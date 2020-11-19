@@ -31,6 +31,7 @@
 OSTImage::OSTImage() {
     ResetData();
 }
+
 OSTImage::~OSTImage() {
     ResetData();
 }
@@ -43,42 +44,43 @@ bool OSTImage::LoadFromBlob(IBLOB *bp)
 {
     IDLog("readblob %s %s %i \n",bp->label,bp->name,bp->size);
     ResetData();
+    int status = 0, anynullptr = 0;
+    long naxes[3];
 
     fitsfile *fptr;  // FITS file pointer
-    int status = 0, anynullptr = 0;
-    int hdutype, naxis;
-    int nhdus=0;
-    long fits_size[2];
-    long fpixel[3] = {1,1,1};
-    long naxes[3];
     size_t bsize = static_cast<size_t>(bp->bloblen);
     // load blob to CFITSIO
-    if (fits_open_memfile(&fptr,"",READONLY,&(bp->blob),&bsize,0,NULL,&status) )
+    if (fits_open_memfile(&fptr,"",READONLY,&bp->blob,&bsize,0,NULL,&status) )
+    {
+        IDLog("Unsupported type or read error loading FITS blob\n");
+        return false;
+    } else {
+        stats.size = bp->bloblen;
+    }
+
+    // Use open diskfile as it does not use extended file names which has problems opening
+    // files with [ ] or ( ) in their names.
+    /*QString fileToProcess;
+    fileToProcess = "/home/gilles/ekos6/Light/lum/M_33_Light_lum_60_secs_2020-11-06T22-25-13_139.fits";
+    if (fits_open_diskfile(&fptr,fileToProcess.toLatin1() , READONLY, &status))
     {
         IDLog("Unsupported type or read error loading FITS blob\n");
         return false;
     }
-    if (fits_get_hdu_type(fptr, &hdutype, &status) || hdutype != IMAGE_HDU) {
-        IDLog("FITS file is not of an image\n");
-        fits_close_file(fptr,&status);
+    else
+        stats.size = QFile(fileToProcess).size();*/
+
+    if (fits_movabs_hdu(fptr, 1, IMAGE_HDU, &status))
+    {
+        IDLog("Could not locate image HDU.\n");
+        fits_close_file(fptr, &status);
         return false;
     }
-    // Get HDUs and size
-    fits_get_img_dim(fptr, &naxis, &status);
-    fits_get_img_size(fptr, 2, fits_size, &status);
-    stats.width = (int) fits_size[0];
-    stats.height= (int) fits_size[1];
-    stats.samples_per_channel = stats.width * stats.height;
-    fits_get_num_hdus(fptr,&nhdus,&status);
-    if ((nhdus != 1) || (naxis != 2)) {
-        IDLog("Unsupported type or read error loading FITS file\n");
-        fits_close_file(fptr,&status);
-        return false;
-    }
+
     int fitsBitPix = 0;
     if (fits_get_img_param(fptr, 3, &fitsBitPix, &(stats.ndim), naxes, &status))
     {
-        IDLog("FITS file open error (fits_get_img_param)\n");
+        IDLog("FITS file open error (fits_get_img_param).\n");
         fits_close_file(fptr, &status);
         return false;
     }
@@ -89,6 +91,7 @@ bool OSTImage::LoadFromBlob(IBLOB *bp)
         fits_close_file(fptr, &status);
         return false;
     }
+
     switch (fitsBitPix)
     {
         case BYTE_IMG:
@@ -127,54 +130,58 @@ bool OSTImage::LoadFromBlob(IBLOB *bp)
             break;
         default:
             IDLog("Bit depth %i is not supported.\n",fitsBitPix);
-            fits_close_file(fptr,&status);
+            fits_close_file(fptr, &status);
             return false;
     }
 
+    if (stats.ndim < 3)
+        naxes[2] = 1;
 
-    //clearImageBuffers();
+    if (naxes[0] == 0 || naxes[1] == 0)
+    {
+        IDLog("Image has invalid dimensions %lix %li\n",naxes[0],naxes[1]);
+        return false;
+    }
+
+    stats.width               = static_cast<uint16_t>(naxes[0]);
+    stats.height              = static_cast<uint16_t>(naxes[1]);
+    stats.channels            = static_cast<uint8_t>(naxes[2]);
+    stats.samples_per_channel = stats.width * stats.height;
+
     delete[] m_ImageBuffer;
     m_ImageBuffer = nullptr;
-    //m_BayerBuffer = nullptr;
 
-    //m_Channels = static_cast<uint8_t>(naxes[2]);
-    m_Channels = 16;
-    m_ImageBufferSize = stats.samples_per_channel * m_Channels * static_cast<uint16_t>(stats.bytesPerPixel);
+    m_ImageBufferSize = stats.samples_per_channel * stats.channels * static_cast<uint16_t>(stats.bytesPerPixel);
     m_ImageBuffer = new uint8_t[m_ImageBufferSize];
     if (m_ImageBuffer == nullptr)
     {
         IDLog("FITSData: Not enough memory for image_buffer channel. Requested: %i bytes\n",m_ImageBufferSize);
-        //clearImageBuffers();
         delete[] m_ImageBuffer;
         m_ImageBuffer = nullptr;
-        //m_BayerBuffer = nullptr;
         fits_close_file(fptr, &status);
         return false;
     }
 
-    //long nelements = stats.samples_per_channel * m_Channels;
+    long nelements = stats.samples_per_channel * stats.channels;
 
-    /*rawdata = new unsigned short[stats.width *stats.height ];
-    if (fits_read_pix(fptr, TUSHORT                              , fpixel, stats.width*stats.height , NULL, rawdata, NULL, &status) )
-    if (fits_read_img(fptr, static_cast<uint16_t>(stats.dataType), 1,      stats.width*stats.height, nullptr, m_ImageBuffer, &anynullptr, &status))
-    {
-        IDLog("Error reading data\n");
-        fits_close_file(fptr,&status);
-        return false;
-    }*/
-
+    //long int firstpixel =1;
     //if (fits_read_img(fptr,TUSHORT,1,nelements,nullptr,m_ImageBuffer,&anynullptr,&status))
-    if (fits_read_pix(fptr, static_cast<uint16_t>(stats.dataType), fpixel, stats.width*stats.height, nullptr, m_ImageBuffer, &anynullptr, &status))
+    /*if (fits_read_pix(fptr, static_cast<uint16_t>(stats.dataType), &firstpixel, nelements, nullptr, m_ImageBuffer, &anynullptr, &status))
     {
         IDLog("Error reading imag. %i\n",status);
-        //IDLog("Error reading imag.\n");
+        fits_close_file(fptr, &status);
+        return false;
+    }*/
+    if (fits_read_img(fptr, static_cast<uint16_t>(stats.dataType), 1, nelements, nullptr, m_ImageBuffer, &anynullptr, &status))
+    {
+        IDLog("Error reading imag. %i\n",status);
         fits_close_file(fptr, &status);
         return false;
     }
 
-
     fits_close_file(fptr,&status);
-    CalcStats();
+
+    //CalcStats();
     FindStars();
     IDLog("readblob done %ix%i\n",stats.width ,stats.height );
     return true;
@@ -182,39 +189,44 @@ bool OSTImage::LoadFromBlob(IBLOB *bp)
 
 void OSTImage::CalcStats(void)
 {
-    /*stats.min =65535;
-    stats.max =0;
-    stats.mean=0;
-    stats.median=0;
+    stats.min[0] =65535;
+    stats.max[0] =0;
+    stats.mean[0]=0;
+    stats.median[0]=0;
+    int value;
     long n;
     for (int i=0;i<stats.width ;i++) {
         for (int j=0;j<stats.height ;j++) {
             n=j*stats.width  +i;
-            stats.mean=(n*stats.mean+rawdata[n]);
-            stats.mean=stats.mean/(n+1);
-            //if (rawdata[j*stats.width  +i] > 1000 )IDLog("%i %i %i\n",i,j,rawdata[j*stats.width  +i]);
-            if (rawdata[n] > stats.max ) stats.max = rawdata[n];
-            if (rawdata[n] < stats.min ) stats.min = rawdata[n];
+            value = static_cast<uint16_t>(m_ImageBuffer[n]);
+            stats.mean[0]=(n*stats.mean[0]+value);
+            stats.mean[0]=stats.mean[0]/(n+1);
+            //if (value > 125 )IDLog("%i %i %i\n",i,j,value);
+            if (value > stats.max[0] ) stats.max[0] = value;
+            if (value < stats.min[0] ) stats.min[0] = value;
         }
-    }*/
-    //IDLog("Min=%i Max=%i Avg=%.2f Med=%i\n",stats.min,stats.max,stats.mean,stats.median);
+    }
+    stats.min[0] =2;
+    stats.max[0] =200;
+    stats.mean[0]=50;
+    stats.median[0]=50;
+
+    IDLog("Min=%f Max=%f Avg=%.2f Med=%f\n",stats.min[0],stats.max[0],stats.mean[0],stats.median[0]);
 }
 
 void OSTImage::FindStars(void)
 {
-
-    //IDLog("before\n");
-    stellarSolver.reset(new StellarSolver(stats, m_ImageBuffer));
-    //stellarSolver = new StellarSolver(stats, m_ImageBuffer);
-    //stellarSolver->setParent(this->parent());
-    //stellarSolver->moveToThread(this->thread());
-    //IDLog("after\n");
-    connect(stellarSolver.get(),&StellarSolver::logOutput,this,&OSTImage::sslogOutput);
-    connect(stellarSolver.get(),&StellarSolver::ready,this,&OSTImage::ssReady);
-    //stellarSolver->setParent(this->parent());
+    HFRavg=99;
+    stellarSolver = new StellarSolver(stats, m_ImageBuffer,this);
+    stellarSolver->moveToThread(this->thread());
+    stellarSolver->setParent(this);
+    connect(stellarSolver,&StellarSolver::logOutput,this,&OSTImage::sslogOutput);
+    connect(stellarSolver,&StellarSolver::ready,this,&OSTImage::ssReady);
     stellarSolver->setLogLevel(LOG_ALL);
     stellarSolver->setSSLogLevel(LOG_VERBOSE);
-    printf("SS version = %s\n",stellarSolver->getVersion().toUtf8().data());
+    //printf("--------%s\n",stellarSolver->getCommandString().toStdString().c_str());
+    //printf("%s\n",stellarSolver->getCommandString().data());
+    //printf("%s\n",stellarSolver->getCommandString().toUtf8().data());
     //stellarSolver.m_ExtractorType
     /*typedef enum { EXTRACT,            //This just sextracts the sources
                    EXTRACT_WITH_HFR,   //This sextracts the sources and finds the HFR
@@ -231,41 +243,32 @@ void OSTImage::FindStars(void)
                    SOLVER_ASTAP,            //This uses a local installation of ASTAP
                    SOLVER_ONLINEASTROMETRY  //This uses the online astrometry.net or ASTAP
                  } SolverType;    */
-    stellarSolver->setProperty("ProcessType",EXTRACT);
+    stellarSolver->setProperty("ProcessType",EXTRACT_WITH_HFR);
     stellarSolver->setProperty("ExtractorType",EXTRACTOR_INTERNAL);
     stellarSolver->setProperty("SolverType",SOLVER_STELLARSOLVER);
-    stellarSolver->setParameterProfile(SSolver::Parameters::ALL_STARS);
-    stellarSolver->clearSubFrame();
-
+    //stellarSolver->clearSubFrame();
+    //stellarSolver->extract(true);
     stellarSolver->start();
     IDLog("stellarSolver Start\n");
-/*    while(!stellarSolver.isNull() && !stellarSolver->finished();)
-    {
-        usleep(1000000);
-        stars = stellarSolver->getStarList();
-        IDLog("got %i stars\n",stellarSolver->getStarList().size());
-        //IDLog(".");
 
-    }
-    IDLog("\n");
-    usleep(5000000);
-    stars = stellarSolver->getStarList();
-    IDLog("got %i stars\n",stellarSolver->getStarList().size());*/
 
 }
 
 void OSTImage::sslogOutput(QString text)
 {
-    printf("logoutpout\n");
-    IDLog("%s\n",text.toUtf8().data());
+    IDLog("Stellarsolver log %s\n",text.toUtf8().data());
 }
 void OSTImage::ssReady(void)
 {
-    printf("ssready\n");
     IDLog("stellarSolver ready\n");
     stars = stellarSolver->getStarList();
-    //IDLog("got %i stars\n",stellarSolver->getStarList().size());
-    IDLog("ssready\n");
+    IDLog("got %i stars\n",stars.size());
+    for (int i=0;i<stars.size();i++)
+    {
+        //IDLog("HFR %i %f\n",i,stars[i].HFR);
+        HFRavg=(i*HFRavg + stars[i].HFR)/(i+1);
+    }
+    IDLog("HFRavg %f\n",HFRavg);
 
 }
 

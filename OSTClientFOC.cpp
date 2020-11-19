@@ -1,5 +1,5 @@
 #include "OSTClientFOC.h"
-
+#include "OSTImage.h"
 #include <basedevice.h>
 #include <cstring>
 #include <fstream>
@@ -8,10 +8,32 @@
 #include <string>
 #include <unistd.h>
 #include <inttypes.h>
-using namespace std;
+
+//using namespace std;
+
+//Includes for this project
+#include <structuredefinitions.h>
+#include <stellarsolver.h>
+//QT Includes
+//QT Includes
+#include <QDir>
+#include <QThread>
+#include <QMap>
+#include <QVariant>
+#include <QVector>
+#include <QRect>
+#include <QPointer>
 
 
+/**************************************************************************************
+**
+***************************************************************************************/
+OSTClientFOC::OSTClientFOC()
+{
+    //IDLog("OSTClientFOC %s Device...\n", dp->getDeviceName());
+    img.reset(new OSTImage());
 
+}
 /**************************************************************************************
 **
 ***************************************************************************************/
@@ -52,8 +74,7 @@ void OSTClientFOC::newMessage(INDI::BaseDevice *dp, int messageID)
 void OSTClientFOC::newBLOB(IBLOB *bp)
 {
     IDLog("OSTClientFOC newblob from %s\n",bp->name);
-    img.moveToThread(this->thread());
-    img.LoadFromBlob(bp);
+    img->LoadFromBlob(bp);
 }
 /**************************************************************************************
 **

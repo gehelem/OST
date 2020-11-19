@@ -18,6 +18,7 @@
 #include <QRect>
 #include <QPointer>
 
+
 class OSTImage : public QObject
 {
     Q_OBJECT
@@ -26,21 +27,19 @@ public:
     ~OSTImage();
 // Stellasolver stuff
     FITSImage::Statistic stats;
-    std::unique_ptr<StellarSolver> stellarSolver =nullptr;
-    //StellarSolver *stellarSolver;
+    //std::unique_ptr<StellarSolver> stellarSolver =nullptr;
+    QPointer<StellarSolver> stellarSolver;
     QList<FITSImage::Star> stars;
-    // Number of channels
     uint8_t m_Channels { 1 };
-    // Generic data image buffer
     uint8_t *m_ImageBuffer { nullptr };
-    // Above buffer size in bytes
     uint32_t m_ImageBufferSize { 0 };
+    float HFRavg;
 
     bool LoadFromBlob(IBLOB *bp);
     void ResetData(void);
     void CalcStats(void);
     void FindStars(void);
-//public slots:
+public slots:
     void sslogOutput(QString text);
     void ssReady(void);
 };

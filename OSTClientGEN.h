@@ -1,3 +1,5 @@
+#ifndef OSTClientGEN_h_
+#define OSTClientGEN_h_
 #pragma once
 
 #include "baseclient.h"
@@ -37,3 +39,5 @@ private:
     std::string client_name="defaultname";
 
 };
+
+#endif

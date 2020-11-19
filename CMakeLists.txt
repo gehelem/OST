@@ -12,7 +12,7 @@ set(CMAKE_AUTORCC ON)
 find_package(CFITSIO REQUIRED)
 find_package(INDI COMPONENTS client REQUIRED)
 find_package(ZLIB REQUIRED)
-find_package(Threads REQUIRED)
+#find_package(Threads REQUIRED)
 find_package(Nova REQUIRED)
 find_package(GSL REQUIRED)
 find_package(OpenCV REQUIRED )
@@ -35,7 +35,7 @@ include(CMakeCommon)
 
 
 SET( APP_LIB_IMG OSTImage )
-add_library(${APP_LIB_IMG} ${CMAKE_CURRENT_SOURCE_DIR}/OSTImage.cpp
+add_library(${APP_LIB_IMG} SHARED ${CMAKE_CURRENT_SOURCE_DIR}/OSTImage.cpp
     )
 target_link_libraries( ${APP_LIB_IMG}  ${STELLARSOLVER_LIBRARIES} indiclient
     Qt5::Gui
@@ -45,7 +45,7 @@ target_link_libraries( ${APP_LIB_IMG}  ${STELLARSOLVER_LIBRARIES} indiclient
     Qt5::Concurrent
     ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
     ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
-    z -pthread
+    z -lpthread
     )
 
 SET( APP_LIB_GEN OSTClientGEN )
@@ -60,12 +60,12 @@ target_link_libraries( ${APP_LIB_GEN}  indiclient
     ${STELLARSOLVER_LIBRARIES}
     ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
     ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
-    z -pthread
+    z -lpthread
     )
 
 SET( APP_LIB_FOC OSTClientFOC )
 add_library(${APP_LIB_FOC} SHARED ${CMAKE_CURRENT_SOURCE_DIR}/OSTClientFOC.cpp)
-target_link_libraries( ${APP_LIB_FOC}  indiclient
+target_link_libraries( ${APP_LIB_FOC}  indiclient  ${APP_LIB_IMG}
     Qt5::Gui
     Qt5::Widgets
     Qt5::Core
@@ -74,7 +74,7 @@ target_link_libraries( ${APP_LIB_FOC}  indiclient
     ${STELLARSOLVER_LIBRARIES}
     ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
     ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
-    z -pthread
+    z -lpthread
     )
 
 SET( APP_LIB_SEQ OSTClientSEQ )
@@ -88,14 +88,16 @@ target_link_libraries( ${APP_LIB_SEQ}  indiclient
     ${STELLARSOLVER_LIBRARIES}
     ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
     ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
-    z -pthread
+    z -lpthread
     )
 
 
 
-SET( APP_EXE OSTController )
+SET( APP_EXE OSTTester )
 
-add_executable( ${APP_EXE} ${CMAKE_CURRENT_SOURCE_DIR}/OSTController.cpp
+add_executable( ${APP_EXE}
+        ${CMAKE_CURRENT_SOURCE_DIR}/OSTController.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/OSTTester.cpp
     )
 
 target_link_libraries( ${APP_EXE}  indiclient
@@ -108,12 +110,12 @@ target_link_libraries( ${APP_EXE}  indiclient
     ${APP_LIB_GEN} ${APP_LIB_SEQ} ${APP_LIB_FOC} ${APP_LIB_IMG}
     ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
     ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
-    z -pthread
+    z -lpthread
     )
 #install(TARGETS HeadlessObservatory RUNTIME DESTINATION bin)
 
-get_cmake_property(_variableNames VARIABLES)
-list (SORT _variableNames)
-foreach (_variableName ${_variableNames})
-    message(STATUS "${_variableName}=${${_variableName}}")
-endforeach()
+#get_cmake_property(_variableNames VARIABLES)
+#list (SORT _variableNames)
+#foreach (_variableName ${_variableNames})
+#    message(STATUS "${_variableName}=${${_variableName}}")
+#endforeach()
