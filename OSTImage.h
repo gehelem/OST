@@ -42,6 +42,8 @@ public:
 public slots:
     void sslogOutput(QString text);
     void ssReady(void);
+signals:
+    void success(void);
 };
 
 #endif

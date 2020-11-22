@@ -1,3 +1,4 @@
+#include "OSTClientGEN.h"
 #include "OSTClientSEQ.h"
 #include "OSTClientFOC.h"
 

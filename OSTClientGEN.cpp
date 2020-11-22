@@ -14,19 +14,29 @@ OSTClientGEN::OSTClientGEN()
 {
 
 }
+void OSTClientGEN::askNewJob(std::string job)
+{
+    IDLog("%s Controler is asking %s\n",client_name.c_str(),job.c_str());
+}
+
+
+void OSTClientGEN::switchstate(std::string newstate)
+{
+    IDLog("%s switchstate %s->%s\n",client_name.c_str(),state.c_str(),newstate.c_str());
+    state = newstate;
+    emit s_newstate();
+}
 
 /**************************************************************************************
 **
 ***************************************************************************************/
 void OSTClientGEN::setOSTDevices(std::string wcamera,std::string wfocuser,std::string wmount,std::string wwheel,std::string wguider)
 {
-    IDLog("OSTClientGEN setOSTDevices %s-%s-%s-%s-%s \n", wcamera.c_str(),wfocuser.c_str(),wmount.c_str(),wwheel.c_str(),wguider.c_str());
-
-    camera = getDevice(wcamera.c_str());
-    focuser = getDevice(wfocuser.c_str());
-    mount = getDevice(wmount.c_str());
-    wheel = getDevice(wwheel.c_str());
-    guider = getDevice(wguider.c_str());
+    camera_name = wcamera;
+    focuser_name = wfocuser;
+    mount_name = wmount;
+    wheel_name = wwheel;
+    guider_name = wguider;
 }
 /**************************************************************************************
 **
@@ -61,6 +71,19 @@ void OSTClientGEN::disconnectallOSTDevices(void)
 void OSTClientGEN::newDevice(INDI::BaseDevice *dp)
 {
     IDLog("%s OSTClientGEN %s Device...\n", client_name.c_str(), dp->getDeviceName());
+    if (strcmp(dp->getDeviceName(), camera_name.c_str()) == 0)
+    {
+        camera = getDevice(dp->getDeviceName());
+        watchDevice(camera->getDeviceName());
+        setBLOBMode(B_ALSO, camera->getDeviceName(), nullptr);
+
+    }
+    if (strcmp(dp->getDeviceName(), focuser_name.c_str()) == 0)
+    {
+        focuser = getDevice(dp->getDeviceName());
+        watchDevice(focuser->getDeviceName());
+
+    }
 
 }
 

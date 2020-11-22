@@ -3,17 +3,15 @@
 
 OSTController::OSTController()
 {
-    IDLog("OSTController instanciation1\n");
     MyOSTClientFOC.reset(new OSTClientFOC());
 
-    MyOSTClientFOC->setClientname("focus");
+    MyOSTClientFOC->setClientname("FOC");
+    MyOSTClientFOC->setOSTDevices("CCD Simulator","Focuser Simulator","","","");
     MyOSTClientFOC->setServer("localhost", 7624);
     MyOSTClientFOC->connectServer();
     usleep(500000);
-    MyOSTClientFOC->setOSTDevices("CCD Simulator","Focuser Simulator","","","");
-    usleep(500000);
-    MyOSTClientFOC->startFocusing();
-    IDLog("OSTController instanciation99\n");
+    MyOSTClientFOC->startFocusing(30000,100,200,10);
+    //MyOSTClientFOC->askNewJob("coarse");
 }
 
 OSTController::~OSTController()

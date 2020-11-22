@@ -1,25 +1,47 @@
 #ifndef OSTClientGEN_h_
 #define OSTClientGEN_h_
 #pragma once
-
+#include "OSTClientGEN.h"
+#include "OSTImage.h"
+//QT Includes
+//QT Includes
+#include <QDir>
+#include <QThread>
+#include <QMap>
+#include <QVariant>
+#include <QVector>
+#include <QRect>
+#include <QPointer>
 #include "baseclient.h"
 
-class OSTClientGEN : public  INDI::BaseClient
+class OSTClientGEN : public QObject, public  INDI::BaseClient
 {
+    Q_OBJECT
   public:
     OSTClientGEN();
     ~OSTClientGEN() = default;
 
     void setClientname(std::string n);
+    void askNewJob(std::string job);
     void connectallOSTDevices(void);
     void disconnectallOSTDevices(void);
     void setOSTDevices(std::string wcamera,std::string wfocuser,std::string wmount,std::string wwheel,std::string wguider);
+    void switchstate(std::string newstate);
     INDI::BaseDevice *camera;
     INDI::BaseDevice *focuser;
     INDI::BaseDevice *mount;
     INDI::BaseDevice *wheel;
     INDI::BaseDevice *guider;
+    std::string camera_name="CCD Simulator";
+    std::string focuser_name="Focuser Simulator";
+    std::string mount_name="Telescope Simulator";
+    std::string wheel_name="Filter Simulator";
+    std::string guider_name="Guide Simulator";
     //std::vector<INDI::Property *> pAll;
+    std::string client_name="generic";
+    std::string state="idle";
+    std::string job="";
+
 
   protected:
     virtual void newDevice(INDI::BaseDevice *dp);
@@ -36,7 +58,9 @@ class OSTClientGEN : public  INDI::BaseClient
     virtual void serverDisconnected(int exit_code);
 
 private:
-    std::string client_name="defaultname";
+
+signals:
+    void s_newstate(void);
 
 };
 

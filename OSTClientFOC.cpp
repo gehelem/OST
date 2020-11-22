@@ -30,16 +30,36 @@
 ***************************************************************************************/
 OSTClientFOC::OSTClientFOC()
 {
-    //IDLog("OSTClientFOC %s Device...\n", dp->getDeviceName());
     img.reset(new OSTImage());
-
+    connect(img.get(),&OSTImage::success,this,&OSTClientFOC::sssuccess);
 }
+
 /**************************************************************************************
 **
 ***************************************************************************************/
-void OSTClientFOC::newDevice(INDI::BaseDevice *dp)
+void OSTClientFOC::sssuccess()
 {
-    IDLog("OSTClientFOC %s Device...\n", dp->getDeviceName());
+    if (state=="FN4") {
+        IDLog("%s Analyse %i done HFRavg= %f \n",client_name.c_str(),Fs,img->HFRavg);
+        Fs++;
+        if (Fs>=Fnb) {
+            /*...*/
+            switchstate("F5");
+        } else {
+            IDLog("%s moving to next position %i\n",client_name.c_str(),Fs);
+            INumberVectorProperty *pos = nullptr;
+            pos = focuser->getNumber("ABS_FOCUS_POSITION");
+            if (pos== nullptr)
+            {
+                IDLog("%s Error: unable to find %s ABS_FOCUS_POSITION property...\n",client_name.c_str(),focuser->getDeviceName());
+                return;
+            }
+            pos->np[0].value = Fpos+Fs*Fincr;
+            sendNewNumber(pos);
+            switchstate("FN2");
+
+        }
+    }
 }
 
 /**************************************************************************************
@@ -47,7 +67,11 @@ void OSTClientFOC::newDevice(INDI::BaseDevice *dp)
 *************************************************************************************/
 void OSTClientFOC::newProperty(INDI::Property *property)
 {
-    IDLog("OSTClientFOC %s Device %s property\n",property->getDeviceName(),property->getName());
+    if ((strcmp(property->getName(), "ABS_FOCUS_POSITION") == 0)&&(strcmp(property->getDeviceName(), focuser_name.c_str()) == 0))
+    {
+        IDLog("%s %s Device %s property\n",client_name.c_str(),property->getDeviceName(),property->getName());
+        //watchProperty(property->getDeviceName(),property->getName());
+    }
 
 }
 
@@ -56,7 +80,39 @@ void OSTClientFOC::newProperty(INDI::Property *property)
 ***************************************************************************************/
 void OSTClientFOC::newNumber(INumberVectorProperty *nvp)
 {
-    //IDLog("OSTClientFOC Receving new number %s : %g C\n", nvp->device,nvp->np[0].value);
+    if ((strcmp(nvp->name, "ABS_FOCUS_POSITION") == 0)&&(strcmp(nvp->device, focuser->getDeviceName()) == 0))
+    {
+       IDLog("%s Device %s new %s value : %g\n",client_name.c_str(),nvp->device,nvp->name,nvp->np[0].value);
+
+       if ((state=="F1")&&(nvp->np[0].value=Fpos-Fbl)) {
+           IDLog("%s first position reached, going to start position\n",client_name.c_str());
+           nvp->np[0].value = Fpos;
+           sendNewNumber(nvp);
+           switchstate("FN2");
+       }
+
+       if ((state=="FN2") && (nvp->np[0].value=Fpos+Fs*Fincr)) {
+           //Fs++;
+           if (Fs >= Fnb) {
+               /*...*/
+
+           } else {
+               IDLog("%s position %i reached, taking exposure\n",client_name.c_str(),Fs);
+               INumberVectorProperty *ccd_exposure = nullptr;
+               ccd_exposure = camera->getNumber("CCD_EXPOSURE");
+               if (ccd_exposure == nullptr)
+               {
+                   IDLog("Error: unable to find CCD Simulator CCD_EXPOSURE property...\n");
+                   return;
+               }
+               ccd_exposure->np[0].value = 100;
+               sendNewNumber(ccd_exposure);
+               switchstate("FN3");
+
+           }
+       }
+    }
+
 }
 
 /**************************************************************************************
@@ -64,8 +120,7 @@ void OSTClientFOC::newNumber(INumberVectorProperty *nvp)
 ***************************************************************************************/
 void OSTClientFOC::newMessage(INDI::BaseDevice *dp, int messageID)
 {
-    IDLog("OSTClientFOC Recveing message from Server:\n\n########################\n%s\n########################\n\n",
-          dp->messageQueue(messageID).c_str());
+    //IDLog("%s Recveing message from Server:\n\n########################\n%s\n########################\n\n",client_name.c_str(),dp->messageQueue(messageID).c_str());
 }
 
 /**************************************************************************************
@@ -73,54 +128,39 @@ void OSTClientFOC::newMessage(INDI::BaseDevice *dp, int messageID)
 ***************************************************************************************/
 void OSTClientFOC::newBLOB(IBLOB *bp)
 {
-    IDLog("OSTClientFOC newblob from %s\n",bp->name);
-    img->LoadFromBlob(bp);
+    IDLog("%s newblob from %s\n",client_name.c_str(),bp->name);
+    if (state=="FN3") {
+        IDLog("%s exposure %i done : analysing\n",client_name.c_str(),Fs);
+        switchstate("FN4");
+        img->LoadFromBlob(bp);
+    }
 }
+
 /**************************************************************************************
 **
 ***************************************************************************************/
-void OSTClientFOC::setOSTDevices(std::string wcamera,std::string wfocuser,std::string wmount,std::string wwheel,std::string wguider)
+bool OSTClientFOC::startFocusing(int start, int backlash,int incr, int nb)
 {
-    IDLog("OSTClientFOC setOSTDevices %s-%s \n", wcamera.c_str(),wfocuser.c_str());
-
-    focuser = getDevice(wfocuser.c_str());
-    if (focuser!=nullptr) {
-        IDLog("OSTClientFOC able to find focuser device %s\n", wfocuser.c_str());
-        watchDevice(wfocuser.c_str());
-    } else {
-        IDLog("OSTClientFOC unable to find focuser device %s\n", wfocuser.c_str());
-        return;
+    if (!(state=="idle")) {
+        IDLog("%s startFocusing\n",client_name.c_str());
+        return false;
     }
-
-    camera = getDevice(wcamera.c_str());
-    if (camera!=nullptr) {
-        IDLog("OSTClientFOC able to find camera device %s\n", wcamera.c_str());
-        watchDevice(wcamera.c_str());
-        setBLOBMode(B_ALSO, wcamera.c_str(), nullptr);
-    } else {
-        IDLog("OSTClientFOC unable to find camera device %s\n", wcamera.c_str());
-        return;
-    }
-
-}
-/**************************************************************************************
-**
-***************************************************************************************/
-void OSTClientFOC::startFocusing(void)
-{
-
-    IDLog("OSTClientFOC startFocusing\n");
-    INumberVectorProperty *ccd_exposure = nullptr;
-    IDLog("OSTClientFOC startFocusing2\n");
-    ccd_exposure = camera->getNumber("CCD_EXPOSURE");
-    if (ccd_exposure == nullptr)
+    Fpos=start;
+    Fbl=backlash;
+    Fincr=incr;
+    Fnb=nb;
+    Fs=0;
+    switchstate("init");
+    IDLog("%s startFocusing begin=%i backlash=%i incr=%i nb=%i\n",client_name.c_str(),Fpos,Fbl,Fincr,Fnb);
+    INumberVectorProperty *pos = nullptr;
+    pos = focuser->getNumber("ABS_FOCUS_POSITION");
+    if (pos== nullptr)
     {
-        IDLog("Error: unable to find %s CCD_EXPOSURE property...\n",camera->getDeviceName());
-        return;
+        IDLog("%s Error: unable to find %s ABS_FOCUS_POSITION property...\n",client_name.c_str(),focuser->getDeviceName());
+        return false;
     }
-    IDLog("OSTClientFOC startFocusing3\n");
-    ccd_exposure->np[0].value = 100;
-    IDLog("OSTClientFOC startFocusing4\n");
-    sendNewNumber(ccd_exposure);
-    IDLog("OSTClientFOC startFocusing5\n");
+    pos->np[0].value = Fpos-Fbl;
+    sendNewNumber(pos);
+    switchstate("F1");
+    return true;
 }

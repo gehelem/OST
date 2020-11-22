@@ -15,16 +15,17 @@
 #include <QRect>
 #include <QPointer>
 
-class OSTClientFOC : public QObject, public OSTClientGEN
+class OSTClientFOC : public OSTClientGEN
 {
     Q_OBJECT
   public:
     OSTClientFOC();
     std::unique_ptr<OSTImage> img =nullptr;
-    void startFocusing(void);
-    void setOSTDevices(std::string wcamera,std::string wfocuser,std::string wmount,std::string wwheel,std::string wguider);
+    bool startFocusing(int start, int backlash,int incr, int nb);
+    //void setOSTDevices(std::string wcamera,std::string wfocuser,std::string wmount,std::string wwheel,std::string wguider);
+  public slots:
+    void sssuccess(void);
   protected:
-    virtual void newDevice(INDI::BaseDevice *dp) override;
     virtual void removeDevice(INDI::BaseDevice */*dp*/) override {}
     virtual void newProperty(INDI::Property *property) override;
     virtual void removeProperty(INDI::Property */*property*/) override {}
@@ -35,7 +36,9 @@ class OSTClientFOC : public QObject, public OSTClientGEN
     virtual void newText(ITextVectorProperty */*tvp*/) override {}
     virtual void newLight(ILightVectorProperty */*lvp*/) override {}
   private:
-
+    // simple focus parameters
+    int Fpos,Fbl,Fincr,Fnb;
+    int Fs; // simple focus iterator
 
 };
 

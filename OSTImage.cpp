@@ -42,7 +42,7 @@ void OSTImage::ResetData(void) {
 
 bool OSTImage::LoadFromBlob(IBLOB *bp)
 {
-    IDLog("readblob %s %s %i \n",bp->label,bp->name,bp->size);
+    IDLog("IMG readblob %s %s %i \n",bp->label,bp->name,bp->size);
     ResetData();
     int status = 0, anynullptr = 0;
     long naxes[3];
@@ -52,7 +52,7 @@ bool OSTImage::LoadFromBlob(IBLOB *bp)
     // load blob to CFITSIO
     if (fits_open_memfile(&fptr,"",READONLY,&bp->blob,&bsize,0,NULL,&status) )
     {
-        IDLog("Unsupported type or read error loading FITS blob\n");
+        IDLog("IMG Unsupported type or read error loading FITS blob\n");
         return false;
     } else {
         stats.size = bp->bloblen;
@@ -72,7 +72,7 @@ bool OSTImage::LoadFromBlob(IBLOB *bp)
 
     if (fits_movabs_hdu(fptr, 1, IMAGE_HDU, &status))
     {
-        IDLog("Could not locate image HDU.\n");
+        IDLog("IMG Could not locate image HDU.\n");
         fits_close_file(fptr, &status);
         return false;
     }
@@ -80,14 +80,14 @@ bool OSTImage::LoadFromBlob(IBLOB *bp)
     int fitsBitPix = 0;
     if (fits_get_img_param(fptr, 3, &fitsBitPix, &(stats.ndim), naxes, &status))
     {
-        IDLog("FITS file open error (fits_get_img_param).\n");
+        IDLog("IMG FITS file open error (fits_get_img_param).\n");
         fits_close_file(fptr, &status);
         return false;
     }
 
     if (stats.ndim < 2)
     {
-        IDLog("1D FITS images are not supported.\n");
+        IDLog("IMG 1D FITS images are not supported.\n");
         fits_close_file(fptr, &status);
         return false;
     }
@@ -129,7 +129,7 @@ bool OSTImage::LoadFromBlob(IBLOB *bp)
             stats.bytesPerPixel = sizeof(double);
             break;
         default:
-            IDLog("Bit depth %i is not supported.\n",fitsBitPix);
+            IDLog("IMG Bit depth %i is not supported.\n",fitsBitPix);
             fits_close_file(fptr, &status);
             return false;
     }
@@ -139,7 +139,7 @@ bool OSTImage::LoadFromBlob(IBLOB *bp)
 
     if (naxes[0] == 0 || naxes[1] == 0)
     {
-        IDLog("Image has invalid dimensions %lix %li\n",naxes[0],naxes[1]);
+        IDLog("IMG Image has invalid dimensions %lix %li\n",naxes[0],naxes[1]);
         return false;
     }
 
@@ -155,7 +155,7 @@ bool OSTImage::LoadFromBlob(IBLOB *bp)
     m_ImageBuffer = new uint8_t[m_ImageBufferSize];
     if (m_ImageBuffer == nullptr)
     {
-        IDLog("FITSData: Not enough memory for image_buffer channel. Requested: %i bytes\n",m_ImageBufferSize);
+        IDLog("IMG FITSData: Not enough memory for image_buffer channel. Requested: %i bytes\n",m_ImageBufferSize);
         delete[] m_ImageBuffer;
         m_ImageBuffer = nullptr;
         fits_close_file(fptr, &status);
@@ -174,7 +174,7 @@ bool OSTImage::LoadFromBlob(IBLOB *bp)
     }*/
     if (fits_read_img(fptr, static_cast<uint16_t>(stats.dataType), 1, nelements, nullptr, m_ImageBuffer, &anynullptr, &status))
     {
-        IDLog("Error reading imag. %i\n",status);
+        IDLog("IMG Error reading imag. %i\n",status);
         fits_close_file(fptr, &status);
         return false;
     }
@@ -183,7 +183,7 @@ bool OSTImage::LoadFromBlob(IBLOB *bp)
 
     //CalcStats();
     FindStars();
-    IDLog("readblob done %ix%i\n",stats.width ,stats.height );
+    IDLog("IMG readblob done %ix%i\n",stats.width ,stats.height );
     return true;
 }
 
@@ -211,7 +211,7 @@ void OSTImage::CalcStats(void)
     stats.mean[0]=50;
     stats.median[0]=50;
 
-    IDLog("Min=%f Max=%f Avg=%.2f Med=%f\n",stats.min[0],stats.max[0],stats.mean[0],stats.median[0]);
+    IDLog("IMG Min=%f Max=%f Avg=%.2f Med=%f\n",stats.min[0],stats.max[0],stats.mean[0],stats.median[0]);
 }
 
 void OSTImage::FindStars(void)
@@ -249,26 +249,27 @@ void OSTImage::FindStars(void)
     //stellarSolver->clearSubFrame();
     //stellarSolver->extract(true);
     stellarSolver->start();
-    IDLog("stellarSolver Start\n");
+    IDLog("IMG stellarSolver Start\n");
 
 
 }
 
 void OSTImage::sslogOutput(QString text)
 {
-    IDLog("Stellarsolver log %s\n",text.toUtf8().data());
+    IDLog("IMG Stellarsolver log : %s\n",text.toUtf8().data());
 }
 void OSTImage::ssReady(void)
 {
-    IDLog("stellarSolver ready\n");
+    IDLog("IMG stellarSolver ready\n");
     stars = stellarSolver->getStarList();
-    IDLog("got %i stars\n",stars.size());
+    IDLog("IMG got %i stars\n",stars.size());
     for (int i=0;i<stars.size();i++)
     {
-        //IDLog("HFR %i %f\n",i,stars[i].HFR);
+        //IDLog("IMG HFR %i %f\n",i,stars[i].HFR);
         HFRavg=(i*HFRavg + stars[i].HFR)/(i+1);
     }
-    IDLog("HFRavg %f\n",HFRavg);
+    IDLog("IMG HFRavg %f\n",HFRavg);
+    emit success();
 
 }
 
