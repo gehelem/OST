@@ -2,7 +2,6 @@
 #define OSTClientFOC_h_
 
 #pragma once
-
 #include "OSTClientGEN.h"
 #include "OSTImage.h"
 //QT Includes
@@ -14,12 +13,18 @@
 #include <QVector>
 #include <QRect>
 #include <QPointer>
+#include <QtCore/QObject>
+#include <QtCore/QList>
+#include <QtCore/QByteArray>
 
 class OSTClientFOC : public OSTClientGEN
 {
     Q_OBJECT
   public:
-    OSTClientFOC();
+
+    OSTClientFOC(QObject *parent = Q_NULLPTR);
+    virtual ~OSTClientFOC();
+
     std::unique_ptr<OSTImage> img =nullptr;
     bool startFocusing(int start, int backlash,int incr, int nb);
     //void setOSTDevices(std::string wcamera,std::string wfocuser,std::string wmount,std::string wwheel,std::string wguider);
@@ -37,9 +42,12 @@ class OSTClientFOC : public OSTClientGEN
     virtual void newLight(ILightVectorProperty */*lvp*/) override {}
   private:
     // simple focus parameters
-    int Fpos,Fbl,Fincr,Fnb;
+    int Fpos,Fbl,Fincr,Fnb,Factpos;
     int Fs; // simple focus iterator
-
+    int FBestpos;
+    float FBestHFR;
+  signals:
+    void focusdone(void);
 };
 
 #endif

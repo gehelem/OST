@@ -1,16 +1,14 @@
 cmake_minimum_required(VERSION 3.0)
 PROJECT(OST C CXX)
-
 LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-include(GNUInstallDirs)
-
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
+#find_package(Qt5Core)
 find_package(CFITSIO REQUIRED)
-find_package(INDI COMPONENTS client REQUIRED)
+find_package(INDI REQUIRED)
+#find_package(INDI COMPONENTS clientqt5 REQUIRED)
 find_package(ZLIB REQUIRED)
 #find_package(Threads REQUIRED)
 find_package(Nova REQUIRED)
@@ -18,7 +16,7 @@ find_package(GSL REQUIRED)
 find_package(OpenCV REQUIRED )
 find_package(CImg REQUIRED )
 find_package(WCSLIB REQUIRED)
-find_package(Qt5 5.4 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network)
+find_package(Qt5 5.4 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets)
 find_package(StellarSolver REQUIRED)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
@@ -33,81 +31,26 @@ include_directories(${QT5Declarative_INCLUDE_DIRS} )
 include_directories(${STELLARSOLVER_INCLUDE_DIR})
 include(CMakeCommon)
 
-
-SET( APP_LIB_IMG OSTImage )
-add_library(${APP_LIB_IMG} SHARED ${CMAKE_CURRENT_SOURCE_DIR}/OSTImage.cpp
-    )
-target_link_libraries( ${APP_LIB_IMG}  ${STELLARSOLVER_LIBRARIES} indiclient
-    Qt5::Gui
-    Qt5::Widgets
-    Qt5::Core
-    Qt5::Network
-    Qt5::Concurrent
-    ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
-    ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
-    z -lpthread
-    )
-
-SET( APP_LIB_GEN OSTClientGEN )
-add_library(${APP_LIB_GEN} SHARED ${CMAKE_CURRENT_SOURCE_DIR}/OSTClientGEN.cpp
-    )
-target_link_libraries( ${APP_LIB_GEN}  indiclient
-    Qt5::Gui
-    Qt5::Widgets
-    Qt5::Core
-    Qt5::Network
-    Qt5::Concurrent
-    ${STELLARSOLVER_LIBRARIES}
-    ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
-    ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
-    z -lpthread
-    )
-
-SET( APP_LIB_FOC OSTClientFOC )
-add_library(${APP_LIB_FOC} SHARED ${CMAKE_CURRENT_SOURCE_DIR}/OSTClientFOC.cpp)
-target_link_libraries( ${APP_LIB_FOC}  indiclient  ${APP_LIB_IMG}
-    Qt5::Gui
-    Qt5::Widgets
-    Qt5::Core
-    Qt5::Network
-    Qt5::Concurrent
-    ${STELLARSOLVER_LIBRARIES}
-    ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
-    ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
-    z -lpthread
-    )
-
-SET( APP_LIB_SEQ OSTClientSEQ )
-add_library(${APP_LIB_SEQ} SHARED ${CMAKE_CURRENT_SOURCE_DIR}/OSTClientSEQ.cpp)
-target_link_libraries( ${APP_LIB_SEQ}  indiclient
-    Qt5::Gui
-    Qt5::Widgets
-    Qt5::Core
-    Qt5::Network
-    Qt5::Concurrent
-    ${STELLARSOLVER_LIBRARIES}
-    ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
-    ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
-    z -lpthread
-    )
-
-
-
 SET( APP_EXE OSTTester )
 
 add_executable( ${APP_EXE}
         ${CMAKE_CURRENT_SOURCE_DIR}/OSTController.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/OSTTester.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/OSTImage.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/OSTClientGEN.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/OSTClientFOC.cpp
+#        ${CMAKE_CURRENT_SOURCE_DIR}/OSTClientSEQ.cpp
     )
 
-target_link_libraries( ${APP_EXE}  indiclient
-    Qt5::Gui
+target_link_libraries( ${APP_EXE}
+    indiclientqt
     Qt5::Widgets
+    Qt5::Gui
     Qt5::Core
     Qt5::Network
     Qt5::Concurrent
+    Qt5::WebSockets
     ${STELLARSOLVER_LIBRARIES}
-    ${APP_LIB_GEN} ${APP_LIB_SEQ} ${APP_LIB_FOC} ${APP_LIB_IMG}
     ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
     ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
     z -lpthread

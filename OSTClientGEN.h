@@ -1,8 +1,7 @@
 #ifndef OSTClientGEN_h_
 #define OSTClientGEN_h_
 #pragma once
-#include "OSTClientGEN.h"
-#include "OSTImage.h"
+
 //QT Includes
 //QT Includes
 #include <QDir>
@@ -12,14 +11,34 @@
 #include <QVector>
 #include <QRect>
 #include <QPointer>
-#include "baseclient.h"
+#include <QtNetwork>
+#include <baseclientqt.h>
+#include <basedevice.h>
+#include <cstring>
+#include <fstream>
+#include <iostream>
+#include <memory>
 
-class OSTClientGEN : public QObject, public  INDI::BaseClient
+enum OSTLogLevel
 {
-    Q_OBJECT
+    OSTLOG_ALL,
+    OSTLOG_NONE,
+    OSTLOG_INFO
+};
+
+struct OSTProperty
+{
+    std::string client_name="generic";
+    std::string state="idle";
+    OSTLogLevel LogLevel=OSTLOG_ALL;
+
+};
+
+class OSTClientGEN : public INDI::BaseClientQt
+{
   public:
-    OSTClientGEN();
-    ~OSTClientGEN() = default;
+    OSTClientGEN(QObject *parent = Q_NULLPTR);
+    virtual ~OSTClientGEN();
 
     void setClientname(std::string n);
     void askNewJob(std::string job);
@@ -32,15 +51,17 @@ class OSTClientGEN : public QObject, public  INDI::BaseClient
     INDI::BaseDevice *mount;
     INDI::BaseDevice *wheel;
     INDI::BaseDevice *guider;
-    std::string camera_name="CCD Simulator";
-    std::string focuser_name="Focuser Simulator";
-    std::string mount_name="Telescope Simulator";
-    std::string wheel_name="Filter Simulator";
-    std::string guider_name="Guide Simulator";
+    std::string camera_name;
+    std::string focuser_name;
+    std::string mount_name;
+    std::string wheel_name;
+    std::string guider_name;
     //std::vector<INDI::Property *> pAll;
     std::string client_name="generic";
     std::string state="idle";
     std::string job="";
+    OSTLogLevel LogLevel;
+    QList<INDI::Property> OSTprops;
 
 
   protected:

@@ -1,14 +1,16 @@
 #pragma once
 
 #include "OSTClientGEN.h"
+#include <baseclientqt.h>
 
 
 
 class OSTClientSEQ : public OSTClientGEN
 {
+    Q_OBJECT
   public:
-    //OSTClientSEQ() ;
-    //~OSTClientSEQ()  = default;
+    OSTClientSEQ(QObject *parent = Q_NULLPTR);
+    virtual ~OSTClientSEQ();
 
   protected:
     virtual void newDevice(INDI::BaseDevice *dp) override;

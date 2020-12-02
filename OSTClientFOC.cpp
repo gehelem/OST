@@ -1,3 +1,4 @@
+#include "OSTClientGEN.h"
 #include "OSTClientFOC.h"
 #include "OSTImage.h"
 #include <basedevice.h>
@@ -8,6 +9,7 @@
 #include <string>
 #include <unistd.h>
 #include <inttypes.h>
+#include <baseclientqt.h>
 
 //using namespace std;
 
@@ -24,27 +26,48 @@
 #include <QRect>
 #include <QPointer>
 
-
 /**************************************************************************************
 **
 ***************************************************************************************/
-OSTClientFOC::OSTClientFOC()
+OSTClientFOC::OSTClientFOC(QObject *parent)// : OSTClientGEN(parent)
 {
-    img.reset(new OSTImage());
-    connect(img.get(),&OSTImage::success,this,&OSTClientFOC::sssuccess);
-}
+    IDLog("%s OSTClientFOC instanciations\n",client_name.c_str());
 
+    //img.reset(new OSTImage());
+    //connect(img.get(),&OSTImage::success,this,&OSTClientFOC::sssuccess);
+
+}
+OSTClientFOC::~OSTClientFOC()
+{
+    //clear();
+}
 /**************************************************************************************
 **
 ***************************************************************************************/
 void OSTClientFOC::sssuccess()
 {
     if (state=="FN4") {
-        IDLog("%s Analyse %i done HFRavg= %f \n",client_name.c_str(),Fs,img->HFRavg);
+        IDLog("%s Analyse %i pos=%i done HFRavg= %f \n",client_name.c_str(),Fs,Factpos,img->HFRavg);
+        if (img->HFRavg < FBestHFR){
+            FBestHFR = img->HFRavg;
+            FBestpos = Factpos;
+            IDLog("%s New best position found %i %f\n",client_name.c_str(),FBestpos,img->HFRavg);
+        }
         Fs++;
         if (Fs>=Fnb) {
             /*...*/
-            switchstate("F5");
+            IDLog("%s moving to best position %i\n",client_name.c_str(),FBestpos);
+            INumberVectorProperty *pos = nullptr;
+            pos = focuser->getNumber("ABS_FOCUS_POSITION");
+            if (pos== nullptr)
+            {
+                IDLog("%s Error: unable to find %s ABS_FOCUS_POSITION property...\n",client_name.c_str(),focuser->getDeviceName());
+                return;
+            }
+            pos->np[0].value = FBestpos;
+            sendNewNumber(pos);
+            switchstate("idle");
+            emit focusdone();
         } else {
             IDLog("%s moving to next position %i\n",client_name.c_str(),Fs);
             INumberVectorProperty *pos = nullptr;
@@ -54,7 +77,8 @@ void OSTClientFOC::sssuccess()
                 IDLog("%s Error: unable to find %s ABS_FOCUS_POSITION property...\n",client_name.c_str(),focuser->getDeviceName());
                 return;
             }
-            pos->np[0].value = Fpos+Fs*Fincr;
+            Factpos = Fpos+Fs*Fincr;
+            pos->np[0].value = Factpos;
             sendNewNumber(pos);
             switchstate("FN2");
 
@@ -67,10 +91,13 @@ void OSTClientFOC::sssuccess()
 *************************************************************************************/
 void OSTClientFOC::newProperty(INDI::Property *property)
 {
+    if (LogLevel==OSTLOG_ALL) IDLog("%s OSTClientFOC %s Device %s property\n",client_name.c_str(),property->getDeviceName(),property->getName());
+
     if ((strcmp(property->getName(), "ABS_FOCUS_POSITION") == 0)&&(strcmp(property->getDeviceName(), focuser_name.c_str()) == 0))
     {
         IDLog("%s %s Device %s property\n",client_name.c_str(),property->getDeviceName(),property->getName());
         //watchProperty(property->getDeviceName(),property->getName());
+        //startFocusing(30000,100,200,10);
     }
 
 }
@@ -141,9 +168,17 @@ void OSTClientFOC::newBLOB(IBLOB *bp)
 ***************************************************************************************/
 bool OSTClientFOC::startFocusing(int start, int backlash,int incr, int nb)
 {
+    img.reset(new OSTImage());
+    connect(img.get(),&OSTImage::success,this,&OSTClientFOC::sssuccess);
+
     if (!(state=="idle")) {
         IDLog("%s startFocusing\n",client_name.c_str());
         return false;
+    }
+    if (focuser==nullptr) {
+        IDLog("%s startFocusing focuser KO\n",client_name.c_str());
+        return false;
+
     }
     Fpos=start;
     Fbl=backlash;
@@ -159,6 +194,8 @@ bool OSTClientFOC::startFocusing(int start, int backlash,int incr, int nb)
         IDLog("%s Error: unable to find %s ABS_FOCUS_POSITION property...\n",client_name.c_str(),focuser->getDeviceName());
         return false;
     }
+    FBestpos = pos->np[0].value;
+    FBestHFR = 100;
     pos->np[0].value = Fpos-Fbl;
     sendNewNumber(pos);
     switchstate("F1");

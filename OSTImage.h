@@ -17,6 +17,7 @@
 #include <QVector>
 #include <QRect>
 #include <QPointer>
+#include <QtNetwork>
 
 
 class OSTImage : public QObject
