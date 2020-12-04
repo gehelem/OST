@@ -16,6 +16,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QList>
 #include <QtCore/QByteArray>
+#include <OSTCommon.h>
 
 class OSTClientFOC : public OSTClientGEN
 {
@@ -35,10 +36,10 @@ class OSTClientFOC : public OSTClientGEN
     virtual void newProperty(INDI::Property *property) override;
     virtual void removeProperty(INDI::Property */*property*/) override {}
     virtual void newBLOB(IBLOB */*bp*/) override;
-    virtual void newSwitch(ISwitchVectorProperty */*svp*/) override {}
+    virtual void newSwitch(ISwitchVectorProperty *svp);
     virtual void newNumber(INumberVectorProperty *nvp) override ;
     virtual void newMessage(INDI::BaseDevice *dp, int messageID) override;
-    virtual void newText(ITextVectorProperty */*tvp*/) override {}
+    virtual void newText(ITextVectorProperty *tvp);
     virtual void newLight(ILightVectorProperty */*lvp*/) override {}
   private:
     // simple focus parameters

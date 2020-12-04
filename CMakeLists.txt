@@ -38,7 +38,9 @@ add_executable( ${APP_EXE}
         ${CMAKE_CURRENT_SOURCE_DIR}/OSTTester.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/OSTImage.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/OSTClientGEN.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/OSTClientPAN.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/OSTClientFOC.cpp
+#        ${CMAKE_CURRENT_SOURCE_DIR}/OSTCommon.cpp
 #        ${CMAKE_CURRENT_SOURCE_DIR}/OSTClientSEQ.cpp
     )
 

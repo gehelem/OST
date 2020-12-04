@@ -100,13 +100,25 @@ void OSTClientFOC::newProperty(INDI::Property *property)
         //startFocusing(30000,100,200,10);
     }
 
+
 }
+
+void OSTClientFOC::newText(ITextVectorProperty *tvp)
+{
+
+}
+void OSTClientFOC::newSwitch(ISwitchVectorProperty *svp)
+{
+
+}
+
 
 /**************************************************************************************
 **
 ***************************************************************************************/
 void OSTClientFOC::newNumber(INumberVectorProperty *nvp)
 {
+
     if ((strcmp(nvp->name, "ABS_FOCUS_POSITION") == 0)&&(strcmp(nvp->device, focuser->getDeviceName()) == 0))
     {
        IDLog("%s Device %s new %s value : %g\n",client_name.c_str(),nvp->device,nvp->name,nvp->np[0].value);

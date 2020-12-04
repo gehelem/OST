@@ -18,20 +18,14 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <QJsonObject>
+#include <QJsonDocument>
 
 enum OSTLogLevel
 {
     OSTLOG_ALL,
     OSTLOG_NONE,
     OSTLOG_INFO
-};
-
-struct OSTProperty
-{
-    std::string client_name="generic";
-    std::string state="idle";
-    OSTLogLevel LogLevel=OSTLOG_ALL;
-
 };
 
 class OSTClientGEN : public INDI::BaseClientQt
@@ -46,6 +40,7 @@ class OSTClientGEN : public INDI::BaseClientQt
     void disconnectallOSTDevices(void);
     void setOSTDevices(std::string wcamera,std::string wfocuser,std::string wmount,std::string wwheel,std::string wguider);
     void switchstate(std::string newstate);
+
     INDI::BaseDevice *camera;
     INDI::BaseDevice *focuser;
     INDI::BaseDevice *mount;
@@ -56,12 +51,11 @@ class OSTClientGEN : public INDI::BaseClientQt
     std::string mount_name;
     std::string wheel_name;
     std::string guider_name;
-    //std::vector<INDI::Property *> pAll;
     std::string client_name="generic";
     std::string state="idle";
     std::string job="";
     OSTLogLevel LogLevel;
-    QList<INDI::Property> OSTprops;
+    QList<INDI::Property> OSTproperties;
 
 
   protected:

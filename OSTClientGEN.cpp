@@ -8,7 +8,8 @@ OSTClientGEN::OSTClientGEN(QObject *parent)// : INDI::BaseClientQt(parent)
 {
      IDLog("%s OSTClientGEN instanciations\n",client_name.c_str());
     //this->setParent(parent);
-     OSTprops.clear();
+    // OSTprops.clear();
+    //OSTproperties[0].getProperty()
 
 }
 OSTClientGEN::~OSTClientGEN()
@@ -80,6 +81,8 @@ void OSTClientGEN::setClientname(std::string n)
 {
     client_name=n;
 }
+
+
 
 /**************************************************************************************
 **
