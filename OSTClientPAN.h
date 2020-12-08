@@ -1,7 +1,7 @@
 #ifndef OSTClientPAN_h_
 #define OSTClientPAN_h_
-
 #pragma once
+
 #include "OSTClientGEN.h"
 //QT Includes
 //QT Includes
@@ -15,7 +15,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QList>
 #include <QtCore/QByteArray>
-#include <OSTCommon.h>
 
 class OSTClientPAN : public OSTClientGEN
 {

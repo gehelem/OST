@@ -2,6 +2,7 @@
 //#include "OSTClientSEQ.h"
 #include "OSTClientFOC.h"
 #include "OSTClientPAN.h"
+#include "OSTParser.h"
 #include <baseclientqt.h>
 #include "QtWebSockets/qwebsocketserver.h"
 #include "QtWebSockets/qwebsocket.h"
@@ -27,11 +28,7 @@ public:
     void sendjson(QJsonDocument json);
     QWebSocketServer *m_pWebSocketServer;
     QList<QWebSocket *> m_clients;
-    QJsonDocument  nINDItoJSON(INumberVectorProperty *prop);
-    QJsonDocument  tINDItoJSON(ITextVectorProperty *prop);
-    QJsonDocument  sINDItoJSON(ISwitchVectorProperty *prop);
-    QJsonDocument  lINDItoJSON(ILightVectorProperty *prop);
-    QJsonDocument  dINDItoJSON(INDI::BaseDevice *d);
+
 
 private Q_SLOTS:
     void onNewConnection();

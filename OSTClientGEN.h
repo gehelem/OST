@@ -28,6 +28,32 @@ enum OSTLogLevel
     OSTLOG_INFO
 };
 
+
+
+class OSTPropertyDet
+{
+public:
+    std::string name;
+    std::string label;
+    std::string text;
+    double number;
+    ISState swit;
+    IPState light;
+
+};
+
+class OSTProperty
+{
+public:
+    std::string Name;
+    std::string Label;
+    IPState State;
+    ISRule Rule;
+    IPerm Permissions;
+    INDI_PROPERTY_TYPE Type;
+    std::vector<OSTPropertyDet *> propdet;
+};
+
 class OSTClientGEN : public INDI::BaseClientQt
 {
   public:
@@ -40,7 +66,6 @@ class OSTClientGEN : public INDI::BaseClientQt
     void disconnectallOSTDevices(void);
     void setOSTDevices(std::string wcamera,std::string wfocuser,std::string wmount,std::string wwheel,std::string wguider);
     void switchstate(std::string newstate);
-
     INDI::BaseDevice *camera;
     INDI::BaseDevice *focuser;
     INDI::BaseDevice *mount;
@@ -55,7 +80,7 @@ class OSTClientGEN : public INDI::BaseClientQt
     std::string state="idle";
     std::string job="";
     OSTLogLevel LogLevel;
-    QList<INDI::Property> OSTproperties;
+    std::vector<OSTProperty *> OSTproperties;
 
 
   protected:

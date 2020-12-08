@@ -32,7 +32,7 @@
 OSTClientFOC::OSTClientFOC(QObject *parent)// : OSTClientGEN(parent)
 {
     IDLog("%s OSTClientFOC instanciations\n",client_name.c_str());
-
+    IDLog("proplabel %s\n",OSTproperties[0]->Label);
     //img.reset(new OSTImage());
     //connect(img.get(),&OSTImage::success,this,&OSTClientFOC::sssuccess);
 

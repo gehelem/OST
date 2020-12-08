@@ -16,7 +16,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QList>
 #include <QtCore/QByteArray>
-#include <OSTCommon.h>
 
 class OSTClientFOC : public OSTClientGEN
 {

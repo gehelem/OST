@@ -2,7 +2,7 @@
 //#include <baseclientqt.h>
 #include <vector>
 #include <string>
-
+#include "OSTParser.h"
 
 
 OSTController::OSTController(QObject *parent)
@@ -91,14 +91,13 @@ void OSTController::startf(void)
 void OSTController::onNewConnection()
 {
     QWebSocket *pSocket = m_pWebSocketServer->nextPendingConnection();
-    IDLog("Echoserver new connection\n");
+    IDLog("new client connection\n");
 
     connect(pSocket, &QWebSocket::textMessageReceived, this, &OSTController::processTextMessage);
     connect(pSocket, &QWebSocket::binaryMessageReceived, this, &OSTController::processBinaryMessage);
     connect(pSocket, &QWebSocket::disconnected, this, &OSTController::socketDisconnected);
 
     m_clients << pSocket;
-    //MyOSTClientPAN->givemeall();
     emitall();
 }
 
@@ -143,348 +142,116 @@ void OSTController::emitnewprop(INDI::Property *property) {
     //IDLog("emit new prop %s\n",property->getName());
 }
 void OSTController::emitnewtext(ITextVectorProperty *prop) {
-    sendjson(tINDItoJSON(prop));
+    //sendjson(tINDItoJSON(prop));
 }
 void OSTController::emitnewnumber(INumberVectorProperty *prop) {
-    sendjson(nINDItoJSON(prop));
+    //sendjson(nINDItoJSON(prop));
 }
 void OSTController::emitnewswitch(ISwitchVectorProperty *prop) {
-    sendjson(sINDItoJSON(prop));
+    //sendjson(sINDItoJSON(prop));
 }
 void OSTController::emitnewlight(ILightVectorProperty *prop) {
-    sendjson(lINDItoJSON(prop));
+    //sendjson(lINDItoJSON(prop));
 }
 void OSTController::emitnewdevice(INDI::BaseDevice *d) {
-    sendjson(dINDItoJSON(d));
+    //sendjson(dINDItoJSON(d));
 }
 void OSTController::emitall(void){
-    QJsonArray pros,devs,numbers,texts,swits,lights,groups;
-    QJsonObject pro,dev,rt,number,text,swit,light,group;
+    QJsonObject dev,client,grp,prop,num;
+    QJsonArray alldev,allclient,allgrp,allprop,allnum;
+    allclient = QJsonArray();
+    client=QJsonObject();
+    client["ClientName"]="OSTCLientPAN";
+    client["ClientLabel"]="INDI control panel";
+
+    for (int i=0;i<MyOSTClientPAN->getDevices().size();i++) {
+        dev=QJsonObject();
+        dev["DeviceName"]=MyOSTClientPAN->getDevices()[i]->getDeviceName();
+        dev["groups"]=IDevToJson(MyOSTClientPAN->getDevices()[i]);
+        alldev.append(dev);
+    }
+    client["devices"]=alldev;
+    allclient.append(client);
+
+    client=QJsonObject();
+    client["ClientName"]="MAINCONTROL";
+    client["ClientLabel"]="Main control";
+    dev=QJsonObject();
+    dev["DeviceName"]="Global parameters";
+    grp=QJsonObject();
+    allgrp=QJsonArray();
+    grp["GroupName"]="Optics";
+
+    prop=QJsonObject();
+    allprop=QJsonArray();
+    prop["Name"]="SCOPE";
+    prop["Label"]="Main scope values";
+    prop["Permission"]="IP_RW";
+    prop["State"]="IPS_IDLE";
+    prop["Type"]="INDI_NUMBER";
+
+    allnum=QJsonArray();
+    num=QJsonObject();
+    num["name"]="MFL";
+    num["label"]="Focal length (mm)";
+    num["value"]=800;
+    allnum.append(num);
+    num=QJsonObject();
+    num["name"]="MAP";
+    num["label"]="Diameter (mm)";
+    num["value"]=200;
+    allnum.append(num);
+    prop["Numbers"]=allnum;
+    allprop.append(prop);
+
+    prop=QJsonObject();
+    prop["Name"]="GUIDE";
+    prop["Label"]="Guide scope values";
+    prop["Permission"]="IP_RW";
+    prop["State"]="IPS_IDLE";
+    prop["Type"]="INDI_NUMBER";
+
+    allnum=QJsonArray();
+    num=QJsonObject();
+    num["name"]="GFL";
+    num["label"]="Focal length (mm)";
+    num["value"]=250;
+    allnum.append(num);
+    num=QJsonObject();
+    num["name"]="GAP";
+    num["label"]="Diameter (mm)";
+    num["value"]=60;
+    allnum.append(num);
+    prop["Numbers"]=allnum;
+    allprop.append(prop);
+
+
+    grp["properties"]=allprop;
+    allgrp.append(grp);
+    client["groups"]=allgrp;
+    allclient.append(client);
+
+
+
+    client=QJsonObject();
+    client["ClientName"]="OSTCLientFOC";
+    client["ClientLabel"]="Focuser";
+    //client["devices"]=alldev; ???
+    allclient.append(client);
+
+    client=QJsonObject();
+    client["ClientName"]="OSTCLientSEQ";
+    client["ClientLabel"]="Sequencer";
+    //client["devices"]=alldev; ???
+    allclient.append(client);
+
+    QJsonObject rt;
     rt=QJsonObject();
-    devs=QJsonArray();
-
-    /*for (int i=0;i<MyOSTClientPAN->getDevices().size();i++) {
-        INDI::BaseDevice *d = MyOSTClientPAN->getDevices()[i];
-        dev=QJsonObject();
-        groups=QJsonArray();
-        dev["DeviceName"]=d->getDeviceName();
-        dev["Groups"]=groups;
-        devs.append(dev);
-    }
-    rt["devices"]=devs;
-
-    for (int i=0;i<MyOSTClientPAN->getDevices().size();i++) {
-        INDI::BaseDevice *d = MyOSTClientPAN->getDevices()[i];
-        std::vector<INDI::Property *> allprops = *d->getProperties();
-        for (int j=0;j<allprops.size();j++) {
-
-        }
-    }
-    rt["devices"]=devs;*/
-
-
-    for (int i=0;i<MyOSTClientPAN->getDevices().size();i++) {
-        INDI::BaseDevice *d = MyOSTClientPAN->getDevices()[i];
-        dev=QJsonObject();
-        dev["DeviceName"]=d->getDeviceName();
-        std::vector<INDI::Property *> allprops = *d->getProperties();
-        pros=QJsonArray();
-        for (int j=0;j<allprops.size();j++) {
-            pro=QJsonObject();
-            pro["Name"]=allprops[j]->getName();
-            pro["Label"]=allprops[j]->getLabel();
-            pro["GroupName"]=allprops[j]->getGroupName();
-            switch(allprops[j]->getState()){
-            case IPS_IDLE:
-                pro["State"]="IPS_IDLE";
-                break;
-            case IPS_OK:
-                pro["State"]="IPS_OK";
-                break;
-            case IPS_BUSY:
-                pro["State"]="IPS_BUSY";
-                break;
-            case IPS_ALERT:
-                pro["State"]="IPS_ALERT";
-                break;
-            }
-
-            switch(allprops[j]->getPermission()){
-            case IP_RO:
-                pro["Permission"]="IP_RO";
-                break;
-            case IP_WO:
-                pro["Permission"]="IP_WO";
-                break;
-            case IP_RW:
-                pro["Permission"]="IP_RW";
-                break;
-            }
-
-            switch (allprops[j]->getType()) {
-
-            case INDI_NUMBER:
-                pro["Type"]="INDI_NUMBER";
-                numbers=QJsonArray();
-                for (int k=0;k<allprops[j]->getNumber()->nnp;k++) {
-                    number=QJsonObject();
-                    number["value"]=allprops[j]->getNumber()->np[k].value;
-                    number["name"]=allprops[j]->getNumber()->np[k].name;
-                    number["label"]=allprops[j]->getNumber()->np[k].label;
-                    number["format"]=allprops[j]->getNumber()->np[k].format;
-                    number["min"]=allprops[j]->getNumber()->np[k].min;
-                    number["max"]=allprops[j]->getNumber()->np[k].max;
-                    number["step"]=allprops[j]->getNumber()->np[k].step;
-                    numbers.append(number);
-                }
-                pro["Numbers"]=numbers;
-                break;
-
-            case INDI_TEXT:
-                pro["Type"]="INDI_TEXT";
-                texts=QJsonArray();
-                for (int k=0;k<allprops[j]->getText()->ntp;k++) {
-                    text=QJsonObject();
-                    text["name"]=allprops[j]->getText()->tp[k].name;
-                    text["label"]=allprops[j]->getText()->tp[k].label;
-                    text["text"]=allprops[j]->getText()->tp[k].text;
-                    texts.append(text);
-                }
-                pro["Texts"]=texts;
-                break;
-            case INDI_LIGHT:
-                pro["Type"]="INDI_LIGHT";
-                lights=QJsonArray();
-                for (int k=0;k<allprops[j]->getLight()->nlp;k++) {
-                    light=QJsonObject();
-                    light["name"]=allprops[j]->getLight()->lp[k].name;
-                    light["label"]=allprops[j]->getLight()->lp[k].label;
-                    switch (allprops[j]->getLight()->lp[k].s) {
-                    case IPS_IDLE:
-                        light["light"]="IPS_IDLE";
-                        break;
-                    case IPS_OK:
-                        light["light"]="IPS_OK";
-                        break;
-                    case IPS_BUSY:
-                        light["light"]="IPS_BUSY";
-                        break;
-                    case IPS_ALERT:
-                        light["light"]="IPS_ALERT";
-                        break;
-                    }
-                    lights.append(light);
-                }
-                pro["Lights"]=lights;
-                break;
-            case INDI_SWITCH:
-                pro["Type"]="INDI_SWITCH";
-                switch (allprops[j]->getSwitch()->r){
-                case ISR_1OFMANY:
-                    pro["Rule"] ="ISR_1OFMANY";
-                    break;
-                case ISR_ATMOST1:
-                    pro["Rule"] ="ISR_ATMOST1";
-                    break;
-                case ISR_NOFMANY:
-                    pro["Rule"] ="ISR_NOFMANY";
-                    break;
-                }
-                swits=QJsonArray();
-                for (int k=0;k<allprops[j]->getSwitch()->nsp;k++) {
-                    swit=QJsonObject();
-                    swit["name"]=allprops[j]->getSwitch()->sp[k].name;
-                    swit["label"]=allprops[j]->getSwitch()->sp[k].label;
-                    switch (allprops[j]->getSwitch()->sp[k].s) {
-                    case ISS_ON:
-                        swit["switch"]="ISS_ON";
-                        break;
-                    case ISS_OFF:
-                        swit["switch"]="ISS_OFF";
-                        break;
-                    }
-                    swits.append(swit);
-                }
-                pro["Switchs"]=swits;
-                break;
-            }
-            pros.append(pro);
-
-            dev["Properties"]=pros;
-        }
-        devs.append(dev);
-    }
-    rt["Devices"]=devs;
-
+    rt["Clients"]=allclient;
     QJsonDocument jsondoc(rt);
     sendjson(jsondoc);
-}
 
-QJsonDocument  OSTController::nINDItoJSON(INumberVectorProperty *prop) {
-    QJsonObject json;
-    QJsonArray numbers;
-    json["dev"]="indi";
-    json["basedevice"]="fakebasedevice";
-    json["name"]      =prop->name;
-    json["label"]     =prop->label;
-    json["group"] =prop->group;
-    json["device"]=prop->device;
-    json["timestamp"] =prop->timestamp;
-    json["type"]="INDI_NUMBER";
-    switch(prop->p){
-        case IP_RO:
-            json["perm"]="IP_RO";
-            break;
-        case IP_WO:
-            json["perm"]="IP_WO";
-            break;
-        case IP_RW:
-            json["perm"]="IP_RW";
-            break;
-    }
-
-    for (int i=0;i<prop->nnp;i++) {
-        QJsonObject number;
-        number["value"]=prop->np[i].value;
-        number["name"]=prop->np[i].name;
-        number["label"]=prop->np[i].label;
-        number["format"]=prop->np[i].format;
-        number["min"]=prop->np[i].min;
-        number["max"]=prop->np[i].max;
-        number["step"]=prop->np[i].step;
-        numbers.append(number);
-    };
-    json["number"]=numbers;
-
-    QJsonDocument jsondoc(json);
-    return jsondoc;
+    //sendjson(IProToJson(p));
 }
 
 
-QJsonDocument  OSTController::tINDItoJSON(ITextVectorProperty *prop) {
-    QJsonObject json;
-    QJsonArray texts;
-    json["dev"]="indi";
-    json["basedevice"]="fakebasedevice";
-    json["name"]      =prop->name;
-    json["label"]     =prop->label;
-    json["group"] =prop->group;
-    json["device"]=prop->device;
-    json["timestamp"] =prop->timestamp;
-    json["type"]="INDI_TEXT";
-    switch(prop->p){
-        case IP_RO:
-            json["perm"]="IP_RO";
-            break;
-        case IP_WO:
-            json["perm"]="IP_WO";
-            break;
-        case IP_RW:
-            json["perm"]="IP_RW";
-            break;
-    }
-
-
-    for (int i=0;i<prop->ntp;i++) {
-        QJsonObject text;
-        text["name"]=prop->tp[i].name;
-        text["label"]=prop->tp[i].label;
-        text["text"]=prop->tp[i].text;
-        texts.append(text);
-    };
-    json["text"]=texts;
-
-    QJsonDocument jsondoc(json);
-    return jsondoc;
-}
-
-QJsonDocument  OSTController::sINDItoJSON(ISwitchVectorProperty *prop) {
-    QJsonObject json;
-    QJsonArray switchs;
-    json["dev"]="indi";
-    json["basedevice"]="fakebasedevice";
-    json["name"]      =prop->name;
-    json["label"]     =prop->label;
-    json["group"] =prop->group;
-    json["device"]=prop->device;
-    json["timestamp"] =prop->timestamp;
-    json["type"]="INDI_SWITCH";
-    switch(prop->p){
-        case IP_RO:
-            json["perm"]="IP_RO";
-            break;
-        case IP_WO:
-            json["perm"]="IP_WO";
-            break;
-        case IP_RW:
-            json["perm"]="IP_RW";
-            break;
-    }
-
-
-    for (int i=0;i<prop->nsp;i++) {
-        QJsonObject swit;
-        swit["name"]=prop->sp[i].name;
-        swit["label"]=prop->sp[i].label;
-        switch (prop->sp[i].s) {
-            case ISS_ON:
-                swit["s"]="ISS_ON";
-                break;
-            case ISS_OFF:
-                swit["s"]="ISS_OFF";
-                break;
-        }
-        switchs.append(swit);
-    };
-    json["switch"]=switchs;
-
-    QJsonDocument jsondoc(json);
-    return jsondoc;
-}
-
-
-QJsonDocument  OSTController::lINDItoJSON(ILightVectorProperty *prop) {
-    QJsonObject json;
-    QJsonArray lights;
-    json["dev"]="indi";
-    json["basedevice"]="fakebasedevice";
-    json["name"]      =prop->name;
-    json["label"]     =prop->label;
-    json["group"]     =prop->group;
-    json["device"]    =prop->device;
-    json["timestamp"] =prop->timestamp;
-    json["type"]="INDI_LIGHT";
-
-
-    for (int i=0;i<prop->nlp;i++) {
-        QJsonObject light;
-        light["name"]=prop->lp[i].name;
-        light["label"]=prop->lp[i].label;
-        switch (prop->lp[i].s) {
-            case IPS_IDLE:
-                light["s"]="IPS_IDLE";
-                break;
-            case IPS_OK:
-                light["s"]="IPS_OK";
-                break;
-            case IPS_BUSY:
-                light["s"]="IPS_BUSY";
-                break;
-            case IPS_ALERT:
-                light["s"]="IPS_ALERT";
-                break;
-        }
-        lights.append(light);
-    };
-    json["lights"]=lights;
-
-    QJsonDocument jsondoc(json);
-    return jsondoc;
-}
-QJsonDocument  OSTController::dINDItoJSON(INDI::BaseDevice *d) {
-    QJsonObject json;
-    json["basedevice"]="fakebasedevice";
-    json["DeviceName"]=d->getDeviceName();
-    QJsonDocument jsondoc(json);
-    return jsondoc;
-}
