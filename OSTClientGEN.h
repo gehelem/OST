@@ -29,31 +29,6 @@ enum OSTLogLevel
 };
 
 
-
-class OSTPropertyDet
-{
-public:
-    std::string name;
-    std::string label;
-    std::string text;
-    double number;
-    ISState swit;
-    IPState light;
-
-};
-
-class OSTProperty
-{
-public:
-    std::string Name;
-    std::string Label;
-    IPState State;
-    ISRule Rule;
-    IPerm Permissions;
-    INDI_PROPERTY_TYPE Type;
-    std::vector<OSTPropertyDet *> propdet;
-};
-
 class OSTClientGEN : public INDI::BaseClientQt
 {
   public:
@@ -76,11 +51,12 @@ class OSTClientGEN : public INDI::BaseClientQt
     std::string mount_name;
     std::string wheel_name;
     std::string guider_name;
-    std::string client_name="generic";
+    std::string client_name="OSTClientGEN";
     std::string state="idle";
     std::string job="";
     OSTLogLevel LogLevel;
-    std::vector<OSTProperty *> OSTproperties;
+    QJsonObject properties;
+
 
 
   protected:

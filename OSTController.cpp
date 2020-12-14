@@ -15,26 +15,60 @@ OSTController::OSTController(QObject *parent)
        connect(m_pWebSocketServer, &QWebSocketServer::newConnection,this, &OSTController::onNewConnection);
        connect(m_pWebSocketServer, &QWebSocketServer::closed, this, &OSTController::closed);
     }
+    properties = QJsonObject();
+    QJsonObject prop;
+    QJsonArray allprops;
+    QFile file;
+    QString val,filetoread;
+    filetoread=PropertiesFolder+"/";
+    file.setFileName(PropertiesFolder+"/OST.json");
+    file.open(QIODevice::ReadOnly | QIODevice::Text);
+    val = file.readAll();
+    file.close();
+    //qWarning() << val;
+    QJsonDocument d = QJsonDocument::fromJson(val.toUtf8());
+    properties = d.object();
 
+    allprops=properties["Clients"].toArray();
+    foreach (const QJsonValue & module, allprops) {
+        QJsonObject mod = module.toObject();
+        IDLog("reading props %s \n",mod["ClientName"].toString().toStdString().c_str());
+        if (mod["ClientName"].toString()=="OSTClientFOC") {
+                IDLog("Got OSTClientFOC\n");
+                MyOSTClientFOC.reset(new OSTClientFOC(parent));
+                MyOSTClientFOC->setClientname("focuser");
+                MyOSTClientFOC->setOSTDevices("CCD Simulator","Focuser Simulator","","","");
+                MyOSTClientFOC->setServer("localhost", 7624);
+                MyOSTClientFOC->connectServer();
+                MyOSTClientFOC->getDevices();
+                QJsonArray alldev;
+                alldev=mod["devices"].toArray();
+                MyOSTClientFOC->properties["devices"]=mod["devices"];
+                //IDLog(" JSON JSON JSON %s \n",QJsonDocument(MyOSTClientFOC->properties).toJson(QJsonDocument::Indented).toStdString().c_str());
+                MyOSTClientFOC->LogLevel=OSTLOG_NONE;
+                QObject::connect(MyOSTClientFOC.get(), &OSTClientFOC::focusdone, this, &OSTController::focusdone);
+        }
 
-    MyOSTClientFOC.reset(new OSTClientFOC(parent));
+    }
+
+    //MyOSTClientFOC.reset(new OSTClientFOC(parent));
     MyOSTClientPAN.reset(new OSTClientPAN(parent));
     //MyOSTClientFOC.reset(new OSTClientFOC());
-    MyOSTClientFOC->setClientname("focuser");
+    //MyOSTClientFOC->setClientname("focuser");
     MyOSTClientPAN->setClientname("indipanel");
-    MyOSTClientFOC->LogLevel=OSTLOG_NONE;
+    //MyOSTClientFOC->LogLevel=OSTLOG_NONE;
     MyOSTClientPAN->LogLevel=OSTLOG_ALL;
-    MyOSTClientFOC->setOSTDevices("CCD Simulator","Focuser Simulator","","","");
+    //MyOSTClientFOC->setOSTDevices("CCD Simulator","Focuser Simulator","","","");
     MyOSTClientPAN->setOSTDevices("CCD Simulator","Focuser Simulator","Telescope Simulator","Filter Simulator","Guide Simulator");
-    MyOSTClientFOC->setServer("localhost", 7624);
+    //MyOSTClientFOC->setServer("localhost", 7624);
     MyOSTClientPAN->setServer("localhost", 7624);
-    MyOSTClientFOC->connectServer();
+    //MyOSTClientFOC->connectServer();
     MyOSTClientPAN->connectServer();
-    MyOSTClientFOC->getDevices();
+    //MyOSTClientFOC->getDevices();
     MyOSTClientPAN->getDevices();
     //server = new EchoServer(1234, true);
     //connect(server        , &EchoServer::startf     , this, &OSTController::startf   );
-    QObject::connect(MyOSTClientFOC.get(), &OSTClientFOC::focusdone, this, &OSTController::focusdone);
+    //QObject::connect(MyOSTClientFOC.get(), &OSTClientFOC::focusdone, this, &OSTController::focusdone);
     //connect(img.get(),&OSTImage::success,this,&OSTClientFOC::sssuccess);
     /*QObject::connect(MyOSTClientPAN.get(), &OSTClientPAN::emitnewprop, this, &OSTController::emitnewprop);
     QObject::connect(MyOSTClientPAN.get(), &OSTClientPAN::emitnewtext, this, &OSTController::emitnewtext);
@@ -59,7 +93,7 @@ void OSTController::focusdone(void)
     IDLog("OSTController saying focus is done\n");
     QWebSocket *pClient = m_clients[0];
     if (pClient) {
-        pClient->sendTextMessage("focus done");
+        //pClient->sendTextMessage("focus done");
     }
 
 }
@@ -104,16 +138,17 @@ void OSTController::onNewConnection()
 
 void OSTController::processTextMessage(QString message)
 {
-    QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
-    /*QJsonDocument doc = QJsonDocument::fromJson(message.toUtf8());
-    QJsonObject obj = doc.object();
-    QVariantMap mainMap = obj.toVariantMap();
-    QVariantMap dataMap = mainMap[1].toMap();*/
+    //QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
 
-    IDLog("Message received %s\n",message.toUtf8());
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(message.toUtf8()); // garder
+    QJsonObject jsonObject = jsonResponse.object(); // garder
 
-    if (pClient) {
-//        pClient->sendTextMessage(message);
+    //IDLog("Message received %s\n",jsonObject["Name"].toString());
+    //qDebug() << "Message received:" << message;
+    qDebug() << "Message received:" << jsonObject["Name"].toString();
+    if (jsonObject["Name"].toString()=="FOC_ACTIONS") {
+        IDLog("Start focusing\n");
+        startf();
     }
 
 }
@@ -157,8 +192,8 @@ void OSTController::emitnewdevice(INDI::BaseDevice *d) {
     //sendjson(dINDItoJSON(d));
 }
 void OSTController::emitall(void){
-    QJsonObject dev,client,grp,prop,num;
-    QJsonArray alldev,allclient,allgrp,allprop,allnum;
+    QJsonObject dev,client,grp,prop,num,swi;
+    QJsonArray alldev,allclient,allgrp,allprop,allnum,allswi;
     allclient = QJsonArray();
     client=QJsonObject();
     client["ClientName"]="OSTCLientPAN";
@@ -176,8 +211,11 @@ void OSTController::emitall(void){
     client=QJsonObject();
     client["ClientName"]="MAINCONTROL";
     client["ClientLabel"]="Main control";
+    alldev=QJsonArray();
     dev=QJsonObject();
     dev["DeviceName"]="Global parameters";
+
+
     grp=QJsonObject();
     allgrp=QJsonArray();
     grp["GroupName"]="Optics";
@@ -228,20 +266,70 @@ void OSTController::emitall(void){
 
     grp["properties"]=allprop;
     allgrp.append(grp);
-    client["groups"]=allgrp;
+    dev["groups"] =allgrp;
+    alldev.append(dev);
+    client["devices"]=alldev;
     allclient.append(client);
 
-
-
-    client=QJsonObject();
+//-------------------------------- foc
+    /*client=QJsonObject();
     client["ClientName"]="OSTCLientFOC";
     client["ClientLabel"]="Focuser";
-    //client["devices"]=alldev; ???
+    alldev=QJsonArray();
+    dev=QJsonObject();
+    dev["DeviceName"]="Global parameters";
+
+
+    grp=QJsonObject();
+    allgrp=QJsonArray();
+    grp["GroupName"]="Controls";
+
+    prop=QJsonObject();
+    allprop=QJsonArray();
+    prop["Name"]="FOC_ACTIONS";
+    prop["Label"]="Actions";
+    prop["Permission"]="IP_RW";
+    prop["State"]="IPS_IDLE";
+    prop["Type"]="INDI_SWITCH";
+
+    allswi=QJsonArray();
+    swi=QJsonObject();
+    swi["name"]="FOC_GO";
+    swi["label"]="Start focusing";
+    swi["switch"]="ISS_OFF";
+    allswi.append(swi);
+    swi=QJsonObject();
+    swi["name"]="FOC_ABORT";
+    swi["label"]="Abort focusing";
+    swi["switch"]="ISS_OFF";
+    allswi.append(swi);
+    prop["Switchs"]=allswi;
+    allprop.append(prop);
+
+
+
+    grp["properties"]=allprop;
+    allgrp.append(grp);
+    dev["groups"] =allgrp;
+    alldev.append(dev);
+    client["devices"]=alldev;
+    allclient.append(client);*/
+//-------------------------------- foc - end
+    client=QJsonObject();
+    client["ClientName"]="OSTCLientFOC";
+    client["ClientLabel"]="OSTCLientFOC Label";
+    client["devices"]=MyOSTClientFOC->properties["devices"];
     allclient.append(client);
 
     client=QJsonObject();
     client["ClientName"]="OSTCLientSEQ";
     client["ClientLabel"]="Sequencer";
+    //client["devices"]=alldev; ???
+    allclient.append(client);
+
+    client=QJsonObject();
+    client["ClientName"]="OST-TonySuperSequencer";
+    client["ClientLabel"]="TonySuperSequencer";
     //client["devices"]=alldev; ???
     allclient.append(client);
 

@@ -28,7 +28,8 @@ public:
     void sendjson(QJsonDocument json);
     QWebSocketServer *m_pWebSocketServer;
     QList<QWebSocket *> m_clients;
-
+    QJsonObject properties;
+    QString PropertiesFolder="/home/gilles/OST";
 
 private Q_SLOTS:
     void onNewConnection();

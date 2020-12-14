@@ -16,7 +16,11 @@ std::set<std::string> GroupsArray(INDI::BaseDevice *dev) {
     std::vector<INDI::Property *> allprops = *dev->getProperties();
     std::set<std::string> groups;
     for (int j=0;j<allprops.size();j++) {
+        //IDLog("--list %s %s %s\n",allprops[j]->getDeviceName(),allprops[j]->getGroupName(),allprops[j]->getName());
         groups.insert(allprops[j]->getGroupName());
+    }
+    for (std::string gr : groups) {
+//        IDLog("idevtojson %s %s\n",dev->getDeviceName(),gr.c_str());
     }
     return groups;
 }
@@ -27,6 +31,7 @@ QJsonArray IDevToJson(INDI::BaseDevice *dev) {
     QJsonObject group,prop;
     QJsonArray groups,props;
     for (std::string gr : GroupsArray(dev)) {
+//        IDLog("idevtojson %s %s\n",dev->getDeviceName(),gr.c_str());
         group=QJsonObject();
         group["GroupName"]=gr.c_str();
         props=QJsonArray();
