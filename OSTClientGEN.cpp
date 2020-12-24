@@ -1,186 +1,121 @@
 #include "OSTClientGEN.h"
-#include <baseclientqt.h>
+#include "OSTParser.h"
 
 /**************************************************************************************
 **
 ***************************************************************************************/
-OSTClientGEN::OSTClientGEN(QObject *parent)// : INDI::BaseClientQt(parent)
+OSTClientGEN::OSTClientGEN(QObject *parent)
 {
-     IDLog("%s OSTClientGEN instanciations\n",client_name.c_str());
+    QJsonArray props,texts,switchs,nums,lights;
+    QJsonObject num,cat,prop,text,swit,group,light;
+
+
+    thismodule["modulename"]="OSTClientGEN";
+    thismodule["modulelabel"]="Generic example Module";
+    thismodule["modulehasgroups"]="Y";
+    thismodule["modulehascategories"]="Y";
+    thismodule["groups"]=QJsonArray();
+
+    categories=QJsonArray();
+    groups=QJsonArray();
+    properties=QJsonArray();
+
+    cat=QJsonObject();
+    cat["categoryname"]="OSTGENCAT_CAT1";
+    cat["categorylabel"]="Category 1";
+    cat["modulename"]=thismodule["modulename"];
+    categories.append(cat);
+
+    cat=QJsonObject();
+    cat["categoryname"]="OSTGENCAT_CAT2";
+    cat["categorylabel"]="Category 2";
+    cat["modulename"]=thismodule["modulename"];
+    categories.append(cat);
+
+    groups=QJsonArray();
+
+    group=QJsonObject();
+    group["groupname"]="OSTGENGRP_GRP1";
+    group["grouplabel"]="Group 1";
+    group["categoryname"]="OSTGENCAT_CAT1";
+    group["modulename"]=thismodule["modulename"];
+    groups.append(group);
+
+    group=QJsonObject();
+    group["groupname"]="OSTGENGRP_GRP2";
+    group["grouplabel"]="Group 2";
+    group["categoryname"]="OSTGENCAT_CAT1";
+    group["modulename"]=thismodule["modulename"];
+    groups.append(group);
+
+    prop=QJsonObject();
+    texts=QJsonArray();
+    text=QJsonObject();
+    text=Otext("OSTGENPRO_TEXT1","Generic text 1","Value - Generic text 1");
+    texts.append(text);
+    text=QJsonObject();
+    text=Otext("OSTGENPRO_TEXT2","Generic text 2","Value - Generic text 2");
+    texts.append(text);
+    prop=Oproperty("OSTGENPRO_TEXT","Generic text","INDI_TEXT","IP_RW","IPS_IDLE","G","OSTGENGRP_GRP1","",
+                   texts,
+                   thismodule["modulename"].toString(),"OSTGENCAT_CAT1","OSTGENCAT_GRP1");
+    properties.append(prop);
+
+    prop=QJsonObject();
+    nums=QJsonArray();
+    num=QJsonObject();
+    num=Onumber("OSTGENPRO_NUM1","Generic number 1",10);
+    nums.append(num);
+    num=QJsonObject();
+    num=Onumber("OSTGENPRO_NUM2","Generic number 2",0.5);
+    nums.append(num);
+    prop=Oproperty("OSTGENPRO_NUM","Generic number","INDI_NUMBER","IP_RW","IPS_IDLE","G","OSTGENGRP_GRP1","",
+                   nums,
+                   thismodule["modulename"].toString(),"OSTGENCAT_CAT1","OSTGENCAT_GRP1");
+    properties.append(prop);
+
+    prop=QJsonObject();
+    switchs=QJsonArray();
+    swit=QJsonObject();
+    swit=Oswitch("OSTGENPRO_SWITCH1","Generic switch 1","ISS_ON");
+    switchs.append(swit);
+    swit=QJsonObject();
+    swit=Oswitch("OSTGENPRO_SWITCH2","Generic switch 2","ISS_OFF");
+    switchs.append(swit);
+    prop=Oproperty("OSTGENPRO_SWITCH","Generic switch","INDI_SWITCH","IP_RW","IPS_IDLE","G","OSTGENGRP_GRP1","ISS_NORULE",
+                   switchs,
+                   thismodule["modulename"].toString(),"OSTGENCAT_CAT1","OSTGENCAT_GRP1");
+    properties.append(prop);
+
+    prop=QJsonObject();
+    switchs=QJsonArray();
+    swit=QJsonObject();
+    swit=Oswitch("OSTGENPRO_SWITCHBIS1","Generic switchbis 1","ISS_ON");
+    switchs.append(swit);
+    swit=QJsonObject();
+    swit=Oswitch("OSTGENPRO_SWITCHBIS2","Generic switchbis 2","ISS_OFF");
+    switchs.append(swit);
+    prop=Oproperty("OSTGENPRO_SWITCHBIS","Generic switchbis","INDI_SWITCH","IP_RW","IPS_IDLE","C","OSTGENCAT_CAT1","ISS_NORULE",
+                   switchs,
+                   thismodule["modulename"].toString(),"OSTGENCAT_CAT1","");
+    properties.append(prop);
+
+    prop=QJsonObject();
+    switchs=QJsonArray();
+    swit=QJsonObject();
+    swit=Oswitch("OSTGENPRO_SWITCHTER1","Generic switchter 1","ISS_ON");
+    switchs.append(swit);
+    swit=QJsonObject();
+    swit=Oswitch("OSTGENPRO_SWITCHTER2","Generic switchter 2","ISS_OFF");
+    switchs.append(swit);
+    prop=Oproperty("OSTGENPRO_SWITCHTER","Generic switchter","INDI_SWITCH","IP_RW","IPS_IDLE","M",thismodule["modulename"].toString(),"ISS_NORULE",
+                   switchs,
+                   thismodule["modulename"].toString(),"","");
+    properties.append(prop);
+
+
 }
 OSTClientGEN::~OSTClientGEN()
 {
     //clear();
 }
-void OSTClientGEN::askNewJob(std::string job)
-{
-    IDLog("%s Controler is asking %s\n",client_name.c_str(),job.c_str());
-}
-
-
-void OSTClientGEN::switchstate(std::string newstate)
-{
-    IDLog("%s switchstate %s->%s\n",client_name.c_str(),state.c_str(),newstate.c_str());
-    state = newstate;
-    //emit s_newstate();
-
-}
-
-/**************************************************************************************
-**
-***************************************************************************************/
-void OSTClientGEN::setOSTDevices(std::string wcamera,std::string wfocuser,std::string wmount,std::string wwheel,std::string wguider)
-{
-    if (LogLevel==OSTLOG_ALL) IDLog("setostdevices %s %s %s %s %s\n",wcamera.c_str(),wfocuser.c_str(),wmount.c_str(),wwheel.c_str(),wguider.c_str());
-    camera_name = wcamera;
-    watchDevice(wcamera.c_str());
-    focuser_name = wfocuser;
-    watchDevice(wfocuser.c_str());
-    mount_name = wmount;
-    watchDevice(wmount.c_str());
-    wheel_name = wwheel;
-    watchDevice(wwheel.c_str());
-    guider_name = wguider;
-    watchDevice(wguider.c_str());
-
-}
-/**************************************************************************************
-**
-***************************************************************************************/
-void OSTClientGEN::connectallOSTDevices(void)
-{
-    if (LogLevel==OSTLOG_ALL)  IDLog("OSTClientGEN connectallOSTDevices\n");
-    if (camera!=nullptr) connectDevice(camera->getDeviceName());
-    if (focuser!=nullptr) connectDevice(focuser->getDeviceName());
-    if (mount!=nullptr) connectDevice(mount->getDeviceName());
-    if (wheel!=nullptr) connectDevice(wheel->getDeviceName());
-    if (guider!=nullptr) connectDevice(guider->getDeviceName());
-
-}
-/**************************************************************************************
-**
-***************************************************************************************/
-void OSTClientGEN::disconnectallOSTDevices(void)
-{
-    if (LogLevel==OSTLOG_ALL) IDLog("OSTClientGEN connectallOSTDevices\n");
-    if (camera!=nullptr) disconnectDevice(camera->getDeviceName());
-    if (focuser!=nullptr) disconnectDevice(focuser->getDeviceName());
-    if (mount!=nullptr) disconnectDevice(mount->getDeviceName());
-    if (wheel!=nullptr) disconnectDevice(wheel->getDeviceName());
-    if (guider!=nullptr) disconnectDevice(guider->getDeviceName());
-
-}
-/**************************************************************************************
-**
-***************************************************************************************/
-void OSTClientGEN::setClientname(std::string n)
-{
-    client_name=n;
-}
-
-
-
-/**************************************************************************************
-**
-***************************************************************************************/
-void OSTClientGEN::newDevice(INDI::BaseDevice *dp)
-{
-    if (LogLevel==OSTLOG_ALL)  IDLog("%s OSTClientGEN %s Device...\n", client_name.c_str(), dp->getDeviceName());
-    if (strcmp(dp->getDeviceName(), camera_name.c_str()) == 0)
-    {
-        if (LogLevel==OSTLOG_ALL)  IDLog("%s OSTClientGEN %s watchdevice\n", client_name.c_str(), dp->getDeviceName());
-        camera = getDevice(dp->getDeviceName());
-        setBLOBMode(B_ALSO, camera->getDeviceName(), nullptr);
-
-    }
-    if (strcmp(dp->getDeviceName(), focuser_name.c_str()) == 0)
-    {
-        if (LogLevel==OSTLOG_ALL)  IDLog("%s OSTClientGEN %s watchdevice\n", client_name.c_str(), dp->getDeviceName());
-        focuser = getDevice(dp->getDeviceName());
-
-    }
-    if (strcmp(dp->getDeviceName(), mount_name.c_str()) == 0)
-    {
-        if (LogLevel==OSTLOG_ALL)  IDLog("%s OSTClientGEN %s watchdevice\n", client_name.c_str(), dp->getDeviceName());
-        mount = getDevice(dp->getDeviceName());
-
-    }
-    if (strcmp(dp->getDeviceName(), wheel_name.c_str()) == 0)
-    {
-        if (LogLevel==OSTLOG_ALL)  IDLog("%s OSTClientGEN %s watchdevice\n", client_name.c_str(), dp->getDeviceName());
-        wheel = getDevice(dp->getDeviceName());
-
-    }
-    if (strcmp(dp->getDeviceName(), guider_name.c_str()) == 0)
-    {
-        if (LogLevel==OSTLOG_ALL)  IDLog("%s OSTClientGEN %s watchdevice\n", client_name.c_str(), dp->getDeviceName());
-        guider = getDevice(dp->getDeviceName());
-        setBLOBMode(B_ALSO, guider->getDeviceName(), nullptr);
-
-    }
-
-}
-
-/**************************************************************************************
-**
-*************************************************************************************/
-void OSTClientGEN::newProperty(INDI::Property *property)
-{
-    if (LogLevel==OSTLOG_ALL) IDLog("%s OSTClientGEN %s Device %s property\n",client_name.c_str(),property->getDeviceName(),property->getName());
-
-}
-
-/**************************************************************************************
-**
-*************************************************************************************/
-void OSTClientGEN::removeProperty(INDI::Property *property)
-{
-    if (LogLevel==OSTLOG_ALL) IDLog("%s OSTClientGEN %s Device %s property removed\n",client_name.c_str(),property->getDeviceName(),property->getName());
-
-}
-
-/**************************************************************************************
-**
-***************************************************************************************/
-void OSTClientGEN::newNumber(INumberVectorProperty *nvp)
-{
-   if (LogLevel==OSTLOG_ALL) IDLog("%s OSTClientGEN Recieving new number %s %s : %g\n", client_name.c_str(),nvp->device,nvp->np[0].name,nvp->np[0].value);
-}
-
-/**************************************************************************************
-**
-***************************************************************************************/
-void OSTClientGEN::newText(ITextVectorProperty *tvp)
-{
-   if (LogLevel==OSTLOG_ALL) IDLog("%s OSTClientGEN Receving new text %s %s : %s\n", client_name.c_str(), tvp->device,tvp->tp[0].name,tvp->tp[0].text);
-}
-/**************************************************************************************
-**
-***************************************************************************************/
-void OSTClientGEN::newMessage(INDI::BaseDevice *dp, int messageID)
-{
-    if (LogLevel==OSTLOG_ALL) IDLog("%s OSTClientGEN new message from server : %s\n", client_name.c_str(), dp->messageQueue(messageID).c_str());
-}
-
-/**************************************************************************************
-**
-***************************************************************************************/
-void OSTClientGEN::newBLOB(IBLOB *bp)
-{
-    if (LogLevel==OSTLOG_ALL) IDLog("OSTClientGEN newblob\n");
-}
-/**************************************************************************************
-**
-***************************************************************************************/
-void OSTClientGEN::serverConnected(void)
-{
-    if (LogLevel==OSTLOG_ALL) IDLog("%s OSTClientGEN Server connected\n", client_name.c_str());
-}
-/**************************************************************************************
-**
-***************************************************************************************/
-void OSTClientGEN::serverDisconnected(int exit_code)
-{
-    if (LogLevel==OSTLOG_ALL) IDLog("%s OSTClientGEN Server disconnected %i\n", client_name.c_str(),exit_code);
-}
-

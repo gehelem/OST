@@ -11,6 +11,154 @@
 #include <QJsonValue>
 #include <QJsonObject>
 
+QJsonObject Otext(QString name, QString label,QString text)
+{
+    QJsonObject obj;
+    obj["name"]=name;
+    obj["label"]=label;
+    obj["text"]=text;
+    return obj;
+}
+QJsonObject Onumber(QString name, QString label,double value)
+{
+    QJsonObject obj;
+    obj["name"]=name;
+    obj["label"]=label;
+    obj["value"]=value;
+    //obj["format"]="";
+    //obj["min"]=0;
+    //obj["max"]=99;
+    //obj["step"]=1;
+    return obj;
+}
+QJsonObject Onumber(QString name, QString label,double value,QString format,double min,double max,double step)
+{
+    QJsonObject obj;
+    obj["name"]=name;
+    obj["label"]=label;
+    obj["value"]=value;
+    obj["format"]=format;
+    obj["min"]=min;
+    obj["max"]=max;
+    obj["step"]=step;
+    return obj;
+}
+
+QJsonObject Oswitch(QString name, QString label, QString swit)
+{
+    QJsonObject obj;
+    obj["name"]=name;
+    obj["label"]=label;
+    obj["switch"]=swit;
+    return obj;
+}
+QJsonObject Oswitch(QString name, QString label,ISState swit)
+{
+    QJsonObject obj;
+    obj["name"]=name;
+    obj["label"]=label;
+    switch (swit) {
+    case ISS_ON:
+        obj["switch"]="ISS_ON";
+        break;
+    case ISS_OFF:
+        obj["switch"]="ISS_OFF";
+        break;
+    }
+    return obj;
+}
+QJsonObject Oproperty(QString name, QString label, QString type, QString permission,
+                      QString state, QString parentType, QString parentName, QString switchrule, QJsonArray details,
+                      QString modulename,QString categoryname,QString groupname)
+{
+    QJsonObject obj;
+    obj["name"]=name;
+    obj["label"]=label;
+    obj["type"]=type;
+    obj["permission"]=permission;
+    obj["state"]=state;
+    obj["parenttype"]=parentType; // M=module/ C=Category / G=group
+    obj["parentname"]=parentName;
+    obj["modulename"]=modulename;
+    obj["categoryname"]=categoryname;
+    obj["groupname"]=groupname;
+
+
+    if (type=="INDI_TEXT") {
+        obj["texts"]=details;
+    }
+    if (type=="INDI_NUMBER") {
+        obj["numbers"]=details;
+    }
+    if (type=="INDI_SWITCH") {
+        obj["rule"]=switchrule;
+        obj["switchs"]=details;
+    }
+    if (type=="INDI_LIGHT") {
+        obj["lights"]=details;
+    }
+    if (type=="INDI_MESSAGE") {
+    }
+    return obj;
+
+}
+
+QString OGetText(QString name, QJsonArray properties)
+{
+    foreach (const QJsonValue & val, properties) {
+         QJsonObject property = val.toObject();
+         if (property["type"].toString()=="INDI_TEXT") {
+             QJsonArray texts = property["texts"].toArray();
+             foreach (const QJsonValue & txt, texts) {
+                 QJsonObject t = txt.toObject();
+                 if (t["name"].toString().toStdString().c_str()==name) {
+                     return t["text"].toString().toStdString().c_str();
+                 }
+             }
+         }
+    }
+    return nullptr;
+}
+
+double OGetNumber(QString name, QJsonArray properties)
+{
+    foreach (const QJsonValue & val, properties) {
+         QJsonObject property = val.toObject();
+         if (property["type"].toString()=="INDI_NUMBER") {
+             QJsonArray numbers = property["numbers"].toArray();
+             foreach (const QJsonValue & nb, numbers) {
+                 QJsonObject n = nb.toObject();
+                 if (n["name"].toString().toStdString().c_str()==name) {
+                     return n["value"].toDouble();
+                 }
+             }
+         }
+    }
+    return 0;
+}
+
+QJsonArray OSetNumber(std::string name, QJsonArray properties,double value)
+{
+    QJsonArray props;
+    foreach (const QJsonValue & val, properties) {
+         QJsonObject property = val.toObject();
+         if (property["type"].toString()=="INDI_NUMBER") {
+             QJsonArray numbers = property["numbers"].toArray();
+             QJsonArray wnumbers = QJsonArray();
+             foreach (const QJsonValue & nb, numbers) {
+                 QJsonObject n = nb.toObject();
+                 if (n["name"].toString().toStdString().c_str()==name) {
+                     n["value"]=value;
+                 }
+                 wnumbers.append(n);
+             }
+             property["numbers"]=wnumbers;
+         }
+         props.append(property);
+    }
+    return props;
+}
+
 
 std::set<std::string> GroupsArray(INDI::BaseDevice *dev) {
     std::vector<INDI::Property *> allprops = *dev->getProperties();
@@ -56,40 +204,46 @@ QJsonObject IProToJson(INDI::Property *Iprop) {
 
 
     pro=QJsonObject();
-    pro["Name"]=Iprop->getName();
-    pro["Label"]=Iprop->getLabel();
-    //pro["GroupName"]=Iprop->getGroupName();
+    pro["name"]=Iprop->getName();
+    pro["label"]=Iprop->getLabel();
+    pro["module"]="OSTClientPAN";
+    pro["categoryname"]=Iprop->getDeviceName();
+    pro["groupname"]=Iprop->getGroupName();
+    pro["parentType"]="G";
+    pro["parentName"]=Iprop->getGroupName();
+    pro["modulename"]="OSTClientPAN"; // FIXME
+
     switch(Iprop->getState()){
     case IPS_IDLE:
-        pro["State"]="IPS_IDLE";
+        pro["state"]="IPS_IDLE";
         break;
     case IPS_OK:
-        pro["State"]="IPS_OK";
+        pro["state"]="IPS_OK";
         break;
     case IPS_BUSY:
-        pro["State"]="IPS_BUSY";
+        pro["state"]="IPS_BUSY";
         break;
     case IPS_ALERT:
-        pro["State"]="IPS_ALERT";
+        pro["state"]="IPS_ALERT";
         break;
     }
 
     switch(Iprop->getPermission()){
     case IP_RO:
-        pro["Permission"]="IP_RO";
+        pro["permission"]="IP_RO";
         break;
     case IP_WO:
-        pro["Permission"]="IP_WO";
+        pro["permission"]="IP_WO";
         break;
     case IP_RW:
-        pro["Permission"]="IP_RW";
+        pro["permission"]="IP_RW";
         break;
     }
 
     switch (Iprop->getType()) {
 
     case INDI_NUMBER:
-        pro["Type"]="INDI_NUMBER";
+        pro["type"]="INDI_NUMBER";
         propdets=QJsonArray();
         for (int k=0;k<Iprop->getNumber()->nnp;k++) {
             propdet=QJsonObject();
@@ -104,11 +258,11 @@ QJsonObject IProToJson(INDI::Property *Iprop) {
             //propdet["aux1"]=Iprop->getNumber()->np[k].aux1;
             propdets.append(propdet);
         }
-        pro["Numbers"]=propdets;
+        pro["numbers"]=propdets;
         break;
 
     case INDI_TEXT:
-        pro["Type"]="INDI_TEXT";
+        pro["type"]="INDI_TEXT";
         propdets=QJsonArray();
         for (int k=0;k<Iprop->getText()->ntp;k++) {
             propdet=QJsonObject();
@@ -119,11 +273,11 @@ QJsonObject IProToJson(INDI::Property *Iprop) {
             //propdet["aux1"]=Iprop->getText()->tp[k].aux1;
             propdets.append(propdet);
         }
-        pro["Texts"]=propdets;
+        pro["texts"]=propdets;
         break;
 
     case INDI_LIGHT:
-        pro["Type"]="INDI_LIGHT";
+        pro["type"]="INDI_LIGHT";
         propdets=QJsonArray();
         for (int k=0;k<Iprop->getLight()->nlp;k++) {
             propdet=QJsonObject();
@@ -146,20 +300,20 @@ QJsonObject IProToJson(INDI::Property *Iprop) {
             }
             propdets.append(propdet);
         }
-        pro["Lights"]=propdets;
+        pro["lights"]=propdets;
         break;
 
     case INDI_SWITCH:
-        pro["Type"]="INDI_SWITCH";
+        pro["type"]="INDI_SWITCH";
         switch (Iprop->getSwitch()->r){
         case ISR_1OFMANY:
-            pro["Rule"] ="ISR_1OFMANY";
+            pro["rule"] ="ISR_1OFMANY";
             break;
         case ISR_ATMOST1:
-            pro["Rule"] ="ISR_ATMOST1";
+            pro["rule"] ="ISR_ATMOST1";
             break;
         case ISR_NOFMANY:
-            pro["Rule"] ="ISR_NOFMANY";
+            pro["rule"] ="ISR_NOFMANY";
             break;
         }
         propdets=QJsonArray();
@@ -178,7 +332,7 @@ QJsonObject IProToJson(INDI::Property *Iprop) {
             }
             propdets.append(propdet);
         }
-        pro["Switchs"]=propdets;
+        pro["switchs"]=propdets;
         break;
     }
     return pro;

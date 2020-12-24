@@ -1,5 +1,5 @@
-#ifndef OSTClientGEN_h_
-#define OSTClientGEN_h_
+#ifndef OSTClientCTL_h_
+#define OSTClientCTL_h_
 #pragma once
 
 //QT Includes
@@ -20,11 +20,11 @@
 #include <QJsonDocument>
 #include <OSTClient.h>
 
-class OSTClientGEN : public OSTClient
+class OSTClientCTL : public OSTClient
 {
   public:
-    OSTClientGEN(QObject *parent = Q_NULLPTR);
-    virtual ~OSTClientGEN();
+    OSTClientCTL(QObject *parent = Q_NULLPTR);
+    virtual ~OSTClientCTL();
 
 private:
 

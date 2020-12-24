@@ -1,5 +1,6 @@
+#include "OSTClient.h"
 #include "OSTClientGEN.h"
-//#include "OSTClientSEQ.h"
+#include "OSTClientCTL.h"
 #include "OSTClientFOC.h"
 #include "OSTClientPAN.h"
 #include "OSTParser.h"
@@ -11,6 +12,8 @@
 #include <QtCore/QList>
 #include <QtCore/QByteArray>
 
+
+
 QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
 QT_FORWARD_DECLARE_CLASS(QWebSocket)
 
@@ -20,21 +23,21 @@ class OSTController : public QObject
 public:
     OSTController(QObject *parent);
     ~OSTController();
-    std::unique_ptr<OSTClientFOC> MyOSTClientFOC;
+    std::unique_ptr<OSTClientGEN> MyOSTClientGEN;
     std::unique_ptr<OSTClientPAN> MyOSTClientPAN;
-    void startf(void);
-    void focusdone(void);
-    void sendmessage(QString message);
-    void sendjson(QJsonDocument json);
+    std::unique_ptr<OSTClientCTL> MyOSTClientCTL;
+    std::unique_ptr<OSTClientFOC> MyOSTClientFOC;
     QWebSocketServer *m_pWebSocketServer;
     QList<QWebSocket *> m_clients;
     QJsonObject properties;
-    QString PropertiesFolder="/home/gilles/OST";
+    QString PropertiesFolder="~/OST";
 
-private Q_SLOTS:
+public slots:
     void onNewConnection();
     void processTextMessage(QString message);
     void processBinaryMessage(QByteArray message);
+    void sendmessage(QString message);
+    void sendjson(QJsonObject json);
     void socketDisconnected();
     void emitnewprop(INDI::Property *property);
     void emitnewtext(ITextVectorProperty *prop);
@@ -42,11 +45,12 @@ private Q_SLOTS:
     void emitnewswitch(ISwitchVectorProperty *prop);
     void emitnewlight(ILightVectorProperty *prop);
     void emitnewdevice(INDI::BaseDevice *d);
-    void emitall(void);
+    //void emitall(void);
+//    QJsonObject updateproperty(QString module,QString category,QString group,QString property);
 
 
 
-Q_SIGNALS:
+signals:
     void closed();
 private:
     //std::unique_ptr<OSTClientFOC> MyOSTClientFOC;

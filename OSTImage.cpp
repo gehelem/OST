@@ -23,7 +23,6 @@
 #include <set>
 #include <array>
 #include <vector>
-
 #include "OSTImage.h"
 
 
@@ -38,7 +37,11 @@ OSTImage::~OSTImage() {
 void OSTImage::ResetData(void) {
 
 }
+bool OSTImage::saveToJpeg(QString filename) {
 
+    img.save_jpeg(filename.toStdString().c_str(),100);
+    return true;
+}
 
 bool OSTImage::LoadFromBlob(IBLOB *bp)
 {
@@ -100,6 +103,7 @@ bool OSTImage::LoadFromBlob(IBLOB *bp)
             break;
         case SHORT_IMG:
             // Read SHORT image as USHORT
+            IDLog("SHORT_IMG\n");
             stats.dataType      = TUSHORT;
             stats.bytesPerPixel = sizeof(int16_t);
             break;
@@ -153,6 +157,13 @@ bool OSTImage::LoadFromBlob(IBLOB *bp)
 
     m_ImageBufferSize = stats.samples_per_channel * stats.channels * static_cast<uint16_t>(stats.bytesPerPixel);
     m_ImageBuffer = new uint8_t[m_ImageBufferSize];
+    IDLog("--------------------------\n");
+    IDLog("m_ImageBufferSize %i bytes\n"        ,m_ImageBufferSize);
+    IDLog("stats.samples_per_channel %i bytes\n",stats.samples_per_channel);
+    IDLog("stats.channels %i bytes\n"           ,stats.channels);
+    IDLog("stats.bytesPerPixel %i bytes\n"      ,stats.bytesPerPixel);
+    IDLog("--------------------------\n");
+
     if (m_ImageBuffer == nullptr)
     {
         IDLog("IMG FITSData: Not enough memory for image_buffer channel. Requested: %i bytes\n",m_ImageBufferSize);
@@ -172,6 +183,7 @@ bool OSTImage::LoadFromBlob(IBLOB *bp)
         fits_close_file(fptr, &status);
         return false;
     }*/
+    //if (fits_read_pix(fptr, TUSHORT                              , fpixel, xsize*ysize, nullptr, ImageData, nullptr, &status))
     if (fits_read_img(fptr, static_cast<uint16_t>(stats.dataType), 1, nelements, nullptr, m_ImageBuffer, &anynullptr, &status))
     {
         IDLog("IMG Error reading imag. %i\n",status);
@@ -180,8 +192,17 @@ bool OSTImage::LoadFromBlob(IBLOB *bp)
     }
 
     fits_close_file(fptr,&status);
+    // Load image into Cimg object
+    img=nullptr;
+    img.clear();
+    img.resize(stats.width ,stats.height,1,1);
+    cimg_forXY(img, x, y)
+        {
+            img(x, img.height() - y - 1) = (reinterpret_cast<uint16_t *>(m_ImageBuffer))[img.offset(x, y)]; // FIXME ???
+        }
 
-    //CalcStats();
+    CalcStats();
+    saveToJpeg("/home/gilles/OST/toto.jpeg");
     FindStars();
     IDLog("IMG readblob done %ix%i\n",stats.width ,stats.height );
     return true;
@@ -189,29 +210,12 @@ bool OSTImage::LoadFromBlob(IBLOB *bp)
 
 void OSTImage::CalcStats(void)
 {
-    stats.min[0] =65535;
-    stats.max[0] =0;
-    stats.mean[0]=0;
-    stats.median[0]=0;
-    int value;
-    long n;
-    for (int i=0;i<stats.width ;i++) {
-        for (int j=0;j<stats.height ;j++) {
-            n=j*stats.width  +i;
-            value = static_cast<uint16_t>(m_ImageBuffer[n]);
-            stats.mean[0]=(n*stats.mean[0]+value);
-            stats.mean[0]=stats.mean[0]/(n+1);
-            //if (value > 125 )IDLog("%i %i %i\n",i,j,value);
-            if (value > stats.max[0] ) stats.max[0] = value;
-            if (value < stats.min[0] ) stats.min[0] = value;
-        }
-    }
-    stats.min[0] =2;
-    stats.max[0] =200;
-    stats.mean[0]=50;
-    stats.median[0]=50;
-
-    IDLog("IMG Min=%f Max=%f Avg=%.2f Med=%f\n",stats.min[0],stats.max[0],stats.mean[0],stats.median[0]);
+    stats.min[0] =img.min();
+    stats.max[0] =img.max();
+    stats.mean[0]=img.mean();
+    stats.median[0]=img.median();
+    stats.stddev[0]=sqrt(img.variance(1));
+    IDLog("IMG Min=%f Max=%f Avg=%.2f Med=%f StdDev=%.2f\n",stats.min[0],stats.max[0],stats.mean[0],stats.median[0],stats.stddev[0]);
 }
 
 void OSTImage::FindStars(void)

@@ -31,13 +31,15 @@ include_directories(${QT5Declarative_INCLUDE_DIRS} )
 include_directories(${STELLARSOLVER_INCLUDE_DIR})
 include(CMakeCommon)
 
-SET( APP_EXE OSTTester )
+SET( APP_EXE OSTServer )
 
 add_executable( ${APP_EXE}
         ${CMAKE_CURRENT_SOURCE_DIR}/OSTController.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/OSTTester.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/OSTServer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/OSTImage.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/OSTClient.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/OSTClientGEN.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/OSTClientCTL.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/OSTClientPAN.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/OSTClientFOC.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/OSTParser.cpp

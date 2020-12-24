@@ -2,7 +2,7 @@
 #define OSTClientPAN_h_
 #pragma once
 
-#include "OSTClientGEN.h"
+#include "OSTClient.h"
 //QT Includes
 //QT Includes
 #include <QDir>
@@ -16,37 +16,39 @@
 #include <QtCore/QList>
 #include <QtCore/QByteArray>
 
-class OSTClientPAN : public OSTClientGEN
+class OSTClientPAN : public OSTClient
 {
     Q_OBJECT
   public:
 
     OSTClientPAN(QObject *parent = Q_NULLPTR);
     virtual ~OSTClientPAN();
-    void givemeall(void);
+    virtual QJsonObject getmodule  (QString module) override;
+    virtual QJsonObject getcategory(QString module,QString category) override;
+    virtual QJsonObject getgroup   (QString module,QString category,QString group) override;
+    virtual QJsonObject getproperty(QString module,QString category,QString group,QString property) override;
 
-  public slots:
+
+public slots:
 //    void sssuccess(void);
-  protected:
-    virtual void newDevice(INDI::BaseDevice *dp);
-    virtual void removeDevice(INDI::BaseDevice */*dp*/) override {}
-    virtual void newProperty(INDI::Property *property) override;
-    virtual void removeProperty(INDI::Property */*property*/) override {}
-    virtual void newBLOB(IBLOB */*bp*/) override;
-    virtual void newSwitch(ISwitchVectorProperty *svp) override;
-    virtual void newNumber(INumberVectorProperty *nvp);
-    virtual void newMessage(INDI::BaseDevice *dp, int messageID) override;
-    virtual void newText(ITextVectorProperty *tvp) override;
-    virtual void newLight(ILightVectorProperty *lvp) override;
-  private:
 
-  signals:
-    void emitnewdevice(INDI::BaseDevice *dp);
-    void emitnewprop(INDI::Property *property);
-    void emitnewtext(ITextVectorProperty *prop);
-    void emitnewlight(ILightVectorProperty *prop);
-    void emitnewnumber(INumberVectorProperty *prop);
-    void emitnewswitch(ISwitchVectorProperty *prop);
+  protected:
+    virtual void serverConnected() override;
+    virtual void serverDisconnected(int exit_code) override;
+    virtual void newDevice(INDI::BaseDevice *dp) override;
+    virtual void removeDevice(INDI::BaseDevice *dp) override;
+    virtual void newProperty(INDI::Property *property) override;
+    virtual void removeProperty(INDI::Property *property) override;
+    virtual void newNumber(INumberVectorProperty *nvp) override;
+    virtual void newText(ITextVectorProperty *tvp) override;
+    virtual void newSwitch(ISwitchVectorProperty *svp) override;
+    virtual void newLight(ILightVectorProperty *lvp) override;
+    virtual void newBLOB(IBLOB *bp) override;
+    virtual void newMessage(INDI::BaseDevice *dp, int messageID) override;
+
+private:
+
+
 
 };
 

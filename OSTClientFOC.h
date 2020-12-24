@@ -17,20 +17,24 @@
 #include <QtCore/QList>
 #include <QtCore/QByteArray>
 
-class OSTClientFOC : public OSTClientGEN
+class OSTClientFOC : public OSTClient
 {
     Q_OBJECT
   public:
 
     OSTClientFOC(QObject *parent = Q_NULLPTR);
     virtual ~OSTClientFOC();
+    INDI::BaseDevice *cameradevice;
+    INDI::BaseDevice *focuserdevice;
 
     std::unique_ptr<OSTImage> img =nullptr;
-    bool startFocusing(int start, int backlash,int incr, int nb);
+    bool startFocusing(void);
     //void setOSTDevices(std::string wcamera,std::string wfocuser,std::string wmount,std::string wwheel,std::string wguider);
   public slots:
     void sssuccess(void);
+    virtual void processTextMessage(QString message) override;
   protected:
+    virtual void newDevice(INDI::BaseDevice *dp) override;
     virtual void removeDevice(INDI::BaseDevice */*dp*/) override {}
     virtual void newProperty(INDI::Property *property) override;
     virtual void removeProperty(INDI::Property */*property*/) override {}
@@ -42,9 +46,9 @@ class OSTClientFOC : public OSTClientGEN
     virtual void newLight(ILightVectorProperty */*lvp*/) override {}
   private:
     // simple focus parameters
-    int Fpos,Fbl,Fincr,Fnb,Factpos;
-    int Fs; // simple focus iterator
-    int FBestpos;
+    double Fpos,Fbl,Fincr,Fnb,Factpos;
+    double Fs; // simple focus iterator
+    double FBestpos;
     float FBestHFR;
   signals:
     void focusdone(void);
