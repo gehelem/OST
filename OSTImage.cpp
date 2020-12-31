@@ -40,12 +40,15 @@ void OSTImage::ResetData(void) {
 bool OSTImage::saveToJpeg(QString filename) {
 
     img.save_jpeg(filename.toStdString().c_str(),100);
+    //int buf_size = sizeof(img.data());
+    //jpegmem.load(filename.toStdString().c_str());
+
     return true;
 }
 
 bool OSTImage::LoadFromBlob(IBLOB *bp)
 {
-    IDLog("IMG readblob %s %s %i \n",bp->label,bp->name,bp->size);
+    //IDLog("IMG readblob %s %s %i \n",bp->label,bp->name,bp->size);
     ResetData();
     int status = 0, anynullptr = 0;
     long naxes[3];
@@ -103,7 +106,6 @@ bool OSTImage::LoadFromBlob(IBLOB *bp)
             break;
         case SHORT_IMG:
             // Read SHORT image as USHORT
-            IDLog("SHORT_IMG\n");
             stats.dataType      = TUSHORT;
             stats.bytesPerPixel = sizeof(int16_t);
             break;
@@ -157,12 +159,13 @@ bool OSTImage::LoadFromBlob(IBLOB *bp)
 
     m_ImageBufferSize = stats.samples_per_channel * stats.channels * static_cast<uint16_t>(stats.bytesPerPixel);
     m_ImageBuffer = new uint8_t[m_ImageBufferSize];
-    IDLog("--------------------------\n");
+/*    IDLog("--------------------------\n");
     IDLog("m_ImageBufferSize %i bytes\n"        ,m_ImageBufferSize);
     IDLog("stats.samples_per_channel %i bytes\n",stats.samples_per_channel);
     IDLog("stats.channels %i bytes\n"           ,stats.channels);
     IDLog("stats.bytesPerPixel %i bytes\n"      ,stats.bytesPerPixel);
     IDLog("--------------------------\n");
+*/
 
     if (m_ImageBuffer == nullptr)
     {
@@ -202,9 +205,9 @@ bool OSTImage::LoadFromBlob(IBLOB *bp)
         }
 
     CalcStats();
-    saveToJpeg("/home/gilles/OST/toto.jpeg");
-    FindStars();
-    IDLog("IMG readblob done %ix%i\n",stats.width ,stats.height );
+    //saveToJpeg("/home/gilles/OST/toto.jpeg");
+    //FindStars();
+    //IDLog("IMG readblob done %ix%i\n",stats.width ,stats.height );
     return true;
 }
 
@@ -220,6 +223,7 @@ void OSTImage::CalcStats(void)
 
 void OSTImage::FindStars(void)
 {
+    FindStarsFinished = false;
     HFRavg=99;
     stellarSolver = new StellarSolver(stats, m_ImageBuffer,this);
     stellarSolver->moveToThread(this->thread());
@@ -273,6 +277,7 @@ void OSTImage::ssReady(void)
         HFRavg=(i*HFRavg + stars[i].HFR)/(i+1);
     }
     IDLog("IMG HFRavg %f\n",HFRavg);
+    FindStarsFinished = true;
     emit success();
 
 }

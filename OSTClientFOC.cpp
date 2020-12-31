@@ -97,6 +97,9 @@ OSTClientFOC::OSTClientFOC(QObject *parent)
     num=QJsonObject();
     num=Onumber("OSTFOCPRO_PARAMS_ITERATIONS","Iterations",5,"%.f",0,100,1);
     nums.append(num);
+    num=QJsonObject();
+    num=Onumber("OSTFOCPRO_PARAMS_EXP","Exposure",5,"%.f",0,100,1);
+    nums.append(num);
     prop=Oproperty("OSTFOCPRO_PARAM","Parameters","INDI_NUMBER","IP_RW","IPS_IDLE","C","OSTFOCCAT_PARAMS","",
                    nums,
                    thismodule["modulename"].toString(),"OSTFOCCAT_PARAMS","");
@@ -181,8 +184,15 @@ void OSTClientFOC::processTextMessage(QString message)
                 startFocusing();
 
             }
+            if ((obj["message"].toString()=="setswitch")&&(obj["switchname"].toString()=="OSTFOCPRO_ACTIONS_FRAMING")) {
+                messagelog("Start framing request");
+                startFraming();
 
-
+            }
+            if ((obj["message"].toString()=="setswitch")&&(obj["switchname"].toString()=="OSTFOCPRO_ACTIONS_ABORT")) {
+                messagelog("Abort task");
+                tasks =QQueue<Ttask>();
+            }
         }
 
 }
@@ -257,109 +267,115 @@ void OSTClientFOC::newProperty(INDI::Property *property)
 
 }
 
-void OSTClientFOC::newText(ITextVectorProperty *tvp)
-{
 
-}
-void OSTClientFOC::newSwitch(ISwitchVectorProperty *svp)
-{
-
-}
-
-
-/**************************************************************************************
-**
-***************************************************************************************/
-void OSTClientFOC::newNumber(INumberVectorProperty *nvp)
-{
-
-    if ((strcmp(nvp->name, "ABS_FOCUS_POSITION") == 0)&&(strcmp(nvp->device, OGetText("OSTFOCPRO_DEVICES_FOCUSER",properties).toStdString().c_str()) == 0))
-    {
-       if ((state=="F1")&&(nvp->np[0].value==Fpos-Fbl)) {
-           nvp->np[0].value = Fpos;
-           sendNewNumber(nvp);
-           switchstate("FN2");
-       }
-
-       if ((state=="FN2") && (nvp->np[0].value=Fpos+Fs*Fincr)) {
-           //Fs++;
-           if (Fs >= Fnb) {
-               /*...*/
-
-           } else {
-               INumberVectorProperty *ccd_exposure = nullptr;
-               ccd_exposure = cameradevice->getNumber("CCD_EXPOSURE");
-               if (ccd_exposure == nullptr)
-               {
-                   IDLog("Error: unable to find CCD Simulator CCD_EXPOSURE property...\n");
-                   return;
-               }
-               ccd_exposure->np[0].value = 100;
-               sendNewNumber(ccd_exposure);
-               switchstate("FN3");
-
-           }
-       }
-    }
-
-}
-
-/**************************************************************************************
-**
-***************************************************************************************/
-void OSTClientFOC::newMessage(INDI::BaseDevice *dp, int messageID)
-{
-    //IDLog("%s Recveing message from Server:\n\n########################\n%s\n########################\n\n",thismodule["modulename"].toString().toStdString().c_str(),dp->messageQueue(messageID).c_str());
-}
-
-/**************************************************************************************
-**
-***************************************************************************************/
-void OSTClientFOC::newBLOB(IBLOB *bp)
-{
-    //IDLog("%s newblob from %s\n",thismodule["modulename"].toString().toStdString().c_str(),bp->name);
-    if (state=="FN3") {
-        IDLog("%s exposure %g done : analysing\n",thismodule["modulename"].toString().toStdString().c_str(),Fs);
-        switchstate("FN4");
-        img->LoadFromBlob(bp);
-    }
-}
-
-/**************************************************************************************
-**
-***************************************************************************************/
 bool OSTClientFOC::startFocusing(void)
 {
-    img.reset(new OSTImage());
-    connect(img.get(),&OSTImage::success,this,&OSTClientFOC::sssuccess);
-    if (!(state=="idle")) {
-        IDLog("%s startFocusing not idle\n",thismodule["modulename"].toString().toStdString().c_str());
-        return false;
-    }
-    if (focuserdevice==nullptr) {
-        IDLog("%s startFocusing focuser KO\n",thismodule["modulename"].toString().toStdString().c_str());
-        return false;
 
+    if (tasks.size()) {
+        messagelog("Can't start focusing, i'm busy doing this now :" + tasks.front().tasklabel);
+        return true;
     }
     Fpos=OGetNumber("OSTFOCPRO_PARAMS_STARTPOS",properties);
     Fbl=OGetNumber("OSTFOCPRO_PARAMS_BACKLASH",properties);
     Fincr=OGetNumber("OSTFOCPRO_PARAMS_INCRE",properties);
     Fnb=OGetNumber("OSTFOCPRO_PARAMS_ITERATIONS",properties);
+    Fexp=OGetNumber("OSTFOCPRO_PARAMS_EXP",properties);
     Fs=0;
-
-    switchstate("init");
-    IDLog("%s startFocusing begin=%g backlash=%g incr=%g nb=%g\n",thismodule["modulename"].toString().toStdString().c_str(),Fpos,Fbl,Fincr,Fnb);
-    INumberVectorProperty *pos = nullptr;
-    pos = focuserdevice->getNumber("ABS_FOCUS_POSITION");
-    if (pos== nullptr)
+    INumberVectorProperty *number = nullptr;
+    number = focuserdevice->getNumber("ABS_FOCUS_POSITION");
+    if (number == nullptr)
     {
-        IDLog("%s Error: unable to find %s ABS_FOCUS_POSITION property...\n",thismodule["modulename"].toString().toStdString().c_str(),focuserdevice->getDeviceName());
+        IDLog("Error - unable to find %s - %s property : aborting\n","","ABS_FOCUS_POSITION");
+        tasks =QQueue<Ttask>();
         return false;
     }
-    FBestpos = pos->np[0].value;
-    FBestHFR = 100;
-    pos->np[0].value = Fpos-Fbl;
-    sendNewNumber(pos);
-    switchstate("F1");
+    FBestpos =number->np[0].value;
+    FBestHFR = 999;
+
+    addnewtask(TT_SEND_NUMBER,true,"Coarse focus","init","sendblpos","Asking focuser to go to backlash position",focuserdevice->getDeviceName(),"ABS_FOCUS_POSITION","FOCUS_ABSOLUTE_POSITION",Fpos-Fbl,"",ISS_OFF);
+    addnewtask(TT_WAIT_NUMBER,false,"Coarse focus","init","waitblpos","waiting focuser to go to backlash position",focuserdevice->getDeviceName(),"ABS_FOCUS_POSITION","FOCUS_ABSOLUTE_POSITION",Fpos-Fbl,"",ISS_OFF);
+    for (int i=0;i<Fnb;i++) {
+        addnewtask(TT_SEND_NUMBER,true,"Coarse focus","loop","sendfocpos","Asking focuser to go to position",focuserdevice->getDeviceName(),"ABS_FOCUS_POSITION","FOCUS_ABSOLUTE_POSITION",Fpos + i*Fincr,"",ISS_OFF);
+        addnewtask(TT_WAIT_NUMBER,false,"Coarse focus","loop","waitfocpos","waiting focuser to go to position",focuserdevice->getDeviceName(),"ABS_FOCUS_POSITION","FOCUS_ABSOLUTE_POSITION",Fpos + i*Fincr,"",ISS_OFF);
+        addnewtask(TT_SEND_NUMBER,true,"Coarse focus","loop","exprequest","exposure request",cameradevice->getDeviceName(),"CCD_EXPOSURE","CCD_EXPOSURE_VALUE",Fexp,"",ISS_OFF);
+        addnewtask(TT_WAIT_BLOB  ,false,"Coarse focus","loop","waitblob","waiting exp","CCD1","CCD1","");
+        addnewtask(TT_ANALYSE_SEP,true,"Coarse focus","loop","askanalyse","asking to find stars","CCD1","CCD1","");
+        addnewtask(TT_WAIT_SEP,false,"Coarse focus","loop","waitanalyse","waiting to find stars","CCD1","CCD1","");
+        addnewtask(TT_SPEC,true,"Coarse focus","loop","store","store pos/hfr","","","",Fpos + i*Fincr,"",ISS_OFF);
+    }
+    addnewtask(TT_SPEC,true,"Coarse focus","finish","movbest","moving to best position","","","");
+    /*addnewtask(TT_WAIT_BLOB  ,false,"Coarse focus","finish","waitblob","waiting exp","CCD1","CCD1","");
+    addnewtask(TT_ANALYSE_SEP,true,"Coarse focus","finish","askanalyse","asking to find stars","CCD1","CCD1","");
+    addnewtask(TT_WAIT_SEP,false,"Coarse focus","finish","waitanalyse","waiting to find stars","CCD1","CCD1","");*/
+
+
+
+    executecurrenttask();
     return true;
+}
+
+bool OSTClientFOC::startFraming(void)
+{
+
+    if (tasks.size()) {
+        messagelog("Can't start framing, i'm busy doing this now :" + tasks.front().tasklabel);
+        return true;
+    }
+    Fexp=OGetNumber("OSTFOCPRO_PARAMS_EXP",properties);
+    INumberVectorProperty *number = nullptr;
+    number = focuserdevice->getNumber("ABS_FOCUS_POSITION");
+    if (number == nullptr)
+    {
+        IDLog("Error - unable to find %s - %s property : aborting\n","","ABS_FOCUS_POSITION");
+        tasks =QQueue<Ttask>();
+        return false;
+    }
+    FBestpos =number->np[0].value;
+    FBestHFR = 999;
+
+    addnewtask(TT_SEND_NUMBER,true,"Framing","loop","exprequest","exposure request",cameradevice->getDeviceName(),"CCD_EXPOSURE","CCD_EXPOSURE_VALUE",Fexp,"",ISS_OFF);
+    addnewtask(TT_WAIT_BLOB  ,false,"Framing","loop","waitblob","waiting exp","CCD1","CCD1","");
+    addnewtask(TT_ANALYSE_SEP,true,"Framing","loop","askanalyse","asking to find stars","CCD1","CCD1","");
+    addnewtask(TT_WAIT_SEP,false,"Framing","loop","waitanalyse","waiting to find stars","CCD1","CCD1","");
+    addnewtask(TT_SPEC,true,"Framing","loop","addnextloop","Sending new loop","","","");
+
+
+    executecurrenttask();
+    return true;
+}
+
+
+void OSTClientFOC::executespecificcurrenttask(INumberVectorProperty *nvp,ITextVectorProperty *tvp,ISwitchVectorProperty *svp,ILightVectorProperty *lvp,IBLOB *bp)
+{
+    Ttask task=tasks.front();
+    if ((task.taskname=="store")&&(image->FindStarsFinished)) {
+        IDLog("store values %f/%f\n",task.value,image->HFRavg);
+        if (image->HFRavg < FBestHFR ) {
+            FBestpos = task.value;
+            FBestHFR = image->HFRavg;
+        }
+        popnext();
+    }
+    if (task.taskname=="movbest") {
+        INumberVectorProperty *number = nullptr;
+        number = focuserdevice->getNumber("ABS_FOCUS_POSITION");
+        if (number == nullptr)
+        {
+            IDLog("Error - unable to find %s - %s property : aborting\n","","ABS_FOCUS_POSITION");
+            tasks =QQueue<Ttask>();
+            return;
+        }
+        number->np[0].value = FBestpos;
+        sendNewNumber(number);
+        popnext();
+    }
+    if (task.taskname=="addnextloop") {
+        addnewtask(TT_SEND_NUMBER,true,"Framing","loop","exprequest","exposure request",cameradevice->getDeviceName(),"CCD_EXPOSURE","CCD_EXPOSURE_VALUE",Fexp,"",ISS_OFF);
+        addnewtask(TT_WAIT_BLOB  ,false,"Framing","loop","waitblob","waiting exp","CCD1","CCD1","");
+        addnewtask(TT_ANALYSE_SEP,true,"Framing","loop","askanalyse","asking to find stars","CCD1","CCD1","");
+        addnewtask(TT_WAIT_SEP,false,"Framing","loop","waitanalyse","waiting to find stars","CCD1","CCD1","");
+        addnewtask(TT_SPEC,true,"Framing","loop","addnextloop","Sending new loop","","","");
+        popnext();
+    }
+
 }

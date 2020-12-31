@@ -2,6 +2,7 @@
 #include "OSTClientGEN.h"
 #include "OSTClientCTL.h"
 #include "OSTClientFOC.h"
+#include "OSTClientGUI.h"
 #include "OSTClientPAN.h"
 #include "OSTParser.h"
 #include <baseclientqt.h>
@@ -27,6 +28,7 @@ public:
     std::unique_ptr<OSTClientPAN> MyOSTClientPAN;
     std::unique_ptr<OSTClientCTL> MyOSTClientCTL;
     std::unique_ptr<OSTClientFOC> MyOSTClientFOC;
+    std::unique_ptr<OSTClientGUI> MyOSTClientGUI;
     QWebSocketServer *m_pWebSocketServer;
     QList<QWebSocket *> m_clients;
     QJsonObject properties;
@@ -38,6 +40,7 @@ public slots:
     void processBinaryMessage(QByteArray message);
     void sendmessage(QString message);
     void sendjson(QJsonObject json);
+    void sendbinary(QByteArray *data);
     void socketDisconnected();
     void emitnewprop(INDI::Property *property);
     void emitnewtext(ITextVectorProperty *prop);

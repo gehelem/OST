@@ -14,7 +14,7 @@ OSTController::OSTController(QObject *parent)
 {
     //OSTClientGEN *MyOSTClientGEN = new OSTClientGEN(parent);
 
-    m_pWebSocketServer = new QWebSocketServer(QStringLiteral("Echo Server"),QWebSocketServer::NonSecureMode, this);
+    m_pWebSocketServer = new QWebSocketServer(QStringLiteral("OST server"),QWebSocketServer::NonSecureMode, this);
     if (m_pWebSocketServer->listen(QHostAddress::Any, 9624)) {
        IDLog("OST server listening on port %i\n",9624);
        connect(m_pWebSocketServer, &QWebSocketServer::newConnection,this, &OSTController::onNewConnection);
@@ -23,7 +23,7 @@ OSTController::OSTController(QObject *parent)
     properties = QJsonObject();
     QJsonObject prop;
     QJsonArray allprops;
-    QFile file;
+    /*QFile file;
     QString val,filetoread;
     filetoread=PropertiesFolder+"/";
     file.setFileName(PropertiesFolder+"/OST.json");
@@ -32,17 +32,20 @@ OSTController::OSTController(QObject *parent)
     file.close();
     //qWarning() << val;
     QJsonDocument d = QJsonDocument::fromJson(val.toUtf8());
-    properties = d.object();
+    properties = d.object();*/
 
     //connect(MyOSTClientPAN.get(), &OSTClientPAN::sendmessage, this, &OSTController::sendjson );
     MyOSTClientCTL.reset(new OSTClientCTL(parent));
     MyOSTClientGEN.reset(new OSTClientGEN(parent));
     MyOSTClientPAN.reset(new OSTClientPAN(parent));
     MyOSTClientFOC.reset(new OSTClientFOC(parent));
+    MyOSTClientGUI.reset(new OSTClientGUI(parent));
     connect(MyOSTClientPAN.get(),&OSTClientPAN::sendjson, this, &OSTController::sendjson );
     connect(MyOSTClientCTL.get(),&OSTClientCTL::sendjson, this, &OSTController::sendjson );
     connect(MyOSTClientGEN.get(),&OSTClientGEN::sendjson, this, &OSTController::sendjson );
     connect(MyOSTClientFOC.get(),&OSTClientFOC::sendjson, this, &OSTController::sendjson );
+    connect(MyOSTClientGUI.get(),&OSTClientGUI::sendjson, this, &OSTController::sendjson );
+    connect(MyOSTClientGUI.get(),&OSTClientGUI::sendbinary, this, &OSTController::sendbinary);
 
 
 }
@@ -65,15 +68,28 @@ void OSTController::sendmessage(QString message)
     }
 
 }
+void OSTController::sendbinary(QByteArray *data)
+{
+
+
+    for (int i=0;i<m_clients.size();i++) {
+        QWebSocket *pClient = m_clients[i];
+        if (pClient) pClient->sendBinaryMessage(*data);
+    }
+}
 
 
 void OSTController::sendjson(QJsonObject json)
 {
-    //QString strJson(json.toJson(QJsonDocument::Compact)); // version compactée
     QJsonDocument jsondoc;
     jsondoc.setObject(json);
-    QString strJson(jsondoc.toJson(QJsonDocument::Indented));
+    //QString strJson(jsondoc.toJson(QJsonDocument::Indented)); // version lisible
+    QString strJson(jsondoc.toJson(QJsonDocument::Compact)); // version compactée
     sendmessage(strJson);
+
+
+
+
 }
 
 
@@ -88,7 +104,7 @@ void OSTController::onNewConnection()
     connect(pSocket, &QWebSocket::textMessageReceived, MyOSTClientGEN.get(), &OSTClientGEN::processTextMessage);
     connect(pSocket, &QWebSocket::textMessageReceived, MyOSTClientPAN.get(), &OSTClientPAN::processTextMessage);
     connect(pSocket, &QWebSocket::textMessageReceived, MyOSTClientFOC.get(), &OSTClientFOC::processTextMessage);
-    connect(pSocket, &QWebSocket::binaryMessageReceived, this, &OSTController::processBinaryMessage);
+    connect(pSocket, &QWebSocket::textMessageReceived, MyOSTClientGUI.get(), &OSTClientGUI::processTextMessage);
     connect(pSocket, &QWebSocket::disconnected, this, &OSTController::socketDisconnected);
 
     m_clients << pSocket;
@@ -119,8 +135,22 @@ void OSTController::processTextMessage(QString message)
         mods.append(mod);
         mod=MyOSTClientFOC->getmodule("OSTClientFOC");
         mods.append(mod);
+        mod=MyOSTClientGUI->getmodule("OSTClientGUI");
+        mods.append(mod);
         tosend["modules"]=mods;
         sendjson(tosend);
+
+        /*
+        QByteArray data;
+        QString toto = "toto";
+        data =toto.toUtf8();
+        sendbinary(&data);
+        */
+        /*QImage *ii = new QImage ("/home/gilles/OST/toto.jpeg");
+        QByteArray ba;
+        QBuffer buffer(&ba);
+        ii->save(&buffer, "JPEG");
+        sendbinary(&ba);*/
     }
     if (obj["message"].toString()=="readmodule") {
         if (obj["module"].toString()=="OSTClientPAN") {
@@ -134,6 +164,9 @@ void OSTController::processTextMessage(QString message)
         }
         if (obj["module"].toString()=="OSTClientFOC") {
             MyOSTClientFOC->updatemodule("OSTClientFOC");
+        }
+        if (obj["module"].toString()=="OSTClientGUI") {
+            MyOSTClientGUI->updatemodule("OSTClientGUI");
         }
     }
     if (obj["message"].toString()=="readcategory") {
@@ -151,7 +184,11 @@ void OSTController::processTextMessage(QString message)
             MyOSTClientPAN->updateproperty("OSTClientPAN",obj["category"].toString(),obj["group"].toString(),obj["property"].toString());
         }
     }
-
+    if (obj["message"].toString()=="readproperty") {
+        if (obj["module"].toString()=="OSTClientGUI") {
+            MyOSTClientGUI->updateproperty("OSTClientGUI",obj["category"].toString(),obj["group"].toString(),obj["property"].toString());
+        }
+    }
 }
 
 void OSTController::processBinaryMessage(QByteArray message)

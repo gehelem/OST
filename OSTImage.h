@@ -18,6 +18,7 @@
 #include <QRect>
 #include <QPointer>
 #include <QtNetwork>
+#include <QImage>
 #define cimg_display 0
 #include <CImg.h>
 
@@ -46,6 +47,8 @@ public:
     void ResetData(void);
     void CalcStats(void);
     void FindStars(void);
+    bool FindStarsFinished = true;
+    QImage jpegmem;
 public slots:
     void sslogOutput(QString text);
     void ssReady(void);

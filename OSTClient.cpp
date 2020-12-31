@@ -46,21 +46,29 @@ void OSTClient::removeProperty(INDI::Property *property)
 }
 void OSTClient::newNumber(INumberVectorProperty *nvp)
 {
+    executecurrenttask(nvp,nullptr,nullptr,nullptr,nullptr);
 }
 void OSTClient::newText(ITextVectorProperty *tvp)
 {
+    executecurrenttask(nullptr,tvp,nullptr,nullptr,nullptr);
 }
 void OSTClient::newSwitch(ISwitchVectorProperty *svp)
 {
+    executecurrenttask(nullptr,nullptr,svp,nullptr,nullptr);
 }
 void OSTClient::newLight(ILightVectorProperty *lvp)
 {
+    executecurrenttask(nullptr,nullptr,nullptr,lvp,nullptr);
 }
 void OSTClient::newMessage(INDI::BaseDevice *dp, int messageID)
 {
+    messagelog(*dp->getDeviceName() + " - " + *dp->messageQueue(messageID).c_str());
 }
 void OSTClient::newBLOB(IBLOB *bp)
 {
+    IDLog("0 Got blob %s %s\n",bp->name,bp->bvp->name);
+
+    executecurrenttask(nullptr,nullptr,nullptr,nullptr,bp);
 }
 
 void OSTClient::processTextMessage(QString message)
@@ -173,7 +181,6 @@ QJsonObject OSTClient::getproperty   (QString module,QString category,QString gr
     }
     return QJsonObject();
 }
-
 void OSTClient::updateproperty(QString module,QString category,QString group,QString property)
 {
     QJsonObject result;
@@ -213,7 +220,242 @@ void OSTClient::appendmessage(QString module, QString messagename,QString messag
     emit sendjson(result);
 
 }
-;
 void OSTClient::messagelog(QString message) {
-    appendmessage(thismodule["modulename"].toString(),thismodule["modulename"].toString()+"MESSAGE",message);
+    QString sDate = QDateTime::currentDateTime().toString("yyyy MM dd hh:mm:ss.zzz");
+    appendmessage(thismodule["modulename"].toString(),thismodule["modulename"].toString()+"MESSAGE", sDate + " - "+ message);
+}
+void OSTClient::addnewtask (    Tasktype tasktype,    bool executeimmediate,    QString jobname,    QString groupname,    QString taskname,    QString tasklabel,    QString modulename,    QString propertyname,    QString detailname)
+{
+    Ttask task;
+    task.tasktype = tasktype;
+    task.executeimmediate = executeimmediate;
+    task.jobname = jobname;
+    task.groupname = groupname;
+    task.taskname = taskname;
+    task.tasklabel = tasklabel;
+    task.modulename = modulename;
+    task.propertyname = propertyname;
+    task.detailname = detailname;
+    tasks.append(task);
+
+}
+void OSTClient::addnewtask (Tasktype tasktype,    bool executeimmediate,    QString jobname,    QString groupname,    QString taskname,    QString tasklabel,    QString modulename,    QString propertyname,    QString detailname,    double value,    QString text,    ISState sw)
+{
+    Ttask task;
+    task.tasktype = tasktype;
+    task.executeimmediate= executeimmediate;
+    task.jobname = jobname;
+    task.groupname = groupname;
+    task.taskname = taskname;
+    task.tasklabel = tasklabel;
+    task.modulename = modulename;
+    task.propertyname = propertyname;
+    task.detailname = detailname;
+    task.value = value;
+    task.text = text;
+    task.sw = sw;
+    tasks.append(task);
+
+}
+void OSTClient::popnext(void)
+{
+    if (tasks.size()<=1) {
+        messagelog(tasks.front().tasklabel + " finished - Idle");
+        tasks=QQueue<Ttask>();
+        return;
+    }
+    tasks.pop_front();
+    if (tasks.front().executeimmediate) executecurrenttask();
+
+
+}
+void OSTClient::executecurrenttask(INumberVectorProperty *nvp,ITextVectorProperty *tvp,ISwitchVectorProperty *svp,ILightVectorProperty *lvp,IBLOB *bp)
+{
+    //IDLog("executecurrenttask\n");
+    if (!tasks.size()) return;
+    Ttask task=tasks.front();
+    messagelog(task.tasklabel);
+
+    switch (task.tasktype) {
+        case TT_SPEC: {
+            IDLog("TT_SPEC executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
+            executespecificcurrenttask(nvp,tvp,svp,lvp,bp);
+            //popnext();
+            break;
+        }
+
+        case TT_SEND_NUMBER: {
+            IDLog("**********TT_SEND_NUMBER executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
+            INumberVectorProperty *number = nullptr;
+            number = getDevice(task.modulename.toStdString().c_str())->getNumber(task.propertyname.toStdString().c_str());
+            if (number == nullptr)
+            {
+                IDLog("Error - unable to find %s - %s property : aborting\n",task.modulename.toStdString().c_str(),task.propertyname.toStdString().c_str());
+                tasks =QQueue<Ttask>();
+                break;
+            }
+            bool found = false;
+            for (int i=0;i<number->nnp;i++) {
+                if (strcmp(number->np[i].name, task.detailname.toStdString().c_str()) == 0) {
+                    number->np[i].value=task.value;
+                    sendNewNumber(number);
+                    popnext();
+                    found = true;
+                }
+            }
+            if (found) break;
+            IDLog("Error - unable to find %s - %s - %s number : aborting\n",task.modulename.toStdString().c_str(),task.propertyname.toStdString().c_str(),task.detailname.toStdString().c_str());
+            tasks =QQueue<Ttask>();
+            break;
+        }
+
+        case TT_SEND_TEXT: {
+            IDLog("**********TT_SEND_TEXT executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
+            ITextVectorProperty *text = nullptr;
+            text = getDevice(task.modulename.toStdString().c_str())->getText(task.propertyname.toStdString().c_str());
+            if (text == nullptr)
+            {
+                IDLog("Error - unable to find %s - %s property : aborting\n",task.modulename.toStdString().c_str(),task.propertyname.toStdString().c_str());
+                tasks =QQueue<Ttask>();
+                break;
+            }
+            bool found = false;
+            for (int i=0;i<text->ntp;i++) {
+                if (strcmp(text->tp[i].name, task.detailname.toStdString().c_str()) == 0) {
+                    text->tp[i].text=(char *)task.text.toStdString().c_str();
+                    sendNewText(text);
+                    popnext();
+                    found = true;
+                }
+            }
+            if (found) break;
+            IDLog("Error - unable to find %s - %s - %s text : aborting\n",task.modulename.toStdString().c_str(),task.propertyname.toStdString().c_str(),task.detailname.toStdString().c_str());
+            tasks =QQueue<Ttask>();
+            break;
+        }
+
+        case TT_SEND_SWITCH: {
+            IDLog("**********TT_SEND_SWITCH executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
+
+            ISwitchVectorProperty *sw = nullptr;
+            sw = getDevice(task.modulename.toStdString().c_str())->getSwitch(task.propertyname.toStdString().c_str());
+            if (sw == nullptr)
+            {
+                IDLog("Error - unable to find %s - %s property : aborting\n",task.modulename.toStdString().c_str(),task.propertyname.toStdString().c_str());
+                tasks =QQueue<Ttask>();
+                break;
+            }
+            bool found = false;
+            for (int i=0;i<sw->nsp;i++) {
+                if (strcmp(sw->sp[i].name, task.detailname.toStdString().c_str()) == 0) {
+                    sw->sp[i].s=task.sw;
+                    sendNewSwitch(sw);
+                    popnext();
+                    found = true;
+                }
+            }
+            if (found) break;
+            IDLog("Error - unable to find %s - %s - %s switch : aborting\n",task.modulename.toStdString().c_str(),task.propertyname.toStdString().c_str(),task.detailname.toStdString().c_str());
+            tasks =QQueue<Ttask>();
+            break;
+        }
+
+        case TT_ANALYSE_SEP: {
+        IDLog("**********TT_ANALYSE_SEP executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
+
+            image->FindStars();
+            popnext();
+            break;
+        }
+
+        case TT_ANALYSE_SOLVE: {
+        IDLog("**********TT_ANALYSE_SOLVE executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
+            image->FindStars();
+            popnext();
+            break;
+        }
+
+        case TT_WAIT_NUMBER: {
+        IDLog("**********TT_WAIT_NUMBER executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
+            bool found = false;
+            if ((strcmp(nvp->device, task.modulename.toStdString().c_str()) == 0)&&
+                (strcmp(nvp->name, task.propertyname.toStdString().c_str()) == 0)){
+                for (int i=0;i<nvp->nnp;i++) {
+                    if ((strcmp(nvp->np[i].name, task.detailname.toStdString().c_str()) == 0)
+                      &&(nvp->np[i].value==task.value)){
+                        found=true;
+                    }
+                }
+            }
+            if (found) popnext();
+            break;
+        }
+
+        case TT_WAIT_TEXT: {
+        IDLog("********** TT_WAIT_TEXTexecuting %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
+            bool found = false;
+            if ((strcmp(tvp->device, task.modulename.toStdString().c_str()) == 0)&&
+                (strcmp(tvp->name, task.propertyname.toStdString().c_str()) == 0)){
+                for (int i=0;i<tvp->ntp;i++) {
+                    if ((strcmp(tvp->tp[i].name, task.detailname.toStdString().c_str()) == 0)
+                      &&(strcmp(tvp->tp[i].text, task.text.toStdString().c_str()) == 0)) {
+                        found=true;
+                    }
+                }
+            }
+            if (found) popnext();
+            break;
+        }
+
+        case TT_WAIT_SWITCH: {
+        IDLog("**********TT_WAIT_SWITCH executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
+            bool found = false;
+            if ((strcmp(svp->device, task.modulename.toStdString().c_str()) == 0)&&
+                (strcmp(svp->name, task.propertyname.toStdString().c_str()) == 0)){
+                for (int i=0;i<svp->nsp;i++) {
+                    if ((strcmp(svp->sp[i].name, task.detailname.toStdString().c_str()) == 0)
+                            &&(svp->sp[i].s==task.sw)){
+                        found=true;
+                    }
+                }
+            }
+            if (found) popnext();
+            break;
+        }
+
+    case TT_WAIT_SEP: {
+        IDLog("**********TT_WAIT_SEP executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
+            /* dostuff */
+            popnext();
+            break;
+        }
+    case TT_WAIT_SOLVE: {
+        IDLog("**********TT_WAIT_SOLVE executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
+            /* dostuff */
+            popnext();
+            break;
+        }
+
+    case TT_WAIT_BLOB: {
+        IDLog("**********TT_WAIT_BLOB executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
+        if (bp == nullptr) break;
+            if (strcmp(bp->bvp->name, task.modulename.toStdString().c_str()) == 0) {
+                image.reset(new OSTImage());
+                connect(image.get(),&OSTImage::success,this,&OSTClient::analysefinished);
+                image->LoadFromBlob(bp);
+                popnext();
+                break;
+            }
+            break;
+        }
+
+    }
+
+
+}
+
+
+void OSTClient::analysefinished()
+{
+    if (image->FindStarsFinished) executecurrenttask();
 }

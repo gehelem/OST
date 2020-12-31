@@ -70,7 +70,7 @@ void OSTClientPAN::newText(ITextVectorProperty *tvp)
 }
 void OSTClientPAN::newSwitch(ISwitchVectorProperty *svp)
 {
-    IDLog("New switch %s\n",svp->name);
+    //IDLog("New switch %s\n",svp->name);
     updateproperty("OSTClientPAN",svp->device,svp->group,svp->name);
 }
 void OSTClientPAN::newLight(ILightVectorProperty *lvp)
