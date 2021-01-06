@@ -184,7 +184,11 @@ void OSTClientFOC::processTextMessage(QString message)
                 startFocusing();
 
             }
-            if ((obj["message"].toString()=="setswitch")&&(obj["switchname"].toString()=="OSTFOCPRO_ACTIONS_FRAMING")) {
+            if ((obj["message"].toString()=="setswitch")&&(obj["switchname"].toString()=="OSTFOCPRO_ACTIONS_FINE")) {
+                messagelog("Start coarse focus request");
+                startFinefocus();
+
+            }            if ((obj["message"].toString()=="setswitch")&&(obj["switchname"].toString()=="OSTFOCPRO_ACTIONS_FRAMING")) {
                 messagelog("Start framing request");
                 startFraming();
 
@@ -267,7 +271,14 @@ void OSTClientFOC::newProperty(INDI::Property *property)
 
 }
 
+bool OSTClientFOC::startFinefocus(void)
+{
 
+    if (tasks.size()) {
+        messagelog("Can't start focusing, i'm busy doing this now :" + tasks.front().tasklabel);
+        return true;
+    }
+}
 bool OSTClientFOC::startFocusing(void)
 {
 

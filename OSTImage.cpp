@@ -229,13 +229,10 @@ void OSTImage::FindStars(void)
     stellarSolver->moveToThread(this->thread());
     stellarSolver->setParent(this);
     connect(stellarSolver,&StellarSolver::logOutput,this,&OSTImage::sslogOutput);
-    connect(stellarSolver,&StellarSolver::ready,this,&OSTImage::ssReady);
+    connect(stellarSolver,&StellarSolver::ready,this,&OSTImage::ssReadySEP);
     stellarSolver->setLogLevel(LOG_ALL);
     stellarSolver->setSSLogLevel(LOG_VERBOSE);
-    //printf("--------%s\n",stellarSolver->getCommandString().toStdString().c_str());
-    //printf("%s\n",stellarSolver->getCommandString().data());
-    //printf("%s\n",stellarSolver->getCommandString().toUtf8().data());
-    //stellarSolver.m_ExtractorType
+
     /*typedef enum { EXTRACT,            //This just sextracts the sources
                    EXTRACT_WITH_HFR,   //This sextracts the sources and finds the HFR
                    SOLVE                //This solves the image
@@ -254,10 +251,47 @@ void OSTImage::FindStars(void)
     stellarSolver->setProperty("ProcessType",EXTRACT_WITH_HFR);
     stellarSolver->setProperty("ExtractorType",EXTRACTOR_INTERNAL);
     stellarSolver->setProperty("SolverType",SOLVER_STELLARSOLVER);
-    //stellarSolver->clearSubFrame();
-    //stellarSolver->extract(true);
     stellarSolver->start();
-    IDLog("IMG stellarSolver Start\n");
+    IDLog("IMG stellarSolver SEP Start\n");
+
+
+}
+
+void OSTImage::SolveStars(void)
+{
+    SolveStarsFinished = false;
+    HFRavg=99;
+    stellarSolver = new StellarSolver(stats, m_ImageBuffer,this);
+    stellarSolver->moveToThread(this->thread());
+    stellarSolver->setParent(this);
+    connect(stellarSolver,&StellarSolver::logOutput,this,&OSTImage::sslogOutput);
+    connect(stellarSolver,&StellarSolver::ready,this,&OSTImage::ssReadySolve);
+    stellarSolver->setLogLevel(LOG_ALL);
+    stellarSolver->setSSLogLevel(LOG_VERBOSE);
+    stellarSolver->m_LogToFile=true;
+    stellarSolver->m_LogFileName="/home/gilles/OST/logs/solver.log";
+    stellarSolver->m_AstrometryLogLevel=LOG_ALL;
+
+    /*typedef enum { EXTRACT,            //This just sextracts the sources
+                   EXTRACT_WITH_HFR,   //This sextracts the sources and finds the HFR
+                   SOLVE                //This solves the image
+                 } ProcessType;
+
+    typedef enum { EXTRACTOR_INTERNAL, //This uses internal SEP to Sextract Sources
+                   EXTRACTOR_EXTERNAL,  //This uses the external sextractor to Sextract Sources.
+                   EXTRACTOR_BUILTIN  //This uses whatever default sextraction method the selected solver uses
+                 } ExtractorType;
+
+    typedef enum { SOLVER_STELLARSOLVER,    //This uses the internal build of astrometry.net
+                   SOLVER_LOCALASTROMETRY,  //This uses an astrometry.net or ANSVR locally on this computer
+                   SOLVER_ASTAP,            //This uses a local installation of ASTAP
+                   SOLVER_ONLINEASTROMETRY  //This uses the online astrometry.net or ASTAP
+                 } SolverType;    */
+    stellarSolver->setProperty("ProcessType",SOLVE);
+    stellarSolver->setProperty("ExtractorType",EXTRACTOR_INTERNAL);
+    stellarSolver->setProperty("SolverType",SOLVER_STELLARSOLVER);
+    stellarSolver->start();
+    IDLog("IMG stellarSolver Solve Start\n");
 
 
 }
@@ -266,7 +300,7 @@ void OSTImage::sslogOutput(QString text)
 {
     IDLog("IMG Stellarsolver log : %s\n",text.toUtf8().data());
 }
-void OSTImage::ssReady(void)
+void OSTImage::ssReadySEP(void)
 {
     IDLog("IMG stellarSolver ready\n");
     stars = stellarSolver->getStarList();
@@ -278,7 +312,22 @@ void OSTImage::ssReady(void)
     }
     IDLog("IMG HFRavg %f\n",HFRavg);
     FindStarsFinished = true;
-    emit success();
+    emit successSEP();
 
 }
 
+void OSTImage::ssReadySolve(void)
+{
+    IDLog("IMG stellarSolver ready\n");
+    stars = stellarSolver->getStarListFromSolve();
+    IDLog("IMG got %i stars\n",stars.size());
+    for (int i=0;i<stars.size();i++)
+    {
+        //IDLog("IMG HFR %i %f\n",i,stars[i].HFR);
+        HFRavg=(i*HFRavg + stars[i].HFR)/(i+1);
+    }
+    IDLog("IMG HFRavg %f\n",HFRavg);
+    SolveStarsFinished = true;
+    emit successSolve();
+
+}

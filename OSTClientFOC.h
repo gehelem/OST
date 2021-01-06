@@ -29,6 +29,7 @@ class OSTClientFOC : public OSTClient
 
     std::unique_ptr<OSTImage> img =nullptr;
     bool startFocusing(void);
+    bool startFinefocus(void);
     bool startFraming(void);
     virtual void executespecificcurrenttask(INumberVectorProperty *nvp,ITextVectorProperty *tvp,ISwitchVectorProperty *svp,ILightVectorProperty *lvp,IBLOB *bp) override;
   public slots:

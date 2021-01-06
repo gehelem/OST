@@ -5,6 +5,10 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 #find_package(Qt5Core)
 find_package(CFITSIO REQUIRED)
 find_package(INDI REQUIRED)
@@ -31,23 +35,46 @@ include_directories(${QT5Declarative_INCLUDE_DIRS} )
 include_directories(${STELLARSOLVER_INCLUDE_DIR})
 include(CMakeCommon)
 
-SET( APP_EXE OSTServer )
-
-add_executable( ${APP_EXE}
-        ${CMAKE_CURRENT_SOURCE_DIR}/OSTController.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/OSTServer.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/OSTImage.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/OSTClient.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/OSTClientGEN.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/OSTClientCTL.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/OSTClientPAN.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/OSTClientFOC.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/OSTClientGUI.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/OSTParser.cpp
+#SET( APP_EXE OSTServer )
+#
+#add_executable( ${APP_EXE}
+#        ${CMAKE_CURRENT_SOURCE_DIR}/OSTController.cpp
+#        ${CMAKE_CURRENT_SOURCE_DIR}/OSTServer.cpp
+#        ${CMAKE_CURRENT_SOURCE_DIR}/OSTImage.cpp
+#        ${CMAKE_CURRENT_SOURCE_DIR}/OSTClient.cpp
+#        ${CMAKE_CURRENT_SOURCE_DIR}/OSTClientGEN.cpp
+#        ${CMAKE_CURRENT_SOURCE_DIR}/OSTClientCTL.cpp
+#        ${CMAKE_CURRENT_SOURCE_DIR}/OSTClientPAN.cpp
+#        ${CMAKE_CURRENT_SOURCE_DIR}/OSTClientFOC.cpp
+#        ${CMAKE_CURRENT_SOURCE_DIR}/OSTClientGUI.cpp
+#        ${CMAKE_CURRENT_SOURCE_DIR}/OSTParser.cpp
 #        ${CMAKE_CURRENT_SOURCE_DIR}/OSTClientSEQ.cpp
+#    )
+
+SET( APP_EXETEST tester )
+
+add_executable( ${APP_EXETEST}
+        ${CMAKE_CURRENT_SOURCE_DIR}/job.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/client.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/apptester.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/OSTImage.cpp
     )
 
-target_link_libraries( ${APP_EXE}
+#target_link_libraries( ${APP_EXE}
+#    indiclientqt
+#    Qt5::Widgets
+#    Qt5::Gui
+#    Qt5::Core
+#    Qt5::Network
+#    Qt5::Concurrent
+#    Qt5::WebSockets
+#    ${STELLARSOLVER_LIBRARIES}
+#    ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
+#    ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
+#    z -lpthread
+#    )
+
+target_link_libraries( ${APP_EXETEST}
     indiclientqt
     Qt5::Widgets
     Qt5::Gui
@@ -60,6 +87,8 @@ target_link_libraries( ${APP_EXE}
     ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
     z -lpthread
     )
+
+
 #install(TARGETS HeadlessObservatory RUNTIME DESTINATION bin)
 
 #get_cmake_property(_variableNames VARIABLES)

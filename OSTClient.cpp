@@ -66,8 +66,6 @@ void OSTClient::newMessage(INDI::BaseDevice *dp, int messageID)
 }
 void OSTClient::newBLOB(IBLOB *bp)
 {
-    IDLog("0 Got blob %s %s\n",bp->name,bp->bvp->name);
-
     executecurrenttask(nullptr,nullptr,nullptr,nullptr,bp);
 }
 
@@ -278,14 +276,14 @@ void OSTClient::executecurrenttask(INumberVectorProperty *nvp,ITextVectorPropert
 
     switch (task.tasktype) {
         case TT_SPEC: {
-            IDLog("TT_SPEC executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
+            //IDLog("TT_SPEC executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
             executespecificcurrenttask(nvp,tvp,svp,lvp,bp);
             //popnext();
             break;
         }
 
         case TT_SEND_NUMBER: {
-            IDLog("**********TT_SEND_NUMBER executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
+            //IDLog("**********TT_SEND_NUMBER executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
             INumberVectorProperty *number = nullptr;
             number = getDevice(task.modulename.toStdString().c_str())->getNumber(task.propertyname.toStdString().c_str());
             if (number == nullptr)
@@ -310,7 +308,7 @@ void OSTClient::executecurrenttask(INumberVectorProperty *nvp,ITextVectorPropert
         }
 
         case TT_SEND_TEXT: {
-            IDLog("**********TT_SEND_TEXT executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
+            //IDLog("**********TT_SEND_TEXT executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
             ITextVectorProperty *text = nullptr;
             text = getDevice(task.modulename.toStdString().c_str())->getText(task.propertyname.toStdString().c_str());
             if (text == nullptr)
@@ -335,7 +333,7 @@ void OSTClient::executecurrenttask(INumberVectorProperty *nvp,ITextVectorPropert
         }
 
         case TT_SEND_SWITCH: {
-            IDLog("**********TT_SEND_SWITCH executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
+            //IDLog("**********TT_SEND_SWITCH executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
 
             ISwitchVectorProperty *sw = nullptr;
             sw = getDevice(task.modulename.toStdString().c_str())->getSwitch(task.propertyname.toStdString().c_str());
@@ -361,7 +359,7 @@ void OSTClient::executecurrenttask(INumberVectorProperty *nvp,ITextVectorPropert
         }
 
         case TT_ANALYSE_SEP: {
-        IDLog("**********TT_ANALYSE_SEP executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
+        //IDLog("**********TT_ANALYSE_SEP executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
 
             image->FindStars();
             popnext();
@@ -369,14 +367,14 @@ void OSTClient::executecurrenttask(INumberVectorProperty *nvp,ITextVectorPropert
         }
 
         case TT_ANALYSE_SOLVE: {
-        IDLog("**********TT_ANALYSE_SOLVE executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
+        //IDLog("**********TT_ANALYSE_SOLVE executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
             image->FindStars();
             popnext();
             break;
         }
 
         case TT_WAIT_NUMBER: {
-        IDLog("**********TT_WAIT_NUMBER executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
+        //IDLog("**********TT_WAIT_NUMBER executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
             bool found = false;
             if ((strcmp(nvp->device, task.modulename.toStdString().c_str()) == 0)&&
                 (strcmp(nvp->name, task.propertyname.toStdString().c_str()) == 0)){
@@ -392,7 +390,7 @@ void OSTClient::executecurrenttask(INumberVectorProperty *nvp,ITextVectorPropert
         }
 
         case TT_WAIT_TEXT: {
-        IDLog("********** TT_WAIT_TEXTexecuting %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
+        //IDLog("********** TT_WAIT_TEXTexecuting %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
             bool found = false;
             if ((strcmp(tvp->device, task.modulename.toStdString().c_str()) == 0)&&
                 (strcmp(tvp->name, task.propertyname.toStdString().c_str()) == 0)){
@@ -408,7 +406,7 @@ void OSTClient::executecurrenttask(INumberVectorProperty *nvp,ITextVectorPropert
         }
 
         case TT_WAIT_SWITCH: {
-        IDLog("**********TT_WAIT_SWITCH executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
+        //IDLog("**********TT_WAIT_SWITCH executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
             bool found = false;
             if ((strcmp(svp->device, task.modulename.toStdString().c_str()) == 0)&&
                 (strcmp(svp->name, task.propertyname.toStdString().c_str()) == 0)){
@@ -424,20 +422,20 @@ void OSTClient::executecurrenttask(INumberVectorProperty *nvp,ITextVectorPropert
         }
 
     case TT_WAIT_SEP: {
-        IDLog("**********TT_WAIT_SEP executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
+        //IDLog("**********TT_WAIT_SEP executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
             /* dostuff */
             popnext();
             break;
         }
     case TT_WAIT_SOLVE: {
-        IDLog("**********TT_WAIT_SOLVE executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
+        //IDLog("**********TT_WAIT_SOLVE executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
             /* dostuff */
             popnext();
             break;
         }
 
     case TT_WAIT_BLOB: {
-        IDLog("**********TT_WAIT_BLOB executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
+        //IDLog("**********TT_WAIT_BLOB executing %s %s %s\n",task.jobname.toStdString().c_str(),task.groupname.toStdString().c_str(),task.taskname.toStdString().c_str());
         if (bp == nullptr) break;
             if (strcmp(bp->bvp->name, task.modulename.toStdString().c_str()) == 0) {
                 image.reset(new OSTImage());

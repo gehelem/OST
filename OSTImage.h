@@ -47,13 +47,18 @@ public:
     void ResetData(void);
     void CalcStats(void);
     void FindStars(void);
+    void SolveStars(void);
     bool FindStarsFinished = true;
+    bool SolveStarsFinished = true;
     QImage jpegmem;
 public slots:
     void sslogOutput(QString text);
-    void ssReady(void);
+    void ssReadySEP(void);
+    void ssReadySolve(void);
 signals:
-    void success(void);
+    void successSEP(void);
+    void successSolve(void);
+
 };
 
 #endif
