@@ -439,7 +439,7 @@ void OSTClient::executecurrenttask(INumberVectorProperty *nvp,ITextVectorPropert
         if (bp == nullptr) break;
             if (strcmp(bp->bvp->name, task.modulename.toStdString().c_str()) == 0) {
                 image.reset(new OSTImage());
-                connect(image.get(),&OSTImage::success,this,&OSTClient::analysefinished);
+                connect(image.get(),&OSTImage::successSEP,this,&OSTClient::analysefinished);
                 image->LoadFromBlob(bp);
                 popnext();
                 break;

@@ -314,7 +314,7 @@ bool OSTClientGUI::startFraming(void)
     return true;
 
     img.reset(new OSTImage());
-    connect(img.get(),&OSTImage::success,this,&OSTClientGUI::analyse);
+    connect(img.get(),&OSTImage::successSEP,this,&OSTClientGUI::analyse);
 
     ISwitchVectorProperty *ccd_frame_reset = nullptr;
     ccd_frame_reset = guiderdevice->getSwitch("CCD_FRAME_RESET");
