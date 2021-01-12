@@ -1,5 +1,5 @@
-#ifndef CLIENTOST_h_
-#define CLIENTOST_h_
+#ifndef CLIENT_h_
+#define CLIENT_h_
 #pragma once
 #include <baseclientqt.h>
 

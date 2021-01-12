@@ -1,13 +1,14 @@
-#include "job.h"
-#include "client.h"
+#include <QtCore>
 #include <basedevice.h>
+#include "client.h"
+#include "image.h"
+#include "job.h"
 #define DDD false
 
 Job::Job(MyClient *cli)
 {
-    setProperty("toto","zoubiea");
-    setProperty("tutu",12);
     if (DDD) qDebug() << "Instanciation";
+    setProperties();
     client=cli;
     connect(client,&MyClient::gotserverConnected,this,&Job::gotserverConnected);
     connect(client,&MyClient::gotserverDisconnected,this,&Job::gotserverDisconnected);
@@ -26,6 +27,17 @@ Job::Job(MyClient *cli)
 Job::~Job()
 {
 }
+
+void Job::setProperties(void)
+{
+    props.setProperty("Name","DefaultJob");
+
+}
+QObject Job::getProperties(void)
+{
+    //return props.;
+}
+
 void Job::gotserverConnected()
 {
     if (DDD) qDebug() << "gotserverConnected";
@@ -49,13 +61,6 @@ void Job::gotremoveDevice(INDI::BaseDevice *dp)
 void Job::gotnewProperty(INDI::Property *property)
 {
     if (DDD) qDebug() << "gotnewProperty" << tasks.size();
-    if (!(tasks.size())) return;
-    if ( (strcmp(tasks.front().devicename,property->getDeviceName())==0) &&
-         (strcmp(tasks.front().propertyname,property->getName())==0)
-         ) {
-        executeTask(tasks.front());
-    }
-
     Q_UNUSED(property);
 
 }
@@ -64,27 +69,41 @@ void Job::gotremoveProperty(INDI::Property *property)
     if (DDD) qDebug() << "gotremoveProperty";
     Q_UNUSED(property);
 }
+
+
 void Job::gotnewText(ITextVectorProperty *tvp)
 {
     if (DDD) qDebug() << "gotnewText";
     if (!tasks.size()) return;
-    if ( (tasks.front().tasktype==TT_WAIT_PROP)
+
+    if (    (tasks.front().tasktype==TT_WAIT_PROP)
          && (strcmp(tasks.front().devicename,tvp->device)==0)
          && (strcmp(tasks.front().propertyname,tvp->name)==0)
-         ) {
-        popnext();
+         )
+    {
+        if (tasks.front().specific) {
+            executeTaskSpec(tasks.front(),tvp);
+        } else {
+            popnext();
+        }
     }
-    if ( (tasks.front().tasktype==TT_WAIT_TEXT)
+
+    if (    (tasks.front().tasktype==TT_WAIT_TEXT)
          && (strcmp(tasks.front().devicename,tvp->device)==0)
          && (strcmp(tasks.front().propertyname,tvp->name)==0) ) {
         for (int i=0;i<tvp->ntp;i++) {
-            if (  (strcmp(tasks.front().elementname,tvp->tp[i].name)==0)
-               && (strcmp(tasks.front().text,tvp->tp[i].text       )==0) ){
-               popnext();
+            if ((strcmp(tasks.front().elementname,tvp->tp[i].name)==0)
+               && (tasks.front().text==tvp->tp[i].text) ){
+                if (tasks.front().specific) {
+                    executeTaskSpec(tasks.front(),tvp);
+                } else {
+                    popnext();
+                }
             }
         }
     }
 }
+
 void Job::gotnewSwitch(ISwitchVectorProperty *svp)
 {
     if (DDD) qDebug() << "gotnewSwitch";
@@ -93,20 +112,32 @@ void Job::gotnewSwitch(ISwitchVectorProperty *svp)
     if (    (tasks.front().tasktype==TT_WAIT_PROP)
          && (strcmp(tasks.front().devicename,svp->device)==0)
          && (strcmp(tasks.front().propertyname,svp->name)==0)
-         ) {
-        popnext();
+         )
+    {
+        if (tasks.front().specific) {
+            executeTaskSpec(tasks.front(),svp);
+        } else {
+            popnext();
+        }
     }
+
     if (    (tasks.front().tasktype==TT_WAIT_SWITCH)
          && (strcmp(tasks.front().devicename,svp->device)==0)
          && (strcmp(tasks.front().propertyname,svp->name)==0) ) {
         for (int i=0;i<svp->nsp;i++) {
             if ((strcmp(tasks.front().elementname,svp->sp[i].name)==0)
                && (tasks.front().sw==svp->sp[i].s) ){
-               popnext();
+                if (tasks.front().specific) {
+                    executeTaskSpec(tasks.front(),svp);
+                } else {
+                    popnext();
+                }
             }
         }
     }
+
 }
+
 void Job::gotnewNumber(INumberVectorProperty *nvp)
 {
     if (DDD) qDebug() << "gotnewNumber";
@@ -115,16 +146,26 @@ void Job::gotnewNumber(INumberVectorProperty *nvp)
     if (    (tasks.front().tasktype==TT_WAIT_PROP)
          && (strcmp(tasks.front().devicename,nvp->device)==0)
          && (strcmp(tasks.front().propertyname,nvp->name)==0)
-         ) {
-        popnext();
+         )
+    {
+        if (tasks.front().specific) {
+            executeTaskSpec(tasks.front(),nvp);
+        } else {
+            popnext();
+        }
     }
+
     if (    (tasks.front().tasktype==TT_WAIT_NUMBER)
          && (strcmp(tasks.front().devicename,nvp->device)==0)
          && (strcmp(tasks.front().propertyname,nvp->name)==0) ) {
         for (int i=0;i<nvp->nnp;i++) {
             if ((strcmp(tasks.front().elementname,nvp->np[i].name)==0)
                && (tasks.front().value==nvp->np[i].value) ){
-               popnext();
+                if (tasks.front().specific) {
+                    executeTaskSpec(tasks.front(),nvp);
+                } else {
+                    popnext();
+                }
             }
         }
     }
@@ -134,7 +175,34 @@ void Job::gotnewLight(ILightVectorProperty *lvp)
     if (DDD) qDebug() << "gotnewLight";
     if (!tasks.size()) return;
 
-    Q_UNUSED(lvp);
+    if (    (tasks.front().tasktype==TT_WAIT_PROP)
+         && (strcmp(tasks.front().devicename,lvp->device)==0)
+         && (strcmp(tasks.front().propertyname,lvp->name)==0)
+         )
+    {
+        if (tasks.front().specific) {
+            executeTaskSpec(tasks.front(),lvp);
+        } else {
+            popnext();
+        }
+    }
+
+    if (    (tasks.front().tasktype==TT_WAIT_LIGHT)
+         && (strcmp(tasks.front().devicename,lvp->device)==0)
+         && (strcmp(tasks.front().propertyname,lvp->name)==0) )
+    {
+        for (int i=0;i<lvp->nlp;i++) {
+/*            if ((strcmp(tasks.front().elementname,lvp->lp[i].name)==0)
+               && (tasks.front().XXXX==lvp->lp[i].s) ){
+                if (tasks.front().specific) {
+                    executeTaskSpec(tasks.front(),lvp);
+                } else {
+                    popnext();
+                }
+            }
+*/
+        }
+    }
 }
 void Job::gotnewBLOB(IBLOB *bp)
 {
@@ -143,27 +211,39 @@ void Job::gotnewBLOB(IBLOB *bp)
 
     if (  (tasks.front().tasktype==TT_WAIT_BLOB)
        && (strcmp(tasks.front().devicename,bp->bvp->device)==0) ) {
-        popnext();
+        if (tasks.front().specific) {
+            executeTaskSpec(tasks.front(),bp);
+        } else {
+            popnext();
+        }
     }
 
     if (  (tasks.front().tasktype==TT_ANALYSE_SEP)
        && (strcmp(tasks.front().devicename,bp->bvp->device)==0) ) {
-        image.reset(new OSTImage());
-        disconnect(image.get(),&OSTImage::successSEP, 0, 0);
-        connect(image.get(),&OSTImage::successSEP,this,&Job::finishedSEP);
-        image->LoadFromBlob(bp);
-        image->FindStars();
-        popnext();
+        if (tasks.front().specific) {
+            executeTaskSpec(tasks.front(),bp);
+        } else {
+            image.reset(new Image());
+            disconnect(image.get(),&Image::successSEP, 0, 0);
+            connect(image.get(),&Image::successSEP,this,&Job::finishedSEP);
+            image->LoadFromBlob(bp);
+            image->FindStars();
+            popnext();
+        }
     }
 
     if (  (tasks.front().tasktype==TT_ANALYSE_SOLVE)
        && (strcmp(tasks.front().devicename,bp->bvp->device)==0) ) {
-        image.reset(new OSTImage());
-        disconnect(image.get(),&OSTImage::successSolve, 0, 0);
-        connect(image.get(),&OSTImage::successSolve,this,&Job::finishedSolve);
-        image->LoadFromBlob(bp);
-        image->SolveStars();
-        popnext();
+        if (tasks.front().specific) {
+            executeTaskSpec(tasks.front(),bp);
+        } else {
+            image.reset(new Image());
+            disconnect(image.get(),&Image::successSolve, 0, 0);
+            connect(image.get(),&Image::successSolve,this,&Job::finishedSolve);
+            image->LoadFromBlob(bp);
+            image->SolveStars();
+            popnext();
+        }
     }
 }
 void Job::gotnewMessage(INDI::BaseDevice *dp, int messageID)
@@ -178,10 +258,6 @@ void Job::gotnewMessage(INDI::BaseDevice *dp, int messageID)
 bool Job::taskSendNewNumber(const char *deviceName, const char *propertyName, const char *elementName, double value)
 {
     if (DDD) qDebug() << "taskSendNewNumber";
-
-//-----------------
-//-----------------
-//-----------------
     sleep(1);
     INDI::BaseDevice *dp;
     dp = client->getDevice(deviceName);
@@ -216,10 +292,6 @@ bool Job::taskSendNewNumber(const char *deviceName, const char *propertyName, co
 bool Job::taskSendNewText  (const char *deviceName, const char *propertyName, const char *elementName, const char *text)
 {
     if (DDD) qDebug() << "taskSendNewText";
-
-    //-----------------
-    //-----------------
-    //-----------------
     INDI::BaseDevice *dp;
     dp = client->getDevice(deviceName);
 
@@ -251,10 +323,6 @@ bool Job::taskSendNewText  (const char *deviceName, const char *propertyName, co
 bool Job::taskSendNewSwitch(const char *deviceName, const char *propertyName, const char *elementName, ISState sw)
 {
     if (DDD) qDebug() << "taskSendNewSwitch";
-
-//-----------------
-//-----------------
-//-----------------
 
     INDI::BaseDevice *dp;
     dp = client->getDevice(deviceName);
@@ -302,17 +370,20 @@ void Job::executeTask(Ttask task)
         taskSendNewSwitch(task.devicename,task.propertyname,task.elementname,task.sw);
         popnext();
     }
+    if (task.tasktype==TT_SPEC) {
+        executeTaskSpec(task);
+    }
 
 }
 void Job::popnext(void)
 {
     if (DDD) qDebug() << "popnext";
-
     if (tasks.size()<=1) {
         qDebug() << "finished";
         emit finished();
         return;
     }  else {
+        qDebug() << tasks.front().tasklabel << "finished";
         tasks.pop_front();
         executeTask(tasks.front());
     }
@@ -322,25 +393,35 @@ void Job::popnext(void)
 void Job::finishedSEP(void)
 {
     if (DDD) qDebug() << "finishedSEP";
+    if (!tasks.size()) return;
 
-    if (  (!tasks.size()) && (tasks.front().tasktype==TT_WAIT_SEP)
-       && (true) ) {
-        stars=image->stars;
-        popnext();
+    if (tasks.front().tasktype==TT_WAIT_SEP)
+    {
+        if (tasks.front().specific) {
+            executeTaskSpec(tasks.front());
+        } else {
+            stars=image->stars;
+            popnext();
+        }
     }
 }
 void Job::finishedSolve(void)
 {
     if (DDD) qDebug() << "finishedSolve";
+    if (!tasks.size()) return;
 
-    if (  (!tasks.size()) && (tasks.front().tasktype==TT_WAIT_SOLVE)
-       && (true) ) {
-        stars=image->stars;
-        /* process solve results ?? */
-        popnext();
+    if  (tasks.front().tasktype==TT_WAIT_SOLVE)
+    {
+        if (tasks.front().specific) {
+            executeTaskSpec(tasks.front());
+        } else {
+            stars=image->stars;
+            popnext();
+        }
     }
+
 }
-void Job::addnewtask (Tasktype tasktype,  QString taskname, QString tasklabel,
+void Job::addnewtask (Tasktype tasktype,  QString taskname, QString tasklabel,bool specific,
                 const char *devicename,const char *propertyname,const char *elementname)
 {
     if (DDD) qDebug() << "addnewtask1";
@@ -349,12 +430,13 @@ void Job::addnewtask (Tasktype tasktype,  QString taskname, QString tasklabel,
     task.tasktype = tasktype;
     task.taskname = taskname;
     task.tasklabel = tasklabel;
+    task.specific = specific;
     task.devicename= devicename;
     task.propertyname = propertyname;
     task.elementname = elementname;
     tasks.append(task);
 }
-void Job::addnewtask (Tasktype tasktype,  QString taskname, QString tasklabel,
+void Job::addnewtask (Tasktype tasktype,  QString taskname, QString tasklabel,bool specific,
                 const char *devicename,const char *propertyname,const char *elementname,
                 double value,const char *text,ISState sw)
 {
@@ -364,6 +446,7 @@ void Job::addnewtask (Tasktype tasktype,  QString taskname, QString tasklabel,
     task.tasktype = tasktype;
     task.taskname = taskname;
     task.tasklabel = tasklabel;
+    task.specific = specific;
     task.devicename= devicename;
     task.propertyname = propertyname;
     task.elementname = elementname;
@@ -372,4 +455,3 @@ void Job::addnewtask (Tasktype tasktype,  QString taskname, QString tasklabel,
     task.sw = sw;
     tasks.append(task);
 }
-

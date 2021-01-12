@@ -14,16 +14,6 @@
 #include <QPointer>
 #include <QtNetwork>
 #include <baseclientqt.h>
-#include <basedevice.h>
-#include <cstring>
-#include <fstream>
-#include <iostream>
-#include <memory>
-#include <QJsonObject>
-#include <QJsonDocument>
-#include <QQueue>
-#include <QImage>
-#include <queue>
 
 /**************************************************************************************
 **
