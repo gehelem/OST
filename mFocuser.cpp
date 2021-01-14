@@ -1,24 +1,21 @@
 #include <basedevice.h>
-#include "client.h"
-#include "image.h"
-#include "job.h"
-#include "jFocuser.h"
+#include "mFocuser.h"
 
-JFocuser::JFocuser(MyClient *cli) : Job(cli)
+MFocuser::MFocuser(MyClient *cli) : Module(cli)
 {
-    Job::setProperties();
+    Module::setProperties();
     setProperties();
 }
-JFocuser::~JFocuser()
+MFocuser::~MFocuser()
 {
     //
 }
-void JFocuser::setProperties(void)
+void MFocuser::setProperties(void)
 {
     props.setProperty("Focus","this is mine");
 
 }
-void JFocuser::startFraming(void)
+void MFocuser::startFraming(void)
 {
     addnewtask(TT_SEND_NUMBER,"fram1","Exp. request",false,"CCD Simulator","CCD_EXPOSURE","CCD_EXPOSURE_VALUE",10,"",ISS_OFF);
     addnewtask(TT_WAIT_BLOB  ,"fram2","Exp. waiting",false,"CCD Simulator","CCD_EXPOSURE","CCD_EXPOSURE_VALUE",10,"",ISS_OFF);
@@ -29,7 +26,7 @@ void JFocuser::startFraming(void)
 }
 
 
-void JFocuser::executeTaskSpec(Ttask task)
+void MFocuser::executeTaskSpec(Ttask task)
 {
     Q_UNUSED(task);
     if (strcmp(task.taskname.toStdString().c_str(),"fram0") == 0) {
@@ -42,27 +39,27 @@ void JFocuser::executeTaskSpec(Ttask task)
         executeTask(tasks.front());
     }
 }
-void JFocuser::executeTaskSpec(Ttask task,IBLOB *bp)
+void MFocuser::executeTaskSpec(Ttask task,IBLOB *bp)
 {
     Q_UNUSED(task);
 
 }
-void JFocuser::executeTaskSpec(Ttask task,INumberVectorProperty *nvp)
+void MFocuser::executeTaskSpec(Ttask task,INumberVectorProperty *nvp)
 {
     Q_UNUSED(task);
     Q_UNUSED(nvp);
 }
-void JFocuser::executeTaskSpec(Ttask task,ISwitchVectorProperty *svp)
+void MFocuser::executeTaskSpec(Ttask task,ISwitchVectorProperty *svp)
 {
     Q_UNUSED(task);
     Q_UNUSED(svp);
 }
-void JFocuser::executeTaskSpec(Ttask task,ITextVectorProperty *tvp)
+void MFocuser::executeTaskSpec(Ttask task,ITextVectorProperty *tvp)
 {
     Q_UNUSED(task);
     Q_UNUSED(tvp);
 }
-void JFocuser::executeTaskSpec(Ttask task,ILightVectorProperty *lvp)
+void MFocuser::executeTaskSpec(Ttask task,ILightVectorProperty *lvp)
 {
     Q_UNUSED(task);
     Q_UNUSED(lvp);

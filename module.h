@@ -1,33 +1,37 @@
 #ifndef JOB_h_
 #define JOB_h_
 #include <QtCore>
-#include <QDir>
-#include <QThread>
-#include <QMap>
-#include <QVariant>
-#include <QVector>
-#include <QRect>
-#include <QPointer>
-#include <QtCore/QObject>
-#include <QtCore/QList>
-#include <QtCore/QByteArray>
 #include "client.h"
 #include "image.h"
 enum Tasktype
 {
+    /*! Wait new property event from indiserver */
     TT_WAIT_PROP,
+    /*! Wait new number event from indiserver */
     TT_WAIT_NUMBER,
+    /*! Wait new text event from indiserver */
     TT_WAIT_TEXT,
+    /*! Wait new switch event from indiserver */
     TT_WAIT_SWITCH,
+    /*! Wait Stellarsolver SEP job to finish */
     TT_WAIT_SEP,
+    /*! Wait Stellarsolver Solve job to finish */
     TT_WAIT_SOLVE,
+    /*! Wait new Blob event from indiserver */
     TT_WAIT_BLOB,
+    /*! Wait new light event from indiserver */
     TT_WAIT_LIGHT,
+    /*! Send new number to indiserver */
     TT_SEND_NUMBER,
+    /*! Send new text to indiserver */
     TT_SEND_TEXT,
+    /*! Send new switch to indiserver */
     TT_SEND_SWITCH,
+    /*! Asking Stellarsolver to find stars*/
     TT_ANALYSE_SEP,
+    /*! Asking Stellarsolver to solve field */
     TT_ANALYSE_SOLVE,
+    /*! calling specific task, to be defined in inherited module */
     TT_SPEC
 };
 
@@ -36,7 +40,8 @@ struct Ttask
     Tasktype tasktype;
     QString taskname;
     QString tasklabel;
-    bool specific;              // when true : calling **spec overloaded methods within inherited jobs
+    /*! when true : calling **spec overloaded methods within inherited jobs */
+    bool specific;
     const char *devicename;
     const char *propertyname;
     const char *elementname;
@@ -44,12 +49,17 @@ struct Ttask
     const char *text;
     ISState sw;
 };
-class Job : public QObject
+/*!
+ * This Class shouldn't be used as is
+ * Every functionnal module should inherit it
+ * It mainly provides a task queue skeleton
+*/
+class Module : public QObject
 {
     Q_OBJECT
     public:
-        Job(MyClient *cli);
-        ~Job();
+        Module(MyClient *cli);
+        ~Module();
 
         MyClient *client;
         QQueue<Ttask> tasks;

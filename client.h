@@ -2,26 +2,33 @@
 #define CLIENT_h_
 #pragma once
 #include <baseclientqt.h>
-
+/*!
+ * indiclient class, overloaded with some basic functions to help us
+ * it should be instanciated only once, to keep only one active connection to indiserver
+*/
 class MyClient : public INDI::BaseClientQt
 {
     Q_OBJECT
   public:
     MyClient(QObject *parent = Q_NULLPTR);
     ~MyClient() = default;
+    void connectIndi(void);
+    void connectAllDevices(void);
+    void disconnectAllDevices(void);
+    void loadDevicesConfs(void);
   signals:
-    virtual void gotserverConnected();
-    virtual void gotserverDisconnected(int exit_code);
-    virtual void gotnewDevice(INDI::BaseDevice *dp);
-    virtual void gotremoveDevice(INDI::BaseDevice *dp);
-    virtual void gotnewProperty(INDI::Property *property);
-    virtual void gotremoveProperty(INDI::Property *property);
-    virtual void gotnewText(ITextVectorProperty *tvp);
-    virtual void gotnewSwitch(ISwitchVectorProperty *svp);
-    virtual void gotnewLight(ILightVectorProperty *lvp);
-    virtual void gotnewBLOB(IBLOB *bp);
-    virtual void gotnewNumber(INumberVectorProperty *nvp);
-    virtual void gotnewMessage(INDI::BaseDevice *dp, int messageID);
+    void gotserverConnected();
+    void gotserverDisconnected(int exit_code);
+    void gotnewDevice(INDI::BaseDevice *dp);
+    void gotremoveDevice(INDI::BaseDevice *dp);
+    void gotnewProperty(INDI::Property *property);
+    void gotremoveProperty(INDI::Property *property);
+    void gotnewText(ITextVectorProperty *tvp);
+    void gotnewSwitch(ISwitchVectorProperty *svp);
+    void gotnewLight(ILightVectorProperty *lvp);
+    void gotnewBLOB(IBLOB *bp);
+    void gotnewNumber(INumberVectorProperty *nvp);
+    void gotnewMessage(INDI::BaseDevice *dp, int messageID);
 
   protected:
     virtual void serverConnected();

@@ -9,6 +9,12 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+get_cmake_property(_variableNames VARIABLES)
+list (SORT _variableNames)
+foreach (_variableName ${_variableNames})
+    message(STATUS "${_variableName}=${${_variableName}}")
+endforeach()
+
 #find_package(Qt5Core)
 find_package(CFITSIO REQUIRED)
 find_package(INDI REQUIRED)
@@ -54,8 +60,8 @@ include(CMakeCommon)
 SET( APP_EXEOST ost )
 
 add_executable( ${APP_EXEOST}
-        ${CMAKE_CURRENT_SOURCE_DIR}/job.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/jFocuser.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/module.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/mFocuser.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/client.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/ost.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/controller.cpp

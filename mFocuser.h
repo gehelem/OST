@@ -1,14 +1,13 @@
 #ifndef JFOCUSER_h_
 #define JFOCUSER_h_
-#include "client.h"
-#include "job.h"
+#include "module.h"
 
-class JFocuser : public Job
+class MFocuser : public Module
 {
     Q_OBJECT
     public:
-        JFocuser(MyClient *cli);
-        ~JFocuser();
+        MFocuser(MyClient *cli);
+        ~MFocuser();
 
         void setProperties(void);
         void startFraming(void);

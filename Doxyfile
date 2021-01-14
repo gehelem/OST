@@ -1,0 +1,21 @@
+PROJECT_NAME = "OST"
+OUTPUT_DIRECTORY = ./doc/
+BUILTIN_STL_SUPPORT = YES
+EXTRACT_ALL = YES
+INPUT = ./client.cpp \
+        ./client.h \
+        ./controller.cpp \
+        ./controller.h \
+        ./image.cpp \
+        ./image.h \
+        ./module.cpp \
+        ./module.h \
+        ./ost.cpp \
+        ./mFocuser.cpp \
+        ./mFocuser.h 
+RECURSIVE = YES
+HIDE_UNDOC_RELATIONS = NO
+HAVE_DOT = YES
+UML_LOOK = YES
+CALL_GRAPH = YES
+CALLER_GRAPH = YES

@@ -2,7 +2,7 @@
 #include "controller.h"
 
 /*!
- * ... coucou c'est mon commentaire hyper pratique qui sert à rien ...
+ * ... ...
  */
 Controller::Controller(QObject *parent)
 {

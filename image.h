@@ -8,17 +8,6 @@
 //Includes for this project
 #include <structuredefinitions.h>
 #include <stellarsolver.h>
-//QT Includes
-//QT Includes
-#include <QDir>
-#include <QThread>
-#include <QMap>
-#include <QVariant>
-#include <QVector>
-#include <QRect>
-#include <QPointer>
-#include <QtNetwork>
-#include <QImage>
 #define cimg_display 0
 #include <CImg.h>
 
@@ -50,7 +39,6 @@ public:
     void SolveStars(void);
     bool FindStarsFinished = true;
     bool SolveStarsFinished = true;
-    QImage jpegmem;
 public slots:
     void sslogOutput(QString text);
     void ssReadySEP(void);

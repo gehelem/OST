@@ -1,21 +1,23 @@
 #ifndef CONTROLLER_h_
 #define CONTROLLER_h_
 #pragma once
-#include "client.h"
-#include "job.h"
-#include <baseclientqt.h>
+#include "mFocuser.h"
 #include "QtWebSockets/qwebsocketserver.h"
 #include "QtWebSockets/qwebsocket.h"
-#include <QtCore/QDebug>
-#include <QtCore/QObject>
-#include <QtCore/QList>
-#include <QtCore/QByteArray>
+
 
 
 
 QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
 QT_FORWARD_DECLARE_CLASS(QWebSocket)
 
+/*!
+ * This class is the heart of OST
+ * It dispatches events/orders/datas  from one layer to each other
+ * - indiclient
+ * - websocket traffic
+ * - functional Modules
+ */
 class Controller : public QObject
 {
     Q_OBJECT
@@ -24,11 +26,6 @@ public:
     ~Controller();
     QWebSocketServer *m_pWebSocketServer;
     QList<QWebSocket *> m_clients;
-    QJsonObject properties;
-    QString PropertiesFolder="~/OST";
-    void processShoot(void);
-    void connectIndi(void);
-    void connectAllDevices(void);
     MyClient *indiclient;
 public slots:
     void onNewConnection();
