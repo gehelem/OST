@@ -1,6 +1,7 @@
 tester
 OSTServer
 CMakeLists.txt.user*
+doc/
 
 # Projectile tags
 TAGS
