@@ -27,6 +27,7 @@ public:
     QWebSocketServer *m_pWebSocketServer;
     QList<QWebSocket *> m_clients;
     MyClient *indiclient;
+    MFocuser *focuser;
 public slots:
     void onNewConnection();
     void processTextMessage(QString message);

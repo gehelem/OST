@@ -1,8 +1,10 @@
-#ifndef JOB_h_
-#define JOB_h_
+#ifndef MODULE_h_
+#define MODULE_h_
 #include <QtCore>
 #include "client.h"
 #include "image.h"
+#include "properties.h"
+
 enum Tasktype
 {
     /*! Wait new property event from indiserver */
@@ -82,9 +84,8 @@ class Module : public QObject
         virtual void executeTaskSpec(Ttask task,ITextVectorProperty *tvp) {Q_UNUSED(task);Q_UNUSED(tvp);}
         virtual void executeTaskSpec(Ttask task,ILightVectorProperty *lvp) {Q_UNUSED(task);Q_UNUSED(lvp);}
         void popnext(void);
-        void setProperties(void);
-        QObject getProperties(void);
-        QObject props;
+        void initProperties(void);
+        OstProperties props;
     public slots:
         virtual void gotserverConnected();
         virtual void gotserverDisconnected(int exit_code);

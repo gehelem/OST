@@ -1,12 +1,11 @@
 #include <QtCore>
 #include <basedevice.h>
 #include "module.h"
-#define DDD false
 
 Module::Module(MyClient *cli)
 {
-    if (DDD) qDebug() << "Instanciation";
-    setProperties();
+    //qDebug() << "Instanciation";
+    initProperties();
     client=cli;
     connect(client,&MyClient::gotserverConnected,this,&Module::gotserverConnected);
     connect(client,&MyClient::gotserverDisconnected,this,&Module::gotserverDisconnected);
@@ -26,52 +25,49 @@ Module::~Module()
 {
 }
 
-void Module::setProperties(void)
+void Module::initProperties(void)
 {
-    props.setProperty("Name","DefaultJob");
-
-}
-QObject Module::getProperties(void)
-{
-    //return props.;
+    props.setText("modulename",QString("DefaultModule"));
+    props.setText("modulelabel",QString("DefaultModuleDoNotUseAsIs"));
+    props.setText("dummy",QString("Quand on a pas de technique faut y aller à la zob."));
 }
 
 void Module::gotserverConnected()
 {
-    if (DDD) qDebug() << "gotserverConnected";
+    //qDebug() << "gotserverConnected";
 
 }
 void Module::gotserverDisconnected(int exit_code)
 {
-    if (DDD) qDebug() << "gotserverDisconnected";
+    //qDebug() << "gotserverDisconnected";
     Q_UNUSED(exit_code);
 }
 void Module::gotnewDevice(INDI::BaseDevice *dp)
 {
-    if (DDD) qDebug() << "gotnewDevice : " << dp->getDeviceName();
+    //qDebug() << "gotnewDevice : " << dp->getDeviceName();
     Q_UNUSED(dp);
 }
 void Module::gotremoveDevice(INDI::BaseDevice *dp)
 {
-    if (DDD) qDebug() << "gotremoveDevice";
+    //qDebug() << "gotremoveDevice";
     Q_UNUSED(dp);
 }
 void Module::gotnewProperty(INDI::Property *property)
 {
-    if (DDD) qDebug() << "gotnewProperty" << tasks.size();
+    //qDebug() << "gotnewProperty" << tasks.size();
     Q_UNUSED(property);
 
 }
 void Module::gotremoveProperty(INDI::Property *property)
 {
-    if (DDD) qDebug() << "gotremoveProperty";
+    //qDebug() << "gotremoveProperty";
     Q_UNUSED(property);
 }
 
 
 void Module::gotnewText(ITextVectorProperty *tvp)
 {
-    if (DDD) qDebug() << "gotnewText";
+    //qDebug() << "gotnewText";
     if (!tasks.size()) return;
 
     if (    (tasks.front().tasktype==TT_WAIT_PROP)
@@ -104,7 +100,7 @@ void Module::gotnewText(ITextVectorProperty *tvp)
 
 void Module::gotnewSwitch(ISwitchVectorProperty *svp)
 {
-    if (DDD) qDebug() << "gotnewSwitch";
+   // qDebug() << "gotnewSwitch";
     if (!tasks.size()) return;
 
     if (    (tasks.front().tasktype==TT_WAIT_PROP)
@@ -138,7 +134,7 @@ void Module::gotnewSwitch(ISwitchVectorProperty *svp)
 
 void Module::gotnewNumber(INumberVectorProperty *nvp)
 {
-    if (DDD) qDebug() << "gotnewNumber";
+    //qDebug() << "gotnewNumber";
     if (!tasks.size()) return;
 
     if (    (tasks.front().tasktype==TT_WAIT_PROP)
@@ -170,7 +166,7 @@ void Module::gotnewNumber(INumberVectorProperty *nvp)
 }
 void Module::gotnewLight(ILightVectorProperty *lvp)
 {
-    if (DDD) qDebug() << "gotnewLight";
+    //qDebug() << "gotnewLight";
     if (!tasks.size()) return;
 
     if (    (tasks.front().tasktype==TT_WAIT_PROP)
@@ -204,7 +200,7 @@ void Module::gotnewLight(ILightVectorProperty *lvp)
 }
 void Module::gotnewBLOB(IBLOB *bp)
 {
-    if (DDD) qDebug() << "gotnewBLOB";
+    //qDebug() << "gotnewBLOB";
     if (!tasks.size()) return;
 
     if (  (tasks.front().tasktype==TT_WAIT_BLOB)
@@ -246,7 +242,7 @@ void Module::gotnewBLOB(IBLOB *bp)
 }
 void Module::gotnewMessage(INDI::BaseDevice *dp, int messageID)
 {
-    if (DDD) qDebug() << "gotnewMessage";
+    //qDebug() << "gotnewMessage";
     if (!tasks.size()) return;
 
     Q_UNUSED(dp);
@@ -255,7 +251,7 @@ void Module::gotnewMessage(INDI::BaseDevice *dp, int messageID)
 
 bool Module::taskSendNewNumber(const char *deviceName, const char *propertyName, const char *elementName, double value)
 {
-    if (DDD) qDebug() << "taskSendNewNumber";
+    //qDebug() << "taskSendNewNumber";
     sleep(1);
     INDI::BaseDevice *dp;
     dp = client->getDevice(deviceName);
@@ -289,7 +285,7 @@ bool Module::taskSendNewNumber(const char *deviceName, const char *propertyName,
 }
 bool Module::taskSendNewText  (const char *deviceName, const char *propertyName, const char *elementName, const char *text)
 {
-    if (DDD) qDebug() << "taskSendNewText";
+    //qDebug() << "taskSendNewText";
     INDI::BaseDevice *dp;
     dp = client->getDevice(deviceName);
 
@@ -320,7 +316,7 @@ bool Module::taskSendNewText  (const char *deviceName, const char *propertyName,
 }
 bool Module::taskSendNewSwitch(const char *deviceName, const char *propertyName, const char *elementName, ISState sw)
 {
-    if (DDD) qDebug() << "taskSendNewSwitch";
+    //qDebug() << "taskSendNewSwitch";
 
     INDI::BaseDevice *dp;
     dp = client->getDevice(deviceName);
@@ -354,7 +350,7 @@ bool Module::taskSendNewSwitch(const char *deviceName, const char *propertyName,
 }
 void Module::executeTask(Ttask task)
 {
-    if (DDD) qDebug() << "executeTask";
+    //qDebug() << "executeTask";
 
     if (task.tasktype==TT_SEND_NUMBER) {
         taskSendNewNumber(task.devicename,task.propertyname,task.elementname,task.value);
@@ -375,7 +371,7 @@ void Module::executeTask(Ttask task)
 }
 void Module::popnext(void)
 {
-    if (DDD) qDebug() << "popnext";
+    //qDebug() << "popnext";
     if (tasks.size()<=1) {
         qDebug() << "finished";
         emit finished();
@@ -390,7 +386,7 @@ void Module::popnext(void)
 
 void Module::finishedSEP(void)
 {
-    if (DDD) qDebug() << "finishedSEP";
+    //qDebug() << "finishedSEP";
     if (!tasks.size()) return;
 
     if (tasks.front().tasktype==TT_WAIT_SEP)
@@ -405,7 +401,7 @@ void Module::finishedSEP(void)
 }
 void Module::finishedSolve(void)
 {
-    if (DDD) qDebug() << "finishedSolve";
+    //qDebug() << "finishedSolve";
     if (!tasks.size()) return;
 
     if  (tasks.front().tasktype==TT_WAIT_SOLVE)
@@ -422,7 +418,7 @@ void Module::finishedSolve(void)
 void Module::addnewtask (Tasktype tasktype,  QString taskname, QString tasklabel,bool specific,
                 const char *devicename,const char *propertyname,const char *elementname)
 {
-    if (DDD) qDebug() << "addnewtask1";
+    //qDebug() << "addnewtask1";
 
     Ttask task;
     task.tasktype = tasktype;
@@ -438,7 +434,7 @@ void Module::addnewtask (Tasktype tasktype,  QString taskname, QString tasklabel
                 const char *devicename,const char *propertyname,const char *elementname,
                 double value,const char *text,ISState sw)
 {
-    if (DDD) qDebug() << "addnewtask2";
+    //qDebug() << "addnewtask2";
 
     Ttask task;
     task.tasktype = tasktype;

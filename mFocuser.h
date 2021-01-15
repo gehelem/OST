@@ -1,5 +1,5 @@
-#ifndef JFOCUSER_h_
-#define JFOCUSER_h_
+#ifndef MFOCUSER_h_
+#define MFOCUSER_h_
 #include "module.h"
 
 class MFocuser : public Module
@@ -9,7 +9,7 @@ class MFocuser : public Module
         MFocuser(MyClient *cli);
         ~MFocuser();
 
-        void setProperties(void);
+        void initProperties(void);
         void startFraming(void);
         virtual void executeTaskSpec(Ttask task) override;
         virtual void executeTaskSpec(Ttask task,IBLOB *bp) override;

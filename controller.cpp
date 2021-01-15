@@ -2,7 +2,7 @@
 #include "controller.h"
 
 /*!
- * ... coucou c'est mon commentaire hyper pratique qui sert à rien ...
+ * ... ...
  */
 Controller::Controller(QObject *parent)
 {
@@ -16,6 +16,7 @@ Controller::Controller(QObject *parent)
     IDLog("OST server listening\n");
 
     indiclient = new MyClient(this);
+    focuser = new MFocuser(indiclient);
 }
 
 Controller::~Controller()
@@ -64,6 +65,7 @@ void Controller::processTextMessage(QString message)
         if (indiclient->isServerConnected())
         {
             //processShoot();
+            focuser->startFraming();
         } else {
             IDLog("Indi server not connected\n");
         }

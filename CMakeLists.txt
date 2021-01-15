@@ -66,6 +66,7 @@ add_executable( ${APP_EXEOST}
         ${CMAKE_CURRENT_SOURCE_DIR}/ost.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/controller.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/image.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/properties.cpp
     )
 
 #target_link_libraries( ${APP_EXE}
