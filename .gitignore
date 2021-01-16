@@ -13,6 +13,8 @@ build-*/
 *~
 *.orig
 
+*.autosave
+
 .cmake
 nbproject/
 .directory
