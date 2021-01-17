@@ -56,7 +56,7 @@ struct Ttask
  * Every functionnal module should inherit it
  * It mainly provides a task queue skeleton
 */
-class Module : public QObject
+abstract class Module : public QObject
 {
     Q_OBJECT
     public:

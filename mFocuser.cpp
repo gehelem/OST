@@ -19,9 +19,6 @@ void MFocuser::initProperties(void)
 }
 void MFocuser::startFraming(void)
 {
-    qDebug() << props.getText("modulelabel");
-    qDebug() << props.getText("dummy");
-    qDebug() << props.getText("exp");
     addnewtask(TT_SEND_NUMBER,"fram1","Exp. request",false,"CCD Simulator","CCD_EXPOSURE","CCD_EXPOSURE_VALUE",props.getNumber("exp"),"",ISS_OFF);
     addnewtask(TT_WAIT_BLOB  ,"fram2","Exp. waiting",false,"CCD Simulator","CCD_EXPOSURE","CCD_EXPOSURE_VALUE",10,"",ISS_OFF);
     addnewtask(TT_ANALYSE_SEP,"fram3","Analyse request",false,"CCD Simulator","CCD_EXPOSURE","CCD_EXPOSURE_VALUE",10,"",ISS_OFF);
