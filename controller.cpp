@@ -8,132 +8,53 @@ Controller::Controller(QObject *parent)
 {
 
     this->setParent(parent);
-    m_pWebSocketServer = new QWebSocketServer(QStringLiteral("OST server"),QWebSocketServer::NonSecureMode, this);
-    if (m_pWebSocketServer->listen(QHostAddress::Any, 9624)) {
-       connect(m_pWebSocketServer, &QWebSocketServer::newConnection,this, &Controller::onNewConnection);
-       connect(m_pWebSocketServer, &QWebSocketServer::closed, this, &Controller::closed);
-    }
-    IDLog("OST server listening\n");
 
     indiclient = new MyClient(this);
+    wshandler= new WShandler(this);
     focuser = new MFocuser(indiclient);
+    connect(focuser,&MFocuser::signalvalueChanged,this,&Controller::valueChanged);
+    connect(focuser,&MFocuser::signalpropCreated,this,&Controller::propCreated);
+    connect(focuser,&MFocuser::signalpropDeleted,this,&Controller::propDeleted);
+    connect(wshandler,&WShandler::changeValue,focuser,&MFocuser::slotvalueChangedFromCtl);
+    focuser->initProperties();
+
+    mainctl = new MMainctl(indiclient);
+    connect(mainctl,&MMainctl::signalvalueChanged,this,&Controller::valueChanged);
+    connect(mainctl,&MMainctl::signalpropCreated,this,&Controller::propCreated);
+    connect(mainctl,&MMainctl::signalpropDeleted,this,&Controller::propDeleted);
+    connect(wshandler,&WShandler::changeValue,mainctl,&MMainctl::slotvalueChangedFromCtl);
+    mainctl->initProperties();
+
+    navigator = new MNavigator(indiclient);
+    connect(navigator,&MNavigator::signalvalueChanged,this,&Controller::valueChanged);
+    connect(navigator,&MNavigator::signalpropCreated,this,&Controller::propCreated);
+    connect(navigator,&MNavigator::signalpropDeleted,this,&Controller::propDeleted);
+    connect(wshandler,&WShandler::changeValue,navigator,&MNavigator::slotvalueChangedFromCtl);
+    navigator->initProperties();
+
 }
+
 
 Controller::~Controller()
 {
-    m_pWebSocketServer->close();
-    qDeleteAll(m_clients.begin(), m_clients.end());
+    /*m_pWebSocketServer->close();
+    qDeleteAll(m_clients.begin(), m_clients.end());*/
 }
 
-
-void Controller::sendmessage(QString message)
+void Controller::valueChanged(elem elt)
 {
-    for (int i=0;i<m_clients.size();i++) {
-        QWebSocket *pClient = m_clients[i];
-        if (pClient) pClient->sendTextMessage(message);
-    }
-
+    wshandler->sendElement(elt);
 }
-void Controller::sendbinary(QByteArray *data)
+
+void Controller::propCreated(elem elt)
 {
-    for (int i=0;i<m_clients.size();i++) {
-        QWebSocket *pClient = m_clients[i];
-        if (pClient) pClient->sendBinaryMessage(*data);
-    }
+    wshandler->sendmessage("New prop " +  elt.name);
 }
-
-
-void Controller::onNewConnection()
+void Controller::propDeleted(elem elt)
 {
-    IDLog("New client connection\n");
-    QWebSocket *pSocket = m_pWebSocketServer->nextPendingConnection();
-    connect(pSocket, &QWebSocket::textMessageReceived, this, &Controller::processTextMessage);
-    connect(pSocket, &QWebSocket::disconnected, this, &Controller::socketDisconnected);
-    m_clients << pSocket;
+    wshandler->sendmessage("Del prop " +  elt.name);
 }
 
-
-void Controller::processTextMessage(QString message)
-{
-    IDLog("OST server received text message %s\n",message.toStdString().c_str() );
-    QJsonDocument jsonResponse = QJsonDocument::fromJson(message.toUtf8()); // garder
-    QJsonObject  obj = jsonResponse.object(); // garder
-
-    if ( (obj["message"].toString()=="shoot")
-      || (message=="shoot") )
-    {
-        if (indiclient->isServerConnected())
-        {
-            //processShoot();
-            focuser->startFraming();
-        } else {
-            IDLog("Indi server not connected\n");
-        }
-    }
-
-    if ( (obj["message"].toString()=="connectindi")
-      || (message=="connectindi") )
-    {
-        if (!(indiclient->isServerConnected()))
-        {
-            indiclient->connectIndi();
-        } else {
-            //IDLog("Indi server not connected\n");
-        }
-    }
-
-    if ( (obj["message"].toString()=="connectdevices")
-      || (message=="connectdevices") )
-    {
-        if (indiclient->isServerConnected())
-        {
-            indiclient->connectAllDevices();
-        } else {
-            IDLog("Indi server not connected\n");
-        }
-    }
-
-    if ( (obj["message"].toString()=="disconnectdevices")
-      || (message=="disconnectdevices") )
-    {
-        if (indiclient->isServerConnected())
-        {
-            indiclient->disconnectAllDevices();
-        } else {
-            IDLog("Indi server not connected\n");
-        }
-    }
-    if ( (obj["message"].toString()=="loadconfs")
-      || (message=="loadconfs") )
-    {
-        if (indiclient->isServerConnected())
-        {
-            indiclient->loadDevicesConfs();
-        } else {
-            IDLog("Indi server not connected\n");
-        }
-    }
-}
-
-void Controller::processBinaryMessage(QByteArray message)
-{
-    QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
-    IDLog("OST server received binary message\n");
-
-    if (pClient) {
-        pClient->sendBinaryMessage(message);
-    }
-}
-
-void Controller::socketDisconnected()
-{
-    QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
-    IDLog("OST client disconnected\n");
-    if (pClient) {
-        m_clients.removeAll(pClient);
-        pClient->deleteLater();
-    }
-}
 
 
 

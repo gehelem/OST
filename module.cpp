@@ -5,33 +5,45 @@
 Module::Module(MyClient *cli)
 {
     //qDebug() << "Instanciation";
-    initProperties();
-    client=cli;
-    connect(client,&MyClient::gotserverConnected,this,&Module::gotserverConnected);
-    connect(client,&MyClient::gotserverDisconnected,this,&Module::gotserverDisconnected);
-    connect(client,&MyClient::gotnewDevice,this,&Module::gotnewDevice);
-    connect(client,&MyClient::gotremoveDevice,this,&Module::gotremoveDevice);
-    connect(client,&MyClient::gotnewProperty,this,&Module::gotnewProperty);
-    connect(client,&MyClient::gotremoveProperty,this,&Module::gotremoveProperty);
-    connect(client,&MyClient::gotnewText,this,&Module::gotnewText);
-    connect(client,&MyClient::gotnewSwitch,this,&Module::gotnewSwitch);
-    connect(client,&MyClient::gotnewLight,this,&Module::gotnewLight);
-    connect(client,&MyClient::gotnewBLOB,this,&Module::gotnewBLOB);
-    connect(client,&MyClient::gotnewNumber,this,&Module::gotnewNumber);
-    connect(client,&MyClient::gotnewMessage,this,&Module::gotnewMessage);
+    indiclient=cli;
+    connect(indiclient,&MyClient::gotserverConnected,this,&Module::gotserverConnected);
+    connect(indiclient,&MyClient::gotserverDisconnected,this,&Module::gotserverDisconnected);
+    connect(indiclient,&MyClient::gotnewDevice,this,&Module::gotnewDevice);
+    connect(indiclient,&MyClient::gotremoveDevice,this,&Module::gotremoveDevice);
+    connect(indiclient,&MyClient::gotnewProperty,this,&Module::gotnewProperty);
+    connect(indiclient,&MyClient::gotremoveProperty,this,&Module::gotremoveProperty);
+    connect(indiclient,&MyClient::gotnewText,this,&Module::gotnewText);
+    connect(indiclient,&MyClient::gotnewSwitch,this,&Module::gotnewSwitch);
+    connect(indiclient,&MyClient::gotnewLight,this,&Module::gotnewLight);
+    connect(indiclient,&MyClient::gotnewBLOB,this,&Module::gotnewBLOB);
+    connect(indiclient,&MyClient::gotnewNumber,this,&Module::gotnewNumber);
+    connect(indiclient,&MyClient::gotnewMessage,this,&Module::gotnewMessage);
+
+    connect(&props,&OSTProperties::signalvalueChanged,this,&Module::slotvalueChanged);
+    //connect(&props,&OSTProperties::signalpropCreated,this,&Module::slotpropCreated);
+    //connect(&props,&OSTProperties::signalpropDeleted,this,&Module::slotpropDeleted);
+
 
 }
 Module::~Module()
 {
 }
-
+void Module::slotvalueChanged(elem prop)
+{
+   emit signalvalueChanged(prop);
+}
+void Module::slotpropCreated(elem prop)
+{
+   emit signalpropCreated(prop);
+}
+void Module::slotpropDeleted(elem prop)
+{
+   emit signalpropDeleted(prop);
+}
 void Module::initProperties(void)
 {
-    props.setText("modulename",QString("DefaultModule"));
-    props.setText("modulelabel",QString("DefaultModuleDoNotUseAsIs"));
-    props.setText("dummy",QString("Quand on a pas de technique faut y aller à la zob."));
-}
 
+}
 void Module::gotserverConnected()
 {
     //qDebug() << "gotserverConnected";
@@ -71,8 +83,8 @@ void Module::gotnewText(ITextVectorProperty *tvp)
     if (!tasks.size()) return;
 
     if (    (tasks.front().tasktype==TT_WAIT_PROP)
-         && (strcmp(tasks.front().devicename,tvp->device)==0)
-         && (strcmp(tasks.front().propertyname,tvp->name)==0)
+         && (strcmp(tasks.front().devicename.toStdString().c_str(),tvp->device)==0)
+         && (strcmp(tasks.front().propertyname.toStdString().c_str(),tvp->name)==0)
          )
     {
         if (tasks.front().specific) {
@@ -83,10 +95,10 @@ void Module::gotnewText(ITextVectorProperty *tvp)
     }
 
     if (    (tasks.front().tasktype==TT_WAIT_TEXT)
-         && (strcmp(tasks.front().devicename,tvp->device)==0)
-         && (strcmp(tasks.front().propertyname,tvp->name)==0) ) {
+         && (strcmp(tasks.front().devicename.toStdString().c_str(),tvp->device)==0)
+         && (strcmp(tasks.front().propertyname.toStdString().c_str(),tvp->name)==0) ) {
         for (int i=0;i<tvp->ntp;i++) {
-            if ((strcmp(tasks.front().elementname,tvp->tp[i].name)==0)
+            if ((strcmp(tasks.front().elementname.toStdString().c_str(),tvp->tp[i].name)==0)
                && (tasks.front().text==tvp->tp[i].text) ){
                 if (tasks.front().specific) {
                     executeTaskSpec(tasks.front(),tvp);
@@ -104,8 +116,8 @@ void Module::gotnewSwitch(ISwitchVectorProperty *svp)
     if (!tasks.size()) return;
 
     if (    (tasks.front().tasktype==TT_WAIT_PROP)
-         && (strcmp(tasks.front().devicename,svp->device)==0)
-         && (strcmp(tasks.front().propertyname,svp->name)==0)
+         && (strcmp(tasks.front().devicename.toStdString().c_str(),svp->device)==0)
+         && (strcmp(tasks.front().propertyname.toStdString().c_str(),svp->name)==0)
          )
     {
         if (tasks.front().specific) {
@@ -116,10 +128,10 @@ void Module::gotnewSwitch(ISwitchVectorProperty *svp)
     }
 
     if (    (tasks.front().tasktype==TT_WAIT_SWITCH)
-         && (strcmp(tasks.front().devicename,svp->device)==0)
-         && (strcmp(tasks.front().propertyname,svp->name)==0) ) {
+         && (strcmp(tasks.front().devicename.toStdString().c_str(),svp->device)==0)
+         && (strcmp(tasks.front().propertyname.toStdString().c_str(),svp->name)==0) ) {
         for (int i=0;i<svp->nsp;i++) {
-            if ((strcmp(tasks.front().elementname,svp->sp[i].name)==0)
+            if ((strcmp(tasks.front().elementname.toStdString().c_str(),svp->sp[i].name)==0)
                && (tasks.front().sw==svp->sp[i].s) ){
                 if (tasks.front().specific) {
                     executeTaskSpec(tasks.front(),svp);
@@ -138,8 +150,8 @@ void Module::gotnewNumber(INumberVectorProperty *nvp)
     if (!tasks.size()) return;
 
     if (    (tasks.front().tasktype==TT_WAIT_PROP)
-         && (strcmp(tasks.front().devicename,nvp->device)==0)
-         && (strcmp(tasks.front().propertyname,nvp->name)==0)
+         && (strcmp(tasks.front().devicename.toStdString().c_str(),nvp->device)==0)
+         && (strcmp(tasks.front().propertyname.toStdString().c_str(),nvp->name)==0)
          )
     {
         if (tasks.front().specific) {
@@ -150,10 +162,10 @@ void Module::gotnewNumber(INumberVectorProperty *nvp)
     }
 
     if (    (tasks.front().tasktype==TT_WAIT_NUMBER)
-         && (strcmp(tasks.front().devicename,nvp->device)==0)
-         && (strcmp(tasks.front().propertyname,nvp->name)==0) ) {
+         && (strcmp(tasks.front().devicename.toStdString().c_str(),nvp->device)==0)
+         && (strcmp(tasks.front().propertyname.toStdString().c_str(),nvp->name)==0) ) {
         for (int i=0;i<nvp->nnp;i++) {
-            if ((strcmp(tasks.front().elementname,nvp->np[i].name)==0)
+            if ((strcmp(tasks.front().elementname.toStdString().c_str(),nvp->np[i].name)==0)
                && (tasks.front().value==nvp->np[i].value) ){
                 if (tasks.front().specific) {
                     executeTaskSpec(tasks.front(),nvp);
@@ -170,8 +182,8 @@ void Module::gotnewLight(ILightVectorProperty *lvp)
     if (!tasks.size()) return;
 
     if (    (tasks.front().tasktype==TT_WAIT_PROP)
-         && (strcmp(tasks.front().devicename,lvp->device)==0)
-         && (strcmp(tasks.front().propertyname,lvp->name)==0)
+         && (strcmp(tasks.front().devicename.toStdString().c_str(),lvp->device)==0)
+         && (strcmp(tasks.front().propertyname.toStdString().c_str(),lvp->name)==0)
          )
     {
         if (tasks.front().specific) {
@@ -182,8 +194,8 @@ void Module::gotnewLight(ILightVectorProperty *lvp)
     }
 
     if (    (tasks.front().tasktype==TT_WAIT_LIGHT)
-         && (strcmp(tasks.front().devicename,lvp->device)==0)
-         && (strcmp(tasks.front().propertyname,lvp->name)==0) )
+         && (strcmp(tasks.front().devicename.toStdString().c_str(),lvp->device)==0)
+         && (strcmp(tasks.front().propertyname.toStdString().c_str(),lvp->name)==0) )
     {
         for (int i=0;i<lvp->nlp;i++) {
 /*            if ((strcmp(tasks.front().elementname,lvp->lp[i].name)==0)
@@ -204,7 +216,7 @@ void Module::gotnewBLOB(IBLOB *bp)
     if (!tasks.size()) return;
 
     if (  (tasks.front().tasktype==TT_WAIT_BLOB)
-       && (strcmp(tasks.front().devicename,bp->bvp->device)==0) ) {
+       && (strcmp(tasks.front().devicename.toStdString().c_str(),bp->bvp->device)==0) ) {
         if (tasks.front().specific) {
             executeTaskSpec(tasks.front(),bp);
         } else {
@@ -213,7 +225,7 @@ void Module::gotnewBLOB(IBLOB *bp)
     }
 
     if (  (tasks.front().tasktype==TT_ANALYSE_SEP)
-       && (strcmp(tasks.front().devicename,bp->bvp->device)==0) ) {
+       && (strcmp(tasks.front().devicename.toStdString().c_str(),bp->bvp->device)==0) ) {
         if (tasks.front().specific) {
             executeTaskSpec(tasks.front(),bp);
         } else {
@@ -227,7 +239,7 @@ void Module::gotnewBLOB(IBLOB *bp)
     }
 
     if (  (tasks.front().tasktype==TT_ANALYSE_SOLVE)
-       && (strcmp(tasks.front().devicename,bp->bvp->device)==0) ) {
+       && (strcmp(tasks.front().devicename.toStdString().c_str(),bp->bvp->device)==0) ) {
         if (tasks.front().specific) {
             executeTaskSpec(tasks.front(),bp);
         } else {
@@ -249,12 +261,12 @@ void Module::gotnewMessage(INDI::BaseDevice *dp, int messageID)
     Q_UNUSED(messageID);
 }
 
-bool Module::taskSendNewNumber(const char *deviceName, const char *propertyName, const char *elementName, double value)
+bool Module::taskSendNewNumber(QString deviceName, QString propertyName,QString  elementName, double value)
 {
-    //qDebug() << "taskSendNewNumber";
+    //qDebug() << "taskSendNewNumber" << " " << deviceName << " " << propertyName<< " " << elementName;
     sleep(1);
     INDI::BaseDevice *dp;
-    dp = client->getDevice(deviceName);
+    dp = indiclient->getDevice(deviceName.toStdString().c_str());
 
     if (dp== nullptr)
     {
@@ -263,7 +275,7 @@ bool Module::taskSendNewNumber(const char *deviceName, const char *propertyName,
         return false;
     }
     INumberVectorProperty *prop = nullptr;
-    prop = dp->getNumber(propertyName);
+    prop = dp->getNumber(propertyName.toStdString().c_str());
     if (prop == nullptr)
     {
         qDebug() << "Error - unable to find " << deviceName << "/" << propertyName << " property. Aborting.";
@@ -272,9 +284,9 @@ bool Module::taskSendNewNumber(const char *deviceName, const char *propertyName,
     }
 
     for (int i=0;i<prop->nnp;i++) {
-        if (strcmp(prop->np[i].name, elementName) == 0) {
+        if (strcmp(prop->np[i].name, elementName.toStdString().c_str()) == 0) {
             prop->np[i].value=value;
-            client->sendNewNumber(prop);
+            indiclient->sendNewNumber(prop);
             return true;
         }
     }
@@ -283,11 +295,11 @@ bool Module::taskSendNewNumber(const char *deviceName, const char *propertyName,
     return false;
 
 }
-bool Module::taskSendNewText  (const char *deviceName, const char *propertyName, const char *elementName, const char *text)
+bool Module::taskSendNewText  (QString deviceName,QString propertyName,QString elementName, QString text)
 {
     //qDebug() << "taskSendNewText";
     INDI::BaseDevice *dp;
-    dp = client->getDevice(deviceName);
+    dp = indiclient->getDevice(deviceName.toStdString().c_str());
 
     if (dp== nullptr)
     {
@@ -296,7 +308,7 @@ bool Module::taskSendNewText  (const char *deviceName, const char *propertyName,
         return false;
     }
     ITextVectorProperty *prop = nullptr;
-    prop= dp->getText(propertyName);
+    prop= dp->getText(propertyName.toStdString().c_str());
     if (prop == nullptr)
     {
         qDebug() << "Error - unable to find " << deviceName << "/" << propertyName << " property. Aborting.";
@@ -305,8 +317,8 @@ bool Module::taskSendNewText  (const char *deviceName, const char *propertyName,
     }
 
     for (int i=0;i<prop->ntp;i++) {
-        if (strcmp(prop->tp[i].name, elementName) == 0) {
-            client->sendNewText(deviceName,propertyName,elementName,text);
+        if (strcmp(prop->tp[i].name, elementName.toStdString().c_str()) == 0) {
+            indiclient->sendNewText(deviceName.toStdString().c_str(),propertyName.toStdString().c_str(),elementName.toStdString().c_str(),text.toStdString().c_str());
             return true;
         }
     }
@@ -314,12 +326,12 @@ bool Module::taskSendNewText  (const char *deviceName, const char *propertyName,
     tasks =QQueue<Ttask>();
     return false;
 }
-bool Module::taskSendNewSwitch(const char *deviceName, const char *propertyName, const char *elementName, ISState sw)
+bool Module::taskSendNewSwitch(QString deviceName,QString propertyName,QString elementName, ISState sw)
 {
     //qDebug() << "taskSendNewSwitch";
 
     INDI::BaseDevice *dp;
-    dp = client->getDevice(deviceName);
+    dp = indiclient->getDevice(deviceName.toStdString().c_str());
 
     if (dp== nullptr)
     {
@@ -328,7 +340,7 @@ bool Module::taskSendNewSwitch(const char *deviceName, const char *propertyName,
         return false;
     }
     ISwitchVectorProperty *prop = nullptr;
-    prop= dp->getSwitch(propertyName);
+    prop= dp->getSwitch(propertyName.toStdString().c_str());
     if (prop == nullptr)
     {
         qDebug() << "Error - unable to find " << deviceName << "/" << propertyName << " property. Aborting.";
@@ -337,9 +349,9 @@ bool Module::taskSendNewSwitch(const char *deviceName, const char *propertyName,
     }
 
     for (int i=0;i<prop->nsp;i++) {
-        if (strcmp(prop->sp[i].name, elementName) == 0) {
+        if (strcmp(prop->sp[i].name, elementName.toStdString().c_str()) == 0) {
             prop->sp[i].s=sw;
-            client->sendNewSwitch(prop);
+            indiclient->sendNewSwitch(prop);
             return true;
         }
     }
@@ -371,14 +383,14 @@ void Module::executeTask(Ttask task)
 }
 void Module::popnext(void)
 {
-    //qDebug() << "popnext";
     if (tasks.size()<=1) {
-        qDebug() << "finished";
+        //qDebug() << "finished";
+        props.setText("status","idle");
         emit finished();
-        return;
     }  else {
-        qDebug() << tasks.front().tasklabel << "finished";
+        //qDebug() << tasks.front().tasklabel << "finished";
         tasks.pop_front();
+        props.setText("status",tasks.front().tasklabel);
         executeTask(tasks.front());
     }
 }
@@ -416,7 +428,7 @@ void Module::finishedSolve(void)
 
 }
 void Module::addnewtask (Tasktype tasktype,  QString taskname, QString tasklabel,bool specific,
-                const char *devicename,const char *propertyname,const char *elementname)
+                QString devicename,QString propertyname,QString elementname)
 {
     //qDebug() << "addnewtask1";
 
@@ -430,9 +442,10 @@ void Module::addnewtask (Tasktype tasktype,  QString taskname, QString tasklabel
     task.elementname = elementname;
     tasks.append(task);
 }
+
 void Module::addnewtask (Tasktype tasktype,  QString taskname, QString tasklabel,bool specific,
-                const char *devicename,const char *propertyname,const char *elementname,
-                double value,const char *text,ISState sw)
+                QString devicename, QString propertyname, QString elementname,
+                double value,QString text,ISState sw)
 {
     //qDebug() << "addnewtask2";
 
@@ -441,11 +454,20 @@ void Module::addnewtask (Tasktype tasktype,  QString taskname, QString tasklabel
     task.taskname = taskname;
     task.tasklabel = tasklabel;
     task.specific = specific;
-    task.devicename= devicename;
+    task.devicename = devicename;
     task.propertyname = propertyname;
     task.elementname = elementname;
     task.value= value;
     task.text = text;
     task.sw = sw;
     tasks.append(task);
+}
+
+void Module::dumpTasks(void)
+{
+    for (int i=0;i<tasks.size();i++) {
+        qDebug() << tasks[i].tasktype << "-0-" << tasks[i].taskname << "-0-"  << tasks[i].tasklabel << "-0-"  << tasks[i].specific << \
+                    "-0-"  << tasks[i].devicename << "-0-"  << tasks[i].propertyname << "-0-"  << tasks[i].elementname << "-0-"  \
+                    "-0-"  << tasks[i].value << "-0-"  << tasks[i].text << "-0-"  << tasks[i].sw ;
+    }
 }

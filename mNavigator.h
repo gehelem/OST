@@ -1,16 +1,15 @@
-#ifndef MFOCUSER_h_
-#define MFOCUSER_h_
+#ifndef MNAVIGATOR_H_
+#define MNAVIGATOR_H_
 #include "module.h"
 
-class MFocuser : public Module
+class MNavigator : public Module
 {
     Q_OBJECT
     public:
-        MFocuser(MyClient *cli);
-        ~MFocuser();
+        MNavigator(MyClient *cli);
+        ~MNavigator();
 
         void initProperties(void);
-        void startFraming(void);
         void executeTaskSpec(Ttask task);
         void executeTaskSpec(Ttask task,IBLOB *bp);
         void executeTaskSpec(Ttask task,INumberVectorProperty *nvp) ;

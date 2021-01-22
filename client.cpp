@@ -57,7 +57,7 @@ void MyClient::newText(ITextVectorProperty *tvp)
 void MyClient::newSwitch(ISwitchVectorProperty *svp)
 {
     //if (strcmp(svp->name,"CONFIG_PROCESS")==0)
-    for (int i=0;i<svp->nsp;i++) IDLog("Got switch %s %s/%s\n",svp->device,svp->name,svp->sp[i].name);
+    //for (int i=0;i<svp->nsp;i++) IDLog("Got switch %s %s/%s\n",svp->device,svp->name,svp->sp[i].name);
     emit gotnewSwitch(svp);
 }
 void MyClient::newLight(ILightVectorProperty *lvp)
@@ -100,7 +100,6 @@ void MyClient::connectIndi()
 void MyClient::connectAllDevices()
 {
     std::vector<INDI::BaseDevice *> devs = getDevices();
-
     for(std::size_t i = 0; i < devs.size(); i++) {
         ISwitchVectorProperty *svp = devs[i]->getSwitch("CONNECTION");
 
@@ -114,6 +113,7 @@ void MyClient::connectAllDevices()
                     svp->sp[j].s=ISS_OFF;
                 }
             }
+
             sendNewSwitch(svp);
             if (devs[i]->getDriverInterface() & INDI::BaseDevice::CCD_INTERFACE)
             {
@@ -163,7 +163,7 @@ void MyClient::disconnectAllDevices()
 void MyClient::loadDevicesConfs()
 {
     std::vector<INDI::BaseDevice *> devs = getDevices();
-
+    qDebug() << "loadDevicesConfs";
     for(std::size_t i = 0; i < devs.size(); i++) {
         IDLog("Loading device conf %s \n",devs[i]->getDeviceName());
         if (devs[i]->isConnected()) {

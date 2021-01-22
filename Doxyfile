@@ -6,11 +6,23 @@ INPUT = ./client.cpp \
         ./client.h \
         ./controller.cpp \
         ./controller.h \
+        ./wshandler.cpp \
+        ./wshandler.h \
+        ./properties.cpp \
+        ./properties.h \
         ./image.cpp \
         ./image.h \
         ./module.cpp \
         ./module.h \
         ./ost.cpp \
+        ./mSequence.cpp \
+        ./mSequence.h \
+        ./mGuider.cpp \
+        ./mGuider.h \
+        ./mNavigator.cpp \
+        ./mNavigator.h \
+        ./mMainctl.cpp \
+        ./mMainctl.h \
         ./mFocuser.cpp \
         ./mFocuser.h 
 RECURSIVE = YES

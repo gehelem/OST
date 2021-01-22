@@ -1,16 +1,15 @@
-#ifndef MFOCUSER_h_
-#define MFOCUSER_h_
+#ifndef MGUIDER_H_
+#define MGUIDER_H_
 #include "module.h"
 
-class MFocuser : public Module
+class MGuider : public Module
 {
     Q_OBJECT
     public:
-        MFocuser(MyClient *cli);
-        ~MFocuser();
+        MGuider(MyClient *cli);
+        ~MGuider();
 
         void initProperties(void);
-        void startFraming(void);
         void executeTaskSpec(Ttask task);
         void executeTaskSpec(Ttask task,IBLOB *bp);
         void executeTaskSpec(Ttask task,INumberVectorProperty *nvp) ;
@@ -18,6 +17,7 @@ class MFocuser : public Module
         void executeTaskSpec(Ttask task,ITextVectorProperty *tvp) ;
         void executeTaskSpec(Ttask task,ILightVectorProperty *lvp) ;
         void slotvalueChangedFromCtl(elem el);
+
    public slots:
         void test(void);
 

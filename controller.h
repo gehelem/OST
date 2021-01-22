@@ -2,14 +2,12 @@
 #define CONTROLLER_h_
 #pragma once
 #include "mFocuser.h"
-#include "QtWebSockets/qwebsocketserver.h"
-#include "QtWebSockets/qwebsocket.h"
+#include "mMainctl.h"
+#include "mSequence.h"
+#include "mGuider.h"
+#include "mNavigator.h"
+#include "wshandler.h"
 
-
-
-
-QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
-QT_FORWARD_DECLARE_CLASS(QWebSocket)
 
 /*!
  * This class is the heart of OST
@@ -24,17 +22,18 @@ class Controller : public QObject
 public:
     Controller(QObject *parent);
     ~Controller();
-    QWebSocketServer *m_pWebSocketServer;
-    QList<QWebSocket *> m_clients;
     MyClient *indiclient;
     MFocuser *focuser;
+    MGuider  *guider;
+    MSequence  *sequence;
+    MNavigator  *navigator;
+    MMainctl *mainctl;
+    WShandler *wshandler;
 public slots:
-    void onNewConnection();
-    void processTextMessage(QString message);
-    void processBinaryMessage(QByteArray message);
-    void sendmessage(QString message);
-    void sendbinary(QByteArray *data);
-    void socketDisconnected();
+    void valueChanged(elem elt);
+    void propCreated(elem elt);
+    void propDeleted(elem elt);
+
 signals:
     void closed();
 private:

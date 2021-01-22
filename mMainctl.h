@@ -1,16 +1,15 @@
-#ifndef MFOCUSER_h_
-#define MFOCUSER_h_
+#ifndef MMAINCTL_H_
+#define MMAINCTL_H_
 #include "module.h"
 
-class MFocuser : public Module
+class MMainctl : public Module
 {
     Q_OBJECT
     public:
-        MFocuser(MyClient *cli);
-        ~MFocuser();
+        MMainctl(MyClient *cli);
+        ~MMainctl();
 
         void initProperties(void);
-        void startFraming(void);
         void executeTaskSpec(Ttask task);
         void executeTaskSpec(Ttask task,IBLOB *bp);
         void executeTaskSpec(Ttask task,INumberVectorProperty *nvp) ;

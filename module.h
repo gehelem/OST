@@ -44,11 +44,11 @@ struct Ttask
     QString tasklabel;
     /*! when true : calling **spec overloaded methods within inherited jobs */
     bool specific;
-    const char *devicename;
-    const char *propertyname;
-    const char *elementname;
+    QString devicename;
+    QString propertyname;
+    QString elementname;
     double value;
-    const char *text;
+    QString text;
     ISState sw;
 };
 /*!
@@ -63,21 +63,24 @@ class Module : public QObject
         Module(MyClient *cli);
         ~Module();
 
-        MyClient *client;
+        MyClient *indiclient;
         QQueue<Ttask> tasks;
         std::unique_ptr<Image> image =nullptr;
         QList<FITSImage::Star> stars;
 
         void addnewtask (Tasktype tasktype,  QString taskname, QString tasklabel,bool specific,
-                        const char *devicename,const char *propertyname,const char *elementname);
+                         QString devicename,QString propertyname,QString elementname);
         void addnewtask (Tasktype tasktype,  QString taskname, QString tasklabel,bool specific,
-                        const char *devicename,const char *propertyname,const char *elementname,
-                        double value,const char *text,ISState sw);
-        bool taskSendNewNumber(const char *deviceName, const char *propertyName, const char *elementName, double value);
-        bool taskSendNewText  (const char *deviceName, const char *propertyName, const char *elementName, const char *text);
-        bool taskSendNewSwitch(const char *deviceName, const char *propertyName, const char *elementName, ISState sw);
+                        QString devicename,QString propertyname,QString elementname,
+                        double value,QString text,ISState sw);
+
+        bool taskSendNewNumber(QString deviceName, QString propertyName, QString elementName, double value);
+        bool taskSendNewText  (QString deviceName, QString propertyName, QString elementName, QString text);
+        bool taskSendNewSwitch(QString deviceName, QString propertyName, QString elementName, ISState sw);
         void executeTask(Ttask task);
-        virtual void executeTaskSpec(Ttask task) {Q_UNUSED(task)}
+        void dumpTasks(void);
+
+        virtual void executeTaskSpec(Ttask task) {Q_UNUSED(task);}
         virtual void executeTaskSpec(Ttask task,IBLOB *bp) {Q_UNUSED(task);Q_UNUSED(bp);}
         virtual void executeTaskSpec(Ttask task,INumberVectorProperty *nvp) {Q_UNUSED(task);Q_UNUSED(nvp);}
         virtual void executeTaskSpec(Ttask task,ISwitchVectorProperty *svp) {Q_UNUSED(task);Q_UNUSED(svp);}
@@ -85,24 +88,31 @@ class Module : public QObject
         virtual void executeTaskSpec(Ttask task,ILightVectorProperty *lvp) {Q_UNUSED(task);Q_UNUSED(lvp);}
         void popnext(void);
         void initProperties(void);
-        OstProperties props;
+        OSTProperties props;
     public slots:
-        virtual void gotserverConnected();
-        virtual void gotserverDisconnected(int exit_code);
-        virtual void gotnewDevice(INDI::BaseDevice *dp);
-        virtual void gotremoveDevice(INDI::BaseDevice *dp);
-        virtual void gotnewProperty(INDI::Property *property);
-        virtual void gotremoveProperty(INDI::Property *property);
-        virtual void gotnewText(ITextVectorProperty *tvp);
-        virtual void gotnewSwitch(ISwitchVectorProperty *svp);
-        virtual void gotnewLight(ILightVectorProperty *lvp);
-        virtual void gotnewBLOB(IBLOB *bp);
-        virtual void gotnewNumber(INumberVectorProperty *nvp);
-        virtual void gotnewMessage(INDI::BaseDevice *dp, int messageID);
+        void gotserverConnected();
+        void gotserverDisconnected(int exit_code);
+        void gotnewDevice(INDI::BaseDevice *dp);
+        void gotremoveDevice(INDI::BaseDevice *dp);
+        void gotnewProperty(INDI::Property *property);
+        void gotremoveProperty(INDI::Property *property);
+        void gotnewText(ITextVectorProperty *tvp);
+        void gotnewSwitch(ISwitchVectorProperty *svp);
+        void gotnewLight(ILightVectorProperty *lvp);
+        void gotnewBLOB(IBLOB *bp);
+        void gotnewNumber(INumberVectorProperty *nvp);
+        void gotnewMessage(INDI::BaseDevice *dp, int messageID);
         void finishedSEP(void);
         void finishedSolve(void);
+        void slotvalueChanged(elem prop);
+        void slotpropCreated(elem prop);
+        void slotpropDeleted(elem prop);
+        virtual void slotvalueChangedFromCtl(elem prop) {Q_UNUSED(prop);}
     signals:
-        virtual void finished();
+        void finished();
+        void signalpropCreated(elem prop);
+        void signalpropDeleted(elem prop);
+        void signalvalueChanged(elem prop);
         //virtual void taskblob();
 }
 ;
