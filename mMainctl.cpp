@@ -12,6 +12,8 @@ MMainctl::~MMainctl()
 void MMainctl::initProperties(void)
 {
     modulename="mainctl";
+    props->createMod(modulename,"OST Main control");
+
     props->createCateg(modulename,"main","Main control of mainctl");
 
     props->createProp(modulename,"statusprop" ,"Status"  ,"","main","IP_RO","IPS_IDLE","");

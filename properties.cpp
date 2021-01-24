@@ -11,6 +11,13 @@ void    OSTProperties::createElem(elem elt)
     emit signalElemCreated(elt);
 
 }
+void    OSTProperties::createMod(QString modulename, QString modulelabel)
+{
+    mod mo;
+    mo.modulename=modulename;
+    mo.modulelabel=modulelabel;
+    mods.append(mo);
+}
 void    OSTProperties::createGroup(QString modulename,QString groupname, QString grouplabel, QString categname)
 {
     group gro;
@@ -164,7 +171,7 @@ void    OSTProperties::setText(QString modulename,QString elemname,QString text)
 {
     for (int i=0;i<elems.count();i++)
     {
-        if ((elems[i].elemname==elemname)&&(elems[i].modulename==modulename)&&(elems[i].text!=text))
+        if ((elems[i].elemname==elemname)&&(elems[i].modulename==modulename)/*&&(elems[i].text!=text)*/)
         {
             elems[i].text=text;
             emit signalvalueChanged(elems[i]);
@@ -175,7 +182,7 @@ void    OSTProperties::setNum(QString modulename,QString elemname,double num)
 {
     for (int i=0;i<elems.count();i++)
     {
-        if ((elems[i].elemname==elemname)&&(elems[i].modulename==modulename)&&(elems[i].num!=num))
+        if ((elems[i].elemname==elemname)&&(elems[i].modulename==modulename)/*&&(elems[i].num!=num)*/)
         {
             elems[i].num=num;
             emit signalvalueChanged(elems[i]);
@@ -187,7 +194,7 @@ void    OSTProperties::setBool(QString modulename,QString elemname, bool sw)
 {
     for (int i=0;i<elems.count();i++)
     {
-        if ((elems[i].elemname==elemname)&&(elems[i].modulename==modulename)&&(elems[i].sw!=sw))
+        if ((elems[i].elemname==elemname)&&(elems[i].modulename==modulename)/*&&(elems[i].sw!=sw)*/)
         {
             elems[i].sw=sw;
             emit signalvalueChanged(elems[i]);
@@ -260,4 +267,37 @@ QJsonObject OSTProperties::getJsonProp(QString propname,QString modulename)
     if (obj["type"]=="INDI_SWITCH") obj["texts"]=swis;
 
     return obj;
+}
+
+void    OSTProperties::dumproperties(void)
+{
+    int imod,icat,igro,ipro,ielem;
+
+    for (imod=0;imod<mods.count();imod++)
+    {
+        qDebug() << "mod :" << mods[imod].modulename << mods[imod].modulelabel;
+
+        for (icat=0;icat<categs.count();icat++)
+        {
+            if (categs[icat].modulename==mods[imod].modulename)
+            {
+                qDebug() << "- cat :" << categs[icat].categname << categs[icat].categlabel;
+                for (ipro=0;ipro<props.count();ipro++)
+                {
+                    if ((props[ipro].modulename==mods[imod].modulename)&&(props[ipro].categname==categs[icat].categname))
+                    {
+                        qDebug() << "- pro :" << props[ipro].propname << props[ipro].proplabel;
+                        for (ielem=0;ielem<elems.count();ielem++)
+                        {
+                            if ((elems[ielem].modulename==mods[imod].modulename)&&(elems[ielem].propname==props[ipro].propname))
+                            {
+                                qDebug() << "-- elt :" << elems[ielem].elemname << elems[ielem].elemlabel ;
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+    }
 }

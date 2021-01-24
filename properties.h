@@ -118,6 +118,7 @@ public:
     void    setNum    (QString modulename, QString elemname,double num);
     void    setBool   (QString modulename, QString elemname,bool sw);
     QJsonObject getJsonProp(QString propname, QString modulename);
+    void    dumproperties(void);
 signals:
     void    signalPropCreated (pro  prop);
     void    signalPropDeleted (pro  prop);

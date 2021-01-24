@@ -11,6 +11,8 @@ MSequence::~MSequence()
 void MSequence::initProperties(void)
 {
     modulename="sequence";
+    props->createMod(modulename,"OST sequencer");
+
     /*props.createText("camera","Camera","Guide Simulator");
     props.createText("camera2","Camera 2","Guide Simulator");
     props.createNum("exposure","Exposure",10);

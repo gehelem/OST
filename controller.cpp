@@ -34,6 +34,8 @@ Controller::Controller(QObject *parent)
     connect(wshandler,&WShandler::changeValue,navigator,&MNavigator::slotvalueChangedFromCtl);
     navigator->initProperties();
 
+    props->dumproperties();
+
 }
 
 

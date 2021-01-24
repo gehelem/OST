@@ -11,6 +11,8 @@ MNavigator::~MNavigator()
 void MNavigator::initProperties(void)
 {
     modulename="navigator";
+    props->createMod(modulename,"OST Navigator");
+
     /*props.createText("camera","Camera","CCD Simulator");
     props.createText("mount","Mount","Telescope Simulator");
     props.createText("target","Target","");

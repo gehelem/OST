@@ -11,6 +11,8 @@ MGuider::~MGuider()
 void MGuider::initProperties(void)
 {
     modulename="guider";
+    props->createMod(modulename,"OST Guider");
+
     /*props.createText("camera","Camera","Guide Simulator");
     props.createNum("exposure","Exposure",1);
     props.createNum("hfravg","Average HFR",99);
