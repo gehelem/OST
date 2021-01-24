@@ -21,9 +21,9 @@ Module::Module(MyClient *cli,OSTProperties *properties)
     connect(indiclient,&MyClient::gotnewNumber,this,&Module::gotnewNumber);
     connect(indiclient,&MyClient::gotnewMessage,this,&Module::gotnewMessage);
 
-    //connect(&props,&OSTProperties::signalvalueChanged,this,&Module::slotvalueChanged);
-    //connect(&props,&OSTProperties::signalpropCreated,this,&Module::slotpropCreated);
-    //connect(&props,&OSTProperties::signalpropDeleted,this,&Module::slotpropDeleted);
+    connect(properties,&OSTProperties::signalvalueChanged,this,&Module::slotvalueChanged);
+    //connect(properties,&OSTProperties::signalpropCreated,this,&Module::slotpropCreated);
+    //connect(properties,&OSTProperties::signalpropDeleted,this,&Module::slotpropDeleted);
 
 
 }

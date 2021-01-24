@@ -11,9 +11,7 @@ MFocuser::~MFocuser()
 void MFocuser::initProperties(void)
 {
     modulename="focuser";
-    qDebug() << "before";
     props->createCateg(modulename,"main","Main control");
-    qDebug() << "before";
 
     props->createProp(modulename,"statusprop" ,"Status"  ,"","main","IP_RO","IPS_IDLE","");
     props->createProp(modulename,"cameraprop" ,"Cameras" ,"","main","IP_RO","IPS_IDLE","");
