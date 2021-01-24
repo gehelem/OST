@@ -1,6 +1,6 @@
 #include "mGuider.h"
 
-MGuider::MGuider(MyClient *cli) : Module(cli)
+MGuider::MGuider(MyClient *cli,OSTProperties *properties) : Module(cli,properties)
 {
 }
 MGuider::~MGuider()
@@ -10,8 +10,7 @@ MGuider::~MGuider()
 
 void MGuider::initProperties(void)
 {
-    Module::initProperties();
-    props.module="guider";
+    modulename="guider";
     /*props.createText("camera","Camera","Guide Simulator");
     props.createNum("exposure","Exposure",1);
     props.createNum("hfravg","Average HFR",99);
@@ -29,7 +28,7 @@ void MGuider::test(void)
 
 void MGuider::slotvalueChangedFromCtl(elem el)
 {
-    if ((el.type==ET_BTN) && (el.module==props.module) && (el.name=="xx") )
+    if ((el.type==ET_BTN) && (el.modulename==modulename) && (el.elemname=="xxx") )
     {
     }
 }

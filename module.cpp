@@ -2,10 +2,12 @@
 #include <basedevice.h>
 #include "module.h"
 
-Module::Module(MyClient *cli)
+Module::Module(MyClient *cli,OSTProperties *properties)
 {
     //qDebug() << "Instanciation";
     indiclient=cli;
+    props=properties;
+    initProperties();
     connect(indiclient,&MyClient::gotserverConnected,this,&Module::gotserverConnected);
     connect(indiclient,&MyClient::gotserverDisconnected,this,&Module::gotserverDisconnected);
     connect(indiclient,&MyClient::gotnewDevice,this,&Module::gotnewDevice);
@@ -19,7 +21,7 @@ Module::Module(MyClient *cli)
     connect(indiclient,&MyClient::gotnewNumber,this,&Module::gotnewNumber);
     connect(indiclient,&MyClient::gotnewMessage,this,&Module::gotnewMessage);
 
-    connect(&props,&OSTProperties::signalvalueChanged,this,&Module::slotvalueChanged);
+    //connect(&props,&OSTProperties::signalvalueChanged,this,&Module::slotvalueChanged);
     //connect(&props,&OSTProperties::signalpropCreated,this,&Module::slotpropCreated);
     //connect(&props,&OSTProperties::signalpropDeleted,this,&Module::slotpropDeleted);
 
@@ -385,12 +387,12 @@ void Module::popnext(void)
 {
     if (tasks.size()<=1) {
         //qDebug() << "finished";
-        props.setText("status","idle");
+        props->setText(modulename,"status","idle");
         emit finished();
     }  else {
         //qDebug() << tasks.front().tasklabel << "finished";
         tasks.pop_front();
-        props.setText("status",tasks.front().tasklabel);
+        props->setText(modulename,"status",tasks.front().tasklabel);
         executeTask(tasks.front());
     }
 }

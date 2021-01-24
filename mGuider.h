@@ -6,7 +6,7 @@ class MGuider : public Module
 {
     Q_OBJECT
     public:
-        MGuider(MyClient *cli);
+        MGuider(MyClient *cli,OSTProperties *properties);
         ~MGuider();
 
         void initProperties(void);

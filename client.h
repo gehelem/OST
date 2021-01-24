@@ -1,6 +1,5 @@
 #ifndef CLIENT_h_
 #define CLIENT_h_
-#pragma once
 #include <baseclientqt.h>
 /*!
  * indiclient class, overloaded with some basic functions to help us

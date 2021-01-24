@@ -61,8 +61,8 @@ void WShandler::processTextMessage(QString message)
     if (obj["message"].toString()=="clic")
     {
         elem el;
-        el.module = obj["module"].toString();
-        el.name = obj["name"].toString();
+        el.modulename = obj["module"].toString();
+        el.elemname = obj["name"].toString();
         el.type = ET_BTN;
         emit changeValue(el);
     }
@@ -77,30 +77,30 @@ void WShandler::sendElement(elem elt)
 {
     QJsonObject mess,obj,det;
     QJsonArray dets;
-    obj["propertyname"]=elt.name;
-    obj["label"]=elt.label;
+    obj["propertyname"]=elt.elemname;
+    obj["label"]=elt.elemlabel;
 
     obj["permission"]="IP_RW";
     obj["state"]="IPS_IDLE";
     obj["parenttype"]="M"; // M=module/ C=Category / G=group
     obj["parentname"]="";
-    obj["modulename"]=elt.module;
+    obj["modulename"]=elt.modulename;
     obj["categoryname"]="";
     obj["groupname"]="";
 
 
     if (elt.type==ET_TEXT) {
         obj["type"]="INDI_TEXT";
-        det["label"]=elt.label;
-        det["textname"]=elt.name;
+        det["label"]=elt.elemlabel;
+        det["textname"]=elt.elemname;
         det["text"]=elt.text;
         dets.append(det);
         obj["texts"]=dets;
     }
     if (elt.type==ET_NUM) {
         obj["type"]="INDI_NUMBER";
-        det["label"]=elt.label;
-        det["numbername"]=elt.name;
+        det["label"]=elt.elemlabel;
+        det["numbername"]=elt.elemname;
         det["value"]=elt.num;
         det["format"]="";
         det["min"]=0;
@@ -111,8 +111,8 @@ void WShandler::sendElement(elem elt)
     }
     if (elt.type==ET_BOOL) {
         obj["type"]="INDI_SWITCH";
-        det["label"]=elt.label;
-        det["switchname"]=elt.name;
+        det["label"]=elt.elemlabel;
+        det["switchname"]=elt.elemname;
         if (elt.sw) det["switch"]="ISS_ON";
         if (!elt.sw) det["switch"]="ISS_OFF";
         dets.append(det);

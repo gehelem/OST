@@ -1,7 +1,7 @@
 #include "mMainctl.h"
 
 
-MMainctl::MMainctl(MyClient *cli) : Module(cli)
+MMainctl::MMainctl(MyClient *cli,OSTProperties *properties) : Module(cli,properties)
 {
 }
 MMainctl::~MMainctl()
@@ -11,8 +11,13 @@ MMainctl::~MMainctl()
 
 void MMainctl::initProperties(void)
 {
-    Module::initProperties();
-    props.module="mainctl";
+    modulename="mainctl";
+    props->createCateg(modulename,"main","Main control of mainctl");
+
+    props->createProp(modulename,"statusprop" ,"Status"  ,"","main","IP_RO","IPS_IDLE","");
+
+
+    props->createText(modulename,"status","Status","statusprop","","main", "idle");
     /*props.createBTN("connectindi","Connect to indi server");
     props.createBTN("connectdevices","Connect indidevices");
     props.createBTN("loadconfs","Load indi devices configurations");*/
@@ -27,15 +32,15 @@ void MMainctl::test(void)
 void MMainctl::slotvalueChangedFromCtl(elem el)
 {
     //qDebug() << "mainctl" << el.type << el.module << el.name;
-    if ((el.type==ET_BTN) && (el.module==props.module) && (el.name=="connectindi") )
+    if ((el.type==ET_BTN) && (el.modulename==modulename) && (el.elemname=="connectindi") )
     {
         indiclient->connectIndi();
     }
-    if ((el.type==ET_BTN) && (el.module==props.module) && (el.name=="connectdevices") )
+    if ((el.type==ET_BTN) && (el.modulename==modulename) && (el.elemname=="connectdevices") )
     {
         indiclient->connectAllDevices();
     }
-    if ((el.type==ET_BTN) && (el.module==props.module) && (el.name=="loadconfs") )
+    if ((el.type==ET_BTN) && (el.modulename==modulename) && (el.elemname=="loadconfs") )
     {
         indiclient->loadDevicesConfs();
     }

@@ -60,10 +60,11 @@ class Module : public QObject
 {
     Q_OBJECT
     public:
-        Module(MyClient *cli);
+        Module(MyClient *cli,OSTProperties *properties);
         ~Module();
-
+        QString modulename;
         MyClient *indiclient;
+        OSTProperties *props;
         QQueue<Ttask> tasks;
         std::unique_ptr<Image> image =nullptr;
         QList<FITSImage::Star> stars;
@@ -88,7 +89,6 @@ class Module : public QObject
         virtual void executeTaskSpec(Ttask task,ILightVectorProperty *lvp) {Q_UNUSED(task);Q_UNUSED(lvp);}
         void popnext(void);
         void initProperties(void);
-        OSTProperties props;
     public slots:
         void gotserverConnected();
         void gotserverDisconnected(int exit_code);
@@ -114,6 +114,8 @@ class Module : public QObject
         void signalpropDeleted(elem prop);
         void signalvalueChanged(elem prop);
         //virtual void taskblob();
+    protected:
+
 }
 ;
 #endif

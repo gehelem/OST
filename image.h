@@ -1,6 +1,5 @@
 #ifndef IMAGE_h_
 #define IMAGE_h_
-#pragma once
 
 #include <basedevice.h>
 #include <memory>

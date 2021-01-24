@@ -1,12 +1,12 @@
 #ifndef CONTROLLER_h_
 #define CONTROLLER_h_
-#pragma once
 #include "mFocuser.h"
 #include "mMainctl.h"
 #include "mSequence.h"
 #include "mGuider.h"
 #include "mNavigator.h"
 #include "wshandler.h"
+#include "properties.h"
 
 
 /*!
@@ -29,6 +29,7 @@ public:
     MNavigator  *navigator;
     MMainctl *mainctl;
     WShandler *wshandler;
+    OSTProperties *props;
 public slots:
     void valueChanged(elem elt);
     void propCreated(elem elt);

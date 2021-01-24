@@ -1,6 +1,6 @@
 #include "mSequence.h"
 
-MSequence::MSequence(MyClient *cli) : Module(cli)
+MSequence::MSequence(MyClient *cli,OSTProperties *properties) : Module(cli,properties)
 {
 }
 MSequence::~MSequence()
@@ -10,8 +10,7 @@ MSequence::~MSequence()
 
 void MSequence::initProperties(void)
 {
-    Module::initProperties();
-    props.module="sequence";
+    modulename="sequence";
     /*props.createText("camera","Camera","Guide Simulator");
     props.createText("camera2","Camera 2","Guide Simulator");
     props.createNum("exposure","Exposure",10);
@@ -27,7 +26,7 @@ void MSequence::test(void)
 
 void MSequence::slotvalueChangedFromCtl(elem el)
 {
-    if ((el.type==ET_BTN) && (el.module==props.module) && (el.name=="xxx") )
+    if ((el.type==ET_BTN) && (el.modulename==modulename) && (el.elemname=="xxx") )
     {
     }
 }

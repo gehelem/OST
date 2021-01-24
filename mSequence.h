@@ -6,7 +6,7 @@ class MSequence : public Module
 {
     Q_OBJECT
     public:
-        MSequence(MyClient *cli);
+        MSequence(MyClient *cli,OSTProperties *properties);
         ~MSequence();
 
         void initProperties(void);

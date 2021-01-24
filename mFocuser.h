@@ -6,7 +6,7 @@ class MFocuser : public Module
 {
     Q_OBJECT
     public:
-        MFocuser(MyClient *cli);
+        MFocuser(MyClient *cli,OSTProperties *properties);
         ~MFocuser();
 
         void initProperties(void);

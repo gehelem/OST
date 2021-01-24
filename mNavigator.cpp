@@ -1,6 +1,6 @@
 #include "mNavigator.h"
 
-MNavigator::MNavigator(MyClient *cli) : Module(cli)
+MNavigator::MNavigator(MyClient *cli,OSTProperties *properties) : Module(cli,properties)
 {
 }
 MNavigator::~MNavigator()
@@ -10,8 +10,7 @@ MNavigator::~MNavigator()
 
 void MNavigator::initProperties(void)
 {
-    Module::initProperties();
-    props.module="navigator";
+    modulename="navigator";
     /*props.createText("camera","Camera","CCD Simulator");
     props.createText("mount","Mount","Telescope Simulator");
     props.createText("target","Target","");
@@ -30,7 +29,7 @@ void MNavigator::test(void)
 
 void MNavigator::slotvalueChangedFromCtl(elem el)
 {
-    if ((el.type==ET_BTN) && (el.module==props.module) && (el.name=="xxx") )
+    if ((el.type==ET_BTN) && (el.modulename==modulename) && (el.elemname=="xxx") )
     {
     }
 }

@@ -1,6 +1,5 @@
 #ifndef WSHANDLER_h_
 #define WSHANDLER_h_
-#pragma once
 #include "QtWebSockets/qwebsocketserver.h"
 #include "QtWebSockets/qwebsocket.h"
 QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
