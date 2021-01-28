@@ -22,18 +22,18 @@ class Controller : public QObject
 public:
     Controller(QObject *parent);
     ~Controller();
-    MyClient *indiclient;
-    MFocuser *focuser;
-    MGuider  *guider;
-    MSequence  *sequence;
+    MyClient    *indiclient;
+    Properties  *properties;
+    MFocuser    *focuser;
+    MGuider     *guider;
+    MSequence   *sequence;
     MNavigator  *navigator;
-    MMainctl *mainctl;
-    WShandler *wshandler;
-    OSTProperties *props;
+    MMainctl    *mainctl;
+    WShandler   *wshandler;
 public slots:
-    void valueChanged(elem elt);
-    void propCreated(elem elt);
-    void propDeleted(elem elt);
+    void valueChanged(Prop prop);
+    void propCreated(Prop prop);
+    void propDeleted(Prop prop);
 
 signals:
     void closed();

@@ -11,7 +11,7 @@ class MyClient : public INDI::BaseClientQt
   public:
     MyClient(QObject *parent = Q_NULLPTR);
     ~MyClient() = default;
-    void connectIndi(void);
+    bool connectIndi(void);
     void connectAllDevices(void);
     void disconnectAllDevices(void);
     void loadDevicesConfs(void);

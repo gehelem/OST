@@ -1,6 +1,6 @@
 #include "mSequence.h"
 
-MSequence::MSequence(MyClient *cli,OSTProperties *properties) : Module(cli,properties)
+MSequence::MSequence(MyClient *cli,Properties *properties) : Module(cli,properties)
 {
 }
 MSequence::~MSequence()
@@ -11,13 +11,8 @@ MSequence::~MSequence()
 void MSequence::initProperties(void)
 {
     modulename="sequence";
-    props->createMod(modulename,"OST sequencer");
-
-    /*props.createText("camera","Camera","Guide Simulator");
-    props.createText("camera2","Camera 2","Guide Simulator");
-    props.createNum("exposure","Exposure",10);
-    props.createNum("hfravg","Average HFR",99);
-    props.createNum("starscount","Stars found",0);*/
+    createMyModule("Sequencer");
+    createMyCateg("main","Main");
 
 }
 
@@ -26,10 +21,14 @@ void MSequence::test(void)
     qDebug() << "test";
 }
 
-void MSequence::slotvalueChangedFromCtl(elem el)
+void MSequence::slotvalueChangedFromCtl(Prop prop)
 {
-    if ((el.type==ET_BTN) && (el.modulename==modulename) && (el.elemname=="xxx") )
+    if ((prop.typ==PT_SWITCH) && (prop.propname=="buttonsprop") )
     {
+        prop.state=OPS_BUSY;
+        setMyProp("buttonsprop",prop);
+        /*if (prop.s["something"].s==OSS_ON) startSomething();*/
+
     }
 }
 

@@ -6,7 +6,7 @@ class MMainctl : public Module
 {
     Q_OBJECT
     public:
-        MMainctl(MyClient *cli,OSTProperties *properties);
+        MMainctl(MyClient *cli,Properties *properties);
         ~MMainctl();
 
         void initProperties(void);
@@ -16,7 +16,7 @@ class MMainctl : public Module
         void executeTaskSpec(Ttask task,ISwitchVectorProperty *svp) ;
         void executeTaskSpec(Ttask task,ITextVectorProperty *tvp) ;
         void executeTaskSpec(Ttask task,ILightVectorProperty *lvp) ;
-        void slotvalueChangedFromCtl(elem el);
+        void slotvalueChangedFromCtl(Prop prop);
    public slots:
         void test(void);
 

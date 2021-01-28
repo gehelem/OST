@@ -6,7 +6,7 @@ class MNavigator : public Module
 {
     Q_OBJECT
     public:
-        MNavigator(MyClient *cli,OSTProperties *properties);
+        MNavigator(MyClient *cli,Properties *properties);
         ~MNavigator();
 
         void initProperties(void);
@@ -16,7 +16,7 @@ class MNavigator : public Module
         void executeTaskSpec(Ttask task,ISwitchVectorProperty *svp) ;
         void executeTaskSpec(Ttask task,ITextVectorProperty *tvp) ;
         void executeTaskSpec(Ttask task,ILightVectorProperty *lvp) ;
-        void slotvalueChangedFromCtl(elem el);
+        void slotvalueChangedFromCtl(Prop prop);
    public slots:
         void test(void);
 

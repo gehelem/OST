@@ -58,26 +58,32 @@ void WShandler::processTextMessage(QString message)
     qDebug() << "OST server received text message" << message;
     QJsonDocument jsonResponse = QJsonDocument::fromJson(message.toUtf8()); // garder
     QJsonObject  obj = jsonResponse.object(); // garder
-    if (obj["message"].toString()=="clic")
+    if (obj["message"].toString()=="readall")
     {
-        elem el;
-        el.modulename = obj["module"].toString();
-        el.elemname = obj["name"].toString();
-        el.type = ET_BTN;
-        emit changeValue(el);
+
+    }
+    if (obj["message"].toString()=="updateproperty")
+    {
+
     }
 
 }
-void WShandler::sendProperty(pro prop)
+void WShandler::sendProperty(Prop prop)
 {
     QJsonObject mess,obj,det;
     QJsonArray dets;
+
+
+
+    mess["message"]="updateproperty";
+    mess["property"]=obj;
+    sendJsonMessage(mess);
 }
-void WShandler::sendElement(elem elt)
+void WShandler::sendElement(Prop prop)
 {
     QJsonObject mess,obj,det;
     QJsonArray dets;
-    obj["propertyname"]=elt.elemname;
+    /*obj["propertyname"]=elt.elemname;
     obj["label"]=elt.elemlabel;
 
     obj["permission"]="IP_RW";
@@ -117,7 +123,7 @@ void WShandler::sendElement(elem elt)
         if (!elt.sw) det["switch"]="ISS_OFF";
         dets.append(det);
         obj["switchs"]=dets;
-    }
+    }*/
     mess["message"]="updateproperty";
     mess["property"]=obj;
     sendJsonMessage(mess);

@@ -78,20 +78,17 @@ void MyClient::newBLOB(IBLOB *bp)
  * IMHO this would be overkill as headless instance of OST and indiserver should be 99% hosted on the same machine
  * It would be easy to manage 1% remaining with indiserver chaining capabilities
  */
-void MyClient::connectIndi()
+bool MyClient::connectIndi()
 {
 
     if (isServerConnected())
     {
         IDLog("Indi server connected\n");
-        return;
+        return true;
     } else {
         setServer("localhost", 7624);
-        connectServer();
-        return;
+        return connectServer();
     }
-    IDLog("Could not connect to indi server\n");
-
 }
 
 /*!

@@ -1,6 +1,6 @@
 #include "mNavigator.h"
 
-MNavigator::MNavigator(MyClient *cli,OSTProperties *properties) : Module(cli,properties)
+MNavigator::MNavigator(MyClient *cli,Properties *properties) : Module(cli,properties)
 {
 }
 MNavigator::~MNavigator()
@@ -11,16 +11,8 @@ MNavigator::~MNavigator()
 void MNavigator::initProperties(void)
 {
     modulename="navigator";
-    props->createMod(modulename,"OST Navigator");
-
-    /*props.createText("camera","Camera","CCD Simulator");
-    props.createText("mount","Mount","Telescope Simulator");
-    props.createText("target","Target","");
-    props.createNum("exposure","Exposure",10);
-    props.createNum("hfravg","Average HFR",99);
-    props.createNum("starscount","Stars found",0);
-    props.createBTN("search","Search target");
-    props.createBTN("abort","Abort");*/
+    createMyModule("Navigator");
+    createMyCateg("main","Main");
 
 }
 
@@ -29,10 +21,14 @@ void MNavigator::test(void)
     qDebug() << "test";
 }
 
-void MNavigator::slotvalueChangedFromCtl(elem el)
+void MNavigator::slotvalueChangedFromCtl(Prop prop)
 {
-    if ((el.type==ET_BTN) && (el.modulename==modulename) && (el.elemname=="xxx") )
+    if ((prop.typ==PT_SWITCH) && (prop.propname=="buttonsprop") )
     {
+        prop.state=OPS_BUSY;
+        setMyProp("buttonsprop",prop);
+        /*if (prop.s["something"].s==OSS_ON) startSomething();*/
+
     }
 }
 

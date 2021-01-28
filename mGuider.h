@@ -6,7 +6,7 @@ class MGuider : public Module
 {
     Q_OBJECT
     public:
-        MGuider(MyClient *cli,OSTProperties *properties);
+        MGuider(MyClient *cli,Properties *properties);
         ~MGuider();
 
         void initProperties(void);
@@ -16,7 +16,7 @@ class MGuider : public Module
         void executeTaskSpec(Ttask task,ISwitchVectorProperty *svp) ;
         void executeTaskSpec(Ttask task,ITextVectorProperty *tvp) ;
         void executeTaskSpec(Ttask task,ILightVectorProperty *lvp) ;
-        void slotvalueChangedFromCtl(elem el);
+        void slotvalueChangedFromCtl(Prop prop);
 
    public slots:
         void test(void);

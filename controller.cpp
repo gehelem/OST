@@ -10,32 +10,31 @@ Controller::Controller(QObject *parent)
     this->setParent(parent);
 
     wshandler = new WShandler(this);
-    props = new OSTProperties(this);
     indiclient = new MyClient(this);
+    properties = new Properties(this);
 
-    focuser = new MFocuser(indiclient,props);
+    focuser = new MFocuser(indiclient,properties);
     connect(focuser,&MFocuser::signalvalueChanged,this,&Controller::valueChanged);
     connect(focuser,&MFocuser::signalpropCreated,this,&Controller::propCreated);
     connect(focuser,&MFocuser::signalpropDeleted,this,&Controller::propDeleted);
     connect(wshandler,&WShandler::changeValue,focuser,&MFocuser::slotvalueChangedFromCtl);
     focuser->initProperties();
 
-    mainctl = new MMainctl(indiclient,props);
+    mainctl = new MMainctl(indiclient,properties);
     connect(mainctl,&MMainctl::signalvalueChanged,this,&Controller::valueChanged);
     connect(mainctl,&MMainctl::signalpropCreated,this,&Controller::propCreated);
     connect(mainctl,&MMainctl::signalpropDeleted,this,&Controller::propDeleted);
     connect(wshandler,&WShandler::changeValue,mainctl,&MMainctl::slotvalueChangedFromCtl);
     mainctl->initProperties();
 
-    navigator = new MNavigator(indiclient,props);
+    navigator = new MNavigator(indiclient,properties);
     connect(navigator,&MNavigator::signalvalueChanged,this,&Controller::valueChanged);
     connect(navigator,&MNavigator::signalpropCreated,this,&Controller::propCreated);
     connect(navigator,&MNavigator::signalpropDeleted,this,&Controller::propDeleted);
     connect(wshandler,&WShandler::changeValue,navigator,&MNavigator::slotvalueChangedFromCtl);
     navigator->initProperties();
 
-    props->dumproperties();
-
+    properties->dumproperties();
 }
 
 
@@ -45,18 +44,18 @@ Controller::~Controller()
     qDeleteAll(m_clients.begin(), m_clients.end());*/
 }
 
-void Controller::valueChanged(elem elt)
+void Controller::valueChanged(Prop prop)
 {
-    wshandler->sendElement(elt);
+    wshandler->sendProperty(prop);
 }
 
-void Controller::propCreated(elem elt)
+void Controller::propCreated(Prop prop)
 {
-    wshandler->sendmessage("New prop " +  elt.elemname);
+    wshandler->sendmessage("New prop " +  prop.propname);
 }
-void Controller::propDeleted(elem elt)
+void Controller::propDeleted(Prop prop)
 {
-    wshandler->sendmessage("Del prop " +  elt.elemname);
+    wshandler->sendmessage("Del prop " +  prop.propname);
 }
 
 

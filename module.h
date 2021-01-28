@@ -60,11 +60,11 @@ class Module : public QObject
 {
     Q_OBJECT
     public:
-        Module(MyClient *cli,OSTProperties *properties);
+        Module(MyClient *cli,Properties *properties);
         ~Module();
         QString modulename;
         MyClient *indiclient;
-        OSTProperties *props;
+        Properties *props;
         QQueue<Ttask> tasks;
         std::unique_ptr<Image> image =nullptr;
         QList<FITSImage::Star> stars;
@@ -89,6 +89,34 @@ class Module : public QObject
         virtual void executeTaskSpec(Ttask task,ILightVectorProperty *lvp) {Q_UNUSED(task);Q_UNUSED(lvp);}
         void popnext(void);
         void initProperties(void);
+        void    createMyModule(QString modulelabel);
+        void    deleteMyModule(void);
+
+        void    createMyCateg(QString categname,  QString categlabel);
+        void    deleteMyCateg(QString categname);
+
+        void    createMyGroup(QString categname, QString groupname,  QString grouplabel);
+        void    deleteMyGroup(QString categname, QString groupname);
+
+        void    createMyProp (QString propname,Prop    prop);
+        void    createMyProp (QString propname,QString label,propType typ,QString categoryname,QString groupname,OPerm perm,OSRule rule,double timeout,OPState state,QString aux0,QString aux1);
+        void    deleteMyProp (QString propname);
+        Prop    getMyProp    (QString propname);
+        void    setMyProp    (QString propname,Prop    prop);
+
+        void    appendMyElt  (QString propname,  QString txtname, QString text     , QString label, QString aux0,QString aux1);
+        void    appendMyElt  (QString propname,  QString numname, double  num      , QString label, QString aux0,QString aux1);
+        void    appendMyElt  (QString propname,  QString swtname, OSState swt      , QString label, QString aux0,QString aux1);
+        void    appendMyElt  (QString propname,  QString lgtname, OPState lgt      , QString label, QString aux0,QString aux1);
+        void    deleteMyElt  (QString propname,  QString eltname);
+        void    setMyElt     (QString propname,  QString txtname, QString text);
+        void    setMyElt     (QString propname,  QString numname, double  num);
+        void    setMyElt     (QString propname,  QString swtname, OSState swt);
+        void    setMyElt     (QString propname,  QString lgtname, OPState lgt);
+        QString getMyTxt     (QString propname,  QString txtname);
+        double  getMyNum     (QString propname,  QString numname);
+        OSState getMySwt     (QString propname,  QString swtname);
+        OPState getMyLgt     (QString propname,  QString lgtname);
     public slots:
         void gotserverConnected();
         void gotserverDisconnected(int exit_code);
@@ -104,15 +132,15 @@ class Module : public QObject
         void gotnewMessage(INDI::BaseDevice *dp, int messageID);
         void finishedSEP(void);
         void finishedSolve(void);
-        void slotvalueChanged(elem prop);
-        void slotpropCreated(elem prop);
-        void slotpropDeleted(elem prop);
-        virtual void slotvalueChangedFromCtl(elem prop) {Q_UNUSED(prop);}
+        void slotvalueChanged(Prop prop);
+        void slotpropCreated(Prop prop);
+        void slotpropDeleted(Prop prop);
+        virtual void slotvalueChangedFromCtl(Prop prop) {Q_UNUSED(prop);}
     signals:
         void finished();
-        void signalpropCreated(elem prop);
-        void signalpropDeleted(elem prop);
-        void signalvalueChanged(elem prop);
+        void signalpropCreated(Prop prop);
+        void signalpropDeleted(Prop prop);
+        void signalvalueChanged(Prop prop);
         //virtual void taskblob();
     protected:
 

@@ -1,6 +1,6 @@
 #include "mGuider.h"
 
-MGuider::MGuider(MyClient *cli,OSTProperties *properties) : Module(cli,properties)
+MGuider::MGuider(MyClient *cli,Properties *properties) : Module(cli,properties)
 {
 }
 MGuider::~MGuider()
@@ -11,15 +11,8 @@ MGuider::~MGuider()
 void MGuider::initProperties(void)
 {
     modulename="guider";
-    props->createMod(modulename,"OST Guider");
-
-    /*props.createText("camera","Camera","Guide Simulator");
-    props.createNum("exposure","Exposure",1);
-    props.createNum("hfravg","Average HFR",99);
-    props.createNum("starscount","Stars found",0);
-    props.createBTN("calibration","Start calibration");
-    props.createBTN("guide","Start guiding");
-    props.createBTN("abort","Abort");*/
+    createMyModule("Guider");
+    createMyCateg("main","Main");
 
 }
 
@@ -28,10 +21,14 @@ void MGuider::test(void)
     qDebug() << "test";
 }
 
-void MGuider::slotvalueChangedFromCtl(elem el)
+void MGuider::slotvalueChangedFromCtl(Prop prop)
 {
-    if ((el.type==ET_BTN) && (el.modulename==modulename) && (el.elemname=="xxx") )
+    if ((prop.typ==PT_SWITCH) && (prop.propname=="buttonsprop") )
     {
+        prop.state=OPS_BUSY;
+        setMyProp("buttonsprop",prop);
+        /*if (prop.s["something"].s==OSS_ON) startSomething();*/
+
     }
 }
 

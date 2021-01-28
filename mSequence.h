@@ -6,7 +6,7 @@ class MSequence : public Module
 {
     Q_OBJECT
     public:
-        MSequence(MyClient *cli,OSTProperties *properties);
+        MSequence(MyClient *cli,Properties *properties);
         ~MSequence();
 
         void initProperties(void);
@@ -16,7 +16,7 @@ class MSequence : public Module
         void executeTaskSpec(Ttask task,ISwitchVectorProperty *svp) ;
         void executeTaskSpec(Ttask task,ITextVectorProperty *tvp) ;
         void executeTaskSpec(Ttask task,ILightVectorProperty *lvp) ;
-        void slotvalueChangedFromCtl(elem el);
+        void slotvalueChangedFromCtl(Prop prop);
    public slots:
         void test(void);
 

@@ -1,207 +1,162 @@
 #include "properties.h"
 #include "module.h"
+#include "jsonparser.h"
 
-OSTProperties::OSTProperties(QObject *parent)
+Properties::Properties(QObject *parent)
 {
+    Q_UNUSED(parent);
 }
-
-void    OSTProperties::createElem(elem elt)
+void    Properties::createModule(QString modulename,  QString modulelabel)
 {
-    elems.append(elt);
-    emit signalElemCreated(elt);
-
+    modules[modulename].modulelabel=modulelabel;
 }
-void    OSTProperties::createMod(QString modulename, QString modulelabel)
+void    Properties::deleteModule(QString modulename)
 {
-    mod mo;
-    mo.modulename=modulename;
-    mo.modulelabel=modulelabel;
-    mods.append(mo);
+    modules.remove(modulename);
 }
-void    OSTProperties::createGroup(QString modulename,QString groupname, QString grouplabel, QString categname)
+void    Properties::createCateg(QString modulename, QString categname,  QString categlabel)
 {
-    group gro;
-    gro.groupname=groupname;
+    modules[modulename].categs[categname]=categlabel;
+}
+void    Properties::deleteCateg(QString modulename, QString categname)
+{
+    modules[modulename].categs.remove(categname);
+}
+void    Properties::createGroup(QString modulename, QString categname, QString groupname,  QString grouplabel)
+{
+    Group gro;
     gro.grouplabel=grouplabel;
-    gro.modulename=modulename;
     gro.categname=categname;
-    groups.append(gro);
+    modules[modulename].groups[groupname]=gro;
 }
-void    OSTProperties::createCateg(QString modulename,QString categname, QString categlabel)
+void    Properties::deleteGroup(QString modulename, QString categname, QString groupname)
 {
-    categ cat;
-    cat.categname=categname;
-    cat.categlabel=categlabel;
-    cat.modulename=modulename;
-    categs.append(cat);
+    modules[modulename].groups.remove(groupname);
+}
+void    Properties::createProp (QString modulename, QString propname, Prop    prop)
+{
+    modules[modulename].props[propname]=prop;
 }
 
-void    OSTProperties::createProp(QString modulename, QString propname, QString proplabel, QString groupname, QString categname, QString rule,  QString permission, QString state)
+void    Properties::createProp (QString modulename, QString propname, QString label,propType typ,QString categoryname,QString groupname,OPerm perm,OSRule rule,double timeout,OPState state,QString aux0,QString aux1)
 {
-    pro prop;
-    prop.propname=propname;
-    prop.proplabel=proplabel;
-    prop.modulename=modulename;
-    prop.categname = categname;
-    prop.groupname =groupname;
-    prop.rule=rule;
-    prop.permission=permission;
-    prop.state=state;
-    props.append(prop);
-
-}
-void    OSTProperties::createText(QString modulename,QString elemname,QString elemlabel,QString propname, QString groupname, QString categname,QString text)
-{
-    elem elt;
-    elt.elemname=elemname;
-    elt.elemlabel=elemlabel;
-    elt.propname=propname;
-    elt.groupname=groupname;
-    elt.categname=categname;
-    elt.modulename=modulename;
-    elt.text=text;
-    elt.type=ET_TEXT;
-    createElem(elt);
-}
-void    OSTProperties::createNum(QString modulename,QString elemname,QString elemlabel,QString propname, QString groupname, QString categname,double num)
-{
-    elem elt;
-    elt.elemname=elemname;
-    elt.elemlabel=elemlabel;
-    elt.propname=propname;
-    elt.groupname=groupname;
-    elt.categname=categname;
-    elt.modulename=modulename;
-    elt.num=num;
-    elt.type=ET_NUM;
-    createElem(elt);
-}
-void    OSTProperties::createBool(QString modulename,QString elemname,QString elemlabel,QString propname, QString groupname, QString categname,bool sw)
-{
-    elem elt;
-    elt.elemname=elemname;
-    elt.elemlabel=elemlabel;
-    elt.propname=propname;
-    elt.groupname=groupname;
-    elt.categname=categname;
-    elt.modulename=modulename;
-    elt.sw=sw;
-    elt.type=ET_BOOL;
-    createElem(elt);
-}
-void    OSTProperties::createBTN(QString modulename, QString elemname,QString elemlabel,QString propname, QString groupname, QString categname)
-{
-    elem elt;
-    elt.elemname=elemname;
-    elt.elemlabel=elemlabel;
-    elt.propname=propname;
-    elt.groupname=groupname;
-    elt.categname=categname;
-    elt.modulename=modulename;
-    elt.type=ET_BTN;
-    createElem(elt);
+    Prop prop;
+    prop.modulename     = modulename;
+    prop.propname       = propname;
+    prop.label          = label;
+    prop.typ            = typ;
+    prop.categoryname   = categoryname;
+    prop.groupname      = groupname;
+    prop.perm           = perm;
+    prop.rule           = rule;
+    prop.timeout        = timeout;
+    prop.state          = state;
+    prop.aux0           = aux0;
+    prop.aux1           = aux1;
+    modules[modulename].props[propname]= prop;
 }
 
-void    OSTProperties::deleteProp(QString modulename,QString propname)
+void    Properties::deleteProp (QString modulename, QString propname)
 {
-    for (int i=0;i<elems.count();i++)
-    {
-        if ((elems[i].propname==propname)&&(elems[i].modulename==modulename))
-        {
-            emit signalElemDeleted(elems[i]);
-            elems.remove(i);
-        }
-    }
-    for (int i=0;i<props.count();i++)
-    {
-        if ((props[i].propname==propname)&&(elems[i].modulename==modulename))
-        {
-            emit signalPropDeleted(props[i]);
-            props.remove(i);
-        }
-    }
+    modules[modulename].props.remove(propname);
 }
-elem    OSTProperties::getElem(QString modulename,QString elemname)
+Prop    Properties::getProp    (QString modulename, QString propname)
 {
-    for (int i=0;i<elems.count();i++)
-    {
-        if ((elems[i].elemname==elemname)&&(elems[i].modulename==modulename))
-        {
-            return elems[i];
-        }
-    }
-    return elem();
+    return modules[modulename].props[propname];
 }
-QString OSTProperties::getText(QString modulename,QString elemname)
+void    Properties::setProp    (QString modulename, QString propname, Prop prop)
 {
-    for (int i=0;i<elems.count();i++)
-    {
-        if ((elems[i].elemname==elemname)&&(elems[i].modulename==modulename))
-        {
-            return elems[i].text;
-        }
-    }
-    return QString();
+    modules[modulename].props[propname]=prop;
+}
+void    Properties::appendElt  (QString modulename, QString propname,  QString txtname, QString text     , QString label, QString aux0,QString aux1)
+{
+    OText txt;
+    txt.name=txtname;
+    txt.text=text;
+    txt.label=label;
+    txt.aux0=aux0;
+    txt.aux1=aux1;
+    modules[modulename].props[propname].t[txtname]=txt;
+}
+void    Properties::appendElt  (QString modulename, QString propname,  QString numname, double  num      , QString label, QString aux0,QString aux1)
+{
+    ONumber nbr;
+    nbr.name=numname;
+    nbr.value=num;
+    nbr.label=label;
+    nbr.aux0=aux0;
+    nbr.aux1=aux1;
+    modules[modulename].props[propname].n[numname]=nbr;
+}
+void    Properties::appendElt  (QString modulename, QString propname,  QString swtname, OSState swt      , QString label, QString aux0,QString aux1)
+{
+    OSwitch sw;
+    sw.name=swtname;
+    sw.s=swt;
+    sw.label=label;
+    sw.aux0=aux0;
+    sw.aux1=aux1;
+    modules[modulename].props[propname].s[swtname]=sw;
+}
+void    Properties::appendElt  (QString modulename, QString propname,  QString lgtname, OPState lgt      , QString label, QString aux0,QString aux1)
+{
+    OLight l;
+    l.name=lgtname;
+    l.l=lgt;
+    l.label=label;
+    l.aux0=aux0;
+    l.aux1=aux1;
+    modules[modulename].props[propname].l[lgtname]=l;
+}
+void    Properties::deleteElt  (QString modulename, QString propname,  QString eltname)
+{
+    modules[modulename].props[propname].t.remove(eltname);
+    modules[modulename].props[propname].n.remove(eltname);
+    modules[modulename].props[propname].s.remove(eltname);
+    modules[modulename].props[propname].l.remove(eltname);
+    modules[modulename].props[propname].g.remove(eltname);
+    modules[modulename].props[propname].i.remove(eltname);
+    modules[modulename].props[propname].m.remove(eltname);
+}
+void    Properties::setElt     (QString modulename, QString propname,  QString txtname, QString text)
+{
+    modules[modulename].props[propname].t[txtname].text=text;
+    emit signalvalueChanged(modules[modulename].props[propname]);
+}
+void    Properties::setElt     (QString modulename, QString propname,  QString numname, double  num)
+{
+    modules[modulename].props[propname].n[numname].value=num;
+    emit signalvalueChanged(modules[modulename].props[propname]);
+}
+void    Properties::setElt     (QString modulename, QString propname,  QString swtname, OSState swt)
+{
+    modules[modulename].props[propname].s[swtname].s=swt;
+    emit signalvalueChanged(modules[modulename].props[propname]);
+}
+void    Properties::setElt     (QString modulename, QString propname,  QString lgtname, OPState lgt)
+{
+    modules[modulename].props[propname].l[lgtname].l=lgt;
+    emit signalvalueChanged(modules[modulename].props[propname]);
+}
+QString Properties::getTxt     (QString modulename, QString propname,  QString txtname)
+{
+    return modules[modulename].props[propname].t[txtname].text;
+}
+double  Properties::getNum     (QString modulename, QString propname,  QString numname)
+{
+    return modules[modulename].props[propname].n[numname].value;
+}
+OSState Properties::getSwt     (QString modulename, QString propname,  QString swtname)
+{
+    return modules[modulename].props[propname].s[swtname].s;
+}
+OPState Properties::getLgt     (QString modulename, QString propname,  QString lgtname)
+{
+    return modules[modulename].props[propname].l[lgtname].l;
+}
 
-}
-double  OSTProperties::getNum(QString modulename,QString elemname)
-{
-    for (int i=0;i<elems.count();i++)
-    {
-        if ((elems[i].elemname==elemname)&&(elems[i].modulename==modulename))
-        {
-            return elems[i].num;
-        }
-    }
-    return double();
-}
-bool    OSTProperties::getBool(QString modulename,QString elemname)
-{
-    for (int i=0;i<elems.count();i++)
-    {
-        if ((elems[i].elemname==elemname)&&(elems[i].modulename==modulename))
-        {
-            return elems[i].sw;
-        }
-    }
-    return bool();
 
-}
-void    OSTProperties::setText(QString modulename,QString elemname,QString text)
-{
-    for (int i=0;i<elems.count();i++)
-    {
-        if ((elems[i].elemname==elemname)&&(elems[i].modulename==modulename)/*&&(elems[i].text!=text)*/)
-        {
-            elems[i].text=text;
-            emit signalvalueChanged(elems[i]);
-        }
-    }
-}
-void    OSTProperties::setNum(QString modulename,QString elemname,double num)
-{
-    for (int i=0;i<elems.count();i++)
-    {
-        if ((elems[i].elemname==elemname)&&(elems[i].modulename==modulename)/*&&(elems[i].num!=num)*/)
-        {
-            elems[i].num=num;
-            emit signalvalueChanged(elems[i]);
-        }
-    }
-
-}
-void    OSTProperties::setBool(QString modulename,QString elemname, bool sw)
-{
-    for (int i=0;i<elems.count();i++)
-    {
-        if ((elems[i].elemname==elemname)&&(elems[i].modulename==modulename)/*&&(elems[i].sw!=sw)*/)
-        {
-            elems[i].sw=sw;
-            emit signalvalueChanged(elems[i]);
-        }
-    }
-
-}
+/*
 
 QJsonObject OSTProperties::getJsonProp(QString propname,QString modulename)
 {
@@ -268,14 +223,57 @@ QJsonObject OSTProperties::getJsonProp(QString propname,QString modulename)
 
     return obj;
 }
+*/
 
-void    OSTProperties::dumproperties(void)
+void    Properties::dumproperties(void)
 {
-    int imod,icat,igro,ipro,ielem;
 
-    for (imod=0;imod<mods.count();imod++)
+    for(auto m : modules)
     {
-        qDebug() << "mod :" << mods[imod].modulename << mods[imod].modulelabel;
+      qDebug() << "##########################" << m.modulelabel << "###################################";
+      for(auto p : m.props)
+      {
+       qDebug() <<"##### property ="  << p.label << p.typ;
+        if (p.typ==PT_TEXT)  {
+            qDebug() <<"-- texts";
+            for(auto t : p.t)
+            {
+              qDebug() <<"---- " << t.label << t.text;
+            }
+        }
+       if (p.typ==PT_NUM)  {
+           qDebug() <<"-- numbers";
+           for(auto n : p.n)
+           {
+             qDebug() <<"---- " << n.label << n.value;
+           }
+       }
+       if (p.typ==PT_SWITCH)  {
+           qDebug() <<"-- switchs";
+           for(auto s : p.s)
+           {
+             qDebug() <<"---- " << s.label << s.s;
+           }
+       }
+      }
+
+    }
+
+
+    for(auto m : modules)
+    {
+      qDebug() << "##########################" << m.modulelabel << "###################################";
+      for(auto p : m.props)
+      {
+        qDebug() <<"##### property ="  << p.label << p.typ;
+        qDebug() << OpropToJ(p);
+      }
+
+    }
+
+    /*for (imod=0;imod<modules.count();imod++)
+    {
+        qDebug() << "mod :" << modules[imod].modulename << mods[imod].modulelabel;
 
         for (icat=0;icat<categs.count();icat++)
         {
@@ -299,5 +297,5 @@ void    OSTProperties::dumproperties(void)
 
             }
         }
-    }
+    }*/
 }

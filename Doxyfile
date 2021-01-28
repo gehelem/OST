@@ -8,6 +8,8 @@ INPUT = ./client.cpp \
         ./controller.h \
         ./wshandler.cpp \
         ./wshandler.h \
+        ./jsonparser.cpp \
+        ./jsonparser.h \
         ./properties.cpp \
         ./properties.h \
         ./image.cpp \

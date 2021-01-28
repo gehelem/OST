@@ -2,7 +2,7 @@
 #include <basedevice.h>
 #include "module.h"
 
-Module::Module(MyClient *cli,OSTProperties *properties)
+Module::Module(MyClient *cli,Properties *properties)
 {
     //qDebug() << "Instanciation";
     indiclient=cli;
@@ -21,7 +21,7 @@ Module::Module(MyClient *cli,OSTProperties *properties)
     connect(indiclient,&MyClient::gotnewNumber,this,&Module::gotnewNumber);
     connect(indiclient,&MyClient::gotnewMessage,this,&Module::gotnewMessage);
 
-    connect(properties,&OSTProperties::signalvalueChanged,this,&Module::slotvalueChanged);
+    //connect(props,&Properties::signalvalueChanged,this,&Module::slotvalueChanged);
     //connect(properties,&OSTProperties::signalpropCreated,this,&Module::slotpropCreated);
     //connect(properties,&OSTProperties::signalpropDeleted,this,&Module::slotpropDeleted);
 
@@ -30,20 +30,21 @@ Module::Module(MyClient *cli,OSTProperties *properties)
 Module::~Module()
 {
 }
-void Module::slotvalueChanged(elem prop)
+void Module::slotvalueChanged(Prop prop)
 {
    emit signalvalueChanged(prop);
 }
-void Module::slotpropCreated(elem prop)
+void Module::slotpropCreated(Prop prop)
 {
    emit signalpropCreated(prop);
 }
-void Module::slotpropDeleted(elem prop)
+void Module::slotpropDeleted(Prop prop)
 {
    emit signalpropDeleted(prop);
 }
 void Module::initProperties(void)
 {
+
 
 }
 void Module::gotserverConnected()
@@ -387,12 +388,12 @@ void Module::popnext(void)
 {
     if (tasks.size()<=1) {
         //qDebug() << "finished";
-        props->setText(modulename,"status","idle");
+        setMyElt("status","status","Idle");
         emit finished();
     }  else {
         //qDebug() << tasks.front().tasklabel << "finished";
         tasks.pop_front();
-        props->setText(modulename,"status",tasks.front().tasklabel);
+        setMyElt("status","status",tasks.front().tasklabel);
         executeTask(tasks.front());
     }
 }
@@ -472,4 +473,102 @@ void Module::dumpTasks(void)
                     "-0-"  << tasks[i].devicename << "-0-"  << tasks[i].propertyname << "-0-"  << tasks[i].elementname << "-0-"  \
                     "-0-"  << tasks[i].value << "-0-"  << tasks[i].text << "-0-"  << tasks[i].sw ;
     }
+}
+
+
+void    Module::createMyModule(QString modulelabel)
+{
+    props->createModule(modulename,modulelabel);
+}
+void    Module::deleteMyModule(void)
+{
+    props->deleteModule(modulename);
+}
+void    Module::createMyCateg(QString categname,  QString categlabel)
+{
+    props->createCateg(modulename,categname,categlabel);
+}
+void    Module::deleteMyCateg(QString categname)
+{
+    props->deleteCateg(modulename,categname);
+}
+void    Module::createMyGroup(QString categname, QString groupname,  QString grouplabel)
+{
+    props->createGroup(modulename,categname,groupname,grouplabel);
+}
+void    Module::deleteMyGroup(QString categname, QString groupname)
+{
+    props->deleteGroup(modulename,categname,groupname);
+}
+void    Module::createMyProp (QString propname,Prop    prop)
+{
+    props->createProp(modulename,propname,prop);
+}
+void    Module::createMyProp (QString propname,QString label,propType typ,QString categoryname,QString groupname,OPerm perm,OSRule rule,double timeout,OPState state,QString aux0,QString aux1)
+{
+    props->createProp(modulename,propname,label,typ,categoryname,groupname,perm,rule,timeout,state,aux0,aux1);
+}
+void    Module::deleteMyProp (QString propname)
+{
+    props->deleteProp(modulename,propname);
+}
+Prop    Module::getMyProp    (QString propname)
+{
+    return props->getProp(modulename,propname);
+}
+void    Module::setMyProp    (QString propname,Prop    prop)
+{
+    props->setProp(modulename ,propname,prop);
+}
+void    Module::appendMyElt  (QString propname,  QString txtname, QString text     , QString label, QString aux0,QString aux1)
+{
+    props->appendElt(modulename, propname, txtname, text, label, aux0, aux1);
+}
+void    Module::appendMyElt  (QString propname,  QString numname, double  num      , QString label, QString aux0,QString aux1)
+{
+    props->appendElt(modulename, propname, numname, num, label, aux0, aux1);
+}
+void    Module::appendMyElt  (QString propname,  QString swtname, OSState swt      , QString label, QString aux0,QString aux1)
+{
+    props->appendElt(modulename, propname, swtname, swt, label, aux0, aux1);
+}
+void    Module::appendMyElt  (QString propname,  QString lgtname, OPState lgt      , QString label, QString aux0,QString aux1)
+{
+    props->appendElt(modulename, propname, lgtname, lgt, label, aux0, aux1);
+}
+void    Module::deleteMyElt  (QString propname,  QString eltname)
+{
+    props->deleteElt(modulename,propname,eltname);
+}
+void    Module::setMyElt     (QString propname,  QString txtname, QString text)
+{
+    props->setElt(modulename, propname, txtname, text);
+}
+void    Module::setMyElt     (QString propname,  QString numname, double  num)
+{
+    props->setElt(modulename, propname, numname, num);
+}
+void    Module::setMyElt     (QString propname,  QString swtname, OSState swt)
+{
+    props->setElt(modulename, propname, swtname, swt);
+}
+void    Module::setMyElt     (QString propname,  QString lgtname, OPState lgt)
+{
+    props->setElt(modulename, propname, lgtname, lgt);
+}
+QString Module::getMyTxt     (QString propname,  QString txtname)
+{
+    return props->getTxt(modulename, propname, txtname);
+}
+double  Module::getMyNum     (QString propname,  QString numname)
+{
+    return props->getNum(modulename, propname, numname);
+}
+OSState Module::getMySwt     (QString propname,  QString swtname)
+{
+    return props->getSwt(modulename, propname, swtname);
+}
+OPState Module::getMyLgt     (QString propname,  QString lgtname)
+{
+    return props->getLgt(modulename, propname, lgtname);
 }

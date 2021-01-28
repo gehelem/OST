@@ -26,11 +26,11 @@ public slots:
     void sendJsonMessage(QJsonObject json);
     void sendbinary(QByteArray *data);
     void socketDisconnected();
-    void sendElement(elem elt);
-    void sendProperty(pro prop);
+    void sendProperty(Prop prop);
+    void sendElement(Prop prop);
 signals:
     void closed();
-    void changeValue(elem elt);
+    void changeValue(Prop prop);
 private:
 };
 #endif
