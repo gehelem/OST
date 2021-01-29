@@ -8,6 +8,7 @@ Properties::Properties(QObject *parent)
 }
 void    Properties::createModule(QString modulename,  QString modulelabel)
 {
+    modules[modulename].modulename=modulename;
     modules[modulename].modulelabel=modulelabel;
 }
 void    Properties::deleteModule(QString modulename)
@@ -16,7 +17,10 @@ void    Properties::deleteModule(QString modulename)
 }
 void    Properties::createCateg(QString modulename, QString categname,  QString categlabel)
 {
-    modules[modulename].categs[categname]=categlabel;
+    modules[modulename].categs[categname].categlabel=categlabel;
+    modules[modulename].categs[categname].categname=categname;
+    modules[modulename].categs[categname].modulename=modulename;
+
 }
 void    Properties::deleteCateg(QString modulename, QString categname)
 {
@@ -27,6 +31,8 @@ void    Properties::createGroup(QString modulename, QString categname, QString g
     Group gro;
     gro.grouplabel=grouplabel;
     gro.categname=categname;
+    gro.modulename=modulename;
+    gro.groupname=groupname;
     modules[modulename].groups[groupname]=gro;
 }
 void    Properties::deleteGroup(QString modulename, QString categname, QString groupname)
@@ -38,14 +44,14 @@ void    Properties::createProp (QString modulename, QString propname, Prop    pr
     modules[modulename].props[propname]=prop;
 }
 
-void    Properties::createProp (QString modulename, QString propname, QString label,propType typ,QString categoryname,QString groupname,OPerm perm,OSRule rule,double timeout,OPState state,QString aux0,QString aux1)
+void    Properties::createProp (QString modulename, QString propname, QString label,propType typ,QString categname,QString groupname,OPerm perm,OSRule rule,double timeout,OPState state,QString aux0,QString aux1)
 {
     Prop prop;
     prop.modulename     = modulename;
     prop.propname       = propname;
     prop.label          = label;
     prop.typ            = typ;
-    prop.categoryname   = categoryname;
+    prop.categname   = categname;
     prop.groupname      = groupname;
     prop.perm           = perm;
     prop.rule           = rule;
@@ -180,7 +186,7 @@ QJsonObject OSTProperties::getJsonProp(QString propname,QString modulename)
     //obj["parenttype"]=""; // M=module/ C=Category / G=group
     //obj["parentname"]="";
     obj["modulename"]=modulename;
-    obj["categoryname"]=prop.categname;
+    obj["categname"]=prop.categname;
     obj["groupname"]=prop.groupname;
 
     elem elt;
@@ -227,10 +233,16 @@ QJsonObject OSTProperties::getJsonProp(QString propname,QString modulename)
 
 void    Properties::dumproperties(void)
 {
-
+    qDebug() << "nbmodules = " << modules.size();
     for(auto m : modules)
     {
-      qDebug() << "##########################" << m.modulelabel << "###################################";
+      qDebug() << "##########################" << m.modulename << "---" << m.modulelabel <<"###################################";
+      for(auto c : m.categs)
+      {
+          qDebug() <<"##### categ  ="  << c.categname << c.categlabel << c.modulename;
+
+      }
+
       for(auto p : m.props)
       {
        qDebug() <<"##### property ="  << p.label << p.typ;
@@ -260,42 +272,6 @@ void    Properties::dumproperties(void)
     }
 
 
-    for(auto m : modules)
-    {
-      qDebug() << "##########################" << m.modulelabel << "###################################";
-      for(auto p : m.props)
-      {
-        qDebug() <<"##### property ="  << p.label << p.typ;
-        qDebug() << OpropToJ(p);
-      }
 
-    }
 
-    /*for (imod=0;imod<modules.count();imod++)
-    {
-        qDebug() << "mod :" << modules[imod].modulename << mods[imod].modulelabel;
-
-        for (icat=0;icat<categs.count();icat++)
-        {
-            if (categs[icat].modulename==mods[imod].modulename)
-            {
-                qDebug() << "- cat :" << categs[icat].categname << categs[icat].categlabel;
-                for (ipro=0;ipro<props.count();ipro++)
-                {
-                    if ((props[ipro].modulename==mods[imod].modulename)&&(props[ipro].categname==categs[icat].categname))
-                    {
-                        qDebug() << "- pro :" << props[ipro].propname << props[ipro].proplabel;
-                        for (ielem=0;ielem<elems.count();ielem++)
-                        {
-                            if ((elems[ielem].modulename==mods[imod].modulename)&&(elems[ielem].propname==props[ipro].propname))
-                            {
-                                qDebug() << "-- elt :" << elems[ielem].elemname << elems[ielem].elemlabel ;
-                            }
-                        }
-                    }
-                }
-
-            }
-        }
-    }*/
 }

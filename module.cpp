@@ -504,9 +504,9 @@ void    Module::createMyProp (QString propname,Prop    prop)
 {
     props->createProp(modulename,propname,prop);
 }
-void    Module::createMyProp (QString propname,QString label,propType typ,QString categoryname,QString groupname,OPerm perm,OSRule rule,double timeout,OPState state,QString aux0,QString aux1)
+void    Module::createMyProp (QString propname,QString label,propType typ,QString categname,QString groupname,OPerm perm,OSRule rule,double timeout,OPState state,QString aux0,QString aux1)
 {
-    props->createProp(modulename,propname,label,typ,categoryname,groupname,perm,rule,timeout,state,aux0,aux1);
+    props->createProp(modulename,propname,label,typ,categname,groupname,perm,rule,timeout,state,aux0,aux1);
 }
 void    Module::deleteMyProp (QString propname)
 {

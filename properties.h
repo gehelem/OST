@@ -221,7 +221,7 @@ typedef struct
     /** Property type */
     propType    typ;
     /** GUI Category  name */
-    QString     categoryname;
+    QString     categname;
     /** GUI Group name */
     QString     groupname;
     /** GUI Permission */
@@ -254,14 +254,24 @@ typedef struct
 
 typedef struct
 {
+    QString                 groupname;
     QString                 grouplabel;
+    QString                 modulename;
     QString                 categname;
 }  Group;
 
 typedef struct
 {
+    QString                 categname;
+    QString                 categlabel;
+    QString                 modulename;
+}  Categ;
+
+typedef struct
+{
+    QString                 modulename;
     QString                 modulelabel;
-    QMap<QString,QString>   categs;
+    QMap<QString,Categ>     categs;
     QMap<QString,Group>     groups;
     QMap<QString,Prop>      props;
 }  Mod;
@@ -282,7 +292,7 @@ public:
     void    deleteGroup(QString modulename,QString categname, QString groupname);
 
     void    createProp (QString modulename,QString propname,Prop    prop);
-    void    createProp (QString modulename,QString propname,QString label,propType typ,QString categoryname,QString groupname,OPerm perm,OSRule rule,double timeout,OPState state,QString aux0,QString aux1);
+    void    createProp (QString modulename,QString propname,QString label,propType typ,QString categname,QString groupname,OPerm perm,OSRule rule,double timeout,OPState state,QString aux0,QString aux1);
     void    deleteProp (QString modulename,QString propname);
     Prop    getProp    (QString modulename,QString propname);
     void    setProp    (QString modulename,QString propname,Prop    prop);
@@ -300,17 +310,19 @@ public:
     double  getNum     (QString modulename,QString propname,  QString numname);
     OSState getSwt     (QString modulename,QString propname,  QString swtname);
     OPState getLgt     (QString modulename,QString propname,  QString lgtname);
-
+    QMap<QString,Mod> getModules(void)    {return modules;}
+    Mod     getModule(QString modulename) {return modules[modulename];}
 
 
     //QJsonObject getJsonProp(QString modulename,QString propname, QString modulename);
     void    dumproperties(void);
+    QMap<QString,Mod>   modules;
 signals:
     void    signalPropCreated (Prop prop);
     void    signalPropDeleted (Prop prop);
     void    signalvalueChanged(Prop prop);
 private:
-    QMap<QString,Mod>   modules;
+
 };
 
 

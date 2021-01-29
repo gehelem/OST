@@ -71,9 +71,31 @@ QJsonObject OlightToJ (OLight  lgt)
 QJsonObject OpropToJ(Prop prop)
 {
     QJsonObject obj;
-    obj["name"]=prop.propname;
+    obj["propname"]=prop.propname;
     obj["label"]=prop.label;
-    obj["type"]=prop.typ;
+    switch (prop.typ) {
+    case PT_NUM:
+        obj["type"]="INDI_NUMBER";
+        break;
+    case PT_TEXT:
+        obj["type"]="INDI_TEXT";
+        break;
+    case PT_SWITCH:
+        obj["type"]="INDI_SWITCH";
+        break;
+    case PT_LIGHT:
+        obj["type"]="INDI_LIGHT";
+        break;
+    case PT_GRAPH:
+        obj["type"]="INDI_GRAPH";
+        break;
+    case PT_MESSAGE:
+        obj["type"]="INDI_MESSAGE";
+        break;
+    case PT_IMAGE:
+        obj["type"]="INDI_IMAGE";
+        break;
+    }
     switch (prop.perm) {
     case OP_RO:
         obj["switch"]="IP_RO";
@@ -100,7 +122,7 @@ QJsonObject OpropToJ(Prop prop)
         break;
     }
     obj["modulename"]=prop.modulename;
-    obj["categoryname"]=prop.categoryname;
+    obj["categname"]=prop.categname;
     obj["groupname"]=prop.groupname;
 
     QJsonArray details;
@@ -150,3 +172,95 @@ QJsonObject OpropToJ(Prop prop)
     return obj;
 
 }
+
+QJsonObject OgroupToJ(QString groupname)
+{
+    QJsonObject obj;
+    QJsonArray groups;
+
+    return obj;
+}
+QJsonObject OcategToJ(QString categname)
+{
+    QJsonObject obj;
+    return obj;
+}
+QJsonObject OmodToJ(Mod mod)
+{
+    QJsonObject obj;
+    obj["modulename"]=mod.modulename;
+    obj["modulelabel"]=mod.modulelabel;
+
+    QJsonArray props0;
+    for(auto p : mod.props){
+        if (p.modulename==mod.modulename && p.categname=="" && p.groupname =="" ) {
+            QJsonObject prop0 =OpropToJ(p);
+            props0.append(prop0);
+        }
+    }
+    if (props0.size() >0) {
+        obj["properties"]=props0;
+    }
+
+    QJsonArray categs;
+    for(auto c : mod.categs){
+        if (c.modulename==mod.modulename ) {
+            QJsonObject categ;
+            categ["modulename"]=c.modulename;
+            categ["categname"]=c.categname;
+
+            /* ajout des propriétés de la catégorie */
+            QJsonArray props1;
+            for(auto p : mod.props){
+                if (p.modulename==mod.modulename && p.categname==c.categname && p.groupname =="" ) {
+                    QJsonObject prop1 =OpropToJ(p);
+                    props1.append(prop1);
+                }
+            }
+            if (props1.size() >0) {
+                categ["properties"]=props1;
+            }
+            /* fin ajout des propriétés de la catégorie */
+
+            /* ajout des groupes de la catégorie */
+            QJsonArray groups1;
+            for(auto g : mod.groups){
+                if (g.modulename==mod.modulename && g.categname==c.categname && g.groupname !="" ) {
+                    QJsonObject grp;
+                    grp["modulename"]=g.modulename;
+                    grp["groupname"]=g.groupname;
+                    grp["categname"]=g.categname;
+                    grp["grouplabel"]=g.grouplabel;
+
+                    QJsonArray props2;
+                    for(auto p2 : mod.props){
+                        if (p2.modulename==mod.modulename && p2.categname==c.categname && p2.groupname == g.groupname ) {
+                            QJsonObject prop2 =OpropToJ(p2);
+                            props2.append(prop2);
+                        }
+                    }
+                    if (props2.size() >0) {
+                        grp["properties"]=props2;
+                    }
+                    groups1.append(grp);
+                }
+
+                if (groups1.size()>0) {
+                    categ["groups"]=groups1;
+                }
+
+            }
+            /* fin ajout des groupes de la catégorie */
+
+            categs.append(categ);
+
+
+            if (categs.size()>0) {
+                obj["categories"]=categs;
+            }
+        }
+    } // boucle categs
+
+    return obj;
+}
+

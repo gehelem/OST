@@ -99,7 +99,7 @@ class Module : public QObject
         void    deleteMyGroup(QString categname, QString groupname);
 
         void    createMyProp (QString propname,Prop    prop);
-        void    createMyProp (QString propname,QString label,propType typ,QString categoryname,QString groupname,OPerm perm,OSRule rule,double timeout,OPState state,QString aux0,QString aux1);
+        void    createMyProp (QString propname,QString label,propType typ,QString categname,QString groupname,OPerm perm,OSRule rule,double timeout,OPState state,QString aux0,QString aux1);
         void    deleteMyProp (QString propname);
         Prop    getMyProp    (QString propname);
         void    setMyProp    (QString propname,Prop    prop);

@@ -9,9 +9,9 @@ Controller::Controller(QObject *parent)
 
     this->setParent(parent);
 
-    wshandler = new WShandler(this);
     indiclient = new MyClient(this);
     properties = new Properties(this);
+    wshandler = new WShandler(this,properties);
 
     focuser = new MFocuser(indiclient,properties);
     connect(focuser,&MFocuser::signalvalueChanged,this,&Controller::valueChanged);
@@ -34,7 +34,8 @@ Controller::Controller(QObject *parent)
     connect(wshandler,&WShandler::changeValue,navigator,&MNavigator::slotvalueChangedFromCtl);
     navigator->initProperties();
 
-    properties->dumproperties();
+    //properties->dumproperties();
+
 }
 
 

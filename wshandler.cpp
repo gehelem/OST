@@ -1,14 +1,15 @@
 #include <QApplication>
 #include <QtCore>
 #include "wshandler.h"
-
+#include "jsonparser.h"
 /*!
  * ... ...
  */
-WShandler::WShandler(QObject *parent)
+WShandler::WShandler(QObject *parent,Properties *properties)
 {
 
     this->setParent(parent);
+    props = properties;
     m_pWebSocketServer = new QWebSocketServer(QStringLiteral("OST server"),QWebSocketServer::NonSecureMode, this);
     if (m_pWebSocketServer->listen(QHostAddress::Any, 9624)) {
        connect(m_pWebSocketServer, &QWebSocketServer::newConnection,this, &WShandler::onNewConnection);
@@ -60,11 +61,12 @@ void WShandler::processTextMessage(QString message)
     QJsonObject  obj = jsonResponse.object(); // garder
     if (obj["message"].toString()=="readall")
     {
-
+        sendAll();
     }
-    if (obj["message"].toString()=="updateproperty")
+    if (obj["message"].toString()=="readproperty")
     {
-
+        qDebug() << obj["modulename"].toString() <<obj["propertyname"].toString();
+        sendProperty(props->getProp(obj["modulename"].toString(),obj["propertyname"].toString()));
     }
 
 }
@@ -72,13 +74,24 @@ void WShandler::sendProperty(Prop prop)
 {
     QJsonObject mess,obj,det;
     QJsonArray dets;
-
-
-
+    obj=OpropToJ(prop);
     mess["message"]="updateproperty";
     mess["property"]=obj;
     sendJsonMessage(mess);
 }
+
+void WShandler::sendAll(void)
+{
+    QJsonObject mess;
+    QJsonArray dets;
+    mess["message"]="updateall";
+    for(auto m : props->getModules()){
+        dets.append(OmodToJ(props->getModule(m.modulename)));
+    }
+    mess["modules"]=dets;
+    sendJsonMessage(mess);
+}
+
 void WShandler::sendElement(Prop prop)
 {
     QJsonObject mess,obj,det;
@@ -91,7 +104,7 @@ void WShandler::sendElement(Prop prop)
     obj["parenttype"]="M"; // M=module/ C=Category / G=group
     obj["parentname"]="";
     obj["modulename"]=elt.modulename;
-    obj["categoryname"]="";
+    obj["categname"]="";
     obj["groupname"]="";
 
 
