@@ -34,7 +34,7 @@ void MFocuser::initProperties(void)
     appendMyElt ("buttonsprop","abort"      , OSS_OFF       , "Abort","","");
 
     createMyProp("parms","Focus parameters",PT_NUM,"main","", OP_RW,OSR_NOFMANY,0,OPS_IDLE,"","");
-    appendMyElt ("parms","startpos"     , 350000        , "Start position","","");
+    appendMyElt ("parms","startpos"     , 35000         , "Start position","","");
     appendMyElt ("parms","overshoot"    , 200           , "Backlash overshoot","","");
     appendMyElt ("parms","incre"        , 500           , "Incrementation","","");
     appendMyElt ("parms","iterations"   , 10            , "Iterations","","");
@@ -57,7 +57,8 @@ void MFocuser::test(void)
 }
 void MFocuser::slotvalueChangedFromCtl(Prop prop)
 {
-    //qDebug() << "focuser" << el.type << el.module << el.name;
+    if (prop.modulename!=modulename) return;
+
     if ((prop.typ==PT_SWITCH) && (prop.propname=="buttonsprop") )
     {
         prop.state=OPS_BUSY;
@@ -73,21 +74,22 @@ void MFocuser::slotvalueChangedFromCtl(Prop prop)
 
 void MFocuser::startFraming(void)
 {
-
+    qDebug() << "start framing request from ws";
 }
 void MFocuser::startFine(void)
 {
-
+    qDebug() << "start fine focus request from ws";
 }
 
 void MFocuser::startCoarse(void)
 {
+    qDebug() << "start coarse request from ws";
 
     QString expp        = getMyTxt("indiprops","expp");
     QString expe        = getMyTxt("indiprops","expe");
     QString focp        = getMyTxt("indiprops","focp");
     QString foce        = getMyTxt("indiprops","foce");
-    QString camera      = getMyTxt("devices","camerar");
+    QString camera      = getMyTxt("devices","camera");
     QString focuser     = getMyTxt("devices","focuser");
     double istartpos    = getMyNum("parms","startpos");
     double iovershoot   = getMyNum("parms","overshoot");
@@ -119,6 +121,7 @@ void MFocuser::startCoarse(void)
 
 void MFocuser::abort(void)
 {
+    qDebug() << "abort request from ws";
     tasks =QQueue<Ttask>();
     setMyElt("statusprop","status","idle");
     Prop prop = getMyProp("buttonsprop");
@@ -133,13 +136,14 @@ void MFocuser::executeTaskSpec(Ttask task)
     QString expe        = getMyTxt("indiprops","expe");
     QString focp        = getMyTxt("indiprops","focp");
     QString foce        = getMyTxt("indiprops","foce");
-    QString camera      = getMyTxt("devices","camerar");
+    QString camera      = getMyTxt("devices","camera");
     QString focuser     = getMyTxt("devices","focuser");
     double iexposure    = getMyNum("parms","exposure");
 
     if (task.taskname=="fram5") {
         setMyElt("valuesprop","hfravg",image->HFRavg);
         setMyElt("valuesprop","starscount",image->stars.count());
+        setMyElt("valuesprop","focuspos",task.value);
         if (getMyNum("valuesprop","besthfravg")>image->HFRavg) {
             setMyElt("valuesprop","besthfravg",image->HFRavg);
             setMyElt("valuesprop","bestpos",task.value);

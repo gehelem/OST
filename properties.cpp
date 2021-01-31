@@ -8,8 +8,10 @@ Properties::Properties(QObject *parent)
 }
 void    Properties::createModule(QString modulename,  QString modulelabel)
 {
-    modules[modulename].modulename=modulename;
-    modules[modulename].modulelabel=modulelabel;
+    Mod mod;
+    mod.modulelabel=modulelabel;
+    mod.modulename=modulename;
+    modules[modulename]=mod;
 }
 void    Properties::deleteModule(QString modulename)
 {
@@ -17,9 +19,11 @@ void    Properties::deleteModule(QString modulename)
 }
 void    Properties::createCateg(QString modulename, QString categname,  QString categlabel)
 {
-    modules[modulename].categs[categname].categlabel=categlabel;
-    modules[modulename].categs[categname].categname=categname;
-    modules[modulename].categs[categname].modulename=modulename;
+    Categ cat;
+    cat.categname=categname;
+    cat.modulename=modulename;
+    cat.categlabel=categlabel;
+    modules[modulename].categs[categname]=cat;
 
 }
 void    Properties::deleteCateg(QString modulename, QString categname)
@@ -51,7 +55,7 @@ void    Properties::createProp (QString modulename, QString propname, QString la
     prop.propname       = propname;
     prop.label          = label;
     prop.typ            = typ;
-    prop.categname   = categname;
+    prop.categname      = categname;
     prop.groupname      = groupname;
     prop.perm           = perm;
     prop.rule           = rule;

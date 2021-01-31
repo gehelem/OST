@@ -75,7 +75,9 @@ void MMainctl::test(void)
 
 void MMainctl::slotvalueChangedFromCtl(Prop prop)
 {
-    //qDebug() << "mainctl" << el.type << el.module << el.name;
+    //qDebug() << "mainctl" << prop.propname << "received";
+    if (prop.modulename!=modulename) return;
+
     if ((prop.typ==PT_SWITCH) && (prop.propname=="buttonsprop") )
     {
         prop.state=OPS_BUSY;

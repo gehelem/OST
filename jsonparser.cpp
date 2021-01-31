@@ -208,6 +208,7 @@ QJsonObject OmodToJ(Mod mod)
             QJsonObject categ;
             categ["modulename"]=c.modulename;
             categ["categname"]=c.categname;
+            categ["categlabel"]=c.categlabel;
 
             /* ajout des propriétés de la catégorie */
             QJsonArray props1;
@@ -264,3 +265,99 @@ QJsonObject OmodToJ(Mod mod)
     return obj;
 }
 
+
+Prop JpropToO(QJsonObject obj)
+{
+    Prop prop;
+    prop.propname=obj["propname"].toString();
+    prop.label=obj["label"].toString();
+
+    if (obj["type"].toString()=="INDI_NUMBER")     prop.typ=PT_NUM;
+    if (obj["type"].toString()=="INDI_TEXT")       prop.typ=PT_TEXT;
+    if (obj["type"].toString()=="INDI_SWITCH")     prop.typ=PT_SWITCH;
+    if (obj["type"].toString()=="INDI_LIGHT")      prop.typ=PT_LIGHT;
+    if (obj["type"].toString()=="INDI_MESSAGE")    prop.typ=PT_MESSAGE;
+    if (obj["type"].toString()=="INDI_GRAPH")      prop.typ=PT_GRAPH;
+    if (obj["type"].toString()=="INDI_IMAGE")      prop.typ=PT_IMAGE;
+
+    if (obj["switch"].toString()=="IP_RO") prop.perm=OP_RO;
+    if (obj["switch"].toString()=="IP_WO") prop.perm=OP_WO;
+    if (obj["switch"].toString()=="IP_RW") prop.perm=OP_RW;
+
+    if (obj["state"].toString()=="IPS_IDLE")   prop.state = OPS_IDLE;
+    if (obj["state"].toString()=="IPS_OK")     prop.state = OPS_OK;
+    if (obj["state"].toString()=="IPS_ALERT")  prop.state = OPS_ALERT;
+    if (obj["state"].toString()=="IPS_BUSY")   prop.state = OPS_BUSY;
+
+    prop.modulename =obj["modulename"].toString();
+    prop.categname  =obj["categname"].toString();
+    prop.groupname  =obj["groupname"].toString();
+
+
+    QJsonArray details;
+    QJsonObject det;
+    if (prop.typ==PT_TEXT) {
+        details=obj["texts"].toArray();
+        for (auto d : details) {
+            QJsonObject det = d.toObject();
+            prop.t[det["name"].toString()].name =det["name"].toString();
+            prop.t[det["name"].toString()].label=det["label"].toString();
+            prop.t[det["name"].toString()].text =det["text"].toString();
+            prop.t[det["name"].toString()].aux0 =det["aux0"].toString();
+            prop.t[det["name"].toString()].aux1 =det["aux1"].toString();
+        }
+    }
+    if (prop.typ==PT_NUM) {
+        details=obj["numbers"].toArray();
+        for(auto d : details) {
+            QJsonObject det = d.toObject();
+            prop.n[det["name"].toString()].name     =det["name"].toString();
+            prop.n[det["name"].toString()].label    =det["label"].toString();
+            prop.n[det["name"].toString()].value    =det["value"].toDouble();
+            prop.n[det["name"].toString()].min      =det["min"].toDouble();
+            prop.n[det["name"].toString()].max      =det["max"].toDouble();
+            prop.n[det["name"].toString()].step     =det["step"].toDouble();
+            prop.n[det["name"].toString()].format   =det["format"].toString();
+            prop.n[det["name"].toString()].aux0     =det["aux0"].toString();
+            prop.n[det["name"].toString()].aux1     =det["aux1"].toString();
+        }
+    }
+    if (prop.typ==PT_SWITCH) {
+        details=obj["switchs"].toArray();
+        for(auto d : details) {
+            QJsonObject det = d.toObject();
+            prop.s[det["name"].toString()].name     =det["name"].toString();
+            prop.s[det["name"].toString()].label    =det["label"].toString();
+            if (det["switch"].toString()=="ISS_ON")  prop.s[det["name"].toString()].s = OSS_ON;
+            if (det["switch"].toString()=="ISS_OFF") prop.s[det["name"].toString()].s = OSS_OFF;
+            prop.s[det["name"].toString()].aux0     =det["aux0"].toString();
+            prop.s[det["name"].toString()].aux1     =det["aux1"].toString();
+        }
+    }
+    if (prop.typ==PT_LIGHT) {
+        details=obj["lights"].toArray();
+        for(auto d : details) {
+            QJsonObject det = d.toObject();
+            prop.l[det["name"].toString()].name     =det["name"].toString();
+            prop.l[det["name"].toString()].label    =det["label"].toString();
+            if (det["light"].toString()=="IPS_IDLE")    prop.l[det["name"].toString()].l = OPS_IDLE;
+            if (det["light"].toString()=="IPS_OK")      prop.l[det["name"].toString()].l = OPS_OK;
+            if (det["light"].toString()=="IPS_BUSY")    prop.l[det["name"].toString()].l = OPS_BUSY;
+            if (det["light"].toString()=="IPS_ALERT")   prop.l[det["name"].toString()].l = OPS_ALERT;
+            prop.l[det["name"].toString()].aux0     =det["aux0"].toString();
+            prop.l[det["name"].toString()].aux1     =det["aux1"].toString();
+        }
+    }
+    if (prop.typ==PT_MESSAGE) {
+        //TBD
+    }
+    if (prop.typ==PT_IMAGE) {
+        //TBD
+    }
+    if (prop.typ==PT_GRAPH) {
+        //TBD
+    }
+
+    return prop;
+
+}

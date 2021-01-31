@@ -21,7 +21,7 @@ Module::Module(MyClient *cli,Properties *properties)
     connect(indiclient,&MyClient::gotnewNumber,this,&Module::gotnewNumber);
     connect(indiclient,&MyClient::gotnewMessage,this,&Module::gotnewMessage);
 
-    //connect(props,&Properties::signalvalueChanged,this,&Module::slotvalueChanged);
+    connect(props,&Properties::signalvalueChanged,this,&Module::slotvalueChanged);
     //connect(properties,&OSTProperties::signalpropCreated,this,&Module::slotpropCreated);
     //connect(properties,&OSTProperties::signalpropDeleted,this,&Module::slotpropDeleted);
 
@@ -388,12 +388,12 @@ void Module::popnext(void)
 {
     if (tasks.size()<=1) {
         //qDebug() << "finished";
-        setMyElt("status","status","Idle");
+        setMyElt("statusprop","status","Idle");
         emit finished();
     }  else {
         //qDebug() << tasks.front().tasklabel << "finished";
         tasks.pop_front();
-        setMyElt("status","status",tasks.front().tasklabel);
+        setMyElt("statusprop","status",tasks.front().tasklabel);
         executeTask(tasks.front());
     }
 }

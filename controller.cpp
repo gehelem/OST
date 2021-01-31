@@ -34,6 +34,13 @@ Controller::Controller(QObject *parent)
     connect(wshandler,&WShandler::changeValue,navigator,&MNavigator::slotvalueChangedFromCtl);
     navigator->initProperties();
 
+    guider= new MGuider(indiclient,properties);
+    connect(guider,&MGuider::signalvalueChanged,this,&Controller::valueChanged);
+    connect(guider,&MGuider::signalpropCreated,this,&Controller::propCreated);
+    connect(guider,&MGuider::signalpropDeleted,this,&Controller::propDeleted);
+    connect(wshandler,&WShandler::changeValue,guider,&MGuider::slotvalueChangedFromCtl);
+    guider->initProperties();
+
     //properties->dumproperties();
 
 }

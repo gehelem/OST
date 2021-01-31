@@ -65,9 +65,16 @@ void WShandler::processTextMessage(QString message)
     }
     if (obj["message"].toString()=="readproperty")
     {
-        qDebug() << obj["modulename"].toString() <<obj["propertyname"].toString();
+        //qDebug() << obj["modulename"].toString() <<obj["propertyname"].toString();
         sendProperty(props->getProp(obj["modulename"].toString(),obj["propertyname"].toString()));
     }
+    if (obj["message"].toString()=="updateproperty")
+    {
+        QJsonObject prop = obj["property"].toObject();
+        //sendProperty(props->getProp(obj["modulename"].toString(),obj["propertyname"].toString()));
+        emit changeValue(JpropToO(prop));
+    }
+
 
 }
 void WShandler::sendProperty(Prop prop)

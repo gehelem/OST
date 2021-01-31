@@ -13,6 +13,7 @@ QJsonObject OpropToJ(Prop prop);
 QJsonObject OgroupToJ(QString groupname);
 QJsonObject OcategToJ(QString categname);
 QJsonObject OmodToJ(Mod mod);
+Prop JpropToO(QJsonObject obj);
 
 
 #endif
