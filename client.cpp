@@ -87,7 +87,13 @@ bool MyClient::connectIndi()
         return true;
     } else {
         setServer("localhost", 7624);
-        return connectServer();
+        if (connectServer()){
+            IDLog("Indi server connected\n");
+            return true;
+        } else {
+            IDLog("Couldn't connect to Indi server\n");
+            return false;
+        }
     }
 }
 

@@ -96,13 +96,13 @@ typedef struct
     /** GUI display format, see above */
     QString     format;
     /** Range min, ignored if min == max */
-    double      min;
+    double      min =0;
     /** Range max, ignored if min == max */
-    double      max;
+    double      max =0;
     /** Step size, ignored if step == 0 */
-    double      step;
+    double      step =0;
     /** Current value */
-    double      value;
+    double      value =0;
     /** Helper info */
     QString     aux0;
     /** Helper info */

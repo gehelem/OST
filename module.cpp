@@ -32,15 +32,15 @@ Module::~Module()
 }
 void Module::slotvalueChanged(Prop prop)
 {
-   emit signalvalueChanged(prop);
+   if (prop.modulename==modulename) emit signalvalueChanged(prop);
 }
 void Module::slotpropCreated(Prop prop)
 {
-   emit signalpropCreated(prop);
+   if (prop.modulename==modulename) emit signalpropCreated(prop);
 }
 void Module::slotpropDeleted(Prop prop)
 {
-   emit signalpropDeleted(prop);
+   if (prop.modulename==modulename) emit signalpropDeleted(prop);
 }
 void Module::initProperties(void)
 {

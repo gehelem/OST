@@ -78,37 +78,38 @@ void MMainctl::slotvalueChangedFromCtl(Prop prop)
     //qDebug() << "mainctl" << prop.propname << "received";
     if (prop.modulename!=modulename) return;
 
-    if ((prop.typ==PT_SWITCH) && (prop.propname=="buttonsprop") )
+    if ((prop.typ==PT_SWITCH) && (prop.propname=="buttonsprop"))
     {
+        Prop myprop = getMyProp(prop.propname);
         prop.state=OPS_BUSY;
-        setMyProp("buttonsprop",prop);
+        setMyProp("buttonsprop",myprop);
 
         if (prop.s["connectindi"].s==OSS_ON)
         {
             if (indiclient->connectIndi())
             {
-                prop.state=OPS_OK;
+                myprop.state=OPS_OK;
             }  else {
-                prop.state=OPS_ALERT;
+                myprop.state=OPS_ALERT;
             }
-            prop.s["connectindi"].s=OSS_OFF;
-            setMyProp("buttonsprop",prop);
+            myprop.s["connectindi"].s=OSS_OFF;
+            setMyProp("buttonsprop",myprop);
         }
 
         if (prop.s["connectdevices"].s==OSS_ON)
         {
             indiclient->connectAllDevices();
-            prop.state=OPS_OK;
-            prop.s["connectdevices"].s=OSS_OFF;
-            setMyProp("buttonsprop",prop);
+            myprop.state=OPS_OK;
+            myprop.s["connectdevices"].s=OSS_OFF;
+            setMyProp("buttonsprop",myprop);
         }
 
         if (prop.s["loadconfs"].s==OSS_ON)
         {
             indiclient->connectAllDevices();
-            prop.state=OPS_OK;
-            prop.s["loadconfs"].s=OSS_OFF;
-            setMyProp("buttonsprop",prop);
+            myprop.state=OPS_OK;
+            myprop.s["loadconfs"].s=OSS_OFF;
+            setMyProp("buttonsprop",myprop);
         }
     }
 

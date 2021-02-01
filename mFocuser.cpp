@@ -59,10 +59,11 @@ void MFocuser::slotvalueChangedFromCtl(Prop prop)
 {
     if (prop.modulename!=modulename) return;
 
-    if ((prop.typ==PT_SWITCH) && (prop.propname=="buttonsprop") )
+    if ((prop.typ==PT_SWITCH) && (prop.propname=="buttonsprop"))
     {
-        prop.state=OPS_BUSY;
-        setMyProp("buttonsprop",prop);
+        Prop myprop = getMyProp(prop.propname);
+        myprop.state=OPS_BUSY;
+        setMyProp(prop.propname,myprop);
         if (prop.s["coarse"].s==OSS_ON) startCoarse();
         if (prop.s["fine"].s==OSS_ON) startFine();
         if (prop.s["framing"].s==OSS_ON) startFraming();
@@ -141,13 +142,16 @@ void MFocuser::executeTaskSpec(Ttask task)
     double iexposure    = getMyNum("parms","exposure");
 
     if (task.taskname=="fram5") {
-        setMyElt("valuesprop","hfravg",image->HFRavg);
-        setMyElt("valuesprop","starscount",image->stars.count());
-        setMyElt("valuesprop","focuspos",task.value);
-        if (getMyNum("valuesprop","besthfravg")>image->HFRavg) {
-            setMyElt("valuesprop","besthfravg",image->HFRavg);
-            setMyElt("valuesprop","bestpos",task.value);
+        Prop prop = getMyProp("valuesprop");
+        prop.n["hfravg"].value=image->HFRavg;
+        prop.n["starscount"].value=image->stars.count();
+        prop.n["focuspos"].value=task.value;
+
+        if (prop.n["besthfravg"].value>image->HFRavg) {
+            prop.n["besthfravg"].value=image->HFRavg;
+            prop.n["bestpos"].value=task.value;
         }
+        setMyProp(prop.propname,prop);
         popnext();
         executeTask(tasks.front());
     }

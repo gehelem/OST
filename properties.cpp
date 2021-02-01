@@ -77,6 +77,7 @@ Prop    Properties::getProp    (QString modulename, QString propname)
 void    Properties::setProp    (QString modulename, QString propname, Prop prop)
 {
     modules[modulename].props[propname]=prop;
+    emit signalvalueChanged(modules[modulename].props[propname]);
 }
 void    Properties::appendElt  (QString modulename, QString propname,  QString txtname, QString text     , QString label, QString aux0,QString aux1)
 {

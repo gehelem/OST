@@ -23,6 +23,8 @@ void MSequence::test(void)
 
 void MSequence::slotvalueChangedFromCtl(Prop prop)
 {
+    if (prop.modulename!=modulename) return;
+
     if ((prop.typ==PT_SWITCH) && (prop.propname=="buttonsprop") )
     {
         prop.state=OPS_BUSY;

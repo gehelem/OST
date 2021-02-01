@@ -23,10 +23,12 @@ void MNavigator::test(void)
 
 void MNavigator::slotvalueChangedFromCtl(Prop prop)
 {
+    if (prop.modulename!=modulename) return;
+
     if ((prop.typ==PT_SWITCH) && (prop.propname=="buttonsprop") )
     {
-        prop.state=OPS_BUSY;
-        setMyProp("buttonsprop",prop);
+        //prop.state=OPS_BUSY;
+        //setMyProp("buttonsprop",prop);
         /*if (prop.s["something"].s==OSS_ON) startSomething();*/
 
     }
