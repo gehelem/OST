@@ -9,6 +9,7 @@ QJsonObject OtextToJ  (OText   txt);
 QJsonObject OnumToJ   (ONumber num);
 QJsonObject OswitchToJ(OSwitch swt);
 QJsonObject OlightToJ (OLight  lgt);
+QJsonObject OimageToJ (OImage  img);
 QJsonObject OpropToJ(Prop prop);
 QJsonObject OgroupToJ(QString groupname);
 QJsonObject OcategToJ(QString categname);

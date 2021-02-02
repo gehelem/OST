@@ -119,6 +119,20 @@ void    Properties::appendElt  (QString modulename, QString propname,  QString l
     l.aux1=aux1;
     modules[modulename].props[propname].l[lgtname]=l;
 }
+void    Properties::appendElt  (QString modulename,QString propname,  QString imgname, OImgType imt     , QString label, QString aux0,QString aux1,QString url,QString file)
+{
+    OImage i;
+    i.name=imgname;
+    i.label=label;
+    i.url=url;
+    i.f=file;
+    i.imgtype=imt;
+    i.aux0=aux0;
+    i.aux1=aux1;
+    modules[modulename].props[propname].i[imgname]=i;
+
+}
+
 void    Properties::deleteElt  (QString modulename, QString propname,  QString eltname)
 {
     modules[modulename].props[propname].t.remove(eltname);
@@ -149,6 +163,12 @@ void    Properties::setElt     (QString modulename, QString propname,  QString l
     modules[modulename].props[propname].l[lgtname].l=lgt;
     emit signalvalueChanged(modules[modulename].props[propname]);
 }
+void    Properties::setElt     (QString modulename,QString propname,  QString imgname, QString url, QString file)
+{
+    modules[modulename].props[propname].i[imgname].url=url;
+    modules[modulename].props[propname].i[imgname].f=file;
+    emit signalvalueChanged(modules[modulename].props[propname]);
+}
 QString Properties::getTxt     (QString modulename, QString propname,  QString txtname)
 {
     return modules[modulename].props[propname].t[txtname].text;
@@ -165,7 +185,10 @@ OPState Properties::getLgt     (QString modulename, QString propname,  QString l
 {
     return modules[modulename].props[propname].l[lgtname].l;
 }
-
+OImage Properties::getImg    (QString modulename, QString propname,  QString lgtname)
+{
+    return modules[modulename].props[propname].i[lgtname];
+}
 
 /*
 

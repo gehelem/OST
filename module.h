@@ -108,15 +108,19 @@ class Module : public QObject
         void    appendMyElt  (QString propname,  QString numname, double  num      , QString label, QString aux0,QString aux1);
         void    appendMyElt  (QString propname,  QString swtname, OSState swt      , QString label, QString aux0,QString aux1);
         void    appendMyElt  (QString propname,  QString lgtname, OPState lgt      , QString label, QString aux0,QString aux1);
+        void    appendMyElt  (QString propname,  QString imgname, OImgType imt     , QString label, QString aux0, QString aux1, QString url, QString file);
         void    deleteMyElt  (QString propname,  QString eltname);
         void    setMyElt     (QString propname,  QString txtname, QString text);
         void    setMyElt     (QString propname,  QString numname, double  num);
         void    setMyElt     (QString propname,  QString swtname, OSState swt);
         void    setMyElt     (QString propname,  QString lgtname, OPState lgt);
+        void    setMyElt     (QString propname,  QString imgname, QString url, QString file);
+
         QString getMyTxt     (QString propname,  QString txtname);
         double  getMyNum     (QString propname,  QString numname);
         OSState getMySwt     (QString propname,  QString swtname);
         OPState getMyLgt     (QString propname,  QString lgtname);
+        OImage  getMyImg     (QString propname,  QString imgname);
     public slots:
         void gotserverConnected();
         void gotserverDisconnected(int exit_code);

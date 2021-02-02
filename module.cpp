@@ -536,6 +536,11 @@ void    Module::appendMyElt  (QString propname,  QString lgtname, OPState lgt   
 {
     props->appendElt(modulename, propname, lgtname, lgt, label, aux0, aux1);
 }
+void    Module::appendMyElt  (QString propname,  QString imgname, OImgType imt     , QString label, QString aux0, QString aux1, QString url, QString file)
+{
+    props->appendElt(modulename, propname, imgname, imt, label, aux0, aux1,url,file);
+}
+
 void    Module::deleteMyElt  (QString propname,  QString eltname)
 {
     props->deleteElt(modulename,propname,eltname);
@@ -556,6 +561,10 @@ void    Module::setMyElt     (QString propname,  QString lgtname, OPState lgt)
 {
     props->setElt(modulename, propname, lgtname, lgt);
 }
+void    Module::setMyElt     (QString propname,  QString imgname, QString url, QString file)
+{
+    props->setElt(modulename, propname, imgname, url,file);
+}
 QString Module::getMyTxt     (QString propname,  QString txtname)
 {
     return props->getTxt(modulename, propname, txtname);
@@ -571,4 +580,8 @@ OSState Module::getMySwt     (QString propname,  QString swtname)
 OPState Module::getMyLgt     (QString propname,  QString lgtname)
 {
     return props->getLgt(modulename, propname, lgtname);
+}
+OImage  Module::getMyImg     (QString propname,  QString imgname)
+{
+    return props->getImg(modulename, propname, imgname);
 }

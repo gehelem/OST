@@ -13,7 +13,9 @@ void MMainctl::initProperties(void)
 {
     modulename="mainctl";
     createMyModule("Main control");
-    createMyCateg("main","Main");
+    createMyCateg("main","Main control");
+    createMyProp("statusprop","Status",PT_TEXT,"main","", OP_RO,OSR_NOFMANY,0,OPS_IDLE,"","");
+    appendMyElt ("statusprop","status","","Status","","");
 
     createMyProp("buttonsprop","Actions",PT_SWITCH,"main","", OP_RW,OSR_ATMOST1,0,OPS_IDLE,"","");
     appendMyElt ("buttonsprop","connectindi"   , OSS_OFF       , "Connect indi server","","");
@@ -89,7 +91,9 @@ void MMainctl::slotvalueChangedFromCtl(Prop prop)
             if (indiclient->connectIndi())
             {
                 myprop.state=OPS_OK;
+                setMyElt("statusprop","status","Indi server connected");
             }  else {
+                setMyElt("statusprop","status","Could not connect to Indi server");
                 myprop.state=OPS_ALERT;
             }
             myprop.s["connectindi"].s=OSS_OFF;
@@ -102,6 +106,7 @@ void MMainctl::slotvalueChangedFromCtl(Prop prop)
             myprop.state=OPS_OK;
             myprop.s["connectdevices"].s=OSS_OFF;
             setMyProp("buttonsprop",myprop);
+            setMyElt("statusprop","status","Connect devices");
         }
 
         if (prop.s["loadconfs"].s==OSS_ON)
@@ -110,6 +115,8 @@ void MMainctl::slotvalueChangedFromCtl(Prop prop)
             myprop.state=OPS_OK;
             myprop.s["loadconfs"].s=OSS_OFF;
             setMyProp("buttonsprop",myprop);
+            setMyElt("statusprop","status","Load devices configuration");
+
         }
     }
 

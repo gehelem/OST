@@ -44,6 +44,27 @@ QJsonObject OswitchToJ(OSwitch swt)
     obj["aux1"]=swt.aux1;
     return obj;
 }
+QJsonObject OimageToJ(OImage img)
+{
+    QJsonObject obj;
+    obj["name"]=img.name;
+    obj["label"]=img.label;
+    obj["f"]=img.f;
+    obj["url"]=img.url;
+    switch (img.imgtype) {
+    case IM_FULL:
+        obj["imgtype"]="IM_FULL";
+        break;
+    case IM_MINI:
+        obj["imgtype"]="IM_MINI";
+        break;
+    case IM_OVERLAY:
+        obj["imgtype"]="IM_OVERLAY";
+        break;    }
+    obj["aux0"]=img.aux0;
+    obj["aux1"]=img.aux1;
+    return obj;
+}
 QJsonObject OlightToJ (OLight  lgt)
 {
     QJsonObject obj;
@@ -163,8 +184,12 @@ QJsonObject OpropToJ(Prop prop)
         //TBD
     }
     if (prop.typ==PT_IMAGE) {
-        //TBD
-    }
+        for(auto i : prop.i)
+        {
+            det=OimageToJ(i);
+            details.append(det);
+        }
+        obj["images"]=details;    }
     if (prop.typ==PT_GRAPH) {
         //TBD
     }

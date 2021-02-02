@@ -37,9 +37,12 @@ Image::~Image() {
 void Image::ResetData(void) {
 
 }
-bool Image::saveToJpeg(QString filename) {
+bool Image::saveToJpeg(QString filename,int compress)
+{
 
-    img.save_jpeg(filename.toStdString().c_str(),100);
+    CImg<uint16_t> imgtmp = img;
+    imgtmp.resize_halfXY();
+    imgtmp.save_jpeg(filename.toStdString().c_str(),compress);
     //int buf_size = sizeof(img.data());
     //jpegmem.load(filename.toStdString().c_str());
 
@@ -330,4 +333,17 @@ void Image::ssReadySolve(void)
     SolveStarsFinished = true;
     emit successSolve();
 
+}
+void Image::appendStarsFound(void)
+{
+    const unsigned char
+        red[]   = { 255,0,0 },
+        //blue [] = { 0,0,255 },
+        //black[] = { 0,0,0 },
+        green[] = { 0,255,0 };
+    for (int i=0;i<stars.size();i++)
+    {
+        img.draw_text  (stars[i].x, img.height()-stars[i].y, QString::number(stars[i].HFR , 'G', 3).toStdString().c_str(),red,1, 10);
+        img.draw_circle(stars[i].x, img.height()-stars[i].y, stars[i].numPixels, red, 1,FALSE);
+    }
 }

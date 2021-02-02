@@ -31,11 +31,12 @@ public:
     CImg<uint16_t> img;
 
     bool LoadFromBlob(IBLOB *bp);
-    bool saveToJpeg(QString filename);
+    bool saveToJpeg(QString filename,int compress);
     void ResetData(void);
     void CalcStats(void);
     void FindStars(void);
     void SolveStars(void);
+    void appendStarsFound(void);
     bool FindStarsFinished = true;
     bool SolveStarsFinished = true;
 public slots:

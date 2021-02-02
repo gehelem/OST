@@ -63,6 +63,16 @@ OP_RO, /*!< Read Only */
 OP_WO, /*!< Write Only */
 OP_RW  /*!< Read & Write */
 } OPerm;
+/**
+ * @typedef OImgType
+ * @brief Image item type
+ */
+typedef enum
+{
+IM_FULL, /*!< Full image */
+IM_MINI, /*!< Overvieew */
+IM_OVERLAY  /*!< Overlay */
+} OImgType;
 
 /**
  * @struct OText
@@ -166,6 +176,8 @@ typedef struct
     QString     aux0;
     /** Helper info */
     QString     aux1;
+    /** Image type */
+    OImgType    imgtype;
 
 } OImage;
 
@@ -301,27 +313,30 @@ public:
     void    appendElt  (QString modulename,QString propname,  QString numname, double  num      , QString label, QString aux0,QString aux1);
     void    appendElt  (QString modulename,QString propname,  QString swtname, OSState swt      , QString label, QString aux0,QString aux1);
     void    appendElt  (QString modulename,QString propname,  QString lgtname, OPState lgt      , QString label, QString aux0,QString aux1);
+    void    appendElt  (QString modulename,QString propname,  QString imgname, OImgType imt     , QString label, QString aux0, QString aux1, QString url, QString file);
     void    deleteElt  (QString modulename,QString propname,  QString eltname);
     void    setElt     (QString modulename,QString propname,  QString txtname, QString text);
     void    setElt     (QString modulename,QString propname,  QString numname, double  num);
     void    setElt     (QString modulename,QString propname,  QString swtname, OSState swt);
     void    setElt     (QString modulename,QString propname,  QString lgtname, OPState lgt);
+    void    setElt     (QString modulename,QString propname,  QString imgname, QString url, QString file);
     QString getTxt     (QString modulename,QString propname,  QString txtname);
     double  getNum     (QString modulename,QString propname,  QString numname);
     OSState getSwt     (QString modulename,QString propname,  QString swtname);
     OPState getLgt     (QString modulename,QString propname,  QString lgtname);
+    OImage  getImg     (QString modulename,QString propname,  QString imgname);
     QMap<QString,Mod> getModules(void)    {return modules;}
     Mod     getModule(QString modulename) {return modules[modulename];}
 
 
     //QJsonObject getJsonProp(QString modulename,QString propname, QString modulename);
     void    dumproperties(void);
-    QMap<QString,Mod>   modules;
 signals:
     void    signalPropCreated (Prop prop);
     void    signalPropDeleted (Prop prop);
     void    signalvalueChanged(Prop prop);
 private:
+    QMap<QString,Mod>   modules;
 
 };
 

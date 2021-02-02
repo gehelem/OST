@@ -27,6 +27,9 @@ void MFocuser::initProperties(void)
     appendMyElt ("valuesprop","bestpos"      , 0        , "Best position","","");
     appendMyElt ("valuesprop","besthfravg"   , 0        , "Best HFR","","");
 
+    createMyProp("image","Image",PT_IMAGE,"main","", OP_RW,OSR_ATMOST1,0,OPS_IDLE,"","");
+    appendMyElt ("image","imagefoc"  , IM_FULL       , "focus image","","","tobido.jpeg","/var/www/html");
+
     createMyProp("buttonsprop","Actions",PT_SWITCH,"main","", OP_RW,OSR_ATMOST1,0,OPS_IDLE,"","");
     appendMyElt ("buttonsprop","loop"       , OSS_OFF       , "Continuous shooting","","");
     appendMyElt ("buttonsprop","coarse"     , OSS_OFF       , "Coarse focus","","");
@@ -37,7 +40,7 @@ void MFocuser::initProperties(void)
     appendMyElt ("parms","startpos"     , 35000         , "Start position","","");
     appendMyElt ("parms","overshoot"    , 200           , "Backlash overshoot","","");
     appendMyElt ("parms","incre"        , 500           , "Incrementation","","");
-    appendMyElt ("parms","iterations"   , 10            , "Iterations","","");
+    appendMyElt ("parms","iterations"   , 5             , "Iterations","","");
     appendMyElt ("parms","exposure"     , 2             , "Exposure","","");
 
     createMyCateg("adv","Advanced parameters");
@@ -84,7 +87,7 @@ void MFocuser::startFine(void)
 
 void MFocuser::startCoarse(void)
 {
-    qDebug() << "start coarse request from ws";
+    qDebug() << "start coarse request from ws" << tasks.size();
 
     QString expp        = getMyTxt("indiprops","expp");
     QString expe        = getMyTxt("indiprops","expe");
@@ -109,10 +112,11 @@ void MFocuser::startCoarse(void)
         addnewtask(TT_WAIT_BLOB  ,"fram2","Exp. waiting",false,camera,expp,expe,iexposure,"",ISS_OFF);
         addnewtask(TT_ANALYSE_SEP,"fram3","Analyse request",false,camera,expp,expe,iexposure,"",ISS_OFF);
         addnewtask(TT_WAIT_SEP   ,"fram4","Waiting analyse",false,camera,expp,expe,iexposure,"",ISS_OFF);
-        addnewtask(TT_SPEC       ,"fram5","store pos/hfr",true ,   camera,expp,expe,istartpos+i*iincre,"",ISS_OFF);
+        addnewtask(TT_SPEC       ,"fram45","save image",true,   camera,expp,expe,istartpos+i*iincre,"",ISS_OFF);
+        addnewtask(TT_SPEC       ,"fram5","store pos/hfr",true,   camera,expp,expe,istartpos+i*iincre,"",ISS_OFF);
 
     }
-    addnewtask(TT_SPEC,"gobest","Asking focuser to go to best position",false,focuser,"","",0,"",ISS_OFF);
+    addnewtask(TT_SPEC,"gobest","Asking focuser to go to best position",true,focuser,"","",0,"",ISS_OFF);
 
 
 
@@ -155,6 +159,15 @@ void MFocuser::executeTaskSpec(Ttask task)
         popnext();
         executeTask(tasks.front());
     }
+    if (task.taskname=="check5") {
+        Prop prop = getMyProp("valuesprop");
+        prop.n["hfravg"].value=image->HFRavg;
+        prop.n["starscount"].value=image->stars.count();
+        prop.n["focuspos"].value=task.value;
+
+        setMyProp(prop.propname,prop);
+        popnext();
+    }
     if (task.taskname=="gobest") {
 
         addnewtask(TT_SEND_NUMBER,"movebest","Asking focuser to go to best position",false,focuser,focp,foce,getMyNum("valuesprop","bestpos"),"",ISS_OFF);
@@ -163,7 +176,16 @@ void MFocuser::executeTaskSpec(Ttask task)
         addnewtask(TT_WAIT_BLOB  ,"check2","Check waiting",false,   camera,expp,expe,iexposure,"",ISS_OFF);
         addnewtask(TT_ANALYSE_SEP,"check3","Check Analyse request",false,camera,expp,expe,iexposure,"",ISS_OFF);
         addnewtask(TT_WAIT_SEP   ,"check4","Check Waiting analyse",false,camera,expp,expe,iexposure,"",ISS_OFF);
+        addnewtask(TT_SPEC       ,"check5","Finish",true,   camera,expp,expe,0,"",ISS_OFF);
 
+
+        popnext();
+        executeTask(tasks.front());
+    }
+    if (task.taskname=="fram45") {
+        image->appendStarsFound();
+        image->saveToJpeg(getMyImg("image","imagefoc").f+"/"+getMyImg("image","imagefoc").url,100);
+        setMyElt("image","imagefoc",getMyImg("image","imagefoc").url,getMyImg("image","imagefoc").f);
         popnext();
         executeTask(tasks.front());
     }
