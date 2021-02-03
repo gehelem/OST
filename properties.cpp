@@ -132,7 +132,19 @@ void    Properties::appendElt  (QString modulename,QString propname,  QString im
     modules[modulename].props[propname].i[imgname]=i;
 
 }
-
+void    Properties::appendElt  (QString modulename,QString propname,  QString graname, OGraph graph    )
+{
+    modules[modulename].props[propname].g[graname]=graph;
+}
+void    Properties::appendGra  (QString modulename,QString propname,  QString graname, OGraphValue val  )
+{
+    modules[modulename].props[propname].g[graname].values.append(val);
+    emit signalAppendGraph (modules[modulename].props[propname],modules[modulename].props[propname].g[graname],val);
+}
+void    Properties::resetGra   (QString modulename,QString propname,  QString graname)
+{
+    modules[modulename].props[propname].g[graname].values.clear();
+}
 void    Properties::deleteElt  (QString modulename, QString propname,  QString eltname)
 {
     modules[modulename].props[propname].t.remove(eltname);
@@ -169,6 +181,12 @@ void    Properties::setElt     (QString modulename,QString propname,  QString im
     modules[modulename].props[propname].i[imgname].f=file;
     emit signalvalueChanged(modules[modulename].props[propname]);
 }
+void    Properties::setElt     (QString modulename,QString propname,  QString graname, OGraph  graph)
+{
+    modules[modulename].props[propname].g[graname]=graph;
+    //emit signalvalueChanged(modules[modulename].props[propname]);
+}
+
 QString Properties::getTxt     (QString modulename, QString propname,  QString txtname)
 {
     return modules[modulename].props[propname].t[txtname].text;
@@ -188,6 +206,10 @@ OPState Properties::getLgt     (QString modulename, QString propname,  QString l
 OImage Properties::getImg    (QString modulename, QString propname,  QString lgtname)
 {
     return modules[modulename].props[propname].i[lgtname];
+}
+OGraph  Properties::getGraph   (QString modulename,QString propname,  QString graname)
+{
+    return modules[modulename].props[propname].g[graname];
 }
 
 /*

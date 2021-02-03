@@ -98,6 +98,23 @@ void WShandler::sendAll(void)
     mess["modules"]=dets;
     sendJsonMessage(mess);
 }
+void WShandler::sendGraphValue(Prop prop,OGraph gra,OGraphValue val)
+{
+    QJsonObject mess;
+    QJsonArray dets;
+    mess["message"]="appendgraph";
+    mess["module"]=prop.modulename;
+    mess["property"]=prop.propname;
+    mess["graph"]=gra.name;
+    mess["v0"]=val.v0;
+    mess["v1"]=val.v1;
+    mess["v2"]=val.v2;
+    mess["v3"]=val.v3;
+    mess["v4"]=val.v4;
+
+    sendJsonMessage(mess);
+}
+
 
 void WShandler::sendElement(Prop prop)
 {

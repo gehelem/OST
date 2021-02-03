@@ -22,6 +22,8 @@ Module::Module(MyClient *cli,Properties *properties)
     connect(indiclient,&MyClient::gotnewMessage,this,&Module::gotnewMessage);
 
     connect(props,&Properties::signalvalueChanged,this,&Module::slotvalueChanged);
+    connect(props,&Properties::signalAppendGraph,this,&Module::slotAppendGraph);
+
     //connect(properties,&OSTProperties::signalpropCreated,this,&Module::slotpropCreated);
     //connect(properties,&OSTProperties::signalpropDeleted,this,&Module::slotpropDeleted);
 
@@ -33,6 +35,10 @@ Module::~Module()
 void Module::slotvalueChanged(Prop prop)
 {
    if (prop.modulename==modulename) emit signalvalueChanged(prop);
+}
+void Module::slotAppendGraph(Prop prop,OGraph gra,OGraphValue val)
+{
+   if (prop.modulename==modulename) emit signalAppendGraph(prop,gra,val);
 }
 void Module::slotpropCreated(Prop prop)
 {
@@ -540,7 +546,18 @@ void    Module::appendMyElt  (QString propname,  QString imgname, OImgType imt  
 {
     props->appendElt(modulename, propname, imgname, imt, label, aux0, aux1,url,file);
 }
-
+void    Module::appendMyElt  (QString propname,  QString graname, OGraph graph     )
+{
+    props->appendElt(modulename, propname, graname, graph);
+}
+void    Module::appendMyGra  (QString propname,  QString graname, OGraphValue val  )
+{
+    props->appendGra(modulename,propname,graname,val);
+}
+void    Module::resetMyGra   (QString propname,  QString graname)
+{
+    props->resetGra(modulename,propname,graname);
+}
 void    Module::deleteMyElt  (QString propname,  QString eltname)
 {
     props->deleteElt(modulename,propname,eltname);
@@ -565,6 +582,10 @@ void    Module::setMyElt     (QString propname,  QString imgname, QString url, Q
 {
     props->setElt(modulename, propname, imgname, url,file);
 }
+void    Module::setMyElt     (QString propname,  QString graname, OGraph  graph)
+{
+    props->setElt(modulename, propname, graname,graph);
+}
 QString Module::getMyTxt     (QString propname,  QString txtname)
 {
     return props->getTxt(modulename, propname, txtname);
@@ -584,4 +605,8 @@ OPState Module::getMyLgt     (QString propname,  QString lgtname)
 OImage  Module::getMyImg     (QString propname,  QString imgname)
 {
     return props->getImg(modulename, propname, imgname);
+}
+OGraph  Module::getMyGraph   (QString propname,  QString graname)
+{
+    return props->getGraph(modulename, propname, graname);
 }

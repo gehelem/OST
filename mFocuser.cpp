@@ -30,6 +30,15 @@ void MFocuser::initProperties(void)
     createMyProp("image","Image",PT_IMAGE,"main","", OP_RW,OSR_ATMOST1,0,OPS_IDLE,"","");
     appendMyElt ("image","imagefoc"  , IM_FULL       , "focus image","","","tobido.jpeg","/var/www/html");
 
+    createMyProp("curve","Focus plot",PT_GRAPH,"main","", OP_RW,OSR_ATMOST1,0,OPS_IDLE,"","");
+    OGraph gra;
+    gra.name="curve1" ;
+    gra.label="Measure";
+    gra.gtype="2D";
+    gra.V0label="Position";
+    gra.V1label="HFR";
+    appendMyElt ("curve","curve1"  , gra);
+
     createMyProp("buttonsprop","Actions",PT_SWITCH,"main","", OP_RW,OSR_ATMOST1,0,OPS_IDLE,"","");
     appendMyElt ("buttonsprop","loop"       , OSS_OFF       , "Continuous shooting","","");
     appendMyElt ("buttonsprop","coarse"     , OSS_OFF       , "Coarse focus","","");
@@ -100,6 +109,7 @@ void MFocuser::startCoarse(void)
     double iincre       = getMyNum("parms","incre");
     double iiterations  = getMyNum("parms","iterations");
     double iexposure    = getMyNum("parms","exposure");
+    resetMyGra("curve","curve1");
 
     setMyElt("valuesprop","besthfravg",99);
 
@@ -150,6 +160,10 @@ void MFocuser::executeTaskSpec(Ttask task)
         prop.n["hfravg"].value=image->HFRavg;
         prop.n["starscount"].value=image->stars.count();
         prop.n["focuspos"].value=task.value;
+        OGraphValue v;
+        v.v0=task.value;
+        v.v1=image->HFRavg;
+        appendMyGra("curve","curve1",v);
 
         if (prop.n["besthfravg"].value>image->HFRavg) {
             prop.n["besthfravg"].value=image->HFRavg;

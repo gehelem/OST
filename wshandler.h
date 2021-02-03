@@ -29,6 +29,7 @@ public slots:
     void socketDisconnected();
     void sendProperty(Prop prop);
     void sendElement(Prop prop);
+    void sendGraphValue(Prop prop, OGraph gra, OGraphValue val);
     void sendAll(void);
 signals:
     void closed();

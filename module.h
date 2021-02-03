@@ -109,18 +109,25 @@ class Module : public QObject
         void    appendMyElt  (QString propname,  QString swtname, OSState swt      , QString label, QString aux0,QString aux1);
         void    appendMyElt  (QString propname,  QString lgtname, OPState lgt      , QString label, QString aux0,QString aux1);
         void    appendMyElt  (QString propname,  QString imgname, OImgType imt     , QString label, QString aux0, QString aux1, QString url, QString file);
+        void    appendMyElt  (QString propname,  QString graname, OGraph graph     );
+        void    appendMyGra  (QString propname,  QString graname, OGraphValue val  );
+        void    resetMyGra   (QString propname,  QString graname);
         void    deleteMyElt  (QString propname,  QString eltname);
         void    setMyElt     (QString propname,  QString txtname, QString text);
         void    setMyElt     (QString propname,  QString numname, double  num);
         void    setMyElt     (QString propname,  QString swtname, OSState swt);
         void    setMyElt     (QString propname,  QString lgtname, OPState lgt);
         void    setMyElt     (QString propname,  QString imgname, QString url, QString file);
+        void    setMyElt     (QString propname,  QString graname, OGraph  graph);
+
 
         QString getMyTxt     (QString propname,  QString txtname);
         double  getMyNum     (QString propname,  QString numname);
         OSState getMySwt     (QString propname,  QString swtname);
         OPState getMyLgt     (QString propname,  QString lgtname);
         OImage  getMyImg     (QString propname,  QString imgname);
+        OGraph  getMyGraph   (QString propname,  QString graname);
+
     public slots:
         void gotserverConnected();
         void gotserverDisconnected(int exit_code);
@@ -139,12 +146,14 @@ class Module : public QObject
         void slotvalueChanged(Prop prop);
         void slotpropCreated(Prop prop);
         void slotpropDeleted(Prop prop);
+        void slotAppendGraph (Prop prop,OGraph gra,OGraphValue val);
         virtual void slotvalueChangedFromCtl(Prop prop) {Q_UNUSED(prop);}
     signals:
         void finished();
         void signalpropCreated(Prop prop);
         void signalpropDeleted(Prop prop);
         void signalvalueChanged(Prop prop);
+        void signalAppendGraph (Prop prop,OGraph gra,OGraphValue val);
         //virtual void taskblob();
     protected:
 

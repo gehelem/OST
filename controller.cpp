@@ -17,6 +17,7 @@ Controller::Controller(QObject *parent)
     connect(focuser,&MFocuser::signalvalueChanged,this,&Controller::valueChanged);
     connect(focuser,&MFocuser::signalpropCreated,this,&Controller::propCreated);
     connect(focuser,&MFocuser::signalpropDeleted,this,&Controller::propDeleted);
+    connect(focuser,&MFocuser::signalAppendGraph,this,&Controller::AppendGraph);
     connect(wshandler,&WShandler::changeValue,focuser,&MFocuser::slotvalueChangedFromCtl);
     focuser->initProperties();
 
@@ -24,6 +25,7 @@ Controller::Controller(QObject *parent)
     connect(mainctl,&MMainctl::signalvalueChanged,this,&Controller::valueChanged);
     connect(mainctl,&MMainctl::signalpropCreated,this,&Controller::propCreated);
     connect(mainctl,&MMainctl::signalpropDeleted,this,&Controller::propDeleted);
+    connect(mainctl,&MMainctl::signalAppendGraph,this,&Controller::AppendGraph);
     connect(wshandler,&WShandler::changeValue,mainctl,&MMainctl::slotvalueChangedFromCtl);
     mainctl->initProperties();
 
@@ -31,6 +33,7 @@ Controller::Controller(QObject *parent)
     connect(navigator,&MNavigator::signalvalueChanged,this,&Controller::valueChanged);
     connect(navigator,&MNavigator::signalpropCreated,this,&Controller::propCreated);
     connect(navigator,&MNavigator::signalpropDeleted,this,&Controller::propDeleted);
+    connect(navigator,&MNavigator::signalAppendGraph,this,&Controller::AppendGraph);
     connect(wshandler,&WShandler::changeValue,navigator,&MNavigator::slotvalueChangedFromCtl);
     navigator->initProperties();
 
@@ -38,6 +41,7 @@ Controller::Controller(QObject *parent)
     connect(guider,&MGuider::signalvalueChanged,this,&Controller::valueChanged);
     connect(guider,&MGuider::signalpropCreated,this,&Controller::propCreated);
     connect(guider,&MGuider::signalpropDeleted,this,&Controller::propDeleted);
+    connect(guider,&MGuider::signalAppendGraph,this,&Controller::AppendGraph);
     connect(wshandler,&WShandler::changeValue,guider,&MGuider::slotvalueChangedFromCtl);
     guider->initProperties();
 
@@ -55,6 +59,10 @@ Controller::~Controller()
 void Controller::valueChanged(Prop prop)
 {
     wshandler->sendProperty(prop);
+}
+void Controller::AppendGraph (Prop prop,OGraph gra,OGraphValue val)
+{
+    wshandler->sendGraphValue(prop,gra,val);
 }
 
 void Controller::propCreated(Prop prop)

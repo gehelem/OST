@@ -32,8 +32,9 @@ public:
     WShandler   *wshandler;
 public slots:
     void valueChanged(Prop prop);
-    void propCreated(Prop prop);
-    void propDeleted(Prop prop);
+    void AppendGraph (Prop prop,OGraph gra,OGraphValue val);
+    void propCreated (Prop prop);
+    void propDeleted (Prop prop);
 
 signals:
     void closed();

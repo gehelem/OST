@@ -200,6 +200,25 @@ typedef struct
 
 } OMessage;
 
+
+/**
+ * @struct OGraphValues
+ * @brief Graph item data store
+ */
+typedef struct
+{
+    /** Value 0  */
+    double v0 =0;
+    /** Value 1  */
+    double v1 =0;
+    /** Value 2  */
+    double v2 =0;
+    /** Value 3  */
+    double v3 =0;
+    /** Value 4  */
+    double v4 =0;
+} OGraphValue;
+
 /**
  * @struct OGraph
  * @brief One message descriptor.
@@ -209,14 +228,25 @@ typedef struct
     /** internal name */
     QString     name;
     /** Short description */
-    QString     label;
+    QString     label ="";
     /** Graph  Type  - work in progress*/
-    QString     gtype;
+    QString     gtype ="2D";
     /** Helper info */
-    QString     aux0;
+    QString     aux0  ="";
     /** Helper info */
-    QString     aux1;
-
+    QString     aux1  ="";
+    /** Data 0 label */
+    QString     V0label ="";
+    /** Data 1 label */
+    QString     V1label ="";
+    /** Data 2 label */
+    QString     V2label ="";
+    /** Data 3 label */
+    QString     V3label ="";
+    /** Data 4 label */
+    QString     V4label ="";
+    /** Data Store */
+    QVector<OGraphValue> values;
 } OGraph;
 /**
  * @struct Prop
@@ -313,18 +343,23 @@ public:
     void    appendElt  (QString modulename,QString propname,  QString numname, double  num      , QString label, QString aux0,QString aux1);
     void    appendElt  (QString modulename,QString propname,  QString swtname, OSState swt      , QString label, QString aux0,QString aux1);
     void    appendElt  (QString modulename,QString propname,  QString lgtname, OPState lgt      , QString label, QString aux0,QString aux1);
-    void    appendElt  (QString modulename,QString propname,  QString imgname, OImgType imt     , QString label, QString aux0, QString aux1, QString url, QString file);
+    void    appendElt  (QString modulename,QString propname,  QString imgname, OImgType imt     , QString label, QString aux0,QString aux1, QString url, QString file);
+    void    appendElt  (QString modulename,QString propname,  QString graname, OGraph graph     );
+    void    appendGra  (QString modulename,QString propname,  QString graname, OGraphValue val  );
+    void    resetGra   (QString modulename,QString propname,  QString graname);
     void    deleteElt  (QString modulename,QString propname,  QString eltname);
     void    setElt     (QString modulename,QString propname,  QString txtname, QString text);
     void    setElt     (QString modulename,QString propname,  QString numname, double  num);
     void    setElt     (QString modulename,QString propname,  QString swtname, OSState swt);
     void    setElt     (QString modulename,QString propname,  QString lgtname, OPState lgt);
     void    setElt     (QString modulename,QString propname,  QString imgname, QString url, QString file);
+    void    setElt     (QString modulename,QString propname,  QString graname, OGraph  graph);
     QString getTxt     (QString modulename,QString propname,  QString txtname);
     double  getNum     (QString modulename,QString propname,  QString numname);
     OSState getSwt     (QString modulename,QString propname,  QString swtname);
     OPState getLgt     (QString modulename,QString propname,  QString lgtname);
     OImage  getImg     (QString modulename,QString propname,  QString imgname);
+    OGraph  getGraph   (QString modulename,QString propname,  QString graname);
     QMap<QString,Mod> getModules(void)    {return modules;}
     Mod     getModule(QString modulename) {return modules[modulename];}
 
@@ -335,6 +370,7 @@ signals:
     void    signalPropCreated (Prop prop);
     void    signalPropDeleted (Prop prop);
     void    signalvalueChanged(Prop prop);
+    void    signalAppendGraph (Prop prop,OGraph gra,OGraphValue val);
 private:
     QMap<QString,Mod>   modules;
 

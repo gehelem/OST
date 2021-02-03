@@ -89,6 +89,37 @@ QJsonObject OlightToJ (OLight  lgt)
     return obj;
 
 }
+QJsonObject OgraphToJ (OGraph  gra)
+{
+    QJsonObject obj,val;
+    QJsonArray vals;
+    obj["name"]=gra.name;
+    obj["label"]=gra.label;
+    obj["gtype"]=gra.gtype;
+    obj["aux0"]=gra.aux0;
+    obj["aux1"]=gra.aux1;
+    obj["V0label"]=gra.V0label;
+    obj["V1label"]=gra.V1label;
+    obj["V2label"]=gra.V2label;
+    obj["V3label"]=gra.V3label;
+    obj["V4label"]=gra.V4label;
+
+    for (int i=0;i<gra.values.size();i++) {
+        val["v0"]=gra.values[i].v0;
+        val["v1"]=gra.values[i].v1;
+        val["v2"]=gra.values[i].v2;
+        val["v3"]=gra.values[i].v3;
+        val["v4"]=gra.values[i].v4;
+        vals.append(val);
+    }
+    obj["values"]=vals;
+
+    return obj;
+
+    QVector<OGraphValue> values;
+
+}
+
 QJsonObject OpropToJ(Prop prop)
 {
     QJsonObject obj;
@@ -189,9 +220,15 @@ QJsonObject OpropToJ(Prop prop)
             det=OimageToJ(i);
             details.append(det);
         }
-        obj["images"]=details;    }
+        obj["images"]=details;
+    }
     if (prop.typ==PT_GRAPH) {
-        //TBD
+        for(auto g : prop.g)
+        {
+            det=OgraphToJ(g);
+            details.append(det);
+        }
+        obj["graphs"]=details;
     }
 
     return obj;
