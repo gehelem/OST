@@ -37,10 +37,20 @@ Image::~Image() {
 void Image::ResetData(void) {
 
 }
+bool Image::saveStretchedToJpeg(QString filename,int compress)
+{
+    CImg<uint16_t> imgtmp = img_stretched;
+    imgtmp.resize_halfXY();
+    imgtmp.resize_halfXY();
+    imgtmp.save_jpeg(filename.toStdString().c_str(),compress);
+    return true;
+}
 bool Image::saveToJpeg(QString filename,int compress)
 {
 
+    //computeHistogram();
     CImg<uint16_t> imgtmp = img;
+    imgtmp.resize_halfXY();
     imgtmp.resize_halfXY();
     imgtmp.save_jpeg(filename.toStdString().c_str(),compress);
     //int buf_size = sizeof(img.data());
@@ -314,6 +324,7 @@ void Image::ssReadySEP(void)
         HFRavg=(i*HFRavg + stars[i].HFR)/(i+1);
     }
     IDLog("IMG HFRavg %f\n",HFRavg);
+    computeHistogram();
     FindStarsFinished = true;
     emit successSEP();
 
@@ -330,6 +341,8 @@ void Image::ssReadySolve(void)
         HFRavg=(i*HFRavg + stars[i].HFR)/(i+1);
     }
     IDLog("IMG HFRavg %f\n",HFRavg);
+
+
     SolveStarsFinished = true;
     emit successSolve();
 
@@ -346,4 +359,34 @@ void Image::appendStarsFound(void)
         img.draw_text  (stars[i].x, img.height()-stars[i].y, QString::number(stars[i].HFR , 'G', 3).toStdString().c_str(),red,1, 10);
         img.draw_circle(stars[i].x, img.height()-stars[i].y, stars[i].numPixels, red, 1,FALSE);
     }
+}
+void Image::computeHistogram(void)
+{
+
+/* https://github.com/HYPJUDY/histogram-equalization-on-grayscale-and-color-image  */
+    int L = 256*256; // number of grey levels used
+    int w = img._width;
+    int h = img._height;
+    int number_of_pixels = w * h;
+    histogram.clear();
+    histogram.resize(256*256, 1, 1, 1, 0);
+    cimg_forXY(img, x, y) ++histogram[img(x, y)];
+    int count = 0;
+    double cdf[256*256] = { 0 };
+    unsigned int equalized[256*256] = { 0 };
+
+    cimg_forX(histogram, pos) { // calculate cdf and equalized transform
+        count += histogram[pos];
+        cdf[pos] = 1.0 * count /number_of_pixels  ;
+        equalized[pos] = round(cdf[pos] * (L - 1));
+        //qDebug() << "-----" << pos << "----" << equalized[pos];
+    }
+    img_stretched.clear();
+    img_stretched.resize(stats.width ,stats.height,1,1);
+    cimg_forXY(img_stretched, x, y) // calculate histogram equalization result
+            img_stretched(x, y, 0) = equalized[img(x, y)];
+    histogram256.clear();
+    histogram256.resize(256, 1, 1, 1, 0);
+    cimg_forXY(img, x, y) histogram256[img(x, y)/255] = histogram256[img(x, y)/255] +1;
+
 }

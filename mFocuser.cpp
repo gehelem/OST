@@ -28,16 +28,26 @@ void MFocuser::initProperties(void)
     appendMyElt ("valuesprop","besthfravg"   , 0        , "Best HFR","","");
 
     createMyProp("image","Image",PT_IMAGE,"main","", OP_RW,OSR_ATMOST1,0,OPS_IDLE,"","");
-    appendMyElt ("image","imagefoc"  , IM_FULL       , "focus image","","","tobido.jpeg","/var/www/html");
+    appendMyElt ("image","imagefoc"  , IM_FULL       , "focus image","","","imagefoc.jpeg","/var/www/html");
+    appendMyElt ("image","imagefocst"  , IM_FULL       , "stretched focus image","","","imagefocst.jpeg","/var/www/html");
 
     createMyProp("curve","Focus plot",PT_GRAPH,"main","", OP_RW,OSR_ATMOST1,0,OPS_IDLE,"","");
     OGraph gra;
     gra.name="curve1" ;
-    gra.label="Measure";
+    gra.label="HFR";
     gra.gtype="2D";
     gra.V0label="Position";
     gra.V1label="HFR";
     appendMyElt ("curve","curve1"  , gra);
+
+    createMyProp("histo","Histogramme",PT_GRAPH,"main","", OP_RW,OSR_ATMOST1,0,OPS_IDLE,"","");
+    OGraph grafoc;
+    grafoc.name="histofoc" ;
+    grafoc.label="Val";
+    grafoc.gtype="2D";
+    grafoc.V0label="ADU";
+    grafoc.V1label="Intensity";
+    appendMyElt ("histo","histofoc"  , grafoc);
 
     createMyProp("buttonsprop","Actions",PT_SWITCH,"main","", OP_RW,OSR_ATMOST1,0,OPS_IDLE,"","");
     appendMyElt ("buttonsprop","loop"       , OSS_OFF       , "Continuous shooting","","");
@@ -46,11 +56,11 @@ void MFocuser::initProperties(void)
     appendMyElt ("buttonsprop","abort"      , OSS_OFF       , "Abort","","");
 
     createMyProp("parms","Focus parameters",PT_NUM,"main","", OP_RW,OSR_NOFMANY,0,OPS_IDLE,"","");
-    appendMyElt ("parms","startpos"     , 35000         , "Start position","","");
+    appendMyElt ("parms","startpos"     , 32000         , "Start position","","");
     appendMyElt ("parms","overshoot"    , 200           , "Backlash overshoot","","");
     appendMyElt ("parms","incre"        , 500           , "Incrementation","","");
-    appendMyElt ("parms","iterations"   , 5             , "Iterations","","");
-    appendMyElt ("parms","exposure"     , 2             , "Exposure","","");
+    appendMyElt ("parms","iterations"   , 20             , "Iterations","","");
+    appendMyElt ("parms","exposure"     , 100             , "Exposure","","");
 
     createMyCateg("adv","Advanced parameters");
 
@@ -190,16 +200,29 @@ void MFocuser::executeTaskSpec(Ttask task)
         addnewtask(TT_WAIT_BLOB  ,"check2","Check waiting",false,   camera,expp,expe,iexposure,"",ISS_OFF);
         addnewtask(TT_ANALYSE_SEP,"check3","Check Analyse request",false,camera,expp,expe,iexposure,"",ISS_OFF);
         addnewtask(TT_WAIT_SEP   ,"check4","Check Waiting analyse",false,camera,expp,expe,iexposure,"",ISS_OFF);
-        addnewtask(TT_SPEC       ,"check5","Finish",true,   camera,expp,expe,0,"",ISS_OFF);
+        addnewtask(TT_SPEC       ,"check5","Finish",true,   camera,expp,expe,getMyNum("valuesprop","bestpos"),"",ISS_OFF);
 
 
         popnext();
         executeTask(tasks.front());
     }
     if (task.taskname=="fram45") {
-        image->appendStarsFound();
+        //image->appendStarsFound();
+
         image->saveToJpeg(getMyImg("image","imagefoc").f+"/"+getMyImg("image","imagefoc").url,100);
         setMyElt("image","imagefoc",getMyImg("image","imagefoc").url,getMyImg("image","imagefoc").f);
+        image->saveStretchedToJpeg(getMyImg("image","imagefocst").f+"/"+getMyImg("image","imagefocst").url,100);
+        setMyElt("image","imagefocst",getMyImg("image","imagefocst").url,getMyImg("image","imagefocst").f);
+        OGraph graphf = getMyGraph("histo","histofoc");
+        graphf.values.clear();
+        OGraphValue val;
+        for (int i=0;i<256;i++) {
+            val.v0=i;
+            val.v1=image->histogram256[i];
+            graphf.values.append(val);
+        };
+        setMyElt("histo","histofoc",graphf);
+
         popnext();
         executeTask(tasks.front());
     }

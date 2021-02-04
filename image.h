@@ -3,7 +3,7 @@
 
 #include <basedevice.h>
 #include <memory>
-
+#include <QtCore>
 //Includes for this project
 #include <structuredefinitions.h>
 #include <stellarsolver.h>
@@ -29,12 +29,16 @@ public:
     uint32_t m_ImageBufferSize { 0 };
     float HFRavg;
     CImg<uint16_t> img;
-
+    CImg<uint32_t> histogram;
+    CImg<uint16_t> img_stretched;
+    CImg<double>   histogram256;
     bool LoadFromBlob(IBLOB *bp);
     bool saveToJpeg(QString filename,int compress);
+    bool saveStretchedToJpeg(QString filename,int compress);
     void ResetData(void);
     void CalcStats(void);
     void FindStars(void);
+    void computeHistogram(void);
     void SolveStars(void);
     void appendStarsFound(void);
     bool FindStarsFinished = true;

@@ -184,7 +184,7 @@ void    Properties::setElt     (QString modulename,QString propname,  QString im
 void    Properties::setElt     (QString modulename,QString propname,  QString graname, OGraph  graph)
 {
     modules[modulename].props[propname].g[graname]=graph;
-    //emit signalvalueChanged(modules[modulename].props[propname]);
+    emit signalvalueChanged(modules[modulename].props[propname]);
 }
 
 QString Properties::getTxt     (QString modulename, QString propname,  QString txtname)
