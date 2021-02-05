@@ -31,7 +31,7 @@ void MFocuser::initProperties(void)
     appendMyElt ("valuesprop","besthfravg"   , 0        , "Best HFR","","");
 
     createMyProp("image","Image",PT_IMAGE,"main","", OP_RW,OSR_ATMOST1,0,OPS_IDLE,"","",50);
-    appendMyElt ("image","imagefoc"  , IM_FULL       , "focus image","","","imagefoc.jpeg","/var/www/html");
+    //appendMyElt ("image","imagefoc"  , IM_FULL       , "focus image","","","imagefoc.jpeg","/var/www/html");
     appendMyElt ("image","imagefocst"  , IM_FULL       , "stretched focus image","","","imagefocst.jpeg","/var/www/html");
 
     createMyProp("curve","Focus plot",PT_GRAPH,"main","", OP_RW,OSR_ATMOST1,0,OPS_IDLE,"","",60);
@@ -94,6 +94,15 @@ void MFocuser::slotvalueChangedFromCtl(Prop prop)
         if (prop.s["framing"].s==OSS_ON) startFraming();
         if (prop.s["abort"].s==OSS_ON) abort();
 
+    }
+    if ((prop.typ==PT_NUM) && (prop.propname=="parms"))
+    {
+
+        Prop myprop = getMyProp(prop.propname);
+        foreach (ONumber onum, prop.n) {
+            myprop.n[onum.name].value=onum.value;
+        }
+        setMyProp(prop.propname,myprop);
     }
 
 }

@@ -66,7 +66,7 @@
                 {
                   nn= modulename+propname+name;
                   var val = document.getElementById(nn).value;
-                  var msg = "{\"message\": \"updateproperty\",\"property\":{\"modulename\":\""+modulename+"\",\"propname\":\""+propname+"\",\"numbers\":[{\"name\":\""+name+"\",\"value\":\""+val+"\"}],\"type\":\"INDI_NUMBER\"}}";
+                  var msg = "{\"message\": \"updateproperty\",\"property\":{\"modulename\":\""+modulename+"\",\"propname\":\""+propname+"\",\"numbers\":[{\"name\":\""+name+"\",\"value\":"+val+"}],\"type\":\"INDI_NUMBER\"}}";
 
                     websocket.send( msg );
                     //console.log( "string sent :", '"'+msg+'"' );
