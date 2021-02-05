@@ -90,6 +90,8 @@ typedef struct
     QString     aux0;
     /** Helper info */
     QString     aux1;
+    /** GUI order */
+    int         order;
 
 } OText;
 
@@ -117,6 +119,8 @@ typedef struct
     QString     aux0;
     /** Helper info */
     QString     aux1;
+    /** GUI order */
+    int         order;
 
 } ONumber;
 
@@ -136,6 +140,8 @@ typedef struct
     QString     aux0;
     /** Helper info */
     QString     aux1;
+    /** GUI order */
+    int         order;
 
 } OSwitch;
 
@@ -155,6 +161,8 @@ typedef struct
     QString     aux0;
     /** Helper info */
     QString     aux1;
+    /** GUI order */
+    int         order;
 
 } OLight;
 
@@ -178,6 +186,8 @@ typedef struct
     QString     aux1;
     /** Image type */
     OImgType    imgtype;
+    /** GUI order */
+    int         order;
 
 } OImage;
 
@@ -197,6 +207,8 @@ typedef struct
     QString     aux0;
     /** Helper info */
     QString     aux1;
+    /** GUI order */
+    int         order;
 
 } OMessage;
 
@@ -229,7 +241,7 @@ typedef struct
     QString     name;
     /** Short description */
     QString     label ="";
-    /** Graph  Type  - work in progress*/
+    /** Graph  Type */
     QString     gtype ="2D";
     /** Helper info */
     QString     aux0  ="";
@@ -247,6 +259,9 @@ typedef struct
     QString     V4label ="";
     /** Data Store */
     QVector<OGraphValue> values;
+    /** GUI order */
+    int         order;
+
 } OGraph;
 /**
  * @struct Prop
@@ -278,6 +293,9 @@ typedef struct
     QString     aux0;
     /** Helper info */
     QString     aux1;
+    /** GUI order */
+    int         order;
+
     /** Text elements */
     QMap<QString,OText>     t;
     /** Number elements */
@@ -300,6 +318,7 @@ typedef struct
     QString                 grouplabel;
     QString                 modulename;
     QString                 categname;
+    int                     order;
 }  Group;
 
 typedef struct
@@ -307,12 +326,14 @@ typedef struct
     QString                 categname;
     QString                 categlabel;
     QString                 modulename;
+    int                     order;
 }  Categ;
 
 typedef struct
 {
     QString                 modulename;
     QString                 modulelabel;
+    int                     order;
     QMap<QString,Categ>     categs;
     QMap<QString,Group>     groups;
     QMap<QString,Prop>      props;
@@ -324,17 +345,17 @@ class Properties : public QObject
 public:
     Properties(QObject *parent = Q_NULLPTR);
     ~Properties() = default;
-    void    createModule(QString modulename,  QString modulelabel);
+    void    createModule(QString modulename,  QString modulelabel,int order);
     void    deleteModule(QString modulename);
 
-    void    createCateg(QString modulename,QString categname,  QString categlabel);
+    void    createCateg(QString modulename,QString categname,  QString categlabel,int order);
     void    deleteCateg(QString modulename,QString categname);
 
-    void    createGroup(QString modulename,QString categname, QString groupname,  QString grouplabel);
+    void    createGroup(QString modulename,QString categname, QString groupname,  QString grouplabel,int order);
     void    deleteGroup(QString modulename,QString categname, QString groupname);
 
-    void    createProp (QString modulename,QString propname,Prop    prop);
-    void    createProp (QString modulename,QString propname,QString label,propType typ,QString categname,QString groupname,OPerm perm,OSRule rule,double timeout,OPState state,QString aux0,QString aux1);
+    void    createProp (QString modulename, QString propname, Prop    prop);
+    void    createProp (QString modulename,QString propname,QString label,propType typ,QString categname,QString groupname,OPerm perm,OSRule rule,double timeout,OPState state,QString aux0,QString aux1,int order);
     void    deleteProp (QString modulename,QString propname);
     Prop    getProp    (QString modulename,QString propname);
     void    setProp    (QString modulename,QString propname,Prop    prop);

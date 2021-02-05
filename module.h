@@ -89,17 +89,17 @@ class Module : public QObject
         virtual void executeTaskSpec(Ttask task,ILightVectorProperty *lvp) {Q_UNUSED(task);Q_UNUSED(lvp);}
         void popnext(void);
         void initProperties(void);
-        void    createMyModule(QString modulelabel);
+        void    createMyModule(QString modulelabel,int order);
         void    deleteMyModule(void);
 
-        void    createMyCateg(QString categname,  QString categlabel);
+        void    createMyCateg(QString categname,  QString categlabel,int order);
         void    deleteMyCateg(QString categname);
 
-        void    createMyGroup(QString categname, QString groupname,  QString grouplabel);
+        void    createMyGroup(QString categname, QString groupname,  QString grouplabel,int order);
         void    deleteMyGroup(QString categname, QString groupname);
 
         void    createMyProp (QString propname,Prop    prop);
-        void    createMyProp (QString propname,QString label,propType typ,QString categname,QString groupname,OPerm perm,OSRule rule,double timeout,OPState state,QString aux0,QString aux1);
+        void    createMyProp (QString propname,QString label,propType typ,QString categname,QString groupname,OPerm perm,OSRule rule,double timeout,OPState state,QString aux0,QString aux1,int order);
         void    deleteMyProp (QString propname);
         Prop    getMyProp    (QString propname);
         void    setMyProp    (QString propname,Prop    prop);

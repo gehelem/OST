@@ -11,8 +11,8 @@ MNavigator::~MNavigator()
 void MNavigator::initProperties(void)
 {
     modulename="navigator";
-    createMyModule("Navigator");
-    createMyCateg("main","Main");
+    createMyModule("Navigator",40);
+    createMyCateg("main","Main",10);
 
 }
 

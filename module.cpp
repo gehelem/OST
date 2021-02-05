@@ -482,25 +482,25 @@ void Module::dumpTasks(void)
 }
 
 
-void    Module::createMyModule(QString modulelabel)
+void    Module::createMyModule(QString modulelabel,int order)
 {
-    props->createModule(modulename,modulelabel);
+    props->createModule(modulename,modulelabel,order);
 }
 void    Module::deleteMyModule(void)
 {
     props->deleteModule(modulename);
 }
-void    Module::createMyCateg(QString categname,  QString categlabel)
+void    Module::createMyCateg(QString categname,  QString categlabel,int order)
 {
-    props->createCateg(modulename,categname,categlabel);
+    props->createCateg(modulename,categname,categlabel,order);
 }
 void    Module::deleteMyCateg(QString categname)
 {
     props->deleteCateg(modulename,categname);
 }
-void    Module::createMyGroup(QString categname, QString groupname,  QString grouplabel)
+void    Module::createMyGroup(QString categname, QString groupname,  QString grouplabel,int order)
 {
-    props->createGroup(modulename,categname,groupname,grouplabel);
+    props->createGroup(modulename,categname,groupname,grouplabel,order);
 }
 void    Module::deleteMyGroup(QString categname, QString groupname)
 {
@@ -510,9 +510,9 @@ void    Module::createMyProp (QString propname,Prop    prop)
 {
     props->createProp(modulename,propname,prop);
 }
-void    Module::createMyProp (QString propname,QString label,propType typ,QString categname,QString groupname,OPerm perm,OSRule rule,double timeout,OPState state,QString aux0,QString aux1)
+void    Module::createMyProp (QString propname, QString label, propType typ, QString categname, QString groupname, OPerm perm, OSRule rule, double timeout, OPState state, QString aux0, QString aux1, int order)
 {
-    props->createProp(modulename,propname,label,typ,categname,groupname,perm,rule,timeout,state,aux0,aux1);
+    props->createProp(modulename,propname,label,typ,categname,groupname,perm,rule,timeout,state,aux0,aux1,order);
 }
 void    Module::deleteMyProp (QString propname)
 {

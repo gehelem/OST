@@ -11,27 +11,27 @@ MFocuser::~MFocuser()
 void MFocuser::initProperties(void)
 {
     modulename="focuser";
-    createMyModule("Focuser");
-    createMyCateg("main","Main control");
-    createMyProp("statusprop","Status",PT_TEXT,"main","", OP_RO,OSR_NOFMANY,0,OPS_IDLE,"","");
+    createMyModule("Focuser",20);
+    createMyCateg("main","Main control",10);
+    createMyProp("statusprop","Status",PT_TEXT,"main","", OP_RO,OSR_NOFMANY,0,OPS_IDLE,"","",10);
     appendMyElt ("statusprop","status","","Status","","");
 
-    createMyProp("devices","Devices",PT_TEXT,"main","", OP_RW,OSR_NOFMANY,0,OPS_IDLE,"","");
+    createMyProp("devices","Devices",PT_TEXT,"main","", OP_RW,OSR_NOFMANY,0,OPS_IDLE,"","",99);
     appendMyElt ("devices","camera"  , "CCD Simulator"        ,"Camera","","");
     appendMyElt ("devices","focuser" , "Focuser Simulator"    ,"Focuser","","");
 
-    createMyProp("valuesprop","Values",PT_NUM,"main","", OP_RO,OSR_NOFMANY,0,OPS_IDLE,"","");
+    createMyProp("valuesprop","Values",PT_NUM,"main","", OP_RO,OSR_NOFMANY,0,OPS_IDLE,"","",50);
     appendMyElt ("valuesprop","hfravg"       , 99       , "Average HFR","","");
     appendMyElt ("valuesprop","starscount"   , 0        , "Stars found","","");
     appendMyElt ("valuesprop","focuspos"     , 0        , "Focuser position","","");
     appendMyElt ("valuesprop","bestpos"      , 0        , "Best position","","");
     appendMyElt ("valuesprop","besthfravg"   , 0        , "Best HFR","","");
 
-    createMyProp("image","Image",PT_IMAGE,"main","", OP_RW,OSR_ATMOST1,0,OPS_IDLE,"","");
+    createMyProp("image","Image",PT_IMAGE,"main","", OP_RW,OSR_ATMOST1,0,OPS_IDLE,"","",50);
     appendMyElt ("image","imagefoc"  , IM_FULL       , "focus image","","","imagefoc.jpeg","/var/www/html");
     appendMyElt ("image","imagefocst"  , IM_FULL       , "stretched focus image","","","imagefocst.jpeg","/var/www/html");
 
-    createMyProp("curve","Focus plot",PT_GRAPH,"main","", OP_RW,OSR_ATMOST1,0,OPS_IDLE,"","");
+    createMyProp("curve","Focus plot",PT_GRAPH,"main","", OP_RW,OSR_ATMOST1,0,OPS_IDLE,"","",60);
     OGraph gra;
     gra.name="curve1" ;
     gra.label="HFR";
@@ -40,7 +40,7 @@ void MFocuser::initProperties(void)
     gra.V1label="HFR";
     appendMyElt ("curve","curve1"  , gra);
 
-    createMyProp("histo","Histogramme",PT_GRAPH,"main","", OP_RW,OSR_ATMOST1,0,OPS_IDLE,"","");
+    createMyProp("histo","Histogramme",PT_GRAPH,"main","", OP_RW,OSR_ATMOST1,0,OPS_IDLE,"","",70);
     OGraph grafoc;
     grafoc.name="histofoc" ;
     grafoc.label="Val";
@@ -49,22 +49,22 @@ void MFocuser::initProperties(void)
     grafoc.V1label="Intensity";
     appendMyElt ("histo","histofoc"  , grafoc);
 
-    createMyProp("buttonsprop","Actions",PT_SWITCH,"main","", OP_RW,OSR_ATMOST1,0,OPS_IDLE,"","");
+    createMyProp("buttonsprop","Actions",PT_SWITCH,"main","", OP_RW,OSR_ATMOST1,0,OPS_IDLE,"","",20);
     appendMyElt ("buttonsprop","loop"       , OSS_OFF       , "Continuous shooting","","");
     appendMyElt ("buttonsprop","coarse"     , OSS_OFF       , "Coarse focus","","");
     appendMyElt ("buttonsprop","fine"       , OSS_OFF       , "Fine focus","","");
     appendMyElt ("buttonsprop","abort"      , OSS_OFF       , "Abort","","");
 
-    createMyProp("parms","Focus parameters",PT_NUM,"main","", OP_RW,OSR_NOFMANY,0,OPS_IDLE,"","");
+    createMyProp("parms","Focus parameters",PT_NUM,"main","", OP_RW,OSR_NOFMANY,0,OPS_IDLE,"","",30);
     appendMyElt ("parms","startpos"     , 32000         , "Start position","","");
     appendMyElt ("parms","overshoot"    , 200           , "Backlash overshoot","","");
     appendMyElt ("parms","incre"        , 500           , "Incrementation","","");
     appendMyElt ("parms","iterations"   , 20             , "Iterations","","");
     appendMyElt ("parms","exposure"     , 100             , "Exposure","","");
 
-    createMyCateg("adv","Advanced parameters");
+    createMyCateg("adv","Advanced parameters",80);
 
-    createMyProp("indiprops","Indi properties",PT_TEXT,"adv","", OP_RW,OSR_NOFMANY,0,OPS_IDLE,"","");
+    createMyProp("indiprops","Indi properties",PT_TEXT,"adv","", OP_RW,OSR_NOFMANY,0,OPS_IDLE,"","",10);
     appendMyElt ("indiprops","expp" , "CCD_EXPOSURE"           ,"Exposure property","","");
     appendMyElt ("indiprops","expe" , "CCD_EXPOSURE_VALUE"     ,"Exposure element","","");
     appendMyElt ("indiprops","focp" , "ABS_FOCUS_POSITION"     ,"Position property","","");

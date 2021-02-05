@@ -11,8 +11,8 @@ MSequence::~MSequence()
 void MSequence::initProperties(void)
 {
     modulename="sequence";
-    createMyModule("Sequencer");
-    createMyCateg("main","Main");
+    createMyModule("Sequencer",50);
+    createMyCateg("main","Main",10);
 
 }
 

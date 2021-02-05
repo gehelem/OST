@@ -11,8 +11,8 @@ MGuider::~MGuider()
 void MGuider::initProperties(void)
 {
     modulename="guider";
-    createMyModule("Guider");
-    createMyCateg("main","Main");
+    createMyModule("Guider",30);
+    createMyCateg("main","Main",10);
 
 }
 

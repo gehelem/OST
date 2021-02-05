@@ -116,7 +116,7 @@ QJsonObject OgraphToJ (OGraph  gra)
 
     return obj;
 
-    QVector<OGraphValue> values;
+    //QVector<OGraphValue> values;
 
 }
 
@@ -125,6 +125,7 @@ QJsonObject OpropToJ(Prop prop)
     QJsonObject obj;
     obj["propname"]=prop.propname;
     obj["label"]=prop.label;
+    obj["order"]=prop.order;
     switch (prop.typ) {
     case PT_NUM:
         obj["type"]="INDI_NUMBER";
@@ -237,6 +238,7 @@ QJsonObject OpropToJ(Prop prop)
 
 QJsonObject OgroupToJ(QString groupname)
 {
+    Q_UNUSED(groupname);
     QJsonObject obj;
     QJsonArray groups;
 
@@ -244,6 +246,7 @@ QJsonObject OgroupToJ(QString groupname)
 }
 QJsonObject OcategToJ(QString categname)
 {
+    Q_UNUSED(categname);
     QJsonObject obj;
     return obj;
 }
@@ -252,6 +255,7 @@ QJsonObject OmodToJ(Mod mod)
     QJsonObject obj;
     obj["modulename"]=mod.modulename;
     obj["modulelabel"]=mod.modulelabel;
+    obj["order"]=mod.order;
 
     QJsonArray props0;
     for(auto p : mod.props){
@@ -271,6 +275,7 @@ QJsonObject OmodToJ(Mod mod)
             categ["modulename"]=c.modulename;
             categ["categname"]=c.categname;
             categ["categlabel"]=c.categlabel;
+            categ["order"]=c.order;
 
             /* ajout des propriétés de la catégorie */
             QJsonArray props1;
@@ -294,6 +299,7 @@ QJsonObject OmodToJ(Mod mod)
                     grp["groupname"]=g.groupname;
                     grp["categname"]=g.categname;
                     grp["grouplabel"]=g.grouplabel;
+                    grp["order"]=g.order;
 
                     QJsonArray props2;
                     for(auto p2 : mod.props){

@@ -6,23 +6,25 @@ Properties::Properties(QObject *parent)
 {
     Q_UNUSED(parent);
 }
-void    Properties::createModule(QString modulename,  QString modulelabel)
+void    Properties::createModule(QString modulename,  QString modulelabel,int order)
 {
     Mod mod;
     mod.modulelabel=modulelabel;
     mod.modulename=modulename;
+    mod.order=order;
     modules[modulename]=mod;
 }
 void    Properties::deleteModule(QString modulename)
 {
     modules.remove(modulename);
 }
-void    Properties::createCateg(QString modulename, QString categname,  QString categlabel)
+void    Properties::createCateg(QString modulename, QString categname,  QString categlabel,int order)
 {
     Categ cat;
     cat.categname=categname;
     cat.modulename=modulename;
     cat.categlabel=categlabel;
+    cat.order=order;
     modules[modulename].categs[categname]=cat;
 
 }
@@ -30,17 +32,19 @@ void    Properties::deleteCateg(QString modulename, QString categname)
 {
     modules[modulename].categs.remove(categname);
 }
-void    Properties::createGroup(QString modulename, QString categname, QString groupname,  QString grouplabel)
+void    Properties::createGroup(QString modulename, QString categname, QString groupname,  QString grouplabel,int order)
 {
     Group gro;
     gro.grouplabel=grouplabel;
     gro.categname=categname;
     gro.modulename=modulename;
     gro.groupname=groupname;
+    gro.order=order;
     modules[modulename].groups[groupname]=gro;
 }
 void    Properties::deleteGroup(QString modulename, QString categname, QString groupname)
 {
+    Q_UNUSED(categname);
     modules[modulename].groups.remove(groupname);
 }
 void    Properties::createProp (QString modulename, QString propname, Prop    prop)
@@ -48,7 +52,7 @@ void    Properties::createProp (QString modulename, QString propname, Prop    pr
     modules[modulename].props[propname]=prop;
 }
 
-void    Properties::createProp (QString modulename, QString propname, QString label,propType typ,QString categname,QString groupname,OPerm perm,OSRule rule,double timeout,OPState state,QString aux0,QString aux1)
+void    Properties::createProp (QString modulename, QString propname, QString label,propType typ,QString categname,QString groupname,OPerm perm,OSRule rule,double timeout,OPState state,QString aux0,QString aux1,int order)
 {
     Prop prop;
     prop.modulename     = modulename;
@@ -63,6 +67,7 @@ void    Properties::createProp (QString modulename, QString propname, QString la
     prop.state          = state;
     prop.aux0           = aux0;
     prop.aux1           = aux1;
+    prop.order          = order;
     modules[modulename].props[propname]= prop;
 }
 

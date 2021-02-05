@@ -12,51 +12,52 @@ MMainctl::~MMainctl()
 void MMainctl::initProperties(void)
 {
     modulename="mainctl";
-    createMyModule("Main control");
-    createMyCateg("main","Main control");
-    createMyProp("statusprop","Status",PT_TEXT,"main","", OP_RO,OSR_NOFMANY,0,OPS_IDLE,"","");
+    createMyModule("Main control",10);
+    createMyCateg("main","Main control",10);
+    createMyCateg("democateg1","Démo catégorie 1",20);
+    createMyCateg("democateg2","Démo catégorie 2",30);
+    createMyCateg("democateg3","Démo catégorie 3",40);
+    createMyGroup("democateg1","demogroup1C1","Démo group 1C1",10);
+    createMyGroup("democateg2","demogroup1C2","Démo group 1C2",20);
+
+    createMyProp("statusprop","Status",PT_TEXT,"main","", OP_RO,OSR_NOFMANY,0,OPS_IDLE,"","",10);
     appendMyElt ("statusprop","status","","Status","","");
 
-    createMyProp("buttonsprop","Actions",PT_SWITCH,"main","", OP_RW,OSR_ATMOST1,0,OPS_IDLE,"","");
+    createMyProp("buttonsprop","Actions",PT_SWITCH,"main","", OP_RW,OSR_ATMOST1,0,OPS_IDLE,"","",20);
     appendMyElt ("buttonsprop","connectindi"   , OSS_OFF       , "Connect indi server","","");
     appendMyElt ("buttonsprop","connectdevices", OSS_OFF       , "Connect indi devices","","");
     appendMyElt ("buttonsprop","loadconfs"     , OSS_OFF       , "Load devices configurations","","");
 
-    createMyCateg("democateg1","Démo catégorie 1");
-    createMyCateg("democateg2","Démo catégorie 2");
-    createMyCateg("democateg3","Démo catégorie 3");
 
-    createMyGroup("democateg1","demogroup1C1","Démo group 1C1");
-    createMyGroup("democateg2","demogroup1C2","Démo group 1C2");
 
-    createMyProp("prop1","Démo prop1 level 0",PT_TEXT,"","", OP_RW,OSR_NOFMANY,0,OPS_IDLE,"","");
+    createMyProp("prop1","Démo prop1 level 0",PT_TEXT,"","", OP_RW,OSR_NOFMANY,0,OPS_IDLE,"","",10);
     appendMyElt ("prop1","det11", OSS_OFF       , "Détail 11","","");
     appendMyElt ("prop1","det12", OSS_OFF       , "Détail 12","","");
-    createMyProp("prop2","Démo prop2 level 1",PT_TEXT,"democateg1","", OP_RW,OSR_NOFMANY,0,OPS_IDLE,"","");
+    createMyProp("prop2","Démo prop2 level 1",PT_TEXT,"democateg1","", OP_RW,OSR_NOFMANY,0,OPS_IDLE,"","",10);
     appendMyElt ("prop2","det21", OSS_OFF       , "Détail 21","","");
     appendMyElt ("prop2","det22", OSS_OFF       , "Détail 22","","");
-    createMyProp("prop3","Démo prop3 level 2",PT_TEXT,"democateg1","demogroup1C1", OP_RW,OSR_NOFMANY,0,OPS_IDLE,"","");
+    createMyProp("prop3","Démo prop3 level 2",PT_TEXT,"democateg1","demogroup1C1", OP_RW,OSR_NOFMANY,0,OPS_IDLE,"","",10);
     appendMyElt ("prop3","det31", OSS_OFF       , "Détail 31","","");
     appendMyElt ("prop3","det32", OSS_OFF       , "Détail 32","","");
-    createMyProp("prop4","Démo prop4 level 2",PT_TEXT,"democateg1","demogroup1C1", OP_RW,OSR_NOFMANY,0,OPS_IDLE,"","");
+    createMyProp("prop4","Démo prop4 level 2",PT_TEXT,"democateg1","demogroup1C1", OP_RW,OSR_NOFMANY,0,OPS_IDLE,"","",20);
     appendMyElt ("prop4","det41", OSS_OFF       , "Détail 41","","");
     appendMyElt ("prop4","det42", OSS_OFF       , "Détail 42","","");
-    createMyProp("prop5","Démo prop5 level 2",PT_TEXT,"democateg2","demogroup1C2", OP_RW,OSR_NOFMANY,0,OPS_IDLE,"","");
+    createMyProp("prop5","Démo prop5 level 2",PT_TEXT,"democateg2","demogroup1C2", OP_RW,OSR_NOFMANY,0,OPS_IDLE,"","",10);
     appendMyElt ("prop5","det51", OSS_OFF       , "Détail 51","","");
     appendMyElt ("prop5","det52", OSS_OFF       , "Détail 52","","");
-    createMyProp("prop6","Démo prop6 level 1",PT_TEXT,"democateg2","", OP_RW,OSR_NOFMANY,0,OPS_IDLE,"","");
+    createMyProp("prop6","Démo prop6 level 1",PT_TEXT,"democateg2","", OP_RW,OSR_NOFMANY,0,OPS_IDLE,"","",10);
     appendMyElt ("prop6","det61", OSS_OFF       , "Détail 61","","");
     appendMyElt ("prop6","det62", OSS_OFF       , "Détail 62","","");
     appendMyElt ("prop6","det63", OSS_OFF       , "Détail 66","","");
     appendMyElt ("prop6","det64", OSS_OFF       , "Détail 64","","");
     appendMyElt ("prop6","det65", OSS_OFF       , "Détail 65","","");
     appendMyElt ("prop6","det66", OSS_OFF       , "Détail 66","","");
-    createMyProp("prop7","Démo prop7 level 1",PT_SWITCH,"democateg2","", OP_RW,OSR_NOFMANY,0,OPS_IDLE,"","");
+    createMyProp("prop7","Démo prop7 level 1",PT_SWITCH,"democateg2","", OP_RW,OSR_NOFMANY,0,OPS_IDLE,"","",20);
     appendMyElt ("prop7","det71", OSS_ON        , "SW1","","");
     appendMyElt ("prop7","det71", OSS_OFF       , "SW2","","");
     appendMyElt ("prop7","det71", OSS_OFF       , "SW3","","");
     appendMyElt ("prop8","det71", OSS_OFF       , "SW4","","");
-    createMyProp("prop7","Démo prop8 level 1",PT_LIGHT,"democateg2","", OP_RW,OSR_NOFMANY,0,OPS_IDLE,"","");
+    createMyProp("prop7","Démo prop8 level 1",PT_LIGHT,"democateg2","", OP_RW,OSR_NOFMANY,0,OPS_IDLE,"","",30);
     appendMyElt ("prop7","det71", OSS_ON        , "LIGHT1","","");
     appendMyElt ("prop7","det71", OSS_OFF       , "LIGHT2","","");
 
