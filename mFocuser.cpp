@@ -12,6 +12,9 @@ void MFocuser::initProperties(void)
 {
     modulename="focuser";
     createMyModule("Focuser",20);
+    createMyProp("messages","Messages",PT_MESSAGE,"","", OP_RO,OSR_NOFMANY,0,OPS_IDLE,"","",00);
+    appendMyElt ("messages","messageselt","","Messages","","");
+
     createMyCateg("main","Main control",10);
     createMyProp("statusprop","Status",PT_TEXT,"main","", OP_RO,OSR_NOFMANY,0,OPS_IDLE,"","",10);
     appendMyElt ("statusprop","status","","Status","","");
@@ -40,14 +43,14 @@ void MFocuser::initProperties(void)
     gra.V1label="HFR";
     appendMyElt ("curve","curve1"  , gra);
 
-    createMyProp("histo","Histogramme",PT_GRAPH,"main","", OP_RW,OSR_ATMOST1,0,OPS_IDLE,"","",70);
+    /*createMyProp("histo","Histogramme",PT_GRAPH,"main","", OP_RW,OSR_ATMOST1,0,OPS_IDLE,"","",70);
     OGraph grafoc;
     grafoc.name="histofoc" ;
     grafoc.label="Val";
     grafoc.gtype="2D";
     grafoc.V0label="ADU";
     grafoc.V1label="Intensity";
-    appendMyElt ("histo","histofoc"  , grafoc);
+    appendMyElt ("histo","histofoc"  , grafoc);*/
 
     createMyProp("buttonsprop","Actions",PT_SWITCH,"main","", OP_RW,OSR_ATMOST1,0,OPS_IDLE,"","",20);
     appendMyElt ("buttonsprop","loop"       , OSS_OFF       , "Continuous shooting","","");
@@ -213,7 +216,7 @@ void MFocuser::executeTaskSpec(Ttask task)
         setMyElt("image","imagefoc",getMyImg("image","imagefoc").url,getMyImg("image","imagefoc").f);
         image->saveStretchedToJpeg(getMyImg("image","imagefocst").f+"/"+getMyImg("image","imagefocst").url,100);
         setMyElt("image","imagefocst",getMyImg("image","imagefocst").url,getMyImg("image","imagefocst").f);
-        OGraph graphf = getMyGraph("histo","histofoc");
+        /*OGraph graphf = getMyGraph("histo","histofoc");
         graphf.values.clear();
         OGraphValue val;
         for (int i=0;i<256;i++) {
@@ -221,7 +224,7 @@ void MFocuser::executeTaskSpec(Ttask task)
             val.v1=image->histogram256[i];
             graphf.values.append(val);
         };
-        setMyElt("histo","histofoc",graphf);
+        setMyElt("histo","histofoc",graphf);*/
 
         popnext();
         executeTask(tasks.front());

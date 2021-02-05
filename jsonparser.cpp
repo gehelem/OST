@@ -12,6 +12,7 @@ QJsonObject OtextToJ(OText txt)
     obj["aux1"]=txt.aux1;
     return obj;
 }
+
 QJsonObject OnumToJ(ONumber num)
 {
     QJsonObject obj;
@@ -119,7 +120,16 @@ QJsonObject OgraphToJ (OGraph  gra)
     //QVector<OGraphValue> values;
 
 }
-
+QJsonObject OmessToJ(OMessage m)
+{
+    QJsonObject obj;
+    obj["name"]=m.name;
+    obj["label"]=m.label;
+    obj["text"]=m.text;
+    obj["aux0"]=m.aux0;
+    obj["aux1"]=m.aux1;
+    return obj;
+}
 QJsonObject OpropToJ(Prop prop)
 {
     QJsonObject obj;
@@ -210,10 +220,15 @@ QJsonObject OpropToJ(Prop prop)
             det=OlightToJ(l);
             details.append(det);
         }
-        obj["texts"]=details;
+        obj["lights"]=details;
     }
     if (prop.typ==PT_MESSAGE) {
-        //TBD
+        for(auto m : prop.m)
+        {
+            det=OmessToJ(m);
+            details.append(det);
+        }
+        obj["messages"]=details;
     }
     if (prop.typ==PT_IMAGE) {
         for(auto i : prop.i)

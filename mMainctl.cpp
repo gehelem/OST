@@ -13,6 +13,9 @@ void MMainctl::initProperties(void)
 {
     modulename="mainctl";
     createMyModule("Main control",10);
+    createMyProp("messages","Messages",PT_MESSAGE,"","", OP_RO,OSR_NOFMANY,0,OPS_IDLE,"","",00);
+    appendMyElt ("messages","messageselt","","Messages","","");
+
     createMyCateg("main","Main control",10);
     createMyCateg("democateg1","Démo catégorie 1",20);
     createMyCateg("democateg2","Démo catégorie 2",30);

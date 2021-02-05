@@ -86,13 +86,25 @@ void    Properties::setProp    (QString modulename, QString propname, Prop prop)
 }
 void    Properties::appendElt  (QString modulename, QString propname,  QString txtname, QString text     , QString label, QString aux0,QString aux1)
 {
-    OText txt;
-    txt.name=txtname;
-    txt.text=text;
-    txt.label=label;
-    txt.aux0=aux0;
-    txt.aux1=aux1;
-    modules[modulename].props[propname].t[txtname]=txt;
+    if (modules[modulename].props[propname].typ==PT_TEXT) {
+        OText txt;
+        txt.name=txtname;
+        txt.text=text;
+        txt.label=label;
+        txt.aux0=aux0;
+        txt.aux1=aux1;
+        modules[modulename].props[propname].t[txtname]=txt;
+    }
+    if (modules[modulename].props[propname].typ==PT_MESSAGE) {
+        OMessage m;
+        m.name=txtname;
+        m.text=text;
+        m.label=label;
+        m.aux0=aux0;
+        m.aux1=aux1;
+        modules[modulename].props[propname].m[txtname]=m;
+    }
+
 }
 void    Properties::appendElt  (QString modulename, QString propname,  QString numname, double  num      , QString label, QString aux0,QString aux1)
 {
@@ -149,6 +161,7 @@ void    Properties::appendGra  (QString modulename,QString propname,  QString gr
 void    Properties::resetGra   (QString modulename,QString propname,  QString graname)
 {
     modules[modulename].props[propname].g[graname].values.clear();
+    emit signalvalueChanged(modules[modulename].props[propname]);
 }
 void    Properties::deleteElt  (QString modulename, QString propname,  QString eltname)
 {
@@ -162,7 +175,11 @@ void    Properties::deleteElt  (QString modulename, QString propname,  QString e
 }
 void    Properties::setElt     (QString modulename, QString propname,  QString txtname, QString text)
 {
-    modules[modulename].props[propname].t[txtname].text=text;
+    if (modules[modulename].props[propname].typ==PT_TEXT)    modules[modulename].props[propname].t[txtname].text=text;
+    if (modules[modulename].props[propname].typ==PT_MESSAGE) {
+        QString mess = QDateTime::currentDateTime().toString("[yyyyMMdd hh:mm:ss.zzz]") + "-"+ modulename +"-"+text;
+        modules[modulename].props[propname].m[txtname].text=mess;
+    }
     emit signalvalueChanged(modules[modulename].props[propname]);
 }
 void    Properties::setElt     (QString modulename, QString propname,  QString numname, double  num)
@@ -189,7 +206,7 @@ void    Properties::setElt     (QString modulename,QString propname,  QString im
 void    Properties::setElt     (QString modulename,QString propname,  QString graname, OGraph  graph)
 {
     modules[modulename].props[propname].g[graname]=graph;
-    emit signalvalueChanged(modules[modulename].props[propname]);
+    //emit signalvalueChanged(modules[modulename].props[propname]);
 }
 
 QString Properties::getTxt     (QString modulename, QString propname,  QString txtname)

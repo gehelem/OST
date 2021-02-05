@@ -395,11 +395,14 @@ void Module::popnext(void)
     if (tasks.size()<=1) {
         //qDebug() << "finished";
         setMyElt("statusprop","status","Idle");
+        //setMyElt("messages","messageselt","Idle");
         emit finished();
     }  else {
         //qDebug() << tasks.front().tasklabel << "finished";
         tasks.pop_front();
         setMyElt("statusprop","status",tasks.front().tasklabel);
+        //setMyElt("messages","messageselt",tasks.front().tasklabel);
+
         executeTask(tasks.front());
     }
 }
