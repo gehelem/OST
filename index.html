@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OST - L'Observatoire Sans Tete</title>
+  <link rel="stylesheet" href="/jquery-ui-1.12.1.custom/jquery-ui.css">
+  <script src="jquery.js"></script>
+  <script src="/jquery-ui-1.12.1.custom/jquery-ui.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+</head>
+<body>
+<div id="OST">
+</div>
+<div id="CLI">
+        <p>
+            <button onClick="initWebSocket();">Connect</button>
+            <button onClick="stopWebSocket();">Disconnect</button>
+            <button onClick="checkSocket();">State</button>
+            <input type="text" id="inputText" onkeydown="if(event.keyCode==13)sendMessage();"/>
+            <button onClick="sendMessage();">Send</button>
+         </p>
+        <p>
+            <textarea id="debugTextArea" style="width:800px;height:50px;"></textarea>
+        </p>
+</div>
+
+<script>
+            function sortJSON(arr) {
+                if (arr == undefined) return arr;
+                return arr.sort(function(a, b) {
+                    var x = a['order']; var y = b['order'];
+                    return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+                });
+            }
+            var debugTextArea = document.getElementById("debugTextArea");
+            function debug(message) {
+                debugTextArea.value += message + "\n";
+                debugTextArea.scrollTop = debugTextArea.scrollHeight;
+            }
+
+            function sendMessage() {
+                var msg = document.getElementById("inputText").value;
+                if ( websocket != null )
+                {
+                    document.getElementById("inputText").value = "";
+                    websocket.send( msg );
+                    console.log( "string sent :", '"'+msg+'"' );
+                }
+            }
+
+            function indi_switch(btn,modulename,propname,name) {
+              //console.log( "indi_switch clicked:", '"'+btn+'"' ,'"'+modulename+'"');
+            if ( websocket != null )
+                {
+                  var msg = "{\"message\": \"updateproperty\",\"property\":{\"modulename\":\""+modulename+"\",\"propname\":\""+propname+"\",\"switchs\":[{\"name\":\""+name+"\",\"switch\":\"ISS_ON\"}],\"type\":\"INDI_SWITCH\"}}";
+
+                    websocket.send( msg );
+                    //console.log( "string sent :", '"'+msg+'"' );
+                }
+            }
+
+            function indi_number(num,modulename,propname,name) {
+              //console.log( "indi_switch clicked:", '"'+btn+'"' ,'"'+modulename+'"');
+            if ( websocket != null )
+                {
+                  nn= modulename+propname+name;
+                  var val = document.getElementById(nn).value;
+                  var msg = "{\"message\": \"updateproperty\",\"property\":{\"modulename\":\""+modulename+"\",\"propname\":\""+propname+"\",\"numbers\":[{\"name\":\""+name+"\",\"value\":\""+val+"\"}],\"type\":\"INDI_NUMBER\"}}";
+
+                    websocket.send( msg );
+                    //console.log( "string sent :", '"'+msg+'"' );
+                }
+            }
+
+
+
+
+
+            var wsUri = "ws://192.168.1.25:9624";
+            var websocket = null;
+
+            function buildProperty(prop) {
+
+              if  (!($("div#"+prop.modulename+prop.propname).length)) {
+                  //$("div#"+prop.modulename+prop.categname+prop.groupname).append("<div id="+prop.modulename+prop.propname+" label="+prop.label+"></div>");
+                  $("div#"+prop.modulename+prop.categname+prop.groupname).append("<div id="+prop.modulename+prop.propname+" ></div>");
+                  //$("div#"+prop.modulename+prop.propname).append("<label for='name'>"+prop.label+"</label>");
+              }
+
+              if (prop.type =="INDI_TEXT") {
+                  var texts = prop.texts;
+                  $.each( texts, function( iitem, item ) {
+                    if ($("input#"+prop.modulename+prop.propname+item.name).length) {
+                        $("input#"+prop.modulename+prop.propname+item.name).val(item.text);
+                    } else {
+                        $("div#"+prop.modulename+prop.propname).append("<td><label for='name'>"+item.label+"</label></td>");
+                        $("div#"+prop.modulename+prop.propname).append("<td><input id="+prop.modulename+prop.propname+item.name+" value='"+item.text+"' type='text'></td><br>");
+                    }
+                  });
+
+              }
+
+              if (prop.type =="INDI_MESSAGE") {
+                  var messages = prop.messages;
+                  $.each( messages, function( iitem, item ) {
+                    if ($("textarea#"+prop.modulename+prop.propname+item.name).length) {
+                        var mm = document.getElementById(prop.modulename+prop.propname+item.name);
+                        mm.value += item.text + "\n";
+                        mm.scrollTop = mm.scrollHeight;
+                        /*var mm = document.getElementById("debugTextArea");
+                        mm.value += item.text + "\n";
+                        mm.scrollTop = mm.scrollHeight;*/
+
+                    } else {
+                        //$("div#"+prop.modulename+prop.propname).append("<td><label for='name'>"+item.label+"</label></td>");
+                        //$("div#"+prop.modulename+prop.propname).append("<input id="+prop.modulename+prop.propname+item.name+" value='"+item.text+"' type='text'>");
+                        $("div#"+prop.modulename+prop.propname).append("<textarea id="+prop.modulename+prop.propname+item.name+" style='width:300px;height:20px;' value='"+item.text+"'></textarea>");
+                    }
+                  });
+
+              }
+
+              if (prop.type =="INDI_NUMBER") {
+                  var numbers = prop.numbers;
+                  $.each( numbers, function( iitem, item ) {
+
+                    if ($("input#"+prop.modulename+prop.propname+item.name).length) {
+                        nn= prop.modulename+prop.propname+item.name;
+                        $("input#"+prop.modulename+prop.propname+item.name).val(item.value);
+                        console.log( "update number :", '"'+prop.modulename+prop.propname+item.name+'"' , '"'+item.value+'"' )
+                    } else {
+                        nn= prop.modulename+prop.propname+item.name;
+                        //$("div#"+prop.modulename+prop.propname).append("<td><label for='name'>"+item.label+"</label></td>");
+                        //$("div#"+prop.modulename+prop.propname).append("<input id="+prop.modulename+prop.propname+item.name+" value='"+item.value+"' type='text'>");
+                        /*
+                        <input type="text" id="inputText" onkeydown="if(event.keyCode==13)sendMessage();"/>
+                        <button onClick="sendMessage();">Send</button>
+                        */
+                        $("div#"+prop.modulename+prop.categname).append("<label for='name'>"+item.label+"</label><td>");
+                        $("div#"+prop.modulename+prop.categname).append("<input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value="+item.value+"  label="+item.label+" />");
+                        if (!(prop.perm=="IP_RO")) {
+                          $("div#"+prop.modulename+prop.categname).append("<button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_number('"+nn+"','"+prop.modulename+"','"+prop.propname+"','"+item.name+"');\"    >set</button>");
+                        }
+                        $("div#"+prop.modulename+prop.categname).append("<br>");
+
+                        //$("div#"+prop.modulename+prop.propname).append("<td><input id="+prop.modulename+prop.propname+item.name+" value='"+item.text+"' type='text'></td><br>");
+
+
+                        //$("div#"+prop.modulename+prop.categname).append("<button onClick=\"indi_number('"+nn+"','"+prop.modulename+"','"+prop.propname+"','"+item.name+"');>set</button>");
+
+                    }
+                  });
+              }
+
+              if (prop.type =="INDI_SWITCH") {
+                  var swis = prop.switchs;
+                  $.each( swis, function( iitem, item ) {
+                    if ($("button#"+prop.modulename+prop.propname+item.name).length) {
+                        //$("textarea#"+prop.modulename+prop.propname+sw.name).text(sw.switch);
+                    } else {
+                      nn= prop.modulename+prop.propname+item.name;
+                        $("div#"+prop.modulename+prop.categname).append("<button id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_switch('"+nn+"','"+prop.modulename+"','"+prop.propname+"','"+item.name+"');\"    >"+item.label+"</button>");
+
+                        //    <button onClick="abortfocus();">Abort focus</button>
+                        //$("div#"+prop.modulename+prop.categname).append("<tr><label for='name'>"+sw.label+"</label>");
+                        //$("div#"+prop.modulename+prop.categname).append("<textarea id="+prop.modulename+prop.propname+sw.name+">"+sw.switch+"</textarea></tr>");
+                    }
+                  });
+              }
+
+              if (prop.type =="INDI_IMAGE") {
+                  var imgs = prop.images;
+                  $.each( imgs, function( iitem, item ) {
+                      nn= prop.modulename+prop.propname+item.name;
+                      if ($("img#"+nn).length) {
+                        $("img#"+nn).prop("src",item.url + "?"+ new Date().valueOf());
+                    } else {
+                        $("div#"+prop.modulename+prop.categname).append("<img id="+nn+" src="+item.url+"/>");
+                        //<img id="image" src="" alt="No image loaded"/>
+                    }
+                  });
+              }//end indi_image
+
+              if (prop.type =="INDI_GRAPH") {
+                  var gras = prop.graphs;
+                  $.each( gras, function( iitem, item ) {
+                      nn= prop.modulename+prop.propname+item.name;
+                      if ($("canvas#"+nn).length) {
+                          $("canvas#"+nn).remove;
+                      }
+                      $("div#"+prop.modulename+prop.categname).append("<canvas id="+nn+" width=50 height=10></canvas>");
+                      creategraph2D(nn,item.label);
+                      var values=item.values;
+                      $.each( values, function( ivalue, value ) {
+                        //console.log( "addvalues :", '"'+value.v0+'"' +value.v1+'"');
+                        appendgraph2D(nn,value.v0,value.v1);
+                      });
+                  });
+              }//end indi_graph
+
+            }
+
+            function initWebSocket() {
+                try {
+                    if (typeof MozWebSocket == 'function')
+                        WebSocket = MozWebSocket;
+                    if ( websocket && websocket.readyState == 1 )
+                        websocket.close();
+                    websocket = new WebSocket( wsUri );
+                    websocket.onopen = function (evt) {
+                        debug("CONNECTED");
+                        websocket.send( "{\"message\":\"readall\"}");
+                    };
+                    websocket.onclose = function (evt) {
+                        debug("DISCONNECTED");
+                        $("#OST").empty();
+                        $("#OST").tabs("refresh");
+                    };
+
+
+                    websocket.onmessage = function (evt) {
+                        //console.log( "Message received :", evt.data );
+                        //debug (evt.data);
+                        var obj = jQuery.parseJSON( evt.data );
+
+                        if (obj.message == 'updateproperty') {
+                            var prop = obj.property;
+                            buildProperty(prop);
+                        }
+
+                        if (obj.message == 'appendgraph') {
+                            nn= obj.module+obj.property+obj.graph;
+                            //console.log( "addvalues :", '"'+obj.v0+'"' +obj.v1+'"');
+                            appendgraph2D(nn,obj.v0,obj.v1);
+                        }
+
+                        if (obj.message == 'updateall') {
+                            var modules = sortJSON(obj.modules);
+
+                            $.each( modules, function(imod,mod) {
+                              if  (!($("div#"+mod.modulename).length)) {
+                                  //$("div#OST").append("<div id="+mod.modulename+" label="+mod.modulename+"></div>");
+                                  $("div#OST").append("<h3 id=h"+mod.modulename+">"+mod.modulelabel+"</h3>");
+                                  $("div#OST").append("<div id="+mod.modulename+"></div>");
+                                  $("div#"+mod.modulename).append("<ul id=ul"+mod.modulename+"></ul>");
+                                  //$("div#"+mod.modulename).append("<br><label for='name'>MODULE:"+mod.modulename+"<br></label>");
+                              }
+
+                              var properties = sortJSON(mod.properties);
+                              $.each( properties, function(iprop0,prop0) {
+                                buildProperty(prop0);
+                              });
+
+                              var categs = sortJSON(mod.categories);
+                              $.each( categs, function(icateg,categ) {
+
+                                $("div#"+mod.modulename).append("<div id="+mod.modulename+categ.categname+"></div>");
+
+                                var propertiesc = sortJSON(categ.properties);
+                                $.each( propertiesc, function(iprop1,prop1) {
+                                  buildProperty(prop1);
+                                });
+
+                                var groups = sortJSON(categ.groups);
+                                if (typeof groups !== 'undefined') {
+                                  $("div#"+mod.modulename+categ.categname).append("<ul id=ul"+mod.modulename+categ.categname+"></ul>");
+                                }
+                                $("#ul"+mod.modulename).append("<li id=li"+mod.modulename+categ.categname+"><a href=#"+mod.modulename+categ.categname+">"+categ.categlabel+"</a></li>");
+
+                                $.each( groups, function(igroup,group) {
+                                  $("#ul"+mod.modulename+categ.categname).append("<li id=li"+mod.modulename+categ.categname+group.groupname+"><a href=#"+mod.modulename+categ.categname+group.groupname+">"+group.grouplabel+"</a></li>");
+                                  $("div#"+mod.modulename+categ.categname).append("<div id="+mod.modulename+categ.categname+group.groupname+"></div>");
+
+                                  var propertiesg = sortJSON(group.properties);
+                                  $.each( propertiesg, function(iprop2,prop2) {
+                                    buildProperty(prop2);
+                                  });
+
+
+                                })//end groups
+
+                                $("div#"+mod.modulename+categ.categname).tabs();
+                              });// end categs
+                              $("div#"+mod.modulename).tabs();
+                            });
+                      $("#OST").accordion({header: "h3",collapsible: true,autoHeight: false,navigation: true,heightStyle: "content" });
+                      //$("#OST").tabs("refresh");
+                      }; // end buildall
+
+                    };
+
+                    websocket.onerror = function (evt) {
+                        debug('ERROR: ' + evt.data);
+                    };
+                } catch (exception) {
+                    debug('ERROR: ' + exception);
+                }
+            }
+
+            function stopWebSocket() {
+                if (websocket)
+                    websocket.close();
+            }
+
+            function checkSocket() {
+                if (websocket != null) {
+                    var stateStr;
+                    switch (websocket.readyState) {
+                        case 0: {
+                            stateStr = "CONNECTING";
+                            break;
+                        }
+                        case 1: {
+                            stateStr = "OPEN";
+                            break;
+                        }
+                        case 2: {
+                            stateStr = "CLOSING";
+                            break;
+                        }
+                        case 3: {
+                            stateStr = "CLOSED";
+                            break;
+                        }
+                        default: {
+                            stateStr = "UNKNOW";
+                            break;
+                        }
+                    }
+                    debug("WebSocket state = " + websocket.readyState + " ( " + stateStr + " )");
+                } else {
+                    debug("WebSocket is null");
+                }
+            }
+
+            function appendgraph2D(idgraph,xx,yy) {
+              var graph = $("#"+idgraph).data('graph');
+              graph.data.datasets[0].data.push({x:xx,y:yy});
+              //data.datasets[0].data.push({x:xx, y:yy});
+              //graph.render();
+              graph.update();
+            }
+
+            function creategraph2D(idgraph,graphlabel) {
+              var ctx = $("#"+idgraph);
+              var graph = new Chart(ctx, {
+                          type: 'line',
+                          color: "#000000",
+                          //fill: false,
+                          data: {
+                                  datasets: [{
+                                      label: graphlabel,
+                                      type: "line",
+                                      border:  "#f38b4a",
+                                      borderColor: "#f38b4a",
+                                      //backgroundColor:  "#f38b4a",
+                                      fill: false,
+                                  }]
+                                },
+                          options: {
+                              animation: false,
+                              scales: {
+                                  xAxes: [{
+                                      type: 'linear',
+                                      position: 'bottom'
+                                  }],
+                                  yAxes: [{
+                                      //type: 'logarithmic',
+                                      type: 'linear',
+                                      position: 'right'
+                                  }]
+                              }
+                          }
+              });
+              ctx.data('graph', graph);
+              //graph.update();
+            }
+
+    $(document).ready(function()
+    {
+      initWebSocket();
+    });
+
+</script>
+</body>
+</html>

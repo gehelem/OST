@@ -161,13 +161,13 @@ QJsonObject OpropToJ(Prop prop)
     }
     switch (prop.perm) {
     case OP_RO:
-        obj["switch"]="IP_RO";
+        obj["perm"]="IP_RO";
         break;
     case OP_WO:
-        obj["switch"]="IP_WO";
+        obj["perm"]="IP_WO";
         break;
     case OP_RW:
-        obj["switch"]="IP_RW";
+        obj["perm"]="IP_RW";
         break;
     }
     switch (prop.state) {
