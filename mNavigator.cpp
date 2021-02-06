@@ -118,6 +118,7 @@ void MNavigator::startGoto(void)
     QString expe        = getMyTxt("indiprops","expe");
     QString camera      = getMyTxt("devices","camera");
     QString mount       = getMyTxt("devices","mount");
+    QString radecp      = getMyTxt("indiprops","radecp");
     double ra           = getMyNum("target","ra");
     double dec          = getMyNum("target","dec");
     double iexposure    = getMyNum("parms","exposure");
@@ -129,11 +130,12 @@ void MNavigator::startGoto(void)
     appendMyGra("solver","solver",v);
 
     addnewtask(TT_SPEC,"setradec","Sending RA/DEC",true,mount,"","",0,"",ISS_OFF);
+    addnewtask(TT_WAIT_PROP,"waitradec","Waiting slew end",true,mount,radecp,"",0,"",ISS_OFF);
     addnewtask(TT_SEND_NUMBER,"fram1","Exp. request",false,camera,expp,expe,iexposure,"",ISS_OFF);
     addnewtask(TT_WAIT_BLOB  ,"fram2","Exp. waiting",false,camera,expp,expe,iexposure,"",ISS_OFF);
     addnewtask(TT_ANALYSE_SOLVE,"fram3","Analyse request",false,camera,expp,expe,iexposure,"",ISS_OFF);
     addnewtask(TT_WAIT_SOLVE,"fram4","Waiting analyse",false,camera,expp,expe,iexposure,"",ISS_OFF);
-    addnewtask(TT_SPEC       ,"fram5","save image",true,   camera,expp,expe,iexposure,"",ISS_OFF);
+    addnewtask(TT_SPEC       ,"fram5","Save image",true,   camera,expp,expe,iexposure,"",ISS_OFF);
     addnewtask(TT_SPEC       ,"fram6","Check tolerance",true,   camera,expp,expe,tol,"",ISS_OFF);
 
 
@@ -185,6 +187,7 @@ void MNavigator::executeTaskSpec(Ttask task)
         double ra           = getMyNum("target","ra");
         double dec          = getMyNum("target","dec");
         if (sendRaDec(ra,dec)) {
+            setMyElt("messages","messageselt","Waiting slew end");
             popnext();
         }
 
@@ -212,7 +215,7 @@ void MNavigator::executeTaskSpec(Ttask task)
         double sdec          = getMyNum("results","dec");
         double tol          = getMyNum("parms","tolerance");
 
-        if ( ((ra-sra)>tol)||((dec-sdec)>tol) ) {
+        if ( (fabs(ra-sra)>tol)||(fabs(dec-sdec)>tol) ) {
             setMyElt("messages","messageselt","Too far, moving again");
 
             QString mount       = getMyTxt("devices","mount");
@@ -244,16 +247,18 @@ void MNavigator::executeTaskSpec(Ttask task)
                 }
             }
             indiclient->sendNewNumber(prop);
+            addnewtask(TT_WAIT_PROP,"waitradec","Waiting slew end",true,mount,radecp,"",0,"",ISS_OFF);
             addnewtask(TT_SEND_NUMBER,"fram1","Exp. request",false,camera,expp,expe,iexposure,"",ISS_OFF);
             addnewtask(TT_WAIT_BLOB  ,"fram2","Exp. waiting",false,camera,expp,expe,iexposure,"",ISS_OFF);
             addnewtask(TT_ANALYSE_SOLVE,"fram3","Analyse request",false,camera,expp,expe,iexposure,"",ISS_OFF);
             addnewtask(TT_WAIT_SOLVE,"fram4","Waiting analyse",false,camera,expp,expe,iexposure,"",ISS_OFF);
-            addnewtask(TT_SPEC       ,"fram5","save image",true,   camera,expp,expe,iexposure,"",ISS_OFF);
+            addnewtask(TT_SPEC       ,"fram5","Save image",true,   camera,expp,expe,iexposure,"",ISS_OFF);
             addnewtask(TT_SPEC       ,"fram6","Check tolerance",true,   camera,expp,expe,tol,"",ISS_OFF);
             popnext();
             executeTask(tasks.front());
 
         } else {
+            setMyElt("messages","messageselt","Target reached");
             popnext();
         }
 
@@ -278,8 +283,17 @@ void MNavigator::executeTaskSpec(Ttask task,IBLOB *bp)
 }
 void MNavigator::executeTaskSpec(Ttask task,INumberVectorProperty *nvp)
 {
-    Q_UNUSED(task);
-    Q_UNUSED(nvp);
+    if (task.taskname=="waitradec") {
+
+        if (   (strcmp(tasks.front().devicename.toStdString().c_str(),nvp->device)==0)
+            && (strcmp(tasks.front().propertyname.toStdString().c_str(),nvp->name)==0)
+            && (nvp->s==IPS_OK) ) {
+            setMyElt("messages","messageselt","Slew finished");
+            popnext();
+            executeTask(tasks.front());
+        }
+
+    }
 }
 void MNavigator::executeTaskSpec(Ttask task,ISwitchVectorProperty *svp)
 {
