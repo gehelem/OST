@@ -9,6 +9,9 @@ class MNavigator : public Module
         MNavigator(MyClient *cli,Properties *properties);
         ~MNavigator();
 
+        void startGoto(void);
+        void abort(void);
+
         void initProperties(void);
         void executeTaskSpec(Ttask task);
         void executeTaskSpec(Ttask task,IBLOB *bp);
