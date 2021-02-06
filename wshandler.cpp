@@ -56,9 +56,9 @@ void WShandler::onNewConnection()
 
 void WShandler::processTextMessage(QString message)
 {
-    qDebug() << "OST server received text message" << message;
     QJsonDocument jsonResponse = QJsonDocument::fromJson(message.toUtf8()); // garder
     QJsonObject  obj = jsonResponse.object(); // garder
+    qDebug() << "OST server received json" << obj;
     if (obj["message"].toString()=="readall")
     {
         sendAll();

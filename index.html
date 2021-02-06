@@ -73,7 +73,18 @@
                 }
             }
 
+            function indi_text(num,modulename,propname,name) {
+              //console.log( "indi_switch clicked:", '"'+btn+'"' ,'"'+modulename+'"');
+            if ( websocket != null )
+                {
+                  nn= modulename+propname+name;
+                  var val = document.getElementById(nn).value;
+                  var msg = "{\"message\": \"updateproperty\",\"property\":{\"modulename\":\""+modulename+"\",\"propname\":\""+propname+"\",\"texts\":[{\"name\":\""+name+"\",\"text\":\""+val+"\"}],\"type\":\"INDI_TEXT\"}}";
 
+                    websocket.send( msg );
+                    //console.log( "string sent :", '"'+msg+'"' );
+                }
+            }
 
 
 
@@ -91,11 +102,17 @@
               if (prop.type =="INDI_TEXT") {
                   var texts = prop.texts;
                   $.each( texts, function( iitem, item ) {
+                    nn= prop.modulename+prop.propname+item.name;
                     if ($("input#"+prop.modulename+prop.propname+item.name).length) {
                         $("input#"+prop.modulename+prop.propname+item.name).val(item.text);
                     } else {
-                        $("div#"+prop.modulename+prop.propname).append("<td><label for='name'>"+item.label+"</label></td>");
-                        $("div#"+prop.modulename+prop.propname).append("<td><input id="+prop.modulename+prop.propname+item.name+" value='"+item.text+"' type='text'></td><br>");
+                        $("div#"+prop.modulename+prop.categname).append("<label for='name'>"+item.label+"</label><td>");
+                        $("div#"+prop.modulename+prop.categname).append("<input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" />");
+                        if (!(prop.perm=="IP_RO")) {
+                          $("div#"+prop.modulename+prop.categname).append("<button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_text('"+nn+"','"+prop.modulename+"','"+prop.propname+"','"+item.name+"');\"    >set</button>");
+                        }
+                        $("div#"+prop.modulename+prop.categname).append("<br>");
+
                     }
                   });
 
@@ -131,24 +148,12 @@
                         console.log( "update number :", '"'+prop.modulename+prop.propname+item.name+'"' , '"'+item.value+'"' )
                     } else {
                         nn= prop.modulename+prop.propname+item.name;
-                        //$("div#"+prop.modulename+prop.propname).append("<td><label for='name'>"+item.label+"</label></td>");
-                        //$("div#"+prop.modulename+prop.propname).append("<input id="+prop.modulename+prop.propname+item.name+" value='"+item.value+"' type='text'>");
-                        /*
-                        <input type="text" id="inputText" onkeydown="if(event.keyCode==13)sendMessage();"/>
-                        <button onClick="sendMessage();">Send</button>
-                        */
                         $("div#"+prop.modulename+prop.categname).append("<label for='name'>"+item.label+"</label><td>");
                         $("div#"+prop.modulename+prop.categname).append("<input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value="+item.value+"  label="+item.label+" />");
                         if (!(prop.perm=="IP_RO")) {
                           $("div#"+prop.modulename+prop.categname).append("<button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_number('"+nn+"','"+prop.modulename+"','"+prop.propname+"','"+item.name+"');\"    >set</button>");
                         }
                         $("div#"+prop.modulename+prop.categname).append("<br>");
-
-                        //$("div#"+prop.modulename+prop.propname).append("<td><input id="+prop.modulename+prop.propname+item.name+" value='"+item.text+"' type='text'></td><br>");
-
-
-                        //$("div#"+prop.modulename+prop.categname).append("<button onClick=\"indi_number('"+nn+"','"+prop.modulename+"','"+prop.propname+"','"+item.name+"');>set</button>");
-
                     }
                   });
               }

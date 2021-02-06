@@ -104,6 +104,14 @@ void MFocuser::slotvalueChangedFromCtl(Prop prop)
         }
         setMyProp(prop.propname,myprop);
     }
+    if ((prop.typ==PT_TEXT) && (prop.propname=="devices"))
+    {
+        Prop myprop = getMyProp(prop.propname);
+        foreach (OText otext, prop.t) {
+            myprop.t[otext.name].text=otext.text;
+        }
+        setMyProp(prop.propname,myprop);
+    }
 
 }
 
@@ -221,8 +229,8 @@ void MFocuser::executeTaskSpec(Ttask task)
     if (task.taskname=="fram45") {
         //image->appendStarsFound();
 
-        image->saveToJpeg(getMyImg("image","imagefoc").f+"/"+getMyImg("image","imagefoc").url,100);
-        setMyElt("image","imagefoc",getMyImg("image","imagefoc").url,getMyImg("image","imagefoc").f);
+        //image->saveToJpeg(getMyImg("image","imagefoc").f+"/"+getMyImg("image","imagefoc").url,100);
+        //setMyElt("image","imagefoc",getMyImg("image","imagefoc").url,getMyImg("image","imagefoc").f);
         image->saveStretchedToJpeg(getMyImg("image","imagefocst").f+"/"+getMyImg("image","imagefocst").url,100);
         setMyElt("image","imagefocst",getMyImg("image","imagefocst").url,getMyImg("image","imagefocst").f);
         /*OGraph graphf = getMyGraph("histo","histofoc");
