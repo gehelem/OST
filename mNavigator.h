@@ -22,6 +22,8 @@ class MNavigator : public Module
         void slotvalueChangedFromCtl(Prop prop);
    public slots:
         void test(void);
+   private:
+        bool sendRaDec(double ra, double dec);
 
 };
 #endif

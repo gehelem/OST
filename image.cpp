@@ -341,7 +341,8 @@ void Image::ssReadySolve(void)
         HFRavg=(i*HFRavg + stars[i].HFR)/(i+1);
     }
     IDLog("IMG HFRavg %f\n",HFRavg);
-
+    computeHistogram();
+    FindStarsFinished = true;
 
     SolveStarsFinished = true;
     emit successSolve();
