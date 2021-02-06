@@ -95,7 +95,7 @@
 
               if  (!($("div#"+prop.modulename+prop.propname).length)) {
                   //$("div#"+prop.modulename+prop.categname+prop.groupname).append("<div id="+prop.modulename+prop.propname+" label="+prop.label+"></div>");
-                  $("div#"+prop.modulename+prop.categname+prop.groupname).append("<div id="+prop.modulename+prop.propname+" ></div>");
+                  $("div#"+prop.modulename+prop.categname+prop.groupname).append("<div id="+prop.modulename+prop.propname+" ><table id=tab"+prop.modulename+prop.propname+"><tr><td>"+prop.label+"</td><td>xxx</td></tr></table></div>");
                   //$("div#"+prop.modulename+prop.propname).append("<label for='name'>"+prop.label+"</label>");
               }
 
@@ -106,12 +106,12 @@
                     if ($("input#"+prop.modulename+prop.propname+item.name).length) {
                         $("input#"+prop.modulename+prop.propname+item.name).val(item.text);
                     } else {
-                        $("div#"+prop.modulename+prop.categname).append("<label for='name'>"+item.label+"</label><td>");
-                        $("div#"+prop.modulename+prop.categname).append("<input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" />");
-                        if (!(prop.perm=="IP_RO")) {
-                          $("div#"+prop.modulename+prop.categname).append("<button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_text('"+nn+"','"+prop.modulename+"','"+prop.propname+"','"+item.name+"');\"    >set</button>");
+                        if (prop.perm=="IP_RO") {
+                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<tr><td>"+item.label+"</td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /></td></tr>");
+                        } else {
+                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<tr><td>"+item.label+"</td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /><button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_text('"+nn+"','"+prop.modulename+"','"+prop.propname+"','"+item.name+"');\"    >set</button></td></tr>");
                         }
-                        $("div#"+prop.modulename+prop.categname).append("<br>");
+
 
                     }
                   });
@@ -141,19 +141,26 @@
               if (prop.type =="INDI_NUMBER") {
                   var numbers = prop.numbers;
                   $.each( numbers, function( iitem, item ) {
+                    nn= prop.modulename+prop.propname+item.name;
 
                     if ($("input#"+prop.modulename+prop.propname+item.name).length) {
-                        nn= prop.modulename+prop.propname+item.name;
                         $("input#"+prop.modulename+prop.propname+item.name).val(item.value);
                         console.log( "update number :", '"'+prop.modulename+prop.propname+item.name+'"' , '"'+item.value+'"' )
                     } else {
-                        nn= prop.modulename+prop.propname+item.name;
-                        $("div#"+prop.modulename+prop.categname).append("<label for='name'>"+item.label+"</label><td>");
+/*                        $("div#"+prop.modulename+prop.categname).append("<label for='name'>"+item.label+"</label><td>");
                         $("div#"+prop.modulename+prop.categname).append("<input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value="+item.value+"  label="+item.label+" />");
                         if (!(prop.perm=="IP_RO")) {
                           $("div#"+prop.modulename+prop.categname).append("<button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_number('"+nn+"','"+prop.modulename+"','"+prop.propname+"','"+item.name+"');\"    >set</button>");
                         }
                         $("div#"+prop.modulename+prop.categname).append("<br>");
+*/
+                        if (prop.perm=="IP_RO") {
+                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<tr><td>"+item.label+"</td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /></td></tr>");
+                        } else {
+                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<tr><td>"+item.label+"</td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /><button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_number('"+nn+"','"+prop.modulename+"','"+prop.propname+"','"+item.name+"');\"    >set</button></td></tr>");
+                        }
+
+
                     }
                   });
               }
@@ -225,7 +232,7 @@
 
 
                     websocket.onmessage = function (evt) {
-                        //console.log( "Message received :", evt.data );
+                        console.log( "Message received :", evt.data );
                         //debug (evt.data);
                         var obj = jQuery.parseJSON( evt.data );
 
