@@ -9,6 +9,9 @@ class MGuider : public Module
         MGuider(MyClient *cli,Properties *properties);
         ~MGuider();
 
+        void startCalibration(void);
+        void abort(void);
+
         void initProperties(void);
         void executeTaskSpec(Ttask task);
         void executeTaskSpec(Ttask task,IBLOB *bp);

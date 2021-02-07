@@ -48,6 +48,8 @@ void MyClient::removeProperty(INDI::Property *property)
 }
 void MyClient::newNumber(INumberVectorProperty *nvp)
 {
+    //if (strcmp(svp->name,"CONFIG_PROCESS")==0)
+    //for (int i=0;i<nvp->nnp;i++) IDLog("Got number %s %s %s %f\n",nvp->device,nvp->name,nvp->np[i].name,nvp->np[i].value);
     emit gotnewNumber(nvp);
 }
 void MyClient::newText(ITextVectorProperty *tvp)
@@ -57,7 +59,7 @@ void MyClient::newText(ITextVectorProperty *tvp)
 void MyClient::newSwitch(ISwitchVectorProperty *svp)
 {
     //if (strcmp(svp->name,"CONFIG_PROCESS")==0)
-    //for (int i=0;i<svp->nsp;i++) IDLog("Got switch %s %s/%s\n",svp->device,svp->name,svp->sp[i].name);
+    //for (int i=0;i<svp->nsp;i++) IDLog("Got switch %s %s %s\n",svp->device,svp->name,svp->sp[i].name);
     emit gotnewSwitch(svp);
 }
 void MyClient::newLight(ILightVectorProperty *lvp)
