@@ -117,6 +117,25 @@ void Module::gotnewText(ITextVectorProperty *tvp)
             }
         }
     }
+
+    if (    (tasks.front().tasktype==TT_WAIT_PROP_OK)
+         && (strcmp(tasks.front().devicename.toStdString().c_str(),tvp->device)==0)
+         && (strcmp(tasks.front().propertyname.toStdString().c_str(),tvp->name)==0)
+       )
+    {
+        if (tvp->s==IPS_OK) {
+            if (tasks.front().specific) {
+                executeTaskSpec(tasks.front(),tvp);
+            } else {
+                popnext();
+            }
+        }
+        if (tvp->s==IPS_ALERT) {
+            //tasks =QQueue<Ttask>();
+            setMyElt("messages","messageselt","ERROR" + tasks.front().taskname +"-"+ tasks.front().tasklabel);
+        }
+    }
+
 }
 
 void Module::gotnewSwitch(ISwitchVectorProperty *svp)
@@ -162,7 +181,23 @@ void Module::gotnewSwitch(ISwitchVectorProperty *svp)
             popnext();
         }
     }
-
+    if (    (tasks.front().tasktype==TT_WAIT_PROP_OK)
+         && (strcmp(tasks.front().devicename.toStdString().c_str(),svp->device)==0)
+         && (strcmp(tasks.front().propertyname.toStdString().c_str(),svp->name)==0)
+       )
+    {
+        if (svp->s==IPS_OK) {
+            if (tasks.front().specific) {
+                executeTaskSpec(tasks.front(),svp);
+            } else {
+                popnext();
+            }
+        }
+        if (svp->s==IPS_ALERT) {
+            //tasks =QQueue<Ttask>();
+            setMyElt("messages","messageselt","ERROR" + tasks.front().taskname +"-"+ tasks.front().tasklabel);
+        }
+    }
 }
 
 void Module::gotnewNumber(INumberVectorProperty *nvp)
@@ -179,6 +214,24 @@ void Module::gotnewNumber(INumberVectorProperty *nvp)
             executeTaskSpec(tasks.front(),nvp);
         } else {
             popnext();
+        }
+    }
+
+    if (    (tasks.front().tasktype==TT_WAIT_PROP_OK)
+         && (strcmp(tasks.front().devicename.toStdString().c_str(),nvp->device)==0)
+         && (strcmp(tasks.front().propertyname.toStdString().c_str(),nvp->name)==0)
+       )
+    {
+        if (nvp->s==IPS_OK) {
+            if (tasks.front().specific) {
+                executeTaskSpec(tasks.front(),nvp);
+            } else {
+                popnext();
+            }
+        }
+        if (nvp->s==IPS_ALERT) {
+            //tasks =QQueue<Ttask>();
+            setMyElt("messages","messageselt","ERROR" + tasks.front().taskname +"-"+ tasks.front().tasklabel);
         }
     }
 
@@ -229,6 +282,24 @@ void Module::gotnewLight(ILightVectorProperty *lvp)
             executeTaskSpec(tasks.front(),lvp);
         } else {
             popnext();
+        }
+    }
+
+    if (    (tasks.front().tasktype==TT_WAIT_PROP_OK)
+         && (strcmp(tasks.front().devicename.toStdString().c_str(),lvp->device)==0)
+         && (strcmp(tasks.front().propertyname.toStdString().c_str(),lvp->name)==0)
+       )
+    {
+        if (lvp->s==IPS_OK) {
+            if (tasks.front().specific) {
+                executeTaskSpec(tasks.front(),lvp);
+            } else {
+                popnext();
+            }
+        }
+        if (lvp->s==IPS_ALERT) {
+            //tasks =QQueue<Ttask>();
+            setMyElt("messages","messageselt","ERROR" + tasks.front().taskname +"-"+ tasks.front().tasklabel);
         }
     }
 
@@ -617,6 +688,19 @@ void Module::addnewtaskWaitFrameResetOk (QString taskname, QString tasklabel,boo
     task.specific = specific;
     task.devicename= devicename;
     tasks.append(task);
+}
+void Module::addnewtaskWaitPropOk (QString taskname, QString tasklabel,bool specific,
+                 QString devicename,QString propertyname)
+{
+    Ttask task;
+    task.tasktype = TT_WAIT_PROP_OK;
+    task.taskname = taskname;
+    task.tasklabel = tasklabel;
+    task.specific = specific;
+    task.devicename= devicename;
+    task.propertyname= propertyname;
+    tasks.append(task);
+
 }
 
 void Module::dumpTasks(void)

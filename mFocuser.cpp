@@ -282,7 +282,7 @@ void MFocuser::executeTaskSpec(Ttask task)
     if (task.taskname=="gobest") {
 
         addnewtask(TT_SEND_NUMBER,"movebest","Asking focuser to go to best position",false,focuser,focp,foce,getMyNum("valuesprop","bestpos"),"",ISS_OFF);
-        addnewtask(TT_WAIT_NUMBER,"waitbest","Waiting focuser to go to best position",false,focuser,focp,foce,getMyNum("valuesprop","bestpos"),"",ISS_OFF);
+        addnewtaskWaitPropOk(     "waitbest","Waiting focuser to go to best position",false,focuser,focp);
         addnewtask(TT_SEND_NUMBER,"check1","Check request",false,   camera,expp,expe,iexposure,"",ISS_OFF);
         addnewtask(TT_WAIT_BLOB  ,"check2","Check waiting",false,   camera,expp,expe,iexposure,"",ISS_OFF);
         addnewtask(TT_ANALYSE_SEP,"check3","Check Analyse request",false,camera,expp,expe,iexposure,"",ISS_OFF);

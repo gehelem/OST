@@ -9,6 +9,8 @@ enum Tasktype
 {
     /*! Wait new property event from indiserver */
     TT_WAIT_PROP,
+    /*! Wait IPS_OK event from any property from indiserver */
+    TT_WAIT_PROP_OK,
     /*! Wait new number event from indiserver */
     TT_WAIT_NUMBER,
     /*! Wait new text event from indiserver */
@@ -96,6 +98,8 @@ class Module : public QObject
                          QString devicename);
         void addnewtaskWaitFrameResetOk (QString taskname, QString tasklabel,bool specific,
                          QString devicename);
+        void addnewtaskWaitPropOk (QString taskname, QString tasklabel,bool specific,
+                         QString devicename,QString propertyname);
 
         bool taskSendNewNumber(QString deviceName, QString propertyName, QString elementName, double value);
         bool taskSendNewText  (QString deviceName, QString propertyName, QString elementName, QString text);
