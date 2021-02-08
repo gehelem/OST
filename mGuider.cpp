@@ -124,20 +124,20 @@ void MGuider::startCalibration(void)
     resetMyGra("guider","guiderdrift");
     resetMyGra("guider","guidercalib");
 
-    addnewtask(TT_SEND_SWITCH,"fram01","Reset frame",true,   camera,"CCD_FRAME_RESET","RESET",0,"",ISS_ON);
-    addnewtask(TT_WAIT_PROP,  "fram02","Wait frame reset",true, camera,"CCD_FRAME_RESET","RESET",0,"",ISS_OFF);
-    addnewtask(TT_SEND_NUMBER,"fram1" ,"Exp. request",false,camera,expp,expe,iexposure,"",ISS_OFF);
-    addnewtask(TT_WAIT_BLOB  ,"fram2" ,"Exp. waiting",false,camera,expp,expe,iexposure,"",ISS_OFF);
-    addnewtask(TT_ANALYSE_SEP,"fram3" ,"Analyse request",false,camera,expp,expe,iexposure,"",ISS_OFF);
-    addnewtask(TT_WAIT_SEP   ,"fram4" ,"Waiting analyse",false,camera,expp,expe,iexposure,"",ISS_OFF);
-    addnewtask(TT_SPEC       ,"fram5" ,"Save image",true,   camera,expp,expe,iexposure,"",ISS_OFF);
-    addnewtask(TT_SPEC       ,"fram6" ,"Select star",true,   camera,expp,expe,iexposure,"",ISS_OFF);
-    addnewtask(TT_WAIT_PROP,  "fram7","Wait frame reset",true, camera,"CCD_FRAME","",0,"",ISS_OFF);
-    addnewtask(TT_SEND_NUMBER,"fram1" ,"Exp. request",false,camera,expp,expe,iexposure,"",ISS_OFF);
-    addnewtask(TT_WAIT_BLOB  ,"fram2" ,"Exp. waiting",false,camera,expp,expe,iexposure,"",ISS_OFF);
-    addnewtask(TT_ANALYSE_SEP,"fram3" ,"Analyse request",false,camera,expp,expe,iexposure,"",ISS_OFF);
-    addnewtask(TT_WAIT_SEP   ,"fram4" ,"Waiting analyse",false,camera,expp,expe,iexposure,"",ISS_OFF);
-    addnewtask(TT_SPEC       ,"fram5" ,"Save image",true,   camera,expp,expe,iexposure,"",ISS_OFF);
+    addnewtaskFrameReset      ("fram00","Reset frame",false,camera);
+    addnewtaskWaitFrameResetOk("fram01","Wait frame reset",false,camera);
+    addnewtask(TT_SEND_NUMBER ,"fram1" ,"Exp. request",false,camera,expp,expe,iexposure,"",ISS_OFF);
+    addnewtask(TT_WAIT_BLOB   ,"fram2" ,"Exp. waiting",false,camera,expp,expe,iexposure,"",ISS_OFF);
+    addnewtask(TT_ANALYSE_SEP ,"fram3" ,"Analyse request",false,camera,expp,expe,iexposure,"",ISS_OFF);
+    addnewtask(TT_WAIT_SEP    ,"fram4" ,"Waiting analyse",false,camera,expp,expe,iexposure,"",ISS_OFF);
+    addnewtask(TT_SPEC        ,"fram5" ,"Save image",true,   camera,expp,expe,iexposure,"",ISS_OFF);
+    addnewtask(TT_SPEC        ,"fram6" ,"Select star",true,   camera,expp,expe,iexposure,"",ISS_OFF);
+    addnewtaskWaitFrameSetOk ( "fram7","Wait frame set",false,camera);
+    addnewtask(TT_SEND_NUMBER ,"fram1" ,"Exp. request",false,camera,expp,expe,iexposure,"",ISS_OFF);
+    addnewtask(TT_WAIT_BLOB   ,"fram2" ,"Exp. waiting",false,camera,expp,expe,iexposure,"",ISS_OFF);
+    addnewtask(TT_ANALYSE_SEP ,"fram3" ,"Analyse request",false,camera,expp,expe,iexposure,"",ISS_OFF);
+    addnewtask(TT_WAIT_SEP    ,"fram4" ,"Waiting analyse",false,camera,expp,expe,iexposure,"",ISS_OFF);
+    addnewtask(TT_SPEC        ,"fram5" ,"Save image",true,   camera,expp,expe,iexposure,"",ISS_OFF);
     for (int i=0;i<10;i++) {
         addnewtask(TT_SEND_NUMBER,"fram1","Exp. request",false,camera,expp,expe,iexposure,"",ISS_OFF);
         addnewtask(TT_WAIT_BLOB  ,"fram2","Exp. waiting",false,camera,expp,expe,iexposure,"",ISS_OFF);
@@ -147,7 +147,9 @@ void MGuider::startCalibration(void)
         addnewtask(TT_SPEC       ,"fram8" ,"diplay drif",true,   camera,expp,expe,iexposure,"",ISS_OFF);
     }
     addnewtask(TT_SPEC       ,"fram5" ,"Save image",true,   camera,expp,expe,iexposure,"",ISS_OFF);
-    addnewtask(TT_WAIT_PROP,  "fram7","Wait frame reset",true, camera,"CCD_FRAME","",0,"",ISS_OFF);
+
+    addnewtaskFrameReset      ("fram98","Reset frame",false,camera);
+    addnewtaskWaitFrameResetOk("fram99","Wait frame reset",false,camera);
 
 
     executeTask(tasks.front());
@@ -232,31 +234,14 @@ void MGuider::executeTaskSpec(Ttask task,IBLOB *bp)
 }
 void MGuider::executeTaskSpec(Ttask task,INumberVectorProperty *nvp)
 {
-    if (task.taskname=="fram7") {
+    Q_UNUSED(task);
+    Q_UNUSED(nvp);
 
-        if (   (strcmp(tasks.front().devicename.toStdString().c_str(),nvp->device)==0)
-            && (strcmp(tasks.front().propertyname.toStdString().c_str(),nvp->name)==0)
-            && (nvp->s==IPS_OK) ) {
-            setMyElt("messages","messageselt","Frame box OK");
-            popnext();
-            executeTask(tasks.front());
-        }
-
-    }
 }
 void MGuider::executeTaskSpec(Ttask task,ISwitchVectorProperty *svp)
 {
-    if (task.taskname=="fram02") {
-
-        if (   (strcmp(tasks.front().devicename.toStdString().c_str(),svp->device)==0)
-            && (strcmp(tasks.front().propertyname.toStdString().c_str(),svp->name)==0)
-            && (svp->s==IPS_OK) ) {
-            setMyElt("messages","messageselt","Frame reset OK");
-            popnext();
-            executeTask(tasks.front());
-        }
-
-    }
+    Q_UNUSED(task);
+    Q_UNUSED(svp);
 
 }
 void MGuider::executeTaskSpec(Ttask task,ITextVectorProperty *tvp)

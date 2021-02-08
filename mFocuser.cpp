@@ -145,6 +145,8 @@ void MFocuser::startCoarse(void)
 
     addnewtask(TT_SEND_NUMBER,"sendblpos","Asking focuser to go to backlash position",false,focuser,focp,foce,istartpos-iovershoot,"",ISS_OFF);
     addnewtask(TT_WAIT_NUMBER,"waitblpos","Waiting focuser to go to backlash position",false,focuser,focp,foce,istartpos-iovershoot,"",ISS_OFF);
+    addnewtaskFrameReset      ("fram00","Reset frame",false,camera);
+    addnewtaskWaitFrameResetOk("fram01","Wait frame reset",false,camera);
     for (int i=0;i<iiterations;i++) {
         addnewtask(TT_SEND_NUMBER,"sendfocpos","Asking focuser to move",false,focuser,focp,foce,istartpos+i*iincre,"",ISS_OFF);
         addnewtask(TT_WAIT_NUMBER,"waitfocpos","Waiting focuser",false,focuser,focp,foce,istartpos+i*iincre,"",ISS_OFF);

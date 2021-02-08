@@ -150,6 +150,18 @@ void Module::gotnewSwitch(ISwitchVectorProperty *svp)
             }
         }
     }
+    if (    (tasks.front().tasktype==TT_WAIT_FRAME_RESET)
+         && (strcmp(tasks.front().devicename.toStdString().c_str(),svp->device)==0)
+         && (svp->s==IPS_OK)
+         && (strcmp("CCD_FRAME_RESET",svp->name)==0)
+       )
+    {
+        if (tasks.front().specific) {
+            executeTaskSpec(tasks.front(),svp);
+        } else {
+            popnext();
+        }
+    }
 
 }
 
@@ -182,6 +194,25 @@ void Module::gotnewNumber(INumberVectorProperty *nvp)
                     popnext();
                 }
             }
+        }
+    }
+
+    if (    (tasks.front().tasktype==TT_WAIT_FRAME_SET)
+        && (strcmp(tasks.front().devicename.toStdString().c_str(),nvp->device)==0)
+        //&& (nvp->s==IPS_OK)
+        && (strcmp("CCD_FRAME",nvp->name)==0)
+       )
+    {
+        if (nvp->s==IPS_OK) {
+            if (tasks.front().specific) {
+                executeTaskSpec(tasks.front(),nvp);
+            } else {
+                popnext();
+            }
+        }
+        if (nvp->s==IPS_ALERT) {
+            //tasks =QQueue<Ttask>();
+            setMyElt("messages","messageselt","ERROR" + tasks.front().taskname +"-"+ tasks.front().tasklabel);
         }
     }
 }
@@ -388,6 +419,71 @@ void Module::executeTask(Ttask task)
     if (task.tasktype==TT_SPEC) {
         executeTaskSpec(task);
     }
+    if (task.tasktype==TT_FRAME_SET) {
+        INDI::BaseDevice *dp;
+        dp = indiclient->getDevice(task.devicename.toStdString().c_str());
+        if (dp== nullptr)
+        {
+            qDebug() << "Error - unable to find " << task.devicename << " device. Aborting.";
+            tasks =QQueue<Ttask>();
+            return;
+        }
+
+        INumberVectorProperty *prop = nullptr;
+        prop = dp->getNumber("CCD_FRAME");
+        if (prop == nullptr)
+        {
+            qDebug() << "Error - unable to find " << task.devicename << "/" << "CCD_FRAME" << " property. Aborting.";
+            tasks =QQueue<Ttask>();
+            return ;
+        }
+
+        for (int i=0;i<prop->nnp;i++) {
+            if (strcmp(prop->np[i].name, "X") == 0) {
+                prop->np[i].value=task.value0;
+            }
+            if (strcmp(prop->np[i].name, "Y") == 0) {
+                prop->np[i].value=task.value1;
+            }
+            if (strcmp(prop->np[i].name, "WIDTH") == 0) {
+                prop->np[i].value=task.value2;
+            }
+            if (strcmp(prop->np[i].name, "HEIGHT") == 0) {
+                prop->np[i].value=task.value3;
+            }
+        }
+
+        indiclient->sendNewNumber(prop);
+        popnext();
+    }
+    if (task.tasktype==TT_FRAME_RESET) {
+        INDI::BaseDevice *dp;
+        dp = indiclient->getDevice(task.devicename.toStdString().c_str());
+        if (dp== nullptr)
+        {
+            qDebug() << "Error - unable to find " << task.devicename << " device. Aborting.";
+            tasks =QQueue<Ttask>();
+            return;
+        }
+
+        ISwitchVectorProperty *prop = nullptr;
+        prop = dp->getSwitch("CCD_FRAME_RESET");
+        if (prop == nullptr)
+        {
+            qDebug() << "Error - unable to find " << task.devicename << "/" << "CCD_FRAME_RESET" << " property. Aborting.";
+            tasks =QQueue<Ttask>();
+            return ;
+        }
+
+        for (int i=0;i<prop->nsp;i++) {
+            if (strcmp(prop->sp[i].name, "RESET") == 0) {
+                prop->sp[i].s=ISS_ON;
+            }
+        }
+
+        indiclient->sendNewSwitch(prop);
+        popnext();
+    }
 
 }
 void Module::popnext(void)
@@ -395,13 +491,13 @@ void Module::popnext(void)
     if (tasks.size()<=1) {
         //qDebug() << "finished";
         setMyElt("statusprop","status","Idle");
-        //setMyElt("messages","messageselt","Idle");
+        setMyElt("messages","messageselt","Idle");
         emit finished();
     }  else {
         //qDebug() << tasks.front().tasklabel << "finished";
         tasks.pop_front();
         setMyElt("statusprop","status",tasks.front().tasklabel);
-        //setMyElt("messages","messageselt",tasks.front().tasklabel);
+        setMyElt("messages","messageselt",tasks.front().taskname +"-"+ tasks.front().tasklabel);
 
         executeTask(tasks.front());
     }
@@ -472,6 +568,55 @@ void Module::addnewtask (Tasktype tasktype,  QString taskname, QString tasklabel
     task.value= value;
     task.text = text;
     task.sw = sw;
+    tasks.append(task);
+}
+void Module::addnewtaskFrameSet (QString taskname, QString tasklabel,bool specific,
+                 QString devicename, double x,double y,double width,double height)
+{
+
+    Ttask task;
+    task.tasktype = TT_FRAME_SET;
+    task.taskname = taskname;
+    task.tasklabel = tasklabel;
+    task.specific = specific;
+    task.devicename= devicename;
+    task.value0=x;
+    task.value1=y;
+    task.value2=width;
+    task.value3=height;
+    tasks.append(task);
+}
+void Module::addnewtaskFrameReset (QString taskname, QString tasklabel,bool specific,
+                 QString devicename)
+{
+    Ttask task;
+    task.tasktype = TT_FRAME_RESET;
+    task.taskname = taskname;
+    task.tasklabel = tasklabel;
+    task.specific = specific;
+    task.devicename= devicename;
+    tasks.append(task);
+}
+void Module::addnewtaskWaitFrameSetOk (QString taskname, QString tasklabel,bool specific,
+                 QString devicename)
+{
+    Ttask task;
+    task.tasktype = TT_WAIT_FRAME_SET;
+    task.taskname = taskname;
+    task.tasklabel = tasklabel;
+    task.specific = specific;
+    task.devicename= devicename;
+    tasks.append(task);
+}
+void Module::addnewtaskWaitFrameResetOk (QString taskname, QString tasklabel,bool specific,
+                 QString devicename)
+{
+    Ttask task;
+    task.tasktype = TT_WAIT_FRAME_RESET;
+    task.taskname = taskname;
+    task.tasklabel = tasklabel;
+    task.specific = specific;
+    task.devicename= devicename;
     tasks.append(task);
 }
 

@@ -34,7 +34,15 @@ enum Tasktype
     /*! Asking Stellarsolver to solve field */
     TT_ANALYSE_SOLVE,
     /*! calling specific task, to be defined in inherited module */
-    TT_SPEC
+    TT_SPEC,
+    /*! Sends new frame values do CCD */
+    TT_FRAME_SET,
+    /*! Resets frame values */
+    TT_FRAME_RESET,
+    /*! Wait OK status from frame set property */
+    TT_WAIT_FRAME_SET,
+    /*! Wait OK status from frame set property */
+    TT_WAIT_FRAME_RESET
 };
 
 struct Ttask
@@ -47,9 +55,15 @@ struct Ttask
     QString devicename;
     QString propertyname;
     QString elementname;
-    double value;
     QString text;
     ISState sw;
+    double value;
+    double value0;
+    double value1;
+    double value2;
+    double value3;
+    double value4;
+
 };
 /*!
  * This Class shouldn't be used as is
@@ -74,6 +88,14 @@ class Module : public QObject
         void addnewtask (Tasktype tasktype,  QString taskname, QString tasklabel,bool specific,
                         QString devicename,QString propertyname,QString elementname,
                         double value,QString text,ISState sw);
+        void addnewtaskFrameSet (QString taskname, QString tasklabel,bool specific,
+                         QString devicename, double x,double y,double width,double height);
+        void addnewtaskFrameReset (QString taskname, QString tasklabel,bool specific,
+                         QString devicename);
+        void addnewtaskWaitFrameSetOk (QString taskname, QString tasklabel,bool specific,
+                         QString devicename);
+        void addnewtaskWaitFrameResetOk (QString taskname, QString tasklabel,bool specific,
+                         QString devicename);
 
         bool taskSendNewNumber(QString deviceName, QString propertyName, QString elementName, double value);
         bool taskSendNewText  (QString deviceName, QString propertyName, QString elementName, QString text);
