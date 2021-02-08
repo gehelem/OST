@@ -16,6 +16,8 @@ INPUT = ./client.cpp \
         ./image.h \
         ./module.cpp \
         ./module.h \
+        ./polynomialfit.cpp \
+        ./polynomialfit.h \
         ./ost.cpp \
         ./mSequence.cpp \
         ./mSequence.h \
