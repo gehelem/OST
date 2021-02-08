@@ -1,4 +1,5 @@
 #include "mFocuser.h"
+#include "polynomialfit.h"
 
 MFocuser::MFocuser(MyClient *cli,Properties *properties) : Module(cli,properties)
 {
@@ -122,6 +123,45 @@ void MFocuser::startFraming(void)
 void MFocuser::startFine(void)
 {
     qDebug() << "start fine focus request from ws";
+    posvector.clear();
+    hfdvector.clear();
+    coefficients.clear();
+    QString expp        = getMyTxt("indiprops","expp");
+    QString expe        = getMyTxt("indiprops","expe");
+    QString focp        = getMyTxt("indiprops","focp");
+    QString foce        = getMyTxt("indiprops","foce");
+    QString camera      = getMyTxt("devices","camera");
+    QString focuser     = getMyTxt("devices","focuser");
+    double istartpos    = getMyNum("parms","startpos");
+    double iovershoot   = getMyNum("parms","overshoot");
+    double iincre       = getMyNum("parms","incre");
+    double iiterations  = getMyNum("parms","iterations");
+    double iexposure    = getMyNum("parms","exposure");
+    resetMyGra("curve","curve1");
+
+    setMyElt("valuesprop","besthfravg",99);
+
+    addnewtask(TT_SEND_NUMBER,"sendblpos","Asking focuser to go to backlash position",false,focuser,focp,foce,istartpos-iovershoot,"",ISS_OFF);
+    addnewtask(TT_WAIT_NUMBER,"waitblpos","Waiting focuser to go to backlash position",false,focuser,focp,foce,istartpos-iovershoot,"",ISS_OFF);
+    addnewtaskFrameReset      ("fram00","Reset frame",false,camera);
+    addnewtaskWaitFrameResetOk("fram01","Wait frame reset",false,camera);
+    for (int i=0;i<iiterations;i++) {
+        addnewtask(TT_SEND_NUMBER,"sendfocpos","Asking focuser to move",false,focuser,focp,foce,istartpos+i*iincre,"",ISS_OFF);
+        addnewtask(TT_WAIT_NUMBER,"waitfocpos","Waiting focuser",false,focuser,focp,foce,istartpos+i*iincre,"",ISS_OFF);
+        addnewtask(TT_SEND_NUMBER,"fram1","Exp. request",false,camera,expp,expe,iexposure,"",ISS_OFF);
+        addnewtask(TT_WAIT_BLOB  ,"fram2","Exp. waiting",false,camera,expp,expe,iexposure,"",ISS_OFF);
+        addnewtask(TT_ANALYSE_SEP,"fram3","Analyse request",false,camera,expp,expe,iexposure,"",ISS_OFF);
+        addnewtask(TT_WAIT_SEP   ,"fram4","Waiting analyse",false,camera,expp,expe,iexposure,"",ISS_OFF);
+        addnewtask(TT_SPEC       ,"fram45","save image",true,   camera,expp,expe,istartpos+i*iincre,"",ISS_OFF);
+        addnewtask(TT_SPEC       ,"fram55","store pos/hfr",true,   camera,expp,expe,istartpos+i*iincre,"",ISS_OFF);
+
+    }
+    addnewtask(TT_SPEC,"gobest","Asking focuser to go to best position",true,focuser,"","",0,"",ISS_OFF);
+
+
+
+    //dumpTasks();
+    executeTask(tasks.front());
 }
 
 void MFocuser::startCoarse(void)
@@ -205,6 +245,31 @@ void MFocuser::executeTaskSpec(Ttask task)
         popnext();
         executeTask(tasks.front());
     }
+
+    if (task.taskname=="fram55") {
+        Prop prop = getMyProp("valuesprop");
+        prop.n["hfravg"].value=image->HFRavg;
+        prop.n["starscount"].value=image->stars.count();
+        prop.n["focuspos"].value=task.value;
+        OGraphValue v;
+        v.v0=task.value;
+        v.v1=image->HFRavg;
+        appendMyGra("curve","curve1",v);
+        posvector.push_back(task.value);
+        hfdvector.push_back(image->HFRavg);
+
+        if (posvector.size() > 2)
+        {
+            double coeff[3];
+            polynomialfit(posvector.size(), 3, posvector.data(), hfdvector.data(), coeff);
+            prop.n["bestpos"].value = -coeff[1]/(2*coeff[2]);
+        }
+
+        setMyProp(prop.propname,prop);
+        popnext();
+        executeTask(tasks.front());
+    }
+
     if (task.taskname=="check5") {
         Prop prop = getMyProp("valuesprop");
         prop.n["hfravg"].value=image->HFRavg;

@@ -23,6 +23,9 @@ class MFocuser : public Module
         void slotvalueChangedFromCtl(Prop prop);
    public slots:
         void test(void);
-
+   private:
+        std::vector<double> posvector;
+        std::vector<double> hfdvector;
+        std::vector<double> coefficients;
 };
 #endif

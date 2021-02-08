@@ -199,7 +199,6 @@ void Module::gotnewNumber(INumberVectorProperty *nvp)
 
     if (    (tasks.front().tasktype==TT_WAIT_FRAME_SET)
         && (strcmp(tasks.front().devicename.toStdString().c_str(),nvp->device)==0)
-        //&& (nvp->s==IPS_OK)
         && (strcmp("CCD_FRAME",nvp->name)==0)
        )
     {

@@ -60,6 +60,7 @@ add_executable( ${APP_EXEOST}
         ${CMAKE_CURRENT_SOURCE_DIR}/image.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/properties.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/jsonparser.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/polynomialfit.cpp
     )
 
 

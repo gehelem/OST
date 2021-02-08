@@ -131,6 +131,8 @@ void MNavigator::startGoto(void)
 
     addnewtask(TT_SPEC,"setradec","Sending RA/DEC",true,mount,"","",0,"",ISS_OFF);
     addnewtask(TT_WAIT_PROP,"waitradec","Waiting slew end",true,mount,radecp,"",0,"",ISS_OFF);
+    addnewtaskFrameReset      ("fram00","Reset frame",false,camera);
+    addnewtaskWaitFrameResetOk("fram01","Wait frame reset",false,camera);
     addnewtask(TT_SEND_NUMBER,"fram1","Exp. request",false,camera,expp,expe,iexposure,"",ISS_OFF);
     addnewtask(TT_WAIT_BLOB  ,"fram2","Exp. waiting",false,camera,expp,expe,iexposure,"",ISS_OFF);
     addnewtask(TT_ANALYSE_SOLVE,"fram3","Analyse request",false,camera,expp,expe,iexposure,"",ISS_OFF);
