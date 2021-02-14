@@ -69,11 +69,6 @@ void MGuider::initProperties(void)
     appendMyElt ("indiprops","guideE"  , "TIMED_GUIDE_E" ,"Pulse E","","");
 }
 
-void MGuider::test(void)
-{
-    qDebug() << "test";
-}
-
 void MGuider::slotvalueChangedFromCtl(Prop prop)
 {
     if (prop.modulename!=modulename) return;

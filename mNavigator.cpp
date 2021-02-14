@@ -63,11 +63,6 @@ void MNavigator::initProperties(void)
 
 }
 
-void MNavigator::test(void)
-{
-    qDebug() << "test";
-}
-
 void MNavigator::slotvalueChangedFromCtl(Prop prop)
 {
     if (prop.modulename!=modulename) return;

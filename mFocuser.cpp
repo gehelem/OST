@@ -77,10 +77,6 @@ void MFocuser::initProperties(void)
 
 }
 
-void MFocuser::test(void)
-{
-    qDebug() << "test";
-}
 void MFocuser::slotvalueChangedFromCtl(Prop prop)
 {
     if (prop.modulename!=modulename) return;

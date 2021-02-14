@@ -180,8 +180,6 @@ class Module : public QObject
         void signalpropDeleted(Prop prop);
         void signalvalueChanged(Prop prop);
         void signalAppendGraph (Prop prop,OGraph gra,OGraphValue val);
-        //virtual void taskblob();
-    protected:
 
 }
 ;

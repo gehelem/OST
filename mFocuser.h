@@ -8,8 +8,15 @@ class MFocuser : public Module
     public:
         MFocuser(Properties *properties);
         ~MFocuser();
-
         void initProperties(void);
+
+    public slots:
+        void slotvalueChangedFromCtl(Prop prop);
+
+    private:
+        std::vector<double> posvector;
+        std::vector<double> hfdvector;
+        std::vector<double> coefficients;
         void startFraming(void);
         void startCoarse(void);
         void startFine(void);
@@ -20,12 +27,6 @@ class MFocuser : public Module
         void executeTaskSpec(Ttask task,ISwitchVectorProperty *svp) ;
         void executeTaskSpec(Ttask task,ITextVectorProperty *tvp) ;
         void executeTaskSpec(Ttask task,ILightVectorProperty *lvp) ;
-        void slotvalueChangedFromCtl(Prop prop);
-   public slots:
-        void test(void);
-   private:
-        std::vector<double> posvector;
-        std::vector<double> hfdvector;
-        std::vector<double> coefficients;
+
 };
 #endif

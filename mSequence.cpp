@@ -16,11 +16,6 @@ void MSequence::initProperties(void)
 
 }
 
-void MSequence::test(void)
-{
-    qDebug() << "test";
-}
-
 void MSequence::slotvalueChangedFromCtl(Prop prop)
 {
     if (prop.modulename!=modulename) return;

@@ -74,11 +74,6 @@ void MMainctl::initProperties(void)
 
 }
 
-void MMainctl::test(void)
-{
-    qDebug() << "test";
-}
-
 void MMainctl::slotvalueChangedFromCtl(Prop prop)
 {
     //qDebug() << "mainctl" << prop.propname << "received";
