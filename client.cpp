@@ -18,7 +18,22 @@
 /**************************************************************************************
 **
 ***************************************************************************************/
-MyClient::MyClient(QObject *parent)
+
+
+/* singleton  : getting unique instance if exists, create it if not */
+MyClient* MyClient::getInstance()
+{
+    if (instance == 0)
+    {
+        instance = new MyClient();
+    }
+
+    return instance;
+}
+/* Null, because instance will be initialized on demand. */
+MyClient* MyClient::instance = 0;
+
+MyClient::MyClient()
 {
 }
 

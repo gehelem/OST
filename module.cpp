@@ -5,7 +5,7 @@
 Module::Module(MyClient *cli,Properties *properties)
 {
     //qDebug() << "Instanciation";
-    indiclient=cli;
+    indiclient=MyClient::getInstance();
     props=properties;
     initProperties();
     connect(indiclient,&MyClient::gotserverConnected,this,&Module::gotserverConnected);

@@ -9,7 +9,8 @@ Controller::Controller(QObject *parent)
 
     this->setParent(parent);
 
-    indiclient = new MyClient(this);
+    indiclient = MyClient::getInstance();
+
     properties = new Properties(this);
     wshandler = new WShandler(this,properties);
 
