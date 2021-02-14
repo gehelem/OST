@@ -1,6 +1,6 @@
 #include "mNavigator.h"
 
-MNavigator::MNavigator(MyClient *cli,Properties *properties) : Module(cli,properties)
+MNavigator::MNavigator(Properties *properties) : Module(properties)
 {
 }
 MNavigator::~MNavigator()

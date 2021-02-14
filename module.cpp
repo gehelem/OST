@@ -2,7 +2,7 @@
 #include <basedevice.h>
 #include "module.h"
 
-Module::Module(MyClient *cli,Properties *properties)
+Module::Module(Properties *properties)
 {
     //qDebug() << "Instanciation";
     indiclient=MyClient::getInstance();

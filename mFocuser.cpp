@@ -1,7 +1,7 @@
 #include "mFocuser.h"
 #include "polynomialfit.h"
 
-MFocuser::MFocuser(MyClient *cli,Properties *properties) : Module(cli,properties)
+MFocuser::MFocuser(Properties *properties) : Module(properties)
 {
 }
 MFocuser::~MFocuser()

@@ -6,7 +6,7 @@ class MNavigator : public Module
 {
     Q_OBJECT
     public:
-        MNavigator(MyClient *cli,Properties *properties);
+        MNavigator(Properties *properties);
         ~MNavigator();
 
         void startGoto(void);

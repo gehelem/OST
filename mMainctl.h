@@ -6,7 +6,7 @@ class MMainctl : public Module
 {
     Q_OBJECT
     public:
-        MMainctl(MyClient *cli,Properties *properties);
+        MMainctl(Properties *properties);
         ~MMainctl();
 
         void initProperties(void);

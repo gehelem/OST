@@ -1,7 +1,7 @@
 #include "mMainctl.h"
 
 
-MMainctl::MMainctl(MyClient *cli,Properties *properties) : Module(cli,properties)
+MMainctl::MMainctl(Properties *properties) : Module(properties)
 {
 }
 MMainctl::~MMainctl()

@@ -1,6 +1,6 @@
 #include "mSequence.h"
 
-MSequence::MSequence(MyClient *cli,Properties *properties) : Module(cli,properties)
+MSequence::MSequence(Properties *properties) : Module(properties)
 {
 }
 MSequence::~MSequence()

@@ -12,7 +12,7 @@ class MyClient : public INDI::BaseClientQt
 {
     Q_OBJECT
   public:
-    /* Static access method. */
+    /* Singleton : Static access method. */
     static MyClient* getInstance();
     bool connectIndi(void);
     void connectAllDevices(void);

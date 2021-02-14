@@ -6,7 +6,7 @@ class MGuider : public Module
 {
     Q_OBJECT
     public:
-        MGuider(MyClient *cli,Properties *properties);
+        MGuider(Properties *properties);
         ~MGuider();
 
         void startCalibration(void);

@@ -1,6 +1,6 @@
 #include "mGuider.h"
 
-MGuider::MGuider(MyClient *cli,Properties *properties) : Module(cli,properties)
+MGuider::MGuider(Properties *properties) : Module(properties)
 {
 }
 MGuider::~MGuider()

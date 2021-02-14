@@ -75,8 +75,8 @@ struct Ttask
 class Module : public QObject
 {
     Q_OBJECT
-    public:
-        Module(MyClient *cli,Properties *properties);
+    protected:
+        Module(Properties *properties);
         ~Module();
         QString modulename;
         MyClient *indiclient;

@@ -14,7 +14,7 @@ Controller::Controller(QObject *parent)
     properties = new Properties(this);
     wshandler = new WShandler(this,properties);
 
-    focuser = new MFocuser(indiclient,properties);
+    focuser = new MFocuser(properties);
     connect(focuser,&MFocuser::signalvalueChanged,this,&Controller::valueChanged);
     connect(focuser,&MFocuser::signalpropCreated,this,&Controller::propCreated);
     connect(focuser,&MFocuser::signalpropDeleted,this,&Controller::propDeleted);
@@ -22,7 +22,7 @@ Controller::Controller(QObject *parent)
     connect(wshandler,&WShandler::changeValue,focuser,&MFocuser::slotvalueChangedFromCtl);
     focuser->initProperties();
 
-    mainctl = new MMainctl(indiclient,properties);
+    mainctl = new MMainctl(properties);
     connect(mainctl,&MMainctl::signalvalueChanged,this,&Controller::valueChanged);
     connect(mainctl,&MMainctl::signalpropCreated,this,&Controller::propCreated);
     connect(mainctl,&MMainctl::signalpropDeleted,this,&Controller::propDeleted);
@@ -30,7 +30,7 @@ Controller::Controller(QObject *parent)
     connect(wshandler,&WShandler::changeValue,mainctl,&MMainctl::slotvalueChangedFromCtl);
     mainctl->initProperties();
 
-    navigator = new MNavigator(indiclient,properties);
+    navigator = new MNavigator(properties);
     connect(navigator,&MNavigator::signalvalueChanged,this,&Controller::valueChanged);
     connect(navigator,&MNavigator::signalpropCreated,this,&Controller::propCreated);
     connect(navigator,&MNavigator::signalpropDeleted,this,&Controller::propDeleted);
@@ -38,7 +38,7 @@ Controller::Controller(QObject *parent)
     connect(wshandler,&WShandler::changeValue,navigator,&MNavigator::slotvalueChangedFromCtl);
     navigator->initProperties();
 
-    guider= new MGuider(indiclient,properties);
+    guider= new MGuider(properties);
     connect(guider,&MGuider::signalvalueChanged,this,&Controller::valueChanged);
     connect(guider,&MGuider::signalpropCreated,this,&Controller::propCreated);
     connect(guider,&MGuider::signalpropDeleted,this,&Controller::propDeleted);
