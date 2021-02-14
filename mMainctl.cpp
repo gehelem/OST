@@ -115,7 +115,7 @@ void MMainctl::slotvalueChangedFromCtl(Prop prop)
 
         if (prop.s["loadconfs"].s==OSS_ON)
         {
-            indiclient->connectAllDevices();
+            indiclient->loadDevicesConfs();
             myprop.state=OPS_OK;
             myprop.s["loadconfs"].s=OSS_OFF;
             setMyProp("buttonsprop",myprop);
