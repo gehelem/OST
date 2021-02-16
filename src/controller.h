@@ -1,10 +1,6 @@
 #ifndef CONTROLLER_h_
 #define CONTROLLER_h_
-#include "mFocuser.h"
-#include "mMainctl.h"
-#include "mSequence.h"
-#include "mGuider.h"
-#include "mNavigator.h"
+#include "focus.h"
 #include "wshandler.h"
 #include "properties.h"
 
@@ -24,11 +20,7 @@ public:
     ~Controller();
     MyClient    *indiclient;
     Properties  *properties;
-    MFocuser    *focuser;
-    MGuider     *guider;
-    MSequence   *sequence;
-    MNavigator  *navigator;
-    MMainctl    *mainctl;
+    FocusModule    *focuser;
     WShandler   *wshandler;
 public slots:
     void valueChanged(Prop prop);

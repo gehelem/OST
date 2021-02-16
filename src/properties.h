@@ -312,6 +312,8 @@ typedef struct
     QMap<QString,OGraph>    g;
 } Prop;
 
+Q_DECLARE_METATYPE(Prop);
+
 typedef struct
 {
     QString                 groupname;

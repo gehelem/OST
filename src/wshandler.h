@@ -34,6 +34,7 @@ public slots:
 signals:
     void closed();
     void changeValue(Prop prop);
+    void textRcv(QString txt);
 private:
 };
 #endif

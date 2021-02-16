@@ -3,8 +3,7 @@
 #include <baseclientqt.h>
 /*!
  * indiclient class, overloaded with some basic functions to help us
- * it should be instanciated only once, to keep only one active connection to indiserver
- *
+ * it should be instanciated only once, to keep only one active connection to indiserver :
  * This class is declared as a singleton https://gist.github.com/pazdera/1098119
  * To make sure to keep a unique instance shared by each module
 */
@@ -14,10 +13,7 @@ class MyClient : public INDI::BaseClientQt
   public:
     /* Singleton : Static access method. */
     static MyClient* getInstance();
-    bool connectIndi(void);
-    void connectAllDevices(void);
-    void disconnectAllDevices(void);
-    void loadDevicesConfs(void);
+
   signals:
     void gotserverConnected();
     void gotserverDisconnected(int exit_code);
@@ -52,8 +48,6 @@ private:
     ~MyClient() = default;
     /* Singleton instance storage. */
     static MyClient* instance;
-
-
 
 }
 ;

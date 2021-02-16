@@ -32,6 +32,8 @@ find_package(Qt5 5.4 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network Web
 find_package(StellarSolver REQUIRED)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules)
 include_directories(${INDI_INCLUDE_DIR})
 include_directories(${CFITSIO_INCLUDE_DIR})
 include_directories(${GSL_INCLUDE_DIRS})
@@ -48,20 +50,16 @@ include(CMakeCommon)
 SET( APP_EXEOST ost )
 
 add_executable( ${APP_EXEOST}
-        ${CMAKE_CURRENT_SOURCE_DIR}/module.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/mFocuser.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/mGuider.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/mNavigator.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/mSequence.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/mMainctl.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/client.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/ost.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/controller.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/wshandler.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/image.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/properties.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/jsonparser.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/polynomialfit.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/module.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/client.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ost.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/controller.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/wshandler.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/image.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/properties.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/jsonparser.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/polynomialfit.cpp
     )
 
 

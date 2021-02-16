@@ -9,6 +9,8 @@ class MFocuser : public Module
         MFocuser(Properties *properties);
         ~MFocuser();
         void initProperties(void);
+        Q_PROPERTY(Prop rrrrr);
+        Q_PROPERTY(ONumber nnnn);
 
     public slots:
         void slotvalueChangedFromCtl(Prop prop);

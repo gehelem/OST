@@ -11,6 +11,8 @@ MFocuser::~MFocuser()
 
 void MFocuser::initProperties(void)
 {
+    QString krikri;
+    this->setProperty("krikrikri",krikri);
     modulename="focuser";
     createMyModule("Focuser",20);
     createMyProp("messages","Messages",PT_MESSAGE,"","", OP_RO,OSR_NOFMANY,0,OPS_IDLE,"","",00);
