@@ -50,8 +50,8 @@ include(CMakeCommon)
 SET( APP_EXEOST ost )
 
 add_executable( ${APP_EXEOST}
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/module.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/module.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/client.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/ost.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/controller.cpp
