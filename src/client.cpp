@@ -55,7 +55,6 @@ void MyClient::removeDevice(INDI::BaseDevice *dp)
 }
 void MyClient::newProperty(INDI::Property *property)
 {
-    qDebug() << "new prop" << property->getName();
     emit gotnewProperty(property);
 }
 void MyClient::removeProperty(INDI::Property *property)
@@ -66,7 +65,7 @@ void MyClient::newNumber(INumberVectorProperty *nvp)
 {
     //if (strcmp(svp->name,"CONFIG_PROCESS")==0)
     //for (int i=0;i<nvp->nnp;i++) IDLog("Got number %s %s %s %f\n",nvp->device,nvp->name,nvp->np[i].name,nvp->np[i].value);
-    emit gotnewNumber(nvp);
+    emit SigNewNumber(nvp);
 }
 void MyClient::newText(ITextVectorProperty *tvp)
 {
@@ -88,6 +87,36 @@ void MyClient::newMessage(INDI::BaseDevice *dp, int messageID)
 }
 void MyClient::newBLOB(IBLOB *bp)
 {
-    emit gotnewBLOB(bp);
+    emit SigNewBLOB(bp);
 }
 
+bool MyClient::sssendNewNumber(QString deviceName, QString propertyName,QString  elementName, double value)
+{
+    //qDebug() << "taskSendNewNumber" << " " << deviceName << " " << propertyName<< " " << elementName;
+    INDI::BaseDevice *dp;
+    dp = getDevice(deviceName.toStdString().c_str());
+
+    if (dp== nullptr)
+    {
+        qDebug() << "Error - unable to find " << deviceName << " device. Aborting.";
+        return false;
+    }
+    INumberVectorProperty *prop = nullptr;
+    prop = dp->getNumber(propertyName.toStdString().c_str());
+    if (prop == nullptr)
+    {
+        qDebug() << "Error - unable to find " << deviceName << "/" << propertyName << " property. Aborting.";
+        return false;
+    }
+
+    for (int i=0;i<prop->nnp;i++) {
+        if (strcmp(prop->np[i].name, elementName.toStdString().c_str()) == 0) {
+            prop->np[i].value=value;
+            sendNewNumber(prop);
+            return true;
+        }
+    }
+    qDebug() << "Error - unable to find " << deviceName << "/" << propertyName << "/" << elementName << " element. Aborting.";
+    return false;
+
+}

@@ -13,22 +13,7 @@ class MyClient : public INDI::BaseClientQt
   public:
     /* Singleton : Static access method. */
     static MyClient* getInstance();
-
-  signals:
-    void gotserverConnected();
-    void gotserverDisconnected(int exit_code);
-    void gotnewDevice(INDI::BaseDevice *dp);
-    void gotremoveDevice(INDI::BaseDevice *dp);
-    void gotnewProperty(INDI::Property *property);
-    void gotremoveProperty(INDI::Property *property);
-    void gotnewText(ITextVectorProperty *tvp);
-    void gotnewSwitch(ISwitchVectorProperty *svp);
-    void gotnewLight(ILightVectorProperty *lvp);
-    void gotnewBLOB(IBLOB *bp);
-    void gotnewNumber(INumberVectorProperty *nvp);
-    void gotnewMessage(INDI::BaseDevice *dp, int messageID);
-
-    protected:
+    bool sssendNewNumber(QString deviceName, QString propertyName,QString  elementName, double value);
     virtual void serverConnected();
     virtual void serverDisconnected(int exit_code);
     virtual void newDevice(INDI::BaseDevice *dp);
@@ -41,6 +26,22 @@ class MyClient : public INDI::BaseClientQt
     virtual void newBLOB(IBLOB *bp);
     virtual void newNumber(INumberVectorProperty *nvp);
     virtual void newMessage(INDI::BaseDevice *dp, int messageID);
+
+  signals:
+    void gotserverConnected();
+    void gotserverDisconnected(int exit_code);
+    void gotnewDevice(INDI::BaseDevice *dp);
+    void gotremoveDevice(INDI::BaseDevice *dp);
+    void gotnewProperty(INDI::Property *property);
+    void gotremoveProperty(INDI::Property *property);
+    void gotnewText(ITextVectorProperty *tvp);
+    void gotnewSwitch(ISwitchVectorProperty *svp);
+    void gotnewLight(ILightVectorProperty *lvp);
+    void SigNewBLOB(IBLOB *bp);
+    void SigNewNumber(INumberVectorProperty *nvp);
+    void gotnewMessage(INDI::BaseDevice *dp, int messageID);
+
+    protected:
 
 private:
     /* Private constructor to prevent instancing. */

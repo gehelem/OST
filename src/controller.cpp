@@ -9,12 +9,15 @@ Controller::Controller(QObject *parent)
 
     this->setParent(parent);
 
-//    indiclient = MyClient::getInstance();
+    indiclient = MyClient::getInstance();
 
     wshandler = new WShandler(this,properties);
 
     focuser = new FocusModule();
+    focuser->setProperty("modulename","focuser of the death");
     connect(wshandler,&WShandler::textRcv,focuser,&FocusModule::test0);
+    /*focuser2 = new FocusModule();
+    connect(wshandler,&WShandler::textRcv,focuser2,&FocusModule::test0);*/
 
 
     //properties->dumproperties();

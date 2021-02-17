@@ -4,7 +4,6 @@
 
 Module::Module()
 {
-    sendMessage("parent constructor call");
     indiclient=MyClient::getInstance();
     connect(indiclient,&MyClient::gotserverConnected,this,&Module::gotserverConnected);
     connect(indiclient,&MyClient::gotserverDisconnected,this,&Module::gotserverDisconnected);
@@ -15,8 +14,8 @@ Module::Module()
     connect(indiclient,&MyClient::gotnewText,this,&Module::gotnewText);
     connect(indiclient,&MyClient::gotnewSwitch,this,&Module::gotnewSwitch);
     connect(indiclient,&MyClient::gotnewLight,this,&Module::gotnewLight);
-    connect(indiclient,&MyClient::gotnewBLOB,this,&Module::gotnewBLOB);
-    connect(indiclient,&MyClient::gotnewNumber,this,&Module::gotnewNumber);
+    /*connect(indiclient,&MyClient::gotnewBLOB,this,&Module::gotnewBLOB);*/
+    /*connect(indiclient,&MyClient::IndiNewNumber,this,&Module::SigNewNumber);*/
     connect(indiclient,&MyClient::gotnewMessage,this,&Module::gotnewMessage);
 
 }
@@ -25,8 +24,8 @@ Module::~Module()
 }
 void Module::sendMessage(QString message)
 {
-    QString mess = QDateTime::currentDateTime().toString("[yyyyMMdd hh:mm:ss.zzz]") + "-"+ message;
-    qDebug() << mess;
+    QString mess = QDateTime::currentDateTime().toString("[yyyyMMdd hh:mm:ss.zzz]") + " - " + _modulename + " - " + message;
+    qDebug() << mess.toStdString().c_str();
     emit newMessage(mess);
 }
 /*!
@@ -40,17 +39,33 @@ bool Module::connectIndi()
 
     if (indiclient->isServerConnected())
     {
-        sendMessage("Indi server connected1");
+        sendMessage("Indi server already connected");
         return true;
     } else {
         indiclient->setServer("localhost", 7624);
         if (indiclient->connectServer()){
-            sendMessage("Indi server connected2");
+            sendMessage("Indi server connected");
             return true;
         } else {
             sendMessage("Couldn't connect to Indi server");
             return false;
         }
+    }
+}
+bool Module::disconnectIndi(void)
+{
+    if (indiclient->isServerConnected())
+    {
+        if (indiclient->disconnectServer()){
+            sendMessage("Indi server disconnected");
+            return true;
+        } else {
+            sendMessage("Couldn't disconnect from Indi server");
+            return false;
+        }
+    } else {
+        sendMessage("Indi server already disconnected");
+        return true;
     }
 }
 
@@ -145,78 +160,11 @@ void Module::loadDevicesConfs()
         }
     }
 }
-void Module::gotserverConnected()
-{
-    //qDebug() << "gotserverConnected";
 
-}
-void Module::gotserverDisconnected(int exit_code)
-{
-    //qDebug() << "gotserverDisconnected";
-    Q_UNUSED(exit_code);
-}
-void Module::gotnewDevice(INDI::BaseDevice *dp)
-{
-    //qDebug() << "gotnewDevice : " << dp->getDeviceName();
-    Q_UNUSED(dp);
-}
-void Module::gotremoveDevice(INDI::BaseDevice *dp)
-{
-    //qDebug() << "gotremoveDevice";
-    Q_UNUSED(dp);
-}
-void Module::gotnewProperty(INDI::Property *property)
-{
-    //qDebug() << "gotnewProperty" << tasks.size();
-    Q_UNUSED(property);
-
-}
-void Module::gotremoveProperty(INDI::Property *property)
-{
-    //qDebug() << "gotremoveProperty";
-    Q_UNUSED(property);
-}
-
-
-void Module::gotnewText(ITextVectorProperty *tvp)
-{
-    //qDebug() << "gotnewText";
-    Q_UNUSED(tvp);
-}
-
-void Module::gotnewSwitch(ISwitchVectorProperty *svp)
-{
-   // qDebug() << "gotnewSwitch";
-    Q_UNUSED(svp);
-}
-
-void Module::gotnewNumber(INumberVectorProperty *nvp)
-{
-    //qDebug() << "gotnewNumber";
-    Q_UNUSED(nvp);
-}
-void Module::gotnewLight(ILightVectorProperty *lvp)
-{
-    //qDebug() << "gotnewLight";
-    Q_UNUSED(lvp);
-
-}
-void Module::gotnewBLOB(IBLOB *bp)
-{
-    //qDebug() << "gotnewBLOB";
-    Q_UNUSED(bp);
-}
-void Module::gotnewMessage(INDI::BaseDevice *dp, int messageID)
-{
-    //qDebug() << "gotnewMessage";
-    Q_UNUSED(dp);
-    Q_UNUSED(messageID);
-}
 
 bool Module::sendNewNumber(QString deviceName, QString propertyName,QString  elementName, double value)
 {
     //qDebug() << "taskSendNewNumber" << " " << deviceName << " " << propertyName<< " " << elementName;
-    sleep(1);
     INDI::BaseDevice *dp;
     dp = indiclient->getDevice(deviceName.toStdString().c_str());
 
@@ -365,5 +313,76 @@ bool Module::frameReset(QString devicename)
 
     indiclient->sendNewSwitch(prop);
     return true;
+}
+
+
+
+
+void Module::gotserverConnected()
+{
+    //qDebug() << "gotserverConnected";
+
+}
+void Module::gotserverDisconnected(int exit_code)
+{
+    //qDebug() << "gotserverDisconnected";
+    Q_UNUSED(exit_code);
+}
+void Module::gotnewDevice(INDI::BaseDevice *dp)
+{
+    //qDebug() << "gotnewDevice : " << dp->getDeviceName();
+    Q_UNUSED(dp);
+}
+void Module::gotremoveDevice(INDI::BaseDevice *dp)
+{
+    //qDebug() << "gotremoveDevice";
+    Q_UNUSED(dp);
+}
+void Module::gotnewProperty(INDI::Property *property)
+{
+    //qDebug() << "gotnewProperty" << tasks.size();
+    Q_UNUSED(property);
+
+}
+void Module::gotremoveProperty(INDI::Property *property)
+{
+    //qDebug() << "gotremoveProperty";
+    Q_UNUSED(property);
+}
+
+
+void Module::gotnewText(ITextVectorProperty *tvp)
+{
+    //qDebug() << "gotnewText";
+    Q_UNUSED(tvp);
+}
+
+void Module::gotnewSwitch(ISwitchVectorProperty *svp)
+{
+   // qDebug() << "gotnewSwitch";
+    Q_UNUSED(svp);
+}
+
+/*void Module::gotnewNumber(INumberVectorProperty *nvp)
+{
+    //qDebug() << "gotnewNumber";
+    Q_UNUSED(nvp);
+}*/
+void Module::gotnewLight(ILightVectorProperty *lvp)
+{
+    //qDebug() << "gotnewLight";
+    Q_UNUSED(lvp);
+
+}
+/*void Module::gotnewBLOB(IBLOB *bp)
+{
+    //qDebug() << "gotnewBLOB";
+    Q_UNUSED(bp);
+}*/
+void Module::gotnewMessage(INDI::BaseDevice *dp, int messageID)
+{
+    //qDebug() << "gotnewMessage";
+    Q_UNUSED(dp);
+    Q_UNUSED(messageID);
 }
 

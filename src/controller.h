@@ -21,6 +21,7 @@ public:
     MyClient    *indiclient;
     Properties  *properties;
     FocusModule    *focuser;
+    FocusModule    *focuser2;
     WShandler   *wshandler;
 public slots:
     void valueChanged(Prop prop);

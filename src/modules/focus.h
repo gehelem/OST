@@ -16,10 +16,15 @@ class FocusModule : public Module
         void focuserPositionChanged(const double &newFocuserPosition);
     public slots:
         void test0(QString txt);
+        void IndiNewNumber(INumberVectorProperty *nvp);
+        void IndiNewBLOB(IBLOB *bp);
 
     private:
+        void CallStartCoarse(void);
+        void startCoarse(void);
         QString _camera;
         double  _focuserPosition;
-}
-;
+        bool    _newblob;
+
+};
 #endif
