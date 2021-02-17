@@ -14,11 +14,11 @@ INPUT = ./src/client.cpp \
         ./src/properties.h \
         ./src/image.cpp \
         ./src/image.h \
-        ./src/module.cpp \
-        ./src/module.h \
         ./src/polynomialfit.cpp \
         ./src/polynomialfit.h \
         ./src/ost.cpp \
+        ./src/modules/module.cpp \
+        ./src/modules/module.h \
         ./src/modules/focus.cpp \
         ./src/modules/focus.h \
 RECURSIVE = YES
