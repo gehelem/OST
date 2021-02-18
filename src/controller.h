@@ -18,7 +18,7 @@ class Controller : public QObject
 public:
     Controller(QObject *parent);
     ~Controller();
-    MyClient    *indiclient;
+    IndiCLient    *indiclient;
     Properties  *properties;
     FocusModule    *focuser;
     FocusModule    *focuser2;

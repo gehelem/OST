@@ -8,9 +8,9 @@
 FocusModule::FocusModule() : Module()
 {
     _modulename = "focus";
-    indiclient=MyClient::getInstance();
-    connect(indiclient,&MyClient::SigNewNumber,this,&FocusModule::IndiNewNumber);
-    connect(indiclient,&MyClient::SigNewBLOB,this,&FocusModule::IndiNewBLOB);
+/*    indiclient=IndiCLient::getInstance();
+    connect(indiclient,&IndiCLient::SigNewNumber,this,&FocusModule::IndiNewNumber);
+    connect(indiclient,&IndiCLient::SigNewBLOB,this,&FocusModule::IndiNewBLOB);*/
 
 }
 FocusModule::~FocusModule()
@@ -60,7 +60,7 @@ void FocusModule::startCoarse(void)
     qDebug() << "-2";
     indiclient->setBLOBMode(B_ALSO,"CCD Simulator",nullptr);
     qDebug() << "-3";
-    indiclient->sssendNewNumber("CCD Simulator","CCD_EXPOSURE","CCD_EXPOSURE_VALUE",2);
+    sendNewNumber("CCD Simulator","CCD_EXPOSURE","CCD_EXPOSURE_VALUE",2);
     qDebug() << "-4";
     while (!_newblob )
     {

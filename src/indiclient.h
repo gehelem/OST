@@ -7,12 +7,12 @@
  * This class is declared as a singleton https://gist.github.com/pazdera/1098119
  * To make sure to keep a unique instance shared by each module
 */
-class MyClient : public INDI::BaseClientQt
+class IndiCLient : public INDI::BaseClientQt
 {
     Q_OBJECT
   public:
     /* Singleton : Static access method. */
-    static MyClient* getInstance();
+    static IndiCLient* getInstance();
     bool sssendNewNumber(QString deviceName, QString propertyName,QString  elementName, double value);
     virtual void serverConnected();
     virtual void serverDisconnected(int exit_code);
@@ -45,10 +45,10 @@ class MyClient : public INDI::BaseClientQt
 
 private:
     /* Private constructor to prevent instancing. */
-    MyClient();
-    ~MyClient() = default;
+    IndiCLient();
+    ~IndiCLient() = default;
     /* Singleton instance storage. */
-    static MyClient* instance;
+    static IndiCLient* instance;
 
 }
 ;

@@ -1,7 +1,7 @@
 #ifndef MODULE_h_
 #define MODULE_h_
 #include <QtCore>
-#include "client.h"
+#include "indiclient.h"
 /*!
  * This Class shouldn't be used as is
  * Every functionnal module should inherit it
@@ -17,7 +17,7 @@ class Module : public QObject
     protected:
         Module(); /*declared protected to prevent instanciation */
         ~Module();
-        MyClient *indiclient;
+        IndiCLient *indiclient;
         //std::unique_ptr<Image> image =nullptr;
         //QList<FITSImage::Star> stars;
         bool connectIndi(void);
@@ -49,6 +49,8 @@ class Module : public QObject
         /*void gotnewBLOB(IBLOB *bp);*/
         /*void gotnewNumber(INumberVectorProperty *nvp);*/
         void gotnewMessage(INDI::BaseDevice *dp, int messageID);
+        virtual void IndiNewNumber(INumberVectorProperty *nvp){}
+        virtual void IndiNewBLOB(IBLOB *bp){}
     signals:
         void finished();
         void newMessage(QString message);

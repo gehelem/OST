@@ -4,19 +4,19 @@
 
 Module::Module()
 {
-    indiclient=MyClient::getInstance();
-    connect(indiclient,&MyClient::gotserverConnected,this,&Module::gotserverConnected);
-    connect(indiclient,&MyClient::gotserverDisconnected,this,&Module::gotserverDisconnected);
-    connect(indiclient,&MyClient::gotnewDevice,this,&Module::gotnewDevice);
-    connect(indiclient,&MyClient::gotremoveDevice,this,&Module::gotremoveDevice);
-    connect(indiclient,&MyClient::gotnewProperty,this,&Module::gotnewProperty);
-    connect(indiclient,&MyClient::gotremoveProperty,this,&Module::gotremoveProperty);
-    connect(indiclient,&MyClient::gotnewText,this,&Module::gotnewText);
-    connect(indiclient,&MyClient::gotnewSwitch,this,&Module::gotnewSwitch);
-    connect(indiclient,&MyClient::gotnewLight,this,&Module::gotnewLight);
-    /*connect(indiclient,&MyClient::gotnewBLOB,this,&Module::gotnewBLOB);*/
-    /*connect(indiclient,&MyClient::IndiNewNumber,this,&Module::SigNewNumber);*/
-    connect(indiclient,&MyClient::gotnewMessage,this,&Module::gotnewMessage);
+    indiclient=IndiCLient::getInstance();
+    connect(indiclient,&IndiCLient::gotserverConnected,this,&Module::gotserverConnected);
+    connect(indiclient,&IndiCLient::gotserverDisconnected,this,&Module::gotserverDisconnected);
+    connect(indiclient,&IndiCLient::gotnewDevice,this,&Module::gotnewDevice);
+    connect(indiclient,&IndiCLient::gotremoveDevice,this,&Module::gotremoveDevice);
+    connect(indiclient,&IndiCLient::gotnewProperty,this,&Module::gotnewProperty);
+    connect(indiclient,&IndiCLient::gotremoveProperty,this,&Module::gotremoveProperty);
+    connect(indiclient,&IndiCLient::gotnewText,this,&Module::gotnewText);
+    connect(indiclient,&IndiCLient::gotnewSwitch,this,&Module::gotnewSwitch);
+    connect(indiclient,&IndiCLient::gotnewLight,this,&Module::gotnewLight);
+    connect(indiclient,&IndiCLient::SigNewBLOB,this,&Module::IndiNewBLOB);
+    connect(indiclient,&IndiCLient::SigNewNumber,this,&Module::IndiNewNumber);
+    connect(indiclient,&IndiCLient::gotnewMessage,this,&Module::gotnewMessage);
 
 }
 Module::~Module()
@@ -386,3 +386,16 @@ void Module::gotnewMessage(INDI::BaseDevice *dp, int messageID)
     Q_UNUSED(messageID);
 }
 
+
+/*void Module::IndiNewNumber(INumberVectorProperty *nvp)
+{
+    //qDebug() << "gotnewNumber";
+    if (QString(nvp->name)=="CCD Simulator")
+    sendMessage("New number " + QString(nvp->device) + " - " + QString(nvp->name) + " - " + QString::number(nvp->np[0].value));
+    indiclient->setBLOBMode(B_ALSO,"CCD Simulator",nullptr);
+}
+void Module::IndiNewBLOB(IBLOB *bp)
+{
+    //qDebug() << "gotnewNumber";
+    sendMessage("New blob " + QString(bp->bvp->device) + " - " + QString(bp->name) + " - " + QString::number(bp->bloblen));
+}*/

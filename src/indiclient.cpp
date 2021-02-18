@@ -1,4 +1,4 @@
-#include "client.h"
+#include "indiclient.h"
 #include <QApplication>
 #include <basedevice.h>
 #include <cstring>
@@ -21,76 +21,76 @@
 
 
 /* singleton  : getting unique instance if exists, create it if not */
-MyClient* MyClient::getInstance()
+IndiCLient* IndiCLient::getInstance()
 {
     if (instance == 0)
     {
-        instance = new MyClient();
+        instance = new IndiCLient();
     }
 
     return instance;
 }
 /* Null, because instance will be initialized on demand. */
-MyClient* MyClient::instance = 0;
+IndiCLient* IndiCLient::instance = 0;
 
-MyClient::MyClient()
+IndiCLient::IndiCLient()
 {
 }
 
-void MyClient::serverConnected(void)
+void IndiCLient::serverConnected(void)
 {
     emit gotserverConnected();
 }
-void MyClient::serverDisconnected(int exit_code)
+void IndiCLient::serverDisconnected(int exit_code)
 {
     emit gotserverDisconnected(exit_code);
 }
-void MyClient::newDevice(INDI::BaseDevice *dp)
+void IndiCLient::newDevice(INDI::BaseDevice *dp)
 {
     emit gotnewDevice(dp);
 }
-void MyClient::removeDevice(INDI::BaseDevice *dp)
+void IndiCLient::removeDevice(INDI::BaseDevice *dp)
 {
     emit gotremoveDevice(dp);
 }
-void MyClient::newProperty(INDI::Property *property)
+void IndiCLient::newProperty(INDI::Property *property)
 {
     emit gotnewProperty(property);
 }
-void MyClient::removeProperty(INDI::Property *property)
+void IndiCLient::removeProperty(INDI::Property *property)
 {
     emit gotremoveProperty(property);
 }
-void MyClient::newNumber(INumberVectorProperty *nvp)
+void IndiCLient::newNumber(INumberVectorProperty *nvp)
 {
     //if (strcmp(svp->name,"CONFIG_PROCESS")==0)
     //for (int i=0;i<nvp->nnp;i++) IDLog("Got number %s %s %s %f\n",nvp->device,nvp->name,nvp->np[i].name,nvp->np[i].value);
     emit SigNewNumber(nvp);
 }
-void MyClient::newText(ITextVectorProperty *tvp)
+void IndiCLient::newText(ITextVectorProperty *tvp)
 {
     emit gotnewText(tvp);
 }
-void MyClient::newSwitch(ISwitchVectorProperty *svp)
+void IndiCLient::newSwitch(ISwitchVectorProperty *svp)
 {
     //if (strcmp(svp->name,"CONFIG_PROCESS")==0)
     //for (int i=0;i<svp->nsp;i++) IDLog("Got switch %s %s %s\n",svp->device,svp->name,svp->sp[i].name);
     emit gotnewSwitch(svp);
 }
-void MyClient::newLight(ILightVectorProperty *lvp)
+void IndiCLient::newLight(ILightVectorProperty *lvp)
 {
     emit gotnewLight(lvp);
 }
-void MyClient::newMessage(INDI::BaseDevice *dp, int messageID)
+void IndiCLient::newMessage(INDI::BaseDevice *dp, int messageID)
 {
     emit gotnewMessage(dp,messageID);
 }
-void MyClient::newBLOB(IBLOB *bp)
+void IndiCLient::newBLOB(IBLOB *bp)
 {
     emit SigNewBLOB(bp);
 }
 
-bool MyClient::sssendNewNumber(QString deviceName, QString propertyName,QString  elementName, double value)
+bool IndiCLient::sssendNewNumber(QString deviceName, QString propertyName,QString  elementName, double value)
 {
     //qDebug() << "taskSendNewNumber" << " " << deviceName << " " << propertyName<< " " << elementName;
     INDI::BaseDevice *dp;
