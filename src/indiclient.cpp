@@ -36,30 +36,29 @@ IndiCLient* IndiCLient::instance = 0;
 IndiCLient::IndiCLient()
 {
 }
-
 void IndiCLient::serverConnected(void)
 {
-    emit gotserverConnected();
+    emit SigServerConnected();
 }
 void IndiCLient::serverDisconnected(int exit_code)
 {
-    emit gotserverDisconnected(exit_code);
+    emit SigServerDisconnected(exit_code);
 }
 void IndiCLient::newDevice(INDI::BaseDevice *dp)
 {
-    emit gotnewDevice(dp);
+    emit SigNewDevice(dp);
 }
 void IndiCLient::removeDevice(INDI::BaseDevice *dp)
 {
-    emit gotremoveDevice(dp);
+    emit SigRemoveDevice(dp);
 }
 void IndiCLient::newProperty(INDI::Property *property)
 {
-    emit gotnewProperty(property);
+    emit SigNewProperty(property);
 }
 void IndiCLient::removeProperty(INDI::Property *property)
 {
-    emit gotremoveProperty(property);
+    emit SigRemoveProperty(property);
 }
 void IndiCLient::newNumber(INumberVectorProperty *nvp)
 {
@@ -69,54 +68,24 @@ void IndiCLient::newNumber(INumberVectorProperty *nvp)
 }
 void IndiCLient::newText(ITextVectorProperty *tvp)
 {
-    emit gotnewText(tvp);
+    emit SigNewText(tvp);
 }
 void IndiCLient::newSwitch(ISwitchVectorProperty *svp)
 {
     //if (strcmp(svp->name,"CONFIG_PROCESS")==0)
     //for (int i=0;i<svp->nsp;i++) IDLog("Got switch %s %s %s\n",svp->device,svp->name,svp->sp[i].name);
-    emit gotnewSwitch(svp);
+    emit SigNewSwitch(svp);
 }
 void IndiCLient::newLight(ILightVectorProperty *lvp)
 {
-    emit gotnewLight(lvp);
+    emit SigNewLight(lvp);
 }
 void IndiCLient::newMessage(INDI::BaseDevice *dp, int messageID)
 {
-    emit gotnewMessage(dp,messageID);
+    emit SigNewMessage(dp,messageID);
 }
 void IndiCLient::newBLOB(IBLOB *bp)
 {
     emit SigNewBLOB(bp);
 }
 
-bool IndiCLient::sssendNewNumber(QString deviceName, QString propertyName,QString  elementName, double value)
-{
-    //qDebug() << "taskSendNewNumber" << " " << deviceName << " " << propertyName<< " " << elementName;
-    INDI::BaseDevice *dp;
-    dp = getDevice(deviceName.toStdString().c_str());
-
-    if (dp== nullptr)
-    {
-        qDebug() << "Error - unable to find " << deviceName << " device. Aborting.";
-        return false;
-    }
-    INumberVectorProperty *prop = nullptr;
-    prop = dp->getNumber(propertyName.toStdString().c_str());
-    if (prop == nullptr)
-    {
-        qDebug() << "Error - unable to find " << deviceName << "/" << propertyName << " property. Aborting.";
-        return false;
-    }
-
-    for (int i=0;i<prop->nnp;i++) {
-        if (strcmp(prop->np[i].name, elementName.toStdString().c_str()) == 0) {
-            prop->np[i].value=value;
-            sendNewNumber(prop);
-            return true;
-        }
-    }
-    qDebug() << "Error - unable to find " << deviceName << "/" << propertyName << "/" << elementName << " element. Aborting.";
-    return false;
-
-}

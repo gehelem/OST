@@ -13,10 +13,9 @@ class Module : public QObject
     Q_PROPERTY(QString  modulename MEMBER _modulename)
 
     public:
-        bool sendNewNumber(QString deviceName, QString propertyName,QString elementName, double value);
-    protected:
-        Module(); /*declared protected to prevent instanciation */
+        Module();
         ~Module();
+    protected:
         IndiCLient *indiclient;
         //std::unique_ptr<Image> image =nullptr;
         //QList<FITSImage::Star> stars;
@@ -27,6 +26,7 @@ class Module : public QObject
         void loadDevicesConfs(void);
         bool sendNewText  (QString deviceName, QString propertyName,QString elementName, QString text);
         bool sendNewSwitch(QString deviceName,QString propertyName,QString elementName, ISState sw);
+        bool sendNewNumber(QString deviceName, QString propertyName,QString elementName, double value);
 
         bool frameSet(QString devicename,double x,double y,double width,double height);
         bool frameReset(QString devicename);
@@ -37,24 +37,23 @@ class Module : public QObject
 
 
     public slots:
-        void gotserverConnected();
-        void gotserverDisconnected(int exit_code);
-        void gotnewDevice(INDI::BaseDevice *dp);
-        void gotremoveDevice(INDI::BaseDevice *dp);
-        void gotnewProperty(INDI::Property *property);
-        void gotremoveProperty(INDI::Property *property);
-        void gotnewText(ITextVectorProperty *tvp);
-        void gotnewSwitch(ISwitchVectorProperty *svp);
-        void gotnewLight(ILightVectorProperty *lvp);
-        /*void gotnewBLOB(IBLOB *bp);*/
-        /*void gotnewNumber(INumberVectorProperty *nvp);*/
-        void gotnewMessage(INDI::BaseDevice *dp, int messageID);
-        virtual void IndiNewNumber(INumberVectorProperty *nvp){}
-        virtual void IndiNewBLOB(IBLOB *bp){}
+        virtual void IndiServerConnected    (){}
+        virtual void IndiServerDisconnected (int exit_code)             {Q_UNUSED(exit_code);}
+        virtual void IndiNewDevice          (INDI::BaseDevice *dp)      {Q_UNUSED(dp);}
+        virtual void IndiRemoveDevice       (INDI::BaseDevice *dp)      {Q_UNUSED(dp);}
+        virtual void IndiNewProperty        (INDI::Property *property)  {Q_UNUSED(property);}
+        virtual void IndiRemoveProperty     (INDI::Property *property)  {Q_UNUSED(property);}
+        virtual void IndiNewText            (ITextVectorProperty *tvp)  {Q_UNUSED(tvp);}
+        virtual void IndiNewSwitch          (ISwitchVectorProperty *svp){Q_UNUSED(svp);}
+        virtual void IndiNewLight           (ILightVectorProperty *lvp) {Q_UNUSED(lvp);}
+        virtual void IndiNewMessage         (INDI::BaseDevice *dp, int messageID){Q_UNUSED(dp);Q_UNUSED(messageID);}
+        virtual void IndiNewNumber          (INumberVectorProperty *nvp){Q_UNUSED(nvp);}
+        virtual void IndiNewBLOB            (IBLOB *bp)                 {Q_UNUSED(bp);}
     signals:
         void finished();
         void newMessage(QString message);
         void statusChanged(const QString &newStatus);
+        void askedFrameReset(QString devicename);
     private:
 
 }

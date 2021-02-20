@@ -4,20 +4,6 @@
 
 Module::Module()
 {
-    indiclient=IndiCLient::getInstance();
-    connect(indiclient,&IndiCLient::gotserverConnected,this,&Module::gotserverConnected);
-    connect(indiclient,&IndiCLient::gotserverDisconnected,this,&Module::gotserverDisconnected);
-    connect(indiclient,&IndiCLient::gotnewDevice,this,&Module::gotnewDevice);
-    connect(indiclient,&IndiCLient::gotremoveDevice,this,&Module::gotremoveDevice);
-    connect(indiclient,&IndiCLient::gotnewProperty,this,&Module::gotnewProperty);
-    connect(indiclient,&IndiCLient::gotremoveProperty,this,&Module::gotremoveProperty);
-    connect(indiclient,&IndiCLient::gotnewText,this,&Module::gotnewText);
-    connect(indiclient,&IndiCLient::gotnewSwitch,this,&Module::gotnewSwitch);
-    connect(indiclient,&IndiCLient::gotnewLight,this,&Module::gotnewLight);
-    connect(indiclient,&IndiCLient::SigNewBLOB,this,&Module::IndiNewBLOB);
-    connect(indiclient,&IndiCLient::SigNewNumber,this,&Module::IndiNewNumber);
-    connect(indiclient,&IndiCLient::gotnewMessage,this,&Module::gotnewMessage);
-
 }
 Module::~Module()
 {
@@ -312,13 +298,14 @@ bool Module::frameReset(QString devicename)
     }
 
     indiclient->sendNewSwitch(prop);
+    emit askedFrameReset(devicename);
     return true;
 }
 
 
 
-
-void Module::gotserverConnected()
+/*
+void Module::IndiServerConnected()
 {
     //qDebug() << "gotserverConnected";
 
@@ -363,22 +350,22 @@ void Module::gotnewSwitch(ISwitchVectorProperty *svp)
     Q_UNUSED(svp);
 }
 
-/*void Module::gotnewNumber(INumberVectorProperty *nvp)
+void Module::gotnewNumber(INumberVectorProperty *nvp)
 {
     //qDebug() << "gotnewNumber";
     Q_UNUSED(nvp);
-}*/
+}
 void Module::gotnewLight(ILightVectorProperty *lvp)
 {
     //qDebug() << "gotnewLight";
     Q_UNUSED(lvp);
 
 }
-/*void Module::gotnewBLOB(IBLOB *bp)
+void Module::gotnewBLOB(IBLOB *bp)
 {
     //qDebug() << "gotnewBLOB";
     Q_UNUSED(bp);
-}*/
+}
 void Module::gotnewMessage(INDI::BaseDevice *dp, int messageID)
 {
     //qDebug() << "gotnewMessage";
@@ -387,7 +374,7 @@ void Module::gotnewMessage(INDI::BaseDevice *dp, int messageID)
 }
 
 
-/*void Module::IndiNewNumber(INumberVectorProperty *nvp)
+void Module::IndiNewNumber(INumberVectorProperty *nvp)
 {
     //qDebug() << "gotnewNumber";
     if (QString(nvp->name)=="CCD Simulator")

@@ -13,33 +13,32 @@ class IndiCLient : public INDI::BaseClientQt
   public:
     /* Singleton : Static access method. */
     static IndiCLient* getInstance();
-    bool sssendNewNumber(QString deviceName, QString propertyName,QString  elementName, double value);
-    virtual void serverConnected();
-    virtual void serverDisconnected(int exit_code);
-    virtual void newDevice(INDI::BaseDevice *dp);
-    virtual void removeDevice(INDI::BaseDevice *dp);
-    virtual void newProperty(INDI::Property *property);
-    virtual void removeProperty(INDI::Property *property);
-    virtual void newText(ITextVectorProperty *tvp);
-    virtual void newSwitch(ISwitchVectorProperty *svp);
-    virtual void newLight(ILightVectorProperty *lvp);
-    virtual void newBLOB(IBLOB *bp);
-    virtual void newNumber(INumberVectorProperty *nvp);
-    virtual void newMessage(INDI::BaseDevice *dp, int messageID);
+    void serverConnected();
+    void serverDisconnected(int exit_code);
+    void newDevice(INDI::BaseDevice *dp);
+    void removeDevice(INDI::BaseDevice *dp);
+    void newProperty(INDI::Property *property);
+    void removeProperty(INDI::Property *property);
+    void newText(ITextVectorProperty *tvp);
+    void newSwitch(ISwitchVectorProperty *svp);
+    void newLight(ILightVectorProperty *lvp);
+    void newBLOB(IBLOB *bp);
+    void newNumber(INumberVectorProperty *nvp);
+    void newMessage(INDI::BaseDevice *dp, int messageID);
 
   signals:
-    void gotserverConnected();
-    void gotserverDisconnected(int exit_code);
-    void gotnewDevice(INDI::BaseDevice *dp);
-    void gotremoveDevice(INDI::BaseDevice *dp);
-    void gotnewProperty(INDI::Property *property);
-    void gotremoveProperty(INDI::Property *property);
-    void gotnewText(ITextVectorProperty *tvp);
-    void gotnewSwitch(ISwitchVectorProperty *svp);
-    void gotnewLight(ILightVectorProperty *lvp);
+    void SigServerConnected();
+    void SigServerDisconnected(int exit_code);
+    void SigNewDevice(INDI::BaseDevice *dp);
+    void SigRemoveDevice(INDI::BaseDevice *dp);
+    void SigNewProperty(INDI::Property *property);
+    void SigRemoveProperty(INDI::Property *property);
+    void SigNewText(ITextVectorProperty *tvp);
+    void SigNewSwitch(ISwitchVectorProperty *svp);
+    void SigNewLight(ILightVectorProperty *lvp);
     void SigNewBLOB(IBLOB *bp);
     void SigNewNumber(INumberVectorProperty *nvp);
-    void gotnewMessage(INDI::BaseDevice *dp, int messageID);
+    void SigNewMessage(INDI::BaseDevice *dp, int messageID);
 
     protected:
 
