@@ -2,6 +2,7 @@
 #define FOCUS_MODULE_h_
 
 #include "module.h"
+#include <QScxmlStateMachine>
 
 class FocusModule : public Module
 {
@@ -15,9 +16,10 @@ class FocusModule : public Module
         ~FocusModule();
     signals:
         void focuserPositionChanged(const double &newFocuserPosition);
-        void blobReceived();
+        void expdone();
+        void exprequestdone();
         void focuserReachedPosition();
-        void frameResetDone();
+        void frameresetdone();
         void cameraAlert();
         void abort();
     public slots:
@@ -26,16 +28,16 @@ class FocusModule : public Module
         void IndiNewBLOB(IBLOB *bp) override;
         void IndiNewSwitch(ISwitchVectorProperty *svp) override;
     private:
-        void SMFrameReset(void);
-        void SMExpRequest(void);
-        void SMAlert(void);
-        void CallStartCoarse(void);
-        void startCoarse(void);
+        void SMFrameReset();
+        void SMExpRequest();
+        void SMAlert();
+        void CallStartCoarse();
+        void startCoarse();
         QString _camera;
         QString _focuser;
         double  _focuserPosition;
         bool    _newblob;
-        QStateMachine machine;
+        QScxmlStateMachine *machine;
 
 };
 #endif

@@ -28,7 +28,7 @@ find_package(GSL REQUIRED)
 find_package(OpenCV REQUIRED )
 find_package(CImg REQUIRED )
 find_package(WCSLIB REQUIRED)
-find_package(Qt5 5.4 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets)
+find_package(Qt5 5.15 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Scxml)
 find_package(StellarSolver REQUIRED)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
@@ -43,11 +43,13 @@ include_directories(${QT5Declarative_INCLUDE_LIBRARIES} )
 include_directories(${QT5Declarative_INCLUDE_DIRS} )
 include_directories(${STELLARSOLVER_INCLUDE_DIR})
 
-
 include(CMakeCommon)
 
 
 SET( APP_EXEOST ost )
+
+# Process your *.scsml files with Qt SCXML Compiler (qscxmlc)
+#qt5_add_statecharts(QT_SCXML_COMPILED ${CMAKE_CURRENT_SOURCE_DIR}/scxml/ffff.scxml )
 
 add_executable( ${APP_EXEOST}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/module.cpp
@@ -60,6 +62,7 @@ add_executable( ${APP_EXEOST}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/properties.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/jsonparser.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/polynomialfit.cpp
+#        ${QT_SCXML_COMPILED}
     )
 
 
@@ -71,6 +74,7 @@ target_link_libraries( ${APP_EXEOST}
     Qt5::Network
     Qt5::Concurrent
     Qt5::WebSockets
+    Qt5::Scxml
     ${STELLARSOLVER_LIBRARIES}
     ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
     ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}

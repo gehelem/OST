@@ -1,9 +1,9 @@
 #include <QtCore>
 #include <QtConcurrent>
+#include <QScxmlStateMachine>
+#include <QStateMachine>
 #include <basedevice.h>
 #include "focus.h"
-
-
 
 FocusModule::FocusModule()
 {
@@ -24,7 +24,9 @@ FocusModule::FocusModule()
 }
 FocusModule::~FocusModule()
 {
+
 }
+
 void FocusModule::test0(QString txt)
 {
     if (txt=="z")  emit abort();
@@ -55,7 +57,9 @@ void FocusModule::IndiNewBLOB(IBLOB *bp)
        )
     {
         sendMessage("blobReceived " + QString(bp->bvp->device) + " - " + QString(bp->name) + " - " + QString::number(bp->bloblen));
-        emit blobReceived();
+        //machine->submitEvent(QLatin1String("expdone"));
+
+        emit expdone();
     }
 
 }
@@ -88,70 +92,77 @@ void FocusModule::IndiNewSwitch(ISwitchVectorProperty *svp)
        )
     {
         sendMessage("frameResetDone");
-        emit frameResetDone();
+        emit frameresetdone();
     }
 
 
 }
 
-void FocusModule::CallStartCoarse(void)
+void FocusModule::CallStartCoarse()
 {
 
-    machine.stop();
+    machine->stop();
     sendMessage("machine stopped");
 }
 
-void FocusModule::startCoarse(void)
+void FocusModule::startCoarse()
 {
 
-    QState *framereset = new QState();
-    QObject::connect(framereset, &QState::entered, this, &FocusModule::SMFrameReset);
+    auto *machine = QScxmlStateMachine::fromFile("/home/gilles/OST/scxml/coarsefocus.scxml");
+    for(QScxmlError& error:machine->parseErrors())
+    {
+        sendMessage("Can't load machine" + error.description());
+    }
+    if (machine->parseErrors().size()>0) return;
 
 
-    QState *exprequest = new QState();
-    QObject::connect(exprequest, &QState::entered, this, &FocusModule::SMExpRequest);
 
-    QState *alert = new QState();
-    QObject::connect(alert, &QState::entered, this, &FocusModule::SMAlert);
+    /* connecting machine events to module methods */
+    machine->connectToEvent("SMExpRequest",this, &FocusModule::SMExpRequest);
+    machine->connectToEvent("SMFrameReset",this, &FocusModule::SMFrameReset);
+    machine->connectToEvent("SMAlert",this, &FocusModule::SMAlert);
+
+    /* connecting module events to machine events */
+    connect(this, &FocusModule::abort,
+                [machine] {
+                machine->submitEvent("abort");
+        });
+    connect(this, &FocusModule::cameraAlert,
+                [machine] {
+                machine->submitEvent("cameraAlert");
+        });
+    connect(this, &FocusModule::expdone,
+                [machine] {
+                machine->submitEvent("expdone");
+        });
+    connect(this, &FocusModule::exprequestdone,
+                [machine] {
+                machine->submitEvent("exprequestdone");
+        });
+    connect(this, &FocusModule::frameresetdone,
+                [machine] {
+                machine->submitEvent("frameresetdone");
+        });
 
 
-    QFinalState *abort = new QFinalState();
-    QObject::connect(abort, &QState::entered, this, &FocusModule::CallStartCoarse);
-
-    exprequest->addTransition(this, &FocusModule::cameraAlert, alert);
-    exprequest->addTransition(this, &FocusModule::blobReceived, exprequest);
-    exprequest->addTransition(this, &FocusModule::abort, abort);
-
-    framereset->addTransition(this, &FocusModule::cameraAlert, alert);
-    framereset->addTransition(this, &FocusModule::abort, abort);
-    framereset->addTransition(this, &FocusModule::frameResetDone, exprequest);
-
-    alert->addTransition(this, &FocusModule::abort, abort);
-
-
-    machine.addState(exprequest);
-    machine.addState(framereset);
-    machine.addState(abort);
-    machine.addState(alert);
-
-    machine.setInitialState(framereset);
-    machine.start();
+    machine->start();
     sendMessage("machine started");
 
 }
-void FocusModule::SMFrameReset(void)
+void FocusModule::SMFrameReset()
 {
     sendMessage("SMFrameReset");
     frameReset("CCD Simulator");
+    emit frameresetdone();
 }
-void FocusModule::SMExpRequest(void)
+void FocusModule::SMExpRequest()
 {
     sendMessage("SMExpRequest");
     sendNewNumber("CCD Simulator","CCD_EXPOSURE","CCD_EXPOSURE_VALUE",2);
+    emit exprequestdone();
 }
-void FocusModule::SMAlert(void)
+void FocusModule::SMAlert()
 {
     sendMessage("SMAlert");
     emit abort();
-//    sendNewNumber("CCD Simulator","CCD_EXPOSURE","CCD_EXPOSURE_VALUE",2);
 }

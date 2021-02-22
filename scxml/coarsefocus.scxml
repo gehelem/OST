@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scxml xmlns="http://www.w3.org/2005/07/scxml" version="1.0" binding="early" xmlns:qt="http://www.qt.io/2015/02/scxml-ext" name="SMFocus" qt:editorversion="4.14.0">
+    <state id="abort" initial="framereset">
+        <qt:editorinfo scenegeometry="241.71;444.66;145.46;458.62;901.92;289.96" geometry="241.71;444.66;-96.25;13.96;901.92;289.96"/>
+        <state id="exprequest">
+            <qt:editorinfo scenegeometry="655.70;630.26;500.31;580.26;202.41;127.51" geometry="408.89;164.18;-155.39;-50;202.41;127.51"/>
+            <transition type="external" event="exprequestdone" target="expwait">
+                <qt:editorinfo endTargetFactors="7.44;33.53" startTargetFactors="94.87;39.69"/>
+            </transition>
+            <onentry>
+                <send event="SMExpRequest"/>
+            </onentry>
+        </state>
+        <state id="expwait">
+            <qt:editorinfo scenegeometry="954.59;648.10;848.59;598.10;173.33;124.96" geometry="706.76;182.02;-106;-50;173.33;124.96"/>
+            <transition type="external" target="exprequest" event="expdone">
+                <qt:editorinfo endTargetFactors="92.55;70.99" movePoint="0;1.17" startTargetFactors="5.81;61.04"/>
+            </transition>
+        </state>
+        <state id="framereset">
+            <qt:editorinfo scenegeometry="318.20;636.39;170.56;586.33;207.64;106.39" geometry="71.39;170.31;-147.64;-50.06;207.64;106.39"/>
+            <transition type="external" event="frameresetdone" target="exprequest"/>
+            <onentry>
+                <send event="SMFrameReset"/>
+            </onentry>
+        </state>
+        <transition type="external" event="abort" target="Final_2">
+            <qt:editorinfo startTargetFactors="60.13;22.07"/>
+        </transition>
+    </state>
+    <final id="Final_2">
+        <qt:editorinfo scenegeometry="639.46;320.24;619.46;300.24;40;40" geometry="639.46;320.24;-20;-20;40;40"/>
+    </final>
+</scxml>
