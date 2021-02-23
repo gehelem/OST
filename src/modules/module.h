@@ -2,6 +2,7 @@
 #define MODULE_h_
 #include <QtCore>
 #include "indiclient.h"
+#include "image.h"
 /*!
  * This Class shouldn't be used as is
  * Every functionnal module should inherit it
@@ -17,7 +18,7 @@ class Module : public QObject
         ~Module();
     protected:
         IndiCLient *indiclient;
-        //std::unique_ptr<Image> image =nullptr;
+        std::unique_ptr<Image> image =nullptr;
         //QList<FITSImage::Star> stars;
         bool connectIndi(void);
         bool disconnectIndi(void);

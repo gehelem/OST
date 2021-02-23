@@ -1,34 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scxml xmlns="http://www.w3.org/2005/07/scxml" version="1.0" binding="early" xmlns:qt="http://www.qt.io/2015/02/scxml-ext" name="SMFocus" qt:editorversion="4.14.0">
     <state id="abort" initial="framereset">
-        <qt:editorinfo scenegeometry="241.71;444.66;145.46;458.62;901.92;289.96" geometry="241.71;444.66;-96.25;13.96;901.92;289.96"/>
+        <qt:editorinfo geometry="140.74;100.96;-96.25;-26.38;1230.30;534.34" scenegeometry="140.74;100.96;44.49;74.58;1230.30;534.34"/>
         <state id="exprequest">
-            <qt:editorinfo scenegeometry="655.70;630.26;500.31;580.26;202.41;127.51" geometry="408.89;164.18;-155.39;-50;202.41;127.51"/>
+            <qt:editorinfo geometry="408.89;164.18;-155.39;-50;202.41;127.51" scenegeometry="549.63;265.14;394.24;215.14;202.41;127.51"/>
             <transition type="external" event="exprequestdone" target="expwait">
-                <qt:editorinfo endTargetFactors="7.44;33.53" startTargetFactors="94.87;39.69"/>
+                <qt:editorinfo movePoint="0;-1.02" startTargetFactors="94.87;39.69" endTargetFactors="7.44;33.53"/>
             </transition>
             <onentry>
                 <send event="SMExpRequest"/>
             </onentry>
         </state>
         <state id="expwait">
-            <qt:editorinfo scenegeometry="954.59;648.10;848.59;598.10;173.33;124.96" geometry="706.76;182.02;-106;-50;173.33;124.96"/>
-            <transition type="external" target="exprequest" event="expdone">
-                <qt:editorinfo endTargetFactors="92.55;70.99" movePoint="0;1.17" startTargetFactors="5.81;61.04"/>
+            <qt:editorinfo geometry="689.42;163.66;-106;-50;173.33;124.96" scenegeometry="830.16;264.62;724.16;214.62;173.33;124.96"/>
+            <transition type="external" target="loadblob" event="expdone">
+                <qt:editorinfo movePoint="0;1.17" startTargetFactors="5.81;61.04" endTargetFactors="78.50;10.46"/>
             </transition>
         </state>
         <state id="framereset">
-            <qt:editorinfo scenegeometry="318.20;636.39;170.56;586.33;207.64;106.39" geometry="71.39;170.31;-147.64;-50.06;207.64;106.39"/>
-            <transition type="external" event="frameresetdone" target="exprequest"/>
+            <qt:editorinfo geometry="71.39;170.31;-147.64;-50.06;207.64;106.39" scenegeometry="212.13;271.27;64.49;221.21;207.64;106.39"/>
+            <transition type="external" event="frameresetdone" target="exprequest">
+                <qt:editorinfo movePoint="-1.24;0"/>
+            </transition>
             <onentry>
                 <send event="SMFrameReset"/>
             </onentry>
         </state>
         <transition type="external" event="abort" target="Final_2">
-            <qt:editorinfo startTargetFactors="60.13;22.07"/>
+            <qt:editorinfo startTargetFactors="5.36;96.67"/>
         </transition>
+        <state id="loadblob">
+            <qt:editorinfo geometry="518.90;395.22;-60;-50;120;100" scenegeometry="659.64;496.18;599.64;446.18;120;100"/>
+            <transition type="internal" event="blobloaded" target="exprequest">
+                <qt:editorinfo endTargetFactors="83.72;90.18"/>
+            </transition>
+            <onentry>
+                <send event="SMLoadblob"/>
+            </onentry>
+        </state>
     </state>
     <final id="Final_2">
-        <qt:editorinfo scenegeometry="639.46;320.24;619.46;300.24;40;40" geometry="639.46;320.24;-20;-20;40;40"/>
+        <qt:editorinfo geometry="116.26;812.84;-20;-20;40;40" scenegeometry="116.26;812.84;96.26;792.84;40;40"/>
     </final>
 </scxml>

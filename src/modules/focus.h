@@ -16,10 +16,12 @@ class FocusModule : public Module
         ~FocusModule();
     signals:
         void focuserPositionChanged(const double &newFocuserPosition);
+        //void expdone(IBLOB *bp);
         void expdone();
         void exprequestdone();
         void focuserReachedPosition();
         void frameresetdone();
+        void blobloaded();
         void cameraAlert();
         void abort();
     public slots:
@@ -31,13 +33,15 @@ class FocusModule : public Module
         void SMFrameReset();
         void SMExpRequest();
         void SMAlert();
-        void CallStartCoarse();
+        //void SMLoadblob(IBLOB *bp);
+        void SMLoadblob();
+        void SMAbort();
         void startCoarse();
-        QString _camera;
-        QString _focuser;
+        QString _camera = "CCD Simulator";
+        QString _focuser = "Focuser Simulator";
         double  _focuserPosition;
         bool    _newblob;
-        QScxmlStateMachine *machine;
+        QStateMachine *_machine;
 
 };
 #endif
