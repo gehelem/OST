@@ -3,19 +3,28 @@
 #include <QtCore>
 #include "indiclient.h"
 #include "image.h"
+#include "properties.h"
 /*!
  * This Class shouldn't be used as is
  * Every functionnal module should inherit it
 */
+
+
 class Module : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString  status MEMBER _status NOTIFY statusChanged)
-    Q_PROPERTY(QString  modulename MEMBER _modulename)
+    Q_PROPERTY(QString          status      MEMBER _status NOTIFY statusChanged)
+    Q_PROPERTY(QString          modulename  MEMBER _modulename)
+    Q_PROPERTY(QMap<QString,bool>     actions   )
+    Q_PROPERTY(QMap<QString,QString>    devices READ getDevices WRITE setDevices)
 
     public:
         Module();
         ~Module();
+        QMap<QString,QString> getDevices(void);
+        void setDevices(QMap<QString,QString>);
+        void setAction(QString);
+
     protected:
         IndiCLient *indiclient;
         std::unique_ptr<Image> image =nullptr;
@@ -26,15 +35,17 @@ class Module : public QObject
         void disconnectAllDevices(void);
         void loadDevicesConfs(void);
         bool sendNewText  (QString deviceName, QString propertyName,QString elementName, QString text);
-        bool sendNewSwitch(QString deviceName,QString propertyName,QString elementName, ISState sw);
-        bool sendNewNumber(QString deviceName, QString propertyName,QString elementName, double value);
+        bool sendNewSwitch(QString deviceName, QString propertyName,QString elementName, ISState sw);
+        bool sendNewNumber(const QString& deviceName, const QString& propertyName, const QString& elementName, const double& value);
 
         bool frameSet(QString devicename,double x,double y,double width,double height);
         bool frameReset(QString devicename);
         void sendMessage(QString message);
 
-        QString _status;
-        QString _modulename;
+        QString     _status;
+        QString     _modulename;
+        QMap<QString,bool>        _actions;
+        QMap<QString,QString>     _devices;
 
 
     public slots:

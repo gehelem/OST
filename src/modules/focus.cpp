@@ -7,7 +7,10 @@
 
 FocusModule::FocusModule()
 {
+    qRegisterMetaType<MapStringStr>("MapStringStr");
     _modulename = "focus";
+    _devices["camera"]="";
+    _devices["focuser"]="";
     indiclient=IndiCLient::getInstance();
     connect(indiclient,&IndiCLient::SigServerConnected,this,&FocusModule::IndiServerConnected);
     connect(indiclient,&IndiCLient::SigServerDisconnected,this,&FocusModule::IndiServerDisconnected);
@@ -42,7 +45,7 @@ void FocusModule::test0(QString txt)
 void FocusModule::IndiNewNumber(INumberVectorProperty *nvp)
 {
     if (
-            (QString(nvp->device) == _camera )
+            (QString(nvp->device) == _devices["camera"] )
         &&  (nvp->s==IPS_ALERT)
        )
     {
@@ -54,7 +57,7 @@ void FocusModule::IndiNewNumber(INumberVectorProperty *nvp)
 void FocusModule::IndiNewBLOB(IBLOB *bp)
 {
     if (
-            (QString(bp->bvp->device) == _camera)
+            (QString(bp->bvp->device) == _devices["camera"])
        )
     {
         sendMessage("blobReceived " + QString(bp->bvp->device) + " - " + QString(bp->name) + " - " + QString::number(bp->bloblen));
@@ -71,7 +74,7 @@ void FocusModule::IndiNewBLOB(IBLOB *bp)
 void FocusModule::IndiNewSwitch(ISwitchVectorProperty *svp)
 {
     if (
-            (QString(svp->device) == _camera)
+            (QString(svp->device) == _devices["camera"])
 //        &&  (QString(svp->name)   =="CCD_FRAME_RESET")
         &&  (svp->s==IPS_ALERT)
        )
@@ -81,7 +84,7 @@ void FocusModule::IndiNewSwitch(ISwitchVectorProperty *svp)
     }
 
     if (
-            (QString(svp->device) == _focuser)
+            (QString(svp->device) == _devices["focuser"])
         &&  (QString(svp->name)   =="ABS_FOCUS_POSITION")
         &&  (svp->s==IPS_OK)
        )
@@ -90,7 +93,7 @@ void FocusModule::IndiNewSwitch(ISwitchVectorProperty *svp)
         emit focuserReachedPosition();
     }
     if (
-            (QString(svp->device) == _camera)
+            (QString(svp->device) == _devices["camera"])
         &&  (QString(svp->name)   =="CCD_FRAME_RESET")
         &&  (svp->s==IPS_OK)
        )
@@ -115,11 +118,13 @@ void FocusModule::startCoarse()
     _machine = new QStateMachine();
 
     /* states definitions */
-    QState *framereset  = new QState();
-    QState *exprequest  = new QState();
-    QState *expwait     = new QState();
-    QState *loadblob    = new QState();
+    auto *loop        = new QState();
+    QState *framereset  = new QState(loop);
+    QState *exprequest  = new QState(loop);
+    QState *expwait     = new QState(loop);
+    QState *loadblob    = new QState(loop);
     QFinalState *abort  = new QFinalState();
+    loop->setInitialState(framereset);
 
     /* actions to take when entering into state */
     connect(framereset, &QState::entered, this, &FocusModule::SMFrameReset);
@@ -133,18 +138,12 @@ void FocusModule::startCoarse()
     expwait->   addTransition(this, &FocusModule::expdone, loadblob);
     loadblob->  addTransition(this, &FocusModule::blobloaded, exprequest);
 
-    framereset->addTransition(this, &FocusModule::abort, abort);
-    exprequest->addTransition(this, &FocusModule::abort, abort);
-    expwait->   addTransition(this, &FocusModule::abort, abort);
-    loadblob->  addTransition(this, &FocusModule::abort, abort);
+    loop->addTransition(this, &FocusModule::abort, abort);
 
-    _machine->addState(framereset);
-    _machine->addState(exprequest);
-    _machine->addState(expwait);
-    _machine->addState(loadblob);
+    _machine->addState(loop);
     _machine->addState(abort);
 
-    _machine->setInitialState(framereset);
+    _machine->setInitialState(loop);
     _machine->start();
     sendMessage("machine started");
 
@@ -152,13 +151,21 @@ void FocusModule::startCoarse()
 void FocusModule::SMFrameReset()
 {
     sendMessage("SMFrameReset");
-    frameReset(_camera);
+    if (!frameReset(_devices["camera"]))
+    {
+            emit abort();
+            return;
+    }
     emit frameresetdone();
 }
 void FocusModule::SMExpRequest()
 {
     sendMessage("SMExpRequest");
-    sendNewNumber(_camera,"CCD_EXPOSURE","CCD_EXPOSURE_VALUE",2);
+    if (!sendNewNumber(_devices["camera"],"CCD_EXPOSURE","CCD_EXPOSURE_VALUE",2))
+    {
+            emit abort();
+            return;
+    }
     emit exprequestdone();
 }
 void FocusModule::SMAlert()

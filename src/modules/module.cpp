@@ -8,6 +8,18 @@ Module::Module()
 Module::~Module()
 {
 }
+QMap<QString,QString> Module::getDevices(void)
+{
+    return _devices;
+}
+void Module::setDevices(QMap<QString,QString> devices)
+{
+    _devices =devices;
+}
+void Module::setAction(QString action)
+{
+    _actions[action]=true;
+}
 void Module::sendMessage(QString message)
 {
     QString mess = QDateTime::currentDateTime().toString("[yyyyMMdd hh:mm:ss.zzz]") + " - " + _modulename + " - " + message;
@@ -61,7 +73,6 @@ bool Module::disconnectIndi(void)
 void Module::connectAllDevices()
 {
     std::vector<INDI::BaseDevice *> devs = indiclient->getDevices();
-    qDebug() << "devs size"<< devs.size();
     for(std::size_t i = 0; i < devs.size(); i++) {
         ISwitchVectorProperty *svp = devs[i]->getSwitch("CONNECTION");
 
@@ -148,22 +159,21 @@ void Module::loadDevicesConfs()
 }
 
 
-bool Module::sendNewNumber(QString deviceName, QString propertyName,QString  elementName, double value)
+auto Module::sendNewNumber(const QString& deviceName, const QString& propertyName,const QString&  elementName, const double& value) -> bool
 {
     //qDebug() << "taskSendNewNumber" << " " << deviceName << " " << propertyName<< " " << elementName;
-    INDI::BaseDevice *dp;
-    dp = indiclient->getDevice(deviceName.toStdString().c_str());
+    INDI::BaseDevice *dp = indiclient->getDevice(deviceName.toStdString().c_str());
 
     if (dp== nullptr)
     {
-        qDebug() << "Error - unable to find " << deviceName << " device. Aborting.";
+        sendMessage("Error - unable to find " + deviceName + " device. Aborting.");
         return false;
     }
     INumberVectorProperty *prop = nullptr;
     prop = dp->getNumber(propertyName.toStdString().c_str());
     if (prop == nullptr)
     {
-        qDebug() << "Error - unable to find " << deviceName << "/" << propertyName << " property. Aborting.";
+        sendMessage("Error - unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
         return false;
     }
 
@@ -174,26 +184,25 @@ bool Module::sendNewNumber(QString deviceName, QString propertyName,QString  ele
             return true;
         }
     }
-    qDebug() << "Error - unable to find " << deviceName << "/" << propertyName << "/" << elementName << " element. Aborting.";
+    sendMessage("Error - unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
     return false;
 
 }
 bool Module::sendNewText  (QString deviceName,QString propertyName,QString elementName, QString text)
 {
     //qDebug() << "taskSendNewText";
-    INDI::BaseDevice *dp;
-    dp = indiclient->getDevice(deviceName.toStdString().c_str());
+    INDI::BaseDevice *dp = indiclient->getDevice(deviceName.toStdString().c_str());
 
     if (dp== nullptr)
     {
-        qDebug() << "Error - unable to find " << deviceName << " device. Aborting.";
+        sendMessage("Error - unable to find " + deviceName + " device. Aborting.");
         return false;
     }
     ITextVectorProperty *prop = nullptr;
     prop= dp->getText(propertyName.toStdString().c_str());
     if (prop == nullptr)
     {
-        qDebug() << "Error - unable to find " << deviceName << "/" << propertyName << " property. Aborting.";
+        sendMessage("Error - unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
         return false;
     }
 
@@ -203,7 +212,7 @@ bool Module::sendNewText  (QString deviceName,QString propertyName,QString eleme
             return true;
         }
     }
-    qDebug() << "Error - unable to find " << deviceName << "/" << propertyName << "/" << elementName << " element. Aborting.";
+    sendMessage("Error - unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
     return false;
 }
 bool Module::sendNewSwitch(QString deviceName,QString propertyName,QString elementName, ISState sw)
@@ -215,14 +224,14 @@ bool Module::sendNewSwitch(QString deviceName,QString propertyName,QString eleme
 
     if (dp== nullptr)
     {
-        qDebug() << "Error - unable to find " << deviceName << " device. Aborting.";
+        sendMessage("Error - unable to find " + deviceName + " device. Aborting.");
         return false;
     }
     ISwitchVectorProperty *prop = nullptr;
     prop= dp->getSwitch(propertyName.toStdString().c_str());
     if (prop == nullptr)
     {
-        qDebug() << "Error - unable to find " << deviceName << "/" << propertyName << " property. Aborting.";
+        sendMessage("Error - unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
         return false;
     }
 
@@ -233,7 +242,7 @@ bool Module::sendNewSwitch(QString deviceName,QString propertyName,QString eleme
             return true;
         }
     }
-    qDebug() << "Error - unable to find " << deviceName << "/" << propertyName << "/" << elementName << " element. Aborting.";
+    sendMessage("Error - unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
     return false;
 
 }
@@ -243,7 +252,7 @@ bool Module::frameSet(QString devicename,double x,double y,double width,double h
     dp = indiclient->getDevice(devicename.toStdString().c_str());
     if (dp== nullptr)
     {
-        qDebug() << "Error - unable to find " << devicename << " device. Aborting.";
+        sendMessage("Error - unable to find " + devicename + " device. Aborting.");
         return false;
     }
 
@@ -251,7 +260,7 @@ bool Module::frameSet(QString devicename,double x,double y,double width,double h
     prop = dp->getNumber("CCD_FRAME");
     if (prop == nullptr)
     {
-        qDebug() << "Error - unable to find " << devicename << "/" << "CCD_FRAME" << " property. Aborting.";
+        sendMessage("Error - unable to find " + devicename + "/" + "CCD_FRAME" + " property. Aborting.");
         return false;
     }
 
@@ -279,7 +288,7 @@ bool Module::frameReset(QString devicename)
     dp = indiclient->getDevice(devicename.toStdString().c_str());
     if (dp== nullptr)
     {
-        qDebug() << "Error - unable to find " << devicename << " device. Aborting.";
+        sendMessage("Error - unable to find " + devicename + " device. Aborting.");
         return false;
     }
 
@@ -287,7 +296,7 @@ bool Module::frameReset(QString devicename)
     prop = dp->getSwitch("CCD_FRAME_RESET");
     if (prop == nullptr)
     {
-        qDebug() << "Error - unable to find " << devicename << "/" << "CCD_FRAME_RESET" << " property. Aborting.";
+        sendMessage("Error - unable to find " + devicename + "/" + "CCD_FRAME_RESET" + " property. Aborting.");
         return true;
     }
 

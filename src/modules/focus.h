@@ -2,12 +2,15 @@
 #define FOCUS_MODULE_h_
 
 #include "module.h"
+#include "properties.h"
 #include <QScxmlStateMachine>
 
 class FocusModule : public Module
 {
     Q_OBJECT
     Q_PROPERTY(double  focuserPosition MEMBER _focuserPosition NOTIFY focuserPositionChanged)
+    Q_PROPERTY(MapStringStr    test    MEMBER _test)
+    Q_PROPERTY(QMap<QString,bool>    test2    MEMBER _test2)
     Q_PROPERTY(QString camera   MEMBER _camera)
     Q_PROPERTY(QString focuser  MEMBER _focuser)
 
@@ -37,6 +40,8 @@ class FocusModule : public Module
         void SMLoadblob();
         void SMAbort();
         void startCoarse();
+        MapStringStr _test;
+        QMap<QString,bool> _test2;
         QString _camera = "CCD Simulator";
         QString _focuser = "Focuser Simulator";
         double  _focuserPosition;

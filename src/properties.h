@@ -2,6 +2,15 @@
 #define PROPERTIES_H
 #include <QtCore>
 #include <indibase.h>
+
+typedef QMap<QString, QString> MapStringStr;
+Q_DECLARE_METATYPE(MapStringStr)
+typedef QMap<QString, double> MapStringDbl;
+Q_DECLARE_METATYPE(MapStringDbl)
+typedef QMap<QString, bool> MapStringBool;
+Q_DECLARE_METATYPE(MapStringBool)
+
+
 enum propType
 {
     /*! Text element */

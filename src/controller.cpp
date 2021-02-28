@@ -14,12 +14,20 @@ Controller::Controller(QObject *parent)
     wshandler = new WShandler(this,properties);
 
     focuser = new FocusModule();
+    QMap<QString,QString> dev;
+    dev["camera"]="CCD Simulator";
+    dev["focuser"]="Focuser Simulator";
+    focuser->setDevices(dev);
     //focuser->setProperty("modulename","focuser of the death");
     connect(wshandler,&WShandler::textRcv,focuser,&FocusModule::test0);
     /*focuser2 = new FocusModule();
     connect(wshandler,&WShandler::textRcv,focuser2,&FocusModule::test0);*/
-
-
+    const QMetaObject *metaobject = focuser->metaObject();
+    int count = metaobject->propertyCount();
+    for (int i=0; i<count; ++i) {
+        QMetaProperty metaproperty = metaobject->property(i);
+        qDebug() << "focus props " <<  metaproperty.name() <<  metaproperty.isReadable() <<  metaproperty.isWritable() << metaproperty.type();
+    }
     //properties->dumproperties();
 
 }
