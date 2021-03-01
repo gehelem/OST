@@ -61,7 +61,10 @@ add_executable( ${APP_EXEOST}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/properties.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/jsonparser.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/polynomialfit.cpp
-    )
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/valuebase.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/valuebase.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/textvalue.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/textvalue.h)
 
 ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
 
