@@ -15,8 +15,8 @@ class Module : public QObject
     Q_OBJECT
     Q_PROPERTY(QString          status      MEMBER _status NOTIFY statusChanged)
     Q_PROPERTY(QString          modulename  MEMBER _modulename)
-    Q_PROPERTY(QMap<QString,bool>     actions   )
-    Q_PROPERTY(QMap<QString,QString>    devices READ getDevices WRITE setDevices)
+    //Q_PROPERTY(QMap<QString,bool>     actions   )
+    //Q_PROPERTY(QMap<QString,QString>    devices READ getDevices WRITE setDevices)
 
     public:
         Module();
@@ -49,18 +49,18 @@ class Module : public QObject
 
 
     public slots:
-        virtual void IndiServerConnected    (){}
-        virtual void IndiServerDisconnected (int exit_code)             {Q_UNUSED(exit_code);}
-        virtual void IndiNewDevice          (INDI::BaseDevice *dp)      {Q_UNUSED(dp);}
-        virtual void IndiRemoveDevice       (INDI::BaseDevice *dp)      {Q_UNUSED(dp);}
-        virtual void IndiNewProperty        (INDI::Property *property)  {Q_UNUSED(property);}
-        virtual void IndiRemoveProperty     (INDI::Property *property)  {Q_UNUSED(property);}
-        virtual void IndiNewText            (ITextVectorProperty *tvp)  {Q_UNUSED(tvp);}
-        virtual void IndiNewSwitch          (ISwitchVectorProperty *svp){Q_UNUSED(svp);}
-        virtual void IndiNewLight           (ILightVectorProperty *lvp) {Q_UNUSED(lvp);}
-        virtual void IndiNewMessage         (INDI::BaseDevice *dp, int messageID){Q_UNUSED(dp);Q_UNUSED(messageID);}
-        virtual void IndiNewNumber          (INumberVectorProperty *nvp){Q_UNUSED(nvp);}
-        virtual void IndiNewBLOB            (IBLOB *bp)                 {Q_UNUSED(bp);}
+        virtual void OnIndiServerConnected    (){}
+        virtual void OnIndiServerDisconnected (int exit_code)             {Q_UNUSED(exit_code);}
+        virtual void OnIndiNewDevice          (INDI::BaseDevice *dp)      {Q_UNUSED(dp);}
+        virtual void OnIndiRemoveDevice       (INDI::BaseDevice *dp)      {Q_UNUSED(dp);}
+        virtual void OnIndiNewProperty        (INDI::Property *property)  {Q_UNUSED(property);}
+        virtual void OnIndiRemoveProperty     (INDI::Property *property)  {Q_UNUSED(property);}
+        virtual void OnIndiNewText            (ITextVectorProperty *tvp)  {Q_UNUSED(tvp);}
+        virtual void OnIndiNewSwitch          (ISwitchVectorProperty *svp){Q_UNUSED(svp);}
+        virtual void OnIndiNewLight           (ILightVectorProperty *lvp) {Q_UNUSED(lvp);}
+        virtual void OnIndiNewMessage         (INDI::BaseDevice *dp, int messageID){Q_UNUSED(dp);Q_UNUSED(messageID);}
+        virtual void OnIndiNewNumber          (INumberVectorProperty *nvp){Q_UNUSED(nvp);}
+        virtual void OnIndiNewBLOB            (IBLOB *bp)                 {Q_UNUSED(bp);}
     signals:
         void finished();
         void newMessage(QString message);

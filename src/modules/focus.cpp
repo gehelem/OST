@@ -12,18 +12,18 @@ FocusModule::FocusModule()
     _devices["camera"]="";
     _devices["focuser"]="";
     indiclient=IndiCLient::getInstance();
-    connect(indiclient,&IndiCLient::SigServerConnected,this,&FocusModule::IndiServerConnected);
-    connect(indiclient,&IndiCLient::SigServerDisconnected,this,&FocusModule::IndiServerDisconnected);
-    connect(indiclient,&IndiCLient::SigNewDevice,this,&FocusModule::IndiNewDevice);
-    connect(indiclient,&IndiCLient::SigRemoveDevice,this,&FocusModule::IndiRemoveDevice);
-    connect(indiclient,&IndiCLient::SigNewProperty,this,&FocusModule::IndiNewProperty);
-    connect(indiclient,&IndiCLient::SigRemoveProperty,this,&FocusModule::IndiRemoveProperty);
-    connect(indiclient,&IndiCLient::SigNewText,this,&FocusModule::IndiNewText);
-    connect(indiclient,&IndiCLient::SigNewSwitch,this,&FocusModule::IndiNewSwitch);
-    connect(indiclient,&IndiCLient::SigNewLight,this,&FocusModule::IndiNewLight);
-    connect(indiclient,&IndiCLient::SigNewBLOB,this,&FocusModule::IndiNewBLOB);
-    connect(indiclient,&IndiCLient::SigNewNumber,this,&FocusModule::IndiNewNumber);
-    connect(indiclient,&IndiCLient::SigNewMessage,this,&FocusModule::IndiNewMessage);
+    connect(indiclient,&IndiCLient::SigServerConnected,this,&FocusModule::OnIndiServerConnected);
+    connect(indiclient,&IndiCLient::SigServerDisconnected,this,&FocusModule::OnIndiServerDisconnected);
+    connect(indiclient,&IndiCLient::SigNewDevice,this,&FocusModule::OnIndiNewDevice);
+    connect(indiclient,&IndiCLient::SigRemoveDevice,this,&FocusModule::OnIndiRemoveDevice);
+    connect(indiclient,&IndiCLient::SigNewProperty,this,&FocusModule::OnIndiNewProperty);
+    connect(indiclient,&IndiCLient::SigRemoveProperty,this,&FocusModule::OnIndiRemoveProperty);
+    connect(indiclient,&IndiCLient::SigNewText,this,&FocusModule::OnIndiNewText);
+    connect(indiclient,&IndiCLient::SigNewSwitch,this,&FocusModule::OnIndiNewSwitch);
+    connect(indiclient,&IndiCLient::SigNewLight,this,&FocusModule::OnIndiNewLight);
+    connect(indiclient,&IndiCLient::SigNewBLOB,this,&FocusModule::OnIndiNewBLOB);
+    connect(indiclient,&IndiCLient::SigNewNumber,this,&FocusModule::OnIndiNewNumber);
+    connect(indiclient,&IndiCLient::SigNewMessage,this,&FocusModule::OnIndiNewMessage);
 }
 
 FocusModule::~FocusModule()
@@ -42,7 +42,7 @@ void FocusModule::test0(QString txt)
     if (txt=="f")  startCoarse();
 
 }
-void FocusModule::IndiNewNumber(INumberVectorProperty *nvp)
+void FocusModule::OnIndiNewNumber(INumberVectorProperty *nvp)
 {
     if (
             (QString(nvp->device) == _devices["camera"] )
@@ -54,7 +54,7 @@ void FocusModule::IndiNewNumber(INumberVectorProperty *nvp)
     }
 }
 
-void FocusModule::IndiNewBLOB(IBLOB *bp)
+void FocusModule::OnIndiNewBLOB(IBLOB *bp)
 {
     if (
             (QString(bp->bvp->device) == _devices["camera"])
@@ -71,7 +71,7 @@ void FocusModule::IndiNewBLOB(IBLOB *bp)
 
 }
 
-void FocusModule::IndiNewSwitch(ISwitchVectorProperty *svp)
+void FocusModule::OnIndiNewSwitch(ISwitchVectorProperty *svp)
 {
     if (
             (QString(svp->device) == _devices["camera"])
