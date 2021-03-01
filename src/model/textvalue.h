@@ -19,14 +19,15 @@ public:
      * @param text: text value
      */
     TextValue(const std::string& name, const std::string& label, const std::string& text);
+    ~TextValue() override = default;
 
-public:
     /*!
      * Get value's text
      *
      * @return this value's text
      */
     [[nodiscard]] inline const std::string& text() const {return _text;}
+
 private:
     std::string _text;
 };

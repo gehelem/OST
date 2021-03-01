@@ -64,7 +64,11 @@ add_executable( ${APP_EXEOST}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/valuebase.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/valuebase.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/textvalue.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/textvalue.h)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/textvalue.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/switchvalue.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/switchvalue.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/NumberValue.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/NumberValue.h)
 
 ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
 

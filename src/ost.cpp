@@ -11,9 +11,9 @@ int main(int argc, char *argv[])
 {
     BOOST_LOG_TRIVIAL(info) << "OST starting up";
     QApplication a(argc, argv);
-    Controller *controller = new Controller(&a);
+    Controller controller(&a);
     Q_UNUSED(controller);
-    int nAppReturnCode = a.exec();
+    int nAppReturnCode = QApplication::exec();
     BOOST_LOG_TRIVIAL(info) << "OST app terminated with status : " << nAppReturnCode;
     return nAppReturnCode;
 
