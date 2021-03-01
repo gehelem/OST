@@ -2,25 +2,7 @@ PROJECT_NAME = "OST"
 OUTPUT_DIRECTORY = ./doc/
 BUILTIN_STL_SUPPORT = YES
 EXTRACT_ALL = YES
-INPUT = ./src/client.cpp \
-        ./src/client.h \
-        ./src/controller.cpp \
-        ./src/controller.h \
-        ./src/wshandler.cpp \
-        ./src/wshandler.h \
-        ./src/jsonparser.cpp \
-        ./src/jsonparser.h \
-        ./src/properties.cpp \
-        ./src/properties.h \
-        ./src/image.cpp \
-        ./src/image.h \
-        ./src/polynomialfit.cpp \
-        ./src/polynomialfit.h \
-        ./src/ost.cpp \
-        ./src/modules/module.cpp \
-        ./src/modules/module.h \
-        ./src/modules/focus.cpp \
-        ./src/modules/focus.h \
+INPUT = ./src/
 RECURSIVE = YES
 HIDE_UNDOC_RELATIONS = NO
 HAVE_DOT = YES
