@@ -1,6 +1,5 @@
 #include <QtCore>
 #include <QtConcurrent>
-#include <QScxmlStateMachine>
 #include <QStateMachine>
 #include <basedevice.h>
 #include "focus.h"

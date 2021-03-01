@@ -3,7 +3,6 @@
 
 #include "module.h"
 #include "properties.h"
-#include <QScxmlStateMachine>
 
 class FocusModule : public Module
 {
