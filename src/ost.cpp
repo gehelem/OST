@@ -1,4 +1,6 @@
 #include <QApplication>
+#include <boost/log/trivial.hpp>
+
 #include "controller.h"
 
 /*!
@@ -7,11 +9,13 @@
  */
 int main(int argc, char *argv[])
 {
-
+    BOOST_LOG_TRIVIAL(info) << "OST starting up";
     QApplication a(argc, argv);
     Controller *controller = new Controller(&a);
     Q_UNUSED(controller);
-    return a.exec();
+    int nAppReturnCode = a.exec();
+    BOOST_LOG_TRIVIAL(info) << "OST app terminated with status : " << nAppReturnCode;
+    return nAppReturnCode;
 
 }
 

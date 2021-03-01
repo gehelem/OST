@@ -30,6 +30,7 @@ find_package(CImg REQUIRED )
 find_package(WCSLIB REQUIRED)
 find_package(Qt5 5.4 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets)
 find_package(StellarSolver REQUIRED)
+find_package(Boost COMPONENTS log log_setup REQUIRED)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -62,6 +63,7 @@ add_executable( ${APP_EXEOST}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/polynomialfit.cpp
     )
 
+ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
 
 target_link_libraries( ${APP_EXEOST}
     indiclientqt
@@ -71,7 +73,7 @@ target_link_libraries( ${APP_EXEOST}
     Qt5::Network
     Qt5::Concurrent
     Qt5::WebSockets
-    ${STELLARSOLVER_LIBRARIES}
+    ${STELLARSOLVER_LIBRARIES} ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
     ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
     ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
     z -lpthread
