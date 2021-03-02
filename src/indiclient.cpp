@@ -125,7 +125,7 @@ void IndiCLient::newLight(ILightVectorProperty *lvp)
 }
 void IndiCLient::newMessage(INDI::BaseDevice *dp, int messageID)
 {
-    BOOST_LOG_TRIVIAL(debug) << "Message received";
+    BOOST_LOG_TRIVIAL(debug) << "Message received: " << dp->messageQueue(messageID);
     emit SigNewMessage(dp,messageID);
 }
 void IndiCLient::newBLOB(IBLOB *bp)
@@ -162,8 +162,8 @@ std::string IndiCLient::extract(INumberVectorProperty *pVector) {
     stream << ". Values = ";
 
     for (int i = 0; i < pVector->nnp; ++i) {
-        stream << "\"" << pVector->np[i].label << "\"(" << pVector->np[i].name << ")=";
-        stream << pVector->np[i].value << " ";
+        stream << pVector->np[i].label << "/(" << pVector->np[i].name
+        << "). Format: " << pVector->np[i].format << ". Value: " << pVector->np[i].value << ".";
     }
     return stream.str();
 }
