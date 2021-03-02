@@ -28,6 +28,7 @@ Controller::Controller(QObject *parent)
         QMetaProperty metaproperty = metaobject->property(i);
         qDebug() << "focus props " <<  metaproperty.name() <<  metaproperty.isReadable() <<  metaproperty.isWritable() << metaproperty.type();
     }
+    indiclient->connectServer();
     //properties->dumproperties();
 
 }
