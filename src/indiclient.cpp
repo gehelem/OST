@@ -84,33 +84,9 @@ void IndiCLient::newProperty(INDI::Property *property)
 
     switch (property->getType()) {
 
-        case INDI_NUMBER: {
-            INumberVectorProperty* pNumberVector = property->getNumber();
-
-            for (int i = 0; i < pNumberVector->nnp; ++i) {
-                stream << pNumberVector->np[i].value << " ";
-            }
-            break;
-        }
-
-        case INDI_TEXT: {
-            ITextVectorProperty* pTextVector = property->getText();
-
-            for (int i = 0; i < pTextVector->ntp; ++i) {
-                stream << "\"" << pTextVector->tp[i].text << "\" ";
-            }
-            break;
-        }
-
-        case INDI_SWITCH: {
-            ISwitchVectorProperty* pSwitchVector = property->getSwitch();
-
-            for (int i = 0; i < pSwitchVector->nsp; ++i) {
-                stream << pSwitchVector->sp[i].s << " ";
-            }
-            stream <<"- Rule: " << _switchRuleToNamesMap[pSwitchVector->r];
-            break;
-        }
+        case INDI_NUMBER: stream << extract(property->getNumber()); break;
+        case INDI_TEXT: stream << extract(property->getText()); break;
+        case INDI_SWITCH: stream << extract(property->getSwitch()); break;
 
         default:
             break;
@@ -128,19 +104,19 @@ void IndiCLient::newNumber(INumberVectorProperty *nvp)
 {
     //if (strcmp(svp->name,"CONFIG_PROCESS")==0)
     //for (int i=0;i<nvp->nnp;i++) IDLog("Got number %s %s %s %f\n",nvp->device,nvp->name,nvp->np[i].name,nvp->np[i].value);
-    BOOST_LOG_TRIVIAL(debug) << "Number received: " << nvp->np[0].value;
+    BOOST_LOG_TRIVIAL(debug) << "Number received: " << extract(nvp);
     emit SigNewNumber(nvp);
 }
 void IndiCLient::newText(ITextVectorProperty *tvp)
 {
-    BOOST_LOG_TRIVIAL(debug) << "Text received: \"" << tvp->tp[0].text << "\"";
+    BOOST_LOG_TRIVIAL(debug) << "Text received: " << extract(tvp);
     emit SigNewText(tvp);
 }
 void IndiCLient::newSwitch(ISwitchVectorProperty *svp)
 {
     //if (strcmp(svp->name,"CONFIG_PROCESS")==0)
     //for (int i=0;i<svp->nsp;i++) IDLog("Got switch %s %s %s\n",svp->device,svp->name,svp->sp[i].name);
-    BOOST_LOG_TRIVIAL(debug) << "Switch received";
+    BOOST_LOG_TRIVIAL(debug) << "Switch received: " << extract(svp);
     emit SigNewSwitch(svp);
 }
 void IndiCLient::newLight(ILightVectorProperty *lvp)
@@ -157,5 +133,33 @@ void IndiCLient::newBLOB(IBLOB *bp)
 {
     BOOST_LOG_TRIVIAL(debug) << "BLOB received";
     emit SigNewBLOB(bp);
+}
+
+std::string IndiCLient::extract(ITextVectorProperty *pVector) {
+
+    std::stringstream stream;
+    for (int i = 0; i < pVector->ntp; ++i) {
+        stream << "\"" << pVector->tp[i].text << "\" ";
+    }
+    return stream.str();
+}
+
+std::string IndiCLient::extract(INumberVectorProperty *pVector) {
+
+    std::stringstream stream;
+    for (int i = 0; i < pVector->nnp; ++i) {
+        stream << pVector->np[i].value << " ";
+    }
+    return stream.str();
+}
+
+std::string IndiCLient::extract(ISwitchVectorProperty *pVector) {
+
+    std::stringstream stream;
+    for (int i = 0; i < pVector->nsp; ++i) {
+        stream << pVector->sp[i].s << " ";
+    }
+    stream <<"- Rule: " << _switchRuleToNamesMap[pVector->r];
+    return stream.str();
 }
 
