@@ -15,6 +15,8 @@
 #include <QtNetwork>
 #include <baseclientqt.h>
 
+#include <sstream>
+
 #include "boost/log/trivial.hpp"
 
 /**************************************************************************************
@@ -42,6 +44,10 @@ IndiCLient::IndiCLient()
     _propertyTypesToNamesMap[2] = "Text";
     _propertyTypesToNamesMap[3] = "Light";
     _propertyTypesToNamesMap[4] = "BLOB";
+
+    _switchRuleToNamesMap[0] = "1ofMany";
+    _switchRuleToNamesMap[1] = "atMost1";
+    _switchRuleToNamesMap[2] = "NofMany";
 }
 void IndiCLient::serverConnected(void)
 {
@@ -65,18 +71,52 @@ void IndiCLient::removeDevice(INDI::BaseDevice *dp)
 }
 void IndiCLient::newProperty(INDI::Property *property)
 {
-    const char* propertyName = property->getName();
-    const char* propertyLabel = property->getLabel();
-    const char* propertyDeviceName = property->getDeviceName();
-    const char* propertyGroupName = property->getGroupName();
-    std::string prpoertyType = _propertyTypesToNamesMap[property->getType()];
+    std::stringstream stream;
 
-    BOOST_LOG_TRIVIAL(debug) << "New property received. Device: " << propertyDeviceName
-    << " - Group: " << propertyGroupName
-    << " - Name: " << propertyName
-    << " - Label: " << propertyLabel
-    << " - Type: " << prpoertyType;
 
+    stream << "New property received."
+    << "Device: " << property->getDeviceName()
+    << " - Group: " << property->getGroupName()
+    << " - Name: " << property->getName()
+    << " - Label: " << property->getName()
+    << " - Type: " << _propertyTypesToNamesMap[property->getType()]
+    << " - Values = ";
+
+    switch (property->getType()) {
+
+        case INDI_NUMBER: {
+            INumberVectorProperty* pNumberVector = property->getNumber();
+
+            for (int i = 0; i < pNumberVector->nnp; ++i) {
+                stream << pNumberVector->np[i].value << " ";
+            }
+            break;
+        }
+
+        case INDI_TEXT: {
+            ITextVectorProperty* pTextVector = property->getText();
+
+            for (int i = 0; i < pTextVector->ntp; ++i) {
+                stream << "\"" << pTextVector->tp[i].text << "\" ";
+            }
+            break;
+        }
+
+        case INDI_SWITCH: {
+            ISwitchVectorProperty* pSwitchVector = property->getSwitch();
+
+            for (int i = 0; i < pSwitchVector->nsp; ++i) {
+                stream << pSwitchVector->sp[i].s << " ";
+            }
+            stream <<"- Rule: " << _switchRuleToNamesMap[pSwitchVector->r];
+            break;
+        }
+
+        default:
+            break;
+    }
+
+    BOOST_LOG_TRIVIAL(debug) << stream.str();
     emit SigNewProperty(property);
 }
 void IndiCLient::removeProperty(INDI::Property *property)

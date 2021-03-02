@@ -50,6 +50,7 @@ private:
     static IndiCLient* instance;
 
     std::map<int, std::string> _propertyTypesToNamesMap;
+    std::map<int, std::string> _switchRuleToNamesMap;
 
 }
 ;
