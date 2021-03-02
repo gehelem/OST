@@ -48,6 +48,15 @@ IndiCLient::IndiCLient()
     _switchRuleToNamesMap[0] = "1ofMany";
     _switchRuleToNamesMap[1] = "atMost1";
     _switchRuleToNamesMap[2] = "NofMany";
+
+    _propertyPermsToNamesMap[0] = "ReadOnly";
+    _propertyPermsToNamesMap[1] = "WriteOnly";
+    _propertyPermsToNamesMap[2] = "ReadWrite";
+
+    _propertyStatesToNamesMap[0] = "Idle";
+    _propertyStatesToNamesMap[1] = "OK";
+    _propertyStatesToNamesMap[2] = "Busy";
+    _propertyStatesToNamesMap[3] = "Alert";
 }
 void IndiCLient::serverConnected(void)
 {
@@ -69,30 +78,39 @@ void IndiCLient::removeDevice(INDI::BaseDevice *dp)
     BOOST_LOG_TRIVIAL(debug) << "Device removed";
     emit SigRemoveDevice(dp);
 }
-void IndiCLient::newProperty(INDI::Property *property)
+void IndiCLient::newProperty(INDI::Property *pProperty)
 {
     std::stringstream stream;
 
+    std::string deviceName = pProperty->getDeviceName();
+    std::string groupName = pProperty->getGroupName();
+    std::string propertyName = pProperty->getName();
+    std::string propertyLabel = pProperty->getLabel();
+    std::string propertyPermission = _propertyPermsToNamesMap[pProperty->getPermission()];
+    std::string propertyState = _propertyStatesToNamesMap[pProperty->getState()];
 
     stream << "Property received: "
-    << "Device: " << property->getDeviceName()
-    << ". Group: " << property->getGroupName()
-    << ". Name: " << property->getName()
-    << ". Label: " << property->getName()
-    << ". Type: " << _propertyTypesToNamesMap[property->getType()] << ". ";
+    << "\nDevice:     " << deviceName
+    << "\nGroup:      " << groupName
+    << "\nName:       " << propertyName
+    << "\nLabel:      " << propertyLabel
+    << "\nPermission: " << propertyPermission
+    << "\nState:      " << propertyState
+    << "\nType:       " << _propertyTypesToNamesMap[pProperty->getType()];
 
-    switch (property->getType()) {
+    switch (pProperty->getType()) {
 
-        case INDI_NUMBER: stream << extract(property->getNumber()); break;
-        case INDI_TEXT: stream << extract(property->getText()); break;
-        case INDI_SWITCH: stream << extract(property->getSwitch()); break;
+        case INDI_NUMBER: stream << extract(pProperty->getNumber()); break;
+        case INDI_TEXT: stream << extract(pProperty->getText()); break;
+        case INDI_SWITCH: stream << extract(pProperty->getSwitch()); break;
 
         default:
             break;
     }
 
+    stream << "\nProperty dump END";
     BOOST_LOG_TRIVIAL(debug) << stream.str();
-    emit SigNewProperty(property);
+    emit SigNewProperty(pProperty);
 }
 void IndiCLient::removeProperty(INDI::Property *property)
 {
@@ -138,33 +156,74 @@ std::string IndiCLient::extract(ITextVectorProperty *pVector) {
 
     std::stringstream stream;
 
-    stream << "Device: " << pVector->device;
-    stream << ". Name: " << pVector->name;
-    stream << ". Label: " << pVector->label;
-    stream << ". Group: " << pVector->group;
-    stream << ". Values = ";
+    std::string deviceName = pVector->device;
+    std::string textName = pVector->name;
+    std::string textLabel = pVector->label;
+    std::string textGroup = pVector->group;
+
+    stream << "\nDevice: " << deviceName;
+    stream << "\nGroup:  " << textGroup;
+    stream << "\nName:   " << textName;
+    stream << "\nLabel:  " << textLabel;
+
+    stream << "\nValues:";
 
     for (int i = 0; i < pVector->ntp; ++i) {
-        stream << "\"" << pVector->tp[i].label << "\"(" << pVector->tp[i].name << ")=";
-        stream << "\"" << pVector->tp[i].text << "\" ";
+
+        IText currentValue = pVector->tp[i];
+        std::string valueName = currentValue.name;
+        std::string valueLabel = currentValue.label;
+        std::string valueText = currentValue.text;
+
+        stream << "\n  * Name:  " << valueName;
+        stream << "\n    Label: " << valueLabel;
+        stream << "\n    Text:  " << valueText;
     }
+
+    stream << "\nValues dump END";
+
     return stream.str();
+
 }
 
 std::string IndiCLient::extract(INumberVectorProperty *pVector) {
 
     std::stringstream stream;
 
-    stream << "Device: " << pVector->device;
-    stream << ". Name: " << pVector->name;
-    stream << ". Label: " << pVector->label;
-    stream << ". Group: " << pVector->group;
-    stream << ". Values = ";
+    std::string deviceName = pVector->device;
+    std::string numberName = pVector->name;
+    std::string numberLabel = pVector->label;
+    std::string numberGroup = pVector->group;
+
+    stream << "\nDevice: " << deviceName;
+    stream << "\nGroup:  " << numberGroup;
+    stream << "\nName:   " << numberName;
+    stream << "\nLabel:  " << numberLabel;
+
+    stream << "\nValues:";
 
     for (int i = 0; i < pVector->nnp; ++i) {
-        stream << pVector->np[i].label << "/(" << pVector->np[i].name
-        << "). Format: " << pVector->np[i].format << ". Value: " << pVector->np[i].value << ".";
+
+        INumber currentValue = pVector->np[i];
+        std::string valueName = currentValue.name;
+        std::string valueLabel = currentValue.label;
+        double value = currentValue.value;
+        double valueMin = currentValue.min;
+        double valueMax = currentValue.max;
+        std::string valueFormat = currentValue.format;
+        double valueStep = currentValue.step;
+
+        stream << "\n  * Name:   " << valueName;
+        stream << "\n    Label:  " << valueLabel;
+        stream << "\n    Format: " << valueFormat;
+        stream << "\n    Value:  " << value;
+        stream << "\n    Min:    " << valueMin;
+        stream << "\n    Max:    " << valueMax;
+        stream << "\n    Step:   " << valueStep;
     }
+
+    stream << "\nValues dump END";
+
     return stream.str();
 }
 
@@ -172,17 +231,34 @@ std::string IndiCLient::extract(ISwitchVectorProperty *pVector) {
 
     std::stringstream stream;
 
-    stream << "Device: " << pVector->device;
-    stream << ". Name: " << pVector->name;
-    stream << ". Label: " << pVector->label;
-    stream << ". Group: " << pVector->group;
-    stream << ". Values = ";
+    std::string deviceName = pVector->device;
+    std::string switchName = pVector->name;
+    std::string switchLabel = pVector->label;
+    std::string switchGroup = pVector->group;
+    std::string switchRule = _switchRuleToNamesMap[pVector->r];
+
+    stream << "\nDevice: " << deviceName;
+    stream << "\nGroup:  " << switchGroup;
+    stream << "\nName:   " << switchName;
+    stream << "\nLabel:  " << switchLabel;
+    stream << "\nRule:   " << switchRule;
+
+    stream << "\nValues:";
 
     for (int i = 0; i < pVector->nsp; ++i) {
-        stream << "\"" << pVector->sp[i].label << "\"(" << pVector->sp[i].name << ")=";
-        stream << pVector->sp[i].s << " ";
+
+        ISwitch currentValue = pVector->sp[i];
+        std::string valueName = currentValue.name;
+        std::string valueLabel = currentValue.label;
+        bool valueState = currentValue.s;
+
+        stream << "\n  * Name:  " << valueName;
+        stream << "\n    Label: " << valueLabel;
+        stream << "\n    State: " << valueState;
     }
-    stream <<"- Rule: " << _switchRuleToNamesMap[pVector->r];
+
+    stream << "\nValues dump END";
+
     return stream.str();
 }
 

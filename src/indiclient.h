@@ -13,18 +13,18 @@ class IndiCLient : public INDI::BaseClientQt
   public:
     /* Singleton : Static access method. */
     static IndiCLient* getInstance();
-    void serverConnected();
-    void serverDisconnected(int exit_code);
-    void newDevice(INDI::BaseDevice *dp);
-    void removeDevice(INDI::BaseDevice *dp);
-    void newProperty(INDI::Property *property);
-    void removeProperty(INDI::Property *property);
-    void newText(ITextVectorProperty *tvp);
-    void newSwitch(ISwitchVectorProperty *svp);
-    void newLight(ILightVectorProperty *lvp);
-    void newBLOB(IBLOB *bp);
-    void newNumber(INumberVectorProperty *nvp);
-    void newMessage(INDI::BaseDevice *dp, int messageID);
+    void serverConnected() override;
+    void serverDisconnected(int exit_code) override;
+    void newDevice(INDI::BaseDevice *dp) override;
+    void removeDevice(INDI::BaseDevice *dp) override;
+    void newProperty(INDI::Property*) override;
+    void removeProperty(INDI::Property *property) override;
+    void newText(ITextVectorProperty *tvp) override;
+    void newSwitch(ISwitchVectorProperty *svp) override;
+    void newLight(ILightVectorProperty *lvp) override;
+    void newBLOB(IBLOB *bp) override;
+    void newNumber(INumberVectorProperty *nvp) override;
+    void newMessage(INDI::BaseDevice *dp, int messageID) override;
 
   signals:
     void SigServerConnected();
@@ -50,12 +50,12 @@ private:
     static IndiCLient* instance;
 
     std::map<int, std::string> _propertyTypesToNamesMap;
+    std::map<int, std::string> _propertyStatesToNamesMap;
+    std::map<int, std::string> _propertyPermsToNamesMap;
     std::map<int, std::string> _switchRuleToNamesMap;
 
     std::string extract(ITextVectorProperty* pVector);
     std::string extract(INumberVectorProperty* pVector);
     std::string extract(ISwitchVectorProperty* pVector);
-
-}
-;
+};
 #endif
