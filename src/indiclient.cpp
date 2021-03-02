@@ -74,13 +74,12 @@ void IndiCLient::newProperty(INDI::Property *property)
     std::stringstream stream;
 
 
-    stream << "New property received."
+    stream << "Property received: "
     << "Device: " << property->getDeviceName()
-    << " - Group: " << property->getGroupName()
-    << " - Name: " << property->getName()
-    << " - Label: " << property->getName()
-    << " - Type: " << _propertyTypesToNamesMap[property->getType()]
-    << " - Values = ";
+    << ". Group: " << property->getGroupName()
+    << ". Name: " << property->getName()
+    << ". Label: " << property->getName()
+    << ". Type: " << _propertyTypesToNamesMap[property->getType()] << ". ";
 
     switch (property->getType()) {
 
@@ -138,7 +137,15 @@ void IndiCLient::newBLOB(IBLOB *bp)
 std::string IndiCLient::extract(ITextVectorProperty *pVector) {
 
     std::stringstream stream;
+
+    stream << "Device: " << pVector->device;
+    stream << ". Name: " << pVector->name;
+    stream << ". Label: " << pVector->label;
+    stream << ". Group: " << pVector->group;
+    stream << ". Values = ";
+
     for (int i = 0; i < pVector->ntp; ++i) {
+        stream << "\"" << pVector->tp[i].label << "\"(" << pVector->tp[i].name << ")=";
         stream << "\"" << pVector->tp[i].text << "\" ";
     }
     return stream.str();
@@ -147,7 +154,15 @@ std::string IndiCLient::extract(ITextVectorProperty *pVector) {
 std::string IndiCLient::extract(INumberVectorProperty *pVector) {
 
     std::stringstream stream;
+
+    stream << "Device: " << pVector->device;
+    stream << ". Name: " << pVector->name;
+    stream << ". Label: " << pVector->label;
+    stream << ". Group: " << pVector->group;
+    stream << ". Values = ";
+
     for (int i = 0; i < pVector->nnp; ++i) {
+        stream << "\"" << pVector->np[i].label << "\"(" << pVector->np[i].name << ")=";
         stream << pVector->np[i].value << " ";
     }
     return stream.str();
@@ -156,7 +171,15 @@ std::string IndiCLient::extract(INumberVectorProperty *pVector) {
 std::string IndiCLient::extract(ISwitchVectorProperty *pVector) {
 
     std::stringstream stream;
+
+    stream << "Device: " << pVector->device;
+    stream << ". Name: " << pVector->name;
+    stream << ". Label: " << pVector->label;
+    stream << ". Group: " << pVector->group;
+    stream << ". Values = ";
+
     for (int i = 0; i < pVector->nsp; ++i) {
+        stream << "\"" << pVector->sp[i].label << "\"(" << pVector->sp[i].name << ")=";
         stream << pVector->sp[i].s << " ";
     }
     stream <<"- Rule: " << _switchRuleToNamesMap[pVector->r];
