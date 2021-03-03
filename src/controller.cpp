@@ -1,11 +1,13 @@
 #include <QApplication>
 #include "controller.h"
 
+#include "boost/log/trivial.hpp"
+
 /*!
  * ... ...
  */
 Controller::Controller(QObject *parent)
-{
+: _setup(Setup()){
 
     this->setParent(parent);
 
@@ -29,6 +31,7 @@ Controller::Controller(QObject *parent)
         qDebug() << "focus props " <<  metaproperty.name() <<  metaproperty.isReadable() <<  metaproperty.isWritable() << metaproperty.type();
     }
     indiclient->connectServer();
+    connect(indiclient, &IndiCLient::newDeviceSeen, this, &Controller::onNewDeviceSeen);
     //properties->dumproperties();
 
 }
@@ -56,6 +59,15 @@ void Controller::propCreated(Prop prop)
 void Controller::propDeleted(Prop prop)
 {
     wshandler->sendmessage("Del prop " +  prop.propname);
+}
+
+void Controller::onNewDeviceSeen(const std::string &deviceName) {
+    Device* pDevice = new Device(deviceName);
+    if ( pDevice )
+        _setup.addDevice(new Device(deviceName));
+    else {
+        BOOST_LOG_TRIVIAL(error) << "Cannot create device : Out Of Memory...";
+    }
 }
 
 

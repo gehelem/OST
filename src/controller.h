@@ -1,5 +1,7 @@
 #ifndef CONTROLLER_h_
 #define CONTROLLER_h_
+
+#include <model/setup.h>
 #include "focus.h"
 #include "wshandler.h"
 #include "properties.h"
@@ -31,6 +33,9 @@ public slots:
 
 signals:
     void closed();
+private slots:
+    void onNewDeviceSeen(const std::string& deviceName);
 private:
+    Setup _setup;
 };
 #endif

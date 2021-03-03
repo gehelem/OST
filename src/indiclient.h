@@ -29,7 +29,7 @@ class IndiCLient : public INDI::BaseClientQt
   signals:
     void SigServerConnected();
     void SigServerDisconnected(int exit_code);
-    void SigNewDevice(INDI::BaseDevice *dp);
+    void newDeviceSeen(std::string);
     void SigRemoveDevice(INDI::BaseDevice *dp);
     void SigNewProperty(INDI::Property *property);
     void SigRemoveProperty(INDI::Property *property);

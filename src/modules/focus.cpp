@@ -13,7 +13,7 @@ FocusModule::FocusModule()
     indiclient=IndiCLient::getInstance();
     connect(indiclient,&IndiCLient::SigServerConnected,this,&FocusModule::OnIndiServerConnected);
     connect(indiclient,&IndiCLient::SigServerDisconnected,this,&FocusModule::OnIndiServerDisconnected);
-    connect(indiclient,&IndiCLient::SigNewDevice,this,&FocusModule::OnIndiNewDevice);
+//    connect(indiclient,&IndiCLient::SigNewDevice,this,&FocusModule::OnIndiNewDevice);
     connect(indiclient,&IndiCLient::SigRemoveDevice,this,&FocusModule::OnIndiRemoveDevice);
     connect(indiclient,&IndiCLient::SigNewProperty,this,&FocusModule::OnIndiNewProperty);
     connect(indiclient,&IndiCLient::SigRemoveProperty,this,&FocusModule::OnIndiRemoveProperty);

@@ -71,7 +71,7 @@ void IndiCLient::serverDisconnected(int exit_code)
 void IndiCLient::newDevice(INDI::BaseDevice *dp)
 {
     BOOST_LOG_TRIVIAL(debug) << "New Device: " << dp->getDeviceName();
-    emit SigNewDevice(dp);
+    emit newDeviceSeen(dp->getDeviceName());
 }
 void IndiCLient::removeDevice(INDI::BaseDevice *dp)
 {
