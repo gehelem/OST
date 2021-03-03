@@ -35,6 +35,7 @@ signals:
     void closed();
 private slots:
     void onNewDeviceSeen(const std::string& deviceName);
+    void onDeviceRemoved(const std::string& deviceName);
 private:
     Setup _setup;
 };

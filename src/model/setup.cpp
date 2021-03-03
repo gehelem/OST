@@ -15,3 +15,12 @@ void Setup::addDevice(const Device* pDevice) {
 const Device *Setup::getDeviceByName(const std::string &deviceName) {
     return _devicesMap.contains(deviceName) ? _devicesMap[deviceName] : nullptr;
 }
+
+void Setup::removeDeviceByName(const std::string &deviceName) {
+    if( _devicesMap.contains(deviceName) ) {
+        const Device* pDevice = _devicesMap[deviceName];
+        delete pDevice;
+        _devicesMap.remove(deviceName);
+    }
+    BOOST_LOG_TRIVIAL(info) << "Device removed: " << deviceName;
+}

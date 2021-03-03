@@ -76,7 +76,7 @@ void IndiCLient::newDevice(INDI::BaseDevice *dp)
 void IndiCLient::removeDevice(INDI::BaseDevice *dp)
 {
     BOOST_LOG_TRIVIAL(debug) << "Device removed";
-    emit SigRemoveDevice(dp);
+    emit deviceRemoved(dp->getDeviceName());
 }
 void IndiCLient::newProperty(INDI::Property *pProperty)
 {

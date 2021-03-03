@@ -32,6 +32,7 @@ Controller::Controller(QObject *parent)
     }
     indiclient->connectServer();
     connect(indiclient, &IndiCLient::newDeviceSeen, this, &Controller::onNewDeviceSeen);
+    connect(indiclient, &IndiCLient::deviceRemoved, this, &Controller::onDeviceRemoved);
     //properties->dumproperties();
 
 }
@@ -63,6 +64,10 @@ void Controller::propDeleted(Prop prop)
 
 void Controller::onNewDeviceSeen(const std::string &deviceName) {
     _setup.addDevice(new Device(deviceName));
+}
+
+void Controller::onDeviceRemoved(const std::string &deviceName) {
+    _setup.removeDeviceByName(deviceName);
 }
 
 

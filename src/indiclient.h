@@ -30,7 +30,7 @@ class IndiCLient : public INDI::BaseClientQt
     void SigServerConnected();
     void SigServerDisconnected(int exit_code);
     void newDeviceSeen(std::string);
-    void SigRemoveDevice(INDI::BaseDevice *dp);
+    void deviceRemoved(std::string);
     void SigNewProperty(INDI::Property *property);
     void SigRemoveProperty(INDI::Property *property);
     void SigNewText(ITextVectorProperty *tvp);
