@@ -22,7 +22,7 @@ public:
      * @param max maximum allowed value
      * @param step increment step
      */
-    NumberValue(const std::string& name, const std::string& label,
+    NumberValue(const std::string& name, const std::string& label, const std::string &hint,
                 const double& value, const std::string& format,
                 const double& min, const double& max, const double& step);
     ~NumberValue() override = default;

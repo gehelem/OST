@@ -18,7 +18,7 @@ public:
      * @param label value's display label
      * @param switchState switch state
      */
-    SwitchValue(const std::string& name, const std::string& label, const bool& switchState);
+    SwitchValue(const std::string& name, const std::string& label, const std::string &hint,const bool& switchState );
     ~SwitchValue() override = default;
 
     /*!
