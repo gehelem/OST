@@ -254,7 +254,7 @@ std::string IndiCLient::extract(ISwitchVectorProperty *pVector) {
 
         stream << "\n  * Name:  " << valueName;
         stream << "\n    Label: " << valueLabel;
-        stream << "\n    State: " << valueState;
+        stream << "\n    State: " <<  (valueState ? "true" : "false");
     }
 
     stream << "\nValues dump END";
