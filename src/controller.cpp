@@ -62,12 +62,7 @@ void Controller::propDeleted(Prop prop)
 }
 
 void Controller::onNewDeviceSeen(const std::string &deviceName) {
-    Device* pDevice = new Device(deviceName);
-    if ( pDevice )
-        _setup.addDevice(new Device(deviceName));
-    else {
-        BOOST_LOG_TRIVIAL(error) << "Cannot create device : Out Of Memory...";
-    }
+    _setup.addDevice(new Device(deviceName));
 }
 
 
