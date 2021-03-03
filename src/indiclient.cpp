@@ -70,7 +70,11 @@ void IndiCLient::serverDisconnected(int exit_code)
 }
 void IndiCLient::newDevice(INDI::BaseDevice *dp)
 {
-    BOOST_LOG_TRIVIAL(debug) << "New Device: " << dp->getDeviceName();
+    std::string deviceName = dp->getDeviceName();
+    if ( deviceName == "CCD Simulator" || deviceName == "Guide Simulator" ) {
+        setBLOBMode(B_ALSO, deviceName.c_str());
+    }
+    BOOST_LOG_TRIVIAL(debug) << "New Device: " << deviceName;
     emit newDeviceSeen(dp->getDeviceName());
 }
 void IndiCLient::removeDevice(INDI::BaseDevice *dp)
