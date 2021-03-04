@@ -2,6 +2,12 @@
 
 #include "boost/log/trivial.hpp"
 
+
+Setup::~Setup()
+{
+    purgeDeviceMap();
+}
+
 void Setup::addDevice(const Device* pDevice) {
 
     if( ! _devicesMap.contains(pDevice->getName()) ) {
@@ -18,9 +24,15 @@ const Device *Setup::getDeviceByName(const std::string &deviceName) {
 
 void Setup::removeDeviceByName(const std::string &deviceName) {
     if( _devicesMap.contains(deviceName) ) {
-        const Device* pDevice = _devicesMap[deviceName];
-        delete pDevice;
+        delete _devicesMap[deviceName];;
         _devicesMap.remove(deviceName);
     }
     BOOST_LOG_TRIVIAL(info) << "Device removed: " << deviceName;
+}
+
+void Setup::purgeDeviceMap() {
+
+    for( std::string deviceName : _devicesMap.keys() ) {
+        removeDeviceByName(deviceName);
+    }
 }
