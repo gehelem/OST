@@ -30,7 +30,11 @@ Controller::Controller(QObject *parent)
         QMetaProperty metaproperty = metaobject->property(i);
         qDebug() << "focus props " <<  metaproperty.name() <<  metaproperty.isReadable() <<  metaproperty.isWritable() << metaproperty.type();
     }
-    indiclient->connectServer();
+
+    bool clientConnected = indiclient->connectServer();
+    if ( ! clientConnected ) {
+        BOOST_LOG_TRIVIAL(warning) << "Could not connect to INDI server. Won't do much for now... Please start INDI server and restart OST";
+    }
     connect(indiclient, &IndiCLient::newDeviceSeen, this, &Controller::onNewDeviceSeen);
     connect(indiclient, &IndiCLient::deviceRemoved, this, &Controller::onDeviceRemoved);
     //properties->dumproperties();
