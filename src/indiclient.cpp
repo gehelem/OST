@@ -100,7 +100,7 @@ void IndiCLient::newProperty(INDI::Property *pProperty)
     << ". PropLabel=" << propertyLabel
     << ". PropPermission=" << propertyPermission
     << ". PropState=" << propertyState
-    << ". PropType=" << _propertyTypesToNamesMap[pProperty->getType()];
+    << ". PropType=" << _propertyTypesToNamesMap[pProperty->getType()] << ". ";
 
     switch (pProperty->getType()) {
 
@@ -168,7 +168,6 @@ std::string IndiCLient::extract(ITextVectorProperty *pVector) {
     stream << ". VectGroup=" << textGroup;
     stream << ". VectName=" << textName;
     stream << ". VectLabel=" << textLabel;
-
     stream << ". Values: ";
 
     for (int i = 0; i < pVector->ntp; ++i) {
