@@ -70,11 +70,7 @@ void IndiCLient::serverDisconnected(int exit_code)
 }
 void IndiCLient::newDevice(INDI::BaseDevice *dp)
 {
-    std::string deviceName = dp->getDeviceName();
-    if ( deviceName == "CCD Simulator" || deviceName == "Guide Simulator" ) {
-        setBLOBMode(B_ALSO, deviceName.c_str());
-    }
-    BOOST_LOG_TRIVIAL(debug) << "New Device: " << deviceName;
+    BOOST_LOG_TRIVIAL(debug) << "New Device: " << dp->getDeviceName();
     emit newDeviceSeen(dp->getDeviceName());
 }
 void IndiCLient::removeDevice(INDI::BaseDevice *dp)
@@ -176,6 +172,12 @@ std::string IndiCLient::extract(ITextVectorProperty *pVector) {
         std::string valueName = currentValue.name;
         std::string valueLabel = currentValue.label;
         std::string valueText = currentValue.text;
+
+        if (textName == "DRIVER_INFO" &&
+            valueName == "DRIVER_INTERFACE" &&
+            strtol(valueText.c_str(), nullptr, 10) & INDI::BaseDevice::CCD_INTERFACE ) {
+            setBLOBMode(B_ALSO, deviceName.c_str());
+        }
 
         stream << "  *Name=" << valueName;
         stream << ". Label=" << valueLabel;
