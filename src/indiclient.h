@@ -36,7 +36,7 @@ class IndiCLient : public INDI::BaseClientQt
     void SigNewText(ITextVectorProperty *tvp);
     void SigNewSwitch(ISwitchVectorProperty *svp);
     void SigNewLight(ILightVectorProperty *lvp);
-    void SigNewBLOB(IBLOB *bp);
+    void newBlobReceived(const QByteArray& data, QString format);
     void SigNewNumber(INumberVectorProperty *nvp);
     void SigNewMessage(INDI::BaseDevice *dp, int messageID);
 

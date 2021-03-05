@@ -148,21 +148,8 @@ void IndiCLient::newMessage(INDI::BaseDevice *dp, int messageID)
 void IndiCLient::newBLOB(IBLOB *bp)
 {
     BOOST_LOG_TRIVIAL(debug) << "BLOB received: Format=" << bp->format << ". Size (byptes)=" << bp->bloblen;
-
     const QByteArray data((char*)bp->blob, bp->bloblen);
-    QFile outputFile(QString("/tmp/ost_blob_test").append(bp->format));
-    bool saveSuccess = false;
-    if (outputFile.open(QIODevice::WriteOnly)) {
-        qint64 writtenLength = outputFile.write(data);
-        if (-1 != writtenLength) {
-             saveSuccess = true;
-        }
-        outputFile.close();
-    }
-    if ( ! saveSuccess ) {
-        BOOST_LOG_TRIVIAL(error) << "could not save BLOG to file: " << outputFile.fileName().toStdString();
-    }
-    emit SigNewBLOB(bp);
+    emit newBlobReceived(data, bp->format);
 }
 
 std::string IndiCLient::extract(ITextVectorProperty *pVector) {

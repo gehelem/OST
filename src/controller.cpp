@@ -6,8 +6,10 @@
 /*!
  * ... ...
  */
-Controller::Controller(QObject *parent)
-: _setup(Setup()){
+Controller::Controller(QObject *parent, bool saveAllBlobs)
+: _setup(Setup()),
+  _appSettingsSaveEveryBlob(saveAllBlobs)
+{
 
     this->setParent(parent);
 
@@ -37,6 +39,7 @@ Controller::Controller(QObject *parent)
     }
     connect(indiclient, &IndiCLient::newDeviceSeen, this, &Controller::onNewDeviceSeen);
     connect(indiclient, &IndiCLient::deviceRemoved, this, &Controller::onDeviceRemoved);
+    connect(indiclient, &IndiCLient::newBlobReceived, this, &Controller::onNewBlobReveived);
     //properties->dumproperties();
 
 }
@@ -72,6 +75,27 @@ void Controller::onNewDeviceSeen(const std::string &deviceName) {
 
 void Controller::onDeviceRemoved(const std::string &deviceName) {
     _setup.removeDeviceByName(deviceName);
+}
+
+void Controller::onNewBlobReveived(const QByteArray& data, const QString& format) const {
+
+    if ( _appSettingsSaveEveryBlob ) {
+        QFile outputFile(QString("/tmp/ost_blob_test").append(format));
+        bool saveSuccess = false;
+        if (outputFile.open(QIODevice::WriteOnly)) {
+            qint64 writtenLength = outputFile.write(data);
+            if (-1 != writtenLength) {
+                saveSuccess = true;
+            }
+            outputFile.close();
+        }
+        if (!saveSuccess) {
+            BOOST_LOG_TRIVIAL(error) << "could not save BLOG to file: " << outputFile.fileName().toStdString();
+        } else {
+            BOOST_LOG_TRIVIAL(info) << "Saved BLOG to file: " << outputFile.fileName().toStdString();
+        }
+    }
+
 }
 
 

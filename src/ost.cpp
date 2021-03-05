@@ -10,14 +10,18 @@
 int main(int argc, char *argv[])
 {
     BOOST_LOG_TRIVIAL(info) << "OST starting up";
-    QCoreApplication a(argc, argv);
-    Controller controller(&a);
+    QCoreApplication app(argc, argv);
+
+    QCommandLineParser argParser;
+    argParser.addHelpOption();
+    QCommandLineOption saveAllBlobsOption("s", "Save all received blobs to /tmp");
+    argParser.addOption(saveAllBlobsOption);
+    argParser.process(app);
+
+    Controller controller(&app, argParser.isSet("s"));
     Q_UNUSED(controller);
+
     int nAppReturnCode = QCoreApplication::exec();
     BOOST_LOG_TRIVIAL(info) << "OST app terminated with status : " << nAppReturnCode;
     return nAppReturnCode;
-
 }
-
-
-

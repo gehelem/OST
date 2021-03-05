@@ -18,7 +18,7 @@ class Controller : public QObject
 {
     Q_OBJECT
 public:
-    Controller(QObject *parent);
+    Controller(QObject *parent, bool saveAllBlobs);
     ~Controller();
     IndiCLient    *indiclient;
     Properties  *properties;
@@ -36,7 +36,9 @@ signals:
 private slots:
     void onNewDeviceSeen(const std::string& deviceName);
     void onDeviceRemoved(const std::string& deviceName);
+    void onNewBlobReveived(const QByteArray& data, const QString& format) const;
 private:
     Setup _setup;
+    bool _appSettingsSaveEveryBlob;
 };
 #endif
