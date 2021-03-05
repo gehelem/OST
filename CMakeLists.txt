@@ -67,8 +67,8 @@ add_executable( ${APP_EXEOST}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/textvalue.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/switchvalue.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/switchvalue.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/NumberValue.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/NumberValue.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/numbervalue.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/numbervalue.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/setup.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/setup.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/device.cpp

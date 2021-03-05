@@ -2,7 +2,7 @@
 // Created by deufrai on 01/03/2021.
 //
 
-#include "NumberValue.h"
+#include "numbervalue.h"
 
 NumberValue::NumberValue(const std::string &name, const std::string &label, const std::string &hint,
                          const double &value, const std::string &format,
