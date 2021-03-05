@@ -151,12 +151,17 @@ void IndiCLient::newBLOB(IBLOB *bp)
 
     const QByteArray data((char*)bp->blob, bp->bloblen);
     QFile outputFile(QString("/tmp/ost_blob_test").append(bp->format));
-    outputFile.open(QIODevice::WriteOnly);
-    qint64 writtenLength = outputFile.write(data);
-    if ( -1 == writtenLength ) {
-        BOOST_LOG_TRIVIAL(error) << "written bytes to file: " << writtenLength;
+    bool saveSuccess = false;
+    if (outputFile.open(QIODevice::WriteOnly)) {
+        qint64 writtenLength = outputFile.write(data);
+        if (-1 != writtenLength) {
+             saveSuccess = true;
+        }
+        outputFile.close();
     }
-    outputFile.close();
+    if ( ! saveSuccess ) {
+        BOOST_LOG_TRIVIAL(error) << "could not save BLOG to file: " << outputFile.fileName().toStdString();
+    }
     emit SigNewBLOB(bp);
 }
 
