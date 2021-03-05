@@ -148,6 +148,15 @@ void IndiCLient::newMessage(INDI::BaseDevice *dp, int messageID)
 void IndiCLient::newBLOB(IBLOB *bp)
 {
     BOOST_LOG_TRIVIAL(debug) << "BLOB received: Format=" << bp->format << ". Size (byptes)=" << bp->bloblen;
+
+    const QByteArray data((char*)bp->blob, bp->bloblen);
+    QFile outputFile(QString("/tmp/ost_blob_test").append(bp->format));
+    outputFile.open(QIODevice::WriteOnly);
+    qint64 writtenLength = outputFile.write(data);
+    if ( -1 == writtenLength ) {
+        BOOST_LOG_TRIVIAL(error) << "written bytes to file: " << writtenLength;
+    }
+    outputFile.close();
     emit SigNewBLOB(bp);
 }
 
