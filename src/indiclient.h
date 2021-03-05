@@ -1,13 +1,17 @@
 #ifndef CLIENT_h_
 #define CLIENT_h_
-#include <baseclientqt.h>
+#include <baseclient.h>
+#include <qobject.h>
+
+Q_DECLARE_METATYPE(std::string)
+
 /*!
  * indiclient class, overloaded with some basic functions to help us
  * it should be instanciated only once, to keep only one active connection to indiserver :
  * This class is declared as a singleton https://gist.github.com/pazdera/1098119
  * To make sure to keep a unique instance shared by each module
 */
-class IndiCLient : public INDI::BaseClientQt
+class IndiCLient : public QObject, public INDI::BaseClient
 {
     Q_OBJECT
   public:

@@ -77,7 +77,7 @@ add_executable( ${APP_EXEOST}
 ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
 
 target_link_libraries( ${APP_EXEOST}
-    indiclientqt
+    indiclient
     Qt5::Widgets
     Qt5::Gui
     Qt5::Core

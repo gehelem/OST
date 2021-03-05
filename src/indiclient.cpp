@@ -57,6 +57,8 @@ IndiCLient::IndiCLient()
     _propertyStatesToNamesMap[1] = "OK";
     _propertyStatesToNamesMap[2] = "Busy";
     _propertyStatesToNamesMap[3] = "Alert";
+
+    qRegisterMetaType<std::string>();
 }
 void IndiCLient::serverConnected(void)
 {
