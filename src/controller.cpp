@@ -6,9 +6,11 @@
 /*!
  * ... ...
  */
-Controller::Controller(QObject *parent, bool saveAllBlobs)
+Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, int port)
 : _setup(Setup()),
-  _appSettingsSaveEveryBlob(saveAllBlobs)
+  _appSettingsSaveEveryBlob(saveAllBlobs),
+  _appSettingsHostName(host),
+  _appSettingsServerPort(port)
 {
 
     this->setParent(parent);
@@ -33,6 +35,7 @@ Controller::Controller(QObject *parent, bool saveAllBlobs)
         qDebug() << "focus props " <<  metaproperty.name() <<  metaproperty.isReadable() <<  metaproperty.isWritable() << metaproperty.type();
     }
 
+    indiclient->setServer(_appSettingsHostName.toStdString().c_str(), _appSettingsServerPort);
     bool clientConnected = indiclient->connectServer();
     if ( ! clientConnected ) {
         BOOST_LOG_TRIVIAL(warning) << "Could not connect to INDI server. Won't do much for now... Please start INDI server and restart OST";

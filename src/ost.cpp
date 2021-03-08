@@ -14,11 +14,30 @@ int main(int argc, char *argv[])
 
     QCommandLineParser argParser;
     argParser.addHelpOption();
+
     QCommandLineOption saveAllBlobsOption("s", "Save all received blobs to /tmp");
+    QCommandLineOption indiHostOption("host", "INDI server hostname", "host");
+    indiHostOption.setDefaultValue("localhost");
+    QCommandLineOption indiPortOption("port", "INDI Server port number", "port");
+    indiPortOption.setDefaultValue("7624");
+
     argParser.addOption(saveAllBlobsOption);
+    argParser.addOption(indiHostOption);
+    argParser.addOption(indiPortOption);
     argParser.process(app);
 
-    Controller controller(&app, argParser.isSet("s"));
+    QString hostName = argParser.value(indiHostOption);
+    int portNumber = atoi(argParser.value(indiPortOption).toStdString().c_str());
+
+    BOOST_LOG_TRIVIAL(debug) << "INDI Host=" << hostName.toStdString();
+    BOOST_LOG_TRIVIAL(debug) << "INDI Port=" << portNumber;
+
+    Controller controller(
+            &app,
+            argParser.isSet("s"),
+            hostName,
+            portNumber);
+
     Q_UNUSED(controller);
 
     int nAppReturnCode = QCoreApplication::exec();

@@ -18,8 +18,8 @@ class Controller : public QObject
 {
     Q_OBJECT
 public:
-    Controller(QObject *parent, bool saveAllBlobs);
-    ~Controller();
+    Controller(QObject *parent, bool saveAllBlobs, const QString& host, int port);
+    ~Controller() override;
     IndiCLient    *indiclient;
     Properties  *properties;
     FocusModule    *focuser;
@@ -40,5 +40,7 @@ private slots:
 private:
     Setup _setup;
     bool _appSettingsSaveEveryBlob;
+    QString _appSettingsHostName;
+    int _appSettingsServerPort;
 };
 #endif
