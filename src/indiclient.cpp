@@ -197,16 +197,24 @@ std::string IndiCLient::extract(INumberVectorProperty *pVector) {
     std::stringstream stream;
 
     std::string deviceName = pVector->device;
+    std::string vectorGroup = pVector->group;
     std::string vectorName = pVector->name;
     std::string vectorLabel = pVector->label;
-    std::string vectorGroup = pVector->group;
+    int vectorPermission = pVector->p;
+    double vectorTimeout = pVector->timeout;
+    std::string vectorTimeStamp = pVector->timestamp;
     int vectorState = pVector->s;
+    void* vectorAux = pVector->aux;
 
     stream << "VectDevice=" << deviceName;
     stream << ". VectGroup=" << vectorGroup;
     stream << ". VectName=" << vectorName;
     stream << ". VectLabel=" << vectorLabel;
+    stream << ". VectPerm=" << _propertyPermsToNamesMap[vectorPermission] << '(' << vectorPermission << ')';
+    stream << ". VectTimeout=" << vectorTimeout;
+    stream << ". VectTimeStamp=" << vectorTimeStamp;
     stream << ". State=" << _propertyStatesToNamesMap[vectorState] << '(' << vectorState << ')';
+    stream << ". VectAuxType=" << typeid(vectorAux).name();
     stream << ". Values: ";
 
     for (int i = 0; i < pVector->nnp; ++i) {
