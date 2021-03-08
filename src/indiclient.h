@@ -49,7 +49,7 @@ class IndiCLient : public QObject, public INDI::BaseClient
 private:
     /* Private constructor to prevent instancing. */
     IndiCLient();
-    ~IndiCLient() = default;
+    ~IndiCLient() override = default;
     /* Singleton instance storage. */
     static IndiCLient* instance;
 
@@ -61,5 +61,6 @@ private:
     std::string extract(ITextVectorProperty* pVector);
     std::string extract(INumberVectorProperty* pVector);
     std::string extract(ISwitchVectorProperty* pVector);
+    std::string extract(ILightVectorProperty* pVector);
 };
 #endif

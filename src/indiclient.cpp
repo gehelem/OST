@@ -1,8 +1,6 @@
 #include "indiclient.h"
 #include <QApplication>
 #include <basedevice.h>
-#include <cstring>
-#include <fstream>
 #include <iostream>
 #include <memory>
 #include <QDir>
@@ -27,7 +25,7 @@
 /* singleton  : getting unique instance if exists, create it if not */
 IndiCLient* IndiCLient::getInstance()
 {
-    if (instance == 0)
+    if (instance == nullptr)
     {
         instance = new IndiCLient();
     }
@@ -35,7 +33,7 @@ IndiCLient* IndiCLient::getInstance()
     return instance;
 }
 /* Null, because instance will be initialized on demand. */
-IndiCLient* IndiCLient::instance = 0;
+IndiCLient* IndiCLient::instance = nullptr;
 
 IndiCLient::IndiCLient()
 {
@@ -60,7 +58,7 @@ IndiCLient::IndiCLient()
 
     qRegisterMetaType<std::string>();
 }
-void IndiCLient::serverConnected(void)
+void IndiCLient::serverConnected()
 {
     BOOST_LOG_TRIVIAL(debug) << "Server connected";
     emit SigServerConnected();
@@ -105,6 +103,7 @@ void IndiCLient::newProperty(INDI::Property *pProperty)
         case INDI_NUMBER: stream << extract(pProperty->getNumber()); break;
         case INDI_TEXT: stream << extract(pProperty->getText()); break;
         case INDI_SWITCH: stream << extract(pProperty->getSwitch()); break;
+        case INDI_LIGHT: stream << extract(pProperty->getLight()); break;
 
         default:
             break;
@@ -139,7 +138,7 @@ void IndiCLient::newSwitch(ISwitchVectorProperty *svp)
 }
 void IndiCLient::newLight(ILightVectorProperty *lvp)
 {
-    BOOST_LOG_TRIVIAL(debug) << "Light received";
+    BOOST_LOG_TRIVIAL(debug) << extract(lvp);
     emit SigNewLight(lvp);
 }
 void IndiCLient::newMessage(INDI::BaseDevice *dp, int messageID)
@@ -159,15 +158,21 @@ std::string IndiCLient::extract(ITextVectorProperty *pVector) {
     std::stringstream stream;
 
     std::string deviceName = pVector->device;
+    std::string vectorGroup = pVector->group;
     std::string vectorName = pVector->name;
     std::string vectorLabel = pVector->label;
-    std::string vectorGroup = pVector->group;
+    int vectorPermission = pVector->p;
+    double vectorTimeout = pVector->timeout;
     int vectorState = pVector->s;
+    std::string vectorTimeStamp = pVector->timestamp;
 
     stream << "VectDevice=" << deviceName;
     stream << ". VectGroup=" << vectorGroup;
     stream << ". VectName=" << vectorName;
     stream << ". VectLabel=" << vectorLabel;
+    stream << ". VectPerm=" << _propertyPermsToNamesMap[vectorPermission] << '(' << vectorPermission << ')';
+    stream << ". VectTimeout=" << vectorTimeout;
+    stream << ". VectTimeStamp=" << vectorTimeStamp;
     stream << ". State=" << _propertyStatesToNamesMap[vectorState] << '(' << vectorState << ')';
     stream << ". Values: ";
 
@@ -202,9 +207,8 @@ std::string IndiCLient::extract(INumberVectorProperty *pVector) {
     std::string vectorLabel = pVector->label;
     int vectorPermission = pVector->p;
     double vectorTimeout = pVector->timeout;
-    std::string vectorTimeStamp = pVector->timestamp;
     int vectorState = pVector->s;
-    void* vectorAux = pVector->aux;
+    std::string vectorTimeStamp = pVector->timestamp;
 
     stream << "VectDevice=" << deviceName;
     stream << ". VectGroup=" << vectorGroup;
@@ -214,7 +218,6 @@ std::string IndiCLient::extract(INumberVectorProperty *pVector) {
     stream << ". VectTimeout=" << vectorTimeout;
     stream << ". VectTimeStamp=" << vectorTimeStamp;
     stream << ". State=" << _propertyStatesToNamesMap[vectorState] << '(' << vectorState << ')';
-    stream << ". VectAuxType=" << typeid(vectorAux).name();
     stream << ". Values: ";
 
     for (int i = 0; i < pVector->nnp; ++i) {
@@ -244,19 +247,24 @@ std::string IndiCLient::extract(ISwitchVectorProperty *pVector) {
     std::stringstream stream;
 
     std::string deviceName = pVector->device;
+    std::string vectorGroup = pVector->group;
     std::string vectorName = pVector->name;
     std::string vectorLabel = pVector->label;
-    std::string vectorGroup = pVector->group;
-    std::string switchRule = _switchRuleToNamesMap[pVector->r];
+    int vectorPermission = pVector->p;
+    double vectorTimeout = pVector->timeout;
     int vectorState = pVector->s;
+    std::string vectorTimeStamp = pVector->timestamp;
+    int vectorRule = pVector->r;
 
     stream << "VectDevice=" << deviceName;
     stream << ". VectGroup=" << vectorGroup;
     stream << ". VectName=" << vectorName;
     stream << ". VectLabel=" << vectorLabel;
+    stream << ". VectPerm=" << _propertyPermsToNamesMap[vectorPermission] << '(' << vectorPermission << ')';
+    stream << ". VectTimeout=" << vectorTimeout;
+    stream << ". VectTimeStamp=" << vectorTimeStamp;
     stream << ". State=" << _propertyStatesToNamesMap[vectorState] << '(' << vectorState << ')';
-    stream << ". VectRule=" << switchRule;
-
+    stream << ". Rule=" << _switchRuleToNamesMap[vectorRule] << '(' << vectorRule << ')';
     stream << ". Values: ";
 
     for (int i = 0; i < pVector->nsp; ++i) {
@@ -269,6 +277,39 @@ std::string IndiCLient::extract(ISwitchVectorProperty *pVector) {
         stream << "  *Name=" << switchName;
         stream << ". Label: " << switchLabel;
         stream << ". State: " << (switchState ? "true" : "false") << ". ";
+    }
+    return stream.str();
+}
+
+std::string IndiCLient::extract(ILightVectorProperty* pVector) {
+
+    std::stringstream stream;
+
+    std::string deviceName = pVector->device;
+    std::string vectorGroup = pVector->group;
+    std::string vectorName = pVector->name;
+    std::string vectorLabel = pVector->label;
+    int vectorState = pVector->s;
+    std::string vectorTimeStamp = pVector->timestamp;
+
+    stream << "VectDevice=" << deviceName;
+    stream << ". VectGroup=" << vectorGroup;
+    stream << ". VectName=" << vectorName;
+    stream << ". VectLabel=" << vectorLabel;
+    stream << ". VectTimeStamp=" << vectorTimeStamp;
+    stream << ". State=" << _propertyStatesToNamesMap[vectorState] << '(' << vectorState << ')';
+    stream << ". Values: ";
+
+    for (int i = 0; i < pVector->nlp; ++i) {
+
+        ILight currentValue = pVector->lp[i];
+        std::string lightName = currentValue.name;
+        std::string lightLabel = currentValue.label;
+        int lightState = currentValue.s;
+
+        stream << "  *Name=" << lightName;
+        stream << ". Label: " << lightLabel;
+        stream << ". State: " << _propertyStatesToNamesMap[lightState] << '(' << lightState << ')';
     }
     return stream.str();
 }
