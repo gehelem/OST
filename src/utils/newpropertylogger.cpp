@@ -7,10 +7,7 @@
 void NewPropertyLogger::visit(NumberProperty *pProperty) {
 
     std::stringstream stream;
-    stream << "New Number Property: "
-           << dumpPropertyCommons(pProperty)
-           << ". Values: "
-           << dumpNumbers(pProperty);
+    stream << "New Number Property: " << dump(pProperty);
     BOOST_LOG_TRIVIAL(debug) << stream.str();
 }
 

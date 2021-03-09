@@ -14,9 +14,6 @@ void UpdatedPropertyLogger::visit(SwitchProperty *pProperty) {
 void UpdatedPropertyLogger::visit(NumberProperty *pProperty) {
 
     std::stringstream stream;
-    stream << "Updated Number Property: "
-           << dumpPropertyCommons(pProperty)
-           << ". Values: "
-           << dumpNumbers(pProperty);
+    stream << "Updated Number Property: " << dump(pProperty);
     BOOST_LOG_TRIVIAL(debug) << stream.str();
 }

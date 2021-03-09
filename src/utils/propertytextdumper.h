@@ -16,6 +16,7 @@ protected:
     PropertyTextDumper() = default;
     std::string dumpPropertyCommons(Property* pProperty);
     std::string dumpNumbers(NumberProperty* pProperty);
+    std::string dump(NumberProperty* pProperty);
 
     std::map<int, std::string> _propertyStatesToNamesMap = {
             {0, "Idle"},

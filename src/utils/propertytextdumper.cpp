@@ -31,3 +31,9 @@ std::string PropertyTextDumper::dumpNumbers(NumberProperty* pProperty) {
 
     return stream.str();
 }
+
+std::string PropertyTextDumper::dump(NumberProperty *pProperty) {
+    std::stringstream stream;
+    stream << dumpPropertyCommons(pProperty) << dumpNumbers(pProperty);
+    return stream.str();
+}
