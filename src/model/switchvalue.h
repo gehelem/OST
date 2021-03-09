@@ -3,12 +3,12 @@
 
 #include <string>
 
-#include "model/valuebase.h"
+#include "model/value.h"
 
 /*!
  * Indi-like switch
  */
-class SwitchValue : public ValueBase {
+class SwitchValue : public Value {
 
 public:
     /*!
@@ -18,7 +18,9 @@ public:
      * @param label value's display label
      * @param switchState switch state
      */
-    SwitchValue(const std::string& name, const std::string& label, const std::string &hint,const bool& switchState );
+    SwitchValue(const QString& name, const QString& label, const QString &hint,const bool& switchState )
+    : Value(name, label, hint), _switchState(switchState) {}
+
     ~SwitchValue() override = default;
 
     /*!

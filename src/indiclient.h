@@ -3,6 +3,8 @@
 #include <baseclient.h>
 #include <qobject.h>
 
+class Property;
+
 Q_DECLARE_METATYPE(std::string)
 
 /*!
@@ -35,13 +37,13 @@ class IndiCLient : public QObject, public INDI::BaseClient
     void SigServerDisconnected(int exit_code);
     void newDeviceSeen(std::string);
     void deviceRemoved(std::string);
-    void SigNewProperty(INDI::Property *property);
+    void newPropertyReceived(Property* pProperty);
+    void propertyUpdated(Property* pProperty);
     void SigRemoveProperty(INDI::Property *property);
     void SigNewText(ITextVectorProperty *tvp);
     void SigNewSwitch(ISwitchVectorProperty *svp);
     void SigNewLight(ILightVectorProperty *lvp);
     void newBlobReceived(const QByteArray& data, QString format);
-    void SigNewNumber(INumberVectorProperty *nvp);
     void SigNewMessage(INDI::BaseDevice *dp, int messageID);
 
     protected:
@@ -54,12 +56,9 @@ private:
     static IndiCLient* instance;
 
     std::map<int, std::string> _propertyTypesToNamesMap;
-    std::map<int, std::string> _propertyStatesToNamesMap;
-    std::map<int, std::string> _propertyPermsToNamesMap;
     std::map<int, std::string> _switchRuleToNamesMap;
 
     std::string extract(ITextVectorProperty* pVector);
-    std::string extract(INumberVectorProperty* pVector);
     std::string extract(ISwitchVectorProperty* pVector);
     std::string extract(ILightVectorProperty* pVector);
 };

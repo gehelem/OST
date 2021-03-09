@@ -2,6 +2,7 @@
 #include "controller.h"
 
 #include "boost/log/trivial.hpp"
+#include "model/property.h"
 
 /*!
  * ... ...
@@ -43,6 +44,8 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
     connect(indiclient, &IndiCLient::newDeviceSeen, this, &Controller::onNewDeviceSeen);
     connect(indiclient, &IndiCLient::deviceRemoved, this, &Controller::onDeviceRemoved);
     connect(indiclient, &IndiCLient::newBlobReceived, this, &Controller::onNewBlobReveived);
+    connect(indiclient, &IndiCLient::newPropertyReceived, this, &Controller::onNewPropertyReceived);
+    connect(indiclient, &IndiCLient::propertyUpdated, this, &Controller::onPropertyUpdated);
     //properties->dumproperties();
 
 }
@@ -99,6 +102,22 @@ void Controller::onNewBlobReveived(const QByteArray& data, const QString& format
         }
     }
 
+}
+
+void Controller::onNewPropertyReceived(Property *pProperty) {
+
+    pProperty->accept(&_newPropertyLogger);
+
+    // TODO do something with this new property
+    delete pProperty;
+}
+
+void Controller::onPropertyUpdated(Property *pProperty) {
+
+    pProperty->accept(&_updatedPropertyLogger);
+
+    // TODO do something with this updated property
+    delete pProperty;
 }
 
 

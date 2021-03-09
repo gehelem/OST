@@ -3,12 +3,12 @@
 
 #include <string>
 
-#include "model/valuebase.h"
+#include "model/value.h"
 
 /*!
  * INDI-like numerical value
  */
-class NumberValue : public ValueBase {
+class NumberValue : public Value {
 
 public:
     /*!
@@ -22,14 +22,35 @@ public:
      * @param max maximum allowed value
      * @param step increment step
      */
-    NumberValue(const std::string& name, const std::string& label, const std::string &hint,
-                const double& value, const std::string& format,
-                const double& min, const double& max, const double& step);
+    NumberValue(const QString& name, const QString& label, const QString &hint, const double& value,
+                const QString& format, const double& min, const double& max, const double& step)
+    : Value(name, label, hint), _value(value), _format(format), _min(min), _max(max), _step(step) {}
+
     ~NumberValue() override = default;
+
+    double getValue() const {
+        return _value;
+    }
+
+    const QString &getFormat() const {
+        return _format;
+    }
+
+    double getMin() const {
+        return _min;
+    }
+
+    double getMax() const {
+        return _max;
+    }
+
+    double getStep() const {
+        return _step;
+    }
 
 private:
     double _value;
-    std::string _format;
+    QString _format;
     double _min;
     double _max;
     double _step;

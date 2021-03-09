@@ -3,12 +3,12 @@
 
 #include <string>
 
-#include "model/valuebase.h"
+#include "model/value.h"
 
 /*!
  * Basic text value
  */
-class TextValue : public ValueBase {
+class TextValue : public Value {
 
 public:
     /*!
@@ -18,7 +18,9 @@ public:
      * @param label: diplsay label for this value
      * @param text: text value
      */
-    TextValue(const std::string& name, const std::string& label, const std::string &hint, const std::string& text);
+    TextValue(const QString& name, const QString& label, const QString &hint, const QString& text)
+    : Value(name, label, hint), _text(text) {}
+    
     ~TextValue() override = default;
 
     /*!
@@ -26,10 +28,10 @@ public:
      *
      * @return this value's text
      */
-    [[nodiscard]] inline const std::string& text() const {return _text;}
+    [[nodiscard]] inline const QString& text() const {return _text;}
 
 private:
-    std::string _text;
+    QString _text;
 };
 
 

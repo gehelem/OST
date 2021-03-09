@@ -61,18 +61,25 @@ add_executable( ${APP_EXEOST}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/properties.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/jsonparser.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/polynomialfit.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/valuebase.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/valuebase.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/textvalue.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/value.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/textvalue.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/switchvalue.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/switchvalue.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/numbervalue.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/numbervalue.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/setup.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/setup.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/device.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/device.h)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/device.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/property.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/propertyvisitor.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/numberproperty.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/propertyfactory.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/propertyfactory.h 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/newpropertylogger.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/newpropertylogger.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/propertytextdumper.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/propertytextdumper.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/updatedpropertylogger.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/updatedpropertylogger.h)
 
 ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
 
