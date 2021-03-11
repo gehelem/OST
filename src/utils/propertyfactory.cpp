@@ -3,9 +3,9 @@
 //
 
 #include "propertyfactory.h"
-#include "numberproperty.h"
-#include "switchproperty.h"
-#include "textproperty.h"
+#include "model/numberproperty.h"
+#include "model/switchproperty.h"
+#include "model/textproperty.h"
 
 Property* PropertyFactory::createProperty(INumberVectorProperty *pVector) {
 

@@ -6,7 +6,7 @@
 #define OST_PROPERTYFACTORY_H
 
 #include <baseclient.h>
-#include "property.h"
+#include "model/property.h"
 
 class PropertyFactory {
 

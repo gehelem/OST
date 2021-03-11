@@ -14,7 +14,7 @@
 #include <baseclientqt.h>
 
 #include <sstream>
-#include <model/propertyfactory.h>
+#include <utils/propertyfactory.h>
 
 #include "boost/log/trivial.hpp"
 
