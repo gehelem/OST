@@ -18,5 +18,7 @@ void NewPropertyLogger::visit(SwitchProperty *pProperty) {
 }
 
 void NewPropertyLogger::visit(TextProperty *pProperty) {
-
+    std::stringstream stream;
+    stream << "New Text Property: " << dump(pProperty);
+    BOOST_LOG_TRIVIAL(debug) << stream.str();
 }

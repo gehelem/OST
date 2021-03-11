@@ -5,6 +5,7 @@
 #include "propertyfactory.h"
 #include "numberproperty.h"
 #include "switchproperty.h"
+#include "textproperty.h"
 
 Property* PropertyFactory::createProperty(INumberVectorProperty *pVector) {
 
@@ -60,4 +61,28 @@ Property *PropertyFactory::createProperty(ISwitchVectorProperty *pVector) {
     }
 
     return pProperty;
+}
+
+Property *PropertyFactory::createProperty(ITextVectorProperty *pVector) {
+
+    auto* pPorperty = new TextProperty(
+            pVector->device,
+            pVector->group,
+            pVector->name,
+            pVector->label,
+            pVector->p,
+            pVector->s);
+
+    for (int i = 0; i < pVector->ntp; ++i) {
+
+        IText currentText = pVector->tp[i];
+
+        pPorperty->addText(new TextValue(
+                currentText.name,
+                currentText.label,
+                "",
+                currentText.text));
+    }
+
+    return pPorperty;
 }

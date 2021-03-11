@@ -1,6 +1,7 @@
 #include "propertytextdumper.h"
 #include "model/property.h"
 #include <sstream>
+#include <model/textproperty.h>
 
 std::string PropertyTextDumper::dumpPropertyCommons(Property *pProperty) {
 
@@ -28,7 +29,6 @@ std::string PropertyTextDumper::dumpNumbers(NumberProperty* pProperty) {
                << ". Max=" << pNumber->getMax()
                << ". Step=" << pNumber->getStep();
     }
-
     return stream.str();
 }
 
@@ -38,9 +38,12 @@ std::string PropertyTextDumper::dump(NumberProperty *pProperty) {
     return stream.str();
 }
 
-std::string PropertyTextDumper::dumpSwitch(SwitchProperty *pProperty) {
+std::string PropertyTextDumper::dumpSwitches(SwitchProperty *pProperty) {
+
     std::stringstream stream;
+
     stream << ". Rule=" << _switchRuleToNamesMap[pProperty->getRule()] << "(" << pProperty->getRule() << ")";
+
     for ( SwitchValue* pSwitch : pProperty->getSwitches() ) {
         stream << "   *Name=" << pSwitch->name().toStdString()
                << ". Label=" << pSwitch->label().toStdString()
@@ -51,6 +54,25 @@ std::string PropertyTextDumper::dumpSwitch(SwitchProperty *pProperty) {
 
 std::string PropertyTextDumper::dump(SwitchProperty *pProperty) {
     std::stringstream stream;
-    stream << dumpPropertyCommons(pProperty) << dumpSwitch(pProperty);
+    stream << dumpPropertyCommons(pProperty) << dumpSwitches(pProperty);
+    return stream.str();
+}
+
+std::string PropertyTextDumper::dumpTexts(TextProperty *pProperty) {
+
+    std::stringstream stream;
+
+    for ( TextValue* pText : pProperty->getTexts() ) {
+
+        stream << "  *Name=" << pText->name().toStdString()
+               << ". Label=" << pText->label().toStdString()
+               << ". Text=" << pText->text().toStdString() << ". ";
+    }
+    return stream.str();
+}
+
+std::string PropertyTextDumper::dump(TextProperty *pProperty) {
+    std::stringstream stream;
+    stream << dumpPropertyCommons(pProperty) << dumpTexts(pProperty);
     return stream.str();
 }

@@ -55,9 +55,6 @@ private:
     /* Singleton instance storage. */
     static IndiCLient* instance;
 
-    std::map<int, std::string> _propertyTypesToNamesMap;
-
-    std::string extract(ITextVectorProperty* pVector);
     std::string extract(ILightVectorProperty* pVector);
 };
 #endif

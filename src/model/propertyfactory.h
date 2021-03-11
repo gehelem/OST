@@ -14,6 +14,7 @@ public:
     PropertyFactory() = delete;
     static Property* createProperty(INumberVectorProperty* pVector);
     static Property* createProperty(ISwitchVectorProperty * pVector);
+    static Property* createProperty(ITextVectorProperty* pVector);
 };
 
 

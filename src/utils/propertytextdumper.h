@@ -18,8 +18,10 @@ protected:
     std::string dumpPropertyCommons(Property* pProperty);
     std::string dumpNumbers(NumberProperty* pProperty);
     std::string dump(NumberProperty* pProperty);
-    std::string dumpSwitch(SwitchProperty* pProperty);
+    std::string dumpSwitches(SwitchProperty* pProperty);
     std::string dump(SwitchProperty* pProperty);
+    std::string dumpTexts(TextProperty* pProperty);
+    std::string dump(TextProperty* pProperty);
 
     std::map<int, std::string> _propertyStatesToNamesMap = {
             {0, "Idle"},
