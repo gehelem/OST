@@ -4,7 +4,6 @@
 #include <sstream>
 
 void UpdatedPropertyLogger::visit(TextProperty *pProperty) {
-
     std::stringstream stream;
     stream << "Updated Text Property: " << dump(pProperty);
     BOOST_LOG_TRIVIAL(debug) << stream.str();
@@ -17,8 +16,13 @@ void UpdatedPropertyLogger::visit(SwitchProperty *pProperty) {
 }
 
 void UpdatedPropertyLogger::visit(NumberProperty *pProperty) {
-
     std::stringstream stream;
     stream << "Updated Number Property: " << dump(pProperty);
+    BOOST_LOG_TRIVIAL(debug) << stream.str();
+}
+
+void UpdatedPropertyLogger::visit(LightProperty *pProperty) {
+    std::stringstream stream;
+    stream << "Updated Light Property: " << dump(pProperty);
     BOOST_LOG_TRIVIAL(debug) << stream.str();
 }

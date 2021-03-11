@@ -8,6 +8,7 @@
 class NumberProperty;
 class TextProperty;
 class SwitchProperty;
+class LightProperty;
 
 class PropertyVisitor {
 
@@ -18,6 +19,7 @@ public:
     virtual void visit(NumberProperty* pProperty) = 0;
     virtual void visit(SwitchProperty* pProperty) = 0;
     virtual void visit(TextProperty* pProperty) = 0;
+    virtual void visit(LightProperty* pProperty) = 0;
 };
 
 #endif //OST_PROPERTYVISITOR_H

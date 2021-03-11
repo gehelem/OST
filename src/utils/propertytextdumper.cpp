@@ -2,6 +2,7 @@
 #include "model/property.h"
 #include <sstream>
 #include <model/textproperty.h>
+#include <model/lightproperty.h>
 
 std::string PropertyTextDumper::dumpPropertyCommons(Property *pProperty) {
 
@@ -10,8 +11,8 @@ std::string PropertyTextDumper::dumpPropertyCommons(Property *pProperty) {
            << ". Group=" << pProperty->getGroupName().toStdString()
            << ". Name=" << pProperty->getName().toStdString()
            << ". Label=" << pProperty->getLabel().toStdString()
-           << ". Permission=" << _propertyPermsToNamesMap[pProperty->getPermission()] << "(" << pProperty->getPermission() << ")"
-           << ". State=" << _propertyStatesToNamesMap[pProperty->getState()] << "(" << pProperty->getState() << ")";
+           << ". Permission=" << _permsToNamesMap[pProperty->getPermission()] << "(" << pProperty->getPermission() << ")"
+           << ". State=" << _statesToNamesMap[pProperty->getState()] << "(" << pProperty->getState() << ")";
     return stream.str();
 }
 
@@ -42,7 +43,7 @@ std::string PropertyTextDumper::dumpSwitches(SwitchProperty *pProperty) {
 
     std::stringstream stream;
 
-    stream << ". Rule=" << _switchRuleToNamesMap[pProperty->getRule()] << "(" << pProperty->getRule() << ")";
+    stream << ". Rule=" << _ruleToNamesMap[pProperty->getRule()] << "(" << pProperty->getRule() << ")";
 
     for ( SwitchValue* pSwitch : pProperty->getSwitches() ) {
         stream << "   *Name=" << pSwitch->name().toStdString()
@@ -74,5 +75,23 @@ std::string PropertyTextDumper::dumpTexts(TextProperty *pProperty) {
 std::string PropertyTextDumper::dump(TextProperty *pProperty) {
     std::stringstream stream;
     stream << dumpPropertyCommons(pProperty) << dumpTexts(pProperty);
+    return stream.str();
+}
+
+std::string PropertyTextDumper::dumpLights(LightProperty *pProperty) {
+
+    std::stringstream stream;
+
+    for ( LightValue* pLight : pProperty->getLights() ) {
+        stream << "   *Name=" << pLight->name().toStdString()
+               << ". Label=" << pLight->label().toStdString()
+               << ". State=" << _statesToNamesMap[pLight->lightState()] << "(" << pLight->lightState() << ")";
+    }
+    return stream.str();
+}
+
+std::string PropertyTextDumper::dump(LightProperty *pProperty) {
+    std::stringstream stream;
+    stream << dumpPropertyCommons(pProperty) << dumpLights(pProperty);
     return stream.str();
 }

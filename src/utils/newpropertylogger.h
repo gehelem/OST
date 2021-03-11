@@ -10,6 +10,7 @@ public:
     void visit(NumberProperty *pProperty) override;
     void visit(SwitchProperty *pProperty) override;
     void visit(TextProperty *pProperty) override;
+    void visit(LightProperty *pProperty) override;
 };
 
 

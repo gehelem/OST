@@ -78,6 +78,12 @@ void IndiCLient::newProperty(INDI::Property *pProperty)
             break;
         }
 
+        case INDI_LIGHT: {
+
+            emit newPropertyReceived(PropertyFactory::createProperty(pProperty->getLight()));
+            break;
+        }
+
         default:
             break;
     }
@@ -97,12 +103,11 @@ void IndiCLient::newText(ITextVectorProperty *tvp)
 }
 void IndiCLient::newSwitch(ISwitchVectorProperty *svp)
 {
-    emit newPropertyReceived(PropertyFactory::createProperty(svp));
+    emit propertyUpdated(PropertyFactory::createProperty(svp));
 }
 void IndiCLient::newLight(ILightVectorProperty *lvp)
 {
-    BOOST_LOG_TRIVIAL(debug) << extract(lvp);
-    emit SigNewLight(lvp);
+    emit propertyUpdated(PropertyFactory::createProperty(lvp));
 }
 void IndiCLient::newMessage(INDI::BaseDevice *dp, int messageID)
 {

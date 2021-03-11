@@ -15,6 +15,7 @@ public:
     static Property* createProperty(INumberVectorProperty* pVector);
     static Property* createProperty(ISwitchVectorProperty * pVector);
     static Property* createProperty(ITextVectorProperty* pVector);
+    static Property* createProperty(ILightVectorProperty* pVector);
 };
 
 

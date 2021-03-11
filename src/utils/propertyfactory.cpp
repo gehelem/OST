@@ -6,6 +6,8 @@
 #include "model/numberproperty.h"
 #include "model/switchproperty.h"
 #include "model/textproperty.h"
+#include "model/lightproperty.h"
+#include "model/lightvalue.h"
 
 Property* PropertyFactory::createProperty(INumberVectorProperty *pVector) {
 
@@ -82,6 +84,33 @@ Property *PropertyFactory::createProperty(ITextVectorProperty *pVector) {
                 currentText.label,
                 "",
                 currentText.text));
+    }
+
+    return pPorperty;
+}
+
+Property *PropertyFactory::createProperty(ILightVectorProperty *pVector) {
+
+    auto* pPorperty = new LightProperty (
+            pVector->device,
+            pVector->group,
+            pVector->name,
+            pVector->label,
+            /*
+             * INDI light properties have no permission flag and are consuidered
+             * as ReadOnly: hence 0 */
+            0,
+            pVector->s);
+
+    for (int i = 0; i < pVector->nlp; ++i) {
+
+        ILight currentLight = pVector->lp[i];
+
+        pPorperty->addLight(new LightValue (
+                currentLight.name,
+                currentLight.label,
+                "",
+                currentLight.s));
     }
 
     return pPorperty;

@@ -16,27 +16,31 @@ class PropertyTextDumper {
 protected:
     PropertyTextDumper() = default;
     std::string dumpPropertyCommons(Property* pProperty);
-    std::string dumpNumbers(NumberProperty* pProperty);
-    std::string dump(NumberProperty* pProperty);
-    std::string dumpSwitches(SwitchProperty* pProperty);
-    std::string dump(SwitchProperty* pProperty);
-    std::string dumpTexts(TextProperty* pProperty);
-    std::string dump(TextProperty* pProperty);
 
-    std::map<int, std::string> _propertyStatesToNamesMap = {
+    std::string dumpNumbers(NumberProperty* pProperty);
+    std::string dumpSwitches(SwitchProperty* pProperty);
+    std::string dumpTexts(TextProperty* pProperty);
+    std::string dumpLights(LightProperty* pProperty);
+
+    std::string dump(NumberProperty* pProperty);
+    std::string dump(SwitchProperty* pProperty);
+    std::string dump(TextProperty* pProperty);
+    std::string dump(LightProperty* pProperty);
+
+    std::map<int, std::string> _statesToNamesMap = {
             {0, "Idle"},
             {1, "OK"},
             {2, "Busy"},
             {3, "Alert"}
     };
 
-    std::map<int, std::string> _propertyPermsToNamesMap = {
+    std::map<int, std::string> _permsToNamesMap = {
             {0, "ReadOnly"},
             {1, "WriteOnly"},
             {2, "ReadWrite"}
     };
 
-    std::map<int, std::string> _switchRuleToNamesMap = {
+    std::map<int, std::string> _ruleToNamesMap = {
             {0, "1ofMany"},
             {1, "atMost1"},
             {2, "NofMany"}
