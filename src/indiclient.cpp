@@ -36,11 +36,6 @@ IndiCLient* IndiCLient::getInstance()
 /* Null, because instance will be initialized on demand. */
 IndiCLient* IndiCLient::instance = nullptr;
 
-IndiCLient::IndiCLient()
-{
-    // This will die soon
-    qRegisterMetaType<std::string>();
-}
 void IndiCLient::serverConnected()
 {
     BOOST_LOG_TRIVIAL(debug) << "Server connected";

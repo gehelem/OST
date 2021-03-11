@@ -36,8 +36,8 @@ public slots:
 signals:
     void closed();
 private slots:
-    void onNewDeviceSeen(const std::string& deviceName);
-    void onDeviceRemoved(const std::string& deviceName);
+    void onNewDeviceSeen(const QString &deviceName);
+    void onDeviceRemoved(const QString &deviceName);
     void onNewBlobReveived(const QByteArray& data, const QString& format) const;
     void onNewPropertyReceived(Property* pProperty);
     void onPropertyUpdated(Property* pProperty);

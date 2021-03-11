@@ -1,15 +1,15 @@
 #ifndef OST_DEVICE_H
 #define OST_DEVICE_H
 
-#include <string>
+#include <QString>
 
 class Device {
 
 public:
-    Device(const std::string& name);
-    [[nodiscard]] inline const std::string& getName() const {return _name;}
+    Device(const QString& name);
+    [[nodiscard]] inline const QString& getName() const {return _name;}
 private:
-    std::string _name;
+    QString _name;
 };
 
 

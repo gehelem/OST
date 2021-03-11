@@ -5,7 +5,6 @@
 
 class Property;
 
-Q_DECLARE_METATYPE(std::string)
 
 /*!
  * indiclient class, overloaded with some basic functions to help us
@@ -35,8 +34,8 @@ class IndiCLient : public QObject, public INDI::BaseClient
   signals:
     void SigServerConnected();
     void SigServerDisconnected(int exit_code);
-    void newDeviceSeen(std::string);
-    void deviceRemoved(std::string);
+    void newDeviceSeen(QString);
+    void deviceRemoved(QString);
     void newPropertyReceived(Property* pProperty);
     void propertyUpdated(Property* pProperty);
     void SigRemoveProperty(INDI::Property *property);
@@ -46,11 +45,9 @@ class IndiCLient : public QObject, public INDI::BaseClient
     void newBlobReceived(const QByteArray& data, QString format);
     void SigNewMessage(INDI::BaseDevice *dp, int messageID);
 
-    protected:
-
 private:
     /* Private constructor to prevent instancing. */
-    IndiCLient();
+    IndiCLient() = default;
     ~IndiCLient() override = default;
     /* Singleton instance storage. */
     static IndiCLient* instance;

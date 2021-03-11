@@ -4,7 +4,7 @@
 
 #include "device.h"
 
-Device::Device(const std::string &name)
+Device::Device(const QString& name)
 : _name(name)
 {
 

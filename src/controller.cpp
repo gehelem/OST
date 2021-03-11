@@ -75,11 +75,11 @@ void Controller::propDeleted(Prop prop)
     wshandler->sendmessage("Del prop " +  prop.propname);
 }
 
-void Controller::onNewDeviceSeen(const std::string &deviceName) {
+void Controller::onNewDeviceSeen(const QString &deviceName) {
     _setup.addDevice(new Device(deviceName));
 }
 
-void Controller::onDeviceRemoved(const std::string &deviceName) {
+void Controller::onDeviceRemoved(const QString &deviceName) {
     _setup.removeDeviceByName(deviceName);
 }
 
