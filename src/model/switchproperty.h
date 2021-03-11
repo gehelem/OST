@@ -20,8 +20,8 @@ public:
 
     void addSwitch(SwitchValue* pValue) { _switches.append(pValue); }
 
-    int getRule() const { return _rule; }
-    const QList<SwitchValue*>& getSwitches() { return _switches; }
+    [[nodiscard]] int getRule() const { return _rule; }
+    inline const QList<SwitchValue*>& getSwitches() { return _switches; }
     void accept(PropertyVisitor *pVisitor) override { pVisitor->visit(this); }
 
 private:

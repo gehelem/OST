@@ -28,25 +28,11 @@ public:
 
     ~NumberValue() override = default;
 
-    double getValue() const {
-        return _value;
-    }
-
-    const QString &getFormat() const {
-        return _format;
-    }
-
-    double getMin() const {
-        return _min;
-    }
-
-    double getMax() const {
-        return _max;
-    }
-
-    double getStep() const {
-        return _step;
-    }
+    [[nodiscard]] inline double getValue() const { return _value; }
+    [[nodiscard]] inline const QString &getFormat() const { return _format; }
+    [[nodiscard]] inline double getMin() const { return _min; }
+    [[nodiscard]] inline double getMax() const { return _max; }
+    [[nodiscard]] inline double getStep() const { return _step; }
 
 private:
     double _value;

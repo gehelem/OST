@@ -21,7 +21,7 @@ public:
     ~NumberProperty() override { for (NumberValue* pVal : _numbers) {delete pVal;} }
 
     void addNumber(NumberValue* pValue) { _numbers.append(pValue); }
-    const QList<NumberValue*>& getNumbers() { return _numbers; }
+    inline const QList<NumberValue*>& getNumbers() { return _numbers; }
     void accept(PropertyVisitor *pVisitor) override { pVisitor->visit(this); }
 
 private:
