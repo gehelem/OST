@@ -111,8 +111,7 @@ void IndiCLient::newLight(ILightVectorProperty *lvp)
 }
 void IndiCLient::newMessage(INDI::BaseDevice *dp, int messageID)
 {
-    BOOST_LOG_TRIVIAL(debug) << "Message received: " << dp->messageQueue(messageID);
-    emit SigNewMessage(dp,messageID);
+    emit messageReceived(QString(dp->messageQueue(messageID).c_str()));
 }
 void IndiCLient::newBLOB(IBLOB *bp)
 {

@@ -43,7 +43,7 @@ class IndiCLient : public QObject, public INDI::BaseClient
     void SigNewSwitch(ISwitchVectorProperty *svp);
     void SigNewLight(ILightVectorProperty *lvp);
     void newBlobReceived(const QByteArray& data, QString format);
-    void SigNewMessage(INDI::BaseDevice *dp, int messageID);
+    void messageReceived(QString message);
 
 private:
     /* Private constructor to prevent instancing. */

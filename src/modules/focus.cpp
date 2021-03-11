@@ -20,7 +20,7 @@ FocusModule::FocusModule()
     connect(indiclient,&IndiCLient::SigNewLight,this,&FocusModule::OnIndiNewLight);
 //    connect(indiclient,&IndiCLient::SigNewBLOB,this,&FocusModule::OnIndiNewBLOB);
 //    connect(indiclient,&IndiCLient::SigNewNumber,this,&FocusModule::OnIndiNewNumber);
-    connect(indiclient,&IndiCLient::SigNewMessage,this,&FocusModule::OnIndiNewMessage);
+//    connect(indiclient, &IndiCLient::messageReceived, this, &FocusModule::OnIndiNewMessage);
 }
 
 FocusModule::~FocusModule()

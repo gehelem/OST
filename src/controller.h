@@ -40,6 +40,7 @@ private slots:
     void onNewBlobReveived(const QByteArray& data, const QString& format) const;
     void onNewPropertyReceived(Property* pProperty);
     void onPropertyUpdated(Property* pProperty);
+    void onMessageReceived(const QString& message);
 private:
     Setup _setup;
     bool _appSettingsSaveEveryBlob;

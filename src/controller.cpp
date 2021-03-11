@@ -46,6 +46,7 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
     connect(indiclient, &IndiCLient::newBlobReceived, this, &Controller::onNewBlobReveived);
     connect(indiclient, &IndiCLient::newPropertyReceived, this, &Controller::onNewPropertyReceived);
     connect(indiclient, &IndiCLient::propertyUpdated, this, &Controller::onPropertyUpdated);
+    connect(indiclient, &IndiCLient::messageReceived, this, &Controller::onMessageReceived);
     //properties->dumproperties();
 
 }
@@ -118,6 +119,19 @@ void Controller::onPropertyUpdated(Property *pProperty) {
     pProperty->accept(&logger);
     // TODO do something with this updated property
     delete pProperty;
+}
+
+void Controller::onMessageReceived(const QString& message) {
+
+    QString fullMessage = "Message received: " + message;
+
+    if ( message.contains("[ERROR]") ) {
+        BOOST_LOG_TRIVIAL(error) << fullMessage.toStdString();
+    } else if ( message.contains("[WARNING]") ) {
+        BOOST_LOG_TRIVIAL(warning) << fullMessage.toStdString();
+    } else if ( message.contains("[INFO]") ) {
+        BOOST_LOG_TRIVIAL(info) << fullMessage.toStdString();
+    }
 }
 
 
