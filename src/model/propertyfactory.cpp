@@ -4,6 +4,7 @@
 
 #include "propertyfactory.h"
 #include "numberproperty.h"
+#include "switchproperty.h"
 
 Property* PropertyFactory::createProperty(INumberVectorProperty *pVector) {
 
@@ -31,4 +32,32 @@ Property* PropertyFactory::createProperty(INumberVectorProperty *pVector) {
     }
 
     return pPorperty;
+}
+
+Property *PropertyFactory::createProperty(ISwitchVectorProperty *pVector) {
+
+    auto *pProperty = new SwitchProperty(
+            pVector->device,
+            pVector->group,
+            pVector->name,
+            pVector->label,
+            pVector->p,
+            pVector->s,
+            pVector->r
+    );
+
+    for (int i = 0; i < pVector->nsp; ++i) {
+
+        ISwitch currentValue = pVector->sp[i];
+
+        pProperty->addSwitch(new SwitchValue(
+
+                currentValue.name,
+                currentValue.label,
+                "",
+                currentValue.s
+        ));
+    }
+
+    return pProperty;
 }

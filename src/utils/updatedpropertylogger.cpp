@@ -8,7 +8,9 @@ void UpdatedPropertyLogger::visit(TextProperty *pProperty) {
 }
 
 void UpdatedPropertyLogger::visit(SwitchProperty *pProperty) {
-
+    std::stringstream stream;
+    stream << "Updated Switch Property: " << dump(pProperty);
+    BOOST_LOG_TRIVIAL(debug) << stream.str();
 }
 
 void UpdatedPropertyLogger::visit(NumberProperty *pProperty) {

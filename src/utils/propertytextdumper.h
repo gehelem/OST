@@ -7,6 +7,7 @@
 
 #include <string>
 #include <model/numberproperty.h>
+#include <model/switchproperty.h>
 
 class Property;
 
@@ -17,6 +18,8 @@ protected:
     std::string dumpPropertyCommons(Property* pProperty);
     std::string dumpNumbers(NumberProperty* pProperty);
     std::string dump(NumberProperty* pProperty);
+    std::string dumpSwitch(SwitchProperty* pProperty);
+    std::string dump(SwitchProperty* pProperty);
 
     std::map<int, std::string> _propertyStatesToNamesMap = {
             {0, "Idle"},
@@ -29,6 +32,12 @@ protected:
             {0, "ReadOnly"},
             {1, "WriteOnly"},
             {2, "ReadWrite"}
+    };
+
+    std::map<int, std::string> _switchRuleToNamesMap = {
+            {0, "1ofMany"},
+            {1, "atMost1"},
+            {2, "NofMany"}
     };
 };
 

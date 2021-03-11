@@ -59,7 +59,6 @@ private:
     std::map<int, std::string> _switchRuleToNamesMap;
 
     std::string extract(ITextVectorProperty* pVector);
-    std::string extract(ISwitchVectorProperty* pVector);
     std::string extract(ILightVectorProperty* pVector);
 };
 #endif

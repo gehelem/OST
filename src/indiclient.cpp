@@ -80,6 +80,12 @@ void IndiCLient::newProperty(INDI::Property *pProperty)
             break;
         }
 
+        case INDI_SWITCH: {
+
+            emit newPropertyReceived(PropertyFactory::createProperty(pProperty->getSwitch()));
+            break;
+        }
+
         default:
             break;
     }
@@ -100,10 +106,7 @@ void IndiCLient::newText(ITextVectorProperty *tvp)
 }
 void IndiCLient::newSwitch(ISwitchVectorProperty *svp)
 {
-    //if (strcmp(svp->name,"CONFIG_PROCESS")==0)
-    //for (int i=0;i<svp->nsp;i++) IDLog("Got switch %s %s %s\n",svp->device,svp->name,svp->sp[i].name);
-    BOOST_LOG_TRIVIAL(debug) << "Switch received: " << extract(svp);
-    emit SigNewSwitch(svp);
+    emit newPropertyReceived(PropertyFactory::createProperty(svp));
 }
 void IndiCLient::newLight(ILightVectorProperty *lvp)
 {
@@ -163,45 +166,6 @@ std::string IndiCLient::extract(ITextVectorProperty *pVector) {
     }
     return stream.str();
 
-}
-
-std::string IndiCLient::extract(ISwitchVectorProperty *pVector) {
-
-    std::stringstream stream;
-
-    QString deviceName = pVector->device;
-    QString vectorGroup = pVector->group;
-    QString vectorName = pVector->name;
-    QString vectorLabel = pVector->label;
-    int vectorPermission = pVector->p;
-    double vectorTimeout = pVector->timeout;
-    int vectorState = pVector->s;
-    QString vectorTimeStamp = pVector->timestamp;
-    int vectorRule = pVector->r;
-
-    stream << "VectDevice=" << deviceName.toStdString()
-    << ". VectGroup=" << vectorGroup.toStdString()
-    << ". VectName=" << vectorName.toStdString()
-    << ". VectLabel=" << vectorLabel.toStdString()
-    << ". VectPerm=" << vectorPermission
-    << ". VectTimeout=" << vectorTimeout
-    << ". VectTimeStamp=" << vectorTimeStamp.toStdString()
-    << ". State=" << vectorState
-    << ". Rule=" << _switchRuleToNamesMap[vectorRule] << '(' << vectorRule << ')'
-    << ". Values: ";
-
-    for (int i = 0; i < pVector->nsp; ++i) {
-
-        ISwitch currentValue = pVector->sp[i];
-        QString switchName = currentValue.name;
-        QString switchLabel = currentValue.label;
-        bool switchState = currentValue.s;
-
-        stream << "  *Name=" << switchName.toStdString()
-        << ". Label: " << switchLabel.toStdString()
-        << ". State: " << (switchState ? "true" : "false") << ". ";
-    }
-    return stream.str();
 }
 
 std::string IndiCLient::extract(ILightVectorProperty* pVector) {

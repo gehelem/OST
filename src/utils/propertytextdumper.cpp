@@ -37,3 +37,20 @@ std::string PropertyTextDumper::dump(NumberProperty *pProperty) {
     stream << dumpPropertyCommons(pProperty) << dumpNumbers(pProperty);
     return stream.str();
 }
+
+std::string PropertyTextDumper::dumpSwitch(SwitchProperty *pProperty) {
+    std::stringstream stream;
+    stream << ". Rule=" << _switchRuleToNamesMap[pProperty->getRule()] << "(" << pProperty->getRule() << ")";
+    for ( SwitchValue* pSwitch : pProperty->getSwitches() ) {
+        stream << "   *Name=" << pSwitch->name().toStdString()
+               << ". Label=" << pSwitch->label().toStdString()
+               << ". State=" << pSwitch->switchState();
+    }
+    return stream.str();
+}
+
+std::string PropertyTextDumper::dump(SwitchProperty *pProperty) {
+    std::stringstream stream;
+    stream << dumpPropertyCommons(pProperty) << dumpSwitch(pProperty);
+    return stream.str();
+}

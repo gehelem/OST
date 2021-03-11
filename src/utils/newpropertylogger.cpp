@@ -12,7 +12,9 @@ void NewPropertyLogger::visit(NumberProperty *pProperty) {
 }
 
 void NewPropertyLogger::visit(SwitchProperty *pProperty) {
-
+    std::stringstream stream;
+    stream << "New Switch Property: " << dump(pProperty);
+    BOOST_LOG_TRIVIAL(debug) << stream.str();
 }
 
 void NewPropertyLogger::visit(TextProperty *pProperty) {
