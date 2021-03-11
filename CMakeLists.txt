@@ -90,7 +90,9 @@ add_executable( ${APP_EXEOST}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/switchproperty.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/textproperty.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/lightvalue.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/lightproperty.h)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/lightproperty.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/propertystore.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/propertystore.h)
 
 ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
 

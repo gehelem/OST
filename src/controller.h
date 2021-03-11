@@ -3,6 +3,7 @@
 
 #include <model/setup.h>
 #include <utils/propertylogger.h>
+#include <model/propertystore.h>
 #include "focus.h"
 #include "wshandler.h"
 #include "properties.h"
@@ -46,5 +47,6 @@ private:
     bool _appSettingsSaveEveryBlob;
     QString _appSettingsHostName;
     int _appSettingsServerPort;
+    PropertyStore _propertyStore;
 };
 #endif

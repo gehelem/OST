@@ -1,8 +1,5 @@
-#include "indiclient.h"
 #include <QApplication>
 #include <basedevice.h>
-#include <iostream>
-#include <memory>
 #include <QDir>
 #include <QThread>
 #include <QMap>
@@ -12,11 +9,10 @@
 #include <QPointer>
 #include <QtNetwork>
 #include <baseclientqt.h>
-
-#include <sstream>
-#include <utils/propertyfactory.h>
-
 #include "boost/log/trivial.hpp"
+
+#include "indiclient.h"
+#include "utils/propertyfactory.h"
 
 /**************************************************************************************
 **
@@ -120,36 +116,4 @@ void IndiCLient::newBLOB(IBLOB *bp)
     emit newBlobReceived(data, bp->format);
 }
 
-std::string IndiCLient::extract(ILightVectorProperty* pVector) {
-
-    std::stringstream stream;
-
-    QString deviceName = pVector->device;
-    QString vectorGroup = pVector->group;
-    QString vectorName = pVector->name;
-    QString vectorLabel = pVector->label;
-    int vectorState = pVector->s;
-    QString vectorTimeStamp = pVector->timestamp;
-
-    stream << "VectDevice=" << deviceName.toStdString()
-    << ". VectGroup=" << vectorGroup.toStdString()
-    << ". VectName=" << vectorName.toStdString()
-    << ". VectLabel=" << vectorLabel.toStdString()
-    << ". VectTimeStamp=" << vectorTimeStamp.toStdString()
-    << ". State=" << vectorState
-    << ". Values: ";
-
-    for (int i = 0; i < pVector->nlp; ++i) {
-
-        ILight currentValue = pVector->lp[i];
-        QString lightName = currentValue.name;
-        QString lightLabel = currentValue.label;
-        int lightState = currentValue.s;
-
-        stream << "  *Name=" << lightName.toStdString()
-        << ". Label: " << lightLabel.toStdString()
-        << ". State: " << lightState;
-    }
-    return stream.str();
-}
 

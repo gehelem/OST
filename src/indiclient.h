@@ -51,7 +51,5 @@ private:
     ~IndiCLient() override = default;
     /* Singleton instance storage. */
     static IndiCLient* instance;
-
-    std::string extract(ILightVectorProperty* pVector);
 };
 #endif

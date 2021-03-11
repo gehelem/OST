@@ -109,16 +109,17 @@ void Controller::onNewPropertyReceived(Property *pProperty) {
 
     PropertyLogger logger(false);
     pProperty->accept(&logger);
-    // TODO do something with this new property
-    delete pProperty;
+
+    _propertyStore.add(pProperty);
+
 }
 
 void Controller::onPropertyUpdated(Property *pProperty) {
 
     PropertyLogger logger;
     pProperty->accept(&logger);
-    // TODO do something with this updated property
-    delete pProperty;
+
+    _propertyStore.update(pProperty);
 }
 
 void Controller::onMessageReceived(const QString& message) {
