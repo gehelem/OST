@@ -11,6 +11,8 @@ int main(int argc, char *argv[])
 {
     BOOST_LOG_TRIVIAL(info) << "OST starting up";
     QCoreApplication app(argc, argv);
+    QCoreApplication::setOrganizationName("Alazob");
+    QCoreApplication::setApplicationName("ost");
 
     QCommandLineParser argParser;
     argParser.addHelpOption();
