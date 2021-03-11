@@ -83,12 +83,10 @@ add_executable( ${APP_EXEOST}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/numberproperty.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/propertyfactory.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/propertyfactory.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/newpropertylogger.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/newpropertylogger.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/propertylogger.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/propertylogger.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/propertytextdumper.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/propertytextdumper.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/updatedpropertylogger.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/updatedpropertylogger.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/switchproperty.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/textproperty.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/lightvalue.h

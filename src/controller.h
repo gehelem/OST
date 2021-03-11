@@ -2,8 +2,7 @@
 #define CONTROLLER_h_
 
 #include <model/setup.h>
-#include <utils/newpropertylogger.h>
-#include <utils/updatedpropertylogger.h>
+#include <utils/propertylogger.h>
 #include "focus.h"
 #include "wshandler.h"
 #include "properties.h"
@@ -46,7 +45,5 @@ private:
     bool _appSettingsSaveEveryBlob;
     QString _appSettingsHostName;
     int _appSettingsServerPort;
-    NewPropertyLogger _newPropertyLogger;
-    UpdatedPropertyLogger _updatedPropertyLogger;
 };
 #endif

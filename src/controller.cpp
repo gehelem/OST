@@ -106,16 +106,16 @@ void Controller::onNewBlobReveived(const QByteArray& data, const QString& format
 
 void Controller::onNewPropertyReceived(Property *pProperty) {
 
-    pProperty->accept(&_newPropertyLogger);
-
+    PropertyLogger logger(false);
+    pProperty->accept(&logger);
     // TODO do something with this new property
     delete pProperty;
 }
 
 void Controller::onPropertyUpdated(Property *pProperty) {
 
-    pProperty->accept(&_updatedPropertyLogger);
-
+    PropertyLogger logger;
+    pProperty->accept(&logger);
     // TODO do something with this updated property
     delete pProperty;
 }
