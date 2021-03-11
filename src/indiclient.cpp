@@ -44,10 +44,6 @@ IndiCLient::IndiCLient()
     _propertyTypesToNamesMap[3] = "Light";
     _propertyTypesToNamesMap[4] = "BLOB";
 
-    _switchRuleToNamesMap[0] = "1ofMany";
-    _switchRuleToNamesMap[1] = "atMost1";
-    _switchRuleToNamesMap[2] = "NofMany";
-
     qRegisterMetaType<std::string>();
 }
 void IndiCLient::serverConnected()
