@@ -84,10 +84,36 @@ void IndiCLient::newProperty(INDI::Property *pProperty)
             break;
     }
 }
-void IndiCLient::removeProperty(INDI::Property *property)
+void IndiCLient::removeProperty(INDI::Property *pProperty)
 {
-    BOOST_LOG_TRIVIAL(debug) << "Property Removed: " << property->getDeviceName() << " : " << property->getName();
-    emit SigRemoveProperty(property);
+    switch (pProperty->getType()) {
+
+        case INDI_NUMBER: {
+            emit propertyRemoved(PropertyFactory::createProperty(pProperty->getNumber()));
+            break;
+        }
+
+        case INDI_SWITCH: {
+
+            emit propertyRemoved(PropertyFactory::createProperty(pProperty->getSwitch()));
+            break;
+        }
+
+        case INDI_TEXT: {
+
+            emit propertyRemoved(PropertyFactory::createProperty(pProperty->getText()));
+            break;
+        }
+
+        case INDI_LIGHT: {
+
+            emit propertyRemoved(PropertyFactory::createProperty(pProperty->getLight()));
+            break;
+        }
+
+        default:
+            break;
+    }
 }
 void IndiCLient::newNumber(INumberVectorProperty *nvp)
 {

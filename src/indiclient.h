@@ -38,7 +38,7 @@ class IndiCLient : public QObject, public INDI::BaseClient
     void deviceRemoved(QString);
     void newPropertyReceived(Property* pProperty);
     void propertyUpdated(Property* pProperty);
-    void SigRemoveProperty(INDI::Property *property);
+    void propertyRemoved(Property* pProperty);
     void SigNewText(ITextVectorProperty *tvp);
     void SigNewSwitch(ISwitchVectorProperty *svp);
     void SigNewLight(ILightVectorProperty *lvp);

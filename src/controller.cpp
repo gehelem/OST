@@ -46,6 +46,7 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
     connect(indiclient, &IndiCLient::newBlobReceived, this, &Controller::onNewBlobReveived);
     connect(indiclient, &IndiCLient::newPropertyReceived, this, &Controller::onNewPropertyReceived);
     connect(indiclient, &IndiCLient::propertyUpdated, this, &Controller::onPropertyUpdated);
+    connect(indiclient, &IndiCLient::propertyRemoved, this, &Controller::onPropertyRemoved);
     connect(indiclient, &IndiCLient::messageReceived, this, &Controller::onMessageReceived);
     //properties->dumproperties();
 
@@ -111,7 +112,6 @@ void Controller::onNewPropertyReceived(Property *pProperty) {
     pProperty->accept(&logger);
 
     _propertyStore.add(pProperty);
-
 }
 
 void Controller::onPropertyUpdated(Property *pProperty) {
@@ -133,6 +133,16 @@ void Controller::onMessageReceived(const QString& message) {
     } else if ( message.contains("[INFO]") ) {
         BOOST_LOG_TRIVIAL(info) << fullMessage.toStdString();
     }
+}
+
+void Controller::onPropertyRemoved(Property *pProperty) {
+
+    BOOST_LOG_TRIVIAL(debug) << "Property removed : "
+    << pProperty->getDeviceName().toStdString() << '|'
+    << pProperty->getGroupName().toStdString() << '|'
+    << pProperty->getName().toStdString();
+
+    _propertyStore.remove(pProperty);
 }
 
 
