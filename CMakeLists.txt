@@ -92,7 +92,9 @@ add_executable( ${APP_EXEOST}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/lightvalue.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/lightproperty.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/propertystore.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/propertystore.h)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/propertystore.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/jsondumper.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/jsondumper.h)
 
 ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
 
