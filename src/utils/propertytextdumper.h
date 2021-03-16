@@ -1,31 +1,26 @@
-//
-// Created by deufrai on 09/03/2021.
-//
-
 #ifndef OST_PROPERTYTEXTDUMPER_H
 #define OST_PROPERTYTEXTDUMPER_H
 
 #include <string>
 #include <model/numberproperty.h>
 #include <model/switchproperty.h>
+#include <utils/propertyvisitor.h>
 
 class Property;
 
-class PropertyTextDumper {
+class PropertyTextDumper : public PropertyVisitor {
 
-protected:
+public:
     PropertyTextDumper() = default;
-    std::string dumpPropertyCommons(Property* pProperty);
 
-    std::string dumpNumbers(NumberProperty* pProperty);
-    std::string dumpSwitches(SwitchProperty* pProperty);
-    std::string dumpTexts(TextProperty* pProperty);
-    std::string dumpLights(LightProperty* pProperty);
+    void visit(NumberProperty *pProperty) override;
+    void visit(SwitchProperty *pProperty) override;
+    void visit(TextProperty *pProperty) override;
+    void visit(LightProperty *pProperty) override;
 
-    std::string dump(NumberProperty* pProperty);
-    std::string dump(SwitchProperty* pProperty);
-    std::string dump(TextProperty* pProperty);
-    std::string dump(LightProperty* pProperty);
+    [[nodiscard]] const std::string& getResult() const { return _result; }
+
+private:
 
     std::map<int, std::string> _statesToNamesMap = {
             {0, "Idle"},
@@ -45,6 +40,11 @@ protected:
             {1, "atMost1"},
             {2, "NofMany"}
     };
+
+    std::string dumpPropertyCommons(Property* pProperty);
+
+    std::string _result;
+
 };
 
 #endif //OST_PROPERTYTEXTDUMPER_H

@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <utils/propertytextdumper.h>
 #include "controller.h"
 
 #include "boost/log/trivial.hpp"
@@ -108,16 +109,18 @@ void Controller::onNewBlobReveived(const QByteArray& data, const QString& format
 
 void Controller::onNewPropertyReceived(Property *pProperty) {
 
-    PropertyLogger logger(false);
-    pProperty->accept(&logger);
+    PropertyTextDumper textDumper;
+    pProperty->accept(&textDumper);
+    BOOST_LOG_TRIVIAL(debug) << "CREATED " << textDumper.getResult();
 
     _propertyStore.add(pProperty);
 }
 
 void Controller::onPropertyUpdated(Property *pProperty) {
 
-    PropertyLogger logger;
-    pProperty->accept(&logger);
+    PropertyTextDumper textDumper;
+    pProperty->accept(&textDumper);
+    BOOST_LOG_TRIVIAL(debug) << "UPDATED " << textDumper.getResult();
 
     _propertyStore.update(pProperty);
 }

@@ -16,9 +16,11 @@ std::string PropertyTextDumper::dumpPropertyCommons(Property *pProperty) {
     return stream.str();
 }
 
-std::string PropertyTextDumper::dumpNumbers(NumberProperty* pProperty) {
+void PropertyTextDumper::visit(NumberProperty *pProperty) {
 
     std::stringstream stream;
+
+    stream << "Number Property : " << dumpPropertyCommons(pProperty);
 
     for (NumberValue* pNumber : pProperty->getNumbers() ) {
 
@@ -30,19 +32,14 @@ std::string PropertyTextDumper::dumpNumbers(NumberProperty* pProperty) {
                << ". Max=" << pNumber->getMax()
                << ". Step=" << pNumber->getStep();
     }
-    return stream.str();
+    _result = stream.str();
 }
 
-std::string PropertyTextDumper::dump(NumberProperty *pProperty) {
-    std::stringstream stream;
-    stream << dumpPropertyCommons(pProperty) << dumpNumbers(pProperty);
-    return stream.str();
-}
-
-std::string PropertyTextDumper::dumpSwitches(SwitchProperty *pProperty) {
+void PropertyTextDumper::visit(SwitchProperty *pProperty) {
 
     std::stringstream stream;
 
+    stream << "Switch Property : " << dumpPropertyCommons(pProperty);
     stream << ". Rule=" << _ruleToNamesMap[pProperty->getRule()] << "(" << pProperty->getRule() << ")";
 
     for ( SwitchValue* pSwitch : pProperty->getSwitches() ) {
@@ -50,18 +47,14 @@ std::string PropertyTextDumper::dumpSwitches(SwitchProperty *pProperty) {
                << ". Label=" << pSwitch->label().toStdString()
                << ". State=" << pSwitch->switchState();
     }
-    return stream.str();
+    _result = stream.str();
 }
 
-std::string PropertyTextDumper::dump(SwitchProperty *pProperty) {
-    std::stringstream stream;
-    stream << dumpPropertyCommons(pProperty) << dumpSwitches(pProperty);
-    return stream.str();
-}
-
-std::string PropertyTextDumper::dumpTexts(TextProperty *pProperty) {
+void PropertyTextDumper::visit(TextProperty *pProperty) {
 
     std::stringstream stream;
+
+    stream << "Text Property : " << dumpPropertyCommons(pProperty);
 
     for ( TextValue* pText : pProperty->getTexts() ) {
 
@@ -69,29 +62,19 @@ std::string PropertyTextDumper::dumpTexts(TextProperty *pProperty) {
                << ". Label=" << pText->label().toStdString()
                << ". Text=" << pText->text().toStdString() << ". ";
     }
-    return stream.str();
+    _result = stream.str();
 }
 
-std::string PropertyTextDumper::dump(TextProperty *pProperty) {
-    std::stringstream stream;
-    stream << dumpPropertyCommons(pProperty) << dumpTexts(pProperty);
-    return stream.str();
-}
-
-std::string PropertyTextDumper::dumpLights(LightProperty *pProperty) {
+void PropertyTextDumper::visit(LightProperty *pProperty) {
 
     std::stringstream stream;
+
+    stream << "Light Property : " << dumpPropertyCommons(pProperty);
 
     for ( LightValue* pLight : pProperty->getLights() ) {
         stream << "   *Name=" << pLight->name().toStdString()
                << ". Label=" << pLight->label().toStdString()
                << ". State=" << _statesToNamesMap[pLight->lightState()] << "(" << pLight->lightState() << ")";
     }
-    return stream.str();
-}
-
-std::string PropertyTextDumper::dump(LightProperty *pProperty) {
-    std::stringstream stream;
-    stream << dumpPropertyCommons(pProperty) << dumpLights(pProperty);
-    return stream.str();
+    _result = stream.str();
 }

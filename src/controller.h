@@ -2,7 +2,7 @@
 #define CONTROLLER_h_
 
 #include <model/setup.h>
-#include <utils/propertylogger.h>
+#include <utils/propertytextdumper.h>
 #include <model/propertystore.h>
 #include "focus.h"
 #include "wshandler.h"
