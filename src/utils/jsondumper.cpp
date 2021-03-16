@@ -26,7 +26,7 @@ void JSonDumper::visit(NumberProperty *pProperty) {
     }
     json["numbers"] = jsonNumbers;
     QJsonDocument doc(json);
-    _result = doc.toJson(QJsonDocument::Compact);
+    _result = doc.toJson(QJsonDocument::Compact).toStdString();
 }
 
 void JSonDumper::visit(SwitchProperty *pProperty) {
@@ -42,7 +42,7 @@ void JSonDumper::visit(SwitchProperty *pProperty) {
     }
     json["switches"] = jsonSwitches;
     QJsonDocument doc(json);
-    _result = doc.toJson(QJsonDocument::Compact);
+    _result = doc.toJson(QJsonDocument::Compact).toStdString();
 }
 
 void JSonDumper::visit(TextProperty *pProperty) {
@@ -57,7 +57,7 @@ void JSonDumper::visit(TextProperty *pProperty) {
     }
     json["texts"] = jsonTexts;
     QJsonDocument doc(json);
-    _result = doc.toJson(QJsonDocument::Compact);
+    _result = doc.toJson(QJsonDocument::Compact).toStdString();
 }
 
 void JSonDumper::visit(LightProperty *pProperty) {
@@ -72,7 +72,7 @@ void JSonDumper::visit(LightProperty *pProperty) {
     }
     json["lights"] = jsonLights;
     QJsonDocument doc(json);
-    _result = doc.toJson(QJsonDocument::Compact);
+    _result = doc.toJson(QJsonDocument::Compact).toStdString();
 }
 
 QJsonObject JSonDumper::dumpPropertyCommons(Property *pProperty) {

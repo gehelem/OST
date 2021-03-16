@@ -18,10 +18,10 @@ public:
     void visit(TextProperty *pProperty) override;
     void visit(LightProperty *pProperty) override;
 
-    [[nodiscard]] inline const QString& getResult() const { return _result; }
+    [[nodiscard]] inline const std::string& getResult() const { return _result; }
 
 private:
-    QString _result;
+    std::string _result;
 
     QJsonObject dumpPropertyCommons(Property* pProperty);
 };

@@ -1,5 +1,6 @@
 #include <QApplication>
 #include <utils/propertytextdumper.h>
+#include <utils/jsondumper.h>
 #include "controller.h"
 
 #include "boost/log/trivial.hpp"
@@ -113,6 +114,10 @@ void Controller::onNewPropertyReceived(Property *pProperty) {
     pProperty->accept(&textDumper);
     BOOST_LOG_TRIVIAL(debug) << "CREATED " << textDumper.getResult();
 
+    JSonDumper jsonDumper;
+    pProperty->accept(&jsonDumper);
+    BOOST_LOG_TRIVIAL(debug) << "JSON : " << jsonDumper.getResult();
+
     _propertyStore.add(pProperty);
 }
 
@@ -121,6 +126,10 @@ void Controller::onPropertyUpdated(Property *pProperty) {
     PropertyTextDumper textDumper;
     pProperty->accept(&textDumper);
     BOOST_LOG_TRIVIAL(debug) << "UPDATED " << textDumper.getResult();
+
+    JSonDumper jsonDumper;
+    pProperty->accept(&jsonDumper);
+    BOOST_LOG_TRIVIAL(debug) << "JSON : " << jsonDumper.getResult();
 
     _propertyStore.update(pProperty);
 }
