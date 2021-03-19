@@ -1,7 +1,3 @@
-//
-// Created by deufrai on 09/03/2021.
-//
-
 #include "propertyfactory.h"
 #include "model/numberproperty.h"
 #include "model/switchproperty.h"

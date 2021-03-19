@@ -1,7 +1,3 @@
-//
-// Created by deufrai on 12/03/2021.
-//
-
 #ifndef OST_JSONDUMPER_H
 #define OST_JSONDUMPER_H
 

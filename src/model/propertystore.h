@@ -1,10 +1,5 @@
-//
-// Created by deufrai on 11/03/2021.
-//
-
 #ifndef OST_PROPERTYSTORE_H
 #define OST_PROPERTYSTORE_H
-
 
 #include <QMap>
 #include "lightproperty.h"

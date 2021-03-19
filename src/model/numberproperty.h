@@ -1,7 +1,3 @@
-//
-// Created by deufrai on 09/03/2021.
-//
-
 #ifndef OST_NUMBERPROPERTY_H
 #define OST_NUMBERPROPERTY_H
 

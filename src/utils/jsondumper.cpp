@@ -1,7 +1,3 @@
-//
-// Created by deufrai on 12/03/2021.
-//
-
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QJsonArray>
