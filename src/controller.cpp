@@ -10,15 +10,14 @@
  * ... ...
  */
 Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, int port)
-: _setup(Setup()),
+:  indiclient(nullptr),
+  _setup(Setup()),
   _appSettingsSaveEveryBlob(saveAllBlobs),
   _appSettingsHostName(host),
   _appSettingsServerPort(port)
 {
 
     this->setParent(parent);
-
-    indiclient=IndiCLient::getInstance();
 
     wshandler = new WShandler(this,properties);
 
@@ -38,20 +37,8 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
         qDebug() << "focus props " <<  metaproperty.name() <<  metaproperty.isReadable() <<  metaproperty.isWritable() << metaproperty.type();
     }
 
-    indiclient->setServer(_appSettingsHostName.toStdString().c_str(), _appSettingsServerPort);
-    bool clientConnected = indiclient->connectServer();
-    if ( ! clientConnected ) {
-        BOOST_LOG_TRIVIAL(warning) << "Could not connect to INDI server. Won't do much for now... Please start INDI server and restart OST";
-    }
-    connect(indiclient, &IndiCLient::newDeviceSeen, this, &Controller::onNewDeviceSeen);
-    connect(indiclient, &IndiCLient::deviceRemoved, this, &Controller::onDeviceRemoved);
-    connect(indiclient, &IndiCLient::newBlobReceived, this, &Controller::onNewBlobReveived);
-    connect(indiclient, &IndiCLient::newPropertyReceived, this, &Controller::onNewPropertyReceived);
-    connect(indiclient, &IndiCLient::propertyUpdated, this, &Controller::onPropertyUpdated);
-    connect(indiclient, &IndiCLient::propertyRemoved, this, &Controller::onPropertyRemoved);
-    connect(indiclient, &IndiCLient::messageReceived, this, &Controller::onMessageReceived);
-    //properties->dumproperties();
-
+    resetClient();
+    connectClient();
 }
 
 
@@ -155,6 +142,49 @@ void Controller::onPropertyRemoved(Property *pProperty) {
     << pProperty->getName().toStdString();
 
     _propertyStore.remove(pProperty);
+}
+
+void Controller::onIndiConnected() {
+
+    BOOST_LOG_TRIVIAL(info) << "Connected to INDI server";
+}
+
+void Controller::onIndiDisconnected() {
+
+    BOOST_LOG_TRIVIAL(info) << "Lost connection to INDI server";
+    _propertyStore.cleanup();
+    _setup.cleanup();
+    connectClient();
+}
+
+void Controller::resetClient() {
+
+    delete indiclient;
+    indiclient = new IndiCLient();
+    connect(indiclient, &IndiCLient::newDeviceSeen, this, &Controller::onNewDeviceSeen);
+    connect(indiclient, &IndiCLient::deviceRemoved, this, &Controller::onDeviceRemoved);
+    connect(indiclient, &IndiCLient::newBlobReceived, this, &Controller::onNewBlobReveived);
+    connect(indiclient, &IndiCLient::newPropertyReceived, this, &Controller::onNewPropertyReceived);
+    connect(indiclient, &IndiCLient::propertyUpdated, this, &Controller::onPropertyUpdated);
+    connect(indiclient, &IndiCLient::propertyRemoved, this, &Controller::onPropertyRemoved);
+    connect(indiclient, &IndiCLient::messageReceived, this, &Controller::onMessageReceived);
+    connect(indiclient, &IndiCLient::indiConnected, this, &Controller::onIndiConnected);
+    connect(indiclient, &IndiCLient::indiDisconnected, this, &Controller::onIndiDisconnected);
+    indiclient->setServer(_appSettingsHostName.toStdString().c_str(), _appSettingsServerPort);
+}
+
+void Controller::connectClient() {
+
+    static const int retry_period_in_seconds = 5;
+    resetClient();
+    BOOST_LOG_TRIVIAL(debug) << "Tring to connect to INDI server...";
+    bool connected = indiclient->connectServer();
+
+    while (!connected) {
+        BOOST_LOG_TRIVIAL(debug) << "Waiting " << retry_period_in_seconds << "s before retrying to connect to INDI server";
+        sleep(retry_period_in_seconds);
+        connected = indiclient->connectServer();
+    }
 }
 
 

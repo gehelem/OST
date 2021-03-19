@@ -16,8 +16,9 @@ class IndiCLient : public QObject, public INDI::BaseClient
 {
     Q_OBJECT
   public:
-    /* Singleton : Static access method. */
-    static IndiCLient* getInstance();
+    IndiCLient() = default;
+    ~IndiCLient() override = default;
+
     void serverConnected() override;
     void serverDisconnected(int exit_code) override;
     void newDevice(INDI::BaseDevice *dp) override;
@@ -32,8 +33,8 @@ class IndiCLient : public QObject, public INDI::BaseClient
     void newMessage(INDI::BaseDevice *dp, int messageID) override;
 
   signals:
-    void SigServerConnected();
-    void SigServerDisconnected(int exit_code);
+    void indiConnected();
+    void indiDisconnected();
     void newDeviceSeen(QString);
     void deviceRemoved(QString);
     void newPropertyReceived(Property* pProperty);
@@ -44,12 +45,5 @@ class IndiCLient : public QObject, public INDI::BaseClient
     void SigNewLight(ILightVectorProperty *lvp);
     void newBlobReceived(const QByteArray& data, QString format);
     void messageReceived(QString message);
-
-private:
-    /* Private constructor to prevent instancing. */
-    IndiCLient() = default;
-    ~IndiCLient() override = default;
-    /* Singleton instance storage. */
-    static IndiCLient* instance;
 };
 #endif

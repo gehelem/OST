@@ -14,33 +14,16 @@
 #include "indiclient.h"
 #include "utils/propertyfactory.h"
 
-/**************************************************************************************
-**
-***************************************************************************************/
-
-
-/* singleton  : getting unique instance if exists, create it if not */
-IndiCLient* IndiCLient::getInstance()
-{
-    if (instance == nullptr)
-    {
-        instance = new IndiCLient();
-    }
-
-    return instance;
-}
-/* Null, because instance will be initialized on demand. */
-IndiCLient* IndiCLient::instance = nullptr;
 
 void IndiCLient::serverConnected()
 {
     BOOST_LOG_TRIVIAL(debug) << "Server connected";
-    emit SigServerConnected();
+    emit indiConnected();
 }
 void IndiCLient::serverDisconnected(int exit_code)
 {
     BOOST_LOG_TRIVIAL(debug) << "Server disconnected";
-    emit SigServerDisconnected(exit_code);
+    emit indiDisconnected();
 }
 void IndiCLient::newDevice(INDI::BaseDevice *dp)
 {

@@ -50,7 +50,7 @@ class Module : public QObject
 
     public slots:
         virtual void OnIndiServerConnected    (){}
-        virtual void OnIndiServerDisconnected (int exit_code)             {Q_UNUSED(exit_code);}
+        virtual void OnIndiServerDisconnected () {}
         virtual void OnIndiNewDevice          (INDI::BaseDevice *dp)      {Q_UNUSED(dp);}
         virtual void OnIndiRemoveDevice       (INDI::BaseDevice *dp)      {Q_UNUSED(dp);}
         virtual void OnIndiNewProperty        (INDI::Property *property)  {Q_UNUSED(property);}

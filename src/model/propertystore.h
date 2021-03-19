@@ -15,6 +15,8 @@ public:
     void add(Property* pProperty);
     void update(Property* pProperty);
     void remove(Property* pProperty);
+    void cleanup();
+
     [[nodiscard]] int getSize() const;
 private:
     QMap<QString, QMap<QString, QMap<QString, Property*>>> _store;

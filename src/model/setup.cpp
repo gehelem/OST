@@ -5,7 +5,7 @@
 
 Setup::~Setup()
 {
-    purgeDeviceMap();
+    cleanup();
 }
 
 void Setup::addDevice(const Device* pDevice) {
@@ -30,9 +30,9 @@ void Setup::removeDeviceByName(const QString &deviceName) {
     BOOST_LOG_TRIVIAL(info) << "Device removed: " << deviceName.toStdString();
 }
 
-void Setup::purgeDeviceMap() {
+void Setup::cleanup() {
 
-    for( QString deviceName : _devicesMap.keys() ) {
+    for( const QString& deviceName : _devicesMap.keys() ) {
         removeDeviceByName(deviceName);
     }
 }

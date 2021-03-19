@@ -43,7 +43,12 @@ private slots:
     void onPropertyUpdated(Property* pProperty);
     void onPropertyRemoved(Property* pProperty);
     void onMessageReceived(const QString& message);
+    void onIndiConnected();
+    void onIndiDisconnected();
 private:
+    void resetClient();
+    void connectClient();
+
     Setup _setup;
     bool _appSettingsSaveEveryBlob;
     QString _appSettingsHostName;

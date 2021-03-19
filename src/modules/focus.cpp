@@ -10,9 +10,9 @@ FocusModule::FocusModule()
     _modulename = "focus";
     _devices["camera"]="";
     _devices["focuser"]="";
-    indiclient=IndiCLient::getInstance();
-    connect(indiclient,&IndiCLient::SigServerConnected,this,&FocusModule::OnIndiServerConnected);
-    connect(indiclient,&IndiCLient::SigServerDisconnected,this,&FocusModule::OnIndiServerDisconnected);
+    indiclient = new IndiCLient();
+    connect(indiclient, &IndiCLient::indiConnected, this, &FocusModule::OnIndiServerConnected);
+    connect(indiclient, &IndiCLient::indiDisconnected, this, &FocusModule::OnIndiServerDisconnected);
 //    connect(indiclient,&IndiCLient::SigNewProperty,this,&FocusModule::OnIndiNewProperty);
 //    connect(indiclient, &IndiCLient::propertyRemoved, this, &FocusModule::OnIndiRemoveProperty);
     connect(indiclient,&IndiCLient::SigNewText,this,&FocusModule::OnIndiNewText);
