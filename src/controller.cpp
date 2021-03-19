@@ -158,6 +158,7 @@ void Controller::onIndiDisconnected() {
     BOOST_LOG_TRIVIAL(info) << "Lost connection to INDI server";
     _propertyStore.cleanup();
     _setup.cleanup();
+    resetClient();
     connectClient();
 }
 
@@ -180,7 +181,6 @@ void Controller::resetClient() {
 void Controller::connectClient() {
 
     static const int retry_period_in_seconds = 5;
-    resetClient();
     BOOST_LOG_TRIVIAL(debug) << "Tring to connect to INDI server...";
     bool connected = indiclient->connectServer();
 
