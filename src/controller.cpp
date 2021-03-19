@@ -106,6 +106,8 @@ void Controller::onNewPropertyReceived(Property *pProperty) {
     BOOST_LOG_TRIVIAL(debug) << "JSON : " << jsonDumper.getResult();
 
     _propertyStore.add(pProperty);
+
+    BOOST_LOG_TRIVIAL(debug) << "Store size: " << _propertyStore.getSize();
 }
 
 void Controller::onPropertyUpdated(Property *pProperty) {
@@ -119,6 +121,8 @@ void Controller::onPropertyUpdated(Property *pProperty) {
     BOOST_LOG_TRIVIAL(debug) << "JSON : " << jsonDumper.getResult();
 
     _propertyStore.update(pProperty);
+
+    BOOST_LOG_TRIVIAL(debug) << "Store size: " << _propertyStore.getSize();
 }
 
 void Controller::onMessageReceived(const QString& message) {
