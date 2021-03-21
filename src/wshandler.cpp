@@ -57,11 +57,14 @@ void WShandler::onNewConnection()
 void WShandler::processTextMessage(QString message)
 {
     QJsonDocument jsonResponse = QJsonDocument::fromJson(message.toUtf8()); // garder
-    QJsonObject  obj = jsonResponse.object(); // garder
+    emit textRcv(message);
+    /*QJsonObject  obj = jsonResponse.object(); // garder
     qDebug() << "OST server received json" << obj;
     if (obj["message"].toString()=="readall")
     {
-        sendAll();
+        //sendAll();
+        emit changeValue(Prop());
+
     }
     if (obj["message"].toString()=="readproperty")
     {
@@ -73,7 +76,7 @@ void WShandler::processTextMessage(QString message)
         QJsonObject prop = obj["property"].toObject();
         //sendProperty(props->getProp(obj["modulename"].toString(),obj["propertyname"].toString()));
         emit changeValue(JpropToO(prop));
-    }
+    }*/
 
 
 }
@@ -92,9 +95,9 @@ void WShandler::sendAll(void)
     QJsonObject mess;
     QJsonArray dets;
     mess["message"]="updateall";
-    for(auto m : props->getModules()){
+    /*for(auto m : props->getModules()){
         dets.append(OmodToJ(props->getModule(m.modulename)));
-    }
+    }*/
     mess["modules"]=dets;
     sendJsonMessage(mess);
 }

@@ -1,10 +1,6 @@
 #ifndef CONTROLLER_h_
 #define CONTROLLER_h_
-#include "mFocuser.h"
-#include "mMainctl.h"
-#include "mSequence.h"
-#include "mGuider.h"
-#include "mNavigator.h"
+#include "focus.h"
 #include "wshandler.h"
 #include "properties.h"
 
@@ -22,13 +18,10 @@ class Controller : public QObject
 public:
     Controller(QObject *parent);
     ~Controller();
-    MyClient    *indiclient;
+    IndiCLient    *indiclient;
     Properties  *properties;
-    MFocuser    *focuser;
-    MGuider     *guider;
-    MSequence   *sequence;
-    MNavigator  *navigator;
-    MMainctl    *mainctl;
+    FocusModule    *focuser;
+    FocusModule    *focuser2;
     WShandler   *wshandler;
 public slots:
     void valueChanged(Prop prop);

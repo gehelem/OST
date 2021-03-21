@@ -28,10 +28,12 @@ find_package(GSL REQUIRED)
 find_package(OpenCV REQUIRED )
 find_package(CImg REQUIRED )
 find_package(WCSLIB REQUIRED)
-find_package(Qt5 5.4 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets)
+find_package(Qt5 5.15 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Scxml)
 find_package(StellarSolver REQUIRED)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules)
 include_directories(${INDI_INCLUDE_DIR})
 include_directories(${CFITSIO_INCLUDE_DIR})
 include_directories(${GSL_INCLUDE_DIRS})
@@ -41,27 +43,34 @@ include_directories(${QT5Declarative_INCLUDE_LIBRARIES} )
 include_directories(${QT5Declarative_INCLUDE_DIRS} )
 include_directories(${STELLARSOLVER_INCLUDE_DIR})
 
-
 include(CMakeCommon)
 
 
 SET( APP_EXEOST ost )
 
+# Process your *.scsml files with Qt SCXML Compiler (qscxmlc)
+#qt5_add_statecharts(QT_SCXML_COMPILED ${CMAKE_CURRENT_SOURCE_DIR}/scxml/ffff.scxml )
+
 add_executable( ${APP_EXEOST}
-        ${CMAKE_CURRENT_SOURCE_DIR}/module.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/mFocuser.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/mGuider.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/mNavigator.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/mSequence.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/mMainctl.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/client.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/ost.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/controller.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/wshandler.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/image.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/properties.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/jsonparser.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/polynomialfit.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/module.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/module.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/indiclient.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/indiclient.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ost.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/controller.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/controller.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/wshandler.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/wshandler.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/image.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/image.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/properties.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/properties.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/jsonparser.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/polynomialfit.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/polynomialfit.h
+#        ${QT_SCXML_COMPILED}
     )
 
 
@@ -73,6 +82,7 @@ target_link_libraries( ${APP_EXEOST}
     Qt5::Network
     Qt5::Concurrent
     Qt5::WebSockets
+    Qt5::Scxml
     ${STELLARSOLVER_LIBRARIES}
     ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
     ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
