@@ -39,6 +39,7 @@ void PropertyStore::cleanup() {
         for ( const QString& group : _store[device].keys() ) {
             for ( const QString& property : _store[device][group].keys() ) {
                 delete _store[device][group][property];
+                _store[device][group].remove(property);
             }
         }
     }
