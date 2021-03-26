@@ -107,7 +107,7 @@ void Controller::onNewPropertyReceived(Property *pProperty) {
 
     _propertyStore.add(pProperty);
 
-    BOOST_LOG_TRIVIAL(debug) << "Store size: " << _propertyStore.getSize();
+    dumpStore();
 }
 
 void Controller::onPropertyUpdated(Property *pProperty) {
@@ -121,8 +121,6 @@ void Controller::onPropertyUpdated(Property *pProperty) {
     BOOST_LOG_TRIVIAL(debug) << "JSON : " << jsonDumper.getResult();
 
     _propertyStore.update(pProperty);
-
-    BOOST_LOG_TRIVIAL(debug) << "Store size: " << _propertyStore.getSize();
 }
 
 void Controller::onMessageReceived(const QString& message) {
@@ -146,6 +144,8 @@ void Controller::onPropertyRemoved(Property *pProperty) {
     << pProperty->getName().toStdString();
 
     _propertyStore.remove(pProperty);
+
+    dumpStore();
 }
 
 void Controller::onIndiConnected() {
@@ -192,5 +192,19 @@ void Controller::connectClient() {
 }
 
 
+void Controller::dumpStore() {
 
+    BOOST_LOG_TRIVIAL(debug) << "*** STORE DUMP START ***";
 
+    PropertyTextDumper dumper;
+
+    QList<Property*> allProps = _propertyStore.toList();
+
+    for (Property* pProperty : allProps) {
+        pProperty->accept(&dumper);
+        BOOST_LOG_TRIVIAL(debug) << dumper.getResult();
+    }
+
+    BOOST_LOG_TRIVIAL(debug) << "Store size: " << allProps.size();
+    BOOST_LOG_TRIVIAL(debug) << "*** STORE DUMP END ***";
+}

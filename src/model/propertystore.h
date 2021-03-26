@@ -11,6 +11,7 @@ public:
     void update(Property* pProperty);
     void remove(Property* pProperty);
     void cleanup();
+    [[nodiscard]] QList<Property *> toList() const;
 
     [[nodiscard]] int getSize() const;
 private:

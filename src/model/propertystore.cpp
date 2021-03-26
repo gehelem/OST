@@ -43,3 +43,18 @@ void PropertyStore::cleanup() {
         }
     }
 }
+
+QList<Property *> PropertyStore::toList() const {
+
+    QList<Property *> properties;
+
+    for ( const QString& device : _store.keys() ) {
+        for ( const QString& group : _store[device].keys() ) {
+            for ( const QString& property : _store[device][group].keys() ) {
+                properties.append(_store[device][group][property]);
+            }
+        }
+    }
+
+    return properties;
+}

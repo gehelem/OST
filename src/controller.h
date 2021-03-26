@@ -48,6 +48,7 @@ private slots:
 private:
     void resetClient();
     void connectClient();
+    void dumpStore();
 
     Setup _setup;
     bool _appSettingsSaveEveryBlob;
