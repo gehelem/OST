@@ -43,11 +43,10 @@ void FocusModule::test0(QString txt)
     {
         _startpos = 36000;
         _steps = 50;
-        _iteration = 0;
         _iterations = 10;
+        _loopIterations = 3;
         _exposure =2;
         _backlash=100;
-        _besthfr=99;
         startCoarse();
     }
 
@@ -147,12 +146,18 @@ void FocusModule::startCoarse()
     auto *RequestGotoStart    = new QState(Init);
     auto *WaitGotoStart       = new QState(Init);
 
-    auto *RequestExposure     = new QState(Loop);
-    auto *WaitExposure        = new QState(Loop);
-    auto *FindStars           = new QState(Loop);
     auto *Compute             = new QState(Loop);
     auto *RequestGotoNext     = new QState(Loop);
     auto *WaitGotoNext        = new QState(Loop);
+    auto *LoopFrame           = new QState(Loop);
+
+    auto *InitLoopFrame     = new QState(LoopFrame);
+    auto *RequestExposure   = new QState(LoopFrame);
+    auto *WaitExposure      = new QState(LoopFrame);
+    auto *FindStars         = new QState(LoopFrame);
+    auto *ComputeLoopFrame  = new QState(LoopFrame);
+
+
 
     auto *RequestBacklashBest   = new QState(Finish);
     auto *WaitBacklashBest      = new QState(Finish);
@@ -169,7 +174,8 @@ void FocusModule::startCoarse()
 
     /* Set initial states */
     Init->setInitialState(RequestFrameReset);
-    Loop->setInitialState(RequestExposure);
+    Loop->setInitialState(LoopFrame);
+    LoopFrame->setInitialState(InitLoopFrame);
     Finish->setInitialState(RequestBacklashBest);
     CoarseFocus->setInitialState(Init);
     _machine.setInitialState(CoarseFocus);
@@ -186,6 +192,8 @@ void FocusModule::startCoarse()
     connect(RequestGotoBest,    &QState::entered, this, &FocusModule::SMRequestGotoBest);
     connect(RequestExposureBest,&QState::entered, this, &FocusModule::SMRequestExposureBest);
     connect(ComputeResult,      &QState::entered, this, &FocusModule::SMComputeResult);
+    connect(ComputeLoopFrame,   &QState::entered, this, &FocusModule::SMComputeLoopFrame);
+    connect(InitLoopFrame,      &QState::entered, this, &FocusModule::SMInitLoopFrame);
 
     /* mapping signals to state transitions */
     RequestFrameReset-> addTransition(this,&FocusModule::RequestFrameResetDone,WaitFrameReset);
@@ -197,11 +205,12 @@ void FocusModule::startCoarse()
 
     RequestExposure->   addTransition(this,&FocusModule::RequestExposureDone,   WaitExposure);
     WaitExposure->      addTransition(this,&FocusModule::ExposureDone,          FindStars);
-    FindStars->         addTransition(this,&FocusModule::FindStarsDone,         Compute);
+    FindStars->         addTransition(this,&FocusModule::FindStarsDone,         ComputeLoopFrame);
     Compute->           addTransition(this,&FocusModule::LoopFinished,          Finish);
+
     Compute->           addTransition(this,&FocusModule::NextLoop,              RequestGotoNext);
     RequestGotoNext->   addTransition(this,&FocusModule::RequestGotoNextDone,   WaitGotoNext);
-    WaitGotoNext->      addTransition(this,&FocusModule::GotoNextDone,          RequestExposure);
+    WaitGotoNext->      addTransition(this,&FocusModule::GotoNextDone,          LoopFrame);
 
     RequestBacklashBest->   addTransition(this,&FocusModule::RequestBacklashBestDone,   WaitBacklashBest);
     WaitBacklashBest->      addTransition(this,&FocusModule::BacklashBestDone,          RequestGotoBest);
@@ -211,23 +220,32 @@ void FocusModule::startCoarse()
     WaitExposureBest->      addTransition(this,&FocusModule::ExposureBestDone,          ComputeResult);
     ComputeResult->         addTransition(this,&FocusModule::ComputeResultDone,         Final);
 
+    InitLoopFrame-> addTransition(this ,&FocusModule::InitLoopFrameDone,RequestExposure );
+    ComputeLoopFrame->addTransition(this,&FocusModule::NextFrame,RequestExposure);
+    ComputeLoopFrame->addTransition(this,&FocusModule::LoopFrameDone,Compute);
 
 
 
-    //QSet<QAbstractState *>::iterator i;
-    /*qDebug() << "conf count" << _machine.configuration().count();
-    for (QSet<QAbstractState *>::iterator i=_machine.configuration().begin();i !=_machine.configuration().end();i++)
-    {
-        qDebug() << *i;
-    }*/
+
+
     _machine.start();
     sendMessage("machine started");
-
 }
 
 void FocusModule::SMRequestFrameReset()
 {
     sendMessage("SMRequestFrameReset");
+    _iteration=0;
+    _besthfr=99;
+
+
+    /*qDebug() << "conf count" << _machine.configuration().count();
+    QSet<QAbstractState *>::iterator i;
+    for (i=_machine.configuration().begin();i !=_machine.configuration().end();i++)
+    {
+        qDebug() << (*i)->objectName();
+    }*/
+
     if (!frameReset(_devices["camera"]))
     {
             emit abort();
@@ -285,9 +303,9 @@ void FocusModule::SMCompute()
 {
     sendMessage("SMCompute");
 
-    if (image->HFRavg < _besthfr )
+    if ( _loopHFRavg < _besthfr )
     {
-        _besthfr=image->HFRavg;
+        _besthfr=_loopHFRavg;
         _bestpos=_startpos + _iteration*_steps;
     }
 
@@ -353,11 +371,37 @@ void FocusModule::SMComputeResult()
     emit ComputeResultDone();
 }
 
+
+
+
+void FocusModule::SMInitLoopFrame()
+{
+    sendMessage("SMInitLoopFrame");
+    _loopIteration=0;
+    _loopHFRavg=99;
+
+    emit InitLoopFrameDone();
+}
+
+void FocusModule::SMComputeLoopFrame()
+{
+    sendMessage("SMComputeLoopFrame");
+    _loopIteration++;
+    _loopHFRavg=((_loopIteration-1)*_loopHFRavg + image->HFRavg)/_loopIteration;
+
+    if (_loopIteration < _loopIterations )
+    {
+        emit NextFrame();
+    }
+    else
+    {
+        emit LoopFrameDone();
+    }
+}
+
 void FocusModule::SMAlert()
 {
     sendMessage("SMAlert");
     emit abort();
 }
-
-
 

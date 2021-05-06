@@ -39,10 +39,12 @@ IndiCLient::IndiCLient()
 void IndiCLient::serverConnected(void)
 {
     emit SigServerConnected();
+    _nbprops =0;
 }
 void IndiCLient::serverDisconnected(int exit_code)
 {
     emit SigServerDisconnected(exit_code);
+    _nbprops =0;
 }
 void IndiCLient::newDevice(INDI::BaseDevice *dp)
 {
@@ -55,14 +57,14 @@ void IndiCLient::removeDevice(INDI::BaseDevice *dp)
 void IndiCLient::newProperty(INDI::Property *property)
 {
     emit SigNewProperty(property);
-    _nbprops++;
-    qDebug() << _nbprops << property->getDeviceName() << property->getName();
+    //_props.insert(QString(property->getDeviceName()) + QString(property->getName()));
+    //qDebug() << "add prop - " << _props.size();
 }
 void IndiCLient::removeProperty(INDI::Property *property)
 {
     emit SigRemoveProperty(property);
-    _nbprops--;
-    qDebug() << _nbprops << property->getDeviceName() << property->getName();
+    //_props.remove(QString(property->getDeviceName()) + QString(property->getName()));
+    //qDebug() << "del prop - " << _props.size();
 }
 void IndiCLient::newNumber(INumberVectorProperty *nvp)
 {

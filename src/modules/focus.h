@@ -44,6 +44,9 @@ class FocusModule : public Module
         void RequestExposureBestDone();
         void ExposureBestDone();
         void ComputeResultDone();
+        void InitLoopFrameDone();
+        void LoopFrameDone();
+        void NextFrame();
 
         void blobloaded();
         void cameraAlert();
@@ -67,6 +70,8 @@ class FocusModule : public Module
         void SMRequestGotoBest();
         void SMRequestExposureBest();
         void SMComputeResult();
+        void SMInitLoopFrame();
+        void SMComputeLoopFrame();
 
 
         void SMAlert();
@@ -78,17 +83,21 @@ class FocusModule : public Module
         QMap<QString,bool> _test2;
         QString _camera  = "CCD Simulator";
         QString _focuser = "Focuser Simulator";
-        double  _focuserPosition;
         bool    _newblob;
 
         int    _startpos;
         int    _backlash;
-        int    _iteration;
         int    _iterations;
         int    _steps;
+        int    _exposure;
+        int    _loopIterations;
+        int    _loopIteration;
+        double _loopHFRavg;
+
+        int    _iteration;
         double _bestpos;
         double _besthfr;
-        int    _exposure;
+        double  _focuserPosition;
         QStateMachine _machine;
 
 };
