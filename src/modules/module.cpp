@@ -23,7 +23,7 @@ void Module::setAction(QString action)
 void Module::sendMessage(QString message)
 {
     QString mess = QDateTime::currentDateTime().toString("[yyyyMMdd hh:mm:ss.zzz]") + " - " + _modulename + " - " + message;
-    qDebug() << mess.toStdString().c_str();
+    //qDebug() << mess.toStdString().c_str();
     emit newMessage(mess);
 }
 /*!

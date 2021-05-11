@@ -96,9 +96,14 @@ class FocusModule : public Module
 
         int    _iteration;
         double _bestpos;
+        double _bestposfit;
         double _besthfr;
         double  _focuserPosition;
         QStateMachine _machine;
+
+        std::vector<double> _posvector;
+        std::vector<double> _hfdvector;
+        std::vector<double> _coefficients;
 
 };
 #endif

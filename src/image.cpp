@@ -231,7 +231,7 @@ void Image::CalcStats(void)
     stats.mean[0]=img.mean();
     stats.median[0]=img.median();
     stats.stddev[0]=sqrt(img.variance(1));
-    IDLog("IMG Min=%f Max=%f Avg=%.2f Med=%f StdDev=%.2f\n",stats.min[0],stats.max[0],stats.mean[0],stats.median[0],stats.stddev[0]);
+    //IDLog("IMG Min=%f Max=%f Avg=%.2f Med=%f StdDev=%.2f\n",stats.min[0],stats.max[0],stats.mean[0],stats.median[0],stats.stddev[0]);
 }
 
 void Image::FindStars(void)
@@ -265,7 +265,7 @@ void Image::FindStars(void)
     stellarSolver->setProperty("ExtractorType",EXTRACTOR_INTERNAL);
     stellarSolver->setProperty("SolverType",SOLVER_STELLARSOLVER);
     stellarSolver->start();
-    IDLog("IMG stellarSolver SEP Start\n");
+    //IDLog("IMG stellarSolver SEP Start\n");
 
 
 }
@@ -304,26 +304,26 @@ void Image::SolveStars(void)
     stellarSolver->setProperty("ExtractorType",EXTRACTOR_INTERNAL);
     stellarSolver->setProperty("SolverType",SOLVER_STELLARSOLVER);
     stellarSolver->start();
-    IDLog("IMG stellarSolver Solve Start\n");
+    //IDLog("IMG stellarSolver Solve Start\n");
 
 
 }
 
 void Image::sslogOutput(QString text)
 {
-    IDLog("IMG Stellarsolver log : %s\n",text.toUtf8().data());
+    //IDLog("IMG Stellarsolver log : %s\n",text.toUtf8().data());
 }
 void Image::ssReadySEP(void)
 {
-    IDLog("IMG stellarSolver ready\n");
+    //IDLog("IMG stellarSolver ready\n");
     stars = stellarSolver->getStarList();
-    IDLog("IMG got %i stars\n",stars.size());
+    //IDLog("IMG got %i stars\n",stars.size());
     for (int i=0;i<stars.size();i++)
     {
         //IDLog("IMG HFR %i %f\n",i,stars[i].HFR);
         HFRavg=(i*HFRavg + stars[i].HFR)/(i+1);
     }
-    IDLog("IMG HFRavg %f\n",HFRavg);
+    //IDLog("IMG HFRavg %f\n",HFRavg);
     computeHistogram();
     FindStarsFinished = true;
     emit successSEP();

@@ -4,6 +4,7 @@
 #include <QStateMachine>
 #include <basedevice.h>
 #include "focus.h"
+#include "polynomialfit.h"
 
 FocusModule::FocusModule()
 {
@@ -41,10 +42,10 @@ void FocusModule::test0(QString txt)
     if (txt=="x")  disconnectIndi();
     if (txt=="f")
     {
-        _startpos = 36000;
-        _steps = 50;
+        _startpos = 30000;
+        _steps = 1000;
         _iterations = 10;
-        _loopIterations = 3;
+        _loopIterations = 4;
         _exposure =2;
         _backlash=100;
         startCoarse();
@@ -127,6 +128,12 @@ void FocusModule::SMAbort()
 
 void FocusModule::startCoarse()
 {
+    _posvector.clear();
+    _hfdvector.clear();
+    _coefficients.clear();
+    _iteration=0;
+    _besthfr=99;
+    _bestposfit=99;
 
     //_machine = new QStateMachine();
 
@@ -230,13 +237,13 @@ void FocusModule::startCoarse()
 
     _machine.start();
     sendMessage("machine started");
+    qDebug() << "Start coarse focus";
 }
 
 void FocusModule::SMRequestFrameReset()
 {
     sendMessage("SMRequestFrameReset");
-    _iteration=0;
-    _besthfr=99;
+
 
 
     /*qDebug() << "conf count" << _machine.configuration().count();
@@ -303,11 +310,22 @@ void FocusModule::SMCompute()
 {
     sendMessage("SMCompute");
 
+    _posvector.push_back(_startpos + _iteration*_steps);
+    _hfdvector.push_back(_loopHFRavg);
+
+    if (_posvector.size() > 2)
+    {
+        double coeff[3];
+        polynomialfit(_posvector.size(), 3, _posvector.data(), _hfdvector.data(), coeff);
+        _bestposfit= -coeff[1]/(2*coeff[2]);
+    }
+
     if ( _loopHFRavg < _besthfr )
     {
         _besthfr=_loopHFRavg;
         _bestpos=_startpos + _iteration*_steps;
     }
+    qDebug() << "Compute " << _iteration << "/" << _iterations << "=" << _loopHFRavg << "bestpos/pos" << _bestpos << "/" << _startpos + _iteration*_steps << "polfit=" << _bestposfit;
 
     if (_iteration <_iterations )
     {
@@ -388,6 +406,8 @@ void FocusModule::SMComputeLoopFrame()
     sendMessage("SMComputeLoopFrame");
     _loopIteration++;
     _loopHFRavg=((_loopIteration-1)*_loopHFRavg + image->HFRavg)/_loopIteration;
+    qDebug() << "Loop    " << _loopIteration << "/" << _loopIterations << " = " <<  image->HFRavg;
+
 
     if (_loopIteration < _loopIterations )
     {
