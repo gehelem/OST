@@ -13,14 +13,18 @@ class FocusModule : public Module
     //Q_PROPERTY(QMap<QString,bool>    test2    MEMBER _test2)
     Q_PROPERTY(QString camera   MEMBER _camera)
     Q_PROPERTY(QString focuser  MEMBER _focuser)
+    Q_PROPERTY(double loopHFRavg MEMBER _loopHFRavg NOTIFY valueChanged(_loopHFRavg))
 
     public:
         FocusModule();
         ~FocusModule();
+
     signals:
         void focuserPositionChanged(const double &newFocuserPosition);
         //void expdone(IBLOB *bp);
         void focuserReachedPosition();
+        void valueChanged(const double &newValue);
+        //void valueChanged(const QString qnewValue);
 
         void RequestFrameResetDone();
         void FrameResetDone();

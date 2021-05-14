@@ -323,6 +323,7 @@ void FocusModule::SMCompute()
     if ( _loopHFRavg < _besthfr )
     {
         _besthfr=_loopHFRavg;
+        //emit valueChanged(_loopHFRavg);
         _bestpos=_startpos + _iteration*_steps;
     }
     qDebug() << "Compute " << _iteration << "/" << _iterations << "=" << _loopHFRavg << "bestpos/pos" << _bestpos << "/" << _startpos + _iteration*_steps << "polfit=" << _bestposfit;

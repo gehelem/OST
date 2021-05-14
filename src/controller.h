@@ -24,6 +24,8 @@ public:
     FocusModule    *focuser2;
     WShandler   *wshandler;
 public slots:
+    void OnValueChanged(double newValue);
+    //void OnValueChanged(QString newValue);
     void valueChanged(Prop prop);
     void AppendGraph (Prop prop,OGraph gra,OGraphValue val);
     void propCreated (Prop prop);

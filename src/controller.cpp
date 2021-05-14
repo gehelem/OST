@@ -20,6 +20,7 @@ Controller::Controller(QObject *parent)
     focuser->setDevices(dev);
     //focuser->setProperty("modulename","focuser of the death");
     connect(wshandler,&WShandler::textRcv,focuser,&FocusModule::test0);
+    connect(focuser,&FocusModule::valueChanged,this,&Controller::OnValueChanged);
     /*focuser2 = new FocusModule();
     connect(wshandler,&WShandler::textRcv,focuser2,&FocusModule::test0);*/
     const QMetaObject *metaobject = focuser->metaObject();
@@ -57,6 +58,11 @@ void Controller::propDeleted(Prop prop)
     wshandler->sendmessage("Del prop " +  prop.propname);
 }
 
+void Controller::OnValueChanged(double newValue)
+{
+    qDebug() << "*******************************" << newValue;
+
+}
 
 
 
