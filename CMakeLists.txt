@@ -28,7 +28,7 @@ find_package(GSL REQUIRED)
 find_package(OpenCV REQUIRED )
 find_package(CImg REQUIRED )
 find_package(WCSLIB REQUIRED)
-find_package(Qt5 5.15 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Scxml)
+find_package(Qt5 5.15.2 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Scxml Sql)
 find_package(StellarSolver REQUIRED)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
@@ -83,6 +83,7 @@ target_link_libraries( ${APP_EXEOST}
     Qt5::Concurrent
     Qt5::WebSockets
     Qt5::Scxml
+    Qt5::Sql
     ${STELLARSOLVER_LIBRARIES}
     ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
     ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}

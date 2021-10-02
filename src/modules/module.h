@@ -47,6 +47,8 @@ class Module : public QObject
         QMap<QString,bool>        _actions;
         QMap<QString,QString>     _devices;
 
+        Properties  *properties;
+
 
     public slots:
         virtual void OnIndiServerConnected    (){}
@@ -67,7 +69,6 @@ class Module : public QObject
         void statusChanged(const QString &newStatus);
         void askedFrameReset(QString devicename);
     private:
-
 }
 ;
 #endif

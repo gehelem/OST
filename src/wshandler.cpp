@@ -58,12 +58,12 @@ void WShandler::processTextMessage(QString message)
 {
     QJsonDocument jsonResponse = QJsonDocument::fromJson(message.toUtf8()); // garder
     emit textRcv(message);
-    /*QJsonObject  obj = jsonResponse.object(); // garder
+    QJsonObject  obj = jsonResponse.object(); // garder
     qDebug() << "OST server received json" << obj;
     if (obj["message"].toString()=="readall")
     {
-        //sendAll();
-        emit changeValue(Prop());
+        sendAll();
+        //emit changeValue(Prop());
 
     }
     if (obj["message"].toString()=="readproperty")
@@ -76,7 +76,7 @@ void WShandler::processTextMessage(QString message)
         QJsonObject prop = obj["property"].toObject();
         //sendProperty(props->getProp(obj["modulename"].toString(),obj["propertyname"].toString()));
         emit changeValue(JpropToO(prop));
-    }*/
+    }
 
 
 }
@@ -89,15 +89,24 @@ void WShandler::sendProperty(Prop prop)
     mess["property"]=obj;
     sendJsonMessage(mess);
 }
+void WShandler::updateElements(Prop prop)
+{
+    QJsonObject mess,obj,det;
+    QJsonArray dets;
+    obj=OElementsToJ(prop);
+    mess["message"]="updateelements";
+    mess["property"]=obj;
+    sendJsonMessage(mess);
+}
 
 void WShandler::sendAll(void)
 {
     QJsonObject mess;
     QJsonArray dets;
     mess["message"]="updateall";
-    /*for(auto m : props->getModules()){
+    for(auto m : props->getModules()){
         dets.append(OmodToJ(props->getModule(m.modulename)));
-    }*/
+    }
     mess["modules"]=dets;
     sendJsonMessage(mess);
 }

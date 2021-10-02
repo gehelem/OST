@@ -354,8 +354,10 @@ class Properties : public QObject
 {
   Q_OBJECT
 public:
-    Properties(QObject *parent = Q_NULLPTR);
-    ~Properties() = default;
+    //Properties(QObject *parent = Q_NULLPTR);
+    //~Properties() = default;
+    /* Singleton : Static access method. */
+    static Properties* getInstance();
     void    createModule(QString modulename,  QString modulelabel,int order);
     void    deleteModule(QString modulename);
 
@@ -370,6 +372,7 @@ public:
     void    deleteProp (QString modulename,QString propname);
     Prop    getProp    (QString modulename,QString propname);
     void    setProp    (QString modulename,QString propname,Prop    prop);
+    void    emitProp   (QString modulename,QString propname);
 
     void    appendElt  (QString modulename,QString propname,  QString txtname, QString text     , QString label, QString aux0,QString aux1);
     void    appendElt  (QString modulename,QString propname,  QString numname, double  num      , QString label, QString aux0,QString aux1);
@@ -405,7 +408,11 @@ signals:
     void    signalAppendGraph (Prop prop,OGraph gra,OGraphValue val);
 private:
     QMap<QString,Mod>   modules;
-
+    /* Private constructor to prevent instancing. */
+    Properties(QObject *parent = Q_NULLPTR);
+    ~Properties() = default;
+    /* Singleton instance storage. */
+    static Properties* instance;
 };
 
 

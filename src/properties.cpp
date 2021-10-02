@@ -2,6 +2,20 @@
 #include "module.h"
 #include "jsonparser.h"
 
+/* singleton  : getting unique instance if exists, create it if not */
+Properties* Properties::getInstance()
+{
+    if (instance == 0)
+    {
+        instance = new Properties();
+    }
+
+    return instance;
+}
+/* Null, because instance will be initialized on demand. */
+Properties* Properties::instance = 0;
+
+
 Properties::Properties(QObject *parent)
 {
     Q_UNUSED(parent);
@@ -82,6 +96,10 @@ Prop    Properties::getProp    (QString modulename, QString propname)
 void    Properties::setProp    (QString modulename, QString propname, Prop prop)
 {
     modules[modulename].props[propname]=prop;
+    emit signalvalueChanged(modules[modulename].props[propname]);
+}
+void    Properties::emitProp    (QString modulename, QString propname)
+{
     emit signalvalueChanged(modules[modulename].props[propname]);
 }
 void    Properties::appendElt  (QString modulename, QString propname,  QString txtname, QString text     , QString label, QString aux0,QString aux1)
@@ -180,28 +198,28 @@ void    Properties::setElt     (QString modulename, QString propname,  QString t
         QString mess = QDateTime::currentDateTime().toString("[yyyyMMdd hh:mm:ss.zzz]") + "-"+ modulename +"-"+text;
         modules[modulename].props[propname].m[txtname].text=mess;
     }
-    emit signalvalueChanged(modules[modulename].props[propname]);
+    //emit signalvalueChanged(modules[modulename].props[propname]);
 }
 void    Properties::setElt     (QString modulename, QString propname,  QString numname, double  num)
 {
     modules[modulename].props[propname].n[numname].value=num;
-    emit signalvalueChanged(modules[modulename].props[propname]);
+    //emit signalvalueChanged(modules[modulename].props[propname]);
 }
 void    Properties::setElt     (QString modulename, QString propname,  QString swtname, OSState swt)
 {
     modules[modulename].props[propname].s[swtname].s=swt;
-    emit signalvalueChanged(modules[modulename].props[propname]);
+    //emit signalvalueChanged(modules[modulename].props[propname]);
 }
 void    Properties::setElt     (QString modulename, QString propname,  QString lgtname, OPState lgt)
 {
     modules[modulename].props[propname].l[lgtname].l=lgt;
-    emit signalvalueChanged(modules[modulename].props[propname]);
+    //emit signalvalueChanged(modules[modulename].props[propname]);
 }
 void    Properties::setElt     (QString modulename,QString propname,  QString imgname, QString url, QString file)
 {
     modules[modulename].props[propname].i[imgname].url=url;
     modules[modulename].props[propname].i[imgname].f=file;
-    emit signalvalueChanged(modules[modulename].props[propname]);
+    //emit signalvalueChanged(modules[modulename].props[propname]);
 }
 void    Properties::setElt     (QString modulename,QString propname,  QString graname, OGraph  graph)
 {

@@ -250,7 +250,111 @@ QJsonObject OpropToJ(Prop prop)
     return obj;
 
 }
+QJsonObject OElementsToJ(Prop prop)
+{
+    QJsonObject obj;
+    obj["propname"]=prop.propname;
+    switch (prop.typ) {
+    case PT_NUM:
+        obj["type"]="INDI_NUMBER";
+        break;
+    case PT_TEXT:
+        obj["type"]="INDI_TEXT";
+        break;
+    case PT_SWITCH:
+        obj["type"]="INDI_SWITCH";
+        break;
+    case PT_LIGHT:
+        obj["type"]="INDI_LIGHT";
+        break;
+    case PT_GRAPH:
+        obj["type"]="INDI_GRAPH";
+        break;
+    case PT_MESSAGE:
+        obj["type"]="INDI_MESSAGE";
+        break;
+    case PT_IMAGE:
+        obj["type"]="INDI_IMAGE";
+        break;
+    }
+    switch (prop.state) {
+    case OPS_IDLE:
+        obj["state"]="IPS_IDLE";
+        break;
+    case OPS_OK:
+        obj["state"]="IPS_OK";
+        break;
+    case OPS_ALERT:
+        obj["state"]="IPS_ALERT";
+        break;
+    case OPS_BUSY:
+        obj["state"]="IPS_BUSY";
+        break;
+    }
+    obj["modulename"]=prop.modulename;
 
+    QJsonArray details;
+    QJsonObject det;
+    if (prop.typ==PT_TEXT) {
+        for(auto t : prop.t)
+        {
+            det=OtextToJ(t);
+            details.append(det);
+        }
+        obj["texts"]=details;
+    }
+    if (prop.typ==PT_NUM) {
+        for(auto n : prop.n)
+        {
+            det=OnumToJ(n);
+            details.append(det);
+        }
+        obj["numbers"]=details;
+    }
+    if (prop.typ==PT_SWITCH) {
+        for(auto s : prop.s)
+        {
+            det=OswitchToJ(s);
+            details.append(det);
+        }
+        obj["switchs"]=details;
+    }
+    if (prop.typ==PT_LIGHT) {
+        for(auto l : prop.l)
+        {
+            det=OlightToJ(l);
+            details.append(det);
+        }
+        obj["lights"]=details;
+    }
+    if (prop.typ==PT_MESSAGE) {
+        for(auto m : prop.m)
+        {
+            det=OmessToJ(m);
+            details.append(det);
+        }
+        obj["messages"]=details;
+    }
+    if (prop.typ==PT_IMAGE) {
+        for(auto i : prop.i)
+        {
+            det=OimageToJ(i);
+            details.append(det);
+        }
+        obj["images"]=details;
+    }
+    if (prop.typ==PT_GRAPH) {
+        for(auto g : prop.g)
+        {
+            det=OgraphToJ(g);
+            details.append(det);
+        }
+        obj["graphs"]=details;
+    }
+
+    return obj;
+
+}
 QJsonObject OgroupToJ(QString groupname)
 {
     Q_UNUSED(groupname);

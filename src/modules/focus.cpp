@@ -8,11 +8,26 @@
 
 FocusModule::FocusModule()
 {
+    indiclient=IndiCLient::getInstance();
+    properties=Properties::getInstance();
+    properties->createModule("focus","Focus",2);
     qRegisterMetaType<MapStringStr>("MapStringStr");
     _modulename = "focus";
     _devices["camera"]="";
     _devices["focuser"]="";
-    indiclient=IndiCLient::getInstance();
+    properties->createCateg(_modulename,"ctl","Control",1);
+    properties->createProp(_modulename,"values","Valeurs"    ,PT_NUM,"ctl","",OP_RO,OSRule::OSR_NOFMANY,0,OPState::OPS_IDLE,"","",1);
+    properties->createProp(_modulename,"params","Paramètres" ,PT_NUM,"ctl","",OP_RW,OSRule::OSR_NOFMANY,0,OPState::OPS_IDLE,"","",1);
+    properties->appendElt(_modulename,"values","loopHFRavg",0,"Average HFR","","");
+    properties->appendElt(_modulename,"values","focpos"    ,0,"Focuser position","","");
+
+    properties->appendElt(_modulename,"params","startpos",0,"Départ","","");
+    properties->appendElt(_modulename,"params","steps"    ,0,"Incrément","","");
+    properties->appendElt(_modulename,"params","iterations",0,"Nombre d'incréments","","");
+    properties->appendElt(_modulename,"params","loopIterations"    ,0,"Moyenne sur","","");
+    properties->appendElt(_modulename,"params","exposure",0,"Exposition","","");
+    properties->appendElt(_modulename,"params","backlash"    ,0,"Backlash","","");
+
     connect(indiclient,&IndiCLient::SigServerConnected,this,&FocusModule::OnIndiServerConnected);
     connect(indiclient,&IndiCLient::SigServerDisconnected,this,&FocusModule::OnIndiServerDisconnected);
     connect(indiclient,&IndiCLient::SigNewDevice,this,&FocusModule::OnIndiNewDevice);
@@ -48,6 +63,13 @@ void FocusModule::test0(QString txt)
         _loopIterations = 4;
         _exposure =2;
         _backlash=100;
+        properties->setElt(_modulename,"params","startpos",_startpos);
+        properties->setElt(_modulename,"params","steps",_steps);
+        properties->setElt(_modulename,"params","iterations",_iterations);
+        properties->setElt(_modulename,"params","loopIterations",_loopIterations);
+        properties->setElt(_modulename,"params","exposure",_exposure);
+        properties->setElt(_modulename,"params","backlash",_backlash);
+        properties->emitProp(_modulename,"params");
         startCoarse();
     }
 
@@ -87,8 +109,10 @@ void FocusModule::OnIndiNewBLOB(IBLOB *bp)
         image.reset(new Image());
         connect(image.get(),&Image::successSEP        ,this,&FocusModule::OnSucessSEP);
         image->LoadFromBlob(bp);
-        emit ExposureDone();
-        emit ExposureBestDone();
+        if (_machine.isRunning()) {
+            emit ExposureDone();
+            emit ExposureBestDone();
+        }
     }
 
 }
@@ -312,6 +336,9 @@ void FocusModule::SMCompute()
 
     _posvector.push_back(_startpos + _iteration*_steps);
     _hfdvector.push_back(_loopHFRavg);
+    properties->setElt(_modulename,"values","loopHFRavg",_loopHFRavg);
+    properties->setElt(_modulename,"values","focpos",_startpos + _iteration*_steps);
+    properties->emitProp(_modulename,"values");
 
     if (_posvector.size() > 2)
     {

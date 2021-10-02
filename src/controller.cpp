@@ -1,6 +1,8 @@
 #include <QApplication>
 #include "controller.h"
-
+#include <QtSql/QSql>
+#include <QtSql/QSqlDatabase>
+//#include <QtSql/QSqlError>
 /*!
  * ... ...
  */
@@ -9,7 +11,20 @@ Controller::Controller(QObject *parent)
 
     this->setParent(parent);
 
+    const QString DRIVER("QSQLITE");
+    if(QSqlDatabase::isDriverAvailable(DRIVER))
+    {
+        QSqlDatabase db = QSqlDatabase::addDatabase(DRIVER);
+        db.setDatabaseName("/home/gilles/projets/OST/db/ost.db" );
+        if(!db.open())
+                    //qDebug() << "dbOpen - ERROR: " << db.lastError().text();
+                    qDebug() << "dbOpen - ERROR: " << db.databaseName();// << db.lastError().text();
+    }
+    else
+        qDebug() << "DatabaseConnect - ERROR: no driver " << DRIVER << " available";
+
     indiclient=IndiCLient::getInstance();
+    properties=Properties::getInstance();
 
     wshandler = new WShandler(this,properties);
 
@@ -21,15 +36,16 @@ Controller::Controller(QObject *parent)
     //focuser->setProperty("modulename","focuser of the death");
     connect(wshandler,&WShandler::textRcv,focuser,&FocusModule::test0);
     connect(focuser,&FocusModule::valueChanged,this,&Controller::OnValueChanged);
+    connect(properties,&Properties::signalvalueChanged,this,&Controller::valueChanged);
     /*focuser2 = new FocusModule();
     connect(wshandler,&WShandler::textRcv,focuser2,&FocusModule::test0);*/
-    const QMetaObject *metaobject = focuser->metaObject();
+    /*const QMetaObject *metaobject = focuser->metaObject();
     int count = metaobject->propertyCount();
     for (int i=0; i<count; ++i) {
         QMetaProperty metaproperty = metaobject->property(i);
         qDebug() << "focus props " <<  metaproperty.name() <<  metaproperty.isReadable() <<  metaproperty.isWritable() << metaproperty.type();
-    }
-    //properties->dumproperties();
+    }*/
+    properties->dumproperties();
 
 }
 
@@ -42,7 +58,7 @@ Controller::~Controller()
 
 void Controller::valueChanged(Prop prop)
 {
-    wshandler->sendProperty(prop);
+    wshandler->updateElements(prop);
 }
 void Controller::AppendGraph (Prop prop,OGraph gra,OGraphValue val)
 {

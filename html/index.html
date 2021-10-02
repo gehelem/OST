@@ -10,8 +10,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 </head>
 <body>
-<div id="OST">
-</div>
 <div id="CLI">
         <p>
             <button onClick="initWebSocket();">Connect</button>
@@ -23,6 +21,8 @@
         <p>
             <textarea id="debugTextArea" style="width:800px;height:50px;"></textarea>
         </p>
+</div>
+<div id="OST">
 </div>
 
 <script>
@@ -233,7 +233,7 @@
 
                     websocket.onmessage = function (evt) {
                         console.log( "Message received :", evt.data );
-                        //debug (evt.data);
+                        debug (evt.data);
                         var obj = jQuery.parseJSON( evt.data );
 
                         if (obj.message == 'updateproperty') {
