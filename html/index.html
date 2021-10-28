@@ -11,6 +11,7 @@
 </head>
 <body>
 <div id="CLI">
+CHOUBIDOU
         <p>
             <button onClick="initWebSocket();">Connect</button>
             <button onClick="stopWebSocket();">Disconnect</button>
@@ -172,8 +173,33 @@
                         //$("textarea#"+prop.modulename+prop.propname+sw.name).text(sw.switch);
                     } else {
                       nn= prop.modulename+prop.propname+item.name;
-                        $("div#"+prop.modulename+prop.categname).append("<button id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_switch('"+nn+"','"+prop.modulename+"','"+prop.propname+"','"+item.name+"');\"    >"+item.label+"</button>");
+                        //$("div#"+prop.modulename+prop.categname).append("<button id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_switch('"+nn+"','"+prop.modulename+"','"+prop.propname+"','"+item.name+"');\"    >"+item.label+"</button>");
+                        if (prop.perm=="IP_RO") {
+                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /></td></tr>");
+                        } else {
+                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_switch('"+nn+"','"+prop.modulename+"','"+prop.propname+"','"+item.name+"');\"    >"+item.label+"</button>"
+							);
+                        }
+                        //    <button onClick="abortfocus();">Abort focus</button>
+                        //$("div#"+prop.modulename+prop.categname).append("<tr><label for='name'>"+sw.label+"</label>");
+                        //$("div#"+prop.modulename+prop.categname).append("<textarea id="+prop.modulename+prop.propname+sw.name+">"+sw.switch+"</textarea></tr>");
+                    }
+                  });
+              }
 
+              if (prop.type =="INDI_LIGHT") {
+                  var swis = prop.switchs;
+                  $.each( swis, function( iitem, item ) {
+                    if ($("button#"+prop.modulename+prop.propname+item.name).length) {
+                        //$("textarea#"+prop.modulename+prop.propname+sw.name).text(sw.switch);
+                    } else {
+                      nn= prop.modulename+prop.propname+item.name;
+                        //$("div#"+prop.modulename+prop.categname).append("<button id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_switch('"+nn+"','"+prop.modulename+"','"+prop.propname+"','"+item.name+"');\"    >"+item.label+"</button>");
+                        if (prop.perm=="IP_RO") {
+                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /></td></tr>");
+                        } else {
+                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<td></td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /><button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_number('"+nn+"','"+prop.modulename+"','"+prop.propname+"','"+item.name+"');\"    >set</button>");
+                        }
                         //    <button onClick="abortfocus();">Abort focus</button>
                         //$("div#"+prop.modulename+prop.categname).append("<tr><label for='name'>"+sw.label+"</label>");
                         //$("div#"+prop.modulename+prop.categname).append("<textarea id="+prop.modulename+prop.propname+sw.name+">"+sw.switch+"</textarea></tr>");
@@ -233,10 +259,17 @@
 
                     websocket.onmessage = function (evt) {
                         console.log( "Message received :", evt.data );
-                        debug (evt.data);
+                        //debug ("BEGIN-------------------------------------------------");
+                        //debug (evt.data);
+                        //debug ("END  -------------------------------------------------");
                         var obj = jQuery.parseJSON( evt.data );
 
                         if (obj.message == 'updateproperty') {
+                            var prop = obj.property;
+                            buildProperty(prop);
+                        }
+
+                        if (obj.message == 'updateelements') {
                             var prop = obj.property;
                             buildProperty(prop);
                         }
@@ -283,11 +316,14 @@
                                 $.each( groups, function(igroup,group) {
                                   $("#ul"+mod.modulename+categ.categname).append("<li id=li"+mod.modulename+categ.categname+group.groupname+"><a href=#"+mod.modulename+categ.categname+group.groupname+">"+group.grouplabel+"</a></li>");
                                   $("div#"+mod.modulename+categ.categname).append("<div id="+mod.modulename+categ.categname+group.groupname+"></div>");
+								  //debug("BUILD GROUP " + mod.modulename+ " " + categ.categname + " " + group.groupname);
 
                                   var propertiesg = sortJSON(group.properties);
                                   $.each( propertiesg, function(iprop2,prop2) {
+								    //debug("BUILD GROUP PROP " + mod.modulename+ " " + categ.categname + " " + group.groupname + " " + prop2.propname  );
                                     buildProperty(prop2);
                                   });
+							      $("div#"+mod.modulename+categ.categname+group.grouname).tabs();
 
 
                                 })//end groups

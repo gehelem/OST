@@ -8,8 +8,8 @@
 
 FocusModule::FocusModule()
 {
-    indiclient=IndiCLient::getInstance();
     properties=Properties::getInstance();
+    indiclient=IndiCLient::getInstance();
     properties->createModule("focus","Focus",2);
     qRegisterMetaType<MapStringStr>("MapStringStr");
     _modulename = "focus";
@@ -20,6 +20,7 @@ FocusModule::FocusModule()
     properties->createProp(_modulename,"params","Paramètres" ,PT_NUM,"ctl","",OP_RW,OSRule::OSR_NOFMANY,0,OPState::OPS_IDLE,"","",1);
     properties->appendElt(_modulename,"values","loopHFRavg",0,"Average HFR","","");
     properties->appendElt(_modulename,"values","focpos"    ,0,"Focuser position","","");
+    properties->appendElt(_modulename,"values","imgHFR",0,"Last imgage HFR","","");
 
     properties->appendElt(_modulename,"params","startpos",0,"Départ","","");
     properties->appendElt(_modulename,"params","steps"    ,0,"Incrément","","");
@@ -54,7 +55,7 @@ void FocusModule::test0(QString txt)
     if (txt=="a")  connectAllDevices();
     if (txt=="l")  loadDevicesConfs();
     if (txt=="d")  disconnectAllDevices();
-    if (txt=="x")  disconnectIndi();
+    if (txt=="w")  properties->dumproperties();
     if (txt=="f")
     {
         _startpos = 30000;
@@ -87,17 +88,21 @@ void FocusModule::OnIndiNewNumber(INumberVectorProperty *nvp)
     if (
             (QString(nvp->device) == _devices["focuser"])
         &&  (QString(nvp->name)   =="ABS_FOCUS_POSITION")
-        &&  (nvp->s==IPS_OK)
        )
     {
-        sendMessage("focuserReachedPosition");
-
-        emit GotoBestDone();
-        emit BacklashBestDone();
-        emit BacklashDone();
-        emit GotoNextDone();
-        emit GotoStartDone();
+        properties->setElt(_modulename,"values","focpos",nvp->np[0].value);
+        properties->emitProp(_modulename,"values");
+        if (nvp->s==IPS_OK)
+        {
+            sendMessage("focuserReachedPosition");
+            emit GotoBestDone();
+            emit BacklashBestDone();
+            emit BacklashDone();
+            emit GotoNextDone();
+            emit GotoStartDone();
+        }
     }
+
 }
 
 void FocusModule::OnIndiNewBLOB(IBLOB *bp)
@@ -327,6 +332,8 @@ void FocusModule::SMFindStars()
 void FocusModule::OnSucessSEP()
 {
     sendMessage("FindStarsDone");
+    properties->setElt(_modulename,"values","imgHFR",image->HFRavg);
+    properties->emitProp(_modulename,"values");
     emit FindStarsDone();
 }
 
@@ -336,9 +343,9 @@ void FocusModule::SMCompute()
 
     _posvector.push_back(_startpos + _iteration*_steps);
     _hfdvector.push_back(_loopHFRavg);
-    properties->setElt(_modulename,"values","loopHFRavg",_loopHFRavg);
-    properties->setElt(_modulename,"values","focpos",_startpos + _iteration*_steps);
-    properties->emitProp(_modulename,"values");
+    //properties->setElt(_modulename,"values","loopHFRavg",_loopHFRavg);
+    //properties->setElt(_modulename,"values","focpos",_startpos + _iteration*_steps);
+    //properties->emitProp(_modulename,"values");
 
     if (_posvector.size() > 2)
     {
@@ -425,6 +432,8 @@ void FocusModule::SMInitLoopFrame()
     sendMessage("SMInitLoopFrame");
     _loopIteration=0;
     _loopHFRavg=99;
+    properties->setElt(_modulename,"values","loopHFRavg",_loopHFRavg);
+    properties->emitProp(_modulename,"values");
 
     emit InitLoopFrameDone();
 }
@@ -434,6 +443,9 @@ void FocusModule::SMComputeLoopFrame()
     sendMessage("SMComputeLoopFrame");
     _loopIteration++;
     _loopHFRavg=((_loopIteration-1)*_loopHFRavg + image->HFRavg)/_loopIteration;
+    properties->setElt(_modulename,"values","loopHFRavg",_loopHFRavg);
+    properties->emitProp(_modulename,"values");
+
     qDebug() << "Loop    " << _loopIteration << "/" << _loopIterations << " = " <<  image->HFRavg;
 
 

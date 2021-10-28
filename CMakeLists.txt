@@ -56,6 +56,8 @@ add_executable( ${APP_EXEOST}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/module.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/indiclient.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/indiclient.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/ost.cpp

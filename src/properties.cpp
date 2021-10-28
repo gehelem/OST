@@ -64,6 +64,7 @@ void    Properties::deleteGroup(QString modulename, QString categname, QString g
 void    Properties::createProp (QString modulename, QString propname, Prop    prop)
 {
     modules[modulename].props[propname]=prop;
+    emit signalPropCreated(modules[modulename].props[propname]);
 }
 
 void    Properties::createProp (QString modulename, QString propname, QString label,propType typ,QString categname,QString groupname,OPerm perm,OSRule rule,double timeout,OPState state,QString aux0,QString aux1,int order)
@@ -83,11 +84,14 @@ void    Properties::createProp (QString modulename, QString propname, QString la
     prop.aux1           = aux1;
     prop.order          = order;
     modules[modulename].props[propname]= prop;
+    emit signalPropCreated(modules[modulename].props[propname]);
+
 }
 
 void    Properties::deleteProp (QString modulename, QString propname)
 {
     modules[modulename].props.remove(propname);
+    emit signalPropDeleted(modules[modulename].props[propname]);
 }
 Prop    Properties::getProp    (QString modulename, QString propname)
 {
@@ -329,13 +333,18 @@ void    Properties::dumproperties(void)
       qDebug() << "##########################" << m.modulename << "---" << m.modulelabel <<"###################################";
       for(auto c : m.categs)
       {
-          qDebug() <<"##### categ  ="  << c.categname << c.categlabel << c.modulename;
+          qDebug() <<"##### categ  ="  << c.modulename << c.categname << c.categlabel;
+
+      }
+      for(auto g : m.groups)
+      {
+          qDebug() <<"##### group  =" << g.modulename << g.categname << g.groupname  << g.grouplabel ;
 
       }
 
       for(auto p : m.props)
       {
-       qDebug() <<"##### property ="  << p.label << p.typ;
+       qDebug() <<"##### property ="  << p.modulename << p.categname << p.groupname << p.propname << p.label << p.typ ;
         if (p.typ==PT_TEXT)  {
             qDebug() <<"-- texts";
             for(auto t : p.t)

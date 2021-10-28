@@ -1,6 +1,7 @@
 #ifndef CONTROLLER_h_
 #define CONTROLLER_h_
 #include "focus.h"
+#include "indipanel.h"
 #include "wshandler.h"
 #include "properties.h"
 
@@ -21,7 +22,7 @@ public:
     IndiCLient    *indiclient;
     Properties  *properties;
     FocusModule    *focuser;
-    FocusModule    *focuser2;
+    IndiPanel      *indipanel;
     WShandler   *wshandler;
 public slots:
     void OnValueChanged(double newValue);

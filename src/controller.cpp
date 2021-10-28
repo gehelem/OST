@@ -23,11 +23,11 @@ Controller::Controller(QObject *parent)
     else
         qDebug() << "DatabaseConnect - ERROR: no driver " << DRIVER << " available";
 
-    indiclient=IndiCLient::getInstance();
+    //indiclient=IndiCLient::getInstance();
     properties=Properties::getInstance();
 
     wshandler = new WShandler(this,properties);
-
+    indipanel = new IndiPanel();
     focuser = new FocusModule();
     QMap<QString,QString> dev;
     dev["camera"]="CCD Simulator";
@@ -36,16 +36,9 @@ Controller::Controller(QObject *parent)
     //focuser->setProperty("modulename","focuser of the death");
     connect(wshandler,&WShandler::textRcv,focuser,&FocusModule::test0);
     connect(focuser,&FocusModule::valueChanged,this,&Controller::OnValueChanged);
+    connect(indipanel,&IndiPanel::valueChanged,this,&Controller::OnValueChanged);
     connect(properties,&Properties::signalvalueChanged,this,&Controller::valueChanged);
-    /*focuser2 = new FocusModule();
-    connect(wshandler,&WShandler::textRcv,focuser2,&FocusModule::test0);*/
-    /*const QMetaObject *metaobject = focuser->metaObject();
-    int count = metaobject->propertyCount();
-    for (int i=0; i<count; ++i) {
-        QMetaProperty metaproperty = metaobject->property(i);
-        qDebug() << "focus props " <<  metaproperty.name() <<  metaproperty.isReadable() <<  metaproperty.isWritable() << metaproperty.type();
-    }*/
-    properties->dumproperties();
+    connect(properties,&Properties::signalPropCreated,wshandler,&WShandler::sendProperty);
 
 }
 
