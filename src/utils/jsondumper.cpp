@@ -75,7 +75,7 @@ QJsonObject JSonDumper::dumpPropertyCommons(Property *pProperty) {
 
     QJsonObject json;
 
-    json["deviceName"] = pProperty->getDeviceName();
+    json["devcatName"] = pProperty->getDevcatName();
     json["groupName"] = pProperty->getGroupName();
     json["name"] = pProperty->getName();
     json["label"] = pProperty->getLabel();

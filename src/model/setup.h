@@ -2,18 +2,18 @@
 #define OST_SETUP_H
 
 #include <QMap>
-#include "device.h"
+#include "devcat.h"
 
 class Setup {
 
 public:
     virtual ~Setup();
-    void addDevice(const Device *pDevice);
-    void removeDeviceByName(const QString &deviceName);
-    const Device* getDeviceByName(const QString &deviceName);
+    void addDevcat(const Devcat *pDevcat);
+    void removeDevcatByName(const QString &devcatName);
+    const Devcat* getDevcatByName(const QString &devcatName);
     void cleanup();
 private:
-    QMap<QString, const Device*> _devicesMap;
+    QMap<QString, const Devcat*> _devcatsMap;
 
 };
 

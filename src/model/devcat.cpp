@@ -1,6 +1,6 @@
-#include "device.h"
+#include "devcat.h"
 
-Device::Device(const QString& name)
+Devcat::Devcat(const QString& name)
 : _name(name)
 {
 

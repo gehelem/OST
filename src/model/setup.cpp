@@ -8,31 +8,31 @@ Setup::~Setup()
     cleanup();
 }
 
-void Setup::addDevice(const Device* pDevice) {
+void Setup::addDevcat(const Devcat* pDevcat) {
 
-    if( ! _devicesMap.contains(pDevice->getName()) ) {
-        _devicesMap[pDevice->getName()] = pDevice;
-        BOOST_LOG_TRIVIAL(info) << "New device added: " << pDevice->getName().toStdString();
+    if( ! _devcatsMap.contains(pDevcat->getName()) ) {
+        _devcatsMap[pDevcat->getName()] = pDevcat;
+        BOOST_LOG_TRIVIAL(info) << "New device/category added: " << pDevcat->getName().toStdString();
     } else {
-        BOOST_LOG_TRIVIAL(warning) << "Duplicate device name: " << pDevice->getName().toStdString() << ". This should not happen";
+        BOOST_LOG_TRIVIAL(warning) << "Duplicate device/category name: " << pDevcat->getName().toStdString() << ". This should not happen";
     }
 }
 
-const Device *Setup::getDeviceByName(const QString &deviceName) {
-    return _devicesMap.contains(deviceName) ? _devicesMap[deviceName] : nullptr;
+const Devcat *Setup::getDevcatByName(const QString &devcatName) {
+    return _devcatsMap.contains(devcatName) ? _devcatsMap[devcatName] : nullptr;
 }
 
-void Setup::removeDeviceByName(const QString &deviceName) {
-    if( _devicesMap.contains(deviceName) ) {
-        delete _devicesMap[deviceName];;
-        _devicesMap.remove(deviceName);
+void Setup::removeDevcatByName(const QString &devcatName) {
+    if( _devcatsMap.contains(devcatName) ) {
+        delete _devcatsMap[devcatName];;
+        _devcatsMap.remove(devcatName);
     }
-    BOOST_LOG_TRIVIAL(info) << "Device removed: " << deviceName.toStdString();
+    BOOST_LOG_TRIVIAL(info) << "Device/category removed: " << devcatName.toStdString();
 }
 
 void Setup::cleanup() {
 
-    for( const QString& deviceName : _devicesMap.keys() ) {
-        removeDeviceByName(deviceName);
+    for( const QString& devcatName : _devcatsMap.keys() ) {
+        removeDevcatByName(devcatName);
     }
 }

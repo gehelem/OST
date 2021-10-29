@@ -1,16 +1,16 @@
-#ifndef OST_DEVICE_H
-#define OST_DEVICE_H
+#ifndef OST_DEVCAT_H
+#define OST_DEVCAT_H
 
 #include <QString>
 
-class Device {
+class Devcat {
 
 public:
-    Device(const QString& name);
+    Devcat(const QString& name);
     [[nodiscard]] inline const QString& getName() const {return _name;}
 private:
     QString _name;
 };
 
 
-#endif //OST_DEVICE_H
+#endif //OST_DEVCAT_H

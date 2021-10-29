@@ -76,8 +76,8 @@ add_executable( ${APP_EXEOST}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/numbervalue.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/setup.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/setup.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/device.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/device.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/devcat.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/model/devcat.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/property.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/propertyvisitor.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model/numberproperty.h

@@ -7,7 +7,7 @@
 std::string PropertyTextDumper::dumpPropertyCommons(Property *pProperty) {
 
     std::stringstream stream;
-    stream << "Device=" << pProperty->getDeviceName().toStdString()
+    stream << "Dev/cat=" << pProperty->getDevcatName().toStdString()
            << ". Group=" << pProperty->getGroupName().toStdString()
            << ". Name=" << pProperty->getName().toStdString()
            << ". Label=" << pProperty->getLabel().toStdString()

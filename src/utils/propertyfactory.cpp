@@ -7,7 +7,7 @@
 
 Property* PropertyFactory::createProperty(INumberVectorProperty *pVector) {
 
-    auto* pPorperty = new NumberProperty(
+    auto* pProperty = new NumberProperty(
             pVector->device,
             pVector->group,
             pVector->name,
@@ -19,7 +19,7 @@ Property* PropertyFactory::createProperty(INumberVectorProperty *pVector) {
 
         INumber currentNumber = pVector->np[i];
 
-        pPorperty->addNumber(new NumberValue(
+        pProperty->addNumber(new NumberValue(
                 currentNumber.name,
                 currentNumber.label,
                 "",
@@ -30,7 +30,7 @@ Property* PropertyFactory::createProperty(INumberVectorProperty *pVector) {
                 currentNumber.step));
     }
 
-    return pPorperty;
+    return pProperty;
 }
 
 Property *PropertyFactory::createProperty(ISwitchVectorProperty *pVector) {
@@ -63,7 +63,7 @@ Property *PropertyFactory::createProperty(ISwitchVectorProperty *pVector) {
 
 Property *PropertyFactory::createProperty(ITextVectorProperty *pVector) {
 
-    auto* pPorperty = new TextProperty(
+    auto* pProperty = new TextProperty(
             pVector->device,
             pVector->group,
             pVector->name,
@@ -75,25 +75,25 @@ Property *PropertyFactory::createProperty(ITextVectorProperty *pVector) {
 
         IText currentText = pVector->tp[i];
 
-        pPorperty->addText(new TextValue(
+        pProperty->addText(new TextValue(
                 currentText.name,
                 currentText.label,
                 "",
                 currentText.text));
     }
 
-    return pPorperty;
+    return pProperty;
 }
 
 Property *PropertyFactory::createProperty(ILightVectorProperty *pVector) {
 
-    auto* pPorperty = new LightProperty (
+    auto* pProperty = new LightProperty (
             pVector->device,
             pVector->group,
             pVector->name,
             pVector->label,
             /*
-             * INDI light properties have no permission flag and are consuidered
+             * INDI light properties have no permission flag and are considered
              * as ReadOnly: hence 0 */
             0,
             pVector->s);
@@ -102,12 +102,12 @@ Property *PropertyFactory::createProperty(ILightVectorProperty *pVector) {
 
         ILight currentLight = pVector->lp[i];
 
-        pPorperty->addLight(new LightValue (
+        pProperty->addLight(new LightValue (
                 currentLight.name,
                 currentLight.label,
                 "",
                 currentLight.s));
     }
 
-    return pPorperty;
+    return pProperty;
 }

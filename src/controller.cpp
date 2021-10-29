@@ -66,12 +66,12 @@ void Controller::propDeleted(Prop prop)
     wshandler->sendmessage("Del prop " +  prop.propname);
 }
 
-void Controller::onNewDeviceSeen(const QString &deviceName) {
-    _setup.addDevice(new Device(deviceName));
+void Controller::onNewDeviceSeen(const QString &devcatName) {
+    _setup.addDevcat(new Devcat(devcatName));
 }
 
-void Controller::onDeviceRemoved(const QString &deviceName) {
-    _setup.removeDeviceByName(deviceName);
+void Controller::onDeviceRemoved(const QString &devcatName) {
+    _setup.removeDevcatByName(devcatName);
 }
 
 void Controller::onNewBlobReveived(const QByteArray& data, const QString& format) const {
@@ -139,7 +139,7 @@ void Controller::onMessageReceived(const QString& message) {
 void Controller::onPropertyRemoved(Property *pProperty) {
 
     BOOST_LOG_TRIVIAL(debug) << "Property removed : "
-    << pProperty->getDeviceName().toStdString() << '|'
+    << pProperty->getDevcatName().toStdString() << '|'
     << pProperty->getGroupName().toStdString() << '|'
     << pProperty->getName().toStdString();
 

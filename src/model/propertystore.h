@@ -3,6 +3,7 @@
 
 #include <QMap>
 #include "lightproperty.h"
+#include "numberproperty.h"
 
 class PropertyStore {
 
