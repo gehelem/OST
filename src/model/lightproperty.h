@@ -9,9 +9,9 @@
 class LightProperty : public Property {
 public:
     LightProperty() = delete;
-    LightProperty(const QString &devcatName, const QString &groupName, const QString &name, const QString &label,
+    LightProperty(const QString &moduleName, const QString &devcatName, const QString &groupName, const QString &name, const QString &label,
                    int permission, int state, QObject *parent = nullptr)
-            : Property(devcatName, groupName, name, label, permission, state, parent) {}
+            : Property(moduleName, devcatName, groupName, name, label, permission, state, parent) {}
 
     ~LightProperty() override { for (LightValue* pVal : _lights) {delete pVal;} }
 

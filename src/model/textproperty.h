@@ -11,9 +11,9 @@ class TextProperty : public Property {
 
 public:
     TextProperty() = delete;
-    TextProperty(const QString &devcatName, const QString &groupName, const QString &name, const QString &label,
+    TextProperty(const QString &moduleName, const QString &devcatName, const QString &groupName, const QString &name, const QString &label,
                    int permission, int state, QObject *parent = nullptr)
-            : Property(devcatName, groupName, name, label, permission, state, parent) {}
+            : Property(moduleName, devcatName, groupName, name, label, permission, state, parent) {}
 
     ~TextProperty() override { for (TextValue* pVal : _texts) {delete pVal;} }
 

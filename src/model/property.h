@@ -8,11 +8,12 @@ class PropertyVisitor;
 class Property : public QObject {
 Q_OBJECT
 protected:
-    Property(QString devcatName, QString groupName, QString name, QString label,
+    Property(QString moduleName,QString devcatName, QString groupName, QString name, QString label,
              int permission, int state, QObject* parent = nullptr)
-    : QObject(parent), _devcatName(devcatName), _groupName(groupName), _name(name), _label(label),
+    : QObject(parent), _moduleName(moduleName) ,_devcatName(devcatName), _groupName(groupName), _name(name), _label(label),
     _permission(permission), _state(state) {}
 
+    QString _moduleName;
     QString _devcatName;
     QString _groupName;
     QString _name;
@@ -24,6 +25,7 @@ public:
     virtual ~Property() = default;
     virtual void accept(PropertyVisitor* pVisitor) = 0;
 
+    [[nodiscard]] inline const QString &getModuleName() const { return _moduleName; }
     [[nodiscard]] inline const QString &getDevcatName() const { return _devcatName; }
     [[nodiscard]] inline const QString &getGroupName() const { return _groupName; }
     [[nodiscard]] inline const QString &getName() const { return _name; }

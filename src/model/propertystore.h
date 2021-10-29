@@ -16,7 +16,7 @@ public:
 
     [[nodiscard]] int getSize() const;
 private:
-    QMap<QString, QMap<QString, QMap<QString, Property*>>> _store;
+    QMap<QString, QMap<QString, QMap<QString, QMap<QString, Property*>>>> _store;
 };
 
 

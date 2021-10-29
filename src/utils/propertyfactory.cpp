@@ -8,6 +8,7 @@
 Property* PropertyFactory::createProperty(INumberVectorProperty *pVector) {
 
     auto* pProperty = new NumberProperty(
+            "indipanel",
             pVector->device,
             pVector->group,
             pVector->name,
@@ -36,6 +37,7 @@ Property* PropertyFactory::createProperty(INumberVectorProperty *pVector) {
 Property *PropertyFactory::createProperty(ISwitchVectorProperty *pVector) {
 
     auto *pProperty = new SwitchProperty(
+            "indipanel",
             pVector->device,
             pVector->group,
             pVector->name,
@@ -64,6 +66,7 @@ Property *PropertyFactory::createProperty(ISwitchVectorProperty *pVector) {
 Property *PropertyFactory::createProperty(ITextVectorProperty *pVector) {
 
     auto* pProperty = new TextProperty(
+            "indipanel",
             pVector->device,
             pVector->group,
             pVector->name,
@@ -88,6 +91,7 @@ Property *PropertyFactory::createProperty(ITextVectorProperty *pVector) {
 Property *PropertyFactory::createProperty(ILightVectorProperty *pVector) {
 
     auto* pProperty = new LightProperty (
+           "indipanel",
             pVector->device,
             pVector->group,
             pVector->name,

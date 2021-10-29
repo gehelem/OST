@@ -8,9 +8,9 @@
 class SwitchProperty : public Property {
 public:
     SwitchProperty() = delete;
-    SwitchProperty(const QString &devcatName, const QString &groupName, const QString &name, const QString &label,
+    SwitchProperty(const QString &moduleName, const QString &devcatName, const QString &groupName, const QString &name, const QString &label,
                    int permission, int state, int rule, QObject *parent = nullptr)
-            : Property(devcatName, groupName, name, label, permission, state, parent), _rule(rule) {}
+            : Property(moduleName, devcatName, groupName, name, label, permission, state, parent), _rule(rule) {}
 
     ~SwitchProperty() override { for (SwitchValue* pVal : _switches) {delete pVal;} }
 
