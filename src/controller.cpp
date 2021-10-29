@@ -51,6 +51,7 @@ Controller::~Controller()
 void Controller::valueChanged(Prop prop)
 {
     wshandler->sendProperty(prop);
+
 }
 void Controller::AppendGraph (Prop prop,OGraph gra,OGraphValue val)
 {
@@ -99,28 +100,31 @@ void Controller::onNewPropertyReceived(Property *pProperty) {
 
     PropertyTextDumper textDumper;
     pProperty->accept(&textDumper);
-    BOOST_LOG_TRIVIAL(debug) << "CREATED " << textDumper.getResult();
+//    BOOST_LOG_TRIVIAL(debug) << "CREATED " << textDumper.getResult();
 
     JSonDumper jsonDumper;
     pProperty->accept(&jsonDumper);
-    BOOST_LOG_TRIVIAL(debug) << "JSON : " << jsonDumper.getResult();
+//    BOOST_LOG_TRIVIAL(debug) << "JSON : " << jsonDumper.getResult();
 
     _propertyStore.add(pProperty);
+    wshandler->sendmessage(QString::fromStdString(jsonDumper.getResult()));
 
-    dumpStore();
+    //dumpStore();
 }
 
 void Controller::onPropertyUpdated(Property *pProperty) {
 
     PropertyTextDumper textDumper;
     pProperty->accept(&textDumper);
-    BOOST_LOG_TRIVIAL(debug) << "UPDATED " << textDumper.getResult();
+//    BOOST_LOG_TRIVIAL(debug) << "UPDATED " << textDumper.getResult();
 
     JSonDumper jsonDumper;
     pProperty->accept(&jsonDumper);
-    BOOST_LOG_TRIVIAL(debug) << "JSON : " << jsonDumper.getResult();
+//    BOOST_LOG_TRIVIAL(debug) << "JSON : " << jsonDumper.getResult();
 
     _propertyStore.update(pProperty);
+    wshandler->sendmessage(QString::fromStdString(jsonDumper.getResult()));
+
 }
 
 void Controller::onMessageReceived(const QString& message) {
