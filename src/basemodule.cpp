@@ -4,6 +4,27 @@
 
 Basemodule::Basemodule()
 {
+    setVerbose(false);
+    setServer("localhost", 7624);
+    if (connectServer()){
+                BOOST_LOG_TRIVIAL(debug) << "Indi server connected";
+                newUniversalMessage("Indi server connected");
+            } else {
+                BOOST_LOG_TRIVIAL(debug) << "Couldn't connect to Indi server";
+            }
+    _infos.setName("infos");
+    _infos.setLabel("Module informations");
+    //connect(_infos,_infos.PropertyDataChanged(*_infos),this,&Basemodule::OnPropertyDataChanged(*_infos));
+}
+void Basemodule::setNameAndLabel(QString name,QString label)
+{
+    _name = name;
+    _label = label;
+}
+void Basemodule::echoNameAndLabel()
+{
+    BOOST_LOG_TRIVIAL(debug)  << "Hello, i'm " << _name.toStdString() << " " << _label.toStdString() << " " << _infos.getValue().toStdString();
+    _infos.setLabel("chourloubidou");
 }
 QMap<QString,QString> Basemodule::getModDevices(void)
 {

@@ -1,31 +1,35 @@
-#ifndef INDI_PANEL_MODULE_h_
-#define INDI_PANEL_MODULE_h_
+#ifndef INDIPANEL_MODULE_h_
+#define INDIPANEL_MODULE_h_
+#include <basemodule.h>
 
-#include "module.h"
-#include "properties.h"
+#if defined(INDIPANEL_MODULE_h_)
+#  define MODULE_INIT Q_DECL_EXPORT
+#else
+#  define MODULE_INIT Q_DECL_IMPORT
+#endif
 
-class IndiPanel : public Module
+class MODULE_INIT IndiPanel : public Basemodule
 {
     Q_OBJECT
 
     public:
         IndiPanel();
         ~IndiPanel();
-
     signals:
         void valueChanged(const double &newValue);
-
-    public slots:
-        void OnIndiNewDevice          (INDI::BaseDevice *dp) override;
-        void OnIndiRemoveDevice       (INDI::BaseDevice *dp) override;
-        void OnIndiNewProperty        (INDI::Property *property) override;
-        void OnIndiRemoveProperty     (INDI::Property *property) override;
-        void OnIndiNewNumber(INumberVectorProperty *nvp) override;
-        void OnIndiNewText(ITextVectorProperty *tvp) override;
-        void OnIndiNewLight(ILightVectorProperty *lvp) override;
-        void OnIndiNewBLOB(IBLOB *bp) override;
-        void OnIndiNewSwitch(ISwitchVectorProperty *svp) override;
     private:
+        void newDevice      (INDI::BaseDevice *dp) override;
+        void removeDevice   (INDI::BaseDevice *dp) override;
+        void newProperty    (INDI::Property *property) override;
+        void removeProperty (INDI::Property *property) override;
+        void newNumber      (INumberVectorProperty *nvp) override;
+        void newText        (ITextVectorProperty *tvp) override;
+        void newLight       (ILightVectorProperty *lvp) override;
+        void newBLOB        (IBLOB *bp) override;
+        void newSwitch      (ISwitchVectorProperty *svp) override;
 
 };
+
+extern "C" MODULE_INIT IndiPanel *initialize();
+
 #endif

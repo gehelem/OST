@@ -7,6 +7,8 @@
 #include <boost/log/trivial.hpp>
 #include "image.h"
 #include "properties.h"
+#include "datastructures.h"
+
 /*!
  * This Class shouldn't be used as is
  * Every functionnal module should inherit it
@@ -20,10 +22,15 @@ class Basemodule : public QObject, public INDI::BaseClient
     public:
         Basemodule();
         ~Basemodule() = default;
+        void setNameAndLabel(QString name, QString label);
+        void echoNameAndLabel(void);
+
         QMap<QString,QString> getModDevices(void);
         void setDevices(QMap<QString,QString>);
         void setAction(QString);
         std::unique_ptr<Image> image =nullptr;
+
+
 
     protected:
         //QList<FITSImage::Star> stars;
@@ -40,27 +47,30 @@ class Basemodule : public QObject, public INDI::BaseClient
         bool frameReset(QString devicename);
         void sendMessage(QString message);
 
-        QString     _status;
-        QString     _modulename;
+        QString _status;
+        QString _modulename;
+        QString _name;
+        QString _label;
+        PropertyData _infos;
         QMap<QString,bool>        _actions;
         QMap<QString,QString>     _devices;
 
         Properties  *properties;
+        virtual void serverConnected() {}
+        virtual void serverDisconnected(int exit_code)          {Q_UNUSED(exit_code);}
+        virtual void newDevice(INDI::BaseDevice *dp)            {Q_UNUSED(dp);}
+        virtual void removeDevice(INDI::BaseDevice *dp)         {Q_UNUSED(dp);}
+        virtual void newProperty(INDI::Property *property)      {Q_UNUSED(property);}
+        virtual void removeProperty(INDI::Property *property)   {Q_UNUSED(property);}
+        virtual void newText(ITextVectorProperty *tvp)          {Q_UNUSED(tvp);}
+        virtual void newSwitch(ISwitchVectorProperty *svp)      {Q_UNUSED(svp);}
+        virtual void newLight(ILightVectorProperty *lvp)        {Q_UNUSED(lvp);}
+        virtual void newNumber(INumberVectorProperty *nvp)      {Q_UNUSED(nvp);}
+        virtual void newBLOB(IBLOB *bp)                         {Q_UNUSED(bp);}
+        virtual void newMessage(INDI::BaseDevice *dp, int messageID) {Q_UNUSED(dp);Q_UNUSED(messageID);}
+        virtual void newUniversalMessage(std::string message)   {Q_UNUSED(message);}
 
 
-    public slots:
-        virtual void OnIndiServerConnected    (){}
-        virtual void OnIndiServerDisconnected (int exit_code)             {Q_UNUSED(exit_code);}
-        virtual void OnIndiNewDevice          (INDI::BaseDevice *dp)      {Q_UNUSED(dp);}
-        virtual void OnIndiRemoveDevice       (INDI::BaseDevice *dp)      {Q_UNUSED(dp);}
-        virtual void OnIndiNewProperty        (INDI::Property *property)  {Q_UNUSED(property);}
-        virtual void OnIndiRemoveProperty     (INDI::Property *property)  {Q_UNUSED(property);}
-        virtual void OnIndiNewText            (ITextVectorProperty *tvp)  {Q_UNUSED(tvp);}
-        virtual void OnIndiNewSwitch          (ISwitchVectorProperty *svp){Q_UNUSED(svp);}
-        virtual void OnIndiNewLight           (ILightVectorProperty *lvp) {Q_UNUSED(lvp);}
-        virtual void OnIndiNewMessage         (INDI::BaseDevice *dp, int messageID){Q_UNUSED(dp);Q_UNUSED(messageID);}
-        virtual void OnIndiNewNumber          (INumberVectorProperty *nvp){Q_UNUSED(nvp);}
-        virtual void OnIndiNewBLOB            (IBLOB *bp)                 {Q_UNUSED(bp);}
     signals:
         void finished();
         void newMessage(QString message);

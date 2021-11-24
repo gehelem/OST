@@ -1,30 +1,16 @@
-#include <QtCore>
-#include <QtConcurrent>
-#include <QScxmlStateMachine>
-#include <QStateMachine>
-#include <basedevice.h>
 #include "indipanel.h"
-#include "polynomialfit.h"
+
+IndiPanel *initialize()
+{
+    IndiPanel *basemodule = new IndiPanel();
+    return basemodule;
+}
 
 IndiPanel::IndiPanel()
 {
     properties=Properties::getInstance();
     _modulename = "indipanel";
     properties->createModule(_modulename,"Indi control panel",9);
-    indiclient=IndiCLient::getInstance();
-
-    connect(indiclient,&IndiCLient::SigServerConnected,this,&IndiPanel::OnIndiServerConnected);
-    connect(indiclient,&IndiCLient::SigServerDisconnected,this,&IndiPanel::OnIndiServerDisconnected);
-    connect(indiclient,&IndiCLient::SigNewDevice,this,&IndiPanel::OnIndiNewDevice);
-    connect(indiclient,&IndiCLient::SigRemoveDevice,this,&IndiPanel::OnIndiRemoveDevice);
-    connect(indiclient,&IndiCLient::SigNewProperty,this,&IndiPanel::OnIndiNewProperty);
-    connect(indiclient,&IndiCLient::SigRemoveProperty,this,&IndiPanel::OnIndiRemoveProperty);
-    connect(indiclient,&IndiCLient::SigNewText,this,&IndiPanel::OnIndiNewText);
-    connect(indiclient,&IndiCLient::SigNewSwitch,this,&IndiPanel::OnIndiNewSwitch);
-    connect(indiclient,&IndiCLient::SigNewLight,this,&IndiPanel::OnIndiNewLight);
-    connect(indiclient,&IndiCLient::SigNewBLOB,this,&IndiPanel::OnIndiNewBLOB);
-    connect(indiclient,&IndiCLient::SigNewNumber,this,&IndiPanel::OnIndiNewNumber);
-    connect(indiclient,&IndiCLient::SigNewMessage,this,&IndiPanel::OnIndiNewMessage);
 
 }
 
@@ -33,15 +19,15 @@ IndiPanel::~IndiPanel()
 
 }
 
-void IndiPanel::OnIndiNewDevice(INDI::BaseDevice *dp)
+void IndiPanel::newDevice(INDI::BaseDevice *dp)
 {
     properties->createCateg(_modulename,QString(dp->getDeviceName()).replace( " ", "" ),dp->getDeviceName(),0);
 }
-void IndiPanel::OnIndiRemoveDevice(INDI::BaseDevice *dp)
+void IndiPanel::removeDevice(INDI::BaseDevice *dp)
 {
     properties->deleteCateg(_modulename,QString(dp->getDeviceName()).replace( " ", "" ));
 }
-void IndiPanel::OnIndiNewProperty(INDI::Property *property)
+void IndiPanel::newProperty(INDI::Property *property)
 {
    //Properties::createGroup(QString modulename, QString categname, QString groupname,  QString grouplabel,int order)
     //if (properties->getGroup(QString(property->getDeviceName()).replace( " ", "" ), QString(property->getGroupName()).replace( " ", "" )).grouplabel != property->getGroupName())
@@ -117,12 +103,12 @@ void IndiPanel::OnIndiNewProperty(INDI::Property *property)
 
    //properties->dumproperties();
 }
-void IndiPanel::OnIndiRemoveProperty(INDI::Property *property)
+void IndiPanel::removeProperty(INDI::Property *property)
 {
     properties->deleteProp(_modulename,property->getName());
 }
 
-void IndiPanel::OnIndiNewNumber(INumberVectorProperty *nvp)
+void IndiPanel::newNumber(INumberVectorProperty *nvp)
 {
     for (int i =0;i<nvp->nnp;i++) {
         properties->setElt(_modulename,QString(nvp->name).replace( " ", "" ),QString(nvp->np[i].name).replace( " ", "" ),nvp->np[i].value);
@@ -130,7 +116,7 @@ void IndiPanel::OnIndiNewNumber(INumberVectorProperty *nvp)
     properties->emitProp(_modulename,QString(nvp->name).replace( " ", "" ));
 }
 
-void IndiPanel::OnIndiNewText(ITextVectorProperty *tvp)
+void IndiPanel::newText(ITextVectorProperty *tvp)
 {
     for (int i =0;i<tvp->ntp;i++) {
         properties->setElt(_modulename,QString(tvp->name).replace( " ", "" ),QString(tvp->tp[i].name).replace( " ", "" ),tvp->tp[i].text);
@@ -138,7 +124,7 @@ void IndiPanel::OnIndiNewText(ITextVectorProperty *tvp)
     properties->emitProp(_modulename,QString(tvp->name).replace( " ", "" ));
 }
 
-void IndiPanel::OnIndiNewLight(ILightVectorProperty *lvp)
+void IndiPanel::newLight(ILightVectorProperty *lvp)
 {
     for (int i =0;i<lvp->nlp;i++) {
         properties->setElt(_modulename,QString(lvp->name).replace( " ", "" ),QString(lvp->lp[i].name).replace( " ", "" ),lvp->lp[i].s);
@@ -148,7 +134,7 @@ void IndiPanel::OnIndiNewLight(ILightVectorProperty *lvp)
 }
 
 
-void IndiPanel::OnIndiNewSwitch(ISwitchVectorProperty *svp)
+void IndiPanel::newSwitch(ISwitchVectorProperty *svp)
 {
     for (int i =0;i<svp->nsp;i++) {
         properties->setElt(_modulename,QString(svp->name).replace( " ", "" ),QString(svp->sp[i].name).replace( " ", "" ),svp->sp[i].s);
@@ -158,7 +144,7 @@ void IndiPanel::OnIndiNewSwitch(ISwitchVectorProperty *svp)
 
 }
 
-void IndiPanel::OnIndiNewBLOB(IBLOB *bp)
+void IndiPanel::newBLOB(IBLOB *bp)
 {
 
 }

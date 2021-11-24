@@ -1,8 +1,15 @@
 #ifndef CONTROLLER_h_
 #define CONTROLLER_h_
+#include <QCoreApplication>
+#include <QtSql/QSql>
+#include <QtSql/QSqlDatabase>
+//#include <QtSql/QSqlError>
+#include <boost/log/trivial.hpp>
+
+#include <basemodule.h>
+
 #include "wshandler.h"
 #include "properties.h"
-
 
 /*!
  * This class is the heart of OST
@@ -29,5 +36,7 @@ public slots:
 signals:
     void closed();
 private:
+private:
+    void LoadModule(QString lib,QString name,QString label);
 };
 #endif

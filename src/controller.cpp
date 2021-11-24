@@ -1,8 +1,6 @@
-#include <QCoreApplication>
 #include "controller.h"
-#include <QtSql/QSql>
-#include <QtSql/QSqlDatabase>
-//#include <QtSql/QSqlError>
+
+
 /*!
  * ... ...
  */
@@ -31,6 +29,12 @@ Controller::Controller(QObject *parent)
     dev["camera"]="CCD Simulator";
     dev["focuser"]="Focuser Simulator";
     //focuser->setProperty("modulename","focuser of the death");
+    BOOST_LOG_TRIVIAL(debug) << "Controller warmup";
+    BOOST_LOG_TRIVIAL(debug) <<  QCoreApplication::applicationDirPath().toStdString();
+    LoadModule(QCoreApplication::applicationDirPath()+"/libfocuser.so","focuser1","focuser 1");
+    LoadModule(QCoreApplication::applicationDirPath()+"/libindipanel.so","indipanel1","indipanel 1");
+
+
 
 }
 
@@ -65,5 +69,25 @@ void Controller::OnValueChanged(double newValue)
 
 }
 
+void Controller::LoadModule(QString lib,QString name,QString label)
+{
+    QLibrary library(lib);
+    if (!library.load()) BOOST_LOG_TRIVIAL(debug) << library.errorString().toStdString();
+    if (library.load())  BOOST_LOG_TRIVIAL(debug) << "library loaded";
+
+    typedef Basemodule *(*CreateModule)();
+        CreateModule createmodule = (CreateModule)library.resolve("initialize");
+        if (createmodule) {
+            Basemodule *mod = createmodule();
+            if (mod)
+                mod->setNameAndLabel(name,label);
+                mod->echoNameAndLabel();
+                //connect(mod,&Basemodule::NewModuleMessage,this,&Controller::OnNewModuleMessage);
+                //connect(mod,&Basemodule::newMessage )
+
+        } else {
+            BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library";
+        }
+}
 
 

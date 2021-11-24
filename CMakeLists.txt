@@ -5,7 +5,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -51,6 +51,7 @@ include(CMakeCommon)
 # OST Server
 add_executable( ost
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ost.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/datastructures.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/controller.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/controller.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/wshandler.cpp
@@ -95,21 +96,19 @@ target_link_libraries( ost
 #    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
 #)
 #target_compile_definitions(focuser PRIVATE FOCUSER_LIBRARY)
-#
-## Indipanel module
-#add_library(indipanel SHARED
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel/indipanel.h
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel/indipanel.cpp
-#)
-#target_link_libraries(indipanel PRIVATE
-#    indiclient
-#    Qt${QT_VERSION_MAJOR}::Core
-#    Qt${QT_VERSION_MAJOR}::Concurrent
-#    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
-#)
-#target_compile_definitions(indipanel PRIVATE INDIPANEL_LIBRARY)
 
-
+# Indipanel module
+add_library(indipanel SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel/indipanel.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel/indipanel.cpp
+)
+target_link_libraries(indipanel PRIVATE
+    indiclient
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+)
+target_compile_definitions(indipanel PRIVATE INDIPANEL_LIBRARY)
 
 
 #install(TARGETS HeadlessObservatory RUNTIME DESTINATION bin)
