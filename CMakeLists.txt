@@ -82,20 +82,20 @@ target_link_libraries( ost
     z -lpthread
     )
 
-## Focus module
-#add_library(focuser SHARED
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.h
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.h
-#)
-#target_link_libraries(focuser PRIVATE
-#    indiclient
-#    Qt${QT_VERSION_MAJOR}::Core
-#    Qt${QT_VERSION_MAJOR}::Concurrent
-#    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
-#)
-#target_compile_definitions(focuser PRIVATE FOCUSER_LIBRARY)
+# Focus module
+add_library(focuser SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.h
+)
+target_link_libraries(focuser PRIVATE
+    indiclient
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+)
+target_compile_definitions(focuser PRIVATE FOCUSER_LIBRARY)
 
 # Indipanel module
 add_library(indipanel SHARED

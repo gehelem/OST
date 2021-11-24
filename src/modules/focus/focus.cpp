@@ -1,15 +1,15 @@
-#include <QtCore>
-#include <QtConcurrent>
-#include <QScxmlStateMachine>
-#include <QStateMachine>
-#include <basedevice.h>
 #include "focus.h"
 #include "polynomialfit.h"
+
+FocusModule *initialize()
+{
+    FocusModule *basemodule = new FocusModule();
+    return basemodule;
+}
 
 FocusModule::FocusModule()
 {
     properties=Properties::getInstance();
-    indiclient=IndiCLient::getInstance();
     properties->createModule("focus","Focus",2);
     qRegisterMetaType<MapStringStr>("MapStringStr");
     _modulename = "focus";
@@ -29,18 +29,6 @@ FocusModule::FocusModule()
     properties->appendElt(_modulename,"params","exposure",0,"Exposition","","");
     properties->appendElt(_modulename,"params","backlash"    ,0,"Backlash","","");
 
-    connect(indiclient,&IndiCLient::SigServerConnected,this,&FocusModule::OnIndiServerConnected);
-    connect(indiclient,&IndiCLient::SigServerDisconnected,this,&FocusModule::OnIndiServerDisconnected);
-    connect(indiclient,&IndiCLient::SigNewDevice,this,&FocusModule::OnIndiNewDevice);
-    connect(indiclient,&IndiCLient::SigRemoveDevice,this,&FocusModule::OnIndiRemoveDevice);
-    connect(indiclient,&IndiCLient::SigNewProperty,this,&FocusModule::OnIndiNewProperty);
-    connect(indiclient,&IndiCLient::SigRemoveProperty,this,&FocusModule::OnIndiRemoveProperty);
-    connect(indiclient,&IndiCLient::SigNewText,this,&FocusModule::OnIndiNewText);
-    connect(indiclient,&IndiCLient::SigNewSwitch,this,&FocusModule::OnIndiNewSwitch);
-    connect(indiclient,&IndiCLient::SigNewLight,this,&FocusModule::OnIndiNewLight);
-    connect(indiclient,&IndiCLient::SigNewBLOB,this,&FocusModule::OnIndiNewBLOB);
-    connect(indiclient,&IndiCLient::SigNewNumber,this,&FocusModule::OnIndiNewNumber);
-    connect(indiclient,&IndiCLient::SigNewMessage,this,&FocusModule::OnIndiNewMessage);
 }
 
 FocusModule::~FocusModule()
@@ -75,7 +63,7 @@ void FocusModule::test0(QString txt)
     }
 
 }
-void FocusModule::OnIndiNewNumber(INumberVectorProperty *nvp)
+void FocusModule::newNumber(INumberVectorProperty *nvp)
 {
     if (
             (QString(nvp->device) == _devices["camera"] )
@@ -105,7 +93,7 @@ void FocusModule::OnIndiNewNumber(INumberVectorProperty *nvp)
 
 }
 
-void FocusModule::OnIndiNewBLOB(IBLOB *bp)
+void FocusModule::newBLOB(IBLOB *bp)
 {
     if (
             (QString(bp->bvp->device) == _devices["camera"])
@@ -122,7 +110,7 @@ void FocusModule::OnIndiNewBLOB(IBLOB *bp)
 
 }
 
-void FocusModule::OnIndiNewSwitch(ISwitchVectorProperty *svp)
+void FocusModule::newSwitch(ISwitchVectorProperty *svp)
 {
     if (
             (QString(svp->device) == _devices["camera"])
@@ -293,7 +281,7 @@ void FocusModule::SMRequestFrameReset()
 void FocusModule::SMRequestBacklash()
 {
     sendMessage("SMRequestBacklash");
-    if (!sendNewNumber(_devices["focuser"],"ABS_FOCUS_POSITION","FOCUS_ABSOLUTE_POSITION", _startpos - _backlash))
+    if (!sendModNewNumber(_focuser,"ABS_FOCUS_POSITION","FOCUS_ABSOLUTE_POSITION", _startpos - _backlash))
     {
         emit abort();
         return;
@@ -304,7 +292,7 @@ void FocusModule::SMRequestBacklash()
 void FocusModule::SMRequestGotoStart()
 {
     sendMessage("SMRequestGotoStart");
-    if (!sendNewNumber(_devices["focuser"],"ABS_FOCUS_POSITION","FOCUS_ABSOLUTE_POSITION", _startpos))
+    if (!sendModNewNumber(_focuser,"ABS_FOCUS_POSITION","FOCUS_ABSOLUTE_POSITION", _startpos))
     {
         emit abort();
         return;
@@ -315,7 +303,7 @@ void FocusModule::SMRequestGotoStart()
 void FocusModule::SMRequestExposure()
 {
     sendMessage("SMRequestExposure");
-    if (!sendNewNumber(_devices["camera"],"CCD_EXPOSURE","CCD_EXPOSURE_VALUE", _exposure))
+    if (!sendModNewNumber(_camera,"CCD_EXPOSURE","CCD_EXPOSURE_VALUE", _exposure))
     {
         emit abort();
         return;
@@ -376,7 +364,7 @@ void FocusModule::SMCompute()
 void FocusModule::SMRequestGotoNext()
 {
     sendMessage("SMRequestGotoNext");
-    if (!sendNewNumber(_devices["focuser"],"ABS_FOCUS_POSITION","FOCUS_ABSOLUTE_POSITION", _startpos + _iteration*_steps))
+    if (!sendModNewNumber(_focuser,"ABS_FOCUS_POSITION","FOCUS_ABSOLUTE_POSITION", _startpos + _iteration*_steps))
     {
         emit abort();
         return;
@@ -387,7 +375,7 @@ void FocusModule::SMRequestGotoNext()
 void FocusModule::SMRequestBacklashBest()
 {
     sendMessage("SMRequestBacklashBest");
-    if (!sendNewNumber(_devices["focuser"],"ABS_FOCUS_POSITION","FOCUS_ABSOLUTE_POSITION", _bestpos - _backlash))
+    if (!sendModNewNumber(_focuser,"ABS_FOCUS_POSITION","FOCUS_ABSOLUTE_POSITION", _bestpos - _backlash))
     {
         emit abort();
         return;
@@ -398,7 +386,7 @@ void FocusModule::SMRequestBacklashBest()
 void FocusModule::SMRequestGotoBest()
 {
     sendMessage("SMRequestGotoBest");
-    if (!sendNewNumber(_devices["focuser"],"ABS_FOCUS_POSITION","FOCUS_ABSOLUTE_POSITION", _bestpos))
+    if (!sendModNewNumber(_focuser,"ABS_FOCUS_POSITION","FOCUS_ABSOLUTE_POSITION", _bestpos))
     {
         emit abort();
         return;
@@ -409,7 +397,7 @@ void FocusModule::SMRequestGotoBest()
 void FocusModule::SMRequestExposureBest()
 {
     sendMessage("SMRequestExposureBest");
-    if (!sendNewNumber(_devices["camera"],"CCD_EXPOSURE","CCD_EXPOSURE_VALUE", _exposure))
+    if (!sendModNewNumber(_camera,"CCD_EXPOSURE","CCD_EXPOSURE_VALUE", _exposure))
     {
         emit abort();
         return;

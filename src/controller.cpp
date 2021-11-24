@@ -30,7 +30,7 @@ Controller::Controller(QObject *parent)
     dev["focuser"]="Focuser Simulator";
     //focuser->setProperty("modulename","focuser of the death");
     BOOST_LOG_TRIVIAL(debug) << "Controller warmup";
-    BOOST_LOG_TRIVIAL(debug) <<  QCoreApplication::applicationDirPath().toStdString();
+    BOOST_LOG_TRIVIAL(debug) <<  "ApplicationDirPath :" << QCoreApplication::applicationDirPath().toStdString();
     LoadModule(QCoreApplication::applicationDirPath()+"/libfocuser.so","focuser1","focuser 1");
     LoadModule(QCoreApplication::applicationDirPath()+"/libindipanel.so","indipanel1","indipanel 1");
 
@@ -72,10 +72,15 @@ void Controller::OnValueChanged(double newValue)
 void Controller::LoadModule(QString lib,QString name,QString label)
 {
     QLibrary library(lib);
-    if (!library.load()) BOOST_LOG_TRIVIAL(debug) << library.errorString().toStdString();
-    if (library.load())  BOOST_LOG_TRIVIAL(debug) << "library loaded";
+    if (!library.load())
+    {
+        BOOST_LOG_TRIVIAL(debug) << name.toStdString() << " " << library.errorString().toStdString();
+    }
+    else
+    {
+        BOOST_LOG_TRIVIAL(debug) << name.toStdString() << " " << "library loaded";
 
-    typedef Basemodule *(*CreateModule)();
+        typedef Basemodule *(*CreateModule)();
         CreateModule createmodule = (CreateModule)library.resolve("initialize");
         if (createmodule) {
             Basemodule *mod = createmodule();
@@ -88,6 +93,7 @@ void Controller::LoadModule(QString lib,QString name,QString label)
         } else {
             BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library";
         }
+    }
 }
 
 
