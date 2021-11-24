@@ -1,5 +1,5 @@
 #include "properties.h"
-#include "module.h"
+#include "basemodule.h"
 #include "jsonparser.h"
 
 /* singleton  : getting unique instance if exists, create it if not */

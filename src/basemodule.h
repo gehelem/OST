@@ -20,7 +20,7 @@ class Basemodule : public QObject, public INDI::BaseClient
     public:
         Basemodule();
         ~Basemodule() = default;
-        QMap<QString,QString> getDevices(void);
+        QMap<QString,QString> getModDevices(void);
         void setDevices(QMap<QString,QString>);
         void setAction(QString);
         std::unique_ptr<Image> image =nullptr;
@@ -32,9 +32,9 @@ class Basemodule : public QObject, public INDI::BaseClient
         void connectAllDevices(void);
         void disconnectAllDevices(void);
         void loadDevicesConfs(void);
-        bool sendNewText  (QString deviceName, QString propertyName,QString elementName, QString text);
-        bool sendNewSwitch(QString deviceName, QString propertyName,QString elementName, ISState sw);
-        bool sendNewNumber(const QString& deviceName, const QString& propertyName, const QString& elementName, const double& value);
+        bool sendModNewText  (QString deviceName, QString propertyName,QString elementName, QString text);
+        bool sendModNewSwitch(QString deviceName, QString propertyName,QString elementName, ISState sw);
+        bool sendModNewNumber(const QString& deviceName, const QString& propertyName, const QString& elementName, const double& value);
 
         bool frameSet(QString devicename,double x,double y,double width,double height);
         bool frameReset(QString devicename);

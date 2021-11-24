@@ -1,4 +1,4 @@
-#include <QApplication>
+#include <QCoreApplication>
 #include <QtCore>
 #include "wshandler.h"
 #include "jsonparser.h"
