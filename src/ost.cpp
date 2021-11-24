@@ -1,4 +1,4 @@
-#include <QApplication>
+#include <QCoreApplication>
 #include "controller.h"
 #include <boost/log/trivial.hpp>
 
@@ -10,7 +10,7 @@
 int main(int argc, char *argv[])
 {
 
-    QApplication a(argc, argv);
+    QCoreApplication a(argc, argv);
     Controller *controller = new Controller(&a);
     Q_UNUSED(controller);
     return a.exec();

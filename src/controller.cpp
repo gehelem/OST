@@ -1,4 +1,4 @@
-#include <QApplication>
+#include <QCoreApplication>
 #include "controller.h"
 #include <QtSql/QSql>
 #include <QtSql/QSqlDatabase>
@@ -27,18 +27,10 @@ Controller::Controller(QObject *parent)
     properties=Properties::getInstance();
 
     wshandler = new WShandler(this,properties);
-    indipanel = new IndiPanel();
-    focuser = new FocusModule();
     QMap<QString,QString> dev;
     dev["camera"]="CCD Simulator";
     dev["focuser"]="Focuser Simulator";
-    focuser->setDevices(dev);
     //focuser->setProperty("modulename","focuser of the death");
-    connect(wshandler,&WShandler::textRcv,focuser,&FocusModule::test0);
-    connect(focuser,&FocusModule::valueChanged,this,&Controller::OnValueChanged);
-    connect(indipanel,&IndiPanel::valueChanged,this,&Controller::OnValueChanged);
-    connect(properties,&Properties::signalvalueChanged,this,&Controller::valueChanged);
-    connect(properties,&Properties::signalPropCreated,wshandler,&WShandler::sendProperty);
 
 }
 

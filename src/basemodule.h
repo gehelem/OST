@@ -1,7 +1,10 @@
 #ifndef MODULE_h_
 #define MODULE_h_
 #include <QtCore>
-#include "indiclient.h"
+#include <QCoreApplication>
+#include <basedevice.h>
+#include <baseclient.h>
+#include <boost/log/trivial.hpp>
 #include "image.h"
 #include "properties.h"
 /*!
@@ -10,24 +13,19 @@
 */
 
 
-class Module : public QObject
+class Basemodule : public QObject, public INDI::BaseClient
 {
     Q_OBJECT
-    Q_PROPERTY(QString          status      MEMBER _status NOTIFY statusChanged)
-    Q_PROPERTY(QString          modulename  MEMBER _modulename)
-    //Q_PROPERTY(QMap<QString,bool>     actions   )
-    //Q_PROPERTY(QMap<QString,QString>    devices READ getDevices WRITE setDevices)
 
     public:
-        Module();
-        ~Module();
+        Basemodule();
+        ~Basemodule() = default;
         QMap<QString,QString> getDevices(void);
         void setDevices(QMap<QString,QString>);
         void setAction(QString);
         std::unique_ptr<Image> image =nullptr;
 
     protected:
-        IndiCLient *indiclient;
         //QList<FITSImage::Star> stars;
         bool connectIndi(void);
         bool disconnectIndi(void);
