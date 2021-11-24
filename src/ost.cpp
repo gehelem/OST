@@ -1,5 +1,7 @@
 #include <QApplication>
 #include "controller.h"
+#include <boost/log/trivial.hpp>
+
 
 /*!
  * Entry point
