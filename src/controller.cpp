@@ -4,7 +4,9 @@
 /*!
  * ... ...
  */
-Controller::Controller(QObject *parent)
+Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, int port)
+    :_indihost(host),
+      _indiport(port)
 {
 
     this->setParent(parent);
@@ -89,6 +91,8 @@ void Controller::LoadModule(QString lib,QString name,QString label)
                 mod->echoNameAndLabel();
                 //connect(mod,&Basemodule::NewModuleMessage,this,&Controller::OnNewModuleMessage);
                 //connect(mod,&Basemodule::newMessage )
+                mod->setHostport(_indihost,_indiport);
+                mod->connectIndi();
 
         } else {
             BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library";

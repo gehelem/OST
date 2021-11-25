@@ -24,6 +24,9 @@ class Basemodule : public QObject, public INDI::BaseClient
         ~Basemodule() = default;
         void setNameAndLabel(QString name, QString label);
         void echoNameAndLabel(void);
+        void setHostport(QString host, int port);
+        bool connectIndi(void);
+
 
         QMap<QString,QString> getModDevices(void);
         void setDevices(QMap<QString,QString>);
@@ -34,7 +37,6 @@ class Basemodule : public QObject, public INDI::BaseClient
 
     protected:
         //QList<FITSImage::Star> stars;
-        bool connectIndi(void);
         bool disconnectIndi(void);
         void connectAllDevices(void);
         void disconnectAllDevices(void);

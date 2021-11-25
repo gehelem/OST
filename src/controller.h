@@ -21,8 +21,8 @@ class Controller : public QObject
 {
     Q_OBJECT
 public:
-    Controller(QObject *parent);
-    ~Controller();
+    Controller(QObject *parent, bool saveAllBlobs, const QString& host, int port);
+    ~Controller() override;
     Properties  *properties;
     WShandler   *wshandler;
 public slots:
@@ -36,7 +36,9 @@ public slots:
 signals:
     void closed();
 private:
-private:
     void LoadModule(QString lib,QString name,QString label);
+    QString _indihost;
+    int _indiport;
+
 };
 #endif

@@ -5,13 +5,6 @@
 Basemodule::Basemodule()
 {
     setVerbose(false);
-    setServer("localhost", 7624);
-    if (connectServer()){
-                BOOST_LOG_TRIVIAL(debug) << "Indi server connected";
-                newUniversalMessage("Indi server connected");
-            } else {
-                BOOST_LOG_TRIVIAL(debug) << "Couldn't connect to Indi server";
-            }
     _infos.setName("infos");
     _infos.setLabel("Module informations");
     //connect(_infos,_infos.PropertyDataChanged(*_infos),this,&Basemodule::OnPropertyDataChanged(*_infos));
@@ -25,6 +18,39 @@ void Basemodule::echoNameAndLabel()
 {
     BOOST_LOG_TRIVIAL(debug)  << "Hello, i'm " << _name.toStdString() << " " << _label.toStdString() << " " << _infos.getValue().toStdString();
     _infos.setLabel("chourloubidou");
+}
+void Basemodule::setHostport(QString host, int port)
+{
+    setServer(host.toStdString().c_str(), port);
+}
+/*!
+ * Connects to indi server
+ * Should we add host/port ??
+ * IMHO this would be overkill as headless instance of OST and indiserver should be 99% hosted on the same machine
+ * It would be easy to manage 1% remaining with indiserver chaining capabilities
+ */
+bool Basemodule::connectIndi()
+{
+
+    if (isServerConnected())
+    {
+        sendMessage("Indi server already connected");
+        BOOST_LOG_TRIVIAL(debug) << "Indi server already connected";
+        newUniversalMessage("Indi server already connected");
+        return true;
+    } else {
+        if (connectServer()){
+            BOOST_LOG_TRIVIAL(debug) << "Indi server connected";
+            newUniversalMessage("Indi server connected");
+            sendMessage("Indi server connected");
+            return true;
+        } else {
+            BOOST_LOG_TRIVIAL(debug) << "Couldn't connect to Indi server";
+            sendMessage("Couldn't connect to Indi server");
+            return false;
+        }
+    }
+
 }
 QMap<QString,QString> Basemodule::getModDevices(void)
 {
@@ -44,30 +70,7 @@ void Basemodule::sendMessage(QString message)
     qDebug() << mess.toStdString().c_str();
     emit newMessage(mess);
 }
-/*!
- * Connects to indi server
- * Should we add host/port ??
- * IMHO this would be overkill as headless instance of OST and indiserver should be 99% hosted on the same machine
- * It would be easy to manage 1% remaining with indiserver chaining capabilities
- */
-bool Basemodule::connectIndi()
-{
 
-    if (isServerConnected())
-    {
-        sendMessage("Indi server already connected");
-        return true;
-    } else {
-        setServer("localhost", 7624);
-        if (connectServer()){
-            sendMessage("Indi server connected");
-            return true;
-        } else {
-            sendMessage("Couldn't connect to Indi server");
-            return false;
-        }
-    }
-}
 bool Basemodule::disconnectIndi(void)
 {
     if (isServerConnected())
