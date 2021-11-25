@@ -10,7 +10,7 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
 {
 
     this->setParent(parent);
-
+    Q_UNUSED(saveAllBlobs);
     const QString DRIVER("QSQLITE");
     if(QSqlDatabase::isDriverAvailable(DRIVER))
     {
@@ -23,14 +23,12 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
     else
         qDebug() << "DatabaseConnect - ERROR: no driver " << DRIVER << " available";
 
-    //indiclient=IndiCLient::getInstance();
     properties=Properties::getInstance();
-
     wshandler = new WShandler(this,properties);
-    QMap<QString,QString> dev;
-    dev["camera"]="CCD Simulator";
-    dev["focuser"]="Focuser Simulator";
-    //focuser->setProperty("modulename","focuser of the death");
+    connect(properties,&Properties::signalPropCreated,this,&Controller::propCreated);
+    connect(properties,&Properties::signalPropDeleted,this,&Controller::propDeleted);
+    connect(properties,&Properties::signalvalueChanged,this,&Controller::valueChanged);
+
     BOOST_LOG_TRIVIAL(debug) << "Controller warmup";
     BOOST_LOG_TRIVIAL(debug) <<  "ApplicationDirPath :" << QCoreApplication::applicationDirPath().toStdString();
     LoadModule(QCoreApplication::applicationDirPath()+"/libfocuser.so","focuser1","focuser 1");
@@ -82,12 +80,11 @@ void Controller::LoadModule(QString lib,QString name,QString label)
     {
         BOOST_LOG_TRIVIAL(debug) << name.toStdString() << " " << "library loaded";
 
-        typedef Basemodule *(*CreateModule)();
+        typedef Basemodule *(*CreateModule)(QString,QString);
         CreateModule createmodule = (CreateModule)library.resolve("initialize");
         if (createmodule) {
-            Basemodule *mod = createmodule();
+            Basemodule *mod = createmodule(name,label);
             if (mod)
-                mod->setNameAndLabel(name,label);
                 mod->echoNameAndLabel();
                 //connect(mod,&Basemodule::NewModuleMessage,this,&Controller::OnNewModuleMessage);
                 //connect(mod,&Basemodule::newMessage )

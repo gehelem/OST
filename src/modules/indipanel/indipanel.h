@@ -13,7 +13,7 @@ class MODULE_INIT IndiPanel : public Basemodule
     Q_OBJECT
 
     public:
-        IndiPanel();
+        IndiPanel(QString name,QString label);
         ~IndiPanel();
     signals:
         void valueChanged(const double &newValue);
@@ -30,6 +30,6 @@ class MODULE_INIT IndiPanel : public Basemodule
 
 };
 
-extern "C" MODULE_INIT IndiPanel *initialize();
+extern "C" MODULE_INIT IndiPanel *initialize(QString name,QString label);
 
 #endif

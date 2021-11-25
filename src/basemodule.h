@@ -17,7 +17,7 @@ class Basemodule : public QObject, public INDI::BaseClient
     Q_OBJECT
 
     public:
-        Basemodule();
+        Basemodule(QString name,QString label);
         ~Basemodule() = default;
         void setNameAndLabel(QString name, QString label);
         void echoNameAndLabel(void);
@@ -29,7 +29,8 @@ class Basemodule : public QObject, public INDI::BaseClient
         void setDevices(QMap<QString,QString>);
         std::unique_ptr<Image> image =nullptr;
 
-
+        QString _modulename;
+        QString _modulelabel;
 
     protected:
         //QList<FITSImage::Star> stars;
@@ -46,8 +47,7 @@ class Basemodule : public QObject, public INDI::BaseClient
         void sendMessage(QString message);
 
         QString _status;
-        QString _modulename;
-        QString _modulelabel;
+
         QMap<QString,QString>     _devices;
 
         Properties  *properties;

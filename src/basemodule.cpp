@@ -2,15 +2,16 @@
 #include <basedevice.h>
 #include "basemodule.h"
 
-Basemodule::Basemodule()
+Basemodule::Basemodule(QString name,QString label)
+    :_modulename(name),
+      _modulelabel(label)
 {
+    properties=Properties::getInstance();
+    properties->createModule(_modulename,_modulelabel,9);
     setVerbose(false);
 }
 void Basemodule::setNameAndLabel(QString name,QString label)
 {
-    _modulename = name;
-    _modulelabel = label;
-    properties->createModule(_modulename,_modulelabel,9);
 }
 void Basemodule::echoNameAndLabel()
 {

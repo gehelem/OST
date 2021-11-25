@@ -1,14 +1,14 @@
 #include "indipanel.h"
 
-IndiPanel *initialize()
+IndiPanel *initialize(QString name,QString label)
 {
-    IndiPanel *basemodule = new IndiPanel();
+    IndiPanel *basemodule = new IndiPanel(name,label);
     return basemodule;
 }
 
-IndiPanel::IndiPanel()
+IndiPanel::IndiPanel(QString name,QString label)
+    : Basemodule(name,label)
 {
-    properties=Properties::getInstance();
 
 }
 

@@ -1,24 +1,27 @@
 #include "focus.h"
 #include "polynomialfit.h"
 
-FocusModule *initialize()
+FocusModule *initialize(QString name,QString label)
 {
-    FocusModule *basemodule = new FocusModule();
+    FocusModule *basemodule = new FocusModule(name,label);
     return basemodule;
 }
 
-FocusModule::FocusModule()
+FocusModule::FocusModule(QString name,QString label)
+    : Basemodule(name,label)
+
 {
     properties=Properties::getInstance();
     _devices["camera"]="";
     _devices["focuser"]="";
     properties->createDevcat(_modulename,"ctl","Control",1);
+
     properties->createProp(_modulename,"values","Valeurs"    ,PT_NUM,"ctl","",OP_RO,OSRule::OSR_NOFMANY,0,OPState::OPS_IDLE,"","",1);
-    properties->createProp(_modulename,"params","Paramètres" ,PT_NUM,"ctl","",OP_RW,OSRule::OSR_NOFMANY,0,OPState::OPS_IDLE,"","",1);
     properties->appendElt(_modulename,"values","loopHFRavg",0,"Average HFR","","");
     properties->appendElt(_modulename,"values","focpos"    ,0,"Focuser position","","");
     properties->appendElt(_modulename,"values","imgHFR",0,"Last imgage HFR","","");
 
+    properties->createProp(_modulename,"params","Paramètres" ,PT_NUM,"ctl","",OP_RW,OSRule::OSR_NOFMANY,0,OPState::OPS_IDLE,"","",1);
     properties->appendElt(_modulename,"params","startpos",0,"Départ","","");
     properties->appendElt(_modulename,"params","steps"    ,0,"Incrément","","");
     properties->appendElt(_modulename,"params","iterations",0,"Nombre d'incréments","","");

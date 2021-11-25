@@ -18,7 +18,7 @@ class MODULE_INIT FocusModule : public Basemodule
     Q_OBJECT
 
     public:
-        FocusModule();
+        FocusModule(QString name,QString label);
         ~FocusModule();
 
     signals:
@@ -113,6 +113,6 @@ class MODULE_INIT FocusModule : public Basemodule
 
 };
 
-extern "C" MODULE_INIT FocusModule *initialize();
+extern "C" MODULE_INIT FocusModule *initialize(QString name,QString label);
 
 #endif
