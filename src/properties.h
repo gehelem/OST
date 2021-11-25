@@ -3,14 +3,6 @@
 #include <QtCore>
 #include <indibase.h>
 
-typedef QMap<QString, QString> MapStringStr;
-Q_DECLARE_METATYPE(MapStringStr)
-typedef QMap<QString, double> MapStringDbl;
-Q_DECLARE_METATYPE(MapStringDbl)
-typedef QMap<QString, bool> MapStringBool;
-Q_DECLARE_METATYPE(MapStringBool)
-
-
 enum propType
 {
     /*! Text element */
@@ -332,20 +324,22 @@ typedef struct
     int                     order;
 }  Group;
 
+
+
 typedef struct
 {
     QString                 categname;
     QString                 categlabel;
     QString                 modulename;
     int                     order;
-}  Categ;
+}  Devcat;
 
 typedef struct
 {
     QString                 modulename;
     QString                 modulelabel;
     int                     order;
-    QMap<QString,Categ>     categs;
+    QMap<QString,Devcat>    devcats;
     QMap<QString,Group>     groups;
     QMap<QString,Prop>      props;
 }  Mod;

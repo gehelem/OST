@@ -11,7 +11,6 @@ FocusModule::FocusModule()
 {
     properties=Properties::getInstance();
     properties->createModule("focus","Focus",2);
-    qRegisterMetaType<MapStringStr>("MapStringStr");
     _modulename = "focus";
     _devices["camera"]="";
     _devices["focuser"]="";

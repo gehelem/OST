@@ -5,19 +5,15 @@
 Basemodule::Basemodule()
 {
     setVerbose(false);
-    _infos.setName("infos");
-    _infos.setLabel("Module informations");
-    //connect(_infos,_infos.PropertyDataChanged(*_infos),this,&Basemodule::OnPropertyDataChanged(*_infos));
 }
 void Basemodule::setNameAndLabel(QString name,QString label)
 {
-    _name = name;
-    _label = label;
+    _modulename = name;
+    _modulelabel = label;
 }
 void Basemodule::echoNameAndLabel()
 {
-    BOOST_LOG_TRIVIAL(debug)  << "Hello, i'm " << _name.toStdString() << " " << _label.toStdString() << " " << _infos.getValue().toStdString();
-    _infos.setLabel("chourloubidou");
+    BOOST_LOG_TRIVIAL(debug)  << "Hello, i'm " << _modulename.toStdString() << " " << _modulelabel.toStdString();
 }
 void Basemodule::setHostport(QString host, int port)
 {
@@ -59,10 +55,6 @@ QMap<QString,QString> Basemodule::getModDevices(void)
 void Basemodule::setDevices(QMap<QString,QString> devices)
 {
     _devices =devices;
-}
-void Basemodule::setAction(QString action)
-{
-    _actions[action]=true;
 }
 void Basemodule::sendMessage(QString message)
 {

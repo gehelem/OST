@@ -388,7 +388,7 @@ QJsonObject OmodToJ(Mod mod)
     }
 
     QJsonArray categs;
-    for(auto c : mod.categs){
+    for(auto c : mod.devcats){
         if (c.modulename==mod.modulename ) {
             QJsonObject categ;
             categ["modulename"]=c.modulename;

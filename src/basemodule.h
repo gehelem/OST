@@ -2,19 +2,16 @@
 #define MODULE_h_
 #include <QtCore>
 #include <QCoreApplication>
+#include <QObject>
 #include <basedevice.h>
 #include <baseclient.h>
 #include <boost/log/trivial.hpp>
 #include "image.h"
 #include "properties.h"
-#include "datastructures.h"
-
 /*!
  * This Class shouldn't be used as is
  * Every functionnal module should inherit it
 */
-
-
 class Basemodule : public QObject, public INDI::BaseClient
 {
     Q_OBJECT
@@ -30,7 +27,6 @@ class Basemodule : public QObject, public INDI::BaseClient
 
         QMap<QString,QString> getModDevices(void);
         void setDevices(QMap<QString,QString>);
-        void setAction(QString);
         std::unique_ptr<Image> image =nullptr;
 
 
@@ -51,10 +47,7 @@ class Basemodule : public QObject, public INDI::BaseClient
 
         QString _status;
         QString _modulename;
-        QString _name;
-        QString _label;
-        PropertyData _infos;
-        QMap<QString,bool>        _actions;
+        QString _modulelabel;
         QMap<QString,QString>     _devices;
 
         Properties  *properties;

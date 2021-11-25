@@ -34,17 +34,17 @@ void    Properties::deleteModule(QString modulename)
 }
 void    Properties::createCateg(QString modulename, QString categname,  QString categlabel,int order)
 {
-    Categ cat;
+    Devcat cat;
     cat.categname=categname;
     cat.modulename=modulename;
     cat.categlabel=categlabel;
     cat.order=order;
-    modules[modulename].categs[categname]=cat;
+    modules[modulename].devcats[categname]=cat;
 
 }
 void    Properties::deleteCateg(QString modulename, QString categname)
 {
-    modules[modulename].categs.remove(categname);
+    modules[modulename].devcats.remove(categname);
 }
 void    Properties::createGroup(QString modulename, QString categname, QString groupname,  QString grouplabel,int order)
 {
@@ -256,74 +256,6 @@ OGraph  Properties::getGraph   (QString modulename,QString propname,  QString gr
     return modules[modulename].props[propname].g[graname];
 }
 
-/*
-
-QJsonObject OSTProperties::getJsonProp(QString propname,QString modulename)
-{
-    bool found= false;
-    pro prop;
-    for (int i=0;i<props.count();i++) {
-        if ((props[i].propname==propname)&&(props[i].modulename==modulename) ){
-            found=true;
-            prop=props[i];
-        }
-    }
-    if (!found) return QJsonObject();
-
-    QJsonObject mess,obj,det;
-    QJsonArray texts,nums,swis;
-    obj["propertyname"]=prop.propname;
-    obj["label"]=prop.proplabel;
-    obj["permission"]=prop.permission;
-    obj["state"]=prop.state;
-    obj["rule"]=prop.rule;
-    //obj["parenttype"]=""; // M=module/ C=Category / G=group
-    //obj["parentname"]="";
-    obj["modulename"]=modulename;
-    obj["categname"]=prop.categname;
-    obj["groupname"]=prop.groupname;
-
-    elem elt;
-    for (int i=0;i<elems.count();i++){
-        if (elems[i].propname==prop.propname) {
-            elt=elems[i];
-            if (elt.type==ET_TEXT) {
-                obj["type"]="INDI_TEXT";
-                det["label"]=elt.elemlabel;
-                det["textname"]=elt.elemname;
-                det["text"]=elt.text;
-                texts.append(det);
-            }
-            if (elt.type==ET_NUM) {
-                obj["type"]="INDI_NUMBER";
-                det["label"]=elt.elemlabel;
-                det["numbername"]=elt.elemname;
-                det["value"]=elt.num;
-                det["format"]="";
-                det["min"]=0;
-                det["max"]=0;
-                det["step"]=0;
-                nums.append(det);
-            }
-            if (elt.type==ET_BOOL) {
-                obj["type"]="INDI_SWITCH";
-                det["label"]=elt.elemlabel;
-                det["switchname"]=elt.elemname;
-                if (elt.sw) det["switch"]="ISS_ON";
-                if (!elt.sw) det["switch"]="ISS_OFF";
-                swis.append(det);
-            }
-
-        }
-
-    }
-    if (obj["type"]=="INDI_TEXT") obj["texts"]=texts;
-    if (obj["type"]=="INDI_NUMBER") obj["texts"]=nums;
-    if (obj["type"]=="INDI_SWITCH") obj["texts"]=swis;
-
-    return obj;
-}
-*/
 
 void    Properties::dumproperties(void)
 {
@@ -331,7 +263,7 @@ void    Properties::dumproperties(void)
     for(auto m : modules)
     {
       qDebug() << "##########################" << m.modulename << "---" << m.modulelabel <<"###################################";
-      for(auto c : m.categs)
+      for(auto c : m.devcats)
       {
           qDebug() <<"##### categ  ="  << c.modulename << c.categname << c.categlabel;
 

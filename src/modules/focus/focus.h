@@ -87,8 +87,6 @@ class MODULE_INIT FocusModule : public Basemodule
         void SMLoadblob();
         void SMAbort();
         void startCoarse();
-        MapStringStr _test;
-        QMap<QString,bool> _test2;
         QString _camera  = "CCD Simulator";
         QString _focuser = "Focuser Simulator";
         bool    _newblob;

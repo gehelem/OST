@@ -51,7 +51,6 @@ include(CMakeCommon)
 # OST Server
 add_executable( ost
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ost.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/datastructures.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/controller.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/controller.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/wshandler.cpp
