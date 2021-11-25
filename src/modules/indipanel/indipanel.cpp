@@ -9,8 +9,6 @@ IndiPanel *initialize()
 IndiPanel::IndiPanel()
 {
     properties=Properties::getInstance();
-    _modulename = "indipanel";
-    properties->createModule(_modulename,"Indi control panel",9);
 
 }
 
@@ -21,11 +19,11 @@ IndiPanel::~IndiPanel()
 
 void IndiPanel::newDevice(INDI::BaseDevice *dp)
 {
-    properties->createCateg(_modulename,QString(dp->getDeviceName()).replace( " ", "" ),dp->getDeviceName(),0);
+    properties->createDevcat(_modulename,QString(dp->getDeviceName()).replace( " ", "" ),dp->getDeviceName(),0);
 }
 void IndiPanel::removeDevice(INDI::BaseDevice *dp)
 {
-    properties->deleteCateg(_modulename,QString(dp->getDeviceName()).replace( " ", "" ));
+    properties->deleteDevcat(_modulename,QString(dp->getDeviceName()).replace( " ", "" ));
 }
 void IndiPanel::newProperty(INDI::Property *property)
 {
@@ -36,7 +34,7 @@ void IndiPanel::newProperty(INDI::Property *property)
                                 QString(property->getDeviceName()).replace( " ", "" ),
                                 QString(property->getGroupName()).replace( " ", "" ),
                                 property->getGroupName(),0);
-            qDebug() << _modulename << QString(property->getDeviceName()).replace( " ", "" ) << QString(property->getGroupName()).replace( " ", "" ) << property->getGroupName();
+            BOOST_LOG_TRIVIAL(debug)  << _modulename.toStdString() << QString(property->getDeviceName()).replace( " ", "" ).toStdString() << QString(property->getGroupName()).replace( " ", "" ).toStdString() << QString(property->getName()).toStdString();
     //    }
 
    Prop wprop;

@@ -10,6 +10,7 @@ void Basemodule::setNameAndLabel(QString name,QString label)
 {
     _modulename = name;
     _modulelabel = label;
+    properties->createModule(_modulename,_modulelabel,9);
 }
 void Basemodule::echoNameAndLabel()
 {

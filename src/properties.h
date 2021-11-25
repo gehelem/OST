@@ -355,8 +355,8 @@ public:
     void    createModule(QString modulename,  QString modulelabel,int order);
     void    deleteModule(QString modulename);
 
-    void    createCateg(QString modulename,QString categname,  QString categlabel,int order);
-    void    deleteCateg(QString modulename,QString categname);
+    void    createDevcat(QString modulename,QString categname,  QString categlabel,int order);
+    void    deleteDevcat(QString modulename,QString categname);
 
     void    createGroup(QString modulename,QString categname, QString groupname,  QString grouplabel,int order);
     void    deleteGroup(QString modulename,QString categname, QString groupname);

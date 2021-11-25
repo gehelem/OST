@@ -10,11 +10,9 @@ FocusModule *initialize()
 FocusModule::FocusModule()
 {
     properties=Properties::getInstance();
-    properties->createModule("focus","Focus",2);
-    _modulename = "focus";
     _devices["camera"]="";
     _devices["focuser"]="";
-    properties->createCateg(_modulename,"ctl","Control",1);
+    properties->createDevcat(_modulename,"ctl","Control",1);
     properties->createProp(_modulename,"values","Valeurs"    ,PT_NUM,"ctl","",OP_RO,OSRule::OSR_NOFMANY,0,OPState::OPS_IDLE,"","",1);
     properties->createProp(_modulename,"params","Paramètres" ,PT_NUM,"ctl","",OP_RW,OSRule::OSR_NOFMANY,0,OPState::OPS_IDLE,"","",1);
     properties->appendElt(_modulename,"values","loopHFRavg",0,"Average HFR","","");

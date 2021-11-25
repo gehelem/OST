@@ -32,7 +32,7 @@ void    Properties::deleteModule(QString modulename)
 {
     modules.remove(modulename);
 }
-void    Properties::createCateg(QString modulename, QString categname,  QString categlabel,int order)
+void    Properties::createDevcat(QString modulename, QString categname,  QString categlabel,int order)
 {
     Devcat cat;
     cat.categname=categname;
@@ -42,7 +42,7 @@ void    Properties::createCateg(QString modulename, QString categname,  QString 
     modules[modulename].devcats[categname]=cat;
 
 }
-void    Properties::deleteCateg(QString modulename, QString categname)
+void    Properties::deleteDevcat(QString modulename, QString categname)
 {
     modules[modulename].devcats.remove(categname);
 }
