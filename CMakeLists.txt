@@ -81,6 +81,18 @@ target_link_libraries( ost
     z -lpthread
     )
 
+# Maincontrol module
+add_library(maincontrol SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.cpp
+)
+target_link_libraries(maincontrol PRIVATE
+    indiclient
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+)
+
 # Focus module
 add_library(focuser SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.h
