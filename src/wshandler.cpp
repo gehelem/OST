@@ -2,7 +2,7 @@
 #include <QtCore>
 #include "wshandler.h"
 #include "jsonparser.h"
-/*!
+#include <boost/log/trivial.hpp>/*!
  * ... ...
  */
 WShandler::WShandler(QObject *parent,Properties *properties)
@@ -15,8 +15,7 @@ WShandler::WShandler(QObject *parent,Properties *properties)
        connect(m_pWebSocketServer, &QWebSocketServer::newConnection,this, &WShandler::onNewConnection);
        connect(m_pWebSocketServer, &QWebSocketServer::closed, this, &WShandler::closed);
     }
-    qDebug("OST server listening");
-
+    BOOST_LOG_TRIVIAL(debug) <<"OST WS server listening";
 }
 
 
@@ -46,7 +45,7 @@ void WShandler::sendbinary(QByteArray *data)
 
 void WShandler::onNewConnection()
 {
-    qDebug("New client connection");
+    BOOST_LOG_TRIVIAL(debug) << "New WS client connection";
     QWebSocket *pSocket = m_pWebSocketServer->nextPendingConnection();
     connect(pSocket, &QWebSocket::textMessageReceived, this, &WShandler::processTextMessage);
     connect(pSocket, &QWebSocket::disconnected, this, &WShandler::socketDisconnected);
@@ -59,7 +58,7 @@ void WShandler::processTextMessage(QString message)
     QJsonDocument jsonResponse = QJsonDocument::fromJson(message.toUtf8()); // garder
     emit textRcv(message);
     QJsonObject  obj = jsonResponse.object(); // garder
-    qDebug() << "OST server received json" << obj;
+    BOOST_LOG_TRIVIAL(debug) << "OST server received json" << message.toStdString();
     if (obj["message"].toString()=="readall")
     {
         sendAll();

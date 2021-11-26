@@ -21,6 +21,8 @@
          </p>
         <p>
             <textarea id="debugTextArea" style="width:800px;height:50px;"></textarea>
+            <textarea id="debuginput" style="width:800px;height:50px;"></textarea>
+            <textarea id="debugoutput" style="width:800px;height:50px;"></textarea>
         </p>
 </div>
 <div id="OST">
@@ -35,9 +37,12 @@
                 });
             }
             var debugTextArea = document.getElementById("debugTextArea");
+            var debuginput = document.getElementById("debuginput");
+            var debugoutput = document.getElementById("debugoutput");
             function debug(message) {
                 debugTextArea.value += message + "\n";
                 debugTextArea.scrollTop = debugTextArea.scrollHeight;
+                debuginput.value = message;
             }
 
             function sendMessage() {
@@ -46,6 +51,7 @@
                 {
                     document.getElementById("inputText").value = "";
                     websocket.send( msg );
+                    debugoutput.value = msg;
                     console.log( "string sent :", '"'+msg+'"' );
                 }
             }
@@ -57,6 +63,7 @@
                   var msg = "{\"message\": \"updateproperty\",\"property\":{\"modulename\":\""+modulename+"\",\"propname\":\""+propname+"\",\"switchs\":[{\"name\":\""+name+"\",\"switch\":\"ISS_ON\"}],\"type\":\"INDI_SWITCH\"}}";
 
                     websocket.send( msg );
+                    debugoutput.value = msg;
                     //console.log( "string sent :", '"'+msg+'"' );
                 }
             }
@@ -70,6 +77,7 @@
                   var msg = "{\"message\": \"updateproperty\",\"property\":{\"modulename\":\""+modulename+"\",\"propname\":\""+propname+"\",\"numbers\":[{\"name\":\""+name+"\",\"value\":"+val+"}],\"type\":\"INDI_NUMBER\"}}";
 
                     websocket.send( msg );
+                    debugoutput.value = msg;
                     //console.log( "string sent :", '"'+msg+'"' );
                 }
             }
@@ -83,6 +91,7 @@
                   var msg = "{\"message\": \"updateproperty\",\"property\":{\"modulename\":\""+modulename+"\",\"propname\":\""+propname+"\",\"texts\":[{\"name\":\""+name+"\",\"text\":\""+val+"\"}],\"type\":\"INDI_TEXT\"}}";
 
                     websocket.send( msg );
+                    debugoutput.value = msg;
                     //console.log( "string sent :", '"'+msg+'"' );
                 }
             }
@@ -249,6 +258,7 @@
                     websocket.onopen = function (evt) {
                         debug("CONNECTED");
                         websocket.send( "{\"message\":\"readall\"}");
+                        debugoutput.value = msg;
                     };
                     websocket.onclose = function (evt) {
                         debug("DISCONNECTED");
@@ -262,6 +272,7 @@
                         //debug ("BEGIN-------------------------------------------------");
                         //debug (evt.data);
                         //debug ("END  -------------------------------------------------");
+                        debuginput.value = evt.data;
                         var obj = jQuery.parseJSON( evt.data );
 
                         if (obj.message == 'updateproperty') {
