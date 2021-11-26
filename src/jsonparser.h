@@ -12,6 +12,7 @@ QJsonObject OlightToJ (OLight  lgt);
 QJsonObject OimageToJ (OImage  img);
 QJsonObject OgraphToJ (OGraph  gra);
 QJsonObject OpropToJ(Prop prop);
+QJsonObject OElementsToJ(Prop prop);
 QJsonObject OgroupToJ(QString groupname);
 QJsonObject OcategToJ(QString categname);
 QJsonObject OmodToJ(Mod mod);

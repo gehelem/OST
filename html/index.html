@@ -10,9 +10,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 </head>
 <body>
-<div id="OST">
-</div>
 <div id="CLI">
+20211124
         <p>
             <button onClick="initWebSocket();">Connect</button>
             <button onClick="stopWebSocket();">Disconnect</button>
@@ -22,7 +21,11 @@
          </p>
         <p>
             <textarea id="debugTextArea" style="width:800px;height:50px;"></textarea>
+            <textarea id="debuginput" style="width:800px;height:50px;"></textarea>
+            <textarea id="debugoutput" style="width:800px;height:50px;"></textarea>
         </p>
+</div>
+<div id="OST">
 </div>
 
 <script>
@@ -34,9 +37,12 @@
                 });
             }
             var debugTextArea = document.getElementById("debugTextArea");
+            var debuginput = document.getElementById("debuginput");
+            var debugoutput = document.getElementById("debugoutput");
             function debug(message) {
                 debugTextArea.value += message + "\n";
                 debugTextArea.scrollTop = debugTextArea.scrollHeight;
+                debuginput.value = message;
             }
 
             function sendMessage() {
@@ -45,6 +51,7 @@
                 {
                     document.getElementById("inputText").value = "";
                     websocket.send( msg );
+                    debugoutput.value = msg;
                     console.log( "string sent :", '"'+msg+'"' );
                 }
             }
@@ -56,6 +63,7 @@
                   var msg = "{\"message\": \"updateproperty\",\"property\":{\"modulename\":\""+modulename+"\",\"propname\":\""+propname+"\",\"switchs\":[{\"name\":\""+name+"\",\"switch\":\"ISS_ON\"}],\"type\":\"INDI_SWITCH\"}}";
 
                     websocket.send( msg );
+                    debugoutput.value = msg;
                     //console.log( "string sent :", '"'+msg+'"' );
                 }
             }
@@ -69,6 +77,7 @@
                   var msg = "{\"message\": \"updateproperty\",\"property\":{\"modulename\":\""+modulename+"\",\"propname\":\""+propname+"\",\"numbers\":[{\"name\":\""+name+"\",\"value\":"+val+"}],\"type\":\"INDI_NUMBER\"}}";
 
                     websocket.send( msg );
+                    debugoutput.value = msg;
                     //console.log( "string sent :", '"'+msg+'"' );
                 }
             }
@@ -82,6 +91,7 @@
                   var msg = "{\"message\": \"updateproperty\",\"property\":{\"modulename\":\""+modulename+"\",\"propname\":\""+propname+"\",\"texts\":[{\"name\":\""+name+"\",\"text\":\""+val+"\"}],\"type\":\"INDI_TEXT\"}}";
 
                     websocket.send( msg );
+                    debugoutput.value = msg;
                     //console.log( "string sent :", '"'+msg+'"' );
                 }
             }
@@ -172,8 +182,33 @@
                         //$("textarea#"+prop.modulename+prop.propname+sw.name).text(sw.switch);
                     } else {
                       nn= prop.modulename+prop.propname+item.name;
-                        $("div#"+prop.modulename+prop.categname).append("<button id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_switch('"+nn+"','"+prop.modulename+"','"+prop.propname+"','"+item.name+"');\"    >"+item.label+"</button>");
+                        //$("div#"+prop.modulename+prop.categname).append("<button id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_switch('"+nn+"','"+prop.modulename+"','"+prop.propname+"','"+item.name+"');\"    >"+item.label+"</button>");
+                        if (prop.perm=="IP_RO") {
+                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /></td></tr>");
+                        } else {
+                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_switch('"+nn+"','"+prop.modulename+"','"+prop.propname+"','"+item.name+"');\"    >"+item.label+"</button>"
+							);
+                        }
+                        //    <button onClick="abortfocus();">Abort focus</button>
+                        //$("div#"+prop.modulename+prop.categname).append("<tr><label for='name'>"+sw.label+"</label>");
+                        //$("div#"+prop.modulename+prop.categname).append("<textarea id="+prop.modulename+prop.propname+sw.name+">"+sw.switch+"</textarea></tr>");
+                    }
+                  });
+              }
 
+              if (prop.type =="INDI_LIGHT") {
+                  var swis = prop.switchs;
+                  $.each( swis, function( iitem, item ) {
+                    if ($("button#"+prop.modulename+prop.propname+item.name).length) {
+                        //$("textarea#"+prop.modulename+prop.propname+sw.name).text(sw.switch);
+                    } else {
+                      nn= prop.modulename+prop.propname+item.name;
+                        //$("div#"+prop.modulename+prop.categname).append("<button id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_switch('"+nn+"','"+prop.modulename+"','"+prop.propname+"','"+item.name+"');\"    >"+item.label+"</button>");
+                        if (prop.perm=="IP_RO") {
+                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /></td></tr>");
+                        } else {
+                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<td></td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /><button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_number('"+nn+"','"+prop.modulename+"','"+prop.propname+"','"+item.name+"');\"    >set</button>");
+                        }
                         //    <button onClick="abortfocus();">Abort focus</button>
                         //$("div#"+prop.modulename+prop.categname).append("<tr><label for='name'>"+sw.label+"</label>");
                         //$("div#"+prop.modulename+prop.categname).append("<textarea id="+prop.modulename+prop.propname+sw.name+">"+sw.switch+"</textarea></tr>");
@@ -223,6 +258,7 @@
                     websocket.onopen = function (evt) {
                         debug("CONNECTED");
                         websocket.send( "{\"message\":\"readall\"}");
+                        debugoutput.value = msg;
                     };
                     websocket.onclose = function (evt) {
                         debug("DISCONNECTED");
@@ -233,10 +269,18 @@
 
                     websocket.onmessage = function (evt) {
                         console.log( "Message received :", evt.data );
+                        //debug ("BEGIN-------------------------------------------------");
                         //debug (evt.data);
+                        //debug ("END  -------------------------------------------------");
+                        debuginput.value = evt.data;
                         var obj = jQuery.parseJSON( evt.data );
 
                         if (obj.message == 'updateproperty') {
+                            var prop = obj.property;
+                            buildProperty(prop);
+                        }
+
+                        if (obj.message == 'updateelements') {
                             var prop = obj.property;
                             buildProperty(prop);
                         }
@@ -283,11 +327,14 @@
                                 $.each( groups, function(igroup,group) {
                                   $("#ul"+mod.modulename+categ.categname).append("<li id=li"+mod.modulename+categ.categname+group.groupname+"><a href=#"+mod.modulename+categ.categname+group.groupname+">"+group.grouplabel+"</a></li>");
                                   $("div#"+mod.modulename+categ.categname).append("<div id="+mod.modulename+categ.categname+group.groupname+"></div>");
+								  //debug("BUILD GROUP " + mod.modulename+ " " + categ.categname + " " + group.groupname);
 
                                   var propertiesg = sortJSON(group.properties);
                                   $.each( propertiesg, function(iprop2,prop2) {
+								    //debug("BUILD GROUP PROP " + mod.modulename+ " " + categ.categname + " " + group.groupname + " " + prop2.propname  );
                                     buildProperty(prop2);
                                   });
+							      $("div#"+mod.modulename+categ.categname+group.grouname).tabs();
 
 
                                 })//end groups

@@ -1,22 +1,24 @@
 #ifndef FOCUS_MODULE_h_
 #define FOCUS_MODULE_h_
 
-#include "module.h"
-#include "properties.h"
-#include <QScxmlStateMachine>
+#if defined(FOCUS_MODULE_h_)
+#  define MODULE_INIT Q_DECL_EXPORT
+#else
+#  define MODULE_INIT Q_DECL_IMPORT
+#endif
 
-class FocusModule : public Module
+#include <QtCore>
+#include <QtConcurrent>
+#include <QStateMachine>
+#include <basedevice.h>
+#include <basemodule.h>
+
+class MODULE_INIT FocusModule : public Basemodule
 {
     Q_OBJECT
-    Q_PROPERTY(double  focuserPosition MEMBER _focuserPosition NOTIFY focuserPositionChanged)
-    //Q_PROPERTY(MapStringStr    test    MEMBER _test)
-    //Q_PROPERTY(QMap<QString,bool>    test2    MEMBER _test2)
-    Q_PROPERTY(QString camera   MEMBER _camera)
-    Q_PROPERTY(QString focuser  MEMBER _focuser)
-    Q_PROPERTY(double loopHFRavg MEMBER _loopHFRavg NOTIFY valueChanged(_loopHFRavg))
 
     public:
-        FocusModule();
+        FocusModule(QString name,QString label);
         ~FocusModule();
 
     signals:
@@ -57,11 +59,13 @@ class FocusModule : public Module
         void abort();
     public slots:
         void test0(QString txt);
-        void OnIndiNewNumber(INumberVectorProperty *nvp) override;
-        void OnIndiNewBLOB(IBLOB *bp) override;
-        void OnIndiNewSwitch(ISwitchVectorProperty *svp) override;
         void OnSucessSEP();
     private:
+        void newNumber(INumberVectorProperty *nvp) override;
+        void newBLOB(IBLOB *bp) override;
+        void newSwitch(ISwitchVectorProperty *svp) override;
+
+
         void SMRequestFrameReset();
         void SMRequestBacklash();
         void SMRequestGotoStart();
@@ -83,8 +87,6 @@ class FocusModule : public Module
         void SMLoadblob();
         void SMAbort();
         void startCoarse();
-        MapStringStr _test;
-        QMap<QString,bool> _test2;
         QString _camera  = "CCD Simulator";
         QString _focuser = "Focuser Simulator";
         bool    _newblob;
@@ -110,4 +112,7 @@ class FocusModule : public Module
         std::vector<double> _coefficients;
 
 };
+
+extern "C" MODULE_INIT FocusModule *initialize(QString name,QString label);
+
 #endif

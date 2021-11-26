@@ -1,14 +1,19 @@
 #ifndef CONTROLLER_h_
 #define CONTROLLER_h_
-#include "focus.h"
+#include <QCoreApplication>
+#include <QtSql/QSql>
+#include <QtSql/QSqlDatabase>
+//#include <QtSql/QSqlError>
+#include <boost/log/trivial.hpp>
+
+#include <basemodule.h>
+
 #include "wshandler.h"
 #include "properties.h"
-
 
 /*!
  * This class is the heart of OST
  * It dispatches events/orders/datas  from one layer to each other
- * - indiclient
  * - websocket traffic
  * - functional Modules
  */
@@ -16,12 +21,9 @@ class Controller : public QObject
 {
     Q_OBJECT
 public:
-    Controller(QObject *parent);
-    ~Controller();
-    IndiCLient    *indiclient;
+    Controller(QObject *parent, bool saveAllBlobs, const QString& host, int port);
+    ~Controller() override;
     Properties  *properties;
-    FocusModule    *focuser;
-    FocusModule    *focuser2;
     WShandler   *wshandler;
 public slots:
     void OnValueChanged(double newValue);
@@ -34,5 +36,9 @@ public slots:
 signals:
     void closed();
 private:
+    void LoadModule(QString lib,QString name,QString label);
+    QString _indihost;
+    int _indiport;
+
 };
 #endif

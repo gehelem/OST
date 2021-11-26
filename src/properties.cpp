@@ -1,6 +1,20 @@
 #include "properties.h"
-#include "module.h"
+#include "basemodule.h"
 #include "jsonparser.h"
+
+/* singleton  : getting unique instance if exists, create it if not */
+Properties* Properties::getInstance()
+{
+    if (instance == 0)
+    {
+        instance = new Properties();
+    }
+
+    return instance;
+}
+/* Null, because instance will be initialized on demand. */
+Properties* Properties::instance = 0;
+
 
 Properties::Properties(QObject *parent)
 {
@@ -18,19 +32,19 @@ void    Properties::deleteModule(QString modulename)
 {
     modules.remove(modulename);
 }
-void    Properties::createCateg(QString modulename, QString categname,  QString categlabel,int order)
+void    Properties::createDevcat(QString modulename, QString categname,  QString categlabel,int order)
 {
-    Categ cat;
+    Devcat cat;
     cat.categname=categname;
     cat.modulename=modulename;
     cat.categlabel=categlabel;
     cat.order=order;
-    modules[modulename].categs[categname]=cat;
+    modules[modulename].devcats[categname]=cat;
 
 }
-void    Properties::deleteCateg(QString modulename, QString categname)
+void    Properties::deleteDevcat(QString modulename, QString categname)
 {
-    modules[modulename].categs.remove(categname);
+    modules[modulename].devcats.remove(categname);
 }
 void    Properties::createGroup(QString modulename, QString categname, QString groupname,  QString grouplabel,int order)
 {
@@ -50,6 +64,7 @@ void    Properties::deleteGroup(QString modulename, QString categname, QString g
 void    Properties::createProp (QString modulename, QString propname, Prop    prop)
 {
     modules[modulename].props[propname]=prop;
+    emit signalPropCreated(modules[modulename].props[propname]);
 }
 
 void    Properties::createProp (QString modulename, QString propname, QString label,propType typ,QString categname,QString groupname,OPerm perm,OSRule rule,double timeout,OPState state,QString aux0,QString aux1,int order)
@@ -69,11 +84,14 @@ void    Properties::createProp (QString modulename, QString propname, QString la
     prop.aux1           = aux1;
     prop.order          = order;
     modules[modulename].props[propname]= prop;
+    emit signalPropCreated(modules[modulename].props[propname]);
+
 }
 
 void    Properties::deleteProp (QString modulename, QString propname)
 {
     modules[modulename].props.remove(propname);
+    emit signalPropDeleted(modules[modulename].props[propname]);
 }
 Prop    Properties::getProp    (QString modulename, QString propname)
 {
@@ -82,6 +100,10 @@ Prop    Properties::getProp    (QString modulename, QString propname)
 void    Properties::setProp    (QString modulename, QString propname, Prop prop)
 {
     modules[modulename].props[propname]=prop;
+    emit signalvalueChanged(modules[modulename].props[propname]);
+}
+void    Properties::emitProp    (QString modulename, QString propname)
+{
     emit signalvalueChanged(modules[modulename].props[propname]);
 }
 void    Properties::appendElt  (QString modulename, QString propname,  QString txtname, QString text     , QString label, QString aux0,QString aux1)
@@ -180,28 +202,28 @@ void    Properties::setElt     (QString modulename, QString propname,  QString t
         QString mess = QDateTime::currentDateTime().toString("[yyyyMMdd hh:mm:ss.zzz]") + "-"+ modulename +"-"+text;
         modules[modulename].props[propname].m[txtname].text=mess;
     }
-    emit signalvalueChanged(modules[modulename].props[propname]);
+    //emit signalvalueChanged(modules[modulename].props[propname]);
 }
 void    Properties::setElt     (QString modulename, QString propname,  QString numname, double  num)
 {
     modules[modulename].props[propname].n[numname].value=num;
-    emit signalvalueChanged(modules[modulename].props[propname]);
+    //emit signalvalueChanged(modules[modulename].props[propname]);
 }
 void    Properties::setElt     (QString modulename, QString propname,  QString swtname, OSState swt)
 {
     modules[modulename].props[propname].s[swtname].s=swt;
-    emit signalvalueChanged(modules[modulename].props[propname]);
+    //emit signalvalueChanged(modules[modulename].props[propname]);
 }
 void    Properties::setElt     (QString modulename, QString propname,  QString lgtname, OPState lgt)
 {
     modules[modulename].props[propname].l[lgtname].l=lgt;
-    emit signalvalueChanged(modules[modulename].props[propname]);
+    //emit signalvalueChanged(modules[modulename].props[propname]);
 }
 void    Properties::setElt     (QString modulename,QString propname,  QString imgname, QString url, QString file)
 {
     modules[modulename].props[propname].i[imgname].url=url;
     modules[modulename].props[propname].i[imgname].f=file;
-    emit signalvalueChanged(modules[modulename].props[propname]);
+    //emit signalvalueChanged(modules[modulename].props[propname]);
 }
 void    Properties::setElt     (QString modulename,QString propname,  QString graname, OGraph  graph)
 {
@@ -234,74 +256,6 @@ OGraph  Properties::getGraph   (QString modulename,QString propname,  QString gr
     return modules[modulename].props[propname].g[graname];
 }
 
-/*
-
-QJsonObject OSTProperties::getJsonProp(QString propname,QString modulename)
-{
-    bool found= false;
-    pro prop;
-    for (int i=0;i<props.count();i++) {
-        if ((props[i].propname==propname)&&(props[i].modulename==modulename) ){
-            found=true;
-            prop=props[i];
-        }
-    }
-    if (!found) return QJsonObject();
-
-    QJsonObject mess,obj,det;
-    QJsonArray texts,nums,swis;
-    obj["propertyname"]=prop.propname;
-    obj["label"]=prop.proplabel;
-    obj["permission"]=prop.permission;
-    obj["state"]=prop.state;
-    obj["rule"]=prop.rule;
-    //obj["parenttype"]=""; // M=module/ C=Category / G=group
-    //obj["parentname"]="";
-    obj["modulename"]=modulename;
-    obj["categname"]=prop.categname;
-    obj["groupname"]=prop.groupname;
-
-    elem elt;
-    for (int i=0;i<elems.count();i++){
-        if (elems[i].propname==prop.propname) {
-            elt=elems[i];
-            if (elt.type==ET_TEXT) {
-                obj["type"]="INDI_TEXT";
-                det["label"]=elt.elemlabel;
-                det["textname"]=elt.elemname;
-                det["text"]=elt.text;
-                texts.append(det);
-            }
-            if (elt.type==ET_NUM) {
-                obj["type"]="INDI_NUMBER";
-                det["label"]=elt.elemlabel;
-                det["numbername"]=elt.elemname;
-                det["value"]=elt.num;
-                det["format"]="";
-                det["min"]=0;
-                det["max"]=0;
-                det["step"]=0;
-                nums.append(det);
-            }
-            if (elt.type==ET_BOOL) {
-                obj["type"]="INDI_SWITCH";
-                det["label"]=elt.elemlabel;
-                det["switchname"]=elt.elemname;
-                if (elt.sw) det["switch"]="ISS_ON";
-                if (!elt.sw) det["switch"]="ISS_OFF";
-                swis.append(det);
-            }
-
-        }
-
-    }
-    if (obj["type"]=="INDI_TEXT") obj["texts"]=texts;
-    if (obj["type"]=="INDI_NUMBER") obj["texts"]=nums;
-    if (obj["type"]=="INDI_SWITCH") obj["texts"]=swis;
-
-    return obj;
-}
-*/
 
 void    Properties::dumproperties(void)
 {
@@ -309,15 +263,20 @@ void    Properties::dumproperties(void)
     for(auto m : modules)
     {
       qDebug() << "##########################" << m.modulename << "---" << m.modulelabel <<"###################################";
-      for(auto c : m.categs)
+      for(auto c : m.devcats)
       {
-          qDebug() <<"##### categ  ="  << c.categname << c.categlabel << c.modulename;
+          qDebug() <<"##### categ  ="  << c.modulename << c.categname << c.categlabel;
+
+      }
+      for(auto g : m.groups)
+      {
+          qDebug() <<"##### group  =" << g.modulename << g.categname << g.groupname  << g.grouplabel ;
 
       }
 
       for(auto p : m.props)
       {
-       qDebug() <<"##### property ="  << p.label << p.typ;
+       qDebug() <<"##### property ="  << p.modulename << p.categname << p.groupname << p.propname << p.label << p.typ ;
         if (p.typ==PT_TEXT)  {
             qDebug() <<"-- texts";
             for(auto t : p.t)

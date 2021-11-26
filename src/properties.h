@@ -3,14 +3,6 @@
 #include <QtCore>
 #include <indibase.h>
 
-typedef QMap<QString, QString> MapStringStr;
-Q_DECLARE_METATYPE(MapStringStr)
-typedef QMap<QString, double> MapStringDbl;
-Q_DECLARE_METATYPE(MapStringDbl)
-typedef QMap<QString, bool> MapStringBool;
-Q_DECLARE_METATYPE(MapStringBool)
-
-
 enum propType
 {
     /*! Text element */
@@ -332,20 +324,22 @@ typedef struct
     int                     order;
 }  Group;
 
+
+
 typedef struct
 {
     QString                 categname;
     QString                 categlabel;
     QString                 modulename;
     int                     order;
-}  Categ;
+}  Devcat;
 
 typedef struct
 {
     QString                 modulename;
     QString                 modulelabel;
     int                     order;
-    QMap<QString,Categ>     categs;
+    QMap<QString,Devcat>    devcats;
     QMap<QString,Group>     groups;
     QMap<QString,Prop>      props;
 }  Mod;
@@ -354,13 +348,15 @@ class Properties : public QObject
 {
   Q_OBJECT
 public:
-    Properties(QObject *parent = Q_NULLPTR);
-    ~Properties() = default;
+    //Properties(QObject *parent = Q_NULLPTR);
+    //~Properties() = default;
+    /* Singleton : Static access method. */
+    static Properties* getInstance();
     void    createModule(QString modulename,  QString modulelabel,int order);
     void    deleteModule(QString modulename);
 
-    void    createCateg(QString modulename,QString categname,  QString categlabel,int order);
-    void    deleteCateg(QString modulename,QString categname);
+    void    createDevcat(QString modulename,QString categname,  QString categlabel,int order);
+    void    deleteDevcat(QString modulename,QString categname);
 
     void    createGroup(QString modulename,QString categname, QString groupname,  QString grouplabel,int order);
     void    deleteGroup(QString modulename,QString categname, QString groupname);
@@ -370,6 +366,7 @@ public:
     void    deleteProp (QString modulename,QString propname);
     Prop    getProp    (QString modulename,QString propname);
     void    setProp    (QString modulename,QString propname,Prop    prop);
+    void    emitProp   (QString modulename,QString propname);
 
     void    appendElt  (QString modulename,QString propname,  QString txtname, QString text     , QString label, QString aux0,QString aux1);
     void    appendElt  (QString modulename,QString propname,  QString numname, double  num      , QString label, QString aux0,QString aux1);
@@ -394,6 +391,7 @@ public:
     OGraph  getGraph   (QString modulename,QString propname,  QString graname);
     QMap<QString,Mod> getModules(void)    {return modules;}
     Mod     getModule(QString modulename) {return modules[modulename];}
+    Group   getGroup(QString modulename,QString groupname) {return modules[modulename].groups[groupname];}
 
 
     //QJsonObject getJsonProp(QString modulename,QString propname, QString modulename);
@@ -405,7 +403,11 @@ signals:
     void    signalAppendGraph (Prop prop,OGraph gra,OGraphValue val);
 private:
     QMap<QString,Mod>   modules;
-
+    /* Private constructor to prevent instancing. */
+    Properties(QObject *parent = Q_NULLPTR);
+    ~Properties() = default;
+    /* Singleton instance storage. */
+    static Properties* instance;
 };
 
 

@@ -1,30 +1,25 @@
 #include <QtCore>
 #include <basedevice.h>
-#include "module.h"
+#include "basemodule.h"
 
-Module::Module()
+Basemodule::Basemodule(QString name,QString label)
+    :_modulename(name),
+      _modulelabel(label)
+{
+    properties=Properties::getInstance();
+    properties->createModule(_modulename,_modulelabel,9);
+    setVerbose(false);
+}
+void Basemodule::setNameAndLabel(QString name,QString label)
 {
 }
-Module::~Module()
+void Basemodule::echoNameAndLabel()
 {
+    BOOST_LOG_TRIVIAL(debug)  << "Hello, i'm " << _modulename.toStdString() << " " << _modulelabel.toStdString();
 }
-QMap<QString,QString> Module::getDevices(void)
+void Basemodule::setHostport(QString host, int port)
 {
-    return _devices;
-}
-void Module::setDevices(QMap<QString,QString> devices)
-{
-    _devices =devices;
-}
-void Module::setAction(QString action)
-{
-    _actions[action]=true;
-}
-void Module::sendMessage(QString message)
-{
-    QString mess = QDateTime::currentDateTime().toString("[yyyyMMdd hh:mm:ss.zzz]") + " - " + _modulename + " - " + message;
-    qDebug() << mess.toStdString().c_str();
-    emit newMessage(mess);
+    setServer(host.toStdString().c_str(), port);
 }
 /*!
  * Connects to indi server
@@ -32,29 +27,49 @@ void Module::sendMessage(QString message)
  * IMHO this would be overkill as headless instance of OST and indiserver should be 99% hosted on the same machine
  * It would be easy to manage 1% remaining with indiserver chaining capabilities
  */
-bool Module::connectIndi()
+bool Basemodule::connectIndi()
 {
 
-    if (indiclient->isServerConnected())
+    if (isServerConnected())
     {
         sendMessage("Indi server already connected");
+        BOOST_LOG_TRIVIAL(debug) << "Indi server already connected";
+        newUniversalMessage("Indi server already connected");
         return true;
     } else {
-        indiclient->setServer("localhost", 7624);
-        if (indiclient->connectServer()){
+        if (connectServer()){
+            BOOST_LOG_TRIVIAL(debug) << "Indi server connected";
+            newUniversalMessage("Indi server connected");
             sendMessage("Indi server connected");
             return true;
         } else {
+            BOOST_LOG_TRIVIAL(debug) << "Couldn't connect to Indi server";
             sendMessage("Couldn't connect to Indi server");
             return false;
         }
     }
+
 }
-bool Module::disconnectIndi(void)
+QMap<QString,QString> Basemodule::getModDevices(void)
 {
-    if (indiclient->isServerConnected())
+    return _devices;
+}
+void Basemodule::setDevices(QMap<QString,QString> devices)
+{
+    _devices =devices;
+}
+void Basemodule::sendMessage(QString message)
+{
+    QString mess = QDateTime::currentDateTime().toString("[yyyyMMdd hh:mm:ss.zzz]") + " - " + _modulename + " - " + message;
+    qDebug() << mess.toStdString().c_str();
+    emit newMessage(mess);
+}
+
+bool Basemodule::disconnectIndi(void)
+{
+    if (isServerConnected())
     {
-        if (indiclient->disconnectServer()){
+        if (disconnectServer()){
             sendMessage("Indi server disconnected");
             return true;
         } else {
@@ -70,9 +85,9 @@ bool Module::disconnectIndi(void)
 /*!
  * Asks every device to connect
  */
-void Module::connectAllDevices()
+void Basemodule::connectAllDevices()
 {
-    std::vector<INDI::BaseDevice *> devs = indiclient->getDevices();
+    std::vector<INDI::BaseDevice *> devs = getDevices();
     for(std::size_t i = 0; i < devs.size(); i++) {
         ISwitchVectorProperty *svp = devs[i]->getSwitch("CONNECTION");
 
@@ -87,11 +102,11 @@ void Module::connectAllDevices()
                 }
             }
 
-           indiclient->sendNewSwitch(svp);
+           sendNewSwitch(svp);
             if (devs[i]->getDriverInterface() & INDI::BaseDevice::CCD_INTERFACE)
             {
                 sendMessage("Setting blob mode " + QString(devs[i]->getDeviceName()));
-                indiclient->setBLOBMode(B_ALSO,devs[i]->getDeviceName(),nullptr);
+                setBLOBMode(B_ALSO,devs[i]->getDeviceName(),nullptr);
             }
 
         }
@@ -104,9 +119,9 @@ void Module::connectAllDevices()
 /*!
  * Asks every device to disconnect
  */
-void Module::disconnectAllDevices()
+void Basemodule::disconnectAllDevices()
 {
-    std::vector<INDI::BaseDevice *> devs = indiclient->getDevices();
+    std::vector<INDI::BaseDevice *> devs = getDevices();
 
     for(std::size_t i = 0; i < devs.size(); i++) {
         ISwitchVectorProperty *svp = devs[i]->getSwitch("CONNECTION");
@@ -121,7 +136,7 @@ void Module::disconnectAllDevices()
                     svp->sp[j].s=ISS_OFF;
                 }
             }
-            indiclient->sendNewSwitch(svp);
+            sendNewSwitch(svp);
 
         }
 
@@ -133,9 +148,9 @@ void Module::disconnectAllDevices()
 /*!
  * Asks every device to load saved configuration
  */
-void Module::loadDevicesConfs()
+void Basemodule::loadDevicesConfs()
 {
-    std::vector<INDI::BaseDevice *> devs = indiclient->getDevices();
+    std::vector<INDI::BaseDevice *> devs = getDevices();
     for(std::size_t i = 0; i < devs.size(); i++) {
         sendMessage("Loading device conf " +QString(devs[i]->getDeviceName()));
         if (devs[i]->isConnected()) {
@@ -151,7 +166,7 @@ void Module::loadDevicesConfs()
                         svp->sp[j].s=ISS_OFF;
                     }
                 }
-                indiclient->sendNewSwitch(svp);
+                sendNewSwitch(svp);
             }
 
         }
@@ -159,10 +174,10 @@ void Module::loadDevicesConfs()
 }
 
 
-auto Module::sendNewNumber(const QString& deviceName, const QString& propertyName,const QString&  elementName, const double& value) -> bool
+auto Basemodule::sendModNewNumber(const QString& deviceName, const QString& propertyName,const QString&  elementName, const double& value) -> bool
 {
     //qDebug() << "taskSendNewNumber" << " " << deviceName << " " << propertyName<< " " << elementName;
-    INDI::BaseDevice *dp = indiclient->getDevice(deviceName.toStdString().c_str());
+    INDI::BaseDevice *dp = getDevice(deviceName.toStdString().c_str());
 
     if (dp== nullptr)
     {
@@ -180,7 +195,7 @@ auto Module::sendNewNumber(const QString& deviceName, const QString& propertyNam
     for (int i=0;i<prop->nnp;i++) {
         if (strcmp(prop->np[i].name, elementName.toStdString().c_str()) == 0) {
             prop->np[i].value=value;
-            indiclient->sendNewNumber(prop);
+            sendNewNumber(prop);
             return true;
         }
     }
@@ -188,10 +203,10 @@ auto Module::sendNewNumber(const QString& deviceName, const QString& propertyNam
     return false;
 
 }
-bool Module::sendNewText  (QString deviceName,QString propertyName,QString elementName, QString text)
+bool Basemodule::sendModNewText  (QString deviceName,QString propertyName,QString elementName, QString text)
 {
     //qDebug() << "taskSendNewText";
-    INDI::BaseDevice *dp = indiclient->getDevice(deviceName.toStdString().c_str());
+    INDI::BaseDevice *dp = getDevice(deviceName.toStdString().c_str());
 
     if (dp== nullptr)
     {
@@ -208,19 +223,19 @@ bool Module::sendNewText  (QString deviceName,QString propertyName,QString eleme
 
     for (int i=0;i<prop->ntp;i++) {
         if (strcmp(prop->tp[i].name, elementName.toStdString().c_str()) == 0) {
-            indiclient->sendNewText(deviceName.toStdString().c_str(),propertyName.toStdString().c_str(),elementName.toStdString().c_str(),text.toStdString().c_str());
+            sendNewText(deviceName.toStdString().c_str(),propertyName.toStdString().c_str(),elementName.toStdString().c_str(),text.toStdString().c_str());
             return true;
         }
     }
     sendMessage("Error - unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
     return false;
 }
-bool Module::sendNewSwitch(QString deviceName,QString propertyName,QString elementName, ISState sw)
+bool Basemodule::sendModNewSwitch(QString deviceName,QString propertyName,QString elementName, ISState sw)
 {
     //qDebug() << "taskSendNewSwitch";
 
     INDI::BaseDevice *dp;
-    dp = indiclient->getDevice(deviceName.toStdString().c_str());
+    dp = getDevice(deviceName.toStdString().c_str());
 
     if (dp== nullptr)
     {
@@ -238,7 +253,7 @@ bool Module::sendNewSwitch(QString deviceName,QString propertyName,QString eleme
     for (int i=0;i<prop->nsp;i++) {
         if (strcmp(prop->sp[i].name, elementName.toStdString().c_str()) == 0) {
             prop->sp[i].s=sw;
-            indiclient->sendNewSwitch(prop);
+            sendNewSwitch(prop);
             return true;
         }
     }
@@ -246,10 +261,10 @@ bool Module::sendNewSwitch(QString deviceName,QString propertyName,QString eleme
     return false;
 
 }
-bool Module::frameSet(QString devicename,double x,double y,double width,double height)
+bool Basemodule::frameSet(QString devicename,double x,double y,double width,double height)
 {
     INDI::BaseDevice *dp;
-    dp = indiclient->getDevice(devicename.toStdString().c_str());
+    dp = getDevice(devicename.toStdString().c_str());
     if (dp== nullptr)
     {
         sendMessage("Error - unable to find " + devicename + " device. Aborting.");
@@ -279,13 +294,13 @@ bool Module::frameSet(QString devicename,double x,double y,double width,double h
         }
     }
 
-    indiclient->sendNewNumber(prop);
+    sendNewNumber(prop);
     return true;
 }
-bool Module::frameReset(QString devicename)
+bool Basemodule::frameReset(QString devicename)
 {
     INDI::BaseDevice *dp;
-    dp = indiclient->getDevice(devicename.toStdString().c_str());
+    dp = getDevice(devicename.toStdString().c_str());
     if (dp== nullptr)
     {
         sendMessage("Error - unable to find " + devicename + " device. Aborting.");
@@ -306,92 +321,7 @@ bool Module::frameReset(QString devicename)
         }
     }
 
-    indiclient->sendNewSwitch(prop);
+    sendNewSwitch(prop);
     emit askedFrameReset(devicename);
     return true;
 }
-
-
-
-/*
-void Module::IndiServerConnected()
-{
-    //qDebug() << "gotserverConnected";
-
-}
-void Module::gotserverDisconnected(int exit_code)
-{
-    //qDebug() << "gotserverDisconnected";
-    Q_UNUSED(exit_code);
-}
-void Module::gotnewDevice(INDI::BaseDevice *dp)
-{
-    //qDebug() << "gotnewDevice : " << dp->getDeviceName();
-    Q_UNUSED(dp);
-}
-void Module::gotremoveDevice(INDI::BaseDevice *dp)
-{
-    //qDebug() << "gotremoveDevice";
-    Q_UNUSED(dp);
-}
-void Module::gotnewProperty(INDI::Property *property)
-{
-    //qDebug() << "gotnewProperty" << tasks.size();
-    Q_UNUSED(property);
-
-}
-void Module::gotremoveProperty(INDI::Property *property)
-{
-    //qDebug() << "gotremoveProperty";
-    Q_UNUSED(property);
-}
-
-
-void Module::gotnewText(ITextVectorProperty *tvp)
-{
-    //qDebug() << "gotnewText";
-    Q_UNUSED(tvp);
-}
-
-void Module::gotnewSwitch(ISwitchVectorProperty *svp)
-{
-   // qDebug() << "gotnewSwitch";
-    Q_UNUSED(svp);
-}
-
-void Module::gotnewNumber(INumberVectorProperty *nvp)
-{
-    //qDebug() << "gotnewNumber";
-    Q_UNUSED(nvp);
-}
-void Module::gotnewLight(ILightVectorProperty *lvp)
-{
-    //qDebug() << "gotnewLight";
-    Q_UNUSED(lvp);
-
-}
-void Module::gotnewBLOB(IBLOB *bp)
-{
-    //qDebug() << "gotnewBLOB";
-    Q_UNUSED(bp);
-}
-void Module::gotnewMessage(INDI::BaseDevice *dp, int messageID)
-{
-    //qDebug() << "gotnewMessage";
-    Q_UNUSED(dp);
-    Q_UNUSED(messageID);
-}
-
-
-void Module::IndiNewNumber(INumberVectorProperty *nvp)
-{
-    //qDebug() << "gotnewNumber";
-    if (QString(nvp->name)=="CCD Simulator")
-    sendMessage("New number " + QString(nvp->device) + " - " + QString(nvp->name) + " - " + QString::number(nvp->np[0].value));
-    indiclient->setBLOBMode(B_ALSO,"CCD Simulator",nullptr);
-}
-void Module::IndiNewBLOB(IBLOB *bp)
-{
-    //qDebug() << "gotnewNumber";
-    sendMessage("New blob " + QString(bp->bvp->device) + " - " + QString(bp->name) + " - " + QString::number(bp->bloblen));
-}*/

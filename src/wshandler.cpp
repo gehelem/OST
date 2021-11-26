@@ -1,8 +1,8 @@
-#include <QApplication>
+#include <QCoreApplication>
 #include <QtCore>
 #include "wshandler.h"
 #include "jsonparser.h"
-/*!
+#include <boost/log/trivial.hpp>/*!
  * ... ...
  */
 WShandler::WShandler(QObject *parent,Properties *properties)
@@ -15,8 +15,7 @@ WShandler::WShandler(QObject *parent,Properties *properties)
        connect(m_pWebSocketServer, &QWebSocketServer::newConnection,this, &WShandler::onNewConnection);
        connect(m_pWebSocketServer, &QWebSocketServer::closed, this, &WShandler::closed);
     }
-    qDebug("OST server listening");
-
+    BOOST_LOG_TRIVIAL(debug) <<"OST WS server listening";
 }
 
 
@@ -46,7 +45,7 @@ void WShandler::sendbinary(QByteArray *data)
 
 void WShandler::onNewConnection()
 {
-    qDebug("New client connection");
+    BOOST_LOG_TRIVIAL(debug) << "New WS client connection";
     QWebSocket *pSocket = m_pWebSocketServer->nextPendingConnection();
     connect(pSocket, &QWebSocket::textMessageReceived, this, &WShandler::processTextMessage);
     connect(pSocket, &QWebSocket::disconnected, this, &WShandler::socketDisconnected);
@@ -58,12 +57,12 @@ void WShandler::processTextMessage(QString message)
 {
     QJsonDocument jsonResponse = QJsonDocument::fromJson(message.toUtf8()); // garder
     emit textRcv(message);
-    /*QJsonObject  obj = jsonResponse.object(); // garder
-    qDebug() << "OST server received json" << obj;
+    QJsonObject  obj = jsonResponse.object(); // garder
+    BOOST_LOG_TRIVIAL(debug) << "OST server received json" << message.toStdString();
     if (obj["message"].toString()=="readall")
     {
-        //sendAll();
-        emit changeValue(Prop());
+        sendAll();
+        //emit changeValue(Prop());
 
     }
     if (obj["message"].toString()=="readproperty")
@@ -76,7 +75,7 @@ void WShandler::processTextMessage(QString message)
         QJsonObject prop = obj["property"].toObject();
         //sendProperty(props->getProp(obj["modulename"].toString(),obj["propertyname"].toString()));
         emit changeValue(JpropToO(prop));
-    }*/
+    }
 
 
 }
@@ -89,15 +88,24 @@ void WShandler::sendProperty(Prop prop)
     mess["property"]=obj;
     sendJsonMessage(mess);
 }
+void WShandler::updateElements(Prop prop)
+{
+    QJsonObject mess,obj,det;
+    QJsonArray dets;
+    obj=OElementsToJ(prop);
+    mess["message"]="updateelements";
+    mess["property"]=obj;
+    sendJsonMessage(mess);
+}
 
 void WShandler::sendAll(void)
 {
     QJsonObject mess;
     QJsonArray dets;
     mess["message"]="updateall";
-    /*for(auto m : props->getModules()){
+    for(auto m : props->getModules()){
         dets.append(OmodToJ(props->getModule(m.modulename)));
-    }*/
+    }
     mess["modules"]=dets;
     sendJsonMessage(mess);
 }
