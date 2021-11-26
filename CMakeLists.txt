@@ -61,6 +61,8 @@ add_executable( ost
     ${CMAKE_CURRENT_SOURCE_DIR}/src/jsonparser.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/basemodule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/basemodule.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/maincontrol.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/maincontrol.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/image.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/image.h
 
@@ -81,45 +83,37 @@ target_link_libraries( ost
     z -lpthread
     )
 
-# Maincontrol module
-add_library(maincontrol SHARED
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.cpp
-)
-target_link_libraries(maincontrol PRIVATE
-    indiclient
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Concurrent
-    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
-)
+#######################
+## modules libraries ##
+#######################
 
 # Focus module
-add_library(focuser SHARED
+add_library(ostfocuser SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.h
 )
-target_link_libraries(focuser PRIVATE
+target_link_libraries(ostfocuser PRIVATE
     indiclient
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
     ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
 )
-target_compile_definitions(focuser PRIVATE FOCUSER_LIBRARY)
+target_compile_definitions(ostfocuser PRIVATE FOCUSER_LIBRARY)
 
 # Indipanel module
-add_library(indipanel SHARED
+add_library(ostindipanel SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel/indipanel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel/indipanel.cpp
 )
-target_link_libraries(indipanel PRIVATE
+target_link_libraries(ostindipanel PRIVATE
     indiclient
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
     ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
 )
-target_compile_definitions(indipanel PRIVATE INDIPANEL_LIBRARY)
+target_compile_definitions(ostindipanel PRIVATE INDIPANEL_LIBRARY)
 
 
 #install(TARGETS HeadlessObservatory RUNTIME DESTINATION bin)

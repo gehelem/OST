@@ -8,8 +8,10 @@
 
 #include <basemodule.h>
 
+
 #include "wshandler.h"
 #include "properties.h"
+#include "maincontrol.h"
 
 /*!
  * This class is the heart of OST

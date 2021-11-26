@@ -31,9 +31,10 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
 
     BOOST_LOG_TRIVIAL(debug) << "Controller warmup";
     BOOST_LOG_TRIVIAL(debug) <<  "ApplicationDirPath :" << QCoreApplication::applicationDirPath().toStdString();
-    LoadModule(QCoreApplication::applicationDirPath()+"/libmaincontrol.so","maincontrol","maincontrol1");
-    LoadModule(QCoreApplication::applicationDirPath()+"/libfocuser.so","focuser1","focuser 1");
-    LoadModule(QCoreApplication::applicationDirPath()+"/libindipanel.so","indipanel1","indipanel 1");
+
+    MainControl *basemodule = new MainControl("maincontrol","Main control");
+    LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focuser1","focuser 1");
+    LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel1","indipanel 1");
 
 
 

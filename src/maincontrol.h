@@ -2,13 +2,7 @@
 #define MAINCONTROL_MODULE_h_
 #include <basemodule.h>
 
-#if defined(MAINCONTROL_MODULE_h_)
-#  define MODULE_INIT Q_DECL_EXPORT
-#else
-#  define MODULE_INIT Q_DECL_IMPORT
-#endif
-
-class MODULE_INIT MainControl : public Basemodule
+class MainControl : public Basemodule
 {
     Q_OBJECT
 
@@ -21,6 +15,5 @@ class MODULE_INIT MainControl : public Basemodule
 
 };
 
-extern "C" MODULE_INIT MainControl *initialize(QString name,QString label);
 
 #endif
