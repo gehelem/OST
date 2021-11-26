@@ -9,7 +9,7 @@ install first from fresh ubuntu server install
 sudo apt-add-repository ppa:mutlaqja/ppa
 sudo apt-get update
 sudo apt upgrade
-sudo apt-get install build-essential cmake git libstellarsolver-dev libeigen3-dev libcfitsio-dev zlib1g-dev libindi-dev extra-cmake-modules libkf5plotting-dev libqt5svg5-dev libkf5xmlgui-dev libkf5kio-dev kinit-dev libkf5newstuff-dev kdoctools-dev libkf5notifications-dev qtdeclarative5-dev libkf5crash-dev gettext libnova-dev libgsl-dev libraw-dev libkf5notifyconfig-dev wcslib-dev libqt5websockets5-dev xplanet xplanet-images qt5keychain-dev libsecret-1-dev breeze-icon-theme indi-full libindi-dev cimg-dev libnova-dev build-essential nginx libgsl-dev wcslib-dev libcfitsio-dev qt5-default libcurl4-gnutls-dev libfftw3-dev imagemagick graphicsmagick 
+sudo apt-get install build-essential cmake git libstellarsolver-dev libeigen3-dev libcfitsio-dev zlib1g-dev libindi-dev extra-cmake-modules libkf5plotting-dev libqt5svg5-dev libkf5xmlgui-dev libkf5kio-dev kinit-dev libkf5newstuff-dev kdoctools-dev libkf5notifications-dev qtdeclarative5-dev libkf5crash-dev gettext libnova-dev libgsl-dev libraw-dev libkf5notifyconfig-dev wcslib-dev libqt5websockets5-dev xplanet xplanet-images qt5keychain-dev libsecret-1-dev breeze-icon-theme indi-full libindi-dev cimg-dev libnova-dev build-essential nginx libgsl-dev wcslib-dev libcfitsio-dev qt5-default libcurl4-gnutls-dev libfftw3-dev imagemagick graphicsmagick libboost-all-dev
 ```
 
 get build and install indi from source to get missing baseclientqt missing header and library
