@@ -31,6 +31,8 @@ class Basemodule : public QObject, public INDI::BaseClient
 
         QString _modulename;
         QString _modulelabel;
+   public slots:
+        virtual void changeProp(Prop prop) {}
 
     protected:
         //QList<FITSImage::Star> stars;

@@ -174,6 +174,7 @@ void Basemodule::loadDevicesConfs()
 }
 
 
+
 auto Basemodule::sendModNewNumber(const QString& deviceName, const QString& propertyName,const QString&  elementName, const double& value) -> bool
 {
     //qDebug() << "taskSendNewNumber" << " " << deviceName << " " << propertyName<< " " << elementName;

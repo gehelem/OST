@@ -29,6 +29,7 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
     connect(properties,&Properties::signalPropDeleted,this,&Controller::propDeleted);
     connect(properties,&Properties::signalvalueChanged,this,&Controller::valueChanged);
 
+
     BOOST_LOG_TRIVIAL(debug) << "Controller warmup";
     BOOST_LOG_TRIVIAL(debug) <<  "ApplicationDirPath :" << QCoreApplication::applicationDirPath().toStdString();
 
@@ -97,12 +98,10 @@ void Controller::LoadModule(QString lib,QString name,QString label)
         if (createmodule) {
             Basemodule *mod = createmodule(name,label);
             if (mod)
-                mod->echoNameAndLabel();
-                //connect(mod,&Basemodule::NewModuleMessage,this,&Controller::OnNewModuleMessage);
-                //connect(mod,&Basemodule::newMessage )
+                //mod->echoNameAndLabel();
                 mod->setHostport(_indihost,_indiport);
                 mod->connectIndi();
-
+                connect(wshandler,&WShandler::changeValue,mod,&Basemodule::changeProp);
         } else {
             BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library";
         }

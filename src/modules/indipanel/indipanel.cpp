@@ -16,7 +16,36 @@ IndiPanel::~IndiPanel()
 {
 
 }
+void IndiPanel::changeProp(Prop prop)
+{
+    QString dev = properties->getDevcat(_modulename,prop.categname).categlabel;
+    if (prop.typ== PT_TEXT)
+    {
+        for(auto e : prop.t)
+        {
+            sendModNewText(dev,prop.propname,e.name,e.text);
+        }
 
+    }
+    if (prop.typ== PT_NUM)
+    {
+        for(auto e : prop.n)
+        {
+            sendModNewNumber(dev,prop.propname,e.name,e.value);
+        }
+
+    }
+    if (prop.typ== PT_SWITCH)
+    {
+        for(auto e : prop.s)
+        {
+            sendModNewSwitch(dev,prop.propname,e.name,transw(e.s));
+            BOOST_LOG_TRIVIAL(debug)  << _modulename.toStdString() << " MOD SWITCH " << prop.propname.toStdString() << " " << e.name.toStdString();
+
+        }
+
+    }
+}
 void IndiPanel::newDevice(INDI::BaseDevice *dp)
 {
     properties->createDevcat(_modulename,QString(dp->getDeviceName()).replace( " ", "" ),dp->getDeviceName(),0);
@@ -147,6 +176,10 @@ void IndiPanel::newBLOB(IBLOB *bp)
 
 }
 
+ISState IndiPanel::transw(OSState osw)
+{
+    if (osw == OSS_ON) return ISS_ON; else return ISS_OFF;
+}
 
 
 

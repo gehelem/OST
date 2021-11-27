@@ -391,6 +391,7 @@ public:
     OGraph  getGraph   (QString modulename,QString propname,  QString graname);
     QMap<QString,Mod> getModules(void)    {return modules;}
     Mod     getModule(QString modulename) {return modules[modulename];}
+    Devcat  getDevcat(QString modulename,QString devcatname) {return modules[modulename].devcats[devcatname];}
     Group   getGroup(QString modulename,QString groupname) {return modules[modulename].groups[groupname];}
 
 
