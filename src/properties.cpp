@@ -48,13 +48,20 @@ void    Properties::deleteDevcat(QString modulename, QString categname)
 }
 void    Properties::createGroup(QString modulename, QString categname, QString groupname,  QString grouplabel,int order)
 {
-    Group gro;
-    gro.grouplabel=grouplabel;
-    gro.categname=categname;
-    gro.modulename=modulename;
-    gro.groupname=groupname;
-    gro.order=order;
-    modules[modulename].groups[groupname]=gro;
+    if (modules[modulename].groups.contains(groupname)) //avoids group duplication for indi properties
+    {
+        BOOST_LOG_TRIVIAL(debug) << "Group duplicate " << modulename.toStdString() << "-" << modules[modulename].groups.value(groupname).groupname.toStdString();
+    }
+    else
+    {
+        Group gro;
+        gro.grouplabel=grouplabel;
+        gro.categname=categname;
+        gro.modulename=modulename;
+        gro.groupname=groupname;
+        gro.order=order;
+        modules[modulename].groups.insert(groupname,gro);
+    }
 }
 void    Properties::deleteGroup(QString modulename, QString categname, QString groupname)
 {

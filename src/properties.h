@@ -313,7 +313,7 @@ typedef struct
     QMap<QString,OGraph>    g;
 } Prop;
 
-Q_DECLARE_METATYPE(Prop);
+Q_DECLARE_METATYPE(Prop)
 
 typedef struct
 {
@@ -409,8 +409,6 @@ private:
     /* Singleton instance storage. */
     static Properties* instance;
 };
-
-
 
 
 #endif // PROPERTIES_H
