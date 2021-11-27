@@ -399,6 +399,7 @@ public:
 signals:
     void    signalPropCreated (Prop prop);
     void    signalPropDeleted (Prop prop);
+    void    signalGroupDeleted (Group group);
     void    signalvalueChanged(Prop prop);
     void    signalAppendGraph (Prop prop,OGraph gra,OGraphValue val);
 private:
