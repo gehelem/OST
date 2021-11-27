@@ -41,6 +41,7 @@ private:
     void LoadModule(QString lib,QString name,QString label);
     QString _indihost;
     int _indiport;
+    QStringList _availableModuleLibs;
 
 };
 #endif

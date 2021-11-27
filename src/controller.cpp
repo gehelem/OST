@@ -33,10 +33,20 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
     BOOST_LOG_TRIVIAL(debug) <<  "ApplicationDirPath :" << QCoreApplication::applicationDirPath().toStdString();
 
     MainControl *basemodule = new MainControl("maincontrol","Main control");
+    basemodule->echoNameAndLabel();
+    basemodule->setHostport(_indihost,_indiport);
+    basemodule->connectIndi();
+    QDir directory(QCoreApplication::applicationDirPath());
+    directory.setFilter(QDir::Files);
+    directory.setNameFilters(QStringList() << "*ost*.so");
+    _availableModuleLibs = directory.entryList();
+    foreach(QString lib, _availableModuleLibs)
+    {
+        BOOST_LOG_TRIVIAL(debug) << "Module lib found " << lib.toStdString();
+    }
+
     LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focuser1","focuser 1");
     LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel1","indipanel 1");
-
-
 
 }
 
