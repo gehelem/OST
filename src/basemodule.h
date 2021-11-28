@@ -32,7 +32,7 @@ class Basemodule : public QObject, public INDI::BaseClient
         QString _modulename;
         QString _modulelabel;
    public slots:
-        virtual void changeProp(Prop prop) {}
+        virtual void changeProp(Prop prop) {Q_UNUSED(prop);}
 
     protected:
         //QList<FITSImage::Star> stars;

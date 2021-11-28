@@ -50,7 +50,7 @@ void    Properties::createGroup(QString modulename, QString categname, QString g
 {
     if (modules[modulename].groups.contains(groupname)) //avoids group duplication for indi properties
     {
-        BOOST_LOG_TRIVIAL(debug) << "Group duplicate " << modulename.toStdString() << "-" << modules[modulename].groups.value(groupname).groupname.toStdString();
+        //BOOST_LOG_TRIVIAL(debug) << "Group duplicate " << modulename.toStdString() << "-" << modules[modulename].groups.value(groupname).groupname.toStdString();
     }
     else
     {

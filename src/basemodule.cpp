@@ -233,7 +233,7 @@ bool Basemodule::sendModNewText  (QString deviceName,QString propertyName,QStrin
 }
 bool Basemodule::sendModNewSwitch(QString deviceName,QString propertyName,QString elementName, ISState sw)
 {
-    //qDebug() << "taskSendNewSwitch";
+    qDebug() << "taskSendNewSwitch";
 
     INDI::BaseDevice *dp;
     dp = getDevice(deviceName.toStdString().c_str());
@@ -252,9 +252,11 @@ bool Basemodule::sendModNewSwitch(QString deviceName,QString propertyName,QStrin
     }
 
     for (int i=0;i<prop->nsp;i++) {
+        if (prop->r==ISR_1OFMANY) prop->sp[i].s=ISS_OFF;
         if (strcmp(prop->sp[i].name, elementName.toStdString().c_str()) == 0) {
             prop->sp[i].s=sw;
             sendNewSwitch(prop);
+            BOOST_LOG_TRIVIAL(debug)  << "SENDNEWSWITCH "<< deviceName.toStdString() <<propertyName.toStdString()<< elementName.toStdString() << " >" << sw << "<";
             return true;
         }
     }

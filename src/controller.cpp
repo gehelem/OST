@@ -47,7 +47,7 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
         BOOST_LOG_TRIVIAL(debug) << "Module lib found " << lib.toStdString();
     }
 
-    LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focuser1","focuser 1");
+    //LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focuser1","focuser 1");
     LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel1","indipanel 1");
 
 }

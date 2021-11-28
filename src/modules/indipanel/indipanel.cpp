@@ -63,7 +63,7 @@ void IndiPanel::newProperty(INDI::Property *property)
                                 QString(property->getDeviceName()).replace( " ", "" ),
                                 QString(property->getGroupName()).replace( " ", "" ),
                                 property->getGroupName(),0);
-            BOOST_LOG_TRIVIAL(debug)  << _modulename.toStdString() << QString(property->getDeviceName()).replace( " ", "" ).toStdString() << QString(property->getGroupName()).replace( " ", "" ).toStdString() << QString(property->getName()).toStdString();
+            //BOOST_LOG_TRIVIAL(debug)  << _modulename.toStdString() << QString(property->getDeviceName()).replace( " ", "" ).toStdString() << QString(property->getGroupName()).replace( " ", "" ).toStdString() << QString(property->getName()).toStdString();
     //    }
 
    Prop wprop;
