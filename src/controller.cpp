@@ -25,6 +25,7 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
 
     properties=Properties::getInstance();
     wshandler = new WShandler(this,properties);
+    qRegisterMetaType<Prop>("Prop");
     connect(properties,&Properties::signalPropCreated,this,&Controller::propCreated);
     connect(properties,&Properties::signalPropDeleted,this,&Controller::propDeleted);
     connect(properties,&Properties::signalvalueChanged,this,&Controller::valueChanged);
