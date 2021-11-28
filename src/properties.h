@@ -313,7 +313,7 @@ typedef struct
     QMap<QString,OGraph>    g;
 } Prop;
 
-Q_DECLARE_METATYPE(Prop);
+Q_DECLARE_METATYPE(Prop)
 
 typedef struct
 {
@@ -391,6 +391,7 @@ public:
     OGraph  getGraph   (QString modulename,QString propname,  QString graname);
     QMap<QString,Mod> getModules(void)    {return modules;}
     Mod     getModule(QString modulename) {return modules[modulename];}
+    Devcat  getDevcat(QString modulename,QString devcatname) {return modules[modulename].devcats[devcatname];}
     Group   getGroup(QString modulename,QString groupname) {return modules[modulename].groups[groupname];}
 
 
@@ -399,6 +400,7 @@ public:
 signals:
     void    signalPropCreated (Prop prop);
     void    signalPropDeleted (Prop prop);
+    void    signalGroupDeleted (Group group);
     void    signalvalueChanged(Prop prop);
     void    signalAppendGraph (Prop prop,OGraph gra,OGraphValue val);
 private:
@@ -409,8 +411,6 @@ private:
     /* Singleton instance storage. */
     static Properties* instance;
 };
-
-
 
 
 #endif // PROPERTIES_H

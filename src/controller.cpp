@@ -25,16 +25,30 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
 
     properties=Properties::getInstance();
     wshandler = new WShandler(this,properties);
+    qRegisterMetaType<Prop>("Prop");
     connect(properties,&Properties::signalPropCreated,this,&Controller::propCreated);
     connect(properties,&Properties::signalPropDeleted,this,&Controller::propDeleted);
     connect(properties,&Properties::signalvalueChanged,this,&Controller::valueChanged);
 
+
     BOOST_LOG_TRIVIAL(debug) << "Controller warmup";
     BOOST_LOG_TRIVIAL(debug) <<  "ApplicationDirPath :" << QCoreApplication::applicationDirPath().toStdString();
-    LoadModule(QCoreApplication::applicationDirPath()+"/libfocuser.so","focuser1","focuser 1");
-    LoadModule(QCoreApplication::applicationDirPath()+"/libindipanel.so","indipanel1","indipanel 1");
 
+    MainControl *basemodule = new MainControl("maincontrol","Main control");
+    basemodule->echoNameAndLabel();
+    basemodule->setHostport(_indihost,_indiport);
+    basemodule->connectIndi();
+    QDir directory(QCoreApplication::applicationDirPath());
+    directory.setFilter(QDir::Files);
+    directory.setNameFilters(QStringList() << "*ost*.so");
+    _availableModuleLibs = directory.entryList();
+    foreach(QString lib, _availableModuleLibs)
+    {
+        BOOST_LOG_TRIVIAL(debug) << "Module lib found " << lib.toStdString();
+    }
 
+    //LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focuser1","focuser 1");
+    LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel1","indipanel 1");
 
 }
 
@@ -85,12 +99,10 @@ void Controller::LoadModule(QString lib,QString name,QString label)
         if (createmodule) {
             Basemodule *mod = createmodule(name,label);
             if (mod)
-                mod->echoNameAndLabel();
-                //connect(mod,&Basemodule::NewModuleMessage,this,&Controller::OnNewModuleMessage);
-                //connect(mod,&Basemodule::newMessage )
+                //mod->echoNameAndLabel();
                 mod->setHostport(_indihost,_indiport);
                 mod->connectIndi();
-
+                connect(wshandler,&WShandler::changeValue,mod,&Basemodule::changeProp);
         } else {
             BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library";
         }

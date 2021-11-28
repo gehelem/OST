@@ -48,18 +48,27 @@ void    Properties::deleteDevcat(QString modulename, QString categname)
 }
 void    Properties::createGroup(QString modulename, QString categname, QString groupname,  QString grouplabel,int order)
 {
-    Group gro;
-    gro.grouplabel=grouplabel;
-    gro.categname=categname;
-    gro.modulename=modulename;
-    gro.groupname=groupname;
-    gro.order=order;
-    modules[modulename].groups[groupname]=gro;
+    if (modules[modulename].groups.contains(groupname)) //avoids group duplication for indi properties
+    {
+        //BOOST_LOG_TRIVIAL(debug) << "Group duplicate " << modulename.toStdString() << "-" << modules[modulename].groups.value(groupname).groupname.toStdString();
+    }
+    else
+    {
+        Group gro;
+        gro.grouplabel=grouplabel;
+        gro.categname=categname;
+        gro.modulename=modulename;
+        gro.groupname=groupname;
+        gro.order=order;
+        modules[modulename].groups.insert(groupname,gro);
+    }
 }
 void    Properties::deleteGroup(QString modulename, QString categname, QString groupname)
 {
     Q_UNUSED(categname);
+    emit signalGroupDeleted(modules[modulename].groups[groupname]);
     modules[modulename].groups.remove(groupname);
+
 }
 void    Properties::createProp (QString modulename, QString propname, Prop    prop)
 {
@@ -90,8 +99,21 @@ void    Properties::createProp (QString modulename, QString propname, QString la
 
 void    Properties::deleteProp (QString modulename, QString propname)
 {
+    QString groupname = modules[modulename].props[propname].groupname;
+    QString categname = modules[modulename].props[propname].categname;
+
     modules[modulename].props.remove(propname);
     emit signalPropDeleted(modules[modulename].props[propname]);
+
+    //look for empty groups
+    bool delgroup = true;
+
+    for(auto p : modules[modulename].props)
+    {
+        if (p.groupname==groupname) delgroup=false;
+    }
+    if (delgroup) deleteGroup(modulename,categname,groupname);
+
 }
 Prop    Properties::getProp    (QString modulename, QString propname)
 {

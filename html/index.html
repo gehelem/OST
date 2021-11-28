@@ -56,11 +56,11 @@
                 }
             }
 
-            function indi_switch(btn,modulename,propname,name) {
+            function indi_switch(btn,modulename,categname,propname,name) {
               //console.log( "indi_switch clicked:", '"'+btn+'"' ,'"'+modulename+'"');
             if ( websocket != null )
                 {
-                  var msg = "{\"message\": \"updateproperty\",\"property\":{\"modulename\":\""+modulename+"\",\"propname\":\""+propname+"\",\"switchs\":[{\"name\":\""+name+"\",\"switch\":\"ISS_ON\"}],\"type\":\"INDI_SWITCH\"}}";
+                  var msg = "{\"message\": \"updateproperty\",\"property\":{\"modulename\":\""+modulename+"\",\"categname\":\""+categname+"\",\"propname\":\""+propname+"\",\"switchs\":[{\"name\":\""+name+"\",\"switch\":\"ISS_ON\"}],\"type\":\"INDI_SWITCH\"}}";
 
                     websocket.send( msg );
                     debugoutput.value = msg;
@@ -68,13 +68,13 @@
                 }
             }
 
-            function indi_number(num,modulename,propname,name) {
+            function indi_number(num,modulename,categname,propname,name) {
               //console.log( "indi_switch clicked:", '"'+btn+'"' ,'"'+modulename+'"');
             if ( websocket != null )
                 {
                   nn= modulename+propname+name;
                   var val = document.getElementById(nn).value;
-                  var msg = "{\"message\": \"updateproperty\",\"property\":{\"modulename\":\""+modulename+"\",\"propname\":\""+propname+"\",\"numbers\":[{\"name\":\""+name+"\",\"value\":"+val+"}],\"type\":\"INDI_NUMBER\"}}";
+                  var msg = "{\"message\": \"updateproperty\",\"property\":{\"modulename\":\""+modulename+"\",\"categname\":\""+categname+"\",\"propname\":\""+propname+"\",\"numbers\":[{\"name\":\""+name+"\",\"value\":"+val+"}],\"type\":\"INDI_NUMBER\"}}";
 
                     websocket.send( msg );
                     debugoutput.value = msg;
@@ -82,13 +82,13 @@
                 }
             }
 
-            function indi_text(num,modulename,propname,name) {
+            function indi_text(num,modulename,categname,propname,name) {
               //console.log( "indi_switch clicked:", '"'+btn+'"' ,'"'+modulename+'"');
             if ( websocket != null )
                 {
                   nn= modulename+propname+name;
                   var val = document.getElementById(nn).value;
-                  var msg = "{\"message\": \"updateproperty\",\"property\":{\"modulename\":\""+modulename+"\",\"propname\":\""+propname+"\",\"texts\":[{\"name\":\""+name+"\",\"text\":\""+val+"\"}],\"type\":\"INDI_TEXT\"}}";
+                  var msg = "{\"message\": \"updateproperty\",\"property\":{\"modulename\":\""+modulename+"\",\"categname\":\""+categname+"\",\"propname\":\""+propname+"\",\"texts\":[{\"name\":\""+name+"\",\"text\":\""+val+"\"}],\"type\":\"INDI_TEXT\"}}";
 
                     websocket.send( msg );
                     debugoutput.value = msg;
@@ -119,7 +119,7 @@
                         if (prop.perm=="IP_RO") {
                           $("#tab"+prop.modulename+prop.propname + " tbody").append("<tr><td><small> "+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /></td></tr>");
                         } else {
-                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /><button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_text('"+nn+"','"+prop.modulename+"','"+prop.propname+"','"+item.name+"');\"    >set</button></td></tr>");
+                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /><button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_text('"+nn+"','"+prop.modulename+"','"+prop.categname+"','"+prop.propname+"','"+item.name+"');\"    >set</button></td></tr>");
                         }
 
 
@@ -167,7 +167,7 @@
                         if (prop.perm=="IP_RO") {
                           $("#tab"+prop.modulename+prop.propname + " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /></td></tr>");
                         } else {
-                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /><button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_number('"+nn+"','"+prop.modulename+"','"+prop.propname+"','"+item.name+"');\"    >set</button></td></tr>");
+                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /><button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_number('"+nn+"','"+prop.modulename+"','"+prop.categname+"','"+prop.propname+"','"+item.name+"');\"    >set</button></td></tr>");
                         }
 
 
@@ -186,7 +186,7 @@
                         if (prop.perm=="IP_RO") {
                           $("#tab"+prop.modulename+prop.propname + " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /></td></tr>");
                         } else {
-                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_switch('"+nn+"','"+prop.modulename+"','"+prop.propname+"','"+item.name+"');\"    >"+item.label+"</button>"
+                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_switch('"+nn+"','"+prop.modulename+"','"+prop.categname+"','"+prop.propname+"','"+item.name+"');\"    >"+item.label+"</button>"
 							);
                         }
                         //    <button onClick="abortfocus();">Abort focus</button>
@@ -207,7 +207,7 @@
                         if (prop.perm=="IP_RO") {
                           $("#tab"+prop.modulename+prop.propname + " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /></td></tr>");
                         } else {
-                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<td></td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /><button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_number('"+nn+"','"+prop.modulename+"','"+prop.propname+"','"+item.name+"');\"    >set</button>");
+                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<td></td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /><button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"onClick=\"indi_number('"+nn+"','"+prop.modulename+"','"+prop.categname+"','"+prop.propname+"','"+item.name+"');\"    >set</button>");
                         }
                         //    <button onClick="abortfocus();">Abort focus</button>
                         //$("div#"+prop.modulename+prop.categname).append("<tr><label for='name'>"+sw.label+"</label>");
