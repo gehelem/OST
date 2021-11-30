@@ -23,13 +23,7 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
     else
         qDebug() << "DatabaseConnect - ERROR: no driver " << DRIVER << " available";
 
-    properties=Properties::getInstance();
-    wshandler = new WShandler(this,properties);
-    qRegisterMetaType<Prop>("Prop");
-    connect(properties,&Properties::signalPropCreated,this,&Controller::propCreated);
-    connect(properties,&Properties::signalPropDeleted,this,&Controller::propDeleted);
-    connect(properties,&Properties::signalvalueChanged,this,&Controller::valueChanged);
-
+    wshandler = new WShandler(this);
 
     BOOST_LOG_TRIVIAL(debug) << "Controller warmup";
     BOOST_LOG_TRIVIAL(debug) <<  "ApplicationDirPath :" << QCoreApplication::applicationDirPath().toStdString();
@@ -59,23 +53,6 @@ Controller::~Controller()
     qDeleteAll(m_clients.begin(), m_clients.end());*/
 }
 
-void Controller::valueChanged(Prop prop)
-{
-    wshandler->updateElements(prop);
-}
-void Controller::AppendGraph (Prop prop,OGraph gra,OGraphValue val)
-{
-    wshandler->sendGraphValue(prop,gra,val);
-}
-
-void Controller::propCreated(Prop prop)
-{
-    wshandler->sendmessage("New prop " +  prop.propname);
-}
-void Controller::propDeleted(Prop prop)
-{
-    wshandler->sendmessage("Del prop " +  prop.propname);
-}
 
 void Controller::OnValueChanged(double newValue)
 {
@@ -102,7 +79,7 @@ void Controller::LoadModule(QString lib,QString name,QString label)
                 //mod->echoNameAndLabel();
                 mod->setHostport(_indihost,_indiport);
                 mod->connectIndi();
-                connect(wshandler,&WShandler::changeValue,mod,&Basemodule::changeProp);
+                //connect(wshandler,&WShandler::changeValue,mod,&Basemodule::changeProp);
         } else {
             BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library";
         }

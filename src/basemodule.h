@@ -25,14 +25,12 @@ class Basemodule : public QObject, public INDI::BaseClient
         bool connectIndi(void);
 
 
-        QMap<QString,QString> getModDevices(void);
-        void setDevices(QMap<QString,QString>);
         std::unique_ptr<Image> image =nullptr;
 
         QString _modulename;
         QString _modulelabel;
    public slots:
-        virtual void changeProp(Prop prop) {Q_UNUSED(prop);}
+        //virtual void changeProp(Prop prop) {Q_UNUSED(prop);}
 
     protected:
         //QList<FITSImage::Star> stars;
@@ -48,11 +46,7 @@ class Basemodule : public QObject, public INDI::BaseClient
         bool frameReset(QString devicename);
         void sendMessage(QString message);
 
-        QString _status;
-
-        QMap<QString,QString>     _devices;
-
-        Properties  *properties;
+        //Properties  *properties;
         virtual void serverConnected() {}
         virtual void serverDisconnected(int exit_code)          {Q_UNUSED(exit_code);}
         virtual void newDevice(INDI::BaseDevice *dp)            {Q_UNUSED(dp);}

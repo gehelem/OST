@@ -6,8 +6,6 @@ Basemodule::Basemodule(QString name,QString label)
     :_modulename(name),
       _modulelabel(label)
 {
-    properties=Properties::getInstance();
-    properties->createModule(_modulename,_modulelabel,9);
     setVerbose(false);
 }
 void Basemodule::setNameAndLabel(QString name,QString label)
@@ -49,14 +47,6 @@ bool Basemodule::connectIndi()
         }
     }
 
-}
-QMap<QString,QString> Basemodule::getModDevices(void)
-{
-    return _devices;
-}
-void Basemodule::setDevices(QMap<QString,QString> devices)
-{
-    _devices =devices;
 }
 void Basemodule::sendMessage(QString message)
 {

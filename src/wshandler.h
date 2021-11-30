@@ -14,9 +14,8 @@ class WShandler : public QObject
 {
     Q_OBJECT
 public:
-    WShandler(QObject *parent,Properties *properties);
+    WShandler(QObject *parent);
     ~WShandler();
-    Properties *props;
     QWebSocketServer *m_pWebSocketServer;
     QList<QWebSocket *> m_clients;
 public slots:
@@ -27,14 +26,8 @@ public slots:
     void sendJsonMessage(QJsonObject json);
     void sendbinary(QByteArray *data);
     void socketDisconnected();
-    void sendProperty(Prop prop);
-    void updateElements(Prop prop);
-    void sendElement(Prop prop);
-    void sendGraphValue(Prop prop, OGraph gra, OGraphValue val);
-    void sendAll(void);
 signals:
     void closed();
-    void changeValue(Prop prop);
     void textRcv(QString txt);
 private:
 };

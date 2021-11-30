@@ -264,153 +264,45 @@ typedef struct
     int         order;
 
 } OGraph;
-/**
- * @struct Prop
- * @brief One property descriptor.
- */
-typedef struct
-{
-    /** Module owner internal name */
-    QString     modulename;
-    /** Property internal name */
-    QString     propname;
-    /** Short description */
-    QString     label;
-    /** Property type */
-    propType    typ;
-    /** GUI Category  name */
-    QString     categname;
-    /** GUI Group name */
-    QString     groupname;
-    /** GUI Permission */
-    OPerm       perm;
-    /** Switch behaviour */
-    OSRule      rule;
-    /** Current max time to change, secs */
-    double      timeout;
-    /** Current property state */
-    OPState     state;
-    /** Helper info */
-    QString     aux0;
-    /** Helper info */
-    QString     aux1;
-    /** GUI order */
-    int         order;
-
-    /** Text elements */
-    QMap<QString,OText>     t;
-    /** Number elements */
-    QMap<QString,ONumber>   n;
-    /** Switchs elements */
-    QMap<QString,OSwitch>   s;
-    /** Light elements */
-    QMap<QString,OLight>    l;
-    /** Message elements */
-    QMap<QString,OMessage>  m;
-    /** Image elements */
-    QMap<QString,OImage>    i;
-    /** Graph elements */
-    QMap<QString,OGraph>    g;
-} Prop;
-
-Q_DECLARE_METATYPE(Prop)
-
-typedef struct
-{
-    QString                 groupname;
-    QString                 grouplabel;
-    QString                 modulename;
-    QString                 categname;
-    int                     order;
-}  Group;
 
 
 
-typedef struct
-{
-    QString                 categname;
-    QString                 categlabel;
-    QString                 modulename;
-    int                     order;
-}  Devcat;
 
-typedef struct
-{
-    QString                 modulename;
-    QString                 modulelabel;
-    int                     order;
-    QMap<QString,Devcat>    devcats;
-    QMap<QString,Group>     groups;
-    QMap<QString,Prop>      props;
-}  Mod;
-
-class Properties : public QObject
-{
-  Q_OBJECT
+class Devcat : public QObject {
+Q_OBJECT
 public:
-    //Properties(QObject *parent = Q_NULLPTR);
-    //~Properties() = default;
-    /* Singleton : Static access method. */
-    static Properties* getInstance();
-    void    createModule(QString modulename,  QString modulelabel,int order);
-    void    deleteModule(QString modulename);
+    Devcat( QString name, QString label,QObject* parent = nullptr)
+        : QObject(parent), _name(name), _label(label){setObjectName(name);}
+    virtual ~Devcat() = default;
 
-    void    createDevcat(QString modulename,QString categname,  QString categlabel,int order);
-    void    deleteDevcat(QString modulename,QString categname);
-
-    void    createGroup(QString modulename,QString categname, QString groupname,  QString grouplabel,int order);
-    void    deleteGroup(QString modulename,QString categname, QString groupname);
-
-    void    createProp (QString modulename, QString propname, Prop    prop);
-    void    createProp (QString modulename,QString propname,QString label,propType typ,QString categname,QString groupname,OPerm perm,OSRule rule,double timeout,OPState state,QString aux0,QString aux1,int order);
-    void    deleteProp (QString modulename,QString propname);
-    Prop    getProp    (QString modulename,QString propname);
-    void    setProp    (QString modulename,QString propname,Prop    prop);
-    void    emitProp   (QString modulename,QString propname);
-
-    void    appendElt  (QString modulename,QString propname,  QString txtname, QString text     , QString label, QString aux0,QString aux1);
-    void    appendElt  (QString modulename,QString propname,  QString numname, double  num      , QString label, QString aux0,QString aux1);
-    void    appendElt  (QString modulename,QString propname,  QString swtname, OSState swt      , QString label, QString aux0,QString aux1);
-    void    appendElt  (QString modulename,QString propname,  QString lgtname, OPState lgt      , QString label, QString aux0,QString aux1);
-    void    appendElt  (QString modulename,QString propname,  QString imgname, OImgType imt     , QString label, QString aux0,QString aux1, QString url, QString file);
-    void    appendElt  (QString modulename,QString propname,  QString graname, OGraph graph     );
-    void    appendGra  (QString modulename,QString propname,  QString graname, OGraphValue val  );
-    void    resetGra   (QString modulename,QString propname,  QString graname);
-    void    deleteElt  (QString modulename,QString propname,  QString eltname);
-    void    setElt     (QString modulename,QString propname,  QString txtname, QString text);
-    void    setElt     (QString modulename,QString propname,  QString numname, double  num);
-    void    setElt     (QString modulename,QString propname,  QString swtname, OSState swt);
-    void    setElt     (QString modulename,QString propname,  QString lgtname, OPState lgt);
-    void    setElt     (QString modulename,QString propname,  QString imgname, QString url, QString file);
-    void    setElt     (QString modulename,QString propname,  QString graname, OGraph  graph);
-    QString getTxt     (QString modulename,QString propname,  QString txtname);
-    double  getNum     (QString modulename,QString propname,  QString numname);
-    OSState getSwt     (QString modulename,QString propname,  QString swtname);
-    OPState getLgt     (QString modulename,QString propname,  QString lgtname);
-    OImage  getImg     (QString modulename,QString propname,  QString imgname);
-    OGraph  getGraph   (QString modulename,QString propname,  QString graname);
-    QMap<QString,Mod> getModules(void)    {return modules;}
-    Mod     getModule(QString modulename) {return modules[modulename];}
-    Devcat  getDevcat(QString modulename,QString devcatname) {return modules[modulename].devcats[devcatname];}
-    Group   getGroup(QString modulename,QString groupname) {return modules[modulename].groups[groupname];}
-
-
-    //QJsonObject getJsonProp(QString modulename,QString propname, QString modulename);
-    void    dumproperties(void);
-signals:
-    void    signalPropCreated (Prop prop);
-    void    signalPropDeleted (Prop prop);
-    void    signalGroupDeleted (Group group);
-    void    signalvalueChanged(Prop prop);
-    void    signalAppendGraph (Prop prop,OGraph gra,OGraphValue val);
+    [[nodiscard]] inline const QString &getName() const { return _name; }
+    [[nodiscard]] inline const QString &getLabel() const { return _label; }
 private:
-    QMap<QString,Mod>   modules;
-    /* Private constructor to prevent instancing. */
-    Properties(QObject *parent = Q_NULLPTR);
-    ~Properties() = default;
-    /* Singleton instance storage. */
-    static Properties* instance;
+    QString _name;
+    QString _label;
 };
 
+
+class Property : public QObject {
+Q_OBJECT
+public:
+    Property( QString name, QString label, int permission, int state,QObject* parent = nullptr);
+    virtual ~Property() = default;
+
+    [[nodiscard]] inline const QString &getName() const { return _name; }
+    [[nodiscard]] inline const QString &getLabel() const { return _label; }
+    [[nodiscard]] inline int getPermission() const { return _permission; }
+    [[nodiscard]] inline int getState() const { return _state; }
+private:
+    QString _name;
+    QString _label;
+    int _permission;
+    int _state;
+signals:
+    void propertyCreated(Property *prop)    ;
+    void propertyModified(Property *prop)    ;
+    void propertyDeleted(Property *prop)    ;
+
+};
 
 #endif // PROPERTIES_H

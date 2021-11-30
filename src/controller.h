@@ -25,15 +25,10 @@ class Controller : public QObject
 public:
     Controller(QObject *parent, bool saveAllBlobs, const QString& host, int port);
     ~Controller() override;
-    Properties  *properties;
     WShandler   *wshandler;
 public slots:
     void OnValueChanged(double newValue);
     //void OnValueChanged(QString newValue);
-    void valueChanged(Prop prop);
-    void AppendGraph (Prop prop,OGraph gra,OGraphValue val);
-    void propCreated (Prop prop);
-    void propDeleted (Prop prop);
 
 signals:
     void closed();
