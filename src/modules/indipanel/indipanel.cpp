@@ -58,28 +58,72 @@ void IndiPanel::newProperty(INDI::Property *pProperty)
 
 void IndiPanel::removeProperty(INDI::Property *property)
 {
+    switch (property->getType()) {
+
+        case INDI_NUMBER: {
+            emit propertyRemoved(PropertyFactory::createProperty(property->getNumber()),&_modulename);
+            _propertyStore.remove(PropertyFactory::createProperty(property->getNumber()));
+            break;
+        }
+
+        case INDI_SWITCH: {
+            emit propertyRemoved(PropertyFactory::createProperty(property->getSwitch()),&_modulename);
+            _propertyStore.remove(PropertyFactory::createProperty(property->getSwitch()));
+            break;
+        }
+
+        case INDI_TEXT: {
+            emit propertyRemoved(PropertyFactory::createProperty(property->getText()),&_modulename);
+            _propertyStore.remove(PropertyFactory::createProperty(property->getText()));
+            break;
+        }
+
+        case INDI_LIGHT: {
+            emit propertyRemoved( PropertyFactory::createProperty(property->getLight()),&_modulename);
+            _propertyStore.remove(PropertyFactory::createProperty(property->getLight()));
+            break;
+        }
+
+        default:
+            break;
+    }
 }
 
 void IndiPanel::newNumber(INumberVectorProperty *nvp)
 {
+    _propertyStore.update(PropertyFactory::createProperty(nvp));
+    emit propertyUpdated(PropertyFactory::createProperty(nvp),&_modulename);
 }
 
 void IndiPanel::newText(ITextVectorProperty *tvp)
 {
+    _propertyStore.update(PropertyFactory::createProperty(tvp));
+    emit propertyUpdated(PropertyFactory::createProperty(tvp),&_modulename);
 }
 
 void IndiPanel::newLight(ILightVectorProperty *lvp)
 {
+    _propertyStore.update(PropertyFactory::createProperty(lvp));
+    emit propertyUpdated(PropertyFactory::createProperty(lvp),&_modulename);
 }
 
 
 void IndiPanel::newSwitch(ISwitchVectorProperty *svp)
 {
+    _propertyStore.update(PropertyFactory::createProperty(svp));
+    emit propertyUpdated(PropertyFactory::createProperty(svp),&_modulename);
 }
 
 void IndiPanel::newBLOB(IBLOB *bp)
 {
 }
 
+void IndiPanel::newMessage     (INDI::BaseDevice *dp, int messageID)
+{
+    QString mess= QString::fromStdString(dp->messageQueue(messageID));
+    QString dev = QString::fromStdString(dp->getDeviceName());
+    dev.replace(" ","");
+    emit newMessageSent(mess,&_modulename,&dev);
+}
 
 

@@ -20,9 +20,12 @@
             <button onClick="sendMessage();">Send</button>
          </p>
         <p>
-            <textarea id="debugTextArea" style="width:800px;height:50px;"></textarea>
-            <textarea id="debuginput" style="width:800px;height:50px;"></textarea>
-            <textarea id="debugoutput" style="width:800px;height:50px;"></textarea>
+            DEBUG
+            <textarea id="debugTextArea" style="width:800px;height:50px;">DEBUG</textarea><br>
+			INPUT
+            <textarea id="debuginput" style="width:800px;height:50px;">INPUT</textarea><br>
+			OUTPUT
+            <textarea id="debugoutput" style="width:800px;height:50px;">OUTPUT</textarea><br>
         </p>
 </div>
 <div id="OST">
@@ -42,7 +45,6 @@
             function debug(message) {
                 debugTextArea.value += message + "\n";
                 debugTextArea.scrollTop = debugTextArea.scrollHeight;
-                debuginput.value = message;
             }
 
             function sendMessage() {
@@ -269,10 +271,10 @@
 
                     websocket.onmessage = function (evt) {
                         console.log( "Message received :", evt.data );
-                        //debug ("BEGIN-------------------------------------------------");
-                        //debug (evt.data);
-                        //debug ("END  -------------------------------------------------");
-                        debuginput.value = evt.data;
+                        debug ("BEGIN-------------------------------------------------");
+                        debug (evt.data);
+                        debug ("END  -------------------------------------------------");
+                        debuginput.value = evt.data +"\n";
                         var obj = jQuery.parseJSON( evt.data );
 
                         if (obj.message == 'updateproperty') {

@@ -32,17 +32,14 @@ bool Basemodule::connectIndi()
     if (isServerConnected())
     {
         sendMessage("Indi server already connected");
-        BOOST_LOG_TRIVIAL(debug) << "Indi server already connected";
         newUniversalMessage("Indi server already connected");
         return true;
     } else {
         if (connectServer()){
-            BOOST_LOG_TRIVIAL(debug) << "Indi server connected";
             newUniversalMessage("Indi server connected");
             sendMessage("Indi server connected");
             return true;
         } else {
-            BOOST_LOG_TRIVIAL(debug) << "Couldn't connect to Indi server";
             sendMessage("Couldn't connect to Indi server");
             return false;
         }
@@ -52,8 +49,8 @@ bool Basemodule::connectIndi()
 void Basemodule::sendMessage(QString message)
 {
     QString mess = QDateTime::currentDateTime().toString("[yyyyMMdd hh:mm:ss.zzz]") + " - " + _modulename + " - " + message;
-    BOOST_LOG_TRIVIAL(debug) << mess.toStdString();
-    emit newMessage(mess);
+    BOOST_LOG_TRIVIAL(debug) << message.toStdString();
+    emit newMessageSent(mess,&_modulename,&_modulename);
 }
 
 bool Basemodule::disconnectIndi(void)

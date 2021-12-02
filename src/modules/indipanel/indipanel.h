@@ -27,6 +27,8 @@ class MODULE_INIT IndiPanel : public Basemodule
         void newLight       (ILightVectorProperty *lvp) override;
         void newBLOB        (IBLOB *bp) override;
         void newSwitch      (ISwitchVectorProperty *svp) override;
+        void newMessage     (INDI::BaseDevice *dp, int messageID) override;
+
 };
 
 extern "C" MODULE_INIT IndiPanel *initialize(QString name,QString label);

@@ -76,9 +76,9 @@ class Basemodule : public QObject, public INDI::BaseClient
         void propertyCreated(Property* pProperty, QString* pModulename);
         void propertyUpdated(Property* pProperty, QString* pModulename);
         void propertyRemoved(Property* pProperty, QString* pModulename);
+        void newMessageSent(QString message,      QString* pModulename, QString* pDevice);
 
         void finished();
-        void newMessage(QString message);
         void statusChanged(const QString &newStatus);
         void askedFrameReset(QString devicename);
 }

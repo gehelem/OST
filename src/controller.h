@@ -26,9 +26,10 @@ public:
     ~Controller() override;
     WShandler   *wshandler;
 public slots:
-    void OnValueChanged(double newValue);
-    //void OnValueChanged(QString newValue);
     void OnPropertyCreated(Property *pProperty, QString *pModulename);
+    void OnPropertyUpdated(Property *pProperty, QString *pModulename);
+    void OnPropertyRemoved(Property *pProperty, QString *pModulename);
+    void OnNewMessageSent(QString message, QString *pModulename, QString *pDevice);
 
 signals:
     void closed();
