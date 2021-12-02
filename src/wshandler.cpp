@@ -24,6 +24,33 @@ WShandler::~WShandler()
     qDeleteAll(m_clients.begin(), m_clients.end());
 }
 
+void WShandler::OnPropertyCreated(Property *pProperty, QString *pModulename)
+{
+    JSonDumper jsonDumper;
+    pProperty->accept(&jsonDumper);
+    BOOST_LOG_TRIVIAL(debug) << "JSON : " << jsonDumper.getResult().toStdString();
+    QJsonObject  obj;
+    obj["event"]="createproperty";
+    obj["module"]=*pModulename;
+    obj["property"]=jsonDumper.getJsonResult();
+    sendJsonMessage(obj);
+
+//    QJsonObject json = dumpPropertyCommons(pProperty);
+//    json["rule"] = pProperty->getRule();
+//    QJsonArray jsonSwitches;
+//    for( const SwitchValue* pSwitch : pProperty->getSwitches() ) {
+//        QJsonObject jsonSwitch;
+//        jsonSwitch["name"] = pSwitch->name();
+//        jsonSwitch["label"] = pSwitch->label();
+//        jsonSwitch["state"] = pSwitch->switchState();
+//        jsonSwitches.append(jsonSwitch);
+//    }
+//    json["switches"] = jsonSwitches;
+//    QJsonDocument doc(json);
+//    _result = doc.toJson(QJsonDocument::Compact).toStdString();
+
+
+}
 
 void WShandler::sendmessage(QString message)
 {

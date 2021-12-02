@@ -22,7 +22,8 @@ void JSonDumper::visit(NumberProperty *pProperty) {
     }
     json["numbers"] = jsonNumbers;
     QJsonDocument doc(json);
-    _result = doc.toJson(QJsonDocument::Compact).toStdString();
+    _jsonResult = json;
+    _result = doc.toJson(QJsonDocument::Compact);
 }
 
 void JSonDumper::visit(SwitchProperty *pProperty) {
@@ -38,7 +39,8 @@ void JSonDumper::visit(SwitchProperty *pProperty) {
     }
     json["switches"] = jsonSwitches;
     QJsonDocument doc(json);
-    _result = doc.toJson(QJsonDocument::Compact).toStdString();
+    _jsonResult = json;
+    _result = doc.toJson(QJsonDocument::Compact);
 }
 
 void JSonDumper::visit(TextProperty *pProperty) {
@@ -53,7 +55,8 @@ void JSonDumper::visit(TextProperty *pProperty) {
     }
     json["texts"] = jsonTexts;
     QJsonDocument doc(json);
-    _result = doc.toJson(QJsonDocument::Compact).toStdString();
+    _jsonResult = json;
+    _result = doc.toJson(QJsonDocument::Compact);
 }
 
 void JSonDumper::visit(LightProperty *pProperty) {
@@ -68,7 +71,8 @@ void JSonDumper::visit(LightProperty *pProperty) {
     }
     json["lights"] = jsonLights;
     QJsonDocument doc(json);
-    _result = doc.toJson(QJsonDocument::Compact).toStdString();
+    _jsonResult = json;
+    _result = doc.toJson(QJsonDocument::Compact);
 }
 
 QJsonObject JSonDumper::dumpPropertyCommons(Property *pProperty) {
@@ -77,6 +81,8 @@ QJsonObject JSonDumper::dumpPropertyCommons(Property *pProperty) {
 
     json["deviceName"] = pProperty->getDeviceName();
     json["groupName"] = pProperty->getGroupName();
+    json["deviceNameShort"] = pProperty->getDeviceNameShort();
+    json["groupNameShort"] = pProperty->getGroupNameShort();
     json["name"] = pProperty->getName();
     json["label"] = pProperty->getLabel();
     json["permission"] = pProperty->getPermission();

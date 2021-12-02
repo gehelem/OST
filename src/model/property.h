@@ -31,6 +31,8 @@ public:
 
     [[nodiscard]] inline const QString &getDeviceName() const { return _deviceName; }
     [[nodiscard]] inline const QString &getGroupName() const { return _groupName; }
+    [[nodiscard]] inline const QString &getDeviceNameShort() const { return _deviceNameShort; }
+    [[nodiscard]] inline const QString &getGroupNameShort() const { return _groupNameShort; }
     [[nodiscard]] inline const QString &getName() const { return _name; }
     [[nodiscard]] inline const QString &getLabel() const { return _label; }
     [[nodiscard]] inline int getPermission() const { return _permission; }

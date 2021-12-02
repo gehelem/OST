@@ -27,23 +27,26 @@ void IndiPanel::newProperty(INDI::Property *pProperty)
     switch (pProperty->getType()) {
 
         case INDI_NUMBER: {
-            emit propertyCreated(PropertyFactory::createProperty(pProperty->getNumber()));
+            emit propertyCreated(PropertyFactory::createProperty(pProperty->getNumber()),&_modulename);
             _propertyStore.add(PropertyFactory::createProperty(pProperty->getNumber()));
             break;
         }
 
         case INDI_SWITCH: {
-            emit propertyCreated(PropertyFactory::createProperty(pProperty->getSwitch()));
+            emit propertyCreated(PropertyFactory::createProperty(pProperty->getSwitch()),&_modulename);
+            _propertyStore.add(PropertyFactory::createProperty(pProperty->getSwitch()));
             break;
         }
 
         case INDI_TEXT: {
-            emit propertyCreated(PropertyFactory::createProperty(pProperty->getText()));
+            emit propertyCreated(PropertyFactory::createProperty(pProperty->getText()),&_modulename);
+            _propertyStore.add(PropertyFactory::createProperty(pProperty->getText()));
             break;
         }
 
         case INDI_LIGHT: {
-            emit propertyCreated( PropertyFactory::createProperty(pProperty->getLight()));
+            emit propertyCreated( PropertyFactory::createProperty(pProperty->getLight()),&_modulename);
+            _propertyStore.add(PropertyFactory::createProperty(pProperty->getLight()));
             break;
         }
 

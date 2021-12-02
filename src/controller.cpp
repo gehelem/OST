@@ -80,6 +80,7 @@ void Controller::LoadModule(QString lib,QString name,QString label)
                 mod->setHostport(_indihost,_indiport);
                 mod->connectIndi();
                 connect(mod,&Basemodule::propertyCreated,this,&Controller::OnPropertyCreated);
+                connect(mod,&Basemodule::propertyCreated,wshandler,&WShandler::OnPropertyCreated);
                 //connect(wshandler,&WShandler::changeValue,mod,&Basemodule::changeProp);
         } else {
             BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library";
@@ -87,10 +88,10 @@ void Controller::LoadModule(QString lib,QString name,QString label)
     }
 }
 
-void Controller::OnPropertyCreated(Property *pProperty)
+void Controller::OnPropertyCreated(Property *pProperty, QString *pModulename)
 {
     PropertyTextDumper textDumper;
     pProperty->accept(&textDumper);
-    BOOST_LOG_TRIVIAL(debug) << "CREATED " << textDumper.getResult();
+    BOOST_LOG_TRIVIAL(debug) << "MODULE " << pModulename->toStdString() <<"CREATED " << textDumper.getResult();
 }
 

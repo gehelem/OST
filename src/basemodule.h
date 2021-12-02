@@ -73,9 +73,9 @@ class Basemodule : public QObject, public INDI::BaseClient
 
 
     signals:
-        void propertyCreated(Property* pProperty);
-        void propertyUpdated(Property* pProperty);
-        void propertyRemoved(Property* pProperty);
+        void propertyCreated(Property* pProperty, QString* pModulename);
+        void propertyUpdated(Property* pProperty, QString* pModulename);
+        void propertyRemoved(Property* pProperty, QString* pModulename);
 
         void finished();
         void newMessage(QString message);

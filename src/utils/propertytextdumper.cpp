@@ -9,6 +9,8 @@ std::string PropertyTextDumper::dumpPropertyCommons(Property *pProperty) {
     std::stringstream stream;
     stream << "Device=" << pProperty->getDeviceName().toStdString()
            << ". Group=" << pProperty->getGroupName().toStdString()
+           << ". DeviceShort=" << pProperty->getDeviceNameShort().toStdString()
+           << ". GroupShort=" << pProperty->getGroupNameShort().toStdString()
            << ". Name=" << pProperty->getName().toStdString()
            << ". Label=" << pProperty->getLabel().toStdString()
            << ". Permission=" << _permsToNamesMap[pProperty->getPermission()] << "(" << pProperty->getPermission() << ")"

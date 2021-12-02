@@ -2,6 +2,9 @@
 #define WSHANDLER_h_
 #include "QtWebSockets/qwebsocketserver.h"
 #include "QtWebSockets/qwebsocket.h"
+#include <utils/jsondumper.h>
+#include "model/property.h"
+
 QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
 QT_FORWARD_DECLARE_CLASS(QWebSocket)
 /*!
@@ -18,6 +21,7 @@ public:
     QWebSocketServer *m_pWebSocketServer;
     QList<QWebSocket *> m_clients;
 public slots:
+    void OnPropertyCreated(Property *pProperty, QString *pModulename);
     void onNewConnection();
     void processTextMessage(QString message);
     void processBinaryMessage(QByteArray message);

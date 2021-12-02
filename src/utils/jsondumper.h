@@ -14,12 +14,14 @@ public:
     void visit(TextProperty *pProperty) override;
     void visit(LightProperty *pProperty) override;
 
-    [[nodiscard]] inline const std::string& getResult() const { return _result; }
+    [[nodiscard]] inline const QString& getResult() const { return _result; }
+    [[nodiscard]] inline const QJsonObject& getJsonResult() const { return _jsonResult; }
 
 private:
-    std::string _result;
-
+    QString _result;
+    QJsonObject _jsonResult;
     QJsonObject dumpPropertyCommons(Property* pProperty);
+
 };
 
 

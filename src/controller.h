@@ -28,7 +28,7 @@ public:
 public slots:
     void OnValueChanged(double newValue);
     //void OnValueChanged(QString newValue);
-    void OnPropertyCreated(Property *pProperty);
+    void OnPropertyCreated(Property *pProperty, QString *pModulename);
 
 signals:
     void closed();
