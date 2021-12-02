@@ -25,13 +25,15 @@ MainControl::MainControl(QString name,QString label)
 //        properties->appendElt(_modulename,"loadmodule",lib,OSState::OSS_OFF,lib,"","");
 //    }
     Devcat *cat = new Devcat("testdev","device de test",this);
-    Property *test;
-    connect(test,&Property::propertyCreated,this,&MainControl::OnPropertyCreated);
-    test = new Property("testprop","test de propriété",0,0,this);
+    CreateProperty("testprop","test de propriété",0,0,this);
+    //connect(test,&Property::propertyCreated,this,&MainControl::OnPropertyCreated);
+    //test->emitProp();
 
-    Property *test2 = new Property("testprop","test de propriété dupliquée",0,0,this);
-    Property *test3 = new Property("testpropdev","test de propriété sur dev",0,0,cat);
-    Property *test4 = new Property("testprop","test de propriété pas vraiment dupliquée",0,0,cat);
+    CreateProperty("testprop","test de propriété dupliquée",0,0,this);
+    CreateProperty("testpropdev","test de propriété sur dev",0,0,cat);
+    CreateProperty("testprop","test de propriété pas vraiment dupliquée",0,0,cat);
+    //connect(test4,&Property::propertyCreated,this,&MainControl::OnPropertyCreated);
+    //test4->emitProp();
     QObjectList children = this->children();
     for (int i = 0; i < children.length(); i++)
     {

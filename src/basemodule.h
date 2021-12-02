@@ -24,13 +24,17 @@ class Basemodule : public QObject, public INDI::BaseClient
         void setHostport(QString host, int port);
         bool connectIndi(void);
 
-
         std::unique_ptr<Image> image =nullptr;
 
         QString _modulename;
         QString _modulelabel;
+        void CreateProperty( QString name, QString label, int permission, int state,QObject* parent = nullptr);
+
    public slots:
         //virtual void changeProp(Prop prop) {Q_UNUSED(prop);}
+    void OnPropertyCreated (Property *prop) {BOOST_LOG_TRIVIAL(debug) << "prop created " << prop->getName().toStdString()<< "-" << prop->getLabel().toStdString();}
+    void OnPropertyDeleted (Property *prop) {BOOST_LOG_TRIVIAL(debug) << "prop deleted " << prop->getName().toStdString()<< "-" << prop->getLabel().toStdString();}
+    void OnPropertyModified(Property *prop) {BOOST_LOG_TRIVIAL(debug) << "prop modified " << prop->getName().toStdString()<< "-" << prop->getLabel().toStdString();}
 
     protected:
         //QList<FITSImage::Star> stars;
