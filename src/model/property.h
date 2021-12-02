@@ -10,11 +10,16 @@ Q_OBJECT
 protected:
     Property(QString deviceName, QString groupName, QString name, QString label,
              int permission, int state, QObject* parent = nullptr)
-    : QObject(parent), _deviceName(deviceName), _groupName(groupName), _name(name), _label(label),
+    : QObject(parent),
+      _deviceName(deviceName), _groupName(groupName),
+      _deviceNameShort(deviceName.replace(" ","")), _groupNameShort(groupName.replace(" ","")),
+      _name(name), _label(label),
     _permission(permission), _state(state) {}
 
     QString _deviceName;
     QString _groupName;
+    QString _deviceNameShort;
+    QString _groupNameShort;
     QString _name;
     QString _label;
     int _permission;

@@ -24,40 +24,16 @@ MainControl::MainControl(QString name,QString label)
 //        BOOST_LOG_TRIVIAL(debug) << "Module lib found " << lib.toStdString();
 //        properties->appendElt(_modulename,"loadmodule",lib,OSState::OSS_OFF,lib,"","");
 //    }
-    Devcat *cat = new Devcat("testdev","device de test",this);
-    CreateProperty("testprop","test de propriété",0,0,this);
-    //connect(test,&Property::propertyCreated,this,&MainControl::OnPropertyCreated);
-    //test->emitProp();
 
-    CreateProperty("testprop","test de propriété dupliquée",0,0,this);
-    CreateProperty("testpropdev","test de propriété sur dev",0,0,cat);
-    CreateProperty("testprop","test de propriété pas vraiment dupliquée",0,0,cat);
-    //connect(test4,&Property::propertyCreated,this,&MainControl::OnPropertyCreated);
-    //test4->emitProp();
-    QObjectList children = this->children();
-    for (int i = 0; i < children.length(); i++)
-    {
-        BOOST_LOG_TRIVIAL(debug) << "childrens of maincontrol : " << children[i]->metaObject()->className() << "-" << children[i]->objectName().toStdString() << "-" ;//<< ((Property)(*children[i])).getLabel().toStdString();
-        if (strcmp(children[i]->metaObject()->className(),"Devcat")==0)
-        {
-            BOOST_LOG_TRIVIAL(debug) << "childrens of children : ohoh, let's check... " ;
-            QObjectList children2 = children[i]->children();
-            for (int i = 0; i < children2.length(); i++)
-            {
-                BOOST_LOG_TRIVIAL(debug) << "childrens of children : " << children2[i]->metaObject()->className() << "-" << children2[i]->objectName().toStdString();
-
-            }
-
-
-        }
-    }
 }
 
 MainControl::~MainControl()
 {
 
 }
-
+void MainControl::newProperty(INDI::Property *pProperty)
+{
+}
 
 
 

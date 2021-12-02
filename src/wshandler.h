@@ -4,7 +4,6 @@
 #include "QtWebSockets/qwebsocket.h"
 QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
 QT_FORWARD_DECLARE_CLASS(QWebSocket)
-#include "properties.h"
 /*!
  * Websocket management
  * open/close/send/receives sockets

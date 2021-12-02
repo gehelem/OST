@@ -15,8 +15,6 @@ class MODULE_INIT IndiPanel : public Basemodule
     public:
         IndiPanel(QString name,QString label);
         ~IndiPanel();
-    public slots:
-        void changeProp(Prop prop) override;
     signals:
         void valueChanged(const double &newValue);
     private:
@@ -29,7 +27,6 @@ class MODULE_INIT IndiPanel : public Basemodule
         void newLight       (ILightVectorProperty *lvp) override;
         void newBLOB        (IBLOB *bp) override;
         void newSwitch      (ISwitchVectorProperty *svp) override;
-        ISState transw(OSState osw);
 };
 
 extern "C" MODULE_INIT IndiPanel *initialize(QString name,QString label);

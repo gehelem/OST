@@ -9,6 +9,7 @@ class MainControl : public Basemodule
     public:
         MainControl(QString name,QString label);
         ~MainControl();
+        void newProperty(INDI::Property*) override;
     signals:
         void valueChanged(const double &newValue);
     private:

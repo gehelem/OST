@@ -7,7 +7,13 @@
 #include <baseclient.h>
 #include <boost/log/trivial.hpp>
 #include "image.h"
-#include "properties.h"
+#include <model/setup.h>
+#include <utils/propertytextdumper.h>
+#include <model/propertystore.h>
+#include "utils/propertyfactory.h"
+
+class Property;
+
 /*!
  * This Class shouldn't be used as is
  * Every functionnal module should inherit it
@@ -28,13 +34,12 @@ class Basemodule : public QObject, public INDI::BaseClient
 
         QString _modulename;
         QString _modulelabel;
-        void CreateProperty( QString name, QString label, int permission, int state,QObject* parent = nullptr);
 
    public slots:
         //virtual void changeProp(Prop prop) {Q_UNUSED(prop);}
-    void OnPropertyCreated (Property *prop) {BOOST_LOG_TRIVIAL(debug) << "prop created " << prop->getName().toStdString()<< "-" << prop->getLabel().toStdString();}
-    void OnPropertyDeleted (Property *prop) {BOOST_LOG_TRIVIAL(debug) << "prop deleted " << prop->getName().toStdString()<< "-" << prop->getLabel().toStdString();}
-    void OnPropertyModified(Property *prop) {BOOST_LOG_TRIVIAL(debug) << "prop modified " << prop->getName().toStdString()<< "-" << prop->getLabel().toStdString();}
+    //void OnPropertyCreated (Property *prop) {BOOST_LOG_TRIVIAL(debug) << "prop created " << prop->getName().toStdString()<< "-" << prop->getLabel().toStdString();}
+    //void OnPropertyDeleted (Property *prop) {BOOST_LOG_TRIVIAL(debug) << "prop deleted " << prop->getName().toStdString()<< "-" << prop->getLabel().toStdString();}
+    //void OnPropertyModified(Property *prop) {BOOST_LOG_TRIVIAL(debug) << "prop modified " << prop->getName().toStdString()<< "-" << prop->getLabel().toStdString();}
 
     protected:
         //QList<FITSImage::Star> stars;
@@ -50,7 +55,8 @@ class Basemodule : public QObject, public INDI::BaseClient
         bool frameReset(QString devicename);
         void sendMessage(QString message);
 
-        //Properties  *properties;
+        PropertyStore _propertyStore;
+
         virtual void serverConnected() {}
         virtual void serverDisconnected(int exit_code)          {Q_UNUSED(exit_code);}
         virtual void newDevice(INDI::BaseDevice *dp)            {Q_UNUSED(dp);}
@@ -67,11 +73,14 @@ class Basemodule : public QObject, public INDI::BaseClient
 
 
     signals:
+        void propertyCreated(Property* pProperty);
+        void propertyUpdated(Property* pProperty);
+        void propertyRemoved(Property* pProperty);
+
         void finished();
         void newMessage(QString message);
         void statusChanged(const QString &newStatus);
         void askedFrameReset(QString devicename);
-    private:
 }
 ;
 #endif

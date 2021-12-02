@@ -10,7 +10,6 @@
 
 
 #include "wshandler.h"
-#include "properties.h"
 #include "maincontrol.h"
 
 /*!
@@ -29,6 +28,7 @@ public:
 public slots:
     void OnValueChanged(double newValue);
     //void OnValueChanged(QString newValue);
+    void OnPropertyCreated(Property *pProperty);
 
 signals:
     void closed();

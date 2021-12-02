@@ -20,17 +20,6 @@ void Basemodule::setHostport(QString host, int port)
     setServer(host.toStdString().c_str(), port);
 }
 
-void Basemodule::CreateProperty( QString name, QString label, int permission, int state,QObject* parent)
-{
-    Property *prop = new Property(name,label,permission,state,parent);
-    prop->setObjectName(name);
-    connect(prop,&Property::propertyCreated ,this,&Basemodule::OnPropertyCreated); // this is useless :-(
-    OnPropertyCreated(prop);                                                       // and this is ugly
-    connect(prop,&Property::propertyDeleted ,this,&Basemodule::OnPropertyDeleted);
-    connect(prop,&Property::propertyModified,this,&Basemodule::OnPropertyModified);
-}
-
-
 /*!
  * Connects to indi server
  * Should we add host/port ??
@@ -63,7 +52,7 @@ bool Basemodule::connectIndi()
 void Basemodule::sendMessage(QString message)
 {
     QString mess = QDateTime::currentDateTime().toString("[yyyyMMdd hh:mm:ss.zzz]") + " - " + _modulename + " - " + message;
-    qDebug() << mess.toStdString().c_str();
+    BOOST_LOG_TRIVIAL(debug) << mess.toStdString();
     emit newMessage(mess);
 }
 
