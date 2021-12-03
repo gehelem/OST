@@ -155,6 +155,45 @@ void WShandler::socketDisconnected()
         pClient->deleteLater();
     }
 }
+void WShandler::OnModuleDumped(QMap<QString, QMap<QString, QMap<QString, Property *> > > treeList, QString* pModulename, QString* pModulelabel)
+{
+    QJsonObject  obj;
+    obj["event"]="moduledump";
+    obj["module"]=*pModulename;
+    obj["modulelabel"]=*pModulelabel;
+
+    QJsonArray devices;
+    for ( const QString& device : treeList.keys() ) {
+        QJsonObject  dev;
+        QString devshort =device;
+        dev["devicename"]=device;
+        dev["devicenameshort"]=devshort.replace(" ","");
+
+
+        QJsonArray groups;
+        for ( const QString& group : treeList[device].keys() ) {
+            QJsonObject  gro;
+            QString groupshort=group;
+            gro["groupname"]=group;
+            gro["groupnameshort"]=groupshort.replace(" ","");
+            QJsonArray props;
+            for ( const QString& property : treeList[device][group].keys() ) {
+                JSonDumper jsonDumper;
+
+                treeList[device][group][property]->accept(&jsonDumper);
+                QJsonObject pro = jsonDumper.getJsonResult();
+                props.append(pro);
+            }
+            gro["properties"]=props;
+            groups.append(gro);
+        }
+        dev["groups"]=groups;
+        devices.append(dev);
+
+    }
+    obj["devices"]=devices;
+    sendJsonMessage(obj);
+}
 
 
 
