@@ -55,7 +55,7 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
     }
 
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focuser1","focuser 1");
-    //LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel1","indipanel 1");
+    LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel1","indipanel 1");
 
 }
 
@@ -126,12 +126,20 @@ void Controller::OnNewMessageSent(QString message, QString *pModulename, QString
 {
     BOOST_LOG_TRIVIAL(debug) << "MODULE " << pModulename->toStdString() << " DEVICE  "<< Device.toStdString() << " MESSAGE " << message.toStdString();
 }
-void Controller::OnModuleDumped(QList<Property *> list, QString* pModulename, QString* pModulelabel)
+void Controller::OnModuleDumped(QMap<QString, QMap<QString, QMap<QString, Property *> > > treeList, QString* pModulename, QString* pModulelabel)
 {
-    BOOST_LOG_TRIVIAL(debug) << "MODULE DUMPED" << pModulename->toStdString() << " size " << list.size();
-    for (int i = 0; i < list.size(); ++i) {
-            PropertyTextDumper textDumper;
-            list.at(i)->accept(&textDumper);
-            BOOST_LOG_TRIVIAL(debug) << "MODULE " << pModulename->toStdString() <<" DUMPED" << textDumper.getResult();
+    BOOST_LOG_TRIVIAL(debug) << "MODULE DUMPED " << pModulename->toStdString() << " size " << treeList.size();
+
+    for ( const QString& device : treeList.keys() ) {
+        BOOST_LOG_TRIVIAL(debug) << "MODULE DUMPED " << pModulename->toStdString() << " device " << device.toStdString();
+        for ( const QString& group : treeList[device].keys() ) {
+            BOOST_LOG_TRIVIAL(debug) << "MODULE DUMPED " << pModulename->toStdString() << " device " << device.toStdString() << " group " << group.toStdString();
+            for ( const QString& property : treeList[device][group].keys() ) {
+                //BOOST_LOG_TRIVIAL(debug) << "MODULE DUMPED " << pModulename->toStdString() << " device " << device.toStdString() << " group " << group.toStdString()<< " property " << property.toStdString();
+                PropertyTextDumper textDumper;
+                treeList[device][group][property]->accept(&textDumper);
+                BOOST_LOG_TRIVIAL(debug) << "MODULE " << pModulename->toStdString() <<" DUMPED " << textDumper.getResult();
+            }
+        }
     }
 }

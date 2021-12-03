@@ -12,6 +12,7 @@ public:
     void remove(Property* pProperty);
     void cleanup();
     [[nodiscard]] QList<Property *> toList() const;
+    [[nodiscard]] QMap<QString, QMap<QString, QMap<QString, Property*>>> toTreeList() const;
 
     [[nodiscard]] int getSize() const;
 private:

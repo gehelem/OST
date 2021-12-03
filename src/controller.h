@@ -30,7 +30,7 @@ public slots:
     void OnPropertyUpdated(Property *pProperty, QString *pModulename);
     void OnPropertyRemoved(Property *pProperty, QString *pModulename);
     void OnNewMessageSent(QString message, QString *pModulename, QString Device);
-    void OnModuleDumped(QList<Property *> list, QString* pModulename, QString* pModulelabel);
+    void OnModuleDumped(QMap<QString, QMap<QString, QMap<QString, Property*>>> treeList, QString* pModulename, QString* pModulelabel);
 
 signals:
     void closed();

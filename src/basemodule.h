@@ -77,7 +77,7 @@ class Basemodule : public QObject, public INDI::BaseClient
         void propertyCreated(Property* pProperty, QString* pModulename);
         void propertyUpdated(Property* pProperty, QString* pModulename);
         void propertyRemoved(Property* pProperty, QString* pModulename);
-        void moduleDumped(QList<Property *> list, QString* pModulename, QString* pModulelabel);
+        void moduleDumped(QMap<QString, QMap<QString, QMap<QString, Property*>>> treeList, QString* pModulename, QString* pModulelabel);
         void newMessageSent(QString message,      QString* pModulename, QString Device);
 
         void finished();

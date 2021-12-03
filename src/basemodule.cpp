@@ -57,7 +57,7 @@ void Basemodule::OnDumpAsked()
 {
     //QList<Property *> list;
     qDebug() << "we dump";
-    emit moduleDumped(_propertyStore.toList(),&_modulename,&_modulelabel);
+    emit moduleDumped(_propertyStore.toTreeList(),&_modulename,&_modulelabel);
 }
 
 bool Basemodule::disconnectIndi(void)

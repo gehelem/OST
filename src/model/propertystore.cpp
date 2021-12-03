@@ -59,3 +59,7 @@ QList<Property *> PropertyStore::toList() const {
 
     return properties;
 }
+QMap<QString, QMap<QString, QMap<QString, Property*>>>  PropertyStore::toTreeList() const {
+
+    return _store;
+}
