@@ -90,3 +90,4 @@ QJsonObject JSonDumper::dumpPropertyCommons(Property *pProperty) {
 
     return json;
 }
+

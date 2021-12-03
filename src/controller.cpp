@@ -36,10 +36,12 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
     connect(mainctl,&Basemodule::propertyUpdated,this,&Controller::OnPropertyUpdated);
     connect(mainctl,&Basemodule::propertyRemoved,this,&Controller::OnPropertyRemoved);
     connect(mainctl,&Basemodule::newMessageSent, this,&Controller::OnNewMessageSent);
+    connect(mainctl,&Basemodule::moduleDumped, this,&Controller::OnModuleDumped);
     connect(mainctl,&Basemodule::propertyCreated,wshandler,&WShandler::OnPropertyCreated);
     connect(mainctl,&Basemodule::propertyUpdated,wshandler,&WShandler::OnPropertyUpdated);
     connect(mainctl,&Basemodule::propertyRemoved,wshandler,&WShandler::OnPropertyRemoved);
     connect(mainctl,&Basemodule::newMessageSent,wshandler,&WShandler::OnNewMessageSent);
+    connect(wshandler,&WShandler::dumpAsked,mainctl,&Basemodule::OnDumpAsked);
 
 
 
@@ -53,7 +55,7 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
     }
 
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focuser1","focuser 1");
-    LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel1","indipanel 1");
+    //LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel1","indipanel 1");
 
 }
 
@@ -87,10 +89,13 @@ void Controller::LoadModule(QString lib,QString name,QString label)
                 connect(mod,&Basemodule::propertyUpdated,this,&Controller::OnPropertyUpdated);
                 connect(mod,&Basemodule::propertyRemoved,this,&Controller::OnPropertyRemoved);
                 connect(mod,&Basemodule::newMessageSent, this,&Controller::OnNewMessageSent);
+                connect(mod,&Basemodule::moduleDumped, this,&Controller::OnModuleDumped);
                 connect(mod,&Basemodule::propertyCreated,wshandler,&WShandler::OnPropertyCreated);
                 connect(mod,&Basemodule::propertyUpdated,wshandler,&WShandler::OnPropertyUpdated);
                 connect(mod,&Basemodule::propertyRemoved,wshandler,&WShandler::OnPropertyRemoved);
                 connect(mod,&Basemodule::newMessageSent,wshandler,&WShandler::OnNewMessageSent);
+                connect(wshandler,&WShandler::dumpAsked,mod,&Basemodule::OnDumpAsked);
+
 
         } else {
             BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library";
@@ -120,4 +125,13 @@ void Controller::OnPropertyRemoved(Property *pProperty, QString *pModulename)
 void Controller::OnNewMessageSent(QString message, QString *pModulename, QString Device)
 {
     BOOST_LOG_TRIVIAL(debug) << "MODULE " << pModulename->toStdString() << " DEVICE  "<< Device.toStdString() << " MESSAGE " << message.toStdString();
+}
+void Controller::OnModuleDumped(QList<Property *> list, QString* pModulename, QString* pModulelabel)
+{
+    BOOST_LOG_TRIVIAL(debug) << "MODULE DUMPED" << pModulename->toStdString() << " size " << list.size();
+    for (int i = 0; i < list.size(); ++i) {
+            PropertyTextDumper textDumper;
+            list.at(i)->accept(&textDumper);
+            BOOST_LOG_TRIVIAL(debug) << "MODULE " << pModulename->toStdString() <<" DUMPED" << textDumper.getResult();
+    }
 }

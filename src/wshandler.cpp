@@ -107,6 +107,7 @@ void WShandler::processTextMessage(QString message)
     {
         //sendAll();
         //emit changeValue(Prop());
+        emit dumpAsked();
 
     }
     if (obj["message"].toString()=="readproperty")

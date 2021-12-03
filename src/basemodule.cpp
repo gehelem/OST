@@ -6,6 +6,7 @@ Basemodule::Basemodule(QString name,QString label)
     :_modulename(name),
       _modulelabel(label)
 {
+    _propertyStore.cleanup();
     setVerbose(false);
 }
 void Basemodule::setNameAndLabel(QString name,QString label)
@@ -51,12 +52,12 @@ void Basemodule::sendMessage(QString message)
     QString mess = QDateTime::currentDateTime().toString("[yyyyMMdd hh:mm:ss.zzz]") + " - " + _modulename + " - " + message;
     BOOST_LOG_TRIVIAL(debug) << message.toStdString();
     emit newMessageSent(mess,&_modulename,_modulename);
-    dump();
 }
-void Basemodule::dump()
+void Basemodule::OnDumpAsked()
 {
     //QList<Property *> list;
     qDebug() << "we dump";
+    emit moduleDumped(_propertyStore.toList(),&_modulename,&_modulelabel);
 }
 
 bool Basemodule::disconnectIndi(void)

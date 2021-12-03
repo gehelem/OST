@@ -25,6 +25,14 @@ MainControl::MainControl(QString name,QString label)
 //        properties->appendElt(_modulename,"loadmodule",lib,OSState::OSS_OFF,lib,"","");
 //    }
 
+    //ITextVectorProperty testtext;
+    //strcpy(testtext.name, "proprtest");
+    //strcpy(testtext.label, "propriété de test");
+    //Property test = new Property("root","root","proptest","propriété de test",1,0,this);
+    BOOST_LOG_TRIVIAL(debug) << "Maincontrol properties size before " << _propertyStore.getSize();
+    emit propertyCreated(PropertyFactory::createProperty("proprtest","propriété de test"),&_modulename);
+    _propertyStore.add(PropertyFactory::createProperty("proprtest","propriété de test"));
+    BOOST_LOG_TRIVIAL(debug) << "Maincontrol properties size after " << _propertyStore.getSize();
 }
 
 MainControl::~MainControl()

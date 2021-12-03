@@ -12,6 +12,7 @@ public:
     static Property* createProperty(ISwitchVectorProperty * pVector);
     static Property* createProperty(ITextVectorProperty* pVector);
     static Property* createProperty(ILightVectorProperty* pVector);
+    static Property* createProperty(QString name,QString label);
 };
 
 

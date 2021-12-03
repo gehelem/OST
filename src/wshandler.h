@@ -36,6 +36,7 @@ public slots:
 signals:
     void closed();
     void textRcv(QString txt);
+    void dumpAsked(void);
 private:
 };
 #endif

@@ -35,7 +35,8 @@ class Basemodule : public QObject, public INDI::BaseClient
         QString _modulename;
         QString _modulelabel;
 
-   public slots:
+    public slots:
+        void OnDumpAsked(void);
         //virtual void changeProp(Prop prop) {Q_UNUSED(prop);}
     //void OnPropertyCreated (Property *prop) {BOOST_LOG_TRIVIAL(debug) << "prop created " << prop->getName().toStdString()<< "-" << prop->getLabel().toStdString();}
     //void OnPropertyDeleted (Property *prop) {BOOST_LOG_TRIVIAL(debug) << "prop deleted " << prop->getName().toStdString()<< "-" << prop->getLabel().toStdString();}
@@ -71,12 +72,12 @@ class Basemodule : public QObject, public INDI::BaseClient
         virtual void newMessage(INDI::BaseDevice *dp, int messageID) {Q_UNUSED(dp);Q_UNUSED(messageID);}
         virtual void newUniversalMessage(std::string message)   {Q_UNUSED(message);}
 
-    public slots:
-        void dump(void);
+
     signals:
         void propertyCreated(Property* pProperty, QString* pModulename);
         void propertyUpdated(Property* pProperty, QString* pModulename);
         void propertyRemoved(Property* pProperty, QString* pModulename);
+        void moduleDumped(QList<Property *> list, QString* pModulename, QString* pModulelabel);
         void newMessageSent(QString message,      QString* pModulename, QString Device);
 
         void finished();

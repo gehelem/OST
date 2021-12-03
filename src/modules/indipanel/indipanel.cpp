@@ -29,24 +29,28 @@ void IndiPanel::newProperty(INDI::Property *pProperty)
         case INDI_NUMBER: {
             emit propertyCreated(PropertyFactory::createProperty(pProperty->getNumber()),&_modulename);
             _propertyStore.add(PropertyFactory::createProperty(pProperty->getNumber()));
+            //BOOST_LOG_TRIVIAL(debug) << "Indipanel propeties size " << _propertyStore.getSize();
             break;
         }
 
         case INDI_SWITCH: {
             emit propertyCreated(PropertyFactory::createProperty(pProperty->getSwitch()),&_modulename);
             _propertyStore.add(PropertyFactory::createProperty(pProperty->getSwitch()));
+            //BOOST_LOG_TRIVIAL(debug) << "Indipanel propeties size " << _propertyStore.getSize();
             break;
         }
 
         case INDI_TEXT: {
             emit propertyCreated(PropertyFactory::createProperty(pProperty->getText()),&_modulename);
             _propertyStore.add(PropertyFactory::createProperty(pProperty->getText()));
+            //BOOST_LOG_TRIVIAL(debug) << "Indipanel propeties size " << _propertyStore.getSize();
             break;
         }
 
         case INDI_LIGHT: {
             emit propertyCreated( PropertyFactory::createProperty(pProperty->getLight()),&_modulename);
             _propertyStore.add(PropertyFactory::createProperty(pProperty->getLight()));
+            //BOOST_LOG_TRIVIAL(debug) << "Indipanel propeties size " << _propertyStore.getSize();
             break;
         }
 
@@ -63,24 +67,28 @@ void IndiPanel::removeProperty(INDI::Property *property)
         case INDI_NUMBER: {
             emit propertyRemoved(PropertyFactory::createProperty(property->getNumber()),&_modulename);
             _propertyStore.remove(PropertyFactory::createProperty(property->getNumber()));
+            //BOOST_LOG_TRIVIAL(debug) << "Indipanel propeties size " << _propertyStore.getSize();
             break;
         }
 
         case INDI_SWITCH: {
             emit propertyRemoved(PropertyFactory::createProperty(property->getSwitch()),&_modulename);
             _propertyStore.remove(PropertyFactory::createProperty(property->getSwitch()));
+            //BOOST_LOG_TRIVIAL(debug) << "Indipanel propeties size " << _propertyStore.getSize();
             break;
         }
 
         case INDI_TEXT: {
             emit propertyRemoved(PropertyFactory::createProperty(property->getText()),&_modulename);
             _propertyStore.remove(PropertyFactory::createProperty(property->getText()));
+            //BOOST_LOG_TRIVIAL(debug) << "Indipanel propeties size " << _propertyStore.getSize();
             break;
         }
 
         case INDI_LIGHT: {
             emit propertyRemoved( PropertyFactory::createProperty(property->getLight()),&_modulename);
             _propertyStore.remove(PropertyFactory::createProperty(property->getLight()));
+            //BOOST_LOG_TRIVIAL(debug) << "Indipanel propeties size " << _propertyStore.getSize();
             break;
         }
 

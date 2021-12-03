@@ -30,9 +30,11 @@ public slots:
     void OnPropertyUpdated(Property *pProperty, QString *pModulename);
     void OnPropertyRemoved(Property *pProperty, QString *pModulename);
     void OnNewMessageSent(QString message, QString *pModulename, QString Device);
+    void OnModuleDumped(QList<Property *> list, QString* pModulename, QString* pModulelabel);
 
 signals:
     void closed();
+    void dumpAsked(void);
 private:
     void LoadModule(QString lib,QString name,QString label);
     QString _indihost;

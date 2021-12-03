@@ -5,6 +5,12 @@
 #include "model/lightproperty.h"
 #include "model/lightvalue.h"
 
+Property* PropertyFactory::createProperty(QString name,QString label)
+{
+    auto* pProperty = new TextProperty("root","root",name,label,0,0);
+    return pProperty;
+}
+
 Property* PropertyFactory::createProperty(INumberVectorProperty *pVector) {
 
     auto* pProperty = new NumberProperty(
