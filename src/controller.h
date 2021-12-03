@@ -29,7 +29,7 @@ public slots:
     void OnPropertyCreated(Property *pProperty, QString *pModulename);
     void OnPropertyUpdated(Property *pProperty, QString *pModulename);
     void OnPropertyRemoved(Property *pProperty, QString *pModulename);
-    void OnNewMessageSent(QString message, QString *pModulename, QString *pDevice);
+    void OnNewMessageSent(QString message, QString *pModulename, QString Device);
 
 signals:
     void closed();

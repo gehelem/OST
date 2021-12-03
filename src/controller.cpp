@@ -117,7 +117,7 @@ void Controller::OnPropertyRemoved(Property *pProperty, QString *pModulename)
     pProperty->accept(&textDumper);
     //BOOST_LOG_TRIVIAL(debug) << "MODULE " << pModulename->toStdString() <<" REMOVED" << textDumper.getResult();
 }
-void Controller::OnNewMessageSent(QString message, QString *pModulename, QString *pDevice)
+void Controller::OnNewMessageSent(QString message, QString *pModulename, QString Device)
 {
-    BOOST_LOG_TRIVIAL(debug) << "MODULE " << pModulename->toStdString() << " DEVICE  "<< pDevice->toStdString() << " MESSAGE " << message.toStdString();
+    BOOST_LOG_TRIVIAL(debug) << "MODULE " << pModulename->toStdString() << " DEVICE  "<< Device.toStdString() << " MESSAGE " << message.toStdString();
 }

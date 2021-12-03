@@ -50,7 +50,13 @@ void Basemodule::sendMessage(QString message)
 {
     QString mess = QDateTime::currentDateTime().toString("[yyyyMMdd hh:mm:ss.zzz]") + " - " + _modulename + " - " + message;
     BOOST_LOG_TRIVIAL(debug) << message.toStdString();
-    emit newMessageSent(mess,&_modulename,&_modulename);
+    emit newMessageSent(mess,&_modulename,_modulename);
+    dump();
+}
+void Basemodule::dump()
+{
+    //QList<Property *> list;
+    qDebug() << "we dump";
 }
 
 bool Basemodule::disconnectIndi(void)

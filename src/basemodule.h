@@ -71,12 +71,13 @@ class Basemodule : public QObject, public INDI::BaseClient
         virtual void newMessage(INDI::BaseDevice *dp, int messageID) {Q_UNUSED(dp);Q_UNUSED(messageID);}
         virtual void newUniversalMessage(std::string message)   {Q_UNUSED(message);}
 
-
+    public slots:
+        void dump(void);
     signals:
         void propertyCreated(Property* pProperty, QString* pModulename);
         void propertyUpdated(Property* pProperty, QString* pModulename);
         void propertyRemoved(Property* pProperty, QString* pModulename);
-        void newMessageSent(QString message,      QString* pModulename, QString* pDevice);
+        void newMessageSent(QString message,      QString* pModulename, QString Device);
 
         void finished();
         void statusChanged(const QString &newStatus);

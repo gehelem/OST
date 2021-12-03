@@ -59,12 +59,12 @@ void WShandler::OnPropertyUpdated(Property *pProperty, QString *pModulename)
     sendJsonMessage(obj);
 
 }
-void WShandler::OnNewMessageSent(QString message, QString *pModulename, QString *pDevice)
+void WShandler::OnNewMessageSent(QString message, QString *pModulename, QString Device)
 {
     QJsonObject  obj;
     obj["event"]="newmessage";
     obj["module"]=*pModulename;
-    obj["device"]=*pDevice;
+    obj["device"]=Device;
     obj["message"]=message;
     sendJsonMessage(obj);
 }

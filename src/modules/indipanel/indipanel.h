@@ -15,6 +15,7 @@ class MODULE_INIT IndiPanel : public Basemodule
     public:
         IndiPanel(QString name,QString label);
         ~IndiPanel();
+
     signals:
         void valueChanged(const double &newValue);
     private:

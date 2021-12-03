@@ -123,7 +123,7 @@ void IndiPanel::newMessage     (INDI::BaseDevice *dp, int messageID)
     QString mess= QString::fromStdString(dp->messageQueue(messageID));
     QString dev = QString::fromStdString(dp->getDeviceName());
     dev.replace(" ","");
-    emit newMessageSent(mess,&_modulename,&dev);
+    emit newMessageSent(mess,&_modulename,dev);
 }
 
 
