@@ -3,6 +3,7 @@
 
 #include <QMap>
 #include "lightproperty.h"
+#include <boost/log/trivial.hpp>
 
 class PropertyStore {
 

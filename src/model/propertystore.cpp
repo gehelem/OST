@@ -17,8 +17,23 @@ void PropertyStore::remove(Property *pProperty) {
 
     Property* oldProperty = _store[pProperty->getDeviceName()][pProperty->getGroupName()][pProperty->getName()];
     _store[pProperty->getDeviceName()][pProperty->getGroupName()].remove(pProperty->getName());
+
+    if (_store[pProperty->getDeviceName()][pProperty->getGroupName()].keys().count()==0)
+    {
+         //BOOST_LOG_TRIVIAL(debug) << "Remove group " << pProperty->getGroupName().toStdString();
+        _store[pProperty->getDeviceName()].remove(pProperty->getGroupName());
+    }
+
+    if (_store[pProperty->getDeviceName()].keys().count()==0)
+    {
+        //BOOST_LOG_TRIVIAL(debug) << "Remove device " << pProperty->getDeviceName().toStdString();
+        _store.remove(pProperty->getDeviceName());
+    }
+
     delete oldProperty;
     delete pProperty;
+
+
 }
 
 int PropertyStore::getSize() const {

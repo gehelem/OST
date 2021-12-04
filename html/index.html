@@ -51,7 +51,6 @@
                 var msg = document.getElementById("inputText").value;
                 if ( websocket != null )
                 {
-                    document.getElementById("inputText").value = "";
                     websocket.send( msg );
                     debugoutput.value = msg;
                     console.log( "string sent :", '"'+msg+'"' );
