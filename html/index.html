@@ -99,7 +99,11 @@
 
 
 
-            var wsUri = "ws://192.168.1.25:9624";
+            //var wsUri = "ws://192.168.1.25:9624";
+			var ur = window.location.origin.replace("http://", "");
+			var result = ur.replace("http://", "");
+			var wsUri = "ws://"+ur+":9624";
+			
             var websocket = null;
 
             function buildProperty(prop) {
