@@ -83,12 +83,12 @@ QJsonObject JSonDumper::dumpPropertyCommons(Property *pProperty) {
 
     QJsonObject json;
 
-    json["moduleName"] = pProperty->getModuleName();
-    json["deviceName"] = pProperty->getDeviceName();
-    json["groupName"] = pProperty->getGroupName();
-    json["deviceNameShort"] = pProperty->getDeviceNameShort();
-    json["groupNameShort"] = pProperty->getGroupNameShort();
-    json["name"] = pProperty->getName();
+    json["modulename"] = pProperty->getModuleName();
+    json["devicename"] = pProperty->getDeviceName();
+    json["groupname"] = pProperty->getGroupName();
+    json["devicenameshort"] = pProperty->getDeviceNameShort();
+    json["groupnameshort"] = pProperty->getGroupNameShort();
+    json["propname"] = pProperty->getName();
     json["label"] = pProperty->getLabel();
     json["permission"] = pProperty->getPermission();
     json["state"] = pProperty->getState();

@@ -1,35 +1,18 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>OST - L'Observatoire Sans Tete</title>
-  <link rel="stylesheet" href="/jquery-ui-1.12.1.custom/jquery-ui.css">
-  <script src="jquery.js"></script>
-  <script src="/jquery-ui-1.12.1.custom/jquery-ui.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
 </head>
+
 <body>
-<div id="CLI">
-20211124
-        <p>
-            <button onClick="initWebSocket();">Connect</button>
-            <button onClick="stopWebSocket();">Disconnect</button>
-            <button onClick="checkSocket();">State</button>
-            <input type="text" id="inputText" onkeydown="if(event.keyCode==13)sendMessage();"/>
-            <button onClick="sendMessage();">Send</button>
-         </p>
-        <p>
-            DEBUG
-            <textarea id="debugTextArea" style="width:800px;height:50px;">DEBUG</textarea><br>
-			INPUT
-            <textarea id="debuginput" style="width:800px;height:50px;">INPUT</textarea><br>
-			OUTPUT
-            <textarea id="debugoutput" style="width:800px;height:50px;">OUTPUT</textarea><br>
-        </p>
-</div>
+
 <div id="OST">
-</div>
+</div> 
+</body>
+</html>
 
 <script>
             function sortJSON(arr) {
@@ -43,19 +26,8 @@
             var debuginput = document.getElementById("debuginput");
             var debugoutput = document.getElementById("debugoutput");
             function debug(message) {
-                debugTextArea.value += message + "\n";
-                debugTextArea.scrollTop = debugTextArea.scrollHeight;
             }
 
-            function sendMessage() {
-                var msg = document.getElementById("inputText").value;
-                if ( websocket != null )
-                {
-                    websocket.send( msg );
-                    debugoutput.value = msg;
-                    console.log( "string sent :", '"'+msg+'"' );
-                }
-            }
 
             function indi_switch(btn,modulename,categname,propname,name) {
               //console.log( "indi_switch clicked:", '"'+btn+'"' ,'"'+modulename+'"');
@@ -99,18 +71,16 @@
 
 
 
-            //var wsUri = "ws://192.168.1.25:9624";
 			var ur = window.location.origin.replace("http://", "");
 			var result = ur.replace("http://", "");
-			var wsUri = "ws://"+ur+":9624";
-			
-            var websocket = null;
+			var wsUri = "ws://"+ur+":9624";            
+			var websocket = null;
 
             function buildProperty(prop) {
 
-              if  (!($("div#"+prop.modulename+prop.propname).length)) {
+              if  (!($("div#"+prop.deviceNameShort+prop.deviceNameShort+prop.name).length)) {
                   //$("div#"+prop.modulename+prop.categname+prop.groupname).append("<div id="+prop.modulename+prop.propname+" label="+prop.label+"></div>");
-                  $("div#"+prop.modulename+prop.categname+prop.groupname).append("<div id="+prop.modulename+prop.propname+" ><table id=tab"+prop.modulename+prop.propname+"><tr><td><strong>"+prop.label+"</strong></td><td></td></tr></table></div>");
+                  $("div#"+prop.deviceNameShort+prop.deviceNameShort).append("<div id="+prop.modulename+prop.propname+" ><table id=tab"+prop.modulename+prop.propname+"><tr><td><strong>"+prop.label+"</strong></td><td></td></tr></table></div>");
                   //$("div#"+prop.modulename+prop.propname).append("<label for='name'>"+prop.label+"</label>");
               }
 
@@ -263,7 +233,7 @@
                     websocket.onopen = function (evt) {
                         debug("CONNECTED");
                         websocket.send( "{\"message\":\"readall\"}");
-                        debugoutput.value = msg;
+                        //debugoutput.value = msg;
                     };
                     websocket.onclose = function (evt) {
                         debug("DISCONNECTED");
@@ -277,10 +247,100 @@
                         debug ("BEGIN-------------------------------------------------");
                         debug (evt.data);
                         debug ("END  -------------------------------------------------");
-                        debuginput.value = evt.data +"\n";
+                        //debuginput.value = evt.data +"\n";
                         var obj = jQuery.parseJSON( evt.data );
+                        if (obj.event == 'moduledump') {
 
-                        if (obj.message == 'updateproperty') {
+                              if  (!($("div#"+obj.module).length)) {
+                                    $("div#OST").append("<div id='"+obj.module+"'>"+obj.modulelabel+"</div>");
+									var devices = obj.devices;
+                            		$.each( devices, function(idev,dev) {
+		                              if  (!($("div#"+obj.module+dev.devicenameshort).length)) {
+		                                  $("div#"+obj.module).append("<div id='"+obj.module+dev.devicenameshort+"'>----"+dev.devicename+"</div>");
+
+											var groups = dev.groups;
+		                            		$.each( groups, function(igro,gro) {
+				                              if  (!($("div#"+obj.module+dev.devicenameshort+gro.groupnameshort).length)) {
+				                                  $("div#"+obj.module+dev.devicenameshort).append("<div id='"+obj.module+dev.devicenameshort+gro.groupnameshort+"'>----------"+gro.groupname+"</div>");
+
+												var props = gro.properties;
+			                            		$.each( props, function(iprop,pro) {
+												  nn=obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname;
+					                              if  (!($("div#"+nn).length)) {
+					                                  $("div#"+obj.module+dev.devicenameshort+gro.groupnameshort).append("<div id='"+nn+"' class='"+nn+"'>--------------- "+pro.label+"</div>");
+	
+													if (pro.hasOwnProperty('texts')) {
+													var dets = pro.texts;
+				                            		$.each( dets, function(idet,det) {
+													  nn=obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname+det.name;
+						                              if  (!($("div#"+nn).length)) {
+						                                  $("div#"+obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname).append("<div id='"+nn+"' class='"+nn+"'>-----------------TEXT "+det.label+"-"+det.text+"</div>");
+			    		    	                      }
+												    })
+													}														
+													if (pro.hasOwnProperty('numbers')) {
+													var dets = pro.numbers;
+				                            		$.each( dets, function(idet,det) {
+													  nn=obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname+det.name;
+						                              if  (!($("div#"+nn).length)) {
+						                                  $("div#"+obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname).append("<div id='"+nn+"' class='"+nn+"'>-----------------NUMBER "+det.label+"</div>");
+			    		    	                      }
+												    })
+													}														
+													if (pro.hasOwnProperty('switches')) {
+													var dets = pro.switches;
+				                            		$.each( dets, function(idet,det) {
+													  nn=obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname+det.name;
+						                              if  (!($("div#"+nn).length)) {
+						                                  $("div#"+obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname).append("<div id='"+nn+"' class='"+nn+"'>-----------------SWITCH "+det.label+"</div>");
+			    		    	                      }
+												    })
+													}														
+													if (pro.hasOwnProperty('lights')) {
+													var dets = pro.lights;
+				                            		$.each( dets, function(idet,det) {
+													  nn=obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname+det.name;
+						                              if  (!($("div#"+nn).length)) {
+						                                  $("div#"+obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname).append("<div id='"+nn+"' class='"+nn+"'>-----------------LIGHT "+det.label+"</div>");
+			    		    	                      }
+												    })
+													}														
+	
+	
+		    		    	                      }
+											    })
+
+
+
+	    		    	                      }
+										    })
+
+
+	        	                      }
+								    })
+                              }
+                            
+                        }
+
+                        if (obj.event == 'removeproperty') {
+								var dev   = obj.module+obj.property.devicenameshort;
+								var group = dev+obj.property.groupnameshort;
+							  	var prop  = group+obj.property.propname;
+							  	console.log("REMOVE "+prop);
+								$( "."+ prop ).remove();
+
+								if ($("div#"+ group + " > div").length == 0 ){
+									$( "div#"+ group ).remove();
+								}
+								if ($("div#"+dev+ " > div").length == 0 ){
+									$( "div#"+ dev ).remove();
+								}
+
+                            
+                        }
+
+
+                        if (obj.event == 'createproperty') {
                             var prop = obj.property;
                             buildProperty(prop);
                         }
@@ -447,5 +507,4 @@
     });
 
 </script>
-</body>
-</html>
+
