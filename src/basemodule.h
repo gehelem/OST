@@ -8,6 +8,8 @@
 #include <boost/log/trivial.hpp>
 #include "image.h"
 #include <model/setup.h>
+#include <model/value.h>
+#include <model/textvalue.h>
 #include <utils/propertytextdumper.h>
 #include <model/propertystore.h>
 #include "utils/propertyfactory.h"

@@ -18,6 +18,7 @@ void JSonDumper::visit(NumberProperty *pProperty) {
         jsonNumber["min"] = pNumber->getMin();
         jsonNumber["max"] = pNumber->getMax();
         jsonNumber["value"] = pNumber->getValue();
+        jsonNumber["hint"] = pNumber->hint();
         jsonNumbers.append(jsonNumber);
     }
     json["numbers"] = jsonNumbers;
@@ -35,6 +36,7 @@ void JSonDumper::visit(SwitchProperty *pProperty) {
         jsonSwitch["name"] = pSwitch->name();
         jsonSwitch["label"] = pSwitch->label();
         jsonSwitch["state"] = pSwitch->switchState();
+        jsonSwitch["hint"] = pSwitch->hint();
         jsonSwitches.append(jsonSwitch);
     }
     json["switches"] = jsonSwitches;
@@ -51,6 +53,7 @@ void JSonDumper::visit(TextProperty *pProperty) {
         jsonText["name"] = pText->name();
         jsonText["label"] = pText->label();
         jsonText["text"] = pText->text();
+        jsonText["hint"] = pText->hint();
         jsonTexts.append(jsonText);
     }
     json["texts"] = jsonTexts;
@@ -67,6 +70,7 @@ void JSonDumper::visit(LightProperty *pProperty) {
         jsonLight["name"] = pSwitch->name();
         jsonLight["label"] = pSwitch->label();
         jsonLight["state"] = pSwitch->lightState();
+        jsonLight["hint"] = pSwitch->hint();
         jsonLights.append(jsonLight);
     }
     json["lights"] = jsonLights;
@@ -87,7 +91,6 @@ QJsonObject JSonDumper::dumpPropertyCommons(Property *pProperty) {
     json["label"] = pProperty->getLabel();
     json["permission"] = pProperty->getPermission();
     json["state"] = pProperty->getState();
-
     return json;
 }
 

@@ -1,4 +1,5 @@
 #include "maincontrol.h"
+#include "model/textproperty.h"
 
 
 MainControl::MainControl(QString name,QString label)
@@ -15,24 +16,32 @@ MainControl::MainControl(QString name,QString label)
 //    properties->createDevcat(_modulename,"modules","Modules",1);
 //    properties->createProp(_modulename,"loadmodule","Load module"    ,PT_SWITCH,"modules","",OP_RW,OSRule::OSR_1OFMANY,0,OPState::OPS_IDLE,"","",1);
 //
-//    QDir directory(QCoreApplication::applicationDirPath());
-//    directory.setFilter(QDir::Files);
-//    directory.setNameFilters(QStringList() << "*ost*.so");
-//    QStringList libs = directory.entryList();
-//    foreach(QString lib, libs)
-//    {
-//        BOOST_LOG_TRIVIAL(debug) << "Module lib found " << lib.toStdString();
-//        properties->appendElt(_modulename,"loadmodule",lib,OSState::OSS_OFF,lib,"","");
-//    }
+
+    TextProperty* prop = new TextProperty("modules","root","availablemodules","Available modules",1,0);
+
+    QDir directory(QCoreApplication::applicationDirPath());
+    directory.setFilter(QDir::Files);
+    directory.setNameFilters(QStringList() << "*ost*.so");
+    QStringList libs = directory.entryList();
+    foreach(QString lib, libs)
+    {
+        BOOST_LOG_TRIVIAL(debug) << "Module lib found " << lib.toStdString();
+        prop->addText(new TextValue(lib,lib,"hint",lib));
+    }
+
+    emit propertyCreated(prop,&_modulename);
+    _propertyStore.add(prop);
 
     //ITextVectorProperty testtext;
     //strcpy(testtext.name, "proprtest");
     //strcpy(testtext.label, "propriété de test");
     //Property test = new Property("root","root","proptest","propriété de test",1,0,this);
-    BOOST_LOG_TRIVIAL(debug) << "Maincontrol properties size before " << _propertyStore.getSize();
-    emit propertyCreated(PropertyFactory::createProperty("proprtest","propriété de test"),&_modulename);
-    _propertyStore.add(PropertyFactory::createProperty("proprtest","propriété de test"));
-    BOOST_LOG_TRIVIAL(debug) << "Maincontrol properties size after " << _propertyStore.getSize();
+    //BOOST_LOG_TRIVIAL(debug) << "Maincontrol properties size before " << _propertyStore.getSize();
+    emit propertyCreated(PropertyFactory::createProperty("proptest2","propriété de test"),&_modulename);
+    _propertyStore.add(PropertyFactory::createProperty("proptest2","propriété de test"));
+    emit propertyCreated(PropertyFactory::createProperty("proptest3","propriété de test"),&_modulename);
+    _propertyStore.add(PropertyFactory::createProperty("proptest3","propriété de test"));
+    //BOOST_LOG_TRIVIAL(debug) << "Maincontrol properties size after " << _propertyStore.getSize();
 }
 
 MainControl::~MainControl()
