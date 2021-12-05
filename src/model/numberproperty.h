@@ -10,15 +10,15 @@ class NumberProperty : public Property {
 
 public:
     NumberProperty() = delete;
-    NumberProperty(const QString &deviceName, const QString &groupName, const QString &name, const QString &label,
+    NumberProperty(const QString &moduleName,const QString &deviceName, const QString &groupName, const QString &name, const QString &label,
                    int permission, int state, QObject *parent = nullptr)
-    : Property(deviceName, groupName, name, label, permission, state, parent) {}
+    : Property(moduleName,deviceName, groupName, name, label, permission, state, parent) {}
 
     ~NumberProperty() override { for (NumberValue* pVal : _numbers) {delete pVal;} }
 
     void addNumber(NumberValue* pValue) { _numbers.append(pValue); }
     inline const QList<NumberValue*>& getNumbers() { return _numbers; }
-    void accept(PropertyVisitor *pVisitor) override { pVisitor->visit(this); }
+    void accept(PropertyVisitor *pVisitor) override { pVisitor->visit(this,&_moduleName); }
 
 private:
     QList<NumberValue*> _numbers;

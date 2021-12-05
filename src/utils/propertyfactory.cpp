@@ -5,15 +5,10 @@
 #include "model/lightproperty.h"
 #include "model/lightvalue.h"
 
-Property* PropertyFactory::createProperty(QString name,QString label)
-{
-    auto* pProperty = new TextProperty("root","root",name,label,0,0);
-    return pProperty;
-}
-
-Property* PropertyFactory::createProperty(INumberVectorProperty *pVector) {
+Property* PropertyFactory::createProperty(INumberVectorProperty *pVector,QString *moduleName) {
 
     auto* pProperty = new NumberProperty(
+            *moduleName,
             pVector->device,
             pVector->group,
             pVector->name,
@@ -39,9 +34,10 @@ Property* PropertyFactory::createProperty(INumberVectorProperty *pVector) {
     return pProperty;
 }
 
-Property *PropertyFactory::createProperty(ISwitchVectorProperty *pVector) {
+Property *PropertyFactory::createProperty(ISwitchVectorProperty *pVector, QString *moduleName) {
 
     auto *pProperty = new SwitchProperty(
+            *moduleName,
             pVector->device,
             pVector->group,
             pVector->name,
@@ -67,9 +63,10 @@ Property *PropertyFactory::createProperty(ISwitchVectorProperty *pVector) {
     return pProperty;
 }
 
-Property *PropertyFactory::createProperty(ITextVectorProperty *pVector) {
+Property *PropertyFactory::createProperty(ITextVectorProperty *pVector, QString *moduleName) {
 
     auto* pProperty = new TextProperty(
+            *moduleName,
             pVector->device,
             pVector->group,
             pVector->name,
@@ -91,9 +88,10 @@ Property *PropertyFactory::createProperty(ITextVectorProperty *pVector) {
     return pProperty;
 }
 
-Property *PropertyFactory::createProperty(ILightVectorProperty *pVector) {
+Property *PropertyFactory::createProperty(ILightVectorProperty *pVector, QString *moduleName) {
 
     auto* pProperty = new LightProperty (
+            *moduleName,
             pVector->device,
             pVector->group,
             pVector->name,

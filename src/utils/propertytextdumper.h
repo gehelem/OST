@@ -13,10 +13,10 @@ class PropertyTextDumper : public PropertyVisitor {
 public:
     PropertyTextDumper() = default;
 
-    void visit(NumberProperty *pProperty) override;
-    void visit(SwitchProperty *pProperty) override;
-    void visit(TextProperty *pProperty) override;
-    void visit(LightProperty *pProperty) override;
+    void visit(NumberProperty *pProperty,QString *moduleName) override;
+    void visit(SwitchProperty *pProperty,QString *moduleName) override;
+    void visit(TextProperty *pProperty,QString *moduleName) override;
+    void visit(LightProperty *pProperty,QString *moduleName) override;
 
     [[nodiscard]] const std::string& getResult() const { return _result; }
 
@@ -41,7 +41,7 @@ private:
             {2, "NofMany"}
     };
 
-    std::string dumpPropertyCommons(Property* pProperty);
+    std::string dumpPropertyCommons(Property* pProperty, QString *moduleName);
 
     std::string _result;
 

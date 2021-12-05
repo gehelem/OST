@@ -9,10 +9,10 @@ class JSonDumper : public PropertyVisitor {
 
 
 public:
-    void visit(NumberProperty *pProperty) override;
-    void visit(SwitchProperty *pProperty) override;
-    void visit(TextProperty *pProperty) override;
-    void visit(LightProperty *pProperty) override;
+    void visit(NumberProperty *pProperty,QString *modulName) override;
+    void visit(SwitchProperty *pProperty,QString *modulName) override;
+    void visit(TextProperty *pProperty,QString *modulName) override;
+    void visit(LightProperty *pProperty,QString *modulName) override;
 
     [[nodiscard]] inline const QString& getResult() const { return _result; }
     [[nodiscard]] inline const QJsonObject& getJsonResult() const { return _jsonResult; }

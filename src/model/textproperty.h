@@ -11,15 +11,15 @@ class TextProperty : public Property {
 
 public:
     TextProperty() = delete;
-    TextProperty(const QString &deviceName, const QString &groupName, const QString &name, const QString &label,
+    TextProperty(const QString &moduleName, const QString &deviceName, const QString &groupName, const QString &name, const QString &label,
                    int permission, int state, QObject *parent = nullptr)
-            : Property(deviceName, groupName, name, label, permission, state, parent) {}
+            : Property(moduleName,deviceName, groupName, name, label, permission, state, parent) {}
 
     ~TextProperty() override { for (TextValue* pVal : _texts) {delete pVal;} }
 
     void addText(TextValue* pValue) { _texts.append(pValue); }
     inline const QList<TextValue*>& getTexts() { return _texts; }
-    void accept(PropertyVisitor *pVisitor) override { pVisitor->visit(this); }
+    void accept(PropertyVisitor *pVisitor) override { pVisitor->visit(this,&_moduleName); }
 
 private:
     QList<TextValue*> _texts;

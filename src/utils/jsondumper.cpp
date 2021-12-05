@@ -7,7 +7,7 @@
 #include "model/switchproperty.h"
 #include "model/lightproperty.h"
 
-void JSonDumper::visit(NumberProperty *pProperty) {
+void JSonDumper::visit(NumberProperty *pProperty, QString *moduleName) {
     QJsonObject json = dumpPropertyCommons(pProperty);
     QJsonArray jsonNumbers;
     for (const NumberValue *pNumber : pProperty->getNumbers()) {
@@ -27,7 +27,7 @@ void JSonDumper::visit(NumberProperty *pProperty) {
     _result = doc.toJson(QJsonDocument::Compact);
 }
 
-void JSonDumper::visit(SwitchProperty *pProperty) {
+void JSonDumper::visit(SwitchProperty *pProperty, QString *moduleName) {
     QJsonObject json = dumpPropertyCommons(pProperty);
     json["rule"] = pProperty->getRule();
     QJsonArray jsonSwitches;
@@ -45,7 +45,7 @@ void JSonDumper::visit(SwitchProperty *pProperty) {
     _result = doc.toJson(QJsonDocument::Compact);
 }
 
-void JSonDumper::visit(TextProperty *pProperty) {
+void JSonDumper::visit(TextProperty *pProperty, QString *moduleName) {
     QJsonObject json = dumpPropertyCommons(pProperty);
     QJsonArray jsonTexts;
     for( const TextValue* pText : pProperty->getTexts() ) {
@@ -62,7 +62,7 @@ void JSonDumper::visit(TextProperty *pProperty) {
     _result = doc.toJson(QJsonDocument::Compact);
 }
 
-void JSonDumper::visit(LightProperty *pProperty) {
+void JSonDumper::visit(LightProperty *pProperty, QString *moduleName) {
     QJsonObject json = dumpPropertyCommons(pProperty);
     QJsonArray jsonLights;
     for( const LightValue* pSwitch : pProperty->getLights() ) {
@@ -83,6 +83,7 @@ QJsonObject JSonDumper::dumpPropertyCommons(Property *pProperty) {
 
     QJsonObject json;
 
+    json["moduleName"] = pProperty->getModuleName();
     json["deviceName"] = pProperty->getDeviceName();
     json["groupName"] = pProperty->getGroupName();
     json["deviceNameShort"] = pProperty->getDeviceNameShort();

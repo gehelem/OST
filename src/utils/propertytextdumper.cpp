@@ -4,10 +4,11 @@
 #include <model/textproperty.h>
 #include <model/lightproperty.h>
 
-std::string PropertyTextDumper::dumpPropertyCommons(Property *pProperty) {
+std::string PropertyTextDumper::dumpPropertyCommons(Property *pProperty, QString *moduleName) {
 
     std::stringstream stream;
-    stream << "Device=" << pProperty->getDeviceName().toStdString()
+    stream << "Module=" << moduleName->toStdString()
+           << ". Device=" << pProperty->getDeviceName().toStdString()
            << ". Group=" << pProperty->getGroupName().toStdString()
            << ". DeviceShort=" << pProperty->getDeviceNameShort().toStdString()
            << ". GroupShort=" << pProperty->getGroupNameShort().toStdString()
@@ -18,11 +19,11 @@ std::string PropertyTextDumper::dumpPropertyCommons(Property *pProperty) {
     return stream.str();
 }
 
-void PropertyTextDumper::visit(NumberProperty *pProperty) {
+void PropertyTextDumper::visit(NumberProperty *pProperty, QString *moduleName) {
 
     std::stringstream stream;
 
-    stream << "Number Property : " << dumpPropertyCommons(pProperty);
+    stream << "Number Property : " << dumpPropertyCommons(pProperty,moduleName);
 
     for (NumberValue* pNumber : pProperty->getNumbers() ) {
 
@@ -37,11 +38,11 @@ void PropertyTextDumper::visit(NumberProperty *pProperty) {
     _result = stream.str();
 }
 
-void PropertyTextDumper::visit(SwitchProperty *pProperty) {
+void PropertyTextDumper::visit(SwitchProperty *pProperty, QString *moduleName) {
 
     std::stringstream stream;
 
-    stream << "Switch Property : " << dumpPropertyCommons(pProperty);
+    stream << "Switch Property : " << dumpPropertyCommons(pProperty,moduleName);
     stream << ". Rule=" << _ruleToNamesMap[pProperty->getRule()] << "(" << pProperty->getRule() << ")";
 
     for ( SwitchValue* pSwitch : pProperty->getSwitches() ) {
@@ -52,11 +53,11 @@ void PropertyTextDumper::visit(SwitchProperty *pProperty) {
     _result = stream.str();
 }
 
-void PropertyTextDumper::visit(TextProperty *pProperty) {
+void PropertyTextDumper::visit(TextProperty *pProperty, QString *moduleName) {
 
     std::stringstream stream;
 
-    stream << "Text Property : " << dumpPropertyCommons(pProperty);
+    stream << "Text Property : " << dumpPropertyCommons(pProperty,moduleName);
 
     for ( TextValue* pText : pProperty->getTexts() ) {
 
@@ -67,11 +68,11 @@ void PropertyTextDumper::visit(TextProperty *pProperty) {
     _result = stream.str();
 }
 
-void PropertyTextDumper::visit(LightProperty *pProperty) {
+void PropertyTextDumper::visit(LightProperty *pProperty, QString *moduleName) {
 
     std::stringstream stream;
 
-    stream << "Light Property : " << dumpPropertyCommons(pProperty);
+    stream << "Light Property : " << dumpPropertyCommons(pProperty,moduleName);
 
     for ( LightValue* pLight : pProperty->getLights() ) {
         stream << "   *Name=" << pLight->name().toStdString()

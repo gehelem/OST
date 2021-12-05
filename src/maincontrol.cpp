@@ -17,7 +17,7 @@ MainControl::MainControl(QString name,QString label)
 //    properties->createProp(_modulename,"loadmodule","Load module"    ,PT_SWITCH,"modules","",OP_RW,OSRule::OSR_1OFMANY,0,OPState::OPS_IDLE,"","",1);
 //
 
-    TextProperty* prop = new TextProperty("modules","root","availablemodules","Available modules",1,0);
+    TextProperty* prop = new TextProperty(_modulename,"modules","root","availablemodules","Available modules",1,0);
 
     QDir directory(QCoreApplication::applicationDirPath());
     directory.setFilter(QDir::Files);
@@ -37,10 +37,6 @@ MainControl::MainControl(QString name,QString label)
     //strcpy(testtext.label, "propriété de test");
     //Property test = new Property("root","root","proptest","propriété de test",1,0,this);
     //BOOST_LOG_TRIVIAL(debug) << "Maincontrol properties size before " << _propertyStore.getSize();
-    emit propertyCreated(PropertyFactory::createProperty("proptest2","propriété de test"),&_modulename);
-    _propertyStore.add(PropertyFactory::createProperty("proptest2","propriété de test"));
-    emit propertyCreated(PropertyFactory::createProperty("proptest3","propriété de test"),&_modulename);
-    _propertyStore.add(PropertyFactory::createProperty("proptest3","propriété de test"));
     //BOOST_LOG_TRIVIAL(debug) << "Maincontrol properties size after " << _propertyStore.getSize();
 }
 

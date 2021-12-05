@@ -1,6 +1,6 @@
 #ifndef OST_PROPERTYVISITOR_H
 #define OST_PROPERTYVISITOR_H
-
+#include <QString>
 class NumberProperty;
 class TextProperty;
 class SwitchProperty;
@@ -12,10 +12,10 @@ protected:
     PropertyVisitor() = default;
 
 public:
-    virtual void visit(NumberProperty* pProperty) = 0;
-    virtual void visit(SwitchProperty* pProperty) = 0;
-    virtual void visit(TextProperty* pProperty) = 0;
-    virtual void visit(LightProperty* pProperty) = 0;
+    virtual void visit(NumberProperty* pProperty, QString* moduleName) = 0;
+    virtual void visit(SwitchProperty* pProperty, QString* moduleName) = 0;
+    virtual void visit(TextProperty* pProperty, QString* moduleName) = 0;
+    virtual void visit(LightProperty* pProperty, QString* moduleName) = 0;
 };
 
 #endif //OST_PROPERTYVISITOR_H

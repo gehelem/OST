@@ -9,15 +9,15 @@
 class LightProperty : public Property {
 public:
     LightProperty() = delete;
-    LightProperty(const QString &deviceName, const QString &groupName, const QString &name, const QString &label,
+    LightProperty(const QString &moduleName, const QString &deviceName, const QString &groupName, const QString &name, const QString &label,
                    int permission, int state, QObject *parent = nullptr)
-            : Property(deviceName, groupName, name, label, permission, state, parent) {}
+            : Property(moduleName,deviceName, groupName, name, label, permission, state, parent) {}
 
     ~LightProperty() override { for (LightValue* pVal : _lights) {delete pVal;} }
 
     void addLight(LightValue* pValue) { _lights.append(pValue); }
     inline const QList<LightValue*>& getLights() { return _lights; }
-    void accept(PropertyVisitor *pVisitor) override { pVisitor->visit(this); }
+    void accept(PropertyVisitor *pVisitor) override { pVisitor->visit(this,&_moduleName); }
 
 private:
     QList<LightValue*> _lights;

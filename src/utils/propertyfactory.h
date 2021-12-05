@@ -8,11 +8,10 @@ class PropertyFactory {
 
 public:
     PropertyFactory() = delete;
-    static Property* createProperty(INumberVectorProperty* pVector);
-    static Property* createProperty(ISwitchVectorProperty * pVector);
-    static Property* createProperty(ITextVectorProperty* pVector);
-    static Property* createProperty(ILightVectorProperty* pVector);
-    static Property* createProperty(QString name,QString label);
+    static Property* createProperty(INumberVectorProperty* pVector,QString* moduleName );
+    static Property* createProperty(ISwitchVectorProperty * pVector,QString* moduleName );
+    static Property* createProperty(ITextVectorProperty* pVector,QString* moduleName );
+    static Property* createProperty(ILightVectorProperty* pVector,QString* moduleName );
 };
 
 
