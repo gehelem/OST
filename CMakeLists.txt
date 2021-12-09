@@ -28,7 +28,7 @@ find_package(GSL REQUIRED)
 find_package(OpenCV REQUIRED )
 find_package(CImg REQUIRED )
 find_package(WCSLIB REQUIRED)
-find_package(Qt5 5.15.2 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Scxml Sql)
+find_package(Qt5 5.12 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Scxml Sql)
 find_package(StellarSolver REQUIRED)
 find_package(Boost COMPONENTS log log_setup REQUIRED)
 
@@ -55,8 +55,6 @@ add_executable( ost
     ${CMAKE_CURRENT_SOURCE_DIR}/src/controller.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/wshandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/wshandler.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/properties.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/properties.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/jsonparser.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/jsonparser.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/basemodule.cpp
@@ -65,6 +63,30 @@ add_executable( ost
     ${CMAKE_CURRENT_SOURCE_DIR}/src/maincontrol.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/image.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/image.h
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/value.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/textvalue.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/switchvalue.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/numbervalue.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/setup.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/setup.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/device.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/device.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/property.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/propertyvisitor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/numberproperty.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/propertyfactory.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/propertyfactory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/propertytextdumper.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/propertytextdumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/switchproperty.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/textproperty.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/lightvalue.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/lightproperty.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/propertystore.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/propertystore.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/jsondumper.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/jsondumper.h
 
 )
 target_link_libraries( ost
@@ -83,25 +105,41 @@ target_link_libraries( ost
     z -lpthread
     )
 
-#######################
-## modules libraries ##
-#######################
-
-# Focus module
-add_library(ostfocuser SHARED
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.h
+########################
+### modules libraries ##
+########################
+# Indipanel module
+add_library(ostdummy SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.cpp
 )
-target_link_libraries(ostfocuser PRIVATE
+target_link_libraries(ostdummy PRIVATE
     indiclient
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
     ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
 )
-target_compile_definitions(ostfocuser PRIVATE FOCUSER_LIBRARY)
+target_compile_definitions(ostdummy PRIVATE dummy_LIBRARY)
 
+
+
+
+#
+## Focus module
+#add_library(ostfocuser SHARED
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.h
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.cpp
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.cpp
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.h
+#)
+#target_link_libraries(ostfocuser PRIVATE
+#    indiclient
+#    Qt${QT_VERSION_MAJOR}::Core
+#    Qt${QT_VERSION_MAJOR}::Concurrent
+#    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+#)
+#target_compile_definitions(ostfocuser PRIVATE FOCUSER_LIBRARY)
+#
 # Indipanel module
 add_library(ostindipanel SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel/indipanel.h

@@ -1,32 +1,20 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>OST - L'Observatoire Sans Tete</title>
-  <link rel="stylesheet" href="/jquery-ui-1.12.1.custom/jquery-ui.css">
-  <script src="jquery.js"></script>
-  <script src="/jquery-ui-1.12.1.custom/jquery-ui.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="jquery-ui.min.css">
+<script src="external/jquery/jquery.js"></script>
+<script src="jquery-ui.min.js"></script>
+<link rel="stylesheet" href="ost.css">
 </head>
+
 <body>
-<div id="CLI">
-20211124
-        <p>
-            <button onClick="initWebSocket();">Connect</button>
-            <button onClick="stopWebSocket();">Disconnect</button>
-            <button onClick="checkSocket();">State</button>
-            <input type="text" id="inputText" onkeydown="if(event.keyCode==13)sendMessage();"/>
-            <button onClick="sendMessage();">Send</button>
-         </p>
-        <p>
-            <textarea id="debugTextArea" style="width:800px;height:50px;"></textarea>
-            <textarea id="debuginput" style="width:800px;height:50px;"></textarea>
-            <textarea id="debugoutput" style="width:800px;height:50px;"></textarea>
-        </p>
-</div>
+
 <div id="OST">
-</div>
+</div> 
+
+</body>
+</html>
 
 <script>
             function sortJSON(arr) {
@@ -40,21 +28,8 @@
             var debuginput = document.getElementById("debuginput");
             var debugoutput = document.getElementById("debugoutput");
             function debug(message) {
-                debugTextArea.value += message + "\n";
-                debugTextArea.scrollTop = debugTextArea.scrollHeight;
-                debuginput.value = message;
             }
 
-            function sendMessage() {
-                var msg = document.getElementById("inputText").value;
-                if ( websocket != null )
-                {
-                    document.getElementById("inputText").value = "";
-                    websocket.send( msg );
-                    debugoutput.value = msg;
-                    console.log( "string sent :", '"'+msg+'"' );
-                }
-            }
 
             function indi_switch(btn,modulename,categname,propname,name) {
               //console.log( "indi_switch clicked:", '"'+btn+'"' ,'"'+modulename+'"');
@@ -98,28 +73,33 @@
 
 
 
-            var wsUri = "ws://192.168.1.25:9624";
-            var websocket = null;
+			var ur = window.location.origin.replace("http://", "");
+			var result = ur.replace("http://", "");
+			var wsUri = "ws://"+ur+":9624";            
+			var websocket = null;
 
             function buildProperty(prop) {
-
-              if  (!($("div#"+prop.modulename+prop.propname).length)) {
-                  //$("div#"+prop.modulename+prop.categname+prop.groupname).append("<div id="+prop.modulename+prop.propname+" label="+prop.label+"></div>");
-                  $("div#"+prop.modulename+prop.categname+prop.groupname).append("<div id="+prop.modulename+prop.propname+" ><table id=tab"+prop.modulename+prop.propname+"><tr><td><strong>"+prop.label+"</strong></td><td></td></tr></table></div>");
+              nn=prop.modulename+prop.devicenameshort+prop.groupnameshort+prop.propname;
+              console.log( "BUILD :", nn);
+              if  (!($("div#P"+nn).length)) {
+                  $("#U"+prop.modulename+prop.devicenameshort+prop.groupnameshort).append("<div id=P"+nn+" ><table id=tab"+nn+"><tr><td><strong>"+prop.label+"</strong></td><td></td></tr></table></div>");
                   //$("div#"+prop.modulename+prop.propname).append("<label for='name'>"+prop.label+"</label>");
               }
 
-              if (prop.type =="INDI_TEXT") {
+              if (prop.hasOwnProperty('texts')) {
                   var texts = prop.texts;
                   $.each( texts, function( iitem, item ) {
-                    nn= prop.modulename+prop.propname+item.name;
+                    nnn = nn+item.name;
+                    console.log( "BUILD TEXT :", nnn);
                     if ($("input#"+prop.modulename+prop.propname+item.name).length) {
                         $("input#"+prop.modulename+prop.propname+item.name).val(item.text);
                     } else {
-                        if (prop.perm=="IP_RO") {
-                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<tr><td><small> "+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /></td></tr>");
-                        } else {
-                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /><button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_text('"+nn+"','"+prop.modulename+"','"+prop.categname+"','"+prop.propname+"','"+item.name+"');\"    >set</button></td></tr>");
+                        console.log( "BUILD TEXT :", nnn);
+                        if (prop.permission=="0") {
+                          $("#tab"+nn + " tbody").append("<tr><td><small> "+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /></td></tr>");
+                        } 
+                        if (prop.permission=="1") {
+                          $("#tab"+nn+ " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /><button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_text('"+nn+"','"+prop.modulename+"','"+prop.categname+"','"+prop.propname+"','"+item.name+"');\"    >set</button></td></tr>");
                         }
 
 
@@ -258,7 +238,7 @@
                     websocket.onopen = function (evt) {
                         debug("CONNECTED");
                         websocket.send( "{\"message\":\"readall\"}");
-                        debugoutput.value = msg;
+                        //debugoutput.value = msg;
                     };
                     websocket.onclose = function (evt) {
                         debug("DISCONNECTED");
@@ -269,13 +249,83 @@
 
                     websocket.onmessage = function (evt) {
                         console.log( "Message received :", evt.data );
-                        //debug ("BEGIN-------------------------------------------------");
-                        //debug (evt.data);
-                        //debug ("END  -------------------------------------------------");
-                        debuginput.value = evt.data;
+                        debug ("BEGIN-------------------------------------------------");
+                        debug (evt.data);
+                        debug ("END  -------------------------------------------------");
+                        //debuginput.value = evt.data +"\n";
                         var obj = jQuery.parseJSON( evt.data );
+                        if (obj.event == 'moduledump') {
+                              
+                              if  (!($("div#D"+obj.module).length)) {
+                                    $("div#OST").append("<h1 id=H"+obj.module+">"+obj.modulelabel+"</h1>");
+                                    $("div#OST").append("<div id=D"+obj.module+"></div>");
+                                    $("div#D"+obj.module).append("<ul id=U"+obj.module+"></ul>");
+									var devices = obj.devices;
+                            		$.each( devices, function(idev,dev) {
+		                              if  (!($("div#D"+obj.module+dev.devicenameshort).length)) {
+                                          $("div#D"+obj.module).append("<div id=D"+obj.module+dev.devicenameshort+"></div>");
+                                          $("#U"+obj.module).append("<li id=L"+obj.module+dev.devicenameshort+"><a href=#D"+obj.module+dev.devicenameshort+">"+dev.devicename+"</a></li>");
+                                          $("div#D"+obj.module+dev.devicenameshort).append("<ul id=U"+obj.module+dev.devicenameshort+"></ul>");
+ 
+                                          
+											var groups = dev.groups;
+		                            		$.each( groups, function(igro,gro) {
+				                              if  (!($("div#"+obj.module+dev.devicenameshort+gro.groupnameshort).length)) {
+				                                //$("div#"+obj.module+dev.devicenameshort).append("<div id='"+obj.module+dev.devicenameshort+gro.groupnameshort+"'>----------"+gro.groupname+"</div>");
+                                                $("div#D"+obj.module+dev.devicenameshort).append("<div id=D"+obj.module+dev.devicenameshort+gro.groupnameshort+"></div>");
+                                                $("#U"+obj.module+dev.devicenameshort).append("<li id=L"+obj.module+dev.devicenameshort+gro.groupnameshort+"><a href=#D"+obj.module+dev.devicenameshort+gro.groupnameshort+">"+gro.groupname+"</a></li>");
+                                                $("div#D"+obj.module+dev.devicenameshort+gro.groupnameshort).append("<ul id=U"+obj.module+dev.devicenameshort+gro.groupnameshort+"></ul>");
+    
+												var props = gro.properties;
+			                            		$.each( props, function(iprop,pro) {
+					                              if  (!($("div#P"+obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname).length)) {
+                                                    buildProperty(pro)
+	
+		    		    	                      }
+											    })
 
-                        if (obj.message == 'updateproperty') {
+
+
+	    		    	                      }
+										    })
+										    $("div#D"+obj.module+dev.devicenameshort).tabs();
+
+
+	        	                      }
+								    })
+                                    $("div#D"+obj.module).tabs();
+                                    //$("#OST").tabs("refresh");
+                                    //$("div#D"+obj.module).accordion({header: "h4",collapsible: true,autoHeight: false,navigation: true,heightStyle: "content" });
+                                    //$("div#D"+obj.module).accordion("refresh");  
+
+                              }
+                        $("#OST").accordion({header: "h1",collapsible: true,autoHeight: false,navigation: true,heightStyle: "content" });
+                        $("#OST").accordion("refresh");  
+                        //$("#OST").tabs("refresh");
+                        //$("#OST").accordion();
+                        }// end moduledump
+
+                        if (obj.event == 'removeproperty') {
+								var dev   = obj.module+obj.property.devicenameshort;
+								var group = dev+obj.property.groupnameshort;
+							  	var prop  = group+obj.property.propname;
+							  	console.log("REMOVE "+prop);
+								$( "."+ prop ).remove();
+
+								if ($("div#D"+ group + " > div").length == 0 ){
+									$("div#D"+ group ).remove();
+									$("#L"+ group ).remove();
+								}
+								if ($("div#D"+ dev + " > div").length == 0 ){
+									$("div#D"+ dev ).remove();
+									$("#L"+ dev ).remove();
+								}
+
+                            
+                        }
+
+
+                        if (obj.event == 'createproperty') {
                             var prop = obj.property;
                             buildProperty(prop);
                         }
@@ -442,5 +492,4 @@
     });
 
 </script>
-</body>
-</html>
+

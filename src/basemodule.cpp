@@ -2,25 +2,19 @@
 #include <basedevice.h>
 #include "basemodule.h"
 
-Basemodule::Basemodule(QString name,QString label)
+Basemodule::Basemodule(QString name, QString label)
     :_modulename(name),
       _modulelabel(label)
 {
-    properties=Properties::getInstance();
-    properties->createModule(_modulename,_modulelabel,9);
+    _propertyStore.cleanup();
     setVerbose(false);
-}
-void Basemodule::setNameAndLabel(QString name,QString label)
-{
-}
-void Basemodule::echoNameAndLabel()
-{
-    BOOST_LOG_TRIVIAL(debug)  << "Hello, i'm " << _modulename.toStdString() << " " << _modulelabel.toStdString();
+    _moduledescription="This is a base module, it shouldn't be used as is";
 }
 void Basemodule::setHostport(QString host, int port)
 {
     setServer(host.toStdString().c_str(), port);
 }
+
 /*!
  * Connects to indi server
  * Should we add host/port ??
@@ -33,36 +27,29 @@ bool Basemodule::connectIndi()
     if (isServerConnected())
     {
         sendMessage("Indi server already connected");
-        BOOST_LOG_TRIVIAL(debug) << "Indi server already connected";
         newUniversalMessage("Indi server already connected");
         return true;
     } else {
         if (connectServer()){
-            BOOST_LOG_TRIVIAL(debug) << "Indi server connected";
             newUniversalMessage("Indi server connected");
             sendMessage("Indi server connected");
             return true;
         } else {
-            BOOST_LOG_TRIVIAL(debug) << "Couldn't connect to Indi server";
             sendMessage("Couldn't connect to Indi server");
             return false;
         }
     }
 
 }
-QMap<QString,QString> Basemodule::getModDevices(void)
-{
-    return _devices;
-}
-void Basemodule::setDevices(QMap<QString,QString> devices)
-{
-    _devices =devices;
-}
 void Basemodule::sendMessage(QString message)
 {
     QString mess = QDateTime::currentDateTime().toString("[yyyyMMdd hh:mm:ss.zzz]") + " - " + _modulename + " - " + message;
-    qDebug() << mess.toStdString().c_str();
-    emit newMessage(mess);
+    BOOST_LOG_TRIVIAL(debug) << message.toStdString();
+    emit newMessageSent(mess,&_modulename,_modulename);
+}
+void Basemodule::OnDumpAsked()
+{
+    emit moduleDumped(_propertyStore.toTreeList(),&_modulename,&_modulelabel,&_moduledescription);
 }
 
 bool Basemodule::disconnectIndi(void)

@@ -10,7 +10,6 @@
 
 
 #include "wshandler.h"
-#include "properties.h"
 #include "maincontrol.h"
 
 /*!
@@ -25,18 +24,17 @@ class Controller : public QObject
 public:
     Controller(QObject *parent, bool saveAllBlobs, const QString& host, int port);
     ~Controller() override;
-    Properties  *properties;
     WShandler   *wshandler;
 public slots:
-    void OnValueChanged(double newValue);
-    //void OnValueChanged(QString newValue);
-    void valueChanged(Prop prop);
-    void AppendGraph (Prop prop,OGraph gra,OGraphValue val);
-    void propCreated (Prop prop);
-    void propDeleted (Prop prop);
+    void OnPropertyCreated(Property *pProperty, QString *pModulename);
+    void OnPropertyUpdated(Property *pProperty, QString *pModulename);
+    void OnPropertyRemoved(Property *pProperty, QString *pModulename);
+    void OnNewMessageSent(QString message, QString *pModulename, QString Device);
+    void OnModuleDumped(QMap<QString, QMap<QString, QMap<QString, Property*>>> treeList, QString* pModulename, QString* pModulelabel);
 
 signals:
     void closed();
+    void dumpAsked(void);
 private:
     void LoadModule(QString lib,QString name,QString label);
     QString _indihost;

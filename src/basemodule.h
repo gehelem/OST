@@ -7,7 +7,15 @@
 #include <baseclient.h>
 #include <boost/log/trivial.hpp>
 #include "image.h"
-#include "properties.h"
+#include <model/setup.h>
+#include <model/value.h>
+#include <model/textvalue.h>
+#include <utils/propertytextdumper.h>
+#include <model/propertystore.h>
+#include "utils/propertyfactory.h"
+
+class Property;
+
 /*!
  * This Class shouldn't be used as is
  * Every functionnal module should inherit it
@@ -19,23 +27,20 @@ class Basemodule : public QObject, public INDI::BaseClient
     public:
         Basemodule(QString name,QString label);
         ~Basemodule() = default;
-        void setNameAndLabel(QString name, QString label);
-        void echoNameAndLabel(void);
         void setHostport(QString host, int port);
         bool connectIndi(void);
+        QString getDescription(void) {return _moduledescription;}
 
-
-        QMap<QString,QString> getModDevices(void);
-        void setDevices(QMap<QString,QString>);
         std::unique_ptr<Image> image =nullptr;
 
         QString _modulename;
         QString _modulelabel;
-   public slots:
-        virtual void changeProp(Prop prop) {Q_UNUSED(prop);}
+        QString _moduledescription;
+
+    public slots:
+        void OnDumpAsked(void);
 
     protected:
-        //QList<FITSImage::Star> stars;
         bool disconnectIndi(void);
         void connectAllDevices(void);
         void disconnectAllDevices(void);
@@ -48,11 +53,8 @@ class Basemodule : public QObject, public INDI::BaseClient
         bool frameReset(QString devicename);
         void sendMessage(QString message);
 
-        QString _status;
+        PropertyStore _propertyStore;
 
-        QMap<QString,QString>     _devices;
-
-        Properties  *properties;
         virtual void serverConnected() {}
         virtual void serverDisconnected(int exit_code)          {Q_UNUSED(exit_code);}
         virtual void newDevice(INDI::BaseDevice *dp)            {Q_UNUSED(dp);}
@@ -69,11 +71,15 @@ class Basemodule : public QObject, public INDI::BaseClient
 
 
     signals:
+        void propertyCreated(Property* pProperty, QString* pModulename);
+        void propertyUpdated(Property* pProperty, QString* pModulename);
+        void propertyRemoved(Property* pProperty, QString* pModulename);
+        void moduleDumped(QMap<QString, QMap<QString, QMap<QString, Property*>>> treeList, QString* pModulename, QString* pModulelabel, QString* pModuledescription);
+        void newMessageSent(QString message,      QString* pModulename, QString Device);
+
         void finished();
-        void newMessage(QString message);
         void statusChanged(const QString &newStatus);
         void askedFrameReset(QString devicename);
-    private:
 }
 ;
 #endif

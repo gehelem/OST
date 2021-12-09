@@ -2,9 +2,11 @@
 #define WSHANDLER_h_
 #include "QtWebSockets/qwebsocketserver.h"
 #include "QtWebSockets/qwebsocket.h"
+#include <utils/jsondumper.h>
+#include "model/property.h"
+
 QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
 QT_FORWARD_DECLARE_CLASS(QWebSocket)
-#include "properties.h"
 /*!
  * Websocket management
  * open/close/send/receives sockets
@@ -14,12 +16,18 @@ class WShandler : public QObject
 {
     Q_OBJECT
 public:
-    WShandler(QObject *parent,Properties *properties);
+    WShandler(QObject *parent);
     ~WShandler();
-    Properties *props;
     QWebSocketServer *m_pWebSocketServer;
     QList<QWebSocket *> m_clients;
 public slots:
+    void OnPropertyCreated(Property *pProperty, QString *pModulename);
+    void OnPropertyUpdated(Property *pProperty, QString *pModulename);
+    void OnPropertyRemoved(Property *pProperty, QString *pModulename);
+    void OnNewMessageSent(QString message,QString *pModulename, QString Device);
+    void OnModuleDumped(QMap<QString, QMap<QString, QMap<QString, Property*>>> treeList, QString* pModulename, QString* pModulelabel, QString* pModuledescription);
+
+
     void onNewConnection();
     void processTextMessage(QString message);
     void processBinaryMessage(QByteArray message);
@@ -27,15 +35,10 @@ public slots:
     void sendJsonMessage(QJsonObject json);
     void sendbinary(QByteArray *data);
     void socketDisconnected();
-    void sendProperty(Prop prop);
-    void updateElements(Prop prop);
-    void sendElement(Prop prop);
-    void sendGraphValue(Prop prop, OGraph gra, OGraphValue val);
-    void sendAll(void);
 signals:
     void closed();
-    void changeValue(Prop prop);
     void textRcv(QString txt);
+    void dumpAsked(void);
 private:
 };
 #endif
