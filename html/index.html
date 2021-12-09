@@ -2,15 +2,17 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
-<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
-<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+<link rel="stylesheet" href="jquery-ui.min.css">
+<script src="external/jquery/jquery.js"></script>
+<script src="jquery-ui.min.js"></script>
+<link rel="stylesheet" href="ost.css">
 </head>
 
 <body>
 
 <div id="OST">
 </div> 
+
 </body>
 </html>
 
@@ -250,31 +252,39 @@
                         //debuginput.value = evt.data +"\n";
                         var obj = jQuery.parseJSON( evt.data );
                         if (obj.event == 'moduledump') {
-
-                              if  (!($("div#"+obj.module).length)) {
-                                    $("div#OST").append("<div id='"+obj.module+"'>"+obj.modulelabel+"</div>");
+                              
+                              if  (!($("div#D"+obj.module).length)) {
+                                    $("div#OST").append("<h1 id=H"+obj.module+">"+obj.modulelabel+"</h1>");
+                                    $("div#OST").append("<div id=D"+obj.module+"></div>");
+                                    $("div#D"+obj.module).append("<ul id=U"+obj.module+"></ul>");
 									var devices = obj.devices;
                             		$.each( devices, function(idev,dev) {
-		                              if  (!($("div#"+obj.module+dev.devicenameshort).length)) {
-		                                  $("div#"+obj.module).append("<div id='"+obj.module+dev.devicenameshort+"'>----"+dev.devicename+"</div>");
-
+		                              if  (!($("div#D"+obj.module+dev.devicenameshort).length)) {
+                                          $("div#D"+obj.module).append("<div id=D"+obj.module+dev.devicenameshort+"></div>");
+                                          $("#U"+obj.module).append("<li id=L"+obj.module+dev.devicenameshort+"><a href=#D"+obj.module+dev.devicenameshort+">"+dev.devicename+"</a></li>");
+                                          $("div#D"+obj.module+dev.devicenameshort).append("<ul id=U"+obj.module+dev.devicenameshort+"></ul>");
+ 
+                                          
 											var groups = dev.groups;
 		                            		$.each( groups, function(igro,gro) {
 				                              if  (!($("div#"+obj.module+dev.devicenameshort+gro.groupnameshort).length)) {
-				                                  $("div#"+obj.module+dev.devicenameshort).append("<div id='"+obj.module+dev.devicenameshort+gro.groupnameshort+"'>----------"+gro.groupname+"</div>");
-
+				                                //$("div#"+obj.module+dev.devicenameshort).append("<div id='"+obj.module+dev.devicenameshort+gro.groupnameshort+"'>----------"+gro.groupname+"</div>");
+                                                $("div#D"+obj.module+dev.devicenameshort).append("<div id=D"+obj.module+dev.devicenameshort+gro.groupnameshort+"></div>");
+                                                $("#U"+obj.module+dev.devicenameshort).append("<li id=L"+obj.module+dev.devicenameshort+gro.groupnameshort+"><a href=#D"+obj.module+dev.devicenameshort+gro.groupnameshort+">"+gro.groupname+"</a></li>");
+                                                $("div#D"+obj.module+dev.devicenameshort+gro.groupnameshort).append("<ul id=U"+obj.module+dev.devicenameshort+gro.groupnameshort+"></ul>");
+    
 												var props = gro.properties;
 			                            		$.each( props, function(iprop,pro) {
 												  nn=obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname;
 					                              if  (!($("div#"+nn).length)) {
-					                                  $("div#"+obj.module+dev.devicenameshort+gro.groupnameshort).append("<div id='"+nn+"' class='"+nn+"'>--------------- "+pro.label+"</div>");
+					                                  $("div#D"+obj.module+dev.devicenameshort+gro.groupnameshort).append("<div id=D"+nn+" class="+nn+">--------------- "+pro.label+"</div>");
 	
 													if (pro.hasOwnProperty('texts')) {
 													var dets = pro.texts;
 				                            		$.each( dets, function(idet,det) {
 													  nn=obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname+det.name;
 						                              if  (!($("div#"+nn).length)) {
-						                                  $("div#"+obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname).append("<div id='"+nn+"' class='"+nn+"'>-----------------TEXT "+det.label+"-"+det.text+"</div>");
+						                                  $("div#D"+obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname).append("<div id='"+nn+"' class='"+nn+"'>-----------------TEXT "+det.label+"-"+det.text+"</div>");
 			    		    	                      }
 												    })
 													}														
@@ -283,7 +293,7 @@
 				                            		$.each( dets, function(idet,det) {
 													  nn=obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname+det.name;
 						                              if  (!($("div#"+nn).length)) {
-						                                  $("div#"+obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname).append("<div id='"+nn+"' class='"+nn+"'>-----------------NUMBER "+det.label+"</div>");
+						                                  $("div#D"+obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname).append("<div id='"+nn+"' class='"+nn+"'>-----------------NUMBER "+det.label+"</div>");
 			    		    	                      }
 												    })
 													}														
@@ -292,7 +302,7 @@
 				                            		$.each( dets, function(idet,det) {
 													  nn=obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname+det.name;
 						                              if  (!($("div#"+nn).length)) {
-						                                  $("div#"+obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname).append("<div id='"+nn+"' class='"+nn+"'>-----------------SWITCH "+det.label+"</div>");
+						                                  $("div#D"+obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname).append("<div id='"+nn+"' class='"+nn+"'>-----------------SWITCH "+det.label+"</div>");
 			    		    	                      }
 												    })
 													}														
@@ -301,7 +311,7 @@
 				                            		$.each( dets, function(idet,det) {
 													  nn=obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname+det.name;
 						                              if  (!($("div#"+nn).length)) {
-						                                  $("div#"+obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname).append("<div id='"+nn+"' class='"+nn+"'>-----------------LIGHT "+det.label+"</div>");
+						                                  $("div#D"+obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname).append("<div id='"+nn+"' class='"+nn+"'>-----------------LIGHT "+det.label+"</div>");
 			    		    	                      }
 												    })
 													}														
@@ -314,13 +324,22 @@
 
 	    		    	                      }
 										    })
+										    $("div#D"+obj.module+dev.devicenameshort).tabs();
 
 
 	        	                      }
 								    })
+                                    $("div#D"+obj.module).tabs();
+                                    //$("#OST").tabs("refresh");
+                                    //$("div#D"+obj.module).accordion({header: "h4",collapsible: true,autoHeight: false,navigation: true,heightStyle: "content" });
+                                    //$("div#D"+obj.module).accordion("refresh");  
+
                               }
-                            
-                        }
+                        $("#OST").accordion({header: "h1",collapsible: true,autoHeight: false,navigation: true,heightStyle: "content" });
+                        $("#OST").accordion("refresh");  
+                        //$("#OST").tabs("refresh");
+                        //$("#OST").accordion();
+                        }// end moduledump
 
                         if (obj.event == 'removeproperty') {
 								var dev   = obj.module+obj.property.devicenameshort;
@@ -329,11 +348,13 @@
 							  	console.log("REMOVE "+prop);
 								$( "."+ prop ).remove();
 
-								if ($("div#"+ group + " > div").length == 0 ){
-									$( "div#"+ group ).remove();
+								if ($("div#D"+ group + " > div").length == 0 ){
+									$("div#D"+ group ).remove();
+									$("#L"+ group ).remove();
 								}
-								if ($("div#"+dev+ " > div").length == 0 ){
-									$( "div#"+ dev ).remove();
+								if ($("div#D"+ dev + " > div").length == 0 ){
+									$("div#D"+ dev ).remove();
+									$("#L"+ dev ).remove();
 								}
 
                             

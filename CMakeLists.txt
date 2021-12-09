@@ -28,7 +28,7 @@ find_package(GSL REQUIRED)
 find_package(OpenCV REQUIRED )
 find_package(CImg REQUIRED )
 find_package(WCSLIB REQUIRED)
-find_package(Qt5 5.15.2 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Scxml Sql)
+find_package(Qt5 5.12 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Scxml Sql)
 find_package(StellarSolver REQUIRED)
 find_package(Boost COMPONENTS log log_setup REQUIRED)
 
@@ -108,6 +108,22 @@ target_link_libraries( ost
 ########################
 ### modules libraries ##
 ########################
+# Indipanel module
+add_library(ostdummy SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.cpp
+)
+target_link_libraries(ostdummy PRIVATE
+    indiclient
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+)
+target_compile_definitions(ostdummy PRIVATE dummy_LIBRARY)
+
+
+
+
 #
 ## Focus module
 #add_library(ostfocuser SHARED

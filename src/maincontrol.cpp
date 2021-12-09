@@ -32,6 +32,8 @@ MainControl::MainControl(QString name,QString label)
     emit propertyCreated(prop,&_modulename);
     _propertyStore.add(prop);
 
+
+
     //ITextVectorProperty testtext;
     //strcpy(testtext.name, "proprtest");
     //strcpy(testtext.label, "propriété de test");
