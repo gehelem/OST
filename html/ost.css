@@ -1,0 +1,10 @@
+
+
+#OST .ui-accordion-header {  
+line-height: 5px;   /*Header Box height*/
+font-size: 12px;     /*Header Text size*/
+text-indent: 1px;}  
+	.ui-tabs .ui-tabs-nav .ui-tabs-anchor {
+    padding: 0 0;
+    font-size: smaller;
+}

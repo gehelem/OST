@@ -94,7 +94,6 @@
                     if ($("input#"+prop.modulename+prop.propname+item.name).length) {
                         $("input#"+prop.modulename+prop.propname+item.name).val(item.text);
                     } else {
-                        console.log( "BUILD TEXT :", nnn);
                         if (prop.permission=="0") {
                           $("#tab"+nn + " tbody").append("<tr><td><small> "+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /></td></tr>");
                         } 
@@ -107,6 +106,27 @@
                   });
 
               }
+              
+              if (prop.hasOwnProperty('numbers')) {
+                  var numbers = prop.numbers;
+                  $.each( numbers, function( iitem, item ) {
+                    nnn = nn+item.name;
+                    console.log( "BUILD NUMBER :", nnn);
+                    if ($("input#"+prop.modulename+prop.propname+item.name).length) {
+                        $("input#"+prop.modulename+prop.propname+item.name).val(item.value);
+                    } else {
+                        if (prop.permission=="0") {
+                          $("#tab"+nn + " tbody").append("<tr><td><small> "+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /></td></tr>");
+                        } 
+                        if (prop.permission=="2") {
+                          $("#tab"+nn+ " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /><button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_number('"+nn+"','"+prop.modulename+"','"+prop.categname+"','"+prop.propname+"','"+item.name+"');\"    >set</button></td></tr>");
+                        }
+
+
+                    }
+                  });
+
+              }              
 
               if (prop.type =="INDI_MESSAGE") {
                   var messages = prop.messages;
