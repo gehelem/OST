@@ -84,6 +84,20 @@ If you really want to play the "headless way" (wich is the goal), add this at th
 
 News
 ====
+09/12/2021
+----------
+Well, i think we'll keep on trying this way to deal with properties. I still don't understand Deufrai's implementation, but i've managed to use it ...
+Big problem :
+Someone on Webastro french forum told me that Indigo software is exactly doing what i'm trying to achieve ... OMG OMG OMG
+https://www.indigo-astronomy.org/
+What should i do ? I've tried : it's really a nice toy.
+Problems with it :
+- Not GPL
+- Not Indi (despite partial compatibility)
+- Only two (very active and obvioulsy talentuous) developers 
+> I think i'll continue to play this game my way, just for fun.
+
+
 28/11/2021
 ----------
 We can instanciate modules dynamicaly, they can be built separately
