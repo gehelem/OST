@@ -29,7 +29,6 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
     BOOST_LOG_TRIVIAL(debug) <<  "ApplicationDirPath :" << QCoreApplication::applicationDirPath().toStdString();
 
     MainControl *mainctl = new MainControl("maincontrol","Main control");
-    mainctl->echoNameAndLabel();
     mainctl->setHostport(_indihost,_indiport);
     mainctl->connectIndi();
     connect(mainctl,&Basemodule::propertyCreated,this,&Controller::OnPropertyCreated);
@@ -45,16 +44,6 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
 
     connect(wshandler,&WShandler::dumpAsked,mainctl,&Basemodule::OnDumpAsked);
 
-
-
-    QDir directory(QCoreApplication::applicationDirPath());
-    directory.setFilter(QDir::Files);
-    directory.setNameFilters(QStringList() << "*ost*.so");
-    _availableModuleLibs = directory.entryList();
-    foreach(QString lib, _availableModuleLibs)
-    {
-        BOOST_LOG_TRIVIAL(debug) << "Module lib found " << lib.toStdString();
-    }
 
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focuser1","focuser 1");
     LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel1","indipanel 1");

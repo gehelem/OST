@@ -79,24 +79,27 @@
 			var websocket = null;
 
             function buildProperty(prop) {
-
-              if  (!($("div#"+prop.deviceNameShort+prop.deviceNameShort+prop.name).length)) {
-                  //$("div#"+prop.modulename+prop.categname+prop.groupname).append("<div id="+prop.modulename+prop.propname+" label="+prop.label+"></div>");
-                  $("div#"+prop.deviceNameShort+prop.deviceNameShort).append("<div id="+prop.modulename+prop.propname+" ><table id=tab"+prop.modulename+prop.propname+"><tr><td><strong>"+prop.label+"</strong></td><td></td></tr></table></div>");
+              nn=prop.modulename+prop.devicenameshort+prop.groupnameshort+prop.propname;
+              console.log( "BUILD :", nn);
+              if  (!($("div#P"+nn).length)) {
+                  $("#U"+prop.modulename+prop.devicenameshort+prop.groupnameshort).append("<div id=P"+nn+" ><table id=tab"+nn+"><tr><td><strong>"+prop.label+"</strong></td><td></td></tr></table></div>");
                   //$("div#"+prop.modulename+prop.propname).append("<label for='name'>"+prop.label+"</label>");
               }
 
-              if (prop.type =="INDI_TEXT") {
+              if (prop.hasOwnProperty('texts')) {
                   var texts = prop.texts;
                   $.each( texts, function( iitem, item ) {
-                    nn= prop.modulename+prop.propname+item.name;
+                    nnn = nn+item.name;
+                    console.log( "BUILD TEXT :", nnn);
                     if ($("input#"+prop.modulename+prop.propname+item.name).length) {
                         $("input#"+prop.modulename+prop.propname+item.name).val(item.text);
                     } else {
-                        if (prop.perm=="IP_RO") {
-                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<tr><td><small> "+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /></td></tr>");
-                        } else {
-                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /><button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_text('"+nn+"','"+prop.modulename+"','"+prop.categname+"','"+prop.propname+"','"+item.name+"');\"    >set</button></td></tr>");
+                        console.log( "BUILD TEXT :", nnn);
+                        if (prop.permission=="0") {
+                          $("#tab"+nn + " tbody").append("<tr><td><small> "+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /></td></tr>");
+                        } 
+                        if (prop.permission=="1") {
+                          $("#tab"+nn+ " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /><button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_text('"+nn+"','"+prop.modulename+"','"+prop.categname+"','"+prop.propname+"','"+item.name+"');\"    >set</button></td></tr>");
                         }
 
 
@@ -275,47 +278,8 @@
     
 												var props = gro.properties;
 			                            		$.each( props, function(iprop,pro) {
-												  nn=obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname;
-					                              if  (!($("div#"+nn).length)) {
-					                                  $("div#D"+obj.module+dev.devicenameshort+gro.groupnameshort).append("<div id=D"+nn+" class="+nn+">--------------- "+pro.label+"</div>");
-	
-													if (pro.hasOwnProperty('texts')) {
-													var dets = pro.texts;
-				                            		$.each( dets, function(idet,det) {
-													  nn=obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname+det.name;
-						                              if  (!($("div#"+nn).length)) {
-						                                  $("div#D"+obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname).append("<div id='"+nn+"' class='"+nn+"'>-----------------TEXT "+det.label+"-"+det.text+"</div>");
-			    		    	                      }
-												    })
-													}														
-													if (pro.hasOwnProperty('numbers')) {
-													var dets = pro.numbers;
-				                            		$.each( dets, function(idet,det) {
-													  nn=obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname+det.name;
-						                              if  (!($("div#"+nn).length)) {
-						                                  $("div#D"+obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname).append("<div id='"+nn+"' class='"+nn+"'>-----------------NUMBER "+det.label+"</div>");
-			    		    	                      }
-												    })
-													}														
-													if (pro.hasOwnProperty('switches')) {
-													var dets = pro.switches;
-				                            		$.each( dets, function(idet,det) {
-													  nn=obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname+det.name;
-						                              if  (!($("div#"+nn).length)) {
-						                                  $("div#D"+obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname).append("<div id='"+nn+"' class='"+nn+"'>-----------------SWITCH "+det.label+"</div>");
-			    		    	                      }
-												    })
-													}														
-													if (pro.hasOwnProperty('lights')) {
-													var dets = pro.lights;
-				                            		$.each( dets, function(idet,det) {
-													  nn=obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname+det.name;
-						                              if  (!($("div#"+nn).length)) {
-						                                  $("div#D"+obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname).append("<div id='"+nn+"' class='"+nn+"'>-----------------LIGHT "+det.label+"</div>");
-			    		    	                      }
-												    })
-													}														
-	
+					                              if  (!($("div#P"+obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname).length)) {
+                                                    buildProperty(pro)
 	
 		    		    	                      }
 											    })

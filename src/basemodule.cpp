@@ -2,19 +2,13 @@
 #include <basedevice.h>
 #include "basemodule.h"
 
-Basemodule::Basemodule(QString name,QString label)
+Basemodule::Basemodule(QString name, QString label)
     :_modulename(name),
       _modulelabel(label)
 {
     _propertyStore.cleanup();
     setVerbose(false);
-}
-void Basemodule::setNameAndLabel(QString name,QString label)
-{
-}
-void Basemodule::echoNameAndLabel()
-{
-    BOOST_LOG_TRIVIAL(debug)  << "Hello, i'm " << _modulename.toStdString() << " " << _modulelabel.toStdString();
+    _moduledescription="This is a base module, it shouldn't be used as is";
 }
 void Basemodule::setHostport(QString host, int port)
 {
@@ -55,9 +49,7 @@ void Basemodule::sendMessage(QString message)
 }
 void Basemodule::OnDumpAsked()
 {
-    //QList<Property *> list;
-    qDebug() << "we dump";
-    emit moduleDumped(_propertyStore.toTreeList(),&_modulename,&_modulelabel);
+    emit moduleDumped(_propertyStore.toTreeList(),&_modulename,&_modulelabel,&_moduledescription);
 }
 
 bool Basemodule::disconnectIndi(void)

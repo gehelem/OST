@@ -9,6 +9,7 @@ IndiPanel *initialize(QString name,QString label)
 IndiPanel::IndiPanel(QString name,QString label)
     : Basemodule(name,label)
 {
+    _moduledescription="Indi control panel";
 
 }
 

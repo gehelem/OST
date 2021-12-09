@@ -155,12 +155,13 @@ void WShandler::socketDisconnected()
         pClient->deleteLater();
     }
 }
-void WShandler::OnModuleDumped(QMap<QString, QMap<QString, QMap<QString, Property *> > > treeList, QString* pModulename, QString* pModulelabel)
+void WShandler::OnModuleDumped(QMap<QString, QMap<QString, QMap<QString, Property *> > > treeList, QString* pModulename, QString* pModulelabel, QString* pModuledescription)
 {
     QJsonObject  obj;
     obj["event"]="moduledump";
     obj["module"]=*pModulename;
     obj["modulelabel"]=*pModulelabel;
+    obj["moduledescription"]=*pModuledescription;
 
     QJsonArray devices;
     for ( const QString& device : treeList.keys() ) {

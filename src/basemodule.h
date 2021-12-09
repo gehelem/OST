@@ -27,25 +27,20 @@ class Basemodule : public QObject, public INDI::BaseClient
     public:
         Basemodule(QString name,QString label);
         ~Basemodule() = default;
-        void setNameAndLabel(QString name, QString label);
-        void echoNameAndLabel(void);
         void setHostport(QString host, int port);
         bool connectIndi(void);
+        QString getDescription(void) {return _moduledescription;}
 
         std::unique_ptr<Image> image =nullptr;
 
         QString _modulename;
         QString _modulelabel;
+        QString _moduledescription;
 
     public slots:
         void OnDumpAsked(void);
-        //virtual void changeProp(Prop prop) {Q_UNUSED(prop);}
-    //void OnPropertyCreated (Property *prop) {BOOST_LOG_TRIVIAL(debug) << "prop created " << prop->getName().toStdString()<< "-" << prop->getLabel().toStdString();}
-    //void OnPropertyDeleted (Property *prop) {BOOST_LOG_TRIVIAL(debug) << "prop deleted " << prop->getName().toStdString()<< "-" << prop->getLabel().toStdString();}
-    //void OnPropertyModified(Property *prop) {BOOST_LOG_TRIVIAL(debug) << "prop modified " << prop->getName().toStdString()<< "-" << prop->getLabel().toStdString();}
 
     protected:
-        //QList<FITSImage::Star> stars;
         bool disconnectIndi(void);
         void connectAllDevices(void);
         void disconnectAllDevices(void);
@@ -79,7 +74,7 @@ class Basemodule : public QObject, public INDI::BaseClient
         void propertyCreated(Property* pProperty, QString* pModulename);
         void propertyUpdated(Property* pProperty, QString* pModulename);
         void propertyRemoved(Property* pProperty, QString* pModulename);
-        void moduleDumped(QMap<QString, QMap<QString, QMap<QString, Property*>>> treeList, QString* pModulename, QString* pModulelabel);
+        void moduleDumped(QMap<QString, QMap<QString, QMap<QString, Property*>>> treeList, QString* pModulename, QString* pModulelabel, QString* pModuledescription);
         void newMessageSent(QString message,      QString* pModulename, QString Device);
 
         void finished();
