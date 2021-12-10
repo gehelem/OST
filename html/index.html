@@ -95,10 +95,10 @@
                         $("input#"+prop.modulename+prop.propname+item.name).val(item.text);
                     } else {
                         if (prop.permission=="0") {
-                          $("#tab"+nn + " tbody").append("<tr><td><small> "+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /></td></tr>");
+                          $("#tab"+nn + " tbody").append("<tr><td><small> "+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /></td></tr>");
                         } 
-                        if (prop.permission=="1") {
-                          $("#tab"+nn+ " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /><button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_text('"+nn+"','"+prop.modulename+"','"+prop.categname+"','"+prop.propname+"','"+item.name+"');\"    >set</button></td></tr>");
+                        if (prop.permission=="2") {
+                          $("#tab"+nn+ " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /><button class='ui-button ui-widget ui-corner-all' id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_text('"+nn+"','"+prop.modulename+"','"+prop.categname+"','"+prop.propname+"','"+item.name+"');\"    >set</button></td></tr>");
                         }
 
 
@@ -116,17 +116,39 @@
                         $("input#"+prop.modulename+prop.propname+item.name).val(item.value);
                     } else {
                         if (prop.permission=="0") {
-                          $("#tab"+nn + " tbody").append("<tr><td><small> "+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /></td></tr>");
+                          $("#tab"+nn + " tbody").append("<tr><td><small> "+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /></td></tr>");
                         } 
                         if (prop.permission=="2") {
-                          $("#tab"+nn+ " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /><button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_number('"+nn+"','"+prop.modulename+"','"+prop.categname+"','"+prop.propname+"','"+item.name+"');\"    >set</button></td></tr>");
+                          $("#tab"+nn+ " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /><button class='ui-button ui-widget ui-corner-all' id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_number('"+nn+"','"+prop.modulename+"','"+prop.categname+"','"+prop.propname+"','"+item.name+"');\"    >set</button></td></tr>");
                         }
 
 
                     }
                   });
 
-              }              
+              }    
+              
+              if (prop.hasOwnProperty('switches')) {
+                  var switches = prop.switches;
+                  $.each( switches, function( iitem, item ) {
+                    nnn = nn+item.name;
+                    console.log( "BUILD SWITCH :", nnn);
+                    if ($("input#"+prop.modulename+prop.propname+item.name).length) {
+                        $("input#"+prop.modulename+prop.propname+item.name).val(item.state);
+                    } else {
+                        if (prop.permission=="0") {
+                          $("#tab"+nn+ " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.state+"'  label="+item.state+" /></td></tr>");
+                        } 
+                        if (prop.permission=="2") {
+                          $("#tab"+nn + " tbody").append("<button class='ui-button ui-widget ui-corner-all' backlogid=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_switch('"+nn+"','"+prop.modulename+"','"+prop.categname+"','"+prop.propname+"','"+item.name+"');\"    >"+item.label+"</button>");
+                        }
+
+
+                    }
+                  });
+
+              }
+              
 
               if (prop.type =="INDI_MESSAGE") {
                   var messages = prop.messages;
@@ -327,14 +349,17 @@
 								var dev   = obj.module+obj.property.devicenameshort;
 								var group = dev+obj.property.groupnameshort;
 							  	var prop  = group+obj.property.propname;
-							  	console.log("REMOVE "+prop);
-								$( "."+ prop ).remove();
-
-								if ($("div#D"+ group + " > div").length == 0 ){
+							  	console.log("REMOVE PROP "+prop);
+								$( "div#P"+ prop ).children().remove();
+								$( "div#P"+ prop ).remove();
+								
+								if ($("#U"+ group).is(':empty')){
+                                    console.log("REMOVE GROUP "+group);
 									$("div#D"+ group ).remove();
 									$("#L"+ group ).remove();
 								}
-								if ($("div#D"+ dev + " > div").length == 0 ){
+								if ($("#U"+ dev).is(':empty')){
+                                    console.log("REMOVE DEVICE "+dev);
 									$("div#D"+ dev ).remove();
 									$("#L"+ dev ).remove();
 								}
