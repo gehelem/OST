@@ -8,7 +8,7 @@ MainControl::MainControl(QString name,QString label)
 
     _moduledescription="Main control module - and so on";
 
-    TextProperty* prop = new TextProperty(_modulename,"modules","root","availablemodules","Available modules",1,0);
+    TextProperty* prop = new TextProperty(_modulename,"modules","root","availablemodules","Available modules",0,0);
 
     QDir directory(QCoreApplication::applicationDirPath());
     directory.setFilter(QDir::Files);
