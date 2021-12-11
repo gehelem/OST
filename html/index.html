@@ -74,30 +74,31 @@ function initWebSocket() {
             }
             if (obj.event == 'createproperty') {
                 p=obj.property;
+                builddevice  (obj.module,p.devicenameshort,p.devicename);
+                $("#D"+obj.module+p.devicenameshort).tabs("refresh");
+                buildgroup   (obj.module,p.devicenameshort,p.groupnameshort,p.groupname);
+                $("#D"+obj.module).tabs("refresh"); 
                 buildproperty(obj.module,p.devicenameshort,p.groupnameshort,p);
-                if ($("#U"+ obj.module + p.devicenameshort + p.groupnameshort).is(':empty')){
-                    buildgroup(obj.module,p.devicenameshort,p.groupnameshort,p.groupname);
-                }
             }
             if (obj.event == 'removeproperty') {
                     var dev   = obj.module+obj.property.devicenameshort;
                     var group = dev+obj.property.groupnameshort;
                     var prop  = group+obj.property.propname;
-                    //console.log("REMOVE PROP "+prop);
-                    $( "div#P"+ prop ).children().remove();
-                    $( "div#P"+ prop ).remove();
+                    console.log("REMOVE PROP "+prop);
+                    $( "#P"+ prop ).children().remove();
+                    $( "#P"+ prop ).remove();
                     
-                    if ($("#U"+ group).is(':empty')){
-                        //console.log("REMOVE GROUP "+group);
-                        $("#L"+ group ).remove();
-                        $("#D"+ group ).remove();
+                    if (!($("#U"+ group).children().length > 0)){
+                        console.log("REMOVE GROUP "+group);
                         $("#U"+ group ).remove();
+                        $("#D"+ group ).remove();
+                        $("#L"+ group ).remove();
                     }
-                    if ($("#U"+ dev).is(':empty')){
-                        //console.log("REMOVE DEVICE "+dev);
-                        $("#L"+ dev ).remove();
-                        $("#D"+ dev ).remove();
+                    if (!($("#U"+ dev).children().length > 0)){
+                        console.log("REMOVE DEVICE "+dev);
                         $("#U"+ dev ).remove();
+                        $("#D"+ dev ).remove();
+                        $("#L"+ dev ).remove();
                     }
 
                 
@@ -133,27 +134,27 @@ function buildmodule(m,l) {
 
 function builddevice(m,d,l) {
     //console.log('BUILD DEVICE ' + m + "-"+ d + "-"+ l + "-");
-    if  (!($("div#D"+m+d).length)) {
-        $("div#D"+m).append("<div id=D"+m+d+"></div>");
+    if  (!($("#D"+m+d).length >0)) {
+        $("#D"+m).append("<div id=D"+m+d+"></div>");
         $("#U"+m).append("<li id=L"+m+d+"><a href=#D"+m+d+">"+l+"</a></li>");
-        $("div#D"+m+d).append("<ul id=U"+m+d+"></ul>");
+        $("#D"+m+d).append("<ul id=U"+m+d+"></ul>");
     };
+    //$("#D"+m).tabs("refresh");  
 }
 
 function buildgroup(m,d,g,l) {
-    //console.log('BUILD GROUP ' + m + "-" + d + "-"+ g + "-"+ l + "-");
-    if  (!($("div#"+m+d+g).length)) {
-        $("div#D"+m+d).append("<div id=D"+m+d+g+"></div>");
+    if  (!($("#D"+m+d+g).length > 0)) {
+        console.log('BUILD GROUP ' + m + "-" + d + "-"+ g + "-"+ l + "-");
+        $("#D"+m+d).append("<div id=D"+m+d+g+"></div>");
         $("#U"+m+d).append("<li id=L"+m+d+g+"><a href=#D"+m+d+g+">"+l+"</a></li>");
-        $("div#D"+m+d+g).append("<ul id=U"+m+d+g+"></ul>");
+        $("#D"+m+d+g).append("<ul id=U"+m+d+g+"></ul>");
     };
-    //$("div#D"+m+d).tabs();    
 }
 
 function buildproperty(m,d,g,p) {
     nn=m+d+g;
     nnp=nn+p.propname;
-    if  (!($("div#P"+nnp).length)) {
+    if  (!($("#P"+nnp).length)) {
         $("#U"+nn).append("<div id=P"+nnp+" ><table id=tab"+nnp+"><tr><td><stm+d+grong>"+p.label+"</strong></td><td></td></tr></table></div>");
     }
     if (p.hasOwnProperty('texts')) buildtexts(m,d,g,p);
