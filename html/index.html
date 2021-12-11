@@ -33,8 +33,8 @@ function initWebSocket() {
         };
         websocket.onclose = function (evt) {
             console.log("DISCONNECTED");
-            $("#OST").empty();
-            $("#OST").tabs("refresh");
+            $("#OST").empty();                      /* this shouldn't be here */
+            $("#OST").tabs("refresh");              /* this shouldn't be here */
         };
         websocket.onmessage = function (evt) {
             var obj = jQuery.parseJSON( evt.data );
@@ -61,10 +61,10 @@ function initWebSocket() {
                         })
 
                     })
-                    $("div#D"+m+d).tabs();    
+                    $("div#D"+m+d).tabs();              /* this shouldn't be here */    
 
                 })
-                $("div#D"+m).tabs();    
+                $("div#D"+m).tabs();              /* this shouldn't be here */    
 
 
             }
@@ -75,27 +75,27 @@ function initWebSocket() {
             if (obj.event == 'createproperty') {
                 p=obj.property;
                 builddevice  (obj.module,p.devicenameshort,p.devicename);
-                $("#D"+obj.module+p.devicenameshort).tabs("refresh");
+                $("#D"+obj.module+p.devicenameshort).tabs("refresh");              /* this shouldn't be here */
                 buildgroup   (obj.module,p.devicenameshort,p.groupnameshort,p.groupname);
-                $("#D"+obj.module).tabs("refresh"); 
+                $("#D"+obj.module).tabs("refresh");              /* this shouldn't be here */
                 buildproperty(obj.module,p.devicenameshort,p.groupnameshort,p);
             }
-            if (obj.event == 'removeproperty') {
-                    var dev   = obj.module+obj.property.devicenameshort;
+            if (obj.event == 'removeproperty') { 
+                    var dev   = obj.module+obj.property.devicenameshort;               /* this should be moved to a dedicated function */
                     var group = dev+obj.property.groupnameshort;
                     var prop  = group+obj.property.propname;
-                    console.log("REMOVE PROP "+prop);
+                    //console.log("REMOVE PROP "+prop);
                     $( "#P"+ prop ).children().remove();
                     $( "#P"+ prop ).remove();
                     
                     if (!($("#U"+ group).children().length > 0)){
-                        console.log("REMOVE GROUP "+group);
+                        //console.log("REMOVE GROUP "+group);
                         $("#U"+ group ).remove();
                         $("#D"+ group ).remove();
                         $("#L"+ group ).remove();
                     }
                     if (!($("#U"+ dev).children().length > 0)){
-                        console.log("REMOVE DEVICE "+dev);
+                        //console.log("REMOVE DEVICE "+dev);
                         $("#U"+ dev ).remove();
                         $("#D"+ dev ).remove();
                         $("#L"+ dev ).remove();
@@ -144,7 +144,7 @@ function builddevice(m,d,l) {
 
 function buildgroup(m,d,g,l) {
     if  (!($("#D"+m+d+g).length > 0)) {
-        console.log('BUILD GROUP ' + m + "-" + d + "-"+ g + "-"+ l + "-");
+        //console.log('BUILD GROUP ' + m + "-" + d + "-"+ g + "-"+ l + "-");
         $("#D"+m+d).append("<div id=D"+m+d+g+"></div>");
         $("#U"+m+d).append("<li id=L"+m+d+g+"><a href=#D"+m+d+g+">"+l+"</a></li>");
         $("#D"+m+d+g).append("<ul id=U"+m+d+g+"></ul>");
