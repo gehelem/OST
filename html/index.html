@@ -262,18 +262,20 @@ function buildswitchs(m,d,g,prop) {
     $.each( prop.switches, function( iitem, item ) {
         nn=m+d+g+p;
         nnn = nn+item.name;
-        if ($("#"+nnn).length) {
-            $("#"+nnn).val(item.state);
+        if ($("#bbb"+nnn).length) {
+            $("#bbb"+nnn).val(item.state);
         } else {
             if (prop.permission=="0") {
                 $("#tab"+nn+ " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.state+"'  label="+item.state+" /></td></tr>");
             
             };
             if (prop.permission=="1" || prop.permission=="2") {
-                $("#tab"+nn + " tbody").append("<button id="+nnn+" class='ui-button ui-widget ui-corner-all' backlogid=btn"+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+"  onClick=\"indi_switch('"+nnn+"','"+m+"','"+d+"','"+p+"','"+item.name+"');\"    >"+item.label+"</button>");
+                $("#tab"+nn + " tbody").append("<button id=bbb"+nnn+" class='ui-button ui-widget ui-corner-all' backlogid=btn"+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+"  onClick=\"indi_switch('"+nnn+"','"+m+"','"+d+"','"+p+"','"+item.name+"');\"    >"+item.label+"</button>");
             }
         
         }
+        if (item.state) $("#bbb"+nnn).css("background", "green");   
+        if (!item.state) $("#bbb"+nnn).css("background", "");   
 
     })
 }    
