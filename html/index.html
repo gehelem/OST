@@ -155,12 +155,50 @@ function buildproperty(m,d,g,p) {
     nn=m+d+g;
     nnp=nn+p.propname;
     if  (!($("#P"+nnp).length)) {
-        $("#U"+nn).append("<div id=P"+nnp+" ><table id=tab"+nnp+"><tr><td><stm+d+grong>"+p.label+"</strong></td><td></td></tr></table></div>");
+        div="<div id=P"+nnp+" ><table id=tab"+nnp+"><tr><td><stm+d+grong>"+p.label+"</strong></td><td>";
+        
+        if ((p.permission=="1"||p.permission=="2")&&(p.hasOwnProperty('numbers')||p.hasOwnProperty('texts'))) {
+            div=div+"<button class='ui-button ui-widget ui-corner-all' "
+            +"id=B"+nnp+ " data-json=\"\">set</button></tr>";
+        }
+        div=div+"</td></tr></table></div>";
+        $("#U"+nn).append(div);
+        
+        
+        if ((p.permission=="1"||p.permission=="2")&&(p.hasOwnProperty('numbers'))) {
+            $("#B"+nnp).data("json",p);
+            $("#B"+nnp).on("click", function () {
+                var pp=$(this).data("json");
+                $.each( pp.numbers, function( ii, i ) {
+                    pp.numbers[ii].value=document.getElementById(pp.modulename+pp.devicenameshort+pp.groupnameshort+pp.propname+i.name).value;
+                })
+                var obj = jQuery.parseJSON("{\"message\":\"setproperty\",\"property\":"+JSON.stringify(pp)+"}");
+                console.log(obj);
+                websocket.send(JSON.stringify(obj));
+            });
+            
+        }
+
+        if ((p.permission=="1"||p.permission=="2")&&(p.hasOwnProperty('texts'))) {
+            $("#B"+nnp).data("json",p);
+            $("#B"+nnp).on("click", function () {
+                var pp=$(this).data("json");
+                $.each( pp.texts, function( ii, i ) {
+                    //console.log( "indi_number clicked: " + nnp+i.name);
+                    pp.texts[ii].value=document.getElementById(pp.modulename+pp.devicenameshort+pp.groupnameshort+pp.propname+i.name).value;
+                })
+                
+                console.log("{\"message\":\"setproperty\",\"property\":"+JSON.stringify(pp)+"}");
+                websocket.send( "{\"message\":\"setproperty\",\"property\":"+JSON.stringify(pp)+"}");
+            });
+            
+        }
+        
     }
-    if (p.hasOwnProperty('texts')) buildtexts(m,d,g,p);
-    if (p.hasOwnProperty('numbers')) buildnumbers(m,d,g,p);
+    if (p.hasOwnProperty('texts'   )) buildtexts  (m,d,g,p);
+    if (p.hasOwnProperty('numbers' )) buildnumbers(m,d,g,p);
     if (p.hasOwnProperty('switches')) buildswitchs(m,d,g,p);
-    if (p.hasOwnProperty('lights')) buildlights(m,d,g,p);
+    if (p.hasOwnProperty('lights'  )) buildlights (m,d,g,p);
     //$("div#D"+m+d+g).tabs();    
 }
 function buildtexts(m,d,g,prop) {
@@ -176,13 +214,17 @@ function buildtexts(m,d,g,prop) {
                 $("#tab"+nn + " tbody").append("<tr><td><small> "+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /></td></tr>");
             };
             if (prop.permission=="2") {
-                $("#tab"+nn+ " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /><button class='ui-button ui-widget ui-corner-all' id=btn"+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+"  onClick=\"indi_text('"+nnn+"','"+m+"','"+d+"','"+p+"','"+item.name+"');\"    >set</button></td></tr>");
+                $("#tab"+nn+ " tbody").append(
+                "<tr><td><small>"+item.label+"</small></td><td>"
+                +"<input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" />"
+                );
             }
         
         }
 
     })
-}    
+}                
+
 function buildnumbers(m,d,g,prop) {
 
     p=prop.propname;
@@ -196,7 +238,10 @@ function buildnumbers(m,d,g,prop) {
                 $("#tab"+nn + " tbody").append("<tr><td><small> "+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /></td></tr>");
             };
             if (prop.permission=="2") {
-                $("#tab"+nn+ " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /><button class='ui-button ui-widget ui-corner-all' id=btn"+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+"  onClick=\"indi_number('"+nnn+"','"+m+"','"+d+"','"+p+"','"+item.name+"');\"    >set</button></td></tr>");
+                $("#tab"+nn+ " tbody").append(
+                "<tr><td><small>"+item.label+"</small></td><td>"
+                +"<input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" />"
+                );
             }
         
         }
@@ -244,6 +289,6 @@ function buildlights(m,d,g,prop) {
 
     })
 }    
-    
+
 </script>
 
