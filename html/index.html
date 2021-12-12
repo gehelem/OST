@@ -192,8 +192,9 @@ function buildproperty(m,d,g,p) {
                     pp.texts[ii].value=document.getElementById(pp.modulename+pp.devicenameshort+pp.groupnameshort+pp.propname+i.name).value;
                 })
                 
-                console.log("{\"message\":\"setproperty\",\"property\":"+JSON.stringify(pp)+"}");
-                websocket.send( "{\"message\":\"setproperty\",\"property\":"+JSON.stringify(pp)+"}");
+                var obj = jQuery.parseJSON("{\"message\":\"setproperty\",\"property\":"+JSON.stringify(pp)+"}");
+                console.log(obj);
+                websocket.send(JSON.stringify(obj));
             });
             
         }
@@ -268,10 +269,39 @@ function buildswitchs(m,d,g,prop) {
             if (prop.permission=="0") {
                 $("#tab"+nn+ " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.state+"'  label="+item.state+" /></td></tr>");
             
-            };
-            if (prop.permission=="1" || prop.permission=="2") {
-                $("#tab"+nn + " tbody").append("<button id=bbb"+nnn+" class='ui-button ui-widget ui-corner-all' backlogid=btn"+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+"  onClick=\"indi_switch('"+nnn+"','"+m+"','"+d+"','"+p+"','"+item.name+"');\"    >"+item.label+"</button>");
             }
+            if (prop.permission=="1" || prop.permission=="2") {
+                $("#tab"+nn + " tbody").append("<button id=bbb"+nnn+" class='ui-button ui-widget ui-corner-all' backlogid=btn"+nnn
+                +" value="+item.state
+                +" data-value=\"\""
+                +" data-btn=\"\" >"+item.label+"</button>");
+                $("#bbb"+nnn).data("btn",prop);
+                $("#bbb"+nnn).data("value",item.state);
+                $("#bbb"+nnn).val(item.state);
+            }
+            $("#bbb"+nnn).on("click", function () {
+                var pp=$(this).data("btn");
+                /*$.each( pp.switches, function( ii, i ) {
+                    //console.log( "switch clicked: " + pp.modulename+pp.devicenameshort+pp.groupnameshort+pp.propname+i.name);
+                    pp.switches[ii].state=document.getElementById("bbb"+pp.modulename+pp.devicenameshort+pp.groupnameshort+pp.propname+i.name).value;
+                })*/
+                
+
+                var message = "{\"message\":\"setproperty\",\"property\":{\"devicename\":\""+pp.devicename
+                +"\",\"devicenameshort\":\""+pp.devicenameshort
+                +"\",\"groupname\":\""+pp.groupname
+                +"\",\"groupnameshort\":\""+pp.groupnameshort
+                +"\",\"label\":\""+pp.label
+                +"\",\"modulename\":\""+pp.modulename
+                +"\",\"propname\":\""+pp.propname
+                +"\",\"switches\":[{\"name\":\""+item.name+"\"}]}}";
+                console.log(jQuery.parseJSON(message));
+                websocket.send( message);
+                
+                
+                
+            })
+            
         
         }
         if (item.state) $("#bbb"+nnn).css("background", "green");   
