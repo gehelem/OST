@@ -283,17 +283,25 @@ function buildlights(m,d,g,prop) {
     $.each( prop.lights, function( iitem, item ) {
         nn=m+d+g+p;
         nnn = nn+item.name;
-        if ($("#"+nnn).length) {
-            $("#"+nnn).val(item.state);
+        if ($("#status"+nnn).length) {
+            //$("#"+nnn).val(item.state);
         } else {
             if (prop.permission=="0") {
-                $("#tab"+nn+ " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.state+"'  label="+item.state+" /></td></tr>");
+                $("#tab"+nn+ " tbody").append("<tr>"
+                +"<td><strong id=status"+nnn+" >"+"---"+"</strong></td>"
+                +"<td><small>"+item.label+"</small></td>"
+                +"</tr>");
             };
             if (prop.permission=="2") {
                 /* not available */
             }
         
         }
+        if (item.state=="0") $("#status"+nnn).css("background-color", "gray");   
+        if (item.state=="1") $("#status"+nnn).css("background-color", "green");   
+        if (item.state=="2") $("#status"+nnn).css("background-color", "yellow");   
+        if (item.state=="3") $("#status"+nnn).css("background-color", "red");  
+
 
     })
 }    
