@@ -1,0 +1,33 @@
+#OST 
+.ui-accordion-header {  
+line-height: 14px;   /*Header Box height*/
+font-size: 12px;     /*Header Text size*/
+text-indent: 1px;
+}  
+.ui-accordion .ui-accordion-content {  
+padding-top:0;
+padding-right:0;
+padding-bottom:0;
+padding-left:0;
+}  
+.ui-tabs .ui-tabs-panel {
+padding-top:0;
+padding-right:0;
+padding-bottom:0;
+padding-left:0;
+}
+ul {
+    display: block;
+    list-style-type: disc;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    padding-inline-start: 0px;
+}
+.ui-tabs-tab {
+	line-height: 8px;
+	font-size: 12px;
+	text-indent: 1px;
+	padding: 0 0;
+}

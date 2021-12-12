@@ -6,490 +6,337 @@
 <script src="external/jquery/jquery.js"></script>
 <script src="jquery-ui.min.js"></script>
 <link rel="stylesheet" href="ost.css">
-</head>
-
-<body>
-
-<div id="OST">
-</div> 
-
-</body>
+</head><body><div id="OST"></div></body>
 </html>
 
 <script>
-            function sortJSON(arr) {
-                if (arr == undefined) return arr;
-                return arr.sort(function(a, b) {
-                    var x = a['order']; var y = b['order'];
-                    return ((x < y) ? -1 : ((x > y) ? 1 : 0));
-                });
-            }
-            var debugTextArea = document.getElementById("debugTextArea");
-            var debuginput = document.getElementById("debuginput");
-            var debugoutput = document.getElementById("debugoutput");
-            function debug(message) {
-            }
 
+var ur = window.location.origin.replace("http://", "");
+var result = ur.replace("http://", "");
+var wsUri = "ws://"+ur+":9624";            
+var websocket = null;
 
-            function indi_switch(btn,modulename,categname,propname,name) {
-              //console.log( "indi_switch clicked:", '"'+btn+'"' ,'"'+modulename+'"');
-            if ( websocket != null )
-                {
-                  var msg = "{\"message\": \"updateproperty\",\"property\":{\"modulename\":\""+modulename+"\",\"categname\":\""+categname+"\",\"propname\":\""+propname+"\",\"switchs\":[{\"name\":\""+name+"\",\"switch\":\"ISS_ON\"}],\"type\":\"INDI_SWITCH\"}}";
+$(document).ready(function()
+{
+    initWebSocket();
+});
 
-                    websocket.send( msg );
-                    debugoutput.value = msg;
-                    //console.log( "string sent :", '"'+msg+'"' );
-                }
-            }
+function initWebSocket() {
+    try {
+        if (typeof MozWebSocket == 'function') WebSocket = MozWebSocket;
+        if ( websocket && websocket.readyState == 1 ) websocket.close();
+        
+        websocket = new WebSocket( wsUri );
+        websocket.onopen = function (evt) {
+            console.log("CONNECTED");
+            websocket.send( "{\"message\":\"readall\"}");
+        };
+        websocket.onclose = function (evt) {
+            console.log("DISCONNECTED");
+            $("#OST").empty();                      /* this shouldn't be here */
+            $("#OST").tabs("refresh");              /* this shouldn't be here */
+        };
+        websocket.onmessage = function (evt) {
+            var obj = jQuery.parseJSON( evt.data );
+            console.log(obj);
+            if (obj.event == 'moduledump') {
+                m=obj.module;
+                l=obj.modulelabel;
+                buildmodule(m,l);
+                
+                var devices = obj.devices;
+                $.each( devices, function(idev,dev) {
+                    d=dev.devicenameshort;
+                    l=dev.devicename;
+                    builddevice(m,d,l);
 
-            function indi_number(num,modulename,categname,propname,name) {
-              //console.log( "indi_switch clicked:", '"'+btn+'"' ,'"'+modulename+'"');
-            if ( websocket != null )
-                {
-                  nn= modulename+propname+name;
-                  var val = document.getElementById(nn).value;
-                  var msg = "{\"message\": \"updateproperty\",\"property\":{\"modulename\":\""+modulename+"\",\"categname\":\""+categname+"\",\"propname\":\""+propname+"\",\"numbers\":[{\"name\":\""+name+"\",\"value\":"+val+"}],\"type\":\"INDI_NUMBER\"}}";
+                    var groups = dev.groups;
+                    $.each( groups, function(igro,gro) {
+                        g=gro.groupnameshort;
+                        l=gro.groupname;
+                        buildgroup(m,d,g,l);
+                        var props = gro.properties;
+                        $.each( props, function(ipro,pro) {
+                            buildproperty(m,d,g,pro);
+                        })
 
-                    websocket.send( msg );
-                    debugoutput.value = msg;
-                    //console.log( "string sent :", '"'+msg+'"' );
-                }
-            }
+                    })
+                    $("div#D"+m+d).tabs();              /* this shouldn't be here */    
 
-            function indi_text(num,modulename,categname,propname,name) {
-              //console.log( "indi_switch clicked:", '"'+btn+'"' ,'"'+modulename+'"');
-            if ( websocket != null )
-                {
-                  nn= modulename+propname+name;
-                  var val = document.getElementById(nn).value;
-                  var msg = "{\"message\": \"updateproperty\",\"property\":{\"modulename\":\""+modulename+"\",\"categname\":\""+categname+"\",\"propname\":\""+propname+"\",\"texts\":[{\"name\":\""+name+"\",\"text\":\""+val+"\"}],\"type\":\"INDI_TEXT\"}}";
+                })
+                $("div#D"+m).tabs();              /* this shouldn't be here */    
 
-                    websocket.send( msg );
-                    debugoutput.value = msg;
-                    //console.log( "string sent :", '"'+msg+'"' );
-                }
-            }
-
-
-
-			var ur = window.location.origin.replace("http://", "");
-			var result = ur.replace("http://", "");
-			var wsUri = "ws://"+ur+":9624";            
-			var websocket = null;
-
-            function buildProperty(prop) {
-              nn=prop.modulename+prop.devicenameshort+prop.groupnameshort+prop.propname;
-              console.log( "BUILD :", nn);
-              if  (!($("div#P"+nn).length)) {
-                  $("#U"+prop.modulename+prop.devicenameshort+prop.groupnameshort).append("<div id=P"+nn+" ><table id=tab"+nn+"><tr><td><strong>"+prop.label+"</strong></td><td></td></tr></table></div>");
-                  //$("div#"+prop.modulename+prop.propname).append("<label for='name'>"+prop.label+"</label>");
-              }
-
-              if (prop.hasOwnProperty('texts')) {
-                  var texts = prop.texts;
-                  $.each( texts, function( iitem, item ) {
-                    nnn = nn+item.name;
-                    console.log( "BUILD TEXT :", nnn);
-                    if ($("input#"+prop.modulename+prop.propname+item.name).length) {
-                        $("input#"+prop.modulename+prop.propname+item.name).val(item.text);
-                    } else {
-                        console.log( "BUILD TEXT :", nnn);
-                        if (prop.permission=="0") {
-                          $("#tab"+nn + " tbody").append("<tr><td><small> "+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /></td></tr>");
-                        } 
-                        if (prop.permission=="1") {
-                          $("#tab"+nn+ " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /><button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_text('"+nn+"','"+prop.modulename+"','"+prop.categname+"','"+prop.propname+"','"+item.name+"');\"    >set</button></td></tr>");
-                        }
-
-
-                    }
-                  });
-
-              }
-
-              if (prop.type =="INDI_MESSAGE") {
-                  var messages = prop.messages;
-                  $.each( messages, function( iitem, item ) {
-                    if ($("textarea#"+prop.modulename+prop.propname+item.name).length) {
-                        var mm = document.getElementById(prop.modulename+prop.propname+item.name);
-                        mm.value += item.text + "\n";
-                        mm.scrollTop = mm.scrollHeight;
-                        /*var mm = document.getElementById("debugTextArea");
-                        mm.value += item.text + "\n";
-                        mm.scrollTop = mm.scrollHeight;*/
-
-                    } else {
-                        //$("div#"+prop.modulename+prop.propname).append("<td><label for='name'>"+item.label+"</label></td>");
-                        //$("div#"+prop.modulename+prop.propname).append("<input id="+prop.modulename+prop.propname+item.name+" value='"+item.text+"' type='text'>");
-                        $("div#"+prop.modulename+prop.propname).append("<textarea id="+prop.modulename+prop.propname+item.name+" style='width:300px;height:20px;' value='"+item.text+"'></textarea>");
-                    }
-                  });
-
-              }
-
-              if (prop.type =="INDI_NUMBER") {
-                  var numbers = prop.numbers;
-                  $.each( numbers, function( iitem, item ) {
-                    nn= prop.modulename+prop.propname+item.name;
-
-                    if ($("input#"+prop.modulename+prop.propname+item.name).length) {
-                        $("input#"+prop.modulename+prop.propname+item.name).val(item.value);
-                        console.log( "update number :", '"'+prop.modulename+prop.propname+item.name+'"' , '"'+item.value+'"' )
-                    } else {
-/*                        $("div#"+prop.modulename+prop.categname).append("<label for='name'>"+item.label+"</label><td>");
-                        $("div#"+prop.modulename+prop.categname).append("<input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value="+item.value+"  label="+item.label+" />");
-                        if (!(prop.perm=="IP_RO")) {
-                          $("div#"+prop.modulename+prop.categname).append("<button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_number('"+nn+"','"+prop.modulename+"','"+prop.propname+"','"+item.name+"');\"    >set</button>");
-                        }
-                        $("div#"+prop.modulename+prop.categname).append("<br>");
-*/
-                        if (prop.perm=="IP_RO") {
-                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /></td></tr>");
-                        } else {
-                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /><button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_number('"+nn+"','"+prop.modulename+"','"+prop.categname+"','"+prop.propname+"','"+item.name+"');\"    >set</button></td></tr>");
-                        }
-
-
-                    }
-                  });
-              }
-
-              if (prop.type =="INDI_SWITCH") {
-                  var swis = prop.switchs;
-                  $.each( swis, function( iitem, item ) {
-                    if ($("button#"+prop.modulename+prop.propname+item.name).length) {
-                        //$("textarea#"+prop.modulename+prop.propname+sw.name).text(sw.switch);
-                    } else {
-                      nn= prop.modulename+prop.propname+item.name;
-                        //$("div#"+prop.modulename+prop.categname).append("<button id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_switch('"+nn+"','"+prop.modulename+"','"+prop.propname+"','"+item.name+"');\"    >"+item.label+"</button>");
-                        if (prop.perm=="IP_RO") {
-                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /></td></tr>");
-                        } else {
-                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_switch('"+nn+"','"+prop.modulename+"','"+prop.categname+"','"+prop.propname+"','"+item.name+"');\"    >"+item.label+"</button>"
-							);
-                        }
-                        //    <button onClick="abortfocus();">Abort focus</button>
-                        //$("div#"+prop.modulename+prop.categname).append("<tr><label for='name'>"+sw.label+"</label>");
-                        //$("div#"+prop.modulename+prop.categname).append("<textarea id="+prop.modulename+prop.propname+sw.name+">"+sw.switch+"</textarea></tr>");
-                    }
-                  });
-              }
-
-              if (prop.type =="INDI_LIGHT") {
-                  var swis = prop.switchs;
-                  $.each( swis, function( iitem, item ) {
-                    if ($("button#"+prop.modulename+prop.propname+item.name).length) {
-                        //$("textarea#"+prop.modulename+prop.propname+sw.name).text(sw.switch);
-                    } else {
-                      nn= prop.modulename+prop.propname+item.name;
-                        //$("div#"+prop.modulename+prop.categname).append("<button id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"  onClick=\"indi_switch('"+nn+"','"+prop.modulename+"','"+prop.propname+"','"+item.name+"');\"    >"+item.label+"</button>");
-                        if (prop.perm=="IP_RO") {
-                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /></td></tr>");
-                        } else {
-                          $("#tab"+prop.modulename+prop.propname + " tbody").append("<td></td><input type='text' id="+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /><button id=btn"+nn+" data-btn="+nn+" data-modulename="+prop.modulename+" data-propname="+prop.propname+" data-name="+item.name+"onClick=\"indi_number('"+nn+"','"+prop.modulename+"','"+prop.categname+"','"+prop.propname+"','"+item.name+"');\"    >set</button>");
-                        }
-                        //    <button onClick="abortfocus();">Abort focus</button>
-                        //$("div#"+prop.modulename+prop.categname).append("<tr><label for='name'>"+sw.label+"</label>");
-                        //$("div#"+prop.modulename+prop.categname).append("<textarea id="+prop.modulename+prop.propname+sw.name+">"+sw.switch+"</textarea></tr>");
-                    }
-                  });
-              }
-
-              if (prop.type =="INDI_IMAGE") {
-                  var imgs = prop.images;
-                  $.each( imgs, function( iitem, item ) {
-                      nn= prop.modulename+prop.propname+item.name;
-                      if ($("img#"+nn).length) {
-                        $("img#"+nn).prop("src",item.url + "?"+ new Date().valueOf());
-                    } else {
-                        $("div#"+prop.modulename+prop.categname).append("<img id="+nn+" src="+item.url+"/>");
-                        //<img id="image" src="" alt="No image loaded"/>
-                    }
-                  });
-              }//end indi_image
-
-              if (prop.type =="INDI_GRAPH") {
-                  var gras = prop.graphs;
-                  $.each( gras, function( iitem, item ) {
-                      nn= prop.modulename+prop.propname+item.name;
-                      if ($("canvas#"+nn).length) {
-                          $("canvas#"+nn).remove;
-                      }
-                      $("div#"+prop.modulename+prop.categname).append("<canvas id="+nn+" width=50 height=10></canvas>");
-                      creategraph2D(nn,item.label);
-                      var values=item.values;
-                      $.each( values, function( ivalue, value ) {
-                        //console.log( "addvalues :", '"'+value.v0+'"' +value.v1+'"');
-                        appendgraph2D(nn,value.v0,value.v1);
-                      });
-                  });
-              }//end indi_graph
 
             }
+            if (obj.event == 'updateproperty') {
+                p=obj.property;
+                buildproperty(obj.module,p.devicenameshort,p.groupnameshort,p);
+            }
+            if (obj.event == 'createproperty') {
+                p=obj.property;
+                builddevice  (obj.module,p.devicenameshort,p.devicename);
+                $("#D"+obj.module+p.devicenameshort).tabs("refresh");              /* this shouldn't be here */
+                buildgroup   (obj.module,p.devicenameshort,p.groupnameshort,p.groupname);
+                $("#D"+obj.module).tabs("refresh");              /* this shouldn't be here */
+                buildproperty(obj.module,p.devicenameshort,p.groupnameshort,p);
+            }
+            if (obj.event == 'removeproperty') { 
+                    var dev   = obj.module+obj.property.devicenameshort;               /* this should be moved to a dedicated function */
+                    var group = dev+obj.property.groupnameshort;
+                    var prop  = group+obj.property.propname;
+                    //console.log("REMOVE PROP "+prop);
+                    $( "#P"+ prop ).children().remove();
+                    $( "#P"+ prop ).remove();
+                    
+                    if (!($("#U"+ group).children().length > 0)){
+                        //console.log("REMOVE GROUP "+group);
+                        $("#U"+ group ).remove();
+                        $("#D"+ group ).remove();
+                        $("#L"+ group ).remove();
+                    }
+                    if (!($("#U"+ dev).children().length > 0)){
+                        //console.log("REMOVE DEVICE "+dev);
+                        $("#U"+ dev ).remove();
+                        $("#D"+ dev ).remove();
+                        $("#L"+ dev ).remove();
+                    }
 
-            function initWebSocket() {
-                try {
-                    if (typeof MozWebSocket == 'function')
-                        WebSocket = MozWebSocket;
-                    if ( websocket && websocket.readyState == 1 )
-                        websocket.close();
-                    websocket = new WebSocket( wsUri );
-                    websocket.onopen = function (evt) {
-                        debug("CONNECTED");
-                        websocket.send( "{\"message\":\"readall\"}");
-                        //debugoutput.value = msg;
-                    };
-                    websocket.onclose = function (evt) {
-                        debug("DISCONNECTED");
-                        $("#OST").empty();
-                        $("#OST").tabs("refresh");
-                    };
+                
+            }
+            
+        };
+        
+        websocket.onerror = function (evt) {
+            console.log('ERROR: ' + evt.data);
+        };
+    } 
+    catch (exception) {
+        console.log('ERROR: ' + exception);
+    }
+}
 
+function stopWebSocket() {
+    if (websocket)  websocket.close();
+}
+            
+function buildmodule(m,l) {
 
-                    websocket.onmessage = function (evt) {
-                        console.log( "Message received :", evt.data );
-                        debug ("BEGIN-------------------------------------------------");
-                        debug (evt.data);
-                        debug ("END  -------------------------------------------------");
-                        //debuginput.value = evt.data +"\n";
-                        var obj = jQuery.parseJSON( evt.data );
-                        if (obj.event == 'moduledump') {
-                              
-                              if  (!($("div#D"+obj.module).length)) {
-                                    $("div#OST").append("<h1 id=H"+obj.module+">"+obj.modulelabel+"</h1>");
-                                    $("div#OST").append("<div id=D"+obj.module+"></div>");
-                                    $("div#D"+obj.module).append("<ul id=U"+obj.module+"></ul>");
-									var devices = obj.devices;
-                            		$.each( devices, function(idev,dev) {
-		                              if  (!($("div#D"+obj.module+dev.devicenameshort).length)) {
-                                          $("div#D"+obj.module).append("<div id=D"+obj.module+dev.devicenameshort+"></div>");
-                                          $("#U"+obj.module).append("<li id=L"+obj.module+dev.devicenameshort+"><a href=#D"+obj.module+dev.devicenameshort+">"+dev.devicename+"</a></li>");
-                                          $("div#D"+obj.module+dev.devicenameshort).append("<ul id=U"+obj.module+dev.devicenameshort+"></ul>");
- 
-                                          
-											var groups = dev.groups;
-		                            		$.each( groups, function(igro,gro) {
-				                              if  (!($("div#"+obj.module+dev.devicenameshort+gro.groupnameshort).length)) {
-				                                //$("div#"+obj.module+dev.devicenameshort).append("<div id='"+obj.module+dev.devicenameshort+gro.groupnameshort+"'>----------"+gro.groupname+"</div>");
-                                                $("div#D"+obj.module+dev.devicenameshort).append("<div id=D"+obj.module+dev.devicenameshort+gro.groupnameshort+"></div>");
-                                                $("#U"+obj.module+dev.devicenameshort).append("<li id=L"+obj.module+dev.devicenameshort+gro.groupnameshort+"><a href=#D"+obj.module+dev.devicenameshort+gro.groupnameshort+">"+gro.groupname+"</a></li>");
-                                                $("div#D"+obj.module+dev.devicenameshort+gro.groupnameshort).append("<ul id=U"+obj.module+dev.devicenameshort+gro.groupnameshort+"></ul>");
+    if  (!($("div#D"+m).length)) {
+        $("div#OST").append("<h1  id=H"+m+">"+l+"</h1>");
+        $("div#OST").append("<div id=D"+m+"></div>");
+        $("div#D"+m).append("<ul id=U"+m+"></ul>");
+        
+    };
+    $("#OST").accordion({header: "h1",collapsible: true,autoHeight: false,navigation: true,heightStyle: "content" });
+    $("#OST").accordion("refresh");  
     
-												var props = gro.properties;
-			                            		$.each( props, function(iprop,pro) {
-					                              if  (!($("div#P"+obj.module+dev.devicenameshort+gro.groupnameshort+pro.propname).length)) {
-                                                    buildProperty(pro)
-	
-		    		    	                      }
-											    })
+}
 
+function builddevice(m,d,l) {
+    //console.log('BUILD DEVICE ' + m + "-"+ d + "-"+ l + "-");
+    if  (!($("#D"+m+d).length >0)) {
+        $("#D"+m).append("<div id=D"+m+d+"></div>");
+        $("#U"+m).append("<li id=L"+m+d+"><a href=#D"+m+d+">"+l+"</a></li>");
+        $("#D"+m+d).append("<ul id=U"+m+d+"></ul>");
+    };
+    //$("#D"+m).tabs("refresh");  
+}
 
+function buildgroup(m,d,g,l) {
+    if  (!($("#D"+m+d+g).length > 0)) {
+        //console.log('BUILD GROUP ' + m + "-" + d + "-"+ g + "-"+ l + "-");
+        $("#D"+m+d).append("<div id=D"+m+d+g+"></div>");
+        $("#U"+m+d).append("<li id=L"+m+d+g+"><a href=#D"+m+d+g+">"+l+"</a></li>");
+        $("#D"+m+d+g).append("<ul id=U"+m+d+g+"></ul>");
+    };
+}
 
-	    		    	                      }
-										    })
-										    $("div#D"+obj.module+dev.devicenameshort).tabs();
+function buildproperty(m,d,g,p) {
+    nn=m+d+g;
+    nnp=nn+p.propname;
+    if  (!($("#P"+nnp).length)) {
+        div="<div id=P"+nnp+" ><table id=tab"+nnp+">"
+        +"<tr><td>"
+        +"<strong id=status"+nnp+" >"+"---"+"</strong>"
+        +"<strong id=title"+nnp+" >"+p.label+"</strong></td><td>";
+        
+        if ((p.permission=="1"||p.permission=="2")&&(p.hasOwnProperty('numbers')||p.hasOwnProperty('texts'))) {
+            div=div+"<button class='ui-button ui-widget ui-corner-all' "
+            +"id=B"+nnp+ " data-json=\"\">set</button></tr>";
+        }
+        div=div+"</td></tr></table></div>";
+        $("#U"+nn).append(div);
+        //$("#status"+nnp).css("background-color", "gray");
+        
+        if ((p.permission=="1"||p.permission=="2")&&(p.hasOwnProperty('numbers'))) {
+            $("#B"+nnp).data("json",p);
+            $("#B"+nnp).on("click", function () {
+                var pp=$(this).data("json");
+                $.each( pp.numbers, function( ii, i ) {
+                    pp.numbers[ii].value=document.getElementById(pp.modulename+pp.devicenameshort+pp.groupnameshort+pp.propname+i.name).value;
+                })
+                var obj = jQuery.parseJSON("{\"message\":\"setproperty\",\"property\":"+JSON.stringify(pp)+"}");
+                console.log(obj);
+                websocket.send(JSON.stringify(obj));
+            });
+            
+        }
 
+        
+        if ((p.permission=="1"||p.permission=="2")&&(p.hasOwnProperty('texts'))) {
+            $("#B"+nnp).data("json",p);
+            $("#B"+nnp).on("click", function () {
+                var pp=$(this).data("json");
+                $.each( pp.texts, function( ii, i ) {
+                    //console.log( "indi_number clicked: " + nnp+i.name);
+                    pp.texts[ii].value=document.getElementById(pp.modulename+pp.devicenameshort+pp.groupnameshort+pp.propname+i.name).value;
+                })
+                
+                var obj = jQuery.parseJSON("{\"message\":\"setproperty\",\"property\":"+JSON.stringify(pp)+"}");
+                console.log(obj);
+                websocket.send(JSON.stringify(obj));
+            });
+            
+        }
+        
+    }
+    if (p.state=="0") $("#status"+nnp).css("background-color", "gray");   
+    if (p.state=="1") $("#status"+nnp).css("background-color", "green");   
+    if (p.state=="2") $("#status"+nnp).css("background-color", "yellow");   
+    if (p.state=="3") $("#status"+nnp).css("background-color", "red");   
+    if (p.hasOwnProperty('texts'   )) buildtexts  (m,d,g,p);
+    if (p.hasOwnProperty('numbers' )) buildnumbers(m,d,g,p);
+    if (p.hasOwnProperty('switches')) buildswitchs(m,d,g,p);
+    if (p.hasOwnProperty('lights'  )) buildlights (m,d,g,p);
+    //$("div#D"+m+d+g).tabs();    
+}
+function buildtexts(m,d,g,prop) {
 
-	        	                      }
-								    })
-                                    $("div#D"+obj.module).tabs();
-                                    //$("#OST").tabs("refresh");
-                                    //$("div#D"+obj.module).accordion({header: "h4",collapsible: true,autoHeight: false,navigation: true,heightStyle: "content" });
-                                    //$("div#D"+obj.module).accordion("refresh");  
-
-                              }
-                        $("#OST").accordion({header: "h1",collapsible: true,autoHeight: false,navigation: true,heightStyle: "content" });
-                        $("#OST").accordion("refresh");  
-                        //$("#OST").tabs("refresh");
-                        //$("#OST").accordion();
-                        }// end moduledump
-
-                        if (obj.event == 'removeproperty') {
-								var dev   = obj.module+obj.property.devicenameshort;
-								var group = dev+obj.property.groupnameshort;
-							  	var prop  = group+obj.property.propname;
-							  	console.log("REMOVE "+prop);
-								$( "."+ prop ).remove();
-
-								if ($("div#D"+ group + " > div").length == 0 ){
-									$("div#D"+ group ).remove();
-									$("#L"+ group ).remove();
-								}
-								if ($("div#D"+ dev + " > div").length == 0 ){
-									$("div#D"+ dev ).remove();
-									$("#L"+ dev ).remove();
-								}
-
-                            
-                        }
-
-
-                        if (obj.event == 'createproperty') {
-                            var prop = obj.property;
-                            buildProperty(prop);
-                        }
-
-                        if (obj.message == 'updateelements') {
-                            var prop = obj.property;
-                            buildProperty(prop);
-                        }
-
-                        if (obj.message == 'appendgraph') {
-                            nn= obj.module+obj.property+obj.graph;
-                            //console.log( "addvalues :", '"'+obj.v0+'"' +obj.v1+'"');
-                            appendgraph2D(nn,obj.v0,obj.v1);
-                        }
-
-                        if (obj.message == 'updateall') {
-                            var modules = sortJSON(obj.modules);
-
-                            $.each( modules, function(imod,mod) {
-                              if  (!($("div#"+mod.modulename).length)) {
-                                  //$("div#OST").append("<div id="+mod.modulename+" label="+mod.modulename+"></div>");
-                                  $("div#OST").append("<h3 id=h"+mod.modulename+">"+mod.modulelabel+"</h3>");
-                                  $("div#OST").append("<div id="+mod.modulename+"></div>");
-                                  $("div#"+mod.modulename).append("<ul id=ul"+mod.modulename+"></ul>");
-                                  //$("div#"+mod.modulename).append("<br><label for='name'>MODULE:"+mod.modulename+"<br></label>");
-                              }
-
-                              var properties = sortJSON(mod.properties);
-                              $.each( properties, function(iprop0,prop0) {
-                                buildProperty(prop0);
-                              });
-
-                              var categs = sortJSON(mod.categories);
-                              $.each( categs, function(icateg,categ) {
-
-                                $("div#"+mod.modulename).append("<div id="+mod.modulename+categ.categname+"></div>");
-
-                                var propertiesc = sortJSON(categ.properties);
-                                $.each( propertiesc, function(iprop1,prop1) {
-                                  buildProperty(prop1);
-                                });
-
-                                var groups = sortJSON(categ.groups);
-                                if (typeof groups !== 'undefined') {
-                                  $("div#"+mod.modulename+categ.categname).append("<ul id=ul"+mod.modulename+categ.categname+"></ul>");
-                                }
-                                $("#ul"+mod.modulename).append("<li id=li"+mod.modulename+categ.categname+"><a href=#"+mod.modulename+categ.categname+">"+categ.categlabel+"</a></li>");
-
-                                $.each( groups, function(igroup,group) {
-                                  $("#ul"+mod.modulename+categ.categname).append("<li id=li"+mod.modulename+categ.categname+group.groupname+"><a href=#"+mod.modulename+categ.categname+group.groupname+">"+group.grouplabel+"</a></li>");
-                                  $("div#"+mod.modulename+categ.categname).append("<div id="+mod.modulename+categ.categname+group.groupname+"></div>");
-								  //debug("BUILD GROUP " + mod.modulename+ " " + categ.categname + " " + group.groupname);
-
-                                  var propertiesg = sortJSON(group.properties);
-                                  $.each( propertiesg, function(iprop2,prop2) {
-								    //debug("BUILD GROUP PROP " + mod.modulename+ " " + categ.categname + " " + group.groupname + " " + prop2.propname  );
-                                    buildProperty(prop2);
-                                  });
-							      $("div#"+mod.modulename+categ.categname+group.grouname).tabs();
-
-
-                                })//end groups
-
-                                $("div#"+mod.modulename+categ.categname).tabs();
-                              });// end categs
-                              $("div#"+mod.modulename).tabs();
-                            });
-                      $("#OST").accordion({header: "h3",collapsible: true,autoHeight: false,navigation: true,heightStyle: "content" });
-                      //$("#OST").tabs("refresh");
-                      }; // end buildall
-
-                    };
-
-                    websocket.onerror = function (evt) {
-                        debug('ERROR: ' + evt.data);
-                    };
-                } catch (exception) {
-                    debug('ERROR: ' + exception);
-                }
+    p=prop.propname;
+    $.each( prop.texts, function( iitem, item ) {
+        nn=m+d+g+p;
+        nnn = nn+item.name;
+        if ($("#"+nnn).length) {
+            $("#"+nnn).val(item.text);
+        } else {
+            if (prop.permission=="0") {
+                $("#tab"+nn + " tbody").append("<tr><td><small> "+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /></td></tr>");
+            };
+            if (prop.permission=="2") {
+                $("#tab"+nn+ " tbody").append(
+                "<tr><td><small>"+item.label+"</small></td><td>"
+                +"<input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" />"
+                );
             }
+        
+        }
 
-            function stopWebSocket() {
-                if (websocket)
-                    websocket.close();
+    })
+}                
+
+function buildnumbers(m,d,g,prop) {
+
+    p=prop.propname;
+    $.each( prop.numbers, function( iitem, item ) {
+        nn=m+d+g+p;
+        nnn = nn+item.name;
+        if ($("#"+nnn).length) {
+            $("#"+nnn).val(item.value);
+        } else {
+            if (prop.permission=="0") {
+                $("#tab"+nn + " tbody").append("<tr><td><small> "+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /></td></tr>");
+            };
+            if (prop.permission=="2") {
+                $("#tab"+nn+ " tbody").append(
+                "<tr><td><small>"+item.label+"</small></td><td>"
+                +"<input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" />"
+                );
             }
+        
+        }
 
-            function checkSocket() {
-                if (websocket != null) {
-                    var stateStr;
-                    switch (websocket.readyState) {
-                        case 0: {
-                            stateStr = "CONNECTING";
-                            break;
-                        }
-                        case 1: {
-                            stateStr = "OPEN";
-                            break;
-                        }
-                        case 2: {
-                            stateStr = "CLOSING";
-                            break;
-                        }
-                        case 3: {
-                            stateStr = "CLOSED";
-                            break;
-                        }
-                        default: {
-                            stateStr = "UNKNOW";
-                            break;
-                        }
-                    }
-                    debug("WebSocket state = " + websocket.readyState + " ( " + stateStr + " )");
-                } else {
-                    debug("WebSocket is null");
-                }
+    })
+}    
+function buildswitchs(m,d,g,prop) {
+
+    p=prop.propname;
+    $.each( prop.switches, function( iitem, item ) {
+        nn=m+d+g+p;
+        nnn = nn+item.name;
+        if ($("#bbb"+nnn).length) {
+            $("#bbb"+nnn).val(item.state);
+        } else {
+            if (prop.permission=="0") {
+                $("#tab"+nn+ " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.state+"'  label="+item.state+" /></td></tr>");
+            
             }
-
-            function appendgraph2D(idgraph,xx,yy) {
-              var graph = $("#"+idgraph).data('graph');
-              graph.data.datasets[0].data.push({x:xx,y:yy});
-              //data.datasets[0].data.push({x:xx, y:yy});
-              //graph.render();
-              graph.update();
+            if (prop.permission=="1" || prop.permission=="2") {
+                $("#tab"+nn + " tbody").append("<button id=bbb"+nnn+" class='ui-button ui-widget ui-corner-all' backlogid=btn"+nnn
+                +" value="+item.state
+                +" data-value=\"\""
+                +" data-btn=\"\" >"+item.label+"</button>");
+                $("#bbb"+nnn).data("btn",prop);
+                $("#bbb"+nnn).data("value",item.state);
+                $("#bbb"+nnn).val(item.state);
             }
+            $("#bbb"+nnn).on("click", function () {
+                var pp=$(this).data("btn");
+                /*$.each( pp.switches, function( ii, i ) {
+                    //console.log( "switch clicked: " + pp.modulename+pp.devicenameshort+pp.groupnameshort+pp.propname+i.name);
+                    pp.switches[ii].state=document.getElementById("bbb"+pp.modulename+pp.devicenameshort+pp.groupnameshort+pp.propname+i.name).value;
+                })*/
+                
 
-            function creategraph2D(idgraph,graphlabel) {
-              var ctx = $("#"+idgraph);
-              var graph = new Chart(ctx, {
-                          type: 'line',
-                          color: "#000000",
-                          //fill: false,
-                          data: {
-                                  datasets: [{
-                                      label: graphlabel,
-                                      type: "line",
-                                      border:  "#f38b4a",
-                                      borderColor: "#f38b4a",
-                                      //backgroundColor:  "#f38b4a",
-                                      fill: false,
-                                  }]
-                                },
-                          options: {
-                              animation: false,
-                              scales: {
-                                  xAxes: [{
-                                      type: 'linear',
-                                      position: 'bottom'
-                                  }],
-                                  yAxes: [{
-                                      //type: 'logarithmic',
-                                      type: 'linear',
-                                      position: 'right'
-                                  }]
-                              }
-                          }
-              });
-              ctx.data('graph', graph);
-              //graph.update();
+                var message = "{\"message\":\"setproperty\",\"property\":{\"devicename\":\""+pp.devicename
+                +"\",\"devicenameshort\":\""+pp.devicenameshort
+                +"\",\"groupname\":\""+pp.groupname
+                +"\",\"groupnameshort\":\""+pp.groupnameshort
+                +"\",\"label\":\""+pp.label
+                +"\",\"modulename\":\""+pp.modulename
+                +"\",\"propname\":\""+pp.propname
+                +"\",\"switches\":[{\"name\":\""+item.name+"\"}]}}";
+                console.log(jQuery.parseJSON(message));
+                websocket.send( message);
+                
+                
+                
+            })
+            
+        
+        }
+        if (item.state) $("#bbb"+nnn).css("background", "green");   
+        if (!item.state) $("#bbb"+nnn).css("background", "");   
+
+    })
+}    
+function buildlights(m,d,g,prop) {
+
+    p=prop.propname;
+    $.each( prop.lights, function( iitem, item ) {
+        nn=m+d+g+p;
+        nnn = nn+item.name;
+        if ($("#status"+nnn).length) {
+            //$("#"+nnn).val(item.state);
+        } else {
+            if (prop.permission=="0") {
+                $("#tab"+nn+ " tbody").append("<tr>"
+                +"<td><strong id=status"+nnn+" >"+"---"+"</strong></td>"
+                +"<td><small>"+item.label+"</small></td>"
+                +"</tr>");
+            };
+            if (prop.permission=="2") {
+                /* not available */
             }
+        
+        }
+        if (item.state=="0") $("#status"+nnn).css("background-color", "gray");   
+        if (item.state=="1") $("#status"+nnn).css("background-color", "green");   
+        if (item.state=="2") $("#status"+nnn).css("background-color", "yellow");   
+        if (item.state=="3") $("#status"+nnn).css("background-color", "red");  
 
-    $(document).ready(function()
-    {
-      initWebSocket();
-    });
+
+    })
+}    
 
 </script>
 

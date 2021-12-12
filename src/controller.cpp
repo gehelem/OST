@@ -47,6 +47,7 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
 
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focuser1","focuser 1");
     LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel1","indipanel 1");
+    LoadModule(QCoreApplication::applicationDirPath()+"/libostdummy.so","dummymodule","Dummy module just to play");
 
 }
 

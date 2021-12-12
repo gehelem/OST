@@ -28,7 +28,7 @@ find_package(GSL REQUIRED)
 find_package(OpenCV REQUIRED )
 find_package(CImg REQUIRED )
 find_package(WCSLIB REQUIRED)
-find_package(Qt5 5.12 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Scxml Sql)
+find_package(Qt5 5.12 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql)
 find_package(StellarSolver REQUIRED)
 find_package(Boost COMPONENTS log log_setup REQUIRED)
 
@@ -97,7 +97,6 @@ target_link_libraries( ost
     Qt${QT_VERSION_MAJOR}::Network
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::WebSockets
-    Qt${QT_VERSION_MAJOR}::Scxml
     Qt${QT_VERSION_MAJOR}::Sql
     ${STELLARSOLVER_LIBRARIES}
     ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
