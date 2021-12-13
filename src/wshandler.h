@@ -39,6 +39,7 @@ signals:
     void closed();
     void textRcv(QString txt);
     void dumpAsked(void);
+    void setProperty(Property *pProperty);
 private:
 };
 #endif

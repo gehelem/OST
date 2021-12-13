@@ -95,3 +95,29 @@ QJsonObject JSonDumper::dumpPropertyCommons(Property *pProperty) {
     return json;
 }
 
+Property& JSonDumper::setProFromJson(QJsonObject obj)  {
+
+    if (!(obj["texts"].isArray())) {
+        auto* _propt = new TextProperty(
+                    obj["modulename"].toString(),
+                    obj["devicenameshort"].toString(),
+                    obj["groupnameshort"].toString(),
+                    obj["propname"].toString(),
+                    obj["label"].toString(),
+                    obj["permission"].toInt(),
+                    obj["state"].toInt()
+                );
+        QJsonArray texts = obj["texts"].toArray();
+        for (int i = 0; i < texts.size() ; ++i)
+        {
+            QJsonObject text = texts[i].toObject();
+            _propt->addText(new TextValue(
+                        text["name"].toString(),
+                        text["label"].toString(),
+                        text["hint"].toString(),
+                        text["text"].toString()
+                    ));
+        }
+        return* _propt;
+    }
+}

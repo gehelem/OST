@@ -39,6 +39,7 @@ class Basemodule : public QObject, public INDI::BaseClient
 
     public slots:
         void OnDumpAsked(void);
+        virtual void OnSetProperty(Property* prop) { BOOST_LOG_TRIVIAL(debug) << _modulename.toStdString() << " : recv setprop : " <<prop->getLabel().toStdString();}
 
     protected:
         bool disconnectIndi(void);

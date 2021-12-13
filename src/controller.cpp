@@ -42,7 +42,9 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
     connect(mainctl,&Basemodule::newMessageSent,wshandler,&WShandler::OnNewMessageSent);
     connect(mainctl,&Basemodule::moduleDumped, wshandler,&WShandler::OnModuleDumped);
 
+
     connect(wshandler,&WShandler::dumpAsked,mainctl,&Basemodule::OnDumpAsked);
+    connect(wshandler,&WShandler::setProperty,mainctl,&Basemodule::OnSetProperty);
 
 
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focuser1","focuser 1");
@@ -88,6 +90,7 @@ void Controller::LoadModule(QString lib,QString name,QString label)
                 connect(mod,&Basemodule::newMessageSent,wshandler,&WShandler::OnNewMessageSent);
                 connect(mod,&Basemodule::moduleDumped, wshandler,&WShandler::OnModuleDumped);
                 connect(wshandler,&WShandler::dumpAsked,mod,&Basemodule::OnDumpAsked);
+                connect(wshandler,&WShandler::setProperty,mod,&Basemodule::OnSetProperty);
 
 
         } else {

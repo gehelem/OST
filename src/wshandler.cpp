@@ -1,7 +1,7 @@
 #include <QCoreApplication>
 #include <QtCore>
 #include "wshandler.h"
-#include "jsonparser.h"
+#include "utils/jsondumper.h"
 #include <boost/log/trivial.hpp>/*!
  * ... ...
  */
@@ -115,9 +115,11 @@ void WShandler::processTextMessage(QString message)
         //qDebug() << obj["modulename"].toString() <<obj["propertyname"].toString();
         //sendProperty(props->getProp(obj["modulename"].toString(),obj["propertyname"].toString()));
     }
-    if (obj["message"].toString()=="updateproperty")
+    if (obj["message"].toString()=="setproperty")
     {
-        //QJsonObject prop = obj["property"].toObject();
+        QJsonObject prop = obj["property"].toObject();
+        JSonDumper jsonDumper;
+        emit setProperty(&jsonDumper.setProFromJson(prop));
         //sendProperty(props->getProp(obj["modulename"].toString(),obj["propertyname"].toString()));
         //emit changeValue(JpropToO(prop));
     }
