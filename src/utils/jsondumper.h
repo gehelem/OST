@@ -22,7 +22,9 @@ public:
 
     [[nodiscard]] inline const QString& getResult() const { return _result; }
     [[nodiscard]] inline const QJsonObject& getJsonResult() const { return _jsonResult; }
-    Property& setProFromJson(QJsonObject obj);
+    TextProperty   &setProTextFromJson(QJsonObject obj);
+    NumberProperty &setProNumberFromJson(QJsonObject obj);
+    SwitchProperty &setProSwitchFromJson(QJsonObject obj);
 
 private:
     QString _result;

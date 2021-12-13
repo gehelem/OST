@@ -136,3 +136,55 @@ void IndiPanel::newMessage     (INDI::BaseDevice *dp, int messageID)
 }
 
 
+void IndiPanel::OnSetPropertyText(TextProperty* prop)
+{
+
+    if (!(prop->getModuleName()==_modulename)) return;
+
+    INDI::BaseDevice *dp = getDevice(prop->getDeviceName().toStdString().c_str());
+    if (dp== nullptr)
+    {
+        BOOST_LOG_TRIVIAL(debug) << "Indipanel device not found " << prop->getDeviceName().toStdString();
+        return;
+    }
+    INDI_PROPERTY_TYPE type;
+    INDI::Property *iprop;
+    iprop =  dp->getProperty(prop->getName().toStdString().c_str());
+    if (iprop== nullptr)
+    {
+        BOOST_LOG_TRIVIAL(debug) << "Indipanel property not found " << prop->getDeviceName().toStdString() << " " << prop->getName().toStdString();
+        return;
+    }
+    BOOST_LOG_TRIVIAL(debug) << "Indipanel property " << prop->getDeviceName().toStdString() << " " << prop->getName().toStdString();
+
+    if (iprop->getType()==INDI_TEXT) {
+        ITextVectorProperty *inditprop;
+        inditprop =  dp->getText(prop->getName().toStdString().c_str());
+
+
+
+        BOOST_LOG_TRIVIAL(debug) << "Indipanel text property " << prop->getDeviceName().toStdString() << " " << prop->getName().toStdString() << " type >" << type << "<";
+
+        for (int i = 0; i < inditprop->ntp; ++i) {
+            char* pchar="xxx";
+            //tprop->tp[i].text=pchar;
+            BOOST_LOG_TRIVIAL(debug) << "Indipanel text propertyitem  " << inditprop->tp[i].name << "/" << inditprop->tp[i].text;
+
+        }
+        sendNewText(inditprop);
+        return;
+    }
+
+
+    return;
+
+}
+
+void IndiPanel::OnSetPropertyNumber(NumberProperty* prop)
+{
+    if (!(prop->getModuleName()==_modulename)) return;
+}
+void IndiPanel::OnSetPropertySwitch(SwitchProperty* prop)
+{
+    if (!(prop->getModuleName()==_modulename)) return;
+}

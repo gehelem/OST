@@ -35,7 +35,7 @@ function initWebSocket() {
         };
         websocket.onclose = function (evt) {
             console.log("DISCONNECTED");
-            $("div#OST").append("Connecting to backend...");
+            $("div#OST").append("Connection to backend lost, reconnecting...");
             //window.location.reload();
             setTimeout(function() {
                 window.location.reload(); 

@@ -95,13 +95,13 @@ QJsonObject JSonDumper::dumpPropertyCommons(Property *pProperty) {
     return json;
 }
 
-Property& JSonDumper::setProFromJson(QJsonObject obj)  {
+TextProperty& JSonDumper::setProTextFromJson(QJsonObject obj)  {
 
     if (!(obj["texts"].isArray())) {
         auto* _propt = new TextProperty(
                     obj["modulename"].toString(),
-                    obj["devicenameshort"].toString(),
-                    obj["groupnameshort"].toString(),
+                    obj["devicename"].toString(),
+                    obj["groupname"].toString(),
                     obj["propname"].toString(),
                     obj["label"].toString(),
                     obj["permission"].toInt(),
@@ -120,4 +120,66 @@ Property& JSonDumper::setProFromJson(QJsonObject obj)  {
         }
         return* _propt;
     }
+
+}
+
+NumberProperty& JSonDumper::setProNumberFromJson(QJsonObject obj)  {
+
+    if (!(obj["numbers"].isArray())) {
+        auto* _propn = new NumberProperty(
+                    obj["modulename"].toString(),
+                    obj["devicename"].toString(),
+                    obj["groupname"].toString(),
+                    obj["propname"].toString(),
+                    obj["label"].toString(),
+                    obj["permission"].toInt(),
+                    obj["state"].toInt()
+                );
+        QJsonArray numbers = obj["numbers"].toArray();
+        for (int i = 0; i < numbers.size() ; ++i)
+        {
+            QJsonObject number = numbers[i].toObject();
+            _propn->addNumber(new NumberValue(
+                        number["name"].toString(),
+                        number["label"].toString(),
+                        number["hint"].toString(),
+                        number["value"].toDouble(),
+                        number["format"].toString(),
+                        number["min"].toDouble(),
+                        number["max"].toDouble(),
+                        number["step"].toDouble()
+                    ));
+        }
+        return* _propn;
+    }
+}
+
+SwitchProperty& JSonDumper::setProSwitchFromJson(QJsonObject obj)  {
+
+    if (!(obj["switches"].isArray())) {
+        auto* _props = new SwitchProperty(
+                    obj["modulename"].toString(),
+                    obj["devicename"].toString(),
+                    obj["groupname"].toString(),
+                    obj["propname"].toString(),
+                    obj["label"].toString(),
+                    obj["permission"].toInt(),
+                    obj["state"].toInt(),
+                    obj["rule"].toInt()
+                );
+        QJsonArray switches = obj["switches"].toArray();
+        for (int i = 0; i < switches.size() ; ++i)
+        {
+            QJsonObject sw = switches[i].toObject();
+            _props->addSwitch(new SwitchValue(
+                        sw["name"].toString(),
+                        sw["label"].toString(),
+                        sw["hint"].toString(),
+                        true                    /* frontend sends only click information ... must be handled in module */
+                    ));
+        }
+        return* _props;
+    }
+
+
 }

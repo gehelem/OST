@@ -44,11 +44,13 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
 
 
     connect(wshandler,&WShandler::dumpAsked,mainctl,&Basemodule::OnDumpAsked);
-    connect(wshandler,&WShandler::setProperty,mainctl,&Basemodule::OnSetProperty);
+    connect(wshandler,&WShandler::setPropertyText,mainctl,&Basemodule::OnSetPropertyText);
+    connect(wshandler,&WShandler::setPropertyNumber,mainctl,&Basemodule::OnSetPropertyNumber);
+    connect(wshandler,&WShandler::setPropertySwitch,mainctl,&Basemodule::OnSetPropertySwitch);
 
 
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focuser1","focuser 1");
-    LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel1","indipanel 1");
+    LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel1","Indi control panel");
     LoadModule(QCoreApplication::applicationDirPath()+"/libostdummy.so","dummymodule","Dummy module just to play");
 
 }
@@ -90,7 +92,9 @@ void Controller::LoadModule(QString lib,QString name,QString label)
                 connect(mod,&Basemodule::newMessageSent,wshandler,&WShandler::OnNewMessageSent);
                 connect(mod,&Basemodule::moduleDumped, wshandler,&WShandler::OnModuleDumped);
                 connect(wshandler,&WShandler::dumpAsked,mod,&Basemodule::OnDumpAsked);
-                connect(wshandler,&WShandler::setProperty,mod,&Basemodule::OnSetProperty);
+                connect(wshandler,&WShandler::setPropertyText,mod,&Basemodule::OnSetPropertyText);
+                connect(wshandler,&WShandler::setPropertyNumber,mod,&Basemodule::OnSetPropertyNumber);
+                connect(wshandler,&WShandler::setPropertySwitch,mod,&Basemodule::OnSetPropertySwitch);
 
 
         } else {
