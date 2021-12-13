@@ -21,6 +21,8 @@ $(document).ready(function()
     initWebSocket();
 });
 
+ 
+
 function initWebSocket() {
     try {
         if (typeof MozWebSocket == 'function') WebSocket = MozWebSocket;
@@ -33,9 +35,14 @@ function initWebSocket() {
         };
         websocket.onclose = function (evt) {
             console.log("DISCONNECTED");
-            $("#OST").empty();                      /* this shouldn't be here */
-            $("#OST").tabs("refresh");              /* this shouldn't be here */
+            $("div#OST").append("Connecting to backend...");
+            //window.location.reload();
+            setTimeout(function() {
+                window.location.reload(); 
+                //initWebSocket();
+            },3000);
         };
+
         websocket.onmessage = function (evt) {
             var obj = jQuery.parseJSON( evt.data );
             console.log(obj);
