@@ -119,9 +119,9 @@ void WShandler::processTextMessage(QString message)
     {
         QJsonObject prop = obj["property"].toObject();
         JSonDumper jsonDumper;
-        if (!(obj["texts"].isArray())) emit setPropertyText(&jsonDumper.setProTextFromJson(prop));
-        if (!(obj["numbers"].isArray())) emit setPropertyNumber(&jsonDumper.setProNumberFromJson(prop));
-        if (!(obj["switches"].isArray())) emit setPropertySwitch(&jsonDumper.setProSwitchFromJson(prop));
+        if (prop["texts"].isArray()) emit setPropertyText(&jsonDumper.setProTextFromJson(prop));
+        if (prop["numbers"].isArray()) emit setPropertyNumber(&jsonDumper.setProNumberFromJson(prop));
+        if (prop["switches"].isArray()) emit setPropertySwitch(&jsonDumper.setProSwitchFromJson(prop));
         //sendProperty(props->getProp(obj["modulename"].toString(),obj["propertyname"].toString()));
         //emit changeValue(JpropToO(prop));
     }
