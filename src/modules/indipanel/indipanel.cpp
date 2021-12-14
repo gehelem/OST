@@ -147,7 +147,6 @@ void IndiPanel::OnSetPropertyText(TextProperty* prop)
         BOOST_LOG_TRIVIAL(debug) << "Indipanel device not found " << prop->getDeviceName().toStdString();
         return;
     }
-    INDI_PROPERTY_TYPE type;
     INDI::Property *iprop;
     iprop =  dp->getProperty(prop->getName().toStdString().c_str());
     if (iprop== nullptr)
@@ -155,21 +154,26 @@ void IndiPanel::OnSetPropertyText(TextProperty* prop)
         BOOST_LOG_TRIVIAL(debug) << "Indipanel property not found " << prop->getDeviceName().toStdString() << " " << prop->getName().toStdString();
         return;
     }
-    BOOST_LOG_TRIVIAL(debug) << "Indipanel property " << prop->getDeviceName().toStdString() << " " << prop->getName().toStdString();
 
     if (iprop->getType()==INDI_TEXT) {
         ITextVectorProperty *inditprop;
         inditprop =  dp->getText(prop->getName().toStdString().c_str());
-
-
-
-        BOOST_LOG_TRIVIAL(debug) << "Indipanel text property " << prop->getDeviceName().toStdString() << " " << prop->getName().toStdString() << " type >" << type << "<";
-
+        if (inditprop== nullptr)
+        {
+            BOOST_LOG_TRIVIAL(debug) << "Indipanel text property not found " << prop->getDeviceName().toStdString() << " " << prop->getName().toStdString();
+            return;
+        }
+        QList<TextValue*> texts=prop->getTexts();
         for (int i = 0; i < inditprop->ntp; ++i) {
-            char* pchar="xxx";
-            //tprop->tp[i].text=pchar;
-            BOOST_LOG_TRIVIAL(debug) << "Indipanel text propertyitem  " << inditprop->tp[i].name << "/" << inditprop->tp[i].text;
-
+            for (int j = 0; j < texts.size(); ++j) {
+                if (strcmp(texts[j]->name().toStdString().c_str(),inditprop->tp[i].name)==0) {
+                    //strcpy(inditprop->tp[i].text,texts[j]->text().toStdString().c_str);
+                    inditprop->tp[i].text=texts[j]->text().toStdString().c_str;
+                    //char* chr = texts[j]->text().toStdString().data();
+                    //inditprop->tp[i].text=*chr;
+                    BOOST_LOG_TRIVIAL(debug) << "Indipanel text propertyitem  modified " << inditprop->tp[i].name << "/" << inditprop->tp[i].text << "/" << inditprop->tp[i].text;;
+                }
+            }
         }
         sendNewText(inditprop);
         return;
@@ -183,6 +187,45 @@ void IndiPanel::OnSetPropertyText(TextProperty* prop)
 void IndiPanel::OnSetPropertyNumber(NumberProperty* prop)
 {
     if (!(prop->getModuleName()==_modulename)) return;
+
+    INDI::BaseDevice *dp = getDevice(prop->getDeviceName().toStdString().c_str());
+    if (dp== nullptr)
+    {
+        BOOST_LOG_TRIVIAL(debug) << "Indipanel device not found " << prop->getDeviceName().toStdString();
+        return;
+    }
+    INDI::Property *iprop;
+    iprop =  dp->getProperty(prop->getName().toStdString().c_str());
+    if (iprop== nullptr)
+    {
+        BOOST_LOG_TRIVIAL(debug) << "Indipanel property not found " << prop->getDeviceName().toStdString() << " " << prop->getName().toStdString();
+        return;
+    }
+
+    if (iprop->getType()==INDI_NUMBER) {
+        INumberVectorProperty *indiprop;
+        indiprop =  dp->getNumber(prop->getName().toStdString().c_str());
+        if (indiprop== nullptr)
+        {
+            BOOST_LOG_TRIVIAL(debug) << "Indipanel text property not found " << prop->getDeviceName().toStdString() << " " << prop->getName().toStdString();
+            return;
+        }
+        QList<NumberValue*> numbers=prop->getNumbers();
+        for (int i = 0; i < indiprop->nnp; ++i) {
+            for (int j = 0; j < numbers.size(); ++j) {
+                if (strcmp(numbers[j]->name().toStdString().c_str(),indiprop->np[i].name)==0) {
+                    //strcpy(inditprop->tp[i].text,texts[j]->text().toStdString().c_str());
+                    indiprop->np[i].value=numbers[j]->getValue();
+                    BOOST_LOG_TRIVIAL(debug) << "Indipanel number propertyitem  modified " << indiprop->np[i].name << "/" << indiprop->np[i].value;
+                }
+            }
+        }
+        sendNewNumber(indiprop);
+        return;
+    }
+
+
+    return;
 }
 void IndiPanel::OnSetPropertySwitch(SwitchProperty* prop)
 {
