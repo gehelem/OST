@@ -8,9 +8,9 @@
 #include <boost/log/trivial.hpp>
 #include "image.h"
 #include <model/setup.h>
-#include <model/value.h>
-#include <model/textvalue.h>
-#include <utils/propertytextdumper.h>
+#include <model/textproperty.h>
+#include <model/numberproperty.h>
+#include <model/switchproperty.h>
 #include <model/propertystore.h>
 #include "utils/propertyfactory.h"
 
@@ -39,6 +39,18 @@ class Basemodule : public QObject, public INDI::BaseClient
 
     public slots:
         void OnDumpAsked(void);
+        virtual void OnSetPropertyText(TextProperty* prop) {
+            if (!(prop->getModuleName()==_modulename)) return;
+            BOOST_LOG_TRIVIAL(debug) << _modulename.toStdString() << " : recv setprop text : " << prop->getLabel().toStdString();
+        }
+        virtual void OnSetPropertyNumber(NumberProperty* prop) {
+            if (!(prop->getModuleName()==_modulename)) return;
+            BOOST_LOG_TRIVIAL(debug) << _modulename.toStdString() << " : recv setprop number : " <<prop->getLabel().toStdString();
+        }
+        virtual void OnSetPropertySwitch(SwitchProperty* prop) {
+            if (!(prop->getModuleName()==_modulename)) return;
+            BOOST_LOG_TRIVIAL(debug) << _modulename.toStdString() << " : recv setprop switch : " <<prop->getLabel().toStdString();
+        }
 
     protected:
         bool disconnectIndi(void);

@@ -42,11 +42,15 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
     connect(mainctl,&Basemodule::newMessageSent,wshandler,&WShandler::OnNewMessageSent);
     connect(mainctl,&Basemodule::moduleDumped, wshandler,&WShandler::OnModuleDumped);
 
+
     connect(wshandler,&WShandler::dumpAsked,mainctl,&Basemodule::OnDumpAsked);
+    connect(wshandler,&WShandler::setPropertyText,mainctl,&Basemodule::OnSetPropertyText);
+    connect(wshandler,&WShandler::setPropertyNumber,mainctl,&Basemodule::OnSetPropertyNumber);
+    connect(wshandler,&WShandler::setPropertySwitch,mainctl,&Basemodule::OnSetPropertySwitch);
 
 
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focuser1","focuser 1");
-    LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel1","indipanel 1");
+    LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel1","Indi control panel");
     LoadModule(QCoreApplication::applicationDirPath()+"/libostdummy.so","dummymodule","Dummy module just to play");
 
 }
@@ -88,6 +92,9 @@ void Controller::LoadModule(QString lib,QString name,QString label)
                 connect(mod,&Basemodule::newMessageSent,wshandler,&WShandler::OnNewMessageSent);
                 connect(mod,&Basemodule::moduleDumped, wshandler,&WShandler::OnModuleDumped);
                 connect(wshandler,&WShandler::dumpAsked,mod,&Basemodule::OnDumpAsked);
+                connect(wshandler,&WShandler::setPropertyText,mod,&Basemodule::OnSetPropertyText);
+                connect(wshandler,&WShandler::setPropertyNumber,mod,&Basemodule::OnSetPropertyNumber);
+                connect(wshandler,&WShandler::setPropertySwitch,mod,&Basemodule::OnSetPropertySwitch);
 
 
         } else {
@@ -121,17 +128,17 @@ void Controller::OnNewMessageSent(QString message, QString *pModulename, QString
 }
 void Controller::OnModuleDumped(QMap<QString, QMap<QString, QMap<QString, Property *> > > treeList, QString* pModulename, QString* pModulelabel)
 {
-    BOOST_LOG_TRIVIAL(debug) << "MODULE DUMPED " << pModulename->toStdString() << " size " << treeList.size();
+    //BOOST_LOG_TRIVIAL(debug) << "MODULE DUMPED " << pModulename->toStdString() << " size " << treeList.size();
 
     for ( const QString& device : treeList.keys() ) {
-        BOOST_LOG_TRIVIAL(debug) << "MODULE DUMPED " << pModulename->toStdString() << " device " << device.toStdString();
+        //BOOST_LOG_TRIVIAL(debug) << "MODULE DUMPED " << pModulename->toStdString() << " device " << device.toStdString();
         for ( const QString& group : treeList[device].keys() ) {
-            BOOST_LOG_TRIVIAL(debug) << "MODULE DUMPED " << pModulename->toStdString() << " device " << device.toStdString() << " group " << group.toStdString();
+            //BOOST_LOG_TRIVIAL(debug) << "MODULE DUMPED " << pModulename->toStdString() << " device " << device.toStdString() << " group " << group.toStdString();
             for ( const QString& property : treeList[device][group].keys() ) {
                 //BOOST_LOG_TRIVIAL(debug) << "MODULE DUMPED " << pModulename->toStdString() << " device " << device.toStdString() << " group " << group.toStdString()<< " property " << property.toStdString();
                 PropertyTextDumper textDumper;
                 treeList[device][group][property]->accept(&textDumper);
-                BOOST_LOG_TRIVIAL(debug) << "MODULE " << pModulename->toStdString() <<" DUMPED " << textDumper.getResult();
+                //BOOST_LOG_TRIVIAL(debug) << "MODULE " << pModulename->toStdString() <<" DUMPED " << textDumper.getResult();
             }
         }
     }

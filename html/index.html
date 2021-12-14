@@ -21,6 +21,8 @@ $(document).ready(function()
     initWebSocket();
 });
 
+ 
+
 function initWebSocket() {
     try {
         if (typeof MozWebSocket == 'function') WebSocket = MozWebSocket;
@@ -33,9 +35,14 @@ function initWebSocket() {
         };
         websocket.onclose = function (evt) {
             console.log("DISCONNECTED");
-            $("#OST").empty();                      /* this shouldn't be here */
-            $("#OST").tabs("refresh");              /* this shouldn't be here */
+            $("div#OST").append("Connection to backend lost, reconnecting...");
+            //window.location.reload();
+            setTimeout(function() {
+                window.location.reload(); 
+                //initWebSocket();
+            },3000);
         };
+
         websocket.onmessage = function (evt) {
             var obj = jQuery.parseJSON( evt.data );
             console.log(obj);
@@ -173,7 +180,7 @@ function buildproperty(m,d,g,p) {
             $("#B"+nnp).on("click", function () {
                 var pp=$(this).data("json");
                 $.each( pp.numbers, function( ii, i ) {
-                    pp.numbers[ii].value=document.getElementById(pp.modulename+pp.devicenameshort+pp.groupnameshort+pp.propname+i.name).value;
+                    pp.numbers[ii].value=parseFloat(document.getElementById(pp.modulename+pp.devicenameshort+pp.groupnameshort+pp.propname+i.name).value);
                 })
                 var obj = jQuery.parseJSON("{\"message\":\"setproperty\",\"property\":"+JSON.stringify(pp)+"}");
                 console.log(obj);
@@ -189,7 +196,7 @@ function buildproperty(m,d,g,p) {
                 var pp=$(this).data("json");
                 $.each( pp.texts, function( ii, i ) {
                     //console.log( "indi_number clicked: " + nnp+i.name);
-                    pp.texts[ii].value=document.getElementById(pp.modulename+pp.devicenameshort+pp.groupnameshort+pp.propname+i.name).value;
+                    pp.texts[ii].text=document.getElementById(pp.modulename+pp.devicenameshort+pp.groupnameshort+pp.propname+i.name).value;
                 })
                 
                 var obj = jQuery.parseJSON("{\"message\":\"setproperty\",\"property\":"+JSON.stringify(pp)+"}");

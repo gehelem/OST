@@ -16,8 +16,11 @@ class MODULE_INIT IndiPanel : public Basemodule
         IndiPanel(QString name,QString label);
         ~IndiPanel();
 
-    signals:
-        void valueChanged(const double &newValue);
+    public slots:
+        void OnSetPropertyText(TextProperty* prop) override;
+        void OnSetPropertyNumber(NumberProperty* prop) override;
+        void OnSetPropertySwitch(SwitchProperty* prop) override;
+
     private:
         void newDevice      (INDI::BaseDevice *dp) override;
         void removeDevice   (INDI::BaseDevice *dp) override;

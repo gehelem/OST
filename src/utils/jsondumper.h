@@ -4,6 +4,12 @@
 #include <QString>
 #include "propertyvisitor.h"
 #include "model/property.h"
+#include <model/setup.h>
+#include <model/value.h>
+#include <model/textvalue.h>
+#include <utils/propertytextdumper.h>
+#include <model/propertystore.h>
+#include "utils/propertyfactory.h"
 
 class JSonDumper : public PropertyVisitor {
 
@@ -16,6 +22,9 @@ public:
 
     [[nodiscard]] inline const QString& getResult() const { return _result; }
     [[nodiscard]] inline const QJsonObject& getJsonResult() const { return _jsonResult; }
+    TextProperty   &setProTextFromJson(QJsonObject obj);
+    NumberProperty &setProNumberFromJson(QJsonObject obj);
+    SwitchProperty &setProSwitchFromJson(QJsonObject obj);
 
 private:
     QString _result;
