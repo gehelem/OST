@@ -164,16 +164,16 @@ void IndiPanel::OnSetPropertyText(TextProperty* prop)
             return;
         }
         QList<TextValue*> texts=prop->getTexts();
-        for (int i = 0; i < inditprop->ntp; ++i) {
-            for (int j = 0; j < texts.size(); ++j) {
-                if (strcmp(texts[j]->name().toStdString().c_str(),inditprop->tp[i].name)==0) {
-                    //strcpy(inditprop->tp[i].text,texts[j]->text().toStdString().c_str);
-                    inditprop->tp[i].text=texts[j]->text().toStdString().c_str;
-                    //char* chr = texts[j]->text().toStdString().data();
-                    //inditprop->tp[i].text=*chr;
-                    BOOST_LOG_TRIVIAL(debug) << "Indipanel text propertyitem  modified " << inditprop->tp[i].name << "/" << inditprop->tp[i].text << "/" << inditprop->tp[i].text;;
+        for (int j = 0; j < inditprop->ntp; ++j) {
+                for (int i = 0; i < texts.size(); ++i) {
+                    if (strcmp(texts[i]->name().toStdString().c_str(),inditprop->tp[j].name)==0) {
+                        strcpy(inditprop->tp[j].text,texts[i]->text().toStdString().c_str());
+                        BOOST_LOG_TRIVIAL(debug) << "Indipanel text property item  modified "
+                                                 << prop->getName().toStdString() << "/"
+                                                 << texts[j]->name().toStdString() << "/"
+                                                 << texts[j]->text().toStdString();
+                    }
                 }
-            }
         }
         sendNewText(inditprop);
         return;
