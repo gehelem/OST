@@ -81,3 +81,12 @@ void PropertyTextDumper::visit(LightProperty *pProperty, QString *moduleName) {
     }
     _result = stream.str();
 }
+
+void PropertyTextDumper::visit(MessageProperty *pProperty, QString *moduleName) {
+
+    std::stringstream stream;
+
+    stream << "Message Property : " << dumpPropertyCommons(pProperty,moduleName)
+           << ". Message=" << pProperty->getMessage().toStdString();
+    _result = stream.str();
+}

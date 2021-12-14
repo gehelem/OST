@@ -3,6 +3,7 @@
 #include "model/switchproperty.h"
 #include "model/textproperty.h"
 #include "model/lightproperty.h"
+#include "model/messageproperty.h"
 #include "model/lightvalue.h"
 
 Property* PropertyFactory::createProperty(INumberVectorProperty *pVector,QString *moduleName) {

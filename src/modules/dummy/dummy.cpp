@@ -45,6 +45,13 @@ Dummy::Dummy(QString name,QString label)
     emit propertyCreated(props,&_modulename);
     _propertyStore.add(props);
 
+    MessageProperty* mess = new MessageProperty(_modulename,"Examples","Message","message1","First message zone",0,0,0);
+    emit propertyCreated(mess,&_modulename);
+    _propertyStore.add(mess);
+    mess = new MessageProperty(_modulename,"Examples","Message","message2","Second message zone",0,0,0);
+    emit propertyCreated(mess,&_modulename);
+    _propertyStore.add(mess);
+
 
 }
 
