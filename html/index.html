@@ -180,7 +180,7 @@ function buildproperty(m,d,g,p) {
             $("#B"+nnp).on("click", function () {
                 var pp=$(this).data("json");
                 $.each( pp.numbers, function( ii, i ) {
-                    pp.numbers[ii].value=document.getElementById(pp.modulename+pp.devicenameshort+pp.groupnameshort+pp.propname+i.name).value;
+                    pp.numbers[ii].value=parseFloat(document.getElementById(pp.modulename+pp.devicenameshort+pp.groupnameshort+pp.propname+i.name).value);
                 })
                 var obj = jQuery.parseJSON("{\"message\":\"setproperty\",\"property\":"+JSON.stringify(pp)+"}");
                 console.log(obj);
