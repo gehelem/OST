@@ -140,6 +140,7 @@ void IndiPanel::newMessage     (INDI::BaseDevice *dp, int messageID)
 
     MessageProperty* message = new MessageProperty(_modulename,dp->getDeviceName(),"root",dp->getDeviceName(),dp->getDeviceName(),0,0,0);
     message->setMessage(mess);
+    _propertyStore.update(message);
     emit propertyUpdated(message,&_modulename);
 
 
