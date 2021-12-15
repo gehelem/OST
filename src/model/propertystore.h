@@ -2,7 +2,7 @@
 #define OST_PROPERTYSTORE_H
 
 #include <QMap>
-#include "lightproperty.h"
+#include "property.h"
 #include <boost/log/trivial.hpp>
 
 class PropertyStore {

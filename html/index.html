@@ -161,7 +161,7 @@ function buildgroup(m,d,g,l) {
 function buildproperty(m,d,g,p) {
     nn=m+d+g;
     nnp=nn+p.propname;
-    if  (!($("#P"+nnp).length)) {
+    if  (!($("#P"+nnp).length)&&(p.hasOwnProperty('texts')||p.hasOwnProperty('numbers')||p.hasOwnProperty('switches')||p.hasOwnProperty('lights')))  {
         div="<div id=P"+nnp+" ><table id=tab"+nnp+">"
         +"<tr><td>"
         +"<strong id=status"+nnp+" >"+"---"+"</strong>"
@@ -204,6 +204,20 @@ function buildproperty(m,d,g,p) {
                 websocket.send(JSON.stringify(obj));
             });
             
+        }
+        
+    }
+    if  (p.hasOwnProperty('message'))  {
+        if (!($("#M"+m+d).length))  {
+            div="<div id=M"+m+d+" >"
+            /*+"<table><tbody><tr><td>"*/
+            +"<input  class='ui-text ui-widget ui-corner-all' type='text' id=MD"+m+d+" value='"+p.message+"'  width='auto' ></input>"
+            /*+"</td></tr></tbody></table>"*/
+            +"</div>"
+            $("#D"+m+d).append(div);
+            $("#MD"+m+d).width("98%");
+        } else {
+            $("#MD"+m+d).val(p.message);
         }
         
     }

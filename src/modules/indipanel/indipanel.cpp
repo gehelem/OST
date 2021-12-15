@@ -19,9 +19,16 @@ IndiPanel::~IndiPanel()
 }
 void IndiPanel::newDevice(INDI::BaseDevice *dp)
 {
+    MessageProperty* mess = new MessageProperty(_modulename,dp->getDeviceName(),"root",dp->getDeviceName(),dp->getDeviceName(),0,0,0);
+    emit propertyCreated(mess,&_modulename);
+    _propertyStore.add(mess);
+
 }
 void IndiPanel::removeDevice(INDI::BaseDevice *dp)
 {
+    MessageProperty* mess = new MessageProperty(_modulename,dp->getDeviceName(),"root",dp->getDeviceName(),dp->getDeviceName(),0,0,0);
+    emit propertyRemoved(mess,&_modulename);
+    _propertyStore.remove(mess);
 }
 void IndiPanel::newProperty(INDI::Property *pProperty)
 {
@@ -130,9 +137,13 @@ void IndiPanel::newBLOB(IBLOB *bp)
 void IndiPanel::newMessage     (INDI::BaseDevice *dp, int messageID)
 {
     QString mess= QString::fromStdString(dp->messageQueue(messageID));
-    QString dev = QString::fromStdString(dp->getDeviceName());
-    dev.replace(" ","");
-    emit newMessageSent(mess,&_modulename,dev);
+
+    MessageProperty* message = new MessageProperty(_modulename,dp->getDeviceName(),"root",dp->getDeviceName(),dp->getDeviceName(),0,0,0);
+    message->setMessage(mess);
+    _propertyStore.update(message);
+    emit propertyUpdated(message,&_modulename);
+
+
 }
 
 

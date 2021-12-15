@@ -79,6 +79,14 @@ void JSonDumper::visit(LightProperty *pProperty, QString *moduleName) {
     _result = doc.toJson(QJsonDocument::Compact);
 }
 
+void JSonDumper::visit(MessageProperty *pProperty, QString *moduleName) {
+    QJsonObject json = dumpPropertyCommons(pProperty);
+    json["message"] = pProperty->getMessage();
+    QJsonDocument doc(json);
+    _jsonResult = json;
+    _result = doc.toJson(QJsonDocument::Compact);
+}
+
 QJsonObject JSonDumper::dumpPropertyCommons(Property *pProperty) {
 
     QJsonObject json;

@@ -2,8 +2,11 @@
 #define OST_PROPERTYTEXTDUMPER_H
 
 #include <string>
+#include <model/textproperty.h>
 #include <model/numberproperty.h>
+#include <model/lightproperty.h>
 #include <model/switchproperty.h>
+#include <model/messageproperty.h>
 #include <utils/propertyvisitor.h>
 
 class Property;
@@ -17,6 +20,7 @@ public:
     void visit(SwitchProperty *pProperty,QString *moduleName) override;
     void visit(TextProperty *pProperty,QString *moduleName) override;
     void visit(LightProperty *pProperty,QString *moduleName) override;
+    void visit(MessageProperty *pProperty,QString *moduleName) override;
 
     [[nodiscard]] const std::string& getResult() const { return _result; }
 

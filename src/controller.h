@@ -7,7 +7,9 @@
 #include <boost/log/trivial.hpp>
 
 #include <basemodule.h>
-
+#include "utils/propertyvisitor.h"
+#include "utils/propertyfactory.h"
+#include "utils/propertytextdumper.h"
 
 #include "wshandler.h"
 #include "maincontrol.h"
