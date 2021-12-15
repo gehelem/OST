@@ -11,24 +11,28 @@ FocusModule::FocusModule(QString name,QString label)
     : Basemodule(name,label)
 
 {
-    properties=Properties::getInstance();
-    _devices["camera"]="";
-    _devices["focuser"]="";
-    properties->createDevcat(_modulename,"ctl","Control",1);
+    _devices = new TextProperty(_modulename,"Options","root","devices","Devices",2,0);
+    _devices->addText(new TextValue("camera","Camera","hint",_camera));
+    _devices->addText(new TextValue("focuser","Focuser","hint",_focuser));
+    emit propertyCreated(_devices,&_modulename);
+    _propertyStore.add(_devices);
 
-    properties->createProp(_modulename,"values","Valeurs"    ,PT_NUM,"ctl","",OP_RO,OSRule::OSR_NOFMANY,0,OPState::OPS_IDLE,"","",1);
-    properties->appendElt(_modulename,"values","loopHFRavg",0,"Average HFR","","");
-    properties->appendElt(_modulename,"values","focpos"    ,0,"Focuser position","","");
-    properties->appendElt(_modulename,"values","imgHFR",0,"Last imgage HFR","","");
+    _values = new NumberProperty(_modulename,"Control","root","values","Values",0,0);
+    _values->addNumber(new NumberValue("loopHFRavg","Average HFR","hint",0,"",0,99,0));
+    _values->addNumber(new NumberValue("focpos","Focuser position","hint",0,"",0,99,0));
+    _values->addNumber(new NumberValue("imgHFR","Last imgage HFR","hint",0,"",0,99,0));
+    emit propertyCreated(_values,&_modulename);
+    _propertyStore.add(_values);
 
-    properties->createProp(_modulename,"params","Paramètres" ,PT_NUM,"ctl","",OP_RW,OSRule::OSR_NOFMANY,0,OPState::OPS_IDLE,"","",1);
-    properties->appendElt(_modulename,"params","startpos",0,"Départ","","");
-    properties->appendElt(_modulename,"params","steps"    ,0,"Incrément","","");
-    properties->appendElt(_modulename,"params","iterations",0,"Nombre d'incréments","","");
-    properties->appendElt(_modulename,"params","loopIterations"    ,0,"Moyenne sur","","");
-    properties->appendElt(_modulename,"params","exposure",0,"Exposition","","");
-    properties->appendElt(_modulename,"params","backlash"    ,0,"Backlash","","");
-
+    _parameters = new NumberProperty(_modulename,"Control","root","parameters","Parameters",2,0);
+    _parameters->addNumber(new NumberValue("startpos"      ,"Start position","hint",_startpos,"",0,100000,100));
+    _parameters->addNumber(new NumberValue("steps"         ,"Steps gap","hint",_steps,"",0,1000,100));
+    _parameters->addNumber(new NumberValue("iterations"    ,"Iterations","hint",_iterations,"",0,99,1));
+    _parameters->addNumber(new NumberValue("loopIterations","Average over","hint",_loopIterations,"",0,99,1));
+    _parameters->addNumber(new NumberValue("exposure"      ,"Exposure","hint",_exposure,"",0,120,1));
+    _parameters->addNumber(new NumberValue("backlash"      ,"Backlash overshoot","hint",_backlash,"",0,1000,1));
+    emit propertyCreated(_parameters,&_modulename);
+    _propertyStore.add(_parameters);
 }
 
 FocusModule::~FocusModule()
@@ -43,7 +47,6 @@ void FocusModule::test0(QString txt)
     if (txt=="a")  connectAllDevices();
     if (txt=="l")  loadDevicesConfs();
     if (txt=="d")  disconnectAllDevices();
-    if (txt=="w")  properties->dumproperties();
     if (txt=="f")
     {
         _startpos = 30000;
@@ -52,13 +55,13 @@ void FocusModule::test0(QString txt)
         _loopIterations = 4;
         _exposure =2;
         _backlash=100;
-        properties->setElt(_modulename,"params","startpos",_startpos);
+        /*properties->setElt(_modulename,"params","startpos",_startpos);
         properties->setElt(_modulename,"params","steps",_steps);
         properties->setElt(_modulename,"params","iterations",_iterations);
         properties->setElt(_modulename,"params","loopIterations",_loopIterations);
         properties->setElt(_modulename,"params","exposure",_exposure);
         properties->setElt(_modulename,"params","backlash",_backlash);
-        properties->emitProp(_modulename,"params");
+        properties->emitProp(_modulename,"params");*/
         startCoarse();
     }
 
@@ -66,7 +69,7 @@ void FocusModule::test0(QString txt)
 void FocusModule::newNumber(INumberVectorProperty *nvp)
 {
     if (
-            (QString(nvp->device) == _devices["camera"] )
+            (QString(nvp->device) == _camera )
         &&  (nvp->s==IPS_ALERT)
        )
     {
@@ -74,12 +77,13 @@ void FocusModule::newNumber(INumberVectorProperty *nvp)
         emit cameraAlert();
     }
     if (
-            (QString(nvp->device) == _devices["focuser"])
+            (QString(nvp->device) == _focuser)
         &&  (QString(nvp->name)   =="ABS_FOCUS_POSITION")
        )
     {
+        /*_values->getNumbers()
         properties->setElt(_modulename,"values","focpos",nvp->np[0].value);
-        properties->emitProp(_modulename,"values");
+        properties->emitProp(_modulename,"values");*/
         if (nvp->s==IPS_OK)
         {
             sendMessage("focuserReachedPosition");
@@ -96,7 +100,7 @@ void FocusModule::newNumber(INumberVectorProperty *nvp)
 void FocusModule::newBLOB(IBLOB *bp)
 {
     if (
-            (QString(bp->bvp->device) == _devices["camera"])
+            (QString(bp->bvp->device) == _camera)
        )
     {
         image.reset(new Image());
@@ -113,7 +117,7 @@ void FocusModule::newBLOB(IBLOB *bp)
 void FocusModule::newSwitch(ISwitchVectorProperty *svp)
 {
     if (
-            (QString(svp->device) == _devices["camera"])
+            (QString(svp->device) == _camera)
 //        &&  (QString(svp->name)   =="CCD_FRAME_RESET")
         &&  (svp->s==IPS_ALERT)
        )
@@ -124,7 +128,7 @@ void FocusModule::newSwitch(ISwitchVectorProperty *svp)
 
 
     if (
-            (QString(svp->device) == _devices["camera"])
+            (QString(svp->device) == _camera)
         &&  (QString(svp->name)   =="CCD_FRAME_RESET")
         &&  (svp->s==IPS_OK)
        )
@@ -270,7 +274,7 @@ void FocusModule::SMRequestFrameReset()
         qDebug() << (*i)->objectName();
     }*/
 
-    if (!frameReset(_devices["camera"]))
+    if (!frameReset(_camera))
     {
             emit abort();
             return;
@@ -320,8 +324,8 @@ void FocusModule::SMFindStars()
 void FocusModule::OnSucessSEP()
 {
     sendMessage("FindStarsDone");
-    properties->setElt(_modulename,"values","imgHFR",image->HFRavg);
-    properties->emitProp(_modulename,"values");
+    /*properties->setElt(_modulename,"values","imgHFR",image->HFRavg);
+    properties->emitProp(_modulename,"values");*/
     emit FindStarsDone();
 }
 
@@ -420,8 +424,8 @@ void FocusModule::SMInitLoopFrame()
     sendMessage("SMInitLoopFrame");
     _loopIteration=0;
     _loopHFRavg=99;
-    properties->setElt(_modulename,"values","loopHFRavg",_loopHFRavg);
-    properties->emitProp(_modulename,"values");
+    /*properties->setElt(_modulename,"values","loopHFRavg",_loopHFRavg);
+    properties->emitProp(_modulename,"values");*/
 
     emit InitLoopFrameDone();
 }
@@ -431,8 +435,8 @@ void FocusModule::SMComputeLoopFrame()
     sendMessage("SMComputeLoopFrame");
     _loopIteration++;
     _loopHFRavg=((_loopIteration-1)*_loopHFRavg + image->HFRavg)/_loopIteration;
-    properties->setElt(_modulename,"values","loopHFRavg",_loopHFRavg);
-    properties->emitProp(_modulename,"values");
+    /*properties->setElt(_modulename,"values","loopHFRavg",_loopHFRavg);
+    properties->emitProp(_modulename,"values");*/
 
     qDebug() << "Loop    " << _loopIteration << "/" << _loopIterations << " = " <<  image->HFRavg;
 
