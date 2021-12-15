@@ -15,8 +15,9 @@ public:
 
     ~MessageProperty() override {delete &_message;}
 
-    void setMessage(QString* pValue) { _message = *pValue; }
-    inline const QString& getMessage() { return _message; }
+    void setMessage(QString pValue) { _message = pValue; }
+
+    QString getMessage() { return _message; }
     void accept(PropertyVisitor *pVisitor) override { pVisitor->visit(this,&_moduleName); }
 
 private:
