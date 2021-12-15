@@ -45,12 +45,28 @@ Dummy::Dummy(QString name,QString label)
     emit propertyCreated(props,&_modulename);
     _propertyStore.add(props);
 
-    MessageProperty* mess = new MessageProperty(_modulename,"Examples","Message","message1","First message zone",0,0,0);
+    props = new SwitchProperty(_modulename,"Testdevice","Fake Group","swRO","Switches read only",0,0,0);
+    props->addSwitch(new SwitchValue("swRO1","Switch RO 1 ","hint",1));
+    props->addSwitch(new SwitchValue("swRO2","Switch RO 2 ","hint",0));
+    props->addSwitch(new SwitchValue("swRO3","Switch RO 3 ","hint",0));
+    emit propertyCreated(props,&_modulename);
+    _propertyStore.add(props);
+    MessageProperty* mess = new MessageProperty(_modulename,"Testdevice","root","message1","First message zone",0,0,0);
     emit propertyCreated(mess,&_modulename);
     _propertyStore.add(mess);
-    mess = new MessageProperty(_modulename,"Examples","Message","message2","Second message zone",0,0,0);
+    mess->setMessage("this is a first message from first device");
+    emit propertyCreated(mess,&_modulename);
+    mess->setMessage("this is a second message from module");
+    emit propertyCreated(mess,&_modulename);
+    mess->setMessage("this is a third message from module");
     emit propertyCreated(mess,&_modulename);
     _propertyStore.add(mess);
+
+    mess = new MessageProperty(_modulename,"Examples","root","message2","Second message zone",0,0,0);
+    mess->setMessage("this is a message from another device");
+    emit propertyCreated(mess,&_modulename);
+    _propertyStore.add(mess);
+
 
 
 }
