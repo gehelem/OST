@@ -28,7 +28,8 @@ find_package(GSL REQUIRED)
 find_package(OpenCV REQUIRED )
 find_package(CImg REQUIRED )
 find_package(WCSLIB REQUIRED)
-find_package(Qt5 5.12 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql)
+find_package(QT NAMES Qt5 COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql REQUIRED)
+find_package(Qt5 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql)
 find_package(StellarSolver REQUIRED)
 find_package(Boost COMPONENTS log log_setup REQUIRED)
 
@@ -107,7 +108,7 @@ target_link_libraries( ost
 ########################
 ### modules libraries ##
 ########################
-# Indipanel module
+# Dummy module
 add_library(ostdummy SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.cpp
@@ -118,7 +119,7 @@ target_link_libraries(ostdummy PRIVATE
     Qt${QT_VERSION_MAJOR}::Concurrent
     ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
 )
-target_compile_definitions(ostdummy PRIVATE dummy_LIBRARY)
+target_compile_definitions(ostdummy PRIVATE DUMMY_MODULE)
 
 
 
@@ -136,8 +137,13 @@ target_link_libraries(ostfocuser PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
     ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+    ${STELLARSOLVER_LIBRARIES}
+    ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
+    ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
+    z -lpthread
+
 )
-target_compile_definitions(ostfocuser PRIVATE FOCUSER_LIBRARY)
+target_compile_definitions(ostfocuser PRIVATE FOCUS_MODULE)
 
 # Indipanel module
 add_library(ostindipanel SHARED
@@ -150,7 +156,7 @@ target_link_libraries(ostindipanel PRIVATE
     Qt${QT_VERSION_MAJOR}::Concurrent
     ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
 )
-target_compile_definitions(ostindipanel PRIVATE INDIPANEL_LIBRARY)
+target_compile_definitions(ostindipanel PRIVATE INDIPANEL_MODULE)
 
 
 #install(TARGETS HeadlessObservatory RUNTIME DESTINATION bin)
