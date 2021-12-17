@@ -73,6 +73,7 @@ add_executable( ost
     ${CMAKE_CURRENT_SOURCE_DIR}/src/model/numberproperty.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/model/numbervalue.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/model/switchproperty.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/switchproperty.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/model/switchvalue.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/model/lightproperty.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/model/lightvalue.h
