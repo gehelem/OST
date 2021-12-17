@@ -76,4 +76,130 @@ Dummy::~Dummy()
 
 }
 
+void Dummy::OnSetPropertyText(TextProperty* prop)
+{
+
+    if (!(prop->getModuleName()==_modulename)) return;
+    QList<TextValue*> texts=prop->getTexts();
+
+    for (int i = 0; i < texts.size(); ++i) {
+        texts[i]->setText(texts[i]->text()+" modified by module");
+    }
+    prop->setState(1);
+    emit propertyCreated(prop,&_modulename);
+    _propertyStore.add(prop);
+
+}
+void Dummy::OnSetPropertyNumber(NumberProperty* prop)
+{
+    if (!(prop->getModuleName()==_modulename)) return;
+
+    /*INDI::BaseDevice *dp = getDevice(prop->getDeviceName().toStdString().c_str());
+    if (dp== nullptr)
+    {
+        BOOST_LOG_TRIVIAL(debug) << "Indipanel device not found " << prop->getDeviceName().toStdString();
+        return;
+    }
+    INDI::Property *iprop;
+    iprop =  dp->getProperty(prop->getName().toStdString().c_str());
+    if (iprop== nullptr)
+    {
+        BOOST_LOG_TRIVIAL(debug) << "Indipanel property not found " << prop->getDeviceName().toStdString() << " " << prop->getName().toStdString();
+        return;
+    }
+
+    if (iprop->getType()==INDI_NUMBER) {
+        INumberVectorProperty *indiprop;
+        indiprop =  dp->getNumber(prop->getName().toStdString().c_str());
+        if (indiprop== nullptr)
+        {
+            BOOST_LOG_TRIVIAL(debug) << "Indipanel number property not found " << prop->getDeviceName().toStdString() << " " << prop->getName().toStdString();
+            return;
+        }
+        QList<NumberValue*> numbers=prop->getNumbers();
+        for (int i = 0; i < indiprop->nnp; ++i) {
+            for (int j = 0; j < numbers.size(); ++j) {
+                if (strcmp(numbers[j]->name().toStdString().c_str(),indiprop->np[i].name)==0) {
+                    //strcpy(inditprop->tp[i].text,texts[j]->text().toStdString().c_str());
+                    indiprop->np[i].value=numbers[j]->getValue();
+                    numbers[j]->setValue(indiprop->np[i].value);
+                    BOOST_LOG_TRIVIAL(debug) << "Indipanel number propertyitem  modified " << indiprop->np[i].name << "/" << indiprop->np[i].value;
+                }
+            }
+        }
+        sendNewNumber(indiprop);
+        return;
+    }
+
+
+    return;*/
+}
+void Dummy::OnSetPropertySwitch(SwitchProperty* prop)
+{
+    if (!(prop->getModuleName()==_modulename)) return;
+
+    /*INDI::BaseDevice *dp = getDevice(prop->getDeviceName().toStdString().c_str());
+    if (dp== nullptr)
+    {
+        BOOST_LOG_TRIVIAL(debug) << "Indipanel device not found " << prop->getDeviceName().toStdString();
+        return;
+    }
+    INDI::Property *iprop;
+    iprop =  dp->getProperty(prop->getName().toStdString().c_str());
+    if (iprop== nullptr)
+    {
+        BOOST_LOG_TRIVIAL(debug) << "Indipanel property not found " << prop->getDeviceName().toStdString() << " " << prop->getName().toStdString();
+        return;
+    }
+
+    if (iprop->getType()==INDI_SWITCH) {
+        ISwitchVectorProperty *indiprop;
+        indiprop =  dp->getSwitch(prop->getName().toStdString().c_str());
+        if (indiprop== nullptr)
+        {
+            BOOST_LOG_TRIVIAL(debug) << "Indipanel switch property not found " << prop->getDeviceName().toStdString() << " " << prop->getName().toStdString();
+            return;
+        }
+        BOOST_LOG_TRIVIAL(debug) << "Indipanel switch property  " << prop->getDeviceName().toStdString() << " " << prop->getName().toStdString();
+
+        QList<SwitchValue*> switchs=prop->getSwitches();
+        for (int i = 0; i < indiprop->nsp; ++i) {
+            for (int j = 0; j < switchs.size(); ++j) {
+                if (indiprop->r==ISR_1OFMANY) {
+                    indiprop->sp[i].s=ISS_OFF;
+                    if (strcmp(switchs[j]->name().toStdString().c_str(),indiprop->sp[i].name)==0) {
+                        BOOST_LOG_TRIVIAL(debug) << "ISR_1OFMANY";
+                        indiprop->sp[i].s=ISS_ON;
+                    }
+
+                }
+                if (indiprop->r==ISR_ATMOST1) {
+                    if (strcmp(switchs[j]->name().toStdString().c_str(),indiprop->sp[i].name)==0) {
+                        BOOST_LOG_TRIVIAL(debug) << "ISR_ATMOST1";
+                        indiprop->sp[i].s=ISS_OFF;
+                        if (indiprop->sp[i].s==ISS_ON ) indiprop->sp[i].s=ISS_OFF;
+                        if (indiprop->sp[i].s==ISS_OFF) indiprop->sp[i].s=ISS_ON;
+                    }
+
+                }
+                if (indiprop->r==ISR_NOFMANY) {
+                    if (strcmp(switchs[j]->name().toStdString().c_str(),indiprop->sp[i].name)==0) {
+                        BOOST_LOG_TRIVIAL(debug) << "ISR_NOFMANY";
+                        if (indiprop->sp[i].s==ISS_ON ) {
+                            indiprop->sp[i].s=ISS_OFF;
+                        } else {
+                            indiprop->sp[i].s=ISS_ON;
+                        }
+                    }
+
+                }
+            }
+        }
+        sendNewSwitch(indiprop);
+        return;
+    }
+
+
+    return;*/
+}
 

@@ -29,6 +29,7 @@ public:
      * @return the switch state
      */
     [[nodiscard]] inline const bool& switchState() const {return _switchState;}
+    void setState(bool val)  { _switchState=val; }
 
 private:
     bool _switchState;

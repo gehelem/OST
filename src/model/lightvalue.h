@@ -24,6 +24,7 @@ public:
      * @return the switch state
      */
     [[nodiscard]] inline const int& lightState() const {return _lightState;}
+    void setState(bool val)  { _lightState=val; }
 
 private:
     int _lightState;

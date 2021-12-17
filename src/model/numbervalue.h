@@ -33,6 +33,7 @@ public:
     [[nodiscard]] inline double getMin() const { return _min; }
     [[nodiscard]] inline double getMax() const { return _max; }
     [[nodiscard]] inline double getStep() const { return _step; }
+    void setValue(double val)  { _value=val; }
 
 private:
     double _value;
