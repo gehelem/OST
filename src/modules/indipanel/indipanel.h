@@ -2,7 +2,7 @@
 #define INDIPANEL_MODULE_h_
 #include <basemodule.h>
 
-#if defined(INDIPANEL_MODULE_h_)
+#if defined(INDIPANEL_MODULE)
 #  define MODULE_INIT Q_DECL_EXPORT
 #else
 #  define MODULE_INIT Q_DECL_IMPORT

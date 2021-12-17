@@ -4,6 +4,7 @@
 #include <basedevice.h>
 #include <memory>
 #include <QtCore>
+#include <QThread>
 //Includes for this project
 #include <structuredefinitions.h>
 #include <stellarsolver.h>
@@ -12,6 +13,7 @@
 #define cimg_use_png 1
 #define cimg_use_jpeg 1*/
 #include <CImg.h>
+#include <boost/log/trivial.hpp>
 
 using namespace cimg_library;
 
@@ -24,8 +26,8 @@ public:
     ~Image();
 // Stellasolver stuff
     FITSImage::Statistic stats;
-    //std::unique_ptr<StellarSolver> stellarSolver =nullptr;
-    QPointer<StellarSolver> stellarSolver;
+    std::unique_ptr<StellarSolver> stellarSolver =nullptr;
+    //QPointer<StellarSolver> stellarSolver;
     QList<FITSImage::Star> stars;
     uint8_t m_Channels { 1 };
     uint8_t *m_ImageBuffer { nullptr };

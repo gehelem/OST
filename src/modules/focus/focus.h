@@ -2,7 +2,7 @@
 #define FOCUS_MODULE_h_
 #include <basemodule.h>
 
-#if defined(FOCUS_MODULE_h_)
+#if defined(FOCUS_MODULE)
 #  define MODULE_INIT Q_DECL_EXPORT
 #else
 #  define MODULE_INIT Q_DECL_IMPORT
@@ -11,7 +11,7 @@
 #include <QtCore>
 #include <QtConcurrent>
 #include <QStateMachine>
-
+#include "image.h"
 
 class MODULE_INIT FocusModule : public Basemodule
 {
@@ -58,8 +58,12 @@ class MODULE_INIT FocusModule : public Basemodule
         void cameraAlert();
         void abort();
     public slots:
+        void OnSetPropertyText(TextProperty* prop) override;
+        void OnSetPropertyNumber(NumberProperty* prop) override;
+        void OnSetPropertySwitch(SwitchProperty* prop) override;
         void test0(QString txt);
         void OnSucessSEP();
+
     private:
         void newNumber(INumberVectorProperty *nvp) override;
         void newBLOB(IBLOB *bp) override;
@@ -88,9 +92,13 @@ class MODULE_INIT FocusModule : public Basemodule
         void SMAbort();
         void startCoarse();
 
+        //std::unique_ptr<Image> image =nullptr;
+        QPointer<Image> image;
+
         TextProperty* _devices;
         NumberProperty* _values;
         NumberProperty* _parameters;
+        SwitchProperty* _actions;
 
 
         QString _camera  = "CCD Simulator";

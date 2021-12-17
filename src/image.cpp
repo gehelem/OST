@@ -238,33 +238,26 @@ void Image::FindStars(void)
 {
     FindStarsFinished = false;
     HFRavg=99;
-    stellarSolver = new StellarSolver(stats, m_ImageBuffer,this);
-    stellarSolver->moveToThread(this->thread());
-    stellarSolver->setParent(this);
-    connect(stellarSolver,&StellarSolver::logOutput,this,&Image::sslogOutput);
-    connect(stellarSolver,&StellarSolver::ready,this,&Image::ssReadySEP);
+    //stellarSolver = new StellarSolver(stats, m_ImageBuffer);
+    stellarSolver.reset(new StellarSolver(stats, m_ImageBuffer, this));
+    //stellarSolver.reset(new StellarSolver(stats, m_ImageBuffer, this));
+    //ellarSolver->moveToThread(this->thread());
+    //stellarSolver->setParent(this);
+    //connect(stellarSolver,&StellarSolver::logOutput,this,&Image::sslogOutput);
+    //connect(stellarSolver,&StellarSolver::ready,this,&Image::ssReadySEP);
+    connect(stellarSolver.get(),&StellarSolver::logOutput,this,&Image::sslogOutput);
+    connect(stellarSolver.get(),&StellarSolver::ready,this,&Image::ssReadySEP);
     stellarSolver->setLogLevel(LOG_ALL);
     stellarSolver->setSSLogLevel(LOG_VERBOSE);
+    stellarSolver->setProperty("LogToFile", true);
+    stellarSolver->setProperty("LogFileName", "/home/gilles/projets/OST/sslog.txt");
 
-    /*typedef enum { EXTRACT,            //This just sextracts the sources
-                   EXTRACT_WITH_HFR,   //This sextracts the sources and finds the HFR
-                   SOLVE                //This solves the image
-                 } ProcessType;
 
-    typedef enum { EXTRACTOR_INTERNAL, //This uses internal SEP to Sextract Sources
-                   EXTRACTOR_EXTERNAL,  //This uses the external sextractor to Sextract Sources.
-                   EXTRACTOR_BUILTIN  //This uses whatever default sextraction method the selected solver uses
-                 } ExtractorType;
-
-    typedef enum { SOLVER_STELLARSOLVER,    //This uses the internal build of astrometry.net
-                   SOLVER_LOCALASTROMETRY,  //This uses an astrometry.net or ANSVR locally on this computer
-                   SOLVER_ASTAP,            //This uses a local installation of ASTAP
-                   SOLVER_ONLINEASTROMETRY  //This uses the online astrometry.net or ASTAP
-                 } SolverType;    */
     stellarSolver->setProperty("ProcessType",EXTRACT_WITH_HFR);
     stellarSolver->setProperty("ExtractorType",EXTRACTOR_INTERNAL);
     stellarSolver->setProperty("SolverType",SOLVER_STELLARSOLVER);
     stellarSolver->start();
+    BOOST_LOG_TRIVIAL(debug) << "FindStars Start";
     //IDLog("IMG stellarSolver SEP Start\n");
 
 
@@ -272,11 +265,12 @@ void Image::FindStars(void)
 
 void Image::SolveStars(void)
 {
+/*
     SolveStarsFinished = false;
     HFRavg=99;
     stellarSolver = new StellarSolver(stats, m_ImageBuffer,this);
-    stellarSolver->moveToThread(this->thread());
-    stellarSolver->setParent(this);
+    //stellarSolver->moveToThread(this->thread());
+    //stellarSolver->setParent(this);
     connect(stellarSolver,&StellarSolver::logOutput,this,&Image::sslogOutput);
     connect(stellarSolver,&StellarSolver::ready,this,&Image::ssReadySolve);
     stellarSolver->setLogLevel(LOG_ALL);
@@ -285,33 +279,18 @@ void Image::SolveStars(void)
     stellarSolver->m_LogFileName="/home/gilles/OST/logs/solver.log";
     stellarSolver->m_AstrometryLogLevel=LOG_ALL;
 
-    /*typedef enum { EXTRACT,            //This just sextracts the sources
-                   EXTRACT_WITH_HFR,   //This sextracts the sources and finds the HFR
-                   SOLVE                //This solves the image
-                 } ProcessType;
-
-    typedef enum { EXTRACTOR_INTERNAL, //This uses internal SEP to Sextract Sources
-                   EXTRACTOR_EXTERNAL,  //This uses the external sextractor to Sextract Sources.
-                   EXTRACTOR_BUILTIN  //This uses whatever default sextraction method the selected solver uses
-                 } ExtractorType;
-
-    typedef enum { SOLVER_STELLARSOLVER,    //This uses the internal build of astrometry.net
-                   SOLVER_LOCALASTROMETRY,  //This uses an astrometry.net or ANSVR locally on this computer
-                   SOLVER_ASTAP,            //This uses a local installation of ASTAP
-                   SOLVER_ONLINEASTROMETRY  //This uses the online astrometry.net or ASTAP
-                 } SolverType;    */
     stellarSolver->setProperty("ProcessType",SOLVE);
     stellarSolver->setProperty("ExtractorType",EXTRACTOR_INTERNAL);
     stellarSolver->setProperty("SolverType",SOLVER_STELLARSOLVER);
     stellarSolver->start();
-    //IDLog("IMG stellarSolver Solve Start\n");
-
+*/
 
 }
 
 void Image::sslogOutput(QString text)
 {
     //IDLog("IMG Stellarsolver log : %s\n",text.toUtf8().data());
+    BOOST_LOG_TRIVIAL(debug) << "IMG Stellarsolver log : " << text.toUtf8().data();
 }
 void Image::ssReadySEP(void)
 {
@@ -351,10 +330,10 @@ void Image::ssReadySolve(void)
 void Image::appendStarsFound(void)
 {
     const unsigned char
-        red[]   = { 255,0,0 },
+        red[]   = { 255,0,0 };
         //blue [] = { 0,0,255 },
         //black[] = { 0,0,0 },
-        green[] = { 0,255,0 };
+        //green[] = { 0,255,0 };
     for (int i=0;i<stars.size();i++)
     {
         img.draw_text  (stars[i].x, img.height()-stars[i].y, QString::number(stars[i].HFR , 'G', 3).toStdString().c_str(),red,1, 10);

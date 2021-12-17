@@ -2,7 +2,7 @@
 #define DUMMY_MODULE_h_
 #include <basemodule.h>
 
-#if defined(DUMMY_MODULE_h_)
+#if defined(DUMMY_MODULE)
 #  define MODULE_INIT Q_DECL_EXPORT
 #else
 #  define MODULE_INIT Q_DECL_IMPORT

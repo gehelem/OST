@@ -24,6 +24,14 @@ FocusModule::FocusModule(QString name,QString label)
     emit propertyCreated(_values,&_modulename);
     _propertyStore.add(_values);
 
+    _actions = new SwitchProperty(_modulename,"Control","root","actions","Actions",1,0,0);
+    _actions->addSwitch(new SwitchValue("condev","Connect devices","hint",0));
+    _actions->addSwitch(new SwitchValue("coarse","Autofocus","hint",0));
+    _actions->addSwitch(new SwitchValue("loop","Infinite loop","hint",0));
+    _actions->addSwitch(new SwitchValue("abort","Abort","hint",0));
+    emit propertyCreated(_actions,&_modulename);
+    _propertyStore.add(_actions);
+
     _parameters = new NumberProperty(_modulename,"Control","root","parameters","Parameters",2,0);
     _parameters->addNumber(new NumberValue("startpos"      ,"Start position","hint",_startpos,"",0,100000,100));
     _parameters->addNumber(new NumberValue("steps"         ,"Steps gap","hint",_steps,"",0,1000,100));
@@ -38,6 +46,88 @@ FocusModule::FocusModule(QString name,QString label)
 FocusModule::~FocusModule()
 {
 
+}
+void FocusModule::OnSetPropertyNumber(NumberProperty* prop)
+{
+    if (!(prop->getModuleName()==_modulename)) return;
+    _propertyStore.add(prop);
+
+    QList<NumberValue*> numbers=prop->getNumbers();
+    for (int j = 0; j < numbers.size(); ++j) {
+        if (numbers[j]->name()=="startpos")        _startpos=numbers[j]->getValue();
+        if (numbers[j]->name()=="steps")           _steps=numbers[j]->getValue();
+        if (numbers[j]->name()=="iterations")      _iterations=numbers[j]->getValue();
+        if (numbers[j]->name()=="loopIterations")  _loopIterations=numbers[j]->getValue();
+        if (numbers[j]->name()=="exposure")        _exposure=numbers[j]->getValue();
+        if (numbers[j]->name()=="backlash")        _backlash=numbers[j]->getValue();
+        emit propertyUpdated(prop,&_modulename);
+        BOOST_LOG_TRIVIAL(debug) << "Focus number property item modified " << prop->getName().toStdString();
+    }
+}
+void FocusModule::OnSetPropertyText(TextProperty* prop)
+{
+    if (!(prop->getModuleName()==_modulename)) return;
+}
+
+void FocusModule::OnSetPropertySwitch(SwitchProperty* prop)
+{
+    if (!(prop->getModuleName()==_modulename)) return;
+    //_propertyStore.add(prop);
+
+    SwitchProperty* _sw;
+
+    for ( const QString& device : _propertyStore.toTreeList().keys() ) {
+        for ( const QString& group : _propertyStore.toTreeList()[device].keys() ) {
+            for ( const QString& property : _propertyStore.toTreeList()[device][group].keys() ) {
+                if (_propertyStore.toTreeList()[device][group][property]->getName()==prop->getName() ) {
+                    _sw=_propertyStore[device][group][property];
+                }
+            }
+        }
+    }
+
+    QList<SwitchValue*> switchs=_sw->getSwitches();
+    for (const SwitchValue& val : switchs  ) {
+            if (_sw->getPermission()==ISR_1OFMANY) {
+                val.setSwitchState(ISS_OFF);
+
+             }
+    }
+
+            /*if (indiprop->r==ISR_ATMOST1) {
+                if (strcmp(switchs[j]->name().toStdString().c_str(),indiprop->sp[i].name)==0) {
+                    BOOST_LOG_TRIVIAL(debug) << "ISR_ATMOST1";
+                    indiprop->sp[i].s=ISS_OFF;
+                    if (indiprop->sp[i].s==ISS_ON ) indiprop->sp[i].s=ISS_OFF;
+                    if (indiprop->sp[i].s==ISS_OFF) indiprop->sp[i].s=ISS_ON;
+                }
+
+            }
+            if (indiprop->r==ISR_NOFMANY) {
+                if (strcmp(switchs[j]->name().toStdString().c_str(),indiprop->sp[i].name)==0) {
+                    BOOST_LOG_TRIVIAL(debug) << "ISR_NOFMANY";
+                    if (indiprop->sp[i].s==ISS_ON ) {
+                        indiprop->sp[i].s=ISS_OFF;
+                    } else {
+                        indiprop->sp[i].s=ISS_ON;
+                    }
+                }
+
+            }
+        }
+    }    */
+
+
+    QList<SwitchValue*> switchs=prop->getSwitches();
+    for (int j = 0; j < switchs.size(); ++j) {
+        if (switchs[j]->name()=="coarse") startCoarse();
+        if (switchs[j]->name()=="loop")                ;
+        if (switchs[j]->name()=="abort")               ;
+        if (switchs[j]->name()=="condev") connectAllDevices();
+
+        emit propertyUpdated(prop,&_modulename);
+        BOOST_LOG_TRIVIAL(debug) << "Focus switch property item modified " << prop->getName().toStdString();
+    }
 }
 
 void FocusModule::test0(QString txt)
@@ -55,13 +145,7 @@ void FocusModule::test0(QString txt)
         _loopIterations = 4;
         _exposure =2;
         _backlash=100;
-        /*properties->setElt(_modulename,"params","startpos",_startpos);
-        properties->setElt(_modulename,"params","steps",_steps);
-        properties->setElt(_modulename,"params","iterations",_iterations);
-        properties->setElt(_modulename,"params","loopIterations",_loopIterations);
-        properties->setElt(_modulename,"params","exposure",_exposure);
-        properties->setElt(_modulename,"params","backlash",_backlash);
-        properties->emitProp(_modulename,"params");*/
+
         startCoarse();
     }
 
@@ -103,9 +187,12 @@ void FocusModule::newBLOB(IBLOB *bp)
             (QString(bp->bvp->device) == _camera)
        )
     {
-        image.reset(new Image());
-        connect(image.get(),&Image::successSEP        ,this,&FocusModule::OnSucessSEP);
+        image = new Image();
+        BOOST_LOG_TRIVIAL(debug) << "Avant connec";
+        connect(image,&Image::successSEP,this,&FocusModule::OnSucessSEP);
+        BOOST_LOG_TRIVIAL(debug) << "Avant load";
         image->LoadFromBlob(bp);
+        BOOST_LOG_TRIVIAL(debug) << "Avant signal";
         if (_machine.isRunning()) {
             emit ExposureDone();
             emit ExposureBestDone();
