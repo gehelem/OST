@@ -119,9 +119,15 @@ void Dummy::OnSetPropertySwitch(SwitchProperty* prop)
 {
     if (!(prop->getModuleName()==_modulename)) return;
 
+    for (int i = 0; i < prop->getSwitches().size(); ++i) {
+        BOOST_LOG_TRIVIAL(debug) << "Switch recieved " << prop->getSwitches()[i]->name().toStdString() << "-" << prop->getSwitches()[i]->switchState();
+    }
+
     SwitchProperty* temp = _propertyStore.getSwitch(prop->getDeviceName(),prop->getGroupName(),prop->getName());
 
     QList<SwitchValue*> switches=temp->getSwitches();
+    BOOST_LOG_TRIVIAL(debug) << "Switch rule " << temp->getRule();
+
     /*!< Only 1 switch of many can be ON (e.g. radio buttons) */
     if (temp->getRule()==ISR_1OFMANY) {
         for (int i = 0; i < switches.size(); ++i) {
@@ -137,12 +143,11 @@ void Dummy::OnSetPropertySwitch(SwitchProperty* prop)
         }
     }
     /*!< At most one switch can be ON, but all switches can be off. It is similar to ISR_1OFMANY with the exception that all switches can be off. */
-    if (prop->getRule()==ISR_ATMOST1) {
+    if (temp->getRule()==ISR_ATMOST1) {
         for (int i = 0; i < switches.size(); ++i) {
-
             for (int j = 0; j < prop->getSwitches().size(); ++j) {
                 if (prop->getSwitches()[j]->name()==switches[i]->name()) {
-                    switches[i]->setState(!switches[i]->switchState());
+                    if (switches[i]->switchState()) switches[i]->setState(false); else switches[i]->setState(true);
                 } else {
                     switches[i]->setState(false);
                 }
@@ -151,11 +156,11 @@ void Dummy::OnSetPropertySwitch(SwitchProperty* prop)
         }
     }
     /*!< Any number of switches can be ON (e.g. check boxes) */
-    if (prop->getRule()==ISR_NOFMANY) {
+    if (temp->getRule()==ISR_NOFMANY) {
         for (int i = 0; i < switches.size(); ++i) {
             for (int j = 0; j < prop->getSwitches().size(); ++j) {
                 if (prop->getSwitches()[j]->name()==switches[i]->name()) {
-                    switches[i]->setState(true);
+                    if (switches[i]->switchState()) switches[i]->setState(false); else switches[i]->setState(true);
                 }
             }
 
@@ -163,6 +168,9 @@ void Dummy::OnSetPropertySwitch(SwitchProperty* prop)
 
     }
 
+    for (int i = 0; i < temp->getSwitches().size(); ++i) {
+        BOOST_LOG_TRIVIAL(debug) << "Switch " << temp->getSwitches()[i]->name().toStdString() << "-" << temp->getSwitches()[i]->switchState();
+    }
     for (int i = 0; i < switches.size(); ++i) {
         BOOST_LOG_TRIVIAL(debug) << "Switch " << switches[i]->name().toStdString() << "-" << switches[i]->switchState();
     }
