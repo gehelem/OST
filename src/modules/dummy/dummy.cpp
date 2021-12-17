@@ -29,26 +29,37 @@ Dummy::Dummy(QString name,QString label)
     _propertyStore.add(prop);
 
     SwitchProperty* props = new SwitchProperty(_modulename,"Examples","Switches","swRO","Switches read only",0,0,0);
-    props->addSwitch(new SwitchValue("swRO1","Switch RO 1 ","hint",1));
-    props->addSwitch(new SwitchValue("swRO2","Switch RO 2 ","hint",0));
-    props->addSwitch(new SwitchValue("swRO3","Switch RO 3 ","hint",0));
+    props->addSwitch(new SwitchValue("swRO1","Switch RO 1 ","hint",true));
+    props->addSwitch(new SwitchValue("swRO2","Switch RO 2 ","hint",false));
+    props->addSwitch(new SwitchValue("swRO3","Switch RO 3 ","hint",false));
     emit propertyCreated(props,&_modulename);
     _propertyStore.add(props);
 
-    props = new SwitchProperty(_modulename,"Examples","Switches","swRW","Switches read/write",1,0,0);
-    props->addSwitch(new SwitchValue("swRW1","Switch RW 1 ","hint",0));
-    props->addSwitch(new SwitchValue("swRW2","Switch RW 2 ","hint",0));
-    props->addSwitch(new SwitchValue("swRW3","Switch RW 3 ","hint",0));
-    props->addSwitch(new SwitchValue("swRW4","Switch RW 4 ","hint",1));
-    props->addSwitch(new SwitchValue("swRW5","Switch RW 5 ","hint",0));
-    props->addSwitch(new SwitchValue("swRW6","Switch RW 6 ","hint",0));
+    props = new SwitchProperty(_modulename,"Examples","Switches","swRW1ofmany","Switches read/write 1 of many",2,0,0);
+    props->addSwitch(new SwitchValue("swRW1","Switch RW 1 of many 1 ","hint",false));
+    props->addSwitch(new SwitchValue("swRW2","Switch RW 2 of many ","hint",true));
+    props->addSwitch(new SwitchValue("swRW3","Switch RW 3 of many ","hint",false));
+    emit propertyCreated(props,&_modulename);
+    _propertyStore.add(props);
+
+    props = new SwitchProperty(_modulename,"Examples","Switches","swRWatmostone","Switches read/write at most 1",2,0,1);
+    props->addSwitch(new SwitchValue("swRW1","Switch RW atmost 1 ","hint",true));
+    props->addSwitch(new SwitchValue("swRW2","Switch RW atmost 2 ","hint",false));
+    props->addSwitch(new SwitchValue("swRW3","Switch RW atmost 3 ","hint",false));
+    emit propertyCreated(props,&_modulename);
+    _propertyStore.add(props);
+
+    props = new SwitchProperty(_modulename,"Examples","Switches","swRWnoofmany","Switches read/write any",2,0,2);
+    props->addSwitch(new SwitchValue("swRW1","Switch RW any 1 ","hint",false));
+    props->addSwitch(new SwitchValue("swRW2","Switch RW any 2 ","hint",true));
+    props->addSwitch(new SwitchValue("swRW3","Switch RW any 3 ","hint",true));
     emit propertyCreated(props,&_modulename);
     _propertyStore.add(props);
 
     props = new SwitchProperty(_modulename,"Testdevice","Fake Group","swRO","Switches read only",0,0,0);
-    props->addSwitch(new SwitchValue("swRO1","Switch RO 1 ","hint",1));
-    props->addSwitch(new SwitchValue("swRO2","Switch RO 2 ","hint",0));
-    props->addSwitch(new SwitchValue("swRO3","Switch RO 3 ","hint",0));
+    props->addSwitch(new SwitchValue("swRO1","Switch RO 1 ","hint",true));
+    props->addSwitch(new SwitchValue("swRO2","Switch RO 2 ","hint",false));
+    props->addSwitch(new SwitchValue("swRO3","Switch RO 3 ","hint",false));
     emit propertyCreated(props,&_modulename);
     _propertyStore.add(props);
     MessageProperty* mess = new MessageProperty(_modulename,"Testdevice","root","message1","First message zone",0,0,0);
@@ -94,112 +105,73 @@ void Dummy::OnSetPropertyNumber(NumberProperty* prop)
 {
     if (!(prop->getModuleName()==_modulename)) return;
 
-    /*INDI::BaseDevice *dp = getDevice(prop->getDeviceName().toStdString().c_str());
-    if (dp== nullptr)
-    {
-        BOOST_LOG_TRIVIAL(debug) << "Indipanel device not found " << prop->getDeviceName().toStdString();
-        return;
-    }
-    INDI::Property *iprop;
-    iprop =  dp->getProperty(prop->getName().toStdString().c_str());
-    if (iprop== nullptr)
-    {
-        BOOST_LOG_TRIVIAL(debug) << "Indipanel property not found " << prop->getDeviceName().toStdString() << " " << prop->getName().toStdString();
-        return;
-    }
+    QList<NumberValue*> numbers=prop->getNumbers();
 
-    if (iprop->getType()==INDI_NUMBER) {
-        INumberVectorProperty *indiprop;
-        indiprop =  dp->getNumber(prop->getName().toStdString().c_str());
-        if (indiprop== nullptr)
-        {
-            BOOST_LOG_TRIVIAL(debug) << "Indipanel number property not found " << prop->getDeviceName().toStdString() << " " << prop->getName().toStdString();
-            return;
-        }
-        QList<NumberValue*> numbers=prop->getNumbers();
-        for (int i = 0; i < indiprop->nnp; ++i) {
-            for (int j = 0; j < numbers.size(); ++j) {
-                if (strcmp(numbers[j]->name().toStdString().c_str(),indiprop->np[i].name)==0) {
-                    //strcpy(inditprop->tp[i].text,texts[j]->text().toStdString().c_str());
-                    indiprop->np[i].value=numbers[j]->getValue();
-                    numbers[j]->setValue(indiprop->np[i].value);
-                    BOOST_LOG_TRIVIAL(debug) << "Indipanel number propertyitem  modified " << indiprop->np[i].name << "/" << indiprop->np[i].value;
-                }
-            }
-        }
-        sendNewNumber(indiprop);
-        return;
+    for (int i = 0; i < numbers.size(); ++i) {
+        numbers[i]->setValue(numbers[i]->getValue()+2);
     }
+    prop->setState(1);
+    emit propertyCreated(prop,&_modulename);
+    _propertyStore.add(prop);
 
-
-    return;*/
 }
 void Dummy::OnSetPropertySwitch(SwitchProperty* prop)
 {
     if (!(prop->getModuleName()==_modulename)) return;
 
-    /*INDI::BaseDevice *dp = getDevice(prop->getDeviceName().toStdString().c_str());
-    if (dp== nullptr)
-    {
-        BOOST_LOG_TRIVIAL(debug) << "Indipanel device not found " << prop->getDeviceName().toStdString();
-        return;
-    }
-    INDI::Property *iprop;
-    iprop =  dp->getProperty(prop->getName().toStdString().c_str());
-    if (iprop== nullptr)
-    {
-        BOOST_LOG_TRIVIAL(debug) << "Indipanel property not found " << prop->getDeviceName().toStdString() << " " << prop->getName().toStdString();
-        return;
-    }
+    SwitchProperty* temp = _propertyStore.getSwitch(prop->getDeviceName(),prop->getGroupName(),prop->getName());
 
-    if (iprop->getType()==INDI_SWITCH) {
-        ISwitchVectorProperty *indiprop;
-        indiprop =  dp->getSwitch(prop->getName().toStdString().c_str());
-        if (indiprop== nullptr)
-        {
-            BOOST_LOG_TRIVIAL(debug) << "Indipanel switch property not found " << prop->getDeviceName().toStdString() << " " << prop->getName().toStdString();
-            return;
-        }
-        BOOST_LOG_TRIVIAL(debug) << "Indipanel switch property  " << prop->getDeviceName().toStdString() << " " << prop->getName().toStdString();
+    QList<SwitchValue*> switches=temp->getSwitches();
+    /*!< Only 1 switch of many can be ON (e.g. radio buttons) */
+    if (temp->getRule()==ISR_1OFMANY) {
+        for (int i = 0; i < switches.size(); ++i) {
 
-        QList<SwitchValue*> switchs=prop->getSwitches();
-        for (int i = 0; i < indiprop->nsp; ++i) {
-            for (int j = 0; j < switchs.size(); ++j) {
-                if (indiprop->r==ISR_1OFMANY) {
-                    indiprop->sp[i].s=ISS_OFF;
-                    if (strcmp(switchs[j]->name().toStdString().c_str(),indiprop->sp[i].name)==0) {
-                        BOOST_LOG_TRIVIAL(debug) << "ISR_1OFMANY";
-                        indiprop->sp[i].s=ISS_ON;
-                    }
-
-                }
-                if (indiprop->r==ISR_ATMOST1) {
-                    if (strcmp(switchs[j]->name().toStdString().c_str(),indiprop->sp[i].name)==0) {
-                        BOOST_LOG_TRIVIAL(debug) << "ISR_ATMOST1";
-                        indiprop->sp[i].s=ISS_OFF;
-                        if (indiprop->sp[i].s==ISS_ON ) indiprop->sp[i].s=ISS_OFF;
-                        if (indiprop->sp[i].s==ISS_OFF) indiprop->sp[i].s=ISS_ON;
-                    }
-
-                }
-                if (indiprop->r==ISR_NOFMANY) {
-                    if (strcmp(switchs[j]->name().toStdString().c_str(),indiprop->sp[i].name)==0) {
-                        BOOST_LOG_TRIVIAL(debug) << "ISR_NOFMANY";
-                        if (indiprop->sp[i].s==ISS_ON ) {
-                            indiprop->sp[i].s=ISS_OFF;
-                        } else {
-                            indiprop->sp[i].s=ISS_ON;
-                        }
-                    }
-
+            for (int j = 0; j < prop->getSwitches().size(); ++j) {
+                if (prop->getSwitches()[j]->name()==switches[i]->name()) {
+                    switches[i]->setState(true);
+                } else {
+                    switches[i]->setState(false);
                 }
             }
+
         }
-        sendNewSwitch(indiprop);
-        return;
+    }
+    /*!< At most one switch can be ON, but all switches can be off. It is similar to ISR_1OFMANY with the exception that all switches can be off. */
+    if (prop->getRule()==ISR_ATMOST1) {
+        for (int i = 0; i < switches.size(); ++i) {
+
+            for (int j = 0; j < prop->getSwitches().size(); ++j) {
+                if (prop->getSwitches()[j]->name()==switches[i]->name()) {
+                    switches[i]->setState(!switches[i]->switchState());
+                } else {
+                    switches[i]->setState(false);
+                }
+            }
+
+        }
+    }
+    /*!< Any number of switches can be ON (e.g. check boxes) */
+    if (prop->getRule()==ISR_NOFMANY) {
+        for (int i = 0; i < switches.size(); ++i) {
+            for (int j = 0; j < prop->getSwitches().size(); ++j) {
+                if (prop->getSwitches()[j]->name()==switches[i]->name()) {
+                    switches[i]->setState(true);
+                }
+            }
+
+        }
+
+    }
+
+    for (int i = 0; i < switches.size(); ++i) {
+        BOOST_LOG_TRIVIAL(debug) << "Switch " << switches[i]->name().toStdString() << "-" << switches[i]->switchState();
     }
 
 
-    return;*/
+    temp->setState(1);
+    temp->setSwitches(switches);
+    emit propertyCreated(temp,&_modulename);
+    _propertyStore.add(temp);
+
 }
 
