@@ -351,10 +351,10 @@ void Image::ssReadySolve(void)
 void Image::appendStarsFound(void)
 {
     const unsigned char
-        red[]   = { 255,0,0 },
+        red[]   = { 255,0,0 };
         //blue [] = { 0,0,255 },
         //black[] = { 0,0,0 },
-        green[] = { 0,255,0 };
+        //green[] = { 0,255,0 };
     for (int i=0;i<stars.size();i++)
     {
         img.draw_text  (stars[i].x, img.height()-stars[i].y, QString::number(stars[i].HFR , 'G', 3).toStdString().c_str(),red,1, 10);
