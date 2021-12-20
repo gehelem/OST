@@ -61,7 +61,7 @@ bool Image::saveToJpeg(QString filename,int compress)
 
 bool Image::LoadFromBlob(IBLOB *bp)
 {
-    //IDLog("IMG readblob %s %s %i \n",bp->label,bp->name,bp->size);
+    BOOST_LOG_TRIVIAL(debug) << "Image load from blob " << bp->label << "-" << bp->name << "-" << bp->size;
     ResetData();
     int status = 0, anynullptr = 0;
     long naxes[3];
