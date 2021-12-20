@@ -311,7 +311,7 @@ void Image::SolveStars(void)
 
 void Image::sslogOutput(QString text)
 {
-    //IDLog("IMG Stellarsolver log : %s\n",text.toUtf8().data());
+    BOOST_LOG_TRIVIAL(debug) << "STellarSolver log : " << text.toStdString();
 }
 void Image::ssReadySEP(void)
 {
