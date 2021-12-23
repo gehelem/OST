@@ -1,6 +1,7 @@
 #ifndef MODULE_h_
 #define MODULE_h_
 #include <QtCore>
+#include <QtConcurrent>
 #include <QCoreApplication>
 #include <QObject>
 #include <basedevice.h>
@@ -14,6 +15,7 @@
 #include <model/messageproperty.h>
 #include <model/propertystore.h>
 #include "utils/propertyfactory.h"
+
 
 class Property;
 
@@ -30,9 +32,10 @@ class Basemodule : public QObject, public INDI::BaseClient
         ~Basemodule() = default;
         void setHostport(QString host, int port);
         bool connectIndi(void);
+        void setBlobMode(void);
         QString getDescription(void) {return _moduledescription;}
 
-        std::unique_ptr<Image> image =nullptr;
+        QPointer<Image> image =nullptr;
 
         QString _modulename;
         QString _modulelabel;

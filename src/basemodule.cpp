@@ -9,6 +9,13 @@ Basemodule::Basemodule(QString name, QString label)
     _propertyStore.cleanup();
     setVerbose(false);
     _moduledescription="This is a base module, it shouldn't be used as is";
+
+    SwitchProperty* props = new SwitchProperty(_modulename,"Indi server","root","connect","Indi server",1,0,1);
+    props->addSwitch(new SwitchValue("connect","Connect","hint",false));
+    props->addSwitch(new SwitchValue("disconnect","Disconnect","hint",false));
+    emit propertyCreated(props,&_modulename);
+    _propertyStore.add(props);
+
 }
 void Basemodule::setHostport(QString host, int port)
 {
@@ -67,6 +74,22 @@ bool Basemodule::disconnectIndi(void)
         sendMessage("Indi server already disconnected");
         return true;
     }
+}
+void Basemodule::setBlobMode(void)
+{
+    BOOST_LOG_TRIVIAL(debug) << "Looking for blob mode... ";
+    std::vector<INDI::BaseDevice *> devs = getDevices();
+    for(std::size_t i = 0; i < devs.size(); i++) {
+        BOOST_LOG_TRIVIAL(debug) << "Looking for blob mode on device ... " << devs[i]->getDeviceName();
+            if (devs[i]->getDriverInterface() & INDI::BaseDevice::CCD_INTERFACE)
+            {
+                BOOST_LOG_TRIVIAL(debug) << "Setting blob mode " << devs[i]->getDeviceName();
+                sendMessage("Setting blob mode " + QString(devs[i]->getDeviceName()));
+                setBLOBMode(B_ALSO,devs[i]->getDeviceName(),nullptr);
+            }
+    }
+
+
 }
 
 /*!

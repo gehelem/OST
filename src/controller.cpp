@@ -51,7 +51,7 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
 
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focuser1","focuser 1");
     LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel1","Indi control panel");
-    LoadModule(QCoreApplication::applicationDirPath()+"/libostdummy.so","dummymodule","Dummy module just to play");
+    //LoadModule(QCoreApplication::applicationDirPath()+"/libostdummy.so","dummymodule","Dummy module just to play");
 
 }
 
@@ -81,6 +81,7 @@ void Controller::LoadModule(QString lib,QString name,QString label)
             if (mod)
                 mod->setHostport(_indihost,_indiport);
                 mod->connectIndi();
+                mod->setBlobMode();
                 connect(mod,&Basemodule::propertyCreated,this,&Controller::OnPropertyCreated);
                 connect(mod,&Basemodule::propertyUpdated,this,&Controller::OnPropertyUpdated);
                 connect(mod,&Basemodule::propertyRemoved,this,&Controller::OnPropertyRemoved);

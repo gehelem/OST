@@ -22,7 +22,7 @@ find_package(CFITSIO REQUIRED)
 find_package(INDI REQUIRED)
 #find_package(INDI COMPONENTS clientqt5 REQUIRED)
 find_package(ZLIB REQUIRED)
-#find_package(Threads REQUIRED)
+find_package(Threads REQUIRED)
 find_package(Nova REQUIRED)
 find_package(GSL REQUIRED)
 find_package(OpenCV REQUIRED )
@@ -89,7 +89,6 @@ add_executable( ost
     ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/propertytextdumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/jsondumper.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/jsondumper.h
-
 )
 target_link_libraries( ost
     indiclient
@@ -100,27 +99,28 @@ target_link_libraries( ost
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::WebSockets
     Qt${QT_VERSION_MAJOR}::Sql
-    ${STELLARSOLVER_LIBRARIES}
     ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
     ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
+    ${STELLARSOLVER_LIBRARIES}
     z -lpthread
     )
 
-########################
-### modules libraries ##
-########################
-# Indipanel module
-add_library(ostdummy SHARED
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.cpp
-)
-target_link_libraries(ostdummy PRIVATE
-    indiclient
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Concurrent
-    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
-)
-target_compile_definitions(ostdummy PRIVATE dummy_LIBRARY)
+#########################
+#### modules libraries ##
+#########################
+## Dummy module
+#add_library(ostdummy SHARED
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.h
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.cpp
+#)
+#target_link_libraries(ostdummy PRIVATE
+#    indiclient
+#    Qt${QT_VERSION_MAJOR}::Core
+#    Qt${QT_VERSION_MAJOR}::Concurrent
+#    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+#    -lpthread
+#)
+#target_compile_definitions(ostdummy PRIVATE dummy_LIBRARY)
 
 
 
@@ -148,9 +148,17 @@ add_library(ostindipanel SHARED
 )
 target_link_libraries(ostindipanel PRIVATE
     indiclient
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Concurrent
     ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+    Qt${QT_VERSION_MAJOR}::Gui
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Network
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    Qt${QT_VERSION_MAJOR}::WebSockets
+    Qt${QT_VERSION_MAJOR}::Sql
+    ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
+    ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
+    ${STELLARSOLVER_LIBRARIES}
+    z -lpthread
 )
 target_compile_definitions(ostindipanel PRIVATE INDIPANEL_LIBRARY)
 
