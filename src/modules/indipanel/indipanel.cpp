@@ -156,7 +156,23 @@ void IndiPanel::newBLOB(IBLOB *bp)
     image->CalcStats();
     image->computeHistogram();
     image->saveStretchedToJpeg(_webroot+"/"+QString(bp->bvp->device)+".jpeg",100);
+
+
+    ImageProperty* img = new ImageProperty(
+                _modulename,
+                bp->bvp->device,
+                QString(bp->bvp->device) + " Viewer",
+                QString(bp->bvp->device) + "viewer",
+                "Image property label",0,0,0
+                );
+    img->setURL(QString(bp->bvp->device)+".jpeg");
+    emit propertyUpdated(img,&_modulename);
+    _propertyStore.add(img);
+
+
     BOOST_LOG_TRIVIAL(debug) << "image stats " << image->stats.median[0];
+
+
     _solver.ResetSolver(image->stats,image->m_ImageBuffer);
     connect(&_solver,&Solver::successSEP,this,&IndiPanel::OnSucessSEP,Qt::AutoConnection);
     //image->FindStars();
