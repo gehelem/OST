@@ -90,3 +90,12 @@ void PropertyTextDumper::visit(MessageProperty *pProperty, QString *moduleName) 
            << ". Message=" << pProperty->getMessage().toStdString();
     _result = stream.str();
 }
+
+void PropertyTextDumper::visit(ImageProperty *pProperty, QString *moduleName) {
+
+    std::stringstream stream;
+
+    stream << "Image Property : " << dumpPropertyCommons(pProperty,moduleName)
+           << ". URL=" << pProperty->getURL().toStdString();
+    _result = stream.str();
+}

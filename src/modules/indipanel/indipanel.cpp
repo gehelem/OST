@@ -21,6 +21,7 @@ void IndiPanel::newDevice(INDI::BaseDevice *dp)
     MessageProperty* mess = new MessageProperty(_modulename,dp->getDeviceName(),"root",dp->getDeviceName(),dp->getDeviceName(),0,0,0);
     emit propertyCreated(mess,&_modulename);
 
+
 }
 void IndiPanel::removeDevice(INDI::BaseDevice *dp)
 {
@@ -36,6 +37,18 @@ void IndiPanel::newProperty(INDI::Property *pProperty)
             emit propertyCreated(PropertyFactory::createProperty(pProperty->getNumber(),&_modulename),&_modulename);
             _propertyStore.add(PropertyFactory::createProperty(pProperty->getNumber(),&_modulename));
             //BOOST_LOG_TRIVIAL(debug) << "Indipanel propeties size " << _propertyStore.getSize();
+            if  (strcmp(pProperty->getName(),"CCD_EXPOSURE")==0) {
+                INDI::BaseDevice *_wdp=getDevice(pProperty->getDeviceName());
+                if (_wdp->getDriverInterface() & INDI::BaseDevice::CCD_INTERFACE)
+                {
+                    BOOST_LOG_TRIVIAL(debug) << "Setting blob mode for " << _wdp->getDeviceName();
+                    setBLOBMode(B_ALSO,_wdp->getDeviceName(),nullptr);
+                    ImageProperty* img = new ImageProperty(_modulename,_wdp->getDeviceName(),"Viewer","viewer","Image label",0,0,0);
+                    emit propertyCreated(img,&_modulename);
+
+                }
+
+            }
             break;
         }
 
@@ -107,6 +120,7 @@ void IndiPanel::newNumber(INumberVectorProperty *nvp)
 {
     _propertyStore.update(PropertyFactory::createProperty(nvp,&_modulename));
     emit propertyUpdated(PropertyFactory::createProperty(nvp,&_modulename),&_modulename);
+
 }
 
 void IndiPanel::newText(ITextVectorProperty *tvp)

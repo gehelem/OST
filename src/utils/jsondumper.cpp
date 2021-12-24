@@ -22,6 +22,7 @@ void JSonDumper::visit(NumberProperty *pProperty, QString *moduleName) {
         jsonNumbers.append(jsonNumber);
     }
     json["numbers"] = jsonNumbers;
+    json["proptype"] = "number";
     QJsonDocument doc(json);
     _jsonResult = json;
     _result = doc.toJson(QJsonDocument::Compact);
@@ -40,6 +41,7 @@ void JSonDumper::visit(SwitchProperty *pProperty, QString *moduleName) {
         jsonSwitches.append(jsonSwitch);
     }
     json["switches"] = jsonSwitches;
+    json["proptype"] = "switch";
     QJsonDocument doc(json);
     _jsonResult = json;
     _result = doc.toJson(QJsonDocument::Compact);
@@ -57,6 +59,7 @@ void JSonDumper::visit(TextProperty *pProperty, QString *moduleName) {
         jsonTexts.append(jsonText);
     }
     json["texts"] = jsonTexts;
+    json["proptype"] = "text";
     QJsonDocument doc(json);
     _jsonResult = json;
     _result = doc.toJson(QJsonDocument::Compact);
@@ -74,6 +77,7 @@ void JSonDumper::visit(LightProperty *pProperty, QString *moduleName) {
         jsonLights.append(jsonLight);
     }
     json["lights"] = jsonLights;
+    json["proptype"] = "light";
     QJsonDocument doc(json);
     _jsonResult = json;
     _result = doc.toJson(QJsonDocument::Compact);
@@ -81,7 +85,17 @@ void JSonDumper::visit(LightProperty *pProperty, QString *moduleName) {
 
 void JSonDumper::visit(MessageProperty *pProperty, QString *moduleName) {
     QJsonObject json = dumpPropertyCommons(pProperty);
+    json["proptype"] = "message";
     json["message"] = pProperty->getMessage();
+    QJsonDocument doc(json);
+    _jsonResult = json;
+    _result = doc.toJson(QJsonDocument::Compact);
+}
+
+void JSonDumper::visit(ImageProperty *pProperty, QString *moduleName) {
+    QJsonObject json = dumpPropertyCommons(pProperty);
+    json["proptype"] = "image";
+    json["URL"] = pProperty->getURL();
     QJsonDocument doc(json);
     _jsonResult = json;
     _result = doc.toJson(QJsonDocument::Compact);
