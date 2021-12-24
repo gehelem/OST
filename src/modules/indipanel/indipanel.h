@@ -2,7 +2,8 @@
 #define INDIPANEL_MODULE_h_
 #include <basemodule.h>
 
-#if defined(INDIPANEL_MODULE_h_)
+
+#if defined(INDIPANEL_MODULE)
 #  define MODULE_INIT Q_DECL_EXPORT
 #else
 #  define MODULE_INIT Q_DECL_IMPORT
@@ -20,6 +21,8 @@ class MODULE_INIT IndiPanel : public Basemodule
         void OnSetPropertyText(TextProperty* prop) override;
         void OnSetPropertyNumber(NumberProperty* prop) override;
         void OnSetPropertySwitch(SwitchProperty* prop) override;
+        void OnSucessSEP(void);
+
 
     private:
         void newDevice      (INDI::BaseDevice *dp) override;

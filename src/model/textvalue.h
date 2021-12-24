@@ -29,6 +29,8 @@ public:
      * @return this value's text
      */
     [[nodiscard]] inline const QString& text() const {return _text;}
+    void setText(QString val)  { _text=val; }
+
 
 private:
     QString _text;

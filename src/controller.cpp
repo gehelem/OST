@@ -9,7 +9,7 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
       _indiport(port)
 {
 
-    this->setParent(parent);
+    //this->setParent(parent);
     Q_UNUSED(saveAllBlobs);
     const QString DRIVER("QSQLITE");
     if(QSqlDatabase::isDriverAvailable(DRIVER))
@@ -28,7 +28,7 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
     BOOST_LOG_TRIVIAL(debug) << "Controller warmup";
     BOOST_LOG_TRIVIAL(debug) <<  "ApplicationDirPath :" << QCoreApplication::applicationDirPath().toStdString();
 
-    MainControl *mainctl = new MainControl("maincontrol","Main control");
+    /*MainControl *mainctl = new MainControl("maincontrol","Main control");
     mainctl->setHostport(_indihost,_indiport);
     mainctl->connectIndi();
     connect(mainctl,&Basemodule::propertyCreated,this,&Controller::OnPropertyCreated);
@@ -46,12 +46,12 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
     connect(wshandler,&WShandler::dumpAsked,mainctl,&Basemodule::OnDumpAsked);
     connect(wshandler,&WShandler::setPropertyText,mainctl,&Basemodule::OnSetPropertyText);
     connect(wshandler,&WShandler::setPropertyNumber,mainctl,&Basemodule::OnSetPropertyNumber);
-    connect(wshandler,&WShandler::setPropertySwitch,mainctl,&Basemodule::OnSetPropertySwitch);
+    connect(wshandler,&WShandler::setPropertySwitch,mainctl,&Basemodule::OnSetPropertySwitch);*/
 
 
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focuser1","focuser 1");
     LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel1","Indi control panel");
-    LoadModule(QCoreApplication::applicationDirPath()+"/libostdummy.so","dummymodule","Dummy module just to play");
+    //LoadModule(QCoreApplication::applicationDirPath()+"/libostdummy.so","dummymodule","Dummy module just to play");
 
 }
 
@@ -81,6 +81,7 @@ void Controller::LoadModule(QString lib,QString name,QString label)
             if (mod)
                 mod->setHostport(_indihost,_indiport);
                 mod->connectIndi();
+                mod->setBlobMode();
                 connect(mod,&Basemodule::propertyCreated,this,&Controller::OnPropertyCreated);
                 connect(mod,&Basemodule::propertyUpdated,this,&Controller::OnPropertyUpdated);
                 connect(mod,&Basemodule::propertyRemoved,this,&Controller::OnPropertyRemoved);

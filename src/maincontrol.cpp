@@ -2,7 +2,7 @@
 #include "model/textproperty.h"
 
 
-MainControl::MainControl(QString name,QString label)
+MainControl::MainControl(QString name, QString label)
     : Basemodule(name,label)
 {
 

@@ -29,26 +29,37 @@ Dummy::Dummy(QString name,QString label)
     _propertyStore.add(prop);
 
     SwitchProperty* props = new SwitchProperty(_modulename,"Examples","Switches","swRO","Switches read only",0,0,0);
-    props->addSwitch(new SwitchValue("swRO1","Switch RO 1 ","hint",1));
-    props->addSwitch(new SwitchValue("swRO2","Switch RO 2 ","hint",0));
-    props->addSwitch(new SwitchValue("swRO3","Switch RO 3 ","hint",0));
+    props->addSwitch(new SwitchValue("swRO1","Switch RO 1 ","hint",true));
+    props->addSwitch(new SwitchValue("swRO2","Switch RO 2 ","hint",false));
+    props->addSwitch(new SwitchValue("swRO3","Switch RO 3 ","hint",false));
     emit propertyCreated(props,&_modulename);
     _propertyStore.add(props);
 
-    props = new SwitchProperty(_modulename,"Examples","Switches","swRW","Switches read/write",1,0,0);
-    props->addSwitch(new SwitchValue("swRW1","Switch RW 1 ","hint",0));
-    props->addSwitch(new SwitchValue("swRW2","Switch RW 2 ","hint",0));
-    props->addSwitch(new SwitchValue("swRW3","Switch RW 3 ","hint",0));
-    props->addSwitch(new SwitchValue("swRW4","Switch RW 4 ","hint",1));
-    props->addSwitch(new SwitchValue("swRW5","Switch RW 5 ","hint",0));
-    props->addSwitch(new SwitchValue("swRW6","Switch RW 6 ","hint",0));
+    props = new SwitchProperty(_modulename,"Examples","Switches","swRW1ofmany","Switches read/write 1 of many",2,0,0);
+    props->addSwitch(new SwitchValue("swRW1","Switch RW 1 of many 1 ","hint",false));
+    props->addSwitch(new SwitchValue("swRW2","Switch RW 2 of many ","hint",true));
+    props->addSwitch(new SwitchValue("swRW3","Switch RW 3 of many ","hint",false));
+    emit propertyCreated(props,&_modulename);
+    _propertyStore.add(props);
+
+    props = new SwitchProperty(_modulename,"Examples","Switches","swRWatmostone","Switches read/write at most 1",2,0,1);
+    props->addSwitch(new SwitchValue("swRW1","Switch RW atmost 1 ","hint",true));
+    props->addSwitch(new SwitchValue("swRW2","Switch RW atmost 2 ","hint",false));
+    props->addSwitch(new SwitchValue("swRW3","Switch RW atmost 3 ","hint",false));
+    emit propertyCreated(props,&_modulename);
+    _propertyStore.add(props);
+
+    props = new SwitchProperty(_modulename,"Examples","Switches","swRWnoofmany","Switches read/write any",2,0,2);
+    props->addSwitch(new SwitchValue("swRW1","Switch RW any 1 ","hint",false));
+    props->addSwitch(new SwitchValue("swRW2","Switch RW any 2 ","hint",true));
+    props->addSwitch(new SwitchValue("swRW3","Switch RW any 3 ","hint",true));
     emit propertyCreated(props,&_modulename);
     _propertyStore.add(props);
 
     props = new SwitchProperty(_modulename,"Testdevice","Fake Group","swRO","Switches read only",0,0,0);
-    props->addSwitch(new SwitchValue("swRO1","Switch RO 1 ","hint",1));
-    props->addSwitch(new SwitchValue("swRO2","Switch RO 2 ","hint",0));
-    props->addSwitch(new SwitchValue("swRO3","Switch RO 3 ","hint",0));
+    props->addSwitch(new SwitchValue("swRO1","Switch RO 1 ","hint",true));
+    props->addSwitch(new SwitchValue("swRO2","Switch RO 2 ","hint",false));
+    props->addSwitch(new SwitchValue("swRO3","Switch RO 3 ","hint",false));
     emit propertyCreated(props,&_modulename);
     _propertyStore.add(props);
     MessageProperty* mess = new MessageProperty(_modulename,"Testdevice","root","message1","First message zone",0,0,0);
@@ -76,4 +87,44 @@ Dummy::~Dummy()
 
 }
 
+void Dummy::OnSetPropertyText(TextProperty* prop)
+{
+
+    if (!(prop->getModuleName()==_modulename)) return;
+    QList<TextValue*> texts=prop->getTexts();
+
+    for (int i = 0; i < texts.size(); ++i) {
+        texts[i]->setText(texts[i]->text()+" modified by module");
+    }
+    prop->setState(1);
+    emit propertyCreated(prop,&_modulename);
+    _propertyStore.add(prop);
+
+}
+void Dummy::OnSetPropertyNumber(NumberProperty* prop)
+{
+    if (!(prop->getModuleName()==_modulename)) return;
+
+    QList<NumberValue*> numbers=prop->getNumbers();
+
+    for (int i = 0; i < numbers.size(); ++i) {
+        numbers[i]->setValue(numbers[i]->getValue()+2);
+    }
+    prop->setState(1);
+    emit propertyCreated(prop,&_modulename);
+    _propertyStore.add(prop);
+
+}
+void Dummy::OnSetPropertySwitch(SwitchProperty* prop)
+{
+    if (!(prop->getModuleName()==_modulename)) return;
+
+    SwitchProperty* temp = _propertyStore.getSwitch(prop->getDeviceName(),prop->getGroupName(),prop->getName());
+    QString name =prop->getSwitches()[0]->name(); /* only 1 switch is sent */
+    temp->setSwitch(name,true);
+    temp->setState(1);
+    emit propertyCreated(temp,&_modulename);
+    _propertyStore.add(temp);
+
+}
 

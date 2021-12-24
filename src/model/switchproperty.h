@@ -18,6 +18,8 @@ public:
 
     [[nodiscard]] int getRule() const { return _rule; }
     inline const QList<SwitchValue*>& getSwitches() { return _switches; }
+    void setSwitches(QList<SwitchValue*> switches)  {_switches=switches;}
+    void setSwitch(QString name,bool value);
     void accept(PropertyVisitor *pVisitor) override { pVisitor->visit(this,&_moduleName); }
 
 private:

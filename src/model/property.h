@@ -39,6 +39,7 @@ public:
     [[nodiscard]] inline const QString &getLabel() const { return _label; }
     [[nodiscard]] inline int getPermission() const { return _permission; }
     [[nodiscard]] inline int getState() const { return _state; }
+    void setState (int val) { _state=val; }
 };
 
 

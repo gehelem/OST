@@ -1,16 +1,15 @@
 #include "indipanel.h"
 
-IndiPanel *initialize(QString name,QString label)
+IndiPanel *initialize(QString name, QString label)
 {
     IndiPanel *basemodule = new IndiPanel(name,label);
     return basemodule;
 }
 
-IndiPanel::IndiPanel(QString name,QString label)
+IndiPanel::IndiPanel(QString name, QString label)
     : Basemodule(name,label)
 {
     _moduledescription="Indi control panel";
-
 }
 
 IndiPanel::~IndiPanel()
@@ -21,7 +20,6 @@ void IndiPanel::newDevice(INDI::BaseDevice *dp)
 {
     MessageProperty* mess = new MessageProperty(_modulename,dp->getDeviceName(),"root",dp->getDeviceName(),dp->getDeviceName(),0,0,0);
     emit propertyCreated(mess,&_modulename);
-    _propertyStore.add(mess);
 
 }
 void IndiPanel::removeDevice(INDI::BaseDevice *dp)
@@ -132,18 +130,30 @@ void IndiPanel::newSwitch(ISwitchVectorProperty *svp)
 
 void IndiPanel::newBLOB(IBLOB *bp)
 {
+    image = new Image();
+    BOOST_LOG_TRIVIAL(debug) << "RCV new blob ";
+    image->LoadFromBlob(bp);
+    BOOST_LOG_TRIVIAL(debug) << "calc stats new blob ";
+    image->CalcStats();
+    BOOST_LOG_TRIVIAL(debug) << "image stats " << image->stats.median[0];
+    _solver.ResetSolver(image->stats,image->m_ImageBuffer);
+    connect(&_solver,&Solver::successSEP,this,&IndiPanel::OnSucessSEP,Qt::AutoConnection);
+    //image->FindStars();
+    _solver.FindStars();
+    BOOST_LOG_TRIVIAL(debug) << "Find stars running (indipanel)";
 }
-
+void IndiPanel::OnSucessSEP(void)
+{
+    BOOST_LOG_TRIVIAL(debug) << "IMG stars found " << _solver.stars.size();
+}
 void IndiPanel::newMessage     (INDI::BaseDevice *dp, int messageID)
 {
-    QString mess= QString::fromStdString(dp->messageQueue(messageID));
+    QString txt= QString::fromStdString(dp->messageQueue(messageID));
 
-    MessageProperty* message = new MessageProperty(_modulename,dp->getDeviceName(),"root",dp->getDeviceName(),dp->getDeviceName(),0,0,0);
-    message->setMessage(mess);
-    _propertyStore.update(message);
-    emit propertyUpdated(message,&_modulename);
-
-
+    MessageProperty* mess = new MessageProperty(_modulename,dp->getDeviceName(),"root",dp->getDeviceName(),dp->getDeviceName(),0,0,0);
+    mess->setMessage(txt);
+    emit propertyUpdated(mess,&_modulename);
+    _propertyStore.add(mess);
 }
 
 
@@ -199,12 +209,23 @@ void IndiPanel::OnSetPropertyNumber(NumberProperty* prop)
 {
     if (!(prop->getModuleName()==_modulename)) return;
 
+
+
     INDI::BaseDevice *dp = getDevice(prop->getDeviceName().toStdString().c_str());
     if (dp== nullptr)
     {
         BOOST_LOG_TRIVIAL(debug) << "Indipanel device not found " << prop->getDeviceName().toStdString();
         return;
     }
+
+    BOOST_LOG_TRIVIAL(debug) << "Activate blob mode " << dp->getDeviceName();
+    if (dp->getDriverInterface() & INDI::BaseDevice::CCD_INTERFACE)
+    {
+        BOOST_LOG_TRIVIAL(debug) << "Setting blob mode " << dp->getDeviceName();
+        sendMessage("Setting blob mode " + QString(dp->getDeviceName()));
+        setBLOBMode(B_ALSO,dp->getDeviceName(),nullptr);
+    }
+
     INDI::Property *iprop;
     iprop =  dp->getProperty(prop->getName().toStdString().c_str());
     if (iprop== nullptr)

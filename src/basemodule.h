@@ -1,12 +1,14 @@
 #ifndef MODULE_h_
 #define MODULE_h_
 #include <QtCore>
+#include <QtConcurrent>
 #include <QCoreApplication>
 #include <QObject>
 #include <basedevice.h>
 #include <baseclient.h>
 #include <boost/log/trivial.hpp>
 #include "image.h"
+#include "solver.h"
 #include <model/setup.h>
 #include <model/textproperty.h>
 #include <model/numberproperty.h>
@@ -14,6 +16,7 @@
 #include <model/messageproperty.h>
 #include <model/propertystore.h>
 #include "utils/propertyfactory.h"
+
 
 class Property;
 
@@ -26,13 +29,16 @@ class Basemodule : public QObject, public INDI::BaseClient
     Q_OBJECT
 
     public:
-        Basemodule(QString name,QString label);
+        Basemodule(QString name, QString label);
         ~Basemodule() = default;
         void setHostport(QString host, int port);
         bool connectIndi(void);
+        void setBlobMode(void);
         QString getDescription(void) {return _moduledescription;}
 
-        std::unique_ptr<Image> image =nullptr;
+        //std::unique_ptr<Image> image =nullptr;
+        QPointer<Image> image;
+        Solver _solver;
 
         QString _modulename;
         QString _modulelabel;
