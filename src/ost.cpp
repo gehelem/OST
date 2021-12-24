@@ -23,23 +23,29 @@ int main(int argc, char *argv[])
     indiHostOption.setDefaultValue("localhost");
     QCommandLineOption indiPortOption("port", "INDI Server port number", "port");
     indiPortOption.setDefaultValue("7624");
+    QCommandLineOption webrootOption("webroot", "Web server root folder", "webroot");
+    webrootOption.setDefaultValue("/var/www/html");
 
     argParser.addOption(saveAllBlobsOption);
     argParser.addOption(indiHostOption);
     argParser.addOption(indiPortOption);
+    argParser.addOption(webrootOption);
     argParser.process(app);
 
     QString hostName = argParser.value(indiHostOption);
     int portNumber = atoi(argParser.value(indiPortOption).toStdString().c_str());
+    QString webroot= argParser.value(webrootOption);
 
     BOOST_LOG_TRIVIAL(debug) << "INDI Host=" << hostName.toStdString();
     BOOST_LOG_TRIVIAL(debug) << "INDI Port=" << portNumber;
+    BOOST_LOG_TRIVIAL(debug) << "Webroot  =" << webroot.toStdString();
 
     Controller controller(
             &app,
             argParser.isSet("s"),
             hostName,
-            portNumber);
+            portNumber,
+            webroot);
     Q_UNUSED(controller);
 
     int nAppReturnCode = QCoreApplication::exec();

@@ -4,9 +4,10 @@
 /*!
  * ... ...
  */
-Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, int port)
+Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, int port,const QString& webroot)
     :_indihost(host),
-      _indiport(port)
+      _indiport(port),
+      _webroot(webroot)
 {
 
     //this->setParent(parent);
