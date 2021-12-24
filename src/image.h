@@ -27,12 +27,7 @@ public:
     Image();
     ~Image();
 
-// Stellasolver stuff
     FITSImage::Statistic stats;
-    QPointer<StellarSolver> stellarSolver;
-    QList<SSolver::Parameters> stellarSolverProfiles;
-
-    QList<FITSImage::Star> stars;
     uint8_t m_Channels { 1 };
     uint8_t *m_ImageBuffer { nullptr };
     uint32_t m_ImageBufferSize { 0 };
@@ -46,22 +41,7 @@ public:
     bool saveStretchedToJpeg(QString filename,int compress);
     void ResetData(void);
     void CalcStats(void);
-    void FindStars(void);
     void computeHistogram(void);
-    void SolveStars(void);
-    void appendStarsFound(void);
-    bool FindStarsFinished = true;
-    bool SolveStarsFinished = true;
-private:
-
-public slots:
-    void sslogOutput(QString text);
-    void ssReadySEP();
-    void ssReadySolve();
-    void ssFinished();
-signals:
-    void successSEP(void);
-    void successSolve(void);
 
 };
 

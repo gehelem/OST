@@ -2,7 +2,7 @@
 #include <basedevice.h>
 #include "basemodule.h"
 
-Basemodule::Basemodule(QString name, QString label)
+Basemodule::Basemodule(QString name,QString label)
     :_modulename(name),
       _modulelabel(label)
 {

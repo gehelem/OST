@@ -8,7 +8,7 @@
 WShandler::WShandler(QObject *parent)
 {
 
-    this->setParent(parent);
+    //this->setParent(parent);
     m_pWebSocketServer = new QWebSocketServer(QStringLiteral("OST server"),QWebSocketServer::NonSecureMode, this);
     if (m_pWebSocketServer->listen(QHostAddress::Any, 9624)) {
        connect(m_pWebSocketServer, &QWebSocketServer::newConnection,this, &WShandler::onNewConnection);

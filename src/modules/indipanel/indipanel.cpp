@@ -1,12 +1,12 @@
 #include "indipanel.h"
 
-IndiPanel *initialize(QString name,QString label)
+IndiPanel *initialize(QString name, QString label)
 {
     IndiPanel *basemodule = new IndiPanel(name,label);
     return basemodule;
 }
 
-IndiPanel::IndiPanel(QString name,QString label)
+IndiPanel::IndiPanel(QString name, QString label)
     : Basemodule(name,label)
 {
     _moduledescription="Indi control panel";
@@ -130,22 +130,21 @@ void IndiPanel::newSwitch(ISwitchVectorProperty *svp)
 
 void IndiPanel::newBLOB(IBLOB *bp)
 {
-    //image.reset(new Image());
-    //image->setParent(this);
     image = new Image();
-
-    connect(image,&Image::successSEP        ,this,&IndiPanel::OnSucessSEP);
     BOOST_LOG_TRIVIAL(debug) << "RCV new blob ";
     image->LoadFromBlob(bp);
     BOOST_LOG_TRIVIAL(debug) << "calc stats new blob ";
     image->CalcStats();
     BOOST_LOG_TRIVIAL(debug) << "image stats " << image->stats.median[0];
-    image->FindStars();
-    BOOST_LOG_TRIVIAL(debug) << "Find stars running";
+    _solver.ResetSolver(image->stats,image->m_ImageBuffer);
+    connect(&_solver,&Solver::successSEP,this,&IndiPanel::OnSucessSEP,Qt::AutoConnection);
+    //image->FindStars();
+    _solver.FindStars();
+    BOOST_LOG_TRIVIAL(debug) << "Find stars running (indipanel)";
 }
 void IndiPanel::OnSucessSEP(void)
 {
-    BOOST_LOG_TRIVIAL(debug) << "IMG stars found " << image->stars.size();
+    BOOST_LOG_TRIVIAL(debug) << "IMG stars found " << _solver.stars.size();
 }
 void IndiPanel::newMessage     (INDI::BaseDevice *dp, int messageID)
 {

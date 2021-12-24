@@ -9,7 +9,7 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
       _indiport(port)
 {
 
-    this->setParent(parent);
+    //this->setParent(parent);
     Q_UNUSED(saveAllBlobs);
     const QString DRIVER("QSQLITE");
     if(QSqlDatabase::isDriverAvailable(DRIVER))
@@ -28,7 +28,7 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
     BOOST_LOG_TRIVIAL(debug) << "Controller warmup";
     BOOST_LOG_TRIVIAL(debug) <<  "ApplicationDirPath :" << QCoreApplication::applicationDirPath().toStdString();
 
-    MainControl *mainctl = new MainControl("maincontrol","Main control");
+    /*MainControl *mainctl = new MainControl("maincontrol","Main control");
     mainctl->setHostport(_indihost,_indiport);
     mainctl->connectIndi();
     connect(mainctl,&Basemodule::propertyCreated,this,&Controller::OnPropertyCreated);
@@ -46,7 +46,7 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
     connect(wshandler,&WShandler::dumpAsked,mainctl,&Basemodule::OnDumpAsked);
     connect(wshandler,&WShandler::setPropertyText,mainctl,&Basemodule::OnSetPropertyText);
     connect(wshandler,&WShandler::setPropertyNumber,mainctl,&Basemodule::OnSetPropertyNumber);
-    connect(wshandler,&WShandler::setPropertySwitch,mainctl,&Basemodule::OnSetPropertySwitch);
+    connect(wshandler,&WShandler::setPropertySwitch,mainctl,&Basemodule::OnSetPropertySwitch);*/
 
 
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focuser1","focuser 1");

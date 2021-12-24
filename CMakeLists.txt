@@ -60,10 +60,12 @@ add_executable( ost
     ${CMAKE_CURRENT_SOURCE_DIR}/src/jsonparser.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/basemodule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/basemodule.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/maincontrol.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/maincontrol.cpp
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/maincontrol.h
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/maincontrol.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/image.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/image.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/solver.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/solver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/model/property.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/model/propertystore.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/model/propertystore.h
@@ -99,9 +101,9 @@ target_link_libraries( ost
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::WebSockets
     Qt${QT_VERSION_MAJOR}::Sql
+    ${STELLARSOLVER_LIBRARIES}
     ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
     ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
-    ${STELLARSOLVER_LIBRARIES}
     z -lpthread
     )
 
@@ -155,9 +157,9 @@ target_link_libraries(ostindipanel PRIVATE
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::WebSockets
     Qt${QT_VERSION_MAJOR}::Sql
+    ${STELLARSOLVER_LIBRARIES}
     ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
     ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
-    ${STELLARSOLVER_LIBRARIES}
     z -lpthread
 )
 target_compile_definitions(ostindipanel PRIVATE INDIPANEL_LIBRARY)
