@@ -32,6 +32,8 @@ class Basemodule : public QObject, public INDI::BaseClient
         Basemodule(QString name, QString label);
         ~Basemodule() = default;
         void setHostport(QString host, int port);
+        void setWebroot(QString webroot) {_webroot = webroot;}
+        QString getWebroot(void) {return _webroot;}
         bool connectIndi(void);
         void setBlobMode(void);
         QString getDescription(void) {return _moduledescription;}
@@ -43,6 +45,7 @@ class Basemodule : public QObject, public INDI::BaseClient
         QString _modulename;
         QString _modulelabel;
         QString _moduledescription;
+        QString _webroot;
 
     public slots:
         void OnDumpAsked(void);
