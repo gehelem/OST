@@ -154,6 +154,8 @@ void IndiPanel::newBLOB(IBLOB *bp)
     image->LoadFromBlob(bp);
     BOOST_LOG_TRIVIAL(debug) << "calc stats new blob ";
     image->CalcStats();
+    image->computeHistogram();
+    image->saveStretchedToJpeg(_webroot+"/"+QString(bp->bvp->device)+".jpeg",100);
     BOOST_LOG_TRIVIAL(debug) << "image stats " << image->stats.median[0];
     _solver.ResetSolver(image->stats,image->m_ImageBuffer);
     connect(&_solver,&Solver::successSEP,this,&IndiPanel::OnSucessSEP,Qt::AutoConnection);
