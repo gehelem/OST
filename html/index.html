@@ -222,17 +222,22 @@ function buildproperty(m,d,g,p) {
         
     }
     if  (p.hasOwnProperty('URL'))  {
-    
+        
         if (!($("[id='I"+nnp+"']").length))  {
             div="<div id='I"+nnp+"' >"
+            //+ "<td><tr>"
             //+"<strong id='title"+nnp+"' >"+p.label+"</strong>"
             +"<br><img id='im"+nnp+"'  src='"+p.URL+"' />"
-            +"</td></tr></table>"
+            //+"</td></tr></table>"
             +"</div>";
             $("#U"+nn).append(div);
         } else {
             $("[id='im"+nnp+"']").prop("src",p.URL + "?"+ new Date().valueOf()); // append "Date" to force image reload ...
         }
+        var new_width = 0.99*$("[id='im"+nnp+"']").parent().width();
+        if (new_width > 0) $("[id='im"+nnp+"']").css({'width': new_width, 'height': '100%'});
+        
+   
         
     }
 
