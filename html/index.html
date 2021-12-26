@@ -92,6 +92,9 @@ function initWebSocket() {
                     var group = dev+obj.property.groupnameshort;
                     var prop  = group+obj.property.propname;
                     //console.log("REMOVE PROP "+prop);
+                    $( "#tab3"+ prop ).remove()
+                    $( "#tab2"+ prop ).remove()
+                    $( "#tab"+ prop ).remove()
                     $( "#P"+ prop ).children().remove();
                     $( "#P"+ prop ).remove();
                     
@@ -163,17 +166,18 @@ function buildproperty(m,d,g,p) {
     nnp=nn+p.propname;
     if  (!($("#P"+nnp).length)&&(p.hasOwnProperty('texts')||p.hasOwnProperty('numbers')||p.hasOwnProperty('switches')||p.hasOwnProperty('lights')))  {
         div="<div id=P"+nnp+" ><table id=tab"+nnp+">"
-        +"<tr><td>"
+        +"<tr>"
         +"<strong id=status"+nnp+" >"+"---"+"</strong>"
-        +"<strong id=title"+nnp+" >"+p.label+"</strong></td><td>";
-        
+        +"<strong id=title"+nnp+" >"+p.label+"</strong></tr>"
+        +"<tr><td><table id=tab2"+nnp+">"
+        +"<td><table id=tab3"+nnp+"><tbody></tbody></table></td>";
         if ((p.permission=="1"||p.permission=="2")&&(p.hasOwnProperty('numbers')||p.hasOwnProperty('texts'))) {
-            div=div+"<button class='ui-button ui-widget ui-corner-all' "
-            +"id=B"+nnp+ " data-json=\"\">set</button></tr>";
+            div=div+"<td><button class='ui-button ui-widget ui-corner-all' "
+            +"id=B"+nnp+ " data-json=\"\">set</button></td>";
         }
-        div=div+"</td></tr></table></div>";
+        div=div+"</td></tr></table>"; //tab2
+        div=div+"</table></div>"; //tab
         $("#U"+nn).append(div);
-        //$("#status"+nnp).css("background-color", "gray");
         
         if ((p.permission=="1"||p.permission=="2")&&(p.hasOwnProperty('numbers'))) {
             $("#B"+nnp).data("json",p);
@@ -205,7 +209,8 @@ function buildproperty(m,d,g,p) {
             });
             
         }
-        
+       
+       
     }
     if  (p.hasOwnProperty('message'))  {
         if (!($("#M"+m+d).length))  {
@@ -250,30 +255,34 @@ function buildproperty(m,d,g,p) {
     if (p.hasOwnProperty('numbers' )) buildnumbers(m,d,g,p);
     if (p.hasOwnProperty('switches')) buildswitchs(m,d,g,p);
     if (p.hasOwnProperty('lights'  )) buildlights (m,d,g,p);
-    //$("div#D"+m+d+g).tabs();    
+    $("#B"+nnp).css('height', $("#B"+nnp).parent().height()*0.95);
+
 }
 function buildtexts(m,d,g,prop) {
 
     p=prop.propname;
+    nn=m+d+g+p;
+    
     $.each( prop.texts, function( iitem, item ) {
-        nn=m+d+g+p;
         nnn = nn+item.name;
         if ($("#"+nnn).length) {
             $("#"+nnn).val(item.text);
         } else {
             if (prop.permission=="0") {
-                $("#tab"+nn + " tbody").append("<tr><td><small> "+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /></td></tr>");
-            };
+                $("#tab3"+nn + " tbody").append("<tr><td><small> "+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /></td></tr>");
+            }
             if (prop.permission=="2") {
-                $("#tab"+nn+ " tbody").append(
+                $("#tab3"+nn+ " tbody").append(
                 "<tr><td><small>"+item.label+"</small></td><td>"
-                +"<input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" />"
+                +"<input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /></td></tr>"
                 );
             }
         
         }
 
     })
+
+
 }                
 
 function buildnumbers(m,d,g,prop) {
@@ -286,10 +295,10 @@ function buildnumbers(m,d,g,prop) {
             $("#"+nnn).val(item.value);
         } else {
             if (prop.permission=="0") {
-                $("#tab"+nn + " tbody").append("<tr><td><small> "+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /></td></tr>");
+                $("#tab3"+nn + " tbody").append("<tr><td><small> "+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /></td></tr>");
             };
             if (prop.permission=="2") {
-                $("#tab"+nn+ " tbody").append(
+                $("#tab3"+nn+ " tbody").append(
                 "<tr><td><small>"+item.label+"</small></td><td>"
                 +"<input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" />"
                 );
@@ -309,11 +318,11 @@ function buildswitchs(m,d,g,prop) {
             $("#bbb"+nnn).val(item.state);
         } else {
             if (prop.permission=="0") {
-                $("#tab"+nn+ " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.state+"'  label="+item.state+" /></td></tr>");
+                $("#tab3"+nn+ " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.state+"'  label="+item.state+" /></td></tr>");
             
             }
             if (prop.permission=="1" || prop.permission=="2") {
-                $("#tab"+nn + " tbody").append("<button id=bbb"+nnn+" class='ui-button ui-widget ui-corner-all' backlogid=btn"+nnn
+                $("#tab3"+nn + " tbody").append("<button id=bbb"+nnn+" class='ui-button ui-widget ui-corner-all' backlogid=btn"+nnn
                 +" value="+item.state
                 +" data-value=\"\""
                 +" data-btn=\"\" >"+item.label+"</button>");
@@ -361,7 +370,7 @@ function buildlights(m,d,g,prop) {
             //$("#"+nnn).val(item.state);
         } else {
             if (prop.permission=="0") {
-                $("#tab"+nn+ " tbody").append("<tr>"
+                $("#tab3"+nn+ " tbody").append("<tr>"
                 +"<td><strong id=status"+nnn+" >"+"---"+"</strong></td>"
                 +"<td><small>"+item.label+"</small></td>"
                 +"</tr>");
