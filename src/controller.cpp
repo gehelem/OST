@@ -4,9 +4,10 @@
 /*!
  * ... ...
  */
-Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, int port)
+Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, int port,const QString& webroot)
     :_indihost(host),
-      _indiport(port)
+      _indiport(port),
+      _webroot(webroot)
 {
 
     //this->setParent(parent);
@@ -31,6 +32,7 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
     /*MainControl *mainctl = new MainControl("maincontrol","Main control");
     mainctl->setHostport(_indihost,_indiport);
     mainctl->connectIndi();
+    mainctl->setWebroot(_webroot);
     connect(mainctl,&Basemodule::propertyCreated,this,&Controller::OnPropertyCreated);
     connect(mainctl,&Basemodule::propertyUpdated,this,&Controller::OnPropertyUpdated);
     connect(mainctl,&Basemodule::propertyRemoved,this,&Controller::OnPropertyRemoved);
@@ -81,7 +83,7 @@ void Controller::LoadModule(QString lib,QString name,QString label)
             if (mod)
                 mod->setHostport(_indihost,_indiport);
                 mod->connectIndi();
-                mod->setBlobMode();
+                mod->setWebroot(_webroot);
                 connect(mod,&Basemodule::propertyCreated,this,&Controller::OnPropertyCreated);
                 connect(mod,&Basemodule::propertyUpdated,this,&Controller::OnPropertyUpdated);
                 connect(mod,&Basemodule::propertyRemoved,this,&Controller::OnPropertyRemoved);

@@ -20,13 +20,17 @@ void IndiPanel::newDevice(INDI::BaseDevice *dp)
 {
     MessageProperty* mess = new MessageProperty(_modulename,dp->getDeviceName(),"root",dp->getDeviceName(),dp->getDeviceName(),0,0,0);
     emit propertyCreated(mess,&_modulename);
-
+    _propertyStore.add(mess);
 }
 void IndiPanel::removeDevice(INDI::BaseDevice *dp)
 {
     MessageProperty* mess = new MessageProperty(_modulename,dp->getDeviceName(),"root",dp->getDeviceName(),dp->getDeviceName(),0,0,0);
     emit propertyRemoved(mess,&_modulename);
     _propertyStore.remove(mess);
+    ImageProperty* img = new ImageProperty(_modulename,dp->getDeviceName(),QString(dp->getDeviceName()) + " Viewer",QString(dp->getDeviceName()) + "viewer","Image property label",0,0,0);
+    emit propertyRemoved(img,&_modulename);
+    _propertyStore.remove(img);
+
 }
 void IndiPanel::newProperty(INDI::Property *pProperty)
 {
@@ -36,6 +40,20 @@ void IndiPanel::newProperty(INDI::Property *pProperty)
             emit propertyCreated(PropertyFactory::createProperty(pProperty->getNumber(),&_modulename),&_modulename);
             _propertyStore.add(PropertyFactory::createProperty(pProperty->getNumber(),&_modulename));
             //BOOST_LOG_TRIVIAL(debug) << "Indipanel propeties size " << _propertyStore.getSize();
+            if ( (strcmp(pProperty->getName(),"CCD_EXPOSURE")==0) ||
+                 (strcmp(pProperty->getName(),"GUIDER_EXPOSURE")==0) )
+            {
+                INDI::BaseDevice *_wdp=getDevice(pProperty->getDeviceName());
+                if (_wdp->getDriverInterface() & INDI::BaseDevice::CCD_INTERFACE)
+                {
+                    BOOST_LOG_TRIVIAL(debug) << "Setting blob mode for " << _wdp->getDeviceName();
+                    setBLOBMode(B_ALSO,_wdp->getDeviceName(),nullptr);
+                    ImageProperty* img = new ImageProperty(_modulename,_wdp->getDeviceName(),QString(_wdp->getDeviceName()) + " Viewer",QString(_wdp->getDeviceName()) + "viewer","Image property label",0,0,0);
+                    emit propertyCreated(img,&_modulename);
+                    _propertyStore.add(img);
+                }
+
+            }
             break;
         }
 
@@ -107,6 +125,7 @@ void IndiPanel::newNumber(INumberVectorProperty *nvp)
 {
     _propertyStore.update(PropertyFactory::createProperty(nvp,&_modulename));
     emit propertyUpdated(PropertyFactory::createProperty(nvp,&_modulename),&_modulename);
+
 }
 
 void IndiPanel::newText(ITextVectorProperty *tvp)
@@ -135,7 +154,25 @@ void IndiPanel::newBLOB(IBLOB *bp)
     image->LoadFromBlob(bp);
     BOOST_LOG_TRIVIAL(debug) << "calc stats new blob ";
     image->CalcStats();
+    image->computeHistogram();
+    image->saveStretchedToJpeg(_webroot+"/"+QString(bp->bvp->device)+".jpeg",100);
+
+
+    ImageProperty* img = new ImageProperty(
+                _modulename,
+                bp->bvp->device,
+                QString(bp->bvp->device) + " Viewer",
+                QString(bp->bvp->device) + "viewer",
+                "Image property label",0,0,0
+                );
+    img->setURL(QString(bp->bvp->device)+".jpeg");
+    emit propertyUpdated(img,&_modulename);
+    _propertyStore.add(img);
+
+
     BOOST_LOG_TRIVIAL(debug) << "image stats " << image->stats.median[0];
+
+
     _solver.ResetSolver(image->stats,image->m_ImageBuffer);
     connect(&_solver,&Solver::successSEP,this,&IndiPanel::OnSucessSEP,Qt::AutoConnection);
     //image->FindStars();
