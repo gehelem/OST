@@ -108,42 +108,46 @@ target_link_libraries( ost
     z -lpthread
     )
 
-#########################
-#### modules libraries ##
-#########################
-## Dummy module
-#add_library(ostdummy SHARED
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.h
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.cpp
-#)
-#target_link_libraries(ostdummy PRIVATE
-#    indiclient
-#    Qt${QT_VERSION_MAJOR}::Core
-#    Qt${QT_VERSION_MAJOR}::Concurrent
-#    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
-#    -lpthread
-#)
-#target_compile_definitions(ostdummy PRIVATE dummy_LIBRARY)
+########################
+### modules libraries ##
+########################
+# Indipanel module
+add_library(ostdummy SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.cpp
+)
+target_link_libraries(ostdummy PRIVATE
+    indiclient
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+)
+target_compile_definitions(ostdummy PRIVATE dummy_LIBRARY)
 
 
 
 
-#
-## Focus module
-#add_library(ostfocuser SHARED
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.h
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.h
-#)
-#target_link_libraries(ostfocuser PRIVATE
-#    indiclient
-#    Qt${QT_VERSION_MAJOR}::Core
-#    Qt${QT_VERSION_MAJOR}::Concurrent
-#    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
-#)
-#target_compile_definitions(ostfocuser PRIVATE FOCUSER_LIBRARY)
-#
+
+# Focus module
+add_library(ostfocuser SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.h
+)
+target_link_libraries(ostfocuser PRIVATE
+    indiclient
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+    ${STELLARSOLVER_LIBRARIES}
+    ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
+    ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
+    z -lpthread
+
+)
+target_compile_definitions(ostfocuser PRIVATE FOCUS_MODULE)
+
 # Indipanel module
 add_library(ostindipanel SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel/indipanel.h
@@ -163,7 +167,7 @@ target_link_libraries(ostindipanel PRIVATE
     ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
     z -lpthread
 )
-target_compile_definitions(ostindipanel PRIVATE INDIPANEL_LIBRARY)
+target_compile_definitions(ostindipanel PRIVATE INDIPANEL_MODULE)
 
 
 #install(TARGETS HeadlessObservatory RUNTIME DESTINATION bin)

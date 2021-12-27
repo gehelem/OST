@@ -7,8 +7,8 @@
 #include <basedevice.h>
 #include <baseclient.h>
 #include <boost/log/trivial.hpp>
-#include "image.h"
 #include "solver.h"
+#include "image.h"
 #include <model/setup.h>
 #include <model/textproperty.h>
 #include <model/numberproperty.h>
@@ -38,7 +38,6 @@ class Basemodule : public QObject, public INDI::BaseClient
         void setBlobMode(void);
         QString getDescription(void) {return _moduledescription;}
 
-        //std::unique_ptr<Image> image =nullptr;
         QPointer<Image> image;
         Solver _solver;
 
