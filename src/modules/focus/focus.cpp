@@ -34,13 +34,17 @@ FocusModule::FocusModule(QString name,QString label)
 
     _parameters = new NumberProperty(_modulename,"Control","root","parameters","Parameters",2,0);
     _parameters->addNumber(new NumberValue("startpos"      ,"Start position","hint",_startpos,"",0,100000,100));
-    _parameters->addNumber(new NumberValue("steps"         ,"Steps gap","hint",_steps,"",0,1000,100));
+    _parameters->addNumber(new NumberValue("steps"         ,"Steps gap","hint",_steps,"",0,2000,100));
     _parameters->addNumber(new NumberValue("iterations"    ,"Iterations","hint",_iterations,"",0,99,1));
     _parameters->addNumber(new NumberValue("loopIterations","Average over","hint",_loopIterations,"",0,99,1));
     _parameters->addNumber(new NumberValue("exposure"      ,"Exposure","hint",_exposure,"",0,120,1));
     _parameters->addNumber(new NumberValue("backlash"      ,"Backlash overshoot","hint",_backlash,"",0,1000,1));
     emit propertyCreated(_parameters,&_modulename);
     _propertyStore.add(_parameters);
+
+    ImageProperty* img = new ImageProperty(_modulename,"control","root","viewer","Image property label",0,0,0);
+    emit propertyCreated(img,&_modulename);
+    _propertyStore.add(img);
 }
 
 FocusModule::~FocusModule()
@@ -72,51 +76,6 @@ void FocusModule::OnSetPropertyText(TextProperty* prop)
 void FocusModule::OnSetPropertySwitch(SwitchProperty* prop)
 {
     if (!(prop->getModuleName()==_modulename)) return;
-    //_propertyStore.add(prop);
-
-    SwitchProperty* _sw;
-
-    for ( const QString& device : _propertyStore.toTreeList().keys() ) {
-        for ( const QString& group : _propertyStore.toTreeList()[device].keys() ) {
-            for ( const QString& property : _propertyStore.toTreeList()[device][group].keys() ) {
-                if (_propertyStore.toTreeList()[device][group][property]->getName()==prop->getName() ) {
-                    _sw=_propertyStore[device][group][property];
-                }
-            }
-        }
-    }
-
-    QList<SwitchValue*> switchs=_sw->getSwitches();
-    for (const SwitchValue& val : switchs  ) {
-            if (_sw->getPermission()==ISR_1OFMANY) {
-                val.setSwitchState(ISS_OFF);
-
-             }
-    }
-
-            /*if (indiprop->r==ISR_ATMOST1) {
-                if (strcmp(switchs[j]->name().toStdString().c_str(),indiprop->sp[i].name)==0) {
-                    BOOST_LOG_TRIVIAL(debug) << "ISR_ATMOST1";
-                    indiprop->sp[i].s=ISS_OFF;
-                    if (indiprop->sp[i].s==ISS_ON ) indiprop->sp[i].s=ISS_OFF;
-                    if (indiprop->sp[i].s==ISS_OFF) indiprop->sp[i].s=ISS_ON;
-                }
-
-            }
-            if (indiprop->r==ISR_NOFMANY) {
-                if (strcmp(switchs[j]->name().toStdString().c_str(),indiprop->sp[i].name)==0) {
-                    BOOST_LOG_TRIVIAL(debug) << "ISR_NOFMANY";
-                    if (indiprop->sp[i].s==ISS_ON ) {
-                        indiprop->sp[i].s=ISS_OFF;
-                    } else {
-                        indiprop->sp[i].s=ISS_ON;
-                    }
-                }
-
-            }
-        }
-    }    */
-
 
     QList<SwitchValue*> switchs=prop->getSwitches();
     for (int j = 0; j < switchs.size(); ++j) {
@@ -188,11 +147,15 @@ void FocusModule::newBLOB(IBLOB *bp)
        )
     {
         image = new Image();
-        BOOST_LOG_TRIVIAL(debug) << "Avant connec";
-        connect(image,&Image::successSEP,this,&FocusModule::OnSucessSEP);
-        BOOST_LOG_TRIVIAL(debug) << "Avant load";
         image->LoadFromBlob(bp);
-        BOOST_LOG_TRIVIAL(debug) << "Avant signal";
+        image->CalcStats();
+        image->computeHistogram();
+        image->saveStretchedToJpeg(_webroot+"/"+QString(bp->bvp->device)+".jpeg",100);
+
+        ImageProperty* img = new ImageProperty(_modulename,"control","root","viewer","Image property label",0,0,0);
+        img->setURL(QString(bp->bvp->device)+".jpeg");
+        emit propertyUpdated(img,&_modulename);
+        _propertyStore.add(img);
         if (_machine.isRunning()) {
             emit ExposureDone();
             emit ExposureBestDone();
@@ -405,12 +368,14 @@ void FocusModule::SMRequestExposure()
 void FocusModule::SMFindStars()
 {
     sendMessage("SMFindStars");
-    image->FindStars();
+    _solver.ResetSolver(image->stats,image->m_ImageBuffer);
+    connect(&_solver,&Solver::successSEP,this,&FocusModule::OnSucessSEP);
+    _solver.FindStars();
 }
 
 void FocusModule::OnSucessSEP()
 {
-    sendMessage("FindStarsDone");
+    //sendMessage("FindStarsDone");
     /*properties->setElt(_modulename,"values","imgHFR",image->HFRavg);
     properties->emitProp(_modulename,"values");*/
     emit FindStarsDone();
@@ -524,6 +489,14 @@ void FocusModule::SMComputeLoopFrame()
     _loopHFRavg=((_loopIteration-1)*_loopHFRavg + image->HFRavg)/_loopIteration;
     /*properties->setElt(_modulename,"values","loopHFRavg",_loopHFRavg);
     properties->emitProp(_modulename,"values");*/
+    NumberProperty* prop = _propertyStore.getNumber("Control","root","values");
+    for (int j = 0; j <  prop->getNumbers().size(); ++j) {
+        if ( prop->getNumbers()[j]->name()=="loopHFRavg")  prop->getNumbers()[j]->setValue(_loopHFRavg);
+        //if (numbers[j]->name()=="focpos")      numbers[j]->setValue(_);
+        if ( prop->getNumbers()[j]->name()=="imgHFR")      prop->getNumbers()[j]->setValue(image->HFRavg);
+        emit propertyUpdated(prop,&_modulename);
+        BOOST_LOG_TRIVIAL(debug) << "Focus update values ";
+    }
 
     qDebug() << "Loop    " << _loopIteration << "/" << _loopIterations << " = " <<  image->HFRavg;
 

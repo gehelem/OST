@@ -150,9 +150,7 @@ void IndiPanel::newSwitch(ISwitchVectorProperty *svp)
 void IndiPanel::newBLOB(IBLOB *bp)
 {
     image = new Image();
-    BOOST_LOG_TRIVIAL(debug) << "RCV new blob ";
     image->LoadFromBlob(bp);
-    BOOST_LOG_TRIVIAL(debug) << "calc stats new blob ";
     image->CalcStats();
     image->computeHistogram();
     image->saveStretchedToJpeg(_webroot+"/"+QString(bp->bvp->device)+".jpeg",100);
@@ -169,15 +167,6 @@ void IndiPanel::newBLOB(IBLOB *bp)
     emit propertyUpdated(img,&_modulename);
     _propertyStore.add(img);
 
-
-    BOOST_LOG_TRIVIAL(debug) << "image stats " << image->stats.median[0];
-
-
-    _solver.ResetSolver(image->stats,image->m_ImageBuffer);
-    connect(&_solver,&Solver::successSEP,this,&IndiPanel::OnSucessSEP,Qt::AutoConnection);
-    //image->FindStars();
-    _solver.FindStars();
-    BOOST_LOG_TRIVIAL(debug) << "Find stars running (indipanel)";
 }
 void IndiPanel::OnSucessSEP(void)
 {
