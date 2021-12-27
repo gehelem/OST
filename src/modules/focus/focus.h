@@ -1,7 +1,8 @@
 #ifndef FOCUS_MODULE_h_
 #define FOCUS_MODULE_h_
+#include <basemodule.h>
 
-#if defined(FOCUS_MODULE_h_)
+#if defined(FOCUS_MODULE)
 #  define MODULE_INIT Q_DECL_EXPORT
 #else
 #  define MODULE_INIT Q_DECL_IMPORT
@@ -10,8 +11,7 @@
 #include <QtCore>
 #include <QtConcurrent>
 #include <QStateMachine>
-#include <basedevice.h>
-#include <basemodule.h>
+#include "image.h"
 
 class MODULE_INIT FocusModule : public Basemodule
 {
@@ -58,8 +58,12 @@ class MODULE_INIT FocusModule : public Basemodule
         void cameraAlert();
         void abort();
     public slots:
+        void OnSetPropertyText(TextProperty* prop) override;
+        void OnSetPropertyNumber(NumberProperty* prop) override;
+        void OnSetPropertySwitch(SwitchProperty* prop) override;
         void test0(QString txt);
         void OnSucessSEP();
+
     private:
         void newNumber(INumberVectorProperty *nvp) override;
         void newBLOB(IBLOB *bp) override;
@@ -87,16 +91,26 @@ class MODULE_INIT FocusModule : public Basemodule
         void SMLoadblob();
         void SMAbort();
         void startCoarse();
+
+        //std::unique_ptr<Image> image =nullptr;
+        QPointer<Image> image;
+
+        TextProperty* _devices;
+        NumberProperty* _values;
+        NumberProperty* _parameters;
+        SwitchProperty* _actions;
+
+
         QString _camera  = "CCD Simulator";
         QString _focuser = "Focuser Simulator";
         bool    _newblob;
 
-        int    _startpos;
-        int    _backlash;
-        int    _iterations;
-        int    _steps;
-        int    _exposure;
-        int    _loopIterations;
+        int    _startpos = 30000;
+        int    _backlash = 100;
+        int    _iterations = 10;
+        int    _steps = 1000;
+        int    _exposure = 2;
+        int    _loopIterations = 4;
         int    _loopIteration;
         double _loopHFRavg;
 
