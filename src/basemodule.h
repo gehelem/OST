@@ -16,9 +16,8 @@
 #include <model/messageproperty.h>
 #include <model/propertystore.h>
 #include "utils/propertyfactory.h"
+#include "properties/ostproperty.h"
 
-
-class Property;
 
 /*!
  * This Class shouldn't be used as is
@@ -46,6 +45,9 @@ class Basemodule : public QObject, public INDI::BaseClient
         QString _moduledescription;
         QString _webroot;
 
+
+
+
     public slots:
         void OnDumpAsked(void);
         virtual void OnSetPropertyText(TextProperty* prop) {
@@ -59,6 +61,9 @@ class Basemodule : public QObject, public INDI::BaseClient
         virtual void OnSetPropertySwitch(SwitchProperty* prop) {
             if (!(prop->getModuleName()==_modulename)) return;
             BOOST_LOG_TRIVIAL(debug) << _modulename.toStdString() << " : recv setprop switch : " <<prop->getLabel().toStdString();
+        }
+        virtual void OnOstPropertyChanged(Oproperty* prop) {
+            BOOST_LOG_TRIVIAL(debug) << _modulename.toStdString() << " : OnOstPropertyChanged " << prop->getLabel().toStdString();
         }
 
     protected:

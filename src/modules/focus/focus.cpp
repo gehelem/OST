@@ -6,11 +6,19 @@ FocusModule *initialize(QString name,QString label)
     FocusModule *basemodule = new FocusModule(name,label);
     return basemodule;
 }
+void FocusModule::OnZob(Oproperty* prop)
+{
+    BOOST_LOG_TRIVIAL(debug) << "OnZob " << prop->getName().toStdString();
+
+}
 
 FocusModule::FocusModule(QString name,QString label)
-    : Basemodule(name,label)
+    : Basemodule(name,label),
+    _test(name,"devcatName","groupName","testprop","testprop label",0,0,this),
+    _test2(name,"devcatName","groupName","testprop2","testprop label",0,0,this)
 
 {
+    //QObject::connect(&_test,&Oproperty::changed,this,&FocusModule::OnZob);
     _devices = new TextProperty(_modulename,"Options","root","devices","Devices",2,0);
     _devices->addText(new TextValue("camera","Camera","hint",_camera));
     _devices->addText(new TextValue("focuser","Focuser","hint",_focuser));
@@ -29,6 +37,7 @@ FocusModule::FocusModule(QString name,QString label)
     _actions->addSwitch(new SwitchValue("coarse","Autofocus","hint",0));
     _actions->addSwitch(new SwitchValue("loop","Infinite loop","hint",0));
     _actions->addSwitch(new SwitchValue("abort","Abort","hint",0));
+    _actions->addSwitch(new SwitchValue("test","test","hint",0));
     emit propertyCreated(_actions,&_modulename);
     _propertyStore.add(_actions);
 
@@ -83,6 +92,7 @@ void FocusModule::OnSetPropertySwitch(SwitchProperty* prop)
         if (switchs[j]->name()=="loop")                ;
         if (switchs[j]->name()=="abort")               ;
         if (switchs[j]->name()=="condev") connectAllDevices();
+        if (switchs[j]->name()=="test") test0("dummy")              ;
 
         emit propertyUpdated(prop,&_modulename);
         BOOST_LOG_TRIVIAL(debug) << "Focus switch property item modified " << prop->getName().toStdString();
@@ -91,22 +101,32 @@ void FocusModule::OnSetPropertySwitch(SwitchProperty* prop)
 
 void FocusModule::test0(QString txt)
 {
-    if (txt=="z")  emit abort();
-    if (txt=="c")  connectIndi();
-    if (txt=="a")  connectAllDevices();
-    if (txt=="l")  loadDevicesConfs();
-    if (txt=="d")  disconnectAllDevices();
-    if (txt=="f")
-    {
-        _startpos = 30000;
-        _steps = 1000;
-        _iterations = 10;
-        _loopIterations = 4;
-        _exposure =2;
-        _backlash=100;
+    BOOST_LOG_TRIVIAL(debug) << "let's find Focus children ";
 
-        startCoarse();
+    const QMetaObject *metaobject = this->metaObject();
+    for (int i = 0; i < metaobject->propertyCount(); i++)
+    {
+        QMetaProperty metaproperty = metaobject->property(i);
+
+        BOOST_LOG_TRIVIAL(debug) << "Focus meta children " << i << " - " << metaproperty.name();
     }
+
+
+    QObjectList lst = children();
+    if (lst.length()==0) BOOST_LOG_TRIVIAL(debug) << "no children found";
+    for (int i = 0; i < lst.length(); i++)
+    {
+        BOOST_LOG_TRIVIAL(debug) << "Focus children " << i << " - " << lst[i]->metaObject()->className();
+    }
+
+    Oproperty *prop = this->findChild<Oproperty *>("testprop");
+    if (prop == nullptr) {
+        BOOST_LOG_TRIVIAL(debug) << "not found";
+        return;
+    }
+    BOOST_LOG_TRIVIAL(debug) << prop->getGroupNameShort().toStdString();
+    _test.setState(1);
+
 
 }
 void FocusModule::newNumber(INumberVectorProperty *nvp)

@@ -6,6 +6,7 @@ Basemodule::Basemodule(QString name,QString label)
     :_modulename(name),
       _modulelabel(label)
 {
+
     _propertyStore.cleanup();
     setVerbose(false);
     _moduledescription="This is a base module, it shouldn't be used as is";

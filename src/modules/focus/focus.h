@@ -12,6 +12,7 @@
 #include <QtConcurrent>
 #include <QStateMachine>
 #include "image.h"
+#include "properties/ostproperty.h"
 
 class MODULE_INIT FocusModule : public Basemodule
 {
@@ -20,7 +21,9 @@ class MODULE_INIT FocusModule : public Basemodule
     public:
         FocusModule(QString name,QString label);
         ~FocusModule();
-
+        Oproperty _test;
+        Oproperty _test2;
+        QString torototo;
     signals:
         void focuserPositionChanged(const double &newFocuserPosition);
         //void expdone(IBLOB *bp);
@@ -63,8 +66,11 @@ class MODULE_INIT FocusModule : public Basemodule
         void OnSetPropertySwitch(SwitchProperty* prop) override;
         void test0(QString txt);
         void OnSucessSEP();
+        void OnZob(Oproperty* prop);
+
 
     private:
+
         void newNumber(INumberVectorProperty *nvp) override;
         void newBLOB(IBLOB *bp) override;
         void newSwitch(ISwitchVectorProperty *svp) override;

@@ -92,6 +92,9 @@ add_executable( ost
     ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/propertytextdumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/jsondumper.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/jsondumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/properties/ostproperty.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/properties/ostproperty.h
+
 )
 target_link_libraries( ost
     indiclient
