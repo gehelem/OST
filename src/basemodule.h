@@ -45,6 +45,8 @@ class Basemodule : public QObject, public INDI::BaseClient
         QString _modulelabel;
         QString _moduledescription;
         QString _webroot;
+        MessageProperty* _message;
+
 
     public slots:
         void OnDumpAsked(void);

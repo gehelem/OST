@@ -16,6 +16,10 @@ Basemodule::Basemodule(QString name,QString label)
     emit propertyCreated(props,&_modulename);
     _propertyStore.add(props);
 
+    _message = new MessageProperty(_modulename,"root","root","message","message",0,0,0);
+    emit propertyCreated(_message,&_modulename);
+    _propertyStore.add(_message);
+
 }
 void Basemodule::setHostport(QString host, int port)
 {
@@ -51,8 +55,12 @@ bool Basemodule::connectIndi()
 void Basemodule::sendMessage(QString message)
 {
     QString mess = QDateTime::currentDateTime().toString("[yyyyMMdd hh:mm:ss.zzz]") + " - " + _modulename + " - " + message;
-    BOOST_LOG_TRIVIAL(debug) << message.toStdString();
-    emit newMessageSent(mess,&_modulename,_modulename);
+    //BOOST_LOG_TRIVIAL(debug) << message.toStdString();
+    //emit newMessageSent(mess,&_modulename,_modulename);
+    _message->setMessage(mess);
+    emit propertyUpdated(_message,&_modulename);
+    _propertyStore.add(_message);
+
 }
 void Basemodule::OnDumpAsked()
 {
