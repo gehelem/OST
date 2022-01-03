@@ -61,7 +61,6 @@ class MODULE_INIT FocusModule : public Basemodule
         void OnSetPropertyText(TextProperty* prop) override;
         void OnSetPropertyNumber(NumberProperty* prop) override;
         void OnSetPropertySwitch(SwitchProperty* prop) override;
-        void test0(QString txt);
         void OnSucessSEP();
 
     private:
@@ -107,10 +106,10 @@ class MODULE_INIT FocusModule : public Basemodule
 
         int    _startpos = 30000;
         int    _backlash = 100;
-        int    _iterations = 10;
-        int    _steps = 1000;
+        int    _iterations = 3;
+        int    _steps = 3000;
         int    _exposure = 2;
-        int    _loopIterations = 4;
+        int    _loopIterations = 2;
         int    _loopIteration;
         double _loopHFRavg;
 
