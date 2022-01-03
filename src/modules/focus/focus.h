@@ -98,6 +98,7 @@ class MODULE_INIT FocusModule : public Basemodule
         NumberProperty* _values;
         NumberProperty* _parameters;
         SwitchProperty* _actions;
+        ImageProperty* _img;
 
 
         QString _camera  = "CCD Simulator";

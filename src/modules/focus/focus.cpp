@@ -46,9 +46,10 @@ FocusModule::FocusModule(QString name,QString label)
     emit propertyCreated(_parameters,&_modulename);
     _propertyStore.add(_parameters);
 
-    ImageProperty* img = new ImageProperty(_modulename,"Control","root","viewer","Image property label",0,0,0);
-    emit propertyCreated(img,&_modulename);
-    _propertyStore.add(img);
+    _img = new ImageProperty(_modulename,"Control","root","viewer","Image property label",0,0,0);
+    emit propertyCreated(_img,&_modulename);
+    _propertyStore.add(_img);
+
 }
 
 FocusModule::~FocusModule()
@@ -121,10 +122,9 @@ void FocusModule::newNumber(INumberVectorProperty *nvp)
         &&  (QString(nvp->name)   =="ABS_FOCUS_POSITION")
        )
     {
-        NumberProperty* prop = _propertyStore.getNumber("Control","root","values");
-        prop->setNumber("focpos",nvp->np[0].value);
-        _propertyStore.update(prop);
-        emit propertyUpdated(prop,&_modulename);
+        _values->setNumber("focpos",nvp->np[0].value);
+        _propertyStore.update(_values);
+        emit propertyUpdated(_values,&_modulename);
 
         if (nvp->s==IPS_OK)
         {
@@ -152,10 +152,9 @@ void FocusModule::newBLOB(IBLOB *bp)
         image->computeHistogram();
         image->saveStretchedToJpeg(_webroot+"/"+QString(bp->bvp->device)+".jpeg",100);
 
-        ImageProperty* img = new ImageProperty(_modulename,"Control","root","viewer","Image property label",0,0,0);
-        img->setURL(QString(bp->bvp->device)+".jpeg");
-        emit propertyUpdated(img,&_modulename);
-        _propertyStore.add(img);
+        _img->setURL(QString(bp->bvp->device)+".jpeg");
+        emit propertyUpdated(_img,&_modulename);
+        _propertyStore.add(_img);
         if (_machine.isRunning()) {
             emit ExposureDone();
             emit ExposureBestDone();
@@ -377,11 +376,9 @@ void FocusModule::SMFindStars()
 
 void FocusModule::OnSucessSEP()
 {
-    //sendMessage("FindStarsDone");
-    NumberProperty* prop = _propertyStore.getNumber("Control","root","values");
-    prop->setNumber("imgHFR",_solver.HFRavg);
-    _propertyStore.update(prop);
-    emit propertyUpdated(prop,&_modulename);
+    _values->setNumber("imgHFR",_solver.HFRavg);
+    _propertyStore.update(_values);
+    emit propertyUpdated(_values,&_modulename);
     emit FindStarsDone();
 }
 
@@ -407,14 +404,13 @@ void FocusModule::SMCompute()
     }
     qDebug() << "Compute " << _iteration << "/" << _iterations << "=" << _loopHFRavg << "bestpos/pos" << _bestpos << "/" << _startpos + _iteration*_steps << "polfit=" << _bestposfit;
 
-    NumberProperty* prop = _propertyStore.getNumber("Control","root","values");
-    prop->setNumber("loopHFRavg",_loopHFRavg);
-    prop->setNumber("bestpos",_bestpos);
-    prop->setNumber("bestposfit",_bestposfit);
-    prop->setNumber("focpos",_startpos + _iteration*_steps);
-    prop->setNumber("iteration",_iteration);
-    _propertyStore.update(prop);
-    emit propertyUpdated(prop,&_modulename);
+    _values->setNumber("loopHFRavg",_loopHFRavg);
+    _values->setNumber("bestpos",_bestpos);
+    _values->setNumber("bestposfit",_bestposfit);
+    _values->setNumber("focpos",_startpos + _iteration*_steps);
+    _values->setNumber("iteration",_iteration);
+    _propertyStore.update(_values);
+    emit propertyUpdated(_values,&_modulename);
 
     if (_iteration <_iterations )
     {
@@ -474,10 +470,9 @@ void FocusModule::SMRequestExposureBest()
 void FocusModule::SMComputeResult()
 {
     sendMessage("SMComputeResult");
-    NumberProperty* prop = _propertyStore.getNumber("Control","root","values");
-    prop->setNumber("imgHFR",_solver.HFRavg);
-    _propertyStore.update(prop);
-    emit propertyUpdated(prop,&_modulename);
+    _values->setNumber("imgHFR",_solver.HFRavg);
+    _propertyStore.update(_values);
+    emit propertyUpdated(_values,&_modulename);
     // what should i do here ?
     emit ComputeResultDone();
 }
@@ -490,10 +485,9 @@ void FocusModule::SMInitLoopFrame()
     sendMessage("SMInitLoopFrame");
     _loopIteration=0;
     _loopHFRavg=99;
-    NumberProperty* prop = _propertyStore.getNumber("Control","root","values");
-    prop->setNumber("loopHFRavg",_loopHFRavg);
-    _propertyStore.update(prop);
-    emit propertyUpdated(prop,&_modulename);
+    _values->setNumber("loopHFRavg",_loopHFRavg);
+    _propertyStore.update(_values);
+    emit propertyUpdated(_values,&_modulename);
     emit InitLoopFrameDone();
 }
 
@@ -502,11 +496,10 @@ void FocusModule::SMComputeLoopFrame()
     sendMessage("SMComputeLoopFrame");
     _loopIteration++;
     _loopHFRavg=((_loopIteration-1)*_loopHFRavg + _solver.HFRavg)/_loopIteration;
-    NumberProperty* prop = _propertyStore.getNumber("Control","root","values");
-    prop->setNumber("loopHFRavg",_loopHFRavg);
-    prop->setNumber("imgHFR",_solver.HFRavg);
-    _propertyStore.update(prop);
-    emit propertyUpdated(prop,&_modulename);
+    _values->setNumber("loopHFRavg",_loopHFRavg);
+    _values->setNumber("imgHFR",_solver.HFRavg);
+    _propertyStore.update(_values);
+    emit propertyUpdated(_values,&_modulename);
 
     qDebug() << "Loop    " << _loopIteration << "/" << _loopIterations << " = " <<  _solver.HFRavg;
 
