@@ -17,6 +17,11 @@ public:
     ~NumberProperty() override { for (NumberValue* pVal : _numbers) {delete pVal;} }
 
     void addNumber(NumberValue* pValue) { _numbers.append(pValue); }
+    void setNumber(QString name, double value) {
+                                                for (int i=0; i< _numbers.size();i++ ) {
+                                                    if(_numbers[i]->name()==name)  _numbers[i]->setValue(value);
+                                                };
+                                              }
     inline const QList<NumberValue*>& getNumbers() { return _numbers; }
     void accept(PropertyVisitor *pVisitor) override { pVisitor->visit(this,&_moduleName); }
 
