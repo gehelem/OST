@@ -81,7 +81,7 @@ void FocusModule::OnSetPropertySwitch(SwitchProperty* prop)
     for (int j = 0; j < switchs.size(); ++j) {
         if (switchs[j]->name()=="coarse") startCoarse();
         if (switchs[j]->name()=="loop")                ;
-        if (switchs[j]->name()=="abort")               ;
+        if (switchs[j]->name()=="abort")  emit abort();
         if (switchs[j]->name()=="condev") connectAllDevices();
 
         emit propertyUpdated(prop,&_modulename);
@@ -259,6 +259,7 @@ void FocusModule::startCoarse()
     _machine.setInitialState(CoarseFocus);
 
     /* actions to take when entering into state */
+    connect(Abort,              &QState::entered, this, &FocusModule::SMAbort);
     connect(RequestFrameReset,  &QState::entered, this, &FocusModule::SMRequestFrameReset);
     connect(RequestBacklash,    &QState::entered, this, &FocusModule::SMRequestBacklash);
     connect(RequestGotoStart,   &QState::entered, this, &FocusModule::SMRequestGotoStart);
@@ -274,6 +275,7 @@ void FocusModule::startCoarse()
     connect(InitLoopFrame,      &QState::entered, this, &FocusModule::SMInitLoopFrame);
 
     /* mapping signals to state transitions */
+    CoarseFocus->       addTransition(this,&FocusModule::abort,                Abort);
     RequestFrameReset-> addTransition(this,&FocusModule::RequestFrameResetDone,WaitFrameReset);
     WaitFrameReset->    addTransition(this,&FocusModule::FrameResetDone,       RequestBacklash);
     RequestBacklash->   addTransition(this,&FocusModule::RequestBacklashDone,  WaitBacklash);
@@ -494,6 +496,7 @@ void FocusModule::SMComputeLoopFrame()
         if ( prop->getNumbers()[j]->name()=="loopHFRavg")  prop->getNumbers()[j]->setValue(_loopHFRavg);
         //if (numbers[j]->name()=="focpos")      numbers[j]->setValue(_);
         if ( prop->getNumbers()[j]->name()=="imgHFR")      prop->getNumbers()[j]->setValue(image->HFRavg);
+        _propertyStore.add(prop);
         emit propertyUpdated(prop,&_modulename);
         BOOST_LOG_TRIVIAL(debug) << "Focus update values ";
     }
