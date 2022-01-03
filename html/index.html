@@ -144,7 +144,7 @@ function buildmodule(m,l) {
 
 function builddevice(m,d,l) {
     //console.log('BUILD DEVICE ' + m + "-"+ d + "-"+ l + "-");
-    if  (!($("#D"+m+d).length >0)) {
+    if  (!($("#D"+m+d).length >0)&&!(d=="root")) {
         $("#D"+m).append("<div id=D"+m+d+"></div>");
         $("#U"+m).append("<li id=L"+m+d+"><a href=#D"+m+d+">"+l+"</a></li>");
         $("#D"+m+d).append("<ul id=U"+m+d+"></ul>");
@@ -153,7 +153,7 @@ function builddevice(m,d,l) {
 }
 
 function buildgroup(m,d,g,l) {
-    if  (!($("#D"+m+d+g).length > 0)) {
+    if  (!($("#D"+m+d+g).length > 0)&&!(g=="root")) {
         //console.log('BUILD GROUP ' + m + "-" + d + "-"+ g + "-"+ l + "-");
         $("#D"+m+d).append("<div id=D"+m+d+g+"></div>");
         $("#U"+m+d).append("<li id=L"+m+d+g+"><a href=#D"+m+d+g+">"+l+"</a></li>");
@@ -162,6 +162,8 @@ function buildgroup(m,d,g,l) {
 }
 
 function buildproperty(m,d,g,p) {
+    if (d=="root") d="";
+    if (g=="root") g="";
     nn=m+d+g;
     nnp=nn+p.propname;
     if  (!($("#P"+nnp).length)&&(p.hasOwnProperty('texts')||p.hasOwnProperty('numbers')||p.hasOwnProperty('switches')||p.hasOwnProperty('lights')))  {
@@ -184,7 +186,7 @@ function buildproperty(m,d,g,p) {
             $("#B"+nnp).on("click", function () {
                 var pp=$(this).data("json");
                 $.each( pp.numbers, function( ii, i ) {
-                    pp.numbers[ii].value=parseFloat(document.getElementById(pp.modulename+pp.devicenameshort+pp.groupnameshort+pp.propname+i.name).value);
+                    pp.numbers[ii].value=parseFloat(document.getElementById(pp.modulename+d+g+pp.propname+i.name).value);
                 })
                 var obj = jQuery.parseJSON("{\"message\":\"setproperty\",\"property\":"+JSON.stringify(pp)+"}");
                 console.log(obj);
@@ -213,16 +215,18 @@ function buildproperty(m,d,g,p) {
        
     }
     if  (p.hasOwnProperty('message'))  {
-        if (!($("#M"+m+d).length))  {
-            div="<div id=M"+m+d+" >"
+        var dd=d;
+        if (d=="root") dd="";
+        if (!($("#M"+m+dd).length))  {
+            div="<div id=M"+m+dd+" >"
             /*+"<table><tbody><tr><td>"*/
-            +"<input  class='ui-text ui-widget ui-corner-all' type='text' id=MD"+m+d+" value='"+p.message+"'  width='auto' ></input>"
+            +"<input  class='ui-text ui-widget ui-corner-all' type='text' id=MD"+m+dd+" value='"+p.message+"'  width='auto' ></input>"
             /*+"</td></tr></tbody></table>"*/
             +"</div>"
-            $("#D"+m+d).append(div);
-            $("#MD"+m+d).width("98%");
+            $("#D"+m+dd).append(div);
+            $("#MD"+m+dd).width("98%");
         } else {
-            $("#MD"+m+d).val(p.message);
+            $("#MD"+m+dd).val(p.message);
         }
         
     }
@@ -311,6 +315,8 @@ function buildnumbers(m,d,g,prop) {
 function buildswitchs(m,d,g,prop) {
 
     p=prop.propname;
+    if (d=="root") d="";
+    if (g=="root") g="";    
     $.each( prop.switches, function( iitem, item ) {
         nn=m+d+g+p;
         nnn = nn+item.name;
