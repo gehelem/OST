@@ -23,6 +23,7 @@ FocusModule::FocusModule(QString name,QString label)
     _values->addNumber(new NumberValue("bestpos","Best position","hint",0,"",0,99,0));
     _values->addNumber(new NumberValue("bestposfit","Pol. fit position","hint",0,"",0,99,0));
     _values->addNumber(new NumberValue("imgHFR","Last imgage HFR","hint",0,"",0,99,0));
+    _values->addNumber(new NumberValue("iteration","Iteration","hint",0,"",0,99,0));
     emit propertyCreated(_values,&_modulename);
     _propertyStore.add(_values);
 
@@ -411,6 +412,7 @@ void FocusModule::SMCompute()
     prop->setNumber("bestpos",_bestpos);
     prop->setNumber("bestposfit",_bestposfit);
     prop->setNumber("focpos",_startpos + _iteration*_steps);
+    prop->setNumber("iteration",_iteration);
     _propertyStore.update(prop);
     emit propertyUpdated(prop,&_modulename);
 
