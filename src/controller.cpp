@@ -29,7 +29,7 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
     BOOST_LOG_TRIVIAL(debug) << "Controller warmup";
     BOOST_LOG_TRIVIAL(debug) <<  "ApplicationDirPath :" << QCoreApplication::applicationDirPath().toStdString();
 
-    /*MainControl *mainctl = new MainControl("maincontrol","Main control");
+    MainControl *mainctl = new MainControl("maincontrol","Main control");
     mainctl->setHostport(_indihost,_indiport);
     mainctl->connectIndi();
     mainctl->setWebroot(_webroot);
@@ -48,12 +48,12 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
     connect(wshandler,&WShandler::dumpAsked,mainctl,&Basemodule::OnDumpAsked);
     connect(wshandler,&WShandler::setPropertyText,mainctl,&Basemodule::OnSetPropertyText);
     connect(wshandler,&WShandler::setPropertyNumber,mainctl,&Basemodule::OnSetPropertyNumber);
-    connect(wshandler,&WShandler::setPropertySwitch,mainctl,&Basemodule::OnSetPropertySwitch);*/
+    connect(wshandler,&WShandler::setPropertySwitch,mainctl,&Basemodule::OnSetPropertySwitch);
 
 
-    //LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focuser1","focuser 1");
     LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel1","Indi control panel");
     LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focus1","Focus assistant");
+    LoadModule(QCoreApplication::applicationDirPath()+"/libostdummy.so","dummy1","Demo module");
 
 }
 

@@ -60,8 +60,8 @@ add_executable( ost
     ${CMAKE_CURRENT_SOURCE_DIR}/src/jsonparser.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/basemodule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/basemodule.h
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/maincontrol.h
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/maincontrol.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/maincontrol.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/maincontrol.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/image.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/image.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/solver.cpp
