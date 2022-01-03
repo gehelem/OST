@@ -8,9 +8,9 @@ void PropertyStore::add(Property* pProperty) {
 
 void PropertyStore::update(Property* pProperty) {
 
-    Property* oldProperty = _store[pProperty->getDeviceName()][pProperty->getGroupName()][pProperty->getName()];
+    //Property* oldProperty = _store[pProperty->getDeviceName()][pProperty->getGroupName()][pProperty->getName()];
     _store[pProperty->getDeviceName()][pProperty->getGroupName()][pProperty->getName()] = pProperty;
-    delete oldProperty;
+    //delete oldProperty;
 }
 
 void PropertyStore::remove(Property *pProperty) {
