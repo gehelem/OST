@@ -27,12 +27,14 @@ public:
 
     ~GridProperty() override {}
     void accept(PropertyVisitor *pVisitor) override { pVisitor->visit(this,&_moduleName); }
+    void accept(PropertyVisitor *pVisitor,double s,double x,double y,double z) override  { pVisitor->visit(this,&_moduleName,s,x,y,z); }
 
     void clear(void) { _vals.clear();}
     void append(double s, double x,double y)          {GridPropertyValue xy; xy.s=s; xy.x = x; xy.y=y ;  _vals.append(xy)    ;}
     void append(double s, double x,double y,double z) {GridPropertyValue xy; xy.s=s; xy.x = x; xy.y=y ; xy.z=z ;  _vals.append(xy)    ;}
     void append(double x,double y)                    {GridPropertyValue xy; xy.x = x; xy.y=y ;  _vals.append(xy)    ;}
     QVector<GridPropertyValue> getValues(void) {return  _vals;}
+    QString getType(void) {return  _type;}
 
 private:
     QString _type;

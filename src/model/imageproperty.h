@@ -19,6 +19,8 @@ public:
 
     QString getURL() { return _URL; }
     void accept(PropertyVisitor *pVisitor) override { pVisitor->visit(this,&_moduleName); }
+    void accept(PropertyVisitor* pVisitor,double s,double x,double y,double z) override {};
+
 
 private:
     QString _URL;

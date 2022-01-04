@@ -97,7 +97,7 @@ class Basemodule : public QObject, public INDI::BaseClient
     signals:
         void propertyCreated(Property* pProperty, QString* pModulename);
         void propertyUpdated(Property* pProperty, QString* pModulename);
-        void propertyAppended(Property* pProperty, QString* pModulename);
+        void propertyAppended(Property* pProperty, QString* pModulename, double s, double x,double y,double z);
         void propertyRemoved(Property* pProperty, QString* pModulename);
         void moduleDumped(QMap<QString, QMap<QString, QMap<QString, Property*>>> treeList, QString* pModulename, QString* pModulelabel, QString* pModuledescription);
         void newMessageSent(QString message,      QString* pModulename, QString Device);

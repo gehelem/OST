@@ -46,6 +46,8 @@ function initWebSocket() {
         websocket.onmessage = function (evt) {
             var obj = jQuery.parseJSON( evt.data );
             console.log(obj);
+            //if ((obj.event == 'appendproperty')) {console.log(obj)};
+            //if ((obj.event == 'updateproperty')&&(obj.property.propname=='grid')) {console.log(obj)};
             if (obj.event == 'moduledump') {
                 m=obj.module;
                 l=obj.modulelabel;

@@ -18,6 +18,8 @@ public:
     void addLight(LightValue* pValue) { _lights.append(pValue); }
     inline const QList<LightValue*>& getLights() { return _lights; }
     void accept(PropertyVisitor *pVisitor) override { pVisitor->visit(this,&_moduleName); }
+    void accept(PropertyVisitor* pVisitor,double s,double x,double y,double z) override {};
+
 
 private:
     QList<LightValue*> _lights;

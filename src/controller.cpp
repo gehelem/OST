@@ -51,7 +51,7 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
     connect(wshandler,&WShandler::setPropertySwitch,mainctl,&Basemodule::OnSetPropertySwitch);
 
 
-    LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel1","Indi control panel");
+    //LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel1","Indi control panel");
     LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focus1","Focus assistant");
     LoadModule(QCoreApplication::applicationDirPath()+"/libostdummy.so","dummy1","Demo module");
 
@@ -91,6 +91,7 @@ void Controller::LoadModule(QString lib,QString name,QString label)
                 connect(mod,&Basemodule::moduleDumped, this,&Controller::OnModuleDumped);
                 connect(mod,&Basemodule::propertyCreated,wshandler,&WShandler::OnPropertyCreated);
                 connect(mod,&Basemodule::propertyUpdated,wshandler,&WShandler::OnPropertyUpdated);
+                connect(mod,&Basemodule::propertyAppended,wshandler,&WShandler::OnPropertyAppended);
                 connect(mod,&Basemodule::propertyRemoved,wshandler,&WShandler::OnPropertyRemoved);
                 connect(mod,&Basemodule::newMessageSent,wshandler,&WShandler::OnNewMessageSent);
                 connect(mod,&Basemodule::moduleDumped, wshandler,&WShandler::OnModuleDumped);
