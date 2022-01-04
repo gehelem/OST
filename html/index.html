@@ -246,10 +246,25 @@ function buildproperty(m,d,g,p) {
         var new_width = 0.99*$("[id='im"+nnp+"']").parent().width();
         if (new_width > 0) $("[id='im"+nnp+"']").css({'width': new_width, 'height': '100%'});
         
-   
-        
     }
 
+    if  (p.hasOwnProperty('values'))  {
+        
+        if (!($("[id='G"+nnp+"']").length))  {
+            div="<div id='G"+nnp+"' >GRID"
+            //+ "<td><tr>"
+            //+"<strong id='title"+nnp+"' >"+p.label+"</strong>"
+            //+"<br><img id='im"+nnp+"'  src='"+p.URL+"' />"
+            //+"</td></tr></table>"
+            +"</div>";
+            $("#U"+nn).append(div);
+        } else {
+            $("[id='im"+nnp+"']").prop("src",p.URL + "?"+ new Date().valueOf()); // append "Date" to force image reload ...
+        }
+        var new_width = 0.99*$("[id='im"+nnp+"']").parent().width();
+        if (new_width > 0) $("[id='im"+nnp+"']").css({'width': new_width, 'height': '100%'});
+        
+    }
     
     if (p.state=="0") $("#status"+nnp).css("background-color", "gray");   
     if (p.state=="1") $("#status"+nnp).css("background-color", "green");   

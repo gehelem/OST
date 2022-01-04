@@ -23,6 +23,7 @@ public:
 public slots:
     void OnPropertyCreated(Property *pProperty, QString *pModulename);
     void OnPropertyUpdated(Property *pProperty, QString *pModulename);
+    void OnPropertyAppended(Property *pProperty, QString *pModulename);
     void OnPropertyRemoved(Property *pProperty, QString *pModulename);
     void OnNewMessageSent(QString message,QString *pModulename, QString Device);
     void OnModuleDumped(QMap<QString, QMap<QString, QMap<QString, Property*>>> treeList, QString* pModulename, QString* pModulelabel, QString* pModuledescription);

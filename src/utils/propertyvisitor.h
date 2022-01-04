@@ -22,6 +22,7 @@ public:
     virtual void visit(MessageProperty* pProperty, QString* moduleName) = 0;
     virtual void visit(ImageProperty* pProperty, QString* moduleName) = 0;
     virtual void visit(GridProperty* pProperty, QString* moduleName) = 0;
+    virtual void visit(GridProperty* pProperty, QString* moduleName,double s,double x,double y,double z) = 0;
 
 };
 

@@ -27,6 +27,7 @@ public:
     void visit(MessageProperty *pProperty,QString *moduleName) override;
     void visit(ImageProperty *pProperty,QString *moduleName) override;
     void visit(GridProperty *pProperty,QString *moduleName) override;
+    void visit(GridProperty *pProperty,QString *moduleName,double s,double x,double y,double z) override;
 
     [[nodiscard]] const std::string& getResult() const { return _result; }
 

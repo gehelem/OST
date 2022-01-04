@@ -119,6 +119,12 @@ void Controller::OnPropertyUpdated(Property *pProperty, QString *pModulename)
     pProperty->accept(&textDumper);
     //BOOST_LOG_TRIVIAL(debug) << "MODULE " << pModulename->toStdString() <<" UPDATED " << textDumper.getResult();
 }
+void Controller::OnPropertyAppended(Property *pProperty, QString *pModulename)
+{
+    PropertyTextDumper textDumper;
+    pProperty->accept(&textDumper);
+    //BOOST_LOG_TRIVIAL(debug) << "MODULE " << pModulename->toStdString() <<" UPDATED " << textDumper.getResult();
+}
 void Controller::OnPropertyRemoved(Property *pProperty, QString *pModulename)
 {
     PropertyTextDumper textDumper;

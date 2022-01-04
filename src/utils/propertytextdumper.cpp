@@ -107,3 +107,11 @@ void PropertyTextDumper::visit(GridProperty *pProperty, QString *moduleName) {
     stream << "Grid Property : " << dumpPropertyCommons(pProperty,moduleName);
     _result = stream.str();
 }
+void PropertyTextDumper::visit(GridProperty *pProperty, QString *moduleName,double s,double x,double y,double z)  {
+
+    std::stringstream stream;
+
+    stream << "Grid Property appended : " << dumpPropertyCommons(pProperty,moduleName);
+    _result = stream.str();
+}
+

@@ -50,6 +50,10 @@ FocusModule::FocusModule(QString name,QString label)
     emit propertyCreated(_img,&_modulename);
     _propertyStore.add(_img);
 
+    _grid = new GridProperty(_modulename,"Control","root","grid","Grid property label",0,0,"SXY","Set","Pos","HFR","");
+    emit propertyCreated(_grid,&_modulename);
+    _propertyStore.add(_grid);
+
 }
 
 FocusModule::~FocusModule()
