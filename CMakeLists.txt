@@ -80,6 +80,7 @@ add_executable( ost
     ${CMAKE_CURRENT_SOURCE_DIR}/src/model/lightproperty.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/model/lightvalue.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/model/messageproperty.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/gridproperty.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/model/imageproperty.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/model/setup.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/model/setup.h

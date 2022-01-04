@@ -21,6 +21,7 @@ public:
     void visit(LightProperty *pProperty,QString *modulName) override;
     void visit(MessageProperty *pProperty,QString *modulName) override;
     void visit(ImageProperty *pProperty,QString *modulName) override;
+    void visit(GridProperty *pProperty,QString *modulName) override;
 
     [[nodiscard]] inline const QString& getResult() const { return _result; }
     [[nodiscard]] inline const QJsonObject& getJsonResult() const { return _jsonResult; }

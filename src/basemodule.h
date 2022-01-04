@@ -14,6 +14,7 @@
 #include <model/numberproperty.h>
 #include <model/switchproperty.h>
 #include <model/messageproperty.h>
+#include <model/gridproperty.h>
 #include <model/propertystore.h>
 #include "utils/propertyfactory.h"
 

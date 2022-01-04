@@ -10,6 +10,7 @@
 #include "lightproperty.h"
 #include "messageproperty.h"
 #include "imageproperty.h"
+#include "gridproperty.h"
 
 class PropertyStore {
 
@@ -27,6 +28,7 @@ public:
     LightProperty*   getLight  (QString device, QString group, QString name) {return static_cast<LightProperty*>(_store[device][group][name]);}
     MessageProperty* getMessage(QString device, QString group, QString name) {return static_cast<MessageProperty*>(_store[device][group][name]);}
     ImageProperty*   getImage  (QString device, QString group, QString name) {return static_cast<ImageProperty*>(_store[device][group][name]);}
+    GridProperty*    getGrid   (QString device, QString group, QString name) {return static_cast<GridProperty*>(_store[device][group][name]);}
 
 private:
     QMap<QString, QMap<QString, QMap<QString, Property*>>> _store;

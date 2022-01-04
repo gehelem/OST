@@ -7,6 +7,7 @@ class SwitchProperty;
 class LightProperty;
 class MessageProperty;
 class ImageProperty;
+class GridProperty;
 
 class PropertyVisitor {
 
@@ -20,6 +21,9 @@ public:
     virtual void visit(LightProperty* pProperty, QString* moduleName) = 0;
     virtual void visit(MessageProperty* pProperty, QString* moduleName) = 0;
     virtual void visit(ImageProperty* pProperty, QString* moduleName) = 0;
+    virtual void visit(GridProperty* pProperty, QString* moduleName) = 0;
+
 };
+
 
 #endif //OST_PROPERTYVISITOR_H

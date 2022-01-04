@@ -8,7 +8,9 @@
 #include <model/switchproperty.h>
 #include <model/messageproperty.h>
 #include <model/imageproperty.h>
+#include <model/gridproperty.h>
 #include <utils/propertyvisitor.h>
+
 
 
 class Property;
@@ -24,6 +26,7 @@ public:
     void visit(LightProperty *pProperty,QString *moduleName) override;
     void visit(MessageProperty *pProperty,QString *moduleName) override;
     void visit(ImageProperty *pProperty,QString *moduleName) override;
+    void visit(GridProperty *pProperty,QString *moduleName) override;
 
     [[nodiscard]] const std::string& getResult() const { return _result; }
 
