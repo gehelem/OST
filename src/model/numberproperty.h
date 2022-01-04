@@ -24,6 +24,8 @@ public:
                                               }
     inline const QList<NumberValue*>& getNumbers() { return _numbers; }
     void accept(PropertyVisitor *pVisitor) override { pVisitor->visit(this,&_moduleName); }
+    void accept(PropertyVisitor* pVisitor,double s,double x,double y,double z) override {};
+
 
 private:
     QList<NumberValue*> _numbers;

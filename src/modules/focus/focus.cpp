@@ -50,6 +50,10 @@ FocusModule::FocusModule(QString name,QString label)
     emit propertyCreated(_img,&_modulename);
     _propertyStore.add(_img);
 
+    _grid = new GridProperty(_modulename,"Control","root","grid","Grid property label",0,0,"SXY","Set","Pos","HFR","");
+    emit propertyCreated(_grid,&_modulename);
+    _propertyStore.add(_grid);
+
 }
 
 FocusModule::~FocusModule()
@@ -204,6 +208,10 @@ void FocusModule::startCoarse()
     _iteration=0;
     _besthfr=99;
     _bestposfit=99;
+    _grid->clear();
+    _propertyStore.update(_grid);
+    emit propertyUpdated(_grid,&_modulename);
+
 
     //_machine = new QStateMachine();
 
@@ -411,6 +419,10 @@ void FocusModule::SMCompute()
     _values->setNumber("iteration",_iteration);
     _propertyStore.update(_values);
     emit propertyUpdated(_values,&_modulename);
+
+    _grid->append(_startpos + _iteration*_steps,_loopHFRavg);
+    _propertyStore.update(_grid);
+    emit propertyAppended(_grid,&_modulename,0,_startpos + _iteration*_steps,_loopHFRavg,0);
 
     if (_iteration <_iterations )
     {

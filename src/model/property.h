@@ -29,6 +29,7 @@ protected:
 public:
     virtual ~Property() = default;
     virtual void accept(PropertyVisitor* pVisitor) = 0;
+    virtual void accept(PropertyVisitor* pVisitor,double s,double x,double y,double z) = 0;
 
     [[nodiscard]] inline const QString &getModuleName() const { return _moduleName; }
     [[nodiscard]] inline const QString &getDeviceName() const { return _deviceName; }
