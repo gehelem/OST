@@ -50,6 +50,7 @@ class Basemodule : public QObject, public INDI::BaseClient
 
 
     public slots:
+        void connectIndiTimer(void);
         void OnDumpAsked(void);
         virtual void OnSetPropertyText(TextProperty* prop) {
             if (!(prop->getModuleName()==_modulename)) return;

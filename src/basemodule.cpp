@@ -20,6 +20,21 @@ Basemodule::Basemodule(QString name,QString label)
     emit propertyCreated(_message,&_modulename);
     _propertyStore.add(_message);
 
+    QTimer *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &Basemodule::connectIndiTimer);
+    timer->start(10000);
+
+}
+void Basemodule::connectIndiTimer()
+{
+        if (!isServerConnected()) {
+            if (connectServer()){
+                newUniversalMessage("Indi server connected");
+                sendMessage("Indi server connected");
+            } else {
+                sendMessage("Couldn't connect to Indi server");
+            }
+        }
 }
 void Basemodule::setHostport(QString host, int port)
 {

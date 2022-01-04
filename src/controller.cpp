@@ -51,7 +51,7 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
     connect(wshandler,&WShandler::setPropertySwitch,mainctl,&Basemodule::OnSetPropertySwitch);
 
 
-    //LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel1","Indi control panel");
+    LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel1","Indi control panel");
     LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focus1","Focus assistant");
     LoadModule(QCoreApplication::applicationDirPath()+"/libostdummy.so","dummy1","Demo module");
 
