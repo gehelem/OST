@@ -104,10 +104,17 @@ void JSonDumper::visit(ImageProperty *pProperty, QString *moduleName) {
 void JSonDumper::visit(GridProperty *pProperty, QString *moduleName) {
     QJsonObject json = dumpPropertyCommons(pProperty);
     json["proptype"] = "grid";
-    //json["URL"] = pProperty->getURL();
+    for( const GridPropertyValue pValue : pProperty->getValues() ) {
+        QJsonObject jsonValue;
+        jsonValue["s"] = pValue.s;
+        jsonValue["x"] = pValue.x;
+        jsonValue["y"] = pValue.y;
+        jsonValue["z"] = pValue.z;
+    }
     QJsonDocument doc(json);
     _jsonResult = json;
     _result = doc.toJson(QJsonDocument::Compact);
+
 }
 
 QJsonObject JSonDumper::dumpPropertyCommons(Property *pProperty) {
