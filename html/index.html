@@ -220,8 +220,7 @@ function buildproperty(m,d,g,p) {
             $("#B"+nnp).on("click", function () {
                 var pp=$(this).data("json");
                 $.each( pp.texts, function( ii, i ) {
-                    //console.log( "indi_number clicked: " + nnp+i.name);
-                    pp.texts[ii].text=document.getElementById(pp.modulename+pp.devicenameshort+pp.groupnameshort+pp.propname+i.name).value;
+                    pp.texts[ii].text=document.getElementById(pp.modulename+d+g+pp.propname+i.name).value;
                 })
                 
                 var obj = jQuery.parseJSON("{\"message\":\"setproperty\",\"property\":"+JSON.stringify(pp)+"}");
