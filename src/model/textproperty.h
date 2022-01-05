@@ -18,9 +18,15 @@ public:
     ~TextProperty() override { for (TextValue* pVal : _texts) {delete pVal;} }
 
     void addText(TextValue* pValue) { _texts.append(pValue); }
+    void setText(QString name, QString txt) {
+                                                for (int i=0; i< _texts.size();i++ ) {
+                                                    if(_texts[i]->name()==name)  _texts[i]->setText(txt);
+                                                };
+                                              }
+
     inline const QList<TextValue*>& getTexts() { return _texts; }
     void accept(PropertyVisitor *pVisitor) override { pVisitor->visit(this,&_moduleName); }
-    void accept(PropertyVisitor* pVisitor,double s,double x,double y,double z) override {Q_UNUSED(pVisitor);Q_UNUSED(s);Q_UNUSED(x);Q_UNUSED(y)Q_UNUSED(z)};
+    void accept(PropertyVisitor* pVisitor,double s,double x,double y,double z) override {Q_UNUSED(pVisitor) Q_UNUSED(s) Q_UNUSED(x) Q_UNUSED(y) Q_UNUSED(z)};
 
 private:
     QList<TextValue*> _texts;
