@@ -17,10 +17,14 @@ class MainControl : public Basemodule
 
     signals:
         void valueChanged(const double &newValue);
+        void loadModule(QString lib, QString label);
+
     private:
         SwitchProperty* _chooseModule;
         TextProperty* _giveItaName;
         SwitchProperty* _loadModule;
+        QString _selectedlibrary;
+        QString _selectedlabel;
 
 
 };

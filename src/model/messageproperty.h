@@ -19,7 +19,7 @@ public:
 
     QString getMessage() { return _message; }
     void accept(PropertyVisitor *pVisitor) override { pVisitor->visit(this,&_moduleName); }
-    void accept(PropertyVisitor* pVisitor,double s,double x,double y,double z) override {Q_UNUSED(pVisitor);Q_UNUSED(s);Q_UNUSED(x);Q_UNUSED(y)Q_UNUSED(z)};
+    void accept(PropertyVisitor* pVisitor,double s,double x,double y,double z) override {Q_UNUSED(pVisitor) Q_UNUSED(s) Q_UNUSED(x) Q_UNUSED(y) Q_UNUSED(z)};
 
 
 private:
