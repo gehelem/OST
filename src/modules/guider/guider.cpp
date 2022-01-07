@@ -196,12 +196,18 @@ void GuiderModule::SMFindStars()
     sendMessage("SMFindStars");
     _solver.ResetSolver(image->stats,image->m_ImageBuffer);
     connect(&_solver,&Solver::successSEP,this,&GuiderModule::OnSucessSEP);
-    _solver.FindStars();
+    _solver.FindStars(_solver.stellarSolverProfiles[6]);
 }
 
 void GuiderModule::OnSucessSEP()
 {
     sendMessage("SEP finished");
+
+    foreach( FITSImage::Star star, _solver.stars )
+    {
+         BOOST_LOG_TRIVIAL(debug) << "Star found " << star.x << "-" << star.y << "-" << star.mag << "-";
+    }
+
     emit FindStarsDone();
 }
 

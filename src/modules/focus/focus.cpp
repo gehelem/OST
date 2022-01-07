@@ -380,7 +380,7 @@ void FocusModule::SMFindStars()
     sendMessage("SMFindStars");
     _solver.ResetSolver(image->stats,image->m_ImageBuffer);
     connect(&_solver,&Solver::successSEP,this,&FocusModule::OnSucessSEP);
-    _solver.FindStars();
+    _solver.FindStars(_solver.stellarSolverProfiles[0]);
 }
 
 void FocusModule::OnSucessSEP()

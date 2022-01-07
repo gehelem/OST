@@ -18,10 +18,10 @@ void Solver::ResetSolver(FITSImage::Statistic &stats, uint8_t *m_ImageBuffer)
     stellarSolver = new StellarSolver(stats, m_ImageBuffer);
     stellarSolver->moveToThread(this->thread());
     stellarSolver->setParent(this);
-
+    stellarSolverProfiles=StellarSolver::getBuiltInProfiles();
 }
 
-void Solver::FindStars()
+void Solver::FindStars(Parameters param)
 {
 
     if (!connect(stellarSolver,&StellarSolver::logOutput,this,&Solver::sslogOutput))
@@ -33,7 +33,7 @@ void Solver::FindStars()
 
 
     //QList<Parameters> params = stellarSolver->getBuiltInProfiles();
-    //stellarSolver->setParameters(params[0]);
+    stellarSolver->setParameters(param);
     //stellarSolver->clearSubFrame();
     stellarSolver->setProperty("ProcessType",EXTRACT_WITH_HFR);
     //stellarSolver->setProperty("ProcessType",SOLVE);

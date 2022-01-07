@@ -24,7 +24,7 @@ public:
         QList<FITSImage::Star> stars;
         float HFRavg;
         void ResetSolver(FITSImage::Statistic &stats, uint8_t *m_ImageBuffer);
-        void FindStars(void);
+        void FindStars(Parameters param);
         void SolveStars(void);
 public slots:
         void sslogOutput(QString text);
