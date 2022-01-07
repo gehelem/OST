@@ -8,21 +8,19 @@ MainControl::MainControl(QString name, QString label)
 
     _moduledescription="Main control module - and so on";
 
-    TextProperty* prop = new TextProperty(_modulename,"modules","root","availablemodules","Available modules",0,0);
-
     QDir directory(QCoreApplication::applicationDirPath());
     directory.setFilter(QDir::Files);
     directory.setNameFilters(QStringList() << "*ost*.so");
     QStringList libs = directory.entryList();
     foreach(QString lib, libs)
     {
-        BOOST_LOG_TRIVIAL(debug) << "Module lib found " << lib.toStdString();
-        prop->addText(new TextValue(lib,lib,"hint",lib));
+        QString tt = lib.replace(".so","");
+        auto *tmp = new TextProperty(_modulename,"modules","root",tt,"Load module " + tt,2,0);
+        tmp->addText(new TextValue("loadmodname","Give it a name","hint",tt));
+        emit propertyCreated(tmp,&_modulename);
+        _propertyStore.add(tmp);
+
     }
-
-    emit propertyCreated(prop,&_modulename);
-    _propertyStore.add(prop);
-
 
 }
 
@@ -32,6 +30,34 @@ MainControl::~MainControl()
 }
 void MainControl::newProperty(INDI::Property *pProperty)
 {
+}
+void MainControl::OnSetPropertyText(TextProperty* prop)
+{
+    if (!(prop->getModuleName()==_modulename)) return;
+
+    QList<TextValue*> texts=prop->getTexts();
+    for (int j = 0; j < texts.size(); ++j) {
+            if (texts[j]->name()=="loadmodname") {
+            auto *tmp = _propertyStore.getText(prop->getDeviceName(),prop->getGroupName(),prop->getName());
+            tmp->setText(texts[j]->name(),texts[j]->text());
+            _propertyStore.update(tmp);
+            tmp->setState(1);
+            emit propertyUpdated(tmp,&_modulename);
+            emit loadModule(tmp->getName(),texts[j]->text());
+
+        }
+
+    }
+
+}
+void MainControl::OnSetPropertyNumber(NumberProperty* prop)
+{
+
+}
+void MainControl::OnSetPropertySwitch(SwitchProperty* prop)
+{
+
+
 }
 
 

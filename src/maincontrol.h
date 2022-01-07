@@ -10,8 +10,15 @@ class MainControl : public Basemodule
         MainControl(QString name,QString label);
         ~MainControl();
         void newProperty(INDI::Property*) override;
+    public slots:
+        void OnSetPropertyText(TextProperty* prop) override;
+        void OnSetPropertyNumber(NumberProperty* prop) override;
+        void OnSetPropertySwitch(SwitchProperty* prop) override;
+
     signals:
         void valueChanged(const double &newValue);
+        void loadModule(QString lib, QString label);
+
     private:
 
 

@@ -11,6 +11,7 @@ FocusModule::FocusModule(QString name,QString label)
     : Basemodule(name,label)
 
 {
+    _moduledescription="Focuser module";
     _devices = new TextProperty(_modulename,"Options","root","devices","Devices",2,0);
     _devices->addText(new TextValue("camera","Camera","hint",_camera));
     _devices->addText(new TextValue("focuser","Focuser","hint",_focuser));
