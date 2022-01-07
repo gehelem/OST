@@ -20,11 +20,6 @@ class MainControl : public Basemodule
         void loadModule(QString lib, QString label);
 
     private:
-        SwitchProperty* _chooseModule;
-        TextProperty* _giveItaName;
-        SwitchProperty* _loadModule;
-        QString _selectedlibrary;
-        QString _selectedlabel;
 
 
 };
