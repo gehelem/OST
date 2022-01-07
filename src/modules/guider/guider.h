@@ -22,12 +22,19 @@ class MODULE_INIT GuiderModule : public Basemodule
         ~GuiderModule();
 
     signals:
+        void RequestFrameResetDone();
+        void FrameResetDone();
+        void RequestExposureDone();
+        void ExposureDone();
+        void FindStarsDone();
+        void abort();
+
 
     public slots:
         void OnSetPropertyText(TextProperty* prop) override;
         void OnSetPropertyNumber(NumberProperty* prop) override;
         void OnSetPropertySwitch(SwitchProperty* prop) override;
-
+        void OnSucessSEP();
     private:
         void newNumber(INumberVectorProperty *nvp) override;
         void newBLOB(IBLOB *bp) override;
@@ -36,7 +43,7 @@ class MODULE_INIT GuiderModule : public Basemodule
         SwitchProperty* _actions;
         NumberProperty* _parameters;
         NumberProperty* _values;
-        ImageProperty* _img;
+        ImageProperty*  _img;
 
         //std::unique_ptr<Image> image =nullptr;
         QPointer<Image> image;
@@ -48,6 +55,12 @@ class MODULE_INIT GuiderModule : public Basemodule
         QStateMachine _machine;
 
         void startCalibration();
+
+
+        void SMFindStars();
+        void SMRequestFrameReset();
+        void SMRequestExposure();
+        void SMAbort();
 
 
 };
