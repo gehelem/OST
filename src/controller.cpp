@@ -86,9 +86,6 @@ void Controller::LoadModule(QString lib,QString name,QString label)
                 mod->setHostport(_indihost,_indiport);
                 mod->connectIndi();
                 mod->setWebroot(_webroot);
-                connect(mod,&Basemodule::moduleDumped, wshandler,&WShandler::OnModuleDumped);
-                mod->OnDumpAsked();
-                sleep(1);
                 connect(mod,&Basemodule::propertyCreated,this,&Controller::OnPropertyCreated);
                 connect(mod,&Basemodule::propertyUpdated,this,&Controller::OnPropertyUpdated);
                 connect(mod,&Basemodule::propertyRemoved,this,&Controller::OnPropertyRemoved);
@@ -100,6 +97,8 @@ void Controller::LoadModule(QString lib,QString name,QString label)
                 connect(mod,&Basemodule::propertyAppended,wshandler,&WShandler::OnPropertyAppended);
                 connect(mod,&Basemodule::propertyRemoved,wshandler,&WShandler::OnPropertyRemoved);
                 connect(mod,&Basemodule::newMessageSent,wshandler,&WShandler::OnNewMessageSent);
+                connect(mod,&Basemodule::moduleDumped, wshandler,&WShandler::OnModuleDumped);
+                mod->OnDumpAsked();
 
                 connect(wshandler,&WShandler::dumpAsked,mod,&Basemodule::OnDumpAsked);
                 connect(wshandler,&WShandler::setPropertyText,mod,&Basemodule::OnSetPropertyText);

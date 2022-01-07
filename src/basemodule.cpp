@@ -79,6 +79,7 @@ void Basemodule::sendMessage(QString message)
 }
 void Basemodule::OnDumpAsked()
 {
+    usleep(200*1000);
     emit moduleDumped(_propertyStore.toTreeList(),&_modulename,&_modulelabel,&_moduledescription);
 }
 
