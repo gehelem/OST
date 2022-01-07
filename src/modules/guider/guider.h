@@ -33,14 +33,21 @@ class MODULE_INIT GuiderModule : public Basemodule
         void newBLOB(IBLOB *bp) override;
         void newSwitch(ISwitchVectorProperty *svp) override;
 
-
+        SwitchProperty* _actions;
+        NumberProperty* _parameters;
+        NumberProperty* _values;
+        ImageProperty* _img;
 
         //std::unique_ptr<Image> image =nullptr;
         QPointer<Image> image;
 
-        QString _camera  = "CCD Simulator";
+        int    _exposure = 2;
+
+        QString _camera  = "Guide Simulator";
         QString _mount  = "Telescope Simulator";
         QStateMachine _machine;
+
+        void startCalibration();
 
 
 };
