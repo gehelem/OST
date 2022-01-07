@@ -91,9 +91,6 @@ class MODULE_INIT FocusModule : public Basemodule
         void SMAbort();
         void startCoarse();
 
-        //std::unique_ptr<Image> image =nullptr;
-        QPointer<Image> image;
-
         TextProperty* _devices;
         NumberProperty* _values;
         NumberProperty* _parameters;
