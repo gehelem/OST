@@ -86,6 +86,7 @@ void Solver::ssReadySEP()
         HFRavg=(i*HFRavg + stars[i].HFR)/(i+1);
     }
     BOOST_LOG_TRIVIAL(debug) << "SSolver HFRavg = " << HFRavg;
+    disconnect(stellarSolver,&StellarSolver::ready,this,&Solver::ssReadySEP);
     emit successSEP();
     return;
 }
