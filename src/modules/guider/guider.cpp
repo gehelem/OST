@@ -91,7 +91,7 @@ void GuiderModule::OnSetPropertySwitch(SwitchProperty* prop)
 
 void GuiderModule::newNumber(INumberVectorProperty *nvp)
 {
-
+ Q_UNUSED(nvp)
 }
 
 void GuiderModule::newBLOB(IBLOB *bp)
@@ -202,12 +202,11 @@ void GuiderModule::SMFindStars()
 void GuiderModule::OnSucessSEP()
 {
     sendMessage("SEP finished");
-
-    foreach( FITSImage::Star star, _solver.stars )
-    {
-         BOOST_LOG_TRIVIAL(debug) << "Star found " << star.x << "-" << star.y << "-" << star.mag << "-";
+    disconnect(&_solver,&Solver::successSEP,this,&GuiderModule::OnSucessSEP);
+    BOOST_LOG_TRIVIAL(debug) << "********* SEP Finished";
+    foreach (FITSImage::Star star, _solver.stars) {
+        BOOST_LOG_TRIVIAL(debug) << "Star found " << " - " << star.x << " - " << star.y << " - " << star.mag << " - " << star.HFR  << " - " << _solver.stars.size();
     }
-
     emit FindStarsDone();
 }
 
