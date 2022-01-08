@@ -27,6 +27,8 @@ class MODULE_INIT GuiderModule : public Basemodule
         void RequestExposureDone();
         void ExposureDone();
         void FindStarsDone();
+        void RequestPulsesDone();
+        void PulsesDone();
         void abort();
 
 
@@ -49,6 +51,7 @@ class MODULE_INIT GuiderModule : public Basemodule
         QPointer<Image> image;
 
         int    _exposure = 2;
+        int    _pulse = 1000;
 
         QString _camera  = "Guide Simulator";
         QString _mount  = "Telescope Simulator";
@@ -60,6 +63,7 @@ class MODULE_INIT GuiderModule : public Basemodule
         void SMFindStars();
         void SMRequestFrameReset();
         void SMRequestExposure();
+        void SMRequestPulses();
         void SMAbort();
 
 

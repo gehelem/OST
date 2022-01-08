@@ -91,7 +91,18 @@ void GuiderModule::OnSetPropertySwitch(SwitchProperty* prop)
 
 void GuiderModule::newNumber(INumberVectorProperty *nvp)
 {
- Q_UNUSED(nvp)
+    if (
+            (QString(nvp->device) == _mount) &&
+            (QString(nvp->name)   == "TELESCOPE_TIMED_GUIDE_NS") &&
+            (nvp->s   == IPS_IDLE)
+
+       )
+    {
+        if (_machine.isRunning()) {
+            emit PulsesDone();
+        }
+    }
+
 }
 
 void GuiderModule::newBLOB(IBLOB *bp)
@@ -104,7 +115,8 @@ void GuiderModule::newBLOB(IBLOB *bp)
         image->LoadFromBlob(bp);
         image->CalcStats();
         image->computeHistogram();
-        image->saveStretchedToJpeg(_webroot+"/"+QString(bp->bvp->device)+".jpeg",100);
+        //image->saveStretchedToJpeg(_webroot+"/"+QString(bp->bvp->device)+".jpeg",100);
+        image->saveToJpeg(_webroot+"/"+QString(bp->bvp->device)+".jpeg",100);
 
         _img->setURL(QString(bp->bvp->device)+".jpeg");
         emit propertyUpdated(_img,&_modulename);
@@ -141,6 +153,9 @@ void GuiderModule::startCalibration()
     auto *RequestExposure   = new QState(calibrate);
     auto *WaitExposure      = new QState(calibrate);
     auto *FindStars         = new QState(calibrate);
+    auto *RequestPulses     = new QState(calibrate);
+    auto *WaitPulses        = new QState(calibrate);
+
     calibrate->setInitialState(RequestFrameReset);
 
     _machine.addState(calibrate);
@@ -149,6 +164,7 @@ void GuiderModule::startCalibration()
 
     connect(RequestFrameReset,  &QState::entered, this, &GuiderModule::SMRequestFrameReset);
     connect(RequestExposure,    &QState::entered, this, &GuiderModule::SMRequestExposure);
+    connect(RequestPulses,      &QState::entered, this, &GuiderModule::SMRequestPulses);
     connect(FindStars,          &QState::entered, this, &GuiderModule::SMFindStars);
     connect(Abort,              &QState::entered, this, &GuiderModule::SMAbort);
 
@@ -157,13 +173,11 @@ void GuiderModule::startCalibration()
     WaitFrameReset->    addTransition(this,&GuiderModule::FrameResetDone       ,RequestExposure);
     RequestExposure->   addTransition(this,&GuiderModule::RequestExposureDone , WaitExposure);
     WaitExposure->      addTransition(this,&GuiderModule::ExposureDone ,        FindStars);
-    FindStars->         addTransition(this,&GuiderModule::FindStarsDone,        RequestExposure);
+    FindStars->         addTransition(this,&GuiderModule::FindStarsDone,        RequestPulses);
+    RequestPulses->     addTransition(this,&GuiderModule::RequestPulsesDone ,   WaitPulses);
+    WaitPulses->        addTransition(this,&GuiderModule::PulsesDone ,          RequestExposure);
 
 
-
-    connect(RequestFrameReset,  &QState::entered, this, &GuiderModule::SMRequestFrameReset);
-    connect(RequestExposure,  &QState::entered, this, &GuiderModule::SMRequestExposure);
-    connect(FindStars,  &QState::entered, this, &GuiderModule::SMFindStars);
 
     _machine.start();
     sendMessage("machine started");
@@ -189,6 +203,17 @@ void GuiderModule::SMRequestExposure()
         return;
     }
     emit RequestExposureDone();
+}
+
+void GuiderModule::SMRequestPulses()
+{
+    sendMessage("SMRequestPulses");
+    if (!sendModNewNumber(_mount,"TELESCOPE_TIMED_GUIDE_NS","TIMED_GUIDE_N", _pulse))
+    {
+        emit abort();
+        return;
+    }
+    emit RequestPulsesDone();
 }
 
 void GuiderModule::SMFindStars()
