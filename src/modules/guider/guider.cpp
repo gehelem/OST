@@ -21,7 +21,8 @@ GuiderModule::GuiderModule(QString name,QString label)
     _propertyStore.add(_actions);
 
     _parameters = new NumberProperty(_modulename,"Control","root","parameters","Parameters",2,0);
-    _parameters->addNumber(new NumberValue("exposure"      ,"Exposure","hint",_exposure,"",0,120,1));
+    _parameters->addNumber(new NumberValue("exposure"      ,"Exposure","hint",_exposure,"",0,5,1));
+    _parameters->addNumber(new NumberValue("pulse"      ,"Calibration pulse","hint",_pulse,"",0,5000,1));
     emit propertyCreated(_parameters,&_modulename);
     _propertyStore.add(_parameters);
 
@@ -49,6 +50,8 @@ void GuiderModule::OnSetPropertyNumber(NumberProperty* prop)
     QList<NumberValue*> numbers=prop->getNumbers();
     for (int j = 0; j < numbers.size(); ++j) {
         if (numbers[j]->name()=="exposure")        _exposure=numbers[j]->getValue();
+        if (numbers[j]->name()=="pulse")           _pulse=numbers[j]->getValue();
+
         emit propertyUpdated(prop,&_modulename);
         BOOST_LOG_TRIVIAL(debug) << "Focus number property item modified " << prop->getName().toStdString();
     }
@@ -200,11 +203,13 @@ void GuiderModule::startCalibration()
 
     _calState=0;
     _calStep=0;
-    _calSteps=3;
-    _pulseN = 200;
-    _pulseS = 200;
-    _pulseE = 200;
-    _pulseW = 200;
+    _calSteps=5;
+    _pulseN = _pulse;
+    _pulseS = _pulse;
+    _pulseE = _pulse;
+    _pulseW = _pulse;
+    _trigRef.clear();
+    _trigCurrent.clear();
 
 
     _machine.start();
@@ -281,7 +286,8 @@ void GuiderModule::SMFindStars()
     sendMessage("SMFindStars");
     _solver.ResetSolver(image->stats,image->m_ImageBuffer);
     connect(&_solver,&Solver::successSEP,this,&GuiderModule::OnSucessSEP);
-    _solver.FindStars(_solver.stellarSolverProfiles[6]);
+    _solver.stars.clear();
+    _solver.FindStars(_solver.stellarSolverProfiles[0]);
 }
 
 void GuiderModule::OnSucessSEP()
@@ -291,25 +297,72 @@ void GuiderModule::OnSucessSEP()
     BOOST_LOG_TRIVIAL(debug) << "********* SEP Finished";
 
     int nb = _solver.stars.size();
-    if (nb > 7) nb = 7;
-
-    for (int i=0;i<nb;i++)
-    {
-        for (int j=i+1;j<nb;j++)
+    if (nb > 10) nb = 10;
+    _trigCurrent.clear();
+    _matchedPairs.clear();
+    if (_trigRef.size()==0) {
+        for (int i=0;i<nb;i++)
         {
-            for (int k=j+1;k<nb;k++)
+            for (int j=i+1;j<nb;j++)
             {
-                double dij,dik,djk,p,s;
-                dij=sqrt(square(_solver.stars[i].x-_solver.stars[j].x)+square(_solver.stars[i].y-_solver.stars[j].y));
-                dik=sqrt(square(_solver.stars[i].x-_solver.stars[k].x)+square(_solver.stars[i].y-_solver.stars[k].y));
-                djk=sqrt(square(_solver.stars[j].x-_solver.stars[k].x)+square(_solver.stars[j].y-_solver.stars[k].y));
-                p=dij+dik+djk;
-                s=sqrt(p*(p-dij)*(p-dik)*(p-djk));
-                BOOST_LOG_TRIVIAL(debug) << "Trig " << " - " << i << " - " << j << " - " << k << " - p=  " << p << " - s=" << s;
+                for (int k=j+1;k<nb;k++)
+                {
+                    double dij,dik,djk,p,s;
+                    dij=sqrt(square(_solver.stars[i].x-_solver.stars[j].x)+square(_solver.stars[i].y-_solver.stars[j].y));
+                    dik=sqrt(square(_solver.stars[i].x-_solver.stars[k].x)+square(_solver.stars[i].y-_solver.stars[k].y));
+                    djk=sqrt(square(_solver.stars[j].x-_solver.stars[k].x)+square(_solver.stars[j].y-_solver.stars[k].y));
+                    p=dij+dik+djk;
+                    s=sqrt(p*(p-dij)*(p-dik)*(p-djk));
+                    //BOOST_LOG_TRIVIAL(debug) << "Trig REF " << " - " << i << " - " << j << " - " << k << " - p=  " << p << " - s=" << s << " - s/p=" << s/p;
+                    _trigRef.append({
+                                     _solver.stars[i].x,
+                                     _solver.stars[i].y,
+                                     _solver.stars[j].x,
+                                     _solver.stars[j].y,
+                                     _solver.stars[k].x,
+                                     _solver.stars[k].y,
+                                     dij,dik,djk,
+                                     p,s,s/p
+                                    });
+
+                }
             }
+
         }
+      } else {
+            for (int i=0;i<nb;i++)
+            {
+                for (int j=i+1;j<nb;j++)
+                {
+                    for (int k=j+1;k<nb;k++)
+                    {
+                        double dij,dik,djk,p,s;
+                        dij=sqrt(square(_solver.stars[i].x-_solver.stars[j].x)+square(_solver.stars[i].y-_solver.stars[j].y));
+                        dik=sqrt(square(_solver.stars[i].x-_solver.stars[k].x)+square(_solver.stars[i].y-_solver.stars[k].y));
+                        djk=sqrt(square(_solver.stars[j].x-_solver.stars[k].x)+square(_solver.stars[j].y-_solver.stars[k].y));
+                        p=dij+dik+djk;
+                        s=sqrt(p*(p-dij)*(p-dik)*(p-djk));
+                        //BOOST_LOG_TRIVIAL(debug) << "Trig CURRENT" << " - " << i << " - " << j << " - " << k << " - p=  " << p << " - s=" << s << " - s/p=" << s/p;
+                        _trigCurrent.append({
+                                         _solver.stars[i].x,
+                                         _solver.stars[i].y,
+                                         _solver.stars[j].x,
+                                         _solver.stars[j].y,
+                                         _solver.stars[k].x,
+                                         _solver.stars[k].y,
+                                         dij,dik,djk,
+                                         p,s,s/p
+                                        });
+
+                    }
+                }
+
+            }
     }
 
+    if (_trigCurrent.size()>0) {
+        matchTrig(_trigRef,_trigCurrent);
+    }
     emit FindStarsDone();
 }
 
@@ -318,4 +371,40 @@ void GuiderModule::SMAbort()
 
     _machine.stop();
     sendMessage("machine stopped");
+}
+
+void GuiderModule::matchTrig(QVector<Trig> ref,QVector<Trig> act)
+{
+    foreach (Trig r, ref) {
+        foreach (Trig a, act) {
+            if (
+                    (r.s< a.s*1.001 ) && (r.s> a.s*0.999 ) && (r.p< a.p*1.001 ) && (r.p> a.p*0.999 )
+               )
+            {
+                //BOOST_LOG_TRIVIAL(debug) << "Matching " << r.ratio <<  " / " << a.ratio << " xr-yr=" << r.x1 << "-" << r.y1 << " xa-ya=" << a.x1 << "-" << a.y1 << " / dx1 =" << r.x1-a.x1 << " / dy1 =" << r.y1-a.y1 << " / dx2 =" << r.x2-a.x2 << " / dy2 =" << r.y2-a.y2 << " / dx3 =" << r.x3-a.x3 << " / dy3 =" << r.y3-a.y3;
+                //BOOST_LOG_TRIVIAL(debug) << "Matching " << r.x1 << " - " << r.d12 << " / " << a.d12 << " - " << r.d13 << " / " << a.d13 << " - " << r.d23 << " / " << a.d23;
+                //BOOST_LOG_TRIVIAL(debug) << "Matching dxy1= " << r.x1-a.x1 << "/" << r.y1-a.y1 << " - dxy2="  << r.x2-a.x2 << "/" << r.y2-a.y2 << " - dxy3="  << r.x3-a.x3 << "/" << r.y3-a.y3;
+                bool found;
+                found= false;
+                foreach (MatchedPair pair, _matchedPairs) {
+                    if ( (pair.xr==r.x1)&&(pair.yr==r.y1) ) found=true;
+                }
+                if (!found) _matchedPairs.append({r.x1,r.y1,a.x1,a.y1,r.x1-a.x1,r.y1-a.y1});
+                found= false;
+                foreach (MatchedPair pair, _matchedPairs) {
+                    if ( (pair.xr==r.x2)&&(pair.yr==r.y2) ) found=true;
+                }
+                if (!found) _matchedPairs.append({r.x2,r.y2,a.x2,a.y2,r.x2-a.x2,r.y2-a.y2});
+                found= false;
+                foreach (MatchedPair pair, _matchedPairs) {
+                    if ( (pair.xr==r.x3)&&(pair.yr==r.y3) ) found=true;
+                }
+                if (!found) _matchedPairs.append({r.x3,r.y3,a.x3,a.y3,r.x3-a.x3,r.y3-a.y3});
+            }
+        }
+    }
+    foreach (MatchedPair pair, _matchedPairs) {
+            BOOST_LOG_TRIVIAL(debug) << "Matched pair =  " << pair.dx << "-" << pair.dy;
+    }
+
 }
