@@ -51,7 +51,15 @@ class MODULE_INIT GuiderModule : public Basemodule
         QPointer<Image> image;
 
         int    _exposure = 2;
-        int    _pulse = 1000;
+        int    _pulseN = 200;
+        int    _pulseS = 200;
+        int    _pulseE = 200;
+        int    _pulseW = 200;
+        int    _calState =0;
+        int    _calStep=0;
+        int    _calSteps=3;
+        bool   _pulseRAfinished= true;
+        bool   _pulseDECfinished = true;
 
         QString _camera  = "Guide Simulator";
         QString _mount  = "Telescope Simulator";
@@ -65,8 +73,7 @@ class MODULE_INIT GuiderModule : public Basemodule
         void SMRequestExposure();
         void SMRequestPulses();
         void SMAbort();
-
-
+        double square(double value){ return value*value;}
 };
 
 extern "C" MODULE_INIT GuiderModule *initialize(QString name,QString label);

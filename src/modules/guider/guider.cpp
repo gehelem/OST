@@ -98,8 +98,29 @@ void GuiderModule::newNumber(INumberVectorProperty *nvp)
 
        )
     {
+        _pulseDECfinished=true;
+    }
+
+    if (
+            (QString(nvp->device) == _mount) &&
+            (QString(nvp->name)   == "TELESCOPE_TIMED_GUIDE_WE") &&
+            (nvp->s   == IPS_IDLE)
+
+       )
+    {
+        _pulseRAfinished=true;
+    }
+
+    if (
+            (QString(nvp->device) == _mount) &&
+            ( (QString(nvp->name)   == "TELESCOPE_TIMED_GUIDE_WE") ||
+              (QString(nvp->name)   == "TELESCOPE_TIMED_GUIDE_NS") ) &&
+            (nvp->s   == IPS_IDLE)
+
+       )
+    {
         if (_machine.isRunning()) {
-            emit PulsesDone();
+            if (_pulseRAfinished && _pulseDECfinished) emit PulsesDone();
         }
     }
 
@@ -177,6 +198,13 @@ void GuiderModule::startCalibration()
     RequestPulses->     addTransition(this,&GuiderModule::RequestPulsesDone ,   WaitPulses);
     WaitPulses->        addTransition(this,&GuiderModule::PulsesDone ,          RequestExposure);
 
+    _calState=0;
+    _calStep=0;
+    _calSteps=3;
+    _pulseN = 200;
+    _pulseS = 200;
+    _pulseE = 200;
+    _pulseW = 200;
 
 
     _machine.start();
@@ -208,11 +236,43 @@ void GuiderModule::SMRequestExposure()
 void GuiderModule::SMRequestPulses()
 {
     sendMessage("SMRequestPulses");
-    if (!sendModNewNumber(_mount,"TELESCOPE_TIMED_GUIDE_NS","TIMED_GUIDE_N", _pulse))
-    {
-        emit abort();
-        return;
+
+    if (_calState==0) {
+        BOOST_LOG_TRIVIAL(debug) << "********* Pulse  N";
+        _pulseDECfinished = false;
+        if (!sendModNewNumber(_mount,"TELESCOPE_TIMED_GUIDE_NS","TIMED_GUIDE_N", _pulseN))
+        {        emit abort();        return;    }
     }
+
+    if (_calState==1) {
+        _pulseDECfinished = false;
+        BOOST_LOG_TRIVIAL(debug) << "********* Pulse  S";
+        if (!sendModNewNumber(_mount,"TELESCOPE_TIMED_GUIDE_NS","TIMED_GUIDE_S", _pulseS))
+        {        emit abort();        return;    }
+    }
+
+    if (_calState==2) {
+        _pulseRAfinished = false;
+        BOOST_LOG_TRIVIAL(debug) << "********* Pulse  E";
+        if (!sendModNewNumber(_mount,"TELESCOPE_TIMED_GUIDE_WE","TIMED_GUIDE_E", _pulseE))
+        {        emit abort();        return;    }
+    }
+
+    if (_calState==3) {
+        _pulseRAfinished = false;
+        BOOST_LOG_TRIVIAL(debug) << "********* Pulse  W";
+        if (!sendModNewNumber(_mount,"TELESCOPE_TIMED_GUIDE_WE","TIMED_GUIDE_W", _pulseW))
+        {        emit abort();        return;    }
+    }
+
+    _calStep++;
+    if (_calStep > _calSteps) {
+        _calStep=0;
+        _calState++;
+        if (_calState > 3)_calState=0;
+    }
+    BOOST_LOG_TRIVIAL(debug) << "********* step " << _calStep << " - next State " << _calState;
+
     emit RequestPulsesDone();
 }
 
@@ -229,9 +289,27 @@ void GuiderModule::OnSucessSEP()
     sendMessage("SEP finished");
     disconnect(&_solver,&Solver::successSEP,this,&GuiderModule::OnSucessSEP);
     BOOST_LOG_TRIVIAL(debug) << "********* SEP Finished";
-    foreach (FITSImage::Star star, _solver.stars) {
-        BOOST_LOG_TRIVIAL(debug) << "Star found " << " - " << star.x << " - " << star.y << " - " << star.mag << " - " << star.HFR  << " - " << _solver.stars.size();
+
+    int nb = _solver.stars.size();
+    if (nb > 7) nb = 7;
+
+    for (int i=0;i<nb;i++)
+    {
+        for (int j=i+1;j<nb;j++)
+        {
+            for (int k=j+1;k<nb;k++)
+            {
+                double dij,dik,djk,p,s;
+                dij=sqrt(square(_solver.stars[i].x-_solver.stars[j].x)+square(_solver.stars[i].y-_solver.stars[j].y));
+                dik=sqrt(square(_solver.stars[i].x-_solver.stars[k].x)+square(_solver.stars[i].y-_solver.stars[k].y));
+                djk=sqrt(square(_solver.stars[j].x-_solver.stars[k].x)+square(_solver.stars[j].y-_solver.stars[k].y));
+                p=dij+dik+djk;
+                s=sqrt(p*(p-dij)*(p-dik)*(p-djk));
+                BOOST_LOG_TRIVIAL(debug) << "Trig " << " - " << i << " - " << j << " - " << k << " - p=  " << p << " - s=" << s;
+            }
+        }
     }
+
     emit FindStarsDone();
 }
 
