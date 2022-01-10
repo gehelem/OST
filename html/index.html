@@ -277,7 +277,7 @@ function buildproperty(m,d,g,p) {
             +"<canvas id=G2D"+nnp+" width=30 height=10></canvas>"            
             +"</div>";
             $("#U"+nn).append(div);
-            creategraph2D("#G2D"+nnp,"Pos/HFR");
+            creategraph2D("#G2D"+nnp,"---/---");
             var values=p.values;
             if (values.size==0) {
                 cleargraph2D("#G2D"+nnp);
@@ -453,7 +453,7 @@ function creategraph2D(idgraph,graphlabel) {
                 data: {
                         datasets: [{
                             label: graphlabel,
-                            type: "line",
+                            type: "scatter",
                             border:  "#f38b4a",
                             borderColor: "#f38b4a",
                             //backgroundColor:  "#f38b4a",
