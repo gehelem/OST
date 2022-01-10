@@ -72,6 +72,8 @@ class MODULE_INIT GuiderModule : public Basemodule
         NumberProperty* _parameters;
         NumberProperty* _values;
         ImageProperty*  _img;
+        GridProperty*   _grid;
+
 
         //std::unique_ptr<Image> image =nullptr;
         QPointer<Image> image;

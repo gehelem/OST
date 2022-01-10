@@ -35,6 +35,10 @@ GuiderModule::GuiderModule(QString name,QString label)
     emit propertyCreated(_img,&_modulename);
     _propertyStore.add(_img);
 
+    _grid = new GridProperty(_modulename,"Control","root","grid","Grid property label",0,0,"PXY","Set","DX","DY","");
+    emit propertyCreated(_grid,&_modulename);
+    _propertyStore.add(_grid);
+
 
 }
 
@@ -169,6 +173,11 @@ void GuiderModule::newSwitch(ISwitchVectorProperty *svp)
 void GuiderModule::startCalibration()
 {
     BOOST_LOG_TRIVIAL(debug) << "Guider module - Start calibration ";
+
+    _grid->clear();
+    _propertyStore.update(_grid);
+    emit propertyUpdated(_grid,&_modulename);
+
     auto *calibrate = new QState();
     auto *Abort       = new QState();
 
@@ -379,6 +388,9 @@ void GuiderModule::matchTrig(QVector<Trig> ref,QVector<Trig> act)
         foreach (Trig a, act) {
             if (
                     (r.s< a.s*1.001 ) && (r.s> a.s*0.999 ) && (r.p< a.p*1.001 ) && (r.p> a.p*0.999 )
+                 && (r.d12 < a.d12*1.001) && (r.d12 > a.d12*0.999)
+                 && (r.d13 < a.d13*1.001) && (r.d13 > a.d13*0.999)
+                 && (r.d23 < a.d23*1.001) && (r.d23 > a.d23*0.999)
                )
             {
                 //BOOST_LOG_TRIVIAL(debug) << "Matching " << r.ratio <<  " / " << a.ratio << " xr-yr=" << r.x1 << "-" << r.y1 << " xa-ya=" << a.x1 << "-" << a.y1 << " / dx1 =" << r.x1-a.x1 << " / dy1 =" << r.y1-a.y1 << " / dx2 =" << r.x2-a.x2 << " / dy2 =" << r.y2-a.y2 << " / dx3 =" << r.x3-a.x3 << " / dy3 =" << r.y3-a.y3;
@@ -403,6 +415,16 @@ void GuiderModule::matchTrig(QVector<Trig> ref,QVector<Trig> act)
             }
         }
     }
+    double avdx=0,avdy=0;
+    for (int i=0 ; i <_matchedPairs.size();i++ ) {
+        avdx=avdx+_matchedPairs[i].dx;
+        avdy=avdy+_matchedPairs[i].dy;
+    }
+
+    _grid->append(avdx,avdy);
+    _propertyStore.update(_grid);
+    emit propertyAppended(_grid,&_modulename,0,avdx,avdy,0);
+
     foreach (MatchedPair pair, _matchedPairs) {
             BOOST_LOG_TRIVIAL(debug) << "Matched pair =  " << pair.dx << "-" << pair.dy;
     }
