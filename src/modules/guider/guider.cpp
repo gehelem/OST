@@ -139,6 +139,7 @@ void GuiderModule::newBLOB(IBLOB *bp)
             (QString(bp->bvp->device) == _camera)
        )
     {
+        delete image;
         image = new Image();
         image->LoadFromBlob(bp);
         image->CalcStats();
