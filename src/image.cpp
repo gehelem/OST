@@ -36,7 +36,7 @@ Image::~Image() {
     ResetData();
 }
 void Image::ResetData(void) {
-
+    delete[] m_ImageBuffer;
 }
 bool Image::saveStretchedToJpeg(QString filename,int compress)
 {
@@ -167,10 +167,7 @@ bool Image::LoadFromBlob(IBLOB *bp)
     stats.height              = static_cast<uint16_t>(naxes[1]);
     stats.channels            = static_cast<uint8_t>(naxes[2]);
     stats.samples_per_channel = stats.width * stats.height;
-
     delete[] m_ImageBuffer;
-    m_ImageBuffer = nullptr;
-
     m_ImageBufferSize = stats.samples_per_channel * stats.channels * static_cast<uint16_t>(stats.bytesPerPixel);
     m_ImageBuffer = new uint8_t[m_ImageBufferSize];
 /*    IDLog("--------------------------\n");
