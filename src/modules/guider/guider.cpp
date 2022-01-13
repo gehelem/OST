@@ -395,6 +395,12 @@ void GuiderModule::SMComputeCal()
     } else {
       BOOST_LOG_TRIVIAL(debug) << "houston, we have a problem";
     }
+    if (_calState==0) {
+        BOOST_LOG_TRIVIAL(debug) << "RA drif " << sqrt(square(_avdx)+square(_avdy)) << " drift / ms = " << 1000*sqrt(square(_avdx)+square(_avdy))/_pulseWTot;
+    }
+    if (_calState==2) {
+        BOOST_LOG_TRIVIAL(debug) << "DEC drif " << sqrt(square(_avdx)+square(_avdy)) << " drift / ms = " << 1000*sqrt(square(_avdx)+square(_avdy))/_pulseNTot;
+    }
     _pulseN=0;
     _pulseS=0;
     _pulseE=0;
