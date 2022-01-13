@@ -88,11 +88,17 @@ class MODULE_INIT GuiderModule : public Basemodule
         int    _pulseS = 0;
         int    _pulseE = 0;
         int    _pulseW = 0;
+        int    _pulseNTot = 0;
+        int    _pulseSTot = 0;
+        int    _pulseETot = 0;
+        int    _pulseWTot = 0;
         int    _calState =0;
         int    _calStep=0;
-        int    _calSteps=10;
+        int    _calSteps=3;
         bool   _pulseRAfinished= true;
         bool   _pulseDECfinished = true;
+        double _avdx=0;
+        double _avdy=0;
 
         QString _camera  = "Guide Simulator";
         QString _mount  = "Telescope Simulator";
@@ -100,6 +106,13 @@ class MODULE_INIT GuiderModule : public Basemodule
         QVector<Trig> _trigRef;
         QVector<Trig> _trigCurrent;
         QVector<MatchedPair> _matchedPairs;
+
+        std::vector<double> _dxvector;
+        std::vector<double> _dyvector;
+        std::vector<double> _coefficients;
+        std::vector<double> _dRAvector;
+        std::vector<double> _dDEvector;
+
 
         void startCalibration();
         void matchTrig(QVector<Trig> ref,QVector<Trig> act);

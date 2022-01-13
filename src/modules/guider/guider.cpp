@@ -1,5 +1,6 @@
 #include "guider.h"
-
+#include "polynomialfit.h"
+#define PI 3.14159265
 
 GuiderModule *initialize(QString name,QString label)
 {
@@ -265,6 +266,9 @@ void GuiderModule::startCalibration()
     _pulseW = _pulse;
     _trigRef.clear();
     _trigCurrent.clear();
+    _dxvector.clear();
+    _dyvector.clear();
+    _coefficients.clear();
 
 
     _machine.start();
@@ -297,12 +301,122 @@ void GuiderModule::SMRequestExposure()
 void GuiderModule::SMComputeRef()
 {
     BOOST_LOG_TRIVIAL(debug) << "SMComputeRef";
+    int nb = _solver.stars.size();
+    if (nb > 10) nb = 10;
+    _trigCurrent.clear();
+    _trigRef.clear();
+        for (int i=0;i<nb;i++)
+        {
+            for (int j=i+1;j<nb;j++)
+            {
+                for (int k=j+1;k<nb;k++)
+                {
+                    double dij,dik,djk,p,s;
+                    dij=sqrt(square(_solver.stars[i].x-_solver.stars[j].x)+square(_solver.stars[i].y-_solver.stars[j].y));
+                    dik=sqrt(square(_solver.stars[i].x-_solver.stars[k].x)+square(_solver.stars[i].y-_solver.stars[k].y));
+                    djk=sqrt(square(_solver.stars[j].x-_solver.stars[k].x)+square(_solver.stars[j].y-_solver.stars[k].y));
+                    p=dij+dik+djk;
+                    s=sqrt(p*(p-dij)*(p-dik)*(p-djk));
+                    //BOOST_LOG_TRIVIAL(debug) << "Trig REF " << " - " << i << " - " << j << " - " << k << " - p=  " << p << " - s=" << s << " - s/p=" << s/p;
+                    _trigRef.append({
+                                     _solver.stars[i].x,
+                                     _solver.stars[i].y,
+                                     _solver.stars[j].x,
+                                     _solver.stars[j].y,
+                                     _solver.stars[k].x,
+                                     _solver.stars[k].y,
+                                     dij,dik,djk,
+                                     p,s,s/p
+                                    });
+                }
+            }
+        }
+
+    _calState =0;
+    _calStep = 0;
+    _pulseW = _pulse;
+    _pulseE = 0;
+    _pulseN = 0;
+    _pulseS = 0;
+    _pulseWTot = _pulse;
+    _pulseETot = 0;
+    _pulseNTot = 0;
+    _pulseSTot = 0;
 
     emit ComputeRefDone();
 }
 void GuiderModule::SMComputeCal()
 {
     BOOST_LOG_TRIVIAL(debug) << "SMComputeCal";
+    int nb = _solver.stars.size();
+    if (nb > 10) nb = 10;
+    _trigCurrent.clear();
+
+    for (int i=0;i<nb;i++)
+    {
+        for (int j=i+1;j<nb;j++)
+        {
+            for (int k=j+1;k<nb;k++)
+            {
+                double dij,dik,djk,p,s;
+                dij=sqrt(square(_solver.stars[i].x-_solver.stars[j].x)+square(_solver.stars[i].y-_solver.stars[j].y));
+                dik=sqrt(square(_solver.stars[i].x-_solver.stars[k].x)+square(_solver.stars[i].y-_solver.stars[k].y));
+                djk=sqrt(square(_solver.stars[j].x-_solver.stars[k].x)+square(_solver.stars[j].y-_solver.stars[k].y));
+                p=dij+dik+djk;
+                s=sqrt(p*(p-dij)*(p-dik)*(p-djk));
+                //BOOST_LOG_TRIVIAL(debug) << "Trig CURRENT" << " - " << i << " - " << j << " - " << k << " - p=  " << p << " - s=" << s << " - s/p=" << s/p;
+                _trigCurrent.append({
+                                 _solver.stars[i].x,
+                                 _solver.stars[i].y,
+                                 _solver.stars[j].x,
+                                 _solver.stars[j].y,
+                                 _solver.stars[k].x,
+                                 _solver.stars[k].y,
+                                 dij,dik,djk,
+                                 p,s,s/p
+                                });
+
+            }
+        }
+
+    }
+    if (_trigCurrent.size()>0) {
+        matchTrig(_trigRef,_trigCurrent);
+        _dxvector.push_back(_avdx);
+        _dyvector.push_back(_avdy);
+        if (_dxvector.size() > 1)
+        {
+            double coeff[2];
+            polynomialfit(_dxvector.size(), 2, _dxvector.data(), _dyvector.data(), coeff);
+            BOOST_LOG_TRIVIAL(debug) << "Coeffs " << coeff[0] << "-" <<  coeff[1] << " CCD Orientation = " << atan(coeff[1])*180/PI;
+        }
+
+
+    } else {
+      BOOST_LOG_TRIVIAL(debug) << "houston, we have a problem";
+    }
+    _pulseN=0;
+    _pulseS=0;
+    _pulseE=0;
+    _pulseW=0;
+    _calStep++;
+    if (_calStep >= _calSteps) {
+        _calStep=0;
+        _calState++;
+        if (_calState==2) {
+            _dxvector.clear();
+            _dyvector.clear();
+            _coefficients.clear();
+        }
+        if (_calState>=4) {
+            emit StartGuiding();
+            return;
+        }
+    }
+    if (_calState==0) {_pulseW=_pulse;_pulseWTot=_pulseWTot+_pulse;}
+    if (_calState==1) {_pulseE=_pulse;_pulseETot=_pulseETot+_pulse;}
+    if (_calState==2) {_pulseN=_pulse;_pulseNTot=_pulseNTot+_pulse;}
+    if (_calState==3) {_pulseS=_pulse;_pulseSTot=_pulseSTot+_pulse;}
 
     emit ComputeCalDone();
 }
@@ -319,7 +433,7 @@ void GuiderModule::SMRequestPulses()
     sendMessage("SMRequestPulses");
 
     if (_pulseN>0) {
-        BOOST_LOG_TRIVIAL(debug) << "********* Pulse  N";
+        BOOST_LOG_TRIVIAL(debug) << "********* Pulse  N " << _pulseN;
         _pulseDECfinished = false;
         if (!sendModNewNumber(_mount,"TELESCOPE_TIMED_GUIDE_NS","TIMED_GUIDE_N", _pulseN))
         {        emit abort();        return;    }
@@ -327,21 +441,21 @@ void GuiderModule::SMRequestPulses()
 
     if (_pulseS>0) {
         _pulseDECfinished = false;
-        BOOST_LOG_TRIVIAL(debug) << "********* Pulse  S";
+        BOOST_LOG_TRIVIAL(debug) << "********* Pulse  S " << _pulseS;
         if (!sendModNewNumber(_mount,"TELESCOPE_TIMED_GUIDE_NS","TIMED_GUIDE_S", _pulseS))
         {        emit abort();        return;    }
     }
 
     if (_pulseE>0) {
         _pulseRAfinished = false;
-        BOOST_LOG_TRIVIAL(debug) << "********* Pulse  E";
+        BOOST_LOG_TRIVIAL(debug) << "********* Pulse  E " << _pulseE;
         if (!sendModNewNumber(_mount,"TELESCOPE_TIMED_GUIDE_WE","TIMED_GUIDE_E", _pulseE))
         {        emit abort();        return;    }
     }
 
     if (_pulseW>0) {
         _pulseRAfinished = false;
-        BOOST_LOG_TRIVIAL(debug) << "********* Pulse  W";
+        BOOST_LOG_TRIVIAL(debug) << "********* Pulse  W " << _pulseW;
         if (!sendModNewNumber(_mount,"TELESCOPE_TIMED_GUIDE_WE","TIMED_GUIDE_W", _pulseW))
         {        emit abort();        return;    }
     }
@@ -367,74 +481,6 @@ void GuiderModule::OnSucessSEP()
     sendMessage("SEP finished");
     disconnect(&_solver,&Solver::successSEP,this,&GuiderModule::OnSucessSEP);
     BOOST_LOG_TRIVIAL(debug) << "********* SEP Finished";
-
-    int nb = _solver.stars.size();
-    if (nb > 10) nb = 10;
-    _trigCurrent.clear();
-    _matchedPairs.clear();
-    if (_trigRef.size()==0) {
-        for (int i=0;i<nb;i++)
-        {
-            for (int j=i+1;j<nb;j++)
-            {
-                for (int k=j+1;k<nb;k++)
-                {
-                    double dij,dik,djk,p,s;
-                    dij=sqrt(square(_solver.stars[i].x-_solver.stars[j].x)+square(_solver.stars[i].y-_solver.stars[j].y));
-                    dik=sqrt(square(_solver.stars[i].x-_solver.stars[k].x)+square(_solver.stars[i].y-_solver.stars[k].y));
-                    djk=sqrt(square(_solver.stars[j].x-_solver.stars[k].x)+square(_solver.stars[j].y-_solver.stars[k].y));
-                    p=dij+dik+djk;
-                    s=sqrt(p*(p-dij)*(p-dik)*(p-djk));
-                    //BOOST_LOG_TRIVIAL(debug) << "Trig REF " << " - " << i << " - " << j << " - " << k << " - p=  " << p << " - s=" << s << " - s/p=" << s/p;
-                    _trigRef.append({
-                                     _solver.stars[i].x,
-                                     _solver.stars[i].y,
-                                     _solver.stars[j].x,
-                                     _solver.stars[j].y,
-                                     _solver.stars[k].x,
-                                     _solver.stars[k].y,
-                                     dij,dik,djk,
-                                     p,s,s/p
-                                    });
-
-                }
-            }
-
-        }
-      } else {
-            for (int i=0;i<nb;i++)
-            {
-                for (int j=i+1;j<nb;j++)
-                {
-                    for (int k=j+1;k<nb;k++)
-                    {
-                        double dij,dik,djk,p,s;
-                        dij=sqrt(square(_solver.stars[i].x-_solver.stars[j].x)+square(_solver.stars[i].y-_solver.stars[j].y));
-                        dik=sqrt(square(_solver.stars[i].x-_solver.stars[k].x)+square(_solver.stars[i].y-_solver.stars[k].y));
-                        djk=sqrt(square(_solver.stars[j].x-_solver.stars[k].x)+square(_solver.stars[j].y-_solver.stars[k].y));
-                        p=dij+dik+djk;
-                        s=sqrt(p*(p-dij)*(p-dik)*(p-djk));
-                        //BOOST_LOG_TRIVIAL(debug) << "Trig CURRENT" << " - " << i << " - " << j << " - " << k << " - p=  " << p << " - s=" << s << " - s/p=" << s/p;
-                        _trigCurrent.append({
-                                         _solver.stars[i].x,
-                                         _solver.stars[i].y,
-                                         _solver.stars[j].x,
-                                         _solver.stars[j].y,
-                                         _solver.stars[k].x,
-                                         _solver.stars[k].y,
-                                         dij,dik,djk,
-                                         p,s,s/p
-                                        });
-
-                    }
-                }
-
-            }
-    }
-
-    if (_trigCurrent.size()>0) {
-        matchTrig(_trigRef,_trigCurrent);
-    }
     emit FindStarsDone();
 }
 
@@ -447,6 +493,8 @@ void GuiderModule::SMAbort()
 
 void GuiderModule::matchTrig(QVector<Trig> ref,QVector<Trig> act)
 {
+    _matchedPairs.clear();
+
     foreach (Trig r, ref) {
         foreach (Trig a, act) {
             if (
@@ -478,18 +526,22 @@ void GuiderModule::matchTrig(QVector<Trig> ref,QVector<Trig> act)
             }
         }
     }
-    double avdx=0,avdy=0;
+    _avdx=0;
+    _avdy=0;
     for (int i=0 ; i <_matchedPairs.size();i++ ) {
-        avdx=avdx+_matchedPairs[i].dx;
-        avdy=avdy+_matchedPairs[i].dy;
+        _avdx=_avdx+_matchedPairs[i].dx;
+        _avdy=_avdy+_matchedPairs[i].dy;
     }
+    _avdx=_avdx/_matchedPairs.size();
+    _avdy=_avdy/_matchedPairs.size();
 
-    _grid->append(avdx,avdy);
+    _grid->append(_avdx,_avdy);
     _propertyStore.update(_grid);
-    emit propertyAppended(_grid,&_modulename,0,avdx,avdy,0);
+    emit propertyAppended(_grid,&_modulename,0,_avdx,_avdy,0);
+    BOOST_LOG_TRIVIAL(debug) << "AVDX AVDY =  " << _avdx << "-" << _avdy;
 
-    foreach (MatchedPair pair, _matchedPairs) {
+    /*foreach (MatchedPair pair, _matchedPairs) {
             BOOST_LOG_TRIVIAL(debug) << "Matched pair =  " << pair.dx << "-" << pair.dy;
-    }
+    }*/
 
 }
