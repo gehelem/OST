@@ -55,6 +55,10 @@ class MODULE_INIT GuiderModule : public Basemodule
         void FindStarsDone();
         void RequestPulsesDone();
         void PulsesDone();
+        void ComputeRefDone();
+        void ComputeCalDone();
+        void ComputeGuideDone();
+        void StartGuiding();
         void abort();
 
 
@@ -79,11 +83,11 @@ class MODULE_INIT GuiderModule : public Basemodule
         QPointer<Image> image;
 
         int    _exposure = 2;
-        int    _pulse  = 200;
-        int    _pulseN = 200;
-        int    _pulseS = 200;
-        int    _pulseE = 200;
-        int    _pulseW = 200;
+        int    _pulse  = 1000;
+        int    _pulseN = 0;
+        int    _pulseS = 0;
+        int    _pulseE = 0;
+        int    _pulseW = 0;
         int    _calState =0;
         int    _calStep=0;
         int    _calSteps=10;
@@ -99,13 +103,16 @@ class MODULE_INIT GuiderModule : public Basemodule
 
         void startCalibration();
         void matchTrig(QVector<Trig> ref,QVector<Trig> act);
-
-        void SMFindStars();
-        void SMRequestFrameReset();
-        void SMRequestExposure();
-        void SMRequestPulses();
-        void SMAbort();
         double square(double value){ return value*value;}
+
+        void SMRequestExposure();
+        void SMComputeRef();
+        void SMRequestPulses();
+        void SMFindStars();
+        void SMComputeCal();
+        void SMComputeGuide();
+        void SMRequestFrameReset();
+        void SMAbort();
 };
 
 extern "C" MODULE_INIT GuiderModule *initialize(QString name,QString label);

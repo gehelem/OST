@@ -151,6 +151,7 @@ void GuiderModule::newBLOB(IBLOB *bp)
         emit propertyUpdated(_img,&_modulename);
         _propertyStore.add(_img);
         if (_machine.isRunning()) {
+            BOOST_LOG_TRIVIAL(debug) << "Emit Exposure done";
             emit ExposureDone();
         }
     }
@@ -179,37 +180,81 @@ void GuiderModule::startCalibration()
     _propertyStore.update(_grid);
     emit propertyUpdated(_grid,&_modulename);
 
+    auto *init  = new QState();
     auto *calibrate = new QState();
-    auto *Abort       = new QState();
+    auto *guide = new QState();
+    auto *abort = new QState();
 
-    auto *RequestFrameReset = new QState(calibrate);
-    auto *WaitFrameReset    = new QState(calibrate);
-    auto *RequestExposure   = new QState(calibrate);
-    auto *WaitExposure      = new QState(calibrate);
-    auto *FindStars         = new QState(calibrate);
-    auto *RequestPulses     = new QState(calibrate);
-    auto *WaitPulses        = new QState(calibrate);
+    auto *RequestFrameReset    = new QState(init);
+    auto *WaitFrameReset       = new QState(init);
+    auto *RequestFirstExposure = new QState(init);
+    auto *WaitFirstExposure    = new QState(init);
+    auto *FindStarsRef         = new QState(init);
+    auto *ComputeRef           = new QState(init);
 
-    calibrate->setInitialState(RequestFrameReset);
+    auto *RequestCalPulses     = new QState(calibrate);
+    auto *WaitCalPulses        = new QState(calibrate);
+    auto *RequestCalExposure   = new QState(calibrate);
+    auto *WaitCalExposure      = new QState(calibrate);
+    auto *FindStarsCal         = new QState(calibrate);
+    auto *ComputeCal           = new QState(calibrate);
 
+    auto *RequestGuidePulses     = new QState(guide);
+    auto *WaitGuidePulses        = new QState(guide);
+    auto *RequestGuideExposure   = new QState(guide);
+    auto *WaitGuideExposure      = new QState(guide);
+    auto *FindStarsGuide         = new QState(guide);
+    auto *ComputeGuide           = new QState(guide);
+
+    init->setInitialState(RequestFrameReset);
+    calibrate->setInitialState(RequestCalPulses);
+    guide->setInitialState(RequestGuidePulses);
+
+    _machine.addState(init);
     _machine.addState(calibrate);
-    _machine.addState(Abort);
-    _machine.setInitialState(calibrate);
+    _machine.addState(guide);
+    _machine.addState(abort);
+    _machine.setInitialState(init);
 
-    connect(RequestFrameReset,  &QState::entered, this, &GuiderModule::SMRequestFrameReset);
-    connect(RequestExposure,    &QState::entered, this, &GuiderModule::SMRequestExposure);
-    connect(RequestPulses,      &QState::entered, this, &GuiderModule::SMRequestPulses);
-    connect(FindStars,          &QState::entered, this, &GuiderModule::SMFindStars);
-    connect(Abort,              &QState::entered, this, &GuiderModule::SMAbort);
+    connect(RequestFrameReset,   &QState::entered, this, &GuiderModule::SMRequestFrameReset);
+    connect(RequestFirstExposure,&QState::entered, this, &GuiderModule::SMRequestExposure);
+    connect(FindStarsRef        ,&QState::entered, this, &GuiderModule::SMFindStars);
+    connect(ComputeRef,          &QState::entered, this, &GuiderModule::SMComputeRef);
+    connect(RequestCalExposure,  &QState::entered, this, &GuiderModule::SMRequestExposure);
+    connect(RequestCalPulses,    &QState::entered, this, &GuiderModule::SMRequestPulses);
+    connect(FindStarsCal,        &QState::entered, this, &GuiderModule::SMFindStars);
+    connect(ComputeCal,          &QState::entered, this, &GuiderModule::SMComputeCal);
+    connect(RequestGuideExposure,&QState::entered, this, &GuiderModule::SMRequestExposure);
+    connect(RequestGuidePulses,  &QState::entered, this, &GuiderModule::SMRequestPulses);
+    connect(FindStarsGuide,      &QState::entered, this, &GuiderModule::SMFindStars);
+    connect(ComputeGuide,        &QState::entered, this, &GuiderModule::SMComputeGuide);
+    connect(abort,               &QState::entered, this, &GuiderModule::SMAbort);
 
-    calibrate->         addTransition(this,&GuiderModule::abort,                Abort);
-    RequestFrameReset-> addTransition(this,&GuiderModule::RequestFrameResetDone,WaitFrameReset);
-    WaitFrameReset->    addTransition(this,&GuiderModule::FrameResetDone       ,RequestExposure);
-    RequestExposure->   addTransition(this,&GuiderModule::RequestExposureDone , WaitExposure);
-    WaitExposure->      addTransition(this,&GuiderModule::ExposureDone ,        FindStars);
-    FindStars->         addTransition(this,&GuiderModule::FindStarsDone,        RequestPulses);
-    RequestPulses->     addTransition(this,&GuiderModule::RequestPulsesDone ,   WaitPulses);
-    WaitPulses->        addTransition(this,&GuiderModule::PulsesDone ,          RequestExposure);
+    init->     addTransition(this,&GuiderModule::abort,                abort);
+    calibrate->addTransition(this,&GuiderModule::abort,                abort);
+    guide->    addTransition(this,&GuiderModule::abort,                abort);
+
+    RequestFrameReset->   addTransition(this,&GuiderModule::RequestFrameResetDone,WaitFrameReset);
+    WaitFrameReset->      addTransition(this,&GuiderModule::FrameResetDone       ,RequestFirstExposure);
+    RequestFirstExposure->addTransition(this,&GuiderModule::RequestExposureDone  ,WaitFirstExposure);
+    WaitFirstExposure->   addTransition(this,&GuiderModule::ExposureDone ,        FindStarsRef);
+    FindStarsRef->        addTransition(this,&GuiderModule::FindStarsDone ,       ComputeRef);
+    ComputeRef->          addTransition(this,&GuiderModule::ComputeRefDone ,      calibrate);
+
+    RequestCalPulses     ->addTransition(this,&GuiderModule::RequestPulsesDone,WaitCalPulses);
+    WaitCalPulses        ->addTransition(this,&GuiderModule::PulsesDone,RequestCalExposure);
+    RequestCalExposure   ->addTransition(this,&GuiderModule::RequestExposureDone,WaitCalExposure);
+    WaitCalExposure      ->addTransition(this,&GuiderModule::ExposureDone,FindStarsCal);
+    FindStarsCal         ->addTransition(this,&GuiderModule::FindStarsDone,ComputeCal);
+    ComputeCal           ->addTransition(this,&GuiderModule::ComputeCalDone,RequestCalPulses);
+    ComputeCal           ->addTransition(this,&GuiderModule::StartGuiding,guide);
+
+    RequestGuidePulses     ->addTransition(this,&GuiderModule::RequestPulsesDone,WaitGuidePulses);
+    WaitGuidePulses        ->addTransition(this,&GuiderModule::PulsesDone,RequestGuideExposure);
+    RequestGuideExposure   ->addTransition(this,&GuiderModule::RequestExposureDone,WaitGuideExposure);
+    WaitGuideExposure      ->addTransition(this,&GuiderModule::ExposureDone,FindStarsGuide);
+    FindStarsGuide         ->addTransition(this,&GuiderModule::FindStarsDone,ComputeGuide);
+    ComputeGuide           ->addTransition(this,&GuiderModule::ComputeGuideDone,RequestGuidePulses);
 
     _calState=0;
     _calStep=0;
@@ -227,6 +272,7 @@ void GuiderModule::startCalibration()
 }
 void GuiderModule::SMRequestFrameReset()
 {
+    BOOST_LOG_TRIVIAL(debug) << "SMRequestFrameReset";
     sendMessage("SMRequestFrameReset");
     if (!frameReset(_camera))
     {
@@ -239,6 +285,7 @@ void GuiderModule::SMRequestFrameReset()
 
 void GuiderModule::SMRequestExposure()
 {
+    BOOST_LOG_TRIVIAL(debug) << "SMRequestExposure";
     sendMessage("SMRequestExposure");
     if (!sendModNewNumber(_camera,"CCD_EXPOSURE","CCD_EXPOSURE_VALUE", _exposure))
     {
@@ -247,52 +294,65 @@ void GuiderModule::SMRequestExposure()
     }
     emit RequestExposureDone();
 }
+void GuiderModule::SMComputeRef()
+{
+    BOOST_LOG_TRIVIAL(debug) << "SMComputeRef";
 
+    emit ComputeRefDone();
+}
+void GuiderModule::SMComputeCal()
+{
+    BOOST_LOG_TRIVIAL(debug) << "SMComputeCal";
+
+    emit ComputeCalDone();
+}
+void GuiderModule::SMComputeGuide()
+{
+    BOOST_LOG_TRIVIAL(debug) << "SMComputeGuide";
+
+    emit ComputeGuideDone();
+}
 void GuiderModule::SMRequestPulses()
 {
+    BOOST_LOG_TRIVIAL(debug) << "SMRequestPulses";
+
     sendMessage("SMRequestPulses");
 
-    if (_calState==0) {
+    if (_pulseN>0) {
         BOOST_LOG_TRIVIAL(debug) << "********* Pulse  N";
         _pulseDECfinished = false;
         if (!sendModNewNumber(_mount,"TELESCOPE_TIMED_GUIDE_NS","TIMED_GUIDE_N", _pulseN))
         {        emit abort();        return;    }
     }
 
-    if (_calState==1) {
+    if (_pulseS>0) {
         _pulseDECfinished = false;
         BOOST_LOG_TRIVIAL(debug) << "********* Pulse  S";
         if (!sendModNewNumber(_mount,"TELESCOPE_TIMED_GUIDE_NS","TIMED_GUIDE_S", _pulseS))
         {        emit abort();        return;    }
     }
 
-    if (_calState==2) {
+    if (_pulseE>0) {
         _pulseRAfinished = false;
         BOOST_LOG_TRIVIAL(debug) << "********* Pulse  E";
         if (!sendModNewNumber(_mount,"TELESCOPE_TIMED_GUIDE_WE","TIMED_GUIDE_E", _pulseE))
         {        emit abort();        return;    }
     }
 
-    if (_calState==3) {
+    if (_pulseW>0) {
         _pulseRAfinished = false;
         BOOST_LOG_TRIVIAL(debug) << "********* Pulse  W";
         if (!sendModNewNumber(_mount,"TELESCOPE_TIMED_GUIDE_WE","TIMED_GUIDE_W", _pulseW))
         {        emit abort();        return;    }
     }
 
-    _calStep++;
-    if (_calStep > _calSteps) {
-        _calStep=0;
-        _calState++;
-        if (_calState > 3)_calState=0;
-    }
-    BOOST_LOG_TRIVIAL(debug) << "********* step " << _calStep << " - next State " << _calState;
-
     emit RequestPulsesDone();
 }
 
 void GuiderModule::SMFindStars()
 {
+    BOOST_LOG_TRIVIAL(debug) << "SMFindStars";
+
     sendMessage("SMFindStars");
     _solver.ResetSolver(image->stats,image->m_ImageBuffer);
     connect(&_solver,&Solver::successSEP,this,&GuiderModule::OnSucessSEP);
@@ -302,6 +362,8 @@ void GuiderModule::SMFindStars()
 
 void GuiderModule::OnSucessSEP()
 {
+    BOOST_LOG_TRIVIAL(debug) << "OnSucessSEP";
+
     sendMessage("SEP finished");
     disconnect(&_solver,&Solver::successSEP,this,&GuiderModule::OnSucessSEP);
     BOOST_LOG_TRIVIAL(debug) << "********* SEP Finished";
