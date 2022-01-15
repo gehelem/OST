@@ -272,7 +272,7 @@ void GuiderModule::startCalibration()
 
     _calState=0;
     _calStep=0;
-    _calSteps=5;
+    _calSteps=4;
     _pulseN = _pulse;
     _pulseS = _pulse;
     _pulseE = _pulse;
@@ -355,7 +355,7 @@ void GuiderModule::SMComputeRef()
     _pulseETot = 0;
     _pulseNTot = 0;
     _pulseSTot = 0;
-
+    _trigPrev=_trigRef;
     emit ComputeRefDone();
 }
 void GuiderModule::SMComputeCal()
@@ -393,13 +393,18 @@ void GuiderModule::SMComputeCal()
         }
 
     }
+    double coeff[2];
     if (_trigCurrent.size()>0) {
-        matchTrig(_trigRef,_trigCurrent);
+        matchTrig(_trigPrev,_trigCurrent,_matchedPairs,_avdx,_avdy);
+        matchTrig(_trigRef,_trigCurrent,_matchedTotPairs,_totdx,_totdy);
+        _grid->append(_totdx,_totdy);
+        _propertyStore.update(_grid);
+        emit propertyAppended(_grid,&_modulename,0,_totdx,_totdy,0);
+        BOOST_LOG_TRIVIAL(debug) << "AVDX AVDY =  " << _avdx << "-" << _avdy;
         _dxvector.push_back(_avdx);
         _dyvector.push_back(_avdy);
         if (_dxvector.size() > 1)
         {
-            double coeff[2];
             polynomialfit(_dxvector.size(), 2, _dxvector.data(), _dyvector.data(), coeff);
             BOOST_LOG_TRIVIAL(debug) << "Coeffs " << coeff[0] << "-" <<  coeff[1] << " CCD Orientation = " << atan(coeff[1])*180/PI;
         }
@@ -408,18 +413,22 @@ void GuiderModule::SMComputeCal()
     } else {
       BOOST_LOG_TRIVIAL(debug) << "houston, we have a problem";
     }
-    if (_calState==0) {
-        BOOST_LOG_TRIVIAL(debug) << "RA drif " << sqrt(square(_avdx)+square(_avdy)) << " drift / ms = " << 1000*sqrt(square(_avdx)+square(_avdy))/_pulseWTot;
+    BOOST_LOG_TRIVIAL(debug) << "Drifts " << sqrt(square(_avdx)+square(_avdy));
+    _trigPrev=_trigCurrent;
+
+    /*if (_calState==0) {
+        BOOST_LOG_TRIVIAL(debug) << "RA drift " << sqrt(square(_avdx)+square(_avdy)) << " drift / ms = " << 1000*sqrt(square(_avdx)+square(_avdy))/_pulseWTot;
     }
     if (_calState==2) {
-        BOOST_LOG_TRIVIAL(debug) << "DEC drif " << sqrt(square(_avdx)+square(_avdy)) << " drift / ms = " << 1000*sqrt(square(_avdx)+square(_avdy))/_pulseNTot;
-    }
+        BOOST_LOG_TRIVIAL(debug) << "DEC drift " << sqrt(square(_avdx)+square(_avdy)) << " drift / ms = " << 1000*sqrt(square(_avdx)+square(_avdy))/_pulseNTot;
+    }*/
     _pulseN=0;
     _pulseS=0;
     _pulseE=0;
     _pulseW=0;
     _calStep++;
     if (_calStep >= _calSteps) {
+        BOOST_LOG_TRIVIAL(debug) << "*********************** step "<< _calState <<" finished. Coeffs " << coeff[0] << "-" <<  coeff[1] << " CCD Orientation = " << atan(coeff[1])*180/PI;
         _calStep=0;
         _calState++;
         if (_calState==2) {
@@ -510,9 +519,9 @@ void GuiderModule::SMAbort()
     sendMessage("machine stopped");
 }
 
-void GuiderModule::matchTrig(QVector<Trig> ref,QVector<Trig> act)
+void GuiderModule::matchTrig(QVector<Trig> ref, QVector<Trig> act, QVector<MatchedPair>& pairs, double& dx, double& dy)
 {
-    _matchedPairs.clear();
+    pairs.clear();
 
     foreach (Trig r, ref) {
         foreach (Trig a, act) {
@@ -528,36 +537,33 @@ void GuiderModule::matchTrig(QVector<Trig> ref,QVector<Trig> act)
                 //BOOST_LOG_TRIVIAL(debug) << "Matching dxy1= " << r.x1-a.x1 << "/" << r.y1-a.y1 << " - dxy2="  << r.x2-a.x2 << "/" << r.y2-a.y2 << " - dxy3="  << r.x3-a.x3 << "/" << r.y3-a.y3;
                 bool found;
                 found= false;
-                foreach (MatchedPair pair, _matchedPairs) {
+                foreach (MatchedPair pair, pairs) {
                     if ( (pair.xr==r.x1)&&(pair.yr==r.y1) ) found=true;
                 }
-                if (!found) _matchedPairs.append({r.x1,r.y1,a.x1,a.y1,r.x1-a.x1,r.y1-a.y1});
+                if (!found) pairs.append({r.x1,r.y1,a.x1,a.y1,r.x1-a.x1,r.y1-a.y1});
                 found= false;
-                foreach (MatchedPair pair, _matchedPairs) {
+                foreach (MatchedPair pair, pairs) {
                     if ( (pair.xr==r.x2)&&(pair.yr==r.y2) ) found=true;
                 }
-                if (!found) _matchedPairs.append({r.x2,r.y2,a.x2,a.y2,r.x2-a.x2,r.y2-a.y2});
+                if (!found) pairs.append({r.x2,r.y2,a.x2,a.y2,r.x2-a.x2,r.y2-a.y2});
                 found= false;
-                foreach (MatchedPair pair, _matchedPairs) {
+                foreach (MatchedPair pair, pairs) {
                     if ( (pair.xr==r.x3)&&(pair.yr==r.y3) ) found=true;
                 }
-                if (!found) _matchedPairs.append({r.x3,r.y3,a.x3,a.y3,r.x3-a.x3,r.y3-a.y3});
+                if (!found) pairs.append({r.x3,r.y3,a.x3,a.y3,r.x3-a.x3,r.y3-a.y3});
             }
         }
     }
-    _avdx=0;
-    _avdy=0;
-    for (int i=0 ; i <_matchedPairs.size();i++ ) {
-        _avdx=_avdx+_matchedPairs[i].dx;
-        _avdy=_avdy+_matchedPairs[i].dy;
+    dx=0;
+    dy=0;
+    for (int i=0 ; i <pairs.size();i++ ) {
+        dx=dx+pairs[i].dx;
+        dy=dy+pairs[i].dy;
     }
-    _avdx=_avdx/_matchedPairs.size();
-    _avdy=_avdy/_matchedPairs.size();
+    dx=dx/pairs.size();
+    dy=dy/pairs.size();
 
-    _grid->append(_avdx,_avdy);
-    _propertyStore.update(_grid);
-    emit propertyAppended(_grid,&_modulename,0,_avdx,_avdy,0);
-    BOOST_LOG_TRIVIAL(debug) << "AVDX AVDY =  " << _avdx << "-" << _avdy;
+
 
     /*foreach (MatchedPair pair, _matchedPairs) {
             BOOST_LOG_TRIVIAL(debug) << "Matched pair =  " << pair.dx << "-" << pair.dy;

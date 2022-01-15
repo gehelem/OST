@@ -99,6 +99,8 @@ class MODULE_INIT GuiderModule : public Basemodule
         bool   _pulseDECfinished = true;
         double _avdx=0;
         double _avdy=0;
+        double _totdx=0;
+        double _totdy=0;
         double _mountDEC;
         double _mountRA;
 
@@ -107,8 +109,11 @@ class MODULE_INIT GuiderModule : public Basemodule
         QString _mount  = "Telescope Simulator";
         QStateMachine _machine;
         QVector<Trig> _trigRef;
+        QVector<Trig> _trigPrev;
         QVector<Trig> _trigCurrent;
         QVector<MatchedPair> _matchedPairs;
+        QVector<MatchedPair> _matchedTotPairs;
+
 
         std::vector<double> _dxvector;
         std::vector<double> _dyvector;
@@ -118,7 +123,7 @@ class MODULE_INIT GuiderModule : public Basemodule
 
 
         void startCalibration();
-        void matchTrig(QVector<Trig> ref,QVector<Trig> act);
+        void matchTrig(QVector<Trig> ref,QVector<Trig> act, QVector<MatchedPair>& pairs, double& dx,double& dy);
         double square(double value){ return value*value;}
 
         void SMRequestExposure();
