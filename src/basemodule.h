@@ -74,6 +74,8 @@ class Basemodule : public QObject, public INDI::BaseClient
         bool sendModNewSwitch(QString deviceName, QString propertyName,QString elementName, ISState sw);
         bool sendModNewNumber(const QString& deviceName, const QString& propertyName, const QString& elementName, const double& value);
 
+        bool getModNumber(const QString& deviceName, const QString& propertyName, const QString& elementName, double& value);
+
         bool frameSet(QString devicename,double x,double y,double width,double height);
         bool frameReset(QString devicename);
         void sendMessage(QString message);

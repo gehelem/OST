@@ -238,6 +238,33 @@ auto Basemodule::sendModNewNumber(const QString& deviceName, const QString& prop
     return false;
 
 }
+bool Basemodule::getModNumber(const QString& deviceName, const QString& propertyName, const QString&  elementName, double &value)
+{
+    //qDebug() << "taskSendNewNumber" << " " << deviceName << " " << propertyName<< " " << elementName;
+    INDI::BaseDevice *dp = getDevice(deviceName.toStdString().c_str());
+
+    if (dp== nullptr)
+    {
+        sendMessage("Error - unable to find " + deviceName + " device. Aborting.");
+        return false;
+    }
+    INumberVectorProperty *prop = nullptr;
+    prop = dp->getNumber(propertyName.toStdString().c_str());
+    if (prop == nullptr)
+    {
+        sendMessage("Error - unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
+        return false;
+    }
+
+    for (int i=0;i<prop->nnp;i++) {
+        if (strcmp(prop->np[i].name, elementName.toStdString().c_str()) == 0) {
+            value = prop->np[i].value;
+            return true;
+        }
+    }
+    sendMessage("Error - unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
+    return false;
+}
 bool Basemodule::sendModNewText  (QString deviceName,QString propertyName,QString elementName, QString text)
 {
     //qDebug() << "taskSendNewText";

@@ -99,6 +99,9 @@ class MODULE_INIT GuiderModule : public Basemodule
         bool   _pulseDECfinished = true;
         double _avdx=0;
         double _avdy=0;
+        double _mountDEC;
+        double _mountRA;
+
 
         QString _camera  = "Guide Simulator";
         QString _mount  = "Telescope Simulator";

@@ -176,6 +176,19 @@ void GuiderModule::newSwitch(ISwitchVectorProperty *svp)
 void GuiderModule::startCalibration()
 {
     BOOST_LOG_TRIVIAL(debug) << "Guider module - Start calibration ";
+    /* get mount DEC */
+    if (!getModNumber(_mount,"EQUATORIAL_EOD_COORD","DEC",_mountDEC)) {
+        emit abort();
+        return;
+    }
+     /* get mount RA */
+    if (!getModNumber(_mount,"EQUATORIAL_EOD_COORD","RA",_mountRA)) {
+        emit abort();
+        return;
+    }
+
+    BOOST_LOG_TRIVIAL(debug) << "Guider module - RA/DEC = " << _mountRA << "/" << _mountDEC;
+
 
     _grid->clear();
     _propertyStore.update(_grid);
