@@ -437,6 +437,9 @@ void GuiderModule::SMComputeCal()
             _coefficients.clear();
         }
         if (_calState>=4) {
+            _grid->clear();
+            _propertyStore.update(_grid);
+            emit propertyUpdated(_grid,&_modulename);
             emit StartGuiding();
             return;
         }
@@ -450,8 +453,49 @@ void GuiderModule::SMComputeCal()
 }
 void GuiderModule::SMComputeGuide()
 {
-    BOOST_LOG_TRIVIAL(debug) << "SMComputeGuide";
+    BOOST_LOG_TRIVIAL(debug) << "SMComputeGuide " << _solver.stars.size();
+    _pulseW = 0;
+    _pulseE = 0;
+    _pulseN = 0;
+    _pulseS = 0;
+    int nb = _solver.stars.size();
+    if (nb > 10) nb = 10;
 
+    _trigCurrent.clear();
+    for (int i=0;i<nb;i++)
+    {
+        for (int j=i+1;j<nb;j++)
+        {
+            for (int k=j+1;k<nb;k++)
+            {
+                double dij,dik,djk,p,s;
+                dij=sqrt(square(_solver.stars[i].x-_solver.stars[j].x)+square(_solver.stars[i].y-_solver.stars[j].y));
+                dik=sqrt(square(_solver.stars[i].x-_solver.stars[k].x)+square(_solver.stars[i].y-_solver.stars[k].y));
+                djk=sqrt(square(_solver.stars[j].x-_solver.stars[k].x)+square(_solver.stars[j].y-_solver.stars[k].y));
+                p=dij+dik+djk;
+                s=sqrt(p*(p-dij)*(p-dik)*(p-djk));
+                //BOOST_LOG_TRIVIAL(debug) << "Trig REF " << " - " << i << " - " << j << " - " << k << " - p=  " << p << " - s=" << s << " - s/p=" << s/p;
+                _trigCurrent.append({
+                                 _solver.stars[i].x,
+                                 _solver.stars[i].y,
+                                 _solver.stars[j].x,
+                                 _solver.stars[j].y,
+                                 _solver.stars[k].x,
+                                 _solver.stars[k].y,
+                                 dij,dik,djk,
+                                 p,s,s/p
+                                });
+            }
+        }
+    }
+    BOOST_LOG_TRIVIAL(debug) << "Trig current size " << _trigCurrent.size();
+    if (_trigCurrent.size()>0) {
+        matchTrig(_trigRef,_trigCurrent,_matchedTotPairs,_totdx,_totdy);
+        _grid->append(_totdx,_totdy);
+        _propertyStore.update(_grid);
+        emit propertyAppended(_grid,&_modulename,0,_totdx,_totdy,0);
+    }
+    _pulseN=50;
     emit ComputeGuideDone();
 }
 void GuiderModule::SMRequestPulses()
@@ -489,6 +533,7 @@ void GuiderModule::SMRequestPulses()
     }
 
     emit RequestPulsesDone();
+    if ((_pulseN==0)||(_pulseS==0)||(_pulseE==0)||(_pulseW==0)) emit PulsesDone();
 }
 
 void GuiderModule::SMFindStars()
