@@ -272,7 +272,7 @@ void GuiderModule::startCalibration()
 
     _calState=0;
     _calStep=0;
-    _calSteps=10;
+    _calSteps=5;
     _pulseN = _pulse;
     _pulseS = _pulse;
     _pulseE = _pulse;
@@ -439,16 +439,42 @@ void GuiderModule::SMComputeCal()
         }
         ddx=ddx/(_dxvector.size()-1);
         ddy=ddy/(_dyvector.size()-1);
-        double a;
-        if (_calState<2) a=atan(ddy/ddx); else a=atan(ddy/ddx)-PI/2;
+        double a=atan(ddy/ddx);
+        //if (_calState<2) a=atan(ddy/ddx); else a=atan(ddy/ddx)-PI/2;
         BOOST_LOG_TRIVIAL(debug) << "*********************** step "<< _calState <<" finished. Coeffs " << coeff[0] << "-" <<  coeff[1] << " tot pusles = " << _pulse*_calSteps;
         BOOST_LOG_TRIVIAL(debug) << "*********************** step "<< _calState <<" DX drift " <<  ddx;
         BOOST_LOG_TRIVIAL(debug) << "*********************** step "<< _calState <<" DY drift " <<  ddy;
         BOOST_LOG_TRIVIAL(debug) << "*********************** step "<< _calState <<" CCD orientation =  " << a*180/PI;
-        BOOST_LOG_TRIVIAL(debug) << "*********************** step "<< _calState <<" RA drift " <<  ddx*cos(a)+ddy*sin(a);
-        BOOST_LOG_TRIVIAL(debug) << "*********************** step "<< _calState <<" DE drift " << -ddx*sin(a)+ddy*cos(a);
-        BOOST_LOG_TRIVIAL(debug) << "*********************** step "<< _calState <<" RA ms/arcsec " << (_pulse)/ (( ddx*cos(a)+ddy*sin(a))*_ccdSampling);
-        BOOST_LOG_TRIVIAL(debug) << "*********************** step "<< _calState <<" DE ms/arcsec " << (_pulse)/ ((-ddx*sin(a)+ddy*cos(a))*_ccdSampling);
+        BOOST_LOG_TRIVIAL(debug) << "*********************** step "<< _calState <<" RA drift (px) " <<  ddx*cos(a)+ddy*sin(a);
+        BOOST_LOG_TRIVIAL(debug) << "*********************** step "<< _calState <<" DE drift (px) " << -ddx*sin(a)+ddy*cos(a);
+        BOOST_LOG_TRIVIAL(debug) << "*********************** step "<< _calState <<" RA drift ('') " << ( ddx*cos(a)+ddy*sin(a))*_ccdSampling;
+        BOOST_LOG_TRIVIAL(debug) << "*********************** step "<< _calState <<" DE drift ('') " << (-ddx*sin(a)+ddy*cos(a))*_ccdSampling;
+        BOOST_LOG_TRIVIAL(debug) << "*********************** step "<< _calState <<" RA ms/px " << (_pulse)/ (( ddx*cos(a)+ddy*sin(a)));
+        BOOST_LOG_TRIVIAL(debug) << "*********************** step "<< _calState <<" DE ms/px " << (_pulse)/ ((-ddx*sin(a)+ddy*cos(a)));
+        BOOST_LOG_TRIVIAL(debug) << "*********************** step "<< _calState <<" RA ms/'' " << (_pulse)/ (( ddx*cos(a)+ddy*sin(a))*_ccdSampling);
+        BOOST_LOG_TRIVIAL(debug) << "*********************** step "<< _calState <<" DE ms/'' " << (_pulse)/ ((-ddx*sin(a)+ddy*cos(a))*_ccdSampling);
+        if (_calState==0) {
+            if ( ddx*cos(a)+ddy*sin(a) > 0 ) _calPulseW=(_pulse)/ (( ddx*cos(a)+ddy*sin(a)));
+            else _calPulseE=-(_pulse)/ (( ddx*cos(a)+ddy*sin(a)));
+            _ccdOrientation=a;
+        }
+        if (_calState==1) {
+            if ( ddx*cos(a)+ddy*sin(a) > 0 ) _calPulseE=(_pulse)/ (( ddx*cos(a)+ddy*sin(a)));
+            else _calPulseW=-(_pulse)/ (( ddx*cos(a)+ddy*sin(a)));
+        }
+        if (_calState==2) {
+            if ( ddx*cos(a)+ddy*sin(a) > 0 ) _calPulseN=(_pulse)/ (( ddx*cos(a)+ddy*sin(a)));
+            else _calPulseS=-(_pulse)/ (( ddx*cos(a)+ddy*sin(a)));
+        }
+        if (_calState==3) {
+            if ( ddx*cos(a)+ddy*sin(a) > 0 ) _calPulseS=(_pulse)/ (( ddx*cos(a)+ddy*sin(a)));
+            else _calPulseN=-(_pulse)/ (( ddx*cos(a)+ddy*sin(a)));
+        }
+        BOOST_LOG_TRIVIAL(debug) << "*********************** cal W "<< _calPulseW;
+        BOOST_LOG_TRIVIAL(debug) << "*********************** cal E "<< _calPulseE;
+        BOOST_LOG_TRIVIAL(debug) << "*********************** cal N "<< _calPulseN;
+        BOOST_LOG_TRIVIAL(debug) << "*********************** cal S "<< _calPulseS;
+
         _calStep=0;
         _trigRef=_trigCurrent;
         _calState++;
@@ -458,11 +484,15 @@ void GuiderModule::SMComputeCal()
             _coefficients.clear();
         //}
         if (_calState>=4) {
-            //_grid->clear();
-            //_propertyStore.update(_grid);
-            //emit propertyUpdated(_grid,&_modulename);
-            //emit StartGuiding();
-            emit abort();
+            _calPulseW=198;
+            _calPulseE=198;
+            _calPulseN=177;
+            _calPulseS=177;
+            _grid->clear();
+            _propertyStore.update(_grid);
+            emit propertyUpdated(_grid,&_modulename);
+            emit StartGuiding();
+            //emit abort();
             return;
         }
     }
@@ -517,7 +547,35 @@ void GuiderModule::SMComputeGuide()
         _propertyStore.update(_grid);
         emit propertyAppended(_grid,&_modulename,0,_totdx,_totdy,0);
     }
-    _pulseN=50;
+    double _driftRA=  _totdx*cos(_ccdOrientation)+_totdy*sin(_ccdOrientation);
+    double _driftDE= -_totdx*sin(_ccdOrientation)+_totdy*cos(_ccdOrientation);
+    BOOST_LOG_TRIVIAL(debug) << "*********************** guide  RA drift (px) " << _driftRA;
+    BOOST_LOG_TRIVIAL(debug) << "*********************** guide  DE drift (px) " << _driftDE;
+    if (_driftRA > 0 ) {
+        _pulseW = _raAgr*_driftRA*_calPulseW;
+        if (_pulseW > _pulseMax) _pulseW=_pulseMax;
+        if (_pulseW < _pulseMin) _pulseW=0;
+    } else _pulseW=0;
+    if (_driftRA < 0 ) {
+        _pulseE = -_raAgr*_driftRA*_calPulseE;
+        if (_pulseE > _pulseMax) _pulseE=_pulseMax;
+        if (_pulseE < _pulseMin) _pulseE=0;
+    } else _pulseE=0;
+    if (_driftDE > 0 ) {
+        _pulseS = _deAgr*_driftDE*_calPulseS;
+        if (_pulseS > _pulseMax) _pulseS=_pulseMax;
+        if (_pulseS < _pulseMin) _pulseS=0;
+    } else _pulseS=0;
+    if (_driftDE < 0 ) {
+        _pulseN = -_deAgr*_driftDE*_calPulseN;
+        if (_pulseN > _pulseMax) _pulseN=_pulseMax;
+        if (_pulseN < _pulseMin) _pulseN=0;
+    } else _pulseN=0;
+    BOOST_LOG_TRIVIAL(debug) << "*********************** guide  W pulse " << _pulseW;
+    BOOST_LOG_TRIVIAL(debug) << "*********************** guide  E pusle " << _pulseE;
+    BOOST_LOG_TRIVIAL(debug) << "*********************** guide  N pusle " << _pulseN;
+    BOOST_LOG_TRIVIAL(debug) << "*********************** guide  S pusle " << _pulseS;
+    //_pulseN=50;
     emit ComputeGuideDone();
 }
 void GuiderModule::SMRequestPulses()
@@ -555,7 +613,7 @@ void GuiderModule::SMRequestPulses()
     }
 
     emit RequestPulsesDone();
-    if ((_pulseN==0)||(_pulseS==0)||(_pulseE==0)||(_pulseW==0)) emit PulsesDone();
+    if ((_pulseN==0)&&(_pulseS==0)&&(_pulseE==0)&&(_pulseW==0)) emit PulsesDone();
 }
 
 void GuiderModule::SMFindStars()

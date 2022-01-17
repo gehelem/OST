@@ -82,12 +82,22 @@ class MODULE_INIT GuiderModule : public Basemodule
         //std::unique_ptr<Image> image =nullptr;
         QPointer<Image> image;
 
-        int    _exposure = 2;
-        int    _pulse  = 1000;
+        int    _exposure = 1;
+        int    _pulse  = 500;
+        int    _pulseMax  = 2000;
+        int    _pulseMin  = 100;
+        double _raAgr = 1.33;
+        double _deAgr = 1.33;
         int    _pulseN = 0;
         int    _pulseS = 0;
         int    _pulseE = 0;
         int    _pulseW = 0;
+        int    _calPulseN = 0;
+        int    _calPulseS = 0;
+        int    _calPulseE = 0;
+        int    _calPulseW = 0;
+        int    _calPulseRA = 0;
+        int    _calPulseDEC = 0;
         int    _pulseNTot = 0;
         int    _pulseSTot = 0;
         int    _pulseETot = 0;
