@@ -103,11 +103,14 @@ class MODULE_INIT GuiderModule : public Basemodule
         double _totdy=0;
         double _mountDEC;
         double _mountRA;
+        double _ccdOrientation;
+        double _ccdSampling=206*5.2/800;
 
 
         QString _camera  = "Guide Simulator";
         QString _mount  = "Telescope Simulator";
         QStateMachine _machine;
+        QVector<Trig> _trigFirst;
         QVector<Trig> _trigRef;
         QVector<Trig> _trigPrev;
         QVector<Trig> _trigCurrent;

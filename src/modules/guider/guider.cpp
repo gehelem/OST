@@ -272,7 +272,7 @@ void GuiderModule::startCalibration()
 
     _calState=0;
     _calStep=0;
-    _calSteps=4;
+    _calSteps=10;
     _pulseN = _pulse;
     _pulseS = _pulse;
     _pulseE = _pulse;
@@ -318,6 +318,7 @@ void GuiderModule::SMComputeRef()
     if (nb > 10) nb = 10;
     _trigCurrent.clear();
     _trigRef.clear();
+    _trigFirst.clear();
         for (int i=0;i<nb;i++)
         {
             for (int j=i+1;j<nb;j++)
@@ -355,7 +356,9 @@ void GuiderModule::SMComputeRef()
     _pulseETot = 0;
     _pulseNTot = 0;
     _pulseSTot = 0;
+    _ccdOrientation=0;
     _trigPrev=_trigRef;
+    _trigFirst=_trigRef;
     emit ComputeRefDone();
 }
 void GuiderModule::SMComputeCal()
@@ -401,8 +404,8 @@ void GuiderModule::SMComputeCal()
         _propertyStore.update(_grid);
         emit propertyAppended(_grid,&_modulename,0,_totdx,_totdy,0);
         BOOST_LOG_TRIVIAL(debug) << "AVDX AVDY =  " << _avdx << "-" << _avdy;
-        _dxvector.push_back(_avdx);
-        _dyvector.push_back(_avdy);
+        _dxvector.push_back(_totdx);
+        _dyvector.push_back(_totdy);
         if (_dxvector.size() > 1)
         {
             polynomialfit(_dxvector.size(), 2, _dxvector.data(), _dyvector.data(), coeff);
@@ -428,19 +431,38 @@ void GuiderModule::SMComputeCal()
     _pulseW=0;
     _calStep++;
     if (_calStep >= _calSteps) {
-        BOOST_LOG_TRIVIAL(debug) << "*********************** step "<< _calState <<" finished. Coeffs " << coeff[0] << "-" <<  coeff[1] << " CCD Orientation = " << atan(coeff[1])*180/PI;
+        double ddx=0;
+        double ddy=0;
+        for (int i=1;i<_dxvector.size();i++) {
+            ddx=ddx+_dxvector[i]-_dxvector[i-1];
+            ddy=ddy+_dyvector[i]-_dyvector[i-1];
+        }
+        ddx=ddx/(_dxvector.size()-1);
+        ddy=ddy/(_dyvector.size()-1);
+        double a;
+        if (_calState<2) a=atan(ddy/ddx); else a=atan(ddy/ddx)-PI/2;
+        BOOST_LOG_TRIVIAL(debug) << "*********************** step "<< _calState <<" finished. Coeffs " << coeff[0] << "-" <<  coeff[1] << " tot pusles = " << _pulse*_calSteps;
+        BOOST_LOG_TRIVIAL(debug) << "*********************** step "<< _calState <<" DX drift " <<  ddx;
+        BOOST_LOG_TRIVIAL(debug) << "*********************** step "<< _calState <<" DY drift " <<  ddy;
+        BOOST_LOG_TRIVIAL(debug) << "*********************** step "<< _calState <<" CCD orientation =  " << a*180/PI;
+        BOOST_LOG_TRIVIAL(debug) << "*********************** step "<< _calState <<" RA drift " <<  ddx*cos(a)+ddy*sin(a);
+        BOOST_LOG_TRIVIAL(debug) << "*********************** step "<< _calState <<" DE drift " << -ddx*sin(a)+ddy*cos(a);
+        BOOST_LOG_TRIVIAL(debug) << "*********************** step "<< _calState <<" RA ms/arcsec " << (_pulse)/ (( ddx*cos(a)+ddy*sin(a))*_ccdSampling);
+        BOOST_LOG_TRIVIAL(debug) << "*********************** step "<< _calState <<" DE ms/arcsec " << (_pulse)/ ((-ddx*sin(a)+ddy*cos(a))*_ccdSampling);
         _calStep=0;
+        _trigRef=_trigCurrent;
         _calState++;
-        if (_calState==2) {
+        //if (_calState==2) {
             _dxvector.clear();
             _dyvector.clear();
             _coefficients.clear();
-        }
+        //}
         if (_calState>=4) {
-            _grid->clear();
-            _propertyStore.update(_grid);
-            emit propertyUpdated(_grid,&_modulename);
-            emit StartGuiding();
+            //_grid->clear();
+            //_propertyStore.update(_grid);
+            //emit propertyUpdated(_grid,&_modulename);
+            //emit StartGuiding();
+            emit abort();
             return;
         }
     }
@@ -490,7 +512,7 @@ void GuiderModule::SMComputeGuide()
     }
     BOOST_LOG_TRIVIAL(debug) << "Trig current size " << _trigCurrent.size();
     if (_trigCurrent.size()>0) {
-        matchTrig(_trigRef,_trigCurrent,_matchedTotPairs,_totdx,_totdy);
+        matchTrig(_trigFirst,_trigCurrent,_matchedTotPairs,_totdx,_totdy);
         _grid->append(_totdx,_totdy);
         _propertyStore.update(_grid);
         emit propertyAppended(_grid,&_modulename,0,_totdx,_totdy,0);
