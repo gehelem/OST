@@ -294,7 +294,7 @@ void GuiderModule::startCalibration()
 
     _calState=0;
     _calStep=0;
-    _calSteps=5;
+    _calSteps=4;
     _pulseN = _pulse;
     _pulseS = _pulse;
     _pulseE = _pulse;
