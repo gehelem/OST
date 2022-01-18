@@ -519,7 +519,29 @@ function creategraphPHD(idgraph,graphlabel) {
                             yAxisID: 'y',
                             data: [],
                             
-                        }
+                        },
+                        {
+                            label: "Cra",
+                            //type: "scatter",
+                            border:  "#f38b4a",
+                            borderColor: " #00ffff",
+                            //backgroundColor:  "#f38b4a",
+                            //fill: false,
+                            yAxisID: 'z',
+                            data: [],
+                            stepped: true,                            
+                        },
+                        {
+                            label: "Cdec",
+                            //type: "scatter",
+                            border:  "#f38b4a",
+                            borderColor: " #ffff00",
+                            //backgroundColor:  "#f38b4a",
+                            //fill: false,
+                            yAxisID: 'z',
+                            data: [],
+                            stepped: true,                            
+                        },
                         ]
                     },
                 options: {
@@ -535,6 +557,11 @@ function creategraphPHD(idgraph,graphlabel) {
                             type: 'linear',
                             position: 'right',
                             borderColor: "#0000ff",
+                        },
+                        z: {
+                            type: 'linear',
+                            position: 'left',
+                            borderColor: "#ff0000",
                         }
                     }
                 }
@@ -550,6 +577,8 @@ function appendgraphPHD(idgraph,ss,xx,yy,zz,kk) {
     graph.data.labels.push(ss);
     graph.data.datasets[0].data.push({x:ss,y:xx});
     graph.data.datasets[1].data.push({x:ss,y:yy});
+    graph.data.datasets[2].data.push({x:ss,y:zz});
+    graph.data.datasets[3].data.push({x:ss,y:kk});
     /*graph.data.datasets[1].data.push({s:ss,y:yy});
     graph.data.datasets[2].data.push({s:ss,z:zz});
     graph.data.datasets[3].data.push({s:ss,k:kk});*/
