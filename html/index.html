@@ -88,7 +88,9 @@ function initWebSocket() {
                 values=p.values;
                 $.each( values, function( ivalue, value ) {
                     //console.log( "addvalues :", '"'+value.x+'"' +value.y+'"');
-                    appendgraph2D("#G2D"+m+d+g+p.propname,value.x,value.y);
+                    if (p.type=='PXY')  appendgraph2D("#G2D"+m+d+g+p.propname,value.x,value.y);
+                    if (p.type=='PHD') appendgraphPHD("#G2D"+m+d+g+p.propname,value.s,value.x,value.y,value.z,value.k);
+                    
                 });            
 
 
@@ -271,7 +273,7 @@ function buildproperty(m,d,g,p) {
         if (!($("[id='G"+nnp+"']").length))  {
             if ($("[id='G2D"+nnp+"']").length) {
                 $("[id='G2D"+nnp+"']").remove;
-                console.log( "removecanvas 1 : " + "[id='G2D"+nnp+"']");
+                //console.log( "removecanvas 1 : " + "[id='G2D"+nnp+"']");
             }
             div="<div id='G"+nnp+"' >"
             +"<canvas id=G2D"+nnp+" width=30 height=10></canvas>"            
@@ -285,12 +287,12 @@ function buildproperty(m,d,g,p) {
             }
             $.each( values, function( ivalue, value ) {
                 //console.log( "addvalues :", '"'+value.v0+'"' +value.v1+'"');
-                appendgraph2D("#G2D"+nnp,value.x,value.y);
+                if (p.type=='PXY') appendgraph2D("#G2D"+nnp,value.x,value.y);
+                if (p.type=='PHD') appendgraphPHD("#G2D"+nnp,value.s,value.x,value.y,value.z,value.k);
             });            
         } else {
             if ($("[id='G2D"+nnp+"']").length) {
                 $("[id='G2D"+nnp+"']").remove;
-                console.log( "removecanvas 2 : " + "[id='G2D"+nnp+"']");
                 var graph = $("#G2D"+nnp).data('graph');
                 graph.destroy();
                 if (p.type=='PXY') creategraph2D("#G2D"+nnp,"---/---");
@@ -299,7 +301,7 @@ function buildproperty(m,d,g,p) {
             $.each( values, function( ivalue, value ) {
                 //console.log( "addvalues :", '"'+value.v0+'"' +value.v1+'"');
                 if (p.type=='PXY') appendgraph2D("#G2D"+nnp,value.x,value.y);
-                if (p.type=='PHD') appendgraphPHD("#G2D"+nnp,value.x,value.y);
+                if (p.type=='PHD') appendgraphPHD("#G2D"+nnp,value.s,value.x,value.y,value.z,value.k);
             });            
         }
     }
@@ -485,6 +487,72 @@ function appendgraph2D(idgraph,xx,yy) {
     var graph = $(idgraph).data('graph');
     graph.data.datasets[0].data.push({x:xx,y:yy});
     //data.datasets[0].data.push({x:xx, y:yy});
+    //graph.render();
+    graph.update();
+}
+
+function creategraphPHD(idgraph,graphlabel) {
+    console.log( "CREATE GRAPH PHD : "+ idgraph);
+    var ctx = $(idgraph);
+    var graph = new Chart(ctx, {
+                type: 'line',
+                color: "#000000",
+                //fill: false,
+                data: {
+                        labels: [],
+                        datasets: [{
+                            label: "RA",
+                            //type: "scatter",
+                            border:  "#f38b4a",
+                            borderColor: " #00ff00",
+                            //backgroundColor:  "#f38b4a",
+                            //fill: false,
+                            yAxisID: 'y',
+                            data: [],
+                        },
+                        {
+                            label: "DEC",
+                            //type: "scatter",
+                            border:  "#f38b4a",
+                            borderColor: "#0000ff",
+                            //fill: false,
+                            yAxisID: 'y',
+                            data: [],
+                            
+                        }
+                        ]
+                    },
+                options: {
+                    animation: false,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'right',
+                            borderColor: "#0000ff",
+                            
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'right',
+                            borderColor: "#0000ff",
+                        }
+                    }
+                }
+    });
+    ctx.data('graph', graph);
+    ctx.labels('graph', graph);
+    
+}
+
+function appendgraphPHD(idgraph,ss,xx,yy,zz,kk) {
+    //console.log( "addvalues :", +ss+ " / "  +xx+ " / "  +yy+ " / "  +zz+ " / "  +kk);
+    var graph = $(idgraph).data('graph');
+    graph.data.labels.push(ss);
+    graph.data.datasets[0].data.push({x:ss,y:xx});
+    graph.data.datasets[1].data.push({x:ss,y:yy});
+    /*graph.data.datasets[1].data.push({s:ss,y:yy});
+    graph.data.datasets[2].data.push({s:ss,z:zz});
+    graph.data.datasets[3].data.push({s:ss,k:kk});*/
     //graph.render();
     graph.update();
 }

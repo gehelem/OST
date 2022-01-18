@@ -117,6 +117,7 @@ class MODULE_INIT GuiderModule : public Basemodule
         double _mountRA;
         double _ccdOrientation;
         double _ccdSampling=206*5.2/800;
+        int _itt=0;
 
 
         QString _camera  = "Guide Simulator";

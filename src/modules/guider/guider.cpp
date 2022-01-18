@@ -212,6 +212,10 @@ void GuiderModule::startCalibration()
     _propertyStore.update(_grid);
     emit propertyUpdated(_grid,&_modulename);
 
+    _gridguide->clear();
+    _propertyStore.update(_gridguide);
+    emit propertyUpdated(_gridguide,&_modulename);
+
     auto *init  = new QState();
     auto *calibrate = new QState();
     auto *guide = new QState();
@@ -300,6 +304,7 @@ void GuiderModule::startCalibration()
     _dxvector.clear();
     _dyvector.clear();
     _coefficients.clear();
+    _itt=0;
 
 
     _machine.start();
@@ -509,6 +514,7 @@ void GuiderModule::SMComputeCal()
             _grid->clear();
             _propertyStore.update(_grid);
             emit propertyUpdated(_grid,&_modulename);
+            _trigRef=_trigPrev;
             emit StartGuiding();
             //emit abort();
             return;
@@ -600,7 +606,10 @@ void GuiderModule::SMComputeGuide()
     BOOST_LOG_TRIVIAL(debug) << "*********************** guide  E pusle " << _pulseE;
     BOOST_LOG_TRIVIAL(debug) << "*********************** guide  N pusle " << _pulseN;
     BOOST_LOG_TRIVIAL(debug) << "*********************** guide  S pusle " << _pulseS;
-    //_pulseN=50;
+    _gridguide->append(_itt,_totdx,_totdy,_pulseW-_pulseE,_pulseN-_pulseS);
+    _propertyStore.update(_gridguide);
+    emit propertyAppended(_gridguide,&_modulename,_itt,_totdx,_totdy,_pulseW-_pulseE,_pulseN-_pulseS);
+    _itt++;
     emit ComputeGuideDone();
 }
 void GuiderModule::SMRequestPulses()
