@@ -277,10 +277,11 @@ function buildproperty(m,d,g,p) {
             +"<canvas id=G2D"+nnp+" width=30 height=10></canvas>"            
             +"</div>";
             $("#U"+nn).append(div);
-            creategraph2D("#G2D"+nnp,"---/---");
+            if (p.type=='PXY') creategraph2D("#G2D"+nnp,"---/---");
+            if (p.type=='PHD') creategraphPHD("#G2D"+nnp,"---/---");
             var values=p.values;
             if (values.size==0) {
-                cleargraph2D("#G2D"+nnp);
+                //cleargraph2D("#G2D"+nnp);
             }
             $.each( values, function( ivalue, value ) {
                 //console.log( "addvalues :", '"'+value.v0+'"' +value.v1+'"');
@@ -292,11 +293,13 @@ function buildproperty(m,d,g,p) {
                 console.log( "removecanvas 2 : " + "[id='G2D"+nnp+"']");
                 var graph = $("#G2D"+nnp).data('graph');
                 graph.destroy();
-                creategraph2D("#G2D"+nnp,"Pos/HFR");
+                if (p.type=='PXY') creategraph2D("#G2D"+nnp,"---/---");
+                if (p.type=='PHD') creategraphPHD("#G2D"+nnp,"---/---");
             }
             $.each( values, function( ivalue, value ) {
                 //console.log( "addvalues :", '"'+value.v0+'"' +value.v1+'"');
-                appendgraph2D("#G2D"+nnp,value.x,value.y);
+                if (p.type=='PXY') appendgraph2D("#G2D"+nnp,value.x,value.y);
+                if (p.type=='PHD') appendgraphPHD("#G2D"+nnp,value.x,value.y);
             });            
         }
     }

@@ -78,6 +78,7 @@ class MODULE_INIT GuiderModule : public Basemodule
         ImageProperty*  _img;
         GridProperty*   _grid;
         LightProperty*  _states;
+        GridProperty*   _gridguide;
 
 
         //std::unique_ptr<Image> image =nullptr;

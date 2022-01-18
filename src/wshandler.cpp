@@ -48,10 +48,10 @@ void WShandler::OnPropertyUpdated(Property *pProperty, QString *pModulename)
     sendJsonMessage(obj);
 
 }
-void WShandler::OnPropertyAppended(Property *pProperty, QString *pModulename, double s, double x,double y,double z)
+void WShandler::OnPropertyAppended(Property *pProperty, QString *pModulename, double s, double x,double y,double z,double k)
 {
     JSonDumper jsonDumper;
-    pProperty->accept(&jsonDumper,s,x,y,z);
+    pProperty->accept(&jsonDumper,s,x,y,z,k);
     //BOOST_LOG_TRIVIAL(debug) << "JSON : " << jsonDumper.getResult().toStdString();
     QJsonObject  obj;
     obj["event"]="appendproperty";

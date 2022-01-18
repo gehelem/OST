@@ -105,6 +105,11 @@ void JSonDumper::visit(GridProperty *pProperty, QString *moduleName) {
     QJsonObject json = dumpPropertyCommons(pProperty);
     json["proptype"] = "grid";
     json["type"] = pProperty->getType();
+    json["sname"] = pProperty->getSname();
+    json["xname"] = pProperty->getXname();
+    json["yname"] = pProperty->getYname();
+    json["zname"] = pProperty->getZname();
+    json["kname"] = pProperty->getKname();
     QJsonArray jsonValues;
     for( const GridPropertyValue pValue : pProperty->getValues() ) {
         QJsonObject jsonValue;
@@ -112,6 +117,7 @@ void JSonDumper::visit(GridProperty *pProperty, QString *moduleName) {
         jsonValue["x"] = pValue.x;
         jsonValue["y"] = pValue.y;
         jsonValue["z"] = pValue.z;
+        jsonValue["k"] = pValue.k;
         jsonValues.append(jsonValue);
     }
     json["values"] = jsonValues;
@@ -120,7 +126,7 @@ void JSonDumper::visit(GridProperty *pProperty, QString *moduleName) {
     _result = doc.toJson(QJsonDocument::Compact);
 
 }
-void JSonDumper::visit(GridProperty *pProperty, QString *moduleName,double s,double x,double y,double z) {
+void JSonDumper::visit(GridProperty *pProperty, QString *moduleName, double s, double x, double y, double z, double k) {
     QJsonObject json = dumpPropertyCommons(pProperty);
     json["proptype"] = "grid";
     json["type"] = pProperty->getType();
@@ -130,6 +136,7 @@ void JSonDumper::visit(GridProperty *pProperty, QString *moduleName,double s,dou
     jsonValue["x"] = x;
     jsonValue["y"] = y;
     jsonValue["z"] = z;
+    jsonValue["k"] = k;
     jsonValues.append(jsonValue);
     json["values"] = jsonValues;
     QJsonDocument doc(json);

@@ -36,9 +36,13 @@ GuiderModule::GuiderModule(QString name,QString label)
     emit propertyCreated(_img,&_modulename);
     _propertyStore.add(_img);
 
-    _grid = new GridProperty(_modulename,"Control","root","grid","Grid property label",0,0,"PXY","Set","DX","DY","");
+    _grid = new GridProperty(_modulename,"Control","root","grid","Grid property label",0,0,"PXY","Set","DX","DY","","");
     emit propertyCreated(_grid,&_modulename);
     _propertyStore.add(_grid);
+
+    _gridguide = new GridProperty(_modulename,"Control","root","gridguide","Grid property label",0,0,"PHD","Time","RA","DE","CRA","CDE");
+    emit propertyCreated(_gridguide,&_modulename);
+    _propertyStore.add(_gridguide);
 
     _states = new LightProperty(_modulename,"Control","root","states","State",0,0);
     _states->addLight(new LightValue("idle"  ,"Idle","hint",1));
@@ -416,7 +420,7 @@ void GuiderModule::SMComputeCal()
         matchTrig(_trigRef,_trigCurrent,_matchedTotPairs,_totdx,_totdy);
         _grid->append(_totdx,_totdy);
         _propertyStore.update(_grid);
-        emit propertyAppended(_grid,&_modulename,0,_totdx,_totdy,0);
+        emit propertyAppended(_grid,&_modulename,0,_totdx,_totdy,0,0);
         BOOST_LOG_TRIVIAL(debug) << "AVDX AVDY =  " << _avdx << "-" << _avdy;
         _dxvector.push_back(_totdx);
         _dyvector.push_back(_totdy);
@@ -566,7 +570,7 @@ void GuiderModule::SMComputeGuide()
         matchTrig(_trigFirst,_trigCurrent,_matchedTotPairs,_totdx,_totdy);
         _grid->append(_totdx,_totdy);
         _propertyStore.update(_grid);
-        emit propertyAppended(_grid,&_modulename,0,_totdx,_totdy,0);
+        emit propertyAppended(_grid,&_modulename,0,_totdx,_totdy,0,0);
     }
     double _driftRA=  _totdx*cos(_ccdOrientation)+_totdy*sin(_ccdOrientation);
     double _driftDE= -_totdx*sin(_ccdOrientation)+_totdy*cos(_ccdOrientation);
