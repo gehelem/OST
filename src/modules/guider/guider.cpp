@@ -28,7 +28,7 @@ GuiderModule::GuiderModule(QString name,QString label)
     _propertyStore.add(_parameters);
 
     _values = new NumberProperty(_modulename,"Control","root","values","Values",0,0);
-    //_values->addNumber(new NumberValue("xxx","xxx","hint",0,"",0,99,0));
+    _values->addNumber(new NumberValue("xxx","xxx","hint",0,"",0,99,0));
     emit propertyCreated(_values,&_modulename);
     _propertyStore.add(_values);
 
@@ -39,6 +39,14 @@ GuiderModule::GuiderModule(QString name,QString label)
     _grid = new GridProperty(_modulename,"Control","root","grid","Grid property label",0,0,"PXY","Set","DX","DY","");
     emit propertyCreated(_grid,&_modulename);
     _propertyStore.add(_grid);
+
+    _states = new LightProperty(_modulename,"Control","root","states","State",0,0);
+    _states->addLight(new LightValue("idle"  ,"Idle","hint",1));
+    _states->addLight(new LightValue("cal"   ,"Calibrating","hint",0));
+    _states->addLight(new LightValue("guide" ,"Guiding","hint",0));
+    _states->addLight(new LightValue("error" ,"Error","hint",0));
+    emit propertyCreated(_states,&_modulename);
+    _propertyStore.add(_states);
 
 
 }
@@ -186,6 +194,12 @@ void GuiderModule::startCalibration()
         emit abort();
         return;
     }
+    _states->addLight(new LightValue("idle"  ,"Idle","hint",0));
+    _states->addLight(new LightValue("cal"   ,"Calibrating","hint",2));
+    _states->addLight(new LightValue("guide" ,"Guiding","hint",0));
+    _states->addLight(new LightValue("error" ,"Error","hint",0));
+    emit propertyUpdated(_states,&_modulename);
+    _propertyStore.update(_states);
 
     BOOST_LOG_TRIVIAL(debug) << "Guider module - RA/DEC = " << _mountRA << "/" << _mountDEC;
 
@@ -505,6 +519,13 @@ void GuiderModule::SMComputeCal()
 }
 void GuiderModule::SMComputeGuide()
 {
+    _states->addLight(new LightValue("idle"  ,"Idle","hint",0));
+    _states->addLight(new LightValue("cal"   ,"Calibrating","hint",1));
+    _states->addLight(new LightValue("guide" ,"Guiding","hint",2));
+    _states->addLight(new LightValue("error" ,"Error","hint",0));
+    emit propertyUpdated(_states,&_modulename);
+    _propertyStore.update(_states);
+
     BOOST_LOG_TRIVIAL(debug) << "SMComputeGuide " << _solver.stars.size();
     _pulseW = 0;
     _pulseE = 0;
@@ -642,6 +663,14 @@ void GuiderModule::SMAbort()
 
     _machine.stop();
     sendMessage("machine stopped");
+    _states->addLight(new LightValue("idle"  ,"Idle","hint",1));
+    _states->addLight(new LightValue("cal"   ,"Calibrating","hint",0));
+    _states->addLight(new LightValue("guide" ,"Guiding","hint",0));
+    _states->addLight(new LightValue("error" ,"Error","hint",0));
+    emit propertyUpdated(_states,&_modulename);
+    _propertyStore.update(_states);
+
+
 }
 
 void GuiderModule::matchTrig(QVector<Trig> ref, QVector<Trig> act, QVector<MatchedPair>& pairs, double& dx, double& dy)
