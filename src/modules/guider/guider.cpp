@@ -198,6 +198,11 @@ void GuiderModule::startCalibration()
         emit abort();
         return;
     }
+    /* get mount Pier position  */
+   if (!getModSwitch(_mount,"TELESCOPE_PIER_SIDE","PIER_WEST",_mountPointingWest)) {
+       emit abort();
+       return;
+   }
     _states->addLight(new LightValue("idle"  ,"Idle","hint",0));
     _states->addLight(new LightValue("cal"   ,"Calibrating","hint",2));
     _states->addLight(new LightValue("guide" ,"Guiding","hint",0));

@@ -115,6 +115,7 @@ class MODULE_INIT GuiderModule : public Basemodule
         double _totdy=0;
         double _mountDEC;
         double _mountRA;
+        bool   _mountPointingWest=false;
         double _ccdOrientation;
         double _ccdSampling=206*5.2/800;
         int _itt=0;
