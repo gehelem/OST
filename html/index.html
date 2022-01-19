@@ -280,7 +280,7 @@ function buildproperty(m,d,g,p) {
             +"</div>";
             $("#U"+nn).append(div);
             if (p.type=='PXY') creategraph2D("#G2D"+nnp,"---/---");
-            if (p.type=='PHD') creategraphPHD("#G2D"+nnp,"---/---");
+            if (p.type=='PHD') creategraphPHD("#G2D"+nnp,p.sname,p.xname,p.yname,p.zname,p.kname);
             var values=p.values;
             if (values.size==0) {
                 //cleargraph2D("#G2D"+nnp);
@@ -296,7 +296,7 @@ function buildproperty(m,d,g,p) {
                 var graph = $("#G2D"+nnp).data('graph');
                 graph.destroy();
                 if (p.type=='PXY') creategraph2D("#G2D"+nnp,"---/---");
-                if (p.type=='PHD') creategraphPHD("#G2D"+nnp,"---/---");
+                if (p.type=='PHD') creategraphPHD("#G2D"+nnp,p.sname,p.xname,p.yname,p.zname,p.kname);
             }
             $.each( values, function( ivalue, value ) {
                 //console.log( "addvalues :", '"'+value.v0+'"' +value.v1+'"');
@@ -491,8 +491,7 @@ function appendgraph2D(idgraph,xx,yy) {
     graph.update();
 }
 
-function creategraphPHD(idgraph,graphlabel) {
-    console.log( "CREATE GRAPH PHD : "+ idgraph);
+function creategraphPHD(idgraph,sname,xname,yname,zname,kname) {
     var ctx = $(idgraph);
     var graph = new Chart(ctx, {
                 type: 'line',
@@ -501,7 +500,7 @@ function creategraphPHD(idgraph,graphlabel) {
                 data: {
                         labels: [],
                         datasets: [{
-                            label: "RA",
+                            label: xname,
                             //type: "scatter",
                             border:  "#f38b4a",
                             borderColor: " #00ff00",
@@ -511,7 +510,7 @@ function creategraphPHD(idgraph,graphlabel) {
                             data: [],
                         },
                         {
-                            label: "DEC",
+                            label: yname,
                             //type: "scatter",
                             border:  "#f38b4a",
                             borderColor: "#0000ff",
@@ -521,7 +520,7 @@ function creategraphPHD(idgraph,graphlabel) {
                             
                         },
                         {
-                            label: "Cra",
+                            label: zname,
                             //type: "scatter",
                             border:  "#f38b4a",
                             borderColor: " #00ffff",
@@ -532,7 +531,7 @@ function creategraphPHD(idgraph,graphlabel) {
                             stepped: true,                            
                         },
                         {
-                            label: "Cdec",
+                            label: kname,
                             //type: "scatter",
                             border:  "#f38b4a",
                             borderColor: " #ffff00",
