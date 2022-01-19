@@ -209,6 +209,7 @@ void GuiderModule::newSwitch(ISwitchVectorProperty *svp)
 void GuiderModule::startCalibration()
 {
     BOOST_LOG_TRIVIAL(debug) << "Guider module - Start calibration ";
+    setBlobMode();
     /* get mount DEC */
     if (!getModNumber(_mount,"EQUATORIAL_EOD_COORD","DEC",_mountDEC)) {
         emit abort();
