@@ -142,7 +142,8 @@ class MODULE_INIT GuiderModule : public Basemodule
 
 
         void startCalibration();
-        void matchTrig(QVector<Trig> ref,QVector<Trig> act, QVector<MatchedPair>& pairs, double& dx,double& dy);
+        void buildIndexes(Solver& solver, QVector<Trig>& trig);
+        void matchIndexes(QVector<Trig> ref,QVector<Trig> act, QVector<MatchedPair>& pairs, double& dx,double& dy);
         double square(double value){ return value*value;}
 
         void SMRequestExposure();

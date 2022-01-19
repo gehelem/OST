@@ -363,37 +363,11 @@ void GuiderModule::SMRequestExposure()
 void GuiderModule::SMComputeRef()
 {
     BOOST_LOG_TRIVIAL(debug) << "SMComputeRef";
-    int nb = _solver.stars.size();
-    if (nb > 10) nb = 10;
-    _trigCurrent.clear();
-    _trigRef.clear();
     _trigFirst.clear();
-        for (int i=0;i<nb;i++)
-        {
-            for (int j=i+1;j<nb;j++)
-            {
-                for (int k=j+1;k<nb;k++)
-                {
-                    double dij,dik,djk,p,s;
-                    dij=sqrt(square(_solver.stars[i].x-_solver.stars[j].x)+square(_solver.stars[i].y-_solver.stars[j].y));
-                    dik=sqrt(square(_solver.stars[i].x-_solver.stars[k].x)+square(_solver.stars[i].y-_solver.stars[k].y));
-                    djk=sqrt(square(_solver.stars[j].x-_solver.stars[k].x)+square(_solver.stars[j].y-_solver.stars[k].y));
-                    p=dij+dik+djk;
-                    s=sqrt(p*(p-dij)*(p-dik)*(p-djk));
-                    //BOOST_LOG_TRIVIAL(debug) << "Trig REF " << " - " << i << " - " << j << " - " << k << " - p=  " << p << " - s=" << s << " - s/p=" << s/p;
-                    _trigRef.append({
-                                     _solver.stars[i].x,
-                                     _solver.stars[i].y,
-                                     _solver.stars[j].x,
-                                     _solver.stars[j].y,
-                                     _solver.stars[k].x,
-                                     _solver.stars[k].y,
-                                     dij,dik,djk,
-                                     p,s,s/p
-                                    });
-                }
-            }
-        }
+    _trigPrev.clear();
+    buildIndexes(_solver,_trigRef);
+    _trigPrev=_trigRef;
+    _trigFirst=_trigRef;
 
     _calState =0;
     _calStep = 0;
@@ -413,42 +387,12 @@ void GuiderModule::SMComputeRef()
 void GuiderModule::SMComputeCal()
 {
     BOOST_LOG_TRIVIAL(debug) << "SMComputeCal";
-    int nb = _solver.stars.size();
-    if (nb > 10) nb = 10;
-    _trigCurrent.clear();
+    buildIndexes(_solver,_trigCurrent);
 
-    for (int i=0;i<nb;i++)
-    {
-        for (int j=i+1;j<nb;j++)
-        {
-            for (int k=j+1;k<nb;k++)
-            {
-                double dij,dik,djk,p,s;
-                dij=sqrt(square(_solver.stars[i].x-_solver.stars[j].x)+square(_solver.stars[i].y-_solver.stars[j].y));
-                dik=sqrt(square(_solver.stars[i].x-_solver.stars[k].x)+square(_solver.stars[i].y-_solver.stars[k].y));
-                djk=sqrt(square(_solver.stars[j].x-_solver.stars[k].x)+square(_solver.stars[j].y-_solver.stars[k].y));
-                p=dij+dik+djk;
-                s=sqrt(p*(p-dij)*(p-dik)*(p-djk));
-                //BOOST_LOG_TRIVIAL(debug) << "Trig CURRENT" << " - " << i << " - " << j << " - " << k << " - p=  " << p << " - s=" << s << " - s/p=" << s/p;
-                _trigCurrent.append({
-                                 _solver.stars[i].x,
-                                 _solver.stars[i].y,
-                                 _solver.stars[j].x,
-                                 _solver.stars[j].y,
-                                 _solver.stars[k].x,
-                                 _solver.stars[k].y,
-                                 dij,dik,djk,
-                                 p,s,s/p
-                                });
-
-            }
-        }
-
-    }
     double coeff[2];
     if (_trigCurrent.size()>0) {
-        matchTrig(_trigPrev,_trigCurrent,_matchedPairs,_avdx,_avdy);
-        matchTrig(_trigRef,_trigCurrent,_matchedTotPairs,_totdx,_totdy);
+        matchIndexes(_trigPrev,_trigCurrent,_matchedPairs,_avdx,_avdy);
+        matchIndexes(_trigRef,_trigCurrent,_matchedTotPairs,_totdx,_totdy);
         _grid->append(_totdx,_totdy);
         _propertyStore.update(_grid);
         emit propertyAppended(_grid,&_modulename,0,_totdx,_totdy,0,0);
@@ -567,39 +511,11 @@ void GuiderModule::SMComputeGuide()
     _pulseE = 0;
     _pulseN = 0;
     _pulseS = 0;
-    int nb = _solver.stars.size();
-    if (nb > 10) nb = 10;
+    buildIndexes(_solver,_trigCurrent);
 
-    _trigCurrent.clear();
-    for (int i=0;i<nb;i++)
-    {
-        for (int j=i+1;j<nb;j++)
-        {
-            for (int k=j+1;k<nb;k++)
-            {
-                double dij,dik,djk,p,s;
-                dij=sqrt(square(_solver.stars[i].x-_solver.stars[j].x)+square(_solver.stars[i].y-_solver.stars[j].y));
-                dik=sqrt(square(_solver.stars[i].x-_solver.stars[k].x)+square(_solver.stars[i].y-_solver.stars[k].y));
-                djk=sqrt(square(_solver.stars[j].x-_solver.stars[k].x)+square(_solver.stars[j].y-_solver.stars[k].y));
-                p=dij+dik+djk;
-                s=sqrt(p*(p-dij)*(p-dik)*(p-djk));
-                //BOOST_LOG_TRIVIAL(debug) << "Trig REF " << " - " << i << " - " << j << " - " << k << " - p=  " << p << " - s=" << s << " - s/p=" << s/p;
-                _trigCurrent.append({
-                                 _solver.stars[i].x,
-                                 _solver.stars[i].y,
-                                 _solver.stars[j].x,
-                                 _solver.stars[j].y,
-                                 _solver.stars[k].x,
-                                 _solver.stars[k].y,
-                                 dij,dik,djk,
-                                 p,s,s/p
-                                });
-            }
-        }
-    }
     BOOST_LOG_TRIVIAL(debug) << "Trig current size " << _trigCurrent.size();
     if (_trigCurrent.size()>0) {
-        matchTrig(_trigFirst,_trigCurrent,_matchedTotPairs,_totdx,_totdy);
+        matchIndexes(_trigFirst,_trigCurrent,_matchedTotPairs,_totdx,_totdy);
         _grid->append(_totdx,_totdy);
         _propertyStore.update(_grid);
         emit propertyAppended(_grid,&_modulename,0,_totdx,_totdy,0,0);
@@ -720,7 +636,7 @@ void GuiderModule::SMAbort()
 
 }
 
-void GuiderModule::matchTrig(QVector<Trig> ref, QVector<Trig> act, QVector<MatchedPair>& pairs, double& dx, double& dy)
+void GuiderModule::matchIndexes(QVector<Trig> ref, QVector<Trig> act, QVector<MatchedPair>& pairs, double& dx, double& dy)
 {
     pairs.clear();
 
@@ -769,5 +685,41 @@ void GuiderModule::matchTrig(QVector<Trig> ref, QVector<Trig> act, QVector<Match
     /*foreach (MatchedPair pair, _matchedPairs) {
             BOOST_LOG_TRIVIAL(debug) << "Matched pair =  " << pair.dx << "-" << pair.dy;
     }*/
+
+}
+void GuiderModule::buildIndexes(Solver& solver, QVector<Trig>& trig)
+{
+    int nb = solver.stars.size();
+    if (nb > 10) nb = 10;
+    trig.clear();
+
+    for (int i=0;i<nb;i++)
+    {
+        for (int j=i+1;j<nb;j++)
+        {
+            for (int k=j+1;k<nb;k++)
+            {
+                double dij,dik,djk,p,s;
+                dij=sqrt(square(solver.stars[i].x-solver.stars[j].x)+square(solver.stars[i].y-solver.stars[j].y));
+                dik=sqrt(square(solver.stars[i].x-solver.stars[k].x)+square(solver.stars[i].y-solver.stars[k].y));
+                djk=sqrt(square(solver.stars[j].x-solver.stars[k].x)+square(solver.stars[j].y-solver.stars[k].y));
+                p=dij+dik+djk;
+                s=sqrt(p*(p-dij)*(p-dik)*(p-djk));
+                //BOOST_LOG_TRIVIAL(debug) << "Trig CURRENT" << " - " << i << " - " << j << " - " << k << " - p=  " << p << " - s=" << s << " - s/p=" << s/p;
+                trig.append({
+                                 solver.stars[i].x,
+                                 solver.stars[i].y,
+                                 solver.stars[j].x,
+                                 solver.stars[j].y,
+                                 solver.stars[k].x,
+                                 solver.stars[k].y,
+                                 dij,dik,djk,
+                                 p,s,s/p
+                                });
+
+            }
+        }
+
+    }
 
 }
