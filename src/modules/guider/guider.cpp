@@ -381,8 +381,6 @@ void GuiderModule::SMComputeRef()
     _pulseNTot = 0;
     _pulseSTot = 0;
     _ccdOrientation=0;
-    _trigPrev=_trigRef;
-    _trigFirst=_trigRef;
     emit ComputeRefDone();
 }
 void GuiderModule::SMComputeCal()
@@ -392,14 +390,15 @@ void GuiderModule::SMComputeCal()
 
     double coeff[2];
     if (_trigCurrent.size()>0) {
-        matchIndexes(_trigPrev,_trigCurrent,_matchedPairs,_avdx,_avdy);
-        matchIndexes(_trigRef,_trigCurrent,_matchedTotPairs,_totdx,_totdy);
-        _grid->append(_totdx,_totdy);
+        matchIndexes(_trigPrev,_trigCurrent,_matchedCurPrev,_dxPrev,_dyPrev);
+        matchIndexes(_trigRef,_trigCurrent,_matchedCurRef,_dxRef,_dyRef);
+        matchIndexes(_trigFirst,_trigCurrent,_matchedCurFirst,_dxFirst,_dyFirst);
+        _grid->append(_dxFirst,_dyFirst);
         _propertyStore.update(_grid);
-        emit propertyAppended(_grid,&_modulename,0,_totdx,_totdy,0,0);
-        BOOST_LOG_TRIVIAL(debug) << "AVDX AVDY =  " << _avdx << "-" << _avdy;
-        _dxvector.push_back(_totdx);
-        _dyvector.push_back(_totdy);
+        emit propertyAppended(_grid,&_modulename,0,_dxFirst,_dyFirst,0,0);
+        BOOST_LOG_TRIVIAL(debug) << "DX DY // first =  " << _dxFirst << "-" << _dyFirst;
+        _dxvector.push_back(_dxPrev);
+        _dyvector.push_back(_dyPrev);
         if (_dxvector.size() > 1)
         {
             polynomialfit(_dxvector.size(), 2, _dxvector.data(), _dyvector.data(), coeff);
@@ -410,7 +409,7 @@ void GuiderModule::SMComputeCal()
     } else {
       BOOST_LOG_TRIVIAL(debug) << "houston, we have a problem";
     }
-    BOOST_LOG_TRIVIAL(debug) << "Drifts " << sqrt(square(_avdx)+square(_avdy));
+    BOOST_LOG_TRIVIAL(debug) << "Drifts // prev " << sqrt(square(_dxPrev)+square(_dyPrev));
     _trigPrev=_trigCurrent;
 
     /*if (_calState==0) {
@@ -516,13 +515,13 @@ void GuiderModule::SMComputeGuide()
 
     BOOST_LOG_TRIVIAL(debug) << "Trig current size " << _trigCurrent.size();
     if (_trigCurrent.size()>0) {
-        matchIndexes(_trigFirst,_trigCurrent,_matchedTotPairs,_totdx,_totdy);
-        _grid->append(_totdx,_totdy);
+        matchIndexes(_trigFirst,_trigCurrent,_matchedCurFirst,_dxFirst,_dyFirst);
+        _grid->append(_dxFirst,_dyFirst);
         _propertyStore.update(_grid);
-        emit propertyAppended(_grid,&_modulename,0,_totdx,_totdy,0,0);
+        emit propertyAppended(_grid,&_modulename,0,_dxFirst,_dyFirst,0,0);
     }
-    double _driftRA=  _totdx*cos(_ccdOrientation)+_totdy*sin(_ccdOrientation);
-    double _driftDE= -_totdx*sin(_ccdOrientation)+_totdy*cos(_ccdOrientation);
+    double _driftRA=  _dxFirst*cos(_ccdOrientation)+_dyFirst*sin(_ccdOrientation);
+    double _driftDE= -_dxFirst*sin(_ccdOrientation)+_dyFirst*cos(_ccdOrientation);
     BOOST_LOG_TRIVIAL(debug) << "*********************** guide  RA drift (px) " << _driftRA;
     BOOST_LOG_TRIVIAL(debug) << "*********************** guide  DE drift (px) " << _driftDE;
     if (_driftRA > 0 ) {
@@ -549,9 +548,9 @@ void GuiderModule::SMComputeGuide()
     BOOST_LOG_TRIVIAL(debug) << "*********************** guide  E pusle " << _pulseE;
     BOOST_LOG_TRIVIAL(debug) << "*********************** guide  N pusle " << _pulseN;
     BOOST_LOG_TRIVIAL(debug) << "*********************** guide  S pusle " << _pulseS;
-    _gridguide->append(_itt,_totdx,_totdy,_pulseW-_pulseE,_pulseN-_pulseS);
+    _gridguide->append(_itt,_driftRA,_driftDE,_pulseW-_pulseE,_pulseN-_pulseS);
     _propertyStore.update(_gridguide);
-    emit propertyAppended(_gridguide,&_modulename,_itt,_totdx,_totdy,_pulseW-_pulseE,_pulseN-_pulseS);
+    emit propertyAppended(_gridguide,&_modulename,_itt,_driftRA,_driftDE,_pulseW-_pulseE,_pulseN-_pulseS);
     _itt++;
 
     _values->addNumber(new NumberValue("pulseN","Pulse N","hint",_pulseN,"",0,10000,0));

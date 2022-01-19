@@ -111,10 +111,12 @@ class MODULE_INIT GuiderModule : public Basemodule
         int    _calSteps=3;
         bool   _pulseRAfinished= true;
         bool   _pulseDECfinished = true;
-        double _avdx=0;
-        double _avdy=0;
-        double _totdx=0;
-        double _totdy=0;
+        double _dxFirst=0;
+        double _dyFirst=0;
+        double _dxRef=0;
+        double _dyRef=0;
+        double _dxPrev=0;
+        double _dyPrev=0;
         double _mountDEC;
         double _mountRA;
         bool   _mountPointingWest=false;
@@ -130,8 +132,9 @@ class MODULE_INIT GuiderModule : public Basemodule
         QVector<Trig> _trigRef;
         QVector<Trig> _trigPrev;
         QVector<Trig> _trigCurrent;
-        QVector<MatchedPair> _matchedPairs;
-        QVector<MatchedPair> _matchedTotPairs;
+        QVector<MatchedPair> _matchedCurRef;
+        QVector<MatchedPair> _matchedCurPrev;
+        QVector<MatchedPair> _matchedCurFirst;
 
 
         std::vector<double> _dxvector;
