@@ -73,7 +73,9 @@ class MODULE_INIT GuiderModule : public Basemodule
         void newSwitch(ISwitchVectorProperty *svp) override;
 
         SwitchProperty* _actions;
-        NumberProperty* _parameters;
+        NumberProperty* _commonParams;
+        NumberProperty* _calParams;
+        NumberProperty* _guideParams;
         NumberProperty* _values;
         ImageProperty*  _img;
         GridProperty*   _grid;

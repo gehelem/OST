@@ -21,14 +21,28 @@ GuiderModule::GuiderModule(QString name,QString label)
     emit propertyCreated(_actions,&_modulename);
     _propertyStore.add(_actions);
 
-    _parameters = new NumberProperty(_modulename,"Control","root","parameters","Parameters",2,0);
-    _parameters->addNumber(new NumberValue("exposure"      ,"Exposure","hint",_exposure,"",0,5,1));
-    _parameters->addNumber(new NumberValue("pulse"      ,"Calibration pulse","hint",_pulse,"",0,5000,1));
-    emit propertyCreated(_parameters,&_modulename);
-    _propertyStore.add(_parameters);
+    _commonParams = new NumberProperty(_modulename,"Parameters","root","commonParams","Common Parameters",2,0);
+    _commonParams->addNumber(new NumberValue("exposure"      ,"Exposure (s)","hint",_exposure,"",0,5,1));
+    emit propertyCreated(_commonParams,&_modulename);
+    _propertyStore.add(_commonParams);
+
+    _calParams = new NumberProperty(_modulename,"Parameters","root","calParams","Calibration Parameters",2,0);
+    _calParams->addNumber(new NumberValue("pulse"      ,"Calibration pulse (ms)","hint",_pulse,"",0,5000,1));
+    _calParams->addNumber(new NumberValue("calsteps"   ,"Iteratinos / axis","hint",_calSteps,"",0,15,1));
+    emit propertyCreated(_calParams,&_modulename);
+    _propertyStore.add(_calParams);
+
+    _guideParams = new NumberProperty(_modulename,"Parameters","root","guideParams","Guiding Parameters",2,0);
+    _guideParams->addNumber(new NumberValue("pulsemax"      ,"Max pulse (ms)","hint",_pulseMax,"",0,5000,1));
+    _guideParams->addNumber(new NumberValue("pulsemin"      ,"Min pulse (ms)","hint",_pulseMin,"",0,1000,1));
+    emit propertyCreated(_guideParams,&_modulename);
+    _propertyStore.add(_guideParams);
 
     _values = new NumberProperty(_modulename,"Control","root","values","Values",0,0);
-    _values->addNumber(new NumberValue("xxx","xxx","hint",0,"",0,99,0));
+    _values->addNumber(new NumberValue("pulseN","Pulse N","hint",_pulseN,"",0,10000,0));
+    _values->addNumber(new NumberValue("pulseS","Pulse S","hint",_pulseS,"",0,10000,0));
+    _values->addNumber(new NumberValue("pulseE","Pulse E","hint",_pulseE,"",0,10000,0));
+    _values->addNumber(new NumberValue("pulseW","Pulse W","hint",_pulseW,"",0,10000,0));
     emit propertyCreated(_values,&_modulename);
     _propertyStore.add(_values);
 
@@ -68,9 +82,12 @@ void GuiderModule::OnSetPropertyNumber(NumberProperty* prop)
     for (int j = 0; j < numbers.size(); ++j) {
         if (numbers[j]->name()=="exposure")        _exposure=numbers[j]->getValue();
         if (numbers[j]->name()=="pulse")           _pulse=numbers[j]->getValue();
+        if (numbers[j]->name()=="calsteps")        _calSteps=numbers[j]->getValue();
+        if (numbers[j]->name()=="pulsemax")        _pulseMax=numbers[j]->getValue();
+        if (numbers[j]->name()=="pulsemin")        _pulseMin=numbers[j]->getValue();
 
         emit propertyUpdated(prop,&_modulename);
-        BOOST_LOG_TRIVIAL(debug) << "Focus number property item modified " << prop->getName().toStdString();
+        //BOOST_LOG_TRIVIAL(debug) << "Focus number property item modified " << prop->getName().toStdString();
     }
 
 }
@@ -615,6 +632,14 @@ void GuiderModule::SMComputeGuide()
     _propertyStore.update(_gridguide);
     emit propertyAppended(_gridguide,&_modulename,_itt,_totdx,_totdy,_pulseW-_pulseE,_pulseN-_pulseS);
     _itt++;
+
+    _values->addNumber(new NumberValue("pulseN","Pulse N","hint",_pulseN,"",0,10000,0));
+    _values->addNumber(new NumberValue("pulseS","Pulse S","hint",_pulseS,"",0,10000,0));
+    _values->addNumber(new NumberValue("pulseE","Pulse E","hint",_pulseE,"",0,10000,0));
+    _values->addNumber(new NumberValue("pulseW","Pulse W","hint",_pulseW,"",0,10000,0));
+    emit propertyCreated(_values,&_modulename);
+    _propertyStore.add(_values);
+
     emit ComputeGuideDone();
 }
 void GuiderModule::SMRequestPulses()
