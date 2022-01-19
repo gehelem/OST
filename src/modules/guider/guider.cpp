@@ -28,13 +28,15 @@ GuiderModule::GuiderModule(QString name,QString label)
 
     _calParams = new NumberProperty(_modulename,"Parameters","root","calParams","Calibration Parameters",2,0);
     _calParams->addNumber(new NumberValue("pulse"      ,"Calibration pulse (ms)","hint",_pulse,"",0,5000,1));
-    _calParams->addNumber(new NumberValue("calsteps"   ,"Iteratinos / axis","hint",_calSteps,"",0,15,1));
+    _calParams->addNumber(new NumberValue("calsteps"   ,"Iterations / axis","hint",_calSteps,"",0,15,1));
     emit propertyCreated(_calParams,&_modulename);
     _propertyStore.add(_calParams);
 
     _guideParams = new NumberProperty(_modulename,"Parameters","root","guideParams","Guiding Parameters",2,0);
     _guideParams->addNumber(new NumberValue("pulsemax"      ,"Max pulse (ms)","hint",_pulseMax,"",0,5000,1));
     _guideParams->addNumber(new NumberValue("pulsemin"      ,"Min pulse (ms)","hint",_pulseMin,"",0,1000,1));
+    _guideParams->addNumber(new NumberValue("raAgr"         ,"RA Agressivity","hint",_raAgr,"",0,2,1));
+    _guideParams->addNumber(new NumberValue("deAgr"         ,"DEC Agressivity","hint",_deAgr,"",0,2,1));
     emit propertyCreated(_guideParams,&_modulename);
     _propertyStore.add(_guideParams);
 
@@ -76,7 +78,6 @@ GuiderModule::~GuiderModule()
 void GuiderModule::OnSetPropertyNumber(NumberProperty* prop)
 {
     if (!(prop->getModuleName()==_modulename)) return;
-    _propertyStore.add(prop);
 
     QList<NumberValue*> numbers=prop->getNumbers();
     for (int j = 0; j < numbers.size(); ++j) {
@@ -85,8 +86,11 @@ void GuiderModule::OnSetPropertyNumber(NumberProperty* prop)
         if (numbers[j]->name()=="calsteps")        _calSteps=numbers[j]->getValue();
         if (numbers[j]->name()=="pulsemax")        _pulseMax=numbers[j]->getValue();
         if (numbers[j]->name()=="pulsemin")        _pulseMin=numbers[j]->getValue();
-
+        if (numbers[j]->name()=="raAgr")        _raAgr=numbers[j]->getValue();
+        if (numbers[j]->name()=="deAgr")        _deAgr=numbers[j]->getValue();
+        prop->setState(1);
         emit propertyUpdated(prop,&_modulename);
+        _propertyStore.add(prop);
         //BOOST_LOG_TRIVIAL(debug) << "Focus number property item modified " << prop->getName().toStdString();
     }
 
