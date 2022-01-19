@@ -265,6 +265,60 @@ bool Basemodule::getModNumber(const QString& deviceName, const QString& property
     sendMessage("Error - unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
     return false;
 }
+bool Basemodule::getModSwitch(const QString& deviceName, const QString& propertyName, const QString&  elementName, bool &value)
+{
+    //qDebug() << "taskSendNewNumber" << " " << deviceName << " " << propertyName<< " " << elementName;
+    INDI::BaseDevice *dp = getDevice(deviceName.toStdString().c_str());
+
+    if (dp== nullptr)
+    {
+        sendMessage("Error - unable to find " + deviceName + " device. Aborting.");
+        return false;
+    }
+    ISwitchVectorProperty *prop = nullptr;
+    prop = dp->getSwitch(propertyName.toStdString().c_str());
+    if (prop == nullptr)
+    {
+        sendMessage("Error - unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
+        return false;
+    }
+
+    for (int i=0;i<prop->nsp;i++) {
+        if (strcmp(prop->sp[i].name, elementName.toStdString().c_str()) == 0) {
+            value = prop->sp[i].s;
+            return true;
+        }
+    }
+    sendMessage("Error - unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
+    return false;
+}
+bool Basemodule::getModText(const QString& deviceName, const QString& propertyName, const QString&  elementName, QString& value)
+{
+    //qDebug() << "taskSendNewNumber" << " " << deviceName << " " << propertyName<< " " << elementName;
+    INDI::BaseDevice *dp = getDevice(deviceName.toStdString().c_str());
+
+    if (dp== nullptr)
+    {
+        sendMessage("Error - unable to find " + deviceName + " device. Aborting.");
+        return false;
+    }
+    ITextVectorProperty *prop = nullptr;
+    prop = dp->getText(propertyName.toStdString().c_str());
+    if (prop == nullptr)
+    {
+        sendMessage("Error - unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
+        return false;
+    }
+
+    for (int i=0;i<prop->ntp;i++) {
+        if (strcmp(prop->tp[i].name, elementName.toStdString().c_str()) == 0) {
+            value = prop->tp[i].text;
+            return true;
+        }
+    }
+    sendMessage("Error - unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
+    return false;
+}
 bool Basemodule::sendModNewText  (QString deviceName,QString propertyName,QString elementName, QString text)
 {
     //qDebug() << "taskSendNewText";
