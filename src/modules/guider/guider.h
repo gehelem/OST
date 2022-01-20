@@ -58,7 +58,7 @@ class MODULE_INIT GuiderModule : public Basemodule
         void ComputeRefDone();
         void ComputeCalDone();
         void ComputeGuideDone();
-        void StartGuiding();
+        void CalibrationDone();
         void abort();
 
 
@@ -102,10 +102,6 @@ class MODULE_INIT GuiderModule : public Basemodule
         int    _calPulseW = 0;
         int    _calPulseRA = 0;
         int    _calPulseDEC = 0;
-        int    _pulseNTot = 0;
-        int    _pulseSTot = 0;
-        int    _pulseETot = 0;
-        int    _pulseWTot = 0;
         int    _calState =0;
         int    _calStep=0;
         int    _calSteps=3;
@@ -120,14 +116,19 @@ class MODULE_INIT GuiderModule : public Basemodule
         double _mountDEC;
         double _mountRA;
         bool   _mountPointingWest=false;
+        bool   _calMountPointingWest=false;
         double _ccdOrientation;
+        double _calCcdOrientation;
         double _ccdSampling=206*5.2/800;
         int _itt=0;
 
 
         QString _camera  = "Guide Simulator";
         QString _mount  = "Telescope Simulator";
-        QStateMachine _machine;
+        QStateMachine *_machine;
+        QStateMachine _SMInit;
+        QStateMachine _SMCalibration;
+        QStateMachine _SMGuide;
         QVector<Trig> _trigFirst;
         QVector<Trig> _trigRef;
         QVector<Trig> _trigPrev;
@@ -144,7 +145,7 @@ class MODULE_INIT GuiderModule : public Basemodule
         std::vector<double> _dDEvector;
 
 
-        void startCalibration();
+        void startCalGuide(bool cal);
         void buildIndexes(Solver& solver, QVector<Trig>& trig);
         void matchIndexes(QVector<Trig> ref,QVector<Trig> act, QVector<MatchedPair>& pairs, double& dx,double& dy);
         double square(double value){ return value*value;}
