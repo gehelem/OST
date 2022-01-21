@@ -49,6 +49,8 @@ class MODULE_INIT GuiderModule : public Basemodule
 
     signals:
         void InitDone();
+        void InitCalDone();
+        void InitGuideDone();
         void AbortDone();
         void Abort();
         void RequestFrameResetDone();
@@ -111,8 +113,6 @@ class MODULE_INIT GuiderModule : public Basemodule
         bool   _pulseDECfinished = true;
         double _dxFirst=0;
         double _dyFirst=0;
-        double _dxRef=0;
-        double _dyRef=0;
         double _dxPrev=0;
         double _dyPrev=0;
         double _mountDEC;
@@ -132,10 +132,8 @@ class MODULE_INIT GuiderModule : public Basemodule
         QStateMachine _SMCalibration;
         QStateMachine _SMGuide;
         QVector<Trig> _trigFirst;
-        QVector<Trig> _trigRef;
         QVector<Trig> _trigPrev;
         QVector<Trig> _trigCurrent;
-        QVector<MatchedPair> _matchedCurRef;
         QVector<MatchedPair> _matchedCurPrev;
         QVector<MatchedPair> _matchedCurFirst;
 
@@ -152,8 +150,11 @@ class MODULE_INIT GuiderModule : public Basemodule
         void matchIndexes(QVector<Trig> ref,QVector<Trig> act, QVector<MatchedPair>& pairs, double& dx,double& dy);
         double square(double value){ return value*value;}
 
-        void buildStateMachines(void);
-        void SMInit();
+        void buildInitStateMachines(void);
+        void buildCalStateMachines(void);
+        void SMInitInit();
+        void SMInitCal();
+        void SMInitGuide();
         void SMRequestExposure();
         void SMRequestPulses();
         void SMFindStars();
