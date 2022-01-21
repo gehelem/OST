@@ -145,13 +145,13 @@ class MODULE_INIT GuiderModule : public Basemodule
         std::vector<double> _dDEvector;
 
 
-        void startCalGuide(bool cal);
         void buildIndexes(Solver& solver, QVector<Trig>& trig);
         void matchIndexes(QVector<Trig> ref,QVector<Trig> act, QVector<MatchedPair>& pairs, double& dx,double& dy);
         double square(double value){ return value*value;}
 
         void buildInitStateMachines(void);
         void buildCalStateMachines(void);
+        void buildGuideStateMachines(void);
         void SMInitInit();
         void SMInitCal();
         void SMInitGuide();

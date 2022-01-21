@@ -72,6 +72,9 @@ GuiderModule::GuiderModule(QString name,QString label)
 
     buildInitStateMachines();
     buildCalStateMachines();
+    buildGuideStateMachines();
+
+
 
 }
 
@@ -121,7 +124,7 @@ void GuiderModule::OnSetPropertySwitch(SwitchProperty* prop)
         }
         if (switchs[j]->name()=="guide") {
             wprop->setSwitch(switchs[j]->name(),true);
-            startCalGuide(false);
+            _SMGuide.start();
         }
         if (switchs[j]->name()=="loadconfs") {
             wprop->setSwitch(switchs[j]->name(),true);
@@ -299,140 +302,49 @@ void GuiderModule::buildCalStateMachines(void)
 
 
 }
-void GuiderModule::startCalGuide(bool cal)
+void GuiderModule::buildGuideStateMachines(void)
 {
-    delete _machine;
-    if (cal) BOOST_LOG_TRIVIAL(debug) << "Guider module - Start calibration and guide";
-    else     {
-        BOOST_LOG_TRIVIAL(debug) << "Guider module - Start guide with existing calibration : ";
-        BOOST_LOG_TRIVIAL(debug) << "*********************** cal CCD Orientation "<< _calCcdOrientation*180/PI;
-        BOOST_LOG_TRIVIAL(debug) << "*********************** cal moutn pointing west  " << _calMountPointingWest;
-        BOOST_LOG_TRIVIAL(debug) << "*********************** cal W "<< _calPulseW;
-        BOOST_LOG_TRIVIAL(debug) << "*********************** cal E "<< _calPulseE;
-        BOOST_LOG_TRIVIAL(debug) << "*********************** cal N "<< _calPulseN;
-        BOOST_LOG_TRIVIAL(debug) << "*********************** cal S "<< _calPulseS;
 
-    }
+    auto *Abort = new QState();
+    auto *Guide  = new QState();
+    auto *End   = new QFinalState();
 
-    _states->addLight(new LightValue("idle"  ,"Idle","hint",0));
-    if (cal) _states->addLight(new LightValue("cal"   ,"Calibrating","hint",2));
-    else     _states->addLight(new LightValue("cal"   ,"Calibrating","hint",0));
-    _states->addLight(new LightValue("guide" ,"Guiding","hint",0));
-    _states->addLight(new LightValue("error" ,"Error","hint",0));
-    emit propertyUpdated(_states,&_modulename);
-    _propertyStore.update(_states);
+    auto *InitGuide           = new QState(Guide);
+    auto *RequestGuidePulses  = new QState(Guide);
+    auto *WaitGuidePulses     = new QState(Guide);
+    auto *RequestGuideExposure= new QState(Guide);
+    auto *WaitGuideExposure   = new QState(Guide);
+    auto *FindStarsGuide      = new QState(Guide);
+    auto *ComputeGuide        = new QState(Guide);
 
-    BOOST_LOG_TRIVIAL(debug) << "Guider module - RA/DEC = " << _mountRA << "/" << _mountDEC;
-
-    _machine = new QStateMachine();
-    _grid->clear();
-    _propertyStore.update(_grid);
-    emit propertyUpdated(_grid,&_modulename);
-
-    _gridguide->clear();
-    _propertyStore.update(_gridguide);
-    emit propertyUpdated(_gridguide,&_modulename);
-
-    auto *init  = new QState();
-    auto *calibrate = new QState();
-    auto *guide = new QState();
-    auto *abort = new QState();
-
-    auto *RequestFrameReset    = new QState(init);
-    auto *WaitFrameReset       = new QState(init);
-    auto *RequestFirstExposure = new QState(init);
-    auto *WaitFirstExposure    = new QState(init);
-    auto *FindStarsRef         = new QState(init);
-    auto *ComputeRef           = new QState(init);
-
-    auto *RequestCalPulses     = new QState(calibrate);
-    auto *WaitCalPulses        = new QState(calibrate);
-    auto *RequestCalExposure   = new QState(calibrate);
-    auto *WaitCalExposure      = new QState(calibrate);
-    auto *FindStarsCal         = new QState(calibrate);
-    auto *ComputeCal           = new QState(calibrate);
-
-    auto *RequestGuidePulses     = new QState(guide);
-    auto *WaitGuidePulses        = new QState(guide);
-    auto *RequestGuideExposure   = new QState(guide);
-    auto *WaitGuideExposure      = new QState(guide);
-    auto *FindStarsGuide         = new QState(guide);
-    auto *ComputeGuide           = new QState(guide);
-
-    init->setInitialState(RequestFrameReset);
-    calibrate->setInitialState(RequestCalPulses);
-    guide->setInitialState(RequestGuidePulses);
-
-    _machine->addState(init);
-    _machine->addState(calibrate);
-    _machine->addState(guide);
-    _machine->addState(abort);
-    _machine->setInitialState(init);
-
-    connect(RequestFrameReset,   &QState::entered, this, &GuiderModule::SMRequestFrameReset);
-    connect(RequestFirstExposure,&QState::entered, this, &GuiderModule::SMRequestExposure);
-    connect(FindStarsRef        ,&QState::entered, this, &GuiderModule::SMFindStars);
-    connect(ComputeRef,          &QState::entered, this, &GuiderModule::SMComputeFirst);
-    connect(RequestCalExposure,  &QState::entered, this, &GuiderModule::SMRequestExposure);
-    connect(RequestCalPulses,    &QState::entered, this, &GuiderModule::SMRequestPulses);
-    connect(FindStarsCal,        &QState::entered, this, &GuiderModule::SMFindStars);
-    connect(ComputeCal,          &QState::entered, this, &GuiderModule::SMComputeCal);
+    connect(InitGuide           ,&QState::entered, this, &GuiderModule::SMInitGuide);
     connect(RequestGuideExposure,&QState::entered, this, &GuiderModule::SMRequestExposure);
+    connect(FindStarsGuide      ,&QState::entered, this, &GuiderModule::SMFindStars);
+    connect(ComputeGuide        ,&QState::entered, this, &GuiderModule::SMComputeGuide);
     connect(RequestGuidePulses,  &QState::entered, this, &GuiderModule::SMRequestPulses);
-    connect(FindStarsGuide,      &QState::entered, this, &GuiderModule::SMFindStars);
-    connect(ComputeGuide,        &QState::entered, this, &GuiderModule::SMComputeGuide);
-    connect(abort,               &QState::entered, this, &GuiderModule::SMAbort);
+    connect(Abort,               &QState::entered, this, &GuiderModule::SMAbort);
 
-    init->     addTransition(this,&GuiderModule::Abort,                abort);
-    calibrate->addTransition(this,&GuiderModule::Abort,                abort);
-    guide->    addTransition(this,&GuiderModule::Abort,                abort);
+    Guide->               addTransition(this,&GuiderModule::Abort               ,Abort);
+    Abort->               addTransition(this,&GuiderModule::AbortDone           ,End);
+    InitGuide->           addTransition(this,&GuiderModule::InitGuideDone       ,RequestGuideExposure);
 
-    RequestFrameReset->   addTransition(this,&GuiderModule::RequestFrameResetDone,WaitFrameReset);
-    WaitFrameReset->      addTransition(this,&GuiderModule::FrameResetDone       ,RequestFirstExposure);
-    RequestFirstExposure->addTransition(this,&GuiderModule::RequestExposureDone  ,WaitFirstExposure);
-    WaitFirstExposure->   addTransition(this,&GuiderModule::ExposureDone ,        FindStarsRef);
-    FindStarsRef->        addTransition(this,&GuiderModule::FindStarsDone ,       ComputeRef);
-    if (cal) {
-        ComputeRef->      addTransition(this,&GuiderModule::ComputeFirstDone ,      calibrate);
-    } else {
-        ComputeRef->      addTransition(this,&GuiderModule::ComputeFirstDone ,      guide);
-    }
+    RequestGuidePulses->    addTransition(this,&GuiderModule::RequestPulsesDone   ,WaitGuidePulses);
+    WaitGuidePulses->       addTransition(this,&GuiderModule::PulsesDone          ,RequestGuideExposure);
+    RequestGuideExposure->  addTransition(this,&GuiderModule::RequestExposureDone ,WaitGuideExposure);
+    WaitGuideExposure->     addTransition(this,&GuiderModule::ExposureDone        ,FindStarsGuide);
+    FindStarsGuide->        addTransition(this,&GuiderModule::FindStarsDone       ,ComputeGuide);
+    ComputeGuide->          addTransition(this,&GuiderModule::ComputeGuideDone    ,RequestGuidePulses);
+    //ComputeGuide->          addTransition(this,&GuiderModule::GuideDone           ,End); // useless ??
 
 
-    RequestCalPulses     ->addTransition(this,&GuiderModule::RequestPulsesDone,WaitCalPulses);
-    WaitCalPulses        ->addTransition(this,&GuiderModule::PulsesDone,RequestCalExposure);
-    RequestCalExposure   ->addTransition(this,&GuiderModule::RequestExposureDone,WaitCalExposure);
-    WaitCalExposure      ->addTransition(this,&GuiderModule::ExposureDone,FindStarsCal);
-    FindStarsCal         ->addTransition(this,&GuiderModule::FindStarsDone,ComputeCal);
-    ComputeCal           ->addTransition(this,&GuiderModule::ComputeCalDone,RequestCalPulses);
-    ComputeCal           ->addTransition(this,&GuiderModule::CalibrationDone,guide);
+    Guide->setInitialState(InitGuide);
 
-    RequestGuidePulses     ->addTransition(this,&GuiderModule::RequestPulsesDone,WaitGuidePulses);
-    WaitGuidePulses        ->addTransition(this,&GuiderModule::PulsesDone,RequestGuideExposure);
-    RequestGuideExposure   ->addTransition(this,&GuiderModule::RequestExposureDone,WaitGuideExposure);
-    WaitGuideExposure      ->addTransition(this,&GuiderModule::ExposureDone,FindStarsGuide);
-    FindStarsGuide         ->addTransition(this,&GuiderModule::FindStarsDone,ComputeGuide);
-    ComputeGuide           ->addTransition(this,&GuiderModule::ComputeGuideDone,RequestGuidePulses);
-
-    _calState=0;
-    _calStep=0;
-    _calSteps=4;
-    _pulseN = 0;
-    _pulseS = 0;
-    _pulseE = 0;
-    _pulseW = 0;
-    if (cal) _pulseW=_pulse;
-    _trigCurrent.clear();
-    _dxvector.clear();
-    _dyvector.clear();
-    _coefficients.clear();
-    _itt=0;
-    _pulseDECfinished = true;
-    _pulseRAfinished = true;
+    _SMGuide.addState(Guide);
+    _SMGuide.addState(Abort);
+    _SMGuide.addState(End);
+    _SMGuide.setInitialState(Guide);
 
 
-    _machine->start();
-    sendMessage("machine started");
 }
 void GuiderModule::SMInitInit()
 {
@@ -511,7 +423,13 @@ void GuiderModule::SMInitGuide()
     emit propertyUpdated(_states,&_modulename);
     _propertyStore.update(_states);
 
+    _gridguide->clear();
+    _propertyStore.update(_gridguide);
+    emit propertyUpdated(_gridguide,&_modulename);
 
+    _grid->clear();
+    _propertyStore.update(_grid);
+    emit propertyUpdated(_grid,&_modulename);
 
     BOOST_LOG_TRIVIAL(debug) << "SMInitGuideDone";
     emit InitGuideDone();
