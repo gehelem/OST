@@ -48,6 +48,9 @@ class MODULE_INIT GuiderModule : public Basemodule
         ~GuiderModule();
 
     signals:
+        void InitDone();
+        void AbortDone();
+        void Abort();
         void RequestFrameResetDone();
         void FrameResetDone();
         void RequestExposureDone();
@@ -55,11 +58,10 @@ class MODULE_INIT GuiderModule : public Basemodule
         void FindStarsDone();
         void RequestPulsesDone();
         void PulsesDone();
-        void ComputeRefDone();
+        void ComputeFirstDone();
         void ComputeCalDone();
         void ComputeGuideDone();
         void CalibrationDone();
-        void abort();
 
 
     public slots:
@@ -150,10 +152,12 @@ class MODULE_INIT GuiderModule : public Basemodule
         void matchIndexes(QVector<Trig> ref,QVector<Trig> act, QVector<MatchedPair>& pairs, double& dx,double& dy);
         double square(double value){ return value*value;}
 
+        void buildStateMachines(void);
+        void SMInit();
         void SMRequestExposure();
-        void SMComputeRef();
         void SMRequestPulses();
         void SMFindStars();
+        void SMComputeFirst();
         void SMComputeCal();
         void SMComputeGuide();
         void SMRequestFrameReset();

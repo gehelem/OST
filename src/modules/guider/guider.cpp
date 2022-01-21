@@ -17,7 +17,8 @@ GuiderModule::GuiderModule(QString name,QString label)
     _actions->addSwitch(new SwitchValue("condev","Connect devices","hint",0));
     _actions->addSwitch(new SwitchValue("loadconfs","Load devices conf","hint",0));
     _actions->addSwitch(new SwitchValue("abort","Abort","hint",0));
-    _actions->addSwitch(new SwitchValue("calibration","Calibrate and guide","hint",0));
+    _actions->addSwitch(new SwitchValue("init","Initialize","hint",0));
+    _actions->addSwitch(new SwitchValue("calibration","Calibrate","hint",0));
     _actions->addSwitch(new SwitchValue("guide","Guide","hint",0));
     emit propertyCreated(_actions,&_modulename);
     _propertyStore.add(_actions);
@@ -69,6 +70,7 @@ GuiderModule::GuiderModule(QString name,QString label)
     emit propertyCreated(_states,&_modulename);
     _propertyStore.add(_states);
 
+    buildStateMachines();
 
 }
 
@@ -112,6 +114,10 @@ void GuiderModule::OnSetPropertySwitch(SwitchProperty* prop)
             wprop->setSwitch(switchs[j]->name(),true);
             startCalGuide(true);
         }
+        if (switchs[j]->name()=="init") {
+            wprop->setSwitch(switchs[j]->name(),true);
+            _SMInit.start();
+        }
         if (switchs[j]->name()=="guide") {
             wprop->setSwitch(switchs[j]->name(),true);
             startCalGuide(false);
@@ -122,7 +128,7 @@ void GuiderModule::OnSetPropertySwitch(SwitchProperty* prop)
         }
         if (switchs[j]->name()=="abort")  {
             wprop->setSwitch(switchs[j]->name(),true);
-            emit abort();
+            emit Abort();
         }
         if (switchs[j]->name()=="condev") {
             wprop->setSwitch(switchs[j]->name(),true);
@@ -165,9 +171,7 @@ void GuiderModule::newNumber(INumberVectorProperty *nvp)
 
        )
     {
-        if (_machine->isRunning()) {
-            if (_pulseRAfinished && _pulseDECfinished) emit PulsesDone();
-        }
+        if (_pulseRAfinished && _pulseDECfinished) emit PulsesDone();
     }
 
 }
@@ -189,10 +193,8 @@ void GuiderModule::newBLOB(IBLOB *bp)
         _img->setURL(QString(bp->bvp->device)+".jpeg");
         emit propertyUpdated(_img,&_modulename);
         _propertyStore.add(_img);
-        if (_machine->isRunning()) {
-            BOOST_LOG_TRIVIAL(debug) << "Emit Exposure done";
-            emit ExposureDone();
-        }
+        BOOST_LOG_TRIVIAL(debug) << "Emit Exposure done";
+        emit ExposureDone();
     }
 
 }
@@ -206,11 +208,52 @@ void GuiderModule::newSwitch(ISwitchVectorProperty *svp)
        )
     {
         sendMessage("FrameResetDone");
-        if (_machine->isRunning()) emit FrameResetDone();
+        emit FrameResetDone();
     }
 
 }
+void GuiderModule::buildStateMachines(void)
+{
+    /* Initialization statemachine = SMInit */
 
+    auto *Abort = new QState();
+    auto *Init  = new QState();
+    auto *End   = new QFinalState();
+
+    auto *InitInit             = new QState(Init);
+    auto *RequestFrameReset    = new QState(Init);
+    auto *WaitFrameReset       = new QState(Init);
+    auto *RequestFirstExposure = new QState(Init);
+    auto *WaitFirstExposure    = new QState(Init);
+    auto *FindStarsFirst       = new QState(Init);
+    auto *ComputeFirst         = new QState(Init);
+
+    connect(InitInit            ,&QState::entered, this, &GuiderModule::SMInit);
+    connect(RequestFrameReset   ,&QState::entered, this, &GuiderModule::SMRequestFrameReset);
+    connect(RequestFirstExposure,&QState::entered, this, &GuiderModule::SMRequestExposure);
+    connect(FindStarsFirst      ,&QState::entered, this, &GuiderModule::SMFindStars);
+    connect(ComputeFirst        ,&QState::entered, this, &GuiderModule::SMComputeFirst);
+    connect(Abort,               &QState::entered, this, &GuiderModule::SMAbort);
+
+    Init->                addTransition(this,&GuiderModule::Abort,                Abort);
+    Abort->               addTransition(this,&GuiderModule::AbortDone,            End);
+    InitInit->            addTransition(this,&GuiderModule::InitDone             ,RequestFrameReset);
+    RequestFrameReset->   addTransition(this,&GuiderModule::RequestFrameResetDone,WaitFrameReset);
+    WaitFrameReset->      addTransition(this,&GuiderModule::FrameResetDone       ,RequestFirstExposure);
+    RequestFirstExposure->addTransition(this,&GuiderModule::RequestExposureDone  ,WaitFirstExposure);
+    WaitFirstExposure->   addTransition(this,&GuiderModule::ExposureDone         ,FindStarsFirst);
+    FindStarsFirst->      addTransition(this,&GuiderModule::FindStarsDone        ,ComputeFirst);
+    ComputeFirst->        addTransition(this,&GuiderModule::ComputeFirstDone     ,End);
+
+    Init->setInitialState(InitInit);
+
+    _SMInit.addState(Init);
+    _SMInit.addState(Abort);
+    _SMInit.addState(End);
+    _SMInit.setInitialState(Init);
+
+
+}
 void GuiderModule::startCalGuide(bool cal)
 {
     delete _machine;
@@ -299,7 +342,7 @@ void GuiderModule::startCalGuide(bool cal)
     connect(RequestFrameReset,   &QState::entered, this, &GuiderModule::SMRequestFrameReset);
     connect(RequestFirstExposure,&QState::entered, this, &GuiderModule::SMRequestExposure);
     connect(FindStarsRef        ,&QState::entered, this, &GuiderModule::SMFindStars);
-    connect(ComputeRef,          &QState::entered, this, &GuiderModule::SMComputeRef);
+    connect(ComputeRef,          &QState::entered, this, &GuiderModule::SMComputeFirst);
     connect(RequestCalExposure,  &QState::entered, this, &GuiderModule::SMRequestExposure);
     connect(RequestCalPulses,    &QState::entered, this, &GuiderModule::SMRequestPulses);
     connect(FindStarsCal,        &QState::entered, this, &GuiderModule::SMFindStars);
@@ -310,9 +353,9 @@ void GuiderModule::startCalGuide(bool cal)
     connect(ComputeGuide,        &QState::entered, this, &GuiderModule::SMComputeGuide);
     connect(abort,               &QState::entered, this, &GuiderModule::SMAbort);
 
-    init->     addTransition(this,&GuiderModule::abort,                abort);
-    calibrate->addTransition(this,&GuiderModule::abort,                abort);
-    guide->    addTransition(this,&GuiderModule::abort,                abort);
+    init->     addTransition(this,&GuiderModule::Abort,                abort);
+    calibrate->addTransition(this,&GuiderModule::Abort,                abort);
+    guide->    addTransition(this,&GuiderModule::Abort,                abort);
 
     RequestFrameReset->   addTransition(this,&GuiderModule::RequestFrameResetDone,WaitFrameReset);
     WaitFrameReset->      addTransition(this,&GuiderModule::FrameResetDone       ,RequestFirstExposure);
@@ -320,9 +363,9 @@ void GuiderModule::startCalGuide(bool cal)
     WaitFirstExposure->   addTransition(this,&GuiderModule::ExposureDone ,        FindStarsRef);
     FindStarsRef->        addTransition(this,&GuiderModule::FindStarsDone ,       ComputeRef);
     if (cal) {
-        ComputeRef->      addTransition(this,&GuiderModule::ComputeRefDone ,      calibrate);
+        ComputeRef->      addTransition(this,&GuiderModule::ComputeFirstDone ,      calibrate);
     } else {
-        ComputeRef->      addTransition(this,&GuiderModule::ComputeRefDone ,      guide);
+        ComputeRef->      addTransition(this,&GuiderModule::ComputeFirstDone ,      guide);
     }
 
 
@@ -362,15 +405,40 @@ void GuiderModule::startCalGuide(bool cal)
     _machine->start();
     sendMessage("machine started");
 }
+void GuiderModule::SMInit()
+{
+    BOOST_LOG_TRIVIAL(debug) << "SMInit";
+    sendMessage("SMInit");
+    setBlobMode();
+    /* get mount DEC */
+    if (!getModNumber(_mount,"EQUATORIAL_EOD_COORD","DEC",_mountDEC)) {
+        emit Abort();
+        return;
+    }
+     /* get mount RA */
+    if (!getModNumber(_mount,"EQUATORIAL_EOD_COORD","RA",_mountRA)) {
+        emit Abort();
+        return;
+    }
+    /* get mount Pier position  */
+   if (!getModSwitch(_mount,"TELESCOPE_PIER_SIDE","PIER_WEST",_mountPointingWest)) {
+       emit Abort();
+       return;
+   }
+
+    BOOST_LOG_TRIVIAL(debug) << "SMInitDone";
+    emit InitDone();
+}
 void GuiderModule::SMRequestFrameReset()
 {
     BOOST_LOG_TRIVIAL(debug) << "SMRequestFrameReset";
     sendMessage("SMRequestFrameReset");
     if (!frameReset(_camera))
     {
-            emit abort();
+            emit Abort();
             return;
     }
+    BOOST_LOG_TRIVIAL(debug) << "SMRequestFrameResetDone";
     emit RequestFrameResetDone();
 }
 
@@ -381,27 +449,17 @@ void GuiderModule::SMRequestExposure()
     sendMessage("SMRequestExposure");
     if (!sendModNewNumber(_camera,"CCD_EXPOSURE","CCD_EXPOSURE_VALUE", _exposure))
     {
-        emit abort();
+        emit Abort();
         return;
     }
     emit RequestExposureDone();
 }
-void GuiderModule::SMComputeRef()
+void GuiderModule::SMComputeFirst()
 {
-    BOOST_LOG_TRIVIAL(debug) << "SMComputeRef";
+    BOOST_LOG_TRIVIAL(debug) << "SMComputeFirst";
     _trigFirst.clear();
-    _trigPrev.clear();
     buildIndexes(_solver,_trigRef);
-    _trigPrev=_trigRef;
-    _trigFirst=_trigRef;
-
-    _calState =0;
-    _calStep = 0;
-    _pulseW = _pulse;
-    _pulseE = 0;
-    _pulseN = 0;
-    _pulseS = 0;
-    emit ComputeRefDone();
+    emit ComputeFirstDone();
 }
 void GuiderModule::SMComputeCal()
 {
@@ -659,8 +717,8 @@ void GuiderModule::OnSucessSEP()
 void GuiderModule::SMAbort()
 {
 
-    _machine->stop();
-    sendMessage("machine stopped");
+    emit AbortDone();
+
     _states->addLight(new LightValue("idle"  ,"Idle","hint",1));
     _states->addLight(new LightValue("cal"   ,"Calibrating","hint",0));
     _states->addLight(new LightValue("guide" ,"Guiding","hint",0));
