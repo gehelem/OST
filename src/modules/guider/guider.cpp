@@ -19,6 +19,7 @@ GuiderModule::GuiderModule(QString name,QString label)
     _actions->addSwitch(new SwitchValue("abort","Abort","hint",0));
     _actions->addSwitch(new SwitchValue("init","Initialize","hint",0));
     _actions->addSwitch(new SwitchValue("calibration","Calibrate","hint",0));
+    _actions->addSwitch(new SwitchValue("calguide","Calibrate and guide","hint",0));
     _actions->addSwitch(new SwitchValue("guide","Guide","hint",0));
     emit propertyCreated(_actions,&_modulename);
     _propertyStore.add(_actions);
@@ -115,16 +116,32 @@ void GuiderModule::OnSetPropertySwitch(SwitchProperty* prop)
     QList<SwitchValue*> switchs=prop->getSwitches();
     for (int j = 0; j < switchs.size(); ++j) {
         if (switchs[j]->name()=="calibration") {
+            disconnect(&_SMInit,        &QStateMachine::finished,nullptr, nullptr);
+            disconnect(&_SMCalibration, &QStateMachine::finished,nullptr, nullptr);
+            connect(&_SMInit,           &QStateMachine::finished,&_SMCalibration,&QStateMachine::start) ;
+            _SMInit.start();
             wprop->setSwitch(switchs[j]->name(),true);
-            _SMCalibration.start();
         }
         if (switchs[j]->name()=="init") {
-            wprop->setSwitch(switchs[j]->name(),true);
+            disconnect(&_SMInit,        &QStateMachine::finished,nullptr, nullptr);
+            disconnect(&_SMCalibration, &QStateMachine::finished,nullptr, nullptr);
             _SMInit.start();
+            wprop->setSwitch(switchs[j]->name(),true);
         }
         if (switchs[j]->name()=="guide") {
+            disconnect(&_SMInit,        &QStateMachine::finished,nullptr, nullptr);
+            disconnect(&_SMCalibration, &QStateMachine::finished,nullptr, nullptr);
+            connect(&_SMInit,           &QStateMachine::finished,&_SMGuide,&QStateMachine::start) ;
+            _SMInit.start();
             wprop->setSwitch(switchs[j]->name(),true);
-            _SMGuide.start();
+        }
+        if (switchs[j]->name()=="calguide") {
+            disconnect(&_SMInit,        &QStateMachine::finished,nullptr, nullptr);
+            disconnect(&_SMCalibration, &QStateMachine::finished,nullptr, nullptr);
+            connect(&_SMInit,           &QStateMachine::finished,&_SMCalibration,&QStateMachine::start) ;
+            connect(&_SMCalibration,    &QStateMachine::finished,&_SMGuide,      &QStateMachine::start) ;
+            _SMInit.start();
+            wprop->setSwitch(switchs[j]->name(),true);
         }
         if (switchs[j]->name()=="loadconfs") {
             wprop->setSwitch(switchs[j]->name(),true);
@@ -310,12 +327,12 @@ void GuiderModule::buildGuideStateMachines(void)
     auto *End   = new QFinalState();
 
     auto *InitGuide           = new QState(Guide);
-    auto *RequestGuidePulses  = new QState(Guide);
-    auto *WaitGuidePulses     = new QState(Guide);
     auto *RequestGuideExposure= new QState(Guide);
     auto *WaitGuideExposure   = new QState(Guide);
     auto *FindStarsGuide      = new QState(Guide);
     auto *ComputeGuide        = new QState(Guide);
+    auto *RequestGuidePulses  = new QState(Guide);
+    auto *WaitGuidePulses     = new QState(Guide);
 
     connect(InitGuide           ,&QState::entered, this, &GuiderModule::SMInitGuide);
     connect(RequestGuideExposure,&QState::entered, this, &GuiderModule::SMRequestExposure);
@@ -328,12 +345,13 @@ void GuiderModule::buildGuideStateMachines(void)
     Abort->               addTransition(this,&GuiderModule::AbortDone           ,End);
     InitGuide->           addTransition(this,&GuiderModule::InitGuideDone       ,RequestGuideExposure);
 
-    RequestGuidePulses->    addTransition(this,&GuiderModule::RequestPulsesDone   ,WaitGuidePulses);
-    WaitGuidePulses->       addTransition(this,&GuiderModule::PulsesDone          ,RequestGuideExposure);
     RequestGuideExposure->  addTransition(this,&GuiderModule::RequestExposureDone ,WaitGuideExposure);
     WaitGuideExposure->     addTransition(this,&GuiderModule::ExposureDone        ,FindStarsGuide);
     FindStarsGuide->        addTransition(this,&GuiderModule::FindStarsDone       ,ComputeGuide);
     ComputeGuide->          addTransition(this,&GuiderModule::ComputeGuideDone    ,RequestGuidePulses);
+    RequestGuidePulses->    addTransition(this,&GuiderModule::RequestPulsesDone   ,WaitGuidePulses);
+    RequestGuidePulses->    addTransition(this,&GuiderModule::PulsesDone          ,RequestGuideExposure);
+    WaitGuidePulses->       addTransition(this,&GuiderModule::PulsesDone          ,RequestGuideExposure);
     //ComputeGuide->          addTransition(this,&GuiderModule::GuideDone           ,End); // useless ??
 
 
@@ -366,7 +384,13 @@ void GuiderModule::SMInitInit()
        emit Abort();
        return;
    }
+   _gridguide->clear();
+   _propertyStore.update(_gridguide);
+   emit propertyUpdated(_gridguide,&_modulename);
 
+   _grid->clear();
+   _propertyStore.update(_grid);
+   emit propertyUpdated(_grid,&_modulename);
     BOOST_LOG_TRIVIAL(debug) << "SMInitInitDone";
     emit InitDone();
 }
@@ -576,10 +600,8 @@ void GuiderModule::SMComputeCal()
             BOOST_LOG_TRIVIAL(debug) << "*********************** cal S "<< _calPulseS;
 
             //emit abort(); return;
-            _grid->clear();
-            _propertyStore.update(_grid);
-            emit propertyUpdated(_grid,&_modulename);
             emit CalibrationDone();
+            _trigFirst=_trigCurrent;
             return;
         }
     }
@@ -699,7 +721,6 @@ void GuiderModule::SMRequestPulses()
 
     if ((_pulseN==0)&&(_pulseS==0)&&(_pulseE==0)&&(_pulseW==0)) {
         BOOST_LOG_TRIVIAL(debug) << "SMRequestPulses zéro";
-        usleep(100000);
         emit PulsesDone();
     }
 
@@ -728,6 +749,12 @@ void GuiderModule::OnSucessSEP()
 
 void GuiderModule::SMAbort()
 {
+
+    disconnect(&_SMInit,        &QStateMachine::finished,nullptr, nullptr);
+    disconnect(&_SMCalibration, &QStateMachine::finished,nullptr, nullptr);
+    _SMInit.stop();
+    _SMCalibration.stop();
+    _SMGuide.stop();
 
     emit AbortDone();
 

@@ -71,6 +71,7 @@ class MODULE_INIT GuiderModule : public Basemodule
         void OnSetPropertyNumber(NumberProperty* prop) override;
         void OnSetPropertySwitch(SwitchProperty* prop) override;
         void OnSucessSEP();
+        void DummySlot(){BOOST_LOG_TRIVIAL(debug) << "************************* DUMMY SLOT";}
     private:
         void newNumber(INumberVectorProperty *nvp) override;
         void newBLOB(IBLOB *bp) override;
