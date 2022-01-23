@@ -48,6 +48,9 @@ InspectorModule::InspectorModule(QString name,QString label)
     emit propertyCreated(_grid,&_modulename);
     _propertyStore.add(_grid);
 
+    SMBuild();
+    setBlobMode();
+
 }
 
 InspectorModule::~InspectorModule()
@@ -80,7 +83,7 @@ void InspectorModule::OnSetPropertySwitch(SwitchProperty* prop)
     for (int j = 0; j < switchs.size(); ++j) {
         if (switchs[j]->name()=="shoot") {
             wprop->setSwitch(switchs[j]->name(),true);
-
+            _machine.start();
         }
         if (switchs[j]->name()=="loadconfs") {
             wprop->setSwitch(switchs[j]->name(),true);
@@ -88,7 +91,7 @@ void InspectorModule::OnSetPropertySwitch(SwitchProperty* prop)
         }
         if (switchs[j]->name()=="abort")  {
             wprop->setSwitch(switchs[j]->name(),true);
-            emit abort();
+            emit Abort();
         }
         if (switchs[j]->name()=="condev") {
             wprop->setSwitch(switchs[j]->name(),true);
@@ -97,7 +100,6 @@ void InspectorModule::OnSetPropertySwitch(SwitchProperty* prop)
         //prop->setSwitches(switchs);
         _propertyStore.update(wprop);
         emit propertyUpdated(wprop,&_modulename);
-        BOOST_LOG_TRIVIAL(debug) << "Focus switch property item modified " << wprop->getName().toStdString();
     }
 }
 
@@ -163,10 +165,58 @@ void InspectorModule::newSwitch(ISwitchVectorProperty *svp)
 
 }
 
+void InspectorModule::SMBuild()
+{
+    auto *Abort = new QState();
+    auto *Init  = new QState();
+    auto *End   = new QFinalState();
+
+    auto *InitInit             = new QState(Init);
+    auto *RequestFrameReset    = new QState(Init);
+    auto *WaitFrameReset       = new QState(Init);
+    auto *RequestExposure      = new QState(Init);
+    auto *WaitExposure         = new QState(Init);
+    auto *FindStars            = new QState(Init);
+    auto *Compute              = new QState(Init);
+
+    connect(InitInit            ,&QState::entered, this, &InspectorModule::SMInit);
+    connect(RequestFrameReset   ,&QState::entered, this, &InspectorModule::SMRequestFrameReset);
+    connect(RequestExposure     ,&QState::entered, this, &InspectorModule::SMRequestExposure);
+    connect(FindStars           ,&QState::entered, this, &InspectorModule::SMFindStars);
+    connect(Compute             ,&QState::entered, this, &InspectorModule::SMCompute);
+    connect(Abort,               &QState::entered, this, &InspectorModule::SMAbort);
+
+    Init->                addTransition(this,&InspectorModule::Abort                ,Abort);
+    Abort->               addTransition(this,&InspectorModule::AbortDone            ,End);
+    InitInit->            addTransition(this,&InspectorModule::InitDone             ,RequestFrameReset);
+    RequestFrameReset->   addTransition(this,&InspectorModule::RequestFrameResetDone,WaitFrameReset);
+    WaitFrameReset->      addTransition(this,&InspectorModule::FrameResetDone       ,RequestExposure);
+    RequestExposure->     addTransition(this,&InspectorModule::RequestExposureDone  ,WaitExposure);
+    WaitExposure->        addTransition(this,&InspectorModule::ExposureDone         ,FindStars);
+    FindStars->           addTransition(this,&InspectorModule::FindStarsDone        ,Compute);
+    Compute->             addTransition(this,&InspectorModule::ComputeDone          ,End);
+
+    Init->setInitialState(InitInit);
+
+    _machine.addState(Init);
+    _machine.addState(Abort);
+    _machine.addState(End);
+    _machine.setInitialState(Init);
+
+}
+
+void InspectorModule::SMInit()
+{
+
+    emit InitDone();
+}
+
 void InspectorModule::SMAbort()
 {
 
-    _machine.stop();
+    //_machine.stop();
+    emit AbortDone();
+    BOOST_LOG_TRIVIAL(debug) << "SMAbort";
     sendMessage("machine stopped");
 }
 
@@ -174,15 +224,6 @@ void InspectorModule::SMAbort()
 void InspectorModule::SMRequestFrameReset()
 {
     sendMessage("SMRequestFrameReset");
-
-
-
-    /*qDebug() << "conf count" << _machine.configuration().count();
-    QSet<QAbstractState *>::iterator i;
-    for (i=_machine.configuration().begin();i !=_machine.configuration().end();i++)
-    {
-        qDebug() << (*i)->objectName();
-    }*/
 
     if (!frameReset(_camera))
     {
@@ -226,21 +267,9 @@ void InspectorModule::SMCompute()
     sendMessage("SMCompute");
 
 
-    _values->setNumber("loopHFRavg",_loopHFRavg);
-    _values->setNumber("iteration",_iteration);
-    _propertyStore.update(_values);
-    emit propertyUpdated(_values,&_modulename);
 
 
-    if (_iteration <_iterations )
-    {
-        _iteration++;
-        emit NextLoop();
-    }
-    else
-    {
-        emit LoopFinished();
-    }
+    emit ComputeDone();
 }
 
 

@@ -30,6 +30,8 @@ class MODULE_INIT InspectorModule : public Basemodule
         void FindStarsDone();
         void NextLoop();
         void LoopFinished();
+        void ComputeDone();
+        void InitDone();
 
         void RequestExposureBestDone();
         void ExposureBestDone();
@@ -40,7 +42,8 @@ class MODULE_INIT InspectorModule : public Basemodule
 
         void blobloaded();
         void cameraAlert();
-        void abort();
+        void AbortDone();
+        void Abort();
     public slots:
         void OnSetPropertyText(TextProperty* prop) override;
         void OnSetPropertyNumber(NumberProperty* prop) override;
@@ -53,6 +56,8 @@ class MODULE_INIT InspectorModule : public Basemodule
         void newSwitch(ISwitchVectorProperty *svp) override;
 
 
+        void SMBuild();
+        void SMInit();
         void SMRequestFrameReset();
         void SMRequestExposure();
         void SMFindStars();
@@ -86,7 +91,7 @@ class MODULE_INIT InspectorModule : public Basemodule
         int    _loopIterations = 2;
         int    _loopIteration;
         double _loopHFRavg;
-        double _exposure;
+        double _exposure = 2;
 
         int    _iteration;
         double _bestpos;
