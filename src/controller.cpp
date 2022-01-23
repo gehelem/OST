@@ -54,6 +54,7 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
 
 
     LoadModule(QCoreApplication::applicationDirPath()+"/libostguider.so","guider1","Guider");
+    LoadModule(QCoreApplication::applicationDirPath()+"/libostinspector.so","inspector1","Frame inspector");
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focus1","Focus assistant");
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostdummy.so","dummy1","Demo module");
 
