@@ -22,7 +22,7 @@ public:
     void visit(MessageProperty *pProperty,QString *modulName) override;
     void visit(ImageProperty *pProperty,QString *modulName) override;
     void visit(GridProperty *pProperty,QString *modulName) override;
-    void visit(GridProperty* pProperty, QString *moduleName,double s,double x,double y,double z) override;
+    void visit(GridProperty* pProperty, QString *moduleName,double s,double x,double y,double z,double k) override;
 
 
     [[nodiscard]] inline const QString& getResult() const { return _result; }

@@ -51,7 +51,7 @@ FocusModule::FocusModule(QString name,QString label)
     emit propertyCreated(_img,&_modulename);
     _propertyStore.add(_img);
 
-    _grid = new GridProperty(_modulename,"Control","root","grid","Grid property label",0,0,"SXY","Set","Pos","HFR","");
+    _grid = new GridProperty(_modulename,"Control","root","grid","Grid property label",0,0,"SXY","Set","Pos","HFR","","");
     emit propertyCreated(_grid,&_modulename);
     _propertyStore.add(_grid);
 
@@ -151,6 +151,7 @@ void FocusModule::newBLOB(IBLOB *bp)
             (QString(bp->bvp->device) == _camera)
        )
     {
+        delete image;
         image = new Image();
         image->LoadFromBlob(bp);
         image->CalcStats();
@@ -380,7 +381,7 @@ void FocusModule::SMFindStars()
     sendMessage("SMFindStars");
     _solver.ResetSolver(image->stats,image->m_ImageBuffer);
     connect(&_solver,&Solver::successSEP,this,&FocusModule::OnSucessSEP);
-    _solver.FindStars();
+    _solver.FindStars(_solver.stellarSolverProfiles[0]);
 }
 
 void FocusModule::OnSucessSEP()
@@ -423,7 +424,7 @@ void FocusModule::SMCompute()
 
     _grid->append(_startpos + _iteration*_steps,_loopHFRavg);
     _propertyStore.update(_grid);
-    emit propertyAppended(_grid,&_modulename,0,_startpos + _iteration*_steps,_loopHFRavg,0);
+    emit propertyAppended(_grid,&_modulename,0,_startpos + _iteration*_steps,_loopHFRavg,0,0);
 
     if (_iteration <_iterations )
     {

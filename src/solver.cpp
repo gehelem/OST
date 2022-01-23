@@ -13,15 +13,16 @@ Solver::~Solver()
 
 void Solver::ResetSolver(FITSImage::Statistic &stats, uint8_t *m_ImageBuffer)
 {
-    BOOST_LOG_TRIVIAL(debug) << "Reset solver";
+    //BOOST_LOG_TRIVIAL(debug) << "Reset solver";
     HFRavg=99;
+    delete stellarSolver;
     stellarSolver = new StellarSolver(stats, m_ImageBuffer);
     stellarSolver->moveToThread(this->thread());
     stellarSolver->setParent(this);
-
+    stellarSolverProfiles=StellarSolver::getBuiltInProfiles();
 }
 
-void Solver::FindStars()
+void Solver::FindStars(Parameters param)
 {
 
     if (!connect(stellarSolver,&StellarSolver::logOutput,this,&Solver::sslogOutput))
@@ -33,7 +34,7 @@ void Solver::FindStars()
 
 
     //QList<Parameters> params = stellarSolver->getBuiltInProfiles();
-    //stellarSolver->setParameters(params[0]);
+    stellarSolver->setParameters(param);
     //stellarSolver->clearSubFrame();
     stellarSolver->setProperty("ProcessType",EXTRACT_WITH_HFR);
     //stellarSolver->setProperty("ProcessType",SOLVE);
@@ -58,7 +59,7 @@ void Solver::FindStars()
     //IDLog("IMG stellarSolver SEP Start\n");
 
 
-    BOOST_LOG_TRIVIAL(debug) << "SS command string into solver" << stellarSolver->getCommandString().toStdString();
+    //BOOST_LOG_TRIVIAL(debug) << "SS command string into solver" << stellarSolver->getCommandString().toStdString();
 
     //stellarSolver->extract(true);
     if (stellarSolver->failed()) BOOST_LOG_TRIVIAL(debug) << "SS Failed";
@@ -73,19 +74,20 @@ void Solver::SolveStars()
 
 void Solver::ssFinished()
 {
-    BOOST_LOG_TRIVIAL(debug) << "solve finished";
+    //BOOST_LOG_TRIVIAL(debug) << "solve finished";
 
 }
 void Solver::ssReadySEP()
 {
 
-    BOOST_LOG_TRIVIAL(debug) << "SSolver ready SEP";
+    //BOOST_LOG_TRIVIAL(debug) << "SSolver ready SEP";
     stars = stellarSolver->getStarList();
     for (int i=0;i<stars.size();i++)
     {
         HFRavg=(i*HFRavg + stars[i].HFR)/(i+1);
     }
-    BOOST_LOG_TRIVIAL(debug) << "SSolver HFRavg = " << HFRavg;
+    BOOST_LOG_TRIVIAL(debug) << "SSolver Ready : HFRavg = " << HFRavg;
+    disconnect(stellarSolver,&StellarSolver::ready,this,&Solver::ssReadySEP);
     emit successSEP();
     return;
 }
@@ -105,5 +107,5 @@ void Solver::ssReadySolve()
 }
 void Solver::sslogOutput(QString text)
 {
-    BOOST_LOG_TRIVIAL(debug) << "SSolver log : " << text.toStdString();
+    //BOOST_LOG_TRIVIAL(debug) << "SSolver log : " << text.toStdString();
 }

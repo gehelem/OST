@@ -74,6 +74,10 @@ class Basemodule : public QObject, public INDI::BaseClient
         bool sendModNewSwitch(QString deviceName, QString propertyName,QString elementName, ISState sw);
         bool sendModNewNumber(const QString& deviceName, const QString& propertyName, const QString& elementName, const double& value);
 
+        bool getModNumber(const QString& deviceName, const QString& propertyName, const QString& elementName, double& value);
+        bool getModSwitch(const QString& deviceName, const QString& propertyName, const QString& elementName, bool& value);
+        bool getModText(const QString& deviceName, const QString& propertyName, const QString& elementName, QString& value);
+
         bool frameSet(QString devicename,double x,double y,double width,double height);
         bool frameReset(QString devicename);
         void sendMessage(QString message);
@@ -98,7 +102,7 @@ class Basemodule : public QObject, public INDI::BaseClient
     signals:
         void propertyCreated(Property* pProperty, QString* pModulename);
         void propertyUpdated(Property* pProperty, QString* pModulename);
-        void propertyAppended(Property* pProperty, QString* pModulename, double s, double x,double y,double z);
+        void propertyAppended(Property* pProperty, QString* pModulename, double s, double x,double y,double z,double k);
         void propertyRemoved(Property* pProperty, QString* pModulename);
         void moduleDumped(QMap<QString, QMap<QString, QMap<QString, Property*>>> treeList, QString* pModulename, QString* pModulelabel, QString* pModuledescription);
         void newMessageSent(QString message,      QString* pModulename, QString Device);
