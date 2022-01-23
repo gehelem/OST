@@ -37,10 +37,13 @@ public:
     CImg<double>   histogram256;
     bool LoadFromBlob(IBLOB *bp);
     bool saveToJpeg(QString filename,int compress);
+    bool saveMapToJpeg(QString filename,int compress,QList<FITSImage::Star> stars);
     bool saveStretchedToJpeg(QString filename,int compress);
     void ResetData(void);
     void CalcStats(void);
     void computeHistogram(void);
+    void appendStarsFound(QList<FITSImage::Star> stars);
+
 
 };
 

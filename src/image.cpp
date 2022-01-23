@@ -41,8 +41,8 @@ void Image::ResetData(void) {
 bool Image::saveStretchedToJpeg(QString filename,int compress)
 {
     CImg<uint16_t> imgtmp = img_stretched;
-    imgtmp.resize_halfXY();
-    imgtmp.resize_halfXY();
+    //imgtmp.resize_halfXY();
+    //imgtmp.resize_halfXY();
     imgtmp.save_jpeg(filename.toStdString().c_str(),compress);
     return true;
 }
@@ -51,8 +51,8 @@ bool Image::saveToJpeg(QString filename,int compress)
 
     //computeHistogram();
     CImg<uint16_t> imgtmp = img;
-    imgtmp.resize_halfXY();
-    imgtmp.resize_halfXY();
+    //imgtmp.resize_halfXY();
+    //imgtmp.resize_halfXY();
     imgtmp.save_jpeg(filename.toStdString().c_str(),compress);
     //int buf_size = sizeof(img.data());
     //jpegmem.load(filename.toStdString().c_str());
@@ -263,4 +263,100 @@ void Image::computeHistogram(void)
     histogram256.resize(256, 1, 1, 1, 0);
     cimg_forXY(img, x, y) histogram256[img(x, y)/255] = histogram256[img(x, y)/255] +1;
 
+}
+
+bool Image::saveMapToJpeg(QString filename,int compress,QList<FITSImage::Star> stars)
+{
+
+    //computeHistogram();
+    int stretch=3;
+    CImg<unsigned char> imgtmp(stats.width/stretch,stats.height/stretch,1,3,0);
+    const unsigned char
+        white[] = { 255,255,255 },
+        red[]   = { 255,0,0 },
+        blue [] = { 0,0,255 },
+        black[] = { 0,0,0 },
+        green[] = { 0,255,0 };
+    for (int i=0;i<stars.size();i++)
+    {
+
+        imgtmp.draw_text  (stars[i].x/stretch, imgtmp.height()-stars[i].y/stretch,
+                        QString::number(stars[i].HFR , 'G', 3).toStdString().c_str(),
+                        red,
+                        1, 50);
+        imgtmp.draw_circle(stars[i].x/stretch, imgtmp.height()-stars[i].y/stretch, stars[i].numPixels*1, blue, 1,TRUE);
+    }
+    double HFR0=0;
+    double HFR1=0;
+    double HFR2=0;
+    double HFR3=0;
+    double HFR4=0;
+    int16_t n1=0;
+    int16_t n2=0;
+    int16_t n3=0;
+    int16_t n4=0;
+    for (int i=0;i<stars.size();i++)
+    {
+        HFR0=HFR0+stars[i].HFR;
+        if ((stars[i].x < stats.width/2) && (stars[i].y < stats.height/2)) {HFR1=HFR1+stars[i].HFR;n1++;};
+        if ((stars[i].x > stats.width/2) && (stars[i].y < stats.height/2)) {HFR2=HFR2+stars[i].HFR;n2++;};
+        if ((stars[i].x < stats.width/2) && (stars[i].y > stats.height/2)) {HFR3=HFR3+stars[i].HFR;n3++;};
+        if ((stars[i].x > stats.width/2) && (stars[i].y > stats.height/2)) {HFR4=HFR4+stars[i].HFR;n4++;};
+    }
+    HFR0=HFR0/stars.size();
+    HFR1=HFR1/n1;
+    HFR2=HFR2/n2;
+    HFR3=HFR3/n3;
+    HFR4=HFR4/n4;
+    int mul=15;
+    int16_t x0=imgtmp.width()/2;
+    int16_t y0=imgtmp.height()/2;
+
+    int16_t x1=1*imgtmp.width() /4+mul*(HFR1-HFR0);
+    int16_t y1=3*imgtmp.height()/4+mul*(HFR1-HFR0);
+
+    int16_t x2=3*imgtmp.width() /4+mul*(HFR2-HFR0);
+    int16_t y2=3*imgtmp.height()/4+mul*(HFR2-HFR0);
+
+    int16_t x3=1*imgtmp.width() /4+mul*(HFR3-HFR0);
+    int16_t y3=1*imgtmp.height()/4+mul*(HFR3-HFR0);
+
+    int16_t x4=3*imgtmp.width() /4+mul*(HFR4-HFR0);
+    int16_t y4=1*imgtmp.height()/4+mul*(HFR4-HFR0);
+
+    imgtmp.draw_text  (x0, y0, QString::number(HFR0 , 'G', 4).toStdString().c_str(), white,1, 80);
+    imgtmp.draw_text  (x1, y1, QString::number(HFR1 , 'G', 4).toStdString().c_str(), white,1, 80);
+    imgtmp.draw_text  (x2, y2, QString::number(HFR2 , 'G', 4).toStdString().c_str(), white,1, 80);
+    imgtmp.draw_text  (x3, y3, QString::number(HFR3 , 'G', 4).toStdString().c_str(), white,1, 80);
+    imgtmp.draw_text  (x4, y4, QString::number(HFR4 , 'G', 4).toStdString().c_str(), white,1, 80);
+
+    imgtmp.draw_line(x1,y1,x2,y2,white);
+    imgtmp.draw_line(x1,y1,x3,y3,white);
+    imgtmp.draw_line(x1,y1,x4,y4,white);
+    imgtmp.draw_line(x2,y2,x3,y3,white);
+    imgtmp.draw_line(x2,y2,x4,y4,white);
+    imgtmp.draw_line(x3,y3,x4,y4,white);
+
+    imgtmp.save_jpeg(filename.toStdString().c_str(),compress);
+
+    return true;
+}
+
+
+void Image::appendStarsFound(QList<FITSImage::Star> stars)
+{
+    const unsigned char
+        white[] = { 255,255,255 },
+        red[]   = { 255,0,0 },
+        blue [] = { 0,0,255 },
+        black[] = { 0,0,0 },
+        green[] = { 0,255,0 };
+    for (int i=0;i<stars.size();i++)
+    {
+        img.draw_text  (stars[i].x, img.height()-stars[i].y,
+                        QString::number(stars[i].HFR , 'G', 3).toStdString().c_str(),
+                        white,
+                        1, 20);
+        img.draw_circle(stars[i].x, img.height()-stars[i].y, stars[i].numPixels*10, white, 1,TRUE);
+    }
 }

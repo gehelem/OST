@@ -17,9 +17,9 @@ InspectorModule::InspectorModule(QString name,QString label)
     _propertyStore.add(_devices);
 
     _values = new NumberProperty(_modulename,"Control","root","values","Values",0,0);
-    _values->addNumber(new NumberValue("loopHFRavg","Average HFR","hint",0,"",0,99,0));
+    //_values->addNumber(new NumberValue("loopHFRavg","Average HFR","hint",0,"",0,99,0));
     _values->addNumber(new NumberValue("imgHFR","Last imgage HFR","hint",0,"",0,99,0));
-    _values->addNumber(new NumberValue("iteration","Iteration","hint",0,"",0,99,0));
+    //_values->addNumber(new NumberValue("iteration","Iteration","hint",0,"",0,99,0));
     emit propertyCreated(_values,&_modulename);
     _propertyStore.add(_values);
 
@@ -33,9 +33,9 @@ InspectorModule::InspectorModule(QString name,QString label)
     _propertyStore.add(_actions);
 
     _parameters = new NumberProperty(_modulename,"Control","root","parameters","Parameters",2,0);
-    _parameters->addNumber(new NumberValue("steps"         ,"Steps gap","hint",_steps,"",0,2000,100));
-    _parameters->addNumber(new NumberValue("iterations"    ,"Iterations","hint",_iterations,"",0,99,1));
-    _parameters->addNumber(new NumberValue("loopIterations","Average over","hint",_loopIterations,"",0,99,1));
+    //_parameters->addNumber(new NumberValue("steps"         ,"Steps gap","hint",_steps,"",0,2000,100));
+    //_parameters->addNumber(new NumberValue("iterations"    ,"Iterations","hint",_iterations,"",0,99,1));
+    //_parameters->addNumber(new NumberValue("loopIterations","Average over","hint",_loopIterations,"",0,99,1));
     _parameters->addNumber(new NumberValue("exposure"      ,"Exposure","hint",_exposure,"",0,120,1));
     emit propertyCreated(_parameters,&_modulename);
     _propertyStore.add(_parameters);
@@ -126,11 +126,11 @@ void InspectorModule::newBLOB(IBLOB *bp)
         image->LoadFromBlob(bp);
         image->CalcStats();
         image->computeHistogram();
-        image->saveStretchedToJpeg(_webroot+"/"+QString(bp->bvp->device)+".jpeg",100);
+        //image->saveStretchedToJpeg(_webroot+"/"+_modulename+".jpeg",100);
 
-        _img->setURL(QString(bp->bvp->device)+".jpeg");
-        emit propertyUpdated(_img,&_modulename);
-        _propertyStore.add(_img);
+        //_img->setURL(_modulename+".jpeg");
+        //emit propertyUpdated(_img,&_modulename);
+        //_propertyStore.add(_img);
         if (_machine.isRunning()) {
             emit ExposureDone();
             emit ExposureBestDone();
@@ -207,6 +207,8 @@ void InspectorModule::SMBuild()
 
 void InspectorModule::SMInit()
 {
+    connectAllDevices();
+    setBlobMode();
 
     emit InitDone();
 }
@@ -259,6 +261,16 @@ void InspectorModule::OnSucessSEP()
     _values->setNumber("imgHFR",_solver.HFRavg);
     _propertyStore.update(_values);
     emit propertyUpdated(_values,&_modulename);
+
+    //image->appendStarsFound(_solver.stars);
+    image->saveMapToJpeg(_webroot+"/"+_modulename+".jpeg",100,_solver.stars);
+
+    _img->setURL(_modulename+".jpeg");
+    emit propertyUpdated(_img,&_modulename);
+    _propertyStore.add(_img);
+
+
+
     emit FindStarsDone();
 }
 
