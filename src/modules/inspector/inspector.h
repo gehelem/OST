@@ -57,6 +57,7 @@ class MODULE_INIT InspectorModule : public Basemodule
 
 
         void SMBuild();
+        void SMBuildLoop();
         void SMInit();
         void SMRequestFrameReset();
         void SMRequestExposure();
@@ -98,6 +99,7 @@ class MODULE_INIT InspectorModule : public Basemodule
         double _bestposfit;
         double _besthfr;
         QStateMachine _machine;
+        QStateMachine _machineLoop;
 
 };
 

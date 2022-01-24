@@ -36,6 +36,7 @@ public:
     CImg<uint16_t> img_stretched;
     CImg<double>   histogram256;
     bool LoadFromBlob(IBLOB *bp);
+    bool LoadFromFile(QString filename);
     bool saveToJpeg(QString filename,int compress);
     bool saveMapToJpeg(QString filename,int compress,QList<FITSImage::Star> stars);
     bool saveStretchedToJpeg(QString filename,int compress);

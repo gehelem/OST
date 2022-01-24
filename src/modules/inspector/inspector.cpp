@@ -49,6 +49,7 @@ InspectorModule::InspectorModule(QString name,QString label)
     _propertyStore.add(_grid);
 
     SMBuild();
+    SMBuildLoop();
     setBlobMode();
 
 }
@@ -84,6 +85,10 @@ void InspectorModule::OnSetPropertySwitch(SwitchProperty* prop)
         if (switchs[j]->name()=="shoot") {
             wprop->setSwitch(switchs[j]->name(),true);
             _machine.start();
+        }
+        if (switchs[j]->name()=="loop") {
+            wprop->setSwitch(switchs[j]->name(),true);
+            _machineLoop.start();
         }
         if (switchs[j]->name()=="loadconfs") {
             wprop->setSwitch(switchs[j]->name(),true);
@@ -124,17 +129,10 @@ void InspectorModule::newBLOB(IBLOB *bp)
         delete image;
         image = new Image();
         image->LoadFromBlob(bp);
+        //image->LoadFromFile("/home/gilles/ekos/va/Light/Luminance/Light_Luminance_1_secs_2021-09-01T22-21-09_043.fits");
         image->CalcStats();
         image->computeHistogram();
-        //image->saveStretchedToJpeg(_webroot+"/"+_modulename+".jpeg",100);
-
-        //_img->setURL(_modulename+".jpeg");
-        //emit propertyUpdated(_img,&_modulename);
-        //_propertyStore.add(_img);
-        if (_machine.isRunning()) {
-            emit ExposureDone();
-            emit ExposureBestDone();
-        }
+        emit ExposureDone();
     }
 
 }
@@ -159,7 +157,7 @@ void InspectorModule::newSwitch(ISwitchVectorProperty *svp)
        )
     {
         sendMessage("FrameResetDone");
-        if (_machine.isRunning()) emit FrameResetDone();
+        emit FrameResetDone();
     }
 
 
@@ -204,7 +202,45 @@ void InspectorModule::SMBuild()
     _machine.setInitialState(Init);
 
 }
+void InspectorModule::SMBuildLoop()
+{
+    auto *Abort = new QState();
+    auto *Init  = new QState();
+    auto *End   = new QFinalState();
 
+    auto *InitInit             = new QState(Init);
+    auto *RequestFrameReset    = new QState(Init);
+    auto *WaitFrameReset       = new QState(Init);
+    auto *RequestExposure      = new QState(Init);
+    auto *WaitExposure         = new QState(Init);
+    auto *FindStars            = new QState(Init);
+    auto *Compute              = new QState(Init);
+
+    connect(InitInit            ,&QState::entered, this, &InspectorModule::SMInit);
+    connect(RequestFrameReset   ,&QState::entered, this, &InspectorModule::SMRequestFrameReset);
+    connect(RequestExposure     ,&QState::entered, this, &InspectorModule::SMRequestExposure);
+    connect(FindStars           ,&QState::entered, this, &InspectorModule::SMFindStars);
+    connect(Compute             ,&QState::entered, this, &InspectorModule::SMCompute);
+    connect(Abort,               &QState::entered, this, &InspectorModule::SMAbort);
+
+    Init->                addTransition(this,&InspectorModule::Abort                ,Abort);
+    Abort->               addTransition(this,&InspectorModule::AbortDone            ,End);
+    InitInit->            addTransition(this,&InspectorModule::InitDone             ,RequestFrameReset);
+    RequestFrameReset->   addTransition(this,&InspectorModule::RequestFrameResetDone,WaitFrameReset);
+    WaitFrameReset->      addTransition(this,&InspectorModule::FrameResetDone       ,RequestExposure);
+    RequestExposure->     addTransition(this,&InspectorModule::RequestExposureDone  ,WaitExposure);
+    WaitExposure->        addTransition(this,&InspectorModule::ExposureDone         ,FindStars);
+    FindStars->           addTransition(this,&InspectorModule::FindStarsDone        ,Compute);
+    Compute->             addTransition(this,&InspectorModule::ComputeDone          ,RequestExposure);
+
+    Init->setInitialState(InitInit);
+
+    _machineLoop.addState(Init);
+    _machineLoop.addState(Abort);
+    _machineLoop.addState(End);
+    _machineLoop.setInitialState(Init);
+
+}
 void InspectorModule::SMInit()
 {
     connectAllDevices();
