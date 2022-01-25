@@ -21,7 +21,7 @@ PolarModule::PolarModule(QString name,QString label)
     _propertyStore.add(_actions);
 
     _commonParams = new NumberProperty(_modulename,"Control","root","commonParams","Parameters",2,0);
-    _commonParams->addNumber(new NumberValue("exposure"      ,"Exposure (s)","hint",_exposure,"",0,5,1));
+    _commonParams->addNumber(new NumberValue("exposure"      ,"Exposure s","hint",_exposure,"",0,5,1));
     emit propertyCreated(_commonParams,&_modulename);
     _propertyStore.add(_commonParams);
 
@@ -38,6 +38,13 @@ PolarModule::PolarModule(QString name,QString label)
     _values->addNumber(new NumberValue("t2", "+Time 2","hint",_t2 ,"",0,10000,0));
     emit propertyCreated(_values,&_modulename);
     _propertyStore.add(_values);
+
+    _errors = new NumberProperty(_modulename,"Control","root","errors","Polar error",0,0);
+    _errors->addNumber(new NumberValue("erraz","Azimuth error °"  ,"hint",_erraz,"",0,10000,0));
+    _errors->addNumber(new NumberValue("erralt","Altitude error °"  ,"hint",_erralt,"",0,10000,0));
+    _errors->addNumber(new NumberValue("errtot","Total error °"  ,"hint",_errtot,"",0,10000,0));
+    emit propertyCreated(_errors,&_modulename);
+    _propertyStore.add(_errors);
 
     _img = new ImageProperty(_modulename,"Control","root","viewer","Image property label",0,0,0);
     emit propertyCreated(_img,&_modulename);
@@ -383,9 +390,9 @@ void PolarModule::SMComputeFinal()
 {
        BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal";
 
-       _ra0=354.1265137671062;  _de0=0.2921369570805727;_t0=1643110224331;
-       _ra1=339.12724652172227; _de1=0.300002845425132; _t1=1643110229671;
-       _ra2=324.1279546867718;  _de2=0.315854040156525; _t2=1643110234681;
+       //_ra0=354.1265137671062;  _de0=0.2921369570805727;_t0=1643110224331;
+       //_ra1=339.12724652172227; _de1=0.300002845425132; _t1=1643110229671;
+       //_ra2=324.1279546867718;  _de2=0.315854040156525; _t2=1643110234681;
        BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal RA 0 = " <<     _ra0;
        BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal DE 0 = " <<     _de0;
        BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal t 0  = " <<     _t0;
@@ -397,10 +404,11 @@ void PolarModule::SMComputeFinal()
        BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal RA 2 = " <<     _ra2;
        BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal DE 2 = " <<     _de2;
        BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal t 2  = " <<     _t2;
-
+       double dra1=(_t1-_t0)/(1000*3600);
+       double dra2=(_t2-_t0)/(1000*3600);
        Rotations::V3 p0(Rotations::azAlt2xyz(QPointF(_ra0, _de0)));
-       Rotations::V3 p1(Rotations::azAlt2xyz(QPointF(_ra1, _de1)));
-       Rotations::V3 p2(Rotations::azAlt2xyz(QPointF(_ra2, _de2)));
+       Rotations::V3 p1(Rotations::azAlt2xyz(QPointF(_ra1-dra1, _de1)));
+       Rotations::V3 p2(Rotations::azAlt2xyz(QPointF(_ra2-dra2, _de2)));
        Rotations::V3 axis = Rotations::getAxis(p0, p1, p2);
 
        if (axis.length() < 0.9)
@@ -420,8 +428,19 @@ void PolarModule::SMComputeFinal()
        QPointF azAlt = Rotations::xyz2azAlt(axis);
        //azimuthCenter = azAlt.x();
        //altitudeCenter = azAlt.y();
-       BOOST_LOG_TRIVIAL(debug) << "azimuthCenter "  << azAlt.x();
-       BOOST_LOG_TRIVIAL(debug) << "altitudeCenter " << azAlt.y();
+       _erraz=azAlt.x();
+       _erralt=90-azAlt.y();
+       _errtot=sqrt(square(_erraz) + square(_erralt));
+       BOOST_LOG_TRIVIAL(debug) << "azimuthCenter "  << _erraz;
+       BOOST_LOG_TRIVIAL(debug) << "altitudeCenter " << _erralt;
+       BOOST_LOG_TRIVIAL(debug) << "PA error °"       << _errtot;
+
+       _errors = new NumberProperty(_modulename,"Control","root","errors","Polar error",0,0);
+       _errors->addNumber(new NumberValue("erraz","Azimuth error °"  ,"hint",_erraz,"",0,10000,0));
+       _errors->addNumber(new NumberValue("erralt","Altitude error °"  ,"hint",_erralt,"",0,10000,0));
+       _errors->addNumber(new NumberValue("errtot","Total error °"  ,"hint",_errtot,"",0,10000,0));
+       emit propertyCreated(_errors,&_modulename);
+       _propertyStore.add(_errors);
 
        return;
 

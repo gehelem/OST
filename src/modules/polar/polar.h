@@ -55,6 +55,7 @@ class MODULE_INIT PolarModule : public Basemodule
         NumberProperty* _calParams;
         NumberProperty* _guideParams;
         NumberProperty* _values;
+        NumberProperty* _errors;
         ImageProperty*  _img;
         LightProperty*  _states;
 
@@ -84,6 +85,9 @@ class MODULE_INIT PolarModule : public Basemodule
         double _ra2=0;
         double _de2=0;
         double _t2=0;
+        double _erraz=0;
+        double _erralt=0;
+        double _errtot=0;
         int _itt=0;
 
 
