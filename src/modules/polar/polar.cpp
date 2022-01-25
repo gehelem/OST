@@ -16,6 +16,7 @@ PolarModule::PolarModule(QString name,QString label)
     _actions->addSwitch(new SwitchValue("loadconfs","Load devices conf","hint",0));
     _actions->addSwitch(new SwitchValue("abort","Abort","hint",0));
     _actions->addSwitch(new SwitchValue("start","Start","hint",0));
+    _actions->addSwitch(new SwitchValue("test","Test","hint",0));
     emit propertyCreated(_actions,&_modulename);
     _propertyStore.add(_actions);
 
@@ -95,6 +96,10 @@ void PolarModule::OnSetPropertySwitch(SwitchProperty* prop)
             wprop->setSwitch(switchs[j]->name(),true);
             connectAllDevices();
         }
+        if (switchs[j]->name()=="test") {
+            wprop->setSwitch(switchs[j]->name(),true);
+            SMComputeFinal();
+        }
         //prop->setSwitches(switchs);
         _propertyStore.update(wprop);
         emit propertyUpdated(wprop,&_modulename);
@@ -171,6 +176,7 @@ void PolarModule::buildStateMachine(void)
     connect(RequestMove         ,&QState::entered, this, &PolarModule::SMRequestMove);
     connect(FindStars           ,&QState::entered, this, &PolarModule::SMFindStars);
     connect(Compute             ,&QState::entered, this, &PolarModule::SMCompute);
+    connect(FinalCompute        ,&QState::entered, this, &PolarModule::SMComputeFinal);
     connect(Abort,               &QState::entered, this, &PolarModule::SMAbort);
 
     Polar->               addTransition(this,&PolarModule::Abort                ,Abort);
@@ -376,6 +382,49 @@ void PolarModule::SMCompute()
 void PolarModule::SMComputeFinal()
 {
        BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal";
+
+       _ra0=354.1265137671062;  _de0=0.2921369570805727;_t0=1643110224331;
+       _ra1=339.12724652172227; _de1=0.300002845425132; _t1=1643110229671;
+       _ra2=324.1279546867718;  _de2=0.315854040156525; _t2=1643110234681;
+       BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal RA 0 = " <<     _ra0;
+       BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal DE 0 = " <<     _de0;
+       BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal t 0  = " <<     _t0;
+
+       BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal RA 1 = " <<     _ra1;
+       BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal DE 1 = " <<     _de1;
+       BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal t 1  = " <<     _t1;
+
+       BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal RA 2 = " <<     _ra2;
+       BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal DE 2 = " <<     _de2;
+       BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal t 2  = " <<     _t2;
+
+       Rotations::V3 p0(Rotations::azAlt2xyz(QPointF(_ra0, _de0)));
+       Rotations::V3 p1(Rotations::azAlt2xyz(QPointF(_ra1, _de1)));
+       Rotations::V3 p2(Rotations::azAlt2xyz(QPointF(_ra2, _de2)));
+       Rotations::V3 axis = Rotations::getAxis(p0, p1, p2);
+
+       if (axis.length() < 0.9)
+       {
+           // It failed to normalize the vector, something's wrong.
+            BOOST_LOG_TRIVIAL(debug) << "Normal vector too short. findAxis failed.";
+           return;
+       }
+
+       // Need to make sure we're pointing to the right pole.
+       //if ((northernHemisphere() && (axis.x() < 0)) || (!northernHemisphere() && axis.x() > 0))
+       if (axis.x() < 0)
+       {
+           axis = Rotations::V3(-axis.x(), -axis.y(), -axis.z());
+       }
+
+       QPointF azAlt = Rotations::xyz2azAlt(axis);
+       //azimuthCenter = azAlt.x();
+       //altitudeCenter = azAlt.y();
+       BOOST_LOG_TRIVIAL(debug) << "azimuthCenter "  << azAlt.x();
+       BOOST_LOG_TRIVIAL(debug) << "altitudeCenter " << azAlt.y();
+
+       return;
+
 }
 
 void PolarModule::SMFindStars()
