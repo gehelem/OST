@@ -65,9 +65,46 @@ void Solver::FindStars(Parameters param)
     if (stellarSolver->failed()) BOOST_LOG_TRIVIAL(debug) << "SS Failed";
 
 }
-void Solver::SolveStars()
+void Solver::SolveStars(Parameters param)
 {
+    if (!connect(stellarSolver,&StellarSolver::logOutput,this,&Solver::sslogOutput))
+        BOOST_LOG_TRIVIAL(debug) << "Can't connect logOutput";
+    if (!connect(stellarSolver,&StellarSolver::ready,this,&Solver::ssReadySolve))
+        BOOST_LOG_TRIVIAL(debug) << "Can't connect ready";
+    if (!connect(stellarSolver,&StellarSolver::finished,this,&Solver::ssFinished))
+        BOOST_LOG_TRIVIAL(debug) << "Can't connect finished";
 
+
+    //QList<Parameters> params = stellarSolver->getBuiltInProfiles();
+    stellarSolver->setParameters(param);
+    //stellarSolver->clearSubFrame();
+    //stellarSolver->setProperty("ProcessType",EXTRACT_WITH_HFR);
+    stellarSolver->setProperty("ProcessType",SOLVE);
+    stellarSolver->setProperty("ExtractorType",EXTRACTOR_INTERNAL);
+    stellarSolver->setProperty("SolverType",SOLVER_STELLARSOLVER);
+
+    //stellarSolver->setProperty("SolverType",SOLVER_STELLARSOLVER);
+    stellarSolver->setLogLevel(LOG_ALL);
+    stellarSolver->setSSLogLevel(LOG_VERBOSE);
+    stellarSolver->setProperty("LogToFile", true);
+    //stellarSolver->setProperty("UseScale", false);
+    //stellarSolver->setProperty("UsePosition", false);
+    stellarSolver->setProperty("LogFileName", "/home/gilles/projets/OST/solver.log");
+    //stellarSolver->setLoadWCS(false);
+    //stellarSolver->setParameters();
+    //qDebug() << "SS command string " << stellarSolver->getCommandString();
+    //QEventLoop loop;
+    //connect(stellarSolver, &StellarSolver::finished, &loop, &QEventLoop::quit);
+    //stellarSolver->extract(true);
+    stellarSolver->start();
+    //loop.exec(QEventLoop::ExcludeUserInputEvents);
+    //IDLog("IMG stellarSolver SEP Start\n");
+
+
+    //BOOST_LOG_TRIVIAL(debug) << "SS command string into solver" << stellarSolver->getCommandString().toStdString();
+
+    //stellarSolver->extract(true);
+    if (stellarSolver->failed()) BOOST_LOG_TRIVIAL(debug) << "SS Failed";
 
 }
 
@@ -94,18 +131,9 @@ void Solver::ssReadySEP()
 
 void Solver::ssReadySolve()
 {
-    BOOST_LOG_TRIVIAL(debug) << "SSolver ready solve";
-    stars = stellarSolver->getStarListFromSolve();
-    for (int i=0;i<stars.size();i++)
-    {
-        //IDLog("IMG HFR %i %f\n",i,stars[i].HFR);
-        HFRavg=(i*HFRavg + stars[i].HFR)/(i+1);
-    }
-
-    BOOST_LOG_TRIVIAL(debug) << "SSolver HFRavg = " << HFRavg;
     emit successSolve();
 }
 void Solver::sslogOutput(QString text)
 {
-    //BOOST_LOG_TRIVIAL(debug) << "SSolver log : " << text.toStdString();
+    BOOST_LOG_TRIVIAL(debug) << "SSolver log : " << text.toStdString();
 }

@@ -12,6 +12,7 @@
 #include <QtConcurrent>
 #include <QStateMachine>
 #include "image.h"
+#include "rotations.h"
 
 
 
@@ -55,7 +56,6 @@ class MODULE_INIT PolarModule : public Basemodule
         NumberProperty* _guideParams;
         NumberProperty* _values;
         ImageProperty*  _img;
-        GridProperty*   _grid;
         LightProperty*  _states;
 
 
@@ -67,7 +67,23 @@ class MODULE_INIT PolarModule : public Basemodule
         double _mountRA;
         bool   _mountPointingWest=false;
         double _ccdOrientation;
+        double _aperture;
+        double _focalLength;
+        double _ccdX;
+        double _ccdY;
+        double _ccdSize;
+        double _ccdFov;
+        double _pixelSize;
         double _ccdSampling=206*5.2/800;
+        double _ra0=0;
+        double _de0=0;
+        double _t0=0;
+        double _ra1=0;
+        double _de1=0;
+        double _t1=0;
+        double _ra2=0;
+        double _de2=0;
+        double _t2=0;
         int _itt=0;
 
 

@@ -19,14 +19,22 @@ PolarModule::PolarModule(QString name,QString label)
     emit propertyCreated(_actions,&_modulename);
     _propertyStore.add(_actions);
 
-    _commonParams = new NumberProperty(_modulename,"Parameters","root","commonParams","Common Parameters",2,0);
+    _commonParams = new NumberProperty(_modulename,"Control","root","commonParams","Parameters",2,0);
     _commonParams->addNumber(new NumberValue("exposure"      ,"Exposure (s)","hint",_exposure,"",0,5,1));
     emit propertyCreated(_commonParams,&_modulename);
     _propertyStore.add(_commonParams);
 
 
     _values = new NumberProperty(_modulename,"Control","root","values","Values",0,0);
-    //_values->addNumber(new NumberValue("pulseN","Pulse N","hint",_pulseN,"",0,10000,0));
+    _values->addNumber(new NumberValue("ra0","RA 0"  ,"hint",_ra0,"",0,10000,0));
+    _values->addNumber(new NumberValue("de0","DE 0"  ,"hint",_de0,"",0,10000,0));
+    _values->addNumber(new NumberValue("t0", "Time 0","hint",_t0 ,"",0,10000,0));
+    _values->addNumber(new NumberValue("ra1","RA 1"  ,"hint",_ra1,"",0,10000,0));
+    _values->addNumber(new NumberValue("de1","DE 1"  ,"hint",_de1,"",0,10000,0));
+    _values->addNumber(new NumberValue("t1", "+Time 1","hint",_t1 ,"",0,10000,0));
+    _values->addNumber(new NumberValue("ra2","RA 2"  ,"hint",_ra2,"",0,10000,0));
+    _values->addNumber(new NumberValue("de2","DE 2"  ,"hint",_de2,"",0,10000,0));
+    _values->addNumber(new NumberValue("t2", "+Time 2","hint",_t2 ,"",0,10000,0));
     emit propertyCreated(_values,&_modulename);
     _propertyStore.add(_values);
 
@@ -97,12 +105,12 @@ void PolarModule::newNumber(INumberVectorProperty *nvp)
 {
     if (
             (QString(nvp->device) == _mount) &&
-            (QString(nvp->name)   == "xx") &&
-            (nvp->s   == IPS_IDLE)
+            (QString(nvp->name)   == "EQUATORIAL_EOD_COORD") &&
+            (nvp->s   == IPS_OK)
 
        )
     {
-        //xx
+        emit MoveDone();
     }
 
 }
@@ -155,7 +163,7 @@ void PolarModule::buildStateMachine(void)
     auto *Compute              = new QState(Polar);
     auto *RequestMove          = new QState(Polar);
     auto *WaitMove             = new QState(Polar);
-    auto *FinalCompute         = new QState(Polar);
+    auto *FinalCompute         = new QFinalState(Polar);
 
     connect(InitInit            ,&QState::entered, this, &PolarModule::SMInit);
     connect(RequestFrameReset   ,&QState::entered, this, &PolarModule::SMRequestFrameReset);
@@ -167,6 +175,7 @@ void PolarModule::buildStateMachine(void)
 
     Polar->               addTransition(this,&PolarModule::Abort                ,Abort);
     Abort->               addTransition(this,&PolarModule::AbortDone            ,End);
+
     InitInit->            addTransition(this,&PolarModule::InitDone             ,RequestFrameReset);
     RequestFrameReset->   addTransition(this,&PolarModule::RequestFrameResetDone,WaitFrameReset);
     WaitFrameReset->      addTransition(this,&PolarModule::FrameResetDone       ,RequestExposure);
@@ -174,7 +183,7 @@ void PolarModule::buildStateMachine(void)
     WaitExposure->        addTransition(this,&PolarModule::ExposureDone         ,FindStars);
     FindStars->           addTransition(this,&PolarModule::FindStarsDone        ,Compute);
     Compute->             addTransition(this,&PolarModule::ComputeDone          ,RequestMove);
-    Compute->             addTransition(this,&PolarModule::PolarDone            ,End);
+    Compute->             addTransition(this,&PolarModule::PolarDone            ,FinalCompute);
     RequestMove->         addTransition(this,&PolarModule::RequestMoveDone      ,WaitMove);
     WaitMove->            addTransition(this,&PolarModule::MoveDone             ,RequestExposure);
 
@@ -199,12 +208,51 @@ void PolarModule::SMInit()
         return;
     }
     BOOST_LOG_TRIVIAL(debug) << "Mount DEC " << _mountDEC;
-     /* get mount RA */
+
+    /* get mount RA */
     if (!getModNumber(_mount,"EQUATORIAL_EOD_COORD","RA",_mountRA)) {
         emit Abort();
         return;
     }
-    BOOST_LOG_TRIVIAL(debug) << "Mount DEC " << _mountRA;
+    BOOST_LOG_TRIVIAL(debug) << "Mount RA " << _mountRA;
+
+    /* get focal length */
+    if (!getModNumber(_mount,"TELESCOPE_INFO","TELESCOPE_FOCAL_LENGTH",_focalLength)) {
+        emit Abort();
+        return;
+    }
+    BOOST_LOG_TRIVIAL(debug) << "focal lenth " << _focalLength;
+
+    /* get pixel size */
+    if (!getModNumber(_camera,"CCD_INFO","CCD_PIXEL_SIZE",_pixelSize)) {
+        emit Abort();
+        return;
+    }
+    BOOST_LOG_TRIVIAL(debug) << "Pixel size " << _pixelSize;
+
+    /* get ccd width */
+    if (!getModNumber(_camera,"CCD_INFO","CCD_MAX_X",_ccdX)) {
+        emit Abort();
+        return;
+    }
+    BOOST_LOG_TRIVIAL(debug) << "CCD width " << _ccdX;
+
+    /* get ccd height */
+    if (!getModNumber(_camera,"CCD_INFO","CCD_MAX_Y",_ccdY)) {
+        emit Abort();
+        return;
+    }
+    BOOST_LOG_TRIVIAL(debug) << "CCD height " << _ccdY;
+
+
+    _ccdSampling=206*_pixelSize/_focalLength;
+    BOOST_LOG_TRIVIAL(debug) << "CCD sampling (arcs/px) " << _ccdSampling;
+    _ccdFov=sqrt(square(_ccdX)+square(_ccdY))*_ccdSampling;
+    BOOST_LOG_TRIVIAL(debug) << "CCD FOV (arcs) " << _ccdFov;
+    BOOST_LOG_TRIVIAL(debug) << "CCD FOV (arcm) " << _ccdFov/60;
+    BOOST_LOG_TRIVIAL(debug) << "CCD FOV (deg)  " << _ccdFov/3600;
+
+
     /* get mount Pier position  */
    if (!getModSwitch(_mount,"TELESCOPE_PIER_SIDE","PIER_WEST",_mountPointingWest)) {
        emit Abort();
@@ -212,11 +260,13 @@ void PolarModule::SMInit()
    }
    BOOST_LOG_TRIVIAL(debug) << "PIER_WEST " << _mountPointingWest;
 
-   _grid->clear();
-   _propertyStore.update(_grid);
-   emit propertyUpdated(_grid,&_modulename);
-    BOOST_LOG_TRIVIAL(debug) << "SMInitDone";
-    emit InitDone();
+   _itt=0;
+   _ra0=0;_de0=0;_t0=0;
+   _ra1=0;_de1=0;_t1=0;
+   _ra2=0;_de2=0;_t2=0;
+
+   BOOST_LOG_TRIVIAL(debug) << "SMInitDone";
+   emit InitDone();
 }
 void PolarModule::SMRequestFrameReset()
 {
@@ -233,6 +283,16 @@ void PolarModule::SMRequestFrameReset()
 void PolarModule::SMRequestExposure()
 {
     BOOST_LOG_TRIVIAL(debug) << "SMRequestExposure";
+    if (_itt==0) {
+        _t0=QDateTime::currentDateTime().currentMSecsSinceEpoch();
+    }
+    if (_itt==1) {
+        _t1=QDateTime::currentDateTime().currentMSecsSinceEpoch();
+    }
+    if (_itt==2) {
+        _t2=QDateTime::currentDateTime().currentMSecsSinceEpoch();
+    }
+
     sendMessage("SMRequestExposure");
     if (!sendModNewNumber(_camera,"CCD_EXPOSURE","CCD_EXPOSURE_VALUE", _exposure))
     {
@@ -245,36 +305,98 @@ void PolarModule::SMRequestMove()
 {
     BOOST_LOG_TRIVIAL(debug) << "SMRequestMove";
     sendMessage("SMRequestMove");
-    /*if (!sendModNewNumber(_camera,"CCD_EXPOSURE","CCD_EXPOSURE_VALUE", _exposure))
-    {
+
+    double oldRA,newRA;
+
+    /* get mount RA */
+    if (!getModNumber(_mount,"EQUATORIAL_EOD_COORD","RA",oldRA)) {
+        BOOST_LOG_TRIVIAL(debug) << "SMRequestMove error 1";
         emit Abort();
         return;
-    }*/
+    }
+
+
+    if (_mountPointingWest) newRA=oldRA-15*24/360; else newRA=oldRA+15*24/360;
+    BOOST_LOG_TRIVIAL(debug) << "SMRequestMove old RA = " << oldRA << " new RA= " << newRA << " pointing west " << _mountPointingWest;
+
+    if (!sendModNewNumber(_mount,"EQUATORIAL_EOD_COORD","RA", newRA))
+    {
+        BOOST_LOG_TRIVIAL(debug) << "SMRequestMove error 2";
+        emit Abort();
+        return;
+    }
+    BOOST_LOG_TRIVIAL(debug) << "SMRequestMove done";
     emit RequestMoveDone();
+
 }
 
 void PolarModule::SMCompute()
 {
-    BOOST_LOG_TRIVIAL(debug) << "SMCompute";
+    BOOST_LOG_TRIVIAL(debug) << "*******  SMCompute ******** ";
+    BOOST_LOG_TRIVIAL(debug) << "****** SSolver ready solve";
+    BOOST_LOG_TRIVIAL(debug) << "SMCompute STEP     = " <<     _itt;
+    BOOST_LOG_TRIVIAL(debug) << "SMCompute solve RA = " <<     _solver.stellarSolver->getSolution().ra;
+    BOOST_LOG_TRIVIAL(debug) << "SMCompute solve DE = " <<     _solver.stellarSolver->getSolution().dec;
+    BOOST_LOG_TRIVIAL(debug) << "SMCompute solve WI = " <<     _solver.stellarSolver->getSolution().fieldWidth;
+    BOOST_LOG_TRIVIAL(debug) << "SMCompute solve HE = " <<     _solver.stellarSolver->getSolution().fieldHeight;
+    BOOST_LOG_TRIVIAL(debug) << "SMCompute solve OR = " <<     _solver.stellarSolver->getSolution().orientation;
+    BOOST_LOG_TRIVIAL(debug) << "SMCompute solve SC = " <<     _solver.stellarSolver->getSolution().pixscale;
+    if (_itt==0) {
+        _ra0=_solver.stellarSolver->getSolution().ra;
+        _de0=_solver.stellarSolver->getSolution().dec;
+    }
+    if (_itt==1) {
+        _ra1=_solver.stellarSolver->getSolution().ra;
+        _de1=_solver.stellarSolver->getSolution().dec;
+        //_t0=
+    }
+    if (_itt==2) {
+        _ra2=_solver.stellarSolver->getSolution().ra;
+        _de2=_solver.stellarSolver->getSolution().dec;
+        //_t0=
+    }
 
-    emit ComputeDone();
+    _values = new NumberProperty(_modulename,"Control","root","values","Values",0,0);
+    _values->addNumber(new NumberValue("ra0","RA 0"  ,"hint",_ra0,"",0,10000,0));
+    _values->addNumber(new NumberValue("de0","DE 0"  ,"hint",_de0,"",0,10000,0));
+    _values->addNumber(new NumberValue("t0", "Time 0","hint",_t0 ,"",0,10000,0));
+    _values->addNumber(new NumberValue("ra1","RA 1"  ,"hint",_ra1,"",0,10000,0));
+    _values->addNumber(new NumberValue("de1","DE 1"  ,"hint",_de1,"",0,10000,0));
+    _values->addNumber(new NumberValue("t1", "Time 1","hint",_t1 ,"",0,10000,0));
+    _values->addNumber(new NumberValue("ra2","RA 2"  ,"hint",_ra2,"",0,10000,0));
+    _values->addNumber(new NumberValue("de2","DE 2"  ,"hint",_de2,"",0,10000,0));
+    _values->addNumber(new NumberValue("t2", "Time 2","hint",_t2 ,"",0,10000,0));
+    emit propertyCreated(_values,&_modulename);
+    _propertyStore.add(_values);
+
+    _itt++;
+    if (_itt < 3) emit ComputeDone(); else emit PolarDone();
+
 }
+void PolarModule::SMComputeFinal()
+{
+       BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal";
+}
+
 void PolarModule::SMFindStars()
 {
     BOOST_LOG_TRIVIAL(debug) << "SMFindStars";
 
     sendMessage("SMFindStars");
     _solver.ResetSolver(image->stats,image->m_ImageBuffer);
-    connect(&_solver,&Solver::successSEP,this,&PolarModule::OnSucessSEP);
+    connect(&_solver,&Solver::successSolve,this,&PolarModule::OnSucessSEP);
+    SSolver::Parameters params=_solver.stellarSolverProfiles[0];
+    params.minwidth=0.1*_ccdFov/3600;
+    params.maxwidth=1.1*_ccdFov/3600;
     _solver.stars.clear();
-    _solver.FindStars(_solver.stellarSolverProfiles[0]);
+    _solver.SolveStars(params);
 }
 void PolarModule::OnSucessSEP()
 {
     BOOST_LOG_TRIVIAL(debug) << "OnSucessSEP";
 
     sendMessage("SEP finished");
-    disconnect(&_solver,&Solver::successSEP,this,&PolarModule::OnSucessSEP);
+    disconnect(&_solver,&Solver::successSolve,this,&PolarModule::OnSucessSEP);
     BOOST_LOG_TRIVIAL(debug) << "********* SEP Finished";
     emit FindStarsDone();
 }

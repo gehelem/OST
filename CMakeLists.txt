@@ -196,6 +196,8 @@ target_compile_definitions(ostguider PRIVATE GUIDER_MODULE)
 add_library(ostpolar SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/polar/polar.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/polar/polar.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/polar/rotations.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/polar/rotations.cpp
 )
 target_link_libraries(ostpolar PRIVATE
     indiclient
