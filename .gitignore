@@ -37,3 +37,5 @@ documentation
 install_manifest.txt
 .idea
 *.kdev4
+
+solver.log
