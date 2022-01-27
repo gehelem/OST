@@ -34,6 +34,7 @@ class MODULE_INIT PolarModule : public Basemodule
         void ExposureDone();
         void FindStarsDone();
         void ComputeDone();
+        void ComputeFinalDone();
         void PolarDone();
         void RequestMoveDone();
         void MoveDone();
