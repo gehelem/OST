@@ -175,8 +175,8 @@ target_compile_definitions(ostindipanel PRIVATE INDIPANEL_MODULE)
 add_library(ostguider SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/guider.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/guider.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/polynomialfit.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/polynomialfit.h
+    #${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/polynomialfit.cpp
+    #${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/polynomialfit.h
 
 )
 target_link_libraries(ostguider PRIVATE

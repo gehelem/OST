@@ -1,5 +1,5 @@
 #include "guider.h"
-#include "polynomialfit.h"
+//#include "polynomialfit.h"
 #define PI 3.14159265
 
 GuiderModule *initialize(QString name,QString label)
