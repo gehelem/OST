@@ -39,3 +39,5 @@ install_manifest.txt
 *.kdev4
 
 solver.log
+
+db/ost.db
