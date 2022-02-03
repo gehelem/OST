@@ -1,8 +1,9 @@
 #include "polar.h"
 #include <libastro.h>
-#include <libnova/julian_day.h>
+#include <libnova/libnova.h>
 
 #define PI 3.14159265
+#define J2000          2451545.0    //Julian Date for noon on Jan 1, 2000 (epoch J2000)
 
 PolarModule *initialize(QString name,QString label)
 {
@@ -112,6 +113,9 @@ void PolarModule::OnSetPropertySwitch(SwitchProperty* prop)
         }
         if (switchs[j]->name()=="test") {
             wprop->setSwitch(switchs[j]->name(),true);
+            _ra0=330.69107; _de0=1.26547; _t0=0;
+            _ra1=341.20879; _de1=1.25555; _t1=0;
+            _ra2=351.72867; _de2=1.25023; _t2=0;
             SMComputeFinal();
         }
         //prop->setSwitches(switchs);
@@ -335,17 +339,17 @@ void PolarModule::SMRequestExposure()
     _propertyStore.add(_states);
 
     BOOST_LOG_TRIVIAL(debug) << "SMRequestExposure";
-    double t = QDateTime::currentDateTime().currentMSecsSinceEpoch();
-    //double t = ln_get_julian_from_sys();
+    //double t = QDateTime::currentDateTime().currentMSecsSinceEpoch();
+    _t = ln_get_julian_from_sys();
 
     if (_itt==0) {
-        _t0= t;
+        _t0= _t;
     }
     if (_itt==1) {
-        _t1= t;
+        _t1= _t;
     }
     if (_itt==2) {
-        _t2= t;
+        _t2= _t;
     }
 
     sendMessage("SMRequestExposure");
@@ -381,10 +385,10 @@ void PolarModule::SMRequestMove()
 
 
     if (_mountPointingWest) {
-        newRA=oldRA-15*24/360;
+        newRA=oldRA-0.3333333;
         if (newRA < 0) newRA=newRA+24;
     } else {
-        newRA=oldRA+15*24/360;
+        newRA=oldRA+0.3333333;
         if (newRA >= 24) newRA=newRA-24;
     }
     BOOST_LOG_TRIVIAL(debug) << "SMRequestMove old RA = " << oldRA << " new RA= " << newRA << " pointing west " << _mountPointingWest;
@@ -410,44 +414,49 @@ void PolarModule::SMCompute()
     _states->addLight(new LightValue("Compute"  ,"Compute","hint",2));
     emit propertyCreated(_states,&_modulename);
     _propertyStore.add(_states);
-
+    _ra=_solver.stellarSolver->getSolution().ra;
+    _de=_solver.stellarSolver->getSolution().dec;
     BOOST_LOG_TRIVIAL(debug) << "*******  SMCompute ******** ";
     BOOST_LOG_TRIVIAL(debug) << "****** SSolver ready solve";
     BOOST_LOG_TRIVIAL(debug) << "SMCompute STEP     = " <<     _itt;
-    BOOST_LOG_TRIVIAL(debug) << "SMCompute solve RA = " <<     _solver.stellarSolver->getSolution().ra;
-    BOOST_LOG_TRIVIAL(debug) << "SMCompute solve DE = " <<     _solver.stellarSolver->getSolution().dec;
+    BOOST_LOG_TRIVIAL(debug) << "SMCompute solve RA = " <<     _ra;
+    BOOST_LOG_TRIVIAL(debug) << "SMCompute solve DE = " <<     _de;
     BOOST_LOG_TRIVIAL(debug) << "SMCompute solve WI = " <<     _solver.stellarSolver->getSolution().fieldWidth;
     BOOST_LOG_TRIVIAL(debug) << "SMCompute solve HE = " <<     _solver.stellarSolver->getSolution().fieldHeight;
     BOOST_LOG_TRIVIAL(debug) << "SMCompute solve OR = " <<     _solver.stellarSolver->getSolution().orientation;
     BOOST_LOG_TRIVIAL(debug) << "SMCompute solve SC = " <<     _solver.stellarSolver->getSolution().pixscale;
-    INDI::IEquatorialCoordinates coord2000,coordNow;
-    coordNow.rightascension=_solver.stellarSolver->getSolution().ra*24/360;
-    coordNow.declination=_solver.stellarSolver->getSolution().dec;
-
-    //coord2000.rightascension=_solver.stellarSolver->getSolution().ra;
-    //coord2000.declination=_solver.stellarSolver->getSolution().dec;
+    //BOOST_LOG_TRIVIAL(debug) << "SMCompute solve WCS RA = " <<     _solver.stellarSolver->getWCSCoord()->ra;
+    //BOOST_LOG_TRIVIAL(debug) << "SMCompute solve WCS DE = " <<     _solver.stellarSolver->getWCSCoord()->dec;
+    //INDI::IEquatorialCoordinates coord2000,coordNow;
+    //coordNow.rightascension=_ra*24/360;
+    //coordNow.declination=_de;
+    //INDI::ObservedToJ2000(&coordNow,_t,&coord2000);
+    //_ra_conv=coord2000.rightascension*360/24;
+    //_de_conv=coord2000.declination;
+    struct ln_equ_posn j2000,jnow;
+    j2000.ra  = _ra;
+    j2000.dec = _de;
+    ln_get_equ_prec2(&j2000, JD2000, _t, &jnow);
+    _ra_conv=jnow.ra;
+    _de_conv=jnow.dec;
 
     if (_itt==0) {
-        //INDI::ObservedToJ2000(&coordNow,_t0,&coord2000);
-        //_ra0=coord2000.rightascension;
-        //_de0=coord2000.declination;
-        _ra0=_solver.stellarSolver->getSolution().ra;
-        _de0=_solver.stellarSolver->getSolution().dec;
+        _ra0=_ra;
+        _de0=_de;
+        _ra0_conv=_ra_conv;
+        _de0_conv=_de_conv;
     }
     if (_itt==1) {
-        //INDI::ObservedToJ2000(&coordNow,_t1,&coord2000);
-        //_ra1=coord2000.rightascension;
-        //_de1=coord2000.declination;
-        _ra1=_solver.stellarSolver->getSolution().ra;
-        _de1=_solver.stellarSolver->getSolution().dec;
+        _ra1=_ra;
+        _de1=_de;
+        _ra1_conv=_ra_conv;
+        _de1_conv=_de_conv;
     }
     if (_itt==2) {
-        //INDI::ObservedToJ2000(&coordNow,_t2,&coord2000);
-        //_ra2=coord2000.rightascension;
-        //_de2=coord2000.declination;
-        _ra2=_solver.stellarSolver->getSolution().ra;
-        _de2=_solver.stellarSolver->getSolution().dec;
-
+        _ra2=_ra;
+        _de2=_de;
+        _ra2_conv=_ra_conv;
+        _de2_conv=_de_conv;
     }
 
     _values = new NumberProperty(_modulename,"Control","root","values","Values",0,0);
@@ -470,19 +479,31 @@ void PolarModule::SMCompute()
 void PolarModule::SMComputeFinal()
 {
        BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal";
-       //_ra0=354.1265137671062;  _de0=0.2921369570805727;_t0=1643110224331;
-       //_ra1=339.12724652172227; _de1=0.300002845425132; _t1=1643110229671;
-       //_ra2=324.1279546867718;  _de2=0.315854040156525; _t2=1643110234681;
-       BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal RA 0 = " <<     _ra0;
-       BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal DE 0 = " <<     _de0;
+
+       _values = new NumberProperty(_modulename,"Control","root","values","Values",0,0);
+       _values->addNumber(new NumberValue("ra0","RA 0"  ,"hint",_ra0,"",0,10000,0));
+       _values->addNumber(new NumberValue("de0","DE 0"  ,"hint",_de0,"",0,10000,0));
+       _values->addNumber(new NumberValue("t0", "Time 0","hint",_t0 ,"",0,10000,0));
+       _values->addNumber(new NumberValue("ra1","RA 1"  ,"hint",_ra1,"",0,10000,0));
+       _values->addNumber(new NumberValue("de1","DE 1"  ,"hint",_de1,"",0,10000,0));
+       _values->addNumber(new NumberValue("t1", "Time 1","hint",_t1 ,"",0,10000,0));
+       _values->addNumber(new NumberValue("ra2","RA 2"  ,"hint",_ra2,"",0,10000,0));
+       _values->addNumber(new NumberValue("de2","DE 2"  ,"hint",_de2,"",0,10000,0));
+       _values->addNumber(new NumberValue("t2", "Time 2","hint",_t2 ,"",0,10000,0));
+       emit propertyCreated(_values,&_modulename);
+       _propertyStore.add(_values);
+
+
+       BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal RA 0 = " <<     _ra0_conv;
+       BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal DE 0 = " <<     _de0_conv;
        BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal t 0  = " <<     _t0;
 
-       BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal RA 1 = " <<     _ra1;
-       BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal DE 1 = " <<     _de1;
+       BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal RA 1 = " <<     _ra1_conv;
+       BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal DE 1 = " <<     _de1_conv;
        BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal t 1  = " <<     _t1;
 
-       BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal RA 2 = " <<     _ra2;
-       BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal DE 2 = " <<     _de2;
+       BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal RA 2 = " <<     _ra2_conv;
+       BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal DE 2 = " <<     _de2_conv;
        BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal t 2  = " <<     _t2;
        /*double dra1=360*(_t1-_t0)/(1000*3600*24);
        double dra2=360*(_t2-_t0)/(1000*3600*24);
@@ -490,13 +511,14 @@ void PolarModule::SMComputeFinal()
        BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal DRA1-0 = " << dra1;
        BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal DRA2-0 = " << dra2;*/
 
-       Rotations::V3 p0(Rotations::azAlt2xyz(QPointF(_ra0, _de0)));
-       Rotations::V3 p1(Rotations::azAlt2xyz(QPointF(_ra1, _de1)));
-       Rotations::V3 p2(Rotations::azAlt2xyz(QPointF(_ra2, _de2)));
+       Rotations::V3 p0(Rotations::azAlt2xyz(QPointF(_ra0_conv, _de0_conv)));
+       Rotations::V3 p1(Rotations::azAlt2xyz(QPointF(_ra1_conv, _de1_conv)));
+       Rotations::V3 p2(Rotations::azAlt2xyz(QPointF(_ra2_conv, _de2_conv)));
        //Rotations::V3 p0(Rotations::haDec2xyz(QPointF(_ra0, _de0),0));
        //Rotations::V3 p1(Rotations::haDec2xyz(QPointF(_ra1, _de1),0));
        //Rotations::V3 p2(Rotations::haDec2xyz(QPointF(_ra2, _de2),0));
-       Rotations::V3 axis = Rotations::getAxis(p0, p1, p2);
+       //Rotations::V3 axis = Rotations::getAxis(p0, p1, p2);
+       Rotations::V3 axis = Rotations::getAxis(p0, p1);
 
        if (axis.length() < 0.9)
        {
@@ -517,15 +539,29 @@ void PolarModule::SMComputeFinal()
        BOOST_LOG_TRIVIAL(debug) << "axis.y() " << axis.y();
        BOOST_LOG_TRIVIAL(debug) << "axis.z() " << axis.z();
        QPointF azAlt = Rotations::xyz2azAlt(axis);
-       //azimuthCenter = azAlt.x();
-       //altitudeCenter = azAlt.y();
+       //QPointF haDec = Rotations::xyz2haDec(axis,0);
+       //BOOST_LOG_TRIVIAL(debug) << "haDec x "  << haDec.x();
+       //BOOST_LOG_TRIVIAL(debug) << "haDec y " << haDec.y();
+       BOOST_LOG_TRIVIAL(debug) << "axex "  << (180*(asin(axis.x()))/PI);
+       BOOST_LOG_TRIVIAL(debug) << "axey "  << (180*(asin(axis.y()))/PI);
        _erraz=azAlt.x();
-       _erralt=90-azAlt.y();
-       //_erralt=azAlt.y();
+       //_erralt=90-azAlt.y();
+       _erralt=azAlt.y();
        _errtot=sqrt(square(_erraz) + square(_erralt));
-       BOOST_LOG_TRIVIAL(debug) << "azimuthCenter "  << _erraz;
-       BOOST_LOG_TRIVIAL(debug) << "altitudeCenter " << _erralt;
-       BOOST_LOG_TRIVIAL(debug) << "PA error °"       << _errtot;
+       BOOST_LOG_TRIVIAL(debug) << "az  error " << _erraz;
+       BOOST_LOG_TRIVIAL(debug) << "alt error " << _erralt;
+       BOOST_LOG_TRIVIAL(debug) << "tot error " << 180*(Rotations::getAngle(axis,Rotations::V3(0.0, 0.0 , 1)))/PI;
+       BOOST_LOG_TRIVIAL(debug) << "tot error " << 180*(Rotations::getAngle(axis,Rotations::V3(0.0, 0.0 ,-1)))/PI;
+
+       struct ln_equ_posn j2000,jnow;
+       jnow.ra  = azAlt.x();
+       jnow.dec = azAlt.y();
+       ln_get_equ_prec2(&jnow, _t, JD2000, &j2000);
+       BOOST_LOG_TRIVIAL(debug) << "j2000 RA " << j2000.ra;
+       BOOST_LOG_TRIVIAL(debug) << "j2000 DE " << j2000.dec;
+
+
+
 
        _errors = new NumberProperty(_modulename,"Control","root","errors","Polar error",0,0);
        _errors->addNumber(new NumberValue("erraz","Azimuth error °"  ,"hint",_erraz,"",0,10000,0));
@@ -584,14 +620,15 @@ void PolarModule::SMFindStars()
     connect(&_solver,&Solver::successSolve,this,&PolarModule::OnSucessSEP);
     _solver.stars.clear();
     SSolver::Parameters params=_solver.stellarSolverProfiles[0];
+    //_solver.stellarSolver->
     //params.minwidth=0.1*_ccdFov/3600;
     //params.maxwidth=1.1*_ccdFov/3600;
     //params.search_radius=2;
     //BOOST_LOG_TRIVIAL(debug) << "minwidth " << params.minwidth;
     //BOOST_LOG_TRIVIAL(debug) << "maxidth " << params.maxwidth;
-    //_solver.setSearchScale(0.1*_ccdFov/3600,1.1*_ccdFov/3600,ScaleUnits::DEG_WIDTH);
-    //_solver.setSearchPositionInDegrees(_mountRA*360/24,_mountDEC);
+    _solver.stellarSolver->setSearchScale(0.1*_ccdFov/3600,1.1*_ccdFov/3600,ScaleUnits::DEG_WIDTH);
     _solver.stellarSolver->setSearchPositionInDegrees(_mountRA*360/24,_mountDEC);
+    //params.
     _solver.SolveStars(params);
 }
 void PolarModule::OnSucessSEP()

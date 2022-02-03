@@ -64,7 +64,7 @@ class MODULE_INIT PolarModule : public Basemodule
         //std::unique_ptr<Image> image =nullptr;
         QPointer<Image> image;
 
-        double _exposure = 2;
+        double _exposure = 0.5;
         double _mountDEC;
         double _mountRA;
         bool   _mountPointingWest=false;
@@ -77,6 +77,9 @@ class MODULE_INIT PolarModule : public Basemodule
         double _ccdFov;
         double _pixelSize;
         double _ccdSampling=206*5.2/800;
+        double _t;
+        double _ra=0;
+        double _de=0;
         double _ra0=0;
         double _de0=0;
         double _t0=0;
@@ -86,6 +89,16 @@ class MODULE_INIT PolarModule : public Basemodule
         double _ra2=0;
         double _de2=0;
         double _t2=0;
+
+        double _ra_conv=0;
+        double _de_conv=0;
+        double _ra0_conv=0;
+        double _de0_conv=0;
+        double _ra1_conv=0;
+        double _de1_conv=0;
+        double _ra2_conv=0;
+        double _de2_conv=0;
+
         double _erraz=0;
         double _erralt=0;
         double _errtot=0;
