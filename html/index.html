@@ -187,7 +187,7 @@ function buildproperty(m,d,g,p) {
     if (g=="root") g="";
     nn=m+d+g;
     nnp=nn+p.propname;
-    if  (!($("#P"+nnp).length)&&(p.hasOwnProperty('texts')||p.hasOwnProperty('numbers')||p.hasOwnProperty('switches')||p.hasOwnProperty('lights')))  {
+    if  (!($("[id='P"+nnp+"']").length)&&(p.hasOwnProperty('texts')||p.hasOwnProperty('numbers')||p.hasOwnProperty('switches')||p.hasOwnProperty('lights')))  {
         div="<div id=P"+nnp+" ><table id=tab"+nnp+">"
         +"<tr>"
         +"<strong id=status"+nnp+" >"+"---"+"</strong>"
@@ -203,8 +203,8 @@ function buildproperty(m,d,g,p) {
         $("#U"+nn).append(div);
         
         if ((p.permission=="1"||p.permission=="2")&&(p.hasOwnProperty('numbers'))) {
-            $("#B"+nnp).data("json",p);
-            $("#B"+nnp).on("click", function () {
+            $("[id='B"+nnp+"']").data("json",p);
+            $("[id='B"+nnp+"']").on("click", function () {
                 var pp=$(this).data("json");
                 $.each( pp.numbers, function( ii, i ) {
                     pp.numbers[ii].value=parseFloat(document.getElementById(pp.modulename+d+g+pp.propname+i.name).value);
@@ -218,8 +218,8 @@ function buildproperty(m,d,g,p) {
 
         
         if ((p.permission=="1"||p.permission=="2")&&(p.hasOwnProperty('texts'))) {
-            $("#B"+nnp).data("json",p);
-            $("#B"+nnp).on("click", function () {
+            $("[id='B"+nnp+"']").data("json",p);
+            $("[id='B"+nnp+"']").on("click", function () {
                 var pp=$(this).data("json");
                 $.each( pp.texts, function( ii, i ) {
                     pp.texts[ii].text=document.getElementById(pp.modulename+d+g+pp.propname+i.name).value;
@@ -350,14 +350,14 @@ function buildnumbers(m,d,g,prop) {
     $.each( prop.numbers, function( iitem, item ) {
         nn=m+d+g+p;
         nnn = nn+item.name;
-        if ($("#"+nnn).length) {
-            $("#"+nnn).val(item.value);
+        if ($("[id='"+nnn+"']").length) {
+            $("[id='"+nnn+"']").val(item.value);
         } else {
             if (prop.permission=="0") {
-                $("#tab3"+nn + " tbody").append("<tr><td><small> "+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /></td></tr>");
+                $("[id='tab3"+nn + "']").append("<tr><td><small> "+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /></td></tr>");
             };
             if (prop.permission=="2") {
-                $("#tab3"+nn+ " tbody").append(
+                $("[id='tab3"+nn+ "']").append(
                 "<tr><td><small>"+item.label+"</small></td><td>"
                 +"<input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" />"
                 );
@@ -375,23 +375,23 @@ function buildswitchs(m,d,g,prop) {
     $.each( prop.switches, function( iitem, item ) {
         nn=m+d+g+p;
         nnn = nn+item.name;
-        if ($("#bbb"+nnn).length) {
-            $("#bbb"+nnn).val(item.state);
+        if ($("[id='bbb"+nnn+"']").length) {
+            $("[id='bbb"+nnn+"']").val(item.state);
         } else {
             if (prop.permission=="0") {
-                $("#tab3"+nn+ " tbody").append("<tr><td><small>"+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.state+"'  label="+item.state+" /></td></tr>");
+                $("[id='tab3"+nn+ "']").append("<tr><td><small>"+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.state+"'  label="+item.state+" /></td></tr>");
             
             }
             if (prop.permission=="1" || prop.permission=="2") {
-                $("#tab3"+nn + " tbody").append("<button id=bbb"+nnn+" class='ui-button ui-widget ui-corner-all' backlogid=btn"+nnn
+                $("[id='tab3"+nn + "']").append("<button id=bbb"+nnn+" class='ui-button ui-widget ui-corner-all' backlogid=btn"+nnn
                 +" value="+item.state
                 +" data-value=\"\""
                 +" data-btn=\"\" >"+item.label+"</button>");
-                $("#bbb"+nnn).data("btn",prop);
-                $("#bbb"+nnn).data("value",item.state);
-                $("#bbb"+nnn).val(item.state);
+                $("[id='bbb"+nnn+"']").data("btn",prop);
+                $("[id='bbb"+nnn+"']").data("value",item.state);
+                $("[id='bbb"+nnn+"']").val(item.state);
             }
-            $("#bbb"+nnn).on("click", function () {
+            $("[id='bbb"+nnn+"']").on("click", function () {
                 var pp=$(this).data("btn");
                 /*$.each( pp.switches, function( ii, i ) {
                     //console.log( "switch clicked: " + pp.modulename+pp.devicenameshort+pp.groupnameshort+pp.propname+i.name);
@@ -416,8 +416,8 @@ function buildswitchs(m,d,g,prop) {
             
         
         }
-        if (item.state) $("#bbb"+nnn).css("background", "green");   
-        if (!item.state) $("#bbb"+nnn).css("background", "");   
+        if (item.state) $("[id='bbb"+nnn+"']").css("background", "green");   
+        if (!item.state) $("[id='bbb"+nnn+"']").css("background", "");   
 
     })
 }    
