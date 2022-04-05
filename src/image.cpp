@@ -281,9 +281,9 @@ void Image::SolveStars(void)
     connect(stellarSolver,&StellarSolver::ready,this,&Image::ssReadySolve);
     stellarSolver->setLogLevel(LOG_ALL);
     stellarSolver->setSSLogLevel(LOG_VERBOSE);
-    stellarSolver->m_LogToFile=true;
-    stellarSolver->m_LogFileName="/home/gilles/OST/logs/solver.log";
-    stellarSolver->m_AstrometryLogLevel=LOG_ALL;
+//    stellarSolver->m_LogToFile=true;
+//    stellarSolver->m_LogFileName="/home/gilles/OST/logs/solver.log";
+//    stellarSolver->m_AstrometryLogLevel=LOG_ALL;
 
     /*typedef enum { EXTRACT,            //This just sextracts the sources
                    EXTRACT_WITH_HFR,   //This sextracts the sources and finds the HFR
