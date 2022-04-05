@@ -8,7 +8,6 @@
 #include <QRect>
 #include <QPointer>
 #include <QtNetwork>
-#include <baseclientqt.h>
 #include "boost/log/trivial.hpp"
 
 #include "indiclient.h"
@@ -27,7 +26,11 @@ void IndiCLient::serverDisconnected(int exit_code)
 }
 void IndiCLient::newDevice(INDI::BaseDevice *dp)
 {
+    QString deviceName = dp->getDeviceName();
     BOOST_LOG_TRIVIAL(debug) << "New Device: " << dp->getDeviceName();
+    if ( deviceName.contains("CCD") ) {
+        this->setBLOBMode(B_ALSO, deviceName.toStdString().c_str());
+    }
     emit newDeviceSeen(dp->getDeviceName());
 }
 void IndiCLient::removeDevice(INDI::BaseDevice *dp)
