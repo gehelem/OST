@@ -116,7 +116,7 @@ void Controller::onPropertyUpdated(Property *pProperty) {
 
     PropertyTextDumper textDumper;
     pProperty->accept(&textDumper);
-//    BOOST_LOG_TRIVIAL(debug) << "UPDATED " << textDumper.getResult();
+    BOOST_LOG_TRIVIAL(debug) << "UPDATED " << textDumper.getResult();
 
     JSonDumper jsonDumper;
     pProperty->accept(&jsonDumper);
