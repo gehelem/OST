@@ -10,6 +10,7 @@ Basemodule::Basemodule(QString name,QString label)
     setVerbose(false);
     _moduledescription="This is a base module, it shouldn't be used as is";
     setProperty("Name","basemodule");
+    setProperty("Desciption","Basemodule description");
     setProperty("Version",0.1);
     setProperty("BaseVersion",0.1);
     setProperty("Connected",false);

@@ -74,7 +74,9 @@ class Basemodule : public QObject, public INDI::BaseClient
             if (event->type() == QEvent::DynamicPropertyChange) {
                 QDynamicPropertyChangeEvent *const propEvent = static_cast<QDynamicPropertyChangeEvent*>(event);
                 QString propName = propEvent->propertyName();
-                emit propertyChanged(propName);
+                QVariant propValue = this->property(propEvent->propertyName());
+
+                emit propertyChanged(propName,propValue);
             }
             return QObject::event(event);
         }
@@ -122,7 +124,7 @@ class Basemodule : public QObject, public INDI::BaseClient
         void finished();
         void statusChanged(const QString &newStatus);
         void askedFrameReset(QString devicename);
-        void propertyChanged(QVariant propName);
+        void propertyChanged(QVariant propName,QVariant propValue);
 }
 ;
 #endif

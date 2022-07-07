@@ -15,6 +15,8 @@ Dummy::Dummy(QString name,QString label)
     _moduledescription="Dummy module to show what we can do";
     setProperty("Name","dummymodule");
     setProperty("Version",0.2);
+    setProperty("MyDummyProperty","JohnDoe");
+    setProperty("Desciption","Dummy module description, just for demo purpose");
 
     TextProperty* prop = new TextProperty(_modulename,"Examples","Texts","extextRO","Text example - read only",0,0);
     prop->addText(new TextValue("extext1","Text 1","hint","Text 1 initial value" ));
@@ -97,12 +99,12 @@ void Dummy::OnSetPropertyText(TextProperty* prop)
     QList<TextValue*> texts=prop->getTexts();
 
     for (int i = 0; i < texts.size(); ++i) {
+        setProperty("Message","RCV Text :" + prop->getName() + ":" + texts[i]->name()+ ":" + texts[i]->text());
         texts[i]->setText(texts[i]->text()+" modified by module");
     }
     prop->setState(1);
     emit propertyCreated(prop,&_modulename);
     _propertyStore.add(prop);
-    setProperty("Message","RCV PropertyText ");
 
 
 }

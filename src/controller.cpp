@@ -174,7 +174,7 @@ void Controller::OnLoadModule(QString lib, QString label)
     LoadModule(QCoreApplication::applicationDirPath()+"/"+lib,name,label);
 }
 
-void Controller::OnPropertyChanged(QVariant propName)
+void Controller::OnPropertyChanged(QVariant propName, QVariant propValue)
 {
-    BOOST_LOG_TRIVIAL(debug) << "OnDynamicPropertyChangeEvent " << propName.toString().toStdString();
+    BOOST_LOG_TRIVIAL(debug) << "OnDynamicPropertyChangeEvent " << propName.toString().toStdString() << " - " << propValue.toString().toStdString();
 }
