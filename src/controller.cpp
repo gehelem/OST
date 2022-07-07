@@ -53,11 +53,11 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
     connect(wshandler,&WShandler::setPropertySwitch,mainctl,&Basemodule::OnSetPropertySwitch);
 
 
-    LoadModule(QCoreApplication::applicationDirPath()+"/libostguider.so","guider1","Guider");
-    LoadModule(QCoreApplication::applicationDirPath()+"/libostinspector.so","inspector1","Frame inspector");
-    LoadModule(QCoreApplication::applicationDirPath()+"/libostpolar.so","polar1","Polar assistant");
+    //LoadModule(QCoreApplication::applicationDirPath()+"/libostguider.so","guider1","Guider");
+    //LoadModule(QCoreApplication::applicationDirPath()+"/libostinspector.so","inspector1","Frame inspector");
+    //LoadModule(QCoreApplication::applicationDirPath()+"/libostpolar.so","polar1","Polar assistant");
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focus1","Focus assistant");
-    //LoadModule(QCoreApplication::applicationDirPath()+"/libostdummy.so","dummy1","Demo module");
+    LoadModule(QCoreApplication::applicationDirPath()+"/libostdummy.so","dummy1","Demo module");
 
 }
 
@@ -107,6 +107,13 @@ void Controller::LoadModule(QString lib,QString name,QString label)
                 connect(wshandler,&WShandler::setPropertyNumber,mod,&Basemodule::OnSetPropertyNumber);
                 connect(wshandler,&WShandler::setPropertySwitch,mod,&Basemodule::OnSetPropertySwitch);
 
+                BOOST_LOG_TRIVIAL(debug) << name.toStdString() << " " << "properties ";
+                QList<QByteArray> dynamicProperties = mod->dynamicPropertyNames();
+                for (int i = 0; i < dynamicProperties.size(); ++i) {
+                    BOOST_LOG_TRIVIAL(debug) << dynamicProperties.at(i).toStdString() << " value : " << mod->property(dynamicProperties.at(i)).toString().toStdString();
+                }
+
+                connect(mod,&Basemodule::propertyChanged,this,Controller::OnPropertyChanged);
 
         } else {
             BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library";
@@ -165,4 +172,9 @@ void Controller::OnLoadModule(QString lib, QString label)
     QString name=label;
     name.replace(" ","");
     LoadModule(QCoreApplication::applicationDirPath()+"/"+lib,name,label);
+}
+
+void Controller::OnPropertyChanged(QVariant propName)
+{
+    BOOST_LOG_TRIVIAL(debug) << "OnDynamicPropertyChangeEvent " << propName.toString().toStdString();
 }

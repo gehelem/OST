@@ -21,6 +21,9 @@
 
 class Property;
 
+typedef QMap<QString, QVariant> Eee;
+Q_DECLARE_METATYPE(Eee);
+
 /*!
  * This Class shouldn't be used as is
  * Every functionnal module should inherit it
@@ -66,6 +69,15 @@ class Basemodule : public QObject, public INDI::BaseClient
         }
 
     protected:
+
+        bool event(QEvent *event) override {
+            if (event->type() == QEvent::DynamicPropertyChange) {
+                QDynamicPropertyChangeEvent *const propEvent = static_cast<QDynamicPropertyChangeEvent*>(event);
+                QString propName = propEvent->propertyName();
+                emit propertyChanged(propName);
+            }
+            return QObject::event(event);
+        }
         bool disconnectIndi(void);
         void connectAllDevices(void);
         void disconnectAllDevices(void);
@@ -110,6 +122,7 @@ class Basemodule : public QObject, public INDI::BaseClient
         void finished();
         void statusChanged(const QString &newStatus);
         void askedFrameReset(QString devicename);
+        void propertyChanged(QVariant propName);
 }
 ;
 #endif

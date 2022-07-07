@@ -9,6 +9,12 @@ Basemodule::Basemodule(QString name,QString label)
     _propertyStore.cleanup();
     setVerbose(false);
     _moduledescription="This is a base module, it shouldn't be used as is";
+    setProperty("Name","basemodule");
+    setProperty("Version",0.1);
+    setProperty("BaseVersion",0.1);
+    setProperty("Connected",false);
+    setProperty("Message","");
+
 
     SwitchProperty* props = new SwitchProperty(_modulename,"Indi server","root","connect","Indi server",1,0,1);
     props->addSwitch(new SwitchValue("connect","Connect","hint",false));
@@ -24,6 +30,8 @@ Basemodule::Basemodule(QString name,QString label)
     connect(timer, &QTimer::timeout, this, &Basemodule::connectIndiTimer);
     timer->start(10000);
 
+    setProperty("Message","Basemodule init finished");
+
 }
 void Basemodule::connectIndiTimer()
 {
@@ -31,8 +39,10 @@ void Basemodule::connectIndiTimer()
             if (connectServer()){
                 newUniversalMessage("Indi server connected");
                 sendMessage("Indi server connected");
+                setProperty("IndiConnected",true);
             } else {
                 sendMessage("Couldn't connect to Indi server");
+                setProperty("IndiConnected",false);
             }
         }
 }
@@ -443,3 +453,5 @@ bool Basemodule::frameReset(QString devicename)
     emit askedFrameReset(devicename);
     return true;
 }
+
+
