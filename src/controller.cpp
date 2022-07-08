@@ -107,10 +107,9 @@ void Controller::LoadModule(QString lib,QString name,QString label)
                 connect(wshandler,&WShandler::setPropertyNumber,mod,&Basemodule::OnSetPropertyNumber);
                 connect(wshandler,&WShandler::setPropertySwitch,mod,&Basemodule::OnSetPropertySwitch);
 
-                BOOST_LOG_TRIVIAL(debug) << name.toStdString() << " " << "properties ";
                 QList<QByteArray> dynamicProperties = mod->dynamicPropertyNames();
                 for (int i = 0; i < dynamicProperties.size(); ++i) {
-                    BOOST_LOG_TRIVIAL(debug) << dynamicProperties.at(i).toStdString() << " value : " << mod->property(dynamicProperties.at(i)).toString().toStdString();
+                    BOOST_LOG_TRIVIAL(debug) << "--- list " << name.toStdString() <<" properties --- " << dynamicProperties.at(i).toStdString() << " = " << mod->property(dynamicProperties.at(i)).toString().toStdString();
                 }
 
                 connect(mod,&Basemodule::propertyChanged,this,Controller::OnPropertyChanged);
