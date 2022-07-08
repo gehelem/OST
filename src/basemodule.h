@@ -21,9 +21,6 @@
 
 class Property;
 
-typedef QMap<QString, QVariant> Eee;
-Q_DECLARE_METATYPE(Eee);
-
 /*!
  * This Class shouldn't be used as is
  * Every functionnal module should inherit it
