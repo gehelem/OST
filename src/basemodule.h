@@ -109,6 +109,8 @@ class Basemodule : public QObject, public INDI::BaseClient
         virtual void newMessage(INDI::BaseDevice *dp, int messageID) {Q_UNUSED(dp);Q_UNUSED(messageID);}
         virtual void newUniversalMessage(std::string message)   {Q_UNUSED(message);}
 
+        void createOstProperty(const QString& name,const QString& label, const int& permission);
+        void setOstProperty(QString name, QVariant value);
 
     signals:
         void propertyCreated(Property* pProperty, QString* pModulename);

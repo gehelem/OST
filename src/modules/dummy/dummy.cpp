@@ -16,7 +16,7 @@ Dummy::Dummy(QString name,QString label)
     setProperty("Name","dummymodule");
     setProperty("Version",0.2);
     setProperty("MyDummyProperty","JohnDoe");
-    setProperty("Desciption","Dummy module description, just for demo purpose");
+    setProperty("Description","Dummy module description, just for demo purpose");
 
     TextProperty* prop = new TextProperty(_modulename,"Examples","Texts","extextRO","Text example - read only",0,0);
     prop->addText(new TextValue("extext1","Text 1","hint","Text 1 initial value" ));
@@ -24,6 +24,8 @@ Dummy::Dummy(QString name,QString label)
     prop->addText(new TextValue("extext3","Text 3","hint","Text 3 initial value" ));
     emit propertyCreated(prop,&_modulename);
     _propertyStore.add(prop);
+    createOstProperty("extext1","Text 1",0);
+    setOstProperty("extext1","Text 1 initial value");
 
     prop = new TextProperty(_modulename,"Examples","Texts","extextRW","Text example - read/write",2,0);
     prop->addText(new TextValue("extext1","Text 1","hint","Text 1 initial value" ));
@@ -97,15 +99,20 @@ void Dummy::OnSetPropertyText(TextProperty* prop)
 
     if (!(prop->getModuleName()==_modulename)) return;
     QList<TextValue*> texts=prop->getTexts();
-
     for (int i = 0; i < texts.size(); ++i) {
-        setProperty("Message","RCV Text :" + prop->getName() + ":" + texts[i]->name()+ ":" + texts[i]->text());
+        //setProperty("Message","RCV Text :" + prop->getName() + ":" + texts[i]->name()+ ":" + texts[i]->text());
         texts[i]->setText(texts[i]->text()+" modified by module");
+        //titi[texts[i]->name()]=texts[0]->text();
+        //jsonobj["name"]=texts[i]->name();
+        //jsonobj["label"]=texts[i]->label();
+        //jsonobj["text"]=texts[i]->text();
+        //jsonarray.append(jsonobj);
+        setOstProperty(texts[i]->name(),texts[i]->text());
     }
+
     prop->setState(1);
     emit propertyCreated(prop,&_modulename);
     _propertyStore.add(prop);
-
 
 }
 void Dummy::OnSetPropertyNumber(NumberProperty* prop)
@@ -113,10 +120,17 @@ void Dummy::OnSetPropertyNumber(NumberProperty* prop)
     if (!(prop->getModuleName()==_modulename)) return;
 
     QList<NumberValue*> numbers=prop->getNumbers();
-
+    QJsonArray jsonarray;
+    QJsonObject jsonobj;
     for (int i = 0; i < numbers.size(); ++i) {
         numbers[i]->setValue(numbers[i]->getValue()+2);
+        jsonobj["name"]=numbers[i]->name();
+        jsonobj["label"]=numbers[i]->label();
+        jsonobj["value"]=numbers[i]->getValue();
+        jsonarray.append(jsonobj);
+
     }
+    setProperty("json",jsonarray);
     prop->setState(1);
     emit propertyCreated(prop,&_modulename);
     _propertyStore.add(prop);

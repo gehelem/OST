@@ -109,7 +109,17 @@ void Controller::LoadModule(QString lib,QString name,QString label)
 
                 QList<QByteArray> dynamicProperties = mod->dynamicPropertyNames();
                 for (int i = 0; i < dynamicProperties.size(); ++i) {
-                    BOOST_LOG_TRIVIAL(debug) << "--- list " << name.toStdString() <<" properties --- " << dynamicProperties.at(i).toStdString() << " = " << mod->property(dynamicProperties.at(i)).toString().toStdString();
+                    if (strcmp(mod->property(dynamicProperties.at(i)).typeName(),"QJsonArray")==0 )
+                    {
+                        QJsonArray arr = mod->property(dynamicProperties.at(i)).toJsonArray();
+                        QJsonDocument doc(arr);
+                        QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
+                        QString strJson = QLatin1String(docByteArray);
+                        BOOST_LOG_TRIVIAL(debug) << "--- list " << name.toStdString() <<" properties --- " << dynamicProperties.at(i).toStdString() << " = " << strJson.toStdString();
+                    } else {
+                        BOOST_LOG_TRIVIAL(debug) << "--- list " << name.toStdString() <<" properties --- " << dynamicProperties.at(i).toStdString() << " T= " << mod->property(dynamicProperties.at(i)).typeName()   << " = " << mod->property(dynamicProperties.at(i)).toString().toStdString();
+                    }
+
                 }
 
                 connect(mod,&Basemodule::propertyChanged,this,Controller::OnPropertyChanged);
@@ -175,5 +185,18 @@ void Controller::OnLoadModule(QString lib, QString label)
 
 void Controller::OnPropertyChanged(QVariant propName, QVariant propValue)
 {
-    BOOST_LOG_TRIVIAL(debug) << "OnDynamicPropertyChangeEvent " << propName.toString().toStdString() << " - " << propValue.toString().toStdString();
+    if (strcmp(propValue.typeName(),"QJsonObject")==0 )
+    {
+        QJsonObject obj = propValue.toJsonObject();
+        QJsonDocument doc(obj);
+        QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
+        QString strJson = QLatin1String(docByteArray);
+        BOOST_LOG_TRIVIAL(debug) << "OnDynamicPropertyChangeEvent " << propName.toString().toStdString() << " - " <<  strJson.toStdString();
+    }
+
+    if (strcmp(propValue.typeName(),"QJsonArray")==0 )
+    {
+        BOOST_LOG_TRIVIAL(debug) << "OnDynamicPropertyChangeEvent " << propName.toString().toStdString() << " - " << propValue.toString().toStdString() << " - " << propValue.typeName();
+    }
+
 }

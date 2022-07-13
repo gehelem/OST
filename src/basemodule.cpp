@@ -456,3 +456,20 @@ bool Basemodule::frameReset(QString devicename)
 }
 
 
+void Basemodule::createOstProperty(const QString& name,const QString& label, const int& permission)
+{
+    QVariantMap map = property("ostproperties").toMap();
+    //QJsonArray jsonarray = property("ostproperties").toJsonArray();
+    QJsonObject jsonobj =map[name].toJsonObject();
+    jsonobj["name"]=name;
+    jsonobj["label"]=label;
+    jsonobj["permission"]=permission;
+    map[name]=jsonobj;
+    setProperty("ostproperties",map);
+}
+void Basemodule::setOstProperty(QString name, QVariant value)
+{
+    QJsonObject jsonobj = property(name.toStdString().c_str()).toJsonObject();
+    jsonobj["value"]=value.toString();
+    setProperty(name.toStdString().c_str(),jsonobj);
+}
