@@ -9,12 +9,26 @@ Basemodule::Basemodule(QString name,QString label)
     _propertyStore.cleanup();
     setVerbose(false);
     _moduledescription="This is a base module, it shouldn't be used as is";
-    setProperty("Name","basemodule");
-    setProperty("Desciption","Basemodule description");
-    setProperty("Version",0.1);
-    setProperty("BaseVersion",0.1);
-    setProperty("Connected",false);
-    setProperty("Message","");
+    createOstProperty("name","Name",0);
+    setOstProperty("name",name);
+
+    createOstProperty("label","Label",0);
+    setOstProperty("label",label);
+
+    createOstProperty("description","Description",0);
+    setOstProperty("description","This is a base module, it shouldn't be used as is");
+
+    createOstProperty("version","Version",0);
+    setOstProperty("version",0.1);
+
+    createOstProperty("baseVersion","BaseVersion",0);
+    setOstProperty("baseVersion",0.1);
+
+    createOstProperty("indiConnected","Indi server connected",0);
+    setOstProperty("indiConnected",false);
+
+    createOstProperty("message","Message",0);
+    setOstProperty("message","First base message");
 
 
     SwitchProperty* props = new SwitchProperty(_modulename,"Indi server","root","connect","Indi server",1,0,1);
@@ -40,10 +54,10 @@ void Basemodule::connectIndiTimer()
             if (connectServer()){
                 newUniversalMessage("Indi server connected");
                 sendMessage("Indi server connected");
-                setProperty("IndiConnected",true);
+                setOstProperty("IndiConnected",true);
             } else {
                 sendMessage("Couldn't connect to Indi server");
-                setProperty("IndiConnected",false);
+                setOstProperty("IndiConnected",false);
             }
         }
 }

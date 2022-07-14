@@ -121,6 +121,21 @@ void Controller::LoadModule(QString lib,QString name,QString label)
                     }
 
                 }
+                //QJsonObject obj = mod->property("ostproperties").toJsonObject();
+                QVariantMap map = mod->property("ostproperties").toMap();
+                if (map.size()==0) BOOST_LOG_TRIVIAL(debug) << "ostproperties reading problem";
+
+                for (auto m : map)
+                {
+                    QJsonObject obj = m.toJsonObject();
+                    QJsonObject jsonobj = property(obj["name"].toString().toLatin1()).toJsonObject();
+                    QVariant val = jsonobj["value"].toVariant();
+                    BOOST_LOG_TRIVIAL(debug) << "ostproperties - " << obj["name"].toString().toStdString() << " = " << val.toString().toStdString();
+                }
+                //QJsonDocument doc(obj);
+                //QByteArray docByteArray = doc.toJson(QJsonDocument::Indented);
+                //QString strJson = QLatin1String(docByteArray);
+                //BOOST_LOG_TRIVIAL(debug) << "ostproperties " << " - " <<  strJson.toStdString();
 
                 connect(mod,&Basemodule::propertyChanged,this,Controller::OnPropertyChanged);
 

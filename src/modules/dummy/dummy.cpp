@@ -13,10 +13,12 @@ Dummy::Dummy(QString name,QString label)
 {
 
     _moduledescription="Dummy module to show what we can do";
-    setProperty("Name","dummymodule");
-    setProperty("Version",0.2);
-    setProperty("MyDummyProperty","JohnDoe");
-    setProperty("Description","Dummy module description, just for demo purpose");
+
+    createOstProperty("description","Description",0);
+    setOstProperty("description","Dummy module to show what we can do");
+
+    createOstProperty("version","Version",0);
+    setOstProperty("version",0.1);
 
     TextProperty* prop = new TextProperty(_modulename,"Examples","Texts","extextRO","Text example - read only",0,0);
     prop->addText(new TextValue("extext1","Text 1","hint","Text 1 initial value" ));
@@ -84,7 +86,7 @@ Dummy::Dummy(QString name,QString label)
     emit propertyCreated(mess,&_modulename);
     _propertyStore.add(mess);
 
-    setProperty("Message","Dummy module init finished");
+    setOstProperty("message","Dummy module init finished");
 
 
 }
