@@ -184,20 +184,20 @@ void Controller::OnLoadModule(QString lib, QString label)
     LoadModule(QCoreApplication::applicationDirPath()+"/"+lib,name,label);
 }
 
-void Controller::OnPropertyChanged(QVariant propName, QVariant propValue)
+void Controller::OnPropertyChanged(QString *moduleName, QString *propName, QVariant *propValue)
 {
-    if (strcmp(propValue.typeName(),"QJsonObject")==0 )
+    if (strcmp(propValue->typeName(),"QJsonObject")==0 )
     {
-        QJsonObject obj = propValue.toJsonObject();
+        QJsonObject obj = propValue->toJsonObject();
         QJsonDocument doc(obj);
         QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
         QString strJson = QLatin1String(docByteArray);
-        BOOST_LOG_TRIVIAL(debug) << "OnDynamicPropertyChangeEvent " << propName.toString().toStdString() << " - " <<  strJson.toStdString();
+        BOOST_LOG_TRIVIAL(debug) << "OnDynamicPropertyChangeEvent - "  <<  moduleName->toStdString() << " - " << propName->toStdString() << " - " <<  strJson.toStdString();
     }
 
-    if (strcmp(propValue.typeName(),"QJsonArray")==0 )
+    if (strcmp(propValue->typeName(),"QJsonArray")==0 )
     {
-        BOOST_LOG_TRIVIAL(debug) << "OnDynamicPropertyChangeEvent " << propName.toString().toStdString() << " - " << propValue.toString().toStdString() << " - " << propValue.typeName();
+        BOOST_LOG_TRIVIAL(debug) << "OnDynamicPropertyChangeEvent " << propName->toStdString() << " - " << propValue->toString().toStdString() << " - " << propValue->typeName();
     }
 
 }

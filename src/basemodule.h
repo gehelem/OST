@@ -73,7 +73,7 @@ class Basemodule : public QObject, public INDI::BaseClient
                 QString propName = propEvent->propertyName();
                 QVariant propValue = this->property(propEvent->propertyName());
 
-                emit propertyChanged(propName,propValue);
+                emit propertyChanged(&_modulename,&propName,&propValue);
             }
             return QObject::event(event);
         }
@@ -123,7 +123,7 @@ class Basemodule : public QObject, public INDI::BaseClient
         void finished();
         void statusChanged(const QString &newStatus);
         void askedFrameReset(QString devicename);
-        void propertyChanged(QVariant propName,QVariant propValue);
+        void propertyChanged(QString *moduleName, QString *propName,QVariant *propValue);
 }
 ;
 #endif
