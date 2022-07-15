@@ -45,7 +45,7 @@ Basemodule::Basemodule(QString name,QString label)
     connect(timer, &QTimer::timeout, this, &Basemodule::connectIndiTimer);
     timer->start(10000);
 
-    setProperty("Message","Basemodule init finished");
+    setOstProperty("message","Basemodule init finished");
 
 }
 void Basemodule::connectIndiTimer()
