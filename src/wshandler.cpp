@@ -216,3 +216,13 @@ void WShandler::OnModuleDumped(QMap<QString, QMap<QString, QMap<QString, Propert
 
 
 
+void WShandler::OnPropertyChanged(QString *moduleName, QString *propName,QVariant *propValue)
+{
+    QJsonObject  obj;
+    QVariantMap map=propValue->toMap();
+    obj["event"]="updatepropertyqmap";
+    obj["module"]=*moduleName;
+    obj["property"]=*propName;
+    obj["values"]=QJsonObject::fromVariantMap(map);
+    sendJsonMessage(obj);
+}

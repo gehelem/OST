@@ -100,6 +100,8 @@ void Controller::LoadModule(QString lib,QString name,QString label)
                 connect(mod,&Basemodule::propertyRemoved,wshandler,&WShandler::OnPropertyRemoved);
                 connect(mod,&Basemodule::newMessageSent,wshandler,&WShandler::OnNewMessageSent);
                 connect(mod,&Basemodule::moduleDumped, wshandler,&WShandler::OnModuleDumped);
+                connect(mod,&Basemodule::propertyChanged,wshandler,&WShandler::OnPropertyChanged);
+
                 mod->OnDumpAsked();
 
                 connect(wshandler,&WShandler::dumpAsked,mod,&Basemodule::OnDumpAsked);
@@ -125,7 +127,7 @@ void Controller::LoadModule(QString lib,QString name,QString label)
 
 
                 }
-                connect(mod,&Basemodule::propertyChanged,this,Controller::OnPropertyChanged);
+                connect(mod,&Basemodule::propertyChanged,this,&Controller::OnPropertyChanged);
 
         } else {
             BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library";

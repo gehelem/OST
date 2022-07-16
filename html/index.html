@@ -100,6 +100,10 @@ function initWebSocket() {
                 p=obj.property;
                 buildproperty(obj.module,p.devicenameshort,p.groupnameshort,p);
             }
+            if (obj.event == 'updatepropertyqmap') {
+                values=obj.values;
+                console.log(values);
+            }
             if (obj.event == 'createproperty') {
                 p=obj.property;
                 builddevice  (obj.module,p.devicenameshort,p.devicename);
