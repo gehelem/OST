@@ -214,15 +214,25 @@ void WShandler::OnModuleDumped(QMap<QString, QMap<QString, QMap<QString, Propert
     sendJsonMessage(obj);
 }
 
+void WShandler::OnModuleDumped2(QVariant props, QString* pModulename, QString* pModulelabel, QString* pModuledescription)
+{
+    QJsonObject  obj;
+    obj["event"]="moduledump2";
+    obj["module"]=*pModulename;
+    obj["modulelabel"]=*pModulelabel;
+    obj["moduledescription"]=*pModuledescription;
+    obj["properties"]=QJsonObject::fromVariantMap(props.toMap());
+    sendJsonMessage(obj);
+}
 
-
-void WShandler::OnPropertyChanged(QString *moduleName, QString *propName,QVariant *propValue)
+void WShandler::OnPropertyChanged(QString *moduleName, QString *propName,QVariant *propValue,QVariant *prop)
 {
     QJsonObject  obj;
     QVariantMap map=propValue->toMap();
+    QVariantMap pro=prop->toMap();
     obj["event"]="updatepropertyqmap";
     obj["module"]=*moduleName;
-    obj["property"]=*propName;
+    obj["property"]=QJsonObject::fromVariantMap(pro);
     obj["values"]=QJsonObject::fromVariantMap(map);
     sendJsonMessage(obj);
 }

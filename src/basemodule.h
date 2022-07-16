@@ -72,8 +72,9 @@ class Basemodule : public QObject, public INDI::BaseClient
                 QDynamicPropertyChangeEvent *const propEvent = static_cast<QDynamicPropertyChangeEvent*>(event);
                 QString propName = propEvent->propertyName();
                 QVariant propValue = this->property(propEvent->propertyName());
-
-                emit propertyChanged(&_modulename,&propName,&propValue);
+                QVariantMap map=this->property("ostproperties").toMap();
+                QVariant prop=map[propEvent->propertyName()];
+                emit propertyChanged(&_modulename,&propName,&propValue,&prop);
             }
             return QObject::event(event);
         }
@@ -122,12 +123,13 @@ class Basemodule : public QObject, public INDI::BaseClient
         void propertyAppended(Property* pProperty, QString* pModulename, double s, double x,double y,double z,double k);
         void propertyRemoved(Property* pProperty, QString* pModulename);
         void moduleDumped(QMap<QString, QMap<QString, QMap<QString, Property*>>> treeList, QString* pModulename, QString* pModulelabel, QString* pModuledescription);
+        void moduleDumped2(QVariant props, QString* pModulename, QString* pModulelabel, QString* pModuledescription);
         void newMessageSent(QString message,      QString* pModulename, QString Device);
 
         void finished();
         void statusChanged(const QString &newStatus);
         void askedFrameReset(QString devicename);
-        void propertyChanged(QString *moduleName, QString *propName,QVariant *propValue);
+        void propertyChanged(QString *moduleName, QString *propName,QVariant *propValue,QVariant *prop);
 }
 ;
 #endif

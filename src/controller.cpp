@@ -100,6 +100,7 @@ void Controller::LoadModule(QString lib,QString name,QString label)
                 connect(mod,&Basemodule::propertyRemoved,wshandler,&WShandler::OnPropertyRemoved);
                 connect(mod,&Basemodule::newMessageSent,wshandler,&WShandler::OnNewMessageSent);
                 connect(mod,&Basemodule::moduleDumped, wshandler,&WShandler::OnModuleDumped);
+                connect(mod,&Basemodule::moduleDumped2, wshandler,&WShandler::OnModuleDumped2);
                 connect(mod,&Basemodule::propertyChanged,wshandler,&WShandler::OnPropertyChanged);
 
                 mod->OnDumpAsked();

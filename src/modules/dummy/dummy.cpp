@@ -14,9 +14,11 @@ Dummy::Dummy(QString name,QString label)
 
     _moduledescription="Dummy module to show what we can do";
 
+    loadAttributesFromFile("dummy.json");
+
     setOstProperty("moduleDescription","Dummy module to show what we can do");
 
-    createOstProperty("version","Version",0);
+    //createOstProperty("version","Version",0);
     setOstProperty("version",0.1);
 
     TextProperty* prop = new TextProperty(_modulename,"Examples","Texts","extextRO","Text example - read only",0,0);
@@ -32,11 +34,11 @@ Dummy::Dummy(QString name,QString label)
     prop->addText(new TextValue("extext3","Text 3","hint","Text 3 initial value" ));
     emit propertyCreated(prop,&_modulename);
     _propertyStore.add(prop);
-    createOstProperty("extextRW","Text example - read/write",2);
+    /*createOstProperty("extextRW","Text example - read/write",2);
     createOstElement("extextRW","extext1","Text 1");
     createOstElement("extextRW","extext2","Text 2");
     createOstElement("extextRW","extext3","Text 3");
-    setOstElement("extextRW","extext1","Text 1 initial value");
+    setOstElement("extextRW","extext1","Text 1 initial value");*/
 
     SwitchProperty* props = new SwitchProperty(_modulename,"Examples","Switches","swRO","Switches read only",0,0,0);
     props->addSwitch(new SwitchValue("swRO1","Switch RO 1 ","hint",true));
@@ -90,7 +92,7 @@ Dummy::Dummy(QString name,QString label)
 
     setOstProperty("message","Dummy module init finished");
 
-    saveAttributesToFile("dummy.json");
+    //saveAttributesToFile("dummy.json");
 
 }
 
@@ -109,7 +111,6 @@ void Dummy::OnSetPropertyText(TextProperty* prop)
         texts[i]->setText(texts[i]->text()+" modified by module");
         setOstElement(prop->getName(),texts[i]->name(),texts[i]->text());
     }
-    saveAttributesToFile("dummy.json");
 
     prop->setState(1);
     emit propertyCreated(prop,&_modulename);

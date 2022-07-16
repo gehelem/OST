@@ -1,0 +1,60 @@
+{
+    "baseVersion": {
+        "devcat": "Info",
+        "group": "",
+        "permission": 0,
+        "propertyLabel": "BaseVersion"
+    },
+    "extextRW": {
+        "devcat": "Examples",
+        "elements": {
+            "extext1": {
+                "elementLabel": "Text 1"
+            },
+            "extext2": {
+                "elementLabel": "Text 2"
+            },
+            "extext3": {
+                "elementLabel": "Text 3"
+            },
+            "extext4": {
+                "elementLabel": "Text 4"
+            }
+        },
+        "group": "Texts",
+        "permission": 2,
+        "propertyLabel": "Text example - read/write"
+    },
+    "indiConnected": {
+        "permission": 0,
+        "propertyLabel": "Indi server connected"
+    },
+    "message": {
+        "permission": 0,
+        "propertyLabel": "Message"
+    },
+    "moduleDescription": {
+        "devcat": "Info",
+        "group": "",
+        "permission": 0,
+        "propertyLabel": "Module description"
+    },
+    "moduleLabel": {
+        "devcat": "Info",
+        "group": "",
+        "permission": 0,
+        "propertyLabel": "Module label"
+    },
+    "moduleName": {
+        "devcat": "Info",
+        "group": "",
+        "permission": 0,
+        "propertyLabel": "Module name"
+    },
+    "version": {
+        "devcat": "Info",
+        "group": "",
+        "permission": 0,
+        "propertyLabel": "Version"
+    }
+}

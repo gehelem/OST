@@ -107,6 +107,7 @@ void Basemodule::OnDumpAsked()
 {
     usleep(200*1000);
     emit moduleDumped(_propertyStore.toTreeList(),&_modulename,&_modulelabel,&_moduledescription);
+    emit moduleDumped2(property("ostproperties"),&_modulename,&_modulelabel,&_moduledescription);
 }
 
 bool Basemodule::disconnectIndi(void)
@@ -517,7 +518,7 @@ void Basemodule::loadAttributesFromFile(QString fileName)
     file.close();
     QJsonDocument d = QJsonDocument::fromJson(val.toUtf8());
     QJsonObject attributes = d.object();
-    setProperty("ostattributes",attributes.toVariantMap());
+    setProperty("ostproperties",attributes.toVariantMap());
 
     QByteArray docByteArray = d.toJson(QJsonDocument::Compact);
     QString strJson = QLatin1String(docByteArray);
@@ -529,31 +530,16 @@ void Basemodule::loadAttributesFromFile(QString fileName)
 void Basemodule::saveAttributesToFile(QString fileName)
 {
     QVariantMap map = property("ostproperties").toMap();
-    foreach(const QString& key, map.keys()) {
+    /*foreach(const QString& key, map.keys()) {
         if (key!="ostproperties")
         {
             QVariantMap mm=map[key].toMap();
             mm["propertyValue"]=property(key.toStdString().c_str());
             map[key]=mm;
         }
-    }
-/*    for (auto m : map)
-    {
-        QVariantMap mm=m.toMap();
-        if (mm["propertyName"]!="ostproperties")
-        {
-            QString pn = mm["propertyName"].toString();
-            mm["propertyValue"]=property(pn.toStdString().c_str());
-            map[pn]=mm;
-        }
-
     }*/
     QJsonObject obj =QJsonObject::fromVariantMap(map);
     QJsonDocument doc(obj);
-    QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
-    QString strJson = QLatin1String(docByteArray);
-    //QJsonObject jsonobj = mod->property(obj["name"].toString().toStdString().c_str()).toJsonObject();
-    //QVariant val = jsonobj["value"].toVariant();
 
     QFile jsonFile(fileName);
     jsonFile.open(QFile::WriteOnly);
