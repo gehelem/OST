@@ -110,15 +110,17 @@ void Controller::LoadModule(QString lib,QString name,QString label)
                 QVariantMap map = mod->property("ostproperties").toMap();
                 if (map.size()==0) BOOST_LOG_TRIVIAL(debug) << "ostproperties reading problem";
 
-                for (auto m : map)
+                for (QVariant m : map)
                 {
-                    QJsonObject obj = m.toJsonObject();
-                    QJsonObject jsonobj = mod->property(obj["name"].toString().toStdString().c_str()).toJsonObject();
-                    QJsonDocument doc(jsonobj);
+                    QVariantMap attribute = m.toMap();
+                    QJsonObject obj =QJsonObject::fromVariantMap(attribute);
+                    QJsonDocument doc(obj);
                     QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
                     QString strJson = QLatin1String(docByteArray);
-                    QVariant val = jsonobj["value"].toVariant();
-                    BOOST_LOG_TRIVIAL(debug) << "ostproperties - " << obj["name"].toString().toStdString() << " = " << val.toString().toStdString();
+                    //QJsonObject jsonobj = mod->property(obj["name"].toString().toStdString().c_str()).toJsonObject();
+                    //QVariant val = jsonobj["value"].toVariant();
+                    QVariant val = mod->property(attribute["name"].toString().toStdString().c_str());
+                    BOOST_LOG_TRIVIAL(debug) << "ostproperties - " << attribute["name"].toString().toStdString() << " - " <<strJson.toStdString() << " = " << val.toString().toStdString();
 
 
 
@@ -186,18 +188,16 @@ void Controller::OnLoadModule(QString lib, QString label)
 
 void Controller::OnPropertyChanged(QString *moduleName, QString *propName, QVariant *propValue)
 {
-    if (strcmp(propValue->typeName(),"QJsonObject")==0 )
+    //BOOST_LOG_TRIVIAL(debug) << propValue->typeName();
+    if (strcmp(propValue->typeName(),"QVariantMap")==0 )
     {
-        QJsonObject obj = propValue->toJsonObject();
+        QVariantMap map=propValue->toMap();
+        QJsonObject obj =QJsonObject::fromVariantMap(map);
         QJsonDocument doc(obj);
         QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
         QString strJson = QLatin1String(docByteArray);
         BOOST_LOG_TRIVIAL(debug) << "OnDynamicPropertyChangeEvent - "  <<  moduleName->toStdString() << " - " << propName->toStdString() << " - " <<  strJson.toStdString();
     }
 
-    if (strcmp(propValue->typeName(),"QJsonArray")==0 )
-    {
-        BOOST_LOG_TRIVIAL(debug) << "OnDynamicPropertyChangeEvent " << propName->toStdString() << " - " << propValue->toString().toStdString() << " - " << propValue->typeName();
-    }
 
 }

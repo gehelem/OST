@@ -9,14 +9,14 @@ Basemodule::Basemodule(QString name,QString label)
     _propertyStore.cleanup();
     setVerbose(false);
     _moduledescription="This is a base module, it shouldn't be used as is";
-    createOstProperty("name","Name",0);
-    setOstProperty("name",name);
+    createOstProperty("moduleName","Module name",0);
+    setOstProperty("moduleName",name);
 
-    createOstProperty("label","Label",0);
-    setOstProperty("label",label);
+    createOstProperty("moduleLabel","Module label",0);
+    setOstProperty("moduleLabel",label);
 
-    createOstProperty("description","Description",0);
-    setOstProperty("description","This is a base module, it shouldn't be used as is");
+    createOstProperty("moduleDescription","Module description",0);
+    setOstProperty("moduleDescription","This is a base module, it shouldn't be used as is");
 
     createOstProperty("version","Version",0);
     setOstProperty("version",0.1);
@@ -29,6 +29,7 @@ Basemodule::Basemodule(QString name,QString label)
 
     createOstProperty("message","Message",0);
     setOstProperty("message","First base message");
+    //loadAttributesFromFile("/home/gilles/projets/OST/test.json");
 
 
     SwitchProperty* props = new SwitchProperty(_modulename,"Indi server","root","connect","Indi server",1,0,1);
@@ -470,20 +471,93 @@ bool Basemodule::frameReset(QString devicename)
 }
 
 
-void Basemodule::createOstProperty(const QString& name,const QString& label, const int& permission)
+void Basemodule::createOstProperty(QString propertyName,QString propertyLabel, int propertyPermission)
 {
     QVariantMap map = property("ostproperties").toMap();
-    //QJsonArray jsonarray = property("ostproperties").toJsonArray();
-    QJsonObject jsonobj =map[name].toJsonObject();
-    jsonobj["name"]=name;
-    jsonobj["label"]=label;
-    jsonobj["permission"]=permission;
-    map[name]=jsonobj;
+    QVariantMap prop;
+    //attribute["propertyName"]=propertyName;
+    prop["propertyLabel"]=propertyLabel;
+    prop["permission"]=propertyPermission;
+    map[propertyName]=prop;
     setProperty("ostproperties",map);
 }
-void Basemodule::setOstProperty(QString name, QVariant value)
+void Basemodule::setOstProperty(QString propertyName, QVariant propertyValue)
 {
-    QJsonObject jsonobj = property(name.toStdString().c_str()).toJsonObject();
-    jsonobj["value"]=value.toString();
-    setProperty(name.toStdString().c_str(),jsonobj);
+    setProperty(propertyName.toStdString().c_str(),propertyValue);
+}
+void Basemodule::createOstElement (QString propertyName, QString elementName, QString elementLabel)
+{
+    QVariantMap map = property("ostproperties").toMap();
+    QVariantMap prop = map[propertyName].toMap();
+    QVariantMap elts = prop["elements"].toMap();
+    QVariantMap elt = elts[elementName].toMap();
+    //elt["elementName"]=elementName;
+    elt["elementLabel"]=elementLabel;
+    elts[elementName]=elt;
+    prop["elements"]=elts;
+    map[propertyName]=prop;
+    setProperty("ostproperties",map);
+}
+void Basemodule::setOstElement    (QString propertyName, QString elementName, QVariant elementValue)
+{
+     QVariantMap prop= property(propertyName.toStdString().c_str()).toMap();
+     prop[elementName]=elementValue;
+     setProperty(propertyName.toStdString().c_str(),prop);
+}
+
+
+
+void Basemodule::loadAttributesFromFile(QString fileName)
+{
+    QString val;
+    QFile file;
+    file.setFileName(fileName);
+    file.open(QIODevice::ReadOnly | QIODevice::Text);
+    val = file.readAll();
+    file.close();
+    QJsonDocument d = QJsonDocument::fromJson(val.toUtf8());
+    QJsonObject attributes = d.object();
+    setProperty("ostattributes",attributes.toVariantMap());
+
+    QByteArray docByteArray = d.toJson(QJsonDocument::Compact);
+    QString strJson = QLatin1String(docByteArray);
+    BOOST_LOG_TRIVIAL(debug) << "loadAttributesFromFile  - " << _modulename.toStdString() << " - " << strJson.toStdString();
+
+
+}
+
+void Basemodule::saveAttributesToFile(QString fileName)
+{
+    QVariantMap map = property("ostproperties").toMap();
+    foreach(const QString& key, map.keys()) {
+        if (key!="ostproperties")
+        {
+            QVariantMap mm=map[key].toMap();
+            mm["propertyValue"]=property(key.toStdString().c_str());
+            map[key]=mm;
+        }
+    }
+/*    for (auto m : map)
+    {
+        QVariantMap mm=m.toMap();
+        if (mm["propertyName"]!="ostproperties")
+        {
+            QString pn = mm["propertyName"].toString();
+            mm["propertyValue"]=property(pn.toStdString().c_str());
+            map[pn]=mm;
+        }
+
+    }*/
+    QJsonObject obj =QJsonObject::fromVariantMap(map);
+    QJsonDocument doc(obj);
+    QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
+    QString strJson = QLatin1String(docByteArray);
+    //QJsonObject jsonobj = mod->property(obj["name"].toString().toStdString().c_str()).toJsonObject();
+    //QVariant val = jsonobj["value"].toVariant();
+
+    QFile jsonFile(fileName);
+    jsonFile.open(QFile::WriteOnly);
+    jsonFile.write(doc.toJson());
+    jsonFile.close();
+
 }

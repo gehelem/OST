@@ -14,8 +14,7 @@ Dummy::Dummy(QString name,QString label)
 
     _moduledescription="Dummy module to show what we can do";
 
-    createOstProperty("description","Description",0);
-    setOstProperty("description","Dummy module to show what we can do");
+    setOstProperty("moduleDescription","Dummy module to show what we can do");
 
     createOstProperty("version","Version",0);
     setOstProperty("version",0.1);
@@ -26,8 +25,6 @@ Dummy::Dummy(QString name,QString label)
     prop->addText(new TextValue("extext3","Text 3","hint","Text 3 initial value" ));
     emit propertyCreated(prop,&_modulename);
     _propertyStore.add(prop);
-    createOstProperty("extext1","Text 1",0);
-    setOstProperty("extext1","Text 1 initial value");
 
     prop = new TextProperty(_modulename,"Examples","Texts","extextRW","Text example - read/write",2,0);
     prop->addText(new TextValue("extext1","Text 1","hint","Text 1 initial value" ));
@@ -35,6 +32,11 @@ Dummy::Dummy(QString name,QString label)
     prop->addText(new TextValue("extext3","Text 3","hint","Text 3 initial value" ));
     emit propertyCreated(prop,&_modulename);
     _propertyStore.add(prop);
+    createOstProperty("extextRW","Text example - read/write",2);
+    createOstElement("extextRW","extext1","Text 1");
+    createOstElement("extextRW","extext2","Text 2");
+    createOstElement("extextRW","extext3","Text 3");
+    setOstElement("extextRW","extext1","Text 1 initial value");
 
     SwitchProperty* props = new SwitchProperty(_modulename,"Examples","Switches","swRO","Switches read only",0,0,0);
     props->addSwitch(new SwitchValue("swRO1","Switch RO 1 ","hint",true));
@@ -88,6 +90,7 @@ Dummy::Dummy(QString name,QString label)
 
     setOstProperty("message","Dummy module init finished");
 
+    saveAttributesToFile("dummy.json");
 
 }
 
@@ -104,13 +107,9 @@ void Dummy::OnSetPropertyText(TextProperty* prop)
     for (int i = 0; i < texts.size(); ++i) {
         //setProperty("Message","RCV Text :" + prop->getName() + ":" + texts[i]->name()+ ":" + texts[i]->text());
         texts[i]->setText(texts[i]->text()+" modified by module");
-        //titi[texts[i]->name()]=texts[0]->text();
-        //jsonobj["name"]=texts[i]->name();
-        //jsonobj["label"]=texts[i]->label();
-        //jsonobj["text"]=texts[i]->text();
-        //jsonarray.append(jsonobj);
-        setOstProperty(texts[i]->name(),texts[i]->text());
+        setOstElement(prop->getName(),texts[i]->name(),texts[i]->text());
     }
+    saveAttributesToFile("dummy.json");
 
     prop->setState(1);
     emit propertyCreated(prop,&_modulename);

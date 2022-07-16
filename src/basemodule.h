@@ -109,8 +109,12 @@ class Basemodule : public QObject, public INDI::BaseClient
         virtual void newMessage(INDI::BaseDevice *dp, int messageID) {Q_UNUSED(dp);Q_UNUSED(messageID);}
         virtual void newUniversalMessage(std::string message)   {Q_UNUSED(message);}
 
-        void createOstProperty(const QString& name,const QString& label, const int& permission);
-        void setOstProperty(QString name, QVariant value);
+        void createOstProperty(QString propertyName, QString propertyLabel, int propertyPermission);
+        void createOstElement (QString propertyName, QString elementName, QString elementLabel);
+        void setOstProperty   (QString propertyName, QVariant propertyValue);
+        void setOstElement    (QString propertyName, QString elementName, QVariant elementValue);
+        void loadAttributesFromFile(QString fileName);
+        void saveAttributesToFile(QString fileName);
 
     signals:
         void propertyCreated(Property* pProperty, QString* pModulename);
