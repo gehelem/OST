@@ -45,6 +45,7 @@ Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, 
     connect(mainctl,&Basemodule::propertyRemoved,wshandler,&WShandler::OnPropertyRemoved);
     connect(mainctl,&Basemodule::newMessageSent,wshandler,&WShandler::OnNewMessageSent);
     connect(mainctl,&Basemodule::moduleDumped, wshandler,&WShandler::OnModuleDumped);
+    connect(mainctl,&Basemodule::moduleDumped2, wshandler,&WShandler::OnModuleDumped2);
 
 
     connect(wshandler,&WShandler::dumpAsked,mainctl,&Basemodule::OnDumpAsked);

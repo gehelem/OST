@@ -8,6 +8,7 @@ MainControl::MainControl(QString name, QString label)
 
     _moduledescription="Main control module - and so on";
 
+
     QDir directory(QCoreApplication::applicationDirPath());
     directory.setFilter(QDir::Files);
     directory.setNameFilters(QStringList() << "*ost*.so");
@@ -15,6 +16,8 @@ MainControl::MainControl(QString name, QString label)
     foreach(QString lib, libs)
     {
         QString tt = lib.replace(".so","");
+        createOstProperty("mod"+tt,"Load module " + tt,2);
+        setOstProperty("mod"+tt,tt);
         auto *tmp = new TextProperty(_modulename,"modules","root",tt,"Load module " + tt,2,0);
         tmp->addText(new TextValue("loadmodname","Give it a name","hint",tt));
         emit propertyCreated(tmp,&_modulename);
