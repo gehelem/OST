@@ -6,7 +6,6 @@ Basemodule::Basemodule(QString name,QString label)
     :_modulename(name),
       _modulelabel(label)
 {
-    _propertyStore.cleanup();
     setVerbose(false);
     _moduledescription="This is a base module, it shouldn't be used as is";
     createOstProperty("moduleName","Module name",0);
@@ -31,16 +30,6 @@ Basemodule::Basemodule(QString name,QString label)
     setOstProperty("message","First base message");
     //loadAttributesFromFile("/home/gilles/projets/OST/test.json");
 
-
-    SwitchProperty* props = new SwitchProperty(_modulename,"Indi server","root","connect","Indi server",1,0,1);
-    props->addSwitch(new SwitchValue("connect","Connect","hint",false));
-    props->addSwitch(new SwitchValue("disconnect","Disconnect","hint",false));
-    emit propertyCreated(props,&_modulename);
-    _propertyStore.add(props);
-
-    _message = new MessageProperty(_modulename,"root","root","message","message",0,0,0);
-    emit propertyCreated(_message,&_modulename);
-    _propertyStore.add(_message);
 
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &Basemodule::connectIndiTimer);
@@ -96,17 +85,10 @@ bool Basemodule::connectIndi()
 void Basemodule::sendMessage(QString message)
 {
     QString mess = QDateTime::currentDateTime().toString("[yyyyMMdd hh:mm:ss.zzz]") + " - " + _modulename + " - " + message;
-    //BOOST_LOG_TRIVIAL(debug) << message.toStdString();
-    //emit newMessageSent(mess,&_modulename,_modulename);
-    _message->setMessage(mess);
-    emit propertyUpdated(_message,&_modulename);
-    _propertyStore.add(_message);
-
 }
 void Basemodule::OnDumpAsked()
 {
     usleep(200*1000);
-    emit moduleDumped(_propertyStore.toTreeList(),&_modulename,&_modulelabel,&_moduledescription);
     emit moduleDumped2(property("ostproperties"),&_modulename,&_modulelabel,&_moduledescription);
 }
 

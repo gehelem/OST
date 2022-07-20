@@ -11,9 +11,7 @@ class MainControl : public Basemodule
         ~MainControl();
         void newProperty(INDI::Property*) override;
     public slots:
-        void OnSetPropertyText(TextProperty* prop) override;
-        void OnSetPropertyNumber(NumberProperty* prop) override;
-        void OnSetPropertySwitch(SwitchProperty* prop) override;
+        //void OnSetPropertyText(TextProperty* prop) override;
 
     signals:
         void valueChanged(const double &newValue);

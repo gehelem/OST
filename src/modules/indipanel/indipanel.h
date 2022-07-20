@@ -18,9 +18,7 @@ class MODULE_INIT IndiPanel : public Basemodule
         ~IndiPanel();
 
     public slots:
-        void OnSetPropertyText(TextProperty* prop) override;
-        void OnSetPropertyNumber(NumberProperty* prop) override;
-        void OnSetPropertySwitch(SwitchProperty* prop) override;
+        //void OnSetPropertyText(TextProperty* prop) override;
         void OnSucessSEP(void);
 
 

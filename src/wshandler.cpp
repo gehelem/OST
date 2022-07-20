@@ -1,7 +1,6 @@
 #include <QCoreApplication>
 #include <QtCore>
 #include "wshandler.h"
-#include "utils/jsondumper.h"
 #include <boost/log/trivial.hpp>/*!
  * ... ...
  */
@@ -24,55 +23,18 @@ WShandler::~WShandler()
     qDeleteAll(m_clients.begin(), m_clients.end());
 }
 
-void WShandler::OnPropertyCreated(Property *pProperty, QString *pModulename)
-{
-    JSonDumper jsonDumper;
-    pProperty->accept(&jsonDumper);
-    //BOOST_LOG_TRIVIAL(debug) << "JSON : " << jsonDumper.getResult().toStdString();
-    QJsonObject  obj;
-    obj["event"]="createproperty";
-    obj["module"]=*pModulename;
-    obj["property"]=jsonDumper.getJsonResult();
-    sendJsonMessage(obj);
-
-}
-void WShandler::OnPropertyUpdated(Property *pProperty, QString *pModulename)
-{
-    JSonDumper jsonDumper;
-    pProperty->accept(&jsonDumper);
-    //BOOST_LOG_TRIVIAL(debug) << "JSON : " << jsonDumper.getResult().toStdString();
-    QJsonObject  obj;
-    obj["event"]="updateproperty";
-    obj["module"]=*pModulename;
-    obj["property"]=jsonDumper.getJsonResult();
-    sendJsonMessage(obj);
-
-}
-void WShandler::OnPropertyAppended(Property *pProperty, QString *pModulename, double s, double x,double y,double z,double k)
-{
-    JSonDumper jsonDumper;
-    pProperty->accept(&jsonDumper,s,x,y,z,k);
-    //BOOST_LOG_TRIVIAL(debug) << "JSON : " << jsonDumper.getResult().toStdString();
-    QJsonObject  obj;
-    obj["event"]="appendproperty";
-    obj["module"]=*pModulename;
-    obj["property"]=jsonDumper.getJsonResult();
-    sendJsonMessage(obj);
-
-}
-
-void WShandler::OnPropertyRemoved(Property *pProperty, QString *pModulename)
-{
-    JSonDumper jsonDumper;
-    pProperty->accept(&jsonDumper);
-    //BOOST_LOG_TRIVIAL(debug) << "JSON : " << jsonDumper.getResult().toStdString();
-    QJsonObject  obj;
-    obj["event"]="removeproperty";
-    obj["module"]=*pModulename;
-    obj["property"]=jsonDumper.getJsonResult();
-    sendJsonMessage(obj);
-
-}
+//void WShandler::OnPropertyCreated(Property *pProperty, QString *pModulename)
+//{
+//}
+//void WShandler::OnPropertyUpdated(Property *pProperty, QString *pModulename)
+//{
+//}
+//void WShandler::OnPropertyAppended(Property *pProperty, QString *pModulename, double s, double x,double y,double z,double k)
+//{
+//}
+//void WShandler::OnPropertyRemoved(Property *pProperty, QString *pModulename)
+//{
+//}
 void WShandler::OnNewMessageSent(QString message, QString *pModulename, QString Device)
 {
     QJsonObject  obj;
@@ -82,8 +44,6 @@ void WShandler::OnNewMessageSent(QString message, QString *pModulename, QString 
     obj["message"]=message;
     sendJsonMessage(obj);
 }
-
-
 void WShandler::sendmessage(QString message)
 {
     for (int i=0;i<m_clients.size();i++) {
@@ -131,13 +91,10 @@ void WShandler::processTextMessage(QString message)
     }
     if (obj["message"].toString()=="setproperty")
     {
-        QJsonObject prop = obj["property"].toObject();
-        JSonDumper jsonDumper;
-        if (prop["texts"].isArray()) emit setPropertyText(&jsonDumper.setProTextFromJson(prop));
-        if (prop["numbers"].isArray()) emit setPropertyNumber(&jsonDumper.setProNumberFromJson(prop));
-        if (prop["switches"].isArray()) emit setPropertySwitch(&jsonDumper.setProSwitchFromJson(prop));
-        //sendProperty(props->getProp(obj["modulename"].toString(),obj["propertyname"].toString()));
-        //emit changeValue(JpropToO(prop));
+        //QJsonObject prop = obj["property"].toObject();
+        //if (prop["texts"].isArray()) emit setPropertyText(&jsonDumper.setProTextFromJson(prop));
+        //if (prop["numbers"].isArray()) emit setPropertyNumber(&jsonDumper.setProNumberFromJson(prop));
+        //if (prop["switches"].isArray()) emit setPropertySwitch(&jsonDumper.setProSwitchFromJson(prop));
     }
 
 
@@ -172,46 +129,6 @@ void WShandler::socketDisconnected()
         m_clients.removeAll(pClient);
         pClient->deleteLater();
     }
-}
-void WShandler::OnModuleDumped(QMap<QString, QMap<QString, QMap<QString, Property *> > > treeList, QString* pModulename, QString* pModulelabel, QString* pModuledescription)
-{
-    QJsonObject  obj;
-    obj["event"]="moduledump";
-    obj["module"]=*pModulename;
-    obj["modulelabel"]=*pModulelabel;
-    obj["moduledescription"]=*pModuledescription;
-
-    QJsonArray devices;
-    for ( const QString& device : treeList.keys() ) {
-        QJsonObject  dev;
-        QString devshort =device;
-        dev["devicename"]=device;
-        dev["devicenameshort"]=devshort.replace(" ","");
-
-
-        QJsonArray groups;
-        for ( const QString& group : treeList[device].keys() ) {
-            QJsonObject  gro;
-            QString groupshort=group;
-            gro["groupname"]=group;
-            gro["groupnameshort"]=groupshort.replace(" ","");
-            QJsonArray props;
-            for ( const QString& property : treeList[device][group].keys() ) {
-                JSonDumper jsonDumper;
-
-                treeList[device][group][property]->accept(&jsonDumper);
-                QJsonObject pro = jsonDumper.getJsonResult();
-                props.append(pro);
-            }
-            gro["properties"]=props;
-            groups.append(gro);
-        }
-        dev["groups"]=groups;
-        devices.append(dev);
-
-    }
-    obj["devices"]=devices;
-    sendJsonMessage(obj);
 }
 
 void WShandler::OnModuleDumped2(QVariant props, QString* pModulename, QString* pModulelabel, QString* pModuledescription)

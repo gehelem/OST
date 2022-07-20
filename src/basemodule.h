@@ -9,17 +9,6 @@
 #include <boost/log/trivial.hpp>
 #include "solver.h"
 #include "image.h"
-#include <model/setup.h>
-#include <model/textproperty.h>
-#include <model/numberproperty.h>
-#include <model/switchproperty.h>
-#include <model/messageproperty.h>
-#include <model/gridproperty.h>
-#include <model/propertystore.h>
-#include "utils/propertyfactory.h"
-
-
-class Property;
 
 /*!
  * This Class shouldn't be used as is
@@ -46,24 +35,15 @@ class Basemodule : public QObject, public INDI::BaseClient
         QString _modulelabel;
         QString _moduledescription;
         QString _webroot;
-        MessageProperty* _message;
 
 
     public slots:
         void connectIndiTimer(void);
         void OnDumpAsked(void);
-        virtual void OnSetPropertyText(TextProperty* prop) {
-            if (!(prop->getModuleName()==_modulename)) return;
-            BOOST_LOG_TRIVIAL(debug) << _modulename.toStdString() << " : recv setprop text : " << prop->getLabel().toStdString();
-        }
-        virtual void OnSetPropertyNumber(NumberProperty* prop) {
-            if (!(prop->getModuleName()==_modulename)) return;
-            BOOST_LOG_TRIVIAL(debug) << _modulename.toStdString() << " : recv setprop number : " <<prop->getLabel().toStdString();
-        }
-        virtual void OnSetPropertySwitch(SwitchProperty* prop) {
-            if (!(prop->getModuleName()==_modulename)) return;
-            BOOST_LOG_TRIVIAL(debug) << _modulename.toStdString() << " : recv setprop switch : " <<prop->getLabel().toStdString();
-        }
+        //virtual void OnSetPropertyText(TextProperty* prop) {
+        //    if (!(prop->getModuleName()==_modulename)) return;
+        //    BOOST_LOG_TRIVIAL(debug) << _modulename.toStdString() << " : recv setprop text : " << prop->getLabel().toStdString();
+        //}
 
     protected:
 
@@ -94,8 +74,6 @@ class Basemodule : public QObject, public INDI::BaseClient
         bool frameReset(QString devicename);
         void sendMessage(QString message);
 
-        PropertyStore _propertyStore;
-
         virtual void serverConnected() {}
         virtual void serverDisconnected(int exit_code)          {Q_UNUSED(exit_code);}
         virtual void newDevice(INDI::BaseDevice *dp)            {Q_UNUSED(dp);}
@@ -119,11 +97,6 @@ class Basemodule : public QObject, public INDI::BaseClient
         void saveAttributesToFile(QString fileName);
 
     signals:
-        void propertyCreated(Property* pProperty, QString* pModulename);
-        void propertyUpdated(Property* pProperty, QString* pModulename);
-        void propertyAppended(Property* pProperty, QString* pModulename, double s, double x,double y,double z,double k);
-        void propertyRemoved(Property* pProperty, QString* pModulename);
-        void moduleDumped(QMap<QString, QMap<QString, QMap<QString, Property*>>> treeList, QString* pModulename, QString* pModulelabel, QString* pModuledescription);
         void moduleDumped2(QVariant props, QString* pModulename, QString* pModulelabel, QString* pModuledescription);
         void newMessageSent(QString message,      QString* pModulename, QString Device);
 
