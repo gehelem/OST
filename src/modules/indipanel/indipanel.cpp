@@ -18,9 +18,11 @@ IndiPanel::~IndiPanel()
 }
 void IndiPanel::newDevice(INDI::BaseDevice *dp)
 {
+    Q_UNUSED(dp)
 }
 void IndiPanel::removeDevice(INDI::BaseDevice *dp)
 {
+    Q_UNUSED(dp)
 }
 void IndiPanel::newProperty(INDI::Property *pProperty)
 {
@@ -28,25 +30,6 @@ void IndiPanel::newProperty(INDI::Property *pProperty)
     QString pro = pProperty->getName();
     QString devpro = dev+pro;
     createOstProperty(devpro,pProperty->getLabel(),pProperty->getPermission(),pProperty->getDeviceName(),pProperty->getGroupName());
-    switch (pProperty->getType()) {
-
-        case INDI_NUMBER: {
-            //INDI::PropertyView<INumber> prop = pProperty->getNumber();
-            //for (INumber elt : prop.np) {
-            //    createOstElement(pProperty->getDeviceName()&pProperty->getName(),elt.name,elt.label);
-            //}
-        }
-        case INDI_SWITCH: {
-        }
-        case INDI_TEXT: {
-            //INDI::PropertyView<IText> prop = pProperty->getText();
-            //for (IText elt : prop.tp) {
-            //    createOstElement(pProperty->getDeviceName()&pProperty->getName(),elt.name,elt.label);
-            //}
-        }
-        case INDI_LIGHT: {
-        }
-    }
 
     switch (pProperty->getType()) {
 
@@ -64,21 +47,21 @@ void IndiPanel::newProperty(INDI::Property *pProperty)
             }
             break;
         }
-
         case INDI_SWITCH: {
             break;
         }
-
         case INDI_TEXT: {
             break;
         }
-
         case INDI_LIGHT: {
             break;
         }
-
-        default:
+        case INDI_BLOB: {
             break;
+        }
+        case INDI_UNKNOWN: {
+            break;
+        }
     }
 
 }
@@ -90,57 +73,47 @@ void IndiPanel::removeProperty(INDI::Property *property)
         case INDI_NUMBER: {
             break;
         }
-
         case INDI_SWITCH: {
             break;
         }
-
         case INDI_TEXT: {
             break;
         }
-
         case INDI_LIGHT: {
             break;
         }
-
-        default:
+        case INDI_BLOB: {
             break;
+        }
+        case INDI_UNKNOWN: {
+            break;
+        }
     }
 }
-
 void IndiPanel::newNumber(INumberVectorProperty *nvp)
 {
+    Q_UNUSED(nvp)
 }
-
 void IndiPanel::newText(ITextVectorProperty *tvp)
 {
+    Q_UNUSED(tvp)
 }
-
 void IndiPanel::newLight(ILightVectorProperty *lvp)
 {
+    Q_UNUSED(lvp)
 }
-
-
 void IndiPanel::newSwitch(ISwitchVectorProperty *svp)
 {
+    Q_UNUSED(svp)
 }
-
 void IndiPanel::newBLOB(IBLOB *bp)
 {
-    image = new Image();
-    image->LoadFromBlob(bp);
-    image->CalcStats();
-    image->computeHistogram();
-    image->saveStretchedToJpeg(_webroot+"/"+QString(bp->bvp->device)+".jpeg",100);
-
-}
-void IndiPanel::OnSucessSEP(void)
-{
-    BOOST_LOG_TRIVIAL(debug) << "IMG stars found " << _solver.stars.size();
+    Q_UNUSED(bp)
 }
 void IndiPanel::newMessage     (INDI::BaseDevice *dp, int messageID)
 {
     QString txt= QString::fromStdString(dp->messageQueue(messageID));
+    Q_UNUSED(txt)
 }
 
 

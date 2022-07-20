@@ -26,7 +26,6 @@ find_package(Threads REQUIRED)
 find_package(Nova REQUIRED)
 find_package(GSL REQUIRED)
 find_package(OpenCV REQUIRED )
-find_package(CImg REQUIRED )
 find_package(WCSLIB REQUIRED)
 find_package(QT NAMES Qt5 COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql)
@@ -40,7 +39,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules)
 include_directories(${INDI_INCLUDE_DIR})
 include_directories(${CFITSIO_INCLUDE_DIR})
 include_directories(${GSL_INCLUDE_DIRS})
-include_directories(${CIMG_INCLUDE_DIRS})
 include_directories(${Qt5_DIR})
 include_directories(${QT5Declarative_INCLUDE_LIBRARIES} )
 include_directories(${QT5Declarative_INCLUDE_DIRS} )
@@ -60,10 +58,6 @@ add_executable( ost
     ${CMAKE_CURRENT_SOURCE_DIR}/src/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/maincontrol.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/maincontrol.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/image.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/image.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/solver.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/solver.h
 )
 target_link_libraries( ost
     indiclient

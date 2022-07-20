@@ -7,8 +7,6 @@
 #include <basedevice.h>
 #include <baseclient.h>
 #include <boost/log/trivial.hpp>
-#include "solver.h"
-#include "image.h"
 
 /*!
  * This Class shouldn't be used as is
@@ -27,9 +25,6 @@ class Basemodule : public QObject, public INDI::BaseClient
         bool connectIndi(void);
         void setBlobMode(void);
         QString getDescription(void) {return _moduledescription;}
-
-        QPointer<Image> image;
-        Solver _solver;
 
         QString _modulename;
         QString _modulelabel;

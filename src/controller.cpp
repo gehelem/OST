@@ -4,7 +4,7 @@
 /*!
  * ... ...
  */
-Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, int port,const QString& webroot)
+Controller::Controller(bool saveAllBlobs, const QString& host, int port,const QString& webroot)
     :_indihost(host),
       _indiport(port),
       _webroot(webroot)
@@ -78,7 +78,7 @@ void Controller::LoadModule(QString lib,QString name,QString label)
         CreateModule createmodule = (CreateModule)library.resolve("initialize");
         if (createmodule) {
             Basemodule *mod = createmodule(name,label);
-            if (mod)
+            if (mod) {
                 mod->setHostport(_indihost,_indiport);
                 mod->connectIndi();
                 mod->setWebroot(_webroot);
@@ -114,7 +114,7 @@ void Controller::LoadModule(QString lib,QString name,QString label)
 
                 }
                 connect(mod,&Basemodule::propertyChanged,this,&Controller::OnPropertyChanged);
-
+            }
         } else {
             BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library";
         }

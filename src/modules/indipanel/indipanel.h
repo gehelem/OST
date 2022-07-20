@@ -19,8 +19,6 @@ class MODULE_INIT IndiPanel : public Basemodule
 
     public slots:
         //void OnSetPropertyText(TextProperty* prop) override;
-        void OnSucessSEP(void);
-
 
     private:
         void newDevice      (INDI::BaseDevice *dp) override;

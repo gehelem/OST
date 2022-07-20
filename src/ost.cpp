@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
     BOOST_LOG_TRIVIAL(debug) << "Webroot  =" << webroot.toStdString();
 
     Controller controller(
-            &app,
+            //&app,
             argParser.isSet("s"),
             hostName,
             portNumber,
