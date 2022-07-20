@@ -111,6 +111,7 @@ class Basemodule : public QObject, public INDI::BaseClient
         virtual void newUniversalMessage(std::string message)   {Q_UNUSED(message);}
 
         void createOstProperty(QString propertyName, QString propertyLabel, int propertyPermission);
+        void createOstProperty(QString propertyName, QString propertyLabel, int propertyPermission, QString propertyDevcat, QString propertyGroup);
         void createOstElement (QString propertyName, QString elementName, QString elementLabel);
         void setOstProperty   (QString propertyName, QVariant propertyValue);
         void setOstElement    (QString propertyName, QString elementName, QVariant elementValue);

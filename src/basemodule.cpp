@@ -471,16 +471,22 @@ bool Basemodule::frameReset(QString devicename)
     return true;
 }
 
-
-void Basemodule::createOstProperty(QString propertyName,QString propertyLabel, int propertyPermission)
+void Basemodule::createOstProperty(QString propertyName, QString propertyLabel, int propertyPermission, QString propertyDevcat, QString propertyGroup)
 {
     QVariantMap map = property("ostproperties").toMap();
     QVariantMap prop;
     //attribute["propertyName"]=propertyName;
     prop["propertyLabel"]=propertyLabel;
     prop["permission"]=propertyPermission;
+    prop["devcat"]=propertyDevcat;
+    prop["group"]=propertyGroup;
     map[propertyName]=prop;
     setProperty("ostproperties",map);
+}
+
+void Basemodule::createOstProperty(QString propertyName,QString propertyLabel, int propertyPermission)
+{
+    createOstProperty(propertyName,propertyLabel,propertyPermission,"","");
 }
 void Basemodule::setOstProperty(QString propertyName, QVariant propertyValue)
 {

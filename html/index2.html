@@ -53,15 +53,20 @@ function initWebSocket() {
                 m=obj.module;
                 l=obj.modulelabel;
                 buildmodule(m,l);
-                
+               
                 var properties = obj.properties;
                 $.each( properties, function(iprop,prop) {
-                    builddevice(m,prop.devcat,prop.devcat);
-                    buildgroup(m,prop.devcat,prop.group,prop.group);
+                    d = prop.devcat.replace(' ', '');
+                    g = prop.group.replace(' ', ''); 
+                    builddevice(m,d,prop.devcat);
+                    buildgroup(m,d,g,prop.group);
                     //console.log( "build prop :", '"'+iprop+'"' +prop.propertyLabel+'"');
-                    buildproperty(m,prop.devcat,prop.group,prop,iprop);
-                    $("div#D"+m+prop.devcat).tabs(); 
+                    buildproperty(m,d,g,prop,iprop);
                 })
+                $.each( properties, function(iprop,prop) {
+                    d = prop.devcat.replace(' ', '');
+                    $("div#D"+m+d).tabs(); 
+                })                
                 $("div#D"+m).tabs();              /* this shouldn't be here */    
 
 
@@ -156,21 +161,21 @@ function buildmodule(m,l) {
 }
 
 function builddevice(m,d,l) {
-    //console.log('BUILD DEVICE ' + m + "-"+ d + "-"+ l + "-");
-    if  (!($("#D"+m+d).length >0)&&!(d=="root")) {
-        $("#D"+m).append("<div id=D"+m+d+"></div>");
-        $("#U"+m).append("<li id=L"+m+d+"><a href=#D"+m+d+">"+l+"</a></li>");
-        $("#D"+m+d).append("<ul id=U"+m+d+"></ul>");
+    if  (!($("[id='D"+m+d+"']").length >0)&&!(d=="root")) {
+        console.log('BUILD DEVICE ' + m + "-"+ d + "-"+ l + "-");
+        $("[id='D"+m+"']").append("<div id='D"+m+d+"'></div>");
+        $("[id='U"+m+"']").append("<li id='L"+m+d+"'><a href=#D"+m+d+">"+l+"</a></li>");
+        $("[id='D"+m+d+"']").append("<ul id='U"+m+d+"'></ul>");
     };
     //$("#D"+m).tabs("refresh");  
 }
 
 function buildgroup(m,d,g,l) {
-    if  (!($("#D"+m+d+g).length > 0)&&!(g=="root")) {
-        //console.log('BUILD GROUP ' + m + "-" + d + "-"+ g + "-"+ l + "-");
-        $("#D"+m+d).append("<div id=D"+m+d+g+"></div>");
-        $("#U"+m+d).append("<li id=L"+m+d+g+"><a href=#D"+m+d+g+">"+l+"</a></li>");
-        $("#D"+m+d+g).append("<ul id=U"+m+d+g+"></ul>");
+    if  (!($("[id='D"+m+d+g+"']").length > 0)&&!(g=="root")) {
+        console.log('BUILD GROUP ' + m + "-" + d + "-"+ g + "-"+ l + "-");
+        $("[id='D"+m+d+"']").append("<div id='D"+m+d+g+"'></div>");
+        $("[id='U"+m+d+"']").append("<li id='L"+m+d+g+"'><a href=#D"+m+d+g+">"+l+"</a></li>");
+        $("[id='D"+m+d+g+"']").append("<ul id='U"+m+d+g+"'></ul>");
     };
 }
 
@@ -179,7 +184,7 @@ function buildproperty(m,d,g,p,n) {
     if (g=="undefined") g="";
     nn=m+d+g;
     nnp=nn+n;
-    console.log('BUILD PROPERTY ' + nnp + "-" + p.propertyLabel);
+    //console.log('BUILD PROPERTY ' + nnp + "-" + p.propertyLabel);
     if  (!($("[id='P"+nnp+"']").length)&&(true||p.hasOwnProperty('texts')||p.hasOwnProperty('numbers')||p.hasOwnProperty('switches')||p.hasOwnProperty('lights')))  {
         div="<div id=P"+nnp+" ><table id=tab"+nnp+">"
         +"<tr>"

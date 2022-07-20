@@ -150,26 +150,26 @@ target_compile_definitions(ostdummy PRIVATE dummy_LIBRARY)
 
 
 
-## Indipanel module
-#add_library(ostindipanel SHARED
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel/indipanel.h
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel/indipanel.cpp
-#)
-#target_link_libraries(ostindipanel PRIVATE
-#    indiclient
-#    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
-#    Qt${QT_VERSION_MAJOR}::Gui
-#    Qt${QT_VERSION_MAJOR}::Core
-#    Qt${QT_VERSION_MAJOR}::Network
-#    Qt${QT_VERSION_MAJOR}::Concurrent
-#    Qt${QT_VERSION_MAJOR}::WebSockets
-#    Qt${QT_VERSION_MAJOR}::Sql
-#    ${STELLARSOLVER_LIBRARIES}
-#    ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
-#    ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
-#    z -lpthread
-#)
-#target_compile_definitions(ostindipanel PRIVATE INDIPANEL_MODULE)
+# Indipanel module
+add_library(ostindipanel SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel/indipanel.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel/indipanel.cpp
+)
+target_link_libraries(ostindipanel PRIVATE
+    indiclient
+    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+    Qt${QT_VERSION_MAJOR}::Gui
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Network
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    Qt${QT_VERSION_MAJOR}::WebSockets
+    Qt${QT_VERSION_MAJOR}::Sql
+    ${STELLARSOLVER_LIBRARIES}
+    ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
+    ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
+    z -lpthread
+)
+target_compile_definitions(ostindipanel PRIVATE INDIPANEL_MODULE)
 #
 ## guider module
 #add_library(ostguider SHARED

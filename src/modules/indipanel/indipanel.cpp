@@ -34,6 +34,30 @@ void IndiPanel::removeDevice(INDI::BaseDevice *dp)
 }
 void IndiPanel::newProperty(INDI::Property *pProperty)
 {
+    QString dev = pProperty->getDeviceName();
+    QString pro = pProperty->getName();
+    QString devpro = dev+pro;
+    createOstProperty(devpro,pProperty->getLabel(),pProperty->getPermission(),pProperty->getDeviceName(),pProperty->getGroupName());
+    switch (pProperty->getType()) {
+
+        case INDI_NUMBER: {
+            //INDI::PropertyView<INumber> prop = pProperty->getNumber();
+            //for (INumber elt : prop.np) {
+            //    createOstElement(pProperty->getDeviceName()&pProperty->getName(),elt.name,elt.label);
+            //}
+        }
+        case INDI_SWITCH: {
+        }
+        case INDI_TEXT: {
+            //INDI::PropertyView<IText> prop = pProperty->getText();
+            //for (IText elt : prop.tp) {
+            //    createOstElement(pProperty->getDeviceName()&pProperty->getName(),elt.name,elt.label);
+            //}
+        }
+        case INDI_LIGHT: {
+        }
+    }
+
     switch (pProperty->getType()) {
 
         case INDI_NUMBER: {
