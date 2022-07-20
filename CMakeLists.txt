@@ -64,33 +64,6 @@ add_executable( ost
     ${CMAKE_CURRENT_SOURCE_DIR}/src/image.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/solver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/solver.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/property.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/propertystore.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/propertystore.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/value.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/textproperty.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/textvalue.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/numberproperty.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/numbervalue.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/switchproperty.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/switchproperty.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/switchvalue.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/lightproperty.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/lightvalue.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/messageproperty.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/gridproperty.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/imageproperty.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/setup.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/setup.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/device.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/device.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/propertyvisitor.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/propertyfactory.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/propertyfactory.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/propertytextdumper.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/propertytextdumper.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/jsondumper.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/jsondumper.h
 )
 target_link_libraries( ost
     indiclient
