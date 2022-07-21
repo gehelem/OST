@@ -29,7 +29,7 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
 
     BOOST_LOG_TRIVIAL(debug) <<  "ApplicationDirPath :" << QCoreApplication::applicationDirPath().toStdString();
 
-    MainControl *mainctl = new MainControl("maincontrol","Main control");
+    /*MainControl *mainctl = new MainControl("maincontrol","Main control");
     mainctl->setHostport(_indihost,_indiport);
     mainctl->connectIndi();
     mainctl->setWebroot(_webroot);
@@ -40,7 +40,7 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
     connect(mainctl,&Basemodule::moduleDumped2, wshandler,&WShandler::OnModuleDumped2);
 
 
-    connect(wshandler,&WShandler::dumpAsked,mainctl,&Basemodule::OnDumpAsked);
+    connect(wshandler,&WShandler::dumpAsked,mainctl,&Basemodule::OnDumpAsked);*/
     //connect(wshandler,&WShandler::setPropertyText,mainctl,&Basemodule::OnSetPropertyText);
     //connect(wshandler,&WShandler::setPropertyNumber,mainctl,&Basemodule::OnSetPropertyNumber);
     //connect(wshandler,&WShandler::setPropertySwitch,mainctl,&Basemodule::OnSetPropertySwitch);
@@ -83,10 +83,10 @@ void Controller::LoadModule(QString lib,QString name,QString label)
                 mod->connectIndi();
                 mod->setWebroot(_webroot);
                 connect(mod,&Basemodule::newMessageSent, this,&Controller::OnNewMessageSent);
+                connect(mod,&Basemodule::moduleEvent, this,&Controller::OnModuleEvent);
 
                 connect(mod,&Basemodule::newMessageSent,wshandler,&WShandler::OnNewMessageSent);
                 connect(mod,&Basemodule::moduleDumped2, wshandler,&WShandler::OnModuleDumped2);
-                connect(mod,&Basemodule::propertyChanged,wshandler,&WShandler::OnPropertyChanged);
 
                 mod->OnDumpAsked();
 
@@ -95,25 +95,6 @@ void Controller::LoadModule(QString lib,QString name,QString label)
                 //connect(wshandler,&WShandler::setPropertyNumber,mod,&Basemodule::OnSetPropertyNumber);
                 //connect(wshandler,&WShandler::setPropertySwitch,mod,&Basemodule::OnSetPropertySwitch);
 
-                QVariantMap map = mod->property("ostproperties").toMap();
-                if (map.size()==0) BOOST_LOG_TRIVIAL(debug) << "ostproperties reading problem";
-
-                for (QVariant m : map)
-                {
-                    QVariantMap attribute = m.toMap();
-                    QJsonObject obj =QJsonObject::fromVariantMap(attribute);
-                    QJsonDocument doc(obj);
-                    QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
-                    QString strJson = QLatin1String(docByteArray);
-                    //QJsonObject jsonobj = mod->property(obj["name"].toString().toStdString().c_str()).toJsonObject();
-                    //QVariant val = jsonobj["value"].toVariant();
-                    QVariant val = mod->property(attribute["name"].toString().toStdString().c_str());
-                    BOOST_LOG_TRIVIAL(debug) << "ostproperties - " << attribute["name"].toString().toStdString() << " - " <<strJson.toStdString() << " = " << val.toString().toStdString();
-
-
-
-                }
-                connect(mod,&Basemodule::propertyChanged,this,&Controller::OnPropertyChanged);
             }
         } else {
             BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library";
@@ -160,3 +141,25 @@ void Controller::OnPropertyChanged(QString *moduleName, QString *propName, QVari
 
 
 }
+void Controller::OnModuleEvent(QString *pModulename, QString *eventType, QVariantMap *pEventData, QString *pFree)
+{
+    if (pEventData->isValid()) {
+        //BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - " << pEventData->typeName() << "-" << pFree->toStdString() << "-" << pModulename->toStdString() << "-" << eventType->toStdString();
+        //QVariantMap map=pEventData->toMap();
+        QJsonObject obj =QJsonObject::fromVariantMap(pEventData);
+        QJsonDocument doc(obj);
+        QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
+        QString strJson = QLatin1String(docByteArray);
+        BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - " << pModulename->toStdString() << " - " << eventType->toStdString() << " - " << strJson.toStdString();
+        //switch eventType {
+        //    case:"propertyCreated" {
+        //       BOOST_LOG_TRIVIAL(debug) << "OnDynamicPropertyChangeEvent - " ;
+        //    }
+        //
+        //}
+
+    } else {
+        BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - INVALID DATA - " << eventType->toStdString() << " - " << pModulename->toStdString() << " - " << pFree->toStdString() ;
+    }
+}
+

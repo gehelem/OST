@@ -42,17 +42,6 @@ class Basemodule : public QObject, public INDI::BaseClient
 
     protected:
 
-        bool event(QEvent *event) override {
-            if (event->type() == QEvent::DynamicPropertyChange) {
-                QDynamicPropertyChangeEvent *const propEvent = static_cast<QDynamicPropertyChangeEvent*>(event);
-                QString propName = propEvent->propertyName();
-                QVariant propValue = this->property(propEvent->propertyName());
-                QVariantMap map=this->property("ostproperties").toMap();
-                QVariant prop=map[propEvent->propertyName()];
-                emit propertyChanged(&_modulename,&propName,&propValue,&prop);
-            }
-            return QObject::event(event);
-        }
         bool disconnectIndi(void);
         void connectAllDevices(void);
         void disconnectAllDevices(void);
@@ -83,17 +72,18 @@ class Basemodule : public QObject, public INDI::BaseClient
         virtual void newMessage(INDI::BaseDevice *dp, int messageID) {Q_UNUSED(dp);Q_UNUSED(messageID);}
         virtual void newUniversalMessage(std::string message)   {Q_UNUSED(message);}
 
-        void createOstProperty(QString propertyName, QString propertyLabel, int propertyPermission);
-        void createOstProperty(QString propertyName, QString propertyLabel, int propertyPermission, QString propertyDevcat, QString propertyGroup);
+        void createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,const  QString &pPropertyDevcat, const QString &pPropertyGroup);
         void createOstElement (QString propertyName, QString elementName, QString elementLabel);
         void setOstProperty   (QString propertyName, QVariant propertyValue);
         void setOstElement    (QString propertyName, QString elementName, QVariant elementValue);
         void loadAttributesFromFile(QString fileName);
         void saveAttributesToFile(QString fileName);
-
+    private:
+        QVariantMap _ostproperties;
     signals:
         void moduleDumped2(QVariant props, QString* pModulename, QString* pModulelabel, QString* pModuledescription);
         void newMessageSent(QString message,      QString* pModulename, QString Device);
+        void moduleEvent(QString *pModulename, QString *eventType, QVariantMap *pEventData, QString *pFree);
 
         void finished();
         void statusChanged(const QString &newStatus);

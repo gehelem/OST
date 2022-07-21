@@ -15,7 +15,7 @@ MainControl::MainControl(QString name, QString label)
     foreach(QString lib, libs)
     {
         QString tt = lib.replace(".so","");
-        createOstProperty("mod"+tt,"Load module " + tt,2);
+        createOstProperty("mod"+tt,"Load module " + tt,2,"modules","");
         setOstProperty("mod"+tt,tt);
     }
 
@@ -27,6 +27,7 @@ MainControl::~MainControl()
 }
 void MainControl::newProperty(INDI::Property *pProperty)
 {
+    Q_UNUSED(pProperty)
 }
 //void MainControl::OnSetPropertyText(TextProperty* prop)
 //{

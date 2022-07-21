@@ -8,34 +8,25 @@ Basemodule::Basemodule(QString name,QString label)
 {
     setVerbose(false);
     _moduledescription="This is a base module, it shouldn't be used as is";
-    createOstProperty("moduleName","Module name",0);
-    setOstProperty("moduleName",name);
+    createOstProperty("moduleName","Module name",0,"info","");
 
-    createOstProperty("moduleLabel","Module label",0);
-    setOstProperty("moduleLabel",label);
+    createOstProperty("moduleLabel","Module label",0,"info","");
 
-    createOstProperty("moduleDescription","Module description",0);
-    setOstProperty("moduleDescription","This is a base module, it shouldn't be used as is");
+    createOstProperty("moduleDescription","Module description",0,"info","");
 
-    createOstProperty("version","Version",0);
-    setOstProperty("version",0.1);
+    createOstProperty("version","Version",0,"info","");
 
-    createOstProperty("baseVersion","BaseVersion",0);
-    setOstProperty("baseVersion",0.1);
+    createOstProperty("baseVersion","BaseVersion",0,"info","");
 
-    createOstProperty("indiConnected","Indi server connected",0);
-    setOstProperty("indiConnected",false);
+    createOstProperty("indiConnected","Indi server connected",0,"info","");
 
-    createOstProperty("message","Message",0);
-    setOstProperty("message","First base message");
-    //loadAttributesFromFile("/home/gilles/projets/OST/test.json");
+    createOstProperty("message","Message",0,"info","");
+
+    //QTimer *timer = new QTimer(this);
+    //connect(timer, &QTimer::timeout, this, &Basemodule::connectIndiTimer);
+    //timer->start(10000);
 
 
-    QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &Basemodule::connectIndiTimer);
-    timer->start(10000);
-
-    setOstProperty("message","Basemodule init finished");
 
 }
 void Basemodule::connectIndiTimer()
@@ -44,10 +35,8 @@ void Basemodule::connectIndiTimer()
             if (connectServer()){
                 newUniversalMessage("Indi server connected");
                 sendMessage("Indi server connected");
-                setOstProperty("IndiConnected",true);
             } else {
                 sendMessage("Couldn't connect to Indi server");
-                setOstProperty("IndiConnected",false);
             }
         }
 }
@@ -88,8 +77,11 @@ void Basemodule::sendMessage(QString message)
 }
 void Basemodule::OnDumpAsked()
 {
-    usleep(200*1000);
-    emit moduleDumped2(property("ostproperties"),&_modulename,&_modulelabel,&_moduledescription);
+    //usleep(200*1000);
+    //emit moduleDumped2(property("ostproperties"),&_modulename,&_modulelabel,&_moduledescription);
+    QString _event="moduleDumped";
+    emit moduleEvent(&_modulename, &_event,&_ostproperties,&_modulename);
+
 }
 
 bool Basemodule::disconnectIndi(void)
@@ -453,45 +445,53 @@ bool Basemodule::frameReset(QString devicename)
     return true;
 }
 
-void Basemodule::createOstProperty(QString propertyName, QString propertyLabel, int propertyPermission, QString propertyDevcat, QString propertyGroup)
+void Basemodule::createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,const  QString &pPropertyDevcat, const QString &pPropertyGroup)
 {
-    QVariantMap map = property("ostproperties").toMap();
-    QVariantMap prop;
-    //attribute["propertyName"]=propertyName;
-    prop["propertyLabel"]=propertyLabel;
-    prop["permission"]=propertyPermission;
-    prop["devcat"]=propertyDevcat;
-    prop["group"]=propertyGroup;
-    map[propertyName]=prop;
-    setProperty("ostproperties",map);
+    //BOOST_LOG_TRIVIAL(debug) << "createOstProperty  - " << _modulename.toStdString() << "-" << pPropertyName.toStdString();
+    QVariant *_props=&_ostproperties;
+    QVariantMap _prop=_ostproperties.toMap()[pPropertyName].toMap();
+    _prop["propertyLabel"]=pPropertyLabel;
+    _prop["permission"]=pPropertyPermission;
+    _prop["devcat"]=pPropertyDevcat;
+    _prop["group"]=pPropertyGroup;
+    //_props[pPropertyName]=_prop;
+    //_ostproperties=_props;
+    QVariantMap(_ostproperties)[pPropertyName]=QVariant(_prop);
+    //QJsonObject obj =QJsonObject::fromVariantMap(_ostproperties.toMap()[pPropertyName].toMap());
+    //QJsonDocument doc(obj);
+    //QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
+    //QString strJson = QLatin1String(docByteArray);
+    //BOOST_LOG_TRIVIAL(debug) << "createOstProperty  - " << _modulename.toStdString() << "-" << pPropertyName.toStdString() << "=" << strJson.toStdString();
+    QString pn = pPropertyName;
+    QString _event="propertyCreated";
+    //BOOST_LOG_TRIVIAL(debug) << "before SIG";
+    QVariant _qq=QVariant(_prop);
+    emit moduleEvent(&_modulename, &_event,&_qq,&pn);
+    //BOOST_LOG_TRIVIAL(debug) << "after  SIG";
 }
 
-void Basemodule::createOstProperty(QString propertyName,QString propertyLabel, int propertyPermission)
-{
-    createOstProperty(propertyName,propertyLabel,propertyPermission,"","");
-}
 void Basemodule::setOstProperty(QString propertyName, QVariant propertyValue)
 {
-    setProperty(propertyName.toStdString().c_str(),propertyValue);
+    //setProperty(propertyName.toStdString().c_str(),propertyValue);
 }
 void Basemodule::createOstElement (QString propertyName, QString elementName, QString elementLabel)
 {
-    QVariantMap map = property("ostproperties").toMap();
-    QVariantMap prop = map[propertyName].toMap();
-    QVariantMap elts = prop["elements"].toMap();
-    QVariantMap elt = elts[elementName].toMap();
+    //QVariantMap map = property("ostproperties").toMap();
+    //QVariantMap prop = map[propertyName].toMap();
+    //QVariantMap elts = prop["elements"].toMap();
+    //QVariantMap elt = elts[elementName].toMap();
     //elt["elementName"]=elementName;
-    elt["elementLabel"]=elementLabel;
-    elts[elementName]=elt;
-    prop["elements"]=elts;
-    map[propertyName]=prop;
-    setProperty("ostproperties",map);
+    //elt["elementLabel"]=elementLabel;
+    //elts[elementName]=elt;
+    //prop["elements"]=elts;
+    //map[propertyName]=prop;
+    //setProperty("ostproperties",map);
 }
 void Basemodule::setOstElement    (QString propertyName, QString elementName, QVariant elementValue)
 {
-     QVariantMap prop= property(propertyName.toStdString().c_str()).toMap();
-     prop[elementName]=elementValue;
-     setProperty(propertyName.toStdString().c_str(),prop);
+     //QVariantMap prop= property(propertyName.toStdString().c_str()).toMap();
+     //prop[elementName]=elementValue;
+     //setProperty(propertyName.toStdString().c_str(),prop);
 }
 
 
