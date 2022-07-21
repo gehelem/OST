@@ -83,7 +83,7 @@ class Basemodule : public QObject, public INDI::BaseClient
     signals:
         void moduleDumped2(QVariant props, QString* pModulename, QString* pModulelabel, QString* pModuledescription);
         void newMessageSent(QString message,      QString* pModulename, QString Device);
-        void moduleEvent(QString *pModulename, QString *eventType, QVariantMap *pEventData, QString *pFree);
+        void moduleEvent(QString *pModulename, const QString &eventType, QVariant *pEventData, QString *pFree);
 
         void finished();
         void statusChanged(const QString &newStatus);

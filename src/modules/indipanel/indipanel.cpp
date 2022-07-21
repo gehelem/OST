@@ -29,7 +29,7 @@ void IndiPanel::newProperty(INDI::Property *pProperty)
     QString dev = pProperty->getDeviceName();
     QString pro = pProperty->getName();
     QString devpro = dev+pro;
-    BOOST_LOG_TRIVIAL(debug) << "Indipanel new property " << devpro.toStdString();
+    //BOOST_LOG_TRIVIAL(debug) << "Indipanel new property " << devpro.toStdString();
     createOstProperty(devpro,pProperty->getLabel(),pProperty->getPermission(),pProperty->getDeviceName(),pProperty->getGroupName());
     switch (pProperty->getType()) {
 

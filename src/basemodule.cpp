@@ -79,8 +79,8 @@ void Basemodule::OnDumpAsked()
 {
     //usleep(200*1000);
     //emit moduleDumped2(property("ostproperties"),&_modulename,&_modulelabel,&_moduledescription);
-    QString _event="moduleDumped";
-    emit moduleEvent(&_modulename, &_event,&_ostproperties,&_modulename);
+    QVariant _pData=_ostproperties;
+    emit moduleEvent(&_modulename,"moduleDumped",&_pData,&_modulename);
 
 }
 
@@ -448,26 +448,22 @@ bool Basemodule::frameReset(QString devicename)
 void Basemodule::createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,const  QString &pPropertyDevcat, const QString &pPropertyGroup)
 {
     //BOOST_LOG_TRIVIAL(debug) << "createOstProperty  - " << _modulename.toStdString() << "-" << pPropertyName.toStdString();
-    QVariant *_props=&_ostproperties;
-    QVariantMap _prop=_ostproperties.toMap()[pPropertyName].toMap();
+    QVariantMap _prop=_ostproperties[pPropertyName].toMap();
     _prop["propertyLabel"]=pPropertyLabel;
     _prop["permission"]=pPropertyPermission;
     _prop["devcat"]=pPropertyDevcat;
     _prop["group"]=pPropertyGroup;
     //_props[pPropertyName]=_prop;
     //_ostproperties=_props;
-    QVariantMap(_ostproperties)[pPropertyName]=QVariant(_prop);
+    _ostproperties[pPropertyName]=_prop;
     //QJsonObject obj =QJsonObject::fromVariantMap(_ostproperties.toMap()[pPropertyName].toMap());
     //QJsonDocument doc(obj);
     //QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
     //QString strJson = QLatin1String(docByteArray);
     //BOOST_LOG_TRIVIAL(debug) << "createOstProperty  - " << _modulename.toStdString() << "-" << pPropertyName.toStdString() << "=" << strJson.toStdString();
     QString pn = pPropertyName;
-    QString _event="propertyCreated";
-    //BOOST_LOG_TRIVIAL(debug) << "before SIG";
     QVariant _qq=QVariant(_prop);
-    emit moduleEvent(&_modulename, &_event,&_qq,&pn);
-    //BOOST_LOG_TRIVIAL(debug) << "after  SIG";
+    emit moduleEvent(&_modulename, "propertyCreated",&_ostproperties[pPropertyName],&pn);
 }
 
 void Basemodule::setOstProperty(QString propertyName, QVariant propertyValue)

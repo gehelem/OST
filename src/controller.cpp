@@ -141,16 +141,20 @@ void Controller::OnPropertyChanged(QString *moduleName, QString *propName, QVari
 
 
 }
-void Controller::OnModuleEvent(QString *pModulename, QString *eventType, QVariantMap *pEventData, QString *pFree)
+void Controller::OnModuleEvent(QString *pModulename, const QString &eventType, QVariant *pEventData, QString *pFree)
 {
-    if (pEventData->isValid()) {
+    if (!pEventData->isValid()) {
+       BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - INVALID DATA - " << eventType.toStdString() << " - " << pModulename->toStdString() << " - " << pFree->toStdString() ;
+       return;
+    }
+    if (strcmp(pEventData->typeName(),"QVariantMap")==0) {
         //BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - " << pEventData->typeName() << "-" << pFree->toStdString() << "-" << pModulename->toStdString() << "-" << eventType->toStdString();
-        //QVariantMap map=pEventData->toMap();
-        QJsonObject obj =QJsonObject::fromVariantMap(pEventData);
+        QVariantMap map=pEventData->toMap();
+        QJsonObject obj =QJsonObject::fromVariantMap(map);
         QJsonDocument doc(obj);
         QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
         QString strJson = QLatin1String(docByteArray);
-        BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - " << pModulename->toStdString() << " - " << eventType->toStdString() << " - " << strJson.toStdString();
+        BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - " << pModulename->toStdString() << " - " << eventType.toStdString() << " - " << strJson.toStdString();
         //switch eventType {
         //    case:"propertyCreated" {
         //       BOOST_LOG_TRIVIAL(debug) << "OnDynamicPropertyChangeEvent - " ;
@@ -159,7 +163,7 @@ void Controller::OnModuleEvent(QString *pModulename, QString *eventType, QVarian
         //}
 
     } else {
-        BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - INVALID DATA - " << eventType->toStdString() << " - " << pModulename->toStdString() << " - " << pFree->toStdString() ;
+        BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - OTHER FORMAT - " << pEventData->typeName();
     }
 }
 
