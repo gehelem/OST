@@ -21,7 +21,7 @@ class Controller : public QObject
 {
     Q_OBJECT
 public:
-    Controller(bool saveAllBlobs, const QString& host, int port,const QString& webroot);
+    Controller(bool saveAllBlobs, const QString& host, int port,const QString& webroot,const QString& dbpath);
     ~Controller() override;
     WShandler   *wshandler;
 public slots:
@@ -37,6 +37,7 @@ private:
     QString _indihost;
     int _indiport;
     QString _webroot;
+    QString _dbpath;
     QStringList _availableModuleLibs;
 
 };

@@ -4,10 +4,11 @@
 /*!
  * ... ...
  */
-Controller::Controller(bool saveAllBlobs, const QString& host, int port,const QString& webroot)
+Controller::Controller(bool saveAllBlobs, const QString& host, int port, const QString& webroot, const QString &dbpath)
     :_indihost(host),
       _indiport(port),
-      _webroot(webroot)
+      _webroot(webroot),
+      _dbpath(dbpath)
 {
 
     //this->setParent(parent);
@@ -16,7 +17,7 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port,const QS
     if(QSqlDatabase::isDriverAvailable(DRIVER))
     {
         QSqlDatabase db = QSqlDatabase::addDatabase(DRIVER);
-        db.setDatabaseName("/home/gilles/projets/OST/db/ost.db" );
+        db.setDatabaseName(_dbpath+"ost.db" );
         if(!db.open())
                     //qDebug() << "dbOpen - ERROR: " << db.lastError().text();
                     qDebug() << "dbOpen - ERROR: " << db.databaseName();// << db.lastError().text();
@@ -26,7 +27,6 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port,const QS
 
     wshandler = new WShandler(this);
 
-    BOOST_LOG_TRIVIAL(debug) << "Controller warmup";
     BOOST_LOG_TRIVIAL(debug) <<  "ApplicationDirPath :" << QCoreApplication::applicationDirPath().toStdString();
 
     MainControl *mainctl = new MainControl("maincontrol","Main control");
