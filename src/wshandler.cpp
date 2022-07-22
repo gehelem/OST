@@ -153,15 +153,12 @@ void WShandler::OnPropertyChanged(QString *moduleName, QString *propName,QVarian
     obj["values"]=QJsonObject::fromVariantMap(map);
     sendJsonMessage(obj);
 }
-void WShandler::OnModuleEvent(QString *pModulename, const QString &eventType, QVariant *pEventData, QString *pFree)
+void WShandler::OnModuleEvent(QString *pModulename, const QString &eventType, QVariant *pEventData, QVariant *pComplement)
 {
-    if (strcmp(eventType.toStdString().c_str(),"moduleDumped")==0) {
         QJsonObject  obj;
-        obj["event"]="moduledump2";
-        obj["module"]=*pModulename;
-        //obj["modulelabel"]=*pModulelabel;
-        //obj["moduledescription"]=*pModuledescription;
-        obj["properties"]=QJsonObject::fromVariantMap(pEventData->toMap());
+        obj["eventType"]=eventType;
+        obj["ModuleName"]=*pModulename;
+        obj["EventData"]=QJsonObject::fromVariantMap(pEventData->toMap());
+        obj["Complement"]=QJsonObject::fromVariantMap(pComplement->toMap());
         sendJsonMessage(obj);
-    }
 }

@@ -142,10 +142,10 @@ void Controller::OnPropertyChanged(QString *moduleName, QString *propName, QVari
 
 
 }
-void Controller::OnModuleEvent(QString *pModulename, const QString &eventType, QVariant *pEventData, QString *pFree)
+void Controller::OnModuleEvent(QString *pModulename, const QString &eventType, QVariant *pEventData, QVariant *pComplement)
 {
     if (!pEventData->isValid()) {
-       BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - INVALID DATA - " << eventType.toStdString() << " - " << pModulename->toStdString() << " - " << pFree->toStdString() ;
+       BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - INVALID DATA - " << eventType.toStdString() << " - " << pModulename->toStdString();
        return;
     }
     if (strcmp(pEventData->typeName(),"QVariantMap")==0) {

@@ -80,7 +80,12 @@ void Basemodule::OnDumpAsked()
     //usleep(200*1000);
     //emit moduleDumped2(property("ostproperties"),&_modulename,&_modulelabel,&_moduledescription);
     QVariant _pData=_ostproperties;
-    emit moduleEvent(&_modulename,"moduleDumped",&_pData,&_modulename);
+    QVariantMap _pComplementMap;
+    _pComplementMap["moduleLabel"]=_modulelabel;
+    _pComplementMap["moduleDescription"]=_moduledescription;
+    QVariant _pComplement=_pComplementMap;
+
+    emit moduleEvent(&_modulename,"moduleDumped",&_pData,&_pComplement);
 
 }
 
@@ -456,9 +461,12 @@ void Basemodule::createOstProperty(const QString &pPropertyName, const QString &
     //_props[pPropertyName]=_prop;
     //_ostproperties=_props;
     _ostproperties[pPropertyName]=_prop;
-    QString pn = pPropertyName;
-    QVariant _qq=QVariant(_prop);
-    emit moduleEvent(&_modulename, "propertyCreated",&_ostproperties[pPropertyName],&pn);
+    QVariant pn = pPropertyName;
+    QVariantMap _pComplementMap;
+    _pComplementMap["PropertyName"]=pPropertyName;
+    QVariant _pComplement=_pComplementMap;
+
+    emit moduleEvent(&_modulename, "propertyCreated",&_ostproperties[pPropertyName],&_pComplement);
 }
 
 void Basemodule::setOstProperty(QString propertyName, QVariant propertyValue)
