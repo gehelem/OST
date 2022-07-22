@@ -138,7 +138,7 @@ void Controller::OnModuleEvent(QString *pModulename, const QString &eventType, Q
             BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - INVALID COMPLEMENT - " << eventType.toStdString() << " - " << pModulename->toStdString();
         }
         QJsonDocument doc(obj);
-        QByteArray docByteArray = doc.toJson(QJsonDocument::Indented);
+        QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
         QString strJson = QLatin1String(docByteArray);
         BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - " << pModulename->toStdString() << " - " << eventType.toStdString() << " - " << strJson.toStdString();
         //switch eventType {

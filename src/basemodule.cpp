@@ -459,7 +459,6 @@ void Basemodule::createOstProperty(const QString &pPropertyName, const QString &
     _prop["devcat"]=pPropertyDevcat;
     _prop["group"]=pPropertyGroup;
     _prop["name"]=pPropertyName;
-    //_ostproperties=_props;
     _ostproperties[pPropertyName]=_prop;
     QVariantMap _pComplementMap=QVariantMap();
     _pComplementMap["name"]=_prop["name"];
@@ -471,17 +470,10 @@ void Basemodule::deleteOstProperty(QString propertyName)
 {
     BOOST_LOG_TRIVIAL(debug) << "deleteOstProperty  - " << _modulename.toStdString() << "-" << propertyName.toStdString();
     _ostproperties.remove(propertyName);
-    BOOST_LOG_TRIVIAL(debug) << "deleteOstProperty 1";
     QVariantMap _pComplementMap=QVariantMap();
-    BOOST_LOG_TRIVIAL(debug) << "deleteOstProperty 2";
     _pComplementMap["name"]=propertyName;
-    BOOST_LOG_TRIVIAL(debug) << "deleteOstProperty 3";
     QVariant _pComplement=_pComplementMap;
-    BOOST_LOG_TRIVIAL(debug) << "deleteOstProperty 4";
-    if (!_pComplement.canConvert<QVariantMap>()) BOOST_LOG_TRIVIAL(debug) << " KOKOKOKO";
-    BOOST_LOG_TRIVIAL(debug) << "deleteOstProperty 5";
     emit moduleEvent(&_modulename, "delprop",_pComplement,_pComplement);
-    BOOST_LOG_TRIVIAL(debug) << "deleteOstProperty 6";
 
 }
 
