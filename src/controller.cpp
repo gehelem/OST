@@ -87,6 +87,7 @@ void Controller::LoadModule(QString lib,QString name,QString label)
 
                 connect(mod,&Basemodule::newMessageSent,wshandler,&WShandler::OnNewMessageSent);
                 connect(mod,&Basemodule::moduleDumped2, wshandler,&WShandler::OnModuleDumped2);
+                connect(mod,&Basemodule::moduleEvent, wshandler,&WShandler::OnModuleEvent);
 
                 mod->OnDumpAsked();
 

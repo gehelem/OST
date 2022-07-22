@@ -456,11 +456,6 @@ void Basemodule::createOstProperty(const QString &pPropertyName, const QString &
     //_props[pPropertyName]=_prop;
     //_ostproperties=_props;
     _ostproperties[pPropertyName]=_prop;
-    //QJsonObject obj =QJsonObject::fromVariantMap(_ostproperties.toMap()[pPropertyName].toMap());
-    //QJsonDocument doc(obj);
-    //QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
-    //QString strJson = QLatin1String(docByteArray);
-    //BOOST_LOG_TRIVIAL(debug) << "createOstProperty  - " << _modulename.toStdString() << "-" << pPropertyName.toStdString() << "=" << strJson.toStdString();
     QString pn = pPropertyName;
     QVariant _qq=QVariant(_prop);
     emit moduleEvent(&_modulename, "propertyCreated",&_ostproperties[pPropertyName],&pn);
