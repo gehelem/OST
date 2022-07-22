@@ -35,15 +35,6 @@ WShandler::~WShandler()
 //void WShandler::OnPropertyRemoved(Property *pProperty, QString *pModulename)
 //{
 //}
-void WShandler::OnNewMessageSent(QString message, QString *pModulename, QString Device)
-{
-    QJsonObject  obj;
-    obj["event"]="newmessage";
-    obj["module"]=*pModulename;
-    obj["device"]=Device;
-    obj["message"]=message;
-    sendJsonMessage(obj);
-}
 void WShandler::sendmessage(QString message)
 {
     for (int i=0;i<m_clients.size();i++) {
@@ -131,34 +122,18 @@ void WShandler::socketDisconnected()
     }
 }
 
-void WShandler::OnModuleDumped2(QVariant props, QString* pModulename, QString* pModulelabel, QString* pModuledescription)
-{
-    QJsonObject  obj;
-    obj["event"]="moduledump2";
-    obj["module"]=*pModulename;
-    obj["modulelabel"]=*pModulelabel;
-    obj["moduledescription"]=*pModuledescription;
-    obj["properties"]=QJsonObject::fromVariantMap(props.toMap());
-    sendJsonMessage(obj);
-}
-
-void WShandler::OnPropertyChanged(QString *moduleName, QString *propName,QVariant *propValue,QVariant *prop)
-{
-    QJsonObject  obj;
-    QVariantMap map=propValue->toMap();
-    QVariantMap pro=prop->toMap();
-    obj["event"]="updatepropertyqmap";
-    obj["module"]=*moduleName;
-    obj["property"]=QJsonObject::fromVariantMap(pro);
-    obj["values"]=QJsonObject::fromVariantMap(map);
-    sendJsonMessage(obj);
-}
-void WShandler::OnModuleEvent(QString *pModulename, const QString &eventType, QVariant *pEventData, QVariant *pComplement)
+void WShandler::OnModuleEvent(QString *pModulename, const QString &eventType, QVariant pEventData, QVariant pComplement)
 {
         QJsonObject  obj;
         obj["evt"]=eventType;
         obj["mod"]=*pModulename;
-        obj["dta"]=QJsonObject::fromVariantMap(pEventData->toMap());
-        obj["cpl"]=QJsonObject::fromVariantMap(pComplement->toMap());
+        if (pEventData.canConvert<QVariantMap>()) {
+        //if (strcmp(pEventData->typeName(),"QVariantMap")==0) {
+            obj["dta"]=QJsonObject::fromVariantMap(pEventData.toMap());
+        }
+        if (pComplement.canConvert<QVariantMap>()) {
+        //if (strcmp(pComplement->typeName(),"QVariantMap")==0) {
+            obj["cpl"]=QJsonObject::fromVariantMap(pComplement.toMap());
+        }
         sendJsonMessage(obj);
 }

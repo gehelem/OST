@@ -19,10 +19,7 @@ public:
     QWebSocketServer *m_pWebSocketServer;
     QList<QWebSocket *> m_clients;
 public slots:
-    void OnNewMessageSent(QString message,QString *pModulename, QString Device);
-    void OnModuleDumped2(QVariant props, QString* pModulename, QString* pModulelabel, QString* pModuledescription);
-    void OnPropertyChanged(QString *moduleName, QString *propName, QVariant *propValue, QVariant *prop);
-    void OnModuleEvent(QString *pModulename, const QString &eventType, QVariant *pEventData, QVariant *pComplement);
+    void OnModuleEvent(QString *pModulename, const QString &eventType, QVariant pEventData, QVariant pComplement);
 
 
     void onNewConnection();

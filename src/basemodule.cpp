@@ -77,7 +77,7 @@ void Basemodule::sendMessage(QString message)
 }
 void Basemodule::OnDumpAsked()
 {
-    //usleep(200*1000);
+    usleep(200*1000);
     //emit moduleDumped2(property("ostproperties"),&_modulename,&_modulelabel,&_moduledescription);
     QVariant _pData=_ostproperties;
     QVariantMap _pComplementMap;
@@ -85,7 +85,7 @@ void Basemodule::OnDumpAsked()
     _pComplementMap["description"]=_moduledescription;
     QVariant _pComplement=_pComplementMap;
 
-    emit moduleEvent(&_modulename,"module",&_pData,&_pComplement);
+    emit moduleEvent(&_modulename,"moduledump",_pData,_pComplement);
 
 }
 
@@ -452,20 +452,37 @@ bool Basemodule::frameReset(QString devicename)
 
 void Basemodule::createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,const  QString &pPropertyDevcat, const QString &pPropertyGroup)
 {
-    //BOOST_LOG_TRIVIAL(debug) << "createOstProperty  - " << _modulename.toStdString() << "-" << pPropertyName.toStdString();
+    BOOST_LOG_TRIVIAL(debug) << "createOstProperty  - " << _modulename.toStdString() << "-" << pPropertyName.toStdString();
     QVariantMap _prop=_ostproperties[pPropertyName].toMap();
     _prop["propertyLabel"]=pPropertyLabel;
     _prop["permission"]=pPropertyPermission;
     _prop["devcat"]=pPropertyDevcat;
     _prop["group"]=pPropertyGroup;
-    //_props[pPropertyName]=_prop;
+    _prop["name"]=pPropertyName;
     //_ostproperties=_props;
     _ostproperties[pPropertyName]=_prop;
-    //QVariantMap _pComplementMap;
-    //_pComplementMap["name"]=pPropertyName;
-    QVariant _pComplement;//=_pComplementMap;
+    QVariantMap _pComplementMap=QVariantMap();
+    _pComplementMap["name"]=_prop["name"];
+    QVariant _pComplement=_pComplementMap;
+    if (!_pComplement.canConvert<QVariantMap>()) BOOST_LOG_TRIVIAL(debug) << " KOKOKOKO";
+    emit moduleEvent(&_modulename, "addprop",_ostproperties[pPropertyName],_pComplement);
+}
+void Basemodule::deleteOstProperty(QString propertyName)
+{
+    BOOST_LOG_TRIVIAL(debug) << "deleteOstProperty  - " << _modulename.toStdString() << "-" << propertyName.toStdString();
+    _ostproperties.remove(propertyName);
+    BOOST_LOG_TRIVIAL(debug) << "deleteOstProperty 1";
+    QVariantMap _pComplementMap=QVariantMap();
+    BOOST_LOG_TRIVIAL(debug) << "deleteOstProperty 2";
+    _pComplementMap["name"]=propertyName;
+    BOOST_LOG_TRIVIAL(debug) << "deleteOstProperty 3";
+    QVariant _pComplement=_pComplementMap;
+    BOOST_LOG_TRIVIAL(debug) << "deleteOstProperty 4";
+    if (!_pComplement.canConvert<QVariantMap>()) BOOST_LOG_TRIVIAL(debug) << " KOKOKOKO";
+    BOOST_LOG_TRIVIAL(debug) << "deleteOstProperty 5";
+    emit moduleEvent(&_modulename, "delprop",_pComplement,_pComplement);
+    BOOST_LOG_TRIVIAL(debug) << "deleteOstProperty 6";
 
-    emit moduleEvent(&_modulename, "property",&_ostproperties[pPropertyName],&_pComplement);
 }
 
 void Basemodule::setOstProperty(QString propertyName, QVariant propertyValue)
@@ -496,6 +513,7 @@ void Basemodule::setOstElement    (QString propertyName, QString elementName, QV
 
 void Basemodule::loadAttributesFromFile(QString fileName)
 {
+    /*
     QString val;
     QFile file;
     file.setFileName(fileName);
@@ -509,6 +527,7 @@ void Basemodule::loadAttributesFromFile(QString fileName)
     QByteArray docByteArray = d.toJson(QJsonDocument::Compact);
     QString strJson = QLatin1String(docByteArray);
     BOOST_LOG_TRIVIAL(debug) << "loadAttributesFromFile  - " << _modulename.toStdString() << " - " << strJson.toStdString();
+    */
 
 
 }

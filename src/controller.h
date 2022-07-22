@@ -27,8 +27,7 @@ public:
 public slots:
     void OnNewMessageSent(QString message, QString *pModulename, QString Device);
     void OnLoadModule(QString lib, QString label);
-    void OnPropertyChanged(QString *moduleName, QString *propName,QVariant *propValue);
-    void OnModuleEvent(QString *pModulename, const QString &eventType, QVariant *pEventData, QVariant *pComplement);
+    void OnModuleEvent(QString *pModulename, const QString &eventType, QVariant pEventData, QVariant pComplement);
 
 
 signals:

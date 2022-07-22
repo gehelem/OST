@@ -73,6 +73,8 @@ class Basemodule : public QObject, public INDI::BaseClient
         virtual void newUniversalMessage(std::string message)   {Q_UNUSED(message);}
 
         void createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,const  QString &pPropertyDevcat, const QString &pPropertyGroup);
+        void deleteOstProperty(QString propertyName);
+
         void createOstElement (QString propertyName, QString elementName, QString elementLabel);
         void setOstProperty   (QString propertyName, QVariant propertyValue);
         void setOstElement    (QString propertyName, QString elementName, QVariant elementValue);
@@ -83,7 +85,7 @@ class Basemodule : public QObject, public INDI::BaseClient
     signals:
         void moduleDumped2(QVariant props, QString* pModulename, QString* pModulelabel, QString* pModuledescription);
         void newMessageSent(QString message,      QString* pModulename, QString Device);
-        void moduleEvent(QString *pModulename, const QString &eventType, QVariant *pEventData, QVariant *pComplement);
+        void moduleEvent(QString *pModulename, const QString &eventType, QVariant pEventData, QVariant pComplement);
 
         void finished();
         void statusChanged(const QString &newStatus);

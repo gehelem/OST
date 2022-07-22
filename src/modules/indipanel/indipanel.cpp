@@ -68,6 +68,12 @@ void IndiPanel::newProperty(INDI::Property *pProperty)
 
 void IndiPanel::removeProperty(INDI::Property *property)
 {
+    QString dev = property->getDeviceName();
+    QString pro = property->getName();
+    QString devpro = dev+pro;
+    BOOST_LOG_TRIVIAL(debug) << "indi remove property " << devpro.toStdString();
+    deleteOstProperty(devpro);
+
     switch (property->getType()) {
 
         case INDI_NUMBER: {

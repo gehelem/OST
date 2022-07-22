@@ -82,20 +82,9 @@ void Controller::LoadModule(QString lib,QString name,QString label)
                 mod->setHostport(_indihost,_indiport);
                 mod->connectIndi();
                 mod->setWebroot(_webroot);
-                connect(mod,&Basemodule::newMessageSent, this,&Controller::OnNewMessageSent);
                 connect(mod,&Basemodule::moduleEvent, this,&Controller::OnModuleEvent);
-
-                connect(mod,&Basemodule::newMessageSent,wshandler,&WShandler::OnNewMessageSent);
-                connect(mod,&Basemodule::moduleDumped2, wshandler,&WShandler::OnModuleDumped2);
                 connect(mod,&Basemodule::moduleEvent, wshandler,&WShandler::OnModuleEvent);
-
-                mod->OnDumpAsked();
-
                 connect(wshandler,&WShandler::dumpAsked,mod,&Basemodule::OnDumpAsked);
-                //connect(wshandler,&WShandler::setPropertyText,mod,&Basemodule::OnSetPropertyText);
-                //connect(wshandler,&WShandler::setPropertyNumber,mod,&Basemodule::OnSetPropertyNumber);
-                //connect(wshandler,&WShandler::setPropertySwitch,mod,&Basemodule::OnSetPropertySwitch);
-
             }
         } else {
             BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library";
@@ -127,44 +116,40 @@ void Controller::OnLoadModule(QString lib, QString label)
     LoadModule(QCoreApplication::applicationDirPath()+"/"+lib,name,label);
 }
 
-void Controller::OnPropertyChanged(QString *moduleName, QString *propName, QVariant *propValue)
+void Controller::OnModuleEvent(QString *pModulename, const QString &eventType, QVariant pEventData, QVariant pComplement)
 {
-    //BOOST_LOG_TRIVIAL(debug) << propValue->typeName();
-    if (strcmp(propValue->typeName(),"QVariantMap")==0 )
-    {
-        QVariantMap map=propValue->toMap();
-        QJsonObject obj =QJsonObject::fromVariantMap(map);
-        QJsonDocument doc(obj);
-        QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
-        QString strJson = QLatin1String(docByteArray);
-        BOOST_LOG_TRIVIAL(debug) << "OnDynamicPropertyChangeEvent - "  <<  moduleName->toStdString() << " - " << propName->toStdString() << " - " <<  strJson.toStdString();
-    }
-
-
-}
-void Controller::OnModuleEvent(QString *pModulename, const QString &eventType, QVariant *pEventData, QVariant *pComplement)
-{
-    if (!pEventData->isValid()) {
+    if (!pEventData.isValid()) {
        BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - INVALID DATA - " << eventType.toStdString() << " - " << pModulename->toStdString();
        return;
     }
-    if (strcmp(pEventData->typeName(),"QVariantMap")==0) {
-//        //BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - " << pEventData->typeName() << "-" << pFree->toStdString() << "-" << pModulename->toStdString() << "-" << eventType->toStdString();
-//        QVariantMap map=pEventData->toMap();
-//        QJsonObject obj =QJsonObject::fromVariantMap(map);
-//        QJsonDocument doc(obj);
-//        QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
-//        QString strJson = QLatin1String(docByteArray);
-//        BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - " << pModulename->toStdString() << " - " << eventType.toStdString() << " - " << strJson.toStdString();
-//        //switch eventType {
-//        //    case:"propertyCreated" {
-//        //       BOOST_LOG_TRIVIAL(debug) << "OnDynamicPropertyChangeEvent - " ;
-//        //    }
-//        //
-//        //}
+    if (strcmp(pEventData.typeName(),"QVariantMap")==0) {
+        //BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - " << pEventData->typeName() << "-" << pFree->toStdString() << "-" << pModulename->toStdString() << "-" << eventType->toStdString();
+        QJsonObject obj;
+        obj["evt"]=eventType;
+        obj["mod"]=*pModulename;
+        if (pEventData.canConvert<QVariantMap>()) {
+        //if (strcmp(pEventData->typeName(),"QVariantMap")==0) {
+            obj["dta"]=QJsonObject::fromVariantMap(pEventData.toMap());
+        }
+        if (pComplement.canConvert<QVariantMap>()) {
+        //if (strcmp(pComplement->typeName(),"QVariantMap")==0) {
+            obj["cpl"]=QJsonObject::fromVariantMap(pComplement.toMap());
+        } else {
+            BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - INVALID COMPLEMENT - " << eventType.toStdString() << " - " << pModulename->toStdString();
+        }
+        QJsonDocument doc(obj);
+        QByteArray docByteArray = doc.toJson(QJsonDocument::Indented);
+        QString strJson = QLatin1String(docByteArray);
+        BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - " << pModulename->toStdString() << " - " << eventType.toStdString() << " - " << strJson.toStdString();
+        //switch eventType {
+        //    case:"propertyCreated" {
+        //       BOOST_LOG_TRIVIAL(debug) << "OnDynamicPropertyChangeEvent - " ;
+        //    }
+        //
+        //}
 
     } else {
-        BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - OTHER FORMAT - " << pEventData->typeName();
+        BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - OTHER FORMAT - " << pEventData.typeName();
     }
 }
 
