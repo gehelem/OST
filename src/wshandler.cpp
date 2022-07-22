@@ -156,9 +156,9 @@ void WShandler::OnPropertyChanged(QString *moduleName, QString *propName,QVarian
 void WShandler::OnModuleEvent(QString *pModulename, const QString &eventType, QVariant *pEventData, QVariant *pComplement)
 {
         QJsonObject  obj;
-        obj["eventType"]=eventType;
-        obj["ModuleName"]=*pModulename;
-        obj["EventData"]=QJsonObject::fromVariantMap(pEventData->toMap());
-        obj["Complement"]=QJsonObject::fromVariantMap(pComplement->toMap());
+        obj["evt"]=eventType;
+        obj["mod"]=*pModulename;
+        obj["dta"]=QJsonObject::fromVariantMap(pEventData->toMap());
+        obj["cpl"]=QJsonObject::fromVariantMap(pComplement->toMap());
         sendJsonMessage(obj);
 }
