@@ -49,12 +49,12 @@ function initWebSocket() {
             console.log(obj);
             //if ((obj.event == 'appendproperty')) {console.log(obj)};
             //if ((obj.event == 'updateproperty')&&(obj.property.propname=='grid')) {console.log(obj)};
-            if (obj.event == 'moduledump2') {
-                m=obj.module;
-                l=obj.modulelabel;
+            if (obj.eventType == 'ModuleDumped') {
+                m=obj.ModuleName;
+                l=obj.Complement.moduleLabel;
                 buildmodule(m,l);
                
-                var properties = obj.properties;
+                var properties = obj.EventData;
                 $.each( properties, function(iprop,prop) {
                     d = prop.devcat.replace(' ', '');
                     g = prop.group.replace(' ', ''); 

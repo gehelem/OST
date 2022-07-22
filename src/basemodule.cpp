@@ -85,7 +85,7 @@ void Basemodule::OnDumpAsked()
     _pComplementMap["moduleDescription"]=_moduledescription;
     QVariant _pComplement=_pComplementMap;
 
-    emit moduleEvent(&_modulename,"moduleDumped",&_pData,&_pComplement);
+    emit moduleEvent(&_modulename,"ModuleDumped",&_pData,&_pComplement);
 
 }
 
