@@ -162,7 +162,7 @@ function buildmodule(m,l) {
 
 function builddevice(m,d,l) {
     if  (!($("[id='D"+m+d+"']").length >0)&&!(d=="root")) {
-        console.log('BUILD DEVICE ' + m + "-"+ d + "-"+ l + "-");
+        //console.log('BUILD DEVICE ' + m + "-"+ d + "-"+ l + "-");
         $("[id='D"+m+"']").append("<div id='D"+m+d+"'></div>");
         $("[id='U"+m+"']").append("<li id='L"+m+d+"'><a href=#D"+m+d+">"+l+"</a></li>");
         $("[id='D"+m+d+"']").append("<ul id='U"+m+d+"'></ul>");
@@ -172,7 +172,7 @@ function builddevice(m,d,l) {
 
 function buildgroup(m,d,g,l) {
     if  (!($("[id='D"+m+d+g+"']").length > 0)&&!(g=="root")) {
-        console.log('BUILD GROUP ' + m + "-" + d + "-"+ g + "-"+ l + "-");
+        //console.log('BUILD GROUP ' + m + "-" + d + "-"+ g + "-"+ l + "-");
         $("[id='D"+m+d+"']").append("<div id='D"+m+d+g+"'></div>");
         $("[id='U"+m+d+"']").append("<li id='L"+m+d+g+"'><a href=#D"+m+d+g+">"+l+"</a></li>");
         $("[id='D"+m+d+g+"']").append("<ul id='U"+m+d+g+"'></ul>");
