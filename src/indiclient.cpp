@@ -26,10 +26,12 @@ void IndiCLient::serverDisconnected(int exit_code)
 }
 void IndiCLient::newDevice(INDI::BaseDevice *dp)
 {
-    QString deviceName = dp->getDeviceName();
-    BOOST_LOG_TRIVIAL(debug) << "New Device: " << dp->getDeviceName();
-    if ( deviceName.contains("CCD") ) {
-        this->setBLOBMode(B_ALSO, deviceName.toStdString().c_str());
+    const char* deviceName = dp->getDeviceName();
+    BOOST_LOG_TRIVIAL(debug) << "New Device: " << deviceName;
+    BOOST_LOG_TRIVIAL(debug) << "New Device Driver Interface: " << dp->getDriverInterface();
+    if ( INDI::BaseDevice::CCD_INTERFACE == dp->getDriverInterface() ) {
+        BOOST_LOG_TRIVIAL(debug) << "Registering for BLOBs from device: " << deviceName;
+        this->setBLOBMode(B_ALSO, deviceName);
     }
     emit newDeviceSeen(dp->getDeviceName());
 }
@@ -67,6 +69,8 @@ void IndiCLient::newProperty(INDI::Property *pProperty)
         }
 
         default:
+            BOOST_LOG_TRIVIAL(debug) << "Ignoring unhandled property type: " << pProperty->getType();
+            BOOST_LOG_TRIVIAL(debug) << "Ignoring unhandled property name: " << pProperty->getName();
             break;
     }
 }
