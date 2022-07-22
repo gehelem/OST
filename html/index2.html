@@ -49,7 +49,7 @@ function initWebSocket() {
             console.log(obj);
             //if ((obj.event == 'appendproperty')) {console.log(obj)};
             //if ((obj.event == 'updateproperty')&&(obj.property.propname=='grid')) {console.log(obj)};
-            if (obj.evt == 'module') {
+            if (obj.evt == 'moduledump') {
                 m=obj.mod;
                 l=obj.cpl.label;
                 buildmodule(m,l);
@@ -71,7 +71,7 @@ function initWebSocket() {
 
 
             }
-            if (obj.event == 'appendproperty') {
+            if (obj.evt == 'appendproperty') {
                 m=obj.module;
                 p=obj.property;
                 d=p.devicenameshort;
@@ -89,15 +89,15 @@ function initWebSocket() {
 
             }            
             
-            if (obj.event == 'updateproperty') {
+            if (obj.evt == 'updateproperty') {
                 p=obj.property;
                 buildproperty(obj.module,p.devicenameshort,p.groupnameshort,p);
             }
-            if (obj.event == 'updatepropertyqmap') {
+            if (obj.evt == 'updatepropertyqmap') {
                 values=obj.values;
                 console.log(values);
             }
-            if (obj.event == 'createproperty') {
+            if (obj.evt == 'createproperty') {
                 p=obj.property;
                 builddevice  (obj.module,p.devicenameshort,p.devicename);
                 $("#D"+obj.module+p.devicenameshort).tabs("refresh");              /* this shouldn't be here */
@@ -105,18 +105,18 @@ function initWebSocket() {
                 $("#D"+obj.module).tabs("refresh");              /* this shouldn't be here */
                 buildproperty(obj.module,p.devicenameshort,p.groupnameshort,p);
             }
-            if (obj.event == 'removeproperty') { 
-                    var dev   = obj.module+obj.property.devicenameshort;               /* this should be moved to a dedicated function */
-                    var group = dev+obj.property.groupnameshort;
-                    var prop  = group+obj.property.propname;
-                    //console.log("REMOVE PROP "+prop);
+            if (obj.evt == 'delprop') { 
+                    //var dev   = obj.module+obj.property.devicenameshort;               /* this should be moved to a dedicated function */
+                    //var group = dev+obj.property.groupnameshort;
+                    var prop  = obj.cpl.name;
+                    console.log("REMOVE PROP "+prop);
                     $( "#tab3"+ prop ).remove()
                     $( "#tab2"+ prop ).remove()
                     $( "#tab"+ prop ).remove()
                     $( "#P"+ prop ).children().remove();
                     $( "#P"+ prop ).remove();
                     
-                    if (!($("#U"+ group).children().length > 0)){
+                    /*if (!($("#U"+ group).children().length > 0)){
                         //console.log("REMOVE GROUP "+group);
                         $("#U"+ group ).remove();
                         $("#D"+ group ).remove();
@@ -127,7 +127,7 @@ function initWebSocket() {
                         $("#U"+ dev ).remove();
                         $("#D"+ dev ).remove();
                         $("#L"+ dev ).remove();
-                    }
+                    }*/
 
                 
             }
