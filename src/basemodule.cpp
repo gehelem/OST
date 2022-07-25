@@ -477,9 +477,18 @@ void Basemodule::deleteOstProperty(QString propertyName)
 
 }
 
-void Basemodule::setOstProperty(QString propertyName, QVariant propertyValue)
+void Basemodule::setOstProperty(const QString &pPropertyName, QVariant _value)
 {
+    BOOST_LOG_TRIVIAL(debug) << "setpropvalue  - " << _modulename.toStdString() << "-" << pPropertyName.toStdString();
+
     //setProperty(propertyName.toStdString().c_str(),propertyValue);
+    QVariantMap _prop=_ostproperties[pPropertyName].toMap();
+    _prop["value"]=_value;
+    _ostproperties[pPropertyName]=_prop;
+    QVariantMap _pComplementMap=QVariantMap();
+    _pComplementMap["name"]=_prop["name"];
+    QVariant _pComplement=_pComplementMap;
+    emit moduleEvent(&_modulename, "setpropvalue",_ostproperties[pPropertyName],_pComplement);
 }
 void Basemodule::createOstElement (QString propertyName, QString elementName, QString elementLabel)
 {
@@ -522,7 +531,7 @@ void Basemodule::loadPropertiesFromFile(QString fileName)
 
     QByteArray docByteArray = d.toJson(QJsonDocument::Compact);
     QString strJson = QLatin1String(docByteArray);
-    BOOST_LOG_TRIVIAL(debug) << "loadPropertiesFromFile  - " << _modulename.toStdString() << " - " << strJson.toStdString();
+    BOOST_LOG_TRIVIAL(debug) << "loadPropertiesFromFile  - " << _modulename.toStdString() << " - filename=" << fileName.toStdString() << " - " << strJson.toStdString();
 
 }
 

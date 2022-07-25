@@ -10,6 +10,7 @@ Dummy::Dummy(QString name,QString label)
     : Basemodule(name,label)
 {
 
+    Q_INIT_RESOURCE(dummy);
     _moduledescription="Dummy module to show what we can do";
 
     loadPropertiesFromFile(":dummy.json");
@@ -28,7 +29,7 @@ Dummy::Dummy(QString name,QString label)
 
 Dummy::~Dummy()
 {
-
+    Q_CLEANUP_RESOURCE(dummy);
 }
 
 //void Dummy::OnSetPropertyText(TextProperty* prop)

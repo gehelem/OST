@@ -80,9 +80,13 @@ target_link_libraries( ost
 ### modules libraries ##
 ########################
 # Dummy module
+list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.qrc)
+qt5_add_resources (RCC_SOURCES ${RESOURCES})
+
 add_library(ostdummy SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.cpp
+    ${RCC_SOURCES}
 )
 target_link_libraries(ostdummy PRIVATE
     indiclient
@@ -123,6 +127,7 @@ target_compile_definitions(ostdummy PRIVATE dummy_LIBRARY)
 add_library(ostindipanel SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel/indipanel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel/indipanel.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/resources/resources.qrc
 )
 target_link_libraries(ostindipanel PRIVATE
     indiclient
