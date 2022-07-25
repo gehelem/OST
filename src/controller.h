@@ -3,6 +3,7 @@
 #include <QCoreApplication>
 #include <QtSql/QSql>
 #include <QtSql/QSqlDatabase>
+#include <QtSql/QSqlQuery>
 //#include <QtSql/QSqlError>
 #include <boost/log/trivial.hpp>
 

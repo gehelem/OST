@@ -18,9 +18,22 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
     {
         QSqlDatabase db = QSqlDatabase::addDatabase(DRIVER);
         db.setDatabaseName(_dbpath+"ost.db" );
-        if(!db.open())
-                    //qDebug() << "dbOpen - ERROR: " << db.lastError().text();
-                    qDebug() << "dbOpen - ERROR: " << db.databaseName();// << db.lastError().text();
+        if(!db.open()) {
+            qDebug() << "dbOpen - ERROR: " << db.databaseName();// << db.lastError().text();
+        } else {
+            QString sql;
+            QFile file;
+            file.setFileName(":db.sql");
+            file.open(QIODevice::ReadOnly | QIODevice::Text);
+            sql = file.readAll();
+            file.close();
+            BOOST_LOG_TRIVIAL(debug) <<  "SQL :" << sql.toStdString();
+            QSqlQuery query(db);
+            query.prepare(sql);
+            if (!query.exec()) qDebug() << "DatabaseQuery - ERROR - ";// << query.lastError().text().toLocal8Bit().data();
+
+
+        }
     }
     else
         qDebug() << "DatabaseConnect - ERROR: no driver " << DRIVER << " available";
