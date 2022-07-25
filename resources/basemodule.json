@@ -6,6 +6,8 @@
         "propertyLabel": "BaseVersion"
     },
     "message": {
+        "devcat": "messages",
+        "group": "",
         "permission": 0,
         "propertyLabel": "Message"
     },

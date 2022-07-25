@@ -512,8 +512,13 @@ void Basemodule::loadPropertiesFromFile(QString fileName)
     val = file.readAll();
     file.close();
     QJsonDocument d = QJsonDocument::fromJson(val.toUtf8());
-    QJsonObject attributes = d.object();
-
+    QJsonObject props = d.object();
+    foreach(const QString& key, props.keys()) {
+        if (key!="baseVersion"&&key!="baseVersion")
+        {
+            _ostproperties[key]=props[key].toVariant();
+        }
+    }
 
     QByteArray docByteArray = d.toJson(QJsonDocument::Compact);
     QString strJson = QLatin1String(docByteArray);
