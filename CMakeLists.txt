@@ -58,6 +58,8 @@ add_executable( ost
     ${CMAKE_CURRENT_SOURCE_DIR}/src/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/maincontrol.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/maincontrol.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/resources/resources.qrc
+
 )
 target_link_libraries( ost
     indiclient

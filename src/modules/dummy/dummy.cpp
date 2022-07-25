@@ -12,7 +12,7 @@ Dummy::Dummy(QString name,QString label)
 
     _moduledescription="Dummy module to show what we can do";
 
-    loadAttributesFromFile("dummy.json");
+    loadPropertiesFromFile(":dummy.json");
 
     setOstProperty("moduleDescription","Dummy module to show what we can do");
 

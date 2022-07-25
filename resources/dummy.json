@@ -1,0 +1,42 @@
+{
+    "extextRO": {
+        "devcat": "Examples",
+        "elements": {
+            "extext1": {
+                "elementLabel": "Text 1"
+            },
+            "extext2": {
+                "elementLabel": "Text 2"
+            },
+            "extext3": {
+                "elementLabel": "Text 3"
+            },
+            "extext4": {
+                "elementLabel": "Text 4"
+            }
+        },
+        "group": "Texts",
+        "permission": 0,
+        "propertyLabel": "Text example - read only"
+    },
+    "extextRW": {
+        "devcat": "Examples",
+        "elements": {
+            "extext1": {
+                "elementLabel": "Text 1"
+            },
+            "extext2": {
+                "elementLabel": "Text 2"
+            },
+            "extext3": {
+                "elementLabel": "Text 3"
+            },
+            "extext4": {
+                "elementLabel": "Text 4"
+            }
+        },
+        "group": "Texts",
+        "permission": 2,
+        "propertyLabel": "Text example - read/write"
+    }
+}

@@ -78,7 +78,7 @@ class Basemodule : public QObject, public INDI::BaseClient
         void createOstElement (QString propertyName, QString elementName, QString elementLabel);
         void setOstProperty   (QString propertyName, QVariant propertyValue);
         void setOstElement    (QString propertyName, QString elementName, QVariant elementValue);
-        void loadAttributesFromFile(QString fileName);
+        void loadPropertiesFromFile(QString fileName);
         void saveAttributesToFile(QString fileName);
     private:
         QVariantMap _ostproperties;

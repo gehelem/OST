@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>basemodule.json</file>
+        <file>dummy.json</file>
+    </qresource>
+</RCC>

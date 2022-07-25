@@ -8,7 +8,7 @@ Basemodule::Basemodule(QString name,QString label)
 {
     setVerbose(false);
     _moduledescription="This is a base module, it shouldn't be used as is";
-    createOstProperty("moduleName","Module name",0,"info","");
+    /*createOstProperty("moduleName","Module name",0,"info","");
 
     createOstProperty("moduleLabel","Module label",0,"info","");
 
@@ -20,11 +20,11 @@ Basemodule::Basemodule(QString name,QString label)
 
     createOstProperty("indiConnected","Indi server connected",0,"info","");
 
-    createOstProperty("message","Message",0,"info","");
-
-    //QTimer *timer = new QTimer(this);
-    //connect(timer, &QTimer::timeout, this, &Basemodule::connectIndiTimer);
-    //timer->start(10000);
+    createOstProperty("message","Message",0,"info","");*/
+    loadPropertiesFromFile(":basemodule.json");
+    QTimer *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &Basemodule::connectIndiTimer);
+    timer->start(10000);
 
 
 
@@ -503,9 +503,8 @@ void Basemodule::setOstElement    (QString propertyName, QString elementName, QV
 
 
 
-void Basemodule::loadAttributesFromFile(QString fileName)
+void Basemodule::loadPropertiesFromFile(QString fileName)
 {
-    /*
     QString val;
     QFile file;
     file.setFileName(fileName);
@@ -514,13 +513,11 @@ void Basemodule::loadAttributesFromFile(QString fileName)
     file.close();
     QJsonDocument d = QJsonDocument::fromJson(val.toUtf8());
     QJsonObject attributes = d.object();
-    setProperty("ostproperties",attributes.toVariantMap());
+
 
     QByteArray docByteArray = d.toJson(QJsonDocument::Compact);
     QString strJson = QLatin1String(docByteArray);
-    BOOST_LOG_TRIVIAL(debug) << "loadAttributesFromFile  - " << _modulename.toStdString() << " - " << strJson.toStdString();
-    */
-
+    BOOST_LOG_TRIVIAL(debug) << "loadPropertiesFromFile  - " << _modulename.toStdString() << " - " << strJson.toStdString();
 
 }
 
