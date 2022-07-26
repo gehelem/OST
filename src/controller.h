@@ -11,6 +11,7 @@
 
 #include "wshandler.h"
 #include "maincontrol.h"
+#include "dbmanager.h"
 
 /*!
  * This class is the heart of OST
@@ -25,6 +26,7 @@ public:
     Controller(bool saveAllBlobs, const QString& host, int port,const QString& webroot,const QString& dbpath);
     ~Controller() override;
     WShandler   *wshandler;
+    DBManager   *dbmanager;
 public slots:
     void OnNewMessageSent(QString message, QString *pModulename, QString Device);
     void OnLoadModule(QString lib, QString label);

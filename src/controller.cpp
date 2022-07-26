@@ -13,32 +13,10 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
 
     //this->setParent(parent);
     Q_UNUSED(saveAllBlobs);
-    const QString DRIVER("QSQLITE");
-    if(QSqlDatabase::isDriverAvailable(DRIVER))
-    {
-        QSqlDatabase db = QSqlDatabase::addDatabase(DRIVER);
-        db.setDatabaseName(_dbpath+"ost.db" );
-        if(!db.open()) {
-            qDebug() << "dbOpen - ERROR: " << db.databaseName();// << db.lastError().text();
-        } else {
-            QString sql;
-            QFile file;
-            file.setFileName(":db.sql");
-            file.open(QIODevice::ReadOnly | QIODevice::Text);
-            sql = file.readAll();
-            file.close();
-            BOOST_LOG_TRIVIAL(debug) <<  "SQL :" << sql.toStdString();
-            QSqlQuery query(db);
-            query.prepare(sql);
-            if (!query.exec()) qDebug() << "DatabaseQuery - ERROR - ";// << query.lastError().text().toLocal8Bit().data();
 
-
-        }
-    }
-    else
-        qDebug() << "DatabaseConnect - ERROR: no driver " << DRIVER << " available";
 
     wshandler = new WShandler(this);
+    dbmanager = new DBManager(this,_dbpath);
 
     BOOST_LOG_TRIVIAL(debug) <<  "ApplicationDirPath :" << QCoreApplication::applicationDirPath().toStdString();
 

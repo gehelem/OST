@@ -54,6 +54,8 @@ add_executable( ost
     ${CMAKE_CURRENT_SOURCE_DIR}/src/controller.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/wshandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/wshandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/dbmanager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/dbmanager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/basemodule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/maincontrol.h
