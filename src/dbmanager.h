@@ -18,6 +18,7 @@ class DBManager : public QObject
 public:
     DBManager(QObject *parent,const QString &dbpath);
     ~DBManager();
+    void CreateDatabaseStructure();
 
 private:
     QString _dbpath;
