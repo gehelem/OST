@@ -18,9 +18,11 @@ class DBManager : public QObject
 public:
     DBManager(QObject *parent,const QString &dbpath);
     ~DBManager();
-    void CreateDatabaseStructure();
+     bool getProfile(QString moduleType,QString profileName, QVariantMap &result );
+     bool setProfile(QString moduleType,QString profileName, QVariantMap &profile );
 
 private:
+    void CreateDatabaseStructure();
     QString _dbpath;
     QSqlDatabase _db;
     QSqlQuery _query;
