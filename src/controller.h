@@ -30,7 +30,7 @@ public:
 public slots:
     void OnNewMessageSent(QString message, QString *pModulename, QString Device);
     void OnLoadModule(QString lib, QString label, QString profile);
-    void OnModuleEvent(QString *pModulename, const QString &eventType, QVariant pEventData, QVariant pComplement);
+    void OnModuleEvent(const QString &eventType, const QString &eventData);
 
 
 signals:

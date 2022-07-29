@@ -8,7 +8,6 @@ Basemodule::Basemodule(QString name, QString label, QString profile)
 {
     setVerbose(false);
     _moduletype="basemodule";
-    _moduledescription="This is a base module, it shouldn't be used as is";
     /*createOstProperty("moduleName","Module name",0,"info","");
 
     createOstProperty("moduleLabel","Module label",0,"info","");
@@ -78,15 +77,7 @@ void Basemodule::sendMessage(QString message)
 }
 void Basemodule::OnDumpAsked()
 {
-    usleep(200*1000);
-    //emit moduleDumped2(property("ostproperties"),&_modulename,&_modulelabel,&_moduledescription);
-    QVariant _pData=_ostproperties;
-    QVariantMap _pComplementMap;
-    _pComplementMap["label"]=_modulelabel;
-    _pComplementMap["description"]=_moduledescription;
-    QVariant _pComplement=_pComplementMap;
-
-    emit moduleEvent(&_modulename,"moduledump",_pData,_pComplement);
+    emit moduleEvent("moduledump","*");
 }
 
 bool Basemodule::disconnectIndi(void)
@@ -460,20 +451,13 @@ void Basemodule::createOstProperty(const QString &pPropertyName, const QString &
     _prop["group"]=pPropertyGroup;
     _prop["name"]=pPropertyName;
     _ostproperties[pPropertyName]=_prop;
-    QVariantMap _pComplementMap=QVariantMap();
-    _pComplementMap["name"]=_prop["name"];
-    QVariant _pComplement=_pComplementMap;
-    if (!_pComplement.canConvert<QVariantMap>()) BOOST_LOG_TRIVIAL(debug) << " KOKOKOKO";
-    emit moduleEvent(&_modulename, "addprop",_ostproperties[pPropertyName],_pComplement);
+    emit moduleEvent("addprop",pPropertyName);
 }
 void Basemodule::deleteOstProperty(QString propertyName)
 {
     BOOST_LOG_TRIVIAL(debug) << "deleteOstProperty  - " << _modulename.toStdString() << "-" << propertyName.toStdString();
     _ostproperties.remove(propertyName);
-    QVariantMap _pComplementMap=QVariantMap();
-    _pComplementMap["name"]=propertyName;
-    QVariant _pComplement=_pComplementMap;
-    emit moduleEvent(&_modulename, "delprop",_pComplement,_pComplement);
+    emit moduleEvent("delprop",propertyName);
 
 }
 
@@ -488,7 +472,7 @@ void Basemodule::setOstProperty(const QString &pPropertyName, QVariant _value)
     QVariantMap _pComplementMap=QVariantMap();
     _pComplementMap["name"]=_prop["name"];
     QVariant _pComplement=_pComplementMap;
-    emit moduleEvent(&_modulename, "setpropvalue",_ostproperties[pPropertyName],_pComplement);
+    emit moduleEvent("setpropvalue",pPropertyName);
 }
 void Basemodule::createOstElement (QString propertyName, QString elementName, QString elementLabel)
 {
@@ -557,13 +541,5 @@ void Basemodule::saveAttributesToFile(QString fileName)
 }
 void Basemodule::requestProfile(QString profileName)
 {
-    BOOST_LOG_TRIVIAL(debug) << "profilerequest  - " << _modulename.toStdString() << "-" << profileName.toStdString();
-
-    //setProperty(propertyName.toStdString().c_str(),propertyValue);
-    QVariantMap _dta=QVariantMap();
-    QVariantMap _cpl=QVariantMap();
-    _cpl["moduletype"]=_moduletype;
-    _cpl["profilename"]=profileName;
-    //QVariant _cpl=_pComplementMap;
-    emit moduleEvent(&_modulename, "profilerequest",_dta,_cpl);
+    emit moduleEvent("profilerequest",profileName);
 }

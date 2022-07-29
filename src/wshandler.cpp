@@ -1,7 +1,10 @@
 #include <QCoreApplication>
 #include <QtCore>
 #include "wshandler.h"
-#include <boost/log/trivial.hpp>/*!
+#include <boost/log/trivial.hpp>
+#include "basemodule.h"
+/*!
+
  * ... ...
  */
 WShandler::WShandler(QObject *parent)
@@ -122,18 +125,22 @@ void WShandler::socketDisconnected()
     }
 }
 
-void WShandler::OnModuleEvent(QString *pModulename, const QString &eventType, QVariant pEventData, QVariant pComplement)
+void WShandler::OnModuleEvent(const QString &eventType, const QString &eventData)
 {
+        Basemodule *mod = qobject_cast<Basemodule *>(sender());
+
         QJsonObject  obj;
         obj["evt"]=eventType;
-        obj["mod"]=*pModulename;
-        if (pEventData.canConvert<QVariantMap>()) {
-        //if (strcmp(pEventData->typeName(),"QVariantMap")==0) {
-            obj["dta"]=QJsonObject::fromVariantMap(pEventData.toMap());
+        obj["mod"]=mod->getName();
+        if (eventType=="moduledump") {
+            obj["dta"]=QJsonObject::fromVariantMap(mod->getOstProperties());
         }
-        if (pComplement.canConvert<QVariantMap>()) {
-        //if (strcmp(pComplement->typeName(),"QVariantMap")==0) {
-            obj["cpl"]=QJsonObject::fromVariantMap(pComplement.toMap());
+        if (eventType=="addprop") {
+            obj["dta"]=QJsonObject::fromVariantMap(mod->getOstProperty(eventData.toStdString().c_str()));
         }
+        if (eventType=="delprop") {
+            obj["dta"]=eventData;
+        }
+
         sendJsonMessage(obj);
 }

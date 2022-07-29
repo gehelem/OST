@@ -159,57 +159,44 @@ void Controller::OnLoadModule(QString lib, QString label,QString profile)
     LoadModule(QCoreApplication::applicationDirPath()+"/"+lib,name,label,profile);
 }
 
-void Controller::OnModuleEvent(QString *pModulename, const QString &eventType, QVariant pEventData, QVariant pComplement)
+void Controller::OnModuleEvent(const QString &eventType, const QString &eventData)
 {
     Basemodule *mod = qobject_cast<Basemodule *>(sender());
-    BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - SENDER = " << mod->getDescription().toStdString();
+    BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - SENDER = " << mod->getName().toStdString();
     BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - EVENT TYPE = " <<  eventType.toStdString();
-    if (!pEventData.isValid()) {
-       BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - INVALID DATA - " << eventType.toStdString() << " - " << pModulename->toStdString();
-       return;
+
+    //if (eventType=="profilerequest") {
+    //    QVariantMap pro;
+    //    if (!dbmanager->getProfile(pComplement.toMap()["moduletype"].toString(),pComplement.toMap()["profilename"].toString(),pro)) {
+    //        BOOST_LOG_TRIVIAL(debug) <<  "getProfile error";
+    //    } else {
+    //        QJsonObject  obj2=QJsonObject::fromVariantMap(pro);
+    //        QJsonDocument doc2(obj2);
+    //        QByteArray docByteArray2 = doc2.toJson(QJsonDocument::Compact);
+    //        QString strJson2 = QLatin1String(docByteArray2);
+    //        BOOST_LOG_TRIVIAL(debug) <<  "getProfile result =" << strJson2.toStdString();
+    //    }
+    //
+    //}
+
+
+    QJsonObject obj;
+    obj["evt"]=eventType;
+    obj["mod"]=mod->getName();
+    if (eventType=="moduledump") {
+        obj["dta"]=QJsonObject::fromVariantMap(mod->getOstProperties());
     }
-    if (eventType=="profilerequest") {
-        QVariantMap pro;
-        if (!dbmanager->getProfile(pComplement.toMap()["moduletype"].toString(),pComplement.toMap()["profilename"].toString(),pro)) {
-            BOOST_LOG_TRIVIAL(debug) <<  "getProfile error";
-        } else {
-            QJsonObject  obj2=QJsonObject::fromVariantMap(pro);
-            QJsonDocument doc2(obj2);
-            QByteArray docByteArray2 = doc2.toJson(QJsonDocument::Compact);
-            QString strJson2 = QLatin1String(docByteArray2);
-            BOOST_LOG_TRIVIAL(debug) <<  "getProfile result =" << strJson2.toStdString();
-        }
-
+    if (eventType=="addprop") {
+        obj["dta"]=QJsonObject::fromVariantMap(mod->getOstProperty(eventData.toStdString().c_str()));
+    }
+    if (eventType=="delprop") {
+        obj["dta"]=eventData;
     }
 
+    QJsonDocument doc(obj);
+    QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
+    QString strJson = QLatin1String(docByteArray);
+    BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - " << mod->getName().toStdString() << " - " << eventType.toStdString() << " - " << strJson.toStdString();
 
-    if (strcmp(pEventData.typeName(),"QVariantMap")==0) {
-        //BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - " << pEventData->typeName() << "-" << pFree->toStdString() << "-" << pModulename->toStdString() << "-" << eventType->toStdString();
-        QJsonObject obj;
-        obj["evt"]=eventType;
-        obj["mod"]=*pModulename;
-        if (pEventData.canConvert<QVariantMap>()) {
-        //if (strcmp(pEventData->typeName(),"QVariantMap")==0) {
-            obj["dta"]=QJsonObject::fromVariantMap(pEventData.toMap());
-        }
-        if (pComplement.canConvert<QVariantMap>()) {
-        //if (strcmp(pComplement->typeName(),"QVariantMap")==0) {
-            obj["cpl"]=QJsonObject::fromVariantMap(pComplement.toMap());
-        } else {
-            BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - INVALID COMPLEMENT - " << eventType.toStdString() << " - " << pModulename->toStdString();
-        }
-        QJsonDocument doc(obj);
-        QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
-        QString strJson = QLatin1String(docByteArray);
-        BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - " << pModulename->toStdString() << " - " << eventType.toStdString() << " - " << strJson.toStdString();
-        //switch eventType {
-        //    case:"propertyCreated" {
-        //       BOOST_LOG_TRIVIAL(debug) << "OnDynamicPropertyChangeEvent - " ;
-        //    }
-        //
-        //}
 
-    } else {
-        BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - OTHER FORMAT - " << pEventData.typeName();
-    }
 }

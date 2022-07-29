@@ -51,7 +51,7 @@ function initWebSocket() {
             //if ((obj.event == 'updateproperty')&&(obj.property.propname=='grid')) {console.log(obj)};
             if (obj.evt == 'moduledump') {
                 m=obj.mod;
-                l=obj.cpl.label;
+                l=obj.mod;
                 buildmodule(m,l);
                
                 var properties = obj.dta;

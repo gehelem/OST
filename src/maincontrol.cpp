@@ -5,7 +5,6 @@ MainControl::MainControl(QString name, QString label,QString profile)
     : Basemodule(name,label,profile)
 {
 
-    _moduledescription="Main control module - and so on";
 
 
     QDir directory(QCoreApplication::applicationDirPath());

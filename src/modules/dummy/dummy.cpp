@@ -12,7 +12,6 @@ Dummy::Dummy(QString name, QString label, QString profile)
 
     Q_INIT_RESOURCE(dummy);
     _moduletype="dummy";
-    _moduledescription="Dummy module to show what we can do";
 
     loadPropertiesFromFile(":dummy.json");
 

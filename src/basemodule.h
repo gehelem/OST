@@ -26,14 +26,12 @@ class Basemodule : public QObject, public INDI::BaseClient
         QString getWebroot(void) {return _webroot;}
         bool connectIndi(void);
         void setBlobMode(void);
-        QString getDescription(void) {return _moduledescription;}
-        QVariantMap getProperties(void) {return _ostproperties;}
-        QVariantMap getProperty(QString name) {return _ostproperties[name].toMap();}
+        QString getName(void) {return _modulename;}
+        QString getLabel(void) {return _modulelabel;}
+        QVariantMap getOstProperties(void) {return _ostproperties;}
+        QVariantMap getOstProperty(QString name) {return _ostproperties[name].toMap();}
 
         QString _moduletype;
-        QString _modulename;
-        QString _modulelabel;
-        QString _moduledescription;
         QString _webroot;
 
     public slots:
@@ -86,10 +84,13 @@ class Basemodule : public QObject, public INDI::BaseClient
         void saveAttributesToFile(QString fileName);
     private:
         QVariantMap _ostproperties;
+        QString _modulename;
+        QString _modulelabel;
+
     signals:
         void moduleDumped2(QVariant props, QString* pModulename, QString* pModulelabel, QString* pModuledescription);
         void newMessageSent(QString message,      QString* pModulename, QString Device);
-        void moduleEvent(QString *pModulename, const QString &eventType, QVariant pEventData, QVariant pComplement);
+        void moduleEvent(const QString &eventType, const QString  &eventData);
 
         void finished();
         void statusChanged(const QString &newStatus);
