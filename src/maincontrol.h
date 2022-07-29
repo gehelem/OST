@@ -7,7 +7,7 @@ class MainControl : public Basemodule
     Q_OBJECT
 
     public:
-        MainControl(QString name,QString label);
+        MainControl(QString name,QString label,QString profile);
         ~MainControl();
         void newProperty(INDI::Property*) override;
     public slots:

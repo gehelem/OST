@@ -2,11 +2,12 @@
 #include <basedevice.h>
 #include "basemodule.h"
 
-Basemodule::Basemodule(QString name,QString label)
+Basemodule::Basemodule(QString name, QString label, QString profile)
     :_modulename(name),
       _modulelabel(label)
 {
     setVerbose(false);
+    _moduletype="basemodule";
     _moduledescription="This is a base module, it shouldn't be used as is";
     /*createOstProperty("moduleName","Module name",0,"info","");
 
@@ -86,7 +87,6 @@ void Basemodule::OnDumpAsked()
     QVariant _pComplement=_pComplementMap;
 
     emit moduleEvent(&_modulename,"moduledump",_pData,_pComplement);
-
 }
 
 bool Basemodule::disconnectIndi(void)
@@ -554,4 +554,16 @@ void Basemodule::saveAttributesToFile(QString fileName)
     jsonFile.write(doc.toJson());
     jsonFile.close();
 
+}
+void Basemodule::requestProfile(QString profileName)
+{
+    BOOST_LOG_TRIVIAL(debug) << "profilerequest  - " << _modulename.toStdString() << "-" << profileName.toStdString();
+
+    //setProperty(propertyName.toStdString().c_str(),propertyValue);
+    QVariantMap _dta=QVariantMap();
+    QVariantMap _cpl=QVariantMap();
+    _cpl["moduletype"]=_moduletype;
+    _cpl["profilename"]=profileName;
+    //QVariant _cpl=_pComplementMap;
+    emit moduleEvent(&_modulename, "profilerequest",_dta,_cpl);
 }

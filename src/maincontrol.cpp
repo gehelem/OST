@@ -1,8 +1,8 @@
 #include "maincontrol.h"
 
 
-MainControl::MainControl(QString name, QString label)
-    : Basemodule(name,label)
+MainControl::MainControl(QString name, QString label,QString profile)
+    : Basemodule(name,label,profile)
 {
 
     _moduledescription="Main control module - and so on";

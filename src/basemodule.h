@@ -17,20 +17,24 @@ class Basemodule : public QObject, public INDI::BaseClient
     Q_OBJECT
 
     public:
-        Basemodule(QString name, QString label);
+        Basemodule(QString name, QString label,QString profile);
         ~Basemodule() = default;
         void setHostport(QString host, int port);
         void setWebroot(QString webroot) {_webroot = webroot;}
+        void requestProfile(QString profileName);
+
         QString getWebroot(void) {return _webroot;}
         bool connectIndi(void);
         void setBlobMode(void);
         QString getDescription(void) {return _moduledescription;}
+        QVariantMap getProperties(void) {return _ostproperties;}
+        QVariantMap getProperty(QString name) {return _ostproperties[name].toMap();}
 
+        QString _moduletype;
         QString _modulename;
         QString _modulelabel;
         QString _moduledescription;
         QString _webroot;
-
 
     public slots:
         void connectIndiTimer(void);

@@ -14,7 +14,7 @@ class MODULE_INIT IndiPanel : public Basemodule
     Q_OBJECT
 
     public:
-        IndiPanel(QString name,QString label);
+        IndiPanel(QString name,QString label,QString profile);
         ~IndiPanel();
 
     public slots:
@@ -34,6 +34,6 @@ class MODULE_INIT IndiPanel : public Basemodule
 
 };
 
-extern "C" MODULE_INIT IndiPanel *initialize(QString name,QString label);
+extern "C" MODULE_INIT IndiPanel *initialize(QString name, QString label, QString profile);
 
 #endif

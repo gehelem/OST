@@ -13,13 +13,13 @@ class MODULE_INIT Dummy : public Basemodule
     Q_OBJECT
 
     public:
-        Dummy(QString name,QString label);
+        Dummy(QString name,QString label,QString profile);
         ~Dummy();
 
     public slots:
         //void OnSetPropertyText(TextProperty* prop) override;
 };
 
-extern "C" MODULE_INIT Dummy *initialize(QString name,QString label);
+extern "C" MODULE_INIT Dummy *initialize(QString name,QString label,QString profile);
 
 #endif

@@ -29,7 +29,7 @@ public:
     DBManager   *dbmanager;
 public slots:
     void OnNewMessageSent(QString message, QString *pModulename, QString Device);
-    void OnLoadModule(QString lib, QString label);
+    void OnLoadModule(QString lib, QString label, QString profile);
     void OnModuleEvent(QString *pModulename, const QString &eventType, QVariant pEventData, QVariant pComplement);
 
 
@@ -37,7 +37,8 @@ signals:
     void closed();
     void dumpAsked(void);
 private:
-    void LoadModule(QString lib,QString name,QString label);
+    void LoadModule(QString lib, QString name, QString label, QString profile);
+
     QString _indihost;
     int _indiport;
     QString _webroot;
