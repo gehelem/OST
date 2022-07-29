@@ -108,7 +108,7 @@ function initWebSocket() {
             if (obj.evt == 'delprop') { 
                     //var dev   = obj.module+obj.property.devicenameshort;               /* this should be moved to a dedicated function */
                     //var group = dev+obj.property.groupnameshort;
-                    var prop  = obj.cpl.name;
+                    var prop  = obj.dta;
                     console.log("REMOVE PROP "+prop);
                     $( "#tab3"+ prop ).remove()
                     $( "#tab2"+ prop ).remove()
