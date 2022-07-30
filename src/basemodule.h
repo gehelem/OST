@@ -37,7 +37,7 @@ class Basemodule : public QObject, public INDI::BaseClient
     public slots:
         void connectIndiTimer(void);
         void OnDumpAsked(void);
-        void OnExternalEvent(const QString &eventType, const QString &eventData);
+        virtual void OnExternalEvent(const QString &eventType, const QString &eventData){Q_UNUSED(eventType);Q_UNUSED(eventData);}
 
         //virtual void OnSetPropertyText(TextProperty* prop) {
         //    if (!(prop->getModuleName()==_modulename)) return;

@@ -17,7 +17,8 @@ class MODULE_INIT Dummy : public Basemodule
         ~Dummy();
 
     public slots:
-        //void OnSetPropertyText(TextProperty* prop) override;
+        void OnExternalEvent(const QString &eventType, const QString &eventData) override;
+
 };
 
 extern "C" MODULE_INIT Dummy *initialize(QString name,QString label,QString profile);

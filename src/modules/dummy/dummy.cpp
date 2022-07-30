@@ -32,6 +32,10 @@ Dummy::~Dummy()
     Q_CLEANUP_RESOURCE(dummy);
 }
 
-//void Dummy::OnSetPropertyText(TextProperty* prop)
-//{
-//}
+void Dummy::OnExternalEvent(const QString &eventType, const QString &eventData)
+{
+    Basemodule *mod = qobject_cast<Basemodule *>(sender());
+
+    BOOST_LOG_TRIVIAL(debug) << "OnExternalEvent  with override - recv = " << getName().toStdString() << " sender = " << mod->getName().toStdString();
+
+}
