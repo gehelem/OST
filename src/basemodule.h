@@ -37,6 +37,8 @@ class Basemodule : public QObject, public INDI::BaseClient
     public slots:
         void connectIndiTimer(void);
         void OnDumpAsked(void);
+        void OnExternalEvent(const QString &eventType, const QString &eventData);
+
         //virtual void OnSetPropertyText(TextProperty* prop) {
         //    if (!(prop->getModuleName()==_modulename)) return;
         //    BOOST_LOG_TRIVIAL(debug) << _modulename.toStdString() << " : recv setprop text : " << prop->getLabel().toStdString();

@@ -120,14 +120,24 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
         if (createmodule) {
             Basemodule *mod = createmodule(name,label,profile);
             if (mod) {
+                mod->setParent(this);
                 mod->setHostport(_indihost,_indiport);
                 mod->connectIndi();
                 mod->setWebroot(_webroot);
-                //mod->getProfile=&DBManager::getProfile;
-                //mod->setProfile=&(this->setProfile);
+                mod->setObjectName(name);
                 connect(mod,&Basemodule::moduleEvent, this,&Controller::OnModuleEvent);
                 connect(mod,&Basemodule::moduleEvent, wshandler,&WShandler::OnModuleEvent);
                 connect(wshandler,&WShandler::dumpAsked,mod,&Basemodule::OnDumpAsked);
+
+                QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(),Qt::FindChildrenRecursively);
+                for (Basemodule *othermodule : othermodules) {
+                    //BOOST_LOG_TRIVIAL(debug) << "child= " << othermodule->objectName().toStdString();
+                    if (othermodule->getName()!=mod->getName()) {
+                        connect(othermodule,&Basemodule::moduleEvent, mod,&Basemodule::OnExternalEvent);
+                        connect(mod,&Basemodule::moduleEvent, othermodule,&Basemodule::OnExternalEvent);
+
+                    }
+                }
             }
         } else {
             BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library";
@@ -162,8 +172,8 @@ void Controller::OnLoadModule(QString lib, QString label,QString profile)
 void Controller::OnModuleEvent(const QString &eventType, const QString &eventData)
 {
     Basemodule *mod = qobject_cast<Basemodule *>(sender());
-    BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - SENDER = " << mod->getName().toStdString();
-    BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - EVENT TYPE = " <<  eventType.toStdString();
+    //BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - SENDER = " << mod->getName().toStdString();
+    //BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - EVENT TYPE = " <<  eventType.toStdString();
 
     //if (eventType=="profilerequest") {
     //    QVariantMap pro;

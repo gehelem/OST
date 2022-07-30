@@ -543,3 +543,10 @@ void Basemodule::requestProfile(QString profileName)
 {
     emit moduleEvent("profilerequest",profileName);
 }
+void Basemodule::OnExternalEvent(const QString &eventType, const QString &eventData)
+{
+    Basemodule *mod = qobject_cast<Basemodule *>(sender());
+
+    BOOST_LOG_TRIVIAL(debug) << "OnExternalEvent  - recv = " << _modulename.toStdString() << " sender = " << mod->getName().toStdString();
+
+}
