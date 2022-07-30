@@ -42,7 +42,7 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostpolar.so","polar1","Polar assistant");
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focus1","Focus assistant");
     LoadModule(QCoreApplication::applicationDirPath()+"/libostdummy.so","dummy1","Demo module","default");
-    LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel","indi control panel","default");
+    //LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel","indi control panel","default");
 
 
 
@@ -138,6 +138,10 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
 
                     }
                 }
+                QVariantMap prof;
+                dbmanager->getProfile(mod->_moduletype,profile,prof);
+                mod->setProfile(prof);
+
             }
         } else {
             BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library";

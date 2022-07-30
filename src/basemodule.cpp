@@ -543,3 +543,36 @@ void Basemodule::requestProfile(QString profileName)
 {
     emit moduleEvent("profilerequest",profileName);
 }
+
+void Basemodule::setProfile(QVariantMap profiledata)
+{
+    BOOST_LOG_TRIVIAL(debug) << "setProfile " << _modulename.toStdString() << "-size= " << profiledata.size();
+    foreach(const QString& key, profiledata.keys()) {
+        if (_ostproperties.contains(key)) {
+            BOOST_LOG_TRIVIAL(debug) << "setProfile prop" << _modulename.toStdString() << "-key= " << key.toStdString();
+            QVariantMap prop = _ostproperties[key].toMap();
+            QVariantMap data= profiledata[key].toMap();
+            if (prop.contains("hasprofile")&&data.contains("value")) {
+                prop["value"]=data["value"];
+            }
+            if (prop.contains("hasprofile")&&data.contains("elements")) {
+                QVariantMap eltdata= data["elements"].toMap();
+                QVariantMap eltprop= prop["elements"].toMap();
+                foreach(const QString& eltkey, eltdata.keys()) {
+                    BOOST_LOG_TRIVIAL(debug) << "setProfile prop" << _modulename.toStdString() << "-key= " << key.toStdString() << "-element= " << eltkey.toStdString();
+                    QVariantMap eeed=eltdata[eltkey].toMap();
+                    QVariantMap eeep=eltprop[eltkey].toMap();
+                    if (eeed.contains("value")) {
+                        eeep["value"]=eeed["value"];
+                    }
+                    eltprop[eltkey]=eeep;
+                }
+                prop["elements"]=eltprop;
+
+            }
+            _ostproperties[key]=prop;
+
+        }
+    }
+
+}

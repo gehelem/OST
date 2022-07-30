@@ -20,6 +20,7 @@
         "propertyLabel": "Text example - read only"
     },
     "extextRW": {
+        "hasprofile":true,
         "devcat": "Examples",
         "elements": {
             "extext1": {

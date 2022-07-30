@@ -22,6 +22,8 @@ class Basemodule : public QObject, public INDI::BaseClient
         void setHostport(QString host, int port);
         void setWebroot(QString webroot) {_webroot = webroot;}
         void requestProfile(QString profileName);
+        void setProfile(QVariantMap profiledata);
+
 
         QString getWebroot(void) {return _webroot;}
         bool connectIndi(void);
