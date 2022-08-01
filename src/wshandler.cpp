@@ -103,6 +103,7 @@ void WShandler::sendJsonMessage(QJsonObject json)
     //QString strJson(jsondoc.toJson(QJsonDocument::Indented)); // version lisible
     QString strJson(jsondoc.toJson(QJsonDocument::Compact)); // version compactée
     sendmessage(strJson);
+    BOOST_LOG_TRIVIAL(debug) << "WS handler sends : " << strJson.toStdString();
 }
 
 void WShandler::processBinaryMessage(QByteArray message)
@@ -136,10 +137,32 @@ void WShandler::OnModuleEvent(const QString &eventType, const QString &eventData
             obj["dta"]=QJsonObject::fromVariantMap(mod->getOstProperties());
         }
         if (eventType=="addprop") {
-            obj["dta"]=QJsonObject::fromVariantMap(mod->getOstProperty(eventData.toStdString().c_str()));
+            QJsonObject  property;
+            property[eventData]=QJsonObject::fromVariantMap(mod->getOstProperty(eventData.toStdString().c_str()));
+            obj["dta"]=property;
         }
         if (eventType=="delprop") {
             obj["dta"]=eventData;
+        }
+        if (eventType=="setpropvalue") {
+           QVariantMap prop = mod->getOstProperty(eventData.toStdString().c_str());
+           QVariantMap values;
+           if (prop.contains("value")) {
+               values["value"]=prop["value"];
+           }
+           if (prop.contains("elements")) {
+               QVariantMap elements;
+               foreach(const QString& key, prop["elements"].toMap().keys()) {
+                   QVariantMap element;
+                   element["value"]=prop["elements"].toMap()[key].toMap()["value"];
+                   elements[key]=element;
+               }
+               values["elements"]=elements;
+            }
+            QJsonObject  property;
+            property[eventData]=QJsonObject::fromVariantMap(values);
+            obj["dta"]=property;
+
         }
 
         sendJsonMessage(obj);

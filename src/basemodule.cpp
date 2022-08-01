@@ -469,9 +469,6 @@ void Basemodule::setOstProperty(const QString &pPropertyName, QVariant _value)
     QVariantMap _prop=_ostproperties[pPropertyName].toMap();
     _prop["value"]=_value;
     _ostproperties[pPropertyName]=_prop;
-    QVariantMap _pComplementMap=QVariantMap();
-    _pComplementMap["name"]=_prop["name"];
-    QVariant _pComplement=_pComplementMap;
     emit moduleEvent("setpropvalue",pPropertyName);
 }
 void Basemodule::createOstElement (QString propertyName, QString elementName, QString elementLabel)
@@ -489,9 +486,18 @@ void Basemodule::createOstElement (QString propertyName, QString elementName, QS
 }
 void Basemodule::setOstElement    (QString propertyName, QString elementName, QVariant elementValue)
 {
-     //QVariantMap prop= property(propertyName.toStdString().c_str()).toMap();
-     //prop[elementName]=elementValue;
-     //setProperty(propertyName.toStdString().c_str(),prop);
+    QVariantMap _prop=_ostproperties[propertyName].toMap();
+    if (_prop.contains("elements")) {
+        if (_prop["elements"].toMap().contains(elementName)) {
+            QVariantMap elements=_prop["elements"].toMap();
+            QVariantMap element=elements[elementName].toMap();
+            element["value"]=elementValue;
+            elements[elementName]=element;
+            _prop["elements"]=elements;
+        }
+    }
+    _ostproperties[propertyName]=_prop;
+    emit moduleEvent("setpropvalue",propertyName);
 }
 
 
@@ -546,33 +552,21 @@ void Basemodule::requestProfile(QString profileName)
 
 void Basemodule::setProfile(QVariantMap profiledata)
 {
-    BOOST_LOG_TRIVIAL(debug) << "setProfile " << _modulename.toStdString() << "-size= " << profiledata.size();
     foreach(const QString& key, profiledata.keys()) {
         if (_ostproperties.contains(key)) {
-            BOOST_LOG_TRIVIAL(debug) << "setProfile prop" << _modulename.toStdString() << "-key= " << key.toStdString();
-            QVariantMap prop = _ostproperties[key].toMap();
             QVariantMap data= profiledata[key].toMap();
-            if (prop.contains("hasprofile")&&data.contains("value")) {
-                prop["value"]=data["value"];
-            }
-            if (prop.contains("hasprofile")&&data.contains("elements")) {
-                QVariantMap eltdata= data["elements"].toMap();
-                QVariantMap eltprop= prop["elements"].toMap();
-                foreach(const QString& eltkey, eltdata.keys()) {
-                    BOOST_LOG_TRIVIAL(debug) << "setProfile prop" << _modulename.toStdString() << "-key= " << key.toStdString() << "-element= " << eltkey.toStdString();
-                    QVariantMap eeed=eltdata[eltkey].toMap();
-                    QVariantMap eeep=eltprop[eltkey].toMap();
-                    if (eeed.contains("value")) {
-                        eeep["value"]=eeed["value"];
+            if (_ostproperties[key].toMap().contains("hasprofile")) {
+                setOstProperty(key,data["value"]);
+                if (_ostproperties[key].toMap().contains("elements")
+                    &&data.contains("elements")) {
+                    foreach(const QString& eltkey, profiledata[key].toMap()["elements"].toMap().keys()) {
+                        setOstElement(key,eltkey,profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["value"]);
                     }
-                    eltprop[eltkey]=eeep;
+
                 }
-                prop["elements"]=eltprop;
-
             }
-            _ostproperties[key]=prop;
+         }
 
-        }
     }
 
 }

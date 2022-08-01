@@ -200,17 +200,18 @@ void Controller::OnModuleEvent(const QString &eventType, const QString &eventDat
     if (eventType=="moduledump") {
         obj["dta"]=QJsonObject::fromVariantMap(mod->getOstProperties());
     }
-    if (eventType=="addprop") {
+    if (eventType=="addprop"||eventType=="setpropvalue") {
         obj["dta"]=QJsonObject::fromVariantMap(mod->getOstProperty(eventData.toStdString().c_str()));
     }
     if (eventType=="delprop") {
         obj["dta"]=eventData;
     }
 
+
     QJsonDocument doc(obj);
     QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
     QString strJson = QLatin1String(docByteArray);
-    BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - " << mod->getName().toStdString() << " - " << eventType.toStdString() << " - " << strJson.toStdString();
+    //BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - " << mod->getName().toStdString() << " - " << eventType.toStdString() << " - " << strJson.toStdString();
 
 
 }
