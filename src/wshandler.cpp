@@ -136,7 +136,7 @@ void WShandler::OnModuleEvent(const QString &eventType, const QString &eventData
         if (eventType=="moduledump") {
             obj["dta"]=QJsonObject::fromVariantMap(mod->getOstProperties());
         }
-        if (eventType=="addprop") {
+        if (eventType=="addprop"||eventType=="addelt") {
             QJsonObject  property;
             property[eventData]=QJsonObject::fromVariantMap(mod->getOstProperty(eventData.toStdString().c_str()));
             obj["dta"]=property;
