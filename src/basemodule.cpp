@@ -461,7 +461,7 @@ void Basemodule::deleteOstProperty(QString propertyName)
 
 }
 
-void Basemodule::setOstProperty(const QString &pPropertyName, QVariant _value)
+void Basemodule::setOstProperty(const QString &pPropertyName, QVariant _value, bool emitEvent)
 {
     BOOST_LOG_TRIVIAL(debug) << "setpropvalue  - " << _modulename.toStdString() << "-" << pPropertyName.toStdString();
 
@@ -469,7 +469,7 @@ void Basemodule::setOstProperty(const QString &pPropertyName, QVariant _value)
     QVariantMap _prop=_ostproperties[pPropertyName].toMap();
     _prop["value"]=_value;
     _ostproperties[pPropertyName]=_prop;
-    emit moduleEvent("setpropvalue",pPropertyName);
+    if (emitEvent) emit moduleEvent("setpropvalue",pPropertyName);
 }
 void Basemodule::createOstElement (QString propertyName, QString elementName, QString elementLabel)
 {
@@ -482,7 +482,7 @@ void Basemodule::createOstElement (QString propertyName, QString elementName, QS
     _ostproperties[propertyName]=_prop;
     emit moduleEvent("addelt",propertyName);
 }
-void Basemodule::setOstElement    (QString propertyName, QString elementName, QVariant elementValue)
+void Basemodule::setOstElement    (QString propertyName, QString elementName, QVariant elementValue, bool emitEvent)
 {
     QVariantMap _prop=_ostproperties[propertyName].toMap();
     if (_prop.contains("elements")) {
@@ -495,7 +495,7 @@ void Basemodule::setOstElement    (QString propertyName, QString elementName, QV
         }
     }
     _ostproperties[propertyName]=_prop;
-    emit moduleEvent("setpropvalue",propertyName);
+    if (emitEvent) emit moduleEvent("setpropvalue",propertyName);
 }
 
 
@@ -554,11 +554,11 @@ void Basemodule::setProfile(QVariantMap profiledata)
         if (_ostproperties.contains(key)) {
             QVariantMap data= profiledata[key].toMap();
             if (_ostproperties[key].toMap().contains("hasprofile")) {
-                setOstProperty(key,data["value"]);
+                setOstProperty(key,data["value"],true);
                 if (_ostproperties[key].toMap().contains("elements")
                     &&data.contains("elements")) {
                     foreach(const QString& eltkey, profiledata[key].toMap()["elements"].toMap().keys()) {
-                        setOstElement(key,eltkey,profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["value"]);
+                        setOstElement(key,eltkey,profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["value"],true);
                     }
 
                 }

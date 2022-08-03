@@ -82,8 +82,8 @@ class Basemodule : public QObject, public INDI::BaseClient
         void deleteOstProperty(QString propertyName);
 
         void createOstElement (QString propertyName, QString elementName, QString elementLabel);
-        void setOstProperty   (const QString &pPropertyName, QVariant _value);
-        void setOstElement    (QString propertyName, QString elementName, QVariant elementValue);
+        void setOstProperty   (const QString &pPropertyName, QVariant _value,bool emitEvent);
+        void setOstElement    (QString propertyName, QString elementName, QVariant elementValue, bool emitEvent);
         void loadPropertiesFromFile(QString fileName);
         void saveAttributesToFile(QString fileName);
     private:

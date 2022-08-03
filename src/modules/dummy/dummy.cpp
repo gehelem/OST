@@ -15,13 +15,13 @@ Dummy::Dummy(QString name, QString label, QString profile)
 
     loadPropertiesFromFile(":dummy.json");
 
-    setOstProperty("moduleDescription","Dummy module to show what we can do");
+    setOstProperty("moduleDescription","Dummy module to show what we can do",true);
 
     //createOstProperty("version","Version",0);
-    setOstProperty("version",0.1);
+    setOstProperty("version",0.1,true);
 
 
-    setOstProperty("message","Dummy module init finished");
+    setOstProperty("message","Dummy module init finished",true);
 
     //saveAttributesToFile("dummy.json");
 

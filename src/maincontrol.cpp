@@ -15,7 +15,7 @@ MainControl::MainControl(QString name, QString label,QString profile)
     {
         QString tt = lib.replace(".so","");
         createOstProperty("mod"+tt,"Load module " + tt,2,"modules","");
-        setOstProperty("mod"+tt,tt);
+        setOstProperty("mod"+tt,tt,true);
     }
 
 }
