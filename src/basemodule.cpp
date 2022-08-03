@@ -476,7 +476,7 @@ void Basemodule::createOstElement (QString propertyName, QString elementName, QS
     QVariantMap _prop=_ostproperties[propertyName].toMap();
     QVariantMap elements=_prop["elements"].toMap();
     QVariantMap element=elements[elementName].toMap();
-    element["label"]=elementLabel;
+    element["elementLabel"]=elementLabel;
     elements[elementName]=element;
     _prop["elements"]=elements;
     _ostproperties[propertyName]=_prop;
