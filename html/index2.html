@@ -136,29 +136,20 @@ function initWebSocket() {
                 buildproperty(obj.module,p.devicenameshort,p.groupnameshort,p);
             }
             if (obj.evt == 'delprop') { 
-                    //var dev   = obj.module+obj.property.devicenameshort;               /* this should be moved to a dedicated function */
-                    //var group = dev+obj.property.groupnameshort;
-                    var p=obj.mod+obj.dta.replace(' ', '');;
-                    var parentdiv=$( "#P"+ p ).parent(); 
-                    //console.log( "setpropvalue :"+mod);
+                    var p=obj.mod+obj.dta.replace(' ', '');
+                    dev=$("div#P"+ p ).data("devcat");
+                    dev=obj.mod+dev;
+                    dev=dev.replace(' ', '');
+                    group=$("#P"+ p ).data("group");
+                    group=dev+group;
+                    group=group.replace(' ', '');
                     $( "#tab3"+ p ).remove()
                     $( "#tab2"+ p ).remove()
                     $( "#tab"+ p ).remove()
                     $( "#P"+ p ).children().remove();
+
                     $( "#P"+ p ).remove();
-                    if (!(parentdiv.children().length > 0)){
-                        console.log("REMOVE GROUP "+p);
-                        parentdiv.remove();
-                        //$("#D"+ group ).remove();
-                        //$("#L"+ group ).remove();
-                    }
-                    //$( "#tab3"+ prop ).remove()
-                    //$( "#tab2"+ prop ).remove()
-                    //$( "#tab"+ prop ).remove()
-                    //$( "#P"+ prop ).children().remove();
-                    //$( "#P"+ prop ).remove();
-                    
-                    /*if (!($("#U"+ group).children().length > 0)){
+                    if (!($("#U"+ group ).children().length > 0)){
                         //console.log("REMOVE GROUP "+group);
                         $("#U"+ group ).remove();
                         $("#D"+ group ).remove();
@@ -229,7 +220,7 @@ function buildproperty(m,d,g,p,n) {
     nnp=nn+n;
     //console.log('BUILD PROPERTY ' + nnp + "-" + p.propertyLabel);
     if  (!($("[id='P"+nnp+"']").length)&&(true||p.hasOwnProperty('texts')||p.hasOwnProperty('numbers')||p.hasOwnProperty('switches')||p.hasOwnProperty('lights')))  {
-        div="<div id=P"+nnp+" ><table id=tab"+nnp+">"
+        div="<div id=P"+nnp+" data-devcat='"+d+"' data-group='"+g+"' ><table id=tab"+nnp+">"
         +"<tr>"
         +"<strong id=status"+nnp+" >"+"---"+"</strong>"
         +"<strong id=title"+nnp+" >"+p.propertyLabel+"</strong></tr>"
