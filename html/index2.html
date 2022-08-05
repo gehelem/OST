@@ -88,9 +88,23 @@ function initWebSocket() {
 
             }            
             
-            if (obj.evt == 'updateproperty') {
-                p=obj.property;
-                buildproperty(obj.module,p.devicenameshort,p.groupnameshort,p);
+            if (obj.evt == 'setpropvalue') {
+                var dta=obj.dta;
+                var mod=obj.mod;
+                //console.log( "setpropvalue :"+mod);
+                $.each( dta, function( iprop, prop) {
+                    //console.log( "setpropvalue :", '"'+iprop);
+                    $.each( prop.elements   , function( ielt, elt) {
+                        //console.log( "setpropvalue :", '"'+iprop+ielt);
+                        e=mod+iprop+ielt;
+                        e=e.replace(' ', '');
+                        $("[id='"+e+"']").val(elt.value);
+                    
+                    });                  
+                    
+                    
+                });                  
+
             }
             if (obj.evt == 'updatepropertyqmap') {
                 values=obj.values;
@@ -108,7 +122,7 @@ function initWebSocket() {
                     //var dev   = obj.module+obj.property.devicenameshort;               /* this should be moved to a dedicated function */
                     //var group = dev+obj.property.groupnameshort;
                     var prop  = obj.dta;
-                    console.log("REMOVE PROP "+prop);
+                    //console.log("REMOVE PROP "+prop);
                     $( "#tab3"+ prop ).remove()
                     $( "#tab2"+ prop ).remove()
                     $( "#tab"+ prop ).remove()
@@ -182,7 +196,7 @@ function buildproperty(m,d,g,p,n) {
     if (d=="undefined") d="";
     if (g=="undefined") g="";
     n = n.replace(' ', ''); 
-    nn=m+d+g;
+    nn=m;
     nnp=nn+n;
     //console.log('BUILD PROPERTY ' + nnp + "-" + p.propertyLabel);
     if  (!($("[id='P"+nnp+"']").length)&&(true||p.hasOwnProperty('texts')||p.hasOwnProperty('numbers')||p.hasOwnProperty('switches')||p.hasOwnProperty('lights')))  {
@@ -198,7 +212,7 @@ function buildproperty(m,d,g,p,n) {
         }
         div=div+"</td></tr></table>"; //tab2
         div=div+"</table></div>"; //tab
-        $("#U"+nn).append(div);
+        $("#U"+nn+d+g).append(div);
         
         if ((p.permission=="1"||p.permission=="2")&&(p.hasOwnProperty('numbers'))) {
             $("[id='B"+nnp+"']").data("json",p);
@@ -308,7 +322,7 @@ function buildproperty(m,d,g,p,n) {
     if (p.state=="1") $("#status"+nnp).css("background-color", "green");   
     if (p.state=="2") $("#status"+nnp).css("background-color", "yellow");   
     if (p.state=="3") $("#status"+nnp).css("background-color", "red");
-    if (p.hasOwnProperty('elements')) buildelts   (m,d,g,p,n);
+    if (p.hasOwnProperty('elements')) buildelts   (m,p,n);
     if (p.hasOwnProperty('texts'   )) buildtexts  (m,d,g,p);
     if (p.hasOwnProperty('numbers' )) buildnumbers(m,d,g,p);
     if (p.hasOwnProperty('switches')) buildswitchs(m,d,g,p);
@@ -316,13 +330,13 @@ function buildproperty(m,d,g,p,n) {
     $("#B"+nnp).css('height', $("#B"+nnp).parent().height()*0.95);
 
 }
-function buildelts(m,d,g,prop,n) {
+function buildelts(m,prop,n) {
 
 
-    nn=m+d+g+n;
+    nn=m+n;
     
     $.each( prop.elements, function( iitem, item ) {
-        //console.log( "buildelts: " + m + "-"+ d + "-"+ g + "-"+ n + "-"+ iitem);
+        //console.log( "buildelts: " + m + "-"+ n + "-"+ iitem);
         nnn = nn+iitem;
         if ($("#"+nnn).length) {
             $("#"+nnn).val(item.value);
