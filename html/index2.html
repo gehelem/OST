@@ -70,6 +70,7 @@ function initWebSocket() {
                 $("div#D"+m).tabs();       /* this shouldn't be here */    
                 
             }
+            
             if (obj.evt == 'appendproperty') {
                 m=obj.module;
                 p=obj.property;
@@ -99,11 +100,27 @@ function initWebSocket() {
                         e=mod+iprop+ielt;
                         e=e.replace(' ', '');
                         $("[id='"+e+"']").val(elt.value);
-                    
                     });                  
-                    
-                    
                 });                  
+
+            }
+            if (obj.evt == 'addprop') {
+                var dta=obj.dta;
+                var mod=obj.mod;
+                //console.log( "setpropvalue :"+mod);
+                $.each( dta, function( iprop, prop) {
+                    //console.log( "setpropvalue :", '"'+iprop);
+                    d = prop.devcat.replace(' ', '');
+                    g = prop.group.replace(' ', '');    
+                    builddevice(mod,d,prop.devcat);
+                    buildgroup(mod,d,g,prop.group);                    
+                    buildproperty(mod,d,g,prop,iprop);                  
+                });  
+                $.each( dta, function(iprop,prop) {
+                    d = prop.devcat.replace(' ', '');
+                    $("div#D"+mod+d).tabs("refresh"); 
+                })                
+                $("div#D"+mod).tabs("refresh");       /* this shouldn't be here */  
 
             }
             if (obj.evt == 'updatepropertyqmap') {
@@ -121,13 +138,25 @@ function initWebSocket() {
             if (obj.evt == 'delprop') { 
                     //var dev   = obj.module+obj.property.devicenameshort;               /* this should be moved to a dedicated function */
                     //var group = dev+obj.property.groupnameshort;
-                    var prop  = obj.dta;
-                    //console.log("REMOVE PROP "+prop);
-                    $( "#tab3"+ prop ).remove()
-                    $( "#tab2"+ prop ).remove()
-                    $( "#tab"+ prop ).remove()
-                    $( "#P"+ prop ).children().remove();
-                    $( "#P"+ prop ).remove();
+                    var p=obj.mod+obj.dta.replace(' ', '');;
+                    var parentdiv=$( "#P"+ p ).parent(); 
+                    //console.log( "setpropvalue :"+mod);
+                    $( "#tab3"+ p ).remove()
+                    $( "#tab2"+ p ).remove()
+                    $( "#tab"+ p ).remove()
+                    $( "#P"+ p ).children().remove();
+                    $( "#P"+ p ).remove();
+                    if (!(parentdiv.children().length > 0)){
+                        console.log("REMOVE GROUP "+p);
+                        parentdiv.remove();
+                        //$("#D"+ group ).remove();
+                        //$("#L"+ group ).remove();
+                    }
+                    //$( "#tab3"+ prop ).remove()
+                    //$( "#tab2"+ prop ).remove()
+                    //$( "#tab"+ prop ).remove()
+                    //$( "#P"+ prop ).children().remove();
+                    //$( "#P"+ prop ).remove();
                     
                     /*if (!($("#U"+ group).children().length > 0)){
                         //console.log("REMOVE GROUP "+group);
