@@ -18,7 +18,17 @@ IndiPanel::~IndiPanel()
 }
 void IndiPanel::newDevice(INDI::BaseDevice *dp)
 {
-    Q_UNUSED(dp)
+    auto props = dp->getProperties();
+    BOOST_LOG_TRIVIAL(debug) << "Indipanel new device" << dp->getDeviceName();
+
+    for (auto pProperty : props) {
+        QString dev = pProperty->getDeviceName();
+        QString pro = pProperty->getName();
+        QString devpro = dev+pro;
+        BOOST_LOG_TRIVIAL(debug) << "Indipanel new property " << devpro.toStdString();
+        createOstProperty(devpro,pProperty->getLabel(),pProperty->getPermission(),pProperty->getDeviceName(),pProperty->getGroupName());
+
+    }
 }
 void IndiPanel::removeDevice(INDI::BaseDevice *dp)
 {
