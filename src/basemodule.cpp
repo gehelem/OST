@@ -74,6 +74,7 @@ bool Basemodule::connectIndi()
 void Basemodule::sendMessage(QString message)
 {
     QString mess = QDateTime::currentDateTime().toString("[yyyyMMdd hh:mm:ss.zzz]") + " - " + _modulename + " - " + message;
+    setOstProperty("message",mess,true);
 }
 void Basemodule::OnDumpAsked()
 {
