@@ -20,23 +20,6 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
 
     BOOST_LOG_TRIVIAL(debug) <<  "ApplicationDirPath :" << QCoreApplication::applicationDirPath().toStdString();
 
-    /*MainControl *mainctl = new MainControl("maincontrol","Main control");
-    mainctl->setHostport(_indihost,_indiport);
-    mainctl->connectIndi();
-    mainctl->setWebroot(_webroot);
-    connect(mainctl,&Basemodule::newMessageSent, this,&Controller::OnNewMessageSent);
-    connect(mainctl,&MainControl::loadModule, this,&Controller::OnLoadModule);
-
-    connect(mainctl,&Basemodule::newMessageSent,wshandler,&WShandler::OnNewMessageSent);
-    connect(mainctl,&Basemodule::moduleDumped2, wshandler,&WShandler::OnModuleDumped2);
-
-
-    connect(wshandler,&WShandler::dumpAsked,mainctl,&Basemodule::OnDumpAsked);*/
-    //connect(wshandler,&WShandler::setPropertyText,mainctl,&Basemodule::OnSetPropertyText);
-    //connect(wshandler,&WShandler::setPropertyNumber,mainctl,&Basemodule::OnSetPropertyNumber);
-    //connect(wshandler,&WShandler::setPropertySwitch,mainctl,&Basemodule::OnSetPropertySwitch);
-
-
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostguider.so","guider1","Guider");
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostinspector.so","inspector1","Frame inspector");
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostpolar.so","polar1","Polar assistant");

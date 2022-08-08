@@ -464,9 +464,8 @@ void Basemodule::deleteOstProperty(QString propertyName)
 
 void Basemodule::setOstProperty(const QString &pPropertyName, QVariant _value, bool emitEvent)
 {
-    BOOST_LOG_TRIVIAL(debug) << "setpropvalue  - " << _modulename.toStdString() << "-" << pPropertyName.toStdString();
+    //BOOST_LOG_TRIVIAL(debug) << "setpropvalue  - " << _modulename.toStdString() << "-" << pPropertyName.toStdString();
 
-    //setProperty(propertyName.toStdString().c_str(),propertyValue);
     QVariantMap _prop=_ostproperties[pPropertyName].toMap();
     _prop["value"]=_value;
     _ostproperties[pPropertyName]=_prop;

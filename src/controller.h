@@ -10,7 +10,6 @@
 #include <basemodule.h>
 
 #include "wshandler.h"
-#include "maincontrol.h"
 #include "dbmanager.h"
 
 /*!
