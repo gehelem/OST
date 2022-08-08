@@ -523,7 +523,7 @@ void Basemodule::loadPropertiesFromFile(QString fileName)
 
 }
 
-void Basemodule::saveAttributesToFile(QString fileName)
+void Basemodule::savePropertiesToFile(QString fileName)
 {
     QVariantMap map = property("ostproperties").toMap();
     /*foreach(const QString& key, map.keys()) {
