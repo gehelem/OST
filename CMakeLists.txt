@@ -127,7 +127,6 @@ target_compile_definitions(ostdummy PRIVATE dummy_LIBRARY)
 add_library(ostindipanel SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel/indipanel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel/indipanel.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/resources/resources.qrc
 )
 target_link_libraries(ostindipanel PRIVATE
     indiclient
