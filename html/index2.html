@@ -136,7 +136,7 @@ function initWebSocket() {
                 buildproperty(obj.module,p.devicenameshort,p.groupnameshort,p);
             }
             if (obj.evt == 'delprop') { 
-                    var p=obj.mod+obj.dta.replace(' ', '');
+                    var p=obj.mod+obj.key.replace(' ', '');
                     dev=$("div#P"+ p ).data("devcat");
                     dev=obj.mod+dev;
                     dev=dev.replace(' ', '');
@@ -228,7 +228,7 @@ function buildproperty(m,d,g,p,n) {
         +"<td><table id=tab3"+nnp+"><tbody></tbody></table></td>";
         if ((p.permission=="1"||p.permission=="2")&&(true||p.hasOwnProperty('numbers')||p.hasOwnProperty('texts'))) {
             div=div+"<td><button class='ui-button ui-widget ui-corner-all' "
-            +"id=B"+nnp+ " data-json=\"\">set</button></td>";
+            +"id=B"+nnp+ " data-json=\"\" data-nnp=\"\">set</button></td>";
         }
         div=div+"</td></tr></table>"; //tab2
         div=div+"</table></div>"; //tab
@@ -239,7 +239,7 @@ function buildproperty(m,d,g,p,n) {
             $("[id='B"+nnp+"']").on("click", function () {
                 var pp=$(this).data("json");
                 $.each( pp.numbers, function( ii, i ) {
-                    pp.numbers[ii].value=parseFloat(document.getElementById(pp.modulename+d+g+pp.propname+i.name).value);
+                    pp.numbers[ii].value=parseFloat(document.getElementById(nnp+i.name).value);
                 })
                 var obj = jQuery.parseJSON("{\"message\":\"setproperty\",\"property\":"+JSON.stringify(pp)+"}");
                 console.log(obj);
@@ -248,6 +248,22 @@ function buildproperty(m,d,g,p,n) {
             
         }
 
+        if ((p.permission=="1"||p.permission=="2")&&(p.hasOwnProperty('elements'))) {
+            $("[id='B"+nnp+"']").data("json",p);
+            $("[id='B"+nnp+"']").data("nnp",nnp);
+            $("[id='B"+nnp+"']").on("click", function () {
+                var pp=$(this).data("json");
+                var nnp=$(this).data("nnp");                
+                $.each( pp.elements, function( ii, i ) {
+                    console.log("hoho",ii,i,"-----",nnp+ii);
+                    pp.elements[ii].value=document.getElementById(nnp+ii).value;
+                })
+                var obj = jQuery.parseJSON("{\"message\":\"setproperty\",\"property\":"+JSON.stringify(pp)+"}");
+                console.log(obj);
+                websocket.send(JSON.stringify(obj));
+            });
+            
+        }
         
         if ((p.permission=="1"||p.permission=="2")&&(p.hasOwnProperty('texts'))) {
             $("[id='B"+nnp+"']").data("json",p);
