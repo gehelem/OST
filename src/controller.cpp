@@ -15,9 +15,10 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
 
 
     wshandler = new WShandler(this);
+    connect(wshandler,&WShandler::externalEvent,this,&Controller::OnExternalEvent);
     dbmanager = new DBManager(this,_dbpath);
 
-    BOOST_LOG_TRIVIAL(debug) <<  "ApplicationDirPath :" << QCoreApplication::applicationDirPath().toStdString();
+
 
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostguider.so","guider1","Guider");
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostinspector.so","inspector1","Frame inspector");
@@ -59,7 +60,8 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
                 mod->setObjectName(name);
                 connect(mod,&Basemodule::moduleEvent, this,&Controller::OnModuleEvent);
                 connect(mod,&Basemodule::moduleEvent, wshandler,&WShandler::OnModuleEvent);
-                connect(wshandler,&WShandler::dumpAsked,mod,&Basemodule::OnDumpAsked);
+                connect(this,&Controller::controllerEvent,mod,&Basemodule::OnExternalEvent);
+
 
                 QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(),Qt::FindChildrenRecursively);
                 for (Basemodule *othermodule : othermodules) {
@@ -82,38 +84,20 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
 }
 
 
-void Controller::OnModuleEvent(const QString &eventType, const QString &eventData)
+void Controller::OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
 {
-    Basemodule *mod = qobject_cast<Basemodule *>(sender());
-    //BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - SENDER = " << mod->getName().toStdString();
-    //BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - EVENT TYPE = " <<  eventType.toStdString();
-
-    //if (eventType=="profilerequest") {
-    //    QVariantMap pro;
-    //    if (!dbmanager->getProfile(pComplement.toMap()["moduletype"].toString(),pComplement.toMap()["profilename"].toString(),pro)) {
-    //        BOOST_LOG_TRIVIAL(debug) <<  "getProfile error";
-    //    } else {
-    //        QJsonObject  obj2=QJsonObject::fromVariantMap(pro);
-    //        QJsonDocument doc2(obj2);
-    //        QByteArray docByteArray2 = doc2.toJson(QJsonDocument::Compact);
-    //        QString strJson2 = QLatin1String(docByteArray2);
-    //        BOOST_LOG_TRIVIAL(debug) <<  "getProfile result =" << strJson2.toStdString();
-    //    }
-    //
-    //}
-
-
     QJsonObject obj;
     obj["evt"]=eventType;
-    obj["mod"]=mod->getName();
+    obj["mod"]=eventModule;
+    obj["key"]=eventKey;
     if (eventType=="moduledump") {
-        obj["dta"]=QJsonObject::fromVariantMap(mod->getOstProperties());
+        obj["dta"]=QJsonObject::fromVariantMap(eventData);
     }
     if (eventType=="addprop"||eventType=="setpropvalue") {
-        obj["dta"]=QJsonObject::fromVariantMap(mod->getOstProperty(eventData.toStdString().c_str()));
+        obj["dta"]=QJsonObject::fromVariantMap(eventData);
     }
     if (eventType=="delprop") {
-        obj["dta"]=eventData;
+        obj["key"]=eventKey;
     }
 
 
@@ -123,4 +107,10 @@ void Controller::OnModuleEvent(const QString &eventType, const QString &eventDat
     //BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - " << mod->getName().toStdString() << " - " << eventType.toStdString() << " - " << strJson.toStdString();
 
 
+}
+void Controller::OnExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
+{
+    BOOST_LOG_TRIVIAL(debug) << "Controller OnExternalEvent : " << eventType.toStdString() << "-" << eventKey.toStdString();
+    /* we should check here if incoming message is valid*/
+    emit controllerEvent(eventType,eventModule,eventKey,eventData);
 }

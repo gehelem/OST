@@ -19,7 +19,7 @@ public:
     QWebSocketServer *m_pWebSocketServer;
     QList<QWebSocket *> m_clients;
 public slots:
-    void OnModuleEvent(const QString &eventType, const QString &eventData);
+    void OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData);
 
 
     void onNewConnection();
@@ -32,8 +32,7 @@ public slots:
 signals:
     void closed();
     void textRcv(QString txt);
-    void dumpAsked(void);
-    //void setPropertyText(TextProperty *pProperty);
+    void externalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData);
 private:
 };
 #endif

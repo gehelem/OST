@@ -32,10 +32,9 @@ Dummy::~Dummy()
     Q_CLEANUP_RESOURCE(dummy);
 }
 
-void Dummy::OnExternalEvent(const QString &eventType, const QString &eventData)
+void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
 {
-    Basemodule *mod = qobject_cast<Basemodule *>(sender());
-
-    BOOST_LOG_TRIVIAL(debug) << "OnExternalEvent  with override - recv = " << getName().toStdString() << " sender = " << mod->getName().toStdString();
+    Q_UNUSED(eventType);Q_UNUSED(eventModule);Q_UNUSED(eventKey);Q_UNUSED(eventData);
+    //BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << " eventType : " << eventType.toStdString();
 
 }

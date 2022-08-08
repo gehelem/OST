@@ -38,13 +38,9 @@ class Basemodule : public QObject, public INDI::BaseClient
 
     public slots:
         void connectIndiTimer(void);
-        void OnDumpAsked(void);
-        virtual void OnExternalEvent(const QString &eventType, const QString &eventData){Q_UNUSED(eventType);Q_UNUSED(eventData);}
-
-        //virtual void OnSetPropertyText(TextProperty* prop) {
-        //    if (!(prop->getModuleName()==_modulename)) return;
-        //    BOOST_LOG_TRIVIAL(debug) << _modulename.toStdString() << " : recv setprop text : " << prop->getLabel().toStdString();
-        //}
+        void OnExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData);
+        virtual void OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
+        {Q_UNUSED(eventType);Q_UNUSED(eventModule);Q_UNUSED(eventKey);Q_UNUSED(eventData);}
 
     protected:
 
@@ -95,8 +91,7 @@ class Basemodule : public QObject, public INDI::BaseClient
         QString _modulelabel;
 
     signals:
-        void moduleEvent(const QString &eventType, const QString  &eventData);
-
+        void moduleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData);
         void askedFrameReset(QString devicename);
 }
 ;

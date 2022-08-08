@@ -75,7 +75,7 @@ void WShandler::processTextMessage(QString message)
     {
         //sendAll();
         //emit changeValue(Prop());
-        emit dumpAsked();
+        emit externalEvent("dump","*","*",QVariantMap());
 
     }
     if (obj["message"].toString()=="readproperty")
@@ -126,26 +126,25 @@ void WShandler::socketDisconnected()
     }
 }
 
-void WShandler::OnModuleEvent(const QString &eventType, const QString &eventData)
+void WShandler::OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
 {
-        Basemodule *mod = qobject_cast<Basemodule *>(sender());
-
         QJsonObject  obj;
         obj["evt"]=eventType;
-        obj["mod"]=mod->getName();
+        obj["mod"]=eventModule;
         if (eventType=="moduledump") {
-            obj["dta"]=QJsonObject::fromVariantMap(mod->getOstProperties());
+            obj["dta"]=QJsonObject::fromVariantMap(eventData);
         }
         if (eventType=="addprop"||eventType=="addelt") {
             QJsonObject  property;
-            property[eventData]=QJsonObject::fromVariantMap(mod->getOstProperty(eventData.toStdString().c_str()));
+            property[eventKey]=QJsonObject::fromVariantMap(eventData);
             obj["dta"]=property;
+            obj["key"]=eventKey;
         }
         if (eventType=="delprop") {
-            obj["dta"]=eventData;
+            obj["key"]=eventKey;
         }
         if (eventType=="setpropvalue") {
-           QVariantMap prop = mod->getOstProperty(eventData.toStdString().c_str());
+           QVariantMap prop = eventData;
            QVariantMap values;
            if (prop.contains("value")) {
                values["value"]=prop["value"];
@@ -160,7 +159,7 @@ void WShandler::OnModuleEvent(const QString &eventType, const QString &eventData
                values["elements"]=elements;
             }
             QJsonObject  property;
-            property[eventData]=QJsonObject::fromVariantMap(values);
+            property[eventKey]=QJsonObject::fromVariantMap(values);
             obj["dta"]=property;
 
         }

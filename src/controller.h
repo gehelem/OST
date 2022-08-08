@@ -25,7 +25,7 @@ public:
     Controller(bool saveAllBlobs, const QString& host, int port,const QString& webroot,const QString& dbpath);
     ~Controller() override;
 signals:
-    void dumpAsked(void);
+    void controllerEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData);
 private:
     QString _indihost;
     int _indiport;
@@ -36,7 +36,9 @@ private:
     DBManager   *dbmanager;
     void LoadModule(QString lib, QString name, QString label, QString profile);
 private slots:
-    void OnModuleEvent(const QString &eventType, const QString &eventData);
+    void OnModuleEvent  (const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData);
+    void OnExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData);
+
 
 };
 #endif

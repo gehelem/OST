@@ -76,10 +76,6 @@ void Basemodule::sendMessage(QString message)
     QString mess = QDateTime::currentDateTime().toString("[yyyyMMdd hh:mm:ss.zzz]") + " - " + _modulename + " - " + message;
     setOstProperty("message",mess,true);
 }
-void Basemodule::OnDumpAsked()
-{
-    emit moduleEvent("moduledump","*");
-}
 
 bool Basemodule::disconnectIndi(void)
 {
@@ -452,13 +448,13 @@ void Basemodule::createOstProperty(const QString &pPropertyName, const QString &
     _prop["group"]=pPropertyGroup;
     _prop["name"]=pPropertyName;
     _ostproperties[pPropertyName]=_prop;
-    emit moduleEvent("addprop",pPropertyName);
+    emit moduleEvent("addprop",_modulename,pPropertyName,_prop);
 }
 void Basemodule::deleteOstProperty(QString propertyName)
 {
     BOOST_LOG_TRIVIAL(debug) << "deleteOstProperty  - " << _modulename.toStdString() << "-" << propertyName.toStdString();
     _ostproperties.remove(propertyName);
-    emit moduleEvent("delprop",propertyName);
+    emit moduleEvent("delprop",_modulename,propertyName,QVariantMap());
 
 }
 
@@ -469,7 +465,7 @@ void Basemodule::setOstProperty(const QString &pPropertyName, QVariant _value, b
     QVariantMap _prop=_ostproperties[pPropertyName].toMap();
     _prop["value"]=_value;
     _ostproperties[pPropertyName]=_prop;
-    if (emitEvent) emit moduleEvent("setpropvalue",pPropertyName);
+    if (emitEvent) emit moduleEvent("setpropvalue",_modulename,pPropertyName,_prop);
 }
 void Basemodule::createOstElement (QString propertyName, QString elementName, QString elementLabel)
 {
@@ -480,7 +476,8 @@ void Basemodule::createOstElement (QString propertyName, QString elementName, QS
     elements[elementName]=element;
     _prop["elements"]=elements;
     _ostproperties[propertyName]=_prop;
-    emit moduleEvent("addelt",propertyName);
+    emit moduleEvent("addelt",_modulename,propertyName,_prop);
+
 }
 void Basemodule::setOstElement    (QString propertyName, QString elementName, QVariant elementValue, bool emitEvent)
 {
@@ -495,7 +492,8 @@ void Basemodule::setOstElement    (QString propertyName, QString elementName, QV
         }
     }
     _ostproperties[propertyName]=_prop;
-    if (emitEvent) emit moduleEvent("setpropvalue",propertyName);
+    if (emitEvent) emit moduleEvent("setpropvalue",_modulename,propertyName,_prop);
+
 }
 
 
@@ -545,7 +543,7 @@ void Basemodule::savePropertiesToFile(QString fileName)
 }
 void Basemodule::requestProfile(QString profileName)
 {
-    emit moduleEvent("profilerequest",profileName);
+    emit moduleEvent("profilerequest",_modulename,profileName,QVariantMap());
 }
 
 void Basemodule::setProfile(QVariantMap profiledata)
@@ -566,5 +564,17 @@ void Basemodule::setProfile(QVariantMap profiledata)
          }
 
     }
+
+}
+void Basemodule::OnExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
+{
+    BOOST_LOG_TRIVIAL(debug) << "OnExternalEvent - recv : " << _modulename.toStdString() << "-" << eventType.toStdString() << "-" << eventModule.toStdString();
+
+    if ( (eventType=="dump")&&(eventModule=="*") ) {
+        emit moduleEvent("moduledump",_modulename,"*",_ostproperties);
+        return;
+    }
+    OnMyExternalEvent(eventType,eventModule,eventKey,eventData);
+
 
 }

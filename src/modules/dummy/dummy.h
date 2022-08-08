@@ -17,7 +17,7 @@ class MODULE_INIT Dummy : public Basemodule
         ~Dummy();
 
     public slots:
-        void OnExternalEvent(const QString &eventType, const QString &eventData) override;
+        void OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData) override;
 
 };
 
