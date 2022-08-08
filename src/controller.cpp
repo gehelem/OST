@@ -82,17 +82,6 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
 }
 
 
-void Controller::OnNewMessageSent(QString message, QString *pModulename, QString Device)
-{
-    BOOST_LOG_TRIVIAL(debug) << "MODULE " << pModulename->toStdString() << " DEVICE  "<< Device.toStdString() << " MESSAGE " << message.toStdString();
-}
-void Controller::OnLoadModule(QString lib, QString label,QString profile)
-{
-    QString name=label;
-    name.replace(" ","");
-    LoadModule(QCoreApplication::applicationDirPath()+"/"+lib,name,label,profile);
-}
-
 void Controller::OnModuleEvent(const QString &eventType, const QString &eventData)
 {
     Basemodule *mod = qobject_cast<Basemodule *>(sender());

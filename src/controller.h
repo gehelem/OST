@@ -24,25 +24,19 @@ class Controller : public QObject
 public:
     Controller(bool saveAllBlobs, const QString& host, int port,const QString& webroot,const QString& dbpath);
     ~Controller() override;
-    WShandler   *wshandler;
-    DBManager   *dbmanager;
-public slots:
-    void OnNewMessageSent(QString message, QString *pModulename, QString Device);
-    void OnLoadModule(QString lib, QString label, QString profile);
-    void OnModuleEvent(const QString &eventType, const QString &eventData);
-
-
 signals:
-    void closed();
     void dumpAsked(void);
 private:
-    void LoadModule(QString lib, QString name, QString label, QString profile);
-
     QString _indihost;
     int _indiport;
     QString _webroot;
     QString _dbpath;
     QStringList _availableModuleLibs;
+    WShandler   *wshandler;
+    DBManager   *dbmanager;
+    void LoadModule(QString lib, QString name, QString label, QString profile);
+private slots:
+    void OnModuleEvent(const QString &eventType, const QString &eventData);
 
 };
 #endif
