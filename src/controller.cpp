@@ -11,7 +11,6 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
       _dbpath(dbpath)
 {
 
-    //this->setParent(parent);
     Q_UNUSED(saveAllBlobs);
 
 
@@ -26,56 +25,6 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focus1","Focus assistant");
     LoadModule(QCoreApplication::applicationDirPath()+"/libostdummy.so","dummy1","Demo module","default");
     LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel","indi control panel","default");
-
-
-
-    QVariantMap test;
-    test["tata"]="totovalue";
-    test["turlututu"]="chapeau pointu";
-    test["titi"]="titivalue";
-    test["pi"]=3.14159;
-    test["vrai"]=true;
-
-    QVariantMap elt;
-    elt["elt1"]=1;
-    elt["elt2"]="element 2";
-    elt["elt3"]=false;
-    test["elts"]=elt;
-
-
-    if (!dbmanager->setProfile("dummy1","profil numéro 1",test)) {
-        BOOST_LOG_TRIVIAL(debug) <<  "setProfile error";
-    }
-
-    test["tata"]="P2";
-    if (!dbmanager->setProfile("dummy1","Profil numéro 2",test)) {
-        BOOST_LOG_TRIVIAL(debug) <<  "setProfile error";
-    }
-
-    test["tata"]="P3";
-    if (!dbmanager->setProfile("dummy1","Profil numéro 3",test)) {
-        BOOST_LOG_TRIVIAL(debug) <<  "setProfile error";
-    }
-    test["tata"]="P4";
-    if (!dbmanager->setProfile("dummy1","Profil numéro 4",test)) {
-        BOOST_LOG_TRIVIAL(debug) <<  "setProfile error";
-    }
-
-
-    //QVariantMap test2;
-    //if (!dbmanager->getProfile("titi","toto",test2)) {
-    //    BOOST_LOG_TRIVIAL(debug) <<  "getProfile error";
-    //} else {
-    //    QJsonObject  obj2=QJsonObject::fromVariantMap(test2);
-    //    QJsonDocument doc2(obj2);
-    //    QByteArray docByteArray2 = doc2.toJson(QJsonDocument::Compact);
-    //    QString strJson2 = QLatin1String(docByteArray2);
-    //    BOOST_LOG_TRIVIAL(debug) <<  "getProfile result =" << strJson2.toStdString();
-    //}
-
-
-
-
 
 }
 
@@ -132,19 +81,7 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
     }
 }
 
-//void Controller::OnPropertyCreated(Property *pProperty, QString *pModulename)
-//{
-//}
-//
-//void Controller::OnPropertyUpdated(Property *pProperty, QString *pModulename)
-//{
-//}
-//void Controller::OnPropertyAppended(Property *pProperty, QString *pModulename)
-//{
-//}
-//void Controller::OnPropertyRemoved(Property *pProperty, QString *pModulename)
-//{
-//}
+
 void Controller::OnNewMessageSent(QString message, QString *pModulename, QString Device)
 {
     BOOST_LOG_TRIVIAL(debug) << "MODULE " << pModulename->toStdString() << " DEVICE  "<< Device.toStdString() << " MESSAGE " << message.toStdString();
