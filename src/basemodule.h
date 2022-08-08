@@ -48,6 +48,7 @@ class Basemodule : public QObject, public INDI::BaseClient
 
     protected:
 
+        /* Indi helpers */
         bool disconnectIndi(void);
         void connectAllDevices(void);
         void disconnectAllDevices(void);
@@ -64,6 +65,7 @@ class Basemodule : public QObject, public INDI::BaseClient
         bool frameReset(QString devicename);
         void sendMessage(QString message);
 
+        /*indi messages */
         virtual void serverConnected() {}
         virtual void serverDisconnected(int exit_code)          {Q_UNUSED(exit_code);}
         virtual void newDevice(INDI::BaseDevice *dp)            {Q_UNUSED(dp);}
@@ -78,28 +80,24 @@ class Basemodule : public QObject, public INDI::BaseClient
         virtual void newMessage(INDI::BaseDevice *dp, int messageID) {Q_UNUSED(dp);Q_UNUSED(messageID);}
         virtual void newUniversalMessage(std::string message)   {Q_UNUSED(message);}
 
+        /* OST helpers */
         void createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,const  QString &pPropertyDevcat, const QString &pPropertyGroup);
         void deleteOstProperty(QString propertyName);
-
         void createOstElement (QString propertyName, QString elementName, QString elementLabel);
         void setOstProperty   (const QString &pPropertyName, QVariant _value,bool emitEvent);
         void setOstElement    (QString propertyName, QString elementName, QVariant elementValue, bool emitEvent);
         void loadPropertiesFromFile(QString fileName);
         void savePropertiesToFile(QString fileName);
+
     private:
         QVariantMap _ostproperties;
         QString _modulename;
         QString _modulelabel;
 
     signals:
-        void moduleDumped2(QVariant props, QString* pModulename, QString* pModulelabel, QString* pModuledescription);
-        void newMessageSent(QString message,      QString* pModulename, QString Device);
         void moduleEvent(const QString &eventType, const QString  &eventData);
 
-        void finished();
-        void statusChanged(const QString &newStatus);
         void askedFrameReset(QString devicename);
-        void propertyChanged(QString *moduleName, QString *propName,QVariant *propValue,QVariant *prop);
 }
 ;
 #endif
