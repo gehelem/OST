@@ -67,7 +67,8 @@ void IndiPanel::newProperty(INDI::Property *pProperty)
             ISwitchVectorProperty *vp=pProperty->getSwitch();
             for (int i=0;i<vp->nsp;i++) {
                 createOstElement(devpro,vp->sp[i].name,vp->sp[i].label);
-                setOstElement(devpro,vp->sp[i].name,vp->sp[i].s,i==vp->nsp-1);
+                if (vp->sp[i].s==0) setOstElement(devpro,vp->sp[i].name,false,i==vp->nsp-1);
+                if (vp->sp[i].s==1) setOstElement(devpro,vp->sp[i].name,true ,i==vp->nsp-1);
             }
             break;
         }
@@ -162,7 +163,8 @@ void IndiPanel::newSwitch(ISwitchVectorProperty *svp)
     QString pro = svp->name;
     QString devpro = dev+pro;
     for (int i=0;i<svp->nsp;i++) {
-        setOstElement(devpro,svp->sp[i].name,svp->sp[i].s,i==svp->nsp-1);
+        if (svp->sp[i].s==0) setOstElement(devpro,svp->sp[i].name,false,i==svp->nsp-1);
+        if (svp->sp[i].s==1) setOstElement(devpro,svp->sp[i].name,true ,i==svp->nsp-1);
     }
 }
 void IndiPanel::newBLOB(IBLOB *bp)
