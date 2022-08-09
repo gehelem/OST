@@ -85,10 +85,7 @@ void WShandler::processTextMessage(QString message)
     }
     if (obj["message"].toString()=="setproperty")
     {
-        //QJsonObject prop = obj["property"].toObject();
-        //if (prop["texts"].isArray()) emit setPropertyText(&jsonDumper.setProTextFromJson(prop));
-        //if (prop["numbers"].isArray()) emit setPropertyNumber(&jsonDumper.setProNumberFromJson(prop));
-        //if (prop["switches"].isArray()) emit setPropertySwitch(&jsonDumper.setProSwitchFromJson(prop));
+        emit externalEvent("setproperty",obj["mod"].toString(),obj["key"].toString(),obj["dta"].toVariant().toMap());
     }
 
 

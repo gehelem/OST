@@ -177,10 +177,10 @@ void IndiPanel::newMessage     (INDI::BaseDevice *dp, int messageID)
     Q_UNUSED(txt)
 }
 
+void IndiPanel::OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
+{
+    BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << eventKey.toStdString();
 
-//void IndiPanel::OnSetPropertyText(TextProperty* prop)
-//{
-//
-//}
+}
 
 

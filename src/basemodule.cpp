@@ -568,13 +568,11 @@ void Basemodule::setProfile(QVariantMap profiledata)
 }
 void Basemodule::OnExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
 {
-    BOOST_LOG_TRIVIAL(debug) << "OnExternalEvent - recv : " << _modulename.toStdString() << "-" << eventType.toStdString() << "-" << eventModule.toStdString();
 
     if ( (eventType=="dump")&&(eventModule=="*") ) {
         emit moduleEvent("moduledump",_modulename,"*",_ostproperties);
         return;
     }
-    OnMyExternalEvent(eventType,eventModule,eventKey,eventData);
-
+    if (_modulename==eventModule) OnMyExternalEvent(eventType,eventModule,eventKey,eventData);
 
 }

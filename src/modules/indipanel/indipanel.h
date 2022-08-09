@@ -31,6 +31,7 @@ class MODULE_INIT IndiPanel : public Basemodule
         void newBLOB        (IBLOB *bp) override;
         void newSwitch      (ISwitchVectorProperty *svp) override;
         void newMessage     (INDI::BaseDevice *dp, int messageID) override;
+        void OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData) override;
 
 };
 
