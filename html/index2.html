@@ -104,18 +104,17 @@ function initWebSocket() {
                 });                  
 
             }
-            if (obj.evt == 'addprop') {
+            if ((obj.evt == 'addprop')||(obj.evt == 'addelt')) {
                 var dta=obj.dta;
                 var mod=obj.mod;
-                //console.log( "setpropvalue :"+mod);
-                $.each( dta, function( iprop, prop) {
-                    //console.log( "setpropvalue :", '"'+iprop);
+                $.each( dta, function(iprop,prop) {
                     d = prop.devcat.replace(' ', '');
                     g = prop.group.replace(' ', '');    
+                    p = iprop.replace(' ', '');
                     builddevice(mod,d,prop.devcat);
                     buildgroup(mod,d,g,prop.group);                    
                     buildproperty(mod,d,g,prop,iprop);                  
-                });  
+                })                
                 $.each( dta, function(iprop,prop) {
                     d = prop.devcat.replace(' ', '');
                     $("div#D"+mod+d).tabs("refresh"); 
