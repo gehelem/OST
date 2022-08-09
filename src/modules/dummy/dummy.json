@@ -39,5 +39,33 @@
         "group": "Texts",
         "permission": 2,
         "propertyLabel": "Text example - read/write"
+    },
+    "numbersRW": {
+        "hasprofile":true,
+        "devcat": "Examples",
+        "elements": {
+            "n1": {
+                "elementLabel": "Number 1",
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },
+            "n2": {
+                "elementLabel": "Number 2",
+                "min": -100,
+                "max": 100,
+                "step": 10
+            },
+            "n3": {
+                "elementLabel": "Number 3"
+            },
+            "n4": {
+                "elementLabel": "Number 4"
+            }
+        },
+        "group": "Numbers",
+        "permission": 2,
+        "propertyLabel": "Numbers example - read/write"
     }
+
 }
