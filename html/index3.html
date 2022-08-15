@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="jquery-ui.min.css">
+<script src="external/jquery/jquery.js"></script>
+<script src="jquery-ui.min.js"></script>
+<script src="chart.js"></script>
+<link rel="stylesheet" href="ost.css">
+</head><body><div id="OST"></div></body>
+</html>
+
+<script>
+
+var ur = window.location.origin.replace("http://", "");
+var result = ur.replace("http://", "");
+var wsUri = "ws://"+ur+":9624";            
+var websocket = null;
+
+$(document).ready(function()
+{
+    initWebSocket();
+});
+
+
+function initWebSocket() {
+    try {
+        if (typeof MozWebSocket == 'function') WebSocket = MozWebSocket;
+        if ( websocket && websocket.readyState == 1 ) websocket.close();
+        
+        websocket = new WebSocket( wsUri );
+        websocket.onopen = function (evt) {
+            console.log("CONNECTED");
+            websocket.send( "{\"message\":\"readall\"}");
+        };
+        websocket.onclose = function (evt) {
+            console.log("DISCONNECTED");
+            $("div#OST").append("Lost backend connection, reconnecting...");
+            //window.location.reload();
+            setTimeout(function() {
+                window.location.reload(); 
+                //initWebSocket();
+            },3000);
+        };
+
+        websocket.onmessage = function (evt) {
+            var obj = JSON.parse( evt.data );
+            console.log(obj);
+            //if ((obj.event == 'appendproperty')) {console.log(obj)};
+            //if ((obj.event == 'updateproperty')&&(obj.property.propname=='grid')) {console.log(obj)};
+            if (obj.evt == 'moduledump') {
+                m=obj.mod;
+                l=obj.mod;
+                buildmodule(m,l);
+               
+                var properties = obj.dta;
+                $.each( properties, function(iprop,prop) {
+                    builddevcat(m,prop);
+                    buildgroup(m,prop);
+                    buildproperty(m,prop,iprop);
+                })
+                $.each( properties, function(iprop,prop) {
+                    d = prop.devcat.replace(' ', '');
+                    $("div#devDIV"+m+d).tabs(); /* this shouldn't be here */    
+                })                
+                $("div#modDIV"+m).tabs();       /* this shouldn't be here */    
+                
+            }
+            
+           
+            if (obj.evt == 'setpropvalue') {
+                var dta=obj.dta;
+                var mod=obj.mod;
+                //console.log( "setpropvalue :"+mod);
+                $.each( dta, function( iprop, prop) {
+                    //console.log( "setpropvalue :", '"'+iprop);
+                    $.each( prop.elements   , function( ielt, elt) {
+                        //console.log( "setpropvalue :", '"'+iprop+ielt);
+                        e=mod+iprop+ielt;
+                        e=e.replace(' ', '');
+                        $("[id='"+e+"']").val(elt.value);
+                    });                  
+                });                  
+
+            }
+            if ((obj.evt == 'addprop')||(obj.evt == 'addelt')) {
+                var dta=obj.dta;
+                var mod=obj.mod;
+                $.each( dta, function(iprop,prop) {
+                    d = prop.devcat.replace(' ', '');
+                    g = prop.group.replace(' ', '');    
+                    p = iprop.replace(' ', '');
+                    builddevice(mod,d,prop.devcat);
+                    buildgroup(mod,d,g,prop.group);                    
+                    buildproperty(mod,d,g,prop,iprop);                  
+                })                
+                $.each( dta, function(iprop,prop) {
+                    d = prop.devcat.replace(' ', '');
+                    $("div#D"+mod+d).tabs("refresh"); 
+                })                
+                $("div#D"+mod).tabs("refresh");       /* this shouldn't be here */  
+
+            }
+            if (obj.evt == 'createproperty') {
+                p=obj.property;
+                builddevice  (obj.module,p.devicenameshort,p.devicename);
+                $("#D"+obj.module+p.devicenameshort).tabs("refresh");              /* this shouldn't be here */
+                buildgroup   (obj.module,p.devicenameshort,p.groupnameshort,p.groupname);
+                $("#D"+obj.module).tabs("refresh");              /* this shouldn't be here */
+                buildproperty(obj.module,p.devicenameshort,p.groupnameshort,p);
+            }
+            if (obj.evt == 'delprop') { 
+                    var p=obj.mod+obj.key.replace(' ', '');
+                    dev=$("div#P"+ p ).data("devcat");
+                    dev=obj.mod+dev;
+                    dev=dev.replace(' ', '');
+                    group=$("#P"+ p ).data("group");
+                    group=dev+group;
+                    group=group.replace(' ', '');
+                    $( "#tab3"+ p ).remove()
+                    $( "#tab2"+ p ).remove()
+                    $( "#tab"+ p ).remove()
+                    $( "#P"+ p ).children().remove();
+
+                    $( "#P"+ p ).remove();
+                    if (!($("#U"+ group ).children().length > 0)){
+                        //console.log("REMOVE GROUP "+group);
+                        $("#U"+ group ).remove();
+                        $("#D"+ group ).remove();
+                        $("#L"+ group ).remove();
+                    }
+                    if (!($("#U"+ dev).children().length > 0)){
+                        //console.log("REMOVE DEVICE "+dev);
+                        $("#U"+ dev ).remove();
+                        $("#D"+ dev ).remove();
+                        $("#L"+ dev ).remove();
+                    }
+
+                
+            }
+            
+        };
+        
+        websocket.onerror = function (evt) {
+            console.log('ERROR: ' + evt.data);
+        };
+    } 
+    catch (exception) {
+        console.log('ERROR: ' + exception);
+    }
+}
+
+function stopWebSocket() {
+    if (websocket)  websocket.close();
+}
+            
+function buildmodule(m,l) {
+
+    if  (!($("div#modDIV"+m).length)) {
+        $("div#OST").append("<h1  id=modH1"+m+">"+l+"</h1>");
+        $("div#OST").append("<div id=modDIV"+m+"></div>");
+        $("div#modDIV"+m).append("<ul id=modUL"+m+"></ul>");
+    };
+    $("#OST").accordion({header: "h1",collapsible: true,autoHeight: false,navigation: true,heightStyle: "content" });
+    $("#OST").accordion("refresh");  
+    
+}
+
+function builddevcat(m,prop) {
+    dd=prop.devcat.replace(' ', '');
+    if  (!($("[id='devDIV"+m+dd+"']").length >0)) {
+        //console.log('BUILD DEVCAT ' + m + "-"+ d + "-"+ l + "-");
+        $("[id='modDIV"+m+"']").append("<div id='devDIV"+m+dd+"'></div>");
+        $("[id='modUL"+m+"']").append("<li id='devLI"+m+dd+"'><a href=#devDIV"+m+dd+">"+prop.devcat+"</a></li>");
+        $("[id='devDIV"+m+dd+"']").append("<ul id='devUL"+m+dd+"'></ul>");
+    };
+    //$("#D"+m).tabs("refresh");  
+}
+
+function buildgroup(m,prop) {
+    dd=prop.devcat.replace(' ', '');
+    gg=prop.group.replace(' ', '');
+    if  (!($("[id='grpDIV"+m+dd+gg+"']").length > 0)) {
+        //console.log('BUILD GROUP ' + m + "-" + d + "-"+ g + "-"+ l + "-");
+        $("[id='devDIV"+m+dd+"']").append("<div id='grpDIV"+m+dd+gg+"'></div>");
+        $("[id='devUL"+m+dd+"']").append("<li id='grpLIL"+m+dd+gg+"'><a href=#grpDIV"+m+dd+gg+">"+prop.group+"</a></li>");
+        $("[id='grpDIV"+m+dd+gg+"']").append("<ul id='grpUL"+m+dd+gg+"'></ul>");
+    };
+}
+
+function buildproperty(m,p,n) {
+    d=p.devcat.replace(' ', '');
+    g=p.group.replace(' ', '');
+    n = n.replace(' ', ''); 
+    nn=m;
+    nnp=nn+n;
+    //console.log('BUILD PROPERTY ' + nnp + "-" + p.propertyLabel);
+    if  (!($("[id='P"+nnp+"']").length)&&(true||p.hasOwnProperty('texts')||p.hasOwnProperty('numbers')||p.hasOwnProperty('switches')||p.hasOwnProperty('lights')))  {
+        div="<div id=P"+nnp+" data-devcat='"+d+"' data-group='"+g+"' ><table id=tab"+nnp+">"
+        +"<tr>"
+        +"<strong id=status"+nnp+" >"+"---"+"</strong>"
+        +"<strong id=title"+nnp+" >"+p.propertyLabel+"</strong>";
+        if (p.permission=="1"||p.permission=="2") {
+            div=div+"<button class='ui-button ui-widget ui-corner-all' "
+            +"id=edit"+nnp+ " data-json=\"\" data-nnp=\"\" data-mod=\"\" data-key=\"\">Edit</button>";
+        }
+        div=div+"</tr>";
+        
+        div=div+"<tr><td><table id=tab2"+nnp+">";
+        div=div+"<td><table id=tab3"+nnp+"><tbody></tbody></table></td>";
+        //if ((p.permission=="1"||p.permission=="2")&&(true||p.hasOwnProperty('numbers')||p.hasOwnProperty('texts'))) {
+        //    div=div+"<td><button class='ui-button ui-widget ui-corner-all' "
+        //    +"id=editB"+nnp+ " data-json=\"\" data-nnp=\"\" data-mod=\"\" data-key=\"\">set</button></td>";
+        //}
+        div=div+"</td></tr></table>"; //tab2
+        div=div+"</table></div>"; //tab
+        $("#grpUL"+nn+d+g).append(div);
+        
+        if ((p.permission=="1"||p.permission=="2")&&(p.hasOwnProperty('elements'))) {
+
+            //$("[id='form"+nnp+"']").css({'display' :'none'});
+            
+            $("[id='edit"+nnp+"']").data("nnp",nnp);
+            $("[id='edit"+nnp+"']").data("json",p);
+            $("[id='edit"+nnp+"']").data("g",nn+d+g);
+            $("[id='edit"+nnp+"']").data("l",p.propertyLabel);
+            $("[id='edit"+nnp+"']").data("mod",m);
+            $("[id='edit"+nnp+"']").data("key",n);
+            $("[id='edit"+nnp+"']").on("click", function () {
+                var nnp=$(this).data("nnp");
+                var pp=$(this).data("json");
+                var g=$(this).data("g");
+                var l=$(this).data("l");
+                var m=$(this).data("mod");
+                var n=$(this).data("key");
+                form =      "<div id=form"+nnp+" title='"+l +"' data-json=\"\" data-nnp=\"\" data-mod=\"\" data-key=\"\" style='modal:true'>";
+                form = form+"<form>";
+                form = form+"<fieldset><table>";
+                $.each( pp.elements, function( ii, i ) {
+                    console.log(jQuery.type(i.value));
+                    switch(jQuery.type(i.value)) {
+                    case 'string':
+                        form = form+"<tr><td><label for='"+ii+"'>"+i.elementLabel+"</label></td>";
+                        form = form+"<td><input type=text' name='form"+nnp+ii+"' id='form"+nnp+ii+"' value='"+i.value+"' class='text ui-widget-content ui-corner-all'></td></tr>";
+                        break;
+                    case 'boolean':
+                        break;
+                    case 'number':
+                        form = form+"<tr><td><label for='"+ii+"'>"+i.elementLabel+"</label></td>";
+                        form = form+"<td><input type=text' name='form"+nnp+ii+"' id='form"+nnp+ii+"' value='"+i.value+"' class='text ui-widget-content ui-corner-all'></td></tr>";
+                        break;
+                    default:
+                        // code block
+                    } 
+                })                
+
+                form = form+"<input type='submit' style='position:absolute; bottom:0px'>";
+                form = form+"</table></fieldset></form></div>";
+
+                $("#grpUL"+g).append(form);
+                $("[id='form"+nnp+"']").data("json",p);
+                $("[id='form"+nnp+"']").data("nnp",nnp);
+                $("[id='form"+nnp+"']").data("mod",m);
+                $("[id='form"+nnp+"']").data("key",n);
+                $("[id='form"+nnp+"']").on( "submit", function(event) {
+                    event.preventDefault();
+                    var pp=$(this).data("json");
+                    var nnp=$(this).data("nnp");
+                    var m=$(this).data("mod");
+                    var n=$(this).data("key");
+                    $.each( pp.elements, function( ii, i ) {
+                        pp.elements[ii].value=document.getElementById("form"+nnp+ii).value;
+                    })                
+                    var obj = jQuery.parseJSON("{\"evt\":\"setproperty\",\"mod\":\""+m+"\",\"dta\":{\""+n+"\":"+JSON.stringify(pp)+"}}");
+                    console.log(obj);
+                    websocket.send(JSON.stringify(obj));
+                    $( "[id='form"+nnp+"']" ).dialog("close");
+                });
+                $( "[id='form"+nnp+"']" ).dialog();
+            });
+            
+            
+
+        }
+        
+        
+        if ((p.permission=="1"||p.permission=="2")&&(p.hasOwnProperty('numbers'))) {
+            $("[id='B"+nnp+"']").data("json",p);
+            $("[id='B"+nnp+"']").on("click", function () {
+                var pp=$(this).data("json");
+                $.each( pp.numbers, function( ii, i ) {
+                    pp.numbers[ii].value=parseFloat(document.getElementById(nnp+i.name).value);
+                })
+                var obj = jQuery.parseJSON("{\"message\":\"setproperty\",\"dta\":"+JSON.stringify(pp)+"}");
+                console.log(obj);
+                websocket.send(JSON.stringify(obj));
+            });
+            
+        }
+
+        /*if ((p.permission=="1"||p.permission=="2")&&(p.hasOwnProperty('elements'))) {
+            $("[id='B"+nnp+"']").data("json",p);
+            $("[id='B"+nnp+"']").data("nnp",nnp);
+            $("[id='B"+nnp+"']").data("mod",m);
+            $("[id='B"+nnp+"']").data("key",n);
+            $("[id='B"+nnp+"']").on("click", function () {
+                var pp=$(this).data("json");
+                var nnp=$(this).data("nnp");                
+                var mod=$(this).data("mod");                
+                var key=$(this).data("key");                
+                $.each( pp.elements, function( ii, i ) {
+                    pp.elements[ii].value=document.getElementById(nnp+ii).value;
+                })
+                var obj = jQuery.parseJSON("{\"message\":\"setproperty\",\"mod\":\""+mod+"\",\"key\":\""+key+"\",\"dta\":"+JSON.stringify(pp)+"}");
+                console.log(obj);
+                websocket.send(JSON.stringify(obj));
+            });
+            
+        }*/
+        
+        if ((p.permission=="1"||p.permission=="2")&&(p.hasOwnProperty('texts'))) {
+            $("[id='B"+nnp+"']").data("json",p);
+            $("[id='B"+nnp+"']").on("click", function () {
+                var pp=$(this).data("json");
+                $.each( pp.texts, function( ii, i ) {
+                    pp.texts[ii].text=document.getElementById(pp.modulename+d+g+pp.propname+i.name).value;
+                })
+                
+                var obj = jQuery.parseJSON("{\"message\":\"setproperty\",\"property\":"+JSON.stringify(pp)+"}");
+                console.log(obj);
+                websocket.send(JSON.stringify(obj));
+            });
+            
+        }
+       
+       
+    }
+    if  (p.hasOwnProperty('message'))  {
+        var dd=d;
+        if (d=="root") dd="";
+        if (!($("#M"+m+dd).length))  {
+            div="<div id=M"+m+dd+" >"
+            /*+"<table><tbody><tr><td>"*/
+            +"<input  class='ui-text ui-widget ui-corner-all' type='text' id=MD"+m+dd+" value='"+p.message+"'  width='auto' ></input>"
+            /*+"</td></tr></tbody></table>"*/
+            +"</div>"
+            $("#D"+m+dd).append(div);
+            $("#MD"+m+dd).width("98%");
+        } else {
+            $("#MD"+m+dd).val(p.message);
+        }
+        
+    }
+    if  (p.hasOwnProperty('URL'))  {
+        
+        if (!($("[id='I"+nnp+"']").length))  {
+            div="<div id='I"+nnp+"' >"
+            //+ "<td><tr>"
+            //+"<strong id='title"+nnp+"' >"+p.label+"</strong>"
+            +"<br><img id='im"+nnp+"'  src='"+p.URL+"' />"
+            //+"</td></tr></table>"
+            +"</div>";
+            $("#U"+nn).append(div);
+        } else {
+            $("[id='im"+nnp+"']").prop("src",p.URL + "?"+ new Date().valueOf()); // append "Date" to force image reload ...
+        }
+        var new_width = 0.99*$("[id='im"+nnp+"']").parent().width();
+        if (new_width > 0) $("[id='im"+nnp+"']").css({'width': new_width, 'height': '100%'});
+        
+    }
+
+    if  (p.proptype=='grid')  {
+        
+        if (!($("[id='G"+nnp+"']").length))  {
+            if ($("[id='G2D"+nnp+"']").length) {
+                $("[id='G2D"+nnp+"']").remove;
+                //console.log( "removecanvas 1 : " + "[id='G2D"+nnp+"']");
+            }
+            div="<div id='G"+nnp+"' >"
+            +"<canvas id=G2D"+nnp+" width=30 height=10></canvas>"            
+            +"</div>";
+            $("#U"+nn).append(div);
+            if (p.type=='PXY') creategraph2D("#G2D"+nnp,"---/---");
+            if (p.type=='PHD') creategraphPHD("#G2D"+nnp,p.sname,p.xname,p.yname,p.zname,p.kname);
+            var values=p.values;
+            if (values.size==0) {
+                //cleargraph2D("#G2D"+nnp);
+            }
+            $.each( values, function( ivalue, value ) {
+                //console.log( "addvalues :", '"'+value.v0+'"' +value.v1+'"');
+                if (p.type=='PXY') appendgraph2D("#G2D"+nnp,value.x,value.y);
+                if (p.type=='PHD') appendgraphPHD("#G2D"+nnp,value.s,value.x,value.y,value.z,value.k);
+            });            
+        } else {
+            if ($("[id='G2D"+nnp+"']").length) {
+                $("[id='G2D"+nnp+"']").remove;
+                var graph = $("#G2D"+nnp).data('graph');
+                graph.destroy();
+                if (p.type=='PXY') creategraph2D("#G2D"+nnp,"---/---");
+                if (p.type=='PHD') creategraphPHD("#G2D"+nnp,p.sname,p.xname,p.yname,p.zname,p.kname);
+            }
+            $.each( values, function( ivalue, value ) {
+                //console.log( "addvalues :", '"'+value.v0+'"' +value.v1+'"');
+                if (p.type=='PXY') appendgraph2D("#G2D"+nnp,value.x,value.y);
+                if (p.type=='PHD') appendgraphPHD("#G2D"+nnp,value.s,value.x,value.y,value.z,value.k);
+            });            
+        }
+    }
+    
+    if (p.state=="0") $("#status"+nnp).css("background-color", "gray");   
+    if (p.state=="1") $("#status"+nnp).css("background-color", "green");   
+    if (p.state=="2") $("#status"+nnp).css("background-color", "yellow");   
+    if (p.state=="3") $("#status"+nnp).css("background-color", "red");
+    if (p.hasOwnProperty('elements')) buildelts   (m,p,n);
+    if (p.hasOwnProperty('texts'   )) buildtexts  (m,d,g,p);
+    if (p.hasOwnProperty('numbers' )) buildnumbers(m,d,g,p);
+    if (p.hasOwnProperty('switches')) buildswitchs(m,d,g,p);
+    if (p.hasOwnProperty('lights'  )) buildlights (m,d,g,p);
+    $("#B"+nnp).css('height', $("#B"+nnp).parent().height()*0.95);
+
+}
+function buildelts(m,prop,n) {
+
+
+    nn=m+n;
+    $.each( prop.elements, function( iitem, item ) {
+        //console.log( "buildelts: " + m + "-"+ n + "-"+ iitem + "-" + Object.prototype.toString.call(item.value));
+        nnn = nn+iitem;
+        if ($("#"+nnn).length) {
+            $("#"+nnn).val(item.value);
+        } else {
+             switch(jQuery.type(item.value)) {
+            case 'string':
+                $("#tab3"+nn + " tbody").append("<tr><td><small> "+item.elementLabel+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+n+" data-name="+iitem+" value='"+item.value+"'  label="+item.elementLabel+" /></td></tr>");
+                break;
+            case 'boolean':
+                $("[id='tab3"+nn + "']").append("<button id=bbb"+nnn+" class='ui-button ui-widget ui-corner-all' backlogid=btn"+nnn
+                +" value="+item.state
+                +" data-value=\"\""
+                +" data-btn=\"\" >"+item.elementLabel+"</button>");
+                break;
+            case 'number':
+                $("#tab3"+nn + " tbody").append("<tr><td><small> "+item.elementLabel+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+n+" data-name="+iitem+" value='"+item.value+"'  label="+item.elementLabel+" /></td></tr>");
+                break;
+            default:
+                // code block
+            } 
+
+            /*$("#tab3"+nn + " tbody").append("<tr><td><small> "+item.elementLabel+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+n+" data-name="+iitem+" value='"+item.value+"'  label="+item.elementLabel+" /></td></tr>");*/
+            if ((prop.permission=="1"||prop.permission=="2")) {
+                $("#"+nnn).css("background-color", "white");
+            } else {
+                $("#"+nnn).css("background-color", "gray");
+            }
+            
+            //if (prop.permission=="2") {
+            //    $("#tab3"+nn+ " tbody").append(
+            //    "<tr><td><small>"+item.label+"</small></td><td>"
+            //    +"<input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /></td></tr>"
+            //    );
+            //}
+        
+        }
+
+    })
+
+
+}                
+function buildtexts(m,d,g,prop) {
+
+    p=prop.propname;
+    nn=m+d+g+p;
+    
+    $.each( prop.texts, function( iitem, item ) {
+        nnn = nn+item.name;
+        if ($("#"+nnn).length) {
+            $("#"+nnn).val(item.text);
+        } else {
+            if (prop.permission=="0") {
+                $("#tab3"+nn + " tbody").append("<tr><td><small> "+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /></td></tr>");
+            }
+            if (prop.permission=="2") {
+                $("#tab3"+nn+ " tbody").append(
+                "<tr><td><small>"+item.label+"</small></td><td>"
+                +"<input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /></td></tr>"
+                );
+            }
+        
+        }
+
+    })
+
+
+}                
+
+function buildnumbers(m,d,g,prop) {
+
+    p=prop.propname;
+    $.each( prop.numbers, function( iitem, item ) {
+        nn=m+d+g+p;
+        nnn = nn+item.name;
+        if ($("[id='"+nnn+"']").length) {
+            $("[id='"+nnn+"']").val(item.value);
+        } else {
+            if (prop.permission=="0") {
+                $("[id='tab3"+nn + "']").append("<tr><td><small> "+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" /></td></tr>");
+            };
+            if (prop.permission=="2") {
+                $("[id='tab3"+nn+ "']").append(
+                "<tr><td><small>"+item.label+"</small></td><td>"
+                +"<input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.value+"'  label="+item.value+" />"
+                );
+            }
+        
+        }
+
+    })
+}    
+function buildswitchs(m,d,g,prop) {
+
+    p=prop.propname;
+    if (d=="root") d="";
+    if (g=="root") g="";    
+    $.each( prop.switches, function( iitem, item ) {
+        nn=m+d+g+p;
+        nnn = nn+item.name;
+        if ($("[id='bbb"+nnn+"']").length) {
+            $("[id='bbb"+nnn+"']").val(item.state);
+        } else {
+            if (prop.permission=="0") {
+                $("[id='tab3"+nn+ "']").append("<tr><td><small>"+item.label+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.state+"'  label="+item.state+" /></td></tr>");
+            
+            }
+            if (prop.permission=="1" || prop.permission=="2") {
+                $("[id='tab3"+nn + "']").append("<button id=bbb"+nnn+" class='ui-button ui-widget ui-corner-all' backlogid=btn"+nnn
+                +" value="+item.state
+                +" data-value=\"\""
+                +" data-btn=\"\" >"+item.label+"</button>");
+                $("[id='bbb"+nnn+"']").data("btn",prop);
+                $("[id='bbb"+nnn+"']").data("value",item.state);
+                $("[id='bbb"+nnn+"']").val(item.state);
+            }
+            $("[id='bbb"+nnn+"']").on("click", function () {
+                var pp=$(this).data("btn");
+                /*$.each( pp.switches, function( ii, i ) {
+                    //console.log( "switch clicked: " + pp.modulename+pp.devicenameshort+pp.groupnameshort+pp.propname+i.name);
+                    pp.switches[ii].state=document.getElementById("bbb"+pp.modulename+pp.devicenameshort+pp.groupnameshort+pp.propname+i.name).value;
+                })*/
+                
+
+                var message = "{\"message\":\"setproperty\",\"property\":{\"devicename\":\""+pp.devicename
+                +"\",\"devicenameshort\":\""+pp.devicenameshort
+                +"\",\"groupname\":\""+pp.groupname
+                +"\",\"groupnameshort\":\""+pp.groupnameshort
+                +"\",\"label\":\""+pp.label
+                +"\",\"modulename\":\""+pp.modulename
+                +"\",\"propname\":\""+pp.propname
+                +"\",\"switches\":[{\"name\":\""+item.name+"\"}]}}";
+                console.log(jQuery.parseJSON(message));
+                websocket.send( message);
+                
+                
+                
+            })
+            
+        
+        }
+        if (item.state) $("[id='bbb"+nnn+"']").css("background", "green");   
+        if (!item.state) $("[id='bbb"+nnn+"']").css("background", "");   
+
+    })
+}    
+function buildlights(m,d,g,prop) {
+
+    p=prop.propname;
+    $.each( prop.lights, function( iitem, item ) {
+        nn=m+d+g+p;
+        nnn = nn+item.name;
+        if ($("#status"+nnn).length) {
+            //$("#"+nnn).val(item.state);
+        } else {
+            if (prop.permission=="0") {
+                $("#tab3"+nn+ " tbody").append("<tr>"
+                +"<td><strong id=status"+nnn+" >"+"---"+"</strong></td>"
+                +"<td><small>"+item.label+"</small></td>"
+                +"</tr>");
+            };
+            if (prop.permission=="2") {
+                /* not available */
+            }
+        
+        }
+        if (item.state=="0") $("#status"+nnn).css("background-color", "gray");   
+        if (item.state=="1") $("#status"+nnn).css("background-color", "green");   
+        if (item.state=="2") $("#status"+nnn).css("background-color", "yellow");   
+        if (item.state=="3") $("#status"+nnn).css("background-color", "red");  
+
+
+    })
+}    
+function creategraph2D(idgraph,graphlabel) {
+    var ctx = $(idgraph);
+    var graph = new Chart(ctx, {
+                type: 'line',
+                color: "#000000",
+                //fill: false,
+                data: {
+                        datasets: [{
+                            label: graphlabel,
+                            type: "scatter",
+                            border:  "#f38b4a",
+                            borderColor: "#f38b4a",
+                            //backgroundColor:  "#f38b4a",
+                            fill: false,
+                        }]
+                    },
+                options: {
+                    animation: false,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                        },
+                        y: {
+                            //type: 'logarithmic',
+                            type: 'linear',
+                            position: 'right',
+                        }
+                    }
+                }
+    });
+    ctx.data('graph', graph);
+}
+function appendgraph2D(idgraph,xx,yy) {
+    var graph = $(idgraph).data('graph');
+    graph.data.datasets[0].data.push({x:xx,y:yy});
+    //data.datasets[0].data.push({x:xx, y:yy});
+    //graph.render();
+    graph.update();
+}
+function creategraphPHD(idgraph,sname,xname,yname,zname,kname) {
+    var ctx = $(idgraph);
+    var graph = new Chart(ctx, {
+                type: 'line',
+                color: "#000000",
+                //fill: false,
+                data: {
+                        labels: [],
+                        datasets: [{
+                            label: xname,
+                            //type: "scatter",
+                            border:  "#f38b4a",
+                            borderColor: " #00ff00",
+                            //backgroundColor:  "#f38b4a",
+                            //fill: false,
+                            yAxisID: 'y',
+                            data: [],
+                        },
+                        {
+                            label: yname,
+                            //type: "scatter",
+                            border:  "#f38b4a",
+                            borderColor: "#0000ff",
+                            //fill: false,
+                            yAxisID: 'y',
+                            data: [],
+                            
+                        },
+                        {
+                            label: zname,
+                            //type: "scatter",
+                            border:  "#f38b4a",
+                            borderColor: " #ff0000",
+                            //backgroundColor:  "#f38b4a",
+                            //fill: false,
+                            yAxisID: 'z',
+                            data: [],
+                            stepped: true,                            
+                        },
+                        {
+                            label: kname,
+                            //type: "scatter",
+                            border:  "#f38b4a",
+                            borderColor: " #ffff00",
+                            //backgroundColor:  "#f38b4a",
+                            //fill: false,
+                            yAxisID: 'z',
+                            data: [],
+                            stepped: true,                            
+                        },
+                        ]
+                    },
+                options: {
+                    animation: false,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'right',
+                            borderColor: "#0000ff",
+                            
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'right',
+                            borderColor: "#0000ff",
+                        },
+                        z: {
+                            type: 'linear',
+                            position: 'left',
+                            borderColor: "#ff0000",
+                        }
+                    }
+                }
+    });
+    ctx.data('graph', graph);
+    ctx.labels('graph', graph);
+    
+}
+function appendgraphPHD(idgraph,ss,xx,yy,zz,kk) {
+    //console.log( "addvalues :", +ss+ " / "  +xx+ " / "  +yy+ " / "  +zz+ " / "  +kk);
+    var graph = $(idgraph).data('graph');
+    graph.data.labels.push(ss);
+    graph.data.datasets[0].data.push({x:ss,y:xx});
+    graph.data.datasets[1].data.push({x:ss,y:yy});
+    graph.data.datasets[2].data.push({x:ss,y:zz});
+    graph.data.datasets[3].data.push({x:ss,y:kk});
+    /*graph.data.datasets[1].data.push({s:ss,y:yy});
+    graph.data.datasets[2].data.push({s:ss,z:zz});
+    graph.data.datasets[3].data.push({s:ss,k:kk});*/
+    //graph.render();
+    graph.update();
+}
+</script>
+
