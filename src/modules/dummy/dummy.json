@@ -66,6 +66,28 @@
         "group": "Numbers",
         "permission": 2,
         "propertyLabel": "Numbers example - read/write"
+    },
+    "boolsRW": {
+        "hasprofile":true,
+        "devcat": "Examples",
+        "elements": {
+            "b1": {
+                "elementLabel": "Bool 1"
+            },
+            "b2": {
+                "elementLabel": "Bool 2"
+            },
+            "b3": {
+                "elementLabel": "Bool 3"
+            },
+            "b4": {
+                "elementLabel": "Bool 4"
+            }
+        },
+        "group": "Booleans",
+        "permission": 2,
+        "propertyLabel": "Boolean examples - read/write"
     }
+
 
 }

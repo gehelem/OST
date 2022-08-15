@@ -22,7 +22,18 @@ Dummy::Dummy(QString name, QString label, QString profile)
 
 
     setOstProperty("message","Dummy module init finished",true);
-
+    setOstElement("extextRO","extext1","Texte read only 1",false);
+    setOstElement("extextRO","extext2","Texte read only 2",false);
+    setOstElement("extextRO","extext3","Texte read only 3",false);
+    setOstElement("extextRO","extext4","Texte read only 4",true);
+    setOstElement("boolsRW","b1",true,false);
+    setOstElement("boolsRW","b2",false,false);
+    setOstElement("boolsRW","b3",true,false);
+    setOstElement("boolsRW","b4",false,true);
+    setOstElement("numbersRW","n1",0,false);
+    setOstElement("numbersRW","n2",-1000,false);
+    setOstElement("numbersRW","n3",3.14,false);
+    setOstElement("numbersRW","n4",-20.23,true);
     //saveAttributesToFile("dummy.json");
 
 }
