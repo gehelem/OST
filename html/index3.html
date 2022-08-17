@@ -67,25 +67,23 @@ function initWebSocket() {
                 
             }
             
-           
             if (obj.evt == 'setpropvalue') {
                 var dta=obj.dta;
                 var mod=obj.mod;
                 //console.log( "setpropvalue :"+mod);
                 $.each( dta, function( iprop, prop) {
-                    nnp=mod+iprop;
-                    nnp=nnp.replace(' ','');
                     //console.log( "setpropvalue :",iprop,"/",nnp);
-                    if (prop.status=="0") $("[id='status"+nnp+"']").text('\u25ef');       //white
-                    if (prop.status=="1") $("[id='status"+nnp+"']").text('\ud83d\udfe2'); // green
-                    if (prop.status=="2") $("[id='status"+nnp+"']").text('\ud83d\udfe1'); // yellow
-                    if (prop.status=="3") $("[id='status"+nnp+"']").text('\ud83d\udd34'); // red                     
-                    $.each( prop.elements   , function( ielt, elt) {
-                        //console.log( "setpropvalue :", '"'+iprop+ielt);
-                        e=mod+iprop+ielt;
-                        e=e.replace(' ', '');
-                        $("[id='"+e+"']").val(elt.value);
-                    });                  
+                    setattributes(mod,prop,iprop);
+                });                  
+
+            }
+           
+            if (obj.evt == 'setattributes') {
+                var dta=obj.dta;
+                var mod=obj.mod;
+                $.each( dta, function( iprop, prop) {
+                    //console.log( "setattributes :",iprop,"/",nnp);
+                    setattributes(mod,prop,iprop);
                 });                  
 
             }
@@ -186,8 +184,141 @@ function buildgroup(m,prop) {
         $("[id='grpDIV"+m+dd+gg+"']").append("<ul id='grpUL"+m+dd+gg+"'></ul>");
     };
 }
-
 function buildproperty(m,p,n) {
+    var d=p.devcat.replace(' ', '');
+    var g=p.group.replace(' ', '');
+    var mp=m.replace(' ', '')+n.replace(' ', '');
+    if  (!($("[id='P"+mp+"']").length)) {
+        var div="<div id=P"+mp+" data-devcat='"+d+"' data-group='"+g+"' data-key='"+n+"'>";
+        div = div + "<strong id='status"+mp+"' >"+'\u25ef'+"</strong>";                  // status icon
+        div = div + "<strong id=title"+mp+" > "+p.propertyLabel+" </strong>";            // label 
+        
+        // Edit button is added only for writable numbers and texts (not booleans)
+        var addEditBtn = false;
+        if (p.permission=="1"||p.permission=="2") {
+            $.each( p.elements, function( ii, i ) {
+                if ( (jQuery.type(i.value)=='string')||(jQuery.type(i.value)=='number') ) addEditBtn = true;
+            })                
+        }
+        if (addEditBtn) {
+            div = div + "<button class='ui-button ui-widget ui-corner-all' id=edit"+mp;
+            div = div + " data-m"+m+" data-mp="+mp+" data-key=\"\"";
+            div = div + ">&#128393</button>";
+        }
+
+        // show elements values
+        div = div + "<table>";
+        $.each( p.elements, function( ii, i ) {
+            if ( (jQuery.type(i.value)=='string')) {
+               div = div + "<tr><td><label for='"+ii+"'>"+i.elementLabel+"</label></td>";
+               div = div + "<td><input type=text' id='elt"+mp+ii+"' value='"+i.value+"' class='text ui-widget-content ui-corner-all'></td></tr>";
+            }
+            if ( (jQuery.type(i.value)=='number')) {
+               div = div + "<tr><td><label for='"+ii+"'>"+i.elementLabel+"</label></td>";
+               div = div + "<td><input type=text' id='elt"+mp+ii+"' value='"+i.value+"' class='text ui-widget-content ui-corner-all'></td></tr>";
+            }
+        })                
+        div = div + "</table>";
+        div = div + "</div>";
+
+        $("#grpUL"+m+d+g).append(div);
+        $("[id='P"+mp+"']").data("prop",p);
+        $("[id='P"+mp+"']").data("m",m);
+        $("[id='P"+mp+"']").data("key",n);
+        
+        // numbers and texts are readonly
+        $.each( p.elements, function( ii, i ) {
+            if ( (jQuery.type(i.value)=='string') || (jQuery.type(i.value)=='number') ) {
+               $("[id='elt"+mp+ii+"']").attr('readonly', true);
+            }
+        })                
+        
+        
+        // Assign edit button behavior
+        if (addEditBtn) {
+            buildEditBtn(m,p,n)
+        }       
+        
+        //set attributes
+        setattributes(m,p,n);
+        
+        
+    }
+    
+}
+function buildEditBtn(m,p,n) {
+    var d=p.devcat.replace(' ', '');
+    var g=p.group.replace(' ', '');
+    var mp=m.replace(' ', '')+n.replace(' ', '');
+
+    $("[id='edit"+mp+"']").on("click", function () {
+            var mp=$(this).data("mp");
+            var p=$("[id='P"+mp+"']").data("prop");
+            console.log("clic:",p.propertyLabel);
+            var form = "<div id='form"+mp+"' title='"+p.propertyLabel+"' style='modal:true'><form>";
+            form = form+"<fieldset><table>";
+            $.each( p.elements, function( ii, i ) {
+                    //console.log(jQuery.type(i.value));
+                switch(jQuery.type(i.value)) {
+                case 'string':
+                    form = form+"<tr><td><label for='"+ii+"'>"+i.elementLabel+"</label></td>";
+                    form = form+"<td><input type=text' name='form"+mp+ii+"' id='form"+mp+ii+"' value='"+i.value+"' class='text ui-widget-content ui-corner-all'></td></tr>";
+                    break;
+                case 'number':
+                    form = form+"<tr><td><label for='"+ii+"'>"+i.elementLabel+"</label></td>";
+                    form = form+"<td><input type='number' name='form"+mp+ii+"' id='form"+mp+ii+"' value='"+i.value+"' step='"+i.step+"' min='"+i.min+"' max='"+i.max+"' class='text ui-widget-content ui-corner-all'></td></tr>";
+                    break;
+                default:
+                    // code block
+                } 
+            })  
+            form = form+"</fieldset></table>";
+            form = form+"<input type='submit' class='ui-button ui-widget ui-corner-all'>";
+            form = form+"</form></div>";
+            
+            $("[id='P"+mp+"']").append(form);
+            $("[id='form"+mp+"']").data("mp",mp);
+            $("[id='form"+mp+"']").on( "submit", function(event) {
+                event.preventDefault();
+                console.log("submit");
+                var mp=$(this).data("mp");
+                var p=$("[id='P"+mp+"']").data("prop");
+                var m=$("[id='P"+mp+"']").data("m");
+                var n=$("[id='P"+mp+"']").data("key");
+                $.each( p.elements, function( ii, i ) {
+                    //console.log(mp+ii);
+                    if ($("[id='form"+mp+ii+"']").length) { // to avoid booleans
+                        console.log(mp+ii);
+                        p.elements[ii].value=document.getElementById("form"+mp+ii).value;
+                    } 
+                })                
+                var obj = jQuery.parseJSON("{\"evt\":\"setproperty\",\"mod\":\""+m+"\",\"dta\":{\""+n+"\":"+JSON.stringify(p)+"}}");
+                console.log(obj);
+                websocket.send(JSON.stringify(obj));
+                $( "[id='form"+mp+"']" ).dialog("close");
+                $( "[id='form"+mp+"']" ).remove();
+            });
+            
+            
+            $("[id='form"+mp+"']").dialog({modal:true,resizable: false,width:'auto'});
+            
+    });
+    
+
+}
+function setattributes(m,p,n) {
+    var mp=m.replace(' ', '')+n.replace(' ', '');
+
+    if (p.status=="0") $("[id='status"+mp+"']").text('\u25ef');       //white
+    if (p.status=="1") $("[id='status"+mp+"']").text('\ud83d\udfe2'); // green
+    if (p.status=="2") $("[id='status"+mp+"']").text('\ud83d\udfe1'); // yellow
+    if (p.status=="3") $("[id='status"+mp+"']").text('\ud83d\udd34'); // red                     
+    $.each( p.elements   , function( ii, i) {
+        $("[id='elt"+mp+ii+"']").val(i.value);
+    });                  
+    
+}
+function buildpropertybk(m,p,n) {
     d=p.devcat.replace(' ', '');
     g=p.group.replace(' ', '');
     n = n.replace(' ', ''); 
