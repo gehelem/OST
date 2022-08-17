@@ -146,11 +146,23 @@ void WShandler::OnModuleEvent(const QString &eventType, const QString  &eventMod
            if (prop.contains("value")) {
                values["value"]=prop["value"];
            }
+           if (prop.contains("status")) {
+               values["status"]=prop["status"];
+           }
            if (prop.contains("elements")) {
                QVariantMap elements;
                foreach(const QString& key, prop["elements"].toMap().keys()) {
                    QVariantMap element;
                    element["value"]=prop["elements"].toMap()[key].toMap()["value"];
+                   if (prop["elements"].toMap()[key].toMap().contains("min")) {
+                       element["min"]=prop["elements"].toMap()[key].toMap()["min"];
+                   }
+                   if (prop["elements"].toMap()[key].toMap().contains("max")) {
+                       element["max"]=prop["elements"].toMap()[key].toMap()["max"];
+                   }
+                   if (prop["elements"].toMap()[key].toMap().contains("step")) {
+                       element["step"]=prop["elements"].toMap()[key].toMap()["step"];
+                   }
                    elements[key]=element;
                }
                values["elements"]=elements;
