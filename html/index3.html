@@ -107,15 +107,7 @@ function initWebSocket() {
                 $("div#D"+mod).tabs("refresh");       /* this shouldn't be here */  
 
             }
-            if (obj.evt == 'createproperty') {
-                p=obj.property;
-                var dta=obj.dta;
-                builddevcat  (obj.module,p.devicenameshort,p.devicename);
-                $("#D"+obj.module+p.devicenameshort).tabs("refresh");              /* this shouldn't be here */
-                buildgroup   (obj.module,p.devicenameshort,p.groupnameshort,p.groupname);
-                $("#D"+obj.module).tabs("refresh");              /* this shouldn't be here */
-                buildproperty(obj.module,p.devicenameshort,p.groupnameshort,p);
-            }
+
             if (obj.evt == 'delprop') { 
                     var p=obj.mod+obj.key.replace(' ', '');
                     dev=$("div#P"+ p ).data("devcat");
