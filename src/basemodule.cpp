@@ -502,7 +502,7 @@ void Basemodule::setOstPropertyAttribute   (const QString &pPropertyName, const 
     QVariantMap _prop=_ostproperties[pPropertyName].toMap();
     _prop[pAttributeName]=_value;
     _ostproperties[pPropertyName]=_prop;
-    if (emitEvent)  emit moduleEvent("setpropvalue",_modulename,pPropertyName,_prop);
+    if (emitEvent)  emit moduleEvent("setattributes",_modulename,pPropertyName,_prop);
 
 }
 void Basemodule::setOstElementAttribute (QString propertyName, QString elementName, QString attributeName, QVariant _value, bool emitEvent)
