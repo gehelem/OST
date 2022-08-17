@@ -26,10 +26,18 @@ Dummy::Dummy(QString name, QString label, QString profile)
     setOstElement("extextRO","extext2","Texte read only 2",false);
     setOstElement("extextRO","extext3","Texte read only 3",false);
     setOstElement("extextRO","extext4","Texte read only 4",true);
-    setOstElement("boolsRW","b1",true,false);
-    setOstElement("boolsRW","b2",false,false);
-    setOstElement("boolsRW","b3",true,false);
-    setOstElement("boolsRW","b4",false,true);
+    setOstElement("boolsRW0","b1",true,false);
+    setOstElement("boolsRW0","b2",false,false);
+    setOstElement("boolsRW0","b3",false,false);
+    setOstElement("boolsRW0","b4",false,true);
+    setOstElement("boolsRW1","b1",false,false);
+    setOstElement("boolsRW1","b2",false,false);
+    setOstElement("boolsRW1","b3",false,false);
+    setOstElement("boolsRW1","b4",false,true);
+    setOstElement("boolsRW2","b1",true,false);
+    setOstElement("boolsRW2","b2",true,false);
+    setOstElement("boolsRW2","b3",true,false);
+    setOstElement("boolsRW2","b4",false,true);
     setOstElement("numbersRW","n1",0,false);
     setOstElement("numbersRW","n2",-1000,false);
     setOstElement("numbersRW","n3",3.14,false);
@@ -38,6 +46,12 @@ Dummy::Dummy(QString name, QString label, QString profile)
     setOstElementAttribute("numbersRW","n4","min",-10000,true);
     setOstElementAttribute("numbersRW","n4","max",10000,true);
 
+    setOstElement("mixedRW","b1",false,false);
+    setOstElement("mixedRW","b2",false,false);
+    setOstElement("mixedRW","b3",true,false);
+    setOstElement("mixedRW","n1",10,false);
+    setOstElement("mixedRW","n2",11,false);
+    setOstElement("mixedRW","t1","Mixed text value",false);
     //saveAttributesToFile("dummy.json");
 
 }
