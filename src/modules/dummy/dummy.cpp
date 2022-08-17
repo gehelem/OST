@@ -34,6 +34,10 @@ Dummy::Dummy(QString name, QString label, QString profile)
     setOstElement("numbersRW","n2",-1000,false);
     setOstElement("numbersRW","n3",3.14,false);
     setOstElement("numbersRW","n4",-20.23,true);
+    setOstElementAttribute("numbersRW","n4","step",100,true);
+    setOstElementAttribute("numbersRW","n4","min",-10000,true);
+    setOstElementAttribute("numbersRW","n4","max",10000,true);
+
     //saveAttributesToFile("dummy.json");
 
 }

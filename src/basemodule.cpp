@@ -440,7 +440,7 @@ bool Basemodule::frameReset(QString devicename)
 
 void Basemodule::createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,const  QString &pPropertyDevcat, const QString &pPropertyGroup)
 {
-    BOOST_LOG_TRIVIAL(debug) << "createOstProperty  - " << _modulename.toStdString() << "-" << pPropertyName.toStdString();
+    //BOOST_LOG_TRIVIAL(debug) << "createOstProperty  - " << _modulename.toStdString() << "-" << pPropertyName.toStdString();
     QVariantMap _prop=_ostproperties[pPropertyName].toMap();
     _prop["propertyLabel"]=pPropertyLabel;
     _prop["permission"]=pPropertyPermission;
@@ -452,7 +452,7 @@ void Basemodule::createOstProperty(const QString &pPropertyName, const QString &
 }
 void Basemodule::deleteOstProperty(QString propertyName)
 {
-    BOOST_LOG_TRIVIAL(debug) << "deleteOstProperty  - " << _modulename.toStdString() << "-" << propertyName.toStdString();
+    //BOOST_LOG_TRIVIAL(debug) << "deleteOstProperty  - " << _modulename.toStdString() << "-" << propertyName.toStdString();
     _ostproperties.remove(propertyName);
     emit moduleEvent("delprop",_modulename,propertyName,QVariantMap());
 
@@ -496,7 +496,31 @@ void Basemodule::setOstElement    (QString propertyName, QString elementName, QV
 
 }
 
+void Basemodule::setOstPropertyAttribute   (const QString &pPropertyName, const QString &pAttributeName, QVariant _value,bool emitEvent)
+{
+    //BOOST_LOG_TRIVIAL(debug) << "setOstPropertyAttribute  - " << _modulename.toStdString() << "-" << pPropertyName.toStdString();
+    QVariantMap _prop=_ostproperties[pPropertyName].toMap();
+    _prop[pAttributeName]=_value;
+    _ostproperties[pPropertyName]=_prop;
+    if (emitEvent)  emit moduleEvent("setpropvalue",_modulename,pPropertyName,_prop);
 
+}
+void Basemodule::setOstElementAttribute (QString propertyName, QString elementName, QString attributeName, QVariant _value, bool emitEvent)
+{
+    QVariantMap _prop=_ostproperties[propertyName].toMap();
+    if (_prop.contains("elements")) {
+        if (_prop["elements"].toMap().contains(elementName)) {
+            QVariantMap elements=_prop["elements"].toMap();
+            QVariantMap element=elements[elementName].toMap();
+            element[attributeName]=_value;
+            elements[elementName]=element;
+            _prop["elements"]=elements;
+        }
+    }
+    _ostproperties[propertyName]=_prop;
+    if (emitEvent) emit moduleEvent("setpropvalue",_modulename,propertyName,_prop);
+
+}
 
 void Basemodule::loadPropertiesFromFile(QString fileName)
 {

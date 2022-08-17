@@ -41,6 +41,8 @@ void IndiPanel::newProperty(INDI::Property *pProperty)
     QString devpro = dev+pro;
     //BOOST_LOG_TRIVIAL(debug) << "Indipanel new property " << devpro.toStdString();
     createOstProperty(devpro,pProperty->getLabel(),pProperty->getPermission(),pProperty->getDeviceName(),pProperty->getGroupName());
+    setOstPropertyAttribute(devpro,"indi",pProperty->getType(),false);
+
     switch (pProperty->getType()) {
 
         case INDI_NUMBER: {
@@ -58,26 +60,34 @@ void IndiPanel::newProperty(INDI::Property *pProperty)
             INumberVectorProperty *vp=pProperty->getNumber();
             for (int i=0;i<vp->nnp;i++) {
                 createOstElement(devpro,vp->np[i].name,vp->np[i].label);
-                setOstElement(devpro,vp->np[i].name,vp->np[i].value,i==vp->nnp-1);
+                setOstElement(devpro,vp->np[i].name,vp->np[i].value,false);
+                setOstElementAttribute(devpro,vp->np[i].name,"min",vp->np[i].min,false);
+                setOstElementAttribute(devpro,vp->np[i].name,"max",vp->np[i].max,false);
+                setOstElementAttribute(devpro,vp->np[i].name,"step",vp->np[i].step,false);
+                setOstElementAttribute(devpro,vp->np[i].name,"format",vp->np[i].format,false);
+                //setOstElementAttribute(devpro,vp->np[i].name,"aux0",vp->np[i].aux0,false);
+                //setOstElementAttribute(devpro,vp->np[i].name,"aux1",vp->np[i].aux1,false);
             }
-
             break;
         }
         case INDI_SWITCH: {
             ISwitchVectorProperty *vp=pProperty->getSwitch();
             for (int i=0;i<vp->nsp;i++) {
                 createOstElement(devpro,vp->sp[i].name,vp->sp[i].label);
-                if (vp->sp[i].s==0) setOstElement(devpro,vp->sp[i].name,false,i==vp->nsp-1);
-                if (vp->sp[i].s==1) setOstElement(devpro,vp->sp[i].name,true ,i==vp->nsp-1);
+                if (vp->sp[i].s==0) setOstElement(devpro,vp->sp[i].name,false,false);
+                if (vp->sp[i].s==1) setOstElement(devpro,vp->sp[i].name,true ,false);
+                //setOstElementAttribute(devpro,vp->sp[i].name,"aux0",vp->sp[i].aux,false);
             }
+            setOstPropertyAttribute(devpro,"rule",vp->r,false);
             break;
         }
         case INDI_TEXT: {
             ITextVectorProperty *vp=pProperty->getText();
             for (int i=0;i<vp->ntp;i++) {
                 createOstElement(devpro,vp->tp[i].name,vp->tp[i].label);
-                setOstElement(devpro,vp->tp[i].name,vp->tp[i].text,i==vp->ntp-1);
-
+                setOstElement(devpro,vp->tp[i].name,vp->tp[i].text,false);
+                //setOstElementAttribute(devpro,vp->tp[i].name,"aux0",vp->tp[i].aux0,false);
+                //setOstElementAttribute(devpro,vp->tp[i].name,"aux1",vp->tp[i].aux1,false);
             }
             break;
         }
@@ -85,7 +95,8 @@ void IndiPanel::newProperty(INDI::Property *pProperty)
             ILightVectorProperty *vp=pProperty->getLight();
             for (int i=0;i<vp->nlp;i++) {
                 createOstElement(devpro,vp->lp[i].name,vp->lp[i].label);
-                setOstElement(devpro,vp->lp[i].name,vp->lp[i].s,i==vp->nlp-1);
+                setOstElement(devpro,vp->lp[i].name,vp->lp[i].s,false);
+                //setOstElementAttribute(devpro,vp->lp[i].name,"aux0",vp->lp[i].aux,false);
             }
             break;
         }
@@ -97,6 +108,8 @@ void IndiPanel::newProperty(INDI::Property *pProperty)
             break;
         }
     }
+    setOstPropertyAttribute(devpro,"status",pProperty->getState(),true);
+
 
 }
 
@@ -136,8 +149,13 @@ void IndiPanel::newNumber(INumberVectorProperty *nvp)
     QString pro = nvp->name;
     QString devpro = dev+pro;
     for (int i=0;i<nvp->nnp;i++) {
-        setOstElement(devpro,nvp->np[i].name,nvp->np[i].value,i==nvp->nnp-1);
+        setOstElement(devpro,nvp->np[i].name,nvp->np[i].value,false);
+        setOstElementAttribute(devpro,nvp->np[i].name,"min",nvp->np[i].min,false);
+        setOstElementAttribute(devpro,nvp->np[i].name,"max",nvp->np[i].max,false);
+        setOstElementAttribute(devpro,nvp->np[i].name,"step",nvp->np[i].step,false);
+        setOstElementAttribute(devpro,nvp->np[i].name,"format",nvp->np[i].format,false);
     }
+    setOstPropertyAttribute(devpro,"status",nvp->s,true);
 }
 void IndiPanel::newText(ITextVectorProperty *tvp)
 {
@@ -145,8 +163,9 @@ void IndiPanel::newText(ITextVectorProperty *tvp)
     QString pro = tvp->name;
     QString devpro = dev+pro;
     for (int i=0;i<tvp->ntp;i++) {
-        setOstElement(devpro,tvp->tp[i].name,tvp->tp[i].text,i==tvp->ntp-1);
+        setOstElement(devpro,tvp->tp[i].name,tvp->tp[i].text,false);
     }
+    setOstPropertyAttribute(devpro,"status",tvp->s,true);
 }
 void IndiPanel::newLight(ILightVectorProperty *lvp)
 {
@@ -156,6 +175,7 @@ void IndiPanel::newLight(ILightVectorProperty *lvp)
     for (int i=0;i<lvp->nlp;i++) {
         setOstElement(devpro,lvp->lp[i].name,lvp->lp[i].s,i==lvp->nlp-1);
     }
+    setOstPropertyAttribute(devpro,"status",lvp->s,true);
 }
 void IndiPanel::newSwitch(ISwitchVectorProperty *svp)
 {
@@ -166,6 +186,8 @@ void IndiPanel::newSwitch(ISwitchVectorProperty *svp)
         if (svp->sp[i].s==0) setOstElement(devpro,svp->sp[i].name,false,i==svp->nsp-1);
         if (svp->sp[i].s==1) setOstElement(devpro,svp->sp[i].name,true ,i==svp->nsp-1);
     }
+    setOstPropertyAttribute(devpro,"status",svp->s,true);
+
 }
 void IndiPanel::newBLOB(IBLOB *bp)
 {
@@ -173,8 +195,7 @@ void IndiPanel::newBLOB(IBLOB *bp)
 }
 void IndiPanel::newMessage     (INDI::BaseDevice *dp, int messageID)
 {
-    QString txt= QString::fromStdString(dp->messageQueue(messageID));
-    Q_UNUSED(txt)
+    setOstProperty("message",QString::fromStdString(dp->messageQueue(messageID)),true);
 }
 
 void IndiPanel::OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)

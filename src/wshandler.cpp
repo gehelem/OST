@@ -100,7 +100,7 @@ void WShandler::sendJsonMessage(QJsonObject json)
     //QString strJson(jsondoc.toJson(QJsonDocument::Indented)); // version lisible
     QString strJson(jsondoc.toJson(QJsonDocument::Compact)); // version compactée
     sendmessage(strJson);
-    BOOST_LOG_TRIVIAL(debug) << "WS handler sends : " << strJson.toStdString();
+    //BOOST_LOG_TRIVIAL(debug) << "WS handler sends : " << strJson.toStdString();
 }
 
 void WShandler::processBinaryMessage(QByteArray message)
