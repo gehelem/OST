@@ -73,7 +73,13 @@ function initWebSocket() {
                 var mod=obj.mod;
                 //console.log( "setpropvalue :"+mod);
                 $.each( dta, function( iprop, prop) {
-                    //console.log( "setpropvalue :", '"'+iprop);
+                    nnp=mod+iprop;
+                    nnp=nnp.replace(' ','');
+                    console.log( "setpropvalue :",iprop,"/",nnp);
+                    if (prop.status=="0") $("[id='status"+nnp+"']").text('\u25ef');       //white
+                    if (prop.status=="1") $("[id='status"+nnp+"']").text('\ud83d\udfe2'); // green
+                    if (prop.status=="2") $("[id='status"+nnp+"']").text('\ud83d\udfe1'); // yellow
+                    if (prop.status=="3") $("[id='status"+nnp+"']").text('\ud83d\udd34'); // red                     
                     $.each( prop.elements   , function( ielt, elt) {
                         //console.log( "setpropvalue :", '"'+iprop+ielt);
                         e=mod+iprop+ielt;
@@ -90,9 +96,9 @@ function initWebSocket() {
                     d = prop.devcat.replace(' ', '');
                     g = prop.group.replace(' ', '');    
                     p = iprop.replace(' ', '');
-                    builddevice(mod,d,prop.devcat);
-                    buildgroup(mod,d,g,prop.group);                    
-                    buildproperty(mod,d,g,prop,iprop);                  
+                    builddevcat(mod,prop);
+                    buildgroup(mod,prop);                    
+                    buildproperty(mod,prop,iprop);                  
                 })                
                 $.each( dta, function(iprop,prop) {
                     d = prop.devcat.replace(' ', '');
@@ -103,7 +109,8 @@ function initWebSocket() {
             }
             if (obj.evt == 'createproperty') {
                 p=obj.property;
-                builddevice  (obj.module,p.devicenameshort,p.devicename);
+                var dta=obj.dta;
+                builddevcat  (obj.module,p.devicenameshort,p.devicename);
                 $("#D"+obj.module+p.devicenameshort).tabs("refresh");              /* this shouldn't be here */
                 buildgroup   (obj.module,p.devicenameshort,p.groupnameshort,p.groupname);
                 $("#D"+obj.module).tabs("refresh");              /* this shouldn't be here */
@@ -198,11 +205,11 @@ function buildproperty(m,p,n) {
     if  (!($("[id='P"+nnp+"']").length)&&(true||p.hasOwnProperty('texts')||p.hasOwnProperty('numbers')||p.hasOwnProperty('switches')||p.hasOwnProperty('lights')))  {
         div="<div id=P"+nnp+" data-devcat='"+d+"' data-group='"+g+"' ><table id=tab"+nnp+">"
         +"<tr>"
-        +"<strong id=status"+nnp+" >"+"---"+"</strong>"
-        +"<strong id=title"+nnp+" >"+p.propertyLabel+"</strong>";
+        +"<strong id=status"+nnp+" ><a>"+'\u25ef'+"</a></strong>"
+        +"<strong id=title"+nnp+" > "+p.propertyLabel+" </strong>";
         if (p.permission=="1"||p.permission=="2") {
             div=div+"<button class='ui-button ui-widget ui-corner-all' "
-            +"id=edit"+nnp+ " data-json=\"\" data-nnp=\"\" data-mod=\"\" data-key=\"\">Edit</button>";
+            +"id=edit"+nnp+ " data-json=\"\" data-nnp=\"\" data-mod=\"\" data-key=\"\">&#128394</button>";
         }
         div=div+"</tr>";
         
@@ -407,10 +414,10 @@ function buildproperty(m,p,n) {
         }
     }
     
-    if (p.state=="0") $("#status"+nnp).css("background-color", "gray");   
-    if (p.state=="1") $("#status"+nnp).css("background-color", "green");   
-    if (p.state=="2") $("#status"+nnp).css("background-color", "yellow");   
-    if (p.state=="3") $("#status"+nnp).css("background-color", "red");
+    if (p.status=="0") $("[id='status"+nnp+"']").text('\u25ef');       //white
+    if (p.status=="1") $("[id='status"+nnp+"']").text('\ud83d\udfe2'); // green
+    if (p.status=="2") $("[id='status"+nnp+"']").text('\ud83d\udfe1'); // yellow
+    if (p.status=="3") $("[id='status"+nnp+"']").text('\ud83d\udd34'); // red 
     if (p.hasOwnProperty('elements')) buildelts   (m,p,n);
     if (p.hasOwnProperty('texts'   )) buildtexts  (m,d,g,p);
     if (p.hasOwnProperty('numbers' )) buildnumbers(m,d,g,p);
