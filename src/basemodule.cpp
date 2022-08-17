@@ -467,7 +467,7 @@ void Basemodule::setOstProperty(const QString &pPropertyName, QVariant _value, b
     _ostproperties[pPropertyName]=_prop;
     if (emitEvent) emit moduleEvent("setpropvalue",_modulename,pPropertyName,_prop);
 }
-void Basemodule::createOstElement (QString propertyName, QString elementName, QString elementLabel)
+void Basemodule::createOstElement (QString propertyName, QString elementName, QString elementLabel, bool emitEvent)
 {
     QVariantMap _prop=_ostproperties[propertyName].toMap();
     QVariantMap elements=_prop["elements"].toMap();
@@ -476,7 +476,7 @@ void Basemodule::createOstElement (QString propertyName, QString elementName, QS
     elements[elementName]=element;
     _prop["elements"]=elements;
     _ostproperties[propertyName]=_prop;
-    emit moduleEvent("addelt",_modulename,propertyName,_prop);
+    if (emitEvent) emit moduleEvent("addelt",_modulename,propertyName,_prop);
 
 }
 void Basemodule::setOstElement    (QString propertyName, QString elementName, QVariant elementValue, bool emitEvent)
