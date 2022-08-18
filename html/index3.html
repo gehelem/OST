@@ -219,12 +219,35 @@ function buildproperty(m,p,n) {
             }
         })                
         div = div + "</table>";
-        div = div + "</div>";
+        
+        // add switchs or radio for booleans
+        var tt='checkbox';
+        if (p.hasOwnProperty('rule')) {
+            if (p.rule==0) tt='radio';
+        }
+        div = div + "<fieldset id='fs"+mp+"' >";
+        $.each( p.elements, function( ii, i ) {
+            if ( (jQuery.type(i.value)=='boolean')) {
+                div = div + "<label for='sw"+mp+ii+"'>"+i.elementLabel+"</label>"
+                div = div + "<input type="+tt+" name='sw"+mp+"' id='sw"+mp+ii+"'>"
+            }
+        })                
+        div = div + "</fieldset>";
 
+        div = div + "</div>";
         $("#grpUL"+m+d+g).append(div);
         $("[id='P"+mp+"']").data("prop",p);
         $("[id='P"+mp+"']").data("m",m);
         $("[id='P"+mp+"']").data("key",n);
+
+        $.each( p.elements, function( ii, i ) {
+            if ( (jQuery.type(i.value)=='boolean')) {
+                $( "[id='sw"+mp+ii+"']" ).checkboxradio({icon: false});
+            }
+        })                
+
+        //$( "[id='P"+mp+"']").attr('border' , 'none');
+        //$( "[id='P"+mp+"']").attr('outline', 'none');
         
         // numbers and texts are readonly
         $.each( p.elements, function( ii, i ) {

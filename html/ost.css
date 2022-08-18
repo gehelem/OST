@@ -31,3 +31,6 @@ ul {
 	text-indent: 1px;
 	padding: 0 0;
 }
+fieldset {
+    border-width: 0px;
+}
