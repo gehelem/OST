@@ -229,7 +229,7 @@ function buildproperty(m,p,n) {
         $.each( p.elements, function( ii, i ) {
             if ( (jQuery.type(i.value)=='boolean')) {
                 div = div + "<label for='sw"+mp+ii+"'>"+i.elementLabel+"</label>";
-                div = div + "<input type="+tt+" name='sw"+mp+"' id='sw"+mp+ii+"'  >";
+                div = div + "<input type="+tt+" name='sw"+mp+"' id='sw"+mp+ii+"' data-mp='"+mp+"' data-mpi='"+mp+ii+"'  >";
             }
         })                
         div = div + "</fieldset>";
@@ -240,13 +240,25 @@ function buildproperty(m,p,n) {
         $("[id='P"+mp+"']").data("m",m);
         $("[id='P"+mp+"']").data("key",n);
 
+        
         $.each( p.elements, function( ii, i ) {
             if ( (jQuery.type(i.value)=='boolean')) {
                 $("[id='sw"+mp+ii+"']").checkboxradio({icon: false});
                 $("[id='sw"+mp+ii+"']").prop('checked', i.value).checkboxradio("refresh");
+                // send message when check/uncheck
+                $("[id='sw"+mp+ii+"']").change(function () {
+                    var mpi=$(this).data("mpi");
+                    var mp=$(this).data("mp");
+                    var check = $(this).prop('checked');
+                    var n=$("[id='P"+mp+"']").data("key");
+                    var obj = jQuery.parseJSON("{\"evt\":\"setproperty\",\"mod\":\""+m+"\",\"dta\":{\""+n+"\":"+"{\"elements\":{\""+ii+"\":{\"value\":"+check+"}}}}}");
+                    console.log(obj);
+                    websocket.send(JSON.stringify(obj)); 
+                });        
+
             }
-        })                
-        
+        })     
+
         // numbers and texts are readonly
         $.each( p.elements, function( ii, i ) {
             if ( (jQuery.type(i.value)=='string') || (jQuery.type(i.value)=='number') ) {
