@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="jquery-ui.min.css">
+<script src="external/jquery/jquery.js"></script>
+<script src="jquery-ui.min.js"></script>
+<script src="chart.js"></script>
+<link rel="stylesheet" href="ost.css">
+</head><body><div id="OST"></div></body>
+</html>
+
+<script>
+
+var ur = window.location.origin.replace("http://", "");
+var result = ur.replace("http://", "");
+var wsUri = "ws://"+ur+":9624";            
+var websocket = null;
+
+$(document).ready(function()
+{
+    initWebSocket();
+});
+
+
+function initWebSocket() {
+    try {
+        if (typeof MozWebSocket == 'function') WebSocket = MozWebSocket;
+        if ( websocket && websocket.readyState == 1 ) websocket.close();
+        
+        websocket = new WebSocket( wsUri );
+        websocket.onopen = function (evt) {
+            console.log("CONNECTED");
+            websocket.send( "{\"evt\":\"readall\"}");
+        };
+        websocket.onclose = function (evt) {
+            console.log("DISCONNECTED");
+            $("div#OST").append("Lost backend connection, reconnecting...");
+            //window.location.reload();
+            setTimeout(function() {
+                window.location.reload(); 
+                //initWebSocket();
+            },3000);
+        };
+
+        websocket.onmessage = function (evt) {
+            var obj = JSON.parse( evt.data );
+            console.log(obj);
+            //if ((obj.event == 'appendproperty')) {console.log(obj)};
+            //if ((obj.event == 'updateproperty')&&(obj.property.propname=='grid')) {console.log(obj)};
+            if (obj.evt == 'moduledump') {
+                m=obj.mod;
+                l=obj.mod;
+                buildmodule(m,l);
+               
+                var properties = obj.dta;
+                $.each( properties, function(iprop,prop) {
+                    builddevcat(m,prop);
+                    buildgroup(m,prop);
+                    buildproperty(m,prop,iprop);
+                })
+                $.each( properties, function(iprop,prop) {
+                    d = prop.devcat.replace(' ', '');
+                    $("div#devDIV"+m+d).tabs(); /* this shouldn't be here */    
+                })                
+                $("div#modDIV"+m).tabs();       /* this shouldn't be here */    
+                
+            }
+            
+            if (obj.evt == 'setpropvalue') {
+                var dta=obj.dta;
+                var mod=obj.mod;
+                //console.log( "setpropvalue :"+mod);
+                $.each( dta, function( iprop, prop) {
+                    //console.log( "setpropvalue :",iprop,"/",nnp);
+                    setattributes(mod,prop,iprop);
+                });                  
+
+            }
+           
+            if (obj.evt == 'setattributes') {
+                var dta=obj.dta;
+                var mod=obj.mod;
+                $.each( dta, function( iprop, prop) {
+                    //console.log( "setattributes :",iprop,"/",nnp);
+                    setattributes(mod,prop,iprop);
+                });                  
+
+            }
+            if ((obj.evt == 'addprop')||(obj.evt == 'addelt')) {
+                var dta=obj.dta;
+                var mod=obj.mod;
+                $.each( dta, function(iprop,prop) {
+                    d = prop.devcat.replace(' ', '');
+                    g = prop.group.replace(' ', '');    
+                    p = iprop.replace(' ', '');
+                    builddevcat(mod,prop);
+                    buildgroup(mod,prop);                    
+                    buildproperty(mod,prop,iprop);                  
+                })                
+                $.each( dta, function(iprop,prop) {
+                    d = prop.devcat.replace(' ', '');
+                    $("div#devDIV"+mod+d).tabs("refresh"); 
+                })                
+                $("div#modDIV"+mod).tabs("refresh");       /* this shouldn't be here */  
+
+            }
+
+            if (obj.evt == 'delprop') { 
+                    var p=obj.mod+obj.key.replace(' ', '');
+                    dev=$("div#P"+ p ).data("devcat");
+                    dev=obj.mod+dev;
+                    dev=dev.replace(' ', '');
+                    group=$("#P"+ p ).data("group");
+                    group=dev+group;
+                    group=group.replace(' ', '');
+                    $( "#tab3"+ p ).remove()
+                    $( "#tab2"+ p ).remove()
+                    $( "#tab"+ p ).remove()
+                    $( "#P"+ p ).children().remove();
+
+                    $( "#P"+ p ).remove();
+                    if (!($("#grpUL"+ group ).children().length > 0)){
+                        //console.log("REMOVE GROUP "+group);
+                        $("#grpDIV"+ group ).remove();
+                        $("#grpLIL"+ group ).remove();
+                        $("#grpUL" + group ).remove();
+                    }
+                    if (!($("#devUL"+ dev).children().length > 0)){
+                        //console.log("REMOVE DEVICE "+dev);
+                        $("#devDIV"+ dev ).remove();
+                        $("#devLIL"+ dev ).remove();
+                        $("#devUL" + dev ).remove();
+                    }
+
+                
+            }
+            
+        };
+        
+        websocket.onerror = function (evt) {
+            console.log('ERROR: ' + evt.data);
+        };
+    } 
+    catch (exception) {
+        console.log('ERROR: ' + exception);
+    }
+}
+
+function stopWebSocket() {
+    if (websocket)  websocket.close();
+}
+            
+function buildmodule(m,l) {
+
+    if  (!($("div#modDIV"+m).length)) {
+        $("div#OST").append("<h1  id=modH1"+m+">"+l+"</h1>");
+        $("div#OST").append("<div id=modDIV"+m+"></div>");
+        $("div#modDIV"+m).append("<ul id=modUL"+m+"></ul>");
+    };
+    $("#OST").accordion({header: "h1",collapsible: true,autoHeight: false,navigation: true,heightStyle: "content" });
+    $("#OST").accordion("refresh");  
+    
+}
+
+function builddevcat(m,prop) {
+    dd=prop.devcat.replace(' ', '');
+    if  (!($("[id='devDIV"+m+dd+"']").length >0)) {
+        //console.log('BUILD DEVCAT ' + m + "-"+ d + "-"+ l + "-");
+        $("[id='modDIV"+m+"']").append("<div id='devDIV"+m+dd+"'></div>");
+        $("[id='modUL"+m+"']").append("<li id='devLI"+m+dd+"'><a href=#devDIV"+m+dd+">"+prop.devcat+"</a></li>");
+        $("[id='devDIV"+m+dd+"']").append("<ul id='devUL"+m+dd+"'></ul>");
+    };
+    //$("#D"+m).tabs("refresh");  
+}
+
+function buildgroup(m,prop) {
+    dd=prop.devcat.replace(' ', '');
+    gg=prop.group.replace(' ', '');
+    if  (!($("[id='grpDIV"+m+dd+gg+"']").length > 0)) {
+        //console.log('BUILD GROUP ' + m + "-" + d + "-"+ g + "-"+ l + "-");
+        $("[id='devDIV"+m+dd+"']").append("<div id='grpDIV"+m+dd+gg+"'></div>");
+        $("[id='devUL"+m+dd+"']").append("<li id='grpLIL"+m+dd+gg+"'><a href=#grpDIV"+m+dd+gg+">"+prop.group+"</a></li>");
+        $("[id='grpDIV"+m+dd+gg+"']").append("<ul id='grpUL"+m+dd+gg+"'></ul>");
+    };
+}
+function buildproperty(m,p,n) {
+    var d=p.devcat.replace(' ', '');
+    var g=p.group.replace(' ', '');
+    var mp=m.replace(' ', '')+n.replace(' ', '');
+    if  (!($("[id='P"+mp+"']").length)) {
+        var div="<div id=P"+mp+" data-devcat='"+d+"' data-group='"+g+"' data-key='"+n+"'>";
+        div = div + "<strong id='status"+mp+"' >"+'\u25ef'+"</strong>";                  // status icon
+        div = div + "<strong id=title"+mp+" > "+p.propertyLabel+" </strong>";            // label 
+        
+        // Edit button is added only for writable numbers and texts (not booleans)
+        var addEditBtn = false;
+        if (p.permission=="1"||p.permission=="2") {
+            $.each( p.elements, function( ii, i ) {
+                if ( (jQuery.type(i.value)=='string')||(jQuery.type(i.value)=='number') ) addEditBtn = true;
+            })                
+        }
+        if (addEditBtn) {
+            div = div + "<button class='ui-button ui-widget ui-corner-all' id=edit"+mp;
+            div = div + " data-m"+m+" data-mp="+mp+" data-key=\"\"";
+            div = div + ">&#128393</button>";
+        }
+
+        // show elements values
+        div = div + "<table>";
+        $.each( p.elements, function( ii, i ) {
+            if ( (jQuery.type(i.value)=='string')) {
+               div = div + "<tr><td><label for='"+ii+"'>"+i.elementLabel+"</label></td>";
+               div = div + "<td><input type=text' id='elt"+mp+ii+"' value='"+i.value+"' class='text ui-widget-content ui-corner-all'></td></tr>";
+            }
+            if ( (jQuery.type(i.value)=='number')) {
+               div = div + "<tr><td><label for='"+ii+"'>"+i.elementLabel+"</label></td>";
+               div = div + "<td><input type=text' id='elt"+mp+ii+"' value='"+i.value+"' class='text ui-widget-content ui-corner-all'></td></tr>";
+            }
+        })                
+        div = div + "</table>";
+        
+        // add switchs or radio for booleans
+        var tt='checkbox';
+        if (p.hasOwnProperty('rule')) {
+            if (p.rule==0) tt='radio';
+        }
+        div = div + "<fieldset id='fs"+mp+"' >";
+        $.each( p.elements, function( ii, i ) {
+            if ( (jQuery.type(i.value)=='boolean')) {
+                div = div + "<label for='sw"+mp+ii+"'>"+i.elementLabel+"</label>";
+                div = div + "<input type="+tt+" name='sw"+mp+"' id='sw"+mp+ii+"' data-mp='"+mp+"' data-mpi='"+mp+ii+"'  >";
+            }
+        })                
+        div = div + "</fieldset>";
+
+        div = div + "</div>";
+        $("#grpUL"+m+d+g).append(div);
+        $("[id='P"+mp+"']").data("prop",p);
+        $("[id='P"+mp+"']").data("m",m);
+        $("[id='P"+mp+"']").data("key",n);
+
+        
+        $.each( p.elements, function( ii, i ) {
+            if ( (jQuery.type(i.value)=='boolean')) {
+                $("[id='sw"+mp+ii+"']").checkboxradio({icon: false});
+                $("[id='sw"+mp+ii+"']").prop('checked', i.value).checkboxradio("refresh");
+                // send message when check/uncheck
+                $("[id='sw"+mp+ii+"']").change(function () {
+                    var mpi=$(this).data("mpi");
+                    var mp=$(this).data("mp");
+                    var check = $(this).prop('checked');
+                    var n=$("[id='P"+mp+"']").data("key");
+                    var p=$("[id='P"+mp+"']").data("prop");
+                    var obj = jQuery.parseJSON("{\"evt\":\"setproperty\",\"mod\":\""+m+"\",\"dta\":{\""+n+"\":"+"{\"indi\":1,\"devcat\":\""+p.devcat+"\",\"elements\":{\""+ii+"\":{\"value\":"+check+"}}}}}");
+                    console.log(obj);
+                    websocket.send(JSON.stringify(obj)); 
+                });        
+
+            }
+        })     
+
+        // numbers and texts are readonly
+        $.each( p.elements, function( ii, i ) {
+            if ( (jQuery.type(i.value)=='string') || (jQuery.type(i.value)=='number') ) {
+               $("[id='elt"+mp+ii+"']").prop('readonly', true);
+            }
+        })                
+        
+        
+        // Assign edit button behavior
+        if (addEditBtn) {
+            buildEditBtn(m,p,n)
+        }       
+        
+        //set attributes
+        setattributes(m,p,n);
+        
+        
+    }
+    
+}
+function buildEditBtn(m,p,n) {
+    var d=p.devcat.replace(' ', '');
+    var g=p.group.replace(' ', '');
+    var mp=m.replace(' ', '')+n.replace(' ', '');
+
+    $("[id='edit"+mp+"']").on("click", function () {
+            var mp=$(this).data("mp");
+            var p=$("[id='P"+mp+"']").data("prop");
+            console.log("clic:",p.propertyLabel);
+            var form = "<div id='form"+mp+"' title='"+p.propertyLabel+"' style='modal:true'><form>";
+            form = form+"<fieldset><table>";
+            $.each( p.elements, function( ii, i ) {
+                    //console.log(jQuery.type(i.value));
+                switch(jQuery.type(i.value)) {
+                case 'string':
+                    form = form+"<tr><td><label for='"+ii+"'>"+i.elementLabel+"</label></td>";
+                    form = form+"<td><input type=text' name='form"+mp+ii+"' id='form"+mp+ii+"' value='"+i.value+"' class='text ui-widget-content ui-corner-all'></td></tr>";
+                    break;
+                case 'number':
+                    form = form+"<tr><td><label for='"+ii+"'>"+i.elementLabel+"</label></td>";
+                    form = form+"<td><input type='number' name='form"+mp+ii+"' id='form"+mp+ii+"' value='"+i.value+"' step='"+i.step+"' min='"+i.min+"' max='"+i.max+"' class='text ui-widget-content ui-corner-all'></td></tr>";
+                    break;
+                default:
+                    // code block
+                } 
+            })  
+            form = form+"</fieldset></table>";
+            form = form+"<input type='submit' class='ui-button ui-widget ui-corner-all'>";
+            form = form+"</form></div>";
+            
+            $("[id='P"+mp+"']").append(form);
+            $("[id='form"+mp+"']").data("mp",mp);
+            $("[id='form"+mp+"']").on( "submit", function(event) {
+                event.preventDefault();
+                console.log("submit");
+                var mp=$(this).data("mp");
+                var p=$("[id='P"+mp+"']").data("prop");
+                var m=$("[id='P"+mp+"']").data("m");
+                var n=$("[id='P"+mp+"']").data("key");
+                $.each( p.elements, function( ii, i ) {
+                    //console.log(mp+ii);
+                    if ($("[id='form"+mp+ii+"']").length) { // to avoid booleans
+                        console.log(mp+ii);
+                        p.elements[ii].value=document.getElementById("form"+mp+ii).value;
+                    } 
+                })                
+                var obj = jQuery.parseJSON("{\"evt\":\"setproperty\",\"mod\":\""+m+"\",\"dta\":{\""+n+"\":"+JSON.stringify(p)+"}}");
+                console.log(obj);
+                websocket.send(JSON.stringify(obj));
+                $( "[id='form"+mp+"']" ).dialog("close");
+                $( "[id='form"+mp+"']" ).remove();
+            });
+            
+            
+            $("[id='form"+mp+"']").dialog({modal:true,resizable: false,width:'auto'});
+            
+    });
+    
+
+}
+function setattributes(m,p,n) {
+    var mp=m.replace(' ', '')+n.replace(' ', '');
+
+    if (p.status=="0") $("[id='status"+mp+"']").text('\u25ef');       //white
+    if (p.status=="1") $("[id='status"+mp+"']").text('\ud83d\udfe2'); // green
+    if (p.status=="2") $("[id='status"+mp+"']").text('\ud83d\udfe1'); // yellow
+    if (p.status=="3") $("[id='status"+mp+"']").text('\ud83d\udd34'); // red                     
+    $.each( p.elements   , function( ii, i) {
+        $("[id='elt"+mp+ii+"']").val(i.value);
+    });                  
+    
+}
+function buildpropertybk(m,p,n) {
+    d=p.devcat.replace(' ', '');
+    g=p.group.replace(' ', '');
+    n = n.replace(' ', ''); 
+    nn=m;
+    nnp=nn+n;
+    //console.log('BUILD PROPERTY ' + nnp + "-" + p.propertyLabel);
+    if  (!($("[id='P"+nnp+"']").length)&&(true||p.hasOwnProperty('texts')||p.hasOwnProperty('numbers')||p.hasOwnProperty('switches')||p.hasOwnProperty('lights')))  {
+        div="<div id=P"+nnp+" data-devcat='"+d+"' data-group='"+g+"' ><table id=tab"+nnp+">"
+        +"<tr>"
+        +"<strong id=status"+nnp+" ><a>"+'\u25ef'+"</a></strong>"
+        +"<strong id=title"+nnp+" > "+p.propertyLabel+" </strong>";
+        if (p.permission=="1"||p.permission=="2") {
+            div=div+"<button class='ui-button ui-widget ui-corner-all' "
+            +"id=edit"+nnp+ " data-json=\"\" data-nnp=\"\" data-mod=\"\" data-key=\"\">&#128393</button>";
+        }
+        div=div+"</tr>";
+        
+        div=div+"<tr><td><table id=tab2"+nnp+">";
+        div=div+"<td><table id=tab3"+nnp+"><tbody></tbody></table></td>";
+        //if ((p.permission=="1"||p.permission=="2")&&(true||p.hasOwnProperty('numbers')||p.hasOwnProperty('texts'))) {
+        //    div=div+"<td><button class='ui-button ui-widget ui-corner-all' "
+        //    +"id=editB"+nnp+ " data-json=\"\" data-nnp=\"\" data-mod=\"\" data-key=\"\">set</button></td>";
+        //}
+        div=div+"</td></tr></table>"; //tab2
+        div=div+"</table></div>"; //tab
+        $("#grpUL"+nn+d+g).append(div);
+        
+        if ((p.permission=="1"||p.permission=="2")&&(p.hasOwnProperty('elements'))) {
+
+            //$("[id='form"+nnp+"']").css({'display' :'none'});
+            
+            $("[id='edit"+nnp+"']").data("nnp",nnp);
+            $("[id='edit"+nnp+"']").data("json",p);
+            $("[id='edit"+nnp+"']").data("g",nn+d+g);
+            $("[id='edit"+nnp+"']").data("l",p.propertyLabel);
+            $("[id='edit"+nnp+"']").data("mod",m);
+            $("[id='edit"+nnp+"']").data("key",n);
+            $("[id='edit"+nnp+"']").on("click", function () {
+                var nnp=$(this).data("nnp");
+                var pp=$(this).data("json");
+                var g=$(this).data("g");
+                var l=$(this).data("l");
+                var m=$(this).data("mod");
+                var n=$(this).data("key");
+                form =      "<div id=form"+nnp+" title='"+l +"' data-json=\"\" data-nnp=\"\" data-mod=\"\" data-key=\"\" style='modal:true'>";
+                form = form+"<form>";
+                form = form+"<fieldset><table>";
+                $.each( pp.elements, function( ii, i ) {
+                    //console.log(jQuery.type(i.value));
+                    switch(jQuery.type(i.value)) {
+                    case 'string':
+                        form = form+"<tr><td><label for='"+ii+"'>"+i.elementLabel+"</label></td>";
+                        form = form+"<td><input type=text' name='form"+nnp+ii+"' id='form"+nnp+ii+"' value='"+i.value+"' class='text ui-widget-content ui-corner-all'></td></tr>";
+                        break;
+                    case 'boolean':
+                        break;
+                    case 'number':
+                        form = form+"<tr><td><label for='"+ii+"'>"+i.elementLabel+"</label></td>";
+                        form = form+"<td><input type=text' name='form"+nnp+ii+"' id='form"+nnp+ii+"' value='"+i.value+"' class='text ui-widget-content ui-corner-all'></td></tr>";
+                        break;
+                    default:
+                        // code block
+                    } 
+                })                
+
+                form = form+"<input type='submit' style='position:absolute; bottom:0px'>";
+                form = form+"</table></fieldset></form></div>";
+
+                $("#grpUL"+g).append(form);
+                $("[id='form"+nnp+"']").data("json",p);
+                $("[id='form"+nnp+"']").data("nnp",nnp);
+                $("[id='form"+nnp+"']").data("mod",m);
+                $("[id='form"+nnp+"']").data("key",n);
+                $("[id='form"+nnp+"']").on( "submit", function(event) {
+                    event.preventDefault();
+                    var pp=$(this).data("json");
+                    var nnp=$(this).data("nnp");
+                    var m=$(this).data("mod");
+                    var n=$(this).data("key");
+                    $.each( pp.elements, function( ii, i ) {
+                        pp.elements[ii].value=document.getElementById("form"+nnp+ii).value;
+                    })                
+                    var obj = jQuery.parseJSON("{\"evt\":\"setproperty\",\"mod\":\""+m+"\",\"dta\":{\""+n+"\":"+JSON.stringify(pp)+"}}");
+                    console.log(obj);
+                    websocket.send(JSON.stringify(obj));
+                    $( "[id='form"+nnp+"']" ).dialog("close");
+                });
+                $( "[id='form"+nnp+"']" ).dialog();
+            });
+            
+            
+
+        }
+       
+    }
+
+    if (p.status=="0") $("[id='status"+nnp+"']").text('\u25ef');       //white
+    if (p.status=="1") $("[id='status"+nnp+"']").text('\ud83d\udfe2'); // green
+    if (p.status=="2") $("[id='status"+nnp+"']").text('\ud83d\udfe1'); // yellow
+    if (p.status=="3") $("[id='status"+nnp+"']").text('\ud83d\udd34'); // red 
+    if (p.hasOwnProperty('elements')) buildelts   (m,p,n);
+}
+function buildelts(m,prop,n) {
+
+
+    nn=m+n;
+    $.each( prop.elements, function( iitem, item ) {
+        //console.log( "buildelts: " + m + "-"+ n + "-"+ iitem + "-" + Object.prototype.toString.call(item.value));
+        nnn = nn+iitem;
+        if ($("#"+nnn).length) {
+            $("#"+nnn).val(item.value);
+        } else {
+             switch(jQuery.type(item.value)) {
+            case 'string':
+                $("#tab3"+nn + " tbody").append("<tr><td><small> "+item.elementLabel+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+n+" data-name="+iitem+" value='"+item.value+"'  label="+item.elementLabel+" /></td></tr>");
+                break;
+            case 'boolean':
+                $("[id='tab3"+nn + "']").append("<button id=bbb"+nnn+" class='ui-button ui-widget ui-corner-all' backlogid=btn"+nnn
+                +" value="+item.state
+                +" data-value=\"\""
+                +" data-btn=\"\" >"+item.elementLabel+"</button>");
+                break;
+            case 'number':
+                $("#tab3"+nn + " tbody").append("<tr><td><small> "+item.elementLabel+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+n+" data-name="+iitem+" value='"+item.value+"'  label="+item.elementLabel+" /></td></tr>");
+                break;
+            default:
+                // code block
+            } 
+
+            /*$("#tab3"+nn + " tbody").append("<tr><td><small> "+item.elementLabel+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+n+" data-name="+iitem+" value='"+item.value+"'  label="+item.elementLabel+" /></td></tr>");*/
+            if ((prop.permission=="1"||prop.permission=="2")) {
+                $("#"+nnn).css("background-color", "white");
+            } else {
+                $("#"+nnn).css("background-color", "gray");
+            }
+            
+            //if (prop.permission=="2") {
+            //    $("#tab3"+nn+ " tbody").append(
+            //    "<tr><td><small>"+item.label+"</small></td><td>"
+            //    +"<input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /></td></tr>"
+            //    );
+            //}
+        
+        }
+
+    })
+
+
+}                
+
+</script>
+

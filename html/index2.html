@@ -45,40 +45,33 @@ function initWebSocket() {
         };
 
         websocket.onmessage = function (evt) {
-            var obj = jQuery.parseJSON( evt.data );
+            var obj = JSON.parse( evt.data );
             console.log(obj);
             //if ((obj.event == 'appendproperty')) {console.log(obj)};
             //if ((obj.event == 'updateproperty')&&(obj.property.propname=='grid')) {console.log(obj)};
-            if (obj.event == 'moduledump') {
-                m=obj.module;
-                l=obj.modulelabel;
+            if (obj.evt == 'moduledump') {
+                m=obj.mod;
+                l=obj.mod;
                 buildmodule(m,l);
-                
-                var devices = obj.devices;
-                $.each( devices, function(idev,dev) {
-                    d=dev.devicenameshort;
-                    l=dev.devicename;
-                    builddevice(m,d,l);
-
-                    var groups = dev.groups;
-                    $.each( groups, function(igro,gro) {
-                        g=gro.groupnameshort;
-                        l=gro.groupname;
-                        buildgroup(m,d,g,l);
-                        var props = gro.properties;
-                        $.each( props, function(ipro,pro) {
-                            buildproperty(m,d,g,pro);
-                        })
-
-                    })
-                    $("div#D"+m+d).tabs();              /* this shouldn't be here */    
-
+               
+                var properties = obj.dta;
+                $.each( properties, function(iprop,prop) {
+                    d = prop.devcat.replace(' ', '');
+                    g = prop.group.replace(' ', ''); 
+                    builddevice(m,d,prop.devcat);
+                    buildgroup(m,d,g,prop.group);
+                    //console.log( "build prop :", '"'+iprop+'"' +prop.propertyLabel+'"');
+                    buildproperty(m,d,g,prop,iprop);
                 })
-                $("div#D"+m).tabs();              /* this shouldn't be here */    
-
-
+                $.each( properties, function(iprop,prop) {
+                    d = prop.devcat.replace(' ', '');
+                    $("div#D"+m+d).tabs(); 
+                })                
+                $("div#D"+m).tabs();       /* this shouldn't be here */    
+                
             }
-            if (obj.event == 'appendproperty') {
+            
+            if (obj.evt == 'appendproperty') {
                 m=obj.module;
                 p=obj.property;
                 d=p.devicenameshort;
@@ -96,15 +89,44 @@ function initWebSocket() {
 
             }            
             
-            if (obj.event == 'updateproperty') {
-                p=obj.property;
-                buildproperty(obj.module,p.devicenameshort,p.groupnameshort,p);
+            if (obj.evt == 'setpropvalue') {
+                var dta=obj.dta;
+                var mod=obj.mod;
+                //console.log( "setpropvalue :"+mod);
+                $.each( dta, function( iprop, prop) {
+                    //console.log( "setpropvalue :", '"'+iprop);
+                    $.each( prop.elements   , function( ielt, elt) {
+                        //console.log( "setpropvalue :", '"'+iprop+ielt);
+                        e=mod+iprop+ielt;
+                        e=e.replace(' ', '');
+                        $("[id='"+e+"']").val(elt.value);
+                    });                  
+                });                  
+
             }
-            if (obj.event == 'updatepropertyqmap') {
+            if ((obj.evt == 'addprop')||(obj.evt == 'addelt')) {
+                var dta=obj.dta;
+                var mod=obj.mod;
+                $.each( dta, function(iprop,prop) {
+                    d = prop.devcat.replace(' ', '');
+                    g = prop.group.replace(' ', '');    
+                    p = iprop.replace(' ', '');
+                    builddevice(mod,d,prop.devcat);
+                    buildgroup(mod,d,g,prop.group);                    
+                    buildproperty(mod,d,g,prop,iprop);                  
+                })                
+                $.each( dta, function(iprop,prop) {
+                    d = prop.devcat.replace(' ', '');
+                    $("div#D"+mod+d).tabs("refresh"); 
+                })                
+                $("div#D"+mod).tabs("refresh");       /* this shouldn't be here */  
+
+            }
+            if (obj.evt == 'updatepropertyqmap') {
                 values=obj.values;
                 console.log(values);
             }
-            if (obj.event == 'createproperty') {
+            if (obj.evt == 'createproperty') {
                 p=obj.property;
                 builddevice  (obj.module,p.devicenameshort,p.devicename);
                 $("#D"+obj.module+p.devicenameshort).tabs("refresh");              /* this shouldn't be here */
@@ -112,18 +134,21 @@ function initWebSocket() {
                 $("#D"+obj.module).tabs("refresh");              /* this shouldn't be here */
                 buildproperty(obj.module,p.devicenameshort,p.groupnameshort,p);
             }
-            if (obj.event == 'removeproperty') { 
-                    var dev   = obj.module+obj.property.devicenameshort;               /* this should be moved to a dedicated function */
-                    var group = dev+obj.property.groupnameshort;
-                    var prop  = group+obj.property.propname;
-                    //console.log("REMOVE PROP "+prop);
-                    $( "#tab3"+ prop ).remove()
-                    $( "#tab2"+ prop ).remove()
-                    $( "#tab"+ prop ).remove()
-                    $( "#P"+ prop ).children().remove();
-                    $( "#P"+ prop ).remove();
-                    
-                    if (!($("#U"+ group).children().length > 0)){
+            if (obj.evt == 'delprop') { 
+                    var p=obj.mod+obj.key.replace(' ', '');
+                    dev=$("div#P"+ p ).data("devcat");
+                    dev=obj.mod+dev;
+                    dev=dev.replace(' ', '');
+                    group=$("#P"+ p ).data("group");
+                    group=dev+group;
+                    group=group.replace(' ', '');
+                    $( "#tab3"+ p ).remove()
+                    $( "#tab2"+ p ).remove()
+                    $( "#tab"+ p ).remove()
+                    $( "#P"+ p ).children().remove();
+
+                    $( "#P"+ p ).remove();
+                    if (!($("#U"+ group ).children().length > 0)){
                         //console.log("REMOVE GROUP "+group);
                         $("#U"+ group ).remove();
                         $("#D"+ group ).remove();
@@ -168,58 +193,79 @@ function buildmodule(m,l) {
 }
 
 function builddevice(m,d,l) {
-    //console.log('BUILD DEVICE ' + m + "-"+ d + "-"+ l + "-");
-    if  (!($("#D"+m+d).length >0)&&!(d=="root")) {
-        $("#D"+m).append("<div id=D"+m+d+"></div>");
-        $("#U"+m).append("<li id=L"+m+d+"><a href=#D"+m+d+">"+l+"</a></li>");
-        $("#D"+m+d).append("<ul id=U"+m+d+"></ul>");
+    if  (!($("[id='D"+m+d+"']").length >0)&&!(d=="root")) {
+        //console.log('BUILD DEVICE ' + m + "-"+ d + "-"+ l + "-");
+        $("[id='D"+m+"']").append("<div id='D"+m+d+"'></div>");
+        $("[id='U"+m+"']").append("<li id='L"+m+d+"'><a href=#D"+m+d+">"+l+"</a></li>");
+        $("[id='D"+m+d+"']").append("<ul id='U"+m+d+"'></ul>");
     };
     //$("#D"+m).tabs("refresh");  
 }
 
 function buildgroup(m,d,g,l) {
-    if  (!($("#D"+m+d+g).length > 0)&&!(g=="root")) {
+    if  (!($("[id='D"+m+d+g+"']").length > 0)&&!(g=="root")) {
         //console.log('BUILD GROUP ' + m + "-" + d + "-"+ g + "-"+ l + "-");
-        $("#D"+m+d).append("<div id=D"+m+d+g+"></div>");
-        $("#U"+m+d).append("<li id=L"+m+d+g+"><a href=#D"+m+d+g+">"+l+"</a></li>");
-        $("#D"+m+d+g).append("<ul id=U"+m+d+g+"></ul>");
+        $("[id='D"+m+d+"']").append("<div id='D"+m+d+g+"'></div>");
+        $("[id='U"+m+d+"']").append("<li id='L"+m+d+g+"'><a href=#D"+m+d+g+">"+l+"</a></li>");
+        $("[id='D"+m+d+g+"']").append("<ul id='U"+m+d+g+"'></ul>");
     };
 }
 
-function buildproperty(m,d,g,p) {
-    if (d=="root") d="";
-    if (g=="root") g="";
-    nn=m+d+g;
-    nnp=nn+p.propname;
-    if  (!($("[id='P"+nnp+"']").length)&&(p.hasOwnProperty('texts')||p.hasOwnProperty('numbers')||p.hasOwnProperty('switches')||p.hasOwnProperty('lights')))  {
-        div="<div id=P"+nnp+" ><table id=tab"+nnp+">"
+function buildproperty(m,d,g,p,n) {
+    if (d=="undefined") d="";
+    if (g=="undefined") g="";
+    n = n.replace(' ', ''); 
+    nn=m;
+    nnp=nn+n;
+    //console.log('BUILD PROPERTY ' + nnp + "-" + p.propertyLabel);
+    if  (!($("[id='P"+nnp+"']").length)&&(true||p.hasOwnProperty('texts')||p.hasOwnProperty('numbers')||p.hasOwnProperty('switches')||p.hasOwnProperty('lights')))  {
+        div="<div id=P"+nnp+" data-devcat='"+d+"' data-group='"+g+"' ><table id=tab"+nnp+">"
         +"<tr>"
         +"<strong id=status"+nnp+" >"+"---"+"</strong>"
-        +"<strong id=title"+nnp+" >"+p.label+"</strong></tr>"
+        +"<strong id=title"+nnp+" >"+p.propertyLabel+"</strong></tr>"
         +"<tr><td><table id=tab2"+nnp+">"
         +"<td><table id=tab3"+nnp+"><tbody></tbody></table></td>";
-        if ((p.permission=="1"||p.permission=="2")&&(p.hasOwnProperty('numbers')||p.hasOwnProperty('texts'))) {
+        if ((p.permission=="1"||p.permission=="2")&&(true||p.hasOwnProperty('numbers')||p.hasOwnProperty('texts'))) {
             div=div+"<td><button class='ui-button ui-widget ui-corner-all' "
-            +"id=B"+nnp+ " data-json=\"\">set</button></td>";
+            +"id=B"+nnp+ " data-json=\"\" data-nnp=\"\" data-mod=\"\" data-key=\"\">set</button></td>";
         }
         div=div+"</td></tr></table>"; //tab2
         div=div+"</table></div>"; //tab
-        $("#U"+nn).append(div);
+        $("#U"+nn+d+g).append(div);
         
         if ((p.permission=="1"||p.permission=="2")&&(p.hasOwnProperty('numbers'))) {
             $("[id='B"+nnp+"']").data("json",p);
             $("[id='B"+nnp+"']").on("click", function () {
                 var pp=$(this).data("json");
                 $.each( pp.numbers, function( ii, i ) {
-                    pp.numbers[ii].value=parseFloat(document.getElementById(pp.modulename+d+g+pp.propname+i.name).value);
+                    pp.numbers[ii].value=parseFloat(document.getElementById(nnp+i.name).value);
                 })
-                var obj = jQuery.parseJSON("{\"message\":\"setproperty\",\"property\":"+JSON.stringify(pp)+"}");
+                var obj = jQuery.parseJSON("{\"message\":\"setproperty\",\"dta\":"+JSON.stringify(pp)+"}");
                 console.log(obj);
                 websocket.send(JSON.stringify(obj));
             });
             
         }
 
+        if ((p.permission=="1"||p.permission=="2")&&(p.hasOwnProperty('elements'))) {
+            $("[id='B"+nnp+"']").data("json",p);
+            $("[id='B"+nnp+"']").data("nnp",nnp);
+            $("[id='B"+nnp+"']").data("mod",m);
+            $("[id='B"+nnp+"']").data("key",n);
+            $("[id='B"+nnp+"']").on("click", function () {
+                var pp=$(this).data("json");
+                var nnp=$(this).data("nnp");                
+                var mod=$(this).data("mod");                
+                var key=$(this).data("key");                
+                $.each( pp.elements, function( ii, i ) {
+                    pp.elements[ii].value=document.getElementById(nnp+ii).value;
+                })
+                var obj = jQuery.parseJSON("{\"message\":\"setproperty\",\"mod\":\""+mod+"\",\"key\":\""+key+"\",\"dta\":"+JSON.stringify(pp)+"}");
+                console.log(obj);
+                websocket.send(JSON.stringify(obj));
+            });
+            
+        }
         
         if ((p.permission=="1"||p.permission=="2")&&(p.hasOwnProperty('texts'))) {
             $("[id='B"+nnp+"']").data("json",p);
@@ -313,7 +359,8 @@ function buildproperty(m,d,g,p) {
     if (p.state=="0") $("#status"+nnp).css("background-color", "gray");   
     if (p.state=="1") $("#status"+nnp).css("background-color", "green");   
     if (p.state=="2") $("#status"+nnp).css("background-color", "yellow");   
-    if (p.state=="3") $("#status"+nnp).css("background-color", "red");   
+    if (p.state=="3") $("#status"+nnp).css("background-color", "red");
+    if (p.hasOwnProperty('elements')) buildelts   (m,p,n);
     if (p.hasOwnProperty('texts'   )) buildtexts  (m,d,g,p);
     if (p.hasOwnProperty('numbers' )) buildnumbers(m,d,g,p);
     if (p.hasOwnProperty('switches')) buildswitchs(m,d,g,p);
@@ -321,6 +368,32 @@ function buildproperty(m,d,g,p) {
     $("#B"+nnp).css('height', $("#B"+nnp).parent().height()*0.95);
 
 }
+function buildelts(m,prop,n) {
+
+
+    nn=m+n;
+    
+    $.each( prop.elements, function( iitem, item ) {
+        //console.log( "buildelts: " + m + "-"+ n + "-"+ iitem);
+        nnn = nn+iitem;
+        if ($("#"+nnn).length) {
+            $("#"+nnn).val(item.value);
+        } else {
+            $("#tab3"+nn + " tbody").append("<tr><td><small> "+item.elementLabel+"</small></td><td><input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+n+" data-name="+iitem+" value='"+item.value+"'  label="+item.elementLabel+" /></td></tr>");
+            
+            //if (prop.permission=="2") {
+            //    $("#tab3"+nn+ " tbody").append(
+            //    "<tr><td><small>"+item.label+"</small></td><td>"
+            //    +"<input class='ui-text ui-widget ui-corner-all' type='text' id="+nnn+" data-btn="+nnn+" data-modulename="+m+" data-propname="+p+" data-name="+item.name+" value='"+item.text+"'  label="+item.text+" /></td></tr>"
+            //    );
+            //}
+        
+        }
+
+    })
+
+
+}                
 function buildtexts(m,d,g,prop) {
 
     p=prop.propname;

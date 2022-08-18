@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>basemodule.json</file>
+        <file>db.sql</file>
+    </qresource>
+</RCC>

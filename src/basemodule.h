@@ -7,19 +7,6 @@
 #include <basedevice.h>
 #include <baseclient.h>
 #include <boost/log/trivial.hpp>
-#include "solver.h"
-#include "image.h"
-#include <model/setup.h>
-#include <model/textproperty.h>
-#include <model/numberproperty.h>
-#include <model/switchproperty.h>
-#include <model/messageproperty.h>
-#include <model/gridproperty.h>
-#include <model/propertystore.h>
-#include "utils/propertyfactory.h"
-
-
-class Property;
 
 /*!
  * This Class shouldn't be used as is
@@ -30,42 +17,34 @@ class Basemodule : public QObject, public INDI::BaseClient
     Q_OBJECT
 
     public:
-        Basemodule(QString name, QString label);
+        Basemodule(QString name, QString label,QString profile);
         ~Basemodule() = default;
         void setHostport(QString host, int port);
         void setWebroot(QString webroot) {_webroot = webroot;}
+        void requestProfile(QString profileName);
+        void setProfile(QVariantMap profiledata);
+
+
         QString getWebroot(void) {return _webroot;}
         bool connectIndi(void);
         void setBlobMode(void);
-        QString getDescription(void) {return _moduledescription;}
+        QString getName(void) {return _modulename;}
+        QString getLabel(void) {return _modulelabel;}
+        QVariantMap getOstProperties(void) {return _ostproperties;}
+        QVariantMap getOstProperty(QString name) {return _ostproperties[name].toMap();}
 
-        QPointer<Image> image;
-        Solver _solver;
-
-        QString _modulename;
-        QString _modulelabel;
-        QString _moduledescription;
+        QString _moduletype;
         QString _webroot;
-        MessageProperty* _message;
-
 
     public slots:
         void connectIndiTimer(void);
-        void OnDumpAsked(void);
-        virtual void OnSetPropertyText(TextProperty* prop) {
-            if (!(prop->getModuleName()==_modulename)) return;
-            BOOST_LOG_TRIVIAL(debug) << _modulename.toStdString() << " : recv setprop text : " << prop->getLabel().toStdString();
-        }
-        virtual void OnSetPropertyNumber(NumberProperty* prop) {
-            if (!(prop->getModuleName()==_modulename)) return;
-            BOOST_LOG_TRIVIAL(debug) << _modulename.toStdString() << " : recv setprop number : " <<prop->getLabel().toStdString();
-        }
-        virtual void OnSetPropertySwitch(SwitchProperty* prop) {
-            if (!(prop->getModuleName()==_modulename)) return;
-            BOOST_LOG_TRIVIAL(debug) << _modulename.toStdString() << " : recv setprop switch : " <<prop->getLabel().toStdString();
-        }
+        void OnExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData);
+        virtual void OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
+        {Q_UNUSED(eventType);Q_UNUSED(eventModule);Q_UNUSED(eventKey);Q_UNUSED(eventData);}
 
     protected:
+
+        /* Indi helpers */
         bool disconnectIndi(void);
         void connectAllDevices(void);
         void disconnectAllDevices(void);
@@ -82,8 +61,7 @@ class Basemodule : public QObject, public INDI::BaseClient
         bool frameReset(QString devicename);
         void sendMessage(QString message);
 
-        PropertyStore _propertyStore;
-
+        /*indi messages */
         virtual void serverConnected() {}
         virtual void serverDisconnected(int exit_code)          {Q_UNUSED(exit_code);}
         virtual void newDevice(INDI::BaseDevice *dp)            {Q_UNUSED(dp);}
@@ -98,17 +76,25 @@ class Basemodule : public QObject, public INDI::BaseClient
         virtual void newMessage(INDI::BaseDevice *dp, int messageID) {Q_UNUSED(dp);Q_UNUSED(messageID);}
         virtual void newUniversalMessage(std::string message)   {Q_UNUSED(message);}
 
+        /* OST helpers */
+        void createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,const  QString &pPropertyDevcat, const QString &pPropertyGroup);
+        void emitPropertyCreation(const QString &pPropertyName);
+        void deleteOstProperty(QString propertyName);
+        void createOstElement (QString propertyName, QString elementName, QString elementLabel, bool emitEvent);
+        void setOstProperty   (const QString &pPropertyName, QVariant _value,bool emitEvent);
+        void setOstPropertyAttribute   (const QString &pPropertyName, const QString &pAttributeName, QVariant _value,bool emitEvent);
+        void setOstElement          (QString propertyName, QString elementName, QVariant elementValue, bool emitEvent);
+        void setOstElementAttribute (QString propertyName, QString elementName, QString attributeName, QVariant _value, bool emitEvent);
+        void loadPropertiesFromFile(QString fileName);
+        void savePropertiesToFile(QString fileName);
+
+    private:
+        QVariantMap _ostproperties;
+        QString _modulename;
+        QString _modulelabel;
 
     signals:
-        void propertyCreated(Property* pProperty, QString* pModulename);
-        void propertyUpdated(Property* pProperty, QString* pModulename);
-        void propertyAppended(Property* pProperty, QString* pModulename, double s, double x,double y,double z,double k);
-        void propertyRemoved(Property* pProperty, QString* pModulename);
-        void moduleDumped(QMap<QString, QMap<QString, QMap<QString, Property*>>> treeList, QString* pModulename, QString* pModulelabel, QString* pModuledescription);
-        void newMessageSent(QString message,      QString* pModulename, QString Device);
-
-        void finished();
-        void statusChanged(const QString &newStatus);
+        void moduleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData);
         void askedFrameReset(QString devicename);
 }
 ;

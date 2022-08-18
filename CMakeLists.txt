@@ -26,7 +26,6 @@ find_package(Threads REQUIRED)
 find_package(Nova REQUIRED)
 find_package(GSL REQUIRED)
 find_package(OpenCV REQUIRED )
-find_package(CImg REQUIRED )
 find_package(WCSLIB REQUIRED)
 find_package(QT NAMES Qt5 COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql)
@@ -40,7 +39,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules)
 include_directories(${INDI_INCLUDE_DIR})
 include_directories(${CFITSIO_INCLUDE_DIR})
 include_directories(${GSL_INCLUDE_DIRS})
-include_directories(${CIMG_INCLUDE_DIRS})
 include_directories(${Qt5_DIR})
 include_directories(${QT5Declarative_INCLUDE_LIBRARIES} )
 include_directories(${QT5Declarative_INCLUDE_DIRS} )
@@ -56,41 +54,12 @@ add_executable( ost
     ${CMAKE_CURRENT_SOURCE_DIR}/src/controller.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/wshandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/wshandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/dbmanager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/dbmanager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/basemodule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/basemodule.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/maincontrol.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/maincontrol.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/image.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/image.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/solver.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/solver.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/property.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/propertystore.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/propertystore.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/value.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/textproperty.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/textvalue.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/numberproperty.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/numbervalue.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/switchproperty.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/switchproperty.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/switchvalue.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/lightproperty.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/lightvalue.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/messageproperty.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/gridproperty.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/imageproperty.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/setup.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/setup.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/device.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/model/device.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/propertyvisitor.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/propertyfactory.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/propertyfactory.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/propertytextdumper.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/propertytextdumper.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/jsondumper.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/jsondumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/resources/resources.qrc
+
 )
 target_link_libraries( ost
     indiclient
@@ -111,9 +80,13 @@ target_link_libraries( ost
 ### modules libraries ##
 ########################
 # Dummy module
+list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.qrc)
+qt5_add_resources (RCC_SOURCES ${RESOURCES})
+
 add_library(ostdummy SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.cpp
+    ${RCC_SOURCES}
 )
 target_link_libraries(ostdummy PRIVATE
     indiclient
@@ -127,25 +100,25 @@ target_compile_definitions(ostdummy PRIVATE dummy_LIBRARY)
 
 
 
-# Focus module
-add_library(ostfocuser SHARED
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.h
-)
-target_link_libraries(ostfocuser PRIVATE
-    indiclient
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Concurrent
-    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
-    ${STELLARSOLVER_LIBRARIES}
-    ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
-    ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
-    z -lpthread
-
-)
-target_compile_definitions(ostfocuser PRIVATE FOCUS_MODULE)
+## Focus module
+#add_library(ostfocuser SHARED
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.h
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.cpp
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.cpp
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.h
+#)
+#target_link_libraries(ostfocuser PRIVATE
+#    indiclient
+#    Qt${QT_VERSION_MAJOR}::Core
+#    Qt${QT_VERSION_MAJOR}::Concurrent
+#    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+#    ${STELLARSOLVER_LIBRARIES}
+#    ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
+#    ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
+#    z -lpthread
+#
+#)
+#target_compile_definitions(ostfocuser PRIVATE FOCUS_MODULE)
 
 
 
@@ -170,63 +143,63 @@ target_link_libraries(ostindipanel PRIVATE
     z -lpthread
 )
 target_compile_definitions(ostindipanel PRIVATE INDIPANEL_MODULE)
-
-# guider module
-add_library(ostguider SHARED
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/guider.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/guider.cpp
-    #${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/polynomialfit.cpp
-    #${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/polynomialfit.h
-
-)
-target_link_libraries(ostguider PRIVATE
-    indiclient
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Concurrent
-    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
-    ${STELLARSOLVER_LIBRARIES}
-    ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
-    ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
-    z -lpthread
-
-)
-target_compile_definitions(ostguider PRIVATE GUIDER_MODULE)
-
-# polar module
-add_library(ostpolar SHARED
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/polar/polar.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/polar/polar.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/polar/rotations.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/polar/rotations.cpp
-)
-target_link_libraries(ostpolar PRIVATE
-    indiclient
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Concurrent
-    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
-    ${STELLARSOLVER_LIBRARIES}
-    ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
-    ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
-    z -lpthread
-)
-target_compile_definitions(ostpolar PRIVATE POLAR_MODULE)
-
-# inspector module
-add_library(ostinspector SHARED
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/inspector/inspector.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/inspector/inspector.cpp
-)
-target_link_libraries(ostinspector PRIVATE
-    indiclient
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Concurrent
-    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
-    ${STELLARSOLVER_LIBRARIES}
-    ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
-    ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
-    z -lpthread
-)
-target_compile_definitions(ostinspector PRIVATE GUIDER_MODULE)
+#
+## guider module
+#add_library(ostguider SHARED
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/guider.h
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/guider.cpp
+#    #${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/polynomialfit.cpp
+#    #${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/polynomialfit.h
+#
+#)
+#target_link_libraries(ostguider PRIVATE
+#    indiclient
+#    Qt${QT_VERSION_MAJOR}::Core
+#    Qt${QT_VERSION_MAJOR}::Concurrent
+#    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+#    ${STELLARSOLVER_LIBRARIES}
+#    ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
+#    ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
+#    z -lpthread
+#
+#)
+#target_compile_definitions(ostguider PRIVATE GUIDER_MODULE)
+#
+## polar module
+#add_library(ostpolar SHARED
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/polar/polar.h
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/polar/polar.cpp
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/polar/rotations.h
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/polar/rotations.cpp
+#)
+#target_link_libraries(ostpolar PRIVATE
+#    indiclient
+#    Qt${QT_VERSION_MAJOR}::Core
+#    Qt${QT_VERSION_MAJOR}::Concurrent
+#    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+#    ${STELLARSOLVER_LIBRARIES}
+#    ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
+#    ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
+#    z -lpthread
+#)
+#target_compile_definitions(ostpolar PRIVATE POLAR_MODULE)
+#
+## inspector module
+#add_library(ostinspector SHARED
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/inspector/inspector.h
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/inspector/inspector.cpp
+#)
+#target_link_libraries(ostinspector PRIVATE
+#    indiclient
+#    Qt${QT_VERSION_MAJOR}::Core
+#    Qt${QT_VERSION_MAJOR}::Concurrent
+#    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+#    ${STELLARSOLVER_LIBRARIES}
+#    ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
+#    ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
+#    z -lpthread
+#)
+#target_compile_definitions(ostinspector PRIVATE GUIDER_MODULE)
 
 
 
