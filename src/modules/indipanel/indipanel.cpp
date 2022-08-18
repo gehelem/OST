@@ -108,7 +108,8 @@ void IndiPanel::newProperty(INDI::Property *pProperty)
             break;
         }
     }
-    setOstPropertyAttribute(devpro,"status",pProperty->getState(),true);
+    setOstPropertyAttribute(devpro,"status",pProperty->getState(),false);
+    emitPropertyCreation(devpro);
 
 
 }

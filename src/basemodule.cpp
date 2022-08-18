@@ -448,8 +448,14 @@ void Basemodule::createOstProperty(const QString &pPropertyName, const QString &
     _prop["group"]=pPropertyGroup;
     _prop["name"]=pPropertyName;
     _ostproperties[pPropertyName]=_prop;
-    emit moduleEvent("addprop",_modulename,pPropertyName,_prop);
 }
+void Basemodule::emitPropertyCreation(const QString &pPropertyName)
+{
+    QVariantMap _prop=_ostproperties[pPropertyName].toMap();
+    emit moduleEvent("addprop",_modulename,pPropertyName,_prop);
+
+}
+
 void Basemodule::deleteOstProperty(QString propertyName)
 {
     //BOOST_LOG_TRIVIAL(debug) << "deleteOstProperty  - " << _modulename.toStdString() << "-" << propertyName.toStdString();

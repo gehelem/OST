@@ -78,6 +78,7 @@ class Basemodule : public QObject, public INDI::BaseClient
 
         /* OST helpers */
         void createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,const  QString &pPropertyDevcat, const QString &pPropertyGroup);
+        void emitPropertyCreation(const QString &pPropertyName);
         void deleteOstProperty(QString propertyName);
         void createOstElement (QString propertyName, QString elementName, QString elementLabel, bool emitEvent);
         void setOstProperty   (const QString &pPropertyName, QVariant _value,bool emitEvent);
