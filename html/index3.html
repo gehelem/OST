@@ -100,9 +100,9 @@ function initWebSocket() {
                 })                
                 $.each( dta, function(iprop,prop) {
                     d = prop.devcat.replace(' ', '');
-                    $("div#D"+mod+d).tabs("refresh"); 
+                    $("div#devDIV"+mod+d).tabs("refresh"); 
                 })                
-                $("div#D"+mod).tabs("refresh");       /* this shouldn't be here */  
+                $("div#modDIV"+mod).tabs("refresh");       /* this shouldn't be here */  
 
             }
 
@@ -120,17 +120,17 @@ function initWebSocket() {
                     $( "#P"+ p ).children().remove();
 
                     $( "#P"+ p ).remove();
-                    if (!($("#U"+ group ).children().length > 0)){
+                    if (!($("#grpUL"+ group ).children().length > 0)){
                         //console.log("REMOVE GROUP "+group);
-                        $("#U"+ group ).remove();
-                        $("#D"+ group ).remove();
-                        $("#L"+ group ).remove();
+                        $("#grpDIV"+ group ).remove();
+                        $("#grpLIL"+ group ).remove();
+                        $("#grpUL" + group ).remove();
                     }
-                    if (!($("#U"+ dev).children().length > 0)){
+                    if (!($("#devUL"+ dev).children().length > 0)){
                         //console.log("REMOVE DEVICE "+dev);
-                        $("#U"+ dev ).remove();
-                        $("#D"+ dev ).remove();
-                        $("#L"+ dev ).remove();
+                        $("#devDIV"+ dev ).remove();
+                        $("#devLIL"+ dev ).remove();
+                        $("#devUL" + dev ).remove();
                     }
 
                 
