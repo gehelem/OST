@@ -228,8 +228,8 @@ function buildproperty(m,p,n) {
         div = div + "<fieldset id='fs"+mp+"' >";
         $.each( p.elements, function( ii, i ) {
             if ( (jQuery.type(i.value)=='boolean')) {
-                div = div + "<label for='sw"+mp+ii+"'>"+i.elementLabel+"</label>"
-                div = div + "<input type="+tt+" name='sw"+mp+"' id='sw"+mp+ii+"'>"
+                div = div + "<label for='sw"+mp+ii+"'>"+i.elementLabel+"</label>";
+                div = div + "<input type="+tt+" name='sw"+mp+"' id='sw"+mp+ii+"'  >";
             }
         })                
         div = div + "</fieldset>";
@@ -242,17 +242,15 @@ function buildproperty(m,p,n) {
 
         $.each( p.elements, function( ii, i ) {
             if ( (jQuery.type(i.value)=='boolean')) {
-                $( "[id='sw"+mp+ii+"']" ).checkboxradio({icon: false});
+                $("[id='sw"+mp+ii+"']").checkboxradio({icon: false});
+                $("[id='sw"+mp+ii+"']").prop('checked', i.value).checkboxradio("refresh");
             }
         })                
-
-        //$( "[id='P"+mp+"']").attr('border' , 'none');
-        //$( "[id='P"+mp+"']").attr('outline', 'none');
         
         // numbers and texts are readonly
         $.each( p.elements, function( ii, i ) {
             if ( (jQuery.type(i.value)=='string') || (jQuery.type(i.value)=='number') ) {
-               $("[id='elt"+mp+ii+"']").attr('readonly', true);
+               $("[id='elt"+mp+ii+"']").prop('readonly', true);
             }
         })                
         
