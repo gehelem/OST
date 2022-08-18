@@ -202,8 +202,30 @@ void IndiPanel::newMessage     (INDI::BaseDevice *dp, int messageID)
 
 void IndiPanel::OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
 {
-    BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << eventKey.toStdString();
+    //BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << eventKey.toStdString();
+    foreach(const QString& keyprop, eventData.keys()) {
+        QString prop = keyprop;
+        QString devcat = eventData[keyprop].toMap()["devcat"].toString();
+        prop.replace(devcat,"");
+        foreach(const QString& keyelt, eventData[keyprop].toMap()["elements"].toMap().keys()) {
+            BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << prop.toStdString() << "-" << keyelt.toStdString() << "-" << eventData[keyprop].toMap()["indi"].toInt();
+            //setOstElement(keyprop,keyelt,eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"],true);
+            if (eventData[keyprop].toMap()["indi"].toInt()==INDI_TEXT) {
+                BOOST_LOG_TRIVIAL(debug) << "INDI_TEXT";
+                sendModNewText(devcat,prop,keyelt,eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toString());
+            }
+            if (eventData[keyprop].toMap()["indi"].toInt()==INDI_NUMBER) {
+                BOOST_LOG_TRIVIAL(debug) << "INDI_NUMBER";
+                sendModNewNumber(devcat,prop,keyelt,eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toFloat());
+            }
+            if (eventData[keyprop].toMap()["indi"].toInt()==INDI_SWITCH) {
+                BOOST_LOG_TRIVIAL(debug) << "INDI_SWITCH" << devcat.toStdString() << "-" << prop.toStdString() << "-" << keyelt.toStdString();
+                if ( eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toBool()) sendModNewSwitch(devcat,prop,keyelt,ISS_ON);
+                if (!eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toBool()) sendModNewSwitch(devcat,prop,keyelt,ISS_OFF);
+            }
+        }
 
+    }
 }
 
 

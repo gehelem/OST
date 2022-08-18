@@ -251,7 +251,8 @@ function buildproperty(m,p,n) {
                     var mp=$(this).data("mp");
                     var check = $(this).prop('checked');
                     var n=$("[id='P"+mp+"']").data("key");
-                    var obj = jQuery.parseJSON("{\"evt\":\"setproperty\",\"mod\":\""+m+"\",\"dta\":{\""+n+"\":"+"{\"elements\":{\""+ii+"\":{\"value\":"+check+"}}}}}");
+                    var p=$("[id='P"+mp+"']").data("prop");
+                    var obj = jQuery.parseJSON("{\"evt\":\"setproperty\",\"mod\":\""+m+"\",\"dta\":{\""+n+"\":"+"{\"indi\":1,\"devcat\":\""+p.devcat+"\",\"elements\":{\""+ii+"\":{\"value\":"+check+"}}}}}");
                     console.log(obj);
                     websocket.send(JSON.stringify(obj)); 
                 });        
