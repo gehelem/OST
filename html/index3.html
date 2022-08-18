@@ -31,7 +31,7 @@ function initWebSocket() {
         websocket = new WebSocket( wsUri );
         websocket.onopen = function (evt) {
             console.log("CONNECTED");
-            websocket.send( "{\"message\":\"readall\"}");
+            websocket.send( "{\"evt\":\"readall\"}");
         };
         websocket.onclose = function (evt) {
             console.log("DISCONNECTED");

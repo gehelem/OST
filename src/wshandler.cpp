@@ -71,19 +71,14 @@ void WShandler::processTextMessage(QString message)
     emit textRcv(message);
     QJsonObject  obj = jsonResponse.object(); // garder
     BOOST_LOG_TRIVIAL(debug) << "OST server received json" << message.toStdString();
-    if (obj["message"].toString()=="readall")
+    if (obj["evt"].toString()=="readall")
     {
         //sendAll();
         //emit changeValue(Prop());
         emit externalEvent("dump","*","*",QVariantMap());
 
     }
-    if (obj["message"].toString()=="readproperty")
-    {
-        //qDebug() << obj["modulename"].toString() <<obj["propertyname"].toString();
-        //sendProperty(props->getProp(obj["modulename"].toString(),obj["propertyname"].toString()));
-    }
-    if (obj["message"].toString()=="setproperty")
+    if (obj["evt"].toString()=="setproperty")
     {
         emit externalEvent("setproperty",obj["mod"].toString(),obj["key"].toString(),obj["dta"].toVariant().toMap());
     }
