@@ -7,7 +7,11 @@
 <script src="jquery-ui.min.js"></script>
 <script src="chart.js"></script>
 <link rel="stylesheet" href="ost.css">
-</head><body><div id="OST"></div></body>
+</head>
+<body>
+<div id="OST"></div>
+<div id='allmessages'></div>
+</body>
 </html>
 
 <script>
@@ -16,10 +20,17 @@ var ur = window.location.origin.replace("http://", "");
 var result = ur.replace("http://", "");
 var wsUri = "ws://"+ur+":9624";            
 var websocket = null;
+$("[id='allmessages']").prop('readonly', true);
+$("[id='allmessages']").width("98%");
+$("[id='allmessages']").on("dblclick", function () {
+    $("[id='allmessages']").children().remove();
+    console.log("clear");
+});
 
 $(document).ready(function()
 {
     initWebSocket();
+
 });
 
 
@@ -354,6 +365,7 @@ function setattributes(m,p,n) {
     if (p.status=="3") $("[id='status"+mp+"']").text('\ud83d\udd34'); // red   
     if (n=="message") {
         $("[id='message"+mp+"']").val(p.value);
+        $("[id='allmessages']").prepend("<a>"+p.value+"</a><br>");
     }
     $.each( p.elements   , function( ii, i) {
         $("[id='elt"+mp+ii+"']").val(i.value);
