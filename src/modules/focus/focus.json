@@ -1,0 +1,122 @@
+{
+    "devices": {
+        "hasprofile":true,
+        "devcat": "Options",
+        "group": "Devices",
+        "permission": 2,
+        "propertyLabel": "Devices",
+        "elements": {
+            "camera": {
+                "elementLabel": "Camera",
+				"value": "CCD Simulator"
+            },
+            "focuser": {
+                "elementLabel": "Focuser",
+				"value": "Focuser Simulator"
+            }
+        }
+    },
+
+    "values": {
+        "devcat": "Control",
+        "group": "root",
+        "permission": 0,
+        "propertyLabel": "Values",
+        "elements": {
+            "loopHFRavg": {
+                "elementLabel": "Average HFR",
+                                "format": "99.99"
+            },
+            "focpos": {
+                "elementLabel": "Focuser position",
+                                "format": "9999999"
+            },
+            "bestpos": {
+                "elementLabel": "Best position",
+                                "format": "9999999"
+            },
+            "bestposfit": {
+                "elementLabel": "Pol. fit position",
+                                "format": "9999999.99"
+            },
+            "imgHFR": {
+                "elementLabel": "Last imgage HFR",
+                                "format": "99.99"
+            },
+            "iteration": {
+                "elementLabel": "Iteration",
+                                "format": "9999"
+            }
+        }
+    },
+
+    "actions": {
+        "devcat": "Control",
+        "group": "root",
+        "permission": 2,
+        "rule":2,
+        "propertyLabel": "Actions",
+        "elements": {
+            "condev": {
+                "elementLabel": "Connect devices"
+                ,"value":false
+            },
+            "coarse": {
+                "elementLabel": "Autofocus"
+                ,"value":false
+            },
+            "loop": {
+                "elementLabel": "Infinite loop"
+                ,"value":false
+            },
+            "abort": {
+                "elementLabel": "Abort"
+                ,"value":false
+            },
+            "loadconfs": {
+                "elementLabel": "Load devices conf"
+                ,"value":false
+            }
+        }
+    },
+
+    "parameters": {
+        "devcat": "Control",
+        "group": "root",
+        "permission": 2,
+        "propertyLabel": "Parameters",
+        "elements": {
+            "startpos": {
+                "elementLabel": "Start position",
+				"value":30000,
+                                "format": "9999999"
+            },
+            "steps": {
+                "elementLabel": "Steps gap",
+				"value":3000,
+				"format": "9999999"
+            },
+            "iterations": {
+                "elementLabel": "Iterations",
+				"value":3,
+				"format": "999"
+            },
+            "loopIterations": {
+                "elementLabel": "Average over",
+				"value":2,
+				"format": "99"
+            },
+            "exposure": {
+                "elementLabel": "Exposure",
+				"value":2,
+				"format": "99.999999"
+            },
+            "backlash": {
+                "elementLabel": "Backlash overshoot",
+				"value":100,
+				"format": "99.999999"
+            }
+        }
+    }
+
+}

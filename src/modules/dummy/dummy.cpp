@@ -66,7 +66,6 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
         //BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << eventKey.toStdString();
         foreach(const QString& keyprop, eventData.keys()) {
             foreach(const QString& keyelt, eventData[keyprop].toMap()["elements"].toMap().keys()) {
-                BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << keyprop.toStdString() << "-" << keyelt.toStdString();
                 setOstElement(keyprop,keyelt,eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"],true);
             }
 
