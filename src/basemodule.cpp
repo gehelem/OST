@@ -172,6 +172,48 @@ void Basemodule::disconnectAllDevices()
 
 
 }
+void Basemodule::connectDevice(QString deviceName)
+{
+    INDI::BaseDevice *dev = getDevice(deviceName.toStdString().c_str());
+
+    ISwitchVectorProperty *svp = dev->getSwitch("CONNECTION");
+
+    if (svp==nullptr) {
+        sendMessage("Couldn't find CONNECTION switch");
+    } else {
+        for (int j=0;j<svp->nsp;j++) {
+            if (strcmp(svp->sp[j].name,"CONNECT")==0) {
+                svp->sp[j].s=ISS_ON;
+            } else {
+                svp->sp[j].s=ISS_OFF;
+            }
+        }
+        sendNewSwitch(svp);
+
+    }
+
+}
+void Basemodule::disconnectDevice(QString deviceName)
+{
+    INDI::BaseDevice *dev = getDevice(deviceName.toStdString().c_str());
+
+    ISwitchVectorProperty *svp = dev->getSwitch("CONNECTION");
+
+    if (svp==nullptr) {
+        sendMessage("Couldn't find CONNECTION switch");
+    } else {
+        for (int j=0;j<svp->nsp;j++) {
+            if (strcmp(svp->sp[j].name,"DISCONNECT")==0) {
+                svp->sp[j].s=ISS_ON;
+            } else {
+                svp->sp[j].s=ISS_OFF;
+            }
+        }
+        sendNewSwitch(svp);
+
+    }
+
+}
 
 /*!
  * Asks every device to load saved configuration
