@@ -61,6 +61,10 @@
                 "elementLabel": "Connect devices"
                 ,"value":false
             },
+            "discondev": {
+                "elementLabel": "Disconnect devices"
+                ,"value":false
+            },
             "coarse": {
                 "elementLabel": "Autofocus"
                 ,"value":false

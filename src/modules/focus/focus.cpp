@@ -78,7 +78,15 @@ void FocusModule::OnMyExternalEvent(const QString &eventType, const QString  &ev
                     if (keyelt=="condev") {
                         if (setOstElement(keyprop,keyelt,false,false)) {
                             setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
-                            connectAllDevices();
+                            connectDevice(_camera);
+                            connectDevice(_focuser);
+                        }
+                    }
+                    if (keyelt=="discondev") {
+                        if (setOstElement(keyprop,keyelt,false,false)) {
+                            setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
+                            disconnectDevice(_camera);
+                            disconnectDevice(_focuser);
                         }
                     }
                     if (keyelt=="loadconfs") {
