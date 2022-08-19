@@ -83,8 +83,8 @@ class Basemodule : public QObject, public INDI::BaseClient
         void createOstElement (QString propertyName, QString elementName, QString elementLabel, bool emitEvent);
         void setOstProperty   (const QString &pPropertyName, QVariant _value,bool emitEvent);
         void setOstPropertyAttribute   (const QString &pPropertyName, const QString &pAttributeName, QVariant _value,bool emitEvent);
-        void setOstElement          (QString propertyName, QString elementName, QVariant elementValue, bool emitEvent);
-        void setOstElementAttribute (QString propertyName, QString elementName, QString attributeName, QVariant _value, bool emitEvent);
+        bool setOstElement          (QString propertyName, QString elementName, QVariant elementValue, bool emitEvent);
+        bool setOstElementAttribute (QString propertyName, QString elementName, QString attributeName, QVariant _value, bool emitEvent);
         void loadPropertiesFromFile(QString fileName);
         void savePropertiesToFile(QString fileName);
 
