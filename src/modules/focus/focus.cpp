@@ -40,61 +40,93 @@ void FocusModule::OnMyExternalEvent(const QString &eventType, const QString  &ev
         foreach(const QString& keyprop, eventData.keys()) {
             foreach(const QString& keyelt, eventData[keyprop].toMap()["elements"].toMap().keys()) {
                 BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << keyprop.toStdString() << "-" << keyelt.toStdString();
-                setOstElement(keyprop,keyelt,eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"],true);
+                QVariant val=eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
+                if (keyprop=="parameters") {
+                    if (keyelt=="startpos") {
+                        if (setOstElement(keyprop,keyelt,val,true)) {
+                            _startpos=val.toInt();
+                        }
+                    }
+                    if (keyelt=="steps") {
+                        if (setOstElement(keyprop,keyelt,val,true)) {
+                            _steps=val.toInt();
+                        }
+                    }
+                    if (keyelt=="iterations") {
+                        if (setOstElement(keyprop,keyelt,val,true)) {
+                            _iterations=val.toInt();
+                        }
+                    }
+                    if (keyelt=="loopIterations") {
+                        if (setOstElement(keyprop,keyelt,val,true)) {
+                            _loopIterations=val.toInt();
+                        }
+                    }
+                    if (keyelt=="exposure") {
+                        if (setOstElement(keyprop,keyelt,val,true)) {
+                            _exposure=val.toInt();
+                        }
+                    }
+                    if (keyelt=="backlash") {
+                        if (setOstElement(keyprop,keyelt,val,true)) {
+                            _backlash=val.toInt();
+                        }
+                    }
+
+                }
+                if (keyprop=="actions") {
+                    if (keyelt=="condev") {
+                        if (setOstElement(keyprop,keyelt,false,false)) {
+                            setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
+                            connectAllDevices();
+                        }
+                    }
+                    if (keyelt=="loadconfs") {
+                        if (setOstElement(keyprop,keyelt,false,false)) {
+                            setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
+                            loadDevicesConfs();
+                        }
+                    }
+                    if (keyelt=="coarse") {
+                        if (setOstElement(keyprop,keyelt,false,false)) {
+                            setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
+                            startCoarse();
+                        }
+                    }
+                    if (keyelt=="abort") {
+                        if (setOstElement(keyprop,keyelt,false,false)) {
+                            setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
+                            emit abort();
+                        }
+                    }
+                    if (keyelt=="loop") {
+                        if (setOstElement(keyprop,keyelt,false,false)) {
+                            setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
+                        }
+                    }
+
+                }
+                if (keyprop=="devices") {
+                    if (keyelt=="camera") {
+                        if (setOstElement(keyprop,keyelt,val,false)) {
+                            setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
+                            _camera=val.toString();
+                        }
+                    }
+                    if (keyelt=="focuser") {
+                        if (setOstElement(keyprop,keyelt,val,false)) {
+                            setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
+                            _focuser=val.toString();
+                        }
+                    }
+                }
             }
+
+
 
         }
 }
-//void FocusModule::OnSetPropertyNumber(NumberProperty* prop)
-//{
-//    if (!(prop->getModuleName()==_modulename)) return;
-//    _propertyStore.add(prop);
-//
-//    QList<NumberValue*> numbers=prop->getNumbers();
-//    for (int j = 0; j < numbers.size(); ++j) {
-//        if (numbers[j]->name()=="startpos")        _startpos=numbers[j]->getValue();
-//        if (numbers[j]->name()=="steps")           _steps=numbers[j]->getValue();
-//        if (numbers[j]->name()=="iterations")      _iterations=numbers[j]->getValue();
-//        if (numbers[j]->name()=="loopIterations")  _loopIterations=numbers[j]->getValue();
-//        if (numbers[j]->name()=="exposure")        _exposure=numbers[j]->getValue();
-//        if (numbers[j]->name()=="backlash")        _backlash=numbers[j]->getValue();
-//        emit propertyUpdated(prop,&_modulename);
-//        BOOST_LOG_TRIVIAL(debug) << "Focus number property item modified " << prop->getName().toStdString();
-//    }
-//}
-//void FocusModule::OnSetPropertyText(TextProperty* prop)
-//{
-//    if (!(prop->getModuleName()==_modulename)) return;
-//}
-//
-//void FocusModule::OnSetPropertySwitch(SwitchProperty* prop)
-//{
-//    if (!(prop->getModuleName()==_modulename)) return;
-//    SwitchProperty* wprop = _propertyStore.getSwitch(prop->getDeviceName(),prop->getGroupName(),prop->getName());
-//    QList<SwitchValue*> switchs=prop->getSwitches();
-//    for (int j = 0; j < switchs.size(); ++j) {
-//        if (switchs[j]->name()=="coarse") {
-//            wprop->setSwitch(switchs[j]->name(),true);
-//            startCoarse();
-//        }
-//        if (switchs[j]->name()=="loadconfs") {
-//            wprop->setSwitch(switchs[j]->name(),true);
-//            loadDevicesConfs();
-//        }
-//        if (switchs[j]->name()=="abort")  {
-//            wprop->setSwitch(switchs[j]->name(),true);
-//            emit abort();
-//        }
-//        if (switchs[j]->name()=="condev") {
-//            wprop->setSwitch(switchs[j]->name(),true);
-//            connectAllDevices();
-//        }
-//        //prop->setSwitches(switchs);
-//        _propertyStore.update(wprop);
-//        emit propertyUpdated(wprop,&_modulename);
-//        BOOST_LOG_TRIVIAL(debug) << "Focus switch property item modified " << wprop->getName().toStdString();
-//    }
-//}
+
 
 void FocusModule::newNumber(INumberVectorProperty *nvp)
 {
