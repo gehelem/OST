@@ -192,7 +192,6 @@ function buildproperty(m,p,n) {
         var div="<div id=P"+mp+" data-devcat='"+d+"' data-group='"+g+"' data-key='"+n+"'>";
         div = div + "<strong id='status"+mp+"' >"+'\u25ef'+"</strong>";                  // status icon
         div = div + "<strong id=title"+mp+" > "+p.propertyLabel+" </strong>";            // label 
-        
         // Edit button is added only for writable numbers and texts (not booleans)
         var addEditBtn = false;
         if (p.permission=="1"||p.permission=="2") {
@@ -208,6 +207,10 @@ function buildproperty(m,p,n) {
 
         // show elements values
         div = div + "<table>";
+        if (n=="message") {
+            div = div + "<tr><br><input type=text' id='message"+mp+"' class='text ui-widget ui-corner-all' width='auto'></tr>";
+        }
+        
         $.each( p.elements, function( ii, i ) {
             if ( (jQuery.type(i.value)=='string')) {
                div = div + "<tr><td><label for='"+ii+"'>"+i.elementLabel+"</label></td>";
@@ -265,8 +268,10 @@ function buildproperty(m,p,n) {
             if ( (jQuery.type(i.value)=='string') || (jQuery.type(i.value)=='number') ) {
                $("[id='elt"+mp+ii+"']").prop('readonly', true);
             }
-        })                
-        
+        })    
+        $("[id='message"+mp+"']").prop('readonly', true);
+        $("[id='message"+mp+"']").width("98%");
+//         
         
         // Assign edit button behavior
         if (addEditBtn) {
@@ -346,7 +351,10 @@ function setattributes(m,p,n) {
     if (p.status=="0") $("[id='status"+mp+"']").text('\u25ef');       //white
     if (p.status=="1") $("[id='status"+mp+"']").text('\ud83d\udfe2'); // green
     if (p.status=="2") $("[id='status"+mp+"']").text('\ud83d\udfe1'); // yellow
-    if (p.status=="3") $("[id='status"+mp+"']").text('\ud83d\udd34'); // red                     
+    if (p.status=="3") $("[id='status"+mp+"']").text('\ud83d\udd34'); // red   
+    if (n=="message") {
+        $("[id='message"+mp+"']").val(p.value);
+    }
     $.each( p.elements   , function( ii, i) {
         $("[id='elt"+mp+ii+"']").val(i.value);
     });                  
