@@ -534,7 +534,24 @@ bool Basemodule::setOstElement    (QString propertyName, QString elementName, QV
         if (_prop["elements"].toMap().contains(elementName)) {
             QVariantMap elements=_prop["elements"].toMap();
             QVariantMap element=elements[elementName].toMap();
-            element["value"]=elementValue;
+            if (element.contains("value")) {
+                BOOST_LOG_TRIVIAL(debug) << "seteltvalue " << elementName.toStdString() <<  ":" << element["value"].typeName();
+                if (strcmp(element["value"].typeName(),"double")==0) {
+                    element["value"]=elementValue.toDouble();
+                }
+                if (strcmp(element["value"].typeName(),"int")==0) {
+                    element["value"]=elementValue.toInt();
+                }
+                if (strcmp(element["value"].typeName(),"QString")==0) {
+                    element["value"]=elementValue.toString();
+                }
+                if (strcmp(element["value"].typeName(),"bool")==0) {
+                    element["value"]=elementValue.toBool();
+                }
+            } else {
+                BOOST_LOG_TRIVIAL(debug) << "seteltvalue (first time) " << elementName.toStdString() <<  ":" << elementValue.typeName();
+                element["value"]=elementValue;
+            }
             elements[elementName]=element;
             _prop["elements"]=elements;
         }
