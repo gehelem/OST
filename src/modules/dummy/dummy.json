@@ -24,16 +24,20 @@
         "devcat": "Examples",
         "elements": {
             "extext1": {
-                "elementLabel": "Text 1"
+                "elementLabel": "Text 1",
+                "value":"aaaa"
             },
             "extext2": {
-                "elementLabel": "Text 2"
+                "elementLabel": "Text 2",
+                "value":"bbbb"
             },
             "extext3": {
-                "elementLabel": "Text 3"
+                "elementLabel": "Text 3",
+                "value":"cccc"
             },
             "extext4": {
-                "elementLabel": "Text 4"
+                "elementLabel": "Text 4",
+                "value":"dddd"
             }
         },
         "group": "Texts",
