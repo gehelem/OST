@@ -19,6 +19,14 @@ FocusModule::FocusModule(QString name,QString label,QString profile)
     setOstProperty("moduleDescription","Focus module",true);
     setOstProperty("version",0.1,true);
 
+    _startpos=          getOstElementValue("parameters","startpos").toInt();
+    _steps=             getOstElementValue("parameters","steps").toInt();
+    _iterations=        getOstElementValue("parameters","iterations").toInt();
+    _loopIterations=    getOstElementValue("parameters","loopIterations").toInt();
+    _exposure=          getOstElementValue("parameters","exposure").toInt();
+    _backlash=          getOstElementValue("parameters","backlash").toInt();
+
+
 
     /*_img = new ImageProperty(_modulename,"Control","root","viewer","Image property label",0,0,0);
     emit propertyCreated(_img,&_modulename);
@@ -173,16 +181,23 @@ void FocusModule::newBLOB(IBLOB *bp)
             (QString(bp->bvp->device) == _camera)
        )
     {
-        /*delete image;
-        image = new Image();
-        image->LoadFromBlob(bp);
-        image->CalcStats();
-        image->computeHistogram();
-        image->saveStretchedToJpeg(_webroot+"/"+QString(bp->bvp->device)+".jpeg",100);
+        delete _image;
+        _image = new Image();
+        _image->LoadFromBlob2(bp);
+        _image->CalcStats();
+        _image->computeHistogram();
+        _image->saveStretchedToJpeg(_webroot+"/"+QString(bp->bvp->device)+".jpeg",100);
+        BOOST_LOG_TRIVIAL(debug) << "Image stats : min=" << _image->stats.min[0]
+                                 << " max= " << _image->stats.max[0]
+                                 << " mean= " << _image->stats.mean[0]
+                                 << " median= " << _image->stats.median[0]
+                                 << " width= " << _image->stats.width
+                                 << " height= " << _image->stats.height;
 
-        _img->setURL(QString(bp->bvp->device)+".jpeg");
-        emit propertyUpdated(_img,&_modulename);
-        _propertyStore.add(_img);*/
+
+        //_img->setURL(QString(bp->bvp->device)+".jpeg");
+        //emit propertyUpdated(_img,&_modulename);
+        //_propertyStore.add(_img);*/
         if (_machine.isRunning()) {
             emit ExposureDone();
             emit ExposureBestDone();
@@ -349,6 +364,7 @@ void FocusModule::SMRequestFrameReset()
     sendMessage("SMRequestFrameReset");
 
 
+    setBlobMode();
 
     /*qDebug() << "conf count" << _machine.configuration().count();
     QSet<QAbstractState *>::iterator i;
@@ -359,8 +375,10 @@ void FocusModule::SMRequestFrameReset()
 
     if (!frameReset(_camera))
     {
-            emit abort();
-            return;
+        RequestFrameResetDone();
+        usleep(1000);
+        emit FrameResetDone();
+        return;
     }
     emit RequestFrameResetDone();
 }
@@ -401,16 +419,14 @@ void FocusModule::SMRequestExposure()
 void FocusModule::SMFindStars()
 {
     sendMessage("SMFindStars");
-    /*_solver.ResetSolver(image->stats,image->m_ImageBuffer);
+    _solver.ResetSolver(_image->stats,_image->m_ImageBuffer);
     connect(&_solver,&Solver::successSEP,this,&FocusModule::OnSucessSEP);
-    _solver.FindStars(_solver.stellarSolverProfiles[0]);*/
+    _solver.FindStars(_solver.stellarSolverProfiles[0]);
 }
 
 void FocusModule::OnSucessSEP()
 {
-    /*_values->setNumber("imgHFR",_solver.HFRavg);
-    _propertyStore.update(_values);
-    emit propertyUpdated(_values,&_modulename);*/
+    setOstElement("values","imgHFR",_solver.HFRavg,true);
     emit FindStarsDone();
 }
 
@@ -504,10 +520,7 @@ void FocusModule::SMRequestExposureBest()
 void FocusModule::SMComputeResult()
 {
     sendMessage("SMComputeResult");
-    /*setOstElement("values","imgHFR",_solver.HFRavg,true);
-    _values->setNumber("imgHFR",_solver.HFRavg);
-    _propertyStore.update(_values);
-    emit propertyUpdated(_values,&_modulename);*/
+    setOstElement("values","imgHFR",_solver.HFRavg,true);
     // what should i do here ?
     emit ComputeResultDone();
 }
@@ -528,9 +541,9 @@ void FocusModule::SMComputeLoopFrame()
 {
     sendMessage("SMComputeLoopFrame");
     _loopIteration++;
-    //_loopHFRavg=((_loopIteration-1)*_loopHFRavg + _solver.HFRavg)/_loopIteration;
+    _loopHFRavg=((_loopIteration-1)*_loopHFRavg + _solver.HFRavg)/_loopIteration;
     setOstElement("values","loopHFRavg",_loopHFRavg,false);
-    //setOstElement("values","imgHFR",_solver.HFRavg,true;
+    setOstElement("values","imgHFR",_solver.HFRavg,true);
 
     //qDebug() << "Loop    " << _loopIteration << "/" << _loopIterations << " = " <<  _solver.HFRavg;
 

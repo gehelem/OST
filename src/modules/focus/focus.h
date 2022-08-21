@@ -11,7 +11,6 @@
 #include <QtCore>
 #include <QtConcurrent>
 #include <QStateMachine>
-//#include "image.h"
 
 class MODULE_INIT FocusModule : public Basemodule
 {
@@ -113,6 +112,9 @@ class MODULE_INIT FocusModule : public Basemodule
         std::vector<double> _posvector;
         std::vector<double> _hfdvector;
         std::vector<double> _coefficients;
+
+        QPointer<Image> _image;
+        Solver _solver;
 
 };
 
