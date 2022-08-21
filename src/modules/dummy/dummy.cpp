@@ -53,6 +53,7 @@ Dummy::Dummy(QString name, QString label, QString profile)
     setOstElement("mixedRW","n2",11,false);
     setOstElement("mixedRW","t1","Mixed text value",false);
     //saveAttributesToFile("dummy.json");
+    _camera=getOstElementValue("devices","camera").toString();
 
 }
 
@@ -67,7 +68,53 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
         foreach(const QString& keyprop, eventData.keys()) {
             foreach(const QString& keyelt, eventData[keyprop].toMap()["elements"].toMap().keys()) {
                 setOstElement(keyprop,keyelt,eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"],true);
+                if (keyprop=="devices") {
+                    if (keyelt=="camera") {
+                        if (setOstElement(keyprop,keyelt,eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"],false)) {
+                            setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
+                            _camera=getOstElementValue("devices","camera").toString();
+                        }
+                    }
+                }
+
+                if (keyprop=="actions") {
+                    if (keyelt=="shoot") {
+                        if (setOstElement(keyprop,keyelt,false,false)) {
+                            setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
+                            connectDevice(_camera);
+                            setBlobMode();
+                            if (!sendModNewNumber(_camera,"CCD_EXPOSURE","CCD_EXPOSURE_VALUE", getOstElementValue("parameters","exposure").toDouble())) {
+                                setOstPropertyAttribute(keyprop,"status",IPS_ALERT,true);
+                            }
+                        }
+                    }
+                }
+
+
+
             }
 
         }
+}
+
+void Dummy::newBLOB(IBLOB *bp)
+{
+    if (
+            (QString(bp->bvp->device) == _camera)
+       )
+    {
+        delete _image;
+        _image = new Image();
+        _image->LoadFromBlob2(bp);
+        /*_image->CalcStats();
+        _image->computeHistogram();
+        _image->saveStretchedToJpeg(_webroot+"/"+QString(bp->bvp->device)+".jpeg",100);*/
+
+        setOstPropertyAttribute("actions","status",IPS_OK,true);
+
+        setOstElement("imagevalues","width",_image->stats.width,false);
+        setOstElement("imagevalues","height",_image->stats.height,true);
+
+    }
+
 }
