@@ -7,7 +7,11 @@
 <script src="jquery-ui.min.js"></script>
 <script src="chart.js"></script>
 <link rel="stylesheet" href="ost.css">
-</head><body><div id="OST"></div></body>
+</head>
+<body>
+<div id="OST"></div>
+<div id='allmessages'></div>
+</body>
 </html>
 
 <script>
@@ -16,10 +20,16 @@ var ur = window.location.origin.replace("http://", "");
 var result = ur.replace("http://", "");
 var wsUri = "ws://"+ur+":9624";            
 var websocket = null;
+$("[id='allmessages']").prop('readonly', true);
+$("[id='allmessages']").width("98%");
+$("[id='allmessages']").on("dblclick", function () {
+    $("[id='allmessages']").children().remove();
+});
 
 $(document).ready(function()
 {
     initWebSocket();
+
 });
 
 
@@ -192,7 +202,6 @@ function buildproperty(m,p,n) {
         var div="<div id=P"+mp+" data-devcat='"+d+"' data-group='"+g+"' data-key='"+n+"'>";
         div = div + "<strong id='status"+mp+"' >"+'\u25ef'+"</strong>";                  // status icon
         div = div + "<strong id=title"+mp+" > "+p.propertyLabel+" </strong>";            // label 
-        
         // Edit button is added only for writable numbers and texts (not booleans)
         var addEditBtn = false;
         if (p.permission=="1"||p.permission=="2") {
@@ -208,6 +217,10 @@ function buildproperty(m,p,n) {
 
         // show elements values
         div = div + "<table>";
+        if (n=="message") {
+            div = div + "<tr><br><input type=text' id='message"+mp+"' class='text ui-widget ui-corner-all' width='auto'></tr>";
+        }
+        
         $.each( p.elements, function( ii, i ) {
             if ( (jQuery.type(i.value)=='string')) {
                div = div + "<tr><td><label for='"+ii+"'>"+i.elementLabel+"</label></td>";
@@ -265,8 +278,13 @@ function buildproperty(m,p,n) {
             if ( (jQuery.type(i.value)=='string') || (jQuery.type(i.value)=='number') ) {
                $("[id='elt"+mp+ii+"']").prop('readonly', true);
             }
-        })                
-        
+            //if ((jQuery.type(i.value)=='number') ) {
+            //   $("[id='elt"+mp+ii+"']").spinner({numberFormat: "n"});
+            //}
+        })    
+        $("[id='message"+mp+"']").prop('readonly', true);
+        $("[id='message"+mp+"']").width("98%");
+//         
         
         // Assign edit button behavior
         if (addEditBtn) {
@@ -288,7 +306,7 @@ function buildEditBtn(m,p,n) {
     $("[id='edit"+mp+"']").on("click", function () {
             var mp=$(this).data("mp");
             var p=$("[id='P"+mp+"']").data("prop");
-            console.log("clic:",p.propertyLabel);
+            //console.log("clic:",p.propertyLabel);
             var form = "<div id='form"+mp+"' title='"+p.propertyLabel+"' style='modal:true'><form>";
             form = form+"<fieldset><table>";
             $.each( p.elements, function( ii, i ) {
@@ -296,7 +314,7 @@ function buildEditBtn(m,p,n) {
                 switch(jQuery.type(i.value)) {
                 case 'string':
                     form = form+"<tr><td><label for='"+ii+"'>"+i.elementLabel+"</label></td>";
-                    form = form+"<td><input type=text' name='form"+mp+ii+"' id='form"+mp+ii+"' value='"+i.value+"' class='text ui-widget-content ui-corner-all'></td></tr>";
+                    form = form+"<td><input type='text' name='form"+mp+ii+"' id='form"+mp+ii+"' value='"+i.value+"' class='text ui-widget-content ui-corner-all'></td></tr>";
                     break;
                 case 'number':
                     form = form+"<tr><td><label for='"+ii+"'>"+i.elementLabel+"</label></td>";
@@ -311,24 +329,50 @@ function buildEditBtn(m,p,n) {
             form = form+"</form></div>";
             
             $("[id='P"+mp+"']").append(form);
+            /*$.each( p.elements, function( ii, i ) {
+                    //console.log(jQuery.type(i.value));
+                switch(jQuery.type(i.value)) {
+                case 'number':
+                    $("[id='form"+mp+ii+"']").spinner();
+                    break;
+                default:
+                    // code block
+                } 
+            })*/          
             $("[id='form"+mp+"']").data("mp",mp);
             $("[id='form"+mp+"']").on( "submit", function(event) {
                 event.preventDefault();
-                console.log("submit");
+                //console.log("submit");
                 var mp=$(this).data("mp");
                 var p=$("[id='P"+mp+"']").data("prop");
                 var m=$("[id='P"+mp+"']").data("m");
                 var n=$("[id='P"+mp+"']").data("key");
+                var mess="{\"evt\":\"setproperty\",\"mod\":\""+m+"\",\"dta\":{\""+n+"\":{\"elements\":{";
+                var virgule = "";
                 $.each( p.elements, function( ii, i ) {
                     //console.log(mp+ii);
                     if ($("[id='form"+mp+ii+"']").length) { // to avoid booleans
-                        console.log(mp+ii);
-                        p.elements[ii].value=document.getElementById("form"+mp+ii).value;
+                        //console.log(mp+ii);
+                        //p.elements[ii].value=document.getElementById("form"+mp+ii).value;
+                        switch(jQuery.type(i.value)) {
+                        case 'string':
+                            mess = mess + virgule + "\"" + ii + "\":{\"value\":\""+ document.getElementById("form"+mp+ii).value +"\"}";
+                            virgule = ",";
+                        break;
+                        case 'number':
+                            mess = mess + virgule + "\"" + ii + "\":{\"value\":"+ document.getElementById("form"+mp+ii).value +"}";
+                            virgule = ",";
+                        break;
+                        default:
+                            // code block
+                        } 
+                        
                     } 
                 })                
+                mess = mess + "}}}}";
+                console.log(jQuery.parseJSON(mess));
+                websocket.send(mess);
                 var obj = jQuery.parseJSON("{\"evt\":\"setproperty\",\"mod\":\""+m+"\",\"dta\":{\""+n+"\":"+JSON.stringify(p)+"}}");
-                console.log(obj);
-                websocket.send(JSON.stringify(obj));
                 $( "[id='form"+mp+"']" ).dialog("close");
                 $( "[id='form"+mp+"']" ).remove();
             });
@@ -346,7 +390,11 @@ function setattributes(m,p,n) {
     if (p.status=="0") $("[id='status"+mp+"']").text('\u25ef');       //white
     if (p.status=="1") $("[id='status"+mp+"']").text('\ud83d\udfe2'); // green
     if (p.status=="2") $("[id='status"+mp+"']").text('\ud83d\udfe1'); // yellow
-    if (p.status=="3") $("[id='status"+mp+"']").text('\ud83d\udd34'); // red                     
+    if (p.status=="3") $("[id='status"+mp+"']").text('\ud83d\udd34'); // red   
+    if (n=="message") {
+        $("[id='message"+mp+"']").val(p.value);
+        $("[id='allmessages']").prepend("<a>"+p.value+"</a><br>");
+    }
     $.each( p.elements   , function( ii, i) {
         $("[id='elt"+mp+ii+"']").val(i.value);
     });                  

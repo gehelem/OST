@@ -172,6 +172,48 @@ void Basemodule::disconnectAllDevices()
 
 
 }
+void Basemodule::connectDevice(QString deviceName)
+{
+    INDI::BaseDevice *dev = getDevice(deviceName.toStdString().c_str());
+
+    ISwitchVectorProperty *svp = dev->getSwitch("CONNECTION");
+
+    if (svp==nullptr) {
+        sendMessage("Couldn't find CONNECTION switch");
+    } else {
+        for (int j=0;j<svp->nsp;j++) {
+            if (strcmp(svp->sp[j].name,"CONNECT")==0) {
+                svp->sp[j].s=ISS_ON;
+            } else {
+                svp->sp[j].s=ISS_OFF;
+            }
+        }
+        sendNewSwitch(svp);
+
+    }
+
+}
+void Basemodule::disconnectDevice(QString deviceName)
+{
+    INDI::BaseDevice *dev = getDevice(deviceName.toStdString().c_str());
+
+    ISwitchVectorProperty *svp = dev->getSwitch("CONNECTION");
+
+    if (svp==nullptr) {
+        sendMessage("Couldn't find CONNECTION switch");
+    } else {
+        for (int j=0;j<svp->nsp;j++) {
+            if (strcmp(svp->sp[j].name,"DISCONNECT")==0) {
+                svp->sp[j].s=ISS_ON;
+            } else {
+                svp->sp[j].s=ISS_OFF;
+            }
+        }
+        sendNewSwitch(svp);
+
+    }
+
+}
 
 /*!
  * Asks every device to load saved configuration
@@ -485,20 +527,36 @@ void Basemodule::createOstElement (QString propertyName, QString elementName, QS
     if (emitEvent) emit moduleEvent("addelt",_modulename,propertyName,_prop);
 
 }
-void Basemodule::setOstElement    (QString propertyName, QString elementName, QVariant elementValue, bool emitEvent)
+bool Basemodule::setOstElement    (QString propertyName, QString elementName, QVariant elementValue, bool emitEvent)
 {
     QVariantMap _prop=_ostproperties[propertyName].toMap();
     if (_prop.contains("elements")) {
         if (_prop["elements"].toMap().contains(elementName)) {
             QVariantMap elements=_prop["elements"].toMap();
             QVariantMap element=elements[elementName].toMap();
-            element["value"]=elementValue;
+            if (element.contains("value")) {
+                if (strcmp(element["value"].typeName(),"double")==0) {
+                    element["value"]=elementValue.toDouble();
+                }
+                if (strcmp(element["value"].typeName(),"int")==0) {
+                    element["value"]=elementValue.toInt();
+                }
+                if (strcmp(element["value"].typeName(),"QString")==0) {
+                    element["value"]=elementValue.toString();
+                }
+                if (strcmp(element["value"].typeName(),"bool")==0) {
+                    element["value"]=elementValue.toBool();
+                }
+            } else {
+                element["value"]=elementValue;
+            }
             elements[elementName]=element;
             _prop["elements"]=elements;
         }
     }
     _ostproperties[propertyName]=_prop;
     if (emitEvent) emit moduleEvent("setpropvalue",_modulename,propertyName,_prop);
+    return true; // should return false when request is invalid, we'll see that later
 
 }
 
@@ -511,7 +569,7 @@ void Basemodule::setOstPropertyAttribute   (const QString &pPropertyName, const 
     if (emitEvent)  emit moduleEvent("setattributes",_modulename,pPropertyName,_prop);
 
 }
-void Basemodule::setOstElementAttribute (QString propertyName, QString elementName, QString attributeName, QVariant _value, bool emitEvent)
+bool Basemodule::setOstElementAttribute(QString propertyName, QString elementName, QString attributeName, QVariant _value, bool emitEvent)
 {
     QVariantMap _prop=_ostproperties[propertyName].toMap();
     if (_prop.contains("elements")) {
@@ -525,6 +583,8 @@ void Basemodule::setOstElementAttribute (QString propertyName, QString elementNa
     }
     _ostproperties[propertyName]=_prop;
     if (emitEvent) emit moduleEvent("setpropvalue",_modulename,propertyName,_prop);
+    return true; // should return false when request is invalid, we'll see that later
+
 
 }
 

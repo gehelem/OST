@@ -11,14 +11,13 @@
 #include <QtCore>
 #include <QtConcurrent>
 #include <QStateMachine>
-#include "image.h"
 
 class MODULE_INIT FocusModule : public Basemodule
 {
     Q_OBJECT
 
     public:
-        FocusModule(QString name,QString label);
+        FocusModule(QString name,QString label,QString profile);
         ~FocusModule();
 
     signals:
@@ -58,9 +57,7 @@ class MODULE_INIT FocusModule : public Basemodule
         void cameraAlert();
         void abort();
     public slots:
-        void OnSetPropertyText(TextProperty* prop) override;
-        void OnSetPropertyNumber(NumberProperty* prop) override;
-        void OnSetPropertySwitch(SwitchProperty* prop) override;
+        void OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData) override;
         void OnSucessSEP();
 
     private:
@@ -91,13 +88,6 @@ class MODULE_INIT FocusModule : public Basemodule
         void SMAbort();
         void startCoarse();
 
-        TextProperty* _devices;
-        NumberProperty* _values;
-        NumberProperty* _parameters;
-        SwitchProperty* _actions;
-        ImageProperty* _img;
-        GridProperty* _grid;
-
 
         QString _camera  = "CCD Simulator";
         QString _focuser = "Focuser Simulator";
@@ -123,8 +113,11 @@ class MODULE_INIT FocusModule : public Basemodule
         std::vector<double> _hfdvector;
         std::vector<double> _coefficients;
 
+        QPointer<Image> _image;
+        Solver _solver;
+
 };
 
-extern "C" MODULE_INIT FocusModule *initialize(QString name,QString label);
+extern "C" MODULE_INIT FocusModule *initialize(QString name,QString label,QString profile);
 
 #endif

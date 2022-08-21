@@ -7,6 +7,8 @@
 #include <basedevice.h>
 #include <baseclient.h>
 #include <boost/log/trivial.hpp>
+#include "image.h"
+#include "solver.h"
 
 /*!
  * This Class shouldn't be used as is
@@ -48,6 +50,8 @@ class Basemodule : public QObject, public INDI::BaseClient
         bool disconnectIndi(void);
         void connectAllDevices(void);
         void disconnectAllDevices(void);
+        void connectDevice(QString deviceName);
+        void disconnectDevice(QString deviceName);
         void loadDevicesConfs(void);
         bool sendModNewText  (QString deviceName, QString propertyName,QString elementName, QString text);
         bool sendModNewSwitch(QString deviceName, QString propertyName,QString elementName, ISState sw);
@@ -83,12 +87,17 @@ class Basemodule : public QObject, public INDI::BaseClient
         void createOstElement (QString propertyName, QString elementName, QString elementLabel, bool emitEvent);
         void setOstProperty   (const QString &pPropertyName, QVariant _value,bool emitEvent);
         void setOstPropertyAttribute   (const QString &pPropertyName, const QString &pAttributeName, QVariant _value,bool emitEvent);
-        void setOstElement          (QString propertyName, QString elementName, QVariant elementValue, bool emitEvent);
-        void setOstElementAttribute (QString propertyName, QString elementName, QString attributeName, QVariant _value, bool emitEvent);
+        bool setOstElement          (QString propertyName, QString elementName, QVariant elementValue, bool emitEvent);
+        bool setOstElementAttribute (QString propertyName, QString elementName, QString attributeName, QVariant _value, bool emitEvent);
+        QVariant getOstElementValue (QString propertyName, QString elementName){
+            return _ostproperties[propertyName].toMap()["elements"].toMap()[elementName].toMap()["value"]    ;
+        }
+
         void loadPropertiesFromFile(QString fileName);
         void savePropertiesToFile(QString fileName);
 
     private:
+
         QVariantMap _ostproperties;
         QString _modulename;
         QString _modulelabel;
