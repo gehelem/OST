@@ -7,6 +7,8 @@
 #include <basedevice.h>
 #include <baseclient.h>
 #include <boost/log/trivial.hpp>
+#include "image.h"
+#include "solver.h"
 
 /*!
  * This Class shouldn't be used as is
@@ -95,6 +97,7 @@ class Basemodule : public QObject, public INDI::BaseClient
         void savePropertiesToFile(QString fileName);
 
     private:
+
         QVariantMap _ostproperties;
         QString _modulename;
         QString _modulelabel;

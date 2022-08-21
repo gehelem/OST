@@ -58,6 +58,10 @@ add_executable( ost
     ${CMAKE_CURRENT_SOURCE_DIR}/src/dbmanager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/basemodule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/basemodule.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/image.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/image.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/solver.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/solver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/resources/resources.qrc
 
 )

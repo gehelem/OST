@@ -535,7 +535,6 @@ bool Basemodule::setOstElement    (QString propertyName, QString elementName, QV
             QVariantMap elements=_prop["elements"].toMap();
             QVariantMap element=elements[elementName].toMap();
             if (element.contains("value")) {
-                BOOST_LOG_TRIVIAL(debug) << "seteltvalue " << elementName.toStdString() <<  ":" << element["value"].typeName();
                 if (strcmp(element["value"].typeName(),"double")==0) {
                     element["value"]=elementValue.toDouble();
                 }
@@ -549,7 +548,6 @@ bool Basemodule::setOstElement    (QString propertyName, QString elementName, QV
                     element["value"]=elementValue.toBool();
                 }
             } else {
-                BOOST_LOG_TRIVIAL(debug) << "seteltvalue (first time) " << elementName.toStdString() <<  ":" << elementValue.typeName();
                 element["value"]=elementValue;
             }
             elements[elementName]=element;
