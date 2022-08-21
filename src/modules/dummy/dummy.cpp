@@ -82,6 +82,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                         if (setOstElement(keyprop,keyelt,false,false)) {
                             setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
                             connectDevice(_camera);
+                            connectDevice(getOstElementValue("devices","mount").toString());
                             setBlobMode();
                             if (!sendModNewNumber(_camera,"CCD_EXPOSURE","CCD_EXPOSURE_VALUE", getOstElementValue("parameters","exposure").toDouble())) {
                                 setOstPropertyAttribute(keyprop,"status",IPS_ALERT,true);
@@ -94,6 +95,36 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                             _solver.ResetSolver(_image->stats,_image->m_ImageBuffer);
                             connect(&_solver,&Solver::successSEP,this,&Dummy::OnSucessSEP);
                             _solver.FindStars(_solver.stellarSolverProfiles[0]);
+                        }
+                    }
+                    if (keyelt=="solve") {
+                        if (setOstElement(keyprop,keyelt,false,false)) {
+                            setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
+                            double ra,dec;
+                            if (
+                                      !getModNumber(getOstElementValue("devices","mount").toString(),"EQUATORIAL_EOD_COORD","DEC",dec)
+                                    ||!getModNumber(getOstElementValue("devices","mount").toString(),"EQUATORIAL_EOD_COORD","RA",ra)
+                               )
+                            {
+                                setOstPropertyAttribute(keyprop,"status",IPS_ALERT,true);
+                                sendMessage("Can't find mount device "+getOstElementValue("devices","mount").toString()+" solve aborted");
+                            } else {
+                                setOstElement("imagevalues","mountRA",ra*360/24,false);
+                                setOstElement("imagevalues","mountDEC",dec,false);
+
+                                _solver.ResetSolver(_image->stats,_image->m_ImageBuffer);
+                                _solver.stellarSolver->getDefaultIndexFolderPaths();
+                                QStringList folders;
+                                folders.append(getOstElementValue("parameters","indexfolderpath").toString());
+                                _solver.stellarSolver->setIndexFolderPaths(folders);
+                                foreach(const QString& f, _solver.stellarSolver->getDefaultIndexFolderPaths()) {
+                                    BOOST_LOG_TRIVIAL(debug) << "folder = " << f.toStdString();
+                                }
+                                connect(&_solver,&Solver::successSolve,this,&Dummy::OnSucessSolve);
+                                _solver.stellarSolver->setSearchPositionInDegrees(ra*360/24,dec);
+                                _solver.SolveStars(_solver.stellarSolverProfiles[0]);
+                            }
+
                         }
                     }
                 }
@@ -115,8 +146,8 @@ void Dummy::newBLOB(IBLOB *bp)
         _image = new Image();
         _image->LoadFromBlob2(bp);
         /*_image->CalcStats();
-        _image->computeHistogram();
-        _image->saveStretchedToJpeg(_webroot+"/"+QString(bp->bvp->device)+".jpeg",100);*/
+        _image->computeHistogram();*/
+        _image->saveToJpeg(_webroot+"/"+QString(bp->bvp->device)+".jpeg",100);
 
         setOstPropertyAttribute("actions","status",IPS_OK,true);
         setOstElement("imagevalues","width",_image->stats.width,false);
@@ -130,5 +161,21 @@ void Dummy::OnSucessSEP()
     setOstPropertyAttribute("actions","status",IPS_OK,true);
     setOstElement("imagevalues","hfravg",_solver.HFRavg,false);
     setOstElement("imagevalues","starscount",_solver.stars.size(),true);
+
+}
+void Dummy::OnSucessSolve()
+{
+    if (_solver.stellarSolver->failed()) {
+        sendMessage("Solver failed");
+        setOstPropertyAttribute("actions","status",IPS_ALERT,true);
+        setOstPropertyAttribute("imagevalues","status",IPS_ALERT,true);
+        setOstElement("imagevalues","solRA",0,false);
+        setOstElement("imagevalues","solDEC",0,true);
+    } else {
+        setOstPropertyAttribute("actions","status",IPS_OK,true);
+        setOstPropertyAttribute("imagevalues","status",IPS_OK,true);
+        setOstElement("imagevalues","solRA",_solver.stellarSolver->getSolution().ra,false);
+        setOstElement("imagevalues","solDEC",_solver.stellarSolver->getSolution().dec,true);
+    }
 
 }

@@ -19,6 +19,7 @@ class MODULE_INIT Dummy : public Basemodule
     public slots:
         void OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData) override;
         void OnSucessSEP();
+        void OnSucessSolve();
     private:
         void newBLOB(IBLOB *bp) override;
         QString _camera;
