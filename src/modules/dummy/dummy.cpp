@@ -88,6 +88,14 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                             }
                         }
                     }
+                    if (keyelt=="extract") {
+                        if (setOstElement(keyprop,keyelt,false,false)) {
+                            setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
+                            _solver.ResetSolver(_image->stats,_image->m_ImageBuffer);
+                            connect(&_solver,&Solver::successSEP,this,&Dummy::OnSucessSEP);
+                            _solver.FindStars(_solver.stellarSolverProfiles[0]);
+                        }
+                    }
                 }
 
 
@@ -111,10 +119,16 @@ void Dummy::newBLOB(IBLOB *bp)
         _image->saveStretchedToJpeg(_webroot+"/"+QString(bp->bvp->device)+".jpeg",100);*/
 
         setOstPropertyAttribute("actions","status",IPS_OK,true);
-
         setOstElement("imagevalues","width",_image->stats.width,false);
         setOstElement("imagevalues","height",_image->stats.height,true);
 
     }
+
+}
+void Dummy::OnSucessSEP()
+{
+    setOstPropertyAttribute("actions","status",IPS_OK,true);
+    setOstElement("imagevalues","hfravg",_solver.HFRavg,false);
+    setOstElement("imagevalues","starscount",_solver.stars.size(),true);
 
 }

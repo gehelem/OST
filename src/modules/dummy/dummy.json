@@ -202,7 +202,12 @@
             "solve": {
                 "elementLabel": "Solve field",
                 "value":false
+            },
+            "extract": {
+                "elementLabel": "Stars extraction",
+                "value":false
             }
+
         },
         "group": "Images",
         "permission": 2,
