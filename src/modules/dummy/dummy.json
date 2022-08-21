@@ -173,8 +173,94 @@
         "group": "Mixed",
         "permission": 2,
         "propertyLabel": "Mixed types - read/write"
+    },
+    "devices": {
+        "hasprofile":true,
+        "devcat": "Examples",
+        "group": "Images",
+        "permission": 2,
+        "propertyLabel": "Devices",
+        "elements": {
+            "camera": {
+                "elementLabel": "Camera",
+                "value": "CCD Simulator"
+            }
+        }
+    },
+    "actions": {
+        "devcat": "Examples",
+        "rule":1,
+        "elements": {
+            "shoot": {
+                "elementLabel": "Shoot",
+                "value":false
+            },
+            "stats": {
+                "elementLabel": "Compute statistics",
+                "value":false
+            },
+            "solve": {
+                "elementLabel": "Solve field",
+                "value":false
+            }
+        },
+        "group": "Images",
+        "permission": 2,
+        "propertyLabel": "Actions"
+    },
+    "imagevalues": {
+        "devcat": "Examples",
+        "rule":0,
+        "elements": {
+                "width": {
+                    "elementLabel": "Width",
+                    "value":0
+                },
+                "height": {
+                    "elementLabel": "Height",
+                    "value":0
+                },
+                "min": {
+                    "elementLabel": "Min ADU",
+                    "value":0
+                },
+                "max": {
+                    "elementLabel": "Max ADU",
+                    "value":0
+                },
+                "mean": {
+                    "elementLabel": "Mean ADU",
+                    "value":0
+                },
+                "median": {
+                    "elementLabel": "Median ADU",
+                    "value":0
+                },
+                "starscount": {
+                    "elementLabel": "Stars found",
+                    "value":0
+                },
+                "hfravg": {
+                    "elementLabel": "Average HFR",
+                    "value":0
+                }
+        },
+        "group": "Images",
+        "permission": 0,
+        "propertyLabel": "Results"
+    },
+    "parameters": {
+        "devcat": "Examples",
+        "group": "Images",
+        "permission": 2,
+        "propertyLabel": "Parameters",
+        "elements": {
+            "exposure": {
+                "elementLabel": "Exposure",
+                "value":2,
+                "format": "99.99"
+            }
+
+        }
     }
-
-
-
 }
