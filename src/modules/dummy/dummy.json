@@ -184,7 +184,12 @@
             "camera": {
                 "elementLabel": "Camera",
                 "value": "CCD Simulator"
+            },
+            "mount": {
+                "elementLabel": "Mount",
+                "value": "Telescope Simulator"
             }
+
         }
     },
     "actions": {
@@ -248,6 +253,22 @@
                 "hfravg": {
                     "elementLabel": "Average HFR",
                     "value":0
+                },
+                "solRA": {
+                    "elementLabel": "Solver RA",
+                    "value":0
+                },
+                "solDEC": {
+                    "elementLabel": "Solver DEC",
+                    "value":0
+                },
+                "mountRA": {
+                    "elementLabel": "Mount RA",
+                    "value":0
+                },
+                "mountDEC": {
+                    "elementLabel": "Mount DEC",
+                    "value":0
                 }
         },
         "group": "Images",
@@ -264,7 +285,12 @@
                 "elementLabel": "Exposure",
                 "value":2,
                 "format": "99.99"
+            },
+            "indexfolderpath": {
+                "elementLabel": "Astrometry index folder path",
+                "value":"/usr/share/astrometry/"
             }
+
 
         }
     }
