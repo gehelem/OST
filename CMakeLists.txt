@@ -62,6 +62,12 @@ add_executable( ost
     ${CMAKE_CURRENT_SOURCE_DIR}/src/image.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/solver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/solver.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/stretch.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/stretch.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/sep/sep.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/sep/analyse.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/sep/analyse.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/sep/background.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/resources/resources.qrc
 
 )
@@ -105,29 +111,29 @@ target_compile_definitions(ostdummy PRIVATE dummy_LIBRARY)
 
 
 # Focus module
-list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.qrc)
-qt5_add_resources (RCC_SOURCES ${RESOURCES})
-
-
-add_library(ostfocuser SHARED
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.h
-    ${RCC_SOURCES}
-)
-target_link_libraries(ostfocuser PRIVATE
-    indiclient
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Concurrent
-    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
-    ${STELLARSOLVER_LIBRARIES}
-    ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
-    ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
-    z -lpthread
-
-)
-target_compile_definitions(ostfocuser PRIVATE FOCUS_MODULE)
+#list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.qrc)
+#qt5_add_resources (RCC_SOURCES ${RESOURCES})
+#
+#
+#add_library(ostfocuser SHARED
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.h
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.cpp
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.cpp
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.h
+#    ${RCC_SOURCES}
+#)
+#target_link_libraries(ostfocuser PRIVATE
+#    indiclient
+#    Qt${QT_VERSION_MAJOR}::Core
+#    Qt${QT_VERSION_MAJOR}::Concurrent
+#    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+#    ${STELLARSOLVER_LIBRARIES}
+#    ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
+#    ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
+#    z -lpthread
+#
+#)
+#target_compile_definitions(ostfocuser PRIVATE FOCUS_MODULE)
 
 
 
