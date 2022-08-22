@@ -232,6 +232,9 @@ function buildproperty(m,p,n) {
             }
         })                
         div = div + "</table>";
+        if (p.hasOwnProperty('URL')) {
+            div = div + "<img id='im"+mp+"' src='"+p.URL+"' />";
+        }
         
         // add switchs or radio for booleans
         var tt='checkbox';
@@ -395,6 +398,10 @@ function setattributes(m,p,n) {
         $("[id='message"+mp+"']").val(p.value);
         $("[id='allmessages']").prepend("<a>"+p.value+"</a><br>");
     }
+    if (p.hasOwnProperty('URL')) {
+        $("[id='im"+mp+"']").prop("src",p.URL + "?"+ new Date().valueOf());
+    }
+    
     $.each( p.elements   , function( ii, i) {
         $("[id='elt"+mp+ii+"']").val(i.value);
     });                  

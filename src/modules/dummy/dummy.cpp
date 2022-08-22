@@ -150,6 +150,7 @@ void Dummy::newBLOB(IBLOB *bp)
 
         QImage rawImage = _image->getRawQImage();
         rawImage.save(_webroot+"/"+QString(bp->bvp->device)+".jpeg","JPG",50);
+        setOstPropertyAttribute("testimage","URL",QString(bp->bvp->device)+".jpeg",true);
     }
 
 }

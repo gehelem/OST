@@ -293,5 +293,12 @@
 
 
         }
+    },
+    "testimage": {
+        "devcat": "Examples",
+        "group": "Images",
+        "permission": 0,
+        "propertyLabel": "Test image",
+        "URL": ""
     }
 }
