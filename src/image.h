@@ -45,6 +45,11 @@ protected:
 private:
     QImage rawImage;
     void generateQImage();
+    template <typename T>
+    QPair<T, T> getParitionMinMax(uint32_t start, uint32_t stride);
+    template <typename T>
+    void calculateMinMax();
+
 
 
 

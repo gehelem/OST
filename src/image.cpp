@@ -400,17 +400,116 @@ bool Image::LoadFromFile(QString filename)
     //IDLog("IMG readblob done %ix%i\n",stats.width ,stats.height );
     return true;
 }
-void Image::CalcStats(void)
+
+/* taken from Kstars fitviewer FITSData */
+template <typename T>
+QPair<T, T> Image::getParitionMinMax(uint32_t start, uint32_t stride)
 {
-    //stats.min[0] =img.min();
-    //stats.max[0] =img.max();
-    //stats.mean[0]=img.mean();
-    //stats.median[0]=img.median();
-    //stats.stddev[0]=sqrt(img.variance(1));
-    //IDLog("IMG Min=%f Max=%f Avg=%.2f Med=%f StdDev=%.2f\n",stats.min[0],stats.max[0],stats.mean[0],stats.median[0],stats.stddev[0]);
+    auto * buffer = reinterpret_cast<T *>(m_ImageBuffer);
+    T min = std::numeric_limits<T>::max();
+    T max = std::numeric_limits<T>::min();
+
+    uint32_t end = start + stride;
+
+    for (uint32_t i = start; i < end; i++)
+    {
+        min = qMin(buffer[i], min);
+        max = qMax(buffer[i], max);
+        //        if (buffer[i] < min)
+        //            min = buffer[i];
+        //        else if (buffer[i] > max)
+        //            max = buffer[i];
+    }
+
+    return qMakePair(min, max);
 }
 
+/* taken from Kstars fitviewer FITSData */
+template <typename T>
+void Image::calculateMinMax()
+{
+    T min = std::numeric_limits<T>::max();
+    T max = std::numeric_limits<T>::min();
 
+
+    // Create N threads
+    const uint8_t nThreads = 16;
+
+    for (int n = 0; n < stats.channels; n++)
+    {
+        uint32_t cStart = n * stats.samples_per_channel;
+
+        // Calculate how many elements we process per thread
+        uint32_t tStride = stats.samples_per_channel / nThreads;
+
+        // Calculate the final stride since we can have some left over due to division above
+        uint32_t fStride = tStride + (stats.samples_per_channel - (tStride * nThreads));
+
+        // Start location for inspecting elements
+        uint32_t tStart = cStart;
+
+        // List of futures
+        QList<QFuture<QPair<T, T>>> futures;
+
+        for (int i = 0; i < nThreads; i++)
+        {
+            // Run threads
+            futures.append(QtConcurrent::run(this, &Image::getParitionMinMax<T>, tStart, (i == (nThreads - 1)) ? fStride : tStride));
+            tStart += tStride;
+        }
+
+        // Now wait for results
+        for (int i = 0; i < nThreads; i++)
+        {
+            QPair<T, T> result = futures[i].result();
+            min = qMin(result.first, min);
+            max = qMax(result.second, max);
+        }
+
+        stats.min[n] = min;
+        stats.max[n] = max;
+    }
+}
+void Image::CalcStats(void)
+{
+    switch (stats.dataType)
+    {
+        case TBYTE:
+            calculateMinMax<uint8_t>();
+            break;
+
+        case TSHORT:
+            calculateMinMax<int16_t>();
+            break;
+
+        case TUSHORT:
+            calculateMinMax<uint16_t>();
+            break;
+
+        case TLONG:
+            calculateMinMax<int32_t>();
+            break;
+
+        case TULONG:
+            calculateMinMax<uint32_t>();
+            break;
+
+        case TFLOAT:
+            calculateMinMax<float>();
+            break;
+
+        case TLONGLONG:
+            calculateMinMax<int64_t>();
+            break;
+
+        case TDOUBLE:
+            calculateMinMax<double>();
+            break;
+
+        default:
+            break;
+    }
+}
 
 void Image::computeHistogram(void)
 {
