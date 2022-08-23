@@ -97,6 +97,18 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                             _solver.FindStars(_solver.stellarSolverProfiles[0]);
                         }
                     }
+                    if (keyelt=="stats") {
+                        if (setOstElement(keyprop,keyelt,false,false)) {
+                            setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
+                            BOOST_LOG_TRIVIAL(debug) << "********** BEFORE";
+                            _image->CalcStats();
+                            BOOST_LOG_TRIVIAL(debug) << "********** AFTER";
+                            setOstElement("imagevalues","min",_image->stats.min[0],false);
+                            setOstElement("imagevalues","max",_image->stats.max[0],true);
+                            setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
+
+                        }
+                    }
                     if (keyelt=="solve") {
                         if (setOstElement(keyprop,keyelt,false,false)) {
                             setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
@@ -141,12 +153,9 @@ void Dummy::newBLOB(IBLOB *bp)
         delete _image;
         _image = new Image();
         _image->LoadFromBlob(bp);
-
         setOstPropertyAttribute("actions","status",IPS_OK,true);
         setOstElement("imagevalues","width",_image->stats.width,false);
         setOstElement("imagevalues","height",_image->stats.height,true);
-        setOstElement("imagevalues","min",_image->stats.min[0],false);
-        setOstElement("imagevalues","max",_image->stats.max[0],true);
 
         QImage rawImage = _image->getRawQImage();
         rawImage.save(_webroot+"/"+QString(bp->bvp->device)+".jpeg","JPG",50);
