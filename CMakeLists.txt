@@ -58,25 +58,21 @@ add_executable( ost
     ${CMAKE_CURRENT_SOURCE_DIR}/src/dbmanager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/basemodule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/basemodule.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/image.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/image.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/solver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/solver.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/stretch.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/stretch.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/sep/sep.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/sep/analyse.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/sep/analyse.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/sep/background.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/resources/resources.qrc
-
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/fileio.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/imagelabel.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/stretch.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/bayer.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/dms.cpp
 )
 target_link_libraries( ost
     indiclient
     ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
     Qt${QT_VERSION_MAJOR}::Gui
     Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Network
+    Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::WebSockets
     Qt${QT_VERSION_MAJOR}::Sql
@@ -102,6 +98,7 @@ target_link_libraries(ostdummy PRIVATE
     indiclient
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
+    Qt${QT_VERSION_MAJOR}::Widgets
     ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
 )
 target_compile_definitions(ostdummy PRIVATE dummy_LIBRARY)
@@ -149,6 +146,7 @@ target_link_libraries(ostindipanel PRIVATE
     Qt${QT_VERSION_MAJOR}::Gui
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Network
+    Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::WebSockets
     Qt${QT_VERSION_MAJOR}::Sql
