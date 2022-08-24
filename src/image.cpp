@@ -25,6 +25,7 @@
 #include <array>
 #include <vector>
 #include "image.h"
+#include "stretch.h"
 
 double square(double value){ return value*value;}
 
@@ -61,7 +62,7 @@ bool Image::saveToJpeg(QString filename,int compress)
 }
 //This method was copied and pasted and modified from the method privateLoad in fitsdata in KStars
 //It loads a FITS file, reads the FITS Headers, and loads the data from the image
-bool Image::LoadFromBlob2(IBLOB *bp)
+bool Image::LoadFromBlob(IBLOB *bp)
 {
     BOOST_LOG_TRIVIAL(debug) << "Image load from blob " << bp->label << "-" << bp->name << "-" << bp->size;
 
@@ -190,170 +191,44 @@ bool Image::LoadFromBlob2(IBLOB *bp)
     }*/
 
     fits_close_file(fptr, &status);
-
+    generateQImage();
     return true;
 }
 
-bool Image::LoadFromBlob(IBLOB *bp)
+//This method was copied and pasted from Fitsview in KStars
+//It sets up the image that will be displayed on the screen
+void Image::generateQImage()
 {
-    BOOST_LOG_TRIVIAL(debug) << "Image load from blob " << bp->label << "-" << bp->name << "-" << bp->size;
-    ResetData();
-    int status = 0, anynullptr = 0;
-    long naxes[3];
+    int sampling = 2;
+    // Account for leftover when sampling. Thus a 5-wide image sampled by 2
+    // would result in a width of 3 (samples 0, 2 and 4).
 
-    fitsfile *fptr;  // FITS file pointer
-    size_t bsize = static_cast<size_t>(bp->bloblen);
-    // load blob to CFITSIO
-    if (fits_open_memfile(&fptr,"",READONLY,&bp->blob,&bsize,0,NULL,&status) )
-    {
-        IDLog("IMG Unsupported type or read error loading FITS blob\n");
-        return false;
-    } else {
-        stats.size = bp->bloblen;
-    }
+    int w = (stats.width + sampling - 1) / sampling;
+    int h = (stats.height + sampling - 1) / sampling;
 
-    // Use open diskfile as it does not use extended file names which has problems opening
-    // files with [ ] or ( ) in their names.
-    /*QString fileToProcess;
-    fileToProcess = "/home/gilles/ekos6/Light/lum/M_33_Light_lum_60_secs_2020-11-06T22-25-13_139.fits";
-    if (fits_open_diskfile(&fptr,fileToProcess.toLatin1() , READONLY, &status))
+    if (stats.channels == 1)
     {
-        IDLog("Unsupported type or read error loading FITS blob\n");
-        return false;
+        rawImage = QImage(w, h, QImage::Format_Indexed8);
+
+        rawImage.setColorCount(256);
+        for (int i = 0; i < 256; i++)
+            rawImage.setColor(i, qRgb(i, i, i));
     }
     else
-        stats.size = QFile(fileToProcess).size();*/
-
-    if (fits_movabs_hdu(fptr, 1, IMAGE_HDU, &status))
     {
-        IDLog("IMG Could not locate image HDU.\n");
-        fits_close_file(fptr, &status);
-        return false;
+        rawImage = QImage(w, h, QImage::Format_RGB32);
     }
 
-    int fitsBitPix = 0;
-    if (fits_get_img_param(fptr, 3, &fitsBitPix, &(stats.ndim), naxes, &status))
-    {
-        IDLog("IMG FITS file open error (fits_get_img_param).\n");
-        fits_close_file(fptr, &status);
-        return false;
-    }
+    Stretch stretch(static_cast<int>(stats.width),
+                    static_cast<int>(stats.height),
+                    stats.channels, static_cast<uint16_t>(stats.dataType));
 
-    if (stats.ndim < 2)
-    {
-        IDLog("IMG 1D FITS images are not supported.\n");
-        fits_close_file(fptr, &status);
-        return false;
-    }
+    // Compute new auto-stretch params.
+    StretchParams stretchParams = stretch.computeParams(m_ImageBuffer);
 
-    switch (fitsBitPix)
-    {
-        case BYTE_IMG:
-            stats.dataType      = TBYTE;
-            stats.bytesPerPixel = sizeof(uint8_t);
-            break;
-        case SHORT_IMG:
-            // Read SHORT image as USHORT
-            stats.dataType      = TUSHORT;
-            stats.bytesPerPixel = sizeof(int16_t);
-            break;
-        case USHORT_IMG:
-            stats.dataType      = TUSHORT;
-            stats.bytesPerPixel = sizeof(uint16_t);
-            break;
-        case LONG_IMG:
-            // Read LONG image as ULONG
-            stats.dataType      = TULONG;
-            stats.bytesPerPixel = sizeof(int32_t);
-            break;
-        case ULONG_IMG:
-            stats.dataType      = TULONG;
-            stats.bytesPerPixel = sizeof(uint32_t);
-            break;
-        case FLOAT_IMG:
-            stats.dataType      = TFLOAT;
-            stats.bytesPerPixel = sizeof(float);
-            break;
-        case LONGLONG_IMG:
-            stats.dataType      = TLONGLONG;
-            stats.bytesPerPixel = sizeof(int64_t);
-            break;
-        case DOUBLE_IMG:
-            stats.dataType      = TDOUBLE;
-            stats.bytesPerPixel = sizeof(double);
-            break;
-        default:
-            IDLog("IMG Bit depth %i is not supported.\n",fitsBitPix);
-            fits_close_file(fptr, &status);
-            return false;
-    }
+    stretch.setParams(stretchParams);
+    stretch.run(m_ImageBuffer, &rawImage, sampling);
 
-    if (stats.ndim < 3)
-        naxes[2] = 1;
-
-    if (naxes[0] == 0 || naxes[1] == 0)
-    {
-        IDLog("IMG Image has invalid dimensions %lix %li\n",naxes[0],naxes[1]);
-        return false;
-    }
-
-    stats.width               = static_cast<uint16_t>(naxes[0]);
-    stats.height              = static_cast<uint16_t>(naxes[1]);
-    stats.channels            = static_cast<uint8_t>(naxes[2]);
-    stats.samples_per_channel = stats.width * stats.height;
-    delete[] m_ImageBuffer;
-    m_ImageBufferSize = stats.samples_per_channel * stats.channels * static_cast<uint16_t>(stats.bytesPerPixel);
-    m_ImageBuffer = new uint8_t[m_ImageBufferSize];
-/*    IDLog("--------------------------\n");
-    IDLog("m_ImageBufferSize %i bytes\n"        ,m_ImageBufferSize);
-    IDLog("stats.samples_per_channel %i bytes\n",stats.samples_per_channel);
-    IDLog("stats.channels %i bytes\n"           ,stats.channels);
-    IDLog("stats.bytesPerPixel %i bytes\n"      ,stats.bytesPerPixel);
-    IDLog("--------------------------\n");
-*/
-
-    if (m_ImageBuffer == nullptr)
-    {
-        IDLog("IMG FITSData: Not enough memory for image_buffer channel. Requested: %i bytes\n",m_ImageBufferSize);
-        delete[] m_ImageBuffer;
-        m_ImageBuffer = nullptr;
-        fits_close_file(fptr, &status);
-        return false;
-    }
-
-    long nelements = stats.samples_per_channel * stats.channels;
-
-    //long int firstpixel =1;
-    //if (fits_read_img(fptr,TUSHORT,1,nelements,nullptr,m_ImageBuffer,&anynullptr,&status))
-    /*if (fits_read_pix(fptr, static_cast<uint16_t>(stats.dataType), &firstpixel, nelements, nullptr, m_ImageBuffer, &anynullptr, &status))
-    {
-        IDLog("Error reading imag. %i\n",status);
-        fits_close_file(fptr, &status);
-        return false;
-    }*/
-    //if (fits_read_pix(fptr, TUSHORT                              , fpixel, xsize*ysize, nullptr, ImageData, nullptr, &status))
-    if (fits_read_img(fptr, static_cast<uint16_t>(stats.dataType), 1, nelements, nullptr, m_ImageBuffer, &anynullptr, &status))
-    {
-        IDLog("IMG Error reading imag. %i\n",status);
-        fits_close_file(fptr, &status);
-        return false;
-    }
-
-    fits_close_file(fptr,&status);
-    // Load image into Cimg object
-    //img=nullptr;
-    //img.clear();
-    //img.resize(stats.width ,stats.height,1,1);
-    //cimg_forXY(img, x, y)
-    //    {
-    //        img(x, img.height() - y - 1) = (reinterpret_cast<uint16_t *>(m_ImageBuffer))[img.offset(x, y)]; // FIXME ???
-    //    }
-
-    CalcStats();
-    //saveToJpeg("/home/gilles/OST/toto.jpeg");
-    //FindStars();
-    //IDLog("IMG readblob done %ix%i\n",stats.width ,stats.height );
-    return true;
 }
 void Image::deleteImageBuffer()
 {
@@ -525,17 +400,116 @@ bool Image::LoadFromFile(QString filename)
     //IDLog("IMG readblob done %ix%i\n",stats.width ,stats.height );
     return true;
 }
-void Image::CalcStats(void)
+
+/* taken from Kstars fitviewer FITSData */
+template <typename T>
+QPair<T, T> Image::getParitionMinMax(uint32_t start, uint32_t stride)
 {
-    //stats.min[0] =img.min();
-    //stats.max[0] =img.max();
-    //stats.mean[0]=img.mean();
-    //stats.median[0]=img.median();
-    //stats.stddev[0]=sqrt(img.variance(1));
-    //IDLog("IMG Min=%f Max=%f Avg=%.2f Med=%f StdDev=%.2f\n",stats.min[0],stats.max[0],stats.mean[0],stats.median[0],stats.stddev[0]);
+    auto * buffer = reinterpret_cast<T *>(m_ImageBuffer);
+    T min = std::numeric_limits<T>::max();
+    T max = std::numeric_limits<T>::min();
+
+    uint32_t end = start + stride;
+
+    for (uint32_t i = start; i < end; i++)
+    {
+        min = qMin(buffer[i], min);
+        max = qMax(buffer[i], max);
+        //        if (buffer[i] < min)
+        //            min = buffer[i];
+        //        else if (buffer[i] > max)
+        //            max = buffer[i];
+    }
+
+    return qMakePair(min, max);
 }
 
+/* taken from Kstars fitviewer FITSData */
+template <typename T>
+void Image::calculateMinMax()
+{
+    T min = std::numeric_limits<T>::max();
+    T max = std::numeric_limits<T>::min();
 
+
+    // Create N threads
+    const uint8_t nThreads = 16;
+
+    for (int n = 0; n < stats.channels; n++)
+    {
+        uint32_t cStart = n * stats.samples_per_channel;
+
+        // Calculate how many elements we process per thread
+        uint32_t tStride = stats.samples_per_channel / nThreads;
+
+        // Calculate the final stride since we can have some left over due to division above
+        uint32_t fStride = tStride + (stats.samples_per_channel - (tStride * nThreads));
+
+        // Start location for inspecting elements
+        uint32_t tStart = cStart;
+
+        // List of futures
+        QList<QFuture<QPair<T, T>>> futures;
+
+        for (int i = 0; i < nThreads; i++)
+        {
+            // Run threads
+            futures.append(QtConcurrent::run(this, &Image::getParitionMinMax<T>, tStart, (i == (nThreads - 1)) ? fStride : tStride));
+            tStart += tStride;
+        }
+
+        // Now wait for results
+        for (int i = 0; i < nThreads; i++)
+        {
+            QPair<T, T> result = futures[i].result();
+            min = qMin(result.first, min);
+            max = qMax(result.second, max);
+        }
+
+        stats.min[n] = min;
+        stats.max[n] = max;
+    }
+}
+void Image::CalcStats(void)
+{
+    switch (stats.dataType)
+    {
+        case TBYTE:
+            calculateMinMax<uint8_t>();
+            break;
+
+        case TSHORT:
+            calculateMinMax<int16_t>();
+            break;
+
+        case TUSHORT:
+            calculateMinMax<uint16_t>();
+            break;
+
+        case TLONG:
+            calculateMinMax<int32_t>();
+            break;
+
+        case TULONG:
+            calculateMinMax<uint32_t>();
+            break;
+
+        case TFLOAT:
+            calculateMinMax<float>();
+            break;
+
+        case TLONGLONG:
+            calculateMinMax<int64_t>();
+            break;
+
+        case TDOUBLE:
+            calculateMinMax<double>();
+            break;
+
+        default:
+            break;
+    }
+}
 
 void Image::computeHistogram(void)
 {

@@ -5,7 +5,7 @@
 #include <memory>
 #include <QtCore>
 #include <QtConcurrent>
-#include <structuredefinitions.h>
+#include <QtGui/QtGui>
 #include <stellarsolver.h>
 #include <boost/log/trivial.hpp>
 
@@ -25,7 +25,6 @@ public:
     //CImg<uint16_t> img_stretched;
     //CImg<double>   histogram256;
     bool LoadFromBlob(IBLOB *bp);
-    bool LoadFromBlob2(IBLOB *bp);
     bool LoadFromFile(QString filename);
     bool saveToJpeg(QString filename,int compress);
     bool saveMapToJpeg(QString filename,int compress,QList<FITSImage::Star> stars);
@@ -34,10 +33,23 @@ public:
     void CalcStats(void);
     void computeHistogram(void);
     void appendStarsFound(QList<FITSImage::Star> stars);
+    QImage getRawQImage()
+    {
+        return rawImage;
+    }
 protected:
     void deleteImageBuffer(void);
     uint8_t m_Channels { 1 };
     uint32_t m_ImageBufferSize { 0 };
+private:
+    QImage rawImage;
+    void generateQImage();
+    template <typename T>
+    QPair<T, T> getParitionMinMax(uint32_t start, uint32_t stride);
+    template <typename T>
+    void calculateMinMax();
+
+
 
 
 };

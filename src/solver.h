@@ -6,7 +6,6 @@
 #include <QtConcurrent>
 
 //Includes for this project
-#include <structuredefinitions.h>
 #include <stellarsolver.h>
 #include <boost/log/trivial.hpp>
 

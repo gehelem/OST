@@ -92,7 +92,8 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                     if (keyelt=="extract") {
                         if (setOstElement(keyprop,keyelt,false,false)) {
                             setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
-                            _solver.ResetSolver(_image->stats,_image->m_ImageBuffer);
+                            stats=_image.getStats();
+                            _solver.ResetSolver(stats,_image.getImageBuffer());
                             connect(&_solver,&Solver::successSEP,this,&Dummy::OnSucessSEP);
                             _solver.FindStars(_solver.stellarSolverProfiles[0]);
                         }
@@ -112,17 +113,13 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                                 setOstElement("imagevalues","mountRA",ra*360/24,false);
                                 setOstElement("imagevalues","mountDEC",dec,false);
 
-                                _solver.ResetSolver(_image->stats,_image->m_ImageBuffer);
-                                _solver.stellarSolver->getDefaultIndexFolderPaths();
+                                //_solver.ResetSolver(_image.getStats(),_image.getImageBuffer());
                                 QStringList folders;
                                 folders.append(getOstElementValue("parameters","indexfolderpath").toString());
-                                _solver.stellarSolver->setIndexFolderPaths(folders);
-                                foreach(const QString& f, _solver.stellarSolver->getDefaultIndexFolderPaths()) {
-                                    BOOST_LOG_TRIVIAL(debug) << "folder = " << f.toStdString();
-                                }
+                                //_solver.stellarSolver->setIndexFolderPaths(folders);
                                 connect(&_solver,&Solver::successSolve,this,&Dummy::OnSucessSolve);
-                                _solver.stellarSolver->setSearchPositionInDegrees(ra*360/24,dec);
-                                _solver.SolveStars(_solver.stellarSolverProfiles[0]);
+                                //_solver.stellarSolver->setSearchPositionInDegrees(ra*360/24,dec);
+                                //_solver.SolveStars(_solver.stellarSolverProfiles[0]);
                             }
 
                         }
@@ -142,17 +139,16 @@ void Dummy::newBLOB(IBLOB *bp)
             (QString(bp->bvp->device) == _camera)
        )
     {
-        delete _image;
-        _image = new Image();
-        _image->LoadFromBlob2(bp);
-        /*_image->CalcStats();
-        _image->computeHistogram();*/
-        _image->saveToJpeg(_webroot+"/"+QString(bp->bvp->device)+".jpeg",100);
-
+        _image.loadBlob(bp);
         setOstPropertyAttribute("actions","status",IPS_OK,true);
-        setOstElement("imagevalues","width",_image->stats.width,false);
-        setOstElement("imagevalues","height",_image->stats.height,true);
+        setOstElement("imagevalues","width",_image.getStats().width,false);
+        setOstElement("imagevalues","height",_image.getStats().height,false);
+        setOstElement("imagevalues","min",_image.getStats().min[0],false);
+        setOstElement("imagevalues","max",_image.getStats().max[0],true);
 
+        QImage rawImage = _image.getRawQImage();
+        rawImage.save(_webroot+"/"+QString(bp->bvp->device)+".jpeg","JPG",50);
+        setOstPropertyAttribute("testimage","URL",QString(bp->bvp->device)+".jpeg",true);
     }
 
 }
