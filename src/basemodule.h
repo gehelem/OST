@@ -7,7 +7,7 @@
 #include <basedevice.h>
 #include <baseclient.h>
 #include <boost/log/trivial.hpp>
-#include "image.h"
+#include "ssolverutils/fileio.h"
 #include "solver.h"
 
 /*!
