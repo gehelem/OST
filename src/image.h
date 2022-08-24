@@ -6,7 +6,6 @@
 #include <QtCore>
 #include <QtConcurrent>
 #include <QtGui/QtGui>
-#include <structuredefinitions.h>
 #include <stellarsolver.h>
 #include <boost/log/trivial.hpp>
 
