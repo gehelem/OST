@@ -183,21 +183,13 @@ void FocusModule::newBLOB(IBLOB *bp)
     {
         delete _image;
         _image = new Image();
-        _image->LoadFromBlob2(bp);
-        _image->CalcStats();
-        _image->computeHistogram();
-        _image->saveStretchedToJpeg(_webroot+"/"+QString(bp->bvp->device)+".jpeg",100);
-        BOOST_LOG_TRIVIAL(debug) << "Image stats : min=" << _image->stats.min[0]
-                                 << " max= " << _image->stats.max[0]
-                                 << " mean= " << _image->stats.mean[0]
-                                 << " median= " << _image->stats.median[0]
-                                 << " width= " << _image->stats.width
-                                 << " height= " << _image->stats.height;
+        _image->LoadFromBlob(bp);
+        setOstPropertyAttribute("image","status",IPS_OK,true);
 
+        QImage rawImage = _image->getRawQImage();
+        rawImage.save(_webroot+"/"+QString(bp->bvp->device)+".jpeg","JPG",50);
+        setOstPropertyAttribute("image","URL",QString(bp->bvp->device)+".jpeg",true);
 
-        //_img->setURL(QString(bp->bvp->device)+".jpeg");
-        //emit propertyUpdated(_img,&_modulename);
-        //_propertyStore.add(_img);*/
         if (_machine.isRunning()) {
             emit ExposureDone();
             emit ExposureBestDone();

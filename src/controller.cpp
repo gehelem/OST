@@ -23,7 +23,7 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostguider.so","guider1","Guider");
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostinspector.so","inspector1","Frame inspector");
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostpolar.so","polar1","Polar assistant");
-    //LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focus1","Focus assistant","default");
+    LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focus1","Focus assistant","default");
     LoadModule(QCoreApplication::applicationDirPath()+"/libostdummy.so","dummy1","Demo module","default");
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel","indi control panel","default");
 

@@ -130,6 +130,13 @@
                 "format": "99999"
             }
         }
+    },
+    "image": {
+        "devcat": "Control",
+        "group": "root",
+        "permission": 0,
+        "propertyLabel": "Last image",
+        "URL": ""
     }
 
 }
