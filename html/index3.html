@@ -7,6 +7,8 @@
 <script src="jquery-ui.min.js"></script>
 <script src="chart.js"></script>
 <link rel="stylesheet" href="ost.css">
+<link href="photoviewer.min.css" rel="stylesheet" />
+<script src="photoviewer.min.js"></script>
 </head>
 <body>
 <div id="OST"></div>
@@ -232,7 +234,9 @@ function buildproperty(m,p,n) {
             }
         })                
         div = div + "</table>";
-        
+        if (p.hasOwnProperty('URL')) {
+            div = div + "<div><a id='gal"+mp+"' data-gallery='gal"+mp+"' ><img id='im"+mp+"' src='"+p.URL+"' height='150'></a><div>";
+        }
         // add switchs or radio for booleans
         var tt='checkbox';
         if (p.hasOwnProperty('rule')) {
@@ -252,6 +256,16 @@ function buildproperty(m,p,n) {
         $("[id='P"+mp+"']").data("prop",p);
         $("[id='P"+mp+"']").data("m",m);
         $("[id='P"+mp+"']").data("key",n);
+        '[data-gallery=example]'
+        $("[data-gallery='gal"+mp+"']").click(function (e) {
+            e.preventDefault();
+            var items = [{src: p.URL}];
+            var options = {
+                index: $(this).index()
+            };
+            new PhotoViewer(items, options);
+            console.log('clicphoto');
+        });
 
         
         $.each( p.elements, function( ii, i ) {
@@ -395,6 +409,10 @@ function setattributes(m,p,n) {
         $("[id='message"+mp+"']").val(p.value);
         $("[id='allmessages']").prepend("<a>"+p.value+"</a><br>");
     }
+    if (p.hasOwnProperty('URL')) {
+        $("[id='im"+mp+"']").prop("src",p.URL + "?"+ new Date().valueOf());
+    }
+    
     $.each( p.elements   , function( ii, i) {
         $("[id='elt"+mp+ii+"']").val(i.value);
     });                  

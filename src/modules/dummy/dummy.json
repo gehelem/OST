@@ -173,8 +173,135 @@
         "group": "Mixed",
         "permission": 2,
         "propertyLabel": "Mixed types - read/write"
+    },
+    "devices": {
+        "hasprofile":true,
+        "devcat": "Examples",
+        "group": "Images",
+        "permission": 2,
+        "propertyLabel": "Devices",
+        "elements": {
+            "camera": {
+                "elementLabel": "Camera",
+                "value": "CCD Simulator"
+            },
+            "mount": {
+                "elementLabel": "Mount",
+                "value": "Telescope Simulator"
+            }
+
+        }
+    },
+    "actions": {
+        "devcat": "Examples",
+        "rule":1,
+        "elements": {
+            "shoot": {
+                "elementLabel": "Shoot",
+                "value":false
+            },
+            "stats": {
+                "elementLabel": "Compute statistics",
+                "value":false
+            },
+            "solve": {
+                "elementLabel": "Solve field",
+                "value":false
+            },
+            "extract": {
+                "elementLabel": "Stars extraction",
+                "value":false
+            }
+
+        },
+        "group": "Images",
+        "permission": 2,
+        "propertyLabel": "Actions"
+    },
+    "imagevalues": {
+        "devcat": "Examples",
+        "rule":0,
+        "elements": {
+                "width": {
+                    "elementLabel": "Width",
+                    "value":0
+                },
+                "height": {
+                    "elementLabel": "Height",
+                    "value":0
+                },
+                "min": {
+                    "elementLabel": "Min ADU",
+                    "value":0
+                },
+                "max": {
+                    "elementLabel": "Max ADU",
+                    "value":0
+                },
+                "mean": {
+                    "elementLabel": "Mean ADU",
+                    "value":0
+                },
+                "median": {
+                    "elementLabel": "Median ADU",
+                    "value":0
+                },
+                "starscount": {
+                    "elementLabel": "Stars found",
+                    "value":0
+                },
+                "hfravg": {
+                    "elementLabel": "Average HFR",
+                    "value":0
+                },
+                "solRA": {
+                    "elementLabel": "Solver RA",
+                    "value":0
+                },
+                "solDEC": {
+                    "elementLabel": "Solver DEC",
+                    "value":0
+                },
+                "mountRA": {
+                    "elementLabel": "Mount RA",
+                    "value":0
+                },
+                "mountDEC": {
+                    "elementLabel": "Mount DEC",
+                    "value":0
+                }
+        },
+        "group": "Images",
+        "permission": 0,
+        "propertyLabel": "Results"
+    },
+    "parameters": {
+        "devcat": "Examples",
+        "group": "Images",
+        "permission": 2,
+        "propertyLabel": "Parameters",
+        "elements": {
+            "exposure": {
+                "elementLabel": "Exposure",
+                "value":0.1,
+                "step":0.001,
+                "min":0.001,
+                "max":3600,
+                "format": "99.99"
+            },
+            "indexfolderpath": {
+                "elementLabel": "Astrometry index folder path",
+                "value":"/usr/share/astrometry/"
+            }
+
+
+        }
+    },
+    "testimage": {
+        "devcat": "Examples",
+        "group": "Images",
+        "permission": 0,
+        "propertyLabel": "Test image",
+        "URL": ""
     }
-
-
-
 }
