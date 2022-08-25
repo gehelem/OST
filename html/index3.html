@@ -7,8 +7,6 @@
 <script src="jquery-ui.min.js"></script>
 <script src="chart.js"></script>
 <link rel="stylesheet" href="ost.css">
-<link href="photoviewer.min.css" rel="stylesheet" />
-<script src="photoviewer.min.js"></script>
 </head>
 <body>
 <div id="OST"></div>
@@ -236,8 +234,7 @@ function buildproperty(m,p,n) {
         div = div + "</table>";
         if (p.hasOwnProperty('URL')) {
             div = div + "<div id='gal"+mp+"' data-m"+m+" data-mp="+mp+" data-key=\"\">";
-            div = div + "<img id='im"+mp+"' src='"+p.URL+"' height='150'><div>";
-
+            div = div + "<img id='im"+mp+"' src='"+p.URL+ "?"+ new Date().valueOf() +"' height='150'><div>";
         }
         // add switchs or radio for booleans
         var tt='checkbox';
@@ -315,14 +312,14 @@ function buildPhotoform(m,p,n) {
             var p=$("[id='P"+mp+"']").data("prop");
             //console.log("clic:",p.propertyLabel);
             var form = "<div id='photo"+mp+"' title='"+p.propertyLabel+"' style='modal:true'><form>";
-            form = form + "<img id='imphoto"+mp+"' src='"+p.URL+"'  style='height: 100%; width: 100%; object-fit: contain'><div>";
+            form = form + "<img id='imphoto"+mp+"' src='"+p.URL+ "?"+ new Date().valueOf()+"'  style='height: 100%; width: 100%; object-fit: contain'><div>";
             form = form+"</form></div>";
             
             $("[id='P"+mp+"']").append(form);
             $("[id='photo"+mp+"']").data("mp",mp);
             $("[id='photo"+mp+"']").on( "dialogclose", function(event) {
                 //event.preventDefault();
-                console.log("dialogclose");
+                //console.log("dialogclose");
                 //$( "[id='photo"+mp+"']" ).dialog("close");
                 $( "[id='photo"+mp+"']" ).remove();
             });
