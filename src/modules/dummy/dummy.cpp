@@ -150,10 +150,14 @@ void Dummy::newBLOB(IBLOB *bp)
         setOstElement("imagevalues","median",_image.getStats().median[0],false);
         setOstElement("imagevalues","stddev",_image.getStats().stddev[0],false);
         setOstElement("imagevalues","snr",_image.getStats().SNR,true);
+        QList<fileio::Record> rec=_image.getRecords();
+        stats=_image.getStats();
+        _image.saveAsFITS(_webroot+"/"+QString(bp->bvp->device)+".FITS",stats,_image.getImageBuffer(),FITSImage::Solution(),rec,false);
 
         QImage rawImage = _image.getRawQImage();
         rawImage.save(_webroot+"/"+QString(bp->bvp->device)+".jpeg","JPG",50);
         setOstPropertyAttribute("testimage","URL",QString(bp->bvp->device)+".jpeg",true);
+
     }
 
 }
