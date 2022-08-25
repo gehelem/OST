@@ -95,7 +95,7 @@ bool fileio::loadFits(QString fileName)
     switch (fitsBitPix)
     {
         case BYTE_IMG:
-            stats.dataType      = 11; //SEP_TBYTE;
+            stats.dataType      = TBYTE;
             stats.bytesPerPixel = sizeof(uint8_t);
             break;
         case SHORT_IMG:
@@ -285,6 +285,7 @@ bool fileio::loadOtherFormat(QString fileName)
 //It loads a FITS file, reads the FITS Headers, and loads the data from the image
 bool fileio::loadBlob(IBLOB *bp)
 {
+    justLoadBuffer=false;
     int status = 0, anynullptr = 0;
     long naxes[3];
     size_t bsize = static_cast<size_t>(bp->bloblen);
@@ -396,12 +397,11 @@ bool fileio::loadBlob(IBLOB *bp)
 
     if( !justLoadBuffer )
     {
-        if(checkDebayer())
-            debayer();
 
-        //getSolverOptionsFromFITS();
-        CalcStats();
         parseHeader();
+        if(checkDebayer()) debayer();
+        CalcStats();
+
     }
 
     fits_close_file(fptr, &status);
@@ -456,7 +456,7 @@ bool fileio::debayer()
 {
     switch (stats.dataType)
     {
-        case 11: //SEP_TBYTE;
+        case TBYTE:
             return debayer_8bit();
 
         case TUSHORT:
@@ -541,7 +541,9 @@ bool fileio::debayer_8bit()
         *gBuff++ = bayer_destination_buffer[i + 1];
         *bBuff++ = bayer_destination_buffer[i + 2];
     }
-
+    stats.channels = 3;
+    stats.ndim = 3;
+    stats.dataType = TBYTE;
     delete[] destinationBuffer;
     return true;
 }
@@ -620,7 +622,9 @@ bool fileio::debayer_16bit()
         *gBuff++ = bayer_destination_buffer[i + 1];
         *bBuff++ = bayer_destination_buffer[i + 2];
     }
-
+    stats.channels = 3;
+    stats.dataType = TUSHORT;
+    stats.ndim = 3;
     delete[] destinationBuffer;
     return true;
 }
