@@ -145,7 +145,11 @@ void Dummy::newBLOB(IBLOB *bp)
         setOstElement("imagevalues","width",_image.getStats().width,false);
         setOstElement("imagevalues","height",_image.getStats().height,false);
         setOstElement("imagevalues","min",_image.getStats().min[0],false);
-        setOstElement("imagevalues","max",_image.getStats().max[0],true);
+        setOstElement("imagevalues","max",_image.getStats().max[0],false);
+        setOstElement("imagevalues","mean",_image.getStats().mean[0],false);
+        setOstElement("imagevalues","median",_image.getStats().median[0],false);
+        setOstElement("imagevalues","stddev",_image.getStats().stddev[0],false);
+        setOstElement("imagevalues","snr",_image.getStats().SNR,true);
 
         QImage rawImage = _image.getRawQImage();
         rawImage.save(_webroot+"/"+QString(bp->bvp->device)+".jpeg","JPG",50);
