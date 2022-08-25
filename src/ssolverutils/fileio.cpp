@@ -95,7 +95,7 @@ bool fileio::loadFits(QString fileName)
     switch (fitsBitPix)
     {
         case BYTE_IMG:
-            stats.dataType      = 11; //SEP_TBYTE;
+            stats.dataType      = TBYTE;
             stats.bytesPerPixel = sizeof(uint8_t);
             break;
         case SHORT_IMG:
@@ -285,6 +285,7 @@ bool fileio::loadOtherFormat(QString fileName)
 //It loads a FITS file, reads the FITS Headers, and loads the data from the image
 bool fileio::loadBlob(IBLOB *bp)
 {
+    justLoadBuffer=false;
     int status = 0, anynullptr = 0;
     long naxes[3];
     size_t bsize = static_cast<size_t>(bp->bloblen);
@@ -396,12 +397,11 @@ bool fileio::loadBlob(IBLOB *bp)
 
     if( !justLoadBuffer )
     {
-        if(checkDebayer())
-            debayer();
 
-        //getSolverOptionsFromFITS();
-        CalcStats();
         parseHeader();
+        if(checkDebayer()) debayer();
+        CalcStats();
+
     }
 
     fits_close_file(fptr, &status);
@@ -456,7 +456,7 @@ bool fileio::debayer()
 {
     switch (stats.dataType)
     {
-        case 11: //SEP_TBYTE;
+        case TBYTE:
             return debayer_8bit();
 
         case TUSHORT:
@@ -541,7 +541,9 @@ bool fileio::debayer_8bit()
         *gBuff++ = bayer_destination_buffer[i + 1];
         *bBuff++ = bayer_destination_buffer[i + 2];
     }
-
+    stats.channels = 3;
+    stats.ndim = 3;
+    stats.dataType = TBYTE;
     delete[] destinationBuffer;
     return true;
 }
@@ -620,7 +622,9 @@ bool fileio::debayer_16bit()
         *gBuff++ = bayer_destination_buffer[i + 1];
         *bBuff++ = bayer_destination_buffer[i + 2];
     }
-
+    stats.channels = 3;
+    stats.dataType = TUSHORT;
+    stats.ndim = 3;
     delete[] destinationBuffer;
     return true;
 }
@@ -1235,37 +1239,151 @@ void fileio::CalcStats(void)
     {
         case TBYTE:
             calculateMinMax<uint8_t>();
+            calculateMedian<uint8_t>();
+            runningAverageStdDev<uint8_t>();
             break;
 
         case TSHORT:
             calculateMinMax<int16_t>();
+            calculateMedian<int16_t>();
+            runningAverageStdDev<int16_t>();
             break;
 
         case TUSHORT:
             calculateMinMax<uint16_t>();
+            calculateMedian<uint16_t>();
+            runningAverageStdDev<uint16_t>();
             break;
 
         case TLONG:
             calculateMinMax<int32_t>();
+            calculateMedian<int32_t>();
+            runningAverageStdDev<int32_t>();
             break;
 
         case TULONG:
             calculateMinMax<uint32_t>();
+            calculateMedian<uint32_t>();
+            runningAverageStdDev<uint32_t>();
             break;
 
         case TFLOAT:
             calculateMinMax<float>();
+            calculateMedian<float>();
+            runningAverageStdDev<float>();
             break;
 
         case TLONGLONG:
             calculateMinMax<int64_t>();
+            calculateMedian<int64_t>();
+            runningAverageStdDev<int64_t>();
             break;
 
         case TDOUBLE:
             calculateMinMax<double>();
+            calculateMedian<double>();
+            runningAverageStdDev<double>();
             break;
 
         default:
             break;
     }
+    // FIXME That's not really SNR, must implement a proper solution for this value
+    stats.SNR = stats.mean[0] / stats.stddev[0];
 }
+/* taken from Kstars fitviewer FITSData */
+template <typename T>
+void fileio::runningAverageStdDev()
+{
+    // Create N threads
+    const uint8_t nThreads = 16;
+
+    for (int n = 0; n < stats.channels; n++)
+    {
+        uint32_t cStart = n * stats.samples_per_channel;
+
+        // Calculate how many elements we process per thread
+        uint32_t tStride = stats.samples_per_channel / nThreads;
+
+        // Calculate the final stride since we can have some left over due to division above
+        uint32_t fStride = tStride + (stats.samples_per_channel - (tStride * nThreads));
+
+        // Start location for inspecting elements
+        uint32_t tStart = cStart;
+
+        // List of futures
+        QList<QFuture<QPair<double, double>>> futures;
+
+        for (int i = 0; i < nThreads; i++)
+        {
+            // Run threads
+            futures.append(QtConcurrent::run(this, &fileio::getSquaredSumAndMean<T>, tStart,
+                                             (i == (nThreads - 1)) ? fStride : tStride));
+            tStart += tStride;
+        }
+
+        double mean = 0, squared_sum = 0;
+
+        // Now wait for results
+        for (int i = 0; i < nThreads; i++)
+        {
+            QPair<double, double> result = futures[i].result();
+            mean += result.first;
+            squared_sum += result.second;
+        }
+
+        double variance = squared_sum / stats.samples_per_channel;
+
+        stats.mean[n]   = mean / nThreads;
+        stats.stddev[n] = sqrt(variance);
+    }
+}
+/* taken from Kstars fitviewer FITSData */
+template <typename T>
+QPair<double, double> fileio::getSquaredSumAndMean(uint32_t start, uint32_t stride)
+{
+    uint32_t m_n       = 2;
+    double m_oldM = 0, m_newM = 0, m_oldS = 0, m_newS = 0;
+
+    auto * buffer = reinterpret_cast<T *>(m_ImageBuffer);
+    uint32_t end = start + stride;
+
+    for (uint32_t i = start; i < end; i++)
+    {
+        m_newM = m_oldM + (buffer[i] - m_oldM) / m_n;
+        m_newS = m_oldS + (buffer[i] - m_oldM) * (buffer[i] - m_newM);
+
+        m_oldM = m_newM;
+        m_oldS = m_newS;
+        m_n++;
+    }
+
+    return qMakePair<double, double>(m_newM, m_newS);
+}
+/* taken from Kstars fitviewer FITSData */
+template <typename T>
+void fileio::calculateMedian()
+{
+    auto * buffer = reinterpret_cast<T *>(m_ImageBuffer);
+    const uint32_t maxMedianSize = 500000;
+    uint32_t medianSize = stats.samples_per_channel;
+    uint8_t downsample = 1;
+    if (medianSize > maxMedianSize)
+    {
+        downsample = (static_cast<double>(medianSize) / maxMedianSize) + 0.999;
+        medianSize /= downsample;
+    }
+    std::vector<T> samples;
+    samples.reserve(medianSize);
+
+    for (uint8_t n = 0; n < stats.channels; n++)
+    {
+        auto *oneChannel = buffer + n * stats.samples_per_channel;
+        for (uint32_t upto = 0; upto < stats.samples_per_channel; upto += downsample)
+            samples.push_back(oneChannel[upto]);
+        const uint32_t middle = samples.size() / 2;
+        std::nth_element(samples.begin(), samples.begin() + middle, samples.end());
+        stats.median[n] = samples[middle];
+    }
+}
+

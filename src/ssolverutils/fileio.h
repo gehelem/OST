@@ -103,6 +103,12 @@ private:
     QPair<T, T> getParitionMinMax(uint32_t start, uint32_t stride);
     template <typename T>
     void calculateMinMax();
+    template <typename T>
+    void calculateMedian();
+    template <typename T>
+    void runningAverageStdDev();
+    template <typename T>
+    QPair<double, double> getSquaredSumAndMean(uint32_t start, uint32_t stride);
 
 
 signals:

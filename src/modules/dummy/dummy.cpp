@@ -113,13 +113,14 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                                 setOstElement("imagevalues","mountRA",ra*360/24,false);
                                 setOstElement("imagevalues","mountDEC",dec,false);
 
-                                //_solver.ResetSolver(_image.getStats(),_image.getImageBuffer());
+                                stats=_image.getStats();
+                                _solver.ResetSolver(stats,_image.getImageBuffer());
                                 QStringList folders;
                                 folders.append(getOstElementValue("parameters","indexfolderpath").toString());
-                                //_solver.stellarSolver->setIndexFolderPaths(folders);
+                                _solver.stellarSolver->setIndexFolderPaths(folders);
                                 connect(&_solver,&Solver::successSolve,this,&Dummy::OnSucessSolve);
-                                //_solver.stellarSolver->setSearchPositionInDegrees(ra*360/24,dec);
-                                //_solver.SolveStars(_solver.stellarSolverProfiles[0]);
+                                _solver.stellarSolver->setSearchPositionInDegrees(ra*360/24,dec);
+                                _solver.SolveStars(_solver.stellarSolverProfiles[0]);
                             }
 
                         }
@@ -144,11 +145,19 @@ void Dummy::newBLOB(IBLOB *bp)
         setOstElement("imagevalues","width",_image.getStats().width,false);
         setOstElement("imagevalues","height",_image.getStats().height,false);
         setOstElement("imagevalues","min",_image.getStats().min[0],false);
-        setOstElement("imagevalues","max",_image.getStats().max[0],true);
+        setOstElement("imagevalues","max",_image.getStats().max[0],false);
+        setOstElement("imagevalues","mean",_image.getStats().mean[0],false);
+        setOstElement("imagevalues","median",_image.getStats().median[0],false);
+        setOstElement("imagevalues","stddev",_image.getStats().stddev[0],false);
+        setOstElement("imagevalues","snr",_image.getStats().SNR,true);
+        QList<fileio::Record> rec=_image.getRecords();
+        stats=_image.getStats();
+        _image.saveAsFITS(_webroot+"/"+QString(bp->bvp->device)+".FITS",stats,_image.getImageBuffer(),FITSImage::Solution(),rec,false);
 
         QImage rawImage = _image.getRawQImage();
         rawImage.save(_webroot+"/"+QString(bp->bvp->device)+".jpeg","JPG",50);
         setOstPropertyAttribute("testimage","URL",QString(bp->bvp->device)+".jpeg",true);
+
     }
 
 }

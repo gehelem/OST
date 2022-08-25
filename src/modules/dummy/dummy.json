@@ -242,6 +242,15 @@
                     "elementLabel": "Median ADU",
                     "value":0
                 },
+                "stddev": {
+                    "elementLabel": "StdDev",
+                    "value":0
+                },
+                "snr": {
+                    "elementLabel": "SNR",
+                    "step": 0.0001,
+                    "value":0
+                },
                 "starscount": {
                     "elementLabel": "Stars found",
                     "value":0
