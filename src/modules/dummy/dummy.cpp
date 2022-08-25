@@ -113,13 +113,14 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                                 setOstElement("imagevalues","mountRA",ra*360/24,false);
                                 setOstElement("imagevalues","mountDEC",dec,false);
 
-                                //_solver.ResetSolver(_image.getStats(),_image.getImageBuffer());
+                                stats=_image.getStats();
+                                _solver.ResetSolver(stats,_image.getImageBuffer());
                                 QStringList folders;
                                 folders.append(getOstElementValue("parameters","indexfolderpath").toString());
-                                //_solver.stellarSolver->setIndexFolderPaths(folders);
+                                _solver.stellarSolver->setIndexFolderPaths(folders);
                                 connect(&_solver,&Solver::successSolve,this,&Dummy::OnSucessSolve);
-                                //_solver.stellarSolver->setSearchPositionInDegrees(ra*360/24,dec);
-                                //_solver.SolveStars(_solver.stellarSolverProfiles[0]);
+                                _solver.stellarSolver->setSearchPositionInDegrees(ra*360/24,dec);
+                                _solver.SolveStars(_solver.stellarSolverProfiles[0]);
                             }
 
                         }
