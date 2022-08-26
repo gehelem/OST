@@ -16,7 +16,7 @@ Dummy::Dummy(QString name, QString label, QString profile,QVariantMap availableM
     loadPropertiesFromFile(":dummy.json");
 
     setOstProperty("moduleDescription","Dummy module to show what we can do",true);
-
+    setOstProperty("moduleLabel","Dummy module",true);
     //createOstProperty("version","Version",0);
     setOstProperty("version",0.1,true);
 
