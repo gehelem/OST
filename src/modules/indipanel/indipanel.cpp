@@ -1,13 +1,13 @@
 #include "indipanel.h"
 
-IndiPanel *initialize(QString name, QString label,QString profile)
+IndiPanel *initialize(QString name, QString label,QString profile,QVariantMap availableModuleLibs)
 {
-    IndiPanel *basemodule = new IndiPanel(name,label,profile);
+    IndiPanel *basemodule = new IndiPanel(name,label,profile,availableModuleLibs);
     return basemodule;
 }
 
-IndiPanel::IndiPanel(QString name, QString label, QString profile)
-    : Basemodule(name,label,profile)
+IndiPanel::IndiPanel(QString name, QString label, QString profile,QVariantMap availableModuleLibs)
+    : Basemodule(name,label,profile,availableModuleLibs)
 {
     setOstProperty("moduleDescription","Indi control panel",true);
     setOstProperty("moduleName","indipanel",true);

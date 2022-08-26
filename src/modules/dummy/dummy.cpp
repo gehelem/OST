@@ -1,13 +1,13 @@
 #include "dummy.h"
 
-Dummy *initialize(QString name,QString label,QString profile)
+Dummy *initialize(QString name,QString label,QString profile,QVariantMap availableModuleLibs)
 {
-    Dummy *basemodule = new Dummy(name,label,profile);
+    Dummy *basemodule = new Dummy(name,label,profile,availableModuleLibs);
     return basemodule;
 }
 
-Dummy::Dummy(QString name, QString label, QString profile)
-    : Basemodule(name,label,profile)
+Dummy::Dummy(QString name, QString label, QString profile,QVariantMap availableModuleLibs)
+    : Basemodule(name,label,profile,availableModuleLibs)
 {
 
     Q_INIT_RESOURCE(dummy);
@@ -54,6 +54,11 @@ Dummy::Dummy(QString name, QString label, QString profile)
     setOstElement("mixedRW","t1","Mixed text value",false);
     //saveAttributesToFile("dummy.json");
     _camera=getOstElementValue("devices","camera").toString();
+
+    foreach(QString key,getAvailableModuleLibs().keys()) {
+        QVariantMap info = getAvailableModuleLibs()[key].toMap();
+        createOstProperty("mod"+key,"mod"+key,0,"Modules","root");
+    }
 
 }
 
