@@ -28,7 +28,7 @@ Maincontrol::Maincontrol(QString name, QString label, QString profile,QVariantMa
         }
         createOstProperty("load"+key,"",2,"Available modules",info["moduleLabel"].toString());
         createOstElement("load"+key,"instance","Instance name",false);
-        setOstElement("load"+key,"instance","default name",false);
+        setOstElement("load"+key,"instance","my"+key,false);
         createOstElement("load"+key,"load","Load",false);
         setOstElement("load"+key,"load",false,false);
 
@@ -50,6 +50,19 @@ void Maincontrol::OnMyExternalEvent(const QString &eventType, const QString  &ev
             foreach(const QString& keyelt, eventData[keyprop].toMap()["elements"].toMap().keys()) {
                 if (keyelt=="instance") {
                     if (setOstElement(keyprop,keyelt,eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"],true)) {
+                    }
+                }
+                if (keyelt=="load") {
+                    if (setOstElement(keyprop,keyelt,eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"],true)) {
+                        QString pp = keyprop;
+                        QString elt = getOstElementValue(keyprop,"instance").toString();
+                        QString prof = "default";
+                        pp.replace("load","");
+
+                        emit loadOtherModule(pp,
+                                             elt.replace(" ",""),
+                                             elt,
+                                             prof);
                     }
                 }
 
