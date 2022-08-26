@@ -125,36 +125,40 @@ void Controller::checkModules(void)
     QStringList libs = directory.entryList();
     foreach(QString lib, libs)
     {
-
-        QLibrary library(QCoreApplication::applicationDirPath()+"/"+lib);
-        if (!library.load())
-        {
-            BOOST_LOG_TRIVIAL(debug) << lib.toStdString() << " " << library.errorString().toStdString();
-        }
-        else
-        {
-            typedef Basemodule *(*CreateModule)(QString,QString,QString,QVariantMap);
-            CreateModule createmodule = (CreateModule)library.resolve("initialize");
-            QString tt = lib.replace(".so","");
-
-            if (createmodule) {
-                Basemodule *mod = createmodule(tt,"temp",QString(),QVariantMap());
-                if (mod) {
-                    mod->setParent(this);
-                    mod->setObjectName(lib);
-                    QVariantMap info = mod->getModuleInfo();
-                    _availableModuleLibs[tt]=info;
-                    QString message;
-                    foreach (QString key,info.keys()) {
-                        message = message + "--" + key+ "=" + info[key].toString();
-                    }
-                    BOOST_LOG_TRIVIAL(debug) << "lib=" << lib.toStdString() << message.toStdString();
-                    delete mod;
-                }
-            } else {
-                BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library";
+        QString tt = lib.replace(".so","");
+        if (!(tt=="libostmaincontrol" )) {
+            QLibrary library(QCoreApplication::applicationDirPath()+"/"+lib);
+            if (!library.load())
+            {
+                BOOST_LOG_TRIVIAL(debug) << lib.toStdString() << " " << library.errorString().toStdString();
             }
+            else
+            {
+                typedef Basemodule *(*CreateModule)(QString,QString,QString,QVariantMap);
+                CreateModule createmodule = (CreateModule)library.resolve("initialize");
+
+
+                if (createmodule) {
+                    Basemodule *mod = createmodule(tt,"temp",QString(),QVariantMap());
+                    if (mod) {
+                        mod->setParent(this);
+                        mod->setObjectName(lib);
+                        QVariantMap info = mod->getModuleInfo();
+                        _availableModuleLibs[tt]=info;
+                        QString message;
+                        foreach (QString key,info.keys()) {
+                            message = message + "--" + key+ "=" + info[key].toString();
+                        }
+                        BOOST_LOG_TRIVIAL(debug) << "lib=" << lib.toStdString() << message.toStdString();
+                        delete mod;
+                    }
+                } else {
+                    BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library";
+                }
+            }
+
         }
+
 
     }
     BOOST_LOG_TRIVIAL(debug) << "**** end check ****";
