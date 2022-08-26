@@ -209,7 +209,8 @@ void IndiPanel::OnMyExternalEvent(const QString &eventType, const QString  &even
     //BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << eventKey.toStdString();
     foreach(const QString& keyprop, eventData.keys()) {
         QString prop = keyprop;
-        QString devcat = eventData[keyprop].toMap()["devcat"].toString();
+        QVariantMap ostprop = getOstProperty(keyprop);
+        QString devcat = ostprop["devcat"].toString();
         prop.replace(devcat,"");
         foreach(const QString& keyelt, eventData[keyprop].toMap()["elements"].toMap().keys()) {
             BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << prop.toStdString() << "-" << keyelt.toStdString() << "-" << eventData[keyprop].toMap()["indi"].toInt();
