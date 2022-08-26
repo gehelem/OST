@@ -13,12 +13,25 @@ Maincontrol::Maincontrol(QString name, QString label, QString profile,QVariantMa
     Q_INIT_RESOURCE(maincontrol);
 
     loadPropertiesFromFile(":maincontrol.json");
-    setOstProperty("moduleDescription","Maincontrol",true);
-    setOstProperty("version",0.1,true);
+    setOstProperty("moduleLabel","Main control",false);
+    setOstProperty("moduleDescription","Maincontrol",false);
+    setOstProperty("version",0.1,false);
 
     foreach(QString key,getAvailableModuleLibs().keys()) {
         QVariantMap info = getAvailableModuleLibs()[key].toMap();
-        createOstProperty("mod"+key,"mod"+key,0,"Available modules",info["moduleLabel"].toString());
+        BOOST_LOG_TRIVIAL(debug) << "lst : " << key.toStdString();
+        createOstProperty("desc"+key,"Description",0,"Available modules",info["moduleLabel"].toString());
+        foreach (QString ii,info.keys()) {
+            QVariant val=info[ii];
+            createOstElement("desc"+key,ii,ii,false);
+            setOstElement("desc"+key,ii,val,false);
+        }
+        createOstProperty("load"+key,"",2,"Available modules",info["moduleLabel"].toString());
+        createOstElement("load"+key,"instance","Instance name",false);
+        setOstElement("load"+key,"instance","default name",false);
+        createOstElement("load"+key,"load","Load",false);
+        setOstElement("load"+key,"load",false,false);
+
     }
 
 
@@ -35,13 +48,13 @@ void Maincontrol::OnMyExternalEvent(const QString &eventType, const QString  &ev
         //BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << eventKey.toStdString();
         foreach(const QString& keyprop, eventData.keys()) {
             foreach(const QString& keyelt, eventData[keyprop].toMap()["elements"].toMap().keys()) {
+                if (keyelt=="instance") {
+                    if (setOstElement(keyprop,keyelt,eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"],true)) {
+                    }
+                }
 
 
                 if (keyprop=="devices") {
-                    if (keyelt=="camera") {
-                        if (setOstElement(keyprop,keyelt,eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"],false)) {
-                        }
-                    }
                 }
 
 
