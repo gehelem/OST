@@ -34,6 +34,7 @@ class Basemodule : public QObject, public INDI::BaseClient
         QString getLabel(void) {return _modulelabel;}
         QVariantMap getOstProperties(void) {return _ostproperties;}
         QVariantMap getOstProperty(QString name) {return _ostproperties[name].toMap();}
+        QVariantMap getModuleInfo(void);
 
         QString _moduletype;
         QString _webroot;

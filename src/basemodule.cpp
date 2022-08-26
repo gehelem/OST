@@ -605,9 +605,9 @@ void Basemodule::loadPropertiesFromFile(QString fileName)
         }
     }
 
-    QByteArray docByteArray = d.toJson(QJsonDocument::Compact);
-    QString strJson = QLatin1String(docByteArray);
-    BOOST_LOG_TRIVIAL(debug) << "loadPropertiesFromFile  - " << _modulename.toStdString() << " - filename=" << fileName.toStdString() << " - " << strJson.toStdString();
+    //QByteArray docByteArray = d.toJson(QJsonDocument::Compact);
+    //QString strJson = QLatin1String(docByteArray);
+    //BOOST_LOG_TRIVIAL(debug) << "loadPropertiesFromFile  - " << _modulename.toStdString() << " - filename=" << fileName.toStdString() << " - " << strJson.toStdString();
 
 }
 
@@ -665,4 +665,14 @@ void Basemodule::OnExternalEvent(const QString &eventType, const QString  &event
     }
     if (_modulename==eventModule) OnMyExternalEvent(eventType,eventModule,eventKey,eventData);
 
+}
+QVariantMap Basemodule::getModuleInfo(void)
+{
+    QVariantMap temp;
+    foreach (QString key, _ostproperties.keys()) {
+        if (_ostproperties[key].toMap()["devcat"].toString()=="Info") {
+            temp[key]=_ostproperties[key].toMap()["value"];
+        }
+    }
+    return temp;
 }
