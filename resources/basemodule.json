@@ -27,7 +27,7 @@
         "propertyLabel": "Module name",
         "value":"basemodule"
     },
-    "version": {
+    "moduleVersion": {
         "devcat": "Info",
         "group": "",
         "permission": 0,
