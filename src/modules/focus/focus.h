@@ -17,7 +17,7 @@ class MODULE_INIT FocusModule : public Basemodule
     Q_OBJECT
 
     public:
-        FocusModule(QString name,QString label,QString profile);
+        FocusModule(QString name,QString label,QString profile,QVariantMap availableModuleLibs);
         ~FocusModule();
 
     signals:
@@ -113,11 +113,13 @@ class MODULE_INIT FocusModule : public Basemodule
         std::vector<double> _hfdvector;
         std::vector<double> _coefficients;
 
-        QPointer<Image> _image;
+        fileio _image;
         Solver _solver;
+        FITSImage::Statistic stats;
+
 
 };
 
-extern "C" MODULE_INIT FocusModule *initialize(QString name,QString label,QString profile);
+extern "C" MODULE_INIT FocusModule *initialize(QString name,QString label,QString profile,QVariantMap availableModuleLibs);
 
 #endif

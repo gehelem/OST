@@ -1,14 +1,14 @@
 #include "focus.h"
 #include "polynomialfit.h"
 
-FocusModule *initialize(QString name,QString label,QString profile)
+FocusModule *initialize(QString name,QString label,QString profile,QVariantMap availableModuleLibs)
 {
-    FocusModule *basemodule = new FocusModule(name,label,profile);
+    FocusModule *basemodule = new FocusModule(name,label,profile,availableModuleLibs);
     return basemodule;
 }
 
-FocusModule::FocusModule(QString name,QString label,QString profile)
-    : Basemodule(name,label,profile)
+FocusModule::FocusModule(QString name,QString label,QString profile,QVariantMap availableModuleLibs)
+    : Basemodule(name,label,profile,availableModuleLibs)
 
 {
     Q_INIT_RESOURCE(focus);
@@ -16,8 +16,9 @@ FocusModule::FocusModule(QString name,QString label,QString profile)
 
     loadPropertiesFromFile(":focus.json");
 
-    setOstProperty("moduleDescription","Focus module",true);
-    setOstProperty("version",0.1,true);
+    setOstProperty("moduleDescription","Focus module with statemachines",true);
+    setOstProperty("moduleLabel","Focus module",true);
+    setOstProperty("moduleVersion",0.1,true);
 
     _startpos=          getOstElementValue("parameters","startpos").toInt();
     _steps=             getOstElementValue("parameters","steps").toInt();
@@ -181,12 +182,10 @@ void FocusModule::newBLOB(IBLOB *bp)
             (QString(bp->bvp->device) == _camera)
        )
     {
-        delete _image;
-        _image = new Image();
-        _image->LoadFromBlob(bp);
+        _image.loadBlob(bp);
         setOstPropertyAttribute("image","status",IPS_OK,true);
 
-        QImage rawImage = _image->getRawQImage();
+        QImage rawImage = _image.getRawQImage();
         rawImage.save(_webroot+"/"+QString(bp->bvp->device)+".jpeg","JPG",50);
         setOstPropertyAttribute("image","URL",QString(bp->bvp->device)+".jpeg",true);
 
@@ -411,7 +410,8 @@ void FocusModule::SMRequestExposure()
 void FocusModule::SMFindStars()
 {
     sendMessage("SMFindStars");
-    _solver.ResetSolver(_image->stats,_image->m_ImageBuffer);
+    stats=_image.getStats();
+    _solver.ResetSolver(stats,_image.getImageBuffer());
     connect(&_solver,&Solver::successSEP,this,&FocusModule::OnSucessSEP);
     _solver.FindStars(_solver.stellarSolverProfiles[0]);
 }
