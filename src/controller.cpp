@@ -26,7 +26,7 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostpolar.so","polar1","Polar assistant");
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focus1","Focus assistant","default");
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostdummy.so","dummy1","Demo module","default");
-    LoadModule(QCoreApplication::applicationDirPath()+"/libostmaincontrol.so","mainctl","Maincontrol","default");
+    LoadModule("libostmaincontrol","mainctl","Maincontrol","default");
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel","indi control panel","default");
 
 }
@@ -41,7 +41,8 @@ Controller::~Controller()
 
 void Controller::LoadModule(QString lib,QString name,QString label,QString profile)
 {
-    QLibrary library(lib);
+    QString fulllib = QCoreApplication::applicationDirPath()+"/"+lib+".so";
+    QLibrary library(fulllib);
     if (!library.load())
     {
         BOOST_LOG_TRIVIAL(debug) << name.toStdString() << " " << library.errorString().toStdString();
@@ -62,6 +63,7 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
                 mod->setObjectName(name);
                 connect(mod,&Basemodule::moduleEvent, this,&Controller::OnModuleEvent);
                 connect(mod,&Basemodule::moduleEvent, wshandler,&WShandler::OnModuleEvent);
+                connect(mod,&Basemodule::loadOtherModule, this,&Controller::LoadModule);
                 connect(this,&Controller::controllerEvent,mod,&Basemodule::OnExternalEvent);
 
 
@@ -77,6 +79,7 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
                 QVariantMap prof;
                 dbmanager->getProfile(mod->_moduletype,profile,prof);
                 mod->setProfile(prof);
+                wshandler->processTextMessage("{'evt':'readall'}");
 
             }
         } else {
@@ -118,7 +121,7 @@ void Controller::OnExternalEvent(const QString &eventType, const QString  &event
 }
 void Controller::checkModules(void)
 {
-    BOOST_LOG_TRIVIAL(debug) << "**** Check available modules ****";
+    BOOST_LOG_TRIVIAL(debug) << "Check available modules";
     QDir directory(QCoreApplication::applicationDirPath());
     directory.setFilter(QDir::Files);
     directory.setNameFilters(QStringList() << "*ost*.so");
@@ -149,7 +152,6 @@ void Controller::checkModules(void)
                         foreach (QString key,info.keys()) {
                             message = message + "--" + key+ "=" + info[key].toString();
                         }
-                        BOOST_LOG_TRIVIAL(debug) << "lib=" << lib.toStdString() << message.toStdString();
                         delete mod;
                     }
                 } else {
@@ -161,6 +163,5 @@ void Controller::checkModules(void)
 
 
     }
-    BOOST_LOG_TRIVIAL(debug) << "**** end check ****";
 
 }
