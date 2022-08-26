@@ -140,12 +140,8 @@ target_link_libraries(ostfocuser PRIVATE
     indiclient
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
+    Qt${QT_VERSION_MAJOR}::Widgets
     ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
-    ${STELLARSOLVER_LIBRARIES}
-    ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
-    ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
-    z -lpthread
-
 )
 target_compile_definitions(ostfocuser PRIVATE FOCUS_MODULE)
 
