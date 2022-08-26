@@ -9,6 +9,9 @@ IndiPanel *initialize(QString name, QString label,QString profile)
 IndiPanel::IndiPanel(QString name, QString label, QString profile)
     : Basemodule(name,label,profile)
 {
+    setOstProperty("moduleDescription","Indi control panel",true);
+    setOstProperty("moduleName","indipanel",true);
+    setOstProperty("moduleVersion",0.11,true);
 
 }
 

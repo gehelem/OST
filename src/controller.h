@@ -31,10 +31,12 @@ private:
     int _indiport;
     QString _webroot;
     QString _dbpath;
-    QStringList _availableModuleLibs;
+    QVariantMap _availableModuleLibs;
     WShandler   *wshandler;
     DBManager   *dbmanager;
     void LoadModule(QString lib, QString name, QString label, QString profile);
+    void checkModules(void);
+
 private slots:
     void OnModuleEvent  (const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData);
     void OnExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData);

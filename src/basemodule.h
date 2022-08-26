@@ -25,6 +25,7 @@ class Basemodule : public QObject, public INDI::BaseClient
         void setWebroot(QString webroot) {_webroot = webroot;}
         void requestProfile(QString profileName);
         void setProfile(QVariantMap profiledata);
+        void setAvailableModules(QVariantMap mods){_availableModuleLibs=mods;}
 
 
         QString getWebroot(void) {return _webroot;}
@@ -102,6 +103,7 @@ class Basemodule : public QObject, public INDI::BaseClient
         QVariantMap _ostproperties;
         QString _modulename;
         QString _modulelabel;
+        QVariantMap _availableModuleLibs;
 
     signals:
         void moduleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData);

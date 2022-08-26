@@ -13,6 +13,7 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
 
     Q_UNUSED(saveAllBlobs);
 
+    checkModules();
 
     wshandler = new WShandler(this);
     connect(wshandler,&WShandler::externalEvent,this,&Controller::OnExternalEvent);
@@ -58,6 +59,7 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
                 mod->connectIndi();
                 mod->setWebroot(_webroot);
                 mod->setObjectName(name);
+                mod->setAvailableModules(_availableModuleLibs);
                 connect(mod,&Basemodule::moduleEvent, this,&Controller::OnModuleEvent);
                 connect(mod,&Basemodule::moduleEvent, wshandler,&WShandler::OnModuleEvent);
                 connect(this,&Controller::controllerEvent,mod,&Basemodule::OnExternalEvent);
@@ -113,4 +115,48 @@ void Controller::OnExternalEvent(const QString &eventType, const QString  &event
     BOOST_LOG_TRIVIAL(debug) << "Controller OnExternalEvent : " << eventType.toStdString() << "-" << eventKey.toStdString();
     /* we should check here if incoming message is valid*/
     emit controllerEvent(eventType,eventModule,eventKey,eventData);
+}
+void Controller::checkModules(void)
+{
+    BOOST_LOG_TRIVIAL(debug) << "**** Check available modules ****";
+    QDir directory(QCoreApplication::applicationDirPath());
+    directory.setFilter(QDir::Files);
+    directory.setNameFilters(QStringList() << "*ost*.so");
+    QStringList libs = directory.entryList();
+    foreach(QString lib, libs)
+    {
+
+        QLibrary library(QCoreApplication::applicationDirPath()+"/"+lib);
+        if (!library.load())
+        {
+            BOOST_LOG_TRIVIAL(debug) << lib.toStdString() << " " << library.errorString().toStdString();
+        }
+        else
+        {
+            typedef Basemodule *(*CreateModule)(QString,QString,QString);
+            CreateModule createmodule = (CreateModule)library.resolve("initialize");
+            QString tt = lib.replace(".so","");
+
+            if (createmodule) {
+                Basemodule *mod = createmodule(tt,"temp",QString());
+                if (mod) {
+                    mod->setParent(this);
+                    mod->setObjectName(lib);
+                    QVariantMap info = mod->getModuleInfo();
+                    _availableModuleLibs[tt]=info;
+                    QString message;
+                    foreach (QString key,info.keys()) {
+                        message = message + "--" + key+ "=" + info[key].toString();
+                    }
+                    BOOST_LOG_TRIVIAL(debug) << "lib=" << lib.toStdString() << message.toStdString();
+                    delete mod;
+                }
+            } else {
+                BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library";
+            }
+        }
+
+    }
+    BOOST_LOG_TRIVIAL(debug) << "**** end check ****";
+
 }
