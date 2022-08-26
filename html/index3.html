@@ -15,7 +15,14 @@
 </html>
 
 <script>
-
+function removeblanks (t) {
+    var r=t.replace(' ','');
+    if (r==t) {
+        return r;
+    } else {
+        return removeblanks(r);
+    }
+}
 var ur = window.location.origin.replace("http://", "");
 var result = ur.replace("http://", "");
 var wsUri = "ws://"+ur+":9624";            
@@ -70,7 +77,7 @@ function initWebSocket() {
                     buildproperty(m,prop,iprop);
                 })
                 $.each( properties, function(iprop,prop) {
-                    d = prop.devcat.replace(' ', '');
+                    d = removeblanks(prop.devcat);
                     $("div#devDIV"+m+d).tabs(); /* this shouldn't be here */    
                 })                
                 $("div#modDIV"+m).tabs();       /* this shouldn't be here */    
@@ -101,15 +108,15 @@ function initWebSocket() {
                 var dta=obj.dta;
                 var mod=obj.mod;
                 $.each( dta, function(iprop,prop) {
-                    d = prop.devcat.replace(' ', '');
-                    g = prop.group.replace(' ', '');    
-                    p = iprop.replace(' ', '');
+                    d = removeblanks(prop.devcat);
+                    g = removeblanks(prop.group);
+                    p = removeblanks(iprop);
                     builddevcat(mod,prop);
                     buildgroup(mod,prop);                    
                     buildproperty(mod,prop,iprop);                  
                 })                
                 $.each( dta, function(iprop,prop) {
-                    d = prop.devcat.replace(' ', '');
+                    d = removeblanks(prop.devcat);
                     $("div#devDIV"+mod+d).tabs("refresh"); 
                 })                
                 $("div#modDIV"+mod).tabs("refresh");       /* this shouldn't be here */  
@@ -117,13 +124,11 @@ function initWebSocket() {
             }
 
             if (obj.evt == 'delprop') { 
-                    var p=obj.mod+obj.key.replace(' ', '');
+                    var p=removeblanks(obj.mod+obj.key);
                     dev=$("div#P"+ p ).data("devcat");
-                    dev=obj.mod+dev;
-                    dev=dev.replace(' ', '');
+                    dev=removeblanks(obj.mod+dev);
                     group=$("#P"+ p ).data("group");
-                    group=dev+group;
-                    group=group.replace(' ', '');
+                    group=removeblanks(dev+group);
                     $( "#tab3"+ p ).remove()
                     $( "#tab2"+ p ).remove()
                     $( "#tab"+ p ).remove()
@@ -174,7 +179,7 @@ function buildmodule(m,l) {
 }
 
 function builddevcat(m,prop) {
-    dd=prop.devcat.replace(' ', '');
+    dd=removeblanks(prop.devcat);
     if  (!($("[id='devDIV"+m+dd+"']").length >0)) {
         //console.log('BUILD DEVCAT ' + m + "-"+ d + "-"+ l + "-");
         $("[id='modDIV"+m+"']").append("<div id='devDIV"+m+dd+"'></div>");
@@ -185,19 +190,19 @@ function builddevcat(m,prop) {
 }
 
 function buildgroup(m,prop) {
-    dd=prop.devcat.replace(' ', '');
-    gg=prop.group.replace(' ', '');
+    dd=removeblanks(prop.devcat);
+    gg=removeblanks(prop.group);
     if  (!($("[id='grpDIV"+m+dd+gg+"']").length > 0)) {
-        //console.log('BUILD GROUP ' + m + "-" + d + "-"+ g + "-"+ l + "-");
+        //console.log('BUILD GROUP ' + m + "-" + dd + "-"+ gg+ "-");
         $("[id='devDIV"+m+dd+"']").append("<div id='grpDIV"+m+dd+gg+"'></div>");
         $("[id='devUL"+m+dd+"']").append("<li id='grpLIL"+m+dd+gg+"'><a href=#grpDIV"+m+dd+gg+">"+prop.group+"</a></li>");
         $("[id='grpDIV"+m+dd+gg+"']").append("<ul id='grpUL"+m+dd+gg+"'></ul>");
     };
 }
 function buildproperty(m,p,n) {
-    var d=p.devcat.replace(' ', '');
-    var g=p.group.replace(' ', '');
-    var mp=m.replace(' ', '')+n.replace(' ', '');
+    var d=removeblanks(p.devcat);
+    var g=removeblanks(p.group);
+    var mp=removeblanks(m+n);
     if  (!($("[id='P"+mp+"']").length)) {
         var div="<div id=P"+mp+" data-devcat='"+d+"' data-group='"+g+"' data-key='"+n+"'>";
         div = div + "<strong id='status"+mp+"' >"+'\u25ef'+"</strong>";                  // status icon
@@ -304,9 +309,9 @@ function buildproperty(m,p,n) {
     
 }
 function buildPhotoform(m,p,n) {
-    var d=p.devcat.replace(' ', '');
-    var g=p.group.replace(' ', '');
-    var mp=m.replace(' ', '')+n.replace(' ', '');
+    var d=removeblanks(p.devcat);
+    var g=removeblanks(p.group);
+    var mp=removeblanks(m+n);
     $("[id='gal"+mp+"']").on("click", function () {    
             var mp=$(this).data("mp");
             var p=$("[id='P"+mp+"']").data("prop");
@@ -330,9 +335,9 @@ function buildPhotoform(m,p,n) {
             
 }
 function buildEditBtn(m,p,n) {
-    var d=p.devcat.replace(' ', '');
-    var g=p.group.replace(' ', '');
-    var mp=m.replace(' ', '')+n.replace(' ', '');
+    var d=removeblanks(p.devcat);
+    var g=removeblanks(p.group);
+    var mp=removeblanks(m+n);
 
     $("[id='edit"+mp+"']").on("click", function () {
             var mp=$(this).data("mp");
@@ -416,7 +421,7 @@ function buildEditBtn(m,p,n) {
 
 }
 function setattributes(m,p,n) {
-    var mp=m.replace(' ', '')+n.replace(' ', '');
+    var mp=removeblanks(m+n);
 
     if (p.status=="0") $("[id='status"+mp+"']").text('\u25ef');       //white
     if (p.status=="1") $("[id='status"+mp+"']").text('\ud83d\udfe2'); // green
@@ -435,109 +440,6 @@ function setattributes(m,p,n) {
         $("[id='elt"+mp+ii+"']").val(i.value);
     });                  
     
-}
-function buildpropertybk(m,p,n) {
-    d=p.devcat.replace(' ', '');
-    g=p.group.replace(' ', '');
-    n = n.replace(' ', ''); 
-    nn=m;
-    nnp=nn+n;
-    //console.log('BUILD PROPERTY ' + nnp + "-" + p.propertyLabel);
-    if  (!($("[id='P"+nnp+"']").length)&&(true||p.hasOwnProperty('texts')||p.hasOwnProperty('numbers')||p.hasOwnProperty('switches')||p.hasOwnProperty('lights')))  {
-        div="<div id=P"+nnp+" data-devcat='"+d+"' data-group='"+g+"' ><table id=tab"+nnp+">"
-        +"<tr>"
-        +"<strong id=status"+nnp+" ><a>"+'\u25ef'+"</a></strong>"
-        +"<strong id=title"+nnp+" > "+p.propertyLabel+" </strong>";
-        if (p.permission=="1"||p.permission=="2") {
-            div=div+"<button class='ui-button ui-widget ui-corner-all' "
-            +"id=edit"+nnp+ " data-json=\"\" data-nnp=\"\" data-mod=\"\" data-key=\"\">&#128393</button>";
-        }
-        div=div+"</tr>";
-        
-        div=div+"<tr><td><table id=tab2"+nnp+">";
-        div=div+"<td><table id=tab3"+nnp+"><tbody></tbody></table></td>";
-        //if ((p.permission=="1"||p.permission=="2")&&(true||p.hasOwnProperty('numbers')||p.hasOwnProperty('texts'))) {
-        //    div=div+"<td><button class='ui-button ui-widget ui-corner-all' "
-        //    +"id=editB"+nnp+ " data-json=\"\" data-nnp=\"\" data-mod=\"\" data-key=\"\">set</button></td>";
-        //}
-        div=div+"</td></tr></table>"; //tab2
-        div=div+"</table></div>"; //tab
-        $("#grpUL"+nn+d+g).append(div);
-        
-        if ((p.permission=="1"||p.permission=="2")&&(p.hasOwnProperty('elements'))) {
-
-            //$("[id='form"+nnp+"']").css({'display' :'none'});
-            
-            $("[id='edit"+nnp+"']").data("nnp",nnp);
-            $("[id='edit"+nnp+"']").data("json",p);
-            $("[id='edit"+nnp+"']").data("g",nn+d+g);
-            $("[id='edit"+nnp+"']").data("l",p.propertyLabel);
-            $("[id='edit"+nnp+"']").data("mod",m);
-            $("[id='edit"+nnp+"']").data("key",n);
-            $("[id='edit"+nnp+"']").on("click", function () {
-                var nnp=$(this).data("nnp");
-                var pp=$(this).data("json");
-                var g=$(this).data("g");
-                var l=$(this).data("l");
-                var m=$(this).data("mod");
-                var n=$(this).data("key");
-                form =      "<div id=form"+nnp+" title='"+l +"' data-json=\"\" data-nnp=\"\" data-mod=\"\" data-key=\"\" style='modal:true'>";
-                form = form+"<form>";
-                form = form+"<fieldset><table>";
-                $.each( pp.elements, function( ii, i ) {
-                    //console.log(jQuery.type(i.value));
-                    switch(jQuery.type(i.value)) {
-                    case 'string':
-                        form = form+"<tr><td><label for='"+ii+"'>"+i.elementLabel+"</label></td>";
-                        form = form+"<td><input type=text' name='form"+nnp+ii+"' id='form"+nnp+ii+"' value='"+i.value+"' class='text ui-widget-content ui-corner-all'></td></tr>";
-                        break;
-                    case 'boolean':
-                        break;
-                    case 'number':
-                        form = form+"<tr><td><label for='"+ii+"'>"+i.elementLabel+"</label></td>";
-                        form = form+"<td><input type=text' name='form"+nnp+ii+"' id='form"+nnp+ii+"' value='"+i.value+"' class='text ui-widget-content ui-corner-all'></td></tr>";
-                        break;
-                    default:
-                        // code block
-                    } 
-                })                
-
-                form = form+"<input type='submit' style='position:absolute; bottom:0px'>";
-                form = form+"</table></fieldset></form></div>";
-
-                $("#grpUL"+g).append(form);
-                $("[id='form"+nnp+"']").data("json",p);
-                $("[id='form"+nnp+"']").data("nnp",nnp);
-                $("[id='form"+nnp+"']").data("mod",m);
-                $("[id='form"+nnp+"']").data("key",n);
-                $("[id='form"+nnp+"']").on( "submit", function(event) {
-                    event.preventDefault();
-                    var pp=$(this).data("json");
-                    var nnp=$(this).data("nnp");
-                    var m=$(this).data("mod");
-                    var n=$(this).data("key");
-                    $.each( pp.elements, function( ii, i ) {
-                        pp.elements[ii].value=document.getElementById("form"+nnp+ii).value;
-                    })                
-                    var obj = jQuery.parseJSON("{\"evt\":\"setproperty\",\"mod\":\""+m+"\",\"dta\":{\""+n+"\":"+JSON.stringify(pp)+"}}");
-                    console.log(obj);
-                    websocket.send(JSON.stringify(obj));
-                    $( "[id='form"+nnp+"']" ).dialog("close");
-                });
-                $( "[id='form"+nnp+"']" ).dialog();
-            });
-            
-            
-
-        }
-       
-    }
-
-    if (p.status=="0") $("[id='status"+nnp+"']").text('\u25ef');       //white
-    if (p.status=="1") $("[id='status"+nnp+"']").text('\ud83d\udfe2'); // green
-    if (p.status=="2") $("[id='status"+nnp+"']").text('\ud83d\udfe1'); // yellow
-    if (p.status=="3") $("[id='status"+nnp+"']").text('\ud83d\udd34'); // red 
-    if (p.hasOwnProperty('elements')) buildelts   (m,p,n);
 }
 function buildelts(m,prop,n) {
 

@@ -1,14 +1,18 @@
 #include "indipanel.h"
 
-IndiPanel *initialize(QString name, QString label,QString profile)
+IndiPanel *initialize(QString name, QString label,QString profile,QVariantMap availableModuleLibs)
 {
-    IndiPanel *basemodule = new IndiPanel(name,label,profile);
+    IndiPanel *basemodule = new IndiPanel(name,label,profile,availableModuleLibs);
     return basemodule;
 }
 
-IndiPanel::IndiPanel(QString name, QString label, QString profile)
-    : Basemodule(name,label,profile)
+IndiPanel::IndiPanel(QString name, QString label, QString profile,QVariantMap availableModuleLibs)
+    : Basemodule(name,label,profile,availableModuleLibs)
 {
+    setOstProperty("moduleDescription","Full indi control panel",true);
+    setOstProperty("moduleLabel","Indi control panel",true);
+    setOstProperty("moduleName","indipanel",true);
+    setOstProperty("moduleVersion",0.11,true);
 
 }
 
@@ -205,7 +209,8 @@ void IndiPanel::OnMyExternalEvent(const QString &eventType, const QString  &even
     //BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << eventKey.toStdString();
     foreach(const QString& keyprop, eventData.keys()) {
         QString prop = keyprop;
-        QString devcat = eventData[keyprop].toMap()["devcat"].toString();
+        QVariantMap ostprop = getOstProperty(keyprop);
+        QString devcat = ostprop["devcat"].toString();
         prop.replace(devcat,"");
         foreach(const QString& keyelt, eventData[keyprop].toMap()["elements"].toMap().keys()) {
             BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << prop.toStdString() << "-" << keyelt.toStdString() << "-" << eventData[keyprop].toMap()["indi"].toInt();

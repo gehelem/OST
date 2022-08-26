@@ -13,7 +13,7 @@ class MODULE_INIT Dummy : public Basemodule
     Q_OBJECT
 
     public:
-        Dummy(QString name,QString label,QString profile);
+        Dummy(QString name,QString label,QString profile,QVariantMap availableModuleLibs);
         ~Dummy();
 
     public slots:
@@ -31,6 +31,6 @@ class MODULE_INIT Dummy : public Basemodule
 
 };
 
-extern "C" MODULE_INIT Dummy *initialize(QString name,QString label,QString profile);
+extern "C" MODULE_INIT Dummy *initialize(QString name,QString label,QString profile,QVariantMap availableModuleLibs);
 
 #endif

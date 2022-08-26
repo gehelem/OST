@@ -3,36 +3,42 @@
         "devcat": "Info",
         "group": "",
         "permission": 0,
-        "propertyLabel": "BaseVersion"
+        "propertyLabel": "BaseVersion",
+        "value":1
+    },
+    "moduleDescription": {
+        "devcat": "Info",
+        "group": "",
+        "permission": 0,
+        "propertyLabel": "Module description",
+        "value":"N/A"
+    },
+    "moduleLabel": {
+        "devcat": "Info",
+        "group": "",
+        "permission": 0,
+        "propertyLabel": "Module label",
+        "value":"Base module label"
+    },
+    "moduleName": {
+        "devcat": "Info",
+        "group": "",
+        "permission": 0,
+        "propertyLabel": "Module name",
+        "value":"basemodule"
+    },
+    "moduleVersion": {
+        "devcat": "Info",
+        "group": "",
+        "permission": 0,
+        "propertyLabel": "Version",
+        "value":1
     },
     "message": {
         "devcat": "messages",
         "group": "",
         "permission": 0,
         "propertyLabel": "Message"
-    },
-    "moduleDescription": {
-        "devcat": "Info",
-        "group": "",
-        "permission": 0,
-        "propertyLabel": "Module description"
-    },
-    "moduleLabel": {
-        "devcat": "Info",
-        "group": "",
-        "permission": 0,
-        "propertyLabel": "Module label"
-    },
-    "moduleName": {
-        "devcat": "Info",
-        "group": "",
-        "permission": 0,
-        "propertyLabel": "Module name"
-    },
-    "version": {
-        "devcat": "Info",
-        "group": "",
-        "permission": 0,
-        "propertyLabel": "Version"
     }
+
 }

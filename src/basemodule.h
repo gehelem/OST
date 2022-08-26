@@ -19,7 +19,7 @@ class Basemodule : public QObject, public INDI::BaseClient
     Q_OBJECT
 
     public:
-        Basemodule(QString name, QString label,QString profile);
+        Basemodule(QString name, QString label,QString profile,QVariantMap availableModuleLibs);
         ~Basemodule() = default;
         void setHostport(QString host, int port);
         void setWebroot(QString webroot) {_webroot = webroot;}
@@ -34,6 +34,8 @@ class Basemodule : public QObject, public INDI::BaseClient
         QString getLabel(void) {return _modulelabel;}
         QVariantMap getOstProperties(void) {return _ostproperties;}
         QVariantMap getOstProperty(QString name) {return _ostproperties[name].toMap();}
+        QVariantMap getModuleInfo(void);
+        QVariantMap getAvailableModuleLibs(void) {return _availableModuleLibs;}
 
         QString _moduletype;
         QString _webroot;
@@ -101,10 +103,12 @@ class Basemodule : public QObject, public INDI::BaseClient
         QVariantMap _ostproperties;
         QString _modulename;
         QString _modulelabel;
+        QVariantMap _availableModuleLibs;
 
     signals:
         void moduleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData);
         void askedFrameReset(QString devicename);
+        void loadOtherModule(QString &lib, QString &name, QString &label, QString &profile);
 }
 ;
 #endif
