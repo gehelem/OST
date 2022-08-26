@@ -15,7 +15,7 @@ Maincontrol::Maincontrol(QString name, QString label, QString profile,QVariantMa
     loadPropertiesFromFile(":maincontrol.json");
     setOstProperty("moduleLabel","Main control",false);
     setOstProperty("moduleDescription","Maincontrol",false);
-    setOstProperty("version",0.1,false);
+    setOstProperty("moduleVersion",0.1,false);
 
     foreach(QString key,getAvailableModuleLibs().keys()) {
         QVariantMap info = getAvailableModuleLibs()[key].toMap();
