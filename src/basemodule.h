@@ -108,6 +108,7 @@ class Basemodule : public QObject, public INDI::BaseClient
     signals:
         void moduleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData);
         void askedFrameReset(QString devicename);
+        void loadOtherModule(QString &lib, QString &name, QString &label, QString &profile);
 }
 ;
 #endif
