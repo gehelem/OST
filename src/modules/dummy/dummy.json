@@ -200,10 +200,6 @@
                 "elementLabel": "Shoot",
                 "value":false
             },
-            "stats": {
-                "elementLabel": "Compute statistics",
-                "value":false
-            },
             "solve": {
                 "elementLabel": "Solve field",
                 "value":false
@@ -244,6 +240,15 @@
                 },
                 "median": {
                     "elementLabel": "Median ADU",
+                    "value":0
+                },
+                "stddev": {
+                    "elementLabel": "StdDev",
+                    "value":0
+                },
+                "snr": {
+                    "elementLabel": "SNR",
+                    "step": 0.0001,
                     "value":0
                 },
                 "starscount": {
