@@ -19,13 +19,12 @@ class Basemodule : public QObject, public INDI::BaseClient
     Q_OBJECT
 
     public:
-        Basemodule(QString name, QString label,QString profile);
+        Basemodule(QString name, QString label,QString profile,QVariantMap availableModuleLibs);
         ~Basemodule() = default;
         void setHostport(QString host, int port);
         void setWebroot(QString webroot) {_webroot = webroot;}
         void requestProfile(QString profileName);
         void setProfile(QVariantMap profiledata);
-        void setAvailableModules(QVariantMap mods){_availableModuleLibs=mods;}
 
 
         QString getWebroot(void) {return _webroot;}
@@ -36,6 +35,7 @@ class Basemodule : public QObject, public INDI::BaseClient
         QVariantMap getOstProperties(void) {return _ostproperties;}
         QVariantMap getOstProperty(QString name) {return _ostproperties[name].toMap();}
         QVariantMap getModuleInfo(void);
+        QVariantMap getAvailableModuleLibs(void) {return _availableModuleLibs;}
 
         QString _moduletype;
         QString _webroot;

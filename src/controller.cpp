@@ -49,17 +49,16 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
     {
         BOOST_LOG_TRIVIAL(debug) << name.toStdString() << " " << "library loaded";
 
-        typedef Basemodule *(*CreateModule)(QString,QString,QString);
+        typedef Basemodule *(*CreateModule)(QString,QString,QString,QVariantMap);
         CreateModule createmodule = (CreateModule)library.resolve("initialize");
         if (createmodule) {
-            Basemodule *mod = createmodule(name,label,profile);
+            Basemodule *mod = createmodule(name,label,profile,_availableModuleLibs);
             if (mod) {
                 mod->setParent(this);
                 mod->setHostport(_indihost,_indiport);
                 mod->connectIndi();
                 mod->setWebroot(_webroot);
                 mod->setObjectName(name);
-                mod->setAvailableModules(_availableModuleLibs);
                 connect(mod,&Basemodule::moduleEvent, this,&Controller::OnModuleEvent);
                 connect(mod,&Basemodule::moduleEvent, wshandler,&WShandler::OnModuleEvent);
                 connect(this,&Controller::controllerEvent,mod,&Basemodule::OnExternalEvent);
@@ -133,12 +132,12 @@ void Controller::checkModules(void)
         }
         else
         {
-            typedef Basemodule *(*CreateModule)(QString,QString,QString);
+            typedef Basemodule *(*CreateModule)(QString,QString,QString,QVariantMap);
             CreateModule createmodule = (CreateModule)library.resolve("initialize");
             QString tt = lib.replace(".so","");
 
             if (createmodule) {
-                Basemodule *mod = createmodule(tt,"temp",QString());
+                Basemodule *mod = createmodule(tt,"temp",QString(),QVariantMap());
                 if (mod) {
                     mod->setParent(this);
                     mod->setObjectName(lib);

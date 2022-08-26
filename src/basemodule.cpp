@@ -2,9 +2,10 @@
 #include <basedevice.h>
 #include "basemodule.h"
 
-Basemodule::Basemodule(QString name, QString label, QString profile)
+Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
     :_modulename(name),
-      _modulelabel(label)
+      _modulelabel(label),
+      _availableModuleLibs(availableModuleLibs)
 {
     setVerbose(false);
     _moduletype="basemodule";
