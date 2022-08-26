@@ -103,6 +103,23 @@ target_link_libraries(ostdummy PRIVATE
 )
 target_compile_definitions(ostdummy PRIVATE dummy_LIBRARY)
 
+# Maincontrol module
+list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.qrc)
+qt5_add_resources (RCC_SOURCES ${RESOURCES})
+
+add_library(ostmaincontrol SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.cpp
+    ${RCC_SOURCES}
+)
+target_link_libraries(ostmaincontrol PRIVATE
+    indiclient
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    Qt${QT_VERSION_MAJOR}::Widgets
+    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+)
+target_compile_definitions(ostmaincontrol PRIVATE maincontrol_LIBRARY)
 
 
 
