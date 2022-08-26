@@ -174,7 +174,7 @@ function buildmodule(m,l) {
 }
 
 function builddevcat(m,prop) {
-    dd=prop.devcat.replace(' ', '');
+    dd=prop.devcat.replace(' ', '').replace(' ', '');
     if  (!($("[id='devDIV"+m+dd+"']").length >0)) {
         //console.log('BUILD DEVCAT ' + m + "-"+ d + "-"+ l + "-");
         $("[id='modDIV"+m+"']").append("<div id='devDIV"+m+dd+"'></div>");
@@ -185,19 +185,19 @@ function builddevcat(m,prop) {
 }
 
 function buildgroup(m,prop) {
-    dd=prop.devcat.replace(' ', '');
-    gg=prop.group.replace(' ', '');
+    dd=prop.devcat.replace(' ', '').replace(' ', '');
+    gg=prop.group.replace(' ', '').replace(' ', '');
     if  (!($("[id='grpDIV"+m+dd+gg+"']").length > 0)) {
-        //console.log('BUILD GROUP ' + m + "-" + d + "-"+ g + "-"+ l + "-");
+        console.log('BUILD GROUP ' + m + "-" + dd + "-"+ gg+ "-");
         $("[id='devDIV"+m+dd+"']").append("<div id='grpDIV"+m+dd+gg+"'></div>");
         $("[id='devUL"+m+dd+"']").append("<li id='grpLIL"+m+dd+gg+"'><a href=#grpDIV"+m+dd+gg+">"+prop.group+"</a></li>");
         $("[id='grpDIV"+m+dd+gg+"']").append("<ul id='grpUL"+m+dd+gg+"'></ul>");
     };
 }
 function buildproperty(m,p,n) {
-    var d=p.devcat.replace(' ', '');
-    var g=p.group.replace(' ', '');
-    var mp=m.replace(' ', '')+n.replace(' ', '');
+    var d=p.devcat.replace(' ', '').replace(' ', '');
+    var g=p.group.replace(' ', '').replace(' ', '');
+    var mp=m.replace(' ', '').replace(' ', '')+n.replace(' ', '').replace(' ', '');
     if  (!($("[id='P"+mp+"']").length)) {
         var div="<div id=P"+mp+" data-devcat='"+d+"' data-group='"+g+"' data-key='"+n+"'>";
         div = div + "<strong id='status"+mp+"' >"+'\u25ef'+"</strong>";                  // status icon
@@ -304,9 +304,9 @@ function buildproperty(m,p,n) {
     
 }
 function buildPhotoform(m,p,n) {
-    var d=p.devcat.replace(' ', '');
-    var g=p.group.replace(' ', '');
-    var mp=m.replace(' ', '')+n.replace(' ', '');
+    var d=p.devcat.replace(' ', '').replace(' ', '');
+    var g=p.group.replace(' ', '').replace(' ', '');
+    var mp=m.replace(' ', '').replace(' ', '')+n.replace(' ', '').replace(' ', '');
     $("[id='gal"+mp+"']").on("click", function () {    
             var mp=$(this).data("mp");
             var p=$("[id='P"+mp+"']").data("prop");
