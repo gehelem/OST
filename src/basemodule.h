@@ -52,7 +52,7 @@ class Basemodule : public QObject, public INDI::BaseClient
         bool disconnectIndi(void);
         void connectAllDevices(void);
         void disconnectAllDevices(void);
-        void connectDevice(QString deviceName);
+        bool connectDevice(QString deviceName);
         void disconnectDevice(QString deviceName);
         void loadDevicesConfs(void);
         bool sendModNewText  (QString deviceName, QString propertyName,QString elementName, QString text);
