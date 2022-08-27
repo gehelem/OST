@@ -59,11 +59,14 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
                 mod->connectIndi();
                 mod->setWebroot(_webroot);
                 mod->setObjectName(name);
+                QVariantMap prof;
+                dbmanager->getProfile(mod->_moduletype,profile,prof);
+                mod->setProfile(prof);
                 connect(mod,&Basemodule::moduleEvent, this,&Controller::OnModuleEvent);
                 connect(mod,&Basemodule::moduleEvent, wshandler,&WShandler::OnModuleEvent);
                 connect(mod,&Basemodule::loadOtherModule, this,&Controller::LoadModule);
                 connect(this,&Controller::controllerEvent,mod,&Basemodule::OnExternalEvent);
-
+                emit controllerEvent("dump",name,"*",QVariantMap());
 
                 QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(),Qt::FindChildrenRecursively);
                 for (Basemodule *othermodule : othermodules) {
@@ -74,10 +77,7 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
 
                     }
                 }
-                QVariantMap prof;
-                dbmanager->getProfile(mod->_moduletype,profile,prof);
-                mod->setProfile(prof);
-                wshandler->processTextMessage("{'evt':'readall'}");
+
 
             }
         } else {

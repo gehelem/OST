@@ -664,6 +664,10 @@ void Basemodule::OnExternalEvent(const QString &eventType, const QString  &event
         emit moduleEvent("moduledump",_modulename,"*",_ostproperties);
         return;
     }
+    if ( (eventType=="dump")&&(eventModule==_modulename) ) {
+        emit moduleEvent("moduledump",_modulename,"*",_ostproperties);
+        return;
+    }
     if (_modulename==eventModule) OnMyExternalEvent(eventType,eventModule,eventKey,eventData);
 
 }
