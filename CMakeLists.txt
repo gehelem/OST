@@ -100,6 +100,7 @@ target_link_libraries(ostdummy PRIVATE
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Widgets
     ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+    z -lpthread
 )
 target_compile_definitions(ostdummy PRIVATE dummy_LIBRARY)
 
@@ -118,6 +119,7 @@ target_link_libraries(ostmaincontrol PRIVATE
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Widgets
     ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+    z -lpthread
 )
 target_compile_definitions(ostmaincontrol PRIVATE maincontrol_LIBRARY)
 
@@ -142,6 +144,7 @@ target_link_libraries(ostfocuser PRIVATE
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Widgets
     ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+    z -lpthread
 )
 target_compile_definitions(ostfocuser PRIVATE FOCUS_MODULE)
 
@@ -155,17 +158,10 @@ add_library(ostindipanel SHARED
 )
 target_link_libraries(ostindipanel PRIVATE
     indiclient
-    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
-    Qt${QT_VERSION_MAJOR}::Gui
     Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Network
-    Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Concurrent
-    Qt${QT_VERSION_MAJOR}::WebSockets
-    Qt${QT_VERSION_MAJOR}::Sql
-    ${STELLARSOLVER_LIBRARIES}
-    ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
-    ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
+    Qt${QT_VERSION_MAJOR}::Widgets
+    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
     z -lpthread
 )
 target_compile_definitions(ostindipanel PRIVATE INDIPANEL_MODULE)

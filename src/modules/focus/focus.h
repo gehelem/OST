@@ -8,8 +8,6 @@
 #  define MODULE_INIT Q_DECL_IMPORT
 #endif
 
-#include <QtCore>
-#include <QtConcurrent>
 #include <QStateMachine>
 
 class MODULE_INIT FocusModule : public Basemodule
@@ -113,7 +111,7 @@ class MODULE_INIT FocusModule : public Basemodule
         std::vector<double> _hfdvector;
         std::vector<double> _coefficients;
 
-        fileio _image;
+        QPointer<fileio> _image;
         Solver _solver;
         FITSImage::Statistic stats;
 

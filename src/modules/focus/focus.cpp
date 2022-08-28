@@ -185,10 +185,14 @@ void FocusModule::newBLOB(IBLOB *bp)
             (QString(bp->bvp->device) == _camera)
        )
     {
-        _image.loadBlob(bp);
+        delete _image;
+        _image = new fileio();
+        _image->loadBlob(bp);
+        setBLOBMode(B_NEVER,_camera.toStdString().c_str(),nullptr);
+
         setOstPropertyAttribute("image","status",IPS_OK,true);
 
-        QImage rawImage = _image.getRawQImage();
+        QImage rawImage = _image->getRawQImage();
         rawImage.save(_webroot+"/"+QString(bp->bvp->device)+".jpeg","JPG",50);
         setOstPropertyAttribute("image","URL",QString(bp->bvp->device)+".jpeg",true);
 
@@ -358,7 +362,7 @@ void FocusModule::SMRequestFrameReset()
     sendMessage("SMRequestFrameReset");
 
 
-    setBlobMode();
+    setBLOBMode(B_ALSO,_camera.toStdString().c_str(),nullptr);
 
     /*qDebug() << "conf count" << _machine.configuration().count();
     QSet<QAbstractState *>::iterator i;
@@ -407,14 +411,16 @@ void FocusModule::SMRequestExposure()
         emit abort();
         return;
     }
+    setBLOBMode(B_ALSO,_camera.toStdString().c_str(),nullptr);
     emit RequestExposureDone();
+
 }
 
 void FocusModule::SMFindStars()
 {
     sendMessage("SMFindStars");
-    stats=_image.getStats();
-    _solver.ResetSolver(stats,_image.getImageBuffer());
+    stats=_image->getStats();
+    _solver.ResetSolver(stats,_image->getImageBuffer());
     connect(&_solver,&Solver::successSEP,this,&FocusModule::OnSucessSEP);
     _solver.FindStars(_solver.stellarSolverProfiles[0]);
 }

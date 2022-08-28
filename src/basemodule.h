@@ -1,8 +1,5 @@
 #ifndef MODULE_h_
 #define MODULE_h_
-#include <QtCore>
-#include <QtConcurrent>
-#include <QCoreApplication>
 #include <QObject>
 #include <basedevice.h>
 #include <baseclient.h>
