@@ -16,6 +16,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 #foreach (_variableName ${_variableNames})
 #    message(STATUS "${_variableName}=${${_variableName}}")
 #endforeach()
+set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 #find_package(Qt5Core)
 find_package(CFITSIO REQUIRED)
@@ -68,7 +69,8 @@ target_link_libraries( ost
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::WebSockets
     Qt${QT_VERSION_MAJOR}::Sql
-    z -lpthread
+    Threads::Threads
+    z
     )
 
 #########################
@@ -88,7 +90,6 @@ add_library(ostbasemodule STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/bayer.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/dms.cpp
 )
-set_target_properties(ostbasemodule PROPERTIES COMPILE_FLAGS "-fPIC")
 target_link_libraries(ostbasemodule
     indiclient
     Qt${QT_VERSION_MAJOR}::Core
@@ -98,8 +99,10 @@ target_link_libraries(ostbasemodule
     ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${NOVA_LIBRARIES}
     ${GSL_LIBRARIES} ${ZLIB_LIBRARY}
     ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
-    z -lpthread
+    Threads::Threads
+    z
 )
+
 
 
 
@@ -112,18 +115,19 @@ add_library(ostdummy SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.cpp
     ${RCC_SOURCES}
 )
-set_target_properties(ostdummy PROPERTIES COMPILE_FLAGS "-fPIC")
 
 target_link_libraries(ostdummy PRIVATE
+    indiclient
     ostbasemodule
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Widgets
     ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
-    z -lpthread
+    Threads::Threads
+    z
 )
 target_compile_definitions(ostdummy PRIVATE dummy_LIBRARY)
-#
+
 ## Maincontrol module
 #list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.qrc)
 #qt5_add_resources (RCC_SOURCES ${RESOURCES})

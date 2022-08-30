@@ -204,6 +204,10 @@
                 "elementLabel": "Solve field",
                 "value":false
             },
+            "blob": {
+                "elementLabel": "Set blob mode",
+                "value":false
+            },
             "extract": {
                 "elementLabel": "Stars extraction",
                 "value":false

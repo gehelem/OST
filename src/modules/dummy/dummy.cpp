@@ -59,6 +59,8 @@ Dummy::Dummy(QString name, QString label, QString profile,QVariantMap availableM
         QVariantMap info = getAvailableModuleLibs()[key].toMap();
         createOstProperty("mod"+key,"mod"+key,0,"Modules","root");
     }
+    setBLOBMode(B_ALSO,_camera.toStdString().c_str(),nullptr);
+
 
 }
 
@@ -83,12 +85,17 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                 }
 
                 if (keyprop=="actions") {
-                    if (keyelt=="shoot") {
+                    if (keyelt=="blob") {
                         if (setOstElement(keyprop,keyelt,false,false)) {
-                            setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
+                            setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
                             connectDevice(_camera);
                             connectDevice(getOstElementValue("devices","mount").toString());
                             setBLOBMode(B_ALSO,_camera.toStdString().c_str(),nullptr);
+                        }
+                    }
+                    if (keyelt=="shoot") {
+                        if (setOstElement(keyprop,keyelt,false,false)) {
+                            setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
                             if (!sendModNewNumber(_camera,"CCD_EXPOSURE","CCD_EXPOSURE_VALUE", getOstElementValue("parameters","exposure").toDouble())) {
                                 setOstPropertyAttribute(keyprop,"status",IPS_ALERT,true);
                             }
@@ -142,33 +149,36 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
 void Dummy::newBLOB(IBLOB *bp)
 {
     BOOST_LOG_TRIVIAL(debug) << "Dummy newblob begins";
-    if (
-            (QString(bp->bvp->device) == _camera)
-       )
-    {
-        delete _image;
-        _image=new fileio();
-        _image->loadBlob(bp);
 
-        setOstPropertyAttribute("actions","status",IPS_OK,true);
-        setOstElement("imagevalues","width",_image->getStats().width,false);
-        setOstElement("imagevalues","height",_image->getStats().height,false);
-        setOstElement("imagevalues","min",_image->getStats().min[0],false);
-        setOstElement("imagevalues","max",_image->getStats().max[0],false);
-        setOstElement("imagevalues","mean",_image->getStats().mean[0],false);
-        setOstElement("imagevalues","median",_image->getStats().median[0],false);
-        setOstElement("imagevalues","stddev",_image->getStats().stddev[0],false);
-        setOstElement("imagevalues","snr",_image->getStats().SNR,true);
-        QList<fileio::Record> rec=_image->getRecords();
-        stats=_image->getStats();
-        _image->saveAsFITS(_webroot+"/"+QString(bp->bvp->device)+".FITS",stats,_image->getImageBuffer(),FITSImage::Solution(),rec,false);
-
-        QImage rawImage = _image->getRawQImage();
-        rawImage.save(_webroot+"/"+QString(bp->bvp->device)+".jpeg","JPG",50);
-        setOstPropertyAttribute("testimage","URL",QString(bp->bvp->device)+".jpeg",true);
-
-    }
+//    if (
+//            (QString(bp->bvp->device) == _camera)
+//       )
+//    {
+//        delete _image;
+//        _image=new fileio();
+//        //_image->loadBlob(bp);
+//
+//        setOstPropertyAttribute("actions","status",IPS_OK,true);
+//        setOstElement("imagevalues","width",_image->getStats().width,false);
+//        setOstElement("imagevalues","height",_image->getStats().height,false);
+//        setOstElement("imagevalues","min",_image->getStats().min[0],false);
+//        setOstElement("imagevalues","max",_image->getStats().max[0],false);
+//        setOstElement("imagevalues","mean",_image->getStats().mean[0],false);
+//        setOstElement("imagevalues","median",_image->getStats().median[0],false);
+//        setOstElement("imagevalues","stddev",_image->getStats().stddev[0],false);
+//        setOstElement("imagevalues","snr",_image->getStats().SNR,true);
+//        //QList<fileio::Record> rec=_image->getRecords();
+//        //stats=_image->getStats();
+//        //_image->saveAsFITS(_webroot+"/"+getName()+QString(bp->bvp->device)+".FITS",stats,_image->getImageBuffer(),FITSImage::Solution(),rec,false);
+//
+//        //QImage rawImage = _image->getRawQImage();
+//        //rawImage.save(_webroot+"/"+getName()+QString(bp->bvp->device)+".jpeg","JPG",50);
+//        //setOstPropertyAttribute("testimage","URL",QString(bp->bvp->device)+".jpeg",true);
+//
+//    }
     BOOST_LOG_TRIVIAL(debug) << "Dummy newblob ends";
+    setOstPropertyAttribute("actions","status",IPS_OK,true);
+
 
 }
 void Dummy::OnSucessSEP()
