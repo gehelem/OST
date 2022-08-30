@@ -13,7 +13,7 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
 
     Q_UNUSED(saveAllBlobs);
 
-    checkModules();
+    //checkModules();
 
     wshandler = new WShandler(this);
     connect(wshandler,&WShandler::externalEvent,this,&Controller::OnExternalEvent);
@@ -27,6 +27,12 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
     LoadModule("libostmaincontrol","mainctl","Maincontrol","default");
     LoadModule("libostdummy","dummy1","Dummy 1","default");
     LoadModule("libostdummy","dummy2","Dummy 2","default");
+    LoadModule("libostdummy","dummy3","Dummy 3","default");
+    LoadModule("libostdummy","dummy4","Dummy 4","default");
+    LoadModule("libostdummy","dummy5","Dummy 5","default");
+    LoadModule("libostdummy","dummy6","Dummy 6","default");
+    LoadModule("libostdummy","dummy7","Dummy 7","default");
+    LoadModule("libostdummy","dummy8","Dummy 8","default");
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel","indi control panel","default");
 
 }
@@ -55,6 +61,7 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
         CreateModule createmodule = (CreateModule)library.resolve("initialize");
         if (createmodule) {
             Basemodule *mod = createmodule(name,label,profile,_availableModuleLibs);
+            //QPointer<Basemodule> mod = createmodule(name,label,profile,_availableModuleLibs);
             if (mod) {
                 mod->setParent(this);
                 mod->setHostport(_indihost,_indiport);
