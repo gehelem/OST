@@ -312,5 +312,31 @@
         "permission": 0,
         "propertyLabel": "Test image",
         "URL": ""
+    },
+    "testgrid": {
+        "devcat": "Examples",
+        "group": "Grids",
+        "permission": 2,
+        "grid":0,
+        "propertyLabel": "Grid example",
+        "elements": {
+            "X": {
+                "elementLabel": "Abscisse",
+                "value":0,
+                "gridvalues":[0,1,2,3,4]
+            },
+            "Y": {
+                "elementLabel": "ordonnée",
+                "value":0,
+                "gridvalues":[0,1,4,9,16]
+            },
+            "Z": {
+                "elementLabel": "info",
+                "value":"Zéro",
+                "gridvalues":["P0","P1","P2","P3","P4"]
+            }
+        }
+
     }
+
 }
