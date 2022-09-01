@@ -1,6 +1,6 @@
 #ifndef FOCUS_MODULE_h_
 #define FOCUS_MODULE_h_
-#include <basemodule.h>
+#include <indimodule.h>
 
 #if defined(FOCUS_MODULE)
 #  define MODULE_INIT Q_DECL_EXPORT
@@ -10,7 +10,7 @@
 
 #include <QStateMachine>
 
-class MODULE_INIT FocusModule : public Basemodule
+class MODULE_INIT FocusModule : public IndiModule
 {
     Q_OBJECT
 

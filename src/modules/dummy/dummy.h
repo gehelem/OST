@@ -1,6 +1,6 @@
 #ifndef DUMMY_MODULE_h_
 #define DUMMY_MODULE_h_
-#include <basemodule.h>
+#include <indimodule.h>
 
 #if defined(DUMMY_MODULE)
 #  define MODULE_INIT Q_DECL_EXPORT
@@ -8,7 +8,7 @@
 #  define MODULE_INIT Q_DECL_IMPORT
 #endif
 
-class MODULE_INIT Dummy : public Basemodule
+class MODULE_INIT Dummy : public IndiModule
 {
     Q_OBJECT
 
