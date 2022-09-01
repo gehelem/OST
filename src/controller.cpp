@@ -13,7 +13,7 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
 
     Q_UNUSED(saveAllBlobs);
 
-    //checkModules();
+    checkModules();
 
     wshandler = new WShandler(this);
     connect(wshandler,&WShandler::externalEvent,this,&Controller::OnExternalEvent);
@@ -26,13 +26,6 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostpolar.so","polar1","Polar assistant");
     LoadModule("libostmaincontrol","mainctl","Maincontrol","default");
     LoadModule("libostdummy","dummy1","Dummy 1","default");
-    LoadModule("libostdummy","dummy2","Dummy 2","default");
-    LoadModule("libostdummy","dummy3","Dummy 3","default");
-    LoadModule("libostdummy","dummy4","Dummy 4","default");
-    LoadModule("libostdummy","dummy5","Dummy 5","default");
-    LoadModule("libostdummy","dummy6","Dummy 6","default");
-    LoadModule("libostdummy","dummy7","Dummy 7","default");
-    LoadModule("libostdummy","dummy8","Dummy 8","default");
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel","indi control panel","default");
 
 }
