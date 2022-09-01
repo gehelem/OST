@@ -66,14 +66,6 @@
         "rule":2,
         "propertyLabel": "Actions",
         "elements": {
-            "condev": {
-                "elementLabel": "Connect devices"
-                ,"value":false
-            },
-            "discondev": {
-                "elementLabel": "Disconnect devices"
-                ,"value":false
-            },
             "coarse": {
                 "elementLabel": "Autofocus"
                 ,"value":false
@@ -84,10 +76,6 @@
             },
             "abort": {
                 "elementLabel": "Abort"
-                ,"value":false
-            },
-            "loadconfs": {
-                "elementLabel": "Load devices conf"
                 ,"value":false
             }
         }
