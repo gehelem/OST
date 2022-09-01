@@ -1,22 +1,4 @@
 {
-    "devices": {
-        "hasprofile":true,
-        "devcat": "Options",
-        "group": "Devices",
-        "permission": 2,
-        "propertyLabel": "Devices",
-        "elements": {
-            "camera": {
-                "elementLabel": "Camera",
-                "value": "CCD Simulator"
-            },
-            "focuser": {
-                "elementLabel": "Focuser",
-                "value": "Focuser Simulator"
-            }
-        }
-    },
-
     "values": {
         "devcat": "Control",
         "group": "root",

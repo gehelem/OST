@@ -20,13 +20,18 @@ FocusModule::FocusModule(QString name,QString label,QString profile,QVariantMap 
     setOstProperty("moduleLabel","Focus module",true);
     setOstProperty("moduleVersion",0.1,true);
 
+    createOstElement("devices","camera","Camera",true);
+    createOstElement("devices","focuser","Focuser",true);
+    createOstElement("devices","mount","Mount",true);
+    setOstElement("devices","camera",   _camera,false);
+    setOstElement("devices","focuser",  _focuser,false);
+    setOstElement("devices","mount",    _mount,true);
     _startpos=          getOstElementValue("parameters","startpos").toInt();
     _steps=             getOstElementValue("parameters","steps").toInt();
     _iterations=        getOstElementValue("parameters","iterations").toInt();
     _loopIterations=    getOstElementValue("parameters","loopIterations").toInt();
     _exposure=          getOstElementValue("parameters","exposure").toInt();
     _backlash=          getOstElementValue("parameters","backlash").toInt();
-
 
 
     /*_img = new ImageProperty(_modulename,"Control","root","viewer","Image property label",0,0,0);
