@@ -35,11 +35,11 @@ class IndiModule : public Basemodule, public INDI::BaseClient
 
         /* Indi helpers */
         bool disconnectIndi(void);
-        void connectAllDevices(void);
-        void disconnectAllDevices(void);
+        bool connectAllDevices(void);
+        bool disconnectAllDevices(void);
         bool connectDevice(QString deviceName);
-        void disconnectDevice(QString deviceName);
-        void loadDevicesConfs(void);
+        bool disconnectDevice(QString deviceName);
+        bool loadDevicesConfs(void);
         bool sendModNewText  (QString deviceName, QString propertyName,QString elementName, QString text);
         bool sendModNewSwitch(QString deviceName, QString propertyName,QString elementName, ISState sw);
         bool sendModNewNumber(const QString& deviceName, const QString& propertyName, const QString& elementName, const double& value);

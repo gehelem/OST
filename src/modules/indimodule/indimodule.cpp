@@ -23,14 +23,41 @@ void IndiModule::OnDispatchToIndiExternalEvent(const QString &eventType, const Q
         foreach(const QString& keyprop, eventData.keys()) {
             foreach(const QString& keyelt, eventData[keyprop].toMap()["elements"].toMap().keys()) {
                 setOstElement(keyprop,keyelt,eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"],true);
-                if (keyprop=="indiactions") {
+                if (keyprop=="serveractions") {
                     if (keyelt=="conserv") {
-                        connectIndi();
+                        setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
+                        if (connectIndi()) setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
+                        else setOstPropertyAttribute(keyprop,"status",IPS_ALERT,true);
                     }
                     if (keyelt=="disconserv") {
-                        disconnectIndi();
+                        setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
+                        if (disconnectIndi()) setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
+                        else setOstPropertyAttribute(keyprop,"status",IPS_ALERT,true);
                     }
                 }
+                if (keyprop=="devicesactions") {
+                    if (!isServerConnected()) {
+                        sendMessage("Indi server not connected");
+                        setOstPropertyAttribute(keyprop,"status",IPS_ALERT,true);
+                        break;
+                    }
+                    if (keyelt=="condevs") {
+                        setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
+                        if (connectAllDevices()) setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
+                        else setOstPropertyAttribute(keyprop,"status",IPS_ALERT,true);
+                    }
+                    if (keyelt=="discondevs") {
+                        setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
+                        if (disconnectAllDevices()) setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
+                        else setOstPropertyAttribute(keyprop,"status",IPS_ALERT,true);
+                    }
+                    if (keyelt=="loadconfs") {
+                        setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
+                        if (loadDevicesConfs()) setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
+                        else setOstPropertyAttribute(keyprop,"status",IPS_ALERT,true);
+                    }
+                }
+
 
 
 
@@ -118,14 +145,16 @@ void IndiModule::setBlobMode(void)
 /*!
  * Asks every device to connect
  */
-void IndiModule::connectAllDevices()
+bool IndiModule::connectAllDevices()
 {
+    int err=0;
     std::vector<INDI::BaseDevice *> devs = getDevices();
     for(std::size_t i = 0; i < devs.size(); i++) {
         ISwitchVectorProperty *svp = devs[i]->getSwitch("CONNECTION");
 
         if (svp==nullptr) {
             sendMessage("Couldn't find CONNECTION switch");
+            err++;
         } else {
             for (int j=0;j<svp->nsp;j++) {
                 if (strcmp(svp->sp[j].name,"CONNECT")==0) {
@@ -145,15 +174,16 @@ void IndiModule::connectAllDevices()
         }
 
     }
-
+    if (err==0) return true; else return false;
 
 }
 
 /*!
  * Asks every device to disconnect
  */
-void IndiModule::disconnectAllDevices()
+bool IndiModule::disconnectAllDevices()
 {
+    int err=0;
     std::vector<INDI::BaseDevice *> devs = getDevices();
 
     for(std::size_t i = 0; i < devs.size(); i++) {
@@ -161,6 +191,7 @@ void IndiModule::disconnectAllDevices()
 
         if (svp==nullptr) {
             sendMessage("Couldn't find CONNECTION switch");
+            err++;
         } else {
             for (int j=0;j<svp->nsp;j++) {
                 if (strcmp(svp->sp[j].name,"DISCONNECT")==0) {
@@ -174,7 +205,7 @@ void IndiModule::disconnectAllDevices()
         }
 
     }
-
+    if (err==0) return true; else return false;
 
 }
 bool IndiModule::connectDevice(QString deviceName)
@@ -211,7 +242,7 @@ bool IndiModule::connectDevice(QString deviceName)
     }
     return true;
 }
-void IndiModule::disconnectDevice(QString deviceName)
+bool IndiModule::disconnectDevice(QString deviceName)
 {
     INDI::BaseDevice *dev = getDevice(deviceName.toStdString().c_str());
 
@@ -219,6 +250,7 @@ void IndiModule::disconnectDevice(QString deviceName)
 
     if (svp==nullptr) {
         sendMessage("Couldn't find CONNECTION switch");
+        return false;
     } else {
         for (int j=0;j<svp->nsp;j++) {
             if (strcmp(svp->sp[j].name,"DISCONNECT")==0) {
@@ -230,14 +262,16 @@ void IndiModule::disconnectDevice(QString deviceName)
         sendNewSwitch(svp);
 
     }
+    return true;
 
 }
 
 /*!
  * Asks every device to load saved configuration
  */
-void IndiModule::loadDevicesConfs()
+bool IndiModule::loadDevicesConfs()
 {
+    int err=0;
     std::vector<INDI::BaseDevice *> devs = getDevices();
     for(std::size_t i = 0; i < devs.size(); i++) {
         sendMessage("Loading device conf " +QString(devs[i]->getDeviceName()));
@@ -246,6 +280,7 @@ void IndiModule::loadDevicesConfs()
 
             if (svp==nullptr) {
                 sendMessage("Couldn't find CONFIG_PROCESS switch");
+                err++;
             } else {
                 for (int j=0;j<svp->nsp;j++) {
                     if (strcmp(svp->sp[j].name,"CONFIG_LOAD")==0) {
@@ -259,6 +294,8 @@ void IndiModule::loadDevicesConfs()
 
         }
     }
+    if (err==0) return true; else return false;
+
 }
 
 
