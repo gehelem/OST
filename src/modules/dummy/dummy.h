@@ -23,7 +23,7 @@ class MODULE_INIT Dummy : public Basemodule
     private:
         void newBLOB(IBLOB *bp) override;
         QString _camera;
-        fileio _image;
+        QPointer<fileio> _image;
         Solver _solver;
         FITSImage::Statistic stats;
 

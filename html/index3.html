@@ -239,7 +239,7 @@ function buildproperty(m,p,n) {
         div = div + "</table>";
         if (p.hasOwnProperty('URL')) {
             div = div + "<div id='gal"+mp+"' data-m"+m+" data-mp="+mp+" data-key=\"\">";
-            div = div + "<img id='im"+mp+"' src='"+p.URL+ "?"+ new Date().valueOf() +"' height='150'><div>";
+            div = div + "<img id='im"+mp+"' src='"+p.URL+ "?"+ new Date().valueOf() +"' height='150'></div>";
         }
         // add switchs or radio for booleans
         var tt='checkbox';
@@ -254,8 +254,35 @@ function buildproperty(m,p,n) {
             }
         })                
         div = div + "</fieldset>";
+        if (p.hasOwnProperty('grid')) {
+            var arr;
+            div = div + "<div id='grid"+mp+"' data-m"+m+" data-mp="+mp+" data-key=\"\"><table><tr>";
+            $.each( p.elements, function( ii, i ) {
+                div = div + "<th>"+i.elementLabel+"</th>";
+                arr=i.gridvalues;                
+            })                
+            div = div + "</tr>";
+            var ligne=0;
+            for (const val of arr) {
+                div = div + "<tr>";
+                $.each( p.elements, function( ii, i ) {
+                    div = div + "<td>"+i.gridvalues[ligne]+"</td>";
+                })                
+                ligne++;
+                div = div + "</tr>";                
+            }            
+            div = div + "</table></div>";
+        }
 
+        
+        
         div = div + "</div>";
+        
+        
+        
+        
+        
+        
         $("#grpUL"+m+d+g).append(div);
         $("[id='P"+mp+"']").data("prop",p);
         $("[id='P"+mp+"']").data("m",m);

@@ -2,7 +2,7 @@
 #include <QtCore>
 #include "wshandler.h"
 #include <boost/log/trivial.hpp>
-#include "basemodule.h"
+
 /*!
 
  * ... ...

@@ -16,6 +16,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 #foreach (_variableName ${_variableNames})
 #    message(STATUS "${_variableName}=${${_variableName}}")
 #endforeach()
+set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 #find_package(Qt5Core)
 find_package(CFITSIO REQUIRED)
@@ -56,6 +57,28 @@ add_executable( ost
     ${CMAKE_CURRENT_SOURCE_DIR}/src/wshandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/dbmanager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/dbmanager.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/basemodule.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/resources/resources.qrc
+)
+target_link_libraries( ost
+    ostbasemodule
+    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+    Qt${QT_VERSION_MAJOR}::Gui
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    Qt${QT_VERSION_MAJOR}::WebSockets
+    Qt${QT_VERSION_MAJOR}::Sql
+    Threads::Threads
+    z
+    )
+
+#########################
+#### modules libraries ##
+#########################
+# Base module
+
+add_library(ostbasemodule STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/basemodule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/solver.cpp
@@ -67,24 +90,22 @@ add_executable( ost
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/bayer.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/dms.cpp
 )
-target_link_libraries( ost
+target_link_libraries(ostbasemodule
     indiclient
-    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
-    Qt${QT_VERSION_MAJOR}::Gui
     Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Concurrent
-    Qt${QT_VERSION_MAJOR}::WebSockets
-    Qt${QT_VERSION_MAJOR}::Sql
+    Qt${QT_VERSION_MAJOR}::Widgets
     ${STELLARSOLVER_LIBRARIES}
-    ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
-    ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
-    z -lpthread
-    )
+    ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${NOVA_LIBRARIES}
+    ${GSL_LIBRARIES} ${ZLIB_LIBRARY}
+    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+    Threads::Threads
+    z
+)
 
-########################
-### modules libraries ##
-########################
+
+
+
 # Dummy module
 list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.qrc)
 qt5_add_resources (RCC_SOURCES ${RESOURCES})
@@ -94,12 +115,16 @@ add_library(ostdummy SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.cpp
     ${RCC_SOURCES}
 )
+
 target_link_libraries(ostdummy PRIVATE
     indiclient
+    ostbasemodule
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Widgets
     ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+    Threads::Threads
+    z
 )
 target_compile_definitions(ostdummy PRIVATE dummy_LIBRARY)
 
@@ -118,38 +143,34 @@ target_link_libraries(ostmaincontrol PRIVATE
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Widgets
     ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+    Threads::Threads
+    z
 )
 target_compile_definitions(ostmaincontrol PRIVATE maincontrol_LIBRARY)
 
 
-
-
 # Focus module
-#list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.qrc)
-#qt5_add_resources (RCC_SOURCES ${RESOURCES})
-#
-#
-#add_library(ostfocuser SHARED
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.h
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.h
-#    ${RCC_SOURCES}
-#)
-#target_link_libraries(ostfocuser PRIVATE
-#    indiclient
-#    Qt${QT_VERSION_MAJOR}::Core
-#    Qt${QT_VERSION_MAJOR}::Concurrent
-#    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
-#    ${STELLARSOLVER_LIBRARIES}
-#    ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
-#    ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
-#    z -lpthread
-#
-#)
-#target_compile_definitions(ostfocuser PRIVATE FOCUS_MODULE)
+list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.qrc)
+qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
 
+add_library(ostfocuser SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.h
+    ${RCC_SOURCES}
+)
+target_link_libraries(ostfocuser PRIVATE
+    indiclient
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    Qt${QT_VERSION_MAJOR}::Widgets
+    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+    Threads::Threads
+    z
+)
+target_compile_definitions(ostfocuser PRIVATE FOCUS_MODULE)
 
 
 # Indipanel module
@@ -159,20 +180,15 @@ add_library(ostindipanel SHARED
 )
 target_link_libraries(ostindipanel PRIVATE
     indiclient
-    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
-    Qt${QT_VERSION_MAJOR}::Gui
     Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Network
-    Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Concurrent
-    Qt${QT_VERSION_MAJOR}::WebSockets
-    Qt${QT_VERSION_MAJOR}::Sql
-    ${STELLARSOLVER_LIBRARIES}
-    ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${ZLIB_LIBRARY}  ${NOVA_LIBRARIES}
-    ${GSL_LIBRARIES} ${ZLIB_LIBRARY} ${CIMG_LIBRARIES} ${OpenCV_LIBS}
-    z -lpthread
+    Qt${QT_VERSION_MAJOR}::Widgets
+    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+    Threads::Threads
+    z
 )
 target_compile_definitions(ostindipanel PRIVATE INDIPANEL_MODULE)
+
 #
 ## guider module
 #add_library(ostguider SHARED

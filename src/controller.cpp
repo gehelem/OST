@@ -24,9 +24,8 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostguider.so","guider1","Guider");
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostinspector.so","inspector1","Frame inspector");
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostpolar.so","polar1","Polar assistant");
-    //LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focus1","Focus assistant","default");
-    //LoadModule(QCoreApplication::applicationDirPath()+"/libostdummy.so","dummy1","Demo module","default");
     LoadModule("libostmaincontrol","mainctl","Maincontrol","default");
+    LoadModule("libostdummy","dummy1","Dummy 1","default");
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel","indi control panel","default");
 
 }
@@ -55,17 +54,21 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
         CreateModule createmodule = (CreateModule)library.resolve("initialize");
         if (createmodule) {
             Basemodule *mod = createmodule(name,label,profile,_availableModuleLibs);
+            //QPointer<Basemodule> mod = createmodule(name,label,profile,_availableModuleLibs);
             if (mod) {
                 mod->setParent(this);
                 mod->setHostport(_indihost,_indiport);
                 mod->connectIndi();
                 mod->setWebroot(_webroot);
                 mod->setObjectName(name);
+                QVariantMap prof;
+                dbmanager->getProfile(mod->_moduletype,profile,prof);
+                mod->setProfile(prof);
                 connect(mod,&Basemodule::moduleEvent, this,&Controller::OnModuleEvent);
                 connect(mod,&Basemodule::moduleEvent, wshandler,&WShandler::OnModuleEvent);
                 connect(mod,&Basemodule::loadOtherModule, this,&Controller::LoadModule);
                 connect(this,&Controller::controllerEvent,mod,&Basemodule::OnExternalEvent);
-
+                emit controllerEvent("dump",name,"*",QVariantMap());
 
                 QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(),Qt::FindChildrenRecursively);
                 for (Basemodule *othermodule : othermodules) {
@@ -76,10 +79,7 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
 
                     }
                 }
-                QVariantMap prof;
-                dbmanager->getProfile(mod->_moduletype,profile,prof);
-                mod->setProfile(prof);
-                wshandler->processTextMessage("{'evt':'readall'}");
+
 
             }
         } else {

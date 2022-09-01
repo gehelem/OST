@@ -173,14 +173,28 @@ void Basemodule::disconnectAllDevices()
 
 
 }
-void Basemodule::connectDevice(QString deviceName)
+bool Basemodule::connectDevice(QString deviceName)
 {
+    if (!isServerConnected()) {
+        sendMessage("Indi server is not connected");
+        return false;
+    }
+    bool _checkdevice = false;
+    foreach (INDI::BaseDevice *dd , getDevices()) {
+        if (strcmp(dd->getDeviceName(),deviceName.toStdString().c_str())==0) _checkdevice=true;
+    }
+    if (!_checkdevice) {
+        sendMessage("Device "+deviceName+" not found");
+        return false;
+    }
+
     INDI::BaseDevice *dev = getDevice(deviceName.toStdString().c_str());
 
     ISwitchVectorProperty *svp = dev->getSwitch("CONNECTION");
 
     if (svp==nullptr) {
         sendMessage("Couldn't find CONNECTION switch");
+        return false;
     } else {
         for (int j=0;j<svp->nsp;j++) {
             if (strcmp(svp->sp[j].name,"CONNECT")==0) {
@@ -190,9 +204,8 @@ void Basemodule::connectDevice(QString deviceName)
             }
         }
         sendNewSwitch(svp);
-
     }
-
+    return true;
 }
 void Basemodule::disconnectDevice(QString deviceName)
 {
@@ -661,6 +674,10 @@ void Basemodule::OnExternalEvent(const QString &eventType, const QString  &event
 {
 
     if ( (eventType=="dump")&&(eventModule=="*") ) {
+        emit moduleEvent("moduledump",_modulename,"*",_ostproperties);
+        return;
+    }
+    if ( (eventType=="dump")&&(eventModule==_modulename) ) {
         emit moduleEvent("moduledump",_modulename,"*",_ostproperties);
         return;
     }

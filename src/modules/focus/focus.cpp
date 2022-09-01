@@ -1,14 +1,14 @@
 #include "focus.h"
 #include "polynomialfit.h"
 
-FocusModule *initialize(QString name,QString label,QString profile)
+FocusModule *initialize(QString name,QString label,QString profile,QVariantMap availableModuleLibs)
 {
-    FocusModule *basemodule = new FocusModule(name,label,profile);
+    FocusModule *basemodule = new FocusModule(name,label,profile,availableModuleLibs);
     return basemodule;
 }
 
-FocusModule::FocusModule(QString name,QString label,QString profile)
-    : Basemodule(name,label,profile)
+FocusModule::FocusModule(QString name,QString label,QString profile,QVariantMap availableModuleLibs)
+    : Basemodule(name,label,profile,availableModuleLibs)
 
 {
     Q_INIT_RESOURCE(focus);
@@ -16,8 +16,9 @@ FocusModule::FocusModule(QString name,QString label,QString profile)
 
     loadPropertiesFromFile(":focus.json");
 
-    setOstProperty("moduleDescription","Focus module",true);
-    setOstProperty("version",0.1,true);
+    setOstProperty("moduleDescription","Focus module with statemachines",true);
+    setOstProperty("moduleLabel","Focus module",true);
+    setOstProperty("moduleVersion",0.1,true);
 
     _startpos=          getOstElementValue("parameters","startpos").toInt();
     _steps=             getOstElementValue("parameters","steps").toInt();
@@ -86,8 +87,11 @@ void FocusModule::OnMyExternalEvent(const QString &eventType, const QString  &ev
                     if (keyelt=="condev") {
                         if (setOstElement(keyprop,keyelt,false,false)) {
                             setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
-                            connectDevice(_camera);
-                            connectDevice(_focuser);
+                            if (connectDevice(_camera)&&connectDevice(_focuser)) {
+                                setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
+                            } else {
+                                setOstPropertyAttribute(keyprop,"status",IPS_ALERT,true);
+                            }
                         }
                     }
                     if (keyelt=="discondev") {
@@ -182,22 +186,16 @@ void FocusModule::newBLOB(IBLOB *bp)
        )
     {
         delete _image;
-        _image = new Image();
-        _image->LoadFromBlob2(bp);
-        _image->CalcStats();
-        _image->computeHistogram();
-        _image->saveStretchedToJpeg(_webroot+"/"+QString(bp->bvp->device)+".jpeg",100);
-        BOOST_LOG_TRIVIAL(debug) << "Image stats : min=" << _image->stats.min[0]
-                                 << " max= " << _image->stats.max[0]
-                                 << " mean= " << _image->stats.mean[0]
-                                 << " median= " << _image->stats.median[0]
-                                 << " width= " << _image->stats.width
-                                 << " height= " << _image->stats.height;
+        _image = new fileio();
+        _image->loadBlob(bp);
+        setBLOBMode(B_NEVER,_camera.toStdString().c_str(),nullptr);
 
+        setOstPropertyAttribute("image","status",IPS_OK,true);
 
-        //_img->setURL(QString(bp->bvp->device)+".jpeg");
-        //emit propertyUpdated(_img,&_modulename);
-        //_propertyStore.add(_img);*/
+        QImage rawImage = _image->getRawQImage();
+        rawImage.save(_webroot+"/"+QString(bp->bvp->device)+".jpeg","JPG",50);
+        setOstPropertyAttribute("image","URL",QString(bp->bvp->device)+".jpeg",true);
+
         if (_machine.isRunning()) {
             emit ExposureDone();
             emit ExposureBestDone();
@@ -364,7 +362,7 @@ void FocusModule::SMRequestFrameReset()
     sendMessage("SMRequestFrameReset");
 
 
-    setBlobMode();
+    setBLOBMode(B_ALSO,_camera.toStdString().c_str(),nullptr);
 
     /*qDebug() << "conf count" << _machine.configuration().count();
     QSet<QAbstractState *>::iterator i;
@@ -413,13 +411,16 @@ void FocusModule::SMRequestExposure()
         emit abort();
         return;
     }
+    setBLOBMode(B_ALSO,_camera.toStdString().c_str(),nullptr);
     emit RequestExposureDone();
+
 }
 
 void FocusModule::SMFindStars()
 {
     sendMessage("SMFindStars");
-    _solver.ResetSolver(_image->stats,_image->m_ImageBuffer);
+    stats=_image->getStats();
+    _solver.ResetSolver(stats,_image->getImageBuffer());
     connect(&_solver,&Solver::successSEP,this,&FocusModule::OnSucessSEP);
     _solver.FindStars(_solver.stellarSolverProfiles[0]);
 }
