@@ -34,6 +34,15 @@
             }
         }
     },
+    "devices": {
+        "hasprofile":true,
+        "devcat": "Indi",
+        "group": "Devices",
+        "permission": 2,
+        "propertyLabel": "Devices",
+        "elements": {
+        }
+    },
     "devicesactions": {
         "devcat": "Indi",
         "group": "Control",
