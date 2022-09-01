@@ -205,7 +205,7 @@ void Basemodule::OnExternalEvent(const QString &eventType, const QString  &event
         return;
     }
     if (_modulename==eventModule) OnMyExternalEvent(eventType,eventModule,eventKey,eventData);
-
+    if (_modulename==eventModule) OnDispatchToIndiExternalEvent(eventType,eventModule,eventKey,eventData);
 }
 QVariantMap Basemodule::getModuleInfo(void)
 {

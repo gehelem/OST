@@ -68,6 +68,7 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         virtual void newUniversalMessage(std::string message)   {Q_UNUSED(message);}
 
     private:
+        void OnDispatchToIndiExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData) override;
 
     signals:
         void askedFrameReset(QString devicename);

@@ -1,2 +1,45 @@
 {
+    "server": {
+        "hasprofile":true,
+        "devcat": "Indi",
+        "group": "Control",
+        "permission": 2,
+        "propertyLabel": "Server",
+        "elements": {
+            "host": {
+                "elementLabel": "Host",
+                "value": "localhost"
+            },
+            "port": {
+                "elementLabel": "Port",
+                "value": 7624
+            }
+
+        }
+    },
+    "indiactions": {
+        "devcat": "Indi",
+        "group": "Control",
+        "permission": 2,
+        "rule":2,
+        "propertyLabel": "Actions",
+        "elements": {
+            "conserv": {
+                "elementLabel": "Connect server"
+                ,"value":false
+            },
+            "disconserv": {
+                "elementLabel": "Disconnect server"
+                ,"value":false
+            },
+            "condev": {
+                "elementLabel": "Connect devices"
+                ,"value":false
+            },
+            "discondev": {
+                "elementLabel": "Disconnect devices"
+                ,"value":false
+            }
+        }
+    }
 }
