@@ -204,6 +204,27 @@ void Basemodule::OnExternalEvent(const QString &eventType, const QString  &event
         emit moduleEvent("moduledump",_modulename,"*",_ostproperties);
         return;
     }
+
+    foreach(const QString& keyprop, eventData.keys()) {
+        foreach(const QString& keyelt, eventData[keyprop].toMap()["elements"].toMap().keys()) {
+            QVariant val= eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
+            if ((keyprop=="profileactions")&&(keyelt=="load")) {
+                setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
+                if (val.toBool()) emit moduleEvent("modloadprofile",_modulename,getOstElementValue("profileactions","name").toString(),QVariantMap());
+                return;
+            }
+            if ((keyprop=="profileactions")&&(keyelt=="save")) {
+                setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
+                if (val.toBool()) emit moduleEvent("modsaveprofile",_modulename,getOstElementValue("profileactions","name").toString(),_ostproperties);
+                return;
+            }
+            if ((keyprop=="profileactions")&&(keyelt=="name")) {
+                //setOstElement("profileactions","name",val,true);
+                return;
+            }
+        }
+    }
+
     if (_modulename==eventModule) OnMyExternalEvent(eventType,eventModule,eventKey,eventData);
     if (_modulename==eventModule) OnDispatchToIndiExternalEvent(eventType,eventModule,eventKey,eventData);
 }

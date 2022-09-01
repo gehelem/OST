@@ -83,7 +83,7 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
 
             }
         } else {
-            BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library";
+            BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library : " << fulllib.toStdString();
         }
     }
 }
@@ -104,11 +104,20 @@ void Controller::OnModuleEvent(const QString &eventType, const QString  &eventMo
     if (eventType=="delprop") {
         obj["key"]=eventKey;
     }
+    if (eventType=="modsaveprofile") {
+        QVariantMap _vm = eventData;
+        dbmanager->setProfile(eventModule,eventKey,_vm);
+    }
+    if (eventType=="modloadprofile") {
+        QVariantMap prof;
+        dbmanager->getProfile(eventModule,eventKey,prof);
+        emit controllerEvent("setproperty",eventModule,eventKey,prof);
 
+    }
 
-    QJsonDocument doc(obj);
-    QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
-    QString strJson = QLatin1String(docByteArray);
+    //QJsonDocument doc(obj);
+    //QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
+    //QString strJson = QLatin1String(docByteArray);
     //BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - " << mod->getName().toStdString() << " - " << eventType.toStdString() << " - " << strJson.toStdString();
 
 
@@ -129,7 +138,7 @@ void Controller::checkModules(void)
     foreach(QString lib, libs)
     {
         QString tt = lib.replace(".so","");
-        if (!(tt=="libostmaincontrol" )) {
+        if (!((tt=="libostmaincontrol" )||(tt=="libostbasemodule" )||(tt=="libostindimodule" ))) {
             QLibrary library(QCoreApplication::applicationDirPath()+"/"+lib);
             if (!library.load())
             {
@@ -155,7 +164,7 @@ void Controller::checkModules(void)
                         delete mod;
                     }
                 } else {
-                    BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library";
+                    BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library : " << lib.toStdString();
                 }
             }
 
