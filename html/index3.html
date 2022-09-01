@@ -222,6 +222,9 @@ function buildproperty(m,p,n) {
 
         // show elements values
         div = div + "<table>";
+        if (p.hasOwnProperty('value')) {
+               div = div + "<tr><br>"+p.value+"</tr>";
+        }
         if (n=="message") {
             div = div + "<tr><br><input type=text' id='message"+mp+"' class='text ui-widget ui-corner-all' width='auto'></tr>";
         }

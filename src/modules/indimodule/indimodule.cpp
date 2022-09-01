@@ -7,14 +7,39 @@ IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap
 {
     setVerbose(false);
     _moduletype="IndiModule";
-    loadPropertiesFromFile(":IndiModule.json");
-    QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &IndiModule::connectIndiTimer);
-    timer->start(10000);
+    loadPropertiesFromFile(":indimodule.json");
+    //QTimer *timer = new QTimer(this);
+    //connect(timer, &QTimer::timeout, this, &IndiModule::connectIndiTimer);
+    //timer->start(10000);
 
 
 
 }
+void IndiModule::OnDispatchToIndiExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
+
+{
+
+        BOOST_LOG_TRIVIAL(debug) << "OnIndiExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << eventKey.toStdString();
+        foreach(const QString& keyprop, eventData.keys()) {
+            foreach(const QString& keyelt, eventData[keyprop].toMap()["elements"].toMap().keys()) {
+                setOstElement(keyprop,keyelt,eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"],true);
+                if (keyprop=="indiactions") {
+                    if (keyelt=="conserv") {
+                        connectIndi();
+                    }
+                    if (keyelt=="disconserv") {
+                        disconnectIndi();
+                    }
+                }
+
+
+
+
+            }
+
+        }
+}
+
 void IndiModule::connectIndiTimer()
 {
         if (!isServerConnected()) {
