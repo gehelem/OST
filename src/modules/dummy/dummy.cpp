@@ -7,7 +7,7 @@ Dummy *initialize(QString name,QString label,QString profile,QVariantMap availab
 }
 
 Dummy::Dummy(QString name, QString label, QString profile,QVariantMap availableModuleLibs)
-    : Basemodule(name,label,profile,availableModuleLibs)
+    : IndiModule(name,label,profile,availableModuleLibs)
 {
 
     Q_INIT_RESOURCE(dummy);

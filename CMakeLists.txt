@@ -37,6 +37,8 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule)
 include_directories(${INDI_INCLUDE_DIR})
 include_directories(${CFITSIO_INCLUDE_DIR})
 include_directories(${GSL_INCLUDE_DIRS})
@@ -49,7 +51,7 @@ include(CMakeCommon)
 
 
 # OST Server
-add_executable( ost
+add_executable(ostserver
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ost.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/controller.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/controller.h
@@ -57,10 +59,10 @@ add_executable( ost
     ${CMAKE_CURRENT_SOURCE_DIR}/src/wshandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/dbmanager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/dbmanager.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/basemodule.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/resources/resources.qrc
 )
-target_link_libraries( ost
+target_link_libraries(ostserver
     ostbasemodule
     ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
     Qt${QT_VERSION_MAJOR}::Gui
@@ -71,19 +73,20 @@ target_link_libraries( ost
     Qt${QT_VERSION_MAJOR}::Sql
     Threads::Threads
     z
-    )
+)
 
 #########################
 #### modules libraries ##
 #########################
 # Base module
+list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule/basemodule.qrc)
+qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
-add_library(ostbasemodule STATIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/basemodule.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/basemodule.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/solver.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/solver.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/resources/resources.qrc
+add_library(ostbasemodule SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule/basemodule.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule/basemodule.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/solver.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/solver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/fileio.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/imagelabel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/stretch.cpp
@@ -91,6 +94,27 @@ add_library(ostbasemodule STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/dms.cpp
 )
 target_link_libraries(ostbasemodule
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    Qt${QT_VERSION_MAJOR}::Widgets
+    ${STELLARSOLVER_LIBRARIES}
+    ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${NOVA_LIBRARIES}
+    ${GSL_LIBRARIES} ${ZLIB_LIBRARY}
+    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+    Threads::Threads
+    z
+)
+
+# Indi module
+list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.qrc)
+qt5_add_resources (RCC_SOURCES ${RESOURCES})
+
+add_library(ostindimodule SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.h
+)
+target_link_libraries(ostindimodule
+    ostbasemodule
     indiclient
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
@@ -105,7 +129,6 @@ target_link_libraries(ostbasemodule
 
 
 
-
 # Dummy module
 list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.qrc)
 qt5_add_resources (RCC_SOURCES ${RESOURCES})
@@ -117,8 +140,7 @@ add_library(ostdummy SHARED
 )
 
 target_link_libraries(ostdummy PRIVATE
-    indiclient
-    ostbasemodule
+    ostindimodule
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Widgets
@@ -138,7 +160,7 @@ add_library(ostmaincontrol SHARED
     ${RCC_SOURCES}
 )
 target_link_libraries(ostmaincontrol PRIVATE
-    indiclient
+    ostindimodule
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Widgets
@@ -162,7 +184,7 @@ add_library(ostfocuser SHARED
     ${RCC_SOURCES}
 )
 target_link_libraries(ostfocuser PRIVATE
-    indiclient
+    ostindimodule
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Widgets
@@ -179,7 +201,7 @@ add_library(ostindipanel SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel/indipanel.cpp
 )
 target_link_libraries(ostindipanel PRIVATE
-    indiclient
+    ostindimodule
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Widgets

@@ -8,7 +8,7 @@ FocusModule *initialize(QString name,QString label,QString profile,QVariantMap a
 }
 
 FocusModule::FocusModule(QString name,QString label,QString profile,QVariantMap availableModuleLibs)
-    : Basemodule(name,label,profile,availableModuleLibs)
+    : IndiModule(name,label,profile,availableModuleLibs)
 
 {
     Q_INIT_RESOURCE(focus);

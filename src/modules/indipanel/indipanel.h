@@ -1,6 +1,6 @@
 #ifndef INDIPANEL_MODULE_h_
 #define INDIPANEL_MODULE_h_
-#include <basemodule.h>
+#include <indimodule.h>
 
 
 #if defined(INDIPANEL_MODULE)
@@ -9,7 +9,7 @@
 #  define MODULE_INIT Q_DECL_IMPORT
 #endif
 
-class MODULE_INIT IndiPanel : public Basemodule
+class MODULE_INIT IndiPanel : public IndiModule
 {
     Q_OBJECT
 
