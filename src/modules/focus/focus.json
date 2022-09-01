@@ -67,6 +67,7 @@
         "devcat": "Control",
         "group": "root",
         "permission": 2,
+        "hasprofile":true,
         "propertyLabel": "Parameters",
         "elements": {
             "startpos": {
