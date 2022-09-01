@@ -285,12 +285,10 @@ bool fileio::loadOtherFormat(QString fileName)
 //It loads a FITS file, reads the FITS Headers, and loads the data from the image
 bool fileio::loadBlob(IBLOB *bp)
 {
-    BOOST_LOG_TRIVIAL(debug) << "fileio::loadBlob";
     justLoadBuffer=false;
     int status = 0, anynullptr = 0;
     long naxes[3];
     size_t bsize = static_cast<size_t>(bp->bloblen);
-    BOOST_LOG_TRIVIAL(debug) << "fileio::loadBlob1";
 
     if (fits_open_memfile(&fptr,"",READONLY,&bp->blob,&bsize,0,NULL,&status) )
 
@@ -300,14 +298,12 @@ bool fileio::loadBlob(IBLOB *bp)
     }
     else
         stats.size = bsize;
-    BOOST_LOG_TRIVIAL(debug) << "fileio::loadBlob2";
     if (fits_movabs_hdu(fptr, 1, IMAGE_HDU, &status))
     {
         logIssue(QString("Could not locate image HDU."));
         fits_close_file(fptr, &status);
         return false;
     }
-    BOOST_LOG_TRIVIAL(debug) << "fileio::loadBlob3";
     int fitsBitPix = 0;
     if (fits_get_img_param(fptr, 3, &fitsBitPix, &(stats.ndim), naxes, &status))
     {
@@ -389,7 +385,6 @@ bool fileio::loadBlob(IBLOB *bp)
     }
 
     long nelements = stats.samples_per_channel * stats.channels;
-    BOOST_LOG_TRIVIAL(debug) << "fileio::loadBlob4";
 
     if (fits_read_img(fptr, static_cast<uint16_t>(stats.dataType), 1, nelements, nullptr, m_ImageBuffer, &anynullptr, &status))
     {
@@ -406,7 +401,6 @@ bool fileio::loadBlob(IBLOB *bp)
         CalcStats();
 
     }
-    BOOST_LOG_TRIVIAL(debug) << "fileio::loadBlob5";
 
     fits_close_file(fptr, &status);
     generateQImage();
