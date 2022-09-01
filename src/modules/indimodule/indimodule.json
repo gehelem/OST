@@ -17,29 +17,43 @@
 
         }
     },
-    "indiactions": {
+    "serveractions": {
         "devcat": "Indi",
         "group": "Control",
         "permission": 2,
         "rule":2,
-        "propertyLabel": "Actions",
+        "propertyLabel": "Server",
         "elements": {
             "conserv": {
-                "elementLabel": "Connect server"
+                "elementLabel": "Connect"
                 ,"value":false
             },
             "disconserv": {
-                "elementLabel": "Disconnect server"
-                ,"value":false
-            },
-            "condev": {
-                "elementLabel": "Connect devices"
-                ,"value":false
-            },
-            "discondev": {
-                "elementLabel": "Disconnect devices"
+                "elementLabel": "Disconnect"
                 ,"value":false
             }
+        }
+    },
+    "devicesactions": {
+        "devcat": "Indi",
+        "group": "Control",
+        "permission": 2,
+        "rule":2,
+        "propertyLabel": "Devices",
+        "elements": {
+            "condevs": {
+                "elementLabel": "Connect"
+                ,"value":false
+            },
+            "discondevs": {
+                "elementLabel": "Disconnect"
+                ,"value":false
+            },
+            "loadconfs": {
+                "elementLabel": "Load devices conf"
+                ,"value":false
+            }
+
         }
     }
 }
