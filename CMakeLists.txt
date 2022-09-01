@@ -85,8 +85,8 @@ qt5_add_resources (RCC_SOURCES ${RESOURCES})
 add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule/basemodule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule/basemodule.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/solver.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/solver.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/solver.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/solver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/fileio.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/imagelabel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/stretch.cpp

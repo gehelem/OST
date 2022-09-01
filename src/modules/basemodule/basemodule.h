@@ -5,7 +5,7 @@
 #include <baseclient.h>
 #include <boost/log/trivial.hpp>
 #include "ssolverutils/fileio.h"
-#include "solver.h"
+#include "ssolverutils/solver.h"
 
 /*!
  * This Class shouldn't be used as is
