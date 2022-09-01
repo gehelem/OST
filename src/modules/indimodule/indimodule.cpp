@@ -7,7 +7,7 @@ IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap
 {
     setVerbose(false);
     _moduletype="IndiModule";
-    loadPropertiesFromFile(":IndiModule.json");
+    loadPropertiesFromFile(":indimodule.json");
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &IndiModule::connectIndiTimer);
     timer->start(10000);
