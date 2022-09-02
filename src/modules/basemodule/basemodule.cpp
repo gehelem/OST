@@ -66,17 +66,29 @@ void Basemodule::createOstElement (QString propertyName, QString elementName, QS
 }
 bool Basemodule::setOstElement    (QString propertyName, QString elementName, QVariant elementValue, bool emitEvent)
 {
+
     QVariantMap _prop=_ostproperties[propertyName].toMap();
     if (_prop.contains("elements")) {
         if (_prop["elements"].toMap().contains(elementName)) {
             QVariantMap elements=_prop["elements"].toMap();
             QVariantMap element=elements[elementName].toMap();
             if (element.contains("value")) {
+                BOOST_LOG_TRIVIAL(debug) << "setOstElement BEFORE: "  << elementValue.typeName() << "//"  << element["value"].typeName() << "-" << element["value"].toString().toStdString();
                 if (strcmp(element["value"].typeName(),"double")==0) {
-                    element["value"]=elementValue.toDouble();
+                    //element["value"]=elementValue.toDouble();
+                    element["value"].setValue(elementValue.toDouble());
+                }
+                if (strcmp(element["value"].typeName(),"float")==0) {
+                    //element["value"]=elementValue.toFloat();
+                    element["value"].setValue(elementValue.toFloat());
+                }
+                if (strcmp(element["value"].typeName(),"qlonglong")==0) {
+                    //element["value"]=elementValue.toFloat();
+                    element["value"].setValue(elementValue.toDouble());
                 }
                 if (strcmp(element["value"].typeName(),"int")==0) {
-                    element["value"]=elementValue.toInt();
+                    //element["value"]=elementValue.toInt();
+                    element["value"].setValue(elementValue.toInt());
                 }
                 if (strcmp(element["value"].typeName(),"QString")==0) {
                     element["value"]=elementValue.toString();
@@ -84,6 +96,7 @@ bool Basemodule::setOstElement    (QString propertyName, QString elementName, QV
                 if (strcmp(element["value"].typeName(),"bool")==0) {
                     element["value"]=elementValue.toBool();
                 }
+                BOOST_LOG_TRIVIAL(debug) << "setOstElement AFTER : "  << elementValue.typeName() << "-" << element["value"].toString().toStdString();
             } else {
                 element["value"]=elementValue;
             }
@@ -93,6 +106,8 @@ bool Basemodule::setOstElement    (QString propertyName, QString elementName, QV
     }
     _ostproperties[propertyName]=_prop;
     if (emitEvent) emit moduleEvent("setpropvalue",_modulename,propertyName,_prop);
+
+
     return true; // should return false when request is invalid, we'll see that later
 
 }
