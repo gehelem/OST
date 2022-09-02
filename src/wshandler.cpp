@@ -125,15 +125,18 @@ void WShandler::OnModuleEvent(const QString &eventType, const QString  &eventMod
         obj["mod"]=eventModule;
         if (eventType=="moduledump") {
             obj["dta"]=QJsonObject::fromVariantMap(eventData);
+            sendJsonMessage(obj);
         }
         if (eventType=="addprop"||eventType=="addelt"||eventType=="setattributes") {
             QJsonObject  property;
             property[eventKey]=QJsonObject::fromVariantMap(eventData);
             obj["dta"]=property;
             obj["key"]=eventKey;
+            sendJsonMessage(obj);
         }
         if (eventType=="delprop") {
             obj["key"]=eventKey;
+            sendJsonMessage(obj);
         }
         if (eventType=="setpropvalue") {
            QVariantMap prop = eventData;
@@ -165,8 +168,7 @@ void WShandler::OnModuleEvent(const QString &eventType, const QString  &eventMod
             QJsonObject  property;
             property[eventKey]=QJsonObject::fromVariantMap(values);
             obj["dta"]=property;
-
+            sendJsonMessage(obj);
         }
 
-        sendJsonMessage(obj);
 }
