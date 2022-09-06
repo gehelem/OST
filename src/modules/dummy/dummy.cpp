@@ -65,24 +65,6 @@ Dummy::Dummy(QString name, QString label, QString profile,QVariantMap availableM
     }
     setBLOBMode(B_ALSO,_camera.toStdString().c_str(),nullptr);
 
-    QFile fileout(name+".dat");
-    fileout.open(QIODevice::WriteOnly);
-    QDataStream out(&fileout);   // we will serialize the data into the file
-    out << QVariantMap(getOstProperties());
-    fileout.close();
-
-    QFile file(name+".dat");
-    file.open(QIODevice::ReadOnly);
-    QDataStream in(&file);    // read the data serialized from the file
-    QVariantMap inv;
-    in >> inv;
-
-    file.close();
-    foreach(QString key, inv.keys() ) {
-        BOOST_LOG_TRIVIAL(debug) << "read data : " << name.toStdString() << ":" << key.toStdString() << "=" << inv[key].toMap()["value"].toString().toStdString();
-    }
-
-
 }
 
 Dummy::~Dummy()
