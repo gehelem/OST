@@ -56,9 +56,31 @@ Dummy::Dummy(QString name, QString label, QString profile,QVariantMap availableM
 
     foreach(QString key,getAvailableModuleLibs().keys()) {
         QVariantMap info = getAvailableModuleLibs()[key].toMap();
-        createOstProperty("mod"+key,"mod"+key,0,"Modules","root");
+        QString mess;
+        if (createOstProperty("mod"+key,"mod"+key,0,"Modules","root",mess)) {
+                BOOST_LOG_TRIVIAL(debug) << "createOstProperty OK : " << mess.toStdString();
+        } else {
+            BOOST_LOG_TRIVIAL(debug) << "createOstProperty KO : " << mess.toStdString();
+        }
     }
     setBLOBMode(B_ALSO,_camera.toStdString().c_str(),nullptr);
+
+    QFile fileout(name+".dat");
+    fileout.open(QIODevice::WriteOnly);
+    QDataStream out(&fileout);   // we will serialize the data into the file
+    out << QVariantMap(getOstProperties());
+    fileout.close();
+
+    QFile file(name+".dat");
+    file.open(QIODevice::ReadOnly);
+    QDataStream in(&file);    // read the data serialized from the file
+    QVariantMap inv;
+    in >> inv;
+
+    file.close();
+    foreach(QString key, inv.keys() ) {
+        BOOST_LOG_TRIVIAL(debug) << "read data : " << name.toStdString() << ":" << key.toStdString() << "=" << inv[key].toMap()["value"].toString().toStdString();
+    }
 
 
 }
@@ -165,13 +187,13 @@ void Dummy::newBLOB(IBLOB *bp)
         setOstElement("imagevalues","median",_image->getStats().median[0],false);
         setOstElement("imagevalues","stddev",_image->getStats().stddev[0],false);
         setOstElement("imagevalues","snr",_image->getStats().SNR,true);
-        //QList<fileio::Record> rec=_image->getRecords();
-        //stats=_image->getStats();
-        //_image->saveAsFITS(_webroot+"/"+getName()+QString(bp->bvp->device)+".FITS",stats,_image->getImageBuffer(),FITSImage::Solution(),rec,false);
+        QList<fileio::Record> rec=_image->getRecords();
+        stats=_image->getStats();
+        _image->saveAsFITS(_webroot+"/"+getName()+QString(bp->bvp->device)+".FITS",stats,_image->getImageBuffer(),FITSImage::Solution(),rec,false);
 
-        //QImage rawImage = _image->getRawQImage();
-        //rawImage.save(_webroot+"/"+getName()+QString(bp->bvp->device)+".jpeg","JPG",50);
-        //setOstPropertyAttribute("testimage","URL",QString(bp->bvp->device)+".jpeg",true);
+        QImage rawImage = _image->getRawQImage();
+        rawImage.save(_webroot+"/"+getName()+QString(bp->bvp->device)+".jpeg","JPG",50);
+        setOstPropertyAttribute("testimage","URL",QString(bp->bvp->device)+".jpeg",true);
 
     }
     setOstPropertyAttribute("actions","status",IPS_OK,true);
