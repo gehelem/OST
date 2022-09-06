@@ -20,13 +20,15 @@ Maincontrol::Maincontrol(QString name, QString label, QString profile,QVariantMa
     foreach(QString key,getAvailableModuleLibs().keys()) {
         QVariantMap info = getAvailableModuleLibs()[key].toMap();
         BOOST_LOG_TRIVIAL(debug) << "lst : " << key.toStdString();
-        createOstProperty("desc"+key,"Description",0,"Available modules",info["moduleLabel"].toString());
+        QString err;
+        createOstProperty("desc"+key,"Description",0,"Available modules",info["moduleLabel"].toString(),err);
+        createOstProperty("desc"+key,"Description",0,"Available modules",info["moduleLabel"].toString(),err);
         foreach (QString ii,info.keys()) {
             QVariant val=info[ii];
             createOstElement("desc"+key,ii,ii,false);
             setOstElement("desc"+key,ii,val,false);
         }
-        createOstProperty("load"+key,"",2,"Available modules",info["moduleLabel"].toString());
+        createOstProperty("load"+key,"",2,"Available modules",info["moduleLabel"].toString(),err);
         createOstElement("load"+key,"instance","Instance name",false);
         setOstElement("load"+key,"instance","my"+key,false);
         createOstElement("load"+key,"load","Load",false);

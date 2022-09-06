@@ -17,16 +17,24 @@ void Basemodule::sendMessage(QString message)
     setOstProperty("message",mess,true);
 }
 
-void Basemodule::createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,const  QString &pPropertyDevcat, const QString &pPropertyGroup)
+bool Basemodule::createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,const  QString &pPropertyDevcat, const QString &pPropertyGroup, QString &err)
 {
     //BOOST_LOG_TRIVIAL(debug) << "createOstProperty  - " << _modulename.toStdString() << "-" << pPropertyName.toStdString();
-    QVariantMap _prop=_ostproperties[pPropertyName].toMap();
-    _prop["propertyLabel"]=pPropertyLabel;
-    _prop["permission"]=pPropertyPermission;
-    _prop["devcat"]=pPropertyDevcat;
-    _prop["group"]=pPropertyGroup;
-    _prop["name"]=pPropertyName;
-    _ostproperties[pPropertyName]=_prop;
+    if (_ostproperties.contains(pPropertyName)) {
+        err=_modulename + " - createOstProperty " + pPropertyName + " already exists";
+        BOOST_LOG_TRIVIAL(debug) << err.toStdString();
+        return false;
+    } else {
+        QVariantMap _prop;
+        _prop["propertyLabel"]=pPropertyLabel;
+        _prop["permission"]=pPropertyPermission;
+        _prop["devcat"]=pPropertyDevcat;
+        _prop["group"]=pPropertyGroup;
+        _prop["name"]=pPropertyName;
+        _ostproperties[pPropertyName]=_prop;
+        err = "OK";
+        return true;
+    }
 }
 void Basemodule::emitPropertyCreation(const QString &pPropertyName)
 {
