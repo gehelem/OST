@@ -79,12 +79,13 @@ target_link_libraries(ostserver
 #### modules libraries ##
 #########################
 # Base module
-list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule/basemodule.qrc)
-qt5_add_resources (RCC_SOURCES ${RESOURCES})
+#list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule/basemodule.qrc)
+#qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
 add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule/basemodule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule/basemodule.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule/basemodule.qrc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/solver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/solver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/fileio.cpp
@@ -106,12 +107,13 @@ target_link_libraries(ostbasemodule
 )
 
 # Indi module
-list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.qrc)
-qt5_add_resources (RCC_SOURCES ${RESOURCES})
+#list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.qrc)
+#qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
 add_library(ostindimodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.qrc
 )
 target_link_libraries(ostindimodule
     ostbasemodule
@@ -130,13 +132,13 @@ target_link_libraries(ostindimodule
 
 
 # Dummy module
-list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.qrc)
-qt5_add_resources (RCC_SOURCES ${RESOURCES})
+#list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.qrc)
+#qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
 add_library(ostdummy SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.cpp
-    ${RCC_SOURCES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.qrc
 )
 
 target_link_libraries(ostdummy PRIVATE
@@ -151,13 +153,13 @@ target_link_libraries(ostdummy PRIVATE
 target_compile_definitions(ostdummy PRIVATE dummy_LIBRARY)
 
 # Maincontrol module
-list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.qrc)
-qt5_add_resources (RCC_SOURCES ${RESOURCES})
+#list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.qrc)
+#qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
 add_library(ostmaincontrol SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.cpp
-    ${RCC_SOURCES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.qrc
 )
 target_link_libraries(ostmaincontrol PRIVATE
     ostindimodule
@@ -172,8 +174,8 @@ target_compile_definitions(ostmaincontrol PRIVATE maincontrol_LIBRARY)
 
 
 # Focus module
-list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.qrc)
-qt5_add_resources (RCC_SOURCES ${RESOURCES})
+#list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.qrc)
+#qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
 
 #add_library(ostfocuser SHARED

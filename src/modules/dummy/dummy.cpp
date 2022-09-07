@@ -10,7 +10,7 @@ Dummy::Dummy(QString name, QString label, QString profile,QVariantMap availableM
     : IndiModule(name,label,profile,availableModuleLibs)
 {
 
-    Q_INIT_RESOURCE(dummy);
+    //Q_INIT_RESOURCE(dummy);
     _moduletype="dummy";
 
     loadPropertiesFromFile(":dummy.json");
@@ -69,7 +69,7 @@ Dummy::Dummy(QString name, QString label, QString profile,QVariantMap availableM
 
 Dummy::~Dummy()
 {
-    Q_CLEANUP_RESOURCE(dummy);
+    //Q_CLEANUP_RESOURCE(dummy);
 }
 
 void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)

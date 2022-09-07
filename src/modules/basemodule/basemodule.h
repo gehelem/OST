@@ -17,7 +17,7 @@ class Basemodule : public QObject
 
     public:
         Basemodule(QString name, QString label,QString profile,QVariantMap availableModuleLibs);
-        ~Basemodule() = default;
+        ~Basemodule();
         void setHostport(QString host, int port);
         void setWebroot(QString webroot) {_webroot = webroot;}
         void requestProfile(QString profileName);

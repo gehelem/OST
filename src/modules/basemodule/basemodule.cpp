@@ -7,10 +7,14 @@ Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap
       _modulelabel(label),
       _availableModuleLibs(availableModuleLibs)
 {
+    Q_INIT_RESOURCE(basemodule);
     _moduletype="basemodule";
     loadPropertiesFromFile(":basemodule.json");
 }
-
+Basemodule::~Basemodule()
+{
+    Q_CLEANUP_RESOURCE(basemodule);
+}
 void Basemodule::sendMessage(QString message)
 {
     QString mess = QDateTime::currentDateTime().toString("[yyyyMMdd hh:mm:ss.zzz]") + " - " + _modulename + " - " + message;
@@ -81,7 +85,6 @@ bool Basemodule::setOstElement    (QString propertyName, QString elementName, QV
             QVariantMap elements=_prop["elements"].toMap();
             QVariantMap element=elements[elementName].toMap();
             if (element.contains("value")) {
-                BOOST_LOG_TRIVIAL(debug) << "setOstElement BEFORE: "  << elementValue.typeName() << "//"  << element["value"].typeName() << "-" << element["value"].toString().toStdString();
                 if (strcmp(element["value"].typeName(),"double")==0) {
                     //element["value"]=elementValue.toDouble();
                     element["value"].setValue(elementValue.toDouble());
@@ -104,7 +107,6 @@ bool Basemodule::setOstElement    (QString propertyName, QString elementName, QV
                 if (strcmp(element["value"].typeName(),"bool")==0) {
                     element["value"]=elementValue.toBool();
                 }
-                BOOST_LOG_TRIVIAL(debug) << "setOstElement AFTER : "  << elementValue.typeName() << "-" << element["value"].toString().toStdString();
             } else {
                 element["value"]=elementValue;
             }
