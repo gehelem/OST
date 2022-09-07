@@ -158,7 +158,7 @@ void Dummy::newBLOB(IBLOB *bp)
     {
         delete _image;
         _image=new fileio();
-        //_image->loadBlob(bp);
+        _image->loadBlob(bp);
 
         setOstPropertyAttribute("actions","status",IPS_OK,true);
         setOstElement("imagevalues","width",_image->getStats().width,false);
@@ -174,8 +174,8 @@ void Dummy::newBLOB(IBLOB *bp)
         _image->saveAsFITS(_webroot+"/"+getName()+QString(bp->bvp->device)+".FITS",stats,_image->getImageBuffer(),FITSImage::Solution(),rec,false);
 
         QImage rawImage = _image->getRawQImage();
-        rawImage.save(_webroot+"/"+getName()+QString(bp->bvp->device)+".jpeg","JPG",50);
-        setOstPropertyAttribute("testimage","URL",QString(bp->bvp->device)+".jpeg",true);
+        rawImage.save(_webroot+"/"+getName()+QString(bp->bvp->device)+".jpeg","JPG",100);
+        setOstPropertyAttribute("testimage","URL",getName()+QString(bp->bvp->device)+".jpeg",true);
 
     }
     setOstPropertyAttribute("actions","status",IPS_OK,true);
