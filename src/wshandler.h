@@ -16,12 +16,15 @@ class WShandler : public QObject
 public:
     WShandler(QObject *parent);
     ~WShandler();
-    QWebSocketServer *m_pWebSocketServer;
-    QList<QWebSocket *> m_clients;
-public slots:
-    void OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData);
+public :
+    void processModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData);
 
 
+signals:
+    void closed();
+    void textRcv(QString txt);
+    void externalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData);
+private:
     void onNewConnection();
     void processTextMessage(QString message);
     void processBinaryMessage(QByteArray message);
@@ -29,10 +32,8 @@ public slots:
     void sendJsonMessage(QJsonObject json);
     void sendbinary(QByteArray *data);
     void socketDisconnected();
-signals:
-    void closed();
-    void textRcv(QString txt);
-    void externalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData);
-private:
+    QWebSocketServer *m_pWebSocketServer;
+    QList<QWebSocket *> m_clients;
+
 };
 #endif

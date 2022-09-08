@@ -26,18 +26,6 @@ WShandler::~WShandler()
     qDeleteAll(m_clients.begin(), m_clients.end());
 }
 
-//void WShandler::OnPropertyCreated(Property *pProperty, QString *pModulename)
-//{
-//}
-//void WShandler::OnPropertyUpdated(Property *pProperty, QString *pModulename)
-//{
-//}
-//void WShandler::OnPropertyAppended(Property *pProperty, QString *pModulename, double s, double x,double y,double z,double k)
-//{
-//}
-//void WShandler::OnPropertyRemoved(Property *pProperty, QString *pModulename)
-//{
-//}
 void WShandler::sendmessage(QString message)
 {
     for (int i=0;i<m_clients.size();i++) {
@@ -118,7 +106,7 @@ void WShandler::socketDisconnected()
     }
 }
 
-void WShandler::OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
+void WShandler::processModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
 {
         QJsonObject  obj;
         obj["evt"]=eventType;
