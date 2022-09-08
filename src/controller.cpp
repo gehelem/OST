@@ -91,28 +91,27 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
 
 void Controller::OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
 {
-    QJsonObject obj;
-    obj["evt"]=eventType;
-    obj["mod"]=eventModule;
-    obj["key"]=eventKey;
-    if (eventType=="moduledump") {
-        obj["dta"]=QJsonObject::fromVariantMap(eventData);
-    }
-    if (eventType=="addprop"||eventType=="setpropvalue") {
-        obj["dta"]=QJsonObject::fromVariantMap(eventData);
-    }
-    if (eventType=="delprop") {
-        obj["key"]=eventKey;
-    }
+    //QJsonObject obj;
+    //obj["evt"]=eventType;
+    //obj["mod"]=eventModule;
+    //obj["key"]=eventKey;
+    //if (eventType=="moduledump") {
+    //    obj["dta"]=QJsonObject::fromVariantMap(eventData);
+    //}
+    //if (eventType=="addprop"||eventType=="setpropvalue") {
+    //    obj["dta"]=QJsonObject::fromVariantMap(eventData);
+    //}
+    //if (eventType=="delprop") {
+    //    obj["key"]=eventKey;
+    //}
     if (eventType=="modsaveprofile") {
         QVariantMap _vm = eventData;
         dbmanager->setProfile(eventModule,eventKey,_vm);
     }
     if (eventType=="modloadprofile") {
-        QVariantMap prof;
-        dbmanager->getProfile(eventModule,eventKey,prof);
-        emit controllerEvent("setproperty",eventModule,eventKey,prof);
-
+        QVariantMap _prof;
+        dbmanager->getProfile(eventModule,eventKey,_prof);
+        emit controllerEvent("loadprofile",eventModule,eventKey,_prof);
     }
 
     //QJsonDocument doc(obj);

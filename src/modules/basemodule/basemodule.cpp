@@ -230,6 +230,30 @@ void Basemodule::OnExternalEvent(const QString &eventType, const QString  &event
         return;
     }
 
+    if ( (eventType=="loadprofile")&&(eventModule==_modulename) ) {
+        foreach(const QString& keyprop, eventData.keys()) {
+             BOOST_LOG_TRIVIAL(debug) << _modulename.toStdString() <<" *********************loadProfile " << eventModule.toStdString() << "-" << eventKey.toStdString();
+            if ( _ostproperties[keyprop].toMap().contains("hasprofile") )  {
+                BOOST_LOG_TRIVIAL(debug) << _modulename.toStdString() <<" loadProfile " << keyprop.toStdString() << "->";
+                if ( _ostproperties[keyprop].toMap().contains("value") )  {
+                    QVariant _val = eventData[keyprop].toMap()["value"];
+                    BOOST_LOG_TRIVIAL(debug) << _modulename.toStdString() <<" loadProfile " << keyprop.toStdString() << "->";
+                    setOstProperty(keyprop,_val,true);
+                }
+                if ( _ostproperties[keyprop].toMap().contains("elements") )  {
+                    foreach(const QString& keyelt, _ostproperties[keyprop].toMap()["elements"].toMap().keys()) {
+                        if ( _ostproperties[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("value") )  {
+                            QVariant _valelt = eventData[keyprop].toMap()[keyelt].toMap()["value"];
+                            BOOST_LOG_TRIVIAL(debug) << _modulename.toStdString() <<" loadProfile " << keyprop.toStdString() << "/" << keyelt.toStdString() << "->"  <<_valelt.toString().toStdString();
+                            setOstElement(keyprop,keyelt,_valelt,true);
+                        }
+                    }
+                }
+            }
+        }
+        return;
+    }
+
     foreach(const QString& keyprop, eventData.keys()) {
         foreach(const QString& keyelt, eventData[keyprop].toMap()["elements"].toMap().keys()) {
             QVariant val= eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
