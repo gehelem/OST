@@ -33,8 +33,6 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
 
 Controller::~Controller()
 {
-    /*m_pWebSocketServer->close();
-    qDeleteAll(m_clients.begin(), m_clients.end());*/
 }
 
 
@@ -106,15 +104,15 @@ void Controller::OnModuleEvent(const QString &eventType, const QString  &eventMo
     //if (eventType=="delprop") {
     //    obj["key"]=eventKey;
     //}
-    if (eventType=="modsaveprofile") {
-        QVariantMap _vm = eventData;
-        dbmanager->setProfile(eventModule,eventKey,_vm);
-    }
-    if (eventType=="modloadprofile") {
-        QVariantMap _prof;
-        dbmanager->getProfile(eventModule,eventKey,_prof);
-        emit controllerEvent("loadprofile",eventModule,eventKey,_prof);
-    }
+    //if (eventType=="modsaveprofile") {
+    //    QVariantMap _vm = eventData;
+    //    dbmanager->setProfile(eventModule,eventKey,_vm);
+    //}
+    //if (eventType=="modloadprofile") {
+    //    QVariantMap _prof;
+    //    dbmanager->getProfile(eventModule,eventKey,_prof);
+    //    emit controllerEvent("loadprofile",eventModule,eventKey,_prof);
+    //}
 
     //QJsonDocument doc(obj);
     //QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
