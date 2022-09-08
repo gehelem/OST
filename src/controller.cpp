@@ -65,7 +65,7 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
                 dbmanager->getProfile(mod->_moduletype,profile,prof);
                 mod->setProfile(prof);
                 connect(mod,&Basemodule::moduleEvent, this,&Controller::OnModuleEvent);
-                connect(mod,&Basemodule::moduleEvent, wshandler,&WShandler::OnModuleEvent);
+                //connect(mod,&Basemodule::moduleEvent, wshandler,&WShandler::OnModuleEvent);
                 connect(mod,&Basemodule::loadOtherModule, this,&Controller::LoadModule);
                 connect(this,&Controller::controllerEvent,mod,&Basemodule::OnExternalEvent);
                 emit controllerEvent("dump",name,"*",QVariantMap());
@@ -91,6 +91,8 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
 
 void Controller::OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
 {
+    wshandler->processModuleEvent(eventType,eventModule,eventKey,eventData);
+
     //QJsonObject obj;
     //obj["evt"]=eventType;
     //obj["mod"]=eventModule;
