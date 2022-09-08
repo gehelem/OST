@@ -218,6 +218,36 @@ void Basemodule::setProfile(QVariantMap profiledata)
     }
 
 }
+QVariantMap Basemodule::getProfile(void)
+{
+    QVariantMap _res;
+
+    foreach(const QString& keyprop, _ostproperties.keys()) {
+        if (_ostproperties[keyprop].toMap().contains("hasprofile")) {
+            qDebug() << _modulename << " keep   " << keyprop;
+            QVariantMap property;
+            if (_ostproperties[keyprop].toMap().contains("value")) {
+                property["value"]=_ostproperties[keyprop].toMap()["value"];
+            }
+            if (_ostproperties[keyprop].toMap().contains("elements")) {
+                QVariantMap element,elements;
+                foreach(const QString& keyelt, _ostproperties[keyprop].toMap()["elements"].toMap().keys()){
+                    if (_ostproperties[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("value")) {
+                        element["value"]=_ostproperties[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
+                        elements[keyelt]=element;
+                    }
+                }
+                property["elements"]=elements;
+
+            }
+            _res[keyprop]=property;
+
+        }
+
+    }
+
+    return _res;
+}
 void Basemodule::OnExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
 {
 
