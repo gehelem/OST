@@ -58,7 +58,7 @@ Dummy::Dummy(QString name, QString label, QString profile,QVariantMap availableM
         QVariantMap info = getAvailableModuleLibs()[key].toMap();
         QString mess;
         if (createOstProperty("mod"+key,"mod"+key,0,"Modules","root",mess)) {
-                BOOST_LOG_TRIVIAL(debug) << "createOstProperty OK : " << mess.toStdString();
+                //BOOST_LOG_TRIVIAL(debug) << "createOstProperty OK : " << mess.toStdString();
         } else {
             BOOST_LOG_TRIVIAL(debug) << "createOstProperty KO : " << mess.toStdString();
         }

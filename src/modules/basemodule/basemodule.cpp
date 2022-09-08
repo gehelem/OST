@@ -224,7 +224,6 @@ QVariantMap Basemodule::getProfile(void)
 
     foreach(const QString& keyprop, _ostproperties.keys()) {
         if (_ostproperties[keyprop].toMap().contains("hasprofile")) {
-            qDebug() << _modulename << " keep   " << keyprop;
             QVariantMap property;
             if (_ostproperties[keyprop].toMap().contains("value")) {
                 property["value"]=_ostproperties[keyprop].toMap()["value"];
@@ -238,12 +237,9 @@ QVariantMap Basemodule::getProfile(void)
                     }
                 }
                 property["elements"]=elements;
-
             }
             _res[keyprop]=property;
-
         }
-
     }
 
     return _res;
@@ -260,52 +256,31 @@ void Basemodule::OnExternalEvent(const QString &eventType, const QString  &event
         return;
     }
 
-    if ( (eventType=="loadprofile")&&(eventModule==_modulename) ) {
+    if (_modulename==eventModule) {
         foreach(const QString& keyprop, eventData.keys()) {
-             BOOST_LOG_TRIVIAL(debug) << _modulename.toStdString() <<" *********************loadProfile " << eventModule.toStdString() << "-" << eventKey.toStdString();
-            if ( _ostproperties[keyprop].toMap().contains("hasprofile") )  {
-                BOOST_LOG_TRIVIAL(debug) << _modulename.toStdString() <<" loadProfile " << keyprop.toStdString() << "->";
-                if ( _ostproperties[keyprop].toMap().contains("value") )  {
-                    QVariant _val = eventData[keyprop].toMap()["value"];
-                    BOOST_LOG_TRIVIAL(debug) << _modulename.toStdString() <<" loadProfile " << keyprop.toStdString() << "->";
-                    setOstProperty(keyprop,_val,true);
+            foreach(const QString& keyelt, eventData[keyprop].toMap()["elements"].toMap().keys()) {
+                QVariant val= eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
+                if ((keyprop=="profileactions")&&(keyelt=="load")) {
+                    setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
+                    if (val.toBool()) emit moduleEvent("modloadprofile",_modulename,getOstElementValue("profileactions","name").toString(),QVariantMap());
+                    return;
                 }
-                if ( _ostproperties[keyprop].toMap().contains("elements") )  {
-                    foreach(const QString& keyelt, _ostproperties[keyprop].toMap()["elements"].toMap().keys()) {
-                        if ( _ostproperties[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("value") )  {
-                            QVariant _valelt = eventData[keyprop].toMap()[keyelt].toMap()["value"];
-                            BOOST_LOG_TRIVIAL(debug) << _modulename.toStdString() <<" loadProfile " << keyprop.toStdString() << "/" << keyelt.toStdString() << "->"  <<_valelt.toString().toStdString();
-                            setOstElement(keyprop,keyelt,_valelt,true);
-                        }
-                    }
+                if ((keyprop=="profileactions")&&(keyelt=="save")) {
+                    setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
+                    if (val.toBool()) emit moduleEvent("modsaveprofile",_modulename,getOstElementValue("profileactions","name").toString(),getProfile());
+                    return;
+                }
+                if ((keyprop=="profileactions")&&(keyelt=="name")) {
+                    setOstElement("profileactions","name",val,true);
+                    return;
                 }
             }
         }
-        return;
+
+    OnMyExternalEvent(eventType,eventModule,eventKey,eventData);
+    OnDispatchToIndiExternalEvent(eventType,eventModule,eventKey,eventData);
     }
 
-    foreach(const QString& keyprop, eventData.keys()) {
-        foreach(const QString& keyelt, eventData[keyprop].toMap()["elements"].toMap().keys()) {
-            QVariant val= eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
-            if ((keyprop=="profileactions")&&(keyelt=="load")) {
-                setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
-                if (val.toBool()) emit moduleEvent("modloadprofile",_modulename,getOstElementValue("profileactions","name").toString(),QVariantMap());
-                return;
-            }
-            if ((keyprop=="profileactions")&&(keyelt=="save")) {
-                setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
-                if (val.toBool()) emit moduleEvent("modsaveprofile",_modulename,getOstElementValue("profileactions","name").toString(),_ostproperties);
-                return;
-            }
-            if ((keyprop=="profileactions")&&(keyelt=="name")) {
-                //setOstElement("profileactions","name",val,true);
-                return;
-            }
-        }
-    }
-
-    if (_modulename==eventModule) OnMyExternalEvent(eventType,eventModule,eventKey,eventData);
-    if (_modulename==eventModule) OnDispatchToIndiExternalEvent(eventType,eventModule,eventKey,eventData);
 }
 QVariantMap Basemodule::getModuleInfo(void)
 {

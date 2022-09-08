@@ -89,31 +89,23 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
 
 void Controller::OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
 {
+
+
+    if (eventType=="modsaveprofile") {
+        Basemodule* mod= qobject_cast<Basemodule*>(sender());
+        QVariantMap _vm = mod->getProfile();
+        dbmanager->setProfile(eventModule,eventKey,_vm);
+        return;
+    }
+    if (eventType=="modloadprofile") {
+        QVariantMap _prof;
+        dbmanager->getProfile(eventModule,eventKey,_prof);
+        Basemodule* mod= qobject_cast<Basemodule*>(sender());
+        mod->setProfile(_prof);
+        return;
+
+    }
     wshandler->processModuleEvent(eventType,eventModule,eventKey,eventData);
-
-    //QJsonObject obj;
-    //obj["evt"]=eventType;
-    //obj["mod"]=eventModule;
-    //obj["key"]=eventKey;
-    //if (eventType=="moduledump") {
-    //    obj["dta"]=QJsonObject::fromVariantMap(eventData);
-    //}
-    //if (eventType=="addprop"||eventType=="setpropvalue") {
-    //    obj["dta"]=QJsonObject::fromVariantMap(eventData);
-    //}
-    //if (eventType=="delprop") {
-    //    obj["key"]=eventKey;
-    //}
-    //if (eventType=="modsaveprofile") {
-    //    QVariantMap _vm = eventData;
-    //    dbmanager->setProfile(eventModule,eventKey,_vm);
-    //}
-    //if (eventType=="modloadprofile") {
-    //    QVariantMap _prof;
-    //    dbmanager->getProfile(eventModule,eventKey,_prof);
-    //    emit controllerEvent("loadprofile",eventModule,eventKey,_prof);
-    //}
-
     //QJsonDocument doc(obj);
     //QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
     //QString strJson = QLatin1String(docByteArray);
@@ -123,7 +115,14 @@ void Controller::OnModuleEvent(const QString &eventType, const QString  &eventMo
 }
 void Controller::OnExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
 {
-    BOOST_LOG_TRIVIAL(debug) << "Controller OnExternalEvent : " << eventType.toStdString() << "-" << eventKey.toStdString();
+    //QJsonObject obj =QJsonObject::fromVariantMap(eventData);
+    //QJsonDocument doc(obj);
+    //QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
+    //QString strJson = QLatin1String(docByteArray);
+
+    //BOOST_LOG_TRIVIAL(debug) << "Controller OnExternalEvent : " << eventType.toStdString() << " : " << eventModule.toStdString() << eventKey.toStdString() << " : "<< " : " << strJson.toStdString();
+
+
     /* we should check here if incoming message is valid*/
     emit controllerEvent(eventType,eventModule,eventKey,eventData);
 }
