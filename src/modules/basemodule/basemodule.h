@@ -22,7 +22,9 @@ class Basemodule : public QObject
         void setWebroot(QString webroot) {_webroot = webroot;}
         void requestProfile(QString profileName);
         void setProfile(QVariantMap profiledata);
+        void sendDump(void);
         QVariantMap getProfile(void);
+
 
 
         QString getWebroot(void) {return _webroot;}

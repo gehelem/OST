@@ -248,7 +248,7 @@ void Basemodule::OnExternalEvent(const QString &eventType, const QString  &event
 {
 
     if ( (eventType=="dump")&&((eventModule=="*")||(eventModule==_modulename)) ) {
-        emit moduleEvent("moduledump",_modulename,"*",_ostproperties);
+        sendDump();
         return;
     }
 
@@ -288,4 +288,9 @@ QVariantMap Basemodule::getModuleInfo(void)
         }
     }
     return temp;
+}
+
+void Basemodule::sendDump(void)
+{
+    emit moduleEvent("moduledump",_modulename,"*",_ostproperties);
 }

@@ -65,7 +65,7 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
                 connect(mod,&Basemodule::moduleEvent, this,&Controller::OnModuleEvent);
                 connect(mod,&Basemodule::loadOtherModule, this,&Controller::LoadModule);
                 connect(this,&Controller::controllerEvent,mod,&Basemodule::OnExternalEvent);
-                emit controllerEvent("dump",name,"*",QVariantMap());
+                mod->sendDump();
 
                 QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(),Qt::FindChildrenRecursively);
                 for (Basemodule *othermodule : othermodules) {
