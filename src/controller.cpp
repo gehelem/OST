@@ -63,7 +63,6 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
                 dbmanager->getProfile(mod->_moduletype,profile,prof);
                 mod->setProfile(prof);
                 connect(mod,&Basemodule::moduleEvent, this,&Controller::OnModuleEvent);
-                //connect(mod,&Basemodule::moduleEvent, wshandler,&WShandler::OnModuleEvent);
                 connect(mod,&Basemodule::loadOtherModule, this,&Controller::LoadModule);
                 connect(this,&Controller::controllerEvent,mod,&Basemodule::OnExternalEvent);
                 emit controllerEvent("dump",name,"*",QVariantMap());
@@ -72,8 +71,8 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
                 for (Basemodule *othermodule : othermodules) {
                     //BOOST_LOG_TRIVIAL(debug) << "child= " << othermodule->objectName().toStdString();
                     if (othermodule->getName()!=mod->getName()) {
-                        connect(othermodule,&Basemodule::moduleEvent, mod,&Basemodule::OnExternalEvent);
-                        connect(mod,&Basemodule::moduleEvent, othermodule,&Basemodule::OnExternalEvent);
+                        //connect(othermodule,&Basemodule::moduleEvent, mod,&Basemodule::OnExternalEvent);
+                        //connect(mod,&Basemodule::moduleEvent, othermodule,&Basemodule::OnExternalEvent);
 
                     }
                 }
