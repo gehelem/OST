@@ -75,6 +75,8 @@ Dummy::~Dummy()
 void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
 {
         //BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << eventKey.toStdString();
+    if (getName()==eventModule)
+    {
         foreach(const QString& keyprop, eventData.keys()) {
             foreach(const QString& keyelt, eventData[keyprop].toMap()["elements"].toMap().keys()) {
                 setOstElement(keyprop,keyelt,eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"],true);
@@ -138,16 +140,12 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                                 _solver.stellarSolver->setSearchPositionInDegrees(ra*360/24,dec);
                                 _solver.SolveStars(_solver.stellarSolverProfiles[0]);
                             }
-
                         }
                     }
                 }
-
-
-
             }
-
         }
+    }
 }
 
 void Dummy::newBLOB(IBLOB *bp)
