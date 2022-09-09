@@ -227,6 +227,14 @@ void FocusModule::startCoarse()
     _iteration=0;
     _besthfr=99;
     _bestposfit=99;
+
+    _startpos=          getOstElementValue("parameters","startpos").toInt();
+    _steps=             getOstElementValue("parameters","steps").toInt();
+    _iterations=        getOstElementValue("parameters","iterations").toInt();
+    _loopIterations=    getOstElementValue("parameters","loopIterations").toInt();
+    _exposure=          getOstElementValue("parameters","exposure").toInt();
+    _backlash=          getOstElementValue("parameters","backlash").toInt();
+
     /*_grid->clear();
     _propertyStore.update(_grid);
     emit propertyUpdated(_grid,&_modulename);*/

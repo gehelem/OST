@@ -26,6 +26,7 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostpolar.so","polar1","Polar assistant");
     LoadModule("libostmaincontrol","mainctl","Maincontrol","default");
     LoadModule("libostdummy","dummy1","Dummy 1","default");
+    LoadModule("libostfocuser","focus1","My favorite focuser","default");
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel","indi control panel","default");
 
 }
