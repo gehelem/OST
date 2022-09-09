@@ -22,7 +22,6 @@ Maincontrol::Maincontrol(QString name, QString label, QString profile,QVariantMa
         BOOST_LOG_TRIVIAL(debug) << "lst : " << key.toStdString();
         QString err;
         createOstProperty("desc"+key,"Description",0,"Available modules",info["moduleLabel"].toString(),err);
-        createOstProperty("desc"+key,"Description",0,"Available modules",info["moduleLabel"].toString(),err);
         foreach (QString ii,info.keys()) {
             QVariant val=info[ii];
             createOstElement("desc"+key,ii,ii,false);
@@ -48,32 +47,32 @@ Maincontrol::~Maincontrol()
 void Maincontrol::OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
 {
         //BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << eventKey.toStdString();
-        foreach(const QString& keyprop, eventData.keys()) {
-            foreach(const QString& keyelt, eventData[keyprop].toMap()["elements"].toMap().keys()) {
-                if (keyelt=="instance") {
-                    if (setOstElement(keyprop,keyelt,eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"],true)) {
+        if (getName()==eventModule) {
+            foreach(const QString& keyprop, eventData.keys()) {
+                foreach(const QString& keyelt, eventData[keyprop].toMap()["elements"].toMap().keys()) {
+                    if (keyelt=="instance") {
+                        if (setOstElement(keyprop,keyelt,eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"],true)) {
+                        }
                     }
-                }
-                if (keyelt=="load") {
-                    if (setOstElement(keyprop,keyelt,eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"],true)) {
-                        QString pp = keyprop;
-                        QString elt = getOstElementValue(keyprop,"instance").toString();
-                        QString prof = "default";
-                        pp.replace("load","");
+                    if (keyelt=="load") {
+                        if (setOstElement(keyprop,keyelt,eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"],true)) {
+                            QString pp = keyprop;
+                            QString elt = getOstElementValue(keyprop,"instance").toString();
+                            QString prof = "default";
+                            pp.replace("load","");
 
-                        emit loadOtherModule(pp,
-                                             elt.replace(" ",""),
-                                             elt,
-                                             prof);
+                            emit loadOtherModule(pp,
+                                                 elt.replace(" ",""),
+                                                 elt,
+                                                 prof);
+                        }
                     }
+
+
+                    if (keyprop=="devices") {
+                    }
+
                 }
-
-
-                if (keyprop=="devices") {
-                }
-
-
-
 
             }
 
