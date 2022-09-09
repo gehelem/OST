@@ -247,7 +247,7 @@ QVariantMap Basemodule::getProfile(void)
 void Basemodule::OnExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
 {
 
-    if ( (eventType=="dump")&&((eventModule=="*")||(eventModule==_modulename)) ) {
+    if ( (eventType=="readall")&&((eventModule=="*")||(eventModule==_modulename)) ) {
         sendDump();
         return;
     }

@@ -63,7 +63,7 @@ void WShandler::processTextMessage(QString message)
     {
         //sendAll();
         //emit changeValue(Prop());
-        emit externalEvent("dump","*","*",QVariantMap());
+        emit externalEvent("readall","*","*",QVariantMap());
 
     }
     if (obj["evt"].toString()=="setproperty")
