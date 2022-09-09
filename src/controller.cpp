@@ -155,10 +155,6 @@ void Controller::checkModules(void)
                         mod->setObjectName(lib);
                         QVariantMap info = mod->getModuleInfo();
                         _availableModuleLibs[tt]=info;
-                        QString message;
-                        foreach (QString key,info.keys()) {
-                            message = message + "--" + key+ "=" + info[key].toString();
-                        }
                         delete mod;
                     }
                 } else {
