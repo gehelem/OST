@@ -276,10 +276,11 @@ void Basemodule::OnExternalEvent(const QString &eventType, const QString  &event
                 }
             }
         }
-
+    }
+    /* dispatch any message to children */
     OnMyExternalEvent(eventType,eventModule,eventKey,eventData);
     OnDispatchToIndiExternalEvent(eventType,eventModule,eventKey,eventData);
-    }
+
 
 }
 QVariantMap Basemodule::getModuleInfo(void)
