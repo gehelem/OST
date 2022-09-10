@@ -67,7 +67,7 @@ function initWebSocket() {
             //if ((obj.event == 'updateproperty')&&(obj.property.propname=='grid')) {console.log(obj)};
             if (obj.evt == 'moduledump') {
                 m=obj.mod;
-                l=obj.mod;
+                l=obj.dta.moduleLabel.value;
                 buildmodule(m,l);
                
                 var properties = obj.dta;
@@ -242,7 +242,7 @@ function buildproperty(m,p,n) {
         div = div + "</table>";
         if (p.hasOwnProperty('URL')) {
             div = div + "<div id='gal"+mp+"' data-m"+m+" data-mp="+mp+" data-key=\"\">";
-            div = div + "<img id='im"+mp+"' src='"+p.URL+ "?"+ new Date().valueOf() +"' height='150'></div>";
+            div = div + "<img id='im"+mp+"' src='"+p.URL+ "?"+ new Date().valueOf() +"' data-m"+m+" data-mp="+mp+" data-key=\"\" height='150'></div>";
         }
         // add switchs or radio for booleans
         var tt='checkbox';
@@ -299,9 +299,10 @@ function buildproperty(m,p,n) {
                 $("[id='sw"+mp+ii+"']").change(function () {
                     var mpi=$(this).data("mpi");
                     var mp=$(this).data("mp");
-                    var check = $(this).prop('checked');
                     var n=$("[id='P"+mp+"']").data("key");
                     var p=$("[id='P"+mp+"']").data("prop");
+                    var check;
+                    if (p.permission==1) check=true; else check = $(this).prop('checked');
                     var obj = jQuery.parseJSON("{\"evt\":\"setproperty\",\"mod\":\""+m+"\",\"dta\":{\""+n+"\":"+"{\"indi\":1,\"devcat\":\""+p.devcat+"\",\"elements\":{\""+ii+"\":{\"value\":"+check+"}}}}}");
                     console.log(obj);
                     websocket.send(JSON.stringify(obj)); 
@@ -345,9 +346,13 @@ function buildPhotoform(m,p,n) {
     $("[id='gal"+mp+"']").on("click", function () {    
             var mp=$(this).data("mp");
             var p=$("[id='P"+mp+"']").data("prop");
+            var src=$("[id='im"+mp+"']").data("src");
+            console.log("[id='im"+mp+"']");
             //console.log("clic:",p.propertyLabel);
             var form = "<div id='photo"+mp+"' title='"+p.propertyLabel+"' style='modal:true'><form>";
-            form = form + "<img id='imphoto"+mp+"' src='"+p.URL+ "?"+ new Date().valueOf()+"'  style='height: 100%; width: 100%; object-fit: contain'><div>";
+            console.log("<img id='imphoto"+mp+"' src='"+src+ "'  style='height: 100%; width: 100%; object-fit: contain'><div>");
+            //form = form + "<img id='imphoto"+mp+"' src='"+p.URL+ "?"+ new Date().valueOf()+"'  style='height: 100%; width: 100%; object-fit: contain'><div>";
+            form = form + "<img id='imphoto"+mp+"' src='"+src+ "'  style='height: 100%; width: 100%; object-fit: contain'><div>";
             form = form+"</form></div>";
             
             $("[id='P"+mp+"']").append(form);
