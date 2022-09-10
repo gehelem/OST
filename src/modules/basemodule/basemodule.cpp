@@ -221,6 +221,11 @@ void Basemodule::setProfile(QVariantMap profiledata)
     }
 
 }
+void Basemodule::setProfiles(QVariantMap profilesdata)
+{
+    _availableProfiles=profilesdata;
+}
+
 QVariantMap Basemodule::getProfile(void)
 {
     QVariantMap _res;

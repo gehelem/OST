@@ -63,6 +63,9 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
                 QVariantMap prof;
                 dbmanager->getProfile(mod->_moduletype,profile,prof);
                 mod->setProfile(prof);
+                QVariantMap profs;
+                dbmanager->getProfiles(mod->_moduletype,profs);
+                mod->setProfiles(profs);
                 connect(mod,&Basemodule::moduleEvent, this,&Controller::OnModuleEvent);
                 connect(mod,&Basemodule::loadOtherModule, this,&Controller::LoadModule);
                 connect(this,&Controller::controllerEvent,mod,&Basemodule::OnExternalEvent);

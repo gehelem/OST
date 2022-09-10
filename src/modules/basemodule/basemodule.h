@@ -22,6 +22,7 @@ class Basemodule : public QObject
         void setWebroot(QString webroot) {_webroot = webroot;}
         void requestProfile(QString profileName);
         void setProfile(QVariantMap profiledata);
+        void setProfiles(QVariantMap profilesdata);
         void sendDump(void);
         QVariantMap getProfile(void);
 
@@ -71,6 +72,7 @@ class Basemodule : public QObject
         QString _modulename;
         QString _modulelabel;
         QVariantMap _availableModuleLibs;
+        QVariantMap _availableProfiles;
 
     signals:
         void moduleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData);
