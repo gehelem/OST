@@ -10,6 +10,9 @@ Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap
     Q_INIT_RESOURCE(basemodule);
     _moduletype="basemodule";
     loadPropertiesFromFile(":basemodule.json");
+    setOstProperty("moduleLabel",label,false);
+    setOstProperty("moduleType","basemodule",false);
+
 }
 Basemodule::~Basemodule()
 {
@@ -258,12 +261,12 @@ void Basemodule::OnExternalEvent(const QString &eventType, const QString  &event
                 QVariant val= eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
                 if ((keyprop=="profileactions")&&(keyelt=="load")) {
                     setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
-                    if (val.toBool()) emit moduleEvent("modloadprofile",_modulename,getOstElementValue("profileactions","name").toString(),QVariantMap());
+                    if (val.toBool()) emit moduleEvent("modloadprofile",_moduletype,getOstElementValue("profileactions","name").toString(),QVariantMap());
                     return;
                 }
                 if ((keyprop=="profileactions")&&(keyelt=="save")) {
                     setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
-                    if (val.toBool()) emit moduleEvent("modsaveprofile",_modulename,getOstElementValue("profileactions","name").toString(),getProfile());
+                    if (val.toBool()) emit moduleEvent("modsaveprofile",_moduletype,getOstElementValue("profileactions","name").toString(),getProfile());
                     return;
                 }
                 if ((keyprop=="profileactions")&&(keyelt=="name")) {

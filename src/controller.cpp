@@ -149,7 +149,7 @@ void Controller::checkModules(void)
 
 
                 if (createmodule) {
-                    Basemodule *mod = createmodule(tt,"temp",QString(),QVariantMap());
+                    Basemodule *mod = createmodule(tt,tt,QString(),QVariantMap());
                     if (mod) {
                         mod->setParent(this);
                         mod->setObjectName(lib);

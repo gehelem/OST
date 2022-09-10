@@ -17,8 +17,8 @@ FocusModule::FocusModule(QString name,QString label,QString profile,QVariantMap 
     loadPropertiesFromFile(":focus.json");
 
     setOstProperty("moduleDescription","Focus module with statemachines",true);
-    setOstProperty("moduleLabel","Focus module",true);
     setOstProperty("moduleVersion",0.1,true);
+    setOstProperty("moduleType",_moduletype,true);
 
     createOstElement("devices","camera","Camera",true);
     createOstElement("devices","focuser","Focuser",true);
@@ -175,7 +175,7 @@ void FocusModule::newBLOB(IBLOB *bp)
         setOstPropertyAttribute("image","status",IPS_OK,true);
 
         QImage rawImage = _image->getRawQImage();
-        rawImage.save(_webroot+"/"+QString(bp->bvp->device)+".jpeg","JPG",50);
+        rawImage.save(_webroot+"/"+QString(bp->bvp->device)+".jpeg","JPG",100);
         setOstPropertyAttribute("image","URL",QString(bp->bvp->device)+".jpeg",true);
 
         if (_machine.isRunning()) {

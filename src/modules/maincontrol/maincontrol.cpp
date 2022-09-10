@@ -58,11 +58,13 @@ void Maincontrol::OnMyExternalEvent(const QString &eventType, const QString  &ev
                         if (setOstElement(keyprop,keyelt,eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"],true)) {
                             QString pp = keyprop;
                             QString elt = getOstElementValue(keyprop,"instance").toString();
+                            QString eltwithoutblanks = getOstElementValue(keyprop,"instance").toString();
+                            eltwithoutblanks.replace(" ","");
                             QString prof = "default";
                             pp.replace("load","");
 
                             emit loadOtherModule(pp,
-                                                 elt.replace(" ",""),
+                                                 eltwithoutblanks,
                                                  elt,
                                                  prof);
                         }

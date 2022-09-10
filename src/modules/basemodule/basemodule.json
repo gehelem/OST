@@ -34,6 +34,13 @@
         "propertyLabel": "Version",
         "value":1
     },
+    "moduleType": {
+        "devcat": "Info",
+        "group": "",
+        "permission": 0,
+        "propertyLabel": "Module type",
+        "value":"basemodule"
+    },
     "message": {
         "devcat": "messages",
         "group": "",
