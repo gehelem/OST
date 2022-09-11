@@ -125,6 +125,7 @@ function initWebSocket() {
 
             if (obj.evt == 'delprop') { 
                     var p=removeblanks(obj.mod+obj.key);
+                    var mod=removeblanks(obj.mod);
                     dev=$("div#P"+ p ).data("devcat");
                     dev=removeblanks(obj.mod+dev);
                     group=$("#P"+ p ).data("group");
@@ -138,14 +139,21 @@ function initWebSocket() {
                     if (!($("#grpUL"+ group ).children().length > 0)){
                         //console.log("REMOVE GROUP "+group);
                         $("#grpDIV"+ group ).remove();
+                        $("#grpLI"+ group ).remove();
                         $("#grpLIL"+ group ).remove();
                         $("#grpUL" + group ).remove();
                     }
                     if (!($("#devUL"+ dev).children().length > 0)){
                         //console.log("REMOVE DEVICE "+dev);
                         $("#devDIV"+ dev ).remove();
+                        $("#devLI"+ dev ).remove();
                         $("#devLIL"+ dev ).remove();
                         $("#devUL" + dev ).remove();
+                    }
+                    if (!($("#modUL"+ mod).children().length > 0)){
+                        $("#modDIV"+ mod ).remove();
+                        $("#modH1"+ mod ).remove();
+                        $("#modUL"+ mod ).remove();
                     }
 
                 
@@ -169,12 +177,65 @@ function stopWebSocket() {
 function buildmodule(m,l) {
 
     if  (!($("div#modDIV"+m).length)) {
-        $("div#OST").append("<h1  id=modH1"+m+">"+l+"</h1>");
+        header = "<h3  id=modH1"+m+">"+l;
+        /*header = header + "<span><button class='ui-button ui-widget ui-corner-all' id='saveasmod"+m + "'";
+        header = header + " data-m="+m+" data-key=\"\"";
+        header = header + ">&#10060</button></span>";
+
+        header = header + "<span><button class='ui-button ui-widget ui-corner-all' id='savemod"+m + "'";
+        header = header + " data-m="+m+" data-key=\"\"";
+        header = header + ">&#128190</button></span>";
+
+        header = header + "<span><button class='ui-button ui-widget ui-corner-all' id='closmod"+m + "'";
+        header = header + " data-m="+m+" data-key=\"\"";
+        header = header + ">&#10060</button></span>";*/
+        if (m!="mainctl") {
+            header=header+"<span id='savemod"+m + "'class='ui-icon ui-icon-disk' data-m="+m+"></span>";
+            header=header+"<span id='saveasmod"+m + "'class='ui-icon ui-icon-copy' data-m="+m+"></span>";
+            header=header+"<span id='closemod"+m + "'class='ui-icon ui-icon-close' data-m="+m+" data-l='"+l+"'></span>";
+        }
+
+        header = header + "</h3>";
+
+        $("div#OST").append(header);
         $("div#OST").append("<div id=modDIV"+m+"></div>");
         $("div#modDIV"+m).append("<ul id=modUL"+m+"></ul>");
     };
-    $("#OST").accordion({header: "h1",collapsible: true,autoHeight: false,navigation: true,heightStyle: "content" });
+    $("#OST").accordion({header: "h3",collapsible: true,autoHeight: false,navigation: true,heightStyle: "content" });
     $("#OST").accordion("refresh");  
+
+    if (m!="mainctl") {
+        $("[id='closemod"+m+"']").css("color", "red");
+
+        $("[id='closemod"+m+"']").css("float", "right");
+        $("[id='saveasmod"+m+"']").css("float", "right");
+        $("[id='savemod"+m+"']").css("float", "right");
+
+        $("[id='savemod"+m+"']").on("click", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                //if (!confirm('Confirm save')) return;
+                var m=$(this).data("m");
+                //console.log("clic:",p.propertyLabel);
+                var obj = jQuery.parseJSON("{\"evt\":\"setproperty\",\"mod\":\""+m+"\",\"dta\":{\"profileactions\":"+"{\"indi\":1,\"elements\":{\"save\":{\"value\":true}}}}}");
+                console.log(obj);
+                websocket.send(JSON.stringify(obj));
+        });
+
+        $("[id='closemod"+m+"']").on("click", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var m=$(this).data("m");
+                var l=$(this).data("l");
+                if (!confirm("Really close module \'" + l + "\' ?")) return;
+                //console.log("clic:",p.propertyLabel);
+                var obj = jQuery.parseJSON("{\"evt\":\"setproperty\",\"mod\":\""+m+"\",\"dta\":{\"moduleactions\":"+"{\"indi\":1,\"elements\":{\"kill\":{\"value\":true}}}}}");
+                console.log(obj);
+                websocket.send(JSON.stringify(obj));
+        });
+    }
+
+
     
 }
 
