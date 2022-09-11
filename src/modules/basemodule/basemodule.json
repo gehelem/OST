@@ -2,6 +2,7 @@
     "baseVersion": {
         "devcat": "Info",
         "group": "",
+        "order":"00",
         "permission": 0,
         "propertyLabel": "BaseVersion",
         "value":1
@@ -9,6 +10,7 @@
     "moduleDescription": {
         "devcat": "Info",
         "group": "",
+        "order":"01",
         "permission": 0,
         "propertyLabel": "Module description",
         "value":"N/A"
@@ -16,6 +18,7 @@
     "moduleLabel": {
         "devcat": "Info",
         "group": "",
+        "order":"02",
         "permission": 0,
         "propertyLabel": "Module label",
         "value":"Base module label"
@@ -23,6 +26,7 @@
     "moduleName": {
         "devcat": "Info",
         "group": "",
+        "order":"03",
         "permission": 0,
         "propertyLabel": "Module name",
         "value":"basemodule"
@@ -30,6 +34,7 @@
     "moduleVersion": {
         "devcat": "Info",
         "group": "",
+        "order":"04",
         "permission": 0,
         "propertyLabel": "Version",
         "value":1
@@ -37,6 +42,7 @@
     "moduleType": {
         "devcat": "Info",
         "group": "",
+        "order":"05",
         "permission": 0,
         "propertyLabel": "Module type",
         "value":"basemodule"
