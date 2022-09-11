@@ -30,8 +30,10 @@ void IndiPanel::newDevice(INDI::BaseDevice *dp)
         QString pro = pProperty->getName();
         QString devpro = dev+pro;
         BOOST_LOG_TRIVIAL(debug) << "Indipanel new property " << devpro.toStdString();
-        createOstProperty(devpro,pProperty->getLabel(),pProperty->getPermission(),pProperty->getDeviceName(),pProperty->getGroupName());
-
+        QString mess;
+        if (!createOstProperty(devpro,pProperty->getLabel(),pProperty->getPermission(),pProperty->getDeviceName(),pProperty->getGroupName(),mess)) {
+            BOOST_LOG_TRIVIAL(debug) << "Indipanel can't create property" << mess.toStdString();
+        }
     }
 }
 void IndiPanel::removeDevice(INDI::BaseDevice *dp)
@@ -44,7 +46,10 @@ void IndiPanel::newProperty(INDI::Property *pProperty)
     QString pro = pProperty->getName();
     QString devpro = dev+pro;
     //BOOST_LOG_TRIVIAL(debug) << "Indipanel new property " << devpro.toStdString();
-    createOstProperty(devpro,pProperty->getLabel(),pProperty->getPermission(),pProperty->getDeviceName(),pProperty->getGroupName());
+    QString mess;
+    if (!createOstProperty(devpro,pProperty->getLabel(),pProperty->getPermission(),pProperty->getDeviceName(),pProperty->getGroupName(),mess)) {
+        BOOST_LOG_TRIVIAL(debug) << "Indipanel can't create property" << mess.toStdString();
+    }
     setOstPropertyAttribute(devpro,"indi",pProperty->getType(),false);
 
     switch (pProperty->getType()) {

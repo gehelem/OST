@@ -194,25 +194,25 @@ target_link_libraries(ostfocuser PRIVATE
     z
 )
 target_compile_definitions(ostfocuser PRIVATE FOCUS_MODULE)
-#
-#
-## Indipanel module
-#add_library(ostindipanel SHARED
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel/indipanel.h
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel/indipanel.cpp
-#)
-#target_link_libraries(ostindipanel PRIVATE
-#    ostindimodule
-#    Qt${QT_VERSION_MAJOR}::Core
-#    Qt${QT_VERSION_MAJOR}::Concurrent
-#    Qt${QT_VERSION_MAJOR}::Widgets
-#    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
-#    Threads::Threads
-#    z
-#)
-#target_compile_definitions(ostindipanel PRIVATE INDIPANEL_MODULE)
-#
-#
+
+
+# Indipanel module
+add_library(ostindipanel SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel/indipanel.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel/indipanel.cpp
+)
+target_link_libraries(ostindipanel PRIVATE
+    ostindimodule
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    Qt${QT_VERSION_MAJOR}::Widgets
+    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+    Threads::Threads
+    z
+)
+target_compile_definitions(ostindipanel PRIVATE INDIPANEL_MODULE)
+
+
 ## guider module
 #add_library(ostguider SHARED
 #    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/guider.h
