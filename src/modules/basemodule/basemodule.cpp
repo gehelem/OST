@@ -16,6 +16,9 @@ Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap
 }
 Basemodule::~Basemodule()
 {
+    foreach(const QString& key, _ostproperties.keys()) {
+        deleteOstProperty(key);
+    }
     Q_CLEANUP_RESOURCE(basemodule);
 }
 void Basemodule::sendMessage(QString message)
@@ -276,6 +279,10 @@ void Basemodule::OnExternalEvent(const QString &eventType, const QString  &event
                 }
                 if ((keyprop=="profileactions")&&(keyelt=="name")) {
                     setOstElement("profileactions","name",val,true);
+                    return;
+                }
+                if ((keyprop=="moduleactions")&&(keyelt=="kill")) {
+                    this->~Basemodule();
                     return;
                 }
             }

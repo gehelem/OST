@@ -67,5 +67,21 @@
                 "value": "default"
             }
         }
+    },
+    "moduleactions": {
+        "devcat": "Control",
+        "group": "",
+        "permission": 1,
+        "propertyLabel": "Controls",
+        "rule":2,
+        "elements": {
+            "kill": {
+                "elementLabel": "Kill module",
+                "value":false
+            }
+        }
+
     }
+
+
 }
