@@ -11,7 +11,7 @@ IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap
     //QTimer *timer = new QTimer(this);
     //connect(timer, &QTimer::timeout, this, &IndiModule::connectIndiTimer);
     //timer->start(10000);
-
+    qDebug() << "start indi like this : " << getOstElementValue("startup","indiatstart").toString();
 
 
 }
