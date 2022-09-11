@@ -23,6 +23,10 @@ function removeblanks (t) {
         return removeblanks(r);
     }
 }
+jQuery.fn.sortDivs = function sortDivs() {
+    $("> div", this[0]).sort(dec_sort).appendTo(this[0]);
+    function dec_sort(a, b){ return ($(b).data("order")) < ($(a).data("order")) ? 1 : -1; }
+}
 var ur = window.location.origin.replace("http://", "");
 var result = ur.replace("http://", "");
 var wsUri = "ws://"+ur+":9624";            
@@ -178,17 +182,7 @@ function buildmodule(m,l) {
 
     if  (!($("div#modDIV"+m).length)) {
         header = "<h3  id=modH1"+m+">"+l;
-        /*header = header + "<span><button class='ui-button ui-widget ui-corner-all' id='saveasmod"+m + "'";
-        header = header + " data-m="+m+" data-key=\"\"";
-        header = header + ">&#10060</button></span>";
 
-        header = header + "<span><button class='ui-button ui-widget ui-corner-all' id='savemod"+m + "'";
-        header = header + " data-m="+m+" data-key=\"\"";
-        header = header + ">&#128190</button></span>";
-
-        header = header + "<span><button class='ui-button ui-widget ui-corner-all' id='closmod"+m + "'";
-        header = header + " data-m="+m+" data-key=\"\"";
-        header = header + ">&#10060</button></span>";*/
         if (m!="mainctl") {
             header=header+"<span id='savemod"+m + "'class='ui-icon ui-icon-disk' data-m="+m+"></span>";
             header=header+"<span id='saveasmod"+m + "'class='ui-icon ui-icon-copy' data-m="+m+"></span>";
@@ -265,7 +259,7 @@ function buildproperty(m,p,n) {
     var g=removeblanks(p.group);
     var mp=removeblanks(m+n);
     if  (!($("[id='P"+mp+"']").length)) {
-        var div="<div id=P"+mp+" data-devcat='"+d+"' data-group='"+g+"' data-key='"+n+"'>";
+        var div="<div id=P"+mp+" data-devcat='"+d+"' data-group='"+g+"' data-key='"+n+"' data-order='"+p.order+"' '>";
         div = div + "<strong id='status"+mp+"' >"+'\u25ef'+"</strong>";                  // status icon
         div = div + "<strong id=title"+mp+" > "+p.propertyLabel+" </strong>";            // label 
         // Edit button is added only for writable numbers and texts (not booleans)
@@ -278,7 +272,7 @@ function buildproperty(m,p,n) {
         if (addEditBtn) {
             div = div + "<button class='ui-button ui-widget ui-corner-all' id=edit"+mp;
             div = div + " data-m"+m+" data-mp="+mp+" data-key=\"\"";
-            div = div + ">&#128393</button>";
+            div = div + "><span class='ui-icon ui-icon-pencil'></span></button>";
         }
 
         // show elements values
@@ -348,10 +342,15 @@ function buildproperty(m,p,n) {
         
         
         $("#grpUL"+m+d+g).append(div);
+
+
         $("[id='P"+mp+"']").data("prop",p);
         $("[id='P"+mp+"']").data("m",m);
         $("[id='P"+mp+"']").data("key",n);
-        
+        $("[id='P"+mp+"']").data("order",p.order);
+
+        $("#grpUL"+m+d+g).sortDivs();
+
         $.each( p.elements, function( ii, i ) {
             if ( (jQuery.type(i.value)=='boolean')) {
                 $("[id='sw"+mp+ii+"']").checkboxradio({icon: false});
