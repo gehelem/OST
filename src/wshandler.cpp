@@ -126,6 +126,17 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
             obj["key"]=eventKey;
             sendJsonMessage(obj);
         }
+        if (eventType=="pushvalues") {
+            QJsonObject  values;
+            values[eventKey]=QJsonObject::fromVariantMap(eventData);
+            obj["dta"]=values;
+            obj["key"]=eventKey;
+            sendJsonMessage(obj);
+        }
+        if (eventType=="resetvalues") {
+            obj["key"]=eventKey;
+            sendJsonMessage(obj);
+        }
         if (eventType=="setpropvalue") {
            QVariantMap prop = eventData;
            QVariantMap values;

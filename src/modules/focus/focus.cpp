@@ -221,6 +221,7 @@ void FocusModule::SMAbort()
 
 void FocusModule::startCoarse()
 {
+    resetOstElements("values");
     _posvector.clear();
     _hfdvector.clear();
     _coefficients.clear();
@@ -448,6 +449,8 @@ void FocusModule::SMCompute()
     setOstElement("values","bestposfit",_bestposfit,false);
     setOstElement("values","focpos",    _startpos + _iteration*_steps,false);
     setOstElement("values","iteration", _iteration,true);
+
+    pushOstElements("values");
 
     /*_grid->append(_startpos + _iteration*_steps,_loopHFRavg);
     _propertyStore.update(_grid);

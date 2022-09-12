@@ -65,7 +65,8 @@ function initWebSocket() {
         };
 
         websocket.onmessage = function (evt) {
-            var obj = JSON.parse( evt.data );
+            var obj = JSON.parse( evt.data);
+            //var obj = jQuery.parseJSON( evt.data );
             console.log(obj);
             //if ((obj.event == 'appendproperty')) {console.log(obj)};
             //if ((obj.event == 'updateproperty')&&(obj.property.propname=='grid')) {console.log(obj)};
@@ -73,7 +74,6 @@ function initWebSocket() {
                 m=obj.mod;
                 l=obj.dta.moduleLabel.value;
                 buildmodule(m,l);
-               
                 var properties = obj.dta;
                 $.each( properties, function(iprop,prop) {
                     builddevcat(m,prop);
@@ -317,18 +317,28 @@ function buildproperty(m,p,n) {
             div = div + "<div id='grid"+mp+"' data-m"+m+" data-mp="+mp+" data-key=\"\"><table><tr>";
             $.each( p.elements, function( ii, i ) {
                 div = div + "<th>"+i.elementLabel+"</th>";
-                arr=i.gridvalues;                
+                //arr=i.gridvalues;
             })                
             div = div + "</tr>";
-            var ligne=0;
-            for (const val of arr) {
+
+
+            $.each( p.grid, function( ii, ligne ) {
+                    div = div + "<tr>";
+                    $.each( ligne, function( cc, c ) {
+                        div = div + "<td>"+c+"</td>";
+                    })
+                    div = div + "</tr>";
+            })
+
+
+            /*for (const val of arr) {
                 div = div + "<tr>";
                 $.each( p.elements, function( ii, i ) {
                     div = div + "<td>"+i.gridvalues[ligne]+"</td>";
                 })                
                 ligne++;
                 div = div + "</tr>";                
-            }            
+            }*/
             div = div + "</table></div>";
         }
 
@@ -583,6 +593,5 @@ function buildelts(m,prop,n) {
 
 
 }                
-
 </script>
 
