@@ -3,6 +3,7 @@
         "hasprofile":true,
         "devcat": "Indi",
         "group": "Control",
+        "order":"99",
         "permission": 2,
         "propertyLabel": "Server",
         "elements": {
@@ -20,6 +21,7 @@
     "serveractions": {
         "devcat": "Indi",
         "group": "Control",
+        "order":"01",
         "permission": 2,
         "rule":2,
         "propertyLabel": "Server",
@@ -34,9 +36,20 @@
             }
         }
     },
+    "devices": {
+        "hasprofile":true,
+        "devcat": "Indi",
+        "group": "Control",
+        "order":"06",
+        "permission": 2,
+        "propertyLabel": "Devices",
+        "elements": {
+        }
+    },
     "devicesactions": {
         "devcat": "Indi",
         "group": "Control",
+        "order":"04",
         "permission": 2,
         "rule":2,
         "propertyLabel": "Devices",
@@ -55,5 +68,30 @@
             }
 
         }
+    },
+    "startup": {
+        "devcat": "Indi",
+        "group": "Control",
+        "order":"08",
+        "permission": 2,
+        "rule":2,
+        "hasprofile":true,
+        "propertyLabel": "Actions on module startup",
+        "elements": {
+            "indiatstart": {
+                "elementLabel": "Connect indi"
+                ,"value":false
+            },
+            "devatstart": {
+                "elementLabel": "Connect devices"
+                ,"value":false
+            },
+            "confsatstart": {
+                "elementLabel": "Load devices conf"
+                ,"value":false
+            }
+
+        }
     }
+
 }

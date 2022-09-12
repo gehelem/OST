@@ -17,16 +17,21 @@ FocusModule::FocusModule(QString name,QString label,QString profile,QVariantMap 
     loadPropertiesFromFile(":focus.json");
 
     setOstProperty("moduleDescription","Focus module with statemachines",true);
-    setOstProperty("moduleLabel","Focus module",true);
     setOstProperty("moduleVersion",0.1,true);
+    setOstProperty("moduleType",_moduletype,true);
 
+    createOstElement("devices","camera","Camera",true);
+    createOstElement("devices","focuser","Focuser",true);
+    createOstElement("devices","mount","Mount",true);
+    setOstElement("devices","camera",   _camera,false);
+    setOstElement("devices","focuser",  _focuser,false);
+    setOstElement("devices","mount",    _mount,true);
     _startpos=          getOstElementValue("parameters","startpos").toInt();
     _steps=             getOstElementValue("parameters","steps").toInt();
     _iterations=        getOstElementValue("parameters","iterations").toInt();
     _loopIterations=    getOstElementValue("parameters","loopIterations").toInt();
     _exposure=          getOstElementValue("parameters","exposure").toInt();
     _backlash=          getOstElementValue("parameters","backlash").toInt();
-
 
 
     /*_img = new ImageProperty(_modulename,"Control","root","viewer","Image property label",0,0,0);
@@ -170,7 +175,7 @@ void FocusModule::newBLOB(IBLOB *bp)
         setOstPropertyAttribute("image","status",IPS_OK,true);
 
         QImage rawImage = _image->getRawQImage();
-        rawImage.save(_webroot+"/"+QString(bp->bvp->device)+".jpeg","JPG",50);
+        rawImage.save(_webroot+"/"+QString(bp->bvp->device)+".jpeg","JPG",100);
         setOstPropertyAttribute("image","URL",QString(bp->bvp->device)+".jpeg",true);
 
         if (_machine.isRunning()) {
@@ -222,6 +227,14 @@ void FocusModule::startCoarse()
     _iteration=0;
     _besthfr=99;
     _bestposfit=99;
+
+    _startpos=          getOstElementValue("parameters","startpos").toInt();
+    _steps=             getOstElementValue("parameters","steps").toInt();
+    _iterations=        getOstElementValue("parameters","iterations").toInt();
+    _loopIterations=    getOstElementValue("parameters","loopIterations").toInt();
+    _exposure=          getOstElementValue("parameters","exposure").toInt();
+    _backlash=          getOstElementValue("parameters","backlash").toInt();
+
     /*_grid->clear();
     _propertyStore.update(_grid);
     emit propertyUpdated(_grid,&_modulename);*/

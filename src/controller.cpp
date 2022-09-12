@@ -26,6 +26,7 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostpolar.so","polar1","Polar assistant");
     LoadModule("libostmaincontrol","mainctl","Maincontrol","default");
     LoadModule("libostdummy","dummy1","Dummy 1","default");
+    LoadModule("libostfocuser","focus1","My favorite focuser","default");
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostindipanel.so","indipanel","indi control panel","default");
 
 }
@@ -33,8 +34,6 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
 
 Controller::~Controller()
 {
-    /*m_pWebSocketServer->close();
-    qDeleteAll(m_clients.begin(), m_clients.end());*/
 }
 
 
@@ -64,18 +63,20 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
                 QVariantMap prof;
                 dbmanager->getProfile(mod->_moduletype,profile,prof);
                 mod->setProfile(prof);
+                QVariantMap profs;
+                dbmanager->getProfiles(mod->_moduletype,profs);
+                mod->setProfiles(profs);
                 connect(mod,&Basemodule::moduleEvent, this,&Controller::OnModuleEvent);
-                connect(mod,&Basemodule::moduleEvent, wshandler,&WShandler::OnModuleEvent);
                 connect(mod,&Basemodule::loadOtherModule, this,&Controller::LoadModule);
                 connect(this,&Controller::controllerEvent,mod,&Basemodule::OnExternalEvent);
-                emit controllerEvent("dump",name,"*",QVariantMap());
+                mod->sendDump();
 
                 QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(),Qt::FindChildrenRecursively);
                 for (Basemodule *othermodule : othermodules) {
                     //BOOST_LOG_TRIVIAL(debug) << "child= " << othermodule->objectName().toStdString();
                     if (othermodule->getName()!=mod->getName()) {
-                        connect(othermodule,&Basemodule::moduleEvent, mod,&Basemodule::OnExternalEvent);
-                        connect(mod,&Basemodule::moduleEvent, othermodule,&Basemodule::OnExternalEvent);
+                        //connect(othermodule,&Basemodule::moduleEvent, mod,&Basemodule::OnExternalEvent);
+                        //connect(mod,&Basemodule::moduleEvent, othermodule,&Basemodule::OnExternalEvent);
 
                     }
                 }
@@ -83,7 +84,7 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
 
             }
         } else {
-            BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library";
+            BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library : " << fulllib.toStdString();
         }
     }
 }
@@ -91,31 +92,40 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
 
 void Controller::OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
 {
-    QJsonObject obj;
-    obj["evt"]=eventType;
-    obj["mod"]=eventModule;
-    obj["key"]=eventKey;
-    if (eventType=="moduledump") {
-        obj["dta"]=QJsonObject::fromVariantMap(eventData);
-    }
-    if (eventType=="addprop"||eventType=="setpropvalue") {
-        obj["dta"]=QJsonObject::fromVariantMap(eventData);
-    }
-    if (eventType=="delprop") {
-        obj["key"]=eventKey;
-    }
 
 
-    QJsonDocument doc(obj);
-    QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
-    QString strJson = QLatin1String(docByteArray);
+    if (eventType=="modsaveprofile") {
+        Basemodule* mod= qobject_cast<Basemodule*>(sender());
+        QVariantMap _vm = mod->getProfile();
+        dbmanager->setProfile(eventModule,eventKey,_vm);
+        return;
+    }
+    if (eventType=="modloadprofile") {
+        QVariantMap _prof;
+        dbmanager->getProfile(eventModule,eventKey,_prof);
+        Basemodule* mod= qobject_cast<Basemodule*>(sender());
+        mod->setProfile(_prof);
+        return;
+
+    }
+    wshandler->processModuleEvent(eventType,eventModule,eventKey,eventData);
+    //QJsonDocument doc(obj);
+    //QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
+    //QString strJson = QLatin1String(docByteArray);
     //BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - " << mod->getName().toStdString() << " - " << eventType.toStdString() << " - " << strJson.toStdString();
 
 
 }
 void Controller::OnExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
 {
-    BOOST_LOG_TRIVIAL(debug) << "Controller OnExternalEvent : " << eventType.toStdString() << "-" << eventKey.toStdString();
+    //QJsonObject obj =QJsonObject::fromVariantMap(eventData);
+    //QJsonDocument doc(obj);
+    //QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
+    //QString strJson = QLatin1String(docByteArray);
+
+    //BOOST_LOG_TRIVIAL(debug) << "Controller OnExternalEvent : " << eventType.toStdString() << " : " << eventModule.toStdString() << eventKey.toStdString() << " : "<< " : " << strJson.toStdString();
+
+
     /* we should check here if incoming message is valid*/
     emit controllerEvent(eventType,eventModule,eventKey,eventData);
 }
@@ -129,7 +139,7 @@ void Controller::checkModules(void)
     foreach(QString lib, libs)
     {
         QString tt = lib.replace(".so","");
-        if (!(tt=="libostmaincontrol" )) {
+        if (!((tt=="libostmaincontrol" )||(tt=="libostbasemodule" )||(tt=="libostindimodule" ))) {
             QLibrary library(QCoreApplication::applicationDirPath()+"/"+lib);
             if (!library.load())
             {
@@ -142,20 +152,16 @@ void Controller::checkModules(void)
 
 
                 if (createmodule) {
-                    Basemodule *mod = createmodule(tt,"temp",QString(),QVariantMap());
+                    Basemodule *mod = createmodule(tt,tt,QString(),QVariantMap());
                     if (mod) {
                         mod->setParent(this);
                         mod->setObjectName(lib);
                         QVariantMap info = mod->getModuleInfo();
                         _availableModuleLibs[tt]=info;
-                        QString message;
-                        foreach (QString key,info.keys()) {
-                            message = message + "--" + key+ "=" + info[key].toString();
-                        }
                         delete mod;
                     }
                 } else {
-                    BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library";
+                    BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library : " << lib.toStdString();
                 }
             }
 

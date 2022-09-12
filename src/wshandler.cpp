@@ -26,18 +26,6 @@ WShandler::~WShandler()
     qDeleteAll(m_clients.begin(), m_clients.end());
 }
 
-//void WShandler::OnPropertyCreated(Property *pProperty, QString *pModulename)
-//{
-//}
-//void WShandler::OnPropertyUpdated(Property *pProperty, QString *pModulename)
-//{
-//}
-//void WShandler::OnPropertyAppended(Property *pProperty, QString *pModulename, double s, double x,double y,double z,double k)
-//{
-//}
-//void WShandler::OnPropertyRemoved(Property *pProperty, QString *pModulename)
-//{
-//}
 void WShandler::sendmessage(QString message)
 {
     for (int i=0;i<m_clients.size();i++) {
@@ -75,7 +63,7 @@ void WShandler::processTextMessage(QString message)
     {
         //sendAll();
         //emit changeValue(Prop());
-        emit externalEvent("dump","*","*",QVariantMap());
+        emit externalEvent("readall","*","*",QVariantMap());
 
     }
     if (obj["evt"].toString()=="setproperty")
@@ -118,22 +106,25 @@ void WShandler::socketDisconnected()
     }
 }
 
-void WShandler::OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
+void WShandler::processModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
 {
         QJsonObject  obj;
         obj["evt"]=eventType;
         obj["mod"]=eventModule;
         if (eventType=="moduledump") {
             obj["dta"]=QJsonObject::fromVariantMap(eventData);
+            sendJsonMessage(obj);
         }
         if (eventType=="addprop"||eventType=="addelt"||eventType=="setattributes") {
             QJsonObject  property;
             property[eventKey]=QJsonObject::fromVariantMap(eventData);
             obj["dta"]=property;
             obj["key"]=eventKey;
+            sendJsonMessage(obj);
         }
         if (eventType=="delprop") {
             obj["key"]=eventKey;
+            sendJsonMessage(obj);
         }
         if (eventType=="setpropvalue") {
            QVariantMap prop = eventData;
@@ -165,8 +156,7 @@ void WShandler::OnModuleEvent(const QString &eventType, const QString  &eventMod
             QJsonObject  property;
             property[eventKey]=QJsonObject::fromVariantMap(values);
             obj["dta"]=property;
-
+            sendJsonMessage(obj);
         }
 
-        sendJsonMessage(obj);
 }

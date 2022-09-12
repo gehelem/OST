@@ -89,6 +89,7 @@ class MODULE_INIT FocusModule : public IndiModule
 
         QString _camera  = "CCD Simulator";
         QString _focuser = "Focuser Simulator";
+        QString _mount = "Telescope Simulator";
         bool    _newblob;
 
         int    _startpos = 30000;

@@ -11,14 +11,14 @@ IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap
     //QTimer *timer = new QTimer(this);
     //connect(timer, &QTimer::timeout, this, &IndiModule::connectIndiTimer);
     //timer->start(10000);
-
+    qDebug() << "start indi like this : " << getOstElementValue("startup","indiatstart").toString();
 
 
 }
 void IndiModule::OnDispatchToIndiExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
 
 {
-
+    if (getName()==eventModule) {
         BOOST_LOG_TRIVIAL(debug) << "OnIndiExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << eventKey.toStdString();
         foreach(const QString& keyprop, eventData.keys()) {
             foreach(const QString& keyelt, eventData[keyprop].toMap()["elements"].toMap().keys()) {
@@ -57,14 +57,9 @@ void IndiModule::OnDispatchToIndiExternalEvent(const QString &eventType, const Q
                         else setOstPropertyAttribute(keyprop,"status",IPS_ALERT,true);
                     }
                 }
-
-
-
-
-
             }
-
         }
+    }
 }
 
 void IndiModule::connectIndiTimer()

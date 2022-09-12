@@ -23,6 +23,10 @@ function removeblanks (t) {
         return removeblanks(r);
     }
 }
+jQuery.fn.sortDivs = function sortDivs() {
+    $("> div", this[0]).sort(dec_sort).appendTo(this[0]);
+    function dec_sort(a, b){ return ($(b).data("order")) < ($(a).data("order")) ? 1 : -1; }
+}
 var ur = window.location.origin.replace("http://", "");
 var result = ur.replace("http://", "");
 var wsUri = "ws://"+ur+":9624";            
@@ -67,7 +71,7 @@ function initWebSocket() {
             //if ((obj.event == 'updateproperty')&&(obj.property.propname=='grid')) {console.log(obj)};
             if (obj.evt == 'moduledump') {
                 m=obj.mod;
-                l=obj.mod;
+                l=obj.dta.moduleLabel.value;
                 buildmodule(m,l);
                
                 var properties = obj.dta;
@@ -125,6 +129,7 @@ function initWebSocket() {
 
             if (obj.evt == 'delprop') { 
                     var p=removeblanks(obj.mod+obj.key);
+                    var mod=removeblanks(obj.mod);
                     dev=$("div#P"+ p ).data("devcat");
                     dev=removeblanks(obj.mod+dev);
                     group=$("#P"+ p ).data("group");
@@ -138,14 +143,21 @@ function initWebSocket() {
                     if (!($("#grpUL"+ group ).children().length > 0)){
                         //console.log("REMOVE GROUP "+group);
                         $("#grpDIV"+ group ).remove();
+                        $("#grpLI"+ group ).remove();
                         $("#grpLIL"+ group ).remove();
                         $("#grpUL" + group ).remove();
                     }
                     if (!($("#devUL"+ dev).children().length > 0)){
                         //console.log("REMOVE DEVICE "+dev);
                         $("#devDIV"+ dev ).remove();
+                        $("#devLI"+ dev ).remove();
                         $("#devLIL"+ dev ).remove();
                         $("#devUL" + dev ).remove();
+                    }
+                    if (!($("#modUL"+ mod).children().length > 0)){
+                        $("#modDIV"+ mod ).remove();
+                        $("#modH1"+ mod ).remove();
+                        $("#modUL"+ mod ).remove();
                     }
 
                 
@@ -169,12 +181,55 @@ function stopWebSocket() {
 function buildmodule(m,l) {
 
     if  (!($("div#modDIV"+m).length)) {
-        $("div#OST").append("<h1  id=modH1"+m+">"+l+"</h1>");
+        header = "<h3  id=modH1"+m+">"+l;
+
+        if (m!="mainctl") {
+            header=header+"<span id='savemod"+m + "'class='ui-icon ui-icon-disk' data-m="+m+"></span>";
+            header=header+"<span id='saveasmod"+m + "'class='ui-icon ui-icon-copy' data-m="+m+"></span>";
+            header=header+"<span id='closemod"+m + "'class='ui-icon ui-icon-close' data-m="+m+" data-l='"+l+"'></span>";
+        }
+
+        header = header + "</h3>";
+
+        $("div#OST").append(header);
         $("div#OST").append("<div id=modDIV"+m+"></div>");
         $("div#modDIV"+m).append("<ul id=modUL"+m+"></ul>");
     };
-    $("#OST").accordion({header: "h1",collapsible: true,autoHeight: false,navigation: true,heightStyle: "content" });
+    $("#OST").accordion({header: "h3",collapsible: true,autoHeight: false,navigation: true,heightStyle: "content" });
     $("#OST").accordion("refresh");  
+
+    if (m!="mainctl") {
+        $("[id='closemod"+m+"']").css("color", "red");
+
+        $("[id='closemod"+m+"']").css("float", "right");
+        $("[id='saveasmod"+m+"']").css("float", "right");
+        $("[id='savemod"+m+"']").css("float", "right");
+
+        $("[id='savemod"+m+"']").on("click", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                //if (!confirm('Confirm save')) return;
+                var m=$(this).data("m");
+                //console.log("clic:",p.propertyLabel);
+                var obj = jQuery.parseJSON("{\"evt\":\"setproperty\",\"mod\":\""+m+"\",\"dta\":{\"profileactions\":"+"{\"indi\":1,\"elements\":{\"save\":{\"value\":true}}}}}");
+                console.log(obj);
+                websocket.send(JSON.stringify(obj));
+        });
+
+        $("[id='closemod"+m+"']").on("click", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var m=$(this).data("m");
+                var l=$(this).data("l");
+                if (!confirm("Really close module \'" + l + "\' ?")) return;
+                //console.log("clic:",p.propertyLabel);
+                var obj = jQuery.parseJSON("{\"evt\":\"setproperty\",\"mod\":\""+m+"\",\"dta\":{\"moduleactions\":"+"{\"indi\":1,\"elements\":{\"kill\":{\"value\":true}}}}}");
+                console.log(obj);
+                websocket.send(JSON.stringify(obj));
+        });
+    }
+
+
     
 }
 
@@ -204,7 +259,7 @@ function buildproperty(m,p,n) {
     var g=removeblanks(p.group);
     var mp=removeblanks(m+n);
     if  (!($("[id='P"+mp+"']").length)) {
-        var div="<div id=P"+mp+" data-devcat='"+d+"' data-group='"+g+"' data-key='"+n+"'>";
+        var div="<div id=P"+mp+" data-devcat='"+d+"' data-group='"+g+"' data-key='"+n+"' data-order='"+p.order+"' '>";
         div = div + "<strong id='status"+mp+"' >"+'\u25ef'+"</strong>";                  // status icon
         div = div + "<strong id=title"+mp+" > "+p.propertyLabel+" </strong>";            // label 
         // Edit button is added only for writable numbers and texts (not booleans)
@@ -217,7 +272,7 @@ function buildproperty(m,p,n) {
         if (addEditBtn) {
             div = div + "<button class='ui-button ui-widget ui-corner-all' id=edit"+mp;
             div = div + " data-m"+m+" data-mp="+mp+" data-key=\"\"";
-            div = div + ">&#128393</button>";
+            div = div + "><span class='ui-icon ui-icon-pencil'></span></button>";
         }
 
         // show elements values
@@ -242,7 +297,7 @@ function buildproperty(m,p,n) {
         div = div + "</table>";
         if (p.hasOwnProperty('URL')) {
             div = div + "<div id='gal"+mp+"' data-m"+m+" data-mp="+mp+" data-key=\"\">";
-            div = div + "<img id='im"+mp+"' src='"+p.URL+ "?"+ new Date().valueOf() +"' height='150'></div>";
+            div = div + "<img id='im"+mp+"' src='"+p.URL+ "?"+ new Date().valueOf() +"' data-m"+m+" data-mp="+mp+" data-key=\"\" height='150'></div>";
         }
         // add switchs or radio for booleans
         var tt='checkbox';
@@ -287,10 +342,15 @@ function buildproperty(m,p,n) {
         
         
         $("#grpUL"+m+d+g).append(div);
+
+
         $("[id='P"+mp+"']").data("prop",p);
         $("[id='P"+mp+"']").data("m",m);
         $("[id='P"+mp+"']").data("key",n);
-        
+        $("[id='P"+mp+"']").data("order",p.order);
+
+        $("#grpUL"+m+d+g).sortDivs();
+
         $.each( p.elements, function( ii, i ) {
             if ( (jQuery.type(i.value)=='boolean')) {
                 $("[id='sw"+mp+ii+"']").checkboxradio({icon: false});
@@ -299,9 +359,10 @@ function buildproperty(m,p,n) {
                 $("[id='sw"+mp+ii+"']").change(function () {
                     var mpi=$(this).data("mpi");
                     var mp=$(this).data("mp");
-                    var check = $(this).prop('checked');
                     var n=$("[id='P"+mp+"']").data("key");
                     var p=$("[id='P"+mp+"']").data("prop");
+                    var check;
+                    if (p.permission==1) check=true; else check = $(this).prop('checked');
                     var obj = jQuery.parseJSON("{\"evt\":\"setproperty\",\"mod\":\""+m+"\",\"dta\":{\""+n+"\":"+"{\"indi\":1,\"devcat\":\""+p.devcat+"\",\"elements\":{\""+ii+"\":{\"value\":"+check+"}}}}}");
                     console.log(obj);
                     websocket.send(JSON.stringify(obj)); 
@@ -345,9 +406,13 @@ function buildPhotoform(m,p,n) {
     $("[id='gal"+mp+"']").on("click", function () {    
             var mp=$(this).data("mp");
             var p=$("[id='P"+mp+"']").data("prop");
+            var src=$("[id='im"+mp+"']").data("src");
+            console.log("[id='im"+mp+"']");
             //console.log("clic:",p.propertyLabel);
             var form = "<div id='photo"+mp+"' title='"+p.propertyLabel+"' style='modal:true'><form>";
-            form = form + "<img id='imphoto"+mp+"' src='"+p.URL+ "?"+ new Date().valueOf()+"'  style='height: 100%; width: 100%; object-fit: contain'><div>";
+            console.log("<img id='imphoto"+mp+"' src='"+src+ "'  style='height: 100%; width: 100%; object-fit: contain'><div>");
+            //form = form + "<img id='imphoto"+mp+"' src='"+p.URL+ "?"+ new Date().valueOf()+"'  style='height: 100%; width: 100%; object-fit: contain'><div>";
+            form = form + "<img id='imphoto"+mp+"' src='"+src+ "'  style='height: 100%; width: 100%; object-fit: contain'><div>";
             form = form+"</form></div>";
             
             $("[id='P"+mp+"']").append(form);

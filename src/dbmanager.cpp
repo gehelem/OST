@@ -76,3 +76,19 @@ bool DBManager::getProfile(QString moduleType,QString profileName, QVariantMap &
     }
     return false;
 }
+bool DBManager::getProfiles(QString moduleType, QVariantMap &result )
+{
+    QString _sql = "SELECT PROFILENAME,ALLVALUES FROM PROFILES WHERE MODULETYPE='"+moduleType+"' ";
+    if (!_query.exec(_sql)) {
+        BOOST_LOG_TRIVIAL(debug) <<  "getProfiles ERROR SQL =" << _sql.toStdString();
+        BOOST_LOG_TRIVIAL(debug) << "getProfiles - ERROR : " << _query.lastError().text().toLocal8Bit().data();
+    }
+    while (_query.next()) {
+        QString name=_query.value(0).toString().toUtf8();
+        QJsonDocument res = QJsonDocument::fromJson(_query.value(1).toString().toUtf8());
+        QJsonObject  obj = res.object();
+        QVariantMap line = obj.toVariantMap();
+        result [name]=line;
+    }
+    return true;
+}

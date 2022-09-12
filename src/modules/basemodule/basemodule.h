@@ -17,11 +17,15 @@ class Basemodule : public QObject
 
     public:
         Basemodule(QString name, QString label,QString profile,QVariantMap availableModuleLibs);
-        ~Basemodule() = default;
+        ~Basemodule();
         void setHostport(QString host, int port);
         void setWebroot(QString webroot) {_webroot = webroot;}
         void requestProfile(QString profileName);
         void setProfile(QVariantMap profiledata);
+        void setProfiles(QVariantMap profilesdata);
+        void sendDump(void);
+        QVariantMap getProfile(void);
+
 
 
         QString getWebroot(void) {return _webroot;}
@@ -47,7 +51,7 @@ class Basemodule : public QObject
         void sendMessage(QString message);
 
         /* OST helpers */
-        void createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,const  QString &pPropertyDevcat, const QString &pPropertyGroup);
+        bool createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,const  QString &pPropertyDevcat, const QString &pPropertyGroup, QString &err);
         void emitPropertyCreation(const QString &pPropertyName);
         void deleteOstProperty(QString propertyName);
         void createOstElement (QString propertyName, QString elementName, QString elementLabel, bool emitEvent);
@@ -68,6 +72,7 @@ class Basemodule : public QObject
         QString _modulename;
         QString _modulelabel;
         QVariantMap _availableModuleLibs;
+        QVariantMap _availableProfiles;
 
     signals:
         void moduleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData);
