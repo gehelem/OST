@@ -117,7 +117,9 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
 
         if (eventType=="moduledump") {
             QJsonObject mods;
-            QJsonObject  mod = QJsonObject::fromVariantMap(eventData);
+            QJsonObject  mod;
+            mod["properties"]= QJsonObject::fromVariantMap(eventData);
+            mod["moduleLabel"]= eventData["moduleLabel"].toMap()["value"].toString();
             mods[eventModule] = mod;
             //obj["dta"]=QJsonObject::fromVariantMap(eventData);
             obj["modules"]=mods;
@@ -126,7 +128,9 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
         if (eventType=="addprop"||eventType=="addelt"||eventType=="setattributes") {
             QJsonObject mods;
             QJsonObject  mod;
-            mod[eventKey]=QJsonObject::fromVariantMap(eventData);
+            QJsonObject  prop;
+            prop[eventKey]=QJsonObject::fromVariantMap(eventData);
+            mod["properties"]=prop;
             mods[eventModule] = mod;
             obj["modules"]=mods;
             sendJsonMessage(obj);
@@ -134,7 +138,10 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
         if (eventType=="delprop") {
             QJsonObject mods;
             QJsonObject  mod;
-            mod[eventKey]=QJsonObject();
+            QJsonObject  prop;
+            prop[eventKey]=QJsonObject();
+            mod["properties"]= prop;
+
             mods[eventModule] = mod;
             obj["modules"]=mods;
             sendJsonMessage(obj);
@@ -177,9 +184,11 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
                }
                values["elements"]=elements;
             }
+            QJsonObject props;
+            props[eventKey]=QJsonObject::fromVariantMap(values);
             QJsonObject mods;
             QJsonObject  mod;
-            mod[eventKey]=QJsonObject::fromVariantMap(values);
+            mod["properties"]=props;
             mods[eventModule] = mod;
             obj["modules"]=mods;
             sendJsonMessage(obj);
