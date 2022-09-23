@@ -58,6 +58,8 @@ class Basemodule : public QObject
         void setOstProperty   (const QString &pPropertyName, QVariant _value,bool emitEvent);
         void setOstPropertyAttribute   (const QString &pPropertyName, const QString &pAttributeName, QVariant _value,bool emitEvent);
         bool setOstElement          (QString propertyName, QString elementName, QVariant elementValue, bool emitEvent);
+        bool pushOstElements        (QString propertyName);
+        bool resetOstElements      (QString propertyName);
         bool setOstElementAttribute (QString propertyName, QString elementName, QString attributeName, QVariant _value, bool emitEvent);
         QVariant getOstElementValue (QString propertyName, QString elementName){
             return _ostproperties[propertyName].toMap()["elements"].toMap()[elementName].toMap()["value"]    ;

@@ -55,7 +55,10 @@ void WShandler::onNewConnection()
 
 void WShandler::processTextMessage(QString message)
 {
-    QJsonDocument jsonResponse = QJsonDocument::fromJson(message.toUtf8()); // garder
+    QString _mess=message.replace("\\\"", "\"");
+            _mess = _mess.replace("}\"", "}");
+            _mess = _mess.replace("\"{", "{");
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(_mess.toUtf8()); // garder
     emit textRcv(message);
     QJsonObject  obj = jsonResponse.object(); // garder
     BOOST_LOG_TRIVIAL(debug) << "OST server received json" << message.toStdString();
@@ -123,6 +126,17 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
             sendJsonMessage(obj);
         }
         if (eventType=="delprop") {
+            obj["key"]=eventKey;
+            sendJsonMessage(obj);
+        }
+        if (eventType=="pushvalues") {
+            QJsonObject  values;
+            values[eventKey]=QJsonObject::fromVariantMap(eventData);
+            obj["dta"]=values;
+            obj["key"]=eventKey;
+            sendJsonMessage(obj);
+        }
+        if (eventType=="resetvalues") {
             obj["key"]=eventKey;
             sendJsonMessage(obj);
         }

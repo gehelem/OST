@@ -127,6 +127,29 @@ bool Basemodule::setOstElement    (QString propertyName, QString elementName, QV
     return true; // should return false when request is invalid, we'll see that later
 
 }
+bool Basemodule::pushOstElements        (QString propertyName)
+{
+    QVariantMap _prop = _ostproperties[propertyName].toMap();
+    QVariantList _arr=_prop["grid"].toList();
+    QVariantList _cols;
+    foreach(auto _elt,_prop["elements"].toMap()) {
+        _cols.push_back(_elt.toMap()["value"]);
+    }
+    _arr.push_back(_cols);
+    _prop["grid"]=_arr;
+    _ostproperties[propertyName] = _prop;
+    QVariantMap _mess;
+    _mess["values"]=_arr;
+    emit moduleEvent("pushvalues",_modulename,propertyName,_mess);
+
+}
+bool Basemodule::resetOstElements      (QString propertyName)
+{
+    QVariantMap _prop = _ostproperties[propertyName].toMap();
+    _prop["grid"].clear();
+    _ostproperties[propertyName] = _prop;
+    emit moduleEvent("resetvalues",_modulename,propertyName,QVariantMap());
+}
 
 void Basemodule::setOstPropertyAttribute   (const QString &pPropertyName, const QString &pAttributeName, QVariant _value,bool emitEvent)
 {
