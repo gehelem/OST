@@ -42,7 +42,7 @@
         "group": "Control",
         "order":"06",
         "permission": 2,
-        "propertyLabel": "Devices",
+        "propertyLabel": "Devices actions",
         "elements": {
         }
     },
