@@ -34,11 +34,11 @@ FocusModule::FocusModule(QString name,QString label,QString profile,QVariantMap 
     _backlash=          getOstElementValue("parameters","backlash").toInt();
 
 
-    /*_img = new ImageProperty(_modulename,"Control","root","viewer","Image property label",0,0,0);
+    /*_img = new ImageProperty(_modulename,"Control","","viewer","Image property label",0,0,0);
     emit propertyCreated(_img,&_modulename);
     _propertyStore.add(_img);
 
-    _grid = new GridProperty(_modulename,"Control","root","grid","Grid property label",0,0,"SXY","Set","Pos","HFR","","");
+    _grid = new GridProperty(_modulename,"Control","","grid","Grid property label",0,0,"SXY","Set","Pos","HFR","","");
     emit propertyCreated(_grid,&_modulename);
     _propertyStore.add(_grid);*/
 

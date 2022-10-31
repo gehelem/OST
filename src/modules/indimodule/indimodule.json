@@ -2,7 +2,7 @@
     "server": {
         "hasprofile":true,
         "devcat": "Indi",
-        "group": "Control",
+        "group": "",
         "order":"99",
         "permission": 2,
         "propertyLabel": "Server",
@@ -20,7 +20,7 @@
     },
     "serveractions": {
         "devcat": "Indi",
-        "group": "Control",
+        "group": "",
         "order":"01",
         "permission": 2,
         "rule":2,
@@ -39,7 +39,7 @@
     "devices": {
         "hasprofile":true,
         "devcat": "Indi",
-        "group": "Control",
+        "group": "",
         "order":"06",
         "permission": 2,
         "propertyLabel": "Devices actions",
@@ -48,7 +48,7 @@
     },
     "devicesactions": {
         "devcat": "Indi",
-        "group": "Control",
+        "group": "",
         "order":"04",
         "permission": 2,
         "rule":2,
@@ -71,7 +71,7 @@
     },
     "startup": {
         "devcat": "Indi",
-        "group": "Control",
+        "group": "",
         "order":"08",
         "permission": 2,
         "rule":2,

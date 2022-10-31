@@ -75,7 +75,7 @@
         }
     },
     "moduleactions": {
-        "devcat": "Control",
+        "devcat": "Profiles",
         "group": "",
         "permission": 1,
         "propertyLabel": "Controls",

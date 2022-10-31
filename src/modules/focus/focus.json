@@ -1,7 +1,7 @@
 {
     "values": {
         "devcat": "Control",
-        "group": "root",
+        "group": "",
         "permission": 0,
         "propertyLabel": "Values",
         "elements": {
@@ -43,7 +43,7 @@
 
     "actions": {
         "devcat": "Control",
-        "group": "root",
+        "group": "",
         "permission": 2,
         "rule":2,
         "propertyLabel": "Actions",
@@ -65,7 +65,7 @@
 
     "parameters": {
         "devcat": "Control",
-        "group": "root",
+        "group": "",
         "permission": 2,
         "hasprofile":true,
         "propertyLabel": "Parameters",
@@ -104,7 +104,7 @@
     },
     "image": {
         "devcat": "Control",
-        "group": "root",
+        "group": "",
         "permission": 0,
         "propertyLabel": "Last image",
         "URL": ""
