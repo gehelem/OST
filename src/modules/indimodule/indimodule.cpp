@@ -24,7 +24,9 @@ void IndiModule::OnDispatchToIndiExternalEvent(const QString &eventType, const Q
             foreach(const QString& keyelt, eventData[keyprop].toMap()["elements"].toMap().keys()) {
                 setOstElement(keyprop,keyelt,eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"],true);
                 if (keyprop=="serveractions") {
+                    setOstElement(keyprop,keyelt,false,false);
                     if (keyelt=="conserv") {
+
                         setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
                         if (connectIndi()) setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
                         else setOstPropertyAttribute(keyprop,"status",IPS_ALERT,true);
@@ -36,6 +38,7 @@ void IndiModule::OnDispatchToIndiExternalEvent(const QString &eventType, const Q
                     }
                 }
                 if (keyprop=="devicesactions") {
+                    setOstElement(keyprop,keyelt,false,false);
                     if (!isServerConnected()) {
                         sendMessage("Indi server not connected");
                         setOstPropertyAttribute(keyprop,"status",IPS_ALERT,true);
