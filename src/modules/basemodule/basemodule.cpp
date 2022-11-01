@@ -139,7 +139,7 @@ bool Basemodule::pushOstElements        (QString propertyName)
     _prop["grid"]=_arr;
     _ostproperties[propertyName] = _prop;
     QVariantMap _mess;
-    _mess["values"]=_arr;
+    _mess["values"]=_cols;
     emit moduleEvent("pushvalues",_modulename,propertyName,_mess);
 
 }
