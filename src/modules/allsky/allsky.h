@@ -26,6 +26,7 @@ class MODULE_INIT Allsky : public IndiModule
         Solver _solver;
         FITSImage::Statistic stats;
         bool _isLooping = false;
+        long _index;
 
 
 

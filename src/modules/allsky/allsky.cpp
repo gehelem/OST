@@ -59,14 +59,15 @@ void Allsky::OnMyExternalEvent(const QString &eventType, const QString  &eventMo
                         }
                     }
                     if (keyelt=="loop") {
-                        if (setOstElement(keyprop,keyelt,false,false)) {
+                        if (setOstElement(keyprop,keyelt,true,false)) {
+                            setOstPropertyAttribute("actions","status",IPS_BUSY,true);
                             startLoop();
                         }
                     }
                     if (keyelt=="abort") {
                         if (setOstElement(keyprop,keyelt,false,false)) {
                             _isLooping=false;
-                            setOstElement("actions","abort",false,true);
+                            setOstElement(keyprop,"loop",false,false);
                             setOstPropertyAttribute("actions","status",IPS_OK,true);
 
                         }
@@ -79,8 +80,7 @@ void Allsky::OnMyExternalEvent(const QString &eventType, const QString  &eventMo
 void Allsky::startLoop()
 {
     _isLooping=true;
-    setOstElement("actions","loop",false,true);
-    setOstPropertyAttribute("actions","status",IPS_BUSY,true);
+    _index=0;
     connectIndi();
     connectDevice(_camera);
     setBLOBMode(B_ALSO,_camera.toStdString().c_str(),nullptr);
@@ -114,10 +114,12 @@ void Allsky::newBLOB(IBLOB *bp)
         QList<fileio::Record> rec=_image->getRecords();
         stats=_image->getStats();
         _image->saveAsFITS(_webroot+"/"+getName()+QString(bp->bvp->device)+".FITS",stats,_image->getImageBuffer(),FITSImage::Solution(),rec,false);
-
+        _index++;
         QImage rawImage = _image->getRawQImage();
         rawImage.save(_webroot+"/"+getName()+QString(bp->bvp->device)+".jpeg","JPG",100);
         setOstPropertyAttribute("image","URL",getName()+QString(bp->bvp->device)+".jpeg",true);
+
+        rawImage.save(_webroot+"/"+getName()+QString(bp->bvp->device)+_index+".jpeg","JPG",100);
 
         setOstPropertyAttribute("actions","status",IPS_BUSY,true);
         if (_isLooping)
