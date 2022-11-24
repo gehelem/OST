@@ -6,10 +6,6 @@
         "rule":2,
         "propertyLabel": "Actions",
         "elements": {
-            "coarse": {
-                "elementLabel": "Autofocus"
-                ,"value":false
-            },
             "loop": {
                 "elementLabel": "Infinite loop"
                 ,"value":false
@@ -17,10 +13,55 @@
             "abort": {
                 "elementLabel": "Abort"
                 ,"value":false
+            },
+            "batch": {
+                "elementLabel": "Start batch"
+                ,"value":false
             }
         }
     },
-
+    "imagevalues": {
+        "devcat": "Control",
+        "rule":0,
+        "elements": {
+                "width": {
+                    "elementLabel": "Width",
+                    "value":0
+                },
+                "height": {
+                    "elementLabel": "Height",
+                    "value":0
+                },
+                "min": {
+                    "elementLabel": "Min ADU",
+                    "value":0
+                },
+                "max": {
+                    "elementLabel": "Max ADU",
+                    "value":0
+                },
+                "mean": {
+                    "elementLabel": "Mean ADU",
+                    "value":0
+                },
+                "median": {
+                    "elementLabel": "Median ADU",
+                    "value":0
+                },
+                "stddev": {
+                    "elementLabel": "StdDev",
+                    "value":0
+                },
+                "snr": {
+                    "elementLabel": "SNR",
+                    "step": 0.0001,
+                    "value":0
+                }
+        },
+        "group": "",
+        "permission": 0,
+        "propertyLabel": "Last image statistics"
+    },
     "parameters": {
         "devcat": "Control",
         "group": "",
@@ -28,35 +69,10 @@
         "hasprofile":true,
         "propertyLabel": "Parameters",
         "elements": {
-            "startpos": {
-                "elementLabel": "Start position",
-                "value":36000,
-                "format": "999999"
-            },
-            "steps": {
-                "elementLabel": "Steps gap",
-                "value":100,
-                "format": "999999"
-            },
-            "iterations": {
-                "elementLabel": "Iterations",
-                "value":10,
-                "format": "99"
-            },
-            "loopIterations": {
-                "elementLabel": "Average over",
-                "value":3,
-                "format": "99"
-            },
             "exposure": {
                 "elementLabel": "Exposure",
-                "value":2,
+                "value":10,
                 "format": "99.99"
-            },
-            "backlash": {
-                "elementLabel": "Backlash overshoot",
-                "value":100,
-                "format": "99999"
             }
         }
     },
