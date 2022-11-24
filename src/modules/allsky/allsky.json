@@ -1,0 +1,70 @@
+{
+    "actions": {
+        "devcat": "Control",
+        "group": "",
+        "permission": 2,
+        "rule":2,
+        "propertyLabel": "Actions",
+        "elements": {
+            "coarse": {
+                "elementLabel": "Autofocus"
+                ,"value":false
+            },
+            "loop": {
+                "elementLabel": "Infinite loop"
+                ,"value":false
+            },
+            "abort": {
+                "elementLabel": "Abort"
+                ,"value":false
+            }
+        }
+    },
+
+    "parameters": {
+        "devcat": "Control",
+        "group": "",
+        "permission": 2,
+        "hasprofile":true,
+        "propertyLabel": "Parameters",
+        "elements": {
+            "startpos": {
+                "elementLabel": "Start position",
+                "value":36000,
+                "format": "999999"
+            },
+            "steps": {
+                "elementLabel": "Steps gap",
+                "value":100,
+                "format": "999999"
+            },
+            "iterations": {
+                "elementLabel": "Iterations",
+                "value":10,
+                "format": "99"
+            },
+            "loopIterations": {
+                "elementLabel": "Average over",
+                "value":3,
+                "format": "99"
+            },
+            "exposure": {
+                "elementLabel": "Exposure",
+                "value":2,
+                "format": "99.99"
+            },
+            "backlash": {
+                "elementLabel": "Backlash overshoot",
+                "value":100,
+                "format": "99999"
+            }
+        }
+    },
+    "image": {
+        "devcat": "Control",
+        "group": "",
+        "permission": 0,
+        "propertyLabel": "Last image",
+        "URL": ""
+    }
+}

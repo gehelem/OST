@@ -270,6 +270,22 @@ target_compile_definitions(ostindipanel PRIVATE INDIPANEL_MODULE)
 #)
 #target_compile_definitions(ostinspector PRIVATE GUIDER_MODULE)
 
+# Allsky module
+add_library(ostallsky SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/allsky/allsky.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/allsky/allsky.cpp
+)
+target_link_libraries(ostallsky PRIVATE
+    ostindimodule
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    Qt${QT_VERSION_MAJOR}::Widgets
+    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
+    Threads::Threads
+    z
+)
+target_compile_definitions(ostallsky PRIVATE ALLSKY_MODULE)
+
 
 
 #install(TARGETS HeadlessObservatory RUNTIME DESTINATION bin)
