@@ -274,6 +274,7 @@ target_compile_definitions(ostindipanel PRIVATE INDIPANEL_MODULE)
 add_library(ostallsky SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/allsky/allsky.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/allsky/allsky.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/allsky/allsky.qrc
 )
 target_link_libraries(ostallsky PRIVATE
     ostindimodule
