@@ -38,7 +38,14 @@ void IndiPanel::newDevice(INDI::BaseDevice *dp)
 }
 void IndiPanel::removeDevice(INDI::BaseDevice *dp)
 {
-    Q_UNUSED(dp)
+    QString dev = dp->getDeviceName();
+    QVariantMap props=getOstProperties();
+    for(QVariantMap::const_iterator prop = props.begin(); prop != props.end(); ++prop) {
+      if (prop.value().toMap()["devcat"]==dev) {
+          BOOST_LOG_TRIVIAL(debug) << "indi remove property " << prop.key().toStdString();
+          deleteOstProperty(prop.key());
+      }
+    }
 }
 void IndiPanel::newProperty(INDI::Property *pProperty)
 {
@@ -218,7 +225,7 @@ void IndiPanel::OnMyExternalEvent(const QString &eventType, const QString  &even
         QString devcat = ostprop["devcat"].toString();
         prop.replace(devcat,"");
         foreach(const QString& keyelt, eventData[keyprop].toMap()["elements"].toMap().keys()) {
-            BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << prop.toStdString() << "-" << keyelt.toStdString() << "-" << eventData[keyprop].toMap()["indi"].toInt();
+            //BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << prop.toStdString() << "-" << keyelt.toStdString() << "-" << eventData[keyprop].toMap()["indi"].toInt();
             //setOstElement(keyprop,keyelt,eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"],true);
             if (eventData[keyprop].toMap()["indi"].toInt()==INDI_TEXT) {
                 BOOST_LOG_TRIVIAL(debug) << "INDI_TEXT";

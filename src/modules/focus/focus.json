@@ -1,9 +1,14 @@
 {
     "values": {
         "devcat": "Control",
-        "group": "root",
+        "group": "",
         "permission": 0,
         "propertyLabel": "Values",
+        "array":{
+            "key": "iteration",
+            "columns":["focpos","loopHFRavg"],
+            "type":"grid"
+        },
         "elements": {
             "loopHFRavg": {
                 "elementLabel": "Average HFR",
@@ -43,7 +48,7 @@
 
     "actions": {
         "devcat": "Control",
-        "group": "root",
+        "group": "",
         "permission": 2,
         "rule":2,
         "propertyLabel": "Actions",
@@ -65,7 +70,7 @@
 
     "parameters": {
         "devcat": "Control",
-        "group": "root",
+        "group": "",
         "permission": 2,
         "hasprofile":true,
         "propertyLabel": "Parameters",
@@ -104,7 +109,7 @@
     },
     "image": {
         "devcat": "Control",
-        "group": "root",
+        "group": "",
         "permission": 0,
         "propertyLabel": "Last image",
         "URL": ""
