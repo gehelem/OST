@@ -128,8 +128,8 @@ void Allsky::newBLOB(IBLOB *bp)
         QImage rawImage = _image->getRawQImage();
         rawImage.save(_webroot+"/"+getName()+QString(bp->bvp->device)+".jpeg","JPG",100);
         setOstPropertyAttribute("image","URL",getName()+QString(bp->bvp->device)+".jpeg",true);
-
-        rawImage.save(_webroot+"/"+getName()+"/batch/"+QString::number(_index)+".jpeg","JPG",100);
+        QString _n = QStringLiteral("%1").arg(_index, 10, 10, QLatin1Char('0'));
+        rawImage.save(_webroot+"/"+getName()+"/batch/"+_n+".jpeg","JPG",100);
 
         setOstPropertyAttribute("actions","status",IPS_BUSY,true);
         if (_isLooping)
