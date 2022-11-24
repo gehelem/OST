@@ -18,14 +18,14 @@ class MODULE_INIT Allsky : public IndiModule
 
     public slots:
         void OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData) override;
-        void OnSucessSEP();
-        void OnSucessSolve();
     private:
         void newBLOB(IBLOB *bp) override;
-        QString _camera;
+        void startLoop();
+        QString _camera  = "CCD Simulator";
         QPointer<fileio> _image;
         Solver _solver;
         FITSImage::Statistic stats;
+        bool _isLooping = false;
 
 
 

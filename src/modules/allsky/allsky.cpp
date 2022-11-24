@@ -19,19 +19,11 @@ Allsky::Allsky(QString name, QString label, QString profile,QVariantMap availabl
     setOstProperty("moduleVersion",0.1,true);
     setOstProperty("moduleType",_moduletype,true);
 
+    createOstElement("devices","camera","Camera",true);
+    setOstElement("devices","camera",   _camera,false);
+
     //saveAttributesToFile("allsky.json");
     _camera=getOstElementValue("devices","camera").toString();
-
-    foreach(QString key,getAvailableModuleLibs().keys()) {
-        QVariantMap info = getAvailableModuleLibs()[key].toMap();
-        QString mess;
-        if (createOstProperty("mod"+key,"mod"+key,0,"Modules","root",mess)) {
-                //BOOST_LOG_TRIVIAL(debug) << "createOstProperty OK : " << mess.toStdString();
-        } else {
-            BOOST_LOG_TRIVIAL(debug) << "createOstProperty KO : " << mess.toStdString();
-        }
-    }
-    setBLOBMode(B_ALSO,_camera.toStdString().c_str(),nullptr);
 
 }
 
@@ -66,48 +58,17 @@ void Allsky::OnMyExternalEvent(const QString &eventType, const QString  &eventMo
                             setBLOBMode(B_ALSO,_camera.toStdString().c_str(),nullptr);
                         }
                     }
-                    if (keyelt=="shoot") {
+                    if (keyelt=="loop") {
                         if (setOstElement(keyprop,keyelt,false,false)) {
-                            setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
-                            sendModNewNumber(_camera,"SIMULATOR_SETTINGS","SIM_TIME_FACTOR",0.01 );
-                            if (!sendModNewNumber(_camera,"CCD_EXPOSURE","CCD_EXPOSURE_VALUE", getOstElementValue("parameters","exposure").toDouble())) {
-                                setOstPropertyAttribute(keyprop,"status",IPS_ALERT,true);
-                            }
+                            startLoop();
                         }
                     }
-                    if (keyelt=="extract") {
+                    if (keyelt=="abort") {
                         if (setOstElement(keyprop,keyelt,false,false)) {
-                            setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
-                            stats=_image->getStats();
-                            _solver.ResetSolver(stats,_image->getImageBuffer());
-                            connect(&_solver,&Solver::successSEP,this,&Allsky::OnSucessSEP);
-                            _solver.FindStars(_solver.stellarSolverProfiles[0]);
-                        }
-                    }
-                    if (keyelt=="solve") {
-                        if (setOstElement(keyprop,keyelt,false,false)) {
-                            setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
-                            double ra,dec;
-                            if (
-                                      !getModNumber(getOstElementValue("devices","mount").toString(),"EQUATORIAL_EOD_COORD","DEC",dec)
-                                    ||!getModNumber(getOstElementValue("devices","mount").toString(),"EQUATORIAL_EOD_COORD","RA",ra)
-                               )
-                            {
-                                setOstPropertyAttribute(keyprop,"status",IPS_ALERT,true);
-                                sendMessage("Can't find mount device "+getOstElementValue("devices","mount").toString()+" solve aborted");
-                            } else {
-                                setOstElement("imagevalues","mountRA",ra*360/24,false);
-                                setOstElement("imagevalues","mountDEC",dec,false);
+                            _isLooping=false;
+                            setOstElement("actions","abort",false,true);
+                            setOstPropertyAttribute("actions","status",IPS_OK,true);
 
-                                stats=_image->getStats();
-                                _solver.ResetSolver(stats,_image->getImageBuffer());
-                                QStringList folders;
-                                folders.append(getOstElementValue("parameters","indexfolderpath").toString());
-                                _solver.stellarSolver->setIndexFolderPaths(folders);
-                                connect(&_solver,&Solver::successSolve,this,&Allsky::OnSucessSolve);
-                                _solver.stellarSolver->setSearchPositionInDegrees(ra*360/24,dec);
-                                _solver.SolveStars(_solver.stellarSolverProfiles[0]);
-                            }
                         }
                     }
                 }
@@ -115,7 +76,21 @@ void Allsky::OnMyExternalEvent(const QString &eventType, const QString  &eventMo
         }
     }
 }
+void Allsky::startLoop()
+{
+    _isLooping=true;
+    setOstElement("actions","loop",false,true);
+    setOstPropertyAttribute("actions","status",IPS_BUSY,true);
+    connectIndi();
+    connectDevice(_camera);
+    setBLOBMode(B_ALSO,_camera.toStdString().c_str(),nullptr);
+    sendModNewNumber(_camera,"SIMULATOR_SETTINGS","SIM_TIME_FACTOR",0.01 );
 
+    if (!sendModNewNumber(_camera,"CCD_EXPOSURE","CCD_EXPOSURE_VALUE", getOstElementValue("parameters","exposure").toDouble())) {
+        setOstPropertyAttribute("actions","status",IPS_ALERT,true);
+    }
+
+}
 void Allsky::newBLOB(IBLOB *bp)
 {
 
@@ -123,11 +98,11 @@ void Allsky::newBLOB(IBLOB *bp)
             (QString(bp->bvp->device) == _camera)
        )
     {
+        setOstPropertyAttribute("actions","status",IPS_OK,true);
         delete _image;
         _image=new fileio();
         _image->loadBlob(bp);
 
-        setOstPropertyAttribute("actions","status",IPS_OK,true);
         setOstElement("imagevalues","width",_image->getStats().width,false);
         setOstElement("imagevalues","height",_image->getStats().height,false);
         setOstElement("imagevalues","min",_image->getStats().min[0],false);
@@ -142,33 +117,17 @@ void Allsky::newBLOB(IBLOB *bp)
 
         QImage rawImage = _image->getRawQImage();
         rawImage.save(_webroot+"/"+getName()+QString(bp->bvp->device)+".jpeg","JPG",100);
-        setOstPropertyAttribute("testimage","URL",getName()+QString(bp->bvp->device)+".jpeg",true);
+        setOstPropertyAttribute("image","URL",getName()+QString(bp->bvp->device)+".jpeg",true);
 
-    }
-    setOstPropertyAttribute("actions","status",IPS_OK,true);
+        setOstPropertyAttribute("actions","status",IPS_BUSY,true);
+        if (_isLooping)
+        {
+            if (!sendModNewNumber(_camera,"CCD_EXPOSURE","CCD_EXPOSURE_VALUE", getOstElementValue("parameters","exposure").toDouble())) {
+                setOstPropertyAttribute("actions","status",IPS_ALERT,true);
+                _isLooping=false;
+            }
+        }
 
-
-}
-void Allsky::OnSucessSEP()
-{
-    setOstPropertyAttribute("actions","status",IPS_OK,true);
-    setOstElement("imagevalues","hfravg",_solver.HFRavg,false);
-    setOstElement("imagevalues","starscount",_solver.stars.size(),true);
-
-}
-void Allsky::OnSucessSolve()
-{
-    if (_solver.stellarSolver->failed()) {
-        sendMessage("Solver failed");
-        setOstPropertyAttribute("actions","status",IPS_ALERT,true);
-        setOstPropertyAttribute("imagevalues","status",IPS_ALERT,true);
-        setOstElement("imagevalues","solRA",0,false);
-        setOstElement("imagevalues","solDEC",0,true);
-    } else {
-        setOstPropertyAttribute("actions","status",IPS_OK,true);
-        setOstPropertyAttribute("imagevalues","status",IPS_OK,true);
-        setOstElement("imagevalues","solRA",_solver.stellarSolver->getSolution().ra,false);
-        setOstElement("imagevalues","solDEC",_solver.stellarSolver->getSolution().dec,true);
     }
 
 }
