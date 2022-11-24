@@ -81,6 +81,16 @@ void Allsky::startLoop()
 {
     _isLooping=true;
     _index=0;
+
+    QDir dir0(_webroot+"/"+getName()+"/batch/", {"*"});
+    for(const QString & filename: dir0.entryList()){
+        dir0.remove(filename);
+    }
+
+    QDir dir;
+    dir.mkdir(_webroot+"/"+getName());
+    dir.mkdir(_webroot+"/"+getName()+"/batch/");
+
     connectIndi();
     connectDevice(_camera);
     setBLOBMode(B_ALSO,_camera.toStdString().c_str(),nullptr);
@@ -119,7 +129,7 @@ void Allsky::newBLOB(IBLOB *bp)
         rawImage.save(_webroot+"/"+getName()+QString(bp->bvp->device)+".jpeg","JPG",100);
         setOstPropertyAttribute("image","URL",getName()+QString(bp->bvp->device)+".jpeg",true);
 
-        rawImage.save(_webroot+"/"+getName()+QString(bp->bvp->device)+_index+".jpeg","JPG",100);
+        rawImage.save(_webroot+"/"+getName()+"/batch/"+QString::number(_index)+".jpeg","JPG",100);
 
         setOstPropertyAttribute("actions","status",IPS_BUSY,true);
         if (_isLooping)
