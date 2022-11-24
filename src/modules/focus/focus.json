@@ -4,6 +4,11 @@
         "group": "",
         "permission": 0,
         "propertyLabel": "Values",
+        "array":{
+            "key": "iteration",
+            "columns":["focpos","loopHFRavg"],
+            "type":"grid"
+        },
         "elements": {
             "loopHFRavg": {
                 "elementLabel": "Average HFR",
