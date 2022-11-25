@@ -77,10 +77,18 @@
         }
     },
     "image": {
-        "devcat": "Control",
+        "devcat": "Results",
         "group": "",
         "permission": 0,
         "propertyLabel": "Last image",
         "URL": ""
+    },
+    "timelapse": {
+        "devcat": "Results",
+        "group": "",
+        "permission": 0,
+        "propertyLabel": "Timelapse",
+        "video": ""
     }
+
 }
