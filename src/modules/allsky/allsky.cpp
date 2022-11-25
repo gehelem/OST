@@ -1,4 +1,5 @@
 #include "allsky.h"
+#include <QPainter>
 
 Allsky *initialize(QString name,QString label,QString profile,QVariantMap availableModuleLibs)
 {
@@ -165,10 +166,25 @@ void Allsky::newBLOB(IBLOB *bp)
         _image->saveAsFITS(_webroot+"/"+getName()+QString(bp->bvp->device)+".FITS",stats,_image->getImageBuffer(),FITSImage::Solution(),rec,false);
         _index++;
         QImage rawImage = _image->getRawQImage();
-        rawImage.save(_webroot+"/"+getName()+QString(bp->bvp->device)+".jpeg","JPG",100);
+        QImage im = rawImage.convertToFormat(QImage::Format_RGB32);
+        im.setColorTable(rawImage.colorTable());
+        QRect r;
+        r.setRect(0,0,im.width(),im.height()/10);
+
+        QPainter p;
+        p.begin(&im);
+        p.setPen(QPen(Qt::red));
+        p.setFont(QFont("Times", 15, QFont::Bold));
+        p.drawText(r, Qt::AlignLeft, QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss zzz") );
+        p.end();
+
+
+
+
+        im.save(_webroot+"/"+getName()+QString(bp->bvp->device)+".jpeg","JPG",100);
         setOstPropertyAttribute("image","URL",getName()+QString(bp->bvp->device)+".jpeg",true);
         QString _n = QStringLiteral("%1").arg(_index, 10, 10, QLatin1Char('0'));
-        rawImage.save(_webroot+"/"+getName()+"/batch/"+_n+".jpeg","JPG",100);
+        im.save(_webroot+"/"+getName()+"/batch/"+_n+".jpeg","JPG",100);
 
         setOstPropertyAttribute("actions","status",IPS_BUSY,true);
         if (_isLooping)
