@@ -127,6 +127,7 @@ void Allsky::startBatch()
 }
 void Allsky::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
+    setOstPropertyAttribute("timelapse","video",getName()+"/batch/"+getName()+".mp4",true);
     sendMessage("PROCESS FINISHED (" + QString::number(exitCode) + ")");
 }
 void Allsky::processOutput()
