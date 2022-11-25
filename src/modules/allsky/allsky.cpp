@@ -25,6 +25,11 @@ Allsky::Allsky(QString name, QString label, QString profile,QVariantMap availabl
     //saveAttributesToFile("allsky.json");
     _camera=getOstElementValue("devices","camera").toString();
 
+    _process = new QProcess(this);
+    connect(_process,&QProcess::readyReadStandardOutput,this,&Allsky::processOutput);
+    connect(_process,&QProcess::readyReadStandardError, this,&Allsky::processError);
+    connect(_process,static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this,&Allsky::processFinished);
+
 }
 
 Allsky::~Allsky()
@@ -50,12 +55,9 @@ void Allsky::OnMyExternalEvent(const QString &eventType, const QString  &eventMo
                 }
 
                 if (keyprop=="actions") {
-                    if (keyelt=="blob") {
-                        if (setOstElement(keyprop,keyelt,false,false)) {
-                            setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
-                            connectDevice(_camera);
-                            connectDevice(getOstElementValue("devices","mount").toString());
-                            setBLOBMode(B_ALSO,_camera.toStdString().c_str(),nullptr);
+                    if (keyelt=="batch") {
+                        if (setOstElement(keyprop,keyelt,true,true)) {
+                            startBatch();
                         }
                     }
                     if (keyelt=="loop") {
@@ -100,6 +102,42 @@ void Allsky::startLoop()
         setOstPropertyAttribute("actions","status",IPS_ALERT,true);
     }
 
+}
+void Allsky::startBatch()
+{
+    qDebug() << "PROCESS Start Batch";
+    if (_process->state()!=0) {
+        qDebug() << "can't start process";
+    } else {
+        QString program = "ffmpeg";
+        QStringList arguments;
+        arguments << "-framerate" << "30";
+        arguments << "-pattern_type" << "glob";
+        arguments << "-i" << _webroot+"/"+getName()+"/batch/*.jpeg";
+        arguments << "-c:v" << "libx264";
+        arguments << "-pix_fmt" << "yuv420p";
+        arguments << "-framerate" << "30";
+        arguments << "-y";
+        arguments << _webroot+"/"+getName()+"/batch/"+getName()+".mp4";
+        qDebug() << "PROCESS ARGS " << arguments;
+        _process->start(program,arguments);
+
+    }
+
+}
+void Allsky::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    sendMessage("PROCESS FINISHED (" + QString::number(exitCode) + ")");
+}
+void Allsky::processOutput()
+{
+    QString output = _process->readAllStandardOutput();
+    qDebug() << "PROCESS LOG   " << output;
+}
+void Allsky::processError()
+{
+    QString output = _process->readAllStandardError();
+    sendMessage("Process log : "+output);
 }
 void Allsky::newBLOB(IBLOB *bp)
 {
