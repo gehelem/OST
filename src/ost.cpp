@@ -1,4 +1,4 @@
-#include <QCoreApplication>
+#include <QGuiApplication>
 #include "controller.h"
 #include <boost/log/trivial.hpp>
 
@@ -11,9 +11,9 @@ int main(int argc, char *argv[])
 {
 
     BOOST_LOG_TRIVIAL(info) << "OST starting up";
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setOrganizationName("alazob.team");
-    QCoreApplication::setApplicationName("ost");
+    QGuiApplication app(argc, argv,false);
+    QGuiApplication::setOrganizationName("alazob.team");
+    QGuiApplication::setApplicationName("ost");
 
     QCommandLineParser argParser;
     argParser.addHelpOption();
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 
     Q_UNUSED(controller);
 
-    int nAppReturnCode = QCoreApplication::exec();
+    int nAppReturnCode = QGuiApplication::exec();
     BOOST_LOG_TRIVIAL(info) << "OST app terminated with status : " << nAppReturnCode;
     return nAppReturnCode;
 
