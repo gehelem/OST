@@ -89,6 +89,20 @@
         "permission": 0,
         "propertyLabel": "Timelapse",
         "video": ""
+    },
+    "log": {
+        "devcat": "Results",
+        "rule":0,
+        "elements": {
+                "time": {
+                    "elementLabel": "Time"
+                },
+                "snr": {
+                    "elementLabel": "SNR"
+                }
+        },
+        "group": "",
+        "permission": 0,
+        "propertyLabel": "Log"
     }
-
 }
