@@ -126,7 +126,8 @@ bool IndiModule::disconnectIndi(void)
 void IndiModule::setBlobMode(void)
 {
     BOOST_LOG_TRIVIAL(debug) << "Looking for blob mode... ";
-    std::vector<INDI::BaseDevice *> devs = getDevices();
+
+    std::vector<INDI::BaseDevice> devs = getDevices();
     for(std::size_t i = 0; i < devs.size(); i++) {
         BOOST_LOG_TRIVIAL(debug) << "Looking for blob mode on device ... " << devs[i]->getDeviceName();
             if (devs[i]->getDriverInterface() & INDI::BaseDevice::CCD_INTERFACE)
@@ -146,7 +147,7 @@ void IndiModule::setBlobMode(void)
 bool IndiModule::connectAllDevices()
 {
     int err=0;
-    std::vector<INDI::BaseDevice *> devs = getDevices();
+    std::vector<INDI::BaseDevice> devs = getDevices();
     for(std::size_t i = 0; i < devs.size(); i++) {
         ISwitchVectorProperty *svp = devs[i]->getSwitch("CONNECTION");
 
@@ -182,7 +183,7 @@ bool IndiModule::connectAllDevices()
 bool IndiModule::disconnectAllDevices()
 {
     int err=0;
-    std::vector<INDI::BaseDevice *> devs = getDevices();
+    std::vector<INDI::BaseDevice> devs = getDevices();
 
     for(std::size_t i = 0; i < devs.size(); i++) {
         ISwitchVectorProperty *svp = devs[i]->getSwitch("CONNECTION");
@@ -213,7 +214,7 @@ bool IndiModule::connectDevice(QString deviceName)
         return false;
     }
     bool _checkdevice = false;
-    foreach (INDI::BaseDevice *dd , getDevices()) {
+    foreach (INDI::BaseDevice dd , getDevices()) {
         if (strcmp(dd->getDeviceName(),deviceName.toStdString().c_str())==0) _checkdevice=true;
     }
     if (!_checkdevice) {
@@ -270,7 +271,7 @@ bool IndiModule::disconnectDevice(QString deviceName)
 bool IndiModule::loadDevicesConfs()
 {
     int err=0;
-    std::vector<INDI::BaseDevice *> devs = getDevices();
+    std::vector<INDI::BaseDevice> devs = getDevices();
     for(std::size_t i = 0; i < devs.size(); i++) {
         sendMessage("Loading device conf " +QString(devs[i]->getDeviceName()));
         if (devs[i]->isConnected()) {

@@ -194,6 +194,10 @@ void Allsky::newBLOB(IBLOB *bp)
                 _isLooping=false;
             }
         }
+        setOstElement("log","time", QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss zzz"),false);
+        setOstElement("log","snr", _image->getStats().SNR,true);
+        pushOstElements("log");
+
 
     }
 
