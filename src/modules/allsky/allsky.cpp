@@ -85,6 +85,8 @@ void Allsky::startLoop()
     _isLooping=true;
     _index=0;
 
+    resetOstElements("log");
+
     QDir dir0(_webroot+"/"+getName()+"/batch/", {"*"});
     for(const QString & filename: dir0.entryList()){
         dir0.remove(filename);
