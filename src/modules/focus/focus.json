@@ -4,6 +4,11 @@
         "group": "",
         "permission": 0,
         "propertyLabel": "Values",
+        "GDY":{
+            "D":"focpos",
+            "Y":"loopHFRavg"
+        },
+
         "array":{
             "key": "iteration",
             "columns":["focpos","loopHFRavg"],
