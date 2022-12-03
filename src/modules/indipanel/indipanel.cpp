@@ -30,13 +30,22 @@ void IndiPanel::newDevice(INDI::BaseDevice *dp)
         QString pro = pProperty->getName();
         QString devpro = dev+pro;
         BOOST_LOG_TRIVIAL(debug) << "Indipanel new property " << devpro.toStdString();
-        createOstProperty(devpro,pProperty->getLabel(),pProperty->getPermission(),pProperty->getDeviceName(),pProperty->getGroupName());
-
+        QString mess;
+        if (!createOstProperty(devpro,pProperty->getLabel(),pProperty->getPermission(),pProperty->getDeviceName(),pProperty->getGroupName(),mess)) {
+            BOOST_LOG_TRIVIAL(debug) << "Indipanel can't create property" << mess.toStdString();
+        }
     }
 }
 void IndiPanel::removeDevice(INDI::BaseDevice *dp)
 {
-    Q_UNUSED(dp)
+    QString dev = dp->getDeviceName();
+    QVariantMap props=getOstProperties();
+    for(QVariantMap::const_iterator prop = props.begin(); prop != props.end(); ++prop) {
+      if (prop.value().toMap()["devcat"]==dev) {
+          BOOST_LOG_TRIVIAL(debug) << "indi remove property " << prop.key().toStdString();
+          deleteOstProperty(prop.key());
+      }
+    }
 }
 void IndiPanel::newProperty(INDI::Property *pProperty)
 {
@@ -44,7 +53,10 @@ void IndiPanel::newProperty(INDI::Property *pProperty)
     QString pro = pProperty->getName();
     QString devpro = dev+pro;
     //BOOST_LOG_TRIVIAL(debug) << "Indipanel new property " << devpro.toStdString();
-    createOstProperty(devpro,pProperty->getLabel(),pProperty->getPermission(),pProperty->getDeviceName(),pProperty->getGroupName());
+    QString mess;
+    if (!createOstProperty(devpro,pProperty->getLabel(),pProperty->getPermission(),pProperty->getDeviceName(),pProperty->getGroupName(),mess)) {
+        BOOST_LOG_TRIVIAL(debug) << "Indipanel can't create property" << mess.toStdString();
+    }
     setOstPropertyAttribute(devpro,"indi",pProperty->getType(),false);
 
     switch (pProperty->getType()) {
@@ -213,7 +225,7 @@ void IndiPanel::OnMyExternalEvent(const QString &eventType, const QString  &even
         QString devcat = ostprop["devcat"].toString();
         prop.replace(devcat,"");
         foreach(const QString& keyelt, eventData[keyprop].toMap()["elements"].toMap().keys()) {
-            BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << prop.toStdString() << "-" << keyelt.toStdString() << "-" << eventData[keyprop].toMap()["indi"].toInt();
+            //BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << prop.toStdString() << "-" << keyelt.toStdString() << "-" << eventData[keyprop].toMap()["indi"].toInt();
             //setOstElement(keyprop,keyelt,eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"],true);
             if (eventData[keyprop].toMap()["indi"].toInt()==INDI_TEXT) {
                 BOOST_LOG_TRIVIAL(debug) << "INDI_TEXT";

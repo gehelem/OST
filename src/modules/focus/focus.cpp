@@ -17,9 +17,15 @@ FocusModule::FocusModule(QString name,QString label,QString profile,QVariantMap 
     loadPropertiesFromFile(":focus.json");
 
     setOstProperty("moduleDescription","Focus module with statemachines",true);
-    setOstProperty("moduleLabel","Focus module",true);
     setOstProperty("moduleVersion",0.1,true);
+    setOstProperty("moduleType",_moduletype,true);
 
+    createOstElement("devices","camera","Camera",true);
+    createOstElement("devices","focuser","Focuser",true);
+    createOstElement("devices","mount","Mount",true);
+    setOstElement("devices","camera",   _camera,false);
+    setOstElement("devices","focuser",  _focuser,false);
+    setOstElement("devices","mount",    _mount,true);
     _startpos=          getOstElementValue("parameters","startpos").toInt();
     _steps=             getOstElementValue("parameters","steps").toInt();
     _iterations=        getOstElementValue("parameters","iterations").toInt();
@@ -28,12 +34,11 @@ FocusModule::FocusModule(QString name,QString label,QString profile,QVariantMap 
     _backlash=          getOstElementValue("parameters","backlash").toInt();
 
 
-
-    /*_img = new ImageProperty(_modulename,"Control","root","viewer","Image property label",0,0,0);
+    /*_img = new ImageProperty(_modulename,"Control","","viewer","Image property label",0,0,0);
     emit propertyCreated(_img,&_modulename);
     _propertyStore.add(_img);
 
-    _grid = new GridProperty(_modulename,"Control","root","grid","Grid property label",0,0,"SXY","Set","Pos","HFR","","");
+    _grid = new GridProperty(_modulename,"Control","","grid","Grid property label",0,0,"SXY","Set","Pos","HFR","","");
     emit propertyCreated(_grid,&_modulename);
     _propertyStore.add(_grid);*/
 
@@ -46,6 +51,7 @@ FocusModule::~FocusModule()
 void FocusModule::OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
 {
         //BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << eventKey.toStdString();
+    if (getName()==eventModule) {
         foreach(const QString& keyprop, eventData.keys()) {
             foreach(const QString& keyelt, eventData[keyprop].toMap()["elements"].toMap().keys()) {
                 BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << keyprop.toStdString() << "-" << keyelt.toStdString();
@@ -84,29 +90,6 @@ void FocusModule::OnMyExternalEvent(const QString &eventType, const QString  &ev
 
                 }
                 if (keyprop=="actions") {
-                    if (keyelt=="condev") {
-                        if (setOstElement(keyprop,keyelt,false,false)) {
-                            setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
-                            if (connectDevice(_camera)&&connectDevice(_focuser)) {
-                                setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
-                            } else {
-                                setOstPropertyAttribute(keyprop,"status",IPS_ALERT,true);
-                            }
-                        }
-                    }
-                    if (keyelt=="discondev") {
-                        if (setOstElement(keyprop,keyelt,false,false)) {
-                            setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
-                            disconnectDevice(_camera);
-                            disconnectDevice(_focuser);
-                        }
-                    }
-                    if (keyelt=="loadconfs") {
-                        if (setOstElement(keyprop,keyelt,false,false)) {
-                            setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
-                            loadDevicesConfs();
-                        }
-                    }
                     if (keyelt=="coarse") {
                         if (setOstElement(keyprop,keyelt,false,false)) {
                             setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
@@ -141,10 +124,8 @@ void FocusModule::OnMyExternalEvent(const QString &eventType, const QString  &ev
                     }
                 }
             }
-
-
-
         }
+    }
 }
 
 
@@ -193,7 +174,7 @@ void FocusModule::newBLOB(IBLOB *bp)
         setOstPropertyAttribute("image","status",IPS_OK,true);
 
         QImage rawImage = _image->getRawQImage();
-        rawImage.save(_webroot+"/"+QString(bp->bvp->device)+".jpeg","JPG",50);
+        rawImage.save(_webroot+"/"+QString(bp->bvp->device)+".jpeg","JPG",100);
         setOstPropertyAttribute("image","URL",QString(bp->bvp->device)+".jpeg",true);
 
         if (_machine.isRunning()) {
@@ -239,12 +220,21 @@ void FocusModule::SMAbort()
 
 void FocusModule::startCoarse()
 {
+    resetOstElements("values");
     _posvector.clear();
     _hfdvector.clear();
     _coefficients.clear();
     _iteration=0;
     _besthfr=99;
     _bestposfit=99;
+
+    _startpos=          getOstElementValue("parameters","startpos").toInt();
+    _steps=             getOstElementValue("parameters","steps").toInt();
+    _iterations=        getOstElementValue("parameters","iterations").toInt();
+    _loopIterations=    getOstElementValue("parameters","loopIterations").toInt();
+    _exposure=          getOstElementValue("parameters","exposure").toInt();
+    _backlash=          getOstElementValue("parameters","backlash").toInt();
+
     /*_grid->clear();
     _propertyStore.update(_grid);
     emit propertyUpdated(_grid,&_modulename);*/
@@ -458,6 +448,8 @@ void FocusModule::SMCompute()
     setOstElement("values","bestposfit",_bestposfit,false);
     setOstElement("values","focpos",    _startpos + _iteration*_steps,false);
     setOstElement("values","iteration", _iteration,true);
+
+    pushOstElements("values");
 
     /*_grid->append(_startpos + _iteration*_steps,_loopHFRavg);
     _propertyStore.update(_grid);

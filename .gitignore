@@ -41,3 +41,5 @@ install_manifest.txt
 solver.log
 
 db/ost.db
+
+batch/

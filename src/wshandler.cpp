@@ -26,18 +26,6 @@ WShandler::~WShandler()
     qDeleteAll(m_clients.begin(), m_clients.end());
 }
 
-//void WShandler::OnPropertyCreated(Property *pProperty, QString *pModulename)
-//{
-//}
-//void WShandler::OnPropertyUpdated(Property *pProperty, QString *pModulename)
-//{
-//}
-//void WShandler::OnPropertyAppended(Property *pProperty, QString *pModulename, double s, double x,double y,double z,double k)
-//{
-//}
-//void WShandler::OnPropertyRemoved(Property *pProperty, QString *pModulename)
-//{
-//}
 void WShandler::sendmessage(QString message)
 {
     for (int i=0;i<m_clients.size();i++) {
@@ -67,7 +55,10 @@ void WShandler::onNewConnection()
 
 void WShandler::processTextMessage(QString message)
 {
-    QJsonDocument jsonResponse = QJsonDocument::fromJson(message.toUtf8()); // garder
+    QString _mess=message.replace("\\\"", "\"");
+            _mess = _mess.replace("}\"", "}");
+            _mess = _mess.replace("\"{", "{");
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(_mess.toUtf8()); // garder
     emit textRcv(message);
     QJsonObject  obj = jsonResponse.object(); // garder
     BOOST_LOG_TRIVIAL(debug) << "OST server received json" << message.toStdString();
@@ -75,7 +66,7 @@ void WShandler::processTextMessage(QString message)
     {
         //sendAll();
         //emit changeValue(Prop());
-        emit externalEvent("dump","*","*",QVariantMap());
+        emit externalEvent("readall","*","*",QVariantMap());
 
     }
     if (obj["evt"].toString()=="setproperty")
@@ -118,22 +109,66 @@ void WShandler::socketDisconnected()
     }
 }
 
-void WShandler::OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
+void WShandler::processModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
 {
         QJsonObject  obj;
         obj["evt"]=eventType;
-        obj["mod"]=eventModule;
+        //obj["mod"]=eventModule;
+
         if (eventType=="moduledump") {
-            obj["dta"]=QJsonObject::fromVariantMap(eventData);
+            QJsonObject mods;
+            QJsonObject  mod;
+            mod["properties"]= QJsonObject::fromVariantMap(eventData);
+            mod["moduleLabel"]= eventData["moduleLabel"].toMap()["value"].toString();
+            mods[eventModule] = mod;
+            //obj["dta"]=QJsonObject::fromVariantMap(eventData);
+            obj["modules"]=mods;
+            sendJsonMessage(obj);
         }
         if (eventType=="addprop"||eventType=="addelt"||eventType=="setattributes") {
-            QJsonObject  property;
-            property[eventKey]=QJsonObject::fromVariantMap(eventData);
-            obj["dta"]=property;
-            obj["key"]=eventKey;
+            QJsonObject mods;
+            QJsonObject  mod;
+            QJsonObject  prop;
+            prop[eventKey]=QJsonObject::fromVariantMap(eventData);
+            mod["properties"]=prop;
+            mods[eventModule] = mod;
+            obj["modules"]=mods;
+            sendJsonMessage(obj);
         }
         if (eventType=="delprop") {
-            obj["key"]=eventKey;
+            QJsonObject mods;
+            QJsonObject  mod;
+            QJsonObject  prop;
+            prop[eventKey]=QJsonObject();
+            mod["properties"]= prop;
+
+            mods[eventModule] = mod;
+            obj["modules"]=mods;
+            sendJsonMessage(obj);
+        }
+        if (eventType=="pushvalues") {
+            QVariantMap values;
+            QVariantMap prop;
+            QJsonObject props;
+            QJsonObject mod;
+            QJsonObject mods;
+            props[eventKey]=QJsonObject::fromVariantMap(eventData);
+            mod["properties"]=props;
+            mods[eventModule] = mod;
+            obj["modules"]=mods;
+            sendJsonMessage(obj);
+        }
+        if (eventType=="resetvalues") {
+            QVariantMap values;
+            QVariantMap prop;
+            QJsonObject props;
+            QJsonObject mod;
+            QJsonObject mods;
+            props[eventKey]=QJsonObject::fromVariantMap(prop);
+            mod["properties"]=props;
+            mods[eventModule] = mod;
+            obj["modules"]=mods;
+            sendJsonMessage(obj);
         }
         if (eventType=="setpropvalue") {
            QVariantMap prop = eventData;
@@ -162,11 +197,14 @@ void WShandler::OnModuleEvent(const QString &eventType, const QString  &eventMod
                }
                values["elements"]=elements;
             }
-            QJsonObject  property;
-            property[eventKey]=QJsonObject::fromVariantMap(values);
-            obj["dta"]=property;
-
+            QJsonObject props;
+            props[eventKey]=QJsonObject::fromVariantMap(values);
+            QJsonObject mods;
+            QJsonObject  mod;
+            mod["properties"]=props;
+            mods[eventModule] = mod;
+            obj["modules"]=mods;
+            sendJsonMessage(obj);
         }
 
-        sendJsonMessage(obj);
 }

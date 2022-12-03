@@ -1,27 +1,19 @@
 {
-    "devices": {
-        "hasprofile":true,
-        "devcat": "Options",
-        "group": "Devices",
-        "permission": 2,
-        "propertyLabel": "Devices",
-        "elements": {
-            "camera": {
-                "elementLabel": "Camera",
-                "value": "CCD Simulator"
-            },
-            "focuser": {
-                "elementLabel": "Focuser",
-                "value": "Focuser Simulator"
-            }
-        }
-    },
-
     "values": {
         "devcat": "Control",
-        "group": "root",
+        "group": "",
         "permission": 0,
         "propertyLabel": "Values",
+        "GDY":{
+            "D":"focpos",
+            "Y":"loopHFRavg"
+        },
+
+        "array":{
+            "key": "iteration",
+            "columns":["focpos","loopHFRavg"],
+            "type":"grid"
+        },
         "elements": {
             "loopHFRavg": {
                 "elementLabel": "Average HFR",
@@ -61,19 +53,11 @@
 
     "actions": {
         "devcat": "Control",
-        "group": "root",
+        "group": "",
         "permission": 2,
         "rule":2,
         "propertyLabel": "Actions",
         "elements": {
-            "condev": {
-                "elementLabel": "Connect devices"
-                ,"value":false
-            },
-            "discondev": {
-                "elementLabel": "Disconnect devices"
-                ,"value":false
-            },
             "coarse": {
                 "elementLabel": "Autofocus"
                 ,"value":false
@@ -85,18 +69,15 @@
             "abort": {
                 "elementLabel": "Abort"
                 ,"value":false
-            },
-            "loadconfs": {
-                "elementLabel": "Load devices conf"
-                ,"value":false
             }
         }
     },
 
     "parameters": {
         "devcat": "Control",
-        "group": "root",
+        "group": "",
         "permission": 2,
+        "hasprofile":true,
         "propertyLabel": "Parameters",
         "elements": {
             "startpos": {
@@ -133,7 +114,7 @@
     },
     "image": {
         "devcat": "Control",
-        "group": "root",
+        "group": "",
         "permission": 0,
         "propertyLabel": "Last image",
         "URL": ""

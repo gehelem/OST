@@ -20,6 +20,7 @@ public:
     ~DBManager();
      bool getProfile(QString moduleType,QString profileName, QVariantMap &result );
      bool setProfile(QString moduleType,QString profileName, QVariantMap &profile );
+     bool getProfiles(QString moduleType,QVariantMap &result );
 
 private:
     void CreateDatabaseStructure();

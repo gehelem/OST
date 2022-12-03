@@ -592,7 +592,7 @@ bool fileio::debayer_16bit()
 
     if (m_ImageBufferSize != rgb_size)
     {
-        delete[] m_ImageBuffer;
+        deleteImageBuffer();
         m_ImageBuffer = new uint8_t[rgb_size];
 
         if (m_ImageBuffer == nullptr)
