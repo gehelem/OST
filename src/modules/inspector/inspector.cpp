@@ -56,10 +56,6 @@ InspectorModule::InspectorModule(QString name, QString label, QString profile,QV
     emit propertyCreated(_grid,&_modulename);
     _propertyStore.add(_grid);*/
 
-    SMBuild();
-    SMBuildLoop();
-    //setBlobMode();
-
 }
 
 InspectorModule::~InspectorModule()
@@ -94,19 +90,18 @@ void InspectorModule::OnMyExternalEvent(const QString &eventType, const QString 
                 if (keyprop=="actions") {
                     if (keyelt=="shoot") {
                         if (setOstElement(keyprop,keyelt,true,true)) {
-                            _machine.start();
+                            Shoot();
                         }
                     }
                     if (keyelt=="loop") {
                         if (setOstElement(keyprop,keyelt,true,true)) {
-                            _machineLoop.start();
+                            //
                         }
                     }
                     if (keyelt=="abort") {
                         if (setOstElement(keyprop,keyelt,false,false)) {
                             emit Abort();
-                            _machine.stop();
-                            _machineLoop.stop();
+                            //
                         }
                     }
                 }
@@ -140,7 +135,6 @@ void InspectorModule::newBLOB(IBLOB *bp)
         _image->loadBlob(bp);
         stats=_image->getStats();
         //_image->computeHistogram();
-        emit ExposureDone();
         setOstElement("imagevalues","width",_image->getStats().width,false);
         setOstElement("imagevalues","height",_image->getStats().height,false);
         setOstElement("imagevalues","min",_image->getStats().min[0],false);
@@ -149,6 +143,11 @@ void InspectorModule::newBLOB(IBLOB *bp)
         setOstElement("imagevalues","median",_image->getStats().median[0],false);
         setOstElement("imagevalues","stddev",_image->getStats().stddev[0],false);
         setOstElement("imagevalues","snr",_image->getStats().SNR,true);
+        sendMessage("SMFindStars");
+        _solver.ResetSolver(stats,_image->getImageBuffer());
+        connect(&_solver,&Solver::successSEP,this,&InspectorModule::OnSucessSEP);
+        _solver.FindStars(_solver.stellarSolverProfiles[0]);
+
     }
 
 
@@ -181,138 +180,18 @@ void InspectorModule::newSwitch(ISwitchVectorProperty *svp)
 
 }
 
-void InspectorModule::SMBuild()
-{
-    auto *Abort = new QState();
-    auto *Init  = new QState();
-    auto *End   = new QFinalState();
-
-    auto *InitInit             = new QState(Init);
-    auto *RequestFrameReset    = new QState(Init);
-    auto *WaitFrameReset       = new QState(Init);
-    auto *RequestExposure      = new QState(Init);
-    auto *WaitExposure         = new QState(Init);
-    auto *FindStars            = new QState(Init);
-    auto *Compute              = new QState(Init);
-
-    connect(InitInit            ,&QState::entered, this, &InspectorModule::SMInit);
-    connect(RequestFrameReset   ,&QState::entered, this, &InspectorModule::SMRequestFrameReset);
-    connect(RequestExposure     ,&QState::entered, this, &InspectorModule::SMRequestExposure);
-    connect(FindStars           ,&QState::entered, this, &InspectorModule::SMFindStars);
-    connect(Compute             ,&QState::entered, this, &InspectorModule::SMCompute);
-    connect(Abort,               &QState::entered, this, &InspectorModule::SMAbort);
-
-    Init->                addTransition(this,&InspectorModule::Abort                ,Abort);
-    Abort->               addTransition(this,&InspectorModule::AbortDone            ,End);
-    InitInit->            addTransition(this,&InspectorModule::InitDone             ,RequestFrameReset);
-    RequestFrameReset->   addTransition(this,&InspectorModule::RequestFrameResetDone,WaitFrameReset);
-    WaitFrameReset->      addTransition(this,&InspectorModule::FrameResetDone       ,RequestExposure);
-    RequestExposure->     addTransition(this,&InspectorModule::RequestExposureDone  ,WaitExposure);
-    WaitExposure->        addTransition(this,&InspectorModule::ExposureDone         ,FindStars);
-    FindStars->           addTransition(this,&InspectorModule::FindStarsDone        ,Compute);
-    Compute->             addTransition(this,&InspectorModule::ComputeDone          ,End);
-
-    Init->setInitialState(InitInit);
-
-    _machine.addState(Init);
-    _machine.addState(Abort);
-    _machine.addState(End);
-    _machine.setInitialState(Init);
-
-}
-void InspectorModule::SMBuildLoop()
-{
-    auto *Abort = new QState();
-    auto *Init  = new QState();
-    auto *End   = new QFinalState();
-
-    auto *InitInit             = new QState(Init);
-    auto *RequestFrameReset    = new QState(Init);
-    auto *WaitFrameReset       = new QState(Init);
-    auto *RequestExposure      = new QState(Init);
-    auto *WaitExposure         = new QState(Init);
-    auto *FindStars            = new QState(Init);
-    auto *Compute              = new QState(Init);
-
-    connect(InitInit            ,&QState::entered, this, &InspectorModule::SMInit);
-    connect(RequestFrameReset   ,&QState::entered, this, &InspectorModule::SMRequestFrameReset);
-    connect(RequestExposure     ,&QState::entered, this, &InspectorModule::SMRequestExposure);
-    connect(FindStars           ,&QState::entered, this, &InspectorModule::SMFindStars);
-    connect(Compute             ,&QState::entered, this, &InspectorModule::SMCompute);
-    connect(Abort,               &QState::entered, this, &InspectorModule::SMAbort);
-
-    Init->                addTransition(this,&InspectorModule::Abort                ,Abort);
-    Abort->               addTransition(this,&InspectorModule::AbortDone            ,End);
-    InitInit->            addTransition(this,&InspectorModule::InitDone             ,RequestFrameReset);
-    RequestFrameReset->   addTransition(this,&InspectorModule::RequestFrameResetDone,WaitFrameReset);
-    WaitFrameReset->      addTransition(this,&InspectorModule::FrameResetDone       ,RequestExposure);
-    RequestExposure->     addTransition(this,&InspectorModule::RequestExposureDone  ,WaitExposure);
-    WaitExposure->        addTransition(this,&InspectorModule::ExposureDone         ,FindStars);
-    FindStars->           addTransition(this,&InspectorModule::FindStarsDone        ,Compute);
-    Compute->             addTransition(this,&InspectorModule::ComputeDone          ,RequestExposure);
-
-    Init->setInitialState(InitInit);
-
-    _machineLoop.addState(Init);
-    _machineLoop.addState(Abort);
-    _machineLoop.addState(End);
-    _machineLoop.setInitialState(Init);
-
-}
-void InspectorModule::SMInit()
+void InspectorModule::Shoot()
 {
     connectIndi();
-    connectDevice(_camera);
-    setBLOBMode(B_ALSO,_camera.toStdString().c_str(),nullptr);
-    sendModNewNumber(_camera,"SIMULATOR_SETTINGS","SIM_TIME_FACTOR",0.01 );
-
-
-    emit InitDone();
-}
-
-void InspectorModule::SMAbort()
-{
-
-    _machine.stop();
-    _machineLoop.stop();
-    emit AbortDone();
-    BOOST_LOG_TRIVIAL(debug) << "SMAbort";
-    sendMessage("machine stopped");
-}
-
-
-void InspectorModule::SMRequestFrameReset()
-{
-    sendMessage("SMRequestFrameReset");
-
-    if (!frameReset(_camera))
-    {
-            emit abort();
-            return;
+    if (connectDevice(_camera)) {
+        setBLOBMode(B_ALSO,_camera.toStdString().c_str(),nullptr);
+        frameReset(_camera);
+        sendModNewNumber(_camera,"SIMULATOR_SETTINGS","SIM_TIME_FACTOR",0.01 );
+        sendModNewNumber(_camera,"CCD_EXPOSURE","CCD_EXPOSURE_VALUE", _exposure);
+        setOstPropertyAttribute("actions","status",IPS_BUSY,true);
+    } else {
+        setOstPropertyAttribute("actions","status",IPS_ALERT,true);
     }
-    emit RequestFrameResetDone();
-}
-
-
-
-void InspectorModule::SMRequestExposure()
-{
-    sendMessage("SMRequestExposure");
-    if (!sendModNewNumber(_camera,"CCD_EXPOSURE","CCD_EXPOSURE_VALUE", _exposure))
-    {
-        emit abort();
-        return;
-    }
-    emit RequestExposureDone();
-}
-
-void InspectorModule::SMFindStars()
-{
-    sendMessage("SMFindStars");
-    stats=_image->getStats();
-    _solver.ResetSolver(stats,_image->getImageBuffer());
-    connect(&_solver,&Solver::successSEP,this,&InspectorModule::OnSucessSEP);
-    _solver.FindStars(_solver.stellarSolverProfiles[0]);
 }
 
 void InspectorModule::OnSucessSEP()
@@ -320,6 +199,7 @@ void InspectorModule::OnSucessSEP()
     setOstPropertyAttribute("actions","status",IPS_OK,true);
     setOstElement("imagevalues","imgHFR",_solver.HFRavg,false);
     setOstElement("imagevalues","starscount",_solver.stars.size(),true);
+
 
 
     //image->saveMapToJpeg(_webroot+"/"+_modulename+".jpeg",100,_solver.stars);
@@ -357,83 +237,3 @@ void InspectorModule::OnSucessSEP()
 
     emit FindStarsDone();
 }
-
-void InspectorModule::SMCompute()
-{
-    sendMessage("SMCompute");
-
-
-
-
-    emit ComputeDone();
-}
-
-
-
-void InspectorModule::SMRequestExposureBest()
-{
-    sendMessage("SMRequestExposureBest");
-    if (!sendModNewNumber(_camera,"CCD_EXPOSURE","CCD_EXPOSURE_VALUE", _exposure))
-    {
-        emit abort();
-        return;
-    }
-    emit RequestExposureBestDone();
-}
-
-void InspectorModule::SMComputeResult()
-{
-    sendMessage("SMComputeResult");
-
-    setOstElement("imagevalues","width",_image->getStats().width,false);
-    setOstElement("imagevalues","height",_image->getStats().height,false);
-    setOstElement("imagevalues","min",_image->getStats().min[0],false);
-    setOstElement("imagevalues","max",_image->getStats().max[0],false);
-    setOstElement("imagevalues","mean",_image->getStats().mean[0],false);
-    setOstElement("imagevalues","median",_image->getStats().median[0],false);
-    setOstElement("imagevalues","stddev",_image->getStats().stddev[0],false);
-    setOstElement("imagevalues","snr",_image->getStats().SNR,false);
-    setOstElement("imagevalues","imgHFR",_solver.HFRavg,true);
-    emit ComputeResultDone();
-    // what should i do here ?
-
-}
-
-
-
-
-void InspectorModule::SMInitLoopFrame()
-{
-    sendMessage("SMInitLoopFrame");
-    _loopIteration=0;
-    _loopHFRavg=99;
-    setOstElement("imagevalues","imgHFR",_loopHFRavg,false);
-    emit InitLoopFrameDone();
-}
-
-void InspectorModule::SMComputeLoopFrame()
-{
-    sendMessage("SMComputeLoopFrame");
-    _loopIteration++;
-    _loopHFRavg=((_loopIteration-1)*_loopHFRavg + _solver.HFRavg)/_loopIteration;
-    setOstElement("imagevalues","imgHFR",_loopHFRavg,false);
-
-    qDebug() << "Loop    " << _loopIteration << "/" << _loopIterations << " = " <<  _solver.HFRavg;
-
-
-    if (_loopIteration < _loopIterations )
-    {
-        emit NextFrame();
-    }
-    else
-    {
-        emit LoopFrameDone();
-    }
-}
-
-void InspectorModule::SMAlert()
-{
-    sendMessage("SMAlert");
-    emit abort();
-}
-

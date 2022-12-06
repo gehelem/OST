@@ -50,33 +50,12 @@ class MODULE_INIT InspectorModule : public IndiModule
 
 
 
-        void SMBuild();
-        void SMBuildLoop();
-        void SMInit();
-        void SMRequestFrameReset();
-        void SMRequestExposure();
-        void SMFindStars();
-        void SMCompute();
-
-        void SMRequestExposureBest();
-        void SMComputeResult();
-        void SMInitLoopFrame();
-        void SMComputeLoopFrame();
-
-
+        void Shoot();
         void SMAlert();
         //void SMLoadblob(IBLOB *bp);
         void SMLoadblob();
         void SMAbort();
         void startCoarse();
-
-        /*TextProperty* _devices;
-        NumberProperty* _values;
-        NumberProperty* _parameters;
-        SwitchProperty* _actions;
-        ImageProperty* _img;
-        GridProperty* _grid;*/
-
 
         QString _camera  = "CCD Simulator";
         bool    _newblob;
@@ -96,8 +75,6 @@ class MODULE_INIT InspectorModule : public IndiModule
         double _bestpos;
         double _bestposfit;
         double _besthfr;
-        QStateMachine _machine;
-        QStateMachine _machineLoop;
 
 };
 
