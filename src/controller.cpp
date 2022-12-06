@@ -4,74 +4,44 @@
 /*!
  * ... ...
  */
-Controller::Controller(QObject *parent, bool saveAllBlobs, const QString& host, int port,const QString& webroot)
+Controller::Controller(bool saveAllBlobs, const QString& host, int port, const QString& webroot, const QString &dbpath)
     :_indihost(host),
       _indiport(port),
-      _webroot(webroot)
+      _webroot(webroot),
+      _dbpath(dbpath)
 {
 
-    //this->setParent(parent);
     Q_UNUSED(saveAllBlobs);
-    const QString DRIVER("QSQLITE");
-    if(QSqlDatabase::isDriverAvailable(DRIVER))
-    {
-        QSqlDatabase db = QSqlDatabase::addDatabase(DRIVER);
-        db.setDatabaseName("/home/gilles/projets/OST/db/ost.db" );
-        if(!db.open())
-                    //qDebug() << "dbOpen - ERROR: " << db.lastError().text();
-                    qDebug() << "dbOpen - ERROR: " << db.databaseName();// << db.lastError().text();
-    }
-    else
-        qDebug() << "DatabaseConnect - ERROR: no driver " << DRIVER << " available";
+
+    checkModules();
 
     wshandler = new WShandler(this);
-
-    BOOST_LOG_TRIVIAL(debug) << "Controller warmup";
-    BOOST_LOG_TRIVIAL(debug) <<  "ApplicationDirPath :" << QCoreApplication::applicationDirPath().toStdString();
-
-    MainControl *mainctl = new MainControl("maincontrol","Main control");
-    mainctl->setHostport(_indihost,_indiport);
-    mainctl->connectIndi();
-    mainctl->setWebroot(_webroot);
-    connect(mainctl,&Basemodule::propertyCreated,this,&Controller::OnPropertyCreated);
-    connect(mainctl,&Basemodule::propertyUpdated,this,&Controller::OnPropertyUpdated);
-    connect(mainctl,&Basemodule::propertyRemoved,this,&Controller::OnPropertyRemoved);
-    connect(mainctl,&Basemodule::newMessageSent, this,&Controller::OnNewMessageSent);
-    connect(mainctl,&Basemodule::moduleDumped, this,&Controller::OnModuleDumped);
-    connect(mainctl,&MainControl::loadModule, this,&Controller::OnLoadModule);
-
-    connect(mainctl,&Basemodule::propertyCreated,wshandler,&WShandler::OnPropertyCreated);
-    connect(mainctl,&Basemodule::propertyUpdated,wshandler,&WShandler::OnPropertyUpdated);
-    connect(mainctl,&Basemodule::propertyRemoved,wshandler,&WShandler::OnPropertyRemoved);
-    connect(mainctl,&Basemodule::newMessageSent,wshandler,&WShandler::OnNewMessageSent);
-    connect(mainctl,&Basemodule::moduleDumped, wshandler,&WShandler::OnModuleDumped);
+    connect(wshandler,&WShandler::externalEvent,this,&Controller::OnExternalEvent);
+    dbmanager = new DBManager(this,_dbpath);
 
 
-    connect(wshandler,&WShandler::dumpAsked,mainctl,&Basemodule::OnDumpAsked);
-    connect(wshandler,&WShandler::setPropertyText,mainctl,&Basemodule::OnSetPropertyText);
-    connect(wshandler,&WShandler::setPropertyNumber,mainctl,&Basemodule::OnSetPropertyNumber);
-    connect(wshandler,&WShandler::setPropertySwitch,mainctl,&Basemodule::OnSetPropertySwitch);
 
-
-    LoadModule(QCoreApplication::applicationDirPath()+"/libostguider.so","guider1","Guider");
-    LoadModule(QCoreApplication::applicationDirPath()+"/libostinspector.so","inspector1","Frame inspector");
-    LoadModule(QCoreApplication::applicationDirPath()+"/libostpolar.so","polar1","Polar assistant");
-    //LoadModule(QCoreApplication::applicationDirPath()+"/libostfocuser.so","focus1","Focus assistant");
-    //LoadModule(QCoreApplication::applicationDirPath()+"/libostdummy.so","dummy1","Demo module");
+    //LoadModule(QCoreApplication::applicationDirPath()+"/libostguider.so","guider1","Guider");
+    //LoadModule(QCoreApplication::applicationDirPath()+"/libostinspector.so","inspector1","Frame inspector");
+    //LoadModule(QCoreApplication::applicationDirPath()+"/libostpolar.so","polar1","Polar assistant");
+    LoadModule("libostmaincontrol","mainctl","Maincontrol","default");
+    //LoadModule("libostdummy","dummy1","Dummy 1","default");
+    LoadModule("libostfocuser","focus1","My favorite focuser","default");
+    //LoadModule("libostindipanel","indipanel","indi control panel","default");
+    LoadModule("libostallsky","allsky","Allsky Camera","default");
 
 }
 
 
 Controller::~Controller()
 {
-    /*m_pWebSocketServer->close();
-    qDeleteAll(m_clients.begin(), m_clients.end());*/
 }
 
 
-void Controller::LoadModule(QString lib,QString name,QString label)
+void Controller::LoadModule(QString lib,QString name,QString label,QString profile)
 {
-    QLibrary library(lib);
+    QString fulllib = QCoreApplication::applicationDirPath()+"/"+lib+".so";
+    QLibrary library(fulllib);
     if (!library.load())
     {
         BOOST_LOG_TRIVIAL(debug) << name.toStdString() << " " << library.errorString().toStdString();
@@ -80,89 +50,125 @@ void Controller::LoadModule(QString lib,QString name,QString label)
     {
         BOOST_LOG_TRIVIAL(debug) << name.toStdString() << " " << "library loaded";
 
-        typedef Basemodule *(*CreateModule)(QString,QString);
+        typedef Basemodule *(*CreateModule)(QString,QString,QString,QVariantMap);
         CreateModule createmodule = (CreateModule)library.resolve("initialize");
         if (createmodule) {
-            Basemodule *mod = createmodule(name,label);
-            if (mod)
-                mod->setHostport(_indihost,_indiport);
-                mod->connectIndi();
+            Basemodule *mod = createmodule(name,label,profile,_availableModuleLibs);
+            //QPointer<Basemodule> mod = createmodule(name,label,profile,_availableModuleLibs);
+            if (mod) {
+                mod->setParent(this);
+                //mod->setHostport(_indihost,_indiport);
+                //mod->connectIndi();
                 mod->setWebroot(_webroot);
-                connect(mod,&Basemodule::propertyCreated,this,&Controller::OnPropertyCreated);
-                connect(mod,&Basemodule::propertyUpdated,this,&Controller::OnPropertyUpdated);
-                connect(mod,&Basemodule::propertyRemoved,this,&Controller::OnPropertyRemoved);
-                connect(mod,&Basemodule::newMessageSent, this,&Controller::OnNewMessageSent);
-                connect(mod,&Basemodule::moduleDumped, this,&Controller::OnModuleDumped);
+                mod->setObjectName(name);
+                QVariantMap prof;
+                dbmanager->getProfile(mod->_moduletype,profile,prof);
+                mod->setProfile(prof);
+                QVariantMap profs;
+                dbmanager->getProfiles(mod->_moduletype,profs);
+                mod->setProfiles(profs);
+                connect(mod,&Basemodule::moduleEvent, this,&Controller::OnModuleEvent);
+                connect(mod,&Basemodule::loadOtherModule, this,&Controller::LoadModule);
+                connect(this,&Controller::controllerEvent,mod,&Basemodule::OnExternalEvent);
+                mod->sendDump();
 
-                connect(mod,&Basemodule::propertyCreated,wshandler,&WShandler::OnPropertyCreated);
-                connect(mod,&Basemodule::propertyUpdated,wshandler,&WShandler::OnPropertyUpdated);
-                connect(mod,&Basemodule::propertyAppended,wshandler,&WShandler::OnPropertyAppended);
-                connect(mod,&Basemodule::propertyRemoved,wshandler,&WShandler::OnPropertyRemoved);
-                connect(mod,&Basemodule::newMessageSent,wshandler,&WShandler::OnNewMessageSent);
-                connect(mod,&Basemodule::moduleDumped, wshandler,&WShandler::OnModuleDumped);
-                mod->OnDumpAsked();
+                QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(),Qt::FindChildrenRecursively);
+                for (Basemodule *othermodule : othermodules) {
+                    //BOOST_LOG_TRIVIAL(debug) << "child= " << othermodule->objectName().toStdString();
+                    if (othermodule->getName()!=mod->getName()) {
+                        //connect(othermodule,&Basemodule::moduleEvent, mod,&Basemodule::OnExternalEvent);
+                        //connect(mod,&Basemodule::moduleEvent, othermodule,&Basemodule::OnExternalEvent);
 
-                connect(wshandler,&WShandler::dumpAsked,mod,&Basemodule::OnDumpAsked);
-                connect(wshandler,&WShandler::setPropertyText,mod,&Basemodule::OnSetPropertyText);
-                connect(wshandler,&WShandler::setPropertyNumber,mod,&Basemodule::OnSetPropertyNumber);
-                connect(wshandler,&WShandler::setPropertySwitch,mod,&Basemodule::OnSetPropertySwitch);
+                    }
+                }
 
 
-        } else {
-            BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library";
-        }
-    }
-}
-
-void Controller::OnPropertyCreated(Property *pProperty, QString *pModulename)
-{
-    PropertyTextDumper textDumper;
-    pProperty->accept(&textDumper);
-    //BOOST_LOG_TRIVIAL(debug) << "MODULE " << pModulename->toStdString() <<" CREATED " << textDumper.getResult();
-}
-
-void Controller::OnPropertyUpdated(Property *pProperty, QString *pModulename)
-{
-    PropertyTextDumper textDumper;
-    pProperty->accept(&textDumper);
-    //BOOST_LOG_TRIVIAL(debug) << "MODULE " << pModulename->toStdString() <<" UPDATED " << textDumper.getResult();
-}
-void Controller::OnPropertyAppended(Property *pProperty, QString *pModulename)
-{
-    PropertyTextDumper textDumper;
-    pProperty->accept(&textDumper);
-    //BOOST_LOG_TRIVIAL(debug) << "MODULE " << pModulename->toStdString() <<" UPDATED " << textDumper.getResult();
-}
-void Controller::OnPropertyRemoved(Property *pProperty, QString *pModulename)
-{
-    PropertyTextDumper textDumper;
-    pProperty->accept(&textDumper);
-    //BOOST_LOG_TRIVIAL(debug) << "MODULE " << pModulename->toStdString() <<" REMOVED" << textDumper.getResult();
-}
-void Controller::OnNewMessageSent(QString message, QString *pModulename, QString Device)
-{
-    BOOST_LOG_TRIVIAL(debug) << "MODULE " << pModulename->toStdString() << " DEVICE  "<< Device.toStdString() << " MESSAGE " << message.toStdString();
-}
-void Controller::OnModuleDumped(QMap<QString, QMap<QString, QMap<QString, Property *> > > treeList, QString* pModulename, QString* pModulelabel)
-{
-    //BOOST_LOG_TRIVIAL(debug) << "MODULE DUMPED " << pModulename->toStdString() << " size " << treeList.size();
-
-    for ( const QString& device : treeList.keys() ) {
-        //BOOST_LOG_TRIVIAL(debug) << "MODULE DUMPED " << pModulename->toStdString() << " device " << device.toStdString();
-        for ( const QString& group : treeList[device].keys() ) {
-            //BOOST_LOG_TRIVIAL(debug) << "MODULE DUMPED " << pModulename->toStdString() << " device " << device.toStdString() << " group " << group.toStdString();
-            for ( const QString& property : treeList[device][group].keys() ) {
-                //BOOST_LOG_TRIVIAL(debug) << "MODULE DUMPED " << pModulename->toStdString() << " device " << device.toStdString() << " group " << group.toStdString()<< " property " << property.toStdString();
-                PropertyTextDumper textDumper;
-                treeList[device][group][property]->accept(&textDumper);
-                //BOOST_LOG_TRIVIAL(debug) << "MODULE " << pModulename->toStdString() <<" DUMPED " << textDumper.getResult();
             }
+        } else {
+            BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library : " << fulllib.toStdString();
         }
     }
 }
-void Controller::OnLoadModule(QString lib, QString label)
+
+
+void Controller::OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
 {
-    QString name=label;
-    name.replace(" ","");
-    LoadModule(QCoreApplication::applicationDirPath()+"/"+lib,name,label);
+
+
+    if (eventType=="modsaveprofile") {
+        Basemodule* mod= qobject_cast<Basemodule*>(sender());
+        QVariantMap _vm = mod->getProfile();
+        dbmanager->setProfile(eventModule,eventKey,_vm);
+        return;
+    }
+    if (eventType=="modloadprofile") {
+        QVariantMap _prof;
+        dbmanager->getProfile(eventModule,eventKey,_prof);
+        Basemodule* mod= qobject_cast<Basemodule*>(sender());
+        mod->setProfile(_prof);
+        return;
+
+    }
+    wshandler->processModuleEvent(eventType,eventModule,eventKey,eventData);
+    //QJsonDocument doc(obj);
+    //QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
+    //QString strJson = QLatin1String(docByteArray);
+    //BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - " << mod->getName().toStdString() << " - " << eventType.toStdString() << " - " << strJson.toStdString();
+
+
+}
+void Controller::OnExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
+{
+    //QJsonObject obj =QJsonObject::fromVariantMap(eventData);
+    //QJsonDocument doc(obj);
+    //QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
+    //QString strJson = QLatin1String(docByteArray);
+
+    //BOOST_LOG_TRIVIAL(debug) << "Controller OnExternalEvent : " << eventType.toStdString() << " : " << eventModule.toStdString() << eventKey.toStdString() << " : "<< " : " << strJson.toStdString();
+
+
+    /* we should check here if incoming message is valid*/
+    emit controllerEvent(eventType,eventModule,eventKey,eventData);
+}
+void Controller::checkModules(void)
+{
+    BOOST_LOG_TRIVIAL(debug) << "Check available modules";
+    QDir directory(QCoreApplication::applicationDirPath());
+    directory.setFilter(QDir::Files);
+    directory.setNameFilters(QStringList() << "*ost*.so");
+    QStringList libs = directory.entryList();
+    foreach(QString lib, libs)
+    {
+        QString tt = lib.replace(".so","");
+        if (!((tt=="libostmaincontrol" )||(tt=="libostbasemodule" )||(tt=="libostindimodule" ))) {
+            QLibrary library(QCoreApplication::applicationDirPath()+"/"+lib);
+            if (!library.load())
+            {
+                BOOST_LOG_TRIVIAL(debug) << lib.toStdString() << " " << library.errorString().toStdString();
+            }
+            else
+            {
+                typedef Basemodule *(*CreateModule)(QString,QString,QString,QVariantMap);
+                CreateModule createmodule = (CreateModule)library.resolve("initialize");
+
+
+                if (createmodule) {
+                    Basemodule *mod = createmodule(tt,tt,QString(),QVariantMap());
+                    if (mod) {
+                        mod->setParent(this);
+                        mod->setObjectName(lib);
+                        QVariantMap info = mod->getModuleInfo();
+                        _availableModuleLibs[tt]=info;
+                        delete mod;
+                    }
+                } else {
+                    BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library : " << lib.toStdString();
+                }
+            }
+
+        }
+
+
+    }
+
 }
