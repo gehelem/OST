@@ -1,6 +1,6 @@
 #ifndef INSPECTOR_MODULE_h_
 #define INSPECTOR_MODULE_h_
-#include <basemodule.h>
+#include <indimodule.h>
 
 #if defined(INSPECTOR_MODULE)
 #  define MODULE_INIT Q_DECL_EXPORT
@@ -8,17 +8,12 @@
 #  define MODULE_INIT Q_DECL_IMPORT
 #endif
 
-#include <QtCore>
-#include <QtConcurrent>
-#include <QStateMachine>
-#include "image.h"
-
-class MODULE_INIT InspectorModule : public Basemodule
+class MODULE_INIT InspectorModule : public IndiModule
 {
     Q_OBJECT
 
     public:
-        InspectorModule(QString name,QString label);
+        InspectorModule(QString name,QString label,QString profile,QVariantMap availableModuleLibs);
         ~InspectorModule();
 
     signals:
@@ -45,15 +40,14 @@ class MODULE_INIT InspectorModule : public Basemodule
         void AbortDone();
         void Abort();
     public slots:
-        void OnSetPropertyText(TextProperty* prop) override;
-        void OnSetPropertyNumber(NumberProperty* prop) override;
-        void OnSetPropertySwitch(SwitchProperty* prop) override;
+        void OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData) override;
         void OnSucessSEP();
 
     private:
         void newNumber(INumberVectorProperty *nvp) override;
         void newBLOB(IBLOB *bp) override;
         void newSwitch(ISwitchVectorProperty *svp) override;
+
 
 
         void SMBuild();
@@ -76,16 +70,20 @@ class MODULE_INIT InspectorModule : public Basemodule
         void SMAbort();
         void startCoarse();
 
-        TextProperty* _devices;
+        /*TextProperty* _devices;
         NumberProperty* _values;
         NumberProperty* _parameters;
         SwitchProperty* _actions;
         ImageProperty* _img;
-        GridProperty* _grid;
+        GridProperty* _grid;*/
 
 
         QString _camera  = "CCD Simulator";
         bool    _newblob;
+
+        QPointer<fileio> _image;
+        Solver _solver;
+        FITSImage::Statistic stats;
 
         int    _iterations = 3;
         int    _steps = 3000;
@@ -103,6 +101,6 @@ class MODULE_INIT InspectorModule : public Basemodule
 
 };
 
-extern "C" MODULE_INIT InspectorModule *initialize(QString name,QString label);
+extern "C" MODULE_INIT InspectorModule *initialize(QString name,QString label,QString profile,QVariantMap availableModuleLibs);
 
 #endif
