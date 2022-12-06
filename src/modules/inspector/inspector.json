@@ -107,5 +107,25 @@
         "permission": 0,
         "propertyLabel": "Image map",
         "URL": ""
+    },
+    "histogram": {
+        "devcat": "Results",
+        "rule":0,
+        "GDY":{
+            "D":"i",
+            "Y":"n"
+        },
+        "elements": {
+                "i": {
+                    "elementLabel": "I"
+                },
+                "n": {
+                    "elementLabel": "N"
+                }
+        },
+        "group": "",
+        "permission": 0,
+        "propertyLabel": "Histogram"
     }
+
 }

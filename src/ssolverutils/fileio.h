@@ -81,6 +81,19 @@ public:
     {
         return rawImage;
     }
+    const QVector<uint32_t> &getCumulativeFrequency(uint8_t channel = 0) const
+    {
+        return m_CumulativeFrequency[channel];
+    }
+    const QVector<double> &getHistogramIntensity(uint8_t channel = 0) const
+    {
+        return m_HistogramIntensity[channel];
+    }
+    const QVector<double> &getHistogramFrequency(uint8_t channel = 0) const
+    {
+        return m_HistogramFrequency[channel];
+    }
+
 
 private:
     QString file;
@@ -99,6 +112,7 @@ private:
     QImage rawImage;
     void CalcStats(void);
     void generateQImage();
+
     template <typename T>
     QPair<T, T> getParitionMinMax(uint32_t start, uint32_t stride);
     template <typename T>
@@ -109,6 +123,16 @@ private:
     void runningAverageStdDev();
     template <typename T>
     QPair<double, double> getSquaredSumAndMean(uint32_t start, uint32_t stride);
+    template <typename T>
+    void CalcHisto(void);
+
+    QVector<QVector<uint32_t>> m_CumulativeFrequency;
+    QVector<QVector<double>> m_HistogramIntensity;
+    QVector<QVector<double>> m_HistogramFrequency;
+    QVector<double> m_HistogramBinWidth;
+    uint16_t m_HistogramBinCount { 0 };
+    double m_JMIndex { 1 };
+    bool m_HistogramConstructed { false };
 
 
 signals:

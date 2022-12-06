@@ -134,7 +134,6 @@ void InspectorModule::newBLOB(IBLOB *bp)
         _image=new fileio();
         _image->loadBlob(bp);
         stats=_image->getStats();
-        //_image->computeHistogram();
         setOstElement("imagevalues","width",_image->getStats().width,false);
         setOstElement("imagevalues","height",_image->getStats().height,false);
         setOstElement("imagevalues","min",_image->getStats().min[0],false);
@@ -229,9 +228,20 @@ void InspectorModule::OnSucessSEP()
         int y=s.y;
         int a=s.a;
         int b=s.b;
+        qDebug() << "draw " << x << "/" << y;
         p.drawEllipse(QPoint(x,y),a*5,b*5);
     }
     p.end();
+
+    resetOstElements("histogram");
+    QVector<double> his = _image->getHistogramFrequency(0);
+    for( int i=1;i<his.size();i++) {
+        //qDebug() << "HIS " << i << "-"  << _image->getCumulativeFrequency(0)[i] << "-"  << _image->getHistogramIntensity(0)[i] << "-"  << _image->getHistogramFrequency(0)[i];
+        setOstElement("histogram","i",i,false);
+        setOstElement("histogram","n",his[i],false);
+        pushOstElements("histogram");
+    }
+
     immap.save(_webroot+"/"+getName()+"map.jpeg","JPG",100);
     setOstPropertyAttribute("imagemap","URL",getName()+"map.jpeg",true);
 
