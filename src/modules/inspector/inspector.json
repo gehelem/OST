@@ -100,5 +100,12 @@
         "permission": 0,
         "propertyLabel": "Last image",
         "URL": ""
+    },
+    "imagemap": {
+        "devcat": "Results",
+        "group": "",
+        "permission": 0,
+        "propertyLabel": "Image map",
+        "URL": ""
     }
 }

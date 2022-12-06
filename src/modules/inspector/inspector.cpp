@@ -1,4 +1,5 @@
 #include "inspector.h"
+#include <QPainter>
 
 InspectorModule *initialize(QString name,QString label,QString profile,QVariantMap availableModuleLibs)
 {
@@ -23,6 +24,7 @@ InspectorModule::InspectorModule(QString name, QString label, QString profile,QV
 
     //saveAttributesToFile("inspector.json");
     _camera=getOstElementValue("devices","camera").toString();
+    _exposure=getOstElementValue("parameters","exposure").toFloat();
 
     /*_moduledescription="Inspector module";
     _devices = new TextProperty(_modulename,"Options","root","devices","Devices",2,0);
@@ -85,7 +87,7 @@ void InspectorModule::OnMyExternalEvent(const QString &eventType, const QString 
                     if (keyelt=="exposure") {
                         if (setOstElement(keyprop,keyelt,eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"],false)) {
                             setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
-                            _exposure=getOstElementValue("devices","camera").toFloat();
+                            _exposure=getOstElementValue("parameters","exposure").toFloat();
                         }
                     }
                 }
@@ -103,6 +105,8 @@ void InspectorModule::OnMyExternalEvent(const QString &eventType, const QString 
                     if (keyelt=="abort") {
                         if (setOstElement(keyprop,keyelt,false,false)) {
                             emit Abort();
+                            _machine.stop();
+                            _machineLoop.stop();
                         }
                     }
                 }
@@ -257,8 +261,11 @@ void InspectorModule::SMBuildLoop()
 }
 void InspectorModule::SMInit()
 {
-    connectAllDevices();
-    setBlobMode();
+    connectIndi();
+    connectDevice(_camera);
+    setBLOBMode(B_ALSO,_camera.toStdString().c_str(),nullptr);
+    sendModNewNumber(_camera,"SIMULATOR_SETTINGS","SIM_TIME_FACTOR",0.01 );
+
 
     emit InitDone();
 }
@@ -266,7 +273,8 @@ void InspectorModule::SMInit()
 void InspectorModule::SMAbort()
 {
 
-    //_machine.stop();
+    _machine.stop();
+    _machineLoop.stop();
     emit AbortDone();
     BOOST_LOG_TRIVIAL(debug) << "SMAbort";
     sendMessage("machine stopped");
@@ -319,9 +327,33 @@ void InspectorModule::OnSucessSEP()
     QImage rawImage = _image->getRawQImage();
     QImage im = rawImage.convertToFormat(QImage::Format_RGB32);
     im.setColorTable(rawImage.colorTable());
+    QImage immap = rawImage.convertToFormat(QImage::Format_RGB32);
+    immap.setColorTable(rawImage.colorTable());
 
     im.save(_webroot+"/"+getName()+".jpeg","JPG",100);
     setOstPropertyAttribute("image","URL",getName()+".jpeg",true);
+
+    //QRect r;
+    //r.setRect(0,0,im.width(),im.height());
+
+    QPainter p;
+    p.begin(&immap);
+    p.setPen(QPen(Qt::red));
+    //p.setFont(QFont("Times", 15, QFont::Normal));
+    //p.drawText(r, Qt::AlignLeft, QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss zzz") );
+    p.setPen(QPen(Qt::green));
+    foreach( FITSImage::Star s, _solver.stars )
+    {
+        qDebug() << "draw " << s.x << "/" << s.y;
+        int x=s.x;
+        int y=s.y;
+        int a=s.a;
+        int b=s.b;
+        p.drawEllipse(QPoint(x,y),a*5,b*5);
+    }
+    p.end();
+    immap.save(_webroot+"/"+getName()+"map.jpeg","JPG",100);
+    setOstPropertyAttribute("imagemap","URL",getName()+"map.jpeg",true);
 
     emit FindStarsDone();
 }
