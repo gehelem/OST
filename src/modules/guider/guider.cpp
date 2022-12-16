@@ -107,7 +107,7 @@ void GuiderModule::OnMyExternalEvent(const QString &eventType, const QString  &e
                     if (keyelt=="abort") {
                         if (setOstElement(keyprop,keyelt,false,false)) {
                             setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
-                            emit abort();
+                            emit Abort();
                         }
                     }
                     if (keyelt=="calibration") {
