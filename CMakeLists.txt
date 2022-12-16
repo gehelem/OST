@@ -217,6 +217,7 @@ target_compile_definitions(ostindipanel PRIVATE INDIPANEL_MODULE)
 add_library(ostguider SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/guider.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/guider.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/guider.qrc
 )
 target_link_libraries(ostguider PRIVATE
     ostindimodule

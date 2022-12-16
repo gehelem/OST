@@ -1,0 +1,149 @@
+{
+    "values": {
+        "devcat": "Control",
+        "group": "",
+        "permission": 0,
+        "propertyLabel": "Values",
+        "GDY":{
+            "D":"focpos",
+            "Y":"loopHFRavg"
+        },
+
+        "array":{
+            "key": "iteration",
+            "columns":["focpos","loopHFRavg"],
+            "type":"grid"
+        },
+        "elements": {
+            "pulseN": {
+                "elementLabel": "Pulse N",
+                "format": "99.99"
+            },
+            "pulseS": {
+                "elementLabel": "Pulse S",
+                "format": "99.99"
+            },
+            "pulseE": {
+                "elementLabel": "Pulse E",
+                "format": "99.99"
+            },
+            "pulseW": {
+                "elementLabel": "Pulse W",
+                "format": "99.99"
+            },
+            "imgHFR": {
+                "elementLabel": "Last imgage HFR",
+                "value":0,
+                "format": "99.99"
+            },
+            "iteration": {
+                "elementLabel": "Iteration",
+                "value":0,
+                "step":1,
+                "format": "9999"
+            }
+        }
+    },
+
+    "actions": {
+        "devcat": "Control",
+        "group": "",
+        "permission": 2,
+        "rule":2,
+        "propertyLabel": "Actions",
+        "elements": {
+            "abort": {
+                "elementLabel": "Abort"
+                ,"value":false
+            },
+            "calibration": {
+                "elementLabel": "Calibration"
+                ,"value":false
+            },
+            "guide": {
+                "elementLabel": "Guide"
+                ,"value":false
+            },
+            "init": {
+                "elementLabel": "Initialize"
+                ,"value":false
+            },
+            "calguide": {
+                "elementLabel": "Calibrate & guide"
+                ,"value":false
+            }
+        }
+    },
+
+    "commonParams": {
+        "devcat": "Control",
+        "group": "Parameters",
+        "permission": 2,
+        "hasprofile":true,
+        "propertyLabel": "Common Parameters",
+        "elements": {
+            "exposure": {
+                "elementLabel": "Exposure (s)",
+                "value":0.5,
+                "format": "99.99"
+            }
+        }
+    },
+    "calParams": {
+        "devcat": "Control",
+        "group": "Parameters",
+        "permission": 2,
+        "hasprofile":true,
+        "propertyLabel": "Calibration Parameters",
+        "elements": {
+            "pulse": {
+                "elementLabel": "Calibration pulse (ms)",
+                "value":1000,
+                "format": "99"
+            },
+            "calsteps": {
+                "elementLabel": "Iterations / axis",
+                "value":3,
+                "format": "99"
+            }
+
+        }
+    },
+    "guideParams": {
+        "devcat": "Control",
+        "group": "Parameters",
+        "permission": 2,
+        "hasprofile":true,
+        "propertyLabel": "Guide parameters",
+        "elements": {
+            "pulsemax": {
+                "elementLabel": "Max pulse (ms)",
+                "value":2000,
+                "format": "99"
+            },
+            "pulsemin": {
+                "elementLabel": "Min pulse (ms)",
+                "value":100,
+                "format": "99"
+            },
+            "raAgr": {
+                "elementLabel": "RA Agressivity",
+                "value":0.7,
+                "format": "99.99"
+            },
+            "deaAgr": {
+                "elementLabel": "DEC Agressivity",
+                "value":0.7,
+                "format": "99"
+            }
+        }
+    },
+    "image": {
+        "devcat": "Control",
+        "group": "",
+        "permission": 0,
+        "propertyLabel": "Last image",
+        "URL": ""
+    }
+
+}

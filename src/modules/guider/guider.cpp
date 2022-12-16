@@ -2,74 +2,43 @@
 //#include "polynomialfit.h"
 #define PI 3.14159265
 
-GuiderModule *initialize(QString name,QString label)
+GuiderModule *initialize(QString name,QString label,QString profile,QVariantMap availableModuleLibs)
 {
-    GuiderModule *basemodule = new GuiderModule(name,label);
+    GuiderModule *basemodule = new GuiderModule(name,label,profile,availableModuleLibs);
     return basemodule;
 }
-
-GuiderModule::GuiderModule(QString name,QString label)
-    : Basemodule(name,label)
+GuiderModule::GuiderModule(QString name,QString label,QString profile,QVariantMap availableModuleLibs)
+    : IndiModule(name,label,profile,availableModuleLibs)
 {
-    _moduledescription="Guider module";
+    _moduletype="guider";
 
-    _actions = new SwitchProperty(_modulename,"Control","root","actions","Actions",2,0,1);
-    _actions->addSwitch(new SwitchValue("condev","Connect devices","hint",0));
-    _actions->addSwitch(new SwitchValue("loadconfs","Load devices conf","hint",0));
-    _actions->addSwitch(new SwitchValue("abort","Abort","hint",0));
-    _actions->addSwitch(new SwitchValue("init","Initialize","hint",0));
-    _actions->addSwitch(new SwitchValue("calibration","Calibrate","hint",0));
-    _actions->addSwitch(new SwitchValue("calguide","Calibrate and guide","hint",0));
-    _actions->addSwitch(new SwitchValue("guide","Guide","hint",0));
-    emit propertyCreated(_actions,&_modulename);
-    _propertyStore.add(_actions);
+    loadPropertiesFromFile(":guider.json");
 
-    _commonParams = new NumberProperty(_modulename,"Parameters","root","commonParams","Common Parameters",2,0);
-    _commonParams->addNumber(new NumberValue("exposure"      ,"Exposure (s)","hint",_exposure,"",0,5,1));
-    emit propertyCreated(_commonParams,&_modulename);
-    _propertyStore.add(_commonParams);
+    setOstProperty("moduleDescription","Guider",true);
+    setOstProperty("moduleVersion",0.1,true);
+    setOstProperty("moduleType",_moduletype,true);
 
-    _calParams = new NumberProperty(_modulename,"Parameters","root","calParams","Calibration Parameters",2,0);
-    _calParams->addNumber(new NumberValue("pulse"      ,"Calibration pulse (ms)","hint",_pulse,"",0,5000,1));
-    _calParams->addNumber(new NumberValue("calsteps"   ,"Iterations / axis","hint",_calSteps,"",0,15,1));
-    emit propertyCreated(_calParams,&_modulename);
-    _propertyStore.add(_calParams);
+    createOstElement("devices","camera","Camera",true);
+    createOstElement("devices","mount","Mount",true);
+    setOstElement("devices","camera",   _camera,false);
+    setOstElement("devices","mount",    _mount,true);
 
-    _guideParams = new NumberProperty(_modulename,"Parameters","root","guideParams","Guiding Parameters",2,0);
-    _guideParams->addNumber(new NumberValue("pulsemax"      ,"Max pulse (ms)","hint",_pulseMax,"",0,5000,1));
-    _guideParams->addNumber(new NumberValue("pulsemin"      ,"Min pulse (ms)","hint",_pulseMin,"",0,1000,1));
-    _guideParams->addNumber(new NumberValue("raAgr"         ,"RA Agressivity","hint",_raAgr,"",0,2,1));
-    _guideParams->addNumber(new NumberValue("deAgr"         ,"DEC Agressivity","hint",_deAgr,"",0,2,1));
-    emit propertyCreated(_guideParams,&_modulename);
-    _propertyStore.add(_guideParams);
 
-    _values = new NumberProperty(_modulename,"Control","root","values","Values",0,0);
-    _values->addNumber(new NumberValue("pulseN","Pulse N","hint",_pulseN,"",0,10000,0));
-    _values->addNumber(new NumberValue("pulseS","Pulse S","hint",_pulseS,"",0,10000,0));
-    _values->addNumber(new NumberValue("pulseE","Pulse E","hint",_pulseE,"",0,10000,0));
-    _values->addNumber(new NumberValue("pulseW","Pulse W","hint",_pulseW,"",0,10000,0));
-    emit propertyCreated(_values,&_modulename);
-    _propertyStore.add(_values);
-
-    _img = new ImageProperty(_modulename,"Control","root","viewer","Image property label",0,0,0);
-    emit propertyCreated(_img,&_modulename);
-    _propertyStore.add(_img);
-
-    _grid = new GridProperty(_modulename,"Control","root","grid","Grid property label",0,0,"PXY","Set","DX","DY","","");
-    emit propertyCreated(_grid,&_modulename);
-    _propertyStore.add(_grid);
-
-    _gridguide = new GridProperty(_modulename,"Control","root","gridguide","Grid property label",0,0,"PHD","Time","RA","DE","CRA","CDE");
-    emit propertyCreated(_gridguide,&_modulename);
-    _propertyStore.add(_gridguide);
-
-    _states = new LightProperty(_modulename,"Control","root","states","State",0,0);
-    _states->addLight(new LightValue("idle"  ,"Idle","hint",1));
-    _states->addLight(new LightValue("cal"   ,"Calibrating","hint",0));
-    _states->addLight(new LightValue("guide" ,"Guiding","hint",0));
-    _states->addLight(new LightValue("error" ,"Error","hint",0));
-    emit propertyCreated(_states,&_modulename);
-    _propertyStore.add(_states);
+//    _grid = new GridProperty(_modulename,"Control","root","grid","Grid property label",0,0,"PXY","Set","DX","DY","","");
+//    emit propertyCreated(_grid,&_modulename);
+//    _propertyStore.add(_grid);
+//
+//    _gridguide = new GridProperty(_modulename,"Control","root","gridguide","Grid property label",0,0,"PHD","Time","RA","DE","CRA","CDE");
+//    emit propertyCreated(_gridguide,&_modulename);
+//    _propertyStore.add(_gridguide);
+//
+//    _states = new LightProperty(_modulename,"Control","root","states","State",0,0);
+//    _states->addLight(new LightValue("idle"  ,"Idle","hint",1));
+//    _states->addLight(new LightValue("cal"   ,"Calibrating","hint",0));
+//    _states->addLight(new LightValue("guide" ,"Guiding","hint",0));
+//    _states->addLight(new LightValue("error" ,"Error","hint",0));
+//    emit propertyCreated(_states,&_modulename);
+//    _propertyStore.add(_states);
 
     buildInitStateMachines();
     buildCalStateMachines();
@@ -83,84 +52,163 @@ GuiderModule::~GuiderModule()
 {
 
 }
-void GuiderModule::OnSetPropertyNumber(NumberProperty* prop)
+void GuiderModule::OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
 {
-    if (!(prop->getModuleName()==_modulename)) return;
-
-    QList<NumberValue*> numbers=prop->getNumbers();
-    for (int j = 0; j < numbers.size(); ++j) {
-        if (numbers[j]->name()=="exposure")        _exposure=numbers[j]->getValue();
-        if (numbers[j]->name()=="pulse")           _pulse=numbers[j]->getValue();
-        if (numbers[j]->name()=="calsteps")        _calSteps=numbers[j]->getValue();
-        if (numbers[j]->name()=="pulsemax")        _pulseMax=numbers[j]->getValue();
-        if (numbers[j]->name()=="pulsemin")        _pulseMin=numbers[j]->getValue();
-        if (numbers[j]->name()=="raAgr")        _raAgr=numbers[j]->getValue();
-        if (numbers[j]->name()=="deAgr")        _deAgr=numbers[j]->getValue();
-        prop->setState(1);
-        emit propertyUpdated(prop,&_modulename);
-        _propertyStore.add(prop);
-        //BOOST_LOG_TRIVIAL(debug) << "Focus number property item modified " << prop->getName().toStdString();
+        //BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << eventKey.toStdString();
+    if (getName()==eventModule) {
+        foreach(const QString& keyprop, eventData.keys()) {
+            foreach(const QString& keyelt, eventData[keyprop].toMap()["elements"].toMap().keys()) {
+                BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << keyprop.toStdString() << "-" << keyelt.toStdString();
+                QVariant val=eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
+                if (keyprop=="parameters") {
+                    if (keyelt=="startpos") {
+                        if (setOstElement(keyprop,keyelt,val,true)) {
+                            //_startpos=val.toInt();
+                        }
+                    }
+//                    if (keyelt=="steps") {
+//                        if (setOstElement(keyprop,keyelt,val,true)) {
+//                            _steps=val.toInt();
+//                        }
+//                    }
+//                    if (keyelt=="iterations") {
+//                        if (setOstElement(keyprop,keyelt,val,true)) {
+//                            _iterations=val.toInt();
+//                        }
+//                    }
+//                    if (keyelt=="loopIterations") {
+//                        if (setOstElement(keyprop,keyelt,val,true)) {
+//                            _loopIterations=val.toInt();
+//                        }
+//                    }
+//                    if (keyelt=="exposure") {
+//                        if (setOstElement(keyprop,keyelt,val,true)) {
+//                            _exposure=val.toInt();
+//                        }
+//                    }
+//                    if (keyelt=="backlash") {
+//                        if (setOstElement(keyprop,keyelt,val,true)) {
+//                            _backlash=val.toInt();
+//                        }
+//                    }
+//
+                }
+//                if (keyprop=="actions") {
+//                    if (keyelt=="coarse") {
+//                        if (setOstElement(keyprop,keyelt,false,false)) {
+//                            setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
+//                            startCoarse();
+//                        }
+//                    }
+//                    if (keyelt=="abort") {
+//                        if (setOstElement(keyprop,keyelt,false,false)) {
+//                            setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
+//                            emit abort();
+//                        }
+//                    }
+//                    if (keyelt=="loop") {
+//                        if (setOstElement(keyprop,keyelt,false,false)) {
+//                            setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
+//                        }
+//                    }
+//
+//                }
+//                if (keyprop=="devices") {
+//                    if (keyelt=="camera") {
+//                        if (setOstElement(keyprop,keyelt,val,false)) {
+//                            setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
+//                            _camera=val.toString();
+//                        }
+//                    }
+//                    if (keyelt=="focuser") {
+//                        if (setOstElement(keyprop,keyelt,val,false)) {
+//                            setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
+//                            _focuser=val.toString();
+//                        }
+//                    }
+//                }
+            }
+        }
     }
-
 }
-void GuiderModule::OnSetPropertyText(TextProperty* prop)
-{
-    if (!(prop->getModuleName()==_modulename)) return;
-}
-
-void GuiderModule::OnSetPropertySwitch(SwitchProperty* prop)
-{
-    if (!(prop->getModuleName()==_modulename)) return;
-
-    SwitchProperty* wprop = _propertyStore.getSwitch(prop->getDeviceName(),prop->getGroupName(),prop->getName());
-    QList<SwitchValue*> switchs=prop->getSwitches();
-    for (int j = 0; j < switchs.size(); ++j) {
-        if (switchs[j]->name()=="calibration") {
-            disconnect(&_SMInit,        &QStateMachine::finished,nullptr, nullptr);
-            disconnect(&_SMCalibration, &QStateMachine::finished,nullptr, nullptr);
-            connect(&_SMInit,           &QStateMachine::finished,&_SMCalibration,&QStateMachine::start) ;
-            _SMInit.start();
-            wprop->setSwitch(switchs[j]->name(),true);
-        }
-        if (switchs[j]->name()=="init") {
-            disconnect(&_SMInit,        &QStateMachine::finished,nullptr, nullptr);
-            disconnect(&_SMCalibration, &QStateMachine::finished,nullptr, nullptr);
-            _SMInit.start();
-            wprop->setSwitch(switchs[j]->name(),true);
-        }
-        if (switchs[j]->name()=="guide") {
-            disconnect(&_SMInit,        &QStateMachine::finished,nullptr, nullptr);
-            disconnect(&_SMCalibration, &QStateMachine::finished,nullptr, nullptr);
-            connect(&_SMInit,           &QStateMachine::finished,&_SMGuide,&QStateMachine::start) ;
-            _SMInit.start();
-            wprop->setSwitch(switchs[j]->name(),true);
-        }
-        if (switchs[j]->name()=="calguide") {
-            disconnect(&_SMInit,        &QStateMachine::finished,nullptr, nullptr);
-            disconnect(&_SMCalibration, &QStateMachine::finished,nullptr, nullptr);
-            connect(&_SMInit,           &QStateMachine::finished,&_SMCalibration,&QStateMachine::start) ;
-            connect(&_SMCalibration,    &QStateMachine::finished,&_SMGuide,      &QStateMachine::start) ;
-            _SMInit.start();
-            wprop->setSwitch(switchs[j]->name(),true);
-        }
-        if (switchs[j]->name()=="loadconfs") {
-            wprop->setSwitch(switchs[j]->name(),true);
-            loadDevicesConfs();
-        }
-        if (switchs[j]->name()=="abort")  {
-            wprop->setSwitch(switchs[j]->name(),true);
-            emit Abort();
-        }
-        if (switchs[j]->name()=="condev") {
-            wprop->setSwitch(switchs[j]->name(),true);
-            connectAllDevices();
-        }
-        //prop->setSwitches(switchs);
-        _propertyStore.update(wprop);
-        emit propertyUpdated(wprop,&_modulename);
-    }
-
-}
+//void GuiderModule::OnSetPropertyNumber(NumberProperty* prop)
+//{
+//    if (!(prop->getModuleName()==_modulename)) return;
+//
+//    QList<NumberValue*> numbers=prop->getNumbers();
+//    for (int j = 0; j < numbers.size(); ++j) {
+//        if (numbers[j]->name()=="exposure")        _exposure=numbers[j]->getValue();
+//        if (numbers[j]->name()=="pulse")           _pulse=numbers[j]->getValue();
+//        if (numbers[j]->name()=="calsteps")        _calSteps=numbers[j]->getValue();
+//        if (numbers[j]->name()=="pulsemax")        _pulseMax=numbers[j]->getValue();
+//        if (numbers[j]->name()=="pulsemin")        _pulseMin=numbers[j]->getValue();
+//        if (numbers[j]->name()=="raAgr")        _raAgr=numbers[j]->getValue();
+//        if (numbers[j]->name()=="deAgr")        _deAgr=numbers[j]->getValue();
+//        prop->setState(1);
+//        emit propertyUpdated(prop,&_modulename);
+//        _propertyStore.add(prop);
+//        //BOOST_LOG_TRIVIAL(debug) << "Focus number property item modified " << prop->getName().toStdString();
+//    }
+//
+//}
+//void GuiderModule::OnSetPropertyText(TextProperty* prop)
+//{
+//    if (!(prop->getModuleName()==_modulename)) return;
+//}
+//
+//void GuiderModule::OnSetPropertySwitch(SwitchProperty* prop)
+//{
+//    if (!(prop->getModuleName()==_modulename)) return;
+//
+//    SwitchProperty* wprop = _propertyStore.getSwitch(prop->getDeviceName(),prop->getGroupName(),prop->getName());
+//    QList<SwitchValue*> switchs=prop->getSwitches();
+//    for (int j = 0; j < switchs.size(); ++j) {
+//        if (switchs[j]->name()=="calibration") {
+//            disconnect(&_SMInit,        &QStateMachine::finished,nullptr, nullptr);
+//            disconnect(&_SMCalibration, &QStateMachine::finished,nullptr, nullptr);
+//            connect(&_SMInit,           &QStateMachine::finished,&_SMCalibration,&QStateMachine::start) ;
+//            _SMInit.start();
+//            wprop->setSwitch(switchs[j]->name(),true);
+//        }
+//        if (switchs[j]->name()=="init") {
+//            disconnect(&_SMInit,        &QStateMachine::finished,nullptr, nullptr);
+//            disconnect(&_SMCalibration, &QStateMachine::finished,nullptr, nullptr);
+//            _SMInit.start();
+//            wprop->setSwitch(switchs[j]->name(),true);
+//        }
+//        if (switchs[j]->name()=="guide") {
+//            disconnect(&_SMInit,        &QStateMachine::finished,nullptr, nullptr);
+//            disconnect(&_SMCalibration, &QStateMachine::finished,nullptr, nullptr);
+//            connect(&_SMInit,           &QStateMachine::finished,&_SMGuide,&QStateMachine::start) ;
+//            _SMInit.start();
+//            wprop->setSwitch(switchs[j]->name(),true);
+//        }
+//        if (switchs[j]->name()=="calguide") {
+//            disconnect(&_SMInit,        &QStateMachine::finished,nullptr, nullptr);
+//            disconnect(&_SMCalibration, &QStateMachine::finished,nullptr, nullptr);
+//            connect(&_SMInit,           &QStateMachine::finished,&_SMCalibration,&QStateMachine::start) ;
+//            connect(&_SMCalibration,    &QStateMachine::finished,&_SMGuide,      &QStateMachine::start) ;
+//            _SMInit.start();
+//            wprop->setSwitch(switchs[j]->name(),true);
+//        }
+//        if (switchs[j]->name()=="loadconfs") {
+//            wprop->setSwitch(switchs[j]->name(),true);
+//            loadDevicesConfs();
+//        }
+//        if (switchs[j]->name()=="abort")  {
+//            wprop->setSwitch(switchs[j]->name(),true);
+//            emit Abort();
+//        }
+//        if (switchs[j]->name()=="condev") {
+//            wprop->setSwitch(switchs[j]->name(),true);
+//            connectAllDevices();
+//        }
+//        //prop->setSwitches(switchs);
+//        _propertyStore.update(wprop);
+//        emit propertyUpdated(wprop,&_modulename);
+//    }
+//
+//}
 
 void GuiderModule::newNumber(INumberVectorProperty *nvp)
 {
@@ -731,7 +779,8 @@ void GuiderModule::SMFindStars()
     BOOST_LOG_TRIVIAL(debug) << "SMFindStars";
 
     sendMessage("SMFindStars");
-    _solver.ResetSolver(image->stats,image->m_ImageBuffer);
+    stats=_image->getStats();
+    _solver.ResetSolver(stats,_image->getImageBuffer());
     connect(&_solver,&Solver::successSEP,this,&GuiderModule::OnSucessSEP);
     _solver.stars.clear();
     _solver.FindStars(_solver.stellarSolverProfiles[0]);
