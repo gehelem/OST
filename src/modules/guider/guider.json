@@ -121,7 +121,7 @@
                 "value":0.7,
                 "format": "99.99"
             },
-            "deaAgr": {
+            "deAgr": {
                 "elementLabel": "DEC Agressivity",
                 "value":0.7,
                 "format": "99"
