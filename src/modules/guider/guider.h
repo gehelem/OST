@@ -125,7 +125,7 @@ class MODULE_INIT GuiderModule  : public IndiModule
         int _itt=0;
 
 
-        QString _camera  = "Guide Simulator";
+        QString _camera  = "CCD Simulator";
         QString _mount  = "Telescope Simulator";
         QStateMachine *_machine;
         QStateMachine _SMInit;

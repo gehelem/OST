@@ -93,26 +93,45 @@ void GuiderModule::OnMyExternalEvent(const QString &eventType, const QString  &e
 //                    }
 //
                 }
-//                if (keyprop=="actions") {
-//                    if (keyelt=="coarse") {
-//                        if (setOstElement(keyprop,keyelt,false,false)) {
-//                            setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
-//                            startCoarse();
-//                        }
-//                    }
-//                    if (keyelt=="abort") {
-//                        if (setOstElement(keyprop,keyelt,false,false)) {
-//                            setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
-//                            emit abort();
-//                        }
-//                    }
-//                    if (keyelt=="loop") {
-//                        if (setOstElement(keyprop,keyelt,false,false)) {
-//                            setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
-//                        }
-//                    }
-//
-//                }
+                if (keyprop=="actions") {
+                    if (keyelt=="calguide") {
+                        if (setOstElement(keyprop,keyelt,false,false)) {
+                            setOstPropertyAttribute(keyprop,"status",IPS_BUSY,true);
+                            disconnect(&_SMInit,        &QStateMachine::finished,nullptr, nullptr);
+                            disconnect(&_SMCalibration, &QStateMachine::finished,nullptr, nullptr);
+                            connect(&_SMInit,           &QStateMachine::finished,&_SMCalibration,&QStateMachine::start) ;
+                            connect(&_SMCalibration,    &QStateMachine::finished,&_SMGuide,      &QStateMachine::start) ;
+                            _SMInit.start();
+                        }
+                    }
+                    if (keyelt=="abort") {
+                        if (setOstElement(keyprop,keyelt,false,false)) {
+                            setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
+                            emit abort();
+                        }
+                    }
+                    if (keyelt=="calibration") {
+                        if (setOstElement(keyprop,keyelt,false,false)) {
+                            setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
+                            disconnect(&_SMInit,        &QStateMachine::finished,nullptr, nullptr);
+                            disconnect(&_SMCalibration, &QStateMachine::finished,nullptr, nullptr);
+                            connect(&_SMInit,           &QStateMachine::finished,&_SMCalibration,&QStateMachine::start) ;
+                            _SMInit.start();
+
+                        }
+                    }
+                    if (keyelt=="guide") {
+                        if (setOstElement(keyprop,keyelt,false,false)) {
+                            setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
+                            disconnect(&_SMInit,        &QStateMachine::finished,nullptr, nullptr);
+                            disconnect(&_SMCalibration, &QStateMachine::finished,nullptr, nullptr);
+                            connect(&_SMInit,           &QStateMachine::finished,&_SMGuide,&QStateMachine::start) ;
+                            _SMInit.start();
+
+                        }
+                    }
+
+                }
 //                if (keyprop=="devices") {
 //                    if (keyelt=="camera") {
 //                        if (setOstElement(keyprop,keyelt,val,false)) {
@@ -416,7 +435,17 @@ void GuiderModule::SMInitInit()
 {
     BOOST_LOG_TRIVIAL(debug) << "SMInitInit";
     sendMessage("SMInitInit");
-    setBlobMode();
+    if (connectDevice(_camera)) {
+        setBLOBMode(B_ALSO,_camera.toStdString().c_str(),nullptr);
+        frameReset(_camera);
+        sendModNewNumber(_camera,"SIMULATOR_SETTINGS","SIM_TIME_FACTOR",0.01 );
+        setOstPropertyAttribute("actions","status",IPS_BUSY,true);
+    } else {
+        setOstPropertyAttribute("actions","status",IPS_ALERT,true);
+        emit Abort();
+        return;
+    }
+
     /* get mount DEC */
     if (!getModNumber(_mount,"EQUATORIAL_EOD_COORD","DEC",_mountDEC)) {
         emit Abort();
