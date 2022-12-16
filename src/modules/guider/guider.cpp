@@ -132,102 +132,10 @@ void GuiderModule::OnMyExternalEvent(const QString &eventType, const QString  &e
                     }
 
                 }
-//                if (keyprop=="devices") {
-//                    if (keyelt=="camera") {
-//                        if (setOstElement(keyprop,keyelt,val,false)) {
-//                            setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
-//                            _camera=val.toString();
-//                        }
-//                    }
-//                    if (keyelt=="focuser") {
-//                        if (setOstElement(keyprop,keyelt,val,false)) {
-//                            setOstPropertyAttribute(keyprop,"status",IPS_OK,true);
-//                            _focuser=val.toString();
-//                        }
-//                    }
-//                }
             }
         }
     }
 }
-//void GuiderModule::OnSetPropertyNumber(NumberProperty* prop)
-//{
-//    if (!(prop->getModuleName()==_modulename)) return;
-//
-//    QList<NumberValue*> numbers=prop->getNumbers();
-//    for (int j = 0; j < numbers.size(); ++j) {
-//        if (numbers[j]->name()=="exposure")        _exposure=numbers[j]->getValue();
-//        if (numbers[j]->name()=="pulse")           _pulse=numbers[j]->getValue();
-//        if (numbers[j]->name()=="calsteps")        _calSteps=numbers[j]->getValue();
-//        if (numbers[j]->name()=="pulsemax")        _pulseMax=numbers[j]->getValue();
-//        if (numbers[j]->name()=="pulsemin")        _pulseMin=numbers[j]->getValue();
-//        if (numbers[j]->name()=="raAgr")        _raAgr=numbers[j]->getValue();
-//        if (numbers[j]->name()=="deAgr")        _deAgr=numbers[j]->getValue();
-//        prop->setState(1);
-//        emit propertyUpdated(prop,&_modulename);
-//        _propertyStore.add(prop);
-//        //BOOST_LOG_TRIVIAL(debug) << "Focus number property item modified " << prop->getName().toStdString();
-//    }
-//
-//}
-//void GuiderModule::OnSetPropertyText(TextProperty* prop)
-//{
-//    if (!(prop->getModuleName()==_modulename)) return;
-//}
-//
-//void GuiderModule::OnSetPropertySwitch(SwitchProperty* prop)
-//{
-//    if (!(prop->getModuleName()==_modulename)) return;
-//
-//    SwitchProperty* wprop = _propertyStore.getSwitch(prop->getDeviceName(),prop->getGroupName(),prop->getName());
-//    QList<SwitchValue*> switchs=prop->getSwitches();
-//    for (int j = 0; j < switchs.size(); ++j) {
-//        if (switchs[j]->name()=="calibration") {
-//            disconnect(&_SMInit,        &QStateMachine::finished,nullptr, nullptr);
-//            disconnect(&_SMCalibration, &QStateMachine::finished,nullptr, nullptr);
-//            connect(&_SMInit,           &QStateMachine::finished,&_SMCalibration,&QStateMachine::start) ;
-//            _SMInit.start();
-//            wprop->setSwitch(switchs[j]->name(),true);
-//        }
-//        if (switchs[j]->name()=="init") {
-//            disconnect(&_SMInit,        &QStateMachine::finished,nullptr, nullptr);
-//            disconnect(&_SMCalibration, &QStateMachine::finished,nullptr, nullptr);
-//            _SMInit.start();
-//            wprop->setSwitch(switchs[j]->name(),true);
-//        }
-//        if (switchs[j]->name()=="guide") {
-//            disconnect(&_SMInit,        &QStateMachine::finished,nullptr, nullptr);
-//            disconnect(&_SMCalibration, &QStateMachine::finished,nullptr, nullptr);
-//            connect(&_SMInit,           &QStateMachine::finished,&_SMGuide,&QStateMachine::start) ;
-//            _SMInit.start();
-//            wprop->setSwitch(switchs[j]->name(),true);
-//        }
-//        if (switchs[j]->name()=="calguide") {
-//            disconnect(&_SMInit,        &QStateMachine::finished,nullptr, nullptr);
-//            disconnect(&_SMCalibration, &QStateMachine::finished,nullptr, nullptr);
-//            connect(&_SMInit,           &QStateMachine::finished,&_SMCalibration,&QStateMachine::start) ;
-//            connect(&_SMCalibration,    &QStateMachine::finished,&_SMGuide,      &QStateMachine::start) ;
-//            _SMInit.start();
-//            wprop->setSwitch(switchs[j]->name(),true);
-//        }
-//        if (switchs[j]->name()=="loadconfs") {
-//            wprop->setSwitch(switchs[j]->name(),true);
-//            loadDevicesConfs();
-//        }
-//        if (switchs[j]->name()=="abort")  {
-//            wprop->setSwitch(switchs[j]->name(),true);
-//            emit Abort();
-//        }
-//        if (switchs[j]->name()=="condev") {
-//            wprop->setSwitch(switchs[j]->name(),true);
-//            connectAllDevices();
-//        }
-//        //prop->setSwitches(switchs);
-//        _propertyStore.update(wprop);
-//        emit propertyUpdated(wprop,&_modulename);
-//    }
-//
-//}
 
 void GuiderModule::newNumber(INumberVectorProperty *nvp)
 {
