@@ -1,0 +1,131 @@
+{
+    "actions": {
+        "devcat": "Control",
+        "group": "",
+        "permission": 2,
+        "rule":2,
+        "propertyLabel": "Actions",
+        "elements": {
+            "loop": {
+                "elementLabel": "Infinite loop"
+                ,"value":false
+            },
+            "abort": {
+                "elementLabel": "Abort"
+                ,"value":false
+            },
+            "shoot": {
+                "elementLabel": "Single shoot"
+                ,"value":false
+            }
+        }
+    },
+    "imagevalues": {
+        "devcat": "Control",
+        "rule":0,
+        "elements": {
+                "width": {
+                    "elementLabel": "Width",
+                    "value":0
+                },
+                "height": {
+                    "elementLabel": "Height",
+                    "value":0
+                },
+                "min": {
+                    "elementLabel": "Min ADU",
+                    "value":0
+                },
+                "max": {
+                    "elementLabel": "Max ADU",
+                    "value":0
+                },
+                "mean": {
+                    "elementLabel": "Mean ADU",
+                    "value":0
+                },
+                "median": {
+                    "elementLabel": "Median ADU",
+                    "value":0
+                },
+                "stddev": {
+                    "elementLabel": "StdDev",
+                    "value":0
+                },
+                "snr": {
+                    "elementLabel": "SNR",
+                    "value":0
+                },
+                "imgHFR": {
+                    "elementLabel": "Image HFR",
+                    "value":0
+                },
+                "starscount": {
+                    "elementLabel": "Stars found",
+                    "value":0
+                }
+
+        },
+        "group": "",
+        "permission": 0,
+        "propertyLabel": "Last image statistics"
+    },
+    "parameters": {
+        "devcat": "Control",
+        "group": "",
+        "permission": 2,
+        "hasprofile":true,
+        "propertyLabel": "Parameters",
+        "elements": {
+            "steps": {
+                "elementLabel": "Steps gap",
+                "value":100,
+                "format": "999999"
+            },
+            "iterations": {
+                "elementLabel": "Iterations",
+                "value":10,
+                "format": "99"
+            },
+            "exposure": {
+                "elementLabel": "Exposure",
+                "value":10,
+                "format": "99.99"
+            }
+        }
+    },
+    "image": {
+        "devcat": "Results",
+        "group": "",
+        "permission": 0,
+        "propertyLabel": "Last image",
+        "URL": ""
+    },
+    "imagemap": {
+        "devcat": "Results",
+        "group": "",
+        "permission": 0,
+        "propertyLabel": "Image map",
+        "URL": ""
+    },
+    "histogram": {
+        "devcat": "Results",
+        "rule":0,
+        "GDY":{
+            "D":"i",
+            "Y":"n"
+        },
+        "elements": {
+                "i": {
+                    "elementLabel": "I"
+                },
+                "n": {
+                    "elementLabel": "N"
+                }
+        },
+        "group": "",
+        "permission": 0,
+        "propertyLabel": "Histogram"
+    }
+
+}

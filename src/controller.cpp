@@ -21,14 +21,14 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
 
 
 
-    //LoadModule(QCoreApplication::applicationDirPath()+"/libostguider.so","guider1","Guider");
-    //LoadModule(QCoreApplication::applicationDirPath()+"/libostinspector.so","inspector1","Frame inspector");
+    //LoadModule("libostinspector","inspector1","CCD inspector","default");
+    LoadModule("libostguider","guider1","Guider","default");
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostpolar.so","polar1","Polar assistant");
-    LoadModule("libostmaincontrol","mainctl","Maincontrol","default");
+    //LoadModule("libostmaincontrol","mainctl","Maincontrol","default");
     //LoadModule("libostdummy","dummy1","Dummy 1","default");
-    LoadModule("libostfocuser","focus1","My favorite focuser","default");
+    //LoadModule("libostfocuser","focus1","My favorite focuser","default");
     //LoadModule("libostindipanel","indipanel","indi control panel","default");
-    LoadModule("libostallsky","allsky","Allsky Camera","default");
+    //LoadModule("libostallsky","allsky","Allsky Camera","default");
 
 }
 

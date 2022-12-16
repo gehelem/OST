@@ -1,6 +1,6 @@
 #ifndef INSPECTOR_MODULE_h_
 #define INSPECTOR_MODULE_h_
-#include <basemodule.h>
+#include <indimodule.h>
 
 #if defined(INSPECTOR_MODULE)
 #  define MODULE_INIT Q_DECL_EXPORT
@@ -8,17 +8,12 @@
 #  define MODULE_INIT Q_DECL_IMPORT
 #endif
 
-#include <QtCore>
-#include <QtConcurrent>
-#include <QStateMachine>
-#include "image.h"
-
-class MODULE_INIT InspectorModule : public Basemodule
+class MODULE_INIT InspectorModule : public IndiModule
 {
     Q_OBJECT
 
     public:
-        InspectorModule(QString name,QString label);
+        InspectorModule(QString name,QString label,QString profile,QVariantMap availableModuleLibs);
         ~InspectorModule();
 
     signals:
@@ -45,9 +40,7 @@ class MODULE_INIT InspectorModule : public Basemodule
         void AbortDone();
         void Abort();
     public slots:
-        void OnSetPropertyText(TextProperty* prop) override;
-        void OnSetPropertyNumber(NumberProperty* prop) override;
-        void OnSetPropertySwitch(SwitchProperty* prop) override;
+        void OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData) override;
         void OnSucessSEP();
 
     private:
@@ -56,36 +49,20 @@ class MODULE_INIT InspectorModule : public Basemodule
         void newSwitch(ISwitchVectorProperty *svp) override;
 
 
-        void SMBuild();
-        void SMBuildLoop();
-        void SMInit();
-        void SMRequestFrameReset();
-        void SMRequestExposure();
-        void SMFindStars();
-        void SMCompute();
 
-        void SMRequestExposureBest();
-        void SMComputeResult();
-        void SMInitLoopFrame();
-        void SMComputeLoopFrame();
-
-
+        void Shoot();
         void SMAlert();
         //void SMLoadblob(IBLOB *bp);
         void SMLoadblob();
         void SMAbort();
         void startCoarse();
 
-        TextProperty* _devices;
-        NumberProperty* _values;
-        NumberProperty* _parameters;
-        SwitchProperty* _actions;
-        ImageProperty* _img;
-        GridProperty* _grid;
-
-
         QString _camera  = "CCD Simulator";
         bool    _newblob;
+
+        QPointer<fileio> _image;
+        Solver _solver;
+        FITSImage::Statistic stats;
 
         int    _iterations = 3;
         int    _steps = 3000;
@@ -98,11 +75,9 @@ class MODULE_INIT InspectorModule : public Basemodule
         double _bestpos;
         double _bestposfit;
         double _besthfr;
-        QStateMachine _machine;
-        QStateMachine _machineLoop;
 
 };
 
-extern "C" MODULE_INIT InspectorModule *initialize(QString name,QString label);
+extern "C" MODULE_INIT InspectorModule *initialize(QString name,QString label,QString profile,QVariantMap availableModuleLibs);
 
 #endif

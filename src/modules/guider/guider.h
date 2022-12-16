@@ -1,6 +1,6 @@
 #ifndef GUIDER_MODULE_h_
 #define GUIDER_MODULE_h_
-#include <basemodule.h>
+#include <indimodule.h>
 
 #if defined(GUIDER_MODULE)
 #  define MODULE_INIT Q_DECL_EXPORT
@@ -11,7 +11,7 @@
 #include <QtCore>
 #include <QtConcurrent>
 #include <QStateMachine>
-#include "image.h"
+
 
 struct Trig
 {
@@ -39,12 +39,12 @@ struct MatchedPair
   double dy; // y drift
 };
 
-class MODULE_INIT GuiderModule : public Basemodule
+class MODULE_INIT GuiderModule  : public IndiModule
 {
     Q_OBJECT
 
     public:
-        GuiderModule(QString name,QString label);
+        GuiderModule(QString name,QString label,QString profile,QVariantMap availableModuleLibs);
         ~GuiderModule();
 
     signals:
@@ -67,9 +67,7 @@ class MODULE_INIT GuiderModule : public Basemodule
 
 
     public slots:
-        void OnSetPropertyText(TextProperty* prop) override;
-        void OnSetPropertyNumber(NumberProperty* prop) override;
-        void OnSetPropertySwitch(SwitchProperty* prop) override;
+        void OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData) override;
         void OnSucessSEP();
         void DummySlot(){BOOST_LOG_TRIVIAL(debug) << "************************* DUMMY SLOT";}
     private:
@@ -77,19 +75,20 @@ class MODULE_INIT GuiderModule : public Basemodule
         void newBLOB(IBLOB *bp) override;
         void newSwitch(ISwitchVectorProperty *svp) override;
 
-        SwitchProperty* _actions;
-        NumberProperty* _commonParams;
-        NumberProperty* _calParams;
-        NumberProperty* _guideParams;
-        NumberProperty* _values;
-        ImageProperty*  _img;
-        GridProperty*   _grid;
-        LightProperty*  _states;
-        GridProperty*   _gridguide;
+        //SwitchProperty* _actions;
+        //NumberProperty* _commonParams;
+        //NumberProperty* _calParams;
+        //NumberProperty* _guideParams;
+        //NumberProperty* _values;
+        //ImageProperty*  _img;
+        //GridProperty*   _grid;
+        //LightProperty*  _states;
+        //GridProperty*   _gridguide;
 
 
-        //std::unique_ptr<Image> image =nullptr;
-        QPointer<Image> image;
+        QPointer<fileio> _image;
+        Solver _solver;
+        FITSImage::Statistic stats;
 
         double _exposure = 0.5;
         int    _pulse  = 1000;
@@ -126,7 +125,7 @@ class MODULE_INIT GuiderModule : public Basemodule
         int _itt=0;
 
 
-        QString _camera  = "Guide Simulator";
+        QString _camera  = "CCD Simulator";
         QString _mount  = "Telescope Simulator";
         QStateMachine *_machine;
         QStateMachine _SMInit;
@@ -166,6 +165,6 @@ class MODULE_INIT GuiderModule : public Basemodule
         void SMAbort();
 };
 
-extern "C" MODULE_INIT GuiderModule *initialize(QString name,QString label);
+extern "C" MODULE_INIT GuiderModule *initialize(QString name,QString label,QString profile,QVariantMap availableModuleLibs);
 
 #endif
