@@ -60,38 +60,46 @@ void GuiderModule::OnMyExternalEvent(const QString &eventType, const QString  &e
             foreach(const QString& keyelt, eventData[keyprop].toMap()["elements"].toMap().keys()) {
                 BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << keyprop.toStdString() << "-" << keyelt.toStdString();
                 QVariant val=eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
-                if (keyprop=="parameters") {
-                    if (keyelt=="startpos") {
+                if (keyprop=="commonParams") {
+                    if (keyelt=="exposure") {
                         if (setOstElement(keyprop,keyelt,val,true)) {
-                            //_startpos=val.toInt();
+                            _exposure=val.toDouble();
                         }
                     }
-//                    if (keyelt=="steps") {
-//                        if (setOstElement(keyprop,keyelt,val,true)) {
-//                            _steps=val.toInt();
-//                        }
-//                    }
-//                    if (keyelt=="iterations") {
-//                        if (setOstElement(keyprop,keyelt,val,true)) {
-//                            _iterations=val.toInt();
-//                        }
-//                    }
-//                    if (keyelt=="loopIterations") {
-//                        if (setOstElement(keyprop,keyelt,val,true)) {
-//                            _loopIterations=val.toInt();
-//                        }
-//                    }
-//                    if (keyelt=="exposure") {
-//                        if (setOstElement(keyprop,keyelt,val,true)) {
-//                            _exposure=val.toInt();
-//                        }
-//                    }
-//                    if (keyelt=="backlash") {
-//                        if (setOstElement(keyprop,keyelt,val,true)) {
-//                            _backlash=val.toInt();
-//                        }
-//                    }
-//
+                }
+                if (keyprop=="calParams") {
+                    if (keyelt=="pulse") {
+                        if (setOstElement(keyprop,keyelt,val,true)) {
+                            _pulse=val.toInt();
+                        }
+                    }
+                    if (keyelt=="calsteps") {
+                        if (setOstElement(keyprop,keyelt,val,true)) {
+                            _calSteps=val.toInt();
+                        }
+                    }
+                }
+                if (keyprop=="guideParams") {
+                    if (keyelt=="pulsemax") {
+                        if (setOstElement(keyprop,keyelt,val,true)) {
+                            _pulseMax=val.toInt();
+                        }
+                    }
+                    if (keyelt=="pulsemin") {
+                        if (setOstElement(keyprop,keyelt,val,true)) {
+                            _pulseMin=val.toInt();
+                        }
+                    }
+                    if (keyelt=="raAgr") {
+                        if (setOstElement(keyprop,keyelt,val,true)) {
+                            _raAgr=val.toDouble();
+                        }
+                    }
+                    if (keyelt=="deAgr") {
+                        if (setOstElement(keyprop,keyelt,val,true)) {
+                            _deAgr=val.toDouble();
+                        }
+                    }
                 }
                 if (keyprop=="actions") {
                     if (keyelt=="calguide") {
