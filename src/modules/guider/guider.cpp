@@ -251,17 +251,17 @@ void GuiderModule::newBLOB(IBLOB *bp)
             (QString(bp->bvp->device) == _camera)
        )
     {
-        delete image;
-        image = new Image();
-        image->LoadFromBlob(bp);
-        image->CalcStats();
-        image->computeHistogram();
-        //image->saveStretchedToJpeg(_webroot+"/"+QString(bp->bvp->device)+".jpeg",100);
-        image->saveToJpeg(_webroot+"/"+QString(bp->bvp->device)+".jpeg",100);
+        delete _image;
+        _image=new fileio();
+        _image->loadBlob(bp);
+        stats=_image->getStats();
+        QImage rawImage = _image->getRawQImage();
+        QImage im = rawImage.convertToFormat(QImage::Format_RGB32);
+        im.setColorTable(rawImage.colorTable());
 
-        _img->setURL(QString(bp->bvp->device)+".jpeg");
-        emit propertyUpdated(_img,&_modulename);
-        _propertyStore.add(_img);
+        im.save(_webroot+"/"+getName()+".jpeg","JPG",100);
+        setOstPropertyAttribute("image","URL",getName()+".jpeg",true);
+
         BOOST_LOG_TRIVIAL(debug) << "Emit Exposure done";
         emit ExposureDone();
     }
@@ -432,27 +432,26 @@ void GuiderModule::SMInitInit()
        emit Abort();
        return;
    }
-   _gridguide->clear();
-   _propertyStore.update(_gridguide);
-   emit propertyUpdated(_gridguide,&_modulename);
-
-   _grid->clear();
-   _propertyStore.update(_grid);
-   emit propertyUpdated(_grid,&_modulename);
-    BOOST_LOG_TRIVIAL(debug) << "SMInitInitDone";
-    emit InitDone();
+   //_gridguide->clear();
+   //_propertyStore.update(_gridguide);
+   //emit propertyUpdated(_gridguide,&_modulename);
+   //_grid->clear();
+   //_propertyStore.update(_grid);
+   //emit propertyUpdated(_grid,&_modulename);
+   BOOST_LOG_TRIVIAL(debug) << "SMInitInitDone";
+   emit InitDone();
 }
 void GuiderModule::SMInitCal()
 {
     BOOST_LOG_TRIVIAL(debug) << "SMInitCal";
     sendMessage("SMInitCal");
     BOOST_LOG_TRIVIAL(debug) << "Guider module - Start calibration";
-    _states->addLight(new LightValue("idle"  ,"Idle","hint",0));
-    _states->addLight(new LightValue("cal"   ,"Calibrating","hint",2));
-    _states->addLight(new LightValue("guide" ,"Guiding","hint",0));
-    _states->addLight(new LightValue("error" ,"Error","hint",0));
-    emit propertyUpdated(_states,&_modulename);
-    _propertyStore.update(_states);
+    //_states->addLight(new LightValue("idle"  ,"Idle","hint",0));
+    //_states->addLight(new LightValue("cal"   ,"Calibrating","hint",2));
+    //_states->addLight(new LightValue("guide" ,"Guiding","hint",0));
+    //_states->addLight(new LightValue("error" ,"Error","hint",0));
+    //emit propertyUpdated(_states,&_modulename);
+    //_propertyStore.update(_states);
 
     _calState=0;
     _calStep=0;
@@ -488,20 +487,20 @@ void GuiderModule::SMInitGuide()
     BOOST_LOG_TRIVIAL(debug) << "*********************** cal S "<< _calPulseS;
     BOOST_LOG_TRIVIAL(debug) << "************************************************************";
     BOOST_LOG_TRIVIAL(debug) << "************************************************************";
-    _states->addLight(new LightValue("idle"  ,"Idle","hint",0));
-    _states->addLight(new LightValue("cal"   ,"Calibrating","hint",0));
-    _states->addLight(new LightValue("guide" ,"Guiding","hint",2));
-    _states->addLight(new LightValue("error" ,"Error","hint",0));
-    emit propertyUpdated(_states,&_modulename);
-    _propertyStore.update(_states);
+    //_states->addLight(new LightValue("idle"  ,"Idle","hint",0));
+    //_states->addLight(new LightValue("cal"   ,"Calibrating","hint",0));
+    //_states->addLight(new LightValue("guide" ,"Guiding","hint",2));
+    //_states->addLight(new LightValue("error" ,"Error","hint",0));
+    //emit propertyUpdated(_states,&_modulename);
+    //_propertyStore.update(_states);
 
-    _gridguide->clear();
-    _propertyStore.update(_gridguide);
-    emit propertyUpdated(_gridguide,&_modulename);
+    //_gridguide->clear();
+    //_propertyStore.update(_gridguide);
+    //emit propertyUpdated(_gridguide,&_modulename);
 
-    _grid->clear();
-    _propertyStore.update(_grid);
-    emit propertyUpdated(_grid,&_modulename);
+    //_grid->clear();
+    //_propertyStore.update(_grid);
+    //emit propertyUpdated(_grid,&_modulename);
 
     BOOST_LOG_TRIVIAL(debug) << "SMInitGuideDone";
     emit InitGuideDone();
@@ -558,9 +557,9 @@ void GuiderModule::SMComputeCal()
     if (_trigCurrent.size()>0) {
         matchIndexes(_trigPrev,_trigCurrent,_matchedCurPrev,_dxPrev,_dyPrev);
         matchIndexes(_trigFirst,_trigCurrent,_matchedCurFirst,_dxFirst,_dyFirst);
-        _grid->append(_dxFirst,_dyFirst);
-        _propertyStore.update(_grid);
-        emit propertyAppended(_grid,&_modulename,0,_dxFirst,_dyFirst,0,0);
+        //_grid->append(_dxFirst,_dyFirst);
+        //_propertyStore.update(_grid);
+        //emit propertyAppended(_grid,&_modulename,0,_dxFirst,_dyFirst,0,0);
         BOOST_LOG_TRIVIAL(debug) << "DX DY // first =  " << _dxFirst << "-" << _dyFirst;
         _dxvector.push_back(_dxPrev);
         _dyvector.push_back(_dyPrev);
@@ -662,12 +661,12 @@ void GuiderModule::SMComputeCal()
 }
 void GuiderModule::SMComputeGuide()
 {
-    _states->addLight(new LightValue("idle"  ,"Idle","hint",0));
-    _states->addLight(new LightValue("cal"   ,"Calibrating","hint",1));
-    _states->addLight(new LightValue("guide" ,"Guiding","hint",2));
-    _states->addLight(new LightValue("error" ,"Error","hint",0));
-    emit propertyUpdated(_states,&_modulename);
-    _propertyStore.update(_states);
+    //_states->addLight(new LightValue("idle"  ,"Idle","hint",0));
+    //_states->addLight(new LightValue("cal"   ,"Calibrating","hint",1));
+    //_states->addLight(new LightValue("guide" ,"Guiding","hint",2));
+    //_states->addLight(new LightValue("error" ,"Error","hint",0));
+    //emit propertyUpdated(_states,&_modulename);
+    //_propertyStore.update(_states);
 
     BOOST_LOG_TRIVIAL(debug) << "SMComputeGuide " << _solver.stars.size();
     _pulseW = 0;
@@ -679,9 +678,9 @@ void GuiderModule::SMComputeGuide()
     BOOST_LOG_TRIVIAL(debug) << "Trig current size " << _trigCurrent.size();
     if (_trigCurrent.size()>0) {
         matchIndexes(_trigFirst,_trigCurrent,_matchedCurFirst,_dxFirst,_dyFirst);
-        _grid->append(_dxFirst,_dyFirst);
-        _propertyStore.update(_grid);
-        emit propertyAppended(_grid,&_modulename,0,_dxFirst,_dyFirst,0,0);
+        //_grid->append(_dxFirst,_dyFirst);
+        //_propertyStore.update(_grid);
+        //emit propertyAppended(_grid,&_modulename,0,_dxFirst,_dyFirst,0,0);
     }
     double _driftRA=  _dxFirst*cos(_calCcdOrientation)+_dyFirst*sin(_calCcdOrientation);
     double _driftDE= -_dxFirst*sin(_calCcdOrientation)+_dyFirst*cos(_calCcdOrientation);
@@ -715,17 +714,17 @@ void GuiderModule::SMComputeGuide()
     } else _pulseN=0;
     if (_pulseN>0) BOOST_LOG_TRIVIAL(debug) << "*********************** guide  N pulse " << _pulseN;
 
-    _gridguide->append(_itt,_driftRA,_driftDE,_pulseW-_pulseE,_pulseN-_pulseS);
-    _propertyStore.update(_gridguide);
-    emit propertyAppended(_gridguide,&_modulename,_itt,_driftRA,_driftDE,_pulseW-_pulseE,_pulseN-_pulseS);
+    //_gridguide->append(_itt,_driftRA,_driftDE,_pulseW-_pulseE,_pulseN-_pulseS);
+    //_propertyStore.update(_gridguide);
+    //emit propertyAppended(_gridguide,&_modulename,_itt,_driftRA,_driftDE,_pulseW-_pulseE,_pulseN-_pulseS);
     _itt++;
 
-    _values->addNumber(new NumberValue("pulseN","Pulse N","hint",_pulseN,"",0,10000,0));
-    _values->addNumber(new NumberValue("pulseS","Pulse S","hint",_pulseS,"",0,10000,0));
-    _values->addNumber(new NumberValue("pulseE","Pulse E","hint",_pulseE,"",0,10000,0));
-    _values->addNumber(new NumberValue("pulseW","Pulse W","hint",_pulseW,"",0,10000,0));
-    emit propertyCreated(_values,&_modulename);
-    _propertyStore.add(_values);
+    //_values->addNumber(new NumberValue("pulseN","Pulse N","hint",_pulseN,"",0,10000,0));
+    //_values->addNumber(new NumberValue("pulseS","Pulse S","hint",_pulseS,"",0,10000,0));
+    //_values->addNumber(new NumberValue("pulseE","Pulse E","hint",_pulseE,"",0,10000,0));
+    //_values->addNumber(new NumberValue("pulseW","Pulse W","hint",_pulseW,"",0,10000,0));
+    //emit propertyCreated(_values,&_modulename);
+    //_propertyStore.add(_values);
 
     emit ComputeGuideDone();
 }
@@ -807,12 +806,12 @@ void GuiderModule::SMAbort()
 
     emit AbortDone();
 
-    _states->addLight(new LightValue("idle"  ,"Idle","hint",1));
-    _states->addLight(new LightValue("cal"   ,"Calibrating","hint",0));
-    _states->addLight(new LightValue("guide" ,"Guiding","hint",0));
-    _states->addLight(new LightValue("error" ,"Error","hint",0));
-    emit propertyUpdated(_states,&_modulename);
-    _propertyStore.update(_states);
+    //_states->addLight(new LightValue("idle"  ,"Idle","hint",1));
+    //_states->addLight(new LightValue("cal"   ,"Calibrating","hint",0));
+    //_states->addLight(new LightValue("guide" ,"Guiding","hint",0));
+    //_states->addLight(new LightValue("error" ,"Error","hint",0));
+    //emit propertyUpdated(_states,&_modulename);
+    //_propertyStore.update(_states);
 
 
 }
