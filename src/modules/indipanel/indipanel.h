@@ -1,6 +1,6 @@
 #ifndef INDIPANEL_MODULE_h_
 #define INDIPANEL_MODULE_h_
-#include <basemodule.h>
+#include <indimodule.h>
 
 
 #if defined(INDIPANEL_MODULE)
@@ -9,20 +9,16 @@
 #  define MODULE_INIT Q_DECL_IMPORT
 #endif
 
-class MODULE_INIT IndiPanel : public Basemodule
+class MODULE_INIT IndiPanel : public IndiModule
 {
     Q_OBJECT
 
     public:
-        IndiPanel(QString name,QString label);
+        IndiPanel(QString name,QString label,QString profile,QVariantMap availableModuleLibs);
         ~IndiPanel();
 
     public slots:
-        void OnSetPropertyText(TextProperty* prop) override;
-        void OnSetPropertyNumber(NumberProperty* prop) override;
-        void OnSetPropertySwitch(SwitchProperty* prop) override;
-        void OnSucessSEP(void);
-
+        //void OnSetPropertyText(TextProperty* prop) override;
 
     private:
         void newDevice      (INDI::BaseDevice *dp) override;
@@ -35,9 +31,10 @@ class MODULE_INIT IndiPanel : public Basemodule
         void newBLOB        (IBLOB *bp) override;
         void newSwitch      (ISwitchVectorProperty *svp) override;
         void newMessage     (INDI::BaseDevice *dp, int messageID) override;
+        void OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData) override;
 
 };
 
-extern "C" MODULE_INIT IndiPanel *initialize(QString name,QString label);
+extern "C" MODULE_INIT IndiPanel *initialize(QString name, QString label, QString profile,QVariantMap availableModuleLibs);
 
 #endif

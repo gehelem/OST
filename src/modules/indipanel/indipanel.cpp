@@ -1,15 +1,19 @@
 #include "indipanel.h"
 
-IndiPanel *initialize(QString name, QString label)
+IndiPanel *initialize(QString name, QString label,QString profile,QVariantMap availableModuleLibs)
 {
-    IndiPanel *basemodule = new IndiPanel(name,label);
+    IndiPanel *basemodule = new IndiPanel(name,label,profile,availableModuleLibs);
     return basemodule;
 }
 
-IndiPanel::IndiPanel(QString name, QString label)
-    : Basemodule(name,label)
+IndiPanel::IndiPanel(QString name, QString label, QString profile,QVariantMap availableModuleLibs)
+    : IndiModule(name,label,profile,availableModuleLibs)
 {
-    _moduledescription="Indi control panel";
+    setOstProperty("moduleDescription","Full indi control panel",true);
+    setOstProperty("moduleLabel","Indi control panel",true);
+    setOstProperty("moduleName","indipanel",true);
+    setOstProperty("moduleVersion",0.11,true);
+
 }
 
 IndiPanel::~IndiPanel()
@@ -18,28 +22,46 @@ IndiPanel::~IndiPanel()
 }
 void IndiPanel::newDevice(INDI::BaseDevice *dp)
 {
-    MessageProperty* mess = new MessageProperty(_modulename,dp->getDeviceName(),"root",dp->getDeviceName(),dp->getDeviceName(),0,0,0);
-    emit propertyCreated(mess,&_modulename);
-    _propertyStore.add(mess);
+    auto props = dp->getProperties();
+    BOOST_LOG_TRIVIAL(debug) << "Indipanel new device" << dp->getDeviceName();
+
+    for (auto pProperty : props) {
+        QString dev = pProperty->getDeviceName();
+        QString pro = pProperty->getName();
+        QString devpro = dev+pro;
+        BOOST_LOG_TRIVIAL(debug) << "Indipanel new property " << devpro.toStdString();
+        QString mess;
+        if (!createOstProperty(devpro,pProperty->getLabel(),pProperty->getPermission(),pProperty->getDeviceName(),pProperty->getGroupName(),mess)) {
+            BOOST_LOG_TRIVIAL(debug) << "Indipanel can't create property" << mess.toStdString();
+        }
+    }
 }
 void IndiPanel::removeDevice(INDI::BaseDevice *dp)
 {
-    MessageProperty* mess = new MessageProperty(_modulename,dp->getDeviceName(),"root",dp->getDeviceName(),dp->getDeviceName(),0,0,0);
-    emit propertyRemoved(mess,&_modulename);
-    _propertyStore.remove(mess);
-    ImageProperty* img = new ImageProperty(_modulename,dp->getDeviceName(),QString(dp->getDeviceName()) + " Viewer",QString(dp->getDeviceName()) + "viewer","Image property label",0,0,0);
-    emit propertyRemoved(img,&_modulename);
-    _propertyStore.remove(img);
-
+    QString dev = dp->getDeviceName();
+    QVariantMap props=getOstProperties();
+    for(QVariantMap::const_iterator prop = props.begin(); prop != props.end(); ++prop) {
+      if (prop.value().toMap()["devcat"]==dev) {
+          BOOST_LOG_TRIVIAL(debug) << "indi remove property " << prop.key().toStdString();
+          deleteOstProperty(prop.key());
+      }
+    }
 }
 void IndiPanel::newProperty(INDI::Property *pProperty)
 {
+    QString dev = pProperty->getDeviceName();
+    QString pro = pProperty->getName();
+    QString devpro = dev+pro;
+    //BOOST_LOG_TRIVIAL(debug) << "Indipanel new property " << devpro.toStdString();
+    QString mess;
+    if (!createOstProperty(devpro,pProperty->getLabel(),pProperty->getPermission(),pProperty->getDeviceName(),pProperty->getGroupName(),mess)) {
+        BOOST_LOG_TRIVIAL(debug) << "Indipanel can't create property" << mess.toStdString();
+    }
+    setOstPropertyAttribute(devpro,"indi",pProperty->getType(),false);
+
     switch (pProperty->getType()) {
 
         case INDI_NUMBER: {
-            emit propertyCreated(PropertyFactory::createProperty(pProperty->getNumber(),&_modulename),&_modulename);
-            _propertyStore.add(PropertyFactory::createProperty(pProperty->getNumber(),&_modulename));
-            //BOOST_LOG_TRIVIAL(debug) << "Indipanel propeties size " << _propertyStore.getSize();
             if ( (strcmp(pProperty->getName(),"CCD_EXPOSURE")==0) ||
                  (strcmp(pProperty->getName(),"GUIDER_EXPOSURE")==0) )
             {
@@ -48,308 +70,179 @@ void IndiPanel::newProperty(INDI::Property *pProperty)
                 {
                     BOOST_LOG_TRIVIAL(debug) << "Setting blob mode for " << _wdp->getDeviceName();
                     setBLOBMode(B_ALSO,_wdp->getDeviceName(),nullptr);
-                    ImageProperty* img = new ImageProperty(_modulename,_wdp->getDeviceName(),QString(_wdp->getDeviceName()) + " Viewer",QString(_wdp->getDeviceName()) + "viewer","Image property label",0,0,0);
-                    emit propertyCreated(img,&_modulename);
-                    _propertyStore.add(img);
                 }
 
             }
+            INumberVectorProperty *vp=pProperty->getNumber();
+            for (int i=0;i<vp->nnp;i++) {
+                createOstElement(devpro,vp->np[i].name,vp->np[i].label,false);
+                setOstElement(devpro,vp->np[i].name,vp->np[i].value,false);
+                setOstElementAttribute(devpro,vp->np[i].name,"min",vp->np[i].min,false);
+                setOstElementAttribute(devpro,vp->np[i].name,"max",vp->np[i].max,false);
+                setOstElementAttribute(devpro,vp->np[i].name,"step",vp->np[i].step,false);
+                setOstElementAttribute(devpro,vp->np[i].name,"format",vp->np[i].format,false);
+                //setOstElementAttribute(devpro,vp->np[i].name,"aux0",vp->np[i].aux0,false);
+                //setOstElementAttribute(devpro,vp->np[i].name,"aux1",vp->np[i].aux1,false);
+            }
             break;
         }
-
         case INDI_SWITCH: {
-            emit propertyCreated(PropertyFactory::createProperty(pProperty->getSwitch(),&_modulename),&_modulename);
-            _propertyStore.add(PropertyFactory::createProperty(pProperty->getSwitch(),&_modulename));
-            //BOOST_LOG_TRIVIAL(debug) << "Indipanel propeties size " << _propertyStore.getSize();
+            ISwitchVectorProperty *vp=pProperty->getSwitch();
+            for (int i=0;i<vp->nsp;i++) {
+                createOstElement(devpro,vp->sp[i].name,vp->sp[i].label,false);
+                if (vp->sp[i].s==0) setOstElement(devpro,vp->sp[i].name,false,false);
+                if (vp->sp[i].s==1) setOstElement(devpro,vp->sp[i].name,true ,false);
+                //setOstElementAttribute(devpro,vp->sp[i].name,"aux0",vp->sp[i].aux,false);
+            }
+            setOstPropertyAttribute(devpro,"rule",vp->r,false);
             break;
         }
-
         case INDI_TEXT: {
-            emit propertyCreated(PropertyFactory::createProperty(pProperty->getText(),&_modulename),&_modulename);
-            _propertyStore.add(PropertyFactory::createProperty(pProperty->getText(),&_modulename));
-            //BOOST_LOG_TRIVIAL(debug) << "Indipanel propeties size " << _propertyStore.getSize();
+            ITextVectorProperty *vp=pProperty->getText();
+            for (int i=0;i<vp->ntp;i++) {
+                createOstElement(devpro,vp->tp[i].name,vp->tp[i].label,false);
+                setOstElement(devpro,vp->tp[i].name,vp->tp[i].text,false);
+                //setOstElementAttribute(devpro,vp->tp[i].name,"aux0",vp->tp[i].aux0,false);
+                //setOstElementAttribute(devpro,vp->tp[i].name,"aux1",vp->tp[i].aux1,false);
+            }
             break;
         }
-
         case INDI_LIGHT: {
-            emit propertyCreated( PropertyFactory::createProperty(pProperty->getLight(),&_modulename),&_modulename);
-            _propertyStore.add(PropertyFactory::createProperty(pProperty->getLight(),&_modulename));
-            //BOOST_LOG_TRIVIAL(debug) << "Indipanel propeties size " << _propertyStore.getSize();
+            ILightVectorProperty *vp=pProperty->getLight();
+            for (int i=0;i<vp->nlp;i++) {
+                createOstElement(devpro,vp->lp[i].name,vp->lp[i].label,false);
+                setOstElement(devpro,vp->lp[i].name,vp->lp[i].s,false);
+                //setOstElementAttribute(devpro,vp->lp[i].name,"aux0",vp->lp[i].aux,false);
+            }
             break;
         }
+        case INDI_BLOB: {
 
-        default:
             break;
+        }
+        case INDI_UNKNOWN: {
+            break;
+        }
     }
+    setOstPropertyAttribute(devpro,"status",pProperty->getState(),false);
+    emitPropertyCreation(devpro);
+
 
 }
 
 void IndiPanel::removeProperty(INDI::Property *property)
 {
+    QString dev = property->getDeviceName();
+    QString pro = property->getName();
+    QString devpro = dev+pro;
+    BOOST_LOG_TRIVIAL(debug) << "indi remove property " << devpro.toStdString();
+    deleteOstProperty(devpro);
+
     switch (property->getType()) {
 
         case INDI_NUMBER: {
-            emit propertyRemoved(PropertyFactory::createProperty(property->getNumber(),&_modulename),&_modulename);
-            _propertyStore.remove(PropertyFactory::createProperty(property->getNumber(),&_modulename));
-            //BOOST_LOG_TRIVIAL(debug) << "Indipanel propeties size " << _propertyStore.getSize();
             break;
         }
-
         case INDI_SWITCH: {
-            emit propertyRemoved(PropertyFactory::createProperty(property->getSwitch(),&_modulename),&_modulename);
-            _propertyStore.remove(PropertyFactory::createProperty(property->getSwitch(),&_modulename));
-            //BOOST_LOG_TRIVIAL(debug) << "Indipanel propeties size " << _propertyStore.getSize();
             break;
         }
-
         case INDI_TEXT: {
-            emit propertyRemoved(PropertyFactory::createProperty(property->getText(),&_modulename),&_modulename);
-            _propertyStore.remove(PropertyFactory::createProperty(property->getText(),&_modulename));
-            //BOOST_LOG_TRIVIAL(debug) << "Indipanel propeties size " << _propertyStore.getSize();
             break;
         }
-
         case INDI_LIGHT: {
-            emit propertyRemoved( PropertyFactory::createProperty(property->getLight(),&_modulename),&_modulename);
-            _propertyStore.remove(PropertyFactory::createProperty(property->getLight(),&_modulename));
-            //BOOST_LOG_TRIVIAL(debug) << "Indipanel propeties size " << _propertyStore.getSize();
             break;
         }
-
-        default:
+        case INDI_BLOB: {
             break;
+        }
+        case INDI_UNKNOWN: {
+            break;
+        }
     }
 }
-
 void IndiPanel::newNumber(INumberVectorProperty *nvp)
 {
-    _propertyStore.update(PropertyFactory::createProperty(nvp,&_modulename));
-    emit propertyUpdated(PropertyFactory::createProperty(nvp,&_modulename),&_modulename);
-
+    QString dev = nvp->device;
+    QString pro = nvp->name;
+    QString devpro = dev+pro;
+    for (int i=0;i<nvp->nnp;i++) {
+        setOstElement(devpro,nvp->np[i].name,nvp->np[i].value,false);
+        setOstElementAttribute(devpro,nvp->np[i].name,"min",nvp->np[i].min,false);
+        setOstElementAttribute(devpro,nvp->np[i].name,"max",nvp->np[i].max,false);
+        setOstElementAttribute(devpro,nvp->np[i].name,"step",nvp->np[i].step,false);
+        setOstElementAttribute(devpro,nvp->np[i].name,"format",nvp->np[i].format,false);
+    }
+    setOstPropertyAttribute(devpro,"status",nvp->s,true);
 }
-
 void IndiPanel::newText(ITextVectorProperty *tvp)
 {
-    _propertyStore.update(PropertyFactory::createProperty(tvp,&_modulename));
-    emit propertyUpdated(PropertyFactory::createProperty(tvp,&_modulename),&_modulename);
+    QString dev = tvp->device;
+    QString pro = tvp->name;
+    QString devpro = dev+pro;
+    for (int i=0;i<tvp->ntp;i++) {
+        setOstElement(devpro,tvp->tp[i].name,tvp->tp[i].text,false);
+    }
+    setOstPropertyAttribute(devpro,"status",tvp->s,true);
 }
-
 void IndiPanel::newLight(ILightVectorProperty *lvp)
 {
-    _propertyStore.update(PropertyFactory::createProperty(lvp,&_modulename));
-    emit propertyUpdated(PropertyFactory::createProperty(lvp,&_modulename),&_modulename);
+    QString dev = lvp->device;
+    QString pro = lvp->name;
+    QString devpro = dev+pro;
+    for (int i=0;i<lvp->nlp;i++) {
+        setOstElement(devpro,lvp->lp[i].name,lvp->lp[i].s,i==lvp->nlp-1);
+    }
+    setOstPropertyAttribute(devpro,"status",lvp->s,true);
 }
-
-
 void IndiPanel::newSwitch(ISwitchVectorProperty *svp)
 {
-    _propertyStore.update(PropertyFactory::createProperty(svp,&_modulename));
-    emit propertyUpdated(PropertyFactory::createProperty(svp,&_modulename),&_modulename);
-}
+    QString dev = svp->device;
+    QString pro = svp->name;
+    QString devpro = dev+pro;
+    for (int i=0;i<svp->nsp;i++) {
+        if (svp->sp[i].s==0) setOstElement(devpro,svp->sp[i].name,false,i==svp->nsp-1);
+        if (svp->sp[i].s==1) setOstElement(devpro,svp->sp[i].name,true ,i==svp->nsp-1);
+    }
+    setOstPropertyAttribute(devpro,"status",svp->s,true);
 
+}
 void IndiPanel::newBLOB(IBLOB *bp)
 {
-    image = new Image();
-    image->LoadFromBlob(bp);
-    image->CalcStats();
-    image->computeHistogram();
-    image->saveStretchedToJpeg(_webroot+"/"+QString(bp->bvp->device)+".jpeg",100);
-
-
-    ImageProperty* img = new ImageProperty(
-                _modulename,
-                bp->bvp->device,
-                QString(bp->bvp->device) + " Viewer",
-                QString(bp->bvp->device) + "viewer",
-                "Image property label",0,0,0
-                );
-    img->setURL(QString(bp->bvp->device)+".jpeg");
-    emit propertyUpdated(img,&_modulename);
-    _propertyStore.add(img);
-
-}
-void IndiPanel::OnSucessSEP(void)
-{
-    BOOST_LOG_TRIVIAL(debug) << "IMG stars found " << _solver.stars.size();
+    Q_UNUSED(bp)
 }
 void IndiPanel::newMessage     (INDI::BaseDevice *dp, int messageID)
 {
-    QString txt= QString::fromStdString(dp->messageQueue(messageID));
-
-    MessageProperty* mess = new MessageProperty(_modulename,dp->getDeviceName(),"root",dp->getDeviceName(),dp->getDeviceName(),0,0,0);
-    mess->setMessage(txt);
-    emit propertyUpdated(mess,&_modulename);
-    _propertyStore.add(mess);
+    //setOstProperty("message",QString::fromStdString(dp->messageQueue(messageID)),true);
+    Q_UNUSED(dp)
 }
 
-
-void IndiPanel::OnSetPropertyText(TextProperty* prop)
+void IndiPanel::OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData)
 {
-
-    if (!(prop->getModuleName()==_modulename)) return;
-
-    INDI::BaseDevice *dp = getDevice(prop->getDeviceName().toStdString().c_str());
-    if (dp== nullptr)
-    {
-        BOOST_LOG_TRIVIAL(debug) << "Indipanel device not found " << prop->getDeviceName().toStdString();
-        return;
-    }
-    INDI::Property *iprop;
-    iprop =  dp->getProperty(prop->getName().toStdString().c_str());
-    if (iprop== nullptr)
-    {
-        BOOST_LOG_TRIVIAL(debug) << "Indipanel property not found " << prop->getDeviceName().toStdString() << " " << prop->getName().toStdString();
-        return;
-    }
-
-    if (iprop->getType()==INDI_TEXT) {
-        ITextVectorProperty *inditprop;
-        inditprop =  dp->getText(prop->getName().toStdString().c_str());
-        if (inditprop== nullptr)
-        {
-            BOOST_LOG_TRIVIAL(debug) << "Indipanel text property not found " << prop->getDeviceName().toStdString() << " " << prop->getName().toStdString();
-            return;
-        }
-        QList<TextValue*> texts=prop->getTexts();
-        for (int j = 0; j < inditprop->ntp; ++j) {
-                for (int i = 0; i < texts.size(); ++i) {
-                    if (strcmp(texts[i]->name().toStdString().c_str(),inditprop->tp[j].name)==0) {
-                        strcpy(inditprop->tp[j].text,texts[i]->text().toStdString().c_str());
-                        BOOST_LOG_TRIVIAL(debug) << "Indipanel text property item  modified "
-                                                 << prop->getName().toStdString() << "/"
-                                                 << texts[j]->name().toStdString() << "/"
-                                                 << texts[j]->text().toStdString();
-                    }
-                }
-        }
-        sendNewText(inditprop);
-        return;
-    }
-
-
-    return;
-
-}
-
-void IndiPanel::OnSetPropertyNumber(NumberProperty* prop)
-{
-    if (!(prop->getModuleName()==_modulename)) return;
-
-
-
-    INDI::BaseDevice *dp = getDevice(prop->getDeviceName().toStdString().c_str());
-    if (dp== nullptr)
-    {
-        BOOST_LOG_TRIVIAL(debug) << "Indipanel device not found " << prop->getDeviceName().toStdString();
-        return;
-    }
-
-    BOOST_LOG_TRIVIAL(debug) << "Activate blob mode " << dp->getDeviceName();
-    if (dp->getDriverInterface() & INDI::BaseDevice::CCD_INTERFACE)
-    {
-        BOOST_LOG_TRIVIAL(debug) << "Setting blob mode " << dp->getDeviceName();
-        sendMessage("Setting blob mode " + QString(dp->getDeviceName()));
-        setBLOBMode(B_ALSO,dp->getDeviceName(),nullptr);
-    }
-
-    INDI::Property *iprop;
-    iprop =  dp->getProperty(prop->getName().toStdString().c_str());
-    if (iprop== nullptr)
-    {
-        BOOST_LOG_TRIVIAL(debug) << "Indipanel property not found " << prop->getDeviceName().toStdString() << " " << prop->getName().toStdString();
-        return;
-    }
-
-    if (iprop->getType()==INDI_NUMBER) {
-        INumberVectorProperty *indiprop;
-        indiprop =  dp->getNumber(prop->getName().toStdString().c_str());
-        if (indiprop== nullptr)
-        {
-            BOOST_LOG_TRIVIAL(debug) << "Indipanel number property not found " << prop->getDeviceName().toStdString() << " " << prop->getName().toStdString();
-            return;
-        }
-        QList<NumberValue*> numbers=prop->getNumbers();
-        for (int i = 0; i < indiprop->nnp; ++i) {
-            for (int j = 0; j < numbers.size(); ++j) {
-                if (strcmp(numbers[j]->name().toStdString().c_str(),indiprop->np[i].name)==0) {
-                    //strcpy(inditprop->tp[i].text,texts[j]->text().toStdString().c_str());
-                    indiprop->np[i].value=numbers[j]->getValue();
-                    BOOST_LOG_TRIVIAL(debug) << "Indipanel number propertyitem  modified " << indiprop->np[i].name << "/" << indiprop->np[i].value;
-                }
+    //BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << eventKey.toStdString();
+    foreach(const QString& keyprop, eventData.keys()) {
+        QString prop = keyprop;
+        QVariantMap ostprop = getOstProperty(keyprop);
+        QString devcat = ostprop["devcat"].toString();
+        prop.replace(devcat,"");
+        foreach(const QString& keyelt, eventData[keyprop].toMap()["elements"].toMap().keys()) {
+            //BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << prop.toStdString() << "-" << keyelt.toStdString() << "-" << eventData[keyprop].toMap()["indi"].toInt();
+            //setOstElement(keyprop,keyelt,eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"],true);
+            if (eventData[keyprop].toMap()["indi"].toInt()==INDI_TEXT) {
+                BOOST_LOG_TRIVIAL(debug) << "INDI_TEXT";
+                sendModNewText(devcat,prop,keyelt,eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toString());
+            }
+            if (eventData[keyprop].toMap()["indi"].toInt()==INDI_NUMBER) {
+                BOOST_LOG_TRIVIAL(debug) << "INDI_NUMBER";
+                sendModNewNumber(devcat,prop,keyelt,eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toFloat());
+            }
+            if (eventData[keyprop].toMap()["indi"].toInt()==INDI_SWITCH) {
+                BOOST_LOG_TRIVIAL(debug) << "INDI_SWITCH" << devcat.toStdString() << "-" << prop.toStdString() << "-" << keyelt.toStdString();
+                if ( eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toBool()) sendModNewSwitch(devcat,prop,keyelt,ISS_ON);
+                if (!eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toBool()) sendModNewSwitch(devcat,prop,keyelt,ISS_OFF);
             }
         }
-        sendNewNumber(indiprop);
-        return;
+
     }
-
-
-    return;
 }
-void IndiPanel::OnSetPropertySwitch(SwitchProperty* prop)
-{
-    if (!(prop->getModuleName()==_modulename)) return;
-
-    INDI::BaseDevice *dp = getDevice(prop->getDeviceName().toStdString().c_str());
-    if (dp== nullptr)
-    {
-        BOOST_LOG_TRIVIAL(debug) << "Indipanel device not found " << prop->getDeviceName().toStdString();
-        return;
-    }
-    INDI::Property *iprop;
-    iprop =  dp->getProperty(prop->getName().toStdString().c_str());
-    if (iprop== nullptr)
-    {
-        BOOST_LOG_TRIVIAL(debug) << "Indipanel property not found " << prop->getDeviceName().toStdString() << " " << prop->getName().toStdString();
-        return;
-    }
-
-    if (iprop->getType()==INDI_SWITCH) {
-        ISwitchVectorProperty *indiprop;
-        indiprop =  dp->getSwitch(prop->getName().toStdString().c_str());
-        if (indiprop== nullptr)
-        {
-            BOOST_LOG_TRIVIAL(debug) << "Indipanel switch property not found " << prop->getDeviceName().toStdString() << " " << prop->getName().toStdString();
-            return;
-        }
-        BOOST_LOG_TRIVIAL(debug) << "Indipanel switch property  " << prop->getDeviceName().toStdString() << " " << prop->getName().toStdString();
-
-        QList<SwitchValue*> switchs=prop->getSwitches();
-        for (int i = 0; i < indiprop->nsp; ++i) {
-            for (int j = 0; j < switchs.size(); ++j) {
-                if (indiprop->r==ISR_1OFMANY) {
-                    indiprop->sp[i].s=ISS_OFF;
-                    if (strcmp(switchs[j]->name().toStdString().c_str(),indiprop->sp[i].name)==0) {
-                        BOOST_LOG_TRIVIAL(debug) << "ISR_1OFMANY";
-                        indiprop->sp[i].s=ISS_ON;
-                    }
-
-                }
-                if (indiprop->r==ISR_ATMOST1) {
-                    if (strcmp(switchs[j]->name().toStdString().c_str(),indiprop->sp[i].name)==0) {
-                        BOOST_LOG_TRIVIAL(debug) << "ISR_ATMOST1";
-                        indiprop->sp[i].s=ISS_OFF;
-                        if (indiprop->sp[i].s==ISS_ON ) indiprop->sp[i].s=ISS_OFF;
-                        if (indiprop->sp[i].s==ISS_OFF) indiprop->sp[i].s=ISS_ON;
-                    }
-
-                }
-                if (indiprop->r==ISR_NOFMANY) {
-                    if (strcmp(switchs[j]->name().toStdString().c_str(),indiprop->sp[i].name)==0) {
-                        BOOST_LOG_TRIVIAL(debug) << "ISR_NOFMANY";
-                        if (indiprop->sp[i].s==ISS_ON ) {
-                            indiprop->sp[i].s=ISS_OFF;
-                        } else {
-                            indiprop->sp[i].s=ISS_ON;
-                        }
-                    }
-
-                }
-            }
-        }
-        sendNewSwitch(indiprop);
-        return;
-    }
 
 
-    return;
-}

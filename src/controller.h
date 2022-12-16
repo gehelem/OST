@@ -3,16 +3,14 @@
 #include <QCoreApplication>
 #include <QtSql/QSql>
 #include <QtSql/QSqlDatabase>
+#include <QtSql/QSqlQuery>
 //#include <QtSql/QSqlError>
 #include <boost/log/trivial.hpp>
 
 #include <basemodule.h>
-#include "utils/propertyvisitor.h"
-#include "utils/propertyfactory.h"
-#include "utils/propertytextdumper.h"
 
 #include "wshandler.h"
-#include "maincontrol.h"
+#include "dbmanager.h"
 
 /*!
  * This class is the heart of OST
@@ -24,27 +22,25 @@ class Controller : public QObject
 {
     Q_OBJECT
 public:
-    Controller(QObject *parent, bool saveAllBlobs, const QString& host, int port,const QString& webroot);
+    Controller(bool saveAllBlobs, const QString& host, int port,const QString& webroot,const QString& dbpath);
     ~Controller() override;
-    WShandler   *wshandler;
-public slots:
-    void OnPropertyCreated(Property *pProperty, QString *pModulename);
-    void OnPropertyUpdated(Property *pProperty, QString *pModulename);
-    void OnPropertyAppended(Property *pProperty, QString *pModulename);
-    void OnPropertyRemoved(Property *pProperty, QString *pModulename);
-    void OnNewMessageSent(QString message, QString *pModulename, QString Device);
-    void OnModuleDumped(QMap<QString, QMap<QString, QMap<QString, Property*>>> treeList, QString* pModulename, QString* pModulelabel);
-    void OnLoadModule(QString lib, QString label);
-
 signals:
-    void closed();
-    void dumpAsked(void);
+    void controllerEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData);
 private:
-    void LoadModule(QString lib,QString name,QString label);
     QString _indihost;
     int _indiport;
     QString _webroot;
-    QStringList _availableModuleLibs;
+    QString _dbpath;
+    QVariantMap _availableModuleLibs;
+    WShandler   *wshandler;
+    DBManager   *dbmanager;
+    void LoadModule(QString lib, QString name, QString label, QString profile);
+    void checkModules(void);
+
+private slots:
+    void OnModuleEvent  (const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData);
+    void OnExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData);
+
 
 };
 #endif
