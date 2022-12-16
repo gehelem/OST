@@ -399,7 +399,6 @@ bool fileio::loadBlob(IBLOB *bp)
         parseHeader();
         if(checkDebayer()) debayer();
         CalcStats();
-
     }
 
     fits_close_file(fptr, &status);
@@ -1239,48 +1238,56 @@ void fileio::CalcStats(void)
             calculateMinMax<uint8_t>();
             calculateMedian<uint8_t>();
             runningAverageStdDev<uint8_t>();
+            CalcHisto<uint8_t>();
             break;
 
         case TSHORT:
             calculateMinMax<int16_t>();
             calculateMedian<int16_t>();
             runningAverageStdDev<int16_t>();
+            CalcHisto<int16_t>();
             break;
 
         case TUSHORT:
             calculateMinMax<uint16_t>();
             calculateMedian<uint16_t>();
             runningAverageStdDev<uint16_t>();
+            CalcHisto<uint16_t>();
             break;
 
         case TLONG:
             calculateMinMax<int32_t>();
             calculateMedian<int32_t>();
             runningAverageStdDev<int32_t>();
+            CalcHisto<int32_t>();
             break;
 
         case TULONG:
             calculateMinMax<uint32_t>();
             calculateMedian<uint32_t>();
             runningAverageStdDev<uint32_t>();
+            CalcHisto<uint32_t>();
             break;
 
         case TFLOAT:
             calculateMinMax<float>();
             calculateMedian<float>();
             runningAverageStdDev<float>();
+            CalcHisto<float>();
             break;
 
         case TLONGLONG:
             calculateMinMax<int64_t>();
             calculateMedian<int64_t>();
             runningAverageStdDev<int64_t>();
+            CalcHisto<int64_t>();
             break;
 
         case TDOUBLE:
             calculateMinMax<double>();
             calculateMedian<double>();
             runningAverageStdDev<double>();
+            CalcHisto<double>();
             break;
 
         default:
@@ -1384,4 +1391,104 @@ void fileio::calculateMedian()
         stats.median[n] = samples[middle];
     }
 }
+/* taken from Kstars fitviewer FITSData */
+template <typename T>
+void fileio::CalcHisto(void)
+{
 
+    m_CumulativeFrequency.resize(3);
+    m_HistogramBinWidth.resize(3);
+    m_HistogramFrequency.resize(3);
+    m_HistogramIntensity.resize(3);
+
+    qDebug() << 1;
+    auto * const buffer = reinterpret_cast<T const *>(m_ImageBuffer);
+    qDebug() << 2;
+    uint32_t samples = stats.width * stats.height;
+    qDebug() << 3;
+    const uint32_t sampleBy = samples > 500000 ? samples / 500000 : 1;
+    qDebug() << 4;
+    m_HistogramBinCount = qMax(0., qMin(stats.max[0] - stats.min[0], 256.0));
+    if (m_HistogramBinCount <= 0)
+        m_HistogramBinCount = 256;
+    qDebug() << 5 << " channels " << stats.channels;
+    qDebug() << 5 << " m_HistogramBinCount " << m_HistogramBinCount;
+
+    for (int n = 0; n < stats.channels; n++)
+    {
+        qDebug() << 5 << "-" << n << "-0";
+        m_HistogramIntensity[n].fill(0, m_HistogramBinCount + 1);
+        qDebug() << 5 << "-" << n << "-1";
+        m_HistogramFrequency[n].fill(0, m_HistogramBinCount + 1);
+        qDebug() << 5 << "-" << n << "-2";
+        m_CumulativeFrequency[n].fill(0, m_HistogramBinCount + 1);
+        qDebug() << 5 << "-" << n << "-3";
+        m_HistogramBinWidth[n] = qMax(1.0, (stats.max[n] - stats.min[n]) / (m_HistogramBinCount - 1));
+        qDebug() << 5 << "-" << n << "-4";
+    }
+    qDebug() << 6;
+
+    QVector<QFuture<void>> futures;
+
+    qDebug() << 7;
+    for (int n = 0; n < stats.channels; n++)
+    {
+        futures.append(QtConcurrent::run([ = ]()
+        {
+            for (int i = 0; i < m_HistogramBinCount; i++)
+                m_HistogramIntensity[n][i] = stats.min[n] + (m_HistogramBinWidth[n] * i);
+        }));
+    }
+    qDebug() << 8;
+
+    for (int n = 0; n < stats.channels; n++)
+    {
+        futures.append(QtConcurrent::run([ = ]()
+        {
+            uint32_t offset = n * samples;
+
+            for (uint32_t i = 0; i < samples; i += sampleBy)
+            {
+                int32_t id = qMax(static_cast<T>(0), qMin(static_cast<T>(m_HistogramBinCount),
+                                  static_cast<T>(rint((buffer[i + offset] - stats.min[n]) / m_HistogramBinWidth[n]))));
+                m_HistogramFrequency[n][id] += sampleBy;
+            }
+        }));
+    }
+
+    for (QFuture<void> future : futures)
+        future.waitForFinished();
+
+    futures.clear();
+
+    for (int n = 0; n < stats.channels; n++)
+    {
+        futures.append(QtConcurrent::run([ = ]()
+        {
+            uint32_t accumulator = 0;
+            for (int i = 0; i < m_HistogramBinCount; i++)
+            {
+                accumulator += m_HistogramFrequency[n][i];
+                m_CumulativeFrequency[n].replace(i, accumulator);
+            }
+        }));
+    }
+
+    for (QFuture<void> future : futures)
+        future.waitForFinished();
+
+    futures.clear();
+    // Custom index to indicate the overall contrast of the image
+    if (m_CumulativeFrequency[0][m_HistogramBinCount / 4] > 0)
+        m_JMIndex = m_CumulativeFrequency[0][m_HistogramBinCount / 8] / static_cast<double>
+                    (m_CumulativeFrequency[0][m_HistogramBinCount /
+                            4]);
+    else
+        m_JMIndex = 1;
+
+    qDebug() << "FITHistogram: JMIndex " << m_JMIndex;
+
+    m_HistogramConstructed = true;
+    //emit histogramReady();
+
+}

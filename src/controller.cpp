@@ -21,8 +21,7 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
 
 
 
-    LoadModule("libostguider","guider1","Guider","default");
-    //LoadModule(QCoreApplication::applicationDirPath()+"/libostinspector.so","inspector1","Frame inspector");
+    LoadModule("libostinspector","inspector1","CCD inspector","default");
     //LoadModule(QCoreApplication::applicationDirPath()+"/libostpolar.so","polar1","Polar assistant");
     LoadModule("libostmaincontrol","mainctl","Maincontrol","default");
     //LoadModule("libostdummy","dummy1","Dummy 1","default");
