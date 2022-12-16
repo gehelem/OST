@@ -21,17 +21,23 @@
                 "elementLabel": "Pulse W",
                 "format": "99.99"
             },
-            "imgHFR": {
-                "elementLabel": "Last imgage HFR",
-                "value":0,
+            "calPulseN": {
+                "elementLabel": "Calibration Pulse N",
                 "format": "99.99"
             },
-            "iteration": {
-                "elementLabel": "Iteration",
-                "value":0,
-                "step":1,
-                "format": "9999"
+            "calPulseS": {
+                "elementLabel": "Calibration Pulse S",
+                "format": "99.99"
+            },
+            "calPulseE": {
+                "elementLabel": "Calibration Pulse E",
+                "format": "99.99"
+            },
+            "calPulseW": {
+                "elementLabel": "Calibration Pulse W",
+                "format": "99.99"
             }
+
         }
     },
 

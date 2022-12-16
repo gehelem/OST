@@ -400,6 +400,15 @@ void GuiderModule::SMInitCal()
 
     _calState=0;
     _calStep=0;
+    _calPulseN = 0;
+    _calPulseS = 0;
+    _calPulseE = 0;
+    _calPulseW = 0;
+    setOstElement("values","calPulseN",_calPulseN,false);
+    setOstElement("values","calPulseS",_calPulseS,false);
+    setOstElement("values","calPulseE",_calPulseE,false);
+    setOstElement("values","calPulseW",_calPulseW,true);
+
     _pulseN = 0;
     _pulseS = 0;
     _pulseE = 0;
@@ -590,8 +599,11 @@ void GuiderModule::SMComputeCal()
             BOOST_LOG_TRIVIAL(debug) << "*********************** cal E "<< _calPulseE;
             BOOST_LOG_TRIVIAL(debug) << "*********************** cal N "<< _calPulseN;
             BOOST_LOG_TRIVIAL(debug) << "*********************** cal S "<< _calPulseS;
+            setOstElement("values","calPulseN",_calPulseN,false);
+            setOstElement("values","calPulseS",_calPulseS,false);
+            setOstElement("values","calPulseE",_calPulseE,false);
+            setOstElement("values","calPulseW",_calPulseW,true);
 
-            //emit abort(); return;
             emit CalibrationDone();
             _trigFirst=_trigCurrent;
             return;
@@ -664,12 +676,10 @@ void GuiderModule::SMComputeGuide()
     //emit propertyAppended(_gridguide,&_modulename,_itt,_driftRA,_driftDE,_pulseW-_pulseE,_pulseN-_pulseS);
     _itt++;
 
-    //_values->addNumber(new NumberValue("pulseN","Pulse N","hint",_pulseN,"",0,10000,0));
-    //_values->addNumber(new NumberValue("pulseS","Pulse S","hint",_pulseS,"",0,10000,0));
-    //_values->addNumber(new NumberValue("pulseE","Pulse E","hint",_pulseE,"",0,10000,0));
-    //_values->addNumber(new NumberValue("pulseW","Pulse W","hint",_pulseW,"",0,10000,0));
-    //emit propertyCreated(_values,&_modulename);
-    //_propertyStore.add(_values);
+    setOstElement("values","pulseN",_pulseN,false);
+    setOstElement("values","pulseS",_pulseS,false);
+    setOstElement("values","pulseE",_pulseE,false);
+    setOstElement("values","pulseW",_pulseW,true);
 
     emit ComputeGuideDone();
 }
