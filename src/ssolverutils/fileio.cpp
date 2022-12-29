@@ -12,8 +12,8 @@ fileio::fileio()
 
 fileio::~fileio()
 {
-    if(m_ImageBuffer && !imageBufferTaken)
-        deleteImageBuffer();
+    delete[] m_ImageBuffer;
+    m_ImageBuffer = nullptr;
 }
 
 void fileio::deleteImageBuffer()
