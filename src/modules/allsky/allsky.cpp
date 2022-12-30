@@ -99,7 +99,7 @@ void Allsky::startLoop()
     connectIndi();
     connectDevice(_camera);
     setBLOBMode(B_ALSO,_camera.toStdString().c_str(),nullptr);
-    sendModNewNumber(_camera,"SIMULATOR_SETTINGS","SIM_TIME_FACTOR",0.01 );
+    //sendModNewNumber(_camera,"SIMULATOR_SETTINGS","SIM_TIME_FACTOR",0.01 );
 
     if (!sendModNewNumber(_camera,"CCD_EXPOSURE","CCD_EXPOSURE_VALUE", getOstElementValue("parameters","exposure").toDouble())) {
         setOstPropertyAttribute("actions","status",IPS_ALERT,true);
