@@ -1,0 +1,47 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Format: 1.8
+Date: Fri, 30 Dec 2022 15:48:12 +0100
+Source: ostserver
+Built-For-Profiles: noudeb
+Architecture: source
+Version: 0.1-0ppa0
+Distribution: focal
+Urgency: low
+Maintainer: Gilles  <gilles@joag.fr>
+Changed-By: Gehelem <gilles@joag.fr>
+Changes:
+ ostserver (0.1-0ppa0) focal; urgency=low
+ .
+   * Initial upload!
+Checksums-Sha1:
+ 09cc47f3004b160dfde2964ac0592cf6d6d7b037 1502 ostserver_0.1-0ppa0.dsc
+ cd656cf659aefa7c7e914c58d9cbcfa43dd18d5a 84056 ostserver_0.1.orig.tar.gz
+ 5bfc3ae49ae44d3a778da0b15acaaa3da2bc540d 948 ostserver_0.1-0ppa0.diff.gz
+ 8652292549ee4f0f8dc8ac9610a354e1ca36af95 6335 ostserver_0.1-0ppa0_source.buildinfo
+Checksums-Sha256:
+ f8f2a759f08f1113b2fcf884c2e6300edd0053218697326086a3ea53636cd36d 1502 ostserver_0.1-0ppa0.dsc
+ fdcb5422383ecf3b6f784229099efde34c28419180d4cd674cbd4e8aba99ca66 84056 ostserver_0.1.orig.tar.gz
+ 4d4500166d411a9a6e26d64cba2b491d80570cd58309dd2bb7037f98965d17b1 948 ostserver_0.1-0ppa0.diff.gz
+ bf60d9c36a4547b3248625ff1800141d555c1f4e845023efaae26c22a9d6eb8d 6335 ostserver_0.1-0ppa0_source.buildinfo
+Files:
+ f833e2b041b855a2ee90b4b2e1e58b1d 1502 devel optional ostserver_0.1-0ppa0.dsc
+ 7c09d7761e859ae6c05e5711629b9d68 84056 devel optional ostserver_0.1.orig.tar.gz
+ 756855d94c0ba4f5489df1d955a3742a 948 devel optional ostserver_0.1-0ppa0.diff.gz
+ 1d740d0e57ac10ee8d5c8a159ffbafdd 6335 devel optional ostserver_0.1-0ppa0_source.buildinfo
+
+-----BEGIN PGP SIGNATURE-----
+
+iQHDBAEBCgAtFiEEUDqWpngwZnelOZHFL0ImnwAG0QYFAmOvB/UPHGdpbGxlc0Bq
+b2FnLmZyAAoJEC9CJp8ABtEGzDAL/3PppeyG1J2nA/meVxBIHKklGFsURxwNuS/Q
+4qwNuAJGuAGtT+pqV9tyygcgBZJdWwZ6EJpEjSaqIQqCfxZPkk+j98kya/HHQCLP
+bpx6/DGO/8CWFw0a65086ZU+okswPaHvfNiw+mTi4LcNDTfR+vMSQ2OXcmPPboLq
++ZI806jjVD40QK6eB2DF3bnk/d+SAZDvxSprryVxQIAGa4w74HDJOczSvpkAGABM
+ASieQq30Savo+Lxj/WUBt6LXOBpP00WdryniRml4VFZ1zqbNnj+dztcXcFpcatVY
+TxWP4ZVwzrZmr13XK2IHdQyYEOVW79D7ryr2J0YwmsZN5sJK6NNE8CqfkBFCkeGG
+ILV4CDmaffuZb7HVj57nQeGQui1yHlrqt1ZqBgDw2KNqE518TVyG5/IsfsQ8CSvd
+ZmNHFan3VNISEC2b1KXPNC9uMQ9IMzkivonC6QBr6rzaj5jTWH3rDe9be8vjLG7g
+i9sc7I7EqrxO7ywMcZlVQevtANO4Sw==
+=qOtU
+-----END PGP SIGNATURE-----
