@@ -6,10 +6,13 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-
+set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+SET(CPACK_GENERATOR "DEB")
+SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "gehelem") #required
+INCLUDE(CPack)
 
 #get_cmake_property(_variableNames VARIABLES)
 #list (SORT _variableNames)
@@ -285,7 +288,10 @@ target_compile_definitions(ostallsky PRIVATE ALLSKY_MODULE)
 
 
 
-#install(TARGETS HeadlessObservatory RUNTIME DESTINATION bin)
+install(TARGETS ostserver ostbasemodule ostindimodule ostdummy ostallsky ostinspector ostguider ostindipanel ostfocuser ostmaincontrol
+    RUNTIME DESTINATION "/usr/bin"
+    LIBRARY DESTINATION "/usr/lib"
+)
 
 #get_cmake_property(_variableNames VARIABLES)
 #list (SORT _variableNames)

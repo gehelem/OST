@@ -1,0 +1,5 @@
+ostserver (1.0-1) UNRELEASED; urgency=medium
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- gilles <gilles@unknown>  Thu, 05 Jan 2023 12:02:10 +0100
