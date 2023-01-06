@@ -136,7 +136,7 @@ target_link_libraries(ostindimodule
 #list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.qrc)
 #qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
-add_library(ostdummy STATIC
+add_library(ostdummy SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.qrc
@@ -157,7 +157,7 @@ target_compile_definitions(ostdummy PRIVATE dummy_LIBRARY)
 #list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.qrc)
 #qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
-add_library(ostmaincontrol STATIC
+add_library(ostmaincontrol SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.qrc
@@ -198,7 +198,7 @@ target_compile_definitions(ostfocuser PRIVATE FOCUS_MODULE)
 
 
 # Indipanel module
-add_library(ostindipanel STATIC
+add_library(ostindipanel SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel/indipanel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel/indipanel.cpp
 )
@@ -232,7 +232,7 @@ target_link_libraries(ostguider PRIVATE
 target_compile_definitions(ostguider PRIVATE GUIDER_MODULE)
 
 ## polar module
-#add_library(ostpolar STATIC
+#add_library(ostpolar SHARED
 #    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/polar/polar.h
 #    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/polar/polar.cpp
 #    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/polar/rotations.h
@@ -251,7 +251,7 @@ target_compile_definitions(ostguider PRIVATE GUIDER_MODULE)
 #target_compile_definitions(ostpolar PRIVATE POLAR_MODULE)
 #
 # inspector module
-add_library(ostinspector STATIC
+add_library(ostinspector SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/inspector/inspector.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/inspector/inspector.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/inspector/inspector.qrc
@@ -268,7 +268,7 @@ target_link_libraries(ostinspector PRIVATE
 target_compile_definitions(ostinspector PRIVATE INSPECTOR_MODULE)
 
 # Allsky module
-add_library(ostallsky STATIC
+add_library(ostallsky SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/allsky/allsky.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/allsky/allsky.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/allsky/allsky.qrc
