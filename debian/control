@@ -1,15 +1,51 @@
 Source: ostserver
+Section: ostserver
 Priority: optional
 Maintainer: gilles <gilles@joag.fr>
-Build-Depends: debhelper-compat (= 13)
+Build-Depends: cmake,
+               debhelper (>= 9.0.0),
+               pkg-config,
+               pkg-kde-tools (>= 0.15.15ubuntu1~),
+               extra-cmake-modules (>= 1.7.0),
+               qtbase5-dev,
+               qtdeclarative5-dev,
+               qtmultimedia5-dev,
+               qtpositioning5-dev,
+               libqt5websockets5-dev,
+               libqt5svg5-dev,
+               libqt5sql5-sqlite,
+               kdoctools-dev | libkf5doctools-dev,
+               libkf5config-dev,
+               libkf5guiaddons-dev,
+               libkf5i18n-dev,
+               libkf5newstuff-dev,
+               libkf5notifications-dev,
+               libkf5xmlgui-dev,
+               libkf5plotting-dev,
+               libkf5crash-dev,
+               libkf5notifyconfig-dev,
+               libeigen3-dev,
+               zlib1g-dev,
+               libcfitsio3-dev|libcfitsio-dev,
+               libnova-dev,
+               libindi-dev (>= 1.6.1),
+               indi-bin (>= 1.6.1),
+               wcslib-dev,
+               libraw-dev,
+               libgsl-dev,
+               phonon4qt5-backend-vlc,
+               qt5keychain-dev,
+               libsecret-1-dev,
+               libstellarsolver-dev
 Standards-Version: 4.6.0
-Homepage: <insert the upstream URL, if relevant>
+Homepage: https://github.com/gehelem/OST
 #Vcs-Browser: https://salsa.debian.org/debian/ostserver
 #Vcs-Git: https://salsa.debian.org/debian/ostserver.git
 Rules-Requires-Root: no
 
 Package: ostserver
 Architecture: any
+Section: science
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: <insert up to 60 chars description>
- <insert long description, indented with spaces>
+Description: Observatoire Sans Tête
+ Light and headless astrophotography automation tool
