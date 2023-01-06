@@ -1,5 +1,5 @@
 Source: ostserver
-Section: ostserver
+Section: science
 Priority: optional
 Maintainer: gilles <gilles@joag.fr>
 Build-Depends: cmake,
