@@ -47,3 +47,4 @@ Section: science
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Observatoire Sans Tête
  Light and headless astrophotography automation tool
+
