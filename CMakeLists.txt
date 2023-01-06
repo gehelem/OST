@@ -83,7 +83,7 @@ target_link_libraries(ostserver
 #list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule/basemodule.qrc)
 #qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
-add_library(ostbasemodule SHARED
+add_library(ostbasemodule STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule/basemodule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule/basemodule.qrc
@@ -111,7 +111,7 @@ target_link_libraries(ostbasemodule
 #list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.qrc)
 #qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
-add_library(ostindimodule SHARED
+add_library(ostindimodule STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.qrc
