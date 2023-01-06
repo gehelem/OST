@@ -4,13 +4,11 @@ Priority: optional
 Maintainer: gilles <gilles@joag.fr>
 Build-Depends: cmake,
                debhelper (>= 9.0.0),
+               debhelper-compat (= 13),
                pkg-config,
-               pkg-kde-tools (>= 0.15.15ubuntu1~),
                extra-cmake-modules (>= 1.7.0),
                qtbase5-dev,
                qtdeclarative5-dev,
-               qtmultimedia5-dev,
-               qtpositioning5-dev,
                libqt5websockets5-dev,
                libqt5svg5-dev,
                libqt5sql5-sqlite,
@@ -33,8 +31,6 @@ Build-Depends: cmake,
                wcslib-dev,
                libraw-dev,
                libgsl-dev,
-               phonon4qt5-backend-vlc,
-               qt5keychain-dev,
                libsecret-1-dev,
                libstellarsolver-dev
 Standards-Version: 4.6.0
