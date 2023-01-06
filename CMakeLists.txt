@@ -10,7 +10,7 @@ set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-
+add_compile_options(-fno-sized-deallocation)
 
 #get_cmake_property(_variableNames VARIABLES)
 #list (SORT _variableNames)
@@ -177,7 +177,7 @@ target_compile_definitions(ostmaincontrol PRIVATE maincontrol_LIBRARY)
 # Focus module
 #list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.qrc)
 #qt5_add_resources (RCC_SOURCES ${RESOURCES})
-add_library(ostfocuser STATIC
+add_library(ostfocuser SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.qrc
@@ -215,7 +215,7 @@ target_compile_definitions(ostindipanel PRIVATE INDIPANEL_MODULE)
 
 
 # guider module
-add_library(ostguider STATIC
+add_library(ostguider SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/guider.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/guider.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/guider.qrc
