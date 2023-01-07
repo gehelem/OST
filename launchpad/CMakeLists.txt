@@ -6,12 +6,10 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-add_compile_options(-fno-sized-deallocation)
-add_compile_options(-fPIC)
 
 #get_cmake_property(_variableNames VARIABLES)
 #list (SORT _variableNames)
@@ -28,7 +26,7 @@ find_package(ZLIB REQUIRED)
 find_package(Threads REQUIRED)
 find_package(Nova REQUIRED)
 find_package(GSL REQUIRED)
-#find_package(OpenCV REQUIRED )
+find_package(OpenCV REQUIRED )
 find_package(WCSLIB REQUIRED)
 find_package(QT NAMES Qt5 COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql)
@@ -84,7 +82,7 @@ target_link_libraries(ostserver
 #list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule/basemodule.qrc)
 #qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
-add_library(ostbasemodule STATIC
+add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule/basemodule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule/basemodule.qrc
@@ -112,7 +110,7 @@ target_link_libraries(ostbasemodule
 #list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.qrc)
 #qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
-add_library(ostindimodule STATIC
+add_library(ostindimodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.qrc
@@ -287,10 +285,7 @@ target_compile_definitions(ostallsky PRIVATE ALLSKY_MODULE)
 
 
 
-install(TARGETS ostserver ostbasemodule ostindimodule ostdummy ostallsky ostinspector ostguider ostindipanel ostfocuser ostmaincontrol
-    RUNTIME DESTINATION "/usr/bin"
-    LIBRARY DESTINATION "/usr/bin"
-)
+#install(TARGETS HeadlessObservatory RUNTIME DESTINATION bin)
 
 #get_cmake_property(_variableNames VARIABLES)
 #list (SORT _variableNames)

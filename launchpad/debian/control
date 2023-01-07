@@ -1,0 +1,13 @@
+Source: ostserver
+Section: devel
+Priority: optional
+Maintainer: Gilles  <gilles@joag.fr>
+Build-Depends: cmake, build-essential
+Homepage: https://www.yourhomepage.org
+
+Package: ostserver
+Architecture: any
+Depends: 
+Description: First test-package
+ Long description of ostserver.
+ It can span multiple lines!
