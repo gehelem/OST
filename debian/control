@@ -4,6 +4,7 @@ Priority: optional
 Maintainer: gilles <gilles@joag.fr>
 Build-Depends: cmake,
                debhelper (>= 8.0.0),
+               debhelper-compat (= 11),
                pkg-config,
                extra-cmake-modules (>= 1.7.0),
                qtbase5-dev,
