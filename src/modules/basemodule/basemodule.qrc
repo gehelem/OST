@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>basemodule.json</file>
+        <file>indimodule.json</file>
     </qresource>
 </RCC>
