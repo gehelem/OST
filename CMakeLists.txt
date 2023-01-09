@@ -96,6 +96,7 @@ add_library(ostbasemodule STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/bayer.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/dms.cpp
 )
+set_target_properties(ostbasemodule PROPERTIES PUBLIC_HEADER "basemodule.h")
 target_link_libraries(ostbasemodule
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
@@ -117,6 +118,7 @@ add_library(ostindimodule STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.qrc
 )
+set_target_properties(ostindimodule PROPERTIES PUBLIC_HEADER "indimodule.h")
 target_link_libraries(ostindimodule
     ostbasemodule
     indiclient
