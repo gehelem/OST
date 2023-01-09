@@ -27,23 +27,28 @@ int main(int argc, char *argv[])
     webrootOption.setDefaultValue("/var/www/html");
     QCommandLineOption dbPathOption("dbpath", "DB path", "dbpath");
     dbPathOption.setDefaultValue("");
+    QCommandLineOption libPathOption("libpath", "Modules library path", "libpath");
+    libPathOption.setDefaultValue("");
 
     argParser.addOption(saveAllBlobsOption);
     argParser.addOption(indiHostOption);
     argParser.addOption(indiPortOption);
     argParser.addOption(webrootOption);
     argParser.addOption(dbPathOption);
+    argParser.addOption(libPathOption);
     argParser.process(app);
 
     QString hostName = argParser.value(indiHostOption);
     int portNumber = atoi(argParser.value(indiPortOption).toStdString().c_str());
     QString webroot= argParser.value(webrootOption);
     QString dbPath= argParser.value(dbPathOption);
+    QString libPath= argParser.value(libPathOption);
 
     BOOST_LOG_TRIVIAL(debug) << "INDI Host=" << hostName.toStdString();
     BOOST_LOG_TRIVIAL(debug) << "INDI Port=" << portNumber;
     BOOST_LOG_TRIVIAL(debug) << "Webroot  =" << webroot.toStdString();
     BOOST_LOG_TRIVIAL(debug) << "DB Path  =" << dbPath.toStdString();
+    BOOST_LOG_TRIVIAL(debug) << "Modules Library Path  =" << libPath.toStdString();
 
     Controller controller(
             //&app,
@@ -51,7 +56,9 @@ int main(int argc, char *argv[])
             hostName,
             portNumber,
             webroot,
-            dbPath);
+            dbPath,
+            libPath
+                );
 
     Q_UNUSED(controller);
 

@@ -4,14 +4,19 @@
 /*!
  * ... ...
  */
-Controller::Controller(bool saveAllBlobs, const QString& host, int port, const QString& webroot, const QString &dbpath)
+Controller::Controller(bool saveAllBlobs, const QString& host, int port, const QString& webroot, const QString &dbpath,const QString& libpath)
     :_indihost(host),
       _indiport(port),
       _webroot(webroot),
-      _dbpath(dbpath)
+      _dbpath(dbpath),
+      _libpath(dbpath)
+
 {
 
     Q_UNUSED(saveAllBlobs);
+    if (_libpath=="") {
+        _libpath=QCoreApplication::applicationDirPath();
+    }
 
     checkModules();
 
@@ -40,7 +45,7 @@ Controller::~Controller()
 
 void Controller::LoadModule(QString lib,QString name,QString label,QString profile)
 {
-    QString fulllib = QCoreApplication::applicationDirPath()+"/"+lib+".so";
+    QString fulllib = _libpath+"/"+lib+".so";
     QLibrary library(fulllib);
     if (!library.load())
     {
@@ -132,8 +137,12 @@ void Controller::OnExternalEvent(const QString &eventType, const QString  &event
 }
 void Controller::checkModules(void)
 {
-    BOOST_LOG_TRIVIAL(debug) << "Check available modules";
-    QDir directory(QCoreApplication::applicationDirPath());
+    foreach (const QString &path, QCoreApplication::libraryPaths()) {
+        BOOST_LOG_TRIVIAL(debug) << "Lib paths : " << path.toStdString();
+    }
+
+    BOOST_LOG_TRIVIAL(debug) << "Check available modules in " << QCoreApplication::applicationDirPath().toStdString();
+    QDir directory(_libpath);
     directory.setFilter(QDir::Files);
     directory.setNameFilters(QStringList() << "*ost*.so");
     QStringList libs = directory.entryList();
