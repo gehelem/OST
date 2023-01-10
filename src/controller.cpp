@@ -4,16 +4,19 @@
 /*!
  * ... ...
  */
-Controller::Controller(bool saveAllBlobs, const QString& host, int port, const QString& webroot, const QString &dbpath,const QString& libpath)
+Controller::Controller(bool saveAllBlobs, const QString& host, int port, const QString& webroot, const QString &dbpath,const QString& libpath,const QString& installfront)
     :_indihost(host),
       _indiport(port),
       _webroot(webroot),
       _dbpath(dbpath),
-      _libpath(dbpath)
-
+      _libpath(dbpath),
+      _installfront(installfront)
 {
 
     Q_UNUSED(saveAllBlobs);
+    if (_installfront=="Y") {
+        this->installFront();
+    }
     if (_libpath=="") {
         _libpath=QCoreApplication::applicationDirPath();
     }
@@ -179,5 +182,45 @@ void Controller::checkModules(void)
 
 
     }
+
+}
+void Controller::installFront(void)
+{
+    _process = new QProcess(this);
+    connect(_process,&QProcess::readyReadStandardOutput,this,&Controller::processOutput);
+    connect(_process,&QProcess::readyReadStandardError, this,&Controller::processError);
+    connect(_process,static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this,&Controller::processFinished);
+    qDebug() << "****************************";
+    qDebug() << "Install default web frontend";
+    qDebug() << "****************************";
+    if (_process->state()!=0) {
+        qDebug() << "can't start process";
+    } else {
+        QString program = "wget";
+        QStringList arguments;
+        arguments << "https://github.com/gehelem/ost-front/releases/download/WorkInProgress/html.tar.gz";
+        arguments << "&&";
+        arguments << "tar -xf html.tar.gz -C";
+        arguments << _webroot;
+        qDebug() << "PROCESS ARGS " << arguments;
+        _process->start(program,arguments);
+
+    }
+
+
+}
+void Controller::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    qDebug() << "PROCESS FINISHED (" + QString::number(exitCode) + ")";
+}
+void Controller::processOutput()
+{
+    QString output = _process->readAllStandardOutput();
+    qDebug() << "PROCESS LOG   : " << output;
+}
+void Controller::processError()
+{
+    QString output = _process->readAllStandardError();
+    qDebug() << "PROCESS ERROR : " + output;
 
 }

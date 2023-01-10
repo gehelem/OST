@@ -23,12 +23,14 @@ int main(int argc, char *argv[])
     indiHostOption.setDefaultValue("localhost");
     QCommandLineOption indiPortOption("port", "INDI Server port number", "port");
     indiPortOption.setDefaultValue("7624");
-    QCommandLineOption webrootOption("webroot", "Web server root folder", "webroot");
+    QCommandLineOption webrootOption("webroot", "Web server root folder **must be writable**", "webroot");
     webrootOption.setDefaultValue("/var/www/html");
     QCommandLineOption dbPathOption("dbpath", "DB path", "dbpath");
     dbPathOption.setDefaultValue("");
     QCommandLineOption libPathOption("libpath", "Modules library path", "libpath");
     libPathOption.setDefaultValue("");
+    QCommandLineOption installFrontOption("installfront", "Install default webserver structure", "installfront");
+    installFrontOption.setDefaultValue("N");
 
     argParser.addOption(saveAllBlobsOption);
     argParser.addOption(indiHostOption);
@@ -36,6 +38,7 @@ int main(int argc, char *argv[])
     argParser.addOption(webrootOption);
     argParser.addOption(dbPathOption);
     argParser.addOption(libPathOption);
+    argParser.addOption(installFrontOption);
     argParser.process(app);
 
     QString hostName = argParser.value(indiHostOption);
@@ -43,12 +46,14 @@ int main(int argc, char *argv[])
     QString webroot= argParser.value(webrootOption);
     QString dbPath= argParser.value(dbPathOption);
     QString libPath= argParser.value(libPathOption);
+    QString installFront= argParser.value(installFrontOption);
 
     BOOST_LOG_TRIVIAL(debug) << "INDI Host=" << hostName.toStdString();
     BOOST_LOG_TRIVIAL(debug) << "INDI Port=" << portNumber;
     BOOST_LOG_TRIVIAL(debug) << "Webroot  =" << webroot.toStdString();
     BOOST_LOG_TRIVIAL(debug) << "DB Path  =" << dbPath.toStdString();
     BOOST_LOG_TRIVIAL(debug) << "Modules Library Path  =" << libPath.toStdString();
+    BOOST_LOG_TRIVIAL(debug) << "Install front  =" << installFront.toStdString();
 
     Controller controller(
             //&app,
@@ -57,7 +62,8 @@ int main(int argc, char *argv[])
             portNumber,
             webroot,
             dbPath,
-            libPath
+            libPath,
+            installFront
                 );
 
     Q_UNUSED(controller);
