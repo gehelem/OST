@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>maincontrol.json</file>
-    </qresource>
-</RCC>
