@@ -1401,36 +1401,23 @@ void fileio::CalcHisto(void)
     m_HistogramFrequency.resize(3);
     m_HistogramIntensity.resize(3);
 
-    qDebug() << 1;
     auto * const buffer = reinterpret_cast<T const *>(m_ImageBuffer);
-    qDebug() << 2;
     uint32_t samples = stats.width * stats.height;
-    qDebug() << 3;
     const uint32_t sampleBy = samples > 500000 ? samples / 500000 : 1;
-    qDebug() << 4;
     m_HistogramBinCount = qMax(0., qMin(stats.max[0] - stats.min[0], 256.0));
     if (m_HistogramBinCount <= 0)
         m_HistogramBinCount = 256;
-    qDebug() << 5 << " channels " << stats.channels;
-    qDebug() << 5 << " m_HistogramBinCount " << m_HistogramBinCount;
 
     for (int n = 0; n < stats.channels; n++)
     {
-        qDebug() << 5 << "-" << n << "-0";
         m_HistogramIntensity[n].fill(0, m_HistogramBinCount + 1);
-        qDebug() << 5 << "-" << n << "-1";
         m_HistogramFrequency[n].fill(0, m_HistogramBinCount + 1);
-        qDebug() << 5 << "-" << n << "-2";
         m_CumulativeFrequency[n].fill(0, m_HistogramBinCount + 1);
-        qDebug() << 5 << "-" << n << "-3";
         m_HistogramBinWidth[n] = qMax(1.0, (stats.max[n] - stats.min[n]) / (m_HistogramBinCount - 1));
-        qDebug() << 5 << "-" << n << "-4";
     }
-    qDebug() << 6;
 
     QVector<QFuture<void>> futures;
 
-    qDebug() << 7;
     for (int n = 0; n < stats.channels; n++)
     {
         futures.append(QtConcurrent::run([ = ]()
@@ -1439,7 +1426,6 @@ void fileio::CalcHisto(void)
                 m_HistogramIntensity[n][i] = stats.min[n] + (m_HistogramBinWidth[n] * i);
         }));
     }
-    qDebug() << 8;
 
     for (int n = 0; n < stats.channels; n++)
     {
@@ -1486,7 +1472,6 @@ void fileio::CalcHisto(void)
     else
         m_JMIndex = 1;
 
-    qDebug() << "FITHistogram: JMIndex " << m_JMIndex;
 
     m_HistogramConstructed = true;
     //emit histogramReady();
