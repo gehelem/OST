@@ -130,6 +130,10 @@ bool Basemodule::setOstElement    (QString propertyName, QString elementName, QV
 bool Basemodule::pushOstElements        (QString propertyName)
 {
     QVariantMap _prop = _ostproperties[propertyName].toMap();
+    if (!_prop.contains("grid") ) {
+        qDebug() << this->getName() << "no grid defined for property " << propertyName;
+        return false;
+    }
     QVariantList _arr=_prop["grid"].toList();
     QVariantList _cols;
     foreach(auto _elt,_prop["elements"].toMap()) {
@@ -141,14 +145,19 @@ bool Basemodule::pushOstElements        (QString propertyName)
     QVariantMap _mess;
     _mess["values"]=_cols;
     emit moduleEvent("pushvalues",_modulename,propertyName,_mess);
-
+    return true;
 }
 bool Basemodule::resetOstElements      (QString propertyName)
 {
     QVariantMap _prop = _ostproperties[propertyName].toMap();
+    if (!_prop.contains("grid") ) {
+        qDebug() << this->getName() << "no grid defined for property " << propertyName;
+        return false;
+    }
     _prop["grid"].clear();
     _ostproperties[propertyName] = _prop;
     emit moduleEvent("resetvalues",_modulename,propertyName,QVariantMap());
+    return true;
 }
 
 void Basemodule::setOstPropertyAttribute   (const QString &pPropertyName, const QString &pAttributeName, QVariant _value,bool emitEvent)

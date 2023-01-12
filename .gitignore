@@ -43,3 +43,9 @@ solver.log
 db/ost.db
 
 batch/
+debian/.debhelper
+debian/ostserver
+debian/debhelper-build-stamp
+debian/files
+debian/ostserver.substvars
+obj-x86_64-linux-gnu/
