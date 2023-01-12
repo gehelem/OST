@@ -39,8 +39,6 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule)
 include_directories(${INDI_INCLUDE_DIR})
 include_directories(${CFITSIO_INCLUDE_DIR})
 include_directories(${GSL_INCLUDE_DIRS})
@@ -61,7 +59,7 @@ add_executable(ostserver
     ${CMAKE_CURRENT_SOURCE_DIR}/src/wshandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/dbmanager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/dbmanager.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule/basemodule.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/resources/resources.qrc
 )
 target_link_libraries(ostserver
@@ -85,9 +83,9 @@ target_link_libraries(ostserver
 #qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
 add_library(ostbasemodule STATIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule/basemodule.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule/basemodule.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule/basemodule.qrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule.qrc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/solver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/solver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/fileio.cpp
@@ -114,9 +112,9 @@ target_link_libraries(ostbasemodule
 #qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
 add_library(ostindimodule STATIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.qrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule.qrc
 )
 set_target_properties(ostindimodule PROPERTIES PUBLIC_HEADER ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.h)
 target_link_libraries(ostindimodule
@@ -140,9 +138,9 @@ target_link_libraries(ostindimodule
 #qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
 add_library(ostdummy SHARED
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.qrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy.qrc
 )
 
 target_link_libraries(ostdummy PRIVATE
@@ -161,9 +159,9 @@ target_compile_definitions(ostdummy PRIVATE dummy_LIBRARY)
 #qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
 add_library(ostmaincontrol SHARED
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.qrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol.qrc
 )
 target_link_libraries(ostmaincontrol PRIVATE
     ostindimodule
