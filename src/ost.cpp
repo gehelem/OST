@@ -31,6 +31,8 @@ int main(int argc, char *argv[])
     libPathOption.setDefaultValue("");
     QCommandLineOption installFrontOption("installfront", "Install default webserver structure", "installfront");
     installFrontOption.setDefaultValue("N");
+    QCommandLineOption configurationOption("configuration", "Load configuration", "configuration");
+    configurationOption.setDefaultValue("default");
 
     argParser.addOption(saveAllBlobsOption);
     argParser.addOption(indiHostOption);
@@ -39,6 +41,7 @@ int main(int argc, char *argv[])
     argParser.addOption(dbPathOption);
     argParser.addOption(libPathOption);
     argParser.addOption(installFrontOption);
+    argParser.addOption(configurationOption);
     argParser.process(app);
 
     QString hostName = argParser.value(indiHostOption);
@@ -47,6 +50,7 @@ int main(int argc, char *argv[])
     QString dbPath= argParser.value(dbPathOption);
     QString libPath= argParser.value(libPathOption);
     QString installFront= argParser.value(installFrontOption);
+    QString conf= argParser.value(configurationOption);
 
     BOOST_LOG_TRIVIAL(debug) << "INDI Host=" << hostName.toStdString();
     BOOST_LOG_TRIVIAL(debug) << "INDI Port=" << portNumber;
@@ -54,6 +58,7 @@ int main(int argc, char *argv[])
     BOOST_LOG_TRIVIAL(debug) << "DB Path  =" << dbPath.toStdString();
     BOOST_LOG_TRIVIAL(debug) << "Modules Library Path  =" << libPath.toStdString();
     BOOST_LOG_TRIVIAL(debug) << "Install front  =" << installFront.toStdString();
+    BOOST_LOG_TRIVIAL(debug) << "Load configuration  =" << conf.toStdString();
 
     Controller controller(
             //&app,
@@ -63,7 +68,8 @@ int main(int argc, char *argv[])
             webroot,
             dbPath,
             libPath,
-            installFront
+            installFront,
+            conf
                 );
 
     Q_UNUSED(controller);

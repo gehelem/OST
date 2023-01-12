@@ -4,13 +4,14 @@
 /*!
  * ... ...
  */
-Controller::Controller(bool saveAllBlobs, const QString& host, int port, const QString& webroot, const QString &dbpath,const QString& libpath,const QString& installfront)
+Controller::Controller(bool saveAllBlobs, const QString& host, int port, const QString& webroot, const QString &dbpath,const QString& libpath,const QString& installfront,const QString& conf)
     :_indihost(host),
       _indiport(port),
       _webroot(webroot),
       _dbpath(dbpath),
       _libpath(dbpath),
-      _installfront(installfront)
+      _installfront(installfront),
+      _conf(conf)
 {
 
     Q_UNUSED(saveAllBlobs);
@@ -27,16 +28,17 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
     connect(wshandler,&WShandler::externalEvent,this,&Controller::OnExternalEvent);
     dbmanager = new DBManager(this,_dbpath);
 
-
-
-    //LoadModule("libostinspector","inspector1","CCD inspector","default");
-    LoadModule("libostguider","guider1","Guider","default");
-    //LoadModule(QCoreApplication::applicationDirPath()+"/libostpolar.so","polar1","Polar assistant");
     LoadModule("libostmaincontrol","mainctl","Maincontrol","default");
-    //LoadModule("libostdummy","dummy1","Dummy 1","default");
-    //LoadModule("libostfocuser","focus1","My favorite focuser","default");
-    //LoadModule("libostindipanel","indipanel","indi control panel","default");
-    LoadModule("libostallsky","allsky","Allsky Camera","default");
+
+    QVariantMap _result;
+    dbmanager->getConfiguration(_conf,_result);
+     for(QVariantMap::const_iterator iter = _result.begin(); iter != _result.end(); ++iter) {
+       QVariantMap _line=iter.value().toMap();
+       QString _namewithoutblanks = iter.key();
+       _namewithoutblanks.replace(" ","");
+
+       LoadModule("libost"+_line["moduletype"].toString(),_namewithoutblanks,iter.key(),_line["profilename"].toString());
+     }
 
 }
 

@@ -55,7 +55,7 @@ bool DBManager::setProfile(QString moduleType,QString profileName, QVariantMap &
     QString strJson = QLatin1String(docByteArray);
     QString sql="INSERT OR REPLACE INTO PROFILES ('MODULETYPE','PROFILENAME','ALLVALUES') VALUES ('"+moduleType+"','"+profileName+"','"+strJson+"');";
     if (!_query.exec(sql)) {
-        BOOST_LOG_TRIVIAL(debug) <<  "setProfile ERROR SQL =" << sql.toStdString();
+        BOOST_LOG_TRIVIAL(debug) << "setProfile - ERROR SQL =" << sql.toStdString();
         BOOST_LOG_TRIVIAL(debug) << "setProfile - ERROR : " << _query.lastError().text().toLocal8Bit().data();
         return false;
     }
@@ -65,7 +65,7 @@ bool DBManager::getProfile(QString moduleType,QString profileName, QVariantMap &
 {
     QString _sql = "SELECT ALLVALUES FROM PROFILES WHERE MODULETYPE='"+moduleType+"' AND PROFILENAME='"+profileName+"'";
     if (!_query.exec(_sql)) {
-        BOOST_LOG_TRIVIAL(debug) <<  "getProfile ERROR SQL =" << _sql.toStdString();
+        BOOST_LOG_TRIVIAL(debug) << "getProfile - ERROR SQL =" << _sql.toStdString();
         BOOST_LOG_TRIVIAL(debug) << "getProfile - ERROR : " << _query.lastError().text().toLocal8Bit().data();
     }
     while (_query.next()) {
@@ -80,7 +80,7 @@ bool DBManager::getProfiles(QString moduleType, QVariantMap &result )
 {
     QString _sql = "SELECT PROFILENAME,ALLVALUES FROM PROFILES WHERE MODULETYPE='"+moduleType+"' ";
     if (!_query.exec(_sql)) {
-        BOOST_LOG_TRIVIAL(debug) <<  "getProfiles ERROR SQL =" << _sql.toStdString();
+        BOOST_LOG_TRIVIAL(debug) << "getProfiles - ERROR SQL =" << _sql.toStdString();
         BOOST_LOG_TRIVIAL(debug) << "getProfiles - ERROR : " << _query.lastError().text().toLocal8Bit().data();
     }
     while (_query.next()) {
@@ -89,6 +89,21 @@ bool DBManager::getProfiles(QString moduleType, QVariantMap &result )
         QJsonObject  obj = res.object();
         QVariantMap line = obj.toVariantMap();
         result [name]=line;
+    }
+    return true;
+}
+bool DBManager::getConfiguration(QString configName, QVariantMap &result )
+{
+    QString _sql = "SELECT MODULENAME,MODULETYPE,PROFILENAME FROM CONFIGURATIONS WHERE CONFIGNAME='"+configName+"'";
+    if (!_query.exec(_sql)) {
+        BOOST_LOG_TRIVIAL(debug) << "getConfiguration - ERROR SQL =" << _sql.toStdString();
+        BOOST_LOG_TRIVIAL(debug) << "getConfiguration - ERROR : " << _query.lastError().text().toLocal8Bit().data();
+    }
+    while (_query.next()) {
+        QVariantMap _line;
+        _line["moduletype"]=_query.value(1).toString().toUtf8();
+        _line["profilename"]=_query.value(2).toString().toUtf8();
+        result[_query.value(0).toString().toUtf8()]=_line;
     }
     return true;
 }
