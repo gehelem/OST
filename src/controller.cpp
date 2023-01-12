@@ -4,14 +4,23 @@
 /*!
  * ... ...
  */
-Controller::Controller(bool saveAllBlobs, const QString& host, int port, const QString& webroot, const QString &dbpath)
+Controller::Controller(bool saveAllBlobs, const QString& host, int port, const QString& webroot, const QString &dbpath,const QString& libpath,const QString& installfront,const QString& conf)
     :_indihost(host),
       _indiport(port),
       _webroot(webroot),
-      _dbpath(dbpath)
+      _dbpath(dbpath),
+      _libpath(dbpath),
+      _installfront(installfront),
+      _conf(conf)
 {
 
     Q_UNUSED(saveAllBlobs);
+    if (_installfront=="Y") {
+        this->installFront();
+    }
+    if (_libpath=="") {
+        _libpath=QCoreApplication::applicationDirPath();
+    }
 
     checkModules();
 
@@ -19,16 +28,17 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
     connect(wshandler,&WShandler::externalEvent,this,&Controller::OnExternalEvent);
     dbmanager = new DBManager(this,_dbpath);
 
-
-
-    //LoadModule("libostinspector","inspector1","CCD inspector","default");
-    LoadModule("libostguider","guider1","Guider","default");
-    //LoadModule(QCoreApplication::applicationDirPath()+"/libostpolar.so","polar1","Polar assistant");
     LoadModule("libostmaincontrol","mainctl","Maincontrol","default");
-    //LoadModule("libostdummy","dummy1","Dummy 1","default");
-    //LoadModule("libostfocuser","focus1","My favorite focuser","default");
-    //LoadModule("libostindipanel","indipanel","indi control panel","default");
-    LoadModule("libostallsky","allsky","Allsky Camera","default");
+
+    QVariantMap _result;
+    dbmanager->getConfiguration(_conf,_result);
+     for(QVariantMap::const_iterator iter = _result.begin(); iter != _result.end(); ++iter) {
+       QVariantMap _line=iter.value().toMap();
+       QString _namewithoutblanks = iter.key();
+       _namewithoutblanks.replace(" ","");
+
+       LoadModule("libost"+_line["moduletype"].toString(),_namewithoutblanks,iter.key(),_line["profilename"].toString());
+     }
 
 }
 
@@ -40,7 +50,7 @@ Controller::~Controller()
 
 void Controller::LoadModule(QString lib,QString name,QString label,QString profile)
 {
-    QString fulllib = QCoreApplication::applicationDirPath()+"/"+lib+".so";
+    QString fulllib = _libpath+"/"+lib+".so";
     QLibrary library(fulllib);
     if (!library.load())
     {
@@ -132,8 +142,12 @@ void Controller::OnExternalEvent(const QString &eventType, const QString  &event
 }
 void Controller::checkModules(void)
 {
-    BOOST_LOG_TRIVIAL(debug) << "Check available modules";
-    QDir directory(QCoreApplication::applicationDirPath());
+    foreach (const QString &path, QCoreApplication::libraryPaths()) {
+        BOOST_LOG_TRIVIAL(debug) << "Lib paths : " << path.toStdString();
+    }
+
+    BOOST_LOG_TRIVIAL(debug) << "Check available modules in " << QCoreApplication::applicationDirPath().toStdString();
+    QDir directory(_libpath);
     directory.setFilter(QDir::Files);
     directory.setNameFilters(QStringList() << "*ost*.so");
     QStringList libs = directory.entryList();
@@ -170,5 +184,45 @@ void Controller::checkModules(void)
 
 
     }
+
+}
+void Controller::installFront(void)
+{
+    _process = new QProcess(this);
+    connect(_process,&QProcess::readyReadStandardOutput,this,&Controller::processOutput);
+    connect(_process,&QProcess::readyReadStandardError, this,&Controller::processError);
+    connect(_process,static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this,&Controller::processFinished);
+    qDebug() << "****************************";
+    qDebug() << "Install default web frontend";
+    qDebug() << "****************************";
+    if (_process->state()!=0) {
+        qDebug() << "can't start process";
+    } else {
+        QString program = "wget";
+        QStringList arguments;
+        arguments << "https://github.com/gehelem/ost-front/releases/download/WorkInProgress/html.tar.gz";
+        arguments << "&&";
+        arguments << "tar -xf html.tar.gz -C";
+        arguments << _webroot;
+        qDebug() << "PROCESS ARGS " << arguments;
+        _process->start(program,arguments);
+
+    }
+
+
+}
+void Controller::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    qDebug() << "PROCESS FINISHED (" + QString::number(exitCode) + ")";
+}
+void Controller::processOutput()
+{
+    QString output = _process->readAllStandardOutput();
+    qDebug() << "PROCESS LOG   : " << output;
+}
+void Controller::processError()
+{
+    QString output = _process->readAllStandardError();
+    qDebug() << "PROCESS ERROR : " + output;
 
 }

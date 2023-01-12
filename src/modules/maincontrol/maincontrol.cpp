@@ -20,7 +20,6 @@ Maincontrol::Maincontrol(QString name, QString label, QString profile,QVariantMa
 
     foreach(QString key,getAvailableModuleLibs().keys()) {
         QVariantMap info = getAvailableModuleLibs()[key].toMap();
-        BOOST_LOG_TRIVIAL(debug) << "lst : " << key.toStdString();
         QString err;
         createOstProperty("desc"+key,"Description",0,"Available modules",info["moduleLabel"].toString(),err);
         foreach (QString ii,info.keys()) {
