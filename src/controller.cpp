@@ -9,7 +9,7 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
       _indiport(port),
       _webroot(webroot),
       _dbpath(dbpath),
-      _libpath(dbpath),
+      _libpath(libpath),
       _installfront(installfront),
       _conf(conf)
 {
@@ -50,7 +50,9 @@ Controller::~Controller()
 
 void Controller::LoadModule(QString lib,QString name,QString label,QString profile)
 {
+
     QString fulllib = _libpath+"/"+lib+".so";
+    qDebug() << "Try to load " << fulllib;
     QLibrary library(fulllib);
     if (!library.load())
     {
@@ -146,16 +148,16 @@ void Controller::checkModules(void)
         BOOST_LOG_TRIVIAL(debug) << "Lib paths : " << path.toStdString();
     }
 
-    BOOST_LOG_TRIVIAL(debug) << "Check available modules in " << QCoreApplication::applicationDirPath().toStdString();
+    BOOST_LOG_TRIVIAL(debug) << "Check available modules in " << _libpath.toStdString();
     QDir directory(_libpath);
     directory.setFilter(QDir::Files);
-    directory.setNameFilters(QStringList() << "*ost*.so");
+    directory.setNameFilters(QStringList() << "libost*.so");
     QStringList libs = directory.entryList();
     foreach(QString lib, libs)
     {
         QString tt = lib.replace(".so","");
         if (!((tt=="libostmaincontrol" )||(tt=="libostbasemodule" )||(tt=="libostindimodule" ))) {
-            QLibrary library(QCoreApplication::applicationDirPath()+"/"+lib);
+            QLibrary library(_libpath+"/"+lib);
             if (!library.load())
             {
                 BOOST_LOG_TRIVIAL(debug) << lib.toStdString() << " " << library.errorString().toStdString();
