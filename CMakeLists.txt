@@ -82,7 +82,7 @@ target_link_libraries(ostserver
 #list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule/basemodule.qrc)
 #qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
-add_library(ostbasemodule STATIC
+add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule.qrc
@@ -111,7 +111,7 @@ target_link_libraries(ostbasemodule
 #list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.qrc)
 #qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
-add_library(ostindimodule STATIC
+add_library(ostindimodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule.qrc
@@ -176,10 +176,9 @@ target_compile_definitions(ostmaincontrol PRIVATE maincontrol_LIBRARY)
 
 
 
-
 install(TARGETS ostserver ostbasemodule ostindimodule ostdummy ostmaincontrol
-    RUNTIME DESTINATION "/usr/bin"
-    LIBRARY DESTINATION "/usr/bin"
+#    RUNTIME DESTINATION "/usr/bin"
+#    LIBRARY DESTINATION "/usr/bin"
 )
 
 #get_cmake_property(_variableNames VARIABLES)
