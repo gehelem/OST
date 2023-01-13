@@ -177,8 +177,8 @@ target_compile_definitions(ostmaincontrol PRIVATE maincontrol_LIBRARY)
 
 
 install(TARGETS ostserver ostbasemodule ostindimodule ostdummy ostmaincontrol
-#    RUNTIME DESTINATION "/usr/bin"
-#    LIBRARY DESTINATION "/usr/bin"
+    RUNTIME DESTINATION "/usr/bin"
+    LIBRARY DESTINATION "/usr/lib/ost"
 )
 
 #get_cmake_property(_variableNames VARIABLES)
