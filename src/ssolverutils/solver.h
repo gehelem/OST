@@ -35,6 +35,7 @@ public slots:
 signals:
         void successSEP(void);
         void successSolve(void);
+        void solverLog(QString &text);
 
 };
 #endif

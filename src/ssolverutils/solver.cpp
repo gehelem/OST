@@ -135,5 +135,5 @@ void Solver::ssReadySolve()
 }
 void Solver::sslogOutput(QString text)
 {
-    BOOST_LOG_TRIVIAL(debug) << "SSolver log : " << text.toStdString();
+    emit solverLog(text);
 }
