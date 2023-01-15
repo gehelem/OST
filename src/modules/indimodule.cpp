@@ -299,7 +299,7 @@ bool IndiModule::loadDevicesConfs()
 
 auto IndiModule::sendModNewNumber(const QString& deviceName, const QString& propertyName,const QString&  elementName, const double& value) -> bool
 {
-    //qDebug() << "taskSendNewNumber" << " " << deviceName << " " << propertyName<< " " << elementName;
+    //qDebug() << "sendModNewNumber" << " " << deviceName << "-" << propertyName<< "-" << elementName;
     INDI::BaseDevice *dp = getDevice(deviceName.toStdString().c_str());
 
     if (dp== nullptr)
@@ -328,7 +328,7 @@ auto IndiModule::sendModNewNumber(const QString& deviceName, const QString& prop
 }
 bool IndiModule::getModNumber(const QString& deviceName, const QString& propertyName, const QString&  elementName, double &value)
 {
-    //qDebug() << "taskSendNewNumber" << " " << deviceName << " " << propertyName<< " " << elementName;
+    //qDebug() << "getModNumber" << " " << deviceName << " " << propertyName<< " " << elementName;
     INDI::BaseDevice *dp = getDevice(deviceName.toStdString().c_str());
 
     if (dp== nullptr)
@@ -355,7 +355,7 @@ bool IndiModule::getModNumber(const QString& deviceName, const QString& property
 }
 bool IndiModule::getModSwitch(const QString& deviceName, const QString& propertyName, const QString&  elementName, bool &value)
 {
-    //qDebug() << "taskSendNewNumber" << " " << deviceName << " " << propertyName<< " " << elementName;
+    //qDebug() << "getModSwitch" << "-" << deviceName << "-" << propertyName<< "-" << elementName;
     INDI::BaseDevice *dp = getDevice(deviceName.toStdString().c_str());
 
     if (dp== nullptr)
@@ -382,7 +382,7 @@ bool IndiModule::getModSwitch(const QString& deviceName, const QString& property
 }
 bool IndiModule::getModText(const QString& deviceName, const QString& propertyName, const QString&  elementName, QString& value)
 {
-    //qDebug() << "taskSendNewNumber" << " " << deviceName << " " << propertyName<< " " << elementName;
+    //qDebug() << "getModText" << "-" << deviceName << "-" << propertyName<< "-" << elementName;
     INDI::BaseDevice *dp = getDevice(deviceName.toStdString().c_str());
 
     if (dp== nullptr)
@@ -409,7 +409,7 @@ bool IndiModule::getModText(const QString& deviceName, const QString& propertyNa
 }
 bool IndiModule::sendModNewText  (QString deviceName,QString propertyName,QString elementName, QString text)
 {
-    //qDebug() << "taskSendNewText";
+    //qDebug() << "sendModNewText" << "-" << deviceName << "-" << propertyName<< "-" << elementName;
     INDI::BaseDevice *dp = getDevice(deviceName.toStdString().c_str());
 
     if (dp== nullptr)
@@ -436,7 +436,7 @@ bool IndiModule::sendModNewText  (QString deviceName,QString propertyName,QStrin
 }
 bool IndiModule::sendModNewSwitch(QString deviceName,QString propertyName,QString elementName, ISState sw)
 {
-    qDebug() << "taskSendNewSwitch";
+    //qDebug() << "sendModNewSwitch" << "-" << deviceName << "-" << propertyName<< "-" << elementName;
 
     INDI::BaseDevice *dp;
     dp = getDevice(deviceName.toStdString().c_str());
@@ -469,6 +469,7 @@ bool IndiModule::sendModNewSwitch(QString deviceName,QString propertyName,QStrin
 }
 bool IndiModule::frameSet(QString devicename,double x,double y,double width,double height)
 {
+    //qDebug() << "frameSet" << "-" << devicename;
     INDI::BaseDevice *dp;
     dp = getDevice(devicename.toStdString().c_str());
     if (dp== nullptr)
@@ -505,6 +506,7 @@ bool IndiModule::frameSet(QString devicename,double x,double y,double width,doub
 }
 bool IndiModule::frameReset(QString devicename)
 {
+    //qDebug() << "frameReset" << "-" << devicename;
     INDI::BaseDevice *dp;
     dp = getDevice(devicename.toStdString().c_str());
     if (dp== nullptr)
