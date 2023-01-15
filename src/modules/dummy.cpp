@@ -112,6 +112,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                             stats=_image->getStats();
                             _solver.ResetSolver(stats,_image->getImageBuffer());
                             connect(&_solver,&Solver::successSEP,this,&Dummy::OnSucessSEP);
+                            connect(&_solver,&Solver::solverLog,this,&Dummy::OnSolverLog);
                             _solver.FindStars(_solver.stellarSolverProfiles[0]);
                         }
                     }
@@ -136,6 +137,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                                 folders.append(getOstElementValue("parameters","indexfolderpath").toString());
                                 _solver.stellarSolver->setIndexFolderPaths(folders);
                                 connect(&_solver,&Solver::successSolve,this,&Dummy::OnSucessSolve);
+                                connect(&_solver,&Solver::solverLog,this,&Dummy::OnSolverLog);
                                 _solver.stellarSolver->setSearchPositionInDegrees(ra*360/24,dec);
                                 _solver.SolveStars(_solver.stellarSolverProfiles[0]);
                             }
@@ -202,4 +204,8 @@ void Dummy::OnSucessSolve()
         setOstElement("imagevalues","solDEC",_solver.stellarSolver->getSolution().dec,true);
     }
 
+}
+void Dummy::OnSolverLog(QString &text)
+{
+    sendMessage(text);
 }
