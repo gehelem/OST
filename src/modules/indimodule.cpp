@@ -17,7 +17,7 @@ void IndiModule::OnDispatchToIndiExternalEvent(const QString &eventType, const Q
 
 {
     if (getName()==eventModule) {
-        BOOST_LOG_TRIVIAL(debug) << "OnIndiExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << eventKey.toStdString();
+        //BOOST_LOG_TRIVIAL(debug) << "OnIndiExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << eventKey.toStdString();
         foreach(const QString& keyprop, eventData.keys()) {
             foreach(const QString& keyelt, eventData[keyprop].toMap()["elements"].toMap().keys()) {
                 setOstElement(keyprop,keyelt,eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"],true);
