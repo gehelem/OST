@@ -313,6 +313,21 @@ void Basemodule::OnExternalEvent(const QString &eventType, const QString  &event
         sendDump();
         return;
     }
+    if ( (eventType=="setpropvalue")&&(eventModule==_modulename) ) {
+        foreach(const QString& keyprop, eventData.keys()) {
+            if (!_ostproperties.contains(keyprop) ) {
+                sendMessage(" setpropvalue - property "+ keyprop +" not found");
+                return;
+            }
+            foreach(const QString& keyelt, eventData[keyprop].toMap()["elements"].toMap().keys()) {
+                if (!_ostproperties[keyprop].toMap()["elements"].toMap().contains(keyprop) ) {
+                    sendMessage(" setpropvalue - property "+ keyprop + " - element " + keyelt+  " not found");
+                    return;
+                }
+            }
+        }
+    }
+
 
     if (_modulename==eventModule) {
         foreach(const QString& keyprop, eventData.keys()) {
