@@ -51,7 +51,8 @@
         "devcat": "messages",
         "group": "",
         "permission": 0,
-        "propertyLabel": "Message"
+        "propertyLabel": "Message",
+        "value": ""
     },
     "profileactions": {
         "devcat": "Profiles",
