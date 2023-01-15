@@ -42,7 +42,7 @@
         "group": "",
         "order":"06",
         "permission": 2,
-        "propertyLabel": "Devices actions",
+        "propertyLabel": "Devices",
         "elements": {
         }
     },
@@ -52,7 +52,7 @@
         "order":"04",
         "permission": 2,
         "rule":2,
-        "propertyLabel": "Devices",
+        "propertyLabel": "Devices actions" ,
         "elements": {
             "condevs": {
                 "elementLabel": "Connect"
