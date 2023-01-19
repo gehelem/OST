@@ -19,8 +19,13 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
         this->installFront();
     }
     if (_libpath=="") {
-        _libpath=QCoreApplication::applicationDirPath();
+        //_libpath=QCoreApplication::applicationDirPath();
+    } else {
+        QCoreApplication::addLibraryPath(_libpath);
     }
+    QCoreApplication::addLibraryPath("/usr/lib/ost");
+    QCoreApplication::addLibraryPath("/usr/lib");
+    QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath());
 
     checkModules();
 
@@ -48,19 +53,19 @@ Controller::~Controller()
 }
 
 
-void Controller::LoadModule(QString lib,QString name,QString label,QString profile)
+bool Controller::LoadModule(QString lib,QString name,QString label,QString profile)
 {
 
-    QString fulllib = _libpath+"/"+lib+".so";
-    qDebug() << "Try to load " << fulllib;
-    QLibrary library(fulllib);
+    qDebug() << "Try to load " << lib;
+    QLibrary library(lib);
     if (!library.load())
     {
-        BOOST_LOG_TRIVIAL(debug) << name.toStdString() << " " << library.errorString().toStdString();
+        sendMessage(name + " " + library.errorString());
+        return false;
     }
     else
     {
-        BOOST_LOG_TRIVIAL(debug) << name.toStdString() << " " << "library loaded";
+        sendMessage(name + " library loaded");
 
         typedef Basemodule *(*CreateModule)(QString,QString,QString,QVariantMap);
         CreateModule createmodule = (CreateModule)library.resolve("initialize");
@@ -94,10 +99,11 @@ void Controller::LoadModule(QString lib,QString name,QString label,QString profi
                     }
                 }
 
-
+                return true;
             }
         } else {
-            BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library : " << fulllib.toStdString();
+            BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from library : " << lib.toStdString();
+            return false;
         }
     }
 }
@@ -145,47 +151,47 @@ void Controller::OnExternalEvent(const QString &eventType, const QString  &event
 void Controller::checkModules(void)
 {
     foreach (const QString &path, QCoreApplication::libraryPaths()) {
-        BOOST_LOG_TRIVIAL(debug) << "Lib paths : " << path.toStdString();
-    }
-
-    BOOST_LOG_TRIVIAL(debug) << "Check available modules in " << _libpath.toStdString();
-    QDir directory(_libpath);
-    directory.setFilter(QDir::Files);
-    directory.setNameFilters(QStringList() << "libost*.so");
-    QStringList libs = directory.entryList();
-    foreach(QString lib, libs)
-    {
-        QString tt = lib.replace(".so","");
-        if (!((tt=="libostmaincontrol" )||(tt=="libostbasemodule" )||(tt=="libostindimodule" ))) {
-            QLibrary library(_libpath+"/"+lib);
-            if (!library.load())
-            {
-                BOOST_LOG_TRIVIAL(debug) << lib.toStdString() << " " << library.errorString().toStdString();
-            }
-            else
-            {
-                typedef Basemodule *(*CreateModule)(QString,QString,QString,QVariantMap);
-                CreateModule createmodule = (CreateModule)library.resolve("initialize");
-
-
-                if (createmodule) {
-                    Basemodule *mod = createmodule(tt,tt,QString(),QVariantMap());
-                    if (mod) {
-                        mod->setParent(this);
-                        mod->setObjectName(lib);
-                        QVariantMap info = mod->getModuleInfo();
-                        _availableModuleLibs[tt]=info;
-                        delete mod;
-                    }
-                } else {
-                    BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library : " << lib.toStdString();
+        BOOST_LOG_TRIVIAL(debug) << " ************ Check available modules in " << path.toStdString();
+        QDir directory(path);
+        directory.setFilter(QDir::Files);
+        directory.setNameFilters(QStringList() << "libost*.so");
+        QStringList libs = directory.entryList();
+        foreach(QString lib, libs)
+        {
+            QString tt = lib.replace(".so","");
+            if (!((tt=="libostmaincontrol" )||(tt=="libostbasemodule" )||(tt=="libostindimodule" ))) {
+                QLibrary library(path+"/"+lib);
+                if (!library.load())
+                {
+                    BOOST_LOG_TRIVIAL(debug) << lib.toStdString() << " " << library.errorString().toStdString();
                 }
+                else
+                {
+                    typedef Basemodule *(*CreateModule)(QString,QString,QString,QVariantMap);
+                    CreateModule createmodule = (CreateModule)library.resolve("initialize");
+
+
+                    if (createmodule) {
+                        Basemodule *mod = createmodule(tt,tt,QString(),QVariantMap());
+                        if (mod) {
+                            mod->setParent(this);
+                            mod->setObjectName(lib);
+                            QVariantMap info = mod->getModuleInfo();
+                            _availableModuleLibs[tt]=info;
+                            qDebug() << "found library " << path << "/" << lib ;
+                            delete mod;
+                        }
+                    } else {
+                        BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library : " << lib.toStdString();
+                    }
+                }
+
             }
+
 
         }
-
-
     }
+
 
 }
 void Controller::installFront(void)
@@ -227,4 +233,10 @@ void Controller::processError()
     QString output = _process->readAllStandardError();
     qDebug() << "PROCESS ERROR : " + output;
 
+}
+void Controller::sendMessage(QString message)
+{
+    QString mess = QDateTime::currentDateTime().toString("[yyyyMMdd hh:mm:ss.zzz]") + " - ostserver - " + message;
+    qDebug() << mess;
+    // should we add a dispatch over WS ?
 }

@@ -178,7 +178,7 @@ target_compile_definitions(ostmaincontrol PRIVATE maincontrol_LIBRARY)
 
 install(TARGETS ostserver ostbasemodule ostindimodule ostdummy ostmaincontrol
     RUNTIME DESTINATION "/usr/bin"
-    LIBRARY DESTINATION "/usr/lib/ost"
+    LIBRARY DESTINATION "/usr/lib"
     PUBLIC_HEADER DESTINATION "/usr/include"
 )
 
