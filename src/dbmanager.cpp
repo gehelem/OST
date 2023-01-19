@@ -6,13 +6,14 @@ DBManager::DBManager(QObject *parent, const QString &dbpath) :_dbpath(dbpath)
 {
     if(QSqlDatabase::isDriverAvailable("QSQLITE"))
     {
+        bool _dbExists = QFile::exists(_dbpath+"ost.db");
         _db = QSqlDatabase::addDatabase("QSQLITE");
         _db.setDatabaseName(_dbpath+"ost.db" );
         _query = QSqlQuery(_db);
         if(!_db.open()) {
             BOOST_LOG_TRIVIAL(debug) << "dbOpen - ERROR: " << _db.databaseName().toStdString() << " - " << _db.lastError().text().toStdString();
         } else {
-            CreateDatabaseStructure();
+            if (!_dbExists) CreateDatabaseStructure();
         }
     } else {
         BOOST_LOG_TRIVIAL(debug)  << "DatabaseConnect - ERROR: QSQLITE driver unavailable";
@@ -29,6 +30,7 @@ DBManager::~DBManager()
 
 void DBManager::CreateDatabaseStructure()
 {
+    qDebug() << "OST database creation with default values";
     QFile _file;
     _file.setFileName(":db.sql");
     _file.open(QIODevice::ReadOnly | QIODevice::Text);
