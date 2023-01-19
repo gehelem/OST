@@ -39,12 +39,13 @@ private:
     DBManager   *dbmanager;
     QProcess    *_process;
 
-    void LoadModule(QString lib, QString name, QString label, QString profile);
+    bool LoadModule(QString lib, QString name, QString label, QString profile);
     void checkModules(void);
     void installFront(void);
     void processOutput();
     void processError();
     void processFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void sendMessage(QString message);
 
 private slots:
     void OnModuleEvent  (const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData);

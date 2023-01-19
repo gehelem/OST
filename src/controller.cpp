@@ -228,3 +228,9 @@ void Controller::processError()
     qDebug() << "PROCESS ERROR : " + output;
 
 }
+void Controller::sendMessage(QString message)
+{
+    QString mess = QDateTime::currentDateTime().toString("[yyyyMMdd hh:mm:ss.zzz]") + " - ostserver - " + message;
+    qDebug() << mess;
+    // should we add a dispatch over WS ?
+}
