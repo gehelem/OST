@@ -23,6 +23,9 @@ Controller::Controller(bool saveAllBlobs, const QString& host, int port, const Q
     } else {
         QCoreApplication::addLibraryPath(_libpath);
     }
+    QCoreApplication::addLibraryPath("/usr/lib/ost");
+    QCoreApplication::addLibraryPath("/usr/lib");
+    QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath());
 
     checkModules();
 
