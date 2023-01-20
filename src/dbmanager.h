@@ -14,20 +14,20 @@
 
 class DBManager : public QObject
 {
-    Q_OBJECT
-public:
-    DBManager(QObject *parent,const QString &dbpath);
-    ~DBManager();
-     bool getProfile(QString moduleType,QString profileName, QVariantMap &result );
-     bool setProfile(QString moduleType,QString profileName, QVariantMap &profile );
-     bool getProfiles(QString moduleType,QVariantMap &result );
-     bool getConfiguration(QString configName, QVariantMap &result );
+        Q_OBJECT
+    public:
+        DBManager(QObject *parent, const QString &dbpath);
+        ~DBManager();
+        bool getProfile(QString moduleType, QString profileName, QVariantMap &result );
+        bool setProfile(QString moduleType, QString profileName, QVariantMap &profile );
+        bool getProfiles(QString moduleType, QVariantMap &result );
+        bool getConfiguration(QString configName, QVariantMap &result );
 
-private:
-    void CreateDatabaseStructure();
-    QString _dbpath;
-    QSqlDatabase _db;
-    QSqlQuery _query;
+    private:
+        void CreateDatabaseStructure();
+        QString _dbpath;
+        QSqlDatabase _db;
+        QSqlQuery _query;
 };
 
 

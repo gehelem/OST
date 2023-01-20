@@ -12,28 +12,30 @@ QT_FORWARD_DECLARE_CLASS(QWebSocket)
  */
 class WShandler : public QObject
 {
-    Q_OBJECT
-public:
-    WShandler(QObject *parent);
-    ~WShandler();
-public :
-    void processModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData);
+        Q_OBJECT
+    public:
+        WShandler(QObject *parent);
+        ~WShandler();
+    public :
+        void processModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
+                                const QVariantMap &eventData);
 
 
-signals:
-    void closed();
-    void textRcv(QString txt);
-    void externalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData);
-private:
-    void onNewConnection();
-    void processTextMessage(QString message);
-    void processBinaryMessage(QByteArray message);
-    void sendmessage(QString message);
-    void sendJsonMessage(QJsonObject json);
-    void sendbinary(QByteArray *data);
-    void socketDisconnected();
-    QWebSocketServer *m_pWebSocketServer;
-    QList<QWebSocket *> m_clients;
+    signals:
+        void closed();
+        void textRcv(QString txt);
+        void externalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
+                           const QVariantMap &eventData);
+    private:
+        void onNewConnection();
+        void processTextMessage(QString message);
+        void processBinaryMessage(QByteArray message);
+        void sendmessage(QString message);
+        void sendJsonMessage(QJsonObject json);
+        void sendbinary(QByteArray *data);
+        void socketDisconnected();
+        QWebSocketServer *m_pWebSocketServer;
+        QList<QWebSocket *> m_clients;
 
 };
 #endif

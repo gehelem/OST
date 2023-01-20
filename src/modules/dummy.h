@@ -10,14 +10,15 @@
 
 class MODULE_INIT Dummy : public IndiModule
 {
-    Q_OBJECT
+        Q_OBJECT
 
     public:
-        Dummy(QString name,QString label,QString profile,QVariantMap availableModuleLibs);
+        Dummy(QString name, QString label, QString profile, QVariantMap availableModuleLibs);
         ~Dummy();
 
     public slots:
-        void OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey, const QVariantMap &eventData) override;
+        void OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
+                               const QVariantMap &eventData) override;
         void OnSucessSEP();
         void OnSucessSolve();
         void OnSolverLog(QString &text);
@@ -32,6 +33,6 @@ class MODULE_INIT Dummy : public IndiModule
 
 };
 
-extern "C" MODULE_INIT Dummy *initialize(QString name,QString label,QString profile,QVariantMap availableModuleLibs);
+extern "C" MODULE_INIT Dummy *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs);
 
 #endif

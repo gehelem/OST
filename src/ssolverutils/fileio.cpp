@@ -55,7 +55,7 @@ bool fileio::loadImageBufferOnly(QString fileName)
 //This method was copied and pasted and modified from the method privateLoad in fitsdata in KStars
 //It loads a FITS file, reads the FITS Headers, and loads the data from the image
 bool fileio::loadFits(QString fileName)
-{   
+{
     file = fileName;
     int status = 0, anynullptr = 0;
     long naxes[3];
@@ -192,7 +192,7 @@ bool fileio::loadOtherFormat(QString fileName)
     if (QImageReader::supportedImageFormats().contains(fileReader.format()) == false)
     {
         logIssue("Failed to convert " + file + " to FITS since format, " + fileReader.format() +
-                  ", is not supported in Qt");
+                 ", is not supported in Qt");
         return false;
     }
 
@@ -285,15 +285,15 @@ bool fileio::loadOtherFormat(QString fileName)
 //It loads a FITS file, reads the FITS Headers, and loads the data from the image
 bool fileio::loadBlob(IBLOB *bp)
 {
-    justLoadBuffer=false;
+    justLoadBuffer = false;
     int status = 0, anynullptr = 0;
     long naxes[3];
     size_t bsize = static_cast<size_t>(bp->bloblen);
 
-    if (fits_open_memfile(&fptr,"",READONLY,&bp->blob,&bsize,0,NULL,&status) )
+    if (fits_open_memfile(&fptr, "", READONLY, &bp->blob, &bsize, 0, NULL, &status) )
 
     {
-         BOOST_LOG_TRIVIAL(debug) << "IMG Unsupported type or read error loading FITS blob";
+        BOOST_LOG_TRIVIAL(debug) << "IMG Unsupported type or read error loading FITS blob";
         return false;
     }
     else
@@ -841,7 +841,7 @@ bool fileio::parseHeader()
             oneRecord.value = properties[1].simplified();
 
             // Just in case the comment had / or = in it.
-            for(int prop = 2; prop<properties.size(); prop++)
+            for(int prop = 2; prop < properties.size(); prop++)
             {
                 oneRecord.comment += properties[prop].simplified();
                 if(prop < properties.size() - 1)
@@ -876,7 +876,8 @@ bool fileio::parseHeader()
 }
 
 //This was copied and pasted and modified from ImageToFITS and injectWCS in fitsdata in KStars
-bool fileio::saveAsFITS(QString fileName, FITSImage::Statistic &imageStats, uint8_t *imageBuffer, FITSImage::Solution solution, QList<Record> &records, bool hasSolution)
+bool fileio::saveAsFITS(QString fileName, FITSImage::Statistic &imageStats, uint8_t *imageBuffer,
+                        FITSImage::Solution solution, QList<Record> &records, bool hasSolution)
 {
     int status = 0;
     fitsfile * new_fptr;
@@ -916,29 +917,29 @@ bool fileio::saveAsFITS(QString fileName, FITSImage::Statistic &imageStats, uint
     int bitpix;
     switch(imageStats.dataType)
     {
-    case 11: //SEP_TBYTE;
-        bitpix = BYTE_IMG;
-        break;
-    case TSHORT:
-        bitpix = SHORT_IMG;
-        break;
-    case TUSHORT:
-        bitpix = USHORT_IMG;
-        break;
-    case TLONG:
-        bitpix = LONG_IMG;
-        break;
-    case TULONG:
-        bitpix = ULONG_IMG;
-        break;
-    case TFLOAT:
-        bitpix = FLOAT_IMG;
-        break;
-    case TDOUBLE:
-        bitpix = DOUBLE_IMG;
-        break;
-    default:
-        bitpix = BYTE_IMG;
+        case 11: //SEP_TBYTE;
+            bitpix = BYTE_IMG;
+            break;
+        case TSHORT:
+            bitpix = SHORT_IMG;
+            break;
+        case TUSHORT:
+            bitpix = USHORT_IMG;
+            break;
+        case TLONG:
+            bitpix = LONG_IMG;
+            break;
+        case TULONG:
+            bitpix = ULONG_IMG;
+            break;
+        case TFLOAT:
+            bitpix = FLOAT_IMG;
+            break;
+        case TDOUBLE:
+            bitpix = DOUBLE_IMG;
+            break;
+        default:
+            bitpix = BYTE_IMG;
     }
 
     fitsfile *fptr = new_fptr;
@@ -952,7 +953,8 @@ bool fileio::saveAsFITS(QString fileName, FITSImage::Statistic &imageStats, uint
     }
 
     /* Write Data */
-    if (fits_write_img(fptr, imageStats.dataType, 1, nelements, const_cast<void *>(reinterpret_cast<const void *>(imageBuffer)), &status))
+    if (fits_write_img(fptr, imageStats.dataType, 1, nelements, const_cast<void *>(reinterpret_cast<const void *>(imageBuffer)),
+                       &status))
     {
         fits_report_error(stderr, status);
         return false;
@@ -996,7 +998,7 @@ bool fileio::saveAsFITS(QString fileName, FITSImage::Statistic &imageStats, uint
             default:
             {
                 if(key == "COMMENT" && (value.toString().contains("FITS (Flexible Image Transport System) format") ||
-                   value.toString().contains("volume 376")))
+                                        value.toString().contains("volume 376")))
                 {
                     // Don't duplicate the two standard comment fields CFITSIO writes to the file
                 }
@@ -1016,7 +1018,8 @@ bool fileio::saveAsFITS(QString fileName, FITSImage::Statistic &imageStats, uint
                     }
                     else
                     {
-                        fits_write_key(fptr, TSTRING, key.toLatin1().constData(), value.toString().toLatin1().data(), comment.toLatin1().constData(), &status);
+                        fits_write_key(fptr, TSTRING, key.toLatin1().constData(), value.toString().toLatin1().data(),
+                                       comment.toLatin1().constData(), &status);
                     }
                 }
             }
@@ -1146,7 +1149,8 @@ void fileio::generateQImage()
     stretch.run(m_ImageBuffer, &rawImage, sampling);
 }
 
-void fileio::logIssue(QString message){
+void fileio::logIssue(QString message)
+{
 
     if(logToSignal)
         emit logOutput(message);
@@ -1468,7 +1472,7 @@ void fileio::CalcHisto(void)
     if (m_CumulativeFrequency[0][m_HistogramBinCount / 4] > 0)
         m_JMIndex = m_CumulativeFrequency[0][m_HistogramBinCount / 8] / static_cast<double>
                     (m_CumulativeFrequency[0][m_HistogramBinCount /
-                            4]);
+                                              4]);
     else
         m_JMIndex = 1;
 

@@ -11,12 +11,12 @@
 
 class Solver : public QObject
 {
-    Q_OBJECT
-public:
-    Solver();
-    ~Solver();
+        Q_OBJECT
+    public:
+        Solver();
+        ~Solver();
 
-    // Stellasolver stuff
+        // Stellasolver stuff
         QPointer<StellarSolver> stellarSolver;
         QList<SSolver::Parameters> stellarSolverProfiles;
 
@@ -27,12 +27,12 @@ public:
         void FindStars(Parameters param);
         void SolveStars(Parameters param);
 
-public slots:
+    public slots:
         void sslogOutput(QString text);
         void ssReadySEP();
         void ssReadySolve();
         void ssFinished();
-signals:
+    signals:
         void successSEP(void);
         void successSolve(void);
         void solverLog(QString &text);
