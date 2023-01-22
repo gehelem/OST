@@ -93,13 +93,21 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/fileio.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/imagelabel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/stretch.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/stretch.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/bayer.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/bayer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/dms.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/dms.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/nan.h
 )
 set(BASE_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/fileio.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/stretch.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/bayer.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/dms.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/nan.h
 )
 set_target_properties(ostbasemodule PROPERTIES PUBLIC_HEADER "${BASE_PUBLIC_HEADERS}")
 
