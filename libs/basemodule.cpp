@@ -18,16 +18,9 @@ Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap
     setOstProperty("baseGitMessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT), false);
 
     setModuleLabel(label);
-    setModuleDescription("base module description - we should'nt see that");
+    setModuleDescription("base module description - developer should change this message");
     setModuleVersion("0.1");
     setModuleType("basemodule");
-
-    qDebug() << "*******************************************************************************";
-    qDebug() << "*******************************************************************************";
-    qDebug() << "----------- " << _modulelabel;
-    qDebug() << QJsonDocument::fromVariant(_ostproperties) ;
-    qDebug() << "*******************************************************************************";
-    qDebug() << "*******************************************************************************";
 
 }
 Basemodule::~Basemodule()
@@ -448,9 +441,10 @@ QVariantMap Basemodule::getModuleInfo(void)
     QVariantMap temp;
     foreach (QString key, _ostproperties.keys())
     {
-        if (_ostproperties[key].toMap()["devcat"].toString() == "Info")
+        //if (_ostproperties[key].toMap()["devcat"].toString() == "Info")
+        if (key != "ostproperties")
         {
-            temp[key] = _ostproperties[key].toMap()["value"];
+            temp[key] = _ostproperties[key];
         }
     }
     return temp;

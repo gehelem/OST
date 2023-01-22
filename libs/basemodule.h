@@ -99,6 +99,22 @@ class Basemodule : public QObject
         {
             _ostproperties["type"] = _s;
         }
+        QString getModuleLabel()
+        {
+            return _ostproperties["label"].toString();
+        }
+        QString getModuleDescription()
+        {
+            return _ostproperties["description"].toString();
+        }
+        QString getModuleVersion()
+        {
+            return _ostproperties["version"].toString();
+        }
+        QString getModuleType()
+        {
+            return _ostproperties["type"].toString();
+        }
 
         /* OST helpers */
         bool createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,
@@ -116,7 +132,7 @@ class Basemodule : public QObject
                                      bool emitEvent);
         QVariant getOstElementValue (QString propertyName, QString elementName)
         {
-            return _ostproperties[propertyName].toMap()["elements"].toMap()[elementName].toMap()["value"]    ;
+            return _ostproperties["properties"].toMap()[propertyName].toMap()["elements"].toMap()[elementName].toMap()["value"]    ;
         }
 
         void loadPropertiesFromFile(QString fileName);

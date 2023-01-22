@@ -22,14 +22,14 @@ Maincontrol::Maincontrol(QString name, QString label, QString profile, QVariantM
     {
         QVariantMap info = getAvailableModuleLibs()[key].toMap();
         QString err;
-        createOstProperty("desc" + key, "Description", 0, "Available modules", info["moduleLabel"].toString(), err);
+        createOstProperty("desc" + key, "Description", 0, "Available modules", info["label"].toString(), err);
         foreach (QString ii, info.keys())
         {
             QVariant val = info[ii];
             createOstElement("desc" + key, ii, ii, false);
             setOstElement("desc" + key, ii, val, false);
         }
-        createOstProperty("load" + key, "", 2, "Available modules", info["moduleLabel"].toString(), err);
+        createOstProperty("load" + key, "", 2, "Available modules", info["label"].toString(), err);
         createOstElement("load" + key, "instance", "Instance name", false);
         setOstElement("load" + key, "instance", "my" + key, false);
         createOstElement("load" + key, "load", "Load", false);
@@ -49,7 +49,9 @@ Maincontrol::~Maincontrol()
 void Maincontrol::OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                     const QVariantMap &eventData)
 {
-    //BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << eventKey.toStdString();
+    //BOOST_LOG_TRIVIAL(debug) << "mainctl OnMyExternalEvent - recv : " << getName().toStdString() << "-" <<
+    //                         eventType.toStdString() <<
+    //                         "-" << eventKey.toStdString();
     if (getName() == eventModule)
     {
         foreach(const QString &keyprop, eventData.keys())
