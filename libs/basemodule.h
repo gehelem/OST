@@ -45,11 +45,11 @@ class Basemodule : public QObject
         }
         QVariantMap getOstProperties(void)
         {
-            return _ostproperties;
+            return _ostproperties["properties"].toMap();
         }
         QVariantMap getOstProperty(QString name)
         {
-            return _ostproperties[name].toMap();
+            return _ostproperties["properties"].toMap()[name].toMap();
         }
         QVariantMap getModuleInfo(void);
         QVariantMap getAvailableModuleLibs(void)
