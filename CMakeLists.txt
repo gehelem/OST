@@ -200,8 +200,26 @@ install(TARGETS ostserver ostbasemodule ostindimodule ostdummy ostmaincontrol
     PUBLIC_HEADER DESTINATION "/usr/include/ost"
 )
 
+
+# Get the latest abbreviated commit hash of the working branch
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/src/git_version.cpp.in  ${CMAKE_CURRENT_SOURCE_DIR}/src/git_version.cpp @ONLY)
+execute_process(
+    COMMAND git log -1 --format=%h
+    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+    OUTPUT_VARIABLE GIT_HASH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+add_custom_target(AlwaysCheckGit COMMAND ${CMAKE_COMMAND}
+    -DRUN_CHECK_GIT_VERSION=1
+    -Dpre_configure_dir=${pre_configure_dir}
+    -Dpost_configure_file=${post_configure_dir}
+    -DGIT_HASH_CACHE=${GIT_HASH_CACHE}
+    -P ${CURRENT_LIST_DIR}/CheckGit.cmake
+    BYPRODUCTS ${post_configure_file}
+    )
 #get_cmake_property(_variableNames VARIABLES)
 #list (SORT _variableNames)
 #foreach (_variableName ${_variableNames})
 #    message(STATUS "${_variableName}=${${_variableName}}")
 #endforeach()
+
