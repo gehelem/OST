@@ -39,6 +39,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs)
 include_directories(${INDI_INCLUDE_DIR})
 include_directories(${CFITSIO_INCLUDE_DIR})
 include_directories(${GSL_INCLUDE_DIRS})
@@ -59,8 +60,8 @@ add_executable(ostserver
     ${CMAKE_CURRENT_SOURCE_DIR}/src/wshandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/dbmanager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/dbmanager.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/resources/resources.qrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/resources.qrc
 )
 target_link_libraries(ostserver
     ostbasemodule
@@ -83,18 +84,33 @@ target_link_libraries(ostserver
 #qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
 add_library(ostbasemodule SHARED
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule.qrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/solver.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/solver.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/fileio.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/imagelabel.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/stretch.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/bayer.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/dms.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.qrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/fileio.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/fileio.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/imagelabel.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/stretch.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/stretch.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/bayer.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/bayer.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/dms.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/dms.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/nan.h
 )
-set_target_properties(ostbasemodule PROPERTIES PUBLIC_HEADER ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule.h)
+set(BASE_PUBLIC_HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/fileio.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/stretch.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/bayer.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/dms.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/nan.h
+)
+set_target_properties(ostbasemodule PROPERTIES PUBLIC_HEADER "${BASE_PUBLIC_HEADERS}")
+
 target_link_libraries(ostbasemodule
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
@@ -112,11 +128,15 @@ target_link_libraries(ostbasemodule
 #qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
 add_library(ostindimodule SHARED
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule.qrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/indimodule.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/indimodule.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/indimodule.qrc
 )
-set_target_properties(ostindimodule PROPERTIES PUBLIC_HEADER ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule.h)
+set(INDI_PUBLIC_HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/indimodule.h
+)
+set_target_properties(ostindimodule PROPERTIES PUBLIC_HEADER "${INDI_PUBLIC_HEADERS}")
+
 target_link_libraries(ostindimodule
     ostbasemodule
     indiclient
@@ -174,12 +194,10 @@ target_link_libraries(ostmaincontrol PRIVATE
 )
 target_compile_definitions(ostmaincontrol PRIVATE maincontrol_LIBRARY)
 
-
-
 install(TARGETS ostserver ostbasemodule ostindimodule ostdummy ostmaincontrol
     RUNTIME DESTINATION "/usr/bin"
     LIBRARY DESTINATION "/usr/lib"
-    PUBLIC_HEADER DESTINATION "/usr/include"
+    PUBLIC_HEADER DESTINATION "/usr/include/ost"
 )
 
 #get_cmake_property(_variableNames VARIABLES)
