@@ -1,6 +1,7 @@
 #include <QtCore>
 #include <basedevice.h>
 #include "indimodule.h"
+#include "version.cc"
 
 IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
     : Basemodule(name, label, profile, availableModuleLibs)
@@ -8,6 +9,10 @@ IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap
     setVerbose(false);
     _moduletype = "IndiModule";
     loadPropertiesFromFile(":indimodule.json");
+    setOstProperty("indiGitHash", QString::fromStdString(Version::GIT_SHA1), false);
+    setOstProperty("indiGitDate", QString::fromStdString(Version::GIT_DATE), false);
+    setOstProperty("indiGitMessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT), false);
+
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &IndiModule::connectIndiTimer);
     timer->start(10000);

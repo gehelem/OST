@@ -21,6 +21,7 @@ add_compile_options(-fPIC)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 #find_package(Qt5Core)
+find_package(Git)
 find_package(CFITSIO REQUIRED)
 find_package(INDI REQUIRED)
 #find_package(INDI COMPONENTS clientqt5 REQUIRED)
@@ -200,8 +201,43 @@ install(TARGETS ostserver ostbasemodule ostindimodule ostdummy ostmaincontrol
     PUBLIC_HEADER DESTINATION "/usr/include/ost"
 )
 
+
+# the commit's SHA1, and whether the building workspace was dirty or not
+execute_process(COMMAND
+  "${GIT_EXECUTABLE}" describe --match=NeVeRmAtCh --always --abbrev=40 --dirty
+  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+  OUTPUT_VARIABLE GIT_SHA1
+  ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+# the date of the commit
+execute_process(COMMAND
+  "${GIT_EXECUTABLE}" log -1 --format=%ad --date=local
+  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+  OUTPUT_VARIABLE GIT_DATE
+  ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+# the subject of the commit
+execute_process(COMMAND
+  "${GIT_EXECUTABLE}" log -1 --format=%s
+  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+  OUTPUT_VARIABLE GIT_COMMIT_SUBJECT
+  ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+# generate version.cc
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/version.cc.in" "${CMAKE_CURRENT_BINARY_DIR}/version.cc" @ONLY)
+#list(APPEND SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/version.cc" version.hh)
+list(APPEND SOURCES "${CMAKE_CURRENT_BINARY_DIR}/version.cc" version.hh)
+
+
+message(STATUS "CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR}")
+message(STATUS "GIT_SHA1=${GIT_SHA1}")
+message(STATUS "GIT_DATE=${GIT_DATE}")
+message(STATUS "GIT_COMMIT_SUBJECT=${GIT_COMMIT_SUBJECT}")
+
+
 #get_cmake_property(_variableNames VARIABLES)
 #list (SORT _variableNames)
 #foreach (_variableName ${_variableNames})
 #    message(STATUS "${_variableName}=${${_variableName}}")
 #endforeach()
+
