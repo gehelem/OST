@@ -83,6 +83,22 @@ class Basemodule : public QObject
     protected:
 
         void sendMessage(QString message);
+        void setModuleLabel(QString _s)
+        {
+            _ostproperties["label"] = _s;
+        }
+        void setModuleDescription(QString _s)
+        {
+            _ostproperties["description"] = _s;
+        }
+        void setModuleVersion(QString _s)
+        {
+            _ostproperties["version"] = _s;
+        }
+        void setModuleType(QString _s)
+        {
+            _ostproperties["type"] = _s;
+        }
 
         /* OST helpers */
         bool createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,
