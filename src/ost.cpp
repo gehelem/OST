@@ -1,7 +1,7 @@
 #include <QGuiApplication>
 #include "controller.h"
 #include <boost/log/trivial.hpp>
-
+#include "version.cc"
 
 /*!
  * Entry point
@@ -11,6 +11,7 @@ int main(int argc, char *argv[])
 {
 
     BOOST_LOG_TRIVIAL(info) << "OST starting up";
+    BOOST_LOG_TRIVIAL(info) << Version::GIT_SHA1;
     QGuiApplication app(argc, argv, false);
     QGuiApplication::setOrganizationName("alazob.team");
     QGuiApplication::setApplicationName("ost");

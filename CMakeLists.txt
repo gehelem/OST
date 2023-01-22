@@ -224,13 +224,16 @@ execute_process(COMMAND
   ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 # generate version.cc
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/version.cc.in" "${CMAKE_CURRENT_SOURCE_DIR}/src/version.cc" @ONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/version.cc.in" "${CMAKE_CURRENT_BINARY_DIR}/version.cc" @ONLY)
+#list(APPEND SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/version.cc" version.hh)
+list(APPEND SOURCES "${CMAKE_CURRENT_BINARY_DIR}/version.cc" version.hh)
 
-list(APPEND SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/version.cc" version.hh)
+
 message(STATUS "CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR}")
 message(STATUS "GIT_SHA1=${GIT_SHA1}")
 message(STATUS "GIT_DATE=${GIT_DATE}")
 message(STATUS "GIT_COMMIT_SUBJECT=${GIT_COMMIT_SUBJECT}")
+
 
 #get_cmake_property(_variableNames VARIABLES)
 #list (SORT _variableNames)
