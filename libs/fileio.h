@@ -5,6 +5,8 @@
 #include <QImageReader>
 #include <QFile>
 #include <QVariant>
+#include <basedevice.h>
+#include <baseclient.h>
 
 //CFitsio Includes
 #include "longnam.h"
@@ -18,7 +20,7 @@
 
 #include "parameters.h"
 #include "structuredefinitions.h"
-#include <basedevice.h>
+
 
 class fileio : public QObject
 {

@@ -2,6 +2,7 @@
 #include <QFileInfo>
 #include <QtConcurrent>
 #include <boost/log/trivial.hpp>
+#include "stretch.h"
 
 fileio::fileio()
 {

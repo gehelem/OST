@@ -4,8 +4,8 @@
 #include <basedevice.h>
 #include <baseclient.h>
 #include <boost/log/trivial.hpp>
-#include "ssolverutils/fileio.h"
-#include "ssolverutils/solver.h"
+#include <fileio.h>
+#include <solver.h>
 
 /*!
  * This Class shouldn't be used as is
