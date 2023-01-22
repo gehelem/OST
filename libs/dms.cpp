@@ -98,17 +98,17 @@ bool dms::setFromString(const QString &str, bool isDeg)
     QStringList fields;
 
     //check for colon-delimiters or space-delimiters
-    #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-        if (entry.contains(':'))
-            fields = entry.split(':', Qt::SkipEmptyParts);
-        else
-            fields = entry.split(' ', Qt::SkipEmptyParts);
-    #else
-        if (entry.contains(':'))
-            fields = entry.split(':', QString::SkipEmptyParts);
-        else
-            fields = entry.split(' ', QString::SkipEmptyParts);
-    #endif
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+    if (entry.contains(':'))
+        fields = entry.split(':', Qt::SkipEmptyParts);
+    else
+        fields = entry.split(' ', Qt::SkipEmptyParts);
+#else
+    if (entry.contains(':'))
+        fields = entry.split(':', QString::SkipEmptyParts);
+    else
+        fields = entry.split(' ', QString::SkipEmptyParts);
+#endif
 
 
     //anything with one field is invalid!
@@ -298,7 +298,7 @@ const QString dms::toDMSString(const bool forceSign, const bool machineReadable,
     QChar zero('0');
     int dd = abs(degree());
     int dm = abs(arcmin());
-    int ds = abs(arcsec());    
+    int ds = abs(arcsec());
 
     if (Degrees() < 0.0)
         pm = '-';
@@ -307,23 +307,23 @@ const QString dms::toDMSString(const bool forceSign, const bool machineReadable,
 
     if (machineReadable)
         return QString("%1%2:%3:%4").arg(pm)
-                .arg(dd, 2, 10, QChar('0'))
-                .arg(dm, 2, 10, QChar('0'))
-                .arg(ds, 2, 10, QChar('0'));
+               .arg(dd, 2, 10, QChar('0'))
+               .arg(dm, 2, 10, QChar('0'))
+               .arg(ds, 2, 10, QChar('0'));
 
     if (highPrecision)
     {
         double sec = arcsec() + marcsec() / 1000.;
         return QString("%1%2° %3\' %L4\"").arg(pm)
-                                         .arg(dd, 2, 10, zero)
-                                         .arg(dm, 2, 10, zero)
-                                         .arg(sec, 2,'f', 2, zero);
+               .arg(dd, 2, 10, zero)
+               .arg(dm, 2, 10, zero)
+               .arg(sec, 2, 'f', 2, zero);
     }
 
     return QString("%1%2° %3\' %4\"").arg(pm)
-                                     .arg(dd, 2, 10, zero)
-                                     .arg(dm, 2, 10, zero)
-                                     .arg(ds, 2, 10, zero);
+           .arg(dd, 2, 10, zero)
+           .arg(dm, 2, 10, zero)
+           .arg(ds, 2, 10, zero);
 
 #if 0
     if (!machineReadable && dd < 10)
@@ -370,20 +370,20 @@ const QString dms::toHMSString(const bool machineReadable, const bool highPrecis
     QChar zero('0');
     if (machineReadable)
         return QString("%1:%2:%3").arg(hour(), 2, 10, zero)
-                                  .arg(minute(), 2, 10, zero)
-                                  .arg(second(), 2, 10, zero);
+               .arg(minute(), 2, 10, zero)
+               .arg(second(), 2, 10, zero);
 
     if (highPrecision)
     {
         double sec = second() + msecond() / 1000.;
         return QString("%1h %2m %L3s").arg(hour(), 2, 10, zero)
-                                     .arg(minute(), 2, 10, zero)
-                                     .arg(sec, 2, 'f', 2, zero);
+               .arg(minute(), 2, 10, zero)
+               .arg(sec, 2, 'f', 2, zero);
     }
 
     return QString("%1h %2m %3s").arg(hour(), 2, 10, zero)
-                                 .arg(minute(), 2, 10, zero)
-                                 .arg(second(), 2, 10, zero);
+           .arg(minute(), 2, 10, zero)
+           .arg(second(), 2, 10, zero);
 
 #if 0
     QString dummy;
@@ -440,10 +440,11 @@ QDataStream &operator<<(QDataStream &out, const dms &d)
     return out;
 }
 
-QDataStream &operator>>(QDataStream &in, dms &d){
-   double D;
-   in >> D;
-   d = dms(D);
-   return in;
+QDataStream &operator>>(QDataStream &in, dms &d)
+{
+    double D;
+    in >> D;
+    d = dms(D);
+    return in;
 }
 

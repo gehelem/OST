@@ -1,7 +1,7 @@
 #include <QGuiApplication>
 #include "controller.h"
 #include <boost/log/trivial.hpp>
-
+#include "version.cc"
 
 /*!
  * Entry point
@@ -11,7 +11,10 @@ int main(int argc, char *argv[])
 {
 
     BOOST_LOG_TRIVIAL(info) << "OST starting up";
-    QGuiApplication app(argc, argv,false);
+    BOOST_LOG_TRIVIAL(info) << "GIT_SHA1 " << Version::GIT_SHA1;
+    BOOST_LOG_TRIVIAL(info) << "GIT_DATE " << Version::GIT_DATE;
+    BOOST_LOG_TRIVIAL(info) << "GIT_COMMIT_SUBJECT " << Version::GIT_COMMIT_SUBJECT;
+    QGuiApplication app(argc, argv, false);
     QGuiApplication::setOrganizationName("alazob.team");
     QGuiApplication::setApplicationName("ost");
 
@@ -46,11 +49,11 @@ int main(int argc, char *argv[])
 
     QString hostName = argParser.value(indiHostOption);
     int portNumber = atoi(argParser.value(indiPortOption).toStdString().c_str());
-    QString webroot= argParser.value(webrootOption);
-    QString dbPath= argParser.value(dbPathOption);
-    QString libPath= argParser.value(libPathOption);
-    QString installFront= argParser.value(installFrontOption);
-    QString conf= argParser.value(configurationOption);
+    QString webroot = argParser.value(webrootOption);
+    QString dbPath = argParser.value(dbPathOption);
+    QString libPath = argParser.value(libPathOption);
+    QString installFront = argParser.value(installFrontOption);
+    QString conf = argParser.value(configurationOption);
 
     BOOST_LOG_TRIVIAL(debug) << "INDI Host=" << hostName.toStdString();
     BOOST_LOG_TRIVIAL(debug) << "INDI Port=" << portNumber;
@@ -61,16 +64,16 @@ int main(int argc, char *argv[])
     BOOST_LOG_TRIVIAL(debug) << "Load configuration  =" << conf.toStdString();
 
     Controller controller(
-            //&app,
-            argParser.isSet("s"),
-            hostName,
-            portNumber,
-            webroot,
-            dbPath,
-            libPath,
-            installFront,
-            conf
-                );
+        //&app,
+        argParser.isSet("s"),
+        hostName,
+        portNumber,
+        webroot,
+        dbPath,
+        libPath,
+        installFront,
+        conf
+    );
 
     Q_UNUSED(controller);
 

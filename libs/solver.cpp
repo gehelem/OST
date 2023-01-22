@@ -14,32 +14,32 @@ Solver::~Solver()
 void Solver::ResetSolver(FITSImage::Statistic &stats, uint8_t *m_ImageBuffer)
 {
     //BOOST_LOG_TRIVIAL(debug) << "Reset solver";
-    HFRavg=99;
+    HFRavg = 99;
     delete stellarSolver;
     stellarSolver = new StellarSolver(stats, m_ImageBuffer);
     stellarSolver->moveToThread(this->thread());
     stellarSolver->setParent(this);
-    stellarSolverProfiles=StellarSolver::getBuiltInProfiles();
+    stellarSolverProfiles = StellarSolver::getBuiltInProfiles();
 }
 
 void Solver::FindStars(Parameters param)
 {
 
-    if (!connect(stellarSolver,&StellarSolver::logOutput,this,&Solver::sslogOutput))
+    if (!connect(stellarSolver, &StellarSolver::logOutput, this, &Solver::sslogOutput))
         BOOST_LOG_TRIVIAL(debug) << "Can't connect sslogOutput";
-    if (!connect(stellarSolver,&StellarSolver::ready,this,&Solver::ssReadySEP))
+    if (!connect(stellarSolver, &StellarSolver::ready, this, &Solver::ssReadySEP))
         BOOST_LOG_TRIVIAL(debug) << "Can't connect ssReadySEP";
-    if (!connect(stellarSolver,&StellarSolver::finished,this,&Solver::ssFinished))
+    if (!connect(stellarSolver, &StellarSolver::finished, this, &Solver::ssFinished))
         BOOST_LOG_TRIVIAL(debug) << "Can't connect ssFinished";
 
 
     //QList<Parameters> params = stellarSolver->getBuiltInProfiles();
     stellarSolver->setParameters(param);
     //stellarSolver->clearSubFrame();
-    stellarSolver->setProperty("ProcessType",EXTRACT_WITH_HFR);
+    stellarSolver->setProperty("ProcessType", EXTRACT_WITH_HFR);
     //stellarSolver->setProperty("ProcessType",SOLVE);
-    stellarSolver->setProperty("ExtractorType",EXTRACTOR_INTERNAL);
-    stellarSolver->setProperty("SolverType",SOLVER_STELLARSOLVER);
+    stellarSolver->setProperty("ExtractorType", EXTRACTOR_INTERNAL);
+    stellarSolver->setProperty("SolverType", SOLVER_STELLARSOLVER);
 
     //stellarSolver->setProperty("SolverType",SOLVER_STELLARSOLVER);
     stellarSolver->setLogLevel(LOG_ALL);
@@ -67,11 +67,11 @@ void Solver::FindStars(Parameters param)
 }
 void Solver::SolveStars(Parameters param)
 {
-    if (!connect(stellarSolver,&StellarSolver::logOutput,this,&Solver::sslogOutput))
+    if (!connect(stellarSolver, &StellarSolver::logOutput, this, &Solver::sslogOutput))
         BOOST_LOG_TRIVIAL(debug) << "Can't connect sslogOutput";
-    if (!connect(stellarSolver,&StellarSolver::ready,this,&Solver::ssReadySolve))
+    if (!connect(stellarSolver, &StellarSolver::ready, this, &Solver::ssReadySolve))
         BOOST_LOG_TRIVIAL(debug) << "Can't connect ssReadySolve";
-    if (!connect(stellarSolver,&StellarSolver::finished,this,&Solver::ssFinished))
+    if (!connect(stellarSolver, &StellarSolver::finished, this, &Solver::ssFinished))
         BOOST_LOG_TRIVIAL(debug) << "Can't connect ssFinished";
 
 
@@ -79,9 +79,9 @@ void Solver::SolveStars(Parameters param)
     stellarSolver->setParameters(param);
     //stellarSolver->clearSubFrame();
     //stellarSolver->setProperty("ProcessType",EXTRACT_WITH_HFR);
-    stellarSolver->setProperty("ProcessType",SOLVE);
-    stellarSolver->setProperty("ExtractorType",EXTRACTOR_INTERNAL);
-    stellarSolver->setProperty("SolverType",SOLVER_STELLARSOLVER);
+    stellarSolver->setProperty("ProcessType", SOLVE);
+    stellarSolver->setProperty("ExtractorType", EXTRACTOR_INTERNAL);
+    stellarSolver->setProperty("SolverType", SOLVER_STELLARSOLVER);
 
     //stellarSolver->setProperty("SolverType",SOLVER_STELLARSOLVER);
     stellarSolver->setLogLevel(LOG_ALL);
@@ -119,12 +119,12 @@ void Solver::ssReadySEP()
 
     //BOOST_LOG_TRIVIAL(debug) << "SSolver ready SEP";
     stars = stellarSolver->getStarList();
-    for (int i=0;i<stars.size();i++)
+    for (int i = 0; i < stars.size(); i++)
     {
-        HFRavg=(i*HFRavg + stars[i].HFR)/(i+1);
+        HFRavg = (i * HFRavg + stars[i].HFR) / (i + 1);
     }
     BOOST_LOG_TRIVIAL(debug) << "SSolver Ready : HFRavg = " << HFRavg;
-    disconnect(stellarSolver,&StellarSolver::ready,this,&Solver::ssReadySEP);
+    disconnect(stellarSolver, &StellarSolver::ready, this, &Solver::ssReadySEP);
     emit successSEP();
     return;
 }

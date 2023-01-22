@@ -49,3 +49,7 @@ debian/debhelper-build-stamp
 debian/files
 debian/ostserver.substvars
 obj-x86_64-linux-gnu/
+
+src/git_version.cpp
+
+src/version.cc

@@ -1,4 +1,25 @@
 {
+    "indiGitHash": {
+        "devcat": "Info",
+        "group": "",
+        "order":"00",
+        "permission": 0,
+        "propertyLabel": "Indi module git hash"
+    },
+    "indiGitDate": {
+        "devcat": "Info",
+        "group": "",
+        "order":"00",
+        "permission": 0,
+        "propertyLabel": "Indi module git date"
+    },
+    "indiGitMessage": {
+        "devcat": "Info",
+        "group": "",
+        "order":"00",
+        "permission": 0,
+        "propertyLabel": "Indi module git message"
+    },
     "server": {
         "hasprofile":true,
         "devcat": "Indi",

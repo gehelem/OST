@@ -21,6 +21,7 @@ add_compile_options(-fPIC)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 #find_package(Qt5Core)
+find_package(Git)
 find_package(CFITSIO REQUIRED)
 find_package(INDI REQUIRED)
 #find_package(INDI COMPONENTS clientqt5 REQUIRED)
@@ -39,6 +40,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs)
 include_directories(${INDI_INCLUDE_DIR})
 include_directories(${CFITSIO_INCLUDE_DIR})
 include_directories(${GSL_INCLUDE_DIRS})
@@ -59,8 +61,8 @@ add_executable(ostserver
     ${CMAKE_CURRENT_SOURCE_DIR}/src/wshandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/dbmanager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/dbmanager.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/resources/resources.qrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/resources.qrc
 )
 target_link_libraries(ostserver
     ostbasemodule
@@ -83,18 +85,33 @@ target_link_libraries(ostserver
 #qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
 add_library(ostbasemodule SHARED
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule.qrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/solver.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/solver.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/fileio.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/imagelabel.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/stretch.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/bayer.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ssolverutils/dms.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.qrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/fileio.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/fileio.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/imagelabel.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/stretch.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/stretch.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/bayer.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/bayer.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/dms.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/dms.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/nan.h
 )
-set_target_properties(ostbasemodule PROPERTIES PUBLIC_HEADER ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/basemodule.h)
+set(BASE_PUBLIC_HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/fileio.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/stretch.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/bayer.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/dms.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/nan.h
+)
+set_target_properties(ostbasemodule PROPERTIES PUBLIC_HEADER "${BASE_PUBLIC_HEADERS}")
+
 target_link_libraries(ostbasemodule
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
@@ -112,11 +129,15 @@ target_link_libraries(ostbasemodule
 #qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
 add_library(ostindimodule SHARED
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule.qrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/indimodule.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/indimodule.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/indimodule.qrc
 )
-set_target_properties(ostindimodule PROPERTIES PUBLIC_HEADER ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule.h)
+set(INDI_PUBLIC_HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/indimodule.h
+)
+set_target_properties(ostindimodule PROPERTIES PUBLIC_HEADER "${INDI_PUBLIC_HEADERS}")
+
 target_link_libraries(ostindimodule
     ostbasemodule
     indiclient
@@ -174,16 +195,49 @@ target_link_libraries(ostmaincontrol PRIVATE
 )
 target_compile_definitions(ostmaincontrol PRIVATE maincontrol_LIBRARY)
 
-
-
 install(TARGETS ostserver ostbasemodule ostindimodule ostdummy ostmaincontrol
     RUNTIME DESTINATION "/usr/bin"
-    LIBRARY DESTINATION "/usr/lib/ost"
-    PUBLIC_HEADER DESTINATION "/usr/include"
+    LIBRARY DESTINATION "/usr/lib"
+    PUBLIC_HEADER DESTINATION "/usr/include/ost"
 )
+
+
+# the commit's SHA1, and whether the building workspace was dirty or not
+execute_process(COMMAND
+  "${GIT_EXECUTABLE}" describe --match=NeVeRmAtCh --always --abbrev=40 --dirty
+  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+  OUTPUT_VARIABLE GIT_SHA1
+  ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+# the date of the commit
+execute_process(COMMAND
+  "${GIT_EXECUTABLE}" log -1 --format=%ad --date=local
+  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+  OUTPUT_VARIABLE GIT_DATE
+  ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+# the subject of the commit
+execute_process(COMMAND
+  "${GIT_EXECUTABLE}" log -1 --format=%s
+  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+  OUTPUT_VARIABLE GIT_COMMIT_SUBJECT
+  ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+# generate version.cc
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/version.cc.in" "${CMAKE_CURRENT_BINARY_DIR}/version.cc" @ONLY)
+#list(APPEND SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/version.cc" version.hh)
+list(APPEND SOURCES "${CMAKE_CURRENT_BINARY_DIR}/version.cc" version.hh)
+
+
+message(STATUS "CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR}")
+message(STATUS "GIT_SHA1=${GIT_SHA1}")
+message(STATUS "GIT_DATE=${GIT_DATE}")
+message(STATUS "GIT_COMMIT_SUBJECT=${GIT_COMMIT_SUBJECT}")
+
 
 #get_cmake_property(_variableNames VARIABLES)
 #list (SORT _variableNames)
 #foreach (_variableName ${_variableNames})
 #    message(STATUS "${_variableName}=${${_variableName}}")
 #endforeach()
+
