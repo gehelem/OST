@@ -11,13 +11,13 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
 {
 
     //Q_INIT_RESOURCE(dummy);
-    _moduletype = "dummy";
 
     loadPropertiesFromFile(":dummy.json");
 
-    setOstProperty("moduleDescription", "Dummy module to show what we can do", true);
-    setOstProperty("moduleVersion", 0.1, true);
-    setOstProperty("moduleType", _moduletype, true);
+    setModuleLabel(label);
+    setModuleDescription("Dummy module to show what we can do and not");
+    setModuleVersion("0.1");
+    setModuleType("dummy");
 
     setOstProperty("message", "Dummy module init finished", true);
     setOstElement("extextRO", "extext1", "Texte read only 1", false);

@@ -64,7 +64,7 @@ void WShandler::processTextMessage(QString message)
     QJsonDocument jsonResponse = QJsonDocument::fromJson(_mess.toUtf8()); // garder
     emit textRcv(message);
     QJsonObject  obj = jsonResponse.object(); // garder
-    BOOST_LOG_TRIVIAL(debug) << "OST server received json" << message.toStdString();
+    //BOOST_LOG_TRIVIAL(debug) << "OST server received json" << message.toStdString();
     if (obj["evt"].toString() == "readall")
     {
         //sendAll();
@@ -125,10 +125,7 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
     {
         QJsonObject mods;
         QJsonObject  mod;
-        mod["properties"] = QJsonObject::fromVariantMap(eventData);
-        mod["moduleLabel"] = eventData["moduleLabel"].toMap()["value"].toString();
-        mods[eventModule] = mod;
-        //obj["dta"]=QJsonObject::fromVariantMap(eventData);
+        mods[eventModule] = QJsonObject::fromVariantMap(eventData);
         obj["modules"] = mods;
         sendJsonMessage(obj);
     }
