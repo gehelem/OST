@@ -4,9 +4,7 @@
 #include <basedevice.h>
 #include <baseclient.h>
 #include <boost/log/trivial.hpp>
-#include "fileio.h"
-#include "solver.h"
-
+#include <QVariant>
 /*!
  * This Class shouldn't be used as is
  * Every functionnal module should inherit it

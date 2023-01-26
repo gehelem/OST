@@ -1,6 +1,8 @@
 #ifndef DUMMY_MODULE_h_
 #define DUMMY_MODULE_h_
 #include <indimodule.h>
+#include <fileio.h>
+#include <solver.h>
 
 #if defined(DUMMY_MODULE)
 #  define MODULE_INIT Q_DECL_EXPORT
