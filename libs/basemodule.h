@@ -55,9 +55,22 @@ class Basemodule : public QObject
         {
             return _availableModuleLibs;
         }
-
-        QString _moduletype;
-        QString _webroot;
+        QString getModuleLabel()
+        {
+            return _ostproperties["label"].toString();
+        }
+        QString getModuleDescription()
+        {
+            return _ostproperties["description"].toString();
+        }
+        QString getModuleVersion()
+        {
+            return _ostproperties["version"].toString();
+        }
+        QString getModuleType()
+        {
+            return _ostproperties["type"].toString();
+        }
 
     public slots:
         void OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
@@ -99,22 +112,6 @@ class Basemodule : public QObject
         {
             _ostproperties["type"] = _s;
         }
-        QString getModuleLabel()
-        {
-            return _ostproperties["label"].toString();
-        }
-        QString getModuleDescription()
-        {
-            return _ostproperties["description"].toString();
-        }
-        QString getModuleVersion()
-        {
-            return _ostproperties["version"].toString();
-        }
-        QString getModuleType()
-        {
-            return _ostproperties["type"].toString();
-        }
 
         /* OST helpers */
         bool createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,
@@ -148,6 +145,10 @@ class Basemodule : public QObject
         QString _modulelabel;
         QVariantMap _availableModuleLibs;
         QVariantMap _availableProfiles;
+        QString _moduletype;
+        QString _webroot;
+
+
 
     signals:
         void moduleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,

@@ -7,7 +7,7 @@ IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap
     : Basemodule(name, label, profile, availableModuleLibs)
 {
     setVerbose(false);
-    _moduletype = "IndiModule";
+    //_moduletype = "IndiModule";
     loadPropertiesFromFile(":indimodule.json");
     setOstProperty("indiGitHash", QString::fromStdString(Version::GIT_SHA1), false);
     setOstProperty("indiGitDate", QString::fromStdString(Version::GIT_DATE), false);
@@ -84,6 +84,8 @@ void IndiModule::connectIndiTimer()
 {
     if (!isServerConnected())
     {
+        setServer(getOstElementValue("server", "host").toString().toStdString().c_str(), getOstElementValue("server",
+                  "port").toInt());
         if (connectServer())
         {
             newUniversalMessage("Indi server connected");
@@ -94,10 +96,6 @@ void IndiModule::connectIndiTimer()
             sendMessage("Couldn't connect to Indi server");
         }
     }
-}
-void IndiModule::setHostport(QString host, int port)
-{
-    setServer(host.toStdString().c_str(), port);
 }
 
 /*!
@@ -117,6 +115,8 @@ bool IndiModule::connectIndi()
     }
     else
     {
+        setServer(getOstElementValue("server", "host").toString().toStdString().c_str(), getOstElementValue("server",
+                  "port").toInt());
         if (connectServer())
         {
             newUniversalMessage("Indi server connected");

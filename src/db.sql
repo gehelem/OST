@@ -13,6 +13,6 @@ CREATE TABLE IF NOT EXISTS CONFIGURATIONS (
         PROFILENAME    TEXT NOT NULL,
         PRIMARY KEY("CONFIGNAME","MODULENAME")
 );
-INSERT INTO CONFIGURATIONS VALUES ('default','My Allsky','allsky','default');
+--INSERT INTO CONFIGURATIONS VALUES ('default','My Allsky','allsky','default');
 INSERT INTO CONFIGURATIONS VALUES ('default','My dummy module','dummy','default');
 INSERT INTO CONFIGURATIONS VALUES ('justindipanel','Indipanel','indipanel','default');

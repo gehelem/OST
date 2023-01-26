@@ -18,19 +18,8 @@ class IndiModule : public Basemodule, public INDI::BaseClient
     public:
         IndiModule(QString name, QString label, QString profile, QVariantMap availableModuleLibs);
         ~IndiModule() = default;
-        void setHostport(QString host, int port);
-        void setWebroot(QString webroot)
-        {
-            _webroot = webroot;
-        }
         void requestProfile(QString profileName);
         void setProfile(QVariantMap profiledata);
-
-
-        QString getWebroot(void)
-        {
-            return _webroot;
-        }
         bool connectIndi(void);
         void setBlobMode(void);
 

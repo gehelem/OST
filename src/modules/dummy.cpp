@@ -194,11 +194,11 @@ void Dummy::newBLOB(IBLOB *bp)
         setOstElement("imagevalues", "snr", _image->getStats().SNR, true);
         QList<fileio::Record> rec = _image->getRecords();
         stats = _image->getStats();
-        _image->saveAsFITS(_webroot + "/" + getName() + QString(bp->bvp->device) + ".FITS", stats, _image->getImageBuffer(),
+        _image->saveAsFITS(getWebroot() + "/" + getName() + QString(bp->bvp->device) + ".FITS", stats, _image->getImageBuffer(),
                            FITSImage::Solution(), rec, false);
 
         QImage rawImage = _image->getRawQImage();
-        rawImage.save(_webroot + "/" + getName() + QString(bp->bvp->device) + ".jpeg", "JPG", 100);
+        rawImage.save(getWebroot() + "/" + getName() + QString(bp->bvp->device) + ".jpeg", "JPG", 100);
         setOstPropertyAttribute("testimage", "URL", getName() + QString(bp->bvp->device) + ".jpeg", true);
 
     }
