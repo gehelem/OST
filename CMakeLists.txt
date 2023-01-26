@@ -92,7 +92,6 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/fileio.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/fileio.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/imagelabel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/stretch.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/stretch.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/bayer.c
