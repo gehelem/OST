@@ -61,28 +61,29 @@ class Basemodule : public QObject
         QString _webroot;
 
     public slots:
-        void OnExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                             const QVariantMap &eventData);
-        virtual void OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                                       const QVariantMap &eventData)
+        void OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+                             const QVariantMap &pEventData);
+        virtual void OnMyExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+                                       const QVariantMap &pEventData)
         {
-            Q_UNUSED(eventType);
-            Q_UNUSED(eventModule);
-            Q_UNUSED(eventKey);
-            Q_UNUSED(eventData);
+            Q_UNUSED(pEventType);
+            Q_UNUSED(pEventModule);
+            Q_UNUSED(pEventKey);
+            Q_UNUSED(pEventData);
         }
-        virtual void OnDispatchToIndiExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                const QVariantMap &eventData)
+        virtual void OnDispatchToIndiExternalEvent(const QString &pEventType, const QString  &pEventModule,
+                const QString  &pEventKey,
+                const QVariantMap &pEventData)
         {
-            Q_UNUSED(eventType);
-            Q_UNUSED(eventModule);
-            Q_UNUSED(eventKey);
-            Q_UNUSED(eventData);
+            Q_UNUSED(pEventType);
+            Q_UNUSED(pEventModule);
+            Q_UNUSED(pEventKey);
+            Q_UNUSED(pEventData);
         }
 
     protected:
 
-        void sendMessage(QString message);
+        void sendMessage(QString mMessage);
         void setModuleLabel(QString _s)
         {
             _ostproperties["label"] = _s;
@@ -120,23 +121,26 @@ class Basemodule : public QObject
         bool createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,
                                const  QString &pPropertyDevcat, const QString &pPropertyGroup, QString &err);
         void emitPropertyCreation(const QString &pPropertyName);
-        void deleteOstProperty(QString propertyName);
-        void createOstElement (QString propertyName, QString elementName, QString elementLabel, bool emitEvent);
-        void setOstProperty   (const QString &pPropertyName, QVariant _value, bool emitEvent);
+        void deleteOstProperty(const QString &pPropertyName);
+        void createOstElement (const QString &pPropertyName, const QString &pElementName, const QString &pElementLabel,
+                               bool mEmitEvent);
+        void setOstProperty   (const QString &pPropertyName, const QVariant &pValue, bool emitEvent);
         void setOstPropertyAttribute   (const QString &pPropertyName, const QString &pAttributeName, QVariant _value,
                                         bool emitEvent);
-        bool setOstElement          (QString propertyName, QString elementName, QVariant elementValue, bool emitEvent);
-        bool pushOstElements        (QString propertyName);
-        bool resetOstElements      (QString propertyName);
-        bool setOstElementAttribute (QString propertyName, QString elementName, QString attributeName, QVariant _value,
-                                     bool emitEvent);
-        QVariant getOstElementValue (QString propertyName, QString elementName)
+        bool setOstElement          (const QString &pPropertyName, const QString &pElementName, const QVariant &pElementValue,
+                                     bool mEmitEvent);
+        bool pushOstElements        (const QString &pPropertyName);
+        bool resetOstElements      (const QString &pPropertyName);
+        bool setOstElementAttribute (const QString &pPropertyName, const QString &pElementName, const  QString &pAttributeName,
+                                     const QVariant &pValue,
+                                     bool mEmitEvent);
+        QVariant getOstElementValue (const QString &pPropertyName, const QString &pElementName)
         {
-            return _ostproperties["properties"].toMap()[propertyName].toMap()["elements"].toMap()[elementName].toMap()["value"]    ;
+            return _ostproperties["properties"].toMap()[pPropertyName].toMap()["elements"].toMap()[pElementName].toMap()["value"]    ;
         }
 
-        void loadPropertiesFromFile(QString fileName);
-        void savePropertiesToFile(QString fileName);
+        void loadPropertiesFromFile(const QString &pFileName);
+        void savePropertiesToFile(const QString &pFileName);
 
     private:
 
