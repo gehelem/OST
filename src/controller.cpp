@@ -4,11 +4,9 @@
 /*!
  * ... ...
  */
-Controller::Controller(bool saveAllBlobs, const QString &host, int port, const QString &webroot, const QString &dbpath,
+Controller::Controller(bool saveAllBlobs, const QString &webroot, const QString &dbpath,
                        const QString &libpath, const QString &installfront, const QString &conf)
-    : _indihost(host),
-      _indiport(port),
-      _webroot(webroot),
+    : _webroot(webroot),
       _dbpath(dbpath),
       _libpath(libpath),
       _installfront(installfront),

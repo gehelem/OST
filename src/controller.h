@@ -22,15 +22,13 @@ class Controller : public QObject
 {
         Q_OBJECT
     public:
-        Controller(bool saveAllBlobs, const QString &host, int port, const QString &webroot, const QString &dbpath,
+        Controller(bool saveAllBlobs, const QString &webroot, const QString &dbpath,
                    const QString &libpath, const QString &conf, const QString &installfront);
         ~Controller() override;
     signals:
         void controllerEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                              const QVariantMap &eventData);
     private:
-        QString _indihost;
-        int _indiport;
         QString _webroot;
         QString _dbpath;
         QString _libpath;
