@@ -109,6 +109,7 @@ bool Controller::LoadModule(QString lib, QString name, QString label, QString pr
 
                 return true;
             }
+            return false;
         }
         else
         {
@@ -116,6 +117,7 @@ bool Controller::LoadModule(QString lib, QString name, QString label, QString pr
             return false;
         }
     }
+    return false;
 }
 
 
@@ -245,7 +247,7 @@ void Controller::installFront(void)
 }
 void Controller::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    qDebug() << "PROCESS FINISHED (" + QString::number(exitCode) + ")";
+    qDebug() << "PROCESS FINISHED (" + QString::number(exitCode) + ")" + exitStatus;
 }
 void Controller::processOutput()
 {
