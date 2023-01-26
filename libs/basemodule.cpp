@@ -9,6 +9,7 @@ Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap
       mAvailableModuleLibs(availableModuleLibs)
 {
     Q_INIT_RESOURCE(basemodule);
+    Q_UNUSED(profile)
     mModuleType = "basemodule";
     loadPropertiesFromFile(":basemodule.json");
     setOstProperty("moduleLabel", label, false);
