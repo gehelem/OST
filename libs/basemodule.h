@@ -20,7 +20,7 @@ class Basemodule : public QObject
         ~Basemodule();
         void setWebroot(QString webroot)
         {
-            _webroot = webroot;
+            mWebroot = webroot;
         }
         void requestProfile(QString profileName);
         void setProfile(QVariantMap profiledata);
@@ -32,44 +32,44 @@ class Basemodule : public QObject
 
         QString getWebroot(void)
         {
-            return _webroot;
+            return mWebroot;
         }
         QString getName(void)
         {
-            return _modulename;
+            return mModulename;
         }
         QString getLabel(void)
         {
-            return _modulelabel;
+            return mModulelabel;
         }
         QVariantMap getOstProperties(void)
         {
-            return _ostproperties["properties"].toMap();
+            return mOstProperties["properties"].toMap();
         }
         QVariantMap getOstProperty(QString name)
         {
-            return _ostproperties["properties"].toMap()[name].toMap();
+            return mOstProperties["properties"].toMap()[name].toMap();
         }
         QVariantMap getModuleInfo(void);
         QVariantMap getAvailableModuleLibs(void)
         {
-            return _availableModuleLibs;
+            return mAvailableModuleLibs;
         }
         QString getModuleLabel()
         {
-            return _ostproperties["label"].toString();
+            return mOstProperties["label"].toString();
         }
         QString getModuleDescription()
         {
-            return _ostproperties["description"].toString();
+            return mOstProperties["description"].toString();
         }
         QString getModuleVersion()
         {
-            return _ostproperties["version"].toString();
+            return mOstProperties["version"].toString();
         }
         QString getModuleType()
         {
-            return _ostproperties["type"].toString();
+            return mOstProperties["type"].toString();
         }
 
     public slots:
@@ -98,19 +98,19 @@ class Basemodule : public QObject
         void sendMessage(QString mMessage);
         void setModuleLabel(QString _s)
         {
-            _ostproperties["label"] = _s;
+            mOstProperties["label"] = _s;
         }
         void setModuleDescription(QString _s)
         {
-            _ostproperties["description"] = _s;
+            mOstProperties["description"] = _s;
         }
         void setModuleVersion(QString _s)
         {
-            _ostproperties["version"] = _s;
+            mOstProperties["version"] = _s;
         }
         void setModuleType(QString _s)
         {
-            _ostproperties["type"] = _s;
+            mOstProperties["type"] = _s;
         }
 
         /* OST helpers */
@@ -132,7 +132,7 @@ class Basemodule : public QObject
                                      bool mEmitEvent);
         QVariant getOstElementValue (const QString &pPropertyName, const QString &pElementName)
         {
-            return _ostproperties["properties"].toMap()[pPropertyName].toMap()["elements"].toMap()[pElementName].toMap()["value"]    ;
+            return mOstProperties["properties"].toMap()[pPropertyName].toMap()["elements"].toMap()[pElementName].toMap()["value"]    ;
         }
 
         void loadPropertiesFromFile(const QString &pFileName);
@@ -140,13 +140,13 @@ class Basemodule : public QObject
 
     private:
 
-        QVariantMap _ostproperties;
-        QString _modulename;
-        QString _modulelabel;
-        QVariantMap _availableModuleLibs;
-        QVariantMap _availableProfiles;
-        QString _moduletype;
-        QString _webroot;
+        QVariantMap mOstProperties;
+        QString mModulename;
+        QString mModulelabel;
+        QVariantMap mAvailableModuleLibs;
+        QVariantMap mAvailableProfiles;
+        QString mModuleType;
+        QString mWebroot;
 
 
 
