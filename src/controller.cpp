@@ -82,8 +82,6 @@ bool Controller::LoadModule(QString lib, QString name, QString label, QString pr
             if (mod)
             {
                 mod->setParent(this);
-                //mod->setHostport(_indihost,_indiport);
-                //mod->connectIndi();
                 mod->setWebroot(_webroot);
                 mod->setObjectName(name);
                 QVariantMap prof;
