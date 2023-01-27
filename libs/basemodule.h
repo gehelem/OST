@@ -27,7 +27,10 @@ class Basemodule : public QObject
         QVariantMap getProfile(void);
 
 
-
+        /**
+         * @brief gets webroot directory
+         * @return webroot directory full path directory full
+         */
         QString getWebroot(void)
         {
             return mWebroot;
@@ -93,10 +96,18 @@ class Basemodule : public QObject
 
     protected:
 
+        /**
+         * @brief Sends a message to controller
+         * @param mMessage is the message to send
+         */
         void sendMessage(QString mMessage);
-        void setModuleLabel(QString _s)
+        /**
+         * @brief Sets module label property
+         * @param mLabel is the label
+         */
+        void setModuleLabel(QString mLabel)
         {
-            mOstProperties["label"] = _s;
+            mOstProperties["label"] = mLabel;
         }
         void setModuleDescription(QString _s)
         {
