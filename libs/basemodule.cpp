@@ -378,7 +378,6 @@ QVariantMap Basemodule::getProfile(void)
 void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
                                  const QVariantMap &pEventData)
 {
-
     if ( (pEventType == "readall") && ((pEventModule == "*") || (pEventModule == getName())) )
     {
         sendDump();
@@ -409,34 +408,44 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
     {
         foreach(const QString &keyprop, pEventData.keys())
         {
-            foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
+            if (keyprop == "profileactions")
             {
-                QVariant val = pEventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
-                if ((keyprop == "profileactions") && (keyelt == "load"))
+                foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
                 {
-                    setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
-                    if (val.toBool()) emit moduleEvent("modloadprofile", this->metaObject()->className(), getOstElementValue("profileactions",
-                                                           "name").toString(),
-                                                           QVariantMap());
-                    return;
+                    QVariant val = pEventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
+                    if (keyelt == "load")
+                    {
+                        //setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
+                        if (val.toBool()) emit moduleEvent("modloadprofile", this->metaObject()->className(), getOstElementValue("profileactions",
+                                                               "name").toString(),
+                                                               QVariantMap());
+                    }
+                    if (keyelt == "save")
+                    {
+                        //setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
+                        if (val.toBool()) emit moduleEvent("modsaveprofile", this->metaObject()->className(), getOstElementValue("profileactions",
+                                                               "name").toString(),
+                                                               getProfile());
+                    }
+                    if (keyelt == "name")
+                    {
+                        setOstElement("profileactions", "name", val, true);
+                    }
+
                 }
-                if ((keyprop == "profileactions") && (keyelt == "save"))
+                return;
+            }
+
+            if (keyprop == "moduleactions")
+            {
+                foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
                 {
-                    setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
-                    if (val.toBool()) emit moduleEvent("modsaveprofile", this->metaObject()->className(), getOstElementValue("profileactions",
-                                                           "name").toString(),
-                                                           getProfile());
-                    return;
-                }
-                if ((keyprop == "profileactions") && (keyelt == "name"))
-                {
-                    setOstElement("profileactions", "name", val, true);
-                    return;
-                }
-                if ((keyprop == "moduleactions") && (keyelt == "kill"))
-                {
-                    this->~Basemodule();
-                    return;
+                    if (keyelt == "kill")
+                    {
+                        this->~Basemodule();
+                        return;
+                    }
+
                 }
             }
         }
