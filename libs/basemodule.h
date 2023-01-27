@@ -96,29 +96,13 @@ class Basemodule : public QObject
          * @param message is the message to send
          */
         void sendMessage(QString message);
-        /**
-         * @brief Sets module name property
-         * @param name is the name
-         */
-        void setName(QString name)
+        void setModuleDescription(QString description)
         {
-            mOstProperties["name"] = name;
+            mOstProperties["description"] = description;
         }
-        /**
-         * @brief Sets module label property
-         * @param label is the label
-         */
-        void setModuleLabel(QString label)
+        void setModuleVersion(QString version)
         {
-            mOstProperties["label"] = label;
-        }
-        void setModuleDescription(QString _s)
-        {
-            mOstProperties["description"] = _s;
-        }
-        void setModuleVersion(QString _s)
-        {
-            mOstProperties["version"] = _s;
+            mOstProperties["version"] = version;
         }
 
         /* OST helpers */
@@ -147,6 +131,23 @@ class Basemodule : public QObject
         void savePropertiesToFile(const QString &pFileName);
 
     private:
+        /**
+         * @brief Sets module name property
+         * @param name is the name
+         */
+        void setName(QString name)
+        {
+            mOstProperties["name"] = name;
+        }
+        /**
+         * @brief Sets module label property
+         * @param label is the label
+         */
+        void setModuleLabel(QString label)
+        {
+            mOstProperties["label"] = label;
+        }
+
 
         QVariantMap mOstProperties;
         QVariantMap mAvailableModuleLibs;
