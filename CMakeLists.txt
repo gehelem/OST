@@ -61,6 +61,7 @@ add_executable(ostserver
     ${CMAKE_CURRENT_SOURCE_DIR}/src/wshandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/dbmanager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/dbmanager.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/version.hh
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/resources.qrc
 )
@@ -99,6 +100,7 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/dms.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/dms.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/nan.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/version.hh
 )
 set(BASE_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.h
