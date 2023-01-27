@@ -83,10 +83,10 @@ bool Controller::LoadModule(QString lib, QString name, QString label, QString pr
                 mod->setWebroot(_webroot);
                 mod->setObjectName(name);
                 QVariantMap prof;
-                dbmanager->getProfile(mod->getModuleType(), profile, prof);
+                dbmanager->getProfile(mod->metaObject()->className(), profile, prof);
                 mod->setProfile(prof);
                 QVariantMap profs;
-                dbmanager->getProfiles(mod->getModuleType(), profs);
+                dbmanager->getProfiles(mod->metaObject()->className(), profs);
                 mod->setProfiles(profs);
                 connect(mod, &Basemodule::moduleEvent, this, &Controller::OnModuleEvent);
                 connect(mod, &Basemodule::loadOtherModule, this, &Controller::LoadModule);
@@ -128,14 +128,14 @@ void Controller::OnModuleEvent(const QString &eventType, const QString  &eventMo
     {
         Basemodule* mod = qobject_cast<Basemodule*>(sender());
         QVariantMap _vm = mod->getProfile();
-        dbmanager->setProfile(eventModule, eventKey, _vm);
+        dbmanager->setProfile(mod->metaObject()->className(), eventKey, _vm);
         return;
     }
     if (eventType == "modloadprofile")
     {
         QVariantMap _prof;
-        dbmanager->getProfile(eventModule, eventKey, _prof);
         Basemodule* mod = qobject_cast<Basemodule*>(sender());
+        dbmanager->getProfile(mod->metaObject()->className(), eventKey, _prof);
         mod->setProfile(_prof);
         return;
 

@@ -68,11 +68,6 @@ class Basemodule : public QObject
         {
             return mOstProperties["version"].toString();
         }
-        QString getModuleType()
-        {
-            return mOstProperties["type"].toString();
-        }
-
     public slots:
         void OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
                              const QVariantMap &pEventData);
@@ -125,10 +120,6 @@ class Basemodule : public QObject
         {
             mOstProperties["version"] = _s;
         }
-        void setModuleType(QString _s)
-        {
-            mOstProperties["type"] = _s;
-        }
 
         /* OST helpers */
         bool createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,
@@ -160,7 +151,6 @@ class Basemodule : public QObject
         QVariantMap mOstProperties;
         QVariantMap mAvailableModuleLibs;
         QVariantMap mAvailableProfiles;
-        QString mModuleType;
         QString mWebroot;
 
 

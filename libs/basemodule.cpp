@@ -8,7 +8,6 @@ Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap
 {
     Q_INIT_RESOURCE(basemodule);
     Q_UNUSED(profile)
-    mModuleType = "basemodule";
     setName(name);
     setModuleLabel(label);
     loadPropertiesFromFile(":basemodule.json");
@@ -21,7 +20,8 @@ Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap
     setModuleLabel(label);
     setModuleDescription("base module description - developer should change this message");
     setModuleVersion("0.1");
-    setModuleType("basemodule");
+
+
 
 }
 Basemodule::~Basemodule()
@@ -416,14 +416,16 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
                 if ((keyprop == "profileactions") && (keyelt == "load"))
                 {
                     setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
-                    if (val.toBool()) emit moduleEvent("modloadprofile", mModuleType, getOstElementValue("profileactions", "name").toString(),
+                    if (val.toBool()) emit moduleEvent("modloadprofile", this->metaObject()->className(), getOstElementValue("profileactions",
+                                                           "name").toString(),
                                                            QVariantMap());
                     return;
                 }
                 if ((keyprop == "profileactions") && (keyelt == "save"))
                 {
                     setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
-                    if (val.toBool()) emit moduleEvent("modsaveprofile", mModuleType, getOstElementValue("profileactions", "name").toString(),
+                    if (val.toBool()) emit moduleEvent("modsaveprofile", this->metaObject()->className(), getOstElementValue("profileactions",
+                                                           "name").toString(),
                                                            getProfile());
                     return;
                 }
