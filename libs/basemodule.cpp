@@ -4,13 +4,13 @@
 #include "version.cc"
 
 Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
-    : mModulename(name),
-      mModulelabel(label),
-      mAvailableModuleLibs(availableModuleLibs)
+    : mAvailableModuleLibs(availableModuleLibs)
 {
     Q_INIT_RESOURCE(basemodule);
     Q_UNUSED(profile)
     mModuleType = "basemodule";
+    setName(name);
+    setModuleLabel(label);
     loadPropertiesFromFile(":basemodule.json");
     setOstProperty("moduleLabel", label, false);
     setOstProperty("moduleType", "basemodule", false);
@@ -32,9 +32,9 @@ Basemodule::~Basemodule()
     }
     Q_CLEANUP_RESOURCE(basemodule);
 }
-void Basemodule::sendMessage(QString mMessage)
+void Basemodule::sendMessage(QString message)
 {
-    QString mess = QDateTime::currentDateTime().toString("[yyyyMMdd hh:mm:ss.zzz]") + " - " + mModulename + " - " + mMessage;
+    QString mess = QDateTime::currentDateTime().toString("[yyyyMMdd hh:mm:ss.zzz]") + " - " + getName() + " - " + message;
     qDebug() << mess;
     setOstProperty("message", mess, true);
 }
@@ -45,7 +45,7 @@ bool Basemodule::createOstProperty(const QString &pPropertyName, const QString &
     //BOOST_LOG_TRIVIAL(debug) << "createOstProperty  - " << mModulename.toStdString() << "-" << pPropertyName.toStdString();
     if (mOstProperties["properties"].toMap().contains(pPropertyName))
     {
-        err = mModulename + " - createOstProperty " + pPropertyName + " already exists";
+        err = getName() + " - createOstProperty " + pPropertyName + " already exists";
         BOOST_LOG_TRIVIAL(debug) << err.toStdString();
         return false;
     }
@@ -67,7 +67,7 @@ bool Basemodule::createOstProperty(const QString &pPropertyName, const QString &
 void Basemodule::emitPropertyCreation(const QString &pPropertyName)
 {
     QVariantMap _prop = mOstProperties["properties"].toMap()[pPropertyName].toMap();
-    emit moduleEvent("addprop", mModulename, pPropertyName, _prop);
+    emit moduleEvent("addprop", getName(), pPropertyName, _prop);
 }
 
 void Basemodule::deleteOstProperty(const QString &pPropertyName)
@@ -76,7 +76,7 @@ void Basemodule::deleteOstProperty(const QString &pPropertyName)
     QVariantMap _props = mOstProperties["properties"].toMap();
     _props.remove(pPropertyName);
     mOstProperties["properties"] = _props;
-    emit moduleEvent("delprop", mModulename, pPropertyName, QVariantMap());
+    emit moduleEvent("delprop", getName(), pPropertyName, QVariantMap());
 
 }
 
@@ -88,7 +88,7 @@ void Basemodule::setOstProperty(const QString &pPropertyName, const QVariant &pV
     _prop["value"] = pValue;
     _props[pPropertyName] = _prop;
     mOstProperties["properties"] = _props;
-    if (emitEvent) emit moduleEvent("setpropvalue", mModulename, pPropertyName, _prop);
+    if (emitEvent) emit moduleEvent("setpropvalue", getName(), pPropertyName, _prop);
 }
 void Basemodule::createOstElement (const QString &pPropertyName, const QString &pElementName, const QString &pElementLabel,
                                    bool mEmitEvent)
@@ -114,7 +114,7 @@ void Basemodule::createOstElement (const QString &pPropertyName, const QString &
     _prop["elements"] = _elements;
     _props[pPropertyName] = _prop;
     mOstProperties["properties"] = _props;
-    if (mEmitEvent) emit moduleEvent("addelt", mModulename, pPropertyName, _prop);
+    if (mEmitEvent) emit moduleEvent("addelt", getName(), pPropertyName, _prop);
 
 }
 bool Basemodule::setOstElement    (const QString &pPropertyName, const QString &pElementName,
@@ -182,7 +182,7 @@ bool Basemodule::setOstElement    (const QString &pPropertyName, const QString &
     }
     _props[pPropertyName] = _prop;
     mOstProperties["properties"] = _props;
-    if (mEmitEvent) emit moduleEvent("setpropvalue", mModulename, pPropertyName, _prop);
+    if (mEmitEvent) emit moduleEvent("setpropvalue", getName(), pPropertyName, _prop);
 
 
     return true; // should return false when request is invalid, we'll see that later
@@ -209,7 +209,7 @@ bool Basemodule::pushOstElements         (const QString &pPropertyName)
     mOstProperties["properties"] = _props;
     QVariantMap _mess;
     _mess["values"] = _cols;
-    emit moduleEvent("pushvalues", mModulename, pPropertyName, _mess);
+    emit moduleEvent("pushvalues", getName(), pPropertyName, _mess);
     return true;
 }
 bool Basemodule::resetOstElements      (const QString &pPropertyName)
@@ -225,7 +225,7 @@ bool Basemodule::resetOstElements      (const QString &pPropertyName)
     _prop["grid"].clear();
     _props[pPropertyName] = _prop;
     mOstProperties["properties"] = _props;
-    emit moduleEvent("resetvalues", mModulename, pPropertyName, QVariantMap());
+    emit moduleEvent("resetvalues", getName(), pPropertyName, QVariantMap());
     return true;
 }
 
@@ -239,7 +239,7 @@ void Basemodule::setOstPropertyAttribute   (const QString &pPropertyName, const 
     _prop[pAttributeName] = _value;
     _props[pPropertyName] = _prop;
     mOstProperties["properties"] = _props;
-    if (emitEvent)  emit moduleEvent("setattributes", mModulename, pPropertyName, _prop);
+    if (emitEvent)  emit moduleEvent("setattributes", getName(), pPropertyName, _prop);
 
 }
 bool Basemodule::setOstElementAttribute(const QString &pPropertyName, const QString &pElementName,
@@ -262,7 +262,7 @@ bool Basemodule::setOstElementAttribute(const QString &pPropertyName, const QStr
     }
     _props[pPropertyName] = _prop;
     mOstProperties["properties"] = _props;
-    if (mEmitEvent) emit moduleEvent("setpropvalue", mModulename, pPropertyName, _prop);
+    if (mEmitEvent) emit moduleEvent("setpropvalue", getName(), pPropertyName, _prop);
     return true; // should return false when request is invalid, we'll see that later
 
 
@@ -308,7 +308,7 @@ void Basemodule::savePropertiesToFile(const QString &pFileName)
 }
 void Basemodule::requestProfile(QString profileName)
 {
-    emit moduleEvent("profilerequest", mModulename, profileName, QVariantMap());
+    emit moduleEvent("profilerequest", getName(), profileName, QVariantMap());
 }
 
 void Basemodule::setProfile(QVariantMap profiledata)
@@ -380,12 +380,12 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
                                  const QVariantMap &pEventData)
 {
 
-    if ( (pEventType == "readall") && ((pEventModule == "*") || (pEventModule == mModulename)) )
+    if ( (pEventType == "readall") && ((pEventModule == "*") || (pEventModule == getName())) )
     {
         sendDump();
         return;
     }
-    if ( (pEventType == "setpropvalue") && (pEventModule == mModulename) )
+    if ( (pEventType == "setpropvalue") && (pEventModule == getName()) )
     {
         foreach(const QString &keyprop, pEventData.keys())
         {
@@ -406,7 +406,7 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
     }
 
 
-    if (mModulename == pEventModule)
+    if (getName() == pEventModule)
     {
         foreach(const QString &keyprop, pEventData.keys())
         {
@@ -462,5 +462,5 @@ QVariantMap Basemodule::getModuleInfo(void)
 
 void Basemodule::sendDump(void)
 {
-    emit moduleEvent("moduledump", mModulename, "*", mOstProperties);
+    emit moduleEvent("moduledump", getName(), "*", mOstProperties);
 }

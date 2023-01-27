@@ -37,7 +37,7 @@ class Basemodule : public QObject
         }
         QString getName(void)
         {
-            return mModulename;
+            return mOstProperties["name"].toString();
         }
         QString getLabel(void)
         {
@@ -98,16 +98,24 @@ class Basemodule : public QObject
 
         /**
          * @brief Sends a message to controller
-         * @param mMessage is the message to send
+         * @param message is the message to send
          */
-        void sendMessage(QString mMessage);
+        void sendMessage(QString message);
+        /**
+         * @brief Sets module name property
+         * @param name is the name
+         */
+        void setName(QString name)
+        {
+            mOstProperties["name"] = name;
+        }
         /**
          * @brief Sets module label property
-         * @param mLabel is the label
+         * @param label is the label
          */
-        void setModuleLabel(QString mLabel)
+        void setModuleLabel(QString label)
         {
-            mOstProperties["label"] = mLabel;
+            mOstProperties["label"] = label;
         }
         void setModuleDescription(QString _s)
         {
@@ -150,7 +158,7 @@ class Basemodule : public QObject
     private:
 
         QVariantMap mOstProperties;
-        QString mModulename;
+        //QString mModulename;
         QString mModulelabel;
         QVariantMap mAvailableModuleLibs;
         QVariantMap mAvailableProfiles;
