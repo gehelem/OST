@@ -60,14 +60,6 @@
         "propertyLabel": "Version",
         "value":1
     },
-    "moduleType": {
-        "devcat": "Info",
-        "group": "",
-        "order":"05",
-        "permission": 0,
-        "propertyLabel": "Module type",
-        "value":"basemodule"
-    },
     "message": {
         "devcat": "messages",
         "group": "",

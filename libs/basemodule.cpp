@@ -12,7 +12,6 @@ Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap
     setModuleLabel(label);
     loadPropertiesFromFile(":basemodule.json");
     setOstProperty("moduleLabel", label, false);
-    setOstProperty("moduleType", "basemodule", false);
     setOstProperty("baseGitHash", QString::fromStdString(Version::GIT_SHA1), false);
     setOstProperty("baseGitDate", QString::fromStdString(Version::GIT_DATE), false);
     setOstProperty("baseGitMessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT), false);
