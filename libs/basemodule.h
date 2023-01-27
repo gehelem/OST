@@ -41,7 +41,7 @@ class Basemodule : public QObject
         }
         QString getLabel(void)
         {
-            return mModulelabel;
+            return mOstProperties["label"].toString();
         }
         QVariantMap getOstProperties(void)
         {
@@ -158,8 +158,6 @@ class Basemodule : public QObject
     private:
 
         QVariantMap mOstProperties;
-        //QString mModulename;
-        QString mModulelabel;
         QVariantMap mAvailableModuleLibs;
         QVariantMap mAvailableProfiles;
         QString mModuleType;
