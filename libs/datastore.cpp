@@ -11,25 +11,31 @@ Datastore::Datastore()
 Datastore::~Datastore()
 {
 }
-bool Datastore::createProperty(const QString &pPropertyName, const QString &pPropertyLabel, bool mEmitEvent)
+bool Datastore::createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel,
+                                  const int &pPropertyPermission,
+                                  const  QString &pPropertyDevcat, const QString &pPropertyGroup, QString &err)
 {
     if (mProperties.contains(pPropertyName))
     {
+        sendMessage("createOstProperty - property " + pPropertyName + " already exists.");
         return false;
     }
     else
     {
         QVariantMap prop;
-        prop["label"] = pPropertyLabel;
-        //prop["value"] = val;
+        prop["propertyLabel"] = pPropertyLabel;
+        prop["permission"] = pPropertyPermission;
+        prop["devcat"] = pPropertyDevcat;
+        prop["group"] = pPropertyGroup;
+        prop["name"] = pPropertyName;
         mProperties[pPropertyName] = prop;
         qDebug() << "Datastore createProperty";
-        if (mEmitEvent) OnModuleEvent("createProperty", QString(), pPropertyName, mProperties[pPropertyName].toMap());
+        OnModuleEvent("createProperty", QString(), pPropertyName, mProperties[pPropertyName].toMap());
         return true;
     }
 }
 
-bool Datastore::setPropertyValue(const QString &pPropertyName, const QVariant &pPropertyValue, bool mEmitEvent)
+bool Datastore::setOstPropertyValue(const QString &pPropertyName, const QVariant &pPropertyValue, bool mEmitEvent)
 {
     if (mProperties.contains(pPropertyName))
     {
@@ -45,7 +51,7 @@ bool Datastore::setPropertyValue(const QString &pPropertyName, const QVariant &p
         return false;
     }
 }
-QVariant Datastore::getPropertyValue(QString &pPropertyName)
+QVariant Datastore::getOstPropertyValue(QString &pPropertyName)
 {
     if (mProperties.contains(pPropertyName))
     {
@@ -66,8 +72,8 @@ QVariant Datastore::getPropertyValue(QString &pPropertyName)
     }
 }
 
-bool Datastore::createElement(const QString &pPropertyName, const QString &pElementName, const QString &pElementLabel,
-                              bool mEmitEvent)
+bool Datastore::createOstElement(const QString &pPropertyName, const QString &pElementName, const QString &pElementLabel,
+                                 bool mEmitEvent)
 {
     QVariantMap _props = mProperties["properties"].toMap();
     if (!_props.contains(pPropertyName) )
@@ -92,8 +98,8 @@ bool Datastore::createElement(const QString &pPropertyName, const QString &pElem
     if (mEmitEvent) OnModuleEvent("createElement", QString(), pPropertyName, mProperties[pPropertyName].toMap());
     return true;
 }
-bool Datastore::setElementValue(const QString &pPropertyName, const QString &pElementName, const QVariant &pElementValue,
-                                bool mEmitEvent)
+bool Datastore::setOstElementValue(const QString &pPropertyName, const QString &pElementName, const QVariant &pElementValue,
+                                   bool mEmitEvent)
 {
     QVariantMap _props = mProperties["properties"].toMap();
     if (!_props.contains(pPropertyName) )
@@ -162,7 +168,7 @@ bool Datastore::setElementValue(const QString &pPropertyName, const QString &pEl
 
     return true; // should return false when request is invalid, we'll see that later
 }
-QVariant Datastore::getElementValue(const QString &pPropertyName, const QString &pElementName)
+QVariant Datastore::getOstElementValue(const QString &pPropertyName, const QString &pElementName)
 {
     return mProperties["properties"].toMap()[pPropertyName].toMap()["elements"].toMap()[pElementName].toMap()["value"];
     if (mProperties.contains(pPropertyName))
@@ -194,4 +200,38 @@ QVariant Datastore::getElementValue(const QString &pPropertyName, const QString 
     }
 
 
+}
+void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
+{
+    QVariantMap _props = mProperties["properties"].toMap();
+
+    QString content;
+    QFile file;
+    file.setFileName(pFileName);
+    file.open(QIODevice::ReadOnly | QIODevice::Text);
+    content = file.readAll();
+    file.close();
+    QJsonDocument d = QJsonDocument::fromJson(content.toUtf8());
+    QJsonObject props = d.object();
+    foreach(const QString &key, props.keys())
+    {
+        _props[key] = props[key].toVariant();
+    }
+    mProperties["properties"] = _props;
+
+    //QByteArray docByteArray = d.toJson(QJsonDocument::Compact);
+    //QString strJson = QLatin1String(docByteArray);
+    //BOOST_LOG_TRIVIAL(debug) << "loadPropertiesFromFile  - " << mModulename.toStdString() << " - filename=" << fileName.toStdString() << " - " << strJson.toStdString();
+
+}
+
+void Datastore::saveOstPropertiesToFile(const QString &pFileName)
+{
+    QJsonObject obj = QJsonObject::fromVariantMap(mProperties);
+    QJsonDocument doc(obj);
+
+    QFile jsonFile(pFileName);
+    jsonFile.open(QFile::WriteOnly);
+    jsonFile.write(doc.toJson());
+    jsonFile.close();
 }

@@ -10,11 +10,11 @@ Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap
     Q_UNUSED(profile)
     setName(name);
     setModuleLabel(label);
-    loadPropertiesFromFile(":basemodule.json");
-    setOstProperty("moduleLabel", label, false);
-    setOstProperty("baseGitHash", QString::fromStdString(Version::GIT_SHA1), false);
-    setOstProperty("baseGitDate", QString::fromStdString(Version::GIT_DATE), false);
-    setOstProperty("baseGitMessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT), false);
+    loadOstPropertiesFromFile(":basemodule.json");
+    setOstPropertyValue("moduleLabel", label, false);
+    setOstPropertyValue("baseGitHash", QString::fromStdString(Version::GIT_SHA1), false);
+    setOstPropertyValue("baseGitDate", QString::fromStdString(Version::GIT_DATE), false);
+    setOstPropertyValue("baseGitMessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT), false);
 
     setModuleLabel(label);
     setModuleDescription("base module description - developer should change this message");
@@ -30,39 +30,6 @@ Basemodule::~Basemodule()
         deleteOstProperty(key);
     }
     Q_CLEANUP_RESOURCE(basemodule);
-}
-void Basemodule::sendMessage(QString message)
-{
-    QString mess = QDateTime::currentDateTime().toString("[yyyyMMdd hh:mm:ss.zzz]") + " - " + getName() + " - " + message;
-    qDebug() << mess;
-    setOstProperty("message", mess, true);
-}
-
-bool Basemodule::createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel,
-                                   const int &pPropertyPermission, const  QString &pPropertyDevcat, const QString &pPropertyGroup, QString &err)
-{
-    createProperty(pPropertyName, pPropertyLabel, true);
-    //BOOST_LOG_TRIVIAL(debug) << "createOstProperty  - " << mModulename.toStdString() << "-" << pPropertyName.toStdString();
-    if (mOstProperties["properties"].toMap().contains(pPropertyName))
-    {
-        err = getName() + " - createOstProperty " + pPropertyName + " already exists";
-        BOOST_LOG_TRIVIAL(debug) << err.toStdString();
-        return false;
-    }
-    else
-    {
-        QVariantMap _prop, _props;
-        _prop["propertyLabel"] = pPropertyLabel;
-        _prop["permission"] = pPropertyPermission;
-        _prop["devcat"] = pPropertyDevcat;
-        _prop["group"] = pPropertyGroup;
-        _prop["name"] = pPropertyName;
-        _props = mOstProperties["properties"].toMap();
-        _props[pPropertyName] = _prop;
-        mOstProperties["properties"] = _props;
-        err = "OK";
-        return true;
-    }
 }
 void Basemodule::emitPropertyCreation(const QString &pPropertyName)
 {
@@ -80,116 +47,6 @@ void Basemodule::deleteOstProperty(const QString &pPropertyName)
 
 }
 
-void Basemodule::setOstProperty(const QString &pPropertyName, const QVariant &pValue, bool emitEvent)
-{
-    //BOOST_LOG_TRIVIAL(debug) << "setpropvalue  - " << mModulename.toStdString() << "-" << pPropertyName.toStdString();
-    setPropertyValue(pPropertyName, pValue, true);
-
-    QVariantMap _props = mOstProperties["properties"].toMap();
-    QVariantMap _prop = _props[pPropertyName].toMap();
-    _prop["value"] = pValue;
-    _props[pPropertyName] = _prop;
-    mOstProperties["properties"] = _props;
-    if (emitEvent) emit moduleEvent("setpropvalue", getName(), pPropertyName, _prop);
-}
-void Basemodule::createOstElement (const QString &pPropertyName, const QString &pElementName, const QString &pElementLabel,
-                                   bool mEmitEvent)
-{
-    QVariantMap _props = mOstProperties["properties"].toMap();
-    if (!_props.contains(pPropertyName) )
-    {
-        QString toto = " createOstElement - property " + pPropertyName + " not found";
-        sendMessage(toto);
-        return ;
-    }
-
-    QVariantMap _prop = _props[pPropertyName].toMap();
-    QVariantMap _elements = _prop["elements"].toMap();
-    if (_elements.contains(pPropertyName) )
-    {
-        sendMessage(" createOstElement - property " + pPropertyName + " : element " + pElementName + "already exists.");
-        return ;
-    }
-    QVariantMap _element = _elements[pElementName].toMap();
-    _element["elementLabel"] = pElementLabel;
-    _elements[pElementName] = _element;
-    _prop["elements"] = _elements;
-    _props[pPropertyName] = _prop;
-    mOstProperties["properties"] = _props;
-    if (mEmitEvent) emit moduleEvent("addelt", getName(), pPropertyName, _prop);
-
-}
-bool Basemodule::setOstElement    (const QString &pPropertyName, const QString &pElementName,
-                                   const  QVariant &pElementValue, bool mEmitEvent)
-{
-    QVariantMap _props = mOstProperties["properties"].toMap();
-    if (!_props.contains(pPropertyName) )
-    {
-        sendMessage(" setOstElement - property " + pPropertyName + " not found");
-        return false;
-    }
-
-    QVariantMap _prop = _props[pPropertyName].toMap();
-
-    if (_prop.contains("elements"))
-    {
-        if (_prop["elements"].toMap().contains(pElementName))
-        {
-            QVariantMap _elements = _prop["elements"].toMap();
-            if (!_elements.contains(pElementName) )
-            {
-                sendMessage(" setOstElement - property " + pPropertyName + " : element " + pElementName + " not found.");
-                return false;
-            }
-
-            QVariantMap element = _elements[pElementName].toMap();
-            if (element.contains("value"))
-            {
-                if (strcmp(element["value"].typeName(), "double") == 0)
-                {
-                    //element["value"]=pElementValue.toDouble();
-                    element["value"].setValue(pElementValue.toDouble());
-                }
-                if (strcmp(element["value"].typeName(), "float") == 0)
-                {
-                    //element["value"]=pElementValue.toFloat();
-                    element["value"].setValue(pElementValue.toFloat());
-                }
-                if (strcmp(element["value"].typeName(), "qlonglong") == 0)
-                {
-                    //element["value"]=pElementValue.toFloat();
-                    element["value"].setValue(pElementValue.toDouble());
-                }
-                if (strcmp(element["value"].typeName(), "int") == 0)
-                {
-                    //element["value"]=pElementValue.toInt();
-                    element["value"].setValue(pElementValue.toInt());
-                }
-                if (strcmp(element["value"].typeName(), "QString") == 0)
-                {
-                    element["value"] = pElementValue.toString();
-                }
-                if (strcmp(element["value"].typeName(), "bool") == 0)
-                {
-                    element["value"] = pElementValue.toBool();
-                }
-            }
-            else
-            {
-                element["value"] = pElementValue;
-            }
-            _elements[pElementName] = element;
-            _prop["elements"] = _elements;
-        }
-    }
-    _props[pPropertyName] = _prop;
-    mOstProperties["properties"] = _props;
-    if (mEmitEvent) emit moduleEvent("setpropvalue", getName(), pPropertyName, _prop);
-
-
-    return true; // should return false when request is invalid, we'll see that later
-
-}
 bool Basemodule::pushOstElements         (const QString &pPropertyName)
 {
     QVariantMap _props = mOstProperties["properties"].toMap();
@@ -270,44 +127,7 @@ bool Basemodule::setOstElementAttribute(const QString &pPropertyName, const QStr
 
 }
 
-void Basemodule::loadPropertiesFromFile(const QString &pFileName)
-{
-    QVariantMap _props = mOstProperties["properties"].toMap();
 
-    QString val;
-    QFile file;
-    file.setFileName(pFileName);
-    file.open(QIODevice::ReadOnly | QIODevice::Text);
-    val = file.readAll();
-    file.close();
-    QJsonDocument d = QJsonDocument::fromJson(val.toUtf8());
-    QJsonObject props = d.object();
-    foreach(const QString &key, props.keys())
-    {
-        if (key != "baseVersion" && key != "baseVersion")
-        {
-            _props[key] = props[key].toVariant();
-        }
-    }
-    mOstProperties["properties"] = _props;
-
-    //QByteArray docByteArray = d.toJson(QJsonDocument::Compact);
-    //QString strJson = QLatin1String(docByteArray);
-    //BOOST_LOG_TRIVIAL(debug) << "loadPropertiesFromFile  - " << mModulename.toStdString() << " - filename=" << fileName.toStdString() << " - " << strJson.toStdString();
-
-}
-
-void Basemodule::savePropertiesToFile(const QString &pFileName)
-{
-    QJsonObject obj = QJsonObject::fromVariantMap(mOstProperties);
-    QJsonDocument doc(obj);
-
-    QFile jsonFile(pFileName);
-    jsonFile.open(QFile::WriteOnly);
-    jsonFile.write(doc.toJson());
-    jsonFile.close();
-
-}
 void Basemodule::requestProfile(QString profileName)
 {
     emit moduleEvent("profilerequest", getName(), profileName, QVariantMap());
@@ -324,13 +144,13 @@ void Basemodule::setProfile(QVariantMap profiledata)
             QVariantMap data = profiledata[key].toMap();
             if (_props[key].toMap().contains("hasprofile"))
             {
-                setOstProperty(key, data["value"], true);
+                setOstPropertyValue(key, data["value"], true);
                 if (_props[key].toMap().contains("elements")
                         && data.contains("elements"))
                 {
                     foreach(const QString &eltkey, profiledata[key].toMap()["elements"].toMap().keys())
                     {
-                        setOstElement(key, eltkey, profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["value"], true);
+                        setOstElementValue(key, eltkey, profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["value"], true);
                     }
 
                 }
@@ -432,7 +252,7 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
                     }
                     if (keyelt == "name")
                     {
-                        setOstElement("profileactions", "name", val, true);
+                        setOstElementValue("profileactions", "name", val, true);
                     }
 
                 }
@@ -475,7 +295,9 @@ QVariantMap Basemodule::getModuleInfo(void)
 
 void Basemodule::sendDump(void)
 {
-    emit moduleEvent("moduledump", getName(), "*", mOstProperties);
+    QVariantMap dump;
+    dump["properties"] = getProperties();
+    emit moduleEvent("moduledump", getName(), "*", dump);
 }
 void Basemodule::OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                const QVariantMap &eventData)

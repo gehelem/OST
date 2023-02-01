@@ -98,7 +98,6 @@ class Basemodule : public QObject, public Datastore
          * @brief Sends a message to controller
          * @param message is the message to send
          */
-        void sendMessage(QString message);
         void setModuleDescription(QString description)
         {
             mOstProperties["description"] = description;
@@ -109,29 +108,15 @@ class Basemodule : public QObject, public Datastore
         }
 
         /* OST helpers */
-        bool createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,
-                               const  QString &pPropertyDevcat, const QString &pPropertyGroup, QString &err);
         void emitPropertyCreation(const QString &pPropertyName);
         void deleteOstProperty(const QString &pPropertyName);
-        void createOstElement (const QString &pPropertyName, const QString &pElementName, const QString &pElementLabel,
-                               bool mEmitEvent);
-        void setOstProperty   (const QString &pPropertyName, const QVariant &pValue, bool emitEvent);
         void setOstPropertyAttribute   (const QString &pPropertyName, const QString &pAttributeName, QVariant _value,
                                         bool emitEvent);
-        bool setOstElement          (const QString &pPropertyName, const QString &pElementName, const QVariant &pElementValue,
-                                     bool mEmitEvent);
         bool pushOstElements        (const QString &pPropertyName);
         bool resetOstElements      (const QString &pPropertyName);
         bool setOstElementAttribute (const QString &pPropertyName, const QString &pElementName, const  QString &pAttributeName,
                                      const QVariant &pValue,
                                      bool mEmitEvent);
-        QVariant getOstElementValue (const QString &pPropertyName, const QString &pElementName)
-        {
-            return mOstProperties["properties"].toMap()[pPropertyName].toMap()["elements"].toMap()[pElementName].toMap()["value"]    ;
-        }
-
-        void loadPropertiesFromFile(const QString &pFileName);
-        void savePropertiesToFile(const QString &pFileName);
 
     private:
         /**

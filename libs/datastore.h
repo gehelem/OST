@@ -10,15 +10,24 @@ class Datastore : public Baseroot
         ~Datastore();
     protected:
 
-        bool createProperty(const QString &pPropertyName, const QString &pPropertyLabel, bool mEmitEvent);
-        bool setPropertyValue(const QString &pPropertyName, const QVariant &pPropertyValue, bool mEmitEvent);
-        QVariant getPropertyValue(QString &pPropertyName);
+        QVariantMap getProperties(void)
+        {
+            return mProperties["properties"].toMap();
+        }
 
-        bool createElement(const QString &pPropertyName, const QString &pElementName, const QString &pElementLabel,
-                           bool mEmitEvent);
-        bool setElementValue(const QString &pPropertyName, const QString &pElementName, const QVariant &pElementValue,
-                             bool mEmitEvent);
-        QVariant getElementValue(const QString &pPropertyName, const QString &pElementName);
+        bool createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,
+                               const  QString &pPropertyDevcat, const QString &pPropertyGroup, QString &err);
+        bool setOstPropertyValue(const QString &pPropertyName, const QVariant &pPropertyValue, bool mEmitEvent);
+        QVariant getOstPropertyValue(QString &pPropertyName);
+
+        bool createOstElement(const QString &pPropertyName, const QString &pElementName, const QString &pElementLabel,
+                              bool mEmitEvent);
+        bool setOstElementValue(const QString &pPropertyName, const QString &pElementName, const QVariant &pElementValue,
+                                bool mEmitEvent);
+        QVariant getOstElementValue(const QString &pPropertyName, const QString &pElementName);
+
+        void loadOstPropertiesFromFile(const QString &pFileName);
+        void saveOstPropertiesToFile(const QString &pFileName);
 
     private:
         QVariantMap mProperties;
