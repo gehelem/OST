@@ -45,7 +45,7 @@ class Controller : public QObject
         void processOutput();
         void processError();
         void processFinished(int exitCode, QProcess::ExitStatus exitStatus);
-        void sendMessage(QString message);
+        void sendMessage(const QString &pMessage);
 
     private slots:
         void OnModuleEvent  (const QString &eventType, const QString  &eventModule, const QString  &eventKey,

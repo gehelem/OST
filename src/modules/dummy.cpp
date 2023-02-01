@@ -75,17 +75,12 @@ Dummy::~Dummy()
 void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                               const QVariantMap &eventData)
 {
-    BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getModuleName().toStdString() << "-" <<
-                             eventType.toStdString();
-    BOOST_LOG_TRIVIAL(debug) << "********** - recv : " << getModuleName().toStdString() << "-" << eventModule.toStdString();
-    qDebug() << eventData;
     if (getModuleName() == eventModule )
     {
         foreach(const QString &keyprop, eventData.keys())
         {
             foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
             {
-                qDebug() << keyprop << "-" << keyelt;
                 setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
                 if (keyprop == "devices")
                 {

@@ -93,13 +93,8 @@ class Basemodule : public QObject, public Datastore
 
         /* OST helpers */
         void deleteOstProperty(const QString &pPropertyName);
-        void setOstPropertyAttribute   (const QString &pPropertyName, const QString &pAttributeName, QVariant _value,
-                                        bool emitEvent);
         bool pushOstElements        (const QString &pPropertyName);
         bool resetOstElements      (const QString &pPropertyName);
-        bool setOstElementAttribute (const QString &pPropertyName, const QString &pElementName, const  QString &pAttributeName,
-                                     const QVariant &pValue,
-                                     bool mEmitEvent);
 
     private:
 

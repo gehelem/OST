@@ -117,10 +117,8 @@ void WShandler::socketDisconnected()
 void WShandler::processModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                    const QVariantMap &eventData)
 {
-    qDebug() << "WS process module event ";
     QJsonObject  obj;
     obj["evt"] = eventType;
-    //obj["mod"]=eventModule;
 
     if (eventType == "moduledump")
     {
@@ -130,7 +128,7 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
         obj["modules"] = mods;
         sendJsonMessage(obj);
     }
-    if (eventType == "cp" || eventType == "ce" || eventType == "setattributes")
+    if (eventType == "cp" || eventType == "ce" || eventType == "ap" || eventType == "ae")
     {
         QJsonObject mods;
         QJsonObject  mod;
@@ -223,5 +221,15 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
         obj["modules"] = mods;
         sendJsonMessage(obj);
     }
+    if (eventType == "mm")
+    {
+        QJsonObject mod;
+        QJsonObject mods;
+        mod["message"] = QJsonObject::fromVariantMap(eventData);;
+        mods[eventModule] = mod;
+        obj["modules"] = mods;
+        sendJsonMessage(obj);
+    }
+
 
 }

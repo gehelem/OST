@@ -29,7 +29,6 @@ bool Datastore::createOstProperty(const QString &pPropertyName, const QString &p
         prop["group"] = pPropertyGroup;
         prop["name"] = pPropertyName;
         mProperties[pPropertyName] = prop;
-        qDebug() << "Datastore createProperty";
         OnModuleEvent("cp", QString(), pPropertyName, mProperties[pPropertyName].toMap());
         return true;
     }
@@ -42,7 +41,6 @@ bool Datastore::setOstPropertyValue(const QString &pPropertyName, const QVariant
         QVariantMap prop = mProperties[pPropertyName].toMap();
         prop["value"] = pPropertyValue;
         mProperties[pPropertyName] = prop;
-        qDebug() << "Datastore setPropertyValue";
         if (mEmitEvent) OnModuleEvent("sp", QString(), pPropertyName, mProperties[pPropertyName].toMap());
         return true;
     }
@@ -168,7 +166,6 @@ QVariant Datastore::getOstElementValue(const QString &pPropertyName, const QStri
 {
     if (mProperties.contains(pPropertyName))
     {
-        return false;
         if (mProperties[pPropertyName].toMap().contains("elements"))
         {
             QVariantMap elts = mProperties[pPropertyName].toMap()["elements"].toMap();
@@ -226,4 +223,38 @@ void Datastore::saveOstPropertiesToFile(const QString &pFileName)
     jsonFile.open(QFile::WriteOnly);
     jsonFile.write(doc.toJson());
     jsonFile.close();
+}
+void Datastore::setOstPropertyAttribute   (const QString &pPropertyName, const QString &pAttributeName,
+        const QVariant &AttributeValue,
+        bool mEmitEvent)
+{
+    //BOOST_LOG_TRIVIAL(debug) << "setOstPropertyAttribute  - " << mModulename.toStdString() << "-" << pPropertyName.toStdString();
+    QVariantMap _prop = mProperties[pPropertyName].toMap();
+    _prop[pAttributeName] = AttributeValue;
+    mProperties[pPropertyName] = _prop;
+    if (mEmitEvent) OnModuleEvent("ap", QString(), pPropertyName, mProperties[pPropertyName].toMap());
+
+}
+bool Datastore::setOstElementAttribute(const QString &pPropertyName, const QString &pElementName,
+                                       const  QString &pAttributeName,
+                                       const QVariant &AttributeValue,
+                                       bool mEmitEvent)
+{
+    QVariantMap _prop = mProperties[pPropertyName].toMap();
+    if (_prop.contains("elements"))
+    {
+        if (_prop["elements"].toMap().contains(pElementName))
+        {
+            QVariantMap elements = _prop["elements"].toMap();
+            QVariantMap element = elements[pElementName].toMap();
+            element[pAttributeName] = AttributeValue;
+            elements[pElementName] = element;
+            _prop["elements"] = elements;
+        }
+    }
+    mProperties[pPropertyName] = _prop;
+    if (mEmitEvent) OnModuleEvent("ae", QString(), pPropertyName, mProperties[pPropertyName].toMap());
+    return true; // should return false when request is invalid, we'll see that later
+
+
 }

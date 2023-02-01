@@ -29,6 +29,13 @@ class Datastore : public Baseroot
         void loadOstPropertiesFromFile(const QString &pFileName);
         void saveOstPropertiesToFile(const QString &pFileName);
 
+        void setOstPropertyAttribute   (const QString &pPropertyName, const QString &pAttributeName, const QVariant &AttributeValue,
+                                        bool mEmitEvent);
+        bool setOstElementAttribute (const QString &pPropertyName, const QString &pElementName, const  QString &pAttributeName,
+                                     const QVariant &AttributeValue,
+                                     bool mEmitEvent);
+
+
     private:
         QVariantMap mProperties;
 }

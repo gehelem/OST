@@ -82,44 +82,7 @@ bool Basemodule::resetOstElements      (const QString &pPropertyName)
     return true;
 }
 
-void Basemodule::setOstPropertyAttribute   (const QString &pPropertyName, const QString &pAttributeName, QVariant _value,
-        bool emitEvent)
-{
-    //BOOST_LOG_TRIVIAL(debug) << "setOstPropertyAttribute  - " << mModulename.toStdString() << "-" << pPropertyName.toStdString();
-    QVariantMap _props = mOstProperties["properties"].toMap();
-    QVariantMap _prop = _props[pPropertyName].toMap();
 
-    _prop[pAttributeName] = _value;
-    _props[pPropertyName] = _prop;
-    mOstProperties["properties"] = _props;
-    if (emitEvent)  emit moduleEvent("setattributes", getModuleName(), pPropertyName, _prop);
-
-}
-bool Basemodule::setOstElementAttribute(const QString &pPropertyName, const QString &pElementName,
-                                        const  QString &pAttributeName,
-                                        const QVariant &pValue,
-                                        bool mEmitEvent)
-{
-    QVariantMap _props = mOstProperties["properties"].toMap();
-    QVariantMap _prop = _props[pPropertyName].toMap();
-    if (_prop.contains("elements"))
-    {
-        if (_prop["elements"].toMap().contains(pElementName))
-        {
-            QVariantMap elements = _prop["elements"].toMap();
-            QVariantMap element = elements[pElementName].toMap();
-            element[pAttributeName] = pValue;
-            elements[pElementName] = element;
-            _prop["elements"] = elements;
-        }
-    }
-    _props[pPropertyName] = _prop;
-    mOstProperties["properties"] = _props;
-    if (mEmitEvent) emit moduleEvent("setpropvalue", getModuleName(), pPropertyName, _prop);
-    return true; // should return false when request is invalid, we'll see that later
-
-
-}
 
 
 void Basemodule::requestProfile(QString profileName)
@@ -271,7 +234,6 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
         }
     }
     /* dispatch any message to children */
-    qDebug() << "basmodule dispatch to children";
     OnMyExternalEvent(pEventType, pEventModule, pEventKey, pEventData);
     OnDispatchToIndiExternalEvent(pEventType, pEventModule, pEventKey, pEventData);
 

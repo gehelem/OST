@@ -60,7 +60,6 @@ Controller::~Controller()
 bool Controller::LoadModule(QString lib, QString name, QString label, QString profile)
 {
 
-    qDebug() << "Try to load " << lib;
     QLibrary library(lib);
     if (!library.load())
     {
@@ -113,7 +112,7 @@ bool Controller::LoadModule(QString lib, QString name, QString label, QString pr
         }
         else
         {
-            BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from library : " << lib.toStdString();
+            sendMessage("Could not initialize module from library : " + lib);
             return false;
         }
     }
@@ -124,11 +123,6 @@ bool Controller::LoadModule(QString lib, QString name, QString label, QString pr
 void Controller::OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                const QVariantMap &eventData)
 {
-    qDebug() << "OnModuleEvent ---------------------------------" << eventType << "-" << eventKey ;
-    if (eventType == "message")
-    {
-        qDebug() << eventData;
-    }
     if (eventType == "modsaveprofile")
     {
         Basemodule* mod = qobject_cast<Basemodule*>(sender());
@@ -171,7 +165,7 @@ void Controller::checkModules(void)
 {
     foreach (const QString &path, QCoreApplication::libraryPaths())
     {
-        BOOST_LOG_TRIVIAL(debug) << " ************ Check available modules in " << path.toStdString();
+        sendMessage(" ************ Check available modules in " + path);
         QDir directory(path);
         directory.setFilter(QDir::Files);
         directory.setNameFilters(QStringList() << "libost*.so");
@@ -184,7 +178,7 @@ void Controller::checkModules(void)
                 QLibrary library(path + "/" + lib);
                 if (!library.load())
                 {
-                    BOOST_LOG_TRIVIAL(debug) << lib.toStdString() << " " << library.errorString().toStdString();
+                    sendMessage(lib + " " + library.errorString());
                 }
                 else
                 {
@@ -201,13 +195,13 @@ void Controller::checkModules(void)
                             mod->setObjectName(lib);
                             QVariantMap info = mod->getModuleInfo();
                             _availableModuleLibs[tt] = info;
-                            qDebug() << "found library " << path << "/" << lib ;
+                            sendMessage("found library " + path + "/" + lib) ;
                             delete mod;
                         }
                     }
                     else
                     {
-                        BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library : " << lib.toStdString();
+                        sendMessage("Could not initialize module from the loaded library : " + lib);
                     }
                 }
 
@@ -263,9 +257,12 @@ void Controller::processError()
     qDebug() << "PROCESS ERROR : " + output;
 
 }
-void Controller::sendMessage(QString message)
+void Controller::sendMessage(const QString &pMessage)
 {
-    QString mess = QDateTime::currentDateTime().toString("[yyyyMMdd hh:mm:ss.zzz]") + " - ostserver - " + message;
-    qDebug() << mess;
+    QString messageWithDateTime = "[" + QDateTime::currentDateTime().toString(Qt::ISODateWithMs) + "]-" + pMessage;
+    QDebug debug = qDebug();
+    debug.noquote();
+    debug << messageWithDateTime;
+
     // should we add a dispatch over WS ?
 }
