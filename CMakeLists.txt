@@ -86,8 +86,12 @@ target_link_libraries(ostserver
 #qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
 add_library(ostbasemodule SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/baseroot.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/baseroot.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/datastore.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/datastore.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/profiles.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/profiles.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.qrc

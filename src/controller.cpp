@@ -122,7 +122,7 @@ bool Controller::LoadModule(QString lib, QString name, QString label, QString pr
 void Controller::OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                const QVariantMap &eventData)
 {
-
+    qDebug() << "OnModuleEvent ---------------------------------" << eventType << "-" << eventKey ;
 
     if (eventType == "modsaveprofile")
     {

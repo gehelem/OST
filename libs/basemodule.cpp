@@ -41,6 +41,7 @@ void Basemodule::sendMessage(QString message)
 bool Basemodule::createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel,
                                    const int &pPropertyPermission, const  QString &pPropertyDevcat, const QString &pPropertyGroup, QString &err)
 {
+    createProperty(pPropertyName, pPropertyLabel, true);
     //BOOST_LOG_TRIVIAL(debug) << "createOstProperty  - " << mModulename.toStdString() << "-" << pPropertyName.toStdString();
     if (mOstProperties["properties"].toMap().contains(pPropertyName))
     {
@@ -82,6 +83,8 @@ void Basemodule::deleteOstProperty(const QString &pPropertyName)
 void Basemodule::setOstProperty(const QString &pPropertyName, const QVariant &pValue, bool emitEvent)
 {
     //BOOST_LOG_TRIVIAL(debug) << "setpropvalue  - " << mModulename.toStdString() << "-" << pPropertyName.toStdString();
+    setPropertyValue(pPropertyName, pValue, true);
+
     QVariantMap _props = mOstProperties["properties"].toMap();
     QVariantMap _prop = _props[pPropertyName].toMap();
     _prop["value"] = pValue;
@@ -473,4 +476,10 @@ QVariantMap Basemodule::getModuleInfo(void)
 void Basemodule::sendDump(void)
 {
     emit moduleEvent("moduledump", getName(), "*", mOstProperties);
+}
+void Basemodule::OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
+                               const QVariantMap &eventData)
+{
+    qDebug() << "BM OnDataStoreEvent " << eventType;
+    emit moduleEvent(eventType, this->getName(), eventKey, eventData);
 }

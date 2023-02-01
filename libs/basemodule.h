@@ -1,15 +1,18 @@
 #ifndef BASEMODULE_h_
 #define BASEMODULE_h_
+#include "qdebug.h"
 #include <QObject>
 #include <basedevice.h>
 #include <baseclient.h>
+#include <datastore.h>
+#include <profiles.h>
 #include <boost/log/trivial.hpp>
 #include <QVariant>
 /*!
  * This Class shouldn't be used as is
  * Every functionnal module should inherit it
 */
-class Basemodule : public QObject
+class Basemodule : public QObject, public Datastore
 {
         Q_OBJECT
 
@@ -153,6 +156,9 @@ class Basemodule : public QObject
         QVariantMap mAvailableModuleLibs;
         QVariantMap mAvailableProfiles;
         QString mWebroot;
+
+        void OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
+                           const QVariantMap &eventData) override;
 
 
 

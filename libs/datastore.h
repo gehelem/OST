@@ -1,24 +1,27 @@
 #ifndef DATASTORE_h_
 #define DATASTORE_h_
-#include <QObject>
 #include <QVariant>
+#include <baseroot.h>
 
-class Datastore : public QObject
+class Datastore : public Baseroot
 {
-        Q_OBJECT
-
     public:
         Datastore();
         ~Datastore();
     protected:
-        QVariant getPPP(QString name)
-        {
-            if (mProperties.contains(name)) return mProperties[name];
-            else return QVariant();
-        }
+
+        bool createProperty(const QString &pPropertyName, const QString &pPropertyLabel, bool mEmitEvent);
+        bool setPropertyValue(const QString &pPropertyName, const QVariant &pPropertyValue, bool mEmitEvent);
+        QVariant getPropertyValue(QString &pPropertyName);
+
+        bool createElement(const QString &pPropertyName, const QString &pElementName, const QString &pElementLabel,
+                           bool mEmitEvent);
+        bool setElementValue(const QString &pPropertyName, const QString &pElementName, const QVariant &pElementValue,
+                             bool mEmitEvent);
+        QVariant getElementValue(const QString &pPropertyName, const QString &pElementName);
+
     private:
         QVariantMap mProperties;
-        QVariantMap mParams;
 }
 ;
 #endif
