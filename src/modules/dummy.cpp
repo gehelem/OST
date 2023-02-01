@@ -208,6 +208,8 @@ void Dummy::OnSucessSEP()
     setOstPropertyAttribute("actions", "status", IPS_OK, true);
     setOstElementValue("imagevalues", "hfravg", _solver.HFRavg, false);
     setOstElementValue("imagevalues", "starscount", _solver.stars.size(), true);
+    disconnect(&_solver, &Solver::successSEP, this, &Dummy::OnSucessSEP);
+    disconnect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
 
 }
 void Dummy::OnSucessSolve()
@@ -227,6 +229,8 @@ void Dummy::OnSucessSolve()
         setOstElementValue("imagevalues", "solRA", _solver.stellarSolver->getSolution().ra, false);
         setOstElementValue("imagevalues", "solDEC", _solver.stellarSolver->getSolution().dec, true);
     }
+    disconnect(&_solver, &Solver::successSolve, this, &Dummy::OnSucessSolve);
+    disconnect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
 
 }
 void Dummy::OnSolverLog(QString &text)
