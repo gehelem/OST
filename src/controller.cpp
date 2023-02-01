@@ -33,7 +33,7 @@ Controller::Controller(bool saveAllBlobs, const QString &webroot, const QString 
     checkModules();
 
     wshandler = new WShandler(this);
-    connect(wshandler, &WShandler::externalEvent, this, &Controller::OnExternalEvent);
+    //connect(wshandler, &WShandler::externalEvent, this, &Controller::OnExternalEvent);
     dbmanager = new DBManager(this, _dbpath);
 
     LoadModule("libostmaincontrol", "mainctl", "Maincontrol", "default");
@@ -89,15 +89,17 @@ bool Controller::LoadModule(QString lib, QString name, QString label, QString pr
                 dbmanager->getProfiles(mod->metaObject()->className(), profs);
                 mod->setProfiles(profs);
                 connect(mod, &Basemodule::moduleEvent, this, &Controller::OnModuleEvent);
+                connect(mod, &Basemodule::moduleEvent, wshandler, &WShandler::processModuleEvent);
                 connect(mod, &Basemodule::loadOtherModule, this, &Controller::LoadModule);
-                connect(this, &Controller::controllerEvent, mod, &Basemodule::OnExternalEvent);
+                //connect(this, &Controller::controllerEvent, mod, &Basemodule::OnExternalEvent);
+                connect(wshandler, &WShandler::externalEvent, mod, &Basemodule::OnExternalEvent);
                 mod->sendDump();
 
                 QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
                 for (Basemodule *othermodule : othermodules)
                 {
                     //BOOST_LOG_TRIVIAL(debug) << "child= " << othermodule->objectName().toStdString();
-                    if (othermodule->getName() != mod->getName())
+                    if (othermodule->getModuleName() != mod->getModuleName())
                     {
                         //connect(othermodule,&Basemodule::moduleEvent, mod,&Basemodule::OnExternalEvent);
                         //connect(mod,&Basemodule::moduleEvent, othermodule,&Basemodule::OnExternalEvent);
@@ -123,7 +125,10 @@ void Controller::OnModuleEvent(const QString &eventType, const QString  &eventMo
                                const QVariantMap &eventData)
 {
     qDebug() << "OnModuleEvent ---------------------------------" << eventType << "-" << eventKey ;
-
+    if (eventType == "message")
+    {
+        qDebug() << eventData;
+    }
     if (eventType == "modsaveprofile")
     {
         Basemodule* mod = qobject_cast<Basemodule*>(sender());
@@ -140,7 +145,7 @@ void Controller::OnModuleEvent(const QString &eventType, const QString  &eventMo
         return;
 
     }
-    wshandler->processModuleEvent(eventType, eventModule, eventKey, eventData);
+    //wshandler->processModuleEvent(eventType, eventModule, eventKey, eventData);
     //QJsonDocument doc(obj);
     //QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
     //QString strJson = QLatin1String(docByteArray);

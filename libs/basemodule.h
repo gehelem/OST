@@ -38,38 +38,26 @@ class Basemodule : public QObject, public Datastore
         {
             return mWebroot;
         }
-        QString getName(void)
-        {
-            return mOstProperties["name"].toString();
-        }
-        QString getLabel(void)
-        {
-            return mOstProperties["label"].toString();
-        }
-        QVariantMap getOstProperties(void)
-        {
-            return mOstProperties["properties"].toMap();
-        }
-        QVariantMap getOstProperty(QString name)
-        {
-            return mOstProperties["properties"].toMap()[name].toMap();
-        }
         QVariantMap getModuleInfo(void);
         QVariantMap getAvailableModuleLibs(void)
         {
             return mAvailableModuleLibs;
         }
+        QString getModuleName()
+        {
+            return mModuleName;
+        }
         QString getModuleLabel()
         {
-            return mOstProperties["label"].toString();
+            return mModuleLabel;
         }
         QString getModuleDescription()
         {
-            return mOstProperties["description"].toString();
+            return mModuleDescription;
         }
         QString getModuleVersion()
         {
-            return mOstProperties["version"].toString();
+            return mModuleVersion;
         }
     public slots:
         void OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
@@ -94,21 +82,16 @@ class Basemodule : public QObject, public Datastore
 
     protected:
 
-        /**
-         * @brief Sends a message to controller
-         * @param message is the message to send
-         */
         void setModuleDescription(QString description)
         {
-            mOstProperties["description"] = description;
+            mModuleDescription = description;
         }
         void setModuleVersion(QString version)
         {
-            mOstProperties["version"] = version;
+            mModuleVersion = version;
         }
 
         /* OST helpers */
-        void emitPropertyCreation(const QString &pPropertyName);
         void deleteOstProperty(const QString &pPropertyName);
         void setOstPropertyAttribute   (const QString &pPropertyName, const QString &pAttributeName, QVariant _value,
                                         bool emitEvent);
@@ -119,28 +102,15 @@ class Basemodule : public QObject, public Datastore
                                      bool mEmitEvent);
 
     private:
-        /**
-         * @brief Sets module name property
-         * @param name is the name
-         */
-        void setName(QString name)
-        {
-            mOstProperties["name"] = name;
-        }
-        /**
-         * @brief Sets module label property
-         * @param label is the label
-         */
-        void setModuleLabel(QString label)
-        {
-            mOstProperties["label"] = label;
-        }
-
 
         QVariantMap mOstProperties;
         QVariantMap mAvailableModuleLibs;
         QVariantMap mAvailableProfiles;
         QString mWebroot;
+        QString mModuleName;
+        QString mModuleLabel;
+        QString mModuleDescription;
+        QString mModuleVersion;
 
         void OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                            const QVariantMap &eventData) override;

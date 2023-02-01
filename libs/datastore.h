@@ -12,7 +12,7 @@ class Datastore : public Baseroot
 
         QVariantMap getProperties(void)
         {
-            return mProperties["properties"].toMap();
+            return mProperties;
         }
 
         bool createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,

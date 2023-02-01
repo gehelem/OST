@@ -75,13 +75,17 @@ Dummy::~Dummy()
 void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                               const QVariantMap &eventData)
 {
-    //BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << eventKey.toStdString();
-    if (getName() == eventModule)
+    BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getModuleName().toStdString() << "-" <<
+                             eventType.toStdString();
+    BOOST_LOG_TRIVIAL(debug) << "********** - recv : " << getModuleName().toStdString() << "-" << eventModule.toStdString();
+    qDebug() << eventData;
+    if (getModuleName() == eventModule )
     {
         foreach(const QString &keyprop, eventData.keys())
         {
             foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
             {
+                qDebug() << keyprop << "-" << keyelt;
                 setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
                 if (keyprop == "devices")
                 {
@@ -191,12 +195,13 @@ void Dummy::newBLOB(IBLOB *bp)
         setOstElementValue("imagevalues", "snr", _image->getStats().SNR, true);
         QList<fileio::Record> rec = _image->getRecords();
         stats = _image->getStats();
-        _image->saveAsFITS(getWebroot() + "/" + getName() + QString(bp->bvp->device) + ".FITS", stats, _image->getImageBuffer(),
+        _image->saveAsFITS(getWebroot() + "/" + getModuleName() + QString(bp->bvp->device) + ".FITS", stats,
+                           _image->getImageBuffer(),
                            FITSImage::Solution(), rec, false);
 
         QImage rawImage = _image->getRawQImage();
-        rawImage.save(getWebroot() + "/" + getName() + QString(bp->bvp->device) + ".jpeg", "JPG", 100);
-        setOstPropertyAttribute("testimage", "URL", getName() + QString(bp->bvp->device) + ".jpeg", true);
+        rawImage.save(getWebroot() + "/" + getModuleName() + QString(bp->bvp->device) + ".jpeg", "JPG", 100);
+        setOstPropertyAttribute("testimage", "URL", getModuleName() + QString(bp->bvp->device) + ".jpeg", true);
 
     }
     setOstPropertyAttribute("actions", "status", IPS_OK, true);

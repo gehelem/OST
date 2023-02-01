@@ -30,7 +30,7 @@ bool Datastore::createOstProperty(const QString &pPropertyName, const QString &p
         prop["name"] = pPropertyName;
         mProperties[pPropertyName] = prop;
         qDebug() << "Datastore createProperty";
-        OnModuleEvent("createProperty", QString(), pPropertyName, mProperties[pPropertyName].toMap());
+        OnModuleEvent("cp", QString(), pPropertyName, mProperties[pPropertyName].toMap());
         return true;
     }
 }
@@ -43,7 +43,7 @@ bool Datastore::setOstPropertyValue(const QString &pPropertyName, const QVariant
         prop["value"] = pPropertyValue;
         mProperties[pPropertyName] = prop;
         qDebug() << "Datastore setPropertyValue";
-        if (mEmitEvent) OnModuleEvent("setPropertyValue", QString(), pPropertyName, mProperties[pPropertyName].toMap());
+        if (mEmitEvent) OnModuleEvent("sp", QString(), pPropertyName, mProperties[pPropertyName].toMap());
         return true;
     }
     else
@@ -75,40 +75,37 @@ QVariant Datastore::getOstPropertyValue(QString &pPropertyName)
 bool Datastore::createOstElement(const QString &pPropertyName, const QString &pElementName, const QString &pElementLabel,
                                  bool mEmitEvent)
 {
-    QVariantMap _props = mProperties["properties"].toMap();
-    if (!_props.contains(pPropertyName) )
+    if (!mProperties.contains(pPropertyName) )
     {
         sendMessage(" createElement - property " + pPropertyName + " not found");
         return false;
     }
 
-    QVariantMap _prop = _props[pPropertyName].toMap();
+    QVariantMap _prop = mProperties[pPropertyName].toMap();
     QVariantMap _elements = _prop["elements"].toMap();
-    if (_elements.contains(pPropertyName) )
+    if (_elements.contains(pElementName) )
     {
         sendMessage(" createElement - property " + pPropertyName + " : element " + pElementName + "already exists.");
         return false ;
     }
-    QVariantMap _element = _elements[pElementName].toMap();
+    QVariantMap _element;
     _element["elementLabel"] = pElementLabel;
     _elements[pElementName] = _element;
     _prop["elements"] = _elements;
-    _props[pPropertyName] = _prop;
-    mProperties["properties"] = _props;
-    if (mEmitEvent) OnModuleEvent("createElement", QString(), pPropertyName, mProperties[pPropertyName].toMap());
+    mProperties[pPropertyName] = _prop;
+    if (mEmitEvent) OnModuleEvent("ce", QString(), pPropertyName, mProperties[pPropertyName].toMap());
     return true;
 }
 bool Datastore::setOstElementValue(const QString &pPropertyName, const QString &pElementName, const QVariant &pElementValue,
                                    bool mEmitEvent)
 {
-    QVariantMap _props = mProperties["properties"].toMap();
-    if (!_props.contains(pPropertyName) )
+    if (!mProperties.contains(pPropertyName) )
     {
         sendMessage("setElementValue - property " + pPropertyName + " not found");
         return false;
     }
 
-    QVariantMap _prop = _props[pPropertyName].toMap();
+    QVariantMap _prop = mProperties[pPropertyName].toMap();
 
     if (_prop.contains("elements"))
     {
@@ -161,16 +158,14 @@ bool Datastore::setOstElementValue(const QString &pPropertyName, const QString &
             _prop["elements"] = _elements;
         }
     }
-    _props[pPropertyName] = _prop;
-    mProperties["properties"] = _props;
-    if (mEmitEvent) OnModuleEvent("setElementValue", QString(), pPropertyName, mProperties[pPropertyName].toMap());
+    mProperties[pPropertyName] = _prop;
+    if (mEmitEvent) OnModuleEvent("se", QString(), pPropertyName, mProperties[pPropertyName].toMap());
 
 
     return true; // should return false when request is invalid, we'll see that later
 }
 QVariant Datastore::getOstElementValue(const QString &pPropertyName, const QString &pElementName)
 {
-    return mProperties["properties"].toMap()[pPropertyName].toMap()["elements"].toMap()[pElementName].toMap()["value"];
     if (mProperties.contains(pPropertyName))
     {
         return false;
@@ -179,7 +174,7 @@ QVariant Datastore::getOstElementValue(const QString &pPropertyName, const QStri
             QVariantMap elts = mProperties[pPropertyName].toMap()["elements"].toMap();
             if (elts.contains(pElementName))
             {
-                return mProperties["properties"].toMap()[pPropertyName].toMap()["elements"].toMap()[pElementName].toMap()["value"];
+                return mProperties[pPropertyName].toMap()["elements"].toMap()[pElementName].toMap()["value"];
             }
             else
             {
@@ -203,8 +198,6 @@ QVariant Datastore::getOstElementValue(const QString &pPropertyName, const QStri
 }
 void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
 {
-    QVariantMap _props = mProperties["properties"].toMap();
-
     QString content;
     QFile file;
     file.setFileName(pFileName);
@@ -215,9 +208,8 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
     QJsonObject props = d.object();
     foreach(const QString &key, props.keys())
     {
-        _props[key] = props[key].toVariant();
+        mProperties[key] = props[key].toVariant();
     }
-    mProperties["properties"] = _props;
 
     //QByteArray docByteArray = d.toJson(QJsonDocument::Compact);
     //QString strJson = QLatin1String(docByteArray);

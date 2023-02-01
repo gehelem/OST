@@ -22,7 +22,7 @@ void IndiModule::OnDispatchToIndiExternalEvent(const QString &eventType, const Q
         const QString  &eventKey, const QVariantMap &eventData)
 
 {
-    if (getName() == eventModule)
+    if (getModuleName() == eventModule)
     {
         //BOOST_LOG_TRIVIAL(debug) << "OnIndiExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << eventKey.toStdString();
         foreach(const QString &keyprop, eventData.keys())

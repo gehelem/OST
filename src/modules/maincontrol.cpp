@@ -52,7 +52,7 @@ void Maincontrol::OnMyExternalEvent(const QString &eventType, const QString  &ev
     //BOOST_LOG_TRIVIAL(debug) << "mainctl OnMyExternalEvent - recv : " << getName().toStdString() << "-" <<
     //                         eventType.toStdString() <<
     //                         "-" << eventKey.toStdString();
-    if (getName() == eventModule)
+    if (getModuleName() == eventModule)
     {
         foreach(const QString &keyprop, eventData.keys())
         {

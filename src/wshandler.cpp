@@ -64,17 +64,17 @@ void WShandler::processTextMessage(QString message)
     QJsonDocument jsonResponse = QJsonDocument::fromJson(_mess.toUtf8()); // garder
     emit textRcv(message);
     QJsonObject  obj = jsonResponse.object(); // garder
-    //BOOST_LOG_TRIVIAL(debug) << "OST server received json" << message.toStdString();
-    if (obj["evt"].toString() == "readall")
+    BOOST_LOG_TRIVIAL(debug) << "OST server received json" << message.toStdString();
+    if (obj["evt"].toString() == "Freadall")
     {
         //sendAll();
         //emit changeValue(Prop());
-        emit externalEvent("readall", "*", "*", QVariantMap());
+        emit externalEvent("Freadall", "*", "*", QVariantMap());
 
     }
-    if (obj["evt"].toString() == "setproperty")
+    if (obj["evt"].toString() == "Fsetproperty")
     {
-        emit externalEvent("setproperty", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+        emit externalEvent("Fsetproperty", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
     }
 
 
@@ -117,6 +117,7 @@ void WShandler::socketDisconnected()
 void WShandler::processModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                    const QVariantMap &eventData)
 {
+    qDebug() << "WS process module event ";
     QJsonObject  obj;
     obj["evt"] = eventType;
     //obj["mod"]=eventModule;
@@ -129,7 +130,7 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
         obj["modules"] = mods;
         sendJsonMessage(obj);
     }
-    if (eventType == "addprop" || eventType == "addelt" || eventType == "setattributes")
+    if (eventType == "cp" || eventType == "ce" || eventType == "setattributes")
     {
         QJsonObject mods;
         QJsonObject  mod;
@@ -178,7 +179,7 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
         obj["modules"] = mods;
         sendJsonMessage(obj);
     }
-    if (eventType == "setpropvalue")
+    if (eventType == "sp" || eventType == "se")
     {
         QVariantMap prop = eventData;
         QVariantMap values;
