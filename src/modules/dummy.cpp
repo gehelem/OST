@@ -52,15 +52,9 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
 
     foreach(QString key, getAvailableModuleLibs().keys())
     {
-        QVariantMap info = getAvailableModuleLibs()[key].toMap();
-        QString mess;
-        if (createOstProperty("mod" + key, "mod" + key, 0, "Modules", "root", mess))
+        if (!createOstProperty("mod" + key, "mod" + key, 0, "Modules", "root"))
         {
-            //BOOST_LOG_TRIVIAL(debug) << "createOstProperty OK : " << mess.toStdString();
-        }
-        else
-        {
-            BOOST_LOG_TRIVIAL(debug) << "createOstProperty KO : " << mess.toStdString();
+            sendMessage("createOstProperty KO : " + key);
         }
     }
     setBLOBMode(B_ALSO, _camera.toStdString().c_str(), nullptr);

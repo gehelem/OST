@@ -13,7 +13,7 @@ Datastore::~Datastore()
 }
 bool Datastore::createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel,
                                   const int &pPropertyPermission,
-                                  const  QString &pPropertyDevcat, const QString &pPropertyGroup, QString &err)
+                                  const  QString &pPropertyDevcat, const QString &pPropertyGroup)
 {
     if (mProperties.contains(pPropertyName))
     {
