@@ -12,7 +12,7 @@
  * This Class shouldn't be used as is
  * Every functionnal module should inherit it
 */
-class Basemodule : public QObject, public Datastore
+class Basemodule : public QObject, public Datastore, public Profiles
 {
         Q_OBJECT
 
