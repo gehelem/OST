@@ -3,7 +3,8 @@
 #include <QVariant>
 #include <baseroot.h>
 
-class Datastore : public Baseroot
+/** @class Datastore
+class Datastore : virtual public Baseroot
 {
     public:
         Datastore();

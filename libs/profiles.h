@@ -1,8 +1,9 @@
 #ifndef PROFILES_h_
 #define PROFILES_h_
 #include <QVariant>
+#include <baseroot.h>
 
-class Profiles
+class Profiles : virtual public Baseroot
 {
     public:
         Profiles();
@@ -22,4 +23,3 @@ class Profiles
 }
 ;
 #endif
-
