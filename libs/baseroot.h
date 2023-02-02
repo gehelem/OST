@@ -1,5 +1,5 @@
-#ifndef PROFILES_h_
-#define PROFILES_h_
+#ifndef BASEROOT_h_
+#define BASEROOT_h_
 #include <QObject>
 #include <QVariant>
 
