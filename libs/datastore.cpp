@@ -3,10 +3,7 @@
 
 Datastore::Datastore()
 {
-    /*mParams["name"] = params["name"];
-    mParams["label"] = params["label"];
-    mParams["type"] = this->metaObject()->className();
-    mParams["description"] = params["description"];*/
+    sendMessage("DataStore init");
 }
 Datastore::~Datastore()
 {

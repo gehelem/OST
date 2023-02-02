@@ -3,6 +3,7 @@
 
 Profiles::Profiles()
 {
+    sendMessage("Profiles init");
 }
 Profiles::~Profiles()
 {
