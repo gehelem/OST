@@ -4,6 +4,21 @@
 #include <baseroot.h>
 
 /** @class Datastore
+ *  @brief Class to provide properties management for OST modules
+ *
+ *  zzzzzzzzzzzzzzzzz
+ *
+ *  xxxxxxxxxxxxxxxxxxxxxx
+ *  xxxxxxxxxxxxxxxxxxxxxx
+ *  xxxxxxxxxxxxxxxxxxxxxx
+ *
+ *  @attention xxxxxxxxxxx
+ *  xxxxxxxxxxxxxxxxxxxxxx
+ *
+ *  @see <a href="https://github.com/gehelem/OST">Github repository</a> for more details.
+ *  @author Gehelem
+ */
+
 class Datastore : virtual public Baseroot
 {
     public:
@@ -15,7 +30,23 @@ class Datastore : virtual public Baseroot
         {
             return mProperties;
         }
-
+        /**
+         * @brief createOstProperty is a method that creates a property at runtime
+         * @param pPropertyName is the property internal name
+         * @param pPropertyLabel is the label of the property
+         * @param pPropertyPermission tells if this property is :
+         *  <ul>
+         *    <li>0 = READONLY</li>
+         *    <li>1 = WRITEDONLY</li>
+         *    <li>2 = READWRITE</li>
+         *  </ul>
+         * @note this permission is related to frontend, it has no effect inside module
+         * @param pPropertyDevcat means "device or category", the first hierarchical level of a property (like indilib device level)
+         * @note it's only a label associated to a property, without any hierarchical effect
+         * @param pPropertyGroup is the second hierarchical level of a property (like indilib device group)
+         * @note it's only a label associated to a property, without any hierarchical effect
+         * @return A boolean that reports whether it was successful, true means success.
+         */
         bool createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,
                                const  QString &pPropertyDevcat, const QString &pPropertyGroup);
         bool setOstPropertyValue(const QString &pPropertyName, const QVariant &pPropertyValue, bool mEmitEvent);
