@@ -34,7 +34,7 @@ class Datastore : virtual public Baseroot
          * @brief createOstProperty is a method that creates a property at runtime
          * @param pPropertyName is the property internal name
          * @param pPropertyLabel is the label of the property
-         * @param pPropertyPermission tells if this property is :
+         * @param pPropertyPermission sets if this property is :
          *  <ul>
          *    <li>0 = READONLY</li>
          *    <li>1 = WRITEONLY</li>
