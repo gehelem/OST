@@ -17,7 +17,7 @@ class Basemodule : public QObject, public Datastore, public Profiles
         Q_OBJECT
 
     public:
-        Basemodule(QString name, QString label, QString profile, QVariantMap availableModuleLibs);
+        Basemodule(QString name, QString label, QString profile, QVariantMap params);
         ~Basemodule();
         void setWebroot(QString webroot)
         {
