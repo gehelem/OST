@@ -37,13 +37,13 @@ class Datastore : virtual public Baseroot
          * @param pPropertyPermission tells if this property is :
          *  <ul>
          *    <li>0 = READONLY</li>
-         *    <li>1 = WRITEDONLY</li>
+         *    <li>1 = WRITEONLY</li>
          *    <li>2 = READWRITE</li>
          *  </ul>
          * @note this permission is related to frontend, it has no effect inside module
          * @param pPropertyDevcat means "device or category", the first hierarchical level of a property (like indilib device level)
          * @note it's only a label associated to a property, without any hierarchical effect
-         * @param pPropertyGroup is the second hierarchical level of a property (like indilib device group)
+         * @param pPropertyGroup is the second hierarchical level of a property (like indilib group level)
          * @note it's only a label associated to a property, without any hierarchical effect
          * @return A boolean that reports whether it was successful, true means success.
          */
