@@ -59,6 +59,22 @@ class Basemodule : public QObject, public Datastore, public Profiles
         {
             return mModuleVersion;
         }
+        QString getClassName()
+        {
+            return mClassName;
+        }
+        /**
+         * @brief setClassName is a method to set inherited modules classname (ideally metaObject()->className())
+         * @param pClassName is the classname
+         * @warning This is uggly, i don't know to do that differently :
+         * It's purpose is to share same profiles types between multiple instances of same module
+         * i'd like to avoid to do it within inherited module
+         * @return A boolean that reports whether it was successful, true means success.
+         * False means ClassName has already been set, and sends a corresponding message
+         */
+
+        bool setClassName(const QString &pClassName);
+
     public slots:
         void OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
                              const QVariantMap &pEventData);
@@ -106,6 +122,7 @@ class Basemodule : public QObject, public Datastore, public Profiles
         QString mModuleLabel;
         QString mModuleDescription;
         QString mModuleVersion;
+        QString mClassName = "";
 
         void OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                            const QVariantMap &eventData) override;

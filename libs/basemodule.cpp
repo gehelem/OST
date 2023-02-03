@@ -19,8 +19,6 @@ Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap
     setModuleDescription("base module description - developer should change this message");
     setModuleVersion("0.1");
 
-
-
 }
 Basemodule::~Basemodule()
 {
@@ -270,4 +268,18 @@ void Basemodule::OnModuleEvent(const QString &eventType, const QString  &eventMo
                                const QVariantMap &eventData)
 {
     emit moduleEvent(eventType, this->getModuleName(), eventKey, eventData);
+}
+bool Basemodule::setClassName(const QString &pClassName)
+{
+    if (getClassName() == "")
+    {
+        mClassName = pClassName;
+        return true;
+    }
+    else
+    {
+        sendMessage("ClassName already set (" + mClassName +
+                    ") - this method must be called only once, at the beginn of class constructor");
+        return false;
+    }
 }
