@@ -4,7 +4,7 @@
 #include "version.cc"
 
 Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap params)
-    : mAvailableModuleLibs(availableModuleLibs),
+    : mAvailableModuleLibs(params),
       mModuleName(name),
       mModuleLabel(label)
 {
