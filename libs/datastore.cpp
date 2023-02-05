@@ -287,3 +287,80 @@ QVariantMap Datastore::getProfile(void)
 
     return _res;
 }
+
+void Datastore::deleteOstProperty(const QString &pPropertyName)
+{
+    if (mProperties.contains(pPropertyName))
+    {
+        mProperties.remove(pPropertyName);
+        emit OnModuleEvent("delprop", QString(), pPropertyName, QVariantMap());
+    }
+    else
+    {
+        sendMessage("Can't delete inexistant property " + pPropertyName);
+    }
+
+}
+
+bool Datastore::pushOstElements         (const QString &pPropertyName)
+{
+    if (mProperties.contains(pPropertyName))
+    {
+        QVariantMap _prop = mProperties[pPropertyName].toMap();
+        if (!_prop.contains("grid") )
+        {
+            sendMessage("No grid defined for property  " + pPropertyName);
+            return false;
+        }
+        else
+        {
+            QVariantList _arr = _prop["grid"].toList();
+            QVariantList _cols;
+            foreach(auto _elt, _prop["elements"].toMap())
+            {
+                _cols.push_back(_elt.toMap()["value"]);
+            }
+            _arr.push_back(_cols);
+            _prop["grid"] = _arr;
+            mProperties[pPropertyName] = _prop;
+            QVariantMap _mess;
+            _mess["values"] = _cols;
+            emit OnModuleEvent("pushvalues", QString(), pPropertyName, _mess);
+            return true;
+
+        }
+    }
+    else
+    {
+        sendMessage("Can't push inexistant property " + pPropertyName);
+        return false;
+    }
+
+
+}
+bool Datastore::resetOstElements      (const QString &pPropertyName)
+{
+    if (mProperties.contains(pPropertyName))
+    {
+        QVariantMap _prop = mProperties[pPropertyName].toMap();
+        if (!_prop.contains("grid") )
+        {
+            sendMessage("No grid defined for property  " + pPropertyName);
+            return false;
+        }
+        else
+        {
+            _prop["grid"].clear();
+            mProperties[pPropertyName] = _prop;
+            emit OnModuleEvent("resetvalues", QString(), pPropertyName, QVariantMap());
+            return true;
+
+        }
+    }
+    else
+    {
+        sendMessage("Can't reset inexistant property " + pPropertyName);
+        return false;
+    }
+
+}

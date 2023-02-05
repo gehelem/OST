@@ -29,56 +29,7 @@ Basemodule::~Basemodule()
     Q_CLEANUP_RESOURCE(basemodule);
 }
 
-void Basemodule::deleteOstProperty(const QString &pPropertyName)
-{
-    //BOOST_LOG_TRIVIAL(debug) << "deleteOstProperty  - " << mModulename.toStdString() << "-" << propertyName.toStdString();
-    QVariantMap _props = mOstProperties["properties"].toMap();
-    _props.remove(pPropertyName);
-    mOstProperties["properties"] = _props;
-    emit moduleEvent("delprop", getModuleName(), pPropertyName, QVariantMap());
 
-}
-
-bool Basemodule::pushOstElements         (const QString &pPropertyName)
-{
-    QVariantMap _props = mOstProperties["properties"].toMap();
-    QVariantMap _prop = _props[pPropertyName].toMap();
-    if (!_prop.contains("grid") )
-    {
-        qDebug() << getModuleName() << "no grid defined for property " << pPropertyName;
-        return false;
-    }
-    QVariantList _arr = _prop["grid"].toList();
-    QVariantList _cols;
-    foreach(auto _elt, _prop["elements"].toMap())
-    {
-        _cols.push_back(_elt.toMap()["value"]);
-    }
-    _arr.push_back(_cols);
-    _prop["grid"] = _arr;
-    _props[pPropertyName] = _prop;
-    mOstProperties["properties"] = _props;
-    QVariantMap _mess;
-    _mess["values"] = _cols;
-    emit moduleEvent("pushvalues", getModuleName(), pPropertyName, _mess);
-    return true;
-}
-bool Basemodule::resetOstElements      (const QString &pPropertyName)
-{
-
-    QVariantMap _props = mOstProperties["properties"].toMap();
-    QVariantMap _prop = _props[pPropertyName].toMap();
-    if (!_prop.contains("grid") )
-    {
-        qDebug() << this->getModuleName() << "no grid defined for property " << pPropertyName;
-        return false;
-    }
-    _prop["grid"].clear();
-    _props[pPropertyName] = _prop;
-    mOstProperties["properties"] = _props;
-    emit moduleEvent("resetvalues", getModuleName(), pPropertyName, QVariantMap());
-    return true;
-}
 
 void Basemodule::setProfile(const QString &pProfileName)
 {

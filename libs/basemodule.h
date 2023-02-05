@@ -105,9 +105,6 @@ class Basemodule : public QObject, public Datastore, public DBManager
         }
 
         /* OST helpers */
-        void deleteOstProperty(const QString &pPropertyName);
-        bool pushOstElements        (const QString &pPropertyName);
-        bool resetOstElements      (const QString &pPropertyName);
 
     private:
 

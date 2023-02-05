@@ -67,6 +67,11 @@ class Datastore : virtual public Baseroot
                                      const QVariant &AttributeValue,
                                      bool mEmitEvent);
 
+        void deleteOstProperty(const QString &pPropertyName);
+        bool pushOstElements        (const QString &pPropertyName);
+        bool resetOstElements      (const QString &pPropertyName);
+
+
         QVariantMap getProfile(void);
 
 
