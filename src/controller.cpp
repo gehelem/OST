@@ -34,12 +34,13 @@ Controller::Controller(bool saveAllBlobs, const QString &webroot, const QString 
 
     wshandler = new WShandler(this);
     //connect(wshandler, &WShandler::externalEvent, this, &Controller::OnExternalEvent);
-    dbmanager = new DBManager(this, _dbpath);
+    dbmanager = new DBManager();
+    dbmanager->dbInit(_dbpath, QString());
 
     LoadModule("libostmaincontrol", "mainctl", "Maincontrol", "default");
 
     QVariantMap _result;
-    dbmanager->getConfiguration(_conf, _result);
+    dbmanager->getDbConfiguration(_conf, _result);
     for(QVariantMap::const_iterator iter = _result.begin(); iter != _result.end(); ++iter)
     {
         QVariantMap _line = iter.value().toMap();
@@ -81,11 +82,12 @@ bool Controller::LoadModule(QString lib, QString name, QString label, QString pr
                 mod->setParent(this);
                 mod->setWebroot(_webroot);
                 mod->setObjectName(name);
+                mod->dbInit(_dbpath, name);
                 QVariantMap prof;
-                dbmanager->getProfile(mod->metaObject()->className(), profile, prof);
+                dbmanager->getDbProfile(mod->metaObject()->className(), profile, prof);
                 mod->setProfile(prof);
                 QVariantMap profs;
-                dbmanager->getProfiles(mod->metaObject()->className(), profs);
+                dbmanager->getDbProfiles(mod->metaObject()->className(), profs);
                 mod->setProfiles(profs);
                 connect(mod, &Basemodule::moduleEvent, this, &Controller::OnModuleEvent);
                 connect(mod, &Basemodule::moduleEvent, wshandler, &WShandler::processModuleEvent);
@@ -127,14 +129,14 @@ void Controller::OnModuleEvent(const QString &eventType, const QString  &eventMo
     {
         Basemodule* mod = qobject_cast<Basemodule*>(sender());
         QVariantMap _vm = mod->getProfile();
-        dbmanager->setProfile(mod->metaObject()->className(), eventKey, _vm);
+        dbmanager->setDbProfile(mod->metaObject()->className(), eventKey, _vm);
         return;
     }
     if (eventType == "modloadprofile")
     {
         QVariantMap _prof;
         Basemodule* mod = qobject_cast<Basemodule*>(sender());
-        dbmanager->getProfile(mod->metaObject()->className(), eventKey, _prof);
+        dbmanager->getDbProfile(mod->metaObject()->className(), eventKey, _prof);
         mod->setProfile(_prof);
         return;
 

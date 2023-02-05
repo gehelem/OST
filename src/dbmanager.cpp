@@ -2,18 +2,29 @@
 #include <boost/log/trivial.hpp>
 #include "dbmanager.h"
 
-DBManager::DBManager(QObject *parent, const QString &dbpath) : mDbPath(dbpath)
+DBManager::DBManager()
 {
+
+}
+
+
+DBManager::~DBManager()
+{
+
+}
+
+bool DBManager::dbInit(const QString &pDbPath, const QString &pConnectionName)
+{
+    mDbPath = pDbPath;
     if(QSqlDatabase::isDriverAvailable("QSQLITE"))
     {
         bool mDbExists = QFile::exists(mDbPath + "ost.db");
-        mDb = QSqlDatabase::addDatabase("QSQLITE");
+        mDb = QSqlDatabase::addDatabase("QSQLITE", pConnectionName);
         mDb.setDatabaseName(mDbPath + "ost.db" );
         mQuery = QSqlQuery(mDb);
         if(!mDb.open())
         {
-            BOOST_LOG_TRIVIAL(debug) << "dbOpen - ERROR: " << mDb.databaseName().toStdString() << " - " <<
-                                     mDb.lastError().text().toStdString();
+            sendMessage("dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
         }
         else
         {
@@ -22,14 +33,8 @@ DBManager::DBManager(QObject *parent, const QString &dbpath) : mDbPath(dbpath)
     }
     else
     {
-        BOOST_LOG_TRIVIAL(debug)  << "DatabaseConnect - ERROR: QSQLITE driver unavailable";
+        sendMessage("DatabaseConnect - ERROR: QSQLITE driver unavailable");
     }
-
-}
-
-
-DBManager::~DBManager()
-{
 
 }
 
@@ -60,7 +65,7 @@ void DBManager::CreateDatabaseStructure()
     }
 
 }
-bool DBManager::setProfile(const QString &pModuleType, const QString &pProfileName, QVariantMap &profile )
+bool DBManager::setDbProfile(const QString &pModuleType, const QString &pProfileName, QVariantMap &profile )
 {
     QJsonObject  obj = QJsonObject::fromVariantMap(profile);
     QJsonDocument doc(obj);
@@ -76,7 +81,7 @@ bool DBManager::setProfile(const QString &pModuleType, const QString &pProfileNa
     }
     return true;
 }
-bool DBManager::getProfile(const QString &pModuleType, const QString &pProfileName, QVariantMap &result )
+bool DBManager::getDbProfile(const QString &pModuleType, const QString &pProfileName, QVariantMap &result )
 {
     QString _sql = "SELECT ALLVALUES FROM PROFILES WHERE MODULETYPE='" + pModuleType + "' AND PROFILENAME='" + pProfileName +
                    "'";
@@ -94,7 +99,7 @@ bool DBManager::getProfile(const QString &pModuleType, const QString &pProfileNa
     }
     return false;
 }
-bool DBManager::getProfiles(QString moduleType, QVariantMap &result )
+bool DBManager::getDbProfiles(QString moduleType, QVariantMap &result )
 {
     QString _sql = "SELECT PROFILENAME,ALLVALUES FROM PROFILES WHERE MODULETYPE='" + moduleType + "' ";
     if (!mQuery.exec(_sql))
@@ -112,7 +117,7 @@ bool DBManager::getProfiles(QString moduleType, QVariantMap &result )
     }
     return true;
 }
-bool DBManager::getConfiguration(QString configName, QVariantMap &result )
+bool DBManager::getDbConfiguration(QString configName, QVariantMap &result )
 {
     QString _sql = "SELECT MODULENAME,MODULETYPE,PROFILENAME FROM CONFIGURATIONS WHERE CONFIGNAME='" + configName + "'";
     if (!mQuery.exec(_sql))

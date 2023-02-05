@@ -1,5 +1,6 @@
 #ifndef BASEMODULE_h_
 #define BASEMODULE_h_
+#include "dbmanager.h"
 #include "qdebug.h"
 #include <QObject>
 #include <basedevice.h>
@@ -12,7 +13,7 @@
  * This Class shouldn't be used as is
  * Every functionnal module should inherit it
 */
-class Basemodule : public QObject, public Datastore, public Profiles
+class Basemodule : public QObject, public Datastore, public Profiles, public DBManager
 {
         Q_OBJECT
 
