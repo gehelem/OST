@@ -80,13 +80,23 @@ bool Basemodule::resetOstElements      (const QString &pPropertyName)
     return true;
 }
 
-
-
-
-void Basemodule::requestProfile(QString profileName)
+void Basemodule::setProfile(const QString &pProfileName)
 {
-    emit moduleEvent("profilerequest", getModuleName(), profileName, QVariantMap());
+    QVariantMap prof;
+    if (getDbProfile(getClassName(), pProfileName, prof))
+    {
+        setProfile(prof);
+        sendMessage(pProfileName + " profile sucessfully loaded");
+    }
+    else
+    {
+        sendMessage("Can't load " + pProfileName + " profile");
+    }
+
+
 }
+
+
 
 void Basemodule::setProfile(QVariantMap profiledata)
 {
@@ -120,39 +130,6 @@ void Basemodule::setProfiles(QVariantMap profilesdata)
     mAvailableProfiles = profilesdata;
 }
 
-QVariantMap Basemodule::getProfile(void)
-{
-    QVariantMap _res;
-    QVariantMap _props = mOstProperties["properties"].toMap();
-
-    foreach(const QString &keyprop, _props.keys())
-    {
-        if (_props[keyprop].toMap().contains("hasprofile"))
-        {
-            QVariantMap property;
-            if (_props[keyprop].toMap().contains("value"))
-            {
-                property["value"] = _props[keyprop].toMap()["value"];
-            }
-            if (_props[keyprop].toMap().contains("elements"))
-            {
-                QVariantMap element, elements;
-                foreach(const QString &keyelt, _props[keyprop].toMap()["elements"].toMap().keys())
-                {
-                    if (_props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("value"))
-                    {
-                        element["value"] = _props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
-                        elements[keyelt] = element;
-                    }
-                }
-                property["elements"] = elements;
-            }
-            _res[keyprop] = property;
-        }
-    }
-
-    return _res;
-}
 void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
                                  const QVariantMap &pEventData)
 {
@@ -194,19 +171,36 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
                 foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
                 {
                     QVariant val = pEventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
-                    if (keyelt == "load")
+                    if (keyelt == "load" && val.toBool())
                     {
-                        //setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
-                        if (val.toBool()) emit moduleEvent("modloadprofile", this->metaObject()->className(), getOstElementValue("profileactions",
-                                                               "name").toString(),
-                                                               QVariantMap());
+                        setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
+                        QVariantMap prof;
+                        if (getDbProfile(getClassName(), getOstElementValue("profileactions", "name").toString(), prof))
+                        {
+                            setProfile(prof);
+                            setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
+                            sendMessage(getOstElementValue("profileactions", "name").toString() + " profile sucessfully loaded");
+                        }
+                        else
+                        {
+                            sendMessage("Can't load " + getOstElementValue("profileactions", "name").toString() + " profile");
+                            setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
+                        }
                     }
-                    if (keyelt == "save")
+                    if (keyelt == "save"  && val.toBool())
                     {
-                        //setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
-                        if (val.toBool()) emit moduleEvent("modsaveprofile", this->metaObject()->className(), getOstElementValue("profileactions",
-                                                               "name").toString(),
-                                                               getProfile());
+                        setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
+                        QVariantMap prof = getProfile();
+                        if (setDbProfile(getClassName(), getOstElementValue("profileactions", "name").toString(), prof))
+                        {
+                            setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
+                            sendMessage(getOstElementValue("profileactions", "name").toString() + " profile sucessfully saved");
+                        }
+                        else
+                        {
+                            setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
+                            sendMessage("Can't save " + getOstElementValue("profileactions", "name").toString() + " profile");
+                        }
                     }
                     if (keyelt == "name")
                     {

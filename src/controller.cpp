@@ -83,9 +83,7 @@ bool Controller::LoadModule(QString lib, QString name, QString label, QString pr
                 mod->setWebroot(_webroot);
                 mod->setObjectName(name);
                 mod->dbInit(_dbpath, name);
-                QVariantMap prof;
-                dbmanager->getDbProfile(mod->metaObject()->className(), profile, prof);
-                mod->setProfile(prof);
+                mod->setProfile(profile);
                 QVariantMap profs;
                 dbmanager->getDbProfiles(mod->metaObject()->className(), profs);
                 mod->setProfiles(profs);
@@ -125,28 +123,6 @@ bool Controller::LoadModule(QString lib, QString name, QString label, QString pr
 void Controller::OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                const QVariantMap &eventData)
 {
-    if (eventType == "modsaveprofile")
-    {
-        Basemodule* mod = qobject_cast<Basemodule*>(sender());
-        QVariantMap _vm = mod->getProfile();
-        dbmanager->setDbProfile(mod->metaObject()->className(), eventKey, _vm);
-        return;
-    }
-    if (eventType == "modloadprofile")
-    {
-        QVariantMap _prof;
-        Basemodule* mod = qobject_cast<Basemodule*>(sender());
-        dbmanager->getDbProfile(mod->metaObject()->className(), eventKey, _prof);
-        mod->setProfile(_prof);
-        return;
-
-    }
-    //wshandler->processModuleEvent(eventType, eventModule, eventKey, eventData);
-    //QJsonDocument doc(obj);
-    //QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
-    //QString strJson = QLatin1String(docByteArray);
-    //BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - " << mod->getName().toStdString() << " - " << eventType.toStdString() << " - " << strJson.toStdString();
-
 
 }
 void Controller::OnExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,

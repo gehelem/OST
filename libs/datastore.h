@@ -67,6 +67,8 @@ class Datastore : virtual public Baseroot
                                      const QVariant &AttributeValue,
                                      bool mEmitEvent);
 
+        QVariantMap getProfile(void);
+
 
     private:
         QVariantMap mProperties;

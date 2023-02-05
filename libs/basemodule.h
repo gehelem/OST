@@ -1,19 +1,17 @@
 #ifndef BASEMODULE_h_
 #define BASEMODULE_h_
-#include "dbmanager.h"
-#include "qdebug.h"
+
 #include <QObject>
 #include <basedevice.h>
 #include <baseclient.h>
 #include <datastore.h>
-#include <profiles.h>
-#include <boost/log/trivial.hpp>
+#include <dbmanager.h>
 #include <QVariant>
 /*!
  * This Class shouldn't be used as is
  * Every functionnal module should inherit it
 */
-class Basemodule : public QObject, public Datastore, public Profiles, public DBManager
+class Basemodule : public QObject, public Datastore, public DBManager
 {
         Q_OBJECT
 
@@ -24,12 +22,10 @@ class Basemodule : public QObject, public Datastore, public Profiles, public DBM
         {
             mWebroot = webroot;
         }
-        void requestProfile(QString profileName);
         void setProfile(QVariantMap profiledata);
+        void setProfile(const QString &pProfileName);
         void setProfiles(QVariantMap profilesdata);
         void sendDump(void);
-        QVariantMap getProfile(void);
-
 
         /**
          * @brief gets webroot directory

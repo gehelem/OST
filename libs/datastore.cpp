@@ -255,3 +255,35 @@ bool Datastore::setOstElementAttribute(const QString &pPropertyName, const QStri
 
 
 }
+QVariantMap Datastore::getProfile(void)
+{
+    QVariantMap _res;
+
+    foreach(const QString &keyprop, mProperties.keys())
+    {
+        if (mProperties[keyprop].toMap().contains("hasprofile"))
+        {
+            QVariantMap property;
+            if (mProperties[keyprop].toMap().contains("value"))
+            {
+                property["value"] = mProperties[keyprop].toMap()["value"];
+            }
+            if (mProperties[keyprop].toMap().contains("elements"))
+            {
+                QVariantMap element, elements;
+                foreach(const QString &keyelt, mProperties[keyprop].toMap()["elements"].toMap().keys())
+                {
+                    if (mProperties[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("value"))
+                    {
+                        element["value"] = mProperties[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
+                        elements[keyelt] = element;
+                    }
+                }
+                property["elements"] = elements;
+            }
+            _res[keyprop] = property;
+        }
+    }
+
+    return _res;
+}
