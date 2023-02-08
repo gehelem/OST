@@ -59,8 +59,8 @@ add_executable(ostserver
     ${CMAKE_CURRENT_SOURCE_DIR}/src/controller.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/wshandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/wshandler.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/dbmanager.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/dbmanager.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/dbmanager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/dbmanager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/version.hh
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/resources.qrc
@@ -86,6 +86,12 @@ target_link_libraries(ostserver
 #qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
 add_library(ostbasemodule SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/baseroot.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/baseroot.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/datastore.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/datastore.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/dbmanager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/dbmanager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.qrc
@@ -103,6 +109,9 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/version.hh
 )
 set(BASE_PUBLIC_HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/datastore.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/dbmanager.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/baseroot.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/fileio.h

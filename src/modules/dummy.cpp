@@ -11,56 +11,50 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
 {
 
     //Q_INIT_RESOURCE(dummy);
-
-    loadPropertiesFromFile(":dummy.json");
+    setClassName(metaObject()->className());
+    loadOstPropertiesFromFile(":dummy.json");
     setModuleDescription("Dummy module to show what we can do and not");
     setModuleVersion("0.1");
 
-    setOstProperty("message", "Dummy module init finished", true);
-    setOstElement("extextRO", "extext1", "Texte read only 1", false);
-    setOstElement("extextRO", "extext2", "Texte read only 2", false);
-    setOstElement("extextRO", "extext3", "Texte read only 3", false);
-    setOstElement("extextRO", "extext4", "Texte read only 4", true);
-    setOstElement("boolsRW0", "b1", true, false);
-    setOstElement("boolsRW0", "b2", false, false);
-    setOstElement("boolsRW0", "b3", false, false);
-    setOstElement("boolsRW0", "b4", false, true);
-    setOstElement("boolsRW1", "b1", false, false);
-    setOstElement("boolsRW1", "b2", false, false);
-    setOstElement("boolsRW1", "b3", false, false);
-    setOstElement("boolsRW1", "b4", false, true);
-    setOstElement("boolsRW2", "b1", true, false);
-    setOstElement("boolsRW2", "b2", true, false);
-    setOstElement("boolsRW2", "b3", true, false);
-    setOstElement("boolsRW2", "b4", false, true);
-    setOstElement("numbersRW", "n1", 0, false);
-    setOstElement("numbersRW", "n2", -1000, false);
-    setOstElement("numbersRW", "n3", 3.14, false);
-    setOstElement("numbersRW", "n4", -20.23, true);
+    setOstPropertyValue("message", "Dummy module init finished", true);
+    setOstElementValue("extextRO", "extext1", "Texte read only 1", false);
+    setOstElementValue("extextRO", "extext2", "Texte read only 2", false);
+    setOstElementValue("extextRO", "extext3", "Texte read only 3", false);
+    setOstElementValue("extextRO", "extext4", "Texte read only 4", true);
+    setOstElementValue("boolsRW0", "b1", true, false);
+    setOstElementValue("boolsRW0", "b2", false, false);
+    setOstElementValue("boolsRW0", "b3", false, false);
+    setOstElementValue("boolsRW0", "b4", false, true);
+    setOstElementValue("boolsRW1", "b1", false, false);
+    setOstElementValue("boolsRW1", "b2", false, false);
+    setOstElementValue("boolsRW1", "b3", false, false);
+    setOstElementValue("boolsRW1", "b4", false, true);
+    setOstElementValue("boolsRW2", "b1", true, false);
+    setOstElementValue("boolsRW2", "b2", true, false);
+    setOstElementValue("boolsRW2", "b3", true, false);
+    setOstElementValue("boolsRW2", "b4", false, true);
+    setOstElementValue("numbersRW", "n1", 0, false);
+    setOstElementValue("numbersRW", "n2", -1000, false);
+    setOstElementValue("numbersRW", "n3", 3.14, false);
+    setOstElementValue("numbersRW", "n4", -20.23, true);
     setOstElementAttribute("numbersRW", "n4", "step", 100, true);
     setOstElementAttribute("numbersRW", "n4", "min", -10000, true);
     setOstElementAttribute("numbersRW", "n4", "max", 10000, true);
 
-    setOstElement("mixedRW", "b1", false, false);
-    setOstElement("mixedRW", "b2", false, false);
-    setOstElement("mixedRW", "b3", true, false);
-    setOstElement("mixedRW", "n1", 10, false);
-    setOstElement("mixedRW", "n2", 11, false);
-    setOstElement("mixedRW", "t1", "Mixed text value", false);
+    setOstElementValue("mixedRW", "b1", false, false);
+    setOstElementValue("mixedRW", "b2", false, false);
+    setOstElementValue("mixedRW", "b3", true, false);
+    setOstElementValue("mixedRW", "n1", 10, false);
+    setOstElementValue("mixedRW", "n2", 11, false);
+    setOstElementValue("mixedRW", "t1", "Mixed text value", false);
     //saveAttributesToFile("dummy.json");
     _camera = getOstElementValue("devices", "camera").toString();
 
     foreach(QString key, getAvailableModuleLibs().keys())
     {
-        QVariantMap info = getAvailableModuleLibs()[key].toMap();
-        QString mess;
-        if (createOstProperty("mod" + key, "mod" + key, 0, "Modules", "root", mess))
+        if (!createOstProperty("mod" + key, "mod" + key, 0, "Modules", "root"))
         {
-            //BOOST_LOG_TRIVIAL(debug) << "createOstProperty OK : " << mess.toStdString();
-        }
-        else
-        {
-            BOOST_LOG_TRIVIAL(debug) << "createOstProperty KO : " << mess.toStdString();
+            sendMessage("createOstProperty KO : " + key);
         }
     }
     setBLOBMode(B_ALSO, _camera.toStdString().c_str(), nullptr);
@@ -75,19 +69,18 @@ Dummy::~Dummy()
 void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                               const QVariantMap &eventData)
 {
-    //BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << eventKey.toStdString();
-    if (getName() == eventModule)
+    if (getModuleName() == eventModule )
     {
         foreach(const QString &keyprop, eventData.keys())
         {
             foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
             {
-                setOstElement(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
+                setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
                 if (keyprop == "devices")
                 {
                     if (keyelt == "camera")
                     {
-                        if (setOstElement(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], false))
+                        if (setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], false))
                         {
                             setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
                             _camera = getOstElementValue("devices", "camera").toString();
@@ -99,7 +92,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                 {
                     if (keyelt == "blob")
                     {
-                        if (setOstElement(keyprop, keyelt, false, false))
+                        if (setOstElementValue(keyprop, keyelt, false, false))
                         {
                             setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
                             connectDevice(_camera);
@@ -109,7 +102,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                     }
                     if (keyelt == "shoot")
                     {
-                        if (setOstElement(keyprop, keyelt, false, false))
+                        if (setOstElementValue(keyprop, keyelt, false, false))
                         {
                             setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
                             sendModNewNumber(_camera, "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );
@@ -122,7 +115,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                     }
                     if (keyelt == "extract")
                     {
-                        if (setOstElement(keyprop, keyelt, false, false))
+                        if (setOstElementValue(keyprop, keyelt, false, false))
                         {
                             setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
                             stats = _image->getStats();
@@ -134,7 +127,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                     }
                     if (keyelt == "solve")
                     {
-                        if (setOstElement(keyprop, keyelt, false, false))
+                        if (setOstElementValue(keyprop, keyelt, false, false))
                         {
                             setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
                             double ra, dec;
@@ -148,8 +141,8 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                             }
                             else
                             {
-                                setOstElement("imagevalues", "mountRA", ra * 360 / 24, false);
-                                setOstElement("imagevalues", "mountDEC", dec, false);
+                                setOstElementValue("imagevalues", "mountRA", ra * 360 / 24, false);
+                                setOstElementValue("imagevalues", "mountDEC", dec, false);
 
                                 stats = _image->getStats();
                                 _solver.ResetSolver(stats, _image->getImageBuffer());
@@ -181,22 +174,23 @@ void Dummy::newBLOB(IBLOB *bp)
         _image->loadBlob(bp);
 
         setOstPropertyAttribute("actions", "status", IPS_OK, true);
-        setOstElement("imagevalues", "width", _image->getStats().width, false);
-        setOstElement("imagevalues", "height", _image->getStats().height, false);
-        setOstElement("imagevalues", "min", _image->getStats().min[0], false);
-        setOstElement("imagevalues", "max", _image->getStats().max[0], false);
-        setOstElement("imagevalues", "mean", _image->getStats().mean[0], false);
-        setOstElement("imagevalues", "median", _image->getStats().median[0], false);
-        setOstElement("imagevalues", "stddev", _image->getStats().stddev[0], false);
-        setOstElement("imagevalues", "snr", _image->getStats().SNR, true);
+        setOstElementValue("imagevalues", "width", _image->getStats().width, false);
+        setOstElementValue("imagevalues", "height", _image->getStats().height, false);
+        setOstElementValue("imagevalues", "min", _image->getStats().min[0], false);
+        setOstElementValue("imagevalues", "max", _image->getStats().max[0], false);
+        setOstElementValue("imagevalues", "mean", _image->getStats().mean[0], false);
+        setOstElementValue("imagevalues", "median", _image->getStats().median[0], false);
+        setOstElementValue("imagevalues", "stddev", _image->getStats().stddev[0], false);
+        setOstElementValue("imagevalues", "snr", _image->getStats().SNR, true);
         QList<fileio::Record> rec = _image->getRecords();
         stats = _image->getStats();
-        _image->saveAsFITS(getWebroot() + "/" + getName() + QString(bp->bvp->device) + ".FITS", stats, _image->getImageBuffer(),
+        _image->saveAsFITS(getWebroot() + "/" + getModuleName() + QString(bp->bvp->device) + ".FITS", stats,
+                           _image->getImageBuffer(),
                            FITSImage::Solution(), rec, false);
 
         QImage rawImage = _image->getRawQImage();
-        rawImage.save(getWebroot() + "/" + getName() + QString(bp->bvp->device) + ".jpeg", "JPG", 100);
-        setOstPropertyAttribute("testimage", "URL", getName() + QString(bp->bvp->device) + ".jpeg", true);
+        rawImage.save(getWebroot() + "/" + getModuleName() + QString(bp->bvp->device) + ".jpeg", "JPG", 100);
+        setOstPropertyAttribute("testimage", "URL", getModuleName() + QString(bp->bvp->device) + ".jpeg", true);
 
     }
     setOstPropertyAttribute("actions", "status", IPS_OK, true);
@@ -206,8 +200,10 @@ void Dummy::newBLOB(IBLOB *bp)
 void Dummy::OnSucessSEP()
 {
     setOstPropertyAttribute("actions", "status", IPS_OK, true);
-    setOstElement("imagevalues", "hfravg", _solver.HFRavg, false);
-    setOstElement("imagevalues", "starscount", _solver.stars.size(), true);
+    setOstElementValue("imagevalues", "hfravg", _solver.HFRavg, false);
+    setOstElementValue("imagevalues", "starscount", _solver.stars.size(), true);
+    disconnect(&_solver, &Solver::successSEP, this, &Dummy::OnSucessSEP);
+    disconnect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
 
 }
 void Dummy::OnSucessSolve()
@@ -217,16 +213,18 @@ void Dummy::OnSucessSolve()
         sendMessage("Solver failed");
         setOstPropertyAttribute("actions", "status", IPS_ALERT, true);
         setOstPropertyAttribute("imagevalues", "status", IPS_ALERT, true);
-        setOstElement("imagevalues", "solRA", 0, false);
-        setOstElement("imagevalues", "solDEC", 0, true);
+        setOstElementValue("imagevalues", "solRA", 0, false);
+        setOstElementValue("imagevalues", "solDEC", 0, true);
     }
     else
     {
         setOstPropertyAttribute("actions", "status", IPS_OK, true);
         setOstPropertyAttribute("imagevalues", "status", IPS_OK, true);
-        setOstElement("imagevalues", "solRA", _solver.stellarSolver->getSolution().ra, false);
-        setOstElement("imagevalues", "solDEC", _solver.stellarSolver->getSolution().dec, true);
+        setOstElementValue("imagevalues", "solRA", _solver.stellarSolver->getSolution().ra, false);
+        setOstElementValue("imagevalues", "solDEC", _solver.stellarSolver->getSolution().dec, true);
     }
+    disconnect(&_solver, &Solver::successSolve, this, &Dummy::OnSucessSolve);
+    disconnect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
 
 }
 void Dummy::OnSolverLog(QString &text)

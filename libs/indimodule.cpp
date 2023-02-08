@@ -8,10 +8,10 @@ IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap
 {
     setVerbose(false);
     //_moduletype = "IndiModule";
-    loadPropertiesFromFile(":indimodule.json");
-    setOstProperty("indiGitHash", QString::fromStdString(Version::GIT_SHA1), false);
-    setOstProperty("indiGitDate", QString::fromStdString(Version::GIT_DATE), false);
-    setOstProperty("indiGitMessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT), false);
+    loadOstPropertiesFromFile(":indimodule.json");
+    setOstPropertyValue("indiGitHash", QString::fromStdString(Version::GIT_SHA1), false);
+    setOstPropertyValue("indiGitDate", QString::fromStdString(Version::GIT_DATE), false);
+    setOstPropertyValue("indiGitMessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT), false);
 
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &IndiModule::connectIndiTimer);
@@ -22,17 +22,17 @@ void IndiModule::OnDispatchToIndiExternalEvent(const QString &eventType, const Q
         const QString  &eventKey, const QVariantMap &eventData)
 
 {
-    if (getName() == eventModule)
+    if (getModuleName() == eventModule)
     {
         //BOOST_LOG_TRIVIAL(debug) << "OnIndiExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << eventKey.toStdString();
         foreach(const QString &keyprop, eventData.keys())
         {
             foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
             {
-                setOstElement(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
+                setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
                 if (keyprop == "serveractions")
                 {
-                    setOstElement(keyprop, keyelt, false, false);
+                    setOstElementValue(keyprop, keyelt, false, false);
                     if (keyelt == "conserv")
                     {
 
@@ -49,7 +49,7 @@ void IndiModule::OnDispatchToIndiExternalEvent(const QString &eventType, const Q
                 }
                 if (keyprop == "devicesactions")
                 {
-                    setOstElement(keyprop, keyelt, false, false);
+                    setOstElementValue(keyprop, keyelt, false, false);
                     if (!isServerConnected())
                     {
                         sendMessage("Indi server not connected");
