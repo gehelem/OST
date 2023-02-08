@@ -22,7 +22,7 @@ Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap
 }
 Basemodule::~Basemodule()
 {
-    foreach(const QString &key, mOstProperties.keys())
+    foreach(const QString &key, getProperties().keys())
     {
         deleteOstProperty(key);
     }

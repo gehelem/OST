@@ -30,7 +30,10 @@ bool Datastore::createOstProperty(const QString &pPropertyName, const QString &p
         return true;
     }
 }
-
+void Datastore::emitPropertyCreation(const QString &pPropertyName)
+{
+    emit OnModuleEvent("cp", QString(), pPropertyName, mProperties[pPropertyName].toMap());
+}
 bool Datastore::setOstPropertyValue(const QString &pPropertyName, const QVariant &pPropertyValue, bool mEmitEvent)
 {
     if (mProperties.contains(pPropertyName))

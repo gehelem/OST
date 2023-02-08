@@ -49,6 +49,7 @@ class Datastore : virtual public Baseroot
          */
         bool createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,
                                const  QString &pPropertyDevcat, const QString &pPropertyGroup);
+        void emitPropertyCreation(const QString &pPropertyName);
         bool setOstPropertyValue(const QString &pPropertyName, const QVariant &pPropertyValue, bool mEmitEvent);
         QVariant getOstPropertyValue(QString &pPropertyName);
 
