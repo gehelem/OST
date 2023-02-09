@@ -10,6 +10,9 @@ class Baseroot
         ~Baseroot();
     protected:
         void sendMessage(const QString &pMessage);
+        void sendError(const QString &pMessage);
+        void sendWarning(const QString &pMessage);
+
         virtual void OnModuleEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
                                    const QVariantMap &pEventData)
         {

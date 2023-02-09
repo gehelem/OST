@@ -41,7 +41,7 @@ void Basemodule::setProfile(const QString &pProfileName)
     }
     else
     {
-        sendMessage("Can't load " + pProfileName + " profile");
+        sendWarning("Can't load " + pProfileName + " profile");
     }
 
 

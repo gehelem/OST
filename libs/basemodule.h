@@ -98,6 +98,7 @@ class Basemodule : public QObject, public Datastore, public DBManager
         void setModuleDescription(QString description)
         {
             mModuleDescription = description;
+            setOstPropertyValue("moduleDescription", description, true);
         }
         void setModuleVersion(QString version)
         {

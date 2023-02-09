@@ -52,7 +52,7 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
 
     foreach(QString key, getAvailableModuleLibs().keys())
     {
-        if (!createOstProperty("mod" + key, "mod" + key, 0, "Modules", "root"))
+        if (!createOstProperty("mod" + key, "mod" + key, 0, "Module", "Ava"))
         {
             sendMessage("createOstProperty KO : " + key);
         }

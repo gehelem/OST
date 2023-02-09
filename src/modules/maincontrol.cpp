@@ -15,9 +15,10 @@ Maincontrol::Maincontrol(QString name, QString label, QString profile, QVariantM
 
     loadOstPropertiesFromFile(":maincontrol.json");
     setOstPropertyValue("moduleLabel", "Main control", false);
-    setOstPropertyValue("moduleDescription", "Maincontrol", false);
+    setOstPropertyValue("moduleDescription", "Maincontrol module - this one should always be there", false);
     setOstPropertyValue("moduleVersion", 0.1, false);
     deleteOstProperty("profileactions");
+    deleteOstProperty("moduleactions");
 
     foreach(QString key, getAvailableModuleLibs().keys())
     {
