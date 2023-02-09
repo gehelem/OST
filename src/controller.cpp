@@ -1,6 +1,5 @@
 #include "controller.h"
 
-
 /*!
  * ... ...
  */
@@ -14,7 +13,7 @@ Controller::Controller(bool saveAllBlobs, const QString &webroot, const QString 
 {
 
     Q_UNUSED(saveAllBlobs);
-    if (_installfront == "Y")
+    if (_installfront != "N")
     {
         this->installFront();
     }
@@ -193,6 +192,17 @@ void Controller::checkModules(void)
 }
 void Controller::installFront(void)
 {
+    QString arch = _installfront;
+    if (arch == "Y")
+    {
+        arch = "https://github.com/gehelem/ost-front/releases/download/WorkInProgress/html.tar.gz";
+        BOOST_LOG_TRIVIAL(debug) << "download default archive " << arch.toStdString();
+    }
+    else
+    {
+        BOOST_LOG_TRIVIAL(debug) << "download specific archive " << arch.toStdString();
+    }
+
     _process = new QProcess(this);
     connect(_process, &QProcess::readyReadStandardOutput, this, &Controller::processOutput);
     connect(_process, &QProcess::readyReadStandardError, this, &Controller::processError);
@@ -207,16 +217,36 @@ void Controller::installFront(void)
     }
     else
     {
-        QString program = "wget";
+        QString program = "rm";
         QStringList arguments;
-        arguments << "https://github.com/gehelem/ost-front/releases/download/WorkInProgress/html.tar.gz";
-        arguments << "&&";
-        arguments << "tar -xf html.tar.gz -C";
-        arguments << _webroot;
-        qDebug() << "PROCESS ARGS " << arguments;
+        arguments << "-rf" ;
+        arguments << _webroot + "/html.tar.gz";
+        qDebug() << "+++++++++++++++++++++++++++++++++++++++++++++++++PROCESS ARGS (1)" << program << " " << arguments;
         _process->start(program, arguments);
+        _process->waitForFinished();
+        program = "wget";
+        arguments.clear();
+        arguments << arch ;
+        arguments << "--directory";
+        arguments << _webroot;
+        arguments << " && ";
+        arguments << "tar";
+        qDebug() << "+++++++++++++++++++++++++++++++++++++++++++++++++PROCESS ARGS (2)" << program << " " << arguments;
+        _process->start(program, arguments);
+        _process->waitForFinished();
+        program = "tar";
+        arguments.clear();
+        arguments << "-xvf";
+        arguments << _webroot + "/html.tar.gz";
+        arguments << "-C";
+        arguments << _webroot;
+        qDebug() << "+++++++++++++++++++++++++++++++++++++++++++++++++PROCESS ARGS (3)" << program << " " << arguments;
+        _process->start(program, arguments);
+        _process->waitForFinished();
 
     }
+
+
 
 
 }
