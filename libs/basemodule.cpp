@@ -207,6 +207,9 @@ void Basemodule::sendDump(void)
     dump["properties"] = getProperties();
     dump["state"] = state;
     dump["infos"] = infos;
+    dump["messages"] = getMessages();
+    dump["warnings"] = getWarnings();
+    dump["errors"] = getErrors();
     emit moduleEvent("moduledump", getModuleName(), "*", dump);
 }
 void Basemodule::OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,

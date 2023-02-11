@@ -230,6 +230,24 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
         obj["modules"] = mods;
         sendJsonMessage(obj);
     }
+    if (eventType == "me")
+    {
+        QJsonObject mod;
+        QJsonObject mods;
+        mod["error"] = QJsonObject::fromVariantMap(eventData);;
+        mods[eventModule] = mod;
+        obj["modules"] = mods;
+        sendJsonMessage(obj);
+    }
+    if (eventType == "mw")
+    {
+        QJsonObject mod;
+        QJsonObject mods;
+        mod["warning"] = QJsonObject::fromVariantMap(eventData);;
+        mods[eventModule] = mod;
+        obj["modules"] = mods;
+        sendJsonMessage(obj);
+    }
 
 
 }

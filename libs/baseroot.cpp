@@ -9,26 +9,31 @@ Baseroot::~Baseroot()
 }
 void Baseroot::sendMessage(const QString &pMessage)
 {
-    QString messageWithDateTime = "[" + QDateTime::currentDateTime().toString(Qt::ISODateWithMs) + "]-" + pMessage;
+    QDateTime dt = QDateTime::currentDateTime();
     QVariantMap m;
-    m["message"] = messageWithDateTime;
-    m["type"] = "info";
-    OnModuleEvent("mm", QString(), QString(), m);
-}
-
-void Baseroot::sendWarning(const QString &pMessage)
-{
-    QString messageWithDateTime = "[" + QDateTime::currentDateTime().toString(Qt::ISODateWithMs) + "]-" + pMessage;
-    QVariantMap m;
-    m["message"] = messageWithDateTime;
-    m["type"] = "warning";
+    m["message"] = pMessage;
+    m["datetime"] = dt;
+    mMessages.append(m);
+    if (mMessages.size() > mMessagesSize) mMessages.removeFirst();
     OnModuleEvent("mm", QString(), QString(), m);
 }
 void Baseroot::sendError(const QString &pMessage)
 {
-    QString messageWithDateTime = "[" + QDateTime::currentDateTime().toString(Qt::ISODateWithMs) + "]-" + pMessage;
+    QDateTime dt = QDateTime::currentDateTime();
     QVariantMap m;
-    m["message"] = messageWithDateTime;
-    m["type"] = "error";
-    OnModuleEvent("mm", QString(), QString(), m);
+    m["error"] = pMessage;
+    m["datetime"] = dt;
+    mErrors.append(m);
+    if (mErrors.size() > mErrorsSize) mErrors.removeFirst();
+    OnModuleEvent("me", QString(), QString(), m);
+}
+void Baseroot::sendWarning(const QString &pMessage)
+{
+    QDateTime dt = QDateTime::currentDateTime();
+    QVariantMap m;
+    m["warning"] = pMessage;
+    m["datetime"] = dt;
+    mWarnings.append(m);
+    if (mWarnings.size() > mWarningsSize) mWarnings.removeFirst();
+    OnModuleEvent("mw", QString(), QString(), m);
 }
