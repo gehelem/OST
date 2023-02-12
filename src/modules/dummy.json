@@ -194,7 +194,7 @@
     },
     "actions": {
         "devcat": "Examples",
-        "rule":1,
+        "rule":0,
         "elements": {
             "shoot": {
                 "elementLabel": "Shoot",

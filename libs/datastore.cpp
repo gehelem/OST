@@ -145,7 +145,74 @@ bool Datastore::setOstElementValue(const QString &pPropertyName, const QString &
                 }
                 if (strcmp(element["value"].typeName(), "bool") == 0)
                 {
-                    element["value"] = pElementValue.toBool();
+                    if (_prop.contains("rule"))
+                    {
+                        if (_prop["rule"] == 0) // one of many
+                        {
+                            if (pElementValue.toBool())
+                            {
+                                for(QVariantMap::const_iterator itelt = _elements.begin(); itelt != _elements.end(); ++itelt)
+                                {
+
+                                    QVariantMap elt = _elements[itelt.key()].toMap();
+                                    if (pElementName == itelt.key())
+                                    {
+                                        elt["value"] = true;
+                                        element["value"] = true;
+                                    }
+                                    else
+                                    {
+                                        if (strcmp(elt["value"].typeName(), "bool") == 0) elt["value"] = false;
+                                    }
+
+                                    _elements[itelt.key()] = elt;
+                                }
+                            }
+                            else
+                            {
+
+                            }
+
+                        }
+                        if (_prop["rule"] == 1) // at most one
+                        {
+                            if (pElementValue.toBool())
+                            {
+                                for(QVariantMap::const_iterator itelt = _elements.begin(); itelt != _elements.end(); ++itelt)
+                                {
+
+                                    QVariantMap elt = _elements[itelt.key()].toMap();
+                                    if (pElementName == itelt.key())
+                                    {
+                                        elt["value"] = true;
+                                        element["value"] = true;
+                                    }
+                                    else
+                                    {
+                                        if (strcmp(elt["value"].typeName(), "bool") == 0) elt["value"] = false;
+                                    }
+
+                                    _elements[itelt.key()] = elt;
+                                }
+                            }
+                            else
+                            {
+                                element["value"] = false;
+
+                            }
+
+                        }
+                        if (_prop["rule"] == 2) // any
+                        {
+                            element["value"] = pElementValue.toBool();
+                        }
+
+                    }
+                    else
+                    {
+                        element["value"] = pElementValue.toBool(); // we shouldn't do that, should we ?
+                    }
+
                 }
             }
             else
