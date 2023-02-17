@@ -335,8 +335,12 @@
                 "value":"Zéro",
                 "gridvalues":["P0","P1","P2","P3","P4"]
             }
+        },
+        "array":{
+            "key": "",
+            "columns":["X","Y"],
+            "type":"grid"
         }
-
     },
     "skychart": {
         "propertyLabel": "Skychart",

@@ -158,6 +158,12 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                     }
                 }
             }
+
+            if (keyprop == "testgrid")
+            {
+                pushOstElements(keyprop);
+            }
+
         }
     }
 }
