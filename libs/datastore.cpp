@@ -272,12 +272,13 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
     QJsonObject props = d.object();
     foreach(const QString &key, props.keys())
     {
-        mProperties[key] = props[key].toVariant();
+        QVariant tt = props[key].toVariant();
+        mProperties[key] = tt.toMap();
     }
 
     //QByteArray docByteArray = d.toJson(QJsonDocument::Compact);
     //QString strJson = QLatin1String(docByteArray);
-    //BOOST_LOG_TRIVIAL(debug) << "loadPropertiesFromFile  - " << mModulename.toStdString() << " - filename=" << fileName.toStdString() << " - " << strJson.toStdString();
+    //qDebug() << "loadPropertiesFromFile  - " << strJson;
 
 }
 
