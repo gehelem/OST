@@ -92,20 +92,20 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
     }
 
     /* just check if requested modification is possible */
-    if ( (pEventType == "Fsetpropvalue") && (pEventModule == getModuleName()) )
+    if ( (pEventType == "Fsetproperty") && (pEventModule == getModuleName()) )
     {
         foreach(const QString &keyprop, pEventData.keys())
         {
-            if (!getProperties()["properties"].toMap().contains(keyprop) )
+            if (!getProperties().contains(keyprop) )
             {
-                sendMessage(" Fsetpropvalue - property " + keyprop + " not found");
+                sendMessage(" Fsetproperty - property " + keyprop + " not found");
                 return;
             }
             foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
             {
-                if (!getProperties()["properties"].toMap()[keyprop].toMap()["elements"].toMap().contains(keyprop) )
+                if (!getProperties()[keyprop].toMap()["elements"].toMap().contains(keyelt) )
                 {
-                    sendMessage(" Fsetpropvalue - property " + keyprop + " - element " + keyelt +  " not found");
+                    sendMessage(" Fsetproperty - property " + keyprop + " - element " + keyelt +  " not found");
                     return;
                 }
             }
