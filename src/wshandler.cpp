@@ -76,6 +76,26 @@ void WShandler::processTextMessage(QString message)
     {
         emit externalEvent("Fsetproperty", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
     }
+    if (obj["evt"].toString() == "Flcreate")
+    {
+        emit externalEvent("Flcreate", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+    }
+    if (obj["evt"].toString() == "Flupdate")
+    {
+        emit externalEvent("Flupdate", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+    }
+    if (obj["evt"].toString() == "Fldelete")
+    {
+        emit externalEvent("Fldelete", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+    }
+    if (obj["evt"].toString() == "Flup")
+    {
+        emit externalEvent("Flup", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+    }
+    if (obj["evt"].toString() == "Fldown")
+    {
+        emit externalEvent("Fldown", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+    }
 
 
 }

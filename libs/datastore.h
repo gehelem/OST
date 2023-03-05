@@ -72,6 +72,9 @@ class Datastore : virtual public Baseroot
         bool pushOstElements        (const QString &pPropertyName);
         bool resetOstElements      (const QString &pPropertyName);
 
+        bool newOstPropertyLine(const QString &pPropertyName, const QVariantMap &pElementsValues);
+        bool deleteOstPropertyLine(const QString &pPropertyName, const double &pLine);
+
 
         QVariantMap getProfile(void);
 

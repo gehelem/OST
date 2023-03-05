@@ -17,10 +17,12 @@
         },
         "group": "Texts",
         "permission": 0,
-        "propertyLabel": "Text example - read only"
+        "propertyLabel": "Text example - read only",
+        "order":"00"
     },
     "extextRW": {
         "hasprofile":true,
+        "grid":0,
         "devcat": "Examples",
         "elements": {
             "extext1": {
@@ -42,7 +44,9 @@
         },
         "group": "Texts",
         "permission": 2,
-        "propertyLabel": "Text example - read/write"
+        "propertyLabel": "Text example - read/write",
+        "order":"01"
+
     },
     "numbersRW": {
         "hasprofile":true,
@@ -323,17 +327,52 @@
             "X": {
                 "elementLabel": "Abscisse",
                 "value":0,
-                "gridvalues":[0,1,2,3,4]
+                "gridvalues":[0,1,2,3,4],
+                "order":"B"
             },
             "Y": {
                 "elementLabel": "Ordonnée",
                 "value":0,
-                "gridvalues":[0,1,4,9,16]
+                "gridvalues":[0,1,4,9,16],
+                "order":"C"
             },
             "Z": {
                 "elementLabel": "Info",
                 "value":"Zéro",
-                "gridvalues":["P0","P1","P2","P3","P4"]
+                "gridvalues":["P0","P1","P2","P3","P4"],
+                "order":"A"
+            }
+        },
+        "array":{
+            "key": "",
+            "columns":["X","Y"],
+            "type":"grid"
+        }
+    },
+    "secondtestgrid": {
+        "devcat": "Examples",
+        "group": "AAAGrids",
+        "permission": 2,
+        "grid":0,
+        "propertyLabel": "Grid example 2",
+        "elements": {
+            "X": {
+                "elementLabel": "Abscisse",
+                "value":0,
+                "gridvalues":[],
+                "order":"B"
+            },
+            "Y": {
+                "elementLabel": "Ordonnée",
+                "value":0,
+                "gridvalues":[],
+                "order":"C"
+            },
+            "Z": {
+                "elementLabel": "Info",
+                "value":"Zéro",
+                "gridvalues":[],
+                "order":"A"
             }
         },
         "array":{

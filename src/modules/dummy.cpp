@@ -69,6 +69,7 @@ Dummy::~Dummy()
 void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                               const QVariantMap &eventData)
 {
+
     if (getModuleName() == eventModule )
     {
         foreach(const QString &keyprop, eventData.keys())
@@ -159,9 +160,18 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                 }
             }
 
-            if (keyprop == "testgrid")
+            if (eventType == "Fldelete")
             {
-                pushOstElements(keyprop);
+                double line = eventData[keyprop].toMap()["line"].toDouble();
+                qDebug() << "dummy" << eventType << "-" << eventModule << "-" << eventKey << "-" << eventData << "line=" << line;
+                deleteOstPropertyLine(keyprop, line);
+
+            }
+            if (eventType == "Flcreate")
+            {
+                qDebug() << "dummy" << eventType << "-" << eventModule << "-" << eventKey << "-" << eventData;
+                newOstPropertyLine(keyprop, eventData);
+
             }
 
         }
