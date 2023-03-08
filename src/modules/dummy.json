@@ -322,6 +322,10 @@
         "group": "Grids",
         "permission": 2,
         "grid":0,
+        "GXY":{
+            "X":"X",
+            "Y":"Y"
+        },
         "propertyLabel": "Grid example",
         "elements": {
             "X": {

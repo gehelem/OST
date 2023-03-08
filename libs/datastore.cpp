@@ -104,7 +104,6 @@ bool Datastore::setOstElementValue(const QString &pPropertyName, const QString &
     }
 
     QVariantMap _prop = mProperties[pPropertyName].toMap();
-
     if (_prop.contains("elements"))
     {
         if (_prop["elements"].toMap().contains(pElementName))
@@ -375,12 +374,15 @@ void Datastore::deleteOstProperty(const QString &pPropertyName)
 
 bool Datastore::pushOstElements         (const QString &pPropertyName)
 {
+    qDebug() << "pushOstElements DEB:"  << pPropertyName;
     if (mProperties.contains(pPropertyName))
     {
         QVariantMap _prop = mProperties[pPropertyName].toMap();
         if (!_prop.contains("grid") )
         {
             sendMessage("No grid defined for property  " + pPropertyName);
+            qDebug() << "pushOstElements FIN1:"  << pPropertyName;
+
             return false;
         }
         else
@@ -396,6 +398,7 @@ bool Datastore::pushOstElements         (const QString &pPropertyName)
             QVariantMap _elements = _prop["elements"].toMap();
             for(QVariantMap::const_iterator _elt = _elements.begin(); _elt != _elements.end(); ++_elt)
             {
+
                 //qDebug() << _elt.key() << _elt.value();
                 QVariantMap _myelt = _elements[_elt.key()].toMap();
                 QVariantList _mylist = _myelt["gridvalues"].toList();
@@ -417,6 +420,7 @@ bool Datastore::pushOstElements         (const QString &pPropertyName)
                 _elementsEmpty[_elt.key()] = _myelt;
             }
             //_mess["values"] = _cols;
+            qDebug() << "pushOstElements FIN2:"  << pPropertyName;
             emit OnModuleEvent("pushvalues", QString(), pPropertyName, _elementsEmpty);
             return true;
 
@@ -424,6 +428,8 @@ bool Datastore::pushOstElements         (const QString &pPropertyName)
     }
     else
     {
+        qDebug() << "pushOstElements FIN3:"  << pPropertyName;
+
         sendMessage("Can't push inexistant property " + pPropertyName);
         return false;
     }
@@ -447,9 +453,7 @@ bool Datastore::resetOstElements      (const QString &pPropertyName)
             for(QVariantMap::const_iterator _elt = _elements.begin(); _elt != _elements.end(); ++_elt)
             {
                 QVariantMap _myelt = _elements[_elt.key()].toMap();
-                QVariantList _mylist = _myelt["gridvalues"].toList();
-                _mylist.push_back(_myelt["value"]);
-                _myelt["gridvalues"] = _mylist;
+                _myelt["gridvalues"] = QVariantList();
                 _elements[_elt.key()] = _myelt;
             }
             _prop["elements"] = _elements;
@@ -489,29 +493,45 @@ bool Datastore::newOstPropertyLine(const QString &pPropertyName, const QVariantM
             }
             _arr.push_back(_cols);
             _prop["grid"] = _arr;
-            for(QVariantMap::const_iterator _elt = _elements.begin(); _elt != _elements.end(); ++_elt)
-            {
-                //qDebug() << _elt.key() << _elt.value();
-                QVariantMap _myelt = _elements[_elt.key()].toMap();
-                QVariantList _mylist = _myelt["gridvalues"].toList();
-                _mylist.push_back(pElementsValues[pPropertyName].toMap()["elements"].toMap()[_elt.key()]);
-                _myelt["gridvalues"] = _mylist;
-                _elements[_elt.key()] = _myelt;
-            }
-            _prop["elements"] = _elements;
-            mProperties[pPropertyName] = _prop;
-            //QVariantMap _mess;
             QVariantMap _elementsEmpty;
             for(QVariantMap::const_iterator _elt = _elements.begin(); _elt != _elements.end(); ++_elt)
             {
                 //qDebug() << _elt.key() << _elt.value();
                 QVariantMap _myelt = _elements[_elt.key()].toMap();
-                QVariantList _mylist;
-                _mylist.push_back(pElementsValues[pPropertyName].toMap()["elements"].toMap()[_elt.key()]);
+                QVariantMap _myEmptyElt = _elements[_elt.key()].toMap();
+                QVariantList _mylist = _myelt["gridvalues"].toList();
+                QVariantList _myEmptyList;
+                QVariant _myVal;
+                if (strcmp(_myelt["value"].typeName(), "double") == 0)
+                {
+                    _myVal = pElementsValues[pPropertyName].toMap()["elements"].toMap()[_elt.key()].toDouble();
+                }
+                if (strcmp(_myelt["value"].typeName(), "float") == 0)
+                {
+                    _myVal = pElementsValues[pPropertyName].toMap()["elements"].toMap()[_elt.key()].toFloat();
+                }
+                if (strcmp(_myelt["value"].typeName(), "qlonglong") == 0)
+                {
+                    _myVal = pElementsValues[pPropertyName].toMap()["elements"].toMap()[_elt.key()].toLongLong();
+                }
+                if (strcmp(_myelt["value"].typeName(), "int") == 0)
+                {
+                    _myVal = pElementsValues[pPropertyName].toMap()["elements"].toMap()[_elt.key()].toInt();
+                }
+                if (strcmp(_myelt["value"].typeName(), "QString") == 0)
+                {
+                    _myVal = pElementsValues[pPropertyName].toMap()["elements"].toMap()[_elt.key()].toString();
+                }
+
+                _mylist.push_back(_myVal);
+                _myEmptyList.push_back(_myVal);
                 _myelt["gridvalues"] = _mylist;
-                _elementsEmpty[_elt.key()] = _myelt;
+                _myEmptyElt["gridvalues"] = _myEmptyList;
+                _elements[_elt.key()] = _myelt;
+                _elementsEmpty[_elt.key()] = _myEmptyElt;
             }
-            //_mess["values"] = _cols;
+            _prop["elements"] = _elements;
+            mProperties[pPropertyName] = _prop;
             emit OnModuleEvent("pushvalues", QString(), pPropertyName, _elementsEmpty);
             return true;
 
@@ -559,6 +579,68 @@ bool Datastore::deleteOstPropertyLine(const QString &pPropertyName, const double
     else
     {
         sendMessage("deleteOstPropertyLine : Can't add line to inexistant property " + pPropertyName);
+        return false;
+    }
+
+}
+bool Datastore::updateOstPropertyLine(const QString &pPropertyName, const double &pLine, const QVariantMap &pElementsValues)
+{
+    if (mProperties.contains(pPropertyName))
+    {
+        QVariantMap _prop = mProperties[pPropertyName].toMap();
+        if (!_prop.contains("grid") )
+        {
+            sendMessage("updateOstPropertyLine : No grid defined for property  " + pPropertyName);
+            return false;
+        }
+        else
+        {
+            qDebug() << "updateOstPropertyLine :" << pPropertyName << ">> " << pPropertyName;
+            QVariantMap _elements = _prop["elements"].toMap();
+            QVariantList _arr = _prop["grid"].toList();
+            _arr.removeAt(pLine);
+            _prop["grid"] = _arr;
+            for(QVariantMap::const_iterator _elt = _elements.begin(); _elt != _elements.end(); ++_elt)
+            {
+                //qDebug() << _elt.key() << _elt.value();
+                QVariantMap _myelt = _elements[_elt.key()].toMap();
+                QVariantList _mylist = _myelt["gridvalues"].toList();
+                QVariant _myVal;
+                if (strcmp(_myelt["value"].typeName(), "double") == 0)
+                {
+                    _myVal = pElementsValues[pPropertyName].toMap()["elements"].toMap()[_elt.key()].toDouble();
+                }
+                if (strcmp(_myelt["value"].typeName(), "float") == 0)
+                {
+                    _myVal = pElementsValues[pPropertyName].toMap()["elements"].toMap()[_elt.key()].toFloat();
+                }
+                if (strcmp(_myelt["value"].typeName(), "qlonglong") == 0)
+                {
+                    _myVal = pElementsValues[pPropertyName].toMap()["elements"].toMap()[_elt.key()].toLongLong();
+                }
+                if (strcmp(_myelt["value"].typeName(), "int") == 0)
+                {
+                    _myVal = pElementsValues[pPropertyName].toMap()["elements"].toMap()[_elt.key()].toInt();
+                }
+                if (strcmp(_myelt["value"].typeName(), "QString") == 0)
+                {
+                    _myVal = pElementsValues[pPropertyName].toMap()["elements"].toMap()[_elt.key()].toString();
+                }
+
+
+                _mylist[pLine] = _myVal;
+                _myelt["gridvalues"] = _mylist;
+                _elements[_elt.key()] = _myelt;
+            }
+            _prop["elements"] = _elements;
+            mProperties[pPropertyName] = _prop;
+            OnModuleEvent("ap", QString(), pPropertyName, mProperties[pPropertyName].toMap());
+            return true;
+        }
+    }
+    else
+    {
+        sendMessage("updateOstPropertyLine : Can't add line to inexistant property " + pPropertyName);
         return false;
     }
 

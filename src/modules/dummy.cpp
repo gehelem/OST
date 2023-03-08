@@ -173,6 +173,13 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                 newOstPropertyLine(keyprop, eventData);
 
             }
+            if (eventType == "Flupdate")
+            {
+                double line = eventData[keyprop].toMap()["line"].toDouble();
+                qDebug() << "dummy" << eventType << "-" << eventModule << "-" << eventKey << "-" << eventData;
+                updateOstPropertyLine(keyprop, line, eventData);
+
+            }
 
         }
     }

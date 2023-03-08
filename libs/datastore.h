@@ -74,6 +74,7 @@ class Datastore : virtual public Baseroot
 
         bool newOstPropertyLine(const QString &pPropertyName, const QVariantMap &pElementsValues);
         bool deleteOstPropertyLine(const QString &pPropertyName, const double &pLine);
+        bool updateOstPropertyLine(const QString &pPropertyName, const double &pLine, const QVariantMap &pElementsValues);
 
 
         QVariantMap getProfile(void);
