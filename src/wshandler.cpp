@@ -64,17 +64,37 @@ void WShandler::processTextMessage(QString message)
     QJsonDocument jsonResponse = QJsonDocument::fromJson(_mess.toUtf8()); // garder
     emit textRcv(message);
     QJsonObject  obj = jsonResponse.object(); // garder
-    //BOOST_LOG_TRIVIAL(debug) << "OST server received json" << message.toStdString();
-    if (obj["evt"].toString() == "readall")
+    BOOST_LOG_TRIVIAL(debug) << "OST server received json" << message.toStdString();
+    if (obj["evt"].toString() == "Freadall")
     {
         //sendAll();
         //emit changeValue(Prop());
-        emit externalEvent("readall", "*", "*", QVariantMap());
+        emit externalEvent("Freadall", "*", "*", QVariantMap());
 
     }
-    if (obj["evt"].toString() == "setproperty")
+    if (obj["evt"].toString() == "Fsetproperty")
     {
-        emit externalEvent("setproperty", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+        emit externalEvent("Fsetproperty", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+    }
+    if (obj["evt"].toString() == "Flcreate")
+    {
+        emit externalEvent("Flcreate", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+    }
+    if (obj["evt"].toString() == "Flupdate")
+    {
+        emit externalEvent("Flupdate", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+    }
+    if (obj["evt"].toString() == "Fldelete")
+    {
+        emit externalEvent("Fldelete", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+    }
+    if (obj["evt"].toString() == "Flup")
+    {
+        emit externalEvent("Flup", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+    }
+    if (obj["evt"].toString() == "Fldown")
+    {
+        emit externalEvent("Fldown", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
     }
 
 
@@ -119,7 +139,6 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
 {
     QJsonObject  obj;
     obj["evt"] = eventType;
-    //obj["mod"]=eventModule;
 
     if (eventType == "moduledump")
     {
@@ -129,7 +148,7 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
         obj["modules"] = mods;
         sendJsonMessage(obj);
     }
-    if (eventType == "addprop" || eventType == "addelt" || eventType == "setattributes")
+    if (eventType == "cp" || eventType == "ce" || eventType == "ap" || eventType == "ae")
     {
         QJsonObject mods;
         QJsonObject  mod;
@@ -178,7 +197,7 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
         obj["modules"] = mods;
         sendJsonMessage(obj);
     }
-    if (eventType == "setpropvalue")
+    if (eventType == "sp" || eventType == "se")
     {
         QVariantMap prop = eventData;
         QVariantMap values;
@@ -222,5 +241,33 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
         obj["modules"] = mods;
         sendJsonMessage(obj);
     }
+    if (eventType == "mm")
+    {
+        QJsonObject mod;
+        QJsonObject mods;
+        mod["message"] = QJsonObject::fromVariantMap(eventData);;
+        mods[eventModule] = mod;
+        obj["modules"] = mods;
+        sendJsonMessage(obj);
+    }
+    if (eventType == "me")
+    {
+        QJsonObject mod;
+        QJsonObject mods;
+        mod["error"] = QJsonObject::fromVariantMap(eventData);;
+        mods[eventModule] = mod;
+        obj["modules"] = mods;
+        sendJsonMessage(obj);
+    }
+    if (eventType == "mw")
+    {
+        QJsonObject mod;
+        QJsonObject mods;
+        mod["warning"] = QJsonObject::fromVariantMap(eventData);;
+        mods[eventModule] = mod;
+        obj["modules"] = mods;
+        sendJsonMessage(obj);
+    }
+
 
 }

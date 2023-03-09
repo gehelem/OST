@@ -1,35 +1,35 @@
 {
     "baseVersion": {
-        "devcat": "Info",
-        "group": "",
+        "devcat": "Module",
+        "group": "Info",
         "order":"00",
         "permission": 0,
         "propertyLabel": "BaseVersion",
         "value":1
     },
     "baseGitHash": {
-        "devcat": "Info",
-        "group": "",
+        "devcat": "Module",
+        "group": "Info",
         "order":"00",
         "permission": 0,
         "propertyLabel": "Base module git hash"
     },
     "baseGitDate": {
-        "devcat": "Info",
-        "group": "",
+        "devcat": "Module",
+        "group": "Info",
         "order":"00",
         "permission": 0,
         "propertyLabel": "Base module git date"
     },
     "baseGitMessage": {
-        "devcat": "Info",
-        "group": "",
+        "devcat": "Module",
+        "group": "Info",
         "order":"00",
         "permission": 0,
         "propertyLabel": "Base module git message"
     },
     "moduleDescription": {
-        "devcat": "Info",
+        "devcat": "Module",
         "group": "",
         "order":"01",
         "permission": 0,
@@ -37,36 +37,28 @@
         "value":"N/A"
     },
     "moduleLabel": {
-        "devcat": "Info",
-        "group": "",
+        "devcat": "Module",
+        "group": "Info",
         "order":"02",
         "permission": 0,
         "propertyLabel": "Module label",
         "value":"Base module label"
     },
     "moduleName": {
-        "devcat": "Info",
-        "group": "",
+        "devcat": "Module",
+        "group": "Info",
         "order":"03",
         "permission": 0,
         "propertyLabel": "Module name",
         "value":"basemodule"
     },
     "moduleVersion": {
-        "devcat": "Info",
-        "group": "",
+        "devcat": "Module",
+        "group": "Info",
         "order":"04",
         "permission": 0,
         "propertyLabel": "Version",
         "value":1
-    },
-    "moduleType": {
-        "devcat": "Info",
-        "group": "",
-        "order":"05",
-        "permission": 0,
-        "propertyLabel": "Module type",
-        "value":"basemodule"
     },
     "message": {
         "devcat": "messages",
@@ -76,8 +68,8 @@
         "value": ""
     },
     "profileactions": {
-        "devcat": "Profiles",
-        "group": "",
+        "devcat": "Module",
+        "group": "Profiles",
         "permission": 2,
         "rule":2,
         "propertyLabel": "Profiles",
@@ -97,8 +89,8 @@
         }
     },
     "moduleactions": {
-        "devcat": "Profiles",
-        "group": "",
+        "devcat": "Module",
+        "group": "Profiles",
         "permission": 1,
         "propertyLabel": "Controls",
         "rule":2,

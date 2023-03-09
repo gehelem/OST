@@ -1,14 +1,11 @@
 #include "controller.h"
 
-
 /*!
  * ... ...
  */
-Controller::Controller(bool saveAllBlobs, const QString &host, int port, const QString &webroot, const QString &dbpath,
+Controller::Controller(bool saveAllBlobs, const QString &webroot, const QString &dbpath,
                        const QString &libpath, const QString &installfront, const QString &conf)
-    : _indihost(host),
-      _indiport(port),
-      _webroot(webroot),
+    : _webroot(webroot),
       _dbpath(dbpath),
       _libpath(libpath),
       _installfront(installfront),
@@ -16,7 +13,7 @@ Controller::Controller(bool saveAllBlobs, const QString &host, int port, const Q
 {
 
     Q_UNUSED(saveAllBlobs);
-    if (_installfront == "Y")
+    if (_installfront != "N")
     {
         this->installFront();
     }
@@ -35,13 +32,14 @@ Controller::Controller(bool saveAllBlobs, const QString &host, int port, const Q
     checkModules();
 
     wshandler = new WShandler(this);
-    connect(wshandler, &WShandler::externalEvent, this, &Controller::OnExternalEvent);
-    dbmanager = new DBManager(this, _dbpath);
+    //connect(wshandler, &WShandler::externalEvent, this, &Controller::OnExternalEvent);
+    dbmanager = new DBManager();
+    dbmanager->dbInit(_dbpath, QString());
 
     LoadModule("libostmaincontrol", "mainctl", "Maincontrol", "default");
 
     QVariantMap _result;
-    dbmanager->getConfiguration(_conf, _result);
+    dbmanager->getDbConfiguration(_conf, _result);
     for(QVariantMap::const_iterator iter = _result.begin(); iter != _result.end(); ++iter)
     {
         QVariantMap _line = iter.value().toMap();
@@ -62,7 +60,6 @@ Controller::~Controller()
 bool Controller::LoadModule(QString lib, QString name, QString label, QString profile)
 {
 
-    qDebug() << "Try to load " << lib;
     QLibrary library(lib);
     if (!library.load())
     {
@@ -82,26 +79,25 @@ bool Controller::LoadModule(QString lib, QString name, QString label, QString pr
             if (mod)
             {
                 mod->setParent(this);
-                //mod->setHostport(_indihost,_indiport);
-                //mod->connectIndi();
                 mod->setWebroot(_webroot);
                 mod->setObjectName(name);
-                QVariantMap prof;
-                dbmanager->getProfile(mod->_moduletype, profile, prof);
-                mod->setProfile(prof);
+                mod->dbInit(_dbpath, name);
+                mod->setProfile(profile);
                 QVariantMap profs;
-                dbmanager->getProfiles(mod->_moduletype, profs);
+                dbmanager->getDbProfiles(mod->metaObject()->className(), profs);
                 mod->setProfiles(profs);
                 connect(mod, &Basemodule::moduleEvent, this, &Controller::OnModuleEvent);
+                connect(mod, &Basemodule::moduleEvent, wshandler, &WShandler::processModuleEvent);
                 connect(mod, &Basemodule::loadOtherModule, this, &Controller::LoadModule);
-                connect(this, &Controller::controllerEvent, mod, &Basemodule::OnExternalEvent);
+                //connect(this, &Controller::controllerEvent, mod, &Basemodule::OnExternalEvent);
+                connect(wshandler, &WShandler::externalEvent, mod, &Basemodule::OnExternalEvent);
                 mod->sendDump();
 
                 QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
                 for (Basemodule *othermodule : othermodules)
                 {
                     //BOOST_LOG_TRIVIAL(debug) << "child= " << othermodule->objectName().toStdString();
-                    if (othermodule->getName() != mod->getName())
+                    if (othermodule->getModuleName() != mod->getModuleName())
                     {
                         //connect(othermodule,&Basemodule::moduleEvent, mod,&Basemodule::OnExternalEvent);
                         //connect(mod,&Basemodule::moduleEvent, othermodule,&Basemodule::OnExternalEvent);
@@ -111,44 +107,25 @@ bool Controller::LoadModule(QString lib, QString name, QString label, QString pr
 
                 return true;
             }
+            return false;
         }
         else
         {
-            BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from library : " << lib.toStdString();
+            sendMessage("Could not initialize module from library : " + lib);
             return false;
         }
     }
+    return false;
 }
 
 
 void Controller::OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                const QVariantMap &eventData)
 {
-
-
-    if (eventType == "modsaveprofile")
+    if (eventType == "mm")
     {
-        Basemodule* mod = qobject_cast<Basemodule*>(sender());
-        QVariantMap _vm = mod->getProfile();
-        dbmanager->setProfile(eventModule, eventKey, _vm);
-        return;
+        sendMessage(eventModule + "-" + eventData["message"].toString());
     }
-    if (eventType == "modloadprofile")
-    {
-        QVariantMap _prof;
-        dbmanager->getProfile(eventModule, eventKey, _prof);
-        Basemodule* mod = qobject_cast<Basemodule*>(sender());
-        mod->setProfile(_prof);
-        return;
-
-    }
-    wshandler->processModuleEvent(eventType, eventModule, eventKey, eventData);
-    //QJsonDocument doc(obj);
-    //QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
-    //QString strJson = QLatin1String(docByteArray);
-    //BOOST_LOG_TRIVIAL(debug) << "OnModuleEvent - " << mod->getName().toStdString() << " - " << eventType.toStdString() << " - " << strJson.toStdString();
-
-
 }
 void Controller::OnExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                  const QVariantMap &eventData)
@@ -168,7 +145,7 @@ void Controller::checkModules(void)
 {
     foreach (const QString &path, QCoreApplication::libraryPaths())
     {
-        BOOST_LOG_TRIVIAL(debug) << " ************ Check available modules in " << path.toStdString();
+        sendMessage(" ************ Check available modules in " + path);
         QDir directory(path);
         directory.setFilter(QDir::Files);
         directory.setNameFilters(QStringList() << "libost*.so");
@@ -181,7 +158,7 @@ void Controller::checkModules(void)
                 QLibrary library(path + "/" + lib);
                 if (!library.load())
                 {
-                    BOOST_LOG_TRIVIAL(debug) << lib.toStdString() << " " << library.errorString().toStdString();
+                    sendMessage(lib + " " + library.errorString());
                 }
                 else
                 {
@@ -198,13 +175,13 @@ void Controller::checkModules(void)
                             mod->setObjectName(lib);
                             QVariantMap info = mod->getModuleInfo();
                             _availableModuleLibs[tt] = info;
-                            qDebug() << "found library " << path << "/" << lib ;
+                            sendMessage("found library " + path + "/" + lib) ;
                             delete mod;
                         }
                     }
                     else
                     {
-                        BOOST_LOG_TRIVIAL(debug)  << "Could not initialize module from the loaded library : " << lib.toStdString();
+                        sendMessage("Could not initialize module from the loaded library : " + lib);
                     }
                 }
 
@@ -218,6 +195,17 @@ void Controller::checkModules(void)
 }
 void Controller::installFront(void)
 {
+    QString arch = _installfront;
+    if (arch == "Y")
+    {
+        arch = "https://github.com/gehelem/ost-front/releases/download/WorkInProgress/html.tar.gz";
+        BOOST_LOG_TRIVIAL(debug) << "download default archive " << arch.toStdString();
+    }
+    else
+    {
+        BOOST_LOG_TRIVIAL(debug) << "download specific archive " << arch.toStdString();
+    }
+
     _process = new QProcess(this);
     connect(_process, &QProcess::readyReadStandardOutput, this, &Controller::processOutput);
     connect(_process, &QProcess::readyReadStandardError, this, &Controller::processError);
@@ -232,22 +220,42 @@ void Controller::installFront(void)
     }
     else
     {
-        QString program = "wget";
+        QString program = "rm";
         QStringList arguments;
-        arguments << "https://github.com/gehelem/ost-front/releases/download/WorkInProgress/html.tar.gz";
-        arguments << "&&";
-        arguments << "tar -xf html.tar.gz -C";
-        arguments << _webroot;
-        qDebug() << "PROCESS ARGS " << arguments;
+        arguments << "-rf" ;
+        arguments << _webroot + "/html.tar.gz";
+        qDebug() << "+++++++++++++++++++++++++++++++++++++++++++++++++PROCESS ARGS (1)" << program << " " << arguments;
         _process->start(program, arguments);
+        _process->waitForFinished();
+        program = "wget";
+        arguments.clear();
+        arguments << arch ;
+        arguments << "--directory";
+        arguments << _webroot;
+        arguments << " && ";
+        arguments << "tar";
+        qDebug() << "+++++++++++++++++++++++++++++++++++++++++++++++++PROCESS ARGS (2)" << program << " " << arguments;
+        _process->start(program, arguments);
+        _process->waitForFinished();
+        program = "tar";
+        arguments.clear();
+        arguments << "-xvf";
+        arguments << _webroot + "/html.tar.gz";
+        arguments << "-C";
+        arguments << _webroot;
+        qDebug() << "+++++++++++++++++++++++++++++++++++++++++++++++++PROCESS ARGS (3)" << program << " " << arguments;
+        _process->start(program, arguments);
+        _process->waitForFinished();
 
     }
+
+
 
 
 }
 void Controller::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    qDebug() << "PROCESS FINISHED (" + QString::number(exitCode) + ")";
+    qDebug() << "PROCESS FINISHED (" + QString::number(exitCode) + ")" + exitStatus;
 }
 void Controller::processOutput()
 {
@@ -260,9 +268,12 @@ void Controller::processError()
     qDebug() << "PROCESS ERROR : " + output;
 
 }
-void Controller::sendMessage(QString message)
+void Controller::sendMessage(const QString &pMessage)
 {
-    QString mess = QDateTime::currentDateTime().toString("[yyyyMMdd hh:mm:ss.zzz]") + " - ostserver - " + message;
-    qDebug() << mess;
+    QString messageWithDateTime = "[" + QDateTime::currentDateTime().toString(Qt::ISODateWithMs) + "]-" + pMessage;
+    QDebug debug = qDebug();
+    debug.noquote();
+    debug << messageWithDateTime;
+
     // should we add a dispatch over WS ?
 }

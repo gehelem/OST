@@ -1,29 +1,29 @@
 {
     "indiGitHash": {
-        "devcat": "Info",
-        "group": "",
+        "devcat": "Module",
+        "group": "Info",
         "order":"00",
         "permission": 0,
         "propertyLabel": "Indi module git hash"
     },
     "indiGitDate": {
-        "devcat": "Info",
-        "group": "",
+        "devcat": "Module",
+        "group": "Info",
         "order":"00",
         "permission": 0,
         "propertyLabel": "Indi module git date"
     },
     "indiGitMessage": {
-        "devcat": "Info",
-        "group": "",
+        "devcat": "Module",
+        "group": "Info",
         "order":"00",
         "permission": 0,
         "propertyLabel": "Indi module git message"
     },
     "server": {
         "hasprofile":true,
-        "devcat": "Indi",
-        "group": "",
+        "devcat": "Module",
+        "group": "Indi",
         "order":"99",
         "permission": 2,
         "propertyLabel": "Server",
@@ -40,8 +40,8 @@
         }
     },
     "serveractions": {
-        "devcat": "Indi",
-        "group": "",
+        "devcat": "Module",
+        "group": "Indi",
         "order":"01",
         "permission": 2,
         "rule":2,
@@ -59,8 +59,8 @@
     },
     "devices": {
         "hasprofile":true,
-        "devcat": "Indi",
-        "group": "",
+        "devcat": "Module",
+        "group": "Indi",
         "order":"06",
         "permission": 2,
         "propertyLabel": "Devices",
@@ -68,8 +68,8 @@
         }
     },
     "devicesactions": {
-        "devcat": "Indi",
-        "group": "",
+        "devcat": "Module",
+        "group": "Indi",
         "order":"04",
         "permission": 2,
         "rule":2,
@@ -91,8 +91,8 @@
         }
     },
     "startup": {
-        "devcat": "Indi",
-        "group": "",
+        "devcat": "Module",
+        "group": "Indi",
         "order":"08",
         "permission": 2,
         "rule":2,

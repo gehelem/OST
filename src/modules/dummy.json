@@ -17,7 +17,8 @@
         },
         "group": "Texts",
         "permission": 0,
-        "propertyLabel": "Text example - read only"
+        "propertyLabel": "Text example - read only",
+        "order":"00"
     },
     "extextRW": {
         "hasprofile":true,
@@ -37,12 +38,18 @@
             },
             "extext4": {
                 "elementLabel": "Text 4",
-                "value":"dddd"
+                "value":"i1",
+                "listOfValues":{
+                    "i1":"Value 1",
+                    "i2":"Value 2"
+                }
             }
         },
         "group": "Texts",
         "permission": 2,
-        "propertyLabel": "Text example - read/write"
+        "propertyLabel": "Text example - read/write",
+        "order":"01"
+
     },
     "numbersRW": {
         "hasprofile":true,
@@ -194,7 +201,7 @@
     },
     "actions": {
         "devcat": "Examples",
-        "rule":1,
+        "rule":0,
         "elements": {
             "shoot": {
                 "elementLabel": "Shoot",
@@ -318,25 +325,72 @@
         "group": "Grids",
         "permission": 2,
         "grid":0,
+        "GXY":{
+            "X":"X",
+            "Y":"Y"
+        },
         "propertyLabel": "Grid example",
         "elements": {
             "X": {
                 "elementLabel": "Abscisse",
                 "value":0,
-                "gridvalues":[0,1,2,3,4]
+                "gridvalues":[0,1,2,3,4],
+                "order":"B"
             },
             "Y": {
-                "elementLabel": "ordonnée",
+                "elementLabel": "Ordonnée",
                 "value":0,
-                "gridvalues":[0,1,4,9,16]
+                "gridvalues":[0,1,4,9,16],
+                "order":"C"
             },
             "Z": {
-                "elementLabel": "info",
+                "elementLabel": "Info",
                 "value":"Zéro",
-                "gridvalues":["P0","P1","P2","P3","P4"]
+                "gridvalues":["P0","P1","P2","P3","P4"],
+                "order":"A"
             }
+        },
+        "array":{
+            "key": "",
+            "columns":["X","Y"],
+            "type":"grid"
         }
-
+    },
+    "secondtestgrid": {
+        "devcat": "Examples",
+        "group": "AAAGrids",
+        "permission": 2,
+        "grid":0,
+        "propertyLabel": "Grid example 2",
+        "elements": {
+            "X": {
+                "elementLabel": "Abscisse",
+                "value":0,
+                "gridvalues":[],
+                "order":"B"
+            },
+            "Y": {
+                "elementLabel": "Ordonnée",
+                "value":0,
+                "gridvalues":[],
+                "order":"C"
+            },
+            "Z": {
+                "elementLabel": "Info",
+                "value":"Zéro",
+                "gridvalues":[],
+                "order":"A"
+            }
+        },
+        "array":{
+            "key": "",
+            "columns":["X","Y"],
+            "type":"grid"
+        }
+    },
+    "skychart": {
+        "propertyLabel": "Skychart",
+        "devcat": "Examples",
+        "group": "Images"
     }
-
 }
