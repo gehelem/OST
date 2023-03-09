@@ -22,7 +22,6 @@
     },
     "extextRW": {
         "hasprofile":true,
-        "grid":0,
         "devcat": "Examples",
         "elements": {
             "extext1": {
@@ -39,7 +38,11 @@
             },
             "extext4": {
                 "elementLabel": "Text 4",
-                "value":"dddd"
+                "value":"i1",
+                "listOfValues":{
+                    "i1":"Value 1",
+                    "i2":"Value 2"
+                }
             }
         },
         "group": "Texts",
