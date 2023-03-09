@@ -109,7 +109,6 @@ class Basemodule : public QObject, public Datastore, public DBManager
 
     private:
 
-        QVariantMap mOstProperties;
         QVariantMap mAvailableModuleLibs;
         QVariantMap mAvailableProfiles;
         QString mWebroot;

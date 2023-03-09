@@ -51,8 +51,7 @@ void Basemodule::setProfile(const QString &pProfileName)
 
 void Basemodule::setProfile(QVariantMap profiledata)
 {
-    QVariantMap _props = mOstProperties["properties"].toMap();
-
+    QVariantMap _props = getProperties();
     foreach(const QString &key, profiledata.keys())
     {
         if (_props.contains(key))
@@ -67,12 +66,14 @@ void Basemodule::setProfile(QVariantMap profiledata)
                     foreach(const QString &eltkey, profiledata[key].toMap()["elements"].toMap().keys())
                     {
                         setOstElementValue(key, eltkey, profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["value"], true);
+                        if (_props[key].toMap().contains("grid"))
+                        {
+                            setOstElementGrid (key, eltkey, profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["gridvalues"].toList(), true);
+                        }
                     }
-
                 }
             }
         }
-
     }
 
 }
