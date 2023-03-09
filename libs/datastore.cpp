@@ -228,6 +228,86 @@ bool Datastore::setOstElementValue(const QString &pPropertyName, const QString &
 
     return true; // should return false when request is invalid, we'll see that later
 }
+bool Datastore::setOstElementGrid(const QString &pPropertyName, const QString &pElementName,
+                                  const QVariantList &pElementGrid,
+                                  bool mEmitEvent)
+{
+    if (!mProperties.contains(pPropertyName) )
+    {
+        sendWarning("setOstElementGrid - property " + pPropertyName + " not found");
+        return false;
+    }
+
+    QVariantMap _prop = mProperties[pPropertyName].toMap();
+    if (_prop.contains("elements"))
+    {
+        if (_prop["elements"].toMap().contains(pElementName))
+        {
+            QVariantMap _elements = _prop["elements"].toMap();
+            if (!_elements.contains(pElementName) )
+            {
+                sendWarning("setOstElementGrid - property " + pPropertyName + " : element " + pElementName + " not found.");
+                return false;
+            }
+
+            QVariantMap element = _elements[pElementName].toMap();
+            if (_prop.contains("grid"))
+            {
+                element["gridvalues"] = pElementGrid;
+            }
+            else
+            {
+                sendWarning("setOstElementGrid - property " + pPropertyName + " element " + pElementName + " has no grid.");
+            }
+            _elements[pElementName] = element;
+            _prop["elements"] = _elements;
+        }
+    }
+    mProperties[pPropertyName] = _prop;
+    if (mEmitEvent) OnModuleEvent("se", QString(), pPropertyName, mProperties[pPropertyName].toMap());
+
+
+    return true; // should return false when request is invalid, we'll see that later
+}
+QVariantList Datastore::getOstElementGrid(const QString &pPropertyName, const QString &pElementName)
+{
+    if (mProperties.contains(pPropertyName))
+    {
+        if (mProperties[pPropertyName].toMap().contains("elements"))
+        {
+            QVariantMap elts = mProperties[pPropertyName].toMap()["elements"].toMap();
+            if (elts.contains(pElementName))
+            {
+                if (mProperties[pPropertyName].toMap()["elements"].toMap()[pElementName].toMap().contains("gridvalues"))
+                {
+                    return mProperties[pPropertyName].toMap()["elements"].toMap()[pElementName].toMap()["gridvalues"].toList();
+                }
+                else
+                {
+                    sendWarning("setOstElementGrid - property " + pPropertyName + " element " + pElementName + " has no grid.");
+                    return QVariantList();
+                }
+            }
+            else
+            {
+                sendWarning("setOstElementGrid - property " + pPropertyName + " has no " + pElementName + " element.");
+                return QVariantList();
+            }
+        }
+        else
+        {
+            sendWarning("setOstElementGrid - property " + pPropertyName + " contains no elements.");
+            return QVariantList();
+        }
+    }
+    else
+    {
+        sendWarning("setOstElementGrid - property " + pPropertyName + " not found.");
+        return QVariantList();
+    }
+
+}
+
 QVariant Datastore::getOstElementValue(const QString &pPropertyName, const QString &pElementName)
 {
     if (mProperties.contains(pPropertyName))
@@ -346,8 +426,12 @@ QVariantMap Datastore::getProfile(void)
                     if (mProperties[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("value"))
                     {
                         element["value"] = mProperties[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
-                        elements[keyelt] = element;
                     }
+                    if (mProperties[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("gridvalues"))
+                    {
+                        element["gridvalues"] = mProperties[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["gridvalues"];
+                    }
+                    elements[keyelt] = element;
                 }
                 property["elements"] = elements;
             }
