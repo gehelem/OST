@@ -23,17 +23,10 @@ Maincontrol::Maincontrol(QString name, QString label, QString profile, QVariantM
     foreach(QString key, getAvailableModuleLibs().keys())
     {
         QVariantMap info = getAvailableModuleLibs()[key].toMap();
-        createOstProperty("desc" + key, "Description", 0, "Available modules", info["label"].toString());
-        foreach (QString ii, info.keys())
-        {
-            QVariant val = info[ii];
-            createOstElement("desc" + key, ii, ii, false);
-            setOstElementValue("desc" + key, ii, val, false);
-        }
-        createOstProperty("load" + key, "", 2, "Available modules", info["label"].toString());
-        createOstElement("load" + key, "instance", "Instance name", false);
-        setOstElementValue("load" + key, "instance", "my" + key, false);
-        createOstElement("load" + key, "load", "Load", false);
+        createOstProperty( "load" + key, info["moduleDescription"].toMap()["value"].toString(), 2, "Available modules", "");
+        createOstElement(  "load" + key, "instance", "Instance name", false);
+        setOstElementValue("load" + key, "instance", "My " + key, false);
+        createOstElement(  "load" + key, "load", "Load", false);
         setOstElementValue("load" + key, "load", false, false);
 
     }

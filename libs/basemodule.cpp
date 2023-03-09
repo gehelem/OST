@@ -188,7 +188,7 @@ QVariantMap Basemodule::getModuleInfo(void)
     foreach (QString key, getProperties().keys())
     {
         //if (mOstProperties[key].toMap()["devcat"].toString() == "Info")
-        if (key != "ostproperties")
+        if (key == "moduleDescription")
         {
             temp[key] = getProperties()[key];
         }
