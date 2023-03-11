@@ -14,6 +14,7 @@ WShandler::WShandler(QObject *parent)
     m_pWebSocketServer = new QWebSocketServer(QStringLiteral("OST server"), QWebSocketServer::NonSecureMode, this);
     if (m_pWebSocketServer->listen(QHostAddress::Any, 9624))
     {
+        qDebug() << m_pWebSocketServer->supportedVersions();
         connect(m_pWebSocketServer, &QWebSocketServer::newConnection, this, &WShandler::onNewConnection);
         connect(m_pWebSocketServer, &QWebSocketServer::closed, this, &WShandler::closed);
     }

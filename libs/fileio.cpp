@@ -829,7 +829,7 @@ bool fileio::parseHeader()
         Record oneRecord;
         // Quotes cause issues for simplified below so we're removing them.
         QString record = recordList.mid(i * 80, 80).remove("'");
-        QStringList properties = record.split(QRegExp("[=/]"));
+        QStringList properties = record.split(QRegularExpression("[=/]"));
         // If it is only a comment
         if (properties.size() == 1)
         {
@@ -1219,7 +1219,7 @@ void fileio::calculateMinMax()
         for (int i = 0; i < nThreads; i++)
         {
             // Run threads
-            futures.append(QtConcurrent::run(this, &fileio::getParitionMinMax<T>, tStart, (i == (nThreads - 1)) ? fStride : tStride));
+            futures.append(QtConcurrent::run(&fileio::getParitionMinMax<T>, this, tStart, (i == (nThreads - 1)) ? fStride : tStride));
             tStart += tStride;
         }
 
@@ -1327,7 +1327,7 @@ void fileio::runningAverageStdDev()
         for (int i = 0; i < nThreads; i++)
         {
             // Run threads
-            futures.append(QtConcurrent::run(this, &fileio::getSquaredSumAndMean<T>, tStart,
+            futures.append(QtConcurrent::run(&fileio::getSquaredSumAndMean<T>, this, tStart,
                                              (i == (nThreads - 1)) ? fStride : tStride));
             tStart += tStride;
         }
@@ -1368,7 +1368,7 @@ QPair<double, double> fileio::getSquaredSumAndMean(uint32_t start, uint32_t stri
         m_n++;
     }
 
-    return qMakePair<double, double>(m_newM, m_newS);
+    return QPair<double, double>(m_newM, m_newS);
 }
 /* taken from Kstars fitviewer FITSData */
 template <typename T>

@@ -255,7 +255,7 @@ void Controller::installFront(void)
 }
 void Controller::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    qDebug() << "PROCESS FINISHED (" + QString::number(exitCode) + ")" + exitStatus;
+    qDebug() << "PROCESS FINISHED (" + QString::number(exitCode) + ")" + QChar(exitStatus);
 }
 void Controller::processOutput()
 {
