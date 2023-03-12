@@ -22,20 +22,21 @@ bool DBManager::dbInit(const QString &pDbPath, const QString &pConnectionName)
         mDb = QSqlDatabase::addDatabase("QSQLITE", pConnectionName);
         mDb.setDatabaseName(mDbPath + "ost.db" );
         mQuery = QSqlQuery(mDb);
+
         if(!mDb.open())
         {
             sendMessage("dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+            return false;
         }
-        else
-        {
-            if (!mDbExists) CreateDatabaseStructure();
-        }
+        if (!mDbExists) CreateDatabaseStructure();
+        return true;
     }
     else
     {
         sendMessage("DatabaseConnect - ERROR: QSQLITE driver unavailable");
+        return false;
     }
-
+    return false;
 }
 
 
