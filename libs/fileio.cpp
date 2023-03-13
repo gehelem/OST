@@ -1,7 +1,6 @@
 #include "fileio.h"
 #include <QFileInfo>
 #include <QtConcurrent>
-#include "stretch.h"
 
 fileio::fileio()
 {

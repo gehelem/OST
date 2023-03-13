@@ -2,15 +2,6 @@
 #define DBMANAGER_h_
 
 #include "baseroot.h"
-#include <QtCore>
-#include <QtConcurrent>
-#include <QCoreApplication>
-#include <QObject>
-#include <QtSql/QSql>
-#include <QtSql/QSqlDatabase>
-#include <QtSql/QSqlQuery>
-#include <QtSql/QSqlError>
-
 
 class DBManager : virtual public Baseroot
 {

@@ -3,6 +3,13 @@
 #include <QObject>
 #include <QList>
 #include <QVariant>
+#include <QtCore>
+#include <QtConcurrent>
+#include <QCoreApplication>
+#include <QtSql/QSql>
+#include <QtSql/QSqlDatabase>
+#include <QtSql/QSqlQuery>
+#include <QtSql/QSqlError>
 
 class Baseroot
 {
