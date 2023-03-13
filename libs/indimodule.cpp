@@ -27,7 +27,7 @@ void IndiModule::OnDispatchToIndiExternalEvent(const QString &eventType, const Q
 
     if (getModuleName() == eventModule)
     {
-        //BOOST_LOG_TRIVIAL(debug) << "OnIndiExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << eventKey.toStdString();
+        //sendMessage("OnIndiExternalEvent - recv : " + getModuleName()+ "-" + eventType + "-" + eventKey);
         foreach(const QString &keyprop, eventData.keys())
         {
             foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
@@ -362,7 +362,7 @@ bool IndiModule::loadDevicesConfs()
 auto IndiModule::sendModNewNumber(const QString &deviceName, const QString &propertyName, const QString  &elementName,
                                   const double &value) -> bool
 {
-    qDebug() << "sendModNewNumber" << " " << deviceName << "-" << propertyName << "-" << elementName << "-" << value;
+    //qDebug() << "sendModNewNumber" << " " << deviceName << "-" << propertyName << "-" << elementName << "-" << value;
     INDI::BaseDevice dp = getDevice(deviceName.toStdString().c_str());
 
     if (!dp.isValid())

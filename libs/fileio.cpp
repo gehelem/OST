@@ -1,7 +1,6 @@
 #include "fileio.h"
 #include <QFileInfo>
 #include <QtConcurrent>
-#include <boost/log/trivial.hpp>
 #include "stretch.h"
 
 fileio::fileio()
@@ -295,7 +294,7 @@ bool fileio::loadBlob(INDI::PropertyBlob pblob)
     if (fits_open_memfile(&fptr, "", READONLY, &pblob[0].cast()->blob, &bsize, 0, NULL, &status) )
 
     {
-        BOOST_LOG_TRIVIAL(debug) << "IMG Unsupported type or read error loading FITS blob";
+        sendMessage("IMG Unsupported type or read error loading FITS blob");
         return false;
     }
     else
@@ -1482,4 +1481,11 @@ void fileio::CalcHisto(void)
     m_HistogramConstructed = true;
     //emit histogramReady();
 
+}
+void fileio::sendMessage(const QString &pMessage)
+{
+    QString messageWithDateTime = "[" + QDateTime::currentDateTime().toString(Qt::ISODateWithMs) + "]-" + pMessage;
+    QDebug debug = qDebug();
+    debug.noquote();
+    debug << messageWithDateTime;
 }

@@ -375,7 +375,7 @@ void Datastore::setOstPropertyAttribute   (const QString &pPropertyName, const Q
         const QVariant &AttributeValue,
         bool mEmitEvent)
 {
-    //BOOST_LOG_TRIVIAL(debug) << "setOstPropertyAttribute  - " << mModulename.toStdString() << "-" << pPropertyName.toStdString();
+    //sendMessage("setOstPropertyAttribute  - " + pPropertyName);
     QVariantMap _prop = mProperties[pPropertyName].toMap();
     _prop[pAttributeName] = AttributeValue;
     mProperties[pPropertyName] = _prop;

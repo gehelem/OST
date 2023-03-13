@@ -156,6 +156,7 @@ class fileio : public QObject
             SSolver::getShapeString(SSolver::SHAPE_CIRCLE);
 
         }
+        void sendMessage(const QString &pMessage);
 
 };
 

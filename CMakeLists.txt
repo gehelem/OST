@@ -34,7 +34,6 @@ find_package(WCSLIB REQUIRED)
 find_package(QT NAMES Qt5 COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql)
 find_package(StellarSolver REQUIRED)
-find_package(Boost COMPONENTS log log_setup REQUIRED)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
@@ -67,7 +66,6 @@ add_executable(ostserver
 )
 target_link_libraries(ostserver
     ostbasemodule
-    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
     Qt${QT_VERSION_MAJOR}::Gui
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Widgets
@@ -129,7 +127,6 @@ target_link_libraries(ostbasemodule
     ${STELLARSOLVER_LIBRARIES}
     ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${NOVA_LIBRARIES}
     ${GSL_LIBRARIES} ${ZLIB_LIBRARY}
-    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
     Threads::Threads
     z
 )
@@ -157,7 +154,6 @@ target_link_libraries(ostindimodule
     ${STELLARSOLVER_LIBRARIES}
     ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${NOVA_LIBRARIES}
     ${GSL_LIBRARIES} ${ZLIB_LIBRARY}
-    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
     Threads::Threads
     z
 )
@@ -179,7 +175,6 @@ target_link_libraries(ostdummy PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Widgets
-    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
     Threads::Threads
     z
 )
@@ -199,7 +194,6 @@ target_link_libraries(ostmaincontrol PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Widgets
-    ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY}
     Threads::Threads
     z
 )

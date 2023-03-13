@@ -36,6 +36,8 @@ class WShandler : public QObject
         void socketDisconnected();
         QWebSocketServer *m_pWebSocketServer;
         QList<QWebSocket *> m_clients;
+        void sendMessage(const QString &pMessage);
+
 
 };
 #endif

@@ -13,7 +13,7 @@ Solver::~Solver()
 
 void Solver::ResetSolver(FITSImage::Statistic &stats, uint8_t *m_ImageBuffer)
 {
-    //BOOST_LOG_TRIVIAL(debug) << "Reset solver";
+    //sendMessage( "Reset solver";
     HFRavg = 99;
     delete stellarSolver;
     stellarSolver = new StellarSolver(stats, m_ImageBuffer);
@@ -26,11 +26,11 @@ void Solver::FindStars(Parameters param)
 {
 
     if (!connect(stellarSolver, &StellarSolver::logOutput, this, &Solver::sslogOutput))
-        BOOST_LOG_TRIVIAL(debug) << "Can't connect sslogOutput";
+        sendMessage( "Can't connect sslogOutput");
     if (!connect(stellarSolver, &StellarSolver::ready, this, &Solver::ssReadySEP))
-        BOOST_LOG_TRIVIAL(debug) << "Can't connect ssReadySEP";
+        sendMessage( "Can't connect ssReadySEP");
     if (!connect(stellarSolver, &StellarSolver::finished, this, &Solver::ssFinished))
-        BOOST_LOG_TRIVIAL(debug) << "Can't connect ssFinished";
+        sendMessage( "Can't connect ssFinished");
 
 
     //QList<Parameters> params = stellarSolver->getBuiltInProfiles();
@@ -59,20 +59,20 @@ void Solver::FindStars(Parameters param)
     //IDLog("IMG stellarSolver SEP Start\n");
 
 
-    //BOOST_LOG_TRIVIAL(debug) << "SS command string into solver" << stellarSolver->getCommandString().toStdString();
+    //sendMessage( "SS command string into solver" << stellarSolver->getCommandString().toStdString();
 
     //stellarSolver->extract(true);
-    if (stellarSolver->failed()) BOOST_LOG_TRIVIAL(debug) << "SS Failed";
+    if (stellarSolver->failed()) sendMessage( "SS Failed");
 
 }
 void Solver::SolveStars(Parameters param)
 {
     if (!connect(stellarSolver, &StellarSolver::logOutput, this, &Solver::sslogOutput))
-        BOOST_LOG_TRIVIAL(debug) << "Can't connect sslogOutput";
+        sendMessage( "Can't connect sslogOutput");
     if (!connect(stellarSolver, &StellarSolver::ready, this, &Solver::ssReadySolve))
-        BOOST_LOG_TRIVIAL(debug) << "Can't connect ssReadySolve";
+        sendMessage( "Can't connect ssReadySolve");
     if (!connect(stellarSolver, &StellarSolver::finished, this, &Solver::ssFinished))
-        BOOST_LOG_TRIVIAL(debug) << "Can't connect ssFinished";
+        sendMessage( "Can't connect ssFinished");
 
 
     //QList<Parameters> params = stellarSolver->getBuiltInProfiles();
@@ -101,29 +101,29 @@ void Solver::SolveStars(Parameters param)
     //IDLog("IMG stellarSolver SEP Start\n");
 
 
-    //BOOST_LOG_TRIVIAL(debug) << "SS command string into solver" << stellarSolver->getCommandString().toStdString();
+    //sendMessage( "SS command string into solver" << stellarSolver->getCommandString().toStdString();
 
     //stellarSolver->extract(true);
-    if (stellarSolver->failed()) BOOST_LOG_TRIVIAL(debug) << "SS Failed";
+    if (stellarSolver->failed()) sendMessage( "SS Failed");
 
 }
 
 
 void Solver::ssFinished()
 {
-    //BOOST_LOG_TRIVIAL(debug) << "solve finished";
+    //sendMessage( "solve finished";
 
 }
 void Solver::ssReadySEP()
 {
 
-    //BOOST_LOG_TRIVIAL(debug) << "SSolver ready SEP";
+    //sendMessage( "SSolver ready SEP";
     stars = stellarSolver->getStarList();
     for (int i = 0; i < stars.size(); i++)
     {
         HFRavg = (i * HFRavg + stars[i].HFR) / (i + 1);
     }
-    BOOST_LOG_TRIVIAL(debug) << "SSolver Ready : HFRavg = " << HFRavg;
+    sendMessage( "SSolver Ready : HFRavg = " + QString::number(HFRavg));
     disconnect(stellarSolver, &StellarSolver::ready, this, &Solver::ssReadySEP);
     emit successSEP();
     return;
@@ -136,4 +136,11 @@ void Solver::ssReadySolve()
 void Solver::sslogOutput(QString text)
 {
     emit solverLog(text);
+}
+void Solver::sendMessage(const QString &pMessage)
+{
+    QString messageWithDateTime = "[" + QDateTime::currentDateTime().toString(Qt::ISODateWithMs) + "]-" + pMessage;
+    QDebug debug = qDebug();
+    debug.noquote();
+    debug << messageWithDateTime;
 }

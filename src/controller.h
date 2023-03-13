@@ -5,7 +5,7 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 //#include <QtSql/QSqlError>
-#include <boost/log/trivial.hpp>
+
 
 #include <basemodule.h>
 

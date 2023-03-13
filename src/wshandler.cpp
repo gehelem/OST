@@ -1,7 +1,6 @@
 #include <QCoreApplication>
 #include <QtCore>
 #include "wshandler.h"
-#include <boost/log/trivial.hpp>
 
 /*!
 
@@ -18,7 +17,7 @@ WShandler::WShandler(QObject *parent)
         connect(m_pWebSocketServer, &QWebSocketServer::newConnection, this, &WShandler::onNewConnection);
         connect(m_pWebSocketServer, &QWebSocketServer::closed, this, &WShandler::closed);
     }
-    BOOST_LOG_TRIVIAL(debug) << "OST WS server listening";
+    sendMessage("OST WS server listening");
 }
 
 
@@ -49,7 +48,7 @@ void WShandler::sendbinary(QByteArray *data)
 
 void WShandler::onNewConnection()
 {
-    BOOST_LOG_TRIVIAL(debug) << "New WS client connection";
+    sendMessage("New WS client connection");
     QWebSocket *pSocket = m_pWebSocketServer->nextPendingConnection();
     connect(pSocket, &QWebSocket::textMessageReceived, this, &WShandler::processTextMessage);
     connect(pSocket, &QWebSocket::disconnected, this, &WShandler::socketDisconnected);
@@ -65,7 +64,7 @@ void WShandler::processTextMessage(QString message)
     QJsonDocument jsonResponse = QJsonDocument::fromJson(_mess.toUtf8()); // garder
     emit textRcv(message);
     QJsonObject  obj = jsonResponse.object(); // garder
-    BOOST_LOG_TRIVIAL(debug) << "OST server received json" << message.toStdString();
+    sendMessage("OST server received json" + message);
     if (obj["evt"].toString() == "Freadall")
     {
         //sendAll();
@@ -110,13 +109,13 @@ void WShandler::sendJsonMessage(QJsonObject json)
     //QString strJson(jsondoc.toJson(QJsonDocument::Indented)); // version lisible
     QString strJson(jsondoc.toJson(QJsonDocument::Compact)); // version compactée
     sendmessage(strJson);
-    //BOOST_LOG_TRIVIAL(debug) << "WS handler sends : " << strJson.toStdString();
+    //sendMessage("WS handler sends : " + strJson);
 }
 
 void WShandler::processBinaryMessage(QByteArray message)
 {
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
-    qDebug("OST server received binary message");
+    sendMessage("OST server received binary message");
 
     if (pClient)
     {
@@ -127,7 +126,7 @@ void WShandler::processBinaryMessage(QByteArray message)
 void WShandler::socketDisconnected()
 {
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
-    qDebug("OST client disconnected");
+    sendMessage("OST client disconnected");
     if (pClient)
     {
         m_clients.removeAll(pClient);
@@ -271,4 +270,11 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
     }
 
 
+}
+void WShandler::sendMessage(const QString &pMessage)
+{
+    QString messageWithDateTime = "[" + QDateTime::currentDateTime().toString(Qt::ISODateWithMs) + "]-" + pMessage;
+    QDebug debug = qDebug();
+    debug.noquote();
+    debug << messageWithDateTime;
 }

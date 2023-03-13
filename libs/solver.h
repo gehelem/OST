@@ -7,7 +7,6 @@
 
 //Includes for this project
 #include <stellarsolver.h>
-#include <boost/log/trivial.hpp>
 
 class Solver : public QObject
 {
@@ -43,6 +42,8 @@ class Solver : public QObject
             FITSImage::getShortParityText(FITSImage::Parity::BOTH);
             FITSImage::getParityText(FITSImage::Parity::BOTH);
         }
+        void sendMessage(const QString &pMessage);
+
 
 };
 #endif
