@@ -46,62 +46,6 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         bool frameSet(QString devicename, double x, double y, double width, double height);
         bool frameReset(QString devicename);
 
-
-        /*indi messages */
-        virtual void serverConnected() override
-        {
-
-        }
-        virtual void serverDisconnected(int exit_code) override
-        {
-            Q_UNUSED(exit_code);
-        }
-        virtual void newDevice(INDI::BaseDevice baseDevice) override
-        {
-            Q_UNUSED(baseDevice);
-        }
-        virtual void removeDevice(INDI::BaseDevice baseDevice) override
-        {
-            Q_UNUSED(baseDevice);
-        }
-        virtual void newProperty(INDI::Property property) override
-        {
-            Q_UNUSED(property);
-        }
-        virtual void removeProperty(INDI::Property property) override
-        {
-            Q_UNUSED(property);
-        }
-        /*virtual void newText(ITextVectorProperty *tvp)
-        {
-            Q_UNUSED(tvp);
-        }
-        virtual void newSwitch(ISwitchVectorProperty *svp)
-        {
-            Q_UNUSED(svp);
-        }
-        virtual void newLight(ILightVectorProperty *lvp)
-        {
-            Q_UNUSED(lvp);
-        }
-        virtual void newNumber(INumberVectorProperty *nvp)
-        {
-            Q_UNUSED(nvp);
-        }
-        virtual void newBLOB(IBLOB *bp)
-        {
-            Q_UNUSED(bp);
-        }*/
-        virtual void newMessage(INDI::BaseDevice baseDevice, int messageID) override
-        {
-            Q_UNUSED(baseDevice);
-            Q_UNUSED(messageID);
-        }
-        virtual void newUniversalMessage(std::string message) override
-        {
-            Q_UNUSED(message);
-        }
-
     private:
         void OnDispatchToIndiExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                            const QVariantMap &eventData) override;
