@@ -43,7 +43,7 @@ class fileio : public QObject
         bool loadImage(QString fileName);
         bool loadImageBufferOnly(QString fileName);
         bool loadFits(QString fileName);
-        bool loadBlob(IBLOB *bp);
+        bool loadBlob(INDI::PropertyBlob pblob);
         bool parseHeader();
         bool saveAsFITS(QString fileName, FITSImage::Statistic &imageStats, uint8_t *m_ImageBuffer, FITSImage::Solution solution,
                         QList<Record> &records, bool hasSolution);
