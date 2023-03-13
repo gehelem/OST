@@ -1,12 +1,8 @@
 #ifndef BASEMODULE_h_
 #define BASEMODULE_h_
 
-#include <QObject>
-#include <basedevice.h>
-#include <baseclient.h>
 #include <datastore.h>
 #include <dbmanager.h>
-#include <QVariant>
 /*!
  * This Class shouldn't be used as is
  * Every functionnal module should inherit it

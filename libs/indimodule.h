@@ -1,10 +1,8 @@
 #ifndef INDIMODULE_h_
 #define INDIMODULE_h_
-#include <QObject>
 #include <basemodule.h>
 #include <baseclient.h>
 #include <basedevice.h>
-#include <boost/log/trivial.hpp>
 
 
 /*!
