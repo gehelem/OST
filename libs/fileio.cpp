@@ -1,8 +1,6 @@
 #include "fileio.h"
 #include <QFileInfo>
 #include <QtConcurrent>
-#include <boost/log/trivial.hpp>
-#include "stretch.h"
 
 fileio::fileio()
 {
@@ -284,17 +282,18 @@ bool fileio::loadOtherFormat(QString fileName)
 }
 //This method was copied and pasted and modified from the method privateLoad in fitsdata in KStars
 //It loads a FITS file, reads the FITS Headers, and loads the data from the image
-bool fileio::loadBlob(IBLOB *bp)
+bool fileio::loadBlob(INDI::PropertyBlob pblob)
 {
     justLoadBuffer = false;
     int status = 0, anynullptr = 0;
     long naxes[3];
-    size_t bsize = static_cast<size_t>(bp->bloblen);
 
-    if (fits_open_memfile(&fptr, "", READONLY, &bp->blob, &bsize, 0, NULL, &status) )
+    size_t bsize = static_cast<size_t>(pblob[0].getBlobLen());
+
+    if (fits_open_memfile(&fptr, "", READONLY, &pblob[0].cast()->blob, &bsize, 0, NULL, &status) )
 
     {
-        BOOST_LOG_TRIVIAL(debug) << "IMG Unsupported type or read error loading FITS blob";
+        sendMessage("IMG Unsupported type or read error loading FITS blob");
         return false;
     }
     else
@@ -1481,4 +1480,11 @@ void fileio::CalcHisto(void)
     m_HistogramConstructed = true;
     //emit histogramReady();
 
+}
+void fileio::sendMessage(const QString &pMessage)
+{
+    QString messageWithDateTime = "[" + QDateTime::currentDateTime().toString(Qt::ISODateWithMs) + "]-" + pMessage;
+    QDebug debug = qDebug();
+    debug.noquote();
+    debug << messageWithDateTime;
 }

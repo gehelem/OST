@@ -57,7 +57,9 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
             sendMessage("createOstProperty KO : " + key);
         }
     }
-    setBLOBMode(B_ALSO, _camera.toStdString().c_str(), nullptr);
+    //setBLOBMode(B_ALSO, _camera.toStdString().c_str(), nullptr);
+    //enableDirectBlobAccess(_camera.toStdString().c_str(), nullptr);
+    //setBlobMode();
 
 }
 
@@ -95,10 +97,12 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                     {
                         if (setOstElementValue(keyprop, keyelt, false, false))
                         {
+                            connectIndi();
                             setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
                             connectDevice(_camera);
                             connectDevice(getOstElementValue("devices", "mount").toString());
                             setBLOBMode(B_ALSO, _camera.toStdString().c_str(), nullptr);
+                            enableDirectBlobAccess(_camera.toStdString().c_str(), nullptr);
                         }
                     }
                     if (keyelt == "shoot")
@@ -185,16 +189,19 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
     }
 }
 
-void Dummy::newBLOB(IBLOB *bp)
+void Dummy::newBLOB(INDI::PropertyBlob pblob)
 {
 
     if (
-        (QString(bp->bvp->device) == _camera)
+        (QString(pblob.getDeviceName()) == _camera)
     )
     {
+
+
         delete _image;
         _image = new fileio();
-        _image->loadBlob(bp);
+        _image->loadBlob(pblob);
+
 
         setOstPropertyAttribute("actions", "status", IPS_OK, true);
         setOstElementValue("imagevalues", "width", _image->getStats().width, false);
@@ -207,19 +214,32 @@ void Dummy::newBLOB(IBLOB *bp)
         setOstElementValue("imagevalues", "snr", _image->getStats().SNR, true);
         QList<fileio::Record> rec = _image->getRecords();
         stats = _image->getStats();
-        _image->saveAsFITS(getWebroot() + "/" + getModuleName() + QString(bp->bvp->device) + ".FITS", stats,
+        _image->saveAsFITS(getWebroot() + "/" + getModuleName() + QString(pblob.getDeviceName()) + ".FITS", stats,
                            _image->getImageBuffer(),
                            FITSImage::Solution(), rec, false);
 
         QImage rawImage = _image->getRawQImage();
-        rawImage.save(getWebroot() + "/" + getModuleName() + QString(bp->bvp->device) + ".jpeg", "JPG", 100);
-        setOstPropertyAttribute("testimage", "URL", getModuleName() + QString(bp->bvp->device) + ".jpeg", true);
+        rawImage.save(getWebroot() + "/" + getModuleName() + QString(pblob.getDeviceName()) + ".jpeg", "JPG", 100);
+        setOstPropertyAttribute("testimage", "URL", getModuleName() + QString(pblob.getDeviceName()) + ".jpeg", true);
 
     }
     setOstPropertyAttribute("actions", "status", IPS_OK, true);
 
 
 }
+void Dummy::updateProperty(INDI::Property property)
+{
+    if (strcmp(property.getName(), "CCD Simulator") == 0)
+    {
+        qDebug() << "updateProperty " << property.getName();
+    }
+    if (strcmp(property.getName(), "CCD1") == 0)
+    {
+        qDebug() << "updateProperty " << property.getName();
+        newBLOB(property);
+    }
+}
+
 void Dummy::OnSucessSEP()
 {
     setOstPropertyAttribute("actions", "status", IPS_OK, true);

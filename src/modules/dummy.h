@@ -25,11 +25,12 @@ class MODULE_INIT Dummy : public IndiModule
         void OnSucessSolve();
         void OnSolverLog(QString &text);
     private:
-        void newBLOB(IBLOB *bp) override;
+        void newBLOB(INDI::PropertyBlob pblob);
         QString _camera;
         QPointer<fileio> _image;
         Solver _solver;
         FITSImage::Statistic stats;
+        void updateProperty(INDI::Property property) override;
 
 
 

@@ -35,6 +35,8 @@ Controller::Controller(bool saveAllBlobs, const QString &webroot, const QString 
     //connect(wshandler, &WShandler::externalEvent, this, &Controller::OnExternalEvent);
     dbmanager = new DBManager();
     dbmanager->dbInit(_dbpath, QString());
+    //connect(dbmanager, SIGNAL(dbEvent), &Controller::OnModuleEvent);
+
 
     LoadModule("libostmaincontrol", "mainctl", "Maincontrol", "default");
 
@@ -96,7 +98,7 @@ bool Controller::LoadModule(QString lib, QString name, QString label, QString pr
                 QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
                 for (Basemodule *othermodule : othermodules)
                 {
-                    //BOOST_LOG_TRIVIAL(debug) << "child= " << othermodule->objectName().toStdString();
+                    //sendMessage("child= " + othermodule->objectName());
                     if (othermodule->getModuleName() != mod->getModuleName())
                     {
                         //connect(othermodule,&Basemodule::moduleEvent, mod,&Basemodule::OnExternalEvent);
@@ -122,7 +124,8 @@ bool Controller::LoadModule(QString lib, QString name, QString label, QString pr
 void Controller::OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                const QVariantMap &eventData)
 {
-    if (eventType == "mm")
+    Q_UNUSED(eventKey);
+    if (eventType == "mm" || eventType == "me" || eventType == "mw")
     {
         sendMessage(eventModule + "-" + eventData["message"].toString());
     }
@@ -135,7 +138,7 @@ void Controller::OnExternalEvent(const QString &eventType, const QString  &event
     //QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
     //QString strJson = QLatin1String(docByteArray);
 
-    //BOOST_LOG_TRIVIAL(debug) << "Controller OnExternalEvent : " << eventType.toStdString() << " : " << eventModule.toStdString() << eventKey.toStdString() << " : "<< " : " << strJson.toStdString();
+    //sendMessage("Controller OnExternalEvent : " + eventType + " : " + eventModule+ " : "+  eventKey + " : " + strJson);
 
 
     /* we should check here if incoming message is valid*/
@@ -199,11 +202,11 @@ void Controller::installFront(void)
     if (arch == "Y")
     {
         arch = "https://github.com/gehelem/ost-front/releases/download/WorkInProgress/html.tar.gz";
-        BOOST_LOG_TRIVIAL(debug) << "download default archive " << arch.toStdString();
+        sendMessage("download default archive " + arch);
     }
     else
     {
-        BOOST_LOG_TRIVIAL(debug) << "download specific archive " << arch.toStdString();
+        sendMessage("download specific archive " + arch);
     }
 
     _process = new QProcess(this);
@@ -211,9 +214,9 @@ void Controller::installFront(void)
     connect(_process, &QProcess::readyReadStandardError, this, &Controller::processError);
     connect(_process, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this,
             &Controller::processFinished);
-    qDebug() << "****************************";
-    qDebug() << "Install default web frontend";
-    qDebug() << "****************************";
+    sendMessage("****************************");
+    sendMessage("Install default web frontend");
+    sendMessage("****************************");
     if (_process->state() != 0)
     {
         qDebug() << "can't start process";
@@ -224,7 +227,6 @@ void Controller::installFront(void)
         QStringList arguments;
         arguments << "-rf" ;
         arguments << _webroot + "/html.tar.gz";
-        qDebug() << "+++++++++++++++++++++++++++++++++++++++++++++++++PROCESS ARGS (1)" << program << " " << arguments;
         _process->start(program, arguments);
         _process->waitForFinished();
         program = "wget";
@@ -234,7 +236,6 @@ void Controller::installFront(void)
         arguments << _webroot;
         arguments << " && ";
         arguments << "tar";
-        qDebug() << "+++++++++++++++++++++++++++++++++++++++++++++++++PROCESS ARGS (2)" << program << " " << arguments;
         _process->start(program, arguments);
         _process->waitForFinished();
         program = "tar";
@@ -243,7 +244,6 @@ void Controller::installFront(void)
         arguments << _webroot + "/html.tar.gz";
         arguments << "-C";
         arguments << _webroot;
-        qDebug() << "+++++++++++++++++++++++++++++++++++++++++++++++++PROCESS ARGS (3)" << program << " " << arguments;
         _process->start(program, arguments);
         _process->waitForFinished();
 
@@ -255,17 +255,17 @@ void Controller::installFront(void)
 }
 void Controller::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    qDebug() << "PROCESS FINISHED (" + QString::number(exitCode) + ")" + exitStatus;
+    sendMessage("PROCESS FINISHED (" + QString::number(exitCode) + ")" + exitStatus);
 }
 void Controller::processOutput()
 {
     QString output = _process->readAllStandardOutput();
-    qDebug() << "PROCESS LOG   : " << output;
+    sendMessage("PROCESS LOG   : " + output);
 }
 void Controller::processError()
 {
     QString output = _process->readAllStandardError();
-    qDebug() << "PROCESS ERROR : " + output;
+    sendMessage("PROCESS ERROR   : " + output);
 
 }
 void Controller::sendMessage(const QString &pMessage)
@@ -274,6 +274,4 @@ void Controller::sendMessage(const QString &pMessage)
     QDebug debug = qDebug();
     debug.noquote();
     debug << messageWithDateTime;
-
-    // should we add a dispatch over WS ?
 }

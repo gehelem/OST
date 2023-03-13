@@ -1,6 +1,5 @@
 #ifndef DATASTORE_h_
 #define DATASTORE_h_
-#include <QVariant>
 #include <baseroot.h>
 
 /** @class Datastore

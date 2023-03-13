@@ -7,6 +7,8 @@
 #include <QVariant>
 #include <basedevice.h>
 #include <baseclient.h>
+#include <libstellarsolver/parameters.h>
+#include <libstellarsolver/structuredefinitions.h>
 
 //CFitsio Includes
 #include "longnam.h"
@@ -18,8 +20,6 @@
 #include "dms.h"
 #include "bayer.h"
 
-#include "parameters.h"
-#include "structuredefinitions.h"
 
 
 class fileio : public QObject
@@ -43,7 +43,7 @@ class fileio : public QObject
         bool loadImage(QString fileName);
         bool loadImageBufferOnly(QString fileName);
         bool loadFits(QString fileName);
-        bool loadBlob(IBLOB *bp);
+        bool loadBlob(INDI::PropertyBlob pblob);
         bool parseHeader();
         bool saveAsFITS(QString fileName, FITSImage::Statistic &imageStats, uint8_t *m_ImageBuffer, FITSImage::Solution solution,
                         QList<Record> &records, bool hasSolution);
@@ -141,6 +141,23 @@ class fileio : public QObject
 
     signals:
         void logOutput(QString logText);
+
+    private:
+        void DummyFunctionToAvoidDefinedButNotUsedWarnings(void)
+        {
+            FITSImage::getColorChannelText(FITSImage::ColorChannel::RED);
+            FITSImage::getShortParityText(FITSImage::Parity::BOTH);
+            FITSImage::getParityText(FITSImage::Parity::BOTH);
+            SSolver::getLogLevelString(SSolver::logging_level::LOG_ALL);
+            SSolver::getMultiAlgoString(SSolver::MultiAlgo::MULTI_AUTO);
+            SSolver::getCommandString(SSolver::ProcessType::EXTRACT, SSolver::EXTRACTOR_INTERNAL, SSolver::SOLVER_STELLARSOLVER);
+            SSolver::getScaleUnitString(SSolver::ScaleUnits::ARCMIN_WIDTH);
+            SSolver::getConvFilterString(SSolver::ConvFilterType::CONV_CUSTOM);
+            SSolver::getShapeString(SSolver::SHAPE_CIRCLE);
+
+        }
+        void sendMessage(const QString &pMessage);
+
 };
 
 #endif // FILEIO_H

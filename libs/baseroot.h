@@ -3,6 +3,13 @@
 #include <QObject>
 #include <QList>
 #include <QVariant>
+#include <QtCore>
+#include <QtConcurrent>
+#include <QCoreApplication>
+#include <QtSql/QSql>
+#include <QtSql/QSqlDatabase>
+#include <QtSql/QSqlQuery>
+#include <QtSql/QSqlError>
 
 class Baseroot
 {
@@ -67,6 +74,7 @@ class Baseroot
         void sendMessage(const QString &pMessage);
         void sendError(const QString &pMessage);
         void sendWarning(const QString &pMessage);
+        void sendConsole(const QString &pMessage);
 
 
         virtual void OnModuleEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
@@ -84,6 +92,7 @@ class Baseroot
         int mMessagesSize = 20;
         int mErrorsSize = 20;
         int mWarningsSize = 20;
+
 }
 ;
 #endif

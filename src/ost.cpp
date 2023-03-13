@@ -1,19 +1,20 @@
 #include <QGuiApplication>
 #include "controller.h"
-#include <boost/log/trivial.hpp>
 #include "version.cc"
 
 /*!
  * Entry point
  * Should become some kind of service to start & respawn with host
  */
+void sendMessage(const QString &pMessage);
+
 int main(int argc, char *argv[])
 {
 
-    BOOST_LOG_TRIVIAL(info) << "OST starting up";
-    BOOST_LOG_TRIVIAL(info) << "GIT_SHA1 " << Version::GIT_SHA1;
-    BOOST_LOG_TRIVIAL(info) << "GIT_DATE " << Version::GIT_DATE;
-    BOOST_LOG_TRIVIAL(info) << "GIT_COMMIT_SUBJECT " << Version::GIT_COMMIT_SUBJECT;
+    sendMessage("OST starting up");
+    sendMessage("Git Hash              =" + QString::fromStdString(Version::GIT_SHA1));
+    sendMessage("Git Date              =" + QString::fromStdString(Version::GIT_DATE));
+    sendMessage("Git Commit subject    =" + QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
     QGuiApplication app(argc, argv, false);
     QGuiApplication::setOrganizationName("alazob.team");
     QGuiApplication::setApplicationName("ost");
@@ -47,11 +48,11 @@ int main(int argc, char *argv[])
     QString installFront = argParser.value(installFrontOption);
     QString conf = argParser.value(configurationOption);
 
-    BOOST_LOG_TRIVIAL(debug) << "Webroot  =" << webroot.toStdString();
-    BOOST_LOG_TRIVIAL(debug) << "DB Path  =" << dbPath.toStdString();
-    BOOST_LOG_TRIVIAL(debug) << "Modules Library Path  =" << libPath.toStdString();
-    BOOST_LOG_TRIVIAL(debug) << "Install front  =" << installFront.toStdString();
-    BOOST_LOG_TRIVIAL(debug) << "Load configuration  =" << conf.toStdString();
+    sendMessage("Webroot               =" + webroot);
+    sendMessage("DB Path               =" + dbPath);
+    sendMessage("Modules Library Path  =" + libPath);
+    sendMessage("Install front         =" + installFront);
+    sendMessage("Load configuration    =" + conf);
 
     Controller controller(
         //&app,
@@ -66,10 +67,17 @@ int main(int argc, char *argv[])
     Q_UNUSED(controller);
 
     int nAppReturnCode = QGuiApplication::exec();
-    BOOST_LOG_TRIVIAL(info) << "OST app terminated with status : " << nAppReturnCode;
+    sendMessage("OST app terminated with status : " + QString(nAppReturnCode));
     return nAppReturnCode;
 
 }
 
+void sendMessage(const QString &pMessage)
+{
+    QString messageWithDateTime = "[" + QDateTime::currentDateTime().toString(Qt::ISODateWithMs) + "]-" + pMessage;
+    QDebug debug = qDebug();
+    debug.noquote();
+    debug << messageWithDateTime;
+}
 
 
