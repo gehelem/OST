@@ -43,6 +43,8 @@ Maincontrol::~Maincontrol()
 void Maincontrol::OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                     const QVariantMap &eventData)
 {
+    Q_UNUSED(eventType);
+    Q_UNUSED(eventKey);
     //BOOST_LOG_TRIVIAL(debug) << "mainctl OnMyExternalEvent - recv : " << getName().toStdString() << "-" <<
     //                         eventType.toStdString() <<
     //                         "-" << eventKey.toStdString();

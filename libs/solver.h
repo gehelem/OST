@@ -36,6 +36,13 @@ class Solver : public QObject
         void successSEP(void);
         void successSolve(void);
         void solverLog(QString &text);
+    private:
+        void DummyFunctionToAvoidDefinedButNotUsedWarnings(void)
+        {
+            FITSImage::getColorChannelText(FITSImage::ColorChannel::RED);
+            FITSImage::getShortParityText(FITSImage::Parity::BOTH);
+            FITSImage::getParityText(FITSImage::Parity::BOTH);
+        }
 
 };
 #endif

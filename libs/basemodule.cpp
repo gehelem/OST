@@ -216,6 +216,7 @@ void Basemodule::sendDump(void)
 void Basemodule::OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                const QVariantMap &eventData)
 {
+    Q_UNUSED(eventModule);
     emit moduleEvent(eventType, this->getModuleName(), eventKey, eventData);
 }
 bool Basemodule::setClassName(const QString &pClassName)

@@ -122,6 +122,7 @@ bool Controller::LoadModule(QString lib, QString name, QString label, QString pr
 void Controller::OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                const QVariantMap &eventData)
 {
+    Q_UNUSED(eventKey);
     if (eventType == "mm")
     {
         sendMessage(eventModule + "-" + eventData["message"].toString());
