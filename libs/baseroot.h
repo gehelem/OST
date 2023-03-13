@@ -84,6 +84,7 @@ class Baseroot
         int mMessagesSize = 20;
         int mErrorsSize = 20;
         int mWarningsSize = 20;
+
 }
 ;
 #endif

@@ -10,7 +10,6 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
-#include <boost/log/trivial.hpp>
 
 
 class DBManager : virtual public Baseroot
@@ -29,6 +28,10 @@ class DBManager : virtual public Baseroot
         QString mDbPath;
         QSqlDatabase mDb;
         QSqlQuery mQuery;
+    signals:
+        void dbEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+                     const QVariantMap &pEventData);
+
 };
 
 

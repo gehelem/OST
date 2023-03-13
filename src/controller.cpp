@@ -35,6 +35,8 @@ Controller::Controller(bool saveAllBlobs, const QString &webroot, const QString 
     //connect(wshandler, &WShandler::externalEvent, this, &Controller::OnExternalEvent);
     dbmanager = new DBManager();
     dbmanager->dbInit(_dbpath, QString());
+    //connect(dbmanager, SIGNAL(dbEvent), &Controller::OnModuleEvent);
+
 
     LoadModule("libostmaincontrol", "mainctl", "Maincontrol", "default");
 
@@ -123,7 +125,7 @@ void Controller::OnModuleEvent(const QString &eventType, const QString  &eventMo
                                const QVariantMap &eventData)
 {
     Q_UNUSED(eventKey);
-    if (eventType == "mm")
+    if (eventType == "mm" || eventType == "me" || eventType == "mw")
     {
         sendMessage(eventModule + "-" + eventData["message"].toString());
     }

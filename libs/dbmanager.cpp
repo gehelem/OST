@@ -1,5 +1,4 @@
 #include <QtCore>
-#include <boost/log/trivial.hpp>
 #include "dbmanager.h"
 
 DBManager::DBManager()
@@ -25,7 +24,7 @@ bool DBManager::dbInit(const QString &pDbPath, const QString &pConnectionName)
 
         if(!mDb.open())
         {
-            sendMessage("dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+            sendError("dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
             return false;
         }
         if (!mDbExists) CreateDatabaseStructure();
@@ -33,7 +32,7 @@ bool DBManager::dbInit(const QString &pDbPath, const QString &pConnectionName)
     }
     else
     {
-        sendMessage("DatabaseConnect - ERROR: QSQLITE driver unavailable");
+        sendError("DatabaseConnect - ERROR: QSQLITE driver unavailable");
         return false;
     }
     return false;
@@ -42,7 +41,7 @@ bool DBManager::dbInit(const QString &pDbPath, const QString &pConnectionName)
 
 void DBManager::CreateDatabaseStructure()
 {
-    qDebug() << "OST database creation with default values";
+    sendMessage("OST database creation with default values");
     QFile _file;
     _file.setFileName(":db.sql");
     _file.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -58,8 +57,8 @@ void DBManager::CreateDatabaseStructure()
         {
             if (!mQuery.exec(_sql))
             {
-                BOOST_LOG_TRIVIAL(debug) <<  "CreateDatabaseStructure ERROR SQL =" << _sql.toStdString();
-                BOOST_LOG_TRIVIAL(debug) << "CreateDatabaseStructure - ERROR : " << mQuery.lastError().text().toLocal8Bit().data();
+                sendError("CreateDatabaseStructure ERROR SQL =" + _sql);
+                sendError("CreateDatabaseStructure - ERROR : " + mQuery.lastError().text());
             }
         }
 
@@ -76,8 +75,8 @@ bool DBManager::setDbProfile(const QString &pModuleType, const QString &pProfile
                   pProfileName + "','" + strJson + "');";
     if (!mQuery.exec(sql))
     {
-        BOOST_LOG_TRIVIAL(debug) << "setProfile - ERROR SQL =" << sql.toStdString();
-        BOOST_LOG_TRIVIAL(debug) << "setProfile - ERROR : " << mQuery.lastError().text().toLocal8Bit().data();
+        sendError("setProfile - ERROR SQL =" + sql);
+        sendError("setProfile - ERROR : " + mQuery.lastError().text());
         return false;
     }
     return true;
@@ -88,8 +87,8 @@ bool DBManager::getDbProfile(const QString &pModuleType, const QString &pProfile
                    "'";
     if (!mQuery.exec(_sql))
     {
-        BOOST_LOG_TRIVIAL(debug) << "getProfile - ERROR SQL =" << _sql.toStdString();
-        BOOST_LOG_TRIVIAL(debug) << "getProfile - ERROR : " << mQuery.lastError().text().toLocal8Bit().data();
+        sendError("getProfile - ERROR SQL =" + _sql);
+        sendError("getProfile - ERROR : " + mQuery.lastError().text());
     }
     while (mQuery.next())
     {
@@ -105,8 +104,8 @@ bool DBManager::getDbProfiles(QString moduleType, QVariantMap &result )
     QString _sql = "SELECT PROFILENAME,ALLVALUES FROM PROFILES WHERE MODULETYPE='" + moduleType + "' ";
     if (!mQuery.exec(_sql))
     {
-        BOOST_LOG_TRIVIAL(debug) << "getProfiles - ERROR SQL =" << _sql.toStdString();
-        BOOST_LOG_TRIVIAL(debug) << "getProfiles - ERROR : " << mQuery.lastError().text().toLocal8Bit().data();
+        sendError("getProfiles - ERROR SQL =" + _sql);
+        sendError("getProfiles - ERROR : " + mQuery.lastError().text());
     }
     while (mQuery.next())
     {
@@ -123,8 +122,8 @@ bool DBManager::getDbConfiguration(QString configName, QVariantMap &result )
     QString _sql = "SELECT MODULENAME,MODULETYPE,PROFILENAME FROM CONFIGURATIONS WHERE CONFIGNAME='" + configName + "'";
     if (!mQuery.exec(_sql))
     {
-        BOOST_LOG_TRIVIAL(debug) << "getConfiguration - ERROR SQL =" << _sql.toStdString();
-        BOOST_LOG_TRIVIAL(debug) << "getConfiguration - ERROR : " << mQuery.lastError().text().toLocal8Bit().data();
+        sendError("getConfiguration - ERROR SQL =" + _sql);
+        sendError("getConfiguration - ERROR : " + mQuery.lastError().text());
     }
     while (mQuery.next())
     {
