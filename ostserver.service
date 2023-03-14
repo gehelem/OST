@@ -1,0 +1,19 @@
+[Unit]
+Description=Ostserver  service
+
+[Service]
+WorkingDirectory=/home/ost
+Type=simple
+User=ost
+Group=ost
+TimeoutStartSec=0
+Restart=on-failure
+RestartSec=30s
+#ExecStartPre=
+ExecStart=/bin/bash /usr/bin/ostserver_service.sh
+SyslogIdentifier=Ostserver
+#ExecStop=
+
+[Install]
+WantedBy=multi-user.target
+ 
