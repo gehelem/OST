@@ -1,0 +1,11 @@
+Package: ostserver
+Version: 1.0-1
+Architecture: amd64
+Maintainer: gilles <gilles@joag.fr>
+Installed-Size: 2300
+Depends: libindi1, libstellarsolver, gsc
+Section: science
+Priority: optional
+Homepage: https://github.com/gehelem/OST
+Description: Observatoire Sans Tête
+ Light and headless astrophotography automation tool
