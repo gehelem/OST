@@ -1,35 +1,36 @@
+#!/bin/bash
 sudo add-apt-repository --yes ppa:gehelem/ostserver-daily
-sudo add-apt-repository --yes -ppa:mutlaqja/ppa
+sudo add-apt-repository --yes ppa:mutlaqja/ppa
 sudo apt update
-sudo apt install -y libindi1 libstellarsolver ostserver nginx gsc pip
+sudo apt install -y libindi1 libstellarsolver ostserver ostmodules nginx gsc pip
 
 sudo mkdir /usr/share/astrometry
 sudo chmod 777 -R /usr/share/astrometry
 cd /usr/share/astrometry
-wget http://broiler.astrometry.net/~dstn/4200/index-4206-00.fits
-wget http://broiler.astrometry.net/~dstn/4200/index-4206-01.fits
-wget http://broiler.astrometry.net/~dstn/4200/index-4206-02.fits
-wget http://broiler.astrometry.net/~dstn/4200/index-4206-03.fits
-wget http://broiler.astrometry.net/~dstn/4200/index-4206-04.fits
-wget http://broiler.astrometry.net/~dstn/4200/index-4206-05.fits
-wget http://broiler.astrometry.net/~dstn/4200/index-4206-06.fits
-wget http://broiler.astrometry.net/~dstn/4200/index-4206-07.fits
-wget http://broiler.astrometry.net/~dstn/4200/index-4206-08.fits
-wget http://broiler.astrometry.net/~dstn/4200/index-4206-09.fits
-wget http://broiler.astrometry.net/~dstn/4200/index-4206-10.fits
-wget http://broiler.astrometry.net/~dstn/4200/index-4206-11.fits
-wget http://broiler.astrometry.net/~dstn/4200/index-4207-00.fits
-wget http://broiler.astrometry.net/~dstn/4200/index-4207-01.fits
-wget http://broiler.astrometry.net/~dstn/4200/index-4207-02.fits
-wget http://broiler.astrometry.net/~dstn/4200/index-4207-03.fits
-wget http://broiler.astrometry.net/~dstn/4200/index-4207-04.fits
-wget http://broiler.astrometry.net/~dstn/4200/index-4207-05.fits
-wget http://broiler.astrometry.net/~dstn/4200/index-4207-06.fits
-wget http://broiler.astrometry.net/~dstn/4200/index-4207-07.fits
-wget http://broiler.astrometry.net/~dstn/4200/index-4207-08.fits
-wget http://broiler.astrometry.net/~dstn/4200/index-4207-09.fits
-wget http://broiler.astrometry.net/~dstn/4200/index-4207-10.fits
-wget http://broiler.astrometry.net/~dstn/4200/index-4207-11.fits
+#wget http://broiler.astrometry.net/~dstn/4200/index-4206-00.fits
+#wget http://broiler.astrometry.net/~dstn/4200/index-4206-01.fits
+#wget http://broiler.astrometry.net/~dstn/4200/index-4206-02.fits
+#wget http://broiler.astrometry.net/~dstn/4200/index-4206-03.fits
+#wget http://broiler.astrometry.net/~dstn/4200/index-4206-04.fits
+#wget http://broiler.astrometry.net/~dstn/4200/index-4206-05.fits
+#wget http://broiler.astrometry.net/~dstn/4200/index-4206-06.fits
+#wget http://broiler.astrometry.net/~dstn/4200/index-4206-07.fits
+#wget http://broiler.astrometry.net/~dstn/4200/index-4206-08.fits
+#wget http://broiler.astrometry.net/~dstn/4200/index-4206-09.fits
+#wget http://broiler.astrometry.net/~dstn/4200/index-4206-10.fits
+#wget http://broiler.astrometry.net/~dstn/4200/index-4206-11.fits
+#wget http://broiler.astrometry.net/~dstn/4200/index-4207-00.fits
+#wget http://broiler.astrometry.net/~dstn/4200/index-4207-01.fits
+#wget http://broiler.astrometry.net/~dstn/4200/index-4207-02.fits
+#wget http://broiler.astrometry.net/~dstn/4200/index-4207-03.fits
+#wget http://broiler.astrometry.net/~dstn/4200/index-4207-04.fits
+#wget http://broiler.astrometry.net/~dstn/4200/index-4207-05.fits
+#wget http://broiler.astrometry.net/~dstn/4200/index-4207-06.fits
+#wget http://broiler.astrometry.net/~dstn/4200/index-4207-07.fits
+#wget http://broiler.astrometry.net/~dstn/4200/index-4207-08.fits
+#wget http://broiler.astrometry.net/~dstn/4200/index-4207-09.fits
+#wget http://broiler.astrometry.net/~dstn/4200/index-4207-10.fits
+#wget http://broiler.astrometry.net/~dstn/4200/index-4207-11.fits
 wget http://broiler.astrometry.net/~dstn/4200/index-4208.fits
 wget http://broiler.astrometry.net/~dstn/4200/index-4209.fits
 wget http://broiler.astrometry.net/~dstn/4200/index-4210.fits
