@@ -13,6 +13,9 @@ CREATE TABLE IF NOT EXISTS CONFIGURATIONS (
         PROFILENAME    TEXT NOT NULL,
         PRIMARY KEY("CONFIGNAME","MODULENAME")
 );
---INSERT INTO CONFIGURATIONS VALUES ('default','My Allsky','allsky','default');
 INSERT INTO CONFIGURATIONS VALUES ('default','My dummy module','dummy','default');
-INSERT INTO CONFIGURATIONS VALUES ('justindipanel','Indipanel','indipanel','default');
+INSERT INTO CONFIGURATIONS VALUES ('modules','My dummy module','dummy','default');
+INSERT INTO CONFIGURATIONS VALUES ('modules','Indipanel','indipanel','default');
+INSERT INTO CONFIGURATIONS VALUES ('modules','My Allsky','allsky','default');
+INSERT INTO CONFIGURATIONS VALUES ('modules','My CCD inspector','inspector','default');
+INSERT INTO CONFIGURATIONS VALUES ('modules','My Focuser','focuser','default');
