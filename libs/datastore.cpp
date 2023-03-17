@@ -623,7 +623,7 @@ bool Datastore::deleteOstPropertyLine(const QString &pPropertyName, const double
         }
         else
         {
-            qDebug() << "deleteOstPropertyLine :" << pPropertyName << ">> " << pPropertyName;
+            //qDebug() << "deleteOstPropertyLine :" << pPropertyName << ">> " << pPropertyName;
             QVariantMap _elements = _prop["elements"].toMap();
             QVariantList _arr = _prop["grid"].toList();
             _arr.removeAt(pLine);
