@@ -547,12 +547,14 @@ bool Datastore::newOstPropertyLine(const QString &pPropertyName, const QVariantM
             _arr.push_back(_cols);
             _prop["grid"] = _arr;
             QVariantMap _elementsEmpty;
+            long int gridsize = 0;
             for(QVariantMap::const_iterator _elt = _elements.begin(); _elt != _elements.end(); ++_elt)
             {
                 //qDebug() << _elt.key() << _elt.value();
                 QVariantMap _myelt = _elements[_elt.key()].toMap();
                 QVariantMap _myEmptyElt = _elements[_elt.key()].toMap();
                 QVariantList _mylist = _myelt["gridvalues"].toList();
+                gridsize = _mylist.count();
                 QVariantList _myEmptyList;
                 QVariant _myVal;
                 if (strcmp(_myelt["value"].typeName(), "double") == 0)
@@ -586,6 +588,18 @@ bool Datastore::newOstPropertyLine(const QString &pPropertyName, const QVariantM
             _prop["elements"] = _elements;
             mProperties[pPropertyName] = _prop;
             emit OnModuleEvent("pushvalues", QString(), pPropertyName, _elementsEmpty);
+
+            long int gridlimit = 200;
+
+            if (mProperties[pPropertyName].toMap().contains("gridlimit"))
+            {
+                gridlimit = mProperties[pPropertyName].toMap()["gridlimit"].toLongLong();
+            }
+            if (gridsize >= gridlimit )
+            {
+                deleteOstPropertyLine(pPropertyName, 0);
+            }
+
             return true;
 
         }

@@ -325,6 +325,7 @@
         "group": "Grids",
         "permission": 2,
         "grid":0,
+        "gridlimit":5,
         "GXY":{
             "X":"X",
             "Y":"Y"
@@ -361,6 +362,7 @@
         "group": "AAAGrids",
         "permission": 2,
         "grid":0,
+        "gridlimit":5,
         "propertyLabel": "Grid example 2",
         "elements": {
             "X": {
