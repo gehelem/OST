@@ -284,25 +284,25 @@ QVariantList Datastore::getOstElementGrid(const QString &pPropertyName, const QS
                 }
                 else
                 {
-                    sendWarning("setOstElementGrid - property " + pPropertyName + " element " + pElementName + " has no grid.");
+                    sendWarning("getOstElementGrid - property " + pPropertyName + " element " + pElementName + " has no grid.");
                     return QVariantList();
                 }
             }
             else
             {
-                sendWarning("setOstElementGrid - property " + pPropertyName + " has no " + pElementName + " element.");
+                sendWarning("getOstElementGrid - property " + pPropertyName + " has no " + pElementName + " element.");
                 return QVariantList();
             }
         }
         else
         {
-            sendWarning("setOstElementGrid - property " + pPropertyName + " contains no elements.");
+            sendWarning("getOstElementGrid - property " + pPropertyName + " contains no elements.");
             return QVariantList();
         }
     }
     else
     {
-        sendWarning("setOstElementGrid - property " + pPropertyName + " not found.");
+        sendWarning("getOstElementGrid - property " + pPropertyName + " not found.");
         return QVariantList();
     }
 
@@ -710,5 +710,48 @@ bool Datastore::updateOstPropertyLine(const QString &pPropertyName, const double
         sendMessage("updateOstPropertyLine : Can't add line to inexistant property " + pPropertyName);
         return false;
     }
+
+}
+QVariant Datastore::getOstElementLineValue(const QString &pPropertyName, const QString &pElementName, const double &pLine)
+{
+    if (getOstElementGrid(pPropertyName, pElementName).isEmpty())
+    {
+        sendWarning("Try to read an empty grid (" + pPropertyName + "/" + pElementName + ")");
+        return QVariant();
+
+    }
+    else
+    {
+        if (pLine >= getOstElementGrid(pPropertyName, pElementName).count())
+        {
+            sendWarning("Try to access inexistant line grid (" + pPropertyName + "/" + pElementName + ") size=" + getOstElementGrid(
+                            pPropertyName, pElementName).count() + " vs requested=" + pLine);
+            return QVariant();
+        }
+        else
+        {
+            return getOstElementGrid(pPropertyName, pElementName)[pLine];
+        }
+    }
+}
+bool Datastore::setOstElementLineValue (const QString &pPropertyName, const QString &pElementName, const double &pLine,
+                                        const QVariant &pElementValue)
+{
+    QVariantList elementList  = getOstElementGrid(pPropertyName, pElementName);
+    if (pLine >= elementList.count())
+    {
+        sendWarning("invalid line (" + pPropertyName + "/" + pElementName + ") size=" + QString::number(
+                        elementList.count()) + " vs requested(-1)=" +
+                    QString::number(pLine));
+        return false;
+    }
+    else
+    {
+        elementList[pLine] = pElementValue;
+        setOstElementGrid(pPropertyName, pElementName, elementList, true);
+        OnModuleEvent("ap", QString(), pPropertyName, mProperties[pPropertyName].toMap());
+        return true;
+    }
+
 
 }
