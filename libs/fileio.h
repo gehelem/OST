@@ -47,6 +47,8 @@ class fileio : public QObject
         bool parseHeader();
         bool saveAsFITS(QString fileName, FITSImage::Statistic &imageStats, uint8_t *m_ImageBuffer, FITSImage::Solution solution,
                         QList<Record> &records, bool hasSolution);
+        bool saveAsFITSSimple(QString fileName);
+
         bool loadOtherFormat(QString fileName);
         bool checkDebayer();
         bool debayer();
