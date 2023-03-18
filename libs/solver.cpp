@@ -123,7 +123,7 @@ void Solver::ssReadySEP()
     {
         HFRavg = (i * HFRavg + stars[i].HFR) / (i + 1);
     }
-    sendMessage( "SSolver Ready : HFRavg = " + QString::number(HFRavg));
+    //sendMessage( "SSolver Ready : HFRavg = " + QString::number(HFRavg));
     disconnect(stellarSolver, &StellarSolver::ready, this, &Solver::ssReadySEP);
     emit successSEP();
     return;
