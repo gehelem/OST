@@ -875,6 +875,12 @@ bool fileio::parseHeader()
     return true;
 }
 
+bool fileio::saveAsFITSSimple(QString fileName)
+{
+    QList<Record> rec = getRecords();
+    return saveAsFITS(fileName, this->stats, m_ImageBuffer, FITSImage::Solution(), rec, false);
+}
+
 //This was copied and pasted and modified from ImageToFITS and injectWCS in fitsdata in KStars
 bool fileio::saveAsFITS(QString fileName, FITSImage::Statistic &imageStats, uint8_t *imageBuffer,
                         FITSImage::Solution solution, QList<Record> &records, bool hasSolution)
