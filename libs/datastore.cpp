@@ -3,7 +3,7 @@
 
 Datastore::Datastore()
 {
-    sendMessage("DataStore init");
+    //sendMessage("DataStore init");
 }
 Datastore::~Datastore()
 {
@@ -14,7 +14,7 @@ bool Datastore::createOstProperty(const QString &pPropertyName, const QString &p
 {
     if (mProperties.contains(pPropertyName))
     {
-        sendMessage("createOstProperty - property " + pPropertyName + " already exists.");
+        sendWarning("createOstProperty - property " + pPropertyName + " already exists.");
         return false;
     }
     else
@@ -59,13 +59,13 @@ QVariant Datastore::getOstPropertyValue(QString &pPropertyName)
         }
         else
         {
-            sendMessage("getPropertyValue - property " + pPropertyName + " contains no value.");
+            sendWarning("getPropertyValue - property " + pPropertyName + " contains no value.");
             return QVariant();
         }
     }
     else
     {
-        sendMessage("getPropertyValue - property " + pPropertyName + " not found.");
+        sendWarning("getPropertyValue - property " + pPropertyName + " not found.");
         return QVariant();
     }
 }
@@ -75,7 +75,7 @@ bool Datastore::createOstElement(const QString &pPropertyName, const QString &pE
 {
     if (!mProperties.contains(pPropertyName) )
     {
-        sendMessage(" createElement - property " + pPropertyName + " not found");
+        sendWarning(" createElement - property " + pPropertyName + " not found");
         return false;
     }
 
@@ -83,7 +83,7 @@ bool Datastore::createOstElement(const QString &pPropertyName, const QString &pE
     QVariantMap _elements = _prop["elements"].toMap();
     if (_elements.contains(pElementName) )
     {
-        sendMessage(" createElement - property " + pPropertyName + " : element " + pElementName + "already exists.");
+        sendWarning(" createElement - property " + pPropertyName + " : element " + pElementName + "already exists.");
         return false ;
     }
     QVariantMap _element;
@@ -99,7 +99,7 @@ bool Datastore::setOstElementValue(const QString &pPropertyName, const QString &
 {
     if (!mProperties.contains(pPropertyName) )
     {
-        sendMessage("setElementValue - property " + pPropertyName + " not found");
+        sendWarning("setElementValue - property " + pPropertyName + " not found");
         return false;
     }
 
@@ -111,7 +111,7 @@ bool Datastore::setOstElementValue(const QString &pPropertyName, const QString &
             QVariantMap _elements = _prop["elements"].toMap();
             if (!_elements.contains(pElementName) )
             {
-                sendMessage("setElementValue - property " + pPropertyName + " : element " + pElementName + " not found.");
+                sendWarning("setElementValue - property " + pPropertyName + " : element " + pElementName + " not found.");
                 return false;
             }
 
@@ -321,19 +321,19 @@ QVariant Datastore::getOstElementValue(const QString &pPropertyName, const QStri
             }
             else
             {
-                sendMessage("getElementValue - property " + pPropertyName + " has no " + pElementName + " element.");
+                sendWarning("getElementValue - property " + pPropertyName + " has no " + pElementName + " element.");
                 return QVariant();
             }
         }
         else
         {
-            sendMessage("getElementValue - property " + pPropertyName + " contains no elements.");
+            sendWarning("getElementValue - property " + pPropertyName + " contains no elements.");
             return QVariant();
         }
     }
     else
     {
-        sendMessage("getElementValue - property " + pPropertyName + " not found.");
+        sendWarning("getElementValue - property " + pPropertyName + " not found.");
         return QVariant();
     }
 
@@ -451,7 +451,7 @@ void Datastore::deleteOstProperty(const QString &pPropertyName)
     }
     else
     {
-        sendMessage("Can't delete inexistant property " + pPropertyName);
+        sendWarning("Can't delete inexistant property " + pPropertyName);
     }
 
 }
@@ -463,7 +463,7 @@ bool Datastore::pushOstElements         (const QString &pPropertyName)
         QVariantMap _prop = mProperties[pPropertyName].toMap();
         if (!_prop.contains("grid") )
         {
-            sendMessage("pushOstElements : No grid defined for property  " + pPropertyName);
+            sendWarning("pushOstElements : No grid defined for property  " + pPropertyName);
             return false;
         }
         else
@@ -484,7 +484,7 @@ bool Datastore::pushOstElements         (const QString &pPropertyName)
     }
     else
     {
-        sendMessage("pushOstElements : Can't add line to inexistant property " + pPropertyName);
+        sendWarning("pushOstElements : Can't add line to inexistant property " + pPropertyName);
         return false;
     }
 
@@ -496,7 +496,7 @@ bool Datastore::resetOstElements      (const QString &pPropertyName)
         QVariantMap _prop = mProperties[pPropertyName].toMap();
         if (!_prop.contains("grid") )
         {
-            sendMessage("No grid defined for property  " + pPropertyName);
+            sendWarning("No grid defined for property  " + pPropertyName);
             return false;
         }
         else
@@ -519,7 +519,7 @@ bool Datastore::resetOstElements      (const QString &pPropertyName)
     }
     else
     {
-        sendMessage("Can't reset inexistant property " + pPropertyName);
+        sendWarning("Can't reset inexistant property " + pPropertyName);
         return false;
     }
 
@@ -531,7 +531,7 @@ bool Datastore::newOstPropertyLine(const QString &pPropertyName, const QVariantM
         QVariantMap _prop = mProperties[pPropertyName].toMap();
         if (!_prop.contains("grid") )
         {
-            sendMessage("newOstPropertyLine : No grid defined for property  " + pPropertyName);
+            sendWarning("newOstPropertyLine : No grid defined for property  " + pPropertyName);
             return false;
         }
         else
@@ -606,7 +606,7 @@ bool Datastore::newOstPropertyLine(const QString &pPropertyName, const QVariantM
     }
     else
     {
-        sendMessage("newOstPropertyLine : Can't add line to inexistant property " + pPropertyName);
+        sendWarning("newOstPropertyLine : Can't add line to inexistant property " + pPropertyName);
         return false;
     }
 
@@ -618,7 +618,7 @@ bool Datastore::deleteOstPropertyLine(const QString &pPropertyName, const double
         QVariantMap _prop = mProperties[pPropertyName].toMap();
         if (!_prop.contains("grid") )
         {
-            sendMessage("deleteOstPropertyLine : No grid defined for property  " + pPropertyName);
+            sendWarning("deleteOstPropertyLine : No grid defined for property  " + pPropertyName);
             return false;
         }
         else
@@ -645,7 +645,7 @@ bool Datastore::deleteOstPropertyLine(const QString &pPropertyName, const double
     }
     else
     {
-        sendMessage("deleteOstPropertyLine : Can't add line to inexistant property " + pPropertyName);
+        sendWarning("deleteOstPropertyLine : Can't add line to inexistant property " + pPropertyName);
         return false;
     }
 
@@ -657,12 +657,12 @@ bool Datastore::updateOstPropertyLine(const QString &pPropertyName, const double
         QVariantMap _prop = mProperties[pPropertyName].toMap();
         if (!_prop.contains("grid") )
         {
-            sendMessage("updateOstPropertyLine : No grid defined for property  " + pPropertyName);
+            sendWarning("updateOstPropertyLine : No grid defined for property  " + pPropertyName);
             return false;
         }
         else
         {
-            qDebug() << "updateOstPropertyLine :" << pPropertyName << ">> " << pPropertyName;
+            //qDebug() << "updateOstPropertyLine :" << pPropertyName << ">> " << pPropertyName;
             QVariantMap _elements = _prop["elements"].toMap();
             QVariantList _arr = _prop["grid"].toList();
             _arr.removeAt(pLine);
@@ -707,7 +707,7 @@ bool Datastore::updateOstPropertyLine(const QString &pPropertyName, const double
     }
     else
     {
-        sendMessage("updateOstPropertyLine : Can't add line to inexistant property " + pPropertyName);
+        sendWarning("updateOstPropertyLine : Can't add line to inexistant property " + pPropertyName);
         return false;
     }
 
@@ -753,5 +753,61 @@ bool Datastore::setOstElementLineValue (const QString &pPropertyName, const QStr
         return true;
     }
 
+
+}
+void Datastore::clearOstElementLov(const QString &pPropertyName, const QString &pElementName)
+{
+    if (mProperties.contains(pPropertyName))
+    {
+        if (mProperties[pPropertyName].toMap().contains("elements"))
+        {
+            QVariantMap elts = mProperties[pPropertyName].toMap()["elements"].toMap();
+            if (elts.contains(pElementName))
+            {
+                QVariantMap mElt =  mProperties[pPropertyName].toMap()["elements"].toMap()[pElementName].toMap();
+                if (mElt.contains("listOfValues"))
+                {
+                    mElt["listOfValues"] = QVariantMap();
+                }
+                else
+                {
+                    sendWarning("clearOstElementLov - property " + pPropertyName + " element " + pElementName + " has no list of values.");
+                }
+            }
+            else
+            {
+                sendWarning("clearOstElementLov - property " + pPropertyName + " has no " + pElementName + " element.");
+                return;
+            }
+        }
+        else
+        {
+            sendWarning("clearOstElementLov - property " + pPropertyName + " contains no elements.");
+            return;
+        }
+    }
+    else
+    {
+        sendWarning("clearOstElementLov - property " + pPropertyName + " not found.");
+        return;
+    }
+
+}
+void Datastore::addOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode,
+                                 const QString &pLovLabel)
+{
+
+}
+QVariant Datastore::getOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode)
+{
+
+}
+void Datastore::setOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode,
+                                 const QString &pLovLabel)
+{
+
+}
+QVariant Datastore::deleteOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode)
+{
 
 }
