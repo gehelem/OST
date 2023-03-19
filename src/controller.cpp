@@ -34,7 +34,7 @@ Controller::Controller(bool saveAllBlobs, const QString &webroot, const QString 
     wshandler = new WShandler(this);
     //connect(wshandler, &WShandler::externalEvent, this, &Controller::OnExternalEvent);
     dbmanager = new DBManager();
-    dbmanager->dbInit(_dbpath, QString());
+    dbmanager->dbInit(_dbpath, "controller");
     //connect(dbmanager, SIGNAL(dbEvent), &Controller::OnModuleEvent);
 
 
