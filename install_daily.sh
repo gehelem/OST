@@ -1,4 +1,5 @@
 #!/bin/bash
+sudo apt-get install software-properties-common
 sudo add-apt-repository --yes ppa:gehelem/ostserver-daily
 sudo add-apt-repository --yes ppa:mutlaqja/indinightly
 sudo apt update
