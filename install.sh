@@ -1,5 +1,5 @@
 #!/bin/bash
-sudo add-apt-repository --yes ppa:gehelem/ostserver-daily
+sudo add-apt-repository --yes ppa:gehelem/ostserver
 sudo add-apt-repository --yes ppa:mutlaqja/ppa
 sudo apt update
 sudo apt upgrade -y
