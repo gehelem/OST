@@ -1,6 +1,6 @@
 #!/bin/bash
-sudo add-apt-repository --yes ppa:gehelem/ostserver
-sudo add-apt-repository --yes ppa:mutlaqja/ppa
+sudo add-apt-repository --yes ppa:gehelem/ostserver-daily
+sudo add-apt-repository --yes ppa:mutlaqja/indinightly
 sudo apt update
 sudo apt upgrade -y
 sudo apt install -y libindi1 libstellarsolver ostserver ostmodules nginx gsc pip
