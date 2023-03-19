@@ -2,10 +2,10 @@
 Description=Ostserver  service
 
 [Service]
-WorkingDirectory=/home/ost
+WorkingDirectory=/home/ostusername
 Type=simple
-User=ost
-Group=ost
+User=ostusername
+Group=ostusername
 TimeoutStartSec=0
 Restart=on-failure
 RestartSec=30s
@@ -16,4 +16,3 @@ SyslogIdentifier=Ostserver
 
 [Install]
 WantedBy=multi-user.target
- 

@@ -43,14 +43,14 @@ sudo chmod 777 -R /usr/share/astrometry
 
 cd
 cd /var/www/html
-sudo wget https://github.com/gehelem/ost-front/releases/download/WorkInProgress/html.tar.gz
+sudo wget https://github.com/gehelem/ost-front/releases/download/WorkInProgress/html.tar.gz --no-check-certificate
 sudo tar -xvf html.tar.gz
 sudo chmod 777 /var/www/html
 
 cd 
 sudo pip install indiweb
-wget https://raw.githubusercontent.com/knro/indiwebmanager/master/indiwebmanager.service
-sed -i 's/User=pi/User=ost/g' indiwebmanager.service
+wget https://raw.githubusercontent.com/knro/indiwebmanager/master/indiwebmanager.service --no-check-certificate
+sed -i "s/User=pi/User="$USER"/g" indiwebmanager.service
 sudo cp indiwebmanager.service /etc/systemd/system/
 sudo chmod 644 /etc/systemd/system/indiwebmanager.service
 sudo systemctl daemon-reload
@@ -58,10 +58,11 @@ sudo systemctl enable indiwebmanager.service
 sudo service indiwebmanager restart
 
 cd
-wget https://raw.githubusercontent.com/gehelem/OST/main/ostserver_service.sh
+wget https://raw.githubusercontent.com/gehelem/OST/main/ostserver_service.sh --no-check-certificate
 sudo cp ostserver_service.sh /usr/bin/
 
-wget https://raw.githubusercontent.com/gehelem/OST/main/ostserver.service
+wget https://raw.githubusercontent.com/gehelem/OST/main/ostserver.service --no-check-certificate
+sed -i "s/ostusername/"$USER"/g" ostserver.service
 sudo cp ostserver.service /etc/systemd/system/
 sudo chmod 644 /etc/systemd/system/ostserver.service
 sudo systemctl daemon-reload
