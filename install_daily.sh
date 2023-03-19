@@ -50,7 +50,7 @@ sudo chmod 777 /var/www/html
 cd 
 sudo pip install indiweb
 wget https://raw.githubusercontent.com/knro/indiwebmanager/master/indiwebmanager.service --no-check-certificate
-sed -i 's/User=pi/User=ost/g' indiwebmanager.service
+sed -i "s/User=pi/User="$USER"/g" indiwebmanager.service
 sudo cp indiwebmanager.service /etc/systemd/system/
 sudo chmod 644 /etc/systemd/system/indiwebmanager.service
 sudo systemctl daemon-reload
@@ -62,6 +62,7 @@ wget https://raw.githubusercontent.com/gehelem/OST/main/ostserver_service.sh --n
 sudo cp ostserver_service.sh /usr/bin/
 
 wget https://raw.githubusercontent.com/gehelem/OST/main/ostserver.service --no-check-certificate
+sed -i "s/ostusername/"$USER"/g" ostserver.service
 sudo cp ostserver.service /etc/systemd/system/
 sudo chmod 644 /etc/systemd/system/ostserver.service
 sudo systemctl daemon-reload
