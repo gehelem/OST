@@ -89,7 +89,7 @@ class Datastore : virtual public Baseroot
         QVariant getOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode);
         void setOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode,
                               const QString &pLovLabel);
-        QVariant deleteOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode);
+        void deleteOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode);
 
     private:
         QVariantMap mProperties;
