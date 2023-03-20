@@ -81,10 +81,15 @@ class Datastore : virtual public Baseroot
         bool setOstElementLineValue(const QString &pPropertyName, const QString &pElementName, const double &pLine,
                                     const QVariant &pElementValue);
 
-
-
         QVariantMap getProfile(void);
 
+        void clearOstElementLov(const QString &pPropertyName, const QString &pElementName);
+        void addOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode,
+                              const QString &pLovLabel);
+        QVariant getOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode);
+        void setOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode,
+                              const QString &pLovLabel);
+        void deleteOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode);
 
     private:
         QVariantMap mProperties;
