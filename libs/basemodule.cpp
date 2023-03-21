@@ -79,7 +79,17 @@ void Basemodule::setProfile(QVariantMap profiledata)
 }
 void Basemodule::setProfiles(QVariantMap profilesdata)
 {
-    mAvailableProfiles = profilesdata;
+    Q_UNUSED(profilesdata);
+    //mAvailableProfiles = profilesdata;
+    QVariantMap profs;
+    getDbProfiles(getClassName(), profs);
+    clearOstLov("loadprofile");
+    for(QVariantMap::const_iterator iter = profs.begin(); iter != profs.end(); ++iter)
+    {
+        //qDebug() << iter.key() << iter.value();
+        addOstLov("loadprofile", iter.key(), iter.key() );
+    }
+    sendMessage("Available profiles refreshed");
 }
 
 void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
@@ -114,51 +124,85 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
     }
 
 
-    if (getModuleName() == pEventModule)
+    if ((getModuleName() == pEventModule ) && (pEventType == "Fsetproperty") )
     {
         foreach(const QString &keyprop, pEventData.keys())
         {
-            if (keyprop == "profileactions")
+            if (keyprop == "loadprofile")
             {
+                if (pEventData[keyprop].toMap().contains("value"))
+                {
+                    QVariant val = pEventData[keyprop].toMap()["value"];
+                    setOstPropertyValue(keyprop, val, true);
+                    setOstPropertyValue("saveprofile", val, true);
+                }
+                if (pEventData[keyprop].toMap().contains("elements"))
+                {
+                    foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
+                    {
+                        QVariant val = pEventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
+                        if (keyelt == "load" && val.toBool())
+                        {
+                            setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
+                            QVariantMap prof;
+                            if (getDbProfile(getClassName(), getOstPropertyValue("loadprofile").toString(), prof))
+                            {
+                                setProfile(prof);
+                                setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
+                                sendMessage(getOstPropertyValue("loadprofile").toString() + " profile sucessfully loaded");
+                                sendDump();
+                            }
+                            else
+                            {
+                                sendMessage("Can't load " + getOstElementValue("loadprofile", "name").toString() + " profile");
+                                setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
+                            }
+                            setOstElementValue("loadprofile", "load", false, false);
+                            setOstElementValue("loadprofile", "refresh", false, true);
+                            return;
+                        }
+                        if (keyelt == "refresh" && val.toBool())
+                        {
+                            setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
+                            QVariantMap prof;
+                            setProfiles(QVariantMap());
+                            setOstElementValue("loadprofile", "load", false, false);
+                            setOstElementValue("loadprofile", "refresh", false, false);
+                            setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
+                            return;
+                        }
+
+                    }
+                }
+            }
+
+            if (keyprop == "saveprofile")
+            {
+                if (pEventData[keyprop].toMap().contains("value"))
+                {
+                    QVariant val = pEventData[keyprop].toMap()["value"];
+                    setOstPropertyValue(keyprop, val, true);
+                }
+
+
                 foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
                 {
                     QVariant val = pEventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
-                    if (keyelt == "load" && val.toBool())
-                    {
-                        setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
-                        QVariantMap prof;
-                        if (getDbProfile(getClassName(), getOstElementValue("profileactions", "name").toString(), prof))
-                        {
-                            setProfile(prof);
-                            setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
-                            sendMessage(getOstElementValue("profileactions", "name").toString() + " profile sucessfully loaded");
-                        }
-                        else
-                        {
-                            sendMessage("Can't load " + getOstElementValue("profileactions", "name").toString() + " profile");
-                            setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
-                        }
-                    }
                     if (keyelt == "save"  && val.toBool())
                     {
                         setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
                         QVariantMap prof = getProfile();
-                        if (setDbProfile(getClassName(), getOstElementValue("profileactions", "name").toString(), prof))
+                        if (setDbProfile(getClassName(), getOstPropertyValue("saveprofile").toString(), prof))
                         {
                             setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
-                            sendMessage(getOstElementValue("profileactions", "name").toString() + " profile sucessfully saved");
+                            sendMessage(getOstPropertyValue("saveprofile").toString() + " profile sucessfully saved");
                         }
                         else
                         {
                             setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
-                            sendMessage("Can't save " + getOstElementValue("profileactions", "name").toString() + " profile");
+                            sendMessage("Can't save " + getOstPropertyValue("saveprofile").toString() + " profile");
                         }
                     }
-                    if (keyelt == "name")
-                    {
-                        setOstElementValue("profileactions", "name", val, true);
-                    }
-
                 }
                 return;
             }

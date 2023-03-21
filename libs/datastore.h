@@ -50,7 +50,7 @@ class Datastore : virtual public Baseroot
                                const  QString &pPropertyDevcat, const QString &pPropertyGroup);
         void emitPropertyCreation(const QString &pPropertyName);
         bool setOstPropertyValue(const QString &pPropertyName, const QVariant &pPropertyValue, bool mEmitEvent);
-        QVariant getOstPropertyValue(QString &pPropertyName);
+        QVariant getOstPropertyValue(const QString &pPropertyName);
 
         bool createOstElement(const QString &pPropertyName, const QString &pElementName, const QString &pElementLabel,
                               bool mEmitEvent);
@@ -90,6 +90,14 @@ class Datastore : virtual public Baseroot
         void setOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode,
                               const QString &pLovLabel);
         void deleteOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode);
+
+        void clearOstLov(const QString &pPropertyName);
+        void addOstLov(const QString &pPropertyName, const QString &pLovCode,
+                       const QString &pLovLabel);
+        QVariant getOstLov(const QString &pPropertyName, const QString &pLovCode);
+        void setOstLov(const QString &pPropertyName, const QString &pLovCode,
+                       const QString &pLovLabel);
+        void deleteOstLov(const QString &pPropertyName, const QString &pLovCode);
 
     private:
         QVariantMap mProperties;
