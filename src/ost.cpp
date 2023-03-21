@@ -11,7 +11,18 @@ void sendMessage(const QString &pMessage);
 int main(int argc, char *argv[])
 {
 
-    sendMessage("OST starting up");
+    sendMessage("OST starting up, ladies and gentlemen, squeeze your ALZ !");
+    sendMessage("                                  ");
+    sendMessage("    *******    ******** **********");
+    sendMessage("   **/////**  **////// /////**/// ");
+    sendMessage("  **     //**/**           /**    ");
+    sendMessage(" /**      /**/*********    /**    ");
+    sendMessage(" /**      /**////////**    /**    ");
+    sendMessage(" //**     **        /**    /**    ");
+    sendMessage("  //*******   ********     /**    ");
+    sendMessage("   ///////   ////////      //     ");
+    sendMessage("                                  ");
+
     sendMessage("Git Hash              =" + QString::fromStdString(Version::GIT_SHA1));
     sendMessage("Git Date              =" + QString::fromStdString(Version::GIT_DATE));
     sendMessage("Git Commit subject    =" + QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
