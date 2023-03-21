@@ -17,15 +17,17 @@ Maincontrol::Maincontrol(QString name, QString label, QString profile, QVariantM
     setOstPropertyValue("moduleLabel", "Main control", false);
     setOstPropertyValue("moduleDescription", "Maincontrol module - this one should always be there", false);
     setOstPropertyValue("moduleVersion", 0.1, false);
-    deleteOstProperty("profileactions");
+    deleteOstProperty("saveprofile");
+    deleteOstProperty("loadprofile");
     deleteOstProperty("moduleactions");
 
     foreach(QString key, getAvailableModuleLibs().keys())
     {
         QVariantMap info = getAvailableModuleLibs()[key].toMap();
         createOstProperty( "load" + key, info["moduleDescription"].toMap()["value"].toString(), 2, "Available modules", "");
-        createOstElement(  "load" + key, "instance", "Instance name", false);
-        setOstElementValue("load" + key, "instance", "My " + key, false);
+        setOstPropertyValue("load" + key, "My " + key, false);
+        //createOstElement(  "load" + key, "instance", "Instance name", false);
+        //setOstElementValue("load" + key, "instance", "My " + key, false);
         createOstElement(  "load" + key, "load", "Load", false);
         setOstElementValue("load" + key, "load", false, false);
 
@@ -40,31 +42,31 @@ Maincontrol::~Maincontrol()
     Q_CLEANUP_RESOURCE(maincontrol);
 }
 
-void Maincontrol::OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                                    const QVariantMap &eventData)
+void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+                                    const QVariantMap &pEventData)
 {
-    Q_UNUSED(eventType);
-    Q_UNUSED(eventKey);
+    Q_UNUSED(pEventType);
+    Q_UNUSED(pEventKey);
     //sendMessage("mainctl OnMyExternalEvent - recv : " + getModuleName()+ "-" +eventType +"-" + eventKey);
-    if (getModuleName() == eventModule)
+    if (getModuleName() == pEventModule)
     {
-        foreach(const QString &keyprop, eventData.keys())
+        foreach(const QString &keyprop, pEventData.keys())
         {
-            foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
+            if (pEventData[keyprop].toMap().contains("value"))
             {
-                if (keyelt == "instance")
-                {
-                    if (setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true))
-                    {
-                    }
-                }
+                QVariant val = pEventData[keyprop].toMap()["value"];
+                setOstPropertyValue(keyprop, val, true);
+            }
+            foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
+            {
                 if (keyelt == "load")
                 {
-                    if (setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true))
+                    setOstPropertyAttribute(keyprop, "status", 2, true);
+                    if (setOstElementValue(keyprop, keyelt, false, true))
                     {
                         QString pp = keyprop;
-                        QString elt = getOstElementValue(keyprop, "instance").toString();
-                        QString eltwithoutblanks = getOstElementValue(keyprop, "instance").toString();
+                        QString elt = getOstPropertyValue(keyprop).toString();
+                        QString eltwithoutblanks = getOstPropertyValue(keyprop).toString();
                         eltwithoutblanks.replace(" ", "");
                         QString prof = "default";
                         pp.replace("load", "");
@@ -73,17 +75,15 @@ void Maincontrol::OnMyExternalEvent(const QString &eventType, const QString  &ev
                                              eltwithoutblanks,
                                              elt,
                                              prof);
+                        setOstPropertyAttribute(keyprop, "status", 1, true);
                     }
+                    else
+                    {
+                        setOstPropertyAttribute(keyprop, "status", 3, true);
+                    }
+
                 }
-
-
-                if (keyprop == "devices")
-                {
-                }
-
             }
-
         }
-
     }
 }
