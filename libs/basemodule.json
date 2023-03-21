@@ -67,29 +67,43 @@
         "propertyLabel": "Message",
         "value": ""
     },
-    "profileactions": {
+    "loadprofile": {
         "devcat": "Module",
         "group": "Profiles",
         "permission": 2,
         "value": "default",
         "listOfValues":{
         },
-        "rule":2,
-        "propertyLabel": "Profiles",
+        "rule":1,
+        "propertyLabel": "Load profile",
         "elements": {
             "load": {
                 "elementLabel": "Load",
                 "value":false
             },
+            "refresh": {
+                "elementLabel": "Refresh",
+                "value":false
+            }
+        }
+    },
+    "saveprofile": {
+        "devcat": "Module",
+        "group": "Profiles",
+        "permission": 2,
+        "value": "default",
+        "rule":0,
+        "propertyLabel": "Save profile",
+        "elements": {
             "save": {
-                "elementLabel": "Save",
+                "elementLabel": "Save as",
                 "value":false
             }
         }
     },
     "moduleactions": {
         "devcat": "Module",
-        "group": "Profiles",
+        "group": "Actions",
         "permission": 1,
         "propertyLabel": "Controls",
         "rule":2,

@@ -49,7 +49,7 @@ bool Datastore::setOstPropertyValue(const QString &pPropertyName, const QVariant
         return false;
     }
 }
-QVariant Datastore::getOstPropertyValue(QString &pPropertyName)
+QVariant Datastore::getOstPropertyValue(const QString &pPropertyName)
 {
     if (mProperties.contains(pPropertyName))
     {
