@@ -17,8 +17,8 @@ class MODULE_INIT Maincontrol : public Basemodule
         ~Maincontrol();
 
     public slots:
-        void OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                               const QVariantMap &eventData) override;
+        void OnMyExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+                               const QVariantMap &pEventData) override;
     private:
 
 };
