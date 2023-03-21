@@ -50,13 +50,13 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     //saveAttributesToFile("dummy.json");
     _camera = getOstElementValue("devices", "camera").toString();
 
-    foreach(QString key, getAvailableModuleLibs().keys())
-    {
-        if (!createOstProperty("mod" + key, "mod" + key, 0, "Module", "Ava"))
-        {
-            sendMessage("createOstProperty KO : " + key);
-        }
-    }
+    //foreach(QString key, getAvailableModuleLibs().keys())
+    //{
+    //    if (!createOstProperty("mod" + key, "mod" + key, 0, "Module", "Ava"))
+    //    {
+    //        sendMessage("createOstProperty KO : " + key);
+    //    }
+    //}
     //setBLOBMode(B_ALSO, _camera.toStdString().c_str(), nullptr);
     //enableDirectBlobAccess(_camera.toStdString().c_str(), nullptr);
     //setBlobMode();
