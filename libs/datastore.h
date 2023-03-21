@@ -91,6 +91,14 @@ class Datastore : virtual public Baseroot
                               const QString &pLovLabel);
         void deleteOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode);
 
+        void clearOstLov(const QString &pPropertyName);
+        void addOstLov(const QString &pPropertyName, const QString &pLovCode,
+                       const QString &pLovLabel);
+        QVariant getOstLov(const QString &pPropertyName, const QString &pLovCode);
+        void setOstLov(const QString &pPropertyName, const QString &pLovCode,
+                       const QString &pLovLabel);
+        void deleteOstLov(const QString &pPropertyName, const QString &pLovCode);
+
     private:
         QVariantMap mProperties;
 }

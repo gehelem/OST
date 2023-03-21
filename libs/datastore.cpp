@@ -995,3 +995,175 @@ void Datastore::deleteOstElementLov(const QString &pPropertyName, const QString 
     }
 
 }
+void Datastore::clearOstLov(const QString &pPropertyName)
+{
+    if (mProperties.contains(pPropertyName))
+    {
+        QVariantMap mProp = mProperties[pPropertyName].toMap();
+        if (mProp.contains("listOfValues"))
+        {
+            QVariantMap mLov = mProp["listOfValues"].toMap();
+            mProp["listOfValues"] = QVariantMap();
+            mProperties[pPropertyName] = mProp;
+            OnModuleEvent("ap", QString(), pPropertyName, mProperties[pPropertyName].toMap());
+        }
+        else
+        {
+            sendWarning("clearOstLov - property " + pPropertyName + " has no list of values.");
+            return;
+        }
+    }
+    else
+    {
+        sendWarning("clearOstLov - property " + pPropertyName + " not found.");
+        return;
+    }
+}
+void Datastore::addOstLov(const QString &pPropertyName, const QString &pLovCode,
+                          const QString &pLovLabel)
+{
+    if (mProperties.contains(pPropertyName))
+    {
+        QVariantMap mProp = mProperties[pPropertyName].toMap();
+        if (mProp.contains("listOfValues"))
+        {
+            QVariantMap mLov = mProp["listOfValues"].toMap();
+            if (mLov.contains(pLovCode))
+            {
+                sendWarning("addOstLov - property " + pPropertyName + " list of values member " + pLovCode +
+                            " already exists");
+                return;
+
+            }
+            else
+            {
+                mLov[pLovCode] = pLovLabel;
+                mProp["listOfValues"] = mLov;
+                mProperties[pPropertyName] = mProp;
+                OnModuleEvent("ap", QString(), pPropertyName, mProperties[pPropertyName].toMap());
+
+            }
+        }
+        else
+        {
+            sendWarning("addOstLov - property " + pPropertyName + " has no list of values.");
+            return;
+        }
+    }
+    else
+    {
+        sendWarning("addOstLov - property " + pPropertyName + " not found.");
+        return;
+    }
+    return;
+}
+QVariant Datastore::getOstLov(const QString &pPropertyName, const QString &pLovCode)
+{
+    if (mProperties.contains(pPropertyName))
+    {
+        QVariantMap mProp = mProperties[pPropertyName].toMap();
+        if (mProp.contains("listOfValues"))
+        {
+            QVariantMap mLov = mProp["listOfValues"].toMap();
+            if (!mLov.contains(pLovCode))
+            {
+                sendWarning("getOstLov - property " + pPropertyName + " has no " + pLovCode +
+                            " member in list of values.");
+
+                return QVariant();
+            }
+            else
+            {
+                return mLov[pLovCode];
+            }
+        }
+        else
+        {
+            sendWarning("getOstLov - property " + pPropertyName + " has no list of values.");
+            return QVariant();
+        }
+    }
+    else
+    {
+        sendWarning("getOstLov - property " + pPropertyName + " not found.");
+        return QVariant();
+    }
+    return QVariant();
+}
+void Datastore::setOstLov(const QString &pPropertyName, const QString &pLovCode,
+                          const QString &pLovLabel)
+{
+    if (mProperties.contains(pPropertyName))
+    {
+        QVariantMap mProp = mProperties[pPropertyName].toMap();
+        if (mProp.contains("listOfValues"))
+        {
+            QVariantMap mLov = mProp["listOfValues"].toMap();
+            if (!mLov.contains(pLovCode))
+            {
+                sendWarning("setOstLov - property " + pPropertyName + " list of values member " + pLovCode +
+                            " does not exists");
+                return;
+
+            }
+            else
+            {
+                mLov[pLovCode] = pLovLabel;
+                mProp["listOfValues"] = mLov;
+                mProperties[pPropertyName] = mProp;
+                OnModuleEvent("ap", QString(), pPropertyName, mProperties[pPropertyName].toMap());
+
+            }
+        }
+        else
+        {
+            sendWarning("setOstLov - property " + pPropertyName + " has no list of values.");
+            return;
+        }
+    }
+    else
+    {
+        sendWarning("setOstLov - property " + pPropertyName + " not found.");
+        return;
+    }
+    return;
+
+}
+void Datastore::deleteOstLov(const QString &pPropertyName, const QString &pLovCode)
+{
+    if (mProperties.contains(pPropertyName))
+    {
+        QVariantMap mProp = mProperties[pPropertyName].toMap();
+        if (mProp.contains("listOfValues"))
+        {
+            QVariantMap mLov = mProp["listOfValues"].toMap();
+            if (!mLov.contains(pLovCode))
+            {
+                sendWarning("deleteOstLov - property " + pPropertyName + " list of values member " + pLovCode +
+                            " does not exists");
+                return;
+
+            }
+            else
+            {
+                mLov[pLovCode].clear();
+                mProp["listOfValues"] = mLov;
+                mProperties[pPropertyName] = mProp;
+                OnModuleEvent("ap", QString(), pPropertyName, mProperties[pPropertyName].toMap());
+
+            }
+        }
+        else
+        {
+            sendWarning("deleteOstLov - property " + pPropertyName + " has no list of values.");
+            return;
+        }
+    }
+    else
+    {
+        sendWarning("deleteOstLov - property " + pPropertyName + " not found.");
+        return;
+    }
+    return;
+
+}

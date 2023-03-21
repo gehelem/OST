@@ -79,7 +79,17 @@ void Basemodule::setProfile(QVariantMap profiledata)
 }
 void Basemodule::setProfiles(QVariantMap profilesdata)
 {
-    mAvailableProfiles = profilesdata;
+    //mAvailableProfiles = profilesdata;
+    QVariantMap profs;
+    getDbProfiles(getClassName(), profs);
+    clearOstLov("profileactions");
+    for(QVariantMap::const_iterator iter = profs.begin(); iter != profs.end(); ++iter)
+    {
+        //qDebug() << iter.key() << iter.value();
+        addOstLov("profileactions", iter.key(), iter.key());
+
+    }
+
 }
 
 void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,

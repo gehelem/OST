@@ -71,6 +71,9 @@
         "devcat": "Module",
         "group": "Profiles",
         "permission": 2,
+        "value": "default",
+        "listOfValues":{
+        },
         "rule":2,
         "propertyLabel": "Profiles",
         "elements": {
@@ -81,10 +84,6 @@
             "save": {
                 "elementLabel": "Save",
                 "value":false
-            },
-            "name": {
-                "elementLabel": "Name",
-                "value": "default"
             }
         }
     },
