@@ -76,7 +76,7 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
                 mod->setProfile(profile);
                 QVariantMap profs;
                 dbmanager->getDbProfiles(mod->metaObject()->className(), profs);
-                mod->setProfiles(profs);
+                if (name != "mainctl") mod->setProfiles(profs);
                 connect(mod, &Basemodule::moduleEvent, this, &Controller::OnModuleEvent);
                 connect(mod, &Basemodule::moduleEvent, wshandler, &WShandler::processModuleEvent);
                 connect(mod, &Basemodule::loadOtherModule, this, &Controller::loadModule);
@@ -98,6 +98,10 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
                         //connect(mod,&Basemodule::moduleEvent, othermodule,&Basemodule::OnExternalEvent);
 
                     }
+                }
+                if (name == "mainctl")
+                {
+                    mod->OnExternalEvent("refreshConfigurations", name, QString(), QVariantMap());
                 }
 
                 return true;

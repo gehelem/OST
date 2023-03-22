@@ -32,9 +32,6 @@ Maincontrol::Maincontrol(QString name, QString label, QString profile, QVariantM
         setOstElementValue("load" + key, "load", false, false);
 
     }
-
-
-
 }
 
 Maincontrol::~Maincontrol()
@@ -50,6 +47,10 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
     //sendMessage("mainctl OnMyExternalEvent - recv : " + getModuleName()+ "-" +eventType +"-" + eventKey);
     if (getModuleName() == pEventModule)
     {
+        if (pEventType == "refreshConfigurations")
+        {
+            setConfigurations();
+        }
         foreach(const QString &keyprop, pEventData.keys())
         {
             if (pEventData[keyprop].toMap().contains("value"))
@@ -78,7 +79,12 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
 void Maincontrol::setConfigurations(void)
 {
     QVariantMap confs;
-    getDbConfigurations( confs);
+    if (!getDbConfigurations( confs))
+    {
+        sendError("Can't refresh available configurations");
+        return;
+    }
+
     clearOstLov("loadconf");
     for(QVariantMap::const_iterator iter = confs.begin(); iter != confs.end(); ++iter)
     {
