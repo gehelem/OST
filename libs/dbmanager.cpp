@@ -71,7 +71,7 @@ bool DBManager::setDbProfile(const QString &pModuleType, const QString &pProfile
 {
     if(!mDb.open())
     {
-        sendError("dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+        sendError("setDbProfile dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
         return false;
     }
 
@@ -96,7 +96,7 @@ bool DBManager::getDbProfile(const QString &pModuleType, const QString &pProfile
 {
     if(!mDb.open())
     {
-        sendError("dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+        sendError("getDbProfile dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
         return false;
     }
     QString sql = "SELECT ALLVALUES FROM PROFILES WHERE MODULETYPE='" + pModuleType + "' AND PROFILENAME='" + pProfileName +
@@ -123,7 +123,7 @@ bool DBManager::getDbProfiles(QString moduleType, QVariantMap &result )
 {
     if(!mDb.open())
     {
-        sendError("dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+        sendError("getDbProfiles dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
         return false;
     }
     QString sql = "SELECT PROFILENAME,ALLVALUES FROM PROFILES WHERE MODULETYPE='" + moduleType + "' ";
@@ -149,7 +149,7 @@ bool DBManager::getDbConfiguration(QString configName, QVariantMap &result )
 {
     if(!mDb.open())
     {
-        sendError("dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+        sendError("getDbConfiguration dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
         return false;
     }
     QString sql = "SELECT MODULENAME,MODULETYPE,PROFILENAME FROM CONFIGURATIONS WHERE CONFIGNAME='" + configName + "'";
@@ -174,7 +174,7 @@ bool DBManager::getDbConfigurations(QVariantMap &result )
 {
     if(!mDb.open())
     {
-        sendError("dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+        sendError("getDbConfigurations dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
         return false;
     }
     QString sql = "SELECT CONFIGNAME,MODULENAME,MODULETYPE,PROFILENAME FROM CONFIGURATIONS";
