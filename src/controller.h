@@ -39,7 +39,8 @@ class Controller : public QObject
         DBManager   *dbmanager;
         QProcess    *_process;
 
-        bool LoadModule(QString lib, QString name, QString label, QString profile);
+        bool loadModule(QString lib, QString name, QString label, QString profile);
+        void loadConf(const QString &pConf);
         void checkModules(void);
         void installFront(void);
         void processOutput();

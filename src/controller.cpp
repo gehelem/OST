@@ -38,19 +38,8 @@ Controller::Controller(bool saveAllBlobs, const QString &webroot, const QString 
     //connect(dbmanager, SIGNAL(dbEvent), &Controller::OnModuleEvent);
 
 
-    LoadModule("libostmaincontrol", "mainctl", "Maincontrol", "default");
-
-    QVariantMap _result;
-    dbmanager->getDbConfiguration(_conf, _result);
-    for(QVariantMap::const_iterator iter = _result.begin(); iter != _result.end(); ++iter)
-    {
-        QVariantMap _line = iter.value().toMap();
-        QString _namewithoutblanks = iter.key();
-        _namewithoutblanks.replace(" ", "");
-
-        LoadModule("libost" + _line["moduletype"].toString(), _namewithoutblanks, iter.key(), _line["profilename"].toString());
-    }
-
+    loadModule("libostmaincontrol", "mainctl", "Maincontrol", "default");
+    loadConf(_conf);
 }
 
 
@@ -59,7 +48,7 @@ Controller::~Controller()
 }
 
 
-bool Controller::LoadModule(QString lib, QString name, QString label, QString profile)
+bool Controller::loadModule(QString lib, QString name, QString label, QString profile)
 {
 
     QLibrary library(lib);
@@ -90,7 +79,11 @@ bool Controller::LoadModule(QString lib, QString name, QString label, QString pr
                 mod->setProfiles(profs);
                 connect(mod, &Basemodule::moduleEvent, this, &Controller::OnModuleEvent);
                 connect(mod, &Basemodule::moduleEvent, wshandler, &WShandler::processModuleEvent);
-                connect(mod, &Basemodule::loadOtherModule, this, &Controller::LoadModule);
+                connect(mod, &Basemodule::loadOtherModule, this, &Controller::loadModule);
+                if (name == "mainctl")
+                {
+                    connect(mod, &Basemodule::loadConf, this, &Controller::loadConf);
+                }
                 //connect(this, &Controller::controllerEvent, mod, &Basemodule::OnExternalEvent);
                 connect(wshandler, &WShandler::externalEvent, mod, &Basemodule::OnExternalEvent);
                 mod->sendDump();
@@ -118,6 +111,20 @@ bool Controller::LoadModule(QString lib, QString name, QString label, QString pr
         }
     }
     return false;
+}
+void Controller::loadConf(const QString &pConf)
+{
+    QVariantMap result;
+    dbmanager->getDbConfiguration(pConf, result);
+    for(QVariantMap::const_iterator iter = result.begin(); iter != result.end(); ++iter)
+    {
+        QVariantMap line = iter.value().toMap();
+        QString namewithoutblanks = iter.key();
+        namewithoutblanks.replace(" ", "");
+
+        loadModule("libost" + line["moduletype"].toString(), namewithoutblanks, iter.key(), line["profilename"].toString());
+    }
+
 }
 
 

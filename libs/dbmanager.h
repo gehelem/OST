@@ -13,6 +13,7 @@ class DBManager : virtual public Baseroot
         bool setDbProfile(const QString &pModuleType, const QString &pProfileName, QVariantMap &profile );
         bool getDbProfiles(QString moduleType, QVariantMap &result );
         bool getDbConfiguration(QString configName, QVariantMap &result );
+        bool getDbConfigurations(QVariantMap &result );
 
     private:
         void CreateDatabaseStructure();

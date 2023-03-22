@@ -1,3 +1,36 @@
 {
-
+    "loadconf": {
+        "devcat": "Module",
+        "group": "Configurations",
+        "permission": 2,
+        "value": "default",
+        "listOfValues":{
+        },
+        "rule":1,
+        "propertyLabel": "Load configuration",
+        "elements": {
+            "load": {
+                "elementLabel": "Load",
+                "value":false
+            },
+            "refresh": {
+                "elementLabel": "Refresh",
+                "value":false
+            }
+        }
+    },
+    "saveconf": {
+        "devcat": "Module",
+        "group": "Configurations",
+        "permission": 2,
+        "value": "default",
+        "rule":0,
+        "propertyLabel": "Save configuration",
+        "elements": {
+            "save": {
+                "elementLabel": "Save as",
+                "value":false
+            }
+        }
+    }
 }

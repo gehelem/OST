@@ -56,34 +56,35 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
             {
                 QVariant val = pEventData[keyprop].toMap()["value"];
                 setOstPropertyValue(keyprop, val, true);
+                setOstPropertyValue("saveconf", val, true);
+
             }
             foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
             {
-                if (keyelt == "load")
+                if (keyelt == "load" && keyprop == "loadconf")
                 {
-                    setOstPropertyAttribute(keyprop, "status", 2, true);
-                    if (setOstElementValue(keyprop, keyelt, false, true))
-                    {
-                        QString pp = keyprop;
-                        QString elt = getOstPropertyValue(keyprop).toString();
-                        QString eltwithoutblanks = getOstPropertyValue(keyprop).toString();
-                        eltwithoutblanks.replace(" ", "");
-                        QString prof = "default";
-                        pp.replace("load", "");
+                    emit loadConf(getOstPropertyValue("loadconf").toString());
 
-                        emit loadOtherModule(pp,
-                                             eltwithoutblanks,
-                                             elt,
-                                             prof);
-                        setOstPropertyAttribute(keyprop, "status", 1, true);
-                    }
-                    else
-                    {
-                        setOstPropertyAttribute(keyprop, "status", 3, true);
-                    }
-
+                }
+                if (keyelt == "refresh" && keyprop == "loadconf")
+                {
+                    setConfigurations();
+                    setOstPropertyAttribute(keyprop, "status", 1, true);
                 }
             }
         }
     }
 }
+void Maincontrol::setConfigurations(void)
+{
+    QVariantMap confs;
+    getDbConfigurations( confs);
+    clearOstLov("loadconf");
+    for(QVariantMap::const_iterator iter = confs.begin(); iter != confs.end(); ++iter)
+    {
+        //qDebug() << iter.key() << iter.value();
+        addOstLov("loadconf", iter.key(), iter.key() );
+    }
+    sendMessage("Available configurations refreshed");
+}
+

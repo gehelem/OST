@@ -20,6 +20,7 @@ class MODULE_INIT Maincontrol : public Basemodule
         void OnMyExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
                                const QVariantMap &pEventData) override;
     private:
+        void setConfigurations(void);
 
 };
 
