@@ -38,6 +38,7 @@ class Controller : public QObject
         WShandler   *wshandler;
         DBManager   *dbmanager;
         QProcess    *_process;
+        QMap<QString, QString> mModulesMap;
 
         bool loadModule(QString lib, QString name, QString label, QString profile);
         void loadConf(const QString &pConf);

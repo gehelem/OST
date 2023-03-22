@@ -50,76 +50,76 @@ Controller::~Controller()
 
 bool Controller::loadModule(QString lib, QString name, QString label, QString profile)
 {
-
+    if (mModulesMap.contains(name ))
+    {
+        sendMessage("Module " + name + " already loaded - can't load twice");
+        return false;
+    }
     QLibrary library(lib);
     if (!library.load())
     {
         sendMessage(name + " " + library.errorString());
         return false;
     }
-    else
+    sendMessage(name + " library loaded");
+
+    typedef Basemodule *(*CreateModule)(QString, QString, QString, QVariantMap);
+    CreateModule createmodule = (CreateModule)library.resolve("initialize");
+    if (!createmodule)
     {
-        sendMessage(name + " library loaded");
+        sendMessage("Could not initialize module from library : " + lib);
+        return false;
+    }
+    Basemodule *mod = createmodule(name, label, profile, _availableModuleLibs);
+    //QPointer<Basemodule> mod = createmodule(name,label,profile,_availableModuleLibs);
+    if (!mod)
+    {
+        sendMessage("Could not instanciate module from library : " + lib);
+        return false;
+    }
+    mod->setParent(this);
+    mod->setWebroot(_webroot);
+    mod->setObjectName(name);
+    mod->dbInit(_dbpath, name);
+    mod->setProfile(profile);
+    QVariantMap profs;
+    dbmanager->getDbProfiles(mod->metaObject()->className(), profs);
+    if (name != "mainctl") mod->setProfiles(profs);
+    connect(mod, &Basemodule::moduleEvent, this, &Controller::OnModuleEvent);
+    connect(mod, &Basemodule::moduleEvent, wshandler, &WShandler::processModuleEvent);
+    connect(mod, &Basemodule::loadOtherModule, this, &Controller::loadModule);
+    if (name == "mainctl")
+    {
+        connect(mod, &Basemodule::loadConf, this, &Controller::loadConf);
+    }
+    //connect(this, &Controller::controllerEvent, mod, &Basemodule::OnExternalEvent);
+    connect(wshandler, &WShandler::externalEvent, mod, &Basemodule::OnExternalEvent);
+    mod->sendDump();
 
-        typedef Basemodule *(*CreateModule)(QString, QString, QString, QVariantMap);
-        CreateModule createmodule = (CreateModule)library.resolve("initialize");
-        if (createmodule)
+    QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
+    for (Basemodule *othermodule : othermodules)
+    {
+        if (othermodule->getModuleName() != mod->getModuleName())
         {
-            Basemodule *mod = createmodule(name, label, profile, _availableModuleLibs);
-            //QPointer<Basemodule> mod = createmodule(name,label,profile,_availableModuleLibs);
-            if (mod)
-            {
-                mod->setParent(this);
-                mod->setWebroot(_webroot);
-                mod->setObjectName(name);
-                mod->dbInit(_dbpath, name);
-                mod->setProfile(profile);
-                QVariantMap profs;
-                dbmanager->getDbProfiles(mod->metaObject()->className(), profs);
-                if (name != "mainctl") mod->setProfiles(profs);
-                connect(mod, &Basemodule::moduleEvent, this, &Controller::OnModuleEvent);
-                connect(mod, &Basemodule::moduleEvent, wshandler, &WShandler::processModuleEvent);
-                connect(mod, &Basemodule::loadOtherModule, this, &Controller::loadModule);
-                if (name == "mainctl")
-                {
-                    connect(mod, &Basemodule::loadConf, this, &Controller::loadConf);
-                }
-                //connect(this, &Controller::controllerEvent, mod, &Basemodule::OnExternalEvent);
-                connect(wshandler, &WShandler::externalEvent, mod, &Basemodule::OnExternalEvent);
-                mod->sendDump();
-
-                QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
-                for (Basemodule *othermodule : othermodules)
-                {
-                    //sendMessage("child= " + othermodule->objectName());
-                    if (othermodule->getModuleName() != mod->getModuleName())
-                    {
-                        //connect(othermodule,&Basemodule::moduleEvent, mod,&Basemodule::OnExternalEvent);
-                        //connect(mod,&Basemodule::moduleEvent, othermodule,&Basemodule::OnExternalEvent);
-
-                    }
-                }
-                if (name == "mainctl")
-                {
-                    mod->OnExternalEvent("refreshConfigurations", name, QString(), QVariantMap());
-                }
-
-                return true;
-            }
-            return false;
-        }
-        else
-        {
-            sendMessage("Could not initialize module from library : " + lib);
-            return false;
+            //connect(othermodule,&Basemodule::moduleEvent, mod,&Basemodule::OnExternalEvent);
+            //connect(mod,&Basemodule::moduleEvent, othermodule,&Basemodule::OnExternalEvent);
         }
     }
-    return false;
+    if (name == "mainctl")
+    {
+        mod->OnExternalEvent("refreshConfigurations", name, QString(), QVariantMap());
+    }
+    mModulesMap[name] = label;
+    return true;
+
 }
 void Controller::loadConf(const QString &pConf)
 {
     QVariantMap result;
-    dbmanager->getDbConfiguration(pConf, result);
+    if (!dbmanager->getDbConfiguration(pConf, result))
+    {
+        return;
+    }
     for(QVariantMap::const_iterator iter = result.begin(); iter != result.end(); ++iter)
     {
         QVariantMap line = iter.value().toMap();
@@ -140,6 +140,18 @@ void Controller::OnModuleEvent(const QString &eventType, const QString  &eventMo
     {
         sendMessage(eventModule + "-" + eventData["message"].toString());
     }
+    if (eventType == "moduledelete")
+    {
+        if (!mModulesMap.contains(eventModule))
+        {
+            sendMessage("Module " + eventModule + " not in module map");
+        }
+        else
+        {
+            mModulesMap.remove(eventModule);
+        }
+    }
+
 }
 void Controller::OnExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                  const QVariantMap &eventData)
