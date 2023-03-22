@@ -26,6 +26,7 @@ Basemodule::~Basemodule()
     {
         deleteOstProperty(key);
     }
+    emit moduleEvent("moduledelete", getModuleName(), "*", QVariantMap());
     Q_CLEANUP_RESOURCE(basemodule);
 }
 
