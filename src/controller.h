@@ -57,5 +57,7 @@ class Controller : public QObject
                              const QVariantMap &pEventData);
         void OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
                              const QVariantMap &pEventData);
+        void OnMainCtlEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+                            const QVariantMap &pEventData);
 };
 #endif

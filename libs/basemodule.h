@@ -100,12 +100,12 @@ class Basemodule : public QObject, public Datastore, public DBManager
         {
             mModuleVersion = version;
         }
+        QVariantMap mAvailableModuleLibs;
 
         /* OST helpers */
 
     private:
 
-        QVariantMap mAvailableModuleLibs;
         QVariantMap mAvailableProfiles;
         QString mWebroot;
         QString mModuleName;

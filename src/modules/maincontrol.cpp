@@ -26,8 +26,6 @@ Maincontrol::Maincontrol(QString name, QString label, QString profile, QVariantM
         QVariantMap info = getAvailableModuleLibs()[key].toMap();
         createOstProperty( "load" + key, info["moduleDescription"].toMap()["value"].toString(), 2, "Available modules", "");
         setOstPropertyValue("load" + key, "My " + key, false);
-        //createOstElement(  "load" + key, "instance", "Instance name", false);
-        //setOstElementValue("load" + key, "instance", "My " + key, false);
         createOstElement(  "load" + key, "load", "Load", false);
         setOstElementValue("load" + key, "load", false, false);
 
@@ -89,8 +87,8 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                 }
                 if (keyelt == "load" && keyprop == "loadconf")
                 {
-                    emit loadConf(getOstPropertyValue("loadconf").toString());
-
+                    emit mainCtlEvent("loadconf", QString(), getOstPropertyValue("loadconf").toString(),
+                                      QVariantMap());
                 }
                 if (keyelt == "refresh" && keyprop == "loadconf")
                 {
@@ -99,7 +97,8 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                 }
                 if (keyelt == "save" && keyprop == "saveconf")
                 {
-                    emit saveConf(getOstPropertyValue("saveconf").toString());
+                    emit mainCtlEvent("saveconf", QString(), getOstPropertyValue("saveconf").toString(),
+                                      QVariantMap());
                 }
             }
         }
@@ -123,3 +122,31 @@ void Maincontrol::setConfigurations(void)
     sendMessage("Available configurations refreshed");
 }
 
+void Maincontrol::sendMainMessage(const QString &pMessage)
+{
+    sendMessage(pMessage);
+}
+void Maincontrol::sendMainError(const QString &pMessage)
+{
+    sendError(pMessage);
+}
+void Maincontrol::sendMainWarning(const QString &pMessage)
+{
+    sendWarning(pMessage);
+}
+void Maincontrol::sendMainConsole(const QString &pMessage)
+{
+    sendConsole(pMessage);
+}
+void Maincontrol::setAvailableModuleLibs(const QVariantMap libs)
+{
+    foreach(QString key, libs.keys())
+    {
+        QVariantMap info = libs[key].toMap();
+        createOstProperty( "load" + key, info["moduleDescription"].toMap()["value"].toString(), 2, "Available modules", "");
+        setOstPropertyValue("load" + key, "My " + key, false);
+        createOstElement(  "load" + key, "load", "Load", false);
+        setOstElementValue("load" + key, "load", false, false);
+
+    }
+}

@@ -17,6 +17,7 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     dbmanager = new DBManager();
     dbmanager->dbInit(_dbpath, "controller");
 
+
     if (_libpath == "")
     {
         //_libpath=QCoreApplication::applicationDirPath();
@@ -29,22 +30,23 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     QCoreApplication::addLibraryPath("/usr/lib");
     QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath());
 
-    pMainControl = new Maincontrol(QString("mainctl2"), QString("Main control 2"), QString(), QVariantMap());
+    pMainControl = new Maincontrol(QString("mainctl"), QString("Main control"), QString(), QVariantMap());
     connect(pMainControl, &Maincontrol::moduleEvent, this, &Controller::OnModuleEvent);
     connect(pMainControl, &Maincontrol::moduleEvent, wshandler, &WShandler::processModuleEvent);
     connect(pMainControl, &Maincontrol::loadOtherModule, this, &Controller::loadModule);
-    connect(pMainControl, &Maincontrol::loadConf, this, &Controller::loadConf);
-    connect(pMainControl, &Maincontrol::saveConf, this, &Controller::saveConf);
+    connect(pMainControl, &Maincontrol::mainCtlEvent, this, &Controller::OnMainCtlEvent);
     connect(this, &Controller::controllerEvent, pMainControl, &Maincontrol::OnExternalEvent);
     pMainControl->setParent(this);
     pMainControl->setWebroot(_webroot);
-    pMainControl->setObjectName("mainctl2");
-    pMainControl->dbInit(_dbpath, "mainctl2");
-
+    pMainControl->setObjectName("mainctl");
+    pMainControl->dbInit(_dbpath, "mainctl");
+    pMainControl->OnExternalEvent("refreshConfigurations", "mainctl", QString(), QVariantMap());
+    checkModules();
+    pMainControl->setAvailableModuleLibs(_availableModuleLibs);
 
     pMainControl->sendDump();
 
-    loadModule("maincontrol", "mainctl", "Maincontrol", "default");
+    //loadModule("maincontrol", "mainctl", "Maincontrol", "default");
 
 
     if (_installfront != "N")
@@ -52,7 +54,6 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
         this->installFront();
     }
 
-    checkModules();
 
 
     loadConf(_conf);
@@ -69,29 +70,29 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
 {
     if (mModulesMap.contains(name ))
     {
-        sendMessage("Module " + name + " already loaded - can't load twice");
+        pMainControl->sendMainMessage("Module " + name + " already loaded - can't load twice");
         return false;
     }
     QLibrary library("libost" + lib);
     if (!library.load())
     {
-        sendMessage(name + " " + library.errorString());
+        pMainControl->sendMainMessage(name + " " + library.errorString());
         return false;
     }
-    sendMessage(name + " library loaded");
+    pMainControl->sendMainMessage(name + " library loaded");
 
     typedef Basemodule *(*CreateModule)(QString, QString, QString, QVariantMap);
     CreateModule createmodule = (CreateModule)library.resolve("initialize");
     if (!createmodule)
     {
-        sendMessage("Could not initialize module from library : " + lib);
+        pMainControl->sendMainMessage("Could not initialize module from library : " + lib);
         return false;
     }
     Basemodule *mod = createmodule(name, label, profile, _availableModuleLibs);
     //QPointer<Basemodule> mod = createmodule(name,label,profile,_availableModuleLibs);
     if (!mod)
     {
-        sendMessage("Could not instanciate module from library : " + lib);
+        pMainControl->sendMainMessage("Could not instanciate module from library : " + lib);
         return false;
     }
     mod->setParent(this);
@@ -101,7 +102,6 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     mod->setProfile(profile);
     QVariantMap profs;
     dbmanager->getDbProfiles(mod->metaObject()->className(), profs);
-    if (name != "mainctl") mod->setProfiles(profs);
     connect(mod, &Basemodule::moduleEvent, this, &Controller::OnModuleEvent);
     connect(mod, &Basemodule::moduleEvent, wshandler, &WShandler::processModuleEvent);
     connect(mod, &Basemodule::loadOtherModule, this, &Controller::loadModule);
@@ -118,18 +118,11 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
             //connect(mod,&Basemodule::moduleEvent, othermodule,&Basemodule::OnExternalEvent);
         }
     }
-    if (name == "mainctl")
-    {
-        mod->OnExternalEvent("refreshConfigurations", name, QString(), QVariantMap());
-    }
-    else
-    {
-        QMap<QString, QString> l;
-        l["label"] = label;
-        l["type"] = lib;
-        l["profile"] = profile;
-        mModulesMap[name] = l;
-    }
+    QMap<QString, QString> l;
+    l["label"] = label;
+    l["type"] = lib;
+    l["profile"] = profile;
+    mModulesMap[name] = l;
     return true;
 
 }
@@ -138,6 +131,7 @@ void Controller::loadConf(const QString &pConf)
     QVariantMap result;
     if (!dbmanager->getDbConfiguration(pConf, result))
     {
+        pMainControl->sendMainError("loadConf " + pConf + " failed");
         return;
     }
     for(QVariantMap::const_iterator iter = result.begin(); iter != result.end(); ++iter)
@@ -145,20 +139,19 @@ void Controller::loadConf(const QString &pConf)
         QVariantMap line = iter.value().toMap();
         QString namewithoutblanks = iter.key();
         namewithoutblanks.replace(" ", "");
-
         loadModule(line["moduletype"].toString(), namewithoutblanks, iter.key(), line["profilename"].toString());
     }
-
+    pMainControl->sendMainMessage("loadConf " + pConf + " successful");
 }
 void Controller::saveConf(const QString &pConf)
 {
     QVariantMap result;
     if (!dbmanager->saveDbConfiguration(pConf, mModulesMap))
     {
-        sendMessage("saveDbConfiguration " + pConf + " failed");
+        pMainControl->sendMainError("saveDbConfiguration " + pConf + " failed");
         return;
     }
-    sendMessage("saveDbConfiguration " + pConf + " sucessfull");
+    pMainControl->sendMainMessage("saveDbConfiguration " + pConf + " sucessfull");
 
 }
 
@@ -168,15 +161,16 @@ void Controller::OnModuleEvent(const QString &pEventType, const QString  &pEvent
 {
     Q_UNUSED(pEventKey);
     Q_UNUSED(pEventData);
-    //if (pEventType == "mm" || pEventType == "me" || pEventType == "mw")
-    //{
-    //    sendMessage(pEventModule + "-" + pEventData["message"].toString());
-    //}
+    if (pEventType == "mm" || pEventType == "me" || pEventType == "mw")
+    {
+        //qDebug() << pEventModule << "-" << pEventData["message"].toString();
+    }
+
     if (pEventType == "moduledelete")
     {
         if (!mModulesMap.contains(pEventModule))
         {
-            sendMessage("moduledelete Module " + pEventModule + " not in module map");
+            pMainControl->sendMainWarning("moduledelete Module " + pEventModule + " not in module map");
         }
         mModulesMap.remove(pEventModule);
     }
@@ -190,20 +184,32 @@ void Controller::OnExternalEvent(const QString &pEventType, const QString  &pEve
     QString strJson = QLatin1String(docByteArray);
     if (pEventModule == "mainctl2")
     {
-        sendMessage("Mainctl event : " + pEventType + " : " + pEventModule + " : " +  pEventKey + " : " + strJson);
+        pMainControl->sendMainMessage("Mainctl event : " + pEventType + " : " + pEventModule + " : " +  pEventKey + " : " +
+                                      strJson);
 
     }
 
-
-
     /* we should check here if incoming message is valid*/
     emit controllerEvent(pEventType, pEventModule, pEventKey, pEventData);
+}
+void Controller::OnMainCtlEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+                                const QVariantMap &pEventData)
+{
+    if (pEventType == "loadconf")
+    {
+        loadConf(pEventKey);
+    }
+    if (pEventType == "saveconf")
+    {
+        saveConf(pEventKey);
+    }
+
 }
 void Controller::checkModules(void)
 {
     foreach (const QString &path, QCoreApplication::libraryPaths())
     {
-        sendMessage(" ************ Check available modules in " + path);
+        pMainControl->sendMainMessage("Check available modules in " + path);
         QDir directory(path);
         directory.setFilter(QDir::Files);
         directory.setNameFilters(QStringList() << "libost*.so");
@@ -216,7 +222,7 @@ void Controller::checkModules(void)
                 QLibrary library(path + "/" + lib);
                 if (!library.load())
                 {
-                    sendMessage(lib + " " + library.errorString());
+                    pMainControl->sendMainWarning(lib + " " + library.errorString());
                 }
                 else
                 {
@@ -233,13 +239,13 @@ void Controller::checkModules(void)
                             mod->setObjectName(lib);
                             QVariantMap info = mod->getModuleInfo();
                             _availableModuleLibs[tt] = info;
-                            sendMessage("found library " + path + "/" + lib) ;
+                            pMainControl->sendMainMessage("found library " + path + "/" + lib) ;
                             delete mod;
                         }
                     }
                     else
                     {
-                        sendMessage("Could not initialize module from the loaded library : " + lib);
+                        pMainControl->sendMainError("Could not initialize module from the loaded library : " + lib);
                     }
                 }
 
@@ -257,11 +263,11 @@ void Controller::installFront(void)
     if (arch == "Y")
     {
         arch = "https://github.com/gehelem/ost-front/releases/download/WorkInProgress/html.tar.gz";
-        sendMessage("download default archive " + arch);
+        pMainControl->sendMainMessage("download default archive " + arch);
     }
     else
     {
-        sendMessage("download specific archive " + arch);
+        pMainControl->sendMainMessage("download specific archive " + arch);
     }
 
     _process = new QProcess(this);
@@ -269,9 +275,9 @@ void Controller::installFront(void)
     connect(_process, &QProcess::readyReadStandardError, this, &Controller::processError);
     connect(_process, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this,
             &Controller::processFinished);
-    sendMessage("****************************");
-    sendMessage("Install default web frontend");
-    sendMessage("****************************");
+    pMainControl->sendMainMessage("****************************");
+    pMainControl->sendMainMessage("Install default web frontend");
+    pMainControl->sendMainMessage("****************************");
     if (_process->state() != 0)
     {
         qDebug() << "can't start process";
@@ -310,20 +316,15 @@ void Controller::installFront(void)
 }
 void Controller::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    sendMessage("PROCESS FINISHED (" + QString::number(exitCode) + ")" + exitStatus);
+    pMainControl->sendMainMessage("PROCESS FINISHED (" + QString::number(exitCode) + ")" + exitStatus);
 }
 void Controller::processOutput()
 {
     QString output = _process->readAllStandardOutput();
-    sendMessage("PROCESS LOG   : " + output);
+    pMainControl->sendMainMessage("PROCESS LOG   : " + output);
 }
 void Controller::processError()
 {
     QString output = _process->readAllStandardError();
-    sendMessage("PROCESS ERROR   : " + output);
-
-}
-void Controller::sendMessage(const QString &pMessage)
-{
-    pMainControl->sendMessage(pMessage);
+    pMainControl->sendMainError("PROCESS ERROR   : " + output);
 }

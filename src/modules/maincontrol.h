@@ -15,6 +15,11 @@ class MODULE_INIT Maincontrol : public Basemodule
     public:
         Maincontrol(QString name, QString label, QString profile, QVariantMap availableModuleLibs);
         ~Maincontrol();
+        void sendMainMessage(const QString &pMessage);
+        void sendMainError(const QString &pMessage);
+        void sendMainWarning(const QString &pMessage);
+        void sendMainConsole(const QString &pMessage);
+        void setAvailableModuleLibs(const QVariantMap libs);
 
     public slots:
         void OnMyExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
@@ -22,8 +27,8 @@ class MODULE_INIT Maincontrol : public Basemodule
     private:
         void setConfigurations(void);
     signals:
-        void loadConf(const QString &pConf);
-        void saveConf(const QString &pConf);
+        void mainCtlEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+                          const QVariantMap &pEventData);
 
 };
 
