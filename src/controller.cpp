@@ -70,29 +70,29 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
 {
     if (mModulesMap.contains(name ))
     {
-        pMainControl->sendMainMessage("Module " + name + " already loaded - can't load twice");
+        pMainControl->sendMainError("Module " + name + " already loaded - can't load twice");
         return false;
     }
     QLibrary library("libost" + lib);
     if (!library.load())
     {
-        pMainControl->sendMainMessage(name + " " + library.errorString());
+        pMainControl->sendMainError(name + " " + library.errorString());
         return false;
     }
-    pMainControl->sendMainMessage(name + " library loaded");
+    //pMainControl->sendMainMessage(name + " library loaded");
 
     typedef Basemodule *(*CreateModule)(QString, QString, QString, QVariantMap);
     CreateModule createmodule = (CreateModule)library.resolve("initialize");
     if (!createmodule)
     {
-        pMainControl->sendMainMessage("Could not initialize module from library : " + lib);
+        pMainControl->sendMainError("Could not initialize module from library : " + lib);
         return false;
     }
     Basemodule *mod = createmodule(name, label, profile, _availableModuleLibs);
     //QPointer<Basemodule> mod = createmodule(name,label,profile,_availableModuleLibs);
     if (!mod)
     {
-        pMainControl->sendMainMessage("Could not instanciate module from library : " + lib);
+        pMainControl->sendMainError("Could not instanciate module from library : " + lib);
         return false;
     }
     mod->setParent(this);
@@ -100,6 +100,7 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     mod->setObjectName(name);
     mod->dbInit(_dbpath, name);
     mod->setProfile(profile);
+    mod->setProfiles();
     QVariantMap profs;
     dbmanager->getDbProfiles(mod->metaObject()->className(), profs);
     connect(mod, &Basemodule::moduleEvent, this, &Controller::OnModuleEvent);
@@ -123,6 +124,10 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     l["type"] = lib;
     l["profile"] = profile;
     mModulesMap[name] = l;
+
+    pMainControl->addModuleData(name, label, lib, profile);
+    pMainControl->sendMainMessage("Module  " + label + " successfully loaded");
+
     return true;
 
 }
@@ -173,7 +178,21 @@ void Controller::OnModuleEvent(const QString &pEventType, const QString  &pEvent
             pMainControl->sendMainWarning("moduledelete Module " + pEventModule + " not in module map");
         }
         mModulesMap.remove(pEventModule);
+        pMainControl->deldModuleData(pEventModule);
     }
+    if (pEventType == "modulesavedprofile")
+    {
+        mModulesMap[pEventModule]["profile"] = pEventKey;
+        pMainControl->setModuleData(pEventModule, "", "", pEventKey);
+
+    }
+    if (pEventType == "moduleloadedprofile")
+    {
+        mModulesMap[pEventModule]["profile"] = pEventKey;
+        pMainControl->setModuleData(pEventModule, "", "", pEventKey);
+
+    }
+
 }
 void Controller::OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
                                  const QVariantMap &pEventData)
@@ -195,6 +214,9 @@ void Controller::OnExternalEvent(const QString &pEventType, const QString  &pEve
 void Controller::OnMainCtlEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
                                 const QVariantMap &pEventData)
 {
+    Q_UNUSED(pEventModule);
+    Q_UNUSED(pEventData);
+
     if (pEventType == "loadconf")
     {
         loadConf(pEventKey);

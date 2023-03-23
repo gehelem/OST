@@ -20,7 +20,7 @@ class Basemodule : public QObject, public Datastore, public DBManager
         }
         void setProfile(QVariantMap profiledata);
         void setProfile(const QString &pProfileName);
-        void setProfiles(QVariantMap profilesdata);
+        void setProfiles();
         void sendDump(void);
 
         /**

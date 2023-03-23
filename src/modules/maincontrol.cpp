@@ -143,10 +143,46 @@ void Maincontrol::setAvailableModuleLibs(const QVariantMap libs)
     foreach(QString key, libs.keys())
     {
         QVariantMap info = libs[key].toMap();
-        createOstProperty( "load" + key, info["moduleDescription"].toMap()["value"].toString(), 2, "Available modules", "");
+        createOstProperty( "load" + key, info["moduleDescription"].toMap()["value"].toString(), 2, "Modules", "");
         setOstPropertyValue("load" + key, "My " + key, false);
         createOstElement(  "load" + key, "load", "Load", false);
         setOstElementValue("load" + key, "load", false, false);
 
     }
+}
+void Maincontrol::addModuleData(const QString  &pName, const QString  &pLabel, const QString  &pType,
+                                const QString  &pProfile)
+{
+    setOstElementValue("modules", "name", pName, false);
+    setOstElementValue("modules", "label", pLabel, false);
+    setOstElementValue("modules", "type", pType, false);
+    setOstElementValue("modules", "profile", pProfile, false);
+    pushOstElements("modules");
+}
+void Maincontrol::setModuleData(const QString  &pName, const QString  &pLabel, const QString  &pType,
+                                const QString  &pProfile)
+{
+    Q_UNUSED(pLabel);
+    Q_UNUSED(pType);
+    QVariantList l = getOstElementGrid("modules", "name");
+    for (int i = 0; i < l.count(); i++)
+    {
+        if( l[i].toString() == pName)
+        {
+            setOstElementLineValue("modules", "profile", i, pProfile);
+        }
+    }
+
+}
+void Maincontrol::deldModuleData(const QString  &pName)
+{
+    QVariantList l = getOstElementGrid("modules", "name");
+    for (int i = 0; i < l.count(); i++)
+    {
+        if( l[i].toString() == pName)
+        {
+            deleteOstPropertyLine("modules", i);
+        }
+    }
+
 }

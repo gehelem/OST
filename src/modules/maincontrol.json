@@ -32,5 +32,36 @@
                 "value":false
             }
         }
+    },
+    "modules": {
+        "devcat": "Modules",
+        "group": "",
+        "permission": 0,
+        "grid":0,
+        "gridlimit":255,
+        "rule":0,
+        "propertyLabel": "Loaded modules",
+        "elements": {
+            "name": {
+                "elementLabel": "Internal name",
+                "value":""
+            },
+            "label": {
+                "elementLabel": "Label",
+                "value":""
+            },
+            "type": {
+                "elementLabel": "Type",
+                "value":""
+            },
+            "profile": {
+                "elementLabel": "Profile",
+                "value":""
+            }
+
+
+
+        }
     }
+
 }
