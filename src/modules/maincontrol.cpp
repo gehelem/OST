@@ -57,11 +57,36 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
             {
                 QVariant val = pEventData[keyprop].toMap()["value"];
                 setOstPropertyValue(keyprop, val, true);
-                setOstPropertyValue("saveconf", val, true);
-
+                if (keyprop == "loadconf")
+                {
+                    setOstPropertyValue("saveconf", val, true);
+                }
             }
             foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
             {
+                if (keyelt == "load" && keyprop != "loadconf")
+                {
+                    if (setOstElementValue(keyprop, keyelt, false, true))
+                    {
+                        QString pp = keyprop;
+                        QString elt = getOstPropertyValue(keyprop).toString();
+                        QString eltwithoutblanks = getOstPropertyValue(keyprop).toString();
+                        eltwithoutblanks.replace(" ", "");
+                        QString prof = "default";
+                        pp.replace("loadlibost", "");
+
+                        emit loadOtherModule(pp,
+                                             eltwithoutblanks,
+                                             elt,
+                                             prof);
+                        setOstPropertyAttribute(keyprop, "status", 1, true);
+                    }
+                    else
+                    {
+                        setOstPropertyAttribute(keyprop, "status", 3, true);
+                    }
+
+                }
                 if (keyelt == "load" && keyprop == "loadconf")
                 {
                     emit loadConf(getOstPropertyValue("loadconf").toString());
@@ -71,6 +96,10 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                 {
                     setConfigurations();
                     setOstPropertyAttribute(keyprop, "status", 1, true);
+                }
+                if (keyelt == "save" && keyprop == "saveconf")
+                {
+                    emit saveConf(getOstPropertyValue("saveconf").toString());
                 }
             }
         }

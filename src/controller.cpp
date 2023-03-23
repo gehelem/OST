@@ -55,7 +55,7 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
         sendMessage("Module " + name + " already loaded - can't load twice");
         return false;
     }
-    QLibrary library(lib);
+    QLibrary library("libsost" + lib);
     if (!library.load())
     {
         sendMessage(name + " " + library.errorString());
@@ -91,6 +91,7 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     if (name == "mainctl")
     {
         connect(mod, &Basemodule::loadConf, this, &Controller::loadConf);
+        connect(mod, &Basemodule::saveConf, this, &Controller::saveConf);
     }
     //connect(this, &Controller::controllerEvent, mod, &Basemodule::OnExternalEvent);
     connect(wshandler, &WShandler::externalEvent, mod, &Basemodule::OnExternalEvent);
@@ -109,7 +110,14 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     {
         mod->OnExternalEvent("refreshConfigurations", name, QString(), QVariantMap());
     }
-    mModulesMap[name] = label;
+    else
+    {
+        QMap<QString, QString> l;
+        l["label"] = label;
+        l["type"] = lib;
+        l["profile"] = profile;
+        mModulesMap[name] = l;
+    }
     return true;
 
 }
@@ -126,8 +134,19 @@ void Controller::loadConf(const QString &pConf)
         QString namewithoutblanks = iter.key();
         namewithoutblanks.replace(" ", "");
 
-        loadModule("libost" + line["moduletype"].toString(), namewithoutblanks, iter.key(), line["profilename"].toString());
+        loadModule(line["moduletype"].toString(), namewithoutblanks, iter.key(), line["profilename"].toString());
     }
+
+}
+void Controller::saveConf(const QString &pConf)
+{
+    QVariantMap result;
+    if (!dbmanager->saveDbConfiguration(pConf, mModulesMap))
+    {
+        sendMessage("saveDbConfiguration " + pConf + " failed");
+        return;
+    }
+    sendMessage("saveDbConfiguration " + pConf + " sucessfull");
 
 }
 
@@ -144,14 +163,10 @@ void Controller::OnModuleEvent(const QString &eventType, const QString  &eventMo
     {
         if (!mModulesMap.contains(eventModule))
         {
-            sendMessage("Module " + eventModule + " not in module map");
+            sendMessage("moduledelete Module " + eventModule + " not in module map");
         }
-        else
-        {
-            mModulesMap.remove(eventModule);
-        }
+        mModulesMap.remove(eventModule);
     }
-
 }
 void Controller::OnExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                  const QVariantMap &eventData)

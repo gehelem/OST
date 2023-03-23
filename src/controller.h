@@ -38,10 +38,11 @@ class Controller : public QObject
         WShandler   *wshandler;
         DBManager   *dbmanager;
         QProcess    *_process;
-        QMap<QString, QString> mModulesMap;
+        QMap<QString, QMap<QString, QString>> mModulesMap;
 
         bool loadModule(QString lib, QString name, QString label, QString profile);
         void loadConf(const QString &pConf);
+        void saveConf(const QString &pConf);
         void checkModules(void);
         void installFront(void);
         void processOutput();
@@ -54,7 +55,6 @@ class Controller : public QObject
                              const QVariantMap &eventData);
         void OnExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                              const QVariantMap &eventData);
-
 
 };
 #endif

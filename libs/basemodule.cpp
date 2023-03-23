@@ -35,17 +35,14 @@ Basemodule::~Basemodule()
 void Basemodule::setProfile(const QString &pProfileName)
 {
     QVariantMap prof;
-    if (getDbProfile(getClassName(), pProfileName, prof))
+    if (!getDbProfile(getClassName(), pProfileName, prof))
     {
-        setProfile(prof);
-        sendMessage(pProfileName + " profile sucessfully loaded");
+        sendWarning("Can't get " + pProfileName + " profile");
+        return;
     }
-    else
-    {
-        sendWarning("Can't load " + pProfileName + " profile");
-    }
-
-
+    setProfile(prof);
+    emit moduleEvent("moduleSetProfile", getModuleName(), pProfileName, QVariantMap());
+    sendMessage(pProfileName + " profile sucessfully loaded");
 }
 
 

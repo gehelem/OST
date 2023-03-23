@@ -145,14 +145,14 @@ bool DBManager::getDbProfiles(QString moduleType, QVariantMap &result )
     mDb.close();
     return true;
 }
-bool DBManager::getDbConfiguration(QString configName, QVariantMap &result )
+bool DBManager::getDbConfiguration(const QString &pConfigName, QVariantMap &result )
 {
     if(!mDb.open())
     {
         sendError("getDbConfiguration dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
         return false;
     }
-    QString sql = "SELECT MODULENAME,MODULETYPE,PROFILENAME FROM CONFIGURATIONS WHERE CONFIGNAME='" + configName + "'";
+    QString sql = "SELECT MODULENAME,MODULETYPE,PROFILENAME FROM CONFIGURATIONS WHERE CONFIGNAME='" + pConfigName + "'";
     if (!mQuery.exec(sql))
     {
         sendError("getConfiguration - ERROR SQL =" + sql);
@@ -169,6 +169,35 @@ bool DBManager::getDbConfiguration(QString configName, QVariantMap &result )
     }
     mDb.close();
     return true;
+}
+bool DBManager::saveDbConfiguration(const QString &pConfigName, QMap<QString, QMap<QString, QString> > &pConf)
+{
+    if(!mDb.open())
+    {
+        sendError("setDbConfiguration dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+        return false;
+    }
+    foreach(const QString &key, pConf.keys())
+    {
+        QString label = pConf[key]["label"];
+        QString type = pConf[key]["type"];
+        QString profile = pConf[key]["profile"];
+        qDebug() << "DB conf = " << key << " label = " << label << " type = " << type << " profile = " << profile;
+        QString sql = "INSERT OR REPLACE INTO CONFIGURATIONS (CONFIGNAME,MODULENAME,MODULETYPE,PROFILENAME) VALUES ('" + pConfigName
+                      + "','" + label + "','" + type + "','" + profile + "');";
+        if (!mQuery.exec(sql))
+        {
+            sendError("setDbConfiguration - ERROR SQL =" + sql);
+            sendError("setDbConfiguration - ERROR : " + mQuery.lastError().text());
+            mDb.close();
+            return false;
+        }
+
+    }
+    mDb.close();
+    return true;
+
+
 }
 bool DBManager::getDbConfigurations(QVariantMap &result )
 {
