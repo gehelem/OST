@@ -26,6 +26,7 @@ Basemodule::~Basemodule()
     {
         deleteOstProperty(key);
     }
+    emit moduleEvent("moduledelete", getModuleName(), "*", QVariantMap());
     Q_CLEANUP_RESOURCE(basemodule);
 }
 
@@ -34,17 +35,14 @@ Basemodule::~Basemodule()
 void Basemodule::setProfile(const QString &pProfileName)
 {
     QVariantMap prof;
-    if (getDbProfile(getClassName(), pProfileName, prof))
+    if (!getDbProfile(getClassName(), pProfileName, prof))
     {
-        setProfile(prof);
-        sendMessage(pProfileName + " profile sucessfully loaded");
+        sendWarning("Can't get " + pProfileName + " profile");
+        return;
     }
-    else
-    {
-        sendWarning("Can't load " + pProfileName + " profile");
-    }
-
-
+    setProfile(prof);
+    emit moduleEvent("moduleSetProfile", getModuleName(), pProfileName, QVariantMap());
+    sendMessage(pProfileName + " profile sucessfully loaded");
 }
 
 
@@ -77,9 +75,8 @@ void Basemodule::setProfile(QVariantMap profiledata)
     }
 
 }
-void Basemodule::setProfiles(QVariantMap profilesdata)
+void Basemodule::setProfiles()
 {
-    Q_UNUSED(profilesdata);
     //mAvailableProfiles = profilesdata;
     QVariantMap profs;
     getDbProfiles(getClassName(), profs);
@@ -150,6 +147,7 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
                                 setProfile(prof);
                                 setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
                                 sendMessage(getOstPropertyValue("loadprofile").toString() + " profile sucessfully loaded");
+                                emit moduleEvent("moduleloadedprofile", getModuleName(), getOstPropertyValue("loadprofile").toString(), QVariantMap());
                                 sendDump();
                             }
                             else
@@ -164,8 +162,7 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
                         if (keyelt == "refresh" && val.toBool())
                         {
                             setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
-                            QVariantMap prof;
-                            setProfiles(QVariantMap());
+                            setProfiles();
                             setOstElementValue("loadprofile", "load", false, false);
                             setOstElementValue("loadprofile", "refresh", false, false);
                             setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
@@ -196,6 +193,7 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
                         {
                             setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
                             sendMessage(getOstPropertyValue("saveprofile").toString() + " profile sucessfully saved");
+                            emit moduleEvent("modulesavedprofile", getModuleName(), getOstPropertyValue("saveprofile").toString(), QVariantMap());
                         }
                         else
                         {
@@ -226,6 +224,10 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
     OnDispatchToIndiExternalEvent(pEventType, pEventModule, pEventKey, pEventData);
 
 
+}
+void Basemodule::killMe()
+{
+    this->~Basemodule();
 }
 QVariantMap Basemodule::getModuleInfo(void)
 {

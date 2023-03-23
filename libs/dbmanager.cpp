@@ -43,22 +43,22 @@ void DBManager::CreateDatabaseStructure()
 {
 
     sendMessage("OST database creation with default values");
-    QFile _file;
-    _file.setFileName(":db.sql");
-    _file.open(QIODevice::ReadOnly | QIODevice::Text);
-    QStringList _queries = QTextStream(&_file).readAll().split(";");
-    _file.close();
-    foreach (QString _sql, _queries)
+    QFile file;
+    file.setFileName(":db.sql");
+    file.open(QIODevice::ReadOnly | QIODevice::Text);
+    QStringList queries = QTextStream(&file).readAll().split(";");
+    file.close();
+    foreach (QString sql, queries)
     {
-        if (_sql.trimmed().isEmpty())
+        if (sql.trimmed().isEmpty())
         {
             continue;
         }
         else
         {
-            if (!mQuery.exec(_sql))
+            if (!mQuery.exec(sql))
             {
-                sendError("CreateDatabaseStructure ERROR SQL =" + _sql);
+                sendError("CreateDatabaseStructure ERROR SQL =" + sql);
                 sendError("CreateDatabaseStructure - ERROR : " + mQuery.lastError().text());
             }
         }
@@ -71,7 +71,7 @@ bool DBManager::setDbProfile(const QString &pModuleType, const QString &pProfile
 {
     if(!mDb.open())
     {
-        sendError("dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+        sendError("setDbProfile dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
         return false;
     }
 
@@ -96,14 +96,14 @@ bool DBManager::getDbProfile(const QString &pModuleType, const QString &pProfile
 {
     if(!mDb.open())
     {
-        sendError("dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+        sendError("getDbProfile dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
         return false;
     }
-    QString _sql = "SELECT ALLVALUES FROM PROFILES WHERE MODULETYPE='" + pModuleType + "' AND PROFILENAME='" + pProfileName +
-                   "'";
-    if (!mQuery.exec(_sql))
+    QString sql = "SELECT ALLVALUES FROM PROFILES WHERE MODULETYPE='" + pModuleType + "' AND PROFILENAME='" + pProfileName +
+                  "'";
+    if (!mQuery.exec(sql))
     {
-        sendError("getProfile - ERROR SQL =" + _sql);
+        sendError("getProfile - ERROR SQL =" + sql);
         sendError("getProfile - ERROR : " + mQuery.lastError().text());
         mDb.close();
         return false;
@@ -123,13 +123,13 @@ bool DBManager::getDbProfiles(QString moduleType, QVariantMap &result )
 {
     if(!mDb.open())
     {
-        sendError("dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+        sendError("getDbProfiles dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
         return false;
     }
-    QString _sql = "SELECT PROFILENAME,ALLVALUES FROM PROFILES WHERE MODULETYPE='" + moduleType + "' ";
-    if (!mQuery.exec(_sql))
+    QString sql = "SELECT PROFILENAME,ALLVALUES FROM PROFILES WHERE MODULETYPE='" + moduleType + "' ";
+    if (!mQuery.exec(sql))
     {
-        sendError("getProfiles - ERROR SQL =" + _sql);
+        sendError("getProfiles - ERROR SQL =" + sql);
         sendError("getProfiles - ERROR : " + mQuery.lastError().text());
         mDb.close();
         return false;
@@ -145,27 +145,82 @@ bool DBManager::getDbProfiles(QString moduleType, QVariantMap &result )
     mDb.close();
     return true;
 }
-bool DBManager::getDbConfiguration(QString configName, QVariantMap &result )
+bool DBManager::getDbConfiguration(const QString &pConfigName, QVariantMap &result )
 {
     if(!mDb.open())
     {
-        sendError("dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+        sendError("getDbConfiguration dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
         return false;
     }
-    QString _sql = "SELECT MODULENAME,MODULETYPE,PROFILENAME FROM CONFIGURATIONS WHERE CONFIGNAME='" + configName + "'";
-    if (!mQuery.exec(_sql))
+    QString sql = "SELECT MODULENAME,MODULETYPE,PROFILENAME FROM CONFIGURATIONS WHERE CONFIGNAME='" + pConfigName + "'";
+    if (!mQuery.exec(sql))
     {
-        sendError("getConfiguration - ERROR SQL =" + _sql);
+        sendError("getConfiguration - ERROR SQL =" + sql);
         sendError("getConfiguration - ERROR : " + mQuery.lastError().text());
         mDb.close();
         return false;
     }
     while (mQuery.next())
     {
-        QVariantMap _line;
-        _line["moduletype"] = mQuery.value(1).toString().toUtf8();
-        _line["profilename"] = mQuery.value(2).toString().toUtf8();
-        result[mQuery.value(0).toString().toUtf8()] = _line;
+        QVariantMap line;
+        line["moduletype"] = mQuery.value(1).toString().toUtf8();
+        line["profilename"] = mQuery.value(2).toString().toUtf8();
+        result[mQuery.value(0).toString().toUtf8()] = line;
+    }
+    mDb.close();
+    return true;
+}
+bool DBManager::saveDbConfiguration(const QString &pConfigName, QMap<QString, QMap<QString, QString> > &pConf)
+{
+    if(!mDb.open())
+    {
+        sendError("setDbConfiguration dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+        return false;
+    }
+    foreach(const QString &key, pConf.keys())
+    {
+        QString label = pConf[key]["label"];
+        QString type = pConf[key]["type"];
+        QString profile = pConf[key]["profile"];
+        qDebug() << "DB conf = " << key << " label = " << label << " type = " << type << " profile = " << profile;
+        QString sql = "INSERT OR REPLACE INTO CONFIGURATIONS (CONFIGNAME,MODULENAME,MODULETYPE,PROFILENAME) VALUES ('" + pConfigName
+                      + "','" + label + "','" + type + "','" + profile + "');";
+        if (!mQuery.exec(sql))
+        {
+            sendError("setDbConfiguration - ERROR SQL =" + sql);
+            sendError("setDbConfiguration - ERROR : " + mQuery.lastError().text());
+            mDb.close();
+            return false;
+        }
+
+    }
+    mDb.close();
+    return true;
+
+
+}
+bool DBManager::getDbConfigurations(QVariantMap &result )
+{
+    if(!mDb.open())
+    {
+        sendError("getDbConfigurations dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+        return false;
+    }
+    QString sql = "SELECT CONFIGNAME,MODULENAME,MODULETYPE,PROFILENAME FROM CONFIGURATIONS";
+    if (!mQuery.exec(sql))
+    {
+        sendError("getDbConfigurations - ERROR SQL =" + sql);
+        sendError("getDbConfigurations - ERROR : " + mQuery.lastError().text());
+        mDb.close();
+        return false;
+    }
+    while (mQuery.next())
+    {
+        QVariantMap line;
+        line["modulename"] = mQuery.value(1).toString().toUtf8();
+        line["moduletype"] = mQuery.value(2).toString().toUtf8();
+        line["profilename"] = mQuery.value(3).toString().toUtf8();
+        result[mQuery.value(0).toString().toUtf8()] = line;
     }
     mDb.close();
     return true;

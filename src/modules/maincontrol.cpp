@@ -26,15 +26,10 @@ Maincontrol::Maincontrol(QString name, QString label, QString profile, QVariantM
         QVariantMap info = getAvailableModuleLibs()[key].toMap();
         createOstProperty( "load" + key, info["moduleDescription"].toMap()["value"].toString(), 2, "Available modules", "");
         setOstPropertyValue("load" + key, "My " + key, false);
-        //createOstElement(  "load" + key, "instance", "Instance name", false);
-        //setOstElementValue("load" + key, "instance", "My " + key, false);
         createOstElement(  "load" + key, "load", "Load", false);
         setOstElementValue("load" + key, "load", false, false);
 
     }
-
-
-
 }
 
 Maincontrol::~Maincontrol()
@@ -50,18 +45,25 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
     //sendMessage("mainctl OnMyExternalEvent - recv : " + getModuleName()+ "-" +eventType +"-" + eventKey);
     if (getModuleName() == pEventModule)
     {
+        if (pEventType == "refreshConfigurations")
+        {
+            setConfigurations();
+        }
         foreach(const QString &keyprop, pEventData.keys())
         {
             if (pEventData[keyprop].toMap().contains("value"))
             {
                 QVariant val = pEventData[keyprop].toMap()["value"];
                 setOstPropertyValue(keyprop, val, true);
+                if (keyprop == "loadconf")
+                {
+                    setOstPropertyValue("saveconf", val, true);
+                }
             }
             foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
             {
-                if (keyelt == "load")
+                if (keyelt == "load" && keyprop != "loadconf")
                 {
-                    setOstPropertyAttribute(keyprop, "status", 2, true);
                     if (setOstElementValue(keyprop, keyelt, false, true))
                     {
                         QString pp = keyprop;
@@ -69,7 +71,7 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                         QString eltwithoutblanks = getOstPropertyValue(keyprop).toString();
                         eltwithoutblanks.replace(" ", "");
                         QString prof = "default";
-                        pp.replace("load", "");
+                        pp.replace("loadlibost", "");
 
                         emit loadOtherModule(pp,
                                              eltwithoutblanks,
@@ -83,7 +85,108 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                     }
 
                 }
+                if (keyelt == "load" && keyprop == "loadconf")
+                {
+                    emit mainCtlEvent("loadconf", QString(), getOstPropertyValue("loadconf").toString(),
+                                      QVariantMap());
+                }
+                if (keyelt == "refresh" && keyprop == "loadconf")
+                {
+                    setConfigurations();
+                    setOstPropertyAttribute(keyprop, "status", 1, true);
+                }
+                if (keyelt == "save" && keyprop == "saveconf")
+                {
+                    emit mainCtlEvent("saveconf", QString(), getOstPropertyValue("saveconf").toString(),
+                                      QVariantMap());
+                }
+                if (keyelt == "kill" && keyprop == "killall")
+                {
+                    emit mainCtlEvent("killall", QString(), QString(), QVariantMap());
+                }
             }
         }
     }
+}
+void Maincontrol::setConfigurations(void)
+{
+    QVariantMap confs;
+    if (!getDbConfigurations( confs))
+    {
+        sendError("Can't refresh available configurations");
+        return;
+    }
+
+    clearOstLov("loadconf");
+    for(QVariantMap::const_iterator iter = confs.begin(); iter != confs.end(); ++iter)
+    {
+        //qDebug() << iter.key() << iter.value();
+        addOstLov("loadconf", iter.key(), iter.key() );
+    }
+    sendMessage("Available configurations refreshed");
+}
+
+void Maincontrol::sendMainMessage(const QString &pMessage)
+{
+    sendMessage(pMessage);
+}
+void Maincontrol::sendMainError(const QString &pMessage)
+{
+    sendError(pMessage);
+}
+void Maincontrol::sendMainWarning(const QString &pMessage)
+{
+    sendWarning(pMessage);
+}
+void Maincontrol::sendMainConsole(const QString &pMessage)
+{
+    sendConsole(pMessage);
+}
+void Maincontrol::setAvailableModuleLibs(const QVariantMap libs)
+{
+    foreach(QString key, libs.keys())
+    {
+        QVariantMap info = libs[key].toMap();
+        createOstProperty( "load" + key, info["moduleDescription"].toMap()["value"].toString(), 2, "Modules", "");
+        setOstPropertyValue("load" + key, "My " + key, false);
+        createOstElement(  "load" + key, "load", "Load", false);
+        setOstElementValue("load" + key, "load", false, false);
+
+    }
+}
+void Maincontrol::addModuleData(const QString  &pName, const QString  &pLabel, const QString  &pType,
+                                const QString  &pProfile)
+{
+    setOstElementValue("modules", "name", pName, false);
+    setOstElementValue("modules", "label", pLabel, false);
+    setOstElementValue("modules", "type", pType, false);
+    setOstElementValue("modules", "profile", pProfile, false);
+    pushOstElements("modules");
+}
+void Maincontrol::setModuleData(const QString  &pName, const QString  &pLabel, const QString  &pType,
+                                const QString  &pProfile)
+{
+    Q_UNUSED(pLabel);
+    Q_UNUSED(pType);
+    QVariantList l = getOstElementGrid("modules", "name");
+    for (int i = 0; i < l.count(); i++)
+    {
+        if( l[i].toString() == pName)
+        {
+            setOstElementLineValue("modules", "profile", i, pProfile);
+        }
+    }
+
+}
+void Maincontrol::deldModuleData(const QString  &pName)
+{
+    QVariantList l = getOstElementGrid("modules", "name");
+    for (int i = 0; i < l.count(); i++)
+    {
+        if( l[i].toString() == pName)
+        {
+            deleteOstPropertyLine("modules", i);
+        }
+    }
+
 }

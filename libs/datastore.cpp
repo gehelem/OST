@@ -853,46 +853,37 @@ void Datastore::addOstElementLov(const QString &pPropertyName, const QString &pE
 }
 QVariant Datastore::getOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode)
 {
-    if (mProperties.contains(pPropertyName))
-    {
-        if (mProperties[pPropertyName].toMap().contains("elements"))
-        {
-            QVariantMap elts = mProperties[pPropertyName].toMap()["elements"].toMap();
-            if (elts.contains(pElementName))
-            {
-                QVariantMap mElt =  mProperties[pPropertyName].toMap()["elements"].toMap()[pElementName].toMap();
-                if (mElt.contains("listOfValues"))
-                {
-                    if (mElt["listOfValues"].toMap().contains(pLovCode))
-                    {
-                        return mElt["listOfValues"].toMap()[pLovCode];
-                    }
-                    else
-                    {
-                        sendWarning("getOstElementLov - property " + pPropertyName + " element " + pElementName + " has no " + pLovCode +
-                                    " member in list of values.");
-                    }
-                }
-                else
-                {
-                    sendWarning("getOstElementLov - property " + pPropertyName + " element " + pElementName + " has no list of values.");
-                }
-            }
-            else
-            {
-                sendWarning("getOstElementLov - property " + pPropertyName + " has no " + pElementName + " element.");
-            }
-        }
-        else
-        {
-            sendWarning("getOstElementLov - property " + pPropertyName + " contains no elements.");
-        }
-    }
-    else
+    if (!mProperties.contains(pPropertyName))
     {
         sendWarning("getOstElementLov - property " + pPropertyName + " not found.");
+        return QVariant();
     }
-    return QVariant();
+    if (!mProperties[pPropertyName].toMap().contains("elements"))
+    {
+        sendWarning("getOstElementLov - property " + pPropertyName + " contains no elements.");
+        return QVariant();
+    }
+    QVariantMap elts = mProperties[pPropertyName].toMap()["elements"].toMap();
+    if (!elts.contains(pElementName))
+    {
+        sendWarning("getOstElementLov - property " + pPropertyName + " has no " + pElementName + " element.");
+        return QVariant();
+    }
+    QVariantMap elt =  mProperties[pPropertyName].toMap()["elements"].toMap()[pElementName].toMap();
+    if (!elt.contains("listOfValues"))
+    {
+        sendWarning("getOstElementLov - property " + pPropertyName + " element " + pElementName + " has no list of values.");
+        return QVariant();
+    }
+    if (!elt["listOfValues"].toMap().contains(pLovCode))
+    {
+        sendWarning("getOstElementLov - property " + pPropertyName + " element " + pElementName + " has no " + pLovCode +
+                    " member in list of values.");
+        return QVariant();
+    }
+
+    return elt["listOfValues"].toMap()[pLovCode];
+
 }
 void Datastore::setOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode,
                                  const QString &pLovLabel)

@@ -8,6 +8,7 @@
 
 
 #include <basemodule.h>
+#include "maincontrol.h"
 
 #include "wshandler.h"
 #include "dbmanager.h"
@@ -22,7 +23,7 @@ class Controller : public QObject
 {
         Q_OBJECT
     public:
-        Controller(bool saveAllBlobs, const QString &webroot, const QString &dbpath,
+        Controller(const QString &webroot, const QString &dbpath,
                    const QString &libpath, const QString &conf, const QString &installfront);
         ~Controller() override;
     signals:
@@ -37,9 +38,13 @@ class Controller : public QObject
         QVariantMap _availableModuleLibs;
         WShandler   *wshandler;
         DBManager   *dbmanager;
+        Maincontrol *pMainControl;
         QProcess    *_process;
+        QMap<QString, QMap<QString, QString>> mModulesMap;
 
-        bool LoadModule(QString lib, QString name, QString label, QString profile);
+        bool loadModule(QString lib, QString name, QString label, QString profile);
+        void loadConf(const QString &pConf);
+        void saveConf(const QString &pConf);
         void checkModules(void);
         void installFront(void);
         void processOutput();
@@ -48,11 +53,11 @@ class Controller : public QObject
         void sendMessage(const QString &pMessage);
 
     private slots:
-        void OnModuleEvent  (const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                             const QVariantMap &eventData);
-        void OnExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                             const QVariantMap &eventData);
-
-
+        void OnModuleEvent  (const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+                             const QVariantMap &pEventData);
+        void OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+                             const QVariantMap &pEventData);
+        void OnMainCtlEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+                            const QVariantMap &pEventData);
 };
 #endif

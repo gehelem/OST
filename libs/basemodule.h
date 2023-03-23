@@ -20,8 +20,9 @@ class Basemodule : public QObject, public Datastore, public DBManager
         }
         void setProfile(QVariantMap profiledata);
         void setProfile(const QString &pProfileName);
-        void setProfiles(QVariantMap profilesdata);
+        void setProfiles();
         void sendDump(void);
+        void killMe(void);
 
         /**
          * @brief gets webroot directory
@@ -100,12 +101,12 @@ class Basemodule : public QObject, public Datastore, public DBManager
         {
             mModuleVersion = version;
         }
+        QVariantMap mAvailableModuleLibs;
 
         /* OST helpers */
 
     private:
 
-        QVariantMap mAvailableModuleLibs;
         QVariantMap mAvailableProfiles;
         QString mWebroot;
         QString mModuleName;

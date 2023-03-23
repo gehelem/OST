@@ -66,6 +66,7 @@ add_executable(ostserver
 )
 target_link_libraries(ostserver
     ostbasemodule
+    ostmaincontrol
     Qt${QT_VERSION_MAJOR}::Gui
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Widgets
