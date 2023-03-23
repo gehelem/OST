@@ -22,6 +22,7 @@ class Basemodule : public QObject, public Datastore, public DBManager
         void setProfile(const QString &pProfileName);
         void setProfiles();
         void sendDump(void);
+        void killMe(void);
 
         /**
          * @brief gets webroot directory

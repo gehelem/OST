@@ -62,6 +62,19 @@
 
 
         }
+    },
+    "killall": {
+        "devcat": "Modules",
+        "group": "",
+        "permission": 2,
+        "rule":0,
+        "propertyLabel": "",
+        "elements": {
+            "kill": {
+                "elementLabel": "Kill all modules",
+                "value":false
+            }
+        }
     }
 
 }

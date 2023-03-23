@@ -100,6 +100,10 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                     emit mainCtlEvent("saveconf", QString(), getOstPropertyValue("saveconf").toString(),
                                       QVariantMap());
                 }
+                if (keyelt == "kill" && keyprop == "killall")
+                {
+                    emit mainCtlEvent("killall", QString(), QString(), QVariantMap());
+                }
             }
         }
     }

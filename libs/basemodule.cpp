@@ -225,6 +225,10 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
 
 
 }
+void Basemodule::killMe()
+{
+    this->~Basemodule();
+}
 QVariantMap Basemodule::getModuleInfo(void)
 {
     QVariantMap temp;

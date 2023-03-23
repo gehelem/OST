@@ -201,7 +201,7 @@ void Controller::OnExternalEvent(const QString &pEventType, const QString  &pEve
     QJsonDocument doc(obj);
     QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
     QString strJson = QLatin1String(docByteArray);
-    if (pEventModule == "mainctl2")
+    if (pEventModule == "mainctl")
     {
         pMainControl->sendMainMessage("Mainctl event : " + pEventType + " : " + pEventModule + " : " +  pEventKey + " : " +
                                       strJson);
@@ -224,6 +224,18 @@ void Controller::OnMainCtlEvent(const QString &pEventType, const QString  &pEven
     if (pEventType == "saveconf")
     {
         saveConf(pEventKey);
+    }
+    if (pEventType == "killall")
+    {
+        QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
+        for (Basemodule *othermodule : othermodules)
+        {
+            if (othermodule->getModuleName() != "mainctl")
+            {
+                othermodule->killMe();
+            }
+        }
+
     }
 
 }
