@@ -21,6 +21,9 @@ class MODULE_INIT Maincontrol : public Basemodule
                                const QVariantMap &pEventData) override;
     private:
         void setConfigurations(void);
+    signals:
+        void loadConf(const QString &pConf);
+        void saveConf(const QString &pConf);
 
 };
 

@@ -3,20 +3,20 @@
 /*!
  * ... ...
  */
-Controller::Controller(bool saveAllBlobs, const QString &webroot, const QString &dbpath,
+Controller::Controller(const QString &webroot, const QString &dbpath,
                        const QString &libpath, const QString &installfront, const QString &conf)
-    : _webroot(webroot),
-      _dbpath(dbpath),
-      _libpath(libpath),
-      _installfront(installfront),
-      _conf(conf)
+    :       _webroot(webroot),
+            _dbpath(dbpath),
+            _libpath(libpath),
+            _installfront(installfront),
+            _conf(conf)
 {
 
-    Q_UNUSED(saveAllBlobs);
-    if (_installfront != "N")
-    {
-        this->installFront();
-    }
+    wshandler = new WShandler(this);
+    connect(wshandler, &WShandler::externalEvent, this, &Controller::OnExternalEvent);
+    dbmanager = new DBManager();
+    dbmanager->dbInit(_dbpath, "controller");
+
     if (_libpath == "")
     {
         //_libpath=QCoreApplication::applicationDirPath();
@@ -29,17 +29,34 @@ Controller::Controller(bool saveAllBlobs, const QString &webroot, const QString 
     QCoreApplication::addLibraryPath("/usr/lib");
     QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath());
 
+    pMainControl = new Maincontrol(QString("mainctl2"), QString("Main control 2"), QString(), QVariantMap());
+    connect(pMainControl, &Maincontrol::moduleEvent, this, &Controller::OnModuleEvent);
+    connect(pMainControl, &Maincontrol::moduleEvent, wshandler, &WShandler::processModuleEvent);
+    connect(pMainControl, &Maincontrol::loadOtherModule, this, &Controller::loadModule);
+    connect(pMainControl, &Maincontrol::loadConf, this, &Controller::loadConf);
+    connect(pMainControl, &Maincontrol::saveConf, this, &Controller::saveConf);
+    connect(this, &Controller::controllerEvent, pMainControl, &Maincontrol::OnExternalEvent);
+    pMainControl->setParent(this);
+    pMainControl->setWebroot(_webroot);
+    pMainControl->setObjectName("mainctl2");
+    pMainControl->dbInit(_dbpath, "mainctl2");
+
+
+    pMainControl->sendDump();
+
+    loadModule("maincontrol", "mainctl", "Maincontrol", "default");
+
+
+    if (_installfront != "N")
+    {
+        this->installFront();
+    }
+
     checkModules();
 
-    wshandler = new WShandler(this);
-    //connect(wshandler, &WShandler::externalEvent, this, &Controller::OnExternalEvent);
-    dbmanager = new DBManager();
-    dbmanager->dbInit(_dbpath, "controller");
-    //connect(dbmanager, SIGNAL(dbEvent), &Controller::OnModuleEvent);
 
-
-    loadModule("libostmaincontrol", "mainctl", "Maincontrol", "default");
     loadConf(_conf);
+
 }
 
 
@@ -55,7 +72,7 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
         sendMessage("Module " + name + " already loaded - can't load twice");
         return false;
     }
-    QLibrary library("libsost" + lib);
+    QLibrary library("libost" + lib);
     if (!library.load())
     {
         sendMessage(name + " " + library.errorString());
@@ -88,13 +105,8 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     connect(mod, &Basemodule::moduleEvent, this, &Controller::OnModuleEvent);
     connect(mod, &Basemodule::moduleEvent, wshandler, &WShandler::processModuleEvent);
     connect(mod, &Basemodule::loadOtherModule, this, &Controller::loadModule);
-    if (name == "mainctl")
-    {
-        connect(mod, &Basemodule::loadConf, this, &Controller::loadConf);
-        connect(mod, &Basemodule::saveConf, this, &Controller::saveConf);
-    }
-    //connect(this, &Controller::controllerEvent, mod, &Basemodule::OnExternalEvent);
-    connect(wshandler, &WShandler::externalEvent, mod, &Basemodule::OnExternalEvent);
+    connect(this, &Controller::controllerEvent, mod, &Basemodule::OnExternalEvent);
+    //connect(wshandler, &WShandler::externalEvent, mod, &Basemodule::OnExternalEvent);
     mod->sendDump();
 
     QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
@@ -151,36 +163,41 @@ void Controller::saveConf(const QString &pConf)
 }
 
 
-void Controller::OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                               const QVariantMap &eventData)
+void Controller::OnModuleEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+                               const QVariantMap &pEventData)
 {
-    Q_UNUSED(eventKey);
-    if (eventType == "mm" || eventType == "me" || eventType == "mw")
+    Q_UNUSED(pEventKey);
+    Q_UNUSED(pEventData);
+    //if (pEventType == "mm" || pEventType == "me" || pEventType == "mw")
+    //{
+    //    sendMessage(pEventModule + "-" + pEventData["message"].toString());
+    //}
+    if (pEventType == "moduledelete")
     {
-        sendMessage(eventModule + "-" + eventData["message"].toString());
-    }
-    if (eventType == "moduledelete")
-    {
-        if (!mModulesMap.contains(eventModule))
+        if (!mModulesMap.contains(pEventModule))
         {
-            sendMessage("moduledelete Module " + eventModule + " not in module map");
+            sendMessage("moduledelete Module " + pEventModule + " not in module map");
         }
-        mModulesMap.remove(eventModule);
+        mModulesMap.remove(pEventModule);
     }
 }
-void Controller::OnExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                                 const QVariantMap &eventData)
+void Controller::OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+                                 const QVariantMap &pEventData)
 {
-    //QJsonObject obj =QJsonObject::fromVariantMap(eventData);
-    //QJsonDocument doc(obj);
-    //QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
-    //QString strJson = QLatin1String(docByteArray);
+    QJsonObject obj = QJsonObject::fromVariantMap(pEventData);
+    QJsonDocument doc(obj);
+    QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
+    QString strJson = QLatin1String(docByteArray);
+    if (pEventModule == "mainctl2")
+    {
+        sendMessage("Mainctl event : " + pEventType + " : " + pEventModule + " : " +  pEventKey + " : " + strJson);
 
-    //sendMessage("Controller OnExternalEvent : " + eventType + " : " + eventModule+ " : "+  eventKey + " : " + strJson);
+    }
+
 
 
     /* we should check here if incoming message is valid*/
-    emit controllerEvent(eventType, eventModule, eventKey, eventData);
+    emit controllerEvent(pEventType, pEventModule, pEventKey, pEventData);
 }
 void Controller::checkModules(void)
 {
@@ -308,8 +325,5 @@ void Controller::processError()
 }
 void Controller::sendMessage(const QString &pMessage)
 {
-    QString messageWithDateTime = "[" + QDateTime::currentDateTime().toString(Qt::ISODateWithMs) + "]-" + pMessage;
-    QDebug debug = qDebug();
-    debug.noquote();
-    debug << messageWithDateTime;
+    pMainControl->sendMessage(pMessage);
 }

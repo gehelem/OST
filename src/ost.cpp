@@ -66,8 +66,6 @@ int main(int argc, char *argv[])
     sendMessage("Load configuration    =" + conf);
 
     Controller controller(
-        //&app,
-        argParser.isSet("s"),
         webroot,
         dbPath,
         libPath,

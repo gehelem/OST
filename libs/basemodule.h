@@ -123,8 +123,6 @@ class Basemodule : public QObject, public Datastore, public DBManager
         void moduleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                          const QVariantMap &eventData);
         void loadOtherModule(QString &lib, QString &name, QString &label, QString &profile);
-        void loadConf(const QString &pConf);
-        void saveConf(const QString &pConf);
 }
 ;
 #endif
