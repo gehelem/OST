@@ -225,3 +225,39 @@ bool DBManager::getDbConfigurations(QVariantMap &result )
     mDb.close();
     return true;
 }
+bool DBManager::searchCatalog(const QString &pArgument, QList<catalogResult> &pResult)
+{
+    if(!mDb.open())
+    {
+        sendError("searchCatalog dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+        return false;
+    }
+    QString argumentWithoutBlanks = pArgument;
+    argumentWithoutBlanks.replace(" ", "");
+    QString sql = "SELECT CATALOG,CODE,RA,NS,DEC,DIAM,MAG,ALIAS FROM CATALOGS ";
+    sql = sql + "WHERE UPPER(CODE) LIKE UPPER('%" + argumentWithoutBlanks + "%')";
+    qDebug() << sql;
+    if (!mQuery.exec(sql))
+    {
+        sendError("searchCatalog - ERROR SQL =" + sql);
+        sendError("searchCatalog - ERROR : " + mQuery.lastError().text());
+        mDb.close();
+        return false;
+    }
+    while (mQuery.next())
+    {
+        catalogResult line;
+        line.catalog = mQuery.value(0).toString();
+        line.code = mQuery.value(1).toString();
+        line.RA = mQuery.value(2).toDouble();
+        line.NS = mQuery.value(3).toString();
+        line.DEC = mQuery.value(4).toDouble();
+        line.diam = mQuery.value(5).toDouble();
+        line.mag = mQuery.value(6).toDouble();
+        line.alias = mQuery.value(7).toString();
+        pResult.push_back(line);
+    }
+    mDb.close();
+    return true;
+
+}

@@ -3,6 +3,21 @@
 
 #include "baseroot.h"
 
+struct catalogResult
+{
+    QString  catalog;
+    QString  code;
+    double RA;
+    QString  NS;
+    double DEC;
+    double diam;
+    double mag;
+    QString  name;
+    QString  alias;
+
+};
+
+
 class DBManager : virtual public Baseroot
 {
     public:
@@ -15,6 +30,7 @@ class DBManager : virtual public Baseroot
         bool getDbConfiguration(const QString &pConfigName, QVariantMap &result );
         bool saveDbConfiguration(const QString &pConfigName, QMap<QString, QMap<QString, QString>> &pConf);
         bool getDbConfigurations(QVariantMap &result );
+        bool searchCatalog(const QString &pArgument, QList<catalogResult> &pResult);
 
     private:
         void CreateDatabaseStructure();
