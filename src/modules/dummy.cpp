@@ -85,6 +85,11 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
     {
         foreach(const QString &keyprop, eventData.keys())
         {
+            if (eventData[keyprop].toMap().contains("value"))
+            {
+                QVariant val = eventData[keyprop].toMap()["value"];
+                setOstPropertyValue(keyprop, val, true);
+            }
             foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
             {
                 setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
@@ -99,7 +104,6 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                         }
                     }
                 }
-
                 if (keyprop == "actions")
                 {
                     if (keyelt == "blob")
@@ -171,6 +175,18 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                         }
                     }
                 }
+                if (keyprop == "search")
+                {
+                    if (keyelt == "searchbtn")
+                    {
+                        if (setOstElementValue(keyprop, keyelt, true, true))
+                        {
+                            updateSearchList();
+
+                        }
+                    }
+                }
+
             }
 
             if (eventType == "Fldelete")
@@ -282,4 +298,30 @@ void Dummy::OnSucessSolve()
 void Dummy::OnSolverLog(QString &text)
 {
     sendMessage(text);
+}
+void Dummy::updateSearchList(void)
+{
+    sendMessage("Searching " + getOstPropertyValue("search").toString());
+    resetOstElements("results");
+    QList<catalogResult> results;
+    searchCatalog(getOstPropertyValue("search").toString(), results);
+    if (results.count() == 0)
+    {
+        sendWarning("Searching " + getOstPropertyValue("search").toString() + " gives no result");
+        return;
+    }
+    for (int i = 0; i < results.count(); i++)
+    {
+        setOstElementValue("results", "catalog", results[i].catalog, false);
+        setOstElementValue("results", "code", results[i].code, false);
+        setOstElementValue("results", "RA", results[i].RA, false);
+        setOstElementValue("results", "NS", results[i].NS, false);
+        setOstElementValue("results", "DEC", results[i].DEC, false);
+        setOstElementValue("results", "diam", results[i].diam, false);
+        setOstElementValue("results", "mag", results[i].mag, false);
+        setOstElementValue("results", "name", results[i].name, false);
+        setOstElementValue("results", "alias", results[i].alias, false);
+        pushOstElements("results");
+    }
+
 }

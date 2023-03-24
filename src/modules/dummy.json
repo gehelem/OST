@@ -394,5 +394,64 @@
         "propertyLabel": "Skychart",
         "devcat": "Examples",
         "group": "Images"
+    },
+    "search": {
+        "devcat": "Examples",
+        "order": "Catalog00",
+        "group": "Catalog",
+        "permission": 2,
+        "value": "default",
+        "rule":0,
+        "propertyLabel": "",
+        "elements": {
+            "searchbtn": {
+                "elementLabel": "Search object",
+                "value":false
+            }
+        }
+    },
+    "results": {
+        "devcat": "Examples",
+        "order": "Catalog10",
+        "group": "Catalog",
+        "permission": 0,
+        "grid":0,
+        "gridlimit":255,
+        "rule":0,
+        "propertyLabel": "Results",
+        "elements": {
+            "code": {
+                "elementLabel": "Code",
+                "value":""
+            },
+            "RA": {
+                "elementLabel": "RA",
+                "value":0
+            },
+            "NS": {
+                "elementLabel": "N/S",
+                "value":""
+            },
+            "DEC": {
+                "elementLabel": "DEC",
+                "value":0
+            },
+            "diam": {
+                "elementLabel": "Diameter",
+                "value":0
+            },
+            "mag": {
+                "elementLabel": "Magnitude",
+                "value":0
+            },
+            "name": {
+                "elementLabel": "Name",
+                "value":""
+            },
+            "alias": {
+                "elementLabel": "Alias",
+                "value":""
+            }
+        }
     }
 }
