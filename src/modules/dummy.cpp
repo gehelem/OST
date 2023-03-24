@@ -209,6 +209,20 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                 updateOstPropertyLine(keyprop, line, eventData);
 
             }
+            if (eventType == "Flselect")
+            {
+                double line = eventData[keyprop].toMap()["line"].toDouble();
+                qDebug() << "dummy" << eventType << "-" << eventModule << "-" << eventKey << "-" << eventData << "line=" << line;
+                QString code = getOstElementLineValue("results", "code", line).toString();
+                float ra = getOstElementLineValue("results", "RA", line).toFloat();
+                float dec = getOstElementLineValue("results", "DEC", line).toFloat();
+                QString ns = getOstElementLineValue("results", "NS", line).toString();
+                setOstElementValue("selection", "code", code, false);
+                setOstElementValue("selection", "RA", ra, false);
+                setOstElementValue("selection", "DEC", dec, false);
+                setOstElementValue("selection", "NS", ns, true);
+
+            }
 
         }
     }
@@ -310,7 +324,19 @@ void Dummy::updateSearchList(void)
         sendWarning("Searching " + getOstPropertyValue("search").toString() + " gives no result");
         return;
     }
-    for (int i = 0; i < results.count(); i++)
+
+    int max = 20;
+    if (max < results.count())
+    {
+        sendWarning("updateSearchList more than " + QString::number(max) + " objects found, limiting result to " + QString::number(
+                        max));
+    }
+    else
+    {
+        max = results.count();
+    }
+
+    for (int i = 0; i < max; i++)
     {
         setOstElementValue("results", "catalog", results[i].catalog, false);
         setOstElementValue("results", "code", results[i].code, false);
