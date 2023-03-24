@@ -88,6 +88,10 @@ void WShandler::processTextMessage(QString message)
     {
         emit externalEvent("Fldelete", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
     }
+    if (obj["evt"].toString() == "Flselect")
+    {
+        emit externalEvent("Flselect", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+    }
     if (obj["evt"].toString() == "Flup")
     {
         emit externalEvent("Flup", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
