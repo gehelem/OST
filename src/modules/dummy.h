@@ -31,6 +31,7 @@ class MODULE_INIT Dummy : public IndiModule
         Solver _solver;
         FITSImage::Statistic stats;
         void updateProperty(INDI::Property property) override;
+        void updateSearchList(void);
 
 
 

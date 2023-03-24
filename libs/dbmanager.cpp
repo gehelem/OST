@@ -225,3 +225,114 @@ bool DBManager::getDbConfigurations(QVariantMap &result )
     mDb.close();
     return true;
 }
+bool DBManager::searchCatalog(const QString &pArgument, QList<catalogResult> &pResult)
+{
+    if(!mDb.open())
+    {
+        sendError("searchCatalog dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+        return false;
+    }
+    QString argumentWithoutBlanks = pArgument;
+    argumentWithoutBlanks.replace(" ", "");
+    QString sql = "SELECT CATALOG,CODE,RA,NS,DEC,DIAM,MAG,NAME,ALIAS FROM CATALOGS WHERE ";
+    sql = sql + "    UPPER(CODE) LIKE UPPER('%" + argumentWithoutBlanks + "%')";
+    sql = sql + " OR UPPER(ALIAS) LIKE UPPER('%" + argumentWithoutBlanks + "%')";
+    sql = sql + " OR UPPER(NAME) LIKE UPPER('%" + argumentWithoutBlanks + "%')";
+    if (!mQuery.exec(sql))
+    {
+        sendError("searchCatalog - ERROR SQL =" + sql);
+        sendError("searchCatalog - ERROR : " + mQuery.lastError().text());
+        mDb.close();
+        return false;
+    }
+    while (mQuery.next())
+    {
+        catalogResult line;
+        line.catalog = mQuery.value(0).toString();
+        line.code = mQuery.value(1).toString();
+        line.RA = mQuery.value(2).toDouble();
+        line.NS = mQuery.value(3).toString();
+        line.DEC = mQuery.value(4).toDouble();
+        line.diam = mQuery.value(5).toDouble();
+        line.mag = mQuery.value(6).toDouble();
+        line.name = mQuery.value(7).toString();
+        line.alias = mQuery.value(8).toString();
+        pResult.push_back(line);
+    }
+    mDb.close();
+    return true;
+
+}
+bool DBManager::populateCatalog(const QString &pFileName, const QString &pName)
+{
+    if(!mDb.open())
+    {
+        sendError("populateCatalog dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+        return false;
+    }
+    QString sql = "DELETE FROM CATALOGS WHERE CATALOG='" + pName + "'";
+    if (!mQuery.exec(sql))
+    {
+        sendError("searchCatalog - ERROR SQL =" + sql);
+        sendError("searchCatalog - ERROR : " + mQuery.lastError().text());
+        mDb.close();
+        return false;
+    }
+
+
+    QFile inputFile(pFileName);
+    if (!inputFile.open(QIODevice::ReadOnly))
+    {
+        sendError("populateCatalog can't read file " + pFileName);
+        return false;
+    }
+    QTextStream in(&inputFile);
+    while (!in.atEnd())
+    {
+
+        QString line = in.readLine();
+        line = line.replace("'", " ");
+        QStringList splitted = line.split(u';');
+        if (splitted.size() != 9)
+        {
+            sendWarning("populateCatalog with file " + pFileName + " ; can't parse this line : " + line);
+        }
+        else
+        {
+            sql = "INSERT INTO CATALOGS VALUES (";
+            sql = sql + "'" + pName + "',";
+            sql = sql + "'" + splitted[0] + "',";
+            sql = sql + "'" + splitted[1] + "',";
+            sql = sql + "'" + splitted[2] + "',";
+            sql = sql + "'" + splitted[3] + "',";
+            sql = sql + "'" + splitted[4] + "',";
+            sql = sql + "'" + splitted[5] + "',";
+            sql = sql + "'" + splitted[6] + "',";
+            sql = sql + "'" + splitted[7] + "'";
+            sql = sql + ");";
+            if (!mQuery.exec(sql))
+            {
+                sendWarning("searchCatalog - ERROR SQL =" + sql);
+                sendWarning("searchCatalog - ERROR : " + mQuery.lastError().text());
+            }
+
+        }
+    }
+    mDb.close();
+    inputFile.close();
+    return true;
+    /*QFile file;
+    file.setFileName(pFileName);
+    file.open(QIODevice::ReadOnly | QIODevice::Text);
+    content = file.readAll();
+    file.close();
+    QJsonDocument d = QJsonDocument::fromJson(content.toUtf8());
+    QJsonObject props = d.object();
+    foreach(const QString &key, props.keys())
+    {
+        QVariant tt = props[key].toVariant();
+        mProperties[key] = tt.toMap();
+    }*/
+
+
+}

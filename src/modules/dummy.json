@@ -394,5 +394,107 @@
         "propertyLabel": "Skychart",
         "devcat": "Examples",
         "group": "Images"
+    },
+    "search": {
+        "devcat": "Examples",
+        "order": "Catalog00",
+        "group": "Catalog",
+        "permission": 2,
+        "value": "M13",
+        "rule":0,
+        "propertyLabel": "",
+        "elements": {
+            "searchbtn": {
+                "elementLabel": "Search object",
+                "value":false
+            }
+        }
+    },
+    "results": {
+        "devcat": "Examples",
+        "order": "Catalog10",
+        "group": "Catalog",
+        "permission": 0,
+        "grid":0,
+        "gridlimit":255,
+        "rule":0,
+        "propertyLabel": "Results",
+        "elements": {
+            "catalog": {
+                "elementLabel": "Catalogue",
+                "order":"10",
+                "value":""
+            },
+            "code": {
+                "elementLabel": "Code",
+                "order":"20",
+                "value":""
+            },
+            "RA": {
+                "elementLabel": "RA",
+                "order":"30",
+                "value":0
+            },
+            "NS": {
+                "elementLabel": "N/S",
+                "order":"50",
+                "value":""
+            },
+            "DEC": {
+                "elementLabel": "DEC",
+                "order":"40",
+                "value":0
+            },
+            "diam": {
+                "elementLabel": "Diameter",
+                "order":"60",
+                "value":0
+            },
+            "mag": {
+                "elementLabel": "Magnitude",
+                "order":"70",
+                "value":0
+            },
+            "name": {
+                "elementLabel": "Name",
+                "order":"80",
+                "value":""
+            },
+            "alias": {
+                "elementLabel": "Alias",
+                "order":"90",
+                "value":""
+            }
+        }
+    },
+    "selection": {
+        "devcat": "Examples",
+        "order": "Catalog15",
+        "group": "Catalog",
+        "permission": 2,
+        "rule":0,
+        "propertyLabel": "Selection",
+        "elements": {
+            "code": {
+                "elementLabel": "Code",
+                "order":"10",
+                "value":""
+            },
+            "RA": {
+                "elementLabel": "RA",
+                "order":"20",
+                "value":0
+            },
+            "NS": {
+                "elementLabel": "N/S",
+                "order":"40",
+                "value":""
+            },
+            "DEC": {
+                "elementLabel": "DEC",
+                "order":"30",
+                "value":0
+            }
+        }
     }
 }
