@@ -31,6 +31,7 @@ class DBManager : virtual public Baseroot
         bool saveDbConfiguration(const QString &pConfigName, QMap<QString, QMap<QString, QString>> &pConf);
         bool getDbConfigurations(QVariantMap &result );
         bool searchCatalog(const QString &pArgument, QList<catalogResult> &pResult);
+        bool populateCatalog(const QString &pFileName, const QString &pName);
 
     private:
         void CreateDatabaseStructure();
