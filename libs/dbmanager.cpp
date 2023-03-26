@@ -293,22 +293,26 @@ bool DBManager::populateCatalog(const QString &pFileName, const QString &pName)
         QString line = in.readLine();
         line = line.replace("'", " ");
         QStringList splitted = line.split(u';');
-        if (splitted.size() != 9)
+        if (splitted.size() >= 9)
         {
             sendWarning("populateCatalog with file " + pFileName + " ; can't parse this line : " + line);
         }
         else
         {
             sql = "INSERT INTO CATALOGS VALUES (";
-            sql = sql + "'" + pName + "',";
-            sql = sql + "'" + splitted[0] + "',";
-            sql = sql + "'" + splitted[1] + "',";
-            sql = sql + "'" + splitted[2] + "',";
-            sql = sql + "'" + splitted[3] + "',";
-            sql = sql + "'" + splitted[4] + "',";
-            sql = sql + "'" + splitted[5] + "',";
-            sql = sql + "'" + splitted[6] + "',";
-            sql = sql + "'" + splitted[7] + "'";
+            sql = sql + "'" + pName + "'";
+            sql = sql + ",'" + splitted[0] + "'";
+            sql = sql + ",'" + splitted[1] + "'";
+            sql = sql + ",'" + splitted[2] + "'";
+            sql = sql + ",'" + splitted[3] + "'";
+            if (splitted.size() >= 5) sql = sql + ",'" + splitted[4] + "'";
+            else  sql = sql + ",''";
+            if (splitted.size() >= 6) sql = sql + ",'" + splitted[5] + "'";
+            else  sql = sql + ",''";
+            if (splitted.size() >= 7) sql = sql + ",'" + splitted[6] + "'";
+            else  sql = sql + ",''";
+            if (splitted.size() >= 8) sql = sql + ",'" + splitted[7] + "'";
+            else  sql = sql + ",''";
             sql = sql + ");";
             if (!mQuery.exec(sql))
             {
