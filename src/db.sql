@@ -19,6 +19,7 @@ INSERT INTO CONFIGURATIONS VALUES ('modules','Indipanel','indipanel','default');
 INSERT INTO CONFIGURATIONS VALUES ('modules','My Allsky','allsky','default');
 INSERT INTO CONFIGURATIONS VALUES ('modules','My CCD inspector','inspector','default');
 INSERT INTO CONFIGURATIONS VALUES ('modules','My Focuser','focuser','default');
+INSERT INTO CONFIGURATIONS VALUES ('modules','My Navigator','navigator','default');
 CREATE TABLE IF NOT EXISTS CATALOGS (
         CATALOG TEXT NOT NULL,
         CODE TEXT NOT NULL,
