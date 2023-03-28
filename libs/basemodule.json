@@ -30,7 +30,7 @@
     },
     "moduleDescription": {
         "devcat": "Module",
-        "group": "",
+        "group": "Info",
         "order":"01",
         "permission": 0,
         "propertyLabel": "Module description",
