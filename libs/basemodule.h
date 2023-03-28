@@ -1,12 +1,8 @@
 #ifndef BASEMODULE_h_
 #define BASEMODULE_h_
 
-#include <QObject>
-#include <basedevice.h>
-#include <baseclient.h>
 #include <datastore.h>
 #include <dbmanager.h>
-#include <QVariant>
 /*!
  * This Class shouldn't be used as is
  * Every functionnal module should inherit it
@@ -24,8 +20,9 @@ class Basemodule : public QObject, public Datastore, public DBManager
         }
         void setProfile(QVariantMap profiledata);
         void setProfile(const QString &pProfileName);
-        void setProfiles(QVariantMap profilesdata);
+        void setProfiles();
         void sendDump(void);
+        void killMe(void);
 
         /**
          * @brief gets webroot directory
@@ -98,18 +95,18 @@ class Basemodule : public QObject, public Datastore, public DBManager
         void setModuleDescription(QString description)
         {
             mModuleDescription = description;
+            setOstPropertyValue("moduleDescription", description, true);
         }
         void setModuleVersion(QString version)
         {
             mModuleVersion = version;
         }
+        QVariantMap mAvailableModuleLibs;
 
         /* OST helpers */
 
     private:
 
-        QVariantMap mOstProperties;
-        QVariantMap mAvailableModuleLibs;
         QVariantMap mAvailableProfiles;
         QString mWebroot;
         QString mModuleName;

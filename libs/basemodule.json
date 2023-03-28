@@ -1,35 +1,35 @@
 {
     "baseVersion": {
-        "devcat": "Info",
-        "group": "",
+        "devcat": "Module",
+        "group": "Info",
         "order":"00",
         "permission": 0,
         "propertyLabel": "BaseVersion",
         "value":1
     },
     "baseGitHash": {
-        "devcat": "Info",
-        "group": "",
+        "devcat": "Module",
+        "group": "Info",
         "order":"00",
         "permission": 0,
         "propertyLabel": "Base module git hash"
     },
     "baseGitDate": {
-        "devcat": "Info",
-        "group": "",
+        "devcat": "Module",
+        "group": "Info",
         "order":"00",
         "permission": 0,
         "propertyLabel": "Base module git date"
     },
     "baseGitMessage": {
-        "devcat": "Info",
-        "group": "",
+        "devcat": "Module",
+        "group": "Info",
         "order":"00",
         "permission": 0,
         "propertyLabel": "Base module git message"
     },
     "moduleDescription": {
-        "devcat": "Info",
+        "devcat": "Module",
         "group": "",
         "order":"01",
         "permission": 0,
@@ -37,24 +37,24 @@
         "value":"N/A"
     },
     "moduleLabel": {
-        "devcat": "Info",
-        "group": "",
+        "devcat": "Module",
+        "group": "Info",
         "order":"02",
         "permission": 0,
         "propertyLabel": "Module label",
         "value":"Base module label"
     },
     "moduleName": {
-        "devcat": "Info",
-        "group": "",
+        "devcat": "Module",
+        "group": "Info",
         "order":"03",
         "permission": 0,
         "propertyLabel": "Module name",
         "value":"basemodule"
     },
     "moduleVersion": {
-        "devcat": "Info",
-        "group": "",
+        "devcat": "Module",
+        "group": "Info",
         "order":"04",
         "permission": 0,
         "propertyLabel": "Version",
@@ -67,30 +67,43 @@
         "propertyLabel": "Message",
         "value": ""
     },
-    "profileactions": {
-        "devcat": "Profiles",
-        "group": "",
+    "loadprofile": {
+        "devcat": "Module",
+        "group": "Profiles",
         "permission": 2,
-        "rule":2,
-        "propertyLabel": "Profiles",
+        "value": "default",
+        "listOfValues":{
+        },
+        "rule":1,
+        "propertyLabel": "Load profile",
         "elements": {
             "load": {
                 "elementLabel": "Load",
                 "value":false
             },
-            "save": {
-                "elementLabel": "Save",
+            "refresh": {
+                "elementLabel": "Refresh",
                 "value":false
-            },
-            "name": {
-                "elementLabel": "Name",
-                "value": "default"
+            }
+        }
+    },
+    "saveprofile": {
+        "devcat": "Module",
+        "group": "Profiles",
+        "permission": 2,
+        "value": "default",
+        "rule":0,
+        "propertyLabel": "Save profile",
+        "elements": {
+            "save": {
+                "elementLabel": "Save as",
+                "value":false
             }
         }
     },
     "moduleactions": {
-        "devcat": "Profiles",
-        "group": "",
+        "devcat": "Module",
+        "group": "Actions",
         "permission": 1,
         "propertyLabel": "Controls",
         "rule":2,

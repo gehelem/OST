@@ -44,12 +44,15 @@ db/ost.db
 
 batch/
 debian/.debhelper
-debian/ostserver
-debian/debhelper-build-stamp
+debian/ostserver/usr
 debian/files
+debian/ostserver/DEBIAN/md5sums
+debian/debhelper-build-stamp
 debian/ostserver.substvars
 obj-x86_64-linux-gnu/
 
 src/git_version.cpp
 
 src/version.cc
+
+clean.sh

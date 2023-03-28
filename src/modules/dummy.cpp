@@ -11,7 +11,7 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
 {
 
     //Q_INIT_RESOURCE(dummy);
-    setClassName(metaObject()->className());
+    setClassName(QString(metaObject()->className()).toLower());
     loadOstPropertiesFromFile(":dummy.json");
     setModuleDescription("Dummy module to show what we can do and not");
     setModuleVersion("0.1");
@@ -50,15 +50,26 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     //saveAttributesToFile("dummy.json");
     _camera = getOstElementValue("devices", "camera").toString();
 
-    foreach(QString key, getAvailableModuleLibs().keys())
-    {
-        if (!createOstProperty("mod" + key, "mod" + key, 0, "Modules", "root"))
-        {
-            sendMessage("createOstProperty KO : " + key);
-        }
-    }
-    setBLOBMode(B_ALSO, _camera.toStdString().c_str(), nullptr);
-
+    //foreach(QString key, getAvailableModuleLibs().keys())
+    //{
+    //    if (!createOstProperty("mod" + key, "mod" + key, 0, "Module", "Ava"))
+    //    {
+    //        sendMessage("createOstProperty KO : " + key);
+    //    }
+    //}
+    //setBLOBMode(B_ALSO, _camera.toStdString().c_str(), nullptr);
+    //enableDirectBlobAccess(_camera.toStdString().c_str(), nullptr);
+    //setBlobMode();
+    setOstElementLov("extextRW", "extext4", "i1", "i1 label modified");
+    //addOstElementLov("extextRW", "extext4", "i1", "i1 label modified"); // should give a warning
+    addOstElementLov("extextRW", "extext4", "i3", "i3 label");
+    addOstElementLov("extextRW", "extext4", "i4", "i4 label");
+    deleteOstElementLov("extextRW", "extext4", "i4");
+    //deleteOstElementLov("extextRW", "extext4", "i4"); // should give a warning
+    //sendMessage(QString("lov element i3=") + getOstElementLov("extextRW", "extext4", "i3").toString());
+    //sendMessage(QString("lov element inexistant") + getOstElementLov("extextRW", "extext4",
+    //            "xxx").toString());// should give a warning
+    //clearOstElementLov("extextRW", "extext4");
 }
 
 Dummy::~Dummy()
@@ -69,10 +80,16 @@ Dummy::~Dummy()
 void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                               const QVariantMap &eventData)
 {
+
     if (getModuleName() == eventModule )
     {
         foreach(const QString &keyprop, eventData.keys())
         {
+            if (eventData[keyprop].toMap().contains("value"))
+            {
+                QVariant val = eventData[keyprop].toMap()["value"];
+                setOstPropertyValue(keyprop, val, true);
+            }
             foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
             {
                 setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
@@ -87,17 +104,18 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                         }
                     }
                 }
-
                 if (keyprop == "actions")
                 {
                     if (keyelt == "blob")
                     {
                         if (setOstElementValue(keyprop, keyelt, false, false))
                         {
+                            connectIndi();
                             setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
                             connectDevice(_camera);
                             connectDevice(getOstElementValue("devices", "mount").toString());
                             setBLOBMode(B_ALSO, _camera.toStdString().c_str(), nullptr);
+                            enableDirectBlobAccess(_camera.toStdString().c_str(), nullptr);
                         }
                     }
                     if (keyelt == "shoot")
@@ -157,21 +175,72 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                         }
                     }
                 }
+                if (keyprop == "search")
+                {
+                    if (keyelt == "searchbtn")
+                    {
+                        if (setOstElementValue(keyprop, keyelt, true, true))
+                        {
+                            updateSearchList();
+
+                        }
+                    }
+                }
+
             }
+
+            if (eventType == "Fldelete")
+            {
+                double line = eventData[keyprop].toMap()["line"].toDouble();
+                qDebug() << "dummy" << eventType << "-" << eventModule << "-" << eventKey << "-" << eventData << "line=" << line;
+                deleteOstPropertyLine(keyprop, line);
+
+            }
+            if (eventType == "Flcreate")
+            {
+                qDebug() << "dummy" << eventType << "-" << eventModule << "-" << eventKey << "-" << eventData;
+                newOstPropertyLine(keyprop, eventData);
+
+            }
+            if (eventType == "Flupdate")
+            {
+                double line = eventData[keyprop].toMap()["line"].toDouble();
+                qDebug() << "dummy" << eventType << "-" << eventModule << "-" << eventKey << "-" << eventData;
+                updateOstPropertyLine(keyprop, line, eventData);
+
+            }
+            if (eventType == "Flselect")
+            {
+                double line = eventData[keyprop].toMap()["line"].toDouble();
+                qDebug() << "dummy" << eventType << "-" << eventModule << "-" << eventKey << "-" << eventData << "line=" << line;
+                QString code = getOstElementLineValue("results", "code", line).toString();
+                float ra = getOstElementLineValue("results", "RA", line).toFloat();
+                float dec = getOstElementLineValue("results", "DEC", line).toFloat();
+                QString ns = getOstElementLineValue("results", "NS", line).toString();
+                setOstElementValue("selection", "code", code, false);
+                setOstElementValue("selection", "RA", ra, false);
+                setOstElementValue("selection", "DEC", dec, false);
+                setOstElementValue("selection", "NS", ns, true);
+
+            }
+
         }
     }
 }
 
-void Dummy::newBLOB(IBLOB *bp)
+void Dummy::newBLOB(INDI::PropertyBlob pblob)
 {
 
     if (
-        (QString(bp->bvp->device) == _camera)
+        (QString(pblob.getDeviceName()) == _camera)
     )
     {
+
+
         delete _image;
         _image = new fileio();
-        _image->loadBlob(bp);
+        _image->loadBlob(pblob);
+
 
         setOstPropertyAttribute("actions", "status", IPS_OK, true);
         setOstElementValue("imagevalues", "width", _image->getStats().width, false);
@@ -184,19 +253,32 @@ void Dummy::newBLOB(IBLOB *bp)
         setOstElementValue("imagevalues", "snr", _image->getStats().SNR, true);
         QList<fileio::Record> rec = _image->getRecords();
         stats = _image->getStats();
-        _image->saveAsFITS(getWebroot() + "/" + getModuleName() + QString(bp->bvp->device) + ".FITS", stats,
+        _image->saveAsFITS(getWebroot() + "/" + getModuleName() + QString(pblob.getDeviceName()) + ".FITS", stats,
                            _image->getImageBuffer(),
                            FITSImage::Solution(), rec, false);
 
         QImage rawImage = _image->getRawQImage();
-        rawImage.save(getWebroot() + "/" + getModuleName() + QString(bp->bvp->device) + ".jpeg", "JPG", 100);
-        setOstPropertyAttribute("testimage", "URL", getModuleName() + QString(bp->bvp->device) + ".jpeg", true);
+        rawImage.save(getWebroot() + "/" + getModuleName() + QString(pblob.getDeviceName()) + ".jpeg", "JPG", 100);
+        setOstPropertyAttribute("testimage", "URL", getModuleName() + QString(pblob.getDeviceName()) + ".jpeg", true);
 
     }
     setOstPropertyAttribute("actions", "status", IPS_OK, true);
 
 
 }
+void Dummy::updateProperty(INDI::Property property)
+{
+    if (strcmp(property.getName(), "CCD Simulator") == 0)
+    {
+        qDebug() << "updateProperty " << property.getName();
+    }
+    if (strcmp(property.getName(), "CCD1") == 0)
+    {
+        qDebug() << "updateProperty " << property.getName();
+        newBLOB(property);
+    }
+}
+
 void Dummy::OnSucessSEP()
 {
     setOstPropertyAttribute("actions", "status", IPS_OK, true);
@@ -230,4 +312,42 @@ void Dummy::OnSucessSolve()
 void Dummy::OnSolverLog(QString &text)
 {
     sendMessage(text);
+}
+void Dummy::updateSearchList(void)
+{
+    sendMessage("Searching " + getOstPropertyValue("search").toString());
+    resetOstElements("results");
+    QList<catalogResult> results;
+    searchCatalog(getOstPropertyValue("search").toString(), results);
+    if (results.count() == 0)
+    {
+        sendWarning("Searching " + getOstPropertyValue("search").toString() + " gives no result");
+        return;
+    }
+
+    int max = 20;
+    if (max < results.count())
+    {
+        sendWarning("updateSearchList more than " + QString::number(max) + " objects found, limiting result to " + QString::number(
+                        max));
+    }
+    else
+    {
+        max = results.count();
+    }
+
+    for (int i = 0; i < max; i++)
+    {
+        setOstElementValue("results", "catalog", results[i].catalog, false);
+        setOstElementValue("results", "code", results[i].code, false);
+        setOstElementValue("results", "RA", results[i].RA, false);
+        setOstElementValue("results", "NS", results[i].NS, false);
+        setOstElementValue("results", "DEC", results[i].DEC, false);
+        setOstElementValue("results", "diam", results[i].diam, false);
+        setOstElementValue("results", "mag", results[i].mag, false);
+        setOstElementValue("results", "name", results[i].name, false);
+        setOstElementValue("results", "alias", results[i].alias, false);
+        pushOstElements("results");
+    }
+
 }

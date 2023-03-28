@@ -26,6 +26,7 @@ Basemodule::~Basemodule()
     {
         deleteOstProperty(key);
     }
+    emit moduleEvent("moduledelete", getModuleName(), "*", QVariantMap());
     Q_CLEANUP_RESOURCE(basemodule);
 }
 
@@ -34,25 +35,21 @@ Basemodule::~Basemodule()
 void Basemodule::setProfile(const QString &pProfileName)
 {
     QVariantMap prof;
-    if (getDbProfile(getClassName(), pProfileName, prof))
+    if (!getDbProfile(getClassName(), pProfileName, prof))
     {
-        setProfile(prof);
-        sendMessage(pProfileName + " profile sucessfully loaded");
+        sendWarning("Can't get " + pProfileName + " profile");
+        return;
     }
-    else
-    {
-        sendMessage("Can't load " + pProfileName + " profile");
-    }
-
-
+    setProfile(prof);
+    emit moduleEvent("moduleSetProfile", getModuleName(), pProfileName, QVariantMap());
+    sendMessage(pProfileName + " profile sucessfully loaded");
 }
 
 
 
 void Basemodule::setProfile(QVariantMap profiledata)
 {
-    QVariantMap _props = mOstProperties["properties"].toMap();
-
+    QVariantMap _props = getProperties();
     foreach(const QString &key, profiledata.keys())
     {
         if (_props.contains(key))
@@ -67,18 +64,29 @@ void Basemodule::setProfile(QVariantMap profiledata)
                     foreach(const QString &eltkey, profiledata[key].toMap()["elements"].toMap().keys())
                     {
                         setOstElementValue(key, eltkey, profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["value"], true);
+                        if (_props[key].toMap().contains("grid"))
+                        {
+                            setOstElementGrid (key, eltkey, profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["gridvalues"].toList(), true);
+                        }
                     }
-
                 }
             }
         }
-
     }
 
 }
-void Basemodule::setProfiles(QVariantMap profilesdata)
+void Basemodule::setProfiles()
 {
-    mAvailableProfiles = profilesdata;
+    //mAvailableProfiles = profilesdata;
+    QVariantMap profs;
+    getDbProfiles(getClassName(), profs);
+    clearOstLov("loadprofile");
+    for(QVariantMap::const_iterator iter = profs.begin(); iter != profs.end(); ++iter)
+    {
+        //qDebug() << iter.key() << iter.value();
+        addOstLov("loadprofile", iter.key(), iter.key() );
+    }
+    sendMessage("Available profiles refreshed");
 }
 
 void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
@@ -92,20 +100,20 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
     }
 
     /* just check if requested modification is possible */
-    if ( (pEventType == "Fsetpropvalue") && (pEventModule == getModuleName()) )
+    if ( (pEventType == "Fsetproperty") && (pEventModule == getModuleName()) )
     {
         foreach(const QString &keyprop, pEventData.keys())
         {
-            if (!getProperties()["properties"].toMap().contains(keyprop) )
+            if (!getProperties().contains(keyprop) )
             {
-                sendMessage(" Fsetpropvalue - property " + keyprop + " not found");
+                sendMessage(" Fsetproperty - property " + keyprop + " not found");
                 return;
             }
             foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
             {
-                if (!getProperties()["properties"].toMap()[keyprop].toMap()["elements"].toMap().contains(keyprop) )
+                if (!getProperties()[keyprop].toMap()["elements"].toMap().contains(keyelt) )
                 {
-                    sendMessage(" Fsetpropvalue - property " + keyprop + " - element " + keyelt +  " not found");
+                    sendMessage(" Fsetproperty - property " + keyprop + " - element " + keyelt +  " not found");
                     return;
                 }
             }
@@ -113,51 +121,86 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
     }
 
 
-    if (getModuleName() == pEventModule)
+    if ((getModuleName() == pEventModule ) && (pEventType == "Fsetproperty") )
     {
         foreach(const QString &keyprop, pEventData.keys())
         {
-            if (keyprop == "profileactions")
+            if (keyprop == "loadprofile")
             {
+                if (pEventData[keyprop].toMap().contains("value"))
+                {
+                    QVariant val = pEventData[keyprop].toMap()["value"];
+                    setOstPropertyValue(keyprop, val, true);
+                    setOstPropertyValue("saveprofile", val, true);
+                }
+                if (pEventData[keyprop].toMap().contains("elements"))
+                {
+                    foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
+                    {
+                        QVariant val = pEventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
+                        if (keyelt == "load" && val.toBool())
+                        {
+                            setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
+                            QVariantMap prof;
+                            if (getDbProfile(getClassName(), getOstPropertyValue("loadprofile").toString(), prof))
+                            {
+                                setProfile(prof);
+                                setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
+                                sendMessage(getOstPropertyValue("loadprofile").toString() + " profile sucessfully loaded");
+                                emit moduleEvent("moduleloadedprofile", getModuleName(), getOstPropertyValue("loadprofile").toString(), QVariantMap());
+                                sendDump();
+                            }
+                            else
+                            {
+                                sendMessage("Can't load " + getOstElementValue("loadprofile", "name").toString() + " profile");
+                                setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
+                            }
+                            setOstElementValue("loadprofile", "load", false, false);
+                            setOstElementValue("loadprofile", "refresh", false, true);
+                            return;
+                        }
+                        if (keyelt == "refresh" && val.toBool())
+                        {
+                            setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
+                            setProfiles();
+                            setOstElementValue("loadprofile", "load", false, false);
+                            setOstElementValue("loadprofile", "refresh", false, false);
+                            setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
+                            return;
+                        }
+
+                    }
+                }
+            }
+
+            if (keyprop == "saveprofile")
+            {
+                if (pEventData[keyprop].toMap().contains("value"))
+                {
+                    QVariant val = pEventData[keyprop].toMap()["value"];
+                    setOstPropertyValue(keyprop, val, true);
+                }
+
+
                 foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
                 {
                     QVariant val = pEventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
-                    if (keyelt == "load" && val.toBool())
-                    {
-                        setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
-                        QVariantMap prof;
-                        if (getDbProfile(getClassName(), getOstElementValue("profileactions", "name").toString(), prof))
-                        {
-                            setProfile(prof);
-                            setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
-                            sendMessage(getOstElementValue("profileactions", "name").toString() + " profile sucessfully loaded");
-                        }
-                        else
-                        {
-                            sendMessage("Can't load " + getOstElementValue("profileactions", "name").toString() + " profile");
-                            setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
-                        }
-                    }
                     if (keyelt == "save"  && val.toBool())
                     {
                         setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
                         QVariantMap prof = getProfile();
-                        if (setDbProfile(getClassName(), getOstElementValue("profileactions", "name").toString(), prof))
+                        if (setDbProfile(getClassName(), getOstPropertyValue("saveprofile").toString(), prof))
                         {
                             setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
-                            sendMessage(getOstElementValue("profileactions", "name").toString() + " profile sucessfully saved");
+                            sendMessage(getOstPropertyValue("saveprofile").toString() + " profile sucessfully saved");
+                            emit moduleEvent("modulesavedprofile", getModuleName(), getOstPropertyValue("saveprofile").toString(), QVariantMap());
                         }
                         else
                         {
                             setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
-                            sendMessage("Can't save " + getOstElementValue("profileactions", "name").toString() + " profile");
+                            sendMessage("Can't save " + getOstPropertyValue("saveprofile").toString() + " profile");
                         }
                     }
-                    if (keyelt == "name")
-                    {
-                        setOstElementValue("profileactions", "name", val, true);
-                    }
-
                 }
                 return;
             }
@@ -182,13 +225,17 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
 
 
 }
+void Basemodule::killMe()
+{
+    this->~Basemodule();
+}
 QVariantMap Basemodule::getModuleInfo(void)
 {
     QVariantMap temp;
     foreach (QString key, getProperties().keys())
     {
         //if (mOstProperties[key].toMap()["devcat"].toString() == "Info")
-        if (key != "ostproperties")
+        if (key == "moduleDescription")
         {
             temp[key] = getProperties()[key];
         }
@@ -207,11 +254,15 @@ void Basemodule::sendDump(void)
     dump["properties"] = getProperties();
     dump["state"] = state;
     dump["infos"] = infos;
+    dump["messages"] = getMessages();
+    dump["warnings"] = getWarnings();
+    dump["errors"] = getErrors();
     emit moduleEvent("moduledump", getModuleName(), "*", dump);
 }
 void Basemodule::OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                const QVariantMap &eventData)
 {
+    Q_UNUSED(eventModule);
     emit moduleEvent(eventType, this->getModuleName(), eventKey, eventData);
 }
 bool Basemodule::setClassName(const QString &pClassName)

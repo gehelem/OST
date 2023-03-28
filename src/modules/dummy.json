@@ -17,7 +17,8 @@
         },
         "group": "Texts",
         "permission": 0,
-        "propertyLabel": "Text example - read only"
+        "propertyLabel": "Text example - read only",
+        "order":"00"
     },
     "extextRW": {
         "hasprofile":true,
@@ -37,12 +38,18 @@
             },
             "extext4": {
                 "elementLabel": "Text 4",
-                "value":"dddd"
+                "value":"i1",
+                "listOfValues":{
+                    "i1":"Value 1",
+                    "i2":"Value 2"
+                }
             }
         },
         "group": "Texts",
         "permission": 2,
-        "propertyLabel": "Text example - read/write"
+        "propertyLabel": "Text example - read/write",
+        "order":"01"
+
     },
     "numbersRW": {
         "hasprofile":true,
@@ -194,7 +201,7 @@
     },
     "actions": {
         "devcat": "Examples",
-        "rule":1,
+        "rule":0,
         "elements": {
             "shoot": {
                 "elementLabel": "Shoot",
@@ -318,25 +325,176 @@
         "group": "Grids",
         "permission": 2,
         "grid":0,
+        "gridlimit":5,
+        "GXY":{
+            "X":"X",
+            "Y":"Y"
+        },
         "propertyLabel": "Grid example",
         "elements": {
             "X": {
                 "elementLabel": "Abscisse",
                 "value":0,
-                "gridvalues":[0,1,2,3,4]
+                "gridvalues":[0,1,2,3,4],
+                "order":"B"
             },
             "Y": {
-                "elementLabel": "ordonnée",
+                "elementLabel": "Ordonnée",
                 "value":0,
-                "gridvalues":[0,1,4,9,16]
+                "gridvalues":[0,1,4,9,16],
+                "order":"C"
             },
             "Z": {
-                "elementLabel": "info",
+                "elementLabel": "Info",
                 "value":"Zéro",
-                "gridvalues":["P0","P1","P2","P3","P4"]
+                "gridvalues":["P0","P1","P2","P3","P4"],
+                "order":"A"
+            }
+        },
+        "array":{
+            "key": "",
+            "columns":["X","Y"],
+            "type":"grid"
+        }
+    },
+    "secondtestgrid": {
+        "devcat": "Examples",
+        "group": "AAAGrids",
+        "permission": 2,
+        "grid":0,
+        "gridlimit":5,
+        "propertyLabel": "Grid example 2",
+        "elements": {
+            "X": {
+                "elementLabel": "Abscisse",
+                "value":0,
+                "gridvalues":[],
+                "order":"B"
+            },
+            "Y": {
+                "elementLabel": "Ordonnée",
+                "value":0,
+                "gridvalues":[],
+                "order":"C"
+            },
+            "Z": {
+                "elementLabel": "Info",
+                "value":"Zéro",
+                "gridvalues":[],
+                "order":"A"
+            }
+        },
+        "array":{
+            "key": "",
+            "columns":["X","Y"],
+            "type":"grid"
+        }
+    },
+    "skychart": {
+        "propertyLabel": "Skychart",
+        "devcat": "Examples",
+        "group": "Images"
+    },
+    "search": {
+        "devcat": "Examples",
+        "order": "Catalog00",
+        "group": "Catalog",
+        "permission": 2,
+        "value": "M13",
+        "rule":0,
+        "propertyLabel": "",
+        "elements": {
+            "searchbtn": {
+                "elementLabel": "Search object",
+                "value":false
             }
         }
-
+    },
+    "results": {
+        "devcat": "Examples",
+        "order": "Catalog10",
+        "group": "Catalog",
+        "permission": 0,
+        "grid":0,
+        "gridlimit":255,
+        "rule":0,
+        "propertyLabel": "Results",
+        "elements": {
+            "catalog": {
+                "elementLabel": "Catalogue",
+                "order":"10",
+                "value":""
+            },
+            "code": {
+                "elementLabel": "Code",
+                "order":"20",
+                "value":""
+            },
+            "RA": {
+                "elementLabel": "RA",
+                "order":"30",
+                "value":0
+            },
+            "NS": {
+                "elementLabel": "N/S",
+                "order":"50",
+                "value":""
+            },
+            "DEC": {
+                "elementLabel": "DEC",
+                "order":"40",
+                "value":0
+            },
+            "diam": {
+                "elementLabel": "Diameter",
+                "order":"60",
+                "value":0
+            },
+            "mag": {
+                "elementLabel": "Magnitude",
+                "order":"70",
+                "value":0
+            },
+            "name": {
+                "elementLabel": "Name",
+                "order":"80",
+                "value":""
+            },
+            "alias": {
+                "elementLabel": "Alias",
+                "order":"90",
+                "value":""
+            }
+        }
+    },
+    "selection": {
+        "devcat": "Examples",
+        "order": "Catalog15",
+        "group": "Catalog",
+        "permission": 2,
+        "rule":0,
+        "propertyLabel": "Selection",
+        "elements": {
+            "code": {
+                "elementLabel": "Code",
+                "order":"10",
+                "value":""
+            },
+            "RA": {
+                "elementLabel": "RA",
+                "order":"20",
+                "value":0
+            },
+            "NS": {
+                "elementLabel": "N/S",
+                "order":"40",
+                "value":""
+            },
+            "DEC": {
+                "elementLabel": "DEC",
+                "order":"30",
+                "value":0
+            }
+        }
     }
-
 }

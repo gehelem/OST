@@ -1,6 +1,5 @@
 #ifndef DATASTORE_h_
 #define DATASTORE_h_
-#include <QVariant>
 #include <baseroot.h>
 
 /** @class Datastore
@@ -51,13 +50,16 @@ class Datastore : virtual public Baseroot
                                const  QString &pPropertyDevcat, const QString &pPropertyGroup);
         void emitPropertyCreation(const QString &pPropertyName);
         bool setOstPropertyValue(const QString &pPropertyName, const QVariant &pPropertyValue, bool mEmitEvent);
-        QVariant getOstPropertyValue(QString &pPropertyName);
+        QVariant getOstPropertyValue(const QString &pPropertyName);
 
         bool createOstElement(const QString &pPropertyName, const QString &pElementName, const QString &pElementLabel,
                               bool mEmitEvent);
         bool setOstElementValue(const QString &pPropertyName, const QString &pElementName, const QVariant &pElementValue,
                                 bool mEmitEvent);
         QVariant getOstElementValue(const QString &pPropertyName, const QString &pElementName);
+        bool setOstElementGrid(const QString &pPropertyName, const QString &pElementName, const QVariantList &pElementGrid,
+                               bool mEmitEvent);
+        QVariantList getOstElementGrid(const QString &pPropertyName, const QString &pElementName);
 
         void loadOstPropertiesFromFile(const QString &pFileName);
         void saveOstPropertiesToFile(const QString &pFileName);
@@ -72,9 +74,30 @@ class Datastore : virtual public Baseroot
         bool pushOstElements        (const QString &pPropertyName);
         bool resetOstElements      (const QString &pPropertyName);
 
+        bool newOstPropertyLine(const QString &pPropertyName, const QVariantMap &pElementsValues);
+        bool deleteOstPropertyLine(const QString &pPropertyName, const double &pLine);
+        bool updateOstPropertyLine(const QString &pPropertyName, const double &pLine, const QVariantMap &pElementsValues);
+        QVariant getOstElementLineValue(const QString &pPropertyName, const QString &pElementName, const double &pLine);
+        bool setOstElementLineValue(const QString &pPropertyName, const QString &pElementName, const double &pLine,
+                                    const QVariant &pElementValue);
 
         QVariantMap getProfile(void);
 
+        void clearOstElementLov(const QString &pPropertyName, const QString &pElementName);
+        void addOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode,
+                              const QString &pLovLabel);
+        QVariant getOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode);
+        void setOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode,
+                              const QString &pLovLabel);
+        void deleteOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode);
+
+        void clearOstLov(const QString &pPropertyName);
+        void addOstLov(const QString &pPropertyName, const QString &pLovCode,
+                       const QString &pLovLabel);
+        QVariant getOstLov(const QString &pPropertyName, const QString &pLovCode);
+        void setOstLov(const QString &pPropertyName, const QString &pLovCode,
+                       const QString &pLovLabel);
+        void deleteOstLov(const QString &pPropertyName, const QString &pLovCode);
 
     private:
         QVariantMap mProperties;

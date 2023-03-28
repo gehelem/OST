@@ -15,16 +15,19 @@ IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap
 
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &IndiModule::connectIndiTimer);
-    timer->start(10000);
+    timer->start(2000);
 
 }
 void IndiModule::OnDispatchToIndiExternalEvent(const QString &eventType, const QString  &eventModule,
         const QString  &eventKey, const QVariantMap &eventData)
 
 {
+    Q_UNUSED(eventType);
+    Q_UNUSED(eventKey);
+
     if (getModuleName() == eventModule)
     {
-        //BOOST_LOG_TRIVIAL(debug) << "OnIndiExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << eventKey.toStdString();
+        //sendMessage("OnIndiExternalEvent - recv : " + getModuleName()+ "-" + eventType + "-" + eventKey);
         foreach(const QString &keyprop, eventData.keys())
         {
             foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
@@ -93,7 +96,7 @@ void IndiModule::connectIndiTimer()
         }
         else
         {
-            sendMessage("Couldn't connect to Indi server");
+            sendError("Couldn't connect to Indi server");
         }
     }
 }
@@ -109,7 +112,7 @@ bool IndiModule::connectIndi()
 
     if (isServerConnected())
     {
-        sendMessage("Indi server already connected");
+        sendWarning("Indi server already connected");
         newUniversalMessage("Indi server already connected");
         return true;
     }
@@ -125,7 +128,7 @@ bool IndiModule::connectIndi()
         }
         else
         {
-            sendMessage("Couldn't connect to Indi server");
+            sendError("Couldn't connect to Indi server");
             return false;
         }
     }
@@ -142,35 +145,16 @@ bool IndiModule::disconnectIndi(void)
         }
         else
         {
-            sendMessage("Couldn't disconnect from Indi server");
+            sendError("Couldn't disconnect from Indi server");
             return false;
         }
     }
     else
     {
-        sendMessage("Indi server already disconnected");
+        sendWarning("Indi server already disconnected");
         return true;
     }
 }
-void IndiModule::setBlobMode(void)
-{
-    BOOST_LOG_TRIVIAL(debug) << "Looking for blob mode... ";
-
-    std::vector<INDI::BaseDevice> devs = getDevices();
-    for(std::size_t i = 0; i < devs.size(); i++)
-    {
-        BOOST_LOG_TRIVIAL(debug) << "Looking for blob mode on device ... " << devs[i]->getDeviceName();
-        if (devs[i]->getDriverInterface() & INDI::BaseDevice::CCD_INTERFACE)
-        {
-            BOOST_LOG_TRIVIAL(debug) << "Setting blob mode " << devs[i]->getDeviceName();
-            sendMessage("Setting blob mode " + QString(devs[i]->getDeviceName()));
-            setBLOBMode(B_ALSO, devs[i]->getDeviceName(), nullptr);
-        }
-    }
-
-
-}
-
 /*!
  * Asks every device to connect
  */
@@ -180,32 +164,33 @@ bool IndiModule::connectAllDevices()
     std::vector<INDI::BaseDevice> devs = getDevices();
     for(std::size_t i = 0; i < devs.size(); i++)
     {
-        ISwitchVectorProperty *svp = devs[i]->getSwitch("CONNECTION");
+        INDI::PropertySwitch svp = devs[i].getSwitch("CONNECTION");
 
-        if (svp == nullptr)
+        if (!svp.isValid())
         {
-            sendMessage("Couldn't find CONNECTION switch");
+            sendError("Couldn't find CONNECTION switch " + QString(devs[i].getDeviceName()));
             err++;
         }
         else
         {
-            for (int j = 0; j < svp->nsp; j++)
+            for (std::size_t j = 0; j < svp.size(); j++)
             {
-                if (strcmp(svp->sp[j].name, "CONNECT") == 0)
+                if (strcmp(svp[j].name, "CONNECT") == 0)
                 {
-                    svp->sp[j].s = ISS_ON;
+                    svp[j].s = ISS_ON;
                 }
                 else
                 {
-                    svp->sp[j].s = ISS_OFF;
+                    svp[j].s  = ISS_OFF;
                 }
             }
 
             sendNewSwitch(svp);
-            if (devs[i]->getDriverInterface() & INDI::BaseDevice::CCD_INTERFACE)
+            if (devs[i].getDriverInterface() & INDI::BaseDevice::CCD_INTERFACE)
             {
-                sendMessage("Setting blob mode " + QString(devs[i]->getDeviceName()));
-                setBLOBMode(B_ALSO, devs[i]->getDeviceName(), nullptr);
+                sendMessage("Can't set blob mode (indi2)" + QString(devs[i].getDeviceName()));
+                setBLOBMode(B_ALSO, devs[i].getDeviceName(), nullptr);
+
             }
 
         }
@@ -226,24 +211,24 @@ bool IndiModule::disconnectAllDevices()
 
     for(std::size_t i = 0; i < devs.size(); i++)
     {
-        ISwitchVectorProperty *svp = devs[i]->getSwitch("CONNECTION");
+        INDI::PropertySwitch svp = devs[i].getSwitch("CONNECTION");
 
-        if (svp == nullptr)
+        if (!svp.isValid())
         {
-            sendMessage("Couldn't find CONNECTION switch");
+            sendError("Couldn't find CONNECTION switch " + QString(devs[i].getDeviceName()));
             err++;
         }
         else
         {
-            for (int j = 0; j < svp->nsp; j++)
+            for (std::size_t j = 0; j < svp.size(); j++)
             {
-                if (strcmp(svp->sp[j].name, "DISCONNECT") == 0)
+                if (strcmp(svp[j].name, "DISCONNECT") == 0)
                 {
-                    svp->sp[j].s = ISS_ON;
+                    svp[j].s = ISS_ON;
                 }
                 else
                 {
-                    svp->sp[j].s = ISS_OFF;
+                    svp[j].s = ISS_OFF;
                 }
             }
             sendNewSwitch(svp);
@@ -259,40 +244,40 @@ bool IndiModule::connectDevice(QString deviceName)
 {
     if (!isServerConnected())
     {
-        sendMessage("Indi server is not connected");
+        sendWarning("Indi server is not connected");
         return false;
     }
     bool _checkdevice = false;
     foreach (INDI::BaseDevice dd, getDevices())
     {
-        if (strcmp(dd->getDeviceName(), deviceName.toStdString().c_str()) == 0) _checkdevice = true;
+        if (strcmp(dd.getDeviceName(), deviceName.toStdString().c_str()) == 0) _checkdevice = true;
     }
     if (!_checkdevice)
     {
-        sendMessage("Device " + deviceName + " not found");
+        sendError("Device " + deviceName + " not found");
         return false;
     }
 
-    INDI::BaseDevice *dev = getDevice(deviceName.toStdString().c_str());
+    INDI::BaseDevice dev = getDevice(deviceName.toStdString().c_str());
 
-    ISwitchVectorProperty *svp = dev->getSwitch("CONNECTION");
+    INDI::PropertySwitch svp = dev.getSwitch("CONNECTION");
 
-    if (svp == nullptr)
+    if (!svp.isValid())
     {
-        sendMessage("Couldn't find CONNECTION switch");
+        sendError("Couldn't find CONNECTION switch " + deviceName);
         return false;
     }
     else
     {
-        for (int j = 0; j < svp->nsp; j++)
+        for (std::size_t  j = 0; j < svp.size(); j++)
         {
-            if (strcmp(svp->sp[j].name, "CONNECT") == 0)
+            if (strcmp(svp[j].name, "CONNECT") == 0)
             {
-                svp->sp[j].s = ISS_ON;
+                svp[j].setState(ISS_ON);
             }
             else
             {
-                svp->sp[j].s = ISS_OFF;
+                svp[j].setState(ISS_OFF);
             }
         }
         sendNewSwitch(svp);
@@ -301,26 +286,26 @@ bool IndiModule::connectDevice(QString deviceName)
 }
 bool IndiModule::disconnectDevice(QString deviceName)
 {
-    INDI::BaseDevice *dev = getDevice(deviceName.toStdString().c_str());
+    INDI::BaseDevice dev = getDevice(deviceName.toStdString().c_str());
 
-    ISwitchVectorProperty *svp = dev->getSwitch("CONNECTION");
+    INDI::PropertySwitch svp = dev.getSwitch("CONNECTION");
 
-    if (svp == nullptr)
+    if (!svp.isValid())
     {
-        sendMessage("Couldn't find CONNECTION switch");
+        sendError("Couldn't find CONNECTION switch " + deviceName);
         return false;
     }
     else
     {
-        for (int j = 0; j < svp->nsp; j++)
+        for (std::size_t j = 0; j < svp.size(); j++)
         {
-            if (strcmp(svp->sp[j].name, "DISCONNECT") == 0)
+            if (strcmp(svp[j].name, "DISCONNECT") == 0)
             {
-                svp->sp[j].s = ISS_ON;
+                svp[j].setState(ISS_ON);
             }
             else
             {
-                svp->sp[j].s = ISS_OFF;
+                svp[j].setState(ISS_OFF);
             }
         }
         sendNewSwitch(svp);
@@ -339,27 +324,27 @@ bool IndiModule::loadDevicesConfs()
     std::vector<INDI::BaseDevice> devs = getDevices();
     for(std::size_t i = 0; i < devs.size(); i++)
     {
-        sendMessage("Loading device conf " + QString(devs[i]->getDeviceName()));
-        if (devs[i]->isConnected())
+        sendMessage("Loading device conf " + QString(devs[i].getDeviceName()));
+        if (devs[i].isConnected())
         {
-            ISwitchVectorProperty *svp = devs[i]->getSwitch("CONFIG_PROCESS");
+            INDI::PropertySwitch svp = devs[i].getSwitch("CONFIG_PROCESS");
 
-            if (svp == nullptr)
+            if (!svp.isValid())
             {
-                sendMessage("Couldn't find CONFIG_PROCESS switch");
+                sendError("Couldn't find CONFIG_PROCESS switch " + QString(devs[i].getDeviceName()));
                 err++;
             }
             else
             {
-                for (int j = 0; j < svp->nsp; j++)
+                for (std::size_t j = 0; j < svp.size(); j++)
                 {
-                    if (strcmp(svp->sp[j].name, "CONFIG_LOAD") == 0)
+                    if (strcmp(svp[j].name, "CONFIG_LOAD") == 0)
                     {
-                        svp->sp[j].s = ISS_ON;
+                        svp[j].setState(ISS_ON);
                     }
                     else
                     {
-                        svp->sp[j].s = ISS_OFF;
+                        svp[j].setState(ISS_OFF);
                     }
                 }
                 sendNewSwitch(svp);
@@ -377,32 +362,31 @@ bool IndiModule::loadDevicesConfs()
 auto IndiModule::sendModNewNumber(const QString &deviceName, const QString &propertyName, const QString  &elementName,
                                   const double &value) -> bool
 {
-    //qDebug() << "sendModNewNumber" << " " << deviceName << "-" << propertyName<< "-" << elementName;
-    INDI::BaseDevice *dp = getDevice(deviceName.toStdString().c_str());
+    //qDebug() << "sendModNewNumber" << " " << deviceName << "-" << propertyName << "-" << elementName << "-" << value;
+    INDI::BaseDevice dp = getDevice(deviceName.toStdString().c_str());
 
-    if (dp == nullptr)
+    if (!dp.isValid())
     {
-        sendMessage("Error - unable to find " + deviceName + " device. Aborting.");
+        sendError("Error - unable to find " + deviceName + " device. Aborting.");
         return false;
     }
-    INumberVectorProperty *prop = nullptr;
-    prop = dp->getNumber(propertyName.toStdString().c_str());
-    if (prop == nullptr)
+    INDI::PropertyNumber prop = dp.getNumber(propertyName.toStdString().c_str());
+    if (!prop.isValid())
     {
-        sendMessage("Error - unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
+        sendError("Error - unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
         return false;
     }
 
-    for (int i = 0; i < prop->nnp; i++)
+    for (std::size_t i = 0; i < prop.size(); i++)
     {
-        if (strcmp(prop->np[i].name, elementName.toStdString().c_str()) == 0)
+        if (strcmp(prop[i].name, elementName.toStdString().c_str()) == 0)
         {
-            prop->np[i].value = value;
+            prop.findWidgetByName(elementName.toStdString().c_str())->value = value;
             sendNewNumber(prop);
             return true;
         }
     }
-    sendMessage("Error - unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
+    sendError("Error - unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
     return false;
 
 }
@@ -410,194 +394,183 @@ bool IndiModule::getModNumber(const QString &deviceName, const QString &property
                               double &value)
 {
     //qDebug() << "getModNumber" << " " << deviceName << " " << propertyName<< " " << elementName;
-    INDI::BaseDevice *dp = getDevice(deviceName.toStdString().c_str());
+    INDI::BaseDevice dp = getDevice(deviceName.toStdString().c_str());
 
-    if (dp == nullptr)
+    if (!dp.isValid())
     {
-        sendMessage("Error - unable to find " + deviceName + " device. Aborting.");
+        sendError("Error - unable to find " + deviceName + " device. Aborting.");
         return false;
     }
-    INumberVectorProperty *prop = nullptr;
-    prop = dp->getNumber(propertyName.toStdString().c_str());
-    if (prop == nullptr)
+    INDI::PropertyNumber prop = dp.getNumber(propertyName.toStdString().c_str());
+    if (!prop.isValid())
     {
-        sendMessage("Error - unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
+        sendError("Error - unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
         return false;
     }
 
-    for (int i = 0; i < prop->nnp; i++)
+    for (std::size_t i = 0; i < prop.size(); i++)
     {
-        if (strcmp(prop->np[i].name, elementName.toStdString().c_str()) == 0)
+        if (strcmp(prop[i].name, elementName.toStdString().c_str()) == 0)
         {
-            value = prop->np[i].value;
+            value = prop.findWidgetByName(elementName.toStdString().c_str())->getValue();
             return true;
         }
     }
-    sendMessage("Error - unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
+    sendError("Error - unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
     return false;
 }
 bool IndiModule::getModSwitch(const QString &deviceName, const QString &propertyName, const QString  &elementName,
                               bool &value)
 {
-    //qDebug() << "getModSwitch" << "-" << deviceName << "-" << propertyName<< "-" << elementName;
-    INDI::BaseDevice *dp = getDevice(deviceName.toStdString().c_str());
+    //qDebug() << "getModswitch " << "-" << deviceName << "-" << propertyName<< "-" << elementName;
+    INDI::BaseDevice dp = getDevice(deviceName.toStdString().c_str());
 
-    if (dp == nullptr)
+    if (!dp.isValid())
     {
-        sendMessage("Error - unable to find " + deviceName + " device. Aborting.");
+        sendError("Error - unable to find " + deviceName + " device. Aborting.");
         return false;
     }
-    ISwitchVectorProperty *prop = nullptr;
-    prop = dp->getSwitch(propertyName.toStdString().c_str());
-    if (prop == nullptr)
+    INDI::PropertySwitch prop = dp.getSwitch(propertyName.toStdString().c_str());
+    if (!prop.isValid())
     {
-        sendMessage("Error - unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
+        sendError("Error - unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
         return false;
     }
 
-    for (int i = 0; i < prop->nsp; i++)
+    for (std::size_t i = 0; i < prop.size(); i++)
     {
-        if (strcmp(prop->sp[i].name, elementName.toStdString().c_str()) == 0)
+        if (strcmp(prop[i].name, elementName.toStdString().c_str()) == 0)
         {
-            value = prop->sp[i].s;
+            value = prop.findWidgetByName(elementName.toStdString().c_str())->getState();
             return true;
         }
     }
-    sendMessage("Error - unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
+    sendError("Error - unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
     return false;
 }
 bool IndiModule::getModText(const QString &deviceName, const QString &propertyName, const QString  &elementName,
                             QString &value)
 {
     //qDebug() << "getModText" << "-" << deviceName << "-" << propertyName<< "-" << elementName;
-    INDI::BaseDevice *dp = getDevice(deviceName.toStdString().c_str());
+    INDI::BaseDevice dp = getDevice(deviceName.toStdString().c_str());
 
-    if (dp == nullptr)
+    if (!dp.isValid())
     {
-        sendMessage("Error - unable to find " + deviceName + " device. Aborting.");
+        sendError("Error - unable to find " + deviceName + " device. Aborting.");
         return false;
     }
-    ITextVectorProperty *prop = nullptr;
-    prop = dp->getText(propertyName.toStdString().c_str());
-    if (prop == nullptr)
+    INDI::PropertyText prop = dp.getText(propertyName.toStdString().c_str());
+    if (!prop.isValid())
     {
-        sendMessage("Error - unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
+        sendError("Error - unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
         return false;
     }
 
-    for (int i = 0; i < prop->ntp; i++)
+    for (std::size_t i = 0; i < prop.size(); i++)
     {
-        if (strcmp(prop->tp[i].name, elementName.toStdString().c_str()) == 0)
+        if (strcmp(prop[i].name, elementName.toStdString().c_str()) == 0)
         {
-            value = prop->tp[i].text;
+            value = prop.findWidgetByName(elementName.toStdString().c_str())->getText();
             return true;
         }
     }
-    sendMessage("Error - unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
+    sendError("Error - unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
     return false;
 }
 bool IndiModule::sendModNewText  (QString deviceName, QString propertyName, QString elementName, QString text)
 {
     //qDebug() << "sendModNewText" << "-" << deviceName << "-" << propertyName<< "-" << elementName;
-    INDI::BaseDevice *dp = getDevice(deviceName.toStdString().c_str());
+    INDI::BaseDevice dp = getDevice(deviceName.toStdString().c_str());
 
-    if (dp == nullptr)
+    if (!dp.isValid())
     {
-        sendMessage("Error - unable to find " + deviceName + " device. Aborting.");
+        sendError("Error - unable to find " + deviceName + " device. Aborting.");
         return false;
     }
-    ITextVectorProperty *prop = nullptr;
-    prop = dp->getText(propertyName.toStdString().c_str());
-    if (prop == nullptr)
+    INDI::PropertyText prop = dp.getText(propertyName.toStdString().c_str());
+    if (!prop.isValid())
     {
-        sendMessage("Error - unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
+        sendError("Error - unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
         return false;
     }
 
-    for (int i = 0; i < prop->ntp; i++)
+    for (std::size_t i = 0; i < prop.size(); i++)
     {
-        if (strcmp(prop->tp[i].name, elementName.toStdString().c_str()) == 0)
+        if (strcmp(prop[i].name, elementName.toStdString().c_str()) == 0)
         {
-            sendNewText(deviceName.toStdString().c_str(), propertyName.toStdString().c_str(), elementName.toStdString().c_str(),
-                        text.toStdString().c_str());
+            prop.findWidgetByName(elementName.toStdString().c_str())->setText(text.toStdString());
+            sendNewText(prop);
             return true;
         }
     }
-    sendMessage("Error - unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
+    sendError("Error - unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
     return false;
 }
 bool IndiModule::sendModNewSwitch(QString deviceName, QString propertyName, QString elementName, ISState sw)
 {
-    //qDebug() << "sendModNewSwitch" << "-" << deviceName << "-" << propertyName<< "-" << elementName;
+    //qDebug() << "sendModNewswitch " << "-" << deviceName << "-" << propertyName<< "-" << elementName;
 
-    INDI::BaseDevice *dp;
-    dp = getDevice(deviceName.toStdString().c_str());
+    INDI::BaseDevice dp = getDevice(deviceName.toStdString().c_str());
 
-    if (dp == nullptr)
+    if (!dp.isValid())
     {
-        sendMessage("Error - unable to find " + deviceName + " device. Aborting.");
+        sendError("Error - unable to find " + deviceName + " device. Aborting.");
         return false;
     }
-    ISwitchVectorProperty *prop = nullptr;
-    prop = dp->getSwitch(propertyName.toStdString().c_str());
-    if (prop == nullptr)
+    INDI::PropertySwitch prop = dp.getSwitch(propertyName.toStdString().c_str());
+    if (!prop.isValid())
     {
-        sendMessage("Error - unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
+        sendError("Error - unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
         return false;
     }
-
-    for (int i = 0; i < prop->nsp; i++)
+    for (std::size_t i = 0; i < prop.size(); i++)
     {
-        if (prop->r == ISR_1OFMANY) prop->sp[i].s = ISS_OFF;
-        if (strcmp(prop->sp[i].name, elementName.toStdString().c_str()) == 0)
+        if (prop.getRule() == ISR_1OFMANY) prop[i].s = ISS_OFF;
+        if (strcmp(prop[i].name, elementName.toStdString().c_str()) == 0)
         {
-            prop->sp[i].s = sw;
+            prop.findWidgetByName(elementName.toStdString().c_str())->setState(sw);
             sendNewSwitch(prop);
-            BOOST_LOG_TRIVIAL(debug)  << "SENDNEWSWITCH " << deviceName.toStdString() << propertyName.toStdString() <<
-                                      elementName.toStdString() << " >" << sw << "<";
             return true;
         }
     }
-    sendMessage("Error - unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
+    sendError("Error - unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
     return false;
 
 }
 bool IndiModule::frameSet(QString devicename, double x, double y, double width, double height)
 {
     //qDebug() << "frameSet" << "-" << devicename;
-    INDI::BaseDevice *dp;
-    dp = getDevice(devicename.toStdString().c_str());
-    if (dp == nullptr)
+    INDI::BaseDevice dp = getDevice(devicename.toStdString().c_str());
+    if (!dp.isValid())
     {
-        sendMessage("Error - unable to find " + devicename + " device. Aborting.");
+        sendError("Error - unable to find " + devicename + " device. Aborting.");
         return false;
     }
 
-    INumberVectorProperty *prop = nullptr;
-    prop = dp->getNumber("CCD_FRAME");
-    if (prop == nullptr)
+    INDI::PropertyNumber prop = dp.getNumber("CCD_FRAME");
+    if (!prop.isValid())
     {
-        sendMessage("Error - unable to find " + devicename + "/" + "CCD_FRAME" + " property. Aborting.");
+        sendError("Error - unable to find " + devicename + "/" + "CCD_FRAME" + " property. Aborting.");
         return false;
     }
 
-    for (int i = 0; i < prop->nnp; i++)
+    for (std::size_t i = 0; i < prop.size(); i++)
     {
-        if (strcmp(prop->np[i].name, "X") == 0)
+        if (strcmp(prop[i].name, "X") == 0)
         {
-            prop->np[i].value = x;
+            prop[i].value = x;
         }
-        if (strcmp(prop->np[i].name, "Y") == 0)
+        if (strcmp(prop[i].name, "Y") == 0)
         {
-            prop->np[i].value = y;
+            prop[i].value = y;
         }
-        if (strcmp(prop->np[i].name, "WIDTH") == 0)
+        if (strcmp(prop[i].name, "WIDTH") == 0)
         {
-            prop->np[i].value = width;
+            prop[i].value = width;
         }
-        if (strcmp(prop->np[i].name, "HEIGHT") == 0)
+        if (strcmp(prop[i].name, "HEIGHT") == 0)
         {
-            prop->np[i].value = height;
+            prop[i].value = height;
         }
     }
 
@@ -607,27 +580,25 @@ bool IndiModule::frameSet(QString devicename, double x, double y, double width, 
 bool IndiModule::frameReset(QString devicename)
 {
     //qDebug() << "frameReset" << "-" << devicename;
-    INDI::BaseDevice *dp;
-    dp = getDevice(devicename.toStdString().c_str());
-    if (dp == nullptr)
+    INDI::BaseDevice dp = getDevice(devicename.toStdString().c_str());
+    if (!dp.isValid())
     {
-        sendMessage("Error - unable to find " + devicename + " device. Aborting.");
+        sendError("Error - unable to find " + devicename + " device. Aborting.");
         return false;
     }
 
-    ISwitchVectorProperty *prop = nullptr;
-    prop = dp->getSwitch("CCD_FRAME_RESET");
-    if (prop == nullptr)
+    INDI::PropertySwitch prop = dp.getSwitch("CCD_FRAME_RESET");
+    if (!prop.isValid())
     {
-        sendMessage("Error - unable to find " + devicename + "/" + "CCD_FRAME_RESET" + " property. Aborting.");
+        sendError("Error - unable to find " + devicename + "/" + "CCD_FRAME_RESET" + " property. Aborting.");
         return true;
     }
 
-    for (int i = 0; i < prop->nsp; i++)
+    for (std::size_t i = 0; i < prop.size(); i++)
     {
-        if (strcmp(prop->sp[i].name, "RESET") == 0)
+        if (strcmp(prop[i].name, "RESET") == 0)
         {
-            prop->sp[i].s = ISS_ON;
+            prop[i].s = ISS_ON;
         }
     }
 
