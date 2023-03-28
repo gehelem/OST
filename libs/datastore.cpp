@@ -271,41 +271,33 @@ bool Datastore::setOstElementGrid(const QString &pPropertyName, const QString &p
 }
 QVariantList Datastore::getOstElementGrid(const QString &pPropertyName, const QString &pElementName)
 {
-    if (mProperties.contains(pPropertyName))
-    {
-        if (mProperties[pPropertyName].toMap().contains("elements"))
-        {
-            QVariantMap elts = mProperties[pPropertyName].toMap()["elements"].toMap();
-            if (elts.contains(pElementName))
-            {
-                if (mProperties[pPropertyName].toMap()["elements"].toMap()[pElementName].toMap().contains("gridvalues"))
-                {
-                    return mProperties[pPropertyName].toMap()["elements"].toMap()[pElementName].toMap()["gridvalues"].toList();
-                }
-                else
-                {
-                    sendWarning("getOstElementGrid - property " + pPropertyName + " element " + pElementName + " has no grid.");
-                    return QVariantList();
-                }
-            }
-            else
-            {
-                sendWarning("getOstElementGrid - property " + pPropertyName + " has no " + pElementName + " element.");
-                return QVariantList();
-            }
-        }
-        else
-        {
-            sendWarning("getOstElementGrid - property " + pPropertyName + " contains no elements.");
-            return QVariantList();
-        }
-    }
-    else
+    if (!mProperties.contains(pPropertyName))
     {
         sendWarning("getOstElementGrid - property " + pPropertyName + " not found.");
         return QVariantList();
     }
+    if (!mProperties[pPropertyName].toMap().contains("elements"))
+    {
+        sendWarning("getOstElementGrid - property " + pPropertyName + " contains no elements.");
+        return QVariantList();
+    }
+    if (!mProperties[pPropertyName].toMap().contains("grid"))
+    {
+        sendWarning("getOstElementGrid - property " + pPropertyName + " element " + pElementName + " has no grid.");
+        return QVariantList();
+    }
 
+    QVariantMap elts = mProperties[pPropertyName].toMap()["elements"].toMap();
+    if (!elts.contains(pElementName))
+    {
+        sendWarning("getOstElementGrid - property " + pPropertyName + " has no " + pElementName + " element.");
+        return QVariantList();
+    }
+    if (!mProperties[pPropertyName].toMap()["elements"].toMap()[pElementName].toMap().contains("gridvalues"))
+    {
+        return QVariantList();
+    }
+    return mProperties[pPropertyName].toMap()["elements"].toMap()[pElementName].toMap()["gridvalues"].toList();
 }
 
 QVariant Datastore::getOstElementValue(const QString &pPropertyName, const QString &pElementName)
@@ -650,7 +642,8 @@ bool Datastore::deleteOstPropertyLine(const QString &pPropertyName, const double
     }
 
 }
-bool Datastore::updateOstPropertyLine(const QString &pPropertyName, const double &pLine, const QVariantMap &pElementsValues)
+bool Datastore::updateOstPropertyLine(const QString &pPropertyName, const double &pLine,
+                                      const QVariantMap &pElementsValues)
 {
     if (mProperties.contains(pPropertyName))
     {
@@ -712,7 +705,8 @@ bool Datastore::updateOstPropertyLine(const QString &pPropertyName, const double
     }
 
 }
-QVariant Datastore::getOstElementLineValue(const QString &pPropertyName, const QString &pElementName, const double &pLine)
+QVariant Datastore::getOstElementLineValue(const QString &pPropertyName, const QString &pElementName,
+        const double &pLine)
 {
     if (getOstElementGrid(pPropertyName, pElementName).isEmpty())
     {
