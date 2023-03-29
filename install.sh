@@ -40,6 +40,7 @@ wget http://broiler.astrometry.net/~dstn/4200/index-4211.fits
 wget http://broiler.astrometry.net/~dstn/4200/index-4212.fits
 wget http://broiler.astrometry.net/~dstn/4200/index-4213.fits
 wget http://broiler.astrometry.net/~dstn/4200/index-4214.fits
+sudo chmod 744 -R /usr/share/astrometry/
 
 cd
 cd /var/www/html
