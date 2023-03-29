@@ -46,7 +46,7 @@ cd
 cd /var/www/html
 sudo wget https://github.com/gehelem/ost-front/releases/download/WorkInProgress/html.tar.gz --no-check-certificate
 sudo tar -xvf html.tar.gz
-sudo chmod 777 /var/www/html
+sudo chmod -R +rX /var/www/html
 
 cd 
 sudo pip install indiweb
