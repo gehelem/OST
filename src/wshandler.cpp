@@ -100,6 +100,10 @@ void WShandler::processTextMessage(QString message)
     {
         emit externalEvent("Fldown", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
     }
+    if (obj["evt"].toString() == "Fclearmessages")
+    {
+        emit externalEvent("Fclearmessages", obj["mod"].toString(), QString(), QVariantMap());
+    }
 
 
 }
