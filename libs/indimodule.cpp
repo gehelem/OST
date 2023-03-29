@@ -25,82 +25,81 @@ void IndiModule::OnDispatchToIndiExternalEvent(const QString &eventType, const Q
     Q_UNUSED(eventType);
     Q_UNUSED(eventKey);
 
-    if (getModuleName() == eventModule)
+    if (!(getModuleName() == eventModule))
     {
-        //sendMessage("OnIndiExternalEvent - recv : " + getModuleName()+ "-" + eventType + "-" + eventKey);
-        foreach(const QString &keyprop, eventData.keys())
+        return;
+    }
+    //sendMessage("OnIndiExternalEvent - recv : " + getModuleName()+ "-" + eventType + "-" + eventKey);
+    foreach(const QString &keyprop, eventData.keys())
+    {
+        foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
         {
-            foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
+            setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
+            if (keyprop == "serveractions")
             {
-                setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
-                if (keyprop == "serveractions")
+                setOstElementValue(keyprop, keyelt, false, false);
+                if (keyelt == "conserv")
                 {
-                    setOstElementValue(keyprop, keyelt, false, false);
-                    if (keyelt == "conserv")
-                    {
 
-                        setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
-                        if (connectIndi()) setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
-                        else setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
-                    }
-                    if (keyelt == "disconserv")
-                    {
-                        setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
-                        if (disconnectIndi()) setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
-                        else setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
-                    }
+                    setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
+                    if (connectIndi()) setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
+                    else setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
                 }
-                if (keyprop == "devicesactions")
+                if (keyelt == "disconserv")
                 {
-                    setOstElementValue(keyprop, keyelt, false, false);
-                    if (!isServerConnected())
-                    {
-                        sendMessage("Indi server not connected");
-                        setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
-                        break;
-                    }
-                    if (keyelt == "condevs")
-                    {
-                        setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
-                        if (connectAllDevices()) setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
-                        else setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
-                    }
-                    if (keyelt == "discondevs")
-                    {
-                        setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
-                        if (disconnectAllDevices()) setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
-                        else setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
-                    }
-                    if (keyelt == "loadconfs")
-                    {
-                        setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
-                        if (loadDevicesConfs()) setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
-                        else setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
-                    }
+                    setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
+                    if (disconnectIndi()) setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
+                    else setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
+                }
+            }
+            if (keyprop == "devicesactions")
+            {
+                setOstElementValue(keyprop, keyelt, false, false);
+                if (!isServerConnected())
+                {
+                    sendMessage("Indi server not connected");
+                    setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
+                    break;
+                }
+                if (keyelt == "condevs")
+                {
+                    setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
+                    if (connectAllDevices()) setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
+                    else setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
+                }
+                if (keyelt == "discondevs")
+                {
+                    setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
+                    if (disconnectAllDevices()) setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
+                    else setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
+                }
+                if (keyelt == "loadconfs")
+                {
+                    setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
+                    if (loadDevicesConfs()) setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
+                    else setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
                 }
             }
         }
     }
 }
-
 void IndiModule::connectIndiTimer()
 {
-    if (!isServerConnected())
+    if (isServerConnected())
     {
-        setServer(getOstElementValue("server", "host").toString().toStdString().c_str(), getOstElementValue("server",
-                  "port").toInt());
-        if (connectServer())
-        {
-            newUniversalMessage("Indi server connected");
-            sendMessage("Indi server connected");
-        }
-        else
-        {
-            sendError("Couldn't connect to Indi server");
-        }
+        return;
     }
-}
+    setServer(getOstElementValue("server", "host").toString().toStdString().c_str(), getOstElementValue("server",
+              "port").toInt());
+    if (!connectServer())
+    {
+        sendError("Couldn't connect to Indi server");
+        return;
+    }
+    newUniversalMessage("Indi server connected");
+    sendMessage("Indi server connected");
 
+}
 /*!
  * Connects to indi server
  * Should we add host/port ??
@@ -116,44 +115,32 @@ bool IndiModule::connectIndi()
         newUniversalMessage("Indi server already connected");
         return true;
     }
-    else
+    setServer(getOstElementValue("server", "host").toString().toStdString().c_str(), getOstElementValue("server",
+              "port").toInt());
+    if (connectServer())
     {
-        setServer(getOstElementValue("server", "host").toString().toStdString().c_str(), getOstElementValue("server",
-                  "port").toInt());
-        if (connectServer())
-        {
-            newUniversalMessage("Indi server connected");
-            sendMessage("Indi server connected");
-            return true;
-        }
-        else
-        {
-            sendError("Couldn't connect to Indi server");
-            return false;
-        }
+        newUniversalMessage("Indi server connected");
+        sendMessage("Indi server connected");
+        return true;
     }
-
+    sendError("Couldn't connect to Indi server");
+    return false;
 }
 bool IndiModule::disconnectIndi(void)
 {
-    if (isServerConnected())
-    {
-        if (disconnectServer())
-        {
-            sendMessage("Indi server disconnected");
-            return true;
-        }
-        else
-        {
-            sendError("Couldn't disconnect from Indi server");
-            return false;
-        }
-    }
-    else
+    if (!isServerConnected())
     {
         sendWarning("Indi server already disconnected");
         return true;
     }
+    if (!disconnectServer())
+    {
+        sendError("Couldn't disconnect from Indi server");
+        return false;
+    }
+    sendMessage("Indi server disconnected");
+    return true;
+
 }
 /*!
  * Asks every device to connect
@@ -200,7 +187,6 @@ bool IndiModule::connectAllDevices()
     else return false;
 
 }
-
 /*!
  * Asks every device to disconnect
  */
@@ -267,21 +253,18 @@ bool IndiModule::connectDevice(QString deviceName)
         sendError("Couldn't find CONNECTION switch " + deviceName);
         return false;
     }
-    else
+    for (std::size_t  j = 0; j < svp.size(); j++)
     {
-        for (std::size_t  j = 0; j < svp.size(); j++)
+        if (strcmp(svp[j].name, "CONNECT") == 0)
         {
-            if (strcmp(svp[j].name, "CONNECT") == 0)
-            {
-                svp[j].setState(ISS_ON);
-            }
-            else
-            {
-                svp[j].setState(ISS_OFF);
-            }
+            svp[j].setState(ISS_ON);
         }
-        sendNewSwitch(svp);
+        else
+        {
+            svp[j].setState(ISS_OFF);
+        }
     }
+    sendNewSwitch(svp);
     return true;
 }
 bool IndiModule::disconnectDevice(QString deviceName)
@@ -295,26 +278,21 @@ bool IndiModule::disconnectDevice(QString deviceName)
         sendError("Couldn't find CONNECTION switch " + deviceName);
         return false;
     }
-    else
+    for (std::size_t j = 0; j < svp.size(); j++)
     {
-        for (std::size_t j = 0; j < svp.size(); j++)
+        if (strcmp(svp[j].name, "DISCONNECT") == 0)
         {
-            if (strcmp(svp[j].name, "DISCONNECT") == 0)
-            {
-                svp[j].setState(ISS_ON);
-            }
-            else
-            {
-                svp[j].setState(ISS_OFF);
-            }
+            svp[j].setState(ISS_ON);
         }
-        sendNewSwitch(svp);
-
+        else
+        {
+            svp[j].setState(ISS_OFF);
+        }
     }
+    sendNewSwitch(svp);
     return true;
 
 }
-
 /*!
  * Asks every device to load saved configuration
  */
@@ -356,9 +334,6 @@ bool IndiModule::loadDevicesConfs()
     else return false;
 
 }
-
-
-
 auto IndiModule::sendModNewNumber(const QString &deviceName, const QString &propertyName, const QString  &elementName,
                                   const double &value) -> bool
 {
