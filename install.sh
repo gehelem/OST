@@ -43,7 +43,7 @@ wget http://broiler.astrometry.net/~dstn/4200/index-4214.fits
 
 cd
 cd /var/www/html
-sudo wget https://github.com/gehelem/ost-front/releases/download/WorkInProgress/html.tar.gz --no-check-certificate
+sudo wget https://github.com/gehelem/ost-front/raw/master/html.tar.gz--no-check-certificate
 sudo tar -xvf html.tar.gz
 sudo chmod -R +rX /var/www/html
 sudo chown -R $USER /var/www/html
