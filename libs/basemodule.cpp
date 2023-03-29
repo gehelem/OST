@@ -219,6 +219,12 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
             }
         }
     }
+    if ((getModuleName() == pEventModule ) && (pEventType == "Fclearmessages") )
+    {
+        resetMessages();
+        resetWarnings();
+        resetErrors();
+    }
     /* dispatch any message to children */
     OnMyExternalEvent(pEventType, pEventModule, pEventKey, pEventData);
     OnDispatchToIndiExternalEvent(pEventType, pEventModule, pEventKey, pEventData);
