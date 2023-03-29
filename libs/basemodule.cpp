@@ -106,14 +106,14 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
         {
             if (!getProperties().contains(keyprop) )
             {
-                sendMessage(" Fsetproperty - property " + keyprop + " not found");
+                sendWarning(" Fsetproperty - property " + keyprop + " not found");
                 return;
             }
             foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
             {
                 if (!getProperties()[keyprop].toMap()["elements"].toMap().contains(keyelt) )
                 {
-                    sendMessage(" Fsetproperty - property " + keyprop + " - element " + keyelt +  " not found");
+                    sendWarning(" Fsetproperty - property " + keyprop + " - element " + keyelt +  " not found");
                     return;
                 }
             }
@@ -152,7 +152,7 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
                             }
                             else
                             {
-                                sendMessage("Can't load " + getOstElementValue("loadprofile", "name").toString() + " profile");
+                                sendWarning("Can't load " + getOstElementValue("loadprofile", "name").toString() + " profile");
                                 setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
                             }
                             setOstElementValue("loadprofile", "load", false, false);
@@ -198,7 +198,7 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
                         else
                         {
                             setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
-                            sendMessage("Can't save " + getOstPropertyValue("saveprofile").toString() + " profile");
+                            sendWarning("Can't save " + getOstPropertyValue("saveprofile").toString() + " profile");
                         }
                     }
                 }
@@ -280,8 +280,8 @@ bool Basemodule::setClassName(const QString &pClassName)
     }
     else
     {
-        sendMessage("ClassName already set (" + mClassName +
-                    ") - this method must be called only once, at the beginn of class constructor");
+        sendWarning("ClassName already set (" + mClassName +
+                    ") - this method must be called only once, at the begin of class constructor");
         return false;
     }
 }

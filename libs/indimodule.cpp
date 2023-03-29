@@ -57,7 +57,7 @@ void IndiModule::OnDispatchToIndiExternalEvent(const QString &eventType, const Q
                 setOstElementValue(keyprop, keyelt, false, false);
                 if (!isServerConnected())
                 {
-                    sendMessage("Indi server not connected");
+                    sendWarning("Indi server not connected");
                     setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
                     break;
                 }
@@ -175,7 +175,7 @@ bool IndiModule::connectAllDevices()
             sendNewSwitch(svp);
             if (devs[i].getDriverInterface() & INDI::BaseDevice::CCD_INTERFACE)
             {
-                sendMessage("Can't set blob mode (indi2)" + QString(devs[i].getDeviceName()));
+                sendWarning("Can't set blob mode " + QString(devs[i].getDeviceName()));
                 setBLOBMode(B_ALSO, devs[i].getDeviceName(), nullptr);
 
             }
@@ -566,7 +566,7 @@ bool IndiModule::frameReset(QString devicename)
     if (!prop.isValid())
     {
         sendError("Error - unable to find " + devicename + "/" + "CCD_FRAME_RESET" + " property. Aborting.");
-        return true;
+        return false;
     }
 
     for (std::size_t i = 0; i < prop.size(); i++)
