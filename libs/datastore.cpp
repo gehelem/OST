@@ -17,18 +17,15 @@ bool Datastore::createOstProperty(const QString &pPropertyName, const QString &p
         sendWarning("createOstProperty - property " + pPropertyName + " already exists.");
         return false;
     }
-    else
-    {
-        QVariantMap prop;
-        prop["propertyLabel"] = pPropertyLabel;
-        prop["permission"] = pPropertyPermission;
-        prop["devcat"] = pPropertyDevcat;
-        prop["group"] = pPropertyGroup;
-        prop["name"] = pPropertyName;
-        mProperties[pPropertyName] = prop;
-        OnModuleEvent("cp", QString(), pPropertyName, mProperties[pPropertyName].toMap());
-        return true;
-    }
+    QVariantMap prop;
+    prop["propertyLabel"] = pPropertyLabel;
+    prop["permission"] = pPropertyPermission;
+    prop["devcat"] = pPropertyDevcat;
+    prop["group"] = pPropertyGroup;
+    prop["name"] = pPropertyName;
+    mProperties[pPropertyName] = prop;
+    OnModuleEvent("cp", QString(), pPropertyName, mProperties[pPropertyName].toMap());
+    return true;
 }
 void Datastore::emitPropertyCreation(const QString &pPropertyName)
 {
@@ -36,38 +33,30 @@ void Datastore::emitPropertyCreation(const QString &pPropertyName)
 }
 bool Datastore::setOstPropertyValue(const QString &pPropertyName, const QVariant &pPropertyValue, bool mEmitEvent)
 {
-    if (mProperties.contains(pPropertyName))
+    if (!mProperties.contains(pPropertyName))
     {
-        QVariantMap prop = mProperties[pPropertyName].toMap();
-        prop["value"] = pPropertyValue;
-        mProperties[pPropertyName] = prop;
-        if (mEmitEvent) OnModuleEvent("sp", QString(), pPropertyName, mProperties[pPropertyName].toMap());
-        return true;
-    }
-    else
-    {
+        sendWarning("setOstPropertyValue - property " + pPropertyName + " not found.");
         return false;
     }
+    QVariantMap prop = mProperties[pPropertyName].toMap();
+    prop["value"] = pPropertyValue;
+    mProperties[pPropertyName] = prop;
+    if (mEmitEvent) OnModuleEvent("sp", QString(), pPropertyName, mProperties[pPropertyName].toMap());
+    return true;
 }
 QVariant Datastore::getOstPropertyValue(const QString &pPropertyName)
 {
-    if (mProperties.contains(pPropertyName))
-    {
-        if (mProperties[pPropertyName].toMap().contains("value"))
-        {
-            return mProperties[pPropertyName].toMap()["value"];
-        }
-        else
-        {
-            sendWarning("getPropertyValue - property " + pPropertyName + " contains no value.");
-            return QVariant();
-        }
-    }
-    else
+    if (!mProperties.contains(pPropertyName))
     {
         sendWarning("getPropertyValue - property " + pPropertyName + " not found.");
         return QVariant();
     }
+    if (!mProperties[pPropertyName].toMap().contains("value"))
+    {
+        sendWarning("getPropertyValue - property " + pPropertyName + " contains no value.");
+        return QVariant();
+    }
+    return mProperties[pPropertyName].toMap()["value"];
 }
 
 bool Datastore::createOstElement(const QString &pPropertyName, const QString &pElementName, const QString &pElementLabel,
@@ -104,124 +93,123 @@ bool Datastore::setOstElementValue(const QString &pPropertyName, const QString &
     }
 
     QVariantMap _prop = mProperties[pPropertyName].toMap();
-    if (_prop.contains("elements"))
+    if (!_prop.contains("elements"))
     {
-        if (_prop["elements"].toMap().contains(pElementName))
+        sendWarning("setOstElementValue - property " + pPropertyName + " has no elemnts");
+        return false;
+    }
+    QVariantMap _elements = _prop["elements"].toMap();
+    if (!_elements.contains(pElementName) )
+    {
+        sendWarning("setElementValue - property " + pPropertyName + " : element " + pElementName + " not found.");
+        return false;
+    }
+    QVariantMap element = _elements[pElementName].toMap();
+    if (element.contains("value"))
+    {
+        if (strcmp(element["value"].typeName(), "double") == 0)
         {
-            QVariantMap _elements = _prop["elements"].toMap();
-            if (!_elements.contains(pElementName) )
+            //element["value"]=pElementValue.toDouble();
+            element["value"].setValue(pElementValue.toDouble());
+        }
+        if (strcmp(element["value"].typeName(), "float") == 0)
+        {
+            //element["value"]=pElementValue.toFloat();
+            element["value"].setValue(pElementValue.toFloat());
+        }
+        if (strcmp(element["value"].typeName(), "qlonglong") == 0)
+        {
+            //element["value"]=pElementValue.toFloat();
+            element["value"].setValue(pElementValue.toDouble());
+        }
+        if (strcmp(element["value"].typeName(), "int") == 0)
+        {
+            //element["value"]=pElementValue.toInt();
+            element["value"].setValue(pElementValue.toInt());
+        }
+        if (strcmp(element["value"].typeName(), "QString") == 0)
+        {
+            element["value"] = pElementValue.toString();
+        }
+        if (strcmp(element["value"].typeName(), "bool") == 0)
+        {
+            if (_prop.contains("rule"))
             {
-                sendWarning("setElementValue - property " + pPropertyName + " : element " + pElementName + " not found.");
-                return false;
-            }
-
-            QVariantMap element = _elements[pElementName].toMap();
-            if (element.contains("value"))
-            {
-                if (strcmp(element["value"].typeName(), "double") == 0)
+                if (_prop["rule"] == 0) // one of many
                 {
-                    //element["value"]=pElementValue.toDouble();
-                    element["value"].setValue(pElementValue.toDouble());
-                }
-                if (strcmp(element["value"].typeName(), "float") == 0)
-                {
-                    //element["value"]=pElementValue.toFloat();
-                    element["value"].setValue(pElementValue.toFloat());
-                }
-                if (strcmp(element["value"].typeName(), "qlonglong") == 0)
-                {
-                    //element["value"]=pElementValue.toFloat();
-                    element["value"].setValue(pElementValue.toDouble());
-                }
-                if (strcmp(element["value"].typeName(), "int") == 0)
-                {
-                    //element["value"]=pElementValue.toInt();
-                    element["value"].setValue(pElementValue.toInt());
-                }
-                if (strcmp(element["value"].typeName(), "QString") == 0)
-                {
-                    element["value"] = pElementValue.toString();
-                }
-                if (strcmp(element["value"].typeName(), "bool") == 0)
-                {
-                    if (_prop.contains("rule"))
+                    if (pElementValue.toBool())
                     {
-                        if (_prop["rule"] == 0) // one of many
+                        for(QVariantMap::const_iterator itelt = _elements.begin(); itelt != _elements.end(); ++itelt)
                         {
-                            if (pElementValue.toBool())
+
+                            QVariantMap elt = _elements[itelt.key()].toMap();
+                            if (pElementName == itelt.key())
                             {
-                                for(QVariantMap::const_iterator itelt = _elements.begin(); itelt != _elements.end(); ++itelt)
-                                {
-
-                                    QVariantMap elt = _elements[itelt.key()].toMap();
-                                    if (pElementName == itelt.key())
-                                    {
-                                        elt["value"] = true;
-                                        element["value"] = true;
-                                    }
-                                    else
-                                    {
-                                        if (strcmp(elt["value"].typeName(), "bool") == 0) elt["value"] = false;
-                                    }
-
-                                    _elements[itelt.key()] = elt;
-                                }
+                                elt["value"] = true;
+                                element["value"] = true;
                             }
                             else
                             {
-
+                                if (strcmp(elt["value"].typeName(), "bool") == 0) elt["value"] = false;
                             }
 
+                            _elements[itelt.key()] = elt;
                         }
-                        if (_prop["rule"] == 1) // at most one
-                        {
-                            if (pElementValue.toBool())
-                            {
-                                for(QVariantMap::const_iterator itelt = _elements.begin(); itelt != _elements.end(); ++itelt)
-                                {
-
-                                    QVariantMap elt = _elements[itelt.key()].toMap();
-                                    if (pElementName == itelt.key())
-                                    {
-                                        elt["value"] = true;
-                                        element["value"] = true;
-                                    }
-                                    else
-                                    {
-                                        if (strcmp(elt["value"].typeName(), "bool") == 0) elt["value"] = false;
-                                    }
-
-                                    _elements[itelt.key()] = elt;
-                                }
-                            }
-                            else
-                            {
-                                element["value"] = false;
-
-                            }
-
-                        }
-                        if (_prop["rule"] == 2) // any
-                        {
-                            element["value"] = pElementValue.toBool();
-                        }
-
                     }
                     else
                     {
-                        element["value"] = pElementValue.toBool(); // we shouldn't do that, should we ?
+
                     }
 
                 }
+                if (_prop["rule"] == 1) // at most one
+                {
+                    if (pElementValue.toBool())
+                    {
+                        for(QVariantMap::const_iterator itelt = _elements.begin(); itelt != _elements.end(); ++itelt)
+                        {
+
+                            QVariantMap elt = _elements[itelt.key()].toMap();
+                            if (pElementName == itelt.key())
+                            {
+                                elt["value"] = true;
+                                element["value"] = true;
+                            }
+                            else
+                            {
+                                if (strcmp(elt["value"].typeName(), "bool") == 0) elt["value"] = false;
+                            }
+
+                            _elements[itelt.key()] = elt;
+                        }
+                    }
+                    else
+                    {
+                        element["value"] = false;
+
+                    }
+
+                }
+                if (_prop["rule"] == 2) // any
+                {
+                    element["value"] = pElementValue.toBool();
+                }
+
             }
             else
             {
-                element["value"] = pElementValue;
+                element["value"] = pElementValue.toBool(); // we shouldn't do that, should we ?
             }
-            _elements[pElementName] = element;
-            _prop["elements"] = _elements;
+
         }
     }
+    else
+    {
+        element["value"] = pElementValue;
+    }
+    _elements[pElementName] = element;
+    _prop["elements"] = _elements;
+
     mProperties[pPropertyName] = _prop;
     if (mEmitEvent) OnModuleEvent("se", QString(), pPropertyName, mProperties[pPropertyName].toMap());
 
