@@ -7,11 +7,11 @@
 //#include <QtSql/QSqlError>
 
 
-#include <basemodule.h>
+
 #include "maincontrol.h"
 
 #include "wshandler.h"
-#include "dbmanager.h"
+
 
 /*!
  * This class is the heart of OST

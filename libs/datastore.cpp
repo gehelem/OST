@@ -317,6 +317,11 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
     {
         QVariant tt = props[key].toVariant();
         mProperties[key] = tt.toMap();
+        BasicProperty *bp = new BasicProperty;
+        bp->setObjectName(key);
+        bp->setPriority(BasicProperty::High);
+
+
     }
 
     //QByteArray docByteArray = d.toJson(QJsonDocument::Compact);

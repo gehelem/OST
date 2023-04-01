@@ -1,13 +1,12 @@
 #ifndef BASEMODULE_h_
 #define BASEMODULE_h_
 
-#include <datastore.h>
 #include <dbmanager.h>
 /*!
  * This Class shouldn't be used as is
  * Every functionnal module should inherit it
 */
-class Basemodule : public QObject, public Datastore, public DBManager
+class Basemodule : public QObject, public DBManager
 {
         Q_OBJECT
 

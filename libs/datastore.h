@@ -1,6 +1,8 @@
 #ifndef DATASTORE_h_
 #define DATASTORE_h_
 #include <baseroot.h>
+#include <basicproperty.h>
+
 
 /** @class Datastore
  *  @brief Class to provide properties management for OST modules

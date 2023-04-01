@@ -1,7 +1,7 @@
 #ifndef DBMANAGER_h_
 #define DBMANAGER_h_
 
-#include "baseroot.h"
+#include "datastore.h"
 
 struct catalogResult
 {
@@ -18,7 +18,7 @@ struct catalogResult
 };
 
 
-class DBManager : virtual public Baseroot
+class DBManager : virtual public Datastore
 {
     public:
         DBManager();
