@@ -5,13 +5,12 @@
 #include <QList>
 #include <QVariant>
 #include <QtCore>
-#include <basicproperty.h>
+#include <rootproperty.h>
 
 
-class NumberProperty : public BasicProperty
+class NumberProperty : public RootProperty
 {
         Q_OBJECT
-        Q_PROPERTY(double value MEMBER mValue NOTIFY valueChanged)
 
     public:
         NumberProperty(const QString &label, const QString &level1, const QString &level2, const Permission &permission );
@@ -20,6 +19,11 @@ class NumberProperty : public BasicProperty
         {
             pVisitor->visit(this);
         }
+        double value()
+        {
+            return mValue;
+        }
+        void setValue(double value);
 
     signals:
         void valueChanged(double);

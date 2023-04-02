@@ -97,10 +97,16 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.qrc
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/propertyvisitor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/rootproperty.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/rootproperty.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basicproperty.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basicproperty.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/propertytextdumper.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/propertytextdumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/numberproperty.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/numberproperty.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/textproperty.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/textproperty.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/fileio.cpp

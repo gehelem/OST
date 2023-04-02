@@ -1,8 +1,11 @@
 #ifndef DATASTORE_h_
 #define DATASTORE_h_
 #include <baseroot.h>
+#include <propertytextdumper.h>
 #include <basicproperty.h>
 #include <numberproperty.h>
+#include <textproperty.h>
+
 
 /** @class Datastore
  *  @brief Class to provide properties management for OST modules
@@ -34,23 +37,13 @@ class Datastore : public Baseroot
         }
         void getQtProperties(void)
         {
-            QList<QByteArray> lst = this->dynamicPropertyNames();
-            for (int i = 0; i < lst.size(); ++i)
+            foreach(const QString &key, mStore.keys())
             {
-                qDebug() << "QT prop = " << lst[i];
+                PropertyTextDumper d;
+                mStore[key]->accept(&d);
+                qDebug() << key << "-" << d.getResult();
             }
-
-            const QMetaObject *metaobject = this->metaObject();
-            int count = metaobject->propertyCount();
-            for (int i = 0; i < count; ++i)
-            {
-                QMetaProperty metaproperty = metaobject->property(i);
-                const char *name = metaproperty.name();
-                QVariant value = this->property(name);
-                QString label = this->property("label").toString();
-                QString propertylabel = this->property("propertyLabel").toString();
-                //qDebug() << "QT prop = " << name << " label:" << label << " propertyLabel:" << propertylabel << " value:" << value;
-            }
+            qDebug() << "store size" << mStore.count();
         }
         /**
          * @brief createOstProperty is a method that creates a property at runtime
@@ -125,6 +118,8 @@ class Datastore : public Baseroot
 
     private:
         QVariantMap mProperties;
+        QMap<QString, RootProperty*> mStore;
+
 }
 ;
 #endif

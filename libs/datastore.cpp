@@ -315,14 +315,45 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
     QJsonObject props = d.object();
     foreach(const QString &key, props.keys())
     {
-        QVariant tt = props[key].toVariant();
-        mProperties[key] = tt.toMap();
+        QVariantMap tt = props[key].toVariant().toMap();
+        mProperties[key] = tt;
+        if (tt.contains("value"))
+        {
+            if (strcmp(tt["value"].typeName(), "QString") == 0)
+            {
+                TextProperty *bp = new TextProperty(tt["propertyLabel"].toString(),
+                                                    tt["devcat"].toString(),
+                                                    tt["group"].toString(),
+                                                    TextProperty::ReadWrite);
+                bp->setValue(tt["value"].toString());
+                mStore[key] = bp;
 
-        NumberProperty *bp = new NumberProperty(tt.toMap()["propertyLabel"].toString(), "", "", NumberProperty::ReadWrite);
-        bp->setObjectName(key);
-        bp->setProperty("label", tt.toMap()["propertyLabel"]);
-        bp->setState(BasicProperty::Ok);
-        setProperty(key.toStdString().c_str(), tt.toMap()["propertyLabel"].toString());
+            }
+            else
+            {
+                if (strcmp(tt["value"].typeName(), "qlonglong") == 0)
+                {
+                    NumberProperty *bp = new NumberProperty(tt["propertyLabel"].toString(),
+                                                            tt["devcat"].toString(),
+                                                            tt["group"].toString(),
+                                                            NumberProperty::ReadWrite);
+                    bp->setValue(tt["value"].toDouble());
+                    mStore[key] = bp;
+
+                }
+                else
+                {
+                    BasicProperty *bp = new BasicProperty(tt["propertyLabel"].toString(),
+                                                          tt["devcat"].toString(),
+                                                          tt["group"].toString(),
+                                                          BasicProperty::ReadWrite);
+                    mStore[key] = bp;
+
+                }
+
+            }
+        }
+
         //qDebug() << bp->property("label").toString();
 
 
