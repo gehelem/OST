@@ -11,7 +11,7 @@
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
 
-class Baseroot
+class Baseroot : public QObject
 {
     public:
         Baseroot();
@@ -70,7 +70,10 @@ class Baseroot
         {
             mWarningsSize = size;
         }
-    protected:
+        void sendMessage(const QString &pMessage);
+        void sendError(const QString &pMessage);
+        void sendWarning(const QString &pMessage);
+        void sendConsole(const QString &pMessage);
         virtual void OnModuleEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
                                    const QVariantMap &pEventData)
         {
@@ -79,10 +82,7 @@ class Baseroot
             Q_UNUSED(pEventKey);
             Q_UNUSED(pEventData);
         };
-        void sendMessage(const QString &pMessage);
-        void sendError(const QString &pMessage);
-        void sendWarning(const QString &pMessage);
-        void sendConsole(const QString &pMessage);
+    protected:
     private:
         QList<QVariantMap> mMessages;
         QList<QVariantMap> mErrors;

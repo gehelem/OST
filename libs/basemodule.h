@@ -6,7 +6,7 @@
  * This Class shouldn't be used as is
  * Every functionnal module should inherit it
 */
-class Basemodule : public QObject, public DBManager
+class Basemodule : public DBManager
 {
         Q_OBJECT
 

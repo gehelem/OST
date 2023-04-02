@@ -5,43 +5,42 @@
 #include <QList>
 #include <QVariant>
 #include <QtCore>
+#include "propertyvisitor.h"
 
+
+class PropertyVisitor;
 
 class BasicProperty : public QObject
 {
+
         Q_OBJECT
-        Q_PROPERTY(Priority priority READ priority WRITE setPriority NOTIFY priorityChanged)
         Q_PROPERTY(QString label MEMBER mLabel)
-        //Q_PROPERTY(QVariant value MEMBER mValue NOTIFY valueChanged)
 
     public:
-        BasicProperty();
+        virtual void accept(PropertyVisitor* pVisitor) = 0;
+        enum Permission { ReadOnly, WriteOnly, ReadWrite};
+        Q_ENUM(Permission)
+        enum State { Idle, Ok, Busy, Error};
+        Q_ENUM(State)
+
+        BasicProperty(const QString &label, const QString &level1, const QString &level2, const Permission &permission );
         ~BasicProperty();
 
-        enum Priority { High, Low, VeryHigh, VeryLow };
-        Q_ENUM(Priority)
-
-        void setPriority(Priority priority)
-        {
-            m_priority = priority;
-            emit priorityChanged( priority);
-        }
-        Priority priority() const
-        {
-            return m_priority;
-        }
+        void setState(State state);
+        State state() const;
 
     signals:
         //void propertyCreated(BasicProperty);
-        void priorityChanged(BasicProperty::Priority);
-        //void valueChanged(QVariant);
+        void stateChanged(BasicProperty::State);
 
     private:
         QString mLabel;
-        Priority m_priority;
-        QVariant mValue;
+        QString mLevel1;
+        QString mLevel2;
+        Permission mPermission;
+        State mState;
 
 };
-
+Q_DECLARE_METATYPE(BasicProperty*);
 #endif
 

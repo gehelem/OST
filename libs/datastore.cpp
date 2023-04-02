@@ -317,9 +317,13 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
     {
         QVariant tt = props[key].toVariant();
         mProperties[key] = tt.toMap();
-        BasicProperty *bp = new BasicProperty;
+
+        NumberProperty *bp = new NumberProperty(tt.toMap()["propertyLabel"].toString(), "", "", NumberProperty::ReadWrite);
         bp->setObjectName(key);
-        bp->setPriority(BasicProperty::High);
+        bp->setProperty("label", tt.toMap()["propertyLabel"]);
+        bp->setState(BasicProperty::Ok);
+        setProperty(key.toStdString().c_str(), tt.toMap()["propertyLabel"].toString());
+        //qDebug() << bp->property("label").toString();
 
 
     }

@@ -2,7 +2,7 @@
 #define DATASTORE_h_
 #include <baseroot.h>
 #include <basicproperty.h>
-
+#include <numberproperty.h>
 
 /** @class Datastore
  *  @brief Class to provide properties management for OST modules
@@ -20,7 +20,7 @@
  *  @author Gehelem
  */
 
-class Datastore : virtual public Baseroot
+class Datastore : public Baseroot
 {
     public:
         Datastore();
@@ -29,7 +29,28 @@ class Datastore : virtual public Baseroot
 
         QVariantMap getProperties(void)
         {
+            getQtProperties();
             return mProperties;
+        }
+        void getQtProperties(void)
+        {
+            QList<QByteArray> lst = this->dynamicPropertyNames();
+            for (int i = 0; i < lst.size(); ++i)
+            {
+                qDebug() << "QT prop = " << lst[i];
+            }
+
+            const QMetaObject *metaobject = this->metaObject();
+            int count = metaobject->propertyCount();
+            for (int i = 0; i < count; ++i)
+            {
+                QMetaProperty metaproperty = metaobject->property(i);
+                const char *name = metaproperty.name();
+                QVariant value = this->property(name);
+                QString label = this->property("label").toString();
+                QString propertylabel = this->property("propertyLabel").toString();
+                //qDebug() << "QT prop = " << name << " label:" << label << " propertyLabel:" << propertylabel << " value:" << value;
+            }
         }
         /**
          * @brief createOstProperty is a method that creates a property at runtime
@@ -66,7 +87,8 @@ class Datastore : virtual public Baseroot
         void loadOstPropertiesFromFile(const QString &pFileName);
         void saveOstPropertiesToFile(const QString &pFileName);
 
-        void setOstPropertyAttribute   (const QString &pPropertyName, const QString &pAttributeName, const QVariant &AttributeValue,
+        void setOstPropertyAttribute   (const QString &pPropertyName, const QString &pAttributeName,
+                                        const QVariant &AttributeValue,
                                         bool mEmitEvent);
         bool setOstElementAttribute (const QString &pPropertyName, const QString &pElementName, const  QString &pAttributeName,
                                      const QVariant &AttributeValue,

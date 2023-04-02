@@ -18,7 +18,7 @@ struct catalogResult
 };
 
 
-class DBManager : virtual public Datastore
+class DBManager : public Datastore
 {
     public:
         DBManager();
