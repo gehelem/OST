@@ -19,6 +19,10 @@ class NumberProperty : public RootProperty
         {
             pVisitor->visit(this);
         }
+        void accept(PropertyVisitor *pVisitor, QVariantMap &data) override
+        {
+            pVisitor->visit(this, data);
+        }
         double value()
         {
             return mValue;

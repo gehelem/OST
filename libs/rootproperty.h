@@ -17,6 +17,7 @@ class RootProperty : public QObject
 
     public:
         virtual void accept(PropertyVisitor* pVisitor) = 0;
+        virtual void accept(PropertyVisitor* pVisitor, QVariantMap &data) = 0;
 
         enum Permission { ReadOnly, WriteOnly, ReadWrite};
         Q_ENUM(Permission)

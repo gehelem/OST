@@ -19,6 +19,10 @@ class TextProperty : public RootProperty
         {
             pVisitor->visit(this);
         }
+        void accept(PropertyVisitor *pVisitor, QVariantMap &data) override
+        {
+            pVisitor->visit(this, data);
+        }
         QString value()
         {
             return mValue;

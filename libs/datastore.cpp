@@ -41,6 +41,17 @@ bool Datastore::setOstPropertyValue(const QString &pPropertyName, const QVariant
     QVariantMap prop = mProperties[pPropertyName].toMap();
     prop["value"] = pPropertyValue;
     mProperties[pPropertyName] = prop;
+
+    if (prop.contains("value") && mStore.contains(pPropertyName))
+    {
+        PropertyUpdate d;
+        mStore[pPropertyName]->accept(&d, prop);
+    }
+
+
+
+
+
     if (mEmitEvent) OnModuleEvent("sp", QString(), pPropertyName, mProperties[pPropertyName].toMap());
     return true;
 }

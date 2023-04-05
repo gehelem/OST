@@ -2,6 +2,7 @@
 #define DATASTORE_h_
 #include <baseroot.h>
 #include <propertytextdumper.h>
+#include <propertyupdate.h>
 #include <basicproperty.h>
 #include <numberproperty.h>
 #include <textproperty.h>
