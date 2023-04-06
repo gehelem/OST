@@ -40,6 +40,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/utils)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/model)
 include_directories(${INDI_INCLUDE_DIR})
 include_directories(${CFITSIO_INCLUDE_DIR})
 include_directories(${GSL_INCLUDE_DIRS})
@@ -96,19 +98,19 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.qrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/propertyvisitor.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/rootproperty.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/rootproperty.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/basicproperty.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/basicproperty.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/propertytextdumper.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/propertytextdumper.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/propertyupdate.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/propertyupdate.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/numberproperty.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/numberproperty.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/textproperty.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/textproperty.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/rootproperty.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/rootproperty.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/basicproperty.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/basicproperty.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/numberproperty.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/numberproperty.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/textproperty.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/textproperty.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyvisitor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertytextdumper.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertytextdumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyupdate.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyupdate.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/fileio.cpp
