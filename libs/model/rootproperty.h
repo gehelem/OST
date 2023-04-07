@@ -6,11 +6,12 @@
 #include <QVariant>
 #include <QtCore>
 #include "propertyvisitor.h"
+#include "rootvalue.h"
 
 
 class PropertyVisitor;
 
-class RootProperty : public QObject
+class RootProperty : public RootValue
 {
 
         Q_OBJECT
@@ -24,13 +25,10 @@ class RootProperty : public QObject
         enum State { Idle, Ok, Busy, Error};
         Q_ENUM(State)
 
-        RootProperty(const QString &label, const QString &level1, const QString &level2, const Permission &permission );
+        RootProperty(const QString &label, const QString &level1, const QString &level2,
+                     const Permission &permission );
         ~RootProperty();
 
-        QString label()
-        {
-            return mLabel;
-        }
         QString level1()
         {
             return mLevel1;
@@ -43,19 +41,13 @@ class RootProperty : public QObject
         {
             return mPermission;
         }
-        State state();
-        void setState(State state);
 
     signals:
-        //void propertyCreated(RootProperty);
-        void stateChanged(RootProperty::State);
 
     private:
-        QString mLabel;
         QString mLevel1;
         QString mLevel2;
         Permission mPermission;
-        State mState;
 
 };
 Q_DECLARE_METATYPE(RootProperty*);

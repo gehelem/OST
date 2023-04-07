@@ -3,6 +3,7 @@
 #include <baseroot.h>
 #include <propertytextdumper.h>
 #include <propertyupdate.h>
+#include <propertyfactory.h>
 #include <basicproperty.h>
 #include <numberproperty.h>
 #include <textproperty.h>
@@ -33,7 +34,7 @@ class Datastore : public Baseroot
 
         QVariantMap getProperties(void)
         {
-            getQtProperties();
+            //getQtProperties();
             return mProperties;
         }
         void getQtProperties(void)

@@ -47,7 +47,7 @@ bool Datastore::setOstPropertyValue(const QString &pPropertyName, const QVariant
         PropertyUpdate d;
         mStore[pPropertyName]->accept(&d, prop);
     }
-
+    getQtProperties();
 
 
 
@@ -328,7 +328,13 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
     {
         QVariantMap tt = props[key].toVariant().toMap();
         mProperties[key] = tt;
-        if (tt.contains("value"))
+        RootProperty *rp = PropertyFactory::createProperty(tt);
+        if (rp != nullptr)
+        {
+            mStore[key] = PropertyFactory::createProperty(tt);
+            mStore[key]->setState(RootValue::State::Ok);
+        }
+        /*if (tt.contains("type"))
         {
             if (strcmp(tt["value"].typeName(), "QString") == 0)
             {
@@ -363,7 +369,7 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
                 }
 
             }
-        }
+        }*/
 
         //qDebug() << bp->property("label").toString();
 

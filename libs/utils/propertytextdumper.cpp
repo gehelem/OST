@@ -3,6 +3,7 @@
 #include <basicproperty.h>
 #include <numberproperty.h>
 #include <textproperty.h>
+#include <multiproperty.h>
 
 std::string PropertyTextDumper::dumpPropertyCommons(RootProperty *pProperty)
 {
@@ -35,5 +36,20 @@ void PropertyTextDumper::visit(NumberProperty *pProperty)
            << ". Value=" << pProperty->value();
     _result = QString::fromStdString(stream.str());
 }
+void PropertyTextDumper::visit(MultiProperty *pProperty)
+{
+    std::stringstream stream;
+    stream << "multi Property :" << dumpPropertyCommons(pProperty)
+           << ". elements=";
 
+    foreach(const QString &key, pProperty->getElts().keys())
+    {
+        PropertyTextDumper d;
+        pProperty->getElts()[key]->accept(&d);
+        stream << " **** key : " << key.toStdString() << " / content : " << d.getResult().toStdString();
+
+    }
+    stream << " #####";
+    _result = QString::fromStdString(stream.str());
+}
 
