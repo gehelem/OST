@@ -14,5 +14,5 @@ TextProperty::~TextProperty()
 void TextProperty::setValue(QString value)
 {
     mValue = value;
-    emit valueChanged(value);
+    emit valueChanged(this);
 }

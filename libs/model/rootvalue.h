@@ -44,8 +44,10 @@ class RootValue: public QObject
         void setState(State state);
 
     signals:
-        //void propertyCreated(RootProperty);
         void stateChanged(RootValue::State);
+        void propertyCreated(void);
+        void valueChanged(RootValue*);
+
 
     private:
         QString mLabel;

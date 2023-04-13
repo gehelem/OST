@@ -31,9 +31,6 @@ class TextProperty : public RootProperty
 
 
 
-    signals:
-        void valueChanged(QString);
-
     private:
         QString mValue;
 

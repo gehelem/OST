@@ -3,8 +3,7 @@
 RootValue::RootValue(const QString &label)
     : mLabel(label)
 {
-    //emit propertyCreated(this->metaObject());
-    //parent->connect(this,&RootProperty::valueChanged,parent,QObject::)
+    emit propertyCreated();
 }
 RootValue::~RootValue()
 {

@@ -29,9 +29,6 @@ class NumberProperty : public RootProperty
         }
         void setValue(double value);
 
-    signals:
-        void valueChanged(double);
-
     private:
         double mValue;
 

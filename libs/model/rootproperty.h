@@ -42,7 +42,6 @@ class RootProperty : public RootValue
             return mPermission;
         }
 
-    signals:
 
     private:
         QString mLevel1;

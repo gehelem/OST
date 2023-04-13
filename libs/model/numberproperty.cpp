@@ -14,5 +14,5 @@ NumberProperty::~NumberProperty()
 void NumberProperty::setValue(double value)
 {
     mValue = value;
-    emit valueChanged(value);
+    emit valueChanged(this);
 }

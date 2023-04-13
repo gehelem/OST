@@ -117,6 +117,8 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyfactory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertytextdumper.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertytextdumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/jsondumper.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/jsondumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyupdate.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyupdate.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.cpp

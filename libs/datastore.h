@@ -1,5 +1,6 @@
 #ifndef DATASTORE_h_
 #define DATASTORE_h_
+#include "jsondumper.h"
 #include <baseroot.h>
 #include <propertytextdumper.h>
 #include <propertyupdate.h>
@@ -44,6 +45,9 @@ class Datastore : public Baseroot
                 PropertyTextDumper d;
                 mStore[key]->accept(&d);
                 qDebug() << key << "-" << d.getResult();
+                JSonDumper j;
+                mStore[key]->accept(&j);
+                qDebug() << key << "-" << j.getStringResult();
             }
             qDebug() << "store size" << mStore.count();
         }
@@ -118,6 +122,8 @@ class Datastore : public Baseroot
                        const QString &pLovLabel);
         void deleteOstLov(const QString &pPropertyName, const QString &pLovCode);
 
+    private slots:
+        void onValueChanged(void);
     private:
         QVariantMap mProperties;
         QMap<QString, RootProperty*> mStore;

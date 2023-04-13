@@ -27,7 +27,8 @@ class BasicProperty : public RootProperty
             pVisitor->visit(this, data);
         }
 
-
+    signals:
+        void valueChanged(void);
     private:
 
 };
