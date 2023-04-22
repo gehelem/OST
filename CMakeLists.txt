@@ -98,6 +98,19 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.qrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuebase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuebase.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueint.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueint.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuestring.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuestring.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuefloat.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuefloat.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuebool.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuebool.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuelight.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuelight.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/rootvalue.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/rootvalue.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/rootvalue.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/rootproperty.cpp
@@ -113,6 +126,7 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/multiproperty.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/multiproperty.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyvisitor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuevisitor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyfactory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyfactory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertytextdumper.cpp
