@@ -1,4 +1,6 @@
 #include "numberproperty.h"
+namespace  OST
+{
 
 NumberProperty::NumberProperty(const QString &label, const QString &level1, const QString &level2,
                                const Permission &permission )
@@ -15,4 +17,5 @@ void NumberProperty::setValue(double value)
 {
     mValue = value;
     emit valueChanged(this);
+}
 }

@@ -1,4 +1,6 @@
 #include "textproperty.h"
+namespace  OST
+{
 
 TextProperty::TextProperty(const QString &label, const QString &level1, const QString &level2,
                            const Permission &permission )
@@ -15,4 +17,5 @@ void TextProperty::setValue(QString value)
 {
     mValue = value;
     emit valueChanged(this);
+}
 }

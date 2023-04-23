@@ -1,4 +1,6 @@
 #include "rootmulti.h"
+namespace  OST
+{
 
 RootMulti::RootMulti(const QString &label, const QString &level1, const QString &level2,
                      const Permission &permission )
@@ -10,4 +12,5 @@ RootMulti::RootMulti(const QString &label, const QString &level1, const QString 
 RootMulti::~RootMulti()
 {
 
+}
 }

@@ -7,6 +7,8 @@
 #include <QtCore>
 #include <rootproperty.h>
 #include <rootmulti.h>
+namespace  OST
+{
 
 
 class MultiProperty : public RootMulti
@@ -41,6 +43,6 @@ class MultiProperty : public RootMulti
 
 
 };
-
+}
 #endif
 

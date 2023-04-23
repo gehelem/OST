@@ -1,4 +1,6 @@
 #include "propertybase.h"
+namespace  OST
+{
 
 PropertyBase::PropertyBase(const QString &label, const Permission &permission, const QString &level1, const QString &level2,
                            const QString &order, const bool &hasProfile, const bool &hasArray)
@@ -17,3 +19,4 @@ void PropertyBase::setState(State state)
     emit stateChanged( state);
 }
 
+}

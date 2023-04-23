@@ -6,6 +6,8 @@
 #include <QVariant>
 #include <QtCore>
 #include "rootproperty.h"
+namespace  OST
+{
 
 
 class PropertyVisitor;
@@ -32,6 +34,6 @@ class BasicProperty : public RootProperty
     private:
 
 };
-Q_DECLARE_METATYPE(BasicProperty*);
+}
 #endif
 

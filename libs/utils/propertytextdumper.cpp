@@ -1,11 +1,9 @@
 #include "propertytextdumper.h"
 #include <sstream>
-#include <basicproperty.h>
-#include <numberproperty.h>
-#include <textproperty.h>
-#include <multiproperty.h>
+namespace  OST
+{
 
-std::string PropertyTextDumper::dumpPropertyCommons(RootProperty *pProperty)
+std::string PropertyTextDumper::dumpPropertyCommons(PropertyBase *pProperty)
 {
     std::stringstream stream;
     stream << " Label=" << pProperty->label().toStdString()
@@ -16,33 +14,26 @@ std::string PropertyTextDumper::dumpPropertyCommons(RootProperty *pProperty)
            ;
     return stream.str();
 }
-void PropertyTextDumper::visit(BasicProperty *pProperty)
+void PropertyTextDumper::visit(PropertySimple *pProperty)
 {
     std::stringstream stream;
-    stream << "Basic Property :" << dumpPropertyCommons(pProperty);
+    stream << "Simple Property :" << dumpPropertyCommons(pProperty);
     _result = QString::fromStdString(stream.str());
 }
-void PropertyTextDumper::visit(TextProperty *pProperty)
+void PropertyTextDumper::visit(PropertyMulti *pProperty)
 {
     std::stringstream stream;
-    stream << "Text Property :" << dumpPropertyCommons(pProperty)
-           << ". Value=" << pProperty->value().toStdString();
-    _result = QString::fromStdString(stream.str());
-}
-void PropertyTextDumper::visit(NumberProperty *pProperty)
-{
-    std::stringstream stream;
-    stream << "Number Property :" << dumpPropertyCommons(pProperty)
-           << ". Value=" << pProperty->value();
-    _result = QString::fromStdString(stream.str());
-}
-void PropertyTextDumper::visit(MultiProperty *pProperty)
-{
-    std::stringstream stream;
-    stream << "multi Property :" << dumpPropertyCommons(pProperty)
+    stream << "Multi Property :" << dumpPropertyCommons(pProperty)
            << ". elements=";
 
-    foreach(const QString &key, pProperty->getElts().keys())
+    QList<ValueBase*>::iterator i;
+    for( int i = 0; i < pProperty->getValues().count(); ++i )
+    {
+
+    }
+
+
+    foreach(const QString &key, pProperty->getValues())
     {
         PropertyTextDumper d;
         pProperty->getElts()[key]->accept(&d);
@@ -53,3 +44,4 @@ void PropertyTextDumper::visit(MultiProperty *pProperty)
     _result = QString::fromStdString(stream.str());
 }
 
+}

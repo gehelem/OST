@@ -7,6 +7,8 @@
 #include <basicproperty.h>
 #include <multiproperty.h>
 #include <propertyvisitor.h>
+namespace  OST
+{
 
 class JSonDumper : public PropertyVisitor
 {
@@ -58,5 +60,5 @@ class JSonDumper : public PropertyVisitor
         QJsonObject dumpPropertyCommons(RootProperty* pProperty);
 };
 
-
+}
 #endif //OST_JSONDUMPER_H

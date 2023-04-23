@@ -3,6 +3,8 @@
 
 #include <baseclient.h>
 #include <model/rootproperty.h>
+namespace  OST
+{
 
 class PropertyFactory
 {
@@ -16,5 +18,5 @@ class PropertyFactory
         static RootProperty* createProperty(const QVariantMap &pData);
 };
 
-
+}
 #endif //OST_PROPERTYFACTORY_H

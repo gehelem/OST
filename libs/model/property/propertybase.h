@@ -1,12 +1,11 @@
 #ifndef PROPERTYBASE_h_
 #define PROPERTYBASE_h_
 
-#include <QObject>
-#include <QList>
-#include <QVariant>
-#include <QtCore>
-#include "propertyvisitor.h"
+#include <propertyvisitor.h>
+#include <valuebase.h>
 
+namespace  OST
+{
 
 class PropertyVisitor;
 
@@ -25,9 +24,6 @@ class PropertyBase: public QObject
     public:
         virtual void accept(PropertyVisitor* pVisitor) = 0;
         virtual void accept(PropertyVisitor* pVisitor, QVariantMap &data) = 0;
-
-        enum State { Idle, Ok, Busy, Error};
-        Q_ENUM(State)
 
         PropertyBase(const QString &label, const Permission &permission, const QString &level1, const QString &level2,
                      const QString &order, const bool &hasProfile, const bool &hasArray
@@ -82,9 +78,9 @@ class PropertyBase: public QObject
 
 
     signals:
-        void stateChanged(PropertyBase::State);
+        void stateChanged(OST::State);
         void propertyCreated(void);
-        void valueChanged(PropertyBase*);
+        void valueChanged(OST::PropertyBase*);
 
 
     private:
@@ -100,5 +96,7 @@ class PropertyBase: public QObject
 
 
 };
+
+}
 #endif
 

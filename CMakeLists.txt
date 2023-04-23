@@ -42,6 +42,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/utils)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/model)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value)
 include_directories(${INDI_INCLUDE_DIR})
 include_directories(${CFITSIO_INCLUDE_DIR})
 include_directories(${GSL_INCLUDE_DIRS})
@@ -112,6 +114,10 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuelight.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertybase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertybase.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertysimple.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertysimple.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertymulti.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertymulti.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/rootvalue.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/rootvalue.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/rootvalue.h

@@ -1,11 +1,7 @@
 #ifndef VALUEBASE_h_
 #define VALUEBASE_h_
 
-#include <QObject>
-#include <QList>
-#include <QVariant>
-#include <QtCore>
-#include "valuevisitor.h"
+#include <valuevisitor.h>
 
 namespace  OST
 {

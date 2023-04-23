@@ -1,4 +1,6 @@
 #include "multiproperty.h"
+namespace  OST
+{
 
 MultiProperty::MultiProperty(const QString &label, const QString &level1, const QString &level2,
                              const Permission &permission )
@@ -10,4 +12,5 @@ MultiProperty::MultiProperty(const QString &label, const QString &level1, const 
 MultiProperty::~MultiProperty()
 {
 
+}
 }

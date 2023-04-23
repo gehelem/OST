@@ -5,6 +5,8 @@
 #include "model/numberproperty.h"
 #include "model/textproperty.h"
 
+namespace  OST
+{
 
 
 
@@ -47,5 +49,6 @@ void JSonDumper::visit(MultiProperty *pProperty)
     json["elements"] = jsonElements;
     QJsonDocument doc(json);
     _result = json;
+}
 }
 

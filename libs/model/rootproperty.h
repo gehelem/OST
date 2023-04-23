@@ -8,6 +8,8 @@
 #include "propertyvisitor.h"
 #include "rootvalue.h"
 
+namespace  OST
+{
 
 class PropertyVisitor;
 
@@ -49,6 +51,7 @@ class RootProperty : public RootValue
         Permission mPermission;
 
 };
-Q_DECLARE_METATYPE(RootProperty*);
+
+}
 #endif
 

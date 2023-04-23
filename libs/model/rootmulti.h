@@ -6,6 +6,8 @@
 #include <QVariant>
 #include <QtCore>
 #include <rootproperty.h>
+namespace  OST
+{
 
 
 class RootMulti: public RootProperty
@@ -31,6 +33,6 @@ class RootMulti: public RootProperty
 
 
 };
-
+}
 #endif
 

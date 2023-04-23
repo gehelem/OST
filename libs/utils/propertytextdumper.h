@@ -2,10 +2,12 @@
 #define OST_PROPERTYTEXTDUMPER_H
 
 #include <string>
-#include <numberproperty.h>
-#include <basicproperty.h>
-#include <multiproperty.h>
+#include <propertybase.h>
+#include <propertysimple.h>
+#include <propertymulti.h>
 #include <propertyvisitor.h>
+namespace  OST
+{
 
 class Property;
 
@@ -15,30 +17,23 @@ class PropertyTextDumper : public PropertyVisitor
     public:
         PropertyTextDumper() = default;
 
-        void visit(RootProperty *pProperty) override
+        void visit(PropertyBase *pProperty) override
         {
             Q_UNUSED(pProperty)
         }
-        void visit(BasicProperty *pProperty) override;
-        void visit(NumberProperty *pProperty) override;
-        void visit(TextProperty *pProperty) override;
-        void visit(MultiProperty *pProperty) override;
-        void visit(RootProperty* pProperty, QVariantMap &data ) override
+        void visit(PropertyBase* pProperty, QVariantMap &data ) override
         {
             Q_UNUSED(pProperty);
             Q_UNUSED(data)
         }
-        void visit(BasicProperty* pProperty, QVariantMap &data ) override
+        void visit(PropertySimple *pProperty) override;
+        void visit(PropertySimple* pProperty, QVariantMap &data ) override
         {
             Q_UNUSED(pProperty);
             Q_UNUSED(data)
         }
-        void visit(NumberProperty* pProperty, QVariantMap &data ) override
-        {
-            Q_UNUSED(pProperty);
-            Q_UNUSED(data)
-        }
-        void visit(TextProperty* pProperty, QVariantMap &data ) override
+        void visit(PropertyMulti *pProperty) override;
+        void visit(PropertyMulti* pProperty, QVariantMap &data ) override
         {
             Q_UNUSED(pProperty);
             Q_UNUSED(data)
@@ -51,10 +46,10 @@ class PropertyTextDumper : public PropertyVisitor
 
     private:
 
-        std::string dumpPropertyCommons(RootProperty *pProperty);
+        std::string dumpPropertyCommons(PropertyBase *pProperty);
 
         QString _result;
 
 };
-
+}
 #endif //OST_PROPERTYTEXTDUMPER_H

@@ -6,6 +6,8 @@
 #include <QVariant>
 #include <QtCore>
 #include <rootproperty.h>
+namespace  OST
+{
 
 
 class NumberProperty : public RootProperty
@@ -33,6 +35,7 @@ class NumberProperty : public RootProperty
         double mValue;
 
 };
-Q_DECLARE_METATYPE(NumberProperty*);
+
+}
 #endif
 

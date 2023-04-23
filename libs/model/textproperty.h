@@ -6,6 +6,8 @@
 #include <QVariant>
 #include <QtCore>
 #include <rootproperty.h>
+namespace  OST
+{
 
 
 class TextProperty : public RootProperty
@@ -35,6 +37,6 @@ class TextProperty : public RootProperty
         QString mValue;
 
 };
-Q_DECLARE_METATYPE(TextProperty*);
+}
 #endif
 

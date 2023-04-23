@@ -1,4 +1,6 @@
 #include "rootproperty.h"
+namespace  OST
+{
 
 RootProperty::RootProperty(const QString &label, const QString &level1, const QString &level2,
                            const Permission &permission )
@@ -12,3 +14,4 @@ RootProperty::~RootProperty()
 
 }
 
+}

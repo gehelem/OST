@@ -6,6 +6,8 @@
 #include <QVariant>
 #include <QtCore>
 #include "propertyvisitor.h"
+namespace  OST
+{
 
 
 class PropertyVisitor;
@@ -55,6 +57,7 @@ class RootValue: public QObject
         State mState;
 
 };
-Q_DECLARE_METATYPE(RootValue*);
+
+}
 #endif
 

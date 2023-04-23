@@ -1,4 +1,6 @@
 #include "basicproperty.h"
+namespace  OST
+{
 
 BasicProperty::BasicProperty(const QString &label, const QString &level1, const QString &level2,
                              const Permission &permission )
@@ -10,4 +12,5 @@ BasicProperty::BasicProperty(const QString &label, const QString &level1, const 
 BasicProperty::~BasicProperty()
 {
 
+}
 }

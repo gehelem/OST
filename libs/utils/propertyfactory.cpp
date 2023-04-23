@@ -5,6 +5,8 @@
 #include "model/textproperty.h"
 //#include "model/lightproperty.h"
 //#include "model/lightvalue.h"
+namespace  OST
+{
 
 RootProperty* PropertyFactory::createProperty(const QVariantMap &pData)
 {
@@ -224,3 +226,4 @@ RootProperty *PropertyFactory::createProperty(ILightVectorProperty *pVector) {
     return pProperty;
 }
 */
+}
