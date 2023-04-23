@@ -110,6 +110,8 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuebool.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuelight.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuelight.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertybase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertybase.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/rootvalue.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/rootvalue.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/rootvalue.h
