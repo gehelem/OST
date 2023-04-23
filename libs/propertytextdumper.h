@@ -41,14 +41,14 @@ class PropertyTextDumper : public PropertyVisitor
 
         [[nodiscard]] const QString &getResult() const
         {
-            return mResult;
+            return _result;
         }
 
     private:
 
         std::string dumpPropertyCommons(PropertyBase *pProperty);
 
-        QString mResult;
+        QString _result;
 
 };
 }

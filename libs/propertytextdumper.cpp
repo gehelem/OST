@@ -1,5 +1,4 @@
 #include "propertytextdumper.h"
-#include "valuetextdumper.h"
 #include <sstream>
 namespace  OST
 {
@@ -30,14 +29,17 @@ void PropertyTextDumper::visit(PropertyMulti *pProperty)
     QList<ValueBase*>::iterator i;
     for( int i = 0; i < pProperty->getValues().count(); ++i )
     {
+
+    }
+
+
+    foreach(const QString &key, pProperty->getValues())
+    {
         PropertyTextDumper d;
         pProperty->getElts()[key]->accept(&d);
         stream << " **** key : " << key.toStdString() << " / content : " << d.getResult().toStdString();
 
     }
-
-
-
     stream << " #####";
     _result = QString::fromStdString(stream.str());
 }
