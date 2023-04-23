@@ -1,17 +1,32 @@
-#include "rootvalue.h"
-
-RootValue::RootValue(const QString &label)
-    : mLabel(label)
+#include "valueint.h"
+namespace  OST
 {
-    emit propertyCreated();
-}
-RootValue::~RootValue()
+ValueInt::ValueInt(const QString &label, const QString &order, const QString &hint)
+    : ValueBase(label, order, hint)
 {
+}
+ValueInt::~ValueInt()
+{
+}
+void ValueInt::setValue(const long &value)
+{
+    mValue = value;
+}
+void ValueInt::setMin(const long &min)
+{
+    mMin = min;
+}
+void ValueInt::setMax(const long &max)
+{
+    mMax = max;
+}
+void ValueInt::setStep(const long &step)
+{
+    mStep = step;
+}
+void ValueInt::setFormat(const QString &format)
+{
+    mFormat = format;
+}
 
 }
-void RootValue::setState(State state)
-{
-    mState = state;
-    emit stateChanged( state);
-}
-

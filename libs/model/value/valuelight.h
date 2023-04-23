@@ -1,60 +1,32 @@
-#ifndef ROOTVALUE_h_
-#define ROOTVALUE_h_
+#ifndef VALUELIGHT_h
+#define VALUELIGHT_h
 
-#include <QObject>
-#include <QList>
-#include <QVariant>
-#include <QtCore>
-#include "propertyvisitor.h"
+#include "valuebase.h"
 
+namespace  OST
+{
 
-class PropertyVisitor;
-
-class RootValue: public QObject
+class ValueLight: public ValueBase
 {
 
         Q_OBJECT
 
     public:
-        virtual void accept(PropertyVisitor* pVisitor) = 0;
-        virtual void accept(PropertyVisitor* pVisitor, QVariantMap &data) = 0;
-
-        enum State { Idle, Ok, Busy, Error};
-        Q_ENUM(State)
-
-        RootValue(const QString &label);
-        ~RootValue();
-
-        QString label()
+        void accept(ValueVisitor *pVisitor) override
         {
-            return mLabel;
+            pVisitor->visit(this);
         }
-        QString order()
+        void accept(ValueVisitor *pVisitor, QVariantMap &data) override
         {
-            return mOrder;
+            pVisitor->visit(this, data);
         }
-        void setOrder(QString &pOrder)
-        {
-            mOrder = pOrder;
-        }
-        State state()
-        {
-            return mState;
-        }
-        void setState(State state);
 
-    signals:
-        void stateChanged(RootValue::State);
-        void propertyCreated(void);
-        void valueChanged(RootValue*);
-
+        ValueLight(const QString &label, const QString &order, const QString &hint);
+        ~ValueLight();
 
     private:
-        QString mLabel;
-        QString mOrder;
-        State mState;
 
 };
-Q_DECLARE_METATYPE(RootValue*);
-#endif
 
+}
+#endif

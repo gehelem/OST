@@ -1,17 +1,12 @@
-#include "rootvalue.h"
-
-RootValue::RootValue(const QString &label)
-    : mLabel(label)
+#include "valuelight.h"
+namespace  OST
 {
-    emit propertyCreated();
+ValueLight::ValueLight(const QString &label, const QString &order, const QString &hint)
+    : ValueBase(label, order, hint)
+{
 }
-RootValue::~RootValue()
+ValueLight::~ValueLight()
 {
-
-}
-void RootValue::setState(State state)
-{
-    mState = state;
-    emit stateChanged( state);
 }
 
+}

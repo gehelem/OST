@@ -1,12 +1,14 @@
 #ifndef OST_VALUEVISITOR_H
 #define OST_VALUEVISITOR_H
 #include <QtCore>
+namespace  OST
+{
 
-class RootProperty;
-class BasicProperty;
-class NumberProperty;
-class TextProperty;
-class MultiProperty;
+class ValueInt;
+class ValueBool;
+class ValueFloat;
+class ValueLight;
+class ValueString;
 
 class ValueVisitor
 {
@@ -15,15 +17,17 @@ class ValueVisitor
         ValueVisitor() = default;
 
     public:
-        virtual void visit(RootProperty* pProperty) = 0;
-        virtual void visit(BasicProperty* pProperty) = 0;
-        virtual void visit(NumberProperty* pProperty) = 0;
-        virtual void visit(TextProperty* pProperty) = 0;
-        virtual void visit(MultiProperty* pProperty) = 0;
-        virtual void visit(RootProperty* pProperty, QVariantMap &data ) = 0;
-        virtual void visit(BasicProperty* pProperty, QVariantMap &data ) = 0;
-        virtual void visit(NumberProperty* pProperty, QVariantMap &data ) = 0;
-        virtual void visit(TextProperty* pProperty, QVariantMap &data ) = 0;
+        virtual void visit(ValueInt* pValue) = 0;
+        virtual void visit(ValueBool* pValue) = 0;
+        virtual void visit(ValueFloat* pValue) = 0;
+        virtual void visit(ValueLight* pValue) = 0;
+        virtual void visit(ValueString* pValue) = 0;
+        virtual void visit(ValueInt* pValue, QVariantMap &data) = 0;
+        virtual void visit(ValueBool* pValue, QVariantMap &data) = 0;
+        virtual void visit(ValueFloat* pValue, QVariantMap &data) = 0;
+        virtual void visit(ValueLight* pValue, QVariantMap &data) = 0;
+        virtual void visit(ValueString* pValue, QVariantMap &data) = 0;
 };
 
+}
 #endif //OST_VALUEVISITOR_H

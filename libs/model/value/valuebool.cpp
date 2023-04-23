@@ -1,17 +1,16 @@
-#include "rootvalue.h"
-
-RootValue::RootValue(const QString &label)
-    : mLabel(label)
+#include "valuebool.h"
+namespace  OST
 {
-    emit propertyCreated();
+ValueBool::ValueBool(const QString &label, const QString &order, const QString &hint)
+    : ValueBase(label, order, hint)
+{
 }
-RootValue::~RootValue()
+ValueBool::~ValueBool()
 {
-
 }
-void RootValue::setState(State state)
+void ValueBool::setValue(const bool &value)
 {
-    mState = state;
-    emit stateChanged( state);
+    mValue = value;
 }
 
+}
