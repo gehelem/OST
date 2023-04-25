@@ -1,14 +1,12 @@
 #ifndef DATASTORE_h_
 #define DATASTORE_h_
-#include "jsondumper.h"
+//#include "jsondumper.h"
 #include <baseroot.h>
 #include <propertytextdumper.h>
 #include <propertyupdate.h>
 #include <propertyfactory.h>
-#include <basicproperty.h>
-#include <numberproperty.h>
-#include <textproperty.h>
-
+#include <propertysimple.h>
+#include <propertymulti.h>
 
 /** @class Datastore
  *  @brief Class to provide properties management for OST modules
