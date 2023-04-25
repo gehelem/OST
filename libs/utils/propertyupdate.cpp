@@ -1,23 +1,17 @@
 #include "propertyupdate.h"
 #include <sstream>
-#include <basicproperty.h>
-#include <numberproperty.h>
-#include <textproperty.h>
-
-void PropertyUpdate::visit(BasicProperty *pProperty, QVariantMap &data )
+namespace  OST
 {
-    Q_UNUSED(pProperty)
-    Q_UNUSED(data)
-}
-void PropertyUpdate::visit(TextProperty *pProperty, QVariantMap &data)
+void PropertyUpdate::visit(PropertySimple *pProperty, QVariantMap &data)
 {
     if (!data.contains("value"))
     {
         qDebug() << "no value for " << pProperty->label();
     }
+    pProperty->getValue;
     pProperty->setValue(data["value"].toString());
 }
-void PropertyUpdate::visit(NumberProperty *pProperty, QVariantMap &data )
+void PropertyUpdate::visit(PropertyMulti *pProperty, QVariantMap &data )
 {
     if (!data.contains("value"))
     {
@@ -25,5 +19,5 @@ void PropertyUpdate::visit(NumberProperty *pProperty, QVariantMap &data )
     }
     pProperty->setValue(data["value"].toDouble());
 }
-
+}
 

@@ -8,11 +8,6 @@ class PropertyBase;
 class PropertySimple;
 class PropertyMulti;
 
-class RootProperty;
-class BasicProperty;
-class NumberProperty;
-class TextProperty;
-class MultiProperty;
 
 class PropertyVisitor
 {
@@ -28,15 +23,6 @@ class PropertyVisitor
         virtual void visit(PropertyMulti* pProperty) = 0;
         virtual void visit(PropertyMulti* pProperty, QVariantMap &data ) = 0;
 
-        virtual void visit(RootProperty* pProperty) = 0;
-        virtual void visit(BasicProperty* pProperty) = 0;
-        virtual void visit(NumberProperty* pProperty) = 0;
-        virtual void visit(TextProperty* pProperty) = 0;
-        virtual void visit(MultiProperty* pProperty) = 0;
-        virtual void visit(RootProperty* pProperty, QVariantMap &data ) = 0;
-        virtual void visit(BasicProperty* pProperty, QVariantMap &data ) = 0;
-        virtual void visit(NumberProperty* pProperty, QVariantMap &data ) = 0;
-        virtual void visit(TextProperty* pProperty, QVariantMap &data ) = 0;
 };
 
 }

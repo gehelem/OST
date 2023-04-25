@@ -1,63 +1,21 @@
 #include "propertyfactory.h"
-#include "model/multiproperty.h"
-#include "model/numberproperty.h"
-//#include "model/switchproperty.h"
-#include "model/textproperty.h"
-//#include "model/lightproperty.h"
-//#include "model/lightvalue.h"
 namespace  OST
 {
 
-RootProperty* PropertyFactory::createProperty(const QVariantMap &pData)
+PropertyBase *PropertyFactory::createProperty(const QVariantMap &pData)
 {
 
-    if(!pData.contains("type"))
-    {
-        if (pData.contains("value"))
-        {
-            if (strcmp(pData["value"].typeName(), "QString") == 0)
-            {
-                auto *pProperty = new TextProperty(pData["propertyLabel"].toString(),
-                                                   pData["devcat"].toString(),
-                                                   pData["group"].toString(),
-                                                   TextProperty::ReadWrite);
-                pProperty->setValue(pData["value"].toString());
-                return pProperty;
-
-            }
-
-
-            if (
-                (strcmp(pData["value"].typeName(), "double") == 0) ||
-                (strcmp(pData["value"].typeName(), "float") == 0) ||
-                (strcmp(pData["value"].typeName(), "qlonglong") == 0) ||
-                (strcmp(pData["value"].typeName(), "int") == 0)
-            )
-
-            {
-                auto *pProperty = new NumberProperty(pData["propertyLabel"].toString(),
-                                                     pData["devcat"].toString(),
-                                                     pData["group"].toString(),
-                                                     TextProperty::ReadWrite);
-                pProperty->setValue(pData["value"].toDouble());
-                return pProperty;
-
-            }
-
-        }
-
-    }
-    auto *pProperty = new MultiProperty(pData["propertyLabel"].toString(),
+    /*auto *pProperty = new PropertyMulti(pData["propertyLabel"].toString(),
                                         pData["devcat"].toString(),
                                         pData["group"].toString(),
-                                        TextProperty::ReadWrite);
+                                        TextProperty::ReadWrite);*/
     if (pData.contains("elements"))
     {
         QVariantMap elts = pData["elements"].toMap();
         foreach(const QString &key, elts.keys())
         {
             QVariantMap elt = elts[key].toMap();
-            RootProperty *rp = PropertyFactory::createProperty(elt);
+            ValueBase *v = ValuefFactory::createProperty(elt);
             if (rp != nullptr)
             {
                 pProperty->addElt(key, rp);

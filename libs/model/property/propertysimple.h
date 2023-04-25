@@ -26,6 +26,10 @@ class PropertySimple: public PropertyBase
                        const QString &order, const bool &hasProfile, const bool &hasArray
                       );
         ~PropertySimple();
+        inline const ValueBase* getValue()
+        {
+            return mValue;
+        }
 
     private:
         ValueBase* mValue;

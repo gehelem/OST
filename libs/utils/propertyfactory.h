@@ -2,7 +2,8 @@
 #define OST_PROPERTYFACTORY_H
 
 #include <baseclient.h>
-#include <model/rootproperty.h>
+#include <propertysimple.h>
+#include <propertymulti.h>
 namespace  OST
 {
 
@@ -15,7 +16,7 @@ class PropertyFactory
         //static RootProperty* createProperty(ISwitchVectorProperty * pVector);
         //static RootProperty* createProperty(ITextVectorProperty* pVector);
         //static RootProperty* createProperty(ILightVectorProperty* pVector);
-        static RootProperty* createProperty(const QVariantMap &pData);
+        static PropertyBase* createProperty(const QVariantMap &pData);
 };
 
 }

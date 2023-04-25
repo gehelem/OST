@@ -2,10 +2,12 @@
 #define OST_PROPERTYUPDATE_H
 #include <QtCore>
 #include <string>
-#include <numberproperty.h>
-#include <basicproperty.h>
+#include <propertybase.h>
+#include <propertysimple.h>
+#include <propertymulti.h>
 #include <propertyvisitor.h>
-
+namespace  OST
+{
 class Property;
 
 class PropertyUpdate : public PropertyVisitor
@@ -13,36 +15,27 @@ class PropertyUpdate : public PropertyVisitor
 
     public:
         PropertyUpdate() = default;
-        void visit(RootProperty* pProperty) override
+        void visit(PropertyBase* pProperty) override
         {
             Q_UNUSED(pProperty)
         }
-        void visit(BasicProperty* pProperty) override
+        void visit(PropertySimple* pProperty) override
         {
             Q_UNUSED(pProperty)
         }
-        void visit(NumberProperty* pProperty) override
+        void visit(PropertyMulti* pProperty) override
         {
             Q_UNUSED(pProperty)
         }
-        void visit(TextProperty* pProperty) override
-        {
-            Q_UNUSED(pProperty)
-        }
-        void visit(MultiProperty* pProperty) override
-        {
-            Q_UNUSED(pProperty)
-        }
-        void visit(RootProperty *pProperty, QVariantMap &data ) override
+        void visit(PropertyBase *pProperty, QVariantMap &data ) override
         {
             Q_UNUSED(pProperty)
             Q_UNUSED(data)
         }
-        void visit(BasicProperty *pProperty, QVariantMap &data ) override;
-        void visit(NumberProperty *pProperty, QVariantMap &data ) override;
-        void visit(TextProperty *pProperty, QVariantMap &data ) override;
+        void visit(PropertySimple *pProperty, QVariantMap &data ) override;
+        void visit(PropertyMulti *pProperty, QVariantMap &data ) override;
 
 
 };
-
+}
 #endif //OST_PROPERTYUPDATE_H

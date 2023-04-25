@@ -19,27 +19,26 @@ void PropertyTextDumper::visit(PropertySimple *pProperty)
 {
     std::stringstream stream;
     stream << "Simple Property :" << dumpPropertyCommons(pProperty);
-    _result = QString::fromStdString(stream.str());
+    mResult = QString::fromStdString(stream.str());
 }
 void PropertyTextDumper::visit(PropertyMulti *pProperty)
 {
     std::stringstream stream;
     stream << "Multi Property :" << dumpPropertyCommons(pProperty)
-           << ". elements=";
+           << ". values=";
 
     QList<ValueBase*>::iterator i;
     for( int i = 0; i < pProperty->getValues().count(); ++i )
     {
-        PropertyTextDumper d;
-        pProperty->getElts()[key]->accept(&d);
-        stream << " **** key : " << key.toStdString() << " / content : " << d.getResult().toStdString();
-
+        ValueTextDumper d;
+        pProperty->getValues()[i]->accept(&d);
+        stream << " **** : / content : " << d.getResult().toStdString();
     }
 
 
 
     stream << " #####";
-    _result = QString::fromStdString(stream.str());
+    mResult = QString::fromStdString(stream.str());
 }
 
 }
