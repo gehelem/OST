@@ -30,6 +30,7 @@ class PropertySimple: public PropertyBase
         {
             return mValue;
         }
+        void setValue(QVariantMap &data);
 
     private:
         ValueBase* mValue;

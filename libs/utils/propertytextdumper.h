@@ -2,8 +2,6 @@
 #define OST_PROPERTYTEXTDUMPER_H
 
 #include <string>
-#include <propertybase.h>
-#include <propertysimple.h>
 #include <propertymulti.h>
 #include <propertyvisitor.h>
 namespace  OST

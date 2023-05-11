@@ -2,7 +2,6 @@
 #define OST_VALUEFACTORY_H
 
 #include <baseclient.h>
-#include <valuebase.h>
 #include <valueint.h>
 #include <valuefloat.h>
 #include <valuebool.h>

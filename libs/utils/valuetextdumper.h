@@ -3,7 +3,6 @@
 
 #include <string>
 #include <valuevisitor.h>
-#include <valuebase.h>
 #include <valuebool.h>
 #include <valueint.h>
 #include <valuefloat.h>

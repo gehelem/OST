@@ -5,8 +5,7 @@
 #include <propertytextdumper.h>
 #include <propertyupdate.h>
 #include <propertyfactory.h>
-#include <propertysimple.h>
-#include <propertymulti.h>
+
 
 /** @class Datastore
  *  @brief Class to provide properties management for OST modules
@@ -40,12 +39,13 @@ class Datastore : public Baseroot
         {
             foreach(const QString &key, mStore.keys())
             {
-                PropertyTextDumper d;
+                OST::PropertyTextDumper d;
+
                 mStore[key]->accept(&d);
                 qDebug() << key << "-" << d.getResult();
-                JSonDumper j;
-                mStore[key]->accept(&j);
-                qDebug() << key << "-" << j.getStringResult();
+                //JSonDumper j;
+                //mStore[key]->accept(&j);
+                //qDebug() << key << "-" << j.getStringResult();
             }
             qDebug() << "store size" << mStore.count();
         }
@@ -124,7 +124,7 @@ class Datastore : public Baseroot
         void onValueChanged(void);
     private:
         QVariantMap mProperties;
-        QMap<QString, RootProperty*> mStore;
+        QMap<QString, OST::PropertyBase*> mStore;
 
 }
 ;

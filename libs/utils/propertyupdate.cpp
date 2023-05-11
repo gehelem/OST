@@ -8,8 +8,9 @@ void PropertyUpdate::visit(PropertySimple *pProperty, QVariantMap &data)
     {
         qDebug() << "no value for " << pProperty->label();
     }
-    pProperty->getValue;
-    pProperty->setValue(data["value"].toString());
+
+    pProperty->getValue();
+    pProperty->setValue(data);
 }
 void PropertyUpdate::visit(PropertyMulti *pProperty, QVariantMap &data )
 {
@@ -17,7 +18,7 @@ void PropertyUpdate::visit(PropertyMulti *pProperty, QVariantMap &data )
     {
         qDebug() << "no value for " << pProperty->label();
     }
-    pProperty->setValue(data["value"].toDouble());
+    pProperty->setValue(data);
 }
 }
 

@@ -2,8 +2,9 @@
 #define OST_PROPERTYFACTORY_H
 
 #include <baseclient.h>
-#include <propertysimple.h>
 #include <propertymulti.h>
+#include <valuefactory.h>
+
 namespace  OST
 {
 

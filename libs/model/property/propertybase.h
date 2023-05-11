@@ -15,7 +15,14 @@ typedef enum
     WriteOnly,
     ReadWrite
 } Permission;
-
+inline Permission IntToPermission(int val )
+{
+    if (val == 0) return ReadOnly;
+    if (val == 1) return WriteOnly;
+    if (val == 2) return ReadWrite;
+    qDebug() << "Cant convert " << val << " to OST::Permission (0-2) - defaults to readonly";
+    return ReadOnly;
+}
 class PropertyBase: public QObject
 {
 

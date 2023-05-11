@@ -44,7 +44,7 @@ bool Datastore::setOstPropertyValue(const QString &pPropertyName, const QVariant
 
     if (prop.contains("value") && mStore.contains(pPropertyName))
     {
-        PropertyUpdate d;
+        OST::PropertyUpdate d;
         mStore[pPropertyName]->accept(&d, prop);
     }
     //getQtProperties();
@@ -57,7 +57,7 @@ bool Datastore::setOstPropertyValue(const QString &pPropertyName, const QVariant
 }
 void Datastore::onValueChanged(void)
 {
-    RootProperty* obj = qobject_cast<RootProperty*>(sender());
+    OST::PropertyBase* obj = qobject_cast<OST::PropertyBase*>(sender());
     qDebug() << "onValueChanged " << obj->label();
 }
 QVariant Datastore::getOstPropertyValue(const QString &pPropertyName)
@@ -333,12 +333,13 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
     {
         QVariantMap tt = props[key].toVariant().toMap();
         mProperties[key] = tt;
-        RootProperty *rp = PropertyFactory::createProperty(tt);
+
+        OST::PropertyBase *rp = OST::PropertyFactory::createProperty(tt);
         if (rp != nullptr)
         {
             mStore[key] = rp;
-            connect(rp, &RootProperty::valueChanged, this, &Datastore::onValueChanged);
-            mStore[key]->setState(RootValue::State::Ok);
+            connect(rp, &OST::PropertyBase::valueChanged, this, &Datastore::onValueChanged);
+            mStore[key]->setState(OST::State::Ok);
 
         }
         /*if (tt.contains("type"))

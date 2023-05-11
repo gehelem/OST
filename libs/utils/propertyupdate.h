@@ -2,8 +2,6 @@
 #define OST_PROPERTYUPDATE_H
 #include <QtCore>
 #include <string>
-#include <propertybase.h>
-#include <propertysimple.h>
 #include <propertymulti.h>
 #include <propertyvisitor.h>
 namespace  OST

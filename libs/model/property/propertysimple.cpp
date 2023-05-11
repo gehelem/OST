@@ -1,4 +1,5 @@
 #include "propertysimple.h"
+#include <valueupdate.h>
 namespace  OST
 {
 
@@ -14,5 +15,11 @@ PropertySimple::~PropertySimple()
 {
 
 }
+void PropertySimple::setValue(QVariantMap &data)
+{
+    ValueUpdate v;
+    mValue->accept(&v, data);
+}
+
 
 }
