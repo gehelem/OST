@@ -4,6 +4,48 @@ namespace  OST
 
 ValueBase *ValueFactory::createValue(const QVariantMap &pData)
 {
+    if (pData.contains("type"))
+    {
+        if (pData["type"].toString() == "bool")
+        {
+            auto *pValue = new ValueBool(pData["elementLabel"].toString(),
+                                         pData["order"].toString(),
+                                         pData["hint"].toString()
+                                        );
+            pValue->setValue(pData["value"].toBool());
+            return pValue;
+        }
+        if (pData["type"].toString() == "string")
+        {
+            auto *pValue = new ValueString(pData["elementLabel"].toString(),
+                                           pData["order"].toString(),
+                                           pData["hint"].toString()
+                                          );
+            pValue->setValue(pData["value"].toString());
+            return pValue;
+        }
+        if (pData["type"].toString() == "int")
+        {
+            auto *pValue = new ValueInt(pData["elementLabel"].toString(),
+                                        pData["order"].toString(),
+                                        pData["hint"].toString()
+                                       );
+            pValue->setValue(pData["value"].toLongLong());
+            return pValue;
+        }
+        if (pData["type"].toString() == "float")
+        {
+            auto *pValue = new ValueFloat(pData["elementLabel"].toString(),
+                                          pData["order"].toString(),
+                                          pData["hint"].toString()
+                                         );
+            pValue->setValue(pData["value"].toDouble());
+            return pValue;
+        }
+
+        qDebug() << "Unknown value type " << pData["elementLabel"].toString() << ":" << pData["type"].toString() << "-" <<
+                 pData["elementLabel"].toString();
+    }
 
     if (pData.contains("value"))
     {

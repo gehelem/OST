@@ -1,5 +1,6 @@
 {
     "loadconf": {
+        "type": "multi",
         "devcat": "Module",
         "group": "Configurations",
         "permission": 2,
@@ -20,6 +21,7 @@
         }
     },
     "saveconf": {
+        "type": "multi",
         "devcat": "Module",
         "group": "Configurations",
         "permission": 2,
@@ -34,6 +36,7 @@
         }
     },
     "modules": {
+        "type": "multi",
         "devcat": "Modules",
         "group": "",
         "permission": 0,
@@ -64,6 +67,7 @@
         }
     },
     "killall": {
+        "type": "multi",
         "devcat": "Modules",
         "group": "",
         "permission": 2,

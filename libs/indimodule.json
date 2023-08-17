@@ -1,5 +1,6 @@
 {
     "indiGitHash": {
+        "type": "simple",
         "devcat": "Module",
         "group": "Info",
         "order":"00",
@@ -7,6 +8,7 @@
         "propertyLabel": "Indi module git hash"
     },
     "indiGitDate": {
+        "type": "simple",
         "devcat": "Module",
         "group": "Info",
         "order":"00",
@@ -14,6 +16,7 @@
         "propertyLabel": "Indi module git date"
     },
     "indiGitMessage": {
+        "type": "simple",
         "devcat": "Module",
         "group": "Info",
         "order":"00",
@@ -21,6 +24,7 @@
         "propertyLabel": "Indi module git message"
     },
     "server": {
+        "type": "multi",
         "hasprofile":true,
         "devcat": "Module",
         "group": "Indi",
@@ -40,6 +44,7 @@
         }
     },
     "serveractions": {
+        "type": "multi",
         "devcat": "Module",
         "group": "Indi",
         "order":"01",
@@ -58,6 +63,7 @@
         }
     },
     "devices": {
+        "type": "multi",
         "hasprofile":true,
         "devcat": "Module",
         "group": "Indi",
@@ -68,6 +74,7 @@
         }
     },
     "devicesactions": {
+        "type": "multi",
         "devcat": "Module",
         "group": "Indi",
         "order":"04",
@@ -91,6 +98,7 @@
         }
     },
     "startup": {
+        "type": "multi",
         "devcat": "Module",
         "group": "Indi",
         "order":"08",

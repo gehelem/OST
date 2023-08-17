@@ -1,17 +1,22 @@
 {
     "extextRO": {
+        "type": "multi",
         "devcat": "Examples",
         "elements": {
             "extext1": {
+                "type":"string",
                 "elementLabel": "Text 1"
             },
             "extext2": {
+                "type":"string",
                 "elementLabel": "Text 2"
             },
             "extext3": {
+                "type":"string",
                 "elementLabel": "Text 3"
             },
             "extext4": {
+                "type":"string",
                 "elementLabel": "Text 4"
             }
         },
@@ -21,6 +26,7 @@
         "order":"00"
     },
     "extextRW": {
+        "type": "multi",
         "hasprofile":true,
         "devcat": "Examples",
         "elements": {
@@ -52,25 +58,30 @@
 
     },
     "numbersRW": {
+        "type": "multi",
         "hasprofile":true,
         "devcat": "Examples",
         "elements": {
             "n1": {
+                "type":"int",
                 "elementLabel": "Number 1",
                 "min": 0,
                 "max": 100,
                 "step": 1
             },
             "n2": {
+                "type":"int",
                 "elementLabel": "Number 2",
                 "min": -100,
                 "max": 100,
                 "step": 10
             },
             "n3": {
+                "type":"int",
                 "elementLabel": "Number 3"
             },
             "n4": {
+                "type":"int",
                 "elementLabel": "Number 4"
             }
         },
@@ -79,20 +90,25 @@
         "propertyLabel": "Numbers example - read/write"
     },
     "boolsRW0": {
+        "type": "multi",
         "hasprofile":true,
         "devcat": "Examples",
         "rule":0,
         "elements": {
             "b1": {
+                "type":"bool",
                 "elementLabel": "Bool 1"
             },
             "b2": {
+                "type":"bool",
                 "elementLabel": "Bool 2"
             },
             "b3": {
+                "type":"bool",
                 "elementLabel": "Bool 3"
             },
             "b4": {
+                "type":"bool",
                 "elementLabel": "Bool 4"
             }
         },
@@ -101,20 +117,25 @@
         "propertyLabel": "One of many"
     },
     "boolsRW1": {
+        "type": "multi",
         "hasprofile":true,
         "devcat": "Examples",
         "rule":1,
         "elements": {
             "b1": {
+                "type":"bool",
                 "elementLabel": "Bool 1"
             },
             "b2": {
+                "type":"bool",
                 "elementLabel": "Bool 2"
             },
             "b3": {
+                "type":"bool",
                 "elementLabel": "Bool 3"
             },
             "b4": {
+                "type":"bool",
                 "elementLabel": "Bool 4"
             }
         },
@@ -123,20 +144,25 @@
         "propertyLabel": "At most one"
     },
     "boolsRW2": {
+        "type": "multi",
         "hasprofile":true,
         "devcat": "Examples",
         "rule":2,
         "elements": {
             "b1": {
+                "type":"bool",
                 "elementLabel": "Bool 1"
             },
             "b2": {
+                "type":"bool",
                 "elementLabel": "Bool 2"
             },
             "b3": {
+                "type":"bool",
                 "elementLabel": "Bool 3"
             },
             "b4": {
+                "type":"bool",
                 "elementLabel": "Bool 4"
             }
         },
@@ -148,32 +174,39 @@
 
     ,
     "mixedRW": {
+        "type": "multi",
         "hasprofile":true,
         "devcat": "Examples",
         "rule":0,
         "elements": {
             "b1": {
+                "type":"bool",
                 "elementLabel": "Bool 1/3"
             },
             "b2": {
+                "type":"bool",
                 "elementLabel": "Bool 2/3"
             },
             "b3": {
+                "type":"bool",
                 "elementLabel": "Bool 3/3"
             },
             "n1": {
+                "type":"int",
                 "elementLabel": "Number 1/2",
                 "min": 0,
                 "max": 100,
                 "step": 1
             },
             "n2": {
+                "type":"int",
                 "elementLabel": "Number 2/2",
                 "min": -100,
                 "max": 100,
                 "step": 10
             },
             "t1": {
+                "type":"string",
                 "elementLabel": "Text mixed"
             }
         },
@@ -182,6 +215,7 @@
         "propertyLabel": "Mixed types - read/write"
     },
     "devices": {
+        "type": "multi",
         "hasprofile":true,
         "devcat": "Examples",
         "group": "Images",
@@ -200,6 +234,7 @@
         }
     },
     "actions": {
+        "type": "multi",
         "devcat": "Examples",
         "rule":0,
         "elements": {
@@ -226,6 +261,7 @@
         "propertyLabel": "Actions"
     },
     "imagevalues": {
+        "type": "multi",
         "devcat": "Examples",
         "rule":0,
         "elements": {
@@ -292,6 +328,7 @@
         "propertyLabel": "Results"
     },
     "parameters": {
+        "type": "multi",
         "devcat": "Examples",
         "group": "Images",
         "permission": 2,
@@ -321,6 +358,7 @@
         "URL": ""
     },
     "testgrid": {
+        "type": "multi",
         "devcat": "Examples",
         "group": "Grids",
         "permission": 2,
@@ -358,6 +396,7 @@
         }
     },
     "secondtestgrid": {
+        "type": "multi",
         "devcat": "Examples",
         "group": "AAAGrids",
         "permission": 2,
@@ -396,6 +435,7 @@
         "group": "Images"
     },
     "search": {
+        "type": "multi",
         "devcat": "Examples",
         "order": "Catalog00",
         "group": "Catalog",
@@ -411,6 +451,7 @@
         }
     },
     "results": {
+        "type": "multi",
         "devcat": "Examples",
         "order": "Catalog10",
         "group": "Catalog",
@@ -468,6 +509,7 @@
         }
     },
     "selection": {
+        "type": "multi",
         "devcat": "Examples",
         "order": "Catalog15",
         "group": "Catalog",

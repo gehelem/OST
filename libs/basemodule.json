@@ -1,5 +1,6 @@
 {
     "baseVersion": {
+        "type": "simple",
         "devcat": "Module",
         "group": "Info",
         "order":"00",
@@ -9,6 +10,7 @@
     },
     "baseGitHash": {
         "devcat": "Module",
+        "type": "simple",
         "group": "Info",
         "order":"00",
         "permission": 0,
@@ -16,6 +18,7 @@
     },
     "baseGitDate": {
         "devcat": "Module",
+        "type": "simple",
         "group": "Info",
         "order":"00",
         "permission": 0,
@@ -23,6 +26,7 @@
     },
     "baseGitMessage": {
         "devcat": "Module",
+        "type": "simple",
         "group": "Info",
         "order":"00",
         "permission": 0,
@@ -30,6 +34,7 @@
     },
     "moduleDescription": {
         "devcat": "Module",
+        "type": "simple",
         "group": "Info",
         "order":"01",
         "permission": 0,
@@ -38,6 +43,7 @@
     },
     "moduleLabel": {
         "devcat": "Module",
+        "type": "simple",
         "group": "Info",
         "order":"02",
         "permission": 0,
@@ -46,6 +52,7 @@
     },
     "moduleName": {
         "devcat": "Module",
+        "type": "simple",
         "group": "Info",
         "order":"03",
         "permission": 0,
@@ -54,6 +61,7 @@
     },
     "moduleVersion": {
         "devcat": "Module",
+        "type": "simple",
         "group": "Info",
         "order":"04",
         "permission": 0,
@@ -62,12 +70,14 @@
     },
     "message": {
         "devcat": "messages",
+        "type": "simple",
         "group": "",
         "permission": 0,
         "propertyLabel": "Message",
         "value": ""
     },
     "loadprofile": {
+        "type": "multi",
         "devcat": "Module",
         "group": "Profiles",
         "permission": 2,
@@ -88,6 +98,7 @@
         }
     },
     "saveprofile": {
+        "type": "multi",
         "devcat": "Module",
         "group": "Profiles",
         "permission": 2,
@@ -102,6 +113,7 @@
         }
     },
     "moduleactions": {
+        "type": "multi",
         "devcat": "Module",
         "group": "Actions",
         "permission": 1,
