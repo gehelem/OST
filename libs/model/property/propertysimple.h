@@ -33,7 +33,7 @@ class PropertySimple: public PropertyBase
         void setValue(QVariantMap &data);
 
     private:
-        ValueBase* mValue;
+        ValueBase* mValue = nullptr;
 
 };
 
