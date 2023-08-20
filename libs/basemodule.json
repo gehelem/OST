@@ -14,7 +14,8 @@
         "group": "Info",
         "order":"00",
         "permission": 0,
-        "propertyLabel": "Base module git hash"
+        "propertyLabel": "Base module git hash",
+        "value":"xxx"
     },
     "baseGitDate": {
         "devcat": "Module",
@@ -22,7 +23,8 @@
         "group": "Info",
         "order":"00",
         "permission": 0,
-        "propertyLabel": "Base module git date"
+        "propertyLabel": "Base module git date",
+        "value":"xxx"
     },
     "baseGitMessage": {
         "devcat": "Module",
@@ -30,7 +32,8 @@
         "group": "Info",
         "order":"00",
         "permission": 0,
-        "propertyLabel": "Base module git message"
+        "propertyLabel": "Base module git message",
+        "value":"xxx"
     },
     "moduleDescription": {
         "devcat": "Module",

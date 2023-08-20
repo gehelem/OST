@@ -1,5 +1,6 @@
 #include "propertysimple.h"
 #include <valueupdate.h>
+#include <valuetextdumper.h>
 #include <valuefactory.h>
 namespace  OST
 {
@@ -19,12 +20,17 @@ PropertySimple::~PropertySimple()
 }
 void PropertySimple::setValue(QVariantMap &data)
 {
-    qDebug() << "setValue " << label();
+    //qDebug() << "setValue " << label() << "-" << data;
+    if (!data.contains("value"))
+    {
+        qDebug() << "setValue - can't set value " << label();
+        return;
+    }
     QVariantMap dta;
     dta["value"] = data["value"];
+
     if (mValue == nullptr)
     {
-        qDebug() << "setValue - create simple value" << label();
         mValue = ValueFactory::createValue(dta);
     }
     ValueUpdate v;

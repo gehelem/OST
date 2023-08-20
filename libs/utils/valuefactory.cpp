@@ -4,6 +4,7 @@ namespace  OST
 
 ValueBase *ValueFactory::createValue(const QVariantMap &pData)
 {
+    //qDebug() << "ValueFactory::createValue " << "-" << pData;
     if (pData.contains("type"))
     {
         if (pData["type"].toString() == "bool")

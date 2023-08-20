@@ -333,7 +333,7 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
     {
         QVariantMap tt = props[key].toVariant().toMap();
         mProperties[key] = tt;
-
+        //qDebug() << "***** create property from file " << key;
         OST::PropertyBase *rp = OST::PropertyFactory::createProperty(tt);
         if (rp != nullptr)
         {
@@ -341,6 +341,10 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
             connect(rp, &OST::PropertyBase::valueChanged, this, &Datastore::onValueChanged);
             mStore[key]->setState(OST::State::Ok);
 
+        }
+        else
+        {
+            qDebug() << "***** can't create property " << key;
         }
         /*if (tt.contains("type"))
         {

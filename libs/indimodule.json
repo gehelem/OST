@@ -5,7 +5,8 @@
         "group": "Info",
         "order":"00",
         "permission": 0,
-        "propertyLabel": "Indi module git hash"
+        "propertyLabel": "Indi module git hash",
+        "value":"xxx"
     },
     "indiGitDate": {
         "type": "simple",
@@ -13,7 +14,8 @@
         "group": "Info",
         "order":"00",
         "permission": 0,
-        "propertyLabel": "Indi module git date"
+        "propertyLabel": "Indi module git date",
+        "value":"xxx"
     },
     "indiGitMessage": {
         "type": "simple",
@@ -21,7 +23,8 @@
         "group": "Info",
         "order":"00",
         "permission": 0,
-        "propertyLabel": "Indi module git message"
+        "propertyLabel": "Indi module git message",
+        "value":"xxx"
     },
     "server": {
         "type": "multi",
