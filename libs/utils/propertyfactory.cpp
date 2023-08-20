@@ -4,10 +4,10 @@ namespace  OST
 
 PropertyBase *PropertyFactory::createProperty(const QVariantMap &pData)
 {
-
+    //qDebug() << "PropertyFactory::createProperty - " << pData;
     if (!pData.contains("type"))
     {
-        qDebug() << "No type defined for property - defaults to 'simple'" << pData;
+        qDebug() << "No type defined for property - defaults to 'simple'" << pData["propertyLabel"].toString();
         auto *pProperty = new PropertySimple(
             pData["propertyLabel"].toString(),
             OST::IntToPermission(pData["permission"].toInt()),
@@ -30,6 +30,8 @@ PropertyBase *PropertyFactory::createProperty(const QVariantMap &pData)
             pData["hasprofile"].toBool(),
             pData.contains("grid")
         );
+        QVariantMap dta = pData;
+        pProperty->setValue(dta);
         return pProperty;
     }
     if ((pData["type"].toString() == "multi") && (pData.contains("elements")))
