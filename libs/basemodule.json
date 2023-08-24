@@ -62,7 +62,6 @@
         "devcat": "Module",
         "group": "Profiles",
         "permission": 2,
-        "value": "default",
         "listOfValues":{
         },
         "rule":1,
@@ -75,7 +74,12 @@
             "refresh": {
                 "elementLabel": "Refresh",
                 "value":false
+            },
+            "value": {
+                "elementLabel": "Name",
+                "value":"default"
             }
+
         }
     },
     "saveprofile": {
@@ -83,14 +87,18 @@
         "devcat": "Module",
         "group": "Profiles",
         "permission": 2,
-        "value": "default",
         "rule":0,
         "propertyLabel": "Save profile",
         "elements": {
             "save": {
                 "elementLabel": "Save as",
                 "value":false
+            },
+            "value": {
+                "elementLabel": "Name",
+                "value":"default"
             }
+
         }
     },
     "moduleactions": {

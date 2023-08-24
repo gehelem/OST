@@ -32,7 +32,7 @@ class Datastore : public Baseroot
 
         QVariantMap getProperties(void)
         {
-            getQtProperties();
+            //getQtProperties();
             return mProperties;
         }
         void getQtProperties(void)
@@ -73,8 +73,7 @@ class Datastore : public Baseroot
         bool createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,
                                const  QString &pPropertyDevcat, const QString &pPropertyGroup);
         void emitPropertyCreation(const QString &pPropertyName);
-        bool setOstPropertyValue(const QString &pPropertyName, const QVariant &pPropertyValue, bool mEmitEvent);
-        QVariant getOstPropertyValue(const QString &pPropertyName);
+        //QVariant getOstPropertyValue(const QString &pPropertyName);
 
         bool createOstElement(const QString &pPropertyName, const QString &pElementName, const QString &pElementLabel,
                               bool mEmitEvent);

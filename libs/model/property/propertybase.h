@@ -91,13 +91,13 @@ class PropertyBase: public QObject
 
 
     private:
-        QString mLabel;
-        Permission mPermission;
-        QString mLevel1;
-        QString mLevel2;
-        QString mOrder;
-        bool mHasProfile;
-        bool mHasArray;
+        QString mLabel = "change me";
+        Permission mPermission = Permission::ReadOnly;
+        QString mLevel1 = "";
+        QString mLevel2 = "";
+        QString mOrder = 0;
+        bool mHasProfile = false;
+        bool mHasArray = false;
         State mState = State::Idle;
         bool mIsEnabled = true;
 

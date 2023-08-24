@@ -58,7 +58,7 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
 
     loadConf(_conf);
 
-    //dbmanager->populateCatalog(":messier.txt", "Messier");
+    dbmanager->populateCatalog(":messier.txt", "Messier");
     //dbmanager->populateCatalog(":ngc.txt", "NGC");
     //dbmanager->populateCatalog(":sh2.txt", "Sh2");
     //dbmanager->populateCatalog(":ldn.txt", "LDN");

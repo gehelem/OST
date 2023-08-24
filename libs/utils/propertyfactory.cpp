@@ -27,7 +27,7 @@ PropertyBase *PropertyFactory::createProperty(const QVariantMap &pData)
         ValueBase *v = ValueFactory::createValue(elt);
         if (v != nullptr)
         {
-            //pProperty->addElt(key, rp);
+            pProperty->addValue(key, v);
         }
     }
     return pProperty;

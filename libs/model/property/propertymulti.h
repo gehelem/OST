@@ -37,18 +37,26 @@ class PropertyMulti: public PropertyBase
         {
             return mRule;
         }
-        inline const QList<ValueBase*> &getValues()
+        inline const QMap<QString, OST::ValueBase*> &getValues()
         {
             return mValues;
         }
-        void addValue(ValueBase* pValue)
+        void addValue(QString key, ValueBase* pValue)
         {
-            mValues.append(pValue);
+            if (mValues.contains(key))
+            {
+                qDebug() << label() << " - addValue - element " << key << " already exists";
+
+            }
+            else
+            {
+                mValues[key] = pValue;
+            }
+
         }
     private:
         SwitchsRule mRule;
-        QList<ValueBase*> mValues;
-
+        QMap<QString, OST::ValueBase*> mValues;
 
 };
 

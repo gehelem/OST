@@ -47,10 +47,10 @@ class ValueBase: public QObject
         void setState(const State &state);
 
     private:
-        QString mLabel;
-        QString mOrder;
-        QString mHint;
-        State mState;
+        QString mLabel = "change me";
+        QString mOrder = "change me";
+        QString mHint = "";
+        State mState = State::Idle;
 
 };
 

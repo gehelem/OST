@@ -31,36 +31,12 @@ void Datastore::emitPropertyCreation(const QString &pPropertyName)
 {
     emit OnModuleEvent("cp", QString(), pPropertyName, mProperties[pPropertyName].toMap());
 }
-bool Datastore::setOstPropertyValue(const QString &pPropertyName, const QVariant &pPropertyValue, bool mEmitEvent)
-{
-    if (!mProperties.contains(pPropertyName))
-    {
-        sendWarning("setOstPropertyValue - property " + pPropertyName + " not found.");
-        return false;
-    }
-    QVariantMap prop = mProperties[pPropertyName].toMap();
-    prop["value"] = pPropertyValue;
-    mProperties[pPropertyName] = prop;
-
-    if (prop.contains("value") && mStore.contains(pPropertyName))
-    {
-        OST::PropertyUpdate d;
-        mStore[pPropertyName]->accept(&d, prop);
-    }
-    //getQtProperties();
-
-
-
-
-    if (mEmitEvent) OnModuleEvent("sp", QString(), pPropertyName, mProperties[pPropertyName].toMap());
-    return true;
-}
 void Datastore::onValueChanged(void)
 {
     OST::PropertyBase* obj = qobject_cast<OST::PropertyBase*>(sender());
     qDebug() << "onValueChanged " << obj->label();
 }
-QVariant Datastore::getOstPropertyValue(const QString &pPropertyName)
+/*QVariant Datastore::getOstPropertyValue(const QString &pPropertyName)
 {
     if (!mProperties.contains(pPropertyName))
     {
@@ -73,7 +49,7 @@ QVariant Datastore::getOstPropertyValue(const QString &pPropertyName)
         return QVariant();
     }
     return mProperties[pPropertyName].toMap()["value"];
-}
+}*/
 
 bool Datastore::createOstElement(const QString &pPropertyName, const QString &pElementName, const QString &pElementLabel,
                                  bool mEmitEvent)

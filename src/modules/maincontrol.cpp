@@ -25,7 +25,8 @@ Maincontrol::Maincontrol(QString name, QString label, QString profile, QVariantM
     {
         QVariantMap info = getAvailableModuleLibs()[key].toMap();
         createOstProperty( "load" + key, info["moduleDescription"].toMap()["value"].toString(), 2, "Available modules", "");
-        setOstPropertyValue("load" + key, "My " + key, false);
+        createOstElement(  "load" + key, "name", "Name", false);
+        setOstElementValue("load" + key, "name", "My " + key, false);
         createOstElement(  "load" + key, "load", "Load", false);
         setOstElementValue("load" + key, "load", false, false);
 
@@ -54,10 +55,10 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
             if (pEventData[keyprop].toMap().contains("value"))
             {
                 QVariant val = pEventData[keyprop].toMap()["value"];
-                setOstPropertyValue(keyprop, val, true);
+                //setOstPropertyValue(keyprop, val, true);
                 if (keyprop == "loadconf")
                 {
-                    setOstPropertyValue("saveconf", val, true);
+                    //setOstPropertyValue("saveconf", val, true);
                 }
             }
             foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
@@ -67,8 +68,8 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                     if (setOstElementValue(keyprop, keyelt, false, true))
                     {
                         QString pp = keyprop;
-                        QString elt = getOstPropertyValue(keyprop).toString();
-                        QString eltwithoutblanks = getOstPropertyValue(keyprop).toString();
+                        QString elt = getOstElementValue("loadconf", "value").toString();
+                        QString eltwithoutblanks = getOstElementValue("loadconf", "value").toString();
                         eltwithoutblanks.replace(" ", "");
                         QString prof = "default";
                         pp.replace("loadlibost", "");
@@ -87,7 +88,7 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                 }
                 if (keyelt == "load" && keyprop == "loadconf")
                 {
-                    emit mainCtlEvent("loadconf", QString(), getOstPropertyValue("loadconf").toString(),
+                    emit mainCtlEvent("loadconf", QString(), getOstElementValue("loadconf", "value").toString(),
                                       QVariantMap());
                 }
                 if (keyelt == "refresh" && keyprop == "loadconf")
@@ -97,7 +98,7 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                 }
                 if (keyelt == "save" && keyprop == "saveconf")
                 {
-                    emit mainCtlEvent("saveconf", QString(), getOstPropertyValue("saveconf").toString(),
+                    emit mainCtlEvent("saveconf", QString(), getOstElementValue("saveconf", "value").toString(),
                                       QVariantMap());
                 }
                 if (keyelt == "kill" && keyprop == "killall")
@@ -148,7 +149,8 @@ void Maincontrol::setAvailableModuleLibs(const QVariantMap libs)
     {
         QVariantMap info = libs[key].toMap();
         createOstProperty( "load" + key, info["moduleDescription"].toMap()["value"].toString(), 2, "Modules", "");
-        setOstPropertyValue("load" + key, "My " + key, false);
+        createOstElement(  "load" + key, "name", "Name", false);
+        setOstElementValue("load" + key, "name", "My " + key, false);
         createOstElement(  "load" + key, "load", "Load", false);
         setOstElementValue("load" + key, "load", false, false);
 

@@ -7,9 +7,9 @@ namespace  OST
 std::string PropertyTextDumper::dumpPropertyCommons(PropertyBase *pProperty)
 {
     std::stringstream stream;
-    stream << " Label=" << pProperty->label().toStdString()
-           << " Level1=" << pProperty->level1().toStdString()
-           << " Level2=" << pProperty->level2().toStdString()
+    stream << " Label='" << pProperty->label().toStdString() << "'"
+           << " Level1='" << pProperty->level1().toStdString() << "'"
+           << " Level2='" << pProperty->level2().toStdString() << "'"
            << " Permission=" << pProperty->permission()
            << " State=" << pProperty->state()
            ;
@@ -21,12 +21,12 @@ void PropertyTextDumper::visit(PropertyMulti *pProperty)
     stream << "Multi Property :" << dumpPropertyCommons(pProperty)
            << ". values=";
 
-    QList<ValueBase*>::iterator i;
-    for( int i = 0; i < pProperty->getValues().count(); ++i )
+    foreach(const QString &key, pProperty->getValues().keys())
     {
-        ValueTextDumper d;
-        pProperty->getValues()[i]->accept(&d);
-        stream << " **** : / content : " << d.getResult().toStdString();
+        OST::ValueTextDumper d;
+
+        pProperty->getValues()[key]->accept(&d);
+        stream << " **** " << key.toStdString() << " : " << d.getResult().toStdString() << "//";
     }
 
 

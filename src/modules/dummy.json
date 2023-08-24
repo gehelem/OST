@@ -442,13 +442,16 @@
         "order": "Catalog00",
         "group": "Catalog",
         "permission": 2,
-        "value": "M13",
         "rule":0,
         "propertyLabel": "",
         "elements": {
             "searchbtn": {
                 "elementLabel": "Search object",
                 "value":false
+            },
+            "search": {
+                "elementLabel": "Search object",
+                "value":"M13"
             }
         }
     },

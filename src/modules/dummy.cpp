@@ -17,7 +17,6 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     setModuleDescription("Dummy module to show what we can do and not");
     setModuleVersion("0.1");
 
-    setOstPropertyValue("message", "Dummy module init finished", true);
     setOstElementValue("extextRO", "extext1", "Texte read only 1", false);
     setOstElementValue("extextRO", "extext2", "Texte read only 2", false);
     setOstElementValue("extextRO", "extext3", "Texte read only 3", false);
@@ -89,7 +88,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
             if (eventData[keyprop].toMap().contains("value"))
             {
                 QVariant val = eventData[keyprop].toMap()["value"];
-                setOstPropertyValue(keyprop, val, true);
+                //setOstPropertyValue(keyprop, val, true);
             }
             foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
             {
@@ -316,13 +315,13 @@ void Dummy::OnSolverLog(QString &text)
 }
 void Dummy::updateSearchList(void)
 {
-    sendMessage("Searching " + getOstPropertyValue("search").toString());
+    sendMessage("Searching " + getOstElementValue("search", "search").toString());
     resetOstElements("results");
     QList<catalogResult> results;
-    searchCatalog(getOstPropertyValue("search").toString(), results);
+    searchCatalog(getOstElementValue("search", "search").toString(), results);
     if (results.count() == 0)
     {
-        sendWarning("Searching " + getOstPropertyValue("search").toString() + " gives no result");
+        sendWarning("Searching " + getOstElementValue("search", "search").toString() + " gives no result");
         return;
     }
 
