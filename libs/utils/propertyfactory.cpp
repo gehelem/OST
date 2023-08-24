@@ -2,7 +2,7 @@
 namespace  OST
 {
 
-PropertyBase *PropertyFactory::createProperty(const QVariantMap &pData)
+PropertyMulti *PropertyFactory::createProperty(const QVariantMap &pData)
 {
     //qDebug() << "PropertyFactory::createProperty - " << pData;
     auto *pProperty = new PropertyMulti(

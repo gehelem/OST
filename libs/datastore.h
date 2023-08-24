@@ -5,7 +5,7 @@
 #include <propertytextdumper.h>
 #include <propertyupdate.h>
 #include <propertyfactory.h>
-
+#include <valueupdate.h>
 
 /** @class Datastore
  *  @brief Class to provide properties management for OST modules
@@ -127,7 +127,7 @@ class Datastore : public Baseroot
         void onValueChanged(void);
     private:
         QVariantMap mProperties;
-        QMap<QString, OST::PropertyBase*> mStore;
+        QMap<QString, OST::PropertyMulti*> mStore;
 
 }
 ;

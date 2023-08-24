@@ -17,7 +17,7 @@ class PropertyFactory
         //static RootProperty* createProperty(ISwitchVectorProperty * pVector);
         //static RootProperty* createProperty(ITextVectorProperty* pVector);
         //static RootProperty* createProperty(ILightVectorProperty* pVector);
-        static PropertyBase* createProperty(const QVariantMap &pData);
+        static PropertyMulti* createProperty(const QVariantMap &pData);
 };
 
 }
