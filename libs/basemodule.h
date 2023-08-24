@@ -94,11 +94,13 @@ class Basemodule : public DBManager
         void setModuleDescription(QString description)
         {
             mModuleDescription = description;
-            setOstPropertyValue("moduleDescription", description, true);
+            setOstElementValue("moduleInfo", "moduleDescription", description, true);
         }
         void setModuleVersion(QString version)
         {
             mModuleVersion = version;
+            setOstElementValue("moduleInfo", "moduleVersion", version, true);
+
         }
         QVariantMap mAvailableModuleLibs;
 

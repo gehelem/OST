@@ -24,12 +24,6 @@ class PropertyTextDumper : public PropertyVisitor
             Q_UNUSED(pProperty);
             Q_UNUSED(data)
         }
-        void visit(PropertySimple *pProperty) override;
-        void visit(PropertySimple* pProperty, QVariantMap &data ) override
-        {
-            Q_UNUSED(pProperty);
-            Q_UNUSED(data)
-        }
         void visit(PropertyMulti *pProperty) override;
         void visit(PropertyMulti* pProperty, QVariantMap &data ) override
         {

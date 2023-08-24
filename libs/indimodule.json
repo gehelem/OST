@@ -1,30 +1,24 @@
 {
-    "indiGitHash": {
-        "type": "simple",
+    "indiGit": {
         "devcat": "Module",
         "group": "Info",
         "order":"00",
         "permission": 0,
-        "propertyLabel": "Indi module git hash",
-        "value":"xxx"
-    },
-    "indiGitDate": {
-        "type": "simple",
-        "devcat": "Module",
-        "group": "Info",
-        "order":"00",
-        "permission": 0,
-        "propertyLabel": "Indi module git date",
-        "value":"xxx"
-    },
-    "indiGitMessage": {
-        "type": "simple",
-        "devcat": "Module",
-        "group": "Info",
-        "order":"00",
-        "permission": 0,
-        "propertyLabel": "Indi module git message",
-        "value":"xxx"
+        "propertyLabel": "Indi module git",
+        "elements": {
+            "hash": {
+                "elementLabel": "Hash",
+                "value":"xxx"
+            },
+            "date": {
+                "elementLabel": "Date",
+                "value":"xxx"
+            },
+            "message": {
+                "elementLabel": "Commit message",
+                "value":"xxx"
+            }
+        }
     },
     "server": {
         "type": "multi",

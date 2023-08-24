@@ -15,12 +15,6 @@ std::string PropertyTextDumper::dumpPropertyCommons(PropertyBase *pProperty)
            ;
     return stream.str();
 }
-void PropertyTextDumper::visit(PropertySimple *pProperty)
-{
-    std::stringstream stream;
-    stream << "Simple Property :" << dumpPropertyCommons(pProperty);
-    mResult = QString::fromStdString(stream.str());
-}
 void PropertyTextDumper::visit(PropertyMulti *pProperty)
 {
     std::stringstream stream;

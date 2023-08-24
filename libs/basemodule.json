@@ -1,75 +1,53 @@
 {
-    "baseVersion": {
-        "type": "simple",
+    "baseGit": {
         "devcat": "Module",
         "group": "Info",
         "order":"00",
         "permission": 0,
-        "propertyLabel": "BaseVersion",
-        "value":1
+        "propertyLabel": "Base module git",
+        "elements": {
+            "hash": {
+                "elementLabel": "Hash",
+                "value":"xxx"
+            },
+            "date": {
+                "elementLabel": "Date",
+                "value":"xxx"
+            },
+            "message": {
+                "elementLabel": "Commit message",
+                "value":"xxx"
+            }
+        }
     },
-    "baseGitHash": {
+    "moduleInfo": {
         "devcat": "Module",
-        "type": "simple",
         "group": "Info",
         "order":"00",
         "permission": 0,
-        "propertyLabel": "Base module git hash",
-        "value":"xxx"
-    },
-    "baseGitDate": {
-        "devcat": "Module",
-        "type": "simple",
-        "group": "Info",
-        "order":"00",
-        "permission": 0,
-        "propertyLabel": "Base module git date",
-        "value":"xxx"
-    },
-    "baseGitMessage": {
-        "devcat": "Module",
-        "type": "simple",
-        "group": "Info",
-        "order":"00",
-        "permission": 0,
-        "propertyLabel": "Base module git message",
-        "value":"xxx"
-    },
-    "moduleDescription": {
-        "devcat": "Module",
-        "type": "simple",
-        "group": "Info",
-        "order":"01",
-        "permission": 0,
-        "propertyLabel": "Module description",
-        "value":"N/A"
-    },
-    "moduleLabel": {
-        "devcat": "Module",
-        "type": "simple",
-        "group": "Info",
-        "order":"02",
-        "permission": 0,
-        "propertyLabel": "Module label",
-        "value":"Base module label"
-    },
-    "moduleName": {
-        "devcat": "Module",
-        "type": "simple",
-        "group": "Info",
-        "order":"03",
-        "permission": 0,
-        "propertyLabel": "Module name",
-        "value":"basemodule"
-    },
-    "moduleVersion": {
-        "devcat": "Module",
-        "type": "simple",
-        "group": "Info",
-        "order":"04",
-        "permission": 0,
-        "propertyLabel": "Version",
-        "value":1
+        "propertyLabel": "Module info",
+        "elements": {
+            "moduleDescription": {
+                "elementLabel": "Module description",
+                "value":"N/A"
+            },
+            "moduleLabel": {
+                "elementLabel": "Module label",
+                "value":"Base module label"
+            },
+            "moduleName": {
+                "elementLabel": "Module name",
+                "value":"basemodule"
+            },
+            "moduleVersion": {
+                "elementLabel": "Version",
+                "value":1
+            },
+            "baseVersion": {
+                "elementLabel": "baseVersion",
+                "value":1
+            }
+        }
     },
     "message": {
         "devcat": "messages",
@@ -77,7 +55,7 @@
         "group": "",
         "permission": 0,
         "propertyLabel": "Message",
-        "value": ""
+        "elements": {}
     },
     "loadprofile": {
         "type": "multi",

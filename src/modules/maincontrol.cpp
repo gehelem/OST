@@ -14,9 +14,9 @@ Maincontrol::Maincontrol(QString name, QString label, QString profile, QVariantM
     setClassName(metaObject()->className());
 
     loadOstPropertiesFromFile(":maincontrol.json");
-    setOstPropertyValue("moduleLabel", "Main control", false);
-    setOstPropertyValue("moduleDescription", "Maincontrol module - this one should always be there", false);
-    setOstPropertyValue("moduleVersion", 0.1, false);
+    setOstElementValue("moduleInfo", "moduleLabel", "Main control", false);
+    setOstElementValue("moduleInfo", "moduleDescription", "Maincontrol module - this one should always be there", false);
+    setOstElementValue("moduleInfo", "moduleVersion", 0.1, false);
     deleteOstProperty("saveprofile");
     deleteOstProperty("loadprofile");
     deleteOstProperty("moduleactions");

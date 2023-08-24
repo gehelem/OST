@@ -355,7 +355,8 @@
         "group": "Images",
         "permission": 0,
         "propertyLabel": "Test image",
-        "URL": ""
+        "URL": "",
+        "elements": {}
     },
     "testgrid": {
         "type": "multi",
@@ -432,7 +433,8 @@
     "skychart": {
         "propertyLabel": "Skychart",
         "devcat": "Examples",
-        "group": "Images"
+        "group": "Images",
+        "elements": {}
     },
     "search": {
         "type": "multi",

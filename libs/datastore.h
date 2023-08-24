@@ -32,11 +32,13 @@ class Datastore : public Baseroot
 
         QVariantMap getProperties(void)
         {
-            //getQtProperties();
+            getQtProperties();
             return mProperties;
         }
         void getQtProperties(void)
         {
+            qDebug() << "****************************************";
+            qDebug() << "****************************************";
             foreach(const QString &key, mStore.keys())
             {
                 OST::PropertyTextDumper d;
@@ -48,6 +50,8 @@ class Datastore : public Baseroot
                 //qDebug() << key << "-" << j.getStringResult();
             }
             qDebug() << "store size" << mStore.count();
+            qDebug() << "****************************************";
+            qDebug() << "****************************************";
         }
         /**
          * @brief createOstProperty is a method that creates a property at runtime

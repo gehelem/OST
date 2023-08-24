@@ -1,7 +1,7 @@
 #ifndef PROPERTYMULTI_h_
 #define PROPERTYMULTI_h_
 
-#include <propertysimple.h>
+#include <propertybase.h>
 namespace  OST
 {
 
@@ -13,7 +13,7 @@ typedef enum
 } SwitchsRule;
 
 
-class PropertyMulti: public PropertySimple
+class PropertyMulti: public PropertyBase
 {
 
         Q_OBJECT

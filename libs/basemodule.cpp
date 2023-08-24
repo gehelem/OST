@@ -11,10 +11,12 @@ Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap
     Q_INIT_RESOURCE(basemodule);
     Q_UNUSED(profile)
     loadOstPropertiesFromFile(":basemodule.json");
-    setOstPropertyValue("moduleLabel", label, false);
-    setOstPropertyValue("baseGitHash", QString::fromStdString(Version::GIT_SHA1), false);
-    setOstPropertyValue("baseGitDate", QString::fromStdString(Version::GIT_DATE), false);
-    setOstPropertyValue("baseGitMessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT), false);
+    setOstElementValue("moduleInfo", "moduleLabel", label, false);
+    setOstElementValue("moduleInfo", "moduleName", name, false);
+    setOstElementValue("moduleInfo", "moduleVersion", 0, false);
+    setOstElementValue("baseGit", "hash", QString::fromStdString(Version::GIT_SHA1), false);
+    setOstElementValue("baseGit", "date", QString::fromStdString(Version::GIT_DATE), false);
+    setOstElementValue("baseGit", "message", QString::fromStdString(Version::GIT_COMMIT_SUBJECT), false);
 
     setModuleDescription("base module description - developer should change this message");
     setModuleVersion("0.1");

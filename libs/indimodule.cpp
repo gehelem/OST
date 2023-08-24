@@ -9,9 +9,10 @@ IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap
     setVerbose(false);
     //_moduletype = "IndiModule";
     loadOstPropertiesFromFile(":indimodule.json");
-    setOstPropertyValue("indiGitHash", QString::fromStdString(Version::GIT_SHA1), false);
-    setOstPropertyValue("indiGitDate", QString::fromStdString(Version::GIT_DATE), false);
-    setOstPropertyValue("indiGitMessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT), false);
+    setOstElementValue("indiGit", "hash", QString::fromStdString(Version::GIT_SHA1), false);
+    setOstElementValue("indiGit", "date", QString::fromStdString(Version::GIT_DATE), false);
+    setOstElementValue("indiGit", "message", QString::fromStdString(Version::GIT_COMMIT_SUBJECT), false);
+
 
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &IndiModule::connectIndiTimer);

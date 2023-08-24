@@ -114,8 +114,6 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuelight.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertybase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertybase.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertysimple.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertysimple.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertymulti.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertymulti.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyvisitor.h

@@ -17,10 +17,6 @@ class PropertyUpdate : public PropertyVisitor
         {
             Q_UNUSED(pProperty)
         }
-        void visit(PropertySimple* pProperty) override
-        {
-            Q_UNUSED(pProperty)
-        }
         void visit(PropertyMulti* pProperty) override
         {
             Q_UNUSED(pProperty)
@@ -30,7 +26,6 @@ class PropertyUpdate : public PropertyVisitor
             Q_UNUSED(pProperty)
             Q_UNUSED(data)
         }
-        void visit(PropertySimple *pProperty, QVariantMap &data ) override;
         void visit(PropertyMulti *pProperty, QVariantMap &data ) override;
 
 

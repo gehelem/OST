@@ -13,6 +13,7 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     //Q_INIT_RESOURCE(dummy);
     setClassName(QString(metaObject()->className()).toLower());
     loadOstPropertiesFromFile(":dummy.json");
+
     setModuleDescription("Dummy module to show what we can do and not");
     setModuleVersion("0.1");
 
