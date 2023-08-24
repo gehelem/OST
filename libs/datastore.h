@@ -3,6 +3,7 @@
 //#include "jsondumper.h"
 #include <baseroot.h>
 #include <propertytextdumper.h>
+#include <propertyjsondumper.h>
 #include <propertyupdate.h>
 #include <propertyfactory.h>
 #include <valueupdate.h>
@@ -39,16 +40,16 @@ class Datastore : public Baseroot
         {
             qDebug() << "****************************************";
             qDebug() << "****************************************";
+            QJsonObject properties;
             foreach(const QString &key, mStore.keys())
             {
-                OST::PropertyTextDumper d;
-
+                OST::PropertyJsonDumper d;
                 mStore[key]->accept(&d);
-                qDebug() << key << "-" << d.getResult();
-                //JSonDumper j;
-                //mStore[key]->accept(&j);
-                //qDebug() << key << "-" << j.getStringResult();
+                properties[key] = d.getResult();
             }
+            QJsonObject json;
+            json["properties"] = properties;
+            qDebug() << json;
             qDebug() << "store size" << mStore.count();
             qDebug() << "****************************************";
             qDebug() << "****************************************";
