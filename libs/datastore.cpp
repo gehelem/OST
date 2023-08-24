@@ -1,4 +1,4 @@
-#include <QtCore>
+﻿#include <QtCore>
 #include "datastore.h"
 
 Datastore::Datastore()
@@ -205,8 +205,23 @@ bool Datastore::setOstElementValue(const QString &pPropertyName, const QString &
     mProperties[pPropertyName] = _prop;
     if (mEmitEvent) OnModuleEvent("se", QString(), pPropertyName, mProperties[pPropertyName].toMap());
 
-
-    return true; // should return false when request is invalid, we'll see that later
+    if (!mStore.contains(pPropertyName))
+    {
+        sendWarning("setElementValue - property2 " + pPropertyName + " not found");
+        return false;
+    }
+    OST::PropertyMulti *pb = mStore[pPropertyName];
+    if (!pb->getValues().contains(pElementName))
+    {
+        sendWarning("setElementValue - property2 " + pPropertyName + " : element " + pElementName + " not found.");
+        return false;
+    }
+    OST::ValueUpdate vu;
+    QVariantMap m;
+    m["value"] = pElementValue;
+    pb->getValues()[pElementName]->accept(&vu, m);
+    getQtProperties();
+    return true; // should return false when request is invalid
 }
 bool Datastore::setOstElementGrid(const QString &pPropertyName, const QString &pElementName,
                                   const QVariantList &pElementGrid,
@@ -310,11 +325,11 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
         QVariantMap tt = props[key].toVariant().toMap();
         mProperties[key] = tt;
         //qDebug() << "***** create property from file " << key;
-        OST::PropertyBase *rp = OST::PropertyFactory::createProperty(tt);
+        OST::PropertyMulti *rp = OST::PropertyFactory::createProperty(tt);
         if (rp != nullptr)
         {
             mStore[key] = rp;
-            connect(rp, &OST::PropertyBase::valueChanged, this, &Datastore::onValueChanged);
+            connect(rp, &OST::PropertyMulti::valueChanged, this, &Datastore::onValueChanged);
             mStore[key]->setState(OST::State::Ok);
 
         }
