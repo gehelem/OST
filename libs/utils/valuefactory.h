@@ -7,6 +7,8 @@
 #include <valuebool.h>
 #include <valuestring.h>
 #include <valuelight.h>
+#include <valueimg.h>
+#include <valuemessage.h>
 
 namespace  OST
 {

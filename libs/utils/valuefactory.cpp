@@ -51,6 +51,25 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
             if (pData.contains("format")) pValue->setFormat(pData["format"].toString());
             return pValue;
         }
+        if (pData["type"].toString() == "img")
+        {
+            auto *pValue = new ValueImg(pData["elementLabel"].toString(),
+                                        pData["order"].toString(),
+                                        pData["hint"].toString()
+                                       );
+            if (pData.contains("urljpeg")) pValue->setUrlJpeg(pData["urljpeg"].toString());
+            if (pData.contains("urlfits")) pValue->setUrlJpeg(pData["urlfits"].toString());
+            if (pData.contains("urlthumbnail")) pValue->setUrlJpeg(pData["urlthumbnail"].toString());
+            if (pData.contains("urloverlay")) pValue->setUrlJpeg(pData["urloverlay"].toString());
+            if (pData.contains("height")) pValue->setHeight(pData["height"].toLongLong());
+            if (pData.contains("width")) pValue->setWidth(pData["width"].toLongLong());
+            if (pData.contains("min")) pValue->setMin(pData["min"].toLongLong());
+            if (pData.contains("max")) pValue->setMax(pData["max"].toLongLong());
+            if (pData.contains("mean")) pValue->setMean(pData["mean"].toDouble());
+            if (pData.contains("stddev")) pValue->setStddev(pData["stddev"].toDouble());
+            if (pData.contains("snr")) pValue->setSNR(pData["snr"].toDouble());
+            return pValue;
+        }
 
         qDebug() << "Unknown value type " << pData["elementLabel"].toString() << ":" << pData["type"].toString() << "-" <<
                  pData["elementLabel"].toString();

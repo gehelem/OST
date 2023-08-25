@@ -63,5 +63,19 @@ void ValueTextDumper::visit(ValueLight *pValue)
     }
     mResult = QString::fromStdString(stream.str());
 }
+void ValueTextDumper::visit(ValueImg *pValue)
+{
+    std::stringstream stream;
+    stream << "Image Value :" << dumpValueCommons(pValue);
+    //stream << "Val = '" << pValue->value().toStdString() << "'";
+    mResult = QString::fromStdString(stream.str());
+}
+void ValueTextDumper::visit(ValueMessage *pValue)
+{
+    std::stringstream stream;
+    stream << "Message Value :" << dumpValueCommons(pValue);
+    //stream << "Val = '" << pValue->value().toStdString() << "'";
+    mResult = QString::fromStdString(stream.str());
+}
 
 }

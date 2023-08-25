@@ -46,4 +46,11 @@ void ValueUpdate::visit(ValueLight *pValue, QVariantMap &data )
     if (data["value"].toInt() == 3 ) pValue->setState(Error);
 
 }
+void ValueUpdate::visit(ValueImg *pValue, QVariantMap &data )
+{
+}
+void ValueUpdate::visit(ValueMessage *pValue, QVariantMap &data )
+{
+}
+
 }

@@ -8,6 +8,9 @@
 #include <valuebool.h>
 #include <valuestring.h>
 #include <valuelight.h>
+#include <valueimg.h>
+#include <valuemessage.h>
+
 namespace  OST
 {
 
@@ -41,6 +44,16 @@ class ValueUpdate : public ValueVisitor
             Q_UNUSED(pProperty)
         }
         void visit(ValueLight* pProperty, QVariantMap &data ) override;
+        void visit(ValueImg* pProperty) override
+        {
+            Q_UNUSED(pProperty)
+        }
+        void visit(ValueImg* pProperty, QVariantMap &data ) override;
+        void visit(ValueMessage* pProperty) override
+        {
+            Q_UNUSED(pProperty)
+        }
+        void visit(ValueMessage* pProperty, QVariantMap &data ) override;
 
 
 };

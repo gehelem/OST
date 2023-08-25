@@ -356,7 +356,13 @@
         "permission": 0,
         "propertyLabel": "Test image",
         "URL": "",
-        "elements": {}
+        "elements": {
+            "image1": {
+                "type": "img",
+                "elementLabel": "First image",
+                "urljpeg":"./dummy.jpg"
+            }
+        }
     },
     "testgrid": {
         "type": "multi",

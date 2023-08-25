@@ -9,6 +9,8 @@ class ValueBool;
 class ValueFloat;
 class ValueString;
 class ValueLight;
+class ValueImg;
+class ValueMessage;
 
 class ValueVisitor
 {
@@ -27,6 +29,10 @@ class ValueVisitor
         virtual void visit(ValueString* pValue, QVariantMap &data) = 0;
         virtual void visit(ValueLight* pValue) = 0;
         virtual void visit(ValueLight* pValue, QVariantMap &data) = 0;
+        virtual void visit(ValueImg* pValue) = 0;
+        virtual void visit(ValueImg* pValue, QVariantMap &data) = 0;
+        virtual void visit(ValueMessage* pValue) = 0;
+        virtual void visit(ValueMessage* pValue, QVariantMap &data) = 0;
 };
 
 }

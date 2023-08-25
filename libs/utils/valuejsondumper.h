@@ -8,6 +8,9 @@
 #include <valuefloat.h>
 #include <valuestring.h>
 #include <valuelight.h>
+#include <valueimg.h>
+#include <valuemessage.h>
+
 
 namespace  OST
 {
@@ -44,6 +47,18 @@ class ValueJsonDumper : public ValueVisitor
         }
         void visit(ValueLight *pValue) override;
         void visit(ValueLight* pValue, QVariantMap &data ) override
+        {
+            Q_UNUSED(pValue);
+            Q_UNUSED(data)
+        }
+        void visit(ValueImg *pValue) override;
+        void visit(ValueImg* pValue, QVariantMap &data ) override
+        {
+            Q_UNUSED(pValue);
+            Q_UNUSED(data)
+        }
+        void visit(ValueMessage *pValue) override;
+        void visit(ValueMessage* pValue, QVariantMap &data ) override
         {
             Q_UNUSED(pValue);
             Q_UNUSED(data)
