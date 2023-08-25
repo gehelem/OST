@@ -71,6 +71,16 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
             return pValue;
         }
 
+        if (pData["type"].toString() == "message")
+        {
+            auto *pValue = new ValueMessage(pData["elementLabel"].toString(),
+                                            pData["order"].toString(),
+                                            pData["hint"].toString()
+                                           );
+            if (pData.contains("message")) pValue->setMessage(pData["message"].toString());
+            return pValue;
+        }
+
         qDebug() << "Unknown value type " << pData["elementLabel"].toString() << ":" << pData["type"].toString() << "-" <<
                  pData["elementLabel"].toString();
     }

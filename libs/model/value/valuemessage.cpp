@@ -8,9 +8,5 @@ ValueMessage::ValueMessage(const QString &label, const QString &order, const QSt
 ValueMessage::~ValueMessage()
 {
 }
-void ValueMessage::setValue(const QString &value)
-{
-    mValue = value;
-}
 
 }

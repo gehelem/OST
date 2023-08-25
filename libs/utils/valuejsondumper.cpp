@@ -11,6 +11,7 @@ QJsonObject ValueJsonDumper::dumpValueCommons(ValueBase *pValue)
     json["order"] = pValue->order();
     json["hint"] = pValue->hint();
     json["state"] = pValue->state();
+    json["type"] = "undefined";
 
     return json;
 
@@ -18,12 +19,14 @@ QJsonObject ValueJsonDumper::dumpValueCommons(ValueBase *pValue)
 void ValueJsonDumper::visit(ValueBool *pValue)
 {
     QJsonObject json = dumpValueCommons(pValue);
+    json["type"] = "bool";
     json["value"] = pValue->value();
     mResult = json;
 }
 void ValueJsonDumper::visit(ValueInt *pValue)
 {
     QJsonObject json = dumpValueCommons(pValue);
+    json["type"] = "int";
     json["value"] = qlonglong(pValue->value());
     json["min"] = qlonglong(pValue->min());
     json["max"] = qlonglong(pValue->max());
@@ -35,6 +38,7 @@ void ValueJsonDumper::visit(ValueInt *pValue)
 void ValueJsonDumper::visit(ValueFloat *pValue)
 {
     QJsonObject json = dumpValueCommons(pValue);
+    json["type"] = "float";
     json["value"] = pValue->value();
     json["min"] = pValue->min();
     json["max"] = pValue->max();
@@ -46,17 +50,20 @@ void ValueJsonDumper::visit(ValueFloat *pValue)
 void ValueJsonDumper::visit(ValueString *pValue)
 {
     QJsonObject json = dumpValueCommons(pValue);
+    json["type"] = "string";
     json["value"] = pValue->value();
     mResult = json;
 }
 void ValueJsonDumper::visit(ValueLight *pValue)
 {
-    mResult = dumpValueCommons(pValue);;
+    QJsonObject json = dumpValueCommons(pValue);
+    json["type"] = "light";
+    mResult = json;
 }
 void ValueJsonDumper::visit(ValueImg *pValue)
 {
     QJsonObject json = dumpValueCommons(pValue);
-    //json["value"] = pValue->value();
+    json["type"] = "img";
     json["urljpeg"] = pValue->urlJpeg();
     json["urlfits"] = pValue->urlFits();
     json["urlthumbnail"] = pValue->urlThumbnail();
@@ -75,7 +82,9 @@ void ValueJsonDumper::visit(ValueImg *pValue)
 void ValueJsonDumper::visit(ValueMessage *pValue)
 {
     QJsonObject json = dumpValueCommons(pValue);
-    //json["value"] = pValue->value();
+    json["type"] = "message";
+    json["level"] = pValue->level();
+    json["timestamp"] = pValue->timeStamp().toString("yyyy/MM/dd hh:mm:ss.zzz");
     mResult = json;
 }
 

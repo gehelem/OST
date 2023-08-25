@@ -361,6 +361,11 @@
                 "type": "img",
                 "elementLabel": "First image",
                 "urljpeg":"./dummy.jpg"
+            },
+            "message": {
+                "type": "message",
+                "elementLabel": "Image message",
+                "level":0
             }
         }
     },

@@ -5,6 +5,12 @@
 
 namespace  OST
 {
+typedef enum
+{
+    Info = 0,
+    Warn,
+    Err
+} MsgLevel;
 
 class ValueMessage: public ValueBase
 {
@@ -23,14 +29,33 @@ class ValueMessage: public ValueBase
 
         ValueMessage(const QString &label, const QString &order, const QString &hint);
         ~ValueMessage();
-        QString value()
+        QString message()
         {
-            return mValue;
+            return mMessage;
         }
-        void setValue(const QString &value);
+        void setMessage(const QString &message)
+        {
+            mMessage = message;
+            mTimestamp = QDateTime::currentDateTime();
+        }
 
+        QDateTime timeStamp()
+        {
+            return mTimestamp;
+        }
+
+        MsgLevel level()
+        {
+            return mLevel;
+        }
+        void setLevel(const MsgLevel &level)
+        {
+            mLevel = level;
+        }
     private:
-        QString mValue;
+        QString mMessage;
+        QDateTime mTimestamp = QDateTime::currentDateTime();
+        MsgLevel mLevel;
 
 };
 

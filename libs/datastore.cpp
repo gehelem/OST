@@ -220,7 +220,7 @@ bool Datastore::setOstElementValue(const QString &pPropertyName, const QString &
     QVariantMap m;
     m["value"] = pElementValue;
     pb->getValues()[pElementName]->accept(&vu, m);
-    getQtProperties();
+    //getQtProperties();
     return true; // should return false when request is invalid
 }
 bool Datastore::setOstElementGrid(const QString &pPropertyName, const QString &pElementName,
