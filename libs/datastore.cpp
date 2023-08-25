@@ -68,7 +68,7 @@ bool Datastore::createOstElement(const QString &pPropertyName, const QString &pE
         return false ;
     }
     QVariantMap _element;
-    _element["elementLabel"] = pElementLabel;
+    _element["label"] = pElementLabel;
     _elements[pElementName] = _element;
     _prop["elements"] = _elements;
     mProperties[pPropertyName] = _prop;

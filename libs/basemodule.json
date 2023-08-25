@@ -4,18 +4,18 @@
         "group": "Info",
         "order":"00",
         "permission": 0,
-        "propertyLabel": "Base module git",
+        "label": "Base module git",
         "elements": {
             "hash": {
-                "elementLabel": "Hash",
+                "label": "Hash",
                 "value":"xxx"
             },
             "date": {
-                "elementLabel": "Date",
+                "label": "Date",
                 "value":"xxx"
             },
             "message": {
-                "elementLabel": "Commit message",
+                "label": "Commit message",
                 "value":"xxx"
             }
         }
@@ -25,26 +25,26 @@
         "group": "Info",
         "order":"00",
         "permission": 0,
-        "propertyLabel": "Module info",
+        "label": "Module info",
         "elements": {
             "moduleDescription": {
-                "elementLabel": "Module description",
+                "label": "Module description",
                 "value":"N/A"
             },
             "moduleLabel": {
-                "elementLabel": "Module label",
+                "label": "Module label",
                 "value":"Base module label"
             },
             "moduleName": {
-                "elementLabel": "Module name",
+                "label": "Module name",
                 "value":"basemodule"
             },
             "moduleVersion": {
-                "elementLabel": "Version",
+                "label": "Version",
                 "value":1
             },
             "baseVersion": {
-                "elementLabel": "baseVersion",
+                "label": "baseVersion",
                 "value":1
             }
         }
@@ -54,7 +54,7 @@
         "type": "simple",
         "group": "",
         "permission": 0,
-        "propertyLabel": "Message",
+        "label": "Message",
         "elements": {}
     },
     "loadprofile": {
@@ -65,18 +65,18 @@
         "listOfValues":{
         },
         "rule":1,
-        "propertyLabel": "Load profile",
+        "label": "Load profile",
         "elements": {
             "load": {
-                "elementLabel": "Load",
+                "label": "Load",
                 "value":false
             },
             "refresh": {
-                "elementLabel": "Refresh",
+                "label": "Refresh",
                 "value":false
             },
             "value": {
-                "elementLabel": "Name",
+                "label": "Name",
                 "value":"default"
             }
 
@@ -88,14 +88,14 @@
         "group": "Profiles",
         "permission": 2,
         "rule":0,
-        "propertyLabel": "Save profile",
+        "label": "Save profile",
         "elements": {
             "save": {
-                "elementLabel": "Save as",
+                "label": "Save as",
                 "value":false
             },
             "value": {
-                "elementLabel": "Name",
+                "label": "Name",
                 "value":"default"
             }
 
@@ -106,11 +106,11 @@
         "devcat": "Module",
         "group": "Actions",
         "permission": 1,
-        "propertyLabel": "Controls",
+        "label": "Controls",
         "rule":2,
         "elements": {
             "kill": {
-                "elementLabel": "Kill module",
+                "label": "Kill module",
                 "value":false
             }
         }

@@ -6,7 +6,7 @@ PropertyMulti *PropertyFactory::createProperty(const QVariantMap &pData)
 {
     //qDebug() << "PropertyFactory::createProperty - " << pData;
     auto *pProperty = new PropertyMulti(
-        pData["propertyLabel"].toString(),
+        pData["label"].toString(),
         OST::IntToPermission(pData["permission"].toInt()),
         pData["devcat"].toString(),
         pData["group"].toString(),

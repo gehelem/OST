@@ -8,14 +8,14 @@
         "listOfValues":{
         },
         "rule":1,
-        "propertyLabel": "Load configuration",
+        "label": "Load configuration",
         "elements": {
             "load": {
-                "elementLabel": "Load",
+                "label": "Load",
                 "value":false
             },
             "refresh": {
-                "elementLabel": "Refresh",
+                "label": "Refresh",
                 "value":false
             }
         }
@@ -27,10 +27,10 @@
         "permission": 2,
         "value": "default",
         "rule":0,
-        "propertyLabel": "Save configuration",
+        "label": "Save configuration",
         "elements": {
             "save": {
-                "elementLabel": "Save as",
+                "label": "Save as",
                 "value":false
             }
         }
@@ -43,22 +43,22 @@
         "grid":0,
         "gridlimit":255,
         "rule":0,
-        "propertyLabel": "Loaded modules",
+        "label": "Loaded modules",
         "elements": {
             "name": {
-                "elementLabel": "Internal name",
+                "label": "Internal name",
                 "value":""
             },
             "label": {
-                "elementLabel": "Label",
+                "label": "Label",
                 "value":""
             },
             "type": {
-                "elementLabel": "Type",
+                "label": "Type",
                 "value":""
             },
             "profile": {
-                "elementLabel": "Profile",
+                "label": "Profile",
                 "value":""
             }
 
@@ -72,10 +72,10 @@
         "group": "",
         "permission": 2,
         "rule":0,
-        "propertyLabel": "",
+        "label": "",
         "elements": {
             "kill": {
-                "elementLabel": "Kill all modules",
+                "label": "Kill all modules",
                 "value":false
             }
         }

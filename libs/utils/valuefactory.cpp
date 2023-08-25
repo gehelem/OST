@@ -9,7 +9,7 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
     {
         if (pData["type"].toString() == "bool")
         {
-            auto *pValue = new ValueBool(pData["elementLabel"].toString(),
+            auto *pValue = new ValueBool(pData["label"].toString(),
                                          pData["order"].toString(),
                                          pData["hint"].toString()
                                         );
@@ -18,7 +18,7 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
         }
         if (pData["type"].toString() == "string")
         {
-            auto *pValue = new ValueString(pData["elementLabel"].toString(),
+            auto *pValue = new ValueString(pData["label"].toString(),
                                            pData["order"].toString(),
                                            pData["hint"].toString()
                                           );
@@ -27,7 +27,7 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
         }
         if (pData["type"].toString() == "int")
         {
-            auto *pValue = new ValueInt(pData["elementLabel"].toString(),
+            auto *pValue = new ValueInt(pData["label"].toString(),
                                         pData["order"].toString(),
                                         pData["hint"].toString()
                                        );
@@ -40,7 +40,7 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
         }
         if (pData["type"].toString() == "float")
         {
-            auto *pValue = new ValueFloat(pData["elementLabel"].toString(),
+            auto *pValue = new ValueFloat(pData["label"].toString(),
                                           pData["order"].toString(),
                                           pData["hint"].toString()
                                          );
@@ -53,7 +53,7 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
         }
         if (pData["type"].toString() == "img")
         {
-            auto *pValue = new ValueImg(pData["elementLabel"].toString(),
+            auto *pValue = new ValueImg(pData["label"].toString(),
                                         pData["order"].toString(),
                                         pData["hint"].toString()
                                        );
@@ -73,7 +73,7 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
 
         if (pData["type"].toString() == "message")
         {
-            auto *pValue = new ValueMessage(pData["elementLabel"].toString(),
+            auto *pValue = new ValueMessage(pData["label"].toString(),
                                             pData["order"].toString(),
                                             pData["hint"].toString()
                                            );
@@ -81,15 +81,15 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
             return pValue;
         }
 
-        qDebug() << "Unknown value type " << pData["elementLabel"].toString() << ":" << pData["type"].toString() << "-" <<
-                 pData["elementLabel"].toString();
+        qDebug() << "Unknown value type " << pData["label"].toString() << ":" << pData["type"].toString() << "-" <<
+                 pData["label"].toString();
     }
 
     if (pData.contains("value"))
     {
         if (strcmp(pData["value"].typeName(), "bool") == 0 )
         {
-            auto *pValue = new ValueBool(pData["elementLabel"].toString(),
+            auto *pValue = new ValueBool(pData["label"].toString(),
                                          pData["order"].toString(),
                                          pData["hint"].toString()
                                         );
@@ -98,7 +98,7 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
         }
         if (strcmp(pData["value"].typeName(), "QString") == 0 )
         {
-            auto *pValue = new ValueString(pData["elementLabel"].toString(),
+            auto *pValue = new ValueString(pData["label"].toString(),
                                            pData["order"].toString(),
                                            pData["hint"].toString()
                                           );
@@ -109,7 +109,7 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                 || (strcmp(pData["value"].typeName(), "qlonglong") == 0 )
            )
         {
-            auto *pValue = new ValueInt(pData["elementLabel"].toString(),
+            auto *pValue = new ValueInt(pData["label"].toString(),
                                         pData["order"].toString(),
                                         pData["hint"].toString()
                                        );
@@ -124,7 +124,7 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                 || (strcmp(pData["value"].typeName(), "float") == 0 )
            )
         {
-            auto *pValue = new ValueFloat(pData["elementLabel"].toString(),
+            auto *pValue = new ValueFloat(pData["label"].toString(),
                                           pData["order"].toString(),
                                           pData["hint"].toString()
                                          );
@@ -136,9 +136,9 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
             return pValue;
         }
 
-        qDebug() << "Unknown value type " << pData["elementLabel"].toString() << ":" << pData["value"].typeName();
+        qDebug() << "Unknown value type " << pData["label"].toString() << ":" << pData["value"].typeName();
     }
-    qDebug() << "Can't guess element type " << pData["elementLabel"].toString();
+    qDebug() << "Can't guess element type " << pData["label"].toString();
     return nullptr;
 
 }

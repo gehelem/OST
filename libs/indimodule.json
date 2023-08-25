@@ -4,18 +4,18 @@
         "group": "Info",
         "order":"00",
         "permission": 0,
-        "propertyLabel": "Indi module git",
+        "label": "Indi module git",
         "elements": {
             "hash": {
-                "elementLabel": "Hash",
+                "label": "Hash",
                 "value":"xxx"
             },
             "date": {
-                "elementLabel": "Date",
+                "label": "Date",
                 "value":"xxx"
             },
             "message": {
-                "elementLabel": "Commit message",
+                "label": "Commit message",
                 "value":"xxx"
             }
         }
@@ -27,14 +27,14 @@
         "group": "Indi",
         "order":"99",
         "permission": 2,
-        "propertyLabel": "Server",
+        "label": "Server",
         "elements": {
             "host": {
-                "elementLabel": "Host",
+                "label": "Host",
                 "value": "localhost"
             },
             "port": {
-                "elementLabel": "Port",
+                "label": "Port",
                 "value": 7624
             }
 
@@ -47,14 +47,14 @@
         "order":"01",
         "permission": 2,
         "rule":2,
-        "propertyLabel": "Server",
+        "label": "Server",
         "elements": {
             "conserv": {
-                "elementLabel": "Connect"
+                "label": "Connect"
                 ,"value":false
             },
             "disconserv": {
-                "elementLabel": "Disconnect"
+                "label": "Disconnect"
                 ,"value":false
             }
         }
@@ -66,7 +66,7 @@
         "group": "Indi",
         "order":"06",
         "permission": 2,
-        "propertyLabel": "Devices",
+        "label": "Devices",
         "elements": {
         }
     },
@@ -77,18 +77,18 @@
         "order":"04",
         "permission": 2,
         "rule":2,
-        "propertyLabel": "Devices actions" ,
+        "label": "Devices actions" ,
         "elements": {
             "condevs": {
-                "elementLabel": "Connect"
+                "label": "Connect"
                 ,"value":false
             },
             "discondevs": {
-                "elementLabel": "Disconnect"
+                "label": "Disconnect"
                 ,"value":false
             },
             "loadconfs": {
-                "elementLabel": "Load devices conf"
+                "label": "Load devices conf"
                 ,"value":false
             }
 
@@ -102,18 +102,18 @@
         "permission": 2,
         "rule":2,
         "hasprofile":true,
-        "propertyLabel": "Actions on module startup",
+        "label": "Actions on module startup",
         "elements": {
             "indiatstart": {
-                "elementLabel": "Connect indi"
+                "label": "Connect indi"
                 ,"value":false
             },
             "devatstart": {
-                "elementLabel": "Connect devices"
+                "label": "Connect devices"
                 ,"value":false
             },
             "confsatstart": {
-                "elementLabel": "Load devices conf"
+                "label": "Load devices conf"
                 ,"value":false
             }
 
