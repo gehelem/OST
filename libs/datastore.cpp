@@ -203,7 +203,7 @@ bool Datastore::setOstElementValue(const QString &pPropertyName, const QString &
     _prop["elements"] = _elements;
 
     mProperties[pPropertyName] = _prop;
-    if (mEmitEvent) OnModuleEvent("se", QString(), pPropertyName, mProperties[pPropertyName].toMap());
+    //if (mEmitEvent) OnModuleEvent("se", QString(), pPropertyName, mProperties[pPropertyName].toMap());
 
     if (!mStore.contains(pPropertyName))
     {
@@ -217,10 +217,14 @@ bool Datastore::setOstElementValue(const QString &pPropertyName, const QString &
         return false;
     }
     OST::ValueUpdate vu;
+    OST::PropertyJsonDumper d;
     QVariantMap m;
     m["value"] = pElementValue;
     pb->getValues()[pElementName]->accept(&vu, m);
-    //getQtProperties();
+    pb->accept(&d);
+
+
+    if (mEmitEvent) OnModuleEvent("se", QString(), pPropertyName, d.getResult().toVariantMap());
     return true; // should return false when request is invalid
 }
 bool Datastore::setOstElementGrid(const QString &pPropertyName, const QString &pElementName,
@@ -330,58 +334,16 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
         {
             mStore[key] = rp;
             connect(rp, &OST::PropertyMulti::valueChanged, this, &Datastore::onValueChanged);
-            mStore[key]->setState(OST::State::Ok);
+            mStore[key]->setState(OST::State::Idle);
 
         }
         else
         {
             qDebug() << "***** can't create property " << key;
         }
-        /*if (tt.contains("type"))
-        {
-            if (strcmp(tt["value"].typeName(), "QString") == 0)
-            {
-                TextProperty *bp = new TextProperty(tt["propertyLabel"].toString(),
-                                                    tt["devcat"].toString(),
-                                                    tt["group"].toString(),
-                                                    TextProperty::ReadWrite);
-                bp->setValue(tt["value"].toString());
-                mStore[key] = bp;
-
-            }
-            else
-            {
-                if (strcmp(tt["value"].typeName(), "qlonglong") == 0)
-                {
-                    NumberProperty *bp = new NumberProperty(tt["propertyLabel"].toString(),
-                                                            tt["devcat"].toString(),
-                                                            tt["group"].toString(),
-                                                            NumberProperty::ReadWrite);
-                    bp->setValue(tt["value"].toDouble());
-                    mStore[key] = bp;
-
-                }
-                else
-                {
-                    BasicProperty *bp = new BasicProperty(tt["propertyLabel"].toString(),
-                                                          tt["devcat"].toString(),
-                                                          tt["group"].toString(),
-                                                          BasicProperty::ReadWrite);
-                    mStore[key] = bp;
-
-                }
-
-            }
-        }*/
-
-        //qDebug() << bp->property("label").toString();
-
 
     }
 
-    //QByteArray docByteArray = d.toJson(QJsonDocument::Compact);
-    //QString strJson = QLatin1String(docByteArray);
-    //qDebug() << "loadPropertiesFromFile  - " << strJson;
 
 }
 
