@@ -50,11 +50,11 @@ class ValueInt: public ValueBase
         void setFormat(const QString &format);
 
     private:
-        long mValue;
-        long mMin;
-        long mMax;
-        long mStep;
-        QString mFormat;
+        long mValue = 0;
+        long mMin = 0;
+        long mMax = 0;
+        long mStep = 0;
+        QString mFormat = "";
 
 };
 

@@ -31,7 +31,11 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                                         pData["order"].toString(),
                                         pData["hint"].toString()
                                        );
-            pValue->setValue(pData["value"].toLongLong());
+            if (pData.contains("value")) pValue->setValue(pData["value"].toLongLong());
+            if (pData.contains("min")) pValue->setMin(pData["min"].toLongLong());
+            if (pData.contains("max")) pValue->setMax(pData["max"].toLongLong());
+            if (pData.contains("step")) pValue->setStep(pData["step"].toLongLong());
+            if (pData.contains("format")) pValue->setFormat(pData["format"].toString());
             return pValue;
         }
         if (pData["type"].toString() == "float")
@@ -40,7 +44,11 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                                           pData["order"].toString(),
                                           pData["hint"].toString()
                                          );
-            pValue->setValue(pData["value"].toDouble());
+            if (pData.contains("value")) pValue->setValue(pData["value"].toDouble());
+            if (pData.contains("min")) pValue->setMin(pData["min"].toDouble());
+            if (pData.contains("max")) pValue->setMax(pData["max"].toDouble());
+            if (pData.contains("step")) pValue->setStep(pData["step"].toDouble());
+            if (pData.contains("format")) pValue->setFormat(pData["format"].toString());
             return pValue;
         }
 
@@ -76,7 +84,11 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                                         pData["order"].toString(),
                                         pData["hint"].toString()
                                        );
-            pValue->setValue(pData["value"].toLongLong());
+            if (pData.contains("value")) pValue->setValue(pData["value"].toLongLong());
+            if (pData.contains("min")) pValue->setMin(pData["min"].toLongLong());
+            if (pData.contains("max")) pValue->setMax(pData["max"].toLongLong());
+            if (pData.contains("step")) pValue->setStep(pData["step"].toLongLong());
+            if (pData.contains("format")) pValue->setFormat(pData["format"].toString());
             return pValue;
         }
         if ((strcmp(pData["value"].typeName(), "double") == 0 )
@@ -87,7 +99,11 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                                           pData["order"].toString(),
                                           pData["hint"].toString()
                                          );
-            pValue->setValue(pData["value"].toDouble());
+            if (pData.contains("value")) pValue->setValue(pData["value"].toDouble());
+            if (pData.contains("min")) pValue->setMin(pData["min"].toDouble());
+            if (pData.contains("max")) pValue->setMax(pData["max"].toDouble());
+            if (pData.contains("step")) pValue->setStep(pData["step"].toDouble());
+            if (pData.contains("format")) pValue->setFormat(pData["format"].toString());
             return pValue;
         }
 

@@ -25,12 +25,22 @@ void ValueJsonDumper::visit(ValueInt *pValue)
 {
     QJsonObject json = dumpValueCommons(pValue);
     json["value"] = qlonglong(pValue->value());
+    json["min"] = qlonglong(pValue->min());
+    json["max"] = qlonglong(pValue->max());
+    json["step"] = qlonglong(pValue->step());
+    json["format"] = pValue->format();
+
     mResult = json;
 }
 void ValueJsonDumper::visit(ValueFloat *pValue)
 {
     QJsonObject json = dumpValueCommons(pValue);
     json["value"] = pValue->value();
+    json["min"] = pValue->min();
+    json["max"] = pValue->max();
+    json["step"] = pValue->step();
+    json["format"] = pValue->format();
+
     mResult = json;
 }
 void ValueJsonDumper::visit(ValueString *pValue)

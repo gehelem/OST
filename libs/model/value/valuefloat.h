@@ -50,11 +50,11 @@ class ValueFloat: public ValueBase
         void setFormat(const QString &format);
 
     private:
-        double mValue;
-        double mMin;
-        double mMax;
-        double mStep;
-        QString mFormat;
+        double mValue = 0;
+        double mMin = 0;
+        double mMax = 0;
+        double mStep = 0;
+        QString mFormat = "";
 
 };
 
