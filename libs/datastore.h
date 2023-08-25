@@ -33,8 +33,12 @@ class Datastore : public Baseroot
 
         QVariantMap getProperties(void)
         {
-            //getQtProperties();
+            getQtProperties();
             return mProperties;
+        }
+        QMap<QString, OST::PropertyMulti*> getStore(void)
+        {
+            return mStore;
         }
         void getQtProperties(void)
         {

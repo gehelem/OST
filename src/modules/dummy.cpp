@@ -70,6 +70,9 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     //sendMessage(QString("lov element inexistant") + getOstElementLov("extextRW", "extext4",
     //            "xxx").toString());// should give a warning
     //clearOstElementLov("extextRW", "extext4");
+    OST::ValueInt *numbersRWn3 = static_cast<OST::ValueInt*>(getStore()["numbersRW"]->getValues()["n3"]);
+    numbersRWn3->setState(OST::State::Error);
+    numbersRWn3->setValue(999666);
 }
 
 Dummy::~Dummy()

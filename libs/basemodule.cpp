@@ -249,13 +249,24 @@ QVariantMap Basemodule::getModuleInfo(void)
 
 void Basemodule::sendDump(void)
 {
+    QJsonObject properties;
+    foreach(const QString &key, getStore().keys())
+    {
+        OST::PropertyJsonDumper d;
+        getStore()[key]->accept(&d);
+        properties[key] = d.getResult();
+    }
+    QJsonObject json;
+    json["properties"] = properties;
+
     QVariantMap dump;
     QVariantMap state;
     QVariantMap infos;
     infos["name"] = getModuleName();
     infos["label"] = getModuleLabel();
     infos["description"] = getModuleDescription();
-    dump["properties"] = getProperties();
+    //dump["properties"] = getProperties();
+    dump["properties"] = properties;
     dump["state"] = state;
     dump["infos"] = infos;
     dump["messages"] = getMessages();
