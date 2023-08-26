@@ -82,6 +82,10 @@ class Datastore : public Baseroot
 
         bool createOstElement(const QString &pPropertyName, const QString &pElementName, const QString &pElementLabel,
                               bool mEmitEvent);
+        bool createOstElementText(const QString &pPropertyName, const QString &pElementName, const QString &pElementLabel,
+                                  bool mEmitEvent);
+        bool createOstElementBool(const QString &pPropertyName, const QString &pElementName, const QString &pElementLabel,
+                                  bool mEmitEvent);
         bool setOstElementValue(const QString &pPropertyName, const QString &pElementName, const QVariant &pElementValue,
                                 bool mEmitEvent);
         QVariant getOstElementValue(const QString &pPropertyName, const QString &pElementName);

@@ -24,7 +24,13 @@ bool Datastore::createOstProperty(const QString &pPropertyName, const QString &p
     prop["group"] = pPropertyGroup;
     prop["name"] = pPropertyName;
     mProperties[pPropertyName] = prop;
-    OnModuleEvent("cp", QString(), pPropertyName, mProperties[pPropertyName].toMap());
+
+    OST::PropertyMulti *pm = OST::PropertyFactory::createProperty(prop);
+    mStore[pPropertyName] = pm;
+    OST::PropertyJsonDumper d;
+    pm->accept(&d);
+
+    OnModuleEvent("cp", QString(), pPropertyName, d.getResult().toVariantMap());
     return true;
 }
 void Datastore::emitPropertyCreation(const QString &pPropertyName)
@@ -72,8 +78,58 @@ bool Datastore::createOstElement(const QString &pPropertyName, const QString &pE
     _elements[pElementName] = _element;
     _prop["elements"] = _elements;
     mProperties[pPropertyName] = _prop;
+
     if (mEmitEvent) OnModuleEvent("ce", QString(), pPropertyName, mProperties[pPropertyName].toMap());
+
     return true;
+}
+bool Datastore::createOstElementText(const QString &pPropertyName, const QString &pElementName,
+                                     const QString &pElementLabel,
+                                     bool mEmitEvent)
+{
+    if (!mStore.contains(pPropertyName) )
+    {
+        sendWarning(" createOstElementText - property " + pPropertyName + " not found");
+        return false;
+    }
+
+    QVariantMap pData;
+    pData["label"] = pElementLabel;
+    pData["type"] = "string";
+
+    OST::ValueBase *el = OST::ValueFactory::createValue(pData);
+
+    mStore[pPropertyName]->addValue(pElementName, el);
+    OST::PropertyJsonDumper d;
+    mStore[pPropertyName]->accept(&d);
+    qDebug() << "createOstElementText el=" << el;
+    if (mEmitEvent) OnModuleEvent("ce", QString(), pPropertyName, d.getResult().toVariantMap());
+    return true;
+
+}
+bool Datastore::createOstElementBool(const QString &pPropertyName, const QString &pElementName,
+                                     const QString &pElementLabel,
+                                     bool mEmitEvent)
+{
+    if (!mStore.contains(pPropertyName) )
+    {
+        sendWarning(" createOstElementBool - property " + pPropertyName + " not found");
+        return false;
+    }
+
+    QVariantMap pData;
+    pData["label"] = pElementLabel;
+    pData["type"] = "bool";
+
+    OST::ValueBase *el = OST::ValueFactory::createValue(pData);
+
+    mStore[pPropertyName]->addValue(pElementName, el);
+    OST::PropertyJsonDumper d;
+    mStore[pPropertyName]->accept(&d);
+    qDebug() << "createOstElementBool el=" << el;
+    if (mEmitEvent) OnModuleEvent("ce", QString(), pPropertyName, d.getResult().toVariantMap());
+    return true;
+
 }
 bool Datastore::setOstElementValue(const QString &pPropertyName, const QString &pElementName, const QVariant &pElementValue,
                                    bool mEmitEvent)
@@ -211,7 +267,7 @@ bool Datastore::setOstElementValue(const QString &pPropertyName, const QString &
         return false;
     }
     OST::PropertyMulti *pb = mStore[pPropertyName];
-    if (!pb->getValues().contains(pElementName))
+    if (!mStore[pPropertyName]->getValues().contains(pElementName))
     {
         sendWarning("setElementValue - property2 " + pPropertyName + " : element " + pElementName + " not found.");
         return false;
