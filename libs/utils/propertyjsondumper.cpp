@@ -12,7 +12,7 @@ QJsonObject PropertyJsonDumper::dumpPropertyCommons(PropertyBase *pProperty)
     json["order"] = pProperty->order();
     json["level1"] = pProperty->level1();
     json["level2"] = pProperty->level2();
-    json["state"] = pProperty->state();
+    json["status"] = pProperty->state();
     json["permission"] = pProperty->permission();
 
 

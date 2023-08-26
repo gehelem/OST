@@ -7,6 +7,7 @@
 #include <propertyupdate.h>
 #include <propertyfactory.h>
 #include <valueupdate.h>
+#include <valuejsondumper.h>
 
 /** @class Datastore
  *  @brief Class to provide properties management for OST modules
@@ -30,7 +31,8 @@ class Datastore : public Baseroot
         Datastore();
         ~Datastore();
     protected:
-
+        QPointer<OST::PropertyMulti> getProperty(QString pProperty);
+        QPointer<OST::ValueString> getText(QString pProperty, QString pElement);
         QVariantMap getProperties(void)
         {
             //getQtProperties();
@@ -131,6 +133,7 @@ class Datastore : public Baseroot
         void setOstLov(const QString &pPropertyName, const QString &pLovCode,
                        const QString &pLovLabel);
         void deleteOstLov(const QString &pPropertyName, const QString &pLovCode);
+        QJsonObject getPropertiesDump(void);
 
     private slots:
         void onValueChanged(void);

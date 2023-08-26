@@ -20,14 +20,17 @@ Maincontrol::Maincontrol(QString name, QString label, QString profile, QVariantM
     deleteOstProperty("saveprofile");
     deleteOstProperty("loadprofile");
     deleteOstProperty("moduleactions");
-
+    qDebug() << "getAvailableModuleLibs";
     foreach(QString key, getAvailableModuleLibs().keys())
     {
         QVariantMap info = getAvailableModuleLibs()[key].toMap();
         createOstProperty( "load" + key, info["moduleDescription"].toMap()["value"].toString(), 2, "Available modules", "");
+        getStore()["load" + key]->setRule(OST::SwitchsRule::AtMostOne);
         createOstElement(  "load" + key, "name", "Name", false);
+        createOstElementText(  "load" + key, "name", "Name", false);
         setOstElementValue("load" + key, "name", "My " + key, false);
         createOstElement(  "load" + key, "load", "Load", false);
+        createOstElementBool(  "load" + key, "load", "Load", false);
         setOstElementValue("load" + key, "load", false, false);
 
     }
@@ -68,8 +71,8 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                     if (setOstElementValue(keyprop, keyelt, false, true))
                     {
                         QString pp = keyprop;
-                        QString elt = getOstElementValue("loadconf", "value").toString();
-                        QString eltwithoutblanks = getOstElementValue("loadconf", "value").toString();
+                        QString elt = getOstElementValue(keyprop, "name").toString();
+                        QString eltwithoutblanks = getOstElementValue(keyprop, "value").toString();
                         eltwithoutblanks.replace(" ", "");
                         QString prof = "default";
                         pp.replace("loadlibost", "");

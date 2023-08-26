@@ -73,6 +73,13 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     OST::ValueInt *numbersRWn3 = static_cast<OST::ValueInt*>(getStore()["numbersRW"]->getValues()["n3"]);
     numbersRWn3->setState(OST::State::Error);
     numbersRWn3->setValue(999666);
+    getText("extextRW", "extext1")->setValue("Value modified");
+    OST::ValueJsonDumper d;
+    getText("extextRW", "extext1")->accept(&d);
+    qDebug() << d.getResult();
+    OST::PropertyMulti *p = getProperty("extextRW");
+    p->setState(OST::State::Busy);
+
 }
 
 Dummy::~Dummy()

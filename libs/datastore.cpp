@@ -1,4 +1,4 @@
-#include <QtCore>
+﻿#include <QtCore>
 #include "datastore.h"
 
 Datastore::Datastore()
@@ -8,6 +8,32 @@ Datastore::Datastore()
 Datastore::~Datastore()
 {
 }
+QPointer<OST::PropertyMulti> Datastore::getProperty(QString pProperty)
+{
+    if (!mStore.contains(pProperty))
+    {
+        sendWarning(" getProperty - property " + pProperty + " not found");
+        return nullptr;
+    }
+    return static_cast<QPointer<OST::PropertyMulti>>(mStore[pProperty]);
+}
+
+QPointer<OST::ValueString> Datastore::getText(QString pProperty, QString pElement)
+{
+    QPointer<OST::PropertyMulti> p = getProperty(pProperty);
+    if (p == nullptr)
+    {
+        sendWarning(" getText - property " + pProperty + " not found");
+        return nullptr;
+    }
+    if (!p->getValues().contains(pElement))
+    {
+        sendWarning("createElement - property " + pProperty + " : element " + pElement + " not found");
+        return nullptr;
+    }
+    return static_cast<OST::ValueString*>(p->getValue(pElement));
+}
+
 bool Datastore::createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel,
                                   const int &pPropertyPermission,
                                   const  QString &pPropertyDevcat, const QString &pPropertyGroup)
@@ -71,7 +97,7 @@ bool Datastore::createOstElement(const QString &pPropertyName, const QString &pE
     QVariantMap _elements = _prop["elements"].toMap();
     if (_elements.contains(pElementName) )
     {
-        sendWarning(" createElement - property " + pPropertyName + " : element " + pElementName + "already exists.");
+        sendWarning("createElement - property " + pPropertyName + " : element " + pElementName + " already exists.");
         return false ;
     }
     QVariantMap _element;
@@ -97,13 +123,12 @@ bool Datastore::createOstElementText(const QString &pPropertyName, const QString
     QVariantMap pData;
     pData["label"] = pElementLabel;
     pData["type"] = "string";
-
     OST::ValueBase *el = OST::ValueFactory::createValue(pData);
 
     mStore[pPropertyName]->addValue(pElementName, el);
     OST::PropertyJsonDumper d;
     mStore[pPropertyName]->accept(&d);
-    qDebug() << "createOstElementText el=" << el;
+    //qDebug() << "createOstElementText el(" << pElementName << ")=" << d.getResult();
     if (mEmitEvent) OnModuleEvent("ce", QString(), pPropertyName, d.getResult().toVariantMap());
     return true;
 
@@ -117,7 +142,6 @@ bool Datastore::createOstElementBool(const QString &pPropertyName, const QString
         sendWarning(" createOstElementBool - property " + pPropertyName + " not found");
         return false;
     }
-
     QVariantMap pData;
     pData["label"] = pElementLabel;
     pData["type"] = "bool";
@@ -127,7 +151,7 @@ bool Datastore::createOstElementBool(const QString &pPropertyName, const QString
     mStore[pPropertyName]->addValue(pElementName, el);
     OST::PropertyJsonDumper d;
     mStore[pPropertyName]->accept(&d);
-    qDebug() << "createOstElementBool el=" << el;
+    //qDebug() << "createOstElementBool el(" << pElementName << ")=" << d.getResult();
     if (mEmitEvent) OnModuleEvent("ce", QString(), pPropertyName, d.getResult().toVariantMap());
     return true;
 
@@ -1204,4 +1228,15 @@ void Datastore::deleteOstLov(const QString &pPropertyName, const QString &pLovCo
     }
     return;
 
+}
+QJsonObject Datastore::getPropertiesDump(void)
+{
+    QJsonObject properties;
+    foreach(const QString &key, mStore.keys())
+    {
+        OST::PropertyJsonDumper d;
+        mStore[key]->accept(&d);
+        properties[key] = d.getResult();
+    }
+    return properties;
 }

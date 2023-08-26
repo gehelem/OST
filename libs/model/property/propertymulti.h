@@ -50,9 +50,13 @@ class PropertyMulti: public PropertyBase
             mRule = rule;
         }
 
-        inline const QMap<QString, OST::ValueBase*> &getValues()
+        QMap<QString, OST::ValueBase*> getValues()
         {
             return mValues;
+        }
+        OST::ValueBase* getValue(QString pElement)
+        {
+            return mValues[pElement];
         }
         void addValue(QString key, ValueBase* pValue)
         {
