@@ -11,6 +11,14 @@ typedef enum
     AtMostOne,
     Any
 } SwitchsRule;
+inline SwitchsRule IntToRule(int val )
+{
+    if (val == 0) return OneOfMany;
+    if (val == 1) return AtMostOne;
+    if (val == 2) return Any;
+    qDebug() << "Cant convert " << val << " to OST::SwitchsRule (0-2) - defaults to any";
+    return Any;
+}
 
 
 class PropertyMulti: public PropertyBase
@@ -33,10 +41,15 @@ class PropertyMulti: public PropertyBase
                       const QString &order, const bool &hasProfile, const bool &hasArray
                      );
         ~PropertyMulti();
-        [[nodiscard]] SwitchsRule getRule() const
+        [[nodiscard]] SwitchsRule rule() const
         {
             return mRule;
         }
+        void setRule(SwitchsRule rule)
+        {
+            mRule = rule;
+        }
+
         inline const QMap<QString, OST::ValueBase*> &getValues()
         {
             return mValues;
@@ -50,6 +63,7 @@ class PropertyMulti: public PropertyBase
             }
             else
             {
+                //qDebug() << label() << " - addValue - element " << key << " OK " << pValue;
                 mValues[key] = pValue;
             }
 

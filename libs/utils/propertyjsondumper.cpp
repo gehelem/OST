@@ -31,6 +31,7 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
         QJsonObject value = d.getResult();
         elements[key] = value;
     }
+    json["rule"] = pProperty->rule();
     json["elements"] = elements;
     mResult = json;
 }
