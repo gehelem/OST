@@ -30,7 +30,8 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     QCoreApplication::addLibraryPath("/usr/lib");
     QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath());
 
-    pMainControl = new Maincontrol(QString("mainctl"), QString("Main control"), QString(), QVariantMap());
+    checkModules();
+    pMainControl = new Maincontrol(QString("mainctl"), QString("Main control"), QString(), _availableModuleLibs);
     connect(pMainControl, &Maincontrol::moduleEvent, this, &Controller::OnModuleEvent);
     connect(pMainControl, &Maincontrol::moduleEvent, wshandler, &WShandler::processModuleEvent);
     connect(pMainControl, &Maincontrol::loadOtherModule, this, &Controller::loadModule);
@@ -41,9 +42,8 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     pMainControl->setObjectName("mainctl");
     pMainControl->dbInit(_dbpath, "mainctl");
     pMainControl->OnExternalEvent("refreshConfigurations", "mainctl", QString(), QVariantMap());
-    checkModules();
     pMainControl->setAvailableModuleLibs(_availableModuleLibs);
-
+    qDebug() << _availableModuleLibs;
     pMainControl->sendDump();
 
     //loadModule("maincontrol", "mainctl", "Maincontrol", "default");
@@ -248,7 +248,7 @@ void Controller::checkModules(void)
 {
     foreach (const QString &path, QCoreApplication::libraryPaths())
     {
-        pMainControl->sendMainMessage("Check available modules in " + path);
+        //pMainControl->sendMainMessage("Check available modules in " + path);
         QDir directory(path);
         directory.setFilter(QDir::Files);
         directory.setNameFilters(QStringList() << "libost*.so");
@@ -261,7 +261,7 @@ void Controller::checkModules(void)
                 QLibrary library(path + "/" + lib);
                 if (!library.load())
                 {
-                    pMainControl->sendMainWarning(lib + " " + library.errorString());
+                    //pMainControl->sendMainWarning(lib + " " + library.errorString());
                 }
                 else
                 {
@@ -278,13 +278,13 @@ void Controller::checkModules(void)
                             mod->setObjectName(lib);
                             QVariantMap info = mod->getModuleInfo();
                             _availableModuleLibs[tt] = info;
-                            pMainControl->sendMainMessage("found library " + path + "/" + lib) ;
+                            //pMainControl->sendMainMessage("found library " + path + "/" + lib) ;
                             delete mod;
                         }
                     }
                     else
                     {
-                        pMainControl->sendMainError("Could not initialize module from the loaded library : " + lib);
+                        //pMainControl->sendMainError("Could not initialize module from the loaded library : " + lib);
                     }
                 }
 
