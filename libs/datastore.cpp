@@ -1,4 +1,4 @@
-﻿#include <QtCore>
+#include <QtCore>
 #include "datastore.h"
 
 Datastore::Datastore()
@@ -18,11 +18,12 @@ bool Datastore::createOstProperty(const QString &pPropertyName, const QString &p
         return false;
     }
     QVariantMap prop;
-    prop["propertyLabel"] = pPropertyLabel;
+    prop["label"] = pPropertyLabel;
     prop["permission"] = pPropertyPermission;
     prop["devcat"] = pPropertyDevcat;
     prop["group"] = pPropertyGroup;
     prop["name"] = pPropertyName;
+    prop["elements"] = QVariantMap();
     mProperties[pPropertyName] = prop;
 
     OST::PropertyMulti *pm = OST::PropertyFactory::createProperty(prop);
