@@ -28,7 +28,7 @@ QPointer<OST::ValueString> Datastore::getText(QString pProperty, QString pElemen
     }
     if (!p->getValues().contains(pElement))
     {
-        sendWarning("createElement - property " + pProperty + " : element " + pElement + " not found");
+        sendWarning("getText - property " + pProperty + " : element " + pElement + " not found");
         return nullptr;
     }
     return static_cast<OST::ValueString*>(p->getValue(pElement));

@@ -70,15 +70,20 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     //sendMessage(QString("lov element inexistant") + getOstElementLov("extextRW", "extext4",
     //            "xxx").toString());// should give a warning
     //clearOstElementLov("extextRW", "extext4");
-    OST::ValueInt *numbersRWn3 = static_cast<OST::ValueInt*>(getStore()["numbersRW"]->getValues()["n3"]);
-    numbersRWn3->setState(OST::State::Error);
+    OST::PropertyMulti *n = getProperty("numbersRW");
+    n->setState(OST::State::Error);
+    //OST::ValueInt *numbersRWn3 = static_cast<OST::ValueInt*>(n->getValue("n3"));
+    OST::ValueInt *numbersRWn3 = static_cast<OST::ValueInt*>(n->getValue("n3"));
     numbersRWn3->setValue(999666);
+
     getText("extextRW", "extext1")->setValue("Value modified");
     OST::ValueJsonDumper d;
     getText("extextRW", "extext1")->accept(&d);
     qDebug() << d.getResult();
     OST::PropertyMulti *p = getProperty("extextRW");
     p->setState(OST::State::Busy);
+    static_cast<OST::ValueString*>(p->getValue("extext1"))->setValue("Value modified2");
+
 
 }
 
