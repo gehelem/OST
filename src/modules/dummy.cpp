@@ -76,10 +76,10 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     OST::ValueInt *numbersRWn3 = static_cast<OST::ValueInt*>(n->getValue("n3"));
     numbersRWn3->setValue(999666);
 
-    getText("extextRW", "extext1")->setValue("Value modified");
-    OST::ValueJsonDumper d;
-    getText("extextRW", "extext1")->accept(&d);
-    qDebug() << d.getResult();
+    //getText("extextRW", "extext1")->setValue("Value modified");
+    //OST::ValueJsonDumper d;
+    //getText("extextRW", "extext1")->accept(&d);
+    //qDebug() << d.getResult();
     OST::PropertyMulti *p = getProperty("extextRW");
     p->setState(OST::State::Busy);
     static_cast<OST::ValueString*>(p->getValue("extext1"))->setValue("Value modified2");

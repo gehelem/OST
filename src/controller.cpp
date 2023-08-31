@@ -248,7 +248,7 @@ void Controller::checkModules(void)
 {
     foreach (const QString &path, QCoreApplication::libraryPaths())
     {
-        //pMainControl->sendMainMessage("Check available modules in " + path);
+        sendMessage("Check available modules in " + path);
         QDir directory(path);
         directory.setFilter(QDir::Files);
         directory.setNameFilters(QStringList() << "libost*.so");
@@ -261,7 +261,7 @@ void Controller::checkModules(void)
                 QLibrary library(path + "/" + lib);
                 if (!library.load())
                 {
-                    //pMainControl->sendMainWarning(lib + " " + library.errorString());
+                    sendMessage(lib + " " + library.errorString());
                 }
                 else
                 {
@@ -278,13 +278,13 @@ void Controller::checkModules(void)
                             mod->setObjectName(lib);
                             QVariantMap info = mod->getModuleInfo();
                             _availableModuleLibs[tt] = info;
-                            //pMainControl->sendMainMessage("found library " + path + "/" + lib) ;
+                            sendMessage("found library " + path + "/" + lib) ;
                             delete mod;
                         }
                     }
                     else
                     {
-                        //pMainControl->sendMainError("Could not initialize module from the loaded library : " + lib);
+                        sendMessage("Could not initialize module from the loaded library : " + lib);
                     }
                 }
 
@@ -366,4 +366,11 @@ void Controller::processError()
 {
     QString output = _process->readAllStandardError();
     pMainControl->sendMainError("PROCESS ERROR   : " + output);
+}
+void Controller::sendMessage(const QString &pMessage)
+{
+    QString messageWithDateTime = "[" + QDateTime::currentDateTime().toString(Qt::ISODateWithMs) + "]-" + pMessage;
+    QDebug debug = qDebug();
+    debug.noquote();
+    debug << messageWithDateTime;
 }

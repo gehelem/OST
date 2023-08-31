@@ -20,7 +20,7 @@ Maincontrol::Maincontrol(QString name, QString label, QString profile, QVariantM
     deleteOstProperty("saveprofile");
     deleteOstProperty("loadprofile");
     deleteOstProperty("moduleactions");
-    qDebug() << "getAvailableModuleLibs";
+    //qDebug() << "getAvailableModuleLibs";
     foreach(QString key, getAvailableModuleLibs().keys())
     {
         QVariantMap info = getAvailableModuleLibs()[key].toMap();

@@ -73,8 +73,8 @@ class PropertyMulti: public PropertyBase
 
         }
     private:
-        SwitchsRule mRule;
-        QMap<QString, OST::ValueBase*> mValues;
+        SwitchsRule mRule = SwitchsRule::Any;
+        QMap<QString, ValueBase*> mValues;
 
 };
 

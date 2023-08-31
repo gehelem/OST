@@ -102,12 +102,12 @@ class Basemodule : public DBManager
             setOstElementValue("moduleInfo", "moduleVersion", version, true);
 
         }
-        QVariantMap mAvailableModuleLibs;
 
         /* OST helpers */
 
     private:
 
+        QVariantMap mAvailableModuleLibs;
         QVariantMap mAvailableProfiles;
         QString mWebroot;
         QString mModuleName;

@@ -8,19 +8,20 @@ Datastore::Datastore()
 Datastore::~Datastore()
 {
 }
-QPointer<OST::PropertyMulti> Datastore::getProperty(QString pProperty)
+OST::PropertyMulti* Datastore::getProperty(QString pProperty)
 {
     if (!mStore.contains(pProperty))
     {
         sendWarning(" getProperty - property " + pProperty + " not found");
-        return nullptr;
+        //return nullptr;
     }
-    return static_cast<QPointer<OST::PropertyMulti>>(mStore[pProperty]);
+
+    return mStore[pProperty];
 }
 
-QPointer<OST::ValueString> Datastore::getText(QString pProperty, QString pElement)
+OST::ValueString* Datastore::getText(QString pProperty, QString pElement)
 {
-    QPointer<OST::PropertyMulti> p = getProperty(pProperty);
+    OST::PropertyMulti* p = getProperty(pProperty);
     if (p == nullptr)
     {
         sendWarning(" getText - property " + pProperty + " not found");
@@ -31,7 +32,7 @@ QPointer<OST::ValueString> Datastore::getText(QString pProperty, QString pElemen
         sendWarning("getText - property " + pProperty + " : element " + pElement + " not found");
         return nullptr;
     }
-    return static_cast<OST::ValueString*>(p->getValue(pElement));
+    return static_cast<OST::ValueString*>(p->getValue("pElement"));
 }
 
 bool Datastore::createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel,
@@ -430,7 +431,7 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
 
 void Datastore::saveOstPropertiesToFile(const QString &pFileName)
 {
-    QJsonObject obj = QJsonObject::fromVariantMap(mProperties);
+    QJsonObject obj = QJsonObject::fromVariantMap(getPropertiesDump().toVariantMap());
     QJsonDocument doc(obj);
 
     QFile jsonFile(pFileName);
@@ -485,34 +486,46 @@ bool Datastore::setOstElementAttribute(const QString &pPropertyName, const QStri
 QVariantMap Datastore::getProfile(void)
 {
     QVariantMap _res;
-
-    foreach(const QString &keyprop, mProperties.keys())
+    QVariantMap m = getPropertiesDump().toVariantMap();
+    foreach(const QString &keyprop, m.keys())
     {
-        if (mProperties[keyprop].toMap().contains("hasprofile"))
+        if (m[keyprop].toMap().contains("hasprofile"))
         {
-            QVariantMap property;
-            if (mProperties[keyprop].toMap().contains("value"))
+            if (m[keyprop].toMap()["hasprofile"].toBool())
             {
-                property["value"] = mProperties[keyprop].toMap()["value"];
-            }
-            if (mProperties[keyprop].toMap().contains("elements"))
-            {
-                QVariantMap element, elements;
-                foreach(const QString &keyelt, mProperties[keyprop].toMap()["elements"].toMap().keys())
+                QVariantMap property;
+                if (m[keyprop].toMap().contains("elements"))
                 {
-                    if (mProperties[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("value"))
+                    QVariantMap element, elements;
+                    foreach(const QString &keyelt, m[keyprop].toMap()["elements"].toMap().keys())
                     {
-                        element["value"] = mProperties[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
+                        if (m[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("value"))
+                        {
+                            element["value"] = m[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
+                        }
+                        if (m[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("min"))
+                        {
+                            element["min"] = m[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["min"];
+                        }
+                        if (m[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("max"))
+                        {
+                            element["max"] = m[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["max"];
+                        }
+                        if (m[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("step"))
+                        {
+                            element["step"] = m[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["step"];
+                        }
+                        if (m[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("gridvalues"))
+                        {
+                            element["gridvalues"] = m[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["gridvalues"];
+                        }
+                        elements[keyelt] = element;
                     }
-                    if (mProperties[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("gridvalues"))
-                    {
-                        element["gridvalues"] = mProperties[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["gridvalues"];
-                    }
-                    elements[keyelt] = element;
+                    property["elements"] = elements;
                 }
-                property["elements"] = elements;
+                _res[keyprop] = property;
             }
-            _res[keyprop] = property;
+
         }
     }
 
