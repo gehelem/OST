@@ -84,7 +84,17 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     p->setState(OST::State::Busy);
     static_cast<OST::ValueString*>(p->getValue("extext1"))->setValue("Value modified2");
 
-
+    dynprop = new OST::PropertyMulti("Dynamic", OST::Permission::ReadWrite, "Examples",
+                                     "Dynamically instanciated", "", true,
+                                     false);
+    dynlight = new OST::ValueLight("Dyn light", "", "");
+    dynprop->addValue("dynlight", dynlight);
+    dyntext = new OST::ValueString("Dyn text", "", "");
+    dynprop->addValue("dyntext", dyntext);
+    createProperty("dynprop", dynprop);
+    dynprop->setState(OST::State::Busy);
+    dyntext->setValue("Okydoky");
+    dynlight->setState(OST::State::Ok);
 }
 
 Dummy::~Dummy()
@@ -100,14 +110,16 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
     {
         foreach(const QString &keyprop, eventData.keys())
         {
-            if (eventData[keyprop].toMap().contains("value"))
-            {
-                QVariant val = eventData[keyprop].toMap()["value"];
-                //setOstPropertyValue(keyprop, val, true);
-            }
             foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
             {
-                setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
+                //setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
+                if (keyprop == "dynprop")
+                {
+                    if (keyelt == "dyntext")
+                    {
+                        dyntext->setValue(eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toString());
+                    }
+                }
                 if (keyprop == "devices")
                 {
                     if (keyelt == "camera")

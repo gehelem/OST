@@ -33,6 +33,9 @@ class MODULE_INIT Dummy : public IndiModule
         void updateProperty(INDI::Property property) override;
         void updateSearchList(void);
 
+        OST::PropertyMulti *dynprop;
+        OST::ValueLight *dynlight;
+        OST::ValueString *dyntext;
 
 
 };

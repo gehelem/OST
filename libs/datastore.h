@@ -80,6 +80,19 @@ class Datastore : public Baseroot
         bool createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,
                                const  QString &pPropertyDevcat, const QString &pPropertyGroup);
         void emitPropertyCreation(const QString &pPropertyName);
+        bool createProperty(const QString &pPropertyName,  OST::PropertyMulti* pProperty)
+        {
+            if (mStore.contains(pPropertyName))
+            {
+                return false;
+            }
+            mStore[pPropertyName] = pProperty;
+            OST::PropertyJsonDumper d;
+            mStore[pPropertyName]->accept(&d);
+            OnModuleEvent("cp", QString(), pPropertyName, d.getResult().toVariantMap());
+            return true;
+        }
+
         //QVariant getOstPropertyValue(const QString &pPropertyName);
 
         bool createOstElement(const QString &pPropertyName, const QString &pElementName, const QString &pElementLabel,

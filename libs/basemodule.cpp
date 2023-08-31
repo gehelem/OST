@@ -51,25 +51,24 @@ void Basemodule::setProfile(const QString &pProfileName)
 
 void Basemodule::setProfile(QVariantMap profiledata)
 {
-    QVariantMap _props = getProperties();
+    //QVariantMap _props = getProperties();
     foreach(const QString &key, profiledata.keys())
     {
-        if (_props.contains(key))
+        if (getStore().contains(key))
         {
             QVariantMap data = profiledata[key].toMap();
-            if (_props[key].toMap().contains("hasprofile"))
+            if (getStore()[key]->hasProfile())
             {
                 //setOstPropertyValue(key, data["value"], true);
-                if (_props[key].toMap().contains("elements")
-                        && data.contains("elements"))
+                if (data.contains("elements"))
                 {
                     foreach(const QString &eltkey, profiledata[key].toMap()["elements"].toMap().keys())
                     {
                         setOstElementValue(key, eltkey, profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["value"], true);
-                        if (_props[key].toMap().contains("grid"))
-                        {
-                            setOstElementGrid (key, eltkey, profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["gridvalues"].toList(), true);
-                        }
+                        //if (_props[key].toMap().contains("grid"))
+                        //{
+                        //    setOstElementGrid (key, eltkey, profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["gridvalues"].toList(), true);
+                        //}
                     }
                 }
             }
@@ -106,14 +105,14 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
     {
         foreach(const QString &keyprop, pEventData.keys())
         {
-            if (!getProperties().contains(keyprop) )
+            if (!getStore().contains(keyprop) )
             {
                 sendWarning(" Fsetproperty - property " + keyprop + " not found");
                 return;
             }
             foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
             {
-                if (!getProperties()[keyprop].toMap()["elements"].toMap().contains(keyelt) )
+                if (!getStore()[keyprop]->getValues().contains(keyelt) )
                 {
                     sendWarning(" Fsetproperty - property " + keyprop + " - element " + keyelt +  " not found");
                     return;
@@ -129,14 +128,14 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
         {
             if (keyprop == "loadprofile")
             {
-                if (pEventData[keyprop].toMap().contains("value"))
-                {
-                    QVariant val = pEventData[keyprop].toMap()["value"];
-                    setOstElementValue(keyprop, "value", val, true);
-                    setOstElementValue("saveprofile", "value", val, true);
-                }
                 if (pEventData[keyprop].toMap().contains("elements"))
                 {
+                    if (pEventData[keyprop].toMap().contains("value"))
+                    {
+                        QVariant val = pEventData[keyprop].toMap()["elements"].toMap()["value"].toMap()["value"];
+                        setOstElementValue(keyprop, "value", val, true);
+                        setOstElementValue("saveprofile", "value", val, true);
+                    }
                     foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
                     {
                         QVariant val = pEventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
