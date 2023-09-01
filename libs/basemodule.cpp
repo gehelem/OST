@@ -234,16 +234,7 @@ void Basemodule::killMe()
 }
 QVariantMap Basemodule::getModuleInfo(void)
 {
-    QVariantMap temp;
-    foreach (QString key, getProperties().keys())
-    {
-        //if (mOstProperties[key].toMap()["devcat"].toString() == "Info")
-        if (key == "moduleDescription")
-        {
-            temp[key] = getProperties()[key];
-        }
-    }
-    return temp;
+    return getPropertiesDump()["moduleInfo"].toVariant().toMap();
 }
 
 void Basemodule::sendDump(void)

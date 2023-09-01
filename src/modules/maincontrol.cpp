@@ -20,20 +20,6 @@ Maincontrol::Maincontrol(QString name, QString label, QString profile, QVariantM
     deleteOstProperty("saveprofile");
     deleteOstProperty("loadprofile");
     deleteOstProperty("moduleactions");
-    //qDebug() << "getAvailableModuleLibs";
-    foreach(QString key, getAvailableModuleLibs().keys())
-    {
-        QVariantMap info = getAvailableModuleLibs()[key].toMap();
-        createOstProperty( "load" + key, info["moduleDescription"].toMap()["value"].toString(), 2, "Available modules", "");
-        getStore()["load" + key]->setRule(OST::SwitchsRule::AtMostOne);
-        createOstElement(  "load" + key, "name", "Name", false);
-        createOstElementText(  "load" + key, "name", "Name", false);
-        setOstElementValue("load" + key, "name", "My " + key, false);
-        createOstElement(  "load" + key, "load", "Load", false);
-        createOstElementBool(  "load" + key, "load", "Load", false);
-        setOstElementValue("load" + key, "load", false, false);
-
-    }
 }
 
 Maincontrol::~Maincontrol()
@@ -71,8 +57,8 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                     if (setOstElementValue(keyprop, keyelt, false, true))
                     {
                         QString pp = keyprop;
-                        QString elt = getOstElementValue(keyprop, "name").toString();
-                        QString eltwithoutblanks = getOstElementValue(keyprop, "value").toString();
+                        QString elt = getString(keyprop, "name");
+                        QString eltwithoutblanks = getString(keyprop, "name");
                         eltwithoutblanks.replace(" ", "");
                         QString prof = "default";
                         pp.replace("loadlibost", "");
@@ -91,8 +77,7 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                 }
                 if (keyelt == "load" && keyprop == "loadconf")
                 {
-                    emit mainCtlEvent("loadconf", QString(), getOstElementValue("loadconf", "value").toString(),
-                                      QVariantMap());
+                    emit mainCtlEvent("loadconf", QString(), getText("loadconf", "value")->value(), QVariantMap());
                 }
                 if (keyelt == "refresh" && keyprop == "loadconf")
                 {
@@ -101,8 +86,8 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                 }
                 if (keyelt == "save" && keyprop == "saveconf")
                 {
-                    emit mainCtlEvent("saveconf", QString(), getOstElementValue("saveconf", "value").toString(),
-                                      QVariantMap());
+
+                    emit mainCtlEvent("saveconf", QString(), getText("saveconf", "value")->value(), QVariantMap());
                 }
                 if (keyelt == "kill" && keyprop == "killall")
                 {
@@ -150,12 +135,17 @@ void Maincontrol::setAvailableModuleLibs(const QVariantMap libs)
 {
     foreach(QString key, libs.keys())
     {
-        QVariantMap info = libs[key].toMap();
-        createOstProperty( "load" + key, info["moduleDescription"].toMap()["value"].toString(), 2, "Modules", "");
-        createOstElement(  "load" + key, "name", "Name", false);
-        setOstElementValue("load" + key, "name", "My " + key, false);
-        createOstElement(  "load" + key, "load", "Load", false);
-        setOstElementValue("load" + key, "load", false, false);
+        QVariantMap info = libs[key].toMap()["elements"].toMap();
+        QString lab = info["moduleDescription"].toMap()["value"].toString();
+        OST::PropertyMulti *dynprop = new OST::PropertyMulti(lab, OST::Permission::ReadWrite, "Available modules",
+                "", "", false, false);
+        OST::ValueBool* dynbool = new OST::ValueBool("Load", "", "");
+        OST::ValueString* dyntext = new OST::ValueString("Name", "", "");
+        dynbool->setValue(false);
+        dyntext->setValue("My " + key);
+        dynprop->addValue("name", dyntext);
+        dynprop->addValue("load", dynbool);
+        createProperty("load" + key, dynprop);
 
     }
 }

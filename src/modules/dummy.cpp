@@ -95,6 +95,10 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     dynprop->setState(OST::State::Busy);
     dyntext->setValue("Okydoky");
     dynlight->setState(OST::State::Ok);
+
+    dynbool = new OST::ValueBool("Dyn bool", "", "");
+    dynprop->addValue("dynbool", dynbool);
+
 }
 
 Dummy::~Dummy()
@@ -118,6 +122,10 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                     if (keyelt == "dyntext")
                     {
                         dyntext->setValue(eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toString());
+                    }
+                    if (keyelt == "dynbool")
+                    {
+                        dyntext->setValue("Changed from dynamic switch");
                     }
                 }
                 if (keyprop == "devices")

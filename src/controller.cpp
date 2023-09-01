@@ -31,7 +31,7 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath());
 
     checkModules();
-    pMainControl = new Maincontrol(QString("mainctl"), QString("Main control"), QString(), _availableModuleLibs);
+    pMainControl = new Maincontrol(QString("mainctl"), QString("Main control"), QString(), QVariantMap());
     connect(pMainControl, &Maincontrol::moduleEvent, this, &Controller::OnModuleEvent);
     connect(pMainControl, &Maincontrol::moduleEvent, wshandler, &WShandler::processModuleEvent);
     connect(pMainControl, &Maincontrol::loadOtherModule, this, &Controller::loadModule);
@@ -43,7 +43,7 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     pMainControl->dbInit(_dbpath, "mainctl");
     pMainControl->OnExternalEvent("refreshConfigurations", "mainctl", QString(), QVariantMap());
     pMainControl->setAvailableModuleLibs(_availableModuleLibs);
-    qDebug() << _availableModuleLibs;
+    //qDebug() << _availableModuleLibs;
     pMainControl->sendDump();
 
     //loadModule("maincontrol", "mainctl", "Maincontrol", "default");
