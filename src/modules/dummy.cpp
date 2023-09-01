@@ -83,6 +83,7 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     OST::PropertyMulti *p = getProperty("extextRW");
     p->setState(OST::State::Busy);
     static_cast<OST::ValueString*>(p->getValue("extext1"))->setValue("Value modified2");
+    static_cast<OST::ValueString*>(p->getValue("extext4"))->lov.add("i3", "another label");
 
     dynprop = new OST::PropertyMulti("Dynamic", OST::Permission::ReadWrite, "Examples",
                                      "Dynamically instanciated", "", true,
@@ -98,6 +99,7 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
 
     dynbool = new OST::ValueBool("Dyn bool", "", "");
     dynprop->addValue("dynbool", dynbool);
+
 
 }
 

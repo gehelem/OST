@@ -16,6 +16,38 @@ typedef enum
     Error     /*!< State is error */
 } State;
 
+template <typename U>
+class ListOfValues
+{
+    public:
+        QMap<U, QString> getList()
+        {
+            return list;
+        }
+        bool add(U val, QString label)
+        {
+            if (list.contains(val))
+            {
+                qDebug() << "ListOfValues - add - key " << val << " already exists (" << list[val] << ").";
+                return false;
+            }
+            list[val] = label;
+            return true;
+        }
+        bool del(U val)
+        {
+            if (!list.contains(val))
+            {
+                qDebug() << "ListOfValues - del - key " << val << " does not exist.";
+                return false;
+            }
+            list.remove(val);
+            return true;
+        }
+    private:
+        QMap<U, QString> list;
+};
+
 class ValueBase: public QObject
 {
 

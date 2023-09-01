@@ -28,6 +28,7 @@ class ValueString: public ValueBase
             return mValue;
         }
         void setValue(const QString &value);
+        ListOfValues<QString> lov;
 
     private:
         QString mValue;

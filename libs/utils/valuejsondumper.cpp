@@ -52,6 +52,15 @@ void ValueJsonDumper::visit(ValueString *pValue)
     QJsonObject json = dumpValueCommons(pValue);
     json["type"] = "string";
     json["value"] = pValue->value();
+    if (pValue->lov.getList().size() > 0)
+    {
+        QJsonObject lines = QJsonObject();
+        foreach(const QString &key, pValue->lov.getList().keys())
+        {
+            lines[key] = pValue->lov.getList()[key];
+        }
+        json["listOfValues"] = lines;
+    }
     mResult = json;
 }
 void ValueJsonDumper::visit(ValueLight *pValue)

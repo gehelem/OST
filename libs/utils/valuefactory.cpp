@@ -23,6 +23,16 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                                            pData["hint"].toString()
                                           );
             pValue->setValue(pData["value"].toString());
+            if (pData.contains("listOfValues"))
+            {
+                QVariantMap elts = pData["listOfValues"].toMap();
+                foreach(const QString &key, elts.keys())
+                {
+                    pValue->lov.add(key, elts[key].toString());
+
+                }
+
+            }
             return pValue;
         }
         if (pData["type"].toString() == "int")

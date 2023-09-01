@@ -31,18 +31,22 @@
         "devcat": "Examples",
         "elements": {
             "extext1": {
+                "type":"string",
                 "label": "Text 1",
                 "value":"aaaa"
             },
             "extext2": {
+                "type":"string",
                 "label": "Text 2",
                 "value":"bbbb"
             },
             "extext3": {
+                "type":"string",
                 "label": "Text 3",
                 "value":"cccc"
             },
             "extext4": {
+                "type":"string",
                 "label": "Text 4",
                 "value":"i1",
                 "listOfValues":{
