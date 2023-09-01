@@ -32,11 +32,16 @@ class PropertyBase: public QObject
         virtual void accept(PropertyVisitor* pVisitor) = 0;
         virtual void accept(PropertyVisitor* pVisitor, QVariantMap &data) = 0;
 
-        PropertyBase(const QString &label, const Permission &permission, const QString &level1, const QString &level2,
+        PropertyBase(const QString &key, const QString &label, const Permission &permission, const QString &level1,
+                     const QString &level2,
                      const QString &order, const bool &hasProfile, const bool &hasArray
                     );
         ~PropertyBase();
 
+        QString key()
+        {
+            return mKey;
+        }
         QString label()
         {
             return mLabel;
@@ -91,6 +96,7 @@ class PropertyBase: public QObject
 
 
     private:
+        QString mKey = "";
         QString mLabel = "change me";
         Permission mPermission = Permission::ReadOnly;
         QString mLevel1 = "";

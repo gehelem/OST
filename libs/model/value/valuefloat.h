@@ -49,6 +49,8 @@ class ValueFloat: public ValueBase
         }
         void setFormat(const QString &format);
 
+        ListOfValues<double> lov;
+
     private:
         double mValue = 0;
         double mMin = 0;

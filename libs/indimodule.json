@@ -7,21 +7,23 @@
         "label": "Indi module git",
         "elements": {
             "hash": {
+                "type": "string",
                 "label": "Hash",
                 "value":"xxx"
             },
             "date": {
+                "type": "string",
                 "label": "Date",
                 "value":"xxx"
             },
             "message": {
+                "type": "string",
                 "label": "Commit message",
                 "value":"xxx"
             }
         }
     },
     "server": {
-        "type": "multi",
         "hasprofile":true,
         "devcat": "Module",
         "group": "Indi",
@@ -30,10 +32,12 @@
         "label": "Server",
         "elements": {
             "host": {
+                "type": "string",
                 "label": "Host",
                 "value": "localhost"
             },
             "port": {
+                "type": "int",
                 "label": "Port",
                 "value": 7624
             }
@@ -41,7 +45,6 @@
         }
     },
     "serveractions": {
-        "type": "multi",
         "devcat": "Module",
         "group": "Indi",
         "order":"01",
@@ -50,17 +53,18 @@
         "label": "Server",
         "elements": {
             "conserv": {
+                "type": "bool",
                 "label": "Connect"
                 ,"value":false
             },
             "disconserv": {
+                "type": "bool",
                 "label": "Disconnect"
                 ,"value":false
             }
         }
     },
     "devices": {
-        "type": "multi",
         "hasprofile":true,
         "devcat": "Module",
         "group": "Indi",
@@ -71,7 +75,6 @@
         }
     },
     "devicesactions": {
-        "type": "multi",
         "devcat": "Module",
         "group": "Indi",
         "order":"04",
@@ -80,14 +83,17 @@
         "label": "Devices actions" ,
         "elements": {
             "condevs": {
+                "type": "bool",
                 "label": "Connect"
                 ,"value":false
             },
             "discondevs": {
+                "type": "bool",
                 "label": "Disconnect"
                 ,"value":false
             },
             "loadconfs": {
+                "type": "bool",
                 "label": "Load devices conf"
                 ,"value":false
             }
@@ -105,14 +111,17 @@
         "label": "Actions on module startup",
         "elements": {
             "indiatstart": {
+                "type": "bool",
                 "label": "Connect indi"
                 ,"value":false
             },
             "devatstart": {
+                "type": "bool",
                 "label": "Connect devices"
                 ,"value":false
             },
             "confsatstart": {
+                "type": "bool",
                 "label": "Load devices conf"
                 ,"value":false
             }

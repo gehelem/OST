@@ -44,6 +44,12 @@ class ListOfValues
             list.remove(val);
             return true;
         }
+        bool clear()
+        {
+            list.clear();
+            return true;
+        }
+
     private:
         QMap<U, QString> list;
 };
@@ -77,12 +83,23 @@ class ValueBase: public QObject
             return mState;
         }
         void setState(const State &state);
-
+        bool autoUpdate()
+        {
+            return mAutoUpdate;
+        }
+        void setAutoUpdate(const bool &v)
+        {
+            mAutoUpdate = v;
+        }
     private:
         QString mLabel = "change me";
         QString mOrder = "change me";
         QString mHint = "";
         State mState = State::Idle;
+        bool mAutoUpdate = false;
+    signals:
+        void valueChanged(OST::ValueBase*);
+
 
 };
 

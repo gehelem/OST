@@ -12,6 +12,7 @@ QJsonObject ValueJsonDumper::dumpValueCommons(ValueBase *pValue)
     json["hint"] = pValue->hint();
     json["state"] = pValue->state();
     json["type"] = "undefined";
+    json["autoupdate"] = pValue->autoUpdate();
 
     return json;
 
@@ -32,6 +33,15 @@ void ValueJsonDumper::visit(ValueInt *pValue)
     json["max"] = qlonglong(pValue->max());
     json["step"] = qlonglong(pValue->step());
     json["format"] = pValue->format();
+    if (pValue->lov.getList().size() > 0)
+    {
+        QJsonObject lines = QJsonObject();
+        foreach(const long &key, pValue->lov.getList().keys())
+        {
+            lines[QString::number(key)] = pValue->lov.getList()[key];
+        }
+        json["listOfValues"] = lines;
+    }
 
     mResult = json;
 }
@@ -44,6 +54,15 @@ void ValueJsonDumper::visit(ValueFloat *pValue)
     json["max"] = pValue->max();
     json["step"] = pValue->step();
     json["format"] = pValue->format();
+    if (pValue->lov.getList().size() > 0)
+    {
+        QJsonObject lines = QJsonObject();
+        foreach(const float &key, pValue->lov.getList().keys())
+        {
+            lines[QString::number(key)] = pValue->lov.getList()[key];
+        }
+        json["listOfValues"] = lines;
+    }
 
     mResult = json;
 }

@@ -82,10 +82,10 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     //qDebug() << d.getResult();
     OST::PropertyMulti *p = getProperty("extextRW");
     p->setState(OST::State::Busy);
-    static_cast<OST::ValueString*>(p->getValue("extext1"))->setValue("Value modified2");
+    static_cast<OST::ValueString*>(p->getValue("extext1"))->setValue("Value modified2", false);
     static_cast<OST::ValueString*>(p->getValue("extext4"))->lov.add("i3", "another label");
 
-    dynprop = new OST::PropertyMulti("Dynamic", OST::Permission::ReadWrite, "Examples",
+    dynprop = new OST::PropertyMulti("dynprop", "Dynamic", OST::Permission::ReadWrite, "Examples",
                                      "Dynamically instanciated", "", true,
                                      false);
     dynlight = new OST::ValueLight("Dyn light", "", "");
@@ -94,7 +94,7 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     dynprop->addValue("dyntext", dyntext);
     createProperty("dynprop", dynprop);
     dynprop->setState(OST::State::Busy);
-    dyntext->setValue("Okydoky");
+    dyntext->setValue("Okydoky", false);
     dynlight->setState(OST::State::Ok);
 
     dynbool = new OST::ValueBool("Dyn bool", "", "");
@@ -123,11 +123,18 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                 {
                     if (keyelt == "dyntext")
                     {
-                        dyntext->setValue(eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toString());
+
+                        dyntext->setValue(eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toString(), true);
                     }
                     if (keyelt == "dynbool")
                     {
-                        dyntext->setValue("Changed from dynamic switch");
+                        bool val = eventData["dynprop"].toMap()["elements"].toMap()["dynbool"].toMap()["value"].toBool();
+                        if (val)
+                        {
+
+                            dyntext->setValue("Changed from dynamic switch", true);
+                        }
+
                     }
                 }
                 if (keyprop == "devices")

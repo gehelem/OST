@@ -7,14 +7,17 @@
         "label": "Base module git",
         "elements": {
             "hash": {
+                "type": "string",
                 "label": "Hash",
                 "value":"xxx"
             },
             "date": {
+                "type": "string",
                 "label": "Date",
                 "value":"xxx"
             },
             "message": {
+                "type": "string",
                 "label": "Commit message",
                 "value":"xxx"
             }
@@ -28,22 +31,27 @@
         "label": "Module info",
         "elements": {
             "moduleDescription": {
+                "type": "string",
                 "label": "Module description",
                 "value":"N/A"
             },
             "moduleLabel": {
+                "type": "string",
                 "label": "Module label",
                 "value":"Base module label"
             },
             "moduleName": {
+                "type": "string",
                 "label": "Module name",
                 "value":"basemodule"
             },
             "moduleVersion": {
+                "type": "int",
                 "label": "Version",
                 "value":1
             },
             "baseVersion": {
+                "type": "int",
                 "label": "baseVersion",
                 "value":1
             }
@@ -68,14 +76,17 @@
         "label": "Load profile",
         "elements": {
             "load": {
+                "type": "bool",
                 "label": "Load",
                 "value":false
             },
             "refresh": {
+                "type": "bool",
                 "label": "Refresh",
                 "value":false
             },
             "value": {
+                "type": "string",
                 "label": "Name",
                 "value":"default"
             }
@@ -91,10 +102,12 @@
         "label": "Save profile",
         "elements": {
             "save": {
+                "type": "bool",
                 "label": "Save as",
                 "value":false
             },
             "value": {
+                "type": "string",
                 "label": "Name",
                 "value":"default"
             }
@@ -110,6 +123,7 @@
         "rule":2,
         "elements": {
             "kill": {
+                "type": "bool",
                 "label": "Kill module",
                 "value":false
             }

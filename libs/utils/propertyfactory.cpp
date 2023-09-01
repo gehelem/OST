@@ -2,18 +2,18 @@
 namespace  OST
 {
 
-PropertyMulti *PropertyFactory::createProperty(const QVariantMap &pData)
+PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVariantMap &pData)
 {
     //qDebug() << "PropertyFactory::createProperty - " << pData;
-    auto *pProperty = new PropertyMulti(
-        pData["label"].toString(),
-        OST::IntToPermission(pData["permission"].toInt()),
-        pData["devcat"].toString(),
-        pData["group"].toString(),
-        pData["order"].toString(),
-        pData["hasprofile"].toBool(),
-        pData.contains("grid")
-    );
+    auto *pProperty = new PropertyMulti(pKey,
+                                        pData["label"].toString(),
+                                        OST::IntToPermission(pData["permission"].toInt()),
+                                        pData["devcat"].toString(),
+                                        pData["group"].toString(),
+                                        pData["order"].toString(),
+                                        pData["hasprofile"].toBool(),
+                                        pData.contains("grid")
+                                       );
 
     if (!pData.contains("elements"))
     {

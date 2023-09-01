@@ -120,6 +120,22 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
             }
         }
     }
+    /* autoupdate if wanted */
+
+    if ( (pEventType == "Fsetproperty") && (pEventModule == getModuleName()) )
+    {
+        foreach(const QString &keyprop, pEventData.keys())
+        {
+            foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
+            {
+                if (getStore()[keyprop]->getValues()[keyelt]->autoUpdate() )
+                {
+                    setOstElementValue(keyprop, keyelt, pEventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
+                    //sendMessage("Autoupdate - property " + keyprop + " - element " + keyelt);
+                }
+            }
+        }
+    }
 
 
     if ((getModuleName() == pEventModule ) && (pEventType == "Fsetproperty") )

@@ -85,12 +85,14 @@ class Datastore : public Baseroot
         {
             if (mStore.contains(pPropertyName))
             {
+                sendWarning("createProperty - property " + pPropertyName + " already exists.");
                 return false;
             }
             mStore[pPropertyName] = pProperty;
             OST::PropertyJsonDumper d;
             mStore[pPropertyName]->accept(&d);
             OnModuleEvent("cp", QString(), pPropertyName, d.getResult().toVariantMap());
+            connect(mStore[pPropertyName], &OST::PropertyMulti::valueChanged, this, &Datastore::onValueChanged);
             return true;
         }
 

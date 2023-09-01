@@ -52,6 +52,12 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
             }
             foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
             {
+                if (keyelt == "name" && keyprop == "loadconf")
+                {
+                    QString val = pEventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toString();
+                    getText("loadconf", "name")->setValue(val, true);
+                    getText("saveconf", "name")->setValue(val, true);
+                }
                 if (keyelt == "load" && keyprop != "loadconf")
                 {
                     if (setOstElementValue(keyprop, keyelt, false, true))
@@ -77,7 +83,8 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                 }
                 if (keyelt == "load" && keyprop == "loadconf")
                 {
-                    emit mainCtlEvent("loadconf", QString(), getText("loadconf", "value")->value(), QVariantMap());
+                    bool val = pEventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toBool();
+                    if (val) emit mainCtlEvent("loadconf", QString(), getText("loadconf", "name")->value(), QVariantMap());
                 }
                 if (keyelt == "refresh" && keyprop == "loadconf")
                 {
@@ -106,11 +113,10 @@ void Maincontrol::setConfigurations(void)
         return;
     }
 
-    clearOstLov("loadconf");
+    getText("loadconf", "name")->lov.clear();
     for(QVariantMap::const_iterator iter = confs.begin(); iter != confs.end(); ++iter)
     {
-        //qDebug() << iter.key() << iter.value();
-        addOstLov("loadconf", iter.key(), iter.key() );
+        getText("loadconf", "name")->lov.add(iter.key(), iter.key());
     }
     sendMessage("Available configurations refreshed");
 }
@@ -137,12 +143,12 @@ void Maincontrol::setAvailableModuleLibs(const QVariantMap libs)
     {
         QVariantMap info = libs[key].toMap()["elements"].toMap();
         QString lab = info["moduleDescription"].toMap()["value"].toString();
-        OST::PropertyMulti *dynprop = new OST::PropertyMulti(lab, OST::Permission::ReadWrite, "Available modules",
+        OST::PropertyMulti *dynprop = new OST::PropertyMulti("load" + key, lab, OST::Permission::ReadWrite, "Available modules",
                 "", "", false, false);
         OST::ValueBool* dynbool = new OST::ValueBool("Load", "", "");
         OST::ValueString* dyntext = new OST::ValueString("Name", "", "");
         dynbool->setValue(false);
-        dyntext->setValue("My " + key);
+        dyntext->setValue("My " + key, false);
         dynprop->addValue("name", dyntext);
         dynprop->addValue("load", dynbool);
         createProperty("load" + key, dynprop);

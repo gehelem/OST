@@ -27,7 +27,7 @@ class ValueString: public ValueBase
         {
             return mValue;
         }
-        void setValue(const QString &value);
+        void setValue(const QString &value, const bool &emitEvent);
         ListOfValues<QString> lov;
 
     private:

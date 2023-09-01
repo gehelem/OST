@@ -48,6 +48,7 @@ class ValueInt: public ValueBase
             return mFormat;
         }
         void setFormat(const QString &format);
+        ListOfValues<long> lov;
 
     private:
         long mValue = 0;

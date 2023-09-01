@@ -8,9 +8,10 @@ ValueString::ValueString(const QString &label, const QString &order, const QStri
 ValueString::~ValueString()
 {
 }
-void ValueString::setValue(const QString &value)
+void ValueString::setValue(const QString &value, const bool &emitEvent)
 {
     mValue = value;
+    if (emitEvent) emit valueChanged(this);
 }
 
 }

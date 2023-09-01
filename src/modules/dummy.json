@@ -1,6 +1,5 @@
 {
     "extextRO": {
-        "type": "multi",
         "devcat": "Examples",
         "elements": {
             "extext1": {
@@ -26,26 +25,29 @@
         "order":"00"
     },
     "extextRW": {
-        "type": "multi",
         "hasprofile":true,
         "devcat": "Examples",
         "elements": {
             "extext1": {
+                "autoupdate":true,
                 "type":"string",
                 "label": "Text 1",
                 "value":"aaaa"
             },
             "extext2": {
+                "autoupdate":true,
                 "type":"string",
                 "label": "Text 2",
                 "value":"bbbb"
             },
             "extext3": {
+                "autoupdate":true,
                 "type":"string",
                 "label": "Text 3",
                 "value":"cccc"
             },
             "extext4": {
+                "autoupdate":true,
                 "type":"string",
                 "label": "Text 4",
                 "value":"i1",
@@ -62,11 +64,11 @@
 
     },
     "numbersRW": {
-        "type": "multi",
         "hasprofile":true,
         "devcat": "Examples",
         "elements": {
             "n1": {
+                "autoupdate":true,
                 "type":"int",
                 "label": "Number 1",
                 "min": 0,
@@ -74,6 +76,7 @@
                 "step": 1
             },
             "n2": {
+                "autoupdate":true,
                 "type":"int",
                 "label": "Number 2",
                 "min": -100,
@@ -81,12 +84,25 @@
                 "step": 10
             },
             "n3": {
-                "type":"int",
-                "label": "Number 3"
+                "autoupdate":true,
+                "type":"float",
+                "label": "Number 3",
+                "listOfValues":{
+                    "0.0":"Zéro virgule zéro",
+                    "0.1":"Zéro virgule un",
+                    "0.2":"Zéro virgule deux"
+                }
             },
             "n4": {
+                "autoupdate":true,
                 "type":"int",
-                "label": "Number 4"
+                "label": "Number 4",
+                "listOfValues":{
+                    "0":"Zéro",
+                    "1":"Un",
+                    "2":"Deux"
+                }
+
             }
         },
         "group": "Numbers",
@@ -94,7 +110,6 @@
         "label": "Numbers example - read/write"
     },
     "boolsRW0": {
-        "type": "multi",
         "hasprofile":true,
         "devcat": "Examples",
         "rule":0,
@@ -121,7 +136,6 @@
         "label": "One of many"
     },
     "boolsRW1": {
-        "type": "multi",
         "hasprofile":true,
         "devcat": "Examples",
         "rule":1,
@@ -148,7 +162,6 @@
         "label": "At most one"
     },
     "boolsRW2": {
-        "type": "multi",
         "hasprofile":true,
         "devcat": "Examples",
         "rule":2,
@@ -178,7 +191,6 @@
 
     ,
     "mixedRW": {
-        "type": "multi",
         "hasprofile":true,
         "devcat": "Examples",
         "rule":0,
@@ -219,7 +231,6 @@
         "label": "Mixed types - read/write"
     },
     "devices": {
-        "type": "multi",
         "hasprofile":true,
         "devcat": "Examples",
         "group": "Images",
@@ -227,10 +238,12 @@
         "label": "Devices",
         "elements": {
             "camera": {
+                "type": "string",
                 "label": "Camera",
                 "value": "CCD Simulator"
             },
             "mount": {
+                "type": "string",
                 "label": "Mount",
                 "value": "Telescope Simulator"
             }
@@ -238,23 +251,26 @@
         }
     },
     "actions": {
-        "type": "multi",
         "devcat": "Examples",
         "rule":0,
         "elements": {
             "shoot": {
+                "type": "bool",
                 "label": "Shoot",
                 "value":false
             },
             "solve": {
+                "type": "bool",
                 "label": "Solve field",
                 "value":false
             },
             "blob": {
+                "type": "bool",
                 "label": "Set blob mode",
                 "value":false
             },
             "extract": {
+                "type": "bool",
                 "label": "Stars extraction",
                 "value":false
             }
@@ -270,59 +286,73 @@
         "rule":0,
         "elements": {
                 "width": {
+                    "type": "int",
                     "label": "Width",
                     "value":0
                 },
                 "height": {
+                    "type": "int",
                     "label": "Height",
                     "value":0
                 },
                 "min": {
+                    "type": "int",
                     "label": "Min ADU",
                     "value":0
                 },
                 "max": {
+                    "type": "int",
                     "label": "Max ADU",
                     "value":0
                 },
                 "mean": {
+                    "type": "float",
                     "label": "Mean ADU",
                     "value":0
                 },
                 "median": {
+                    "type": "int",
                     "label": "Median ADU",
                     "value":0
                 },
                 "stddev": {
+                    "type": "float",
                     "label": "StdDev",
                     "value":0
                 },
                 "snr": {
+                    "type": "float",
                     "label": "SNR",
                     "step": 0.0001,
                     "value":0
                 },
                 "starscount": {
+                    "type": "int",
                     "label": "Stars found",
                     "value":0
                 },
                 "hfravg": {
+                    "type": "float",
                     "label": "Average HFR",
                     "value":0
                 },
                 "solRA": {
+                    "type": "float",
                     "label": "Solver RA",
                     "value":0
                 },
                 "solDEC": {
+                    "type": "float",
                     "label": "Solver DEC",
                     "value":0
                 },
                 "mountRA": {
+                    "type": "float",
                     "label": "Mount RA",
                     "value":0
                 },
                 "mountDEC": {
+                    "type": "float",
                     "label": "Mount DEC",
                     "value":0
                 }
@@ -332,13 +362,13 @@
         "label": "Results"
     },
     "parameters": {
-        "type": "multi",
         "devcat": "Examples",
         "group": "Images",
         "permission": 2,
         "label": "Parameters",
         "elements": {
             "exposure": {
+                "type": "float",
                 "label": "Exposure",
                 "value":10,
                 "step":0.001,
@@ -347,6 +377,7 @@
                 "format": "99.99"
             },
             "indexfolderpath": {
+                "type": "string",
                 "label": "Astrometry index folder path",
                 "value":"/usr/share/astrometry/"
             }
@@ -374,7 +405,6 @@
         }
     },
     "testgrid": {
-        "type": "multi",
         "devcat": "Examples",
         "group": "Grids",
         "permission": 2,
@@ -387,18 +417,21 @@
         "label": "Grid example",
         "elements": {
             "X": {
+                "type": "int",
                 "label": "Abscisse",
                 "value":0,
                 "gridvalues":[0,1,2,3,4],
                 "order":"B"
             },
             "Y": {
+                "type": "int",
                 "label": "Ordonnée",
                 "value":0,
                 "gridvalues":[0,1,4,9,16],
                 "order":"C"
             },
             "Z": {
+                "type": "string",
                 "label": "Info",
                 "value":"Zéro",
                 "gridvalues":["P0","P1","P2","P3","P4"],
@@ -412,7 +445,6 @@
         }
     },
     "secondtestgrid": {
-        "type": "multi",
         "devcat": "Examples",
         "group": "AAAGrids",
         "permission": 2,
@@ -421,18 +453,21 @@
         "label": "Grid example 2",
         "elements": {
             "X": {
+                "type": "int",
                 "label": "Abscisse",
                 "value":0,
                 "gridvalues":[],
                 "order":"B"
             },
             "Y": {
+                "type": "int",
                 "label": "Ordonnée",
                 "value":0,
                 "gridvalues":[],
                 "order":"C"
             },
             "Z": {
+                "type": "string",
                 "label": "Info",
                 "value":"Zéro",
                 "gridvalues":[],
@@ -461,10 +496,12 @@
         "label": "",
         "elements": {
             "searchbtn": {
+                "type": "bool",
                 "label": "Search object",
                 "value":false
             },
             "search": {
+                "type": "string",
                 "label": "Search object",
                 "value":"M13"
             }
@@ -482,46 +519,55 @@
         "label": "Results",
         "elements": {
             "catalog": {
+                "type": "string",
                 "label": "Catalogue",
                 "order":"10",
                 "value":""
             },
             "code": {
+                "type": "string",
                 "label": "Code",
                 "order":"20",
                 "value":""
             },
             "RA": {
+                "type": "float",
                 "label": "RA",
                 "order":"30",
                 "value":0
             },
             "NS": {
+                "type": "string",
                 "label": "N/S",
                 "order":"50",
                 "value":""
             },
             "DEC": {
+                "type": "float",
                 "label": "DEC",
                 "order":"40",
                 "value":0
             },
             "diam": {
+                "type": "float",
                 "label": "Diameter",
                 "order":"60",
                 "value":0
             },
             "mag": {
+                "type": "float",
                 "label": "Magnitude",
                 "order":"70",
                 "value":0
             },
             "name": {
+                "type": "string",
                 "label": "Name",
                 "order":"80",
                 "value":""
             },
             "alias": {
+                "type": "string",
                 "label": "Alias",
                 "order":"90",
                 "value":""
@@ -529,7 +575,6 @@
         }
     },
     "selection": {
-        "type": "multi",
         "devcat": "Examples",
         "order": "Catalog15",
         "group": "Catalog",
@@ -538,21 +583,25 @@
         "label": "Selection",
         "elements": {
             "code": {
+                "type": "string",
                 "label": "Code",
                 "order":"10",
                 "value":""
             },
             "RA": {
+                "type": "float",
                 "label": "RA",
                 "order":"20",
                 "value":0
             },
             "NS": {
+                "type": "string",
                 "label": "N/S",
                 "order":"40",
                 "value":""
             },
             "DEC": {
+                "type": "float",
                 "label": "DEC",
                 "order":"30",
                 "value":0

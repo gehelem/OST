@@ -35,7 +35,7 @@ void IndiModule::OnDispatchToIndiExternalEvent(const QString &eventType, const Q
     {
         foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
         {
-            setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
+            //setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
             if (keyprop == "serveractions")
             {
                 setOstElementValue(keyprop, keyelt, false, false);

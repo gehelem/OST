@@ -1,35 +1,44 @@
 {
     "loadconf": {
-        "type": "multi",
         "devcat": "Module",
         "group": "Configurations",
         "permission": 2,
-        "value": "default",
-        "listOfValues":{
-        },
         "rule":1,
         "label": "Load configuration",
         "elements": {
+            "name": {
+                "type": "string",
+                "label": "Name",
+                "value":"default",
+                "listOfValues":{
+                }
+            },
             "load": {
+                "type": "bool",
                 "label": "Load",
                 "value":false
             },
             "refresh": {
+                "type": "bool",
                 "label": "Refresh",
                 "value":false
             }
         }
     },
     "saveconf": {
-        "type": "multi",
         "devcat": "Module",
         "group": "Configurations",
         "permission": 2,
-        "value": "default",
         "rule":0,
         "label": "Save configuration",
         "elements": {
+            "name": {
+                "type": "string",
+                "label": "Name",
+                "value":"default"
+            },
             "save": {
+                "type": "bool",
                 "label": "Save as",
                 "value":false
             }
@@ -46,18 +55,22 @@
         "label": "Loaded modules",
         "elements": {
             "name": {
+                "type": "string",
                 "label": "Internal name",
                 "value":""
             },
             "label": {
+                "type": "string",
                 "label": "Label",
                 "value":""
             },
             "type": {
+                "type": "string",
                 "label": "Type",
                 "value":""
             },
             "profile": {
+                "type": "string",
                 "label": "Profile",
                 "value":""
             }
@@ -75,6 +88,7 @@
         "label": "",
         "elements": {
             "kill": {
+                "type": "bool",
                 "label": "Kill all modules",
                 "value":false
             }

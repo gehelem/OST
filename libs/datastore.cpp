@@ -68,13 +68,12 @@ bool Datastore::createOstProperty(const QString &pPropertyName, const QString &p
     prop["group"] = pPropertyGroup;
     prop["name"] = pPropertyName;
     prop["elements"] = QVariantMap();
-    mProperties[pPropertyName] = prop;
 
-    OST::PropertyMulti *pm = OST::PropertyFactory::createProperty(prop);
+    OST::PropertyMulti *pm = OST::PropertyFactory::createProperty(pPropertyName, prop);
     mStore[pPropertyName] = pm;
     OST::PropertyJsonDumper d;
     pm->accept(&d);
-
+    connect(mStore[pPropertyName], &OST::PropertyMulti::valueChanged, this, &Datastore::onValueChanged);
     OnModuleEvent("cp", QString(), pPropertyName, d.getResult().toVariantMap());
     return true;
 }
@@ -85,7 +84,10 @@ void Datastore::emitPropertyCreation(const QString &pPropertyName)
 void Datastore::onValueChanged(void)
 {
     OST::PropertyBase* obj = qobject_cast<OST::PropertyBase*>(sender());
-    qDebug() << "onValueChanged " << obj->label();
+    OST::PropertyJsonDumper d;
+    obj->accept(&d);
+    OnModuleEvent("se", QString(), obj->key(), d.getResult().toVariantMap());
+
 }
 /*QVariant Datastore::getOstPropertyValue(const QString &pPropertyName)
 {
@@ -196,7 +198,7 @@ bool Datastore::setOstElementValue(const QString &pPropertyName, const QString &
     pb->accept(&d);
 
 
-    if (mEmitEvent) OnModuleEvent("se", QString(), pPropertyName, d.getResult().toVariantMap());
+    //if (mEmitEvent) OnModuleEvent("se", QString(), pPropertyName, d.getResult().toVariantMap());
     return true;
 }
 bool Datastore::setOstElementGrid(const QString &pPropertyName, const QString &pElementName,
@@ -301,7 +303,7 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
         QVariantMap tt = props[key].toVariant().toMap();
         mProperties[key] = tt;
         //qDebug() << "***** create property from file " << key;
-        OST::PropertyMulti *rp = OST::PropertyFactory::createProperty(tt);
+        OST::PropertyMulti *rp = OST::PropertyFactory::createProperty(key, tt);
         if (rp != nullptr)
         {
             mStore[key] = rp;

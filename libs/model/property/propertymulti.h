@@ -37,7 +37,8 @@ class PropertyMulti: public PropertyBase
         }
 
 
-        PropertyMulti(const QString &label, const Permission &permission, const QString &level1, const QString &level2,
+        PropertyMulti(const QString &key, const QString &label, const Permission &permission, const QString &level1,
+                      const QString &level2,
                       const QString &order, const bool &hasProfile, const bool &hasArray
                      );
         ~PropertyMulti();
@@ -72,7 +73,14 @@ class PropertyMulti: public PropertyBase
             }
             //qDebug() << label() << " - addValue - element " << key << " OK " << pValue;
             mValues[key] = pValue;
+            connect(mValues[key], &ValueBase::valueChanged, this, &PropertyMulti::OnValueChanged);
         }
+    public slots:
+        void OnValueChanged(ValueBase*)
+        {
+            emit valueChanged(this);
+        }
+
     private:
         SwitchsRule mRule = SwitchsRule::Any;
         QMap<QString, ValueBase*> mValues;

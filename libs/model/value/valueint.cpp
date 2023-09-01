@@ -11,6 +11,7 @@ ValueInt::~ValueInt()
 void ValueInt::setValue(const long &value)
 {
     mValue = value;
+    emit valueChanged(this);
 }
 void ValueInt::setMin(const long &min)
 {

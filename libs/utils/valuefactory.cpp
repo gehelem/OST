@@ -14,6 +14,8 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                                          pData["hint"].toString()
                                         );
             pValue->setValue(pData["value"].toBool());
+            if (pData.contains("autoupdate")) pValue->setAutoUpdate(pData["autoupdate"].toBool());
+
             return pValue;
         }
         if (pData["type"].toString() == "string")
@@ -22,17 +24,17 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                                            pData["order"].toString(),
                                            pData["hint"].toString()
                                           );
-            pValue->setValue(pData["value"].toString());
+            pValue->setValue(pData["value"].toString(), false);
+            if (pData.contains("autoupdate")) pValue->setAutoUpdate(pData["autoupdate"].toBool());
             if (pData.contains("listOfValues"))
             {
                 QVariantMap elts = pData["listOfValues"].toMap();
                 foreach(const QString &key, elts.keys())
                 {
                     pValue->lov.add(key, elts[key].toString());
-
                 }
-
             }
+
             return pValue;
         }
         if (pData["type"].toString() == "int")
@@ -46,6 +48,17 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
             if (pData.contains("max")) pValue->setMax(pData["max"].toLongLong());
             if (pData.contains("step")) pValue->setStep(pData["step"].toLongLong());
             if (pData.contains("format")) pValue->setFormat(pData["format"].toString());
+            if (pData.contains("autoupdate")) pValue->setAutoUpdate(pData["autoupdate"].toBool());
+            if (pData.contains("listOfValues"))
+            {
+                QVariantMap elts = pData["listOfValues"].toMap();
+                QMap<long, QString> eltsLong;
+                foreach(const QString &key, elts.keys())
+                {
+                    pValue->lov.add(key.toLong(), elts[key].toString());
+                }
+            }
+
             return pValue;
         }
         if (pData["type"].toString() == "float")
@@ -59,6 +72,17 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
             if (pData.contains("max")) pValue->setMax(pData["max"].toDouble());
             if (pData.contains("step")) pValue->setStep(pData["step"].toDouble());
             if (pData.contains("format")) pValue->setFormat(pData["format"].toString());
+            if (pData.contains("autoupdate")) pValue->setAutoUpdate(pData["autoupdate"].toBool());
+            if (pData.contains("listOfValues"))
+            {
+                QVariantMap elts = pData["listOfValues"].toMap();
+                QMap<double, QString> eltsLong;
+                foreach(const QString &key, elts.keys())
+                {
+                    pValue->lov.add(key.toDouble(), elts[key].toString());
+                }
+            }
+
             return pValue;
         }
         if (pData["type"].toString() == "img")
@@ -95,59 +119,59 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                  pData["label"].toString();
     }
 
-    if (pData.contains("value"))
-    {
-        if (strcmp(pData["value"].typeName(), "bool") == 0 )
-        {
-            auto *pValue = new ValueBool(pData["label"].toString(),
-                                         pData["order"].toString(),
-                                         pData["hint"].toString()
-                                        );
-            pValue->setValue(pData["value"].toBool());
-            return pValue;
-        }
-        if (strcmp(pData["value"].typeName(), "QString") == 0 )
-        {
-            auto *pValue = new ValueString(pData["label"].toString(),
-                                           pData["order"].toString(),
-                                           pData["hint"].toString()
-                                          );
-            pValue->setValue(pData["value"].toString());
-            return pValue;
-        }
-        if ((strcmp(pData["value"].typeName(), "int") == 0 )
-                || (strcmp(pData["value"].typeName(), "qlonglong") == 0 )
-           )
-        {
-            auto *pValue = new ValueInt(pData["label"].toString(),
-                                        pData["order"].toString(),
-                                        pData["hint"].toString()
-                                       );
-            if (pData.contains("value")) pValue->setValue(pData["value"].toLongLong());
-            if (pData.contains("min")) pValue->setMin(pData["min"].toLongLong());
-            if (pData.contains("max")) pValue->setMax(pData["max"].toLongLong());
-            if (pData.contains("step")) pValue->setStep(pData["step"].toLongLong());
-            if (pData.contains("format")) pValue->setFormat(pData["format"].toString());
-            return pValue;
-        }
-        if ((strcmp(pData["value"].typeName(), "double") == 0 )
-                || (strcmp(pData["value"].typeName(), "float") == 0 )
-           )
-        {
-            auto *pValue = new ValueFloat(pData["label"].toString(),
-                                          pData["order"].toString(),
-                                          pData["hint"].toString()
-                                         );
-            if (pData.contains("value")) pValue->setValue(pData["value"].toDouble());
-            if (pData.contains("min")) pValue->setMin(pData["min"].toDouble());
-            if (pData.contains("max")) pValue->setMax(pData["max"].toDouble());
-            if (pData.contains("step")) pValue->setStep(pData["step"].toDouble());
-            if (pData.contains("format")) pValue->setFormat(pData["format"].toString());
-            return pValue;
-        }
-
-        qDebug() << "Unknown value type " << pData["label"].toString() << ":" << pData["value"].typeName();
-    }
+    //if (pData.contains("value"))
+    //{
+    //    if (strcmp(pData["value"].typeName(), "bool") == 0 )
+    //    {
+    //        auto *pValue = new ValueBool(pData["label"].toString(),
+    //                                     pData["order"].toString(),
+    //                                     pData["hint"].toString()
+    //                                    );
+    //        pValue->setValue(pData["value"].toBool());
+    //        return pValue;
+    //    }
+    //    if (strcmp(pData["value"].typeName(), "QString") == 0 )
+    //    {
+    //        auto *pValue = new ValueString(pData["label"].toString(),
+    //                                       pData["order"].toString(),
+    //                                       pData["hint"].toString()
+    //                                      );
+    //        pValue->setValue(pData["value"].toString(), false);
+    //        return pValue;
+    //    }
+    //    if ((strcmp(pData["value"].typeName(), "int") == 0 )
+    //            || (strcmp(pData["value"].typeName(), "qlonglong") == 0 )
+    //       )
+    //    {
+    //        auto *pValue = new ValueInt(pData["label"].toString(),
+    //                                    pData["order"].toString(),
+    //                                    pData["hint"].toString()
+    //                                   );
+    //        if (pData.contains("value")) pValue->setValue(pData["value"].toLongLong());
+    //        if (pData.contains("min")) pValue->setMin(pData["min"].toLongLong());
+    //        if (pData.contains("max")) pValue->setMax(pData["max"].toLongLong());
+    //        if (pData.contains("step")) pValue->setStep(pData["step"].toLongLong());
+    //        if (pData.contains("format")) pValue->setFormat(pData["format"].toString());
+    //        return pValue;
+    //    }
+    //    if ((strcmp(pData["value"].typeName(), "double") == 0 )
+    //            || (strcmp(pData["value"].typeName(), "float") == 0 )
+    //       )
+    //    {
+    //        auto *pValue = new ValueFloat(pData["label"].toString(),
+    //                                      pData["order"].toString(),
+    //                                      pData["hint"].toString()
+    //                                     );
+    //        if (pData.contains("value")) pValue->setValue(pData["value"].toDouble());
+    //        if (pData.contains("min")) pValue->setMin(pData["min"].toDouble());
+    //        if (pData.contains("max")) pValue->setMax(pData["max"].toDouble());
+    //        if (pData.contains("step")) pValue->setStep(pData["step"].toDouble());
+    //        if (pData.contains("format")) pValue->setFormat(pData["format"].toString());
+    //        return pValue;
+    //    }
+    //
+    //    qDebug() << "Unknown value type " << pData["label"].toString() << ":" << pData["value"].typeName();
+    //}
     qDebug() << "Can't guess element type " << pData["label"].toString();
     return nullptr;
 
