@@ -56,6 +56,11 @@ class PropertyMulti: public PropertyBase
         }
         OST::ValueBase* getValue(QString pElement)
         {
+            if (!mValues.contains(pElement))
+            {
+                qDebug() << label() << " - getValue - element " << pElement << " does not exists.";
+                return nullptr;
+            }
             return mValues[pElement];
         }
         void addValue(QString key, ValueBase* pValue)
@@ -63,14 +68,10 @@ class PropertyMulti: public PropertyBase
             if (mValues.contains(key))
             {
                 qDebug() << label() << " - addValue - element " << key << " already exists";
-
+                return;
             }
-            else
-            {
-                //qDebug() << label() << " - addValue - element " << key << " OK " << pValue;
-                mValues[key] = pValue;
-            }
-
+            //qDebug() << label() << " - addValue - element " << key << " OK " << pValue;
+            mValues[key] = pValue;
         }
     private:
         SwitchsRule mRule = SwitchsRule::Any;

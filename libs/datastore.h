@@ -33,6 +33,7 @@ class Datastore : public Baseroot
     protected:
         OST::PropertyMulti* getProperty(QString pProperty);
         OST::ValueString* getText(QString pProperty, QString pElement);
+        QString getString(QString pProperty, QString pElement);
         QVariantMap getProperties(void)
         {
             //getQtProperties();

@@ -32,7 +32,24 @@ OST::ValueString* Datastore::getText(QString pProperty, QString pElement)
         sendWarning("getText - property " + pProperty + " : element " + pElement + " not found");
         return nullptr;
     }
-    return static_cast<OST::ValueString*>(p->getValue("pElement"));
+    return static_cast<OST::ValueString*>(p->getValue(pElement));
+}
+QString Datastore::getString(QString pProperty, QString pElement)
+{
+    OST::PropertyMulti* p = getProperty(pProperty);
+    if (p == nullptr)
+    {
+        sendWarning(" getText - property " + pProperty + " not found");
+        return "";
+    }
+    if (!p->getValues().contains(pElement))
+    {
+        sendWarning("getText - property " + pProperty + " : element " + pElement + " not found");
+        return "";
+    }
+    QString s = static_cast<OST::ValueString*>(p->getValue(pElement))->value();
+    return s;
+
 }
 
 bool Datastore::createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel,
