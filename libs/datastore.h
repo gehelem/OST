@@ -32,13 +32,18 @@ class Datastore : public Baseroot
         ~Datastore();
     protected:
         OST::PropertyMulti* getProperty(QString pProperty);
-        OST::ValueString* getText(QString pProperty, QString pElement);
+        OST::ValueString* getValueString(QString pProperty, QString pElement);
+        OST::ValueInt* getValueInt(QString pProperty, QString pElement);
+        OST::ValueFloat* getValueFloat(QString pProperty, QString pElement);
+        OST::ValueBool* getValueBool(QString pProperty, QString pElement);
         QString getString(QString pProperty, QString pElement);
         QString getString(QString pProperty, QString pElement, long line);
         long getInt(QString pProperty, QString pElement);
         long getInt(QString pProperty, QString pElement, long line);
         double getFloat(QString pProperty, QString pElement);
         double getFloat(QString pProperty, QString pElement, long line);
+        bool getBool(QString pProperty, QString pElement);
+        bool getBool(QString pProperty, QString pElement, long line);
         QVariantMap getProperties(void)
         {
             //getQtProperties();
@@ -103,8 +108,6 @@ class Datastore : public Baseroot
 
         //QVariant getOstPropertyValue(const QString &pPropertyName);
 
-        bool createOstElement(const QString &pPropertyName, const QString &pElementName, const QString &pElementLabel,
-                              bool mEmitEvent);
         bool createOstElementText(const QString &pPropertyName, const QString &pElementName, const QString &pElementLabel,
                                   bool mEmitEvent);
         bool createOstElementBool(const QString &pPropertyName, const QString &pElementName, const QString &pElementLabel,
@@ -131,21 +134,6 @@ class Datastore : public Baseroot
 
         QVariantMap getProfile(void);
 
-        void clearOstElementLov(const QString &pPropertyName, const QString &pElementName);
-        void addOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode,
-                              const QString &pLovLabel);
-        QVariant getOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode);
-        void setOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode,
-                              const QString &pLovLabel);
-        void deleteOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode);
-
-        void clearOstLov(const QString &pPropertyName);
-        void addOstLov(const QString &pPropertyName, const QString &pLovCode,
-                       const QString &pLovLabel);
-        QVariant getOstLov(const QString &pPropertyName, const QString &pLovCode);
-        void setOstLov(const QString &pPropertyName, const QString &pLovCode,
-                       const QString &pLovLabel);
-        void deleteOstLov(const QString &pPropertyName, const QString &pLovCode);
         QJsonObject getPropertiesDump(void);
 
     private slots:
