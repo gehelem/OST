@@ -284,50 +284,9 @@ bool Datastore::setOstElementValue(const QString &pPropertyName, const QString &
         return false;
     }
     OST::ValueUpdate vu;
-    OST::PropertyJsonDumper d;
     QVariantMap m;
     m["value"] = pElementValue;
     pb->getValue(pElementName)->accept(&vu, m);
-    pb->accept(&d);
-
-
-    //if (mEmitEvent) OnModuleEvent("se", QString(), pPropertyName, d.getResult().toVariantMap());
-    return true;
-}
-bool Datastore::setOstElementGrid(const QString &pPropertyName, const QString &pElementName,
-                                  const QVariantList &pElementGrid,
-                                  bool mEmitEvent)
-{
-    if (!mProperties.contains(pPropertyName) )
-    {
-        sendWarning("setOstElementGrid - property " + pPropertyName + " not found");
-        return false;
-    }
-
-    QVariantMap _prop = mProperties[pPropertyName].toMap();
-    if (!_prop.contains("elements"))
-    {
-        sendWarning("setOstElementGrid - property " + pPropertyName + " has no elemnts");
-        return false;
-    }
-    QVariantMap _elements = _prop["elements"].toMap();
-    if (!_elements.contains(pElementName))
-    {
-        sendWarning("setOstElementGrid - property " + pPropertyName + " : element " + pElementName + " not found.");
-        return false;
-    }
-
-    QVariantMap element = _elements[pElementName].toMap();
-    if (!_prop.contains("grid"))
-    {
-        sendWarning("setOstElementGrid - property " + pPropertyName + " element " + pElementName + " has no grid.");
-        return false;
-    }
-    element["gridvalues"] = pElementGrid;
-    _elements[pElementName] = element;
-    _prop["elements"] = _elements;
-    mProperties[pPropertyName] = _prop;
-    if (mEmitEvent) OnModuleEvent("se", QString(), pPropertyName, mProperties[pPropertyName].toMap());
     return true;
 }
 QVariantList Datastore::getOstElementGrid(const QString &pPropertyName, const QString &pElementName)
@@ -547,7 +506,12 @@ bool Datastore::setOstElementLineValue (const QString &pPropertyName, const QStr
     else
     {
         elementList[pLine] = pElementValue;
-        setOstElementGrid(pPropertyName, pElementName, elementList, true);
+        OST::ValueUpdate u;
+        QVariantMap m;
+        m["i"] = pLine;
+        m["val"] = pElementValue;
+        QString action = "updateline";
+        getStore()[pPropertyName]->getValue(pElementName)->accept(&u, action, m);
         OnModuleEvent("ap", QString(), pPropertyName, mProperties[pPropertyName].toMap());
         return true;
     }
