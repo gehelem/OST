@@ -60,11 +60,11 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     //setBLOBMode(B_ALSO, _camera.toStdString().c_str(), nullptr);
     //enableDirectBlobAccess(_camera.toStdString().c_str(), nullptr);
     //setBlobMode();
-    setOstElementLov("extextRW", "extext4", "i1", "i1 label modified");
+    getValueString("extextRW", "extext4")->lov.update("i1", "i1 label modified");
     //addOstElementLov("extextRW", "extext4", "i1", "i1 label modified"); // should give a warning
-    addOstElementLov("extextRW", "extext4", "i3", "i3 label");
-    addOstElementLov("extextRW", "extext4", "i4", "i4 label");
-    deleteOstElementLov("extextRW", "extext4", "i4");
+    getValueString("extextRW", "extext4")->lov.add("i3", "i3 label");
+    getValueString("extextRW", "extext4")->lov.add("i4", "i4 label");
+    getValueString("extextRW", "extext4")->lov.del("i4");
     //deleteOstElementLov("extextRW", "extext4", "i4"); // should give a warning
     //sendMessage(QString("lov element i3=") + getOstElementLov("extextRW", "extext4", "i3").toString());
     //sendMessage(QString("lov element inexistant") + getOstElementLov("extextRW", "extext4",

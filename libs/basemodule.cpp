@@ -78,14 +78,12 @@ void Basemodule::setProfile(QVariantMap profiledata)
 }
 void Basemodule::setProfiles()
 {
-    //mAvailableProfiles = profilesdata;
     QVariantMap profs;
     getDbProfiles(getClassName(), profs);
-    clearOstLov("loadprofile");
+    getValueString("loadprofile", "value")->lov.clear();
     for(QVariantMap::const_iterator iter = profs.begin(); iter != profs.end(); ++iter)
     {
-        //qDebug() << iter.key() << iter.value();
-        addOstLov("loadprofile", iter.key(), iter.key() );
+        getValueString("loadprofile", "value")->lov.add(iter.key(), iter.key());
     }
     sendMessage("Available profiles refreshed");
 }

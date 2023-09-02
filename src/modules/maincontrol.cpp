@@ -55,8 +55,8 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                 if (keyelt == "name" && keyprop == "loadconf")
                 {
                     QString val = pEventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toString();
-                    getText("loadconf", "name")->setValue(val, true);
-                    getText("saveconf", "name")->setValue(val, true);
+                    getValueString("loadconf", "name")->setValue(val, true);
+                    getValueString("saveconf", "name")->setValue(val, true);
                 }
                 if (keyelt == "load" && keyprop != "loadconf")
                 {
@@ -113,10 +113,10 @@ void Maincontrol::setConfigurations(void)
         return;
     }
 
-    getText("loadconf", "name")->lov.clear();
+    getValueString("loadconf", "name")->lov.clear();
     for(QVariantMap::const_iterator iter = confs.begin(); iter != confs.end(); ++iter)
     {
-        getText("loadconf", "name")->lov.add(iter.key(), iter.key());
+        getValueString("loadconf", "name")->lov.add(iter.key(), iter.key());
     }
     sendMessage("Available configurations refreshed");
 }

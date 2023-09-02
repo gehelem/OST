@@ -70,8 +70,6 @@
         "devcat": "Module",
         "group": "Profiles",
         "permission": 2,
-        "listOfValues":{
-        },
         "rule":1,
         "label": "Load profile",
         "elements": {
@@ -86,6 +84,7 @@
                 "value":false
             },
             "value": {
+                "listOfValues":[],
                 "type": "string",
                 "label": "Name",
                 "value":"default"
