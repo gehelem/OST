@@ -50,6 +50,16 @@ class ListOfValues
             list[val] = label;
             return true;
         }
+        bool update(U val, QString label)
+        {
+            if (!list.contains(val))
+            {
+                qDebug() << "ListOfValues - update - key " << val << " doesn't exist (" << list[val] << ").";
+                return false;
+            }
+            list[val] = label;
+            return true;
+        }
         bool del(U val)
         {
             if (!list.contains(val))
