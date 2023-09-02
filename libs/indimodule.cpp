@@ -90,8 +90,7 @@ void IndiModule::connectIndiTimer()
     {
         return;
     }
-    setServer(getOstElementValue("server", "host").toString().toStdString().c_str(), getOstElementValue("server",
-              "port").toInt());
+    setServer(getString("server", "host").toStdString().c_str(), getInt("server", "port"));
     if (!connectServer())
     {
         sendError("Couldn't connect to Indi server");
@@ -116,8 +115,7 @@ bool IndiModule::connectIndi()
         newUniversalMessage("Indi server already connected");
         return true;
     }
-    setServer(getOstElementValue("server", "host").toString().toStdString().c_str(), getOstElementValue("server",
-              "port").toInt());
+    setServer(getString("server", "host").toStdString().c_str(), getInt("server", "port"));
     if (connectServer())
     {
         newUniversalMessage("Indi server connected");

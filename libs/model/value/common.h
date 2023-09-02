@@ -93,6 +93,16 @@ class Grid
             mGridValues.removeAt(i);
             return true;
         }
+        bool update(U val, int i)
+        {
+            if (i >= mGridValues.size())
+            {
+                qDebug() << "Grid - update - trying to update item " << i << " while grid size is " << mGridValues.size();
+                return false;
+            }
+            mGridValues[i] = val;
+            return true;
+        }
         bool clear()
         {
             mGridValues.clear();

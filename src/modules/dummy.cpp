@@ -48,7 +48,7 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     setOstElementValue("mixedRW", "n2", 11, false);
     setOstElementValue("mixedRW", "t1", "Mixed text value", false);
     //saveAttributesToFile("dummy.json");
-    _camera = getOstElementValue("devices", "camera").toString();
+    _camera = getString("devices", "camera");
 
     //foreach(QString key, getAvailableModuleLibs().keys())
     //{
@@ -144,7 +144,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                         if (setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], false))
                         {
                             setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
-                            _camera = getOstElementValue("devices", "camera").toString();
+                            _camera = getString("devices", "camera");
                         }
                     }
                 }
@@ -157,7 +157,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                             connectIndi();
                             setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
                             connectDevice(_camera);
-                            connectDevice(getOstElementValue("devices", "mount").toString());
+                            connectDevice(getString("devices", "mount"));
                             setBLOBMode(B_ALSO, _camera.toStdString().c_str(), nullptr);
                             enableDirectBlobAccess(_camera.toStdString().c_str(), nullptr);
                         }
@@ -168,8 +168,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                         {
                             setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
                             sendModNewNumber(_camera, "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );
-                            if (!sendModNewNumber(_camera, "CCD_EXPOSURE", "CCD_EXPOSURE_VALUE", getOstElementValue("parameters",
-                                                  "exposure").toDouble()))
+                            if (!sendModNewNumber(_camera, "CCD_EXPOSURE", "CCD_EXPOSURE_VALUE", getFloat("parameters", "exposure")))
                             {
                                 setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
                             }
@@ -194,12 +193,12 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                             setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
                             double ra, dec;
                             if (
-                                !getModNumber(getOstElementValue("devices", "mount").toString(), "EQUATORIAL_EOD_COORD", "DEC", dec)
-                                || !getModNumber(getOstElementValue("devices", "mount").toString(), "EQUATORIAL_EOD_COORD", "RA", ra)
+                                !getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "DEC", dec)
+                                || !getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "RA", ra)
                             )
                             {
                                 setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
-                                sendMessage("Can't find mount device " + getOstElementValue("devices", "mount").toString() + " solve aborted");
+                                sendMessage("Can't find mount device " + getString("devices", "mount") + " solve aborted");
                             }
                             else
                             {
@@ -209,7 +208,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                                 stats = _image->getStats();
                                 _solver.ResetSolver(stats, _image->getImageBuffer());
                                 QStringList folders;
-                                folders.append(getOstElementValue("parameters", "indexfolderpath").toString());
+                                folders.append(getString("parameters", "indexfolderpath"));
                                 _solver.stellarSolver->setIndexFolderPaths(folders);
                                 connect(&_solver, &Solver::successSolve, this, &Dummy::OnSucessSolve);
                                 connect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
@@ -237,20 +236,19 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
             {
                 double line = eventData[keyprop].toMap()["line"].toDouble();
                 qDebug() << "dummy" << eventType << "-" << eventModule << "-" << eventKey << "-" << eventData << "line=" << line;
-                deleteOstPropertyLine(keyprop, line);
-
+                getStore()[keyprop]->deleteLine(line);
             }
             if (eventType == "Flcreate")
             {
                 qDebug() << "dummy" << eventType << "-" << eventModule << "-" << eventKey << "-" << eventData;
-                newOstPropertyLine(keyprop, eventData);
+                getStore()[keyprop]->newLine(eventData[keyprop].toMap()["elements"].toMap());
 
             }
             if (eventType == "Flupdate")
             {
                 double line = eventData[keyprop].toMap()["line"].toDouble();
                 qDebug() << "dummy" << eventType << "-" << eventModule << "-" << eventKey << "-" << eventData;
-                updateOstPropertyLine(keyprop, line, eventData);
+                getStore()[keyprop]->updateLine(line, eventData[keyprop].toMap()["elements"].toMap());
 
             }
             if (eventType == "Flselect")
@@ -359,13 +357,16 @@ void Dummy::OnSolverLog(QString &text)
 }
 void Dummy::updateSearchList(void)
 {
-    sendMessage("Searching " + getOstElementValue("search", "search").toString());
-    resetOstElements("results");
+    QString s = getString("search", "search");
+    sendMessage("Searching " + s);
+
+    getStore()["results"]->clearGrid();
     QList<catalogResult> results;
-    searchCatalog(getOstElementValue("search", "search").toString(), results);
+
+    searchCatalog(s, results);
     if (results.count() == 0)
     {
-        sendWarning("Searching " + getOstElementValue("search", "search").toString() + " gives no result");
+        sendWarning("Searching " + s + " gives no result");
         return;
     }
 

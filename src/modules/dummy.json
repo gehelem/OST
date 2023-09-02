@@ -404,6 +404,7 @@
         }
     },
     "testgrid": {
+        "hasArray":true,
         "devcat": "Examples",
         "group": "Grids",
         "permission": 2,
@@ -444,6 +445,7 @@
         }
     },
     "secondtestgrid": {
+        "hasArray":true,
         "devcat": "Examples",
         "group": "AAAGrids",
         "permission": 2,
@@ -486,13 +488,13 @@
         "elements": {}
     },
     "search": {
-        "type": "multi",
         "devcat": "Examples",
         "order": "Catalog00",
         "group": "Catalog",
         "permission": 2,
         "rule":0,
         "label": "",
+        "autoupdate":true,
         "elements": {
             "searchbtn": {
                 "type": "bool",
@@ -508,12 +510,11 @@
         }
     },
     "results": {
-        "type": "multi",
         "devcat": "Examples",
         "order": "Catalog10",
         "group": "Catalog",
         "permission": 0,
-        "grid":0,
+        "hasArray":true,
         "gridlimit":255,
         "rule":0,
         "label": "Results",

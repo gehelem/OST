@@ -94,7 +94,7 @@ class PropertyBase: public QObject
         void stateChanged(OST::State);
         void propertyCreated(void);
         void valueChanged(OST::PropertyBase*);
-
+        void propertyEvent(QString, QString, OST::PropertyBase*);
 
     private:
         QString mKey = "";

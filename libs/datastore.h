@@ -34,6 +34,8 @@ class Datastore : public Baseroot
         OST::PropertyMulti* getProperty(QString pProperty);
         OST::ValueString* getText(QString pProperty, QString pElement);
         QString getString(QString pProperty, QString pElement);
+        long getInt(QString pProperty, QString pElement);
+        double getFloat(QString pProperty, QString pElement);
         QVariantMap getProperties(void)
         {
             //getQtProperties();
@@ -106,7 +108,6 @@ class Datastore : public Baseroot
                                   bool mEmitEvent);
         bool setOstElementValue(const QString &pPropertyName, const QString &pElementName, const QVariant &pElementValue,
                                 bool mEmitEvent);
-        QVariant getOstElementValue(const QString &pPropertyName, const QString &pElementName);
         bool setOstElementGrid(const QString &pPropertyName, const QString &pElementName, const QVariantList &pElementGrid,
                                bool mEmitEvent);
         QVariantList getOstElementGrid(const QString &pPropertyName, const QString &pElementName);
@@ -122,12 +123,7 @@ class Datastore : public Baseroot
                                      bool mEmitEvent);
 
         void deleteOstProperty(const QString &pPropertyName);
-        bool pushOstElements        (const QString &pPropertyName);
-        bool resetOstElements      (const QString &pPropertyName);
 
-        bool newOstPropertyLine(const QString &pPropertyName, const QVariantMap &pElementsValues);
-        bool deleteOstPropertyLine(const QString &pPropertyName, const double &pLine);
-        bool updateOstPropertyLine(const QString &pPropertyName, const double &pLine, const QVariantMap &pElementsValues);
         QVariant getOstElementLineValue(const QString &pPropertyName, const QString &pElementName, const double &pLine);
         bool setOstElementLineValue(const QString &pPropertyName, const QString &pElementName, const double &pLine,
                                     const QVariant &pElementValue);
@@ -153,6 +149,7 @@ class Datastore : public Baseroot
 
     private slots:
         void onValueChanged(void);
+        void onPropertyEvent(QString event, QString key, OST::PropertyBase* prop);
     private:
         QVariantMap mProperties;
         QMap<QString, OST::PropertyMulti*> mStore;

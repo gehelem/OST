@@ -159,18 +159,18 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
                         {
                             setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
                             QVariantMap prof;
-                            if (getDbProfile(getClassName(), getOstElementValue("loadprofile", "value").toString(), prof))
+                            if (getDbProfile(getClassName(), getString("loadprofile", "value"), prof))
                             {
                                 setProfile(prof);
                                 setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
-                                sendMessage(getOstElementValue("loadprofile", "value").toString() + " profile sucessfully loaded");
-                                emit moduleEvent("moduleloadedprofile", getModuleName(), getOstElementValue("loadprofile", "value").toString(),
+                                sendMessage(getString("loadprofile", "value") + " profile sucessfully loaded");
+                                emit moduleEvent("moduleloadedprofile", getModuleName(), getString("loadprofile", "value"),
                                                  QVariantMap());
                                 sendDump();
                             }
                             else
                             {
-                                sendWarning("Can't load " + getOstElementValue("loadprofile", "name").toString() + " profile");
+                                sendWarning("Can't load " + getString("loadprofile", "name") + " profile");
                                 setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
                             }
                             setOstElementValue("loadprofile", "load", false, false);
@@ -201,17 +201,17 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
                     {
                         setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
                         QVariantMap prof = getProfile();
-                        if (setDbProfile(getClassName(), getOstElementValue("loadprofile", "value").toString(), prof))
+                        if (setDbProfile(getClassName(), getString("loadprofile", "value"), prof))
                         {
                             setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
-                            sendMessage(getOstElementValue("loadprofile", "value").toString() + " profile sucessfully saved");
-                            emit moduleEvent("modulesavedprofile", getModuleName(), getOstElementValue("loadprofile", "value").toString(),
+                            sendMessage(getString("loadprofile", "value") + " profile sucessfully saved");
+                            emit moduleEvent("modulesavedprofile", getModuleName(), getString("loadprofile", "value"),
                                              QVariantMap());
                         }
                         else
                         {
                             setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
-                            sendWarning("Can't save " + getOstElementValue("loadprofile", "value").toString() + " profile");
+                            sendWarning("Can't save " + getString("loadprofile", "value") + " profile");
                         }
                     }
                 }

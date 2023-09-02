@@ -84,7 +84,7 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                 if (keyelt == "load" && keyprop == "loadconf")
                 {
                     bool val = pEventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toBool();
-                    if (val) emit mainCtlEvent("loadconf", QString(), getText("loadconf", "name")->value(), QVariantMap());
+                    if (val) emit mainCtlEvent("loadconf", QString(), getString("loadconf", "name"), QVariantMap());
                 }
                 if (keyelt == "refresh" && keyprop == "loadconf")
                 {
@@ -94,7 +94,7 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                 if (keyelt == "save" && keyprop == "saveconf")
                 {
 
-                    emit mainCtlEvent("saveconf", QString(), getText("saveconf", "value")->value(), QVariantMap());
+                    emit mainCtlEvent("saveconf", QString(), getString("saveconf", "value"), QVariantMap());
                 }
                 if (keyelt == "kill" && keyprop == "killall")
                 {
@@ -162,7 +162,7 @@ void Maincontrol::addModuleData(const QString  &pName, const QString  &pLabel, c
     setOstElementValue("modules", "label", pLabel, false);
     setOstElementValue("modules", "type", pType, false);
     setOstElementValue("modules", "profile", pProfile, false);
-    pushOstElements("modules");
+    getStore()["modules"]->push();
 }
 void Maincontrol::setModuleData(const QString  &pName, const QString  &pLabel, const QString  &pType,
                                 const QString  &pProfile)
@@ -186,7 +186,7 @@ void Maincontrol::deldModuleData(const QString  &pName)
     {
         if( l[i].toString() == pName)
         {
-            deleteOstPropertyLine("modules", i);
+            getStore()["modules"]->deleteLine(i);
         }
     }
 

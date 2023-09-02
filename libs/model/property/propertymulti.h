@@ -76,6 +76,10 @@ class PropertyMulti: public PropertyBase
             connect(mValues[key], &ValueBase::valueChanged, this, &PropertyMulti::OnValueChanged);
         }
         void push();
+        void newLine(const QVariantMap &pValues);
+        void deleteLine(const int i);
+        void updateLine(const int i, const QVariantMap &pValues);
+        void clearGrid();
     public slots:
         void OnValueChanged(ValueBase*)
         {
