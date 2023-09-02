@@ -51,10 +51,10 @@
                 "type":"string",
                 "label": "Text 4",
                 "value":"i1",
-                "listOfValues":{
-                    "i1":"Value 1",
-                    "i2":"Value 2"
-                }
+                "listOfValues":[
+                    ["i1","Value 1"],
+                    ["i2","Value 2"]
+                ]
             }
         },
         "group": "Texts",
@@ -87,22 +87,21 @@
                 "autoupdate":true,
                 "type":"float",
                 "label": "Number 3",
-                "listOfValues":{
-                    "0.0":"Zéro virgule zéro",
-                    "0.1":"Zéro virgule un",
-                    "0.2":"Zéro virgule deux"
-                }
+                "listOfValues":[
+                    [0.0,"Zéro virgule zéro"],
+                    [0.1,"Zéro virgule un"],
+                    [0.2,"Zéro virgule deux"]
+                ]
             },
             "n4": {
                 "autoupdate":true,
                 "type":"int",
                 "label": "Number 4",
-                "listOfValues":{
-                    "0":"Zéro",
-                    "1":"Un",
-                    "2":"Deux"
-                }
-
+                "listOfValues":[
+                    [0,"Zéro"],
+                    [1,"Un"],
+                    [2,"Deux"]
+                ]
             }
         },
         "group": "Numbers",

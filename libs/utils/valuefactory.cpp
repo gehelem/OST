@@ -29,9 +29,10 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
             if (pData.contains("listOfValues"))
             {
                 QVariantMap elts = pData["listOfValues"].toMap();
-                foreach(const QString &key, elts.keys())
+                QList ll  = pData["listOfValues"].toList();
+                foreach (auto line, ll)
                 {
-                    pValue->lov.add(key, elts[key].toString());
+                    pValue->lov.add(line.toList()[0].toString(), line.toList()[1].toString());
                 }
             }
 
@@ -52,10 +53,10 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
             if (pData.contains("listOfValues"))
             {
                 QVariantMap elts = pData["listOfValues"].toMap();
-                QMap<long, QString> eltsLong;
-                foreach(const QString &key, elts.keys())
+                QList ll  = pData["listOfValues"].toList();
+                foreach (auto line, ll)
                 {
-                    pValue->lov.add(key.toLong(), elts[key].toString());
+                    pValue->lov.add(line.toList()[0].toInt(), line.toList()[1].toString());
                 }
             }
 
@@ -76,10 +77,10 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
             if (pData.contains("listOfValues"))
             {
                 QVariantMap elts = pData["listOfValues"].toMap();
-                QMap<double, QString> eltsLong;
-                foreach(const QString &key, elts.keys())
+                QList ll  = pData["listOfValues"].toList();
+                foreach (auto line, ll)
                 {
-                    pValue->lov.add(key.toDouble(), elts[key].toString());
+                    pValue->lov.add(line.toList()[0].toFloat(), line.toList()[1].toString());
                 }
             }
 
