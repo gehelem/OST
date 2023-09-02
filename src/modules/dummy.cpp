@@ -255,10 +255,10 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
             {
                 double line = eventData[keyprop].toMap()["line"].toDouble();
                 qDebug() << "dummy" << eventType << "-" << eventModule << "-" << eventKey << "-" << eventData << "line=" << line;
-                QString code = getOstElementLineValue("results", "code", line).toString();
-                float ra = getOstElementLineValue("results", "RA", line).toFloat();
-                float dec = getOstElementLineValue("results", "DEC", line).toFloat();
-                QString ns = getOstElementLineValue("results", "NS", line).toString();
+                QString code = getString("results", "code", line);
+                float ra = getFloat("results", "RA", line);
+                float dec = getFloat("results", "DEC", line);
+                QString ns = getString("results", "NS", line);
                 setOstElementValue("selection", "code", code, false);
                 setOstElementValue("selection", "RA", ra, false);
                 setOstElementValue("selection", "DEC", dec, false);

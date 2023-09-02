@@ -51,6 +51,23 @@ QString Datastore::getString(QString pProperty, QString pElement)
     return s;
 
 }
+QString Datastore::getString(QString pProperty, QString pElement, long line)
+{
+    OST::PropertyMulti* p = getProperty(pProperty);
+    if (p == nullptr)
+    {
+        sendWarning("getText - property " + pProperty + " not found");
+        return "";
+    }
+    if (!p->getValues().contains(pElement))
+    {
+        sendWarning("getText - property " + pProperty + " : element " + pElement + " not found");
+        return "";
+    }
+    QString s = static_cast<OST::ValueString*>(p->getValue(pElement))->grid.getGrid()[line];
+    return s;
+
+}
 long Datastore::getInt(QString pProperty, QString pElement)
 {
     OST::PropertyMulti* p = getProperty(pProperty);
@@ -68,6 +85,23 @@ long Datastore::getInt(QString pProperty, QString pElement)
     return i;
 
 }
+long Datastore::getInt(QString pProperty, QString pElement, long line)
+{
+    OST::PropertyMulti* p = getProperty(pProperty);
+    if (p == nullptr)
+    {
+        sendWarning("getInt - property " + pProperty + " not found");
+        return 0;
+    }
+    if (!p->getValues().contains(pElement))
+    {
+        sendWarning("getInt - property " + pProperty + " : element " + pElement + " not found");
+        return 0;
+    }
+    long i = static_cast<OST::ValueInt*>(p->getValue(pElement))->grid.getGrid()[line];
+    return i;
+
+}
 double Datastore::getFloat(QString pProperty, QString pElement)
 {
     OST::PropertyMulti* p = getProperty(pProperty);
@@ -82,6 +116,23 @@ double Datastore::getFloat(QString pProperty, QString pElement)
         return 0;
     }
     double i = static_cast<OST::ValueFloat*>(p->getValue(pElement))->value();
+    return i;
+
+}
+double Datastore::getFloat(QString pProperty, QString pElement, long line)
+{
+    OST::PropertyMulti* p = getProperty(pProperty);
+    if (p == nullptr)
+    {
+        sendWarning("getFloat - property " + pProperty + " not found");
+        return 0;
+    }
+    if (!p->getValues().contains(pElement))
+    {
+        sendWarning("getFloat - property " + pProperty + " : element " + pElement + " not found");
+        return 0;
+    }
+    double i = static_cast<OST::ValueFloat*>(p->getValue(pElement))->grid.getGrid()[line];
     return i;
 
 }
