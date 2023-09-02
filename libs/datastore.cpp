@@ -299,17 +299,6 @@ void Datastore::saveOstPropertiesToFile(const QString &pFileName)
     jsonFile.write(doc.toJson());
     jsonFile.close();
 }
-void Datastore::setOstPropertyAttribute   (const QString &pPropertyName, const QString &pAttributeName,
-        const QVariant &AttributeValue,
-        bool mEmitEvent)
-{
-    //sendMessage("setOstPropertyAttribute  - " + pPropertyName);
-    QVariantMap _prop = mProperties[pPropertyName].toMap();
-    _prop[pAttributeName] = AttributeValue;
-    mProperties[pPropertyName] = _prop;
-    if (mEmitEvent) OnModuleEvent("ap", QString(), pPropertyName, mProperties[pPropertyName].toMap());
-
-}
 bool Datastore::setOstElementAttribute(const QString &pPropertyName, const QString &pElementName,
                                        const  QString &pAttributeName,
                                        const QVariant &AttributeValue,
