@@ -70,6 +70,7 @@ class PropertyBase: public QObject
         {
             return mHasArray;
         }
+        void setHasArray(bool hasarray);
         State state()
         {
             return mState;

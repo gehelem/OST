@@ -35,6 +35,14 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                     pValue->lov.add(line.toList()[0].toString(), line.toList()[1].toString());
                 }
             }
+            if (pData.contains("gridvalues"))
+            {
+                QList ll  = pData["gridvalues"].toList();
+                foreach (QVariant val, ll)
+                {
+                    pValue->grid.add(val.toString());
+                }
+            }
 
             return pValue;
         }
@@ -57,6 +65,14 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                 foreach (auto line, ll)
                 {
                     pValue->lov.add(line.toList()[0].toInt(), line.toList()[1].toString());
+                }
+            }
+            if (pData.contains("gridvalues"))
+            {
+                QList ll  = pData["gridvalues"].toList();
+                foreach (QVariant val, ll)
+                {
+                    pValue->grid.add(val.toLongLong());
                 }
             }
 
@@ -83,6 +99,15 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                     pValue->lov.add(line.toList()[0].toFloat(), line.toList()[1].toString());
                 }
             }
+            if (pData.contains("gridvalues"))
+            {
+                QList ll  = pData["gridvalues"].toList();
+                foreach (QVariant val, ll)
+                {
+                    pValue->grid.add(val.toDouble());
+                }
+            }
+
 
             return pValue;
         }

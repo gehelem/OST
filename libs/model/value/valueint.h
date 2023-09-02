@@ -49,7 +49,7 @@ class ValueInt: public ValueBase
         }
         void setFormat(const QString &format);
         ListOfValues<long> lov;
-
+        Grid<long> grid;
     private:
         long mValue = 0;
         long mMin = 0;

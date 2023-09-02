@@ -100,6 +100,7 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.qrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/common.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuebase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuebase.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueint.cpp

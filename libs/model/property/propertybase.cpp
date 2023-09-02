@@ -19,5 +19,9 @@ void PropertyBase::setState(State state)
     mState = state;
     emit stateChanged( state);
 }
+void PropertyBase::setHasArray(bool hasarray)
+{
+    mHasArray = hasarray;
+}
 
 }

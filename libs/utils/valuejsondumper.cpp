@@ -42,7 +42,17 @@ void ValueJsonDumper::visit(ValueInt *pValue)
         }
         json["listOfValues"] = lines;
     }
+    if (pValue->grid.getGrid().size() > 0)
+    {
+        QJsonArray arr;
+        foreach (long val, pValue->grid.getGrid())
+        {
+            QVariant v = QVariant::fromValue(val);
+            arr.append(v.toJsonValue());
+        }
 
+        json["gridvalues"] = arr;
+    }
     mResult = json;
 }
 void ValueJsonDumper::visit(ValueFloat *pValue)
@@ -63,6 +73,17 @@ void ValueJsonDumper::visit(ValueFloat *pValue)
         }
         json["listOfValues"] = lines;
     }
+    if (pValue->grid.getGrid().size() > 0)
+    {
+        QJsonArray arr;
+        foreach (double val, pValue->grid.getGrid())
+        {
+            QVariant v = QVariant::fromValue(val);
+            arr.append(v.toJsonValue());
+        }
+
+        json["gridvalues"] = arr;
+    }
 
     mResult = json;
 }
@@ -80,6 +101,18 @@ void ValueJsonDumper::visit(ValueString *pValue)
         }
         json["listOfValues"] = lines;
     }
+    if (pValue->grid.getGrid().size() > 0)
+    {
+        QJsonArray arr;
+        foreach (QString val, pValue->grid.getGrid())
+        {
+            QVariant v = QVariant::fromValue(val);
+            arr.append(v.toJsonValue());
+        }
+
+        json["gridvalues"] = arr;
+    }
+
     mResult = json;
 }
 void ValueJsonDumper::visit(ValueLight *pValue)

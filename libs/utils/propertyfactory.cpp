@@ -30,6 +30,11 @@ PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVaria
             pProperty->addValue(key, v);
         }
     }
+    if (pData.contains("hasArray"))
+    {
+        pProperty->setHasArray( pData["hasArray"].toBool());
+    }
+
     return pProperty;
 
 

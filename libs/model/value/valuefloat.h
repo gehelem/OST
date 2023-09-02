@@ -50,6 +50,7 @@ class ValueFloat: public ValueBase
         void setFormat(const QString &format);
 
         ListOfValues<double> lov;
+        Grid<double> grid;
 
     private:
         double mValue = 0;

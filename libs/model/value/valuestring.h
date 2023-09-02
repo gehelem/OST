@@ -29,6 +29,7 @@ class ValueString: public ValueBase
         }
         void setValue(const QString &value, const bool &emitEvent);
         ListOfValues<QString> lov;
+        Grid<QString> grid;
 
     private:
         QString mValue;
