@@ -20,6 +20,10 @@ class ValueImg: public ValueBase
         {
             pVisitor->visit(this, data);
         }
+        void accept(ValueVisitor *pVisitor, QString &action, QVariantMap &data) override
+        {
+            pVisitor->visit(this, action, data);
+        }
 
         ValueImg(const QString &label, const QString &order, const QString &hint);
         ~ValueImg();

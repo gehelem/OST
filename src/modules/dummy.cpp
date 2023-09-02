@@ -391,7 +391,7 @@ void Dummy::updateSearchList(void)
         setOstElementValue("results", "mag", results[i].mag, false);
         setOstElementValue("results", "name", results[i].name, false);
         setOstElementValue("results", "alias", results[i].alias, false);
-        pushOstElements("results");
+        getStore()["results"]->push();
     }
 
 }

@@ -500,6 +500,7 @@
                 "value":false
             },
             "search": {
+                "autoupdate":true,
                 "type": "string",
                 "label": "Search object",
                 "value":"M13"

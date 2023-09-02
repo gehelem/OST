@@ -4,6 +4,14 @@ namespace  OST
 {
 void ValueUpdate::visit(ValueInt *pValue, QVariantMap &data )
 {
+    if (data.contains("gridaction"))
+    {
+        if (data["gridaction"].toString() == "push")
+        {
+            pValue->grid.add(pValue->value());
+            return;
+        }
+    }
     if (data.contains("autoupdate")) pValue->setAutoUpdate(data["autoupdate"].toBool());
     if (!data.contains("value"))
     {
@@ -62,9 +70,72 @@ void ValueUpdate::visit(ValueLight *pValue, QVariantMap &data )
 }
 void ValueUpdate::visit(ValueImg *pValue, QVariantMap &data )
 {
+    Q_UNUSED(pValue);
+    Q_UNUSED(data);
 }
 void ValueUpdate::visit(ValueMessage *pValue, QVariantMap &data )
 {
+    Q_UNUSED(pValue);
+    Q_UNUSED(data);
 }
+
+void ValueUpdate::visit(ValueInt* pValue, QString &action, QVariantMap &data)
+{
+    Q_UNUSED(data);
+    if (action == "push")
+    {
+        pValue->grid.add(pValue->value());
+    }
+}
+void ValueUpdate::visit(ValueFloat* pValue, QString &action, QVariantMap &data)
+{
+    Q_UNUSED(data);
+    if (action == "push")
+    {
+        pValue->grid.add(pValue->value());
+    }
+
+}
+void ValueUpdate::visit(ValueBool* pValue, QString &action, QVariantMap &data)
+{
+    Q_UNUSED(data);
+    if (action == "push")
+    {
+        pValue->grid.add(pValue->value());
+    }
+
+}
+void ValueUpdate::visit(ValueString* pValue, QString &action, QVariantMap &data)
+{
+    Q_UNUSED(data);
+    if (action == "push")
+    {
+        pValue->grid.add(pValue->value());
+    }
+
+}
+void ValueUpdate::visit(ValueLight* pValue, QString &action, QVariantMap &data)
+{
+    Q_UNUSED(data);
+    if (action == "push")
+    {
+        pValue->grid.add(pValue->state());
+    }
+
+}
+void ValueUpdate::visit(ValueImg* pValue, QString &action, QVariantMap &data)
+{
+    Q_UNUSED(pValue);
+    Q_UNUSED(action);
+    Q_UNUSED(data);
+}
+void ValueUpdate::visit(ValueMessage* pValue, QString &action, QVariantMap &data)
+{
+    Q_UNUSED(pValue);
+    Q_UNUSED(action);
+    Q_UNUSED(data);
+
+}
+
 
 }

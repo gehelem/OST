@@ -20,6 +20,10 @@ class ValueBool: public ValueBase
         {
             pVisitor->visit(this, data);
         }
+        void accept(ValueVisitor *pVisitor, QString &action, QVariantMap &data) override
+        {
+            pVisitor->visit(this, action, data);
+        }
 
         ValueBool(const QString &label, const QString &order, const QString &hint);
         ~ValueBool();
@@ -28,6 +32,7 @@ class ValueBool: public ValueBase
             return mValue;
         }
         void setValue(const bool &value);
+        Grid<bool> grid;
 
     private:
         bool mValue;

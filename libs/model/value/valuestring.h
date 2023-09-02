@@ -20,6 +20,10 @@ class ValueString: public ValueBase
         {
             pVisitor->visit(this, data);
         }
+        void accept(ValueVisitor *pVisitor, QString &action, QVariantMap &data) override
+        {
+            pVisitor->visit(this, action, data);
+        }
 
         ValueString(const QString &label, const QString &order, const QString &hint);
         ~ValueString();

@@ -17,6 +17,7 @@ class ValueBase: public QObject
     public:
         virtual void accept(ValueVisitor* pVisitor) = 0;
         virtual void accept(ValueVisitor* pVisitor, QVariantMap &data) = 0;
+        virtual void accept(ValueVisitor* pVisitor, QString &action, QVariantMap &data) = 0;
 
         ValueBase(const QString &label, const QString &order, const QString &hint);
         ~ValueBase();

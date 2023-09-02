@@ -15,6 +15,32 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                                         );
             pValue->setValue(pData["value"].toBool());
             if (pData.contains("autoupdate")) pValue->setAutoUpdate(pData["autoupdate"].toBool());
+            if (pData.contains("gridvalues"))
+            {
+                QList ll  = pData["gridvalues"].toList();
+                foreach (QVariant val, ll)
+                {
+                    pValue->grid.add(val.toBool());
+                }
+            }
+
+            return pValue;
+        }
+        if (pData["type"].toString() == "light")
+        {
+            auto *pValue = new ValueLight(pData["label"].toString(),
+                                          pData["order"].toString(),
+                                          pData["hint"].toString()
+                                         );
+            if (pData.contains("autoupdate")) pValue->setAutoUpdate(pData["autoupdate"].toBool());
+            if (pData.contains("gridvalues"))
+            {
+                QList ll  = pData["gridvalues"].toList();
+                foreach (QVariant val, ll)
+                {
+                    pValue->grid.add(IntToState(val.toInt()));
+                }
+            }
 
             return pValue;
         }

@@ -75,6 +75,7 @@ class PropertyMulti: public PropertyBase
             mValues[key] = pValue;
             connect(mValues[key], &ValueBase::valueChanged, this, &PropertyMulti::OnValueChanged);
         }
+        void push();
     public slots:
         void OnValueChanged(ValueBase*)
         {

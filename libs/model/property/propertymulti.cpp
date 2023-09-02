@@ -1,4 +1,6 @@
 #include "propertymulti.h"
+#include "valueupdate.h"
+
 namespace  OST
 {
 
@@ -12,6 +14,17 @@ PropertyMulti::PropertyMulti(const QString &key, const QString &label, const Per
 }
 PropertyMulti::~PropertyMulti()
 {
+
+}
+void PropertyMulti::push()
+{
+    foreach(const QString &key, mValues.keys())
+    {
+        OST::ValueUpdate d;
+        QString action = "push";
+        QVariantMap m;
+        mValues[key]->accept(&d, action, m);
+    }
 
 }
 

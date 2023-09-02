@@ -13,6 +13,24 @@ typedef enum
     Busy,     /*!< State is busy */
     Error     /*!< State is error */
 } State;
+inline State IntToState(int val )
+{
+    if (val == 0) return Idle;
+    if (val == 1) return Ok;
+    if (val == 2) return Busy;
+    if (val == 3) return Error;
+    qDebug() << "Cant convert " << val << " to OST::State (0-3) - defaults to Idle";
+    return Idle;
+}
+inline int StateToInt(State val )
+{
+    if (val == Idle) return 0;
+    if (val == Ok) return 1;
+    if (val == Busy) return 2;
+    if (val == Error) return 3;
+    qDebug() << "StateToInt Cant convert state - return State::Error";
+    return 3;
+}
 
 template <typename U>
 class ListOfValues

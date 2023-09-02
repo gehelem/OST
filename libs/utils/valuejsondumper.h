@@ -27,10 +27,22 @@ class ValueJsonDumper : public ValueVisitor
             Q_UNUSED(pValue);
             Q_UNUSED(data)
         }
+        void visit(ValueBool* pValue, QString &action, QVariantMap &data ) override
+        {
+            Q_UNUSED(pValue);
+            Q_UNUSED(action);
+            Q_UNUSED(data)
+        }
         void visit(ValueInt *pValue) override;
         void visit(ValueInt* pValue, QVariantMap &data ) override
         {
             Q_UNUSED(pValue);
+            Q_UNUSED(data)
+        }
+        void visit(ValueInt* pValue, QString &action, QVariantMap &data ) override
+        {
+            Q_UNUSED(pValue);
+            Q_UNUSED(action);
             Q_UNUSED(data)
         }
         void visit(ValueFloat *pValue) override;
@@ -39,10 +51,22 @@ class ValueJsonDumper : public ValueVisitor
             Q_UNUSED(pValue);
             Q_UNUSED(data)
         }
+        void visit(ValueFloat* pValue, QString &action, QVariantMap &data ) override
+        {
+            Q_UNUSED(pValue);
+            Q_UNUSED(action);
+            Q_UNUSED(data)
+        }
         void visit(ValueString *pValue) override;
         void visit(ValueString* pValue, QVariantMap &data ) override
         {
             Q_UNUSED(pValue);
+            Q_UNUSED(data)
+        }
+        void visit(ValueString* pValue, QString &action, QVariantMap &data ) override
+        {
+            Q_UNUSED(pValue);
+            Q_UNUSED(action);
             Q_UNUSED(data)
         }
         void visit(ValueLight *pValue) override;
@@ -51,16 +75,34 @@ class ValueJsonDumper : public ValueVisitor
             Q_UNUSED(pValue);
             Q_UNUSED(data)
         }
+        void visit(ValueLight* pValue, QString &action, QVariantMap &data ) override
+        {
+            Q_UNUSED(pValue);
+            Q_UNUSED(action);
+            Q_UNUSED(data)
+        }
         void visit(ValueImg *pValue) override;
         void visit(ValueImg* pValue, QVariantMap &data ) override
         {
             Q_UNUSED(pValue);
             Q_UNUSED(data)
         }
+        void visit(ValueImg* pValue, QString &action, QVariantMap &data ) override
+        {
+            Q_UNUSED(pValue);
+            Q_UNUSED(action);
+            Q_UNUSED(data)
+        }
         void visit(ValueMessage *pValue) override;
         void visit(ValueMessage* pValue, QVariantMap &data ) override
         {
             Q_UNUSED(pValue);
+            Q_UNUSED(data)
+        }
+        void visit(ValueMessage* pValue, QString &action, QVariantMap &data ) override
+        {
+            Q_UNUSED(pValue);
+            Q_UNUSED(action);
             Q_UNUSED(data)
         }
 
