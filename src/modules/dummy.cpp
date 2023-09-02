@@ -143,7 +143,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                     {
                         if (setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], false))
                         {
-                            setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
+                            getProperty(keyprop)->setState(OST::Ok);
                             _camera = getString("devices", "camera");
                         }
                     }
@@ -155,7 +155,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                         if (setOstElementValue(keyprop, keyelt, false, false))
                         {
                             connectIndi();
-                            setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
+                            getProperty(keyprop)->setState(OST::Ok);
                             connectDevice(_camera);
                             connectDevice(getString("devices", "mount"));
                             setBLOBMode(B_ALSO, _camera.toStdString().c_str(), nullptr);
@@ -166,11 +166,11 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                     {
                         if (setOstElementValue(keyprop, keyelt, false, false))
                         {
-                            setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
+                            getProperty(keyprop)->setState(OST::Busy);
                             sendModNewNumber(_camera, "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );
                             if (!sendModNewNumber(_camera, "CCD_EXPOSURE", "CCD_EXPOSURE_VALUE", getFloat("parameters", "exposure")))
                             {
-                                setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
+                                getProperty(keyprop)->setState(OST::Error);
                             }
                         }
                     }
@@ -178,7 +178,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                     {
                         if (setOstElementValue(keyprop, keyelt, false, false))
                         {
-                            setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
+                            getProperty(keyprop)->setState(OST::Busy);
                             stats = _image->getStats();
                             _solver.ResetSolver(stats, _image->getImageBuffer());
                             connect(&_solver, &Solver::successSEP, this, &Dummy::OnSucessSEP);
@@ -190,14 +190,14 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                     {
                         if (setOstElementValue(keyprop, keyelt, false, false))
                         {
-                            setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
+                            getProperty(keyprop)->setState(OST::Busy);
                             double ra, dec;
                             if (
                                 !getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "DEC", dec)
                                 || !getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "RA", ra)
                             )
                             {
-                                setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
+                                getProperty(keyprop)->setState(OST::Error);
                                 sendMessage("Can't find mount device " + getString("devices", "mount") + " solve aborted");
                             }
                             else
@@ -283,8 +283,7 @@ void Dummy::newBLOB(INDI::PropertyBlob pblob)
         _image = new fileio();
         _image->loadBlob(pblob);
 
-
-        setOstPropertyAttribute("actions", "status", IPS_OK, true);
+        getProperty("actions")->setState(OST::Ok);
         setOstElementValue("imagevalues", "width", _image->getStats().width, false);
         setOstElementValue("imagevalues", "height", _image->getStats().height, false);
         setOstElementValue("imagevalues", "min", _image->getStats().min[0], false);
@@ -301,10 +300,10 @@ void Dummy::newBLOB(INDI::PropertyBlob pblob)
 
         QImage rawImage = _image->getRawQImage();
         rawImage.save(getWebroot() + "/" + getModuleName() + QString(pblob.getDeviceName()) + ".jpeg", "JPG", 100);
-        setOstPropertyAttribute("testimage", "URL", getModuleName() + QString(pblob.getDeviceName()) + ".jpeg", true);
+        //setOstPropertyAttribute("testimage", "URL", getModuleName() + QString(pblob.getDeviceName()) + ".jpeg", true);
 
     }
-    setOstPropertyAttribute("actions", "status", IPS_OK, true);
+    getProperty("actions")->setState(OST::Ok);
 
 
 }
@@ -323,7 +322,7 @@ void Dummy::updateProperty(INDI::Property property)
 
 void Dummy::OnSucessSEP()
 {
-    setOstPropertyAttribute("actions", "status", IPS_OK, true);
+    getProperty("actions")->setState(OST::Ok);
     setOstElementValue("imagevalues", "hfravg", _solver.HFRavg, false);
     setOstElementValue("imagevalues", "starscount", _solver.stars.size(), true);
     disconnect(&_solver, &Solver::successSEP, this, &Dummy::OnSucessSEP);
@@ -335,15 +334,15 @@ void Dummy::OnSucessSolve()
     if (_solver.stellarSolver->failed())
     {
         sendMessage("Solver failed");
-        setOstPropertyAttribute("actions", "status", IPS_ALERT, true);
-        setOstPropertyAttribute("imagevalues", "status", IPS_ALERT, true);
+        getProperty("actions")->setState(OST::Error);
+        getProperty("imagevalues")->setState(OST::Error);
         setOstElementValue("imagevalues", "solRA", 0, false);
         setOstElementValue("imagevalues", "solDEC", 0, true);
     }
     else
     {
-        setOstPropertyAttribute("actions", "status", IPS_OK, true);
-        setOstPropertyAttribute("imagevalues", "status", IPS_OK, true);
+        getProperty("actions")->setState(OST::Ok);
+        getProperty("imagevalues")->setState(OST::Ok);
         setOstElementValue("imagevalues", "solRA", _solver.stellarSolver->getSolution().ra, false);
         setOstElementValue("imagevalues", "solDEC", _solver.stellarSolver->getSolution().dec, true);
     }

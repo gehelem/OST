@@ -73,11 +73,11 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                                              eltwithoutblanks,
                                              elt,
                                              prof);
-                        setOstPropertyAttribute(keyprop, "status", 1, true);
+                        getProperty(keyprop)->setState(OST::Busy);
                     }
                     else
                     {
-                        setOstPropertyAttribute(keyprop, "status", 3, true);
+                        getProperty(keyprop)->setState(OST::Error);
                     }
 
                 }
@@ -89,7 +89,7 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                 if (keyelt == "refresh" && keyprop == "loadconf")
                 {
                     setConfigurations();
-                    setOstPropertyAttribute(keyprop, "status", 1, true);
+                    getProperty(keyprop)->setState(OST::Busy);
                 }
                 if (keyelt == "save" && keyprop == "saveconf")
                 {

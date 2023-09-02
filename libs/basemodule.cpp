@@ -155,12 +155,12 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
                         QVariant val = pEventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
                         if (keyelt == "load" && val.toBool())
                         {
-                            setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
+                            getProperty(keyprop)->setState(OST::Busy);
                             QVariantMap prof;
                             if (getDbProfile(getClassName(), getString("loadprofile", "value"), prof))
                             {
                                 setProfile(prof);
-                                setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
+                                getProperty(keyprop)->setState(OST::Ok);
                                 sendMessage(getString("loadprofile", "value") + " profile sucessfully loaded");
                                 emit moduleEvent("moduleloadedprofile", getModuleName(), getString("loadprofile", "value"),
                                                  QVariantMap());
@@ -169,7 +169,7 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
                             else
                             {
                                 sendWarning("Can't load " + getString("loadprofile", "name") + " profile");
-                                setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
+                                getProperty(keyprop)->setState(OST::Error);
                             }
                             setOstElementValue("loadprofile", "load", false, false);
                             setOstElementValue("loadprofile", "refresh", false, true);
@@ -177,11 +177,12 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
                         }
                         if (keyelt == "refresh" && val.toBool())
                         {
-                            setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
+                            getProperty(keyprop)->setState(OST::Busy);
+
                             setProfiles();
                             setOstElementValue("loadprofile", "load", false, false);
                             setOstElementValue("loadprofile", "refresh", false, false);
-                            setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
+                            getProperty(keyprop)->setState(OST::Ok);
                             return;
                         }
 
@@ -197,18 +198,18 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
                     QVariant val = pEventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
                     if (keyelt == "save"  && val.toBool())
                     {
-                        setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
+                        getProperty(keyprop)->setState(OST::Busy);
                         QVariantMap prof = getProfile();
                         if (setDbProfile(getClassName(), getString("loadprofile", "value"), prof))
                         {
-                            setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
+                            getProperty(keyprop)->setState(OST::Ok);
                             sendMessage(getString("loadprofile", "value") + " profile sucessfully saved");
                             emit moduleEvent("modulesavedprofile", getModuleName(), getString("loadprofile", "value"),
                                              QVariantMap());
                         }
                         else
                         {
-                            setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
+                            getProperty(keyprop)->setState(OST::Error);
                             sendWarning("Can't save " + getString("loadprofile", "value") + " profile");
                         }
                     }
