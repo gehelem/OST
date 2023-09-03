@@ -37,9 +37,9 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     setOstElementValue("numbersRW", "n2", -1000, false);
     setOstElementValue("numbersRW", "n3", 3.14, false);
     setOstElementValue("numbersRW", "n4", -20.23, true);
-    setOstElementAttribute("numbersRW", "n4", "step", 100, true);
-    setOstElementAttribute("numbersRW", "n4", "min", -10000, true);
-    setOstElementAttribute("numbersRW", "n4", "max", 10000, true);
+    getValueFloat("numbersRW", "n4")->setStep(100);
+    getValueFloat("numbersRW", "n4")->setMin(-10000);
+    getValueFloat("numbersRW", "n4")->setMax(10000);
 
     setOstElementValue("mixedRW", "b1", false, false);
     setOstElementValue("mixedRW", "b2", false, false);
@@ -89,6 +89,7 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
                                      "Dynamically instanciated", "", true,
                                      false);
     dynlight = new OST::ValueLight("Dyn light", "", "");
+    dynlight->setState(OST::State::Busy);
     dynprop->addValue("dynlight", dynlight);
     dyntext = new OST::ValueString("Dyn text", "", "");
     dynprop->addValue("dyntext", dyntext);
@@ -99,6 +100,7 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
 
     dynbool = new OST::ValueBool("Dyn bool", "", "");
     dynprop->addValue("dynbool", dynbool);
+    dynbool->setValue(false, false);
 
 
 }

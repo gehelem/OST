@@ -46,11 +46,6 @@ class Datastore : public Baseroot
         double getFloat(QString pProperty, QString pElement, long line);
         bool getBool(QString pProperty, QString pElement);
         bool getBool(QString pProperty, QString pElement, long line);
-        QVariantMap getProperties(void)
-        {
-            //getQtProperties();
-            return mProperties;
-        }
         QMap<QString, OST::PropertyMulti*> getStore(void)
         {
             return mStore;
@@ -103,10 +98,6 @@ class Datastore : public Baseroot
         void loadOstPropertiesFromFile(const QString &pFileName);
         void saveOstPropertiesToFile(const QString &pFileName);
 
-        bool setOstElementAttribute (const QString &pPropertyName, const QString &pElementName, const  QString &pAttributeName,
-                                     const QVariant &AttributeValue,
-                                     bool mEmitEvent);
-
         void deleteOstProperty(const QString &pPropertyName);
 
         QVariant getOstElementLineValue(const QString &pPropertyName, const QString &pElementName, const double &pLine);
@@ -121,7 +112,6 @@ class Datastore : public Baseroot
         void onValueChanged(void);
         void onPropertyEvent(QString event, QString key, OST::PropertyBase* prop);
     private:
-        QVariantMap mProperties;
         QMap<QString, OST::PropertyMulti*> mStore;
 
 }
