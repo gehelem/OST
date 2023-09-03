@@ -9,9 +9,10 @@ IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap
     setVerbose(false);
     //_moduletype = "IndiModule";
     loadOstPropertiesFromFile(":indimodule.json");
-    setOstPropertyValue("indiGitHash", QString::fromStdString(Version::GIT_SHA1), false);
-    setOstPropertyValue("indiGitDate", QString::fromStdString(Version::GIT_DATE), false);
-    setOstPropertyValue("indiGitMessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT), false);
+    setOstElementValue("indiGit", "hash", QString::fromStdString(Version::GIT_SHA1), false);
+    setOstElementValue("indiGit", "date", QString::fromStdString(Version::GIT_DATE), false);
+    setOstElementValue("indiGit", "message", QString::fromStdString(Version::GIT_COMMIT_SUBJECT), false);
+
 
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &IndiModule::connectIndiTimer);
@@ -34,22 +35,22 @@ void IndiModule::OnDispatchToIndiExternalEvent(const QString &eventType, const Q
     {
         foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
         {
-            setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
+            //setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
             if (keyprop == "serveractions")
             {
                 setOstElementValue(keyprop, keyelt, false, false);
                 if (keyelt == "conserv")
                 {
 
-                    setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
-                    if (connectIndi()) setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
-                    else setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
+                    getProperty(keyprop)->setState(OST::Busy);
+                    if (connectIndi()) getProperty(keyprop)->setState(OST::Ok);
+                    else getProperty(keyprop)->setState(OST::Error);
                 }
                 if (keyelt == "disconserv")
                 {
-                    setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
-                    if (disconnectIndi()) setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
-                    else setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
+                    getProperty(keyprop)->setState(OST::Busy);
+                    if (disconnectIndi()) getProperty(keyprop)->setState(OST::Ok);
+                    else getProperty(keyprop)->setState(OST::Error);
                 }
             }
             if (keyprop == "devicesactions")
@@ -58,26 +59,26 @@ void IndiModule::OnDispatchToIndiExternalEvent(const QString &eventType, const Q
                 if (!isServerConnected())
                 {
                     sendWarning("Indi server not connected");
-                    setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
+                    getProperty(keyprop)->setState(OST::Error);
                     break;
                 }
                 if (keyelt == "condevs")
                 {
-                    setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
-                    if (connectAllDevices()) setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
-                    else setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
+                    getProperty(keyprop)->setState(OST::Busy);
+                    if (connectAllDevices()) getProperty(keyprop)->setState(OST::Ok);
+                    else getProperty(keyprop)->setState(OST::Error);
                 }
                 if (keyelt == "discondevs")
                 {
-                    setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
-                    if (disconnectAllDevices()) setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
-                    else setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
+                    getProperty(keyprop)->setState(OST::Busy);
+                    if (disconnectAllDevices()) getProperty(keyprop)->setState(OST::Ok);
+                    else getProperty(keyprop)->setState(OST::Error);
                 }
                 if (keyelt == "loadconfs")
                 {
-                    setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
-                    if (loadDevicesConfs()) setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
-                    else setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
+                    getProperty(keyprop)->setState(OST::Busy);
+                    if (loadDevicesConfs()) getProperty(keyprop)->setState(OST::Ok);
+                    else getProperty(keyprop)->setState(OST::Error);
                 }
             }
         }
@@ -89,8 +90,7 @@ void IndiModule::connectIndiTimer()
     {
         return;
     }
-    setServer(getOstElementValue("server", "host").toString().toStdString().c_str(), getOstElementValue("server",
-              "port").toInt());
+    setServer(getString("server", "host").toStdString().c_str(), getInt("server", "port"));
     if (!connectServer())
     {
         sendError("Couldn't connect to Indi server");
@@ -115,8 +115,7 @@ bool IndiModule::connectIndi()
         newUniversalMessage("Indi server already connected");
         return true;
     }
-    setServer(getOstElementValue("server", "host").toString().toStdString().c_str(), getOstElementValue("server",
-              "port").toInt());
+    setServer(getString("server", "host").toStdString().c_str(), getInt("server", "port"));
     if (connectServer())
     {
         newUniversalMessage("Indi server connected");

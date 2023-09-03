@@ -1,24 +1,27 @@
 {
-    "indiGitHash": {
+    "indiGit": {
         "devcat": "Module",
         "group": "Info",
         "order":"00",
         "permission": 0,
-        "propertyLabel": "Indi module git hash"
-    },
-    "indiGitDate": {
-        "devcat": "Module",
-        "group": "Info",
-        "order":"00",
-        "permission": 0,
-        "propertyLabel": "Indi module git date"
-    },
-    "indiGitMessage": {
-        "devcat": "Module",
-        "group": "Info",
-        "order":"00",
-        "permission": 0,
-        "propertyLabel": "Indi module git message"
+        "label": "Indi module git",
+        "elements": {
+            "hash": {
+                "type": "string",
+                "label": "Hash",
+                "value":"xxx"
+            },
+            "date": {
+                "type": "string",
+                "label": "Date",
+                "value":"xxx"
+            },
+            "message": {
+                "type": "string",
+                "label": "Commit message",
+                "value":"xxx"
+            }
+        }
     },
     "server": {
         "hasprofile":true,
@@ -26,14 +29,16 @@
         "group": "Indi",
         "order":"99",
         "permission": 2,
-        "propertyLabel": "Server",
+        "label": "Server",
         "elements": {
             "host": {
-                "elementLabel": "Host",
+                "type": "string",
+                "label": "Host",
                 "value": "localhost"
             },
             "port": {
-                "elementLabel": "Port",
+                "type": "int",
+                "label": "Port",
                 "value": 7624
             }
 
@@ -45,14 +50,16 @@
         "order":"01",
         "permission": 2,
         "rule":2,
-        "propertyLabel": "Server",
+        "label": "Server",
         "elements": {
             "conserv": {
-                "elementLabel": "Connect"
+                "type": "bool",
+                "label": "Connect"
                 ,"value":false
             },
             "disconserv": {
-                "elementLabel": "Disconnect"
+                "type": "bool",
+                "label": "Disconnect"
                 ,"value":false
             }
         }
@@ -63,7 +70,7 @@
         "group": "Indi",
         "order":"06",
         "permission": 2,
-        "propertyLabel": "Devices",
+        "label": "Devices",
         "elements": {
         }
     },
@@ -73,42 +80,49 @@
         "order":"04",
         "permission": 2,
         "rule":2,
-        "propertyLabel": "Devices actions" ,
+        "label": "Devices actions" ,
         "elements": {
             "condevs": {
-                "elementLabel": "Connect"
+                "type": "bool",
+                "label": "Connect"
                 ,"value":false
             },
             "discondevs": {
-                "elementLabel": "Disconnect"
+                "type": "bool",
+                "label": "Disconnect"
                 ,"value":false
             },
             "loadconfs": {
-                "elementLabel": "Load devices conf"
+                "type": "bool",
+                "label": "Load devices conf"
                 ,"value":false
             }
 
         }
     },
     "startup": {
+        "type": "multi",
         "devcat": "Module",
         "group": "Indi",
         "order":"08",
         "permission": 2,
         "rule":2,
         "hasprofile":true,
-        "propertyLabel": "Actions on module startup",
+        "label": "Actions on module startup",
         "elements": {
             "indiatstart": {
-                "elementLabel": "Connect indi"
+                "type": "bool",
+                "label": "Connect indi"
                 ,"value":false
             },
             "devatstart": {
-                "elementLabel": "Connect devices"
+                "type": "bool",
+                "label": "Connect devices"
                 ,"value":false
             },
             "confsatstart": {
-                "elementLabel": "Load devices conf"
+                "type": "bool",
+                "label": "Load devices conf"
                 ,"value":false
             }
 

@@ -3,18 +3,24 @@
         "devcat": "Module",
         "group": "Configurations",
         "permission": 2,
-        "value": "default",
-        "listOfValues":{
-        },
         "rule":1,
-        "propertyLabel": "Load configuration",
+        "label": "Load configuration",
         "elements": {
+            "name": {
+                "type": "string",
+                "label": "Name",
+                "value":"default",
+                "listOfValues":{
+                }
+            },
             "load": {
-                "elementLabel": "Load",
+                "type": "bool",
+                "label": "Load",
                 "value":false
             },
             "refresh": {
-                "elementLabel": "Refresh",
+                "type": "bool",
+                "label": "Refresh",
                 "value":false
             }
         }
@@ -23,39 +29,49 @@
         "devcat": "Module",
         "group": "Configurations",
         "permission": 2,
-        "value": "default",
         "rule":0,
-        "propertyLabel": "Save configuration",
+        "label": "Save configuration",
         "elements": {
+            "name": {
+                "type": "string",
+                "label": "Name",
+                "value":"default"
+            },
             "save": {
-                "elementLabel": "Save as",
+                "type": "bool",
+                "label": "Save as",
                 "value":false
             }
         }
     },
     "modules": {
+        "type": "multi",
         "devcat": "Modules",
         "group": "",
         "permission": 0,
         "grid":0,
         "gridlimit":255,
         "rule":0,
-        "propertyLabel": "Loaded modules",
+        "label": "Loaded modules",
         "elements": {
             "name": {
-                "elementLabel": "Internal name",
+                "type": "string",
+                "label": "Internal name",
                 "value":""
             },
             "label": {
-                "elementLabel": "Label",
+                "type": "string",
+                "label": "Label",
                 "value":""
             },
             "type": {
-                "elementLabel": "Type",
+                "type": "string",
+                "label": "Type",
                 "value":""
             },
             "profile": {
-                "elementLabel": "Profile",
+                "type": "string",
+                "label": "Profile",
                 "value":""
             }
 
@@ -64,14 +80,16 @@
         }
     },
     "killall": {
+        "type": "multi",
         "devcat": "Modules",
         "group": "",
         "permission": 2,
         "rule":0,
-        "propertyLabel": "",
+        "label": "",
         "elements": {
             "kill": {
-                "elementLabel": "Kill all modules",
+                "type": "bool",
+                "label": "Kill all modules",
                 "value":false
             }
         }

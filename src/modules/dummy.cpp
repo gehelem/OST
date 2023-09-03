@@ -13,10 +13,10 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     //Q_INIT_RESOURCE(dummy);
     setClassName(QString(metaObject()->className()).toLower());
     loadOstPropertiesFromFile(":dummy.json");
+
     setModuleDescription("Dummy module to show what we can do and not");
     setModuleVersion("0.1");
 
-    setOstPropertyValue("message", "Dummy module init finished", true);
     setOstElementValue("extextRO", "extext1", "Texte read only 1", false);
     setOstElementValue("extextRO", "extext2", "Texte read only 2", false);
     setOstElementValue("extextRO", "extext3", "Texte read only 3", false);
@@ -48,7 +48,7 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     setOstElementValue("mixedRW", "n2", 11, false);
     setOstElementValue("mixedRW", "t1", "Mixed text value", false);
     //saveAttributesToFile("dummy.json");
-    _camera = getOstElementValue("devices", "camera").toString();
+    _camera = getString("devices", "camera");
 
     //foreach(QString key, getAvailableModuleLibs().keys())
     //{
@@ -60,16 +60,47 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     //setBLOBMode(B_ALSO, _camera.toStdString().c_str(), nullptr);
     //enableDirectBlobAccess(_camera.toStdString().c_str(), nullptr);
     //setBlobMode();
-    setOstElementLov("extextRW", "extext4", "i1", "i1 label modified");
+    getValueString("extextRW", "extext4")->lov.update("i1", "i1 label modified");
     //addOstElementLov("extextRW", "extext4", "i1", "i1 label modified"); // should give a warning
-    addOstElementLov("extextRW", "extext4", "i3", "i3 label");
-    addOstElementLov("extextRW", "extext4", "i4", "i4 label");
-    deleteOstElementLov("extextRW", "extext4", "i4");
+    getValueString("extextRW", "extext4")->lov.add("i3", "i3 label");
+    getValueString("extextRW", "extext4")->lov.add("i4", "i4 label");
+    getValueString("extextRW", "extext4")->lov.del("i4");
     //deleteOstElementLov("extextRW", "extext4", "i4"); // should give a warning
     //sendMessage(QString("lov element i3=") + getOstElementLov("extextRW", "extext4", "i3").toString());
     //sendMessage(QString("lov element inexistant") + getOstElementLov("extextRW", "extext4",
     //            "xxx").toString());// should give a warning
     //clearOstElementLov("extextRW", "extext4");
+    OST::PropertyMulti *n = getProperty("numbersRW");
+    n->setState(OST::State::Error);
+    //OST::ValueInt *numbersRWn3 = static_cast<OST::ValueInt*>(n->getValue("n3"));
+    OST::ValueInt *numbersRWn3 = static_cast<OST::ValueInt*>(n->getValue("n3"));
+    numbersRWn3->setValue(999666, true);
+
+    //getText("extextRW", "extext1")->setValue("Value modified");
+    //OST::ValueJsonDumper d;
+    //getText("extextRW", "extext1")->accept(&d);
+    //qDebug() << d.getResult();
+    OST::PropertyMulti *p = getProperty("extextRW");
+    p->setState(OST::State::Busy);
+    static_cast<OST::ValueString*>(p->getValue("extext1"))->setValue("Value modified2", false);
+    static_cast<OST::ValueString*>(p->getValue("extext4"))->lov.update("i3", "another label");
+
+    dynprop = new OST::PropertyMulti("dynprop", "Dynamic", OST::Permission::ReadWrite, "Examples",
+                                     "Dynamically instanciated", "", true,
+                                     false);
+    dynlight = new OST::ValueLight("Dyn light", "", "");
+    dynprop->addValue("dynlight", dynlight);
+    dyntext = new OST::ValueString("Dyn text", "", "");
+    dynprop->addValue("dyntext", dyntext);
+    createProperty("dynprop", dynprop);
+    dynprop->setState(OST::State::Busy);
+    dyntext->setValue("Okydoky", false);
+    dynlight->setState(OST::State::Ok);
+
+    dynbool = new OST::ValueBool("Dyn bool", "", "");
+    dynprop->addValue("dynbool", dynbool);
+
+
 }
 
 Dummy::~Dummy()
@@ -85,22 +116,35 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
     {
         foreach(const QString &keyprop, eventData.keys())
         {
-            if (eventData[keyprop].toMap().contains("value"))
-            {
-                QVariant val = eventData[keyprop].toMap()["value"];
-                setOstPropertyValue(keyprop, val, true);
-            }
             foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
             {
-                setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
+                //setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
+                if (keyprop == "dynprop")
+                {
+                    if (keyelt == "dyntext")
+                    {
+
+                        dyntext->setValue(eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toString(), true);
+                    }
+                    if (keyelt == "dynbool")
+                    {
+                        bool val = eventData["dynprop"].toMap()["elements"].toMap()["dynbool"].toMap()["value"].toBool();
+                        if (val)
+                        {
+
+                            dyntext->setValue("Changed from dynamic switch", true);
+                        }
+
+                    }
+                }
                 if (keyprop == "devices")
                 {
                     if (keyelt == "camera")
                     {
                         if (setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], false))
                         {
-                            setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
-                            _camera = getOstElementValue("devices", "camera").toString();
+                            getProperty(keyprop)->setState(OST::Ok);
+                            _camera = getString("devices", "camera");
                         }
                     }
                 }
@@ -111,9 +155,9 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                         if (setOstElementValue(keyprop, keyelt, false, false))
                         {
                             connectIndi();
-                            setOstPropertyAttribute(keyprop, "status", IPS_OK, true);
+                            getProperty(keyprop)->setState(OST::Ok);
                             connectDevice(_camera);
-                            connectDevice(getOstElementValue("devices", "mount").toString());
+                            connectDevice(getString("devices", "mount"));
                             setBLOBMode(B_ALSO, _camera.toStdString().c_str(), nullptr);
                             enableDirectBlobAccess(_camera.toStdString().c_str(), nullptr);
                         }
@@ -122,12 +166,11 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                     {
                         if (setOstElementValue(keyprop, keyelt, false, false))
                         {
-                            setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
+                            getProperty(keyprop)->setState(OST::Busy);
                             sendModNewNumber(_camera, "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );
-                            if (!sendModNewNumber(_camera, "CCD_EXPOSURE", "CCD_EXPOSURE_VALUE", getOstElementValue("parameters",
-                                                  "exposure").toDouble()))
+                            if (!sendModNewNumber(_camera, "CCD_EXPOSURE", "CCD_EXPOSURE_VALUE", getFloat("parameters", "exposure")))
                             {
-                                setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
+                                getProperty(keyprop)->setState(OST::Error);
                             }
                         }
                     }
@@ -135,7 +178,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                     {
                         if (setOstElementValue(keyprop, keyelt, false, false))
                         {
-                            setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
+                            getProperty(keyprop)->setState(OST::Busy);
                             stats = _image->getStats();
                             _solver.ResetSolver(stats, _image->getImageBuffer());
                             connect(&_solver, &Solver::successSEP, this, &Dummy::OnSucessSEP);
@@ -147,15 +190,15 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                     {
                         if (setOstElementValue(keyprop, keyelt, false, false))
                         {
-                            setOstPropertyAttribute(keyprop, "status", IPS_BUSY, true);
+                            getProperty(keyprop)->setState(OST::Busy);
                             double ra, dec;
                             if (
-                                !getModNumber(getOstElementValue("devices", "mount").toString(), "EQUATORIAL_EOD_COORD", "DEC", dec)
-                                || !getModNumber(getOstElementValue("devices", "mount").toString(), "EQUATORIAL_EOD_COORD", "RA", ra)
+                                !getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "DEC", dec)
+                                || !getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "RA", ra)
                             )
                             {
-                                setOstPropertyAttribute(keyprop, "status", IPS_ALERT, true);
-                                sendMessage("Can't find mount device " + getOstElementValue("devices", "mount").toString() + " solve aborted");
+                                getProperty(keyprop)->setState(OST::Error);
+                                sendMessage("Can't find mount device " + getString("devices", "mount") + " solve aborted");
                             }
                             else
                             {
@@ -165,7 +208,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                                 stats = _image->getStats();
                                 _solver.ResetSolver(stats, _image->getImageBuffer());
                                 QStringList folders;
-                                folders.append(getOstElementValue("parameters", "indexfolderpath").toString());
+                                folders.append(getString("parameters", "indexfolderpath"));
                                 _solver.stellarSolver->setIndexFolderPaths(folders);
                                 connect(&_solver, &Solver::successSolve, this, &Dummy::OnSucessSolve);
                                 connect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
@@ -193,30 +236,29 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
             {
                 double line = eventData[keyprop].toMap()["line"].toDouble();
                 qDebug() << "dummy" << eventType << "-" << eventModule << "-" << eventKey << "-" << eventData << "line=" << line;
-                deleteOstPropertyLine(keyprop, line);
-
+                getStore()[keyprop]->deleteLine(line);
             }
             if (eventType == "Flcreate")
             {
                 qDebug() << "dummy" << eventType << "-" << eventModule << "-" << eventKey << "-" << eventData;
-                newOstPropertyLine(keyprop, eventData);
+                getStore()[keyprop]->newLine(eventData[keyprop].toMap()["elements"].toMap());
 
             }
             if (eventType == "Flupdate")
             {
                 double line = eventData[keyprop].toMap()["line"].toDouble();
                 qDebug() << "dummy" << eventType << "-" << eventModule << "-" << eventKey << "-" << eventData;
-                updateOstPropertyLine(keyprop, line, eventData);
+                getStore()[keyprop]->updateLine(line, eventData[keyprop].toMap()["elements"].toMap());
 
             }
             if (eventType == "Flselect")
             {
                 double line = eventData[keyprop].toMap()["line"].toDouble();
                 qDebug() << "dummy" << eventType << "-" << eventModule << "-" << eventKey << "-" << eventData << "line=" << line;
-                QString code = getOstElementLineValue("results", "code", line).toString();
-                float ra = getOstElementLineValue("results", "RA", line).toFloat();
-                float dec = getOstElementLineValue("results", "DEC", line).toFloat();
-                QString ns = getOstElementLineValue("results", "NS", line).toString();
+                QString code = getString("results", "code", line);
+                float ra = getFloat("results", "RA", line);
+                float dec = getFloat("results", "DEC", line);
+                QString ns = getString("results", "NS", line);
                 setOstElementValue("selection", "code", code, false);
                 setOstElementValue("selection", "RA", ra, false);
                 setOstElementValue("selection", "DEC", dec, false);
@@ -241,8 +283,7 @@ void Dummy::newBLOB(INDI::PropertyBlob pblob)
         _image = new fileio();
         _image->loadBlob(pblob);
 
-
-        setOstPropertyAttribute("actions", "status", IPS_OK, true);
+        getProperty("actions")->setState(OST::Ok);
         setOstElementValue("imagevalues", "width", _image->getStats().width, false);
         setOstElementValue("imagevalues", "height", _image->getStats().height, false);
         setOstElementValue("imagevalues", "min", _image->getStats().min[0], false);
@@ -259,10 +300,14 @@ void Dummy::newBLOB(INDI::PropertyBlob pblob)
 
         QImage rawImage = _image->getRawQImage();
         rawImage.save(getWebroot() + "/" + getModuleName() + QString(pblob.getDeviceName()) + ".jpeg", "JPG", 100);
-        setOstPropertyAttribute("testimage", "URL", getModuleName() + QString(pblob.getDeviceName()) + ".jpeg", true);
+        //setOstPropertyAttribute("testimage", "URL", getModuleName() + QString(pblob.getDeviceName()) + ".jpeg", true);
+        OST::ImgData dta;
+        dta.mUrlJpeg = getModuleName() + QString(pblob.getDeviceName()) + ".jpeg";
+        dta.mUrlFits = getModuleName() + QString(pblob.getDeviceName()) + ".FITS";
+        getValueImg("testimage", "image1")->setValue(dta, true);
 
     }
-    setOstPropertyAttribute("actions", "status", IPS_OK, true);
+    getProperty("actions")->setState(OST::Ok);
 
 
 }
@@ -281,7 +326,7 @@ void Dummy::updateProperty(INDI::Property property)
 
 void Dummy::OnSucessSEP()
 {
-    setOstPropertyAttribute("actions", "status", IPS_OK, true);
+    getProperty("actions")->setState(OST::Ok);
     setOstElementValue("imagevalues", "hfravg", _solver.HFRavg, false);
     setOstElementValue("imagevalues", "starscount", _solver.stars.size(), true);
     disconnect(&_solver, &Solver::successSEP, this, &Dummy::OnSucessSEP);
@@ -293,17 +338,18 @@ void Dummy::OnSucessSolve()
     if (_solver.stellarSolver->failed())
     {
         sendMessage("Solver failed");
-        setOstPropertyAttribute("actions", "status", IPS_ALERT, true);
-        setOstPropertyAttribute("imagevalues", "status", IPS_ALERT, true);
-        setOstElementValue("imagevalues", "solRA", 0, false);
-        setOstElementValue("imagevalues", "solDEC", 0, true);
+        getProperty("actions")->setState(OST::Error);
+        getProperty("imagevalues")->setState(OST::Error);
+        getValueFloat("imagevalues", "solRA")->setValue(0, false);
+        getValueFloat("imagevalues", "solDEC")->setValue(0, true);
     }
     else
     {
-        setOstPropertyAttribute("actions", "status", IPS_OK, true);
-        setOstPropertyAttribute("imagevalues", "status", IPS_OK, true);
-        setOstElementValue("imagevalues", "solRA", _solver.stellarSolver->getSolution().ra, false);
-        setOstElementValue("imagevalues", "solDEC", _solver.stellarSolver->getSolution().dec, true);
+        getProperty("actions")->setState(OST::Ok);
+        getProperty("imagevalues")->setState(OST::Ok);
+        getValueFloat("imagevalues", "solRA")->setValue(_solver.stellarSolver->getSolution().ra, false);
+        getValueFloat("imagevalues", "solDEC")->setValue(_solver.stellarSolver->getSolution().dec, true);
+
     }
     disconnect(&_solver, &Solver::successSolve, this, &Dummy::OnSucessSolve);
     disconnect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
@@ -315,13 +361,16 @@ void Dummy::OnSolverLog(QString &text)
 }
 void Dummy::updateSearchList(void)
 {
-    sendMessage("Searching " + getOstPropertyValue("search").toString());
-    resetOstElements("results");
+    QString s = getString("search", "search");
+    sendMessage("Searching " + s);
+
+    getStore()["results"]->clearGrid();
     QList<catalogResult> results;
-    searchCatalog(getOstPropertyValue("search").toString(), results);
+
+    searchCatalog(s, results);
     if (results.count() == 0)
     {
-        sendWarning("Searching " + getOstPropertyValue("search").toString() + " gives no result");
+        sendWarning("Searching " + s + " gives no result");
         return;
     }
 
@@ -347,7 +396,7 @@ void Dummy::updateSearchList(void)
         setOstElementValue("results", "mag", results[i].mag, false);
         setOstElementValue("results", "name", results[i].name, false);
         setOstElementValue("results", "alias", results[i].alias, false);
-        pushOstElements("results");
+        getStore()["results"]->push();
     }
 
 }

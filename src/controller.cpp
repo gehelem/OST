@@ -30,6 +30,7 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     QCoreApplication::addLibraryPath("/usr/lib");
     QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath());
 
+    checkModules();
     pMainControl = new Maincontrol(QString("mainctl"), QString("Main control"), QString(), QVariantMap());
     connect(pMainControl, &Maincontrol::moduleEvent, this, &Controller::OnModuleEvent);
     connect(pMainControl, &Maincontrol::moduleEvent, wshandler, &WShandler::processModuleEvent);
@@ -41,9 +42,8 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     pMainControl->setObjectName("mainctl");
     pMainControl->dbInit(_dbpath, "mainctl");
     pMainControl->OnExternalEvent("refreshConfigurations", "mainctl", QString(), QVariantMap());
-    checkModules();
     pMainControl->setAvailableModuleLibs(_availableModuleLibs);
-
+    //qDebug() << _availableModuleLibs;
     pMainControl->sendDump();
 
     //loadModule("maincontrol", "mainctl", "Maincontrol", "default");
@@ -58,7 +58,7 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
 
     loadConf(_conf);
 
-    //dbmanager->populateCatalog(":messier.txt", "Messier");
+    dbmanager->populateCatalog(":messier.txt", "Messier");
     //dbmanager->populateCatalog(":ngc.txt", "NGC");
     //dbmanager->populateCatalog(":sh2.txt", "Sh2");
     //dbmanager->populateCatalog(":ldn.txt", "LDN");
@@ -248,7 +248,7 @@ void Controller::checkModules(void)
 {
     foreach (const QString &path, QCoreApplication::libraryPaths())
     {
-        pMainControl->sendMainMessage("Check available modules in " + path);
+        sendMessage("Check available modules in " + path);
         QDir directory(path);
         directory.setFilter(QDir::Files);
         directory.setNameFilters(QStringList() << "libost*.so");
@@ -261,7 +261,7 @@ void Controller::checkModules(void)
                 QLibrary library(path + "/" + lib);
                 if (!library.load())
                 {
-                    pMainControl->sendMainWarning(lib + " " + library.errorString());
+                    sendMessage(lib + " " + library.errorString());
                 }
                 else
                 {
@@ -278,13 +278,13 @@ void Controller::checkModules(void)
                             mod->setObjectName(lib);
                             QVariantMap info = mod->getModuleInfo();
                             _availableModuleLibs[tt] = info;
-                            pMainControl->sendMainMessage("found library " + path + "/" + lib) ;
+                            sendMessage("found library " + path + "/" + lib) ;
                             delete mod;
                         }
                     }
                     else
                     {
-                        pMainControl->sendMainError("Could not initialize module from the loaded library : " + lib);
+                        sendMessage("Could not initialize module from the loaded library : " + lib);
                     }
                 }
 
@@ -366,4 +366,11 @@ void Controller::processError()
 {
     QString output = _process->readAllStandardError();
     pMainControl->sendMainError("PROCESS ERROR   : " + output);
+}
+void Controller::sendMessage(const QString &pMessage)
+{
+    QString messageWithDateTime = "[" + QDateTime::currentDateTime().toString(Qt::ISODateWithMs) + "]-" + pMessage;
+    QDebug debug = qDebug();
+    debug.noquote();
+    debug << messageWithDateTime;
 }
