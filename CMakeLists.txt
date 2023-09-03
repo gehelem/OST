@@ -163,6 +163,46 @@ set(BASE_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/bayer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/dms.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/nan.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/common.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuebase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuebase.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueint.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueint.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuestring.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuestring.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuefloat.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuefloat.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuebool.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuebool.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuelight.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuelight.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueimg.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueimg.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuemessage.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuemessage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertybase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertybase.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertymulti.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertymulti.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyvisitor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuevisitor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyfactory.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyfactory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuefactory.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuefactory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertytextdumper.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertytextdumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyjsondumper.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyjsondumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuetextdumper.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuetextdumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuejsondumper.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuejsondumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyupdate.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyupdate.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valueupdate.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valueupdate.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.cpp
 )
 set_target_properties(ostbasemodule PROPERTIES PUBLIC_HEADER "${BASE_PUBLIC_HEADERS}")
 
