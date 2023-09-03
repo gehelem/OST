@@ -71,12 +71,12 @@ OST::ValueFloat* Datastore::getValueFloat(QString pProperty, QString pElement)
     if (p == nullptr)
     {
         sendWarning("getValueFloat - property " + pProperty + " not found");
-        return 0;
+        return nullptr;
     }
     if (!p->getValues().contains(pElement))
     {
         sendWarning("getValueFloat - property " + pProperty + " : element " + pElement + " not found");
-        return 0;
+        return nullptr;
     }
     return static_cast<OST::ValueFloat*>(p->getValue(pElement));
 }
@@ -94,12 +94,12 @@ OST::ValueLight* Datastore::getValueLight(QString pProperty, QString pElement)
     if (p == nullptr)
     {
         sendWarning("getValueLight - property " + pProperty + " not found");
-        return 0;
+        return nullptr;
     }
     if (!p->getValues().contains(pElement))
     {
         sendWarning("getValueLight - property " + pProperty + " : element " + pElement + " not found");
-        return 0;
+        return nullptr;
     }
     return static_cast<OST::ValueLight*>(p->getValue(pElement));
 }
@@ -110,12 +110,12 @@ OST::ValueImg* Datastore::getValueImg(QString pProperty, QString pElement)
     if (p == nullptr)
     {
         sendWarning("getValueImg - property " + pProperty + " not found");
-        return 0;
+        return nullptr;
     }
     if (!p->getValues().contains(pElement))
     {
         sendWarning("getValueImg - property " + pProperty + " : element " + pElement + " not found");
-        return 0;
+        return nullptr;
     }
     return static_cast<OST::ValueImg*>(p->getValue(pElement));
 }
@@ -125,12 +125,12 @@ OST::ValueBool* Datastore::getValueBool(QString pProperty, QString pElement)
     if (p == nullptr)
     {
         sendWarning("ValueBool - property " + pProperty + " not found");
-        return 0;
+        return nullptr;
     }
     if (!p->getValues().contains(pElement))
     {
         sendWarning("ValueBool - property " + pProperty + " : element " + pElement + " not found");
-        return 0;
+        return nullptr;
     }
     return static_cast<OST::ValueBool*>(p->getValue(pElement));
 }
