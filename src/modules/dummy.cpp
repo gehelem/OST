@@ -83,7 +83,7 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     OST::PropertyMulti *p = getProperty("extextRW");
     p->setState(OST::State::Busy);
     static_cast<OST::ValueString*>(p->getValue("extext1"))->setValue("Value modified2", false);
-    static_cast<OST::ValueString*>(p->getValue("extext4"))->lov.add("i3", "another label");
+    static_cast<OST::ValueString*>(p->getValue("extext4"))->lov.update("i3", "another label");
 
     dynprop = new OST::PropertyMulti("dynprop", "Dynamic", OST::Permission::ReadWrite, "Examples",
                                      "Dynamically instanciated", "", true,
@@ -301,6 +301,10 @@ void Dummy::newBLOB(INDI::PropertyBlob pblob)
         QImage rawImage = _image->getRawQImage();
         rawImage.save(getWebroot() + "/" + getModuleName() + QString(pblob.getDeviceName()) + ".jpeg", "JPG", 100);
         //setOstPropertyAttribute("testimage", "URL", getModuleName() + QString(pblob.getDeviceName()) + ".jpeg", true);
+        OST::ImgData dta;
+        dta.mUrlJpeg = getModuleName() + QString(pblob.getDeviceName()) + ".jpeg";
+        dta.mUrlFits = getModuleName() + QString(pblob.getDeviceName()) + ".FITS";
+        getValueImg("testimage", "image1")->setValue(dta, true);
 
     }
     getProperty("actions")->setState(OST::Ok);

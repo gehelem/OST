@@ -143,17 +143,20 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                                         pData["order"].toString(),
                                         pData["hint"].toString()
                                        );
-            if (pData.contains("urljpeg")) pValue->setUrlJpeg(pData["urljpeg"].toString());
-            if (pData.contains("urlfits")) pValue->setUrlJpeg(pData["urlfits"].toString());
-            if (pData.contains("urlthumbnail")) pValue->setUrlJpeg(pData["urlthumbnail"].toString());
-            if (pData.contains("urloverlay")) pValue->setUrlJpeg(pData["urloverlay"].toString());
-            if (pData.contains("height")) pValue->setHeight(pData["height"].toLongLong());
-            if (pData.contains("width")) pValue->setWidth(pData["width"].toLongLong());
-            if (pData.contains("min")) pValue->setMin(pData["min"].toLongLong());
-            if (pData.contains("max")) pValue->setMax(pData["max"].toLongLong());
-            if (pData.contains("mean")) pValue->setMean(pData["mean"].toDouble());
-            if (pData.contains("stddev")) pValue->setStddev(pData["stddev"].toDouble());
-            if (pData.contains("snr")) pValue->setSNR(pData["snr"].toDouble());
+            ImgData dta;
+
+            if (pData.contains("urljpeg")) dta.mUrlJpeg = pData["urljpeg"].toString();
+            if (pData.contains("urlfits")) dta.mUrlFits = pData["urlfits"].toString();
+            if (pData.contains("urloverlay")) dta.mUrlOverlay = pData["urloverlay"].toString();
+            if (pData.contains("height")) dta.height = pData["height"].toInt();
+            if (pData.contains("width")) dta.width = pData["width"].toInt();
+            if (pData.contains("min")) dta.min[0] = pData["min"].toList()[0].toInt();
+            if (pData.contains("max")) dta.max[0] = pData["max"].toList()[0].toInt();
+            if (pData.contains("mean")) dta.mean[0] = pData["mean"].toList()[0].toDouble();
+            if (pData.contains("stddev")) dta.stddev[0] = pData["stddev"].toList()[0].toDouble();
+            if (pData.contains("snr")) dta.SNR = pData["snr"].toDouble();
+
+            pValue->setValue(dta, false);
             return pValue;
         }
 

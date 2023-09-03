@@ -128,6 +128,26 @@ class Grid
 
 };
 
+typedef struct ImgData
+{
+    QString mUrlJpeg = "";
+    QString mUrlFits = "";
+    QString mUrlOverlay = "";
+    QString mUrlThumbnail = "";
+    double min[3] = {0}, max[3] = {0};  // Minimum and Maximum R, G, B pixel values in the image
+    double mean[3] = {0};               // Average R, G, B value of the pixels in the image
+    double stddev[3] = {0};             // Standard Deviation of the R, G, B pixel values in the image
+    double median[3] = {0};             // Median R, G, B pixel value in the image
+    double SNR { 0 };                   // Signal to noise ratio
+    uint32_t dataType { 0 };            // FITS image data type (TBYTE, TUSHORT, TULONG, TFLOAT, TLONGLONG, TDOUBLE)
+    int bytesPerPixel { 1 };            // Number of bytes used for each pixel, size of datatype above
+    int ndim { 2 };                     // Number of dimensions in a fits image
+    int64_t size { 0 };                 // Filesize in bytes
+    uint32_t samples_per_channel { 0 }; // area of the image in pixels
+    uint16_t width { 0 };               // width of the image in pixels
+    uint16_t height { 0 };              // height of the image in pixels
+    uint8_t channels { 1 };             // Mono Images have 1 channel, RGB has 3 channels
+} ImgData;
 
 }
 

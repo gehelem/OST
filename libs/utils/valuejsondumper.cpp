@@ -125,19 +125,21 @@ void ValueJsonDumper::visit(ValueImg *pValue)
 {
     QJsonObject json = dumpValueCommons(pValue);
     json["type"] = "img";
-    json["urljpeg"] = pValue->urlJpeg();
-    json["urlfits"] = pValue->urlFits();
-    json["urlthumbnail"] = pValue->urlThumbnail();
-    json["urloverlay"] = pValue->urlOverlay();
-    json["min"] = qlonglong(pValue->min());
-    json["max"] = qlonglong(pValue->max());
-    json["width"] = qlonglong(pValue->width());
-    json["height"] = qlonglong(pValue->height());
-    json["mean"] = pValue->mean();
-    json["median"] = qlonglong(pValue->median());
-    json["stddev"] = pValue->stddev();
-    json["snr"] = pValue->SNR();
+    QJsonObject imgdata;
 
+    imgdata["urljpeg"] = pValue->value().mUrlJpeg;
+    imgdata["urlfits"] = pValue->value().mUrlFits;
+    imgdata["urlthumbnail"] = pValue->value().mUrlThumbnail;
+    imgdata["urloverlay"] = pValue->value().mUrlOverlay;
+    imgdata["min"] = qlonglong(pValue->value().min);
+    imgdata["max"] = qlonglong(pValue->value().max);
+    imgdata["width"] = qlonglong(pValue->value().width);
+    imgdata["height"] = qlonglong(pValue->value().height);
+    imgdata["mean"] = qlonglong(pValue->value().mean);
+    imgdata["median"] = qlonglong(pValue->value().median);
+    imgdata["stddev"] = qlonglong(pValue->value().stddev);
+    imgdata["snr"] = qlonglong(pValue->value().SNR);
+    json["value"] = imgdata;
     mResult = json;
 }
 void ValueJsonDumper::visit(ValueMessage *pValue)

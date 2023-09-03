@@ -88,6 +88,37 @@ double Datastore::getFloat(QString pProperty, QString pElement, long line)
 {
     return getValueFloat(pProperty, pElement)->grid.getGrid()[line];
 }
+OST::ValueLight* Datastore::getValueLight(QString pProperty, QString pElement)
+{
+    OST::PropertyMulti* p = getProperty(pProperty);
+    if (p == nullptr)
+    {
+        sendWarning("getValueLight - property " + pProperty + " not found");
+        return 0;
+    }
+    if (!p->getValues().contains(pElement))
+    {
+        sendWarning("getValueLight - property " + pProperty + " : element " + pElement + " not found");
+        return 0;
+    }
+    return static_cast<OST::ValueLight*>(p->getValue(pElement));
+}
+
+OST::ValueImg* Datastore::getValueImg(QString pProperty, QString pElement)
+{
+    OST::PropertyMulti* p = getProperty(pProperty);
+    if (p == nullptr)
+    {
+        sendWarning("getValueImg - property " + pProperty + " not found");
+        return 0;
+    }
+    if (!p->getValues().contains(pElement))
+    {
+        sendWarning("getValueImg - property " + pProperty + " : element " + pElement + " not found");
+        return 0;
+    }
+    return static_cast<OST::ValueImg*>(p->getValue(pElement));
+}
 OST::ValueBool* Datastore::getValueBool(QString pProperty, QString pElement)
 {
     OST::PropertyMulti* p = getProperty(pProperty);
