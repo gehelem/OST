@@ -24,7 +24,7 @@ Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap
 }
 Basemodule::~Basemodule()
 {
-    foreach(const QString &key, getProperties().keys())
+    foreach(const QString &key, getStore().keys())
     {
         deleteOstProperty(key);
     }
@@ -45,6 +45,9 @@ void Basemodule::setProfile(const QString &pProfileName)
     setProfile(prof);
     emit moduleEvent("moduleSetProfile", getModuleName(), pProfileName, QVariantMap());
     sendMessage(pProfileName + " profile sucessfully loaded");
+    QJsonObject ob;
+    ob.fromVariantMap(prof);
+    qDebug() << ob;
 }
 
 
