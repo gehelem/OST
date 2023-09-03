@@ -31,7 +31,7 @@ class ValueInt: public ValueBase
         {
             return mValue;
         }
-        void setValue(const long &value);
+        void setValue(const long &value, const bool &emitEvent);
         long min()
         {
             return mMin;

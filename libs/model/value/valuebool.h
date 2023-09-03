@@ -31,7 +31,7 @@ class ValueBool: public ValueBase
         {
             return mValue;
         }
-        void setValue(const bool &value);
+        void setValue(const bool &value, const bool &emitEvent);
         Grid<bool> grid;
 
     private:

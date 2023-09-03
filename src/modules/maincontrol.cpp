@@ -147,7 +147,7 @@ void Maincontrol::setAvailableModuleLibs(const QVariantMap libs)
                 "", "", false, false);
         OST::ValueBool* dynbool = new OST::ValueBool("Load", "", "");
         OST::ValueString* dyntext = new OST::ValueString("Name", "", "");
-        dynbool->setValue(false);
+        dynbool->setValue(false, false);
         dyntext->setValue("My " + key, false);
         dynprop->addValue("name", dyntext);
         dynprop->addValue("load", dynbool);

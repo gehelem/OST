@@ -13,7 +13,7 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                                          pData["order"].toString(),
                                          pData["hint"].toString()
                                         );
-            pValue->setValue(pData["value"].toBool());
+            pValue->setValue(pData["value"].toBool(), false);
             if (pData.contains("autoupdate")) pValue->setAutoUpdate(pData["autoupdate"].toBool());
             if (pData.contains("gridvalues"))
             {
@@ -78,7 +78,7 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                                         pData["order"].toString(),
                                         pData["hint"].toString()
                                        );
-            if (pData.contains("value")) pValue->setValue(pData["value"].toLongLong());
+            if (pData.contains("value")) pValue->setValue(pData["value"].toLongLong(), false);
             if (pData.contains("min")) pValue->setMin(pData["min"].toLongLong());
             if (pData.contains("max")) pValue->setMax(pData["max"].toLongLong());
             if (pData.contains("step")) pValue->setStep(pData["step"].toLongLong());
@@ -110,7 +110,7 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                                           pData["order"].toString(),
                                           pData["hint"].toString()
                                          );
-            if (pData.contains("value")) pValue->setValue(pData["value"].toDouble());
+            if (pData.contains("value")) pValue->setValue(pData["value"].toDouble(), false);
             if (pData.contains("min")) pValue->setMin(pData["min"].toDouble());
             if (pData.contains("max")) pValue->setMax(pData["max"].toDouble());
             if (pData.contains("step")) pValue->setStep(pData["step"].toDouble());

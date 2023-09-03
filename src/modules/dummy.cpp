@@ -74,7 +74,7 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     n->setState(OST::State::Error);
     //OST::ValueInt *numbersRWn3 = static_cast<OST::ValueInt*>(n->getValue("n3"));
     OST::ValueInt *numbersRWn3 = static_cast<OST::ValueInt*>(n->getValue("n3"));
-    numbersRWn3->setValue(999666);
+    numbersRWn3->setValue(999666, true);
 
     //getText("extextRW", "extext1")->setValue("Value modified");
     //OST::ValueJsonDumper d;
@@ -336,15 +336,16 @@ void Dummy::OnSucessSolve()
         sendMessage("Solver failed");
         getProperty("actions")->setState(OST::Error);
         getProperty("imagevalues")->setState(OST::Error);
-        setOstElementValue("imagevalues", "solRA", 0, false);
-        setOstElementValue("imagevalues", "solDEC", 0, true);
+        getValueFloat("imagevalues", "solRA")->setValue(0, false);
+        getValueFloat("imagevalues", "solDEC")->setValue(0, true);
     }
     else
     {
         getProperty("actions")->setState(OST::Ok);
         getProperty("imagevalues")->setState(OST::Ok);
-        setOstElementValue("imagevalues", "solRA", _solver.stellarSolver->getSolution().ra, false);
-        setOstElementValue("imagevalues", "solDEC", _solver.stellarSolver->getSolution().dec, true);
+        getValueFloat("imagevalues", "solRA")->setValue(_solver.stellarSolver->getSolution().ra, false);
+        getValueFloat("imagevalues", "solDEC")->setValue(_solver.stellarSolver->getSolution().dec, true);
+
     }
     disconnect(&_solver, &Solver::successSolve, this, &Dummy::OnSucessSolve);
     disconnect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);

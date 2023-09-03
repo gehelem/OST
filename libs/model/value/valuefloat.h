@@ -31,7 +31,7 @@ class ValueFloat: public ValueBase
         {
             return mValue;
         }
-        void setValue(const double &value);
+        void setValue(const double &value, const bool &emitEvent);
         double min()
         {
             return mMin;

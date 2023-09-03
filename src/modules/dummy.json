@@ -367,6 +367,7 @@
         "label": "Parameters",
         "elements": {
             "exposure": {
+                "autoupdate":true,
                 "type": "float",
                 "label": "Exposure",
                 "value":10,
@@ -376,6 +377,7 @@
                 "format": "99.99"
             },
             "indexfolderpath": {
+                "autoupdate":true,
                 "type": "string",
                 "label": "Astrometry index folder path",
                 "value":"/usr/share/astrometry/"

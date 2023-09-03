@@ -8,9 +8,10 @@ ValueFloat::ValueFloat(const QString &label, const QString &order, const QString
 ValueFloat::~ValueFloat()
 {
 }
-void ValueFloat::setValue(const double &value)
+void ValueFloat::setValue(const double &value, const bool &emitEvent)
 {
     mValue = value;
+    if (emitEvent) emit valueChanged(this);
 }
 void ValueFloat::setMin(const double &min)
 {

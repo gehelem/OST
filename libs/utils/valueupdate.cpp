@@ -10,7 +10,7 @@ void ValueUpdate::visit(ValueInt *pValue, QVariantMap &data )
         qDebug() << "no value for " << pValue->label();
         return;
     }
-    pValue->setValue(data["value"].toLongLong());
+    pValue->setValue(data["value"].toLongLong(), true);
 }
 void ValueUpdate::visit(ValueFloat *pValue, QVariantMap &data )
 {
@@ -20,7 +20,7 @@ void ValueUpdate::visit(ValueFloat *pValue, QVariantMap &data )
         qDebug() << "no value for " << pValue->label();
         return;
     }
-    pValue->setValue(data["value"].toDouble());
+    pValue->setValue(data["value"].toDouble(), true);
 }
 void ValueUpdate::visit(ValueBool *pValue, QVariantMap &data )
 {
@@ -30,7 +30,7 @@ void ValueUpdate::visit(ValueBool *pValue, QVariantMap &data )
         qDebug() << "no value for " << pValue->label();
         return;
     }
-    pValue->setValue(data["value"].toBool());
+    pValue->setValue(data["value"].toBool(), true);
 }
 void ValueUpdate::visit(ValueString *pValue, QVariantMap &data )
 {

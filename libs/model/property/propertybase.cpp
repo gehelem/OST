@@ -17,7 +17,8 @@ PropertyBase::~PropertyBase()
 void PropertyBase::setState(State state)
 {
     mState = state;
-    emit stateChanged( state);
+    emit propertyEvent("ap", key(), this);
+
 }
 void PropertyBase::setHasArray(bool hasarray)
 {

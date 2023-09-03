@@ -8,10 +8,10 @@ ValueInt::ValueInt(const QString &label, const QString &order, const QString &hi
 ValueInt::~ValueInt()
 {
 }
-void ValueInt::setValue(const long &value)
+void ValueInt::setValue(const long &value, const bool &emitEvent)
 {
     mValue = value;
-    emit valueChanged(this);
+    if (emitEvent) emit valueChanged(this);
 }
 void ValueInt::setMin(const long &min)
 {

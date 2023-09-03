@@ -53,24 +53,6 @@ class Datastore : public Baseroot
         {
             return mStore;
         }
-        void getQtProperties(void)
-        {
-            qDebug() << "****************************************";
-            qDebug() << "****************************************";
-            QJsonObject properties;
-            foreach(const QString &key, mStore.keys())
-            {
-                OST::PropertyJsonDumper d;
-                mStore[key]->accept(&d);
-                properties[key] = d.getResult();
-            }
-            QJsonObject json;
-            json["properties"] = properties;
-            qDebug() << json;
-            qDebug() << "store size" << mStore.count();
-            qDebug() << "****************************************";
-            qDebug() << "****************************************";
-        }
         /**
          * @brief createOstProperty is a method that creates a property at runtime
          * @param pPropertyName is the property internal name
