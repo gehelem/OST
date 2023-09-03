@@ -58,7 +58,6 @@ void ValueUpdate::visit(ValueLight *pValue, QVariantMap &data )
     if (data["value"].toInt() == 1 ) pValue->setState(Ok);
     if (data["value"].toInt() == 2 ) pValue->setState(Busy);
     if (data["value"].toInt() == 3 ) pValue->setState(Error);
-
 }
 void ValueUpdate::visit(ValueImg *pValue, QVariantMap &data )
 {
@@ -93,6 +92,11 @@ void ValueUpdate::visit(ValueInt* pValue, QString &action, QVariantMap &data)
     {
         pValue->grid.clear();
     }
+    if (action == "getgrid")
+    {
+        mGrid.clear();
+        for (int i = 0; i < pValue->grid.getGrid().size(); ++i) mGrid.append(qlonglong(pValue->grid.getGrid()[i]));
+    }
 }
 void ValueUpdate::visit(ValueFloat* pValue, QString &action, QVariantMap &data)
 {
@@ -115,6 +119,11 @@ void ValueUpdate::visit(ValueFloat* pValue, QString &action, QVariantMap &data)
     if (action == "cleargrid")
     {
         pValue->grid.clear();
+    }
+    if (action == "getgrid")
+    {
+        mGrid.clear();
+        for (int i = 0; i < pValue->grid.getGrid().size(); ++i) mGrid.append(pValue->grid.getGrid()[i]);
     }
 
 }
@@ -140,7 +149,11 @@ void ValueUpdate::visit(ValueBool* pValue, QString &action, QVariantMap &data)
     {
         pValue->grid.clear();
     }
-
+    if (action == "getgrid")
+    {
+        mGrid.clear();
+        for (int i = 0; i < pValue->grid.getGrid().size(); ++i) mGrid.append(pValue->grid.getGrid()[i]);
+    }
 }
 void ValueUpdate::visit(ValueString* pValue, QString &action, QVariantMap &data)
 {
@@ -164,7 +177,11 @@ void ValueUpdate::visit(ValueString* pValue, QString &action, QVariantMap &data)
     {
         pValue->grid.clear();
     }
-
+    if (action == "getgrid")
+    {
+        mGrid.clear();
+        for (int i = 0; i < pValue->grid.getGrid().size(); ++i) mGrid.append(pValue->grid.getGrid()[i]);
+    }
 }
 void ValueUpdate::visit(ValueLight* pValue, QString &action, QVariantMap &data)
 {
@@ -188,7 +205,11 @@ void ValueUpdate::visit(ValueLight* pValue, QString &action, QVariantMap &data)
     {
         pValue->grid.clear();
     }
-
+    if (action == "getgrid")
+    {
+        mGrid.clear();
+        for (int i = 0; i < pValue->grid.getGrid().size(); ++i) mGrid.append(pValue->grid.getGrid()[i]);
+    }
 }
 void ValueUpdate::visit(ValueImg* pValue, QString &action, QVariantMap &data)
 {

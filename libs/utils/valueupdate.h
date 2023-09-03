@@ -62,6 +62,13 @@ class ValueUpdate : public ValueVisitor
         void visit(ValueMessage* pProperty, QVariantMap &data ) override;
         void visit(ValueMessage* pValue, QString &action, QVariantMap &data) override;
 
+        [[nodiscard]] const QVariantList &getGrid() const
+        {
+            return mGrid;
+        }
+    private:
+        QVariantList mGrid;
+
 
 };
 }
