@@ -33,8 +33,13 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
         elements[key] = value;
     }
     json["rule"] = pProperty->rule();
-    json["hasArray"] = pProperty->hasArray();
-    if (pProperty->hasArray() ) json["grid"] = 0;
+    if (pProperty->hasArray())
+    {
+        json["hasArray"] = true;
+        //json["gridlimit"] = 255;
+        json["grid"] = 0;
+    }
+
     json["elements"] = elements;
     mResult = json;
 }
