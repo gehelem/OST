@@ -10,6 +10,7 @@
 #include <valuelight.h>
 #include <valueimg.h>
 #include <valuemessage.h>
+#include <valuegraph.h>
 
 
 namespace  OST
@@ -100,6 +101,18 @@ class ValueJsonDumper : public ValueVisitor
             Q_UNUSED(data)
         }
         void visit(ValueMessage* pValue, QString &action, QVariantMap &data ) override
+        {
+            Q_UNUSED(pValue);
+            Q_UNUSED(action);
+            Q_UNUSED(data)
+        }
+        void visit(ValueGraph *pValue) override;
+        void visit(ValueGraph* pValue, QVariantMap &data ) override
+        {
+            Q_UNUSED(pValue);
+            Q_UNUSED(data)
+        }
+        void visit(ValueGraph* pValue, QString &action, QVariantMap &data ) override
         {
             Q_UNUSED(pValue);
             Q_UNUSED(action);

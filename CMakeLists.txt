@@ -117,6 +117,8 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueimg.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuemessage.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuemessage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuegraph.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuegraph.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertybase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertybase.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertymulti.cpp
@@ -172,6 +174,7 @@ set(BASE_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuelight.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueimg.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuemessage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuegraph.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertybase.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertymulti.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyvisitor.h

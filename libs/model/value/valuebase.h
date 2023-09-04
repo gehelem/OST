@@ -22,6 +22,7 @@ class ValueBase: public QObject
         ValueBase(const QString &label, const QString &order, const QString &hint);
         ~ValueBase();
 
+        virtual QString getType() = 0;
         QString label()
         {
             return mLabel;

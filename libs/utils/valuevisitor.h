@@ -11,6 +11,7 @@ class ValueString;
 class ValueLight;
 class ValueImg;
 class ValueMessage;
+class ValueGraph;
 
 class ValueVisitor
 {
@@ -40,6 +41,9 @@ class ValueVisitor
         virtual void visit(ValueMessage* pValue) = 0;
         virtual void visit(ValueMessage* pValue, QVariantMap &data) = 0;
         virtual void visit(ValueMessage* pValue, QString &action, QVariantMap &data) = 0;
+        virtual void visit(ValueGraph* pValue) = 0;
+        virtual void visit(ValueGraph* pValue, QVariantMap &data) = 0;
+        virtual void visit(ValueGraph* pValue, QString &action, QVariantMap &data) = 0;
 };
 
 }

@@ -9,6 +9,7 @@
 #include <valuelight.h>
 #include <valueimg.h>
 #include <valuemessage.h>
+#include <valuegraph.h>
 
 namespace  OST
 {

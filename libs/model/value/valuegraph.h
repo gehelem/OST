@@ -1,12 +1,12 @@
-#ifndef VALUESTRING_h
-#define VALUESTRING_h
+#ifndef VALUEGRAPH_h
+#define VALUEGRAPH_h
 
 #include <valuebase.h>
 
 namespace  OST
 {
 
-class ValueString: public ValueBase
+class ValueGraph: public ValueBase
 {
 
         Q_OBJECT
@@ -25,22 +25,22 @@ class ValueString: public ValueBase
             pVisitor->visit(this, action, data);
         }
 
-        ValueString(const QString &label, const QString &order, const QString &hint);
-        ~ValueString();
+        ValueGraph(const QString &label, const QString &order, const QString &hint);
+        ~ValueGraph();
         QString getType() override
         {
-            return "string";
+            return "graph";
         }
-        QString value()
+
+        GraphDefs getGraphDefs(void)
         {
-            return mValue;
+            return mGraphDefs;
         }
-        void setValue(const QString &value, const bool &emitEvent);
-        ListOfValues<QString> lov;
-        Grid<QString> grid;
+        void setGraphDefs(GraphDefs defs);
+        void setGraphParams(QVariantMap params);
 
     private:
-        QString mValue;
+        GraphDefs mGraphDefs;
 
 };
 

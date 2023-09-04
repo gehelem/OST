@@ -27,6 +27,10 @@ class ValueFloat: public ValueBase
 
         ValueFloat(const QString &label, const QString &order, const QString &hint);
         ~ValueFloat();
+        QString getType() override
+        {
+            return "float";
+        }
         double value()
         {
             return mValue;

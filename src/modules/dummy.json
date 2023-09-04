@@ -411,12 +411,16 @@
         "permission": 2,
         "grid":0,
         "gridlimit":5,
-        "GXY":{
-            "X":"X",
-            "Y":"Y"
-        },
         "label": "Grid example",
         "elements": {
+            "graph": {
+                "type": "graph",
+                "graphtype":"XY",
+                "params":{
+                    "X":"X",
+                    "Y":"Y"
+                }
+            },
             "X": {
                 "type": "int",
                 "label": "Abscisse",

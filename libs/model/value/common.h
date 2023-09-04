@@ -149,6 +149,39 @@ typedef struct ImgData
     uint8_t channels { 1 };             // Mono Images have 1 channel, RGB has 3 channels
 } ImgData;
 
+typedef enum
+{
+    none, /* no graph, just to handle conversion errors */
+    XY, /* Basic X-Y graph */
+    DY, /* X data is a timestamp */
+    PHD, /* PHD-like graph */
+} GraphType;
+inline QString GraphTypeToString(GraphType val )
+{
+    if (val == none) return "none";
+    if (val == XY) return "XY";
+    if (val == DY) return "DY";
+    if (val == PHD) return "PHD";
+    qDebug() << "GraphTypeToString Cant convert type - return 'none' ";
+    return "none";
+}
+inline GraphType StringToGraphType(QString val)
+{
+    if (val == "none") return none;
+    if (val == "XY") return XY;
+    if (val == "DY") return DY;
+    if (val == "PHD") return PHD;
+    qDebug() << "StringToGraphType Cant convert type " << val << " - return 'none' ";
+    return none;
+
+}
+typedef struct GraphDefs
+{
+    GraphType type = none;
+    QVariantMap params = QVariantMap();
+} GraphDefs;
+
+
 }
 
 #endif

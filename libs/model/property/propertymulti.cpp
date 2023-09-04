@@ -44,10 +44,14 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
     /* Check if data is valid and contains every value */
     foreach(const QString &elt, mValues.keys())
     {
-        if (!pValues.contains(elt))
+        if ((mValues[elt]->getType() == "int") || (mValues[elt]->getType() == "float") || (mValues[elt]->getType() == "string")
+                || (mValues[elt]->getType() == "bool"))
         {
-            qDebug() << "PropertyMulti::newLine incomplete values, " << elt << " missing in " << pValues;
-            return;
+            if (!pValues.contains(elt))
+            {
+                qDebug() << "PropertyMulti::newLine incomplete values, " << elt << " missing in " << pValues;
+                return;
+            }
         }
     }
 
