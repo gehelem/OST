@@ -10,6 +10,7 @@
 #include <valuelight.h>
 #include <valueimg.h>
 #include <valuemessage.h>
+#include <valuegraph.h>
 
 namespace  OST
 {
@@ -61,6 +62,12 @@ class ValueUpdate : public ValueVisitor
         }
         void visit(ValueMessage* pProperty, QVariantMap &data ) override;
         void visit(ValueMessage* pValue, QString &action, QVariantMap &data) override;
+        void visit(ValueGraph* pProperty) override
+        {
+            Q_UNUSED(pProperty)
+        }
+        void visit(ValueGraph* pProperty, QVariantMap &data ) override;
+        void visit(ValueGraph* pValue, QString &action, QVariantMap &data) override;
 
         [[nodiscard]] const QVariantList &getGrid() const
         {

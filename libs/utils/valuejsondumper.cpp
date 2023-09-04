@@ -150,5 +150,14 @@ void ValueJsonDumper::visit(ValueMessage *pValue)
     json["timestamp"] = pValue->timeStamp().toString("yyyy/MM/dd hh:mm:ss.zzz");
     mResult = json;
 }
+void ValueJsonDumper::visit(ValueGraph *pValue)
+{
+    QJsonObject json = dumpValueCommons(pValue);
+    json["type"] = "graph";
+    json["graphtype"] = GraphTypeToString(pValue->getGraphDefs().type);
+    json["params"] = QJsonObject::fromVariantMap(pValue->getGraphDefs().params);
+
+    mResult = json;
+}
 
 }

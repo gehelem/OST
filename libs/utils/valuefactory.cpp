@@ -169,64 +169,34 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
             if (pData.contains("message")) pValue->setMessage(pData["message"].toString());
             return pValue;
         }
+        if (pData["type"].toString() == "graph")
+        {
+            auto *pValue = new ValueGraph(pData["label"].toString(),
+                                          pData["order"].toString(),
+                                          pData["hint"].toString()
+                                         );
+            GraphDefs d;
+            if (!pData.contains("graphtype"))
+            {
+                qDebug() << "Graph defined without type " << pValue->label();
+            }
+            if (!pData.contains("params"))
+            {
+                qDebug() << "Graph defined without params " << pValue->label();
+            }
+            d.type = StringToGraphType(pData["graphtype"].toString());
+            d.params = pData["params"].toMap();
+            pValue->setGraphDefs(d);
+
+            return pValue;
+        }
+
 
         qDebug() << "Unknown value type " << pData["label"].toString() << ":" << pData["type"].toString() << "-" <<
                  pData["label"].toString();
     }
 
-    //if (pData.contains("value"))
-    //{
-    //    if (strcmp(pData["value"].typeName(), "bool") == 0 )
-    //    {
-    //        auto *pValue = new ValueBool(pData["label"].toString(),
-    //                                     pData["order"].toString(),
-    //                                     pData["hint"].toString()
-    //                                    );
-    //        pValue->setValue(pData["value"].toBool());
-    //        return pValue;
-    //    }
-    //    if (strcmp(pData["value"].typeName(), "QString") == 0 )
-    //    {
-    //        auto *pValue = new ValueString(pData["label"].toString(),
-    //                                       pData["order"].toString(),
-    //                                       pData["hint"].toString()
-    //                                      );
-    //        pValue->setValue(pData["value"].toString(), false);
-    //        return pValue;
-    //    }
-    //    if ((strcmp(pData["value"].typeName(), "int") == 0 )
-    //            || (strcmp(pData["value"].typeName(), "qlonglong") == 0 )
-    //       )
-    //    {
-    //        auto *pValue = new ValueInt(pData["label"].toString(),
-    //                                    pData["order"].toString(),
-    //                                    pData["hint"].toString()
-    //                                   );
-    //        if (pData.contains("value")) pValue->setValue(pData["value"].toLongLong());
-    //        if (pData.contains("min")) pValue->setMin(pData["min"].toLongLong());
-    //        if (pData.contains("max")) pValue->setMax(pData["max"].toLongLong());
-    //        if (pData.contains("step")) pValue->setStep(pData["step"].toLongLong());
-    //        if (pData.contains("format")) pValue->setFormat(pData["format"].toString());
-    //        return pValue;
-    //    }
-    //    if ((strcmp(pData["value"].typeName(), "double") == 0 )
-    //            || (strcmp(pData["value"].typeName(), "float") == 0 )
-    //       )
-    //    {
-    //        auto *pValue = new ValueFloat(pData["label"].toString(),
-    //                                      pData["order"].toString(),
-    //                                      pData["hint"].toString()
-    //                                     );
-    //        if (pData.contains("value")) pValue->setValue(pData["value"].toDouble());
-    //        if (pData.contains("min")) pValue->setMin(pData["min"].toDouble());
-    //        if (pData.contains("max")) pValue->setMax(pData["max"].toDouble());
-    //        if (pData.contains("step")) pValue->setStep(pData["step"].toDouble());
-    //        if (pData.contains("format")) pValue->setFormat(pData["format"].toString());
-    //        return pValue;
-    //    }
-    //
-    //    qDebug() << "Unknown value type " << pData["label"].toString() << ":" << pData["value"].typeName();
-    //}
+
     qDebug() << "Can't guess element type " << pData["label"].toString();
     return nullptr;
 

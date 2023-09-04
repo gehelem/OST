@@ -77,5 +77,12 @@ void ValueTextDumper::visit(ValueMessage *pValue)
     //stream << "Val = '" << pValue->value().toStdString() << "'";
     mResult = QString::fromStdString(stream.str());
 }
+void ValueTextDumper::visit(ValueGraph *pValue)
+{
+    std::stringstream stream;
+    stream << "Graph Value :" << dumpValueCommons(pValue);
+    //stream << "Val = '" << pValue->value().toStdString() << "'";
+    mResult = QString::fromStdString(stream.str());
+}
 
 }
