@@ -27,6 +27,10 @@ class ValueImg: public ValueBase
 
         ValueImg(const QString &label, const QString &order, const QString &hint);
         ~ValueImg();
+        QString getType() override
+        {
+            return "img";
+        }
         ImgData value()
         {
             return mValue;

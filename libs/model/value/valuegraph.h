@@ -27,6 +27,11 @@ class ValueGraph: public ValueBase
 
         ValueGraph(const QString &label, const QString &order, const QString &hint);
         ~ValueGraph();
+        QString getType() override
+        {
+            return "graph";
+        }
+
         GraphDefs getGraphDefs(void)
         {
             return mGraphDefs;

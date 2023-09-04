@@ -27,6 +27,10 @@ class ValueLight: public ValueBase
 
         ValueLight(const QString &label, const QString &order, const QString &hint);
         ~ValueLight();
+        QString getType() override
+        {
+            return "light";
+        }
         Grid<State> grid;
 
     private:

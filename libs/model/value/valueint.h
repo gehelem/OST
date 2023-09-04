@@ -27,6 +27,10 @@ class ValueInt: public ValueBase
 
         ValueInt(const QString &label, const QString &order, const QString &hint);
         ~ValueInt();
+        QString getType() override
+        {
+            return "int";
+        }
         long value()
         {
             return mValue;

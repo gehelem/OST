@@ -33,6 +33,10 @@ class ValueMessage: public ValueBase
 
         ValueMessage(const QString &label, const QString &order, const QString &hint);
         ~ValueMessage();
+        QString getType() override
+        {
+            return "message";
+        }
         QString message()
         {
             return mMessage;

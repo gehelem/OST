@@ -27,6 +27,11 @@ class ValueBool: public ValueBase
 
         ValueBool(const QString &label, const QString &order, const QString &hint);
         ~ValueBool();
+        QString getType() override
+        {
+            return "bool";
+        }
+
         bool value()
         {
             return mValue;

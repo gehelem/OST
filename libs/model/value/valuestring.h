@@ -27,6 +27,10 @@ class ValueString: public ValueBase
 
         ValueString(const QString &label, const QString &order, const QString &hint);
         ~ValueString();
+        QString getType() override
+        {
+            return "string";
+        }
         QString value()
         {
             return mValue;
