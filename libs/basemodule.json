@@ -84,6 +84,7 @@
                 "value":false
             },
             "value": {
+                "autoupdate":true,
                 "listOfValues":[],
                 "type": "string",
                 "label": "Name",
@@ -106,6 +107,7 @@
                 "value":false
             },
             "value": {
+                "autoupdate":true,
                 "type": "string",
                 "label": "Name",
                 "value":"default"

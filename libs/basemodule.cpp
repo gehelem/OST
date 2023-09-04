@@ -147,12 +147,6 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
             {
                 if (pEventData[keyprop].toMap().contains("elements"))
                 {
-                    if (pEventData[keyprop].toMap().contains("value"))
-                    {
-                        QVariant val = pEventData[keyprop].toMap()["elements"].toMap()["value"].toMap()["value"];
-                        setOstElementValue(keyprop, "value", val, true);
-                        setOstElementValue("saveprofile", "value", val, true);
-                    }
                     foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
                     {
                         QVariant val = pEventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
@@ -167,6 +161,7 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
                                 sendMessage(getString("loadprofile", "value") + " profile sucessfully loaded");
                                 emit moduleEvent("moduleloadedprofile", getModuleName(), getString("loadprofile", "value"),
                                                  QVariantMap());
+                                setOstElementValue("saveprofile", "value", getString("loadprofile", "value"), true);
                                 sendDump();
                             }
                             else
@@ -203,17 +198,17 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
                     {
                         getProperty(keyprop)->setState(OST::Busy);
                         QVariantMap prof = getProfile();
-                        if (setDbProfile(getClassName(), getString("loadprofile", "value"), prof))
+                        if (setDbProfile(getClassName(), getString("saveprofile", "value"), prof))
                         {
                             getProperty(keyprop)->setState(OST::Ok);
-                            sendMessage(getString("loadprofile", "value") + " profile sucessfully saved");
-                            emit moduleEvent("modulesavedprofile", getModuleName(), getString("loadprofile", "value"),
+                            sendMessage(getString("saveprofile", "value") + " profile sucessfully saved");
+                            emit moduleEvent("modulesavedprofile", getModuleName(), getString("saveprofile", "value"),
                                              QVariantMap());
                         }
                         else
                         {
                             getProperty(keyprop)->setState(OST::Error);
-                            sendWarning("Can't save " + getString("loadprofile", "value") + " profile");
+                            sendWarning("Can't save " + getString("saveprofile", "value") + " profile");
                         }
                     }
                 }
