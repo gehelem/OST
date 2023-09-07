@@ -14,7 +14,14 @@ PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVaria
                                         pData["hasprofile"].toBool(),
                                         pData["hasArray"].toBool()
                                        );
-
+    if (pData.contains("rule"))
+    {
+        pProperty->setRule(IntToRule(pData["rule"].toInt()));
+    }
+    else
+    {
+        pProperty->setRule(Any);
+    }
     if (!pData.contains("elements"))
     {
         qDebug() << "Multiproperty defined without elements " << pData;

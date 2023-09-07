@@ -31,6 +31,12 @@ inline int StateToInt(State val )
     qDebug() << "StateToInt Cant convert state - return State::Error";
     return 3;
 }
+typedef enum
+{
+    Info = 0,
+    Warn,
+    Err
+} MsgLevel;
 
 template <typename U>
 class ListOfValues

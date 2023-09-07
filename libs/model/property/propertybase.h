@@ -88,13 +88,24 @@ class PropertyBase: public QObject
         {
             mIsEnabled = false;
         }
-
-
+        void sendInfo(QString m)
+        {
+            emit sendMessage(Info, key() + "-" + m);
+        }
+        void sendWarning(QString m)
+        {
+            emit sendMessage(Warn, key() + "-" + m);
+        }
+        void sendError(QString m)
+        {
+            emit sendMessage(Err, key() + "-" + m);
+        }
     signals:
         void stateChanged(OST::State);
         void propertyCreated(void);
         void valueChanged(OST::PropertyBase*);
         void propertyEvent(QString, QString, OST::PropertyBase*);
+        void sendMessage(MsgLevel, QString);
 
     private:
         QString mKey = "";

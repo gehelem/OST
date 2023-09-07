@@ -111,6 +111,8 @@ class Datastore : public Baseroot
     private slots:
         void onValueChanged(void);
         void onPropertyEvent(QString event, QString key, OST::PropertyBase* prop);
+        void onPropertyMessage(OST::MsgLevel l, QString m);
+
     private:
         QMap<QString, OST::PropertyMulti*> mStore;
 

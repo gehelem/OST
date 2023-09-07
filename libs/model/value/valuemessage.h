@@ -5,12 +5,6 @@
 
 namespace  OST
 {
-typedef enum
-{
-    Info = 0,
-    Warn,
-    Err
-} MsgLevel;
 
 class ValueMessage: public ValueBase
 {
