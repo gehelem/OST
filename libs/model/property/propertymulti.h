@@ -64,6 +64,7 @@ class PropertyMulti: public PropertyBase
             }
             return mValues[pElement];
         }
+        bool setValue(QString key, QVariant Value);
         void addValue(QString key, ValueBase* pValue)
         {
             if (mValues.contains(key))

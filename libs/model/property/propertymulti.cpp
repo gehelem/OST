@@ -16,11 +16,85 @@ PropertyMulti::~PropertyMulti()
 {
 
 }
+bool  PropertyMulti::setValue(QString key, QVariant pValue)
+{
+    if (!mValues.contains(key))
+    {
+        sendError("PropertyMulti::setValue - " + key + " - not found");
+        return false;
+    }
+    if (((mValues[key]->getType() == "int") && (pValue.canConvert<long>())) ||
+            ((mValues[key]->getType() == "string") && (pValue.canConvert<QString>())) ||
+            ((mValues[key]->getType() == "float") && (pValue.canConvert<double>())) )
+    {
+        OST::ValueUpdate vu;
+        QVariantMap m;
+        m["value"] = pValue;
+        getValue(key)->accept(&vu, m);
+        return true;
+    }
+    if ((mValues[key]->getType() == "bool") && (pValue.canConvert<bool>()) )
+    {
+        OST::ValueUpdate vu;
+        QVariantMap m;
+
+        switch (this->rule())
+        {
+            case Any:
+                m["value"] = pValue;
+                getValue(key)->accept(&vu, m);
+                return true;
+                break;
+            case OneOfMany:
+                if (pValue.toBool())
+                {
+                    foreach(const QString &elt, mValues.keys())
+                    {
+                        if ((mValues[elt]->getType() == "bool") && (elt != key))
+                        {
+                            m["value"] = false;
+                            mValues[elt]->accept(&vu, m);
+                        }
+                    }
+                    m["value"] = pValue;
+                    mValues[key]->accept(&vu, m);
+                    return true;
+
+                }
+                sendError("PropertyMulti::setValue - " + key + " - OneOfMany - can't just unset");
+                return false;
+                break;
+            case AtMostOne:
+                foreach(const QString &elt, mValues.keys())
+                {
+                    if ((mValues[elt]->getType() == "bool") && (elt != key))
+                    {
+                        m["value"] = false;
+                        mValues[elt]->accept(&vu, m);
+                    }
+                }
+                m["value"] = pValue;
+                mValues[key]->accept(&vu, m);
+                return true;
+                break;
+            default:
+                sendError("PropertyMulti::setValue - " + key + " - can't determine SwitchRule");
+                return false;
+                break;
+        }
+    }
+    sendError("PropertyMulti::setValue - " + key + " - can't update, unhandled type : "
+              + mValues[key]->getType() + "(" + pValue.toString() + ")");
+    return false;
+
+
+}
+
 void PropertyMulti::push()
 {
     if (!this->hasArray())
     {
-        qDebug() << "PropertyMulti::Push - no array/grid defined";
+        sendError("PropertyMulti::Push - no array/grid defined");
         return;
     }
     foreach(const QString &elt, mValues.keys())
@@ -38,7 +112,7 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
 {
     if (!this->hasArray())
     {
-        qDebug() << "PropertyMulti::Push - no array/grid defined";
+        sendError("PropertyMulti::Push - no array/grid defined");
         return;
     }
     /* Check if data is valid and contains every value */
@@ -49,7 +123,7 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
         {
             if (!pValues.contains(elt))
             {
-                qDebug() << "PropertyMulti::newLine incomplete values, " << elt << " missing in " << pValues;
+                sendWarning("PropertyMulti::newLine incomplete values, " + elt + " missing ");
                 return;
             }
         }
@@ -70,7 +144,7 @@ void PropertyMulti::deleteLine(const int i)
 {
     if (!this->hasArray())
     {
-        qDebug() << "PropertyMulti::Push - no array/grid defined";
+        sendError("PropertyMulti::Push - no array/grid defined");
         return;
     }
 
@@ -89,7 +163,7 @@ void PropertyMulti::updateLine(const int i, const QVariantMap &pValues)
 {
     if (!this->hasArray())
     {
-        qDebug() << "PropertyMulti::Push - no array/grid defined";
+        sendError("PropertyMulti::Push - no array/grid defined");
         return;
     }
 
@@ -98,7 +172,7 @@ void PropertyMulti::updateLine(const int i, const QVariantMap &pValues)
     {
         if (!pValues.contains(elt))
         {
-            qDebug() << "PropertyMulti::updateLine incomplete values, " << elt << " missing in " << pValues;
+            sendError("PropertyMulti::updateLine incomplete values, " + elt + " missing");
             return;
         }
     }
@@ -118,7 +192,7 @@ void PropertyMulti::clearGrid()
 {
     if (!this->hasArray())
     {
-        qDebug() << "PropertyMulti::Push - no array/grid defined";
+        sendError("PropertyMulti::Push - no array/grid defined");
         return;
     }
 
