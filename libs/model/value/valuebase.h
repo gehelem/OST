@@ -56,6 +56,7 @@ class ValueBase: public QObject
         bool mAutoUpdate = false;
     signals:
         void valueChanged(OST::ValueBase*);
+        void listChanged(OST::ValueBase*);
 
 
 };

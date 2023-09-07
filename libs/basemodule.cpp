@@ -68,10 +68,24 @@ void Basemodule::setProfile(QVariantMap profiledata)
                     foreach(const QString &eltkey, profiledata[key].toMap()["elements"].toMap().keys())
                     {
                         setOstElementValue(key, eltkey, profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["value"], true);
-                        //if (_props[key].toMap().contains("grid"))
-                        //{
-                        //    setOstElementGrid (key, eltkey, profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["gridvalues"].toList(), true);
-                        //}
+
+                        if (profiledata[key].toMap()["elements"].toMap()[eltkey].toMap().contains("gridvalues"))
+                        {
+                            //setOstElementGrid (key, eltkey, profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["gridvalues"].toList(), true);
+                            OST::ValueUpdate v;
+                            QVariantMap m;
+                            QString a = "cleargrid";
+                            getProperty(key)->getValue(eltkey)->accept(&v, a, m);
+                            int size = profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["gridvalues"].toList().size();
+                            a = "newline";
+                            for (int i = 0; i < size; i++)
+                            {
+                                m["val"] = profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["gridvalues"].toList()[i];
+                                getProperty(key)->getValue(eltkey)->accept(&v, a, m);
+                            }
+
+
+                        }
                     }
                 }
             }

@@ -262,7 +262,7 @@ QVariantList Datastore::getOstElementGrid(const QString &pPropertyName, const QS
         sendWarning("getOstElementGrid - property " + pPropertyName + " not found.");
         return QVariantList();
     }
-    if (!mStore[pPropertyName]->getValues().contains("elements"))
+    if (mStore[pPropertyName]->getValues().size() == 0)
     {
         sendWarning("getOstElementGrid - property " + pPropertyName + " contains no elements.");
         return QVariantList();
