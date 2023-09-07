@@ -45,12 +45,11 @@
         }
     },
     "modules": {
-        "type": "multi",
+        "hasArray":true,
         "devcat": "Modules",
         "group": "",
         "permission": 0,
         "grid":0,
-        "gridlimit":255,
         "rule":0,
         "label": "Loaded modules",
         "elements": {
