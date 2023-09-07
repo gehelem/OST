@@ -166,6 +166,7 @@ bool Datastore::createOstProperty(const QString &pPropertyName, const QString &p
     pm->accept(&d);
     connect(mStore[pPropertyName], &OST::PropertyMulti::valueChanged, this, &Datastore::onValueChanged);
     connect(mStore[pPropertyName], &OST::PropertyMulti::propertyEvent, this, &Datastore::onPropertyEvent);
+    connect(mStore[pPropertyName], &OST::PropertyMulti::sendMessage, this, &Datastore::onPropertyMessage);
     OnModuleEvent("cp", QString(), pPropertyName, d.getResult().toVariantMap());
     return true;
 }
@@ -252,11 +253,7 @@ bool Datastore::setOstElementValue(const QString &pPropertyName, const QString &
         sendWarning("setElementValue - property2 " + pPropertyName + " : element " + pElementName + " not found.");
         return false;
     }
-    OST::ValueUpdate vu;
-    QVariantMap m;
-    m["value"] = pElementValue;
-    pb->getValue(pElementName)->accept(&vu, m);
-    return true;
+    return pb->setValue(pElementName, pElementValue);
 }
 QVariantList Datastore::getOstElementGrid(const QString &pPropertyName, const QString &pElementName)
 {
@@ -304,6 +301,7 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
             mStore[key] = rp;
             connect(rp, &OST::PropertyMulti::valueChanged, this, &Datastore::onValueChanged);
             connect(rp, &OST::PropertyMulti::propertyEvent, this, &Datastore::onPropertyEvent);
+            connect(rp, &OST::PropertyMulti::sendMessage, this, &Datastore::onPropertyMessage);
             mStore[key]->setState(OST::State::Idle);
 
         }
@@ -451,4 +449,23 @@ QJsonObject Datastore::getPropertiesDump(void)
         properties[key] = d.getResult();
     }
     return properties;
+}
+void Datastore::onPropertyMessage(OST::MsgLevel l, QString m)
+{
+    switch (l)
+    {
+        case OST::Info:
+            sendMessage(m);
+            break;
+        case OST::Warn:
+            sendWarning(m);
+            break;
+        case OST::Err:
+            sendError(m);
+            break;
+        default:
+            sendError(m);
+            break;
+    }
+
 }
