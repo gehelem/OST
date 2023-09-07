@@ -21,10 +21,10 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     setOstElementValue("extextRO", "extext2", "Texte read only 2", false);
     setOstElementValue("extextRO", "extext3", "Texte read only 3", false);
     setOstElementValue("extextRO", "extext4", "Texte read only 4", true);
-    setOstElementValue("boolsRW0", "b1", true, false);
-    setOstElementValue("boolsRW0", "b2", false, false);
-    setOstElementValue("boolsRW0", "b3", false, false);
-    setOstElementValue("boolsRW0", "b4", false, true);
+    setOstElementValue("boolsRW0", "b1", true, true);
+    //setOstElementValue("boolsRW0", "b2", false, false);
+    //setOstElementValue("boolsRW0", "b3", false, false);
+    //setOstElementValue("boolsRW0", "b4", false, true);
     setOstElementValue("boolsRW1", "b1", false, false);
     setOstElementValue("boolsRW1", "b2", false, false);
     setOstElementValue("boolsRW1", "b3", false, false);
@@ -41,12 +41,12 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     getValueFloat("numbersRW", "n4")->setMin(-10000);
     getValueFloat("numbersRW", "n4")->setMax(10000);
 
-    setOstElementValue("mixedRW", "b1", false, false);
-    setOstElementValue("mixedRW", "b2", false, false);
+    //setOstElementValue("mixedRW", "b1", false, false);
+    //setOstElementValue("mixedRW", "b2", false, false);
     setOstElementValue("mixedRW", "b3", true, false);
     setOstElementValue("mixedRW", "n1", 10, false);
     setOstElementValue("mixedRW", "n2", 11, false);
-    setOstElementValue("mixedRW", "t1", "Mixed text value", false);
+    setOstElementValue("mixedRW", "t1", "Mixed text value", true);
     //saveAttributesToFile("dummy.json");
     _camera = getString("devices", "camera");
 

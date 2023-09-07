@@ -112,7 +112,7 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
 {
     if (!this->hasArray())
     {
-        sendError("PropertyMulti::Push - no array/grid defined");
+        sendError("PropertyMulti::newLine - no array/grid defined");
         return;
     }
     /* Check if data is valid and contains every value */

@@ -75,6 +75,7 @@ class PropertyMulti: public PropertyBase
             //qDebug() << label() << " - addValue - element " << key << " OK " << pValue;
             mValues[key] = pValue;
             connect(mValues[key], &ValueBase::valueChanged, this, &PropertyMulti::OnValueChanged);
+            connect(mValues[key], &ValueBase::listChanged, this, &PropertyMulti::OnListChanged);
         }
         void push();
         void newLine(const QVariantMap &pValues);
@@ -85,6 +86,10 @@ class PropertyMulti: public PropertyBase
         void OnValueChanged(ValueBase*)
         {
             emit valueChanged(this);
+        }
+        void OnListChanged(ValueBase*)
+        {
+            emit propertyEvent("ap", key(), this);
         }
 
     private:

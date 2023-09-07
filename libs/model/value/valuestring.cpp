@@ -13,5 +13,10 @@ void ValueString::setValue(const QString &value, const bool &emitEvent)
     mValue = value;
     if (emitEvent) emit valueChanged(this);
 }
+void ValueString::setValue(const QString &value, const bool &emitEvent, const double &line)
+{
+    grid.update(value, line);
+    if (emitEvent) emit listChanged(this);
+}
 
 }
