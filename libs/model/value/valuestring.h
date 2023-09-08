@@ -1,12 +1,11 @@
 #ifndef VALUESTRING_h
 #define VALUESTRING_h
-
-#include <valuebase.h>
+#include <valuesingle.h>
 
 namespace  OST
 {
 
-class ValueString: public ValueBase
+class ValueString: public ValueSingle<QString>
 {
 
         Q_OBJECT
@@ -31,17 +30,8 @@ class ValueString: public ValueBase
         {
             return "string";
         }
-        QString value()
-        {
-            return mValue;
-        }
-        void setValue(const QString &value, const bool &emitEvent);
-        void setValue(const QString &value, const bool &emitEvent, const double &line);
-        ListOfValues<QString> lov;
-        Grid<QString> grid;
 
     private:
-        QString mValue;
 
 };
 

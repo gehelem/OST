@@ -1,8 +1,8 @@
 #ifndef OST_VALUEUPDATE_H
 #define OST_VALUEUPDATE_H
 #include "propertybase.h"
-#include <QtCore>
 #include <string>
+#include <valuesingle.h>
 #include <valueint.h>
 #include <valuefloat.h>
 #include <valuebool.h>

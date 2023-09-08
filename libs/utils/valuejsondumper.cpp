@@ -22,6 +22,18 @@ void ValueJsonDumper::visit(ValueBool *pValue)
     QJsonObject json = dumpValueCommons(pValue);
     json["type"] = "bool";
     json["value"] = pValue->value();
+    if (pValue->getGrid().size() > 0)
+    {
+        QJsonArray arr;
+        foreach (bool val, pValue->getGrid())
+        {
+            QVariant v = QVariant::fromValue(val);
+            arr.append(v.toJsonValue());
+        }
+
+        json["gridvalues"] = arr;
+    }
+
     mResult = json;
 }
 void ValueJsonDumper::visit(ValueInt *pValue)
@@ -33,19 +45,20 @@ void ValueJsonDumper::visit(ValueInt *pValue)
     json["max"] = qlonglong(pValue->max());
     json["step"] = qlonglong(pValue->step());
     json["format"] = pValue->format();
-    if (pValue->lov.getList().size() > 0)
+    if (pValue->getLov().size() > 0)
     {
         QJsonObject lines = QJsonObject();
-        foreach(const long &key, pValue->lov.getList().keys())
+        foreach(const long &key, pValue->getLov().keys())
         {
-            lines[QString::number(key)] = pValue->lov.getList()[key];
+            QString skey = QString::number(key);
+            lines[skey] = pValue->getLov()[key];
         }
         json["listOfValues"] = lines;
     }
-    if (pValue->grid.getGrid().size() > 0)
+    if (pValue->getGrid().size() > 0)
     {
         QJsonArray arr;
-        foreach (long val, pValue->grid.getGrid())
+        foreach (long val, pValue->getGrid())
         {
             QVariant v = QVariant::fromValue(val);
             arr.append(v.toJsonValue());
@@ -64,19 +77,20 @@ void ValueJsonDumper::visit(ValueFloat *pValue)
     json["max"] = pValue->max();
     json["step"] = pValue->step();
     json["format"] = pValue->format();
-    if (pValue->lov.getList().size() > 0)
+    if (!pValue->getLov().isEmpty())
     {
         QJsonObject lines = QJsonObject();
-        foreach(const float &key, pValue->lov.getList().keys())
+        foreach(const double &key, pValue->getLov().keys())
         {
-            lines[QString::number(key)] = pValue->lov.getList()[key];
+            QString skey = QString::number(key);
+            lines[skey] = pValue->getLov()[key];
         }
         json["listOfValues"] = lines;
     }
-    if (pValue->grid.getGrid().size() > 0)
+    if (pValue->getGrid().size() > 0)
     {
         QJsonArray arr;
-        foreach (double val, pValue->grid.getGrid())
+        foreach (double val, pValue->getGrid())
         {
             QVariant v = QVariant::fromValue(val);
             arr.append(v.toJsonValue());
@@ -92,19 +106,19 @@ void ValueJsonDumper::visit(ValueString *pValue)
     QJsonObject json = dumpValueCommons(pValue);
     json["type"] = "string";
     json["value"] = pValue->value();
-    if (pValue->lov.getList().size() > 0)
+    if (pValue->getLov().size() > 0)
     {
         QJsonObject lines = QJsonObject();
-        foreach(const QString &key, pValue->lov.getList().keys())
+        foreach(const QString &key, pValue->getLov().keys())
         {
-            lines[key] = pValue->lov.getList()[key];
+            lines[key] = pValue->getLov()[key];
         }
         json["listOfValues"] = lines;
     }
-    if (pValue->grid.getGrid().size() > 0)
+    if (pValue->getGrid().size() > 0)
     {
         QJsonArray arr;
-        foreach (QString val, pValue->grid.getGrid())
+        foreach (QString val, pValue->getGrid())
         {
             QVariant v = QVariant::fromValue(val);
             arr.append(v.toJsonValue());

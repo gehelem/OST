@@ -1,6 +1,5 @@
 #ifndef OST_PROPERTYUPDATE_H
 #define OST_PROPERTYUPDATE_H
-#include <QtCore>
 #include <string>
 #include <propertymulti.h>
 #include <propertyvisitor.h>

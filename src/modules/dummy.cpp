@@ -18,6 +18,9 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     setModuleVersion("0.1");
 
     setOstElementValue("extextRO", "extext1", "Texte read only 1", false);
+    qDebug() << "---------------------";
+    qDebug() << getValueString("extextRO", "extext1")->getRealType();
+    qDebug() << "---------------------";
     setOstElementValue("extextRO", "extext2", "Texte read only 2", false);
     setOstElementValue("extextRO", "extext3", "Texte read only 3", false);
     setOstElementValue("extextRO", "extext4", "Texte read only 4", true);
@@ -37,9 +40,9 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     setOstElementValue("numbersRW", "n2", -1000, false);
     setOstElementValue("numbersRW", "n3", 3.14, false);
     setOstElementValue("numbersRW", "n4", -20.23, true);
-    getValueFloat("numbersRW", "n4")->setStep(100);
-    getValueFloat("numbersRW", "n4")->setMin(-10000);
-    getValueFloat("numbersRW", "n4")->setMax(10000);
+    getValueInt("numbersRW", "n4")->setStep(100);
+    getValueInt("numbersRW", "n4")->setMin(-10000);
+    getValueInt("numbersRW", "n4")->setMax(10000);
 
     //setOstElementValue("mixedRW", "b1", false, false);
     //setOstElementValue("mixedRW", "b2", false, false);
@@ -60,11 +63,12 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     //setBLOBMode(B_ALSO, _camera.toStdString().c_str(), nullptr);
     //enableDirectBlobAccess(_camera.toStdString().c_str(), nullptr);
     //setBlobMode();
-    getValueString("extextRW", "extext4")->lov.update("i1", "i1 label modified");
+    getValueString("extextRW", "extext4")->lovUpdate("i1", "i1 label modified");
     //addOstElementLov("extextRW", "extext4", "i1", "i1 label modified"); // should give a warning
-    getValueString("extextRW", "extext4")->lov.add("i3", "i3 label");
-    getValueString("extextRW", "extext4")->lov.add("i4", "i4 label");
-    getValueString("extextRW", "extext4")->lov.del("i4");
+    getValueString("extextRW", "extext4")->lovAdd("i3", "i3 label");
+    getValueString("extextRW", "extext4")->lovAdd("i4", "i4 label");
+    getValueString("extextRW", "extext4")->lovDel("i4");
+    getValueString("extextRW", "extext4")->lovDel("i4444");
     //deleteOstElementLov("extextRW", "extext4", "i4"); // should give a warning
     //sendMessage(QString("lov element i3=") + getOstElementLov("extextRW", "extext4", "i3").toString());
     //sendMessage(QString("lov element inexistant") + getOstElementLov("extextRW", "extext4",
@@ -83,7 +87,7 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     OST::PropertyMulti *p = getProperty("extextRW");
     p->setState(OST::State::Busy);
     static_cast<OST::ValueString*>(p->getValue("extext1"))->setValue("Value modified2", false);
-    static_cast<OST::ValueString*>(p->getValue("extext4"))->lov.update("i3", "another label");
+    static_cast<OST::ValueString*>(p->getValue("extext4"))->lovUpdate("i3", "another label");
 
     dynprop = new OST::PropertyMulti("dynprop", "Dynamic", OST::Permission::ReadWrite, "Examples",
                                      "Dynamically instanciated", "", true,

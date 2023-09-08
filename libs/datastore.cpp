@@ -32,6 +32,11 @@ OST::ValueString* Datastore::getValueString(QString pProperty, QString pElement)
         sendWarning("getValueString - property " + pProperty + " : element " + pElement + " not found");
         return nullptr;
     }
+    if (p->getValue(pElement)->getType() != "string")
+    {
+        sendWarning("getValueString - property " + pProperty + " : element " + pElement + " is not string");
+        return nullptr;
+    }
     return static_cast<OST::ValueString*>(p->getValue(pElement));
 }
 QString Datastore::getString(QString pProperty, QString pElement)
@@ -40,7 +45,7 @@ QString Datastore::getString(QString pProperty, QString pElement)
 }
 QString Datastore::getString(QString pProperty, QString pElement, long line)
 {
-    return getValueString(pProperty, pElement)->grid.getGrid()[line];
+    return getValueString(pProperty, pElement)->getGrid()[line];
 }
 OST::ValueInt* Datastore::getValueInt(QString pProperty, QString pElement)
 {
@@ -55,6 +60,11 @@ OST::ValueInt* Datastore::getValueInt(QString pProperty, QString pElement)
         sendWarning("getValueInt - property " + pProperty + " : element " + pElement + " not found");
         return nullptr;
     }
+    if (p->getValue(pElement)->getType() != "int")
+    {
+        sendWarning("getValueInt - property " + pProperty + " : element " + pElement + " is not int");
+        return nullptr;
+    }
     return static_cast<OST::ValueInt*>(p->getValue(pElement));
 }
 long Datastore::getInt(QString pProperty, QString pElement)
@@ -63,7 +73,7 @@ long Datastore::getInt(QString pProperty, QString pElement)
 }
 long Datastore::getInt(QString pProperty, QString pElement, long line)
 {
-    return getValueInt(pProperty, pElement)->grid.getGrid()[line];
+    return getValueInt(pProperty, pElement)->getGrid()[line];
 }
 OST::ValueFloat* Datastore::getValueFloat(QString pProperty, QString pElement)
 {
@@ -78,6 +88,11 @@ OST::ValueFloat* Datastore::getValueFloat(QString pProperty, QString pElement)
         sendWarning("getValueFloat - property " + pProperty + " : element " + pElement + " not found");
         return nullptr;
     }
+    if (p->getValue(pElement)->getType() != "float")
+    {
+        sendWarning("getValueFloat - property " + pProperty + " : element " + pElement + " is not float");
+        return nullptr;
+    }
     return static_cast<OST::ValueFloat*>(p->getValue(pElement));
 }
 double  Datastore::getFloat(QString pProperty, QString pElement)
@@ -86,7 +101,7 @@ double  Datastore::getFloat(QString pProperty, QString pElement)
 }
 double Datastore::getFloat(QString pProperty, QString pElement, long line)
 {
-    return getValueFloat(pProperty, pElement)->grid.getGrid()[line];
+    return getValueFloat(pProperty, pElement)->getGrid()[line];
 }
 OST::ValueLight* Datastore::getValueLight(QString pProperty, QString pElement)
 {
@@ -99,6 +114,11 @@ OST::ValueLight* Datastore::getValueLight(QString pProperty, QString pElement)
     if (!p->getValues().contains(pElement))
     {
         sendWarning("getValueLight - property " + pProperty + " : element " + pElement + " not found");
+        return nullptr;
+    }
+    if (p->getValue(pElement)->getType() != "light")
+    {
+        sendWarning("getValueLight - property " + pProperty + " : element " + pElement + " is not light");
         return nullptr;
     }
     return static_cast<OST::ValueLight*>(p->getValue(pElement));
@@ -117,6 +137,11 @@ OST::ValueImg* Datastore::getValueImg(QString pProperty, QString pElement)
         sendWarning("getValueImg - property " + pProperty + " : element " + pElement + " not found");
         return nullptr;
     }
+    if (p->getValue(pElement)->getType() != "img")
+    {
+        sendWarning("getValueImg - property " + pProperty + " : element " + pElement + " is not img");
+        return nullptr;
+    }
     return static_cast<OST::ValueImg*>(p->getValue(pElement));
 }
 OST::ValueBool* Datastore::getValueBool(QString pProperty, QString pElement)
@@ -132,6 +157,11 @@ OST::ValueBool* Datastore::getValueBool(QString pProperty, QString pElement)
         sendWarning("ValueBool - property " + pProperty + " : element " + pElement + " not found");
         return nullptr;
     }
+    if (p->getValue(pElement)->getType() != "bool")
+    {
+        sendWarning("ValueBool - property " + pProperty + " : element " + pElement + " is not bool");
+        return nullptr;
+    }
     return static_cast<OST::ValueBool*>(p->getValue(pElement));
 }
 bool Datastore::getBool(QString pProperty, QString pElement)
@@ -140,7 +170,7 @@ bool Datastore::getBool(QString pProperty, QString pElement)
 }
 bool Datastore::getBool(QString pProperty, QString pElement, long line)
 {
-    return getValueBool(pProperty, pElement)->grid.getGrid()[line];
+    return getValueBool(pProperty, pElement)->getGrid()[line];
 }
 
 bool Datastore::createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel,
@@ -387,56 +417,6 @@ void Datastore::deleteOstProperty(const QString &pPropertyName)
 
 }
 
-QVariant Datastore::getOstElementLineValue(const QString &pPropertyName, const QString &pElementName,
-        const double &pLine)
-{
-    //if (getOstElementGrid(pPropertyName, pElementName).isEmpty())
-    //{
-    //    sendWarning("Try to read an empty grid (" + pPropertyName + "/" + pElementName + ")");
-    //    return QVariant();
-
-    //}
-    //else
-    //{
-    //    if (pLine >= getOstElementGrid(pPropertyName, pElementName).count())
-    //    {
-    //        sendWarning("Try to access inexistant line grid (" + pPropertyName + "/" + pElementName + ") size=" + getOstElementGrid(
-    //                        pPropertyName, pElementName).count() + " vs requested=" + pLine);
-    //        return QVariant();
-    //    }
-    //    else
-    //    {
-    //        return getOstElementGrid(pPropertyName, pElementName)[pLine];
-    //    }
-    //}
-    return QVariant();
-}
-bool Datastore::setOstElementLineValue (const QString &pPropertyName, const QString &pElementName, const double &pLine,
-                                        const QVariant &pElementValue)
-{
-    //QVariantList elementList  = getOstElementGrid(pPropertyName, pElementName);
-    //if (pLine >= elementList.count())
-    //{
-    //    sendWarning("invalid line (" + pPropertyName + "/" + pElementName + ") size=" + QString::number(
-    //                    elementList.count()) + " vs requested(-1)=" +
-    //                QString::number(pLine));
-    //    return false;
-    //}
-    //else
-    //{
-    //    elementList[pLine] = pElementValue;
-    //    OST::ValueUpdate u;
-    //    QVariantMap m;
-    //    m["i"] = pLine;
-    //    m["val"] = pElementValue;
-    //    QString action = "updateline";
-    //    getStore()[pPropertyName]->getValue(pElementName)->accept(&u, action, m);
-    //    OnModuleEvent("ap", QString(), pPropertyName, mProperties[pPropertyName].toMap());
-    //    return true;
-    //}
-    return true;
-
-}
 
 
 QJsonObject Datastore::getPropertiesDump(void)

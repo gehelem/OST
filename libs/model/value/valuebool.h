@@ -1,12 +1,12 @@
 #ifndef VALUEBOOL_h
 #define VALUEBOOL_h
 
-#include <valuebase.h>
+#include <valuesingle.h>
 
 namespace  OST
 {
 
-class ValueBool: public ValueBase
+class ValueBool: public ValueSingle<bool>
 {
 
         Q_OBJECT
@@ -32,15 +32,7 @@ class ValueBool: public ValueBase
             return "bool";
         }
 
-        bool value()
-        {
-            return mValue;
-        }
-        void setValue(const bool &value, const bool &emitEvent);
-        Grid<bool> grid;
-
     private:
-        bool mValue;
 
 };
 

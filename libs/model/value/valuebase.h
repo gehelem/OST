@@ -57,6 +57,8 @@ class ValueBase: public QObject
     signals:
         void valueChanged(OST::ValueBase*);
         void listChanged(OST::ValueBase*);
+        void sendMessage(MsgLevel, QString);
+
 
 
 };
