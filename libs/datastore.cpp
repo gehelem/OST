@@ -157,7 +157,7 @@ OST::ValueBool* Datastore::getValueBool(QString pProperty, QString pElement)
         sendWarning("ValueBool - property " + pProperty + " : element " + pElement + " not found");
         return nullptr;
     }
-    if (p->getValue(pElement)->getType() != "light")
+    if (p->getValue(pElement)->getType() != "bool")
     {
         sendWarning("ValueBool - property " + pProperty + " : element " + pElement + " is not bool");
         return nullptr;
