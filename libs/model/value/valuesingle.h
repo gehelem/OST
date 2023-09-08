@@ -15,9 +15,16 @@ class ValueSingleSignalAndSlots : public ValueBase
 
         }
         ~ValueSingleSignalAndSlots() {}
+    public slots:
+        void OnSingleValueChanged(void)
+        {
+            emit valueChanged(this);
+        }
     signals:
         void lovEvent();
         void gridEvent();
+        void singleValueChanged();
+
 };
 template <class T>
 class ValueSingle : public ValueSingleSignalAndSlots
@@ -29,6 +36,8 @@ class ValueSingle : public ValueSingleSignalAndSlots
         {
             mLov.clear();
             mGridValues.clear();
+            connect(this, &ValueSingle::singleValueChanged, this, &ValueSingleSignalAndSlots::OnSingleValueChanged);
+
         }
         ~ValueSingle() {}
         T value()
@@ -38,7 +47,7 @@ class ValueSingle : public ValueSingleSignalAndSlots
         void setValue(const T &value, const bool &emitEvent)
         {
             mValue = value;
-            if (emitEvent) emit valueChanged(this);
+            if (emitEvent) emit singleValueChanged();
         }
         QList<T> getGrid()
         {
