@@ -103,6 +103,7 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/common.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuebase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuebase.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuesingle.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueint.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueint.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuestring.cpp
@@ -167,6 +168,7 @@ set(BASE_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/nan.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/common.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuebase.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuesingle.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueint.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuestring.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuefloat.h

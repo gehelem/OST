@@ -45,7 +45,7 @@ QString Datastore::getString(QString pProperty, QString pElement)
 }
 QString Datastore::getString(QString pProperty, QString pElement, long line)
 {
-    return getValueString(pProperty, pElement)->grid.getGrid()[line];
+    return getValueString(pProperty, pElement)->getGrid()[line];
 }
 OST::ValueInt* Datastore::getValueInt(QString pProperty, QString pElement)
 {

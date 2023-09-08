@@ -2,6 +2,7 @@
 #define OST_VALUEUPDATE_H
 #include "propertybase.h"
 #include <string>
+#include <valuesingle.h>
 #include <valueint.h>
 #include <valuefloat.h>
 #include <valuebool.h>

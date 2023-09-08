@@ -58,7 +58,7 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                 QList ll  = pData["listOfValues"].toList();
                 foreach (auto line, ll)
                 {
-                    pValue->lov.add(line.toList()[0].toString(), line.toList()[1].toString());
+                    pValue->lovAdd(line.toList()[0].toString(), line.toList()[1].toString());
                 }
             }
             if (pData.contains("gridvalues"))
@@ -66,7 +66,7 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                 QList ll  = pData["gridvalues"].toList();
                 foreach (QVariant val, ll)
                 {
-                    pValue->grid.add(val.toString());
+                    pValue->gridAdd(val.toString());
                 }
             }
 

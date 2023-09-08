@@ -92,19 +92,19 @@ void ValueJsonDumper::visit(ValueString *pValue)
     QJsonObject json = dumpValueCommons(pValue);
     json["type"] = "string";
     json["value"] = pValue->value();
-    if (pValue->lov.getList().size() > 0)
+    if (pValue->getLov().size() > 0)
     {
         QJsonObject lines = QJsonObject();
-        foreach(const QString &key, pValue->lov.getList().keys())
+        foreach(const QString &key, pValue->getLov().keys())
         {
-            lines[key] = pValue->lov.getList()[key];
+            lines[key] = pValue->getLov()[key];
         }
         json["listOfValues"] = lines;
     }
-    if (pValue->grid.getGrid().size() > 0)
+    if (pValue->getGrid().size() > 0)
     {
         QJsonArray arr;
-        foreach (QString val, pValue->grid.getGrid())
+        foreach (QString val, pValue->getGrid())
         {
             QVariant v = QVariant::fromValue(val);
             arr.append(v.toJsonValue());

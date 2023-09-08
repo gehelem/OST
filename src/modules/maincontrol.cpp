@@ -113,10 +113,10 @@ void Maincontrol::setConfigurations(void)
         return;
     }
 
-    getValueString("loadconf", "name")->lov.clear();
+    getValueString("loadconf", "name")->lovClear();
     for(QVariantMap::const_iterator iter = confs.begin(); iter != confs.end(); ++iter)
     {
-        getValueString("loadconf", "name")->lov.add(iter.key(), iter.key());
+        getValueString("loadconf", "name")->lovAdd(iter.key(), iter.key());
     }
     sendMessage("Available configurations refreshed");
 }
@@ -174,7 +174,7 @@ void Maincontrol::setModuleData(const QString  &pName, const QString  &pLabel, c
     {
         if( l[i].toString() == pName)
         {
-            getValueString("modules", "profile")->grid.getGrid()[i] = pProfile;
+            getValueString("modules", "profile")->getGrid()[i] = pProfile;
         }
     }
 

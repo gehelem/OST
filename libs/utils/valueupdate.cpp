@@ -164,28 +164,28 @@ void ValueUpdate::visit(ValueString* pValue, QString &action, QVariantMap &data)
 {
     if (action == "push")
     {
-        pValue->grid.add(pValue->value());
+        pValue->gridAdd(pValue->value());
     }
     if (action == "newline")
     {
-        pValue->grid.add(data["val"].toString());
+        pValue->gridAdd(data["val"].toString());
     }
     if (action == "deleteline")
     {
-        pValue->grid.del(data["i"].toInt());
+        pValue->gridDel(data["i"].toInt());
     }
     if (action == "updateline")
     {
-        pValue->grid.update(data["val"].toString(), data["i"].toInt());
+        pValue->gridUpdate(data["val"].toString(), data["i"].toInt(), true);
     }
     if (action == "cleargrid")
     {
-        pValue->grid.clear();
+        pValue->gridClear();
     }
     if (action == "getgrid")
     {
         mGrid.clear();
-        for (int i = 0; i < pValue->grid.getGrid().size(); ++i) mGrid.append(pValue->grid.getGrid()[i]);
+        for (int i = 0; i < pValue->getGrid().size(); ++i) mGrid.append(pValue->getGrid()[i]);
     }
 }
 void ValueUpdate::visit(ValueLight* pValue, QString &action, QVariantMap &data)
