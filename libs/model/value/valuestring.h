@@ -36,7 +36,7 @@ class ValueString: public ValueBase
             return mValue;
         }
         void setValue(const QString &value, const bool &emitEvent);
-        void setValue(const QString &value, const bool &emitEvent, const double &line);
+        void setLineValue(const QString &value, const bool &emitEvent, const double &line);
         ListOfValues<QString> lov;
         Grid<QString> grid;
 
