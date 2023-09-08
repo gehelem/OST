@@ -1,6 +1,5 @@
 #ifndef VALUESTRING_h
 #define VALUESTRING_h
-#include <valuebase.h>
 #include <valuesingle.h>
 
 namespace  OST

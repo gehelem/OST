@@ -1,12 +1,12 @@
 #ifndef VALUEFLOAT_h
 #define VALUEFLOAT_h
 
-#include <valuebase.h>
+#include <valuesingle.h>
 
 namespace  OST
 {
 
-class ValueFloat: public ValueBase
+class ValueFloat: public ValueSingle<double>
 {
 
         Q_OBJECT
@@ -31,11 +31,6 @@ class ValueFloat: public ValueBase
         {
             return "float";
         }
-        double value()
-        {
-            return mValue;
-        }
-        void setValue(const double &value, const bool &emitEvent);
         double min()
         {
             return mMin;
@@ -57,11 +52,7 @@ class ValueFloat: public ValueBase
         }
         void setFormat(const QString &format);
 
-        ListOfValues<double> lov;
-        Grid<double> grid;
-
     private:
-        double mValue = 0;
         double mMin = 0;
         double mMax = 0;
         double mStep = 0;

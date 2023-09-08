@@ -19,7 +19,6 @@ class ValueSingleSignalAndSlots : public ValueBase
         void lovEvent();
         void gridEvent();
 };
-
 template <class T>
 class ValueSingle : public ValueSingleSignalAndSlots
 {
@@ -28,7 +27,8 @@ class ValueSingle : public ValueSingleSignalAndSlots
 
         ValueSingle(const QString &label, const QString &order, const QString &hint): ValueSingleSignalAndSlots(label, order, hint)
         {
-
+            mLov.clear();
+            mGridValues.clear();
         }
         ~ValueSingle() {}
         T value()
@@ -53,7 +53,7 @@ class ValueSingle : public ValueSingleSignalAndSlots
         {
             if (i >= mGridValues.size())
             {
-                emit sendMessage(Warn, "Grid - del - trying to delete item " + QString::number(i) + " while grid size is " +
+                emit sendMessage(Warn, "gridDel - trying to delete item " + QString::number(i) + " while grid size is " +
                                  mGridValues.size());
                 return false;
             }
@@ -64,7 +64,7 @@ class ValueSingle : public ValueSingleSignalAndSlots
         {
             if (i >= mGridValues.size())
             {
-                emit sendMessage(Warn, "Grid - update - trying to update item " + QString::number(i) + " while grid size is " +
+                emit sendMessage(Warn, "gridUpdate - trying to update item " + QString::number(i) + " while grid size is " +
                                  mGridValues.size());
                 return false;
             }
@@ -90,7 +90,8 @@ class ValueSingle : public ValueSingleSignalAndSlots
         {
             if (mLov.contains(val))
             {
-                emit sendMessage(Warn, "ListOfValues - add - key " + val + " already exists (" + mLov[val] + ").");
+                QVariant v = val;
+                emit sendMessage(Warn, "lovAdd - key " + v.toString() + " already exists (" + mLov[val] + ").");
                 return false;
             }
             mLov[val] = label;
@@ -100,7 +101,8 @@ class ValueSingle : public ValueSingleSignalAndSlots
         {
             if (!mLov.contains(val))
             {
-                emit sendMessage(Warn, "ListOfValues - update - key " + val + " doesn't exist (" + mLov[val] + ").");
+                QVariant v = val;
+                emit sendMessage(Warn, "lovUpdate - key " + v.toString() + " doesn't exist.");
                 return false;
             }
             mLov[val] = label;
@@ -110,7 +112,8 @@ class ValueSingle : public ValueSingleSignalAndSlots
         {
             if (!mLov.contains(val))
             {
-                emit sendMessage(Warn, "ListOfValues - del - key " + val + " does not exist.");
+                QVariant v = val;
+                emit sendMessage(Warn, "lovDel - key " + v.toString() + " doesn't exist.");
                 return false;
             }
             mLov.remove(val);
@@ -127,8 +130,10 @@ class ValueSingle : public ValueSingleSignalAndSlots
         }
     private:
         T mValue;
-        QList<T> mGridValues;
+        QList<T> mGridValues = QList<T>();
         QMap<T, QString> mLov;
+
+
 };
 
 }

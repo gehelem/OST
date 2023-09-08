@@ -73,7 +73,7 @@ long Datastore::getInt(QString pProperty, QString pElement)
 }
 long Datastore::getInt(QString pProperty, QString pElement, long line)
 {
-    return getValueInt(pProperty, pElement)->grid.getGrid()[line];
+    return getValueInt(pProperty, pElement)->getGrid()[line];
 }
 OST::ValueFloat* Datastore::getValueFloat(QString pProperty, QString pElement)
 {
@@ -101,7 +101,7 @@ double  Datastore::getFloat(QString pProperty, QString pElement)
 }
 double Datastore::getFloat(QString pProperty, QString pElement, long line)
 {
-    return getValueFloat(pProperty, pElement)->grid.getGrid()[line];
+    return getValueFloat(pProperty, pElement)->getGrid()[line];
 }
 OST::ValueLight* Datastore::getValueLight(QString pProperty, QString pElement)
 {
@@ -170,7 +170,7 @@ bool Datastore::getBool(QString pProperty, QString pElement)
 }
 bool Datastore::getBool(QString pProperty, QString pElement, long line)
 {
-    return getValueBool(pProperty, pElement)->grid.getGrid()[line];
+    return getValueBool(pProperty, pElement)->getGrid()[line];
 }
 
 bool Datastore::createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel,

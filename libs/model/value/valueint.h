@@ -1,12 +1,12 @@
 #ifndef VALUEINT_h
 #define VALUEINT_h
 
-#include <valuebase.h>
+#include <valuesingle.h>
 
 namespace  OST
 {
 
-class ValueInt: public ValueBase
+class ValueInt: public ValueSingle<int>
 {
 
         Q_OBJECT
@@ -31,38 +31,30 @@ class ValueInt: public ValueBase
         {
             return "int";
         }
-        long value()
-        {
-            return mValue;
-        }
-        void setValue(const long &value, const bool &emitEvent);
-        long min()
+        int min()
         {
             return mMin;
         }
-        void setMin(const long &min);
-        long max()
+        void setMin(const int &min);
+        int max()
         {
             return mMax;
         }
-        void setMax(const long &max);
-        long step()
+        void setMax(const int &max);
+        int step()
         {
             return mStep;
         }
-        void setStep(const long &step);
+        void setStep(const int &step);
         QString format()
         {
             return mFormat;
         }
         void setFormat(const QString &format);
-        ListOfValues<long> lov;
-        Grid<long> grid;
     private:
-        long mValue = 0;
-        long mMin = 0;
-        long mMax = 0;
-        long mStep = 0;
+        int mMin = 0;
+        int mMax = 0;
+        int mStep = 0;
         QString mFormat = "";
 
 };

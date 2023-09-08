@@ -2,26 +2,21 @@
 namespace  OST
 {
 ValueInt::ValueInt(const QString &label, const QString &order, const QString &hint)
-    : ValueBase(label, order, hint)
+    : ValueSingle(label, order, hint)
 {
 }
 ValueInt::~ValueInt()
 {
 }
-void ValueInt::setValue(const long &value, const bool &emitEvent)
-{
-    mValue = value;
-    if (emitEvent) emit valueChanged(this);
-}
-void ValueInt::setMin(const long &min)
+void ValueInt::setMin(const int &min)
 {
     mMin = min;
 }
-void ValueInt::setMax(const long &max)
+void ValueInt::setMax(const int &max)
 {
     mMax = max;
 }
-void ValueInt::setStep(const long &step)
+void ValueInt::setStep(const int &step)
 {
     mStep = step;
 }
