@@ -32,6 +32,11 @@ OST::ValueString* Datastore::getValueString(QString pProperty, QString pElement)
         sendWarning("getValueString - property " + pProperty + " : element " + pElement + " not found");
         return nullptr;
     }
+    if (p->getValue(pElement)->getType() != "string")
+    {
+        sendWarning("getValueString - property " + pProperty + " : element " + pElement + " is not string");
+        return nullptr;
+    }
     return static_cast<OST::ValueString*>(p->getValue(pElement));
 }
 QString Datastore::getString(QString pProperty, QString pElement)
@@ -53,6 +58,11 @@ OST::ValueInt* Datastore::getValueInt(QString pProperty, QString pElement)
     if (!p->getValues().contains(pElement))
     {
         sendWarning("getValueInt - property " + pProperty + " : element " + pElement + " not found");
+        return nullptr;
+    }
+    if (p->getValue(pElement)->getType() != "int")
+    {
+        sendWarning("getValueInt - property " + pProperty + " : element " + pElement + " is not int");
         return nullptr;
     }
     return static_cast<OST::ValueInt*>(p->getValue(pElement));
@@ -78,6 +88,11 @@ OST::ValueFloat* Datastore::getValueFloat(QString pProperty, QString pElement)
         sendWarning("getValueFloat - property " + pProperty + " : element " + pElement + " not found");
         return nullptr;
     }
+    if (p->getValue(pElement)->getType() != "float")
+    {
+        sendWarning("getValueFloat - property " + pProperty + " : element " + pElement + " is not float");
+        return nullptr;
+    }
     return static_cast<OST::ValueFloat*>(p->getValue(pElement));
 }
 double  Datastore::getFloat(QString pProperty, QString pElement)
@@ -101,6 +116,11 @@ OST::ValueLight* Datastore::getValueLight(QString pProperty, QString pElement)
         sendWarning("getValueLight - property " + pProperty + " : element " + pElement + " not found");
         return nullptr;
     }
+    if (p->getValue(pElement)->getType() != "light")
+    {
+        sendWarning("getValueLight - property " + pProperty + " : element " + pElement + " is not light");
+        return nullptr;
+    }
     return static_cast<OST::ValueLight*>(p->getValue(pElement));
 }
 
@@ -117,6 +137,11 @@ OST::ValueImg* Datastore::getValueImg(QString pProperty, QString pElement)
         sendWarning("getValueImg - property " + pProperty + " : element " + pElement + " not found");
         return nullptr;
     }
+    if (p->getValue(pElement)->getType() != "img")
+    {
+        sendWarning("getValueImg - property " + pProperty + " : element " + pElement + " is not img");
+        return nullptr;
+    }
     return static_cast<OST::ValueImg*>(p->getValue(pElement));
 }
 OST::ValueBool* Datastore::getValueBool(QString pProperty, QString pElement)
@@ -130,6 +155,11 @@ OST::ValueBool* Datastore::getValueBool(QString pProperty, QString pElement)
     if (!p->getValues().contains(pElement))
     {
         sendWarning("ValueBool - property " + pProperty + " : element " + pElement + " not found");
+        return nullptr;
+    }
+    if (p->getValue(pElement)->getType() != "light")
+    {
+        sendWarning("ValueBool - property " + pProperty + " : element " + pElement + " is not bool");
         return nullptr;
     }
     return static_cast<OST::ValueBool*>(p->getValue(pElement));
