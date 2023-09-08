@@ -68,6 +68,7 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     getValueString("extextRW", "extext4")->lovAdd("i3", "i3 label");
     getValueString("extextRW", "extext4")->lovAdd("i4", "i4 label");
     getValueString("extextRW", "extext4")->lovDel("i4");
+    getValueString("extextRW", "extext4")->lovDel("i4444");
     //deleteOstElementLov("extextRW", "extext4", "i4"); // should give a warning
     //sendMessage(QString("lov element i3=") + getOstElementLov("extextRW", "extext4", "i3").toString());
     //sendMessage(QString("lov element inexistant") + getOstElementLov("extextRW", "extext4",

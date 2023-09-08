@@ -53,7 +53,8 @@ class ValueSingle : public ValueSingleSignalAndSlots
         {
             if (i >= mGridValues.size())
             {
-                qDebug() << "Grid - del - trying to delete item " << i << " while grid size is " << mGridValues.size();
+                emit sendMessage(Warn, "Grid - del - trying to delete item " + QString::number(i) + " while grid size is " +
+                                 mGridValues.size());
                 return false;
             }
             mGridValues.removeAt(i);
@@ -63,7 +64,8 @@ class ValueSingle : public ValueSingleSignalAndSlots
         {
             if (i >= mGridValues.size())
             {
-                qDebug() << "Grid - update - trying to update item " << i << " while grid size is " << mGridValues.size();
+                emit sendMessage(Warn, "Grid - update - trying to update item " + QString::number(i) + " while grid size is " +
+                                 mGridValues.size());
                 return false;
             }
             mGridValues[i] = value;
@@ -88,7 +90,7 @@ class ValueSingle : public ValueSingleSignalAndSlots
         {
             if (mLov.contains(val))
             {
-                qDebug() << "ListOfValues - add - key " << val << " already exists (" << mLov[val] << ").";
+                emit sendMessage(Warn, "ListOfValues - add - key " + val + " already exists (" + mLov[val] + ").");
                 return false;
             }
             mLov[val] = label;
@@ -98,7 +100,7 @@ class ValueSingle : public ValueSingleSignalAndSlots
         {
             if (!mLov.contains(val))
             {
-                qDebug() << "ListOfValues - update - key " << val << " doesn't exist (" << mLov[val] << ").";
+                emit sendMessage(Warn, "ListOfValues - update - key " + val + " doesn't exist (" + mLov[val] + ").");
                 return false;
             }
             mLov[val] = label;
@@ -108,7 +110,7 @@ class ValueSingle : public ValueSingleSignalAndSlots
         {
             if (!mLov.contains(val))
             {
-                qDebug() << "ListOfValues - del - key " << val << " does not exist.";
+                emit sendMessage(Warn, "ListOfValues - del - key " + val + " does not exist.");
                 return false;
             }
             mLov.remove(val);
