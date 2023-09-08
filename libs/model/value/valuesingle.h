@@ -119,21 +119,14 @@ class ValueSingle : public ValueSingleSignalAndSlots
             mLov.clear();
             return true;
         }
-
-
-        QString getType2()
+        QString getRealType()
         {
             return typeid(T).name();
-            emit lovEvent();
         }
-
     private:
         T mValue;
         QList<T> mGridValues;
         QMap<T, QString> mLov;
-
-
-
 };
 
 }

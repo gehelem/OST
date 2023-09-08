@@ -19,7 +19,7 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
 
     setOstElementValue("extextRO", "extext1", "Texte read only 1", false);
     qDebug() << "---------------------";
-    qDebug() << getValueString("extextRO", "extext1")->getType2();
+    qDebug() << getValueString("extextRO", "extext1")->getRealType();
     qDebug() << "---------------------";
     setOstElementValue("extextRO", "extext2", "Texte read only 2", false);
     setOstElementValue("extextRO", "extext3", "Texte read only 3", false);

@@ -76,6 +76,7 @@ class PropertyMulti: public PropertyBase
             mValues[key] = pValue;
             connect(mValues[key], &ValueBase::valueChanged, this, &PropertyMulti::OnValueChanged);
             connect(mValues[key], &ValueBase::listChanged, this, &PropertyMulti::OnListChanged);
+            connect(mValues[key], &ValueBase::sendMessage, this, &PropertyMulti::OnMessage);
         }
         void push();
         void newLine(const QVariantMap &pValues);
@@ -90,6 +91,24 @@ class PropertyMulti: public PropertyBase
         void OnListChanged(ValueBase*)
         {
             emit propertyEvent("ap", key(), this);
+        }
+        void OnMessage(MsgLevel l, QString m)
+        {
+            switch (l)
+            {
+                case Info:
+                    sendInfo(this->key() + "-" + m);
+                    break;
+                case Warn:
+                    sendWarning(this->key() + "-" + m);
+                    break;
+                case Err:
+                    sendError(this->key() + "-" + m);
+                    break;
+                default:
+                    sendError(this->key() + "-" + m);
+                    break;
+            }
         }
 
     private:
