@@ -38,7 +38,7 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                 QList ll  = pData["gridvalues"].toList();
                 foreach (QVariant val, ll)
                 {
-                    pValue->grid.add(IntToState(val.toInt()));
+                    pValue->gridAdd(IntToState(val.toInt()));
                 }
             }
 
