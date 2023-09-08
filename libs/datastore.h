@@ -100,10 +100,6 @@ class Datastore : public Baseroot
 
         void deleteOstProperty(const QString &pPropertyName);
 
-        QVariant getOstElementLineValue(const QString &pPropertyName, const QString &pElementName, const double &pLine);
-        bool setOstElementLineValue(const QString &pPropertyName, const QString &pElementName, const double &pLine,
-                                    const QVariant &pElementValue);
-
         QVariantMap getProfile(void);
 
         QJsonObject getPropertiesDump(void);

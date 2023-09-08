@@ -174,7 +174,7 @@ void Maincontrol::setModuleData(const QString  &pName, const QString  &pLabel, c
     {
         if( l[i].toString() == pName)
         {
-            setOstElementLineValue("modules", "profile", i, pProfile);
+            getValueString("modules", "profile")->grid.getGrid()[i] = pProfile;
         }
     }
 

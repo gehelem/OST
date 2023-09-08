@@ -387,56 +387,6 @@ void Datastore::deleteOstProperty(const QString &pPropertyName)
 
 }
 
-QVariant Datastore::getOstElementLineValue(const QString &pPropertyName, const QString &pElementName,
-        const double &pLine)
-{
-    //if (getOstElementGrid(pPropertyName, pElementName).isEmpty())
-    //{
-    //    sendWarning("Try to read an empty grid (" + pPropertyName + "/" + pElementName + ")");
-    //    return QVariant();
-
-    //}
-    //else
-    //{
-    //    if (pLine >= getOstElementGrid(pPropertyName, pElementName).count())
-    //    {
-    //        sendWarning("Try to access inexistant line grid (" + pPropertyName + "/" + pElementName + ") size=" + getOstElementGrid(
-    //                        pPropertyName, pElementName).count() + " vs requested=" + pLine);
-    //        return QVariant();
-    //    }
-    //    else
-    //    {
-    //        return getOstElementGrid(pPropertyName, pElementName)[pLine];
-    //    }
-    //}
-    return QVariant();
-}
-bool Datastore::setOstElementLineValue (const QString &pPropertyName, const QString &pElementName, const double &pLine,
-                                        const QVariant &pElementValue)
-{
-    //QVariantList elementList  = getOstElementGrid(pPropertyName, pElementName);
-    //if (pLine >= elementList.count())
-    //{
-    //    sendWarning("invalid line (" + pPropertyName + "/" + pElementName + ") size=" + QString::number(
-    //                    elementList.count()) + " vs requested(-1)=" +
-    //                QString::number(pLine));
-    //    return false;
-    //}
-    //else
-    //{
-    //    elementList[pLine] = pElementValue;
-    //    OST::ValueUpdate u;
-    //    QVariantMap m;
-    //    m["i"] = pLine;
-    //    m["val"] = pElementValue;
-    //    QString action = "updateline";
-    //    getStore()[pPropertyName]->getValue(pElementName)->accept(&u, action, m);
-    //    OnModuleEvent("ap", QString(), pPropertyName, mProperties[pPropertyName].toMap());
-    //    return true;
-    //}
-    return true;
-
-}
 
 
 QJsonObject Datastore::getPropertiesDump(void)
