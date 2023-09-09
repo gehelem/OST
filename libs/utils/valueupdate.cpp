@@ -54,10 +54,10 @@ void ValueUpdate::visit(ValueLight *pValue, QVariantMap &data )
         qDebug() << "no value for " << pValue->label();
         return;
     }
-    if (data["value"].toInt() == 0 ) pValue->setState(Idle);
-    if (data["value"].toInt() == 1 ) pValue->setState(Ok);
-    if (data["value"].toInt() == 2 ) pValue->setState(Busy);
-    if (data["value"].toInt() == 3 ) pValue->setState(Error);
+    if (data["value"].toInt() == 0 ) pValue->setValue(Idle, true);
+    if (data["value"].toInt() == 1 ) pValue->setValue(Ok, true);
+    if (data["value"].toInt() == 2 ) pValue->setValue(Busy, true);
+    if (data["value"].toInt() == 3 ) pValue->setValue(Error, true);
 }
 void ValueUpdate::visit(ValueImg *pValue, QVariantMap &data )
 {
@@ -192,28 +192,28 @@ void ValueUpdate::visit(ValueLight* pValue, QString &action, QVariantMap &data)
 {
     if (action == "push")
     {
-        pValue->grid.add(pValue->state());
+        pValue->gridAdd(pValue->value());
     }
     if (action == "newline")
     {
-        pValue->grid.add(IntToState(data["val"].toInt()));
+        pValue->gridAdd(IntToState(data["val"].toInt()));
     }
     if (action == "deleteline")
     {
-        pValue->grid.del(data["i"].toInt());
+        pValue->gridDel(data["i"].toInt());
     }
     if (action == "updateline")
     {
-        pValue->grid.update(IntToState(data["val"].toInt()), data["i"].toInt());
+        pValue->gridUpdate(IntToState(data["val"].toInt()), data["i"].toInt(), true);
     }
     if (action == "cleargrid")
     {
-        pValue->grid.clear();
+        pValue->gridClear();
     }
     if (action == "getgrid")
     {
         mGrid.clear();
-        for (int i = 0; i < pValue->grid.getGrid().size(); ++i) mGrid.append(pValue->grid.getGrid()[i]);
+        for (int i = 0; i < pValue->getGrid().size(); ++i) mGrid.append(pValue->getGrid()[i]);
     }
 }
 void ValueUpdate::visit(ValueImg* pValue, QString &action, QVariantMap &data)

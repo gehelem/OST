@@ -27,6 +27,10 @@ PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVaria
         qDebug() << "Multiproperty defined without elements " << pData;
         return pProperty;
     }
+    if (pData.contains("showArray"))
+    {
+        pProperty->setShowArray(pData["showArray"].toBool());
+    }
     QVariantMap elts = pData["elements"].toMap();
     foreach(const QString &key, elts.keys())
     {

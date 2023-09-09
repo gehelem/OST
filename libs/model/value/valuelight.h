@@ -1,12 +1,12 @@
 #ifndef VALUELIGHT_h
 #define VALUELIGHT_h
 
-#include <valuebase.h>
+#include <valuesingle.h>
 
 namespace  OST
 {
 
-class ValueLight: public ValueBase
+class ValueLight: public ValueSingle<State>
 {
 
         Q_OBJECT
@@ -31,7 +31,6 @@ class ValueLight: public ValueBase
         {
             return "light";
         }
-        Grid<State> grid;
 
     private:
 

@@ -10,9 +10,5 @@ ValueBase::~ValueBase()
 {
 
 }
-void ValueBase::setState(const State &state)
-{
-    mState = state;
-}
 
 }

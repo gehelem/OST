@@ -35,11 +35,6 @@ class ValueBase: public QObject
         {
             return mHint;
         }
-        State state()
-        {
-            return mState;
-        }
-        void setState(const State &state);
         bool autoUpdate()
         {
             return mAutoUpdate;
@@ -52,7 +47,6 @@ class ValueBase: public QObject
         QString mLabel = "change me";
         QString mOrder = "change me";
         QString mHint = "";
-        State mState = State::Idle;
         bool mAutoUpdate = false;
     signals:
         void valueChanged(OST::ValueBase*);

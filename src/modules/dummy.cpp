@@ -93,14 +93,14 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
                                      "Dynamically instanciated", "", true,
                                      false);
     dynlight = new OST::ValueLight("Dyn light", "", "");
-    dynlight->setState(OST::State::Busy);
+    dynlight->setValue(OST::State::Busy, true);
     dynprop->addValue("dynlight", dynlight);
     dyntext = new OST::ValueString("Dyn text", "", "");
     dynprop->addValue("dyntext", dyntext);
     createProperty("dynprop", dynprop);
     dynprop->setState(OST::State::Busy);
     dyntext->setValue("Okydoky", false);
-    dynlight->setState(OST::State::Ok);
+    dynlight->setValue(OST::State::Ok, true);
 
     dynbool = new OST::ValueBool("Dyn bool", "", "");
     dynprop->addValue("dynbool", dynbool);
