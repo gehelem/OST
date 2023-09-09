@@ -54,10 +54,10 @@ void ValueUpdate::visit(ValueLight *pValue, QVariantMap &data )
         qDebug() << "no value for " << pValue->label();
         return;
     }
-    if (data["value"].toInt() == 0 ) pValue->setState(Idle);
-    if (data["value"].toInt() == 1 ) pValue->setState(Ok);
-    if (data["value"].toInt() == 2 ) pValue->setState(Busy);
-    if (data["value"].toInt() == 3 ) pValue->setState(Error);
+    if (data["value"].toInt() == 0 ) pValue->setValue(Idle, true);
+    if (data["value"].toInt() == 1 ) pValue->setValue(Ok, true);
+    if (data["value"].toInt() == 2 ) pValue->setValue(Busy, true);
+    if (data["value"].toInt() == 3 ) pValue->setValue(Error, true);
 }
 void ValueUpdate::visit(ValueImg *pValue, QVariantMap &data )
 {
@@ -192,7 +192,7 @@ void ValueUpdate::visit(ValueLight* pValue, QString &action, QVariantMap &data)
 {
     if (action == "push")
     {
-        pValue->gridAdd(pValue->state());
+        pValue->gridAdd(pValue->value());
     }
     if (action == "newline")
     {

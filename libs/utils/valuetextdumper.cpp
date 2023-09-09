@@ -7,7 +7,6 @@ std::string ValueTextDumper::dumpValueCommons(ValueBase *pValue)
 {
     std::stringstream stream;
     stream << " Label='" << pValue->label().toStdString() << "'"
-           << " State=" << pValue->state() << " "
            ;
     return stream.str();
 }
@@ -44,7 +43,7 @@ void ValueTextDumper::visit(ValueLight *pValue)
 {
     std::stringstream stream;
     stream << "Light Value :" << dumpValueCommons(pValue);
-    switch ( pValue->state())
+    switch ( pValue->value())
     {
         case Idle:
             stream << "Val = Idle ";

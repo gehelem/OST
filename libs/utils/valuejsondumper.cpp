@@ -10,7 +10,6 @@ QJsonObject ValueJsonDumper::dumpValueCommons(ValueBase *pValue)
     json["label"] = pValue->label();
     json["order"] = pValue->order();
     json["hint"] = pValue->hint();
-    json["state"] = pValue->state();
     json["type"] = "undefined";
     json["autoupdate"] = pValue->autoUpdate();
 
@@ -133,6 +132,7 @@ void ValueJsonDumper::visit(ValueLight *pValue)
 {
     QJsonObject json = dumpValueCommons(pValue);
     json["type"] = "light";
+    json["value"] = StateToInt(pValue->value());
     mResult = json;
 }
 void ValueJsonDumper::visit(ValueImg *pValue)

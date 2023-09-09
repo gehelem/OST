@@ -26,7 +26,7 @@ class ValueSingleSignalAndSlots : public ValueBase
         void singleValueChanged();
 
 };
-template <class T>
+template <typename T>
 class ValueSingle : public ValueSingleSignalAndSlots
 {
 
@@ -42,6 +42,10 @@ class ValueSingle : public ValueSingleSignalAndSlots
         ~ValueSingle() {}
         T value()
         {
+            //if constexpr (std::is_same_v<T, int>)
+            //{
+            //    return 0;
+            //}
             return mValue;
         }
         void setValue(const T &value, const bool &emitEvent)
@@ -137,6 +141,8 @@ class ValueSingle : public ValueSingleSignalAndSlots
         {
             return typeid(T).name();
         }
+
+
     private:
         T mValue;
         QList<T> mGridValues = QList<T>();
