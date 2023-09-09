@@ -36,6 +36,7 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
     if (pProperty->hasArray())
     {
         json["hasArray"] = true;
+        json["showArray"] = pProperty->getShowArray();
         //json["gridlimit"] = 255;
         json["grid"] = 0;
     }
