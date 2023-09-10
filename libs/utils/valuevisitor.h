@@ -10,6 +10,7 @@ class ValueFloat;
 class ValueString;
 class ValueLight;
 class ValueImg;
+class ValueVideo;
 class ValueMessage;
 class ValueGraph;
 
@@ -38,6 +39,9 @@ class ValueVisitor
         virtual void visit(ValueImg* pValue) = 0;
         virtual void visit(ValueImg* pValue, QVariantMap &data) = 0;
         virtual void visit(ValueImg* pValue, QString &action, QVariantMap &data) = 0;
+        virtual void visit(ValueVideo* pValue) = 0;
+        virtual void visit(ValueVideo* pValue, QVariantMap &data) = 0;
+        virtual void visit(ValueVideo* pValue, QString &action, QVariantMap &data) = 0;
         virtual void visit(ValueMessage* pValue) = 0;
         virtual void visit(ValueMessage* pValue, QVariantMap &data) = 0;
         virtual void visit(ValueMessage* pValue, QString &action, QVariantMap &data) = 0;

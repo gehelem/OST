@@ -156,6 +156,13 @@ void ValueJsonDumper::visit(ValueImg *pValue)
     json["value"] = imgdata;
     mResult = json;
 }
+void ValueJsonDumper::visit(ValueVideo *pValue)
+{
+    QJsonObject json = dumpValueCommons(pValue);
+    json["type"] = "video";
+    json["value"] = pValue->value();
+    mResult = json;
+}
 void ValueJsonDumper::visit(ValueMessage *pValue)
 {
     QJsonObject json = dumpValueCommons(pValue);
