@@ -8,6 +8,7 @@
 #include <valuestring.h>
 #include <valuelight.h>
 #include <valueimg.h>
+#include <valuevideo.h>
 #include <valuemessage.h>
 #include <valuegraph.h>
 

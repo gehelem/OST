@@ -108,7 +108,6 @@ void IndiModule::connectIndiTimer()
  */
 bool IndiModule::connectIndi()
 {
-
     if (isServerConnected())
     {
         sendWarning("Indi server already connected");
@@ -148,6 +147,11 @@ bool IndiModule::connectAllDevices()
 {
     int err = 0;
     std::vector<INDI::BaseDevice> devs = getDevices();
+
+    createDeviceProperty("camera", "Camera", "Module", "Indi", "999", INDI::BaseDevice::CCD_INTERFACE);
+    createDeviceProperty("focuser", "Focuser", "Module", "Indi", "999", INDI::BaseDevice::FOCUSER_INTERFACE);
+    createDeviceProperty("st4", "Pulses (ST4)", "Module", "Indi", "999", INDI::BaseDevice::GUIDER_INTERFACE);
+
     for(std::size_t i = 0; i < devs.size(); i++)
     {
         INDI::PropertySwitch svp = devs[i].getSwitch("CONNECTION");
@@ -578,5 +582,51 @@ bool IndiModule::frameReset(QString devicename)
 
     sendNewSwitch(prop);
     emit askedFrameReset(devicename);
+    return true;
+}
+bool IndiModule::createDeviceProperty(const QString &key, const QString &label, const QString &level1,
+                                      const QString &level2, const QString &order, INDI::BaseDevice::DRIVER_INTERFACE interface)
+{
+    std::vector<INDI::BaseDevice> devs = getDevices();
+    OST::PropertyMulti* pm = new OST::PropertyMulti(key, label, OST::ReadWrite, level1, level2, order, true, false);
+    OST::ValueString* s = new  OST::ValueString("name", "", "");
+    s->setValue("--", false);
+    s->setAutoUpdate(true);
+    pm->addValue("name", s);
+
+    for(std::size_t i = 0; i < devs.size(); i++)
+    {
+        if (devs[i].getDriverInterface() & interface)
+        {
+            s->lovAdd(devs[i].getDeviceName(), devs[i].getDeviceName());
+        }
+        /*sendMessage("------------ list devs " + QString(devs[i].getDeviceName()));
+        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::GENERAL_INTERFACE) sendMessage("GENERAL_INTERFACE");
+        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::TELESCOPE_INTERFACE)
+            sendMessage("TELESCOPE_INTERFACE");
+        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::CCD_INTERFACE) sendMessage("CCD_INTERFACE");
+        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::GUIDER_INTERFACE) sendMessage("GUIDER_INTERFACE");
+        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::FOCUSER_INTERFACE) sendMessage("FOCUSER_INTERFACE");
+        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::FILTER_INTERFACE) sendMessage("FILTER_INTERFACE");
+        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::DOME_INTERFACE) sendMessage("DOME_INTERFACE");
+        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::GPS_INTERFACE) sendMessage("GPS_INTERFACE");
+        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::WEATHER_INTERFACE) sendMessage("WEATHER_INTERFACE");
+        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::AO_INTERFACE) sendMessage("AO_INTERFACE");
+        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::DUSTCAP_INTERFACE) sendMessage("DUSTCAP_INTERFACE");
+        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::LIGHTBOX_INTERFACE)
+            sendMessage("LIGHTBOX_INTERFACE");
+        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::DETECTOR_INTERFACE)
+            sendMessage("DETECTOR_INTERFACE");
+        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::ROTATOR_INTERFACE) sendMessage("ROTATOR_INTERFACE");
+        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::SPECTROGRAPH_INTERFACE)
+            sendMessage("SPECTROGRAPH_INTERFACE");
+        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::CORRELATOR_INTERFACE)
+            sendMessage("CORRELATOR_INTERFACE");
+        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::AUX_INTERFACE) sendMessage("AUX_INTERFACE");
+        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::SENSOR_INTERFACE) sendMessage("SENSOR_INTERFACE");
+        sendMessage("----------------------------");*/
+
+    }
+    createProperty(key, pm);
     return true;
 }

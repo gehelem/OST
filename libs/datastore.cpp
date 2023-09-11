@@ -144,6 +144,26 @@ OST::ValueImg* Datastore::getValueImg(QString pProperty, QString pElement)
     }
     return static_cast<OST::ValueImg*>(p->getValue(pElement));
 }
+OST::ValueVideo* Datastore::getValueVideo(QString pProperty, QString pElement)
+{
+    OST::PropertyMulti* p = getProperty(pProperty);
+    if (p == nullptr)
+    {
+        sendWarning("getValueVideo - property " + pProperty + " not found");
+        return nullptr;
+    }
+    if (!p->getValues().contains(pElement))
+    {
+        sendWarning("getValueVideo - property " + pProperty + " : element " + pElement + " not found");
+        return nullptr;
+    }
+    if (p->getValue(pElement)->getType() != "video")
+    {
+        sendWarning("getValueVideo - property " + pProperty + " : element " + pElement + " is not video");
+        return nullptr;
+    }
+    return static_cast<OST::ValueVideo*>(p->getValue(pElement));
+}
 OST::ValueBool* Datastore::getValueBool(QString pProperty, QString pElement)
 {
     OST::PropertyMulti* p = getProperty(pProperty);

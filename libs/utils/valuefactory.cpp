@@ -161,6 +161,17 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
             return pValue;
         }
 
+        if (pData["type"].toString() == "video")
+        {
+            auto *pValue = new ValueVideo(pData["label"].toString(),
+                                          pData["order"].toString(),
+                                          pData["hint"].toString()
+                                         );
+            if (pData.contains("value")) pValue->setValue(pData["value"].toString(), false);
+
+            return pValue;
+        }
+
         if (pData["type"].toString() == "message")
         {
             auto *pValue = new ValueMessage(pData["label"].toString(),

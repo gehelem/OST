@@ -2,7 +2,6 @@
 #define OST_VALUEUPDATE_H
 #include "propertybase.h"
 #include <string>
-#include <valuesingle.h>
 #include <valueint.h>
 #include <valuefloat.h>
 #include <valuebool.h>
@@ -56,6 +55,12 @@ class ValueUpdate : public ValueVisitor
         }
         void visit(ValueImg* pProperty, QVariantMap &data ) override;
         void visit(ValueImg* pValue, QString &action, QVariantMap &data) override;
+        void visit(ValueVideo* pProperty) override
+        {
+            Q_UNUSED(pProperty)
+        }
+        void visit(ValueVideo* pProperty, QVariantMap &data ) override;
+        void visit(ValueVideo* pValue, QString &action, QVariantMap &data) override;
         void visit(ValueMessage* pProperty) override
         {
             Q_UNUSED(pProperty)

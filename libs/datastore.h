@@ -38,6 +38,7 @@ class Datastore : public Baseroot
         OST::ValueBool* getValueBool(QString pProperty, QString pElement);
         OST::ValueLight* getValueLight(QString pProperty, QString pElement);
         OST::ValueImg* getValueImg(QString pProperty, QString pElement);
+        OST::ValueVideo* getValueVideo(QString pProperty, QString pElement);
         QString getString(QString pProperty, QString pElement);
         QString getString(QString pProperty, QString pElement, long line);
         long getInt(QString pProperty, QString pElement);

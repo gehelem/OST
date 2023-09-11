@@ -9,6 +9,7 @@
 #include <valuestring.h>
 #include <valuelight.h>
 #include <valueimg.h>
+#include <valuevideo.h>
 #include <valuemessage.h>
 #include <valuegraph.h>
 
@@ -88,6 +89,18 @@ class ValueTextDumper : public ValueVisitor
             Q_UNUSED(data)
         }
         void visit(ValueImg* pValue, QString &action, QVariantMap &data ) override
+        {
+            Q_UNUSED(pValue);
+            Q_UNUSED(action);
+            Q_UNUSED(data)
+        }
+        void visit(ValueVideo *pValue) override;
+        void visit(ValueVideo* pValue, QVariantMap &data ) override
+        {
+            Q_UNUSED(pValue);
+            Q_UNUSED(data)
+        }
+        void visit(ValueVideo* pValue, QString &action, QVariantMap &data ) override
         {
             Q_UNUSED(pValue);
             Q_UNUSED(action);
