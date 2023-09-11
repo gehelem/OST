@@ -78,14 +78,6 @@ class PropertyMulti: public PropertyBase
             connect(mValues[key], &ValueBase::listChanged, this, &PropertyMulti::OnListChanged);
             connect(mValues[key], &ValueBase::sendMessage, this, &PropertyMulti::OnMessage);
         }
-        bool getShowArray()
-        {
-            return mShowArray;
-        }
-        void setShowArray(bool b)
-        {
-            mShowArray = b;
-        }
         void push();
         void newLine(const QVariantMap &pValues);
         void deleteLine(const int i);
@@ -122,7 +114,7 @@ class PropertyMulti: public PropertyBase
     private:
         SwitchsRule mRule = SwitchsRule::Any;
         QMap<QString, ValueBase*> mValues;
-        bool mShowArray = true;
+
 
 };
 

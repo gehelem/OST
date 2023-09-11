@@ -102,6 +102,7 @@ void PropertyMulti::push()
         OST::ValueUpdate d;
         QString action = "push";
         QVariantMap m;
+        m["arrayLimit"] = this->getArrayLimit();
         mValues[elt]->accept(&d, action, m);
     }
     emit propertyEvent("ap", key(), this);
@@ -135,6 +136,7 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
         QString action = "newline";
         QVariantMap m;
         m["val"] = pValues[elt];
+        m["arrayLimit"] = this->getArrayLimit();
         mValues[elt]->accept(&d, action, m);
     }
     emit propertyEvent("ap", key(), this);

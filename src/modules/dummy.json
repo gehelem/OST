@@ -271,7 +271,7 @@
     },
     "actions": {
         "devcat": "Examples",
-        "rule":0,
+        "rule":1,
         "elements": {
             "shoot": {
                 "type": "bool",
@@ -429,8 +429,7 @@
         "devcat": "Examples",
         "group": "Grids",
         "permission": 2,
-        "grid":0,
-        "gridlimit":5,
+        "arrayLimit":5,
         "label": "Grid example",
         "elements": {
             "graph": {
