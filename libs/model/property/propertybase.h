@@ -66,11 +66,6 @@ class PropertyBase: public QObject
         {
             return mHasProfile;
         }
-        bool hasArray()
-        {
-            return mHasArray;
-        }
-        void setHasArray(bool hasarray);
         State state()
         {
             return mState;
@@ -88,6 +83,28 @@ class PropertyBase: public QObject
         {
             mIsEnabled = false;
         }
+        bool hasArray()
+        {
+            return mHasArray;
+        }
+        void setHasArray(bool hasarray);
+        bool getShowArray()
+        {
+            return mShowArray;
+        }
+        void setShowArray(bool b)
+        {
+            mShowArray = b;
+        }
+        int getArrayLimit()
+        {
+            return mArrayLimit;
+        }
+        void setArrayLimit(int limit)
+        {
+            if (limit > 0) mArrayLimit = limit;
+        }
+
         void sendInfo(QString m)
         {
             emit sendMessage(Info, key() + "-" + m);
@@ -115,9 +132,12 @@ class PropertyBase: public QObject
         QString mLevel2 = "";
         QString mOrder = 0;
         bool mHasProfile = false;
-        bool mHasArray = false;
         State mState = State::Idle;
         bool mIsEnabled = true;
+        bool mHasArray = false;
+        bool mShowArray = true;
+        int mArrayLimit = 0;
+
 
 
 };

@@ -31,10 +31,15 @@ PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVaria
     {
         pProperty->setShowArray(pData["showArray"].toBool());
     }
+    if (pData.contains("arrayLimit"))
+    {
+        pProperty->setArrayLimit(pData["arrayLimit"].toInt());
+    }
     QVariantMap elts = pData["elements"].toMap();
     foreach(const QString &key, elts.keys())
     {
         QVariantMap elt = elts[key].toMap();
+        if (pProperty->hasArray()) elt["arrayLimit"] = pProperty->getArrayLimit();
         ValueBase *v = ValueFactory::createValue(elt);
         if (v != nullptr)
         {

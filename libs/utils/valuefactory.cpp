@@ -15,6 +15,7 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                                         );
             pValue->setValue(pData["value"].toBool(), false);
             if (pData.contains("autoupdate")) pValue->setAutoUpdate(pData["autoupdate"].toBool());
+            if (pData.contains("arrayLimit")) pValue->setArrayLimit(pData["arrayLimit"].toInt());
             if (pData.contains("gridvalues"))
             {
                 QList ll  = pData["gridvalues"].toList();
@@ -33,6 +34,7 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                                           pData["hint"].toString()
                                          );
             if (pData.contains("autoupdate")) pValue->setAutoUpdate(pData["autoupdate"].toBool());
+            if (pData.contains("arrayLimit")) pValue->setArrayLimit(pData["arrayLimit"].toInt());
             if (pData.contains("gridvalues"))
             {
                 QList ll  = pData["gridvalues"].toList();
@@ -52,6 +54,7 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                                           );
             pValue->setValue(pData["value"].toString(), false);
             if (pData.contains("autoupdate")) pValue->setAutoUpdate(pData["autoupdate"].toBool());
+            if (pData.contains("arrayLimit")) pValue->setArrayLimit(pData["arrayLimit"].toInt());
             if (pData.contains("listOfValues"))
             {
                 QVariantMap elts = pData["listOfValues"].toMap();
@@ -84,6 +87,7 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
             if (pData.contains("step")) pValue->setStep(pData["step"].toLongLong());
             if (pData.contains("format")) pValue->setFormat(pData["format"].toString());
             if (pData.contains("autoupdate")) pValue->setAutoUpdate(pData["autoupdate"].toBool());
+            if (pData.contains("arrayLimit")) pValue->setArrayLimit(pData["arrayLimit"].toInt());
             if (pData.contains("listOfValues"))
             {
                 QVariantMap elts = pData["listOfValues"].toMap();
@@ -117,6 +121,7 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
             if (pData.contains("step")) pValue->setStep(pData["step"].toDouble());
             if (pData.contains("format")) pValue->setFormat(pData["format"].toString());
             if (pData.contains("autoupdate")) pValue->setAutoUpdate(pData["autoupdate"].toBool());
+            if (pData.contains("arrayLimit")) pValue->setArrayLimit(pData["arrayLimit"].toInt());
             if (pData.contains("listOfValues"))
             {
                 QVariantMap elts = pData["listOfValues"].toMap();

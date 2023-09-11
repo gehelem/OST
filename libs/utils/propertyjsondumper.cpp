@@ -23,6 +23,13 @@ QJsonObject PropertyJsonDumper::dumpPropertyCommons(PropertyBase *pProperty)
 void PropertyJsonDumper::visit(PropertyMulti *pProperty)
 {
     QJsonObject json = dumpPropertyCommons(pProperty);
+    if (pProperty->hasArray())
+    {
+        json["hasArray"] = true;
+        json["showArray"] = pProperty->getShowArray();
+        json["arrayLimit"] = pProperty->getArrayLimit();
+    }
+    json["rule"] = pProperty->rule();
     QJsonObject elements;
     foreach(const QString &key, pProperty->getValues().keys())
     {
@@ -32,15 +39,6 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
         QJsonObject value = d.getResult();
         elements[key] = value;
     }
-    json["rule"] = pProperty->rule();
-    if (pProperty->hasArray())
-    {
-        json["hasArray"] = true;
-        json["showArray"] = pProperty->getShowArray();
-        //json["gridlimit"] = 255;
-        json["grid"] = 0;
-    }
-
     json["elements"] = elements;
     mResult = json;
 }

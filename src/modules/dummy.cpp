@@ -18,9 +18,6 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     setModuleVersion("0.1");
 
     setOstElementValue("extextRO", "extext1", "Texte read only 1", false);
-    qDebug() << "---------------------";
-    qDebug() << getValueString("extextRO", "extext1")->getRealType();
-    qDebug() << "---------------------";
     setOstElementValue("extextRO", "extext2", "Texte read only 2", false);
     setOstElementValue("extextRO", "extext3", "Texte read only 3", false);
     setOstElementValue("extextRO", "extext4", "Texte read only 4", true);
@@ -321,11 +318,11 @@ void Dummy::updateProperty(INDI::Property property)
 {
     if (strcmp(property.getName(), "CCD Simulator") == 0)
     {
-        qDebug() << "updateProperty " << property.getName();
+        //qDebug() << "updateProperty " << property.getName();
     }
     if (strcmp(property.getName(), "CCD1") == 0)
     {
-        qDebug() << "updateProperty " << property.getName();
+        //qDebug() << "updateProperty " << property.getName();
         newBLOB(property);
     }
 }

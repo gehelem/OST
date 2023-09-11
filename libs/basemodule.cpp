@@ -47,7 +47,6 @@ void Basemodule::setProfile(const QString &pProfileName)
     sendMessage(pProfileName + " profile sucessfully loaded");
     QJsonObject ob;
     ob.fromVariantMap(prof);
-    qDebug() << ob;
 }
 
 

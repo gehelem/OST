@@ -59,6 +59,10 @@ class ValueSingle : public ValueSingleSignalAndSlots
         }
         bool gridAdd(T val)
         {
+            if ( (mArrayLimit > 0) && (mGridValues.size() >= mArrayLimit)  )
+            {
+                mGridValues.removeFirst();
+            }
             mGridValues.append(val);
             return true;
         }
@@ -141,11 +145,19 @@ class ValueSingle : public ValueSingleSignalAndSlots
         {
             return typeid(T).name();
         }
-
+        int arrayLimit()
+        {
+            return mArrayLimit;
+        }
+        void setArrayLimit(int limit)
+        {
+            if (limit > 0 ) mArrayLimit = limit;
+        }
 
     private:
         T mValue;
         QList<T> mGridValues = QList<T>();
+        int mArrayLimit = 0;
         QMap<T, QString> mLov;
 
 
