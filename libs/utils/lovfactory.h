@@ -14,7 +14,7 @@ class LovFactory
 
     public:
         LovFactory() = delete;
-        static LovBase* createValue(const QVariantMap &pData);
+        static LovBase* createLov(const QVariantMap &pData);
 };
 
 }

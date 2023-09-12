@@ -124,6 +124,7 @@ class Datastore : public Baseroot
         QVariantMap getProfile(void);
 
         QJsonObject getPropertiesDump(void);
+        QJsonObject getGlobalLovsDump(void);
 
     private slots:
         void onValueChanged(void);

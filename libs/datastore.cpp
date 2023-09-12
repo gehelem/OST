@@ -373,6 +373,30 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
 
 
     }
+    if (data.contains("globallov"))
+    {
+        QJsonObject lovs = data["globallov"].toObject();
+        foreach(const QString &key, lovs.keys())
+        {
+            qDebug() << "***** create globlov from file " << key;
+            QVariantMap tt = lovs[key].toVariant().toMap();
+            OST::LovBase *lb = OST::LovFactory::createLov(tt);
+            if (lb != nullptr)
+            {
+                mGlobLov[key] = lb;
+                OST::LovJsonDumper d;
+                mGlobLov[key]->accept(&d);
+                qDebug() << "GlobalLov = " << key << "=" << d.getResult();
+            }
+            else
+            {
+                qDebug() << "***** can't create globlov " << key;
+            }
+
+        }
+
+
+    }
 
 
 }
@@ -455,17 +479,24 @@ void Datastore::deleteOstProperty(const QString &pPropertyName)
 QJsonObject Datastore::getPropertiesDump(void)
 {
     QJsonObject properties;
-    QJsonObject globallov;
-    QJsonObject result;
     foreach(const QString &key, mStore.keys())
     {
         OST::PropertyJsonDumper d;
         mStore[key]->accept(&d);
         properties[key] = d.getResult();
     }
-    result["properties"] = properties;
-    result["globallov"] = globallov;
-    return result;
+    return properties;
+}
+QJsonObject Datastore::getGlobalLovsDump(void)
+{
+    QJsonObject globallov;
+    foreach(const QString &key, mGlobLov.keys())
+    {
+        OST::LovJsonDumper d;
+        mGlobLov[key]->accept(&d);
+        globallov[key] = d.getResult();
+    }
+    return globallov;
 }
 void Datastore::onPropertyMessage(OST::MsgLevel l, QString m)
 {
