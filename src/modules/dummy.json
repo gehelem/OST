@@ -1,4 +1,15 @@
 {
+"globallov":{
+    "dummylov":[
+        ["glob1","Global Value 1"],
+        ["glob2","Global Value 2"]
+    ],
+    "dummylov2":[
+        ["i1","Value 1"],
+        ["i2","Value 2"]
+    ]
+},
+"properties":{
     "extextRO": {
         "devcat": "Examples",
         "elements": {
@@ -633,4 +644,5 @@
             }
         }
     }
+}
 }

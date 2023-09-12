@@ -339,26 +339,38 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
     file.open(QIODevice::ReadOnly | QIODevice::Text);
     content = file.readAll();
     file.close();
-    QJsonDocument d = QJsonDocument::fromJson(content.toUtf8());
-    QJsonObject props = d.object();
-    foreach(const QString &key, props.keys())
+    QJsonParseError parseError;
+    QJsonDocument d = QJsonDocument::fromJson(content.toUtf8(), &parseError);
+    if (!(parseError.error == QJsonParseError::NoError))
     {
-        QVariantMap tt = props[key].toVariant().toMap();
-        //qDebug() << "***** create property from file " << key;
-        OST::PropertyMulti *rp = OST::PropertyFactory::createProperty(key, tt);
-        if (rp != nullptr)
+        qDebug() << "Json parse error " << pFileName << "-" << parseError.errorString();
+    }
+
+    QJsonObject data = d.object();
+    if (data.contains("properties"))
+    {
+        QJsonObject props = data["properties"].toObject();
+        foreach(const QString &key, props.keys())
         {
-            mStore[key] = rp;
-            connect(rp, &OST::PropertyMulti::valueChanged, this, &Datastore::onValueChanged);
-            connect(rp, &OST::PropertyMulti::propertyEvent, this, &Datastore::onPropertyEvent);
-            connect(rp, &OST::PropertyMulti::sendMessage, this, &Datastore::onPropertyMessage);
-            mStore[key]->setState(OST::State::Idle);
+            //qDebug() << "***** create property from file " << key;
+            QVariantMap tt = props[key].toVariant().toMap();
+            OST::PropertyMulti *rp = OST::PropertyFactory::createProperty(key, tt);
+            if (rp != nullptr)
+            {
+                mStore[key] = rp;
+                connect(rp, &OST::PropertyMulti::valueChanged, this, &Datastore::onValueChanged);
+                connect(rp, &OST::PropertyMulti::propertyEvent, this, &Datastore::onPropertyEvent);
+                connect(rp, &OST::PropertyMulti::sendMessage, this, &Datastore::onPropertyMessage);
+                mStore[key]->setState(OST::State::Idle);
+
+            }
+            else
+            {
+                qDebug() << "***** can't create property " << key;
+            }
 
         }
-        else
-        {
-            qDebug() << "***** can't create property " << key;
-        }
+
 
     }
 
@@ -379,7 +391,8 @@ void Datastore::saveOstPropertiesToFile(const QString &pFileName)
 QVariantMap Datastore::getProfile(void)
 {
     QVariantMap _res;
-    QVariantMap m = getPropertiesDump().toVariantMap();
+    QVariantMap data = getPropertiesDump().toVariantMap();
+    QVariantMap m = data["properties"].toMap();
     foreach(const QString &keyprop, m.keys())
     {
         if (m[keyprop].toMap().contains("hasprofile"))
@@ -442,13 +455,17 @@ void Datastore::deleteOstProperty(const QString &pPropertyName)
 QJsonObject Datastore::getPropertiesDump(void)
 {
     QJsonObject properties;
+    QJsonObject globallov;
+    QJsonObject result;
     foreach(const QString &key, mStore.keys())
     {
         OST::PropertyJsonDumper d;
         mStore[key]->accept(&d);
         properties[key] = d.getResult();
     }
-    return properties;
+    result["properties"] = properties;
+    result["globallov"] = globallov;
+    return result;
 }
 void Datastore::onPropertyMessage(OST::MsgLevel l, QString m)
 {
