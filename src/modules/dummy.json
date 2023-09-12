@@ -1,13 +1,22 @@
 {
 "globallov":{
-    "dummylov":[
+    "dummylov":{
+        "type":"string",
+        "label":"Global dummy list of strings",
+        "values":    [
         ["glob1","Global Value 1"],
         ["glob2","Global Value 2"]
-    ],
-    "dummylov2":[
-        ["i1","Value 1"],
-        ["i2","Value 2"]
-    ]
+        ]
+    }
+,
+    "dummylov2":{
+        "type":"int",
+        "label":"Global dummy list of ints",
+        "values":    [
+        [1,"Global Value 1"],
+        [1,"Global Value 2"]
+        ]
+    }
 },
 "properties":{
     "extextRO": {
