@@ -4,17 +4,26 @@
         "type":"string",
         "label":"Global dummy list of strings",
         "values":    [
-        ["glob1","Global Value 1"],
-        ["glob2","Global Value 2"]
+        ["glob1","Global string 1"],
+        ["glob2","Global string 2"]
         ]
     }
-,
+    ,
     "dummylov2":{
         "type":"int",
         "label":"Global dummy list of ints",
         "values":    [
-        [1,"Global Value 1"],
-        [2,"Global Value 2"]
+        [1,"Global int 1"],
+        [2,"Global int 2"]
+        ]
+    }
+    ,
+    "dummylov3":{
+        "type":"float",
+        "label":"Global dummy list of floats",
+        "values":    [
+        [1.1,"Global float 1"],
+        [2.2,"Global float 2"]
         ]
     }
 },
@@ -123,6 +132,12 @@
                     [1,"Un"],
                     [2,"Deux"]
                 ]
+            },
+            "n5": {
+                "autoupdate":true,
+                "type":"float",
+                "label": "Number 5",
+                "listOfValues":"dummylov3"
             }
         },
         "group": "Numbers",
