@@ -64,7 +64,8 @@
                 "autoupdate":true,
                 "type":"string",
                 "label": "Text 3",
-                "value":"cccc"
+                "value":"cccc",
+                "listOfValues":"dummylov"
             },
             "extext4": {
                 "autoupdate":true,

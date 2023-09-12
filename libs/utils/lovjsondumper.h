@@ -18,6 +18,10 @@ class LovJsonDumper : public LovVisitor
         void visit(LovString *pLov) override;
         void visit(LovInt *pLov) override;
         void visit(LovFloat *pLov) override;
+        void visit(LovLight *pLov) override
+        {
+            Q_UNUSED(pLov)
+        };
 
         [[nodiscard]] const QJsonObject &getResult() const
         {

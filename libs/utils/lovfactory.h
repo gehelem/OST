@@ -4,7 +4,7 @@
 #include <lovint.h>
 #include <lovfloat.h>
 #include <lovstring.h>
-
+#include <lovlight.h>
 
 namespace  OST
 {

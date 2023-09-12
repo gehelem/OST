@@ -60,6 +60,7 @@ LovBase *LovFactory::createLov(const QVariantMap &pData)
 
         qDebug() << "Unknown lov type " << pData["label"].toString() << ":" << pData["type"].toString() << "-" <<
                  pData["label"].toString();
+        return nullptr;
     }
 
 

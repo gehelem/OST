@@ -57,11 +57,20 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
             if (pData.contains("arrayLimit")) pValue->setArrayLimit(pData["arrayLimit"].toInt());
             if (pData.contains("listOfValues"))
             {
-                QVariantMap elts = pData["listOfValues"].toMap();
-                QList ll  = pData["listOfValues"].toList();
-                foreach (auto line, ll)
+                if (pData["listOfValues"].canConvert<QVariantList>())
                 {
-                    pValue->lovAdd(line.toList()[0].toString(), line.toList()[1].toString());
+                    QVariantMap elts = pData["listOfValues"].toMap();
+                    QList ll  = pData["listOfValues"].toList();
+                    foreach (auto line, ll)
+                    {
+                        pValue->lovAdd(line.toList()[0].toString(), line.toList()[1].toString());
+                    }
+
+                }
+                else
+                {
+                    qDebug() << "++++++++++++++++++++++++++++ Global lov defined for " << pValue->label();
+                    qDebug() << "++++++++++++++++++++++++++++ Global lov defined for " << pData["listOfValues"];
                 }
             }
             if (pData.contains("gridvalues"))

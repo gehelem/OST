@@ -2,6 +2,7 @@
 #define VALUEFLOAT_h
 
 #include <valuesingle.h>
+#include <lovfloat.h>
 
 namespace  OST
 {
@@ -51,12 +52,33 @@ class ValueFloat: public ValueSingle<double>
             return mFormat;
         }
         void setFormat(const QString &format);
+        QMap<double, QString> getLov()
+        {
+            return mLov.getLov();
+        }
+        bool lovAdd(double val, QString label)
+        {
+            return mLov.lovAdd(val, label);
+        }
+        bool lovUpdate(double  val, QString label)
+        {
+            return mLov.lovUpdate(val, label);
+        }
+        bool lovDel(double  val)
+        {
+            return mLov.lovDel(val);
+        }
+        bool lovClear()
+        {
+            return mLov.lovClear();
+        }
 
     private:
         double mMin = 0;
         double mMax = 0;
         double mStep = 0;
         QString mFormat = "";
+        LovFloat mLov;
 
 };
 

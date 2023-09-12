@@ -1,7 +1,7 @@
 #ifndef VALUESTRING_h
 #define VALUESTRING_h
 #include <valuesingle.h>
-
+#include <lovstring.h>
 namespace  OST
 {
 
@@ -30,8 +30,28 @@ class ValueString: public ValueSingle<QString>
         {
             return "string";
         }
-
+        QMap<QString, QString> getLov()
+        {
+            return mLov.getLov();
+        }
+        bool lovAdd(QString val, QString label)
+        {
+            return mLov.lovAdd(val, label);
+        }
+        bool lovUpdate(QString  val, QString label)
+        {
+            return mLov.lovUpdate(val, label);
+        }
+        bool lovDel(QString  val)
+        {
+            return mLov.lovDel(val);
+        }
+        bool lovClear()
+        {
+            return mLov.lovClear();
+        }
     private:
+        LovString mLov;
 
 };
 
