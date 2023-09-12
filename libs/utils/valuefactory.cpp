@@ -65,12 +65,10 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                     {
                         pValue->lovAdd(line.toList()[0].toString(), line.toList()[1].toString());
                     }
-
                 }
                 else
                 {
-                    qDebug() << "++++++++++++++++++++++++++++ Global lov defined for " << pValue->label();
-                    qDebug() << "++++++++++++++++++++++++++++ Global lov defined for " << pData["listOfValues"];
+                    pValue->setGlobalLov(pData["listOfValues"].toString());
                 }
             }
             if (pData.contains("gridvalues"))
@@ -99,12 +97,19 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
             if (pData.contains("arrayLimit")) pValue->setArrayLimit(pData["arrayLimit"].toInt());
             if (pData.contains("listOfValues"))
             {
-                QVariantMap elts = pData["listOfValues"].toMap();
-                QList ll  = pData["listOfValues"].toList();
-                foreach (auto line, ll)
+                if (pData["listOfValues"].canConvert<QVariantList>())
                 {
-                    long i = line.toList()[0].toInt();
-                    pValue->lovAdd(i, line.toList()[1].toString());
+                    QVariantMap elts = pData["listOfValues"].toMap();
+                    QList ll  = pData["listOfValues"].toList();
+                    foreach (auto line, ll)
+                    {
+                        long i = line.toList()[0].toInt();
+                        pValue->lovAdd(i, line.toList()[1].toString());
+                    }
+                }
+                else
+                {
+                    pValue->setGlobalLov(pData["listOfValues"].toString());
                 }
             }
             if (pData.contains("gridvalues"))
@@ -133,11 +138,18 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
             if (pData.contains("arrayLimit")) pValue->setArrayLimit(pData["arrayLimit"].toInt());
             if (pData.contains("listOfValues"))
             {
-                QVariantMap elts = pData["listOfValues"].toMap();
-                QList ll  = pData["listOfValues"].toList();
-                foreach (auto line, ll)
+                if (pData["listOfValues"].canConvert<QVariantList>())
                 {
-                    pValue->lovAdd(line.toList()[0].toDouble(), line.toList()[1].toString());
+                    QVariantMap elts = pData["listOfValues"].toMap();
+                    QList ll  = pData["listOfValues"].toList();
+                    foreach (auto line, ll)
+                    {
+                        pValue->lovAdd(line.toList()[0].toDouble(), line.toList()[1].toString());
+                    }
+                }
+                else
+                {
+                    pValue->setGlobalLov(pData["listOfValues"].toString());
                 }
             }
             if (pData.contains("gridvalues"))

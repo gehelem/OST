@@ -104,26 +104,6 @@ class ValueSingle : public ValueSingleSignalAndSlots
             mGridValues.clear();
             mGridValues = vals;
         }
-        /*QMap<T, QString> getLov()
-        {
-            return mLov.getLov();
-        }
-        bool lovAdd(T val, QString label)
-        {
-            return mLov.lovAdd(val, label);
-        }
-        bool lovUpdate(T val, QString label)
-        {
-            return mLov.lovUpdate(val, label);
-        }
-        bool lovDel(T val)
-        {
-            return mLov.lovDel(val);
-        }
-        bool lovClear()
-        {
-            return mLov.lovClear();
-        }*/
         QString getRealType()
         {
             return typeid(T).name();
@@ -136,10 +116,19 @@ class ValueSingle : public ValueSingleSignalAndSlots
         {
             if (limit > 0 ) mArrayLimit = limit;
         }
+        QString getGlobalLov()
+        {
+            return mGlobalLov;
+        }
+        void setGlobalLov(QString lovName)
+        {
+            mGlobalLov = lovName;
+        }
     private:
         T mValue;
         QList<T> mGridValues = QList<T>();
         int mArrayLimit = 0;
+        QString mGlobalLov = "";
 
 };
 
