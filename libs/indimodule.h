@@ -45,9 +45,11 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         bool frameReset(QString devicename);
         bool createDeviceProperty(const QString &key, const QString &label, const QString &level1,
                                   const QString &level2, const QString &order, INDI::BaseDevice::DRIVER_INTERFACE interface);
+        bool refreshDeviceslovs();
     private:
         void OnDispatchToIndiExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                            const QVariantMap &eventData) override;
+        bool refreshDevicelovs(INDI::BaseDevice::DRIVER_INTERFACE interface, QString name);
 
     signals:
         void askedFrameReset(QString devicename);

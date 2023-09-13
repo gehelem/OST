@@ -167,6 +167,17 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
         obj["modules"] = mods;
         sendJsonMessage(obj);
     }
+    if (eventType == "lc")
+    {
+        QJsonObject mods;
+        QJsonObject  mod;
+        QJsonObject  lov;
+        lov[eventKey] = QJsonObject::fromVariantMap(eventData);
+        mod["globallovs"] = lov;
+        mods[eventModule] = mod;
+        obj["modules"] = mods;
+        sendJsonMessage(obj);
+    }
     if (eventType == "delprop")
     {
         QJsonObject mods;

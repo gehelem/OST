@@ -274,7 +274,7 @@ void Basemodule::sendDump(void)
     infos["description"] = getModuleDescription();
     //dump["properties"] = getProperties();
     dump["properties"] = getPropertiesDump();;
-    dump["globallov"] = getGlobalLovsDump();;
+    dump["globallovs"] = getGlobalLovsDump();;
     dump["state"] = state;
     dump["infos"] = infos;
     dump["messages"] = getMessages();

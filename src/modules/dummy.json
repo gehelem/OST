@@ -74,7 +74,7 @@
                 "type":"string",
                 "label": "Text 3",
                 "value":"cccc",
-                "listOfValues":"dummylov"
+                "listOfValues":"DRIVER_INTERFACE-TELESCOPE_INTERFACE"
             },
             "extext4": {
                 "autoupdate":true,

@@ -242,6 +242,13 @@ void Datastore::onPropertyEvent(QString event, QString key, OST::PropertyBase* p
     obj->accept(&d);
     OnModuleEvent("ap", QString(), obj->key(), d.getResult().toVariantMap());
 }
+void Datastore::onLovChanged()
+{
+    OST::LovBase* lov = qobject_cast<OST::LovBase*>(sender());
+    OST::LovJsonDumper d;
+    lov->accept(&d);
+    OnModuleEvent("lc", QString(), lov->getKey(), d.getResult().toVariantMap());
+}
 
 bool Datastore::createOstElementText(const QString &pPropertyName, const QString &pElementName,
                                      const QString &pElementLabel,
@@ -378,7 +385,6 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
         QJsonObject lovs = data["globallov"].toObject();
         foreach(const QString &key, lovs.keys())
         {
-            qDebug() << "***** create globlov from file " << key;
             QVariantMap tt = lovs[key].toVariant().toMap();
             OST::LovBase *lb = OST::LovFactory::createLov(tt);
             if (lb != nullptr)
@@ -386,7 +392,6 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
                 mGlobLov[key] = lb;
                 OST::LovJsonDumper d;
                 mGlobLov[key]->accept(&d);
-                qDebug() << "GlobalLov = " << key << "=" << d.getResult();
             }
             else
             {
@@ -497,6 +502,21 @@ QJsonObject Datastore::getGlobalLovsDump(void)
         globallov[key] = d.getResult();
     }
     return globallov;
+}
+OST::LovString* Datastore::getGlovString(QString pLov)
+{
+    if (!getGlobLovs().contains(pLov))
+    {
+        sendWarning(" getGlovString - Globallob " + pLov + " not found");
+        return nullptr;
+    }
+    if (getGlobLovs()[pLov]->getType() != "string")
+    {
+        sendWarning(" getGlovString - Globallob " + pLov + " wrong type " + getGlobLovs()[pLov]->getType());
+        return nullptr;
+    }
+
+    return static_cast<OST::LovString*>(getGlobLovs()[pLov]);
 }
 void Datastore::onPropertyMessage(OST::MsgLevel l, QString m)
 {

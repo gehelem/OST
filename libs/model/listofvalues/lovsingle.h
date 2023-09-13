@@ -23,13 +23,14 @@ class LovSingle : public LovBase
         }
         bool lovAdd(T val, QString label)
         {
+            QVariant v = val;
             if (mLov.contains(val))
             {
-                QVariant v = val;
                 emit sendMessage(Warn, "lovAdd - key " + v.toString() + " already exists (" + mLov[val] + ").");
                 return false;
             }
             mLov[val] = label;
+            emit lovChanged(this);
             return true;
         }
         bool lovUpdate(T val, QString label)
@@ -41,6 +42,7 @@ class LovSingle : public LovBase
                 return false;
             }
             mLov[val] = label;
+            emit lovChanged(this);
             return true;
         }
         bool lovDel(T val)
@@ -52,11 +54,13 @@ class LovSingle : public LovBase
                 return false;
             }
             mLov.remove(val);
+            emit lovChanged(this);
             return true;
         }
         bool lovClear()
         {
             mLov.clear();
+            emit lovChanged(this);
             return true;
         }
         QString getRealType()

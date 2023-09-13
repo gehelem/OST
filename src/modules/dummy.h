@@ -26,6 +26,8 @@ class MODULE_INIT Dummy : public IndiModule
         void OnSolverLog(QString &text);
     private:
         void newBLOB(INDI::PropertyBlob pblob);
+        void newDevice(INDI::BaseDevice bd) override;
+
         QString _camera;
         QPointer<fileio> _image;
         Solver _solver;

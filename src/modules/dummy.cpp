@@ -140,6 +140,13 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
 
                     }
                 }
+                if (keyprop == "boolsRW2")
+                {
+                    if (keyelt == "b1")
+                    {
+                        refreshDeviceslovs();
+                    }
+                }
                 if (keyprop == "devices")
                 {
                     if (keyelt == "camera")
@@ -402,4 +409,8 @@ void Dummy::updateSearchList(void)
         getStore()["results"]->push();
     }
 
+}
+void Dummy::newDevice(INDI::BaseDevice bd)
+{
+    //qDebug()  << "newdevice " << bd.getDeviceName();
 }

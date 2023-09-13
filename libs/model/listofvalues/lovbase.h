@@ -28,8 +28,17 @@ class LovBase: public QObject
         {
             return mLabel;
         }
+        QString getKey()
+        {
+            return mKey;
+        }
+        void setKey(QString key)
+        {
+            mKey = key;
+        }
     private:
         QString mLabel = "change me";
+        QString mKey = "";
     signals:
         void lovChanged(OST::LovBase*);
         void sendMessage(OST::MsgLevel, QString);

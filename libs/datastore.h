@@ -53,10 +53,11 @@ class Datastore : public Baseroot
         {
             return mStore;
         }
-        QMap<QString, OST::LovBase*> getGlobLov(void)
+        QMap<QString, OST::LovBase*> getGlobLovs(void)
         {
             return mGlobLov;
         }
+        OST::LovString* getGlovString(QString pLov);
         /**
          * @brief createOstProperty is a method that creates a property at runtime
          * @param pPropertyName is the property internal name
@@ -98,11 +99,10 @@ class Datastore : public Baseroot
                 sendWarning("createGlobLov - lov " + pLovName + " already exists.");
                 return false;
             }
+            pLov->setKey(pLovName);
             mGlobLov[pLovName] = pLov;
             OST::PropertyJsonDumper d;
-            //mGlobLov[pLovName]->accept(&d);
-            //OnModuleEvent("cp", QString(), pPropertyName, d.getResult().toVariantMap());
-            //connect(mStore[pPropertyName], &OST::PropertyMulti::valueChanged, this, &Datastore::onValueChanged);
+            connect(mGlobLov[pLovName], &OST::LovBase::lovChanged, this, &Datastore::onLovChanged);
             return true;
         }
 
@@ -130,6 +130,7 @@ class Datastore : public Baseroot
         void onValueChanged(void);
         void onPropertyEvent(QString event, QString key, OST::PropertyBase* prop);
         void onPropertyMessage(OST::MsgLevel l, QString m);
+        void onLovChanged(void);
 
     private:
         QMap<QString, OST::PropertyMulti*> mStore;

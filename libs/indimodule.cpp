@@ -630,3 +630,42 @@ bool IndiModule::createDeviceProperty(const QString &key, const QString &label, 
     createProperty(key, pm);
     return true;
 }
+bool IndiModule::refreshDevicelovs(INDI::BaseDevice::DRIVER_INTERFACE interface, QString name)
+{
+    //QString theBig = QVariant::fromValue(interface).toString();
+    QString interfacestring = "DRIVER_INTERFACE-" + name;
+    if (getGlobLovs().contains(interfacestring))
+    {
+        getGlovString(interfacestring)->lovClear();
+    }
+    else
+    {
+        OST::LovString* ls = new OST::LovString(interfacestring);
+        createGlobLov(interfacestring, ls);
+    }
+    std::vector<INDI::BaseDevice> devs = getDevices();
+    //qDebug() << "refreshDeviceslovs devs.size()=" << devs.size();
+
+    for(std::size_t i = 0; i < devs.size(); i++)
+    {
+        //qDebug() << devs[i].getDeviceName();
+        if (devs[i].getDriverInterface() & interface)
+        {
+            getGlovString(interfacestring)->lovAdd(devs[i].getDeviceName(), devs[i].getDeviceName());
+        }
+    }
+
+    //QVariantMap
+    //getGlobLovs()["CAMERA"]->accept();
+    return true;
+}
+bool IndiModule::refreshDeviceslovs()
+{
+    refreshDevicelovs(INDI::BaseDevice::DRIVER_INTERFACE::GENERAL_INTERFACE, "GENERAL_INTERFACE");
+    refreshDevicelovs(INDI::BaseDevice::DRIVER_INTERFACE::TELESCOPE_INTERFACE, "TELESCOPE_INTERFACE");
+    refreshDevicelovs(INDI::BaseDevice::DRIVER_INTERFACE::CCD_INTERFACE, "CCD_INTERFACE");
+    refreshDevicelovs(INDI::BaseDevice::DRIVER_INTERFACE::GUIDER_INTERFACE, "GUIDER_INTERFACE");
+    refreshDevicelovs(INDI::BaseDevice::DRIVER_INTERFACE::FOCUSER_INTERFACE, "FOCUSER_INTERFACE");
+    refreshDevicelovs(INDI::BaseDevice::DRIVER_INTERFACE::FILTER_INTERFACE, "FILTER_INTERFACE");
+    return true;
+}
