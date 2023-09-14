@@ -144,7 +144,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                 {
                     if (keyelt == "b1")
                     {
-                        refreshDeviceslovs();
+                        //refreshDeviceslovs();
                     }
                 }
                 if (keyprop == "devices")
@@ -282,6 +282,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
 
 void Dummy::newBLOB(INDI::PropertyBlob pblob)
 {
+    refreshDeviceslovs(pblob.getDeviceName());
 
     if (
         (QString(pblob.getDeviceName()) == _camera)
@@ -412,5 +413,5 @@ void Dummy::updateSearchList(void)
 }
 void Dummy::newDevice(INDI::BaseDevice bd)
 {
-    //qDebug()  << "newdevice " << bd.getDeviceName();
+
 }

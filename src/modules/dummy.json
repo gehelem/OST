@@ -74,7 +74,7 @@
                 "type":"string",
                 "label": "Text 3",
                 "value":"cccc",
-                "listOfValues":"DRIVER_INTERFACE-TELESCOPE_INTERFACE"
+                "listOfValues":"DRIVER_INTERFACE-CCD_INTERFACE"
             },
             "extext4": {
                 "autoupdate":true,
@@ -294,13 +294,15 @@
                 "autoupdate":true,
                 "type": "string",
                 "label": "Camera",
-                "value": "CCD Simulator"
+                "value": "CCD Simulator",
+                "listOfValues":"DRIVER_INTERFACE-CCD_INTERFACE"
             },
             "mount": {
                 "autoupdate":true,
                 "type": "string",
                 "label": "Mount",
-                "value": "Telescope Simulator"
+                "value": "Telescope Simulator",
+                "listOfValues":"DRIVER_INTERFACE-TELESCOPE_INTERFACE"
             }
 
         }

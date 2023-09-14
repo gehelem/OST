@@ -13,6 +13,20 @@ IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap
     setOstElementValue("indiGit", "date", QString::fromStdString(Version::GIT_DATE), false);
     setOstElementValue("indiGit", "message", QString::fromStdString(Version::GIT_COMMIT_SUBJECT), false);
 
+    OST::LovString* ls = new OST::LovString("DRIVER_INTERFACE-TELESCOPE_INTERFACE");
+    createGlobLov("DRIVER_INTERFACE-TELESCOPE_INTERFACE", ls);
+    ls = new OST::LovString("DRIVER_INTERFACE-GENERAL_INTERFACE");
+    createGlobLov("DRIVER_INTERFACE-GENERAL_INTERFACE", ls);
+    ls = new OST::LovString("DRIVER_INTERFACE-CCD_INTERFACE");
+    createGlobLov("DRIVER_INTERFACE-CCD_INTERFACE", ls);
+    ls = new OST::LovString("DRIVER_INTERFACE-GUIDER_INTERFACE");
+    createGlobLov("DRIVER_INTERFACE-GUIDER_INTERFACE", ls);
+    ls = new OST::LovString("DRIVER_INTERFACE-FOCUSER_INTERFACE");
+    createGlobLov("DRIVER_INTERFACE-FOCUSER_INTERFACE", ls);
+    ls = new OST::LovString("DRIVER_INTERFACE-FILTER_INTERFACE");
+    createGlobLov("DRIVER_INTERFACE-FILTER_INTERFACE", ls);
+    ls = new OST::LovString("DRIVER_INTERFACE-GPS_INTERFACE");
+    createGlobLov("DRIVER_INTERFACE-GPS_INTERFACE", ls);
 
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &IndiModule::connectIndiTimer);
@@ -90,14 +104,7 @@ void IndiModule::connectIndiTimer()
     {
         return;
     }
-    setServer(getString("server", "host").toStdString().c_str(), getInt("server", "port"));
-    if (!connectServer())
-    {
-        sendError("Couldn't connect to Indi server");
-        return;
-    }
-    newUniversalMessage("Indi server connected");
-    sendMessage("Indi server connected");
+    connectIndi();
 
 }
 /*!
@@ -119,6 +126,7 @@ bool IndiModule::connectIndi()
     {
         newUniversalMessage("Indi server connected");
         sendMessage("Indi server connected");
+        QTimer::singleShot(500, this, &IndiModule::OnAfterIndiConnectIndiTimer);
         return true;
     }
     sendError("Couldn't connect to Indi server");
@@ -630,42 +638,59 @@ bool IndiModule::createDeviceProperty(const QString &key, const QString &label, 
     createProperty(key, pm);
     return true;
 }
-bool IndiModule::refreshDevicelovs(INDI::BaseDevice::DRIVER_INTERFACE interface, QString name)
+void IndiModule::OnAfterIndiConnectIndiTimer()
 {
-    //QString theBig = QVariant::fromValue(interface).toString();
-    QString interfacestring = "DRIVER_INTERFACE-" + name;
-    if (getGlobLovs().contains(interfacestring))
-    {
-        getGlovString(interfacestring)->lovClear();
-    }
-    else
-    {
-        OST::LovString* ls = new OST::LovString(interfacestring);
-        createGlobLov(interfacestring, ls);
-    }
+    qDebug() << "after indi connection";
     std::vector<INDI::BaseDevice> devs = getDevices();
-    //qDebug() << "refreshDeviceslovs devs.size()=" << devs.size();
-
     for(std::size_t i = 0; i < devs.size(); i++)
     {
-        //qDebug() << devs[i].getDeviceName();
-        if (devs[i].getDriverInterface() & interface)
-        {
-            getGlovString(interfacestring)->lovAdd(devs[i].getDeviceName(), devs[i].getDeviceName());
-        }
+        refreshDeviceslovs(devs[i].getDeviceName());
     }
 
-    //QVariantMap
-    //getGlobLovs()["CAMERA"]->accept();
-    return true;
 }
-bool IndiModule::refreshDeviceslovs()
+bool IndiModule::refreshDeviceslovs(QString deviceName)
 {
-    refreshDevicelovs(INDI::BaseDevice::DRIVER_INTERFACE::GENERAL_INTERFACE, "GENERAL_INTERFACE");
-    refreshDevicelovs(INDI::BaseDevice::DRIVER_INTERFACE::TELESCOPE_INTERFACE, "TELESCOPE_INTERFACE");
-    refreshDevicelovs(INDI::BaseDevice::DRIVER_INTERFACE::CCD_INTERFACE, "CCD_INTERFACE");
-    refreshDevicelovs(INDI::BaseDevice::DRIVER_INTERFACE::GUIDER_INTERFACE, "GUIDER_INTERFACE");
-    refreshDevicelovs(INDI::BaseDevice::DRIVER_INTERFACE::FOCUSER_INTERFACE, "FOCUSER_INTERFACE");
-    refreshDevicelovs(INDI::BaseDevice::DRIVER_INTERFACE::FILTER_INTERFACE, "FILTER_INTERFACE");
+    if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
+            INDI::BaseDevice::DRIVER_INTERFACE::GENERAL_INTERFACE)
+    {
+        QString d = getDevice(deviceName.toStdString().c_str()).getDeviceName();
+        getGlovString("DRIVER_INTERFACE-GENERAL_INTERFACE")->lovAdd(d, d);
+    }
+    if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
+            INDI::BaseDevice::DRIVER_INTERFACE::CCD_INTERFACE)
+    {
+        QString d = getDevice(deviceName.toStdString().c_str()).getDeviceName();
+        getGlovString("DRIVER_INTERFACE-CCD_INTERFACE")->lovAdd(d, d);
+    }
+    if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
+            INDI::BaseDevice::DRIVER_INTERFACE::TELESCOPE_INTERFACE)
+    {
+        QString d = getDevice(deviceName.toStdString().c_str()).getDeviceName();
+        getGlovString("DRIVER_INTERFACE-TELESCOPE_INTERFACE")->lovAdd(d, d);
+    }
+    if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
+            INDI::BaseDevice::DRIVER_INTERFACE::GUIDER_INTERFACE)
+    {
+        QString d = getDevice(deviceName.toStdString().c_str()).getDeviceName();
+        getGlovString("DRIVER_INTERFACE-GUIDER_INTERFACE")->lovAdd(d, d);
+    }
+    if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
+            INDI::BaseDevice::DRIVER_INTERFACE::FOCUSER_INTERFACE)
+    {
+        QString d = getDevice(deviceName.toStdString().c_str()).getDeviceName();
+        getGlovString("DRIVER_INTERFACE-FOCUSER_INTERFACE")->lovAdd(d, d);
+    }
+    if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
+            INDI::BaseDevice::DRIVER_INTERFACE::FILTER_INTERFACE)
+    {
+        QString d = getDevice(deviceName.toStdString().c_str()).getDeviceName();
+        getGlovString("DRIVER_INTERFACE-FILTER_INTERFACE")->lovAdd(d, d);
+    }
+    if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
+            INDI::BaseDevice::DRIVER_INTERFACE::GPS_INTERFACE)
+    {
+        QString d = getDevice(deviceName.toStdString().c_str()).getDeviceName();
+        getGlovString("DRIVER_INTERFACE-GPS_INTERFACE")->lovAdd(d, d);
+    }
     return true;
 }
