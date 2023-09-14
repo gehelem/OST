@@ -43,11 +43,20 @@ class ValueBase: public QObject
         {
             mAutoUpdate = v;
         }
+        bool getDirectEdit()
+        {
+            return mDirectEdit;
+        }
+        void setDirectEdit(const bool &v)
+        {
+            mDirectEdit = v;
+        }
     private:
         QString mLabel = "change me";
         QString mOrder = "change me";
         QString mHint = "";
         bool mAutoUpdate = false;
+        bool mDirectEdit = false;
     signals:
         void valueChanged(OST::ValueBase*);
         void listChanged(OST::ValueBase*);

@@ -61,7 +61,8 @@
                 "autoupdate":true,
                 "type":"string",
                 "label": "Text 1",
-                "value":"aaaa"
+                "value":"aaaa",
+                "directedit":true
             },
             "extext2": {
                 "autoupdate":true,
@@ -74,7 +75,8 @@
                 "type":"string",
                 "label": "Text 3",
                 "value":"cccc",
-                "listOfValues":"DRIVER_INTERFACE-CCD_INTERFACE"
+                "listOfValues":"DRIVER_INTERFACE-CCD_INTERFACE",
+                "directedit":true
             },
             "extext4": {
                 "autoupdate":true,
@@ -103,7 +105,8 @@
                 "label": "Number 1",
                 "min": 0,
                 "max": 100,
-                "step": 1
+                "step": 1,
+                "directedit":true
             },
             "n2": {
                 "autoupdate":true,
@@ -131,7 +134,8 @@
                     [0,"Zéro"],
                     [1,"Un"],
                     [2,"Deux"]
-                ]
+                ],
+                "directedit":true
             },
             "n5": {
                 "autoupdate":true,

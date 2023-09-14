@@ -12,6 +12,11 @@ QJsonObject ValueJsonDumper::dumpValueCommons(ValueBase *pValue)
     json["hint"] = pValue->hint();
     json["type"] = "undefined";
     json["autoupdate"] = pValue->autoUpdate();
+    if ((pValue->getType() == "int") || (pValue->getType() == "float") || (pValue->getType() == "string")
+            || (pValue->getType() == "bool"))
+    {
+        json["directedit"] = pValue->getDirectEdit();
+    }
 
     return json;
 
