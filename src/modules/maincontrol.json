@@ -1,4 +1,7 @@
 {
+"globallov":{
+},
+"properties":{
     "loadconf": {
         "devcat": "Module",
         "group": "Configurations",
@@ -94,4 +97,5 @@
         }
     }
 
+}
 }

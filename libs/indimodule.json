@@ -1,4 +1,7 @@
 {
+"globallov":{
+},
+"properties":{
     "indiGit": {
         "devcat": "Module",
         "group": "Info",
@@ -129,4 +132,5 @@
         }
     }
 
+}
 }

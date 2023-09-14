@@ -2,6 +2,7 @@
 #define VALUESINGLE_h
 
 #include <valuebase.h>
+#include <lovsingle.h>
 
 namespace  OST
 {
@@ -32,9 +33,9 @@ class ValueSingle : public ValueSingleSignalAndSlots
 
     public:
 
-        ValueSingle(const QString &label, const QString &order, const QString &hint): ValueSingleSignalAndSlots(label, order, hint)
+        ValueSingle(const QString &label, const QString &order, const QString &hint):
+            ValueSingleSignalAndSlots(label, order, hint)
         {
-            mLov.clear();
             mGridValues.clear();
             connect(this, &ValueSingle::singleValueChanged, this, &ValueSingleSignalAndSlots::OnSingleValueChanged);
 
@@ -47,6 +48,10 @@ class ValueSingle : public ValueSingleSignalAndSlots
             //    return 0;
             //}
             return mValue;
+        }
+        QString getType() override
+        {
+            return "error";
         }
         void setValue(const T &value, const bool &emitEvent)
         {
@@ -99,48 +104,6 @@ class ValueSingle : public ValueSingleSignalAndSlots
             mGridValues.clear();
             mGridValues = vals;
         }
-        QMap<T, QString> getLov()
-        {
-            return mLov;
-        }
-        bool lovAdd(T val, QString label)
-        {
-            if (mLov.contains(val))
-            {
-                QVariant v = val;
-                emit sendMessage(Warn, "lovAdd - key " + v.toString() + " already exists (" + mLov[val] + ").");
-                return false;
-            }
-            mLov[val] = label;
-            return true;
-        }
-        bool lovUpdate(T val, QString label)
-        {
-            if (!mLov.contains(val))
-            {
-                QVariant v = val;
-                emit sendMessage(Warn, "lovUpdate - key " + v.toString() + " doesn't exist.");
-                return false;
-            }
-            mLov[val] = label;
-            return true;
-        }
-        bool lovDel(T val)
-        {
-            if (!mLov.contains(val))
-            {
-                QVariant v = val;
-                emit sendMessage(Warn, "lovDel - key " + v.toString() + " doesn't exist.");
-                return false;
-            }
-            mLov.remove(val);
-            return true;
-        }
-        bool lovClear()
-        {
-            mLov.clear();
-            return true;
-        }
         QString getRealType()
         {
             return typeid(T).name();
@@ -153,13 +116,19 @@ class ValueSingle : public ValueSingleSignalAndSlots
         {
             if (limit > 0 ) mArrayLimit = limit;
         }
-
+        QString getGlobalLov()
+        {
+            return mGlobalLov;
+        }
+        void setGlobalLov(QString lovName)
+        {
+            mGlobalLov = lovName;
+        }
     private:
         T mValue;
         QList<T> mGridValues = QList<T>();
         int mArrayLimit = 0;
-        QMap<T, QString> mLov;
-
+        QString mGlobalLov = "";
 
 };
 

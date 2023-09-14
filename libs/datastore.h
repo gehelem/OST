@@ -6,8 +6,10 @@
 #include <propertyjsondumper.h>
 #include <propertyupdate.h>
 #include <propertyfactory.h>
+#include <lovfactory.h>
 #include <valueupdate.h>
 #include <valuejsondumper.h>
+#include <lovjsondumper.h>
 
 /** @class Datastore
  *  @brief Class to provide properties management for OST modules
@@ -51,6 +53,11 @@ class Datastore : public Baseroot
         {
             return mStore;
         }
+        QMap<QString, OST::LovBase*> getGlobLovs(void)
+        {
+            return mGlobLov;
+        }
+        OST::LovString* getGlovString(QString pLov);
         /**
          * @brief createOstProperty is a method that creates a property at runtime
          * @param pPropertyName is the property internal name
@@ -85,6 +92,19 @@ class Datastore : public Baseroot
             connect(mStore[pPropertyName], &OST::PropertyMulti::valueChanged, this, &Datastore::onValueChanged);
             return true;
         }
+        bool createGlobLov(const QString &pLovName,  OST::LovBase* pLov)
+        {
+            if (mGlobLov.contains(pLovName))
+            {
+                sendWarning("createGlobLov - lov " + pLovName + " already exists.");
+                return false;
+            }
+            pLov->setKey(pLovName);
+            mGlobLov[pLovName] = pLov;
+            OST::PropertyJsonDumper d;
+            connect(mGlobLov[pLovName], &OST::LovBase::lovChanged, this, &Datastore::onLovChanged);
+            return true;
+        }
 
         //QVariant getOstPropertyValue(const QString &pPropertyName);
 
@@ -104,14 +124,17 @@ class Datastore : public Baseroot
         QVariantMap getProfile(void);
 
         QJsonObject getPropertiesDump(void);
+        QJsonObject getGlobalLovsDump(void);
 
     private slots:
         void onValueChanged(void);
         void onPropertyEvent(QString event, QString key, OST::PropertyBase* prop);
         void onPropertyMessage(OST::MsgLevel l, QString m);
+        void onLovChanged(void);
 
     private:
         QMap<QString, OST::PropertyMulti*> mStore;
+        QMap<QString, OST::LovBase*> mGlobLov;
 
 }
 ;

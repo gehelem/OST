@@ -2,7 +2,7 @@
 namespace  OST
 {
 ValueInt::ValueInt(const QString &label, const QString &order, const QString &hint)
-    : ValueSingle(label, order, hint)
+    : ValueSingle<int>(label, order, hint), mLov(label)
 {
 }
 ValueInt::~ValueInt()

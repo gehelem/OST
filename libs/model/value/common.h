@@ -92,7 +92,6 @@ typedef struct GraphDefs
     QVariantMap params = QVariantMap();
 } GraphDefs;
 
-
 }
 
 #endif

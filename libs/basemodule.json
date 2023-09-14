@@ -1,4 +1,7 @@
 {
+"globallov":{
+},
+"properties":{
     "baseGit": {
         "devcat": "Module",
         "group": "Info",
@@ -133,4 +136,5 @@
     }
 
 
+}
 }

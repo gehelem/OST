@@ -1,4 +1,33 @@
 {
+"globallov":{
+    "dummylov":{
+        "type":"string",
+        "label":"Global dummy list of strings",
+        "values":    [
+        ["glob1","Global string 1"],
+        ["glob2","Global string 2"]
+        ]
+    }
+    ,
+    "dummylov2":{
+        "type":"int",
+        "label":"Global dummy list of ints",
+        "values":    [
+        [1,"Global int 1"],
+        [2,"Global int 2"]
+        ]
+    }
+    ,
+    "dummylov3":{
+        "type":"float",
+        "label":"Global dummy list of floats",
+        "values":    [
+        [1.1,"Global float 1"],
+        [2.2,"Global float 2"]
+        ]
+    }
+},
+"properties":{
     "extextRO": {
         "devcat": "Examples",
         "elements": {
@@ -44,7 +73,8 @@
                 "autoupdate":true,
                 "type":"string",
                 "label": "Text 3",
-                "value":"cccc"
+                "value":"cccc",
+                "listOfValues":"DRIVER_INTERFACE-CCD_INTERFACE"
             },
             "extext4": {
                 "autoupdate":true,
@@ -102,6 +132,12 @@
                     [1,"Un"],
                     [2,"Deux"]
                 ]
+            },
+            "n5": {
+                "autoupdate":true,
+                "type":"float",
+                "label": "Number 5",
+                "listOfValues":"dummylov3"
             }
         },
         "group": "Numbers",
@@ -258,13 +294,15 @@
                 "autoupdate":true,
                 "type": "string",
                 "label": "Camera",
-                "value": "CCD Simulator"
+                "value": "CCD Simulator",
+                "listOfValues":"DRIVER_INTERFACE-CCD_INTERFACE"
             },
             "mount": {
                 "autoupdate":true,
                 "type": "string",
                 "label": "Mount",
-                "value": "Telescope Simulator"
+                "value": "Telescope Simulator",
+                "listOfValues":"DRIVER_INTERFACE-TELESCOPE_INTERFACE"
             }
 
         }
@@ -633,4 +671,5 @@
             }
         }
     }
+}
 }

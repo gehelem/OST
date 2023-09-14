@@ -44,6 +44,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/utils)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/model)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues)
 include_directories(${INDI_INCLUDE_DIR})
 include_directories(${CFITSIO_INCLUDE_DIR})
 include_directories(${GSL_INCLUDE_DIRS})
@@ -122,20 +123,31 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuemessage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuegraph.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuegraph.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovbase.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovsingle.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovstring.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovint.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovfloat.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovlight.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertybase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertybase.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertymulti.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertymulti.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyvisitor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuevisitor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovvisitor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyfactory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyfactory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuefactory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuefactory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovfactory.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovfactory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertytextdumper.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertytextdumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyjsondumper.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyjsondumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovjsondumper.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovjsondumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuetextdumper.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuetextdumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuejsondumper.cpp
@@ -180,14 +192,23 @@ set(BASE_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuevideo.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuemessage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuegraph.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovbase.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovsingle.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovstring.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovint.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovfloat.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovbool.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovlight.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertybase.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertymulti.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyvisitor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuevisitor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyfactory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuefactory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovfactory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertytextdumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyjsondumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovjsondumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuetextdumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuejsondumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyupdate.h

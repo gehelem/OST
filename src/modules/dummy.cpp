@@ -140,6 +140,13 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
 
                     }
                 }
+                if (keyprop == "boolsRW2")
+                {
+                    if (keyelt == "b1")
+                    {
+                        //refreshDeviceslovs();
+                    }
+                }
                 if (keyprop == "devices")
                 {
                     if (keyelt == "camera")
@@ -275,6 +282,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
 
 void Dummy::newBLOB(INDI::PropertyBlob pblob)
 {
+    refreshDeviceslovs(pblob.getDeviceName());
 
     if (
         (QString(pblob.getDeviceName()) == _camera)
@@ -401,5 +409,9 @@ void Dummy::updateSearchList(void)
         setOstElementValue("results", "alias", results[i].alias, false);
         getStore()["results"]->push();
     }
+
+}
+void Dummy::newDevice(INDI::BaseDevice bd)
+{
 
 }

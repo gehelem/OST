@@ -44,15 +44,23 @@ void ValueJsonDumper::visit(ValueInt *pValue)
     json["max"] = qlonglong(pValue->max());
     json["step"] = qlonglong(pValue->step());
     json["format"] = pValue->format();
-    if (pValue->getLov().size() > 0)
+    if (pValue->getGlobalLov() != "")
     {
-        QJsonObject lines = QJsonObject();
-        foreach(const long &key, pValue->getLov().keys())
+        json["globallov"] = pValue->getGlobalLov();
+    }
+    else
+    {
+        if (pValue->getLov().size() > 0)
         {
-            QString skey = QString::number(key);
-            lines[skey] = pValue->getLov()[key];
+            QJsonObject lines = QJsonObject();
+            foreach(const long &key, pValue->getLov().keys())
+            {
+                QString skey = QString::number(key);
+                lines[skey] = pValue->getLov()[key];
+            }
+            json["listOfValues"] = lines;
         }
-        json["listOfValues"] = lines;
+
     }
     if (pValue->getGrid().size() > 0)
     {
@@ -76,15 +84,22 @@ void ValueJsonDumper::visit(ValueFloat *pValue)
     json["max"] = pValue->max();
     json["step"] = pValue->step();
     json["format"] = pValue->format();
-    if (!pValue->getLov().isEmpty())
+    if (pValue->getGlobalLov() != "")
     {
-        QJsonObject lines = QJsonObject();
-        foreach(const double &key, pValue->getLov().keys())
+        json["globallov"] = pValue->getGlobalLov();
+    }
+    else
+    {
+        if (!pValue->getLov().isEmpty())
         {
-            QString skey = QString::number(key);
-            lines[skey] = pValue->getLov()[key];
+            QJsonObject lines = QJsonObject();
+            foreach(const double &key, pValue->getLov().keys())
+            {
+                QString skey = QString::number(key);
+                lines[skey] = pValue->getLov()[key];
+            }
+            json["listOfValues"] = lines;
         }
-        json["listOfValues"] = lines;
     }
     if (pValue->getGrid().size() > 0)
     {
@@ -105,14 +120,21 @@ void ValueJsonDumper::visit(ValueString *pValue)
     QJsonObject json = dumpValueCommons(pValue);
     json["type"] = "string";
     json["value"] = pValue->value();
-    if (pValue->getLov().size() > 0)
+    if (pValue->getGlobalLov() != "")
     {
-        QJsonObject lines = QJsonObject();
-        foreach(const QString &key, pValue->getLov().keys())
+        json["globallov"] = pValue->getGlobalLov();
+    }
+    else
+    {
+        if (pValue->getLov().size() > 0)
         {
-            lines[key] = pValue->getLov()[key];
+            QJsonObject lines = QJsonObject();
+            foreach(const QString &key, pValue->getLov().keys())
+            {
+                lines[key] = pValue->getLov()[key];
+            }
+            json["listOfValues"] = lines;
         }
-        json["listOfValues"] = lines;
     }
     if (pValue->getGrid().size() > 0)
     {
