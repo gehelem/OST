@@ -353,13 +353,13 @@ auto IndiModule::sendModNewNumber(const QString &deviceName, const QString &prop
 
     if (!dp.isValid())
     {
-        sendError("Error - unable to find " + deviceName + " device. Aborting.");
+        sendError("Unable to find " + deviceName + " device. Aborting.");
         return false;
     }
     INDI::PropertyNumber prop = dp.getNumber(propertyName.toStdString().c_str());
     if (!prop.isValid())
     {
-        sendError("Error - unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
+        sendError("Unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
         return false;
     }
 
@@ -372,7 +372,7 @@ auto IndiModule::sendModNewNumber(const QString &deviceName, const QString &prop
             return true;
         }
     }
-    sendError("Error - unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
+    sendError("Unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
     return false;
 
 }
@@ -384,13 +384,13 @@ bool IndiModule::getModNumber(const QString &deviceName, const QString &property
 
     if (!dp.isValid())
     {
-        sendError("Error - unable to find " + deviceName + " device. Aborting.");
+        sendError("Unable to find " + deviceName + " device. Aborting.");
         return false;
     }
     INDI::PropertyNumber prop = dp.getNumber(propertyName.toStdString().c_str());
     if (!prop.isValid())
     {
-        sendError("Error - unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
+        sendError("Unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
         return false;
     }
 
@@ -402,7 +402,7 @@ bool IndiModule::getModNumber(const QString &deviceName, const QString &property
             return true;
         }
     }
-    sendError("Error - unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
+    sendError("Unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
     return false;
 }
 bool IndiModule::getModSwitch(const QString &deviceName, const QString &propertyName, const QString  &elementName,
@@ -413,13 +413,13 @@ bool IndiModule::getModSwitch(const QString &deviceName, const QString &property
 
     if (!dp.isValid())
     {
-        sendError("Error - unable to find " + deviceName + " device. Aborting.");
+        sendError("Unable to find " + deviceName + " device. Aborting.");
         return false;
     }
     INDI::PropertySwitch prop = dp.getSwitch(propertyName.toStdString().c_str());
     if (!prop.isValid())
     {
-        sendError("Error - unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
+        sendError("Unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
         return false;
     }
 
@@ -431,7 +431,7 @@ bool IndiModule::getModSwitch(const QString &deviceName, const QString &property
             return true;
         }
     }
-    sendError("Error - unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
+    sendError("Unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
     return false;
 }
 bool IndiModule::getModText(const QString &deviceName, const QString &propertyName, const QString  &elementName,
@@ -442,13 +442,13 @@ bool IndiModule::getModText(const QString &deviceName, const QString &propertyNa
 
     if (!dp.isValid())
     {
-        sendError("Error - unable to find " + deviceName + " device. Aborting.");
+        sendError("Unable to find " + deviceName + " device. Aborting.");
         return false;
     }
     INDI::PropertyText prop = dp.getText(propertyName.toStdString().c_str());
     if (!prop.isValid())
     {
-        sendError("Error - unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
+        sendError("Unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
         return false;
     }
 
@@ -460,7 +460,7 @@ bool IndiModule::getModText(const QString &deviceName, const QString &propertyNa
             return true;
         }
     }
-    sendError("Error - unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
+    sendError("Unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
     return false;
 }
 bool IndiModule::sendModNewText  (QString deviceName, QString propertyName, QString elementName, QString text)
@@ -470,13 +470,13 @@ bool IndiModule::sendModNewText  (QString deviceName, QString propertyName, QStr
 
     if (!dp.isValid())
     {
-        sendError("Error - unable to find " + deviceName + " device. Aborting.");
+        sendError("Unable to find " + deviceName + " device. Aborting.");
         return false;
     }
     INDI::PropertyText prop = dp.getText(propertyName.toStdString().c_str());
     if (!prop.isValid())
     {
-        sendError("Error - unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
+        sendError("Unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
         return false;
     }
 
@@ -489,7 +489,7 @@ bool IndiModule::sendModNewText  (QString deviceName, QString propertyName, QStr
             return true;
         }
     }
-    sendError("Error - unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
+    sendError("Unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
     return false;
 }
 bool IndiModule::sendModNewSwitch(QString deviceName, QString propertyName, QString elementName, ISState sw)
@@ -500,13 +500,13 @@ bool IndiModule::sendModNewSwitch(QString deviceName, QString propertyName, QStr
 
     if (!dp.isValid())
     {
-        sendError("Error - unable to find " + deviceName + " device. Aborting.");
+        sendError("Unable to find " + deviceName + " device. Aborting.");
         return false;
     }
     INDI::PropertySwitch prop = dp.getSwitch(propertyName.toStdString().c_str());
     if (!prop.isValid())
     {
-        sendError("Error - unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
+        sendError("Unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
         return false;
     }
     for (std::size_t i = 0; i < prop.size(); i++)
@@ -519,7 +519,7 @@ bool IndiModule::sendModNewSwitch(QString deviceName, QString propertyName, QStr
             return true;
         }
     }
-    sendError("Error - unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
+    sendError("Unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
     return false;
 
 }
@@ -529,14 +529,14 @@ bool IndiModule::frameSet(QString devicename, double x, double y, double width, 
     INDI::BaseDevice dp = getDevice(devicename.toStdString().c_str());
     if (!dp.isValid())
     {
-        sendError("Error - unable to find " + devicename + " device. Aborting.");
+        sendError("Unable to find " + devicename + " device. Aborting.");
         return false;
     }
 
     INDI::PropertyNumber prop = dp.getNumber("CCD_FRAME");
     if (!prop.isValid())
     {
-        sendError("Error - unable to find " + devicename + "/" + "CCD_FRAME" + " property. Aborting.");
+        sendError("Unable to find " + devicename + "/" + "CCD_FRAME" + " property. Aborting.");
         return false;
     }
 
@@ -569,14 +569,14 @@ bool IndiModule::frameReset(QString devicename)
     INDI::BaseDevice dp = getDevice(devicename.toStdString().c_str());
     if (!dp.isValid())
     {
-        sendError("Error - unable to find " + devicename + " device. Aborting.");
+        sendError("Unable to find " + devicename + " device. Aborting.");
         return false;
     }
 
     INDI::PropertySwitch prop = dp.getSwitch("CCD_FRAME_RESET");
     if (!prop.isValid())
     {
-        sendError("Error - unable to find " + devicename + "/" + "CCD_FRAME_RESET" + " property. Aborting.");
+        sendError("Unable to find " + devicename + "/" + "CCD_FRAME_RESET" + " property. Aborting.");
         return false;
     }
 
@@ -640,7 +640,6 @@ bool IndiModule::createDeviceProperty(const QString &key, const QString &label, 
 }
 void IndiModule::OnAfterIndiConnectIndiTimer()
 {
-    qDebug() << "after indi connection";
     std::vector<INDI::BaseDevice> devs = getDevices();
     for(std::size_t i = 0; i < devs.size(); i++)
     {
