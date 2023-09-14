@@ -205,6 +205,7 @@ set(BASE_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyfactory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuefactory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovfactory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovvisitor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertytextdumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyjsondumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovjsondumper.h
