@@ -571,7 +571,8 @@
                 "autoupdate":true,
                 "type": "string",
                 "label": "Search object",
-                "value":"M13"
+                "value":"M13",
+                "directedit":true
             }
         }
     },

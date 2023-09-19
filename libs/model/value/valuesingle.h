@@ -124,11 +124,29 @@ class ValueSingle : public ValueSingleSignalAndSlots
         {
             mGlobalLov = lovName;
         }
+        QString getPreIcon()
+        {
+            return mPreIcon;
+        }
+        void setPreIcon(QString s)
+        {
+            mPreIcon = s;
+        }
+        QString getPostIcon()
+        {
+            return mPostIcon;
+        }
+        void setPostIcon(QString s)
+        {
+            mPostIcon = s;
+        }
     private:
         T mValue;
         QList<T> mGridValues = QList<T>();
         int mArrayLimit = 0;
         QString mGlobalLov = "";
+        QString mPreIcon = "";
+        QString mPostIcon = "";
 
 };
 

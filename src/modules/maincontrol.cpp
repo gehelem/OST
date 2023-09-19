@@ -32,12 +32,30 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
 {
     Q_UNUSED(pEventType);
     Q_UNUSED(pEventKey);
-    //sendMessage("mainctl OnMyExternalEvent - recv : " + getModuleName()+ "-" +eventType +"-" + eventKey);
+    //sendMessage("mainctl OnMyExternalEvent - recv : " + getModuleName() + "-" + pEventType + "-" + pEventKey);
+
     if (getModuleName() == pEventModule)
     {
         if (pEventType == "refreshConfigurations")
         {
             setConfigurations();
+        }
+        if (pEventType == "Fposticon")
+        {
+            QVariantMap m = pEventData["load"].toMap()["elements"].toMap();
+            QString pp = m.firstKey();
+            pp.replace("libost", "");
+            QString elt = getString("load", m.firstKey());
+            QString eltwithoutblanks = getString("load", m.firstKey());
+            eltwithoutblanks.replace(" ", "");
+            QString prof = "default";
+
+
+            emit loadOtherModule(pp,
+                                 eltwithoutblanks,
+                                 elt,
+                                 prof);
+            getProperty("load")->setState(OST::Ok);
         }
         foreach(const QString &keyprop, pEventData.keys())
         {
@@ -57,29 +75,6 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                     QString val = pEventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toString();
                     getValueString("loadconf", "name")->setValue(val, true);
                     getValueString("saveconf", "name")->setValue(val, true);
-                }
-                if (keyelt == "load" && keyprop != "loadconf")
-                {
-                    if (setOstElementValue(keyprop, keyelt, false, true))
-                    {
-                        QString pp = keyprop;
-                        QString elt = getString(keyprop, "name");
-                        QString eltwithoutblanks = getString(keyprop, "name");
-                        eltwithoutblanks.replace(" ", "");
-                        QString prof = "default";
-                        pp.replace("loadlibost", "");
-
-                        emit loadOtherModule(pp,
-                                             eltwithoutblanks,
-                                             elt,
-                                             prof);
-                        getProperty(keyprop)->setState(OST::Busy);
-                    }
-                    else
-                    {
-                        getProperty(keyprop)->setState(OST::Error);
-                    }
-
                 }
                 if (keyelt == "load" && keyprop == "loadconf")
                 {
@@ -139,21 +134,24 @@ void Maincontrol::sendMainConsole(const QString &pMessage)
 }
 void Maincontrol::setAvailableModuleLibs(const QVariantMap libs)
 {
+
+    OST::PropertyMulti *dynprop = new OST::PropertyMulti("load", "Available modules", OST::Permission::ReadWrite,
+            "Available modules",
+            "", "", false, false);
     foreach(QString key, libs.keys())
     {
         QVariantMap info = libs[key].toMap()["elements"].toMap();
         QString lab = info["moduleDescription"].toMap()["value"].toString();
-        OST::PropertyMulti *dynprop = new OST::PropertyMulti("load" + key, lab, OST::Permission::ReadWrite, "Available modules",
-                "", "", false, false);
-        OST::ValueBool* dynbool = new OST::ValueBool("Load", "", "");
-        OST::ValueString* dyntext = new OST::ValueString("Name", "", "");
-        dynbool->setValue(false, false);
+        OST::ValueString* dyntext = new OST::ValueString(lab, "", "");
         dyntext->setValue("My " + key, false);
-        dynprop->addValue("name", dyntext);
-        dynprop->addValue("load", dynbool);
-        createProperty("load" + key, dynprop);
+        dyntext->setAutoUpdate(true);
+        dyntext->setDirectEdit(true);
+        dyntext->setPostIcon("forward");
+        dynprop->addValue(key, dyntext);
 
     }
+    createProperty("load", dynprop);
+
 }
 void Maincontrol::addModuleData(const QString  &pName, const QString  &pLabel, const QString  &pType,
                                 const QString  &pProfile)

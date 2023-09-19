@@ -49,6 +49,8 @@ void ValueJsonDumper::visit(ValueInt *pValue)
     json["max"] = qlonglong(pValue->max());
     json["step"] = qlonglong(pValue->step());
     json["format"] = pValue->format();
+    if (pValue->getPreIcon() != "") json["preicon"] = pValue->getPreIcon();
+    if (pValue->getPostIcon() != "") json["posticon"] = pValue->getPostIcon();
     if (pValue->getGlobalLov() != "")
     {
         json["globallov"] = pValue->getGlobalLov();
@@ -89,6 +91,8 @@ void ValueJsonDumper::visit(ValueFloat *pValue)
     json["max"] = pValue->max();
     json["step"] = pValue->step();
     json["format"] = pValue->format();
+    if (pValue->getPreIcon() != "") json["preicon"] = pValue->getPreIcon();
+    if (pValue->getPostIcon() != "") json["posticon"] = pValue->getPostIcon();
     if (pValue->getGlobalLov() != "")
     {
         json["globallov"] = pValue->getGlobalLov();
@@ -125,6 +129,8 @@ void ValueJsonDumper::visit(ValueString *pValue)
     QJsonObject json = dumpValueCommons(pValue);
     json["type"] = "string";
     json["value"] = pValue->value();
+    if (pValue->getPreIcon() != "") json["preicon"] = pValue->getPreIcon();
+    if (pValue->getPostIcon() != "") json["posticon"] = pValue->getPostIcon();
     if (pValue->getGlobalLov() != "")
     {
         json["globallov"] = pValue->getGlobalLov();

@@ -104,6 +104,10 @@ void WShandler::processTextMessage(QString message)
     {
         emit externalEvent("Fclearmessages", obj["mod"].toString(), QString(), QVariantMap());
     }
+    if ((obj["evt"].toString() == "Fpreicon") || (obj["evt"].toString() == "Fposticon") )
+    {
+        emit externalEvent(obj["evt"].toString(), obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+    }
 
 
 }
