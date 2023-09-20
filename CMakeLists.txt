@@ -34,6 +34,13 @@ find_package(WCSLIB REQUIRED)
 find_package(QT NAMES Qt5 COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql)
 find_package(StellarSolver REQUIRED)
+find_library(avahi-client-lib avahi-client REQUIRED)
+find_library(avahi-common-lib avahi-common REQUIRED)
+find_path(avahi-client-includes avahi-client/client.h REQUIRED)
+find_path(avahi-common-includes avahi-common/defs.h REQUIRED)
+
+
+
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
@@ -52,6 +59,7 @@ include_directories(${Qt5_DIR})
 include_directories(${QT5Declarative_INCLUDE_LIBRARIES} )
 include_directories(${QT5Declarative_INCLUDE_DIRS} )
 include_directories(${STELLARSOLVER_INCLUDE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/QtZeroConf)
 
 include(CMakeCommon)
 
@@ -70,6 +78,13 @@ add_executable(ostserver
     ${CMAKE_CURRENT_SOURCE_DIR}/src/version.hh
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/resources.qrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/QtZeroConf/qzeroconfservice.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/QtZeroConf/qzeroconfglobal.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/QtZeroConf/qzeroconf.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/QtZeroConf/qzeroconfservice.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QtZeroConf/avahi-qt/qt-watch_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/QtZeroConf/avahi-qt/qt-watch.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QtZeroConf/avahiclient.cpp
 )
 target_link_libraries(ostserver
     ostbasemodule
@@ -80,6 +95,9 @@ target_link_libraries(ostserver
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::WebSockets
     Qt${QT_VERSION_MAJOR}::Sql
+    Qt${QT_VERSION_MAJOR}::Network
+    ${avahi-client-lib}
+    ${avahi-common-lib}
     Threads::Threads
     z
 )
@@ -295,12 +313,13 @@ target_link_libraries(ostmaincontrol PRIVATE
 )
 target_compile_definitions(ostmaincontrol PRIVATE maincontrol_LIBRARY)
 
-install(TARGETS ostserver ostbasemodule ostindimodule ostdummy ostmaincontrol
+install(TARGETS
+    ostserver
+    ostbasemodule ostindimodule ostdummy ostmaincontrol
     RUNTIME DESTINATION "/usr/bin"
     LIBRARY DESTINATION "/usr/lib"
     PUBLIC_HEADER DESTINATION "/usr/include/ost"
 )
-
 
 # the commit's SHA1, and whether the building workspace was dirty or not
 execute_process(COMMAND
