@@ -5,8 +5,7 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 //#include <QtSql/QSqlError>
-
-
+#include "qzeroconf.h"
 
 #include "maincontrol.h"
 
@@ -41,6 +40,9 @@ class Controller : public QObject
         Maincontrol *pMainControl;
         QProcess    *_process;
         QMap<QString, QMap<QString, QString>> mModulesMap;
+        QZeroConf zeroConf;
+        QString buildName(void);
+
 
         bool loadModule(QString lib, QString name, QString label, QString profile);
         void loadConf(const QString &pConf);
@@ -51,6 +53,7 @@ class Controller : public QObject
         void processError();
         void processFinished(int exitCode, QProcess::ExitStatus exitStatus);
         void sendMessage(const QString &pMessage);
+        void startPublish();
 
     private slots:
         void OnModuleEvent  (const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
@@ -59,5 +62,6 @@ class Controller : public QObject
                              const QVariantMap &pEventData);
         void OnMainCtlEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
                             const QVariantMap &pEventData);
+
 };
 #endif

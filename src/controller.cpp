@@ -1,8 +1,27 @@
 #include "controller.h"
+#include <QNetworkInterface>
 
 /*!
  * ... ...
  */
+
+#ifdef Q_OS_IOS
+#define	OS_NAME		"iOS"
+#elif defined(Q_OS_MAC)
+#define	OS_NAME		"Mac"
+#elif defined(Q_OS_ANDROID)
+#define	OS_NAME		"Android"
+#elif defined(Q_OS_LINUX)
+#define	OS_NAME		"Linux"
+#elif defined(Q_OS_WIN)
+#define	OS_NAME		"Windows"
+#elif defined(Q_OS_FREEBSD)
+#define	OS_NAME		"FreeBSD"
+#else
+#define	OS_NAME		"Some OS"
+#endif
+
+
 Controller::Controller(const QString &webroot, const QString &dbpath,
                        const QString &libpath, const QString &installfront, const QString &conf)
     :       _webroot(webroot),
@@ -12,6 +31,7 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
             _conf(conf)
 {
 
+    startPublish();
     wshandler = new WShandler(this);
     connect(wshandler, &WShandler::externalEvent, this, &Controller::OnExternalEvent);
     dbmanager = new DBManager();
@@ -373,4 +393,26 @@ void Controller::sendMessage(const QString &pMessage)
     QDebug debug = qDebug();
     debug.noquote();
     debug << messageWithDateTime;
+}
+// ---------- ZeroConf ----------
+
+void Controller::startPublish()
+{
+    zeroConf.clearServiceTxtRecords();
+    zeroConf.addServiceTxtRecord("OstServer", "Observatoire Sans Tete");
+    zeroConf.startServicePublish(buildName().toUtf8(), "_ostserver_ws._tcp", "local", 11437);
+}
+
+QString Controller::buildName(void)
+{
+    QString name;
+
+    QList<QNetworkInterface> list = QNetworkInterface::allInterfaces(); // now you have interfaces list
+
+    name = list.last().hardwareAddress();
+    name.remove(":");
+    name.remove(0, 6);
+    name += ')';
+    name.prepend("OstServer - " OS_NAME " (");
+    return name;
 }
