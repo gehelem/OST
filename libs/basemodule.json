@@ -76,22 +76,15 @@
         "rule":1,
         "label": "Load profile",
         "elements": {
-            "load": {
-                "type": "bool",
-                "label": "Load",
-                "value":false
-            },
-            "refresh": {
-                "type": "bool",
-                "label": "Refresh",
-                "value":false
-            },
-            "value": {
+            "name": {
                 "autoupdate":true,
+                "directedit":true,
                 "listOfValues":[],
                 "type": "string",
-                "label": "Name",
-                "value":"default"
+                "label": "",
+                "value":"default",
+                "posticon":"forward",
+                "preicon":"autorenew"
             }
 
         }
@@ -104,16 +97,13 @@
         "rule":0,
         "label": "Save profile",
         "elements": {
-            "save": {
-                "type": "bool",
-                "label": "Save as",
-                "value":false
-            },
-            "value": {
+            "name": {
                 "autoupdate":true,
+                "directedit":true,
                 "type": "string",
-                "label": "Name",
-                "value":"default"
+                "label": "",
+                "value":"default",
+                "posticon":"save"
             }
 
         }
