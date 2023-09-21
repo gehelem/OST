@@ -88,6 +88,10 @@ void WShandler::processTextMessage(QString message)
     {
         emit externalEvent("Fldelete", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
     }
+    if (obj["evt"].toString() == "Flselect")
+    {
+        emit externalEvent("Flselect", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+    }
     if (obj["evt"].toString() == "Flup")
     {
         emit externalEvent("Flup", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
@@ -95,6 +99,14 @@ void WShandler::processTextMessage(QString message)
     if (obj["evt"].toString() == "Fldown")
     {
         emit externalEvent("Fldown", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+    }
+    if (obj["evt"].toString() == "Fclearmessages")
+    {
+        emit externalEvent("Fclearmessages", obj["mod"].toString(), QString(), QVariantMap());
+    }
+    if ((obj["evt"].toString() == "Fpreicon") || (obj["evt"].toString() == "Fposticon") )
+    {
+        emit externalEvent(obj["evt"].toString(), obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
     }
 
 
@@ -155,6 +167,17 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
         QJsonObject  prop;
         prop[eventKey] = QJsonObject::fromVariantMap(eventData);
         mod["properties"] = prop;
+        mods[eventModule] = mod;
+        obj["modules"] = mods;
+        sendJsonMessage(obj);
+    }
+    if (eventType == "lc")
+    {
+        QJsonObject mods;
+        QJsonObject  mod;
+        QJsonObject  lov;
+        lov[eventKey] = QJsonObject::fromVariantMap(eventData);
+        mod["globallovs"] = lov;
         mods[eventModule] = mod;
         obj["modules"] = mods;
         sendJsonMessage(obj);

@@ -7,7 +7,7 @@ sudo apt upgrade -y
 sudo apt install -y libindi1 libstellarsolver ostserver ostmodules nginx gsc pip
 
 sudo mkdir /usr/share/astrometry
-sudo chmod 777 -R /usr/share/astrometry
+sudo chown -R $USER /usr/share/astrometry
 cd /usr/share/astrometry
 #wget http://broiler.astrometry.net/~dstn/4200/index-4206-00.fits
 #wget http://broiler.astrometry.net/~dstn/4200/index-4206-01.fits
@@ -40,13 +40,15 @@ wget http://broiler.astrometry.net/~dstn/4200/index-4211.fits
 wget http://broiler.astrometry.net/~dstn/4200/index-4212.fits
 wget http://broiler.astrometry.net/~dstn/4200/index-4213.fits
 wget http://broiler.astrometry.net/~dstn/4200/index-4214.fits
-sudo chmod 777 -R /usr/share/astrometry
+sudo chmod 744 -R /usr/share/astrometry/
 
 cd
 cd /var/www/html
 sudo wget https://github.com/gehelem/ost-front/releases/download/WorkInProgress/html.tar.gz --no-check-certificate
 sudo tar -xvf html.tar.gz
-sudo chmod 777 /var/www/html
+sudo chmod -R +rX /var/www/html
+sudo chown -R $USER /var/www/html
+
 
 cd 
 sudo pip install indiweb

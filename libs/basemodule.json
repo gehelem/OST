@@ -1,115 +1,134 @@
 {
-    "baseVersion": {
+"globallov":{
+},
+"properties":{
+    "baseGit": {
         "devcat": "Module",
         "group": "Info",
         "order":"00",
         "permission": 0,
-        "propertyLabel": "BaseVersion",
-        "value":1
+        "label": "Base module git",
+        "elements": {
+            "hash": {
+                "type": "string",
+                "label": "Hash",
+                "value":"xxx"
+            },
+            "date": {
+                "type": "string",
+                "label": "Date",
+                "value":"xxx"
+            },
+            "message": {
+                "type": "string",
+                "label": "Commit message",
+                "value":"xxx"
+            }
+        }
     },
-    "baseGitHash": {
+    "moduleInfo": {
         "devcat": "Module",
         "group": "Info",
         "order":"00",
         "permission": 0,
-        "propertyLabel": "Base module git hash"
-    },
-    "baseGitDate": {
-        "devcat": "Module",
-        "group": "Info",
-        "order":"00",
-        "permission": 0,
-        "propertyLabel": "Base module git date"
-    },
-    "baseGitMessage": {
-        "devcat": "Module",
-        "group": "Info",
-        "order":"00",
-        "permission": 0,
-        "propertyLabel": "Base module git message"
-    },
-    "moduleDescription": {
-        "devcat": "Module",
-        "group": "",
-        "order":"01",
-        "permission": 0,
-        "propertyLabel": "Module description",
-        "value":"N/A"
-    },
-    "moduleLabel": {
-        "devcat": "Module",
-        "group": "Info",
-        "order":"02",
-        "permission": 0,
-        "propertyLabel": "Module label",
-        "value":"Base module label"
-    },
-    "moduleName": {
-        "devcat": "Module",
-        "group": "Info",
-        "order":"03",
-        "permission": 0,
-        "propertyLabel": "Module name",
-        "value":"basemodule"
-    },
-    "moduleVersion": {
-        "devcat": "Module",
-        "group": "Info",
-        "order":"04",
-        "permission": 0,
-        "propertyLabel": "Version",
-        "value":1
+        "label": "Module info",
+        "elements": {
+            "moduleDescription": {
+                "type": "string",
+                "label": "Module description",
+                "value":"N/A"
+            },
+            "moduleLabel": {
+                "type": "string",
+                "label": "Module label",
+                "value":"Base module label"
+            },
+            "moduleName": {
+                "type": "string",
+                "label": "Module name",
+                "value":"basemodule"
+            },
+            "moduleVersion": {
+                "type": "int",
+                "label": "Version",
+                "value":1
+            },
+            "baseVersion": {
+                "type": "int",
+                "label": "baseVersion",
+                "value":1
+            }
+        }
     },
     "message": {
         "devcat": "messages",
+        "type": "simple",
         "group": "",
         "permission": 0,
-        "propertyLabel": "Message",
-        "value": ""
+        "label": "Message",
+        "elements": {}
     },
     "loadprofile": {
+        "type": "multi",
         "devcat": "Module",
         "group": "Profiles",
         "permission": 2,
-        "value": "default",
-        "listOfValues":{
-        },
         "rule":1,
-        "propertyLabel": "Load profile",
+        "label": "Load profile",
         "elements": {
             "load": {
-                "elementLabel": "Load",
+                "type": "bool",
+                "label": "Load",
                 "value":false
             },
             "refresh": {
-                "elementLabel": "Refresh",
+                "type": "bool",
+                "label": "Refresh",
                 "value":false
+            },
+            "value": {
+                "autoupdate":true,
+                "listOfValues":[],
+                "type": "string",
+                "label": "Name",
+                "value":"default"
             }
+
         }
     },
     "saveprofile": {
+        "type": "multi",
         "devcat": "Module",
         "group": "Profiles",
         "permission": 2,
-        "value": "default",
         "rule":0,
-        "propertyLabel": "Save profile",
+        "label": "Save profile",
         "elements": {
             "save": {
-                "elementLabel": "Save as",
+                "type": "bool",
+                "label": "Save as",
                 "value":false
+            },
+            "value": {
+                "autoupdate":true,
+                "type": "string",
+                "label": "Name",
+                "value":"default"
             }
+
         }
     },
     "moduleactions": {
+        "type": "multi",
         "devcat": "Module",
         "group": "Actions",
         "permission": 1,
-        "propertyLabel": "Controls",
+        "label": "Controls",
         "rule":2,
         "elements": {
             "kill": {
-                "elementLabel": "Kill module",
+                "type": "bool",
+                "label": "Kill module",
                 "value":false
             }
         }
@@ -117,4 +136,5 @@
     }
 
 
+}
 }

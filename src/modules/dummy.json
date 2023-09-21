@@ -1,23 +1,56 @@
 {
+"globallov":{
+    "dummylov":{
+        "type":"string",
+        "label":"Global dummy list of strings",
+        "values":    [
+        ["glob1","Global string 1"],
+        ["glob2","Global string 2"]
+        ]
+    }
+    ,
+    "dummylov2":{
+        "type":"int",
+        "label":"Global dummy list of ints",
+        "values":    [
+        [1,"Global int 1"],
+        [2,"Global int 2"]
+        ]
+    }
+    ,
+    "dummylov3":{
+        "type":"float",
+        "label":"Global dummy list of floats",
+        "values":    [
+        [1.1,"Global float 1"],
+        [2.2,"Global float 2"]
+        ]
+    }
+},
+"properties":{
     "extextRO": {
         "devcat": "Examples",
         "elements": {
             "extext1": {
-                "elementLabel": "Text 1"
+                "type":"string",
+                "label": "Text 1"
             },
             "extext2": {
-                "elementLabel": "Text 2"
+                "type":"string",
+                "label": "Text 2"
             },
             "extext3": {
-                "elementLabel": "Text 3"
+                "type":"string",
+                "label": "Text 3"
             },
             "extext4": {
-                "elementLabel": "Text 4"
+                "type":"string",
+                "label": "Text 4"
             }
         },
         "group": "Texts",
         "permission": 0,
-        "propertyLabel": "Text example - read only",
+        "label": "Text example - read only",
         "order":"00"
     },
     "extextRW": {
@@ -25,29 +58,40 @@
         "devcat": "Examples",
         "elements": {
             "extext1": {
-                "elementLabel": "Text 1",
-                "value":"aaaa"
+                "autoupdate":true,
+                "type":"string",
+                "label": "Text 1",
+                "value":"aaaa",
+                "directedit":true
             },
             "extext2": {
-                "elementLabel": "Text 2",
+                "autoupdate":true,
+                "type":"string",
+                "label": "Text 2",
                 "value":"bbbb"
             },
             "extext3": {
-                "elementLabel": "Text 3",
-                "value":"cccc"
+                "autoupdate":true,
+                "type":"string",
+                "label": "Text 3",
+                "value":"cccc",
+                "listOfValues":"DRIVER_INTERFACE-CCD_INTERFACE",
+                "directedit":true
             },
             "extext4": {
-                "elementLabel": "Text 4",
+                "autoupdate":true,
+                "type":"string",
+                "label": "Text 4",
                 "value":"i1",
-                "listOfValues":{
-                    "i1":"Value 1",
-                    "i2":"Value 2"
-                }
+                "listOfValues":[
+                    ["i1","Value 1"],
+                    ["i2","Value 2"]
+                ]
             }
         },
         "group": "Texts",
         "permission": 2,
-        "propertyLabel": "Text example - read/write",
+        "label": "Text example - read/write",
         "order":"01"
 
     },
@@ -56,27 +100,53 @@
         "devcat": "Examples",
         "elements": {
             "n1": {
-                "elementLabel": "Number 1",
+                "autoupdate":true,
+                "type":"int",
+                "label": "Number 1",
                 "min": 0,
                 "max": 100,
-                "step": 1
+                "step": 1,
+                "directedit":true
             },
             "n2": {
-                "elementLabel": "Number 2",
+                "autoupdate":true,
+                "type":"int",
+                "label": "Number 2",
                 "min": -100,
                 "max": 100,
                 "step": 10
             },
             "n3": {
-                "elementLabel": "Number 3"
+                "autoupdate":true,
+                "type":"float",
+                "label": "Number 3",
+                "listOfValues":[
+                    [0.0,"Zéro virgule zéro"],
+                    [0.1,"Zéro virgule un"],
+                    [0.2,"Zéro virgule deux"]
+                ]
             },
             "n4": {
-                "elementLabel": "Number 4"
+                "autoupdate":true,
+                "type":"int",
+                "label": "Number 4",
+                "listOfValues":[
+                    [0,"Zéro"],
+                    [1,"Un"],
+                    [2,"Deux"]
+                ],
+                "directedit":true
+            },
+            "n5": {
+                "autoupdate":true,
+                "type":"float",
+                "label": "Number 5",
+                "listOfValues":"dummylov3"
             }
         },
         "group": "Numbers",
         "permission": 2,
-        "propertyLabel": "Numbers example - read/write"
+        "label": "Numbers example - read/write"
     },
     "boolsRW0": {
         "hasprofile":true,
@@ -84,21 +154,29 @@
         "rule":0,
         "elements": {
             "b1": {
-                "elementLabel": "Bool 1"
+                "autoupdate":true,
+                "type":"bool",
+                "label": "Bool 1"
             },
             "b2": {
-                "elementLabel": "Bool 2"
+                "autoupdate":true,
+                "type":"bool",
+                "label": "Bool 2"
             },
             "b3": {
-                "elementLabel": "Bool 3"
+                "autoupdate":true,
+                "type":"bool",
+                "label": "Bool 3"
             },
             "b4": {
-                "elementLabel": "Bool 4"
+                "autoupdate":true,
+                "type":"bool",
+                "label": "Bool 4"
             }
         },
         "group": "Booleans",
         "permission": 2,
-        "propertyLabel": "One of many"
+        "label": "One of many"
     },
     "boolsRW1": {
         "hasprofile":true,
@@ -106,21 +184,29 @@
         "rule":1,
         "elements": {
             "b1": {
-                "elementLabel": "Bool 1"
+                "autoupdate":true,
+                "type":"bool",
+                "label": "Bool 1"
             },
             "b2": {
-                "elementLabel": "Bool 2"
+                "autoupdate":true,
+                "type":"bool",
+                "label": "Bool 2"
             },
             "b3": {
-                "elementLabel": "Bool 3"
+                "autoupdate":true,
+                "type":"bool",
+                "label": "Bool 3"
             },
             "b4": {
-                "elementLabel": "Bool 4"
+                "autoupdate":true,
+                "type":"bool",
+                "label": "Bool 4"
             }
         },
         "group": "Booleans",
         "permission": 2,
-        "propertyLabel": "At most one"
+        "label": "At most one"
     },
     "boolsRW2": {
         "hasprofile":true,
@@ -128,21 +214,29 @@
         "rule":2,
         "elements": {
             "b1": {
-                "elementLabel": "Bool 1"
+                "autoupdate":true,
+                "type":"bool",
+                "label": "Bool 1"
             },
             "b2": {
-                "elementLabel": "Bool 2"
+                "autoupdate":true,
+                "type":"bool",
+                "label": "Bool 2"
             },
             "b3": {
-                "elementLabel": "Bool 3"
+                "autoupdate":true,
+                "type":"bool",
+                "label": "Bool 3"
             },
             "b4": {
-                "elementLabel": "Bool 4"
+                "autoupdate":true,
+                "type":"bool",
+                "label": "Bool 4"
             }
         },
         "group": "Booleans",
         "permission": 2,
-        "propertyLabel": "Any"
+        "label": "Any"
     }
 
 
@@ -153,152 +247,191 @@
         "rule":0,
         "elements": {
             "b1": {
-                "elementLabel": "Bool 1/3"
+                "autoupdate":true,
+                "type":"bool",
+                "label": "Bool 1/3"
             },
             "b2": {
-                "elementLabel": "Bool 2/3"
+                "autoupdate":true,
+                "type":"bool",
+                "label": "Bool 2/3"
             },
             "b3": {
-                "elementLabel": "Bool 3/3"
+                "autoupdate":true,
+                "type":"bool",
+                "label": "Bool 3/3"
             },
             "n1": {
-                "elementLabel": "Number 1/2",
+                "autoupdate":true,
+                "type":"int",
+                "label": "Number 1/2",
                 "min": 0,
                 "max": 100,
                 "step": 1
             },
             "n2": {
-                "elementLabel": "Number 2/2",
+                "autoupdate":true,
+                "type":"int",
+                "label": "Number 2/2",
                 "min": -100,
                 "max": 100,
                 "step": 10
             },
             "t1": {
-                "elementLabel": "Text mixed"
+                "autoupdate":true,
+                "type":"string",
+                "label": "Text mixed"
             }
         },
         "group": "Mixed",
         "permission": 2,
-        "propertyLabel": "Mixed types - read/write"
+        "label": "Mixed types - read/write"
     },
     "devices": {
         "hasprofile":true,
         "devcat": "Examples",
         "group": "Images",
         "permission": 2,
-        "propertyLabel": "Devices",
+        "label": "Devices",
         "elements": {
             "camera": {
-                "elementLabel": "Camera",
-                "value": "CCD Simulator"
+                "autoupdate":true,
+                "type": "string",
+                "label": "Camera",
+                "value": "CCD Simulator",
+                "listOfValues":"DRIVER_INTERFACE-CCD_INTERFACE"
             },
             "mount": {
-                "elementLabel": "Mount",
-                "value": "Telescope Simulator"
+                "autoupdate":true,
+                "type": "string",
+                "label": "Mount",
+                "value": "Telescope Simulator",
+                "listOfValues":"DRIVER_INTERFACE-TELESCOPE_INTERFACE"
             }
 
         }
     },
     "actions": {
         "devcat": "Examples",
-        "rule":0,
+        "rule":1,
         "elements": {
             "shoot": {
-                "elementLabel": "Shoot",
+                "type": "bool",
+                "label": "Shoot",
                 "value":false
             },
             "solve": {
-                "elementLabel": "Solve field",
+                "type": "bool",
+                "label": "Solve field",
                 "value":false
             },
             "blob": {
-                "elementLabel": "Set blob mode",
+                "type": "bool",
+                "label": "Set blob mode",
                 "value":false
             },
             "extract": {
-                "elementLabel": "Stars extraction",
+                "type": "bool",
+                "label": "Stars extraction",
                 "value":false
             }
 
         },
         "group": "Images",
         "permission": 2,
-        "propertyLabel": "Actions"
+        "label": "Actions"
     },
     "imagevalues": {
+        "type": "multi",
         "devcat": "Examples",
         "rule":0,
         "elements": {
                 "width": {
-                    "elementLabel": "Width",
+                    "type": "int",
+                    "label": "Width",
                     "value":0
                 },
                 "height": {
-                    "elementLabel": "Height",
+                    "type": "int",
+                    "label": "Height",
                     "value":0
                 },
                 "min": {
-                    "elementLabel": "Min ADU",
+                    "type": "int",
+                    "label": "Min ADU",
                     "value":0
                 },
                 "max": {
-                    "elementLabel": "Max ADU",
+                    "type": "int",
+                    "label": "Max ADU",
                     "value":0
                 },
                 "mean": {
-                    "elementLabel": "Mean ADU",
+                    "type": "float",
+                    "label": "Mean ADU",
                     "value":0
                 },
                 "median": {
-                    "elementLabel": "Median ADU",
+                    "type": "int",
+                    "label": "Median ADU",
                     "value":0
                 },
                 "stddev": {
-                    "elementLabel": "StdDev",
+                    "type": "float",
+                    "label": "StdDev",
                     "value":0
                 },
                 "snr": {
-                    "elementLabel": "SNR",
+                    "type": "float",
+                    "label": "SNR",
                     "step": 0.0001,
                     "value":0
                 },
                 "starscount": {
-                    "elementLabel": "Stars found",
+                    "type": "int",
+                    "label": "Stars found",
                     "value":0
                 },
                 "hfravg": {
-                    "elementLabel": "Average HFR",
+                    "type": "float",
+                    "label": "Average HFR",
                     "value":0
                 },
                 "solRA": {
-                    "elementLabel": "Solver RA",
+                    "type": "float",
+                    "label": "Solver RA",
                     "value":0
                 },
                 "solDEC": {
-                    "elementLabel": "Solver DEC",
+                    "type": "float",
+                    "label": "Solver DEC",
                     "value":0
                 },
                 "mountRA": {
-                    "elementLabel": "Mount RA",
+                    "type": "float",
+                    "label": "Mount RA",
                     "value":0
                 },
                 "mountDEC": {
-                    "elementLabel": "Mount DEC",
+                    "type": "float",
+                    "label": "Mount DEC",
                     "value":0
                 }
         },
         "group": "Images",
         "permission": 0,
-        "propertyLabel": "Results"
+        "label": "Results"
     },
     "parameters": {
         "devcat": "Examples",
         "group": "Images",
         "permission": 2,
-        "propertyLabel": "Parameters",
+        "label": "Parameters",
         "elements": {
             "exposure": {
-                "elementLabel": "Exposure",
+                "autoupdate":true,
+                "type": "float",
+                "label": "Exposure",
                 "value":10,
                 "step":0.001,
                 "min":0.001,
@@ -306,7 +439,9 @@
                 "format": "99.99"
             },
             "indexfolderpath": {
-                "elementLabel": "Astrometry index folder path",
+                "autoupdate":true,
+                "type": "string",
+                "label": "Astrometry index folder path",
                 "value":"/usr/share/astrometry/"
             }
 
@@ -317,35 +452,53 @@
         "devcat": "Examples",
         "group": "Images",
         "permission": 0,
-        "propertyLabel": "Test image",
-        "URL": ""
+        "label": "Test image",
+        "elements": {
+            "image1": {
+                "type": "img",
+                "label": "First image",
+                "urljpeg":"./dummy.jpg"
+            },
+            "message": {
+                "type": "message",
+                "label": "Image message",
+                "level":0
+            }
+        }
     },
     "testgrid": {
+        "hasArray":true,
         "devcat": "Examples",
         "group": "Grids",
         "permission": 2,
-        "grid":0,
-        "gridlimit":5,
-        "GXY":{
-            "X":"X",
-            "Y":"Y"
-        },
-        "propertyLabel": "Grid example",
+        "arrayLimit":5,
+        "label": "Grid example",
         "elements": {
+            "graph": {
+                "type": "graph",
+                "graphtype":"XY",
+                "params":{
+                    "X":"X",
+                    "Y":"Y"
+                }
+            },
             "X": {
-                "elementLabel": "Abscisse",
+                "type": "int",
+                "label": "Abscisse",
                 "value":0,
                 "gridvalues":[0,1,2,3,4],
                 "order":"B"
             },
             "Y": {
-                "elementLabel": "Ordonnée",
+                "type": "int",
+                "label": "Ordonnée",
                 "value":0,
                 "gridvalues":[0,1,4,9,16],
                 "order":"C"
             },
             "Z": {
-                "elementLabel": "Info",
+                "type": "string",
+                "label": "Info",
                 "value":"Zéro",
                 "gridvalues":["P0","P1","P2","P3","P4"],
                 "order":"A"
@@ -358,27 +511,31 @@
         }
     },
     "secondtestgrid": {
+        "hasArray":true,
         "devcat": "Examples",
         "group": "AAAGrids",
         "permission": 2,
         "grid":0,
         "gridlimit":5,
-        "propertyLabel": "Grid example 2",
+        "label": "Grid example 2",
         "elements": {
             "X": {
-                "elementLabel": "Abscisse",
+                "type": "int",
+                "label": "Abscisse",
                 "value":0,
                 "gridvalues":[],
                 "order":"B"
             },
             "Y": {
-                "elementLabel": "Ordonnée",
+                "type": "int",
+                "label": "Ordonnée",
                 "value":0,
                 "gridvalues":[],
                 "order":"C"
             },
             "Z": {
-                "elementLabel": "Info",
+                "type": "string",
+                "label": "Info",
                 "value":"Zéro",
                 "gridvalues":[],
                 "order":"A"
@@ -391,8 +548,133 @@
         }
     },
     "skychart": {
-        "propertyLabel": "Skychart",
+        "label": "Skychart",
         "devcat": "Examples",
-        "group": "Images"
+        "group": "Images",
+        "elements": {}
+    },
+    "search": {
+        "devcat": "Examples",
+        "order": "Catalog00",
+        "group": "Catalog",
+        "permission": 2,
+        "rule":0,
+        "label": "",
+        "autoupdate":true,
+        "elements": {
+            "searchbtn": {
+                "type": "bool",
+                "label": "Search object",
+                "value":false
+            },
+            "search": {
+                "autoupdate":true,
+                "type": "string",
+                "label": "Search object",
+                "value":"M13",
+                "directedit":true
+            }
+        }
+    },
+    "results": {
+        "devcat": "Examples",
+        "order": "Catalog10",
+        "group": "Catalog",
+        "permission": 0,
+        "hasArray":true,
+        "gridlimit":255,
+        "rule":0,
+        "label": "Results",
+        "elements": {
+            "catalog": {
+                "type": "string",
+                "label": "Catalogue",
+                "order":"10",
+                "value":""
+            },
+            "code": {
+                "type": "string",
+                "label": "Code",
+                "order":"20",
+                "value":""
+            },
+            "RA": {
+                "type": "float",
+                "label": "RA",
+                "order":"30",
+                "value":0
+            },
+            "NS": {
+                "type": "string",
+                "label": "N/S",
+                "order":"50",
+                "value":""
+            },
+            "DEC": {
+                "type": "float",
+                "label": "DEC",
+                "order":"40",
+                "value":0
+            },
+            "diam": {
+                "type": "float",
+                "label": "Diameter",
+                "order":"60",
+                "value":0
+            },
+            "mag": {
+                "type": "float",
+                "label": "Magnitude",
+                "order":"70",
+                "value":0
+            },
+            "name": {
+                "type": "string",
+                "label": "Name",
+                "order":"80",
+                "value":""
+            },
+            "alias": {
+                "type": "string",
+                "label": "Alias",
+                "order":"90",
+                "value":""
+            }
+        }
+    },
+    "selection": {
+        "devcat": "Examples",
+        "order": "Catalog15",
+        "group": "Catalog",
+        "permission": 2,
+        "rule":0,
+        "label": "Selection",
+        "elements": {
+            "code": {
+                "type": "string",
+                "label": "Code",
+                "order":"10",
+                "value":""
+            },
+            "RA": {
+                "type": "float",
+                "label": "RA",
+                "order":"20",
+                "value":0
+            },
+            "NS": {
+                "type": "string",
+                "label": "N/S",
+                "order":"40",
+                "value":""
+            },
+            "DEC": {
+                "type": "float",
+                "label": "DEC",
+                "order":"30",
+                "value":0
+            }
+        }
     }
+}
 }

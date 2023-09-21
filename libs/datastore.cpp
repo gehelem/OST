@@ -8,337 +8,336 @@ Datastore::Datastore()
 Datastore::~Datastore()
 {
 }
+OST::PropertyMulti* Datastore::getProperty(QString pProperty)
+{
+    if (!mStore.contains(pProperty))
+    {
+        sendWarning(" getProperty - property " + pProperty + " not found");
+        //return nullptr;
+    }
+
+    return mStore[pProperty];
+}
+
+OST::ValueString* Datastore::getValueString(QString pProperty, QString pElement)
+{
+    OST::PropertyMulti* p = getProperty(pProperty);
+    if (p == nullptr)
+    {
+        sendWarning(" getValueString - property " + pProperty + " not found");
+        return nullptr;
+    }
+    if (!p->getValues().contains(pElement))
+    {
+        sendWarning("getValueString - property " + pProperty + " : element " + pElement + " not found");
+        return nullptr;
+    }
+    if (p->getValue(pElement)->getType() != "string")
+    {
+        sendWarning("getValueString - property " + pProperty + " : element " + pElement + " is not string");
+        return nullptr;
+    }
+    return static_cast<OST::ValueString*>(p->getValue(pElement));
+}
+QString Datastore::getString(QString pProperty, QString pElement)
+{
+    return getValueString(pProperty, pElement)->value();
+}
+QString Datastore::getString(QString pProperty, QString pElement, long line)
+{
+    return getValueString(pProperty, pElement)->getGrid()[line];
+}
+OST::ValueInt* Datastore::getValueInt(QString pProperty, QString pElement)
+{
+    OST::PropertyMulti* p = getProperty(pProperty);
+    if (p == nullptr)
+    {
+        sendWarning(" getValueInt - property " + pProperty + " not found");
+        return nullptr;
+    }
+    if (!p->getValues().contains(pElement))
+    {
+        sendWarning("getValueInt - property " + pProperty + " : element " + pElement + " not found");
+        return nullptr;
+    }
+    if (p->getValue(pElement)->getType() != "int")
+    {
+        sendWarning("getValueInt - property " + pProperty + " : element " + pElement + " is not int");
+        return nullptr;
+    }
+    return static_cast<OST::ValueInt*>(p->getValue(pElement));
+}
+long Datastore::getInt(QString pProperty, QString pElement)
+{
+    return getValueInt(pProperty, pElement)->value();
+}
+long Datastore::getInt(QString pProperty, QString pElement, long line)
+{
+    return getValueInt(pProperty, pElement)->getGrid()[line];
+}
+OST::ValueFloat* Datastore::getValueFloat(QString pProperty, QString pElement)
+{
+    OST::PropertyMulti* p = getProperty(pProperty);
+    if (p == nullptr)
+    {
+        sendWarning("getValueFloat - property " + pProperty + " not found");
+        return nullptr;
+    }
+    if (!p->getValues().contains(pElement))
+    {
+        sendWarning("getValueFloat - property " + pProperty + " : element " + pElement + " not found");
+        return nullptr;
+    }
+    if (p->getValue(pElement)->getType() != "float")
+    {
+        sendWarning("getValueFloat - property " + pProperty + " : element " + pElement + " is not float");
+        return nullptr;
+    }
+    return static_cast<OST::ValueFloat*>(p->getValue(pElement));
+}
+double  Datastore::getFloat(QString pProperty, QString pElement)
+{
+    return getValueFloat(pProperty, pElement)->value();
+}
+double Datastore::getFloat(QString pProperty, QString pElement, long line)
+{
+    return getValueFloat(pProperty, pElement)->getGrid()[line];
+}
+OST::ValueLight* Datastore::getValueLight(QString pProperty, QString pElement)
+{
+    OST::PropertyMulti* p = getProperty(pProperty);
+    if (p == nullptr)
+    {
+        sendWarning("getValueLight - property " + pProperty + " not found");
+        return nullptr;
+    }
+    if (!p->getValues().contains(pElement))
+    {
+        sendWarning("getValueLight - property " + pProperty + " : element " + pElement + " not found");
+        return nullptr;
+    }
+    if (p->getValue(pElement)->getType() != "light")
+    {
+        sendWarning("getValueLight - property " + pProperty + " : element " + pElement + " is not light");
+        return nullptr;
+    }
+    return static_cast<OST::ValueLight*>(p->getValue(pElement));
+}
+
+OST::ValueImg* Datastore::getValueImg(QString pProperty, QString pElement)
+{
+    OST::PropertyMulti* p = getProperty(pProperty);
+    if (p == nullptr)
+    {
+        sendWarning("getValueImg - property " + pProperty + " not found");
+        return nullptr;
+    }
+    if (!p->getValues().contains(pElement))
+    {
+        sendWarning("getValueImg - property " + pProperty + " : element " + pElement + " not found");
+        return nullptr;
+    }
+    if (p->getValue(pElement)->getType() != "img")
+    {
+        sendWarning("getValueImg - property " + pProperty + " : element " + pElement + " is not img");
+        return nullptr;
+    }
+    return static_cast<OST::ValueImg*>(p->getValue(pElement));
+}
+OST::ValueVideo* Datastore::getValueVideo(QString pProperty, QString pElement)
+{
+    OST::PropertyMulti* p = getProperty(pProperty);
+    if (p == nullptr)
+    {
+        sendWarning("getValueVideo - property " + pProperty + " not found");
+        return nullptr;
+    }
+    if (!p->getValues().contains(pElement))
+    {
+        sendWarning("getValueVideo - property " + pProperty + " : element " + pElement + " not found");
+        return nullptr;
+    }
+    if (p->getValue(pElement)->getType() != "video")
+    {
+        sendWarning("getValueVideo - property " + pProperty + " : element " + pElement + " is not video");
+        return nullptr;
+    }
+    return static_cast<OST::ValueVideo*>(p->getValue(pElement));
+}
+OST::ValueBool* Datastore::getValueBool(QString pProperty, QString pElement)
+{
+    OST::PropertyMulti* p = getProperty(pProperty);
+    if (p == nullptr)
+    {
+        sendWarning("ValueBool - property " + pProperty + " not found");
+        return nullptr;
+    }
+    if (!p->getValues().contains(pElement))
+    {
+        sendWarning("ValueBool - property " + pProperty + " : element " + pElement + " not found");
+        return nullptr;
+    }
+    if (p->getValue(pElement)->getType() != "bool")
+    {
+        sendWarning("ValueBool - property " + pProperty + " : element " + pElement + " is not bool");
+        return nullptr;
+    }
+    return static_cast<OST::ValueBool*>(p->getValue(pElement));
+}
+bool Datastore::getBool(QString pProperty, QString pElement)
+{
+    return getValueBool(pProperty, pElement)->value();
+}
+bool Datastore::getBool(QString pProperty, QString pElement, long line)
+{
+    return getValueBool(pProperty, pElement)->getGrid()[line];
+}
+
 bool Datastore::createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel,
                                   const int &pPropertyPermission,
                                   const  QString &pPropertyDevcat, const QString &pPropertyGroup)
 {
-    if (mProperties.contains(pPropertyName))
+    if (mStore.contains(pPropertyName))
     {
         sendWarning("createOstProperty - property " + pPropertyName + " already exists.");
         return false;
     }
-    else
-    {
-        QVariantMap prop;
-        prop["propertyLabel"] = pPropertyLabel;
-        prop["permission"] = pPropertyPermission;
-        prop["devcat"] = pPropertyDevcat;
-        prop["group"] = pPropertyGroup;
-        prop["name"] = pPropertyName;
-        mProperties[pPropertyName] = prop;
-        OnModuleEvent("cp", QString(), pPropertyName, mProperties[pPropertyName].toMap());
-        return true;
-    }
+    QVariantMap prop;
+    prop["label"] = pPropertyLabel;
+    prop["permission"] = pPropertyPermission;
+    prop["devcat"] = pPropertyDevcat;
+    prop["group"] = pPropertyGroup;
+    prop["name"] = pPropertyName;
+    prop["elements"] = QVariantMap();
+
+    OST::PropertyMulti *pm = OST::PropertyFactory::createProperty(pPropertyName, prop);
+    mStore[pPropertyName] = pm;
+    OST::PropertyJsonDumper d;
+    pm->accept(&d);
+    connect(mStore[pPropertyName], &OST::PropertyMulti::valueChanged, this, &Datastore::onValueChanged);
+    connect(mStore[pPropertyName], &OST::PropertyMulti::propertyEvent, this, &Datastore::onPropertyEvent);
+    connect(mStore[pPropertyName], &OST::PropertyMulti::sendMessage, this, &Datastore::onPropertyMessage);
+    OnModuleEvent("cp", QString(), pPropertyName, d.getResult().toVariantMap());
+    return true;
 }
 void Datastore::emitPropertyCreation(const QString &pPropertyName)
 {
-    emit OnModuleEvent("cp", QString(), pPropertyName, mProperties[pPropertyName].toMap());
+    OST::PropertyJsonDumper d;
+    QVariantMap result;
+    mStore[pPropertyName]->accept(&d, result);
+    emit OnModuleEvent("cp", QString(), pPropertyName, result);
 }
-bool Datastore::setOstPropertyValue(const QString &pPropertyName, const QVariant &pPropertyValue, bool mEmitEvent)
+void Datastore::onValueChanged(void)
 {
-    if (mProperties.contains(pPropertyName))
-    {
-        QVariantMap prop = mProperties[pPropertyName].toMap();
-        prop["value"] = pPropertyValue;
-        mProperties[pPropertyName] = prop;
-        if (mEmitEvent) OnModuleEvent("sp", QString(), pPropertyName, mProperties[pPropertyName].toMap());
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    OST::PropertyBase* obj = qobject_cast<OST::PropertyBase*>(sender());
+    OST::PropertyJsonDumper d;
+    obj->accept(&d);
+    OnModuleEvent("se", QString(), obj->key(), d.getResult().toVariantMap());
+
 }
-QVariant Datastore::getOstPropertyValue(const QString &pPropertyName)
+void Datastore::onPropertyEvent(QString event, QString key, OST::PropertyBase* prop)
 {
-    if (mProperties.contains(pPropertyName))
-    {
-        if (mProperties[pPropertyName].toMap().contains("value"))
-        {
-            return mProperties[pPropertyName].toMap()["value"];
-        }
-        else
-        {
-            sendWarning("getPropertyValue - property " + pPropertyName + " contains no value.");
-            return QVariant();
-        }
-    }
-    else
-    {
-        sendWarning("getPropertyValue - property " + pPropertyName + " not found.");
-        return QVariant();
-    }
+    OST::PropertyBase* obj = qobject_cast<OST::PropertyBase*>(sender());
+    OST::PropertyJsonDumper d;
+    obj->accept(&d);
+    OnModuleEvent("ap", QString(), obj->key(), d.getResult().toVariantMap());
+}
+void Datastore::onLovChanged()
+{
+    OST::LovBase* lov = qobject_cast<OST::LovBase*>(sender());
+    OST::LovJsonDumper d;
+    lov->accept(&d);
+    OnModuleEvent("lc", QString(), lov->getKey(), d.getResult().toVariantMap());
 }
 
-bool Datastore::createOstElement(const QString &pPropertyName, const QString &pElementName, const QString &pElementLabel,
-                                 bool mEmitEvent)
+bool Datastore::createOstElementText(const QString &pPropertyName, const QString &pElementName,
+                                     const QString &pElementLabel,
+                                     bool mEmitEvent)
 {
-    if (!mProperties.contains(pPropertyName) )
+    if (!mStore.contains(pPropertyName) )
     {
-        sendWarning(" createElement - property " + pPropertyName + " not found");
+        sendWarning(" createOstElementText - property " + pPropertyName + " not found");
         return false;
     }
 
-    QVariantMap _prop = mProperties[pPropertyName].toMap();
-    QVariantMap _elements = _prop["elements"].toMap();
-    if (_elements.contains(pElementName) )
-    {
-        sendWarning(" createElement - property " + pPropertyName + " : element " + pElementName + "already exists.");
-        return false ;
-    }
-    QVariantMap _element;
-    _element["elementLabel"] = pElementLabel;
-    _elements[pElementName] = _element;
-    _prop["elements"] = _elements;
-    mProperties[pPropertyName] = _prop;
-    if (mEmitEvent) OnModuleEvent("ce", QString(), pPropertyName, mProperties[pPropertyName].toMap());
+    QVariantMap pData;
+    pData["label"] = pElementLabel;
+    pData["type"] = "string";
+    OST::ValueBase *el = OST::ValueFactory::createValue(pData);
+
+    mStore[pPropertyName]->addValue(pElementName, el);
+    OST::PropertyJsonDumper d;
+    mStore[pPropertyName]->accept(&d);
+    //qDebug() << "createOstElementText el(" << pElementName << ")=" << d.getResult();
+    if (mEmitEvent) OnModuleEvent("ce", QString(), pPropertyName, d.getResult().toVariantMap());
     return true;
+
+}
+bool Datastore::createOstElementBool(const QString &pPropertyName, const QString &pElementName,
+                                     const QString &pElementLabel,
+                                     bool mEmitEvent)
+{
+    if (!mStore.contains(pPropertyName) )
+    {
+        sendWarning(" createOstElementBool - property " + pPropertyName + " not found");
+        return false;
+    }
+    QVariantMap pData;
+    pData["label"] = pElementLabel;
+    pData["type"] = "bool";
+
+    OST::ValueBase *el = OST::ValueFactory::createValue(pData);
+
+    mStore[pPropertyName]->addValue(pElementName, el);
+    OST::PropertyJsonDumper d;
+    mStore[pPropertyName]->accept(&d);
+    //qDebug() << "createOstElementBool el(" << pElementName << ")=" << d.getResult();
+    if (mEmitEvent) OnModuleEvent("ce", QString(), pPropertyName, d.getResult().toVariantMap());
+    return true;
+
 }
 bool Datastore::setOstElementValue(const QString &pPropertyName, const QString &pElementName, const QVariant &pElementValue,
                                    bool mEmitEvent)
 {
-    if (!mProperties.contains(pPropertyName) )
+    if (!mStore.contains(pPropertyName))
     {
-        sendWarning("setElementValue - property " + pPropertyName + " not found");
+        sendWarning("setElementValue - property2 " + pPropertyName + " not found");
         return false;
     }
-
-    QVariantMap _prop = mProperties[pPropertyName].toMap();
-    if (_prop.contains("elements"))
+    OST::PropertyMulti *pb = mStore[pPropertyName];
+    if (!mStore[pPropertyName]->getValues().contains(pElementName))
     {
-        if (_prop["elements"].toMap().contains(pElementName))
-        {
-            QVariantMap _elements = _prop["elements"].toMap();
-            if (!_elements.contains(pElementName) )
-            {
-                sendWarning("setElementValue - property " + pPropertyName + " : element " + pElementName + " not found.");
-                return false;
-            }
-
-            QVariantMap element = _elements[pElementName].toMap();
-            if (element.contains("value"))
-            {
-                if (strcmp(element["value"].typeName(), "double") == 0)
-                {
-                    //element["value"]=pElementValue.toDouble();
-                    element["value"].setValue(pElementValue.toDouble());
-                }
-                if (strcmp(element["value"].typeName(), "float") == 0)
-                {
-                    //element["value"]=pElementValue.toFloat();
-                    element["value"].setValue(pElementValue.toFloat());
-                }
-                if (strcmp(element["value"].typeName(), "qlonglong") == 0)
-                {
-                    //element["value"]=pElementValue.toFloat();
-                    element["value"].setValue(pElementValue.toDouble());
-                }
-                if (strcmp(element["value"].typeName(), "int") == 0)
-                {
-                    //element["value"]=pElementValue.toInt();
-                    element["value"].setValue(pElementValue.toInt());
-                }
-                if (strcmp(element["value"].typeName(), "QString") == 0)
-                {
-                    element["value"] = pElementValue.toString();
-                }
-                if (strcmp(element["value"].typeName(), "bool") == 0)
-                {
-                    if (_prop.contains("rule"))
-                    {
-                        if (_prop["rule"] == 0) // one of many
-                        {
-                            if (pElementValue.toBool())
-                            {
-                                for(QVariantMap::const_iterator itelt = _elements.begin(); itelt != _elements.end(); ++itelt)
-                                {
-
-                                    QVariantMap elt = _elements[itelt.key()].toMap();
-                                    if (pElementName == itelt.key())
-                                    {
-                                        elt["value"] = true;
-                                        element["value"] = true;
-                                    }
-                                    else
-                                    {
-                                        if (strcmp(elt["value"].typeName(), "bool") == 0) elt["value"] = false;
-                                    }
-
-                                    _elements[itelt.key()] = elt;
-                                }
-                            }
-                            else
-                            {
-
-                            }
-
-                        }
-                        if (_prop["rule"] == 1) // at most one
-                        {
-                            if (pElementValue.toBool())
-                            {
-                                for(QVariantMap::const_iterator itelt = _elements.begin(); itelt != _elements.end(); ++itelt)
-                                {
-
-                                    QVariantMap elt = _elements[itelt.key()].toMap();
-                                    if (pElementName == itelt.key())
-                                    {
-                                        elt["value"] = true;
-                                        element["value"] = true;
-                                    }
-                                    else
-                                    {
-                                        if (strcmp(elt["value"].typeName(), "bool") == 0) elt["value"] = false;
-                                    }
-
-                                    _elements[itelt.key()] = elt;
-                                }
-                            }
-                            else
-                            {
-                                element["value"] = false;
-
-                            }
-
-                        }
-                        if (_prop["rule"] == 2) // any
-                        {
-                            element["value"] = pElementValue.toBool();
-                        }
-
-                    }
-                    else
-                    {
-                        element["value"] = pElementValue.toBool(); // we shouldn't do that, should we ?
-                    }
-
-                }
-            }
-            else
-            {
-                element["value"] = pElementValue;
-            }
-            _elements[pElementName] = element;
-            _prop["elements"] = _elements;
-        }
-    }
-    mProperties[pPropertyName] = _prop;
-    if (mEmitEvent) OnModuleEvent("se", QString(), pPropertyName, mProperties[pPropertyName].toMap());
-
-
-    return true; // should return false when request is invalid, we'll see that later
-}
-bool Datastore::setOstElementGrid(const QString &pPropertyName, const QString &pElementName,
-                                  const QVariantList &pElementGrid,
-                                  bool mEmitEvent)
-{
-    if (!mProperties.contains(pPropertyName) )
-    {
-        sendWarning("setOstElementGrid - property " + pPropertyName + " not found");
+        sendWarning("setElementValue - property2 " + pPropertyName + " : element " + pElementName + " not found.");
         return false;
     }
-
-    QVariantMap _prop = mProperties[pPropertyName].toMap();
-    if (_prop.contains("elements"))
-    {
-        if (_prop["elements"].toMap().contains(pElementName))
-        {
-            QVariantMap _elements = _prop["elements"].toMap();
-            if (!_elements.contains(pElementName) )
-            {
-                sendWarning("setOstElementGrid - property " + pPropertyName + " : element " + pElementName + " not found.");
-                return false;
-            }
-
-            QVariantMap element = _elements[pElementName].toMap();
-            if (_prop.contains("grid"))
-            {
-                element["gridvalues"] = pElementGrid;
-            }
-            else
-            {
-                sendWarning("setOstElementGrid - property " + pPropertyName + " element " + pElementName + " has no grid.");
-            }
-            _elements[pElementName] = element;
-            _prop["elements"] = _elements;
-        }
-    }
-    mProperties[pPropertyName] = _prop;
-    if (mEmitEvent) OnModuleEvent("se", QString(), pPropertyName, mProperties[pPropertyName].toMap());
-
-
-    return true; // should return false when request is invalid, we'll see that later
+    return pb->setValue(pElementName, pElementValue);
 }
 QVariantList Datastore::getOstElementGrid(const QString &pPropertyName, const QString &pElementName)
 {
-    if (mProperties.contains(pPropertyName))
-    {
-        if (mProperties[pPropertyName].toMap().contains("elements"))
-        {
-            QVariantMap elts = mProperties[pPropertyName].toMap()["elements"].toMap();
-            if (elts.contains(pElementName))
-            {
-                if (mProperties[pPropertyName].toMap()["elements"].toMap()[pElementName].toMap().contains("gridvalues"))
-                {
-                    return mProperties[pPropertyName].toMap()["elements"].toMap()[pElementName].toMap()["gridvalues"].toList();
-                }
-                else
-                {
-                    sendWarning("getOstElementGrid - property " + pPropertyName + " element " + pElementName + " has no grid.");
-                    return QVariantList();
-                }
-            }
-            else
-            {
-                sendWarning("getOstElementGrid - property " + pPropertyName + " has no " + pElementName + " element.");
-                return QVariantList();
-            }
-        }
-        else
-        {
-            sendWarning("getOstElementGrid - property " + pPropertyName + " contains no elements.");
-            return QVariantList();
-        }
-    }
-    else
+    if (!mStore.contains(pPropertyName))
     {
         sendWarning("getOstElementGrid - property " + pPropertyName + " not found.");
         return QVariantList();
     }
+    if (mStore[pPropertyName]->getValues().size() == 0)
+    {
+        sendWarning("getOstElementGrid - property " + pPropertyName + " contains no elements.");
+        return QVariantList();
+    }
+    if (!mStore[pPropertyName]->hasArray())
+    {
+        sendWarning("getOstElementGrid - property " + pPropertyName + " has no grid.");
+        return QVariantList();
+    }
+    OST::ValueUpdate v;
+    QString action = "getgrid";
+    QVariantMap m;
+    mStore[pPropertyName]->getValue(pElementName)->accept(&v, action, m);
+    return v.getGrid();
+
 
 }
 
-QVariant Datastore::getOstElementValue(const QString &pPropertyName, const QString &pElementName)
-{
-    if (mProperties.contains(pPropertyName))
-    {
-        if (mProperties[pPropertyName].toMap().contains("elements"))
-        {
-            QVariantMap elts = mProperties[pPropertyName].toMap()["elements"].toMap();
-            if (elts.contains(pElementName))
-            {
-                return mProperties[pPropertyName].toMap()["elements"].toMap()[pElementName].toMap()["value"];
-            }
-            else
-            {
-                sendWarning("getElementValue - property " + pPropertyName + " has no " + pElementName + " element.");
-                return QVariant();
-            }
-        }
-        else
-        {
-            sendWarning("getElementValue - property " + pPropertyName + " contains no elements.");
-            return QVariant();
-        }
-    }
-    else
-    {
-        sendWarning("getElementValue - property " + pPropertyName + " not found.");
-        return QVariant();
-    }
-
-
-}
 void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
 {
     QString content;
@@ -347,23 +346,69 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
     file.open(QIODevice::ReadOnly | QIODevice::Text);
     content = file.readAll();
     file.close();
-    QJsonDocument d = QJsonDocument::fromJson(content.toUtf8());
-    QJsonObject props = d.object();
-    foreach(const QString &key, props.keys())
+    QJsonParseError parseError;
+    QJsonDocument d = QJsonDocument::fromJson(content.toUtf8(), &parseError);
+    if (!(parseError.error == QJsonParseError::NoError))
     {
-        QVariant tt = props[key].toVariant();
-        mProperties[key] = tt.toMap();
+        qDebug() << "Json parse error " << pFileName << "-" << parseError.errorString();
     }
 
-    //QByteArray docByteArray = d.toJson(QJsonDocument::Compact);
-    //QString strJson = QLatin1String(docByteArray);
-    //qDebug() << "loadPropertiesFromFile  - " << strJson;
+    QJsonObject data = d.object();
+    if (data.contains("properties"))
+    {
+        QJsonObject props = data["properties"].toObject();
+        foreach(const QString &key, props.keys())
+        {
+            //qDebug() << "***** create property from file " << key;
+            QVariantMap tt = props[key].toVariant().toMap();
+            OST::PropertyMulti *rp = OST::PropertyFactory::createProperty(key, tt);
+            if (rp != nullptr)
+            {
+                mStore[key] = rp;
+                connect(rp, &OST::PropertyMulti::valueChanged, this, &Datastore::onValueChanged);
+                connect(rp, &OST::PropertyMulti::propertyEvent, this, &Datastore::onPropertyEvent);
+                connect(rp, &OST::PropertyMulti::sendMessage, this, &Datastore::onPropertyMessage);
+                mStore[key]->setState(OST::State::Idle);
+
+            }
+            else
+            {
+                qDebug() << "***** can't create property " << key;
+            }
+
+        }
+
+
+    }
+    if (data.contains("globallov"))
+    {
+        QJsonObject lovs = data["globallov"].toObject();
+        foreach(const QString &key, lovs.keys())
+        {
+            QVariantMap tt = lovs[key].toVariant().toMap();
+            OST::LovBase *lb = OST::LovFactory::createLov(tt);
+            if (lb != nullptr)
+            {
+                mGlobLov[key] = lb;
+                OST::LovJsonDumper d;
+                mGlobLov[key]->accept(&d);
+            }
+            else
+            {
+                qDebug() << "***** can't create globlov " << key;
+            }
+
+        }
+
+
+    }
+
 
 }
 
 void Datastore::saveOstPropertiesToFile(const QString &pFileName)
 {
-    QJsonObject obj = QJsonObject::fromVariantMap(mProperties);
+    QJsonObject obj = QJsonObject::fromVariantMap(getPropertiesDump().toVariantMap());
     QJsonDocument doc(obj);
 
     QFile jsonFile(pFileName);
@@ -371,71 +416,51 @@ void Datastore::saveOstPropertiesToFile(const QString &pFileName)
     jsonFile.write(doc.toJson());
     jsonFile.close();
 }
-void Datastore::setOstPropertyAttribute   (const QString &pPropertyName, const QString &pAttributeName,
-        const QVariant &AttributeValue,
-        bool mEmitEvent)
-{
-    //sendMessage("setOstPropertyAttribute  - " + pPropertyName);
-    QVariantMap _prop = mProperties[pPropertyName].toMap();
-    _prop[pAttributeName] = AttributeValue;
-    mProperties[pPropertyName] = _prop;
-    if (mEmitEvent) OnModuleEvent("ap", QString(), pPropertyName, mProperties[pPropertyName].toMap());
 
-}
-bool Datastore::setOstElementAttribute(const QString &pPropertyName, const QString &pElementName,
-                                       const  QString &pAttributeName,
-                                       const QVariant &AttributeValue,
-                                       bool mEmitEvent)
-{
-    QVariantMap _prop = mProperties[pPropertyName].toMap();
-    if (_prop.contains("elements"))
-    {
-        if (_prop["elements"].toMap().contains(pElementName))
-        {
-            QVariantMap elements = _prop["elements"].toMap();
-            QVariantMap element = elements[pElementName].toMap();
-            element[pAttributeName] = AttributeValue;
-            elements[pElementName] = element;
-            _prop["elements"] = elements;
-        }
-    }
-    mProperties[pPropertyName] = _prop;
-    if (mEmitEvent) OnModuleEvent("ae", QString(), pPropertyName, mProperties[pPropertyName].toMap());
-    return true; // should return false when request is invalid, we'll see that later
-
-
-}
 QVariantMap Datastore::getProfile(void)
 {
     QVariantMap _res;
-
-    foreach(const QString &keyprop, mProperties.keys())
+    QVariantMap data = getPropertiesDump().toVariantMap();
+    QVariantMap m = data["properties"].toMap();
+    foreach(const QString &keyprop, m.keys())
     {
-        if (mProperties[keyprop].toMap().contains("hasprofile"))
+        if (m[keyprop].toMap().contains("hasprofile"))
         {
-            QVariantMap property;
-            if (mProperties[keyprop].toMap().contains("value"))
+            if (m[keyprop].toMap()["hasprofile"].toBool())
             {
-                property["value"] = mProperties[keyprop].toMap()["value"];
-            }
-            if (mProperties[keyprop].toMap().contains("elements"))
-            {
-                QVariantMap element, elements;
-                foreach(const QString &keyelt, mProperties[keyprop].toMap()["elements"].toMap().keys())
+                QVariantMap property;
+                if (m[keyprop].toMap().contains("elements"))
                 {
-                    if (mProperties[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("value"))
+                    QVariantMap element, elements;
+                    foreach(const QString &keyelt, m[keyprop].toMap()["elements"].toMap().keys())
                     {
-                        element["value"] = mProperties[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
+                        if (m[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("value"))
+                        {
+                            element["value"] = m[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
+                        }
+                        if (m[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("min"))
+                        {
+                            element["min"] = m[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["min"];
+                        }
+                        if (m[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("max"))
+                        {
+                            element["max"] = m[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["max"];
+                        }
+                        if (m[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("step"))
+                        {
+                            element["step"] = m[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["step"];
+                        }
+                        if (m[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("gridvalues"))
+                        {
+                            element["gridvalues"] = m[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["gridvalues"];
+                        }
+                        elements[keyelt] = element;
                     }
-                    if (mProperties[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("gridvalues"))
-                    {
-                        element["gridvalues"] = mProperties[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["gridvalues"];
-                    }
-                    elements[keyelt] = element;
+                    property["elements"] = elements;
                 }
-                property["elements"] = elements;
+                _res[keyprop] = property;
             }
-            _res[keyprop] = property;
+
         }
     }
 
@@ -444,726 +469,71 @@ QVariantMap Datastore::getProfile(void)
 
 void Datastore::deleteOstProperty(const QString &pPropertyName)
 {
-    if (mProperties.contains(pPropertyName))
-    {
-        mProperties.remove(pPropertyName);
-        emit OnModuleEvent("delprop", QString(), pPropertyName, QVariantMap());
-    }
-    else
+    if (!mStore.contains(pPropertyName))
     {
         sendWarning("Can't delete inexistant property " + pPropertyName);
-    }
-
-}
-
-bool Datastore::pushOstElements         (const QString &pPropertyName)
-{
-    if (mProperties.contains(pPropertyName))
-    {
-        QVariantMap _prop = mProperties[pPropertyName].toMap();
-        if (!_prop.contains("grid") )
-        {
-            sendWarning("pushOstElements : No grid defined for property  " + pPropertyName);
-            return false;
-        }
-        else
-        {
-            QVariantMap _elements = _prop["elements"].toMap();
-            for(QVariantMap::const_iterator _elt = _elements.begin(); _elt != _elements.end(); ++_elt)
-            {
-                QVariant _myVal = _elements[_elt.key()].toMap()["value"];
-                _elements[_elt.key()] = _myVal;
-            }
-            _prop["elements"] = _elements;
-            QVariantMap _props;
-            _props[pPropertyName] = _prop;
-            newOstPropertyLine(pPropertyName, _props);
-            return true;
-
-        }
-    }
-    else
-    {
-        sendWarning("pushOstElements : Can't add line to inexistant property " + pPropertyName);
-        return false;
-    }
-
-}
-bool Datastore::resetOstElements      (const QString &pPropertyName)
-{
-    if (mProperties.contains(pPropertyName))
-    {
-        QVariantMap _prop = mProperties[pPropertyName].toMap();
-        if (!_prop.contains("grid") )
-        {
-            sendWarning("No grid defined for property  " + pPropertyName);
-            return false;
-        }
-        else
-        {
-            _prop["grid"].clear();
-            QVariantMap _elements = _prop["elements"].toMap();
-            for(QVariantMap::const_iterator _elt = _elements.begin(); _elt != _elements.end(); ++_elt)
-            {
-                QVariantMap _myelt = _elements[_elt.key()].toMap();
-                _myelt["gridvalues"] = QVariantList();
-                _elements[_elt.key()] = _myelt;
-            }
-            _prop["elements"] = _elements;
-
-            mProperties[pPropertyName] = _prop;
-            emit OnModuleEvent("resetvalues", QString(), pPropertyName, QVariantMap());
-            return true;
-
-        }
-    }
-    else
-    {
-        sendWarning("Can't reset inexistant property " + pPropertyName);
-        return false;
-    }
-
-}
-bool Datastore::newOstPropertyLine(const QString &pPropertyName, const QVariantMap &pElementsValues)
-{
-    if (mProperties.contains(pPropertyName))
-    {
-        QVariantMap _prop = mProperties[pPropertyName].toMap();
-        if (!_prop.contains("grid") )
-        {
-            sendWarning("newOstPropertyLine : No grid defined for property  " + pPropertyName);
-            return false;
-        }
-        else
-        {
-            //qDebug() << "newOstPropertyLine :" << pPropertyName << ">> " << pElementsValues;
-            QVariantList _arr = _prop["grid"].toList();
-            QVariantList _cols;
-            QVariantMap _elements = _prop["elements"].toMap();
-            for(QVariantMap::const_iterator _elt = _elements.begin(); _elt != _elements.end(); ++_elt)
-            {
-                _cols.push_back(pElementsValues[pPropertyName].toMap()["elements"].toMap()[_elt.key()]);
-            }
-            _arr.push_back(_cols);
-            _prop["grid"] = _arr;
-            QVariantMap _elementsEmpty;
-            long int gridsize = 0;
-            for(QVariantMap::const_iterator _elt = _elements.begin(); _elt != _elements.end(); ++_elt)
-            {
-                //qDebug() << _elt.key() << _elt.value();
-                QVariantMap _myelt = _elements[_elt.key()].toMap();
-                QVariantMap _myEmptyElt = _elements[_elt.key()].toMap();
-                QVariantList _mylist = _myelt["gridvalues"].toList();
-                gridsize = _mylist.count();
-                QVariantList _myEmptyList;
-                QVariant _myVal;
-                if (strcmp(_myelt["value"].typeName(), "double") == 0)
-                {
-                    _myVal = pElementsValues[pPropertyName].toMap()["elements"].toMap()[_elt.key()].toDouble();
-                }
-                if (strcmp(_myelt["value"].typeName(), "float") == 0)
-                {
-                    _myVal = pElementsValues[pPropertyName].toMap()["elements"].toMap()[_elt.key()].toFloat();
-                }
-                if (strcmp(_myelt["value"].typeName(), "qlonglong") == 0)
-                {
-                    _myVal = pElementsValues[pPropertyName].toMap()["elements"].toMap()[_elt.key()].toLongLong();
-                }
-                if (strcmp(_myelt["value"].typeName(), "int") == 0)
-                {
-                    _myVal = pElementsValues[pPropertyName].toMap()["elements"].toMap()[_elt.key()].toInt();
-                }
-                if (strcmp(_myelt["value"].typeName(), "QString") == 0)
-                {
-                    _myVal = pElementsValues[pPropertyName].toMap()["elements"].toMap()[_elt.key()].toString();
-                }
-
-                _mylist.push_back(_myVal);
-                _myEmptyList.push_back(_myVal);
-                _myelt["gridvalues"] = _mylist;
-                _myEmptyElt["gridvalues"] = _myEmptyList;
-                _elements[_elt.key()] = _myelt;
-                _elementsEmpty[_elt.key()] = _myEmptyElt;
-            }
-            _prop["elements"] = _elements;
-            mProperties[pPropertyName] = _prop;
-            emit OnModuleEvent("pushvalues", QString(), pPropertyName, _elementsEmpty);
-
-            long int gridlimit = 200;
-
-            if (mProperties[pPropertyName].toMap().contains("gridlimit"))
-            {
-                gridlimit = mProperties[pPropertyName].toMap()["gridlimit"].toLongLong();
-            }
-            if (gridsize >= gridlimit )
-            {
-                deleteOstPropertyLine(pPropertyName, 0);
-            }
-
-            return true;
-
-        }
-    }
-    else
-    {
-        sendWarning("newOstPropertyLine : Can't add line to inexistant property " + pPropertyName);
-        return false;
-    }
-
-}
-bool Datastore::deleteOstPropertyLine(const QString &pPropertyName, const double &pLine)
-{
-    if (mProperties.contains(pPropertyName))
-    {
-        QVariantMap _prop = mProperties[pPropertyName].toMap();
-        if (!_prop.contains("grid") )
-        {
-            sendWarning("deleteOstPropertyLine : No grid defined for property  " + pPropertyName);
-            return false;
-        }
-        else
-        {
-            //qDebug() << "deleteOstPropertyLine :" << pPropertyName << ">> " << pPropertyName;
-            QVariantMap _elements = _prop["elements"].toMap();
-            QVariantList _arr = _prop["grid"].toList();
-            _arr.removeAt(pLine);
-            _prop["grid"] = _arr;
-            for(QVariantMap::const_iterator _elt = _elements.begin(); _elt != _elements.end(); ++_elt)
-            {
-                //qDebug() << _elt.key() << _elt.value();
-                QVariantMap _myelt = _elements[_elt.key()].toMap();
-                QVariantList _mylist = _myelt["gridvalues"].toList();
-                _mylist.removeAt(pLine);
-                _myelt["gridvalues"] = _mylist;
-                _elements[_elt.key()] = _myelt;
-            }
-            _prop["elements"] = _elements;
-            mProperties[pPropertyName] = _prop;
-            OnModuleEvent("ap", QString(), pPropertyName, mProperties[pPropertyName].toMap());
-            return true;
-        }
-    }
-    else
-    {
-        sendWarning("deleteOstPropertyLine : Can't add line to inexistant property " + pPropertyName);
-        return false;
-    }
-
-}
-bool Datastore::updateOstPropertyLine(const QString &pPropertyName, const double &pLine, const QVariantMap &pElementsValues)
-{
-    if (mProperties.contains(pPropertyName))
-    {
-        QVariantMap _prop = mProperties[pPropertyName].toMap();
-        if (!_prop.contains("grid") )
-        {
-            sendWarning("updateOstPropertyLine : No grid defined for property  " + pPropertyName);
-            return false;
-        }
-        else
-        {
-            //qDebug() << "updateOstPropertyLine :" << pPropertyName << ">> " << pPropertyName;
-            QVariantMap _elements = _prop["elements"].toMap();
-            QVariantList _arr = _prop["grid"].toList();
-            _arr.removeAt(pLine);
-            _prop["grid"] = _arr;
-            for(QVariantMap::const_iterator _elt = _elements.begin(); _elt != _elements.end(); ++_elt)
-            {
-                //qDebug() << _elt.key() << _elt.value();
-                QVariantMap _myelt = _elements[_elt.key()].toMap();
-                QVariantList _mylist = _myelt["gridvalues"].toList();
-                QVariant _myVal;
-                if (strcmp(_myelt["value"].typeName(), "double") == 0)
-                {
-                    _myVal = pElementsValues[pPropertyName].toMap()["elements"].toMap()[_elt.key()].toDouble();
-                }
-                if (strcmp(_myelt["value"].typeName(), "float") == 0)
-                {
-                    _myVal = pElementsValues[pPropertyName].toMap()["elements"].toMap()[_elt.key()].toFloat();
-                }
-                if (strcmp(_myelt["value"].typeName(), "qlonglong") == 0)
-                {
-                    _myVal = pElementsValues[pPropertyName].toMap()["elements"].toMap()[_elt.key()].toLongLong();
-                }
-                if (strcmp(_myelt["value"].typeName(), "int") == 0)
-                {
-                    _myVal = pElementsValues[pPropertyName].toMap()["elements"].toMap()[_elt.key()].toInt();
-                }
-                if (strcmp(_myelt["value"].typeName(), "QString") == 0)
-                {
-                    _myVal = pElementsValues[pPropertyName].toMap()["elements"].toMap()[_elt.key()].toString();
-                }
-
-
-                _mylist[pLine] = _myVal;
-                _myelt["gridvalues"] = _mylist;
-                _elements[_elt.key()] = _myelt;
-            }
-            _prop["elements"] = _elements;
-            mProperties[pPropertyName] = _prop;
-            OnModuleEvent("ap", QString(), pPropertyName, mProperties[pPropertyName].toMap());
-            return true;
-        }
-    }
-    else
-    {
-        sendWarning("updateOstPropertyLine : Can't add line to inexistant property " + pPropertyName);
-        return false;
-    }
-
-}
-QVariant Datastore::getOstElementLineValue(const QString &pPropertyName, const QString &pElementName, const double &pLine)
-{
-    if (getOstElementGrid(pPropertyName, pElementName).isEmpty())
-    {
-        sendWarning("Try to read an empty grid (" + pPropertyName + "/" + pElementName + ")");
-        return QVariant();
-
-    }
-    else
-    {
-        if (pLine >= getOstElementGrid(pPropertyName, pElementName).count())
-        {
-            sendWarning("Try to access inexistant line grid (" + pPropertyName + "/" + pElementName + ") size=" + getOstElementGrid(
-                            pPropertyName, pElementName).count() + " vs requested=" + pLine);
-            return QVariant();
-        }
-        else
-        {
-            return getOstElementGrid(pPropertyName, pElementName)[pLine];
-        }
-    }
-}
-bool Datastore::setOstElementLineValue (const QString &pPropertyName, const QString &pElementName, const double &pLine,
-                                        const QVariant &pElementValue)
-{
-    QVariantList elementList  = getOstElementGrid(pPropertyName, pElementName);
-    if (pLine >= elementList.count())
-    {
-        sendWarning("invalid line (" + pPropertyName + "/" + pElementName + ") size=" + QString::number(
-                        elementList.count()) + " vs requested(-1)=" +
-                    QString::number(pLine));
-        return false;
-    }
-    else
-    {
-        elementList[pLine] = pElementValue;
-        setOstElementGrid(pPropertyName, pElementName, elementList, true);
-        OnModuleEvent("ap", QString(), pPropertyName, mProperties[pPropertyName].toMap());
-        return true;
-    }
-
-
-}
-void Datastore::clearOstElementLov(const QString &pPropertyName, const QString &pElementName)
-{
-    if (mProperties.contains(pPropertyName))
-    {
-        QVariantMap mProp = mProperties[pPropertyName].toMap();
-        if (mProp.contains("elements"))
-        {
-            QVariantMap mElts = mProp["elements"].toMap();
-            if (mElts.contains(pElementName))
-            {
-                QVariantMap mElt =  mElts[pElementName].toMap();
-                if (mElt.contains("listOfValues"))
-                {
-                    mElt["listOfValues"] = QVariantMap();
-                    mElts[pElementName] = mElt;
-                    mProp["elements"] = mElts;
-                    mProperties[pPropertyName] = mProp;
-                    OnModuleEvent("ap", QString(), pPropertyName, mProperties[pPropertyName].toMap());
-                }
-                else
-                {
-                    sendWarning("clearOstElementLov - property " + pPropertyName + " element " + pElementName + " has no list of values.");
-                }
-            }
-            else
-            {
-                sendWarning("clearOstElementLov - property " + pPropertyName + " has no " + pElementName + " element.");
-                return;
-            }
-        }
-        else
-        {
-            sendWarning("clearOstElementLov - property " + pPropertyName + " contains no elements.");
-            return;
-        }
-    }
-    else
-    {
-        sendWarning("clearOstElementLov - property " + pPropertyName + " not found.");
         return;
     }
+    mStore.remove(pPropertyName);
+    emit OnModuleEvent("delprop", QString(), pPropertyName, QVariantMap());
 
 }
-void Datastore::addOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode,
-                                 const QString &pLovLabel)
+
+
+
+QJsonObject Datastore::getPropertiesDump(void)
 {
-    if (mProperties.contains(pPropertyName))
+    QJsonObject properties;
+    foreach(const QString &key, mStore.keys())
     {
-        QVariantMap mProp = mProperties[pPropertyName].toMap();
-        if (mProp.contains("elements"))
-        {
-            QVariantMap mElts = mProperties[pPropertyName].toMap()["elements"].toMap();
-            if (mElts.contains(pElementName))
-            {
-                QVariantMap mElt =  mProperties[pPropertyName].toMap()["elements"].toMap()[pElementName].toMap();
-                if (mElt.contains("listOfValues"))
-                {
-                    QVariantMap mLov = mElt["listOfValues"].toMap();
-                    if (mLov.contains(pLovCode))
-                    {
-                        sendWarning("addOstElementLov - property " + pPropertyName + " element " + pElementName + " list of values member " +
-                                    pLovCode +
-                                    " already exists");
-                    }
-                    else
-                    {
-                        mLov[pLovCode] = pLovLabel;
-                        mElt["listOfValues"] = mLov;
-                        mElts[pElementName] = mElt;
-                        mProp["elements"] = mElts;
-                        mProperties[pPropertyName] = mProp;
-                        OnModuleEvent("ap", QString(), pPropertyName, mProperties[pPropertyName].toMap());
-
-                    }
-                }
-                else
-                {
-                    sendWarning("addOstElementLov - property " + pPropertyName + " element " + pElementName + " has no list of values.");
-                }
-            }
-            else
-            {
-                sendWarning("addOstElementLov - property " + pPropertyName + " has no " + pElementName + " element.");
-            }
-        }
-        else
-        {
-            sendWarning("addOstElementLov - property " + pPropertyName + " contains no elements.");
-        }
+        OST::PropertyJsonDumper d;
+        mStore[key]->accept(&d);
+        properties[key] = d.getResult();
     }
-    else
-    {
-        sendWarning("addOstElementLov - property " + pPropertyName + " not found.");
-    }
-
+    return properties;
 }
-QVariant Datastore::getOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode)
+QJsonObject Datastore::getGlobalLovsDump(void)
 {
-    if (mProperties.contains(pPropertyName))
+    QJsonObject globallov;
+    foreach(const QString &key, mGlobLov.keys())
     {
-        if (mProperties[pPropertyName].toMap().contains("elements"))
-        {
-            QVariantMap elts = mProperties[pPropertyName].toMap()["elements"].toMap();
-            if (elts.contains(pElementName))
-            {
-                QVariantMap mElt =  mProperties[pPropertyName].toMap()["elements"].toMap()[pElementName].toMap();
-                if (mElt.contains("listOfValues"))
-                {
-                    if (mElt["listOfValues"].toMap().contains(pLovCode))
-                    {
-                        return mElt["listOfValues"].toMap()[pLovCode];
-                    }
-                    else
-                    {
-                        sendWarning("getOstElementLov - property " + pPropertyName + " element " + pElementName + " has no " + pLovCode +
-                                    " member in list of values.");
-                    }
-                }
-                else
-                {
-                    sendWarning("getOstElementLov - property " + pPropertyName + " element " + pElementName + " has no list of values.");
-                }
-            }
-            else
-            {
-                sendWarning("getOstElementLov - property " + pPropertyName + " has no " + pElementName + " element.");
-            }
-        }
-        else
-        {
-            sendWarning("getOstElementLov - property " + pPropertyName + " contains no elements.");
-        }
+        OST::LovJsonDumper d;
+        mGlobLov[key]->accept(&d);
+        globallov[key] = d.getResult();
     }
-    else
-    {
-        sendWarning("getOstElementLov - property " + pPropertyName + " not found.");
-    }
-    return QVariant();
+    return globallov;
 }
-void Datastore::setOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode,
-                                 const QString &pLovLabel)
+OST::LovString* Datastore::getGlovString(QString pLov)
 {
-    if (mProperties.contains(pPropertyName))
+    if (!getGlobLovs().contains(pLov))
     {
-        QVariantMap mProp = mProperties[pPropertyName].toMap();
-        if (mProp.contains("elements"))
-        {
-            QVariantMap mElts = mProperties[pPropertyName].toMap()["elements"].toMap();
-            if (mElts.contains(pElementName))
-            {
-                QVariantMap mElt =  mProperties[pPropertyName].toMap()["elements"].toMap()[pElementName].toMap();
-                if (mElt.contains("listOfValues"))
-                {
-                    QVariantMap mLov = mElt["listOfValues"].toMap();
-                    if (mLov.contains(pLovCode))
-                    {
-                        mLov[pLovCode] = pLovLabel;
-                        mElt["listOfValues"] = mLov;
-                        mElts[pElementName] = mElt;
-                        mProp["elements"] = mElts;
-                        mProperties[pPropertyName] = mProp;
-                        OnModuleEvent("ap", QString(), pPropertyName, mProperties[pPropertyName].toMap());
-                    }
-                    else
-                    {
-                        sendWarning("setOstElementLov - property " + pPropertyName + " element " + pElementName + " has no " + pLovCode +
-                                    " member in list of values.");
-                    }
-                }
-                else
-                {
-                    sendWarning("setOstElementLov - property " + pPropertyName + " element " + pElementName + " has no list of values.");
-                }
-            }
-            else
-            {
-                sendWarning("setOstElementLov - property " + pPropertyName + " has no " + pElementName + " element.");
-            }
-        }
-        else
-        {
-            sendWarning("setOstElementLov - property " + pPropertyName + " contains no elements.");
-        }
+        sendWarning(" getGlovString - Globallob " + pLov + " not found");
+        return nullptr;
     }
-    else
+    if (getGlobLovs()[pLov]->getType() != "string")
     {
-        sendWarning("setOstElementLov - property " + pPropertyName + " not found.");
+        sendWarning(" getGlovString - Globallob " + pLov + " wrong type " + getGlobLovs()[pLov]->getType());
+        return nullptr;
     }
+
+    return static_cast<OST::LovString*>(getGlobLovs()[pLov]);
 }
-void Datastore::deleteOstElementLov(const QString &pPropertyName, const QString &pElementName, const QString &pLovCode)
+void Datastore::onPropertyMessage(OST::MsgLevel l, QString m)
 {
-    if (mProperties.contains(pPropertyName))
+    switch (l)
     {
-        QVariantMap mProp = mProperties[pPropertyName].toMap();
-        if (mProp.contains("elements"))
-        {
-            QVariantMap mElts = mProperties[pPropertyName].toMap()["elements"].toMap();
-            if (mElts.contains(pElementName))
-            {
-                QVariantMap mElt =  mProperties[pPropertyName].toMap()["elements"].toMap()[pElementName].toMap();
-                if (mElt.contains("listOfValues"))
-                {
-                    QVariantMap mLov = mElt["listOfValues"].toMap();
-                    if (mLov.contains(pLovCode))
-                    {
-                        mLov[pLovCode].clear();
-                        mElt["listOfValues"] = mLov;
-                        mElts[pElementName] = mElt;
-                        mProp["elements"] = mElts;
-                        mProperties[pPropertyName] = mProp;
-                        OnModuleEvent("ap", QString(), pPropertyName, mProperties[pPropertyName].toMap());
-
-                    }
-                    else
-                    {
-                        sendWarning("deleteOstElementLov - property " + pPropertyName + " element " + pElementName + " has no " + pLovCode +
-                                    " member in list of values.");
-                    }
-                }
-                else
-                {
-                    sendWarning("deleteOstElementLov - property " + pPropertyName + " element " + pElementName + " has no list of values.");
-                }
-            }
-            else
-            {
-                sendWarning("deleteOstElementLov - property " + pPropertyName + " has no " + pElementName + " element.");
-            }
-        }
-        else
-        {
-            sendWarning("deleteOstElementLov - property " + pPropertyName + " contains no elements.");
-        }
+        case OST::Info:
+            sendMessage(m);
+            break;
+        case OST::Warn:
+            sendWarning(m);
+            break;
+        case OST::Err:
+            sendError(m);
+            break;
+        default:
+            sendError(m);
+            break;
     }
-    else
-    {
-        sendWarning("deleteOstElementLov - property " + pPropertyName + " not found.");
-    }
-
-}
-void Datastore::clearOstLov(const QString &pPropertyName)
-{
-    if (mProperties.contains(pPropertyName))
-    {
-        QVariantMap mProp = mProperties[pPropertyName].toMap();
-        if (mProp.contains("listOfValues"))
-        {
-            QVariantMap mLov = mProp["listOfValues"].toMap();
-            mProp["listOfValues"] = QVariantMap();
-            mProperties[pPropertyName] = mProp;
-            OnModuleEvent("ap", QString(), pPropertyName, mProperties[pPropertyName].toMap());
-        }
-        else
-        {
-            sendWarning("clearOstLov - property " + pPropertyName + " has no list of values.");
-            return;
-        }
-    }
-    else
-    {
-        sendWarning("clearOstLov - property " + pPropertyName + " not found.");
-        return;
-    }
-}
-void Datastore::addOstLov(const QString &pPropertyName, const QString &pLovCode,
-                          const QString &pLovLabel)
-{
-    if (mProperties.contains(pPropertyName))
-    {
-        QVariantMap mProp = mProperties[pPropertyName].toMap();
-        if (mProp.contains("listOfValues"))
-        {
-            QVariantMap mLov = mProp["listOfValues"].toMap();
-            if (mLov.contains(pLovCode))
-            {
-                sendWarning("addOstLov - property " + pPropertyName + " list of values member " + pLovCode +
-                            " already exists");
-                return;
-
-            }
-            else
-            {
-                mLov[pLovCode] = pLovLabel;
-                mProp["listOfValues"] = mLov;
-                mProperties[pPropertyName] = mProp;
-                OnModuleEvent("ap", QString(), pPropertyName, mProperties[pPropertyName].toMap());
-
-            }
-        }
-        else
-        {
-            sendWarning("addOstLov - property " + pPropertyName + " has no list of values.");
-            return;
-        }
-    }
-    else
-    {
-        sendWarning("addOstLov - property " + pPropertyName + " not found.");
-        return;
-    }
-    return;
-}
-QVariant Datastore::getOstLov(const QString &pPropertyName, const QString &pLovCode)
-{
-    if (mProperties.contains(pPropertyName))
-    {
-        QVariantMap mProp = mProperties[pPropertyName].toMap();
-        if (mProp.contains("listOfValues"))
-        {
-            QVariantMap mLov = mProp["listOfValues"].toMap();
-            if (!mLov.contains(pLovCode))
-            {
-                sendWarning("getOstLov - property " + pPropertyName + " has no " + pLovCode +
-                            " member in list of values.");
-
-                return QVariant();
-            }
-            else
-            {
-                return mLov[pLovCode];
-            }
-        }
-        else
-        {
-            sendWarning("getOstLov - property " + pPropertyName + " has no list of values.");
-            return QVariant();
-        }
-    }
-    else
-    {
-        sendWarning("getOstLov - property " + pPropertyName + " not found.");
-        return QVariant();
-    }
-    return QVariant();
-}
-void Datastore::setOstLov(const QString &pPropertyName, const QString &pLovCode,
-                          const QString &pLovLabel)
-{
-    if (mProperties.contains(pPropertyName))
-    {
-        QVariantMap mProp = mProperties[pPropertyName].toMap();
-        if (mProp.contains("listOfValues"))
-        {
-            QVariantMap mLov = mProp["listOfValues"].toMap();
-            if (!mLov.contains(pLovCode))
-            {
-                sendWarning("setOstLov - property " + pPropertyName + " list of values member " + pLovCode +
-                            " does not exists");
-                return;
-
-            }
-            else
-            {
-                mLov[pLovCode] = pLovLabel;
-                mProp["listOfValues"] = mLov;
-                mProperties[pPropertyName] = mProp;
-                OnModuleEvent("ap", QString(), pPropertyName, mProperties[pPropertyName].toMap());
-
-            }
-        }
-        else
-        {
-            sendWarning("setOstLov - property " + pPropertyName + " has no list of values.");
-            return;
-        }
-    }
-    else
-    {
-        sendWarning("setOstLov - property " + pPropertyName + " not found.");
-        return;
-    }
-    return;
-
-}
-void Datastore::deleteOstLov(const QString &pPropertyName, const QString &pLovCode)
-{
-    if (mProperties.contains(pPropertyName))
-    {
-        QVariantMap mProp = mProperties[pPropertyName].toMap();
-        if (mProp.contains("listOfValues"))
-        {
-            QVariantMap mLov = mProp["listOfValues"].toMap();
-            if (!mLov.contains(pLovCode))
-            {
-                sendWarning("deleteOstLov - property " + pPropertyName + " list of values member " + pLovCode +
-                            " does not exists");
-                return;
-
-            }
-            else
-            {
-                mLov[pLovCode].clear();
-                mProp["listOfValues"] = mLov;
-                mProperties[pPropertyName] = mProp;
-                OnModuleEvent("ap", QString(), pPropertyName, mProperties[pPropertyName].toMap());
-
-            }
-        }
-        else
-        {
-            sendWarning("deleteOstLov - property " + pPropertyName + " has no list of values.");
-            return;
-        }
-    }
-    else
-    {
-        sendWarning("deleteOstLov - property " + pPropertyName + " not found.");
-        return;
-    }
-    return;
 
 }

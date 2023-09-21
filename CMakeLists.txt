@@ -34,12 +34,24 @@ find_package(WCSLIB REQUIRED)
 find_package(QT NAMES Qt5 COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql)
 find_package(StellarSolver REQUIRED)
+find_library(avahi-client-lib avahi-client REQUIRED)
+find_library(avahi-common-lib avahi-common REQUIRED)
+find_path(avahi-client-includes avahi-client/client.h REQUIRED)
+find_path(avahi-common-includes avahi-common/defs.h REQUIRED)
+
+
+
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/utils)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/model)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues)
 include_directories(${INDI_INCLUDE_DIR})
 include_directories(${CFITSIO_INCLUDE_DIR})
 include_directories(${GSL_INCLUDE_DIRS})
@@ -47,6 +59,7 @@ include_directories(${Qt5_DIR})
 include_directories(${QT5Declarative_INCLUDE_LIBRARIES} )
 include_directories(${QT5Declarative_INCLUDE_DIRS} )
 include_directories(${STELLARSOLVER_INCLUDE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/QtZeroConf)
 
 include(CMakeCommon)
 
@@ -58,20 +71,33 @@ add_executable(ostserver
     ${CMAKE_CURRENT_SOURCE_DIR}/src/controller.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/wshandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/wshandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/datastore.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/datastore.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/dbmanager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/dbmanager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/version.hh
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/resources.qrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/QtZeroConf/qzeroconfservice.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/QtZeroConf/qzeroconfglobal.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/QtZeroConf/qzeroconf.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/QtZeroConf/qzeroconfservice.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QtZeroConf/avahi-qt/qt-watch_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/QtZeroConf/avahi-qt/qt-watch.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QtZeroConf/avahiclient.cpp
 )
 target_link_libraries(ostserver
     ostbasemodule
+    ostmaincontrol
     Qt${QT_VERSION_MAJOR}::Gui
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::WebSockets
     Qt${QT_VERSION_MAJOR}::Sql
+    Qt${QT_VERSION_MAJOR}::Network
+    ${avahi-client-lib}
+    ${avahi-common-lib}
     Threads::Threads
     z
 )
@@ -93,6 +119,61 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.qrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/common.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuebase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuebase.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuesingle.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueint.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueint.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuestring.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuestring.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuefloat.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuefloat.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuebool.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuebool.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuelight.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuelight.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueimg.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueimg.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuevideo.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuevideo.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuemessage.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuemessage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuegraph.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuegraph.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovbase.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovsingle.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovstring.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovint.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovfloat.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovlight.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertybase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertybase.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertymulti.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertymulti.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyvisitor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuevisitor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovvisitor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyfactory.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyfactory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuefactory.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuefactory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovfactory.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovfactory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertytextdumper.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertytextdumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyjsondumper.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyjsondumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovjsondumper.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovjsondumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuetextdumper.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuetextdumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuejsondumper.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuejsondumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyupdate.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyupdate.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valueupdate.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valueupdate.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/fileio.cpp
@@ -117,6 +198,39 @@ set(BASE_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/bayer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/dms.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/nan.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/common.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuebase.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuesingle.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueint.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuestring.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuefloat.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuebool.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuelight.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueimg.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuevideo.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuemessage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuegraph.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovbase.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovsingle.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovstring.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovint.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovfloat.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovlight.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertybase.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertymulti.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyvisitor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuevisitor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyfactory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuefactory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovfactory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovvisitor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertytextdumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyjsondumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovjsondumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuetextdumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuejsondumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyupdate.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valueupdate.h
 )
 set_target_properties(ostbasemodule PROPERTIES PUBLIC_HEADER "${BASE_PUBLIC_HEADERS}")
 
@@ -199,12 +313,13 @@ target_link_libraries(ostmaincontrol PRIVATE
 )
 target_compile_definitions(ostmaincontrol PRIVATE maincontrol_LIBRARY)
 
-install(TARGETS ostserver ostbasemodule ostindimodule ostdummy ostmaincontrol
+install(TARGETS
+    ostserver
+    ostbasemodule ostindimodule ostdummy ostmaincontrol
     RUNTIME DESTINATION "/usr/bin"
     LIBRARY DESTINATION "/usr/lib"
     PUBLIC_HEADER DESTINATION "/usr/include/ost"
 )
-
 
 # the commit's SHA1, and whether the building workspace was dirty or not
 execute_process(COMMAND

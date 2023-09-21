@@ -32,7 +32,9 @@ Build-Depends: cmake,
                libraw-dev,
                libgsl-dev,
                libsecret-1-dev,
-               libstellarsolver-dev
+               libstellarsolver-dev,
+               libavahi-client-dev,
+               libavahi-common-dev
 Standards-Version: 4.6.0
 Homepage: https://github.com/gehelem/OST
 #Vcs-Browser: https://salsa.debian.org/debian/ostserver

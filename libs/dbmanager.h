@@ -1,9 +1,24 @@
 #ifndef DBMANAGER_h_
 #define DBMANAGER_h_
 
-#include "baseroot.h"
+#include "datastore.h"
 
-class DBManager : virtual public Baseroot
+struct catalogResult
+{
+    QString  catalog;
+    QString  code;
+    double RA;
+    QString  NS;
+    double DEC;
+    double diam;
+    double mag;
+    QString  name;
+    QString  alias;
+
+};
+
+
+class DBManager : public Datastore
 {
     public:
         DBManager();
@@ -12,7 +27,11 @@ class DBManager : virtual public Baseroot
         bool getDbProfile(const QString &pModuleType, const QString &pProfileName, QVariantMap &result );
         bool setDbProfile(const QString &pModuleType, const QString &pProfileName, QVariantMap &profile );
         bool getDbProfiles(QString moduleType, QVariantMap &result );
-        bool getDbConfiguration(QString configName, QVariantMap &result );
+        bool getDbConfiguration(const QString &pConfigName, QVariantMap &result );
+        bool saveDbConfiguration(const QString &pConfigName, QMap<QString, QMap<QString, QString>> &pConf);
+        bool getDbConfigurations(QVariantMap &result );
+        bool searchCatalog(const QString &pArgument, QList<catalogResult> &pResult);
+        bool populateCatalog(const QString &pFileName, const QString &pName);
 
     private:
         void CreateDatabaseStructure();
