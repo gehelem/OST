@@ -53,33 +53,33 @@ void Basemodule::setProfile(const QString &pProfileName)
 
 void Basemodule::setProfile(QVariantMap profiledata)
 {
-    //QVariantMap _props = getProperties();
-    foreach(const QString &key, profiledata.keys())
+    QVariantMap props = profiledata["properties"].toMap();
+    foreach(const QString &key, props.keys())
     {
         if (getStore().contains(key))
         {
-            QVariantMap data = profiledata[key].toMap();
+            QVariantMap data = props[key].toMap();
             if (getStore()[key]->hasProfile())
             {
                 //setOstPropertyValue(key, data["value"], true);
                 if (data.contains("elements"))
                 {
-                    foreach(const QString &eltkey, profiledata[key].toMap()["elements"].toMap().keys())
+                    foreach(const QString &eltkey, props[key].toMap()["elements"].toMap().keys())
                     {
-                        setOstElementValue(key, eltkey, profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["value"], true);
+                        setOstElementValue(key, eltkey, props[key].toMap()["elements"].toMap()[eltkey].toMap()["value"], true);
 
-                        if (profiledata[key].toMap()["elements"].toMap()[eltkey].toMap().contains("gridvalues"))
+                        if (props[key].toMap()["elements"].toMap()[eltkey].toMap().contains("gridvalues"))
                         {
                             //setOstElementGrid (key, eltkey, profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["gridvalues"].toList(), true);
                             OST::ValueUpdate v;
                             QVariantMap m;
                             QString a = "cleargrid";
                             getProperty(key)->getValue(eltkey)->accept(&v, a, m);
-                            int size = profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["gridvalues"].toList().size();
+                            int size = props[key].toMap()["elements"].toMap()[eltkey].toMap()["gridvalues"].toList().size();
                             a = "newline";
                             for (int i = 0; i < size; i++)
                             {
-                                m["val"] = profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["gridvalues"].toList()[i];
+                                m["val"] = props[key].toMap()["elements"].toMap()[eltkey].toMap()["gridvalues"].toList()[i];
                                 getProperty(key)->getValue(eltkey)->accept(&v, a, m);
                             }
 

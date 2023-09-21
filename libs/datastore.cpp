@@ -419,52 +419,56 @@ void Datastore::saveOstPropertiesToFile(const QString &pFileName)
 
 QVariantMap Datastore::getProfile(void)
 {
-    QVariantMap _res;
-    QVariantMap data = getPropertiesDump().toVariantMap();
-    QVariantMap m = data["properties"].toMap();
-    foreach(const QString &keyprop, m.keys())
+    QVariantMap result;
+    QVariantMap propertiesResult;
+    QVariantMap props = getPropertiesDump().toVariantMap();
+    result["globallovs"] = getGlobalLovsDump().toVariantHash();
+
+
+    foreach(const QString &keyprop, props.keys())
     {
-        if (m[keyprop].toMap().contains("hasprofile"))
+        if (props[keyprop].toMap().contains("hasprofile"))
         {
-            if (m[keyprop].toMap()["hasprofile"].toBool())
+            if (props[keyprop].toMap()["hasprofile"].toBool())
             {
                 QVariantMap property;
-                if (m[keyprop].toMap().contains("elements"))
+                if (props[keyprop].toMap().contains("elements"))
                 {
                     QVariantMap element, elements;
-                    foreach(const QString &keyelt, m[keyprop].toMap()["elements"].toMap().keys())
+                    foreach(const QString &keyelt, props[keyprop].toMap()["elements"].toMap().keys())
                     {
-                        if (m[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("value"))
+                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("value"))
                         {
-                            element["value"] = m[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
+                            element["value"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
                         }
-                        if (m[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("min"))
+                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("min"))
                         {
-                            element["min"] = m[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["min"];
+                            element["min"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["min"];
                         }
-                        if (m[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("max"))
+                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("max"))
                         {
-                            element["max"] = m[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["max"];
+                            element["max"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["max"];
                         }
-                        if (m[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("step"))
+                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("step"))
                         {
-                            element["step"] = m[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["step"];
+                            element["step"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["step"];
                         }
-                        if (m[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("gridvalues"))
+                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("gridvalues"))
                         {
-                            element["gridvalues"] = m[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["gridvalues"];
+                            element["gridvalues"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["gridvalues"];
                         }
                         elements[keyelt] = element;
                     }
                     property["elements"] = elements;
                 }
-                _res[keyprop] = property;
+                propertiesResult[keyprop] = property;
             }
 
         }
     }
 
-    return _res;
+    result["properties"] = propertiesResult;
+    return result;
 }
 
 void Datastore::deleteOstProperty(const QString &pPropertyName)

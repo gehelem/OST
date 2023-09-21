@@ -11,20 +11,12 @@
         "elements": {
             "name": {
                 "type": "string",
-                "label": "Name",
+                "label": "",
+                "directedit":true,
                 "value":"default",
-                "listOfValues":{
-                }
-            },
-            "load": {
-                "type": "bool",
-                "label": "Load",
-                "value":false
-            },
-            "refresh": {
-                "type": "bool",
-                "label": "Refresh",
-                "value":false
+                "listOfValues":[],
+                "posticon":"forward",
+                "preicon":"autorenew"
             }
         }
     },
@@ -37,13 +29,11 @@
         "elements": {
             "name": {
                 "type": "string",
-                "label": "Name",
-                "value":"default"
-            },
-            "save": {
-                "type": "bool",
-                "label": "Save as",
-                "value":false
+                "autoupdate":true,
+                "directedit":true,
+                "label": "",
+                "value":"default",
+                "posticon":"save"
             }
         }
     },
