@@ -40,7 +40,7 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
         {
             setConfigurations();
         }
-        if (pEventType == "Fposticon")
+        if ((pEventType == "Fposticon") && (pEventData.contains("load")))
         {
             QVariantMap m = pEventData["load"].toMap()["elements"].toMap();
             QString pp = m.firstKey();
@@ -57,39 +57,29 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                                  prof);
             getProperty("load")->setState(OST::Ok);
         }
+        if ((pEventType == "Fposticon") && (pEventData.contains("saveconf")))
+        {
+            emit mainCtlEvent("saveconf", QString(), getString("saveconf", "name"), QVariantMap());
+            setConfigurations();
+        }
+        if ((pEventType == "Fposticon") && (pEventData.contains("loadconf")))
+        {
+            emit mainCtlEvent("loadconf", QString(), getString("loadconf", "name"), QVariantMap());
+        }
+        if ((pEventType == "Fpreicon") && (pEventData.contains("loadconf")))
+        {
+            setConfigurations();
+        }
         foreach(const QString &keyprop, pEventData.keys())
         {
-            if (pEventData[keyprop].toMap().contains("value"))
-            {
-                QVariant val = pEventData[keyprop].toMap()["value"];
-                //setOstPropertyValue(keyprop, val, true);
-                if (keyprop == "loadconf")
-                {
-                    //setOstPropertyValue("saveconf", val, true);
-                }
-            }
             foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
             {
-                if (keyelt == "name" && keyprop == "loadconf")
-                {
-                    QString val = pEventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toString();
-                    getValueString("loadconf", "name")->setValue(val, true);
-                    getValueString("saveconf", "name")->setValue(val, true);
-                }
-                if (keyelt == "load" && keyprop == "loadconf")
-                {
-                    bool val = pEventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toBool();
-                    if (val) emit mainCtlEvent("loadconf", QString(), getString("loadconf", "name"), QVariantMap());
-                }
-                if (keyelt == "refresh" && keyprop == "loadconf")
-                {
-                    setConfigurations();
-                    getProperty(keyprop)->setState(OST::Busy);
-                }
-                if (keyelt == "save" && keyprop == "saveconf")
+                if (keyelt == "name" && keyprop == "loadconf" && pEventType == "Fsetproperty")
                 {
 
-                    emit mainCtlEvent("saveconf", QString(), getString("saveconf", "value"), QVariantMap());
+                    QString val = pEventData[keyprop].toMap()["elements"].toMap()["name"].toMap()["value"].toString();
+                    getValueString("loadconf", "name")->setValue(val, true);
+                    getValueString("saveconf", "name")->setValue(val, true);
                 }
                 if (keyelt == "kill" && keyprop == "killall")
                 {

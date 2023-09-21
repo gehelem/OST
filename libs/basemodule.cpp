@@ -53,33 +53,33 @@ void Basemodule::setProfile(const QString &pProfileName)
 
 void Basemodule::setProfile(QVariantMap profiledata)
 {
-    //QVariantMap _props = getProperties();
-    foreach(const QString &key, profiledata.keys())
+    QVariantMap props = profiledata["properties"].toMap();
+    foreach(const QString &key, props.keys())
     {
         if (getStore().contains(key))
         {
-            QVariantMap data = profiledata[key].toMap();
+            QVariantMap data = props[key].toMap();
             if (getStore()[key]->hasProfile())
             {
                 //setOstPropertyValue(key, data["value"], true);
                 if (data.contains("elements"))
                 {
-                    foreach(const QString &eltkey, profiledata[key].toMap()["elements"].toMap().keys())
+                    foreach(const QString &eltkey, props[key].toMap()["elements"].toMap().keys())
                     {
-                        setOstElementValue(key, eltkey, profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["value"], true);
+                        setOstElementValue(key, eltkey, props[key].toMap()["elements"].toMap()[eltkey].toMap()["value"], true);
 
-                        if (profiledata[key].toMap()["elements"].toMap()[eltkey].toMap().contains("gridvalues"))
+                        if (props[key].toMap()["elements"].toMap()[eltkey].toMap().contains("gridvalues"))
                         {
                             //setOstElementGrid (key, eltkey, profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["gridvalues"].toList(), true);
                             OST::ValueUpdate v;
                             QVariantMap m;
                             QString a = "cleargrid";
                             getProperty(key)->getValue(eltkey)->accept(&v, a, m);
-                            int size = profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["gridvalues"].toList().size();
+                            int size = props[key].toMap()["elements"].toMap()[eltkey].toMap()["gridvalues"].toList().size();
                             a = "newline";
                             for (int i = 0; i < size; i++)
                             {
-                                m["val"] = profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["gridvalues"].toList()[i];
+                                m["val"] = props[key].toMap()["elements"].toMap()[eltkey].toMap()["gridvalues"].toList()[i];
                                 getProperty(key)->getValue(eltkey)->accept(&v, a, m);
                             }
 
@@ -96,10 +96,10 @@ void Basemodule::setProfiles()
 {
     QVariantMap profs;
     getDbProfiles(getClassName(), profs);
-    getValueString("loadprofile", "value")->lovClear();
+    getValueString("loadprofile", "name")->lovClear();
     for(QVariantMap::const_iterator iter = profs.begin(); iter != profs.end(); ++iter)
     {
-        getValueString("loadprofile", "value")->lovAdd(iter.key(), iter.key());
+        getValueString("loadprofile", "name")->lovAdd(iter.key(), iter.key());
     }
     sendMessage("Available profiles refreshed");
 }
@@ -151,83 +151,61 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
         }
     }
 
+    if ((pEventType == "Fposticon") && (pEventData.contains("saveprofile")) && pEventModule == getModuleName())
+    {
+        getProperty("saveprofile")->setState(OST::Busy);
+        QVariantMap prof = getProfile();
+        if (setDbProfile(getClassName(), getString("saveprofile", "name"), prof))
+        {
+            getProperty("saveprofile")->setState(OST::Ok);
+            sendMessage(getString("saveprofile", "name") + " profile sucessfully saved");
+            emit moduleEvent("modulesavedprofile", getModuleName(), getString("saveprofile", "name"),
+                             QVariantMap());
+        }
+        else
+        {
+            getProperty("saveprofile")->setState(OST::Error);
+            sendWarning("Can't save " + getString("saveprofile", "name") + " profile");
+        }
+        return;
+    }
+
+    if ((pEventType == "Fposticon") && (pEventData.contains("loadprofile")) && pEventModule == getModuleName())
+    {
+        getProperty("loadprofile")->setState(OST::Busy);
+        QVariantMap prof;
+        if (getDbProfile(getClassName(), getString("loadprofile", "name"), prof))
+        {
+            setProfile(prof);
+            getProperty("loadprofile")->setState(OST::Ok);
+            sendMessage(getString("loadprofile", "name") + " profile sucessfully loaded");
+            emit moduleEvent("moduleloadedprofile", getModuleName(), getString("loadprofile", "name"),
+                             QVariantMap());
+            setOstElementValue("saveprofile", "name", getString("loadprofile", "name"), true);
+            sendDump();
+        }
+        else
+        {
+            sendWarning("Can't load " + getString("loadprofile", "name") + " profile");
+            getProperty("loadprofile")->setState(OST::Error);
+        }
+        return;
+
+    }
+
+    if ((pEventType == "Fpreicon") && (pEventData.contains("loadprofile")) && pEventModule == getModuleName())
+    {
+        getProperty("loadprofile")->setState(OST::Busy);
+        setProfiles();
+        getProperty("loadprofile")->setState(OST::Ok);
+        return;
+    }
+
 
     if ((getModuleName() == pEventModule ) && (pEventType == "Fsetproperty") )
     {
         foreach(const QString &keyprop, pEventData.keys())
         {
-            if (keyprop == "loadprofile")
-            {
-                if (pEventData[keyprop].toMap().contains("elements"))
-                {
-                    foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
-                    {
-                        QVariant val = pEventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
-                        if (keyelt == "load" && val.toBool())
-                        {
-                            getProperty(keyprop)->setState(OST::Busy);
-                            QVariantMap prof;
-                            if (getDbProfile(getClassName(), getString("loadprofile", "value"), prof))
-                            {
-                                setProfile(prof);
-                                getProperty(keyprop)->setState(OST::Ok);
-                                sendMessage(getString("loadprofile", "value") + " profile sucessfully loaded");
-                                emit moduleEvent("moduleloadedprofile", getModuleName(), getString("loadprofile", "value"),
-                                                 QVariantMap());
-                                setOstElementValue("saveprofile", "value", getString("loadprofile", "value"), true);
-                                sendDump();
-                            }
-                            else
-                            {
-                                sendWarning("Can't load " + getString("loadprofile", "name") + " profile");
-                                getProperty(keyprop)->setState(OST::Error);
-                            }
-                            setOstElementValue("loadprofile", "load", false, false);
-                            setOstElementValue("loadprofile", "refresh", false, true);
-                            return;
-                        }
-                        if (keyelt == "refresh" && val.toBool())
-                        {
-                            getProperty(keyprop)->setState(OST::Busy);
-
-                            setProfiles();
-                            setOstElementValue("loadprofile", "load", false, false);
-                            setOstElementValue("loadprofile", "refresh", false, false);
-                            getProperty(keyprop)->setState(OST::Ok);
-                            return;
-                        }
-
-                    }
-                }
-            }
-
-            if (keyprop == "saveprofile")
-            {
-
-                foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
-                {
-                    QVariant val = pEventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
-                    if (keyelt == "save"  && val.toBool())
-                    {
-                        getProperty(keyprop)->setState(OST::Busy);
-                        QVariantMap prof = getProfile();
-                        if (setDbProfile(getClassName(), getString("saveprofile", "value"), prof))
-                        {
-                            getProperty(keyprop)->setState(OST::Ok);
-                            sendMessage(getString("saveprofile", "value") + " profile sucessfully saved");
-                            emit moduleEvent("modulesavedprofile", getModuleName(), getString("saveprofile", "value"),
-                                             QVariantMap());
-                        }
-                        else
-                        {
-                            getProperty(keyprop)->setState(OST::Error);
-                            sendWarning("Can't save " + getString("saveprofile", "value") + " profile");
-                        }
-                    }
-                }
-                return;
-            }
-
             if (keyprop == "moduleactions")
             {
                 foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
