@@ -19,7 +19,7 @@
 #include "math.h"
 #include "dms.h"
 #include "bayer.h"
-
+#include "libs/model/value/valueimg.h"
 
 
 class fileio : public QObject
@@ -99,7 +99,7 @@ class fileio : public QObject
         {
             return m_HistogramFrequency[channel];
         }
-
+        OST::ImgData ImgStats();
 
     private:
         QString file;
