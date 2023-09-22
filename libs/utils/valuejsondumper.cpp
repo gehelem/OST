@@ -179,47 +179,49 @@ void ValueJsonDumper::visit(ValueImg *pValue)
     imgdata["urlthumbnail"] = pValue->value().mUrlThumbnail;
     imgdata["urloverlay"] = pValue->value().mUrlOverlay;
     imgdata["channels"] = pValue->value().channels;
+    imgdata["width"] = pValue->value().width;
+    imgdata["height"] = pValue->value().height;
+    imgdata["snr"] = pValue->value().SNR;
+
     QJsonArray arr;
     arr = QJsonArray();
     for (int i = 0; i < pValue->value().channels; i++)
     {
-        arr.append(qlonglong(pValue->value().min[i]));
+        arr.append(pValue->value().min[i]);
     }
     imgdata["min"] = arr;
 
     arr = QJsonArray();
     for (int i = 0; i < pValue->value().channels; i++)
     {
-        arr.append(qlonglong(pValue->value().max[i]));
+        arr.append(pValue->value().max[i]);
     }
     imgdata["max"] = arr;
 
     arr = QJsonArray();
     for (int i = 0; i < pValue->value().channels; i++)
     {
-        arr.append(qlonglong(pValue->value().mean[i]));
+        arr.append(pValue->value().mean[i]);
     }
     imgdata["mean"] = arr;
 
     arr = QJsonArray();
     for (int i = 0; i < pValue->value().channels; i++)
     {
-        arr.append(qlonglong(pValue->value().median[i]));
+        arr.append(pValue->value().median[i]);
     }
     imgdata["median"] = arr;
 
     arr = QJsonArray();
     for (int i = 0; i < pValue->value().channels; i++)
     {
-        arr.append(qlonglong(pValue->value().stddev[i]));
+        arr.append(pValue->value().stddev[i]);
     }
     imgdata["stddev"] = arr;
 
 
 
-    imgdata["width"] = qlonglong(pValue->value().width);
-    imgdata["height"] = qlonglong(pValue->value().height);
-    imgdata["snr"] = qlonglong(pValue->value().SNR);
+
     json["value"] = imgdata;
     mResult = json;
 }
