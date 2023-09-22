@@ -178,6 +178,7 @@ void ValueJsonDumper::visit(ValueImg *pValue)
     imgdata["urlfits"] = pValue->value().mUrlFits;
     imgdata["urlthumbnail"] = pValue->value().mUrlThumbnail;
     imgdata["urloverlay"] = pValue->value().mUrlOverlay;
+    imgdata["channels"] = pValue->value().channels;
     QJsonArray arr;
     arr = QJsonArray();
     for (int i = 0; i < pValue->value().channels; i++)
