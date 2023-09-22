@@ -15,7 +15,7 @@
                 "directedit":true,
                 "value":"default",
                 "listOfValues":[],
-                "posticon":"forward",
+                "posticon":"redo",
                 "preicon":"autorenew"
             }
         }

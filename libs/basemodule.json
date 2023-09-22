@@ -83,7 +83,7 @@
                 "type": "string",
                 "label": "",
                 "value":"default",
-                "posticon":"forward",
+                "posticon":"redo",
                 "preicon":"autorenew"
             }
 
