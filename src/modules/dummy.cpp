@@ -1,4 +1,4 @@
-#include "dummy.h"
+﻿#include "dummy.h"
 
 Dummy *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
 {
@@ -312,7 +312,7 @@ void Dummy::newBLOB(INDI::PropertyBlob pblob)
         QImage rawImage = _image->getRawQImage();
         rawImage.save(getWebroot() + "/" + getModuleName() + QString(pblob.getDeviceName()) + ".jpeg", "JPG", 100);
         //setOstPropertyAttribute("testimage", "URL", getModuleName() + QString(pblob.getDeviceName()) + ".jpeg", true);
-        OST::ImgData dta;
+        OST::ImgData dta = _image->ImgStats();
         dta.mUrlJpeg = getModuleName() + QString(pblob.getDeviceName()) + ".jpeg";
         dta.mUrlFits = getModuleName() + QString(pblob.getDeviceName()) + ".FITS";
         getValueImg("testimage", "image1")->setValue(dta, true);
