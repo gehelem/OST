@@ -1494,3 +1494,25 @@ void fileio::sendMessage(const QString &pMessage)
     debug.noquote();
     debug << messageWithDateTime;
 }
+OST::ImgData fileio::ImgStats()
+{
+    OST::ImgData dta;
+    dta.dataType = stats.dataType;
+    dta.SNR = stats.SNR;
+    dta.bytesPerPixel = stats.bytesPerPixel;
+    dta.height = stats.height;
+    dta.width = stats.width;
+    dta.channels = stats.channels;
+    dta.ndim = stats.ndim;
+    dta.samples_per_channel = stats.samples_per_channel;
+    dta.size = stats.size;
+    for (int i = 0; i < stats.channels; i++)
+    {
+        dta.min[i] = stats.min[i];
+        dta.max[i] = stats.max[i];
+        dta.mean[i] = stats.mean[i];
+        dta.stddev[i] = stats.stddev[i];
+        dta.median[i] = stats.median[i];
+    }
+    return dta;
+}
