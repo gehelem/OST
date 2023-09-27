@@ -69,8 +69,8 @@
     },
     "devices": {
         "hasprofile":true,
-        "devcat": "Module",
-        "group": "Indi",
+        "devcat": "Parameters",
+        "group": "",
         "order":"06",
         "permission": 2,
         "label": "Devices",
@@ -130,7 +130,25 @@
             }
 
         }
+    },
+    "actions": {
+        "devcat": "Control",
+        "order":"Control000",
+        "group": "",
+        "permission": 2,
+        "rule":1,
+        "label": "Actions",
+        "elements": {
+        }
+    },
+    "parms": {
+        "devcat": "Parameters",
+        "group": "",
+        "permission": 2,
+        "hasprofile":true,
+        "label": "Parameters",
+        "elements": {
+        }
     }
-
 }
 }

@@ -47,9 +47,40 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         bool createDeviceProperty(const QString &key, const QString &label, const QString &level1,
                                   const QString &level2, const QString &order, INDI::BaseDevice::DRIVER_INTERFACE interface);
         bool refreshDeviceslovs(QString deviceName);
+        bool defineMeAsFocuser();
+        bool defineMeAsGuider();
+        bool defineMeAsSequencer();
+        bool defineMeAsImager();
+        bool defineMeAsNavigator();
+        bool isFocuser()
+        {
+            return mIsFocuser;
+        }
+        bool isGuider()
+        {
+            return mIsGuider;
+        }
+        bool isSequencer()
+        {
+            return mIsSequencer;
+        }
+        bool isImager()
+        {
+            return mIsImager;
+        }
+        bool isNavigator()
+        {
+            return mIsNavigator;
+        }
+
     private:
         void OnDispatchToIndiExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                            const QVariantMap &eventData) override;
+        bool mIsFocuser = false;
+        bool mIsGuider = false;
+        bool mIsSequencer = false;
+        bool mIsImager = false;
+        bool mIsNavigator = false;
     signals:
         void askedFrameReset(QString devicename);
 }
