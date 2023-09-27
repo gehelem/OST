@@ -693,3 +693,150 @@ bool IndiModule::refreshDeviceslovs(QString deviceName)
     }
     return true;
 }
+bool IndiModule::defineMeAsFocuser()
+{
+    defineMeAsImager();
+    OST::PropertyMulti* pm = getProperty("devices");
+    OST::ValueString* s = new  OST::ValueString("Focus camera", "", "");
+    s->setGlobalLov("DRIVER_INTERFACE-CCD_INTERFACE");
+    s->setDirectEdit(true);
+    s->setAutoUpdate(true);
+    pm->addValue("focuscamera", s);
+    s = new  OST::ValueString("Focuser", "", "");
+    s->setGlobalLov("DRIVER_INTERFACE-FOCUSER_INTERFACE");
+    s->setDirectEdit(true);
+    s->setAutoUpdate(true);
+    pm->addValue("focusfocuser", s);
+    s = new  OST::ValueString("Focus filter", "", "");
+    s->setGlobalLov("DRIVER_INTERFACE-FILTER_INTERFACE");
+    s->setDirectEdit(true);
+    s->setAutoUpdate(true);
+    pm->addValue("focusfilter", s);
+
+    pm = getProperty("actions");
+    pm->setRule(OST::SwitchsRule::AtMostOne);
+    OST::ValueBool* b = new  OST::ValueBool("Abort focus", "", "");
+    b->setValue(false, false);
+    pm->addValue("abortfocus", b);
+    b = new  OST::ValueBool("Autofocus", "", "");
+    b->setValue(false, false);
+    pm->addValue("autofocus", b);
+    b = new  OST::ValueBool("Loop", "", "");
+    b->setValue(false, false);
+    pm->addValue("loop", b);
+    mIsFocuser = true;
+    return true;
+
+}
+bool IndiModule::defineMeAsGuider()
+{
+    defineMeAsImager();
+    OST::PropertyMulti* pm = getProperty("devices");
+    OST::ValueString* s = new  OST::ValueString("Guide camera", "", "");
+    s->setGlobalLov("DRIVER_INTERFACE-CCD_INTERFACE");
+    s->setDirectEdit(true);
+    s->setAutoUpdate(true);
+    pm->addValue("guidecamera", s);
+    s = new  OST::ValueString("Guider", "", "");
+    s->setGlobalLov("DRIVER_INTERFACE-GUIDER_INTERFACE");
+    s->setDirectEdit(true);
+    s->setAutoUpdate(true);
+    pm->addValue("guider", s);
+
+    pm = getProperty("actions");
+    pm->setRule(OST::SwitchsRule::AtMostOne);
+    OST::ValueBool* b = new  OST::ValueBool("Abort guider", "", "");
+    b->setValue(false, false);
+    pm->addValue("abortguider", b);
+    b = new  OST::ValueBool("Guide", "", "");
+    b->setValue(false, false);
+    pm->addValue("guide", b);
+    b = new  OST::ValueBool("Calibrate", "", "");
+    b->setValue(false, false);
+    pm->addValue("calibrate", b);
+    mIsGuider = true;
+    return true;
+
+}
+bool IndiModule::defineMeAsSequencer()
+{
+    defineMeAsImager();
+    OST::PropertyMulti* pm = getProperty("devices");
+    OST::ValueString* s = new  OST::ValueString("Sequencer camera", "", "");
+    s->setGlobalLov("DRIVER_INTERFACE-CCD_INTERFACE");
+    s->setDirectEdit(true);
+    s->setAutoUpdate(true);
+    pm->addValue("sequencercamera", s);
+    s = new  OST::ValueString("Sequencer filter", "", "");
+    s->setGlobalLov("DRIVER_INTERFACE-FILTER_INTERFACE");
+    s->setAutoUpdate(true);
+    s->setDirectEdit(true);
+    pm->addValue("sequencerfilter", s);
+
+
+    pm = getProperty("actions");
+    pm->setRule(OST::SwitchsRule::AtMostOne);
+    OST::ValueBool* b = new  OST::ValueBool("Abort sequence", "", "");
+    b->setValue(false, false);
+    pm->addValue("abortsequence", b);
+    b = new  OST::ValueBool("Start sequence", "", "");
+    b->setValue(false, false);
+    pm->addValue("startsequence", b);
+    mIsSequencer = true;
+    return true;
+
+}
+bool IndiModule::defineMeAsImager()
+{
+    OST::PropertyMulti* dynprop = new OST::PropertyMulti("image", "Image", OST::Permission::WriteOnly, "Control",
+            "", "Control010", false, false);
+    OST::ValueImg* img = new OST::ValueImg("", "", "");
+    dynprop->addValue("image", img);
+    createProperty("image", dynprop);
+    mIsImager = true;
+    return true;
+
+}
+bool IndiModule::defineMeAsNavigator()
+{
+    defineMeAsImager();
+    OST::PropertyMulti* pm = getProperty("devices");
+    OST::ValueString* s = new  OST::ValueString("Navigator camera", "", "");
+    s->setGlobalLov("DRIVER_INTERFACE-CCD_INTERFACE");
+    s->setDirectEdit(true);
+    s->setAutoUpdate(true);
+    pm->addValue("navigatorcamera", s);
+    s = new  OST::ValueString("Navigator mount", "", "");
+    s->setGlobalLov("DRIVER_INTERFACE-TELESCOPE_INTERFACE");
+    s->setAutoUpdate(true);
+    s->setDirectEdit(true);
+    pm->addValue("navigatormount", s);
+
+
+    pm = getProperty("actions");
+    pm->setRule(OST::SwitchsRule::AtMostOne);
+    OST::ValueBool* b = new  OST::ValueBool("Abort navigator", "", "");
+    b->setValue(false, false);
+    pm->addValue("abortnavigator", b);
+    b = new  OST::ValueBool("Center target", "", "");
+    b->setValue(false, false);
+    pm->addValue("gototarget", b);
+
+    pm = getProperty("parms");
+    s = new  OST::ValueString("Target name", "50", "");
+    s->setDirectEdit(true);
+    s->setAutoUpdate(true);
+    pm->addValue("targetname", s);
+    OST::ValueFloat* f = new  OST::ValueFloat("Target RA", "51", "");
+    f->setDirectEdit(true);
+    f->setAutoUpdate(true);
+    pm->addValue("targetra", f);
+    f = new  OST::ValueFloat("Target DEC", "52", "");
+    f->setDirectEdit(true);
+    f->setAutoUpdate(true);
+    pm->addValue("targetde", f);
+
+    mIsNavigator = true;
+    return true;
+
+}

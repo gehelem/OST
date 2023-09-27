@@ -287,31 +287,7 @@
         "permission": 2,
         "label": "Mixed types - read/write"
     },
-    "devices": {
-        "hasprofile":true,
-        "devcat": "Examples",
-        "group": "Images",
-        "permission": 2,
-        "label": "Devices",
-        "elements": {
-            "camera": {
-                "autoupdate":true,
-                "type": "string",
-                "label": "Camera",
-                "value": "CCD Simulator",
-                "listOfValues":"DRIVER_INTERFACE-CCD_INTERFACE"
-            },
-            "mount": {
-                "autoupdate":true,
-                "type": "string",
-                "label": "Mount",
-                "value": "Telescope Simulator",
-                "listOfValues":"DRIVER_INTERFACE-TELESCOPE_INTERFACE"
-            }
-
-        }
-    },
-    "actions": {
+    "actions2": {
         "devcat": "Examples",
         "rule":1,
         "elements": {

@@ -48,7 +48,6 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     setOstElementValue("mixedRW", "n2", 11, false);
     setOstElementValue("mixedRW", "t1", "Mixed text value", true);
     //saveAttributesToFile("dummy.json");
-    _camera = getString("devices", "camera");
 
     //foreach(QString key, getAvailableModuleLibs().keys())
     //{
@@ -103,6 +102,10 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     dynprop->addValue("dynbool", dynbool);
     dynbool->setValue(false, false);
 
+    defineMeAsFocuser();
+    defineMeAsGuider();
+    defineMeAsSequencer();
+    defineMeAsNavigator();
 
 }
 
@@ -149,16 +152,16 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                 }
                 if (keyprop == "devices")
                 {
-                    if (keyelt == "camera")
+                    if (keyelt == "focusercamera")
                     {
                         if (setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], false))
                         {
                             getProperty(keyprop)->setState(OST::Ok);
-                            _camera = getString("devices", "camera");
+                            _camera = getString("devices", "focusercamera");
                         }
                     }
                 }
-                if (keyprop == "actions")
+                if (keyprop == "actions2")
                 {
                     if (keyelt == "blob")
                     {
@@ -294,7 +297,7 @@ void Dummy::newBLOB(INDI::PropertyBlob pblob)
         _image = new fileio();
         _image->loadBlob(pblob);
 
-        getProperty("actions")->setState(OST::Ok);
+        getProperty("actions2")->setState(OST::Ok);
         setOstElementValue("imagevalues", "width", _image->getStats().width, false);
         setOstElementValue("imagevalues", "height", _image->getStats().height, false);
         setOstElementValue("imagevalues", "min", _image->getStats().min[0], false);
@@ -318,7 +321,7 @@ void Dummy::newBLOB(INDI::PropertyBlob pblob)
         getValueImg("testimage", "image1")->setValue(dta, true);
 
     }
-    getProperty("actions")->setState(OST::Ok);
+    getProperty("actions2")->setState(OST::Ok);
 
 
 }
@@ -337,7 +340,7 @@ void Dummy::updateProperty(INDI::Property property)
 
 void Dummy::OnSucessSEP()
 {
-    getProperty("actions")->setState(OST::Ok);
+    getProperty("actions2")->setState(OST::Ok);
     setOstElementValue("imagevalues", "hfravg", _solver.HFRavg, false);
     setOstElementValue("imagevalues", "starscount", _solver.stars.size(), true);
     disconnect(&_solver, &Solver::successSEP, this, &Dummy::OnSucessSEP);
@@ -349,14 +352,14 @@ void Dummy::OnSucessSolve()
     if (_solver.stellarSolver->failed())
     {
         sendMessage("Solver failed");
-        getProperty("actions")->setState(OST::Error);
+        getProperty("actions2")->setState(OST::Error);
         getProperty("imagevalues")->setState(OST::Error);
         getValueFloat("imagevalues", "solRA")->setValue(0, false);
         getValueFloat("imagevalues", "solDEC")->setValue(0, true);
     }
     else
     {
-        getProperty("actions")->setState(OST::Ok);
+        getProperty("actions2")->setState(OST::Ok);
         getProperty("imagevalues")->setState(OST::Ok);
         getValueFloat("imagevalues", "solRA")->setValue(_solver.stellarSolver->getSolution().ra, false);
         getValueFloat("imagevalues", "solDEC")->setValue(_solver.stellarSolver->getSolution().dec, true);
