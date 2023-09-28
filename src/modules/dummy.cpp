@@ -242,6 +242,16 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                         }
                     }
                 }
+                if (keyprop == "lovevents")
+                {
+                    if (keyelt == "btn")
+                    {
+                        getValueString("lovevents", "code")->lovClear();
+                        getValueString("lovevents", "code")->lovAdd("V1", "Value1");
+                        getValueString("lovevents", "code")->lovAdd("V2", "Value2");
+                    }
+                }
+
 
             }
 

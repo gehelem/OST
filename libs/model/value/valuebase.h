@@ -61,8 +61,7 @@ class ValueBase: public QObject
         void valueChanged(OST::ValueBase*);
         void listChanged(OST::ValueBase*);
         void sendMessage(MsgLevel, QString);
-
-
+        void lovChanged(OST::ValueBase*);
 
 };
 

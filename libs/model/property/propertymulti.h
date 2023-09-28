@@ -76,6 +76,7 @@ class PropertyMulti: public PropertyBase
             mValues[key] = pValue;
             connect(mValues[key], &ValueBase::valueChanged, this, &PropertyMulti::OnValueChanged);
             connect(mValues[key], &ValueBase::listChanged, this, &PropertyMulti::OnListChanged);
+            connect(mValues[key], &ValueBase::lovChanged, this, &PropertyMulti::OnLovChanged);
             connect(mValues[key], &ValueBase::sendMessage, this, &PropertyMulti::OnMessage);
         }
         void push();
@@ -89,6 +90,10 @@ class PropertyMulti: public PropertyBase
             emit valueChanged(this);
         }
         void OnListChanged(ValueBase*)
+        {
+            emit propertyEvent("ap", key(), this);
+        }
+        void OnLovChanged(ValueBase*)
         {
             emit propertyEvent("ap", key(), this);
         }
