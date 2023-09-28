@@ -238,8 +238,6 @@
         "permission": 2,
         "label": "Any"
     }
-
-
     ,
     "mixedRW": {
         "hasprofile":true,
@@ -649,6 +647,31 @@
                 "label": "DEC",
                 "order":"30",
                 "value":0
+            }
+        }
+    },
+    "lovevents":{
+        "devcat": "Examples",
+        "order": "00",
+        "group": "List of values",
+        "permission": 2,
+        "rule":2,
+        "label": "Test list of values",
+        "elements": {
+            "code": {
+                "type": "string",
+                "label": "Code",
+                "order":"10",
+                "gridvalues":[],
+                "autoupdate":true,
+                "directedit":true,
+                "value":""
+            },
+            "btn": {
+                "type": "bool",
+                "label": "Code",
+                "order":"11",
+                "value":false
             }
         }
     }
