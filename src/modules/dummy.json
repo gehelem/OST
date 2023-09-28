@@ -315,87 +315,6 @@
         "permission": 2,
         "label": "Actions"
     },
-    "imagevalues": {
-        "type": "multi",
-        "devcat": "Examples",
-        "rule":0,
-        "elements": {
-                "width": {
-                    "type": "int",
-                    "label": "Width",
-                    "value":0
-                },
-                "height": {
-                    "type": "int",
-                    "label": "Height",
-                    "value":0
-                },
-                "min": {
-                    "type": "int",
-                    "label": "Min ADU",
-                    "value":0
-                },
-                "max": {
-                    "type": "int",
-                    "label": "Max ADU",
-                    "value":0
-                },
-                "mean": {
-                    "type": "float",
-                    "label": "Mean ADU",
-                    "value":0
-                },
-                "median": {
-                    "type": "int",
-                    "label": "Median ADU",
-                    "value":0
-                },
-                "stddev": {
-                    "type": "float",
-                    "label": "StdDev",
-                    "value":0
-                },
-                "snr": {
-                    "type": "float",
-                    "label": "SNR",
-                    "step": 0.0001,
-                    "value":0
-                },
-                "starscount": {
-                    "type": "int",
-                    "label": "Stars found",
-                    "value":0
-                },
-                "hfravg": {
-                    "type": "float",
-                    "label": "Average HFR",
-                    "value":0
-                },
-                "solRA": {
-                    "type": "float",
-                    "label": "Solver RA",
-                    "value":0
-                },
-                "solDEC": {
-                    "type": "float",
-                    "label": "Solver DEC",
-                    "value":0
-                },
-                "mountRA": {
-                    "type": "float",
-                    "label": "Mount RA",
-                    "value":0
-                },
-                "mountDEC": {
-                    "type": "float",
-                    "label": "Mount DEC",
-                    "value":0
-                }
-        },
-        "group": "Images",
-        "permission": 0,
-        "label": "Results"
-    },
     "parameters": {
         "devcat": "Examples",
         "group": "Images",
@@ -404,6 +323,7 @@
         "elements": {
             "exposure": {
                 "autoupdate":true,
+                "directedit":true,
                 "type": "float",
                 "label": "Exposure",
                 "value":10,
@@ -414,6 +334,7 @@
             },
             "indexfolderpath": {
                 "autoupdate":true,
+                "directedit":true,
                 "type": "string",
                 "label": "Astrometry index folder path",
                 "value":"/usr/share/astrometry/"

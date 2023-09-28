@@ -60,6 +60,9 @@ typedef struct ImgData
     uint8_t channels { 1 };             // Mono Images have 1 channel, RGB has 3 channels
     double HFRavg{ 0 };                 // Average HFR
     double starsCount{ 0 };             // Stars count
+    bool isSolved = false;
+    double solverRA{ 0 };
+    double solverDE{ 0 };
 
 } ImgData;
 

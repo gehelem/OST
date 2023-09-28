@@ -17,8 +17,8 @@ void Solver::ResetSolver(FITSImage::Statistic &stats, uint8_t *m_ImageBuffer)
     HFRavg = 99;
     delete stellarSolver;
     stellarSolver = new StellarSolver(stats, m_ImageBuffer);
-    stellarSolver->moveToThread(this->thread());
-    stellarSolver->setParent(this);
+    //stellarSolver->moveToThread(this->thread());
+    //stellarSolver->setParent(this);
     stellarSolverProfiles = StellarSolver::getBuiltInProfiles();
 }
 
