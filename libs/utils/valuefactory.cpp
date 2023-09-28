@@ -197,6 +197,9 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
             if (pData.contains("snr")) dta.SNR = pData["snr"].toDouble();
             if (pData.contains("hfravg")) dta.HFRavg = pData["hfravg"].toDouble();
             if (pData.contains("stars")) dta.starsCount = pData["stars"].toDouble();
+            if (pData.contains("issolved")) dta.isSolved = pData["issolved"].toBool();
+            if (pData.contains("solverra")) dta.solverRA = pData["solverra"].toDouble();
+            if (pData.contains("solverde")) dta.solverDE = pData["solverde"].toDouble();
 
             pValue->setValue(dta, false);
             return pValue;

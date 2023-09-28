@@ -184,6 +184,9 @@ void ValueJsonDumper::visit(ValueImg *pValue)
     imgdata["snr"] = pValue->value().SNR;
     imgdata["hfravg"] = pValue->value().HFRavg;
     imgdata["stars"] = pValue->value().starsCount;
+    imgdata["issolved"] = pValue->value().isSolved;
+    imgdata["solverra"] = pValue->value().solverRA;
+    imgdata["solverde"] = pValue->value().solverDE;
 
     QJsonArray arr;
     arr = QJsonArray();
