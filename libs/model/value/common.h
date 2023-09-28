@@ -58,6 +58,9 @@ typedef struct ImgData
     uint16_t width { 0 };               // width of the image in pixels
     uint16_t height { 0 };              // height of the image in pixels
     uint8_t channels { 1 };             // Mono Images have 1 channel, RGB has 3 channels
+    double HFRavg{ 0 };                 // Average HFR
+    double starsCount{ 0 };             // Stars count
+
 } ImgData;
 
 typedef enum
