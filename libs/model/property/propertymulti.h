@@ -79,6 +79,17 @@ class PropertyMulti: public PropertyBase
             connect(mValues[key], &ValueBase::lovChanged, this, &PropertyMulti::OnLovChanged);
             connect(mValues[key], &ValueBase::sendMessage, this, &PropertyMulti::OnMessage);
         }
+        void deleteValue(QString key)
+        {
+            if (!mValues.contains(key))
+            {
+                qDebug() << label() << " - deleteValue - element " << key << " doesn't exist";
+                return;
+            }
+            mValues.remove(key);
+            emit propertyEvent("ap", key, this);
+
+        }
         void push();
         void newLine(const QVariantMap &pValues);
         void deleteLine(const int i);
