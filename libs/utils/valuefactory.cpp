@@ -195,6 +195,8 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
             if (pData.contains("mean")) dta.mean[0] = pData["mean"].toList()[0].toDouble();
             if (pData.contains("stddev")) dta.stddev[0] = pData["stddev"].toList()[0].toDouble();
             if (pData.contains("snr")) dta.SNR = pData["snr"].toDouble();
+            if (pData.contains("hfravg")) dta.HFRavg = pData["hfravg"].toDouble();
+            if (pData.contains("stars")) dta.starsCount = pData["stars"].toDouble();
 
             pValue->setValue(dta, false);
             return pValue;
