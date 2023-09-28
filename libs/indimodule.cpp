@@ -821,8 +821,6 @@ bool IndiModule::defineMeAsNavigator()
     b = new  OST::ValueBool("Center target", "", "");
     b->setValue(false, false);
     pm->addValue("gototarget", b);
-
-    pm = getProperty("parms");
     s = new  OST::ValueString("Target name", "50", "");
     s->setDirectEdit(true);
     s->setAutoUpdate(true);
