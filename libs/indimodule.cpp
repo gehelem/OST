@@ -156,10 +156,6 @@ bool IndiModule::connectAllDevices()
     int err = 0;
     std::vector<INDI::BaseDevice> devs = getDevices();
 
-    createDeviceProperty("camera", "Camera", "Module", "Indi", "999", INDI::BaseDevice::CCD_INTERFACE);
-    createDeviceProperty("focuser", "Focuser", "Module", "Indi", "999", INDI::BaseDevice::FOCUSER_INTERFACE);
-    createDeviceProperty("st4", "Pulses (ST4)", "Module", "Indi", "999", INDI::BaseDevice::GUIDER_INTERFACE);
-
     for(std::size_t i = 0; i < devs.size(); i++)
     {
         INDI::PropertySwitch svp = devs[i].getSwitch("CONNECTION");
@@ -788,11 +784,56 @@ bool IndiModule::defineMeAsSequencer()
 }
 bool IndiModule::defineMeAsImager()
 {
-    OST::PropertyMulti* dynprop = new OST::PropertyMulti("image", "Image", OST::Permission::WriteOnly, "Control",
-            "", "Control010", false, false);
-    OST::ValueImg* img = new OST::ValueImg("", "", "");
-    dynprop->addValue("image", img);
-    createProperty("image", dynprop);
+    if (!getStore().contains("image"))
+    {
+        OST::PropertyMulti* dynprop = new OST::PropertyMulti("image", "Image", OST::Permission::WriteOnly, "Control",
+                "", "Control010", false, false);
+        createProperty("image", dynprop);
+    }
+
+    if (getStore().contains("image"))
+    {
+        if (!(getStore()["image"]->getValues().contains("image")))
+        {
+            OST::PropertyMulti * pm = getProperty("image");
+            OST::ValueImg* img = new OST::ValueImg("", "", "");
+            pm->addValue("image", img);
+        }
+
+    }
+
+    OST::PropertyMulti * pm = getProperty("parms");
+    pm->setRule(OST::SwitchsRule::Any);
+
+    if (!getStore()["parms"]->getValues().contains("exposure"))
+    {
+        OST::ValueFloat* f = new  OST::ValueFloat("Exposure", "200", "");
+        f->setValue(0, false);
+        f->setDirectEdit(true);
+        f->setAutoUpdate(true);
+        pm->addValue("exposure", f);
+    }
+
+
+
+    if (!getStore()["parms"]->getValues().contains("gain"))
+    {
+        OST::ValueInt* i  = new  OST::ValueInt("Gain", "205", "");
+        i->setValue(0, false);
+        i->setDirectEdit(true);
+        i->setAutoUpdate(true);
+        pm->addValue("gain", i);
+    }
+
+    if (!getStore()["parms"]->getValues().contains("offset"))
+    {
+        OST::ValueInt* i  = new  OST::ValueInt("Offset", "210", "");
+        i->setValue(0, false);
+        i->setDirectEdit(true);
+        i->setAutoUpdate(true);
+        pm->addValue("offset", i);
+    }
+
     mIsImager = true;
     return true;
 
