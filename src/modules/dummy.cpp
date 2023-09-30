@@ -219,10 +219,10 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                                 _solver.ResetSolver(stats, _image->getImageBuffer());
                                 QStringList folders;
                                 folders.append(getString("parameters", "indexfolderpath"));
-                                _solver.stellarSolver->setIndexFolderPaths(folders);
+                                _solver.stellarSolver.setIndexFolderPaths(folders);
                                 connect(&_solver, &Solver::successSolve, this, &Dummy::OnSucessSolve);
                                 connect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
-                                _solver.stellarSolver->setSearchPositionInDegrees(ra * 360 / 24, dec);
+                                _solver.stellarSolver.setSearchPositionInDegrees(ra * 360 / 24, dec);
                                 _solver.SolveStars(_solver.stellarSolverProfiles[0]);
                             }
                         }
@@ -350,7 +350,7 @@ void Dummy::OnSucessSEP()
 }
 void Dummy::OnSucessSolve()
 {
-    if (_solver.stellarSolver->failed())
+    if (_solver.stellarSolver.failed())
     {
         sendMessage("Solver failed");
         getProperty("actions2")->setState(OST::Error);
@@ -365,8 +365,8 @@ void Dummy::OnSucessSolve()
         getProperty("actions2")->setState(OST::Ok);
         OST::ImgData dta = getValueImg("testimage", "image1")->value();
         dta.isSolved = true;
-        dta.solverRA = _solver.stellarSolver->getSolution().ra;
-        dta.solverDE = _solver.stellarSolver->getSolution().dec;
+        dta.solverRA = _solver.stellarSolver.getSolution().ra;
+        dta.solverDE = _solver.stellarSolver.getSolution().dec;
         getValueImg("testimage", "image1")->setValue(dta, true);
 
 
@@ -423,5 +423,5 @@ void Dummy::updateSearchList(void)
 }
 void Dummy::newDevice(INDI::BaseDevice bd)
 {
-
+    Q_UNUSED(bd);
 }

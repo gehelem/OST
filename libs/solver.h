@@ -16,7 +16,7 @@ class Solver : public QObject
         ~Solver();
 
         // Stellasolver stuff
-        QPointer<StellarSolver> stellarSolver;
+        StellarSolver stellarSolver;
         QList<SSolver::Parameters> stellarSolverProfiles;
 
         QList<FITSImage::Star> stars;
@@ -43,7 +43,6 @@ class Solver : public QObject
             FITSImage::getParityText(FITSImage::Parity::BOTH);
         }
         void sendMessage(const QString &pMessage);
-
 
 };
 #endif
