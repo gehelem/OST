@@ -1405,8 +1405,9 @@ void fileio::calculateMedian()
 template <typename T>
 void fileio::CalcHisto(int size)
 {
-    double dsize = size;
-    if (dsize >= 256) dsize = 256;
+    double dsize = size - 1;
+    if (dsize >= 1023) dsize = 1023;
+    if (dsize <= 0) dsize = 31;
 
     m_CumulativeFrequency.resize(3);
     m_HistogramBinWidth.resize(3);
