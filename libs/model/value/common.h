@@ -63,7 +63,7 @@ typedef struct ImgData
     bool isSolved = false;
     double solverRA{ 0 };
     double solverDE{ 0 };
-
+    QVector<double> histogram[3];
 } ImgData;
 
 typedef enum

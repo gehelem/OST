@@ -169,6 +169,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                         {
                             connectIndi();
                             getProperty(keyprop)->setState(OST::Ok);
+                            _camera = getString("devices", "focuscamera");
                             connectDevice(_camera);
                             setBLOBMode(B_ALSO, _camera.toStdString().c_str(), nullptr);
                             enableDirectBlobAccess(_camera.toStdString().c_str(), nullptr);
@@ -302,7 +303,7 @@ void Dummy::newBLOB(INDI::PropertyBlob pblob)
 
         delete _image;
         _image = new fileio();
-        _image->loadBlob(pblob);
+        _image->loadBlob(pblob, 0);
 
         getProperty("actions2")->setState(OST::Ok);
         QList<fileio::Record> rec = _image->getRecords();
