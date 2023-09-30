@@ -169,6 +169,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                         {
                             connectIndi();
                             getProperty(keyprop)->setState(OST::Ok);
+                            _camera = getString("devices", "focuscamera");
                             connectDevice(_camera);
                             setBLOBMode(B_ALSO, _camera.toStdString().c_str(), nullptr);
                             enableDirectBlobAccess(_camera.toStdString().c_str(), nullptr);
