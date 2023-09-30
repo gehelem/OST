@@ -224,8 +224,21 @@ void ValueJsonDumper::visit(ValueImg *pValue)
     }
     imgdata["stddev"] = arr;
 
+    arr = QJsonArray();
 
-
+    for (int i = 0; i <  pValue->value().channels; i++  )
+    {
+        QJsonArray oneChannel = QJsonArray();
+        QJsonArray freq = QJsonArray();
+        for (int j = 0; j < pValue->value().histogram[0].size(); j++  )
+        {
+            freq = QJsonArray();
+            freq.append(pValue->value().histogram[i][j]);
+            oneChannel.append(freq);
+        }
+        arr.append(oneChannel);
+    }
+    imgdata["histogram"] = arr;
 
     json["value"] = imgdata;
     mResult = json;

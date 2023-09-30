@@ -1515,6 +1515,7 @@ OST::ImgData fileio::ImgStats()
         dta.mean[i] = stats.mean[i];
         dta.stddev[i] = stats.stddev[i];
         dta.median[i] = stats.median[i];
+        dta.histogram[i] = getHistogramFrequency(i);
     }
     return dta;
 }
