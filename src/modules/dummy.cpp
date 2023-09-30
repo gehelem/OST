@@ -302,7 +302,7 @@ void Dummy::newBLOB(INDI::PropertyBlob pblob)
 
         delete _image;
         _image = new fileio();
-        _image->loadBlob(pblob);
+        _image->loadBlob(pblob, 64);
 
         getProperty("actions2")->setState(OST::Ok);
         QList<fileio::Record> rec = _image->getRecords();
