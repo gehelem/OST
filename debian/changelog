@@ -1,3 +1,9 @@
+ostserver (1.0-2) UNRELEASED; urgency=medium
+
+  * Working release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- gilles <gilles@joag.fr>  Thu, 01 Oct 2023 10:57:00 +0100
+
 ostserver (1.0-1) UNRELEASED; urgency=medium
 
   * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
