@@ -90,6 +90,8 @@ class Datastore : public Baseroot
             mStore[pPropertyName]->accept(&d);
             OnModuleEvent("cp", QString(), pPropertyName, d.getResult().toVariantMap());
             connect(mStore[pPropertyName], &OST::PropertyMulti::valueChanged, this, &Datastore::onValueChanged);
+            connect(mStore[pPropertyName], &OST::PropertyMulti::propertyEvent, this, &Datastore::onPropertyEvent);
+            connect(mStore[pPropertyName], &OST::PropertyMulti::sendMessage, this, &Datastore::onPropertyMessage);
             return true;
         }
         bool createGlobLov(const QString &pLovName,  OST::LovBase* pLov)
