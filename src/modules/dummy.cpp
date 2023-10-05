@@ -102,6 +102,7 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     dynprop->addValue("dynbool", dynbool);
     dynbool->setValue(false, false);
 
+    giveMeADevice("camera", "Multipurpose camera", INDI::BaseDevice::CCD_INTERFACE);
     defineMeAsFocuser();
     defineMeAsGuider();
     defineMeAsSequencer();
@@ -152,12 +153,12 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                 }
                 if (keyprop == "devices")
                 {
-                    if (keyelt == "focuscamera")
+                    if (keyelt == "camera")
                     {
                         if (setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], false))
                         {
                             getProperty(keyprop)->setState(OST::Ok);
-                            _camera = getString("devices", "focuscamera");
+                            _camera = getString("devices", "camera");
                         }
                     }
                 }
@@ -169,7 +170,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                         {
                             connectIndi();
                             getProperty(keyprop)->setState(OST::Ok);
-                            _camera = getString("devices", "focuscamera");
+                            _camera = getString("devices", "camera");
                             connectDevice(_camera);
                             setBLOBMode(B_ALSO, _camera.toStdString().c_str(), nullptr);
                             enableDirectBlobAccess(_camera.toStdString().c_str(), nullptr);
@@ -180,7 +181,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                         if (setOstElementValue(keyprop, keyelt, false, false))
                         {
                             getProperty(keyprop)->setState(OST::Busy);
-                            _camera = getString("devices", "focuscamera");
+                            _camera = getString("devices", "camera");
                             sendModNewNumber(_camera, "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );
                             if (!sendModNewNumber(_camera, "CCD_EXPOSURE", "CCD_EXPOSURE_VALUE", getFloat("parameters", "exposure")))
                             {
