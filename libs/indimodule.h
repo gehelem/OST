@@ -72,6 +72,7 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         {
             return mIsNavigator;
         }
+        bool giveMeADevice(QString name, QString label, INDI::BaseDevice::DRIVER_INTERFACE interface);
 
     private:
         void OnDispatchToIndiExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
