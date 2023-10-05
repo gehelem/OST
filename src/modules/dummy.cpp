@@ -102,6 +102,8 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     dynprop->addValue("dynbool", dynbool);
     dynbool->setValue(false, false);
 
+    giveMeADevice("camera", "Multipurpose camera", INDI::BaseDevice::CCD_INTERFACE);
+    giveMeADevice("mount", "Multipurpose mount", INDI::BaseDevice::TELESCOPE_INTERFACE);
     defineMeAsFocuser();
     defineMeAsGuider();
     defineMeAsSequencer();
@@ -117,7 +119,6 @@ Dummy::~Dummy()
 void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                               const QVariantMap &eventData)
 {
-
     if (getModuleName() == eventModule )
     {
         foreach(const QString &keyprop, eventData.keys())
@@ -152,12 +153,12 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                 }
                 if (keyprop == "devices")
                 {
-                    if (keyelt == "focuscamera")
+                    if (keyelt == "camera")
                     {
                         if (setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], false))
                         {
                             getProperty(keyprop)->setState(OST::Ok);
-                            _camera = getString("devices", "focuscamera");
+                            _camera = getString("devices", "camera");
                         }
                     }
                 }
@@ -169,7 +170,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                         {
                             connectIndi();
                             getProperty(keyprop)->setState(OST::Ok);
-                            _camera = getString("devices", "focuscamera");
+                            _camera = getString("devices", "camera");
                             connectDevice(_camera);
                             setBLOBMode(B_ALSO, _camera.toStdString().c_str(), nullptr);
                             enableDirectBlobAccess(_camera.toStdString().c_str(), nullptr);
@@ -180,7 +181,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                         if (setOstElementValue(keyprop, keyelt, false, false))
                         {
                             getProperty(keyprop)->setState(OST::Busy);
-                            _camera = getString("devices", "focuscamera");
+                            _camera = getString("devices", "camera");
                             sendModNewNumber(_camera, "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );
                             if (!sendModNewNumber(_camera, "CCD_EXPOSURE", "CCD_EXPOSURE_VALUE", getFloat("parameters", "exposure")))
                             {
@@ -207,12 +208,12 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                             getProperty(keyprop)->setState(OST::Busy);
                             double ra, dec;
                             if (
-                                !getModNumber(getString("devices", "navigatormount"), "EQUATORIAL_EOD_COORD", "DEC", dec)
-                                || !getModNumber(getString("devices", "navigatormount"), "EQUATORIAL_EOD_COORD", "RA", ra)
+                                !getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "DEC", dec)
+                                || !getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "RA", ra)
                             )
                             {
                                 getProperty(keyprop)->setState(OST::Error);
-                                sendMessage("Can't find mount device " + getString("devices", "navigatormount") + " solve aborted");
+                                sendMessage("Can't find mount device " + getString("devices", "mount") + " solve aborted");
                             }
                             else
                             {
