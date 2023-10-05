@@ -103,6 +103,7 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     dynbool->setValue(false, false);
 
     giveMeADevice("camera", "Multipurpose camera", INDI::BaseDevice::CCD_INTERFACE);
+    giveMeADevice("mount", "Multipurpose mount", INDI::BaseDevice::TELESCOPE_INTERFACE);
     defineMeAsFocuser();
     defineMeAsGuider();
     defineMeAsSequencer();
@@ -118,7 +119,6 @@ Dummy::~Dummy()
 void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                               const QVariantMap &eventData)
 {
-
     if (getModuleName() == eventModule )
     {
         foreach(const QString &keyprop, eventData.keys())
@@ -208,12 +208,12 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                             getProperty(keyprop)->setState(OST::Busy);
                             double ra, dec;
                             if (
-                                !getModNumber(getString("devices", "navigatormount"), "EQUATORIAL_EOD_COORD", "DEC", dec)
-                                || !getModNumber(getString("devices", "navigatormount"), "EQUATORIAL_EOD_COORD", "RA", ra)
+                                !getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "DEC", dec)
+                                || !getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "RA", ra)
                             )
                             {
                                 getProperty(keyprop)->setState(OST::Error);
-                                sendMessage("Can't find mount device " + getString("devices", "navigatormount") + " solve aborted");
+                                sendMessage("Can't find mount device " + getString("devices", "mount") + " solve aborted");
                             }
                             else
                             {
