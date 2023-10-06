@@ -82,6 +82,10 @@ void ValueUpdate::visit(ValueGraph* pValue, QVariantMap &data )
 
 void ValueUpdate::visit(ValueInt* pValue, QString &action, QVariantMap &data)
 {
+    if (data.contains("arrayLimit"))
+    {
+        pValue->setArrayLimit(data["arrayLimit"].toInt());
+    }
     if (action == "push")
     {
         pValue->gridAdd(pValue->value());
@@ -110,6 +114,10 @@ void ValueUpdate::visit(ValueInt* pValue, QString &action, QVariantMap &data)
 }
 void ValueUpdate::visit(ValueFloat* pValue, QString &action, QVariantMap &data)
 {
+    if (data.contains("arrayLimit"))
+    {
+        pValue->setArrayLimit(data["arrayLimit"].toInt());
+    }
     if (action == "push")
     {
         pValue->gridAdd(pValue->value());
@@ -139,6 +147,10 @@ void ValueUpdate::visit(ValueFloat* pValue, QString &action, QVariantMap &data)
 }
 void ValueUpdate::visit(ValueBool* pValue, QString &action, QVariantMap &data)
 {
+    if (data.contains("arrayLimit"))
+    {
+        pValue->setArrayLimit(data["arrayLimit"].toInt());
+    }
     if (action == "push")
     {
         pValue->gridAdd(pValue->value());
@@ -167,6 +179,10 @@ void ValueUpdate::visit(ValueBool* pValue, QString &action, QVariantMap &data)
 }
 void ValueUpdate::visit(ValueString* pValue, QString &action, QVariantMap &data)
 {
+    if (data.contains("arrayLimit"))
+    {
+        pValue->setArrayLimit(data["arrayLimit"].toInt());
+    }
     if (action == "push")
     {
         pValue->gridAdd(pValue->value());
@@ -195,6 +211,10 @@ void ValueUpdate::visit(ValueString* pValue, QString &action, QVariantMap &data)
 }
 void ValueUpdate::visit(ValueLight* pValue, QString &action, QVariantMap &data)
 {
+    if (data.contains("arrayLimit"))
+    {
+        pValue->setArrayLimit(data["arrayLimit"].toInt());
+    }
     if (action == "push")
     {
         pValue->gridAdd(pValue->value());
