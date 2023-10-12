@@ -182,7 +182,7 @@ bool IndiModule::connectAllDevices()
             sendNewSwitch(svp);
             if (devs[i].getDriverInterface() & INDI::BaseDevice::CCD_INTERFACE)
             {
-                sendWarning("Can't set blob mode " + QString(devs[i].getDeviceName()));
+                sendMessage("Set blob mode " + QString(devs[i].getDeviceName()));
                 setBLOBMode(B_ALSO, devs[i].getDeviceName(), nullptr);
 
             }
