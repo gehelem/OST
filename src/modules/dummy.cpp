@@ -182,8 +182,11 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                         {
                             getProperty(keyprop)->setState(OST::Busy);
                             _camera = getString("devices", "camera");
-                            sendModNewNumber(_camera, "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );
-                            if (!sendModNewNumber(_camera, "CCD_EXPOSURE", "CCD_EXPOSURE_VALUE", getFloat("parameters", "exposure")))
+                            if (_camera == "CCD Simulator")
+                            {
+                                sendModNewNumber(_camera, "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );
+                            }
+                            if (!requestCapture(_camera, getFloat("parms", "exposure"), getInt("parms", "gain"), getInt("parms", "offset")))
                             {
                                 getProperty(keyprop)->setState(OST::Error);
                             }

@@ -37,7 +37,7 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         bool sendModNewSwitch(QString deviceName, QString propertyName, QString elementName, ISState sw);
         bool sendModNewNumber(const QString &deviceName, const QString &propertyName, const QString &elementName,
                               const double &value);
-
+        bool requestCapture(const QString &deviceName, const double &exposure, const double &gain, const double &offset);
         bool getModNumber(const QString &deviceName, const QString &propertyName, const QString &elementName, double &value);
         bool getModSwitch(const QString &deviceName, const QString &propertyName, const QString &elementName, bool &value);
         bool getModText(const QString &deviceName, const QString &propertyName, const QString &elementName, QString &value);
@@ -84,6 +84,7 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         bool mIsNavigator = false;
     signals:
         void askedFrameReset(QString devicename);
+        void requestCaptureDone();
 }
 ;
 #endif
