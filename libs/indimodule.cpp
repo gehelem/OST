@@ -182,7 +182,7 @@ bool IndiModule::connectAllDevices()
             sendNewSwitch(svp);
             if (devs[i].getDriverInterface() & INDI::BaseDevice::CCD_INTERFACE)
             {
-                sendWarning("Can't set blob mode " + QString(devs[i].getDeviceName()));
+                sendMessage("Set blob mode " + QString(devs[i].getDeviceName()));
                 setBLOBMode(B_ALSO, devs[i].getDeviceName(), nullptr);
 
             }
@@ -370,6 +370,97 @@ auto IndiModule::sendModNewNumber(const QString &deviceName, const QString &prop
     }
     sendError("Unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
     return false;
+
+}
+bool IndiModule::requestCapture(const QString &deviceName, const double &exposure, const double &gain, const double &offset)
+{
+    double wgain = gain;
+    double woffset = offset;
+    double wexpose = exposure;
+    INDI::BaseDevice dp = getDevice(deviceName.toStdString().c_str());
+    if (!dp.isValid())
+    {
+        sendError("Capture - device " + deviceName + " not found. Aborting.");
+        return false;
+    }
+    if (!dp.isConnected())
+    {
+        sendWarning("Capture - " + deviceName + " not connected, trying to connect");
+        if (!connectDevice(deviceName)) return false;
+    }
+    setBLOBMode(B_ALSO, deviceName.toStdString().c_str(), nullptr);
+    if(dp.getProperty("CCD_CONTROLS"))
+    {
+        INDI::PropertyNumber prop = dp.getNumber("CCD_CONTROLS");
+        if (wgain < prop.findWidgetByName("Gain")->min)
+        {
+            sendWarning("Capture - " + deviceName + " gain requested too low (" + QString::number(wgain) + "), setting to " +
+                        QString::number(prop.findWidgetByName("Gain")->min));
+            wgain = prop.findWidgetByName("Gain")->min;
+        }
+        if (wgain > prop.findWidgetByName("Gain")->max)
+        {
+            sendWarning("Capture - " + deviceName + " gain requested too high (" + QString::number(wgain) + "), setting to " +
+                        QString::number(prop.findWidgetByName("Gain")->max));
+            wgain = prop.findWidgetByName("Gain")->max;
+        }
+        if (woffset < prop.findWidgetByName("Offset")->min)
+        {
+            sendWarning("Capture - " + deviceName + " gain requested too low (" + QString::number(woffset) + "), setting to " +
+                        QString::number(prop.findWidgetByName("Offset")->min));
+            woffset = prop.findWidgetByName("Offset")->min;
+        }
+        if (woffset > prop.findWidgetByName("Offset")->max)
+        {
+            sendWarning("Capture - " + deviceName + " gain requested too high (" + QString::number(woffset) + "), setting to " +
+                        QString::number(prop.findWidgetByName("Offset")->max));
+            woffset = prop.findWidgetByName("Offset")->max;
+        }
+        prop.findWidgetByName("Gain")->value = wgain;
+        prop.findWidgetByName("Offset")->value = woffset;
+        sendNewNumber(prop);
+    }
+    if(dp.getProperty("CCD_GAIN"))
+    {
+        INDI::PropertyNumber prop = dp.getNumber("CCD_GAIN");
+        if (wgain < prop.findWidgetByName("GAIN")->min)
+        {
+            sendWarning("Capture - " + deviceName + " gain requested too low (" + QString::number(wgain) + "), setting to " +
+                        QString::number(prop.findWidgetByName("GAIN")->min));
+            wgain = prop.findWidgetByName("GAIN")->min;
+        }
+        if (wgain > prop.findWidgetByName("GAIN")->max)
+        {
+            sendWarning("Capture - " + deviceName + " gain requested too high (" + QString::number(wgain) + "), setting to " +
+                        QString::number(prop.findWidgetByName("GAIN")->max));
+            wgain = prop.findWidgetByName("GAIN")->max;
+        }
+        prop.findWidgetByName("GAIN")->value = wgain;
+        sendNewNumber(prop);
+    }
+    if(dp.getProperty("CCD_OFFSET"))
+    {
+        INDI::PropertyNumber prop = dp.getNumber("CCD_OFFSET");
+        if (woffset < prop.findWidgetByName("OFFSET")->min)
+        {
+            sendWarning("Capture - " + deviceName + " offset requested too low (" + QString::number(woffset) + "), setting to " +
+                        QString::number(prop.findWidgetByName("OFFSET")->min));
+            woffset = prop.findWidgetByName("OFFSET")->min;
+        }
+        if (woffset > prop.findWidgetByName("OFFSET")->max)
+        {
+            sendWarning("Capture - " + deviceName + " offset requested too high (" + QString::number(woffset) + "), setting to " +
+                        QString::number(prop.findWidgetByName("OFFSET")->max));
+            woffset = prop.findWidgetByName("OFFSET")->max;
+        }
+        prop.findWidgetByName("OFFSET")->value = woffset;
+        sendNewNumber(prop);
+    }
+
+    if (!sendModNewNumber(deviceName, "CCD_EXPOSURE", "CCD_EXPOSURE_VALUE", wexpose)) return false;
+    emit requestCaptureDone();
+    return true;
+
 
 }
 bool IndiModule::getModNumber(const QString &deviceName, const QString &propertyName, const QString  &elementName,
