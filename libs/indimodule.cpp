@@ -385,8 +385,8 @@ bool IndiModule::requestCapture(const QString &deviceName, const double &exposur
     }
     if (!dp.isConnected())
     {
-        sendError("Capture - " + deviceName + " not connected");
-        return false;
+        sendWarning("Capture - " + deviceName + " not connected, trying to connect");
+        if (!connectDevice(deviceName)) return false;
     }
     setBLOBMode(B_ALSO, deviceName.toStdString().c_str(), nullptr);
     if(dp.getProperty("CCD_CONTROLS"))
