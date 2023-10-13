@@ -79,6 +79,11 @@ void ValueUpdate::visit(ValueGraph* pValue, QVariantMap &data )
     Q_UNUSED(pValue);
     Q_UNUSED(data);
 }
+void ValueUpdate::visit(ValuePrg* pValue, QVariantMap &data )
+{
+    Q_UNUSED(pValue);
+    Q_UNUSED(data);
+}
 
 void ValueUpdate::visit(ValueInt* pValue, QString &action, QVariantMap &data)
 {
@@ -261,6 +266,13 @@ void ValueUpdate::visit(ValueMessage* pValue, QString &action, QVariantMap &data
 
 }
 void ValueUpdate::visit(ValueGraph* pValue, QString &action, QVariantMap &data)
+{
+    Q_UNUSED(pValue);
+    Q_UNUSED(action);
+    Q_UNUSED(data);
+
+}
+void ValueUpdate::visit(ValuePrg* pValue, QString &action, QVariantMap &data)
 {
     Q_UNUSED(pValue);
     Q_UNUSED(action);

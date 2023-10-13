@@ -271,5 +271,14 @@ void ValueJsonDumper::visit(ValueGraph *pValue)
 
     mResult = json;
 }
+void ValueJsonDumper::visit(ValuePrg *pValue)
+{
+    QJsonObject json = dumpValueCommons(pValue);
+    json["type"] = "prg";
+    if (pValue->prgType() == bar) json["prgtype"] = "bar";
+    if (pValue->prgType() == spinner) json["prgtype"] = "spinner";
+
+    mResult = json;
+}
 
 }

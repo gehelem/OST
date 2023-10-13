@@ -347,6 +347,13 @@
                 "type": "message",
                 "label": "Image message",
                 "level":0
+            },
+            "progress": {
+                "type": "prg",
+                "prgtype": "spinner",
+                "label": "Progression",
+                "value": 55.25,
+                "level":0
             }
         }
     },

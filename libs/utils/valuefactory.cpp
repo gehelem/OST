@@ -246,6 +246,25 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
 
             return pValue;
         }
+        if (pData["type"].toString() == "prg")
+        {
+            auto *pValue = new ValuePrg(pData["label"].toString(),
+                                        pData["order"].toString(),
+                                        pData["hint"].toString()
+                                       );
+            if (!pData.contains("prgtype"))
+            {
+                qDebug() << "Progress defined without type " << pValue->label() << " set default to bar";
+            }
+            else
+            {
+                if (pData["prgtype"].toString() == "bar") pValue->setPrgType(bar);
+                if (pData["prgtype"].toString() == "spinner") pValue->setPrgType(spinner);
+            }
+            if (pData.contains("value")) pValue->setValue(pData["prgtype"].toDouble(), false);
+
+            return pValue;
+        }
 
 
         qDebug() << "Unknown value type " << pData["label"].toString() << ":" << pData["type"].toString() << "-" <<

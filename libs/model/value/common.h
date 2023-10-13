@@ -98,6 +98,12 @@ typedef struct GraphDefs
     QVariantMap params = QVariantMap();
 } GraphDefs;
 
+typedef enum
+{
+    bar,
+    spinner
+} PrgType;
+
 }
 
 #endif
