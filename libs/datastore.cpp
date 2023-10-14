@@ -39,6 +39,26 @@ OST::ValueString* Datastore::getValueString(QString pProperty, QString pElement)
     }
     return static_cast<OST::ValueString*>(p->getValue(pElement));
 }
+OST::ValuePrg* Datastore::getValuePrg(QString pProperty, QString pElement)
+{
+    OST::PropertyMulti* p = getProperty(pProperty);
+    if (p == nullptr)
+    {
+        sendWarning(" getValuePrg - property " + pProperty + " not found");
+        return nullptr;
+    }
+    if (!p->getValues().contains(pElement))
+    {
+        sendWarning("getValuePrg - property " + pProperty + " : element " + pElement + " not found");
+        return nullptr;
+    }
+    if (p->getValue(pElement)->getType() != "prg")
+    {
+        sendWarning("getValuePrg - property " + pProperty + " : element " + pElement + " is not progress");
+        return nullptr;
+    }
+    return static_cast<OST::ValuePrg*>(p->getValue(pElement));
+}
 QString Datastore::getString(QString pProperty, QString pElement)
 {
     return getValueString(pProperty, pElement)->value();
