@@ -261,7 +261,8 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                 if (pData["prgtype"].toString() == "bar") pValue->setPrgType(bar);
                 if (pData["prgtype"].toString() == "spinner") pValue->setPrgType(spinner);
             }
-            if (pData.contains("value")) pValue->setValue(pData["prgtype"].toDouble(), false);
+            if (pData.contains("value")) pValue->setValue(pData["value"].toDouble(), false);
+            if (pData.contains("dynlabel")) pValue->setDynLabel(pData["dynlabel"].toString(), false);
 
             return pValue;
         }

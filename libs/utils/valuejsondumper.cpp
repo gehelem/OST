@@ -277,6 +277,8 @@ void ValueJsonDumper::visit(ValuePrg *pValue)
     json["type"] = "prg";
     if (pValue->prgType() == bar) json["prgtype"] = "bar";
     if (pValue->prgType() == spinner) json["prgtype"] = "spinner";
+    json["dynlabel"] = pValue->dynLabel();
+    json["value"] = pValue->value();
 
     mResult = json;
 }
