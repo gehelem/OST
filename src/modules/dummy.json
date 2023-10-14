@@ -347,6 +347,30 @@
                 "type": "message",
                 "label": "Image message",
                 "level":0
+            },
+            "progress": {
+                "type": "prg",
+                "prgtype": "spinner",
+                "label": "P1",
+                "dynlabel": "55.25/100",
+                "value": 55.25,
+                "order":0
+            },
+            "progress2": {
+                "type": "prg",
+                "prgtype": "spinner",
+                "label": "P2",
+                "dynlabel": "99/100",
+                "value": 99,
+                "order":2
+            },
+            "progress3": {
+                "type": "prg",
+                "prgtype": "bar",
+                "label": "P3",
+                "dynlabel": "80/100",
+                "value": 80,
+                "order":3
             }
         }
     },

@@ -11,6 +11,7 @@
 #include <valuevideo.h>
 #include <valuemessage.h>
 #include <valuegraph.h>
+#include <valueprg.h>
 
 
 namespace  OST
@@ -125,6 +126,18 @@ class ValueJsonDumper : public ValueVisitor
             Q_UNUSED(data)
         }
         void visit(ValueGraph* pValue, QString &action, QVariantMap &data ) override
+        {
+            Q_UNUSED(pValue);
+            Q_UNUSED(action);
+            Q_UNUSED(data)
+        }
+        void visit(ValuePrg *pValue) override;
+        void visit(ValuePrg* pValue, QVariantMap &data ) override
+        {
+            Q_UNUSED(pValue);
+            Q_UNUSED(data)
+        }
+        void visit(ValuePrg* pValue, QString &action, QVariantMap &data ) override
         {
             Q_UNUSED(pValue);
             Q_UNUSED(action);

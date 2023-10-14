@@ -141,6 +141,8 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuemessage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuegraph.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuegraph.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueprg.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueprg.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovbase.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovsingle.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovstring.h
@@ -210,6 +212,7 @@ set(BASE_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuevideo.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuemessage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuegraph.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueprg.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovbase.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovsingle.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovstring.h

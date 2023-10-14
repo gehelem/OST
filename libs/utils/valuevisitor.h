@@ -13,6 +13,7 @@ class ValueImg;
 class ValueVideo;
 class ValueMessage;
 class ValueGraph;
+class ValuePrg;
 
 class ValueVisitor
 {
@@ -48,6 +49,9 @@ class ValueVisitor
         virtual void visit(ValueGraph* pValue) = 0;
         virtual void visit(ValueGraph* pValue, QVariantMap &data) = 0;
         virtual void visit(ValueGraph* pValue, QString &action, QVariantMap &data) = 0;
+        virtual void visit(ValuePrg* pValue) = 0;
+        virtual void visit(ValuePrg* pValue, QVariantMap &data) = 0;
+        virtual void visit(ValuePrg* pValue, QString &action, QVariantMap &data) = 0;
 };
 
 }
