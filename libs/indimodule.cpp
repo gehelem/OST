@@ -845,7 +845,7 @@ bool IndiModule::defineMeAsImager()
 
     if (getStore().contains("image"))
     {
-        if (!(getStore()["image"]->getValues().contains("image")))
+        if (!(getStore()["image"]->getValues()->contains("image")))
         {
             OST::PropertyMulti * pm = getProperty("image");
             OST::ValueImg* img = new OST::ValueImg("", "", "");
@@ -857,7 +857,7 @@ bool IndiModule::defineMeAsImager()
     OST::PropertyMulti * pm = getProperty("parms");
     pm->setRule(OST::SwitchsRule::Any);
 
-    if (!getStore()["parms"]->getValues().contains("exposure"))
+    if (!getStore()["parms"]->getValues()->contains("exposure"))
     {
         OST::ValueFloat* f = new  OST::ValueFloat("Exposure", "200", "");
         f->setValue(0, false);
@@ -868,7 +868,7 @@ bool IndiModule::defineMeAsImager()
 
 
 
-    if (!getStore()["parms"]->getValues().contains("gain"))
+    if (!getStore()["parms"]->getValues()->contains("gain"))
     {
         OST::ValueInt* i  = new  OST::ValueInt("Gain", "205", "");
         i->setValue(0, false);
@@ -877,7 +877,7 @@ bool IndiModule::defineMeAsImager()
         pm->addValue("gain", i);
     }
 
-    if (!getStore()["parms"]->getValues().contains("offset"))
+    if (!getStore()["parms"]->getValues()->contains("offset"))
     {
         OST::ValueInt* i  = new  OST::ValueInt("Offset", "210", "");
         i->setValue(0, false);
