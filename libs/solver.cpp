@@ -14,7 +14,17 @@ Solver::~Solver()
 void Solver::ResetSolver(FITSImage::Statistic &stats, uint8_t *m_ImageBuffer)
 {
     //sendMessage( "Reset solver";
+    mImgWidth = stats.width;
+    mImgHeight = stats.height;
+
     HFRavg = 99;
+    HFRavgZone.clear();
+    HFRavgCount.clear();
+    for (int i = 0; i < HFRZones * HFRZones; i++ )
+    {
+        HFRavgCount.append(0);
+        HFRavgZone.append(99);
+    }
     //delete stellarSolver;
     stellarSolver.loadNewImageBuffer(stats, m_ImageBuffer);
     //stellarSolver = new StellarSolver(stats, m_ImageBuffer);
@@ -22,7 +32,11 @@ void Solver::ResetSolver(FITSImage::Statistic &stats, uint8_t *m_ImageBuffer)
     //stellarSolver.setParent(this);
     stellarSolverProfiles = StellarSolver::getBuiltInProfiles();
 }
-
+void Solver::ResetSolver(FITSImage::Statistic &stats, uint8_t *m_ImageBuffer, int zones)
+{
+    HFRZones = zones;
+    ResetSolver(stats, m_ImageBuffer);
+}
 void Solver::FindStars(Parameters param)
 {
 
@@ -123,6 +137,13 @@ void Solver::ssReadySEP()
     for (int i = 0; i < stars.size(); i++)
     {
         HFRavg = (i * HFRavg + stars[i].HFR) / (i + 1);
+
+        /* zoning */
+        int starColumn = HFRZones * stars[i].x / mImgWidth;
+        int starLine = HFRZones * stars[i].y / mImgHeight;
+        int zone = starLine * HFRZones + starColumn;
+        HFRavgZone[zone] = (HFRavgCount[zone] * HFRavgZone[zone] + stars[i].HFR) / (HFRavgCount[zone] + 1);
+        HFRavgCount[zone]++;
     }
     //sendMessage( "SSolver Ready : HFRavg = " + QString::number(HFRavg));
     disconnect(&stellarSolver, &StellarSolver::ready, this, &Solver::ssReadySEP);
