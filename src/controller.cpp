@@ -84,6 +84,13 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     //dbmanager->populateCatalog(":sh2.txt", "Sh2");
     //dbmanager->populateCatalog(":ldn.txt", "LDN");
     //dbmanager->populateCatalog(":ic.txt", "IC");
+
+    if (_indiserver != "N")
+    {
+        this->startIndi();
+    }
+
+
 }
 
 
@@ -388,6 +395,16 @@ void Controller::processError()
     QString output = _process->readAllStandardError();
     pMainControl->sendMainError("PROCESS ERROR   : " + output);
 }
+void Controller::processIndiOutput()
+{
+    QString output = _indiProcess->readAllStandardOutput();
+    pMainControl->sendMainMessage("INDI LOG   : " + output);
+}
+void Controller::processIndiError()
+{
+    QString output = _indiProcess->readAllStandardError();
+    pMainControl->sendMainError("INDI ERROR   : " + output);
+}
 void Controller::sendMessage(const QString &pMessage)
 {
     QString messageWithDateTime = "[" + QDateTime::currentDateTime().toString(Qt::ISODateWithMs) + "]-" + pMessage;
@@ -416,4 +433,39 @@ QString Controller::buildName(void)
     name += ')';
     name.prepend("OstServer - " OS_NAME " (");
     return name;
+}
+void Controller::startIndi(void)
+{
+    pMainControl->sendMainMessage("Start Embedded indi server");
+    _indiProcess = new QProcess(this);
+    connect(_indiProcess, &QProcess::readyReadStandardOutput, this, &Controller::processIndiOutput);
+    connect(_indiProcess, &QProcess::readyReadStandardError, this, &Controller::processIndiError);
+    connect(_indiProcess, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this,
+            &Controller::processFinished);
+
+    if (_indiProcess->state() != 0)
+    {
+        qDebug() << "can't start process";
+    }
+    else
+    {
+        QString program = "mkfifo";
+        QStringList arguments;
+        arguments << "/tmp/ostserverIndiFIFO" ;
+        _indiProcess->start(program, arguments);
+        _indiProcess->waitForFinished();
+        program = "indiserver";
+        arguments.clear();
+        arguments << "-f";
+        arguments << "/tmp/ostserverIndiFIFO";
+        _indiProcess->start(program, arguments);
+
+    }
+
+}
+void Controller::stopIndi(void)
+{
+    pMainControl->sendMainMessage("Stop Embedded indi server");
+    if (_indiProcess->isOpen()) _indiProcess->kill();
+
 }

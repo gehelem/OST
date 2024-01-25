@@ -40,6 +40,7 @@ class Controller : public QObject
         DBManager   *dbmanager;
         Maincontrol *pMainControl;
         QProcess    *_process;
+        QProcess    *_indiProcess;
         QMap<QString, QMap<QString, QString>> mModulesMap;
         QZeroConf zeroConf;
         QString buildName(void);
@@ -52,9 +53,13 @@ class Controller : public QObject
         void installFront(void);
         void processOutput();
         void processError();
+        void processIndiOutput();
+        void processIndiError();
         void processFinished(int exitCode, QProcess::ExitStatus exitStatus);
         void sendMessage(const QString &pMessage);
         void startPublish();
+        void startIndi(void);
+        void stopIndi(void);
 
     private slots:
         void OnModuleEvent  (const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
