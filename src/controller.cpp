@@ -491,7 +491,7 @@ void Controller::startIndi(void)
         _indiProcess->waitForFinished();
         program = "indiserver";
         arguments.clear();
-        arguments << "-v";
+        //arguments << "-v";
         arguments << "-f";
         arguments << "/tmp/ostserverIndiFIFO";
         _indiProcess->start(program, arguments);
