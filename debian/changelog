@@ -1,9 +1,10 @@
-ostserver (1.0-2ubuntu1) UNRELEASED; urgency=medium
+ostserver (1.0.1) UNRELEASED; urgency=medium
 
   * Working release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
   * 
+  * 
 
- -- gilles <gilles@joag.fr>  Thu, 25 Jan 2024 17:00:03 +0100
+ -- gilles <gilles@joag.fr>  Thu, 25 Jan 2024 17:53:00 +0100
 
 ostserver (1.0-1) UNRELEASED; urgency=medium
 
