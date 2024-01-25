@@ -85,6 +85,14 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                 {
                     emit mainCtlEvent("killall", QString(), QString(), QVariantMap());
                 }
+                if (keyprop == "indidrivers" && pEventType == "Fposticon")
+                {
+                    emit mainCtlEvent("startindidriver", QString(), keyelt, QVariantMap());
+                }
+                if (keyprop == "indidrivers" && pEventType == "Fpreicon")
+                {
+                    emit mainCtlEvent("stopindidriver", QString(), keyelt, QVariantMap());
+                }
             }
         }
     }
@@ -178,4 +186,23 @@ void Maincontrol::deldModuleData(const QString  &pName)
         }
     }
 
+}
+void Maincontrol::addIndiServerProperties(const QStringList  pDrivers)
+{
+    qDebug() << pDrivers;
+    OST::PropertyMulti *dynprop = new OST::PropertyMulti("indidrivers", "Available indi drivers", OST::Permission::ReadOnly,
+            "Indi server",
+            "", "", false, false);
+    foreach(QString key, pDrivers)
+    {
+        OST::ValueString* dyntext = new OST::ValueString(key, "", "");
+        dyntext->setValue("", false);
+        dyntext->setAutoUpdate(true);
+        dyntext->setDirectEdit(true);
+        dyntext->setPreIcon("stop");
+        dyntext->setPostIcon("play_arrow");
+        dynprop->addValue(key, dyntext);
+
+    }
+    createProperty("indidrivers", dynprop);
 }

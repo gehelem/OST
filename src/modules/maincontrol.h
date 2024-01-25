@@ -23,6 +23,7 @@ class MODULE_INIT Maincontrol : public Basemodule
         void addModuleData(const QString  &pName, const QString  &pLabel, const QString  &pType, const QString  &pProfile);
         void setModuleData(const QString  &pName, const QString  &pLabel, const QString  &pType, const QString  &pProfile);
         void deldModuleData(const QString  &pName);
+        void addIndiServerProperties(const QStringList pDrivers);
 
     public slots:
         void OnMyExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,

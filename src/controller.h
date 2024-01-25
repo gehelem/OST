@@ -36,6 +36,7 @@ class Controller : public QObject
         QString _conf;
         QString _indiserver;
         QVariantMap _availableModuleLibs;
+        QStringList _availableIndiDrivers;
         WShandler   *wshandler;
         DBManager   *dbmanager;
         Maincontrol *pMainControl;
@@ -50,6 +51,7 @@ class Controller : public QObject
         void loadConf(const QString &pConf);
         void saveConf(const QString &pConf);
         void checkModules(void);
+        void checkIndiDrivers(void);
         void installFront(void);
         void processOutput();
         void processError();
@@ -60,6 +62,8 @@ class Controller : public QObject
         void startPublish();
         void startIndi(void);
         void stopIndi(void);
+        void startIndiDriver(const QString &pDriver);
+        void stopIndiDriver(const QString &pDriver);
 
     private slots:
         void OnModuleEvent  (const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
