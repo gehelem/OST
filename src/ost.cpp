@@ -44,6 +44,8 @@ int main(int argc, char *argv[])
     installFrontOption.setDefaultValue("N");
     QCommandLineOption configurationOption("configuration", "Load configuration", "configuration");
     configurationOption.setDefaultValue("default");
+    QCommandLineOption indiServerOption("indiserver", "Start embedded Indi server", "indiserver");
+    indiServerOption.setDefaultValue("N");
 
     argParser.addOption(saveAllBlobsOption);
     argParser.addOption(webrootOption);
@@ -51,6 +53,7 @@ int main(int argc, char *argv[])
     argParser.addOption(libPathOption);
     argParser.addOption(installFrontOption);
     argParser.addOption(configurationOption);
+    argParser.addOption(indiServerOption);
     argParser.process(app);
 
     QString webroot = argParser.value(webrootOption);
@@ -58,19 +61,22 @@ int main(int argc, char *argv[])
     QString libPath = argParser.value(libPathOption);
     QString installFront = argParser.value(installFrontOption);
     QString conf = argParser.value(configurationOption);
+    QString indiserver = argParser.value(indiServerOption);
 
     sendMessage("Webroot               =" + webroot);
     sendMessage("DB Path               =" + dbPath);
     sendMessage("Modules Library Path  =" + libPath);
     sendMessage("Install front         =" + installFront);
     sendMessage("Load configuration    =" + conf);
+    sendMessage("Embedded Indi server  =" + indiserver);
 
     Controller controller(
         webroot,
         dbPath,
         libPath,
         installFront,
-        conf
+        conf,
+        indiserver
     );
 
     Q_UNUSED(controller);

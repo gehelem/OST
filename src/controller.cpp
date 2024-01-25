@@ -23,12 +23,13 @@
 
 
 Controller::Controller(const QString &webroot, const QString &dbpath,
-                       const QString &libpath, const QString &installfront, const QString &conf)
+                       const QString &libpath, const QString &installfront, const QString &conf, const QString &indiserver)
     :       _webroot(webroot),
             _dbpath(dbpath),
             _libpath(libpath),
             _installfront(installfront),
-            _conf(conf)
+            _conf(conf),
+            _indiserver(indiserver)
 {
 
     startPublish();

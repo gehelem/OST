@@ -23,7 +23,7 @@ class Controller : public QObject
         Q_OBJECT
     public:
         Controller(const QString &webroot, const QString &dbpath,
-                   const QString &libpath, const QString &conf, const QString &installfront);
+                   const QString &libpath, const QString &conf, const QString &installfront, const QString &indiserver);
         ~Controller() override;
     signals:
         void controllerEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
@@ -34,6 +34,7 @@ class Controller : public QObject
         QString _libpath;
         QString _installfront;
         QString _conf;
+        QString _indiserver;
         QVariantMap _availableModuleLibs;
         WShandler   *wshandler;
         DBManager   *dbmanager;
