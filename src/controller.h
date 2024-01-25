@@ -23,7 +23,7 @@ class Controller : public QObject
         Q_OBJECT
     public:
         Controller(const QString &webroot, const QString &dbpath,
-                   const QString &libpath, const QString &conf, const QString &installfront);
+                   const QString &libpath, const QString &conf, const QString &installfront, const QString &indiserver);
         ~Controller() override;
     signals:
         void controllerEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
@@ -34,11 +34,14 @@ class Controller : public QObject
         QString _libpath;
         QString _installfront;
         QString _conf;
+        QString _indiserver;
         QVariantMap _availableModuleLibs;
+        QStringList _availableIndiDrivers;
         WShandler   *wshandler;
         DBManager   *dbmanager;
         Maincontrol *pMainControl;
         QProcess    *_process;
+        QProcess    *_indiProcess;
         QMap<QString, QMap<QString, QString>> mModulesMap;
         QZeroConf zeroConf;
         QString buildName(void);
@@ -48,12 +51,19 @@ class Controller : public QObject
         void loadConf(const QString &pConf);
         void saveConf(const QString &pConf);
         void checkModules(void);
+        void checkIndiDrivers(void);
         void installFront(void);
         void processOutput();
         void processError();
+        void processIndiOutput();
+        void processIndiError();
         void processFinished(int exitCode, QProcess::ExitStatus exitStatus);
         void sendMessage(const QString &pMessage);
         void startPublish();
+        void startIndi(void);
+        void stopIndi(void);
+        void startIndiDriver(const QString &pDriver);
+        void stopIndiDriver(const QString &pDriver);
 
     private slots:
         void OnModuleEvent  (const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,

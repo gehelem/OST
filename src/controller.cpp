@@ -23,12 +23,13 @@
 
 
 Controller::Controller(const QString &webroot, const QString &dbpath,
-                       const QString &libpath, const QString &installfront, const QString &conf)
+                       const QString &libpath, const QString &installfront, const QString &conf, const QString &indiserver)
     :       _webroot(webroot),
             _dbpath(dbpath),
             _libpath(libpath),
             _installfront(installfront),
-            _conf(conf)
+            _conf(conf),
+            _indiserver(indiserver)
 {
 
     startPublish();
@@ -83,6 +84,13 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     //dbmanager->populateCatalog(":sh2.txt", "Sh2");
     //dbmanager->populateCatalog(":ldn.txt", "LDN");
     //dbmanager->populateCatalog(":ic.txt", "IC");
+
+    if (_indiserver != "N")
+    {
+        this->startIndi();
+    }
+
+
 }
 
 
@@ -250,6 +258,25 @@ void Controller::OnMainCtlEvent(const QString &pEventType, const QString  &pEven
     {
         saveConf(pEventKey);
     }
+    if (pEventType == "startindidriver")
+    {
+        startIndiDriver(pEventKey);
+    }
+    if (pEventType == "stopindidriver")
+    {
+        stopIndiDriver(pEventKey);
+    }
+    if (pEventType == "indiserver")
+    {
+        if (pEventKey == "start")
+        {
+            startIndi();
+        }
+        if (pEventKey == "stop")
+        {
+            stopIndi();
+        }
+    }
     if (pEventType == "killall")
     {
         QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
@@ -314,6 +341,22 @@ void Controller::checkModules(void)
         }
     }
 
+
+}
+void Controller::checkIndiDrivers(void)
+{
+    const QString &path = "/usr/bin";
+
+    sendMessage("Check available Indi drivers in " + path);
+    QDir directory(path);
+    directory.setFilter(QDir::Files);
+    directory.setNameFilters(QStringList() << "indi_simulator*");
+    _availableIndiDrivers = directory.entryList();
+    foreach(QString dr, _availableIndiDrivers)
+    {
+        sendMessage("indi driver found " + dr);
+    }
+    pMainControl->addIndiServerProperties(_availableIndiDrivers);
 
 }
 void Controller::installFront(void)
@@ -387,6 +430,16 @@ void Controller::processError()
     QString output = _process->readAllStandardError();
     pMainControl->sendMainError("PROCESS ERROR   : " + output);
 }
+void Controller::processIndiOutput()
+{
+    QString output = _indiProcess->readAllStandardOutput();
+    pMainControl->sendMainMessage("INDI LOG   : " + output);
+}
+void Controller::processIndiError()
+{
+    QString output = _indiProcess->readAllStandardError();
+    pMainControl->sendMainError("INDI ERROR   : " + output);
+}
 void Controller::sendMessage(const QString &pMessage)
 {
     QString messageWithDateTime = "[" + QDateTime::currentDateTime().toString(Qt::ISODateWithMs) + "]-" + pMessage;
@@ -415,4 +468,62 @@ QString Controller::buildName(void)
     name += ')';
     name.prepend("OstServer - " OS_NAME " (");
     return name;
+}
+void Controller::startIndi(void)
+{
+    pMainControl->sendMainMessage("Start Embedded indi server");
+    _indiProcess = new QProcess(this);
+    connect(_indiProcess, &QProcess::readyReadStandardOutput, this, &Controller::processIndiOutput);
+    connect(_indiProcess, &QProcess::readyReadStandardError, this, &Controller::processIndiError);
+    connect(_indiProcess, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this,
+            &Controller::processFinished);
+
+    if (_indiProcess->state() != 0)
+    {
+        qDebug() << "can't start process";
+    }
+    else
+    {
+        QString program = "mkfifo";
+        QStringList arguments;
+        arguments << "/tmp/ostserverIndiFIFO" ;
+        _indiProcess->start(program, arguments);
+        _indiProcess->waitForFinished();
+        program = "indiserver";
+        arguments.clear();
+        arguments << "-v";
+        arguments << "-f";
+        arguments << "/tmp/ostserverIndiFIFO";
+        _indiProcess->start(program, arguments);
+
+    }
+
+    this->checkIndiDrivers();
+
+}
+void Controller::stopIndi(void)
+{
+    pMainControl->sendMainMessage("Stop Embedded indi server");
+    if (_indiProcess->isOpen()) _indiProcess->kill();
+
+}
+void Controller::startIndiDriver(const QString &pDriver)
+{
+    pMainControl->sendMainMessage("Start indidriver " + pDriver);
+    QFile fifo("/tmp/ostserverIndiFIFO");
+    fifo.open(QIODevice::WriteOnly);
+    QTextStream txtStream(&fifo);
+    txtStream << "start " + pDriver;
+    fifo.close();
+
+}
+void Controller::stopIndiDriver(const QString &pDriver)
+{
+    pMainControl->sendMainMessage("Stop indidriver " + pDriver);
+    QFile fifo("/tmp/ostserverIndiFIFO");
+    fifo.open(QIODevice::WriteOnly);
+    QTextStream txtStream(&fifo);
+    txtStream << "stop " + pDriver;
+    fifo.close();
+
 }
