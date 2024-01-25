@@ -40,10 +40,13 @@ void IndiPanel::newDevice(INDI::BaseDevice dp)
 }
 void IndiPanel::removeDevice(INDI::BaseDevice dp)
 {
-
     foreach(const QString &key, getStore().keys())
     {
-        delete getStore()[key]; // this is wrong, we should test level1/devcat before deletion
+        getProperty(key)->level1();
+        if (strcmp(dp.getDeviceName(), getProperty(key)->level1().toStdString().c_str()) == 0)
+        {
+            deleteOstProperty(key);
+        }
     }
 
 }
@@ -231,7 +234,8 @@ void IndiPanel::OnMyExternalEvent(const QString &eventType, const QString  &even
     Q_UNUSED(eventType);
     Q_UNUSED(eventModule);
     Q_UNUSED(eventKey);
-    //BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << eventKey.toStdString();
+    if (eventModule != this->getModuleName()) return;
+
     QVariantMap m = getPropertiesDump().toVariantMap();
     foreach(const QString &keyprop, eventData.keys())
     {
