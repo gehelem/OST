@@ -350,7 +350,7 @@ void Controller::checkIndiDrivers(void)
     sendMessage("Check available Indi drivers in " + path);
     QDir directory(path);
     directory.setFilter(QDir::Files);
-    directory.setNameFilters(QStringList() << "indi_simulator*");
+    directory.setNameFilters(QStringList() << "indi_*");
     _availableIndiDrivers = directory.entryList();
     foreach(QString dr, _availableIndiDrivers)
     {
