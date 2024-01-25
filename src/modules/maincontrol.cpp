@@ -93,6 +93,14 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                 {
                     emit mainCtlEvent("stopindidriver", QString(), keyelt, QVariantMap());
                 }
+                if (keyprop == "indiserver" && pEventType == "Fposticon")
+                {
+                    emit mainCtlEvent("indiserver", QString(), "start", QVariantMap());
+                }
+                if (keyprop == "indiserver" && pEventType == "Fpreicon")
+                {
+                    emit mainCtlEvent("indiserver", QString(), "stop", QVariantMap());
+                }
             }
         }
     }

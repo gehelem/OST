@@ -266,6 +266,17 @@ void Controller::OnMainCtlEvent(const QString &pEventType, const QString  &pEven
     {
         stopIndiDriver(pEventKey);
     }
+    if (pEventType == "indiserver")
+    {
+        if (pEventKey == "start")
+        {
+            startIndi();
+        }
+        if (pEventKey == "stop")
+        {
+            stopIndi();
+        }
+    }
     if (pEventType == "killall")
     {
         QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
@@ -480,6 +491,7 @@ void Controller::startIndi(void)
         _indiProcess->waitForFinished();
         program = "indiserver";
         arguments.clear();
+        arguments << "-v";
         arguments << "-f";
         arguments << "/tmp/ostserverIndiFIFO";
         _indiProcess->start(program, arguments);
