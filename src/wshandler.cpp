@@ -108,6 +108,10 @@ void WShandler::processTextMessage(QString message)
     {
         emit externalEvent(obj["evt"].toString(), obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
     }
+    if ((obj["evt"].toString() == "Fbadge"))
+    {
+        emit externalEvent(obj["evt"].toString(), obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+    }
 
 
 }

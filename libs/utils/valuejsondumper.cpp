@@ -12,6 +12,7 @@ QJsonObject ValueJsonDumper::dumpValueCommons(ValueBase *pValue)
     json["hint"] = pValue->hint();
     json["type"] = "undefined";
     json["autoupdate"] = pValue->autoUpdate();
+    json["badge"] = pValue->getBadge();
     if ((pValue->getType() == "int") || (pValue->getType() == "float") || (pValue->getType() == "string")
             || (pValue->getType() == "bool"))
     {

@@ -241,7 +241,7 @@ void IndiPanel::OnMyExternalEvent(const QString &eventType, const QString  &even
     {
         if (!m.contains(keyprop))
         {
-            sendError ("OnMyExternalEvent - property " + keyprop + " does not exist");
+            sendError ("OnMyExternalEvent - property " + keyprop + " does not exist (indipanel)");
             return;
         }
         QString prop = keyprop;
@@ -255,7 +255,7 @@ void IndiPanel::OnMyExternalEvent(const QString &eventType, const QString  &even
             {
                 if (!m[keyprop].toMap()["elements"].toMap().contains(keyelt))
                 {
-                    sendError ("OnMyExternalEvent - property " + keyprop + ", element " + keyelt + " does not exist");
+                    sendError ("OnMyExternalEvent - property " + keyprop + ", element " + keyelt + " does not exist (indipanel)");
                     return;
                 }
                 if (getStore()[keyprop]->getValue(keyelt)->getType() == "string")

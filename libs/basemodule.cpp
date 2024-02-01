@@ -150,6 +150,21 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
             }
         }
     }
+    if ((pEventType == "Fbadge") && pEventModule == getModuleName())
+    {
+        foreach(const QString &keyprop, pEventData.keys())
+        {
+            if (!getStore().contains(keyprop) )
+            {
+                sendWarning(" Fbadge - property " + keyprop + " not found");
+                return;
+            }
+            getStore()[keyprop]->setBadge(!getStore()[keyprop]->getBadge());
+        }
+        return;
+    }
+
+
 
     if ((pEventType == "Fposticon") && (pEventData.contains("saveprofile")) && pEventModule == getModuleName())
     {
