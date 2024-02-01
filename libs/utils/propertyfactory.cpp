@@ -35,6 +35,10 @@ PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVaria
     {
         pProperty->setArrayLimit(pData["arrayLimit"].toInt());
     }
+    if (pData.contains("badge"))
+    {
+        pProperty->setBadge(pData["badge"].toBool());
+    }
     QVariantMap elts = pData["elements"].toMap();
     foreach(const QString &key, elts.keys())
     {

@@ -17,6 +17,7 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
             if (pData.contains("autoupdate")) pValue->setAutoUpdate(pData["autoupdate"].toBool());
             if (pData.contains("directedit")) pValue->setDirectEdit(pData["directedit"].toBool());
             if (pData.contains("arrayLimit")) pValue->setArrayLimit(pData["arrayLimit"].toInt());
+            if (pData.contains("badge")) pValue->setBadge(pData["badge"].toBool());
             if (pData.contains("gridvalues"))
             {
                 QList ll  = pData["gridvalues"].toList();

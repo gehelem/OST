@@ -104,7 +104,14 @@ class PropertyBase: public QObject
         {
             if (limit > 0) mArrayLimit = limit;
         }
-
+        bool getBadge()
+        {
+            return mBadge;
+        }
+        void setBadge(bool b)
+        {
+            mBadge = b;
+        }
         void sendInfo(QString m)
         {
             emit sendMessage(Info, key() + "-" + m);
@@ -137,6 +144,7 @@ class PropertyBase: public QObject
         bool mHasArray = false;
         bool mShowArray = true;
         int mArrayLimit = 0;
+        bool mBadge = false;
 
 
 
