@@ -30,6 +30,7 @@
 "properties":{
     "extextRO": {
         "devcat": "Examples",
+        "badge": true,
         "elements": {
             "extext1": {
                 "type":"string",

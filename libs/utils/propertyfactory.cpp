@@ -37,6 +37,7 @@ PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVaria
     }
     if (pData.contains("badge"))
     {
+        qDebug() << "*********** setbadge " << pProperty->label();
         pProperty->setBadge(pData["badge"].toBool());
     }
     QVariantMap elts = pData["elements"].toMap();

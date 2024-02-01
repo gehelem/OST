@@ -111,6 +111,7 @@ class PropertyBase: public QObject
         void setBadge(bool b)
         {
             mBadge = b;
+            emit propertyEvent("ap", key(), this);
         }
         void sendInfo(QString m)
         {
