@@ -126,7 +126,7 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
             }
             foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
             {
-                if (!getStore()[keyprop]->getValues().contains(keyelt) )
+                if (!getStore()[keyprop]->getValues()->contains(keyelt) )
                 {
                     sendWarning(" Fsetproperty - property " + keyprop + " - element " + keyelt +  " not found");
                     return;
@@ -142,7 +142,7 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
         {
             foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
             {
-                if (getStore()[keyprop]->getValues()[keyelt]->autoUpdate() )
+                if (getStore()[keyprop]->getValue(keyelt)->autoUpdate() )
                 {
                     setOstElementValue(keyprop, keyelt, pEventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
                     //sendMessage("Autoupdate - property " + keyprop + " - element " + keyelt);
@@ -150,6 +150,21 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
             }
         }
     }
+    if ((pEventType == "Fbadge") && pEventModule == getModuleName())
+    {
+        foreach(const QString &keyprop, pEventData.keys())
+        {
+            if (!getStore().contains(keyprop) )
+            {
+                sendWarning(" Fbadge - property " + keyprop + " not found");
+                return;
+            }
+            getStore()[keyprop]->setBadge(!getStore()[keyprop]->getBadge());
+        }
+        return;
+    }
+
+
 
     if ((pEventType == "Fposticon") && (pEventData.contains("saveprofile")) && pEventModule == getModuleName())
     {

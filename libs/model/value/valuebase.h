@@ -51,18 +51,26 @@ class ValueBase: public QObject
         {
             mDirectEdit = v;
         }
+        bool getBadge()
+        {
+            return mBadge;
+        }
+        void setBadge(const bool &b)
+        {
+            mBadge = b;
+        }
     private:
         QString mLabel = "change me";
         QString mOrder = "change me";
         QString mHint = "";
         bool mAutoUpdate = false;
         bool mDirectEdit = false;
+        bool mBadge = false;
     signals:
         void valueChanged(OST::ValueBase*);
         void listChanged(OST::ValueBase*);
         void sendMessage(MsgLevel, QString);
-
-
+        void lovChanged(OST::ValueBase*);
 
 };
 

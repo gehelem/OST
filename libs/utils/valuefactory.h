@@ -11,6 +11,7 @@
 #include <valuevideo.h>
 #include <valuemessage.h>
 #include <valuegraph.h>
+#include <valueprg.h>
 
 namespace  OST
 {

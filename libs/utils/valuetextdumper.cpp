@@ -90,5 +90,12 @@ void ValueTextDumper::visit(ValueGraph *pValue)
     //stream << "Val = '" << pValue->value().toStdString() << "'";
     mResult = QString::fromStdString(stream.str());
 }
+void ValueTextDumper::visit(ValuePrg *pValue)
+{
+    std::stringstream stream;
+    stream << "Progress Value :" << dumpValueCommons(pValue);
+    //stream << "Val = '" << pValue->value().toStdString() << "'";
+    mResult = QString::fromStdString(stream.str());
+}
 
 }

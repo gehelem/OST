@@ -51,9 +51,9 @@ class PropertyMulti: public PropertyBase
             mRule = rule;
         }
 
-        QMap<QString, OST::ValueBase*> getValues()
+        QMap<QString, OST::ValueBase*>* getValues()
         {
-            return mValues;
+            return &mValues;
         }
         OST::ValueBase* getValue(QString pElement)
         {
@@ -76,7 +76,19 @@ class PropertyMulti: public PropertyBase
             mValues[key] = pValue;
             connect(mValues[key], &ValueBase::valueChanged, this, &PropertyMulti::OnValueChanged);
             connect(mValues[key], &ValueBase::listChanged, this, &PropertyMulti::OnListChanged);
+            connect(mValues[key], &ValueBase::lovChanged, this, &PropertyMulti::OnLovChanged);
             connect(mValues[key], &ValueBase::sendMessage, this, &PropertyMulti::OnMessage);
+        }
+        void deleteValue(QString key)
+        {
+            if (!mValues.contains(key))
+            {
+                qDebug() << label() << " - deleteValue - element " << key << " doesn't exist";
+                return;
+            }
+            mValues.remove(key);
+            emit propertyEvent("ap", key, this);
+
         }
         void push();
         void newLine(const QVariantMap &pValues);
@@ -89,6 +101,10 @@ class PropertyMulti: public PropertyBase
             emit valueChanged(this);
         }
         void OnListChanged(ValueBase*)
+        {
+            emit propertyEvent("ap", key(), this);
+        }
+        void OnLovChanged(ValueBase*)
         {
             emit propertyEvent("ap", key(), this);
         }

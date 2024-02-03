@@ -37,6 +37,22 @@
             }
         }
     },
+    "indiserver": {
+        "devcat": "Indi server",
+        "group": "",
+        "permission": 0,
+        "rule":0,
+        "label": "Start and stop indiserver",
+        "elements": {
+            "startstop": {
+                "type": "string",
+                "label": "",
+                "posticon":"play_arrow",
+                "preicon":"stop",
+                "value":""
+            }
+        }
+    },
     "modules": {
         "hasArray":true,
         "devcat": "Modules",

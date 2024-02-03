@@ -12,6 +12,7 @@ QJsonObject ValueJsonDumper::dumpValueCommons(ValueBase *pValue)
     json["hint"] = pValue->hint();
     json["type"] = "undefined";
     json["autoupdate"] = pValue->autoUpdate();
+    json["badge"] = pValue->getBadge();
     if ((pValue->getType() == "int") || (pValue->getType() == "float") || (pValue->getType() == "string")
             || (pValue->getType() == "bool"))
     {
@@ -26,6 +27,7 @@ void ValueJsonDumper::visit(ValueBool *pValue)
     QJsonObject json = dumpValueCommons(pValue);
     json["type"] = "bool";
     json["value"] = pValue->value();
+    json["arrayLimit"] = pValue->arrayLimit();
     if (pValue->getGrid().size() > 0)
     {
         QJsonArray arr;
@@ -49,6 +51,7 @@ void ValueJsonDumper::visit(ValueInt *pValue)
     json["max"] = qlonglong(pValue->max());
     json["step"] = qlonglong(pValue->step());
     json["format"] = pValue->format();
+    json["arrayLimit"] = pValue->arrayLimit();
     if (pValue->getPreIcon() != "") json["preicon"] = pValue->getPreIcon();
     if (pValue->getPostIcon() != "") json["posticon"] = pValue->getPostIcon();
     if (pValue->getGlobalLov() != "")
@@ -91,6 +94,7 @@ void ValueJsonDumper::visit(ValueFloat *pValue)
     json["max"] = pValue->max();
     json["step"] = pValue->step();
     json["format"] = pValue->format();
+    json["arrayLimit"] = pValue->arrayLimit();
     if (pValue->getPreIcon() != "") json["preicon"] = pValue->getPreIcon();
     if (pValue->getPostIcon() != "") json["posticon"] = pValue->getPostIcon();
     if (pValue->getGlobalLov() != "")
@@ -131,6 +135,7 @@ void ValueJsonDumper::visit(ValueString *pValue)
     json["value"] = pValue->value();
     if (pValue->getPreIcon() != "") json["preicon"] = pValue->getPreIcon();
     if (pValue->getPostIcon() != "") json["posticon"] = pValue->getPostIcon();
+    json["arrayLimit"] = pValue->arrayLimit();
     if (pValue->getGlobalLov() != "")
     {
         json["globallov"] = pValue->getGlobalLov();
@@ -182,6 +187,11 @@ void ValueJsonDumper::visit(ValueImg *pValue)
     imgdata["width"] = pValue->value().width;
     imgdata["height"] = pValue->value().height;
     imgdata["snr"] = pValue->value().SNR;
+    imgdata["hfravg"] = pValue->value().HFRavg;
+    imgdata["stars"] = pValue->value().starsCount;
+    imgdata["issolved"] = pValue->value().isSolved;
+    imgdata["solverra"] = pValue->value().solverRA;
+    imgdata["solverde"] = pValue->value().solverDE;
 
     QJsonArray arr;
     arr = QJsonArray();
@@ -219,8 +229,21 @@ void ValueJsonDumper::visit(ValueImg *pValue)
     }
     imgdata["stddev"] = arr;
 
+    arr = QJsonArray();
 
-
+    for (int i = 0; i <  pValue->value().channels; i++  )
+    {
+        QJsonArray oneChannel = QJsonArray();
+        QJsonArray freq = QJsonArray();
+        for (int j = 0; j < pValue->value().histogram[0].size(); j++  )
+        {
+            freq = QJsonArray();
+            freq.append(pValue->value().histogram[i][j]);
+            oneChannel.append(freq);
+        }
+        arr.append(oneChannel);
+    }
+    imgdata["histogram"] = arr;
 
     json["value"] = imgdata;
     mResult = json;
@@ -246,6 +269,17 @@ void ValueJsonDumper::visit(ValueGraph *pValue)
     json["type"] = "graph";
     json["graphtype"] = GraphTypeToString(pValue->getGraphDefs().type);
     json["params"] = QJsonObject::fromVariantMap(pValue->getGraphDefs().params);
+
+    mResult = json;
+}
+void ValueJsonDumper::visit(ValuePrg *pValue)
+{
+    QJsonObject json = dumpValueCommons(pValue);
+    json["type"] = "prg";
+    if (pValue->prgType() == bar) json["prgtype"] = "bar";
+    if (pValue->prgType() == spinner) json["prgtype"] = "spinner";
+    json["dynlabel"] = pValue->dynLabel();
+    json["value"] = pValue->value();
 
     mResult = json;
 }

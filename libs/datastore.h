@@ -41,6 +41,8 @@ class Datastore : public Baseroot
         OST::ValueLight* getValueLight(QString pProperty, QString pElement);
         OST::ValueImg* getValueImg(QString pProperty, QString pElement);
         OST::ValueVideo* getValueVideo(QString pProperty, QString pElement);
+        OST::ValuePrg* getValuePrg(QString pProperty, QString pElement);
+
         QString getString(QString pProperty, QString pElement);
         QString getString(QString pProperty, QString pElement, long line);
         long getInt(QString pProperty, QString pElement);
@@ -90,6 +92,8 @@ class Datastore : public Baseroot
             mStore[pPropertyName]->accept(&d);
             OnModuleEvent("cp", QString(), pPropertyName, d.getResult().toVariantMap());
             connect(mStore[pPropertyName], &OST::PropertyMulti::valueChanged, this, &Datastore::onValueChanged);
+            connect(mStore[pPropertyName], &OST::PropertyMulti::propertyEvent, this, &Datastore::onPropertyEvent);
+            connect(mStore[pPropertyName], &OST::PropertyMulti::sendMessage, this, &Datastore::onPropertyMessage);
             return true;
         }
         bool createGlobLov(const QString &pLovName,  OST::LovBase* pLov)

@@ -58,6 +58,12 @@ typedef struct ImgData
     uint16_t width { 0 };               // width of the image in pixels
     uint16_t height { 0 };              // height of the image in pixels
     uint8_t channels { 1 };             // Mono Images have 1 channel, RGB has 3 channels
+    double HFRavg{ 0 };                 // Average HFR
+    double starsCount{ 0 };             // Stars count
+    bool isSolved = false;
+    double solverRA{ 0 };
+    double solverDE{ 0 };
+    QVector<double> histogram[3];
 } ImgData;
 
 typedef enum
@@ -91,6 +97,12 @@ typedef struct GraphDefs
     GraphType type = none;
     QVariantMap params = QVariantMap();
 } GraphDefs;
+
+typedef enum
+{
+    bar,
+    spinner
+} PrgType;
 
 }
 

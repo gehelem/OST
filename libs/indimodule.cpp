@@ -156,10 +156,6 @@ bool IndiModule::connectAllDevices()
     int err = 0;
     std::vector<INDI::BaseDevice> devs = getDevices();
 
-    createDeviceProperty("camera", "Camera", "Module", "Indi", "999", INDI::BaseDevice::CCD_INTERFACE);
-    createDeviceProperty("focuser", "Focuser", "Module", "Indi", "999", INDI::BaseDevice::FOCUSER_INTERFACE);
-    createDeviceProperty("st4", "Pulses (ST4)", "Module", "Indi", "999", INDI::BaseDevice::GUIDER_INTERFACE);
-
     for(std::size_t i = 0; i < devs.size(); i++)
     {
         INDI::PropertySwitch svp = devs[i].getSwitch("CONNECTION");
@@ -186,7 +182,7 @@ bool IndiModule::connectAllDevices()
             sendNewSwitch(svp);
             if (devs[i].getDriverInterface() & INDI::BaseDevice::CCD_INTERFACE)
             {
-                sendWarning("Can't set blob mode " + QString(devs[i].getDeviceName()));
+                sendMessage("Set blob mode " + QString(devs[i].getDeviceName()));
                 setBLOBMode(B_ALSO, devs[i].getDeviceName(), nullptr);
 
             }
@@ -374,6 +370,97 @@ auto IndiModule::sendModNewNumber(const QString &deviceName, const QString &prop
     }
     sendError("Unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
     return false;
+
+}
+bool IndiModule::requestCapture(const QString &deviceName, const double &exposure, const double &gain, const double &offset)
+{
+    double wgain = gain;
+    double woffset = offset;
+    double wexpose = exposure;
+    INDI::BaseDevice dp = getDevice(deviceName.toStdString().c_str());
+    if (!dp.isValid())
+    {
+        sendError("Capture - device " + deviceName + " not found. Aborting.");
+        return false;
+    }
+    if (!dp.isConnected())
+    {
+        sendWarning("Capture - " + deviceName + " not connected, trying to connect");
+        if (!connectDevice(deviceName)) return false;
+    }
+    setBLOBMode(B_ALSO, deviceName.toStdString().c_str(), nullptr);
+    if(dp.getProperty("CCD_CONTROLS"))
+    {
+        INDI::PropertyNumber prop = dp.getNumber("CCD_CONTROLS");
+        if (wgain < prop.findWidgetByName("Gain")->min)
+        {
+            sendWarning("Capture - " + deviceName + " gain requested too low (" + QString::number(wgain) + "), setting to " +
+                        QString::number(prop.findWidgetByName("Gain")->min));
+            wgain = prop.findWidgetByName("Gain")->min;
+        }
+        if (wgain > prop.findWidgetByName("Gain")->max)
+        {
+            sendWarning("Capture - " + deviceName + " gain requested too high (" + QString::number(wgain) + "), setting to " +
+                        QString::number(prop.findWidgetByName("Gain")->max));
+            wgain = prop.findWidgetByName("Gain")->max;
+        }
+        if (woffset < prop.findWidgetByName("Offset")->min)
+        {
+            sendWarning("Capture - " + deviceName + " gain requested too low (" + QString::number(woffset) + "), setting to " +
+                        QString::number(prop.findWidgetByName("Offset")->min));
+            woffset = prop.findWidgetByName("Offset")->min;
+        }
+        if (woffset > prop.findWidgetByName("Offset")->max)
+        {
+            sendWarning("Capture - " + deviceName + " gain requested too high (" + QString::number(woffset) + "), setting to " +
+                        QString::number(prop.findWidgetByName("Offset")->max));
+            woffset = prop.findWidgetByName("Offset")->max;
+        }
+        prop.findWidgetByName("Gain")->value = wgain;
+        prop.findWidgetByName("Offset")->value = woffset;
+        sendNewNumber(prop);
+    }
+    if(dp.getProperty("CCD_GAIN"))
+    {
+        INDI::PropertyNumber prop = dp.getNumber("CCD_GAIN");
+        if (wgain < prop.findWidgetByName("GAIN")->min)
+        {
+            sendWarning("Capture - " + deviceName + " gain requested too low (" + QString::number(wgain) + "), setting to " +
+                        QString::number(prop.findWidgetByName("GAIN")->min));
+            wgain = prop.findWidgetByName("GAIN")->min;
+        }
+        if (wgain > prop.findWidgetByName("GAIN")->max)
+        {
+            sendWarning("Capture - " + deviceName + " gain requested too high (" + QString::number(wgain) + "), setting to " +
+                        QString::number(prop.findWidgetByName("GAIN")->max));
+            wgain = prop.findWidgetByName("GAIN")->max;
+        }
+        prop.findWidgetByName("GAIN")->value = wgain;
+        sendNewNumber(prop);
+    }
+    if(dp.getProperty("CCD_OFFSET"))
+    {
+        INDI::PropertyNumber prop = dp.getNumber("CCD_OFFSET");
+        if (woffset < prop.findWidgetByName("OFFSET")->min)
+        {
+            sendWarning("Capture - " + deviceName + " offset requested too low (" + QString::number(woffset) + "), setting to " +
+                        QString::number(prop.findWidgetByName("OFFSET")->min));
+            woffset = prop.findWidgetByName("OFFSET")->min;
+        }
+        if (woffset > prop.findWidgetByName("OFFSET")->max)
+        {
+            sendWarning("Capture - " + deviceName + " offset requested too high (" + QString::number(woffset) + "), setting to " +
+                        QString::number(prop.findWidgetByName("OFFSET")->max));
+            woffset = prop.findWidgetByName("OFFSET")->max;
+        }
+        prop.findWidgetByName("OFFSET")->value = woffset;
+        sendNewNumber(prop);
+    }
+
+    if (!sendModNewNumber(deviceName, "CCD_EXPOSURE", "CCD_EXPOSURE_VALUE", wexpose)) return false;
+    emit requestCaptureDone();
+    return true;
+
 
 }
 bool IndiModule::getModNumber(const QString &deviceName, const QString &propertyName, const QString  &elementName,
@@ -692,4 +779,180 @@ bool IndiModule::refreshDeviceslovs(QString deviceName)
         getGlovString("DRIVER_INTERFACE-GPS_INTERFACE")->lovAdd(d, d);
     }
     return true;
+}
+bool IndiModule::defineMeAsFocuser()
+{
+    defineMeAsImager();
+
+    OST::PropertyMulti* pm = getProperty("actions");
+    pm->setRule(OST::SwitchsRule::AtMostOne);
+    OST::ValueBool* b = new  OST::ValueBool("Abort focus", "", "");
+    b->setValue(false, false);
+    pm->addValue("abortfocus", b);
+    b = new  OST::ValueBool("Autofocus", "", "");
+    b->setValue(false, false);
+    pm->addValue("autofocus", b);
+    b = new  OST::ValueBool("Loop", "", "");
+    b->setValue(false, false);
+    pm->addValue("loop", b);
+    mIsFocuser = true;
+    return true;
+
+}
+bool IndiModule::defineMeAsGuider()
+{
+    defineMeAsImager();
+
+    OST::PropertyMulti* pm = getProperty("actions");
+    pm->setRule(OST::SwitchsRule::AtMostOne);
+    OST::ValueBool* b = new  OST::ValueBool("Abort guider", "", "");
+    b->setValue(false, false);
+    pm->addValue("abortguider", b);
+    b = new  OST::ValueBool("Guide", "", "");
+    b->setValue(false, false);
+    pm->addValue("guide", b);
+    b = new  OST::ValueBool("Calibrate", "", "");
+    b->setValue(false, false);
+    pm->addValue("calibrate", b);
+    mIsGuider = true;
+    return true;
+
+}
+bool IndiModule::defineMeAsSequencer()
+{
+    defineMeAsImager();
+
+    OST::PropertyMulti* pm = getProperty("actions");
+    pm->setRule(OST::SwitchsRule::AtMostOne);
+    OST::ValueBool* b = new  OST::ValueBool("Abort sequence", "", "");
+    b->setValue(false, false);
+    pm->addValue("abortsequence", b);
+    b = new  OST::ValueBool("Start sequence", "", "");
+    b->setValue(false, false);
+    pm->addValue("startsequence", b);
+    mIsSequencer = true;
+    return true;
+
+}
+bool IndiModule::defineMeAsImager()
+{
+    if (!getStore().contains("image"))
+    {
+        OST::PropertyMulti* dynprop = new OST::PropertyMulti("image", "Image", OST::Permission::WriteOnly, "Control",
+                "", "Control010", false, false);
+        createProperty("image", dynprop);
+    }
+
+    if (getStore().contains("image"))
+    {
+        if (!(getStore()["image"]->getValues()->contains("image")))
+        {
+            OST::PropertyMulti * pm = getProperty("image");
+            OST::ValueImg* img = new OST::ValueImg("", "", "");
+            pm->addValue("image", img);
+        }
+
+    }
+
+    OST::PropertyMulti * pm = getProperty("parms");
+    pm->setRule(OST::SwitchsRule::Any);
+
+    if (!getStore()["parms"]->getValues()->contains("exposure"))
+    {
+        OST::ValueFloat* f = new  OST::ValueFloat("Exposure", "200", "");
+        f->setValue(0, false);
+        f->setDirectEdit(true);
+        f->setAutoUpdate(true);
+        pm->addValue("exposure", f);
+    }
+
+
+
+    if (!getStore()["parms"]->getValues()->contains("gain"))
+    {
+        OST::ValueInt* i  = new  OST::ValueInt("Gain", "205", "");
+        i->setValue(0, false);
+        i->setDirectEdit(true);
+        i->setAutoUpdate(true);
+        pm->addValue("gain", i);
+    }
+
+    if (!getStore()["parms"]->getValues()->contains("offset"))
+    {
+        OST::ValueInt* i  = new  OST::ValueInt("Offset", "210", "");
+        i->setValue(0, false);
+        i->setDirectEdit(true);
+        i->setAutoUpdate(true);
+        pm->addValue("offset", i);
+    }
+
+    mIsImager = true;
+    return true;
+
+}
+bool IndiModule::defineMeAsNavigator()
+{
+    defineMeAsImager();
+
+    OST::PropertyMulti* pm  = getProperty("actions");
+    pm->setRule(OST::SwitchsRule::AtMostOne);
+    OST::ValueBool* b = new  OST::ValueBool("Abort navigator", "", "");
+    b->setValue(false, false);
+    pm->addValue("abortnavigator", b);
+    b = new  OST::ValueBool("Center target", "", "");
+    b->setValue(false, false);
+    pm->addValue("gototarget", b);
+    OST::ValueString* s = new  OST::ValueString("Target name", "50", "");
+    s->setDirectEdit(true);
+    s->setAutoUpdate(true);
+    pm->addValue("targetname", s);
+    OST::ValueFloat* f = new  OST::ValueFloat("Target RA", "51", "");
+    f->setDirectEdit(true);
+    f->setAutoUpdate(true);
+    pm->addValue("targetra", f);
+    f = new  OST::ValueFloat("Target DEC", "52", "");
+    f->setDirectEdit(true);
+    f->setAutoUpdate(true);
+    pm->addValue("targetde", f);
+    mIsNavigator = true;
+    return true;
+
+}
+bool IndiModule::giveMeADevice(QString name, QString label, INDI::BaseDevice::DRIVER_INTERFACE interface)
+{
+    OST::PropertyMulti* pm = getProperty("devices");
+    OST::ValueString* s = new  OST::ValueString(label, "", "");
+    switch (interface)
+    {
+        case INDI::BaseDevice::DRIVER_INTERFACE::GENERAL_INTERFACE:
+            s->setGlobalLov("DRIVER_INTERFACE-GENERAL_INTERFACE");
+            break;
+        case INDI::BaseDevice::DRIVER_INTERFACE::CCD_INTERFACE:
+            s->setGlobalLov("DRIVER_INTERFACE-CCD_INTERFACE");
+            break;
+        case INDI::BaseDevice::DRIVER_INTERFACE::TELESCOPE_INTERFACE:
+            s->setGlobalLov("DRIVER_INTERFACE-TELESCOPE_INTERFACE");
+            break;
+        case INDI::BaseDevice::DRIVER_INTERFACE::GUIDER_INTERFACE:
+            s->setGlobalLov("DRIVER_INTERFACE-GUIDER_INTERFACE");
+            break;
+        case INDI::BaseDevice::DRIVER_INTERFACE::FOCUSER_INTERFACE:
+            s->setGlobalLov("DRIVER_INTERFACE-FOCUSER_INTERFACE");
+            break;
+        case INDI::BaseDevice::DRIVER_INTERFACE::FILTER_INTERFACE:
+            s->setGlobalLov("DRIVER_INTERFACE-FILTER_INTERFACE");
+            break;
+        case INDI::BaseDevice::DRIVER_INTERFACE::GPS_INTERFACE:
+            s->setGlobalLov("DRIVER_INTERFACE-GPS_INTERFACE");
+            break;
+        default:
+            sendWarning("giveMeADevice unhandled interface type");
+            break;
+    }
+
+    s->setDirectEdit(true);
+    s->setAutoUpdate(true);
+    pm->addValue(name, s);
+    return true;
+
 }

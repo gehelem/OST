@@ -21,8 +21,11 @@ class ValueSingleSignalAndSlots : public ValueBase
         {
             emit valueChanged(this);
         }
+        void OnLovChanged(void)
+        {
+            emit lovChanged(this);
+        }
     signals:
-        void lovEvent();
         void gridEvent();
         void singleValueChanged();
 
@@ -38,7 +41,6 @@ class ValueSingle : public ValueSingleSignalAndSlots
         {
             mGridValues.clear();
             connect(this, &ValueSingle::singleValueChanged, this, &ValueSingleSignalAndSlots::OnSingleValueChanged);
-
         }
         ~ValueSingle() {}
         T value()

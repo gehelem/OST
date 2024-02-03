@@ -48,7 +48,6 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     setOstElementValue("mixedRW", "n2", 11, false);
     setOstElementValue("mixedRW", "t1", "Mixed text value", true);
     //saveAttributesToFile("dummy.json");
-    _camera = getString("devices", "camera");
 
     //foreach(QString key, getAvailableModuleLibs().keys())
     //{
@@ -103,6 +102,12 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     dynprop->addValue("dynbool", dynbool);
     dynbool->setValue(false, false);
 
+    giveMeADevice("camera", "Multipurpose camera", INDI::BaseDevice::CCD_INTERFACE);
+    giveMeADevice("mount", "Multipurpose mount", INDI::BaseDevice::TELESCOPE_INTERFACE);
+    defineMeAsFocuser();
+    defineMeAsGuider();
+    defineMeAsSequencer();
+    defineMeAsNavigator();
 
 }
 
@@ -114,7 +119,6 @@ Dummy::~Dummy()
 void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                               const QVariantMap &eventData)
 {
-
     if (getModuleName() == eventModule )
     {
         foreach(const QString &keyprop, eventData.keys())
@@ -158,7 +162,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                         }
                     }
                 }
-                if (keyprop == "actions")
+                if (keyprop == "actions2")
                 {
                     if (keyelt == "blob")
                     {
@@ -166,8 +170,8 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                         {
                             connectIndi();
                             getProperty(keyprop)->setState(OST::Ok);
+                            _camera = getString("devices", "camera");
                             connectDevice(_camera);
-                            connectDevice(getString("devices", "mount"));
                             setBLOBMode(B_ALSO, _camera.toStdString().c_str(), nullptr);
                             enableDirectBlobAccess(_camera.toStdString().c_str(), nullptr);
                         }
@@ -177,8 +181,12 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                         if (setOstElementValue(keyprop, keyelt, false, false))
                         {
                             getProperty(keyprop)->setState(OST::Busy);
-                            sendModNewNumber(_camera, "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );
-                            if (!sendModNewNumber(_camera, "CCD_EXPOSURE", "CCD_EXPOSURE_VALUE", getFloat("parameters", "exposure")))
+                            _camera = getString("devices", "camera");
+                            if (_camera == "CCD Simulator")
+                            {
+                                sendModNewNumber(_camera, "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );
+                            }
+                            if (!requestCapture(_camera, getFloat("parms", "exposure"), getInt("parms", "gain"), getInt("parms", "offset")))
                             {
                                 getProperty(keyprop)->setState(OST::Error);
                             }
@@ -212,17 +220,14 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                             }
                             else
                             {
-                                setOstElementValue("imagevalues", "mountRA", ra * 360 / 24, false);
-                                setOstElementValue("imagevalues", "mountDEC", dec, false);
-
                                 stats = _image->getStats();
                                 _solver.ResetSolver(stats, _image->getImageBuffer());
                                 QStringList folders;
                                 folders.append(getString("parameters", "indexfolderpath"));
-                                _solver.stellarSolver->setIndexFolderPaths(folders);
+                                _solver.stellarSolver.setIndexFolderPaths(folders);
                                 connect(&_solver, &Solver::successSolve, this, &Dummy::OnSucessSolve);
                                 connect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
-                                _solver.stellarSolver->setSearchPositionInDegrees(ra * 360 / 24, dec);
+                                _solver.stellarSolver.setSearchPositionInDegrees(ra * 360 / 24, dec);
                                 _solver.SolveStars(_solver.stellarSolverProfiles[0]);
                             }
                         }
@@ -239,6 +244,16 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                         }
                     }
                 }
+                if (keyprop == "lovevents")
+                {
+                    if (keyelt == "btn")
+                    {
+                        getValueString("lovevents", "code")->lovClear();
+                        getValueString("lovevents", "code")->lovAdd("V1", "Value1");
+                        getValueString("lovevents", "code")->lovAdd("V2", "Value2");
+                    }
+                }
+
 
             }
 
@@ -292,17 +307,9 @@ void Dummy::newBLOB(INDI::PropertyBlob pblob)
 
         delete _image;
         _image = new fileio();
-        _image->loadBlob(pblob);
+        _image->loadBlob(pblob, 0);
 
-        getProperty("actions")->setState(OST::Ok);
-        setOstElementValue("imagevalues", "width", _image->getStats().width, false);
-        setOstElementValue("imagevalues", "height", _image->getStats().height, false);
-        setOstElementValue("imagevalues", "min", _image->getStats().min[0], false);
-        setOstElementValue("imagevalues", "max", _image->getStats().max[0], false);
-        setOstElementValue("imagevalues", "mean", _image->getStats().mean[0], false);
-        setOstElementValue("imagevalues", "median", _image->getStats().median[0], false);
-        setOstElementValue("imagevalues", "stddev", _image->getStats().stddev[0], false);
-        setOstElementValue("imagevalues", "snr", _image->getStats().SNR, true);
+        getProperty("actions2")->setState(OST::Ok);
         QList<fileio::Record> rec = _image->getRecords();
         stats = _image->getStats();
         _image->saveAsFITS(getWebroot() + "/" + getModuleName() + QString(pblob.getDeviceName()) + ".FITS", stats,
@@ -311,14 +318,14 @@ void Dummy::newBLOB(INDI::PropertyBlob pblob)
 
         QImage rawImage = _image->getRawQImage();
         rawImage.save(getWebroot() + "/" + getModuleName() + QString(pblob.getDeviceName()) + ".jpeg", "JPG", 100);
-        //setOstPropertyAttribute("testimage", "URL", getModuleName() + QString(pblob.getDeviceName()) + ".jpeg", true);
         OST::ImgData dta = _image->ImgStats();
         dta.mUrlJpeg = getModuleName() + QString(pblob.getDeviceName()) + ".jpeg";
         dta.mUrlFits = getModuleName() + QString(pblob.getDeviceName()) + ".FITS";
+        dta.isSolved = false;
         getValueImg("testimage", "image1")->setValue(dta, true);
 
     }
-    getProperty("actions")->setState(OST::Ok);
+    getProperty("actions2")->setState(OST::Ok);
 
 
 }
@@ -337,29 +344,37 @@ void Dummy::updateProperty(INDI::Property property)
 
 void Dummy::OnSucessSEP()
 {
-    getProperty("actions")->setState(OST::Ok);
-    setOstElementValue("imagevalues", "hfravg", _solver.HFRavg, false);
-    setOstElementValue("imagevalues", "starscount", _solver.stars.size(), true);
+    getProperty("actions2")->setState(OST::Ok);
+    OST::ImgData dta = getValueImg("testimage", "image1")->value();
+    dta.HFRavg = _solver.HFRavg;
+    dta.starsCount = _solver.stars.size();
+    getValueImg("testimage", "image1")->setValue(dta, true);
     disconnect(&_solver, &Solver::successSEP, this, &Dummy::OnSucessSEP);
     disconnect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
 
 }
 void Dummy::OnSucessSolve()
 {
-    if (_solver.stellarSolver->failed())
+    if (_solver.stellarSolver.failed())
     {
         sendMessage("Solver failed");
-        getProperty("actions")->setState(OST::Error);
-        getProperty("imagevalues")->setState(OST::Error);
-        getValueFloat("imagevalues", "solRA")->setValue(0, false);
-        getValueFloat("imagevalues", "solDEC")->setValue(0, true);
+        getProperty("actions2")->setState(OST::Error);
+        OST::ImgData dta = getValueImg("testimage", "image1")->value();
+        dta.isSolved = false;
+        dta.solverRA = 0;
+        dta.solverDE = 0;
+        getValueImg("testimage", "image1")->setValue(dta, true);
     }
     else
     {
-        getProperty("actions")->setState(OST::Ok);
-        getProperty("imagevalues")->setState(OST::Ok);
-        getValueFloat("imagevalues", "solRA")->setValue(_solver.stellarSolver->getSolution().ra, false);
-        getValueFloat("imagevalues", "solDEC")->setValue(_solver.stellarSolver->getSolution().dec, true);
+        getProperty("actions2")->setState(OST::Ok);
+        OST::ImgData dta = getValueImg("testimage", "image1")->value();
+        dta.isSolved = true;
+        dta.solverRA = _solver.stellarSolver.getSolution().ra;
+        dta.solverDE = _solver.stellarSolver.getSolution().dec;
+        getValueImg("testimage", "image1")->setValue(dta, true);
+
+
 
     }
     disconnect(&_solver, &Solver::successSolve, this, &Dummy::OnSucessSolve);
@@ -413,5 +428,5 @@ void Dummy::updateSearchList(void)
 }
 void Dummy::newDevice(INDI::BaseDevice bd)
 {
-
+    Q_UNUSED(bd);
 }

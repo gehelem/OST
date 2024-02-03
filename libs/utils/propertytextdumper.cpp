@@ -21,11 +21,11 @@ void PropertyTextDumper::visit(PropertyMulti *pProperty)
     stream << "Multi Property :" << dumpPropertyCommons(pProperty)
            << ". values=";
 
-    foreach(const QString &key, pProperty->getValues().keys())
+    foreach(const QString &key, pProperty->getValues()->keys())
     {
         OST::ValueTextDumper d;
 
-        pProperty->getValues()[key]->accept(&d);
+        pProperty->getValue(key)->accept(&d);
         stream << " **** " << key.toStdString() << " : " << d.getResult().toStdString() << "//";
     }
 

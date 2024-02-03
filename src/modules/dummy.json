@@ -30,6 +30,7 @@
 "properties":{
     "extextRO": {
         "devcat": "Examples",
+        "badge": true,
         "elements": {
             "extext1": {
                 "type":"string",
@@ -238,8 +239,6 @@
         "permission": 2,
         "label": "Any"
     }
-
-
     ,
     "mixedRW": {
         "hasprofile":true,
@@ -287,31 +286,7 @@
         "permission": 2,
         "label": "Mixed types - read/write"
     },
-    "devices": {
-        "hasprofile":true,
-        "devcat": "Examples",
-        "group": "Images",
-        "permission": 2,
-        "label": "Devices",
-        "elements": {
-            "camera": {
-                "autoupdate":true,
-                "type": "string",
-                "label": "Camera",
-                "value": "CCD Simulator",
-                "listOfValues":"DRIVER_INTERFACE-CCD_INTERFACE"
-            },
-            "mount": {
-                "autoupdate":true,
-                "type": "string",
-                "label": "Mount",
-                "value": "Telescope Simulator",
-                "listOfValues":"DRIVER_INTERFACE-TELESCOPE_INTERFACE"
-            }
-
-        }
-    },
-    "actions": {
+    "actions2": {
         "devcat": "Examples",
         "rule":1,
         "elements": {
@@ -341,105 +316,15 @@
         "permission": 2,
         "label": "Actions"
     },
-    "imagevalues": {
-        "type": "multi",
-        "devcat": "Examples",
-        "rule":0,
-        "elements": {
-                "width": {
-                    "type": "int",
-                    "label": "Width",
-                    "value":0
-                },
-                "height": {
-                    "type": "int",
-                    "label": "Height",
-                    "value":0
-                },
-                "min": {
-                    "type": "int",
-                    "label": "Min ADU",
-                    "value":0
-                },
-                "max": {
-                    "type": "int",
-                    "label": "Max ADU",
-                    "value":0
-                },
-                "mean": {
-                    "type": "float",
-                    "label": "Mean ADU",
-                    "value":0
-                },
-                "median": {
-                    "type": "int",
-                    "label": "Median ADU",
-                    "value":0
-                },
-                "stddev": {
-                    "type": "float",
-                    "label": "StdDev",
-                    "value":0
-                },
-                "snr": {
-                    "type": "float",
-                    "label": "SNR",
-                    "step": 0.0001,
-                    "value":0
-                },
-                "starscount": {
-                    "type": "int",
-                    "label": "Stars found",
-                    "value":0
-                },
-                "hfravg": {
-                    "type": "float",
-                    "label": "Average HFR",
-                    "value":0
-                },
-                "solRA": {
-                    "type": "float",
-                    "label": "Solver RA",
-                    "value":0
-                },
-                "solDEC": {
-                    "type": "float",
-                    "label": "Solver DEC",
-                    "value":0
-                },
-                "mountRA": {
-                    "type": "float",
-                    "label": "Mount RA",
-                    "value":0
-                },
-                "mountDEC": {
-                    "type": "float",
-                    "label": "Mount DEC",
-                    "value":0
-                }
-        },
-        "group": "Images",
-        "permission": 0,
-        "label": "Results"
-    },
     "parameters": {
         "devcat": "Examples",
         "group": "Images",
         "permission": 2,
         "label": "Parameters",
         "elements": {
-            "exposure": {
-                "autoupdate":true,
-                "type": "float",
-                "label": "Exposure",
-                "value":10,
-                "step":0.001,
-                "min":0.001,
-                "max":3600,
-                "format": "99.99"
-            },
             "indexfolderpath": {
                 "autoupdate":true,
+                "directedit":true,
                 "type": "string",
                 "label": "Astrometry index folder path",
                 "value":"/usr/share/astrometry/"
@@ -463,6 +348,30 @@
                 "type": "message",
                 "label": "Image message",
                 "level":0
+            },
+            "progress": {
+                "type": "prg",
+                "prgtype": "spinner",
+                "label": "P1",
+                "dynlabel": "55.25/100",
+                "value": 55.25,
+                "order":0
+            },
+            "progress2": {
+                "type": "prg",
+                "prgtype": "spinner",
+                "label": "P2",
+                "dynlabel": "99/100",
+                "value": 99,
+                "order":2
+            },
+            "progress3": {
+                "type": "prg",
+                "prgtype": "bar",
+                "label": "P3",
+                "dynlabel": "80/100",
+                "value": 80,
+                "order":3
             }
         }
     },
@@ -673,6 +582,31 @@
                 "label": "DEC",
                 "order":"30",
                 "value":0
+            }
+        }
+    },
+    "lovevents":{
+        "devcat": "Examples",
+        "order": "00",
+        "group": "List of values",
+        "permission": 2,
+        "rule":2,
+        "label": "Test list of values",
+        "elements": {
+            "code": {
+                "type": "string",
+                "label": "Code",
+                "order":"10",
+                "gridvalues":[],
+                "autoupdate":true,
+                "directedit":true,
+                "value":""
+            },
+            "btn": {
+                "type": "bool",
+                "label": "Code",
+                "order":"11",
+                "value":false
             }
         }
     }

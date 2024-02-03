@@ -141,6 +141,8 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuemessage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuegraph.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuegraph.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueprg.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueprg.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovbase.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovsingle.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovstring.h
@@ -210,6 +212,7 @@ set(BASE_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuevideo.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuemessage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuegraph.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueprg.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovbase.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovsingle.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovstring.h
@@ -313,9 +316,25 @@ target_link_libraries(ostmaincontrol PRIVATE
 )
 target_compile_definitions(ostmaincontrol PRIVATE maincontrol_LIBRARY)
 
+# Indipanel module
+add_library(ostindipanel SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel.cpp
+)
+target_link_libraries(ostindipanel PRIVATE
+    ostindimodule
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Threads::Threads
+    z
+)
+target_compile_definitions(ostindipanel PRIVATE INDIPANEL_MODULE)
+
+
 install(TARGETS
     ostserver
-    ostbasemodule ostindimodule ostdummy ostmaincontrol
+    ostbasemodule ostindimodule ostdummy ostmaincontrol ostindipanel
     RUNTIME DESTINATION "/usr/bin"
     LIBRARY DESTINATION "/usr/lib"
     PUBLIC_HEADER DESTINATION "/usr/include/ost"
@@ -359,4 +378,5 @@ message(STATUS "GIT_COMMIT_SUBJECT=${GIT_COMMIT_SUBJECT}")
 #foreach (_variableName ${_variableNames})
 #    message(STATUS "${_variableName}=${${_variableName}}")
 #endforeach()
+
 

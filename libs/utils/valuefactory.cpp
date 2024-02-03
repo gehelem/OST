@@ -17,6 +17,7 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
             if (pData.contains("autoupdate")) pValue->setAutoUpdate(pData["autoupdate"].toBool());
             if (pData.contains("directedit")) pValue->setDirectEdit(pData["directedit"].toBool());
             if (pData.contains("arrayLimit")) pValue->setArrayLimit(pData["arrayLimit"].toInt());
+            if (pData.contains("badge")) pValue->setBadge(pData["badge"].toBool());
             if (pData.contains("gridvalues"))
             {
                 QList ll  = pData["gridvalues"].toList();
@@ -195,6 +196,11 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
             if (pData.contains("mean")) dta.mean[0] = pData["mean"].toList()[0].toDouble();
             if (pData.contains("stddev")) dta.stddev[0] = pData["stddev"].toList()[0].toDouble();
             if (pData.contains("snr")) dta.SNR = pData["snr"].toDouble();
+            if (pData.contains("hfravg")) dta.HFRavg = pData["hfravg"].toDouble();
+            if (pData.contains("stars")) dta.starsCount = pData["stars"].toDouble();
+            if (pData.contains("issolved")) dta.isSolved = pData["issolved"].toBool();
+            if (pData.contains("solverra")) dta.solverRA = pData["solverra"].toDouble();
+            if (pData.contains("solverde")) dta.solverDE = pData["solverde"].toDouble();
 
             pValue->setValue(dta, false);
             return pValue;
@@ -238,6 +244,26 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
             d.type = StringToGraphType(pData["graphtype"].toString());
             d.params = pData["params"].toMap();
             pValue->setGraphDefs(d);
+
+            return pValue;
+        }
+        if (pData["type"].toString() == "prg")
+        {
+            auto *pValue = new ValuePrg(pData["label"].toString(),
+                                        pData["order"].toString(),
+                                        pData["hint"].toString()
+                                       );
+            if (!pData.contains("prgtype"))
+            {
+                qDebug() << "Progress defined without type " << pValue->label() << " set default to bar";
+            }
+            else
+            {
+                if (pData["prgtype"].toString() == "bar") pValue->setPrgType(bar);
+                if (pData["prgtype"].toString() == "spinner") pValue->setPrgType(spinner);
+            }
+            if (pData.contains("value")) pValue->setValue(pData["value"].toDouble(), false);
+            if (pData.contains("dynlabel")) pValue->setDynLabel(pData["dynlabel"].toString(), false);
 
             return pValue;
         }

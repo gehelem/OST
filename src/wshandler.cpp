@@ -108,6 +108,10 @@ void WShandler::processTextMessage(QString message)
     {
         emit externalEvent(obj["evt"].toString(), obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
     }
+    if ((obj["evt"].toString() == "Fbadge"))
+    {
+        emit externalEvent(obj["evt"].toString(), obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+    }
 
 
 }
@@ -250,6 +254,10 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
                 if (prop["elements"].toMap()[key].toMap().contains("step"))
                 {
                     element["step"] = prop["elements"].toMap()[key].toMap()["step"];
+                }
+                if (prop["elements"].toMap()[key].toMap().contains("dynlabel"))
+                {
+                    element["dynlabel"] = prop["elements"].toMap()[key].toMap()["dynlabel"];
                 }
                 elements[key] = element;
             }
