@@ -1,0 +1,17 @@
+<map id="dc1394_bayer_Downsample_uint16" name="dc1394_bayer_Downsample_uint16">
+<area shape="rect" id="Node000001" title=" " alt="" coords="914,23,1097,64"/>
+<area shape="rect" id="Node000002" href="$bayer_8c.html#a8a213310e1fc1d26628aca558c983331" title=" " alt="" coords="706,23,866,64"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="898,46,867,46,867,41,898,41"/>
+<area shape="rect" id="Node000003" href="$classfileio.html#a1481719a716c4a99da4bd11f601fed8f" title=" " alt="" coords="524,31,658,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="690,46,658,46,658,41,690,41"/>
+<area shape="rect" id="Node000004" href="$classfileio.html#a7ac92268d1c6ad343c9f56d90e4eaa42" title=" " alt="" coords="378,31,476,56"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="509,46,477,46,477,41,509,41"/>
+<area shape="rect" id="Node000005" href="$classfileio.html#ae83ee5350fb41d186ae1320ef9b5fd02" title=" " alt="" coords="227,5,330,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="362,35,330,30,331,24,363,30"/>
+<area shape="rect" id="Node000006" href="$classfileio.html#a320346f8452770318e31793031e1dabb" title=" " alt="" coords="229,55,328,80"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="363,56,329,62,328,57,362,51"/>
+<area shape="rect" id="Node000007" href="$classfileio.html#a1cc9ceaada09a54b104d9ef891a419e8" title=" " alt="" coords="35,29,149,55"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="213,61,148,52,149,47,214,56"/>
+<area shape="rect" id="Node000008" href="$classfileio.html#ab4a75584c2ef8773f6e275650cb45155" title=" " alt="" coords="5,79,179,104"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="214,78,180,83,179,78,213,73"/>
+</map>

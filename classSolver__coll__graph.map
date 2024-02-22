@@ -1,0 +1,19 @@
+<map id="Solver" name="Solver">
+<area shape="rect" id="Node000001" title=" " alt="" coords="475,134,589,379"/>
+<area shape="rect" id="Node000002" href="$classQObject.html" title=" " alt="" coords="5,5,67,71"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="81,68,191,124,300,170,476,234,474,239,298,175,189,128,78,73"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="91,5,178,71"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="179,61,192,68,461,214,459,219,189,73,176,66"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="202,5,387,71"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="329,68,370,108,464,192,460,196,367,112,325,72"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="411,5,573,71"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="499,70,505,109,507,116,501,117,500,110,494,71"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="597,5,635,71"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="600,61,575,96,566,119,561,117,571,93,595,57"/>
+<area shape="rect" id="Node000007" href="$classint.html" title=" " alt="" coords="659,5,685,71"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="661,65,634,111,601,162,597,159,630,108,657,62"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="721,5,812,71"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="751,72,722,111,664,165,605,211,601,206,661,161,718,108,747,69"/>
+<area shape="rect" id="Node000009" href="$classQList_3_01int_01_4.html" title=" " alt="" coords="845,5,926,71"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="864,72,826,112,771,149,714,181,606,231,604,226,711,177,769,144,822,108,861,69"/>
+</map>

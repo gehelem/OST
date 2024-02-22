@@ -1,0 +1,9 @@
+<map id="DBManager::getDbProfiles" name="DBManager::getDbProfiles">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,178,56"/>
+<area shape="rect" id="Node000002" href="$classBaseroot.html#a11f046456df0e3597b22865491e64356" title=" " alt="" coords="226,31,360,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="178,41,210,41,210,46,178,46"/>
+<area shape="rect" id="Node000003" href="$classBaseroot.html#a1798d4e8fb63f7a127358c15b5c29e90" title=" " alt="" coords="408,5,579,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="360,32,392,28,393,34,360,38"/>
+<area shape="rect" id="Node000004" href="$classBaseroot.html#a19f10e8769981a8ffedd0ea52863fb9a" title=" " alt="" coords="417,55,571,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="360,49,401,54,401,59,360,54"/>
+</map>

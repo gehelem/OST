@@ -1,0 +1,17 @@
+<map id="dms::hour" name="dms::hour">
+<area shape="rect" id="Node000001" title=" " alt="" coords="616,5,693,31"/>
+<area shape="rect" id="Node000002" href="$classdms.html#a5af63a0093378943f7c16c2cdb6a9c81" title=" " alt="" coords="476,56,568,82"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="606,40,558,58,556,53,604,35"/>
+<area shape="rect" id="Node000003" href="$classdms.html#a745a01813ff4743df2818440c1644a4f" title=" " alt="" coords="181,81,286,107"/>
+<area shape="poly" id="edge8_Node000001_Node000003" title=" " alt="" coords="600,25,478,39,335,65,272,83,270,78,333,60,477,34,600,20"/>
+<area shape="rect" id="Node000004" href="$classdms.html#a61313ada5bc7418dfbeef21c9bf8c0d1" title=" " alt="" coords="5,56,133,82"/>
+<area shape="poly" id="edge10_Node000001_Node000004" title=" " alt="" coords="600,17,568,15,458,14,374,18,289,29,181,46,123,58,122,53,180,41,288,23,373,13,458,9,568,10,600,12"/>
+<area shape="rect" id="Node000005" href="$classdms.html#a2fd46fc5e9a77c21642d0327df1dbc39" title=" " alt="" coords="334,132,428,158"/>
+<area shape="poly" id="edge9_Node000001_Node000005" title=" " alt="" coords="633,45,604,72,569,96,534,113,497,125,429,141,428,136,496,120,532,108,566,92,601,68,630,41"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="461,77,287,92,286,87,460,71"/>
+<area shape="poly" id="edge7_Node000002_Node000004" title=" " alt="" coords="461,67,428,65,269,64,133,68,133,63,269,59,428,60,461,61"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="484,92,408,134,405,129,482,87"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="165,86,133,81,134,76,166,81"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="326,129,272,110,274,105,328,124"/>
+<area shape="poly" id="edge6_Node000005_Node000004" title=" " alt="" coords="318,144,251,137,180,122,133,104,93,85,95,80,135,100,181,117,252,132,319,139"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="Baseroot::getWarnings" name="Baseroot::getWarnings">
+<area shape="rect" id="Node000001" title=" " alt="" coords="643,5,795,31"/>
+<area shape="rect" id="Node000002" href="$classBasemodule.html#a6b4bb89eccb743bce3ddcd36dd2edcf6" title=" " alt="" coords="434,5,595,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="628,21,596,21,596,16,628,16"/>
+<area shape="rect" id="Node000003" href="$classController.html#a151f2b2dd8768f74b0b07f3186ebd395" title=" " alt="" coords="5,5,143,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="418,21,143,21,143,16,418,16"/>
+<area shape="rect" id="Node000004" href="$classBasemodule.html#a32ce7f747c54021896d1aa5a276bd842" title=" " alt="" coords="191,31,386,56"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="419,32,387,35,386,30,419,26"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="175,33,143,29,144,24,176,28"/>
+</map>

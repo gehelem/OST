@@ -1,0 +1,9 @@
+<map id="OST::ValueSingle::setPostIcon" name="OST::ValueSingle::setPostIcon">
+<area shape="rect" id="Node000001" title=" " alt="" coords="413,46,612,72"/>
+<area shape="rect" id="Node000002" href="$classMaincontrol.html#a6bee4653bf7515c62bf22053c8955bdb" title=" " alt="" coords="191,5,365,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="402,46,365,41,366,35,403,41"/>
+<area shape="rect" id="Node000003" href="$classMaincontrol.html#a9f3cac7c6a7fbed2dcab41980376ba6b" title=" " alt="" coords="195,71,361,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="399,77,361,82,361,77,398,72"/>
+<area shape="rect" id="Node000004" href="$classController.html#a151f2b2dd8768f74b0b07f3186ebd395" title=" " alt="" coords="5,78,143,104"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="180,94,143,94,143,88,180,88"/>
+</map>

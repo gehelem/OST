@@ -1,0 +1,20 @@
+<map id="OST::PropertyMulti::newLine" name="OST::PropertyMulti::newLine">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,157,136,198"/>
+<area shape="rect" id="Node000002" href="$classOST_1_1PropertyBase.html#a1786506823ecc756c92648118e75d3d3" title=" " alt="" coords="184,5,322,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="85,155,126,107,182,57,189,52,192,56,185,61,130,111,89,159"/>
+<area shape="rect" id="Node000003" href="$classOST_1_1PropertyBase.html#ae6e886171ee6fd7deadcc741bdc2864b" title=" " alt="" coords="184,71,322,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="114,154,193,116,196,121,116,159"/>
+<area shape="rect" id="Node000004" href="$classOST_1_1PropertyBase.html#a87f114f651c52ce952ec9ba5cce5b266" title="Internal property&#39;s name." alt="" coords="370,193,528,219"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="136,172,184,171,253,168,322,171,392,186,391,191,322,176,253,173,184,176,136,178"/>
+<area shape="rect" id="Node000005" href="$classOST_1_1PropertyBase.html#aec74ba39c5f179be7d276bb02ee4ed23" title=" " alt="" coords="184,316,322,357"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="89,197,129,248,156,276,185,301,192,305,188,310,182,305,152,279,125,251,84,200"/>
+<area shape="rect" id="Node000006" href="$classOST_1_1PropertyBase.html#a2d511ae6758e6bb4ae27b1580668289f" title=" " alt="" coords="184,185,322,226"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="137,185,169,190,168,195,136,190"/>
+<area shape="rect" id="Node000008" href="$classOST_1_1PropertyBase.html#a6a4758e6c28ae9b29eccbb50db961ebe" title=" " alt="" coords="184,251,322,291"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="111,196,185,235,196,241,194,246,182,240,109,201"/>
+<area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="322,203,354,203,354,208,322,208"/>
+<area shape="rect" id="Node000007" href="$classOST_1_1PropertyBase.html#a0449ba5e729415a02929036bdb8773df" title=" " alt="" coords="380,247,518,287"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="321,224,369,239,367,244,319,229"/>
+<area shape="poly" id="edge9_Node000008_Node000004" title=" " alt="" coords="315,248,393,221,394,227,317,253"/>
+<area shape="poly" id="edge10_Node000008_Node000007" title=" " alt="" coords="322,267,364,266,365,271,323,272"/>
+</map>

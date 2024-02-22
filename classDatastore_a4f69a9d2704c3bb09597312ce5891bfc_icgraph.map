@@ -1,0 +1,13 @@
+<map id="Datastore::deleteOstProperty" name="Datastore::deleteOstProperty">
+<area shape="rect" id="Node000001" title=" " alt="" coords="660,31,848,56"/>
+<area shape="rect" id="Node000002" href="$classMaincontrol.html#a9389bf4070ccd5d873d4a40ad6b73416" title=" " alt="" coords="443,5,604,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="644,34,604,30,605,24,645,29"/>
+<area shape="rect" id="Node000003" href="$classBasemodule.html#a7b141282c52d704fde6d7b55e8e01465" title=" " alt="" coords="434,55,612,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="645,57,613,61,613,56,645,52"/>
+<area shape="rect" id="Node000004" href="$classBasemodule.html#aca68b58f8e4a9efe64e9a68b88b088b1" title=" " alt="" coords="222,29,355,55"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="418,59,355,52,356,47,419,54"/>
+<area shape="rect" id="Node000005" href="$classBasemodule.html#a32ce7f747c54021896d1aa5a276bd842" title=" " alt="" coords="191,79,386,104"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="419,81,387,84,386,79,418,76"/>
+<area shape="rect" id="Node000006" href="$classController.html#a151f2b2dd8768f74b0b07f3186ebd395" title=" " alt="" coords="5,79,143,104"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="175,94,143,94,143,89,175,89"/>
+</map>

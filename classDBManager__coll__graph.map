@@ -1,0 +1,9 @@
+<map id="DBManager" name="DBManager">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,785,156,1051"/>
+<area shape="rect" id="Node000002" href="$classDatastore.html" title="Class to provide properties management for OST modules." alt="" coords="23,432,139,737"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,752,83,786,78,786,78,752"/>
+<area shape="rect" id="Node000003" href="$classBaseroot.html" title=" " alt="" coords="13,119,148,384"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="83,399,83,432,78,432,78,399"/>
+<area shape="rect" id="Node000004" href="$classQObject.html" title=" " alt="" coords="50,5,111,71"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="83,86,83,119,78,119,78,86"/>
+</map>

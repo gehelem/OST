@@ -1,0 +1,14 @@
+<map id="fileio::getSolverOptionsFromFITS" name="fileio::getSolverOptionsFromFITS">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,159,64"/>
+<area shape="rect" id="Node000002" href="$classdms.html#ae6172a666c0a497fed02abdec7393fa9" title=" " alt="" coords="367,5,467,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="159,23,206,16,282,11,352,12,351,17,282,17,207,21,160,28"/>
+<area shape="rect" id="Node000003" href="$classdms.html#a0fec910923e044d53437336f40ef63ed" title="Static function to create a DMS object from a QString." alt="" coords="207,31,319,56"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="159,41,191,41,191,46,159,46"/>
+<area shape="rect" id="Node000004" href="$classdms.html#a1610fdd22b8f26d6e48f73e6f86cb897" title=" " alt="" coords="219,80,307,106"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="160,62,205,74,204,80,158,67"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="295,77,318,66,377,36,379,41,320,71,297,82"/>
+<area shape="rect" id="Node000005" href="$classdms.html#a3bb5852a6de890b8c59b57367741e95b" title=" " alt="" coords="372,80,463,106"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="307,90,356,90,356,96,307,96"/>
+<area shape="rect" id="Node000006" href="$classdms.html#aa009567f0e2333e260a0a1d6091384c6" title=" " alt="" coords="515,80,593,106"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="463,90,500,90,500,96,463,96"/>
+</map>

@@ -1,0 +1,14 @@
+<map id="Solver::FindStars" name="Solver::FindStars">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,55,126,80"/>
+<area shape="rect" id="Node000002" href="$classSolver.html#a436b443c13cfcc17921c8fa402f35f03" title=" " alt="" coords="180,5,308,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="114,51,179,33,181,38,116,57"/>
+<area shape="rect" id="Node000003" href="$classSolver.html#a1114a4d3a92edcb8448093a497f529a8" title=" " alt="" coords="177,55,311,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="126,65,161,65,161,70,126,70"/>
+<area shape="rect" id="Node000005" href="$classSolver.html#aff14606dd5e1b4bbd6ead5cca69a7fd9" title=" " alt="" coords="174,128,314,154"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="100,78,198,119,196,124,98,83"/>
+<area shape="rect" id="Node000004" href="$classSolver.html#aa24b0e489c33db9f80e7ea5e6177d7d8" title=" " alt="" coords="371,55,492,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="311,65,356,65,356,70,311,70"/>
+<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="214,129,208,119,211,110,224,104,244,101,265,104,277,110,274,115,264,109,244,107,225,109,215,113,213,119,218,126"/>
+<area shape="rect" id="Node000006" href="$classSolver.html#a5e7d33534bfa6cd8d5aea7165a172a14" title=" " alt="" coords="362,128,501,154"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="315,138,347,138,347,144,315,144"/>
+</map>

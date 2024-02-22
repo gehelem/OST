@@ -1,0 +1,17 @@
+<map id="dms::degree" name="dms::degree">
+<area shape="rect" id="Node000001" title=" " alt="" coords="609,51,700,77"/>
+<area shape="rect" id="Node000002" href="$classdms.html#ab2e949d7dd107fb7d7d949549057eaec" title=" " alt="" coords="469,127,561,153"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="617,87,542,129,539,125,615,82"/>
+<area shape="rect" id="Node000003" href="$classdms.html#ab30a0e34176e10dcb3a4dcca25a7e278" title=" " alt="" coords="330,26,421,52"/>
+<area shape="poly" id="edge8_Node000001_Node000003" title=" " alt="" coords="593,61,422,46,422,40,593,56"/>
+<area shape="rect" id="Node000004" href="$classdms.html#a7464ac79738437c89d4066f8923a9fc2" title=" " alt="" coords="180,77,282,102"/>
+<area shape="poly" id="edge9_Node000001_Node000004" title=" " alt="" coords="593,70,282,89,282,84,593,65"/>
+<area shape="rect" id="Node000005" href="$classdms.html#a504ca5421c5e46a8f44ca3cfbf302074" title=" " alt="" coords="5,51,132,77"/>
+<area shape="poly" id="edge10_Node000001_Node000005" title=" " alt="" coords="602,48,560,36,455,15,371,8,286,15,180,35,111,53,109,48,179,30,286,10,371,3,455,9,561,31,604,43"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="482,120,393,54,396,50,485,116"/>
+<area shape="poly" id="edge6_Node000002_Node000004" title=" " alt="" coords="454,133,330,111,282,102,283,97,330,106,454,127"/>
+<area shape="poly" id="edge7_Node000002_Node000005" title=" " alt="" coords="454,145,326,141,252,133,179,117,132,100,92,80,94,75,134,95,180,112,253,127,327,136,454,140"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="323,60,270,79,269,74,322,55"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="314,47,132,62,132,56,314,41"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="164,82,132,77,133,71,165,77"/>
+</map>

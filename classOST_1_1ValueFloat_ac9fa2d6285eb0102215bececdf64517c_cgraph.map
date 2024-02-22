@@ -1,0 +1,9 @@
+<map id="OST::ValueFloat::lovDel" name="OST::ValueFloat::lovDel">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,164,56"/>
+<area shape="rect" id="Node000002" href="$classOST_1_1LovSingle.html#a7d69336eb7c384eaa9161579aadcab7c" title=" " alt="" coords="212,31,366,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="164,41,196,41,196,46,164,46"/>
+<area shape="rect" id="Node000003" href="$classOST_1_1LovBase.html#a842662c8849c052a40070e94d9cb1fad" title=" " alt="" coords="421,5,601,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="366,32,404,28,405,33,367,37"/>
+<area shape="rect" id="Node000004" href="$classOST_1_1LovBase.html#ae8fe861093d002c2890c505e5920479e" title=" " alt="" coords="414,55,607,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="366,49,398,53,398,58,366,54"/>
+</map>

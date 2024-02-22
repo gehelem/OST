@@ -1,0 +1,11 @@
+<map id="Basemodule::setClassName" name="Basemodule::setClassName">
+<area shape="rect" id="Node000001" title="setClassName is a method to set inherited modules classname (ideally metaObject()&#45;&gt;className())" alt="" coords="5,31,191,56"/>
+<area shape="rect" id="Node000002" href="$classBasemodule.html#a724508dc9c9f944972f47e5212865ec5" title=" " alt="" coords="239,5,424,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="191,31,223,27,223,33,191,36"/>
+<area shape="rect" id="Node000003" href="$classBaseroot.html#affc1e3a0ffc17f0bddb90a005ddd2442" title=" " alt="" coords="254,55,409,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="191,50,239,55,239,61,191,56"/>
+<area shape="rect" id="Node000004" href="$classBaseroot.html#a1798d4e8fb63f7a127358c15b5c29e90" title=" " alt="" coords="472,29,643,55"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="409,56,456,51,457,56,409,62"/>
+<area shape="rect" id="Node000005" href="$classBaseroot.html#a19f10e8769981a8ffedd0ea52863fb9a" title=" " alt="" coords="481,79,635,104"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="409,73,465,79,465,84,409,78"/>
+</map>

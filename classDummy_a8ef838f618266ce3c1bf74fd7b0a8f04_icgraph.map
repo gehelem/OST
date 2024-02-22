@@ -1,0 +1,13 @@
+<map id="Dummy::OnSolverLog" name="Dummy::OnSolverLog">
+<area shape="rect" id="Node000001" title=" " alt="" coords="451,52,598,78"/>
+<area shape="rect" id="Node000002" href="$classDummy.html#a52c1ddf28dc85dad5d67eac5d4f83000" title=" " alt="" coords="5,52,190,78"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="484,47,445,31,402,18,357,10,321,8,238,18,179,34,128,54,126,49,177,29,237,13,320,3,357,5,404,13,447,26,487,42"/>
+<area shape="rect" id="Node000003" href="$classDummy.html#a96878f36e30ba5529eb2e1da119c0bae" title=" " alt="" coords="241,52,400,78"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="435,67,400,67,400,62,435,62"/>
+<area shape="rect" id="Node000004" href="$classDummy.html#aec8f90ef2a35c80a71549cff828649d6" title=" " alt="" coords="238,125,403,151"/>
+<area shape="poly" id="edge5_Node000001_Node000004" title=" " alt="" coords="473,86,360,127,358,122,471,81"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="225,67,190,67,190,62,225,62"/>
+<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="356,40,344,33,320,31,299,33,287,37,285,43,291,50,286,53,279,43,284,34,297,27,320,25,345,28,358,35"/>
+<area shape="poly" id="edge6_Node000004_Node000002" title=" " alt="" coords="264,122,138,81,140,76,265,117"/>
+<area shape="poly" id="edge7_Node000004_Node000004" title=" " alt="" coords="356,113,344,106,320,104,299,106,287,111,285,116,291,123,286,126,279,117,284,107,297,101,320,99,345,101,358,108"/>
+</map>

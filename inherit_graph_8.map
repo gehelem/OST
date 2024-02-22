@@ -1,0 +1,89 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="773,29,890,55"/>
+<area shape="rect" id="Node000001" href="$classIndiModule.html" title=" " alt="" coords="942,29,1026,55"/>
+<area shape="poly" id="edge1_Node000000_Node000001" title=" " alt="" coords="905,40,941,40,941,45,905,45"/>
+<area shape="rect" id="Node000002" href="$classDummy.html" title=" " alt="" coords="1081,5,1147,31"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="1041,29,1080,22,1081,27,1042,34"/>
+<area shape="rect" id="Node000003" href="$classIndiPanel.html" title=" " alt="" coords="1076,55,1152,80"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="1042,51,1076,58,1075,63,1041,56"/>
+<area shape="rect" id="Node000009" href="$classQObject.html" title=" " alt="" coords="5,412,75,438"/>
+<area shape="rect" id="Node000008" href="$classBaseroot.html" title=" " alt="" coords="152,128,226,154"/>
+<area shape="poly" id="edge4_Node000009_Node000008" title=" " alt="" coords="46,397,74,312,95,262,120,213,146,179,171,152,175,156,150,182,125,216,100,264,79,314,51,398"/>
+<area shape="rect" id="Node000010" href="$classController.html" title=" " alt="" coords="151,227,227,252"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="46,396,72,329,93,293,121,261,149,246,152,250,124,266,98,296,77,332,51,398"/>
+<area shape="rect" id="Node000011" href="$classOST_1_1LovBase.html" title=" " alt="" coords="136,276,242,302"/>
+<area shape="poly" id="edge11_Node000009_Node000011" title=" " alt="" coords="65,400,171,300,175,304,68,403"/>
+<area shape="rect" id="Node000021" href="$classOST_1_1PropertyBase.html" title="Class to define common property." alt="" coords="123,399,255,424"/>
+<area shape="poly" id="edge21_Node000009_Node000021" title=" " alt="" coords="90,418,122,415,122,420,91,423"/>
+<area shape="rect" id="Node000023" href="$classOST_1_1ValueBase.html" title=" " alt="" coords="130,461,248,487"/>
+<area shape="poly" id="edge23_Node000009_Node000023" title=" " alt="" coords="91,439,148,458,147,463,89,444"/>
+<area shape="rect" id="Node000041" href="$classSolver.html" title=" " alt="" coords="160,511,218,536"/>
+<area shape="poly" id="edge41_Node000009_Node000041" title=" " alt="" coords="65,447,92,473,124,497,160,513,158,518,121,502,89,477,61,451"/>
+<area shape="rect" id="Node000042" href="$classWShandler.html" title=" " alt="" coords="147,560,231,586"/>
+<area shape="poly" id="edge42_Node000009_Node000042" title=" " alt="" coords="55,450,83,500,102,525,124,547,148,560,145,564,121,551,98,528,78,502,50,453"/>
+<area shape="rect" id="Node000043" href="$classfileio.html" title=" " alt="" coords="165,609,213,635"/>
+<area shape="poly" id="edge43_Node000009_Node000043" title=" " alt="" coords="50,452,60,485,75,524,96,563,124,596,144,609,166,616,164,621,142,613,121,600,92,566,70,526,55,487,45,454"/>
+<area shape="rect" id="Node000007" href="$classDatastore.html" title="Class to provide properties management for OST modules." alt="" coords="356,79,433,104"/>
+<area shape="poly" id="edge5_Node000008_Node000007" title=" " alt="" coords="240,126,354,98,356,103,241,131"/>
+<area shape="rect" id="Node000006" href="$classDBManager.html" title=" " alt="" coords="583,79,673,104"/>
+<area shape="poly" id="edge6_Node000007_Node000006" title=" " alt="" coords="448,89,583,89,583,94,448,94"/>
+<area shape="rect" id="Node000004" href="$classBasemodule.html" title=" " alt="" coords="785,79,878,104"/>
+<area shape="poly" id="edge7_Node000006_Node000004" title=" " alt="" coords="688,89,784,89,784,94,688,94"/>
+<area shape="poly" id="edge8_Node000004_Node000001" title=" " alt="" coords="887,71,941,53,943,58,889,76"/>
+<area shape="rect" id="Node000005" href="$classMaincontrol.html" title=" " alt="" coords="940,79,1028,104"/>
+<area shape="poly" id="edge9_Node000004_Node000005" title=" " alt="" coords="894,89,940,89,940,94,894,94"/>
+<area shape="rect" id="Node000012" href="$classOST_1_1LovSingle.html" title=" " alt="" coords="308,128,480,154"/>
+<area shape="poly" id="edge12_Node000011_Node000012" title=" " alt="" coords="250,265,253,263,264,251,270,239,276,214,282,188,289,175,301,163,319,152,321,157,305,167,294,178,287,190,281,215,275,241,268,254,257,267,254,270"/>
+<area shape="rect" id="Node000014" href="$classOST_1_1LovSingle.html" title=" " alt="" coords="320,177,468,203"/>
+<area shape="poly" id="edge14_Node000011_Node000014" title=" " alt="" coords="247,267,253,263,268,250,277,237,286,225,302,212,325,201,327,206,304,216,290,228,281,241,272,254,257,267,250,271"/>
+<area shape="rect" id="Node000016" href="$classOST_1_1LovSingle.html" title=" " alt="" coords="312,227,477,252"/>
+<area shape="poly" id="edge16_Node000011_Node000016" title=" " alt="" coords="257,270,337,250,338,256,258,275"/>
+<area shape="rect" id="Node000018" href="$classOST_1_1LovSingle.html" title=" " alt="" coords="305,276,483,302"/>
+<area shape="poly" id="edge18_Node000011_Node000018" title=" " alt="" coords="258,286,305,286,305,292,258,292"/>
+<area shape="rect" id="Node000020" href="$classOST_1_1LovSingle.html" title=" " alt="" coords="323,325,465,351"/>
+<area shape="poly" id="edge20_Node000011_Node000020" title=" " alt="" coords="258,303,338,322,337,327,257,308"/>
+<area shape="rect" id="Node000013" href="$classOST_1_1LovFloat.html" title=" " alt="" coords="575,128,681,154"/>
+<area shape="poly" id="edge13_Node000012_Node000013" title=" " alt="" coords="496,138,575,138,575,144,496,144"/>
+<area shape="rect" id="Node000015" href="$classOST_1_1LovInt.html" title=" " alt="" coords="582,177,674,203"/>
+<area shape="poly" id="edge15_Node000014_Node000015" title=" " alt="" coords="484,188,582,188,582,193,484,193"/>
+<area shape="rect" id="Node000017" href="$classOST_1_1LovLight.html" title=" " alt="" coords="575,227,681,252"/>
+<area shape="poly" id="edge17_Node000016_Node000017" title=" " alt="" coords="492,237,575,237,575,242,492,242"/>
+<area shape="rect" id="Node000019" href="$classOST_1_1LovString.html" title=" " alt="" coords="573,276,683,302"/>
+<area shape="poly" id="edge19_Node000018_Node000019" title=" " alt="" coords="499,286,572,286,572,292,499,292"/>
+<area shape="rect" id="Node000022" href="$classOST_1_1PropertyMulti.html" title=" " alt="" coords="329,375,459,400"/>
+<area shape="poly" id="edge22_Node000021_Node000022" title=" " alt="" coords="270,399,328,392,329,398,271,405"/>
+<area shape="rect" id="Node000024" href="$classOST_1_1ValueGraph.html" title=" " alt="" coords="333,424,455,450"/>
+<area shape="poly" id="edge24_Node000023_Node000024" title=" " alt="" coords="262,458,332,445,333,451,263,463"/>
+<area shape="rect" id="Node000025" href="$classOST_1_1ValueImg.html" title=" " alt="" coords="340,473,449,499"/>
+<area shape="poly" id="edge25_Node000023_Node000025" title=" " alt="" coords="263,476,339,480,339,486,263,481"/>
+<area shape="rect" id="Node000026" href="$classOST_1_1ValueMessage.html" title=" " alt="" coords="324,523,464,548"/>
+<area shape="poly" id="edge26_Node000023_Node000026" title=" " alt="" coords="244,490,304,509,341,519,340,525,302,514,242,495"/>
+<area shape="rect" id="Node000027" href="$classOST_1_1ValuePrg.html" title=" " alt="" coords="341,572,448,598"/>
+<area shape="poly" id="edge27_Node000023_Node000027" title=" " alt="" coords="251,492,257,496,272,512,281,529,289,544,304,559,341,574,339,579,302,563,285,547,276,531,268,516,253,500,248,497"/>
+<area shape="rect" id="Node000028" href="$classOST_1_1ValueSingleSignalAndSlots.html" title=" " alt="" coords="303,622,485,663"/>
+<area shape="poly" id="edge28_Node000023_Node000028" title=" " alt="" coords="254,493,257,496,269,511,276,525,282,554,287,581,293,595,305,608,319,619,316,623,301,612,289,598,282,583,276,555,271,527,264,514,253,500,250,497"/>
+<area shape="rect" id="Node000040" href="$classOST_1_1ValueVideo.html" title=" " alt="" coords="334,687,454,712"/>
+<area shape="poly" id="edge40_Node000023_Node000040" title=" " alt="" coords="255,495,257,496,273,519,280,542,281,587,282,630,289,651,305,672,318,683,335,690,332,694,316,687,301,676,284,654,276,631,275,587,275,543,268,522,253,500,252,498"/>
+<area shape="rect" id="Node000029" href="$classOST_1_1ValueSingle.html" title=" " alt="" coords="543,505,713,531"/>
+<area shape="poly" id="edge29_Node000028_Node000029" title=" " alt="" coords="479,611,484,608,499,592,507,575,515,557,532,540,552,529,555,534,535,544,519,560,511,577,503,595,487,612,482,616"/>
+<area shape="rect" id="Node000031" href="$classOST_1_1ValueSingle.html" title=" " alt="" coords="536,555,720,580"/>
+<area shape="poly" id="edge31_Node000028_Node000031" title=" " alt="" coords="468,614,484,608,532,589,569,578,571,583,534,594,486,613,470,619"/>
+<area shape="rect" id="Node000033" href="$classOST_1_1ValueSingle.html" title=" " alt="" coords="548,604,708,630"/>
+<area shape="poly" id="edge33_Node000028_Node000033" title=" " alt="" coords="500,628,547,623,548,628,501,633"/>
+<area shape="rect" id="Node000035" href="$classOST_1_1ValueSingle.html" title=" " alt="" coords="540,653,716,679"/>
+<area shape="poly" id="edge35_Node000028_Node000035" title=" " alt="" coords="501,650,540,654,539,660,500,656"/>
+<area shape="rect" id="Node000037" href="$classOST_1_1ValueSingle.html" title=" " alt="" coords="533,703,723,728"/>
+<area shape="poly" id="edge37_Node000028_Node000037" title=" " alt="" coords="469,666,486,672,534,689,571,699,570,705,533,694,484,677,468,671"/>
+<area shape="rect" id="Node000039" href="$classOST_1_1ValueSingle.html" title=" " alt="" coords="551,752,705,778"/>
+<area shape="poly" id="edge39_Node000028_Node000039" title=" " alt="" coords="482,669,487,672,503,689,511,707,519,723,535,739,555,749,552,754,532,743,515,726,507,709,499,692,484,676,479,673"/>
+<area shape="rect" id="Node000030" href="$classOST_1_1ValueBool.html" title=" " alt="" coords="775,505,888,531"/>
+<area shape="poly" id="edge30_Node000029_Node000030" title=" " alt="" coords="728,516,774,516,774,521,728,521"/>
+<area shape="rect" id="Node000032" href="$classOST_1_1ValueFloat.html" title=" " alt="" coords="773,555,890,580"/>
+<area shape="poly" id="edge32_Node000031_Node000032" title=" " alt="" coords="735,565,773,565,773,570,735,570"/>
+<area shape="rect" id="Node000034" href="$classOST_1_1ValueInt.html" title=" " alt="" coords="780,604,883,630"/>
+<area shape="poly" id="edge34_Node000033_Node000034" title=" " alt="" coords="723,614,780,614,780,620,723,620"/>
+<area shape="rect" id="Node000036" href="$classOST_1_1ValueLight.html" title=" " alt="" coords="773,653,890,679"/>
+<area shape="poly" id="edge36_Node000035_Node000036" title=" " alt="" coords="732,664,773,664,773,669,732,669"/>
+<area shape="rect" id="Node000038" href="$classOST_1_1ValueString.html" title=" " alt="" coords="771,703,892,728"/>
+<area shape="poly" id="edge38_Node000037_Node000038" title=" " alt="" coords="738,713,771,713,771,718,738,718"/>
+</map>

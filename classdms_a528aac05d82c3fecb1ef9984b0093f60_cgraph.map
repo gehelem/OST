@@ -1,0 +1,5 @@
+<map id="dms::deltaAngle" name="dms::deltaAngle">
+<area shape="rect" id="Node000001" title="deltaAngle Return the shortest difference (path) between this angle and the supplied angle...." alt="" coords="5,5,119,31"/>
+<area shape="rect" id="Node000002" href="$classdms.html#aa009567f0e2333e260a0a1d6091384c6" title=" " alt="" coords="167,5,244,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="119,16,151,16,151,21,119,21"/>
+</map>

@@ -1,0 +1,18 @@
+<map id="OST::PropertyMulti::setValue" name="OST::PropertyMulti::setValue">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,113,136,153"/>
+<area shape="rect" id="Node000002" href="$classOST_1_1ValueBase.html#ab0224c09ce53ff6a81f0d0322b64c463" title=" " alt="" coords="184,5,346,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,110,132,75,182,41,196,35,198,39,185,46,135,79,95,114"/>
+<area shape="rect" id="Node000003" href="$classOST_1_1PropertyMulti.html#a1f931c08abc58a72e2aa17f224e7937f" title=" " alt="" coords="200,55,330,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="135,111,184,96,186,102,137,116"/>
+<area shape="rect" id="Node000005" href="$classOST_1_1PropertyBase.html#a87f114f651c52ce952ec9ba5cce5b266" title="Internal property&#39;s name." alt="" coords="394,152,552,178"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="136,135,379,155,378,160,136,141"/>
+<area shape="rect" id="Node000006" href="$classOST_1_1PropertyMulti.html#adfcaa08b6cee6fba208af4026db1c4d2" title=" " alt="" coords="200,170,330,211"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="137,150,186,164,184,169,135,155"/>
+<area shape="rect" id="Node000007" href="$classOST_1_1PropertyBase.html#a2d511ae6758e6bb4ae27b1580668289f" title=" " alt="" coords="196,235,334,276"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="96,152,136,186,185,220,196,226,193,230,182,224,133,190,92,156"/>
+<area shape="rect" id="Node000004" href="$classOST_1_1PropertyBase.html#a15add81dca862657c152e64d8616e70c" title="Property&#39;s label." alt="" coords="404,55,542,96"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="330,73,388,73,388,78,330,78"/>
+<area shape="poly" id="edge7_Node000007_Node000005" title=" " alt="" coords="316,232,345,220,428,182,430,187,347,225,318,237"/>
+<area shape="rect" id="Node000008" href="$classOST_1_1PropertyBase.html#a0449ba5e729415a02929036bdb8773df" title=" " alt="" coords="404,235,542,276"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="335,253,389,253,389,258,335,258"/>
+</map>

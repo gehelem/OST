@@ -1,0 +1,10 @@
+<map id="Datastore::deleteOstProperty" name="Datastore::deleteOstProperty">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,29,193,55"/>
+<area shape="rect" id="Node000002" href="$classBaseroot.html#a1798d4e8fb63f7a127358c15b5c29e90" title=" " alt="" coords="443,5,614,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="193,34,427,21,427,26,193,40"/>
+<area shape="rect" id="Node000003" href="$classBaseroot.html#affc1e3a0ffc17f0bddb90a005ddd2442" title=" " alt="" coords="241,55,395,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="194,50,226,54,225,60,193,56"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="375,51,455,33,456,38,377,57"/>
+<area shape="rect" id="Node000004" href="$classBaseroot.html#a19f10e8769981a8ffedd0ea52863fb9a" title=" " alt="" coords="452,55,606,80"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="395,65,436,65,436,70,395,70"/>
+</map>

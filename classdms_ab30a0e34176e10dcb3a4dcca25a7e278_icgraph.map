@@ -1,0 +1,8 @@
+<map id="dms::arcsec" name="dms::arcsec">
+<area shape="rect" id="Node000001" title=" " alt="" coords="330,31,421,56"/>
+<area shape="rect" id="Node000002" href="$classdms.html#a7464ac79738437c89d4066f8923a9fc2" title=" " alt="" coords="180,5,282,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="314,35,282,30,283,24,315,30"/>
+<area shape="rect" id="Node000003" href="$classdms.html#a504ca5421c5e46a8f44ca3cfbf302074" title=" " alt="" coords="5,31,132,56"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="314,46,132,46,132,41,314,41"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="165,31,133,36,132,31,164,26"/>
+</map>

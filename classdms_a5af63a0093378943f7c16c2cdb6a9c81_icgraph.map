@@ -1,0 +1,12 @@
+<map id="dms::minute" name="dms::minute">
+<area shape="rect" id="Node000001" title=" " alt="" coords="476,25,568,51"/>
+<area shape="rect" id="Node000002" href="$classdms.html#a745a01813ff4743df2818440c1644a4f" title=" " alt="" coords="181,25,286,51"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="461,40,286,40,286,35,461,35"/>
+<area shape="rect" id="Node000003" href="$classdms.html#a61313ada5bc7418dfbeef21c9bf8c0d1" title=" " alt="" coords="5,25,133,51"/>
+<area shape="poly" id="edge6_Node000001_Node000003" title=" " alt="" coords="460,27,428,22,304,9,250,9,181,15,119,27,118,22,180,10,250,4,305,3,429,17,461,22"/>
+<area shape="rect" id="Node000004" href="$classdms.html#a2fd46fc5e9a77c21642d0327df1dbc39" title=" " alt="" coords="334,76,428,101"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="471,59,420,78,418,73,469,54"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="165,40,133,40,133,35,165,35"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="326,73,272,54,274,49,328,68"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="318,85,180,66,123,54,125,49,181,61,319,80"/>
+</map>

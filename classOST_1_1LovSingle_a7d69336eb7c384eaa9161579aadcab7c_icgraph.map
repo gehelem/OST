@@ -1,0 +1,11 @@
+<map id="OST::LovSingle::lovDel" name="OST::LovSingle::lovDel">
+<area shape="rect" id="Node000001" title=" " alt="" coords="380,55,534,80"/>
+<area shape="rect" id="Node000002" href="$classOST_1_1ValueFloat.html#ac9fa2d6285eb0102215bececdf64517c" title=" " alt="" coords="171,5,330,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="385,53,307,34,308,29,386,48"/>
+<area shape="rect" id="Node000003" href="$classOST_1_1ValueInt.html#a33b533b0a18f9748ea0973833054c1b6" title=" " alt="" coords="178,55,323,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="365,70,323,70,323,65,365,65"/>
+<area shape="rect" id="Node000004" href="$classOST_1_1ValueString.html#aac888d935bc3d9f7ddbba0d2656ae0ae" title=" " alt="" coords="169,104,332,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="386,87,308,106,307,101,385,82"/>
+<area shape="rect" id="Node000005" href="$classDummy.html#ab4827b75bab26993555a749f5ef2d6c6" title=" " alt="" coords="5,104,121,130"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="153,120,121,120,121,114,153,114"/>
+</map>
