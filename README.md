@@ -1,5 +1,9 @@
 [![CMake](https://github.com/gehelem/OST/actions/workflows/cmake.yml/badge.svg)](https://github.com/gehelem/OST/actions/workflows/cmake.yml)
 
+See documentation site :
+
+https://documentation.ostserver.fr/fr/presentation/index.html
+
 # OST - Observatoire Sans Tête
 /!\ be carefull, all this is a work in progess.
 Very small parts are working, but you are welcome to come and play with me
