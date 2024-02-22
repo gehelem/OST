@@ -1,5 +1,11 @@
 <RCC>
     <qresource prefix="/">
         <file>db.sql</file>
+        <file>ic.txt</file>
+        <file>ldn.txt</file>
+        <file>messier.txt</file>
+        <file>ngc.txt</file>
+        <file>sh2.txt</file>
+        <file>stars.txt</file>
     </qresource>
 </RCC>

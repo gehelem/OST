@@ -1,97 +1,154 @@
 {
+"globallov":{
+},
+"properties":{
+    "indiGit": {
+        "devcat": "Module",
+        "group": "Info",
+        "order":"00",
+        "permission": 0,
+        "label": "Indi module git",
+        "elements": {
+            "hash": {
+                "type": "string",
+                "label": "Hash",
+                "value":"xxx"
+            },
+            "date": {
+                "type": "string",
+                "label": "Date",
+                "value":"xxx"
+            },
+            "message": {
+                "type": "string",
+                "label": "Commit message",
+                "value":"xxx"
+            }
+        }
+    },
     "server": {
         "hasprofile":true,
-        "devcat": "Indi",
-        "group": "",
+        "devcat": "Module",
+        "group": "Indi",
         "order":"99",
         "permission": 2,
-        "propertyLabel": "Server",
+        "label": "Server",
         "elements": {
             "host": {
-                "elementLabel": "Host",
+                "type": "string",
+                "label": "Host",
                 "value": "localhost"
             },
             "port": {
-                "elementLabel": "Port",
+                "type": "int",
+                "label": "Port",
                 "value": 7624
             }
 
         }
     },
     "serveractions": {
-        "devcat": "Indi",
-        "group": "",
+        "devcat": "Module",
+        "group": "Indi",
         "order":"01",
         "permission": 2,
         "rule":2,
-        "propertyLabel": "Server",
+        "label": "Server",
         "elements": {
             "conserv": {
-                "elementLabel": "Connect"
+                "type": "bool",
+                "label": "Connect"
                 ,"value":false
             },
             "disconserv": {
-                "elementLabel": "Disconnect"
+                "type": "bool",
+                "label": "Disconnect"
                 ,"value":false
             }
         }
     },
     "devices": {
         "hasprofile":true,
-        "devcat": "Indi",
+        "devcat": "Parameters",
         "group": "",
         "order":"06",
         "permission": 2,
-        "propertyLabel": "Devices",
+        "label": "Devices",
         "elements": {
         }
     },
     "devicesactions": {
-        "devcat": "Indi",
-        "group": "",
+        "devcat": "Module",
+        "group": "Indi",
         "order":"04",
         "permission": 2,
         "rule":2,
-        "propertyLabel": "Devices actions" ,
+        "label": "Devices actions" ,
         "elements": {
             "condevs": {
-                "elementLabel": "Connect"
+                "type": "bool",
+                "label": "Connect"
                 ,"value":false
             },
             "discondevs": {
-                "elementLabel": "Disconnect"
+                "type": "bool",
+                "label": "Disconnect"
                 ,"value":false
             },
             "loadconfs": {
-                "elementLabel": "Load devices conf"
+                "type": "bool",
+                "label": "Load devices conf"
                 ,"value":false
             }
 
         }
     },
     "startup": {
-        "devcat": "Indi",
-        "group": "",
+        "type": "multi",
+        "devcat": "Module",
+        "group": "Indi",
         "order":"08",
         "permission": 2,
         "rule":2,
         "hasprofile":true,
-        "propertyLabel": "Actions on module startup",
+        "label": "Actions on module startup",
         "elements": {
             "indiatstart": {
-                "elementLabel": "Connect indi"
+                "type": "bool",
+                "label": "Connect indi"
                 ,"value":false
             },
             "devatstart": {
-                "elementLabel": "Connect devices"
+                "type": "bool",
+                "label": "Connect devices"
                 ,"value":false
             },
             "confsatstart": {
-                "elementLabel": "Load devices conf"
+                "type": "bool",
+                "label": "Load devices conf"
                 ,"value":false
             }
 
         }
+    },
+    "actions": {
+        "devcat": "Control",
+        "order":"Control000",
+        "group": "",
+        "permission": 2,
+        "rule":1,
+        "label": "Actions",
+        "elements": {
+        }
+    },
+    "parms": {
+        "devcat": "Parameters",
+        "group": "",
+        "permission": 2,
+        "hasprofile":true,
+        "label": "Parameters",
+        "elements": {
+        }
     }
-
+}
 }

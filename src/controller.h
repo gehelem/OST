@@ -5,12 +5,12 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 //#include <QtSql/QSqlError>
-#include <boost/log/trivial.hpp>
+#include "qzeroconf.h"
 
-#include <basemodule.h>
+#include "maincontrol.h"
 
 #include "wshandler.h"
-#include "dbmanager.h"
+
 
 /*!
  * This class is the heart of OST
@@ -22,39 +22,56 @@ class Controller : public QObject
 {
         Q_OBJECT
     public:
-        Controller(bool saveAllBlobs, const QString &host, int port, const QString &webroot, const QString &dbpath,
-                   const QString &libpath, const QString &conf, const QString &installfront);
+        Controller(const QString &webroot, const QString &dbpath,
+                   const QString &libpath, const QString &conf, const QString &installfront, const QString &indiserver);
         ~Controller() override;
     signals:
         void controllerEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                              const QVariantMap &eventData);
     private:
-        QString _indihost;
-        int _indiport;
         QString _webroot;
         QString _dbpath;
         QString _libpath;
         QString _installfront;
         QString _conf;
+        QString _indiserver;
         QVariantMap _availableModuleLibs;
+        QStringList _availableIndiDrivers;
         WShandler   *wshandler;
         DBManager   *dbmanager;
+        Maincontrol *pMainControl;
         QProcess    *_process;
+        QProcess    *_indiProcess;
+        QMap<QString, QMap<QString, QString>> mModulesMap;
+        QZeroConf zeroConf;
+        QString buildName(void);
 
-        bool LoadModule(QString lib, QString name, QString label, QString profile);
+
+        bool loadModule(QString lib, QString name, QString label, QString profile);
+        void loadConf(const QString &pConf);
+        void saveConf(const QString &pConf);
         void checkModules(void);
+        void checkIndiDrivers(void);
         void installFront(void);
         void processOutput();
         void processError();
+        void processIndiOutput();
+        void processIndiError();
         void processFinished(int exitCode, QProcess::ExitStatus exitStatus);
-        void sendMessage(QString message);
+        void sendMessage(const QString &pMessage);
+        void startPublish();
+        void startIndi(void);
+        void stopIndi(void);
+        void startIndiDriver(const QString &pDriver);
+        void stopIndiDriver(const QString &pDriver);
 
     private slots:
-        void OnModuleEvent  (const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                             const QVariantMap &eventData);
-        void OnExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                             const QVariantMap &eventData);
-
+        void OnModuleEvent  (const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+                             const QVariantMap &pEventData);
+        void OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+                             const QVariantMap &pEventData);
+        void OnMainCtlEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+                            const QVariantMap &pEventData);
 
 };
 #endif

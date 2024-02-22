@@ -1,10 +1,8 @@
 #ifndef INDIMODULE_h_
 #define INDIMODULE_h_
-#include <QObject>
-#include "basemodule.h"
+#include <basemodule.h>
 #include <baseclient.h>
 #include <basedevice.h>
-#include <boost/log/trivial.hpp>
 
 
 /*!
@@ -18,24 +16,13 @@ class IndiModule : public Basemodule, public INDI::BaseClient
     public:
         IndiModule(QString name, QString label, QString profile, QVariantMap availableModuleLibs);
         ~IndiModule() = default;
-        void setHostport(QString host, int port);
-        void setWebroot(QString webroot)
-        {
-            _webroot = webroot;
-        }
         void requestProfile(QString profileName);
         void setProfile(QVariantMap profiledata);
-
-
-        QString getWebroot(void)
-        {
-            return _webroot;
-        }
         bool connectIndi(void);
-        void setBlobMode(void);
 
     public slots:
         void connectIndiTimer(void);
+        void OnAfterIndiConnectIndiTimer(void);
 
     protected:
 
@@ -50,73 +37,54 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         bool sendModNewSwitch(QString deviceName, QString propertyName, QString elementName, ISState sw);
         bool sendModNewNumber(const QString &deviceName, const QString &propertyName, const QString &elementName,
                               const double &value);
-
+        bool requestCapture(const QString &deviceName, const double &exposure, const double &gain, const double &offset);
         bool getModNumber(const QString &deviceName, const QString &propertyName, const QString &elementName, double &value);
         bool getModSwitch(const QString &deviceName, const QString &propertyName, const QString &elementName, bool &value);
         bool getModText(const QString &deviceName, const QString &propertyName, const QString &elementName, QString &value);
 
         bool frameSet(QString devicename, double x, double y, double width, double height);
         bool frameReset(QString devicename);
-
-
-        /*indi messages */
-        virtual void serverConnected() {}
-        virtual void serverDisconnected(int exit_code)
+        bool createDeviceProperty(const QString &key, const QString &label, const QString &level1,
+                                  const QString &level2, const QString &order, INDI::BaseDevice::DRIVER_INTERFACE interface);
+        bool refreshDeviceslovs(QString deviceName);
+        bool defineMeAsFocuser();
+        bool defineMeAsGuider();
+        bool defineMeAsSequencer();
+        bool defineMeAsImager();
+        bool defineMeAsNavigator();
+        bool isFocuser()
         {
-            Q_UNUSED(exit_code);
+            return mIsFocuser;
         }
-        virtual void newDevice(INDI::BaseDevice *dp)
+        bool isGuider()
         {
-            Q_UNUSED(dp);
+            return mIsGuider;
         }
-        virtual void removeDevice(INDI::BaseDevice *dp)
+        bool isSequencer()
         {
-            Q_UNUSED(dp);
+            return mIsSequencer;
         }
-        virtual void newProperty(INDI::Property *property)
+        bool isImager()
         {
-            Q_UNUSED(property);
+            return mIsImager;
         }
-        virtual void removeProperty(INDI::Property *property)
+        bool isNavigator()
         {
-            Q_UNUSED(property);
+            return mIsNavigator;
         }
-        virtual void newText(ITextVectorProperty *tvp)
-        {
-            Q_UNUSED(tvp);
-        }
-        virtual void newSwitch(ISwitchVectorProperty *svp)
-        {
-            Q_UNUSED(svp);
-        }
-        virtual void newLight(ILightVectorProperty *lvp)
-        {
-            Q_UNUSED(lvp);
-        }
-        virtual void newNumber(INumberVectorProperty *nvp)
-        {
-            Q_UNUSED(nvp);
-        }
-        virtual void newBLOB(IBLOB *bp)
-        {
-            Q_UNUSED(bp);
-        }
-        virtual void newMessage(INDI::BaseDevice *dp, int messageID)
-        {
-            Q_UNUSED(dp);
-            Q_UNUSED(messageID);
-        }
-        virtual void newUniversalMessage(std::string message)
-        {
-            Q_UNUSED(message);
-        }
+        bool giveMeADevice(QString name, QString label, INDI::BaseDevice::DRIVER_INTERFACE interface);
 
     private:
         void OnDispatchToIndiExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                            const QVariantMap &eventData) override;
-
+        bool mIsFocuser = false;
+        bool mIsGuider = false;
+        bool mIsSequencer = false;
+        bool mIsImager = false;
+        bool mIsNavigator = false;
     signals:
         void askedFrameReset(QString devicename);
+        void requestCaptureDone();
 }
 ;
 #endif

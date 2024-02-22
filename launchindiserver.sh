@@ -1,0 +1,1 @@
+indiserver -v -m 100 indi_simulator_ccd indi_simulator_telescope indi_simulator_focus indi_simulator_wheel indi_simulator_weather indi_simulator_lightpanel indi_simulator_gps indi_simulator_sqm indi_simulator_guide indi_simulator_dome indi_simulator_receiver indi_simulator_rotator

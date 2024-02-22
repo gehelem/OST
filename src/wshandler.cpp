@@ -1,7 +1,6 @@
 #include <QCoreApplication>
 #include <QtCore>
 #include "wshandler.h"
-#include <boost/log/trivial.hpp>
 
 /*!
 
@@ -11,13 +10,14 @@ WShandler::WShandler(QObject *parent)
 {
 
     //this->setParent(parent);
+    Q_UNUSED(parent);
     m_pWebSocketServer = new QWebSocketServer(QStringLiteral("OST server"), QWebSocketServer::NonSecureMode, this);
     if (m_pWebSocketServer->listen(QHostAddress::Any, 9624))
     {
         connect(m_pWebSocketServer, &QWebSocketServer::newConnection, this, &WShandler::onNewConnection);
         connect(m_pWebSocketServer, &QWebSocketServer::closed, this, &WShandler::closed);
     }
-    BOOST_LOG_TRIVIAL(debug) << "OST WS server listening";
+    sendMessage("OST WS server listening");
 }
 
 
@@ -48,7 +48,7 @@ void WShandler::sendbinary(QByteArray *data)
 
 void WShandler::onNewConnection()
 {
-    BOOST_LOG_TRIVIAL(debug) << "New WS client connection";
+    sendMessage("New WS client connection");
     QWebSocket *pSocket = m_pWebSocketServer->nextPendingConnection();
     connect(pSocket, &QWebSocket::textMessageReceived, this, &WShandler::processTextMessage);
     connect(pSocket, &QWebSocket::disconnected, this, &WShandler::socketDisconnected);
@@ -64,17 +64,53 @@ void WShandler::processTextMessage(QString message)
     QJsonDocument jsonResponse = QJsonDocument::fromJson(_mess.toUtf8()); // garder
     emit textRcv(message);
     QJsonObject  obj = jsonResponse.object(); // garder
-    BOOST_LOG_TRIVIAL(debug) << "OST server received json" << message.toStdString();
-    if (obj["evt"].toString() == "readall")
+    sendMessage("OST server received json" + message);
+    if (obj["evt"].toString() == "Freadall")
     {
         //sendAll();
         //emit changeValue(Prop());
-        emit externalEvent("readall", "*", "*", QVariantMap());
+        emit externalEvent("Freadall", "*", "*", QVariantMap());
 
     }
-    if (obj["evt"].toString() == "setproperty")
+    if (obj["evt"].toString() == "Fsetproperty")
     {
-        emit externalEvent("setproperty", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+        emit externalEvent("Fsetproperty", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+    }
+    if (obj["evt"].toString() == "Flcreate")
+    {
+        emit externalEvent("Flcreate", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+    }
+    if (obj["evt"].toString() == "Flupdate")
+    {
+        emit externalEvent("Flupdate", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+    }
+    if (obj["evt"].toString() == "Fldelete")
+    {
+        emit externalEvent("Fldelete", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+    }
+    if (obj["evt"].toString() == "Flselect")
+    {
+        emit externalEvent("Flselect", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+    }
+    if (obj["evt"].toString() == "Flup")
+    {
+        emit externalEvent("Flup", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+    }
+    if (obj["evt"].toString() == "Fldown")
+    {
+        emit externalEvent("Fldown", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+    }
+    if (obj["evt"].toString() == "Fclearmessages")
+    {
+        emit externalEvent("Fclearmessages", obj["mod"].toString(), QString(), QVariantMap());
+    }
+    if ((obj["evt"].toString() == "Fpreicon") || (obj["evt"].toString() == "Fposticon") )
+    {
+        emit externalEvent(obj["evt"].toString(), obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+    }
+    if ((obj["evt"].toString() == "Fbadge"))
+    {
+        emit externalEvent(obj["evt"].toString(), obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
     }
 
 
@@ -89,13 +125,13 @@ void WShandler::sendJsonMessage(QJsonObject json)
     //QString strJson(jsondoc.toJson(QJsonDocument::Indented)); // version lisible
     QString strJson(jsondoc.toJson(QJsonDocument::Compact)); // version compactée
     sendmessage(strJson);
-    //BOOST_LOG_TRIVIAL(debug) << "WS handler sends : " << strJson.toStdString();
+    //sendMessage("WS handler sends : " + strJson);
 }
 
 void WShandler::processBinaryMessage(QByteArray message)
 {
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
-    qDebug("OST server received binary message");
+    sendMessage("OST server received binary message");
 
     if (pClient)
     {
@@ -106,7 +142,7 @@ void WShandler::processBinaryMessage(QByteArray message)
 void WShandler::socketDisconnected()
 {
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
-    qDebug("OST client disconnected");
+    sendMessage("OST client disconnected");
     if (pClient)
     {
         m_clients.removeAll(pClient);
@@ -119,26 +155,33 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
 {
     QJsonObject  obj;
     obj["evt"] = eventType;
-    //obj["mod"]=eventModule;
 
     if (eventType == "moduledump")
     {
         QJsonObject mods;
         QJsonObject  mod;
-        mod["properties"] = QJsonObject::fromVariantMap(eventData);
-        mod["moduleLabel"] = eventData["moduleLabel"].toMap()["value"].toString();
-        mods[eventModule] = mod;
-        //obj["dta"]=QJsonObject::fromVariantMap(eventData);
+        mods[eventModule] = QJsonObject::fromVariantMap(eventData);
         obj["modules"] = mods;
         sendJsonMessage(obj);
     }
-    if (eventType == "addprop" || eventType == "addelt" || eventType == "setattributes")
+    if (eventType == "cp" || eventType == "ce" || eventType == "ap" || eventType == "ae")
     {
         QJsonObject mods;
         QJsonObject  mod;
         QJsonObject  prop;
         prop[eventKey] = QJsonObject::fromVariantMap(eventData);
         mod["properties"] = prop;
+        mods[eventModule] = mod;
+        obj["modules"] = mods;
+        sendJsonMessage(obj);
+    }
+    if (eventType == "lc")
+    {
+        QJsonObject mods;
+        QJsonObject  mod;
+        QJsonObject  lov;
+        lov[eventKey] = QJsonObject::fromVariantMap(eventData);
+        mod["globallovs"] = lov;
         mods[eventModule] = mod;
         obj["modules"] = mods;
         sendJsonMessage(obj);
@@ -181,7 +224,7 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
         obj["modules"] = mods;
         sendJsonMessage(obj);
     }
-    if (eventType == "setpropvalue")
+    if (eventType == "sp" || eventType == "se")
     {
         QVariantMap prop = eventData;
         QVariantMap values;
@@ -212,6 +255,10 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
                 {
                     element["step"] = prop["elements"].toMap()[key].toMap()["step"];
                 }
+                if (prop["elements"].toMap()[key].toMap().contains("dynlabel"))
+                {
+                    element["dynlabel"] = prop["elements"].toMap()[key].toMap()["dynlabel"];
+                }
                 elements[key] = element;
             }
             values["elements"] = elements;
@@ -225,5 +272,40 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
         obj["modules"] = mods;
         sendJsonMessage(obj);
     }
+    if (eventType == "mm")
+    {
+        QJsonObject mod;
+        QJsonObject mods;
+        mod["message"] = QJsonObject::fromVariantMap(eventData);;
+        mods[eventModule] = mod;
+        obj["modules"] = mods;
+        sendJsonMessage(obj);
+    }
+    if (eventType == "me")
+    {
+        QJsonObject mod;
+        QJsonObject mods;
+        mod["error"] = QJsonObject::fromVariantMap(eventData);;
+        mods[eventModule] = mod;
+        obj["modules"] = mods;
+        sendJsonMessage(obj);
+    }
+    if (eventType == "mw")
+    {
+        QJsonObject mod;
+        QJsonObject mods;
+        mod["warning"] = QJsonObject::fromVariantMap(eventData);;
+        mods[eventModule] = mod;
+        obj["modules"] = mods;
+        sendJsonMessage(obj);
+    }
 
+
+}
+void WShandler::sendMessage(const QString &pMessage)
+{
+    QString messageWithDateTime = "[" + QDateTime::currentDateTime().toString(Qt::ISODateWithMs) + "]-" + pMessage;
+    QDebug debug = qDebug();
+    debug.noquote();
+    debug << messageWithDateTime;
 }

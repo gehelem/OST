@@ -1,118 +1,125 @@
 #ifndef BASEMODULE_h_
 #define BASEMODULE_h_
-#include <QObject>
-#include <basedevice.h>
-#include <baseclient.h>
-#include <boost/log/trivial.hpp>
-#include "fileio.h"
-#include "solver.h"
 
+#include <dbmanager.h>
 /*!
  * This Class shouldn't be used as is
  * Every functionnal module should inherit it
 */
-class Basemodule : public QObject
+class Basemodule : public DBManager
 {
         Q_OBJECT
 
     public:
-        Basemodule(QString name, QString label, QString profile, QVariantMap availableModuleLibs);
+        Basemodule(QString name, QString label, QString profile, QVariantMap params);
         ~Basemodule();
-        void setHostport(QString host, int port);
         void setWebroot(QString webroot)
         {
-            _webroot = webroot;
+            mWebroot = webroot;
         }
-        void requestProfile(QString profileName);
         void setProfile(QVariantMap profiledata);
-        void setProfiles(QVariantMap profilesdata);
+        void setProfile(const QString &pProfileName);
+        void setProfiles();
         void sendDump(void);
-        QVariantMap getProfile(void);
+        void killMe(void);
 
-
-
+        /**
+         * @brief gets webroot directory
+         * @return webroot directory full path directory full
+         */
         QString getWebroot(void)
         {
-            return _webroot;
-        }
-        QString getName(void)
-        {
-            return _modulename;
-        }
-        QString getLabel(void)
-        {
-            return _modulelabel;
-        }
-        QVariantMap getOstProperties(void)
-        {
-            return _ostproperties;
-        }
-        QVariantMap getOstProperty(QString name)
-        {
-            return _ostproperties[name].toMap();
+            return mWebroot;
         }
         QVariantMap getModuleInfo(void);
         QVariantMap getAvailableModuleLibs(void)
         {
-            return _availableModuleLibs;
+            return mAvailableModuleLibs;
         }
+        QString getModuleName()
+        {
+            return mModuleName;
+        }
+        QString getModuleLabel()
+        {
+            return mModuleLabel;
+        }
+        QString getModuleDescription()
+        {
+            return mModuleDescription;
+        }
+        QString getModuleVersion()
+        {
+            return mModuleVersion;
+        }
+        QString getClassName()
+        {
+            return mClassName;
+        }
+        /**
+         * @brief setClassName is a method to set inherited modules classname (ideally metaObject()->className())
+         * @param pClassName is the classname
+         * @warning This is uggly, i don't know to do that differently :
+         * It's purpose is to share same profiles types between multiple instances of same module
+         * i'd like to avoid to do it within inherited module
+         * @return A boolean that reports whether it was successful, true means success.
+         * False means ClassName has already been set, and sends a corresponding message
+         */
 
-        QString _moduletype;
-        QString _webroot;
+        bool setClassName(const QString &pClassName);
 
     public slots:
-        void OnExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                             const QVariantMap &eventData);
-        virtual void OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                                       const QVariantMap &eventData)
+        void OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+                             const QVariantMap &pEventData);
+        virtual void OnMyExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+                                       const QVariantMap &pEventData)
         {
-            Q_UNUSED(eventType);
-            Q_UNUSED(eventModule);
-            Q_UNUSED(eventKey);
-            Q_UNUSED(eventData);
+            Q_UNUSED(pEventType);
+            Q_UNUSED(pEventModule);
+            Q_UNUSED(pEventKey);
+            Q_UNUSED(pEventData);
         }
-        virtual void OnDispatchToIndiExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                const QVariantMap &eventData)
+        virtual void OnDispatchToIndiExternalEvent(const QString &pEventType, const QString  &pEventModule,
+                const QString  &pEventKey,
+                const QVariantMap &pEventData)
         {
-            Q_UNUSED(eventType);
-            Q_UNUSED(eventModule);
-            Q_UNUSED(eventKey);
-            Q_UNUSED(eventData);
+            Q_UNUSED(pEventType);
+            Q_UNUSED(pEventModule);
+            Q_UNUSED(pEventKey);
+            Q_UNUSED(pEventData);
         }
 
     protected:
 
-        void sendMessage(QString message);
-
-        /* OST helpers */
-        bool createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,
-                               const  QString &pPropertyDevcat, const QString &pPropertyGroup, QString &err);
-        void emitPropertyCreation(const QString &pPropertyName);
-        void deleteOstProperty(QString propertyName);
-        void createOstElement (QString propertyName, QString elementName, QString elementLabel, bool emitEvent);
-        void setOstProperty   (const QString &pPropertyName, QVariant _value, bool emitEvent);
-        void setOstPropertyAttribute   (const QString &pPropertyName, const QString &pAttributeName, QVariant _value,
-                                        bool emitEvent);
-        bool setOstElement          (QString propertyName, QString elementName, QVariant elementValue, bool emitEvent);
-        bool pushOstElements        (QString propertyName);
-        bool resetOstElements      (QString propertyName);
-        bool setOstElementAttribute (QString propertyName, QString elementName, QString attributeName, QVariant _value,
-                                     bool emitEvent);
-        QVariant getOstElementValue (QString propertyName, QString elementName)
+        void setModuleDescription(QString description)
         {
-            return _ostproperties[propertyName].toMap()["elements"].toMap()[elementName].toMap()["value"]    ;
+            mModuleDescription = description;
+            setOstElementValue("moduleInfo", "moduleDescription", description, true);
+        }
+        void setModuleVersion(QString version)
+        {
+            mModuleVersion = version;
+            setOstElementValue("moduleInfo", "moduleVersion", version, true);
+
         }
 
-        void loadPropertiesFromFile(QString fileName);
-        void savePropertiesToFile(QString fileName);
+        /* OST helpers */
 
     private:
 
-        QVariantMap _ostproperties;
-        QString _modulename;
-        QString _modulelabel;
-        QVariantMap _availableModuleLibs;
-        QVariantMap _availableProfiles;
+        QVariantMap mAvailableModuleLibs;
+        QVariantMap mAvailableProfiles;
+        QString mWebroot;
+        QString mModuleName;
+        QString mModuleLabel;
+        QString mModuleDescription;
+        QString mModuleVersion;
+        QString mClassName = "";
+
+        void OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
+                           const QVariantMap &eventData) override;
+
+
 
     signals:
         void moduleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,

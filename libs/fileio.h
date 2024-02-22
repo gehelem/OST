@@ -7,6 +7,8 @@
 #include <QVariant>
 #include <basedevice.h>
 #include <baseclient.h>
+#include <libstellarsolver/parameters.h>
+#include <libstellarsolver/structuredefinitions.h>
 
 //CFitsio Includes
 #include "longnam.h"
@@ -17,9 +19,7 @@
 #include "math.h"
 #include "dms.h"
 #include "bayer.h"
-
-#include "parameters.h"
-#include "structuredefinitions.h"
+#include <valueimg.h>
 
 
 class fileio : public QObject
@@ -43,10 +43,16 @@ class fileio : public QObject
         bool loadImage(QString fileName);
         bool loadImageBufferOnly(QString fileName);
         bool loadFits(QString fileName);
-        bool loadBlob(IBLOB *bp);
+        bool loadBlob(INDI::PropertyBlob pblob)
+        {
+            return loadBlob(pblob, 32);
+        }
+        bool loadBlob(INDI::PropertyBlob pblob, int histoSize);
         bool parseHeader();
         bool saveAsFITS(QString fileName, FITSImage::Statistic &imageStats, uint8_t *m_ImageBuffer, FITSImage::Solution solution,
                         QList<Record> &records, bool hasSolution);
+        bool saveAsFITSSimple(QString fileName);
+
         bool loadOtherFormat(QString fileName);
         bool checkDebayer();
         bool debayer();
@@ -97,7 +103,7 @@ class fileio : public QObject
         {
             return m_HistogramFrequency[channel];
         }
-
+        OST::ImgData ImgStats();
 
     private:
         QString file;
@@ -114,7 +120,7 @@ class fileio : public QObject
         void logIssue(QString messsage);
 
         QImage rawImage;
-        void CalcStats(void);
+        void CalcStats(int size);
         void generateQImage();
 
         template <typename T>
@@ -128,7 +134,7 @@ class fileio : public QObject
         template <typename T>
         QPair<double, double> getSquaredSumAndMean(uint32_t start, uint32_t stride);
         template <typename T>
-        void CalcHisto(void);
+        void CalcHisto(int size);
 
         QVector<QVector<uint32_t>> m_CumulativeFrequency;
         QVector<QVector<double>> m_HistogramIntensity;
@@ -141,6 +147,23 @@ class fileio : public QObject
 
     signals:
         void logOutput(QString logText);
+
+    private:
+        void DummyFunctionToAvoidDefinedButNotUsedWarnings(void)
+        {
+            FITSImage::getColorChannelText(FITSImage::ColorChannel::RED);
+            FITSImage::getShortParityText(FITSImage::Parity::BOTH);
+            FITSImage::getParityText(FITSImage::Parity::BOTH);
+            SSolver::getLogLevelString(SSolver::logging_level::LOG_ALL);
+            SSolver::getMultiAlgoString(SSolver::MultiAlgo::MULTI_AUTO);
+            SSolver::getCommandString(SSolver::ProcessType::EXTRACT, SSolver::EXTRACTOR_INTERNAL, SSolver::SOLVER_STELLARSOLVER);
+            SSolver::getScaleUnitString(SSolver::ScaleUnits::ARCMIN_WIDTH);
+            SSolver::getConvFilterString(SSolver::ConvFilterType::CONV_CUSTOM);
+            SSolver::getShapeString(SSolver::SHAPE_CIRCLE);
+
+        }
+        void sendMessage(const QString &pMessage);
+
 };
 
 #endif // FILEIO_H

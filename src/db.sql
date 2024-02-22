@@ -13,6 +13,34 @@ CREATE TABLE IF NOT EXISTS CONFIGURATIONS (
         PROFILENAME    TEXT NOT NULL,
         PRIMARY KEY("CONFIGNAME","MODULENAME")
 );
-INSERT INTO CONFIGURATIONS VALUES ('default','My Allsky','allsky','default');
 INSERT INTO CONFIGURATIONS VALUES ('default','My dummy module','dummy','default');
-INSERT INTO CONFIGURATIONS VALUES ('justindipanel','Indipanel','indipanel','default');
+INSERT INTO CONFIGURATIONS VALUES ('modules','My dummy module','dummy','default');
+INSERT INTO CONFIGURATIONS VALUES ('modules','Indipanel','indipanel','default');
+INSERT INTO CONFIGURATIONS VALUES ('modules','My Allsky','allsky','default');
+INSERT INTO CONFIGURATIONS VALUES ('modules','My CCD inspector','inspector','default');
+INSERT INTO CONFIGURATIONS VALUES ('modules','My Focuser','focuser','default');
+INSERT INTO CONFIGURATIONS VALUES ('modules','My Navigator','navigator','default');
+CREATE TABLE IF NOT EXISTS CATALOGS (
+        CATALOG TEXT NOT NULL,
+        CODE TEXT NOT NULL,
+        RA REAL NOT NULL,
+        NS TEXT NOT NULL,
+        DEC REAL NOT NULL,
+        DIAM REAL,
+        MAG REAL,
+        NAME TEXT,
+        ALIAS TEXT,
+        PRIMARY KEY("CATALOG","CODE")
+);
+--DROP TABLE IF EXISTS OPTICS;
+CREATE TABLE IF NOT EXISTS OPTICS (
+        NAME     TEXT NOT NULL,
+        FOCAL     REAL NOT NULL,
+        DIAM     REAL NOT NULL,
+        BARLOW REAL NOT NULL,
+        FILTER BOOL,
+        PRIMARY KEY("NAME")
+);
+INSERT INTO OPTICS VALUES ('SW200/800',800.0,200.0,1.0,TRUE);
+INSERT INTO OPTICS VALUES ('254/1000',1000.0,254.0,1.5,FALSE);
+

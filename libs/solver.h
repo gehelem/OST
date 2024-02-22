@@ -7,7 +7,6 @@
 
 //Includes for this project
 #include <stellarsolver.h>
-#include <boost/log/trivial.hpp>
 
 class Solver : public QObject
 {
@@ -17,13 +16,17 @@ class Solver : public QObject
         ~Solver();
 
         // Stellasolver stuff
-        QPointer<StellarSolver> stellarSolver;
+        StellarSolver stellarSolver;
         QList<SSolver::Parameters> stellarSolverProfiles;
 
         QList<FITSImage::Star> stars;
 
         float HFRavg;
+        int HFRZones = 1; /* default 1 : 1x1 - 2: 2x2 - 3: 3x3 ... */
+        QList<float> HFRavgZone;
+        QList<int> HFRavgCount;
         void ResetSolver(FITSImage::Statistic &stats, uint8_t *m_ImageBuffer);
+        void ResetSolver(FITSImage::Statistic &stats, uint8_t *m_ImageBuffer, int zones);
         void FindStars(Parameters param);
         void SolveStars(Parameters param);
 
@@ -36,6 +39,16 @@ class Solver : public QObject
         void successSEP(void);
         void successSolve(void);
         void solverLog(QString &text);
+    private:
+        void DummyFunctionToAvoidDefinedButNotUsedWarnings(void)
+        {
+            FITSImage::getColorChannelText(FITSImage::ColorChannel::RED);
+            FITSImage::getShortParityText(FITSImage::Parity::BOTH);
+            FITSImage::getParityText(FITSImage::Parity::BOTH);
+        }
+        void sendMessage(const QString &pMessage);
+        int mImgWidth = 0;
+        int mImgHeight = 0;
 
 };
 #endif

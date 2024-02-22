@@ -1,89 +1,124 @@
 {
-    "baseVersion": {
-        "devcat": "Info",
-        "group": "",
+"globallov":{
+},
+"properties":{
+    "baseGit": {
+        "devcat": "Module",
+        "group": "Info",
         "order":"00",
         "permission": 0,
-        "propertyLabel": "BaseVersion",
-        "value":1
-    },
-    "moduleDescription": {
-        "devcat": "Info",
-        "group": "",
-        "order":"01",
-        "permission": 0,
-        "propertyLabel": "Module description",
-        "value":"N/A"
-    },
-    "moduleLabel": {
-        "devcat": "Info",
-        "group": "",
-        "order":"02",
-        "permission": 0,
-        "propertyLabel": "Module label",
-        "value":"Base module label"
-    },
-    "moduleName": {
-        "devcat": "Info",
-        "group": "",
-        "order":"03",
-        "permission": 0,
-        "propertyLabel": "Module name",
-        "value":"basemodule"
-    },
-    "moduleVersion": {
-        "devcat": "Info",
-        "group": "",
-        "order":"04",
-        "permission": 0,
-        "propertyLabel": "Version",
-        "value":1
-    },
-    "moduleType": {
-        "devcat": "Info",
-        "group": "",
-        "order":"05",
-        "permission": 0,
-        "propertyLabel": "Module type",
-        "value":"basemodule"
-    },
-    "message": {
-        "devcat": "messages",
-        "group": "",
-        "permission": 0,
-        "propertyLabel": "Message",
-        "value": ""
-    },
-    "profileactions": {
-        "devcat": "Profiles",
-        "group": "",
-        "permission": 2,
-        "rule":2,
-        "propertyLabel": "Profiles",
+        "label": "Base module git",
         "elements": {
-            "load": {
-                "elementLabel": "Load",
-                "value":false
+            "hash": {
+                "type": "string",
+                "label": "Hash",
+                "value":"xxx"
             },
-            "save": {
-                "elementLabel": "Save",
-                "value":false
+            "date": {
+                "type": "string",
+                "label": "Date",
+                "value":"xxx"
             },
-            "name": {
-                "elementLabel": "Name",
-                "value": "default"
+            "message": {
+                "type": "string",
+                "label": "Commit message",
+                "value":"xxx"
             }
         }
     },
-    "moduleactions": {
-        "devcat": "Profiles",
+    "moduleInfo": {
+        "devcat": "Module",
+        "group": "Info",
+        "order":"00",
+        "permission": 0,
+        "label": "Module info",
+        "elements": {
+            "moduleDescription": {
+                "type": "string",
+                "label": "Module description",
+                "value":"N/A"
+            },
+            "moduleLabel": {
+                "type": "string",
+                "label": "Module label",
+                "value":"Base module label"
+            },
+            "moduleName": {
+                "type": "string",
+                "label": "Module name",
+                "value":"basemodule"
+            },
+            "moduleVersion": {
+                "type": "int",
+                "label": "Version",
+                "value":1
+            },
+            "baseVersion": {
+                "type": "int",
+                "label": "baseVersion",
+                "value":1
+            }
+        }
+    },
+    "message": {
+        "devcat": "messages",
+        "type": "simple",
         "group": "",
+        "permission": 0,
+        "label": "Message",
+        "elements": {}
+    },
+    "loadprofile": {
+        "type": "multi",
+        "devcat": "Module",
+        "group": "Profiles",
+        "permission": 2,
+        "rule":1,
+        "label": "Load profile",
+        "elements": {
+            "name": {
+                "autoupdate":true,
+                "directedit":true,
+                "listOfValues":[],
+                "type": "string",
+                "label": "",
+                "value":"default",
+                "posticon":"redo",
+                "preicon":"autorenew"
+            }
+
+        }
+    },
+    "saveprofile": {
+        "type": "multi",
+        "devcat": "Module",
+        "group": "Profiles",
+        "permission": 2,
+        "rule":0,
+        "label": "Save profile",
+        "elements": {
+            "name": {
+                "autoupdate":true,
+                "directedit":true,
+                "type": "string",
+                "label": "",
+                "value":"default",
+                "posticon":"save"
+            }
+
+        }
+    },
+    "moduleactions": {
+        "type": "multi",
+        "devcat": "Module",
+        "group": "Actions",
         "permission": 1,
-        "propertyLabel": "Controls",
+        "label": "Controls",
         "rule":2,
         "elements": {
             "kill": {
-                "elementLabel": "Kill module",
+                "type": "bool",
+                "label": "Kill module",
                 "value":false
             }
         }
@@ -91,4 +126,5 @@
     }
 
 
+}
 }

@@ -15,11 +15,24 @@ class MODULE_INIT Maincontrol : public Basemodule
     public:
         Maincontrol(QString name, QString label, QString profile, QVariantMap availableModuleLibs);
         ~Maincontrol();
+        void sendMainMessage(const QString &pMessage);
+        void sendMainError(const QString &pMessage);
+        void sendMainWarning(const QString &pMessage);
+        void sendMainConsole(const QString &pMessage);
+        void setAvailableModuleLibs(const QVariantMap libs);
+        void addModuleData(const QString  &pName, const QString  &pLabel, const QString  &pType, const QString  &pProfile);
+        void setModuleData(const QString  &pName, const QString  &pLabel, const QString  &pType, const QString  &pProfile);
+        void deldModuleData(const QString  &pName);
+        void addIndiServerProperties(const QStringList pDrivers);
 
     public slots:
-        void OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                               const QVariantMap &eventData) override;
+        void OnMyExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+                               const QVariantMap &pEventData) override;
     private:
+        void setConfigurations(void);
+    signals:
+        void mainCtlEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+                          const QVariantMap &pEventData);
 
 };
 

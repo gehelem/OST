@@ -1,16 +1,31 @@
 #include <QGuiApplication>
 #include "controller.h"
-#include <boost/log/trivial.hpp>
-
+#include "version.cc"
 
 /*!
  * Entry point
  * Should become some kind of service to start & respawn with host
  */
+void sendMessage(const QString &pMessage);
+
 int main(int argc, char *argv[])
 {
 
-    BOOST_LOG_TRIVIAL(info) << "OST starting up";
+    sendMessage("OST starting up, ladies and gentlemen, squeeze your ALZ !");
+    sendMessage("                                  ");
+    sendMessage("    *******    ******** **********");
+    sendMessage("   **/////**  **////// /////**/// ");
+    sendMessage("  **     //**/**           /**    ");
+    sendMessage(" /**      /**/*********    /**    ");
+    sendMessage(" /**      /**////////**    /**    ");
+    sendMessage(" //**     **        /**    /**    ");
+    sendMessage("  //*******   ********     /**    ");
+    sendMessage("   ///////   ////////      //     ");
+    sendMessage("                                  ");
+
+    sendMessage("Git Hash              =" + QString::fromStdString(Version::GIT_SHA1));
+    sendMessage("Git Date              =" + QString::fromStdString(Version::GIT_DATE));
+    sendMessage("Git Commit subject    =" + QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
     QGuiApplication app(argc, argv, false);
     QGuiApplication::setOrganizationName("alazob.team");
     QGuiApplication::setApplicationName("ost");
@@ -19,10 +34,6 @@ int main(int argc, char *argv[])
     argParser.addHelpOption();
 
     QCommandLineOption saveAllBlobsOption("s", "Save all received blobs to /tmp");
-    QCommandLineOption indiHostOption("host", "INDI server hostname", "host");
-    indiHostOption.setDefaultValue("localhost");
-    QCommandLineOption indiPortOption("port", "INDI Server port number", "port");
-    indiPortOption.setDefaultValue("7624");
     QCommandLineOption webrootOption("webroot", "Web server root folder **must be writable**", "webroot");
     webrootOption.setDefaultValue("/var/www/html");
     QCommandLineOption dbPathOption("dbpath", "DB path", "dbpath");
@@ -33,52 +44,55 @@ int main(int argc, char *argv[])
     installFrontOption.setDefaultValue("N");
     QCommandLineOption configurationOption("configuration", "Load configuration", "configuration");
     configurationOption.setDefaultValue("default");
+    QCommandLineOption indiServerOption("indiserver", "Start embedded Indi server", "indiserver");
+    indiServerOption.setDefaultValue("N");
 
     argParser.addOption(saveAllBlobsOption);
-    argParser.addOption(indiHostOption);
-    argParser.addOption(indiPortOption);
     argParser.addOption(webrootOption);
     argParser.addOption(dbPathOption);
     argParser.addOption(libPathOption);
     argParser.addOption(installFrontOption);
     argParser.addOption(configurationOption);
+    argParser.addOption(indiServerOption);
     argParser.process(app);
 
-    QString hostName = argParser.value(indiHostOption);
-    int portNumber = atoi(argParser.value(indiPortOption).toStdString().c_str());
     QString webroot = argParser.value(webrootOption);
     QString dbPath = argParser.value(dbPathOption);
     QString libPath = argParser.value(libPathOption);
     QString installFront = argParser.value(installFrontOption);
     QString conf = argParser.value(configurationOption);
+    QString indiserver = argParser.value(indiServerOption);
 
-    BOOST_LOG_TRIVIAL(debug) << "INDI Host=" << hostName.toStdString();
-    BOOST_LOG_TRIVIAL(debug) << "INDI Port=" << portNumber;
-    BOOST_LOG_TRIVIAL(debug) << "Webroot  =" << webroot.toStdString();
-    BOOST_LOG_TRIVIAL(debug) << "DB Path  =" << dbPath.toStdString();
-    BOOST_LOG_TRIVIAL(debug) << "Modules Library Path  =" << libPath.toStdString();
-    BOOST_LOG_TRIVIAL(debug) << "Install front  =" << installFront.toStdString();
-    BOOST_LOG_TRIVIAL(debug) << "Load configuration  =" << conf.toStdString();
+    sendMessage("Webroot               =" + webroot);
+    sendMessage("DB Path               =" + dbPath);
+    sendMessage("Modules Library Path  =" + libPath);
+    sendMessage("Install front         =" + installFront);
+    sendMessage("Load configuration    =" + conf);
+    sendMessage("Embedded Indi server  =" + indiserver);
 
     Controller controller(
-        //&app,
-        argParser.isSet("s"),
-        hostName,
-        portNumber,
         webroot,
         dbPath,
         libPath,
         installFront,
-        conf
+        conf,
+        indiserver
     );
 
     Q_UNUSED(controller);
 
     int nAppReturnCode = QGuiApplication::exec();
-    BOOST_LOG_TRIVIAL(info) << "OST app terminated with status : " << nAppReturnCode;
+    sendMessage("OST app terminated with status : " + QString(nAppReturnCode));
     return nAppReturnCode;
 
 }
 
+void sendMessage(const QString &pMessage)
+{
+    QString messageWithDateTime = "[" + QDateTime::currentDateTime().toString(Qt::ISODateWithMs) + "]-" + pMessage;
+    QDebug debug = qDebug();
+    debug.noquote();
+    debug << messageWithDateTime;
+}
 
 

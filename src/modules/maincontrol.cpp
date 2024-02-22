@@ -11,34 +11,15 @@ Maincontrol::Maincontrol(QString name, QString label, QString profile, QVariantM
 {
 
     Q_INIT_RESOURCE(maincontrol);
+    setClassName(metaObject()->className());
 
-    loadPropertiesFromFile(":maincontrol.json");
-    setOstProperty("moduleLabel", "Main control", false);
-    setOstProperty("moduleDescription", "Maincontrol", false);
-    setOstProperty("moduleVersion", 0.1, false);
-    deleteOstProperty("profileactions");
-
-    foreach(QString key, getAvailableModuleLibs().keys())
-    {
-        QVariantMap info = getAvailableModuleLibs()[key].toMap();
-        QString err;
-        createOstProperty("desc" + key, "Description", 0, "Available modules", info["moduleLabel"].toString(), err);
-        foreach (QString ii, info.keys())
-        {
-            QVariant val = info[ii];
-            createOstElement("desc" + key, ii, ii, false);
-            setOstElement("desc" + key, ii, val, false);
-        }
-        createOstProperty("load" + key, "", 2, "Available modules", info["moduleLabel"].toString(), err);
-        createOstElement("load" + key, "instance", "Instance name", false);
-        setOstElement("load" + key, "instance", "my" + key, false);
-        createOstElement("load" + key, "load", "Load", false);
-        setOstElement("load" + key, "load", false, false);
-
-    }
-
-
-
+    loadOstPropertiesFromFile(":maincontrol.json");
+    setOstElementValue("moduleInfo", "moduleLabel", "Main control", false);
+    setOstElementValue("moduleInfo", "moduleDescription", "Maincontrol module - this one should always be there", false);
+    setOstElementValue("moduleInfo", "moduleVersion", 0.1, false);
+    deleteOstProperty("saveprofile");
+    deleteOstProperty("loadprofile");
+    deleteOstProperty("moduleactions");
 }
 
 Maincontrol::~Maincontrol()
@@ -46,48 +27,190 @@ Maincontrol::~Maincontrol()
     Q_CLEANUP_RESOURCE(maincontrol);
 }
 
-void Maincontrol::OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                                    const QVariantMap &eventData)
+void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+                                    const QVariantMap &pEventData)
 {
-    //BOOST_LOG_TRIVIAL(debug) << "OnMyExternalEvent - recv : " << getName().toStdString() << "-" << eventType.toStdString() << "-" << eventKey.toStdString();
-    if (getName() == eventModule)
+    Q_UNUSED(pEventType);
+    Q_UNUSED(pEventKey);
+    //sendMessage("mainctl OnMyExternalEvent - recv : " + getModuleName() + "-" + pEventType + "-" + pEventKey);
+
+    if (getModuleName() == pEventModule)
     {
-        foreach(const QString &keyprop, eventData.keys())
+        if (pEventType == "refreshConfigurations")
         {
-            foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
-            {
-                if (keyelt == "instance")
-                {
-                    if (setOstElement(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true))
-                    {
-                    }
-                }
-                if (keyelt == "load")
-                {
-                    if (setOstElement(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true))
-                    {
-                        QString pp = keyprop;
-                        QString elt = getOstElementValue(keyprop, "instance").toString();
-                        QString eltwithoutblanks = getOstElementValue(keyprop, "instance").toString();
-                        eltwithoutblanks.replace(" ", "");
-                        QString prof = "default";
-                        pp.replace("load", "");
-
-                        emit loadOtherModule(pp,
-                                             eltwithoutblanks,
-                                             elt,
-                                             prof);
-                    }
-                }
-
-
-                if (keyprop == "devices")
-                {
-                }
-
-            }
-
+            setConfigurations();
         }
+        if ((pEventType == "Fposticon") && (pEventData.contains("load")))
+        {
+            QVariantMap m = pEventData["load"].toMap()["elements"].toMap();
+            QString pp = m.firstKey();
+            pp.replace("libost", "");
+            QString elt = getString("load", m.firstKey());
+            QString eltwithoutblanks = getString("load", m.firstKey());
+            eltwithoutblanks.replace(" ", "");
+            QString prof = "default";
+
+
+            emit loadOtherModule(pp,
+                                 eltwithoutblanks,
+                                 elt,
+                                 prof);
+            getProperty("load")->setState(OST::Ok);
+        }
+        if ((pEventType == "Fposticon") && (pEventData.contains("saveconf")))
+        {
+            emit mainCtlEvent("saveconf", QString(), getString("saveconf", "name"), QVariantMap());
+            setConfigurations();
+        }
+        if ((pEventType == "Fposticon") && (pEventData.contains("loadconf")))
+        {
+            emit mainCtlEvent("loadconf", QString(), getString("loadconf", "name"), QVariantMap());
+        }
+        if ((pEventType == "Fpreicon") && (pEventData.contains("loadconf")))
+        {
+            setConfigurations();
+        }
+        foreach(const QString &keyprop, pEventData.keys())
+        {
+            foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
+            {
+                if (keyelt == "name" && keyprop == "loadconf" && pEventType == "Fsetproperty")
+                {
+
+                    QString val = pEventData[keyprop].toMap()["elements"].toMap()["name"].toMap()["value"].toString();
+                    getValueString("loadconf", "name")->setValue(val, true);
+                    getValueString("saveconf", "name")->setValue(val, true);
+                }
+                if (keyelt == "kill" && keyprop == "killall")
+                {
+                    emit mainCtlEvent("killall", QString(), QString(), QVariantMap());
+                }
+                if (keyprop == "indidrivers" && pEventType == "Fposticon")
+                {
+                    emit mainCtlEvent("startindidriver", QString(), keyelt, QVariantMap());
+                }
+                if (keyprop == "indidrivers" && pEventType == "Fpreicon")
+                {
+                    emit mainCtlEvent("stopindidriver", QString(), keyelt, QVariantMap());
+                }
+                if (keyprop == "indiserver" && pEventType == "Fposticon")
+                {
+                    emit mainCtlEvent("indiserver", QString(), "start", QVariantMap());
+                }
+                if (keyprop == "indiserver" && pEventType == "Fpreicon")
+                {
+                    emit mainCtlEvent("indiserver", QString(), "stop", QVariantMap());
+                }
+            }
+        }
+    }
+}
+void Maincontrol::setConfigurations(void)
+{
+    QVariantMap confs;
+    if (!getDbConfigurations( confs))
+    {
+        sendError("Can't refresh available configurations");
+        return;
+    }
+
+    getValueString("loadconf", "name")->lovClear();
+    for(QVariantMap::const_iterator iter = confs.begin(); iter != confs.end(); ++iter)
+    {
+        getValueString("loadconf", "name")->lovAdd(iter.key(), iter.key());
+    }
+    sendMessage("Available configurations refreshed");
+}
+
+void Maincontrol::sendMainMessage(const QString &pMessage)
+{
+    sendMessage(pMessage);
+}
+void Maincontrol::sendMainError(const QString &pMessage)
+{
+    sendError(pMessage);
+}
+void Maincontrol::sendMainWarning(const QString &pMessage)
+{
+    sendWarning(pMessage);
+}
+void Maincontrol::sendMainConsole(const QString &pMessage)
+{
+    sendConsole(pMessage);
+}
+void Maincontrol::setAvailableModuleLibs(const QVariantMap libs)
+{
+
+    OST::PropertyMulti *dynprop = new OST::PropertyMulti("load", "Available modules", OST::Permission::ReadWrite,
+            "Available modules",
+            "", "", false, false);
+    foreach(QString key, libs.keys())
+    {
+        QVariantMap info = libs[key].toMap()["elements"].toMap();
+        QString lab = info["moduleDescription"].toMap()["value"].toString();
+        OST::ValueString* dyntext = new OST::ValueString(lab, "", "");
+        dyntext->setValue("My " + key, false);
+        dyntext->setAutoUpdate(true);
+        dyntext->setDirectEdit(true);
+        dyntext->setPostIcon("forward");
+        dynprop->addValue(key, dyntext);
 
     }
+    createProperty("load", dynprop);
+
+}
+void Maincontrol::addModuleData(const QString  &pName, const QString  &pLabel, const QString  &pType,
+                                const QString  &pProfile)
+{
+    setOstElementValue("modules", "name", pName, false);
+    setOstElementValue("modules", "label", pLabel, false);
+    setOstElementValue("modules", "type", pType, false);
+    setOstElementValue("modules", "profile", pProfile, false);
+    getStore()["modules"]->push();
+}
+void Maincontrol::setModuleData(const QString  &pName, const QString  &pLabel, const QString  &pType,
+                                const QString  &pProfile)
+{
+    Q_UNUSED(pLabel);
+    Q_UNUSED(pType);
+    QVariantList l = getOstElementGrid("modules", "name");
+    for (int i = 0; i < l.count(); i++)
+    {
+        if( l[i].toString() == pName)
+        {
+            getValueString("modules", "profile")->getGrid()[i] = pProfile;
+        }
+    }
+
+}
+void Maincontrol::deldModuleData(const QString  &pName)
+{
+    QVariantList l = getOstElementGrid("modules", "name");
+    for (int i = 0; i < l.count(); i++)
+    {
+        if( l[i].toString() == pName)
+        {
+            getStore()["modules"]->deleteLine(i);
+        }
+    }
+
+}
+void Maincontrol::addIndiServerProperties(const QStringList  pDrivers)
+{
+    qDebug() << pDrivers;
+    OST::PropertyMulti *dynprop = new OST::PropertyMulti("indidrivers", "Available indi drivers", OST::Permission::ReadOnly,
+            "Indi server",
+            "", "", false, false);
+    foreach(QString key, pDrivers)
+    {
+        OST::ValueString* dyntext = new OST::ValueString(key, "", "");
+        dyntext->setValue("", false);
+        dyntext->setAutoUpdate(true);
+        dyntext->setDirectEdit(true);
+        dyntext->setPreIcon("stop");
+        dyntext->setPostIcon("play_arrow");
+        dynprop->addValue(key, dyntext);
+
+    }
+    createProperty("indidrivers", dynprop);
 }

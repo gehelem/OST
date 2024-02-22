@@ -12,8 +12,6 @@ Build-Depends: cmake,
                libqt5websockets5-dev,
                libqt5svg5-dev,
                libqt5sql5-sqlite,
-               libboost-dev,
-               libboost-log-dev,
                kdoctools-dev | libkf5doctools-dev,
                libkf5config-dev,
                libkf5guiaddons-dev,
@@ -34,7 +32,9 @@ Build-Depends: cmake,
                libraw-dev,
                libgsl-dev,
                libsecret-1-dev,
-               libstellarsolver-dev
+               libstellarsolver-dev,
+               libavahi-client-dev,
+               libavahi-common-dev
 Standards-Version: 4.6.0
 Homepage: https://github.com/gehelem/OST
 #Vcs-Browser: https://salsa.debian.org/debian/ostserver

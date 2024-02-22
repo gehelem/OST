@@ -1,3 +1,107 @@
 {
+"globallov":{
+},
+"properties":{
+    "loadconf": {
+        "devcat": "Module",
+        "group": "Configurations",
+        "permission": 2,
+        "rule":1,
+        "label": "Load configuration",
+        "elements": {
+            "name": {
+                "type": "string",
+                "label": "",
+                "directedit":true,
+                "value":"default",
+                "listOfValues":[],
+                "posticon":"redo",
+                "preicon":"autorenew"
+            }
+        }
+    },
+    "saveconf": {
+        "devcat": "Module",
+        "group": "Configurations",
+        "permission": 2,
+        "rule":0,
+        "label": "Save configuration",
+        "elements": {
+            "name": {
+                "type": "string",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "",
+                "value":"default",
+                "posticon":"save"
+            }
+        }
+    },
+    "indiserver": {
+        "devcat": "Indi server",
+        "group": "",
+        "permission": 0,
+        "rule":0,
+        "label": "Start and stop indiserver",
+        "elements": {
+            "startstop": {
+                "type": "string",
+                "label": "",
+                "posticon":"play_arrow",
+                "preicon":"stop",
+                "value":""
+            }
+        }
+    },
+    "modules": {
+        "hasArray":true,
+        "devcat": "Modules",
+        "group": "",
+        "permission": 0,
+        "grid":0,
+        "rule":0,
+        "label": "Loaded modules",
+        "elements": {
+            "name": {
+                "type": "string",
+                "label": "Internal name",
+                "value":""
+            },
+            "label": {
+                "type": "string",
+                "label": "Label",
+                "value":""
+            },
+            "type": {
+                "type": "string",
+                "label": "Type",
+                "value":""
+            },
+            "profile": {
+                "type": "string",
+                "label": "Profile",
+                "value":""
+            }
 
+
+
+        }
+    },
+    "killall": {
+        "type": "multi",
+        "devcat": "Modules",
+        "group": "",
+        "permission": 2,
+        "rule":0,
+        "label": "",
+        "elements": {
+            "kill": {
+                "type": "bool",
+                "label": "Kill all modules",
+                "value":false
+            }
+        }
+    }
+
+}
 }
