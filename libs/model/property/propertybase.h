@@ -11,10 +11,15 @@ class PropertyVisitor;
 
 typedef enum
 {
-    ReadOnly = 0,
-    WriteOnly,
-    ReadWrite
+    ReadOnly = 0,/*!< property is read only for frontend */
+    WriteOnly,/*!< property is write only for frontend  */
+    ReadWrite/*!< property is read write for frontend  */
 } Permission;
+
+/** @brief Converts integer to property permission
+ *
+ *  Defaults or error returns ReadOnly
+ */
 inline Permission IntToPermission(int val )
 {
     if (val == 0) return ReadOnly;
@@ -23,6 +28,12 @@ inline Permission IntToPermission(int val )
     qDebug() << "Cant convert " << val << " to OST::Permission (0-2) - defaults to readonly";
     return ReadOnly;
 }
+
+
+/** @class OST::PropertyBase
+ *  @brief Class to define common property
+ *
+ */
 class PropertyBase: public QObject
 {
 
@@ -38,30 +49,85 @@ class PropertyBase: public QObject
                     );
         ~PropertyBase();
 
+        /**
+         * @brief Internal property's name
+         * @return returns property's name
+         *
+         * This value cannot be modified after instanciation
+         * \hidecallgraph
+         */
         QString key()
         {
             return mKey;
         }
+        /**
+         * @brief Property's label
+         * @return value of label
+         *
+         * This value cannot be modified after instanciation
+         * \hidecallgraph
+         */
         QString label()
         {
             return mLabel;
         }
+        /**
+         * @brief Property's permission
+         * @return value of permission
+         *
+         * This value cannot be modified after instanciation
+         * \hidecallgraph
+         */
         Permission permission()
         {
             return mPermission;
         }
+        /**
+         * @brief Property's hierachy first level
+         * @return value of level 1
+         *
+         * This value cannot be modified after instanciation
+         *
+         * It equivalent to indi "device" level
+         * \hidecallgraph
+         */
         QString level1()
         {
             return mLevel1;
         }
+        /**
+         * @brief Property's hierachy second level
+         * @return value of level 2
+         *
+         * This value cannot be modified after instanciation
+         *
+         * It equivalent to indi "group" level
+         * \hidecallgraph
+         */
         QString level2()
         {
             return mLevel2;
         }
+        /**
+         * @brief Property's display order
+         * @return order value
+         *
+         * This value cannot be modified after instanciation.
+         *
+         * This value sets display order value within same level1 / level2 values
+         * \hidecallgraph
+         */
         QString order()
         {
             return mOrder;
         }
+        /**
+         * @brief should this value be saved in profiles ?
+         * @return true = yes, false = no
+         *
+         * This value cannot be modified after instanciation.
+         * \hidecallgraph
+         */
         bool hasProfile()
         {
             return mHasProfile;
