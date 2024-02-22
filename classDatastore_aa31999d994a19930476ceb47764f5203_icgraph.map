@@ -1,11 +1,7 @@
 <map id="Datastore::loadOstPropertiesFromFile" name="Datastore::loadOstPropertiesFromFile">
-<area shape="rect" id="Node000001" title=" " alt="" coords="225,73,412,113"/>
-<area shape="rect" id="Node000002" href="$classBasemodule.html#ac8faad3c19368b2a414df88a3a88a2af" title=" " alt="" coords="5,5,177,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="246,69,176,45,141,34,142,29,177,40,248,64"/>
-<area shape="rect" id="Node000003" href="$classDummy.html#ab4827b75bab26993555a749f5ef2d6c6" title=" " alt="" coords="33,55,149,80"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="209,83,148,77,149,71,209,78"/>
-<area shape="rect" id="Node000004" href="$classIndiModule.html#a205dbc4abb495b104b8e16e742d458b3" title=" " alt="" coords="14,104,168,130"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="210,107,168,111,168,106,209,102"/>
-<area shape="rect" id="Node000005" href="$classMaincontrol.html#a9389bf4070ccd5d873d4a40ad6b73416" title=" " alt="" coords="10,153,172,179"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="247,121,177,145,142,155,141,150,176,140,245,116"/>
+<area shape="rect" id="node1" title=" " alt="" coords="245,74,456,115"/>
+<area shape="rect" id="node2" href="$classBasemodule.html#ac8faad3c19368b2a414df88a3a88a2af" title=" " alt="" coords="5,5,197,32"/>
+<area shape="rect" id="node3" href="$classDummy.html#ab4827b75bab26993555a749f5ef2d6c6" title=" " alt="" coords="35,56,168,83"/>
+<area shape="rect" id="node4" href="$classIndiModule.html#a205dbc4abb495b104b8e16e742d458b3" title=" " alt="" coords="14,107,189,133"/>
+<area shape="rect" id="node5" href="$classMaincontrol.html#a9389bf4070ccd5d873d4a40ad6b73416" title=" " alt="" coords="9,157,193,184"/>
 </map>

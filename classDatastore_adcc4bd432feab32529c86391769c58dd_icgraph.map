@@ -1,20 +1,10 @@
 <map id="Datastore::getValueInt" name="Datastore::getValueInt">
-<area shape="rect" id="Node000001" title=" " alt="" coords="815,79,964,104"/>
-<area shape="rect" id="Node000002" href="$classDummy.html#ab4827b75bab26993555a749f5ef2d6c6" title=" " alt="" coords="651,29,766,55"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="824,77,758,58,759,53,825,71"/>
-<area shape="rect" id="Node000003" href="$classDatastore.html#abf8c7391b03d6c269db83e04bba502eb" title=" " alt="" coords="650,79,767,104"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="799,94,767,94,767,89,799,89"/>
-<area shape="rect" id="Node000009" href="$classDatastore.html#a6fcd77661bdee25f38aa365cfa9bc9ec" title=" " alt="" coords="650,128,767,154"/>
-<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="825,112,759,130,758,125,824,106"/>
-<area shape="rect" id="Node000004" href="$classIndiModule.html#a9a60e3380c1d3dcbc6aa780160de3d4c" title=" " alt="" coords="445,53,602,79"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="634,84,602,80,603,74,635,79"/>
-<area shape="rect" id="Node000008" href="$classDummy.html#a52c1ddf28dc85dad5d67eac5d4f83000" title=" " alt="" coords="210,104,394,130"/>
-<area shape="poly" id="edge8_Node000003_Node000008" title=" " alt="" coords="635,99,394,114,394,108,634,93"/>
-<area shape="rect" id="Node000005" href="$classIndiModule.html#a9fed57e5734d61d461238e2ce3aa5c68" title=" " alt="" coords="207,5,397,31"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="445,52,364,34,365,29,446,47"/>
-<area shape="rect" id="Node000007" href="$classIndiPanel.html#abf7b980e6b80fbf791a5b2cef4a638c6" title=" " alt="" coords="234,55,370,80"/>
-<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="429,69,370,70,370,64,429,64"/>
-<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="450,86,362,106,361,101,449,80"/>
-<area shape="rect" id="Node000006" href="$classIndiModule.html#a205dbc4abb495b104b8e16e742d458b3" title=" " alt="" coords="5,5,159,31"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="191,21,159,21,159,16,191,16"/>
+<area shape="rect" id="node1" title=" " alt="" coords="897,56,1065,83"/>
+<area shape="rect" id="node2" href="$classDummy.html#ab4827b75bab26993555a749f5ef2d6c6" title=" " alt="" coords="716,31,849,57"/>
+<area shape="rect" id="node3" href="$classDatastore.html#abf8c7391b03d6c269db83e04bba502eb" title=" " alt="" coords="717,81,849,108"/>
+<area shape="rect" id="node4" href="$classIndiModule.html#a9a60e3380c1d3dcbc6aa780160de3d4c" title=" " alt="" coords="491,56,668,83"/>
+<area shape="rect" id="node8" href="$classDummy.html#a52c1ddf28dc85dad5d67eac5d4f83000" title=" " alt="" coords="230,107,441,133"/>
+<area shape="rect" id="node5" href="$classIndiModule.html#a9fed57e5734d61d461238e2ce3aa5c68" title=" " alt="" coords="228,5,443,32"/>
+<area shape="rect" id="node7" href="$classIndiPanel.html#abf7b980e6b80fbf791a5b2cef4a638c6" title=" " alt="" coords="261,56,409,83"/>
+<area shape="rect" id="node6" href="$classIndiModule.html#a205dbc4abb495b104b8e16e742d458b3" title=" " alt="" coords="5,5,180,32"/>
 </map>

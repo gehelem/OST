@@ -1,9 +1,6 @@
 <map id="OST::ValueInt::min" name="OST::ValueInt::min">
-<area shape="rect" id="Node000001" title=" " alt="" coords="377,35,506,60"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1ValueInt.html#a55e10c8b7cd5e19354692fb01777468a" title=" " alt="" coords="175,5,323,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="361,38,322,32,323,27,362,33"/>
-<area shape="rect" id="Node000004" href="$classOST_1_1ValueJsonDumper.html#a8b9f8aef768186d9aa7017704d5eef05" title=" " alt="" coords="169,55,329,96"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="362,62,330,66,329,61,361,56"/>
-<area shape="rect" id="Node000003" href="$classDummy.html#ab4827b75bab26993555a749f5ef2d6c6" title=" " alt="" coords="5,5,121,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="159,21,121,21,121,16,159,16"/>
+<area shape="rect" id="node1" title=" " alt="" coords="405,35,547,61"/>
+<area shape="rect" id="node2" href="$classOST_1_1ValueInt.html#a55e10c8b7cd5e19354692fb01777468a" title=" " alt="" coords="192,5,352,32"/>
+<area shape="rect" id="node4" href="$classOST_1_1ValueJsonDumper.html#a8b9f8aef768186d9aa7017704d5eef05" title=" " alt="" coords="187,57,357,98"/>
+<area shape="rect" id="node3" href="$classDummy.html#ab4827b75bab26993555a749f5ef2d6c6" title=" " alt="" coords="5,5,139,32"/>
 </map>

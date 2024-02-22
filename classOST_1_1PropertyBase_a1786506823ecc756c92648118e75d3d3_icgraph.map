@@ -1,9 +1,6 @@
 <map id="OST::PropertyBase::getArrayLimit" name="OST::PropertyBase::getArrayLimit">
-<area shape="rect" id="Node000001" title=" " alt="" coords="229,71,367,111"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1PropertyMulti.html#aef6e05aff8694390fc8c343ca9572245" title=" " alt="" coords="28,5,158,46"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="217,68,158,49,159,44,219,63"/>
-<area shape="rect" id="Node000003" href="$classOST_1_1PropertyMulti.html#ab43d22da58aef04621e4406eafb019de" title=" " alt="" coords="28,71,158,111"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="213,94,159,94,159,88,213,88"/>
-<area shape="rect" id="Node000004" href="$classOST_1_1PropertyJsonDumper.html#ab4de79b0cdcebf3b626a6a00d19c4667" title=" " alt="" coords="5,136,181,177"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="218,119,160,138,158,133,217,114"/>
+<area shape="rect" id="node1" title=" " alt="" coords="243,71,393,112"/>
+<area shape="rect" id="node2" href="$classOST_1_1PropertyMulti.html#aef6e05aff8694390fc8c343ca9572245" title=" " alt="" coords="29,5,171,47"/>
+<area shape="rect" id="node3" href="$classOST_1_1PropertyMulti.html#ab43d22da58aef04621e4406eafb019de" title=" " alt="" coords="29,71,171,112"/>
+<area shape="rect" id="node4" href="$classOST_1_1PropertyJsonDumper.html#ab4de79b0cdcebf3b626a6a00d19c4667" title=" " alt="" coords="5,136,195,177"/>
 </map>

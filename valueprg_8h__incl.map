@@ -1,12 +1,7 @@
 <map id="libs/model/value/valueprg.h" name="libs/model/value/valueprg.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="21,5,199,31"/>
-<area shape="rect" id="Node000002" href="$valuebase_8h.html" title=" " alt="" coords="65,79,155,105"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="113,31,113,63,107,63,107,31"/>
-<area shape="rect" id="Node000003" href="$valuevisitor_8h.html" title=" " alt="" coords="5,153,103,178"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="103,107,75,142,71,139,99,103"/>
-<area shape="rect" id="Node000005" href="$common_8h.html" title=" " alt="" coords="127,153,208,178"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="122,103,150,139,146,142,117,107"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="79,226,141,252"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="65,177,93,212,89,216,61,180"/>
-<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="160,180,131,216,127,212,156,177"/>
+<area shape="rect" id="node1" title=" " alt="" coords="22,5,225,32"/>
+<area shape="rect" id="node2" href="$valuebase_8h.html" title=" " alt="" coords="73,80,174,107"/>
+<area shape="rect" id="node3" href="$valuevisitor_8h.html" title=" " alt="" coords="5,155,116,181"/>
+<area shape="rect" id="node5" href="$common_8h.html" title=" " alt="" coords="141,155,231,181"/>
+<area shape="rect" id="node4" title=" " alt="" coords="90,229,157,256"/>
 </map>

@@ -1,13 +1,8 @@
 <map id="src/wshandler.cpp" name="src/wshandler.cpp">
-<area shape="rect" id="Node000001" title=" " alt="" coords="119,5,246,31"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,79,128,105"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="164,34,100,73,97,68,161,29"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="151,79,214,105"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="185,31,185,63,180,63,180,31"/>
-<area shape="rect" id="Node000004" href="$wshandler_8h.html" title=" " alt="" coords="237,79,328,105"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="201,29,255,67,252,72,198,34"/>
-<area shape="rect" id="Node000005" title=" " alt="" coords="49,153,279,178"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="264,107,198,147,196,142,261,103"/>
-<area shape="rect" id="Node000006" title=" " alt="" coords="303,153,497,178"/>
-<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="304,103,368,142,366,147,301,107"/>
+<area shape="rect" id="node1" title=" " alt="" coords="129,5,267,32"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,80,140,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="165,80,231,107"/>
+<area shape="rect" id="node4" href="$wshandler_8h.html" title=" " alt="" coords="256,80,356,107"/>
+<area shape="rect" id="node5" title=" " alt="" coords="55,155,303,181"/>
+<area shape="rect" id="node6" title=" " alt="" coords="327,155,535,181"/>
 </map>

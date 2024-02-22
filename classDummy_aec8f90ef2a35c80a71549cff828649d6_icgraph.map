@@ -1,6 +1,4 @@
 <map id="Dummy::OnSucessSolve" name="Dummy::OnSucessSolve">
-<area shape="rect" id="Node000001" title=" " alt="" coords="238,29,403,55"/>
-<area shape="poly" id="edge2_Node000001_Node000001" title=" " alt="" coords="359,17,346,10,320,8,297,10,284,15,281,20,288,27,283,31,276,21,280,11,296,5,320,3,348,5,361,12"/>
-<area shape="rect" id="Node000002" href="$classDummy.html#a52c1ddf28dc85dad5d67eac5d4f83000" title=" " alt="" coords="5,29,190,55"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="222,45,190,45,190,40,222,40"/>
+<area shape="rect" id="node1" title=" " alt="" coords="264,5,444,32"/>
+<area shape="rect" id="node2" href="$classDummy.html#a52c1ddf28dc85dad5d67eac5d4f83000" title=" " alt="" coords="5,5,216,32"/>
 </map>

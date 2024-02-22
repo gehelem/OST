@@ -1,9 +1,6 @@
 <map id="DBManager::getDbConfiguration" name="DBManager::getDbConfiguration">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,210,56"/>
-<area shape="rect" id="Node000002" href="$classBaseroot.html#a11f046456df0e3597b22865491e64356" title=" " alt="" coords="258,31,392,56"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="210,41,242,41,242,46,210,46"/>
-<area shape="rect" id="Node000003" href="$classBaseroot.html#a1798d4e8fb63f7a127358c15b5c29e90" title=" " alt="" coords="440,5,611,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="392,32,424,28,425,34,392,38"/>
-<area shape="rect" id="Node000004" href="$classBaseroot.html#a19f10e8769981a8ffedd0ea52863fb9a" title=" " alt="" coords="449,55,603,80"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="392,49,433,54,433,59,392,54"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,31,237,57"/>
+<area shape="rect" id="node2" href="$classBaseroot.html#a11f046456df0e3597b22865491e64356" title=" " alt="" coords="285,31,436,57"/>
+<area shape="rect" id="node3" href="$classBaseroot.html#a1798d4e8fb63f7a127358c15b5c29e90" title=" " alt="" coords="484,5,675,32"/>
+<area shape="rect" id="node4" href="$classBaseroot.html#a19f10e8769981a8ffedd0ea52863fb9a" title=" " alt="" coords="494,56,665,83"/>
 </map>

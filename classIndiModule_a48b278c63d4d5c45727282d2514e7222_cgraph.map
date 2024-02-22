@@ -1,15 +1,8 @@
 <map id="IndiModule::disconnectIndi" name="IndiModule::disconnectIndi">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,55,180,80"/>
-<area shape="rect" id="Node000002" href="$classBaseroot.html#a11f046456df0e3597b22865491e64356" title=" " alt="" coords="238,55,372,80"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="180,65,222,65,222,70,180,70"/>
-<area shape="rect" id="Node000005" href="$ost_8cpp.html#a33d5f722b7d098ebc81089e55e435987" title=" " alt="" coords="254,104,356,130"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="152,78,239,99,238,104,151,84"/>
-<area shape="rect" id="Node000006" href="$classBaseroot.html#affc1e3a0ffc17f0bddb90a005ddd2442" title=" " alt="" coords="228,5,382,31"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="151,51,231,32,232,38,152,57"/>
-<area shape="rect" id="Node000003" href="$classBaseroot.html#a1798d4e8fb63f7a127358c15b5c29e90" title=" " alt="" coords="430,5,601,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="362,51,442,33,443,38,364,57"/>
-<area shape="rect" id="Node000004" href="$classBaseroot.html#a19f10e8769981a8ffedd0ea52863fb9a" title=" " alt="" coords="439,55,593,80"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="373,65,423,65,423,70,373,70"/>
-<area shape="poly" id="edge6_Node000006_Node000003" title=" " alt="" coords="382,16,414,16,414,21,382,21"/>
-<area shape="poly" id="edge7_Node000006_Node000004" title=" " alt="" coords="364,29,443,48,442,53,362,34"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,56,201,83"/>
+<area shape="rect" id="node2" href="$classBaseroot.html#a11f046456df0e3597b22865491e64356" title=" " alt="" coords="263,5,413,32"/>
+<area shape="rect" id="node5" href="$classBaseroot.html#ae846a910f240be39cfcd408c7419fb0c" title=" " alt="" coords="249,56,427,83"/>
+<area shape="rect" id="node6" href="$classBaseroot.html#affc1e3a0ffc17f0bddb90a005ddd2442" title=" " alt="" coords="252,107,424,133"/>
+<area shape="rect" id="node3" href="$classBaseroot.html#a1798d4e8fb63f7a127358c15b5c29e90" title=" " alt="" coords="475,31,665,57"/>
+<area shape="rect" id="node4" href="$classBaseroot.html#a19f10e8769981a8ffedd0ea52863fb9a" title=" " alt="" coords="485,81,655,108"/>
 </map>

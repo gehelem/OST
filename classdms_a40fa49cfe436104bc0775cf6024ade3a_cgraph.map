@@ -1,11 +1,6 @@
 <map id="dms::SinCos" name="dms::SinCos">
-<area shape="rect" id="Node000001" title="Compute Sine and Cosine of the angle simultaneously. On machines using glibc &gt;= 2...." alt="" coords="5,79,100,104"/>
-<area shape="rect" id="Node000002" href="$classdms.html#a021d0a5f56f93b9d6f705c8131f4c02d" title="Compute the Angle&#39;s Cosine." alt="" coords="158,29,232,55"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,76,143,57,144,62,93,81"/>
-<area shape="rect" id="Node000003" href="$classdms.html#a797e52a1128f524c4fbe54fcecd2510c" title="Express the angle in radians." alt="" coords="148,79,242,104"/>
-<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="100,89,132,89,132,94,100,94"/>
-<area shape="rect" id="Node000004" href="$classdms.html#afa823308d5cca9a2ad21c75f96899cdd" title="Compute the Angle&#39;s Sine." alt="" coords="160,152,230,178"/>
-<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="81,103,156,142,153,147,78,107"/>
-<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="170,30,166,21,168,11,178,5,195,3,212,5,222,12,219,16,210,10,195,8,180,10,173,14,171,20,175,28"/>
-<area shape="poly" id="edge5_Node000004_Node000004" title=" " alt="" coords="170,153,166,143,168,134,178,128,195,125,212,128,222,135,219,139,210,133,195,131,180,133,173,137,171,143,175,150"/>
+<area shape="rect" id="node1" title="Compute Sine and Cosine of the angle simultaneously. On machines using glibc &gt;= 2...." alt="" coords="5,56,108,83"/>
+<area shape="rect" id="node2" href="$classdms.html#a021d0a5f56f93b9d6f705c8131f4c02d" title="Compute the Angle&#39;s Cosine." alt="" coords="169,5,249,32"/>
+<area shape="rect" id="node3" href="$classdms.html#a797e52a1128f524c4fbe54fcecd2510c" title="Express the angle in radians." alt="" coords="156,56,263,83"/>
+<area shape="rect" id="node4" href="$classdms.html#afa823308d5cca9a2ad21c75f96899cdd" title="Compute the Angle&#39;s Sine." alt="" coords="171,107,248,133"/>
 </map>

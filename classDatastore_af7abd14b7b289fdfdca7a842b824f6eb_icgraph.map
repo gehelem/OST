@@ -1,9 +1,5 @@
 <map id="Datastore::getValueFloat" name="Datastore::getValueFloat">
-<area shape="rect" id="Node000001" title=" " alt="" coords="416,31,579,56"/>
-<area shape="rect" id="Node000002" href="$classDatastore.html#a5d5a9bd849f7110ddd8cf50933bb0b69" title=" " alt="" coords="238,5,368,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="400,34,368,29,368,24,401,28"/>
-<area shape="rect" id="Node000004" href="$classDatastore.html#a6cf9b42ac712728159c9d179c53753f5" title=" " alt="" coords="238,55,368,80"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="401,58,368,62,368,57,400,53"/>
-<area shape="rect" id="Node000003" href="$classDummy.html#a52c1ddf28dc85dad5d67eac5d4f83000" title=" " alt="" coords="5,5,190,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="222,21,190,21,190,16,222,16"/>
+<area shape="rect" id="node1" title=" " alt="" coords="460,5,644,32"/>
+<area shape="rect" id="node2" href="$classDatastore.html#a5d5a9bd849f7110ddd8cf50933bb0b69" title=" " alt="" coords="264,5,412,32"/>
+<area shape="rect" id="node3" href="$classDummy.html#a52c1ddf28dc85dad5d67eac5d4f83000" title=" " alt="" coords="5,5,216,32"/>
 </map>

@@ -1,5 +1,4 @@
 <map id="IndiModule::connectIndiTimer" name="IndiModule::connectIndiTimer">
-<area shape="rect" id="Node000001" title=" " alt="" coords="207,5,397,31"/>
-<area shape="rect" id="Node000002" href="$classIndiModule.html#a205dbc4abb495b104b8e16e742d458b3" title=" " alt="" coords="5,5,159,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="191,21,159,21,159,16,191,16"/>
+<area shape="rect" id="node1" title=" " alt="" coords="228,5,443,32"/>
+<area shape="rect" id="node2" href="$classIndiModule.html#a205dbc4abb495b104b8e16e742d458b3" title=" " alt="" coords="5,5,180,32"/>
 </map>

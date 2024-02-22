@@ -1,9 +1,4 @@
 <map id="OST::ValueInt::ValueInt" name="OST::ValueInt::ValueInt">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,162,60"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1LovBase.html#a842662c8849c052a40070e94d9cb1fad" title=" " alt="" coords="211,5,391,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="162,34,195,30,195,35,163,40"/>
-<area shape="rect" id="Node000003" href="$classOST_1_1ValueSingleSignalAndSlots.html#a4ae2127f479539b9fba1750320ed9067" title=" " alt="" coords="210,55,392,96"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="163,55,195,59,194,64,162,60"/>
-<area shape="rect" id="Node000004" href="$classOST_1_1ValueBase.html#ab658b0d756a6b531e0cda9ddf7fbcf00" title=" " alt="" coords="440,63,631,88"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="393,73,425,73,425,78,393,78"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,13,175,39"/>
+<area shape="rect" id="node2" href="$classOST_1_1ValueSingleSignalAndSlots.html#a4ae2127f479539b9fba1750320ed9067" title=" " alt="" coords="223,5,419,47"/>
 </map>

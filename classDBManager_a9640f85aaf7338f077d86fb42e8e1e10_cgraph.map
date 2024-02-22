@@ -1,9 +1,0 @@
-<map id="DBManager::saveDbConfiguration" name="DBManager::saveDbConfiguration">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,220,56"/>
-<area shape="rect" id="Node000002" href="$classBaseroot.html#a11f046456df0e3597b22865491e64356" title=" " alt="" coords="268,31,402,56"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="220,41,252,41,252,46,220,46"/>
-<area shape="rect" id="Node000003" href="$classBaseroot.html#a1798d4e8fb63f7a127358c15b5c29e90" title=" " alt="" coords="450,5,621,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="402,32,434,28,435,34,402,38"/>
-<area shape="rect" id="Node000004" href="$classBaseroot.html#a19f10e8769981a8ffedd0ea52863fb9a" title=" " alt="" coords="459,55,613,80"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="402,49,443,54,443,59,402,54"/>
-</map>

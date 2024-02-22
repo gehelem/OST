@@ -1,5 +1,4 @@
 <map id="OST::PropertyBase" name="OST::PropertyBase">
-<area shape="rect" id="Node000001" title="Class to define common property." alt="" coords="5,119,129,384"/>
-<area shape="rect" id="Node000002" href="$classQObject.html" title=" " alt="" coords="37,5,98,71"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="70,86,70,119,65,119,65,86"/>
+<area shape="rect" id="node1" title="Class to define common property." alt="" coords="5,131,151,355"/>
+<area shape="rect" id="node2" href="$classQObject.html" title=" " alt="" coords="41,5,115,83"/>
 </map>

@@ -1,13 +1,8 @@
 <map id="libs/indimodule.h" name="libs/indimodule.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="176,5,294,31"/>
-<area shape="rect" id="Node000002" href="$indimodule_8cpp.html" title=" " alt="" coords="5,79,137,105"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="194,40,100,81,98,76,192,35"/>
-<area shape="rect" id="Node000003" href="$dummy_8h.html" title=" " alt="" coords="161,79,309,105"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="238,46,238,79,232,79,232,46"/>
-<area shape="rect" id="Node000005" href="$indipanel_8h.html" title=" " alt="" coords="340,79,498,105"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="281,34,389,76,387,81,279,39"/>
-<area shape="rect" id="Node000004" href="$dummy_8cpp.html" title=" " alt="" coords="150,153,312,178"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="236,120,234,152,229,152,231,120"/>
-<area shape="rect" id="Node000006" href="$indipanel_8cpp.html" title=" " alt="" coords="336,153,507,178"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="423,120,424,152,419,152,417,120"/>
+<area shape="rect" id="node1" title=" " alt="" coords="235,5,369,32"/>
+<area shape="rect" id="node2" href="$dummy_8h.html" title=" " alt="" coords="19,80,185,107"/>
+<area shape="rect" id="node4" href="$indipanel_8h.html" title=" " alt="" coords="213,80,391,107"/>
+<area shape="rect" id="node6" href="$indimodule_8cpp.html" title=" " alt="" coords="415,80,565,107"/>
+<area shape="rect" id="node3" href="$dummy_8cpp.html" title=" " alt="" coords="5,155,185,181"/>
+<area shape="rect" id="node5" href="$indipanel_8cpp.html" title=" " alt="" coords="210,155,402,181"/>
 </map>

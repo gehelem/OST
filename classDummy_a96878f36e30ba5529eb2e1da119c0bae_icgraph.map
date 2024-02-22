@@ -1,6 +1,4 @@
 <map id="Dummy::OnSucessSEP" name="Dummy::OnSucessSEP">
-<area shape="rect" id="Node000001" title=" " alt="" coords="238,29,396,55"/>
-<area shape="poly" id="edge2_Node000001_Node000001" title=" " alt="" coords="355,17,342,10,317,8,294,10,281,15,278,20,285,27,280,31,273,21,277,11,292,5,317,3,344,5,357,12"/>
-<area shape="rect" id="Node000002" href="$classDummy.html#a52c1ddf28dc85dad5d67eac5d4f83000" title=" " alt="" coords="5,29,190,55"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="222,45,190,45,190,40,222,40"/>
+<area shape="rect" id="node1" title=" " alt="" coords="264,5,432,32"/>
+<area shape="rect" id="node2" href="$classDummy.html#a52c1ddf28dc85dad5d67eac5d4f83000" title=" " alt="" coords="5,5,216,32"/>
 </map>

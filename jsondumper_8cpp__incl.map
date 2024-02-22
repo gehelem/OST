@@ -1,27 +1,15 @@
 <map id="libs/utils/jsondumper.cpp" name="libs/utils/jsondumper.cpp">
-<area shape="rect" id="Node000001" title=" " alt="" coords="291,5,455,31"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,79,103,105"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="319,34,118,79,117,74,318,29"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="127,79,245,105"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="342,34,233,75,231,70,340,29"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="269,79,359,105"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="365,33,335,69,331,65,361,30"/>
-<area shape="rect" id="Node000005" href="$jsondumper_8h.html" title=" " alt="" coords="382,79,481,105"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="384,30,414,65,410,69,380,33"/>
-<area shape="rect" id="Node000012" title=" " alt="" coords="505,79,664,105"/>
-<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="409,29,535,71,534,76,408,34"/>
-<area shape="rect" id="Node000013" title=" " alt="" coords="688,79,825,105"/>
-<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="439,29,677,73,676,78,438,34"/>
-<area shape="rect" id="Node000006" title=" " alt="" coords="145,153,211,178"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="389,108,226,153,225,148,388,103"/>
-<area shape="rect" id="Node000007" href="$propertyvisitor_8h.html" title=" " alt="" coords="235,153,348,178"/>
-<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="409,108,330,148,327,143,406,103"/>
-<area shape="rect" id="Node000009" title=" " alt="" coords="371,153,492,178"/>
-<area shape="poly" id="edge8_Node000005_Node000009" title=" " alt="" coords="434,105,434,137,429,137,429,105"/>
-<area shape="rect" id="Node000010" title=" " alt="" coords="516,153,624,178"/>
-<area shape="poly" id="edge9_Node000005_Node000010" title=" " alt="" coords="456,103,534,143,532,147,454,108"/>
-<area shape="rect" id="Node000011" title=" " alt="" coords="648,153,753,178"/>
-<area shape="poly" id="edge10_Node000005_Node000011" title=" " alt="" coords="478,103,641,146,639,151,476,108"/>
-<area shape="rect" id="Node000008" title=" " alt="" coords="260,226,323,252"/>
-<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="294,179,294,211,289,211,289,179"/>
+<area shape="rect" id="node1" title=" " alt="" coords="300,5,484,32"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,80,107,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="131,80,258,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="282,80,377,107"/>
+<area shape="rect" id="node5" href="$jsondumper_8h.html" title=" " alt="" coords="401,80,511,107"/>
+<area shape="rect" id="node12" title=" " alt="" coords="535,80,718,107"/>
+<area shape="rect" id="node13" title=" " alt="" coords="742,80,901,107"/>
+<area shape="rect" id="node6" title=" " alt="" coords="139,155,210,181"/>
+<area shape="rect" id="node7" href="$propertyvisitor_8h.html" title=" " alt="" coords="234,155,363,181"/>
+<area shape="rect" id="node9" title=" " alt="" coords="387,155,525,181"/>
+<area shape="rect" id="node10" title=" " alt="" coords="549,155,670,181"/>
+<area shape="rect" id="node11" title=" " alt="" coords="694,155,815,181"/>
+<area shape="rect" id="node8" title=" " alt="" coords="265,229,332,256"/>
 </map>

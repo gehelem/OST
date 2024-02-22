@@ -1,5 +1,4 @@
 <map id="OST::ValueLight::accept" name="OST::ValueLight::accept">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,13,167,39"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1ValueVisitor.html#a102cd031f2140fc75dfb1f819509e95a" title=" " alt="" coords="215,5,345,46"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="167,23,199,23,199,28,167,28"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,13,180,39"/>
+<area shape="rect" id="node2" href="$classOST_1_1ValueVisitor.html#a102cd031f2140fc75dfb1f819509e95a" title=" " alt="" coords="228,5,369,47"/>
 </map>

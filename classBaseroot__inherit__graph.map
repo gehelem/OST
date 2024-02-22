@@ -1,19 +1,11 @@
 <map id="Baseroot" name="Baseroot">
-<area shape="rect" id="Node000001" title=" " alt="" coords="185,119,319,384"/>
-<area shape="rect" id="Node000003" href="$classDatastore.html" title="Class to provide properties management for OST modules." alt="" coords="194,432,310,737"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="255,399,255,432,249,432,249,399"/>
-<area shape="rect" id="Node000002" href="$classQObject.html" title=" " alt="" coords="221,5,283,71"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="255,86,255,119,249,119,249,86"/>
-<area shape="rect" id="Node000004" href="$classDBManager.html" title=" " alt="" coords="177,785,327,1051"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="255,752,255,786,249,786,249,752"/>
-<area shape="rect" id="Node000005" href="$classBasemodule.html" title=" " alt="" coords="165,1099,339,1479"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="255,1066,255,1099,249,1099,249,1066"/>
-<area shape="rect" id="Node000006" href="$classIndiModule.html" title=" " alt="" coords="48,1527,248,1932"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="206,1494,198,1528,193,1526,201,1492"/>
-<area shape="rect" id="Node000009" href="$classMaincontrol.html" title=" " alt="" coords="272,1587,443,1872"/>
-<area shape="poly" id="edge8_Node000005_Node000009" title=" " alt="" coords="303,1492,326,1586,321,1587,298,1493"/>
-<area shape="rect" id="Node000007" href="$classDummy.html" title=" " alt="" coords="5,1980,149,2145"/>
-<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="105,1947,97,1981,92,1980,99,1946"/>
-<area shape="rect" id="Node000008" href="$classIndiPanel.html" title=" " alt="" coords="174,2020,266,2105"/>
-<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="198,1946,214,2020,208,2021,192,1947"/>
+<area shape="rect" id="node1" title=" " alt="" coords="221,131,379,355"/>
+<area shape="rect" id="node3" href="$classDatastore.html" title="Class to provide properties management for OST modules." alt="" coords="229,403,371,656"/>
+<area shape="rect" id="node2" href="$classQObject.html" title=" " alt="" coords="263,5,337,83"/>
+<area shape="rect" id="node4" href="$classDBManager.html" title=" " alt="" coords="209,704,391,928"/>
+<area shape="rect" id="node5" href="$classBasemodule.html" title=" " alt="" coords="198,976,402,1288"/>
+<area shape="rect" id="node6" href="$classIndiModule.html" title=" " alt="" coords="61,1336,296,1663"/>
+<area shape="rect" id="node9" href="$classMaincontrol.html" title=" " alt="" coords="320,1380,523,1619"/>
+<area shape="rect" id="node7" href="$classDummy.html" title=" " alt="" coords="5,1711,181,1861"/>
+<area shape="rect" id="node8" href="$classIndiPanel.html" title=" " alt="" coords="205,1740,323,1832"/>
 </map>

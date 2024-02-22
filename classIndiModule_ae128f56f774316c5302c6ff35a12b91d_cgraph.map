@@ -1,9 +1,6 @@
 <map id="IndiModule::getModText" name="IndiModule::getModText">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,164,56"/>
-<area shape="rect" id="Node000002" href="$classBaseroot.html#a11f046456df0e3597b22865491e64356" title=" " alt="" coords="212,31,346,56"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="164,41,196,41,196,46,164,46"/>
-<area shape="rect" id="Node000003" href="$classBaseroot.html#a1798d4e8fb63f7a127358c15b5c29e90" title=" " alt="" coords="394,5,565,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="346,32,378,28,379,34,346,38"/>
-<area shape="rect" id="Node000004" href="$classBaseroot.html#a19f10e8769981a8ffedd0ea52863fb9a" title=" " alt="" coords="403,55,557,80"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="346,49,387,54,387,59,346,54"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,31,184,57"/>
+<area shape="rect" id="node2" href="$classBaseroot.html#a11f046456df0e3597b22865491e64356" title=" " alt="" coords="232,31,383,57"/>
+<area shape="rect" id="node3" href="$classBaseroot.html#a1798d4e8fb63f7a127358c15b5c29e90" title=" " alt="" coords="431,5,621,32"/>
+<area shape="rect" id="node4" href="$classBaseroot.html#a19f10e8769981a8ffedd0ea52863fb9a" title=" " alt="" coords="441,56,611,83"/>
 </map>

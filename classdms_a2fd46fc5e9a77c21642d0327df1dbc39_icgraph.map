@@ -1,8 +1,5 @@
 <map id="dms::second" name="dms::second">
-<area shape="rect" id="Node000001" title=" " alt="" coords="334,31,428,56"/>
-<area shape="rect" id="Node000002" href="$classdms.html#a745a01813ff4743df2818440c1644a4f" title=" " alt="" coords="181,5,286,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="318,35,286,30,287,25,319,30"/>
-<area shape="rect" id="Node000003" href="$classdms.html#a61313ada5bc7418dfbeef21c9bf8c0d1" title=" " alt="" coords="5,31,133,56"/>
-<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="318,46,133,46,133,41,318,41"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="166,31,134,36,133,31,165,26"/>
+<area shape="rect" id="node1" title=" " alt="" coords="357,31,461,57"/>
+<area shape="rect" id="node2" href="$classdms.html#a745a01813ff4743df2818440c1644a4f" title=" " alt="" coords="192,5,309,32"/>
+<area shape="rect" id="node3" href="$classdms.html#a61313ada5bc7418dfbeef21c9bf8c0d1" title=" " alt="" coords="5,31,144,57"/>
 </map>

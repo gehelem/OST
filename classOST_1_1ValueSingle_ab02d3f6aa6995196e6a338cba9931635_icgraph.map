@@ -1,9 +1,4 @@
 <map id="OST::ValueSingle::getPostIcon" name="OST::ValueSingle::getPostIcon">
-<area shape="rect" id="Node000001" title=" " alt="" coords="214,78,413,104"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1ValueJsonDumper.html#aadabfe275988d138e70eea378a4b93e2" title=" " alt="" coords="5,5,166,46"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="250,76,158,49,160,44,252,71"/>
-<area shape="rect" id="Node000003" href="$classOST_1_1ValueJsonDumper.html#a8b9f8aef768186d9aa7017704d5eef05" title=" " alt="" coords="5,71,166,111"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="198,94,166,94,166,88,198,88"/>
-<area shape="rect" id="Node000004" href="$classOST_1_1ValueJsonDumper.html#a65329b42e9310b600fdadc1695369e07" title=" " alt="" coords="5,136,166,177"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="252,111,160,138,158,133,250,106"/>
+<area shape="rect" id="node1" title=" " alt="" coords="224,13,439,39"/>
+<area shape="rect" id="node2" href="$classOST_1_1ValueJsonDumper.html#a8b9f8aef768186d9aa7017704d5eef05" title=" " alt="" coords="5,5,176,47"/>
 </map>

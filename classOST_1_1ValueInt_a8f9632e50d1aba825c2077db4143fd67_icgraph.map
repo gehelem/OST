@@ -1,7 +1,5 @@
 <map id="OST::ValueInt::format" name="OST::ValueInt::format">
-<area shape="rect" id="Node000001" title=" " alt="" coords="221,35,366,60"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1ValueInt.html#a36e686264ffed492438016020470a637" title=" " alt="" coords="5,5,173,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="205,38,173,33,174,28,206,32"/>
-<area shape="rect" id="Node000003" href="$classOST_1_1ValueJsonDumper.html#a8b9f8aef768186d9aa7017704d5eef05" title=" " alt="" coords="9,55,169,96"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="206,62,170,67,169,62,205,57"/>
+<area shape="rect" id="node1" title=" " alt="" coords="236,35,396,61"/>
+<area shape="rect" id="node2" href="$classOST_1_1ValueInt.html#a36e686264ffed492438016020470a637" title=" " alt="" coords="5,5,188,32"/>
+<area shape="rect" id="node3" href="$classOST_1_1ValueJsonDumper.html#a8b9f8aef768186d9aa7017704d5eef05" title=" " alt="" coords="11,57,182,98"/>
 </map>

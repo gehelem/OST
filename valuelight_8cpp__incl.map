@@ -1,24 +1,12 @@
 <map id="libs/model/value/valuelight.cpp" name="libs/model/value/valuelight.cpp">
-<area shape="rect" id="Node000001" title=" " alt="" coords="67,5,265,31"/>
-<area shape="rect" id="Node000002" href="$valuelight_8h.html" title=" " alt="" coords="123,79,209,105"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,31,169,63,163,63,163,31"/>
-<area shape="rect" id="Node000003" href="$valuesingle_8h.html" title=" " alt="" coords="118,153,214,178"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="169,105,169,137,163,137,163,105"/>
-<area shape="rect" id="Node000004" href="$valuebase_8h.html" title=" " alt="" coords="68,300,158,326"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="164,180,125,286,120,285,159,178"/>
-<area shape="rect" id="Node000008" href="$lovsingle_8h.html" title=" " alt="" coords="172,226,254,252"/>
-<area shape="poly" id="edge8_Node000003_Node000008" title=" " alt="" coords="176,177,199,212,194,215,171,180"/>
-<area shape="rect" id="Node000005" href="$valuevisitor_8h.html" title=" " alt="" coords="5,374,103,399"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="105,328,75,363,71,360,101,324"/>
-<area shape="rect" id="Node000007" href="$common_8h.html" title=" " alt="" coords="127,374,208,399"/>
-<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="124,324,151,360,147,363,120,328"/>
-<area shape="rect" id="Node000006" title=" " alt="" coords="136,447,199,473"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="75,398,137,436,134,441,72,402"/>
-<area shape="poly" id="edge7_Node000007_Node000006" title=" " alt="" coords="170,400,170,432,165,432,165,400"/>
-<area shape="rect" id="Node000009" href="$lovbase_8h.html" title=" " alt="" coords="183,300,259,326"/>
-<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="217,252,220,284,215,285,211,253"/>
-<area shape="poly" id="edge12_Node000009_Node000007" title=" " alt="" coords="214,327,188,363,183,359,210,324"/>
-<area shape="rect" id="Node000010" href="$lovvisitor_8h.html" title=" " alt="" coords="232,374,316,399"/>
-<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="232,324,258,359,254,363,227,327"/>
-<area shape="poly" id="edge11_Node000010_Node000006" title=" " alt="" coords="257,402,200,441,197,436,254,398"/>
+<area shape="rect" id="node1" title=" " alt="" coords="71,5,298,32"/>
+<area shape="rect" id="node2" href="$valuelight_8h.html" title=" " alt="" coords="135,80,234,107"/>
+<area shape="rect" id="node3" href="$valuesingle_8h.html" title=" " alt="" coords="130,155,239,181"/>
+<area shape="rect" id="node4" href="$valuebase_8h.html" title=" " alt="" coords="77,304,178,331"/>
+<area shape="rect" id="node8" href="$lovsingle_8h.html" title=" " alt="" coords="189,229,282,256"/>
+<area shape="rect" id="node5" href="$valuevisitor_8h.html" title=" " alt="" coords="5,379,116,405"/>
+<area shape="rect" id="node7" href="$common_8h.html" title=" " alt="" coords="141,379,231,405"/>
+<area shape="rect" id="node6" title=" " alt="" coords="153,453,219,480"/>
+<area shape="rect" id="node9" href="$lovbase_8h.html" title=" " alt="" coords="202,304,287,331"/>
+<area shape="rect" id="node10" href="$lovvisitor_8h.html" title=" " alt="" coords="256,379,351,405"/>
 </map>

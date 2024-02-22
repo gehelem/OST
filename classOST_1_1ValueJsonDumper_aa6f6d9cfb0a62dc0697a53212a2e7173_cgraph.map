@@ -1,7 +1,5 @@
 <map id="OST::ValueJsonDumper::visit" name="OST::ValueJsonDumper::visit">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,166,64"/>
-<area shape="rect" id="Node000002" href="$namespaceOST.html#a691dd76df3ee9ffb05dd15431dc49faf" title=" " alt="" coords="236,5,352,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="165,31,220,24,221,30,166,36"/>
-<area shape="rect" id="Node000003" href="$classOST_1_1ValueSingle.html#a2a9a4a828381bf85c50dbecbcab29dbb" title=" " alt="" coords="214,55,374,80"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="166,50,198,54,198,59,165,55"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,23,176,65"/>
+<area shape="rect" id="node2" href="$namespaceOST.html#a691dd76df3ee9ffb05dd15431dc49faf" title=" " alt="" coords="251,5,371,32"/>
+<area shape="rect" id="node3" href="$classOST_1_1ValueSingle.html#a2a9a4a828381bf85c50dbecbcab29dbb" title=" " alt="" coords="224,56,399,83"/>
 </map>

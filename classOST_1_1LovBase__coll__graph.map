@@ -1,5 +1,4 @@
 <map id="OST::LovBase" name="OST::LovBase">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,119,103,304"/>
-<area shape="rect" id="Node000002" href="$classQObject.html" title=" " alt="" coords="23,5,85,71"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="57,86,57,119,51,119,51,86"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,131,119,296"/>
+<area shape="rect" id="node2" href="$classQObject.html" title=" " alt="" coords="25,5,99,83"/>
 </map>

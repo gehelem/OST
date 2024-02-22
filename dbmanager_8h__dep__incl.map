@@ -1,31 +1,17 @@
 <map id="libs/dbmanager.h" name="libs/dbmanager.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="339,5,459,31"/>
-<area shape="rect" id="Node000002" href="$basemodule_8h.html" title=" " alt="" coords="260,79,386,105"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="377,44,338,81,334,77,373,40"/>
-<area shape="rect" id="Node000015" href="$dbmanager_8cpp.html" title=" " alt="" coords="410,79,543,105"/>
-<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="425,40,465,77,462,81,422,44"/>
-<area shape="rect" id="Node000003" href="$basemodule_8cpp.html" title=" " alt="" coords="101,153,241,178"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="285,114,198,154,196,150,282,109"/>
-<area shape="rect" id="Node000004" href="$indimodule_8h.html" title=" " alt="" coords="264,153,382,178"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="326,120,326,152,320,152,320,120"/>
-<area shape="rect" id="Node000010" href="$maincontrol_8h.html" title=" " alt="" coords="495,153,668,178"/>
-<area shape="poly" id="edge9_Node000002_Node000010" title=" " alt="" coords="382,107,538,149,537,155,381,112"/>
-<area shape="rect" id="Node000005" href="$indimodule_8cpp.html" title=" " alt="" coords="5,226,137,252"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="267,185,115,228,113,223,265,180"/>
-<area shape="rect" id="Node000006" href="$dummy_8h.html" title=" " alt="" coords="161,226,309,252"/>
-<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="298,191,251,228,248,224,295,186"/>
-<area shape="rect" id="Node000008" href="$indipanel_8h.html" title=" " alt="" coords="334,226,491,252"/>
-<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="351,186,399,224,396,228,348,190"/>
-<area shape="rect" id="Node000007" href="$dummy_8cpp.html" title=" " alt="" coords="141,300,303,326"/>
-<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="233,268,227,300,221,299,227,267"/>
-<area shape="rect" id="Node000009" href="$indipanel_8cpp.html" title=" " alt="" coords="327,300,498,326"/>
-<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="415,267,415,300,410,300,410,267"/>
-<area shape="rect" id="Node000011" href="$controller_8h.html" title=" " alt="" coords="529,226,635,252"/>
-<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="584,194,584,226,579,226,579,194"/>
-<area shape="rect" id="Node000014" href="$maincontrol_8cpp.html" title=" " alt="" coords="659,226,846,252"/>
-<area shape="poly" id="edge13_Node000010_Node000014" title=" " alt="" coords="625,182,724,223,722,228,623,187"/>
-<area shape="rect" id="Node000012" href="$controller_8cpp.html" title=" " alt="" coords="522,300,642,326"/>
-<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="584,267,584,300,579,300,579,267"/>
-<area shape="rect" id="Node000013" href="$ost_8cpp.html" title=" " alt="" coords="666,300,751,326"/>
-<area shape="poly" id="edge12_Node000011_Node000013" title=" " alt="" coords="618,258,688,297,685,302,615,262"/>
+<area shape="rect" id="node1" title=" " alt="" coords="563,5,698,32"/>
+<area shape="rect" id="node2" href="$basemodule_8h.html" title=" " alt="" coords="476,80,617,107"/>
+<area shape="rect" id="node15" href="$dbmanager_8cpp.html" title=" " alt="" coords="641,80,791,107"/>
+<area shape="rect" id="node3" href="$maincontrol_8h.html" title=" " alt="" coords="231,155,425,181"/>
+<area shape="rect" id="node8" href="$basemodule_8cpp.html" title=" " alt="" coords="469,155,625,181"/>
+<area shape="rect" id="node9" href="$indimodule_8h.html" title=" " alt="" coords="658,155,793,181"/>
+<area shape="rect" id="node4" href="$controller_8h.html" title=" " alt="" coords="81,229,199,256"/>
+<area shape="rect" id="node7" href="$maincontrol_8cpp.html" title=" " alt="" coords="223,229,433,256"/>
+<area shape="rect" id="node5" href="$controller_8cpp.html" title=" " alt="" coords="5,304,139,331"/>
+<area shape="rect" id="node6" href="$ost_8cpp.html" title=" " alt="" coords="163,304,255,331"/>
+<area shape="rect" id="node10" href="$dummy_8h.html" title=" " alt="" coords="457,229,623,256"/>
+<area shape="rect" id="node12" href="$indipanel_8h.html" title=" " alt="" coords="647,229,825,256"/>
+<area shape="rect" id="node14" href="$indimodule_8cpp.html" title=" " alt="" coords="849,229,999,256"/>
+<area shape="rect" id="node11" href="$dummy_8cpp.html" title=" " alt="" coords="442,304,622,331"/>
+<area shape="rect" id="node13" href="$indipanel_8cpp.html" title=" " alt="" coords="647,304,839,331"/>
 </map>

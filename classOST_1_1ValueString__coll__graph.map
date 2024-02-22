@@ -1,11 +1,7 @@
 <map id="OST::ValueString" name="OST::ValueString">
-<area shape="rect" id="Node000001" title=" " alt="" coords="47,1013,160,1279"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1ValueSingle.html" title=" " alt="" coords="13,700,194,965"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="106,980,106,1013,101,1013,101,980"/>
-<area shape="rect" id="Node000003" href="$classOST_1_1ValueSingleSignalAndSlots.html" title=" " alt="" coords="5,512,201,652"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="106,667,106,700,101,700,101,667"/>
-<area shape="rect" id="Node000004" href="$classOST_1_1ValueBase.html" title=" " alt="" coords="44,119,163,464"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="106,479,106,512,101,512,101,479"/>
-<area shape="rect" id="Node000005" href="$classQObject.html" title=" " alt="" coords="73,5,134,71"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="106,86,106,119,101,119,101,86"/>
+<area shape="rect" id="node1" title=" " alt="" coords="55,917,187,1141"/>
+<area shape="rect" id="node2" href="$classOST_1_1ValueSingle.html" title=" " alt="" coords="16,645,225,869"/>
+<area shape="rect" id="node3" href="$classOST_1_1ValueSingleSignalAndSlots.html" title=" " alt="" coords="5,461,236,597"/>
+<area shape="rect" id="node4" href="$classOST_1_1ValueBase.html" title=" " alt="" coords="49,131,193,413"/>
+<area shape="rect" id="node5" href="$classQObject.html" title=" " alt="" coords="83,5,158,83"/>
 </map>

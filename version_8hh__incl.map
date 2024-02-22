@@ -1,5 +1,4 @@
 <map id="src/version.hh" name="src/version.hh">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,108,31"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="30,79,83,105"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="59,31,59,63,54,63,54,31"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,5,119,32"/>
+<area shape="rect" id="node2" title=" " alt="" coords="33,80,91,107"/>
 </map>

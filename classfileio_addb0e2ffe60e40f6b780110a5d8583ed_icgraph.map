@@ -1,7 +1,5 @@
 <map id="fileio::logOutput" name="fileio::logOutput">
-<area shape="rect" id="Node000001" title=" " alt="" coords="394,5,503,31"/>
-<area shape="rect" id="Node000002" href="$classfileio.html#af71ade1bfcf0cca2f2ee1854a9d4cc3c" title=" " alt="" coords="220,5,346,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="378,21,346,21,346,16,378,16"/>
-<area shape="rect" id="Node000003" href="$classfileio.html#a2f1eddbabb1fb91828971a930a604135" title=" " alt="" coords="5,5,172,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="204,21,172,21,172,16,204,16"/>
+<area shape="rect" id="node1" title=" " alt="" coords="421,5,548,32"/>
+<area shape="rect" id="node2" href="$classfileio.html#af71ade1bfcf0cca2f2ee1854a9d4cc3c" title=" " alt="" coords="236,5,373,32"/>
+<area shape="rect" id="node3" href="$classfileio.html#a2f1eddbabb1fb91828971a930a604135" title=" " alt="" coords="5,5,188,32"/>
 </map>

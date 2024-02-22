@@ -1,7 +1,4 @@
 <map id="OST::ValueVideo::setValue" name="OST::ValueVideo::setValue">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,183,56"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1ValueVideo.html#a7bc2f276dbebcad7e2656e7de69bf511" title=" " alt="" coords="255,5,412,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="183,31,239,25,239,31,183,37"/>
-<area shape="rect" id="Node000003" href="$classOST_1_1ValueBase.html#a500741026568d575c9402a23f786edc4" title=" " alt="" coords="231,55,436,80"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="183,50,215,53,215,58,183,55"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,5,197,32"/>
+<area shape="rect" id="node2" href="$classOST_1_1ValueVideo.html#a7bc2f276dbebcad7e2656e7de69bf511" title=" " alt="" coords="245,5,417,32"/>
 </map>

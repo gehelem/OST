@@ -1,7 +1,5 @@
 <map id="libs/stretch.h" name="libs/stretch.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="37,5,132,31"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,79,73,105"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="79,33,57,67,52,64,75,30"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="97,79,165,105"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="94,30,117,64,113,67,90,33"/>
+<area shape="rect" id="node1" title=" " alt="" coords="40,5,147,32"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,80,83,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="107,80,181,107"/>
 </map>

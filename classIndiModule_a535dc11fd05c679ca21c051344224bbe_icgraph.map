@@ -1,16 +1,8 @@
 <map id="IndiModule::defineMeAsImager" name="IndiModule::defineMeAsImager">
-<area shape="rect" id="Node000001" title=" " alt="" coords="437,80,635,106"/>
-<area shape="rect" id="Node000002" href="$classIndiModule.html#af401346f8edb6a6690b8f6e6ad38fcfa" title=" " alt="" coords="176,5,382,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="485,77,388,45,347,34,348,29,390,40,486,72"/>
-<area shape="rect" id="Node000004" href="$classIndiModule.html#a2f728d8048b9bf9181049cba6c23d6a8" title=" " alt="" coords="181,55,377,80"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="421,84,377,80,378,75,422,79"/>
-<area shape="rect" id="Node000005" href="$classIndiModule.html#abae7cc3840dbb35639fe27db2e1c7d4b" title=" " alt="" coords="172,104,386,130"/>
-<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="421,106,387,109,386,104,421,101"/>
-<area shape="rect" id="Node000006" href="$classIndiModule.html#adb409b1044b5852148811e86d0079187" title=" " alt="" coords="169,153,389,179"/>
-<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="485,114,390,145,347,155,346,150,388,140,484,109"/>
-<area shape="rect" id="Node000003" href="$classDummy.html#ab4827b75bab26993555a749f5ef2d6c6" title=" " alt="" coords="5,80,121,106"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="192,38,170,45,126,63,89,82,86,77,124,58,168,40,190,33"/>
-<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="165,84,122,89,121,83,165,78"/>
-<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="156,106,121,102,122,97,157,101"/>
-<area shape="poly" id="edge8_Node000006_Node000003" title=" " alt="" coords="190,151,168,145,125,127,87,109,90,104,127,122,170,140,192,146"/>
+<area shape="rect" id="node1" title=" " alt="" coords="481,81,705,108"/>
+<area shape="rect" id="node2" href="$classIndiModule.html#af401346f8edb6a6690b8f6e6ad38fcfa" title=" " alt="" coords="196,5,424,32"/>
+<area shape="rect" id="node4" href="$classIndiModule.html#a2f728d8048b9bf9181049cba6c23d6a8" title=" " alt="" coords="199,56,421,83"/>
+<area shape="rect" id="node5" href="$classIndiModule.html#abae7cc3840dbb35639fe27db2e1c7d4b" title=" " alt="" coords="189,107,431,133"/>
+<area shape="rect" id="node6" href="$classIndiModule.html#adb409b1044b5852148811e86d0079187" title=" " alt="" coords="187,157,433,184"/>
+<area shape="rect" id="node3" href="$classDummy.html#ab4827b75bab26993555a749f5ef2d6c6" title=" " alt="" coords="5,81,139,108"/>
 </map>

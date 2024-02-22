@@ -1,5 +1,4 @@
 <map id="OST::ValueUpdate" name="OST::ValueUpdate">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,339,127,604"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1ValueVisitor.html" title=" " alt="" coords="8,5,124,291"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="69,306,69,339,63,339,63,306"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,292,144,516"/>
+<area shape="rect" id="node2" href="$classOST_1_1ValueVisitor.html" title=" " alt="" coords="8,5,141,244"/>
 </map>

@@ -1,13 +1,8 @@
 <map id="OST::PropertyFactory::createProperty" name="OST::PropertyFactory::createProperty">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,79,151,120"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1ValueFactory.html#ae3c4354c5783cf1f99d51aa5dd6e8527" title=" " alt="" coords="205,22,342,63"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="149,76,190,64,191,69,150,81"/>
-<area shape="rect" id="Node000005" href="$namespaceOST.html#a9c2ad4facbe34ebea0b47ea87a9d1f12" title="Converts integer to property permission." alt="" coords="199,87,348,112"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="151,97,183,97,183,102,151,102"/>
-<area shape="rect" id="Node000006" href="$namespaceOST.html#a480bf04e26444e2cfcfff7b9661613fa" title=" " alt="" coords="218,136,329,162"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="152,115,205,129,204,134,150,120"/>
-<area shape="rect" id="Node000003" href="$namespaceOST.html#adb882ae07e1b6f1dd54c52e084616c52" title=" " alt="" coords="422,5,537,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="341,32,406,24,406,29,342,37"/>
-<area shape="rect" id="Node000004" href="$namespaceOST.html#a092af59d3237abb0dd3f1972b3b132c7" title=" " alt="" coords="396,55,562,80"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="342,48,381,53,380,58,341,53"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,82,163,123"/>
+<area shape="rect" id="node2" href="$classOST_1_1ValueFactory.html#ae3c4354c5783cf1f99d51aa5dd6e8527" title=" " alt="" coords="217,23,363,65"/>
+<area shape="rect" id="node5" href="$namespaceOST.html#a9c2ad4facbe34ebea0b47ea87a9d1f12" title="Converts integer to property permission." alt="" coords="211,89,369,116"/>
+<area shape="rect" id="node6" href="$namespaceOST.html#a480bf04e26444e2cfcfff7b9661613fa" title=" " alt="" coords="233,140,347,167"/>
+<area shape="rect" id="node3" href="$namespaceOST.html#adb882ae07e1b6f1dd54c52e084616c52" title=" " alt="" coords="445,5,565,32"/>
+<area shape="rect" id="node4" href="$namespaceOST.html#a092af59d3237abb0dd3f1972b3b132c7" title=" " alt="" coords="417,56,593,83"/>
 </map>

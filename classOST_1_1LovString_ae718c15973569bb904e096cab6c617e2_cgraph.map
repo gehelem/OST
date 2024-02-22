@@ -1,5 +1,4 @@
 <map id="OST::LovString::accept" name="OST::LovString::accept">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,161,31"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1LovVisitor.html#a61ce74a547b2c17ad385f08b5d80192d" title=" " alt="" coords="209,5,352,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="161,16,193,16,193,21,161,21"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,5,172,32"/>
+<area shape="rect" id="node2" href="$classOST_1_1LovVisitor.html#a61ce74a547b2c17ad385f08b5d80192d" title=" " alt="" coords="220,5,376,32"/>
 </map>

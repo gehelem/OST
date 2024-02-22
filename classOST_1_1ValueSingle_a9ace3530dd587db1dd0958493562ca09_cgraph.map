@@ -1,9 +1,4 @@
 <map id="OST::ValueSingle::gridUpdate" name="OST::ValueSingle::gridUpdate">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,55,198,80"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1ValueBase.html#af45108904269e325c7f8be71693864cc" title=" " alt="" coords="252,5,444,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,51,265,32,266,37,170,57"/>
-<area shape="rect" id="Node000003" href="$classOST_1_1ValueBase.html#aec7f69b7d69258aa661a28f2c9641566" title=" " alt="" coords="246,55,450,80"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="198,65,230,65,230,70,198,70"/>
-<area shape="rect" id="Node000004" href="$classOST_1_1ValueSingle.html#a2a9a4a828381bf85c50dbecbcab29dbb" title=" " alt="" coords="268,104,428,130"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="170,78,266,98,265,103,169,84"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,5,216,32"/>
+<area shape="rect" id="node2" href="$classOST_1_1ValueSingle.html#a2a9a4a828381bf85c50dbecbcab29dbb" title=" " alt="" coords="264,5,439,32"/>
 </map>

@@ -1,16 +1,9 @@
 <map id="Datastore::createOstElementBool" name="Datastore::createOstElementBool">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,107,219,132"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1ValueFactory.html#ae3c4354c5783cf1f99d51aa5dd6e8527" title=" " alt="" coords="276,42,412,83"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="166,103,260,80,261,85,168,109"/>
-<area shape="rect" id="Node000005" href="$classBaseroot.html#a1798d4e8fb63f7a127358c15b5c29e90" title=" " alt="" coords="469,108,640,134"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="219,117,454,118,454,123,219,122"/>
-<area shape="rect" id="Node000006" href="$classBaseroot.html#affc1e3a0ffc17f0bddb90a005ddd2442" title=" " alt="" coords="267,157,421,183"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="175,130,268,151,266,156,174,136"/>
-<area shape="rect" id="Node000003" href="$namespaceOST.html#adb882ae07e1b6f1dd54c52e084616c52" title=" " alt="" coords="497,5,612,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="412,45,482,31,483,36,413,51"/>
-<area shape="rect" id="Node000004" href="$namespaceOST.html#a092af59d3237abb0dd3f1972b3b132c7" title=" " alt="" coords="472,55,638,80"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="412,61,456,62,456,68,412,67"/>
-<area shape="poly" id="edge6_Node000006_Node000005" title=" " alt="" coords="401,154,481,135,482,140,403,159"/>
-<area shape="rect" id="Node000007" href="$classBaseroot.html#a19f10e8769981a8ffedd0ea52863fb9a" title=" " alt="" coords="478,157,632,183"/>
-<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="421,168,462,168,462,173,421,173"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,111,245,137"/>
+<area shape="rect" id="node2" href="$classOST_1_1ValueFactory.html#ae3c4354c5783cf1f99d51aa5dd6e8527" title=" " alt="" coords="307,45,452,86"/>
+<area shape="rect" id="node5" href="$classBaseroot.html#a1798d4e8fb63f7a127358c15b5c29e90" title=" " alt="" coords="513,111,704,137"/>
+<area shape="rect" id="node6" href="$classBaseroot.html#affc1e3a0ffc17f0bddb90a005ddd2442" title=" " alt="" coords="293,161,465,188"/>
+<area shape="rect" id="node3" href="$namespaceOST.html#adb882ae07e1b6f1dd54c52e084616c52" title=" " alt="" coords="549,5,669,32"/>
+<area shape="rect" id="node4" href="$namespaceOST.html#a092af59d3237abb0dd3f1972b3b132c7" title=" " alt="" coords="521,56,697,83"/>
+<area shape="rect" id="node7" href="$classBaseroot.html#a19f10e8769981a8ffedd0ea52863fb9a" title=" " alt="" coords="523,161,694,188"/>
 </map>

@@ -1,13 +1,7 @@
 <map id="OST::ValueUpdate::visit" name="OST::ValueUpdate::visit">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,55,165,80"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1ValueBase.html#a42ab362d5ba525005a6831dc63f316fd" title=" " alt="" coords="243,5,393,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="149,51,238,32,239,37,150,57"/>
-<area shape="rect" id="Node000003" href="$classOST_1_1ValueBase.html#ad0269cc3eaa89fe800332d7e146402dc" title=" " alt="" coords="213,55,423,80"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="165,65,197,65,197,70,165,70"/>
-<area shape="rect" id="Node000004" href="$classOST_1_1ValueSingle.html#a84f642acb4dd3aa08ddaf441a3223f87" title=" " alt="" coords="228,104,408,130"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="150,78,239,98,238,103,149,84"/>
-<area shape="rect" id="Node000005" href="$classOST_1_1ValueSingleSignalAndSlots.html#aa1cd9e8f4220307e9602723687748bd2" title=" " alt="" coords="471,67,653,108"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="408,103,455,98,456,103,409,109"/>
-<area shape="rect" id="Node000006" href="$classOST_1_1ValueSingle.html#a2a9a4a828381bf85c50dbecbcab29dbb" title=" " alt="" coords="482,132,642,158"/>
-<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="409,125,467,131,466,137,408,130"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,56,180,83"/>
+<area shape="rect" id="node2" href="$classOST_1_1ValueBase.html#a42ab362d5ba525005a6831dc63f316fd" title=" " alt="" coords="261,5,423,32"/>
+<area shape="rect" id="node3" href="$classOST_1_1ValueBase.html#ad0269cc3eaa89fe800332d7e146402dc" title=" " alt="" coords="228,56,456,83"/>
+<area shape="rect" id="node4" href="$classOST_1_1ValueSingle.html#a84f642acb4dd3aa08ddaf441a3223f87" title=" " alt="" coords="245,107,439,133"/>
+<area shape="rect" id="node5" href="$classOST_1_1ValueSingle.html#a2a9a4a828381bf85c50dbecbcab29dbb" title=" " alt="" coords="504,107,679,133"/>
 </map>

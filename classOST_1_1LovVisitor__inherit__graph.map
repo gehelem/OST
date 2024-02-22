@@ -1,5 +1,4 @@
 <map id="OST::LovVisitor" name="OST::LovVisitor">
-<area shape="rect" id="Node000001" title=" " alt="" coords="23,5,129,151"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1LovJsonDumper.html" title=" " alt="" coords="5,199,147,364"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="79,166,79,199,73,199,73,166"/>
+<area shape="rect" id="node1" title=" " alt="" coords="24,5,144,141"/>
+<area shape="rect" id="node2" href="$classOST_1_1LovJsonDumper.html" title=" " alt="" coords="5,189,163,340"/>
 </map>

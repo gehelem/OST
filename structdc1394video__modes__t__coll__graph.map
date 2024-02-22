@@ -1,7 +1,5 @@
 <map id="dc1394video_modes_t" name="dc1394video_modes_t">
-<area shape="rect" id="Node000001" title=" " alt="" coords="23,134,166,199"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,64,71"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="52,69,75,117,70,120,47,72"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="88,5,224,71"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="143,72,120,120,115,117,138,69"/>
+<area shape="rect" id="node1" title=" " alt="" coords="73,145,241,223"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,5,167,83"/>
+<area shape="rect" id="node3" title=" " alt="" coords="191,5,266,83"/>
 </map>

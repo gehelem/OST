@@ -1,60 +1,24 @@
 <map id="IndiModule::connectIndi" name="IndiModule::connectIndi">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,289,163,315"/>
-<area shape="rect" id="Node000002" href="$classDatastore.html#abf8c7391b03d6c269db83e04bba502eb" title=" " alt="" coords="255,237,371,263"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,286,239,264,240,269,144,291"/>
-<area shape="rect" id="Node000005" href="$classBaseroot.html#affc1e3a0ffc17f0bddb90a005ddd2442" title=" " alt="" coords="949,189,1104,215"/>
-<area shape="poly" id="edge34_Node000001_Node000005" title=" " alt="" coords="163,312,301,328,482,337,581,335,682,328,783,313,881,290,914,277,945,260,997,223,1000,227,948,264,916,282,882,295,784,318,683,333,581,341,482,342,301,333,163,317"/>
-<area shape="rect" id="Node000013" href="$classDatastore.html#aa563b45fd8a3300c325b65529bf4b6fb" title=" " alt="" coords="245,188,381,213"/>
-<area shape="poly" id="edge13_Node000001_Node000013" title=" " alt="" coords="102,286,149,254,210,222,229,215,231,220,212,227,152,259,105,290"/>
-<area shape="rect" id="Node000015" href="$classIndiModule.html#a6f8372911a19c8a4bd097a5a3bcc4402" title=" " alt="" coords="211,389,415,430"/>
-<area shape="poly" id="edge21_Node000001_Node000015" title=" " alt="" coords="109,313,212,369,240,381,237,386,210,373,106,318"/>
-<area shape="rect" id="Node000023" href="$classBaseroot.html#a11f046456df0e3597b22865491e64356" title=" " alt="" coords="959,74,1094,100"/>
-<area shape="poly" id="edge30_Node000001_Node000023" title=" " alt="" coords="93,287,139,232,172,200,209,173,279,132,340,101,395,78,449,61,564,36,712,14,797,3,835,5,882,14,943,36,994,63,991,68,941,41,881,19,834,10,798,8,713,19,565,42,450,66,397,83,342,106,281,137,212,177,175,204,143,236,97,290"/>
-<area shape="rect" id="Node000024" href="$ost_8cpp.html#a33d5f722b7d098ebc81089e55e435987" title=" " alt="" coords="262,454,364,480"/>
-<area shape="poly" id="edge33_Node000001_Node000024" title=" " alt="" coords="95,313,140,375,173,410,212,439,248,454,246,459,209,444,170,414,136,378,91,316"/>
-<area shape="rect" id="Node000003" href="$classDatastore.html#adcc4bd432feab32529c86391769c58dd" title=" " alt="" coords="489,237,638,263"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="371,247,473,247,473,252,371,252"/>
-<area shape="rect" id="Node000012" href="$classOST_1_1ValueSingle.html#a2a9a4a828381bf85c50dbecbcab29dbb" title=" " alt="" coords="484,188,644,213"/>
-<area shape="poly" id="edge12_Node000002_Node000012" title=" " alt="" coords="371,236,479,214,480,219,372,241"/>
-<area shape="rect" id="Node000004" href="$classDatastore.html#a79e0b740f868b59b31a068b48fd8ca43" title=" " alt="" coords="722,189,872,215"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="629,234,716,216,717,221,630,239"/>
-<area shape="poly" id="edge11_Node000003_Node000005" title=" " alt="" coords="614,261,669,272,736,282,809,283,881,274,912,264,942,250,993,221,996,226,944,255,914,269,882,279,809,289,736,287,668,278,612,266"/>
-<area shape="rect" id="Node000008" href="$classOST_1_1ValueBase.html#ae5cafb9cec0d2d5b7e7dc329f621d70a" title=" " alt="" coords="712,238,882,264"/>
-<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="639,247,697,248,697,253,639,253"/>
-<area shape="rect" id="Node000009" href="$classOST_1_1PropertyMulti.html#a1f931c08abc58a72e2aa17f224e7937f" title=" " alt="" coords="732,124,862,165"/>
-<area shape="poly" id="edge8_Node000003_Node000009" title=" " alt="" coords="638,234,663,223,678,212,687,200,696,187,711,174,718,170,720,175,714,179,700,191,691,203,681,216,666,228,640,239"/>
-<area shape="rect" id="Node000011" href="$classOST_1_1PropertyMulti.html#aa5b9db926cebff079788543bbaa23b2d" title=" " alt="" coords="732,59,862,99"/>
-<area shape="poly" id="edge10_Node000003_Node000011" title=" " alt="" coords="637,238,663,224,675,211,681,198,687,170,692,141,698,125,710,111,717,105,721,109,714,114,703,128,697,142,692,171,686,199,679,214,666,228,640,243"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="872,199,934,199,934,204,872,204"/>
-<area shape="rect" id="Node000006" href="$classBaseroot.html#a1798d4e8fb63f7a127358c15b5c29e90" title=" " alt="" coords="1171,157,1342,183"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="1104,188,1155,181,1156,186,1104,194"/>
-<area shape="rect" id="Node000007" href="$classBaseroot.html#a19f10e8769981a8ffedd0ea52863fb9a" title=" " alt="" coords="1180,92,1334,117"/>
-<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="1089,186,1122,174,1146,159,1170,142,1210,122,1212,126,1172,147,1149,163,1124,179,1091,191"/>
-<area shape="rect" id="Node000010" href="$classOST_1_1PropertyBase.html#a15add81dca862657c152e64d8616e70c" title="Property&#39;s label." alt="" coords="957,124,1096,165"/>
-<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="863,142,942,142,942,147,863,147"/>
-<area shape="poly" id="edge20_Node000013_Node000012" title=" " alt="" coords="381,198,468,198,468,203,381,203"/>
-<area shape="rect" id="Node000014" href="$classDatastore.html#a79f10d58ea4fd34cd6342dd8c7d7b3bc" title=" " alt="" coords="480,136,648,161"/>
-<area shape="poly" id="edge14_Node000013_Node000014" title=" " alt="" coords="378,184,483,162,484,168,379,190"/>
-<area shape="poly" id="edge15_Node000014_Node000004" title=" " alt="" coords="624,159,723,182,722,187,623,164"/>
-<area shape="poly" id="edge19_Node000014_Node000005" title=" " alt="" coords="576,133,632,87,670,63,711,45,760,29,801,20,840,23,861,31,883,45,898,59,907,75,910,109,913,143,919,159,932,175,937,179,934,183,928,178,914,162,908,144,905,110,901,77,894,63,880,49,858,36,839,28,801,25,761,34,713,50,672,67,635,91,580,137"/>
-<area shape="poly" id="edge16_Node000014_Node000008" title=" " alt="" coords="636,159,666,173,681,186,691,199,699,212,714,225,722,229,719,234,711,229,695,216,686,202,677,190,663,177,634,164"/>
-<area shape="poly" id="edge17_Node000014_Node000009" title=" " alt="" coords="648,144,716,143,717,148,648,150"/>
-<area shape="poly" id="edge18_Node000014_Node000011" title=" " alt="" coords="609,132,716,100,718,105,610,138"/>
-<area shape="rect" id="Node000016" href="$classIndiModule.html#abe2852548cd46d2f128c14e50e0a411e" title=" " alt="" coords="463,397,664,423"/>
-<area shape="poly" id="edge22_Node000015_Node000016" title=" " alt="" coords="415,407,448,407,448,412,415,412"/>
-<area shape="rect" id="Node000017" href="$classDatastore.html#a5ad8f91f1d05c31e9418c4951c3755f0" title=" " alt="" coords="716,390,878,416"/>
-<area shape="poly" id="edge23_Node000016_Node000017" title=" " alt="" coords="665,404,700,403,700,408,665,410"/>
-<area shape="rect" id="Node000019" href="$classOST_1_1LovSingle.html#a3e8b29970ed12f845c9df9bea3ad6c7e" title=" " alt="" coords="718,452,876,477"/>
-<area shape="poly" id="edge26_Node000016_Node000019" title=" " alt="" coords="622,421,725,445,724,450,621,426"/>
-<area shape="poly" id="edge25_Node000017_Node000005" title=" " alt="" coords="844,387,880,369,920,335,955,297,1007,226,1011,230,959,300,924,339,883,373,847,392"/>
-<area shape="rect" id="Node000018" href="$classDatastore.html#a0214591333cf671e80132a6fd0bbfb62" title=" " alt="" coords="948,377,1105,403"/>
-<area shape="poly" id="edge24_Node000017_Node000018" title=" " alt="" coords="878,396,932,393,933,398,878,401"/>
-<area shape="rect" id="Node000020" href="$classOST_1_1LovBase.html#ad5e4857cd1e7406c5e5c811be0b285e6" title=" " alt="" coords="957,525,1096,551"/>
-<area shape="poly" id="edge27_Node000019_Node000020" title=" " alt="" coords="832,475,930,511,953,518,952,523,929,516,830,480"/>
-<area shape="rect" id="Node000021" href="$classOST_1_1LovBase.html#a842662c8849c052a40070e94d9cb1fad" title=" " alt="" coords="936,426,1117,452"/>
-<area shape="poly" id="edge28_Node000019_Node000021" title=" " alt="" coords="876,453,920,448,921,453,877,458"/>
-<area shape="rect" id="Node000022" href="$classOST_1_1LovBase.html#ae8fe861093d002c2890c505e5920479e" title=" " alt="" coords="930,476,1123,501"/>
-<area shape="poly" id="edge29_Node000019_Node000022" title=" " alt="" coords="877,470,915,474,914,479,876,475"/>
-<area shape="poly" id="edge31_Node000023_Node000006" title=" " alt="" coords="1085,98,1124,110,1215,148,1213,152,1122,115,1083,103"/>
-<area shape="poly" id="edge32_Node000023_Node000007" title=" " alt="" coords="1094,89,1164,95,1164,100,1094,95"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,370,183,397"/>
+<area shape="rect" id="node2" href="$classDatastore.html#abf8c7391b03d6c269db83e04bba502eb" title=" " alt="" coords="279,179,411,206"/>
+<area shape="rect" id="node5" href="$classBaseroot.html#affc1e3a0ffc17f0bddb90a005ddd2442" title=" " alt="" coords="1015,341,1187,367"/>
+<area shape="rect" id="node13" href="$classDatastore.html#aa563b45fd8a3300c325b65529bf4b6fb" title=" " alt="" coords="268,230,421,257"/>
+<area shape="rect" id="node15" href="$classIndiModule.html#a6f8372911a19c8a4bd097a5a3bcc4402" title=" " alt="" coords="231,392,459,433"/>
+<area shape="rect" id="node21" href="$classBaseroot.html#a11f046456df0e3597b22865491e64356" title=" " alt="" coords="1025,493,1176,519"/>
+<area shape="rect" id="node22" href="$classBaseroot.html#ae846a910f240be39cfcd408c7419fb0c" title=" " alt="" coords="1012,543,1189,570"/>
+<area shape="rect" id="node3" href="$classDatastore.html#adcc4bd432feab32529c86391769c58dd" title=" " alt="" coords="536,125,704,151"/>
+<area shape="rect" id="node12" href="$classOST_1_1ValueSingle.html#a2a9a4a828381bf85c50dbecbcab29dbb" title=" " alt="" coords="533,179,707,206"/>
+<area shape="rect" id="node4" href="$classDatastore.html#a79e0b740f868b59b31a068b48fd8ca43" title=" " alt="" coords="787,122,958,149"/>
+<area shape="rect" id="node8" href="$classOST_1_1ValueBase.html#ae5cafb9cec0d2d5b7e7dc329f621d70a" title=" " alt="" coords="781,173,964,199"/>
+<area shape="rect" id="node9" href="$classOST_1_1PropertyMulti.html#a0dcf4ab9f9d7ac6bbaf5bbb565cfb5ec" title=" " alt="" coords="801,5,944,47"/>
+<area shape="rect" id="node11" href="$classOST_1_1PropertyMulti.html#a59bcb7d6273a53552f7b73968f11d51f" title=" " alt="" coords="801,224,944,265"/>
+<area shape="rect" id="node6" href="$classBaseroot.html#a1798d4e8fb63f7a127358c15b5c29e90" title=" " alt="" coords="1237,467,1428,494"/>
+<area shape="rect" id="node7" href="$classBaseroot.html#a19f10e8769981a8ffedd0ea52863fb9a" title=" " alt="" coords="1247,518,1418,545"/>
+<area shape="rect" id="node10" href="$classOST_1_1PropertyBase.html#a15add81dca862657c152e64d8616e70c" title="Property&#39;s label." alt="" coords="1025,5,1176,47"/>
+<area shape="rect" id="node14" href="$classDatastore.html#a79f10d58ea4fd34cd6342dd8c7d7b3bc" title=" " alt="" coords="525,230,715,257"/>
+<area shape="rect" id="node16" href="$classIndiModule.html#abe2852548cd46d2f128c14e50e0a411e" title=" " alt="" coords="507,399,733,426"/>
+<area shape="rect" id="node17" href="$classDatastore.html#a5ad8f91f1d05c31e9418c4951c3755f0" title=" " alt="" coords="781,391,964,418"/>
+<area shape="rect" id="node19" href="$classOST_1_1LovSingle.html#a3e8b29970ed12f845c9df9bea3ad6c7e" title=" " alt="" coords="787,442,958,469"/>
+<area shape="rect" id="node18" href="$classDatastore.html#a18ae8364227d0c474828ad56f227447a" title=" " alt="" coords="1013,391,1188,418"/>
+<area shape="rect" id="node20" href="$classOST_1_1LovBase.html#ad5e4857cd1e7406c5e5c811be0b285e6" title=" " alt="" coords="1025,442,1176,469"/>
 </map>

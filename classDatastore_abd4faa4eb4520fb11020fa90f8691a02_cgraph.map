@@ -1,32 +1,14 @@
 <map id="Datastore::createOstProperty" name="Datastore::createOstProperty">
-<area shape="rect" id="Node000001" title="createOstProperty is a method that creates a property at runtime" alt="" coords="5,221,194,247"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1PropertyMulti.html#a02739362084654d38c2a1fa6987c95af" title=" " alt="" coords="254,5,384,46"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,218,165,159,240,85,276,54,280,58,243,89,169,163,115,222"/>
-<area shape="rect" id="Node000004" href="$classOST_1_1PropertyFactory.html#ae43db65eda4bc6671ddb5adfb697d0f4" title=" " alt="" coords="246,99,392,139"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="124,218,240,155,261,144,264,149,243,160,126,223"/>
-<area shape="rect" id="Node000010" href="$classBaseroot.html#a1798d4e8fb63f7a127358c15b5c29e90" title=" " alt="" coords="444,250,615,276"/>
-<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="144,218,195,205,259,195,328,191,397,199,488,241,486,246,395,204,328,197,259,200,196,211,145,223"/>
-<area shape="rect" id="Node000011" href="$classOST_1_1PropertyBase.html#aec74ba39c5f179be7d276bb02ee4ed23" title=" " alt="" coords="250,213,388,254"/>
-<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="194,231,234,231,234,236,194,236"/>
-<area shape="rect" id="Node000012" href="$classOST_1_1PropertyBase.html#a0449ba5e729415a02929036bdb8773df" title=" " alt="" coords="250,279,388,319"/>
-<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="146,244,235,271,234,277,144,250"/>
-<area shape="rect" id="Node000013" href="$classBaseroot.html#affc1e3a0ffc17f0bddb90a005ddd2442" title=" " alt="" coords="242,344,396,369"/>
-<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="118,245,172,285,243,329,257,335,255,340,240,333,169,290,115,249"/>
-<area shape="rect" id="Node000015" href="$classOST_1_1PropertyBase.html#ab7170b3137421c0aad62df83238a3c33" title=" " alt="" coords="250,393,388,434"/>
-<area shape="poly" id="edge15_Node000001_Node000015" title=" " alt="" coords="112,245,164,308,202,346,243,380,249,383,246,388,240,384,198,350,160,312,108,249"/>
-<area shape="rect" id="Node000003" href="$classOST_1_1PropertyVisitor.html#a99eaeac9b8d4475f76f04f151f78e5f0" title=" " alt="" coords="460,5,599,46"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="384,23,445,23,445,28,384,28"/>
-<area shape="rect" id="Node000005" href="$classOST_1_1ValueFactory.html#ae3c4354c5783cf1f99d51aa5dd6e8527" title=" " alt="" coords="462,71,598,111"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="391,107,446,99,447,105,392,112"/>
-<area shape="rect" id="Node000008" href="$namespaceOST.html#a9c2ad4facbe34ebea0b47ea87a9d1f12" title="Converts integer to property permission." alt="" coords="455,136,604,161"/>
-<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="392,126,440,133,439,138,391,132"/>
-<area shape="rect" id="Node000009" href="$namespaceOST.html#a480bf04e26444e2cfcfff7b9661613fa" title=" " alt="" coords="475,185,585,211"/>
-<area shape="poly" id="edge8_Node000004_Node000009" title=" " alt="" coords="365,138,445,171,463,177,461,182,443,176,363,142"/>
-<area shape="rect" id="Node000006" href="$namespaceOST.html#adb882ae07e1b6f1dd54c52e084616c52" title=" " alt="" coords="689,54,804,80"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="598,81,673,72,674,78,598,86"/>
-<area shape="rect" id="Node000007" href="$namespaceOST.html#a092af59d3237abb0dd3f1972b3b132c7" title=" " alt="" coords="663,104,830,129"/>
-<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="598,96,648,102,647,107,598,102"/>
-<area shape="poly" id="edge13_Node000013_Node000010" title=" " alt="" coords="363,340,395,329,490,281,493,286,397,333,365,345"/>
-<area shape="rect" id="Node000014" href="$classBaseroot.html#a19f10e8769981a8ffedd0ea52863fb9a" title=" " alt="" coords="453,344,607,369"/>
-<area shape="poly" id="edge14_Node000013_Node000014" title=" " alt="" coords="396,354,437,354,437,359,396,359"/>
+<area shape="rect" id="node1" title="createOstProperty is a method that creates a property at runtime" alt="" coords="5,166,217,193"/>
+<area shape="rect" id="node2" href="$classOST_1_1PropertyMulti.html#a02739362084654d38c2a1fa6987c95af" title=" " alt="" coords="280,35,423,76"/>
+<area shape="rect" id="node4" href="$classOST_1_1PropertyFactory.html#ae43db65eda4bc6671ddb5adfb697d0f4" title=" " alt="" coords="273,129,430,171"/>
+<area shape="rect" id="node10" href="$classBaseroot.html#a1798d4e8fb63f7a127358c15b5c29e90" title=" " alt="" coords="485,238,676,265"/>
+<area shape="rect" id="node11" href="$classBaseroot.html#affc1e3a0ffc17f0bddb90a005ddd2442" title=" " alt="" coords="265,246,437,273"/>
+<area shape="rect" id="node3" href="$classOST_1_1PropertyVisitor.html#a99eaeac9b8d4475f76f04f151f78e5f0" title=" " alt="" coords="505,5,657,47"/>
+<area shape="rect" id="node5" href="$classOST_1_1ValueFactory.html#ae3c4354c5783cf1f99d51aa5dd6e8527" title=" " alt="" coords="508,71,653,112"/>
+<area shape="rect" id="node8" href="$namespaceOST.html#a9c2ad4facbe34ebea0b47ea87a9d1f12" title="Converts integer to property permission." alt="" coords="501,137,660,163"/>
+<area shape="rect" id="node9" href="$namespaceOST.html#a480bf04e26444e2cfcfff7b9661613fa" title=" " alt="" coords="523,187,638,214"/>
+<area shape="rect" id="node6" href="$namespaceOST.html#adb882ae07e1b6f1dd54c52e084616c52" title=" " alt="" coords="752,53,872,79"/>
+<area shape="rect" id="node7" href="$namespaceOST.html#a092af59d3237abb0dd3f1972b3b132c7" title=" " alt="" coords="724,103,900,130"/>
+<area shape="rect" id="node12" href="$classBaseroot.html#a19f10e8769981a8ffedd0ea52863fb9a" title=" " alt="" coords="495,289,666,315"/>
 </map>

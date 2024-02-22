@@ -1,25 +1,11 @@
 <map id="OST::ValueUpdate::visit" name="OST::ValueUpdate::visit">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,179,165,204"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1ValueSingle.html#a1a812b1793446ed4b341f885f2164c21" title=" " alt="" coords="223,5,395,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,177,136,111,170,73,211,40,219,35,222,40,214,44,174,76,140,114,96,180"/>
-<area shape="rect" id="Node000003" href="$classOST_1_1ValueSingle.html#a12a4f135617a938b921c0c2a5aaef43e" title=" " alt="" coords="222,55,396,80"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="97,176,145,133,177,110,211,89,224,83,227,88,214,94,180,114,148,138,101,180"/>
-<area shape="rect" id="Node000004" href="$classOST_1_1ValueSingle.html#ac2d3b5dd5c3ad450e38bc7ff50a2a341" title=" " alt="" coords="219,104,399,130"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="116,176,212,138,234,132,236,137,214,143,118,181"/>
-<area shape="rect" id="Node000005" href="$classOST_1_1ValueSingle.html#a58c76e9da97d868a340c2f671f563b70" title=" " alt="" coords="224,153,394,179"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="165,180,208,175,209,180,165,185"/>
-<area shape="rect" id="Node000007" href="$classOST_1_1ValueSingle.html#a9ace3530dd587db1dd0958493562ca09" title=" " alt="" coords="213,203,405,228"/>
-<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="165,197,197,201,197,206,165,203"/>
-<area shape="rect" id="Node000009" href="$classOST_1_1ValueSingle.html#a2a9a4a828381bf85c50dbecbcab29dbb" title=" " alt="" coords="475,252,635,278"/>
-<area shape="poly" id="edge12_Node000001_Node000009" title=" " alt="" coords="115,203,160,222,213,238,276,250,341,257,460,263,459,268,341,262,276,255,212,243,158,227,113,207"/>
-<area shape="rect" id="Node000010" href="$namespaceOST.html#adb882ae07e1b6f1dd54c52e084616c52" title=" " alt="" coords="251,304,367,330"/>
-<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="103,203,151,242,214,282,245,296,243,301,211,287,147,246,100,207"/>
-<area shape="rect" id="Node000011" href="$classOST_1_1ValueSingle.html#a1f2ed0dc0d03d0034fa454f5bb95daaf" title=" " alt="" coords="220,354,398,395"/>
-<area shape="poly" id="edge11_Node000001_Node000011" title=" " alt="" coords="96,203,141,268,175,307,214,340,221,344,218,349,211,344,171,311,137,272,92,206"/>
-<area shape="rect" id="Node000006" href="$classOST_1_1ValueBase.html#aec7f69b7d69258aa661a28f2c9641566" title=" " alt="" coords="453,153,657,179"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="394,164,437,164,437,169,394,169"/>
-<area shape="poly" id="edge8_Node000007_Node000006" title=" " alt="" coords="376,199,472,180,473,185,377,205"/>
-<area shape="rect" id="Node000008" href="$classOST_1_1ValueBase.html#af45108904269e325c7f8be71693864cc" title=" " alt="" coords="460,203,651,228"/>
-<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="405,213,444,213,444,218,405,218"/>
-<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="377,226,473,246,472,251,376,232"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,183,180,209"/>
+<area shape="rect" id="node2" href="$classOST_1_1ValueSingle.html#aaf0ef3c8b34320f215742de9bccbc305" title=" " alt="" coords="240,5,427,32"/>
+<area shape="rect" id="node3" href="$classOST_1_1ValueSingle.html#a12a4f135617a938b921c0c2a5aaef43e" title=" " alt="" coords="239,56,428,83"/>
+<area shape="rect" id="node4" href="$classOST_1_1ValueSingle.html#ac2d3b5dd5c3ad450e38bc7ff50a2a341" title=" " alt="" coords="234,107,433,133"/>
+<area shape="rect" id="node5" href="$classOST_1_1ValueSingle.html#a58c76e9da97d868a340c2f671f563b70" title=" " alt="" coords="240,157,427,184"/>
+<area shape="rect" id="node6" href="$classOST_1_1ValueSingle.html#a9ace3530dd587db1dd0958493562ca09" title=" " alt="" coords="228,208,439,235"/>
+<area shape="rect" id="node7" href="$classOST_1_1ValueSingle.html#a2a9a4a828381bf85c50dbecbcab29dbb" title=" " alt="" coords="487,233,661,260"/>
+<area shape="rect" id="node8" href="$namespaceOST.html#adb882ae07e1b6f1dd54c52e084616c52" title=" " alt="" coords="273,309,393,336"/>
+<area shape="rect" id="node9" href="$classOST_1_1ValueSingle.html#a1f2ed0dc0d03d0034fa454f5bb95daaf" title=" " alt="" coords="236,361,431,402"/>
 </map>

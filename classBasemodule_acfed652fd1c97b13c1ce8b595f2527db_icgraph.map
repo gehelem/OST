@@ -1,9 +1,6 @@
 <map id="Basemodule::setClassName" name="Basemodule::setClassName">
-<area shape="rect" id="Node000001" title="setClassName is a method to set inherited modules classname (ideally metaObject()&#45;&gt;className())" alt="" coords="215,55,400,80"/>
-<area shape="rect" id="Node000002" href="$classDummy.html#ab4827b75bab26993555a749f5ef2d6c6" title=" " alt="" coords="28,5,144,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="231,53,143,34,145,28,232,48"/>
-<area shape="rect" id="Node000003" href="$classIndiPanel.html#abf7b980e6b80fbf791a5b2cef4a638c6" title=" " alt="" coords="18,55,154,80"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="200,70,154,70,154,65,200,65"/>
-<area shape="rect" id="Node000004" href="$classMaincontrol.html#a9389bf4070ccd5d873d4a40ad6b73416" title=" " alt="" coords="5,104,167,130"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="232,87,148,106,146,101,231,82"/>
+<area shape="rect" id="node1" title="setClassName is a method to set inherited modules classname (ideally metaObject()&#45;&gt;className())" alt="" coords="237,56,443,83"/>
+<area shape="rect" id="node2" href="$classDummy.html#ab4827b75bab26993555a749f5ef2d6c6" title=" " alt="" coords="31,5,164,32"/>
+<area shape="rect" id="node3" href="$classIndiPanel.html#abf7b980e6b80fbf791a5b2cef4a638c6" title=" " alt="" coords="23,56,171,83"/>
+<area shape="rect" id="node4" href="$classMaincontrol.html#a9389bf4070ccd5d873d4a40ad6b73416" title=" " alt="" coords="5,107,189,133"/>
 </map>

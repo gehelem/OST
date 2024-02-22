@@ -1,5 +1,4 @@
 <map id="WShandler::closed" name="WShandler::closed">
-<area shape="rect" id="Node000001" title=" " alt="" coords="207,5,335,31"/>
-<area shape="rect" id="Node000002" href="$classWShandler.html#afe95c4f8c8cba96368403011ac6a684b" title=" " alt="" coords="5,5,159,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="191,21,159,21,159,16,191,16"/>
+<area shape="rect" id="node1" title=" " alt="" coords="224,5,367,32"/>
+<area shape="rect" id="node2" href="$classWShandler.html#afe95c4f8c8cba96368403011ac6a684b" title=" " alt="" coords="5,5,176,32"/>
 </map>

@@ -1,11 +1,7 @@
 <map id="dms::fromString" name="dms::fromString">
-<area shape="rect" id="Node000001" title="Static function to create a DMS object from a QString." alt="" coords="575,31,688,56"/>
-<area shape="rect" id="Node000002" href="$classfileio.html#aed00e21b1b199b7a7850ff096fbe80f1" title=" " alt="" coords="374,23,527,64"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="560,46,528,46,528,41,560,41"/>
-<area shape="rect" id="Node000003" href="$classfileio.html#a320346f8452770318e31793031e1dabb" title=" " alt="" coords="227,31,326,56"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="358,46,326,46,326,41,358,41"/>
-<area shape="rect" id="Node000004" href="$classfileio.html#a1cc9ceaada09a54b104d9ef891a419e8" title=" " alt="" coords="35,5,149,31"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="211,37,149,29,150,23,212,32"/>
-<area shape="rect" id="Node000005" href="$classfileio.html#ab4a75584c2ef8773f6e275650cb45155" title=" " alt="" coords="5,55,179,80"/>
-<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="212,55,180,59,179,53,211,49"/>
+<area shape="rect" id="node1" title="Static function to create a DMS object from a QString." alt="" coords="637,31,764,57"/>
+<area shape="rect" id="node2" href="$classfileio.html#aed00e21b1b199b7a7850ff096fbe80f1" title=" " alt="" coords="415,23,589,65"/>
+<area shape="rect" id="node3" href="$classfileio.html#a320346f8452770318e31793031e1dabb" title=" " alt="" coords="253,31,367,57"/>
+<area shape="rect" id="node4" href="$classfileio.html#a1cc9ceaada09a54b104d9ef891a419e8" title=" " alt="" coords="40,5,171,32"/>
+<area shape="rect" id="node5" href="$classfileio.html#ab4a75584c2ef8773f6e275650cb45155" title=" " alt="" coords="5,56,205,83"/>
 </map>

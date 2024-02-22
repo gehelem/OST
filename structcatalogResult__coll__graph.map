@@ -1,7 +1,5 @@
 <map id="catalogResult" name="catalogResult">
-<area shape="rect" id="Node000001" title=" " alt="" coords="28,194,120,259"/>
-<area shape="rect" id="Node000002" href="$classQString.html" title=" " alt="" coords="5,5,63,71"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="32,70,30,118,39,169,42,178,37,180,33,170,25,118,27,70"/>
-<area shape="rect" id="Node000003" href="$classdouble.html" title=" " alt="" coords="90,5,141,71"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="111,71,87,177,82,176,106,70"/>
+<area shape="rect" id="node1" title=" " alt="" coords="30,204,141,281"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,5,72,83"/>
+<area shape="rect" id="node3" title=" " alt="" coords="97,5,167,83"/>
 </map>

@@ -1,9 +1,5 @@
 <map id="OST::PropertyBase::setState" name="OST::PropertyBase::setState">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,55,144,96"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1PropertyBase.html#a87f114f651c52ce952ec9ba5cce5b266" title="Internal property&#39;s name." alt="" coords="192,5,350,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,53,209,33,210,38,145,58"/>
-<area shape="rect" id="Node000003" href="$classOST_1_1PropertyBase.html#aec74ba39c5f179be7d276bb02ee4ed23" title=" " alt="" coords="202,55,340,96"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="144,73,186,73,186,78,144,78"/>
-<area shape="rect" id="Node000004" href="$classOST_1_1PropertyBase.html#ae5e989d9098ad0a5907a949d6443e40c" title=" " alt="" coords="202,121,340,161"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="138,94,194,113,192,118,137,99"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,27,156,69"/>
+<area shape="rect" id="node2" href="$classOST_1_1PropertyBase.html#a87f114f651c52ce952ec9ba5cce5b266" title="Internal property&#39;s name." alt="" coords="204,5,377,32"/>
+<area shape="rect" id="node3" href="$classOST_1_1PropertyBase.html#ae5e989d9098ad0a5907a949d6443e40c" title=" " alt="" coords="215,57,366,98"/>
 </map>

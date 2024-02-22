@@ -1,9 +1,6 @@
 <map id="OST::ValueSingleSignalAndSlots::OnLovChanged" name="OST::ValueSingleSignalAndSlots::OnLovChanged">
-<area shape="rect" id="Node000001" title=" " alt="" coords="248,47,430,88"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1ValueFloat.html#a36e99bbf9ac4855d0a21a3e297edabd3" title=" " alt="" coords="10,5,195,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="232,48,167,34,168,29,233,43"/>
-<area shape="rect" id="Node000003" href="$classOST_1_1ValueInt.html#abe2396f6bd19422721dba899d8f562a7" title=" " alt="" coords="24,55,181,80"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="232,70,181,70,181,65,232,65"/>
-<area shape="rect" id="Node000004" href="$classOST_1_1ValueString.html#abaca8e0ee8c5a761cbdd8bddc466a92f" title=" " alt="" coords="5,104,200,130"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="233,92,168,106,167,101,232,87"/>
+<area shape="rect" id="node1" title=" " alt="" coords="264,49,460,90"/>
+<area shape="rect" id="node2" href="$classOST_1_1ValueFloat.html#a36e99bbf9ac4855d0a21a3e297edabd3" title=" " alt="" coords="10,5,211,32"/>
+<area shape="rect" id="node3" href="$classOST_1_1ValueInt.html#abe2396f6bd19422721dba899d8f562a7" title=" " alt="" coords="26,56,195,83"/>
+<area shape="rect" id="node4" href="$classOST_1_1ValueString.html#abaca8e0ee8c5a761cbdd8bddc466a92f" title=" " alt="" coords="5,107,216,133"/>
 </map>

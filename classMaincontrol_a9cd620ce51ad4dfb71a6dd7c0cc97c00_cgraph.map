@@ -1,9 +1,6 @@
 <map id="Maincontrol::sendMainError" name="Maincontrol::sendMainError">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,183,56"/>
-<area shape="rect" id="Node000002" href="$classBaseroot.html#a11f046456df0e3597b22865491e64356" title=" " alt="" coords="231,31,365,56"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="183,41,215,41,215,46,183,46"/>
-<area shape="rect" id="Node000003" href="$classBaseroot.html#a1798d4e8fb63f7a127358c15b5c29e90" title=" " alt="" coords="413,5,584,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="365,32,397,28,398,34,365,38"/>
-<area shape="rect" id="Node000004" href="$classBaseroot.html#a19f10e8769981a8ffedd0ea52863fb9a" title=" " alt="" coords="422,55,576,80"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="365,49,406,54,406,59,365,54"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,31,207,57"/>
+<area shape="rect" id="node2" href="$classBaseroot.html#a11f046456df0e3597b22865491e64356" title=" " alt="" coords="255,31,405,57"/>
+<area shape="rect" id="node3" href="$classBaseroot.html#a1798d4e8fb63f7a127358c15b5c29e90" title=" " alt="" coords="453,5,644,32"/>
+<area shape="rect" id="node4" href="$classBaseroot.html#a19f10e8769981a8ffedd0ea52863fb9a" title=" " alt="" coords="463,56,634,83"/>
 </map>

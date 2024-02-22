@@ -1,19 +1,11 @@
 <map id="libs/dms.cpp" name="libs/dms.cpp">
-<area shape="rect" id="Node000001" title=" " alt="" coords="208,5,303,31"/>
-<area shape="rect" id="Node000002" href="$dms_8h.html" title=" " alt="" coords="139,79,196,105"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="242,34,196,71,192,67,239,29"/>
-<area shape="rect" id="Node000008" title=" " alt="" coords="220,79,291,105"/>
-<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="258,31,258,63,253,63,253,31"/>
-<area shape="rect" id="Node000009" title=" " alt="" coords="315,79,391,105"/>
-<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="274,29,326,68,323,72,270,34"/>
-<area shape="rect" id="Node000003" href="$nan_8h.html" title=" " alt="" coords="5,153,58,178"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="146,108,69,147,67,143,143,103"/>
-<area shape="rect" id="Node000005" title=" " alt="" coords="82,153,147,178"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="161,106,134,142,130,138,157,103"/>
-<area shape="rect" id="Node000006" title=" " alt="" coords="171,153,271,178"/>
-<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="178,103,205,138,201,142,174,106"/>
-<area shape="rect" id="Node000007" title=" " alt="" coords="295,153,352,178"/>
-<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="195,103,284,143,282,148,193,108"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="5,226,58,252"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="34,179,34,211,29,211,29,179"/>
+<area shape="rect" id="node1" title=" " alt="" coords="223,5,327,32"/>
+<area shape="rect" id="node2" href="$dms_8h.html" title=" " alt="" coords="150,80,213,107"/>
+<area shape="rect" id="node8" title=" " alt="" coords="237,80,312,107"/>
+<area shape="rect" id="node9" title=" " alt="" coords="337,80,418,107"/>
+<area shape="rect" id="node3" href="$nan_8h.html" title=" " alt="" coords="5,155,64,181"/>
+<area shape="rect" id="node5" title=" " alt="" coords="89,155,159,181"/>
+<area shape="rect" id="node6" title=" " alt="" coords="183,155,294,181"/>
+<area shape="rect" id="node7" title=" " alt="" coords="318,155,381,181"/>
+<area shape="rect" id="node4" title=" " alt="" coords="5,229,64,256"/>
 </map>

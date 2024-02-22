@@ -1,6 +1,4 @@
 <map id="dms::sin" name="dms::sin">
-<area shape="rect" id="Node000001" title="Compute the Angle&#39;s Sine." alt="" coords="148,29,217,55"/>
-<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="204,16,196,10,182,8,169,10,162,14,161,20,164,28,160,30,155,21,158,11,167,5,182,3,199,5,207,12"/>
-<area shape="rect" id="Node000002" href="$classdms.html#a40fa49cfe436104bc0775cf6024ade3a" title="Compute Sine and Cosine of the angle simultaneously. On machines using glibc &gt;= 2...." alt="" coords="5,29,100,55"/>
-<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="132,45,100,45,100,40,132,40"/>
+<area shape="rect" id="node1" title="Compute the Angle&#39;s Sine." alt="" coords="156,5,233,32"/>
+<area shape="rect" id="node2" href="$classdms.html#a40fa49cfe436104bc0775cf6024ade3a" title="Compute Sine and Cosine of the angle simultaneously. On machines using glibc &gt;= 2...." alt="" coords="5,5,108,32"/>
 </map>

@@ -1,9 +1,4 @@
 <map id="OST::ValueString::lovDel" name="OST::ValueString::lovDel">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,169,56"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1LovSingle.html#a7d69336eb7c384eaa9161579aadcab7c" title=" " alt="" coords="217,31,371,56"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,41,201,41,201,46,169,46"/>
-<area shape="rect" id="Node000003" href="$classOST_1_1LovBase.html#a842662c8849c052a40070e94d9cb1fad" title=" " alt="" coords="426,5,606,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="371,32,409,28,410,33,372,37"/>
-<area shape="rect" id="Node000004" href="$classOST_1_1LovBase.html#ae8fe861093d002c2890c505e5920479e" title=" " alt="" coords="419,55,612,80"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="371,49,403,53,403,58,371,54"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,5,184,32"/>
+<area shape="rect" id="node2" href="$classOST_1_1LovSingle.html#a7d69336eb7c384eaa9161579aadcab7c" title=" " alt="" coords="232,5,400,32"/>
 </map>

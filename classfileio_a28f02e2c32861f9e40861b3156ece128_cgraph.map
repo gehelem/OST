@@ -1,5 +1,4 @@
 <map id="fileio::ImgStats" name="fileio::ImgStats">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,112,31"/>
-<area shape="rect" id="Node000002" href="$classfileio.html#a0609d01f38b09488bc3444bed7b6e2a6" title=" " alt="" coords="160,5,351,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="112,16,144,16,144,21,112,21"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,5,125,32"/>
+<area shape="rect" id="node2" href="$classfileio.html#abeb7014e7bd7ab7d0a48bf50d8c77025" title=" " alt="" coords="173,5,392,32"/>
 </map>

@@ -1,9 +1,6 @@
 <map id="OST::LovFloat" name="OST::LovFloat">
-<area shape="rect" id="Node000001" title=" " alt="" coords="39,605,136,731"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1LovSingle.html" title=" " alt="" coords="5,352,169,557"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="90,572,90,606,85,606,85,572"/>
-<area shape="rect" id="Node000003" href="$classOST_1_1LovBase.html" title=" " alt="" coords="39,119,136,304"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="90,319,90,352,85,352,85,319"/>
-<area shape="rect" id="Node000004" href="$classQObject.html" title=" " alt="" coords="57,5,118,71"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="90,86,90,119,85,119,85,86"/>
+<area shape="rect" id="node1" title=" " alt="" coords="44,572,159,693"/>
+<area shape="rect" id="node2" href="$classOST_1_1LovSingle.html" title=" " alt="" coords="5,344,197,524"/>
+<area shape="rect" id="node3" href="$classOST_1_1LovBase.html" title=" " alt="" coords="45,131,158,296"/>
+<area shape="rect" id="node4" href="$classQObject.html" title=" " alt="" coords="64,5,139,83"/>
 </map>

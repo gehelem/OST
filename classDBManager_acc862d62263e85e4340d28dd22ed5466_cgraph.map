@@ -1,13 +1,7 @@
 <map id="DBManager::populateCatalog" name="DBManager::populateCatalog">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,194,56"/>
-<area shape="rect" id="Node000002" href="$classBaseroot.html#a11f046456df0e3597b22865491e64356" title=" " alt="" coords="252,5,386,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="194,30,236,25,236,30,194,35"/>
-<area shape="rect" id="Node000005" href="$classBaseroot.html#affc1e3a0ffc17f0bddb90a005ddd2442" title=" " alt="" coords="242,55,396,80"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="194,51,227,55,226,60,194,56"/>
-<area shape="rect" id="Node000003" href="$classBaseroot.html#a1798d4e8fb63f7a127358c15b5c29e90" title=" " alt="" coords="444,5,615,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="387,16,428,16,428,21,387,21"/>
-<area shape="rect" id="Node000004" href="$classBaseroot.html#a19f10e8769981a8ffedd0ea52863fb9a" title=" " alt="" coords="453,55,607,80"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="378,29,457,48,456,53,376,34"/>
-<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="376,51,456,33,457,38,378,57"/>
-<area shape="poly" id="edge6_Node000005_Node000004" title=" " alt="" coords="396,65,437,65,437,70,396,70"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,31,219,57"/>
+<area shape="rect" id="node2" href="$classBaseroot.html#a11f046456df0e3597b22865491e64356" title=" " alt="" coords="277,5,428,32"/>
+<area shape="rect" id="node5" href="$classBaseroot.html#affc1e3a0ffc17f0bddb90a005ddd2442" title=" " alt="" coords="267,56,439,83"/>
+<area shape="rect" id="node3" href="$classBaseroot.html#a1798d4e8fb63f7a127358c15b5c29e90" title=" " alt="" coords="487,5,677,32"/>
+<area shape="rect" id="node4" href="$classBaseroot.html#a19f10e8769981a8ffedd0ea52863fb9a" title=" " alt="" coords="497,56,667,83"/>
 </map>

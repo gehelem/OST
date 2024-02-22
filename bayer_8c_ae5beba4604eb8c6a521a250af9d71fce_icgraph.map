@@ -1,22 +1,12 @@
 <map id="ClearBorders_uint16" name="ClearBorders_uint16">
-<area shape="rect" id="Node000001" title=" " alt="" coords="1136,46,1275,72"/>
-<area shape="rect" id="Node000002" href="$bayer_8c.html#ab82415fa3daaaaba6c605738f90444d5" title=" " alt="" coords="914,5,1088,46"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1120,48,1089,43,1089,37,1121,43"/>
-<area shape="rect" id="Node000010" href="$bayer_8c.html#afc1503159baece47c036010b971bf4e7" title=" " alt="" coords="919,71,1083,111"/>
-<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1121,75,1084,81,1084,75,1120,70"/>
-<area shape="rect" id="Node000003" href="$bayer_8c.html#a8a213310e1fc1d26628aca558c983331" title=" " alt="" coords="706,39,866,79"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="899,44,867,49,866,44,898,39"/>
-<area shape="rect" id="Node000004" href="$classfileio.html#a1481719a716c4a99da4bd11f601fed8f" title=" " alt="" coords="524,46,658,72"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="690,62,658,62,658,56,690,56"/>
-<area shape="rect" id="Node000005" href="$classfileio.html#a7ac92268d1c6ad343c9f56d90e4eaa42" title=" " alt="" coords="378,46,476,72"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="509,62,477,62,477,56,509,56"/>
-<area shape="rect" id="Node000006" href="$classfileio.html#ae83ee5350fb41d186ae1320ef9b5fd02" title=" " alt="" coords="227,21,330,47"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="362,51,330,45,331,40,363,45"/>
-<area shape="rect" id="Node000007" href="$classfileio.html#a320346f8452770318e31793031e1dabb" title=" " alt="" coords="229,70,328,96"/>
-<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="363,72,329,78,328,72,362,67"/>
-<area shape="rect" id="Node000008" href="$classfileio.html#a1cc9ceaada09a54b104d9ef891a419e8" title=" " alt="" coords="35,45,149,71"/>
-<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="213,77,148,68,149,63,214,72"/>
-<area shape="rect" id="Node000009" href="$classfileio.html#ab4a75584c2ef8773f6e275650cb45155" title=" " alt="" coords="5,94,179,120"/>
-<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="214,94,180,98,179,93,213,89"/>
-<area shape="poly" id="edge10_Node000010_Node000003" title=" " alt="" coords="903,79,866,74,867,68,904,74"/>
+<area shape="rect" id="node1" title=" " alt="" coords="1251,46,1405,73"/>
+<area shape="rect" id="node2" href="$bayer_8c.html#ab82415fa3daaaaba6c605738f90444d5" title=" " alt="" coords="1012,5,1203,47"/>
+<area shape="rect" id="node10" href="$bayer_8c.html#afc1503159baece47c036010b971bf4e7" title=" " alt="" coords="1017,71,1197,112"/>
+<area shape="rect" id="node3" href="$bayer_8c.html#a8a213310e1fc1d26628aca558c983331" title=" " alt="" coords="785,39,964,80"/>
+<area shape="rect" id="node4" href="$classfileio.html#a1481719a716c4a99da4bd11f601fed8f" title=" " alt="" coords="583,46,737,73"/>
+<area shape="rect" id="node5" href="$classfileio.html#a7ac92268d1c6ad343c9f56d90e4eaa42" title=" " alt="" coords="420,46,535,73"/>
+<area shape="rect" id="node6" href="$classfileio.html#ae83ee5350fb41d186ae1320ef9b5fd02" title=" " alt="" coords="253,21,372,47"/>
+<area shape="rect" id="node7" href="$classfileio.html#a320346f8452770318e31793031e1dabb" title=" " alt="" coords="256,71,369,98"/>
+<area shape="rect" id="node8" href="$classfileio.html#a1cc9ceaada09a54b104d9ef891a419e8" title=" " alt="" coords="40,46,171,73"/>
+<area shape="rect" id="node9" href="$classfileio.html#ab4a75584c2ef8773f6e275650cb45155" title=" " alt="" coords="5,97,205,123"/>
 </map>

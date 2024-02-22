@@ -1,5 +1,4 @@
 <map id="Solver" name="Solver">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,119,144,484"/>
-<area shape="rect" id="Node000002" href="$classQObject.html" title=" " alt="" coords="44,5,105,71"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="77,86,77,119,72,119,72,86"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,131,172,428"/>
+<area shape="rect" id="node2" href="$classQObject.html" title=" " alt="" coords="51,5,126,83"/>
 </map>

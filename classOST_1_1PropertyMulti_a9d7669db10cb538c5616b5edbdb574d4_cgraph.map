@@ -1,14 +1,6 @@
 <map id="OST::PropertyMulti::updateLine" name="OST::PropertyMulti::updateLine">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,92,136,133"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1PropertyBase.html#ae6e886171ee6fd7deadcc741bdc2864b" title=" " alt="" coords="184,5,322,46"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="114,89,193,51,196,55,116,94"/>
-<area shape="rect" id="Node000003" href="$classOST_1_1PropertyBase.html#a87f114f651c52ce952ec9ba5cce5b266" title="Internal property&#39;s name." alt="" coords="370,104,528,129"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="136,107,184,106,322,106,354,107,354,112,322,111,184,111,136,112"/>
-<area shape="rect" id="Node000004" href="$classOST_1_1PropertyBase.html#aec74ba39c5f179be7d276bb02ee4ed23" title=" " alt="" coords="184,120,322,161"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="137,120,169,125,168,130,136,125"/>
-<area shape="rect" id="Node000005" href="$classOST_1_1PropertyBase.html#a2d511ae6758e6bb4ae27b1580668289f" title=" " alt="" coords="184,185,322,226"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="111,131,185,170,196,176,194,180,182,175,109,136"/>
-<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="298,182,404,134,406,139,301,187"/>
-<area shape="rect" id="Node000006" href="$classOST_1_1PropertyBase.html#a0449ba5e729415a02929036bdb8773df" title=" " alt="" coords="380,185,518,226"/>
-<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="322,203,364,203,364,208,322,208"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,64,148,105"/>
+<area shape="rect" id="node2" href="$classOST_1_1PropertyBase.html#ae6e886171ee6fd7deadcc741bdc2864b" title=" " alt="" coords="196,5,347,47"/>
+<area shape="rect" id="node3" href="$classOST_1_1PropertyBase.html#a87f114f651c52ce952ec9ba5cce5b266" title="Internal property&#39;s name." alt="" coords="395,101,568,127"/>
+<area shape="rect" id="node4" href="$classOST_1_1PropertyBase.html#a2d511ae6758e6bb4ae27b1580668289f" title=" " alt="" coords="196,123,347,164"/>
 </map>

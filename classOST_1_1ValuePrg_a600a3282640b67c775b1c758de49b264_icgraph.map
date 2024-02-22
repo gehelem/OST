@@ -1,9 +1,6 @@
 <map id="OST::ValuePrg::value" name="OST::ValuePrg::value">
-<area shape="rect" id="Node000001" title=" " alt="" coords="239,55,383,80"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1ValuePrg.html#aa54dcd93ab19d98f5933dd4079b627d6" title=" " alt="" coords="5,5,191,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="237,53,156,34,157,29,238,48"/>
-<area shape="rect" id="Node000003" href="$classOST_1_1ValuePrg.html#a155803b34f2082dbcf2b95729d3d8f89" title=" " alt="" coords="16,55,180,80"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="223,70,181,70,181,65,223,65"/>
-<area shape="rect" id="Node000004" href="$classOST_1_1ValueJsonDumper.html#aff73aa95e712f0a791b6135bea5d377e" title=" " alt="" coords="18,105,178,145"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="246,88,177,106,176,101,245,82"/>
+<area shape="rect" id="node1" title=" " alt="" coords="255,56,411,83"/>
+<area shape="rect" id="node2" href="$classOST_1_1ValuePrg.html#aa54dcd93ab19d98f5933dd4079b627d6" title=" " alt="" coords="5,5,207,32"/>
+<area shape="rect" id="node3" href="$classOST_1_1ValuePrg.html#a155803b34f2082dbcf2b95729d3d8f89" title=" " alt="" coords="18,56,194,83"/>
+<area shape="rect" id="node4" href="$classOST_1_1ValueJsonDumper.html#aff73aa95e712f0a791b6135bea5d377e" title=" " alt="" coords="21,107,191,149"/>
 </map>

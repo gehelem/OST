@@ -1,14 +1,13 @@
 <map id="dms::setD" name="dms::setD">
-<area shape="rect" id="Node000001" title=" " alt="" coords="478,81,558,107"/>
-<area shape="rect" id="Node000002" href="$classdms.html#aa05d77a1b3741f7e58468f7d64cbff6b" title="Set the floating&#45;point value of the angle according to the four integer arguments." alt="" coords="333,5,410,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="477,76,397,34,399,29,480,72"/>
-<area shape="rect" id="Node000003" href="$classdms.html#a4aa683c945ab71920118c3c058fe723c" title="Attempt to parse the string argument as a dms value, and set the dms object accordingly." alt="" coords="131,81,265,107"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="463,97,266,97,266,92,463,92"/>
-<area shape="rect" id="Node000005" href="$classdms.html#a22184b4dddc2862b04a7b29b3cec2f55" title="Sets floating&#45;point value of angle, in hours." alt="" coords="332,107,412,132"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="463,106,413,115,412,110,462,101"/>
-<area shape="rect" id="Node000006" href="$classdms.html#abbc3acd2a666a28e9e5fe1d8be4fe326" title="Set angle according to the argument, in radians." alt="" coords="313,156,430,182"/>
-<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="484,118,432,147,408,158,406,153,429,142,482,113"/>
-<area shape="rect" id="Node000004" href="$classdms.html#a2d5851c83dbd161f0a380a11a67f86af" title="Construct an angle from a string representation." alt="" coords="5,81,83,107"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="115,97,83,97,83,92,115,92"/>
-<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="316,114,265,107,266,101,317,109"/>
+<area shape="rect" id="node1" title=" " alt="" coords="1188,81,1276,108"/>
+<area shape="rect" id="node2" href="$classdms.html#aa05d77a1b3741f7e58468f7d64cbff6b" title="Set the floating&#45;point value of the angle according to the four integer arguments." alt="" coords="1031,5,1118,32"/>
+<area shape="rect" id="node3" href="$classdms.html#a4aa683c945ab71920118c3c058fe723c" title="Attempt to parse the string argument as a dms value, and set the dms object accordingly." alt="" coords="812,81,961,108"/>
+<area shape="rect" id="node10" href="$classdms.html#a22184b4dddc2862b04a7b29b3cec2f55" title="Sets floating&#45;point value of angle, in hours." alt="" coords="1031,107,1119,133"/>
+<area shape="rect" id="node11" href="$classdms.html#abbc3acd2a666a28e9e5fe1d8be4fe326" title="Set angle according to the argument, in radians." alt="" coords="1009,157,1140,184"/>
+<area shape="rect" id="node4" href="$classdms.html#a2d5851c83dbd161f0a380a11a67f86af" title="Construct an angle from a string representation." alt="" coords="657,56,744,83"/>
+<area shape="rect" id="node5" href="$classdms.html#a0fec910923e044d53437336f40ef63ed" title="Static function to create a DMS object from a QString." alt="" coords="637,107,764,133"/>
+<area shape="rect" id="node6" href="$classfileio.html#aed00e21b1b199b7a7850ff096fbe80f1" title=" " alt="" coords="415,99,589,141"/>
+<area shape="rect" id="node7" href="$classfileio.html#a320346f8452770318e31793031e1dabb" title=" " alt="" coords="253,107,367,133"/>
+<area shape="rect" id="node8" href="$classfileio.html#a1cc9ceaada09a54b104d9ef891a419e8" title=" " alt="" coords="40,81,171,108"/>
+<area shape="rect" id="node9" href="$classfileio.html#ab4a75584c2ef8773f6e275650cb45155" title=" " alt="" coords="5,132,205,159"/>
 </map>
