@@ -248,9 +248,35 @@ void ValueUpdate::visit(ValueLight* pValue, QString &action, QVariantMap &data)
 }
 void ValueUpdate::visit(ValueImg* pValue, QString &action, QVariantMap &data)
 {
-    Q_UNUSED(pValue);
-    Q_UNUSED(action);
-    Q_UNUSED(data);
+    if (data.contains("arrayLimit"))
+    {
+        pValue->setArrayLimit(data["arrayLimit"].toInt());
+    }
+    if (action == "push")
+    {
+        pValue->gridAdd(pValue->value());
+    }
+    if (action == "newline")
+    {
+        //pValue->gridAdd(IntToState(data["val"].toInt()));
+    }
+    if (action == "deleteline")
+    {
+        pValue->gridDel(data["i"].toInt());
+    }
+    if (action == "updateline")
+    {
+        //pValue->gridUpdate(IntToState(data["val"].toInt()), data["i"].toInt(), true);
+    }
+    if (action == "cleargrid")
+    {
+        pValue->gridClear();
+    }
+    if (action == "getgrid")
+    {
+        mGrid.clear();
+        //for (int i = 0; i < pValue->getGrid().size(); ++i) mGrid.append(pValue->getGrid()[i]);
+    }
 }
 void ValueUpdate::visit(ValueVideo* pValue, QString &action, QVariantMap &data)
 {

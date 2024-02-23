@@ -411,6 +411,19 @@
                 "value":"Zéro",
                 "gridvalues":["P0","P1","P2","P3","P4"],
                 "order":"A"
+            },
+            "imgrid": {
+                "type": "img",
+                "label": "image in grid",
+                "urljpeg":"./dummy.jpg"
+            },
+            "prggrid": {
+                "type": "prg",
+                "prgtype": "spinner",
+                "label": "P2",
+                "dynlabel": "99/100",
+                "value": 99,
+                "order":2
             }
         },
         "array":{

@@ -120,7 +120,8 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
     foreach(const QString &elt, mValues.keys())
     {
         if ((mValues[elt]->getType() == "int") || (mValues[elt]->getType() == "float") || (mValues[elt]->getType() == "string")
-                || (mValues[elt]->getType() == "bool"))
+                || (mValues[elt]->getType() == "bool") || (mValues[elt]->getType() == "img") || (mValues[elt]->getType() == "prg")
+                || (mValues[elt]->getType() == "video"))
         {
             if (!pValues.contains(elt))
             {
