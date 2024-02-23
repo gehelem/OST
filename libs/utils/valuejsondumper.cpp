@@ -177,8 +177,21 @@ void ValueJsonDumper::visit(ValueImg *pValue)
 {
     QJsonObject json = dumpValueCommons(pValue);
     json["type"] = "img";
-    QJsonObject imgdata;
 
+    json["arrayLimit"] = pValue->arrayLimit();
+    if (pValue->getGrid().size() > 0)
+    {
+        QJsonArray arr;
+        foreach (ImgData val, pValue->getGrid())
+        {
+            QVariant v = QVariant::fromValue(ImgDataToVariantMap(val));
+            arr.append(v.toJsonValue());
+        }
+
+        json["gridvalues"] = arr;
+    }
+
+    QJsonObject imgdata;
     imgdata["urljpeg"] = pValue->value().mUrlJpeg;
     imgdata["urlfits"] = pValue->value().mUrlFits;
     imgdata["urlthumbnail"] = pValue->value().mUrlThumbnail;
@@ -192,6 +205,7 @@ void ValueJsonDumper::visit(ValueImg *pValue)
     imgdata["issolved"] = pValue->value().isSolved;
     imgdata["solverra"] = pValue->value().solverRA;
     imgdata["solverde"] = pValue->value().solverDE;
+
 
     QJsonArray arr;
     arr = QJsonArray();
@@ -253,6 +267,19 @@ void ValueJsonDumper::visit(ValueVideo *pValue)
     QJsonObject json = dumpValueCommons(pValue);
     json["type"] = "video";
     json["value"] = pValue->value();
+    json["arrayLimit"] = pValue->arrayLimit();
+    if (pValue->getGrid().size() > 0)
+    {
+        QJsonArray arr;
+        foreach (QString val, pValue->getGrid())
+        {
+            QVariant v = QVariant::fromValue(val);
+            arr.append(v.toJsonValue());
+        }
+
+        json["gridvalues"] = arr;
+    }
+
     mResult = json;
 }
 void ValueJsonDumper::visit(ValueMessage *pValue)
@@ -280,6 +307,19 @@ void ValueJsonDumper::visit(ValuePrg *pValue)
     if (pValue->prgType() == spinner) json["prgtype"] = "spinner";
     json["dynlabel"] = pValue->dynLabel();
     json["value"] = pValue->value();
+
+    json["arrayLimit"] = pValue->arrayLimit();
+    if (pValue->getGrid().size() > 0)
+    {
+        QJsonArray arr;
+        foreach (double val, pValue->getGrid())
+        {
+            QVariant v = QVariant::fromValue(val);
+            arr.append(v.toJsonValue());
+        }
+
+        json["gridvalues"] = arr;
+    }
 
     mResult = json;
 }

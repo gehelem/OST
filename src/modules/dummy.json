@@ -415,21 +415,19 @@
             "imgrid": {
                 "type": "img",
                 "label": "image in grid",
-                "urljpeg":"./dummy.jpg"
+                "gridvalues":[{"urljpeg":"./dummy1.jpg"},{"urljpeg":"./dummy2.jpg"},{"urljpeg":"./dummy3.jpg"},{"urljpeg":"./dummy4.jpg"},{"urljpeg":"./dummy5.jpg"}],
+                "urljpeg":"./dummy.jpg",
+                "order":"Z"
             },
             "prggrid": {
                 "type": "prg",
                 "prgtype": "spinner",
-                "label": "P2",
+                "label": "Progress",
                 "dynlabel": "99/100",
                 "value": 99,
+                "gridvalues":[0,1,4,9,16],
                 "order":2
             }
-        },
-        "array":{
-            "key": "",
-            "columns":["X","Y"],
-            "type":"grid"
         }
     },
     "secondtestgrid": {

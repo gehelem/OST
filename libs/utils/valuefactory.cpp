@@ -186,6 +186,8 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                                        );
             ImgData dta;
 
+            if (pData.contains("arrayLimit")) pValue->setArrayLimit(pData["arrayLimit"].toInt());
+
             if (pData.contains("urljpeg")) dta.mUrlJpeg = pData["urljpeg"].toString();
             if (pData.contains("urlfits")) dta.mUrlFits = pData["urlfits"].toString();
             if (pData.contains("urloverlay")) dta.mUrlOverlay = pData["urloverlay"].toString();
@@ -203,6 +205,15 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
             if (pData.contains("solverde")) dta.solverDE = pData["solverde"].toDouble();
 
             pValue->setValue(dta, false);
+            if (pData.contains("gridvalues"))
+            {
+                QList ll  = pData["gridvalues"].toList();
+                foreach (QVariant val, ll)
+                {
+                    pValue->gridAdd(QVariantMapToImgData(val.toMap()));
+                }
+            }
+
             return pValue;
         }
 
@@ -213,6 +224,7 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                                           pData["hint"].toString()
                                          );
             if (pData.contains("value")) pValue->setValue(pData["value"].toString(), false);
+            if (pData.contains("arrayLimit")) pValue->setArrayLimit(pData["arrayLimit"].toInt());
 
             return pValue;
         }
@@ -264,6 +276,16 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
             }
             if (pData.contains("value")) pValue->setValue(pData["value"].toDouble(), false);
             if (pData.contains("dynlabel")) pValue->setDynLabel(pData["dynlabel"].toString(), false);
+            if (pData.contains("arrayLimit")) pValue->setArrayLimit(pData["arrayLimit"].toInt());
+            if (pData.contains("gridvalues"))
+            {
+                QList ll  = pData["gridvalues"].toList();
+                foreach (QVariant val, ll)
+                {
+                    pValue->gridAdd(val.toDouble());
+                }
+            }
+
 
             return pValue;
         }
