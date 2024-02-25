@@ -1,5 +1,0 @@
-<map id="dms::setFromString" name="dms::setFromString">
-<area shape="rect" id="node1" title="Attempt to parse the string argument as a dms value, and set the dms object accordingly." alt="" coords="5,5,155,32"/>
-<area shape="rect" id="node2" href="$classdms.html#ad785599c0f0dc511449eb10cdda59cd8" title=" " alt="" coords="339,5,427,32"/>
-<area shape="rect" id="node3" href="$classdms.html#a22184b4dddc2862b04a7b29b3cec2f55" title="Sets floating&#45;point value of angle, in hours." alt="" coords="203,31,291,57"/>
-</map>

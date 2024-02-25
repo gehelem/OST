@@ -1,4 +1,0 @@
-<map id="dms::radians" name="dms::radians">
-<area shape="rect" id="node1" title="Express the angle in radians." alt="" coords="156,5,263,32"/>
-<area shape="rect" id="node2" href="$classdms.html#a40fa49cfe436104bc0775cf6024ade3a" title="Compute Sine and Cosine of the angle simultaneously. On machines using glibc &gt;= 2...." alt="" coords="5,5,108,32"/>
-</map>

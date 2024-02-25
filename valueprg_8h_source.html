@@ -72,12 +72,12 @@ $(function() {
 <a href="valueprg_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef VALUEPRG_h</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#define VALUEPRG_h</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160; </div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="valuebase_8h.html">valuebase.h</a>&gt;</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="valuesingle_8h.html">valuesingle.h</a>&gt;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160; </div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="keyword">namespace  </span><a class="code" href="namespaceOST.html">OST</a></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;{</div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
-<div class="line"><a name="l00009"></a><span class="lineno"><a class="line" href="classOST_1_1ValuePrg.html">    9</a></span>&#160;<span class="keyword">class </span><a class="code" href="classOST_1_1ValuePrg.html">ValuePrg</a>: <span class="keyword">public</span> <a class="code" href="classOST_1_1ValueBase.html">ValueBase</a></div>
+<div class="line"><a name="l00009"></a><span class="lineno"><a class="line" href="classOST_1_1ValuePrg.html">    9</a></span>&#160;<span class="keyword">class </span><a class="code" href="classOST_1_1ValuePrg.html">ValuePrg</a>: <span class="keyword">public</span> <a class="code" href="classOST_1_1ValueSingle.html">ValueSingle</a>&lt;double&gt;</div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;{</div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;        Q_OBJECT</div>
@@ -138,7 +138,6 @@ $(function() {
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;}</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="aclassOST_1_1ValueBase_html"><div class="ttname"><a href="classOST_1_1ValueBase.html">OST::ValueBase</a></div><div class="ttdef"><b>Definition:</b> valuebase.h:13</div></div>
 <div class="ttc" id="aclassOST_1_1ValueBase_html_a07b57c61dc7fa0142cc95ee39b78212c"><div class="ttname"><a href="classOST_1_1ValueBase.html#a07b57c61dc7fa0142cc95ee39b78212c">OST::ValueBase::hint</a></div><div class="ttdeci">QString hint()</div><div class="ttdef"><b>Definition:</b> valuebase.h:34</div></div>
 <div class="ttc" id="aclassOST_1_1ValueBase_html_a42ab362d5ba525005a6831dc63f316fd"><div class="ttname"><a href="classOST_1_1ValueBase.html#a42ab362d5ba525005a6831dc63f316fd">OST::ValueBase::label</a></div><div class="ttdeci">QString label()</div><div class="ttdef"><b>Definition:</b> valuebase.h:26</div></div>
 <div class="ttc" id="aclassOST_1_1ValueBase_html_a500741026568d575c9402a23f786edc4"><div class="ttname"><a href="classOST_1_1ValueBase.html#a500741026568d575c9402a23f786edc4">OST::ValueBase::valueChanged</a></div><div class="ttdeci">void valueChanged(OST::ValueBase *)</div></div>
@@ -156,12 +155,13 @@ $(function() {
 <div class="ttc" id="aclassOST_1_1ValuePrg_html_aa54dcd93ab19d98f5933dd4079b627d6"><div class="ttname"><a href="classOST_1_1ValuePrg.html#aa54dcd93ab19d98f5933dd4079b627d6">OST::ValuePrg::setDynLabel</a></div><div class="ttdeci">void setDynLabel(const QString &amp;value, const bool &amp;emitEvent)</div><div class="ttdef"><b>Definition:</b> valueprg.h:47</div></div>
 <div class="ttc" id="aclassOST_1_1ValuePrg_html_ab23f1309e2fe2af280416caaadf4c8c2"><div class="ttname"><a href="classOST_1_1ValuePrg.html#ab23f1309e2fe2af280416caaadf4c8c2">OST::ValuePrg::dynLabel</a></div><div class="ttdeci">QString dynLabel()</div><div class="ttdef"><b>Definition:</b> valueprg.h:43</div></div>
 <div class="ttc" id="aclassOST_1_1ValuePrg_html_ae53a3d0fb5165801f19ce10f9e3bf54b"><div class="ttname"><a href="classOST_1_1ValuePrg.html#ae53a3d0fb5165801f19ce10f9e3bf54b">OST::ValuePrg::setPrgType</a></div><div class="ttdeci">void setPrgType(PrgType t)</div><div class="ttdef"><b>Definition:</b> valueprg.h:56</div></div>
+<div class="ttc" id="aclassOST_1_1ValueSingle_html"><div class="ttname"><a href="classOST_1_1ValueSingle.html">OST::ValueSingle</a></div><div class="ttdef"><b>Definition:</b> valuesingle.h:35</div></div>
 <div class="ttc" id="aclassOST_1_1ValueVisitor_html"><div class="ttname"><a href="classOST_1_1ValueVisitor.html">OST::ValueVisitor</a></div><div class="ttdef"><b>Definition:</b> valuevisitor.h:19</div></div>
 <div class="ttc" id="aclassOST_1_1ValueVisitor_html_a102cd031f2140fc75dfb1f819509e95a"><div class="ttname"><a href="classOST_1_1ValueVisitor.html#a102cd031f2140fc75dfb1f819509e95a">OST::ValueVisitor::visit</a></div><div class="ttdeci">virtual void visit(ValueInt *pValue)=0</div></div>
 <div class="ttc" id="anamespaceOST_html"><div class="ttname"><a href="namespaceOST.html">OST</a></div><div class="ttdef"><b>Definition:</b> lovbase.h:8</div></div>
-<div class="ttc" id="anamespaceOST_html_a4f0f6d56fa87488f90f09dc5a77ecfd7"><div class="ttname"><a href="namespaceOST.html#a4f0f6d56fa87488f90f09dc5a77ecfd7">OST::PrgType</a></div><div class="ttdeci">PrgType</div><div class="ttdef"><b>Definition:</b> common.h:102</div></div>
-<div class="ttc" id="anamespaceOST_html_a4f0f6d56fa87488f90f09dc5a77ecfd7a14878ee4737a35c57507a4fd28f7d9ef"><div class="ttname"><a href="namespaceOST.html#a4f0f6d56fa87488f90f09dc5a77ecfd7a14878ee4737a35c57507a4fd28f7d9ef">OST::spinner</a></div><div class="ttdeci">@ spinner</div><div class="ttdef"><b>Definition:</b> common.h:104</div></div>
-<div class="ttc" id="avaluebase_8h_html"><div class="ttname"><a href="valuebase_8h.html">valuebase.h</a></div></div>
+<div class="ttc" id="anamespaceOST_html_a4f0f6d56fa87488f90f09dc5a77ecfd7"><div class="ttname"><a href="namespaceOST.html#a4f0f6d56fa87488f90f09dc5a77ecfd7">OST::PrgType</a></div><div class="ttdeci">PrgType</div><div class="ttdef"><b>Definition:</b> common.h:116</div></div>
+<div class="ttc" id="anamespaceOST_html_a4f0f6d56fa87488f90f09dc5a77ecfd7a14878ee4737a35c57507a4fd28f7d9ef"><div class="ttname"><a href="namespaceOST.html#a4f0f6d56fa87488f90f09dc5a77ecfd7a14878ee4737a35c57507a4fd28f7d9ef">OST::spinner</a></div><div class="ttdeci">@ spinner</div><div class="ttdef"><b>Definition:</b> common.h:118</div></div>
+<div class="ttc" id="avaluesingle_8h_html"><div class="ttname"><a href="valuesingle_8h.html">valuesingle.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

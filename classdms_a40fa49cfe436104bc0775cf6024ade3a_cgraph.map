@@ -1,6 +1,0 @@
-<map id="dms::SinCos" name="dms::SinCos">
-<area shape="rect" id="node1" title="Compute Sine and Cosine of the angle simultaneously. On machines using glibc &gt;= 2...." alt="" coords="5,56,108,83"/>
-<area shape="rect" id="node2" href="$classdms.html#a021d0a5f56f93b9d6f705c8131f4c02d" title="Compute the Angle&#39;s Cosine." alt="" coords="169,5,249,32"/>
-<area shape="rect" id="node3" href="$classdms.html#a797e52a1128f524c4fbe54fcecd2510c" title="Express the angle in radians." alt="" coords="156,56,263,83"/>
-<area shape="rect" id="node4" href="$classdms.html#afa823308d5cca9a2ad21c75f96899cdd" title="Compute the Angle&#39;s Sine." alt="" coords="171,107,248,133"/>
-</map>

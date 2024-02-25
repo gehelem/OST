@@ -76,51 +76,49 @@ $(function() {
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="lovstring_8h.html">lovstring.h</a>&gt;</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="lovint_8h.html">lovint.h</a>&gt;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="lovfloat_8h.html">lovfloat.h</a>&gt;</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="lovvisitor_8h.html">lovvisitor.h</a>&gt;</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="keyword">namespace  </span><a class="code" href="namespaceOST.html">OST</a></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;{</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
-<div class="line"><a name="l00012"></a><span class="lineno"><a class="line" href="classOST_1_1LovJsonDumper.html">   12</a></span>&#160;<span class="keyword">class </span><a class="code" href="classOST_1_1LovJsonDumper.html">LovJsonDumper</a> : <span class="keyword">public</span> <a class="code" href="classOST_1_1LovVisitor.html">LovVisitor</a></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;{</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00016"></a><span class="lineno"><a class="line" href="classOST_1_1LovJsonDumper.html#a08f1e383078f3311d6f319f86c7217e4">   16</a></span>&#160;        <a class="code" href="classOST_1_1LovJsonDumper.html#a08f1e383078f3311d6f319f86c7217e4">LovJsonDumper</a>() = <span class="keywordflow">default</span>;</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classOST_1_1LovJsonDumper.html#a3fab2da5922a9cbba4a695d879234c23">visit</a>(<a class="code" href="classOST_1_1LovString.html">LovString</a> *pLov) <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classOST_1_1LovJsonDumper.html#a3fab2da5922a9cbba4a695d879234c23">visit</a>(<a class="code" href="classOST_1_1LovInt.html">LovInt</a> *pLov) <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classOST_1_1LovJsonDumper.html#a3fab2da5922a9cbba4a695d879234c23">visit</a>(<a class="code" href="classOST_1_1LovFloat.html">LovFloat</a> *pLov) <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00021"></a><span class="lineno"><a class="line" href="classOST_1_1LovJsonDumper.html#acfc190815d1d5369572f1f55353ba2c3">   21</a></span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classOST_1_1LovJsonDumper.html#acfc190815d1d5369572f1f55353ba2c3">visit</a>(<a class="code" href="classOST_1_1LovLight.html">LovLight</a> *pLov)<span class="keyword"> override</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="keyword">        </span>{</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;            Q_UNUSED(pLov)</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;        };</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="classOST_1_1LovJsonDumper.html#add35b9509543db6af3f7673147a70fde">   26</a></span>&#160;        [[nodiscard]] <span class="keyword">const</span> QJsonObject &amp;<a class="code" href="classOST_1_1LovJsonDumper.html#add35b9509543db6af3f7673147a70fde">getResult</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">        </span>{</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;            <span class="keywordflow">return</span> mResult;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;        }</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        QJsonObject mResult;</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        QJsonObject dumpLovCommons(<a class="code" href="classOST_1_1LovBase.html">LovBase</a> *pLov);</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;};</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;}</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">#endif </span><span class="comment">//OST_LOVJSONDUMPER_H</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keyword">namespace  </span><a class="code" href="namespaceOST.html">OST</a></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;{</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160; </div>
+<div class="line"><a name="l00011"></a><span class="lineno"><a class="line" href="classOST_1_1LovJsonDumper.html">   11</a></span>&#160;<span class="keyword">class </span><a class="code" href="classOST_1_1LovJsonDumper.html">LovJsonDumper</a> : <span class="keyword">public</span> <a class="code" href="classOST_1_1LovVisitor.html">LovVisitor</a></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;{</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00015"></a><span class="lineno"><a class="line" href="classOST_1_1LovJsonDumper.html#a08f1e383078f3311d6f319f86c7217e4">   15</a></span>&#160;        <a class="code" href="classOST_1_1LovJsonDumper.html#a08f1e383078f3311d6f319f86c7217e4">LovJsonDumper</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classOST_1_1LovJsonDumper.html#a3fab2da5922a9cbba4a695d879234c23">visit</a>(<a class="code" href="classOST_1_1LovString.html">LovString</a> *pLov) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classOST_1_1LovJsonDumper.html#a3fab2da5922a9cbba4a695d879234c23">visit</a>(<a class="code" href="classOST_1_1LovInt.html">LovInt</a> *pLov) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classOST_1_1LovJsonDumper.html#a3fab2da5922a9cbba4a695d879234c23">visit</a>(<a class="code" href="classOST_1_1LovFloat.html">LovFloat</a> *pLov) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="classOST_1_1LovJsonDumper.html#acfc190815d1d5369572f1f55353ba2c3">   20</a></span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classOST_1_1LovJsonDumper.html#acfc190815d1d5369572f1f55353ba2c3">visit</a>(<a class="code" href="classOST_1_1LovLight.html">LovLight</a> *pLov)<span class="keyword"> override</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="keyword">        </span>{</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;            Q_UNUSED(pLov)</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;        };</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
+<div class="line"><a name="l00025"></a><span class="lineno"><a class="line" href="classOST_1_1LovJsonDumper.html#add35b9509543db6af3f7673147a70fde">   25</a></span>&#160;        [[nodiscard]] <span class="keyword">const</span> QJsonObject &amp;<a class="code" href="classOST_1_1LovJsonDumper.html#add35b9509543db6af3f7673147a70fde">getResult</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">        </span>{</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;            <span class="keywordflow">return</span> mResult;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;        }</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        QJsonObject mResult;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        QJsonObject dumpLovCommons(<a class="code" href="classOST_1_1LovBase.html">LovBase</a> *pLov);</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;};</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;}</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="preprocessor">#endif </span><span class="comment">//OST_LOVJSONDUMPER_H</span></div>
 <div class="ttc" id="aclassOST_1_1LovBase_html"><div class="ttname"><a href="classOST_1_1LovBase.html">OST::LovBase</a></div><div class="ttdef"><b>Definition:</b> lovbase.h:13</div></div>
 <div class="ttc" id="aclassOST_1_1LovFloat_html"><div class="ttname"><a href="classOST_1_1LovFloat.html">OST::LovFloat</a></div><div class="ttdef"><b>Definition:</b> lovfloat.h:10</div></div>
 <div class="ttc" id="aclassOST_1_1LovInt_html"><div class="ttname"><a href="classOST_1_1LovInt.html">OST::LovInt</a></div><div class="ttdef"><b>Definition:</b> lovint.h:10</div></div>
-<div class="ttc" id="aclassOST_1_1LovJsonDumper_html"><div class="ttname"><a href="classOST_1_1LovJsonDumper.html">OST::LovJsonDumper</a></div><div class="ttdef"><b>Definition:</b> lovjsondumper.h:13</div></div>
+<div class="ttc" id="aclassOST_1_1LovJsonDumper_html"><div class="ttname"><a href="classOST_1_1LovJsonDumper.html">OST::LovJsonDumper</a></div><div class="ttdef"><b>Definition:</b> lovjsondumper.h:12</div></div>
 <div class="ttc" id="aclassOST_1_1LovJsonDumper_html_a08f1e383078f3311d6f319f86c7217e4"><div class="ttname"><a href="classOST_1_1LovJsonDumper.html#a08f1e383078f3311d6f319f86c7217e4">OST::LovJsonDumper::LovJsonDumper</a></div><div class="ttdeci">LovJsonDumper()=default</div></div>
 <div class="ttc" id="aclassOST_1_1LovJsonDumper_html_a3fab2da5922a9cbba4a695d879234c23"><div class="ttname"><a href="classOST_1_1LovJsonDumper.html#a3fab2da5922a9cbba4a695d879234c23">OST::LovJsonDumper::visit</a></div><div class="ttdeci">void visit(LovString *pLov) override</div><div class="ttdef"><b>Definition:</b> lovjsondumper.cpp:16</div></div>
-<div class="ttc" id="aclassOST_1_1LovJsonDumper_html_acfc190815d1d5369572f1f55353ba2c3"><div class="ttname"><a href="classOST_1_1LovJsonDumper.html#acfc190815d1d5369572f1f55353ba2c3">OST::LovJsonDumper::visit</a></div><div class="ttdeci">void visit(LovLight *pLov) override</div><div class="ttdef"><b>Definition:</b> lovjsondumper.h:21</div></div>
-<div class="ttc" id="aclassOST_1_1LovJsonDumper_html_add35b9509543db6af3f7673147a70fde"><div class="ttname"><a href="classOST_1_1LovJsonDumper.html#add35b9509543db6af3f7673147a70fde">OST::LovJsonDumper::getResult</a></div><div class="ttdeci">const QJsonObject &amp; getResult() const</div><div class="ttdef"><b>Definition:</b> lovjsondumper.h:26</div></div>
+<div class="ttc" id="aclassOST_1_1LovJsonDumper_html_acfc190815d1d5369572f1f55353ba2c3"><div class="ttname"><a href="classOST_1_1LovJsonDumper.html#acfc190815d1d5369572f1f55353ba2c3">OST::LovJsonDumper::visit</a></div><div class="ttdeci">void visit(LovLight *pLov) override</div><div class="ttdef"><b>Definition:</b> lovjsondumper.h:20</div></div>
+<div class="ttc" id="aclassOST_1_1LovJsonDumper_html_add35b9509543db6af3f7673147a70fde"><div class="ttname"><a href="classOST_1_1LovJsonDumper.html#add35b9509543db6af3f7673147a70fde">OST::LovJsonDumper::getResult</a></div><div class="ttdeci">const QJsonObject &amp; getResult() const</div><div class="ttdef"><b>Definition:</b> lovjsondumper.h:25</div></div>
 <div class="ttc" id="aclassOST_1_1LovLight_html"><div class="ttname"><a href="classOST_1_1LovLight.html">OST::LovLight</a></div><div class="ttdef"><b>Definition:</b> lovlight.h:10</div></div>
 <div class="ttc" id="aclassOST_1_1LovString_html"><div class="ttname"><a href="classOST_1_1LovString.html">OST::LovString</a></div><div class="ttdef"><b>Definition:</b> lovstring.h:10</div></div>
 <div class="ttc" id="aclassOST_1_1LovVisitor_html"><div class="ttname"><a href="classOST_1_1LovVisitor.html">OST::LovVisitor</a></div><div class="ttdef"><b>Definition:</b> lovvisitor.h:13</div></div>
 <div class="ttc" id="alovfloat_8h_html"><div class="ttname"><a href="lovfloat_8h.html">lovfloat.h</a></div></div>
 <div class="ttc" id="alovint_8h_html"><div class="ttname"><a href="lovint_8h.html">lovint.h</a></div></div>
 <div class="ttc" id="alovstring_8h_html"><div class="ttname"><a href="lovstring_8h.html">lovstring.h</a></div></div>
-<div class="ttc" id="alovvisitor_8h_html"><div class="ttname"><a href="lovvisitor_8h.html">lovvisitor.h</a></div></div>
 <div class="ttc" id="anamespaceOST_html"><div class="ttname"><a href="namespaceOST.html">OST</a></div><div class="ttdef"><b>Definition:</b> lovbase.h:8</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

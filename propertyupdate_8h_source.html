@@ -73,46 +73,44 @@ $(function() {
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#define OST_PROPERTYUPDATE_H</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="propertymulti_8h.html">propertymulti.h</a>&gt;</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="propertyvisitor_8h.html">propertyvisitor.h</a>&gt;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="keyword">namespace  </span><a class="code" href="namespaceOST.html">OST</a></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;{</div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keyword">class </span>Property;</div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160; </div>
-<div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="classOST_1_1PropertyUpdate.html">   10</a></span>&#160;<span class="keyword">class </span><a class="code" href="classOST_1_1PropertyUpdate.html">PropertyUpdate</a> : <span class="keyword">public</span> <a class="code" href="classOST_1_1PropertyVisitor.html">PropertyVisitor</a></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;{</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160; </div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00014"></a><span class="lineno"><a class="line" href="classOST_1_1PropertyUpdate.html#a2f16911b6e39789e9b8cb6fd6f5dec7c">   14</a></span>&#160;        <a class="code" href="classOST_1_1PropertyUpdate.html#a2f16911b6e39789e9b8cb6fd6f5dec7c">PropertyUpdate</a>() = <span class="keywordflow">default</span>;</div>
-<div class="line"><a name="l00015"></a><span class="lineno"><a class="line" href="classOST_1_1PropertyUpdate.html#a5e723fa21274db36a49a52d312c703cc">   15</a></span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classOST_1_1PropertyUpdate.html#a5e723fa21274db36a49a52d312c703cc">visit</a>(<a class="code" href="classOST_1_1PropertyBase.html">PropertyBase</a>* pProperty)<span class="keyword"> override</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="keyword">        </span>{</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;            Q_UNUSED(pProperty)</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;        }</div>
-<div class="line"><a name="l00019"></a><span class="lineno"><a class="line" href="classOST_1_1PropertyUpdate.html#affdaad100724d5fc89f41fade6ce6182">   19</a></span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classOST_1_1PropertyUpdate.html#affdaad100724d5fc89f41fade6ce6182">visit</a>(<a class="code" href="classOST_1_1PropertyMulti.html">PropertyMulti</a>* pProperty)<span class="keyword"> override</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">        </span>{</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;            Q_UNUSED(pProperty)</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;        }</div>
-<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="classOST_1_1PropertyUpdate.html#a12b709dc0f659a4ddca3406aced92f45">   23</a></span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classOST_1_1PropertyUpdate.html#a12b709dc0f659a4ddca3406aced92f45">visit</a>(<a class="code" href="classOST_1_1PropertyBase.html">PropertyBase</a> *pProperty, QVariantMap &amp;data )<span class="keyword"> override</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keyword">        </span>{</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;            Q_UNUSED(pProperty)</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;            Q_UNUSED(data)</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        }</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classOST_1_1PropertyUpdate.html#a5e723fa21274db36a49a52d312c703cc">visit</a>(<a class="code" href="classOST_1_1PropertyMulti.html">PropertyMulti</a> *pProperty, QVariantMap &amp;data ) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="keyword">namespace  </span><a class="code" href="namespaceOST.html">OST</a></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;{</div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="keyword">class </span>Property;</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
+<div class="line"><a name="l00009"></a><span class="lineno"><a class="line" href="classOST_1_1PropertyUpdate.html">    9</a></span>&#160;<span class="keyword">class </span><a class="code" href="classOST_1_1PropertyUpdate.html">PropertyUpdate</a> : <span class="keyword">public</span> <a class="code" href="classOST_1_1PropertyVisitor.html">PropertyVisitor</a></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;{</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00013"></a><span class="lineno"><a class="line" href="classOST_1_1PropertyUpdate.html#a2f16911b6e39789e9b8cb6fd6f5dec7c">   13</a></span>&#160;        <a class="code" href="classOST_1_1PropertyUpdate.html#a2f16911b6e39789e9b8cb6fd6f5dec7c">PropertyUpdate</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00014"></a><span class="lineno"><a class="line" href="classOST_1_1PropertyUpdate.html#a5e723fa21274db36a49a52d312c703cc">   14</a></span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classOST_1_1PropertyUpdate.html#a5e723fa21274db36a49a52d312c703cc">visit</a>(<a class="code" href="classOST_1_1PropertyBase.html">PropertyBase</a>* pProperty)<span class="keyword"> override</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword">        </span>{</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;            Q_UNUSED(pProperty)</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;        }</div>
+<div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="classOST_1_1PropertyUpdate.html#affdaad100724d5fc89f41fade6ce6182">   18</a></span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classOST_1_1PropertyUpdate.html#affdaad100724d5fc89f41fade6ce6182">visit</a>(<a class="code" href="classOST_1_1PropertyMulti.html">PropertyMulti</a>* pProperty)<span class="keyword"> override</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="keyword">        </span>{</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;            Q_UNUSED(pProperty)</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;        }</div>
+<div class="line"><a name="l00022"></a><span class="lineno"><a class="line" href="classOST_1_1PropertyUpdate.html#a12b709dc0f659a4ddca3406aced92f45">   22</a></span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classOST_1_1PropertyUpdate.html#a12b709dc0f659a4ddca3406aced92f45">visit</a>(<a class="code" href="classOST_1_1PropertyBase.html">PropertyBase</a> *pProperty, QVariantMap &amp;data )<span class="keyword"> override</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keyword">        </span>{</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;            Q_UNUSED(pProperty)</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;            Q_UNUSED(data)</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;        }</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classOST_1_1PropertyUpdate.html#a5e723fa21274db36a49a52d312c703cc">visit</a>(<a class="code" href="classOST_1_1PropertyMulti.html">PropertyMulti</a> *pProperty, QVariantMap &amp;data ) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;};</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;}</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#endif </span><span class="comment">//OST_PROPERTYUPDATE_H</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;};</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;}</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">#endif </span><span class="comment">//OST_PROPERTYUPDATE_H</span></div>
 <div class="ttc" id="aclassOST_1_1PropertyBase_html"><div class="ttname"><a href="classOST_1_1PropertyBase.html">OST::PropertyBase</a></div><div class="ttdoc">Class to define common property.</div><div class="ttdef"><b>Definition:</b> propertybase.h:38</div></div>
 <div class="ttc" id="aclassOST_1_1PropertyMulti_html"><div class="ttname"><a href="classOST_1_1PropertyMulti.html">OST::PropertyMulti</a></div><div class="ttdef"><b>Definition:</b> propertymulti.h:25</div></div>
-<div class="ttc" id="aclassOST_1_1PropertyUpdate_html"><div class="ttname"><a href="classOST_1_1PropertyUpdate.html">OST::PropertyUpdate</a></div><div class="ttdef"><b>Definition:</b> propertyupdate.h:11</div></div>
-<div class="ttc" id="aclassOST_1_1PropertyUpdate_html_a12b709dc0f659a4ddca3406aced92f45"><div class="ttname"><a href="classOST_1_1PropertyUpdate.html#a12b709dc0f659a4ddca3406aced92f45">OST::PropertyUpdate::visit</a></div><div class="ttdeci">void visit(PropertyBase *pProperty, QVariantMap &amp;data) override</div><div class="ttdef"><b>Definition:</b> propertyupdate.h:23</div></div>
+<div class="ttc" id="aclassOST_1_1PropertyUpdate_html"><div class="ttname"><a href="classOST_1_1PropertyUpdate.html">OST::PropertyUpdate</a></div><div class="ttdef"><b>Definition:</b> propertyupdate.h:10</div></div>
+<div class="ttc" id="aclassOST_1_1PropertyUpdate_html_a12b709dc0f659a4ddca3406aced92f45"><div class="ttname"><a href="classOST_1_1PropertyUpdate.html#a12b709dc0f659a4ddca3406aced92f45">OST::PropertyUpdate::visit</a></div><div class="ttdeci">void visit(PropertyBase *pProperty, QVariantMap &amp;data) override</div><div class="ttdef"><b>Definition:</b> propertyupdate.h:22</div></div>
 <div class="ttc" id="aclassOST_1_1PropertyUpdate_html_a2f16911b6e39789e9b8cb6fd6f5dec7c"><div class="ttname"><a href="classOST_1_1PropertyUpdate.html#a2f16911b6e39789e9b8cb6fd6f5dec7c">OST::PropertyUpdate::PropertyUpdate</a></div><div class="ttdeci">PropertyUpdate()=default</div></div>
-<div class="ttc" id="aclassOST_1_1PropertyUpdate_html_a5e723fa21274db36a49a52d312c703cc"><div class="ttname"><a href="classOST_1_1PropertyUpdate.html#a5e723fa21274db36a49a52d312c703cc">OST::PropertyUpdate::visit</a></div><div class="ttdeci">void visit(PropertyBase *pProperty) override</div><div class="ttdef"><b>Definition:</b> propertyupdate.h:15</div></div>
-<div class="ttc" id="aclassOST_1_1PropertyUpdate_html_affdaad100724d5fc89f41fade6ce6182"><div class="ttname"><a href="classOST_1_1PropertyUpdate.html#affdaad100724d5fc89f41fade6ce6182">OST::PropertyUpdate::visit</a></div><div class="ttdeci">void visit(PropertyMulti *pProperty) override</div><div class="ttdef"><b>Definition:</b> propertyupdate.h:19</div></div>
+<div class="ttc" id="aclassOST_1_1PropertyUpdate_html_a5e723fa21274db36a49a52d312c703cc"><div class="ttname"><a href="classOST_1_1PropertyUpdate.html#a5e723fa21274db36a49a52d312c703cc">OST::PropertyUpdate::visit</a></div><div class="ttdeci">void visit(PropertyBase *pProperty) override</div><div class="ttdef"><b>Definition:</b> propertyupdate.h:14</div></div>
+<div class="ttc" id="aclassOST_1_1PropertyUpdate_html_affdaad100724d5fc89f41fade6ce6182"><div class="ttname"><a href="classOST_1_1PropertyUpdate.html#affdaad100724d5fc89f41fade6ce6182">OST::PropertyUpdate::visit</a></div><div class="ttdeci">void visit(PropertyMulti *pProperty) override</div><div class="ttdef"><b>Definition:</b> propertyupdate.h:18</div></div>
 <div class="ttc" id="aclassOST_1_1PropertyVisitor_html"><div class="ttname"><a href="classOST_1_1PropertyVisitor.html">OST::PropertyVisitor</a></div><div class="ttdef"><b>Definition:</b> propertyvisitor.h:12</div></div>
 <div class="ttc" id="anamespaceOST_html"><div class="ttname"><a href="namespaceOST.html">OST</a></div><div class="ttdef"><b>Definition:</b> lovbase.h:8</div></div>
 <div class="ttc" id="apropertymulti_8h_html"><div class="ttname"><a href="propertymulti_8h.html">propertymulti.h</a></div></div>
-<div class="ttc" id="apropertyvisitor_8h_html"><div class="ttname"><a href="propertyvisitor_8h.html">propertyvisitor.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

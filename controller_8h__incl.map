@@ -1,52 +1,52 @@
 <map id="src/controller.h" name="src/controller.h">
-<area shape="rect" id="node1" title=" " alt="" coords="2763,5,2881,32"/>
-<area shape="rect" id="node2" title=" " alt="" coords="1955,453,2089,480"/>
-<area shape="rect" id="node3" title=" " alt="" coords="2726,453,2817,480"/>
-<area shape="rect" id="node4" title=" " alt="" coords="2841,453,2995,480"/>
-<area shape="rect" id="node5" title=" " alt="" coords="3019,453,3150,480"/>
-<area shape="rect" id="node6" title=" " alt="" coords="2911,80,3008,107"/>
-<area shape="rect" id="node7" href="$maincontrol_8h.html" title=" " alt="" coords="2526,80,2638,107"/>
-<area shape="rect" id="node48" href="$wshandler_8h.html" title=" " alt="" coords="3032,80,3132,107"/>
-<area shape="rect" id="node8" href="$basemodule_8h.html" title=" " alt="" coords="2429,155,2543,181"/>
-<area shape="rect" id="node9" href="$dbmanager_8h.html" title=" " alt="" coords="1401,229,1507,256"/>
-<area shape="rect" id="node10" href="$datastore_8h.html" title=" " alt="" coords="914,304,1010,331"/>
-<area shape="rect" id="node11" href="$baseroot_8h.html" title=" " alt="" coords="2417,379,2507,405"/>
-<area shape="rect" id="node18" href="$propertytextdumper_8h.html" title=" " alt="" coords="164,379,328,405"/>
-<area shape="rect" id="node23" href="$propertyjsondumper_8h.html" title=" " alt="" coords="353,379,518,405"/>
-<area shape="rect" id="node24" href="$propertyupdate_8h.html" title=" " alt="" coords="5,379,140,405"/>
-<area shape="rect" id="node25" href="$propertyfactory_8h.html" title=" " alt="" coords="1217,379,1350,405"/>
-<area shape="rect" id="node42" href="$lovfactory_8h.html" title=" " alt="" coords="555,528,654,555"/>
-<area shape="rect" id="node44" href="$valueupdate_8h.html" title=" " alt="" coords="973,453,1087,480"/>
-<area shape="rect" id="node45" href="$valuejsondumper_8h.html" title=" " alt="" coords="1119,453,1266,480"/>
-<area shape="rect" id="node46" href="$lovjsondumper_8h.html" title=" " alt="" coords="450,453,581,480"/>
-<area shape="rect" id="node12" title=" " alt="" coords="2547,453,2622,480"/>
-<area shape="rect" id="node13" title=" " alt="" coords="2647,453,2701,480"/>
-<area shape="rect" id="node14" title=" " alt="" coords="2165,453,2244,480"/>
-<area shape="rect" id="node15" title=" " alt="" coords="351,677,418,704"/>
-<area shape="rect" id="node16" title=" " alt="" coords="2268,453,2376,480"/>
-<area shape="rect" id="node17" title=" " alt="" coords="2401,453,2523,480"/>
-<area shape="rect" id="node19" title=" " alt="" coords="177,528,235,555"/>
-<area shape="rect" id="node20" href="$propertymulti_8h.html" title=" " alt="" coords="298,453,421,480"/>
-<area shape="rect" id="node22" href="$propertyvisitor_8h.html" title=" " alt="" coords="75,603,204,629"/>
-<area shape="rect" id="node21" href="$propertybase_8h.html" title=" " alt="" coords="259,528,379,555"/>
-<area shape="rect" id="node26" title=" " alt="" coords="1989,528,2090,555"/>
-<area shape="rect" id="node27" href="$valuefactory_8h.html" title=" " alt="" coords="1303,453,1418,480"/>
-<area shape="rect" id="node28" href="$valueint_8h.html" title=" " alt="" coords="1228,528,1315,555"/>
-<area shape="rect" id="node31" href="$valuefloat_8h.html" title=" " alt="" coords="974,528,1073,555"/>
-<area shape="rect" id="node33" href="$valuebool_8h.html" title=" " alt="" coords="1339,528,1438,555"/>
-<area shape="rect" id="node34" href="$valuestring_8h.html" title=" " alt="" coords="1097,528,1203,555"/>
-<area shape="rect" id="node36" href="$valuelight_8h.html" title=" " alt="" coords="1462,528,1561,555"/>
-<area shape="rect" id="node37" href="$valueimg_8h.html" title=" " alt="" coords="1585,528,1680,555"/>
-<area shape="rect" id="node38" href="$valuevideo_8h.html" title=" " alt="" coords="1858,528,1965,555"/>
-<area shape="rect" id="node39" href="$valuemessage_8h.html" title=" " alt="" coords="1704,528,1833,555"/>
-<area shape="rect" id="node40" href="$valuegraph_8h.html" title=" " alt="" coords="729,528,835,555"/>
-<area shape="rect" id="node41" href="$valueprg_8h.html" title=" " alt="" coords="859,528,950,555"/>
-<area shape="rect" id="node29" href="$lovint_8h.html" title=" " alt="" coords="785,603,856,629"/>
-<area shape="rect" id="node30" href="$lovsingle_8h.html" title=" " alt="" coords="613,677,706,704"/>
-<area shape="rect" id="node32" href="$lovfloat_8h.html" title=" " alt="" coords="563,603,646,629"/>
-<area shape="rect" id="node35" href="$lovstring_8h.html" title=" " alt="" coords="670,603,761,629"/>
-<area shape="rect" id="node43" href="$lovlight_8h.html" title=" " alt="" coords="457,603,539,629"/>
-<area shape="rect" id="node47" href="$lovvisitor_8h.html" title=" " alt="" coords="337,603,432,629"/>
-<area shape="rect" id="node49" title=" " alt="" coords="3175,155,3423,181"/>
-<area shape="rect" id="node50" title=" " alt="" coords="2943,155,3151,181"/>
+<area shape="rect" id="node1" title=" " alt="" coords="2493,5,2611,32"/>
+<area shape="rect" id="node2" title=" " alt="" coords="1555,453,1690,480"/>
+<area shape="rect" id="node3" title=" " alt="" coords="1715,453,1805,480"/>
+<area shape="rect" id="node4" title=" " alt="" coords="2482,453,2635,480"/>
+<area shape="rect" id="node5" title=" " alt="" coords="2660,453,2791,480"/>
+<area shape="rect" id="node6" title=" " alt="" coords="2590,80,2687,107"/>
+<area shape="rect" id="node7" href="$maincontrol_8h.html" title=" " alt="" coords="1656,80,1768,107"/>
+<area shape="rect" id="node48" href="$wshandler_8h.html" title=" " alt="" coords="2837,80,2937,107"/>
+<area shape="rect" id="node8" href="$basemodule_8h.html" title=" " alt="" coords="1619,155,1733,181"/>
+<area shape="rect" id="node9" href="$dbmanager_8h.html" title=" " alt="" coords="1587,229,1693,256"/>
+<area shape="rect" id="node10" href="$datastore_8h.html" title=" " alt="" coords="1227,304,1323,331"/>
+<area shape="rect" id="node11" href="$baseroot_8h.html" title=" " alt="" coords="2101,379,2192,405"/>
+<area shape="rect" id="node18" href="$propertytextdumper_8h.html" title=" " alt="" coords="881,379,1045,405"/>
+<area shape="rect" id="node23" href="$propertyjsondumper_8h.html" title=" " alt="" coords="1280,379,1445,405"/>
+<area shape="rect" id="node24" href="$propertyupdate_8h.html" title=" " alt="" coords="1121,379,1255,405"/>
+<area shape="rect" id="node25" href="$propertyfactory_8h.html" title=" " alt="" coords="609,379,743,405"/>
+<area shape="rect" id="node43" href="$lovfactory_8h.html" title=" " alt="" coords="1595,528,1693,555"/>
+<area shape="rect" id="node45" href="$valueupdate_8h.html" title=" " alt="" coords="965,453,1080,480"/>
+<area shape="rect" id="node46" href="$valuejsondumper_8h.html" title=" " alt="" coords="795,453,941,480"/>
+<area shape="rect" id="node47" href="$lovjsondumper_8h.html" title=" " alt="" coords="1400,453,1531,480"/>
+<area shape="rect" id="node12" title=" " alt="" coords="2109,453,2184,480"/>
+<area shape="rect" id="node13" title=" " alt="" coords="2209,453,2263,480"/>
+<area shape="rect" id="node14" title=" " alt="" coords="2287,453,2366,480"/>
+<area shape="rect" id="node15" title=" " alt="" coords="2391,453,2457,480"/>
+<area shape="rect" id="node16" title=" " alt="" coords="1830,453,1938,480"/>
+<area shape="rect" id="node17" title=" " alt="" coords="1963,453,2085,480"/>
+<area shape="rect" id="node19" title=" " alt="" coords="1411,528,1469,555"/>
+<area shape="rect" id="node20" href="$propertymulti_8h.html" title=" " alt="" coords="509,453,632,480"/>
+<area shape="rect" id="node21" href="$propertybase_8h.html" title=" " alt="" coords="29,603,149,629"/>
+<area shape="rect" id="node22" href="$valuebase_8h.html" title=" " alt="" coords="332,677,433,704"/>
+<area shape="rect" id="node26" title=" " alt="" coords="24,528,125,555"/>
+<area shape="rect" id="node27" href="$valuefactory_8h.html" title=" " alt="" coords="656,453,771,480"/>
+<area shape="rect" id="node28" href="$valueint_8h.html" title=" " alt="" coords="1177,528,1263,555"/>
+<area shape="rect" id="node32" href="$valuefloat_8h.html" title=" " alt="" coords="1288,528,1387,555"/>
+<area shape="rect" id="node34" href="$valuebool_8h.html" title=" " alt="" coords="680,528,779,555"/>
+<area shape="rect" id="node35" href="$valuestring_8h.html" title=" " alt="" coords="1045,528,1152,555"/>
+<area shape="rect" id="node37" href="$valuelight_8h.html" title=" " alt="" coords="803,528,901,555"/>
+<area shape="rect" id="node38" href="$valueimg_8h.html" title=" " alt="" coords="926,528,1021,555"/>
+<area shape="rect" id="node39" href="$valuevideo_8h.html" title=" " alt="" coords="149,528,256,555"/>
+<area shape="rect" id="node40" href="$valuemessage_8h.html" title=" " alt="" coords="411,528,541,555"/>
+<area shape="rect" id="node41" href="$valuegraph_8h.html" title=" " alt="" coords="280,528,387,555"/>
+<area shape="rect" id="node42" href="$valueprg_8h.html" title=" " alt="" coords="565,528,656,555"/>
+<area shape="rect" id="node29" href="$valuesingle_8h.html" title=" " alt="" coords="859,603,968,629"/>
+<area shape="rect" id="node31" href="$lovint_8h.html" title=" " alt="" coords="1487,603,1558,629"/>
+<area shape="rect" id="node30" href="$lovsingle_8h.html" title=" " alt="" coords="1476,677,1569,704"/>
+<area shape="rect" id="node33" href="$lovfloat_8h.html" title=" " alt="" coords="1689,603,1772,629"/>
+<area shape="rect" id="node36" href="$lovstring_8h.html" title=" " alt="" coords="1372,603,1463,629"/>
+<area shape="rect" id="node44" href="$lovlight_8h.html" title=" " alt="" coords="1583,603,1665,629"/>
+<area shape="rect" id="node49" title=" " alt="" coords="2763,155,3011,181"/>
+<area shape="rect" id="node50" title=" " alt="" coords="3035,155,3243,181"/>
 </map>

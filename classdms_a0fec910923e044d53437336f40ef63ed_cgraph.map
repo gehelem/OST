@@ -1,6 +1,0 @@
-<map id="dms::fromString" name="dms::fromString">
-<area shape="rect" id="node1" title="Static function to create a DMS object from a QString." alt="" coords="5,5,132,32"/>
-<area shape="rect" id="node2" href="$classdms.html#a4aa683c945ab71920118c3c058fe723c" title="Attempt to parse the string argument as a dms value, and set the dms object accordingly." alt="" coords="180,5,329,32"/>
-<area shape="rect" id="node3" href="$classdms.html#ad785599c0f0dc511449eb10cdda59cd8" title=" " alt="" coords="513,5,601,32"/>
-<area shape="rect" id="node4" href="$classdms.html#a22184b4dddc2862b04a7b29b3cec2f55" title="Sets floating&#45;point value of angle, in hours." alt="" coords="377,31,465,57"/>
-</map>

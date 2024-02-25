@@ -41,6 +41,7 @@ var menudata={children:[
 {text:"n",url:"namespacemembers.html#index_n"},
 {text:"o",url:"namespacemembers.html#index_o"},
 {text:"p",url:"namespacemembers.html#index_p"},
+{text:"q",url:"namespacemembers.html#index_q"},
 {text:"r",url:"namespacemembers.html#index_r"},
 {text:"s",url:"namespacemembers.html#index_s"},
 {text:"w",url:"namespacemembers.html#index_w"},

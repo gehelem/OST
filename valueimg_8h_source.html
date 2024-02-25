@@ -72,12 +72,12 @@ $(function() {
 <a href="valueimg_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef VALUEIMG_h</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#define VALUEIMG_h</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160; </div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="valuebase_8h.html">valuebase.h</a>&gt;</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="valuesingle_8h.html">valuesingle.h</a>&gt;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160; </div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="keyword">namespace  </span><a class="code" href="namespaceOST.html">OST</a></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;{</div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
-<div class="line"><a name="l00009"></a><span class="lineno"><a class="line" href="classOST_1_1ValueImg.html">    9</a></span>&#160;<span class="keyword">class </span><a class="code" href="classOST_1_1ValueImg.html">ValueImg</a>: <span class="keyword">public</span> <a class="code" href="classOST_1_1ValueBase.html">ValueBase</a></div>
+<div class="line"><a name="l00009"></a><span class="lineno"><a class="line" href="classOST_1_1ValueImg.html">    9</a></span>&#160;<span class="keyword">class </span><a class="code" href="classOST_1_1ValueImg.html">ValueImg</a>: <span class="keyword">public</span> <a class="code" href="classOST_1_1ValueSingle.html">ValueSingle</a>&lt;ImgData&gt;</div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;{</div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;        Q_OBJECT</div>
@@ -119,7 +119,6 @@ $(function() {
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;}</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="aclassOST_1_1ValueBase_html"><div class="ttname"><a href="classOST_1_1ValueBase.html">OST::ValueBase</a></div><div class="ttdef"><b>Definition:</b> valuebase.h:13</div></div>
 <div class="ttc" id="aclassOST_1_1ValueBase_html_a07b57c61dc7fa0142cc95ee39b78212c"><div class="ttname"><a href="classOST_1_1ValueBase.html#a07b57c61dc7fa0142cc95ee39b78212c">OST::ValueBase::hint</a></div><div class="ttdeci">QString hint()</div><div class="ttdef"><b>Definition:</b> valuebase.h:34</div></div>
 <div class="ttc" id="aclassOST_1_1ValueBase_html_a42ab362d5ba525005a6831dc63f316fd"><div class="ttname"><a href="classOST_1_1ValueBase.html#a42ab362d5ba525005a6831dc63f316fd">OST::ValueBase::label</a></div><div class="ttdeci">QString label()</div><div class="ttdef"><b>Definition:</b> valuebase.h:26</div></div>
 <div class="ttc" id="aclassOST_1_1ValueBase_html_a500741026568d575c9402a23f786edc4"><div class="ttname"><a href="classOST_1_1ValueBase.html#a500741026568d575c9402a23f786edc4">OST::ValueBase::valueChanged</a></div><div class="ttdeci">void valueChanged(OST::ValueBase *)</div></div>
@@ -133,12 +132,13 @@ $(function() {
 <div class="ttc" id="aclassOST_1_1ValueImg_html_ac5696260ba107e36b8c81bbf361bb4af"><div class="ttname"><a href="classOST_1_1ValueImg.html#ac5696260ba107e36b8c81bbf361bb4af">OST::ValueImg::accept</a></div><div class="ttdeci">void accept(ValueVisitor *pVisitor, QString &amp;action, QVariantMap &amp;data) override</div><div class="ttdef"><b>Definition:</b> valueimg.h:23</div></div>
 <div class="ttc" id="aclassOST_1_1ValueImg_html_ad0707dc3b228c3001996e072f87030d0"><div class="ttname"><a href="classOST_1_1ValueImg.html#ad0707dc3b228c3001996e072f87030d0">OST::ValueImg::value</a></div><div class="ttdeci">ImgData value()</div><div class="ttdef"><b>Definition:</b> valueimg.h:34</div></div>
 <div class="ttc" id="aclassOST_1_1ValueImg_html_adc62197c55681a82b3789a7e4d91b0dd"><div class="ttname"><a href="classOST_1_1ValueImg.html#adc62197c55681a82b3789a7e4d91b0dd">OST::ValueImg::getType</a></div><div class="ttdeci">QString getType() override</div><div class="ttdef"><b>Definition:</b> valueimg.h:30</div></div>
+<div class="ttc" id="aclassOST_1_1ValueSingle_html"><div class="ttname"><a href="classOST_1_1ValueSingle.html">OST::ValueSingle</a></div><div class="ttdef"><b>Definition:</b> valuesingle.h:35</div></div>
 <div class="ttc" id="aclassOST_1_1ValueVisitor_html"><div class="ttname"><a href="classOST_1_1ValueVisitor.html">OST::ValueVisitor</a></div><div class="ttdef"><b>Definition:</b> valuevisitor.h:19</div></div>
 <div class="ttc" id="aclassOST_1_1ValueVisitor_html_a102cd031f2140fc75dfb1f819509e95a"><div class="ttname"><a href="classOST_1_1ValueVisitor.html#a102cd031f2140fc75dfb1f819509e95a">OST::ValueVisitor::visit</a></div><div class="ttdeci">virtual void visit(ValueInt *pValue)=0</div></div>
 <div class="ttc" id="anamespaceOST_html"><div class="ttname"><a href="namespaceOST.html">OST</a></div><div class="ttdef"><b>Definition:</b> lovbase.h:8</div></div>
 <div class="ttc" id="anamespaceOST_html_a040cb5b906df5ef5aad6276edc85a138"><div class="ttname"><a href="namespaceOST.html#a040cb5b906df5ef5aad6276edc85a138">OST::ImgData</a></div><div class="ttdeci">struct OST::ImgData ImgData</div></div>
 <div class="ttc" id="astructOST_1_1ImgData_html"><div class="ttname"><a href="structOST_1_1ImgData.html">OST::ImgData</a></div><div class="ttdef"><b>Definition:</b> common.h:43</div></div>
-<div class="ttc" id="avaluebase_8h_html"><div class="ttname"><a href="valuebase_8h.html">valuebase.h</a></div></div>
+<div class="ttc" id="avaluesingle_8h_html"><div class="ttname"><a href="valuesingle_8h.html">valuesingle.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

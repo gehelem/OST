@@ -1,4 +1,0 @@
-<map id="dms::cos" name="dms::cos">
-<area shape="rect" id="node1" title="Compute the Angle&#39;s Cosine." alt="" coords="156,5,236,32"/>
-<area shape="rect" id="node2" href="$classdms.html#a40fa49cfe436104bc0775cf6024ade3a" title="Compute Sine and Cosine of the angle simultaneously. On machines using glibc &gt;= 2...." alt="" coords="5,5,108,32"/>
-</map>

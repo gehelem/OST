@@ -1,8 +1,8 @@
 <map id="libs/fileio.cpp" name="libs/fileio.cpp">
 <area shape="rect" id="node1" title=" " alt="" coords="1095,5,1203,32"/>
 <area shape="rect" id="node2" href="$fileio_8h.html" title=" " alt="" coords="1019,80,1085,107"/>
-<area shape="rect" id="node30" title=" " alt="" coords="1109,80,1189,107"/>
-<area shape="rect" id="node31" title=" " alt="" coords="1214,80,1322,107"/>
+<area shape="rect" id="node34" title=" " alt="" coords="1109,80,1189,107"/>
+<area shape="rect" id="node35" title=" " alt="" coords="1214,80,1322,107"/>
 <area shape="rect" id="node3" title=" " alt="" coords="5,155,80,181"/>
 <area shape="rect" id="node4" title=" " alt="" coords="105,155,223,181"/>
 <area shape="rect" id="node5" title=" " alt="" coords="247,155,302,181"/>
@@ -16,18 +16,22 @@
 <area shape="rect" id="node13" href="$stretch_8h.html" title=" " alt="" coords="1413,155,1491,181"/>
 <area shape="rect" id="node16" title=" " alt="" coords="1515,155,1583,181"/>
 <area shape="rect" id="node17" href="$dms_8h.html" title=" " alt="" coords="1607,155,1670,181"/>
-<area shape="rect" id="node23" href="$bayer_8h.html" title=" " alt="" coords="1803,155,1874,181"/>
-<area shape="rect" id="node25" href="$valueimg_8h.html" title=" " alt="" coords="1954,155,2049,181"/>
-<area shape="rect" id="node14" title=" " alt="" coords="1285,229,1363,256"/>
-<area shape="rect" id="node15" title=" " alt="" coords="1387,229,1461,256"/>
-<area shape="rect" id="node18" href="$nan_8h.html" title=" " alt="" coords="1485,229,1544,256"/>
-<area shape="rect" id="node20" title=" " alt="" coords="1569,229,1639,256"/>
-<area shape="rect" id="node21" title=" " alt="" coords="1663,229,1774,256"/>
-<area shape="rect" id="node22" title=" " alt="" coords="1798,229,1861,256"/>
-<area shape="rect" id="node19" title=" " alt="" coords="1485,304,1544,331"/>
-<area shape="rect" id="node24" title=" " alt="" coords="1885,229,1955,256"/>
-<area shape="rect" id="node26" href="$valuebase_8h.html" title=" " alt="" coords="1980,229,2081,256"/>
-<area shape="rect" id="node27" href="$valuevisitor_8h.html" title=" " alt="" coords="1913,304,2023,331"/>
-<area shape="rect" id="node29" href="$common_8h.html" title=" " alt="" coords="2048,304,2139,331"/>
-<area shape="rect" id="node28" title=" " alt="" coords="1997,379,2064,405"/>
+<area shape="rect" id="node23" href="$bayer_8h.html" title=" " alt="" coords="1777,155,1847,181"/>
+<area shape="rect" id="node25" href="$valueimg_8h.html" title=" " alt="" coords="1917,155,2011,181"/>
+<area shape="rect" id="node14" title=" " alt="" coords="1259,229,1336,256"/>
+<area shape="rect" id="node15" title=" " alt="" coords="1361,229,1434,256"/>
+<area shape="rect" id="node18" href="$nan_8h.html" title=" " alt="" coords="1459,229,1517,256"/>
+<area shape="rect" id="node20" title=" " alt="" coords="1542,229,1613,256"/>
+<area shape="rect" id="node21" title=" " alt="" coords="1637,229,1747,256"/>
+<area shape="rect" id="node22" title=" " alt="" coords="1771,229,1834,256"/>
+<area shape="rect" id="node19" title=" " alt="" coords="1459,304,1517,331"/>
+<area shape="rect" id="node24" title=" " alt="" coords="1858,229,1929,256"/>
+<area shape="rect" id="node26" href="$valuesingle_8h.html" title=" " alt="" coords="1953,229,2063,256"/>
+<area shape="rect" id="node27" href="$valuebase_8h.html" title=" " alt="" coords="1897,379,1999,405"/>
+<area shape="rect" id="node31" href="$lovsingle_8h.html" title=" " alt="" coords="2011,304,2104,331"/>
+<area shape="rect" id="node28" href="$valuevisitor_8h.html" title=" " alt="" coords="1826,453,1937,480"/>
+<area shape="rect" id="node30" href="$common_8h.html" title=" " alt="" coords="1961,453,2052,480"/>
+<area shape="rect" id="node29" title=" " alt="" coords="1973,528,2040,555"/>
+<area shape="rect" id="node32" href="$lovbase_8h.html" title=" " alt="" coords="2023,379,2108,405"/>
+<area shape="rect" id="node33" href="$lovvisitor_8h.html" title=" " alt="" coords="2077,453,2171,480"/>
 </map>
