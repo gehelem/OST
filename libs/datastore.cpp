@@ -65,6 +65,11 @@ QString Datastore::getString(QString pProperty, QString pElement)
 }
 QString Datastore::getString(QString pProperty, QString pElement, long line)
 {
+    if (getValueString(pProperty, pElement)->getGrid().size() < line + 1)
+    {
+        sendWarning("getString - property " + pProperty + " : element " + pElement + " line : " + line + " does not exist" );
+        return QString();
+    }
     return getValueString(pProperty, pElement)->getGrid()[line];
 }
 OST::ValueInt* Datastore::getValueInt(QString pProperty, QString pElement)
@@ -93,6 +98,12 @@ long Datastore::getInt(QString pProperty, QString pElement)
 }
 long Datastore::getInt(QString pProperty, QString pElement, long line)
 {
+    if (getValueInt(pProperty, pElement)->getGrid().size() < line + 1)
+    {
+        sendWarning("getValueInt - property " + pProperty + " : element " + pElement + " line : " + line + " does not exist" );
+        return 0;
+    }
+
     return getValueInt(pProperty, pElement)->getGrid()[line];
 }
 OST::ValueFloat* Datastore::getValueFloat(QString pProperty, QString pElement)
@@ -121,6 +132,11 @@ double  Datastore::getFloat(QString pProperty, QString pElement)
 }
 double Datastore::getFloat(QString pProperty, QString pElement, long line)
 {
+    if (getValueFloat(pProperty, pElement)->getGrid().size() < line + 1)
+    {
+        sendWarning("getValueFloat - property " + pProperty + " : element " + pElement + " line : " + line + " does not exist" );
+        return 0;
+    }
     return getValueFloat(pProperty, pElement)->getGrid()[line];
 }
 OST::ValueLight* Datastore::getValueLight(QString pProperty, QString pElement)

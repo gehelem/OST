@@ -1,6 +1,5 @@
 #ifndef OST_VALUEUPDATE_H
 #define OST_VALUEUPDATE_H
-#include "propertybase.h"
 #include <string>
 #include <valueint.h>
 #include <valuefloat.h>

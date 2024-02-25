@@ -1,12 +1,12 @@
 #ifndef VALUEIMG_h
 #define VALUEIMG_h
 
-#include <valuebase.h>
+#include <valuesingle.h>
 
 namespace  OST
 {
 
-class ValueImg: public ValueBase
+class ValueImg: public ValueSingle<ImgData>
 {
 
         Q_OBJECT

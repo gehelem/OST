@@ -1,12 +1,12 @@
 #ifndef VALUEVIDEO_h
 #define VALUEVIDEO_h
 
-#include <valuebase.h>
+#include <valuesingle.h>
 
 namespace  OST
 {
 
-class ValueVideo: public ValueBase
+class ValueVideo: public ValueSingle<QString>
 {
 
         Q_OBJECT

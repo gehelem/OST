@@ -276,7 +276,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                 getStore()[keyprop]->updateLine(line, eventData[keyprop].toMap()["elements"].toMap());
 
             }
-            if (eventType == "Flselect")
+            if (eventType == "Flselect" && keyprop == "results")
             {
                 double line = eventData[keyprop].toMap()["line"].toDouble();
                 qDebug() << "dummy" << eventType << "-" << eventModule << "-" << eventKey << "-" << eventData << "line=" << line;

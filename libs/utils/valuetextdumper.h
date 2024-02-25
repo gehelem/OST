@@ -2,7 +2,6 @@
 #define OST_VALUETEXTDUMPER_H
 
 #include <string>
-#include <valuevisitor.h>
 #include <valuebool.h>
 #include <valueint.h>
 #include <valuefloat.h>

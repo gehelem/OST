@@ -411,12 +411,23 @@
                 "value":"Zéro",
                 "gridvalues":["P0","P1","P2","P3","P4"],
                 "order":"A"
+            },
+            "imgrid": {
+                "type": "img",
+                "label": "image in grid",
+                "gridvalues":[{"urljpeg":"./dummy1.jpg"},{"urljpeg":"./dummy2.jpg"},{"urljpeg":"./dummy3.jpg"},{"urljpeg":"./dummy4.jpg"},{"urljpeg":"./dummy5.jpg"}],
+                "urljpeg":"./dummy.jpg",
+                "order":"Z"
+            },
+            "prggrid": {
+                "type": "prg",
+                "prgtype": "spinner",
+                "label": "Progress",
+                "dynlabel": "99/100",
+                "value": 99,
+                "gridvalues":[0,1,4,9,16],
+                "order":2
             }
-        },
-        "array":{
-            "key": "",
-            "columns":["X","Y"],
-            "type":"grid"
         }
     },
     "secondtestgrid": {

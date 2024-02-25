@@ -1,12 +1,12 @@
 #ifndef VALUEPRG_h
 #define VALUEPRG_h
 
-#include <valuebase.h>
+#include <valuesingle.h>
 
 namespace  OST
 {
 
-class ValuePrg: public ValueBase
+class ValuePrg: public ValueSingle<double>
 {
 
         Q_OBJECT
