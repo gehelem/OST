@@ -119,9 +119,7 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
     /* Check if data is valid and contains every value */
     foreach(const QString &elt, mValues.keys())
     {
-        if ((mValues[elt]->getType() == "int") || (mValues[elt]->getType() == "float") || (mValues[elt]->getType() == "string")
-                || (mValues[elt]->getType() == "bool") || (mValues[elt]->getType() == "img") || (mValues[elt]->getType() == "prg")
-                || (mValues[elt]->getType() == "video"))
+        if ((mValues[elt]->getType() == "int") || (mValues[elt]->getType() == "float") || (mValues[elt]->getType() == "string"))
         {
             if (!pValues.contains(elt))
             {
@@ -133,12 +131,15 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
 
     foreach(const QString &elt, mValues.keys())
     {
-        OST::ValueUpdate d;
-        QString action = "newline";
-        QVariantMap m;
-        m["val"] = pValues[elt];
-        m["arrayLimit"] = this->getArrayLimit();
-        mValues[elt]->accept(&d, action, m);
+        if ((mValues[elt]->getType() == "int") || (mValues[elt]->getType() == "float") || (mValues[elt]->getType() == "string"))
+        {
+            OST::ValueUpdate d;
+            QString action = "newline";
+            QVariantMap m;
+            m["val"] = pValues[elt];
+            m["arrayLimit"] = this->getArrayLimit();
+            mValues[elt]->accept(&d, action, m);
+        }
     }
     emit propertyEvent("ap", key(), this);
 
@@ -173,20 +174,26 @@ void PropertyMulti::updateLine(const int i, const QVariantMap &pValues)
     /* Check if data is valid and contains every value */
     foreach(const QString &elt, mValues.keys())
     {
-        if (!pValues.contains(elt))
+        if (mValues[elt]->getType() == "int" || mValues[elt]->getType() == "float" || mValues[elt]->getType() == "string")
         {
-            sendError("PropertyMulti::updateLine incomplete values, " + elt + " missing");
-            return;
+            if (!pValues.contains(elt))
+            {
+                sendError("PropertyMulti::updateLine incomplete values, " + elt + " missing");
+                return;
+            }
         }
     }
     foreach(const QString &elt, mValues.keys())
     {
-        OST::ValueUpdate d;
-        QString action = "updateline";
-        QVariantMap m;
-        m["val"] = pValues[elt];
-        m["i"] = i;
-        mValues[elt]->accept(&d, action, m);
+        if (mValues[elt]->getType() == "int" || mValues[elt]->getType() == "float" || mValues[elt]->getType() == "string")
+        {
+            OST::ValueUpdate d;
+            QString action = "updateline";
+            QVariantMap m;
+            m["val"] = pValues[elt];
+            m["i"] = i;
+            mValues[elt]->accept(&d, action, m);
+        }
     }
     emit propertyEvent("ap", key(), this);
 
