@@ -64,6 +64,7 @@ class PropertyMulti: public PropertyBase
             }
             return mValues[pElement];
         }
+        [[deprecated]]
         bool setValue(QString key, QVariant Value);
         void addValue(QString key, ValueBase* pValue)
         {

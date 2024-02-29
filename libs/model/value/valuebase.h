@@ -66,11 +66,17 @@ class ValueBase: public QObject
         bool mAutoUpdate = false;
         bool mDirectEdit = false;
         bool mBadge = false;
+    public slots:
+        void OnLovChanged()
+        {
+            emit lovChanged(this);
+        }
     signals:
         void valueChanged(OST::ValueBase*);
         void listChanged(OST::ValueBase*);
         void sendMessage(MsgLevel, QString);
         void lovChanged(OST::ValueBase*);
+        void gridEvent();
 
 };
 

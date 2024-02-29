@@ -7,40 +7,16 @@
 namespace  OST
 {
 
-class ValueSingleSignalAndSlots : public ValueBase
-{
-        Q_OBJECT
-    public:
-        ValueSingleSignalAndSlots(const QString &label, const QString &order, const QString &hint) : ValueBase(label, order, hint)
-        {
-
-        }
-        ~ValueSingleSignalAndSlots() {}
-    public slots:
-        void OnSingleValueChanged(void)
-        {
-            emit valueChanged(this);
-        }
-        void OnLovChanged(void)
-        {
-            emit lovChanged(this);
-        }
-    signals:
-        void gridEvent();
-        void singleValueChanged();
-
-};
 template <typename T>
-class ValueSingle : public ValueSingleSignalAndSlots
+class ValueSingle : public ValueBase
 {
 
     public:
 
         ValueSingle(const QString &label, const QString &order, const QString &hint):
-            ValueSingleSignalAndSlots(label, order, hint)
+            ValueBase(label, order, hint)
         {
             mGridValues.clear();
-            connect(this, &ValueSingle::singleValueChanged, this, &ValueSingleSignalAndSlots::OnSingleValueChanged);
         }
         ~ValueSingle() {}
         T value()
@@ -58,7 +34,7 @@ class ValueSingle : public ValueSingleSignalAndSlots
         void setValue(const T &value, const bool &emitEvent)
         {
             mValue = value;
-            if (emitEvent) emit singleValueChanged();
+            if (emitEvent) emit valueChanged(this);
         }
         QList<T> getGrid()
         {
