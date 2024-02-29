@@ -6,7 +6,7 @@
 namespace  OST
 {
 
-class ValueVideo: public ValueSingle<QString>
+class ValueVideo: public ValueSingle<VideoData>
 {
 
         Q_OBJECT
@@ -31,18 +31,6 @@ class ValueVideo: public ValueSingle<QString>
         {
             return "video";
         }
-        QString value()
-        {
-            return mValue;
-        }
-        void setValue(const QString &value, const bool &emitEvent)
-        {
-            mValue = value;
-            if (emitEvent) emit valueChanged(this);
-        }
-
-    private:
-        QString mValue = "";
 
 };
 

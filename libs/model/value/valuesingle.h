@@ -151,6 +151,89 @@ class ValueSingle : public ValueSingleSignalAndSlots
         QString mPostIcon = "";
 
 };
+template <typename T>
+class ValueSingleNumeric : public ValueSingle<T>
+{
+
+    public:
+
+        ValueSingleNumeric(const QString &label, const QString &order, const QString &hint):
+            ValueSingle<T>(label, order, hint)
+        {
+        }
+        ~ValueSingleNumeric<T>() {}
+        void setValue(const T &value, const bool &emitEvent)
+        {
+            if (mUseMinMax)
+            {
+                if (value < mMin)
+                {
+                    emit ValueSingle<T>::sendMessage(Warn,
+                                                     "valueUpdate - value too low " + QString::number(value) + " min= " + QString::number(mMin) );
+                    return;
+                }
+                if (value > mMax)
+                {
+                    emit ValueSingle<T>::sendMessage(Warn,
+                                                     "valueUpdate - value too high " + QString::number(value) + " max= " + QString::number(mMax) );
+                    return;
+                }
+            }
+            ValueSingle<T>::setValue(value, emitEvent);
+        }
+        T min()
+        {
+            return mMin;
+        }
+        void setMin(const T &min)
+        {
+            mMin = min;
+        }
+        int max()
+        {
+            return mMax;
+        }
+        void setMax(const T &max)
+        {
+            mMax = max;
+        }
+        void setMinMax(const T &min, const T &max)
+        {
+            mMin = min;
+            mMax = max;
+            mUseMinMax = true;
+        }
+        void unSetMinMax(void)
+        {
+            mMin = 0;
+            mMax = 0;
+            mUseMinMax = false;
+        }
+        T step()
+        {
+            return mStep;
+        }
+        void setStep(const T &step)
+        {
+            mStep = step;
+        }
+
+        QString format()
+        {
+            return mFormat;
+        }
+        void setFormat(const QString &format)
+        {
+            mFormat = format;
+        }
+    private:
+        T mMin = 0;
+        T mMax = 0;
+        T mStep = 0;
+        bool mUseMinMax = false;
+        QString mFormat = "";
+
+};
 
 }
 #endif

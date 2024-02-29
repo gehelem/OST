@@ -79,7 +79,24 @@ inline ImgData QVariantMapToImgData(QVariantMap m)
     if (m.contains("urljpeg")) i.mUrlJpeg = m["urljpeg"].toString();
     return i;
 }
+typedef struct VideoData
+{
+    QString url = "";
+} VideoData;
 
+inline QVariantMap VideoDataToVariantMap(VideoData d)
+{
+    QVariantMap m;
+    m["url"] = d.url;
+    return m;
+}
+
+inline VideoData VariantMapToVideoData(QVariantMap m)
+{
+    VideoData v;
+    if (m.contains("url")) v.url = m["url"].toString();
+    return v;
+}
 typedef enum
 {
     none, /* no graph, just to handle conversion errors */

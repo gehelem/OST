@@ -266,14 +266,14 @@ void ValueJsonDumper::visit(ValueVideo *pValue)
 {
     QJsonObject json = dumpValueCommons(pValue);
     json["type"] = "video";
-    json["value"] = pValue->value();
+    json["url"] = pValue->value().url;
     json["arrayLimit"] = pValue->arrayLimit();
     if (pValue->getGrid().size() > 0)
     {
         QJsonArray arr;
-        foreach (QString val, pValue->getGrid())
+        foreach (VideoData val, pValue->getGrid())
         {
-            QVariant v = QVariant::fromValue(val);
+            QVariant v = QVariant::fromValue(VideoDataToVariantMap(val));
             arr.append(v.toJsonValue());
         }
 

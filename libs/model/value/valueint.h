@@ -7,7 +7,7 @@
 namespace  OST
 {
 
-class ValueInt: public ValueSingle<int>
+class ValueInt: public ValueSingleNumeric<int>
 {
 
         Q_OBJECT
@@ -32,26 +32,6 @@ class ValueInt: public ValueSingle<int>
         {
             return "int";
         }
-        int min()
-        {
-            return mMin;
-        }
-        void setMin(const int &min);
-        int max()
-        {
-            return mMax;
-        }
-        void setMax(const int &max);
-        int step()
-        {
-            return mStep;
-        }
-        void setStep(const int &step);
-        QString format()
-        {
-            return mFormat;
-        }
-        void setFormat(const QString &format);
         QMap<int, QString> getLov()
         {
             return mLov.getLov();
@@ -73,10 +53,6 @@ class ValueInt: public ValueSingle<int>
             return mLov.lovClear();
         }
     private:
-        int mMin = 0;
-        int mMax = 0;
-        int mStep = 0;
-        QString mFormat = "";
         LovInt mLov;
 };
 

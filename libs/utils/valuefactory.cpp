@@ -223,7 +223,7 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
                                           pData["order"].toString(),
                                           pData["hint"].toString()
                                          );
-            if (pData.contains("value")) pValue->setValue(pData["value"].toString(), false);
+            if (pData.contains("value")) pValue->setValue(VariantMapToVideoData(pData["value"].toMap()), false);
             if (pData.contains("arrayLimit")) pValue->setArrayLimit(pData["arrayLimit"].toInt());
 
             return pValue;

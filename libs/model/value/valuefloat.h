@@ -7,7 +7,7 @@
 namespace  OST
 {
 
-class ValueFloat: public ValueSingle<double>
+class ValueFloat: public ValueSingleNumeric<double>
 {
 
         Q_OBJECT
@@ -32,26 +32,6 @@ class ValueFloat: public ValueSingle<double>
         {
             return "float";
         }
-        double min()
-        {
-            return mMin;
-        }
-        void setMin(const double &min);
-        double max()
-        {
-            return mMax;
-        }
-        void setMax(const double &max);
-        double step()
-        {
-            return mStep;
-        }
-        void setStep(const double &step);
-        QString format()
-        {
-            return mFormat;
-        }
-        void setFormat(const QString &format);
         QMap<double, QString> getLov()
         {
             return mLov.getLov();
@@ -74,10 +54,6 @@ class ValueFloat: public ValueSingle<double>
         }
 
     private:
-        double mMin = 0;
-        double mMax = 0;
-        double mStep = 0;
-        QString mFormat = "";
         LovFloat mLov;
 
 };

@@ -31,12 +31,13 @@ class ValuePrg: public ValueSingle<double>
         {
             return "prg";
         }
-        double value()
-        {
-            return mValue;
-        }
         void setValue(const double &value, const bool &emitEvent)
         {
+            if ((value < 0) || (value > 100))
+            {
+                sendMessage(OST::MsgLevel::Warn, "Invalid spinner value (" + QString::number(value) + ")");
+                return;
+            }
             mValue = value;
             if (emitEvent) emit valueChanged(this);
         }

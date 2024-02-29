@@ -31,18 +31,7 @@ class ValueImg: public ValueSingle<ImgData>
         {
             return "img";
         }
-        ImgData value()
-        {
-            return mValue;
-        }
-        void setValue(const ImgData &value, const bool &emitEvent)
-        {
-            mValue = value;
-            if (emitEvent) emit valueChanged(this);
-        }
-
     private:
-        ImgData mValue = ImgData();
 
 };
 

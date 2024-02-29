@@ -73,7 +73,7 @@ void ValueTextDumper::visit(ValueVideo *pValue)
 {
     std::stringstream stream;
     stream << "Video Value :" << dumpValueCommons(pValue);
-    stream << "Val = '" << pValue->value().toStdString() << "'";
+    stream << "Url = '" << pValue->value().url.toStdString() << "'";
     mResult = QString::fromStdString(stream.str());
 }
 void ValueTextDumper::visit(ValueMessage *pValue)
