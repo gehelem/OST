@@ -34,6 +34,7 @@ class Datastore : public Baseroot
         ~Datastore();
     protected:
         OST::PropertyMulti* getProperty(QString pProperty);
+        OST::ValueBase* getValueBase(QString pProperty, QString pElement);
         OST::ValueString* getValueString(QString pProperty, QString pElement);
         OST::ValueInt* getValueInt(QString pProperty, QString pElement);
         OST::ValueFloat* getValueFloat(QString pProperty, QString pElement);
@@ -116,6 +117,7 @@ class Datastore : public Baseroot
                                   bool mEmitEvent);
         bool createOstElementBool(const QString &pPropertyName, const QString &pElementName, const QString &pElementLabel,
                                   bool mEmitEvent);
+        [[deprecated]]
         bool setOstElementValue(const QString &pPropertyName, const QString &pElementName, const QVariant &pElementValue,
                                 bool mEmitEvent);
         QVariantList getOstElementGrid(const QString &pPropertyName, const QString &pElementName);

@@ -18,6 +18,26 @@ OST::PropertyMulti* Datastore::getProperty(QString pProperty)
 
     return mStore[pProperty];
 }
+OST::ValueBase* Datastore::getValueBase(QString pProperty, QString pElement)
+{
+    OST::PropertyMulti* p = getProperty(pProperty);
+    if (p == nullptr)
+    {
+        sendWarning(" getValueString - property " + pProperty + " not found");
+        return nullptr;
+    }
+    if (!p->getValues()->contains(pElement))
+    {
+        sendWarning("getValueString - property " + pProperty + " : element " + pElement + " not found");
+        return nullptr;
+    }
+    if (p->getValue(pElement)->getType() != "string")
+    {
+        sendWarning("getValueString - property " + pProperty + " : element " + pElement + " is not string");
+        return nullptr;
+    }
+    return p->getValue(pElement);
+}
 
 OST::ValueString* Datastore::getValueString(QString pProperty, QString pElement)
 {
