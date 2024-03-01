@@ -31,10 +31,11 @@ class ValueSingle : public ValueBase
         {
             return "error";
         }
-        void setValue(const T &value, const bool &emitEvent)
+        bool setValue(const T &value, const bool &emitEvent)
         {
             mValue = value;
             if (emitEvent) emit valueChanged(this);
+            return true;
         }
         QList<T> getGrid()
         {
@@ -138,21 +139,21 @@ class ValueSingleNumeric : public ValueSingle<T>
         {
         }
         ~ValueSingleNumeric<T>() {}
-        void setValue(const T &value, const bool &emitEvent)
+        bool setValue(const T &value, const bool &emitEvent)
         {
             if (mUseMinMax)
             {
                 if (value < mMin)
                 {
                     emit ValueSingle<T>::sendMessage(Warn,
-                                                     "valueUpdate - value too low " + QString::number(value) + " min= " + QString::number(mMin) );
-                    return;
+                                                     "setValue - value too low " + QString::number(value) + " min= " + QString::number(mMin) );
+                    return false;
                 }
                 if (value > mMax)
                 {
                     emit ValueSingle<T>::sendMessage(Warn,
-                                                     "valueUpdate - value too high " + QString::number(value) + " max= " + QString::number(mMax) );
-                    return;
+                                                     "setValue - value too high " + QString::number(value) + " max= " + QString::number(mMax) );
+                    return false;
                 }
             }
             ValueSingle<T>::setValue(value, emitEvent);
