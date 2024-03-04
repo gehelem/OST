@@ -19,65 +19,65 @@ class ValueUpdate : public ValueVisitor
 
     public:
         ValueUpdate() = default;
-        void visit(ValueInt* pProperty) override
+        void visit(ValueInt* pValue) override
         {
-            Q_UNUSED(pProperty)
+            Q_UNUSED(pValue)
         }
-        void visit(ValueInt* pProperty, QVariantMap &data ) override;
+        void visit(ValueInt* pValue, QVariantMap &data ) override;
         void visit(ValueInt* pValue, QString &action, QVariantMap &data) override;
-        void visit(ValueFloat* pProperty) override
+        void visit(ValueFloat* pValue) override
         {
-            Q_UNUSED(pProperty)
+            Q_UNUSED(pValue)
         }
-        void visit(ValueFloat* pProperty, QVariantMap &data ) override;
+        void visit(ValueFloat* pValue, QVariantMap &data ) override;
         void visit(ValueFloat* pValue, QString &action, QVariantMap &data) override;
-        void visit(ValueBool* pProperty) override
+        void visit(ValueBool* pValue) override
         {
-            Q_UNUSED(pProperty)
+            Q_UNUSED(pValue)
         }
-        void visit(ValueBool* pProperty, QVariantMap &data ) override;
+        void visit(ValueBool* pValue, QVariantMap &data ) override;
         void visit(ValueBool* pValue, QString &action, QVariantMap &data) override;
-        void visit(ValueString* pProperty) override
+        void visit(ValueString* pValue) override
         {
-            Q_UNUSED(pProperty)
+            Q_UNUSED(pValue)
         }
-        void visit(ValueString* pProperty, QVariantMap &data ) override;
+        void visit(ValueString* pValue, QVariantMap &data ) override;
         void visit(ValueString* pValue, QString &action, QVariantMap &data) override;
-        void visit(ValueLight* pProperty) override
+        void visit(ValueLight* pValue) override
         {
-            Q_UNUSED(pProperty)
+            Q_UNUSED(pValue)
         }
-        void visit(ValueLight* pProperty, QVariantMap &data ) override;
+        void visit(ValueLight* pValue, QVariantMap &data ) override;
         void visit(ValueLight* pValue, QString &action, QVariantMap &data) override;
-        void visit(ValueImg* pProperty) override
+        void visit(ValueImg* pValue) override
         {
-            Q_UNUSED(pProperty)
+            Q_UNUSED(pValue)
         }
-        void visit(ValueImg* pProperty, QVariantMap &data ) override;
+        void visit(ValueImg* pValue, QVariantMap &data ) override;
         void visit(ValueImg* pValue, QString &action, QVariantMap &data) override;
-        void visit(ValueVideo* pProperty) override
+        void visit(ValueVideo* pValue) override
         {
-            Q_UNUSED(pProperty)
+            Q_UNUSED(pValue)
         }
-        void visit(ValueVideo* pProperty, QVariantMap &data ) override;
+        void visit(ValueVideo* pValue, QVariantMap &data ) override;
         void visit(ValueVideo* pValue, QString &action, QVariantMap &data) override;
-        void visit(ValueMessage* pProperty) override
+        void visit(ValueMessage* pValue) override
         {
-            Q_UNUSED(pProperty)
+            Q_UNUSED(pValue)
         }
-        void visit(ValueMessage* pProperty, QVariantMap &data ) override;
+        void visit(ValueMessage* pValue, QVariantMap &data ) override;
         void visit(ValueMessage* pValue, QString &action, QVariantMap &data) override;
-        void visit(ValueGraph* pProperty) override
+        void visit(ValueGraph* pValue) override
         {
-            Q_UNUSED(pProperty)
+            Q_UNUSED(pValue)
         }
-        void visit(ValueGraph* pProperty, QVariantMap &data ) override;
+        void visit(ValueGraph* pValue, QVariantMap &data ) override;
         void visit(ValueGraph* pValue, QString &action, QVariantMap &data) override;
-        void visit(ValuePrg* pProperty) override
+        void visit(ValuePrg* pValue) override
         {
-            Q_UNUSED(pProperty)
+            Q_UNUSED(pValue)
         }
-        void visit(ValuePrg* pProperty, QVariantMap &data ) override;
+        void visit(ValuePrg* pValue, QVariantMap &data ) override;
         void visit(ValuePrg* pValue, QString &action, QVariantMap &data) override;
 
         [[nodiscard]] const QVariantList &getGrid() const
@@ -90,4 +90,4 @@ class ValueUpdate : public ValueVisitor
 
 };
 }
-#endif //OST_PROPERTYUPDATE_H
+#endif //OST_VALUEUPDATE_H
