@@ -49,9 +49,9 @@
                 "value":"basemodule"
             },
             "moduleVersion": {
-                "type": "int",
+                "type": "string",
                 "label": "Version",
-                "value":1
+                "value":"1"
             },
             "baseVersion": {
                 "type": "int",

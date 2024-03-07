@@ -6,7 +6,7 @@
 namespace  OST
 {
 
-class ValuePrg: public ValueSingle<double>
+class ValuePrg: public ValueSingleNotNumeric<double>
 {
 
         Q_OBJECT

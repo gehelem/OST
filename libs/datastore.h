@@ -7,6 +7,7 @@
 #include <propertyupdate.h>
 #include <propertyfactory.h>
 #include <lovfactory.h>
+#include <valueset.h>
 #include <valueupdate.h>
 #include <valuejsondumper.h>
 #include <lovjsondumper.h>

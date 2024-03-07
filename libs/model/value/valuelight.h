@@ -6,7 +6,7 @@
 namespace  OST
 {
 
-class ValueLight: public ValueSingle<State>
+class ValueLight: public ValueSingleNotNumeric<State>
 {
 
         Q_OBJECT

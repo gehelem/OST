@@ -39,6 +39,7 @@ class MODULE_INIT Dummy : public IndiModule
         OST::ValueLight *dynlight;
         OST::ValueString *dyntext;
         OST::ValueBool *dynbool;
+        OST::ValueString *dyntext2;
 
 
 };

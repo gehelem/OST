@@ -102,6 +102,9 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     dynprop->addValue("dynbool", dynbool);
     dynbool->setValue(false, false);
 
+    dyntext2 = getValueString("extextRW", "extext1");
+    dyntext2->setValue("torototo", true);
+
     giveMeADevice("camera", "Multipurpose camera", INDI::BaseDevice::CCD_INTERFACE);
     giveMeADevice("mount", "Multipurpose mount", INDI::BaseDevice::TELESCOPE_INTERFACE);
     defineMeAsFocuser();

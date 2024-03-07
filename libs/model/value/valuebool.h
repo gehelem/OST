@@ -6,7 +6,7 @@
 namespace  OST
 {
 
-class ValueBool: public ValueSingle<bool>
+class ValueBool: public ValueSingleNotNumeric<bool>
 {
 
         Q_OBJECT

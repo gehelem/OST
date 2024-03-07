@@ -19,23 +19,9 @@ class ValueSingle : public ValueBase
             mGridValues.clear();
         }
         ~ValueSingle() {}
-        T value()
-        {
-            //if constexpr (std::is_same_v<T, int>)
-            //{
-            //    return 0;
-            //}
-            return mValue;
-        }
         QString getType() override
         {
             return "error";
-        }
-        bool setValue(const T &value, const bool &emitEvent)
-        {
-            mValue = value;
-            if (emitEvent) emit valueChanged(this);
-            return true;
         }
         QList<T> getGrid()
         {
@@ -120,7 +106,6 @@ class ValueSingle : public ValueBase
             mPostIcon = s;
         }
     private:
-        T mValue;
         QList<T> mGridValues = QList<T>();
         int mArrayLimit = 0;
         QString mGlobalLov = "";
@@ -139,6 +124,10 @@ class ValueSingleNumeric : public ValueSingle<T>
         {
         }
         ~ValueSingleNumeric<T>() {}
+        T value()
+        {
+            return mValue;
+        }
         bool setValue(const T &value, const bool &emitEvent)
         {
             if (mUseMinMax)
@@ -156,7 +145,9 @@ class ValueSingleNumeric : public ValueSingle<T>
                     return false;
                 }
             }
-            ValueSingle<T>::setValue(value, emitEvent);
+            mValue = value;
+            if (emitEvent) emit ValueBase::valueSet(this);
+            return true;
         }
         T min()
         {
@@ -165,6 +156,7 @@ class ValueSingleNumeric : public ValueSingle<T>
         void setMin(const T &min)
         {
             mMin = min;
+            emit ValueBase::valueChanged(this);
         }
         int max()
         {
@@ -173,18 +165,21 @@ class ValueSingleNumeric : public ValueSingle<T>
         void setMax(const T &max)
         {
             mMax = max;
+            emit ValueBase::valueChanged(this);
         }
         void setMinMax(const T &min, const T &max)
         {
             mMin = min;
             mMax = max;
             mUseMinMax = true;
+            emit ValueBase::valueChanged(this);
         }
         void unSetMinMax(void)
         {
             mMin = 0;
             mMax = 0;
             mUseMinMax = false;
+            emit ValueBase::valueChanged(this);
         }
         T step()
         {
@@ -193,6 +188,7 @@ class ValueSingleNumeric : public ValueSingle<T>
         void setStep(const T &step)
         {
             mStep = step;
+            emit ValueBase::valueChanged(this);
         }
 
         QString format()
@@ -202,14 +198,40 @@ class ValueSingleNumeric : public ValueSingle<T>
         void setFormat(const QString &format)
         {
             mFormat = format;
+            emit ValueBase::valueChanged(this);
         }
     private:
+        T mValue;
         T mMin = 0;
         T mMax = 0;
         T mStep = 0;
         bool mUseMinMax = false;
         QString mFormat = "";
 
+};
+template <typename T>
+class ValueSingleNotNumeric : public ValueSingle<T>
+{
+
+    public:
+
+        ValueSingleNotNumeric(const QString &label, const QString &order, const QString &hint):
+            ValueSingle<T>(label, order, hint)
+        {
+        }
+        ~ValueSingleNotNumeric<T>() {}
+        T value()
+        {
+            return mValue;
+        }
+        bool setValue(const T &value, const bool &emitEvent)
+        {
+            mValue = value;
+            if (emitEvent) emit ValueBase::valueSet(this);
+            return true;
+        }
+    private:
+        T mValue;
 };
 
 }

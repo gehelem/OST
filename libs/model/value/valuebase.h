@@ -72,7 +72,8 @@ class ValueBase: public QObject
             emit lovChanged(this);
         }
     signals:
-        void valueChanged(OST::ValueBase*);
+        void valueSet(OST::ValueBase*); /* used in derived template class, only when value is changed*/
+        void valueChanged(OST::ValueBase*); /* used in derived template class, when anything other than value is changed */
         void listChanged(OST::ValueBase*);
         void sendMessage(MsgLevel, QString);
         void lovChanged(OST::ValueBase*);

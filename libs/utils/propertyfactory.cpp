@@ -7,7 +7,7 @@ PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVaria
     //qDebug() << "PropertyFactory::createProperty - " << pData;
     auto *pProperty = new PropertyMulti(pKey,
                                         pData["label"].toString(),
-                                        OST::IntToPermission(pData["permission"].toInt()),
+                                        IntToPermission(pData["permission"].toInt()),
                                         pData["devcat"].toString(),
                                         pData["group"].toString(),
                                         pData["order"].toString(),

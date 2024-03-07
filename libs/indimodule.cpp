@@ -9,9 +9,9 @@ IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap
     setVerbose(false);
     //_moduletype = "IndiModule";
     loadOstPropertiesFromFile(":indimodule.json");
-    setOstElementValue("indiGit", "hash", QString::fromStdString(Version::GIT_SHA1), false);
-    setOstElementValue("indiGit", "date", QString::fromStdString(Version::GIT_DATE), false);
-    setOstElementValue("indiGit", "message", QString::fromStdString(Version::GIT_COMMIT_SUBJECT), false);
+    getValueString("indiGit", "hash")->setValue(QString::fromStdString(Version::GIT_SHA1), false);
+    getValueString("indiGit", "date")->setValue(QString::fromStdString(Version::GIT_DATE), false);
+    getValueString("indiGit", "message")->setValue(QString::fromStdString(Version::GIT_COMMIT_SUBJECT), false);
 
     OST::LovString* ls = new OST::LovString("DRIVER_INTERFACE-TELESCOPE_INTERFACE");
     createGlobLov("DRIVER_INTERFACE-TELESCOPE_INTERFACE", ls);
@@ -52,10 +52,9 @@ void IndiModule::OnDispatchToIndiExternalEvent(const QString &eventType, const Q
             //setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
             if (keyprop == "serveractions")
             {
-                setOstElementValue(keyprop, keyelt, false, false);
+                getValueBool(keyprop, keyelt)->setValue(false, false);
                 if (keyelt == "conserv")
                 {
-
                     getProperty(keyprop)->setState(OST::Busy);
                     if (connectIndi()) getProperty(keyprop)->setState(OST::Ok);
                     else getProperty(keyprop)->setState(OST::Error);
@@ -69,7 +68,7 @@ void IndiModule::OnDispatchToIndiExternalEvent(const QString &eventType, const Q
             }
             if (keyprop == "devicesactions")
             {
-                setOstElementValue(keyprop, keyelt, false, false);
+                getValueBool(keyprop, keyelt)->setValue(false, false);
                 if (!isServerConnected())
                 {
                     sendWarning("Indi server not connected");

@@ -94,12 +94,12 @@ class Basemodule : public DBManager
         void setModuleDescription(QString description)
         {
             mModuleDescription = description;
-            setOstElementValue("moduleInfo", "moduleDescription", description, true);
+            getValueString("moduleInfo", "moduleDescription")->setValue(description, true);
         }
         void setModuleVersion(QString version)
         {
             mModuleVersion = version;
-            setOstElementValue("moduleInfo", "moduleVersion", version, true);
+            getValueString("moduleInfo", "moduleVersion")->setValue(version, true);
 
         }
 
@@ -115,6 +115,7 @@ class Basemodule : public DBManager
         QString mModuleDescription;
         QString mModuleVersion;
         QString mClassName = "";
+        OST::ValueString* mModuleDesc;
 
         void OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                            const QVariantMap &eventData) override;

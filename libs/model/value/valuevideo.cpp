@@ -2,7 +2,7 @@
 namespace  OST
 {
 ValueVideo::ValueVideo(const QString &label, const QString &order, const QString &hint)
-    : ValueSingle(label, order, hint)
+    : ValueSingleNotNumeric(label, order, hint)
 {
 }
 ValueVideo::~ValueVideo()

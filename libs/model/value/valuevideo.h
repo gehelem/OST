@@ -6,7 +6,7 @@
 namespace  OST
 {
 
-class ValueVideo: public ValueSingle<VideoData>
+class ValueVideo: public ValueSingleNotNumeric<VideoData>
 {
 
         Q_OBJECT
@@ -31,6 +31,7 @@ class ValueVideo: public ValueSingle<VideoData>
         {
             return "video";
         }
+    private:
 
 };
 

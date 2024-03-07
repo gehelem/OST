@@ -6,7 +6,7 @@
 namespace  OST
 {
 
-class ValueImg: public ValueSingle<ImgData>
+class ValueImg: public ValueSingleNotNumeric<ImgData>
 {
 
         Q_OBJECT

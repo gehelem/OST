@@ -5,7 +5,7 @@
 namespace  OST
 {
 
-class ValueString: public ValueSingle<QString>
+class ValueString: public ValueSingleNotNumeric<QString>
 {
 
         Q_OBJECT

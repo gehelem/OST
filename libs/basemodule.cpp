@@ -11,14 +11,16 @@ Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap
     Q_INIT_RESOURCE(basemodule);
     Q_UNUSED(profile)
     loadOstPropertiesFromFile(":basemodule.json");
-    setOstElementValue("moduleInfo", "moduleLabel", label, false);
-    setOstElementValue("moduleInfo", "moduleName", name, false);
-    setOstElementValue("moduleInfo", "moduleVersion", 0, false);
-    setOstElementValue("baseGit", "hash", QString::fromStdString(Version::GIT_SHA1), false);
-    setOstElementValue("baseGit", "date", QString::fromStdString(Version::GIT_DATE), false);
-    setOstElementValue("baseGit", "message", QString::fromStdString(Version::GIT_COMMIT_SUBJECT), false);
+    mModuleDesc = getValueString("moduleInfo", "moduleDescription");
+    getValueString("moduleInfo", "moduleLabel")->setValue(label, false);
+    getValueString("moduleInfo", "moduleName")->setValue(name, false);
+    getValueString("moduleInfo", "moduleVersion")->setValue(0, false);
+    getValueString("baseGit", "hash")->setValue(QString::fromStdString(Version::GIT_SHA1), true);
+    getValueString("baseGit", "date")->setValue(QString::fromStdString(Version::GIT_DATE), true);
+    getValueString("baseGit", "message")->setValue(QString::fromStdString(Version::GIT_COMMIT_SUBJECT), true);
 
     setModuleDescription("base module description - developer should change this message");
+    mModuleDesc->setValue("base module description - developer should change this message", false);
     setModuleVersion("0.1");
 
 }
@@ -66,7 +68,24 @@ void Basemodule::setProfile(QVariantMap profiledata)
                 {
                     foreach(const QString &eltkey, props[key].toMap()["elements"].toMap().keys())
                     {
-                        setOstElementValue(key, eltkey, props[key].toMap()["elements"].toMap()[eltkey].toMap()["value"], true);
+                        QVariant v = props[key].toMap()["elements"].toMap()[eltkey].toMap()["value"];
+                        if (getValueBase(key, eltkey)->getType() == "int")
+                        {
+                            getValueInt(key, eltkey)->setValue(v.toInt(), true);
+                        }
+                        if (getValueBase(key, eltkey)->getType() == "float")
+                        {
+                            getValueFloat(key, eltkey)->setValue(v.toDouble(), true);
+                        }
+                        if (getValueBase(key, eltkey)->getType() == "string")
+                        {
+                            getValueString(key, eltkey)->setValue(v.toString(), true);
+                        }
+                        if (getValueBase(key, eltkey)->getType() == "bool")
+                        {
+                            getValueBool(key, eltkey)->setValue(v.toBool(), true);
+                        }
+
 
                         if (props[key].toMap()["elements"].toMap()[eltkey].toMap().contains("gridvalues"))
                         {
@@ -144,7 +163,23 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
             {
                 if (getStore()[keyprop]->getValue(keyelt)->autoUpdate() )
                 {
-                    setOstElementValue(keyprop, keyelt, pEventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
+                    QVariant v = pEventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
+                    if (getValueBase(keyprop, keyelt)->getType() == "int")
+                    {
+                        getValueInt(keyprop, keyelt)->setValue(v.toInt(), true);
+                    }
+                    if (getValueBase(keyprop, keyelt)->getType() == "float")
+                    {
+                        getValueFloat(keyprop, keyelt)->setValue(v.toDouble(), true);
+                    }
+                    if (getValueBase(keyprop, keyelt)->getType() == "string")
+                    {
+                        getValueString(keyprop, keyelt)->setValue(v.toString(), true);
+                    }
+                    if (getValueBase(keyprop, keyelt)->getType() == "bool")
+                    {
+                        getValueBool(keyprop, keyelt)->setValue(v.toBool(), true);
+                    }
                     //sendMessage("Autoupdate - property " + keyprop + " - element " + keyelt);
                 }
             }
@@ -196,7 +231,7 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
             sendMessage(getString("loadprofile", "name") + " profile sucessfully loaded");
             emit moduleEvent("moduleloadedprofile", getModuleName(), getString("loadprofile", "name"),
                              QVariantMap());
-            setOstElementValue("saveprofile", "name", getString("loadprofile", "name"), true);
+            getValueString("saveprofile", "name")->setValue(getString("loadprofile", "name"), true);
             sendDump();
         }
         else
