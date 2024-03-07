@@ -176,6 +176,8 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyupdate.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valueupdate.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valueupdate.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valueset.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valueset.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/fileio.cpp
@@ -234,6 +236,7 @@ set(BASE_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuejsondumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyupdate.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valueupdate.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valueset.h
 )
 set_target_properties(ostbasemodule PROPERTIES PUBLIC_HEADER "${BASE_PUBLIC_HEADERS}")
 
