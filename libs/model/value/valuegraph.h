@@ -46,12 +46,18 @@ class ValueGraph: public ValueSingleNotNumeric<GraphDefs>
 
 class GridGraph: public GridTemplate<GraphDefs>
 {
+
+        Q_OBJECT
+
     public:
 
         void accept(GridVisitor* pVisitor, QVariant &data)  override
         {
             pVisitor->visit(this, data);
         }
+
+        GridGraph(ValueBase* value): GridTemplate<GraphDefs>(value) {}
+        ~GridGraph() {}
 
         QString getType() override
         {

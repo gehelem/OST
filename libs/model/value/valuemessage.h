@@ -63,12 +63,18 @@ class ValueMessage: public ValueSingleNotNumeric<QString>
 
 class GridMessage: public GridTemplate<QString>
 {
+
+        Q_OBJECT
+
     public:
 
         void accept(GridVisitor* pVisitor, QVariant &data)  override
         {
             pVisitor->visit(this, data);
         }
+
+        GridMessage(ValueBase* value): GridTemplate<QString>(value) {}
+        ~GridMessage() {}
 
         QString getType() override
         {

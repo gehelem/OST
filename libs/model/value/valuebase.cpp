@@ -11,4 +11,15 @@ ValueBase::~ValueBase()
 
 }
 
+GridBase::GridBase(ValueBase* value): mValue(value)
+{
+
+}
+GridBase::~GridBase()
+{
+
+}
+
+
+
 }

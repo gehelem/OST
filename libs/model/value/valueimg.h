@@ -37,6 +37,9 @@ class ValueImg: public ValueSingleNotNumeric<ImgData>
 
 class GridImg: public GridTemplate<ImgData>
 {
+
+        Q_OBJECT
+
     public:
 
         void accept(GridVisitor* pVisitor, QVariant &data)  override
@@ -44,6 +47,8 @@ class GridImg: public GridTemplate<ImgData>
             pVisitor->visit(this, data);
         }
 
+        GridImg(ValueBase* value): GridTemplate<ImgData>(value) {}
+        ~GridImg() {}
         QString getType() override
         {
             return "img";

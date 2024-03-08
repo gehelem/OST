@@ -57,12 +57,17 @@ class ValueString: public ValueSingleNotNumeric<QString>
 
 class GridString: public GridTemplate<QString>
 {
-    public:
 
+        Q_OBJECT
+
+    public:
         void accept(GridVisitor* pVisitor, QVariant &data)  override
         {
             pVisitor->visit(this, data);
         }
+
+        GridString(ValueBase* value): GridTemplate<QString>(value) {}
+        ~GridString() {}
 
         QString getType() override
         {

@@ -58,12 +58,18 @@ class ValueInt: public ValueSingleNumeric<int>
 
 class GridInt: public GridTemplate<int>
 {
+
+        Q_OBJECT
+
     public:
 
         void accept(GridVisitor* pVisitor, QVariant &data)  override
         {
             pVisitor->visit(this, data);
         }
+
+        GridInt(ValueBase* value): GridTemplate<int>(value) {}
+        ~GridInt() {}
 
         QString getType() override
         {

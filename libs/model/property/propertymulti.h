@@ -76,6 +76,7 @@ class PropertyMulti: public PropertyBase
             //qDebug() << label() << " - addValue - element " << key << " OK " << pValue;
             mValues[key] = pValue;
             GridBase* b = GridFactory::createGrid(pValue);
+            mGrids[key] = b;
             connect(mValues[key], &ValueBase::valueChanged, this, &PropertyMulti::OnValueChanged);
             connect(mValues[key], &ValueBase::listChanged, this, &PropertyMulti::OnListChanged);
             connect(mValues[key], &ValueBase::lovChanged, this, &PropertyMulti::OnLovChanged);

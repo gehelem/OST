@@ -60,12 +60,17 @@ class ValueFloat: public ValueSingleNumeric<double>
 
 class GridFloat: public GridTemplate<double>
 {
+
+        Q_OBJECT
+
     public:
 
         void accept(GridVisitor* pVisitor, QVariant &data)  override
         {
             pVisitor->visit(this, data);
         }
+        GridFloat(ValueBase* value): GridTemplate<double>(value) {}
+        ~GridFloat() {}
 
         QString getType() override
         {

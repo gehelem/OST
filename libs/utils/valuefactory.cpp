@@ -303,7 +303,54 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
 
 GridBase *GridFactory::createGrid(ValueBase * &pValue)
 {
-    qDebug() << "createGrid " << pValue->getType();
+    if (pValue->getType() == "string")
+    {
+        auto *pGrid = new GridString(pValue);
+        return pGrid;
+    }
+    if (pValue->getType() == "int")
+    {
+        auto *pGrid = new GridInt(pValue);
+        return pGrid;
+    }
+    if (pValue->getType() == "bool")
+    {
+        auto *pGrid = new GridBool(pValue);
+        return pGrid;
+    }
+    if (pValue->getType() == "float")
+    {
+        auto *pGrid = new GridFloat(pValue);
+        return pGrid;
+    }
+    if (pValue->getType() == "prg")
+    {
+        auto *pGrid = new GridPrg(pValue);
+        return pGrid;
+    }
+    if (pValue->getType() == "message")
+    {
+        auto *pGrid = new GridMessage(pValue);
+        return pGrid;
+    }
+    if (pValue->getType() == "video")
+    {
+        auto *pGrid = new GridVideo(pValue);
+        return pGrid;
+    }
+    if (pValue->getType() == "img")
+    {
+        auto *pGrid = new GridImg(pValue);
+        return pGrid;
+    }
+    if (pValue->getType() == "light")
+    {
+        auto *pGrid = new GridLight(pValue);
+        return pGrid;
+    }
+
+    qDebug() << "Unhandled grid type " << pValue->getType();
+
     return nullptr;
 
 }

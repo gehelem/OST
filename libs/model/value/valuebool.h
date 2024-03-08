@@ -38,12 +38,16 @@ class ValueBool: public ValueSingleNotNumeric<bool>
 
 class GridBool: public GridTemplate<bool>
 {
+        Q_OBJECT
+
     public:
 
         void accept(GridVisitor* pVisitor, QVariant &data)  override
         {
             pVisitor->visit(this, data);
         }
+        GridBool(ValueBase* value): GridTemplate<bool>(value) {}
+        ~GridBool() {}
 
         QString getType() override
         {

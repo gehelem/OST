@@ -38,12 +38,18 @@ class ValueLight: public ValueSingleNotNumeric<State>
 
 class GridLight: public GridTemplate<State>
 {
+
+        Q_OBJECT
+
     public:
 
         void accept(GridVisitor* pVisitor, QVariant &data)  override
         {
             pVisitor->visit(this, data);
         }
+
+        GridLight(ValueBase* value): GridTemplate<State>(value) {}
+        ~GridLight() {}
 
         QString getType() override
         {
