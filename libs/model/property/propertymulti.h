@@ -90,6 +90,7 @@ class PropertyMulti: public PropertyBase
                 return;
             }
             mValues.remove(key);
+            mGrids.remove(key);
             emit propertyEvent("ap", key, this);
 
         }
