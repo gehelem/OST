@@ -24,5 +24,13 @@ class ValueFactory
         static ValueBase* createValue(const QVariantMap &pData);
 };
 
+class GridFactory
+{
+
+    public:
+        GridFactory() = delete;
+        static GridBase* createGrid(ValueBase* &pValue);
+};
+
 }
 #endif //OST_VALUEFACTORY_H

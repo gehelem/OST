@@ -88,12 +88,11 @@ class GridBase: public QObject
     public:
         virtual void accept(GridVisitor* pVisitor, QVariant &data) = 0;
 
-        GridBase(ValueBase* value) : mValue(value)
+        GridBase()
         {
         }
         ~GridBase();
         virtual QString getType() = 0;
-    protected:
         ValueBase* mValue;
 
 };

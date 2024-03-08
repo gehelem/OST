@@ -2,6 +2,7 @@
 #define PROPERTYMULTI_h_
 
 #include <propertybase.h>
+#include <valuefactory.h>
 namespace  OST
 {
 
@@ -74,6 +75,7 @@ class PropertyMulti: public PropertyBase
             }
             //qDebug() << label() << " - addValue - element " << key << " OK " << pValue;
             mValues[key] = pValue;
+            GridBase* b = GridFactory::createGrid(pValue);
             connect(mValues[key], &ValueBase::valueChanged, this, &PropertyMulti::OnValueChanged);
             connect(mValues[key], &ValueBase::listChanged, this, &PropertyMulti::OnListChanged);
             connect(mValues[key], &ValueBase::lovChanged, this, &PropertyMulti::OnLovChanged);
@@ -130,6 +132,7 @@ class PropertyMulti: public PropertyBase
     private:
         SwitchsRule mRule = SwitchsRule::Any;
         QMap<QString, ValueBase*> mValues;
+        QMap<QString, GridBase*> mGrids;
 
 
 };

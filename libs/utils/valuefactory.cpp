@@ -301,5 +301,12 @@ ValueBase *ValueFactory::createValue(const QVariantMap &pData)
 
 }
 
+GridBase *GridFactory::createGrid(ValueBase * &pValue)
+{
+    qDebug() << "createGrid " << pValue->getType();
+    return nullptr;
+
+}
+
 
 }
