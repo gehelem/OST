@@ -56,6 +56,10 @@ class PropertyMulti: public PropertyBase
         {
             return &mValues;
         }
+        QMap<QString, GridBase*> getGrids()
+        {
+            return mGrids;
+        }
         OST::ValueBase* getValue(QString pElement)
         {
             if (!mValues.contains(pElement))
@@ -130,7 +134,7 @@ class PropertyMulti: public PropertyBase
                     break;
             }
         }
-
+        QJsonObject getJsonGrids();
     private:
         SwitchsRule mRule = SwitchsRule::Any;
         QMap<QString, ValueBase*> mValues;

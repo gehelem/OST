@@ -348,6 +348,11 @@ GridBase *GridFactory::createGrid(ValueBase * &pValue)
         auto *pGrid = new GridLight(pValue);
         return pGrid;
     }
+    if (pValue->getType() == "graph")
+    {
+        auto *pGrid = new GridGraph(pValue);
+        return pGrid;
+    }
 
     qDebug() << "Unhandled grid type " << pValue->getType();
 

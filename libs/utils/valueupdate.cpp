@@ -611,5 +611,109 @@ void GridUpdate::visit(GridPrg* pGrid, QString &action, int &line)
 }
 
 
+QJsonObject GridJsonDumper::dumpGridCommons(GridBase *pGrid)
+{
+    QJsonObject json;
+    json["type"] = pGrid->getType();
+    return json;
+
+}
+void GridJsonDumper::visit(GridInt* pGrid, QString &action, int &line)
+{
+    QJsonObject json = dumpGridCommons(pGrid);
+    if (pGrid->items.size() > 0)
+    {
+        QJsonArray arr;
+        foreach (int val, pGrid->items)
+        {
+            QVariant v = QVariant::fromValue(val);
+            arr.append(v.toJsonValue());
+        }
+
+        json["gridvalues"] = arr;
+    }
+    mResult = json;
+}
+void GridJsonDumper::visit(GridString* pGrid, QString &action, int &line)
+{
+    QJsonObject json = dumpGridCommons(pGrid);
+    if (pGrid->items.size() > 0)
+    {
+        QJsonArray arr;
+        foreach (QString val, pGrid->items)
+        {
+            QVariant v = QVariant::fromValue(val);
+            arr.append(v.toJsonValue());
+        }
+
+        json["gridvalues"] = arr;
+    }
+    mResult = json;
+
+}
+void GridJsonDumper::visit(GridBool* pGrid, QString &action, int &line)
+{
+    QJsonObject json = dumpGridCommons(pGrid);
+    if (pGrid->items.size() > 0)
+    {
+        QJsonArray arr;
+        foreach (bool val, pGrid->items)
+        {
+            QVariant v = QVariant::fromValue(val);
+            arr.append(v.toJsonValue());
+        }
+
+        json["gridvalues"] = arr;
+    }
+    mResult = json;
+
+}
+void GridJsonDumper::visit(GridImg* pGrid, QString &action, int &line)
+{
+    QJsonObject json = dumpGridCommons(pGrid);
+    mResult = json;
+}
+void GridJsonDumper::visit(GridFloat* pGrid, QString &action, int &line)
+{
+    QJsonObject json = dumpGridCommons(pGrid);
+    if (pGrid->items.size() > 0)
+    {
+        QJsonArray arr;
+        foreach (double val, pGrid->items)
+        {
+            QVariant v = QVariant::fromValue(val);
+            arr.append(v.toJsonValue());
+        }
+
+        json["gridvalues"] = arr;
+    }
+    mResult = json;
+}
+void GridJsonDumper::visit(GridMessage* pGrid, QString &action, int &line)
+{
+    QJsonObject json = dumpGridCommons(pGrid);
+    mResult = json;
+}
+void GridJsonDumper::visit(GridVideo* pGrid, QString &action, int &line)
+{
+    QJsonObject json = dumpGridCommons(pGrid);
+    mResult = json;
+}
+void GridJsonDumper::visit(GridLight* pGrid, QString &action, int &line)
+{
+    QJsonObject json = dumpGridCommons(pGrid);
+    mResult = json;
+}
+void GridJsonDumper::visit(GridPrg* pGrid, QString &action, int &line)
+{
+    QJsonObject json = dumpGridCommons(pGrid);
+    mResult = json;
+}
+void GridJsonDumper::visit(GridGraph* pGrid, QString &action, int &line)
+{
+    QJsonObject json = dumpGridCommons(pGrid);
+    mResult = json;
+}
+
 
 }
