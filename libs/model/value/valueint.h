@@ -63,18 +63,19 @@ class GridInt: public GridTemplate<int>
 
     public:
 
-        void accept(GridVisitor* pVisitor, QVariant &data)  override
+        void accept(GridVisitor* pVisitor, QString &action, int &line)  override
         {
-            pVisitor->visit(this, data);
+            pVisitor->visit(this, action, line);
         }
 
-        GridInt(ValueBase* value): GridTemplate<int>(value) {}
+        GridInt(ValueBase* value): GridTemplate<int>(value), mElement(static_cast<ValueInt*>(value)) {}
         ~GridInt() {}
 
         QString getType() override
         {
             return "int";
         }
+        ValueInt* mElement;
 };
 
 }

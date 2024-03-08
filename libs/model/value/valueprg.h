@@ -73,18 +73,19 @@ class GridPrg: public GridTemplate<double>
 
     public:
 
-        void accept(GridVisitor* pVisitor, QVariant &data)  override
+        void accept(GridVisitor* pVisitor, QString &action, int &line)  override
         {
-            pVisitor->visit(this, data);
+            pVisitor->visit(this, action, line);
         }
 
-        GridPrg(ValueBase* value): GridTemplate<double>(value) {}
+        GridPrg(ValueBase* value): GridTemplate<double>(value), mElement(static_cast<ValuePrg*>(value)) {}
         ~GridPrg() {}
 
         QString getType() override
         {
             return "prg";
         }
+        ValuePrg* mElement;
 };
 
 }

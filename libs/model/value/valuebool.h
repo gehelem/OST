@@ -42,17 +42,18 @@ class GridBool: public GridTemplate<bool>
 
     public:
 
-        void accept(GridVisitor* pVisitor, QVariant &data)  override
+        void accept(GridVisitor* pVisitor, QString &action, int &line)  override
         {
-            pVisitor->visit(this, data);
+            pVisitor->visit(this, action, line);
         }
-        GridBool(ValueBase* value): GridTemplate<bool>(value) {}
+        GridBool(ValueBase* value): GridTemplate<bool>(value), mElement(static_cast<ValueBool*>(value)) {}
         ~GridBool() {}
 
         QString getType() override
         {
             return "bool";
         }
+        ValueBool* mElement;
 };
 
 }

@@ -42,18 +42,20 @@ class GridVideo: public GridTemplate<VideoData>
 
     public:
 
-        void accept(GridVisitor* pVisitor, QVariant &data)  override
+        void accept(GridVisitor* pVisitor, QString &action, int &line)  override
         {
-            pVisitor->visit(this, data);
+            pVisitor->visit(this, action, line);
         }
 
-        GridVideo(ValueBase* value): GridTemplate<VideoData>(value) {}
+        GridVideo(ValueBase* value): GridTemplate<VideoData>(value), mElement(static_cast<ValueVideo*>(value)) {}
         ~GridVideo() {}
 
         QString getType() override
         {
             return "video";
         }
+        ValueVideo* mElement;
+
 };
 }
 #endif

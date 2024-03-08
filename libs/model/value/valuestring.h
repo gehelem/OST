@@ -61,18 +61,19 @@ class GridString: public GridTemplate<QString>
         Q_OBJECT
 
     public:
-        void accept(GridVisitor* pVisitor, QVariant &data)  override
+        void accept(GridVisitor* pVisitor, QString &action, int &line)  override
         {
-            pVisitor->visit(this, data);
+            pVisitor->visit(this, action, line);
         }
 
-        GridString(ValueBase* value): GridTemplate<QString>(value) {}
+        GridString(ValueBase* value): GridTemplate<QString>(value), mElement(static_cast<ValueString*>(value)) {}
         ~GridString() {}
 
         QString getType() override
         {
             return "string";
         }
+        ValueString* mElement;
 };
 
 }

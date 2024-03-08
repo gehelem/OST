@@ -51,18 +51,19 @@ class GridGraph: public GridTemplate<GraphDefs>
 
     public:
 
-        void accept(GridVisitor* pVisitor, QVariant &data)  override
+        void accept(GridVisitor* pVisitor, QString &action, int &line)  override
         {
-            pVisitor->visit(this, data);
+            pVisitor->visit(this, action, line);
         }
 
-        GridGraph(ValueBase* value): GridTemplate<GraphDefs>(value) {}
+        GridGraph(ValueBase* value): GridTemplate<GraphDefs>(value), mElement(static_cast<ValueGraph*>(value)) {}
         ~GridGraph() {}
 
         QString getType() override
         {
             return "graph";
         }
+        ValueGraph* mElement;
 };
 
 

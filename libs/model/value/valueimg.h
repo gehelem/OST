@@ -42,17 +42,18 @@ class GridImg: public GridTemplate<ImgData>
 
     public:
 
-        void accept(GridVisitor* pVisitor, QVariant &data)  override
+        void accept(GridVisitor* pVisitor, QString &action, int &line)  override
         {
-            pVisitor->visit(this, data);
+            pVisitor->visit(this, action, line);
         }
 
-        GridImg(ValueBase* value): GridTemplate<ImgData>(value) {}
+        GridImg(ValueBase* value): GridTemplate<ImgData>(value), mElement(static_cast<ValueImg*>(value)) {}
         ~GridImg() {}
         QString getType() override
         {
             return "img";
         }
+        ValueImg*  mElement;
 };
 
 

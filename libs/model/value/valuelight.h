@@ -43,18 +43,19 @@ class GridLight: public GridTemplate<State>
 
     public:
 
-        void accept(GridVisitor* pVisitor, QVariant &data)  override
+        void accept(GridVisitor* pVisitor, QString &action, int &line)  override
         {
-            pVisitor->visit(this, data);
+            pVisitor->visit(this, action, line);
         }
 
-        GridLight(ValueBase* value): GridTemplate<State>(value) {}
+        GridLight(ValueBase* value): GridTemplate<State>(value), mElement(static_cast<ValueLight*>(value)) {}
         ~GridLight() {}
 
         QString getType() override
         {
             return "light";
         }
+        ValueLight* mElement;
 };
 
 }

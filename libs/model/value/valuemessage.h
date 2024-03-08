@@ -68,18 +68,19 @@ class GridMessage: public GridTemplate<QString>
 
     public:
 
-        void accept(GridVisitor* pVisitor, QVariant &data)  override
+        void accept(GridVisitor* pVisitor, QString &action, int &line)  override
         {
-            pVisitor->visit(this, data);
+            pVisitor->visit(this, action, line);
         }
 
-        GridMessage(ValueBase* value): GridTemplate<QString>(value) {}
+        GridMessage(ValueBase* value): GridTemplate<QString>(value), mElement(static_cast<ValueMessage*>(value)) {}
         ~GridMessage() {}
 
         QString getType() override
         {
             return "message";
         }
+        ValueMessage* mElement;
 };
 
 }

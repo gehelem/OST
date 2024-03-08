@@ -244,7 +244,6 @@ class GridTemplate: public GridBase
         {
             return "error";
         }
-    protected:
         QList<T> items;
 };
 

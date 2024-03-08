@@ -73,16 +73,16 @@ class GridVisitor
         GridVisitor() = default;
 
     public:
-        virtual void visit(GridInt* pValue, QVariant &value) = 0;
-        virtual void visit(GridBool* pValue, QVariant &value) = 0;
-        virtual void visit(GridFloat* pValue, QVariant &value) = 0;
-        virtual void visit(GridString* pValue, QVariant &value) = 0;
-        virtual void visit(GridLight* pValue, QVariant &value) = 0;
-        virtual void visit(GridImg* pValue, QVariant &value) = 0;
-        virtual void visit(GridVideo* pValue, QVariant &value) = 0;
-        virtual void visit(GridMessage* pValue, QVariant &value) = 0;
-        virtual void visit(GridGraph* pValue, QVariant &value) = 0;
-        virtual void visit(GridPrg* pValue, QVariant &value) = 0;
+        virtual void visit(GridInt* pGrid, QString &action, int &line) = 0;
+        virtual void visit(GridBool* pGrid, QString &action, int &line) = 0;
+        virtual void visit(GridFloat* pGrid, QString &action, int &line) = 0;
+        virtual void visit(GridString* pGrid, QString &action, int &line) = 0;
+        virtual void visit(GridLight* pGrid, QString &action, int &line) = 0;
+        virtual void visit(GridImg* pGrid, QString &action, int &line) = 0;
+        virtual void visit(GridVideo* pGrid, QString &action, int &line) = 0;
+        virtual void visit(GridMessage* pGrid, QString &action, int &line) = 0;
+        virtual void visit(GridGraph* pGrid, QString &action, int &line) = 0;
+        virtual void visit(GridPrg* pGrid, QString &action, int &line) = 0;
 };
 
 }

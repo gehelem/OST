@@ -309,5 +309,77 @@ void ValueUpdate::visit(ValuePrg* pValue, QString &action, QVariantMap &data)
 
 }
 
+void GridUpdate::visit(GridInt* pGrid, QString &action, int &line)
+{
+    if(action == "add")
+    {
+        pGrid->items.append(pGrid->mElement->value());
+    }
+}
+void GridUpdate::visit(GridBool* pGrid, QString &action, int &line)
+{
+    if(action == "add")
+    {
+        pGrid->items.append(pGrid->mElement->value());
+    }
+}
+void GridUpdate::visit(GridFloat* pGrid, QString &action, int &line)
+{
+    if(action == "add")
+    {
+        pGrid->items.append(pGrid->mElement->value());
+    }
+}
+void GridUpdate::visit(GridString* pGrid, QString &action, int &line)
+{
+    if(action == "add")
+    {
+        pGrid->items.append(pGrid->mElement->value());
+    }
+}
+void GridUpdate::visit(GridLight* pGrid, QString &action, int &line)
+{
+    if(action == "add")
+    {
+        pGrid->items.append(pGrid->mElement->value());
+    }
+}
+void GridUpdate::visit(GridImg* pGrid, QString &action, int &line)
+{
+    if(action == "add")
+    {
+        pGrid->items.append(pGrid->mElement->value());
+    }
+}
+void GridUpdate::visit(GridVideo* pGrid, QString &action, int &line)
+{
+    if(action == "add")
+    {
+        pGrid->items.append(pGrid->mElement->value());
+    }
+}
+void GridUpdate::visit(GridMessage* pGrid, QString &action, int &line)
+{
+    if(action == "add")
+    {
+        pGrid->items.append(pGrid->mElement->value());
+    }
+}
+void GridUpdate::visit(GridGraph* pGrid, QString &action, int &line)
+{
+    if(action == "add")
+    {
+        pGrid->items.append(pGrid->mElement->value());
+    }
+}
+void GridUpdate::visit(GridPrg* pGrid, QString &action, int &line)
+{
+    if(action == "add")
+    {
+        pGrid->items.append(pGrid->mElement->value());
+    }
+}
+
+
 
 }
