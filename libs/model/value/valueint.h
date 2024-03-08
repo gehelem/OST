@@ -71,5 +71,6 @@ class GridInt: public GridTemplate<int>
         }
 };
 
+}
 
 #endif

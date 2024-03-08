@@ -1,12 +1,12 @@
 #ifndef VALUEGRAPH_h
 #define VALUEGRAPH_h
 
-#include <valuebase.h>
+#include <valuesingle.h>
 
 namespace  OST
 {
 
-class ValueGraph: public ValueBase
+class ValueGraph: public ValueSingleNotNumeric<GraphDefs>
 {
 
         Q_OBJECT
@@ -42,6 +42,21 @@ class ValueGraph: public ValueBase
     private:
         GraphDefs mGraphDefs;
 
+};
+
+class GridGraph: public GridTemplate<GraphDefs>
+{
+    public:
+
+        void accept(GridVisitor* pVisitor, QVariant &data)  override
+        {
+            pVisitor->visit(this, data);
+        }
+
+        QString getType() override
+        {
+            return "graph";
+        }
 };
 
 

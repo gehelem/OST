@@ -1,12 +1,12 @@
 #ifndef VALUEMESSAGE_h
 #define VALUEMESSAGE_h
 
-#include <valuebase.h>
+#include <valuesingle.h>
 
 namespace  OST
 {
 
-class ValueMessage: public ValueBase
+class ValueMessage: public ValueSingleNotNumeric<QString>
 {
 
         Q_OBJECT
@@ -61,6 +61,20 @@ class ValueMessage: public ValueBase
 
 };
 
+class GridMessage: public GridTemplate<QString>
+{
+    public:
+
+        void accept(GridVisitor* pVisitor, QVariant &data)  override
+        {
+            pVisitor->visit(this, data);
+        }
+
+        QString getType() override
+        {
+            return "message";
+        }
+};
 
 }
 #endif
