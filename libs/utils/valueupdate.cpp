@@ -314,70 +314,300 @@ void GridUpdate::visit(GridInt* pGrid, QString &action, int &line)
     if(action == "add")
     {
         pGrid->items.append(pGrid->mElement->value());
+        return;
     }
+    if(line > pGrid->items.size() - 1)
+    {
+        qDebug() << "GridUpdate - index greater than size (" << line << ":" << pGrid->items.size() - 1 << ") - " << action << " - "
+                 << pGrid->mElement->label();
+        return;
+    }
+    if(action == "del")
+    {
+        pGrid->items.removeAt(line);
+        return;
+    }
+    if(action == "upd")
+    {
+        pGrid->items[line] = pGrid->mElement->value();
+        return;
+    }
+    if(action == "fet")
+    {
+        pGrid->mElement->setValue(pGrid->items[line], false);
+        return;
+    }
+    qDebug() << "GridUpdate - unhandled action " << action << " - " << pGrid->mElement->label();
 }
 void GridUpdate::visit(GridBool* pGrid, QString &action, int &line)
 {
     if(action == "add")
     {
         pGrid->items.append(pGrid->mElement->value());
+        return;
     }
+    if(line > pGrid->items.size() - 1)
+    {
+        qDebug() << "GridUpdate - index greater than size (" << line << ":" << pGrid->items.size() - 1 << ") - " << action << " - "
+                 << pGrid->mElement->label();
+        return;
+    }
+    if(action == "del")
+    {
+        pGrid->items.removeAt(line);
+        return;
+    }
+    if(action == "upd")
+    {
+        pGrid->items[line] = pGrid->mElement->value();
+        return;
+    }
+    if(action == "fet")
+    {
+        pGrid->mElement->setValue(pGrid->items[line], false);
+        return;
+    }
+    qDebug() << "GridUpdate - unhandled action " << action << " - " << pGrid->mElement->label();
 }
 void GridUpdate::visit(GridFloat* pGrid, QString &action, int &line)
 {
     if(action == "add")
     {
         pGrid->items.append(pGrid->mElement->value());
+        return;
     }
+    if(line > pGrid->items.size() - 1)
+    {
+        qDebug() << "GridUpdate - index greater than size (" << line << ":" << pGrid->items.size() - 1 << ") - " << action << " - "
+                 << pGrid->mElement->label();
+        return;
+    }
+    if(action == "del")
+    {
+        pGrid->items.removeAt(line);
+        return;
+    }
+    if(action == "upd")
+    {
+        pGrid->items[line] = pGrid->mElement->value();
+        return;
+    }
+    if(action == "fet")
+    {
+        pGrid->mElement->setValue(pGrid->items[line], false);
+        return;
+    }
+    qDebug() << "GridUpdate - unhandled action " << action << " - " << pGrid->mElement->label();
 }
 void GridUpdate::visit(GridString* pGrid, QString &action, int &line)
 {
     if(action == "add")
     {
         pGrid->items.append(pGrid->mElement->value());
+        return;
     }
+    if(line > pGrid->items.size() - 1)
+    {
+        qDebug() << "GridUpdate - index greater than size (" << line << ":" << pGrid->items.size() - 1 << ") - " << action << " - "
+                 << pGrid->mElement->label();
+        return;
+    }
+    if(action == "del")
+    {
+        pGrid->items.removeAt(line);
+        return;
+    }
+    if(action == "upd")
+    {
+        pGrid->items[line] = pGrid->mElement->value();
+        return;
+    }
+    if(action == "fet")
+    {
+        pGrid->mElement->setValue(pGrid->items[line], false);
+        return;
+    }
+    qDebug() << "GridUpdate - unhandled action " << action << " - " << pGrid->mElement->label();
 }
 void GridUpdate::visit(GridLight* pGrid, QString &action, int &line)
 {
     if(action == "add")
     {
         pGrid->items.append(pGrid->mElement->value());
+        return;
     }
+    if(line > pGrid->items.size() - 1)
+    {
+        qDebug() << "GridUpdate - index greater than size (" << line << ":" << pGrid->items.size() - 1 << ") - " << action << " - "
+                 << pGrid->mElement->label();
+        return;
+    }
+    if(action == "del")
+    {
+        pGrid->items.removeAt(line);
+        return;
+    }
+    if(action == "upd")
+    {
+        pGrid->items[line] = pGrid->mElement->value();
+        return;
+    }
+    if(action == "fet")
+    {
+        pGrid->mElement->setValue(pGrid->items[line], false);
+        return;
+    }
+    qDebug() << "GridUpdate - unhandled action " << action << " - " << pGrid->mElement->label();
 }
 void GridUpdate::visit(GridImg* pGrid, QString &action, int &line)
 {
     if(action == "add")
     {
         pGrid->items.append(pGrid->mElement->value());
+        return;
     }
+    if(line > pGrid->items.size() - 1)
+    {
+        qDebug() << "GridUpdate - index greater than size (" << line << ":" << pGrid->items.size() - 1 << ") - " << action << " - "
+                 << pGrid->mElement->label();
+        return;
+    }
+    if(action == "del")
+    {
+        pGrid->items.removeAt(line);
+        return;
+    }
+    if(action == "upd")
+    {
+        pGrid->items[line] = pGrid->mElement->value();
+        return;
+    }
+    if(action == "fet")
+    {
+        pGrid->mElement->setValue(pGrid->items[line], false);
+        return;
+    }
+    qDebug() << "GridUpdate - unhandled action " << action << " - " << pGrid->mElement->label();
 }
 void GridUpdate::visit(GridVideo* pGrid, QString &action, int &line)
 {
     if(action == "add")
     {
         pGrid->items.append(pGrid->mElement->value());
+        return;
     }
+    if(line > pGrid->items.size() - 1)
+    {
+        qDebug() << "GridUpdate - index greater than size (" << line << ":" << pGrid->items.size() - 1 << ") - " << action << " - "
+                 << pGrid->mElement->label();
+        return;
+    }
+    if(action == "del")
+    {
+        pGrid->items.removeAt(line);
+        return;
+    }
+    if(action == "upd")
+    {
+        pGrid->items[line] = pGrid->mElement->value();
+        return;
+    }
+    if(action == "fet")
+    {
+        pGrid->mElement->setValue(pGrid->items[line], false);
+        return;
+    }
+    qDebug() << "GridUpdate - unhandled action " << action << " - " << pGrid->mElement->label();
 }
 void GridUpdate::visit(GridMessage* pGrid, QString &action, int &line)
 {
     if(action == "add")
     {
         pGrid->items.append(pGrid->mElement->value());
+        return;
     }
+    if(line > pGrid->items.size() - 1)
+    {
+        qDebug() << "GridUpdate - index greater than size (" << line << ":" << pGrid->items.size() - 1 << ") - " << action << " - "
+                 << pGrid->mElement->label();
+        return;
+    }
+    if(action == "del")
+    {
+        pGrid->items.removeAt(line);
+        return;
+    }
+    if(action == "upd")
+    {
+        pGrid->items[line] = pGrid->mElement->value();
+        return;
+    }
+    if(action == "fet")
+    {
+        pGrid->mElement->setValue(pGrid->items[line], false);
+        return;
+    }
+    qDebug() << "GridUpdate - unhandled action " << action << " - " << pGrid->mElement->label();
 }
 void GridUpdate::visit(GridGraph* pGrid, QString &action, int &line)
 {
     if(action == "add")
     {
         pGrid->items.append(pGrid->mElement->value());
+        return;
     }
+    if(line > pGrid->items.size() - 1)
+    {
+        qDebug() << "GridUpdate - index greater than size (" << line << ":" << pGrid->items.size() - 1 << ") - " << action << " - "
+                 << pGrid->mElement->label();
+        return;
+    }
+    if(action == "del")
+    {
+        pGrid->items.removeAt(line);
+        return;
+    }
+    if(action == "upd")
+    {
+        pGrid->items[line] = pGrid->mElement->value();
+        return;
+    }
+    if(action == "fet")
+    {
+        pGrid->mElement->setValue(pGrid->items[line], false);
+        return;
+    }
+    qDebug() << "GridUpdate - unhandled action " << action << " - " << pGrid->mElement->label();
 }
 void GridUpdate::visit(GridPrg* pGrid, QString &action, int &line)
 {
     if(action == "add")
     {
         pGrid->items.append(pGrid->mElement->value());
+        return;
     }
+    if(line > pGrid->items.size() - 1)
+    {
+        qDebug() << "GridUpdate - index greater than size (" << line << ":" << pGrid->items.size() - 1 << ") - " << action << " - "
+                 << pGrid->mElement->label();
+        return;
+    }
+    if(action == "del")
+    {
+        pGrid->items.removeAt(line);
+        return;
+    }
+    if(action == "upd")
+    {
+        pGrid->items[line] = pGrid->mElement->value();
+        return;
+    }
+    if(action == "fet")
+    {
+        pGrid->mElement->setValue(pGrid->items[line], false);
+        return;
+    }
+    qDebug() << "GridUpdate - unhandled action " << action << " - " << pGrid->mElement->label();
 }
 
 
