@@ -8,6 +8,7 @@ namespace  OST
 {
 
 class ValueVisitor;
+class GridVisitor;
 
 class ValueBase: public QObject
 {
@@ -80,6 +81,25 @@ class ValueBase: public QObject
         void gridEvent();
 
 };
+
+class GridBase: public QObject
+{
+        Q_OBJECT
+    public:
+        virtual void accept(GridVisitor* pVisitor, QVariant &data) = 0;
+
+        GridBase(ValueBase* value) : mValue(value)
+        {
+        }
+        ~GridBase();
+        virtual QString getType() = 0;
+    protected:
+        ValueBase* mValue;
+
+};
+
+
+
 
 }
 

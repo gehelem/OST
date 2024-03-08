@@ -56,5 +56,20 @@ class ValueInt: public ValueSingleNumeric<int>
         LovInt mLov;
 };
 
-}
+class GridInt: public GridTemplate<int>
+{
+    public:
+
+        void accept(GridVisitor* pVisitor, QVariant &data)  override
+        {
+            pVisitor->visit(this, data);
+        }
+
+        QString getType() override
+        {
+            return "int";
+        }
+};
+
+
 #endif

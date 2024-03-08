@@ -35,5 +35,21 @@ class ValueImg: public ValueSingleNotNumeric<ImgData>
 
 };
 
+class GridImg: public GridTemplate<ImgData>
+{
+    public:
+
+        void accept(GridVisitor* pVisitor, QVariant &data)  override
+        {
+            pVisitor->visit(this, data);
+        }
+
+        QString getType() override
+        {
+            return "img";
+        }
+};
+
+
 }
 #endif

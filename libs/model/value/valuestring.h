@@ -55,5 +55,20 @@ class ValueString: public ValueSingleNotNumeric<QString>
 
 };
 
+class GridString: public GridTemplate<QString>
+{
+    public:
+
+        void accept(GridVisitor* pVisitor, QVariant &data)  override
+        {
+            pVisitor->visit(this, data);
+        }
+
+        QString getType() override
+        {
+            return "string";
+        }
+};
+
 }
 #endif

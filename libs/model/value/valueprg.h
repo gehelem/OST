@@ -66,5 +66,20 @@ class ValuePrg: public ValueSingleNotNumeric<double>
 
 };
 
+class GridPrg: public GridTemplate<double>
+{
+    public:
+
+        void accept(GridVisitor* pVisitor, QVariant &data)  override
+        {
+            pVisitor->visit(this, data);
+        }
+
+        QString getType() override
+        {
+            return "prg";
+        }
+};
+
 }
 #endif

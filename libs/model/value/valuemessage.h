@@ -61,5 +61,6 @@ class ValueMessage: public ValueBase
 
 };
 
+
 }
 #endif

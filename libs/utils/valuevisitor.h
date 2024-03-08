@@ -54,5 +54,36 @@ class ValueVisitor
         virtual void visit(ValuePrg* pValue, QString &action, QVariantMap &data) = 0;
 };
 
+class GridInt;
+class GridBool;
+class GridFloat;
+class GridString;
+class GridLight;
+class GridImg;
+class GridVideo;
+class GridMessage;
+class GridGraph;
+class GridPrg;
+
+
+class GridVisitor
+{
+
+    protected:
+        GridVisitor() = default;
+
+    public:
+        virtual void visit(GridInt* pValue, QVariant &value) = 0;
+        virtual void visit(GridBool* pValue, QVariant &value) = 0;
+        virtual void visit(GridFloat* pValue, QVariant &value) = 0;
+        virtual void visit(GridString* pValue, QVariant &value) = 0;
+        virtual void visit(GridLight* pValue, QVariant &value) = 0;
+        virtual void visit(GridImg* pValue, QVariant &value) = 0;
+        virtual void visit(GridVideo* pValue, QVariant &value) = 0;
+        virtual void visit(GridMessage* pValue, QVariant &value) = 0;
+        virtual void visit(GridGraph* pValue, QVariant &value) = 0;
+        virtual void visit(GridPrg* pValue, QVariant &value) = 0;
+};
+
 }
 #endif //OST_VALUEVISITOR_H

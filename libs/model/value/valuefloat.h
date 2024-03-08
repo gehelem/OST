@@ -58,5 +58,21 @@ class ValueFloat: public ValueSingleNumeric<double>
 
 };
 
+class GridFloat: public GridTemplate<double>
+{
+    public:
+
+        void accept(GridVisitor* pVisitor, QVariant &data)  override
+        {
+            pVisitor->visit(this, data);
+        }
+
+        QString getType() override
+        {
+            return "float";
+        }
+};
+
+
 }
 #endif

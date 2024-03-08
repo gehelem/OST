@@ -36,5 +36,20 @@ class ValueLight: public ValueSingleNotNumeric<State>
 
 };
 
+class GridLight: public GridTemplate<State>
+{
+    public:
+
+        void accept(GridVisitor* pVisitor, QVariant &data)  override
+        {
+            pVisitor->visit(this, data);
+        }
+
+        QString getType() override
+        {
+            return "light";
+        }
+};
+
 }
 #endif

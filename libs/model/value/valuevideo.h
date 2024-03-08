@@ -35,5 +35,19 @@ class ValueVideo: public ValueSingleNotNumeric<VideoData>
 
 };
 
+class GridVideo: public GridTemplate<VideoData>
+{
+    public:
+
+        void accept(GridVisitor* pVisitor, QVariant &data)  override
+        {
+            pVisitor->visit(this, data);
+        }
+
+        QString getType() override
+        {
+            return "video";
+        }
+};
 }
 #endif

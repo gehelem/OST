@@ -234,5 +234,18 @@ class ValueSingleNotNumeric : public ValueSingle<T>
         T mValue;
 };
 
+template <typename T>
+class GridTemplate: public GridBase
+{
+    public:
+        GridTemplate(ValueBase* value) : GridBase(value) {}
+        ~GridTemplate() {}
+        QString getType() override
+        {
+            return "error";
+        }
+        QList<T> items;
+};
+
 }
 #endif
