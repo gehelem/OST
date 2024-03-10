@@ -1,12 +1,12 @@
-#include "valuestring.h"
+#include "elementstring.h"
 namespace  OST
 {
-ValueString::ValueString(const QString &label, const QString &order, const QString &hint)
-    : ValueSingleNotNumeric<QString>(label, order, hint), mLov(label)
+ElementString::ElementString(const QString &label, const QString &order, const QString &hint)
+    : ElementSingleNotNumeric<QString>(label, order, hint), mLov(label)
 {
-    connect(&mLov, &LovString::lovChanged, this, &ValueSingle::OnLovChanged);
+    connect(&mLov, &LovString::lovChanged, this, &ElementSingle::OnLovChanged);
 }
-ValueString::~ValueString()
+ElementString::~ElementString()
 {
 }
 

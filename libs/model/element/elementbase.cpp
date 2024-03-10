@@ -1,17 +1,17 @@
-#include "valuebase.h"
+#include "elementbase.h"
 namespace  OST
 {
 
-ValueBase::ValueBase(const QString &label, const QString &order, const QString &hint)
+ElementBase::ElementBase(const QString &label, const QString &order, const QString &hint)
     : mLabel(label), mOrder(order), mHint(hint)
 {
 }
-ValueBase::~ValueBase()
+ElementBase::~ElementBase()
 {
 
 }
 
-GridBase::GridBase(ValueBase* value)
+GridBase::GridBase(ElementBase* value)
 {
 
 }

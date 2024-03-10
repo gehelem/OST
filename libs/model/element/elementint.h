@@ -1,33 +1,33 @@
-#ifndef VALUEINT_h
-#define VALUEINT_h
+#ifndef ELEMENTINT_h
+#define ELEMENTINT_h
 
-#include <valuesingle.h>
+#include <elementsingle.h>
 #include <lovint.h>
 
 namespace  OST
 {
 
-class ValueInt: public ValueSingleNumeric<int>
+class ElementInt: public ElementSingleNumeric<int>
 {
 
         Q_OBJECT
 
     public:
-        void accept(ValueVisitor *pVisitor) override
+        void accept(ElementVisitor *pVisitor) override
         {
             pVisitor->visit(this);
         }
-        void accept(ValueVisitor *pVisitor, QVariantMap &data) override
+        void accept(ElementVisitor *pVisitor, QVariantMap &data) override
         {
             pVisitor->visit(this, data);
         }
-        void accept(ValueVisitor *pVisitor, QString &action, QVariantMap &data) override
+        void accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data) override
         {
             pVisitor->visit(this, action, data);
         }
 
-        ValueInt(const QString &label, const QString &order, const QString &hint);
-        ~ValueInt();
+        ElementInt(const QString &label, const QString &order, const QString &hint);
+        ~ElementInt();
         QString getType() override
         {
             return "int";
@@ -68,14 +68,14 @@ class GridInt: public GridTemplate<int>
             pVisitor->visit(this, action, line);
         }
 
-        GridInt(ValueBase* value): GridTemplate<int>(value), mElement(static_cast<ValueInt*>(value)) {}
+        GridInt(ElementBase* value): GridTemplate<int>(value), mElement(static_cast<ElementInt*>(value)) {}
         ~GridInt() {}
 
         QString getType() override
         {
             return "int";
         }
-        ValueInt* mElement;
+        ElementInt* mElement;
 };
 
 }

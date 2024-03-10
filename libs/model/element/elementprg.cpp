@@ -1,11 +1,11 @@
-#include "valueprg.h"
+#include "elementprg.h"
 namespace  OST
 {
-ValuePrg::ValuePrg(const QString &label, const QString &order, const QString &hint)
-    : ValueSingleNotNumeric(label, order, hint)
+ElementPrg::ElementPrg(const QString &label, const QString &order, const QString &hint)
+    : ElementSingleNotNumeric(label, order, hint)
 {
 }
-ValuePrg::~ValuePrg()
+ElementPrg::~ElementPrg()
 {
 }
 

@@ -1,12 +1,12 @@
-#include "valueint.h"
+#include "elementint.h"
 namespace  OST
 {
-ValueInt::ValueInt(const QString &label, const QString &order, const QString &hint)
-    : ValueSingleNumeric<int>(label, order, hint), mLov(label)
+ElementInt::ElementInt(const QString &label, const QString &order, const QString &hint)
+    : ElementSingleNumeric<int>(label, order, hint), mLov(label)
 {
-    connect(&mLov, &LovInt::lovChanged, this, &ValueSingle::OnLovChanged);
+    connect(&mLov, &LovInt::lovChanged, this, &ElementSingle::OnLovChanged);
 }
-ValueInt::~ValueInt()
+ElementInt::~ElementInt()
 {
 }
 

@@ -1,11 +1,11 @@
-#include "valuemessage.h"
+#include "elementmessage.h"
 namespace  OST
 {
-ValueMessage::ValueMessage(const QString &label, const QString &order, const QString &hint)
-    : ValueSingleNotNumeric(label, order, hint)
+ElementMessage::ElementMessage(const QString &label, const QString &order, const QString &hint)
+    : ElementSingleNotNumeric(label, order, hint)
 {
 }
-ValueMessage::~ValueMessage()
+ElementMessage::~ElementMessage()
 {
 }
 

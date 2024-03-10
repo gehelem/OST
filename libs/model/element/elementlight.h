@@ -1,32 +1,32 @@
-#ifndef VALUELIGHT_h
-#define VALUELIGHT_h
+#ifndef ELEMENTLIGHT_h
+#define ELEMENTLIGHT_h
 
-#include <valuesingle.h>
+#include <elementsingle.h>
 
 namespace  OST
 {
 
-class ValueLight: public ValueSingleNotNumeric<State>
+class ElementLight: public ElementSingleNotNumeric<State>
 {
 
         Q_OBJECT
 
     public:
-        void accept(ValueVisitor *pVisitor) override
+        void accept(ElementVisitor *pVisitor) override
         {
             pVisitor->visit(this);
         }
-        void accept(ValueVisitor *pVisitor, QVariantMap &data) override
+        void accept(ElementVisitor *pVisitor, QVariantMap &data) override
         {
             pVisitor->visit(this, data);
         }
-        void accept(ValueVisitor *pVisitor, QString &action, QVariantMap &data) override
+        void accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data) override
         {
             pVisitor->visit(this, action, data);
         }
 
-        ValueLight(const QString &label, const QString &order, const QString &hint);
-        ~ValueLight();
+        ElementLight(const QString &label, const QString &order, const QString &hint);
+        ~ElementLight();
         QString getType() override
         {
             return "light";
@@ -48,14 +48,14 @@ class GridLight: public GridTemplate<State>
             pVisitor->visit(this, action, line);
         }
 
-        GridLight(ValueBase* value): GridTemplate<State>(value), mElement(static_cast<ValueLight*>(value)) {}
+        GridLight(ElementBase* value): GridTemplate<State>(value), mElement(static_cast<ElementLight*>(value)) {}
         ~GridLight() {}
 
         QString getType() override
         {
             return "light";
         }
-        ValueLight* mElement;
+        ElementLight* mElement;
 };
 
 }

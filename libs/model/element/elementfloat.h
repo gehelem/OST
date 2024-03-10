@@ -1,33 +1,33 @@
-#ifndef VALUEFLOAT_h
-#define VALUEFLOAT_h
+#ifndef ELEMENTFLOAT_h
+#define ELEMENTFLOAT_h
 
-#include <valuesingle.h>
+#include <elementsingle.h>
 #include <lovfloat.h>
 
 namespace  OST
 {
 
-class ValueFloat: public ValueSingleNumeric<double>
+class ElementFloat: public ElementSingleNumeric<double>
 {
 
         Q_OBJECT
 
     public:
-        void accept(ValueVisitor *pVisitor) override
+        void accept(ElementVisitor *pVisitor) override
         {
             pVisitor->visit(this);
         }
-        void accept(ValueVisitor *pVisitor, QVariantMap &data) override
+        void accept(ElementVisitor *pVisitor, QVariantMap &data) override
         {
             pVisitor->visit(this, data);
         }
-        void accept(ValueVisitor *pVisitor, QString &action, QVariantMap &data) override
+        void accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data) override
         {
             pVisitor->visit(this, action, data);
         }
 
-        ValueFloat(const QString &label, const QString &order, const QString &hint);
-        ~ValueFloat();
+        ElementFloat(const QString &label, const QString &order, const QString &hint);
+        ~ElementFloat();
         QString getType() override
         {
             return "float";
@@ -69,14 +69,14 @@ class GridFloat: public GridTemplate<double>
         {
             pVisitor->visit(this, action, line);
         }
-        GridFloat(ValueBase* value): GridTemplate<double>(value), mElement(static_cast<ValueFloat*>(value)) {}
+        GridFloat(ElementBase* value): GridTemplate<double>(value), mElement(static_cast<ElementFloat*>(value)) {}
         ~GridFloat() {}
 
         QString getType() override
         {
             return "float";
         }
-        ValueFloat* mElement;
+        ElementFloat* mElement;
 
 };
 

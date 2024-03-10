@@ -1,31 +1,31 @@
-#ifndef VALUESTRING_h
-#define VALUESTRING_h
-#include <valuesingle.h>
+#ifndef ELEMENTSTRING_h
+#define ELEMENTSTRING_h
+#include <elementsingle.h>
 #include <lovstring.h>
 namespace  OST
 {
 
-class ValueString: public ValueSingleNotNumeric<QString>
+class ElementString: public ElementSingleNotNumeric<QString>
 {
 
         Q_OBJECT
 
     public:
-        void accept(ValueVisitor *pVisitor) override
+        void accept(ElementVisitor *pVisitor) override
         {
             pVisitor->visit(this);
         }
-        void accept(ValueVisitor *pVisitor, QVariantMap &data) override
+        void accept(ElementVisitor *pVisitor, QVariantMap &data) override
         {
             pVisitor->visit(this, data);
         }
-        void accept(ValueVisitor *pVisitor, QString &action, QVariantMap &data) override
+        void accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data) override
         {
             pVisitor->visit(this, action, data);
         }
 
-        ValueString(const QString &label, const QString &order, const QString &hint);
-        ~ValueString();
+        ElementString(const QString &label, const QString &order, const QString &hint);
+        ~ElementString();
         QString getType() override
         {
             return "string";
@@ -66,14 +66,14 @@ class GridString: public GridTemplate<QString>
             pVisitor->visit(this, action, line);
         }
 
-        GridString(ValueBase* value): GridTemplate<QString>(value), mElement(static_cast<ValueString*>(value)) {}
+        GridString(ElementBase* value): GridTemplate<QString>(value), mElement(static_cast<ElementString*>(value)) {}
         ~GridString() {}
 
         QString getType() override
         {
             return "string";
         }
-        ValueString* mElement;
+        ElementString* mElement;
 };
 
 }

@@ -1,12 +1,12 @@
-#include "valuefloat.h"
+#include "elementfloat.h"
 namespace  OST
 {
-ValueFloat::ValueFloat(const QString &label, const QString &order, const QString &hint)
-    : ValueSingleNumeric<double>(label, order, hint), mLov(label)
+ElementFloat::ElementFloat(const QString &label, const QString &order, const QString &hint)
+    : ElementSingleNumeric<double>(label, order, hint), mLov(label)
 {
-    connect(&mLov, &LovFloat::lovChanged, this, &ValueSingle::OnLovChanged);
+    connect(&mLov, &LovFloat::lovChanged, this, &ElementSingle::OnLovChanged);
 }
-ValueFloat::~ValueFloat()
+ElementFloat::~ElementFloat()
 {
 }
 

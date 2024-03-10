@@ -1,27 +1,27 @@
-#ifndef VALUEBASE_h_
-#define VALUEBASE_h_
+#ifndef ELEMENTBASE_h_
+#define ELEMENTBASE_h_
 
-#include <valuevisitor.h>
+#include <elementvisitor.h>
 #include <common.h>
 
 namespace  OST
 {
 
-class ValueVisitor;
+class ElementVisitor;
 class GridVisitor;
 
-class ValueBase: public QObject
+class ElementBase: public QObject
 {
 
         Q_OBJECT
 
     public:
-        virtual void accept(ValueVisitor* pVisitor) = 0;
-        virtual void accept(ValueVisitor* pVisitor, QVariantMap &data) = 0;
-        virtual void accept(ValueVisitor* pVisitor, QString &action, QVariantMap &data) = 0;
+        virtual void accept(ElementVisitor* pVisitor) = 0;
+        virtual void accept(ElementVisitor* pVisitor, QVariantMap &data) = 0;
+        virtual void accept(ElementVisitor* pVisitor, QString &action, QVariantMap &data) = 0;
 
-        ValueBase(const QString &label, const QString &order, const QString &hint);
-        ~ValueBase();
+        ElementBase(const QString &label, const QString &order, const QString &hint);
+        ~ElementBase();
 
         virtual QString getType() = 0;
         QString label()
@@ -73,11 +73,11 @@ class ValueBase: public QObject
             emit lovChanged(this);
         }
     signals:
-        void valueSet(OST::ValueBase*); /* used in derived template class, only when value is changed*/
-        void valueChanged(OST::ValueBase*); /* used in derived template class, when anything other than value is changed */
-        void listChanged(OST::ValueBase*);
+        void valueSet(OST::ElementBase*); /* used in derived template class, only when value is changed*/
+        void valueChanged(OST::ElementBase*); /* used in derived template class, when anything other than value is changed */
+        void listChanged(OST::ElementBase*);
         void sendMessage(MsgLevel, QString);
-        void lovChanged(OST::ValueBase*);
+        void lovChanged(OST::ElementBase*);
         void gridEvent();
 
 };
@@ -88,10 +88,10 @@ class GridBase: public QObject
     public:
         virtual void accept(GridVisitor* pVisitor, QString &action, int &line) = 0;
 
-        GridBase(ValueBase* value);
+        GridBase(ElementBase* value);
         ~GridBase();
         virtual QString getType() = 0;
-        ValueBase* mValue;
+        ElementBase* mValue;
 
 };
 

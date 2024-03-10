@@ -1,32 +1,32 @@
-#ifndef VALUEBOOL_h
-#define VALUEBOOL_h
+#ifndef ELEMENTBOOL_h
+#define ELEMENTBOOL_h
 
-#include <valuesingle.h>
+#include <elementsingle.h>
 
 namespace  OST
 {
 
-class ValueBool: public ValueSingleNotNumeric<bool>
+class ElementBool: public ElementSingleNotNumeric<bool>
 {
 
         Q_OBJECT
 
     public:
-        void accept(ValueVisitor *pVisitor) override
+        void accept(ElementVisitor *pVisitor) override
         {
             pVisitor->visit(this);
         }
-        void accept(ValueVisitor *pVisitor, QVariantMap &data) override
+        void accept(ElementVisitor *pVisitor, QVariantMap &data) override
         {
             pVisitor->visit(this, data);
         }
-        void accept(ValueVisitor *pVisitor, QString &action, QVariantMap &data) override
+        void accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data) override
         {
             pVisitor->visit(this, action, data);
         }
 
-        ValueBool(const QString &label, const QString &order, const QString &hint);
-        ~ValueBool();
+        ElementBool(const QString &label, const QString &order, const QString &hint);
+        ~ElementBool();
         QString getType() override
         {
             return "bool";
@@ -46,14 +46,14 @@ class GridBool: public GridTemplate<bool>
         {
             pVisitor->visit(this, action, line);
         }
-        GridBool(ValueBase* value): GridTemplate<bool>(value), mElement(static_cast<ValueBool*>(value)) {}
+        GridBool(ElementBase* value): GridTemplate<bool>(value), mElement(static_cast<ElementBool*>(value)) {}
         ~GridBool() {}
 
         QString getType() override
         {
             return "bool";
         }
-        ValueBool* mElement;
+        ElementBool* mElement;
 };
 
 }

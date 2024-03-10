@@ -1,32 +1,32 @@
-#ifndef VALUEGRAPH_h
-#define VALUEGRAPH_h
+#ifndef ELEMENTGRAPH_h
+#define ELEMENTGRAPH_h
 
-#include <valuesingle.h>
+#include <elementsingle.h>
 
 namespace  OST
 {
 
-class ValueGraph: public ValueSingleNotNumeric<GraphDefs>
+class ElementGraph: public ElementSingleNotNumeric<GraphDefs>
 {
 
         Q_OBJECT
 
     public:
-        void accept(ValueVisitor *pVisitor) override
+        void accept(ElementVisitor *pVisitor) override
         {
             pVisitor->visit(this);
         }
-        void accept(ValueVisitor *pVisitor, QVariantMap &data) override
+        void accept(ElementVisitor *pVisitor, QVariantMap &data) override
         {
             pVisitor->visit(this, data);
         }
-        void accept(ValueVisitor *pVisitor, QString &action, QVariantMap &data) override
+        void accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data) override
         {
             pVisitor->visit(this, action, data);
         }
 
-        ValueGraph(const QString &label, const QString &order, const QString &hint);
-        ~ValueGraph();
+        ElementGraph(const QString &label, const QString &order, const QString &hint);
+        ~ElementGraph();
         QString getType() override
         {
             return "graph";
@@ -56,14 +56,14 @@ class GridGraph: public GridTemplate<GraphDefs>
             pVisitor->visit(this, action, line);
         }
 
-        GridGraph(ValueBase* value): GridTemplate<GraphDefs>(value), mElement(static_cast<ValueGraph*>(value)) {}
+        GridGraph(ElementBase* value): GridTemplate<GraphDefs>(value), mElement(static_cast<ElementGraph*>(value)) {}
         ~GridGraph() {}
 
         QString getType() override
         {
             return "graph";
         }
-        ValueGraph* mElement;
+        ElementGraph* mElement;
 };
 
 

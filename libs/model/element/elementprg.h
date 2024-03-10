@@ -1,32 +1,32 @@
-#ifndef VALUEPRG_h
-#define VALUEPRG_h
+#ifndef ELEMENTPRG_h
+#define ELEMENTPRG_h
 
-#include <valuesingle.h>
+#include <elementsingle.h>
 
 namespace  OST
 {
 
-class ValuePrg: public ValueSingleNotNumeric<double>
+class ElementPrg: public ElementSingleNotNumeric<double>
 {
 
         Q_OBJECT
 
     public:
-        void accept(ValueVisitor *pVisitor) override
+        void accept(ElementVisitor *pVisitor) override
         {
             pVisitor->visit(this);
         }
-        void accept(ValueVisitor *pVisitor, QVariantMap &data) override
+        void accept(ElementVisitor *pVisitor, QVariantMap &data) override
         {
             pVisitor->visit(this, data);
         }
-        void accept(ValueVisitor *pVisitor, QString &action, QVariantMap &data) override
+        void accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data) override
         {
             pVisitor->visit(this, action, data);
         }
 
-        ValuePrg(const QString &label, const QString &order, const QString &hint);
-        ~ValuePrg();
+        ElementPrg(const QString &label, const QString &order, const QString &hint);
+        ~ElementPrg();
         QString getType() override
         {
             return "prg";
@@ -78,14 +78,14 @@ class GridPrg: public GridTemplate<double>
             pVisitor->visit(this, action, line);
         }
 
-        GridPrg(ValueBase* value): GridTemplate<double>(value), mElement(static_cast<ValuePrg*>(value)) {}
+        GridPrg(ElementBase* value): GridTemplate<double>(value), mElement(static_cast<ElementPrg*>(value)) {}
         ~GridPrg() {}
 
         QString getType() override
         {
             return "prg";
         }
-        ValuePrg* mElement;
+        ElementPrg* mElement;
 };
 
 }

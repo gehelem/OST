@@ -1,14 +1,14 @@
-#include "valuegraph.h"
+#include "elementgraph.h"
 namespace  OST
 {
-ValueGraph::ValueGraph(const QString &label, const QString &order, const QString &hint)
-    : ValueSingleNotNumeric(label, order, hint)
+ElementGraph::ElementGraph(const QString &label, const QString &order, const QString &hint)
+    : ElementSingleNotNumeric(label, order, hint)
 {
 }
-ValueGraph::~ValueGraph()
+ElementGraph::~ElementGraph()
 {
 }
-void ValueGraph::setGraphDefs(GraphDefs defs)
+void ElementGraph::setGraphDefs(GraphDefs defs)
 {
 
     switch (defs.type)

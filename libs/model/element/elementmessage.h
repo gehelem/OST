@@ -1,32 +1,32 @@
-#ifndef VALUEMESSAGE_h
-#define VALUEMESSAGE_h
+#ifndef ELEMENTMESSAGE_h
+#define ELEMENTMESSAGE_h
 
-#include <valuesingle.h>
+#include <elementsingle.h>
 
 namespace  OST
 {
 
-class ValueMessage: public ValueSingleNotNumeric<QString>
+class ElementMessage: public ElementSingleNotNumeric<QString>
 {
 
         Q_OBJECT
 
     public:
-        void accept(ValueVisitor *pVisitor) override
+        void accept(ElementVisitor *pVisitor) override
         {
             pVisitor->visit(this);
         }
-        void accept(ValueVisitor *pVisitor, QVariantMap &data) override
+        void accept(ElementVisitor *pVisitor, QVariantMap &data) override
         {
             pVisitor->visit(this, data);
         }
-        void accept(ValueVisitor *pVisitor, QString &action, QVariantMap &data) override
+        void accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data) override
         {
             pVisitor->visit(this, action, data);
         }
 
-        ValueMessage(const QString &label, const QString &order, const QString &hint);
-        ~ValueMessage();
+        ElementMessage(const QString &label, const QString &order, const QString &hint);
+        ~ElementMessage();
         QString getType() override
         {
             return "message";
@@ -73,14 +73,14 @@ class GridMessage: public GridTemplate<QString>
             pVisitor->visit(this, action, line);
         }
 
-        GridMessage(ValueBase* value): GridTemplate<QString>(value), mElement(static_cast<ValueMessage*>(value)) {}
+        GridMessage(ElementBase* value): GridTemplate<QString>(value), mElement(static_cast<ElementMessage*>(value)) {}
         ~GridMessage() {}
 
         QString getType() override
         {
             return "message";
         }
-        ValueMessage* mElement;
+        ElementMessage* mElement;
 };
 
 }

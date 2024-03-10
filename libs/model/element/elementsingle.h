@@ -1,24 +1,24 @@
-#ifndef VALUESINGLE_h
-#define VALUESINGLE_h
+#ifndef ELEMENTSINGLE_h
+#define ELEMENTSINGLE_h
 
-#include <valuebase.h>
+#include <elementbase.h>
 #include <lovsingle.h>
 
 namespace  OST
 {
 
 template <typename T>
-class ValueSingle : public ValueBase
+class ElementSingle : public ElementBase
 {
 
     public:
 
-        ValueSingle(const QString &label, const QString &order, const QString &hint):
-            ValueBase(label, order, hint)
+        ElementSingle(const QString &label, const QString &order, const QString &hint):
+            ElementBase(label, order, hint)
         {
             mGridValues.clear();
         }
-        ~ValueSingle() {}
+        ~ElementSingle() {}
         QString getType() override
         {
             return "error";
@@ -114,16 +114,16 @@ class ValueSingle : public ValueBase
 
 };
 template <typename T>
-class ValueSingleNumeric : public ValueSingle<T>
+class ElementSingleNumeric : public ElementSingle<T>
 {
 
     public:
 
-        ValueSingleNumeric(const QString &label, const QString &order, const QString &hint):
-            ValueSingle<T>(label, order, hint)
+        ElementSingleNumeric(const QString &label, const QString &order, const QString &hint):
+            ElementSingle<T>(label, order, hint)
         {
         }
-        ~ValueSingleNumeric<T>() {}
+        ~ElementSingleNumeric<T>() {}
         T value()
         {
             return mValue;
@@ -134,19 +134,19 @@ class ValueSingleNumeric : public ValueSingle<T>
             {
                 if (value < mMin)
                 {
-                    emit ValueSingle<T>::sendMessage(Warn,
-                                                     "setValue - value too low " + QString::number(value) + " min= " + QString::number(mMin) );
+                    emit ElementSingle<T>::sendMessage(Warn,
+                                                       "setValue - value too low " + QString::number(value) + " min= " + QString::number(mMin) );
                     return false;
                 }
                 if (value > mMax)
                 {
-                    emit ValueSingle<T>::sendMessage(Warn,
-                                                     "setValue - value too high " + QString::number(value) + " max= " + QString::number(mMax) );
+                    emit ElementSingle<T>::sendMessage(Warn,
+                                                       "setValue - value too high " + QString::number(value) + " max= " + QString::number(mMax) );
                     return false;
                 }
             }
             mValue = value;
-            if (emitEvent) emit ValueBase::valueSet(this);
+            if (emitEvent) emit ElementBase::valueSet(this);
             return true;
         }
         T min()
@@ -156,7 +156,7 @@ class ValueSingleNumeric : public ValueSingle<T>
         void setMin(const T &min)
         {
             mMin = min;
-            emit ValueBase::valueChanged(this);
+            emit ElementBase::valueChanged(this);
         }
         int max()
         {
@@ -165,21 +165,21 @@ class ValueSingleNumeric : public ValueSingle<T>
         void setMax(const T &max)
         {
             mMax = max;
-            emit ValueBase::valueChanged(this);
+            emit ElementBase::valueChanged(this);
         }
         void setMinMax(const T &min, const T &max)
         {
             mMin = min;
             mMax = max;
             mUseMinMax = true;
-            emit ValueBase::valueChanged(this);
+            emit ElementBase::valueChanged(this);
         }
         void unSetMinMax(void)
         {
             mMin = 0;
             mMax = 0;
             mUseMinMax = false;
-            emit ValueBase::valueChanged(this);
+            emit ElementBase::valueChanged(this);
         }
         T step()
         {
@@ -188,7 +188,7 @@ class ValueSingleNumeric : public ValueSingle<T>
         void setStep(const T &step)
         {
             mStep = step;
-            emit ValueBase::valueChanged(this);
+            emit ElementBase::valueChanged(this);
         }
 
         QString format()
@@ -198,7 +198,7 @@ class ValueSingleNumeric : public ValueSingle<T>
         void setFormat(const QString &format)
         {
             mFormat = format;
-            emit ValueBase::valueChanged(this);
+            emit ElementBase::valueChanged(this);
         }
     private:
         T mValue;
@@ -210,16 +210,16 @@ class ValueSingleNumeric : public ValueSingle<T>
 
 };
 template <typename T>
-class ValueSingleNotNumeric : public ValueSingle<T>
+class ElementSingleNotNumeric : public ElementSingle<T>
 {
 
     public:
 
-        ValueSingleNotNumeric(const QString &label, const QString &order, const QString &hint):
-            ValueSingle<T>(label, order, hint)
+        ElementSingleNotNumeric(const QString &label, const QString &order, const QString &hint):
+            ElementSingle<T>(label, order, hint)
         {
         }
-        ~ValueSingleNotNumeric<T>() {}
+        ~ElementSingleNotNumeric<T>() {}
         T value()
         {
             return mValue;
@@ -227,7 +227,7 @@ class ValueSingleNotNumeric : public ValueSingle<T>
         bool setValue(const T &value, const bool &emitEvent)
         {
             mValue = value;
-            if (emitEvent) emit ValueBase::valueSet(this);
+            if (emitEvent) emit ElementBase::valueSet(this);
             return true;
         }
     private:
@@ -238,7 +238,7 @@ template <typename T>
 class GridTemplate: public GridBase
 {
     public:
-        GridTemplate(ValueBase* value) : GridBase(value) {}
+        GridTemplate(ElementBase* value) : GridBase(value) {}
         ~GridTemplate() {}
         QString getType() override
         {

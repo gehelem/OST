@@ -1,32 +1,32 @@
-#ifndef VALUEVIDEO_h
-#define VALUEVIDEO_h
+#ifndef ELEMENTVIDEO_h
+#define ELEMENTVIDEO_h
 
-#include <valuesingle.h>
+#include <elementsingle.h>
 
 namespace  OST
 {
 
-class ValueVideo: public ValueSingleNotNumeric<VideoData>
+class ElementVideo: public ElementSingleNotNumeric<VideoData>
 {
 
         Q_OBJECT
 
     public:
-        void accept(ValueVisitor *pVisitor) override
+        void accept(ElementVisitor *pVisitor) override
         {
             pVisitor->visit(this);
         }
-        void accept(ValueVisitor *pVisitor, QVariantMap &data) override
+        void accept(ElementVisitor *pVisitor, QVariantMap &data) override
         {
             pVisitor->visit(this, data);
         }
-        void accept(ValueVisitor *pVisitor, QString &action, QVariantMap &data) override
+        void accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data) override
         {
             pVisitor->visit(this, action, data);
         }
 
-        ValueVideo(const QString &label, const QString &order, const QString &hint);
-        ~ValueVideo();
+        ElementVideo(const QString &label, const QString &order, const QString &hint);
+        ~ElementVideo();
         QString getType() override
         {
             return "video";
@@ -47,14 +47,14 @@ class GridVideo: public GridTemplate<VideoData>
             pVisitor->visit(this, action, line);
         }
 
-        GridVideo(ValueBase* value): GridTemplate<VideoData>(value), mElement(static_cast<ValueVideo*>(value)) {}
+        GridVideo(ElementBase* value): GridTemplate<VideoData>(value), mElement(static_cast<ElementVideo*>(value)) {}
         ~GridVideo() {}
 
         QString getType() override
         {
             return "video";
         }
-        ValueVideo* mElement;
+        ElementVideo* mElement;
 
 };
 }

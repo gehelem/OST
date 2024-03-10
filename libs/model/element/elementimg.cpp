@@ -1,11 +1,11 @@
-#include "valueimg.h"
+#include "elementimg.h"
 namespace  OST
 {
-ValueImg::ValueImg(const QString &label, const QString &order, const QString &hint)
-    : ValueSingleNotNumeric(label, order, hint)
+ElementImg::ElementImg(const QString &label, const QString &order, const QString &hint)
+    : ElementSingleNotNumeric(label, order, hint)
 {
 }
-ValueImg::~ValueImg()
+ElementImg::~ElementImg()
 {
 }
 
