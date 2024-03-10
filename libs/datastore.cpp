@@ -31,11 +31,6 @@ OST::ElementBase* Datastore::getValueBase(QString pProperty, QString pElement)
         sendWarning("getValueString - property " + pProperty + " : element " + pElement + " not found");
         return nullptr;
     }
-    if (p->getValue(pElement)->getType() != "string")
-    {
-        sendWarning("getValueString - property " + pProperty + " : element " + pElement + " is not string");
-        return nullptr;
-    }
     return p->getValue(pElement);
 }
 
