@@ -1,85 +1,85 @@
-#ifndef OST_VALUEUPDATE_H
-#define OST_VALUEUPDATE_H
+#ifndef OST_ELEMENTUPDATE_H
+#define OST_ELEMENTUPDATE_H
 #include <string>
-#include <valueint.h>
-#include <valuefloat.h>
-#include <valuebool.h>
-#include <valuestring.h>
-#include <valuelight.h>
-#include <valueimg.h>
-#include <valuevideo.h>
-#include <valuemessage.h>
-#include <valuegraph.h>
-#include <valueprg.h>
+#include <elementint.h>
+#include <elementfloat.h>
+#include <elementbool.h>
+#include <elementstring.h>
+#include <elementlight.h>
+#include <elementimg.h>
+#include <elementvideo.h>
+#include <elementmessage.h>
+#include <elementgraph.h>
+#include <elementprg.h>
 
 namespace  OST
 {
 
-class ValueUpdate : public ValueVisitor
+class ElementUpdate : public ElementVisitor
 {
 
     public:
-        ValueUpdate() = default;
-        void visit(ValueInt* pValue) override
+        ElementUpdate() = default;
+        void visit(ElementInt* pElement) override
         {
-            Q_UNUSED(pValue)
+            Q_UNUSED(pElement)
         }
-        void visit(ValueInt* pValue, QVariantMap &data ) override;
-        void visit(ValueInt* pValue, QString &action, QVariantMap &data) override;
-        void visit(ValueFloat* pValue) override
+        void visit(ElementInt* pElement, QVariantMap &data ) override;
+        void visit(ElementInt* pElement, QString &action, QVariantMap &data) override;
+        void visit(ElementFloat* pElement) override
         {
-            Q_UNUSED(pValue)
+            Q_UNUSED(pElement)
         }
-        void visit(ValueFloat* pValue, QVariantMap &data ) override;
-        void visit(ValueFloat* pValue, QString &action, QVariantMap &data) override;
-        void visit(ValueBool* pValue) override
+        void visit(ElementFloat* pElement, QVariantMap &data ) override;
+        void visit(ElementFloat* pElement, QString &action, QVariantMap &data) override;
+        void visit(ElementBool* pElement) override
         {
-            Q_UNUSED(pValue)
+            Q_UNUSED(pElement)
         }
-        void visit(ValueBool* pValue, QVariantMap &data ) override;
-        void visit(ValueBool* pValue, QString &action, QVariantMap &data) override;
-        void visit(ValueString* pValue) override
+        void visit(ElementBool* pElement, QVariantMap &data ) override;
+        void visit(ElementBool* pElement, QString &action, QVariantMap &data) override;
+        void visit(ElementString* pElement) override
         {
-            Q_UNUSED(pValue)
+            Q_UNUSED(pElement)
         }
-        void visit(ValueString* pValue, QVariantMap &data ) override;
-        void visit(ValueString* pValue, QString &action, QVariantMap &data) override;
-        void visit(ValueLight* pValue) override
+        void visit(ElementString* pElement, QVariantMap &data ) override;
+        void visit(ElementString* pElement, QString &action, QVariantMap &data) override;
+        void visit(ElementLight* pElement) override
         {
-            Q_UNUSED(pValue)
+            Q_UNUSED(pElement)
         }
-        void visit(ValueLight* pValue, QVariantMap &data ) override;
-        void visit(ValueLight* pValue, QString &action, QVariantMap &data) override;
-        void visit(ValueImg* pValue) override
+        void visit(ElementLight* pElement, QVariantMap &data ) override;
+        void visit(ElementLight* pElement, QString &action, QVariantMap &data) override;
+        void visit(ElementImg* pElement) override
         {
-            Q_UNUSED(pValue)
+            Q_UNUSED(pElement)
         }
-        void visit(ValueImg* pValue, QVariantMap &data ) override;
-        void visit(ValueImg* pValue, QString &action, QVariantMap &data) override;
-        void visit(ValueVideo* pValue) override
+        void visit(ElementImg* pElement, QVariantMap &data ) override;
+        void visit(ElementImg* pElement, QString &action, QVariantMap &data) override;
+        void visit(ElementVideo* pElement) override
         {
-            Q_UNUSED(pValue)
+            Q_UNUSED(pElement)
         }
-        void visit(ValueVideo* pValue, QVariantMap &data ) override;
-        void visit(ValueVideo* pValue, QString &action, QVariantMap &data) override;
-        void visit(ValueMessage* pValue) override
+        void visit(ElementVideo* pElement, QVariantMap &data ) override;
+        void visit(ElementVideo* pElement, QString &action, QVariantMap &data) override;
+        void visit(ElementMessage* pElement) override
         {
-            Q_UNUSED(pValue)
+            Q_UNUSED(pElement)
         }
-        void visit(ValueMessage* pValue, QVariantMap &data ) override;
-        void visit(ValueMessage* pValue, QString &action, QVariantMap &data) override;
-        void visit(ValueGraph* pValue) override
+        void visit(ElementMessage* pElement, QVariantMap &data ) override;
+        void visit(ElementMessage* pElement, QString &action, QVariantMap &data) override;
+        void visit(ElementGraph* pElement) override
         {
-            Q_UNUSED(pValue)
+            Q_UNUSED(pElement)
         }
-        void visit(ValueGraph* pValue, QVariantMap &data ) override;
-        void visit(ValueGraph* pValue, QString &action, QVariantMap &data) override;
-        void visit(ValuePrg* pValue) override
+        void visit(ElementGraph* pElement, QVariantMap &data ) override;
+        void visit(ElementGraph* pElement, QString &action, QVariantMap &data) override;
+        void visit(ElementPrg* pElement) override
         {
-            Q_UNUSED(pValue)
+            Q_UNUSED(pElement)
         }
-        void visit(ValuePrg* pValue, QVariantMap &data ) override;
-        void visit(ValuePrg* pValue, QString &action, QVariantMap &data) override;
+        void visit(ElementPrg* pElement, QVariantMap &data ) override;
+        void visit(ElementPrg* pElement, QString &action, QVariantMap &data) override;
 
         [[nodiscard]] const QVariantList &getGrid() const
         {
@@ -138,4 +138,4 @@ class GridJsonDumper: public GridVisitor
 
 
 }
-#endif //OST_VALUEUPDATE_H
+#endif //OST_ELEMENTUPDATE_H

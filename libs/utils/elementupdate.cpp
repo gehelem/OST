@@ -1,310 +1,310 @@
-#include "valueupdate.h"
+#include "elementupdate.h"
 #include <sstream>
 namespace  OST
 {
-void ValueUpdate::visit(ValueInt *pValue, QVariantMap &data )
+void ElementUpdate::visit(ElementInt *pElement, QVariantMap &data )
 {
-    if (data.contains("autoupdate")) pValue->setAutoUpdate(data["autoupdate"].toBool());
+    if (data.contains("autoupdate")) pElement->setAutoUpdate(data["autoupdate"].toBool());
     if (!data.contains("value"))
     {
-        qDebug() << "no value for " << pValue->label();
+        qDebug() << "no value for " << pElement->label();
         return;
     }
-    pValue->setValue(data["value"].toLongLong(), true);
+    pElement->setValue(data["value"].toLongLong(), true);
 }
-void ValueUpdate::visit(ValueFloat *pValue, QVariantMap &data )
+void ElementUpdate::visit(ElementFloat *pElement, QVariantMap &data )
 {
-    if (data.contains("autoupdate")) pValue->setAutoUpdate(data["autoupdate"].toBool());
+    if (data.contains("autoupdate")) pElement->setAutoUpdate(data["autoupdate"].toBool());
     if (!data.contains("value"))
     {
-        qDebug() << "no value for " << pValue->label();
+        qDebug() << "no value for " << pElement->label();
         return;
     }
-    pValue->setValue(data["value"].toDouble(), true);
+    pElement->setValue(data["value"].toDouble(), true);
 }
-void ValueUpdate::visit(ValueBool *pValue, QVariantMap &data )
+void ElementUpdate::visit(ElementBool *pElement, QVariantMap &data )
 {
-    if (data.contains("autoupdate")) pValue->setAutoUpdate(data["autoupdate"].toBool());
+    if (data.contains("autoupdate")) pElement->setAutoUpdate(data["autoupdate"].toBool());
     if (!data.contains("value"))
     {
-        qDebug() << "no value for " << pValue->label();
+        qDebug() << "no value for " << pElement->label();
         return;
     }
-    pValue->setValue(data["value"].toBool(), true);
+    pElement->setValue(data["value"].toBool(), true);
 }
-void ValueUpdate::visit(ValueString *pValue, QVariantMap &data )
+void ElementUpdate::visit(ElementString *pElement, QVariantMap &data )
 {
     if (data.contains("autoupdate"))
     {
-        qDebug() << "autoupdate" << pValue->label() << "/" << data;
-        pValue->setAutoUpdate(data["autoupdate"].toBool());
+        qDebug() << "autoupdate" << pElement->label() << "/" << data;
+        pElement->setAutoUpdate(data["autoupdate"].toBool());
     }
     if (!data.contains("value"))
     {
-        qDebug() << "no value for " << pValue->label();
+        qDebug() << "no value for " << pElement->label();
         return;
     }
-    pValue->setValue(data["value"].toString(), true);
+    pElement->setValue(data["value"].toString(), true);
 }
-void ValueUpdate::visit(ValueLight *pValue, QVariantMap &data )
+void ElementUpdate::visit(ElementLight *pElement, QVariantMap &data )
 {
-    if (data.contains("autoupdate")) pValue->setAutoUpdate(data["autoupdate"].toBool());
+    if (data.contains("autoupdate")) pElement->setAutoUpdate(data["autoupdate"].toBool());
     if (!data.contains("value"))
     {
-        qDebug() << "no value for " << pValue->label();
+        qDebug() << "no value for " << pElement->label();
         return;
     }
-    if (data["value"].toInt() == 0 ) pValue->setValue(Idle, true);
-    if (data["value"].toInt() == 1 ) pValue->setValue(Ok, true);
-    if (data["value"].toInt() == 2 ) pValue->setValue(Busy, true);
-    if (data["value"].toInt() == 3 ) pValue->setValue(Error, true);
+    if (data["value"].toInt() == 0 ) pElement->setValue(Idle, true);
+    if (data["value"].toInt() == 1 ) pElement->setValue(Ok, true);
+    if (data["value"].toInt() == 2 ) pElement->setValue(Busy, true);
+    if (data["value"].toInt() == 3 ) pElement->setValue(Error, true);
 }
-void ValueUpdate::visit(ValueImg *pValue, QVariantMap &data )
+void ElementUpdate::visit(ElementImg *pElement, QVariantMap &data )
 {
-    Q_UNUSED(pValue);
+    Q_UNUSED(pElement);
     Q_UNUSED(data);
 }
-void ValueUpdate::visit(ValueVideo *pValue, QVariantMap &data )
+void ElementUpdate::visit(ElementVideo *pElement, QVariantMap &data )
 {
-    Q_UNUSED(pValue);
+    Q_UNUSED(pElement);
     Q_UNUSED(data);
 }
-void ValueUpdate::visit(ValueMessage *pValue, QVariantMap &data )
+void ElementUpdate::visit(ElementMessage *pElement, QVariantMap &data )
 {
-    Q_UNUSED(pValue);
+    Q_UNUSED(pElement);
     Q_UNUSED(data);
 }
-void ValueUpdate::visit(ValueGraph* pValue, QVariantMap &data )
+void ElementUpdate::visit(ElementGraph* pElement, QVariantMap &data )
 {
-    Q_UNUSED(pValue);
+    Q_UNUSED(pElement);
     Q_UNUSED(data);
 }
-void ValueUpdate::visit(ValuePrg* pValue, QVariantMap &data )
+void ElementUpdate::visit(ElementPrg* pElement, QVariantMap &data )
 {
-    Q_UNUSED(pValue);
+    Q_UNUSED(pElement);
     Q_UNUSED(data);
 }
 
-void ValueUpdate::visit(ValueInt* pValue, QString &action, QVariantMap &data)
+void ElementUpdate::visit(ElementInt* pElement, QString &action, QVariantMap &data)
 {
     if (data.contains("arrayLimit"))
     {
-        pValue->setArrayLimit(data["arrayLimit"].toInt());
+        pElement->setArrayLimit(data["arrayLimit"].toInt());
     }
     if (action == "push")
     {
-        pValue->gridAdd(pValue->value());
+        pElement->gridAdd(pElement->value());
     }
     if (action == "newline")
     {
-        pValue->gridAdd(data["val"].toInt());
+        pElement->gridAdd(data["val"].toInt());
     }
     if (action == "deleteline")
     {
-        pValue->gridDel(data["i"].toInt());
+        pElement->gridDel(data["i"].toInt());
     }
     if (action == "updateline")
     {
-        pValue->gridUpdate(data["val"].toInt(), data["i"].toInt(), true);
+        pElement->gridUpdate(data["val"].toInt(), data["i"].toInt(), true);
     }
     if (action == "cleargrid")
     {
-        pValue->gridClear();
+        pElement->gridClear();
     }
     if (action == "getgrid")
     {
         mGrid.clear();
-        for (int i = 0; i < pValue->getGrid().size(); ++i) mGrid.append(qlonglong(pValue->getGrid()[i]));
+        for (int i = 0; i < pElement->getGrid().size(); ++i) mGrid.append(qlonglong(pElement->getGrid()[i]));
     }
 }
-void ValueUpdate::visit(ValueFloat* pValue, QString &action, QVariantMap &data)
+void ElementUpdate::visit(ElementFloat* pElement, QString &action, QVariantMap &data)
 {
     if (data.contains("arrayLimit"))
     {
-        pValue->setArrayLimit(data["arrayLimit"].toInt());
+        pElement->setArrayLimit(data["arrayLimit"].toInt());
     }
     if (action == "push")
     {
-        pValue->gridAdd(pValue->value());
+        pElement->gridAdd(pElement->value());
     }
     if (action == "newline")
     {
-        pValue->gridAdd(data["val"].toDouble());
+        pElement->gridAdd(data["val"].toDouble());
     }
     if (action == "deleteline")
     {
-        pValue->gridDel(data["i"].toInt());
+        pElement->gridDel(data["i"].toInt());
     }
     if (action == "updateline")
     {
-        pValue->gridUpdate(data["val"].toDouble(), data["i"].toInt(), true);
+        pElement->gridUpdate(data["val"].toDouble(), data["i"].toInt(), true);
     }
     if (action == "cleargrid")
     {
-        pValue->gridClear();
+        pElement->gridClear();
     }
     if (action == "getgrid")
     {
         mGrid.clear();
-        for (int i = 0; i < pValue->getGrid().size(); ++i) mGrid.append(pValue->getGrid()[i]);
+        for (int i = 0; i < pElement->getGrid().size(); ++i) mGrid.append(pElement->getGrid()[i]);
     }
 
 }
-void ValueUpdate::visit(ValueBool* pValue, QString &action, QVariantMap &data)
+void ElementUpdate::visit(ElementBool* pElement, QString &action, QVariantMap &data)
 {
     if (data.contains("arrayLimit"))
     {
-        pValue->setArrayLimit(data["arrayLimit"].toInt());
+        pElement->setArrayLimit(data["arrayLimit"].toInt());
     }
     if (action == "push")
     {
-        pValue->gridAdd(pValue->value());
+        pElement->gridAdd(pElement->value());
     }
     if (action == "newline")
     {
-        pValue->gridAdd(data["val"].toBool());
+        pElement->gridAdd(data["val"].toBool());
     }
     if (action == "deleteline")
     {
-        pValue->gridDel(data["i"].toInt());
+        pElement->gridDel(data["i"].toInt());
     }
     if (action == "updateline")
     {
-        pValue->gridUpdate(data["val"].toBool(), data["i"].toInt(), true);
+        pElement->gridUpdate(data["val"].toBool(), data["i"].toInt(), true);
     }
     if (action == "cleargrid")
     {
-        pValue->gridClear();
+        pElement->gridClear();
     }
     if (action == "getgrid")
     {
         mGrid.clear();
-        for (int i = 0; i < pValue->getGrid().size(); ++i) mGrid.append(pValue->getGrid()[i]);
+        for (int i = 0; i < pElement->getGrid().size(); ++i) mGrid.append(pElement->getGrid()[i]);
     }
 }
-void ValueUpdate::visit(ValueString* pValue, QString &action, QVariantMap &data)
+void ElementUpdate::visit(ElementString* pElement, QString &action, QVariantMap &data)
 {
     if (data.contains("arrayLimit"))
     {
-        pValue->setArrayLimit(data["arrayLimit"].toInt());
+        pElement->setArrayLimit(data["arrayLimit"].toInt());
     }
     if (action == "push")
     {
-        pValue->gridAdd(pValue->value());
+        pElement->gridAdd(pElement->value());
     }
     if (action == "newline")
     {
-        pValue->gridAdd(data["val"].toString());
+        pElement->gridAdd(data["val"].toString());
     }
     if (action == "deleteline")
     {
-        pValue->gridDel(data["i"].toInt());
+        pElement->gridDel(data["i"].toInt());
     }
     if (action == "updateline")
     {
-        pValue->gridUpdate(data["val"].toString(), data["i"].toInt(), true);
+        pElement->gridUpdate(data["val"].toString(), data["i"].toInt(), true);
     }
     if (action == "cleargrid")
     {
-        pValue->gridClear();
+        pElement->gridClear();
     }
     if (action == "getgrid")
     {
         mGrid.clear();
-        for (int i = 0; i < pValue->getGrid().size(); ++i) mGrid.append(pValue->getGrid()[i]);
+        for (int i = 0; i < pElement->getGrid().size(); ++i) mGrid.append(pElement->getGrid()[i]);
     }
 }
-void ValueUpdate::visit(ValueLight* pValue, QString &action, QVariantMap &data)
+void ElementUpdate::visit(ElementLight* pElement, QString &action, QVariantMap &data)
 {
     if (data.contains("arrayLimit"))
     {
-        pValue->setArrayLimit(data["arrayLimit"].toInt());
+        pElement->setArrayLimit(data["arrayLimit"].toInt());
     }
     if (action == "push")
     {
-        pValue->gridAdd(pValue->value());
+        pElement->gridAdd(pElement->value());
     }
     if (action == "newline")
     {
-        pValue->gridAdd(IntToState(data["val"].toInt()));
+        pElement->gridAdd(IntToState(data["val"].toInt()));
     }
     if (action == "deleteline")
     {
-        pValue->gridDel(data["i"].toInt());
+        pElement->gridDel(data["i"].toInt());
     }
     if (action == "updateline")
     {
-        pValue->gridUpdate(IntToState(data["val"].toInt()), data["i"].toInt(), true);
+        pElement->gridUpdate(IntToState(data["val"].toInt()), data["i"].toInt(), true);
     }
     if (action == "cleargrid")
     {
-        pValue->gridClear();
+        pElement->gridClear();
     }
     if (action == "getgrid")
     {
         mGrid.clear();
-        for (int i = 0; i < pValue->getGrid().size(); ++i) mGrid.append(pValue->getGrid()[i]);
+        for (int i = 0; i < pElement->getGrid().size(); ++i) mGrid.append(pElement->getGrid()[i]);
     }
 }
-void ValueUpdate::visit(ValueImg* pValue, QString &action, QVariantMap &data)
+void ElementUpdate::visit(ElementImg* pElement, QString &action, QVariantMap &data)
 {
-    Q_UNUSED(pValue);
+    Q_UNUSED(pElement);
     Q_UNUSED(action);
     Q_UNUSED(data);
 
 }
-void ValueUpdate::visit(ValueVideo* pValue, QString &action, QVariantMap &data)
+void ElementUpdate::visit(ElementVideo* pElement, QString &action, QVariantMap &data)
 {
-    Q_UNUSED(pValue);
+    Q_UNUSED(pElement);
     Q_UNUSED(action);
     Q_UNUSED(data);
 }
-void ValueUpdate::visit(ValueMessage* pValue, QString &action, QVariantMap &data)
+void ElementUpdate::visit(ElementMessage* pElement, QString &action, QVariantMap &data)
 {
-    Q_UNUSED(pValue);
-    Q_UNUSED(action);
-    Q_UNUSED(data);
-
-}
-void ValueUpdate::visit(ValueGraph* pValue, QString &action, QVariantMap &data)
-{
-    Q_UNUSED(pValue);
+    Q_UNUSED(pElement);
     Q_UNUSED(action);
     Q_UNUSED(data);
 
 }
-void ValueUpdate::visit(ValuePrg* pValue, QString &action, QVariantMap &data)
+void ElementUpdate::visit(ElementGraph* pElement, QString &action, QVariantMap &data)
 {
-    qDebug() << "ValueUpdate::visit" << data;
+    Q_UNUSED(pElement);
+    Q_UNUSED(action);
+    Q_UNUSED(data);
+
+}
+void ElementUpdate::visit(ElementPrg* pElement, QString &action, QVariantMap &data)
+{
+    qDebug() << "ElementUpdate::visit" << data;
 
     if (data.contains("arrayLimit"))
     {
-        pValue->setArrayLimit(data["arrayLimit"].toInt());
+        pElement->setArrayLimit(data["arrayLimit"].toInt());
     }
     if (action == "push")
     {
-        pValue->gridAdd(pValue->value());
+        pElement->gridAdd(pElement->value());
     }
     if (action == "newline")
     {
-        pValue->gridAdd(IntToState(data["val"].toInt()));
+        pElement->gridAdd(IntToState(data["val"].toInt()));
     }
     if (action == "deleteline")
     {
-        pValue->gridDel(data["i"].toInt());
+        pElement->gridDel(data["i"].toInt());
     }
     if (action == "updateline")
     {
-        pValue->gridUpdate(IntToState(data["val"].toInt()), data["i"].toInt(), true);
+        pElement->gridUpdate(IntToState(data["val"].toInt()), data["i"].toInt(), true);
     }
     if (action == "cleargrid")
     {
-        pValue->gridClear();
+        pElement->gridClear();
     }
     if (action == "getgrid")
     {
         mGrid.clear();
-        for (int i = 0; i < pValue->getGrid().size(); ++i) mGrid.append(pValue->getGrid()[i]);
+        for (int i = 0; i < pElement->getGrid().size(); ++i) mGrid.append(pElement->getGrid()[i]);
     }
 
 }

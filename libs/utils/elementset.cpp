@@ -1,48 +1,48 @@
-#include "valueset.h"
+#include "elementset.h"
 #include <sstream>
 namespace  OST
 {
-void ValueSet::visit(ValueInt *pValue, QVariantMap &data )
+void ElementSet::visit(ElementInt *pElement, QVariantMap &data )
 {
-    pValue->setValue(QVariant(data).toInt(), true);
+    pElement->setValue(QVariant(data).toInt(), true);
 }
-void ValueSet::visit(ValueFloat *pValue, QVariantMap &data )
+void ElementSet::visit(ElementFloat *pElement, QVariantMap &data )
 {
-    pValue->setValue(QVariant(data).toDouble(), true);
+    pElement->setValue(QVariant(data).toDouble(), true);
 }
-void ValueSet::visit(ValueBool *pValue, QVariantMap &data )
+void ElementSet::visit(ElementBool *pElement, QVariantMap &data )
 {
-    pValue->setValue(QVariant(data).toBool(), true);
+    pElement->setValue(QVariant(data).toBool(), true);
 }
-void ValueSet::visit(ValueString *pValue, QVariantMap &data )
+void ElementSet::visit(ElementString *pElement, QVariantMap &data )
 {
-    pValue->setValue(QVariant(data).toString(), true);
+    pElement->setValue(QVariant(data).toString(), true);
 }
-void ValueSet::visit(ValueLight *pValue, QVariantMap &data )
+void ElementSet::visit(ElementLight *pElement, QVariantMap &data )
 {
-    pValue->setValue(IntToState(QVariant(data).toInt()), true);
+    pElement->setValue(IntToState(QVariant(data).toInt()), true);
 }
-void ValueSet::visit(ValueImg *pValue, QVariantMap &data )
+void ElementSet::visit(ElementImg *pElement, QVariantMap &data )
 {
-    pValue->setValue(QVariantMapToImgData(data), true);
+    pElement->setValue(QVariantMapToImgData(data), true);
 }
-void ValueSet::visit(ValueVideo *pValue, QVariantMap &data )
+void ElementSet::visit(ElementVideo *pElement, QVariantMap &data )
 {
-    pValue->setValue(VariantMapToVideoData(data), true);
+    pElement->setValue(VariantMapToVideoData(data), true);
 }
-void ValueSet::visit(ValueMessage *pValue, QVariantMap &data )
+void ElementSet::visit(ElementMessage *pElement, QVariantMap &data )
 {
-    Q_UNUSED(pValue);
+    Q_UNUSED(pElement);
     Q_UNUSED(data);
 }
-void ValueSet::visit(ValueGraph* pValue, QVariantMap &data )
+void ElementSet::visit(ElementGraph* pElement, QVariantMap &data )
 {
-    Q_UNUSED(pValue);
+    Q_UNUSED(pElement);
     Q_UNUSED(data);
 }
-void ValueSet::visit(ValuePrg* pValue, QVariantMap &data )
+void ElementSet::visit(ElementPrg* pElement, QVariantMap &data )
 {
-    Q_UNUSED(pValue);
+    Q_UNUSED(pElement);
     Q_UNUSED(data);
 }
 

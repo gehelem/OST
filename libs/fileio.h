@@ -19,7 +19,7 @@
 #include "math.h"
 #include "dms.h"
 #include "bayer.h"
-#include <valueimg.h>
+#include <elementimg.h>
 
 
 class fileio : public QObject

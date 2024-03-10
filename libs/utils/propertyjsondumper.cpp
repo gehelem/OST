@@ -1,6 +1,6 @@
 #include "propertyjsondumper.h"
-#include "valuejsondumper.h"
-#include "valueupdate.h"
+#include "elementjsondumper.h"
+#include "elementupdate.h"
 #include <sstream>
 namespace  OST
 {
@@ -34,7 +34,7 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
     QJsonObject elements;
     foreach(const QString &key, pProperty->getValues()->keys())
     {
-        OST::ValueJsonDumper d;
+        OST::ElementJsonDumper d;
 
         pProperty->getValue(key)->accept(&d);
         QJsonObject value = d.getResult();

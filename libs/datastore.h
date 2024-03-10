@@ -7,9 +7,9 @@
 #include <propertyupdate.h>
 #include <propertyfactory.h>
 #include <lovfactory.h>
-#include <valueset.h>
-#include <valueupdate.h>
-#include <valuejsondumper.h>
+#include <elementset.h>
+#include <elementupdate.h>
+#include <elementjsondumper.h>
 #include <lovjsondumper.h>
 
 /** @class Datastore
@@ -35,15 +35,15 @@ class Datastore : public Baseroot
         ~Datastore();
     protected:
         OST::PropertyMulti* getProperty(QString pProperty);
-        OST::ValueBase* getValueBase(QString pProperty, QString pElement);
-        OST::ValueString* getValueString(QString pProperty, QString pElement);
-        OST::ValueInt* getValueInt(QString pProperty, QString pElement);
-        OST::ValueFloat* getValueFloat(QString pProperty, QString pElement);
-        OST::ValueBool* getValueBool(QString pProperty, QString pElement);
-        OST::ValueLight* getValueLight(QString pProperty, QString pElement);
-        OST::ValueImg* getValueImg(QString pProperty, QString pElement);
-        OST::ValueVideo* getValueVideo(QString pProperty, QString pElement);
-        OST::ValuePrg* getValuePrg(QString pProperty, QString pElement);
+        OST::ElementBase* getValueBase(QString pProperty, QString pElement);
+        OST::ElementString* getValueString(QString pProperty, QString pElement);
+        OST::ElementInt* getValueInt(QString pProperty, QString pElement);
+        OST::ElementFloat* getValueFloat(QString pProperty, QString pElement);
+        OST::ElementBool* getValueBool(QString pProperty, QString pElement);
+        OST::ElementLight* getValueLight(QString pProperty, QString pElement);
+        OST::ElementImg* getValueImg(QString pProperty, QString pElement);
+        OST::ElementVideo* getValueVideo(QString pProperty, QString pElement);
+        OST::ElementPrg* getValuePrg(QString pProperty, QString pElement);
 
         QString getString(QString pProperty, QString pElement);
         QString getString(QString pProperty, QString pElement, long line);

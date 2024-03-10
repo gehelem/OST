@@ -2,7 +2,7 @@
 #define PROPERTYBASE_h_
 
 #include <propertyvisitor.h>
-#include <valuebase.h>
+#include <elementbase.h>
 
 namespace  OST
 {

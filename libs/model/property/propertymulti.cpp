@@ -1,5 +1,5 @@
 #include "propertymulti.h"
-#include "valueupdate.h"
+#include "elementupdate.h"
 
 namespace  OST
 {
@@ -27,7 +27,7 @@ bool  PropertyMulti::setValue(QString key, QVariant pValue)
             ((mValues[key]->getType() == "string") && (pValue.canConvert<QString>())) ||
             ((mValues[key]->getType() == "float") && (pValue.canConvert<double>())) )
     {
-        OST::ValueUpdate vu;
+        ElementUpdate vu;
         QVariantMap m;
         m["value"] = pValue;
         getValue(key)->accept(&vu, m);
@@ -35,7 +35,7 @@ bool  PropertyMulti::setValue(QString key, QVariant pValue)
     }
     if ((mValues[key]->getType() == "bool") && (pValue.canConvert<bool>()) )
     {
-        OST::ValueUpdate vu;
+        ElementUpdate vu;
         QVariantMap m;
 
         switch (this->rule())
@@ -99,7 +99,7 @@ void PropertyMulti::push()
     }
     foreach(const QString &elt, mValues.keys())
     {
-        OST::ValueUpdate d;
+        ElementUpdate d;
         QString action = "push";
         QVariantMap m;
         m["arrayLimit"] = this->getArrayLimit();
@@ -133,7 +133,7 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
     {
         if ((mValues[elt]->getType() == "int") || (mValues[elt]->getType() == "float") || (mValues[elt]->getType() == "string"))
         {
-            OST::ValueUpdate d;
+            ElementUpdate d;
             QString action = "newline";
             QVariantMap m;
             m["val"] = pValues[elt];
@@ -159,7 +159,7 @@ void PropertyMulti::deleteLine(const int i)
 
     foreach(const QString &elt, mValues.keys())
     {
-        OST::ValueUpdate d;
+        ElementUpdate d;
         QString action = "deleteline";
         QVariantMap m;
         m["i"] = i;
@@ -192,7 +192,7 @@ void PropertyMulti::updateLine(const int i, const QVariantMap &pValues)
     {
         if (mValues[elt]->getType() == "int" || mValues[elt]->getType() == "float" || mValues[elt]->getType() == "string")
         {
-            OST::ValueUpdate d;
+            ElementUpdate d;
             QString action = "updateline";
             QVariantMap m;
             m["val"] = pValues[elt];
@@ -213,7 +213,7 @@ void PropertyMulti::clearGrid()
 
     foreach(const QString &elt, mValues.keys())
     {
-        OST::ValueUpdate d;
+        ElementUpdate d;
         QString action = "cleargrid";
         QVariantMap m;
         mValues[elt]->accept(&d, action, m);

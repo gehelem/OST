@@ -1,5 +1,5 @@
 #include "propertytextdumper.h"
-#include "valuetextdumper.h"
+#include "elementtextdumper.h"
 #include <sstream>
 namespace  OST
 {
@@ -23,7 +23,7 @@ void PropertyTextDumper::visit(PropertyMulti *pProperty)
 
     foreach(const QString &key, pProperty->getValues()->keys())
     {
-        OST::ValueTextDumper d;
+        ElementTextDumper d;
 
         pProperty->getValue(key)->accept(&d);
         stream << " **** " << key.toStdString() << " : " << d.getResult().toStdString() << "//";

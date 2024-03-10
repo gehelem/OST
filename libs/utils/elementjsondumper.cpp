@@ -1,37 +1,37 @@
-#include "valuejsondumper.h"
+#include "elementjsondumper.h"
 #include <sstream>
 namespace  OST
 {
 
-QJsonObject ValueJsonDumper::dumpValueCommons(ValueBase *pValue)
+QJsonObject ElementJsonDumper::dumpElementCommons(ElementBase *pElement)
 {
     QJsonObject json;
 
-    json["label"] = pValue->label();
-    json["order"] = pValue->order();
-    json["hint"] = pValue->hint();
+    json["label"] = pElement->label();
+    json["order"] = pElement->order();
+    json["hint"] = pElement->hint();
     json["type"] = "undefined";
-    json["autoupdate"] = pValue->autoUpdate();
-    json["badge"] = pValue->getBadge();
-    if ((pValue->getType() == "int") || (pValue->getType() == "float") || (pValue->getType() == "string")
-            || (pValue->getType() == "bool"))
+    json["autoupdate"] = pElement->autoUpdate();
+    json["badge"] = pElement->getBadge();
+    if ((pElement->getType() == "int") || (pElement->getType() == "float") || (pElement->getType() == "string")
+            || (pElement->getType() == "bool"))
     {
-        json["directedit"] = pValue->getDirectEdit();
+        json["directedit"] = pElement->getDirectEdit();
     }
 
     return json;
 
 }
-void ValueJsonDumper::visit(ValueBool *pValue)
+void ElementJsonDumper::visit(ElementBool *pElement)
 {
-    QJsonObject json = dumpValueCommons(pValue);
+    QJsonObject json = dumpElementCommons(pElement);
     json["type"] = "bool";
-    json["value"] = pValue->value();
-    json["arrayLimit"] = pValue->arrayLimit();
-    if (pValue->getGrid().size() > 0)
+    json["value"] = pElement->value();
+    json["arrayLimit"] = pElement->arrayLimit();
+    if (pElement->getGrid().size() > 0)
     {
         QJsonArray arr;
-        foreach (bool val, pValue->getGrid())
+        foreach (bool val, pElement->getGrid())
         {
             QVariant v = QVariant::fromValue(val);
             arr.append(v.toJsonValue());
@@ -42,40 +42,40 @@ void ValueJsonDumper::visit(ValueBool *pValue)
 
     mResult = json;
 }
-void ValueJsonDumper::visit(ValueInt *pValue)
+void ElementJsonDumper::visit(ElementInt *pElement)
 {
-    QJsonObject json = dumpValueCommons(pValue);
+    QJsonObject json = dumpElementCommons(pElement);
     json["type"] = "int";
-    json["value"] = qlonglong(pValue->value());
-    json["min"] = qlonglong(pValue->min());
-    json["max"] = qlonglong(pValue->max());
-    json["step"] = qlonglong(pValue->step());
-    json["format"] = pValue->format();
-    json["arrayLimit"] = pValue->arrayLimit();
-    if (pValue->getPreIcon() != "") json["preicon"] = pValue->getPreIcon();
-    if (pValue->getPostIcon() != "") json["posticon"] = pValue->getPostIcon();
-    if (pValue->getGlobalLov() != "")
+    json["value"] = qlonglong(pElement->value());
+    json["min"] = qlonglong(pElement->min());
+    json["max"] = qlonglong(pElement->max());
+    json["step"] = qlonglong(pElement->step());
+    json["format"] = pElement->format();
+    json["arrayLimit"] = pElement->arrayLimit();
+    if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
+    if (pElement->getPostIcon() != "") json["posticon"] = pElement->getPostIcon();
+    if (pElement->getGlobalLov() != "")
     {
-        json["globallov"] = pValue->getGlobalLov();
+        json["globallov"] = pElement->getGlobalLov();
     }
     else
     {
-        if (pValue->getLov().size() > 0)
+        if (pElement->getLov().size() > 0)
         {
             QJsonObject lines = QJsonObject();
-            foreach(const long &key, pValue->getLov().keys())
+            foreach(const long &key, pElement->getLov().keys())
             {
                 QString skey = QString::number(key);
-                lines[skey] = pValue->getLov()[key];
+                lines[skey] = pElement->getLov()[key];
             }
             json["listOfValues"] = lines;
         }
 
     }
-    if (pValue->getGrid().size() > 0)
+    if (pElement->getGrid().size() > 0)
     {
         QJsonArray arr;
-        foreach (long val, pValue->getGrid())
+        foreach (long val, pElement->getGrid())
         {
             QVariant v = QVariant::fromValue(val);
             arr.append(v.toJsonValue());
@@ -85,39 +85,39 @@ void ValueJsonDumper::visit(ValueInt *pValue)
     }
     mResult = json;
 }
-void ValueJsonDumper::visit(ValueFloat *pValue)
+void ElementJsonDumper::visit(ElementFloat *pElement)
 {
-    QJsonObject json = dumpValueCommons(pValue);
+    QJsonObject json = dumpElementCommons(pElement);
     json["type"] = "float";
-    json["value"] = pValue->value();
-    json["min"] = pValue->min();
-    json["max"] = pValue->max();
-    json["step"] = pValue->step();
-    json["format"] = pValue->format();
-    json["arrayLimit"] = pValue->arrayLimit();
-    if (pValue->getPreIcon() != "") json["preicon"] = pValue->getPreIcon();
-    if (pValue->getPostIcon() != "") json["posticon"] = pValue->getPostIcon();
-    if (pValue->getGlobalLov() != "")
+    json["value"] = pElement->value();
+    json["min"] = pElement->min();
+    json["max"] = pElement->max();
+    json["step"] = pElement->step();
+    json["format"] = pElement->format();
+    json["arrayLimit"] = pElement->arrayLimit();
+    if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
+    if (pElement->getPostIcon() != "") json["posticon"] = pElement->getPostIcon();
+    if (pElement->getGlobalLov() != "")
     {
-        json["globallov"] = pValue->getGlobalLov();
+        json["globallov"] = pElement->getGlobalLov();
     }
     else
     {
-        if (!pValue->getLov().isEmpty())
+        if (!pElement->getLov().isEmpty())
         {
             QJsonObject lines = QJsonObject();
-            foreach(const double &key, pValue->getLov().keys())
+            foreach(const double &key, pElement->getLov().keys())
             {
                 QString skey = QString::number(key);
-                lines[skey] = pValue->getLov()[key];
+                lines[skey] = pElement->getLov()[key];
             }
             json["listOfValues"] = lines;
         }
     }
-    if (pValue->getGrid().size() > 0)
+    if (pElement->getGrid().size() > 0)
     {
         QJsonArray arr;
-        foreach (double val, pValue->getGrid())
+        foreach (double val, pElement->getGrid())
         {
             QVariant v = QVariant::fromValue(val);
             arr.append(v.toJsonValue());
@@ -128,34 +128,34 @@ void ValueJsonDumper::visit(ValueFloat *pValue)
 
     mResult = json;
 }
-void ValueJsonDumper::visit(ValueString *pValue)
+void ElementJsonDumper::visit(ElementString *pElement)
 {
-    QJsonObject json = dumpValueCommons(pValue);
+    QJsonObject json = dumpElementCommons(pElement);
     json["type"] = "string";
-    json["value"] = pValue->value();
-    if (pValue->getPreIcon() != "") json["preicon"] = pValue->getPreIcon();
-    if (pValue->getPostIcon() != "") json["posticon"] = pValue->getPostIcon();
-    json["arrayLimit"] = pValue->arrayLimit();
-    if (pValue->getGlobalLov() != "")
+    json["value"] = pElement->value();
+    if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
+    if (pElement->getPostIcon() != "") json["posticon"] = pElement->getPostIcon();
+    json["arrayLimit"] = pElement->arrayLimit();
+    if (pElement->getGlobalLov() != "")
     {
-        json["globallov"] = pValue->getGlobalLov();
+        json["globallov"] = pElement->getGlobalLov();
     }
     else
     {
-        if (pValue->getLov().size() > 0)
+        if (pElement->getLov().size() > 0)
         {
             QJsonObject lines = QJsonObject();
-            foreach(const QString &key, pValue->getLov().keys())
+            foreach(const QString &key, pElement->getLov().keys())
             {
-                lines[key] = pValue->getLov()[key];
+                lines[key] = pElement->getLov()[key];
             }
             json["listOfValues"] = lines;
         }
     }
-    if (pValue->getGrid().size() > 0)
+    if (pElement->getGrid().size() > 0)
     {
         QJsonArray arr;
-        foreach (QString val, pValue->getGrid())
+        foreach (QString val, pElement->getGrid())
         {
             QVariant v = QVariant::fromValue(val);
             arr.append(v.toJsonValue());
@@ -166,23 +166,23 @@ void ValueJsonDumper::visit(ValueString *pValue)
 
     mResult = json;
 }
-void ValueJsonDumper::visit(ValueLight *pValue)
+void ElementJsonDumper::visit(ElementLight *pElement)
 {
-    QJsonObject json = dumpValueCommons(pValue);
+    QJsonObject json = dumpElementCommons(pElement);
     json["type"] = "light";
-    json["value"] = StateToInt(pValue->value());
+    json["value"] = StateToInt(pElement->value());
     mResult = json;
 }
-void ValueJsonDumper::visit(ValueImg *pValue)
+void ElementJsonDumper::visit(ElementImg *pElement)
 {
-    QJsonObject json = dumpValueCommons(pValue);
+    QJsonObject json = dumpElementCommons(pElement);
     json["type"] = "img";
 
-    json["arrayLimit"] = pValue->arrayLimit();
-    if (pValue->getGrid().size() > 0)
+    json["arrayLimit"] = pElement->arrayLimit();
+    if (pElement->getGrid().size() > 0)
     {
         QJsonArray arr;
-        foreach (ImgData val, pValue->getGrid())
+        foreach (ImgData val, pElement->getGrid())
         {
             QVariant v = QVariant::fromValue(ImgDataToVariantMap(val));
             arr.append(v.toJsonValue());
@@ -192,67 +192,67 @@ void ValueJsonDumper::visit(ValueImg *pValue)
     }
 
     QJsonObject imgdata;
-    imgdata["urljpeg"] = pValue->value().mUrlJpeg;
-    imgdata["urlfits"] = pValue->value().mUrlFits;
-    imgdata["urlthumbnail"] = pValue->value().mUrlThumbnail;
-    imgdata["urloverlay"] = pValue->value().mUrlOverlay;
-    imgdata["channels"] = pValue->value().channels;
-    imgdata["width"] = pValue->value().width;
-    imgdata["height"] = pValue->value().height;
-    imgdata["snr"] = pValue->value().SNR;
-    imgdata["hfravg"] = pValue->value().HFRavg;
-    imgdata["stars"] = pValue->value().starsCount;
-    imgdata["issolved"] = pValue->value().isSolved;
-    imgdata["solverra"] = pValue->value().solverRA;
-    imgdata["solverde"] = pValue->value().solverDE;
+    imgdata["urljpeg"] = pElement->value().mUrlJpeg;
+    imgdata["urlfits"] = pElement->value().mUrlFits;
+    imgdata["urlthumbnail"] = pElement->value().mUrlThumbnail;
+    imgdata["urloverlay"] = pElement->value().mUrlOverlay;
+    imgdata["channels"] = pElement->value().channels;
+    imgdata["width"] = pElement->value().width;
+    imgdata["height"] = pElement->value().height;
+    imgdata["snr"] = pElement->value().SNR;
+    imgdata["hfravg"] = pElement->value().HFRavg;
+    imgdata["stars"] = pElement->value().starsCount;
+    imgdata["issolved"] = pElement->value().isSolved;
+    imgdata["solverra"] = pElement->value().solverRA;
+    imgdata["solverde"] = pElement->value().solverDE;
 
 
     QJsonArray arr;
     arr = QJsonArray();
-    for (int i = 0; i < pValue->value().channels; i++)
+    for (int i = 0; i < pElement->value().channels; i++)
     {
-        arr.append(pValue->value().min[i]);
+        arr.append(pElement->value().min[i]);
     }
     imgdata["min"] = arr;
 
     arr = QJsonArray();
-    for (int i = 0; i < pValue->value().channels; i++)
+    for (int i = 0; i < pElement->value().channels; i++)
     {
-        arr.append(pValue->value().max[i]);
+        arr.append(pElement->value().max[i]);
     }
     imgdata["max"] = arr;
 
     arr = QJsonArray();
-    for (int i = 0; i < pValue->value().channels; i++)
+    for (int i = 0; i < pElement->value().channels; i++)
     {
-        arr.append(pValue->value().mean[i]);
+        arr.append(pElement->value().mean[i]);
     }
     imgdata["mean"] = arr;
 
     arr = QJsonArray();
-    for (int i = 0; i < pValue->value().channels; i++)
+    for (int i = 0; i < pElement->value().channels; i++)
     {
-        arr.append(pValue->value().median[i]);
+        arr.append(pElement->value().median[i]);
     }
     imgdata["median"] = arr;
 
     arr = QJsonArray();
-    for (int i = 0; i < pValue->value().channels; i++)
+    for (int i = 0; i < pElement->value().channels; i++)
     {
-        arr.append(pValue->value().stddev[i]);
+        arr.append(pElement->value().stddev[i]);
     }
     imgdata["stddev"] = arr;
 
     arr = QJsonArray();
 
-    for (int i = 0; i <  pValue->value().channels; i++  )
+    for (int i = 0; i <  pElement->value().channels; i++  )
     {
         QJsonArray oneChannel = QJsonArray();
         QJsonArray freq = QJsonArray();
-        for (int j = 0; j < pValue->value().histogram[0].size(); j++  )
+        for (int j = 0; j < pElement->value().histogram[0].size(); j++  )
         {
             freq = QJsonArray();
-            freq.append(pValue->value().histogram[i][j]);
+            freq.append(pElement->value().histogram[i][j]);
             oneChannel.append(freq);
         }
         arr.append(oneChannel);
@@ -262,16 +262,16 @@ void ValueJsonDumper::visit(ValueImg *pValue)
     json["value"] = imgdata;
     mResult = json;
 }
-void ValueJsonDumper::visit(ValueVideo *pValue)
+void ElementJsonDumper::visit(ElementVideo *pElement)
 {
-    QJsonObject json = dumpValueCommons(pValue);
+    QJsonObject json = dumpElementCommons(pElement);
     json["type"] = "video";
-    json["url"] = pValue->value().url;
-    json["arrayLimit"] = pValue->arrayLimit();
-    if (pValue->getGrid().size() > 0)
+    json["url"] = pElement->value().url;
+    json["arrayLimit"] = pElement->arrayLimit();
+    if (pElement->getGrid().size() > 0)
     {
         QJsonArray arr;
-        foreach (VideoData val, pValue->getGrid())
+        foreach (VideoData val, pElement->getGrid())
         {
             QVariant v = QVariant::fromValue(VideoDataToVariantMap(val));
             arr.append(v.toJsonValue());
@@ -282,37 +282,37 @@ void ValueJsonDumper::visit(ValueVideo *pValue)
 
     mResult = json;
 }
-void ValueJsonDumper::visit(ValueMessage *pValue)
+void ElementJsonDumper::visit(ElementMessage *pElement)
 {
-    QJsonObject json = dumpValueCommons(pValue);
+    QJsonObject json = dumpElementCommons(pElement);
     json["type"] = "message";
-    json["level"] = pValue->level();
-    json["timestamp"] = pValue->timeStamp().toString("yyyy/MM/dd hh:mm:ss.zzz");
+    json["level"] = pElement->level();
+    json["timestamp"] = pElement->timeStamp().toString("yyyy/MM/dd hh:mm:ss.zzz");
     mResult = json;
 }
-void ValueJsonDumper::visit(ValueGraph *pValue)
+void ElementJsonDumper::visit(ElementGraph *pElement)
 {
-    QJsonObject json = dumpValueCommons(pValue);
+    QJsonObject json = dumpElementCommons(pElement);
     json["type"] = "graph";
-    json["graphtype"] = GraphTypeToString(pValue->getGraphDefs().type);
-    json["params"] = QJsonObject::fromVariantMap(pValue->getGraphDefs().params);
+    json["graphtype"] = GraphTypeToString(pElement->getGraphDefs().type);
+    json["params"] = QJsonObject::fromVariantMap(pElement->getGraphDefs().params);
 
     mResult = json;
 }
-void ValueJsonDumper::visit(ValuePrg *pValue)
+void ElementJsonDumper::visit(ElementPrg *pElement)
 {
-    QJsonObject json = dumpValueCommons(pValue);
+    QJsonObject json = dumpElementCommons(pElement);
     json["type"] = "prg";
-    if (pValue->prgType() == bar) json["prgtype"] = "bar";
-    if (pValue->prgType() == spinner) json["prgtype"] = "spinner";
-    json["dynlabel"] = pValue->dynLabel();
-    json["value"] = pValue->value();
+    if (pElement->prgType() == bar) json["prgtype"] = "bar";
+    if (pElement->prgType() == spinner) json["prgtype"] = "spinner";
+    json["dynlabel"] = pElement->dynLabel();
+    json["value"] = pElement->value();
 
-    json["arrayLimit"] = pValue->arrayLimit();
-    if (pValue->getGrid().size() > 0)
+    json["arrayLimit"] = pElement->arrayLimit();
+    if (pElement->getGrid().size() > 0)
     {
         QJsonArray arr;
-        foreach (double val, pValue->getGrid())
+        foreach (double val, pElement->getGrid())
         {
             QVariant v = QVariant::fromValue(val);
             arr.append(v.toJsonValue());

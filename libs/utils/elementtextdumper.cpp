@@ -1,49 +1,49 @@
-#include "valuetextdumper.h"
+#include "elementtextdumper.h"
 #include <sstream>
 namespace  OST
 {
 
-std::string ValueTextDumper::dumpValueCommons(ValueBase *pValue)
+std::string ElementTextDumper::dumpElementCommons(ElementBase *pElement)
 {
     std::stringstream stream;
-    stream << " Label='" << pValue->label().toStdString() << "'"
+    stream << " Label='" << pElement->label().toStdString() << "'"
            ;
     return stream.str();
 }
-void ValueTextDumper::visit(ValueBool *pValue)
+void ElementTextDumper::visit(ElementBool *pElement)
 {
     std::stringstream stream;
-    stream << "Bool Value :" << dumpValueCommons(pValue);
-    if (pValue->value()) stream << "Val = <ON> " ;
+    stream << "Bool Value :" << dumpElementCommons(pElement);
+    if (pElement->value()) stream << "Val = <ON> " ;
     else stream << "Val = <OFF> ";
     mResult = QString::fromStdString(stream.str());
 }
-void ValueTextDumper::visit(ValueInt *pValue)
+void ElementTextDumper::visit(ElementInt *pElement)
 {
     std::stringstream stream;
-    stream << "Int Value :" << dumpValueCommons(pValue);
-    stream << "Val = " << pValue->value() << " ";
+    stream << "Int Value :" << dumpElementCommons(pElement);
+    stream << "Val = " << pElement->value() << " ";
     mResult = QString::fromStdString(stream.str());
 }
-void ValueTextDumper::visit(ValueFloat *pValue)
+void ElementTextDumper::visit(ElementFloat *pElement)
 {
     std::stringstream stream;
-    stream << "Float Value :" << dumpValueCommons(pValue);
-    stream << "Val = " << pValue->value() << " ";
+    stream << "Float Value :" << dumpElementCommons(pElement);
+    stream << "Val = " << pElement->value() << " ";
     mResult = QString::fromStdString(stream.str());
 }
-void ValueTextDumper::visit(ValueString *pValue)
+void ElementTextDumper::visit(ElementString *pElement)
 {
     std::stringstream stream;
-    stream << "String Value :" << dumpValueCommons(pValue);
-    stream << "Val = '" << pValue->value().toStdString() << "'";
+    stream << "String Value :" << dumpElementCommons(pElement);
+    stream << "Val = '" << pElement->value().toStdString() << "'";
     mResult = QString::fromStdString(stream.str());
 }
-void ValueTextDumper::visit(ValueLight *pValue)
+void ElementTextDumper::visit(ElementLight *pElement)
 {
     std::stringstream stream;
-    stream << "Light Value :" << dumpValueCommons(pValue);
-    switch ( pValue->value())
+    stream << "Light Value :" << dumpElementCommons(pElement);
+    switch ( pElement->value())
     {
         case Idle:
             stream << "Val = Idle ";
@@ -62,39 +62,39 @@ void ValueTextDumper::visit(ValueLight *pValue)
     }
     mResult = QString::fromStdString(stream.str());
 }
-void ValueTextDumper::visit(ValueImg *pValue)
+void ElementTextDumper::visit(ElementImg *pElement)
 {
     std::stringstream stream;
-    stream << "Image Value :" << dumpValueCommons(pValue);
-    //stream << "Val = '" << pValue->value().toStdString() << "'";
+    stream << "Image Value :" << dumpElementCommons(pElement);
+    //stream << "Val = '" << pElement->value().toStdString() << "'";
     mResult = QString::fromStdString(stream.str());
 }
-void ValueTextDumper::visit(ValueVideo *pValue)
+void ElementTextDumper::visit(ElementVideo *pElement)
 {
     std::stringstream stream;
-    stream << "Video Value :" << dumpValueCommons(pValue);
-    stream << "Url = '" << pValue->value().url.toStdString() << "'";
+    stream << "Video Value :" << dumpElementCommons(pElement);
+    stream << "Url = '" << pElement->value().url.toStdString() << "'";
     mResult = QString::fromStdString(stream.str());
 }
-void ValueTextDumper::visit(ValueMessage *pValue)
+void ElementTextDumper::visit(ElementMessage *pElement)
 {
     std::stringstream stream;
-    stream << "Message Value :" << dumpValueCommons(pValue);
-    //stream << "Val = '" << pValue->value().toStdString() << "'";
+    stream << "Message Value :" << dumpElementCommons(pElement);
+    //stream << "Val = '" << pElement->value().toStdString() << "'";
     mResult = QString::fromStdString(stream.str());
 }
-void ValueTextDumper::visit(ValueGraph *pValue)
+void ElementTextDumper::visit(ElementGraph *pElement)
 {
     std::stringstream stream;
-    stream << "Graph Value :" << dumpValueCommons(pValue);
-    //stream << "Val = '" << pValue->value().toStdString() << "'";
+    stream << "Graph Value :" << dumpElementCommons(pElement);
+    //stream << "Val = '" << pElement->value().toStdString() << "'";
     mResult = QString::fromStdString(stream.str());
 }
-void ValueTextDumper::visit(ValuePrg *pValue)
+void ElementTextDumper::visit(ElementPrg *pElement)
 {
     std::stringstream stream;
-    stream << "Progress Value :" << dumpValueCommons(pValue);
-    //stream << "Val = '" << pValue->value().toStdString() << "'";
+    stream << "Progress Value :" << dumpElementCommons(pElement);
+    //stream << "Val = '" << pElement->value().toStdString() << "'";
     mResult = QString::fromStdString(stream.str());
 }
 

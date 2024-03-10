@@ -2,7 +2,7 @@
 #define PROPERTYMULTI_h_
 
 #include <propertybase.h>
-#include <valuefactory.h>
+#include <elementfactory.h>
 namespace  OST
 {
 
@@ -52,7 +52,7 @@ class PropertyMulti: public PropertyBase
             mRule = rule;
         }
 
-        QMap<QString, OST::ValueBase*>* getValues()
+        QMap<QString, ElementBase*>* getValues()
         {
             return &mValues;
         }
@@ -60,7 +60,7 @@ class PropertyMulti: public PropertyBase
         {
             return mGrids;
         }
-        OST::ValueBase* getValue(QString pElement)
+        ElementBase* getValue(QString pElement)
         {
             if (!mValues.contains(pElement))
             {
@@ -70,7 +70,7 @@ class PropertyMulti: public PropertyBase
             return mValues[pElement];
         }
         bool setValue(QString key, QVariant Value);
-        void addValue(QString key, ValueBase* pValue)
+        void addValue(QString key, ElementBase* pValue)
         {
             if (mValues.contains(key))
             {
@@ -81,10 +81,10 @@ class PropertyMulti: public PropertyBase
             mValues[key] = pValue;
             GridBase* b = GridFactory::createGrid(pValue);
             mGrids[key] = b;
-            connect(mValues[key], &ValueBase::valueChanged, this, &PropertyMulti::OnValueChanged);
-            connect(mValues[key], &ValueBase::listChanged, this, &PropertyMulti::OnListChanged);
-            connect(mValues[key], &ValueBase::lovChanged, this, &PropertyMulti::OnLovChanged);
-            connect(mValues[key], &ValueBase::sendMessage, this, &PropertyMulti::OnMessage);
+            connect(mValues[key], &ElementBase::valueChanged, this, &PropertyMulti::OnValueChanged);
+            connect(mValues[key], &ElementBase::listChanged, this, &PropertyMulti::OnListChanged);
+            connect(mValues[key], &ElementBase::lovChanged, this, &PropertyMulti::OnLovChanged);
+            connect(mValues[key], &ElementBase::sendMessage, this, &PropertyMulti::OnMessage);
         }
         void deleteValue(QString key)
         {
@@ -104,15 +104,15 @@ class PropertyMulti: public PropertyBase
         void updateLine(const int i, const QVariantMap &pValues);
         void clearGrid();
     public slots:
-        void OnValueChanged(ValueBase*)
+        void OnValueChanged(ElementBase*)
         {
             emit valueChanged(this);
         }
-        void OnListChanged(ValueBase*)
+        void OnListChanged(ElementBase*)
         {
             emit propertyEvent("ap", key(), this);
         }
-        void OnLovChanged(ValueBase*)
+        void OnLovChanged(ElementBase*)
         {
             emit propertyEvent("ap", key(), this);
         }
@@ -137,7 +137,7 @@ class PropertyMulti: public PropertyBase
         QJsonObject getJsonGrids();
     private:
         SwitchsRule mRule = SwitchsRule::Any;
-        QMap<QString, ValueBase*> mValues;
+        QMap<QString, ElementBase*> mValues;
         QMap<QString, GridBase*> mGrids;
 
 

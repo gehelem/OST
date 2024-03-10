@@ -44,7 +44,7 @@ PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVaria
     {
         QVariantMap elt = elts[key].toMap();
         if (pProperty->hasArray()) elt["arrayLimit"] = pProperty->getArrayLimit();
-        ValueBase *v = ValueFactory::createValue(elt);
+        ElementBase *v = ElementFactory::createElement(elt);
         if (v != nullptr)
         {
             pProperty->addValue(key, v);

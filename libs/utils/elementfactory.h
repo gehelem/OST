@@ -1,27 +1,27 @@
-#ifndef OST_VALUEFACTORY_H
-#define OST_VALUEFACTORY_H
+#ifndef OST_ELEMENTFACTORY_H
+#define OST_ELEMENTFACTORY_H
 
 #include <baseclient.h>
-#include <valueint.h>
-#include <valuefloat.h>
-#include <valuebool.h>
-#include <valuestring.h>
-#include <valuelight.h>
-#include <valueimg.h>
-#include <valuevideo.h>
-#include <valuemessage.h>
-#include <valuegraph.h>
-#include <valueprg.h>
+#include <elementint.h>
+#include <elementfloat.h>
+#include <elementbool.h>
+#include <elementstring.h>
+#include <elementlight.h>
+#include <elementimg.h>
+#include <elementvideo.h>
+#include <elementmessage.h>
+#include <elementgraph.h>
+#include <elementprg.h>
 
 namespace  OST
 {
 
-class ValueFactory
+class ElementFactory
 {
 
     public:
-        ValueFactory() = delete;
-        static ValueBase* createValue(const QVariantMap &pData);
+        ElementFactory() = delete;
+        static ElementBase* createElement(const QVariantMap &pData);
 };
 
 class GridFactory
@@ -29,8 +29,8 @@ class GridFactory
 
     public:
         GridFactory() = delete;
-        static GridBase* createGrid(ValueBase* &pValue);
+        static GridBase* createGrid(ElementBase* &pValue);
 };
 
 }
-#endif //OST_VALUEFACTORY_H
+#endif //OST_ELEMENTFACTORY_H
