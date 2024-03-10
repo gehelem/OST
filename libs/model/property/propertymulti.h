@@ -52,48 +52,47 @@ class PropertyMulti: public PropertyBase
             mRule = rule;
         }
 
-        QMap<QString, ElementBase*>* getValues()
+        QMap<QString, ElementBase*>* getElts()
         {
-            return &mValues;
+            return &mElts;
         }
         QMap<QString, GridBase*> getGrids()
         {
             return mGrids;
         }
-        ElementBase* getValue(QString pElement)
+        ElementBase* getElt(QString pElement)
         {
-            if (!mValues.contains(pElement))
+            if (!mElts.contains(pElement))
             {
-                qDebug() << label() << " - getValue - element " << pElement << " does not exists.";
+                qDebug() << label() << " - getElt - element " << pElement << " does not exists.";
                 return nullptr;
             }
-            return mValues[pElement];
+            return mElts[pElement];
         }
-        bool setValue(QString key, QVariant Value);
-        void addValue(QString key, ElementBase* pValue)
+        bool setElt(QString key, QVariant val);
+        void addElt(QString key, ElementBase* pElt)
         {
-            if (mValues.contains(key))
+            if (mElts.contains(key))
             {
-                qDebug() << label() << " - addValue - element " << key << " already exists";
+                qDebug() << label() << " - addElt - element " << key << " already exists";
                 return;
             }
-            //qDebug() << label() << " - addValue - element " << key << " OK " << pValue;
-            mValues[key] = pValue;
-            GridBase* b = GridFactory::createGrid(pValue);
+            mElts[key] = pElt;
+            GridBase* b = GridFactory::createGrid(pElt);
             mGrids[key] = b;
-            connect(mValues[key], &ElementBase::valueChanged, this, &PropertyMulti::OnValueChanged);
-            connect(mValues[key], &ElementBase::listChanged, this, &PropertyMulti::OnListChanged);
-            connect(mValues[key], &ElementBase::lovChanged, this, &PropertyMulti::OnLovChanged);
-            connect(mValues[key], &ElementBase::sendMessage, this, &PropertyMulti::OnMessage);
+            connect(mElts[key], &ElementBase::valueChanged, this, &PropertyMulti::OnValueChanged);
+            connect(mElts[key], &ElementBase::listChanged, this, &PropertyMulti::OnListChanged);
+            connect(mElts[key], &ElementBase::lovChanged, this, &PropertyMulti::OnLovChanged);
+            connect(mElts[key], &ElementBase::sendMessage, this, &PropertyMulti::OnMessage);
         }
-        void deleteValue(QString key)
+        void deleteElt(QString key)
         {
-            if (!mValues.contains(key))
+            if (!mElts.contains(key))
             {
-                qDebug() << label() << " - deleteValue - element " << key << " doesn't exist";
+                qDebug() << label() << " - deleteElt - element " << key << " doesn't exist";
                 return;
             }
-            mValues.remove(key);
+            mElts.remove(key);
             mGrids.remove(key);
             emit propertyEvent("ap", key, this);
 
@@ -137,7 +136,7 @@ class PropertyMulti: public PropertyBase
         QJsonObject getJsonGrids();
     private:
         SwitchsRule mRule = SwitchsRule::Any;
-        QMap<QString, ElementBase*> mValues;
+        QMap<QString, ElementBase*> mElts;
         QMap<QString, GridBase*> mGrids;
 
 

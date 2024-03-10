@@ -47,7 +47,7 @@ PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVaria
         ElementBase *v = ElementFactory::createElement(elt);
         if (v != nullptr)
         {
-            pProperty->addValue(key, v);
+            pProperty->addElt(key, v);
         }
     }
 

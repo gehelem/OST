@@ -37,9 +37,9 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     setOstElementValue("numbersRW", "n2", -1000, false);
     setOstElementValue("numbersRW", "n3", 3.14, false);
     setOstElementValue("numbersRW", "n4", -20.23, true);
-    getValueInt("numbersRW", "n4")->setStep(100);
-    getValueInt("numbersRW", "n4")->setMin(-10000);
-    getValueInt("numbersRW", "n4")->setMax(10000);
+    getEltInt("numbersRW", "n4")->setStep(100);
+    getEltInt("numbersRW", "n4")->setMin(-10000);
+    getEltInt("numbersRW", "n4")->setMax(10000);
 
     //setOstElementValue("mixedRW", "b1", false, false);
     //setOstElementValue("mixedRW", "b2", false, false);
@@ -59,12 +59,12 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     //setBLOBMode(B_ALSO, _camera.toStdString().c_str(), nullptr);
     //enableDirectBlobAccess(_camera.toStdString().c_str(), nullptr);
     //setBlobMode();
-    getValueString("extextRW", "extext4")->lovUpdate("i1", "i1 label modified");
+    getEltString("extextRW", "extext4")->lovUpdate("i1", "i1 label modified");
     //addOstElementLov("extextRW", "extext4", "i1", "i1 label modified"); // should give a warning
-    getValueString("extextRW", "extext4")->lovAdd("i3", "i3 label");
-    getValueString("extextRW", "extext4")->lovAdd("i4", "i4 label");
-    getValueString("extextRW", "extext4")->lovDel("i4");
-    getValueString("extextRW", "extext4")->lovDel("i4444");
+    getEltString("extextRW", "extext4")->lovAdd("i3", "i3 label");
+    getEltString("extextRW", "extext4")->lovAdd("i4", "i4 label");
+    getEltString("extextRW", "extext4")->lovDel("i4");
+    getEltString("extextRW", "extext4")->lovDel("i4444");
     //deleteOstElementLov("extextRW", "extext4", "i4"); // should give a warning
     //sendMessage(QString("lov element i3=") + getOstElementLov("extextRW", "extext4", "i3").toString());
     //sendMessage(QString("lov element inexistant") + getOstElementLov("extextRW", "extext4",
@@ -72,8 +72,8 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     //clearOstElementLov("extextRW", "extext4");
     OST::PropertyMulti *n = getProperty("numbersRW");
     n->setState(OST::State::Error);
-    //OST::ElementInt *numbersRWn3 = static_cast<OST::ElementInt*>(n->getValue("n3"));
-    OST::ElementInt *numbersRWn3 = static_cast<OST::ElementInt*>(n->getValue("n3"));
+    //OST::ElementInt *numbersRWn3 = static_cast<OST::ElementInt*>(n->getElt("n3"));
+    OST::ElementInt *numbersRWn3 = static_cast<OST::ElementInt*>(n->getElt("n3"));
     numbersRWn3->setValue(999666, true);
 
     //getText("extextRW", "extext1")->setValue("Value modified");
@@ -82,27 +82,27 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     //qDebug() << d.getResult();
     OST::PropertyMulti *p = getProperty("extextRW");
     p->setState(OST::State::Busy);
-    static_cast<OST::ElementString*>(p->getValue("extext1"))->setValue("Value modified2", false);
-    static_cast<OST::ElementString*>(p->getValue("extext4"))->lovUpdate("i3", "another label");
+    static_cast<OST::ElementString*>(p->getElt("extext1"))->setValue("Value modified2", false);
+    static_cast<OST::ElementString*>(p->getElt("extext4"))->lovUpdate("i3", "another label");
 
     dynprop = new OST::PropertyMulti("dynprop", "Dynamic", OST::Permission::ReadWrite, "Examples",
                                      "Dynamically instanciated", "", true,
                                      false);
     dynlight = new OST::ElementLight("Dyn light", "", "");
     dynlight->setValue(OST::State::Busy, true);
-    dynprop->addValue("dynlight", dynlight);
+    dynprop->addElt("dynlight", dynlight);
     dyntext = new OST::ElementString("Dyn text", "", "");
-    dynprop->addValue("dyntext", dyntext);
+    dynprop->addElt("dyntext", dyntext);
     createProperty("dynprop", dynprop);
     dynprop->setState(OST::State::Busy);
     dyntext->setValue("Okydoky", false);
     dynlight->setValue(OST::State::Ok, true);
 
     dynbool = new OST::ElementBool("Dyn bool", "", "");
-    dynprop->addValue("dynbool", dynbool);
+    dynprop->addElt("dynbool", dynbool);
     dynbool->setValue(false, false);
 
-    dyntext2 = getValueString("extextRW", "extext1");
+    dyntext2 = getEltString("extextRW", "extext1");
     dyntext2->setValue("torototo", true);
 
     giveMeADevice("camera", "Multipurpose camera", INDI::BaseDevice::CCD_INTERFACE);
@@ -251,9 +251,9 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                 {
                     if (keyelt == "btn")
                     {
-                        getValueString("lovevents", "code")->lovClear();
-                        getValueString("lovevents", "code")->lovAdd("V1", "Value1");
-                        getValueString("lovevents", "code")->lovAdd("V2", "Value2");
+                        getEltString("lovevents", "code")->lovClear();
+                        getEltString("lovevents", "code")->lovAdd("V1", "Value1");
+                        getEltString("lovevents", "code")->lovAdd("V2", "Value2");
                     }
                 }
 
@@ -325,7 +325,7 @@ void Dummy::newBLOB(INDI::PropertyBlob pblob)
         dta.mUrlJpeg = getModuleName() + QString(pblob.getDeviceName()) + ".jpeg";
         dta.mUrlFits = getModuleName() + QString(pblob.getDeviceName()) + ".FITS";
         dta.isSolved = false;
-        getValueImg("testimage", "image1")->setValue(dta, true);
+        getEltImg("testimage", "image1")->setValue(dta, true);
 
     }
     getProperty("actions2")->setState(OST::Ok);
@@ -348,10 +348,10 @@ void Dummy::updateProperty(INDI::Property property)
 void Dummy::OnSucessSEP()
 {
     getProperty("actions2")->setState(OST::Ok);
-    OST::ImgData dta = getValueImg("testimage", "image1")->value();
+    OST::ImgData dta = getEltImg("testimage", "image1")->value();
     dta.HFRavg = _solver.HFRavg;
     dta.starsCount = _solver.stars.size();
-    getValueImg("testimage", "image1")->setValue(dta, true);
+    getEltImg("testimage", "image1")->setValue(dta, true);
     disconnect(&_solver, &Solver::successSEP, this, &Dummy::OnSucessSEP);
     disconnect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
 
@@ -362,20 +362,20 @@ void Dummy::OnSucessSolve()
     {
         sendMessage("Solver failed");
         getProperty("actions2")->setState(OST::Error);
-        OST::ImgData dta = getValueImg("testimage", "image1")->value();
+        OST::ImgData dta = getEltImg("testimage", "image1")->value();
         dta.isSolved = false;
         dta.solverRA = 0;
         dta.solverDE = 0;
-        getValueImg("testimage", "image1")->setValue(dta, true);
+        getEltImg("testimage", "image1")->setValue(dta, true);
     }
     else
     {
         getProperty("actions2")->setState(OST::Ok);
-        OST::ImgData dta = getValueImg("testimage", "image1")->value();
+        OST::ImgData dta = getEltImg("testimage", "image1")->value();
         dta.isSolved = true;
         dta.solverRA = _solver.stellarSolver.getSolution().ra;
         dta.solverDE = _solver.stellarSolver.getSolution().dec;
-        getValueImg("testimage", "image1")->setValue(dta, true);
+        getEltImg("testimage", "image1")->setValue(dta, true);
 
 
 

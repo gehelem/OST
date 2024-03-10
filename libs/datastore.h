@@ -35,15 +35,15 @@ class Datastore : public Baseroot
         ~Datastore();
     protected:
         OST::PropertyMulti* getProperty(QString pProperty);
-        OST::ElementBase* getValueBase(QString pProperty, QString pElement);
-        OST::ElementString* getValueString(QString pProperty, QString pElement);
-        OST::ElementInt* getValueInt(QString pProperty, QString pElement);
-        OST::ElementFloat* getValueFloat(QString pProperty, QString pElement);
-        OST::ElementBool* getValueBool(QString pProperty, QString pElement);
-        OST::ElementLight* getValueLight(QString pProperty, QString pElement);
-        OST::ElementImg* getValueImg(QString pProperty, QString pElement);
-        OST::ElementVideo* getValueVideo(QString pProperty, QString pElement);
-        OST::ElementPrg* getValuePrg(QString pProperty, QString pElement);
+        OST::ElementBase* getEltBase(QString pProperty, QString pElement);
+        OST::ElementString* getEltString(QString pProperty, QString pElement);
+        OST::ElementInt* getEltInt(QString pProperty, QString pElement);
+        OST::ElementFloat* getEltFloat(QString pProperty, QString pElement);
+        OST::ElementBool* getEltBool(QString pProperty, QString pElement);
+        OST::ElementLight* getEltLight(QString pProperty, QString pElement);
+        OST::ElementImg* getEltImg(QString pProperty, QString pElement);
+        OST::ElementVideo* getEltVideo(QString pProperty, QString pElement);
+        OST::ElementPrg* getEltPrg(QString pProperty, QString pElement);
 
         QString getString(QString pProperty, QString pElement);
         QString getString(QString pProperty, QString pElement, long line);

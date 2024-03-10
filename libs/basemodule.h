@@ -94,12 +94,12 @@ class Basemodule : public DBManager
         void setModuleDescription(QString description)
         {
             mModuleDescription = description;
-            getValueString("moduleInfo", "moduleDescription")->setValue(description, true);
+            getEltString("moduleInfo", "moduleDescription")->setValue(description, true);
         }
         void setModuleVersion(QString version)
         {
             mModuleVersion = version;
-            getValueString("moduleInfo", "moduleVersion")->setValue(version, true);
+            getEltString("moduleInfo", "moduleVersion")->setValue(version, true);
 
         }
 

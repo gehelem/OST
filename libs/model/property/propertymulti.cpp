@@ -16,24 +16,24 @@ PropertyMulti::~PropertyMulti()
 {
 
 }
-bool  PropertyMulti::setValue(QString key, QVariant pValue)
+bool  PropertyMulti::setElt(QString key, QVariant val)
 {
-    if (!mValues.contains(key))
+    if (!mElts.contains(key))
     {
         sendError("PropertyMulti::setValue - " + key + " - not found");
         return false;
     }
-    if (((mValues[key]->getType() == "int") && (pValue.canConvert<long>())) ||
-            ((mValues[key]->getType() == "string") && (pValue.canConvert<QString>())) ||
-            ((mValues[key]->getType() == "float") && (pValue.canConvert<double>())) )
+    if (((mElts[key]->getType() == "int") && (val.canConvert<long>())) ||
+            ((mElts[key]->getType() == "string") && (val.canConvert<QString>())) ||
+            ((mElts[key]->getType() == "float") && (val.canConvert<double>())) )
     {
         ElementUpdate vu;
         QVariantMap m;
-        m["value"] = pValue;
-        getValue(key)->accept(&vu, m);
+        m["value"] = val;
+        getElt(key)->accept(&vu, m);
         return true;
     }
-    if ((mValues[key]->getType() == "bool") && (pValue.canConvert<bool>()) )
+    if ((mElts[key]->getType() == "bool") && (val.canConvert<bool>()) )
     {
         ElementUpdate vu;
         QVariantMap m;
@@ -41,23 +41,23 @@ bool  PropertyMulti::setValue(QString key, QVariant pValue)
         switch (this->rule())
         {
             case Any:
-                m["value"] = pValue;
-                getValue(key)->accept(&vu, m);
+                m["value"] = val;
+                getElt(key)->accept(&vu, m);
                 return true;
                 break;
             case OneOfMany:
-                if (pValue.toBool())
+                if (val.toBool())
                 {
-                    foreach(const QString &elt, mValues.keys())
+                    foreach(const QString &elt, mElts.keys())
                     {
-                        if ((mValues[elt]->getType() == "bool") && (elt != key))
+                        if ((mElts[elt]->getType() == "bool") && (elt != key))
                         {
                             m["value"] = false;
-                            mValues[elt]->accept(&vu, m);
+                            mElts[elt]->accept(&vu, m);
                         }
                     }
-                    m["value"] = pValue;
-                    mValues[key]->accept(&vu, m);
+                    m["value"] = val;
+                    mElts[key]->accept(&vu, m);
                     return true;
 
                 }
@@ -65,16 +65,16 @@ bool  PropertyMulti::setValue(QString key, QVariant pValue)
                 return false;
                 break;
             case AtMostOne:
-                foreach(const QString &elt, mValues.keys())
+                foreach(const QString &elt, mElts.keys())
                 {
-                    if ((mValues[elt]->getType() == "bool") && (elt != key))
+                    if ((mElts[elt]->getType() == "bool") && (elt != key))
                     {
                         m["value"] = false;
-                        mValues[elt]->accept(&vu, m);
+                        mElts[elt]->accept(&vu, m);
                     }
                 }
-                m["value"] = pValue;
-                mValues[key]->accept(&vu, m);
+                m["value"] = val;
+                mElts[key]->accept(&vu, m);
                 return true;
                 break;
             default:
@@ -84,7 +84,7 @@ bool  PropertyMulti::setValue(QString key, QVariant pValue)
         }
     }
     sendError("PropertyMulti::setValue - " + key + " - can't update, unhandled type : "
-              + mValues[key]->getType() + "(" + pValue.toString() + ")");
+              + mElts[key]->getType() + "(" + val.toString() + ")");
     return false;
 
 
@@ -97,13 +97,13 @@ void PropertyMulti::push()
         sendError("PropertyMulti::Push - no array/grid defined");
         return;
     }
-    foreach(const QString &elt, mValues.keys())
+    foreach(const QString &elt, mElts.keys())
     {
         ElementUpdate d;
         QString action = "push";
         QVariantMap m;
         m["arrayLimit"] = this->getArrayLimit();
-        mValues[elt]->accept(&d, action, m);
+        mElts[elt]->accept(&d, action, m);
     }
     emit propertyEvent("ap", key(), this);
 
@@ -117,9 +117,9 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
         return;
     }
     /* Check if data is valid and contains every value */
-    foreach(const QString &elt, mValues.keys())
+    foreach(const QString &elt, mElts.keys())
     {
-        if ((mValues[elt]->getType() == "int") || (mValues[elt]->getType() == "float") || (mValues[elt]->getType() == "string"))
+        if ((mElts[elt]->getType() == "int") || (mElts[elt]->getType() == "float") || (mElts[elt]->getType() == "string"))
         {
             if (!pValues.contains(elt))
             {
@@ -129,16 +129,16 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
         }
     }
 
-    foreach(const QString &elt, mValues.keys())
+    foreach(const QString &elt, mElts.keys())
     {
-        if ((mValues[elt]->getType() == "int") || (mValues[elt]->getType() == "float") || (mValues[elt]->getType() == "string"))
+        if ((mElts[elt]->getType() == "int") || (mElts[elt]->getType() == "float") || (mElts[elt]->getType() == "string"))
         {
             ElementUpdate d;
             QString action = "newline";
             QVariantMap m;
             m["val"] = pValues[elt];
             m["arrayLimit"] = this->getArrayLimit();
-            mValues[elt]->accept(&d, action, m);
+            mElts[elt]->accept(&d, action, m);
             OST::GridUpdate g;
             action = "add";
             int line = 0;
@@ -157,13 +157,13 @@ void PropertyMulti::deleteLine(const int i)
         return;
     }
 
-    foreach(const QString &elt, mValues.keys())
+    foreach(const QString &elt, mElts.keys())
     {
         ElementUpdate d;
         QString action = "deleteline";
         QVariantMap m;
         m["i"] = i;
-        mValues[elt]->accept(&d, action, m);
+        mElts[elt]->accept(&d, action, m);
     }
     emit propertyEvent("ap", key(), this);
 
@@ -177,9 +177,9 @@ void PropertyMulti::updateLine(const int i, const QVariantMap &pValues)
     }
 
     /* Check if data is valid and contains every value */
-    foreach(const QString &elt, mValues.keys())
+    foreach(const QString &elt, mElts.keys())
     {
-        if (mValues[elt]->getType() == "int" || mValues[elt]->getType() == "float" || mValues[elt]->getType() == "string")
+        if (mElts[elt]->getType() == "int" || mElts[elt]->getType() == "float" || mElts[elt]->getType() == "string")
         {
             if (!pValues.contains(elt))
             {
@@ -188,16 +188,16 @@ void PropertyMulti::updateLine(const int i, const QVariantMap &pValues)
             }
         }
     }
-    foreach(const QString &elt, mValues.keys())
+    foreach(const QString &elt, mElts.keys())
     {
-        if (mValues[elt]->getType() == "int" || mValues[elt]->getType() == "float" || mValues[elt]->getType() == "string")
+        if (mElts[elt]->getType() == "int" || mElts[elt]->getType() == "float" || mElts[elt]->getType() == "string")
         {
             ElementUpdate d;
             QString action = "updateline";
             QVariantMap m;
             m["val"] = pValues[elt];
             m["i"] = i;
-            mValues[elt]->accept(&d, action, m);
+            mElts[elt]->accept(&d, action, m);
         }
     }
     emit propertyEvent("ap", key(), this);
@@ -211,12 +211,12 @@ void PropertyMulti::clearGrid()
         return;
     }
 
-    foreach(const QString &elt, mValues.keys())
+    foreach(const QString &elt, mElts.keys())
     {
         ElementUpdate d;
         QString action = "cleargrid";
         QVariantMap m;
-        mValues[elt]->accept(&d, action, m);
+        mElts[elt]->accept(&d, action, m);
     }
     emit propertyEvent("ap", key(), this);
 

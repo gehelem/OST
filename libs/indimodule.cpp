@@ -9,9 +9,9 @@ IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap
     setVerbose(false);
     //_moduletype = "IndiModule";
     loadOstPropertiesFromFile(":indimodule.json");
-    getValueString("indiGit", "hash")->setValue(QString::fromStdString(Version::GIT_SHA1), false);
-    getValueString("indiGit", "date")->setValue(QString::fromStdString(Version::GIT_DATE), false);
-    getValueString("indiGit", "message")->setValue(QString::fromStdString(Version::GIT_COMMIT_SUBJECT), false);
+    getEltString("indiGit", "hash")->setValue(QString::fromStdString(Version::GIT_SHA1), false);
+    getEltString("indiGit", "date")->setValue(QString::fromStdString(Version::GIT_DATE), false);
+    getEltString("indiGit", "message")->setValue(QString::fromStdString(Version::GIT_COMMIT_SUBJECT), false);
 
     OST::LovString* ls = new OST::LovString("DRIVER_INTERFACE-TELESCOPE_INTERFACE");
     createGlobLov("DRIVER_INTERFACE-TELESCOPE_INTERFACE", ls);
@@ -52,7 +52,7 @@ void IndiModule::OnDispatchToIndiExternalEvent(const QString &eventType, const Q
             //setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
             if (keyprop == "serveractions")
             {
-                getValueBool(keyprop, keyelt)->setValue(false, false);
+                getEltBool(keyprop, keyelt)->setValue(false, false);
                 if (keyelt == "conserv")
                 {
                     getProperty(keyprop)->setState(OST::Busy);
@@ -68,7 +68,7 @@ void IndiModule::OnDispatchToIndiExternalEvent(const QString &eventType, const Q
             }
             if (keyprop == "devicesactions")
             {
-                getValueBool(keyprop, keyelt)->setValue(false, false);
+                getEltBool(keyprop, keyelt)->setValue(false, false);
                 if (!isServerConnected())
                 {
                     sendWarning("Indi server not connected");
@@ -686,7 +686,7 @@ bool IndiModule::createDeviceProperty(const QString &key, const QString &label, 
     OST::ElementString* s = new  OST::ElementString("name", "", "");
     s->setValue("--", false);
     s->setAutoUpdate(true);
-    pm->addValue("name", s);
+    pm->addElt("name", s);
 
     for(std::size_t i = 0; i < devs.size(); i++)
     {
@@ -787,13 +787,13 @@ bool IndiModule::defineMeAsFocuser()
     pm->setRule(OST::SwitchsRule::AtMostOne);
     OST::ElementBool* b = new  OST::ElementBool("Abort focus", "", "");
     b->setValue(false, false);
-    pm->addValue("abortfocus", b);
+    pm->addElt("abortfocus", b);
     b = new  OST::ElementBool("Autofocus", "", "");
     b->setValue(false, false);
-    pm->addValue("autofocus", b);
+    pm->addElt("autofocus", b);
     b = new  OST::ElementBool("Loop", "", "");
     b->setValue(false, false);
-    pm->addValue("loop", b);
+    pm->addElt("loop", b);
     mIsFocuser = true;
     return true;
 
@@ -806,13 +806,13 @@ bool IndiModule::defineMeAsGuider()
     pm->setRule(OST::SwitchsRule::AtMostOne);
     OST::ElementBool* b = new  OST::ElementBool("Abort guider", "", "");
     b->setValue(false, false);
-    pm->addValue("abortguider", b);
+    pm->addElt("abortguider", b);
     b = new  OST::ElementBool("Guide", "", "");
     b->setValue(false, false);
-    pm->addValue("guide", b);
+    pm->addElt("guide", b);
     b = new  OST::ElementBool("Calibrate", "", "");
     b->setValue(false, false);
-    pm->addValue("calibrate", b);
+    pm->addElt("calibrate", b);
     mIsGuider = true;
     return true;
 
@@ -825,10 +825,10 @@ bool IndiModule::defineMeAsSequencer()
     pm->setRule(OST::SwitchsRule::AtMostOne);
     OST::ElementBool* b = new  OST::ElementBool("Abort sequence", "", "");
     b->setValue(false, false);
-    pm->addValue("abortsequence", b);
+    pm->addElt("abortsequence", b);
     b = new  OST::ElementBool("Start sequence", "", "");
     b->setValue(false, false);
-    pm->addValue("startsequence", b);
+    pm->addElt("startsequence", b);
     mIsSequencer = true;
     return true;
 
@@ -844,11 +844,11 @@ bool IndiModule::defineMeAsImager()
 
     if (getStore().contains("image"))
     {
-        if (!(getStore()["image"]->getValues()->contains("image")))
+        if (!(getStore()["image"]->getElts()->contains("image")))
         {
             OST::PropertyMulti * pm = getProperty("image");
             OST::ElementImg* img = new OST::ElementImg("", "", "");
-            pm->addValue("image", img);
+            pm->addElt("image", img);
         }
 
     }
@@ -856,33 +856,33 @@ bool IndiModule::defineMeAsImager()
     OST::PropertyMulti * pm = getProperty("parms");
     pm->setRule(OST::SwitchsRule::Any);
 
-    if (!getStore()["parms"]->getValues()->contains("exposure"))
+    if (!getStore()["parms"]->getElts()->contains("exposure"))
     {
         OST::ElementFloat* f = new  OST::ElementFloat("Exposure", "200", "");
         f->setValue(0, false);
         f->setDirectEdit(true);
         f->setAutoUpdate(true);
-        pm->addValue("exposure", f);
+        pm->addElt("exposure", f);
     }
 
 
 
-    if (!getStore()["parms"]->getValues()->contains("gain"))
+    if (!getStore()["parms"]->getElts()->contains("gain"))
     {
         OST::ElementInt* i  = new  OST::ElementInt("Gain", "205", "");
         i->setValue(0, false);
         i->setDirectEdit(true);
         i->setAutoUpdate(true);
-        pm->addValue("gain", i);
+        pm->addElt("gain", i);
     }
 
-    if (!getStore()["parms"]->getValues()->contains("offset"))
+    if (!getStore()["parms"]->getElts()->contains("offset"))
     {
         OST::ElementInt* i  = new  OST::ElementInt("Offset", "210", "");
         i->setValue(0, false);
         i->setDirectEdit(true);
         i->setAutoUpdate(true);
-        pm->addValue("offset", i);
+        pm->addElt("offset", i);
     }
 
     mIsImager = true;
@@ -897,22 +897,22 @@ bool IndiModule::defineMeAsNavigator()
     pm->setRule(OST::SwitchsRule::AtMostOne);
     OST::ElementBool* b = new  OST::ElementBool("Abort navigator", "", "");
     b->setValue(false, false);
-    pm->addValue("abortnavigator", b);
+    pm->addElt("abortnavigator", b);
     b = new  OST::ElementBool("Center target", "", "");
     b->setValue(false, false);
-    pm->addValue("gototarget", b);
+    pm->addElt("gototarget", b);
     OST::ElementString* s = new  OST::ElementString("Target name", "50", "");
     s->setDirectEdit(true);
     s->setAutoUpdate(true);
-    pm->addValue("targetname", s);
+    pm->addElt("targetname", s);
     OST::ElementFloat* f = new  OST::ElementFloat("Target RA", "51", "");
     f->setDirectEdit(true);
     f->setAutoUpdate(true);
-    pm->addValue("targetra", f);
+    pm->addElt("targetra", f);
     f = new  OST::ElementFloat("Target DEC", "52", "");
     f->setDirectEdit(true);
     f->setAutoUpdate(true);
-    pm->addValue("targetde", f);
+    pm->addElt("targetde", f);
     mIsNavigator = true;
     return true;
 
@@ -951,7 +951,7 @@ bool IndiModule::giveMeADevice(QString name, QString label, INDI::BaseDevice::DR
 
     s->setDirectEdit(true);
     s->setAutoUpdate(true);
-    pm->addValue(name, s);
+    pm->addElt(name, s);
     return true;
 
 }

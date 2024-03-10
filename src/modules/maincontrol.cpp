@@ -14,7 +14,7 @@ Maincontrol::Maincontrol(QString name, QString label, QString profile, QVariantM
     setClassName(metaObject()->className());
 
     loadOstPropertiesFromFile(":maincontrol.json");
-    getProperty("moduleInfo")->setValue("moduleLabel", "Main control");
+    getProperty("moduleInfo")->setElt("moduleLabel", "Main control");
     setOstElementValue("moduleInfo", "moduleLabel", "Main control", false);
     setOstElementValue("moduleInfo", "moduleDescription", "Maincontrol module - this one should always be there", false);
     setOstElementValue("moduleInfo", "moduleVersion", 0.1, false);
@@ -79,8 +79,8 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                 {
 
                     QString val = pEventData[keyprop].toMap()["elements"].toMap()["name"].toMap()["value"].toString();
-                    getValueString("loadconf", "name")->setValue(val, true);
-                    getValueString("saveconf", "name")->setValue(val, true);
+                    getEltString("loadconf", "name")->setValue(val, true);
+                    getEltString("saveconf", "name")->setValue(val, true);
                 }
                 if (keyelt == "kill" && keyprop == "killall")
                 {
@@ -115,10 +115,10 @@ void Maincontrol::setConfigurations(void)
         return;
     }
 
-    getValueString("loadconf", "name")->lovClear();
+    getEltString("loadconf", "name")->lovClear();
     for(QVariantMap::const_iterator iter = confs.begin(); iter != confs.end(); ++iter)
     {
-        getValueString("loadconf", "name")->lovAdd(iter.key(), iter.key());
+        getEltString("loadconf", "name")->lovAdd(iter.key(), iter.key());
     }
     sendMessage("Available configurations refreshed");
 }
@@ -154,7 +154,7 @@ void Maincontrol::setAvailableModuleLibs(const QVariantMap libs)
         dyntext->setAutoUpdate(true);
         dyntext->setDirectEdit(true);
         dyntext->setPostIcon("forward");
-        dynprop->addValue(key, dyntext);
+        dynprop->addElt(key, dyntext);
 
     }
     createProperty("load", dynprop);
@@ -179,7 +179,7 @@ void Maincontrol::setModuleData(const QString  &pName, const QString  &pLabel, c
     {
         if( l[i].toString() == pName)
         {
-            getValueString("modules", "profile")->getGrid()[i] = pProfile;
+            getEltString("modules", "profile")->getGrid()[i] = pProfile;
         }
     }
 
@@ -210,7 +210,7 @@ void Maincontrol::addIndiServerProperties(const QStringList  pDrivers)
         dyntext->setDirectEdit(true);
         dyntext->setPreIcon("stop");
         dyntext->setPostIcon("play_arrow");
-        dynprop->addValue(key, dyntext);
+        dynprop->addElt(key, dyntext);
 
     }
     createProperty("indidrivers", dynprop);
