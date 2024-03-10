@@ -84,7 +84,7 @@ void IndiPanel::newProperty(INDI::Property pProperty)
             }
             for (unsigned int i = 0; i < n.count(); i++)
             {
-                OST::ValueFloat* v = new OST::ValueFloat(n[i].label, QString(i), n[i].label);
+                OST::ElementFloat* v = new OST::ElementFloat(n[i].label, QString(i), n[i].label);
                 v->setValue(n[i].getValue(), false);
                 v->setMin(n[i].min);
                 v->setMax(n[i].max);
@@ -99,7 +99,7 @@ void IndiPanel::newProperty(INDI::Property pProperty)
             INDI::PropertySwitch s = pProperty;
             for (unsigned int i = 0; i < s.count(); i++)
             {
-                OST::ValueBool* v = new OST::ValueBool(s[i].label, QString(i), s[i].label);
+                OST::ElementBool* v = new OST::ElementBool(s[i].label, QString(i), s[i].label);
                 if (s[i].s == 0) v->setValue(false, false);
                 if (s[i].s == 1) v->setValue(false, true);
                 p->addValue(s[i].getName(), v);
@@ -113,7 +113,7 @@ void IndiPanel::newProperty(INDI::Property pProperty)
             INDI::PropertyText t = pProperty;
             for (unsigned int i = 0; i < t.count(); i++)
             {
-                OST::ValueString* v = new OST::ValueString(t[i].label, QString(i), t[i].label);
+                OST::ElementString* v = new OST::ElementString(t[i].label, QString(i), t[i].label);
                 v->setValue(t[i].text, false);
                 p->addValue(t[i].getName(), v);
             }
@@ -124,7 +124,7 @@ void IndiPanel::newProperty(INDI::Property pProperty)
             INDI::PropertyLight l = pProperty;
             for (unsigned int i = 0; i < l.count(); i++)
             {
-                OST::ValueLight* v = new OST::ValueLight(l[i].label, QString(i), l[i].label);
+                OST::ElementLight* v = new OST::ElementLight(l[i].label, QString(i), l[i].label);
                 v->setValue(OST::IntToState(l[i].getState()), true);
                 p->addValue(l[i].getName(), v);
             }

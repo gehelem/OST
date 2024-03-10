@@ -115,7 +115,7 @@ class Basemodule : public DBManager
         QString mModuleDescription;
         QString mModuleVersion;
         QString mClassName = "";
-        OST::ValueString* mModuleDesc;
+        OST::ElementString* mModuleDesc;
 
         void OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                            const QVariantMap &eventData) override;

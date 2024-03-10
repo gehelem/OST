@@ -18,7 +18,7 @@ OST::PropertyMulti* Datastore::getProperty(QString pProperty)
 
     return mStore[pProperty];
 }
-OST::ValueBase* Datastore::getValueBase(QString pProperty, QString pElement)
+OST::ElementBase* Datastore::getValueBase(QString pProperty, QString pElement)
 {
     OST::PropertyMulti* p = getProperty(pProperty);
     if (p == nullptr)
@@ -39,7 +39,7 @@ OST::ValueBase* Datastore::getValueBase(QString pProperty, QString pElement)
     return p->getValue(pElement);
 }
 
-OST::ValueString* Datastore::getValueString(QString pProperty, QString pElement)
+OST::ElementString* Datastore::getValueString(QString pProperty, QString pElement)
 {
     OST::PropertyMulti* p = getProperty(pProperty);
     if (p == nullptr)
@@ -57,9 +57,9 @@ OST::ValueString* Datastore::getValueString(QString pProperty, QString pElement)
         sendWarning("getValueString - property " + pProperty + " : element " + pElement + " is not string");
         return nullptr;
     }
-    return static_cast<OST::ValueString*>(p->getValue(pElement));
+    return static_cast<OST::ElementString*>(p->getValue(pElement));
 }
-OST::ValuePrg* Datastore::getValuePrg(QString pProperty, QString pElement)
+OST::ElementPrg* Datastore::getValuePrg(QString pProperty, QString pElement)
 {
     OST::PropertyMulti* p = getProperty(pProperty);
     if (p == nullptr)
@@ -77,7 +77,7 @@ OST::ValuePrg* Datastore::getValuePrg(QString pProperty, QString pElement)
         sendWarning("getValuePrg - property " + pProperty + " : element " + pElement + " is not progress");
         return nullptr;
     }
-    return static_cast<OST::ValuePrg*>(p->getValue(pElement));
+    return static_cast<OST::ElementPrg*>(p->getValue(pElement));
 }
 QString Datastore::getString(QString pProperty, QString pElement)
 {
@@ -92,7 +92,7 @@ QString Datastore::getString(QString pProperty, QString pElement, long line)
     }
     return getValueString(pProperty, pElement)->getGrid()[line];
 }
-OST::ValueInt* Datastore::getValueInt(QString pProperty, QString pElement)
+OST::ElementInt* Datastore::getValueInt(QString pProperty, QString pElement)
 {
     OST::PropertyMulti* p = getProperty(pProperty);
     if (p == nullptr)
@@ -110,7 +110,7 @@ OST::ValueInt* Datastore::getValueInt(QString pProperty, QString pElement)
         sendWarning("getValueInt - property " + pProperty + " : element " + pElement + " is not int");
         return nullptr;
     }
-    return static_cast<OST::ValueInt*>(p->getValue(pElement));
+    return static_cast<OST::ElementInt*>(p->getValue(pElement));
 }
 long Datastore::getInt(QString pProperty, QString pElement)
 {
@@ -126,7 +126,7 @@ long Datastore::getInt(QString pProperty, QString pElement, long line)
 
     return getValueInt(pProperty, pElement)->getGrid()[line];
 }
-OST::ValueFloat* Datastore::getValueFloat(QString pProperty, QString pElement)
+OST::ElementFloat* Datastore::getValueFloat(QString pProperty, QString pElement)
 {
     OST::PropertyMulti* p = getProperty(pProperty);
     if (p == nullptr)
@@ -144,7 +144,7 @@ OST::ValueFloat* Datastore::getValueFloat(QString pProperty, QString pElement)
         sendWarning("getValueFloat - property " + pProperty + " : element " + pElement + " is not float");
         return nullptr;
     }
-    return static_cast<OST::ValueFloat*>(p->getValue(pElement));
+    return static_cast<OST::ElementFloat*>(p->getValue(pElement));
 }
 double  Datastore::getFloat(QString pProperty, QString pElement)
 {
@@ -159,7 +159,7 @@ double Datastore::getFloat(QString pProperty, QString pElement, long line)
     }
     return getValueFloat(pProperty, pElement)->getGrid()[line];
 }
-OST::ValueLight* Datastore::getValueLight(QString pProperty, QString pElement)
+OST::ElementLight* Datastore::getValueLight(QString pProperty, QString pElement)
 {
     OST::PropertyMulti* p = getProperty(pProperty);
     if (p == nullptr)
@@ -177,10 +177,10 @@ OST::ValueLight* Datastore::getValueLight(QString pProperty, QString pElement)
         sendWarning("getValueLight - property " + pProperty + " : element " + pElement + " is not light");
         return nullptr;
     }
-    return static_cast<OST::ValueLight*>(p->getValue(pElement));
+    return static_cast<OST::ElementLight*>(p->getValue(pElement));
 }
 
-OST::ValueImg* Datastore::getValueImg(QString pProperty, QString pElement)
+OST::ElementImg* Datastore::getValueImg(QString pProperty, QString pElement)
 {
     OST::PropertyMulti* p = getProperty(pProperty);
     if (p == nullptr)
@@ -198,9 +198,9 @@ OST::ValueImg* Datastore::getValueImg(QString pProperty, QString pElement)
         sendWarning("getValueImg - property " + pProperty + " : element " + pElement + " is not img");
         return nullptr;
     }
-    return static_cast<OST::ValueImg*>(p->getValue(pElement));
+    return static_cast<OST::ElementImg*>(p->getValue(pElement));
 }
-OST::ValueVideo* Datastore::getValueVideo(QString pProperty, QString pElement)
+OST::ElementVideo* Datastore::getValueVideo(QString pProperty, QString pElement)
 {
     OST::PropertyMulti* p = getProperty(pProperty);
     if (p == nullptr)
@@ -218,9 +218,9 @@ OST::ValueVideo* Datastore::getValueVideo(QString pProperty, QString pElement)
         sendWarning("getValueVideo - property " + pProperty + " : element " + pElement + " is not video");
         return nullptr;
     }
-    return static_cast<OST::ValueVideo*>(p->getValue(pElement));
+    return static_cast<OST::ElementVideo*>(p->getValue(pElement));
 }
-OST::ValueBool* Datastore::getValueBool(QString pProperty, QString pElement)
+OST::ElementBool* Datastore::getValueBool(QString pProperty, QString pElement)
 {
     OST::PropertyMulti* p = getProperty(pProperty);
     if (p == nullptr)
@@ -238,7 +238,7 @@ OST::ValueBool* Datastore::getValueBool(QString pProperty, QString pElement)
         sendWarning("ValueBool - property " + pProperty + " : element " + pElement + " is not bool");
         return nullptr;
     }
-    return static_cast<OST::ValueBool*>(p->getValue(pElement));
+    return static_cast<OST::ElementBool*>(p->getValue(pElement));
 }
 bool Datastore::getBool(QString pProperty, QString pElement)
 {
@@ -319,7 +319,7 @@ bool Datastore::createOstElementText(const QString &pPropertyName, const QString
     QVariantMap pData;
     pData["label"] = pElementLabel;
     pData["type"] = "string";
-    OST::ValueBase *el = OST::ValueFactory::createValue(pData);
+    OST::ElementBase *el = OST::ElementFactory::createElement(pData);
 
     mStore[pPropertyName]->addValue(pElementName, el);
     OST::PropertyJsonDumper d;
@@ -342,7 +342,7 @@ bool Datastore::createOstElementBool(const QString &pPropertyName, const QString
     pData["label"] = pElementLabel;
     pData["type"] = "bool";
 
-    OST::ValueBase *el = OST::ValueFactory::createValue(pData);
+    OST::ElementBase *el = OST::ElementFactory::createElement(pData);
 
     mStore[pPropertyName]->addValue(pElementName, el);
     OST::PropertyJsonDumper d;
@@ -385,7 +385,7 @@ QVariantList Datastore::getOstElementGrid(const QString &pPropertyName, const QS
         sendWarning("getOstElementGrid - property " + pPropertyName + " has no grid.");
         return QVariantList();
     }
-    OST::ValueUpdate v;
+    OST::ElementUpdate v;
     QString action = "getgrid";
     QVariantMap m;
     mStore[pPropertyName]->getValue(pElementName)->accept(&v, action, m);

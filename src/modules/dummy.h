@@ -36,10 +36,10 @@ class MODULE_INIT Dummy : public IndiModule
         void updateSearchList(void);
 
         OST::PropertyMulti *dynprop;
-        OST::ValueLight *dynlight;
-        OST::ValueString *dyntext;
-        OST::ValueBool *dynbool;
-        OST::ValueString *dyntext2;
+        OST::ElementLight *dynlight;
+        OST::ElementString *dyntext;
+        OST::ElementBool *dynbool;
+        OST::ElementString *dyntext2;
 
 
 };

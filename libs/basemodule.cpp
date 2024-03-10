@@ -90,7 +90,7 @@ void Basemodule::setProfile(QVariantMap profiledata)
                         if (props[key].toMap()["elements"].toMap()[eltkey].toMap().contains("gridvalues"))
                         {
                             //setOstElementGrid (key, eltkey, profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["gridvalues"].toList(), true);
-                            OST::ValueUpdate v;
+                            OST::ElementUpdate v;
                             QVariantMap m;
                             QString a = "cleargrid";
                             getProperty(key)->getValue(eltkey)->accept(&v, a, m);

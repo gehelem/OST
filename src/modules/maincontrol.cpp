@@ -149,7 +149,7 @@ void Maincontrol::setAvailableModuleLibs(const QVariantMap libs)
     {
         QVariantMap info = libs[key].toMap()["elements"].toMap();
         QString lab = info["moduleDescription"].toMap()["value"].toString();
-        OST::ValueString* dyntext = new OST::ValueString(lab, "", "");
+        OST::ElementString* dyntext = new OST::ElementString(lab, "", "");
         dyntext->setValue("My " + key, false);
         dyntext->setAutoUpdate(true);
         dyntext->setDirectEdit(true);
@@ -204,7 +204,7 @@ void Maincontrol::addIndiServerProperties(const QStringList  pDrivers)
             "", "", false, false);
     foreach(QString key, pDrivers)
     {
-        OST::ValueString* dyntext = new OST::ValueString(key, "", "");
+        OST::ElementString* dyntext = new OST::ElementString(key, "", "");
         dyntext->setValue("", false);
         dyntext->setAutoUpdate(true);
         dyntext->setDirectEdit(true);

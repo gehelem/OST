@@ -72,33 +72,33 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     //clearOstElementLov("extextRW", "extext4");
     OST::PropertyMulti *n = getProperty("numbersRW");
     n->setState(OST::State::Error);
-    //OST::ValueInt *numbersRWn3 = static_cast<OST::ValueInt*>(n->getValue("n3"));
-    OST::ValueInt *numbersRWn3 = static_cast<OST::ValueInt*>(n->getValue("n3"));
+    //OST::ElementInt *numbersRWn3 = static_cast<OST::ElementInt*>(n->getValue("n3"));
+    OST::ElementInt *numbersRWn3 = static_cast<OST::ElementInt*>(n->getValue("n3"));
     numbersRWn3->setValue(999666, true);
 
     //getText("extextRW", "extext1")->setValue("Value modified");
-    //OST::ValueJsonDumper d;
+    //OST::ElementJsonDumper d;
     //getText("extextRW", "extext1")->accept(&d);
     //qDebug() << d.getResult();
     OST::PropertyMulti *p = getProperty("extextRW");
     p->setState(OST::State::Busy);
-    static_cast<OST::ValueString*>(p->getValue("extext1"))->setValue("Value modified2", false);
-    static_cast<OST::ValueString*>(p->getValue("extext4"))->lovUpdate("i3", "another label");
+    static_cast<OST::ElementString*>(p->getValue("extext1"))->setValue("Value modified2", false);
+    static_cast<OST::ElementString*>(p->getValue("extext4"))->lovUpdate("i3", "another label");
 
     dynprop = new OST::PropertyMulti("dynprop", "Dynamic", OST::Permission::ReadWrite, "Examples",
                                      "Dynamically instanciated", "", true,
                                      false);
-    dynlight = new OST::ValueLight("Dyn light", "", "");
+    dynlight = new OST::ElementLight("Dyn light", "", "");
     dynlight->setValue(OST::State::Busy, true);
     dynprop->addValue("dynlight", dynlight);
-    dyntext = new OST::ValueString("Dyn text", "", "");
+    dyntext = new OST::ElementString("Dyn text", "", "");
     dynprop->addValue("dyntext", dyntext);
     createProperty("dynprop", dynprop);
     dynprop->setState(OST::State::Busy);
     dyntext->setValue("Okydoky", false);
     dynlight->setValue(OST::State::Ok, true);
 
-    dynbool = new OST::ValueBool("Dyn bool", "", "");
+    dynbool = new OST::ElementBool("Dyn bool", "", "");
     dynprop->addValue("dynbool", dynbool);
     dynbool->setValue(false, false);
 

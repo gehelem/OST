@@ -683,7 +683,7 @@ bool IndiModule::createDeviceProperty(const QString &key, const QString &label, 
 {
     std::vector<INDI::BaseDevice> devs = getDevices();
     OST::PropertyMulti* pm = new OST::PropertyMulti(key, label, OST::ReadWrite, level1, level2, order, true, false);
-    OST::ValueString* s = new  OST::ValueString("name", "", "");
+    OST::ElementString* s = new  OST::ElementString("name", "", "");
     s->setValue("--", false);
     s->setAutoUpdate(true);
     pm->addValue("name", s);
@@ -785,13 +785,13 @@ bool IndiModule::defineMeAsFocuser()
 
     OST::PropertyMulti* pm = getProperty("actions");
     pm->setRule(OST::SwitchsRule::AtMostOne);
-    OST::ValueBool* b = new  OST::ValueBool("Abort focus", "", "");
+    OST::ElementBool* b = new  OST::ElementBool("Abort focus", "", "");
     b->setValue(false, false);
     pm->addValue("abortfocus", b);
-    b = new  OST::ValueBool("Autofocus", "", "");
+    b = new  OST::ElementBool("Autofocus", "", "");
     b->setValue(false, false);
     pm->addValue("autofocus", b);
-    b = new  OST::ValueBool("Loop", "", "");
+    b = new  OST::ElementBool("Loop", "", "");
     b->setValue(false, false);
     pm->addValue("loop", b);
     mIsFocuser = true;
@@ -804,13 +804,13 @@ bool IndiModule::defineMeAsGuider()
 
     OST::PropertyMulti* pm = getProperty("actions");
     pm->setRule(OST::SwitchsRule::AtMostOne);
-    OST::ValueBool* b = new  OST::ValueBool("Abort guider", "", "");
+    OST::ElementBool* b = new  OST::ElementBool("Abort guider", "", "");
     b->setValue(false, false);
     pm->addValue("abortguider", b);
-    b = new  OST::ValueBool("Guide", "", "");
+    b = new  OST::ElementBool("Guide", "", "");
     b->setValue(false, false);
     pm->addValue("guide", b);
-    b = new  OST::ValueBool("Calibrate", "", "");
+    b = new  OST::ElementBool("Calibrate", "", "");
     b->setValue(false, false);
     pm->addValue("calibrate", b);
     mIsGuider = true;
@@ -823,10 +823,10 @@ bool IndiModule::defineMeAsSequencer()
 
     OST::PropertyMulti* pm = getProperty("actions");
     pm->setRule(OST::SwitchsRule::AtMostOne);
-    OST::ValueBool* b = new  OST::ValueBool("Abort sequence", "", "");
+    OST::ElementBool* b = new  OST::ElementBool("Abort sequence", "", "");
     b->setValue(false, false);
     pm->addValue("abortsequence", b);
-    b = new  OST::ValueBool("Start sequence", "", "");
+    b = new  OST::ElementBool("Start sequence", "", "");
     b->setValue(false, false);
     pm->addValue("startsequence", b);
     mIsSequencer = true;
@@ -847,7 +847,7 @@ bool IndiModule::defineMeAsImager()
         if (!(getStore()["image"]->getValues()->contains("image")))
         {
             OST::PropertyMulti * pm = getProperty("image");
-            OST::ValueImg* img = new OST::ValueImg("", "", "");
+            OST::ElementImg* img = new OST::ElementImg("", "", "");
             pm->addValue("image", img);
         }
 
@@ -858,7 +858,7 @@ bool IndiModule::defineMeAsImager()
 
     if (!getStore()["parms"]->getValues()->contains("exposure"))
     {
-        OST::ValueFloat* f = new  OST::ValueFloat("Exposure", "200", "");
+        OST::ElementFloat* f = new  OST::ElementFloat("Exposure", "200", "");
         f->setValue(0, false);
         f->setDirectEdit(true);
         f->setAutoUpdate(true);
@@ -869,7 +869,7 @@ bool IndiModule::defineMeAsImager()
 
     if (!getStore()["parms"]->getValues()->contains("gain"))
     {
-        OST::ValueInt* i  = new  OST::ValueInt("Gain", "205", "");
+        OST::ElementInt* i  = new  OST::ElementInt("Gain", "205", "");
         i->setValue(0, false);
         i->setDirectEdit(true);
         i->setAutoUpdate(true);
@@ -878,7 +878,7 @@ bool IndiModule::defineMeAsImager()
 
     if (!getStore()["parms"]->getValues()->contains("offset"))
     {
-        OST::ValueInt* i  = new  OST::ValueInt("Offset", "210", "");
+        OST::ElementInt* i  = new  OST::ElementInt("Offset", "210", "");
         i->setValue(0, false);
         i->setDirectEdit(true);
         i->setAutoUpdate(true);
@@ -895,21 +895,21 @@ bool IndiModule::defineMeAsNavigator()
 
     OST::PropertyMulti* pm  = getProperty("actions");
     pm->setRule(OST::SwitchsRule::AtMostOne);
-    OST::ValueBool* b = new  OST::ValueBool("Abort navigator", "", "");
+    OST::ElementBool* b = new  OST::ElementBool("Abort navigator", "", "");
     b->setValue(false, false);
     pm->addValue("abortnavigator", b);
-    b = new  OST::ValueBool("Center target", "", "");
+    b = new  OST::ElementBool("Center target", "", "");
     b->setValue(false, false);
     pm->addValue("gototarget", b);
-    OST::ValueString* s = new  OST::ValueString("Target name", "50", "");
+    OST::ElementString* s = new  OST::ElementString("Target name", "50", "");
     s->setDirectEdit(true);
     s->setAutoUpdate(true);
     pm->addValue("targetname", s);
-    OST::ValueFloat* f = new  OST::ValueFloat("Target RA", "51", "");
+    OST::ElementFloat* f = new  OST::ElementFloat("Target RA", "51", "");
     f->setDirectEdit(true);
     f->setAutoUpdate(true);
     pm->addValue("targetra", f);
-    f = new  OST::ValueFloat("Target DEC", "52", "");
+    f = new  OST::ElementFloat("Target DEC", "52", "");
     f->setDirectEdit(true);
     f->setAutoUpdate(true);
     pm->addValue("targetde", f);
@@ -920,7 +920,7 @@ bool IndiModule::defineMeAsNavigator()
 bool IndiModule::giveMeADevice(QString name, QString label, INDI::BaseDevice::DRIVER_INTERFACE interface)
 {
     OST::PropertyMulti* pm = getProperty("devices");
-    OST::ValueString* s = new  OST::ValueString(label, "", "");
+    OST::ElementString* s = new  OST::ElementString(label, "", "");
     switch (interface)
     {
         case INDI::BaseDevice::DRIVER_INTERFACE::GENERAL_INTERFACE:
