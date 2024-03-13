@@ -74,11 +74,24 @@ class ElementBase: public QObject
         }
     signals:
         void valueSet(OST::ElementBase*); /* used in derived template class, only when value is changed*/
-        void valueChanged(OST::ElementBase*); /* used in derived template class, when anything other than value is changed */
+        void eltChanged(OST::ElementBase*); /* used in derived template class, when anything other than value is changed */
         void listChanged(OST::ElementBase*);
         void sendMessage(MsgLevel, QString);
         void lovChanged(OST::ElementBase*);
         void gridEvent();
+
+};
+
+class ValueBase
+{
+    public:
+        virtual void accept(ValueVisitor* pVisitor) = 0;
+        ValueBase(ElementBase &Element);
+        ~ValueBase();
+        virtual void get();
+        virtual void set();
+    protected:
+        ElementBase* pElement;
 
 };
 

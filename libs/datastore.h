@@ -93,7 +93,8 @@ class Datastore : public Baseroot
             OST::PropertyJsonDumper d;
             mStore[pPropertyName]->accept(&d);
             OnModuleEvent("cp", QString(), pPropertyName, d.getResult().toVariantMap());
-            connect(mStore[pPropertyName], &OST::PropertyMulti::valueChanged, this, &Datastore::onValueChanged);
+            connect(mStore[pPropertyName], &OST::PropertyMulti::valueSet, this, &Datastore::onValueSet);
+            connect(mStore[pPropertyName], &OST::PropertyMulti::eltChanged, this, &Datastore::onEltChanged);
             connect(mStore[pPropertyName], &OST::PropertyMulti::propertyEvent, this, &Datastore::onPropertyEvent);
             connect(mStore[pPropertyName], &OST::PropertyMulti::sendMessage, this, &Datastore::onPropertyMessage);
             return true;
@@ -133,7 +134,8 @@ class Datastore : public Baseroot
         QJsonObject getGlobalLovsDump(void);
 
     private slots:
-        void onValueChanged(void);
+        void onEltChanged(void);
+        void onValueSet(void);
         void onPropertyEvent(QString event, QString key, OST::PropertyBase* prop);
         void onPropertyMessage(OST::MsgLevel l, QString m);
         void onLovChanged(void);

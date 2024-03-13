@@ -39,7 +39,7 @@ class ElementPrg: public ElementSingleNotNumeric<double>
                 return;
             }
             mValue = value;
-            if (emitEvent) emit valueChanged(this);
+            if (emitEvent) emit valueSet(this);
         }
         QString dynLabel()
         {
@@ -48,7 +48,7 @@ class ElementPrg: public ElementSingleNotNumeric<double>
         void setDynLabel(const QString &value, const bool &emitEvent)
         {
             mDynLabel = value;
-            if (emitEvent) emit valueChanged(this);
+            if (emitEvent) emit eltChanged(this);
         }
         PrgType prgType()
         {

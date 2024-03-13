@@ -80,7 +80,8 @@ class PropertyMulti: public PropertyBase
             mElts[key] = pElt;
             GridBase* b = GridFactory::createGrid(pElt);
             mGrids[key] = b;
-            connect(mElts[key], &ElementBase::valueChanged, this, &PropertyMulti::OnValueChanged);
+            connect(mElts[key], &ElementBase::eltChanged, this, &PropertyMulti::OnEltChanged);
+            connect(mElts[key], &ElementBase::valueSet, this, &PropertyMulti::OnValueSet);
             connect(mElts[key], &ElementBase::listChanged, this, &PropertyMulti::OnListChanged);
             connect(mElts[key], &ElementBase::lovChanged, this, &PropertyMulti::OnLovChanged);
             connect(mElts[key], &ElementBase::sendMessage, this, &PropertyMulti::OnMessage);
@@ -103,9 +104,13 @@ class PropertyMulti: public PropertyBase
         void updateLine(const int i, const QVariantMap &pValues);
         void clearGrid();
     public slots:
-        void OnValueChanged(ElementBase*)
+        void OnValueSet(ElementBase*)
         {
-            emit valueChanged(this);
+            emit valueSet(this);
+        }
+        void OnEltChanged(ElementBase*)
+        {
+            emit eltChanged(this);
         }
         void OnListChanged(ElementBase*)
         {

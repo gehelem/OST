@@ -265,7 +265,8 @@ bool Datastore::createOstProperty(const QString &pPropertyName, const QString &p
     mStore[pPropertyName] = pm;
     OST::PropertyJsonDumper d;
     pm->accept(&d);
-    connect(mStore[pPropertyName], &OST::PropertyMulti::valueChanged, this, &Datastore::onValueChanged);
+    connect(mStore[pPropertyName], &OST::PropertyMulti::valueSet, this, &Datastore::onValueSet);
+    connect(mStore[pPropertyName], &OST::PropertyMulti::eltChanged, this, &Datastore::onEltChanged);
     connect(mStore[pPropertyName], &OST::PropertyMulti::propertyEvent, this, &Datastore::onPropertyEvent);
     connect(mStore[pPropertyName], &OST::PropertyMulti::sendMessage, this, &Datastore::onPropertyMessage);
     OnModuleEvent("cp", QString(), pPropertyName, d.getResult().toVariantMap());
@@ -278,12 +279,20 @@ void Datastore::emitPropertyCreation(const QString &pPropertyName)
     mStore[pPropertyName]->accept(&d, result);
     emit OnModuleEvent("cp", QString(), pPropertyName, result);
 }
-void Datastore::onValueChanged(void)
+void Datastore::onValueSet(void)
 {
     OST::PropertyBase* obj = qobject_cast<OST::PropertyBase*>(sender());
     OST::PropertyJsonDumper d;
     obj->accept(&d);
     OnModuleEvent("se", QString(), obj->key(), d.getResult().toVariantMap());
+
+}
+void Datastore::onEltChanged(void)
+{
+    OST::PropertyBase* obj = qobject_cast<OST::PropertyBase*>(sender());
+    OST::PropertyJsonDumper d;
+    obj->accept(&d);
+    OnModuleEvent("ap", QString(), obj->key(), d.getResult().toVariantMap());
 
 }
 void Datastore::onPropertyEvent(QString event, QString key, OST::PropertyBase* prop)
@@ -416,7 +425,8 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
             if (rp != nullptr)
             {
                 mStore[key] = rp;
-                connect(rp, &OST::PropertyMulti::valueChanged, this, &Datastore::onValueChanged);
+                connect(rp, &OST::PropertyMulti::valueSet, this, &Datastore::onValueSet);
+                connect(rp, &OST::PropertyMulti::eltChanged, this, &Datastore::onEltChanged);
                 connect(rp, &OST::PropertyMulti::propertyEvent, this, &Datastore::onPropertyEvent);
                 connect(rp, &OST::PropertyMulti::sendMessage, this, &Datastore::onPropertyMessage);
                 mStore[key]->setState(OST::State::Idle);

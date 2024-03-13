@@ -194,7 +194,8 @@ class PropertyBase: public QObject
     signals:
         void stateChanged(OST::State);
         void propertyCreated(void);
-        void valueChanged(OST::PropertyBase*);
+        void eltChanged(OST::PropertyBase*);
+        void valueSet(OST::PropertyBase*);
         void propertyEvent(QString, QString, OST::PropertyBase*);
         void sendMessage(MsgLevel, QString);
 

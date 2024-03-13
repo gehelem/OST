@@ -156,7 +156,7 @@ class ElementSingleNumeric : public ElementSingle<T>
         void setMin(const T &min)
         {
             mMin = min;
-            emit ElementBase::valueChanged(this);
+            emit ElementBase::eltChanged(this);
         }
         int max()
         {
@@ -165,21 +165,21 @@ class ElementSingleNumeric : public ElementSingle<T>
         void setMax(const T &max)
         {
             mMax = max;
-            emit ElementBase::valueChanged(this);
+            emit ElementBase::eltChanged(this);
         }
         void setMinMax(const T &min, const T &max)
         {
             mMin = min;
             mMax = max;
             mUseMinMax = true;
-            emit ElementBase::valueChanged(this);
+            emit ElementBase::eltChanged(this);
         }
         void unSetMinMax(void)
         {
             mMin = 0;
             mMax = 0;
             mUseMinMax = false;
-            emit ElementBase::valueChanged(this);
+            emit ElementBase::eltChanged(this);
         }
         T step()
         {
@@ -188,7 +188,7 @@ class ElementSingleNumeric : public ElementSingle<T>
         void setStep(const T &step)
         {
             mStep = step;
-            emit ElementBase::valueChanged(this);
+            emit ElementBase::eltChanged(this);
         }
 
         QString format()
@@ -198,7 +198,7 @@ class ElementSingleNumeric : public ElementSingle<T>
         void setFormat(const QString &format)
         {
             mFormat = format;
-            emit ElementBase::valueChanged(this);
+            emit ElementBase::eltChanged(this);
         }
     private:
         T mValue;
