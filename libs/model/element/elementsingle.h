@@ -253,8 +253,6 @@ class ValueTemplate: public ValueBase
     public:
         ValueTemplate(ElementBase* element) : ValueBase(element) {}
         ~ValueTemplate() {}
-        void get() override {}
-        void set() override {}
         T value;
 };
 

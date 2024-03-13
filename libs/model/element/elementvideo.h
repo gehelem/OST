@@ -70,6 +70,15 @@ class ValueVideo: public ValueTemplate<VideoData>
         }
         ValueVideo(ElementBase* element): ValueTemplate<VideoData>(element) {}
         ~ValueVideo() {}
+        void updateValue() override
+        {
+            value = static_cast<ElementVideo*>(pElement)->value();
+        }
+        void updateElement(const bool &emitEvent) override
+        {
+            static_cast<ElementVideo*>(pElement)->setValue(value, emitEvent);
+        }
+
 };
 }
 #endif

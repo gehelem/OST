@@ -365,51 +365,61 @@ ValueBase *ValueFactory::createValue(ElementBase * &pElement)
     if (pElement->getType() == "string")
     {
         auto *pValue = new ValueString(pElement);
+        pValue->updateValue();
         return pValue;
     }
     if (pElement->getType() == "int")
     {
         auto *pValue = new ValueInt(pElement);
+        pValue->updateValue();
         return pValue;
     }
     if (pElement->getType() == "bool")
     {
         auto *pValue = new ValueBool(pElement);
+        pValue->updateValue();
         return pValue;
     }
     if (pElement->getType() == "float")
     {
         auto *pValue = new ValueFloat(pElement);
+        pValue->updateValue();
         return pValue;
     }
     if (pElement->getType() == "prg")
     {
         auto *pValue = new ValuePrg(pElement);
+        pValue->updateValue();
         return pValue;
     }
     if (pElement->getType() == "message")
     {
         auto *pValue = new ValueMessage(pElement);
+        pValue->updateValue();
         return pValue;
     }
     if (pElement->getType() == "video")
     {
         auto *pValue = new ValueVideo(pElement);
+        pValue->updateValue();
         return pValue;
     }
     if (pElement->getType() == "img")
     {
         auto *pValue = new ValueImg(pElement);
+        pValue->updateValue();
         return pValue;
     }
     if (pElement->getType() == "light")
     {
         auto *pValue = new ValueLight(pElement);
+        pValue->updateValue();
         return pValue;
     }
     if (pElement->getType() == "graph")
     {
         auto *pValue = new ValueGraph(pElement);
+        pValue->updateValue();
         return pValue;
     }
 

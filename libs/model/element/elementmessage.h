@@ -95,6 +95,15 @@ class ValueMessage: public ValueTemplate<QString>
         }
         ValueMessage(ElementBase* element): ValueTemplate<QString>(element) {}
         ~ValueMessage() {}
+        void updateValue() override
+        {
+            value = static_cast<ElementMessage*>(pElement)->value();
+        }
+        void updateElement(const bool &emitEvent) override
+        {
+            static_cast<ElementMessage*>(pElement)->setValue(value, emitEvent);
+        }
+
 };
 }
 #endif

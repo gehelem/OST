@@ -92,6 +92,15 @@ class ValueFloat: public ValueTemplate<double>
         }
         ValueFloat(ElementBase* element): ValueTemplate<double>(element) {}
         ~ValueFloat() {}
+        void updateValue() override
+        {
+            value = static_cast<ElementFloat*>(pElement)->value();
+        }
+        void updateElement(const bool &emitEvent) override
+        {
+            static_cast<ElementFloat*>(pElement)->setValue(value, emitEvent);
+        }
+
 };
 
 }

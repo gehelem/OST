@@ -90,6 +90,15 @@ class ValueInt: public ValueTemplate<int>
         }
         ValueInt(ElementBase* element): ValueTemplate<int>(element) {}
         ~ValueInt() {}
+        void updateValue() override
+        {
+            value = static_cast<ElementInt*>(pElement)->value();
+        }
+        void updateElement(const bool &emitEvent) override
+        {
+            static_cast<ElementInt*>(pElement)->setValue(value, emitEvent);
+        }
+
 };
 
 }

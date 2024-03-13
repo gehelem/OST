@@ -78,6 +78,15 @@ class ValueGraph: public ValueTemplate<GraphDefs>
         }
         ValueGraph(ElementBase* element): ValueTemplate<GraphDefs>(element) {}
         ~ValueGraph() {}
+        void updateValue() override
+        {
+            value = static_cast<ElementGraph*>(pElement)->value();
+        }
+        void updateElement(const bool &emitEvent) override
+        {
+            static_cast<ElementGraph*>(pElement)->setValue(value, emitEvent);
+        }
+
 };
 }
 #endif

@@ -68,6 +68,15 @@ class ValueImg: public ValueTemplate<ImgData>
         }
         ValueImg(ElementBase* element): ValueTemplate<ImgData>(element) {}
         ~ValueImg() {}
+        void updateValue() override
+        {
+            value = static_cast<ElementImg*>(pElement)->value();
+        }
+        void updateElement(const bool &emitEvent) override
+        {
+            static_cast<ElementImg*>(pElement)->setValue(value, emitEvent);
+        }
+
 };
 }
 #endif

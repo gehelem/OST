@@ -91,8 +91,8 @@ class ValueBase: public QObject
         virtual void accept(ValueVisitor* pVisitor) = 0;
         ValueBase(ElementBase* element);
         ~ValueBase();
-        virtual void get() = 0;
-        virtual void set() = 0;
+        virtual void updateValue() = 0;
+        virtual void updateElement(const bool &emitEvent) = 0;
     protected:
         ElementBase* pElement;
 

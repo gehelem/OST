@@ -70,6 +70,15 @@ class ValueLight: public ValueTemplate<State>
         }
         ValueLight(ElementBase* element): ValueTemplate<State>(element) {}
         ~ValueLight() {}
+        void updateValue() override
+        {
+            value = static_cast<ElementLight*>(pElement)->value();
+        }
+        void updateElement(const bool &emitEvent) override
+        {
+            static_cast<ElementLight*>(pElement)->setValue(value, emitEvent);
+        }
+
 };
 
 }

@@ -88,6 +88,15 @@ class ValueString: public ValueTemplate<QString>
         }
         ValueString(ElementBase* element): ValueTemplate<QString>(element) {}
         ~ValueString() {}
+        void updateValue() override
+        {
+            value = static_cast<ElementString*>(pElement)->value();
+        }
+        void updateElement(const bool &emitEvent) override
+        {
+            static_cast<ElementString*>(pElement)->setValue(value, emitEvent);
+        }
+
 };
 
 }

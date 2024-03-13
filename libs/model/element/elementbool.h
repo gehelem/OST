@@ -68,6 +68,15 @@ class ValueBool: public ValueTemplate<bool>
         }
         ValueBool(ElementBase* element): ValueTemplate<bool>(element) {}
         ~ValueBool() {}
+        void updateValue() override
+        {
+            value = static_cast<ElementBool*>(pElement)->value();
+        }
+        void updateElement(const bool &emitEvent) override
+        {
+            static_cast<ElementBool*>(pElement)->setValue(value, emitEvent);
+        }
+
 };
 
 }

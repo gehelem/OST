@@ -100,6 +100,15 @@ class ValuePrg: public ValueTemplate<double>
         }
         ValuePrg(ElementBase* element): ValueTemplate<double>(element) {}
         ~ValuePrg() {}
+        void updateValue() override
+        {
+            value = static_cast<ElementPrg*>(pElement)->value();
+        }
+        void updateElement(const bool &emitEvent) override
+        {
+            static_cast<ElementPrg*>(pElement)->setValue(value, emitEvent);
+        }
+
 };
 
 }
