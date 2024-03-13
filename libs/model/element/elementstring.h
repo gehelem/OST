@@ -76,5 +76,19 @@ class GridString: public GridTemplate<QString>
         ElementString* mElement;
 };
 
+class ValueString: public ValueTemplate<QString>
+{
+        Q_OBJECT
+
+    public:
+
+        void accept(ValueVisitor* pVisitor)  override
+        {
+            pVisitor->visit(this);
+        }
+        ValueString(ElementBase* element): ValueTemplate<QString>(element) {}
+        ~ValueString() {}
+};
+
 }
 #endif

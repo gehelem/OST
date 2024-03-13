@@ -32,5 +32,13 @@ class GridFactory
         static GridBase* createGrid(ElementBase* &pValue);
 };
 
+class ValueFactory
+{
+
+    public:
+        ValueFactory() = delete;
+        static ValueBase* createValue(ElementBase* &pElement);
+};
+
 }
 #endif //OST_ELEMENTFACTORY_H

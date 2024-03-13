@@ -247,5 +247,16 @@ class GridTemplate: public GridBase
         QList<T> items;
 };
 
+template <typename T>
+class ValueTemplate: public ValueBase
+{
+    public:
+        ValueTemplate(ElementBase* element) : ValueBase(element) {}
+        ~ValueTemplate() {}
+        void get() override {}
+        void set() override {}
+        T value;
+};
+
 }
 #endif

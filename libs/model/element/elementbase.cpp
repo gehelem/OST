@@ -20,6 +20,14 @@ GridBase::~GridBase()
 
 }
 
+ValueBase::ValueBase(ElementBase *element): pElement(element)
+{
+
+}
+ValueBase::~ValueBase()
+{
+
+}
 
 
 }

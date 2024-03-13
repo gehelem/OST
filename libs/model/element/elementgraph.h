@@ -66,6 +66,18 @@ class GridGraph: public GridTemplate<GraphDefs>
         ElementGraph* mElement;
 };
 
+class ValueGraph: public ValueTemplate<GraphDefs>
+{
+        Q_OBJECT
 
+    public:
+
+        void accept(ValueVisitor* pVisitor)  override
+        {
+            pVisitor->visit(this);
+        }
+        ValueGraph(ElementBase* element): ValueTemplate<GraphDefs>(element) {}
+        ~ValueGraph() {}
+};
 }
 #endif

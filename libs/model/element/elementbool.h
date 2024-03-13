@@ -56,5 +56,19 @@ class GridBool: public GridTemplate<bool>
         ElementBool* mElement;
 };
 
+class ValueBool: public ValueTemplate<bool>
+{
+        Q_OBJECT
+
+    public:
+
+        void accept(ValueVisitor* pVisitor)  override
+        {
+            pVisitor->visit(this);
+        }
+        ValueBool(ElementBase* element): ValueTemplate<bool>(element) {}
+        ~ValueBool() {}
+};
+
 }
 #endif

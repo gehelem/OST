@@ -88,5 +88,19 @@ class GridPrg: public GridTemplate<double>
         ElementPrg* mElement;
 };
 
+class ValuePrg: public ValueTemplate<double>
+{
+        Q_OBJECT
+
+    public:
+
+        void accept(ValueVisitor* pVisitor)  override
+        {
+            pVisitor->visit(this);
+        }
+        ValuePrg(ElementBase* element): ValueTemplate<double>(element) {}
+        ~ValuePrg() {}
+};
+
 }
 #endif

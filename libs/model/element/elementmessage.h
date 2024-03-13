@@ -83,5 +83,18 @@ class GridMessage: public GridTemplate<QString>
         ElementMessage* mElement;
 };
 
+class ValueMessage: public ValueTemplate<QString>
+{
+        Q_OBJECT
+
+    public:
+
+        void accept(ValueVisitor* pVisitor)  override
+        {
+            pVisitor->visit(this);
+        }
+        ValueMessage(ElementBase* element): ValueTemplate<QString>(element) {}
+        ~ValueMessage() {}
+};
 }
 #endif

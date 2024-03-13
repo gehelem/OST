@@ -8,7 +8,9 @@ namespace  OST
 {
 
 class ElementVisitor;
+class ValueVisitor;
 class GridVisitor;
+
 
 class ElementBase: public QObject
 {
@@ -82,14 +84,15 @@ class ElementBase: public QObject
 
 };
 
-class ValueBase
+class ValueBase: public QObject
 {
+        Q_OBJECT
     public:
         virtual void accept(ValueVisitor* pVisitor) = 0;
-        ValueBase(ElementBase &Element);
+        ValueBase(ElementBase* element);
         ~ValueBase();
-        virtual void get();
-        virtual void set();
+        virtual void get() = 0;
+        virtual void set() = 0;
     protected:
         ElementBase* pElement;
 

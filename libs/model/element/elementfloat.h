@@ -80,6 +80,19 @@ class GridFloat: public GridTemplate<double>
 
 };
 
+class ValueFloat: public ValueTemplate<double>
+{
+        Q_OBJECT
+
+    public:
+
+        void accept(ValueVisitor* pVisitor)  override
+        {
+            pVisitor->visit(this);
+        }
+        ValueFloat(ElementBase* element): ValueTemplate<double>(element) {}
+        ~ValueFloat() {}
+};
 
 }
 #endif

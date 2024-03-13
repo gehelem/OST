@@ -58,5 +58,19 @@ class GridLight: public GridTemplate<State>
         ElementLight* mElement;
 };
 
+class ValueLight: public ValueTemplate<State>
+{
+        Q_OBJECT
+
+    public:
+
+        void accept(ValueVisitor* pVisitor)  override
+        {
+            pVisitor->visit(this);
+        }
+        ValueLight(ElementBase* element): ValueTemplate<State>(element) {}
+        ~ValueLight() {}
+};
+
 }
 #endif

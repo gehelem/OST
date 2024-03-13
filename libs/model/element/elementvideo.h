@@ -57,5 +57,19 @@ class GridVideo: public GridTemplate<VideoData>
         ElementVideo* mElement;
 
 };
+
+class ValueVideo: public ValueTemplate<VideoData>
+{
+        Q_OBJECT
+
+    public:
+
+        void accept(ValueVisitor* pVisitor)  override
+        {
+            pVisitor->visit(this);
+        }
+        ValueVideo(ElementBase* element): ValueTemplate<VideoData>(element) {}
+        ~ValueVideo() {}
+};
 }
 #endif

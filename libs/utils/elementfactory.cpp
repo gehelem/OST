@@ -296,7 +296,7 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
     }
 
 
-    qDebug() << "Can't guess element type " << pData["label"].toString();
+    qDebug() << "createElement - Can't guess element type " << pData["label"].toString();
     return nullptr;
 
 }
@@ -355,6 +355,65 @@ GridBase *GridFactory::createGrid(ElementBase * &pElement)
     }
 
     qDebug() << "Unhandled grid type " << pElement->getType();
+
+    return nullptr;
+
+}
+
+ValueBase *ValueFactory::createValue(ElementBase * &pElement)
+{
+    if (pElement->getType() == "string")
+    {
+        auto *pValue = new ValueString(pElement);
+        return pValue;
+    }
+    if (pElement->getType() == "int")
+    {
+        auto *pValue = new ValueInt(pElement);
+        return pValue;
+    }
+    if (pElement->getType() == "bool")
+    {
+        auto *pValue = new ValueBool(pElement);
+        return pValue;
+    }
+    if (pElement->getType() == "float")
+    {
+        auto *pValue = new ValueFloat(pElement);
+        return pValue;
+    }
+    if (pElement->getType() == "prg")
+    {
+        auto *pValue = new ValuePrg(pElement);
+        return pValue;
+    }
+    if (pElement->getType() == "message")
+    {
+        auto *pValue = new ValueMessage(pElement);
+        return pValue;
+    }
+    if (pElement->getType() == "video")
+    {
+        auto *pValue = new ValueVideo(pElement);
+        return pValue;
+    }
+    if (pElement->getType() == "img")
+    {
+        auto *pValue = new ValueImg(pElement);
+        return pValue;
+    }
+    if (pElement->getType() == "light")
+    {
+        auto *pValue = new ValueLight(pElement);
+        return pValue;
+    }
+    if (pElement->getType() == "graph")
+    {
+        auto *pValue = new ValueGraph(pElement);
+        return pValue;
+    }
+
+    qDebug() << "createValue - Unhandled element type " << pElement->getType();
 
     return nullptr;
 

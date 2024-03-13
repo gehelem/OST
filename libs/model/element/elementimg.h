@@ -56,6 +56,18 @@ class GridImg: public GridTemplate<ImgData>
         ElementImg*  mElement;
 };
 
+class ValueImg: public ValueTemplate<ImgData>
+{
+        Q_OBJECT
 
+    public:
+
+        void accept(ValueVisitor* pVisitor)  override
+        {
+            pVisitor->visit(this);
+        }
+        ValueImg(ElementBase* element): ValueTemplate<ImgData>(element) {}
+        ~ValueImg() {}
+};
 }
 #endif

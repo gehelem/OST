@@ -78,6 +78,20 @@ class GridInt: public GridTemplate<int>
         ElementInt* mElement;
 };
 
+class ValueInt: public ValueTemplate<int>
+{
+        Q_OBJECT
+
+    public:
+
+        void accept(ValueVisitor* pVisitor)  override
+        {
+            pVisitor->visit(this);
+        }
+        ValueInt(ElementBase* element): ValueTemplate<int>(element) {}
+        ~ValueInt() {}
+};
+
 }
 
 #endif
