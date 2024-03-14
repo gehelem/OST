@@ -382,6 +382,14 @@
         "permission": 2,
         "arrayLimit":5,
         "label": "Grid example",
+        "gridheaders": ["X","Y","Z","imgrid","prggrid","graph"],
+        "grid": [
+            [0,0.0,"P0","",0,""],
+            [1,0.1,"P1","",10,""],
+            [2,0.4,"P2","",20,""],
+            [3,0.9,"P3","",30,""],
+            [4,0.16,"P4","",40,""]
+        ],
         "elements": {
             "graph": {
                 "type": "graph",
@@ -392,14 +400,14 @@
                 }
             },
             "X": {
-                "type": "int",
+                "type": "float",
                 "label": "Abscisse",
                 "value":0,
                 "gridvalues":[0,1,2,3,4],
                 "order":"B"
             },
             "Y": {
-                "type": "int",
+                "type": "float",
                 "label": "Ordonnée",
                 "value":0,
                 "gridvalues":[0,1,4,9,16],

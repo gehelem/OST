@@ -105,6 +105,13 @@ void PropertyMulti::push()
         m["arrayLimit"] = this->getArrayLimit();
         mElts[elt]->accept(&d, action, m);
     }
+    QList<ValueBase*> wGridLine;
+    foreach(const QString &elt, mGridHeaders)
+    {
+        ValueBase* v = ValueFactory::createValue(mElts[elt]);
+        wGridLine.append(v);
+    }
+    mGrid.append(wGridLine);
     emit propertyEvent("ap", key(), this);
 
 }
@@ -131,6 +138,7 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
 
     foreach(const QString &elt, mElts.keys())
     {
+
         if ((mElts[elt]->getType() == "int") || (mElts[elt]->getType() == "float") || (mElts[elt]->getType() == "string"))
         {
             ElementUpdate d;
@@ -145,6 +153,14 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
             mGrids[elt]->accept(&g, action, line);
         }
     }
+
+
+    foreach(const QString &elt, mElts.keys())
+    {
+        setElt(elt, pValues[elt]);
+
+    }
+    push();
 
     emit propertyEvent("ap", key(), this);
 
@@ -165,6 +181,9 @@ void PropertyMulti::deleteLine(const int i)
         m["i"] = i;
         mElts[elt]->accept(&d, action, m);
     }
+
+    mGrid.removeAt(i);
+
     emit propertyEvent("ap", key(), this);
 
 }

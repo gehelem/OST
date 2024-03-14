@@ -275,8 +275,6 @@ void ElementUpdate::visit(ElementGraph* pElement, QString &action, QVariantMap &
 }
 void ElementUpdate::visit(ElementPrg* pElement, QString &action, QVariantMap &data)
 {
-    qDebug() << "ElementUpdate::visit" << data;
-
     if (data.contains("arrayLimit"))
     {
         pElement->setArrayLimit(data["arrayLimit"].toInt());

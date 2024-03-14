@@ -167,6 +167,8 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertytextdumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyjsondumper.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyjsondumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuejsondumper.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuejsondumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovjsondumper.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovjsondumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementtextdumper.cpp
@@ -232,6 +234,7 @@ set(BASE_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovvisitor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertytextdumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyjsondumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuejsondumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovjsondumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementtextdumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementjsondumper.h

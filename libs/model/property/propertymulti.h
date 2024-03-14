@@ -80,6 +80,7 @@ class PropertyMulti: public PropertyBase
             mElts[key] = pElt;
             GridBase* b = GridFactory::createGrid(pElt);
             mGrids[key] = b;
+            mGridHeaders.append(key);
             connect(mElts[key], &ElementBase::eltChanged, this, &PropertyMulti::OnEltChanged);
             connect(mElts[key], &ElementBase::valueSet, this, &PropertyMulti::OnValueSet);
             connect(mElts[key], &ElementBase::listChanged, this, &PropertyMulti::OnListChanged);
@@ -103,6 +104,14 @@ class PropertyMulti: public PropertyBase
         void deleteLine(const int i);
         void updateLine(const int i, const QVariantMap &pValues);
         void clearGrid();
+        QList<QString> getGridHeaders()
+        {
+            return mGridHeaders;
+        }
+        QList<QList<ValueBase*>> getGrid()
+        {
+            return mGrid;
+        }
     public slots:
         void OnValueSet(ElementBase*)
         {
@@ -143,6 +152,8 @@ class PropertyMulti: public PropertyBase
         SwitchsRule mRule = SwitchsRule::Any;
         QMap<QString, ElementBase*> mElts;
         QMap<QString, GridBase*> mGrids;
+        QList<QString> mGridHeaders;
+        QList<QList<ValueBase*>> mGrid;
 
 
 };

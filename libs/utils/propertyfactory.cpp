@@ -50,6 +50,23 @@ PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVaria
             pProperty->addElt(key, v);
         }
     }
+    if (pData.contains("grid"))
+    {
+        QJsonArray arr = pData["grid"].toJsonArray();
+        for(int i = 0; i < arr.size(); i++)
+        {
+            QJsonArray line = arr[i].toArray();
+            qDebug() << "Grid content " << pProperty->key() << "(" << i << ") : " << line;
+            for(int j = 0; j < line.size(); j++)
+            {
+                pProperty->setElt(pProperty->getGridHeaders()[j], line[j].toVariant());
+            }
+            pProperty->push();
+
+        }
+
+
+    }
 
     return pProperty;
 

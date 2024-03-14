@@ -1,5 +1,6 @@
 #include "propertyjsondumper.h"
 #include "elementjsondumper.h"
+#include <valuejsondumper.h>
 #include "elementupdate.h"
 #include <sstream>
 namespace  OST
@@ -52,8 +53,37 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
         QJsonObject grid = d.getResult();
         grids[key] = grid;
     }
-
     json["grids"] = grids;
+
+
+    if (pProperty->getGridHeaders().size() > 0)
+    {
+        //qDebug() << "jsondump gridheader " << pProperty->key() << "-" << pProperty->getGridHeaders();
+        json["gridheaders"] = QJsonArray::fromStringList(pProperty->getGridHeaders());
+    }
+
+    if (pProperty->getGrid().size() > 0)
+    {
+        QJsonArray grid;
+        foreach(const QList<ValueBase*> &gridLine, pProperty->getGrid())
+        {
+            QJsonArray jLine;
+            foreach(ValueBase* value, gridLine)
+            {
+                ValueJsonDumper d;
+                value->accept(&d);
+                jLine.append(d.getResult());
+            }
+            grid.append(jLine);
+        }
+        json["grid"] = grid;
+
+    }
+
+
+
+
+
     mResult = json;
 }
 
