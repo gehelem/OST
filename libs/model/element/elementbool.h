@@ -36,26 +36,6 @@ class ElementBool: public ElementSingleNotNumeric<bool>
 
 };
 
-class GridBool: public GridTemplate<bool>
-{
-        Q_OBJECT
-
-    public:
-
-        void accept(GridVisitor* pVisitor, QString &action, int &line)  override
-        {
-            pVisitor->visit(this, action, line);
-        }
-        GridBool(ElementBase* value): GridTemplate<bool>(value), mElement(static_cast<ElementBool*>(value)) {}
-        ~GridBool() {}
-
-        QString getType() override
-        {
-            return "bool";
-        }
-        ElementBool* mElement;
-};
-
 class ValueBool: public ValueTemplate<bool>
 {
         Q_OBJECT

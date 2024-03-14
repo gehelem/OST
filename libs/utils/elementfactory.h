@@ -24,14 +24,6 @@ class ElementFactory
         static ElementBase* createElement(const QVariantMap &pData);
 };
 
-class GridFactory
-{
-
-    public:
-        GridFactory() = delete;
-        static GridBase* createGrid(ElementBase* &pValue);
-};
-
 class ValueFactory
 {
 

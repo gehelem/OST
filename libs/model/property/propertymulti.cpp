@@ -147,10 +147,6 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
             m["val"] = pValues[elt];
             m["arrayLimit"] = this->getArrayLimit();
             mElts[elt]->accept(&d, action, m);
-            OST::GridUpdate g;
-            action = "add";
-            int line = 0;
-            mGrids[elt]->accept(&g, action, line);
         }
     }
 
@@ -248,23 +244,6 @@ void PropertyMulti::clearGrid()
         mElts[elt]->accept(&d, action, m);
     }
     emit propertyEvent("ap", key(), this);
-
-}
-
-QJsonObject PropertyMulti::getJsonGrids()
-{
-    QJsonObject grids;
-    foreach(const QString &key, mGrids.keys())
-    {
-        OST::GridJsonDumper d;
-
-        QString action = "";
-        int line = 0;
-        mGrids[key]->accept(&d, action, line);
-        QJsonObject grid = d.getResult();
-        grids[key] = grid;
-    }
-    return grids;
 
 }
 

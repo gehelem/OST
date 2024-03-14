@@ -36,28 +36,6 @@ class ElementLight: public ElementSingleNotNumeric<State>
 
 };
 
-class GridLight: public GridTemplate<State>
-{
-
-        Q_OBJECT
-
-    public:
-
-        void accept(GridVisitor* pVisitor, QString &action, int &line)  override
-        {
-            pVisitor->visit(this, action, line);
-        }
-
-        GridLight(ElementBase* value): GridTemplate<State>(value), mElement(static_cast<ElementLight*>(value)) {}
-        ~GridLight() {}
-
-        QString getType() override
-        {
-            return "light";
-        }
-        ElementLight* mElement;
-};
-
 class ValueLight: public ValueTemplate<State>
 {
         Q_OBJECT

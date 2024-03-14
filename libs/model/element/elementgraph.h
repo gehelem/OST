@@ -44,28 +44,6 @@ class ElementGraph: public ElementSingleNotNumeric<GraphDefs>
 
 };
 
-class GridGraph: public GridTemplate<GraphDefs>
-{
-
-        Q_OBJECT
-
-    public:
-
-        void accept(GridVisitor* pVisitor, QString &action, int &line)  override
-        {
-            pVisitor->visit(this, action, line);
-        }
-
-        GridGraph(ElementBase* value): GridTemplate<GraphDefs>(value), mElement(static_cast<ElementGraph*>(value)) {}
-        ~GridGraph() {}
-
-        QString getType() override
-        {
-            return "graph";
-        }
-        ElementGraph* mElement;
-};
-
 class ValueGraph: public ValueTemplate<GraphDefs>
 {
         Q_OBJECT

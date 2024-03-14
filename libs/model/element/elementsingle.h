@@ -235,19 +235,6 @@ class ElementSingleNotNumeric : public ElementSingle<T>
 };
 
 template <typename T>
-class GridTemplate: public GridBase
-{
-    public:
-        GridTemplate(ElementBase* value) : GridBase(value) {}
-        ~GridTemplate() {}
-        QString getType() override
-        {
-            return "error";
-        }
-        QList<T> items;
-};
-
-template <typename T>
 class ValueTemplate: public ValueBase
 {
     public:

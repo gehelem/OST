@@ -90,52 +90,6 @@ class ElementUpdate : public ElementVisitor
 
 
 };
-class GridUpdate : public GridVisitor
-{
-
-    public:
-        GridUpdate() = default;
-        void visit(GridInt* pGrid, QString &action, int &line) override;
-        void visit(GridBool* pGrid, QString &action, int &line) override;
-        void visit(GridFloat* pGrid, QString &action, int &line) override;
-        void visit(GridString* pGrid, QString &action, int &line) override;
-        void visit(GridLight* pGrid, QString &action, int &line) override;
-        void visit(GridImg* pGrid, QString &action, int &line) override;
-        void visit(GridVideo* pGrid, QString &action, int &line) override;
-        void visit(GridMessage* pGrid, QString &action, int &line) override;
-        void visit(GridGraph* pGrid, QString &action, int &line) override;
-        void visit(GridPrg* pGrid, QString &action, int &line) override;
-
-};
-
-class GridJsonDumper: public GridVisitor
-{
-
-    public:
-        GridJsonDumper() = default;
-        void visit(GridInt* pGrid, QString &action, int &line) override;
-        void visit(GridBool* pGrid, QString &action, int &line) override;
-        void visit(GridFloat* pGrid, QString &action, int &line) override;
-        void visit(GridString* pGrid, QString &action, int &line) override;
-        void visit(GridLight* pGrid, QString &action, int &line) override;
-        void visit(GridImg* pGrid, QString &action, int &line) override;
-        void visit(GridVideo* pGrid, QString &action, int &line) override;
-        void visit(GridMessage* pGrid, QString &action, int &line) override;
-        void visit(GridGraph* pGrid, QString &action, int &line) override;
-        void visit(GridPrg* pGrid, QString &action, int &line) override;
-
-        [[nodiscard]] const QJsonObject &getResult() const
-        {
-            return mResult;
-        }
-
-    private:
-        QJsonObject mResult;
-        QString mJsonString;
-        QJsonObject dumpGridCommons(GridBase *pGrid);
-
-};
-
 
 }
 #endif //OST_ELEMENTUPDATE_H

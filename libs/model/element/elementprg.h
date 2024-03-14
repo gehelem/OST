@@ -66,28 +66,6 @@ class ElementPrg: public ElementSingleNotNumeric<double>
 
 };
 
-class GridPrg: public GridTemplate<double>
-{
-
-        Q_OBJECT
-
-    public:
-
-        void accept(GridVisitor* pVisitor, QString &action, int &line)  override
-        {
-            pVisitor->visit(this, action, line);
-        }
-
-        GridPrg(ElementBase* value): GridTemplate<double>(value), mElement(static_cast<ElementPrg*>(value)) {}
-        ~GridPrg() {}
-
-        QString getType() override
-        {
-            return "prg";
-        }
-        ElementPrg* mElement;
-};
-
 class ValuePrg: public ValueTemplate<double>
 {
         Q_OBJECT

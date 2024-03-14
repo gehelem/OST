@@ -3,6 +3,7 @@
 
 #include <propertybase.h>
 #include <elementfactory.h>
+
 namespace  OST
 {
 
@@ -56,10 +57,6 @@ class PropertyMulti: public PropertyBase
         {
             return &mElts;
         }
-        QMap<QString, GridBase*> getGrids()
-        {
-            return mGrids;
-        }
         ElementBase* getElt(QString pElement)
         {
             if (!mElts.contains(pElement))
@@ -78,8 +75,6 @@ class PropertyMulti: public PropertyBase
                 return;
             }
             mElts[key] = pElt;
-            GridBase* b = GridFactory::createGrid(pElt);
-            mGrids[key] = b;
             mGridHeaders.append(key);
             connect(mElts[key], &ElementBase::eltChanged, this, &PropertyMulti::OnEltChanged);
             connect(mElts[key], &ElementBase::valueSet, this, &PropertyMulti::OnValueSet);
@@ -95,7 +90,6 @@ class PropertyMulti: public PropertyBase
                 return;
             }
             mElts.remove(key);
-            mGrids.remove(key);
             emit propertyEvent("ap", key, this);
 
         }
@@ -147,11 +141,9 @@ class PropertyMulti: public PropertyBase
                     break;
             }
         }
-        QJsonObject getJsonGrids();
     private:
         SwitchsRule mRule = SwitchsRule::Any;
         QMap<QString, ElementBase*> mElts;
-        QMap<QString, GridBase*> mGrids;
         QList<QString> mGridHeaders;
         QList<QList<ValueBase*>> mGrid;
 

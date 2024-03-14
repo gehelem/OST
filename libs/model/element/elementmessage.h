@@ -61,28 +61,6 @@ class ElementMessage: public ElementSingleNotNumeric<QString>
 
 };
 
-class GridMessage: public GridTemplate<QString>
-{
-
-        Q_OBJECT
-
-    public:
-
-        void accept(GridVisitor* pVisitor, QString &action, int &line)  override
-        {
-            pVisitor->visit(this, action, line);
-        }
-
-        GridMessage(ElementBase* value): GridTemplate<QString>(value), mElement(static_cast<ElementMessage*>(value)) {}
-        ~GridMessage() {}
-
-        QString getType() override
-        {
-            return "message";
-        }
-        ElementMessage* mElement;
-};
-
 class ValueMessage: public ValueTemplate<QString>
 {
         Q_OBJECT

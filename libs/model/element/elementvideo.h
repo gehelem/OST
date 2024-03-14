@@ -35,29 +35,6 @@ class ElementVideo: public ElementSingleNotNumeric<VideoData>
 
 };
 
-class GridVideo: public GridTemplate<VideoData>
-{
-
-        Q_OBJECT
-
-    public:
-
-        void accept(GridVisitor* pVisitor, QString &action, int &line)  override
-        {
-            pVisitor->visit(this, action, line);
-        }
-
-        GridVideo(ElementBase* value): GridTemplate<VideoData>(value), mElement(static_cast<ElementVideo*>(value)) {}
-        ~GridVideo() {}
-
-        QString getType() override
-        {
-            return "video";
-        }
-        ElementVideo* mElement;
-
-};
-
 class ValueVideo: public ValueTemplate<VideoData>
 {
         Q_OBJECT

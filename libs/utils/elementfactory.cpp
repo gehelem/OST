@@ -301,65 +301,6 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
 
 }
 
-GridBase *GridFactory::createGrid(ElementBase * &pElement)
-{
-    if (pElement->getType() == "string")
-    {
-        auto *pGrid = new GridString(pElement);
-        return pGrid;
-    }
-    if (pElement->getType() == "int")
-    {
-        auto *pGrid = new GridInt(pElement);
-        return pGrid;
-    }
-    if (pElement->getType() == "bool")
-    {
-        auto *pGrid = new GridBool(pElement);
-        return pGrid;
-    }
-    if (pElement->getType() == "float")
-    {
-        auto *pGrid = new GridFloat(pElement);
-        return pGrid;
-    }
-    if (pElement->getType() == "prg")
-    {
-        auto *pGrid = new GridPrg(pElement);
-        return pGrid;
-    }
-    if (pElement->getType() == "message")
-    {
-        auto *pGrid = new GridMessage(pElement);
-        return pGrid;
-    }
-    if (pElement->getType() == "video")
-    {
-        auto *pGrid = new GridVideo(pElement);
-        return pGrid;
-    }
-    if (pElement->getType() == "img")
-    {
-        auto *pGrid = new GridImg(pElement);
-        return pGrid;
-    }
-    if (pElement->getType() == "light")
-    {
-        auto *pGrid = new GridLight(pElement);
-        return pGrid;
-    }
-    if (pElement->getType() == "graph")
-    {
-        auto *pGrid = new GridGraph(pElement);
-        return pGrid;
-    }
-
-    qDebug() << "Unhandled grid type " << pElement->getType();
-
-    return nullptr;
-
-}
-
 ValueBase *ValueFactory::createValue(ElementBase * &pElement)
 {
     if (pElement->getType() == "string")

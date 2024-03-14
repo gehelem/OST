@@ -9,7 +9,6 @@ namespace  OST
 
 class ElementVisitor;
 class ValueVisitor;
-class GridVisitor;
 
 
 class ElementBase: public QObject
@@ -97,22 +96,6 @@ class ValueBase: public QObject
         ElementBase* pElement;
 
 };
-
-class GridBase: public QObject
-{
-        Q_OBJECT
-    public:
-        virtual void accept(GridVisitor* pVisitor, QString &action, int &line) = 0;
-
-        GridBase(ElementBase* value);
-        ~GridBase();
-        virtual QString getType() = 0;
-        ElementBase* mValue;
-
-};
-
-
-
 
 }
 

@@ -42,19 +42,6 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
         elements[key] = value;
     }
     json["elements"] = elements;
-    QJsonObject grids;
-    foreach(const QString &key, pProperty->getGrids().keys())
-    {
-        OST::GridJsonDumper d;
-
-        QString action = "";
-        int line = 0;
-        pProperty->getGrids()[key]->accept(&d, action, line);
-        QJsonObject grid = d.getResult();
-        grids[key] = grid;
-    }
-    json["grids"] = grids;
-
 
     if (pProperty->getGridHeaders().size() > 0)
     {

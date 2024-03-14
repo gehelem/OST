@@ -58,28 +58,6 @@ class ElementFloat: public ElementSingleNumeric<double>
 
 };
 
-class GridFloat: public GridTemplate<double>
-{
-
-        Q_OBJECT
-
-    public:
-
-        void accept(GridVisitor* pVisitor, QString &action, int &line)  override
-        {
-            pVisitor->visit(this, action, line);
-        }
-        GridFloat(ElementBase* value): GridTemplate<double>(value), mElement(static_cast<ElementFloat*>(value)) {}
-        ~GridFloat() {}
-
-        QString getType() override
-        {
-            return "float";
-        }
-        ElementFloat* mElement;
-
-};
-
 class ValueFloat: public ValueTemplate<double>
 {
         Q_OBJECT

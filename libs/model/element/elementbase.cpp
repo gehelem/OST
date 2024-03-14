@@ -11,15 +11,6 @@ ElementBase::~ElementBase()
 
 }
 
-GridBase::GridBase(ElementBase* value)
-{
-
-}
-GridBase::~GridBase()
-{
-
-}
-
 ValueBase::ValueBase(ElementBase *element): pElement(element)
 {
 

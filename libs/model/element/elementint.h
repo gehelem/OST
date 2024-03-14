@@ -56,28 +56,6 @@ class ElementInt: public ElementSingleNumeric<int>
         LovInt mLov;
 };
 
-class GridInt: public GridTemplate<int>
-{
-
-        Q_OBJECT
-
-    public:
-
-        void accept(GridVisitor* pVisitor, QString &action, int &line)  override
-        {
-            pVisitor->visit(this, action, line);
-        }
-
-        GridInt(ElementBase* value): GridTemplate<int>(value), mElement(static_cast<ElementInt*>(value)) {}
-        ~GridInt() {}
-
-        QString getType() override
-        {
-            return "int";
-        }
-        ElementInt* mElement;
-};
-
 class ValueInt: public ValueTemplate<int>
 {
         Q_OBJECT
