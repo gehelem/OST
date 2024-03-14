@@ -219,6 +219,16 @@ void PropertyMulti::updateLine(const int i, const QVariantMap &pValues)
             mElts[elt]->accept(&d, action, m);
         }
     }
+    foreach(const QString &elt, mElts.keys())
+    {
+        setElt(elt, pValues[elt]);
+    }
+
+    foreach( ValueBase* v, mGrid[i])
+    {
+        v->updateValue();
+    }
+
     emit propertyEvent("ap", key(), this);
 
 }
