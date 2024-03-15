@@ -231,11 +231,18 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
 
         if (pData["type"].toString() == "message")
         {
+            qDebug() << "elt factory " << pData["label"].toString() << "-" << pData["message"].toString();
+
             auto *pElement = new ElementMessage(pData["label"].toString(),
                                                 pData["order"].toString(),
                                                 pData["hint"].toString()
                                                );
-            if (pData.contains("message")) pElement->setMessage(pData["message"].toString());
+            MsgData m;
+            m.message = pData["message"].toString();
+            m.level = IntToMsgLevel(pData["level"].toInt());
+            m.ts = QDateTime::fromString(pData["ts"].toString(), "yyyy/MM/dd hh:mm:ss.zzz");
+            qDebug() << "*****************" << m.ts << "-" << pData["ts"].toString();
+            pElement->setValue(m, false);
             return pElement;
         }
         if (pData["type"].toString() == "graph")

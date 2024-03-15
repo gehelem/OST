@@ -38,6 +38,22 @@ typedef enum
     Warn,
     Err
 } MsgLevel;
+inline MsgLevel IntToMsgLevel(int val )
+{
+    if (val == 0) return Info;
+    if (val == 1) return Warn;
+    if (val == 2) return Err;
+    qDebug() << "Cant convert " << val << " to OST::MsgLevel (0-2) - defaults to Info";
+    return Info;
+}
+
+typedef struct MsgData
+{
+    MsgLevel level = Info;
+    QDateTime ts;
+    QString message;
+} MsgData;
+
 
 typedef struct ImgData
 {

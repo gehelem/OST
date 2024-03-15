@@ -6,7 +6,7 @@
 namespace  OST
 {
 
-class ElementMessage: public ElementSingleNotNumeric<QString>
+class ElementMessage: public ElementSingleNotNumeric<MsgData>
 {
 
         Q_OBJECT
@@ -33,35 +33,20 @@ class ElementMessage: public ElementSingleNotNumeric<QString>
         }
         QString message()
         {
-            return mMessage;
+            return value().message;
         }
-        void setMessage(const QString &message)
-        {
-            mMessage = message;
-            mTimestamp = QDateTime::currentDateTime();
-        }
-
-        QDateTime timeStamp()
-        {
-            return mTimestamp;
-        }
-
         MsgLevel level()
         {
-            return mLevel;
+            return value().level;
         }
-        void setLevel(const MsgLevel &level)
+        QDateTime ts()
         {
-            mLevel = level;
+            return value().ts;
         }
-    private:
-        QString mMessage;
-        QDateTime mTimestamp = QDateTime::currentDateTime();
-        MsgLevel mLevel;
 
 };
 
-class ValueMessage: public ValueTemplate<QString>
+class ValueMessage: public ValueTemplate<MsgData>
 {
         Q_OBJECT
 
@@ -71,7 +56,7 @@ class ValueMessage: public ValueTemplate<QString>
         {
             pVisitor->visit(this);
         }
-        ValueMessage(ElementBase* element): ValueTemplate<QString>(element) {}
+        ValueMessage(ElementBase* element): ValueTemplate<MsgData>(element) {}
         ~ValueMessage() {}
         void updateValue() override
         {

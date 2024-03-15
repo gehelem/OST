@@ -286,8 +286,9 @@ void ElementJsonDumper::visit(ElementMessage *pElement)
 {
     QJsonObject json = dumpElementCommons(pElement);
     json["type"] = "message";
-    json["level"] = pElement->level();
-    json["timestamp"] = pElement->timeStamp().toString("yyyy/MM/dd hh:mm:ss.zzz");
+    json["level"] = pElement->value().level;
+    json["ts"] = pElement->value().ts.toString("yyyy/MM/dd hh:mm:ss.zzz");
+    json["message"] = pElement->value().message;
     mResult = json;
 }
 void ElementJsonDumper::visit(ElementGraph *pElement)

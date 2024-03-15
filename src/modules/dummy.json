@@ -347,7 +347,9 @@
             "message": {
                 "type": "message",
                 "label": "Image message",
-                "level":0
+                "level":0,
+                "message":"Hello, this is a message",
+                "ts":"2024/03/14 15:06:53.000"
             },
             "progress": {
                 "type": "prg",
