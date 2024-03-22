@@ -31,7 +31,7 @@ class ElementPrg: public ElementSingleNotNumeric<PrgData>
         {
             return "prg";
         }
-        void setValue(const double &v, const bool &emitEvent)
+        void setPrgValue(const double &v, const bool &emitEvent)
         {
             if ((v < 0) || (v > 100))
             {
@@ -85,8 +85,7 @@ class ValuePrg: public ValueTemplate<PrgData>
         }
         void updateElement(const bool &emitEvent) override
         {
-            static_cast<ElementPrg*>(pElement)->setValue(value.value, false);
-            static_cast<ElementPrg*>(pElement)->setDynLabel(value.dynlabel, emitEvent);
+            static_cast<ElementPrg*>(pElement)->setValue(value, emitEvent);
         }
 
 };

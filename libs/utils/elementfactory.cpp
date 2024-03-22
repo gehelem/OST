@@ -279,7 +279,7 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
                 if (pData["prgtype"].toString() == "bar") pElement->setPrgType(bar);
                 if (pData["prgtype"].toString() == "spinner") pElement->setPrgType(spinner);
             }
-            if (pData.contains("value")) pElement->setValue(pData["value"].toDouble(), false);
+            if (pData.contains("value")) pElement->setPrgValue(pData["value"].toDouble(), false);
             if (pData.contains("dynlabel")) pElement->setDynLabel(pData["dynlabel"].toString(), false);
             if (pData.contains("arrayLimit")) pElement->setArrayLimit(pData["arrayLimit"].toInt());
             if (pData.contains("gridvalues"))
