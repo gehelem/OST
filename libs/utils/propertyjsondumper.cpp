@@ -72,6 +72,7 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
 
     }
 
+    json["hasGraph"] = pProperty->hasGraph();
     if (pProperty->hasGraph())
     {
         json["graphType"] = GraphTypeToString(pProperty->getGraphDefs().type);
