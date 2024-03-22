@@ -342,7 +342,7 @@
             "image1": {
                 "type": "img",
                 "label": "First image",
-                "urljpeg":"./dummy.jpg"
+                "urljpeg":"dummy.jpg"
             },
             "message": {
                 "type": "message",
@@ -384,6 +384,9 @@
         "permission": 2,
         "arrayLimit":5,
         "label": "Grid example",
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
         "gridheaders": ["X","Y","Z","imgrid","prggrid","graph"],
         "grid": [
             [0,0.0,"P0","",0,""],
@@ -425,8 +428,7 @@
             "imgrid": {
                 "type": "img",
                 "label": "image in grid",
-                "gridvalues":[{"urljpeg":"./dummy1.jpg"},{"urljpeg":"./dummy2.jpg"},{"urljpeg":"./dummy3.jpg"},{"urljpeg":"./dummy4.jpg"},{"urljpeg":"./dummy5.jpg"}],
-                "urljpeg":"./dummy.jpg",
+                "urljpeg":"dummy.jpg",
                 "order":"Z"
             },
             "prggrid": {
@@ -445,8 +447,10 @@
         "devcat": "Examples",
         "group": "AAAGrids",
         "permission": 2,
-        "grid":0,
         "gridlimit":5,
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
         "label": "Grid example 2",
         "elements": {
             "X": {
@@ -470,11 +474,6 @@
                 "gridvalues":[],
                 "order":"A"
             }
-        },
-        "array":{
-            "key": "",
-            "columns":["X","Y"],
-            "type":"grid"
         }
     },
     "skychart": {
@@ -630,6 +629,118 @@
                 "value":false
             }
         }
+    },
+    "agrid": {
+        "showElts":true,
+        "showGrid":true,
+        "devcat": "Grids",
+        "group": "Grids",
+        "permission": 2,
+        "arrayLimit":10,
+        "hasprofile":true,
+        "label": "Grid example",
+        "hasGrid":true,
+        "gridheaders": ["int","intlov","float","string","strlov","image","video","bool","progress","message"],
+        "grid": [
+            [12,1,0.12,"zéro dot 12","00",{"urljpeg":"dummy1.jpg"},{"urljpeg":"dummy1.mpeg"},true,70,"first message content"],
+            [13,2,0.13,"zéro dot 13","02",{"urljpeg":"dummy2.jpg"},{"urljpeg":"dummy3.mpeg"},false,25,"second message content"]
+        ],
+        "elements": {
+            "int": {
+                "type": "int",
+                "label": "Integer",
+                "value":0,
+                "autoupdate":true,
+                "directedit":true,
+                "order":"0"
+            },
+            "intlov": {
+                "type": "int",
+                "label": "Int with lov",
+                "value":0,
+                "autoupdate":true,
+                "directedit":true,
+                "listOfValues":[
+                    [0,"Zéro"],
+                    [1,"Un"],
+                    [2,"Deux"]
+                ],
+                "order":"1"
+            },
+            "float": {
+                "type": "float",
+                "label": "Float",
+                "value":0,
+                "autoupdate":true,
+                "directedit":true,
+                "order":"2"
+            },
+            "string": {
+                "type": "string",
+                "label": "String",
+                "value":"String value",
+                "autoupdate":true,
+                "directedit":true,
+                "order":"3"
+            },
+            "strlov": {
+                "type": "string",
+                "label": "Str with lov",
+                "value":"String value",
+                "autoupdate":true,
+                "directedit":true,
+                "listOfValues":[
+                    ["00","Zéro"],
+                    ["01","Un"],
+                    ["02","Deux"]
+                ],
+                "order":"3"
+            },
+            "image": {
+                "type": "img",
+                "label": "image in grid",
+                "urljpeg":"dummy.jpg",
+                "autoupdate":true,
+                "directedit":true,
+                "order":"4"
+            },
+            "video": {
+                "type": "video",
+                "label": "video in grid",
+                "urlmpeg":"dummy.mpeg",
+                "autoupdate":true,
+                "directedit":true,
+                "order":"5"
+            },
+            "bool": {
+                "type": "bool",
+                "label": "A boolean",
+                "autoupdate":true,
+                "value":false,
+                "directedit":true,
+                "order":"6"
+            },
+            "progress": {
+                "type": "prg",
+                "prgtype": "spinner",
+                "label": "Spinner",
+                "autoupdate":true,
+                "dynlabel": "99/100",
+                "value": 65,
+                "directedit":true,
+                "order":"7"
+            },
+            "message": {
+                "type": "message",
+                "label": "Message",
+                "value": "nothing interesting to say",
+                "autoupdate":true,
+                "directedit":true,
+                "order":"8"
+            }
+        }
     }
+
+
 }
 }

@@ -6,9 +6,9 @@ namespace  OST
 
 PropertyMulti::PropertyMulti(const QString &key, const QString &label, const Permission &permission, const QString &level1,
                              const QString &level2,
-                             const QString &order, const bool &hasProfile, const bool &hasArray)
+                             const QString &order, const bool &hasProfile, const bool &hasGrid)
     : PropertyBase(key, label, permission, level1, level2,
-                   order, hasProfile, hasArray)
+                   order, hasProfile), mHasGrid(hasGrid)
 {
     emit propertyCreated();
 }
@@ -92,7 +92,7 @@ bool  PropertyMulti::setElt(QString key, QVariant val)
 
 void PropertyMulti::push()
 {
-    if (!this->hasArray())
+    if (!this->hasGrid())
     {
         sendError("PropertyMulti::Push - no array/grid defined");
         return;
@@ -102,7 +102,7 @@ void PropertyMulti::push()
         ElementUpdate d;
         QString action = "push";
         QVariantMap m;
-        m["arrayLimit"] = this->getArrayLimit();
+        m["arrayLimit"] = this->getGridLimit();
         mElts[elt]->accept(&d, action, m);
     }
     QList<ValueBase*> wGridLine;
@@ -118,7 +118,7 @@ void PropertyMulti::push()
 
 void PropertyMulti::newLine(const QVariantMap &pValues)
 {
-    if (!this->hasArray())
+    if (!this->hasGrid())
     {
         sendError("PropertyMulti::newLine - no array/grid defined");
         return;
@@ -145,7 +145,6 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
             QString action = "newline";
             QVariantMap m;
             m["val"] = pValues[elt];
-            m["arrayLimit"] = this->getArrayLimit();
             mElts[elt]->accept(&d, action, m);
         }
     }
@@ -163,7 +162,7 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
 }
 void PropertyMulti::deleteLine(const int i)
 {
-    if (!this->hasArray())
+    if (!this->hasGrid())
     {
         sendError("PropertyMulti::Push - no array/grid defined");
         return;
@@ -185,7 +184,7 @@ void PropertyMulti::deleteLine(const int i)
 }
 void PropertyMulti::updateLine(const int i, const QVariantMap &pValues)
 {
-    if (!this->hasArray())
+    if (!this->hasGrid())
     {
         sendError("PropertyMulti::Push - no array/grid defined");
         return;
@@ -230,7 +229,7 @@ void PropertyMulti::updateLine(const int i, const QVariantMap &pValues)
 }
 void PropertyMulti::clearGrid()
 {
-    if (!this->hasArray())
+    if (!this->hasGrid())
     {
         sendError("PropertyMulti::Push - no array/grid defined");
         return;

@@ -54,6 +54,12 @@ typedef struct MsgData
     QString message;
 } MsgData;
 
+typedef struct PrgData
+{
+    QString dynlabel = "";
+    double  value = 0;
+} PrgData;
+
 
 typedef struct ImgData
 {

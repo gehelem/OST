@@ -285,7 +285,7 @@ void ElementUpdate::visit(ElementPrg* pElement, QString &action, QVariantMap &da
     }
     if (action == "newline")
     {
-        pElement->gridAdd(IntToState(data["val"].toInt()));
+        //pElement->gridAdd(IntToState(data["val"].toInt()));
     }
     if (action == "deleteline")
     {
@@ -293,7 +293,7 @@ void ElementUpdate::visit(ElementPrg* pElement, QString &action, QVariantMap &da
     }
     if (action == "updateline")
     {
-        pElement->gridUpdate(IntToState(data["val"].toInt()), data["i"].toInt(), true);
+        //pElement->gridUpdate(IntToState(data["val"].toInt()), data["i"].toInt(), true);
     }
     if (action == "cleargrid")
     {
@@ -301,8 +301,8 @@ void ElementUpdate::visit(ElementPrg* pElement, QString &action, QVariantMap &da
     }
     if (action == "getgrid")
     {
-        mGrid.clear();
-        for (int i = 0; i < pElement->getGrid().size(); ++i) mGrid.append(pElement->getGrid()[i]);
+        //mGrid.clear();
+        //for (int i = 0; i < pElement->getGrid().size(); ++i) mGrid.append(pElement->getGrid()[i]);
     }
 
 }

@@ -201,7 +201,7 @@ void Maincontrol::addIndiServerProperties(const QStringList  pDrivers)
     qDebug() << pDrivers;
     OST::PropertyMulti *dynprop = new OST::PropertyMulti("indidrivers", "Available indi drivers", OST::Permission::ReadOnly,
             "Indi server",
-            "", "", false, false);
+            "", "", false, true);
     foreach(QString key, pDrivers)
     {
         OST::ElementString* dyntext = new OST::ElementString(key, "", "");

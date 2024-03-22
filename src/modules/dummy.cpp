@@ -86,8 +86,7 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     static_cast<OST::ElementString*>(p->getElt("extext4"))->lovUpdate("i3", "another label");
 
     dynprop = new OST::PropertyMulti("dynprop", "Dynamic", OST::Permission::ReadWrite, "Examples",
-                                     "Dynamically instanciated", "", true,
-                                     false);
+                                     "Dynamically instanciated", "", true, false);
     dynlight = new OST::ElementLight("Dyn light", "", "");
     dynlight->setValue(OST::State::Busy, true);
     dynprop->addElt("dynlight", dynlight);

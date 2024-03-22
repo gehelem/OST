@@ -58,8 +58,10 @@
         "devcat": "Modules",
         "group": "",
         "permission": 0,
-        "grid":0,
         "rule":0,
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
         "label": "Loaded modules",
         "elements": {
             "name": {

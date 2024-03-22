@@ -12,7 +12,7 @@ PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVaria
                                         pData["group"].toString(),
                                         pData["order"].toString(),
                                         pData["hasprofile"].toBool(),
-                                        pData["hasArray"].toBool()
+                                        pData["hasGrid"].toBool()
                                        );
     if (pData.contains("rule"))
     {
@@ -27,13 +27,21 @@ PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVaria
         qDebug() << "Multiproperty defined without elements " << pData;
         return pProperty;
     }
-    if (pData.contains("showArray"))
+    if (pData.contains("hasGrid"))
     {
-        pProperty->setShowArray(pData["showArray"].toBool());
+        pProperty->setHasGrid(pData["hasGrid"].toBool());
+    }
+    if (pData.contains("showGrid"))
+    {
+        pProperty->setShowGrid(pData["showGrid"].toBool());
+    }
+    if (pData.contains("showElts"))
+    {
+        pProperty->setShowElts(pData["showElts"].toBool());
     }
     if (pData.contains("arrayLimit"))
     {
-        pProperty->setArrayLimit(pData["arrayLimit"].toInt());
+        pProperty->setGridLimit(pData["gridLimit"].toInt());
     }
     if (pData.contains("badge"))
     {
@@ -43,7 +51,6 @@ PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVaria
     foreach(const QString &key, elts.keys())
     {
         QVariantMap elt = elts[key].toMap();
-        if (pProperty->hasArray()) elt["arrayLimit"] = pProperty->getArrayLimit();
         ElementBase *v = ElementFactory::createElement(elt);
         if (v != nullptr)
         {
@@ -53,17 +60,25 @@ PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVaria
     if (pData.contains("grid"))
     {
         QJsonArray arr = pData["grid"].toJsonArray();
-        for(int i = 0; i < arr.size(); i++)
+        if (!pData.contains("gridheaders"))
         {
-            QJsonArray line = arr[i].toArray();
-            for(int j = 0; j < line.size(); j++)
+            qDebug() << "Can't initialize grid without gridheaders definitions " << pKey;
+        }
+        else
+        {
+            QJsonArray headers = pData["gridheaders"].toJsonArray();
+            for(int i = 0; i < arr.size(); i++)
             {
-                pProperty->setElt(pProperty->getGridHeaders()[j], line[j].toVariant());
+                QJsonArray line = arr[i].toArray();
+                for(int j = 0; j < headers.size(); j++)
+                {
+                    pProperty->setElt(headers[j].toString(), line[j].toVariant());
+                }
+                pProperty->push();
+
             }
-            pProperty->push();
 
         }
-
 
     }
 

@@ -41,7 +41,7 @@ class PropertyMulti: public PropertyBase
 
         PropertyMulti(const QString &key, const QString &label, const Permission &permission, const QString &level1,
                       const QString &level2,
-                      const QString &order, const bool &hasProfile, const bool &hasArray
+                      const QString &order, const bool &hasProfile, const bool &hasGrid
                      );
         ~PropertyMulti();
         [[nodiscard]] SwitchsRule rule() const
@@ -141,7 +141,45 @@ class PropertyMulti: public PropertyBase
                     break;
             }
         }
+        bool getShowElts()
+        {
+            return mShowElts;
+        }
+        void setShowElts(bool b)
+        {
+            mShowElts = b;
+        }
+        bool hasGrid()
+        {
+            return mHasGrid;
+        }
+        void setHasGrid(bool b)
+        {
+            mHasGrid = b;
+        }
+        bool getShowGrid()
+        {
+            return mShowGrid;
+        }
+        void setShowGrid(bool b)
+        {
+            mShowGrid = b;
+        }
+        int getGridLimit()
+        {
+            return mGridLimit;
+        }
+        void setGridLimit(int limit)
+        {
+            if (limit > 0) mGridLimit = limit;
+        }
+
     private:
+        bool mHasGrid = false;
+        bool mShowGrid = false;
+        bool mShowElts = true;
+        int mGridLimit = 0;
+
         SwitchsRule mRule = SwitchsRule::Any;
         QMap<QString, ElementBase*> mElts;
         QList<QString> mGridHeaders;

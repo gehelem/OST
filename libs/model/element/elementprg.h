@@ -6,7 +6,7 @@
 namespace  OST
 {
 
-class ElementPrg: public ElementSingleNotNumeric<double>
+class ElementPrg: public ElementSingleNotNumeric<PrgData>
 {
 
         Q_OBJECT
@@ -31,24 +31,26 @@ class ElementPrg: public ElementSingleNotNumeric<double>
         {
             return "prg";
         }
-        void setValue(const double &value, const bool &emitEvent)
+        void setValue(const double &v, const bool &emitEvent)
         {
-            if ((value < 0) || (value > 100))
+            if ((v < 0) || (v > 100))
             {
-                sendMessage(OST::MsgLevel::Warn, "Invalid spinner value (" + QString::number(value) + ")");
+                sendMessage(OST::MsgLevel::Warn, "Invalid spinner value (" + QString::number(v) + ")");
                 return;
             }
-            mValue = value;
-            if (emitEvent) emit valueSet(this);
+            PrgData d = value();
+            d.value = v;
+            ElementSingleNotNumeric<PrgData>::setValue(d, emitEvent);
+        }
+        void setDynLabel(const QString &s, const bool &emitEvent)
+        {
+            PrgData d = value();
+            d.dynlabel = s;
+            ElementSingleNotNumeric<PrgData>::setValue(d, emitEvent);
         }
         QString dynLabel()
         {
             return mDynLabel;
-        }
-        void setDynLabel(const QString &value, const bool &emitEvent)
-        {
-            mDynLabel = value;
-            if (emitEvent) emit eltChanged(this);
         }
         PrgType prgType()
         {
@@ -60,13 +62,12 @@ class ElementPrg: public ElementSingleNotNumeric<double>
         }
 
     private:
-        double mValue = 0;
         PrgType mType = spinner;
         QString mDynLabel = "" ;
 
 };
 
-class ValuePrg: public ValueTemplate<double>
+class ValuePrg: public ValueTemplate<PrgData>
 {
         Q_OBJECT
 
@@ -76,7 +77,7 @@ class ValuePrg: public ValueTemplate<double>
         {
             pVisitor->visit(this);
         }
-        ValuePrg(ElementBase* element): ValueTemplate<double>(element) {}
+        ValuePrg(ElementBase* element): ValueTemplate<PrgData>(element) {}
         ~ValuePrg() {}
         void updateValue() override
         {
@@ -84,7 +85,8 @@ class ValuePrg: public ValueTemplate<double>
         }
         void updateElement(const bool &emitEvent) override
         {
-            static_cast<ElementPrg*>(pElement)->setValue(value, emitEvent);
+            static_cast<ElementPrg*>(pElement)->setValue(value.value, false);
+            static_cast<ElementPrg*>(pElement)->setDynLabel(value.dynlabel, emitEvent);
         }
 
 };

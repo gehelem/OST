@@ -176,90 +176,13 @@ void ElementJsonDumper::visit(ElementLight *pElement)
 void ElementJsonDumper::visit(ElementImg *pElement)
 {
     QJsonObject json = dumpElementCommons(pElement);
+    QJsonObject imgdata = QJsonObject::fromVariantMap(ImgDataToVariantMap(pElement->value()));
+    for (auto it = imgdata.constBegin(); it != imgdata.constEnd(); it++)
+    {
+        json.insert(it.key(), it.value());
+    }
     json["type"] = "img";
 
-    json["arrayLimit"] = pElement->arrayLimit();
-    if (pElement->getGrid().size() > 0)
-    {
-        QJsonArray arr;
-        foreach (ImgData val, pElement->getGrid())
-        {
-            QVariant v = QVariant::fromValue(ImgDataToVariantMap(val));
-            arr.append(v.toJsonValue());
-        }
-
-        json["gridvalues"] = arr;
-    }
-
-    QJsonObject imgdata;
-    imgdata["urljpeg"] = pElement->value().mUrlJpeg;
-    imgdata["urlfits"] = pElement->value().mUrlFits;
-    imgdata["urlthumbnail"] = pElement->value().mUrlThumbnail;
-    imgdata["urloverlay"] = pElement->value().mUrlOverlay;
-    imgdata["channels"] = pElement->value().channels;
-    imgdata["width"] = pElement->value().width;
-    imgdata["height"] = pElement->value().height;
-    imgdata["snr"] = pElement->value().SNR;
-    imgdata["hfravg"] = pElement->value().HFRavg;
-    imgdata["stars"] = pElement->value().starsCount;
-    imgdata["issolved"] = pElement->value().isSolved;
-    imgdata["solverra"] = pElement->value().solverRA;
-    imgdata["solverde"] = pElement->value().solverDE;
-
-
-    QJsonArray arr;
-    arr = QJsonArray();
-    for (int i = 0; i < pElement->value().channels; i++)
-    {
-        arr.append(pElement->value().min[i]);
-    }
-    imgdata["min"] = arr;
-
-    arr = QJsonArray();
-    for (int i = 0; i < pElement->value().channels; i++)
-    {
-        arr.append(pElement->value().max[i]);
-    }
-    imgdata["max"] = arr;
-
-    arr = QJsonArray();
-    for (int i = 0; i < pElement->value().channels; i++)
-    {
-        arr.append(pElement->value().mean[i]);
-    }
-    imgdata["mean"] = arr;
-
-    arr = QJsonArray();
-    for (int i = 0; i < pElement->value().channels; i++)
-    {
-        arr.append(pElement->value().median[i]);
-    }
-    imgdata["median"] = arr;
-
-    arr = QJsonArray();
-    for (int i = 0; i < pElement->value().channels; i++)
-    {
-        arr.append(pElement->value().stddev[i]);
-    }
-    imgdata["stddev"] = arr;
-
-    arr = QJsonArray();
-
-    for (int i = 0; i <  pElement->value().channels; i++  )
-    {
-        QJsonArray oneChannel = QJsonArray();
-        QJsonArray freq = QJsonArray();
-        for (int j = 0; j < pElement->value().histogram[0].size(); j++  )
-        {
-            freq = QJsonArray();
-            freq.append(pElement->value().histogram[i][j]);
-            oneChannel.append(freq);
-        }
-        arr.append(oneChannel);
-    }
-    imgdata["histogram"] = arr;
-
-    json["value"] = imgdata;
     mResult = json;
 }
 void ElementJsonDumper::visit(ElementVideo *pElement)
@@ -306,21 +229,8 @@ void ElementJsonDumper::visit(ElementPrg *pElement)
     json["type"] = "prg";
     if (pElement->prgType() == bar) json["prgtype"] = "bar";
     if (pElement->prgType() == spinner) json["prgtype"] = "spinner";
-    json["dynlabel"] = pElement->dynLabel();
-    json["value"] = pElement->value();
-
-    json["arrayLimit"] = pElement->arrayLimit();
-    if (pElement->getGrid().size() > 0)
-    {
-        QJsonArray arr;
-        foreach (double val, pElement->getGrid())
-        {
-            QVariant v = QVariant::fromValue(val);
-            arr.append(v.toJsonValue());
-        }
-
-        json["gridvalues"] = arr;
-    }
+    json["dynlabel"] = pElement->value().dynlabel;
+    json["value"] = pElement->value().value;
 
     mResult = json;
 }

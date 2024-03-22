@@ -25,11 +25,12 @@ QJsonObject PropertyJsonDumper::dumpPropertyCommons(PropertyBase *pProperty)
 void PropertyJsonDumper::visit(PropertyMulti *pProperty)
 {
     QJsonObject json = dumpPropertyCommons(pProperty);
-    if (pProperty->hasArray())
+    json["showElts"] = pProperty->getShowElts();
+    json["hasGrid"] = pProperty->hasGrid();
+    if (pProperty->hasGrid())
     {
-        json["hasArray"] = true;
-        json["showArray"] = pProperty->getShowArray();
-        json["arrayLimit"] = pProperty->getArrayLimit();
+        json["showGrid"] = pProperty->getShowGrid();
+        json["gridLimit"] = pProperty->getGridLimit();
     }
     json["rule"] = pProperty->rule();
     QJsonObject elements;
@@ -49,18 +50,22 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
         json["gridheaders"] = QJsonArray::fromStringList(pProperty->getGridHeaders());
     }
 
-    if (pProperty->getGrid().size() > 0)
+    if (pProperty->hasGrid() > 0)
     {
         QJsonArray grid;
         foreach(const QList<ValueBase*> &gridLine, pProperty->getGrid())
         {
             QJsonArray jLine;
-            foreach(ValueBase* value, gridLine)
+            int i = 0;
+            foreach(QString elt, pProperty->getGridHeaders())
             {
                 ValueJsonDumper d;
-                value->accept(&d);
+                gridLine[i]->accept(&d);
                 jLine.append(d.getResult());
+                i++;
             }
+
+
             grid.append(jLine);
         }
         json["grid"] = grid;

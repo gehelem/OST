@@ -45,7 +45,7 @@ class PropertyBase: public QObject
 
         PropertyBase(const QString &key, const QString &label, const Permission &permission, const QString &level1,
                      const QString &level2,
-                     const QString &order, const bool &hasProfile, const bool &hasArray
+                     const QString &order, const bool &hasProfile
                     );
         ~PropertyBase();
 
@@ -149,27 +149,6 @@ class PropertyBase: public QObject
         {
             mIsEnabled = false;
         }
-        bool hasArray()
-        {
-            return mHasArray;
-        }
-        void setHasArray(bool hasarray);
-        bool getShowArray()
-        {
-            return mShowArray;
-        }
-        void setShowArray(bool b)
-        {
-            mShowArray = b;
-        }
-        int getArrayLimit()
-        {
-            return mArrayLimit;
-        }
-        void setArrayLimit(int limit)
-        {
-            if (limit > 0) mArrayLimit = limit;
-        }
         bool getBadge()
         {
             return mBadge;
@@ -209,9 +188,6 @@ class PropertyBase: public QObject
         bool mHasProfile = false;
         State mState = State::Idle;
         bool mIsEnabled = true;
-        bool mHasArray = false;
-        bool mShowArray = true;
-        int mArrayLimit = 0;
         bool mBadge = false;
 
 

@@ -384,7 +384,7 @@ QVariantList Datastore::getOstElementGrid(const QString &pPropertyName, const QS
         sendWarning("getOstElementGrid - property " + pPropertyName + " contains no elements.");
         return QVariantList();
     }
-    if (!mStore[pPropertyName]->hasArray())
+    if (!mStore[pPropertyName]->hasGrid())
     {
         sendWarning("getOstElementGrid - property " + pPropertyName + " has no grid.");
         return QVariantList();

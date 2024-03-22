@@ -35,12 +35,86 @@ void ValueJsonDumper::visit(ValueLight * pValue)
 void ValueJsonDumper::visit(ValueImg *  pValue)
 {
     //mResult = pValue->value;
-    mResult = "to be implementted";
+    mResult = "to be implemented";
+
+    QJsonObject imgdata;
+    imgdata["urljpeg"] =  pValue->value.mUrlJpeg;
+    imgdata["urlfits"] = pValue->value.mUrlFits;
+    imgdata["urlthumbnail"] = pValue->value.mUrlThumbnail;
+    imgdata["urloverlay"] = pValue->value.mUrlOverlay;
+    imgdata["channels"] = pValue->value.channels;
+    imgdata["width"] = pValue->value.width;
+    imgdata["height"] = pValue->value.height;
+    imgdata["snr"] = pValue->value.SNR;
+    imgdata["hfravg"] = pValue->value.HFRavg;
+    imgdata["stars"] = pValue->value.starsCount;
+    imgdata["issolved"] = pValue->value.isSolved;
+    imgdata["solverra"] = pValue->value.solverRA;
+    imgdata["solverde"] = pValue->value.solverDE;
+
+
+    QJsonArray arr;
+    arr = QJsonArray();
+    for (int i = 0; i < pValue->value.channels; i++)
+    {
+        arr.append(pValue->value.min[i]);
+    }
+    imgdata["min"] = arr;
+
+    arr = QJsonArray();
+    for (int i = 0; i < pValue->value.channels; i++)
+    {
+        arr.append(pValue->value.max[i]);
+    }
+    imgdata["max"] = arr;
+
+    arr = QJsonArray();
+    for (int i = 0; i < pValue->value.channels; i++)
+    {
+        arr.append(pValue->value.mean[i]);
+    }
+    imgdata["mean"] = arr;
+
+    arr = QJsonArray();
+    for (int i = 0; i < pValue->value.channels; i++)
+    {
+        arr.append(pValue->value.median[i]);
+    }
+    imgdata["median"] = arr;
+
+    arr = QJsonArray();
+    for (int i = 0; i < pValue->value.channels; i++)
+    {
+        arr.append(pValue->value.stddev[i]);
+    }
+    imgdata["stddev"] = arr;
+
+    arr = QJsonArray();
+
+    for (int i = 0; i <  pValue->value.channels; i++  )
+    {
+        QJsonArray oneChannel = QJsonArray();
+        QJsonArray freq = QJsonArray();
+        for (int j = 0; j < pValue->value.histogram[0].size(); j++  )
+        {
+            freq = QJsonArray();
+            freq.append(pValue->value.histogram[i][j]);
+            oneChannel.append(freq);
+        }
+        arr.append(oneChannel);
+    }
+    imgdata["histogram"] = arr;
+
+    mResult = imgdata;
+
+
+
+
 };
 void ValueJsonDumper::visit(ValueVideo *  pValue)
 {
     //mResult = pValue->value;
-    mResult = "to be implementted";
+    mResult = "to be implemented";
 };
 void ValueJsonDumper::visit(ValueMessage *  pValue)
 {
@@ -53,11 +127,15 @@ void ValueJsonDumper::visit(ValueMessage *  pValue)
 void ValueJsonDumper::visit(ValueGraph *  pValue)
 {
     //mResult = pValue->value;
-    mResult = "to be implementted";
+    mResult = "to be implemented";
 };
 void ValueJsonDumper::visit(ValuePrg * pValue)
 {
-    mResult = pValue->value;
+    QJsonObject ob;
+    ob["value"] = pValue->value.value;
+    ob["dynlabel"] = pValue->value.dynlabel;
+    mResult = ob;
+
 };
 
 
