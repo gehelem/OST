@@ -43,6 +43,24 @@ PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVaria
     {
         pProperty->setGridLimit(pData["gridLimit"].toInt());
     }
+    if (pData.contains("graphType") && !pProperty->hasGrid())
+    {
+        qDebug() << "Graph defined without grid " << pProperty->key();
+    }
+    if (pData.contains("graphType") && pProperty->hasGrid())
+    {
+        if (!pData.contains("graphParams"))
+        {
+            qDebug() << "Graph defined without params " << pProperty->key();
+        }
+        else
+        {
+            GraphDefs d;
+            d.type = StringToGraphType(pData["graphType"].toString());
+            d.params = pData["graphParams"].toMap();
+            pProperty->setGraphDefs(d);
+        }
+    }
     if (pData.contains("badge"))
     {
         pProperty->setBadge(pData["badge"].toBool());

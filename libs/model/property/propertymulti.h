@@ -173,13 +173,26 @@ class PropertyMulti: public PropertyBase
         {
             if (limit > 0) mGridLimit = limit;
         }
-
+        bool hasGraph()
+        {
+            return mHasGraph;
+        }
+        void setHasGraph(bool b)
+        {
+            mHasGraph = b;
+        }
+        GraphDefs getGraphDefs(void)
+        {
+            return mGraphDefs;
+        }
+        void setGraphDefs(GraphDefs defs);
     private:
         bool mHasGrid = false;
         bool mShowGrid = false;
         bool mShowElts = true;
         int mGridLimit = 0;
-
+        bool mHasGraph = false;
+        GraphDefs mGraphDefs;
         SwitchsRule mRule = SwitchsRule::Any;
         QMap<QString, ElementBase*> mElts;
         QList<QString> mGridHeaders;

@@ -50,7 +50,7 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
         json["gridheaders"] = QJsonArray::fromStringList(pProperty->getGridHeaders());
     }
 
-    if (pProperty->hasGrid() > 0)
+    if (pProperty->hasGrid())
     {
         QJsonArray grid;
         foreach(const QList<ValueBase*> &gridLine, pProperty->getGrid())
@@ -72,7 +72,13 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
 
     }
 
+    if (pProperty->hasGraph())
+    {
+        json["graphType"] = GraphTypeToString(pProperty->getGraphDefs().type);
+        json["graphParams"] = QJsonObject::fromVariantMap(pProperty->getGraphDefs().params);
+    }
 
+    mResult = json;
 
 
 
