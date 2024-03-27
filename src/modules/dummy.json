@@ -740,13 +740,13 @@
             }
         }
     },
-    "agraph": {
+    "agraphXY": {
         "hasArray":true,
         "devcat": "Graphes",
         "group": "",
         "permission": 2,
         "arrayLimit":5,
-        "label": "Graph example",
+        "label": "Graph example  - X/Y",
         "hasGrid":true,
         "showGrid":true,
         "showElts":false,
@@ -779,7 +779,46 @@
                 "order":"C"
             }
         }
+    },
+    "agraphDY": {
+        "hasArray":true,
+        "devcat": "Graphes",
+        "group": "",
+        "permission": 2,
+        "arrayLimit":5,
+        "label": "Graph example - Date - Y",
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
+        "gridheaders": ["X","Y"],
+        "grid": [
+            [0,0.0,"P0","",0,""],
+            [1,0.1,"P1","",10,""],
+            [2,0.4,"P2","",20,""],
+            [3,0.9,"P3","",30,""],
+            [4,0.16,"P4","",40,""]
+        ],
+        "graphType":"DY",
+        "graphParams":{
+            "D":"X",
+            "Y":"Y"
+        },
+        "elements": {
+            "X": {
+                "type": "float",
+                "label": "Abscisse",
+                "value":0,
+                "gridvalues":[0,1,2,3,4],
+                "order":"B"
+            },
+            "Y": {
+                "type": "float",
+                "label": "Ordonnée",
+                "value":0,
+                "gridvalues":[0,1,4,9,16],
+                "order":"C"
+            }
+        }
     }
-
 }
 }
