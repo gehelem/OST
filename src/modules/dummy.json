@@ -742,10 +742,11 @@
     },
     "agraphXY": {
         "hasArray":true,
+        "order":0,
         "devcat": "Graphes",
         "group": "",
         "permission": 2,
-        "arrayLimit":5,
+        "gridLimit":5,
         "label": "Graph example  - X/Y",
         "hasGrid":true,
         "showGrid":true,
@@ -768,20 +769,19 @@
                 "type": "float",
                 "label": "Abscisse",
                 "value":0,
-                "gridvalues":[0,1,2,3,4],
                 "order":"B"
             },
             "Y": {
                 "type": "float",
                 "label": "Ordonnée",
                 "value":0,
-                "gridvalues":[0,1,4,9,16],
                 "order":"C"
             }
         }
     },
     "agraphDY": {
         "hasArray":true,
+        "order":1,
         "devcat": "Graphes",
         "group": "",
         "permission": 2,
@@ -808,17 +808,79 @@
                 "type": "float",
                 "label": "Abscisse",
                 "value":0,
-                "gridvalues":[0,1,2,3,4],
                 "order":"B"
             },
             "Y": {
                 "type": "float",
                 "label": "Ordonnée",
                 "value":0,
-                "gridvalues":[0,1,4,9,16],
                 "order":"C"
             }
         }
+    },
+    "agraphPHD": {
+        "hasArray":true,
+        "order":3,
+        "devcat": "Graphes",
+        "group": "",
+        "permission": 2,
+        "arrayLimit":5,
+        "label": "Graph example - PHD",
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
+        "gridheaders": ["T","RA","DE","pRA","pDE"],
+        "grid": [
+            [0,0.2,0.1,200,50],
+            [1,-0.2,0.1,20,50],
+            [2,0.2,-0.1,200,500],
+            [3,0.2,0.1,-200,50],
+            [4,0.2,-0.1,20,-5],
+            [5,-0.2,0.1,200,50],
+            [6,-0.2,0.1,-50,-50],
+            [7,0.2,0.1,100,50]
+        ],
+        "graphType":"PHD",
+        "graphParams":{
+            "D":"T",
+            "RA":"RA",
+            "DE":"DE",
+            "pRA":"pRA",
+            "pDE":"pDE"
+        },
+        "elements": {
+            "T": {
+                "type": "float",
+                "label": "Time",
+                "value":0,
+                "order":1
+            },
+            "RA": {
+                "type": "float",
+                "label": "RA",
+                "value":0,
+                "order":2
+            },
+            "DE": {
+                "type": "float",
+                "label": "DE",
+                "value":0,
+                "order":3
+            },
+            "pRA": {
+                "type": "float",
+                "label": "pRA",
+                "value":0,
+                "order":4
+            },
+            "pDE": {
+                "type": "float",
+                "label": "pDE",
+                "value":0,
+                "order":5
+            }
+        }
     }
+
 }
 }
