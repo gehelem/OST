@@ -8,6 +8,7 @@ PropertyBase::PropertyBase(const QString &key, const QString &label, const Permi
     : mKey(key), mLabel(label), mPermission(permission), mLevel1(level1), mLevel2(level2),
       mOrder(order), mHasProfile(hasProfile)
 {
+    qRegisterMetaType<OST::MsgLevel>("MsgLevel");
     emit propertyCreated();
 }
 PropertyBase::~PropertyBase()
