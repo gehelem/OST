@@ -14,72 +14,15 @@ class ElementSingle : public ElementBase
     public:
 
         ElementSingle(const QString &label, const QString &order, const QString &hint):
-            ElementBase(label, order, hint)
-        {
-            mGridValues.clear();
-        }
+            ElementBase(label, order, hint) {}
         ~ElementSingle() {}
         QString getType() override
         {
             return "error";
         }
-        QList<T> getGrid()
-        {
-            return mGridValues;
-        }
-        bool gridAdd(T val)
-        {
-            if ( (mArrayLimit > 0) && (mGridValues.size() >= mArrayLimit)  )
-            {
-                mGridValues.removeFirst();
-            }
-            mGridValues.append(val);
-            return true;
-        }
-        bool gridDel(int i)
-        {
-            if (i >= mGridValues.size())
-            {
-                emit sendMessage(Warn, "gridDel - trying to delete item " + QString::number(i) + " while grid size is " +
-                                 mGridValues.size());
-                return false;
-            }
-            mGridValues.removeAt(i);
-            return true;
-        }
-        bool gridUpdate(const T &value, int i, const bool &emitEvent)
-        {
-            if (i >= mGridValues.size())
-            {
-                emit sendMessage(Warn, "gridUpdate - trying to update item " + QString::number(i) + " while grid size is " +
-                                 mGridValues.size());
-                return false;
-            }
-            mGridValues[i] = value;
-            if (emitEvent) emit listChanged(this);
-            return true;
-        }
-        bool gridClear()
-        {
-            mGridValues.clear();
-            return true;
-        }
-        void setGrid(QList<T> vals )
-        {
-            mGridValues.clear();
-            mGridValues = vals;
-        }
         QString getRealType()
         {
             return typeid(T).name();
-        }
-        int arrayLimit()
-        {
-            return mArrayLimit;
-        }
-        void setArrayLimit(int limit)
-        {
-            if (limit > 0 ) mArrayLimit = limit;
         }
         QString getGlobalLov()
         {
@@ -106,8 +49,6 @@ class ElementSingle : public ElementBase
             mPostIcon = s;
         }
     private:
-        QList<T> mGridValues = QList<T>();
-        int mArrayLimit = 0;
         QString mGlobalLov = "";
         QString mPreIcon = "";
         QString mPostIcon = "";

@@ -88,13 +88,6 @@ typedef struct ImgData
     QVector<double> histogram[3];
 } ImgData;
 
-inline QVariantMap ImgDataToVariantMap(ImgData i)
-{
-    QVariantMap m;
-    m["urljpeg"] = i.mUrlJpeg;
-    return m;
-}
-
 inline ImgData QVariantMapToImgData(QVariantMap m)
 {
     ImgData i;

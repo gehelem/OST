@@ -80,12 +80,14 @@ QString Datastore::getString(QString pProperty, QString pElement)
 }
 QString Datastore::getString(QString pProperty, QString pElement, long line)
 {
-    if (getEltString(pProperty, pElement)->getGrid().size() < line + 1)
+    if (getProperty(pProperty)->getGrid().size() < line + 1)
     {
-        sendWarning("getString - property " + pProperty + " : element " + pElement + " line : " + line + " does not exist" );
+        sendWarning("getString - property " + pProperty + " line : " + line + " does not exist" );
         return QString();
     }
-    return getEltString(pProperty, pElement)->getGrid()[line];
+    int i = getProperty(pProperty)->getGridHeaders().indexOf(pElement);
+    OST::ValueString* v = static_cast<OST::ValueString*>(getProperty(pProperty)->getGrid()[line][i]);
+    return v->value;
 }
 OST::ElementInt* Datastore::getEltInt(QString pProperty, QString pElement)
 {
@@ -113,13 +115,14 @@ long Datastore::getInt(QString pProperty, QString pElement)
 }
 long Datastore::getInt(QString pProperty, QString pElement, long line)
 {
-    if (getEltInt(pProperty, pElement)->getGrid().size() < line + 1)
+    if (getProperty(pProperty)->getGrid().size() < line + 1)
     {
-        sendWarning("getEltInt - property " + pProperty + " : element " + pElement + " line : " + line + " does not exist" );
+        sendWarning("getInt- property " + pProperty + " line : " + line + " does not exist" );
         return 0;
     }
-
-    return getEltInt(pProperty, pElement)->getGrid()[line];
+    int i = getProperty(pProperty)->getGridHeaders().indexOf(pElement);
+    OST::ValueInt* v = static_cast<OST::ValueInt*>(getProperty(pProperty)->getGrid()[line][i]);
+    return v->value;
 }
 OST::ElementFloat* Datastore::getEltFloat(QString pProperty, QString pElement)
 {
@@ -147,12 +150,14 @@ double  Datastore::getFloat(QString pProperty, QString pElement)
 }
 double Datastore::getFloat(QString pProperty, QString pElement, long line)
 {
-    if (getEltFloat(pProperty, pElement)->getGrid().size() < line + 1)
+    if (getProperty(pProperty)->getGrid().size() < line + 1)
     {
-        sendWarning("getEltFloat - property " + pProperty + " : element " + pElement + " line : " + line + " does not exist" );
+        sendWarning("getFloat - property " + pProperty + " line : " + line + " does not exist" );
         return 0;
     }
-    return getEltFloat(pProperty, pElement)->getGrid()[line];
+    int i = getProperty(pProperty)->getGridHeaders().indexOf(pElement);
+    OST::ValueFloat* v = static_cast<OST::ValueFloat*>(getProperty(pProperty)->getGrid()[line][i]);
+    return v->value;
 }
 OST::ElementLight* Datastore::getEltLight(QString pProperty, QString pElement)
 {
@@ -241,7 +246,14 @@ bool Datastore::getBool(QString pProperty, QString pElement)
 }
 bool Datastore::getBool(QString pProperty, QString pElement, long line)
 {
-    return getEltBool(pProperty, pElement)->getGrid()[line];
+    if (getProperty(pProperty)->getGrid().size() < line + 1)
+    {
+        sendWarning("getBool - property " + pProperty + " line : " + line + " does not exist" );
+        return 0;
+    }
+    int i = getProperty(pProperty)->getGridHeaders().indexOf(pElement);
+    OST::ValueBool* v = static_cast<OST::ValueBool*>(getProperty(pProperty)->getGrid()[line][i]);
+    return v->value;
 }
 
 bool Datastore::createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel,

@@ -387,42 +387,31 @@
         "hasGrid":true,
         "showGrid":true,
         "showElts":false,
-        "gridheaders": ["X","Y","Z","imgrid","prggrid","graph"],
+        "gridheaders": ["X","Y","Z","imgrid","prggrid"],
         "grid": [
-            [0,0.0,"P0","",0,""],
-            [1,0.1,"P1","",10,""],
-            [2,0.4,"P2","",20,""],
-            [3,0.9,"P3","",30,""],
-            [4,0.16,"P4","",40,""]
+            [0,0.0,"P0","",0],
+            [1,0.1,"P1","",10],
+            [2,0.4,"P2","",20],
+            [3,0.9,"P3","",30],
+            [4,0.16,"P4","",40]
         ],
         "elements": {
-            "graph": {
-                "type": "graph",
-                "graphtype":"XY",
-                "params":{
-                    "X":"X",
-                    "Y":"Y"
-                }
-            },
             "X": {
                 "type": "float",
                 "label": "Abscisse",
                 "value":0,
-                "gridvalues":[0,1,2,3,4],
                 "order":"B"
             },
             "Y": {
                 "type": "float",
                 "label": "Ordonnée",
                 "value":0,
-                "gridvalues":[0,1,4,9,16],
                 "order":"C"
             },
             "Z": {
                 "type": "string",
                 "label": "Info",
                 "value":"Zéro",
-                "gridvalues":["P0","P1","P2","P3","P4"],
                 "order":"A"
             },
             "imgrid": {
@@ -437,7 +426,6 @@
                 "label": "Progress",
                 "dynlabel": "99/100",
                 "value": 99,
-                "gridvalues":[0,1,4,9,16],
                 "order":2
             }
         }

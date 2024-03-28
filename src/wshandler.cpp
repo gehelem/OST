@@ -259,6 +259,13 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
                 {
                     element["dynlabel"] = prop["elements"].toMap()[key].toMap()["dynlabel"];
                 }
+                if (prop["elements"].toMap()[key].toMap().contains("type"))
+                {
+                    if (prop["elements"].toMap()[key].toMap()["type"] == "img")
+                    {
+                        element = prop["elements"].toMap()[key].toMap();
+                    }
+                }
                 elements[key] = element;
             }
             values["elements"] = elements;

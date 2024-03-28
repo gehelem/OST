@@ -16,17 +16,7 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
             pElement->setValue(pData["value"].toBool(), false);
             if (pData.contains("autoupdate")) pElement->setAutoUpdate(pData["autoupdate"].toBool());
             if (pData.contains("directedit")) pElement->setDirectEdit(pData["directedit"].toBool());
-            if (pData.contains("arrayLimit")) pElement->setArrayLimit(pData["arrayLimit"].toInt());
             if (pData.contains("badge")) pElement->setBadge(pData["badge"].toBool());
-            if (pData.contains("gridvalues"))
-            {
-                QList ll  = pData["gridvalues"].toList();
-                foreach (QVariant val, ll)
-                {
-                    pElement->gridAdd(val.toBool());
-                }
-            }
-
             return pElement;
         }
         if (pData["type"].toString() == "light")
@@ -37,18 +27,8 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
                                              );
             if (pData.contains("autoupdate")) pElement->setAutoUpdate(pData["autoupdate"].toBool());
             if (pData.contains("directedit")) pElement->setDirectEdit(pData["directedit"].toBool());
-            if (pData.contains("arrayLimit")) pElement->setArrayLimit(pData["arrayLimit"].toInt());
             if (pData.contains("preicon")) pElement->setPreIcon(pData["preicon"].toString());
             if (pData.contains("posticon")) pElement->setPostIcon(pData["posticon"].toString());
-            if (pData.contains("gridvalues"))
-            {
-                QList ll  = pData["gridvalues"].toList();
-                foreach (QVariant val, ll)
-                {
-                    pElement->gridAdd(IntToState(val.toInt()));
-                }
-            }
-
             return pElement;
         }
         if (pData["type"].toString() == "string")
@@ -60,7 +40,6 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
             pElement->setValue(pData["value"].toString(), false);
             if (pData.contains("autoupdate")) pElement->setAutoUpdate(pData["autoupdate"].toBool());
             if (pData.contains("directedit")) pElement->setDirectEdit(pData["directedit"].toBool());
-            if (pData.contains("arrayLimit")) pElement->setArrayLimit(pData["arrayLimit"].toInt());
             if (pData.contains("preicon")) pElement->setPreIcon(pData["preicon"].toString());
             if (pData.contains("posticon")) pElement->setPostIcon(pData["posticon"].toString());
             if (pData.contains("listOfValues"))
@@ -79,15 +58,6 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
                     pElement->setGlobalLov(pData["listOfValues"].toString());
                 }
             }
-            if (pData.contains("gridvalues"))
-            {
-                QList ll  = pData["gridvalues"].toList();
-                foreach (QVariant val, ll)
-                {
-                    pElement->gridAdd(val.toString());
-                }
-            }
-
             return pElement;
         }
         if (pData["type"].toString() == "int")
@@ -103,7 +73,6 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
             if (pData.contains("format")) pElement->setFormat(pData["format"].toString());
             if (pData.contains("autoupdate")) pElement->setAutoUpdate(pData["autoupdate"].toBool());
             if (pData.contains("directedit")) pElement->setDirectEdit(pData["directedit"].toBool());
-            if (pData.contains("arrayLimit")) pElement->setArrayLimit(pData["arrayLimit"].toInt());
             if (pData.contains("preicon")) pElement->setPreIcon(pData["preicon"].toString());
             if (pData.contains("posticon")) pElement->setPostIcon(pData["posticon"].toString());
             if (pData.contains("listOfValues"))
@@ -123,15 +92,6 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
                     pElement->setGlobalLov(pData["listOfValues"].toString());
                 }
             }
-            if (pData.contains("gridvalues"))
-            {
-                QList ll  = pData["gridvalues"].toList();
-                foreach (QVariant val, ll)
-                {
-                    pElement->gridAdd(val.toLongLong());
-                }
-            }
-
             return pElement;
         }
         if (pData["type"].toString() == "float")
@@ -147,7 +107,6 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
             if (pData.contains("format")) pElement->setFormat(pData["format"].toString());
             if (pData.contains("autoupdate")) pElement->setAutoUpdate(pData["autoupdate"].toBool());
             if (pData.contains("directedit")) pElement->setDirectEdit(pData["directedit"].toBool());
-            if (pData.contains("arrayLimit")) pElement->setArrayLimit(pData["arrayLimit"].toInt());
             if (pData.contains("preicon")) pElement->setPreIcon(pData["preicon"].toString());
             if (pData.contains("posticon")) pElement->setPostIcon(pData["posticon"].toString());
             if (pData.contains("listOfValues"))
@@ -166,16 +125,6 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
                     pElement->setGlobalLov(pData["listOfValues"].toString());
                 }
             }
-            if (pData.contains("gridvalues"))
-            {
-                QList ll  = pData["gridvalues"].toList();
-                foreach (QVariant val, ll)
-                {
-                    pElement->gridAdd(val.toDouble());
-                }
-            }
-
-
             return pElement;
         }
         if (pData["type"].toString() == "img")
@@ -186,7 +135,6 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
                                            );
             ImgData dta;
 
-            if (pData.contains("arrayLimit")) pElement->setArrayLimit(pData["arrayLimit"].toInt());
 
             if (pData.contains("urljpeg")) dta.mUrlJpeg = pData["urljpeg"].toString();
             if (pData.contains("urlfits")) dta.mUrlFits = pData["urlfits"].toString();
@@ -205,14 +153,6 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
             if (pData.contains("solverde")) dta.solverDE = pData["solverde"].toDouble();
 
             pElement->setValue(dta, false);
-            if (pData.contains("gridvalues"))
-            {
-                QList ll  = pData["gridvalues"].toList();
-                foreach (QVariant val, ll)
-                {
-                    pElement->gridAdd(QVariantMapToImgData(val.toMap()));
-                }
-            }
 
             return pElement;
         }
@@ -224,8 +164,6 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
                                               pData["hint"].toString()
                                              );
             if (pData.contains("value")) pElement->setValue(VariantMapToVideoData(pData["value"].toMap()), false);
-            if (pData.contains("arrayLimit")) pElement->setArrayLimit(pData["arrayLimit"].toInt());
-
             return pElement;
         }
 
@@ -260,17 +198,6 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
             }
             if (pData.contains("value")) pElement->setPrgValue(pData["value"].toDouble(), false);
             if (pData.contains("dynlabel")) pElement->setDynLabel(pData["dynlabel"].toString(), false);
-            if (pData.contains("arrayLimit")) pElement->setArrayLimit(pData["arrayLimit"].toInt());
-            if (pData.contains("gridvalues"))
-            {
-                QList ll  = pData["gridvalues"].toList();
-                foreach (QVariant val, ll)
-                {
-                    //pElement->gridAdd(val.toDouble());
-                }
-            }
-
-
             return pElement;
         }
 
@@ -338,12 +265,6 @@ ValueBase *ValueFactory::createValue(ElementBase * &pElement)
     if (pElement->getType() == "light")
     {
         auto *pValue = new ValueLight(pElement);
-        pValue->updateValue();
-        return pValue;
-    }
-    if (pElement->getType() == "graph")
-    {
-        auto *pValue = new ValueGraph(pElement);
         pValue->updateValue();
         return pValue;
     }
