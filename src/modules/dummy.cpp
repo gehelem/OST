@@ -328,6 +328,7 @@ void Dummy::newBLOB(INDI::PropertyBlob pblob)
 
     }
     getProperty("actions2")->setState(OST::Ok);
+    getProperty("testimage")->push();
 
 
 }

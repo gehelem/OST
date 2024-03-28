@@ -337,6 +337,8 @@
         "devcat": "Examples",
         "group": "Images",
         "permission": 0,
+        "hasGrid":true,
+        "showGrid":true,
         "label": "Test image",
         "elements": {
             "image1": {
