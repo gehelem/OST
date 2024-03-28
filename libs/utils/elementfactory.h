@@ -10,7 +10,6 @@
 #include <elementimg.h>
 #include <elementvideo.h>
 #include <elementmessage.h>
-#include <elementgraph.h>
 #include <elementprg.h>
 
 namespace  OST

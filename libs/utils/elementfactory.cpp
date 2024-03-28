@@ -242,27 +242,6 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
             pElement->setValue(m, false);
             return pElement;
         }
-        if (pData["type"].toString() == "graph")
-        {
-            auto *pElement = new ElementGraph(pData["label"].toString(),
-                                              pData["order"].toString(),
-                                              pData["hint"].toString()
-                                             );
-            GraphDefs d;
-            if (!pData.contains("graphtype"))
-            {
-                qDebug() << "Graph defined without type " << pElement->label();
-            }
-            if (!pData.contains("params"))
-            {
-                qDebug() << "Graph defined without params " << pElement->label();
-            }
-            d.type = StringToGraphType(pData["graphtype"].toString());
-            d.params = pData["params"].toMap();
-            pElement->setGraphDefs(d);
-
-            return pElement;
-        }
         if (pData["type"].toString() == "prg")
         {
 

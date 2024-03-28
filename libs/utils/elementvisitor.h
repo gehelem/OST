@@ -12,7 +12,6 @@ class ElementLight;
 class ElementImg;
 class ElementVideo;
 class ElementMessage;
-class ElementGraph;
 class ElementPrg;
 
 class ElementVisitor
@@ -46,9 +45,6 @@ class ElementVisitor
         virtual void visit(ElementMessage* pElement) = 0;
         virtual void visit(ElementMessage* pElement, QVariantMap &data) = 0;
         virtual void visit(ElementMessage* pElement, QString &action, QVariantMap &data) = 0;
-        virtual void visit(ElementGraph* pElement) = 0;
-        virtual void visit(ElementGraph* pElement, QVariantMap &data) = 0;
-        virtual void visit(ElementGraph* pElement, QString &action, QVariantMap &data) = 0;
         virtual void visit(ElementPrg* pElement) = 0;
         virtual void visit(ElementPrg* pElement, QVariantMap &data) = 0;
         virtual void visit(ElementPrg* pElement, QString &action, QVariantMap &data) = 0;
@@ -62,7 +58,6 @@ class GridLight;
 class GridImg;
 class GridVideo;
 class GridMessage;
-class GridGraph;
 class GridPrg;
 
 
@@ -81,7 +76,6 @@ class GridVisitor
         virtual void visit(GridImg* pGrid, QString &action, int &line) = 0;
         virtual void visit(GridVideo* pGrid, QString &action, int &line) = 0;
         virtual void visit(GridMessage* pGrid, QString &action, int &line) = 0;
-        virtual void visit(GridGraph* pGrid, QString &action, int &line) = 0;
         virtual void visit(GridPrg* pGrid, QString &action, int &line) = 0;
 };
 class ValueInt;
@@ -92,7 +86,6 @@ class ValueLight;
 class ValueImg;
 class ValueVideo;
 class ValueMessage;
-class ValueGraph;
 class ValuePrg;
 
 
@@ -111,7 +104,6 @@ class ValueVisitor
         virtual void visit(ValueImg*  pValue) = 0;
         virtual void visit(ValueVideo*  pValue) = 0;
         virtual void visit(ValueMessage*  pValue) = 0;
-        virtual void visit(ValueGraph*  pValue) = 0;
         virtual void visit(ValuePrg* pValue) = 0;
 };
 

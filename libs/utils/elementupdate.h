@@ -9,7 +9,6 @@
 #include <elementimg.h>
 #include <elementvideo.h>
 #include <elementmessage.h>
-#include <elementgraph.h>
 #include <elementprg.h>
 
 namespace  OST
@@ -68,12 +67,6 @@ class ElementUpdate : public ElementVisitor
         }
         void visit(ElementMessage* pElement, QVariantMap &data ) override;
         void visit(ElementMessage* pElement, QString &action, QVariantMap &data) override;
-        void visit(ElementGraph* pElement) override
-        {
-            Q_UNUSED(pElement)
-        }
-        void visit(ElementGraph* pElement, QVariantMap &data ) override;
-        void visit(ElementGraph* pElement, QString &action, QVariantMap &data) override;
         void visit(ElementPrg* pElement) override
         {
             Q_UNUSED(pElement)

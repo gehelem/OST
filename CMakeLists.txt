@@ -140,8 +140,6 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementvideo.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementmessage.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementmessage.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementgraph.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementgraph.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementprg.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementprg.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovbase.h
@@ -216,7 +214,6 @@ set(BASE_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementimg.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementvideo.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementmessage.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementgraph.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementprg.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovbase.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovsingle.h

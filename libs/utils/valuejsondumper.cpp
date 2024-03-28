@@ -6,7 +6,6 @@
 #include "elementlight.h"
 #include "elementstring.h"
 #include "elementmessage.h"
-#include "elementgraph.h"
 #include "elementvideo.h"
 #include "elementprg.h"
 namespace  OST
@@ -34,9 +33,6 @@ void ValueJsonDumper::visit(ValueLight * pValue)
 };
 void ValueJsonDumper::visit(ValueImg *  pValue)
 {
-    //mResult = pValue->value;
-    mResult = "to be implemented";
-
     QJsonObject imgdata;
     imgdata["urljpeg"] =  pValue->value.mUrlJpeg;
     imgdata["urlfits"] = pValue->value.mUrlFits;
@@ -123,11 +119,6 @@ void ValueJsonDumper::visit(ValueMessage *  pValue)
     ob["message"] = pValue->value.message;
     ob["ts"] = pValue->value.ts.toString("yyyy/MM/dd hh:mm:ss.zzz");;
     mResult = ob;
-};
-void ValueJsonDumper::visit(ValueGraph *  pValue)
-{
-    //mResult = pValue->value;
-    mResult = "to be implemented";
 };
 void ValueJsonDumper::visit(ValuePrg * pValue)
 {

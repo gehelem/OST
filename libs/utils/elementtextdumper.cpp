@@ -83,13 +83,6 @@ void ElementTextDumper::visit(ElementMessage *pElement)
     //stream << "Val = '" << pElement->value().toStdString() << "'";
     mResult = QString::fromStdString(stream.str());
 }
-void ElementTextDumper::visit(ElementGraph *pElement)
-{
-    std::stringstream stream;
-    stream << "Graph Value :" << dumpElementCommons(pElement);
-    //stream << "Val = '" << pElement->value().toStdString() << "'";
-    mResult = QString::fromStdString(stream.str());
-}
 void ElementTextDumper::visit(ElementPrg *pElement)
 {
     std::stringstream stream;

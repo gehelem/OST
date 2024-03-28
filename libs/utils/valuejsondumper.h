@@ -23,7 +23,6 @@ class ValueJsonDumper : public ValueVisitor
         void visit(ValueImg*  pValue) override;
         void visit(ValueVideo*  pValue)override;
         void visit(ValueMessage*  pValue)override;
-        void visit(ValueGraph*  pValue) override;
         void visit(ValuePrg* pValue) override;
 
         [[nodiscard]] const QJsonValue &getResult() const

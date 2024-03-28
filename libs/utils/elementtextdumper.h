@@ -10,7 +10,6 @@
 #include <elementimg.h>
 #include <elementvideo.h>
 #include <elementmessage.h>
-#include <elementgraph.h>
 #include <elementprg.h>
 
 namespace  OST
@@ -113,18 +112,6 @@ class ElementTextDumper : public ElementVisitor
             Q_UNUSED(data)
         }
         void visit(ElementMessage* pElement, QString &action, QVariantMap &data ) override
-        {
-            Q_UNUSED(pElement);
-            Q_UNUSED(action);
-            Q_UNUSED(data)
-        }
-        void visit(ElementGraph *pElement) override;
-        void visit(ElementGraph* pElement, QVariantMap &data ) override
-        {
-            Q_UNUSED(pElement);
-            Q_UNUSED(data)
-        }
-        void visit(ElementGraph* pElement, QString &action, QVariantMap &data ) override
         {
             Q_UNUSED(pElement);
             Q_UNUSED(action);

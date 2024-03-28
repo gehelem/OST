@@ -35,11 +35,6 @@ void ElementSet::visit(ElementMessage *pElement, QVariantMap &data )
     Q_UNUSED(pElement);
     Q_UNUSED(data);
 }
-void ElementSet::visit(ElementGraph* pElement, QVariantMap &data )
-{
-    Q_UNUSED(pElement);
-    Q_UNUSED(data);
-}
 void ElementSet::visit(ElementPrg* pElement, QVariantMap &data )
 {
     Q_UNUSED(pElement);
