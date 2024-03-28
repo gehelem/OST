@@ -97,14 +97,6 @@ void PropertyMulti::push()
         sendError("PropertyMulti::Push - no array/grid defined");
         return;
     }
-    foreach(const QString &elt, mElts.keys())
-    {
-        ElementUpdate d;
-        QString action = "push";
-        QVariantMap m;
-        m["arrayLimit"] = this->getGridLimit();
-        mElts[elt]->accept(&d, action, m);
-    }
     QList<ValueBase*> wGridLine;
     foreach(const QString &elt, mGridHeaders)
     {
