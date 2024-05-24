@@ -81,9 +81,6 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
 
     mResult = json;
 
-
-
-    mResult = json;
 }
 
 }
