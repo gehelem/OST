@@ -1,13 +1,13 @@
 #ifndef ELEMENTFLOAT_h
 #define ELEMENTFLOAT_h
 
-#include <elementsingle.h>
+#include <elementtemplate.h>
 #include <lovfloat.h>
 
 namespace  OST
 {
 
-class ElementFloat: public ElementSingleNumeric<double>
+class ElementFloat: public ElementTemplateNumeric<double>
 {
 
         Q_OBJECT

@@ -1,11 +1,11 @@
 #ifndef ELEMENTSTRING_h
 #define ELEMENTSTRING_h
-#include <elementsingle.h>
+#include <elementtemplate.h>
 #include <lovstring.h>
 namespace  OST
 {
 
-class ElementString: public ElementSingleNotNumeric<QString>
+class ElementString: public ElementTemplateNotNumeric<QString>
 {
 
         Q_OBJECT

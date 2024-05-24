@@ -1,12 +1,12 @@
 #ifndef ELEMENTPRG_h
 #define ELEMENTPRG_h
 
-#include <elementsingle.h>
+#include <elementtemplate.h>
 
 namespace  OST
 {
 
-class ElementPrg: public ElementSingleNotNumeric<PrgData>
+class ElementPrg: public ElementTemplateNotNumeric<PrgData>
 {
 
         Q_OBJECT
@@ -40,13 +40,13 @@ class ElementPrg: public ElementSingleNotNumeric<PrgData>
             }
             PrgData d = value();
             d.value = v;
-            ElementSingleNotNumeric<PrgData>::setValue(d, emitEvent);
+            ElementTemplateNotNumeric<PrgData>::setValue(d, emitEvent);
         }
         void setDynLabel(const QString &s, const bool &emitEvent)
         {
             PrgData d = value();
             d.dynlabel = s;
-            ElementSingleNotNumeric<PrgData>::setValue(d, emitEvent);
+            ElementTemplateNotNumeric<PrgData>::setValue(d, emitEvent);
         }
         QString dynLabel()
         {

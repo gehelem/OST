@@ -1,12 +1,12 @@
 #ifndef ELEMENTVIDEO_h
 #define ELEMENTVIDEO_h
 
-#include <elementsingle.h>
+#include <elementtemplate.h>
 
 namespace  OST
 {
 
-class ElementVideo: public ElementSingleNotNumeric<VideoData>
+class ElementVideo: public ElementTemplateNotNumeric<VideoData>
 {
 
         Q_OBJECT

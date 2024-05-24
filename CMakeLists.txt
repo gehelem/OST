@@ -123,7 +123,7 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/common.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementbase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementbase.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementsingle.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementtemplate.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementint.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementint.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementstring.cpp

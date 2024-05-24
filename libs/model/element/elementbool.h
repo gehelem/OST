@@ -1,12 +1,12 @@
 #ifndef ELEMENTBOOL_h
 #define ELEMENTBOOL_h
 
-#include <elementsingle.h>
+#include <elementtemplate.h>
 
 namespace  OST
 {
 
-class ElementBool: public ElementSingleNotNumeric<bool>
+class ElementBool: public ElementTemplateNotNumeric<bool>
 {
 
         Q_OBJECT

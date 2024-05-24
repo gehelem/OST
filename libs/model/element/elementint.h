@@ -1,13 +1,13 @@
 #ifndef ELEMENTINT_h
 #define ELEMENTINT_h
 
-#include <elementsingle.h>
+#include <elementtemplate.h>
 #include <lovint.h>
 
 namespace  OST
 {
 
-class ElementInt: public ElementSingleNumeric<int>
+class ElementInt: public ElementTemplateNumeric<int>
 {
 
         Q_OBJECT

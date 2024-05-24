@@ -1,12 +1,12 @@
 #ifndef ELEMENTIMG_h
 #define ELEMENTIMG_h
 
-#include <elementsingle.h>
+#include <elementtemplate.h>
 
 namespace  OST
 {
 
-class ElementImg: public ElementSingleNotNumeric<ImgData>
+class ElementImg: public ElementTemplateNotNumeric<ImgData>
 {
 
         Q_OBJECT

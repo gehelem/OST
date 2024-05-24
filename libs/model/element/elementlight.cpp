@@ -2,7 +2,7 @@
 namespace  OST
 {
 ElementLight::ElementLight(const QString &label, const QString &order, const QString &hint)
-    : ElementSingleNotNumeric(label, order, hint)
+    : ElementTemplateNotNumeric(label, order, hint)
 {
     setValue(Idle, false);
 }

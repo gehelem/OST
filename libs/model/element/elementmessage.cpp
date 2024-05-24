@@ -2,7 +2,7 @@
 namespace  OST
 {
 ElementMessage::ElementMessage(const QString &label, const QString &order, const QString &hint)
-    : ElementSingleNotNumeric(label, order, hint)
+    : ElementTemplateNotNumeric(label, order, hint)
 {
 }
 ElementMessage::~ElementMessage()

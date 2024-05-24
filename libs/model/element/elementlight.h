@@ -1,12 +1,12 @@
 #ifndef ELEMENTLIGHT_h
 #define ELEMENTLIGHT_h
 
-#include <elementsingle.h>
+#include <elementtemplate.h>
 
 namespace  OST
 {
 
-class ElementLight: public ElementSingleNotNumeric<State>
+class ElementLight: public ElementTemplateNotNumeric<State>
 {
 
         Q_OBJECT

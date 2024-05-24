@@ -1,5 +1,5 @@
-#ifndef ELEMENTSINGLE_h
-#define ELEMENTSINGLE_h
+#ifndef ELEMENTTEMPLATE_h
+#define ELEMENTTEMPLATE_h
 
 #include <elementbase.h>
 #include <lovsingle.h>
@@ -8,14 +8,14 @@ namespace  OST
 {
 
 template <typename T>
-class ElementSingle : public ElementBase
+class ElementTemplate: public ElementBase
 {
 
     public:
 
-        ElementSingle(const QString &label, const QString &order, const QString &hint):
+        ElementTemplate(const QString &label, const QString &order, const QString &hint):
             ElementBase(label, order, hint) {}
-        ~ElementSingle() {}
+        ~ElementTemplate() {}
         QString getType() override
         {
             return "error";
@@ -55,16 +55,16 @@ class ElementSingle : public ElementBase
 
 };
 template <typename T>
-class ElementSingleNumeric : public ElementSingle<T>
+class ElementTemplateNumeric : public ElementTemplate<T>
 {
 
     public:
 
-        ElementSingleNumeric(const QString &label, const QString &order, const QString &hint):
-            ElementSingle<T>(label, order, hint)
+        ElementTemplateNumeric(const QString &label, const QString &order, const QString &hint):
+            ElementTemplate<T>(label, order, hint)
         {
         }
-        ~ElementSingleNumeric<T>() {}
+        ~ElementTemplateNumeric<T>() {}
         T value()
         {
             return mValue;
@@ -75,14 +75,14 @@ class ElementSingleNumeric : public ElementSingle<T>
             {
                 if (value < mMin)
                 {
-                    emit ElementSingle<T>::sendMessage(Warn,
-                                                       "setValue - value too low " + QString::number(value) + " min= " + QString::number(mMin) );
+                    emit ElementTemplate<T>::sendMessage(Warn,
+                                                         "setValue - value too low " + QString::number(value) + " min= " + QString::number(mMin) );
                     return false;
                 }
                 if (value > mMax)
                 {
-                    emit ElementSingle<T>::sendMessage(Warn,
-                                                       "setValue - value too high " + QString::number(value) + " max= " + QString::number(mMax) );
+                    emit ElementTemplate<T>::sendMessage(Warn,
+                                                         "setValue - value too high " + QString::number(value) + " max= " + QString::number(mMax) );
                     return false;
                 }
             }
@@ -151,16 +151,16 @@ class ElementSingleNumeric : public ElementSingle<T>
 
 };
 template <typename T>
-class ElementSingleNotNumeric : public ElementSingle<T>
+class ElementTemplateNotNumeric : public ElementTemplate<T>
 {
 
     public:
 
-        ElementSingleNotNumeric(const QString &label, const QString &order, const QString &hint):
-            ElementSingle<T>(label, order, hint)
+        ElementTemplateNotNumeric(const QString &label, const QString &order, const QString &hint):
+            ElementTemplate<T>(label, order, hint)
         {
         }
-        ~ElementSingleNotNumeric<T>() {}
+        ~ElementTemplateNotNumeric<T>() {}
         T value()
         {
             return mValue;

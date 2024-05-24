@@ -1,12 +1,12 @@
 #ifndef ELEMENTMESSAGE_h
 #define ELEMENTMESSAGE_h
 
-#include <elementsingle.h>
+#include <elementtemplate.h>
 
 namespace  OST
 {
 
-class ElementMessage: public ElementSingleNotNumeric<MsgData>
+class ElementMessage: public ElementTemplateNotNumeric<MsgData>
 {
 
         Q_OBJECT

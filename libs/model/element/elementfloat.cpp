@@ -2,9 +2,9 @@
 namespace  OST
 {
 ElementFloat::ElementFloat(const QString &label, const QString &order, const QString &hint)
-    : ElementSingleNumeric<double>(label, order, hint), mLov(label)
+    : ElementTemplateNumeric<double>(label, order, hint), mLov(label)
 {
-    connect(&mLov, &LovFloat::lovChanged, this, &ElementSingle::OnLovChanged);
+    connect(&mLov, &LovFloat::lovChanged, this, &ElementTemplate::OnLovChanged);
 }
 ElementFloat::~ElementFloat()
 {
