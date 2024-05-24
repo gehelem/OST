@@ -227,13 +227,7 @@ void PropertyMulti::clearGrid()
         return;
     }
 
-    foreach(const QString &elt, mElts.keys())
-    {
-        ElementUpdate d;
-        QString action = "cleargrid";
-        QVariantMap m;
-        mElts[elt]->accept(&d, action, m);
-    }
+    mGrid.clear();
     emit propertyEvent("ap", key(), this);
 
 }
