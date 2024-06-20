@@ -16,6 +16,10 @@ class ElementTemplate: public ElementBase
         ElementTemplate(const QString &label, const QString &order, const QString &hint):
             ElementBase(label, order, hint) {}
         ~ElementTemplate() {}
+        T value()
+        {
+            return mValue;
+        }
         QString getType() override
         {
             return "error";
@@ -24,35 +28,8 @@ class ElementTemplate: public ElementBase
         {
             return typeid(T).name();
         }
-        QString getGlobalLov()
-        {
-            return mGlobalLov;
-        }
-        void setGlobalLov(QString lovName)
-        {
-            mGlobalLov = lovName;
-        }
-        QString getPreIcon()
-        {
-            return mPreIcon;
-        }
-        void setPreIcon(QString s)
-        {
-            mPreIcon = s;
-        }
-        QString getPostIcon()
-        {
-            return mPostIcon;
-        }
-        void setPostIcon(QString s)
-        {
-            mPostIcon = s;
-        }
-    private:
-        QString mGlobalLov = "";
-        QString mPreIcon = "";
-        QString mPostIcon = "";
-
+    protected:
+        T mValue;
 };
 template <typename T>
 class ElementTemplateNumeric : public ElementTemplate<T>
@@ -65,10 +42,6 @@ class ElementTemplateNumeric : public ElementTemplate<T>
         {
         }
         ~ElementTemplateNumeric<T>() {}
-        T value()
-        {
-            return mValue;
-        }
         bool setValue(const T &value, const bool &emitEvent)
         {
             if (mUseMinMax)
@@ -86,7 +59,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
                     return false;
                 }
             }
-            mValue = value;
+            ElementTemplate<T>::mValue = value;
             if (emitEvent) emit ElementBase::valueSet(this);
             return true;
         }
@@ -142,7 +115,6 @@ class ElementTemplateNumeric : public ElementTemplate<T>
             emit ElementBase::eltChanged(this);
         }
     private:
-        T mValue;
         T mMin = 0;
         T mMax = 0;
         T mStep = 0;
@@ -161,18 +133,13 @@ class ElementTemplateNotNumeric : public ElementTemplate<T>
         {
         }
         ~ElementTemplateNotNumeric<T>() {}
-        T value()
-        {
-            return mValue;
-        }
         bool setValue(const T &value, const bool &emitEvent)
         {
-            mValue = value;
+            ElementTemplate<T>::mValue = value;
             if (emitEvent) emit ElementBase::valueSet(this);
             return true;
         }
-    private:
-        T mValue;
+
 };
 
 template <typename T>

@@ -85,8 +85,7 @@ QString Datastore::getString(QString pProperty, QString pElement, long line)
         sendWarning("getString - property " + pProperty + " line : " + line + " does not exist" );
         return QString();
     }
-    int i = getProperty(pProperty)->getGridHeaders().indexOf(pElement);
-    OST::ValueString* v = static_cast<OST::ValueString*>(getProperty(pProperty)->getGrid()[line][i]);
+    OST::ValueString* v = static_cast<OST::ValueString*>(getProperty(pProperty)->getGrid()[line][pElement]);
     return v->value;
 }
 OST::ElementInt* Datastore::getEltInt(QString pProperty, QString pElement)
@@ -120,8 +119,7 @@ long Datastore::getInt(QString pProperty, QString pElement, long line)
         sendWarning("getInt- property " + pProperty + " line : " + line + " does not exist" );
         return 0;
     }
-    int i = getProperty(pProperty)->getGridHeaders().indexOf(pElement);
-    OST::ValueInt* v = static_cast<OST::ValueInt*>(getProperty(pProperty)->getGrid()[line][i]);
+    OST::ValueInt* v = static_cast<OST::ValueInt*>(getProperty(pProperty)->getGrid()[line][pElement]);
     return v->value;
 }
 OST::ElementFloat* Datastore::getEltFloat(QString pProperty, QString pElement)
@@ -155,8 +153,7 @@ double Datastore::getFloat(QString pProperty, QString pElement, long line)
         sendWarning("getFloat - property " + pProperty + " line : " + line + " does not exist" );
         return 0;
     }
-    int i = getProperty(pProperty)->getGridHeaders().indexOf(pElement);
-    OST::ValueFloat* v = static_cast<OST::ValueFloat*>(getProperty(pProperty)->getGrid()[line][i]);
+    OST::ValueFloat* v = static_cast<OST::ValueFloat*>(getProperty(pProperty)->getGrid()[line][pElement]);
     return v->value;
 }
 OST::ElementLight* Datastore::getEltLight(QString pProperty, QString pElement)
@@ -251,8 +248,7 @@ bool Datastore::getBool(QString pProperty, QString pElement, long line)
         sendWarning("getBool - property " + pProperty + " line : " + line + " does not exist" );
         return 0;
     }
-    int i = getProperty(pProperty)->getGridHeaders().indexOf(pElement);
-    OST::ValueBool* v = static_cast<OST::ValueBool*>(getProperty(pProperty)->getGrid()[line][i]);
+    OST::ValueBool* v = static_cast<OST::ValueBool*>(getProperty(pProperty)->getGrid()[line][pElement]);
     return v->value;
 }
 

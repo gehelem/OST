@@ -2,6 +2,7 @@
 #include "elementjsondumper.h"
 #include <valuejsondumper.h>
 #include "elementupdate.h"
+#include "qglobal.h"
 #include <sstream>
 namespace  OST
 {
@@ -50,26 +51,21 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
         json["gridheaders"] = QJsonArray::fromStringList(pProperty->getGridHeaders());
     }
 
-    if (pProperty->hasGrid())
+    if ((pProperty->hasGrid()) && (pProperty->getGrid().count() > 0))
     {
         QJsonArray grid;
-        foreach(const QList<ValueBase*> &gridLine, pProperty->getGrid())
+        for(int i = 0; i < pProperty->getGrid().count(); i++)
         {
             QJsonArray jLine;
-            int i = 0;
             foreach(QString elt, pProperty->getGridHeaders())
             {
                 ValueJsonDumper d;
-                gridLine[i]->accept(&d);
+                pProperty->getGrid()[i][elt]->accept(&d);
                 jLine.append(d.getResult());
-                i++;
             }
-
-
             grid.append(jLine);
         }
         json["grid"] = grid;
-
     }
 
     json["hasGraph"] = pProperty->hasGraph();

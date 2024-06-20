@@ -180,9 +180,8 @@ void Maincontrol::setModuleData(const QString  &pName, const QString  &pLabel, c
         if( l[i].toString() == pName)
         {
             //getEltString("modules", "profile")->getGrid()[i] = pProfile;
-            int j = getProperty("modules")->getGridHeaders().indexOf("profile");
             getEltString("modules", "profile")->setValue(pProfile, true);
-            getProperty("modules")->getGrid()[i][j]->updateValue();
+            getProperty("modules")->getGrid()[i]["profile"]->updateValue();
         }
     }
 

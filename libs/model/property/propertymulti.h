@@ -102,7 +102,7 @@ class PropertyMulti: public PropertyBase
         {
             return mGridHeaders;
         }
-        QList<QList<ValueBase*>> getGrid()
+        QList<QMap<QString, ValueBase*>> getGrid()
         {
             return mGrid;
         }
@@ -196,7 +196,7 @@ class PropertyMulti: public PropertyBase
         SwitchsRule mRule = SwitchsRule::Any;
         QMap<QString, ElementBase*> mElts;
         QList<QString> mGridHeaders;
-        QList<QList<ValueBase*>> mGrid;
+        QList<QMap<QString, ValueBase*>> mGrid;
 
 
 };

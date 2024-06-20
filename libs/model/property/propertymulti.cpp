@@ -97,11 +97,10 @@ void PropertyMulti::push()
         sendError("PropertyMulti::Push - no array/grid defined");
         return;
     }
-    QList<ValueBase*> wGridLine;
+    QMap<QString, ValueBase*> wGridLine;
     foreach(const QString &elt, mGridHeaders)
     {
-        ValueBase* v = ValueFactory::createValue(mElts[elt]);
-        wGridLine.append(v);
+        wGridLine[elt] = ValueFactory::createValue(mElts[elt]);
     }
     mGrid.append(wGridLine);
     emit propertyEvent("ap", key(), this);

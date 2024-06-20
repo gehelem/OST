@@ -61,6 +61,30 @@ class ElementBase: public QObject
         {
             mBadge = b;
         }
+        QString getPreIcon()
+        {
+            return mPreIcon;
+        }
+        void setPreIcon(QString s)
+        {
+            mPreIcon = s;
+        }
+        QString getPostIcon()
+        {
+            return mPostIcon;
+        }
+        void setPostIcon(QString s)
+        {
+            mPostIcon = s;
+        }
+        QString getGlobalLov()
+        {
+            return mGlobalLov;
+        }
+        void setGlobalLov(QString lovName)
+        {
+            mGlobalLov = lovName;
+        }
     private:
         QString mLabel = "change me";
         QString mOrder = "change me";
@@ -68,6 +92,11 @@ class ElementBase: public QObject
         bool mAutoUpdate = false;
         bool mDirectEdit = false;
         bool mBadge = false;
+        QString mPreIcon = "";
+        QString mPostIcon = "";
+        QString mGlobalLov = "";
+
+
     public slots:
         void OnLovChanged()
         {
@@ -94,7 +123,6 @@ class ValueBase: public QObject
         virtual void updateElement(const bool &emitEvent) = 0;
     protected:
         ElementBase* pElement;
-
 };
 
 }
