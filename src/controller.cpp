@@ -453,7 +453,8 @@ void Controller::startPublish()
 {
     zeroConf.clearServiceTxtRecords();
     zeroConf.addServiceTxtRecord("OstServer", "Observatoire Sans Tete");
-    zeroConf.startServicePublish(buildName().toUtf8(), "_ostserver_ws._tcp", "local", 11437);
+    //startServicePublish(const char *name, const char *type, const char *domain, quint16 port, quint32 interface)
+    zeroConf.startServicePublish(buildName().toUtf8(), "_ostserver_ws._tcp", "local", 9624);
 }
 
 QString Controller::buildName(void)
