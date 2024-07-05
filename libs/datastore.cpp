@@ -87,7 +87,7 @@ OST::ElementMessage* Datastore::getEltMsg(QString pProperty, QString pElement)
         sendWarning("getEltMsg - property " + pProperty + " : element " + pElement + " not found");
         return nullptr;
     }
-    if (p->getElt(pElement)->getType() != "prg")
+    if (p->getElt(pElement)->getType() != "message")
     {
         sendWarning("getEltMsg - property " + pProperty + " : element " + pElement + " is not message");
         return nullptr;
