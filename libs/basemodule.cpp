@@ -63,7 +63,6 @@ void Basemodule::setProfile(QVariantMap profiledata)
             QVariantMap data = props[key].toMap();
             if (getStore()[key]->hasProfile())
             {
-                //setOstPropertyValue(key, data["value"], true);
                 if (data.contains("elements"))
                 {
                     foreach(const QString &eltkey, props[key].toMap()["elements"].toMap().keys())
@@ -85,8 +84,6 @@ void Basemodule::setProfile(QVariantMap profiledata)
                         {
                             getEltBool(key, eltkey)->setValue(v.toBool(), true);
                         }
-
-
                         if (props[key].toMap()["elements"].toMap()[eltkey].toMap().contains("gridvalues"))
                         {
                             //setOstElementGrid (key, eltkey, profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["gridvalues"].toList(), true);
@@ -101,9 +98,63 @@ void Basemodule::setProfile(QVariantMap profiledata)
                                 m["val"] = props[key].toMap()["elements"].toMap()[eltkey].toMap()["gridvalues"].toList()[i];
                                 getProperty(key)->getElt(eltkey)->accept(&v, a, m);
                             }
-
-
                         }
+                    }
+                }
+
+                if (data.contains("elements") && getStore()[key]->hasGrid() && data.contains("grid") && data.contains("gridheaders"))
+                {
+                    getStore()[key]->clearGrid();
+                    QVariantList lines = props[key].toMap()["grid"].toList();
+                    foreach (const QVariant &vline, lines)
+                    {
+                        QVariantList line = vline.toList();
+                        int icol = 0;
+                        foreach(const QVariant &vv, line)
+                        {
+                            QString eltkey = data["gridheaders"].toList().at(icol).toString();
+                            if (getEltBase(key, eltkey)->getType() == "int")
+                            {
+                                getEltInt(key, eltkey)->setValue(vv.toInt(), true);
+                            }
+                            if (getEltBase(key, eltkey)->getType() == "float")
+                            {
+                                getEltFloat(key, eltkey)->setValue(vv.toDouble(), true);
+                            }
+                            if (getEltBase(key, eltkey)->getType() == "string")
+                            {
+                                getEltString(key, eltkey)->setValue(vv.toString(), true);
+                            }
+                            if (getEltBase(key, eltkey)->getType() == "bool")
+                            {
+                                getEltBool(key, eltkey)->setValue(vv.toBool(), true);
+                            }
+                            if (getEltBase(key, eltkey)->getType() == "prg")
+                            {
+                                getEltPrg(key, eltkey)->setPrgValue(vv.toMap()["value"].toInt(), true);
+                                getEltPrg(key, eltkey)->setDynLabel(vv.toMap()["dynlabel"].toString(), true);
+
+                            }
+                            if (getEltBase(key, eltkey)->getType() == "img")
+                            {
+                                OST::ImgData i;
+                                i.mUrlJpeg = vv.toMap()["urljpeg"].toString();
+                                i.mUrlFits = vv.toMap()["urlfits"].toString();
+                                i.height = vv.toMap()["height"].toInt();
+                                i.width = vv.toMap()["width"].toInt();
+                                getEltImg(key, eltkey)->setValue(i, true);
+                            }
+                            if (getEltBase(key, eltkey)->getType() == "message")
+                            {
+                                OST::MsgData m;
+                                m.level = OST::IntToMsgLevel(vv.toMap()["level"].toInt());
+                                m.ts = vv.toMap()["ts"].toDateTime();
+                                m.message = vv.toMap()["message"].toString();
+                                getEltMsg(key, eltkey)->setValue(m, true);
+                            }
+                            icol++;
+                        }
+                        getStore()[key]->push();
                     }
                 }
             }
