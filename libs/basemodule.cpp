@@ -209,25 +209,39 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
     {
         foreach(const QString &keyprop, pEventData.keys())
         {
-            int l1 = pEventData[keyprop].toMap()["line"].toInt();
-            int l2 = l1 + 1;
-            getStore()[keyprop]->swapLines(l1, l2);
+            if (getStore()[keyprop]->autoUpDown())
+            {
+                int l1 = pEventData[keyprop].toMap()["line"].toInt();
+                int l2 = l1 + 1;
+                getStore()[keyprop]->swapLines(l1, l2);
+            }
         }
-
     }
     if ( (pEventType == "Fldown") && (pEventModule == getModuleName()) )
     {
         foreach(const QString &keyprop, pEventData.keys())
         {
-            int l1 = pEventData[keyprop].toMap()["line"].toInt();
-            int l2 = l1 - 1;
-            getStore()[keyprop]->swapLines(l1, l2);
+            if (getStore()[keyprop]->autoUpDown())
+            {
+                int l1 = pEventData[keyprop].toMap()["line"].toInt();
+                int l2 = l1 - 1;
+                getStore()[keyprop]->swapLines(l1, l2);
+            }
         }
-
+    }
+    if ( (pEventType == "Flselect")  && (pEventModule == getModuleName()) )
+    {
+        foreach(const QString &keyprop, pEventData.keys())
+        {
+            if (getStore()[keyprop]->autoSelect())
+            {
+                double line = pEventData[keyprop].toMap()["line"].toDouble();
+                getStore()[keyprop]->fetchLine(line);
+            }
+        }
     }
 
     /* autoupdate if wanted */
-
 
     if ( (pEventType == "Fsetproperty") && (pEventModule == getModuleName()) )
     {

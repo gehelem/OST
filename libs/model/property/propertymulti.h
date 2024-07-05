@@ -49,6 +49,11 @@ class PropertyMulti: public PropertyBase
         GraphDefs getGraphDefs(void);
         void setGraphDefs(GraphDefs defs);
         bool swapLines(int l1, int l2);
+        bool fetchLine(int l1);
+        bool autoUpDown(void);
+        void setAutoUpDown(bool b);
+        bool autoSelect(void);
+        void setAutoSelect(bool b);
 
 
     public slots:
@@ -67,6 +72,8 @@ class PropertyMulti: public PropertyBase
         SwitchsRule mRule = SwitchsRule::Any;
         QMap<QString, ElementBase*> mElts;
         QList<QMap<QString, ValueBase*>> mGrid;
+        bool mAutoUpDown = true;
+        bool mAutoSelect = true;
 
 
 };

@@ -433,6 +433,38 @@ bool PropertyMulti::swapLines(int l1, int l2)
     return true;
 }
 
+bool PropertyMulti::fetchLine(int l)
+{
+    if ((l >= mGrid.size()))
+    {
+        sendWarning("Can't fetch line" + QString::number(l)  + " >= " + QString::number(mGrid.size()));
+        return false;
+    }
+    foreach(const QString &e, mGrid.at(l).keys())
+    {
+        mGrid.at(l)[e]->updateElement(true);
+    }
+
+    return true;
+}
+bool PropertyMulti::autoUpDown(void)
+{
+    return mAutoUpDown;
+}
+void PropertyMulti::setAutoUpDown(bool b)
+{
+    mAutoUpDown = b;
+}
+bool PropertyMulti::autoSelect(void)
+{
+    return mAutoSelect;
+}
+void PropertyMulti::setAutoSelect(bool b)
+{
+    mAutoSelect = b;
+}
+
+
 
 /* Slots */
 void PropertyMulti::OnValueSet(ElementBase*)

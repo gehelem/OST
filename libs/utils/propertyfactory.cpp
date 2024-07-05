@@ -47,6 +47,14 @@ PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVaria
     {
         qDebug() << "Graph defined without grid " << pProperty->key();
     }
+    if (pData.contains("autoupdown"))
+    {
+        pProperty->setAutoUpDown(pData["autoupdown"].toBool());
+    }
+    if (pData.contains("autoselect"))
+    {
+        pProperty->setAutoSelect(pData["autoselect"].toBool());
+    }
     if (pData.contains("graphType") && pProperty->hasGrid())
     {
         if (!pData.contains("graphParams"))
