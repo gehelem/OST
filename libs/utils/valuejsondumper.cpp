@@ -109,6 +109,7 @@ void ValueJsonDumper::visit(ValueImg *  pValue)
 };
 void ValueJsonDumper::visit(ValueVideo *  pValue)
 {
+    Q_UNUSED(pValue)
     //mResult = pValue->value;
     mResult = "to be implemented";
 };

@@ -12,37 +12,17 @@ class ElementMessage: public ElementTemplateNotNumeric<MsgData>
         Q_OBJECT
 
     public:
-        void accept(ElementVisitor *pVisitor) override
-        {
-            pVisitor->visit(this);
-        }
-        void accept(ElementVisitor *pVisitor, QVariantMap &data) override
-        {
-            pVisitor->visit(this, data);
-        }
-        void accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data) override
-        {
-            pVisitor->visit(this, action, data);
-        }
+        void accept(ElementVisitor *pVisitor) override;
+        void accept(ElementVisitor *pVisitor, QVariantMap &data) override;
+        void accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data) override;
 
         ElementMessage(const QString &label, const QString &order, const QString &hint);
         ~ElementMessage();
-        QString getType() override
-        {
-            return "message";
-        }
-        QString message()
-        {
-            return value().message;
-        }
-        MsgLevel level()
-        {
-            return value().level;
-        }
-        QDateTime ts()
-        {
-            return value().ts;
-        }
+
+        QString getType() override;
+        QString message();
+        MsgLevel level();
+        QDateTime ts();
 
 };
 
@@ -52,20 +32,11 @@ class ValueMessage: public ValueTemplate<MsgData>
 
     public:
 
-        void accept(ValueVisitor* pVisitor)  override
-        {
-            pVisitor->visit(this);
-        }
+        void accept(ValueVisitor* pVisitor)  override;
         ValueMessage(ElementBase* element): ValueTemplate<MsgData>(element) {}
         ~ValueMessage() {}
-        void updateValue() override
-        {
-            value = static_cast<ElementMessage*>(pElement)->value();
-        }
-        void updateElement(const bool &emitEvent) override
-        {
-            static_cast<ElementMessage*>(pElement)->setValue(value, emitEvent);
-        }
+        void updateValue() override;
+        void updateElement(const bool &emitEvent) override;
 
 };
 }

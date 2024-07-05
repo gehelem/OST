@@ -305,6 +305,7 @@ void Datastore::onEltChanged(void)
 }
 void Datastore::onPropertyEvent(QString event, QString key, OST::PropertyBase* prop)
 {
+    Q_UNUSED(event) Q_UNUSED(key) Q_UNUSED(prop)
     OST::PropertyBase* obj = qobject_cast<OST::PropertyBase*>(sender());
     OST::PropertyJsonDumper d;
     obj->accept(&d);
@@ -367,6 +368,7 @@ bool Datastore::createOstElementBool(const QString &pPropertyName, const QString
 bool Datastore::setOstElementValue(const QString &pPropertyName, const QString &pElementName, const QVariant &pElementValue,
                                    bool mEmitEvent)
 {
+    Q_UNUSED(mEmitEvent)
     if (!mStore.contains(pPropertyName))
     {
         sendWarning("setElementValue - property2 " + pPropertyName + " not found");

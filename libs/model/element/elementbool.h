@@ -12,27 +12,13 @@ class ElementBool: public ElementTemplateNotNumeric<bool>
         Q_OBJECT
 
     public:
-        void accept(ElementVisitor *pVisitor) override
-        {
-            pVisitor->visit(this);
-        }
-        void accept(ElementVisitor *pVisitor, QVariantMap &data) override
-        {
-            pVisitor->visit(this, data);
-        }
-        void accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data) override
-        {
-            pVisitor->visit(this, action, data);
-        }
+        void accept(ElementVisitor *pVisitor) override;
+        void accept(ElementVisitor *pVisitor, QVariantMap &data) override;
+        void accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data) override;
 
         ElementBool(const QString &label, const QString &order, const QString &hint);
         ~ElementBool();
-        QString getType() override
-        {
-            return "bool";
-        }
-
-    private:
+        QString getType() override;
 
 };
 
@@ -41,21 +27,11 @@ class ValueBool: public ValueTemplate<bool>
         Q_OBJECT
 
     public:
-
-        void accept(ValueVisitor* pVisitor)  override
-        {
-            pVisitor->visit(this);
-        }
+        void accept(ValueVisitor* pVisitor)  override;
         ValueBool(ElementBase* element): ValueTemplate<bool>(element) {}
         ~ValueBool() {}
-        void updateValue() override
-        {
-            value = static_cast<ElementBool*>(pElement)->value();
-        }
-        void updateElement(const bool &emitEvent) override
-        {
-            static_cast<ElementBool*>(pElement)->setValue(value, emitEvent);
-        }
+        void updateValue() override;
+        void updateElement(const bool &emitEvent) override;
 
 };
 

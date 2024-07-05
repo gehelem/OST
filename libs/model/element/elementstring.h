@@ -11,45 +11,19 @@ class ElementString: public ElementTemplateNotNumeric<QString>
         Q_OBJECT
 
     public:
-        void accept(ElementVisitor *pVisitor) override
-        {
-            pVisitor->visit(this);
-        }
-        void accept(ElementVisitor *pVisitor, QVariantMap &data) override
-        {
-            pVisitor->visit(this, data);
-        }
-        void accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data) override
-        {
-            pVisitor->visit(this, action, data);
-        }
+        void accept(ElementVisitor *pVisitor) override;
+        void accept(ElementVisitor *pVisitor, QVariantMap &data) override;
+        void accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data) override;
 
         ElementString(const QString &label, const QString &order, const QString &hint);
         ~ElementString();
-        QString getType() override
-        {
-            return "string";
-        }
-        QMap<QString, QString> getLov()
-        {
-            return mLov.getLov();
-        }
-        bool lovAdd(QString val, QString label)
-        {
-            return mLov.lovAdd(val, label);
-        }
-        bool lovUpdate(QString  val, QString label)
-        {
-            return mLov.lovUpdate(val, label);
-        }
-        bool lovDel(QString  val)
-        {
-            return mLov.lovDel(val);
-        }
-        bool lovClear()
-        {
-            return mLov.lovClear();
-        }
+        QString getType() override;
+        QMap<QString, QString> getLov();
+        bool lovAdd(QString val, QString label);
+        bool lovUpdate(QString  val, QString label);
+        bool lovDel(QString  val);
+        bool lovClear();
+
     private:
         LovString mLov;
 
@@ -61,20 +35,11 @@ class ValueString: public ValueTemplate<QString>
 
     public:
 
-        void accept(ValueVisitor* pVisitor)  override
-        {
-            pVisitor->visit(this);
-        }
+        void accept(ValueVisitor* pVisitor)  override;
         ValueString(ElementBase* element): ValueTemplate<QString>(element) {}
         ~ValueString() {}
-        void updateValue() override
-        {
-            value = static_cast<ElementString*>(pElement)->value();
-        }
-        void updateElement(const bool &emitEvent) override
-        {
-            static_cast<ElementString*>(pElement)->setValue(value, emitEvent);
-        }
+        void updateValue() override;
+        void updateElement(const bool &emitEvent) override;
 
 };
 

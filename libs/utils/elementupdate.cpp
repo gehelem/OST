@@ -1,5 +1,4 @@
 #include "elementupdate.h"
-#include <sstream>
 namespace  OST
 {
 void ElementUpdate::visit(ElementInt *pElement, QVariantMap &data )
@@ -61,62 +60,55 @@ void ElementUpdate::visit(ElementLight *pElement, QVariantMap &data )
 }
 void ElementUpdate::visit(ElementImg *pElement, QVariantMap &data )
 {
-    Q_UNUSED(pElement);
-    Q_UNUSED(data);
+    Q_UNUSED(pElement) Q_UNUSED(data)
 }
 void ElementUpdate::visit(ElementVideo *pElement, QVariantMap &data )
 {
-    Q_UNUSED(pElement);
-    Q_UNUSED(data);
+    Q_UNUSED(pElement) Q_UNUSED(data)
 }
 void ElementUpdate::visit(ElementMessage *pElement, QVariantMap &data )
 {
-    Q_UNUSED(pElement);
-    Q_UNUSED(data);
+    Q_UNUSED(pElement) Q_UNUSED(data)
 }
 void ElementUpdate::visit(ElementPrg* pElement, QVariantMap &data )
 {
-    Q_UNUSED(pElement);
-    Q_UNUSED(data);
+    Q_UNUSED(pElement)  Q_UNUSED(data)
 }
-
 void ElementUpdate::visit(ElementInt* pElement, QString &action, QVariantMap &data)
 {
+    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
 }
 void ElementUpdate::visit(ElementFloat* pElement, QString &action, QVariantMap &data)
 {
+    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
 }
 void ElementUpdate::visit(ElementBool* pElement, QString &action, QVariantMap &data)
 {
+    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
 }
 void ElementUpdate::visit(ElementString* pElement, QString &action, QVariantMap &data)
 {
+    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
 }
 void ElementUpdate::visit(ElementLight* pElement, QString &action, QVariantMap &data)
 {
+    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
 }
 void ElementUpdate::visit(ElementImg* pElement, QString &action, QVariantMap &data)
 {
-    Q_UNUSED(pElement);
-    Q_UNUSED(action);
-    Q_UNUSED(data);
-
+    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
 }
 void ElementUpdate::visit(ElementVideo* pElement, QString &action, QVariantMap &data)
 {
-    Q_UNUSED(pElement);
-    Q_UNUSED(action);
-    Q_UNUSED(data);
+    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
 }
 void ElementUpdate::visit(ElementMessage* pElement, QString &action, QVariantMap &data)
 {
-    Q_UNUSED(pElement);
-    Q_UNUSED(action);
-    Q_UNUSED(data);
-
+    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
 }
 void ElementUpdate::visit(ElementPrg* pElement, QString &action, QVariantMap &data)
 {
+    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
 }
 
 }

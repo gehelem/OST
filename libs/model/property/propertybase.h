@@ -56,10 +56,7 @@ class PropertyBase: public QObject
          * This value cannot be modified after instanciation
          * \hidecallgraph
          */
-        QString key()
-        {
-            return mKey;
-        }
+        QString key();
         /**
          * @brief Property's label
          * @return value of label
@@ -67,10 +64,7 @@ class PropertyBase: public QObject
          * This value cannot be modified after instanciation
          * \hidecallgraph
          */
-        QString label()
-        {
-            return mLabel;
-        }
+        QString label();
         /**
          * @brief Property's permission
          * @return value of permission
@@ -78,10 +72,7 @@ class PropertyBase: public QObject
          * This value cannot be modified after instanciation
          * \hidecallgraph
          */
-        Permission permission()
-        {
-            return mPermission;
-        }
+        Permission permission();
         /**
          * @brief Property's hierachy first level
          * @return value of level 1
@@ -91,10 +82,7 @@ class PropertyBase: public QObject
          * It equivalent to indi "device" level
          * \hidecallgraph
          */
-        QString level1()
-        {
-            return mLevel1;
-        }
+        QString level1();
         /**
          * @brief Property's hierachy second level
          * @return value of level 2
@@ -104,10 +92,7 @@ class PropertyBase: public QObject
          * It equivalent to indi "group" level
          * \hidecallgraph
          */
-        QString level2()
-        {
-            return mLevel2;
-        }
+        QString level2();
         /**
          * @brief Property's display order
          * @return order value
@@ -117,62 +102,27 @@ class PropertyBase: public QObject
          * This value sets display order value within same level1 / level2 values
          * \hidecallgraph
          */
-        QString order()
-        {
-            return mOrder;
-        }
+        QString order();
         /**
-         * @brief should this value be saved in profiles ?
+         * @brief should values be saved in profiles ?
          * @return true = yes, false = no
          *
          * This value cannot be modified after instanciation.
          * \hidecallgraph
          */
-        bool hasProfile()
-        {
-            return mHasProfile;
-        }
-        State state()
-        {
-            return mState;
-        }
+        bool hasProfile();
+        State state();
         void setState(State state);
-        bool isEnabled()
-        {
-            return mIsEnabled;
-        }
-        void enable(void)
-        {
-            mIsEnabled = true;
-        }
-        void disable(void)
-        {
-            mIsEnabled = false;
-        }
-        bool getBadge()
-        {
-            return mBadge;
-        }
-        void setBadge(bool b)
-        {
-            mBadge = b;
-            emit propertyEvent("ap", key(), this);
-        }
-        void sendInfo(QString m)
-        {
-            emit sendMessage(Info, key() + "-" + m);
-        }
-        void sendWarning(QString m)
-        {
-            emit sendMessage(Warn, key() + "-" + m);
-        }
-        void sendError(QString m)
-        {
-            emit sendMessage(Err, key() + "-" + m);
-        }
+        bool isEnabled();
+        void enable(void);
+        void disable(void);
+        bool getBadge();
+        void setBadge(bool b);
+        void sendInfo(QString m);
+        void sendWarning(QString m);
+        void sendError(QString m);
     signals:
         void stateChanged(OST::State);
-        void propertyCreated(void);
         void eltChanged(OST::PropertyBase*);
         void valueSet(OST::PropertyBase*);
         void propertyEvent(QString, QString, OST::PropertyBase*);
@@ -189,6 +139,10 @@ class PropertyBase: public QObject
         State mState = State::Idle;
         bool mIsEnabled = true;
         bool mBadge = false;
+        QString mPreIcon1 = "";
+        QString mPreIcon2 = "";
+        QString mPostIcon1 = "";
+        QString mPostIcon2 = "";
 
 
 

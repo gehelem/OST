@@ -13,45 +13,18 @@ class ElementFloat: public ElementTemplateNumeric<double>
         Q_OBJECT
 
     public:
-        void accept(ElementVisitor *pVisitor) override
-        {
-            pVisitor->visit(this);
-        }
-        void accept(ElementVisitor *pVisitor, QVariantMap &data) override
-        {
-            pVisitor->visit(this, data);
-        }
-        void accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data) override
-        {
-            pVisitor->visit(this, action, data);
-        }
+        void accept(ElementVisitor *pVisitor) override;
+        void accept(ElementVisitor *pVisitor, QVariantMap &data) override;
+        void accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data) override;
 
         ElementFloat(const QString &label, const QString &order, const QString &hint);
         ~ElementFloat();
-        QString getType() override
-        {
-            return "float";
-        }
-        QMap<double, QString> getLov()
-        {
-            return mLov.getLov();
-        }
-        bool lovAdd(double val, QString label)
-        {
-            return mLov.lovAdd(val, label);
-        }
-        bool lovUpdate(double  val, QString label)
-        {
-            return mLov.lovUpdate(val, label);
-        }
-        bool lovDel(double  val)
-        {
-            return mLov.lovDel(val);
-        }
-        bool lovClear()
-        {
-            return mLov.lovClear();
-        }
+        QString getType() override;
+        QMap<double, QString> getLov();
+        bool lovAdd(double val, QString label);
+        bool lovUpdate(double  val, QString label);
+        bool lovDel(double  val);
+        bool lovClear();
 
     private:
         LovFloat mLov;
@@ -63,21 +36,11 @@ class ValueFloat: public ValueTemplate<double>
         Q_OBJECT
 
     public:
-
-        void accept(ValueVisitor* pVisitor)  override
-        {
-            pVisitor->visit(this);
-        }
+        void accept(ValueVisitor* pVisitor)  override;
         ValueFloat(ElementBase* element): ValueTemplate<double>(element) {}
         ~ValueFloat() {}
-        void updateValue() override
-        {
-            value = static_cast<ElementFloat*>(pElement)->value();
-        }
-        void updateElement(const bool &emitEvent) override
-        {
-            static_cast<ElementFloat*>(pElement)->setValue(value, emitEvent);
-        }
+        void updateValue() override;
+        void updateElement(const bool &emitEvent) override;
 
 };
 

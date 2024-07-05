@@ -4,17 +4,101 @@
 namespace  OST
 {
 
+void PropertyMulti::accept(PropertyVisitor *pVisitor)
+{
+    pVisitor->visit(this);
+}
+void PropertyMulti::accept(PropertyVisitor *pVisitor, QVariantMap &data)
+{
+    pVisitor->visit(this, data);
+}
+
 PropertyMulti::PropertyMulti(const QString &key, const QString &label, const Permission &permission, const QString &level1,
                              const QString &level2,
                              const QString &order, const bool &hasProfile, const bool &hasGrid)
     : PropertyBase(key, label, permission, level1, level2,
                    order, hasProfile), mHasGrid(hasGrid)
 {
-    emit propertyCreated();
 }
 PropertyMulti::~PropertyMulti()
 {
 
+}
+[[nodiscard]] SwitchsRule PropertyMulti::rule() const
+{
+    return mRule;
+}
+void PropertyMulti::setRule(SwitchsRule rule)
+{
+    mRule = rule;
+}
+
+QMap<QString, ElementBase*>* PropertyMulti::getElts()
+{
+    return &mElts;
+}
+ElementBase* PropertyMulti::getElt(QString pElement)
+{
+    if (!mElts.contains(pElement))
+    {
+        qDebug() << label() << " - getElt - element " << pElement << " does not exists.";
+        return nullptr;
+    }
+    return mElts[pElement];
+}
+
+
+QList<QString> PropertyMulti::getGridHeaders()
+{
+    return mElts.keys();
+}
+QList<QMap<QString, ValueBase*>> PropertyMulti::getGrid()
+{
+    return mGrid;
+}
+bool PropertyMulti::getShowElts()
+{
+    return mShowElts;
+}
+void PropertyMulti::setShowElts(bool b)
+{
+    mShowElts = b;
+}
+bool PropertyMulti::hasGrid()
+{
+    return mHasGrid;
+}
+void PropertyMulti::setHasGrid(bool b)
+{
+    mHasGrid = b;
+}
+bool PropertyMulti::getShowGrid()
+{
+    return mShowGrid;
+}
+void PropertyMulti::setShowGrid(bool b)
+{
+    mShowGrid = b;
+}
+int PropertyMulti::getGridLimit()
+{
+    return mGridLimit;
+}
+void PropertyMulti::setGridLimit(int limit)
+{
+    if (limit > 0) mGridLimit = limit;
+}
+bool PropertyMulti::hasGraph()
+{
+    return mHasGraph;
+}
+void PropertyMulti::setHasGraph(bool b)
+{
+    mHasGraph = b;
+}
+GraphDefs PropertyMulti::getGraphDefs(void)
+{
+    return mGraphDefs;
 }
 bool  PropertyMulti::setElt(QString key, QVariant val)
 {
@@ -89,6 +173,33 @@ bool  PropertyMulti::setElt(QString key, QVariant val)
 
 
 }
+void  PropertyMulti::addElt(QString key, ElementBase* pElt)
+{
+    if (mElts.contains(key))
+    {
+        qDebug() << label() << " - addElt - element " << key << " already exists";
+        return;
+    }
+    mElts[key] = pElt;
+    mGrid.clear();
+    connect(mElts[key], &ElementBase::eltChanged, this, &PropertyMulti::OnEltChanged);
+    connect(mElts[key], &ElementBase::valueSet, this, &PropertyMulti::OnValueSet);
+    connect(mElts[key], &ElementBase::listChanged, this, &PropertyMulti::OnListChanged);
+    connect(mElts[key], &ElementBase::lovChanged, this, &PropertyMulti::OnLovChanged);
+    connect(mElts[key], &ElementBase::sendMessage, this, &PropertyMulti::OnMessage);
+}
+void  PropertyMulti::deleteElt(QString key)
+{
+    if (!mElts.contains(key))
+    {
+        qDebug() << label() << " - deleteElt - element " << key << " doesn't exist";
+        return;
+    }
+    mElts.remove(key);
+    mGrid.clear();
+    emit propertyEvent("ap", key, this);
+
+}
 
 void PropertyMulti::push()
 {
@@ -98,7 +209,7 @@ void PropertyMulti::push()
         return;
     }
     QMap<QString, ValueBase*> wGridLine;
-    foreach(const QString &elt, mGridHeaders)
+    foreach(const QString &elt, mElts.keys())
     {
         wGridLine[elt] = ValueFactory::createValue(mElts[elt]);
     }
@@ -304,6 +415,43 @@ void PropertyMulti::setGraphDefs(GraphDefs defs)
             break;
     }
     mGraphDefs = defs;
+}
+
+
+/* Slots */
+void PropertyMulti::OnValueSet(ElementBase*)
+{
+    emit valueSet(this);
+}
+void PropertyMulti::OnEltChanged(ElementBase*)
+{
+    emit eltChanged(this);
+}
+void PropertyMulti::OnListChanged(ElementBase*)
+{
+    emit propertyEvent("ap", key(), this);
+}
+void PropertyMulti::OnLovChanged(ElementBase*)
+{
+    emit propertyEvent("ap", key(), this);
+}
+void PropertyMulti::OnMessage(MsgLevel l, QString m)
+{
+    switch (l)
+    {
+        case Info:
+            sendInfo(this->key() + "-" + m);
+            break;
+        case Warn:
+            sendWarning(this->key() + "-" + m);
+            break;
+        case Err:
+            sendError(this->key() + "-" + m);
+            break;
+        default:
+            sendError(this->key() + "-" + m);
+            break;
+    }
 }
 
 

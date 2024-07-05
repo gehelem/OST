@@ -25,66 +25,22 @@ class ElementBase: public QObject
         ~ElementBase();
 
         virtual QString getType() = 0;
-        QString label()
-        {
-            return mLabel;
-        }
-        QString order()
-        {
-            return mOrder;
-        }
-        QString hint()
-        {
-            return mHint;
-        }
-        bool autoUpdate()
-        {
-            return mAutoUpdate;
-        }
-        void setAutoUpdate(const bool &v)
-        {
-            mAutoUpdate = v;
-        }
-        bool getDirectEdit()
-        {
-            return mDirectEdit;
-        }
-        void setDirectEdit(const bool &v)
-        {
-            mDirectEdit = v;
-        }
-        bool getBadge()
-        {
-            return mBadge;
-        }
-        void setBadge(const bool &b)
-        {
-            mBadge = b;
-        }
-        QString getPreIcon()
-        {
-            return mPreIcon;
-        }
-        void setPreIcon(QString s)
-        {
-            mPreIcon = s;
-        }
-        QString getPostIcon()
-        {
-            return mPostIcon;
-        }
-        void setPostIcon(QString s)
-        {
-            mPostIcon = s;
-        }
-        QString getGlobalLov()
-        {
-            return mGlobalLov;
-        }
-        void setGlobalLov(QString lovName)
-        {
-            mGlobalLov = lovName;
-        }
+        QString label();
+        QString order();
+        QString hint();
+        bool autoUpdate();
+        void setAutoUpdate(const bool &v);
+        bool getDirectEdit();
+        void setDirectEdit(const bool &v);
+        bool getBadge();
+        void setBadge(const bool &b);
+        QString getPreIcon();
+        void setPreIcon(QString s);
+        QString getPostIcon();
+        void setPostIcon(QString s);
+        QString getGlobalLov();
+        void setGlobalLov(QString lovName);
+
     private:
         QString mLabel = "change me";
         QString mOrder = "change me";
@@ -96,12 +52,8 @@ class ElementBase: public QObject
         QString mPostIcon = "";
         QString mGlobalLov = "";
 
-
     public slots:
-        void OnLovChanged()
-        {
-            emit lovChanged(this);
-        }
+        void OnLovChanged();
     signals:
         void valueSet(OST::ElementBase*); /* used in derived template class, only when value is changed*/
         void eltChanged(OST::ElementBase*); /* used in derived template class, when anything other than value is changed */

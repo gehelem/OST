@@ -34,6 +34,21 @@ inline int StateToInt(State val )
 
 typedef enum
 {
+    OneOfMany = 0,
+    AtMostOne,
+    Any
+} SwitchsRule;
+inline SwitchsRule IntToRule(int val )
+{
+    if (val == 0) return OneOfMany;
+    if (val == 1) return AtMostOne;
+    if (val == 2) return Any;
+    qDebug() << "Cant convert " << val << " to OST::SwitchsRule (0-2) - defaults to any";
+    return Any;
+}
+
+typedef enum
+{
     Info = 0,
     Warn,
     Err
