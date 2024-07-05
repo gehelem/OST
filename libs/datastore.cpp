@@ -553,6 +553,15 @@ QVariantMap Datastore::getProfile(void)
                     }
                     property["elements"] = elements;
                 }
+                if (props[keyprop].toMap().contains("gridheaders"))
+                {
+                    property["gridheaders"] = props[keyprop].toMap()["gridheaders"].toList();
+                }
+                if (props[keyprop].toMap().contains("grid"))
+                {
+                    property["grid"] = props[keyprop].toMap()["grid"].toList();
+                }
+
                 propertiesResult[keyprop] = property;
             }
 
