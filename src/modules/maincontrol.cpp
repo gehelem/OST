@@ -86,11 +86,15 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                 {
                     emit mainCtlEvent("killall", QString(), QString(), QVariantMap());
                 }
-                if (keyprop == "indidrivers" && pEventType == "Fposticon")
+                if (keyprop == "indidrivers" && keyelt == "search" && pEventType == "Fposticon")
                 {
-                    emit mainCtlEvent("startindidriver", QString(), keyelt, QVariantMap());
+                    this->searchDriver();
                 }
-                if (keyprop == "indidrivers" && pEventType == "Fpreicon")
+                if (keyprop == "indidrivers" && keyelt == "driver" && pEventType == "Fposticon")
+                {
+                    emit mainCtlEvent("startindidriver", QString(), getString("indidrivers", "driver"), QVariantMap());
+                }
+                if (keyprop == "indidrivers" && keyelt == "driver" && pEventType == "Fpreicon")
                 {
                     emit mainCtlEvent("stopindidriver", QString(), keyelt, QVariantMap());
                 }
@@ -198,22 +202,50 @@ void Maincontrol::deldModuleData(const QString  &pName)
     }
 
 }
-void Maincontrol::addIndiServerProperties(const QStringList  pDrivers)
+void Maincontrol::searchDriver(void)
 {
-    qDebug() << pDrivers;
-    OST::PropertyMulti *dynprop = new OST::PropertyMulti("indidrivers", "Available indi drivers", OST::Permission::ReadOnly,
-            "Indi server",
-            "", "", false, true);
-    foreach(QString key, pDrivers)
-    {
-        OST::ElementString* dyntext = new OST::ElementString(key, "", "");
-        dyntext->setValue("", false);
-        dyntext->setAutoUpdate(true);
-        dyntext->setDirectEdit(true);
-        dyntext->setPreIcon("stop");
-        dyntext->setPostIcon("play_arrow");
-        dynprop->addElt(key, dyntext);
+    getProperty("indidrivers")->clearGrid();
+    QString srch = getString("indidrivers", "search");
 
+    foreach(QString key, mIndiDriverList)
+    {
+        if (key.contains(srch))
+        {
+            getEltString("indidrivers", "driver")->setValue(key, false);
+            getProperty("indidrivers")->push();
+
+        }
     }
-    createProperty("indidrivers", dynprop);
+}
+void Maincontrol::setIndiDriverList(const QStringList pDrivers)
+{
+    mIndiDriverList = pDrivers;
+    OST::PropertyMulti *dynprop2 = new OST::PropertyMulti("indidrivers", "Available indi drivers", OST::Permission::ReadWrite,
+            "Indi server",
+            "", "1", false, true);
+    OST::ElementString* dyntext = new OST::ElementString("Search", "", "");
+    dyntext->setValue("*", false);
+    dyntext->setAutoUpdate(true);
+    dyntext->setDirectEdit(true);
+    dyntext->setPostIcon("play_arrow");
+
+    dynprop2->setHasGrid(true);
+    dynprop2->setShowGrid(true);
+    dynprop2->setShowElts(true);
+    OST::ElementString* dyntext2 = new OST::ElementString("Indi driver", "", "");
+    dyntext2->setValue("", false);
+    dyntext2->setAutoUpdate(true);
+    dyntext2->setDirectEdit(true);
+    dyntext2->setPreIcon("stop");
+    dyntext2->setPostIcon("play_arrow");
+    dynprop2->addElt("driver", dyntext2);
+    dynprop2->addElt("search", dyntext);
+
+    foreach(QString key, mIndiDriverList)
+    {
+        dyntext2->setValue(key, false);
+        dynprop2->push();
+    }
+    createProperty("indidrivers", dynprop2);
+
 }

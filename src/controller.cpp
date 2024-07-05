@@ -52,6 +52,8 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath());
 
     checkModules();
+    checkIndiDrivers();
+
     pMainControl = new Maincontrol(QString("mainctl"), QString("Main control"), QString(), QVariantMap());
     connect(pMainControl, &Maincontrol::moduleEvent, this, &Controller::OnModuleEvent);
     connect(pMainControl, &Maincontrol::moduleEvent, wshandler, &WShandler::processModuleEvent);
@@ -64,18 +66,13 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     pMainControl->dbInit(_dbpath, "mainctl");
     pMainControl->OnExternalEvent("refreshConfigurations", "mainctl", QString(), QVariantMap());
     pMainControl->setAvailableModuleLibs(_availableModuleLibs);
-    //qDebug() << _availableModuleLibs;
+    pMainControl->setIndiDriverList(_availableIndiDrivers);
     pMainControl->sendDump();
-
-    //loadModule("maincontrol", "mainctl", "Maincontrol", "default");
-
 
     if (_installfront != "N")
     {
         this->installFront();
     }
-
-
 
     loadConf(_conf);
 
@@ -89,7 +86,6 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     {
         this->startIndi();
     }
-
 
 }
 
@@ -354,10 +350,8 @@ void Controller::checkIndiDrivers(void)
     _availableIndiDrivers = directory.entryList();
     foreach(QString dr, _availableIndiDrivers)
     {
-        sendMessage("indi driver found " + dr);
+        //sendMessage("indi driver found " + dr);
     }
-    pMainControl->addIndiServerProperties(_availableIndiDrivers);
-
 }
 void Controller::installFront(void)
 {
@@ -479,17 +473,26 @@ void Controller::startIndi(void)
     connect(_indiProcess, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this,
             &Controller::processFinished);
 
+
     if (_indiProcess->state() != 0)
     {
         qDebug() << "can't start process";
     }
     else
     {
-        QString program = "mkfifo";
+        QString program = "rm";
         QStringList arguments;
+        arguments << "-f";
         arguments << "/tmp/ostserverIndiFIFO" ;
         _indiProcess->start(program, arguments);
         _indiProcess->waitForFinished();
+
+        program = "mkfifo";
+        arguments.clear();
+        arguments << "/tmp/ostserverIndiFIFO" ;
+        _indiProcess->start(program, arguments);
+        _indiProcess->waitForFinished();
+
         program = "indiserver";
         arguments.clear();
         //arguments << "-v";
@@ -498,8 +501,6 @@ void Controller::startIndi(void)
         _indiProcess->start(program, arguments);
 
     }
-
-    this->checkIndiDrivers();
 
 }
 void Controller::stopIndi(void)
