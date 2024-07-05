@@ -44,6 +44,7 @@ class Datastore : public Baseroot
         OST::ElementImg* getEltImg(QString pProperty, QString pElement);
         OST::ElementVideo* getEltVideo(QString pProperty, QString pElement);
         OST::ElementPrg* getEltPrg(QString pProperty, QString pElement);
+        OST::ElementMessage* getEltMsg(QString pProperty, QString pElement);
 
         QString getString(QString pProperty, QString pElement);
         QString getString(QString pProperty, QString pElement, long line);
