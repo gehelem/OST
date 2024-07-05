@@ -286,6 +286,39 @@ void Basemodule::killMe()
 {
     this->~Basemodule();
 }
+void Basemodule::setWebroot(QString webroot)
+{
+    mWebroot = webroot;
+}
+
+QString Basemodule::getWebroot(void)
+{
+    return mWebroot;
+}
+QVariantMap Basemodule::getAvailableModuleLibs(void)
+{
+    return mAvailableModuleLibs;
+}
+QString Basemodule::getModuleName()
+{
+    return mModuleName;
+}
+QString Basemodule::getModuleLabel()
+{
+    return mModuleLabel;
+}
+QString Basemodule::getModuleDescription()
+{
+    return mModuleDescription;
+}
+QString Basemodule::getModuleVersion()
+{
+    return mModuleVersion;
+}
+QString Basemodule::getClassName()
+{
+    return mClassName;
+}
 QVariantMap Basemodule::getModuleInfo(void)
 {
     return getPropertiesDump()["moduleInfo"].toVariant().toMap();
@@ -330,4 +363,15 @@ bool Basemodule::setClassName(const QString &pClassName)
                     ") - this method must be called only once, at the begin of class constructor");
         return false;
     }
+}
+void Basemodule::setModuleDescription(QString description)
+{
+    mModuleDescription = description;
+    getEltString("moduleInfo", "moduleDescription")->setValue(description, true);
+}
+void Basemodule::setModuleVersion(QString version)
+{
+    mModuleVersion = version;
+    getEltString("moduleInfo", "moduleVersion")->setValue(version, true);
+
 }
