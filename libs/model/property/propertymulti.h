@@ -48,6 +48,8 @@ class PropertyMulti: public PropertyBase
         void setHasGraph(bool b);
         GraphDefs getGraphDefs(void);
         void setGraphDefs(GraphDefs defs);
+        bool swapLines(int l1, int l2);
+
 
     public slots:
         void OnValueSet(ElementBase*);

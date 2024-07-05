@@ -153,7 +153,30 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
             }
         }
     }
+
+    if ( (pEventType == "Flup") && (pEventModule == getModuleName()) )
+    {
+        foreach(const QString &keyprop, pEventData.keys())
+        {
+            int l1 = pEventData[keyprop].toMap()["line"].toInt();
+            int l2 = l1 + 1;
+            getStore()[keyprop]->swapLines(l1, l2);
+        }
+
+    }
+    if ( (pEventType == "Fldown") && (pEventModule == getModuleName()) )
+    {
+        foreach(const QString &keyprop, pEventData.keys())
+        {
+            int l1 = pEventData[keyprop].toMap()["line"].toInt();
+            int l2 = l1 - 1;
+            getStore()[keyprop]->swapLines(l1, l2);
+        }
+
+    }
+
     /* autoupdate if wanted */
+
 
     if ( (pEventType == "Fsetproperty") && (pEventModule == getModuleName()) )
     {

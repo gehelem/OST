@@ -416,6 +416,22 @@ void PropertyMulti::setGraphDefs(GraphDefs defs)
     }
     mGraphDefs = defs;
 }
+bool PropertyMulti::swapLines(int l1, int l2)
+{
+    if ((l1 >= mGrid.size()) || (l2 >= mGrid.size()))
+    {
+        sendWarning("Can't swap lines" + QString::number(l1) + "/" + QString::number(l2) + " > " + QString::number(mGrid.size()));
+        return false;
+    }
+    if ((l1 < 0) || (l2 < 0))
+    {
+        sendWarning("Can't swap lines" + QString::number(l1) + "/" + QString::number(l2));
+        return false;
+    }
+    mGrid.swapItemsAt(l2, l1);
+    emit propertyEvent("ap", key(), this);
+    return true;
+}
 
 
 /* Slots */
