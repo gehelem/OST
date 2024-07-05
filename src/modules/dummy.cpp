@@ -1,4 +1,4 @@
-﻿#include "dummy.h"
+#include "dummy.h"
 
 Dummy *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
 {

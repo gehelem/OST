@@ -624,7 +624,7 @@
         "showElts":true,
         "showGrid":true,
         "devcat": "Grids",
-        "group": "Grids",
+        "group": "",
         "permission": 2,
         "arrayLimit":10,
         "hasprofile":true,
