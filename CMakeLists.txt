@@ -205,7 +205,7 @@ set(BASE_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/nan.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/common.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementbase.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementsingle.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementtemplate.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementint.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementstring.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementfloat.h
