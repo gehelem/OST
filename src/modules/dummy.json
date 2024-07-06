@@ -28,6 +28,26 @@
     }
 },
 "properties":{
+    "modulesstatus": {
+        "devcat": "Status",
+        "group": "",
+        "badge": true,
+        "hasGrid":true,
+        "showGrid":true,
+        "elements": {
+            "module": {
+                "type":"string",
+                "label": "Module"
+            },
+            "status": {
+                "type":"light",
+                "label": "Status"
+            }
+        },
+        "permission": 2,
+        "label": "Modules status",
+        "order":"00"
+    },
     "extextRO": {
         "devcat": "Examples",
         "badge": true,

@@ -127,6 +127,12 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
         {
             foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
             {
+
+                if ((keyprop == "modulesstatus") && (keyelt == "module"))
+                {
+                    getProperty("modulesstatus")->clearGrid();
+                    emit moduleStatusRequest();
+                }
                 //setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
                 if (keyprop == "dynprop")
                 {
@@ -433,3 +439,14 @@ void Dummy::newDevice(INDI::BaseDevice bd)
 {
     Q_UNUSED(bd);
 }
+void Dummy::OnModuleStatusAnswer(const QString module, OST::ModuleStatus status)
+{
+    //qDebug() << "OnModuleStatusAnswer " << this->getModuleName() << " - from : " << module << " : " << status.message << "(" <<
+    //         status.state << ")";
+    getEltString("modulesstatus", "module")->setValue(module, false);
+    getEltLight("modulesstatus", "status")->setValue(status.state, true);
+    getProperty("modulesstatus")->push();
+
+}
+
+
