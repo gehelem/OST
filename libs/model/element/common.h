@@ -6,6 +6,7 @@
 namespace  OST
 {
 
+
 typedef enum
 {
     Idle = 0, /*!< State is idle */
@@ -53,6 +54,14 @@ typedef enum
     Warn,
     Err
 } MsgLevel;
+
+typedef struct ModuleStatus
+{
+    State state = Idle;
+    QDateTime ts;
+    QString message;
+} ModuleStatus;
+
 inline MsgLevel IntToMsgLevel(int val )
 {
     if (val == 0) return Info;

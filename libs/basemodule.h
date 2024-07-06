@@ -59,13 +59,15 @@ class Basemodule : public DBManager
         QString mModuleVersion;
         QString mClassName = "";
         OST::ElementString* mModuleDesc;
+        OST::ModuleStatus mStatus;
+
 
         void OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                            const QVariantMap &eventData) override;
 
-
-
     signals:
+        void moduleStatusRequest(void);
+        void moduleStatusAnswer(const QString module, OST::ModuleStatus);
         void moduleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                          const QVariantMap &eventData);
         void loadOtherModule(QString &lib, QString &name, QString &label, QString &profile);
@@ -83,6 +85,11 @@ class Basemodule : public DBManager
         {
             Q_UNUSED(pEventType) Q_UNUSED(pEventModule) Q_UNUSED(pEventKey) Q_UNUSED(pEventData)
         }
+        void OnModuleStatusRequest();
+        virtual void OnModuleStatusAnswer(const QString module, OST::ModuleStatus status)
+        {
+            Q_UNUSED(module) Q_UNUSED(status)
+        };
 
 }
 ;

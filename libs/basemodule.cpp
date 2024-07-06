@@ -22,6 +22,9 @@ Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap
     setModuleDescription("base module description - developer should change this message");
     mModuleDesc->setValue("base module description - developer should change this message", false);
     setModuleVersion("0.1");
+    mStatus.ts = QDateTime::currentDateTime();
+    mStatus.message = "init";
+    mStatus.state = OST::Idle;
 
 }
 Basemodule::~Basemodule()
@@ -463,3 +466,8 @@ void Basemodule::setModuleVersion(QString version)
     getEltString("moduleInfo", "moduleVersion")->setValue(version, true);
 
 }
+void Basemodule::OnModuleStatusRequest()
+{
+    emit moduleStatusAnswer(this->getModuleName(), this->mStatus);
+}
+

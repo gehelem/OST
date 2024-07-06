@@ -144,6 +144,10 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     {
         if (othermodule->getModuleName() != mod->getModuleName())
         {
+            connect(othermodule, &Basemodule::moduleStatusRequest, mod, &Basemodule::OnModuleStatusRequest);
+            connect(othermodule, &Basemodule::moduleStatusAnswer, mod, &Basemodule::OnModuleStatusAnswer);
+            connect(mod, &Basemodule::moduleStatusRequest, othermodule, &Basemodule::OnModuleStatusRequest);
+            connect(mod, &Basemodule::moduleStatusAnswer, othermodule, &Basemodule::OnModuleStatusAnswer);
             //connect(othermodule,&Basemodule::moduleEvent, mod,&Basemodule::OnExternalEvent);
             //connect(mod,&Basemodule::moduleEvent, othermodule,&Basemodule::OnExternalEvent);
         }
