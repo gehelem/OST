@@ -75,6 +75,7 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
             if (pData.contains("directedit")) pElement->setDirectEdit(pData["directedit"].toBool());
             if (pData.contains("preicon")) pElement->setPreIcon(pData["preicon"].toString());
             if (pData.contains("posticon")) pElement->setPostIcon(pData["posticon"].toString());
+            if (pData.contains("showslider")) pElement->setShowSlider(pData["showslider"].toBool());
             if (pData.contains("listOfValues"))
             {
                 if (pData["listOfValues"].canConvert<QVariantList>())
@@ -109,6 +110,7 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
             if (pData.contains("directedit")) pElement->setDirectEdit(pData["directedit"].toBool());
             if (pData.contains("preicon")) pElement->setPreIcon(pData["preicon"].toString());
             if (pData.contains("posticon")) pElement->setPostIcon(pData["posticon"].toString());
+            if (pData.contains("showslider")) pElement->setShowSlider(pData["showslider"].toBool());
             if (pData.contains("listOfValues"))
             {
                 if (pData["listOfValues"].canConvert<QVariantList>())
