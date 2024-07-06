@@ -55,7 +55,7 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
         json["gridheaders"] = QJsonArray::fromStringList(pProperty->getGridHeaders());
     }
 
-    if ((pProperty->hasGrid()) && (pProperty->getGrid().count() > 0))
+    if (pProperty->hasGrid())
     {
         QJsonArray grid;
         for(int i = 0; i < pProperty->getGrid().count(); i++)
