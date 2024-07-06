@@ -107,6 +107,22 @@ PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVaria
         }
 
     }
+    if (pData.contains("preicon1"))
+    {
+        pProperty->setPreIcon1(pData["preicon1"].toString());
+    }
+    if (pData.contains("preicon2"))
+    {
+        pProperty->setPreIcon2(pData["preicon2"].toString());
+    }
+    if (pData.contains("posticon1"))
+    {
+        pProperty->setPostIcon1(pData["posticon1"].toString());
+    }
+    if (pData.contains("posticon2"))
+    {
+        pProperty->setPostIcon2(pData["posticon2"].toString());
+    }
 
     return pProperty;
 

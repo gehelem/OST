@@ -121,6 +121,14 @@ class PropertyBase: public QObject
         void sendInfo(QString m);
         void sendWarning(QString m);
         void sendError(QString m);
+        QString getPreIcon1(void);
+        void setPreIcon1(QString s);
+        QString getPreIcon2(void);
+        void setPreIcon2(QString s);
+        QString getPostIcon1(void);
+        void setPostIcon1(QString s);
+        QString getPostIcon2(void);
+        void setPostIcon2(QString s);
     signals:
         void stateChanged(OST::State);
         void eltChanged(OST::PropertyBase*);

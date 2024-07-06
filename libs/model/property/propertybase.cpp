@@ -87,6 +87,37 @@ void PropertyBase::sendError(QString m)
 {
     emit sendMessage(Err, key() + "-" + m);
 }
-
+QString PropertyBase::getPreIcon1(void)
+{
+    return mPreIcon1;
+}
+void PropertyBase::setPreIcon1(QString s)
+{
+    mPreIcon1 = s;
+}
+QString PropertyBase::getPreIcon2(void)
+{
+    return mPreIcon2;
+}
+void PropertyBase::setPreIcon2(QString s)
+{
+    mPreIcon2 = s;
+}
+QString PropertyBase::getPostIcon1(void)
+{
+    return mPostIcon1;
+}
+void PropertyBase::setPostIcon1(QString s)
+{
+    mPostIcon1 = s;
+}
+QString PropertyBase::getPostIcon2(void)
+{
+    return mPostIcon2;
+}
+void PropertyBase::setPostIcon2(QString s)
+{
+    mPostIcon2 = s;
+}
 
 }

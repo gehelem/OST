@@ -125,14 +125,13 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
     {
         foreach(const QString &keyprop, eventData.keys())
         {
+            if ((eventType == "Fpropposticon1") && (keyprop == "modulesstatus"))
+            {
+                getProperty("modulesstatus")->clearGrid();
+                emit moduleStatusRequest();
+            }
             foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
             {
-
-                if ((keyprop == "modulesstatus") && (keyelt == "module"))
-                {
-                    getProperty("modulesstatus")->clearGrid();
-                    emit moduleStatusRequest();
-                }
                 //setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
                 if (keyprop == "dynprop")
                 {
