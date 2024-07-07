@@ -1,10 +1,10 @@
 <map id="IndiPanel" name="IndiPanel">
-<area shape="rect" id="node1" title=" " alt="" coords="143,1711,261,1803"/>
-<area shape="rect" id="node2" href="$classIndiModule.html" title=" " alt="" coords="85,1336,319,1663"/>
-<area shape="rect" id="node3" href="$classBasemodule.html" title=" " alt="" coords="5,976,209,1288"/>
-<area shape="rect" id="node4" href="$classDBManager.html" title=" " alt="" coords="16,704,199,928"/>
-<area shape="rect" id="node5" href="$classDatastore.html" title="Class to provide properties management for OST modules." alt="" coords="36,403,179,656"/>
-<area shape="rect" id="node6" href="$classBaseroot.html" title=" " alt="" coords="28,131,187,355"/>
-<area shape="rect" id="node7" href="$classQObject.html" title=" " alt="" coords="70,5,145,83"/>
-<area shape="rect" id="node8" title=" " alt="" coords="234,1093,362,1171"/>
+<area shape="rect" id="node1" title=" " alt="" coords="146,1740,263,1832"/>
+<area shape="rect" id="node2" href="$classIndiModule.html" title=" " alt="" coords="87,1365,322,1692"/>
+<area shape="rect" id="node3" href="$classBasemodule.html" title=" " alt="" coords="5,976,212,1317"/>
+<area shape="rect" id="node4" href="$classDBManager.html" title=" " alt="" coords="17,704,200,928"/>
+<area shape="rect" id="node5" href="$classDatastore.html" title="Class to provide properties management for OST modules." alt="" coords="47,403,170,656"/>
+<area shape="rect" id="node6" href="$classBaseroot.html" title=" " alt="" coords="29,131,188,355"/>
+<area shape="rect" id="node7" href="$classQObject.html" title=" " alt="" coords="71,5,146,83"/>
+<area shape="rect" id="node8" title=" " alt="" coords="237,1108,365,1185"/>
 </map>

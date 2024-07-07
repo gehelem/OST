@@ -27,11 +27,12 @@ var searchData=
   ['controllerevent_51',['controllerEvent',['../classController.html#af1e9b9852dd4b91edb5af0781d924bd7',1,'Controller']]],
   ['cos_52',['cos',['../classdms.html#a021d0a5f56f93b9d6f705c8131f4c02d',1,'dms']]],
   ['createdeviceproperty_53',['createDeviceProperty',['../classIndiModule.html#a23832b49f58369c3676e95186517c45b',1,'IndiModule']]],
-  ['creategloblov_54',['createGlobLov',['../classDatastore.html#a7528bf40e1ade75a03db8dd77fa780a0',1,'Datastore']]],
-  ['createlov_55',['createLov',['../classOST_1_1LovFactory.html#a428878f75474b3fec66c8370628eb3c8',1,'OST::LovFactory']]],
-  ['createostelementbool_56',['createOstElementBool',['../classDatastore.html#ad97c8ee40051cf98ea1b21f82a469d1b',1,'Datastore']]],
-  ['createostelementtext_57',['createOstElementText',['../classDatastore.html#a48728efbb6251e51682d34d3828e571f',1,'Datastore']]],
-  ['createostproperty_58',['createOstProperty',['../classDatastore.html#abd4faa4eb4520fb11020fa90f8691a02',1,'Datastore']]],
-  ['createproperty_59',['createProperty',['../classDatastore.html#a77ccaa394c32c46092f84de031a766ca',1,'Datastore::createProperty()'],['../classOST_1_1PropertyFactory.html#ae43db65eda4bc6671ddb5adfb697d0f4',1,'OST::PropertyFactory::createProperty()']]],
-  ['createvalue_60',['createValue',['../classOST_1_1ValueFactory.html#ae3c4354c5783cf1f99d51aa5dd6e8527',1,'OST::ValueFactory']]]
+  ['createelement_54',['createElement',['../classOST_1_1ElementFactory.html#a8574ec237845cbe7bc9a7aa0ce04a410',1,'OST::ElementFactory']]],
+  ['creategloblov_55',['createGlobLov',['../classDatastore.html#a7528bf40e1ade75a03db8dd77fa780a0',1,'Datastore']]],
+  ['createlov_56',['createLov',['../classOST_1_1LovFactory.html#a428878f75474b3fec66c8370628eb3c8',1,'OST::LovFactory']]],
+  ['createostelementbool_57',['createOstElementBool',['../classDatastore.html#ad97c8ee40051cf98ea1b21f82a469d1b',1,'Datastore']]],
+  ['createostelementtext_58',['createOstElementText',['../classDatastore.html#a48728efbb6251e51682d34d3828e571f',1,'Datastore']]],
+  ['createostproperty_59',['createOstProperty',['../classDatastore.html#abd4faa4eb4520fb11020fa90f8691a02',1,'Datastore']]],
+  ['createproperty_60',['createProperty',['../classDatastore.html#a77ccaa394c32c46092f84de031a766ca',1,'Datastore::createProperty()'],['../classOST_1_1PropertyFactory.html#ae43db65eda4bc6671ddb5adfb697d0f4',1,'OST::PropertyFactory::createProperty()']]],
+  ['createvalue_61',['createValue',['../classOST_1_1ValueFactory.html#a0669f0ecd75253c94f0b362b55b72ecf',1,'OST::ValueFactory']]]
 ];

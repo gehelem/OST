@@ -67,6 +67,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-slots">Public Slots</a> &#124;
+<a href="#signals">Signals</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classOST_1_1PropertyMulti-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -80,9 +81,9 @@ Inheritance diagram for OST::PropertyMulti:</div>
 <div class="dyncontent">
 <div class="center"><img src="classOST_1_1PropertyMulti__inherit__graph.png" border="0" usemap="#aOST_1_1PropertyMulti_inherit__map" alt="Inheritance graph"/></div>
 <map name="aOST_1_1PropertyMulti_inherit__map" id="aOST_1_1PropertyMulti_inherit__map">
-<area shape="rect" title=" " alt="" coords="5,403,164,685"/>
-<area shape="rect" href="classOST_1_1PropertyBase.html" title="Class to define common property." alt="" coords="12,131,157,355"/>
-<area shape="rect" href="classQObject.html" title=" " alt="" coords="47,5,122,83"/>
+<area shape="rect" title=" " alt="" coords="5,403,152,700"/>
+<area shape="rect" href="classOST_1_1PropertyBase.html" title="Class to define common property." alt="" coords="6,131,151,355"/>
+<area shape="rect" href="classQObject.html" title=" " alt="" coords="41,5,116,83"/>
 </map>
 </div>
 <div class="dynheader">
@@ -90,22 +91,37 @@ Collaboration diagram for OST::PropertyMulti:</div>
 <div class="dyncontent">
 <div class="center"><img src="classOST_1_1PropertyMulti__coll__graph.png" border="0" usemap="#aOST_1_1PropertyMulti_coll__map" alt="Collaboration graph"/></div>
 <map name="aOST_1_1PropertyMulti_coll__map" id="aOST_1_1PropertyMulti_coll__map">
-<area shape="rect" title=" " alt="" coords="5,403,164,685"/>
-<area shape="rect" href="classOST_1_1PropertyBase.html" title="Class to define common property." alt="" coords="12,131,157,355"/>
-<area shape="rect" href="classQObject.html" title=" " alt="" coords="47,5,122,83"/>
+<area shape="rect" title=" " alt="" coords="5,403,152,700"/>
+<area shape="rect" href="classOST_1_1PropertyBase.html" title="Class to define common property." alt="" coords="6,131,151,355"/>
+<area shape="rect" href="classQObject.html" title=" " alt="" coords="41,5,116,83"/>
 </map>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-slots"></a>
 Public Slots</h2></td></tr>
-<tr class="memitem:a821b41cd4decf05661864922bfb57dcf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#a821b41cd4decf05661864922bfb57dcf">OnValueChanged</a> (<a class="el" href="classOST_1_1ValueBase.html">ValueBase</a> *)</td></tr>
-<tr class="separator:a821b41cd4decf05661864922bfb57dcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad6a2cc23923802b2db65b0cb15c6472a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#ad6a2cc23923802b2db65b0cb15c6472a">OnListChanged</a> (<a class="el" href="classOST_1_1ValueBase.html">ValueBase</a> *)</td></tr>
-<tr class="separator:ad6a2cc23923802b2db65b0cb15c6472a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8342cf31e5ab5b178c18c2983386916a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#a8342cf31e5ab5b178c18c2983386916a">OnLovChanged</a> (<a class="el" href="classOST_1_1ValueBase.html">ValueBase</a> *)</td></tr>
-<tr class="separator:a8342cf31e5ab5b178c18c2983386916a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c3ff130d2a95e5645f988e39142d314"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#a8c3ff130d2a95e5645f988e39142d314">OnValueSet</a> (<a class="el" href="classOST_1_1ElementBase.html">ElementBase</a> *)</td></tr>
+<tr class="separator:a8c3ff130d2a95e5645f988e39142d314"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afdb609d94f741b6a10cc1e64f38ada89"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#afdb609d94f741b6a10cc1e64f38ada89">OnEltChanged</a> (<a class="el" href="classOST_1_1ElementBase.html">ElementBase</a> *)</td></tr>
+<tr class="separator:afdb609d94f741b6a10cc1e64f38ada89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeedfaf8082fdc684cf76c6bbd16567c6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#aeedfaf8082fdc684cf76c6bbd16567c6">OnListChanged</a> (<a class="el" href="classOST_1_1ElementBase.html">ElementBase</a> *)</td></tr>
+<tr class="separator:aeedfaf8082fdc684cf76c6bbd16567c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a41b720f9e7ccfdf4646f7ca7a43185b4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#a41b720f9e7ccfdf4646f7ca7a43185b4">OnLovChanged</a> (<a class="el" href="classOST_1_1ElementBase.html">ElementBase</a> *)</td></tr>
+<tr class="separator:a41b720f9e7ccfdf4646f7ca7a43185b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0e6a1e343ba0a09aed6038e34c5b7c89"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#a0e6a1e343ba0a09aed6038e34c5b7c89">OnMessage</a> (<a class="el" href="namespaceOST.html#a4f7f81902ce1709285bca0ca94e65d51">MsgLevel</a> l, QString m)</td></tr>
 <tr class="separator:a0e6a1e343ba0a09aed6038e34c5b7c89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="signals"></a>
+Signals</h2></td></tr>
+<tr class="memitem:a8612c55c73eb525f791a479acb13f3cb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a8612c55c73eb525f791a479acb13f3cb">stateChanged</a> (<a class="el" href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985a">OST::State</a>)</td></tr>
+<tr class="separator:a8612c55c73eb525f791a479acb13f3cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af67b9e0d0d95691642baaee7e90c41b3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#af67b9e0d0d95691642baaee7e90c41b3">eltChanged</a> (<a class="el" href="classOST_1_1PropertyBase.html">OST::PropertyBase</a> *)</td></tr>
+<tr class="separator:af67b9e0d0d95691642baaee7e90c41b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab519a0efa35110e3d304e79b5be21203"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#ab519a0efa35110e3d304e79b5be21203">valueSet</a> (<a class="el" href="classOST_1_1PropertyBase.html">OST::PropertyBase</a> *)</td></tr>
+<tr class="separator:ab519a0efa35110e3d304e79b5be21203"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec74ba39c5f179be7d276bb02ee4ed23"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#aec74ba39c5f179be7d276bb02ee4ed23">propertyEvent</a> (QString, QString, <a class="el" href="classOST_1_1PropertyBase.html">OST::PropertyBase</a> *)</td></tr>
+<tr class="separator:aec74ba39c5f179be7d276bb02ee4ed23"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0449ba5e729415a02929036bdb8773df"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a0449ba5e729415a02929036bdb8773df">sendMessage</a> (<a class="el" href="namespaceOST.html#a4f7f81902ce1709285bca0ca94e65d51">MsgLevel</a>, QString)</td></tr>
+<tr class="separator:a0449ba5e729415a02929036bdb8773df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -113,24 +129,24 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a02739362084654d38c2a1fa6987c95af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afd4f9980bdf69b9fc4d0b752fde0bc52"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#afd4f9980bdf69b9fc4d0b752fde0bc52">accept</a> (<a class="el" href="classOST_1_1PropertyVisitor.html">PropertyVisitor</a> *pVisitor, QVariantMap &amp;data) override</td></tr>
 <tr class="separator:afd4f9980bdf69b9fc4d0b752fde0bc52"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a53a669af05eebd1049faa669bddb4612"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#a53a669af05eebd1049faa669bddb4612">PropertyMulti</a> (const QString &amp;<a class="el" href="classOST_1_1PropertyBase.html#a87f114f651c52ce952ec9ba5cce5b266">key</a>, const QString &amp;<a class="el" href="classOST_1_1PropertyBase.html#a15add81dca862657c152e64d8616e70c">label</a>, const <a class="el" href="namespaceOST.html#a9be35f589fb7dd8d44169b078554ad72">Permission</a> &amp;<a class="el" href="classOST_1_1PropertyBase.html#ab2b11ec778a97bec80c7c5f6e2c7b88d">permission</a>, const QString &amp;<a class="el" href="classOST_1_1PropertyBase.html#abaa6e5d5877cd1fd2c6d2e0c10d8677a">level1</a>, const QString &amp;<a class="el" href="classOST_1_1PropertyBase.html#a36674830c621f90df47a65d3f66f723d">level2</a>, const QString &amp;<a class="el" href="classOST_1_1PropertyBase.html#a3f78603c9cc0ffe1bbbbf9ada04f7437">order</a>, const bool &amp;<a class="el" href="classOST_1_1PropertyBase.html#a50413a002af18ed28de719c4c7510010">hasProfile</a>, const bool &amp;<a class="el" href="classOST_1_1PropertyBase.html#ae6e886171ee6fd7deadcc741bdc2864b">hasArray</a>)</td></tr>
-<tr class="separator:a53a669af05eebd1049faa669bddb4612"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad4b28df72a221cde9e8f8d6f6ad9891b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#ad4b28df72a221cde9e8f8d6f6ad9891b">PropertyMulti</a> (const QString &amp;<a class="el" href="classOST_1_1PropertyBase.html#a87f114f651c52ce952ec9ba5cce5b266">key</a>, const QString &amp;<a class="el" href="classOST_1_1PropertyBase.html#a15add81dca862657c152e64d8616e70c">label</a>, const <a class="el" href="namespaceOST.html#a9be35f589fb7dd8d44169b078554ad72">Permission</a> &amp;<a class="el" href="classOST_1_1PropertyBase.html#ab2b11ec778a97bec80c7c5f6e2c7b88d">permission</a>, const QString &amp;<a class="el" href="classOST_1_1PropertyBase.html#abaa6e5d5877cd1fd2c6d2e0c10d8677a">level1</a>, const QString &amp;<a class="el" href="classOST_1_1PropertyBase.html#a36674830c621f90df47a65d3f66f723d">level2</a>, const QString &amp;<a class="el" href="classOST_1_1PropertyBase.html#a3f78603c9cc0ffe1bbbbf9ada04f7437">order</a>, const bool &amp;<a class="el" href="classOST_1_1PropertyBase.html#a50413a002af18ed28de719c4c7510010">hasProfile</a>, const bool &amp;<a class="el" href="classOST_1_1PropertyMulti.html#aad7290a5de7398aa86f8a94c1df8befc">hasGrid</a>)</td></tr>
+<tr class="separator:ad4b28df72a221cde9e8f8d6f6ad9891b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa81132a21985983742edd614ff3b996c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#aa81132a21985983742edd614ff3b996c">~PropertyMulti</a> ()</td></tr>
 <tr class="separator:aa81132a21985983742edd614ff3b996c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adfcaa08b6cee6fba208af4026db1c4d2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceOST.html#a5df45568d80ad6e745269303f574259e">SwitchsRule</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#adfcaa08b6cee6fba208af4026db1c4d2">rule</a> () const</td></tr>
 <tr class="separator:adfcaa08b6cee6fba208af4026db1c4d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aae686d40ac8113adb438f1a2aecb6ea7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#aae686d40ac8113adb438f1a2aecb6ea7">setRule</a> (<a class="el" href="namespaceOST.html#a5df45568d80ad6e745269303f574259e">SwitchsRule</a> <a class="el" href="classOST_1_1PropertyMulti.html#adfcaa08b6cee6fba208af4026db1c4d2">rule</a>)</td></tr>
 <tr class="separator:aae686d40ac8113adb438f1a2aecb6ea7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a59bcb7d6273a53552f7b73968f11d51f"><td class="memItemLeft" align="right" valign="top">QMap&lt; QString, <a class="el" href="classOST_1_1ValueBase.html">OST::ValueBase</a> * &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#a59bcb7d6273a53552f7b73968f11d51f">getValues</a> ()</td></tr>
-<tr class="separator:a59bcb7d6273a53552f7b73968f11d51f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0dcf4ab9f9d7ac6bbaf5bbb565cfb5ec"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classOST_1_1ValueBase.html">OST::ValueBase</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#a0dcf4ab9f9d7ac6bbaf5bbb565cfb5ec">getValue</a> (QString pElement)</td></tr>
-<tr class="separator:a0dcf4ab9f9d7ac6bbaf5bbb565cfb5ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a70f8ece544d506ff13d6279571dcc158"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#a70f8ece544d506ff13d6279571dcc158">setValue</a> (QString <a class="el" href="classOST_1_1PropertyBase.html#a87f114f651c52ce952ec9ba5cce5b266">key</a>, QVariant Value)</td></tr>
-<tr class="separator:a70f8ece544d506ff13d6279571dcc158"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af2b81b1135e7445f11736a480ea35d5b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#af2b81b1135e7445f11736a480ea35d5b">addValue</a> (QString <a class="el" href="classOST_1_1PropertyBase.html#a87f114f651c52ce952ec9ba5cce5b266">key</a>, <a class="el" href="classOST_1_1ValueBase.html">ValueBase</a> *pValue)</td></tr>
-<tr class="separator:af2b81b1135e7445f11736a480ea35d5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeb5d95d0c3c48b90ef30862698f52bf9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#aeb5d95d0c3c48b90ef30862698f52bf9">deleteValue</a> (QString <a class="el" href="classOST_1_1PropertyBase.html#a87f114f651c52ce952ec9ba5cce5b266">key</a>)</td></tr>
-<tr class="separator:aeb5d95d0c3c48b90ef30862698f52bf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa463e13af2bbc72720c18eb8f68e9dab"><td class="memItemLeft" align="right" valign="top">QMap&lt; QString, <a class="el" href="classOST_1_1ElementBase.html">ElementBase</a> * &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#aa463e13af2bbc72720c18eb8f68e9dab">getElts</a> ()</td></tr>
+<tr class="separator:aa463e13af2bbc72720c18eb8f68e9dab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a218e2562f50a0e952bcb54f9c5c54127"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classOST_1_1ElementBase.html">ElementBase</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#a218e2562f50a0e952bcb54f9c5c54127">getElt</a> (QString pElement)</td></tr>
+<tr class="separator:a218e2562f50a0e952bcb54f9c5c54127"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acdf4aec520750a03bef5316c8804fb95"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#acdf4aec520750a03bef5316c8804fb95">setElt</a> (QString <a class="el" href="classOST_1_1PropertyBase.html#a87f114f651c52ce952ec9ba5cce5b266">key</a>, QVariant val)</td></tr>
+<tr class="separator:acdf4aec520750a03bef5316c8804fb95"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a80972c253c885329546cabccb5a59ac7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#a80972c253c885329546cabccb5a59ac7">addElt</a> (QString <a class="el" href="classOST_1_1PropertyBase.html#a87f114f651c52ce952ec9ba5cce5b266">key</a>, <a class="el" href="classOST_1_1ElementBase.html">ElementBase</a> *pElt)</td></tr>
+<tr class="separator:a80972c253c885329546cabccb5a59ac7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf71b7a45a7cccb42fe2d7c4054fae3d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#abf71b7a45a7cccb42fe2d7c4054fae3d">deleteElt</a> (QString <a class="el" href="classOST_1_1PropertyBase.html#a87f114f651c52ce952ec9ba5cce5b266">key</a>)</td></tr>
+<tr class="separator:abf71b7a45a7cccb42fe2d7c4054fae3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab43d22da58aef04621e4406eafb019de"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#ab43d22da58aef04621e4406eafb019de">push</a> ()</td></tr>
 <tr class="separator:ab43d22da58aef04621e4406eafb019de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef6e05aff8694390fc8c343ca9572245"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#aef6e05aff8694390fc8c343ca9572245">newLine</a> (const QVariantMap &amp;pValues)</td></tr>
@@ -141,82 +157,107 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a9d7669db10cb538c5616b5edbdb574d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aae6d70da2a31c9341203710cc5de0d6b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#aae6d70da2a31c9341203710cc5de0d6b">clearGrid</a> ()</td></tr>
 <tr class="separator:aae6d70da2a31c9341203710cc5de0d6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pub_methods_classOST_1_1PropertyBase"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classOST_1_1PropertyBase')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classOST_1_1PropertyBase.html">OST::PropertyBase</a></td></tr>
-<tr class="memitem:afe4568473d23acc92c903f3babf70f66 inherit pub_methods_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#afe4568473d23acc92c903f3babf70f66">PropertyBase</a> (const QString &amp;<a class="el" href="classOST_1_1PropertyBase.html#a87f114f651c52ce952ec9ba5cce5b266">key</a>, const QString &amp;<a class="el" href="classOST_1_1PropertyBase.html#a15add81dca862657c152e64d8616e70c">label</a>, const <a class="el" href="namespaceOST.html#a9be35f589fb7dd8d44169b078554ad72">Permission</a> &amp;<a class="el" href="classOST_1_1PropertyBase.html#ab2b11ec778a97bec80c7c5f6e2c7b88d">permission</a>, const QString &amp;<a class="el" href="classOST_1_1PropertyBase.html#abaa6e5d5877cd1fd2c6d2e0c10d8677a">level1</a>, const QString &amp;<a class="el" href="classOST_1_1PropertyBase.html#a36674830c621f90df47a65d3f66f723d">level2</a>, const QString &amp;<a class="el" href="classOST_1_1PropertyBase.html#a3f78603c9cc0ffe1bbbbf9ada04f7437">order</a>, const bool &amp;<a class="el" href="classOST_1_1PropertyBase.html#a50413a002af18ed28de719c4c7510010">hasProfile</a>, const bool &amp;<a class="el" href="classOST_1_1PropertyBase.html#ae6e886171ee6fd7deadcc741bdc2864b">hasArray</a>)</td></tr>
-<tr class="separator:afe4568473d23acc92c903f3babf70f66 inherit pub_methods_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a89ef3153d2b3c873fad2d266f3826ef2 inherit pub_methods_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a89ef3153d2b3c873fad2d266f3826ef2">~PropertyBase</a> ()</td></tr>
-<tr class="separator:a89ef3153d2b3c873fad2d266f3826ef2 inherit pub_methods_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a87f114f651c52ce952ec9ba5cce5b266 inherit pub_methods_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a87f114f651c52ce952ec9ba5cce5b266">key</a> ()</td></tr>
-<tr class="memdesc:a87f114f651c52ce952ec9ba5cce5b266 inherit pub_methods_classOST_1_1PropertyBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Internal property's name.  <a href="classOST_1_1PropertyBase.html#a87f114f651c52ce952ec9ba5cce5b266">More...</a><br /></td></tr>
-<tr class="separator:a87f114f651c52ce952ec9ba5cce5b266 inherit pub_methods_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a15add81dca862657c152e64d8616e70c inherit pub_methods_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a15add81dca862657c152e64d8616e70c">label</a> ()</td></tr>
-<tr class="memdesc:a15add81dca862657c152e64d8616e70c inherit pub_methods_classOST_1_1PropertyBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Property's label.  <a href="classOST_1_1PropertyBase.html#a15add81dca862657c152e64d8616e70c">More...</a><br /></td></tr>
-<tr class="separator:a15add81dca862657c152e64d8616e70c inherit pub_methods_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab2b11ec778a97bec80c7c5f6e2c7b88d inherit pub_methods_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceOST.html#a9be35f589fb7dd8d44169b078554ad72">Permission</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#ab2b11ec778a97bec80c7c5f6e2c7b88d">permission</a> ()</td></tr>
-<tr class="memdesc:ab2b11ec778a97bec80c7c5f6e2c7b88d inherit pub_methods_classOST_1_1PropertyBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Property's permission.  <a href="classOST_1_1PropertyBase.html#ab2b11ec778a97bec80c7c5f6e2c7b88d">More...</a><br /></td></tr>
-<tr class="separator:ab2b11ec778a97bec80c7c5f6e2c7b88d inherit pub_methods_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abaa6e5d5877cd1fd2c6d2e0c10d8677a inherit pub_methods_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#abaa6e5d5877cd1fd2c6d2e0c10d8677a">level1</a> ()</td></tr>
-<tr class="memdesc:abaa6e5d5877cd1fd2c6d2e0c10d8677a inherit pub_methods_classOST_1_1PropertyBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Property's hierachy first level.  <a href="classOST_1_1PropertyBase.html#abaa6e5d5877cd1fd2c6d2e0c10d8677a">More...</a><br /></td></tr>
-<tr class="separator:abaa6e5d5877cd1fd2c6d2e0c10d8677a inherit pub_methods_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a36674830c621f90df47a65d3f66f723d inherit pub_methods_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a36674830c621f90df47a65d3f66f723d">level2</a> ()</td></tr>
-<tr class="memdesc:a36674830c621f90df47a65d3f66f723d inherit pub_methods_classOST_1_1PropertyBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Property's hierachy second level.  <a href="classOST_1_1PropertyBase.html#a36674830c621f90df47a65d3f66f723d">More...</a><br /></td></tr>
-<tr class="separator:a36674830c621f90df47a65d3f66f723d inherit pub_methods_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3f78603c9cc0ffe1bbbbf9ada04f7437 inherit pub_methods_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a3f78603c9cc0ffe1bbbbf9ada04f7437">order</a> ()</td></tr>
-<tr class="memdesc:a3f78603c9cc0ffe1bbbbf9ada04f7437 inherit pub_methods_classOST_1_1PropertyBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Property's display order.  <a href="classOST_1_1PropertyBase.html#a3f78603c9cc0ffe1bbbbf9ada04f7437">More...</a><br /></td></tr>
-<tr class="separator:a3f78603c9cc0ffe1bbbbf9ada04f7437 inherit pub_methods_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a50413a002af18ed28de719c4c7510010 inherit pub_methods_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a50413a002af18ed28de719c4c7510010">hasProfile</a> ()</td></tr>
-<tr class="memdesc:a50413a002af18ed28de719c4c7510010 inherit pub_methods_classOST_1_1PropertyBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">should this value be saved in profiles ?  <a href="classOST_1_1PropertyBase.html#a50413a002af18ed28de719c4c7510010">More...</a><br /></td></tr>
-<tr class="separator:a50413a002af18ed28de719c4c7510010 inherit pub_methods_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae5e989d9098ad0a5907a949d6443e40c inherit pub_methods_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985a">State</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#ae5e989d9098ad0a5907a949d6443e40c">state</a> ()</td></tr>
-<tr class="separator:ae5e989d9098ad0a5907a949d6443e40c inherit pub_methods_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a301c490e77dac8a961b2f8daa7841ae7 inherit pub_methods_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a301c490e77dac8a961b2f8daa7841ae7">setState</a> (<a class="el" href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985a">State</a> <a class="el" href="classOST_1_1PropertyBase.html#ae5e989d9098ad0a5907a949d6443e40c">state</a>)</td></tr>
-<tr class="separator:a301c490e77dac8a961b2f8daa7841ae7 inherit pub_methods_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a332a00d4f8dcdc7a38dc1c7339a3128e inherit pub_methods_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a332a00d4f8dcdc7a38dc1c7339a3128e">isEnabled</a> ()</td></tr>
-<tr class="separator:a332a00d4f8dcdc7a38dc1c7339a3128e inherit pub_methods_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac1c1af8e0b312bed2f22b3c4ae318b3 inherit pub_methods_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#aac1c1af8e0b312bed2f22b3c4ae318b3">enable</a> (void)</td></tr>
-<tr class="separator:aac1c1af8e0b312bed2f22b3c4ae318b3 inherit pub_methods_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adcb5c7d54c7b612ea0eca94b7c601c2b inherit pub_methods_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#adcb5c7d54c7b612ea0eca94b7c601c2b">disable</a> (void)</td></tr>
-<tr class="separator:adcb5c7d54c7b612ea0eca94b7c601c2b inherit pub_methods_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae6e886171ee6fd7deadcc741bdc2864b inherit pub_methods_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#ae6e886171ee6fd7deadcc741bdc2864b">hasArray</a> ()</td></tr>
-<tr class="separator:ae6e886171ee6fd7deadcc741bdc2864b inherit pub_methods_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab18336af5b9b1aacc9e34e416e79f13c inherit pub_methods_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#ab18336af5b9b1aacc9e34e416e79f13c">setHasArray</a> (bool hasarray)</td></tr>
-<tr class="separator:ab18336af5b9b1aacc9e34e416e79f13c inherit pub_methods_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ace7594eda6acd6f797d91d67afccebff inherit pub_methods_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#ace7594eda6acd6f797d91d67afccebff">getShowArray</a> ()</td></tr>
-<tr class="separator:ace7594eda6acd6f797d91d67afccebff inherit pub_methods_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a98a7fdadeb700ebbc43a3299cfc09448 inherit pub_methods_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a98a7fdadeb700ebbc43a3299cfc09448">setShowArray</a> (bool b)</td></tr>
-<tr class="separator:a98a7fdadeb700ebbc43a3299cfc09448 inherit pub_methods_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1786506823ecc756c92648118e75d3d3 inherit pub_methods_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a1786506823ecc756c92648118e75d3d3">getArrayLimit</a> ()</td></tr>
-<tr class="separator:a1786506823ecc756c92648118e75d3d3 inherit pub_methods_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a50af7b6684146c858b47aff10266da3a inherit pub_methods_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a50af7b6684146c858b47aff10266da3a">setArrayLimit</a> (int limit)</td></tr>
-<tr class="separator:a50af7b6684146c858b47aff10266da3a inherit pub_methods_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1e823ed1b3e0df24dcc2fed26b19d8c0 inherit pub_methods_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a1e823ed1b3e0df24dcc2fed26b19d8c0">getBadge</a> ()</td></tr>
-<tr class="separator:a1e823ed1b3e0df24dcc2fed26b19d8c0 inherit pub_methods_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a33b53ec9f9936f16daffed24341933a3 inherit pub_methods_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a33b53ec9f9936f16daffed24341933a3">setBadge</a> (bool b)</td></tr>
-<tr class="separator:a33b53ec9f9936f16daffed24341933a3 inherit pub_methods_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7c4d9099a97187c2dacd55a9abfc2ba6 inherit pub_methods_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a7c4d9099a97187c2dacd55a9abfc2ba6">sendInfo</a> (QString m)</td></tr>
-<tr class="separator:a7c4d9099a97187c2dacd55a9abfc2ba6 inherit pub_methods_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6a4758e6c28ae9b29eccbb50db961ebe inherit pub_methods_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a6a4758e6c28ae9b29eccbb50db961ebe">sendWarning</a> (QString m)</td></tr>
-<tr class="separator:a6a4758e6c28ae9b29eccbb50db961ebe inherit pub_methods_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d511ae6758e6bb4ae27b1580668289f inherit pub_methods_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a2d511ae6758e6bb4ae27b1580668289f">sendError</a> (QString m)</td></tr>
-<tr class="separator:a2d511ae6758e6bb4ae27b1580668289f inherit pub_methods_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
-Additional Inherited Members</h2></td></tr>
-<tr class="inherit_header signals_classOST_1_1PropertyBase"><td colspan="2" onclick="javascript:toggleInherit('signals_classOST_1_1PropertyBase')"><img src="closed.png" alt="-"/>&#160;Signals inherited from <a class="el" href="classOST_1_1PropertyBase.html">OST::PropertyBase</a></td></tr>
-<tr class="memitem:a8612c55c73eb525f791a479acb13f3cb inherit signals_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a8612c55c73eb525f791a479acb13f3cb">stateChanged</a> (<a class="el" href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985a">OST::State</a>)</td></tr>
-<tr class="separator:a8612c55c73eb525f791a479acb13f3cb inherit signals_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a482b574e907f313947b29d6166d948d8 inherit signals_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a482b574e907f313947b29d6166d948d8">propertyCreated</a> (void)</td></tr>
-<tr class="separator:a482b574e907f313947b29d6166d948d8 inherit signals_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab7170b3137421c0aad62df83238a3c33 inherit signals_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#ab7170b3137421c0aad62df83238a3c33">valueChanged</a> (<a class="el" href="classOST_1_1PropertyBase.html">OST::PropertyBase</a> *)</td></tr>
-<tr class="separator:ab7170b3137421c0aad62df83238a3c33 inherit signals_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec74ba39c5f179be7d276bb02ee4ed23 inherit signals_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#aec74ba39c5f179be7d276bb02ee4ed23">propertyEvent</a> (QString, QString, <a class="el" href="classOST_1_1PropertyBase.html">OST::PropertyBase</a> *)</td></tr>
-<tr class="separator:aec74ba39c5f179be7d276bb02ee4ed23 inherit signals_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0449ba5e729415a02929036bdb8773df inherit signals_classOST_1_1PropertyBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a0449ba5e729415a02929036bdb8773df">sendMessage</a> (<a class="el" href="namespaceOST.html#a4f7f81902ce1709285bca0ca94e65d51">MsgLevel</a>, QString)</td></tr>
-<tr class="separator:a0449ba5e729415a02929036bdb8773df inherit signals_classOST_1_1PropertyBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe5a577c23e3a48727d5a9224d648a28"><td class="memItemLeft" align="right" valign="top">QList&lt; QString &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#afe5a577c23e3a48727d5a9224d648a28">getGridHeaders</a> ()</td></tr>
+<tr class="separator:afe5a577c23e3a48727d5a9224d648a28"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7a94c34e7feb27bd013ed7113e620888"><td class="memItemLeft" align="right" valign="top">QList&lt; QMap&lt; QString, <a class="el" href="classOST_1_1ValueBase.html">ValueBase</a> * &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#a7a94c34e7feb27bd013ed7113e620888">getGrid</a> ()</td></tr>
+<tr class="separator:a7a94c34e7feb27bd013ed7113e620888"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff12ede376dad61053e6f118f6dcddc4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#aff12ede376dad61053e6f118f6dcddc4">getShowElts</a> ()</td></tr>
+<tr class="separator:aff12ede376dad61053e6f118f6dcddc4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a456c04d0540913630027ad9e22a7af02"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#a456c04d0540913630027ad9e22a7af02">setShowElts</a> (bool b)</td></tr>
+<tr class="separator:a456c04d0540913630027ad9e22a7af02"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad7290a5de7398aa86f8a94c1df8befc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#aad7290a5de7398aa86f8a94c1df8befc">hasGrid</a> ()</td></tr>
+<tr class="separator:aad7290a5de7398aa86f8a94c1df8befc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac88bf1017fe29e3bb3f79eac3674431b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#ac88bf1017fe29e3bb3f79eac3674431b">setHasGrid</a> (bool b)</td></tr>
+<tr class="separator:ac88bf1017fe29e3bb3f79eac3674431b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae4576e97af4089f181d1bc8f7107ac87"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#ae4576e97af4089f181d1bc8f7107ac87">getShowGrid</a> ()</td></tr>
+<tr class="separator:ae4576e97af4089f181d1bc8f7107ac87"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a643d04fc786a32b1a85d18cfaa8f809c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#a643d04fc786a32b1a85d18cfaa8f809c">setShowGrid</a> (bool b)</td></tr>
+<tr class="separator:a643d04fc786a32b1a85d18cfaa8f809c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6ca7bf603d1ebecf7b9592d338557413"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#a6ca7bf603d1ebecf7b9592d338557413">getGridLimit</a> ()</td></tr>
+<tr class="separator:a6ca7bf603d1ebecf7b9592d338557413"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a90f15df03c847e8c8a8e07062e6e96fa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#a90f15df03c847e8c8a8e07062e6e96fa">setGridLimit</a> (int limit)</td></tr>
+<tr class="separator:a90f15df03c847e8c8a8e07062e6e96fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a81bea748c86403fc3cd609f3e4ba8588"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#a81bea748c86403fc3cd609f3e4ba8588">hasGraph</a> ()</td></tr>
+<tr class="separator:a81bea748c86403fc3cd609f3e4ba8588"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a22d183b87db718bbfb7afed1bdb2129b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#a22d183b87db718bbfb7afed1bdb2129b">setHasGraph</a> (bool b)</td></tr>
+<tr class="separator:a22d183b87db718bbfb7afed1bdb2129b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c31f49c0881581637e530e628852e00"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structOST_1_1GraphDefs.html">GraphDefs</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#a4c31f49c0881581637e530e628852e00">getGraphDefs</a> (void)</td></tr>
+<tr class="separator:a4c31f49c0881581637e530e628852e00"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aea8832fcfde07faf706a904b645bdff6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#aea8832fcfde07faf706a904b645bdff6">setGraphDefs</a> (<a class="el" href="structOST_1_1GraphDefs.html">GraphDefs</a> defs)</td></tr>
+<tr class="separator:aea8832fcfde07faf706a904b645bdff6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2967d6245ad774fd67e0335838ac484b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#a2967d6245ad774fd67e0335838ac484b">swapLines</a> (int l1, int l2)</td></tr>
+<tr class="separator:a2967d6245ad774fd67e0335838ac484b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aafa896c9338106e117dda3d5151705cc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#aafa896c9338106e117dda3d5151705cc">fetchLine</a> (int l1)</td></tr>
+<tr class="separator:aafa896c9338106e117dda3d5151705cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a845ced359d297c2620737b7dbfdfe4ca"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#a845ced359d297c2620737b7dbfdfe4ca">autoUpDown</a> (void)</td></tr>
+<tr class="separator:a845ced359d297c2620737b7dbfdfe4ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a763c84e1f951151865b91a2f1d6b05"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#a6a763c84e1f951151865b91a2f1d6b05">setAutoUpDown</a> (bool b)</td></tr>
+<tr class="separator:a6a763c84e1f951151865b91a2f1d6b05"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a550db710bb006ef53232ece86d3295f2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#a550db710bb006ef53232ece86d3295f2">autoSelect</a> (void)</td></tr>
+<tr class="separator:a550db710bb006ef53232ece86d3295f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed4505c8db7d6333a6e873b7d65e0b30"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#aed4505c8db7d6333a6e873b7d65e0b30">setAutoSelect</a> (bool b)</td></tr>
+<tr class="separator:aed4505c8db7d6333a6e873b7d65e0b30"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87f114f651c52ce952ec9ba5cce5b266"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a87f114f651c52ce952ec9ba5cce5b266">key</a> ()</td></tr>
+<tr class="memdesc:a87f114f651c52ce952ec9ba5cce5b266"><td class="mdescLeft">&#160;</td><td class="mdescRight">Internal property's name.  <a href="classOST_1_1PropertyBase.html#a87f114f651c52ce952ec9ba5cce5b266">More...</a><br /></td></tr>
+<tr class="separator:a87f114f651c52ce952ec9ba5cce5b266"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15add81dca862657c152e64d8616e70c"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a15add81dca862657c152e64d8616e70c">label</a> ()</td></tr>
+<tr class="memdesc:a15add81dca862657c152e64d8616e70c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Property's label.  <a href="classOST_1_1PropertyBase.html#a15add81dca862657c152e64d8616e70c">More...</a><br /></td></tr>
+<tr class="separator:a15add81dca862657c152e64d8616e70c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab2b11ec778a97bec80c7c5f6e2c7b88d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceOST.html#a9be35f589fb7dd8d44169b078554ad72">Permission</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#ab2b11ec778a97bec80c7c5f6e2c7b88d">permission</a> ()</td></tr>
+<tr class="memdesc:ab2b11ec778a97bec80c7c5f6e2c7b88d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Property's permission.  <a href="classOST_1_1PropertyBase.html#ab2b11ec778a97bec80c7c5f6e2c7b88d">More...</a><br /></td></tr>
+<tr class="separator:ab2b11ec778a97bec80c7c5f6e2c7b88d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abaa6e5d5877cd1fd2c6d2e0c10d8677a"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#abaa6e5d5877cd1fd2c6d2e0c10d8677a">level1</a> ()</td></tr>
+<tr class="memdesc:abaa6e5d5877cd1fd2c6d2e0c10d8677a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Property's hierachy first level.  <a href="classOST_1_1PropertyBase.html#abaa6e5d5877cd1fd2c6d2e0c10d8677a">More...</a><br /></td></tr>
+<tr class="separator:abaa6e5d5877cd1fd2c6d2e0c10d8677a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36674830c621f90df47a65d3f66f723d"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a36674830c621f90df47a65d3f66f723d">level2</a> ()</td></tr>
+<tr class="memdesc:a36674830c621f90df47a65d3f66f723d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Property's hierachy second level.  <a href="classOST_1_1PropertyBase.html#a36674830c621f90df47a65d3f66f723d">More...</a><br /></td></tr>
+<tr class="separator:a36674830c621f90df47a65d3f66f723d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f78603c9cc0ffe1bbbbf9ada04f7437"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a3f78603c9cc0ffe1bbbbf9ada04f7437">order</a> ()</td></tr>
+<tr class="memdesc:a3f78603c9cc0ffe1bbbbf9ada04f7437"><td class="mdescLeft">&#160;</td><td class="mdescRight">Property's display order.  <a href="classOST_1_1PropertyBase.html#a3f78603c9cc0ffe1bbbbf9ada04f7437">More...</a><br /></td></tr>
+<tr class="separator:a3f78603c9cc0ffe1bbbbf9ada04f7437"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50413a002af18ed28de719c4c7510010"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a50413a002af18ed28de719c4c7510010">hasProfile</a> ()</td></tr>
+<tr class="memdesc:a50413a002af18ed28de719c4c7510010"><td class="mdescLeft">&#160;</td><td class="mdescRight">should values be saved in profiles ?  <a href="classOST_1_1PropertyBase.html#a50413a002af18ed28de719c4c7510010">More...</a><br /></td></tr>
+<tr class="separator:a50413a002af18ed28de719c4c7510010"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae5e989d9098ad0a5907a949d6443e40c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985a">State</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#ae5e989d9098ad0a5907a949d6443e40c">state</a> ()</td></tr>
+<tr class="separator:ae5e989d9098ad0a5907a949d6443e40c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a301c490e77dac8a961b2f8daa7841ae7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a301c490e77dac8a961b2f8daa7841ae7">setState</a> (<a class="el" href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985a">State</a> <a class="el" href="classOST_1_1PropertyBase.html#ae5e989d9098ad0a5907a949d6443e40c">state</a>)</td></tr>
+<tr class="separator:a301c490e77dac8a961b2f8daa7841ae7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a332a00d4f8dcdc7a38dc1c7339a3128e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a332a00d4f8dcdc7a38dc1c7339a3128e">isEnabled</a> ()</td></tr>
+<tr class="separator:a332a00d4f8dcdc7a38dc1c7339a3128e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aac1c1af8e0b312bed2f22b3c4ae318b3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#aac1c1af8e0b312bed2f22b3c4ae318b3">enable</a> (void)</td></tr>
+<tr class="separator:aac1c1af8e0b312bed2f22b3c4ae318b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adcb5c7d54c7b612ea0eca94b7c601c2b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#adcb5c7d54c7b612ea0eca94b7c601c2b">disable</a> (void)</td></tr>
+<tr class="separator:adcb5c7d54c7b612ea0eca94b7c601c2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e823ed1b3e0df24dcc2fed26b19d8c0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a1e823ed1b3e0df24dcc2fed26b19d8c0">getBadge</a> ()</td></tr>
+<tr class="separator:a1e823ed1b3e0df24dcc2fed26b19d8c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a33b53ec9f9936f16daffed24341933a3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a33b53ec9f9936f16daffed24341933a3">setBadge</a> (bool b)</td></tr>
+<tr class="separator:a33b53ec9f9936f16daffed24341933a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c4d9099a97187c2dacd55a9abfc2ba6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a7c4d9099a97187c2dacd55a9abfc2ba6">sendInfo</a> (QString m)</td></tr>
+<tr class="separator:a7c4d9099a97187c2dacd55a9abfc2ba6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a4758e6c28ae9b29eccbb50db961ebe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a6a4758e6c28ae9b29eccbb50db961ebe">sendWarning</a> (QString m)</td></tr>
+<tr class="separator:a6a4758e6c28ae9b29eccbb50db961ebe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d511ae6758e6bb4ae27b1580668289f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a2d511ae6758e6bb4ae27b1580668289f">sendError</a> (QString m)</td></tr>
+<tr class="separator:a2d511ae6758e6bb4ae27b1580668289f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a503a14efb34bf0e3cc63a998e7845c44"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a503a14efb34bf0e3cc63a998e7845c44">getPreIcon1</a> (void)</td></tr>
+<tr class="separator:a503a14efb34bf0e3cc63a998e7845c44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a443d046a8b2efd5aafe1b1233879ee97"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a443d046a8b2efd5aafe1b1233879ee97">setPreIcon1</a> (QString s)</td></tr>
+<tr class="separator:a443d046a8b2efd5aafe1b1233879ee97"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae3798bdc1b2949e19280640a3bbcafef"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#ae3798bdc1b2949e19280640a3bbcafef">getPreIcon2</a> (void)</td></tr>
+<tr class="separator:ae3798bdc1b2949e19280640a3bbcafef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a369764b67d856cc2d39f81139dae0c36"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a369764b67d856cc2d39f81139dae0c36">setPreIcon2</a> (QString s)</td></tr>
+<tr class="separator:a369764b67d856cc2d39f81139dae0c36"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e578ba447bee1049252af67a289eb2b"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a9e578ba447bee1049252af67a289eb2b">getPostIcon1</a> (void)</td></tr>
+<tr class="separator:a9e578ba447bee1049252af67a289eb2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2683f96802ba45408f6114350febd8eb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a2683f96802ba45408f6114350febd8eb">setPostIcon1</a> (QString s)</td></tr>
+<tr class="separator:a2683f96802ba45408f6114350febd8eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a440762cc671b5f76fa8a729cc6c7fcd6"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a440762cc671b5f76fa8a729cc6c7fcd6">getPostIcon2</a> (void)</td></tr>
+<tr class="separator:a440762cc671b5f76fa8a729cc6c7fcd6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78d80fa150a79724ddb7aaac2c78e6a5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a78d80fa150a79724ddb7aaac2c78e6a5">setPostIcon2</a> (QString s)</td></tr>
+<tr class="separator:a78d80fa150a79724ddb7aaac2c78e6a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a53a669af05eebd1049faa669bddb4612"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a53a669af05eebd1049faa669bddb4612">&#9670;&nbsp;</a></span>PropertyMulti()</h2>
+<a id="ad4b28df72a221cde9e8f8d6f6ad9891b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad4b28df72a221cde9e8f8d6f6ad9891b">&#9670;&nbsp;</a></span>PropertyMulti()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -267,7 +308,7 @@ Additional Inherited Members</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const bool &amp;&#160;</td>
-          <td class="paramname"><em>hasArray</em>&#160;</td>
+          <td class="paramname"><em>hasGrid</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -316,7 +357,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -354,7 +395,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -363,17 +404,14 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="af2b81b1135e7445f11736a480ea35d5b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af2b81b1135e7445f11736a480ea35d5b">&#9670;&nbsp;</a></span>addValue()</h2>
+<a id="a80972c253c885329546cabccb5a59ac7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a80972c253c885329546cabccb5a59ac7">&#9670;&nbsp;</a></span>addElt()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void OST::PropertyMulti::addValue </td>
+          <td class="memname">void OST::PropertyMulti::addElt </td>
           <td>(</td>
           <td class="paramtype">QString&#160;</td>
           <td class="paramname"><em>key</em>, </td>
@@ -381,8 +419,8 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classOST_1_1ValueBase.html">ValueBase</a> *&#160;</td>
-          <td class="paramname"><em>pValue</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="classOST_1_1ElementBase.html">ElementBase</a> *&#160;</td>
+          <td class="paramname"><em>pElt</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -390,11 +428,42 @@ Additional Inherited Members</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a550db710bb006ef53232ece86d3295f2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a550db710bb006ef53232ece86d3295f2">&#9670;&nbsp;</a></span>autoSelect()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool OST::PropertyMulti::autoSelect </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a845ced359d297c2620737b7dbfdfe4ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a845ced359d297c2620737b7dbfdfe4ca">&#9670;&nbsp;</a></span>autoUpDown()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool OST::PropertyMulti::autoUpDown </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
 </div><div class="memdoc">
 
 </div>
@@ -409,6 +478,24 @@ Additional Inherited Members</h2></td></tr>
           <td class="memname">void OST::PropertyMulti::clearGrid </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="abf71b7a45a7cccb42fe2d7c4054fae3d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf71b7a45a7cccb42fe2d7c4054fae3d">&#9670;&nbsp;</a></span>deleteElt()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyMulti::deleteElt </td>
+          <td>(</td>
+          <td class="paramtype">QString&#160;</td>
+          <td class="paramname"><em>key</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -434,8 +521,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="aeb5d95d0c3c48b90ef30862698f52bf9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeb5d95d0c3c48b90ef30862698f52bf9">&#9670;&nbsp;</a></span>deleteValue()</h2>
+<a id="adcb5c7d54c7b612ea0eca94b7c601c2b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adcb5c7d54c7b612ea0eca94b7c601c2b">&#9670;&nbsp;</a></span>disable()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -444,24 +531,24 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void OST::PropertyMulti::deleteValue </td>
+          <td class="memname">void OST::PropertyBase::disable </td>
           <td>(</td>
-          <td class="paramtype">QString&#160;</td>
-          <td class="paramname"><em>key</em></td><td>)</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="a0dcf4ab9f9d7ac6bbaf5bbb565cfb5ec"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0dcf4ab9f9d7ac6bbaf5bbb565cfb5ec">&#9670;&nbsp;</a></span>getValue()</h2>
+<a id="af67b9e0d0d95691642baaee7e90c41b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af67b9e0d0d95691642baaee7e90c41b3">&#9670;&nbsp;</a></span>eltChanged</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -470,24 +557,24 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classOST_1_1ValueBase.html">OST::ValueBase</a>* OST::PropertyMulti::getValue </td>
+          <td class="memname">void OST::PropertyBase::eltChanged </td>
           <td>(</td>
-          <td class="paramtype">QString&#160;</td>
-          <td class="paramname"><em>pElement</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="classOST_1_1PropertyBase.html">OST::PropertyBase</a> *&#160;</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">signal</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="a59bcb7d6273a53552f7b73968f11d51f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a59bcb7d6273a53552f7b73968f11d51f">&#9670;&nbsp;</a></span>getValues()</h2>
+<a id="aac1c1af8e0b312bed2f22b3c4ae318b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aac1c1af8e0b312bed2f22b3c4ae318b3">&#9670;&nbsp;</a></span>enable()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -496,7 +583,51 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">QMap&lt;QString, <a class="el" href="classOST_1_1ValueBase.html">OST::ValueBase</a>*&gt;* OST::PropertyMulti::getValues </td>
+          <td class="memname">void OST::PropertyBase::enable </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aafa896c9338106e117dda3d5151705cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aafa896c9338106e117dda3d5151705cc">&#9670;&nbsp;</a></span>fetchLine()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool OST::PropertyMulti::fetchLine </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>l1</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1e823ed1b3e0df24dcc2fed26b19d8c0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1e823ed1b3e0df24dcc2fed26b19d8c0">&#9670;&nbsp;</a></span>getBadge()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool OST::PropertyBase::getBadge </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -504,10 +635,458 @@ Additional Inherited Members</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="a218e2562f50a0e952bcb54f9c5c54127"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a218e2562f50a0e952bcb54f9c5c54127">&#9670;&nbsp;</a></span>getElt()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classOST_1_1ElementBase.html">ElementBase</a> * OST::PropertyMulti::getElt </td>
+          <td>(</td>
+          <td class="paramtype">QString&#160;</td>
+          <td class="paramname"><em>pElement</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa463e13af2bbc72720c18eb8f68e9dab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa463e13af2bbc72720c18eb8f68e9dab">&#9670;&nbsp;</a></span>getElts()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QMap&lt; QString, <a class="el" href="classOST_1_1ElementBase.html">ElementBase</a> * &gt; * OST::PropertyMulti::getElts </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4c31f49c0881581637e530e628852e00"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c31f49c0881581637e530e628852e00">&#9670;&nbsp;</a></span>getGraphDefs()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structOST_1_1GraphDefs.html">GraphDefs</a> OST::PropertyMulti::getGraphDefs </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7a94c34e7feb27bd013ed7113e620888"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7a94c34e7feb27bd013ed7113e620888">&#9670;&nbsp;</a></span>getGrid()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QList&lt; QMap&lt; QString, <a class="el" href="classOST_1_1ValueBase.html">ValueBase</a> * &gt; &gt; OST::PropertyMulti::getGrid </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afe5a577c23e3a48727d5a9224d648a28"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe5a577c23e3a48727d5a9224d648a28">&#9670;&nbsp;</a></span>getGridHeaders()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QList&lt; QString &gt; OST::PropertyMulti::getGridHeaders </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6ca7bf603d1ebecf7b9592d338557413"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6ca7bf603d1ebecf7b9592d338557413">&#9670;&nbsp;</a></span>getGridLimit()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int OST::PropertyMulti::getGridLimit </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9e578ba447bee1049252af67a289eb2b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9e578ba447bee1049252af67a289eb2b">&#9670;&nbsp;</a></span>getPostIcon1()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QString OST::PropertyBase::getPostIcon1 </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a440762cc671b5f76fa8a729cc6c7fcd6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a440762cc671b5f76fa8a729cc6c7fcd6">&#9670;&nbsp;</a></span>getPostIcon2()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QString OST::PropertyBase::getPostIcon2 </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a503a14efb34bf0e3cc63a998e7845c44"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a503a14efb34bf0e3cc63a998e7845c44">&#9670;&nbsp;</a></span>getPreIcon1()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QString OST::PropertyBase::getPreIcon1 </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae3798bdc1b2949e19280640a3bbcafef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae3798bdc1b2949e19280640a3bbcafef">&#9670;&nbsp;</a></span>getPreIcon2()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QString OST::PropertyBase::getPreIcon2 </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aff12ede376dad61053e6f118f6dcddc4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff12ede376dad61053e6f118f6dcddc4">&#9670;&nbsp;</a></span>getShowElts()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool OST::PropertyMulti::getShowElts </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae4576e97af4089f181d1bc8f7107ac87"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae4576e97af4089f181d1bc8f7107ac87">&#9670;&nbsp;</a></span>getShowGrid()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool OST::PropertyMulti::getShowGrid </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a81bea748c86403fc3cd609f3e4ba8588"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a81bea748c86403fc3cd609f3e4ba8588">&#9670;&nbsp;</a></span>hasGraph()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool OST::PropertyMulti::hasGraph </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aad7290a5de7398aa86f8a94c1df8befc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad7290a5de7398aa86f8a94c1df8befc">&#9670;&nbsp;</a></span>hasGrid()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool OST::PropertyMulti::hasGrid </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a50413a002af18ed28de719c4c7510010"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a50413a002af18ed28de719c4c7510010">&#9670;&nbsp;</a></span>hasProfile()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool OST::PropertyBase::hasProfile </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>should values be saved in profiles ? </p>
+<dl class="section return"><dt>Returns</dt><dd>true = yes, false = no</dd></dl>
+<p>This value cannot be modified after instanciation. </p>
+
+</div>
+</div>
+<a id="a332a00d4f8dcdc7a38dc1c7339a3128e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a332a00d4f8dcdc7a38dc1c7339a3128e">&#9670;&nbsp;</a></span>isEnabled()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool OST::PropertyBase::isEnabled </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a87f114f651c52ce952ec9ba5cce5b266"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a87f114f651c52ce952ec9ba5cce5b266">&#9670;&nbsp;</a></span>key()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QString OST::PropertyBase::key </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Internal property's name. </p>
+<dl class="section return"><dt>Returns</dt><dd>returns property's name</dd></dl>
+<p>This value cannot be modified after instanciation </p>
+
+</div>
+</div>
+<a id="a15add81dca862657c152e64d8616e70c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15add81dca862657c152e64d8616e70c">&#9670;&nbsp;</a></span>label()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QString OST::PropertyBase::label </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Property's label. </p>
+<dl class="section return"><dt>Returns</dt><dd>value of label</dd></dl>
+<p>This value cannot be modified after instanciation </p>
+
+</div>
+</div>
+<a id="abaa6e5d5877cd1fd2c6d2e0c10d8677a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abaa6e5d5877cd1fd2c6d2e0c10d8677a">&#9670;&nbsp;</a></span>level1()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QString OST::PropertyBase::level1 </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Property's hierachy first level. </p>
+<dl class="section return"><dt>Returns</dt><dd>value of level 1</dd></dl>
+<p>This value cannot be modified after instanciation</p>
+<p>It equivalent to indi "device" level </p>
+
+</div>
+</div>
+<a id="a36674830c621f90df47a65d3f66f723d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36674830c621f90df47a65d3f66f723d">&#9670;&nbsp;</a></span>level2()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QString OST::PropertyBase::level2 </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Property's hierachy second level. </p>
+<dl class="section return"><dt>Returns</dt><dd>value of level 2</dd></dl>
+<p>This value cannot be modified after instanciation</p>
+<p>It equivalent to indi "group" level </p>
 
 </div>
 </div>
@@ -529,8 +1108,34 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="ad6a2cc23923802b2db65b0cb15c6472a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad6a2cc23923802b2db65b0cb15c6472a">&#9670;&nbsp;</a></span>OnListChanged</h2>
+<a id="afdb609d94f741b6a10cc1e64f38ada89"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afdb609d94f741b6a10cc1e64f38ada89">&#9670;&nbsp;</a></span>OnEltChanged</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyMulti::OnEltChanged </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classOST_1_1ElementBase.html">ElementBase</a> *&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">slot</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aeedfaf8082fdc684cf76c6bbd16567c6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeedfaf8082fdc684cf76c6bbd16567c6">&#9670;&nbsp;</a></span>OnListChanged</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -541,22 +1146,22 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">void OST::PropertyMulti::OnListChanged </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classOST_1_1ValueBase.html">ValueBase</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="classOST_1_1ElementBase.html">ElementBase</a> *&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">slot</span></span>  </td>
+<span class="mlabels"><span class="mlabel">slot</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="a8342cf31e5ab5b178c18c2983386916a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8342cf31e5ab5b178c18c2983386916a">&#9670;&nbsp;</a></span>OnLovChanged</h2>
+<a id="a41b720f9e7ccfdf4646f7ca7a43185b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a41b720f9e7ccfdf4646f7ca7a43185b4">&#9670;&nbsp;</a></span>OnLovChanged</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -567,14 +1172,14 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">void OST::PropertyMulti::OnLovChanged </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classOST_1_1ValueBase.html">ValueBase</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="classOST_1_1ElementBase.html">ElementBase</a> *&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">slot</span></span>  </td>
+<span class="mlabels"><span class="mlabel">slot</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -610,15 +1215,15 @@ Additional Inherited Members</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">slot</span></span>  </td>
+<span class="mlabels"><span class="mlabel">slot</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="a821b41cd4decf05661864922bfb57dcf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a821b41cd4decf05661864922bfb57dcf">&#9670;&nbsp;</a></span>OnValueChanged</h2>
+<a id="a8c3ff130d2a95e5645f988e39142d314"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8c3ff130d2a95e5645f988e39142d314">&#9670;&nbsp;</a></span>OnValueSet</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -627,16 +1232,117 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void OST::PropertyMulti::OnValueChanged </td>
+          <td class="memname">void OST::PropertyMulti::OnValueSet </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classOST_1_1ValueBase.html">ValueBase</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="classOST_1_1ElementBase.html">ElementBase</a> *&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">slot</span></span>  </td>
+<span class="mlabels"><span class="mlabel">slot</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3f78603c9cc0ffe1bbbbf9ada04f7437"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3f78603c9cc0ffe1bbbbf9ada04f7437">&#9670;&nbsp;</a></span>order()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QString OST::PropertyBase::order </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Property's display order. </p>
+<dl class="section return"><dt>Returns</dt><dd>order value</dd></dl>
+<p>This value cannot be modified after instanciation.</p>
+<p>This value sets display order value within same level1 / level2 values </p>
+
+</div>
+</div>
+<a id="ab2b11ec778a97bec80c7c5f6e2c7b88d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab2b11ec778a97bec80c7c5f6e2c7b88d">&#9670;&nbsp;</a></span>permission()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceOST.html#a9be35f589fb7dd8d44169b078554ad72">Permission</a> OST::PropertyBase::permission </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Property's permission. </p>
+<dl class="section return"><dt>Returns</dt><dd>value of permission</dd></dl>
+<p>This value cannot be modified after instanciation </p>
+
+</div>
+</div>
+<a id="aec74ba39c5f179be7d276bb02ee4ed23"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec74ba39c5f179be7d276bb02ee4ed23">&#9670;&nbsp;</a></span>propertyEvent</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyBase::propertyEvent </td>
+          <td>(</td>
+          <td class="paramtype">QString&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QString&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classOST_1_1PropertyBase.html">OST::PropertyBase</a> *&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">signal</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -665,9 +1371,6 @@ Additional Inherited Members</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="namespaceOST.html#a5df45568d80ad6e745269303f574259e">SwitchsRule</a> OST::PropertyMulti::rule </td>
@@ -676,9 +1379,384 @@ Additional Inherited Members</h2></td></tr>
           <td> const</td>
         </tr>
       </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2d511ae6758e6bb4ae27b1580668289f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d511ae6758e6bb4ae27b1580668289f">&#9670;&nbsp;</a></span>sendError()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyBase::sendError </td>
+          <td>(</td>
+          <td class="paramtype">QString&#160;</td>
+          <td class="paramname"><em>m</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7c4d9099a97187c2dacd55a9abfc2ba6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c4d9099a97187c2dacd55a9abfc2ba6">&#9670;&nbsp;</a></span>sendInfo()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyBase::sendInfo </td>
+          <td>(</td>
+          <td class="paramtype">QString&#160;</td>
+          <td class="paramname"><em>m</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0449ba5e729415a02929036bdb8773df"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0449ba5e729415a02929036bdb8773df">&#9670;&nbsp;</a></span>sendMessage</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyBase::sendMessage </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceOST.html#a4f7f81902ce1709285bca0ca94e65d51">MsgLevel</a>&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QString&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">signal</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6a4758e6c28ae9b29eccbb50db961ebe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6a4758e6c28ae9b29eccbb50db961ebe">&#9670;&nbsp;</a></span>sendWarning()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyBase::sendWarning </td>
+          <td>(</td>
+          <td class="paramtype">QString&#160;</td>
+          <td class="paramname"><em>m</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aed4505c8db7d6333a6e873b7d65e0b30"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed4505c8db7d6333a6e873b7d65e0b30">&#9670;&nbsp;</a></span>setAutoSelect()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyMulti::setAutoSelect </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>b</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6a763c84e1f951151865b91a2f1d6b05"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6a763c84e1f951151865b91a2f1d6b05">&#9670;&nbsp;</a></span>setAutoUpDown()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyMulti::setAutoUpDown </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>b</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a33b53ec9f9936f16daffed24341933a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a33b53ec9f9936f16daffed24341933a3">&#9670;&nbsp;</a></span>setBadge()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyBase::setBadge </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>b</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acdf4aec520750a03bef5316c8804fb95"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acdf4aec520750a03bef5316c8804fb95">&#9670;&nbsp;</a></span>setElt()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool OST::PropertyMulti::setElt </td>
+          <td>(</td>
+          <td class="paramtype">QString&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QVariant&#160;</td>
+          <td class="paramname"><em>val</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aea8832fcfde07faf706a904b645bdff6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aea8832fcfde07faf706a904b645bdff6">&#9670;&nbsp;</a></span>setGraphDefs()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyMulti::setGraphDefs </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structOST_1_1GraphDefs.html">GraphDefs</a>&#160;</td>
+          <td class="paramname"><em>defs</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a90f15df03c847e8c8a8e07062e6e96fa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a90f15df03c847e8c8a8e07062e6e96fa">&#9670;&nbsp;</a></span>setGridLimit()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyMulti::setGridLimit </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>limit</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a22d183b87db718bbfb7afed1bdb2129b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a22d183b87db718bbfb7afed1bdb2129b">&#9670;&nbsp;</a></span>setHasGraph()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyMulti::setHasGraph </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>b</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac88bf1017fe29e3bb3f79eac3674431b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac88bf1017fe29e3bb3f79eac3674431b">&#9670;&nbsp;</a></span>setHasGrid()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyMulti::setHasGrid </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>b</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2683f96802ba45408f6114350febd8eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2683f96802ba45408f6114350febd8eb">&#9670;&nbsp;</a></span>setPostIcon1()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyBase::setPostIcon1 </td>
+          <td>(</td>
+          <td class="paramtype">QString&#160;</td>
+          <td class="paramname"><em>s</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a78d80fa150a79724ddb7aaac2c78e6a5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a78d80fa150a79724ddb7aaac2c78e6a5">&#9670;&nbsp;</a></span>setPostIcon2()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyBase::setPostIcon2 </td>
+          <td>(</td>
+          <td class="paramtype">QString&#160;</td>
+          <td class="paramname"><em>s</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a443d046a8b2efd5aafe1b1233879ee97"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a443d046a8b2efd5aafe1b1233879ee97">&#9670;&nbsp;</a></span>setPreIcon1()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyBase::setPreIcon1 </td>
+          <td>(</td>
+          <td class="paramtype">QString&#160;</td>
+          <td class="paramname"><em>s</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a369764b67d856cc2d39f81139dae0c36"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a369764b67d856cc2d39f81139dae0c36">&#9670;&nbsp;</a></span>setPreIcon2()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyBase::setPreIcon2 </td>
+          <td>(</td>
+          <td class="paramtype">QString&#160;</td>
+          <td class="paramname"><em>s</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -690,9 +1768,6 @@ Additional Inherited Members</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void OST::PropertyMulti::setRule </td>
@@ -702,32 +1777,140 @@ Additional Inherited Members</h2></td></tr>
           <td></td>
         </tr>
       </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a456c04d0540913630027ad9e22a7af02"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a456c04d0540913630027ad9e22a7af02">&#9670;&nbsp;</a></span>setShowElts()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyMulti::setShowElts </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>b</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a643d04fc786a32b1a85d18cfaa8f809c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a643d04fc786a32b1a85d18cfaa8f809c">&#9670;&nbsp;</a></span>setShowGrid()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyMulti::setShowGrid </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>b</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a301c490e77dac8a961b2f8daa7841ae7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a301c490e77dac8a961b2f8daa7841ae7">&#9670;&nbsp;</a></span>setState()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyBase::setState </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985a">State</a>&#160;</td>
+          <td class="paramname"><em>state</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="a70f8ece544d506ff13d6279571dcc158"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a70f8ece544d506ff13d6279571dcc158">&#9670;&nbsp;</a></span>setValue()</h2>
+<a id="ae5e989d9098ad0a5907a949d6443e40c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae5e989d9098ad0a5907a949d6443e40c">&#9670;&nbsp;</a></span>state()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985a">State</a> OST::PropertyBase::state </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8612c55c73eb525f791a479acb13f3cb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8612c55c73eb525f791a479acb13f3cb">&#9670;&nbsp;</a></span>stateChanged</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyBase::stateChanged </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985a">OST::State</a>&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">signal</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2967d6245ad774fd67e0335838ac484b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2967d6245ad774fd67e0335838ac484b">&#9670;&nbsp;</a></span>swapLines()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool OST::PropertyMulti::setValue </td>
+          <td class="memname">bool OST::PropertyMulti::swapLines </td>
           <td>(</td>
-          <td class="paramtype">QString&#160;</td>
-          <td class="paramname"><em>key</em>, </td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>l1</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">QVariant&#160;</td>
-          <td class="paramname"><em>Value</em>&#160;</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>l2</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -763,6 +1946,32 @@ Additional Inherited Members</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab519a0efa35110e3d304e79b5be21203"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab519a0efa35110e3d304e79b5be21203">&#9670;&nbsp;</a></span>valueSet</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyBase::valueSet </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classOST_1_1PropertyBase.html">OST::PropertyBase</a> *&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">signal</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 </div>

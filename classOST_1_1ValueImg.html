@@ -67,23 +67,24 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classOST_1_1ValueImg-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">OST::ValueImg Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p><code>#include &lt;<a class="el" href="valueimg_8h_source.html">valueimg.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="elementimg_8h_source.html">elementimg.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for OST::ValueImg:</div>
 <div class="dyncontent">
 <div class="center"><img src="classOST_1_1ValueImg__inherit__graph.png" border="0" usemap="#aOST_1_1ValueImg_inherit__map" alt="Inheritance graph"/></div>
 <map name="aOST_1_1ValueImg_inherit__map" id="aOST_1_1ValueImg_inherit__map">
-<area shape="rect" title=" " alt="" coords="61,917,180,1097"/>
-<area shape="rect" href="classOST_1_1ValueSingle.html" title=" " alt="" coords="12,645,229,869"/>
-<area shape="rect" href="classOST_1_1ValueSingleSignalAndSlots.html" title=" " alt="" coords="5,461,236,597"/>
-<area shape="rect" href="classOST_1_1ValueBase.html" title=" " alt="" coords="49,131,193,413"/>
-<area shape="rect" href="classQObject.html" title=" " alt="" coords="83,5,158,83"/>
+<area shape="rect" title=" " alt="" coords="9,469,156,605"/>
+<area shape="rect" href="classOST_1_1ValueTemplate.html" title=" " alt="" coords="5,315,160,421"/>
+<area shape="rect" href="classOST_1_1ValueBase.html" title=" " alt="" coords="9,131,156,267"/>
+<area shape="rect" href="classQObject.html" title=" " alt="" coords="45,5,120,83"/>
 </map>
 </div>
 <div class="dynheader">
@@ -91,11 +92,11 @@ Collaboration diagram for OST::ValueImg:</div>
 <div class="dyncontent">
 <div class="center"><img src="classOST_1_1ValueImg__coll__graph.png" border="0" usemap="#aOST_1_1ValueImg_coll__map" alt="Collaboration graph"/></div>
 <map name="aOST_1_1ValueImg_coll__map" id="aOST_1_1ValueImg_coll__map">
-<area shape="rect" title=" " alt="" coords="61,917,180,1097"/>
-<area shape="rect" href="classOST_1_1ValueSingle.html" title=" " alt="" coords="12,645,229,869"/>
-<area shape="rect" href="classOST_1_1ValueSingleSignalAndSlots.html" title=" " alt="" coords="5,461,236,597"/>
-<area shape="rect" href="classOST_1_1ValueBase.html" title=" " alt="" coords="49,131,193,413"/>
-<area shape="rect" href="classQObject.html" title=" " alt="" coords="83,5,158,83"/>
+<area shape="rect" title=" " alt="" coords="9,775,156,911"/>
+<area shape="rect" href="classOST_1_1ValueTemplate.html" title=" " alt="" coords="5,619,160,725"/>
+<area shape="rect" href="classOST_1_1ValueBase.html" title=" " alt="" coords="9,433,156,569"/>
+<area shape="rect" href="classQObject.html" title=" " alt="" coords="40,5,115,83"/>
+<area shape="rect" href="classOST_1_1ElementBase.html" title=" " alt="" coords="99,132,245,371"/>
 </map>
 </div>
 <table class="memberdecls">
@@ -103,143 +104,48 @@ Collaboration diagram for OST::ValueImg:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a952dc6ef60eb09d7bd42928233ef63ba"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueImg.html#a952dc6ef60eb09d7bd42928233ef63ba">accept</a> (<a class="el" href="classOST_1_1ValueVisitor.html">ValueVisitor</a> *pVisitor) override</td></tr>
 <tr class="separator:a952dc6ef60eb09d7bd42928233ef63ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a362f2dbc995b32c0cc408eb952c16ed6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueImg.html#a362f2dbc995b32c0cc408eb952c16ed6">accept</a> (<a class="el" href="classOST_1_1ValueVisitor.html">ValueVisitor</a> *pVisitor, QVariantMap &amp;data) override</td></tr>
-<tr class="separator:a362f2dbc995b32c0cc408eb952c16ed6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac5696260ba107e36b8c81bbf361bb4af"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueImg.html#ac5696260ba107e36b8c81bbf361bb4af">accept</a> (<a class="el" href="classOST_1_1ValueVisitor.html">ValueVisitor</a> *pVisitor, QString &amp;action, QVariantMap &amp;data) override</td></tr>
-<tr class="separator:ac5696260ba107e36b8c81bbf361bb4af"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a092c38310bc428a0f90182e7b219c4ad"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueImg.html#a092c38310bc428a0f90182e7b219c4ad">ValueImg</a> (const QString &amp;<a class="el" href="classOST_1_1ValueBase.html#a42ab362d5ba525005a6831dc63f316fd">label</a>, const QString &amp;<a class="el" href="classOST_1_1ValueBase.html#af89fbb9465f4a81829f83b30ce375350">order</a>, const QString &amp;<a class="el" href="classOST_1_1ValueBase.html#a07b57c61dc7fa0142cc95ee39b78212c">hint</a>)</td></tr>
-<tr class="separator:a092c38310bc428a0f90182e7b219c4ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af18357f58e270e43d08c83008a5f076b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueImg.html#af18357f58e270e43d08c83008a5f076b">ValueImg</a> (<a class="el" href="classOST_1_1ElementBase.html">ElementBase</a> *element)</td></tr>
+<tr class="separator:af18357f58e270e43d08c83008a5f076b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0a3419777f71160da3e383d8d8bfab61"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueImg.html#a0a3419777f71160da3e383d8d8bfab61">~ValueImg</a> ()</td></tr>
 <tr class="separator:a0a3419777f71160da3e383d8d8bfab61"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adc62197c55681a82b3789a7e4d91b0dd"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueImg.html#adc62197c55681a82b3789a7e4d91b0dd">getType</a> () override</td></tr>
-<tr class="separator:adc62197c55681a82b3789a7e4d91b0dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad0707dc3b228c3001996e072f87030d0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structOST_1_1ImgData.html">ImgData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueImg.html#ad0707dc3b228c3001996e072f87030d0">value</a> ()</td></tr>
-<tr class="separator:ad0707dc3b228c3001996e072f87030d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaf9534ce92ae3054656fe7b9fbe97dbe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueImg.html#aaf9534ce92ae3054656fe7b9fbe97dbe">setValue</a> (const <a class="el" href="structOST_1_1ImgData.html">ImgData</a> &amp;<a class="el" href="classOST_1_1ValueImg.html#ad0707dc3b228c3001996e072f87030d0">value</a>, const bool &amp;emitEvent)</td></tr>
-<tr class="separator:aaf9534ce92ae3054656fe7b9fbe97dbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pub_methods_classOST_1_1ValueSingle"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classOST_1_1ValueSingle')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classOST_1_1ValueSingle.html">OST::ValueSingle&lt; ImgData &gt;</a></td></tr>
-<tr class="memitem:a272b6ea6ed5d8bf2b2df4ad45f244a43 inherit pub_methods_classOST_1_1ValueSingle"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueSingle.html#a272b6ea6ed5d8bf2b2df4ad45f244a43">ValueSingle</a> (const QString &amp;<a class="el" href="classOST_1_1ValueBase.html#a42ab362d5ba525005a6831dc63f316fd">label</a>, const QString &amp;<a class="el" href="classOST_1_1ValueBase.html#af89fbb9465f4a81829f83b30ce375350">order</a>, const QString &amp;<a class="el" href="classOST_1_1ValueBase.html#a07b57c61dc7fa0142cc95ee39b78212c">hint</a>)</td></tr>
-<tr class="separator:a272b6ea6ed5d8bf2b2df4ad45f244a43 inherit pub_methods_classOST_1_1ValueSingle"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1c202eb54c8b2876d62ba7740e451979 inherit pub_methods_classOST_1_1ValueSingle"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueSingle.html#a1c202eb54c8b2876d62ba7740e451979">~ValueSingle</a> ()</td></tr>
-<tr class="separator:a1c202eb54c8b2876d62ba7740e451979 inherit pub_methods_classOST_1_1ValueSingle"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2a9a4a828381bf85c50dbecbcab29dbb inherit pub_methods_classOST_1_1ValueSingle"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structOST_1_1ImgData.html">ImgData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueSingle.html#a2a9a4a828381bf85c50dbecbcab29dbb">value</a> ()</td></tr>
-<tr class="separator:a2a9a4a828381bf85c50dbecbcab29dbb inherit pub_methods_classOST_1_1ValueSingle"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6b1488f30d509cda67e4eb0e270ef633 inherit pub_methods_classOST_1_1ValueSingle"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueSingle.html#a6b1488f30d509cda67e4eb0e270ef633">getType</a> () override</td></tr>
-<tr class="separator:a6b1488f30d509cda67e4eb0e270ef633 inherit pub_methods_classOST_1_1ValueSingle"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a84f642acb4dd3aa08ddaf441a3223f87 inherit pub_methods_classOST_1_1ValueSingle"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueSingle.html#a84f642acb4dd3aa08ddaf441a3223f87">setValue</a> (const <a class="el" href="structOST_1_1ImgData.html">ImgData</a> &amp;<a class="el" href="classOST_1_1ValueSingle.html#a2a9a4a828381bf85c50dbecbcab29dbb">value</a>, const bool &amp;emitEvent)</td></tr>
-<tr class="separator:a84f642acb4dd3aa08ddaf441a3223f87 inherit pub_methods_classOST_1_1ValueSingle"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaf0ef3c8b34320f215742de9bccbc305 inherit pub_methods_classOST_1_1ValueSingle"><td class="memItemLeft" align="right" valign="top">QList&lt; <a class="el" href="structOST_1_1ImgData.html">ImgData</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueSingle.html#aaf0ef3c8b34320f215742de9bccbc305">getGrid</a> ()</td></tr>
-<tr class="separator:aaf0ef3c8b34320f215742de9bccbc305 inherit pub_methods_classOST_1_1ValueSingle"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a12a4f135617a938b921c0c2a5aaef43e inherit pub_methods_classOST_1_1ValueSingle"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueSingle.html#a12a4f135617a938b921c0c2a5aaef43e">gridAdd</a> (<a class="el" href="structOST_1_1ImgData.html">ImgData</a> val)</td></tr>
-<tr class="separator:a12a4f135617a938b921c0c2a5aaef43e inherit pub_methods_classOST_1_1ValueSingle"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a58c76e9da97d868a340c2f671f563b70 inherit pub_methods_classOST_1_1ValueSingle"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueSingle.html#a58c76e9da97d868a340c2f671f563b70">gridDel</a> (int i)</td></tr>
-<tr class="separator:a58c76e9da97d868a340c2f671f563b70 inherit pub_methods_classOST_1_1ValueSingle"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9ace3530dd587db1dd0958493562ca09 inherit pub_methods_classOST_1_1ValueSingle"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueSingle.html#a9ace3530dd587db1dd0958493562ca09">gridUpdate</a> (const <a class="el" href="structOST_1_1ImgData.html">ImgData</a> &amp;<a class="el" href="classOST_1_1ValueSingle.html#a2a9a4a828381bf85c50dbecbcab29dbb">value</a>, int i, const bool &amp;emitEvent)</td></tr>
-<tr class="separator:a9ace3530dd587db1dd0958493562ca09 inherit pub_methods_classOST_1_1ValueSingle"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac2d3b5dd5c3ad450e38bc7ff50a2a341 inherit pub_methods_classOST_1_1ValueSingle"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueSingle.html#ac2d3b5dd5c3ad450e38bc7ff50a2a341">gridClear</a> ()</td></tr>
-<tr class="separator:ac2d3b5dd5c3ad450e38bc7ff50a2a341 inherit pub_methods_classOST_1_1ValueSingle"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0422e826b0d847ce7f211329601ae82a inherit pub_methods_classOST_1_1ValueSingle"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueSingle.html#a0422e826b0d847ce7f211329601ae82a">setGrid</a> (QList&lt; <a class="el" href="structOST_1_1ImgData.html">ImgData</a> &gt; vals)</td></tr>
-<tr class="separator:a0422e826b0d847ce7f211329601ae82a inherit pub_methods_classOST_1_1ValueSingle"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae96c2bec28f957ace96f3b65e40cdaef inherit pub_methods_classOST_1_1ValueSingle"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueSingle.html#ae96c2bec28f957ace96f3b65e40cdaef">getRealType</a> ()</td></tr>
-<tr class="separator:ae96c2bec28f957ace96f3b65e40cdaef inherit pub_methods_classOST_1_1ValueSingle"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5fec3073d42cc8f2daca21a31a47abda inherit pub_methods_classOST_1_1ValueSingle"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueSingle.html#a5fec3073d42cc8f2daca21a31a47abda">arrayLimit</a> ()</td></tr>
-<tr class="separator:a5fec3073d42cc8f2daca21a31a47abda inherit pub_methods_classOST_1_1ValueSingle"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1f2ed0dc0d03d0034fa454f5bb95daaf inherit pub_methods_classOST_1_1ValueSingle"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueSingle.html#a1f2ed0dc0d03d0034fa454f5bb95daaf">setArrayLimit</a> (int limit)</td></tr>
-<tr class="separator:a1f2ed0dc0d03d0034fa454f5bb95daaf inherit pub_methods_classOST_1_1ValueSingle"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab595d0f62136813b73447088d191653c inherit pub_methods_classOST_1_1ValueSingle"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueSingle.html#ab595d0f62136813b73447088d191653c">getGlobalLov</a> ()</td></tr>
-<tr class="separator:ab595d0f62136813b73447088d191653c inherit pub_methods_classOST_1_1ValueSingle"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a17b3f7a839a43a02a52255af4892b788 inherit pub_methods_classOST_1_1ValueSingle"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueSingle.html#a17b3f7a839a43a02a52255af4892b788">setGlobalLov</a> (QString lovName)</td></tr>
-<tr class="separator:a17b3f7a839a43a02a52255af4892b788 inherit pub_methods_classOST_1_1ValueSingle"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab531480cf4e2542862b1b4d8808c074a inherit pub_methods_classOST_1_1ValueSingle"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueSingle.html#ab531480cf4e2542862b1b4d8808c074a">getPreIcon</a> ()</td></tr>
-<tr class="separator:ab531480cf4e2542862b1b4d8808c074a inherit pub_methods_classOST_1_1ValueSingle"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae67719653d1f03f0b1fe71c7d52b8dc6 inherit pub_methods_classOST_1_1ValueSingle"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueSingle.html#ae67719653d1f03f0b1fe71c7d52b8dc6">setPreIcon</a> (QString s)</td></tr>
-<tr class="separator:ae67719653d1f03f0b1fe71c7d52b8dc6 inherit pub_methods_classOST_1_1ValueSingle"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab02d3f6aa6995196e6a338cba9931635 inherit pub_methods_classOST_1_1ValueSingle"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueSingle.html#ab02d3f6aa6995196e6a338cba9931635">getPostIcon</a> ()</td></tr>
-<tr class="separator:ab02d3f6aa6995196e6a338cba9931635 inherit pub_methods_classOST_1_1ValueSingle"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a37c75dadfd4708697dbb53ae2787d7e3 inherit pub_methods_classOST_1_1ValueSingle"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueSingle.html#a37c75dadfd4708697dbb53ae2787d7e3">setPostIcon</a> (QString s)</td></tr>
-<tr class="separator:a37c75dadfd4708697dbb53ae2787d7e3 inherit pub_methods_classOST_1_1ValueSingle"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pub_methods_classOST_1_1ValueSingleSignalAndSlots"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classOST_1_1ValueSingleSignalAndSlots')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classOST_1_1ValueSingleSignalAndSlots.html">OST::ValueSingleSignalAndSlots</a></td></tr>
-<tr class="memitem:a27e5b1ff5bb849fe945fc453542894f5 inherit pub_methods_classOST_1_1ValueSingleSignalAndSlots"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueSingleSignalAndSlots.html#a27e5b1ff5bb849fe945fc453542894f5">ValueSingleSignalAndSlots</a> (const QString &amp;<a class="el" href="classOST_1_1ValueBase.html#a42ab362d5ba525005a6831dc63f316fd">label</a>, const QString &amp;<a class="el" href="classOST_1_1ValueBase.html#af89fbb9465f4a81829f83b30ce375350">order</a>, const QString &amp;<a class="el" href="classOST_1_1ValueBase.html#a07b57c61dc7fa0142cc95ee39b78212c">hint</a>)</td></tr>
-<tr class="separator:a27e5b1ff5bb849fe945fc453542894f5 inherit pub_methods_classOST_1_1ValueSingleSignalAndSlots"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a311cf3938584d19c0f564feae6003d8b inherit pub_methods_classOST_1_1ValueSingleSignalAndSlots"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueSingleSignalAndSlots.html#a311cf3938584d19c0f564feae6003d8b">~ValueSingleSignalAndSlots</a> ()</td></tr>
-<tr class="separator:a311cf3938584d19c0f564feae6003d8b inherit pub_methods_classOST_1_1ValueSingleSignalAndSlots"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pub_methods_classOST_1_1ValueBase"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classOST_1_1ValueBase')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classOST_1_1ValueBase.html">OST::ValueBase</a></td></tr>
-<tr class="memitem:acde3395970700275b28958deca40eefe inherit pub_methods_classOST_1_1ValueBase"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueBase.html#acde3395970700275b28958deca40eefe">ValueBase</a> (const QString &amp;<a class="el" href="classOST_1_1ValueBase.html#a42ab362d5ba525005a6831dc63f316fd">label</a>, const QString &amp;<a class="el" href="classOST_1_1ValueBase.html#af89fbb9465f4a81829f83b30ce375350">order</a>, const QString &amp;<a class="el" href="classOST_1_1ValueBase.html#a07b57c61dc7fa0142cc95ee39b78212c">hint</a>)</td></tr>
-<tr class="separator:acde3395970700275b28958deca40eefe inherit pub_methods_classOST_1_1ValueBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8dbc84ea53134627aadcbdbfa1375009 inherit pub_methods_classOST_1_1ValueBase"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueBase.html#a8dbc84ea53134627aadcbdbfa1375009">~ValueBase</a> ()</td></tr>
-<tr class="separator:a8dbc84ea53134627aadcbdbfa1375009 inherit pub_methods_classOST_1_1ValueBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a42ab362d5ba525005a6831dc63f316fd inherit pub_methods_classOST_1_1ValueBase"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueBase.html#a42ab362d5ba525005a6831dc63f316fd">label</a> ()</td></tr>
-<tr class="separator:a42ab362d5ba525005a6831dc63f316fd inherit pub_methods_classOST_1_1ValueBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af89fbb9465f4a81829f83b30ce375350 inherit pub_methods_classOST_1_1ValueBase"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueBase.html#af89fbb9465f4a81829f83b30ce375350">order</a> ()</td></tr>
-<tr class="separator:af89fbb9465f4a81829f83b30ce375350 inherit pub_methods_classOST_1_1ValueBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a07b57c61dc7fa0142cc95ee39b78212c inherit pub_methods_classOST_1_1ValueBase"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueBase.html#a07b57c61dc7fa0142cc95ee39b78212c">hint</a> ()</td></tr>
-<tr class="separator:a07b57c61dc7fa0142cc95ee39b78212c inherit pub_methods_classOST_1_1ValueBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1dd9343f9b623650a279c78c9cf59fe5 inherit pub_methods_classOST_1_1ValueBase"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueBase.html#a1dd9343f9b623650a279c78c9cf59fe5">autoUpdate</a> ()</td></tr>
-<tr class="separator:a1dd9343f9b623650a279c78c9cf59fe5 inherit pub_methods_classOST_1_1ValueBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad0269cc3eaa89fe800332d7e146402dc inherit pub_methods_classOST_1_1ValueBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueBase.html#ad0269cc3eaa89fe800332d7e146402dc">setAutoUpdate</a> (const bool &amp;v)</td></tr>
-<tr class="separator:ad0269cc3eaa89fe800332d7e146402dc inherit pub_methods_classOST_1_1ValueBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a84b9690b81c33f486d294fd8d664bdfc inherit pub_methods_classOST_1_1ValueBase"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueBase.html#a84b9690b81c33f486d294fd8d664bdfc">getDirectEdit</a> ()</td></tr>
-<tr class="separator:a84b9690b81c33f486d294fd8d664bdfc inherit pub_methods_classOST_1_1ValueBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e6160f8d205b785262218db36c9bf94 inherit pub_methods_classOST_1_1ValueBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueBase.html#a6e6160f8d205b785262218db36c9bf94">setDirectEdit</a> (const bool &amp;v)</td></tr>
-<tr class="separator:a6e6160f8d205b785262218db36c9bf94 inherit pub_methods_classOST_1_1ValueBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a688c7e29cc45c00c3982a825e8fd7846 inherit pub_methods_classOST_1_1ValueBase"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueBase.html#a688c7e29cc45c00c3982a825e8fd7846">getBadge</a> ()</td></tr>
-<tr class="separator:a688c7e29cc45c00c3982a825e8fd7846 inherit pub_methods_classOST_1_1ValueBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aabc7c3adfd227c8eb3c15f9420697467 inherit pub_methods_classOST_1_1ValueBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueBase.html#aabc7c3adfd227c8eb3c15f9420697467">setBadge</a> (const bool &amp;b)</td></tr>
-<tr class="separator:aabc7c3adfd227c8eb3c15f9420697467 inherit pub_methods_classOST_1_1ValueBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0596f1c7c3799f325c4f259a265da3bc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueImg.html#a0596f1c7c3799f325c4f259a265da3bc">updateValue</a> () override</td></tr>
+<tr class="separator:a0596f1c7c3799f325c4f259a265da3bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef18a92f728e1c3e236f40e1ef556265"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueImg.html#aef18a92f728e1c3e236f40e1ef556265">updateElement</a> (const bool &amp;emitEvent) override</td></tr>
+<tr class="separator:aef18a92f728e1c3e236f40e1ef556265"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
-Additional Inherited Members</h2></td></tr>
-<tr class="inherit_header pub_slots_classOST_1_1ValueSingleSignalAndSlots"><td colspan="2" onclick="javascript:toggleInherit('pub_slots_classOST_1_1ValueSingleSignalAndSlots')"><img src="closed.png" alt="-"/>&#160;Public Slots inherited from <a class="el" href="classOST_1_1ValueSingleSignalAndSlots.html">OST::ValueSingleSignalAndSlots</a></td></tr>
-<tr class="memitem:af8dc50e3fac1b7f2cce8af67c8198277 inherit pub_slots_classOST_1_1ValueSingleSignalAndSlots"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueSingleSignalAndSlots.html#af8dc50e3fac1b7f2cce8af67c8198277">OnSingleValueChanged</a> (void)</td></tr>
-<tr class="separator:af8dc50e3fac1b7f2cce8af67c8198277 inherit pub_slots_classOST_1_1ValueSingleSignalAndSlots"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4ae2127f479539b9fba1750320ed9067 inherit pub_slots_classOST_1_1ValueSingleSignalAndSlots"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueSingleSignalAndSlots.html#a4ae2127f479539b9fba1750320ed9067">OnLovChanged</a> (void)</td></tr>
-<tr class="separator:a4ae2127f479539b9fba1750320ed9067 inherit pub_slots_classOST_1_1ValueSingleSignalAndSlots"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header signals_classOST_1_1ValueSingleSignalAndSlots"><td colspan="2" onclick="javascript:toggleInherit('signals_classOST_1_1ValueSingleSignalAndSlots')"><img src="closed.png" alt="-"/>&#160;Signals inherited from <a class="el" href="classOST_1_1ValueSingleSignalAndSlots.html">OST::ValueSingleSignalAndSlots</a></td></tr>
-<tr class="memitem:a4e21e238f13e2bc364f048193149f613 inherit signals_classOST_1_1ValueSingleSignalAndSlots"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueSingleSignalAndSlots.html#a4e21e238f13e2bc364f048193149f613">gridEvent</a> ()</td></tr>
-<tr class="separator:a4e21e238f13e2bc364f048193149f613 inherit signals_classOST_1_1ValueSingleSignalAndSlots"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa1cd9e8f4220307e9602723687748bd2 inherit signals_classOST_1_1ValueSingleSignalAndSlots"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueSingleSignalAndSlots.html#aa1cd9e8f4220307e9602723687748bd2">singleValueChanged</a> ()</td></tr>
-<tr class="separator:aa1cd9e8f4220307e9602723687748bd2 inherit signals_classOST_1_1ValueSingleSignalAndSlots"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header signals_classOST_1_1ValueBase"><td colspan="2" onclick="javascript:toggleInherit('signals_classOST_1_1ValueBase')"><img src="closed.png" alt="-"/>&#160;Signals inherited from <a class="el" href="classOST_1_1ValueBase.html">OST::ValueBase</a></td></tr>
-<tr class="memitem:a500741026568d575c9402a23f786edc4 inherit signals_classOST_1_1ValueBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueBase.html#a500741026568d575c9402a23f786edc4">valueChanged</a> (<a class="el" href="classOST_1_1ValueBase.html">OST::ValueBase</a> *)</td></tr>
-<tr class="separator:a500741026568d575c9402a23f786edc4 inherit signals_classOST_1_1ValueBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af45108904269e325c7f8be71693864cc inherit signals_classOST_1_1ValueBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueBase.html#af45108904269e325c7f8be71693864cc">listChanged</a> (<a class="el" href="classOST_1_1ValueBase.html">OST::ValueBase</a> *)</td></tr>
-<tr class="separator:af45108904269e325c7f8be71693864cc inherit signals_classOST_1_1ValueBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec7f69b7d69258aa661a28f2c9641566 inherit signals_classOST_1_1ValueBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueBase.html#aec7f69b7d69258aa661a28f2c9641566">sendMessage</a> (<a class="el" href="namespaceOST.html#a4f7f81902ce1709285bca0ca94e65d51">MsgLevel</a>, QString)</td></tr>
-<tr class="separator:aec7f69b7d69258aa661a28f2c9641566 inherit signals_classOST_1_1ValueBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab658b0d756a6b531e0cda9ddf7fbcf00 inherit signals_classOST_1_1ValueBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueBase.html#ab658b0d756a6b531e0cda9ddf7fbcf00">lovChanged</a> (<a class="el" href="classOST_1_1ValueBase.html">OST::ValueBase</a> *)</td></tr>
-<tr class="separator:ab658b0d756a6b531e0cda9ddf7fbcf00 inherit signals_classOST_1_1ValueBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:a806d358a9edb67cfa6ea52fab7f0dd8c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structOST_1_1ImgData.html">ImgData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueTemplate.html#a806d358a9edb67cfa6ea52fab7f0dd8c">value</a></td></tr>
+<tr class="separator:a806d358a9edb67cfa6ea52fab7f0dd8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
+<tr class="memitem:adde2c3508ad0661c5f1efe8efa7ae33e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classOST_1_1ElementBase.html">ElementBase</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ValueBase.html#adde2c3508ad0661c5f1efe8efa7ae33e">pElement</a></td></tr>
+<tr class="separator:adde2c3508ad0661c5f1efe8efa7ae33e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a092c38310bc428a0f90182e7b219c4ad"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a092c38310bc428a0f90182e7b219c4ad">&#9670;&nbsp;</a></span>ValueImg()</h2>
+<a id="af18357f58e270e43d08c83008a5f076b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af18357f58e270e43d08c83008a5f076b">&#9670;&nbsp;</a></span>ValueImg()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">OST::ValueImg::ValueImg </td>
           <td>(</td>
-          <td class="paramtype">const QString &amp;&#160;</td>
-          <td class="paramname"><em>label</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype"><a class="el" href="classOST_1_1ElementBase.html">ElementBase</a> *&#160;</td>
+          <td class="paramname"><em>element</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">const QString &amp;&#160;</td>
-          <td class="paramname"><em>order</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const QString &amp;&#160;</td>
-          <td class="paramname"><em>hint</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 </div>
@@ -249,6 +155,9 @@ Additional Inherited Members</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">OST::ValueImg::~ValueImg </td>
@@ -257,13 +166,18 @@ Additional Inherited Members</h2></td></tr>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
 <a id="a952dc6ef60eb09d7bd42928233ef63ba"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a952dc6ef60eb09d7bd42928233ef63ba">&#9670;&nbsp;</a></span>accept() <span class="overload">[1/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a952dc6ef60eb09d7bd42928233ef63ba">&#9670;&nbsp;</a></span>accept()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -281,7 +195,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -290,8 +204,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="ac5696260ba107e36b8c81bbf361bb4af"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac5696260ba107e36b8c81bbf361bb4af">&#9670;&nbsp;</a></span>accept() <span class="overload">[2/3]</span></h2>
+<a id="aef18a92f728e1c3e236f40e1ef556265"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aef18a92f728e1c3e236f40e1ef556265">&#9670;&nbsp;</a></span>updateElement()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -300,143 +214,26 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void OST::ValueImg::accept </td>
+          <td class="memname">void OST::ValueImg::updateElement </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classOST_1_1ValueVisitor.html">ValueVisitor</a> *&#160;</td>
-          <td class="paramname"><em>pVisitor</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">QString &amp;&#160;</td>
-          <td class="paramname"><em>action</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">QVariantMap &amp;&#160;</td>
-          <td class="paramname"><em>data</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Implements <a class="el" href="classOST_1_1ValueBase.html#ab0890556f415ea7ab319d5eddc7674e5">OST::ValueBase</a>.</p>
-
-</div>
-</div>
-<a id="a362f2dbc995b32c0cc408eb952c16ed6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a362f2dbc995b32c0cc408eb952c16ed6">&#9670;&nbsp;</a></span>accept() <span class="overload">[3/3]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void OST::ValueImg::accept </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classOST_1_1ValueVisitor.html">ValueVisitor</a> *&#160;</td>
-          <td class="paramname"><em>pVisitor</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">QVariantMap &amp;&#160;</td>
-          <td class="paramname"><em>data</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Implements <a class="el" href="classOST_1_1ValueBase.html#a125e657f0434d9d4eef7cca58b66237e">OST::ValueBase</a>.</p>
-
-</div>
-</div>
-<a id="adc62197c55681a82b3789a7e4d91b0dd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adc62197c55681a82b3789a7e4d91b0dd">&#9670;&nbsp;</a></span>getType()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">QString OST::ValueImg::getType </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Implements <a class="el" href="classOST_1_1ValueBase.html#ae5cafb9cec0d2d5b7e7dc329f621d70a">OST::ValueBase</a>.</p>
-
-</div>
-</div>
-<a id="aaf9534ce92ae3054656fe7b9fbe97dbe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaf9534ce92ae3054656fe7b9fbe97dbe">&#9670;&nbsp;</a></span>setValue()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void OST::ValueImg::setValue </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="structOST_1_1ImgData.html">ImgData</a> &amp;&#160;</td>
-          <td class="paramname"><em>value</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
           <td class="paramtype">const bool &amp;&#160;</td>
-          <td class="paramname"><em>emitEvent</em>&#160;</td>
-        </tr>
-        <tr>
+          <td class="paramname"><em>emitEvent</em></td><td>)</td>
           <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
+<p>Implements <a class="el" href="classOST_1_1ValueBase.html#a52caec00ad03f49c47d185b3f4085f77">OST::ValueBase</a>.</p>
+
 </div>
 </div>
-<a id="ad0707dc3b228c3001996e072f87030d0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad0707dc3b228c3001996e072f87030d0">&#9670;&nbsp;</a></span>value()</h2>
+<a id="a0596f1c7c3799f325c4f259a265da3bc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0596f1c7c3799f325c4f259a265da3bc">&#9670;&nbsp;</a></span>updateValue()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -445,7 +242,7 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structOST_1_1ImgData.html">ImgData</a> OST::ValueImg::value </td>
+          <td class="memname">void OST::ValueImg::updateValue </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -453,7 +250,54 @@ Additional Inherited Members</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implements <a class="el" href="classOST_1_1ValueBase.html#a7901fe7e66c4a378a28b32efbc177406">OST::ValueBase</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="adde2c3508ad0661c5f1efe8efa7ae33e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adde2c3508ad0661c5f1efe8efa7ae33e">&#9670;&nbsp;</a></span>pElement</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classOST_1_1ElementBase.html">ElementBase</a>* OST::ValueBase::pElement</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a806d358a9edb67cfa6ea52fab7f0dd8c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a806d358a9edb67cfa6ea52fab7f0dd8c">&#9670;&nbsp;</a></span>value</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structOST_1_1ImgData.html">ImgData</a>  <a class="el" href="classOST_1_1ValueTemplate.html">OST::ValueTemplate</a>&lt; <a class="el" href="structOST_1_1ImgData.html">ImgData</a>  &gt;::value</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -461,8 +305,8 @@ Additional Inherited Members</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>libs/model/value/<a class="el" href="valueimg_8h_source.html">valueimg.h</a></li>
-<li>libs/model/value/<a class="el" href="valueimg_8cpp.html">valueimg.cpp</a></li>
+<li>libs/model/element/<a class="el" href="elementimg_8h_source.html">elementimg.h</a></li>
+<li>libs/model/element/<a class="el" href="elementimg_8cpp.html">elementimg.cpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

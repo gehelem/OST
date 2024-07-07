@@ -1,28 +1,7 @@
 var searchData=
 [
-  ['valuebase_816',['ValueBase',['../classOST_1_1ValueBase.html',1,'OST']]],
-  ['valuebool_817',['ValueBool',['../classOST_1_1ValueBool.html',1,'OST']]],
-  ['valuefactory_818',['ValueFactory',['../classOST_1_1ValueFactory.html',1,'OST']]],
-  ['valuefloat_819',['ValueFloat',['../classOST_1_1ValueFloat.html',1,'OST']]],
-  ['valuegraph_820',['ValueGraph',['../classOST_1_1ValueGraph.html',1,'OST']]],
-  ['valueimg_821',['ValueImg',['../classOST_1_1ValueImg.html',1,'OST']]],
-  ['valueint_822',['ValueInt',['../classOST_1_1ValueInt.html',1,'OST']]],
-  ['valuejsondumper_823',['ValueJsonDumper',['../classOST_1_1ValueJsonDumper.html',1,'OST']]],
-  ['valuelight_824',['ValueLight',['../classOST_1_1ValueLight.html',1,'OST']]],
-  ['valuemessage_825',['ValueMessage',['../classOST_1_1ValueMessage.html',1,'OST']]],
-  ['valueprg_826',['ValuePrg',['../classOST_1_1ValuePrg.html',1,'OST']]],
-  ['valuesingle_827',['ValueSingle',['../classOST_1_1ValueSingle.html',1,'OST']]],
-  ['valuesingle_3c_20bool_20_3e_828',['ValueSingle&lt; bool &gt;',['../classOST_1_1ValueSingle.html',1,'OST']]],
-  ['valuesingle_3c_20double_20_3e_829',['ValueSingle&lt; double &gt;',['../classOST_1_1ValueSingle.html',1,'OST']]],
-  ['valuesingle_3c_20imgdata_20_3e_830',['ValueSingle&lt; ImgData &gt;',['../classOST_1_1ValueSingle.html',1,'OST']]],
-  ['valuesingle_3c_20int_20_3e_831',['ValueSingle&lt; int &gt;',['../classOST_1_1ValueSingle.html',1,'OST']]],
-  ['valuesingle_3c_20qstring_20_3e_832',['ValueSingle&lt; QString &gt;',['../classOST_1_1ValueSingle.html',1,'OST']]],
-  ['valuesingle_3c_20state_20_3e_833',['ValueSingle&lt; State &gt;',['../classOST_1_1ValueSingle.html',1,'OST']]],
-  ['valuesinglesignalandslots_834',['ValueSingleSignalAndSlots',['../classOST_1_1ValueSingleSignalAndSlots.html',1,'OST']]],
-  ['valuestring_835',['ValueString',['../classOST_1_1ValueString.html',1,'OST']]],
-  ['valuetextdumper_836',['ValueTextDumper',['../classOST_1_1ValueTextDumper.html',1,'OST']]],
-  ['valueupdate_837',['ValueUpdate',['../classOST_1_1ValueUpdate.html',1,'OST']]],
-  ['valuevideo_838',['ValueVideo',['../classOST_1_1ValueVideo.html',1,'OST']]],
-  ['valuevisitor_839',['ValueVisitor',['../classOST_1_1ValueVisitor.html',1,'OST']]],
-  ['version_840',['Version',['../structVersion.html',1,'']]]
+  ['solver_926',['Solver',['../classSolver.html',1,'']]],
+  ['stretch_927',['Stretch',['../classStretch.html',1,'']]],
+  ['stretchparams_928',['StretchParams',['../structStretchParams.html',1,'']]],
+  ['stretchparams1channel_929',['StretchParams1Channel',['../structStretchParams1Channel.html',1,'']]]
 ];

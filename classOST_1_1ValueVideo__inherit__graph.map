@@ -1,7 +1,6 @@
 <map id="OST::ValueVideo" name="OST::ValueVideo">
-<area shape="rect" id="node1" title=" " alt="" coords="55,917,186,1097"/>
-<area shape="rect" id="node2" href="$classOST_1_1ValueSingle.html" title=" " alt="" coords="16,645,225,869"/>
-<area shape="rect" id="node3" href="$classOST_1_1ValueSingleSignalAndSlots.html" title=" " alt="" coords="5,461,236,597"/>
-<area shape="rect" id="node4" href="$classOST_1_1ValueBase.html" title=" " alt="" coords="49,131,193,413"/>
-<area shape="rect" id="node5" href="$classQObject.html" title=" " alt="" coords="83,5,158,83"/>
+<area shape="rect" id="node1" title=" " alt="" coords="9,469,156,605"/>
+<area shape="rect" id="node2" href="$classOST_1_1ValueTemplate.html" title=" " alt="" coords="5,315,160,421"/>
+<area shape="rect" id="node3" href="$classOST_1_1ValueBase.html" title=" " alt="" coords="9,131,156,267"/>
+<area shape="rect" id="node4" href="$classQObject.html" title=" " alt="" coords="45,5,120,83"/>
 </map>
