@@ -114,13 +114,13 @@ class ElementTemplateNumeric : public ElementTemplate<T>
             mFormat = format;
             emit ElementBase::eltChanged(this);
         }
-        bool showSlider()
+        SliderRule slider()
         {
-            return mShowSlider;
+            return mSlider;
         }
-        void setShowSlider(const bool &b)
+        void setSlider(const SliderRule &s)
         {
-            mShowSlider = b;
+            mSlider = s;
             emit ElementBase::eltChanged(this);
         }
 
@@ -130,8 +130,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
         T mStep = 0;
         bool mUseMinMax = false;
         QString mFormat = "";
-        bool mShowSlider = false;
-
+        SliderRule mSlider = SliderNone;
 };
 template <typename T>
 class ElementTemplateNotNumeric : public ElementTemplate<T>

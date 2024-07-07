@@ -128,7 +128,7 @@
                 "label": "Number 1",
                 "min": 0,
                 "max": 100,
-                "showslider": true,
+                "slider":1,
                 "step": 1,
                 "directedit":true
             },

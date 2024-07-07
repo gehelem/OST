@@ -864,7 +864,7 @@ bool IndiModule::defineMeAsImager()
         f->setAutoUpdate(true);
         f->setMinMax(0.001, 300);
         f->setStep(0.001);
-        f->setShowSlider(true);
+        f->setSlider(OST::SliderAndValue);
         pm->addElt("exposure", f);
     }
 
@@ -878,7 +878,7 @@ bool IndiModule::defineMeAsImager()
         i->setAutoUpdate(true);
         i->setMinMax(0, 500);
         i->setStep(1);
-        i->setShowSlider(true);
+        i->setSlider(OST::SliderOnly);
         pm->addElt("gain", i);
     }
 
@@ -890,7 +890,7 @@ bool IndiModule::defineMeAsImager()
         i->setAutoUpdate(true);
         i->setMinMax(0, 500);
         i->setStep(1);
-        i->setShowSlider(true);
+        i->setSlider(OST::SliderOnly);
         pm->addElt("offset", i);
     }
 

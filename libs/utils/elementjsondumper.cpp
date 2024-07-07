@@ -39,7 +39,7 @@ void ElementJsonDumper::visit(ElementInt *pElement)
     json["max"] = qlonglong(pElement->max());
     json["step"] = qlonglong(pElement->step());
     json["format"] = pElement->format();
-    json["showslider"] = pElement->showSlider();
+    json["slider"] = pElement->slider();
     if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
     if (pElement->getPostIcon() != "") json["posticon"] = pElement->getPostIcon();
     if (pElement->getGlobalLov() != "")
@@ -71,7 +71,7 @@ void ElementJsonDumper::visit(ElementFloat *pElement)
     json["max"] = pElement->max();
     json["step"] = pElement->step();
     json["format"] = pElement->format();
-    json["showslider"] = pElement->showSlider();
+    json["slider"] = pElement->slider();
     if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
     if (pElement->getPostIcon() != "") json["posticon"] = pElement->getPostIcon();
     if (pElement->getGlobalLov() != "")
