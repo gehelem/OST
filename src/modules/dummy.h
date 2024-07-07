@@ -24,6 +24,7 @@ class MODULE_INIT Dummy : public IndiModule
         void OnSucessSEP();
         void OnSucessSolve();
         void OnSolverLog(QString &text);
+        void OnModuleStatusAnswer(const QString module, OST::ModuleStatus status) override;
     private:
         void newBLOB(INDI::PropertyBlob pblob);
         void newDevice(INDI::BaseDevice bd) override;
@@ -36,9 +37,10 @@ class MODULE_INIT Dummy : public IndiModule
         void updateSearchList(void);
 
         OST::PropertyMulti *dynprop;
-        OST::ValueLight *dynlight;
-        OST::ValueString *dyntext;
-        OST::ValueBool *dynbool;
+        OST::ElementLight *dynlight;
+        OST::ElementString *dyntext;
+        OST::ElementBool *dynbool;
+        OST::ElementString *dyntext2;
 
 
 };

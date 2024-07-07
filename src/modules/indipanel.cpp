@@ -84,13 +84,13 @@ void IndiPanel::newProperty(INDI::Property pProperty)
             }
             for (unsigned int i = 0; i < n.count(); i++)
             {
-                OST::ValueFloat* v = new OST::ValueFloat(n[i].label, QString(i), n[i].label);
+                OST::ElementFloat* v = new OST::ElementFloat(n[i].label, QString(i), n[i].label);
                 v->setValue(n[i].getValue(), false);
                 v->setMin(n[i].min);
                 v->setMax(n[i].max);
                 v->setStep(n[i].step);
                 v->setFormat(n[i].format);
-                p->addValue(n[i].getName(), v);
+                p->addElt(n[i].getName(), v);
             }
             break;
         }
@@ -99,10 +99,10 @@ void IndiPanel::newProperty(INDI::Property pProperty)
             INDI::PropertySwitch s = pProperty;
             for (unsigned int i = 0; i < s.count(); i++)
             {
-                OST::ValueBool* v = new OST::ValueBool(s[i].label, QString(i), s[i].label);
+                OST::ElementBool* v = new OST::ElementBool(s[i].label, QString(i), s[i].label);
                 if (s[i].s == 0) v->setValue(false, false);
                 if (s[i].s == 1) v->setValue(false, true);
-                p->addValue(s[i].getName(), v);
+                p->addElt(s[i].getName(), v);
             }
             p->setRule(OST::IntToRule(s.getRule()));
 
@@ -113,9 +113,9 @@ void IndiPanel::newProperty(INDI::Property pProperty)
             INDI::PropertyText t = pProperty;
             for (unsigned int i = 0; i < t.count(); i++)
             {
-                OST::ValueString* v = new OST::ValueString(t[i].label, QString(i), t[i].label);
+                OST::ElementString* v = new OST::ElementString(t[i].label, QString(i), t[i].label);
                 v->setValue(t[i].text, false);
-                p->addValue(t[i].getName(), v);
+                p->addElt(t[i].getName(), v);
             }
             break;
         }
@@ -124,9 +124,9 @@ void IndiPanel::newProperty(INDI::Property pProperty)
             INDI::PropertyLight l = pProperty;
             for (unsigned int i = 0; i < l.count(); i++)
             {
-                OST::ValueLight* v = new OST::ValueLight(l[i].label, QString(i), l[i].label);
+                OST::ElementLight* v = new OST::ElementLight(l[i].label, QString(i), l[i].label);
                 v->setValue(OST::IntToState(l[i].getState()), true);
-                p->addValue(l[i].getName(), v);
+                p->addElt(l[i].getName(), v);
             }
             break;
         }
@@ -160,11 +160,11 @@ void IndiPanel::updateProperty (INDI::Property property)
 
             for (unsigned int i = 0; i < n.count(); i++)
             {
-                getValueFloat(devpro, n[i].name)->setMin(n[i].min);
-                getValueFloat(devpro, n[i].name)->setMax(n[i].max);
-                getValueFloat(devpro, n[i].name)->setStep(n[i].step);
-                getValueFloat(devpro, n[i].name)->setFormat(n[i].format);
-                getValueFloat(devpro, n[i].name)->setValue(n[i].value, i == n.count() - 1);
+                getEltFloat(devpro, n[i].name)->setMin(n[i].min);
+                getEltFloat(devpro, n[i].name)->setMax(n[i].max);
+                getEltFloat(devpro, n[i].name)->setStep(n[i].step);
+                getEltFloat(devpro, n[i].name)->setFormat(n[i].format);
+                getEltFloat(devpro, n[i].name)->setValue(n[i].value, i == n.count() - 1);
             }
             break;
         }
@@ -173,8 +173,8 @@ void IndiPanel::updateProperty (INDI::Property property)
             INDI::PropertySwitch s = property;
             for (unsigned int i = 0; i < s.count(); i++)
             {
-                if (s[i].s == 0) getValueBool(devpro, s[i].name)->setValue(false, i == s.count() - 1);
-                if (s[i].s == 1) getValueBool(devpro, s[i].name)->setValue(true, i == s.count() - 1);
+                if (s[i].s == 0) getEltBool(devpro, s[i].name)->setValue(false, i == s.count() - 1);
+                if (s[i].s == 1) getEltBool(devpro, s[i].name)->setValue(true, i == s.count() - 1);
             }
             break;
         }
@@ -183,7 +183,7 @@ void IndiPanel::updateProperty (INDI::Property property)
             INDI::PropertyText t = property;
             for (unsigned int i = 0; i < t.count(); i++)
             {
-                getValueString(devpro, t[i].name)->setValue(t[i].text, i == t.count() - 1);
+                getEltString(devpro, t[i].name)->setValue(t[i].text, i == t.count() - 1);
             }
             break;
         }
@@ -192,7 +192,7 @@ void IndiPanel::updateProperty (INDI::Property property)
             INDI::PropertyLight l = property;
             for (unsigned int i = 0; i < l.count(); i++)
             {
-                getValueLight(devpro, l[i].name)->setValue(OST::IntToState(l[i].getState()), true);
+                getEltLight(devpro, l[i].name)->setValue(OST::IntToState(l[i].getState()), true);
             }
             break;
         }
@@ -258,16 +258,16 @@ void IndiPanel::OnMyExternalEvent(const QString &eventType, const QString  &even
                     sendError ("OnMyExternalEvent - property " + keyprop + ", element " + keyelt + " does not exist (indipanel)");
                     return;
                 }
-                if (getStore()[keyprop]->getValue(keyelt)->getType() == "string")
+                if (getStore()[keyprop]->getElt(keyelt)->getType() == "string")
                 {
                     sendModNewText(devcat, prop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toString());
                 }
-                if (getStore()[keyprop]->getValue(keyelt)->getType() == "int"
-                        || getStore()[keyprop]->getValue(keyelt)->getType() == "float")
+                if (getStore()[keyprop]->getElt(keyelt)->getType() == "int"
+                        || getStore()[keyprop]->getElt(keyelt)->getType() == "float")
                 {
                     sendModNewNumber(devcat, prop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toFloat());
                 }
-                if (getStore()[keyprop]->getValue(keyelt)->getType() == "bool")
+                if (getStore()[keyprop]->getElt(keyelt)->getType() == "bool")
                 {
                     keyelt.toStdString();
                     if ( eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toBool()) sendModNewSwitch(devcat, prop,

@@ -112,6 +112,11 @@ void WShandler::processTextMessage(QString message)
     {
         emit externalEvent(obj["evt"].toString(), obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
     }
+    if ((obj["evt"].toString() == "Fproppreicon1") || (obj["evt"].toString() == "Fproppreicon2")
+            || (obj["evt"].toString() == "Fpropposticon1") || (obj["evt"].toString() == "Fpropposticon2"))
+    {
+        emit externalEvent(obj["evt"].toString(), obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+    }
 
 
 }
@@ -258,6 +263,13 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
                 if (prop["elements"].toMap()[key].toMap().contains("dynlabel"))
                 {
                     element["dynlabel"] = prop["elements"].toMap()[key].toMap()["dynlabel"];
+                }
+                if (prop["elements"].toMap()[key].toMap().contains("type"))
+                {
+                    if (prop["elements"].toMap()[key].toMap()["type"] == "img")
+                    {
+                        element = prop["elements"].toMap()[key].toMap();
+                    }
                 }
                 elements[key] = element;
             }

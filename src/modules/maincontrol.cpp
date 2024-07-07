@@ -14,6 +14,7 @@ Maincontrol::Maincontrol(QString name, QString label, QString profile, QVariantM
     setClassName(metaObject()->className());
 
     loadOstPropertiesFromFile(":maincontrol.json");
+    getProperty("moduleInfo")->setElt("moduleLabel", "Main control");
     setOstElementValue("moduleInfo", "moduleLabel", "Main control", false);
     setOstElementValue("moduleInfo", "moduleDescription", "Maincontrol module - this one should always be there", false);
     setOstElementValue("moduleInfo", "moduleVersion", 0.1, false);
@@ -78,18 +79,22 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                 {
 
                     QString val = pEventData[keyprop].toMap()["elements"].toMap()["name"].toMap()["value"].toString();
-                    getValueString("loadconf", "name")->setValue(val, true);
-                    getValueString("saveconf", "name")->setValue(val, true);
+                    getEltString("loadconf", "name")->setValue(val, true);
+                    getEltString("saveconf", "name")->setValue(val, true);
                 }
                 if (keyelt == "kill" && keyprop == "killall")
                 {
                     emit mainCtlEvent("killall", QString(), QString(), QVariantMap());
                 }
-                if (keyprop == "indidrivers" && pEventType == "Fposticon")
+                if (keyprop == "indidrivers" && keyelt == "search" && pEventType == "Fposticon")
                 {
-                    emit mainCtlEvent("startindidriver", QString(), keyelt, QVariantMap());
+                    this->searchDriver();
                 }
-                if (keyprop == "indidrivers" && pEventType == "Fpreicon")
+                if (keyprop == "indidrivers" && keyelt == "driver" && pEventType == "Fposticon")
+                {
+                    emit mainCtlEvent("startindidriver", QString(), getString("indidrivers", "driver"), QVariantMap());
+                }
+                if (keyprop == "indidrivers" && keyelt == "driver" && pEventType == "Fpreicon")
                 {
                     emit mainCtlEvent("stopindidriver", QString(), keyelt, QVariantMap());
                 }
@@ -114,10 +119,10 @@ void Maincontrol::setConfigurations(void)
         return;
     }
 
-    getValueString("loadconf", "name")->lovClear();
+    getEltString("loadconf", "name")->lovClear();
     for(QVariantMap::const_iterator iter = confs.begin(); iter != confs.end(); ++iter)
     {
-        getValueString("loadconf", "name")->lovAdd(iter.key(), iter.key());
+        getEltString("loadconf", "name")->lovAdd(iter.key(), iter.key());
     }
     sendMessage("Available configurations refreshed");
 }
@@ -148,12 +153,12 @@ void Maincontrol::setAvailableModuleLibs(const QVariantMap libs)
     {
         QVariantMap info = libs[key].toMap()["elements"].toMap();
         QString lab = info["moduleDescription"].toMap()["value"].toString();
-        OST::ValueString* dyntext = new OST::ValueString(lab, "", "");
+        OST::ElementString* dyntext = new OST::ElementString(lab, "", "");
         dyntext->setValue("My " + key, false);
         dyntext->setAutoUpdate(true);
         dyntext->setDirectEdit(true);
         dyntext->setPostIcon("forward");
-        dynprop->addValue(key, dyntext);
+        dynprop->addElt(key, dyntext);
 
     }
     createProperty("load", dynprop);
@@ -178,7 +183,9 @@ void Maincontrol::setModuleData(const QString  &pName, const QString  &pLabel, c
     {
         if( l[i].toString() == pName)
         {
-            getValueString("modules", "profile")->getGrid()[i] = pProfile;
+            //getEltString("modules", "profile")->getGrid()[i] = pProfile;
+            getEltString("modules", "profile")->setValue(pProfile, true);
+            getProperty("modules")->getGrid()[i]["profile"]->updateValue();
         }
     }
 
@@ -195,22 +202,50 @@ void Maincontrol::deldModuleData(const QString  &pName)
     }
 
 }
-void Maincontrol::addIndiServerProperties(const QStringList  pDrivers)
+void Maincontrol::searchDriver(void)
 {
-    qDebug() << pDrivers;
-    OST::PropertyMulti *dynprop = new OST::PropertyMulti("indidrivers", "Available indi drivers", OST::Permission::ReadOnly,
-            "Indi server",
-            "", "", false, false);
-    foreach(QString key, pDrivers)
-    {
-        OST::ValueString* dyntext = new OST::ValueString(key, "", "");
-        dyntext->setValue("", false);
-        dyntext->setAutoUpdate(true);
-        dyntext->setDirectEdit(true);
-        dyntext->setPreIcon("stop");
-        dyntext->setPostIcon("play_arrow");
-        dynprop->addValue(key, dyntext);
+    getProperty("indidrivers")->clearGrid();
+    QString srch = getString("indidrivers", "search");
 
+    foreach(QString key, mIndiDriverList)
+    {
+        if (key.contains(srch))
+        {
+            getEltString("indidrivers", "driver")->setValue(key, false);
+            getProperty("indidrivers")->push();
+
+        }
     }
-    createProperty("indidrivers", dynprop);
+}
+void Maincontrol::setIndiDriverList(const QStringList pDrivers)
+{
+    mIndiDriverList = pDrivers;
+    OST::PropertyMulti *dynprop2 = new OST::PropertyMulti("indidrivers", "Available indi drivers", OST::Permission::ReadWrite,
+            "Indi server",
+            "", "1", false, true);
+    OST::ElementString* dyntext = new OST::ElementString("Search", "", "");
+    dyntext->setValue("*", false);
+    dyntext->setAutoUpdate(true);
+    dyntext->setDirectEdit(true);
+    dyntext->setPostIcon("play_arrow");
+
+    dynprop2->setHasGrid(true);
+    dynprop2->setShowGrid(true);
+    dynprop2->setShowElts(true);
+    OST::ElementString* dyntext2 = new OST::ElementString("Indi driver", "", "");
+    dyntext2->setValue("", false);
+    dyntext2->setAutoUpdate(true);
+    dyntext2->setDirectEdit(true);
+    dyntext2->setPreIcon("stop");
+    dyntext2->setPostIcon("play_arrow");
+    dynprop2->addElt("driver", dyntext2);
+    dynprop2->addElt("search", dyntext);
+
+    foreach(QString key, mIndiDriverList)
+    {
+        dyntext2->setValue(key, false);
+        dynprop2->push();
+    }
+    createProperty("indidrivers", dynprop2);
+
 }

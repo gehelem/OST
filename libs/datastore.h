@@ -7,8 +7,9 @@
 #include <propertyupdate.h>
 #include <propertyfactory.h>
 #include <lovfactory.h>
-#include <valueupdate.h>
-#include <valuejsondumper.h>
+#include <elementset.h>
+#include <elementupdate.h>
+#include <elementjsondumper.h>
 #include <lovjsondumper.h>
 
 /** @class Datastore
@@ -34,14 +35,16 @@ class Datastore : public Baseroot
         ~Datastore();
     protected:
         OST::PropertyMulti* getProperty(QString pProperty);
-        OST::ValueString* getValueString(QString pProperty, QString pElement);
-        OST::ValueInt* getValueInt(QString pProperty, QString pElement);
-        OST::ValueFloat* getValueFloat(QString pProperty, QString pElement);
-        OST::ValueBool* getValueBool(QString pProperty, QString pElement);
-        OST::ValueLight* getValueLight(QString pProperty, QString pElement);
-        OST::ValueImg* getValueImg(QString pProperty, QString pElement);
-        OST::ValueVideo* getValueVideo(QString pProperty, QString pElement);
-        OST::ValuePrg* getValuePrg(QString pProperty, QString pElement);
+        OST::ElementBase* getEltBase(QString pProperty, QString pElement);
+        OST::ElementString* getEltString(QString pProperty, QString pElement);
+        OST::ElementInt* getEltInt(QString pProperty, QString pElement);
+        OST::ElementFloat* getEltFloat(QString pProperty, QString pElement);
+        OST::ElementBool* getEltBool(QString pProperty, QString pElement);
+        OST::ElementLight* getEltLight(QString pProperty, QString pElement);
+        OST::ElementImg* getEltImg(QString pProperty, QString pElement);
+        OST::ElementVideo* getEltVideo(QString pProperty, QString pElement);
+        OST::ElementPrg* getEltPrg(QString pProperty, QString pElement);
+        OST::ElementMessage* getEltMsg(QString pProperty, QString pElement);
 
         QString getString(QString pProperty, QString pElement);
         QString getString(QString pProperty, QString pElement, long line);
@@ -91,7 +94,8 @@ class Datastore : public Baseroot
             OST::PropertyJsonDumper d;
             mStore[pPropertyName]->accept(&d);
             OnModuleEvent("cp", QString(), pPropertyName, d.getResult().toVariantMap());
-            connect(mStore[pPropertyName], &OST::PropertyMulti::valueChanged, this, &Datastore::onValueChanged);
+            connect(mStore[pPropertyName], &OST::PropertyMulti::valueSet, this, &Datastore::onValueSet);
+            connect(mStore[pPropertyName], &OST::PropertyMulti::eltChanged, this, &Datastore::onEltChanged);
             connect(mStore[pPropertyName], &OST::PropertyMulti::propertyEvent, this, &Datastore::onPropertyEvent);
             connect(mStore[pPropertyName], &OST::PropertyMulti::sendMessage, this, &Datastore::onPropertyMessage);
             return true;
@@ -131,7 +135,8 @@ class Datastore : public Baseroot
         QJsonObject getGlobalLovsDump(void);
 
     private slots:
-        void onValueChanged(void);
+        void onEltChanged(void);
+        void onValueSet(void);
         void onPropertyEvent(QString event, QString key, OST::PropertyBase* prop);
         void onPropertyMessage(OST::MsgLevel l, QString m);
         void onLovChanged(void);
