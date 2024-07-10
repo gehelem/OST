@@ -241,6 +241,10 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
         {
             values["status"] = prop["status"];
         }
+        if (prop.contains("enabled"))
+        {
+            values["enabled"] = prop["enabled"];
+        }
         if (prop.contains("elements"))
         {
             QVariantMap elements;
