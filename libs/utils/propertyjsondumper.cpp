@@ -23,6 +23,7 @@ QJsonObject PropertyJsonDumper::dumpPropertyCommons(PropertyBase *pProperty)
     json["preicon2"] = pProperty->getPreIcon2();
     json["posticon1"] = pProperty->getPostIcon1();
     json["posticon2"] = pProperty->getPostIcon2();
+    json["enabled"] = pProperty->isEnabled();
 
     return json;
 

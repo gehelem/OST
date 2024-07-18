@@ -197,6 +197,11 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
                 sendWarning(" Fsetproperty - property " + keyprop + " not found");
                 return;
             }
+            if (!getStore()[keyprop]->isEnabled() )
+            {
+                sendWarning(" Fsetproperty - property " + keyprop + " is disabled - can't update");
+                return;
+            }
             foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
             {
                 if (!getStore()[keyprop]->getElts()->contains(keyelt) )
@@ -212,7 +217,7 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
     {
         foreach(const QString &keyprop, pEventData.keys())
         {
-            if (getStore()[keyprop]->autoUpDown())
+            if (getStore()[keyprop]->autoUpDown() && getStore()[keyprop]->isEnabled() )
             {
                 int l1 = pEventData[keyprop].toMap()["line"].toInt();
                 int l2 = l1 + 1;
@@ -224,7 +229,7 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
     {
         foreach(const QString &keyprop, pEventData.keys())
         {
-            if (getStore()[keyprop]->autoUpDown())
+            if (getStore()[keyprop]->autoUpDown() && getStore()[keyprop]->isEnabled())
             {
                 int l1 = pEventData[keyprop].toMap()["line"].toInt();
                 int l2 = l1 - 1;
@@ -236,7 +241,7 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
     {
         foreach(const QString &keyprop, pEventData.keys())
         {
-            if (getStore()[keyprop]->autoSelect())
+            if (getStore()[keyprop]->autoSelect() && getStore()[keyprop]->isEnabled())
             {
                 double line = pEventData[keyprop].toMap()["line"].toDouble();
                 getStore()[keyprop]->fetchLine(line);
@@ -252,7 +257,7 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
         {
             foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
             {
-                if (getStore()[keyprop]->getElt(keyelt)->autoUpdate() )
+                if (getStore()[keyprop]->getElt(keyelt)->autoUpdate() && getStore()[keyprop]->isEnabled() )
                 {
                     QVariant v = pEventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
                     if (getEltBase(keyprop, keyelt)->getType() == "int")
