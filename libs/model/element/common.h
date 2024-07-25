@@ -47,6 +47,20 @@ inline SwitchsRule IntToRule(int val )
     qDebug() << "Cant convert " << val << " to OST::SwitchsRule (0-2) - defaults to any";
     return Any;
 }
+typedef enum
+{
+    SliderNone = 0,
+    SliderOnly,
+    SliderAndValue
+} SliderRule;
+inline SliderRule IntToSlider(int val )
+{
+    if (val == 0) return SliderNone;
+    if (val == 1) return SliderOnly;
+    if (val == 2) return SliderAndValue;
+    qDebug() << "Cant convert " << val << " to OST::SliderRule (0-2) - defaults to SliderNone";
+    return SliderNone;
+}
 
 typedef enum
 {

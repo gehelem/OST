@@ -23,6 +23,7 @@ QJsonObject PropertyJsonDumper::dumpPropertyCommons(PropertyBase *pProperty)
     json["preicon2"] = pProperty->getPreIcon2();
     json["posticon1"] = pProperty->getPostIcon1();
     json["posticon2"] = pProperty->getPostIcon2();
+    json["enabled"] = pProperty->isEnabled();
 
     return json;
 
@@ -55,7 +56,7 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
         json["gridheaders"] = QJsonArray::fromStringList(pProperty->getGridHeaders());
     }
 
-    if ((pProperty->hasGrid()) && (pProperty->getGrid().count() > 0))
+    if (pProperty->hasGrid())
     {
         QJsonArray grid;
         for(int i = 0; i < pProperty->getGrid().count(); i++)
