@@ -39,7 +39,7 @@ PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVaria
     {
         pProperty->setShowElts(pData["showElts"].toBool());
     }
-    if (pData.contains("arrayLimit"))
+    if (pData.contains("gridLimit"))
     {
         pProperty->setGridLimit(pData["gridLimit"].toInt());
     }
