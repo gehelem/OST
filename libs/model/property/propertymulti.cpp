@@ -214,6 +214,8 @@ void PropertyMulti::push()
         wGridLine[elt] = ValueFactory::createValue(mElts[elt]);
     }
     mGrid.append(wGridLine);
+    if (mGridLimit > 0 && mGrid.size() > this->mGridLimit) mGrid.removeFirst();
+
     emit propertyEvent("ap", key(), this);
 
 }

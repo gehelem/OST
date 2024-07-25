@@ -44,6 +44,12 @@ class ElementTemplateNumeric : public ElementTemplate<T>
         ~ElementTemplateNumeric<T>() {}
         bool setValue(const T &value, const bool &emitEvent)
         {
+            bool r = setValue(value);
+            if (r && emitEvent) emit ElementBase::valueSet(this);
+            return r;
+        }
+        bool setValue(const T &value)
+        {
             if (mUseMinMax)
             {
                 if (value < mMin)
@@ -60,7 +66,6 @@ class ElementTemplateNumeric : public ElementTemplate<T>
                 }
             }
             ElementTemplate<T>::mValue = value;
-            if (emitEvent) emit ElementBase::valueSet(this);
             return true;
         }
         T min()
@@ -145,8 +150,14 @@ class ElementTemplateNotNumeric : public ElementTemplate<T>
         ~ElementTemplateNotNumeric<T>() {}
         bool setValue(const T &value, const bool &emitEvent)
         {
+            bool r = setValue(value);
+            if (r && emitEvent) emit ElementBase::valueSet(this);
+            return r;
+        }
+
+        bool setValue(const T &value)
+        {
             ElementTemplate<T>::mValue = value;
-            if (emitEvent) emit ElementBase::valueSet(this);
             return true;
         }
 

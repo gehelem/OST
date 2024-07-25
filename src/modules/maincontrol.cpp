@@ -15,9 +15,9 @@ Maincontrol::Maincontrol(QString name, QString label, QString profile, QVariantM
 
     loadOstPropertiesFromFile(":maincontrol.json");
     getProperty("moduleInfo")->setElt("moduleLabel", "Main control");
-    setOstElementValue("moduleInfo", "moduleLabel", "Main control", false);
-    setOstElementValue("moduleInfo", "moduleDescription", "Maincontrol module - this one should always be there", false);
-    setOstElementValue("moduleInfo", "moduleVersion", 0.1, false);
+    getEltString("moduleInfo", "moduleLabel")->setValue("Main control");
+    getEltString("moduleInfo", "moduleDescription")->setValue("Maincontrol module - this one should always be there");
+    getEltString("moduleInfo", "moduleVersion")->setValue("0.1");
     deleteOstProperty("saveprofile");
     deleteOstProperty("loadprofile");
     deleteOstProperty("moduleactions");
@@ -167,10 +167,12 @@ void Maincontrol::setAvailableModuleLibs(const QVariantMap libs)
 void Maincontrol::addModuleData(const QString  &pName, const QString  &pLabel, const QString  &pType,
                                 const QString  &pProfile)
 {
-    setOstElementValue("modules", "name", pName, false);
-    setOstElementValue("modules", "label", pLabel, false);
-    setOstElementValue("modules", "type", pType, false);
-    setOstElementValue("modules", "profile", pProfile, false);
+    getEltString("modules", "name")->setValue(pName);
+    getEltString("modules", "label")->setValue(pLabel);
+    getEltString("modules", "type")->setValue(pType);
+    getEltString("modules", "profile")->setValue(pProfile);
+
+
     getStore()["modules"]->push();
 }
 void Maincontrol::setModuleData(const QString  &pName, const QString  &pLabel, const QString  &pType,

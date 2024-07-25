@@ -120,8 +120,9 @@ class Datastore : public Baseroot
                                   bool mEmitEvent);
         bool createOstElementBool(const QString &pPropertyName, const QString &pElementName, const QString &pElementLabel,
                                   bool mEmitEvent);
-        bool setOstElementValue(const QString &pPropertyName, const QString &pElementName, const QVariant &pElementValue,
-                                bool mEmitEvent);
+        Q_DECL_DEPRECATED bool setOstElementValue(const QString &pPropertyName, const QString &pElementName,
+                const QVariant &pElementValue,
+                bool mEmitEvent);
         QVariantList getOstElementGrid(const QString &pPropertyName, const QString &pElementName);
 
         void loadOstPropertiesFromFile(const QString &pFileName);
