@@ -151,10 +151,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ab43d22da58aef04621e4406eafb019de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef6e05aff8694390fc8c343ca9572245"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#aef6e05aff8694390fc8c343ca9572245">newLine</a> (const QVariantMap &amp;pValues)</td></tr>
 <tr class="separator:aef6e05aff8694390fc8c343ca9572245"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5783058f7cf2cd01bfdb0f93f9bbee28"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#a5783058f7cf2cd01bfdb0f93f9bbee28">deleteLine</a> (const int i)</td></tr>
-<tr class="separator:a5783058f7cf2cd01bfdb0f93f9bbee28"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d7669db10cb538c5616b5edbdb574d4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#a9d7669db10cb538c5616b5edbdb574d4">updateLine</a> (const int i, const QVariantMap &amp;pValues)</td></tr>
-<tr class="separator:a9d7669db10cb538c5616b5edbdb574d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa9acc9768eeec368ffd5c16fe330e1a1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#aa9acc9768eeec368ffd5c16fe330e1a1">updateLine</a> (const int i, const QVariantMap &amp;pValues)</td></tr>
+<tr class="separator:aa9acc9768eeec368ffd5c16fe330e1a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5f20fe1672b0bb4f9ae2ab76c425355"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#ad5f20fe1672b0bb4f9ae2ab76c425355">deleteLine</a> (const int i)</td></tr>
+<tr class="separator:ad5f20fe1672b0bb4f9ae2ab76c425355"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a412a71ae8b0c9ea0daa659c049ca8f5f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#a412a71ae8b0c9ea0daa659c049ca8f5f">updateLine</a> (const int i)</td></tr>
+<tr class="separator:a412a71ae8b0c9ea0daa659c049ca8f5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aae6d70da2a31c9341203710cc5de0d6b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#aae6d70da2a31c9341203710cc5de0d6b">clearGrid</a> ()</td></tr>
 <tr class="separator:aae6d70da2a31c9341203710cc5de0d6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afe5a577c23e3a48727d5a9224d648a28"><td class="memItemLeft" align="right" valign="top">QList&lt; QString &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html#afe5a577c23e3a48727d5a9224d648a28">getGridHeaders</a> ()</td></tr>
@@ -503,14 +505,14 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a5783058f7cf2cd01bfdb0f93f9bbee28"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5783058f7cf2cd01bfdb0f93f9bbee28">&#9670;&nbsp;</a></span>deleteLine()</h2>
+<a id="ad5f20fe1672b0bb4f9ae2ab76c425355"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad5f20fe1672b0bb4f9ae2ab76c425355">&#9670;&nbsp;</a></span>deleteLine()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void OST::PropertyMulti::deleteLine </td>
+          <td class="memname">bool OST::PropertyMulti::deleteLine </td>
           <td>(</td>
           <td class="paramtype">const int&#160;</td>
           <td class="paramname"><em>i</em></td><td>)</td>
@@ -1922,14 +1924,32 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a9d7669db10cb538c5616b5edbdb574d4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9d7669db10cb538c5616b5edbdb574d4">&#9670;&nbsp;</a></span>updateLine()</h2>
+<a id="a412a71ae8b0c9ea0daa659c049ca8f5f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a412a71ae8b0c9ea0daa659c049ca8f5f">&#9670;&nbsp;</a></span>updateLine() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void OST::PropertyMulti::updateLine </td>
+          <td class="memname">bool OST::PropertyMulti::updateLine </td>
+          <td>(</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>i</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa9acc9768eeec368ffd5c16fe330e1a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa9acc9768eeec368ffd5c16fe330e1a1">&#9670;&nbsp;</a></span>updateLine() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool OST::PropertyMulti::updateLine </td>
           <td>(</td>
           <td class="paramtype">const int&#160;</td>
           <td class="paramname"><em>i</em>, </td>

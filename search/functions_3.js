@@ -36,7 +36,7 @@ var searchData=
   ['deldmoduledata_1119',['deldModuleData',['../classMaincontrol.html#a7cc3cd6a0926599be125b77c7931fbd7',1,'Maincontrol']]],
   ['deleteelt_1120',['deleteElt',['../classOST_1_1PropertyMulti.html#abf71b7a45a7cccb42fe2d7c4054fae3d',1,'OST::PropertyMulti']]],
   ['deleteimagebuffer_1121',['deleteImageBuffer',['../classfileio.html#a31885f6ef52efbba195523203f80895b',1,'fileio']]],
-  ['deleteline_1122',['deleteLine',['../classOST_1_1PropertyMulti.html#a5783058f7cf2cd01bfdb0f93f9bbee28',1,'OST::PropertyMulti']]],
+  ['deleteline_1122',['deleteLine',['../classOST_1_1PropertyMulti.html#ad5f20fe1672b0bb4f9ae2ab76c425355',1,'OST::PropertyMulti']]],
   ['deleteostproperty_1123',['deleteOstProperty',['../classDatastore.html#a4f69a9d2704c3bb09597312ce5891bfc',1,'Datastore']]],
   ['deltaangle_1124',['deltaAngle',['../classdms.html#a528aac05d82c3fecb1ef9984b0093f60',1,'dms']]],
   ['disable_1125',['disable',['../classOST_1_1PropertyBase.html#adcb5c7d54c7b612ea0eca94b7c601c2b',1,'OST::PropertyBase']]],
