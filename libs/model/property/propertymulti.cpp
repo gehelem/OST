@@ -264,36 +264,13 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
     emit propertyEvent("ap", key(), this);
 
 }
-void PropertyMulti::deleteLine(const int i)
+bool PropertyMulti::updateLine(const int i, const QVariantMap &pValues)
 {
     if (!this->hasGrid())
     {
-        sendError("PropertyMulti::Push - no array/grid defined");
-        return;
+        sendError("PropertyMulti::updateLine - no array/grid defined");
+        return false;
     }
-
-    foreach(const QString &elt, mElts.keys())
-    {
-        ElementUpdate d;
-        QString action = "deleteline";
-        QVariantMap m;
-        m["i"] = i;
-        mElts[elt]->accept(&d, action, m);
-    }
-
-    mGrid.removeAt(i);
-
-    emit propertyEvent("ap", key(), this);
-
-}
-void PropertyMulti::updateLine(const int i, const QVariantMap &pValues)
-{
-    if (!this->hasGrid())
-    {
-        sendError("PropertyMulti::Push - no array/grid defined");
-        return;
-    }
-
     /* Check if data is valid and contains every value */
     foreach(const QString &elt, mElts.keys())
     {
@@ -302,22 +279,22 @@ void PropertyMulti::updateLine(const int i, const QVariantMap &pValues)
             if (!pValues.contains(elt))
             {
                 sendError("PropertyMulti::updateLine incomplete values, " + elt + " missing");
-                return;
+                return false;
             }
         }
     }
-    foreach(const QString &elt, mElts.keys())
-    {
-        if (mElts[elt]->getType() == "int" || mElts[elt]->getType() == "float" || mElts[elt]->getType() == "string")
-        {
-            ElementUpdate d;
-            QString action = "updateline";
-            QVariantMap m;
-            m["val"] = pValues[elt];
-            m["i"] = i;
-            mElts[elt]->accept(&d, action, m);
-        }
-    }
+    //foreach(const QString &elt, mElts.keys())
+    //{
+    //    if (mElts[elt]->getType() == "int" || mElts[elt]->getType() == "float" || mElts[elt]->getType() == "string")
+    //    {
+    //        ElementUpdate d;
+    //        QString action = "updateline";
+    //        QVariantMap m;
+    //        m["val"] = pValues[elt];
+    //        m["i"] = i;
+    //        mElts[elt]->accept(&d, action, m);
+    //    }
+    //}
     foreach(const QString &elt, mElts.keys())
     {
         setElt(elt, pValues[elt]);
@@ -329,8 +306,21 @@ void PropertyMulti::updateLine(const int i, const QVariantMap &pValues)
     }
 
     emit propertyEvent("ap", key(), this);
+    return true;
 
 }
+bool PropertyMulti::deleteLine(const int i)
+{
+    if (!this->hasGrid())
+    {
+        sendError("PropertyMulti::Push - no array/grid defined");
+        return false;
+    }
+    mGrid.removeAt(i);
+    emit propertyEvent("ap", key(), this);
+    return true;
+}
+
 void PropertyMulti::clearGrid()
 {
     if (!this->hasGrid())
@@ -446,7 +436,21 @@ bool PropertyMulti::fetchLine(int l)
     {
         mGrid.at(l)[e]->updateElement(true);
     }
-
+    emit propertyEvent("ap", key(), this);
+    return true;
+}
+bool PropertyMulti::updateLine(const int i)
+{
+    if ((i >= mGrid.size()))
+    {
+        sendWarning("Can't update line" + QString::number(i)  + " >= " + QString::number(mGrid.size()));
+        return false;
+    }
+    foreach(const QString &e, mGrid.at(i).keys())
+    {
+        mGrid.at(i)[e]->updateValue();
+    }
+    emit propertyEvent("ap", key(), this);
     return true;
 }
 bool PropertyMulti::autoUpDown(void)
