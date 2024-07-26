@@ -31,8 +31,9 @@ class PropertyMulti: public PropertyBase
         void deleteElt(QString key);
         void push();
         void newLine(const QVariantMap &pValues);
-        void deleteLine(const int i);
-        void updateLine(const int i, const QVariantMap &pValues);
+        bool updateLine(const int i, const QVariantMap &pValues);
+        bool deleteLine(const int i);
+        bool updateLine(const int i);
         void clearGrid();
         QList<QString> getGridHeaders();
         QList<QMap<QString, ValueBase*>> getGrid();
