@@ -163,10 +163,12 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                     }
                     if (keyelt == "shoot")
                     {
+
                         if (getEltBool(keyprop, keyelt)->setValue(false, false))
                         {
                             getProperty(keyprop)->setState(OST::Busy);
                             _camera = getString("devices", "camera");
+                            double d = getPixelSize(_camera);
                             if (_camera == "CCD Simulator")
                             {
                                 sendModNewNumber(_camera, "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );

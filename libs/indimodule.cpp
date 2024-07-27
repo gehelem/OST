@@ -835,6 +835,7 @@ bool IndiModule::defineMeAsSequencer()
 }
 bool IndiModule::defineMeAsImager()
 {
+    giveMeAnOptic();
     if (!getStore().contains("image"))
     {
         OST::PropertyMulti* dynprop = new OST::PropertyMulti("image", "Image", OST::Permission::WriteOnly, "Control",
@@ -902,6 +903,7 @@ bool IndiModule::defineMeAsNavigator()
 {
     defineMeAsImager();
 
+
     OST::PropertyMulti* pm  = getProperty("actions");
     pm->setRule(OST::SwitchsRule::AtMostOne);
     OST::ElementBool* b = new  OST::ElementBool("Abort navigator", "", "");
@@ -926,6 +928,33 @@ bool IndiModule::defineMeAsNavigator()
     return true;
 
 }
+double IndiModule::getPixelSize(const QString &deviceName)
+{
+    INDI::BaseDevice dp = getDevice(deviceName.toStdString().c_str());
+    if (!dp.isValid())
+    {
+        sendError("getPixelSize - device " + deviceName + " not found. Aborting.");
+        return 0;
+    }
+    if (!dp.isConnected())
+    {
+        sendWarning("getPixelSize - " + deviceName + " not connected, trying to connect");
+        if (!connectDevice(deviceName)) return 0;
+    }
+    INDI::PropertyNumber prop = dp.getNumber("CCD_INFO");
+    return prop.findWidgetByName("CCD_PIXEL_SIZE")->getValue();
+
+}
+double IndiModule::getSampling()
+{
+    if (!isImager())
+    {
+        sendWarning("getSampling - module is not defined as an imager - defaults to 1");
+        return 1;
+    }
+    return 206 * getPixelSize(getString("devices", "camera")) / getFloat("optic", "fl");
+}
+
 bool IndiModule::giveMeADevice(QString name, QString label, INDI::BaseDevice::DRIVER_INTERFACE interface)
 {
     OST::PropertyMulti* pm = getProperty("devices");
@@ -964,3 +993,30 @@ bool IndiModule::giveMeADevice(QString name, QString label, INDI::BaseDevice::DR
     return true;
 
 }
+bool IndiModule::giveMeAnOptic()
+{
+    if (getStore().contains("optic")) return false;
+
+    OST::PropertyMulti* pm = new OST::PropertyMulti("optic", "Optic", OST::ReadWrite, "Parameters", "", 0, true, false);
+    createProperty("optic", pm);
+    OST::ElementFloat* f = new  OST::ElementFloat("Focal length", "1", "");
+    f->setDirectEdit(true);
+    f->setMinMax(1, 4000);
+    f->setAutoUpdate(true);
+    pm->addElt("fl", f);
+    OST::ElementFloat* d = new  OST::ElementFloat("Diameter", "2", "");
+    d->setDirectEdit(true);
+    d->setMinMax(1, 4000);
+    d->setAutoUpdate(true);
+    pm->addElt("diam", d);
+    OST::ElementFloat* r = new  OST::ElementFloat("Reducer", "3", "");
+    r->setDirectEdit(true);
+    r->setMinMax(0.1, 10);
+    r->setAutoUpdate(true);
+    r->setValue(1);
+    pm->addElt("red", r);
+    mIsOptic = true;
+    return true;
+
+}
+
