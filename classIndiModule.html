@@ -268,6 +268,10 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:a535dc11fd05c679ca21c051344224bbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abae7cc3840dbb35639fe27db2e1c7d4b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIndiModule.html#abae7cc3840dbb35639fe27db2e1c7d4b">defineMeAsNavigator</a> ()</td></tr>
 <tr class="separator:abae7cc3840dbb35639fe27db2e1c7d4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a957b6e1040d94837ce910d68cc812293"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIndiModule.html#a957b6e1040d94837ce910d68cc812293">getPixelSize</a> (const QString &amp;deviceName)</td></tr>
+<tr class="separator:a957b6e1040d94837ce910d68cc812293"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50f0a71a2413ac9237289282e04c3cca"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIndiModule.html#a50f0a71a2413ac9237289282e04c3cca">getSampling</a> ()</td></tr>
+<tr class="separator:a50f0a71a2413ac9237289282e04c3cca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aacdb9d4bcb1d8776df8f1b8262227095"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIndiModule.html#aacdb9d4bcb1d8776df8f1b8262227095">isFocuser</a> ()</td></tr>
 <tr class="separator:aacdb9d4bcb1d8776df8f1b8262227095"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3a1ca4c0867bb4e99b3429ab0aea72ad"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIndiModule.html#a3a1ca4c0867bb4e99b3429ab0aea72ad">isGuider</a> ()</td></tr>
@@ -278,8 +282,12 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:a1be1d0b7c7534c2e9989aa4f51352216"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c5e202a7ad530b624617f1a588e0f73"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIndiModule.html#a2c5e202a7ad530b624617f1a588e0f73">isNavigator</a> ()</td></tr>
 <tr class="separator:a2c5e202a7ad530b624617f1a588e0f73"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8a5328643c7fe1b23d8a1e952c801787"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIndiModule.html#a8a5328643c7fe1b23d8a1e952c801787">isOptic</a> ()</td></tr>
+<tr class="separator:a8a5328643c7fe1b23d8a1e952c801787"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2a95298af46deff52417bc1bb869ee05"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIndiModule.html#a2a95298af46deff52417bc1bb869ee05">giveMeADevice</a> (QString name, QString label, INDI::BaseDevice::DRIVER_INTERFACE interface)</td></tr>
 <tr class="separator:a2a95298af46deff52417bc1bb869ee05"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a86367c175d731d0e1e91a1585b38d702"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIndiModule.html#a86367c175d731d0e1e91a1585b38d702">giveMeAnOptic</a> ()</td></tr>
+<tr class="separator:a86367c175d731d0e1e91a1585b38d702"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad820c182de6bdf9b6179c155b1a4a50b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBasemodule.html#ad820c182de6bdf9b6179c155b1a4a50b">setModuleDescription</a> (QString description)</td></tr>
 <tr class="separator:ad820c182de6bdf9b6179c155b1a4a50b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8d523684d76e2756f82aec13f940fb44"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBasemodule.html#a8d523684d76e2756f82aec13f940fb44">setModuleVersion</a> (QString version)</td></tr>
@@ -2508,6 +2516,32 @@ Protected Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a957b6e1040d94837ce910d68cc812293"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a957b6e1040d94837ce910d68cc812293">&#9670;&nbsp;</a></span>getPixelSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double IndiModule::getPixelSize </td>
+          <td>(</td>
+          <td class="paramtype">const QString &amp;&#160;</td>
+          <td class="paramname"><em>deviceName</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a7191792040ded4f452a0f49293e69859"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7191792040ded4f452a0f49293e69859">&#9670;&nbsp;</a></span>getProfile()</h2>
 
@@ -2580,6 +2614,31 @@ Protected Member Functions</h2></td></tr>
   </td>
   <td class="mlabels-right">
 <span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a50f0a71a2413ac9237289282e04c3cca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a50f0a71a2413ac9237289282e04c3cca">&#9670;&nbsp;</a></span>getSampling()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double IndiModule::getSampling </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -2784,6 +2843,31 @@ Protected Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a86367c175d731d0e1e91a1585b38d702"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a86367c175d731d0e1e91a1585b38d702">&#9670;&nbsp;</a></span>giveMeAnOptic()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IndiModule::giveMeAnOptic </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="aacdb9d4bcb1d8776df8f1b8262227095"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aacdb9d4bcb1d8776df8f1b8262227095">&#9670;&nbsp;</a></span>isFocuser()</h2>
 
@@ -2870,6 +2954,31 @@ Protected Member Functions</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">bool IndiModule::isNavigator </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8a5328643c7fe1b23d8a1e952c801787"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8a5328643c7fe1b23d8a1e952c801787">&#9670;&nbsp;</a></span>isOptic()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IndiModule::isOptic </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
