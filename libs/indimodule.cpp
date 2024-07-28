@@ -952,7 +952,7 @@ double IndiModule::getSampling()
         sendWarning("getSampling - module is not defined as an imager - defaults to 1");
         return 1;
     }
-    return 206 * getPixelSize(getString("devices", "camera")) / getFloat("optic", "fl");
+    return 206 * getPixelSize(getString("devices", "camera")) / (getFloat("optic", "fl") * getFloat("optic", "red"));
 }
 
 bool IndiModule::giveMeADevice(QString name, QString label, INDI::BaseDevice::DRIVER_INTERFACE interface)
