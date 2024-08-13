@@ -180,7 +180,11 @@ void Maincontrol::setModuleData(const QString  &pName, const QString  &pLabel, c
 {
     Q_UNUSED(pLabel);
     Q_UNUSED(pType);
-    QVariantList l = getOstElementGrid("modules", "name");
+    QVariantList l;
+    for (int i = 0; i < getProperty("modules")->getGrid().size(); i++)
+    {
+        l.append(getString("modules", "name", i));
+    }
     for (int i = 0; i < l.count(); i++)
     {
         if( l[i].toString() == pName)
@@ -194,7 +198,11 @@ void Maincontrol::setModuleData(const QString  &pName, const QString  &pLabel, c
 }
 void Maincontrol::deldModuleData(const QString  &pName)
 {
-    QVariantList l = getOstElementGrid("modules", "name");
+    QVariantList l;
+    for (int i = 0; i < getProperty("modules")->getGrid().size(); i++)
+    {
+        l.append(getString("modules", "name", i));
+    }
     for (int i = 0; i < l.count(); i++)
     {
         if( l[i].toString() == pName)
