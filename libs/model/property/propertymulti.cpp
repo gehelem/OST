@@ -86,6 +86,7 @@ int PropertyMulti::getGridLimit()
 }
 void PropertyMulti::setGridLimit(int limit)
 {
+    clearGrid();
     if (limit > 0) mGridLimit = limit;
 }
 bool PropertyMulti::hasGraph()
