@@ -154,7 +154,9 @@ void Maincontrol::setAvailableModuleLibs(const QVariantMap libs)
         QVariantMap info = libs[key].toMap()["elements"].toMap();
         QString lab = info["moduleDescription"].toMap()["value"].toString();
         OST::ElementString* dyntext = new OST::ElementString(lab, "", "");
-        dyntext->setValue("My " + key, false);
+        QString ss = key.replace("libost", "");
+        ss.replace(0, 1, ss.at(0).toUpper());
+        dyntext->setValue(ss, false);
         dyntext->setAutoUpdate(true);
         dyntext->setDirectEdit(true);
         dyntext->setPostIcon("forward");
