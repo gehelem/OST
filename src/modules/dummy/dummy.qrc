@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>dummy.json</file>
+        <file>dummy.fr.md</file>
     </qresource>
 </RCC>

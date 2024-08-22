@@ -47,6 +47,9 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/utils)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/model)
@@ -286,9 +289,9 @@ target_link_libraries(ostindimodule
 #qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
 add_library(ostdummy SHARED
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy.qrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy/dummy.qrc
 )
 
 target_link_libraries(ostdummy PRIVATE
@@ -306,9 +309,9 @@ target_compile_definitions(ostdummy PRIVATE dummy_LIBRARY)
 #qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
 add_library(ostmaincontrol SHARED
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol.qrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.qrc
 )
 target_link_libraries(ostmaincontrol PRIVATE
     ostindimodule
@@ -322,8 +325,8 @@ target_compile_definitions(ostmaincontrol PRIVATE maincontrol_LIBRARY)
 
 # Indipanel module
 add_library(ostindipanel SHARED
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel/indipanel.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel/indipanel.cpp
 )
 target_link_libraries(ostindipanel PRIVATE
     ostindimodule
