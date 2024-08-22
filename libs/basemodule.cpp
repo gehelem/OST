@@ -415,6 +415,21 @@ QString Basemodule::getClassName()
 {
     return mClassName;
 }
+QString Basemodule::getHelpContent(QString language)
+{
+    QString f = ":" + getClassName() + "." + language + ".md";
+    if (!QFile::exists(f))
+    {
+        return "No help content available";
+    }
+    QFile file;
+    file.setFileName(f);
+    file.open(QIODevice::ReadOnly | QIODevice::Text);
+    QString content = QTextStream(&file).readAll();
+    file.close();
+    return content;
+}
+
 QVariantMap Basemodule::getModuleInfo(void)
 {
     return getPropertiesDump()["moduleInfo"].toVariant().toMap();
@@ -437,8 +452,10 @@ void Basemodule::sendDump(void)
     dump["messages"] = getMessages();
     dump["warnings"] = getWarnings();
     dump["errors"] = getErrors();
+    dump["help"] = getHelpContent("fr");
     //getQtProperties();
     emit moduleEvent("moduledump", getModuleName(), "*", dump);
+
 }
 void Basemodule::OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                const QVariantMap &eventData)

@@ -31,6 +31,7 @@ class Basemodule : public DBManager
         QString getModuleDescription();
         QString getModuleVersion();
         QString getClassName();
+        QString getHelpContent(QString language);
         /**
          * @brief setClassName is a method to set inherited modules classname (ideally metaObject()->className())
          * @param pClassName is the classname
