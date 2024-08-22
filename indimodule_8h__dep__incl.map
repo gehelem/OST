@@ -1,8 +1,8 @@
 <map id="libs/indimodule.h" name="libs/indimodule.h">
-<area shape="rect" id="node1" title=" " alt="" coords="235,5,369,32"/>
-<area shape="rect" id="node2" href="$dummy_8h.html" title=" " alt="" coords="19,80,185,107"/>
-<area shape="rect" id="node4" href="$indipanel_8h.html" title=" " alt="" coords="213,80,391,107"/>
-<area shape="rect" id="node6" href="$indimodule_8cpp.html" title=" " alt="" coords="415,80,565,107"/>
-<area shape="rect" id="node3" href="$dummy_8cpp.html" title=" " alt="" coords="5,155,185,181"/>
-<area shape="rect" id="node5" href="$indipanel_8cpp.html" title=" " alt="" coords="210,155,402,181"/>
+<area shape="rect" id="node1" title=" " alt="" coords="277,5,411,32"/>
+<area shape="rect" id="node2" href="$dummy_8h.html" title=" " alt="" coords="17,87,236,114"/>
+<area shape="rect" id="node4" href="$indipanel_8h.html" title=" " alt="" coords="261,80,427,121"/>
+<area shape="rect" id="node6" href="$indimodule_8cpp.html" title=" " alt="" coords="451,87,600,114"/>
+<area shape="rect" id="node3" href="$dummy_8cpp.html" title=" " alt="" coords="5,177,240,203"/>
+<area shape="rect" id="node5" href="$indipanel_8cpp.html" title=" " alt="" coords="264,169,429,211"/>
 </map>

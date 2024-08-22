@@ -1,8 +1,8 @@
 <map id="libs/dms.h" name="libs/dms.h">
-<area shape="rect" id="node1" title=" " alt="" coords="74,5,163,32"/>
-<area shape="rect" id="node2" href="$dms_8cpp.html" title=" " alt="" coords="5,80,109,107"/>
-<area shape="rect" id="node3" href="$fileio_8h.html" title=" " alt="" coords="133,80,227,107"/>
-<area shape="rect" id="node4" href="$dummy_8h.html" title=" " alt="" coords="17,155,183,181"/>
-<area shape="rect" id="node6" href="$fileio_8cpp.html" title=" " alt="" coords="207,155,315,181"/>
-<area shape="rect" id="node5" href="$dummy_8cpp.html" title=" " alt="" coords="10,229,190,256"/>
+<area shape="rect" id="node1" title=" " alt="" coords="110,5,199,32"/>
+<area shape="rect" id="node2" href="$dms_8cpp.html" title=" " alt="" coords="41,80,145,107"/>
+<area shape="rect" id="node3" href="$fileio_8h.html" title=" " alt="" coords="169,80,263,107"/>
+<area shape="rect" id="node4" href="$dummy_8h.html" title=" " alt="" coords="13,155,232,181"/>
+<area shape="rect" id="node6" href="$fileio_8cpp.html" title=" " alt="" coords="257,155,365,181"/>
+<area shape="rect" id="node5" href="$dummy_8cpp.html" title=" " alt="" coords="5,229,240,256"/>
 </map>

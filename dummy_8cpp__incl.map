@@ -1,5 +1,5 @@
-<map id="src/modules/dummy.cpp" name="src/modules/dummy.cpp">
-<area shape="rect" id="node1" title=" " alt="" coords="2025,5,2205,32"/>
+<map id="src/modules/dummy/dummy.cpp" name="src/modules/dummy/dummy.cpp">
+<area shape="rect" id="node1" title=" " alt="" coords="1998,5,2233,32"/>
 <area shape="rect" id="node2" href="$dummy_8h.html" title=" " alt="" coords="2074,80,2157,107"/>
 <area shape="rect" id="node3" href="$indimodule_8h.html" title=" " alt="" coords="2062,155,2169,181"/>
 <area shape="rect" id="node30" href="$fileio_8h.html" title=" " alt="" coords="1138,453,1205,480"/>
