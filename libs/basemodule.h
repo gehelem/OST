@@ -13,49 +13,24 @@ class Basemodule : public DBManager
     public:
         Basemodule(QString name, QString label, QString profile, QVariantMap params);
         ~Basemodule();
-        void setWebroot(QString webroot)
-        {
-            mWebroot = webroot;
-        }
+        void setWebroot(QString webroot);
         void setProfile(QVariantMap profiledata);
         void setProfile(const QString &pProfileName);
         void setProfiles();
         void sendDump(void);
         void killMe(void);
-
-        /**
+        /*
          * @brief gets webroot directory
          * @return webroot directory full path directory full
          */
-        QString getWebroot(void)
-        {
-            return mWebroot;
-        }
+        QString getWebroot(void);
         QVariantMap getModuleInfo(void);
-        QVariantMap getAvailableModuleLibs(void)
-        {
-            return mAvailableModuleLibs;
-        }
-        QString getModuleName()
-        {
-            return mModuleName;
-        }
-        QString getModuleLabel()
-        {
-            return mModuleLabel;
-        }
-        QString getModuleDescription()
-        {
-            return mModuleDescription;
-        }
-        QString getModuleVersion()
-        {
-            return mModuleVersion;
-        }
-        QString getClassName()
-        {
-            return mClassName;
-        }
+        QVariantMap getAvailableModuleLibs(void);
+        QString getModuleName();
+        QString getModuleLabel();
+        QString getModuleDescription();
+        QString getModuleVersion();
+        QString getClassName();
         /**
          * @brief setClassName is a method to set inherited modules classname (ideally metaObject()->className())
          * @param pClassName is the classname
@@ -65,45 +40,13 @@ class Basemodule : public DBManager
          * @return A boolean that reports whether it was successful, true means success.
          * False means ClassName has already been set, and sends a corresponding message
          */
-
         bool setClassName(const QString &pClassName);
 
-    public slots:
-        void OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
-                             const QVariantMap &pEventData);
-        virtual void OnMyExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
-                                       const QVariantMap &pEventData)
-        {
-            Q_UNUSED(pEventType);
-            Q_UNUSED(pEventModule);
-            Q_UNUSED(pEventKey);
-            Q_UNUSED(pEventData);
-        }
-        virtual void OnDispatchToIndiExternalEvent(const QString &pEventType, const QString  &pEventModule,
-                const QString  &pEventKey,
-                const QVariantMap &pEventData)
-        {
-            Q_UNUSED(pEventType);
-            Q_UNUSED(pEventModule);
-            Q_UNUSED(pEventKey);
-            Q_UNUSED(pEventData);
-        }
 
     protected:
 
-        void setModuleDescription(QString description)
-        {
-            mModuleDescription = description;
-            setOstElementValue("moduleInfo", "moduleDescription", description, true);
-        }
-        void setModuleVersion(QString version)
-        {
-            mModuleVersion = version;
-            setOstElementValue("moduleInfo", "moduleVersion", version, true);
-
-        }
-
-        /* OST helpers */
+        void setModuleDescription(QString description);
+        void setModuleVersion(QString version);
 
     private:
 
@@ -115,16 +58,39 @@ class Basemodule : public DBManager
         QString mModuleDescription;
         QString mModuleVersion;
         QString mClassName = "";
+        OST::ElementString* mModuleDesc;
+        OST::ModuleStatus mStatus;
+
 
         void OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                            const QVariantMap &eventData) override;
 
-
-
     signals:
+        void moduleStatusRequest(void);
+        void moduleStatusAnswer(const QString module, OST::ModuleStatus);
         void moduleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                          const QVariantMap &eventData);
         void loadOtherModule(QString &lib, QString &name, QString &label, QString &profile);
+    public slots:
+        void OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+                             const QVariantMap &pEventData);
+        virtual void OnMyExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+                                       const QVariantMap &pEventData)
+        {
+            Q_UNUSED(pEventType) Q_UNUSED(pEventModule) Q_UNUSED(pEventKey) Q_UNUSED(pEventData)
+        }
+        virtual void OnDispatchToIndiExternalEvent(const QString &pEventType, const QString  &pEventModule,
+                const QString  &pEventKey,
+                const QVariantMap &pEventData)
+        {
+            Q_UNUSED(pEventType) Q_UNUSED(pEventModule) Q_UNUSED(pEventKey) Q_UNUSED(pEventData)
+        }
+        void OnModuleStatusRequest();
+        virtual void OnModuleStatusAnswer(const QString module, OST::ModuleStatus status)
+        {
+            Q_UNUSED(module) Q_UNUSED(status)
+        };
+
 }
 ;
 #endif

@@ -52,6 +52,8 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         bool defineMeAsSequencer();
         bool defineMeAsImager();
         bool defineMeAsNavigator();
+        double getPixelSize(const QString &deviceName);
+        double getSampling();
         bool isFocuser()
         {
             return mIsFocuser;
@@ -72,7 +74,12 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         {
             return mIsNavigator;
         }
+        bool isOptic()
+        {
+            return mIsOptic;
+        }
         bool giveMeADevice(QString name, QString label, INDI::BaseDevice::DRIVER_INTERFACE interface);
+        bool giveMeAnOptic();
 
     private:
         void OnDispatchToIndiExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
@@ -82,6 +89,11 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         bool mIsSequencer = false;
         bool mIsImager = false;
         bool mIsNavigator = false;
+        bool mIsOptic = false;
+        double mFocal;
+        double mDiam;
+        double mRed;
+        double mAperture;
     signals:
         void askedFrameReset(QString devicename);
         void requestCaptureDone();

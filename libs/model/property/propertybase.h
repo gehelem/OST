@@ -2,7 +2,7 @@
 #define PROPERTYBASE_h_
 
 #include <propertyvisitor.h>
-#include <valuebase.h>
+#include <elementbase.h>
 
 namespace  OST
 {
@@ -11,10 +11,15 @@ class PropertyVisitor;
 
 typedef enum
 {
-    ReadOnly = 0,
-    WriteOnly,
-    ReadWrite
+    ReadOnly = 0,/*!< property is read only for frontend */
+    WriteOnly,/*!< property is write only for frontend  */
+    ReadWrite/*!< property is read write for frontend  */
 } Permission;
+
+/** @brief Converts integer to property permission
+ *
+ *  Defaults or error returns ReadOnly
+ */
 inline Permission IntToPermission(int val )
 {
     if (val == 0) return ReadOnly;
@@ -23,6 +28,12 @@ inline Permission IntToPermission(int val )
     qDebug() << "Cant convert " << val << " to OST::Permission (0-2) - defaults to readonly";
     return ReadOnly;
 }
+
+
+/** @class OST::PropertyBase
+ *  @brief Class to define common property
+ *
+ */
 class PropertyBase: public QObject
 {
 
@@ -34,101 +45,94 @@ class PropertyBase: public QObject
 
         PropertyBase(const QString &key, const QString &label, const Permission &permission, const QString &level1,
                      const QString &level2,
-                     const QString &order, const bool &hasProfile, const bool &hasArray
+                     const QString &order, const bool &hasProfile
                     );
         ~PropertyBase();
 
-        QString key()
-        {
-            return mKey;
-        }
-        QString label()
-        {
-            return mLabel;
-        }
-        Permission permission()
-        {
-            return mPermission;
-        }
-        QString level1()
-        {
-            return mLevel1;
-        }
-        QString level2()
-        {
-            return mLevel2;
-        }
-        QString order()
-        {
-            return mOrder;
-        }
-        bool hasProfile()
-        {
-            return mHasProfile;
-        }
-        State state()
-        {
-            return mState;
-        }
+        /**
+         * @brief Internal property's name
+         * @return returns property's name
+         *
+         * This value cannot be modified after instanciation
+         * \hidecallgraph
+         */
+        QString key();
+        /**
+         * @brief Property's label
+         * @return value of label
+         *
+         * This value cannot be modified after instanciation
+         * \hidecallgraph
+         */
+        QString label();
+        /**
+         * @brief Property's permission
+         * @return value of permission
+         *
+         * This value cannot be modified after instanciation
+         * \hidecallgraph
+         */
+        Permission permission();
+        /**
+         * @brief Property's hierachy first level
+         * @return value of level 1
+         *
+         * This value cannot be modified after instanciation
+         *
+         * It equivalent to indi "device" level
+         * \hidecallgraph
+         */
+        QString level1();
+        /**
+         * @brief Property's hierachy second level
+         * @return value of level 2
+         *
+         * This value cannot be modified after instanciation
+         *
+         * It equivalent to indi "group" level
+         * \hidecallgraph
+         */
+        QString level2();
+        /**
+         * @brief Property's display order
+         * @return order value
+         *
+         * This value cannot be modified after instanciation.
+         *
+         * This value sets display order value within same level1 / level2 values
+         * \hidecallgraph
+         */
+        QString order();
+        /**
+         * @brief should values be saved in profiles ?
+         * @return true = yes, false = no
+         *
+         * This value cannot be modified after instanciation.
+         * \hidecallgraph
+         */
+        bool hasProfile();
+        State state();
         void setState(State state);
-        bool isEnabled()
-        {
-            return mIsEnabled;
-        }
-        void enable(void)
-        {
-            mIsEnabled = true;
-        }
-        void disable(void)
-        {
-            mIsEnabled = false;
-        }
-        bool hasArray()
-        {
-            return mHasArray;
-        }
-        void setHasArray(bool hasarray);
-        bool getShowArray()
-        {
-            return mShowArray;
-        }
-        void setShowArray(bool b)
-        {
-            mShowArray = b;
-        }
-        int getArrayLimit()
-        {
-            return mArrayLimit;
-        }
-        void setArrayLimit(int limit)
-        {
-            if (limit > 0) mArrayLimit = limit;
-        }
-        bool getBadge()
-        {
-            return mBadge;
-        }
-        void setBadge(bool b)
-        {
-            mBadge = b;
-            emit propertyEvent("ap", key(), this);
-        }
-        void sendInfo(QString m)
-        {
-            emit sendMessage(Info, key() + "-" + m);
-        }
-        void sendWarning(QString m)
-        {
-            emit sendMessage(Warn, key() + "-" + m);
-        }
-        void sendError(QString m)
-        {
-            emit sendMessage(Err, key() + "-" + m);
-        }
+        bool isEnabled();
+        void enable(void);
+        void disable(void);
+        bool getBadge();
+        void setBadge(bool b);
+        void sendInfo(QString m);
+        void sendWarning(QString m);
+        void sendError(QString m);
+        QString getPreIcon1(void);
+        void setPreIcon1(QString s);
+        QString getPreIcon2(void);
+        void setPreIcon2(QString s);
+        QString getPostIcon1(void);
+        void setPostIcon1(QString s);
+        QString getPostIcon2(void);
+        void setPostIcon2(QString s);
     signals:
         void stateChanged(OST::State);
-        void propertyCreated(void);
-        void valueChanged(OST::PropertyBase*);
+        void eltChanged(OST::PropertyBase*);
+        void valueSet(OST::PropertyBase*);
         void propertyEvent(QString, QString, OST::PropertyBase*);
         void sendMessage(MsgLevel, QString);
 
@@ -142,10 +146,11 @@ class PropertyBase: public QObject
         bool mHasProfile = false;
         State mState = State::Idle;
         bool mIsEnabled = true;
-        bool mHasArray = false;
-        bool mShowArray = true;
-        int mArrayLimit = 0;
         bool mBadge = false;
+        QString mPreIcon1 = "";
+        QString mPreIcon2 = "";
+        QString mPostIcon1 = "";
+        QString mPostIcon2 = "";
 
 
 

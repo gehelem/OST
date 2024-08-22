@@ -23,6 +23,7 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 #find_package(Qt5Core)
 find_package(Git)
 find_package(CFITSIO REQUIRED)
+
 find_package(INDI REQUIRED)
 #find_package(INDI COMPONENTS clientqt5 REQUIRED)
 find_package(ZLIB REQUIRED)
@@ -50,7 +51,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/utils)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/model)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues)
 include_directories(${INDI_INCLUDE_DIR})
 include_directories(${CFITSIO_INCLUDE_DIR})
@@ -119,30 +120,28 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.qrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/common.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuebase.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuebase.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuesingle.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueint.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueint.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuestring.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuestring.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuefloat.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuefloat.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuebool.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuebool.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuelight.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuelight.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueimg.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueimg.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuevideo.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuevideo.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuemessage.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuemessage.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuegraph.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuegraph.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueprg.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueprg.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/common.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementbase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementbase.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementtemplate.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementint.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementint.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementstring.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementstring.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementfloat.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementfloat.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementbool.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementbool.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementlight.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementlight.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementimg.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementimg.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementvideo.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementvideo.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementmessage.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementmessage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementprg.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementprg.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovbase.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovsingle.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovstring.h
@@ -154,28 +153,32 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertymulti.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertymulti.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyvisitor.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuevisitor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementvisitor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovvisitor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyfactory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyfactory.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuefactory.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuefactory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementfactory.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementfactory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovfactory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovfactory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertytextdumper.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertytextdumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyjsondumper.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyjsondumper.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovjsondumper.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovjsondumper.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuetextdumper.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuetextdumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuejsondumper.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuejsondumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovjsondumper.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovjsondumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementtextdumper.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementtextdumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementjsondumper.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementjsondumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyupdate.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyupdate.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valueupdate.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valueupdate.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementupdate.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementupdate.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementset.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementset.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/fileio.cpp
@@ -200,19 +203,18 @@ set(BASE_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/bayer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/dms.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/nan.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/common.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuebase.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuesingle.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueint.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuestring.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuefloat.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuebool.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuelight.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueimg.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuevideo.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuemessage.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valuegraph.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/value/valueprg.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/common.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementbase.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementtemplate.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementint.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementstring.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementfloat.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementbool.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementlight.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementimg.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementvideo.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementmessage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementprg.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovbase.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovsingle.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovstring.h
@@ -222,18 +224,20 @@ set(BASE_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertybase.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertymulti.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyvisitor.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuevisitor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementvisitor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyfactory.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuefactory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementfactory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovfactory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovvisitor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertytextdumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyjsondumper.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovjsondumper.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuetextdumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuejsondumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovjsondumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementtextdumper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementjsondumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyupdate.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valueupdate.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementupdate.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementset.h
 )
 set_target_properties(ostbasemodule PROPERTIES PUBLIC_HEADER "${BASE_PUBLIC_HEADERS}")
 

@@ -40,6 +40,7 @@
     "indiserver": {
         "devcat": "Indi server",
         "group": "",
+        "order": "0",
         "permission": 0,
         "rule":0,
         "label": "Start and stop indiserver",
@@ -58,8 +59,10 @@
         "devcat": "Modules",
         "group": "",
         "permission": 0,
-        "grid":0,
         "rule":0,
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
         "label": "Loaded modules",
         "elements": {
             "name": {
