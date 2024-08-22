@@ -60,14 +60,6 @@
             }
         }
     },
-    "message": {
-        "devcat": "messages",
-        "type": "simple",
-        "group": "",
-        "permission": 0,
-        "label": "Message",
-        "elements": {}
-    },
     "loadprofile": {
         "type": "multi",
         "devcat": "Module",
