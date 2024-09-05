@@ -1,7 +1,7 @@
 #!/bin/bash
 sudo apt-get install software-properties-common
 sudo add-apt-repository --yes ppa:gehelem/ostserver-daily
-sudo add-apt-repository --yes ppa:mutlaqja/indinightly
+sudo add-apt-repository --yes ppa:mutlaqja/ppa
 sudo apt update
 sudo apt upgrade -y
 sudo apt install -y libindi1 libstellarsolver ostserver ostmodules nginx gsc pip
