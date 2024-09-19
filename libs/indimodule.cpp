@@ -382,7 +382,7 @@ bool IndiModule::requestCapture(const QString &deviceName, const double &exposur
         sendError("Capture - device " + deviceName + " not found. Aborting.");
         return false;
     }
-    if (!dp.isConnected())
+    if (dp == false)
     {
         sendWarning("Capture - " + deviceName + " not connected, trying to connect");
         if (!connectDevice(deviceName)) return false;
