@@ -116,7 +116,7 @@ bool IndiModule::connectIndi()
 {
     if (isServerConnected())
     {
-        sendWarning("Indi server already connected");
+        //sendWarning("Indi server already connected");
         newUniversalMessage("Indi server already connected");
         return true;
     }
