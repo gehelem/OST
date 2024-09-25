@@ -51,7 +51,7 @@ sudo chown -R $USER /var/www/html
 
 
 cd 
-sudo apt-get install pipenv
+sudo apt-get install -y pipenv
 mkdir indiweb
 cd indiweb
 pipenv --python=`which python3`
