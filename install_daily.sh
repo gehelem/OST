@@ -4,7 +4,7 @@ sudo add-apt-repository --yes ppa:gehelem/ostserver-daily
 sudo add-apt-repository --yes ppa:mutlaqja/ppa
 sudo apt update
 sudo apt upgrade -y
-sudo apt install -y libindi1 libstellarsolver ostserver ostmodules nginx gsc pip
+sudo apt install -y libindi1 libstellarsolver ostserver ostmodules nginx gsc pip indi-playerone indi-asi
 
 sudo mkdir /usr/share/astrometry
 sudo chmod 777 -R /usr/share/astrometry
