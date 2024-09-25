@@ -48,10 +48,34 @@ sudo wget https://github.com/gehelem/ost-front/releases/download/WorkInProgress/
 sudo tar -xvf html.tar.gz
 sudo chmod 777 /var/www/html
 
+
+
 cd 
-sudo pip install indiweb
-wget https://raw.githubusercontent.com/knro/indiwebmanager/master/indiwebmanager.service --no-check-certificate
-sed -i "s/User=pi/User="$USER"/g" indiwebmanager.service
+sudo apt-get install pipenv
+mkdir indiweb
+cd indiweb
+pipenv --python=`which python3`
+pipenv install bottle==0.12.25
+pipenv install indiweb
+pipenv install importlib_metadata
+
+cd
+echo [Unit]                                  >> indiwebmanager.service
+echo Description=INDI Web Manager >> indiwebmanager.service
+echo After=multi-user.target >> indiwebmanager.service
+echo  >> indiwebmanager.service
+echo [Service] >> indiwebmanager.service
+echo Type=idle >> indiwebmanager.service
+echo # MUST SET YOUR USERNAME HERE. >> indiwebmanager.service
+echo User=$USER >> indiwebmanager.service
+echo WorkingDirectory=/home/$USER/indiweb  >> indiwebmanager.service
+echo ExecStart=/usr/bin/pipenv run indi-web -v >> indiwebmanager.service
+echo Restart=always >> indiwebmanager.service
+echo RestartSec=5 >> indiwebmanager.service
+echo  >> indiwebmanager.service
+echo [Install] >> indiwebmanager.service
+echo WantedBy=multi-user.target >> indiwebmanager.service
+
 sudo cp indiwebmanager.service /etc/systemd/system/
 sudo chmod 644 /etc/systemd/system/indiwebmanager.service
 sudo systemctl daemon-reload
