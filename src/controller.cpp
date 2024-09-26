@@ -23,13 +23,14 @@
 
 
 Controller::Controller(const QString &webroot, const QString &dbpath,
-                       const QString &libpath, const QString &installfront, const QString &conf, const QString &indiserver)
+                       const QString &libpath, const QString &installfront, const QString &conf, const QString &indiserver, const QString &lng)
     :       _webroot(webroot),
             _dbpath(dbpath),
             _libpath(libpath),
             _installfront(installfront),
             _conf(conf),
-            _indiserver(indiserver)
+            _indiserver(indiserver),
+            _lng(lng)
 {
 
     startPublish();
@@ -130,6 +131,7 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     mod->dbInit(_dbpath, name);
     mod->setProfile(profile);
     mod->setProfiles();
+    mod->setLng(_lng);
     QVariantMap profs;
     dbmanager->getDbProfiles(mod->metaObject()->className(), profs);
     connect(mod, &Basemodule::moduleEvent, this, &Controller::OnModuleEvent);

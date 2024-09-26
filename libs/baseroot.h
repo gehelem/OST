@@ -37,6 +37,7 @@ class Baseroot : public QObject
             Q_UNUSED(pEventKey);
             Q_UNUSED(pEventData);
         };
+        void setLng(const QString &pLng);
     protected:
     private:
         QList<QVariantMap> mMessages;
@@ -45,7 +46,6 @@ class Baseroot : public QObject
         int mMessagesSize = 20;
         int mErrorsSize = 20;
         int mWarningsSize = 20;
-
 }
 ;
 #endif
