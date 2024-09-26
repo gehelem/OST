@@ -227,6 +227,7 @@ set(BASE_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovlight.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertybase.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertymulti.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/translate.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyvisitor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementvisitor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyfactory.h
@@ -258,7 +259,7 @@ target_link_libraries(ostbasemodule
 )
 
 # Translate utility
-add_library(osttranslate SHARED
+add_library(osttranslate STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/translate.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/translate.h
 )

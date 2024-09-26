@@ -6,14 +6,12 @@ Translate* translate_ = nullptr;
 
 Translate::Translate(void)
 {
-    QFile jsonFile("translations.json");
+    QFile jsonFile(":translations.json");
     if (jsonFile.open(QFile::ReadOnly))
     {
-        qDebug() << "***************************************************** Loading translation file";
         QJsonDocument d = QJsonDocument().fromJson(jsonFile.readAll());
         jsonFile.close();
         mTranslations = d.toVariant().toMap();
-        qDebug() << mTranslations;
     };
 };
 
@@ -25,11 +23,11 @@ QString Translate::translate(QString val)
         QVariantMap t;
         t["fr"] = "à traduire";
         t["en"] = "to be translated";
-        mTranslations[val] = t;
+        mPendingTranslations[val] = t;
 
         QFile jsonFile("translations_pending.json");
         jsonFile.open(QFile::WriteOnly);
-        jsonFile.write(QJsonDocument::fromVariant(mTranslations).toJson());
+        jsonFile.write(QJsonDocument::fromVariant(mPendingTranslations).toJson());
         jsonFile.close();
         return "[" + val + "]";
     }
@@ -51,6 +49,10 @@ Translate *Translate::GetInstance(void)
     return translate_;
 }
 
+void Translate:: setLanguage(QString lng)
+{
+    mLng = lng;
+}
 
 
 

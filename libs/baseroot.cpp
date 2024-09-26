@@ -103,5 +103,6 @@ void Baseroot::sendConsole(const QString &pMessage)
 }
 void Baseroot::setLng(const QString &pLng)
 {
-    //mTranslate->SetLanguage(pLng);
+    OST::Translate* t = OST::Translate::GetInstance();
+    t->setLanguage(pLng);
 }

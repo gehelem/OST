@@ -11,12 +11,13 @@ class Translate
         Translate(void);
     public:
         Translate(Translate &other) = delete;
-        void SetLanguage(QString lng);
+        void setLanguage(QString lng);
         void operator=(const Translate &) = delete;
         static Translate *GetInstance(void);
         QString translate(QString val);
     private:
         QVariantMap mTranslations;
+        QVariantMap mPendingTranslations;
         QString mLng = "fr";
 
 };

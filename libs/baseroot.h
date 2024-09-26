@@ -1,5 +1,6 @@
 #ifndef BASEROOT_h_
 #define BASEROOT_h_
+#include "translate.h"
 #include <QObject>
 #include <QList>
 #include <QVariant>
@@ -46,6 +47,7 @@ class Baseroot : public QObject
         int mMessagesSize = 20;
         int mErrorsSize = 20;
         int mWarningsSize = 20;
+
 }
 ;
 #endif
