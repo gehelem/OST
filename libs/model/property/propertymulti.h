@@ -2,24 +2,10 @@
 #define PROPERTYMULTI_h_
 
 #include <propertybase.h>
+#include <elementfactory.h>
+
 namespace  OST
 {
-
-typedef enum
-{
-    OneOfMany = 0,
-    AtMostOne,
-    Any
-} SwitchsRule;
-inline SwitchsRule IntToRule(int val )
-{
-    if (val == 0) return OneOfMany;
-    if (val == 1) return AtMostOne;
-    if (val == 2) return Any;
-    qDebug() << "Cant convert " << val << " to OST::SwitchsRule (0-2) - defaults to any";
-    return Any;
-}
-
 
 class PropertyMulti: public PropertyBase
 {
@@ -27,109 +13,68 @@ class PropertyMulti: public PropertyBase
         Q_OBJECT
 
     public:
-        void accept(PropertyVisitor *pVisitor) override
-        {
-            pVisitor->visit(this);
-        }
-        void accept(PropertyVisitor *pVisitor, QVariantMap &data) override
-        {
-            pVisitor->visit(this, data);
-        }
-
+        void accept(PropertyVisitor *pVisitor) override;
+        void accept(PropertyVisitor *pVisitor, QVariantMap &data) override;
 
         PropertyMulti(const QString &key, const QString &label, const Permission &permission, const QString &level1,
                       const QString &level2,
-                      const QString &order, const bool &hasProfile, const bool &hasArray
+                      const QString &order, const bool &hasProfile, const bool &hasGrid
                      );
         ~PropertyMulti();
-        [[nodiscard]] SwitchsRule rule() const
-        {
-            return mRule;
-        }
-        void setRule(SwitchsRule rule)
-        {
-            mRule = rule;
-        }
 
-        QMap<QString, OST::ValueBase*>* getValues()
-        {
-            return &mValues;
-        }
-        OST::ValueBase* getValue(QString pElement)
-        {
-            if (!mValues.contains(pElement))
-            {
-                qDebug() << label() << " - getValue - element " << pElement << " does not exists.";
-                return nullptr;
-            }
-            return mValues[pElement];
-        }
-        bool setValue(QString key, QVariant Value);
-        void addValue(QString key, ValueBase* pValue)
-        {
-            if (mValues.contains(key))
-            {
-                qDebug() << label() << " - addValue - element " << key << " already exists";
-                return;
-            }
-            //qDebug() << label() << " - addValue - element " << key << " OK " << pValue;
-            mValues[key] = pValue;
-            connect(mValues[key], &ValueBase::valueChanged, this, &PropertyMulti::OnValueChanged);
-            connect(mValues[key], &ValueBase::listChanged, this, &PropertyMulti::OnListChanged);
-            connect(mValues[key], &ValueBase::lovChanged, this, &PropertyMulti::OnLovChanged);
-            connect(mValues[key], &ValueBase::sendMessage, this, &PropertyMulti::OnMessage);
-        }
-        void deleteValue(QString key)
-        {
-            if (!mValues.contains(key))
-            {
-                qDebug() << label() << " - deleteValue - element " << key << " doesn't exist";
-                return;
-            }
-            mValues.remove(key);
-            emit propertyEvent("ap", key, this);
-
-        }
+        [[nodiscard]] SwitchsRule rule() const;
+        void setRule(SwitchsRule rule);
+        QMap<QString, ElementBase*>* getElts();
+        ElementBase* getElt(QString pElement);
+        bool setElt(QString key, QVariant val);
+        void addElt(QString key, ElementBase* pElt);
+        void deleteElt(QString key);
         void push();
         void newLine(const QVariantMap &pValues);
-        void deleteLine(const int i);
-        void updateLine(const int i, const QVariantMap &pValues);
+        bool updateLine(const int i, const QVariantMap &pValues);
+        bool deleteLine(const int i);
+        bool updateLine(const int i);
         void clearGrid();
-    public slots:
-        void OnValueChanged(ValueBase*)
-        {
-            emit valueChanged(this);
-        }
-        void OnListChanged(ValueBase*)
-        {
-            emit propertyEvent("ap", key(), this);
-        }
-        void OnLovChanged(ValueBase*)
-        {
-            emit propertyEvent("ap", key(), this);
-        }
-        void OnMessage(MsgLevel l, QString m)
-        {
-            switch (l)
-            {
-                case Info:
-                    sendInfo(this->key() + "-" + m);
-                    break;
-                case Warn:
-                    sendWarning(this->key() + "-" + m);
-                    break;
-                case Err:
-                    sendError(this->key() + "-" + m);
-                    break;
-                default:
-                    sendError(this->key() + "-" + m);
-                    break;
-            }
-        }
+        QList<QString> getGridHeaders();
+        QList<QMap<QString, ValueBase*>> getGrid();
+        bool getShowElts();
+        void setShowElts(bool b);
+        bool hasGrid();
+        void setHasGrid(bool b);
+        bool getShowGrid();
+        void setShowGrid(bool b);
+        int getGridLimit();
+        void setGridLimit(int limit);
+        bool hasGraph();
+        void setHasGraph(bool b);
+        GraphDefs getGraphDefs(void);
+        void setGraphDefs(GraphDefs defs);
+        bool swapLines(int l1, int l2);
+        bool fetchLine(int l1);
+        bool autoUpDown(void);
+        void setAutoUpDown(bool b);
+        bool autoSelect(void);
+        void setAutoSelect(bool b);
 
+
+    public slots:
+        void OnValueSet(ElementBase*);
+        void OnEltChanged(ElementBase*);
+        void OnListChanged(ElementBase*);
+        void OnLovChanged(ElementBase*);
+        void OnMessage(MsgLevel l, QString m);
     private:
+        bool mHasGrid = false;
+        bool mShowGrid = false;
+        bool mShowElts = true;
+        int mGridLimit = 0;
+        bool mHasGraph = false;
+        GraphDefs mGraphDefs;
         SwitchsRule mRule = SwitchsRule::Any;
-        QMap<QString, ValueBase*> mValues;
+        QMap<QString, ElementBase*> mElts;
+        QList<QMap<QString, ValueBase*>> mGrid;
+        bool mAutoUpDown = true;
+        bool mAutoSelect = true;
 
 
 };

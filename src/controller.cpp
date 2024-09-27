@@ -23,13 +23,14 @@
 
 
 Controller::Controller(const QString &webroot, const QString &dbpath,
-                       const QString &libpath, const QString &installfront, const QString &conf, const QString &indiserver)
+                       const QString &libpath, const QString &installfront, const QString &conf, const QString &indiserver, const QString &lng)
     :       _webroot(webroot),
             _dbpath(dbpath),
             _libpath(libpath),
             _installfront(installfront),
             _conf(conf),
-            _indiserver(indiserver)
+            _indiserver(indiserver),
+            _lng(lng)
 {
 
     startPublish();
@@ -52,6 +53,8 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath());
 
     checkModules();
+    checkIndiDrivers();
+
     pMainControl = new Maincontrol(QString("mainctl"), QString("Main control"), QString(), QVariantMap());
     connect(pMainControl, &Maincontrol::moduleEvent, this, &Controller::OnModuleEvent);
     connect(pMainControl, &Maincontrol::moduleEvent, wshandler, &WShandler::processModuleEvent);
@@ -64,18 +67,13 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     pMainControl->dbInit(_dbpath, "mainctl");
     pMainControl->OnExternalEvent("refreshConfigurations", "mainctl", QString(), QVariantMap());
     pMainControl->setAvailableModuleLibs(_availableModuleLibs);
-    //qDebug() << _availableModuleLibs;
+    pMainControl->setIndiDriverList(_availableIndiDrivers);
     pMainControl->sendDump();
-
-    //loadModule("maincontrol", "mainctl", "Maincontrol", "default");
-
 
     if (_installfront != "N")
     {
         this->installFront();
     }
-
-
 
     loadConf(_conf);
 
@@ -89,7 +87,6 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     {
         this->startIndi();
     }
-
 
 }
 
@@ -134,6 +131,7 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     mod->dbInit(_dbpath, name);
     mod->setProfile(profile);
     mod->setProfiles();
+    mod->setLng(_lng);
     QVariantMap profs;
     dbmanager->getDbProfiles(mod->metaObject()->className(), profs);
     connect(mod, &Basemodule::moduleEvent, this, &Controller::OnModuleEvent);
@@ -148,6 +146,10 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     {
         if (othermodule->getModuleName() != mod->getModuleName())
         {
+            connect(othermodule, &Basemodule::moduleStatusRequest, mod, &Basemodule::OnModuleStatusRequest);
+            connect(othermodule, &Basemodule::moduleStatusAnswer, mod, &Basemodule::OnModuleStatusAnswer);
+            connect(mod, &Basemodule::moduleStatusRequest, othermodule, &Basemodule::OnModuleStatusRequest);
+            connect(mod, &Basemodule::moduleStatusAnswer, othermodule, &Basemodule::OnModuleStatusAnswer);
             //connect(othermodule,&Basemodule::moduleEvent, mod,&Basemodule::OnExternalEvent);
             //connect(mod,&Basemodule::moduleEvent, othermodule,&Basemodule::OnExternalEvent);
         }
@@ -354,10 +356,8 @@ void Controller::checkIndiDrivers(void)
     _availableIndiDrivers = directory.entryList();
     foreach(QString dr, _availableIndiDrivers)
     {
-        sendMessage("indi driver found " + dr);
+        //sendMessage("indi driver found " + dr);
     }
-    pMainControl->addIndiServerProperties(_availableIndiDrivers);
-
 }
 void Controller::installFront(void)
 {
@@ -453,7 +453,8 @@ void Controller::startPublish()
 {
     zeroConf.clearServiceTxtRecords();
     zeroConf.addServiceTxtRecord("OstServer", "Observatoire Sans Tete");
-    zeroConf.startServicePublish(buildName().toUtf8(), "_ostserver_ws._tcp", "local", 11437);
+    //startServicePublish(const char *name, const char *type, const char *domain, quint16 port, quint32 interface)
+    zeroConf.startServicePublish(buildName().toUtf8(), "_ostserver_ws._tcp", "local", 9624);
 }
 
 QString Controller::buildName(void)
@@ -478,17 +479,26 @@ void Controller::startIndi(void)
     connect(_indiProcess, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this,
             &Controller::processFinished);
 
+
     if (_indiProcess->state() != 0)
     {
         qDebug() << "can't start process";
     }
     else
     {
-        QString program = "mkfifo";
+        QString program = "rm";
         QStringList arguments;
+        arguments << "-f";
         arguments << "/tmp/ostserverIndiFIFO" ;
         _indiProcess->start(program, arguments);
         _indiProcess->waitForFinished();
+
+        program = "mkfifo";
+        arguments.clear();
+        arguments << "/tmp/ostserverIndiFIFO" ;
+        _indiProcess->start(program, arguments);
+        _indiProcess->waitForFinished();
+
         program = "indiserver";
         arguments.clear();
         //arguments << "-v";
@@ -497,8 +507,6 @@ void Controller::startIndi(void)
         _indiProcess->start(program, arguments);
 
     }
-
-    this->checkIndiDrivers();
 
 }
 void Controller::stopIndi(void)

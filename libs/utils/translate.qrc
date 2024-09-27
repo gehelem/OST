@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>translations.json</file>
+    </qresource>
+</RCC>
