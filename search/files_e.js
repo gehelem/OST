@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['valuejsondumper_2ecpp_1059',['valuejsondumper.cpp',['../valuejsondumper_8cpp.html',1,'']]],
-  ['valuejsondumper_2eh_1060',['valuejsondumper.h',['../valuejsondumper_8h.html',1,'']]],
-  ['version_2ehh_1061',['version.hh',['../version_8hh.html',1,'']]]
+  ['translate_2ecpp_1069',['translate.cpp',['../translate_8cpp.html',1,'']]],
+  ['translate_2eh_1070',['translate.h',['../translate_8h.html',1,'']]]
 ];

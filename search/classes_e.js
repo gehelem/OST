@@ -1,28 +1,4 @@
 var searchData=
 [
-  ['valuebase_939',['ValueBase',['../classOST_1_1ValueBase.html',1,'OST']]],
-  ['valuebool_940',['ValueBool',['../classOST_1_1ValueBool.html',1,'OST']]],
-  ['valuefactory_941',['ValueFactory',['../classOST_1_1ValueFactory.html',1,'OST']]],
-  ['valuefloat_942',['ValueFloat',['../classOST_1_1ValueFloat.html',1,'OST']]],
-  ['valueimg_943',['ValueImg',['../classOST_1_1ValueImg.html',1,'OST']]],
-  ['valueint_944',['ValueInt',['../classOST_1_1ValueInt.html',1,'OST']]],
-  ['valuejsondumper_945',['ValueJsonDumper',['../classOST_1_1ValueJsonDumper.html',1,'OST']]],
-  ['valuelight_946',['ValueLight',['../classOST_1_1ValueLight.html',1,'OST']]],
-  ['valuemessage_947',['ValueMessage',['../classOST_1_1ValueMessage.html',1,'OST']]],
-  ['valueprg_948',['ValuePrg',['../classOST_1_1ValuePrg.html',1,'OST']]],
-  ['valuestring_949',['ValueString',['../classOST_1_1ValueString.html',1,'OST']]],
-  ['valuetemplate_950',['ValueTemplate',['../classOST_1_1ValueTemplate.html',1,'OST']]],
-  ['valuetemplate_3c_20bool_20_3e_951',['ValueTemplate&lt; bool &gt;',['../classOST_1_1ValueTemplate.html',1,'OST']]],
-  ['valuetemplate_3c_20double_20_3e_952',['ValueTemplate&lt; double &gt;',['../classOST_1_1ValueTemplate.html',1,'OST']]],
-  ['valuetemplate_3c_20imgdata_20_3e_953',['ValueTemplate&lt; ImgData &gt;',['../classOST_1_1ValueTemplate.html',1,'OST']]],
-  ['valuetemplate_3c_20int_20_3e_954',['ValueTemplate&lt; int &gt;',['../classOST_1_1ValueTemplate.html',1,'OST']]],
-  ['valuetemplate_3c_20msgdata_20_3e_955',['ValueTemplate&lt; MsgData &gt;',['../classOST_1_1ValueTemplate.html',1,'OST']]],
-  ['valuetemplate_3c_20prgdata_20_3e_956',['ValueTemplate&lt; PrgData &gt;',['../classOST_1_1ValueTemplate.html',1,'OST']]],
-  ['valuetemplate_3c_20qstring_20_3e_957',['ValueTemplate&lt; QString &gt;',['../classOST_1_1ValueTemplate.html',1,'OST']]],
-  ['valuetemplate_3c_20state_20_3e_958',['ValueTemplate&lt; State &gt;',['../classOST_1_1ValueTemplate.html',1,'OST']]],
-  ['valuetemplate_3c_20videodata_20_3e_959',['ValueTemplate&lt; VideoData &gt;',['../classOST_1_1ValueTemplate.html',1,'OST']]],
-  ['valuevideo_960',['ValueVideo',['../classOST_1_1ValueVideo.html',1,'OST']]],
-  ['valuevisitor_961',['ValueVisitor',['../classOST_1_1ValueVisitor.html',1,'OST']]],
-  ['version_962',['Version',['../structVersion.html',1,'']]],
-  ['videodata_963',['VideoData',['../structOST_1_1VideoData.html',1,'OST']]]
+  ['translate_948',['Translate',['../classOST_1_1Translate.html',1,'OST']]]
 ];

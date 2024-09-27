@@ -21,7 +21,7 @@ var searchData=
   ['connectdevice_45',['connectDevice',['../classIndiModule.html#a197bab26661380fdacce7b0f77ed857f',1,'IndiModule']]],
   ['connectindi_46',['connectIndi',['../classIndiModule.html#a9a60e3380c1d3dcbc6aa780160de3d4c',1,'IndiModule']]],
   ['connectinditimer_47',['connectIndiTimer',['../classIndiModule.html#a9fed57e5734d61d461238e2ce3aa5c68',1,'IndiModule']]],
-  ['controller_48',['Controller',['../classController.html#a151f2b2dd8768f74b0b07f3186ebd395',1,'Controller::Controller()'],['../classController.html',1,'Controller']]],
+  ['controller_48',['Controller',['../classController.html#a1780840c09d0be4885bde88f1c2e96bf',1,'Controller::Controller()'],['../classController.html',1,'Controller']]],
   ['controller_2ecpp_49',['controller.cpp',['../controller_8cpp.html',1,'']]],
   ['controller_2eh_50',['controller.h',['../controller_8h.html',1,'']]],
   ['controllerevent_51',['controllerEvent',['../classController.html#af1e9b9852dd4b91edb5af0781d924bd7',1,'Controller']]],

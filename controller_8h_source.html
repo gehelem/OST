@@ -87,8 +87,8 @@ $(function() {
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;{</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;        Q_OBJECT</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;        <a class="code" href="classController.html#a151f2b2dd8768f74b0b07f3186ebd395">Controller</a>(<span class="keyword">const</span> QString &amp;webroot, <span class="keyword">const</span> QString &amp;dbpath,</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;                   <span class="keyword">const</span> QString &amp;libpath, <span class="keyword">const</span> QString &amp;conf, <span class="keyword">const</span> QString &amp;installfront, <span class="keyword">const</span> QString &amp;indiserver);</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;        <a class="code" href="classController.html#a1780840c09d0be4885bde88f1c2e96bf">Controller</a>(<span class="keyword">const</span> QString &amp;webroot, <span class="keyword">const</span> QString &amp;dbpath,</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;                   <span class="keyword">const</span> QString &amp;libpath, <span class="keyword">const</span> QString &amp;conf, <span class="keyword">const</span> QString &amp;installfront, <span class="keyword">const</span> QString &amp;indiserver, <span class="keyword">const</span> QString &amp;lng);</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        <a class="code" href="classController.html#a8351d2a68600034af0dbd1834bb21374">~Controller</a>() <span class="keyword">override</span>;</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    signals:</div>
 <div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="classController.html#af1e9b9852dd4b91edb5af0781d924bd7">   29</a></span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classController.html#af1e9b9852dd4b91edb5af0781d924bd7">controllerEvent</a>(<span class="keyword">const</span> QString &amp;eventType, <span class="keyword">const</span> QString  &amp;eventModule, <span class="keyword">const</span> QString  &amp;eventKey,</div>
@@ -100,49 +100,50 @@ $(function() {
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;        QString _installfront;</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        QString _conf;</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        QString _indiserver;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        QVariantMap _availableModuleLibs;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;        QStringList _availableIndiDrivers;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        <a class="code" href="classWShandler.html">WShandler</a>   *wshandler;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        <a class="code" href="classDBManager.html">DBManager</a>   *dbmanager;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        <a class="code" href="classMaincontrol.html">Maincontrol</a> *pMainControl;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        QProcess    *_process;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        QProcess    *_indiProcess;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        QMap&lt;QString, QMap&lt;QString, QString&gt;&gt; mModulesMap;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        QZeroConf zeroConf;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        QString buildName(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        QString _lng;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;        QVariantMap _availableModuleLibs;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        QStringList _availableIndiDrivers;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        <a class="code" href="classWShandler.html">WShandler</a>   *wshandler;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        <a class="code" href="classDBManager.html">DBManager</a>   *dbmanager;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        <a class="code" href="classMaincontrol.html">Maincontrol</a> *pMainControl;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        QProcess    *_process;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        QProcess    *_indiProcess;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        QMap&lt;QString, QMap&lt;QString, QString&gt;&gt; mModulesMap;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        QZeroConf zeroConf;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        QString buildName(<span class="keywordtype">void</span>);</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        <span class="keywordtype">bool</span> loadModule(QString lib, QString name, QString label, QString profile);</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        <span class="keywordtype">void</span> loadConf(<span class="keyword">const</span> QString &amp;pConf);</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        <span class="keywordtype">void</span> saveConf(<span class="keyword">const</span> QString &amp;pConf);</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        <span class="keywordtype">void</span> checkModules(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        <span class="keywordtype">void</span> checkIndiDrivers(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        <span class="keywordtype">void</span> installFront(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        <span class="keywordtype">void</span> processOutput();</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        <span class="keywordtype">void</span> processError();</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        <span class="keywordtype">void</span> processIndiOutput();</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        <span class="keywordtype">void</span> processIndiError();</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        <span class="keywordtype">void</span> processFinished(<span class="keywordtype">int</span> exitCode, QProcess::ExitStatus exitStatus);</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        <span class="keywordtype">void</span> sendMessage(<span class="keyword">const</span> QString &amp;pMessage);</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        <span class="keywordtype">void</span> startPublish();</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        <span class="keywordtype">void</span> startIndi(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        <span class="keywordtype">void</span> stopIndi(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        <span class="keywordtype">void</span> startIndiDriver(<span class="keyword">const</span> QString &amp;pDriver);</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        <span class="keywordtype">void</span> stopIndiDriver(<span class="keyword">const</span> QString &amp;pDriver);</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keyword">private</span> slots:</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        <span class="keywordtype">void</span> OnModuleEvent  (<span class="keyword">const</span> QString &amp;pEventType, <span class="keyword">const</span> QString  &amp;pEventModule, <span class="keyword">const</span> QString  &amp;pEventKey,</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;                             <span class="keyword">const</span> QVariantMap &amp;pEventData);</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        <span class="keywordtype">void</span> OnExternalEvent(<span class="keyword">const</span> QString &amp;pEventType, <span class="keyword">const</span> QString  &amp;pEventModule, <span class="keyword">const</span> QString  &amp;pEventKey,</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;                             <span class="keyword">const</span> QVariantMap &amp;pEventData);</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        <span class="keywordtype">void</span> OnMainCtlEvent(<span class="keyword">const</span> QString &amp;pEventType, <span class="keyword">const</span> QString  &amp;pEventModule, <span class="keyword">const</span> QString  &amp;pEventKey,</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;                            <span class="keyword">const</span> QVariantMap &amp;pEventData);</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;};</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        <span class="keywordtype">bool</span> loadModule(QString lib, QString name, QString label, QString profile);</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        <span class="keywordtype">void</span> loadConf(<span class="keyword">const</span> QString &amp;pConf);</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        <span class="keywordtype">void</span> saveConf(<span class="keyword">const</span> QString &amp;pConf);</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        <span class="keywordtype">void</span> checkModules(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        <span class="keywordtype">void</span> checkIndiDrivers(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        <span class="keywordtype">void</span> installFront(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        <span class="keywordtype">void</span> processOutput();</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        <span class="keywordtype">void</span> processError();</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        <span class="keywordtype">void</span> processIndiOutput();</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        <span class="keywordtype">void</span> processIndiError();</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        <span class="keywordtype">void</span> processFinished(<span class="keywordtype">int</span> exitCode, QProcess::ExitStatus exitStatus);</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        <span class="keywordtype">void</span> sendMessage(<span class="keyword">const</span> QString &amp;pMessage);</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        <span class="keywordtype">void</span> startPublish();</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        <span class="keywordtype">void</span> startIndi(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        <span class="keywordtype">void</span> stopIndi(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        <span class="keywordtype">void</span> startIndiDriver(<span class="keyword">const</span> QString &amp;pDriver);</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        <span class="keywordtype">void</span> stopIndiDriver(<span class="keyword">const</span> QString &amp;pDriver);</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keyword">private</span> slots:</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <span class="keywordtype">void</span> OnModuleEvent  (<span class="keyword">const</span> QString &amp;pEventType, <span class="keyword">const</span> QString  &amp;pEventModule, <span class="keyword">const</span> QString  &amp;pEventKey,</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;                             <span class="keyword">const</span> QVariantMap &amp;pEventData);</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        <span class="keywordtype">void</span> OnExternalEvent(<span class="keyword">const</span> QString &amp;pEventType, <span class="keyword">const</span> QString  &amp;pEventModule, <span class="keyword">const</span> QString  &amp;pEventKey,</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;                             <span class="keyword">const</span> QVariantMap &amp;pEventData);</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        <span class="keywordtype">void</span> OnMainCtlEvent(<span class="keyword">const</span> QString &amp;pEventType, <span class="keyword">const</span> QString  &amp;pEventModule, <span class="keyword">const</span> QString  &amp;pEventKey,</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;                            <span class="keyword">const</span> QVariantMap &amp;pEventData);</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;};</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="aclassController_html"><div class="ttname"><a href="classController.html">Controller</a></div><div class="ttdef"><b>Definition:</b> controller.h:22</div></div>
-<div class="ttc" id="aclassController_html_a151f2b2dd8768f74b0b07f3186ebd395"><div class="ttname"><a href="classController.html#a151f2b2dd8768f74b0b07f3186ebd395">Controller::Controller</a></div><div class="ttdeci">Controller(const QString &amp;webroot, const QString &amp;dbpath, const QString &amp;libpath, const QString &amp;conf, const QString &amp;installfront, const QString &amp;indiserver)</div><div class="ttdef"><b>Definition:</b> controller.cpp:25</div></div>
-<div class="ttc" id="aclassController_html_a8351d2a68600034af0dbd1834bb21374"><div class="ttname"><a href="classController.html#a8351d2a68600034af0dbd1834bb21374">Controller::~Controller</a></div><div class="ttdeci">~Controller() override</div><div class="ttdef"><b>Definition:</b> controller.cpp:93</div></div>
+<div class="ttc" id="aclassController_html_a1780840c09d0be4885bde88f1c2e96bf"><div class="ttname"><a href="classController.html#a1780840c09d0be4885bde88f1c2e96bf">Controller::Controller</a></div><div class="ttdeci">Controller(const QString &amp;webroot, const QString &amp;dbpath, const QString &amp;libpath, const QString &amp;conf, const QString &amp;installfront, const QString &amp;indiserver, const QString &amp;lng)</div><div class="ttdef"><b>Definition:</b> controller.cpp:25</div></div>
+<div class="ttc" id="aclassController_html_a8351d2a68600034af0dbd1834bb21374"><div class="ttname"><a href="classController.html#a8351d2a68600034af0dbd1834bb21374">Controller::~Controller</a></div><div class="ttdeci">~Controller() override</div><div class="ttdef"><b>Definition:</b> controller.cpp:94</div></div>
 <div class="ttc" id="aclassController_html_af1e9b9852dd4b91edb5af0781d924bd7"><div class="ttname"><a href="classController.html#af1e9b9852dd4b91edb5af0781d924bd7">Controller::controllerEvent</a></div><div class="ttdeci">void controllerEvent(const QString &amp;eventType, const QString &amp;eventModule, const QString &amp;eventKey, const QVariantMap &amp;eventData)</div></div>
 <div class="ttc" id="aclassDBManager_html"><div class="ttname"><a href="classDBManager.html">DBManager</a></div><div class="ttdef"><b>Definition:</b> dbmanager.h:22</div></div>
 <div class="ttc" id="aclassMaincontrol_html"><div class="ttname"><a href="classMaincontrol.html">Maincontrol</a></div><div class="ttdef"><b>Definition:</b> maincontrol.h:12</div></div>
