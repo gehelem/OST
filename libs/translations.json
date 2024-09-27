@@ -253,7 +253,7 @@
     },
     "Final result": {
         "en": "Final result",
-        "fr": "à traduire"
+        "fr": "Résultat final"
     },
     "Focal length": {
         "en": "Focal length",
@@ -354,5 +354,442 @@
     "Module": {
         "en": "Module",
         "fr": "Module"
+    },
+    "Connection": {
+        "en": "Connection",
+        "fr": "Connexion"
+    },
+    "Filter Simulator": {
+        "en": "Filter Simulator",
+        "fr": "Simulateur RAF"
+    },
+    "Indi driver": {
+        "en": "Indi driver",
+        "fr": "Driver Indi"
+    },
+    "Indi module git": {
+        "en": "Indi module git",
+        "fr": "Git module Indi"
+    },
+    "Indi server": {
+        "en": "Indi server",
+        "fr": "Serveur Indi"
+    },
+    "Indi widgets to search": {
+        "en": "Indi widgets to search",
+        "fr": "Propriétés indi à chercher"
+    },
+    "Indi widgets to watch": {
+        "en": "Indi widgets to watch",
+        "fr": "Propriétés indi à surveiller"
+    },
+    "Info": {
+        "en": "Info",
+        "fr": "Info"
+    },
+    "Inspector module - work in progress": {
+        "en": "Inspector module - work in progress",
+        "fr": "Module Inspector"
+    },
+    "Internal name": {
+        "en": "Internal name",
+        "fr": "Nom interne"
+    },
+    "Iteration": {
+        "en": "Iteration",
+        "fr": "Itération"
+    },
+    "Iterations": {
+        "en": "Iterations",
+        "fr": "Itérations"
+    },
+    "Iterations / axis": {
+        "en": "Iterations / axis",
+        "fr": "Itérations par axe"
+    },
+    "Julian day": {
+        "en": "Julian day",
+        "fr": "Jour julien"
+    },
+    "Kd": {
+        "en": "Kd",
+        "fr": "Kd"
+    },
+    "Keep x values": {
+        "en": "Keep x values",
+        "fr": "Garder x valeurs"
+    },
+    "Kheogram": {
+        "en": "Kheogram",
+        "fr": "Kheogramme"
+    },
+    "Ki": {
+        "en": "Ki",
+        "fr": "Ki"
+    },
+    "Kill all modules": {
+        "en": "Kill all modules",
+        "fr": "Fermer tous les modules"
+    },
+    "Kill module": {
+        "en": "Kill module",
+        "fr": "Fermer le module"
+    },
+    "Kp": {
+        "en": "Kp",
+        "fr": "Kp"
+    },
+    "Label": {
+        "en": "Label",
+        "fr": "Libellé"
+    },
+    "Last imgage HFR ('')": {
+        "en": "Last imgage HFR ('')",
+        "fr": "HFR dernière image ('')"
+    },
+    "Load configuration": {
+        "en": "Load configuration",
+        "fr": "Charger une configuration"
+    },
+    "Load devices conf": {
+        "en": "Load devices conf",
+        "fr": "Charger la configuration des appareils"
+    },
+    "Load profile": {
+        "en": "Load profile",
+        "fr": "Charger un profil"
+    },
+    "Loaded modules": {
+        "en": "Loaded modules",
+        "fr": "Modules chargés"
+    },
+    "Log": {
+        "en": "Log",
+        "fr": "Log"
+    },
+    "Loop": {
+        "en": "Loop",
+        "fr": "Boucle"
+    },
+    "Magnitude": {
+        "en": "Magnitude",
+        "fr": "Magnitude"
+    },
+    "Main Control": {
+        "en": "Main Control",
+        "fr": "Contrôle principale"
+    },
+    "Max pulse (ms)": {
+        "en": "Max pulse (ms)",
+        "fr": "Pulse max (ms)"
+    },
+    "Meteo module - work in progress": {
+        "en": "Meteo module - work in progress",
+        "fr": "Module Météo"
+    },
+    "Min pulse (ms)": {
+        "en": "Min pulse (ms)",
+        "fr": "Pulse min (ms)"
+    },
+    "Module description": {
+        "en": "Module description",
+        "fr": "Description du module"
+    },
+    "Module info": {
+        "en": "Module info",
+        "fr": "Informations du module"
+    },
+    "Module label": {
+        "en": "Module label",
+        "fr": "Libellé du module"
+    },
+    "Module name": {
+        "en": "Module name",
+        "fr": "Nom du module"
+    },
+    "Modules": {
+        "en": "Modules",
+        "fr": "Modules"
+    },
+    "Mount": {
+        "en": "Mount",
+        "fr": "Monture"
+    },
+    "Moving": {
+        "en": "Moving",
+        "fr": "En mouvement"
+    },
+    "N/S": {
+        "en": "N/S",
+        "fr": "N/S"
+    },
+    "Name": {
+        "en": "Name",
+        "fr": "Nom"
+    },
+    "Navigator module": {
+        "en": "Navigator module",
+        "fr": "Module Navigator"
+    },
+    "Offset": {
+        "en": "Offset",
+        "fr": "Offset"
+    },
+    "Optic": {
+        "en": "Optic",
+        "fr": "Optique"
+    },
+    "PID Parameters": {
+        "en": "PID Parameters",
+        "fr": "Paramètres PID"
+    },
+    "Parameters": {
+        "en": "Parameters",
+        "fr": "Paramètres"
+    },
+    "Pixels / sec": {
+        "en": "Pixels / sec",
+        "fr": "Pixels / sec"
+    },
+    "Pol. fit position": {
+        "en": "Pol. fit position",
+        "fr": "Position polynôme"
+    },
+    "Polar assistant": {
+        "en": "Polar assistant",
+        "fr": "Assistant MES"
+    },
+    "Polar error": {
+        "en": "Polar error",
+        "fr": "Erreur polaire"
+    },
+    "Populate catalog": {
+        "en": "Populate catalog",
+        "fr": "Alimenter le catalogue"
+    },
+    "Port": {
+        "en": "Port",
+        "fr": "Port"
+    },
+    "Profile": {
+        "en": "Profile",
+        "fr": "Profil"
+    },
+    "Profiles": {
+        "en": "Profiles",
+        "fr": "Profils"
+    },
+    "Progress": {
+        "en": "Progress",
+        "fr": "Progression"
+    },
+    "Pulse (DE)": {
+        "en": "Pulse (DE)",
+        "fr": "Pusle (DE)"
+    },
+    "Pulse (RA)": {
+        "en": "Pulse (RA)",
+        "fr": "Pulse (RA)"
+    },
+    "Pulse E": {
+        "en": "Pulse E",
+        "fr": "Pulse E"
+    },
+    "Pulse N": {
+        "en": "Pulse N",
+        "fr": "Pulse N"
+    },
+    "Pulse S": {
+        "en": "Pulse S",
+        "fr": "Pulse S"
+    },
+    "Pulse W": {
+        "en": "Pulse W",
+        "fr": "Pulse W"
+    },
+    "RA": {
+        "en": "RA",
+        "fr": "AD"
+    },
+    "RA Agressivity": {
+        "en": "RA Agressivity",
+        "fr": "Agressivité AD"
+    },
+    "RA+": {
+        "en": "RA+",
+        "fr": "AD+"
+    },
+    "RA-": {
+        "en": "RA-",
+        "fr": "AD-"
+    },
+    "Reducer": {
+        "en": "Reducer",
+        "fr": "Réducteur"
+    },
+    "Refresh interval (s)": {
+        "en": "Refresh interval (s)",
+        "fr": "Intervalle d'actualisation (s)"
+    },
+    "Results": {
+        "en": "Results",
+        "fr": "Résultats"
+    },
+    "Reverse guiding corrections": {
+        "en": "Reverse guiding corrections",
+        "fr": "Inverser les corrections de guidage"
+    },
+    "SNR": {
+        "en": "SNR",
+        "fr": "RSB"
+    },
+    "Save configuration": {
+        "en": "Save configuration",
+        "fr": "Sauvegarder la configuration"
+    },
+    "Save profile": {
+        "en": "Save profile",
+        "fr": "Sauvegarder le profil"
+    },
+    "Search": {
+        "en": "Search",
+        "fr": "Rechercher"
+    },
+    "Search object": {
+        "en": "Search object",
+        "fr": "Rechercher un objet"
+    },
+    "Selection converted to now": {
+        "en": "Selection converted to now",
+        "fr": "Sélection convertie en JNOW"
+    },
+    "Sequence": {
+        "en": "Sequence",
+        "fr": "Séquence"
+    },
+    "Sequencer module": {
+        "en": "Sequencer module",
+        "fr": "Module Sequencer"
+    },
+    "Server": {
+        "en": "Server",
+        "fr": "Serveur"
+    },
+    "Shoot": {
+        "en": "Shoot",
+        "fr": "Exposer"
+    },
+    "Shooting": {
+        "en": "Shooting",
+        "fr": "Exp. en cours"
+    },
+    "Simple allsky camera module": {
+        "en": "Simple allsky camera module",
+        "fr": "Module Allsky"
+    },
+    "Solving": {
+        "en": "Solving",
+        "fr": "Résolution"
+    },
+    "Start": {
+        "en": "Start",
+        "fr": "Démarrer"
+    },
+    "Start and stop indiserver": {
+        "en": "Start and stop indiserver",
+        "fr": "Démarrer et arrête le serveur Indi"
+    },
+    "Start position": {
+        "en": "Start position",
+        "fr": "Position de démarrage"
+    },
+    "Start sequence": {
+        "en": "Start sequence",
+        "fr": "Démarrer la séquence"
+    },
+    "States": {
+        "en": "States",
+        "fr": "Etats"
+    },
+    "Status": {
+        "en": "Status",
+        "fr": "Statut"
+    },
+    "Steps gap": {
+        "en": "Steps gap",
+        "fr": "Intervalle de pas"
+    },
+    "Target DEC": {
+        "en": "Target DEC",
+        "fr": "DEC cible"
+    },
+    "Target RA": {
+        "en": "Target RA",
+        "fr": "AD cible"
+    },
+    "Target name": {
+        "en": "Target name",
+        "fr": "nom de la cible"
+    },
+    "Test": {
+        "en": "Test",
+        "fr": "Test"
+    },
+    "Time": {
+        "en": "Time",
+        "fr": "Heure"
+    },
+    "Time 0": {
+        "en": "Time 0",
+        "fr": ""
+    },
+    "Time 1": {
+        "en": "Time 1",
+        "fr": ""
+    },
+    "Time 2": {
+        "en": "Time 2",
+        "fr": ""
+    },
+    "Timelapse": {
+        "en": "Timelapse",
+        "fr": "Timelapse"
+    },
+    "Total error °": {
+        "en": "Total error °",
+        "fr": "Erreur totale °"
+    },
+    "Type": {
+        "en": "Type",
+        "fr": "Type"
+    },
+    "Values": {
+        "en": "Values",
+        "fr": "Valeurs"
+    },
+    "Version": {
+        "en": "Version",
+        "fr": "Version"
+    },
+    "Zone id": {
+        "en": "Zone id",
+        "fr": "Id. zone"
+    },
+    "Zoning": {
+        "en": "Zoning",
+        "fr": "Zonage"
+    },
+    "Zoning results": {
+        "en": "Zoning results",
+        "fr": "Résultat du zonage"
+    },
+    "baseVersion": {
+        "en": "baseVersion",
+        "fr": "baseVersion"
+    },
+    "time": {
+        "en": "time",
+        "fr": "heure"
     }
+
 }
