@@ -357,7 +357,7 @@ target_compile_definitions(ostindipanel PRIVATE INDIPANEL_MODULE)
 
 install(TARGETS
     ostserver
-    ostbasemodule ostindimodule ostdummy ostmaincontrol ostindipanel
+    ostbasemodule ostindimodule ostmaincontrol ostindipanel
     RUNTIME DESTINATION "/usr/bin"
     LIBRARY DESTINATION "/usr/lib"
     PUBLIC_HEADER DESTINATION "/usr/include/ost"

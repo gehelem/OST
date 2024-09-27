@@ -19,16 +19,19 @@ QString Translate::translate(QString val)
 {
     if (!mTranslations.contains(val))
     {
-        qDebug() << "new text to translate : " << val;
-        QVariantMap t;
-        t["fr"] = "à traduire";
-        t["en"] = "to be translated";
-        mPendingTranslations[val] = t;
+        if (!mPendingTranslations.contains(val))
+        {
+            qDebug() << "new text to translate : " << val;
+            QVariantMap t;
+            t["fr"] = "à traduire";
+            t["en"] = val;
+            mPendingTranslations[val] = t;
 
-        QFile jsonFile("translations_pending.json");
-        jsonFile.open(QFile::WriteOnly);
-        jsonFile.write(QJsonDocument::fromVariant(mPendingTranslations).toJson());
-        jsonFile.close();
+            QFile jsonFile("translations_pending.json");
+            jsonFile.open(QFile::WriteOnly);
+            jsonFile.write(QJsonDocument::fromVariant(mPendingTranslations).toJson());
+            jsonFile.close();
+        }
         return "[" + val + "]";
     }
     else

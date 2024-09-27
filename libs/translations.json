@@ -6,5 +6,353 @@
     "Actions on module startup": {
         "en": "Actions on module startup",
         "fr": "Actions au démarrage du module"
+    },
+    "Abort": {
+        "en": "Abort",
+        "fr": "Annuler"
+    },
+    "Abort focus": {
+        "en": "Abort focus",
+        "fr": "Annuler (focus)"
+    },
+    "Abort guider": {
+        "en": "Abort guider",
+        "fr": "Annuler (guidage)"
+    },
+    "Abort navigator": {
+        "en": "Abort navigator",
+        "fr": "Annuler (Navigator)"
+    },
+    "Abort sequence": {
+        "en": "Abort sequence",
+        "fr": "Annuler la séquence"
+    },
+    "Actions": {
+        "en": "Actions",
+        "fr": "Actions"
+    },
+    "Alias": {
+        "en": "Alias",
+        "fr": "Alias"
+    },
+    "Altitude error °": {
+        "en": "Altitude error °",
+        "fr": "Erreur ° (ALT) "
+    },
+    "Autofocus": {
+        "en": "Autofocus",
+        "fr": "Autofocus"
+    },
+    "Available indi drivers": {
+        "en": "Available indi drivers",
+        "fr": "Driver Indi disponibles"
+    },
+    "Available modules": {
+        "en": "Available modules",
+        "fr": "Modules disponibles"
+    },
+    "Average HFR ('')": {
+        "en": "Average HFR ('')",
+        "fr": "HFR moyen ('')"
+    },
+    "Average HFR result ('')": {
+        "en": "Average HFR result ('')",
+        "fr": "HFR moyen final ('')"
+    },
+    "Average over": {
+        "en": "Average over",
+        "fr": "Moyenne sur"
+    },
+    "Average over X frames": {
+        "en": "Average over X frames",
+        "fr": "Moyenne sur X images"
+    },
+    "Azimuth error °": {
+        "en": "Azimuth error °",
+        "fr": "Erreur ° (AZ)"
+    },
+    "Backlash overshoot": {
+        "en": "Backlash overshoot",
+        "fr": "Dépassement backlash"
+    },
+    "Base module git": {
+        "en": "Base module git",
+        "fr": "Git module de base"
+    },
+    "Best position": {
+        "en": "Best position",
+        "fr": "Meilleure position"
+    },
+    "Blind PEC - experimental": {
+        "en": "Blind PEC - experimental",
+        "fr": "Blind PEC - experimental"
+    },
+    "Calibrate": {
+        "en": "Calibrate",
+        "fr": "Calibrer"
+    },
+    "Calibration Parameters": {
+        "en": "Calibration Parameters",
+        "fr": "Paramètres de calibration"
+    },
+    "Calibration Pulse E": {
+        "en": "Calibration Pulse E",
+        "fr": "Calibration Pulse E"
+    },
+    "Calibration Pulse N": {
+        "en": "Calibration Pulse N",
+        "fr": "Calibration Pulse N"
+    },
+    "Calibration Pulse S": {
+        "en": "Calibration Pulse S",
+        "fr": "Calibration Pulse S"
+    },
+    "Calibration Pulse W": {
+        "en": "Calibration Pulse W",
+        "fr": "Calibration Pulse W"
+    },
+    "Calibration pulse (ms)": {
+        "en": "Calibration pulse (ms)",
+        "fr": "Calibration pulse (ms)"
+    },
+    "Camera": {
+        "en": "Camera",
+        "fr": "Caméra"
+    },
+    "Catalog": {
+        "en": "Catalog",
+        "fr": "Catalogue"
+    },
+    "Catalogue": {
+        "en": "Catalog",
+        "fr": "Catalogue"
+    },
+    "Center target": {
+        "en": "Center target",
+        "fr": "Centrer la cible"
+    },
+    "Code": {
+        "en": "Code",
+        "fr": "Code"
+    },
+    "Commit message": {
+        "en": "Commit message",
+        "fr": "Message de commit"
+    },
+    "Compute": {
+        "en": "Compute",
+        "fr": "Calculer"
+    },
+    "Configurations": {
+        "en": "Configurations",
+        "fr": "Configurations"
+    },
+    "Connect": {
+        "en": "Connect",
+        "fr": "Connecter"
+    },
+    "Connect devices": {
+        "en": "Connect devices",
+        "fr": "Connecter les appareils"
+    },
+    "Connect indi": {
+        "en": "Connect indi",
+        "fr": "Connecter indi"
+    },
+    "Control": {
+        "en": "Control",
+        "fr": "Contrôle"
+    },
+    "Controls": {
+        "en": "Controls",
+        "fr": "Contrôles"
+    },
+    "Corner size (pixels)": {
+        "en": "Corner size (pixels)",
+        "fr": "Tailldu coin (pixels)"
+    },
+    "Corners": {
+        "en": "Corners",
+        "fr": "Coins"
+    },
+    "Count": {
+        "en": "Count",
+        "fr": "Count"
+    },
+    "Current exposure": {
+        "en": "Current exposure",
+        "fr": "Exposition courante"
+    },
+    "Current line": {
+        "en": "Current line",
+        "fr": "Ligne courante"
+    },
+    "DE+": {
+        "en": "DE+",
+        "fr": "DE+"
+    },
+    "DE-": {
+        "en": "DE-",
+        "fr": "DE-"
+    },
+    "DEC": {
+        "en": "DEC",
+        "fr": "DEC"
+    },
+    "DEC Agressivity": {
+        "en": "DEC Agressivity",
+        "fr": "Agressivité DEC"
+    },
+    "Date": {
+        "en": "Date",
+        "fr": "Date"
+    },
+    "Devices": {
+        "en": "Devices",
+        "fr": "Appareils"
+    },
+    "Devices actions": {
+        "en": "Devices actions",
+        "fr": "Actions sur les appareils"
+    },
+    "Diameter": {
+        "en": "Diameter",
+        "fr": "Diamètre"
+    },
+    "Disable guiding corrections": {
+        "en": "Disable guiding corrections",
+        "fr": "Désactiver les corrections"
+    },
+    "Disconnect": {
+        "en": "Disconnect",
+        "fr": "Déconnecter"
+    },
+    "Drift": {
+        "en": "Drift",
+        "fr": "Dérive"
+    },
+    "Drift (DE)": {
+        "en": "Drift (DE)",
+        "fr": "Dérive (DE)"
+    },
+    "Drift (RA)": {
+        "en": "Drift (RA)",
+        "fr": "Dérive (AD)"
+    },
+    "Exposure": {
+        "en": "Exposure",
+        "fr": "Exposition"
+    },
+    "Filter": {
+        "en": "Filter",
+        "fr": "Filtre"
+    },
+    "Filter wheel": {
+        "en": "Filter wheel",
+        "fr": "Roue à filtre"
+    },
+    "Final result": {
+        "en": "Final result",
+        "fr": "à traduire"
+    },
+    "Focal length": {
+        "en": "Focal length",
+        "fr": "Focale"
+    },
+    "Focus (scxml)": {
+        "en": "Focus (scxml)",
+        "fr": "Focus (scxml)"
+    },
+    "Focus around actual": {
+        "en": "Focus around actual",
+        "fr": "Démarrer autour de la position actuelle"
+    },
+    "Focus parameters": {
+        "en": "Focus parameters",
+        "fr": "Paramètres de focus"
+    },
+    "Focuser": {
+        "en": "Focuser",
+        "fr": "Focuser"
+    },
+    "Focuser final position": {
+        "en": "Focuser final position",
+        "fr": "Position finale du focuser"
+    },
+    "Focuser position": {
+        "en": "Focuser position",
+        "fr": "Position du focuser"
+    },
+    "Frame interval (ms)": {
+        "en": "Frame interval (ms)",
+        "fr": "Intervalle entre les images (ms)"
+    },
+    "Frame type": {
+        "en": "Frame type",
+        "fr": "Type d'image"
+    },
+    "Full indi control panel": {
+        "en": "Indi control panel",
+        "fr": "Panneau de contrôle Indi"
+    },
+    "GO": {
+        "en": "GO",
+        "fr": "GO"
+    },
+    "Gain": {
+        "en": "Gain",
+        "fr": "Gain"
+    },
+    "Graph size": {
+        "en": "Graph size",
+        "fr": "Taille du graphique"
+    },
+    "Guide": {
+        "en": "Guide",
+        "fr": "Guide"
+    },
+    "Guide parameters": {
+        "en": "Guide parameters",
+        "fr": "Paramètres de guidage"
+    },
+    "Guide via": {
+        "en": "Guide via",
+        "fr": "Guider avec"
+    },
+    "Guider module - work in progress": {
+        "en": "Guider module - work in progress",
+        "fr": "Guider module - work in progress"
+    },
+    "Guiding graph": {
+        "en": "Guiding graph",
+        "fr": "Graphique de guidage"
+    },
+    "Hash": {
+        "en": "Hash",
+        "fr": "Hash"
+    },
+    "Host": {
+        "en": "Host",
+        "fr": "Hôte"
+    },
+    "Idle": {
+        "en": "Idle",
+        "fr": "à l'arrêt"
+    },
+    "Image": {
+        "en": "Image",
+        "fr": "Image"
+    },
+    "Image map": {
+        "en": "Image map",
+        "fr": "Carte de l'image"
+    },
+    "Indi": {
+        "en": "Indi",
+        "fr": "Indi"
+    },
+    "Module": {
+        "en": "Module",
+        "fr": "Module"
     }
 }
