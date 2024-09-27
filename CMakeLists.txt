@@ -93,6 +93,7 @@ add_executable(ostserver
 target_link_libraries(ostserver
     ostbasemodule
     ostmaincontrol
+    osttranslate
     Qt${QT_VERSION_MAJOR}::Gui
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Widgets
@@ -226,6 +227,7 @@ set(BASE_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovlight.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertybase.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertymulti.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/translate.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyvisitor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementvisitor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyfactory.h
@@ -245,6 +247,7 @@ set(BASE_PUBLIC_HEADERS
 set_target_properties(ostbasemodule PROPERTIES PUBLIC_HEADER "${BASE_PUBLIC_HEADERS}")
 
 target_link_libraries(ostbasemodule
+    osttranslate
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Widgets
@@ -255,6 +258,19 @@ target_link_libraries(ostbasemodule
     z
 )
 
+# Translate utility
+add_library(osttranslate STATIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/translate.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/translate.h
+)
+set(INDI_PUBLIC_HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/translate.h
+)
+
+set_target_properties(osttranslate PROPERTIES PUBLIC_HEADER "${INDI_PUBLIC_HEADERS}")
+target_link_libraries(osttranslate
+    Qt${QT_VERSION_MAJOR}::Core
+)
 # Indi module
 #list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.qrc)
 #qt5_add_resources (RCC_SOURCES ${RESOURCES})
@@ -341,7 +357,7 @@ target_compile_definitions(ostindipanel PRIVATE INDIPANEL_MODULE)
 
 install(TARGETS
     ostserver
-    ostbasemodule ostindimodule ostdummy ostmaincontrol ostindipanel
+    ostbasemodule ostindimodule ostmaincontrol ostindipanel
     RUNTIME DESTINATION "/usr/bin"
     LIBRARY DESTINATION "/usr/lib"
     PUBLIC_HEADER DESTINATION "/usr/include/ost"

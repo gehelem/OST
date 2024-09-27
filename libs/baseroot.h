@@ -1,5 +1,6 @@
 #ifndef BASEROOT_h_
 #define BASEROOT_h_
+#include "translate.h"
 #include <QObject>
 #include <QList>
 #include <QVariant>
@@ -37,6 +38,7 @@ class Baseroot : public QObject
             Q_UNUSED(pEventKey);
             Q_UNUSED(pEventData);
         };
+        void setLng(const QString &pLng);
     protected:
     private:
         QList<QVariantMap> mMessages;

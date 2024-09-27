@@ -1,7 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>basemodule.json</file>
-        <file>indimodule.json</file>
         <file>translations.json</file>
     </qresource>
 </RCC>

@@ -4,17 +4,19 @@
 #include "elementupdate.h"
 #include "qglobal.h"
 #include <sstream>
+#include <translate.h>
+
 namespace  OST
 {
 
 QJsonObject PropertyJsonDumper::dumpPropertyCommons(PropertyBase *pProperty)
 {
     QJsonObject json;
-
-    json["label"] = pProperty->label();
+    Translate* t = Translate::GetInstance();
+    json["label"] = t->translate(pProperty->label());
     json["order"] = pProperty->order();
-    json["level1"] = pProperty->level1();
-    json["level2"] = pProperty->level2();
+    json["level1"] = t->translate(pProperty->level1());
+    json["level2"] = t->translate(pProperty->level2());
     json["status"] = pProperty->state();
     json["permission"] = pProperty->permission();
     json["hasprofile"] = pProperty->hasProfile();

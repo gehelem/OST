@@ -1,5 +1,5 @@
 #include "elementjsondumper.h"
-#include "valuejsondumper.h"
+#include "translate.h"
 
 namespace  OST
 {
@@ -8,9 +8,10 @@ QJsonObject ElementJsonDumper::dumpElementCommons(ElementBase *pElement)
 {
     QJsonObject json;
 
-    json["label"] = pElement->label();
+    Translate* t = Translate::GetInstance();
+    json["label"] = t->translate(pElement->label());
     json["order"] = pElement->order();
-    json["hint"] = pElement->hint();
+    json["hint"] = t->translate(pElement->hint());
     json["type"] = "undefined";
     json["autoupdate"] = pElement->autoUpdate();
     json["badge"] = pElement->getBadge();

@@ -101,3 +101,8 @@ void Baseroot::sendConsole(const QString &pMessage)
     debug.noquote();
     debug << messageWithDateTime;
 }
+void Baseroot::setLng(const QString &pLng)
+{
+    OST::Translate* t = OST::Translate::GetInstance();
+    t->setLanguage(pLng);
+}
