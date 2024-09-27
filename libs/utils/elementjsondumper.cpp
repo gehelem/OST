@@ -11,7 +11,7 @@ QJsonObject ElementJsonDumper::dumpElementCommons(ElementBase *pElement)
     Translate* t = Translate::GetInstance();
     json["label"] = t->translate(pElement->label());
     json["order"] = pElement->order();
-    json["hint"] = pElement->hint();
+    json["hint"] = t->translate(pElement->hint());
     json["type"] = "undefined";
     json["autoupdate"] = pElement->autoUpdate();
     json["badge"] = pElement->getBadge();

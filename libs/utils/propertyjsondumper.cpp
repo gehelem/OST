@@ -15,8 +15,8 @@ QJsonObject PropertyJsonDumper::dumpPropertyCommons(PropertyBase *pProperty)
     Translate* t = Translate::GetInstance();
     json["label"] = t->translate(pProperty->label());
     json["order"] = pProperty->order();
-    json["level1"] = pProperty->level1();
-    json["level2"] = pProperty->level2();
+    json["level1"] = t->translate(pProperty->level1());
+    json["level2"] = t->translate(pProperty->level2());
     json["status"] = pProperty->state();
     json["permission"] = pProperty->permission();
     json["hasprofile"] = pProperty->hasProfile();
