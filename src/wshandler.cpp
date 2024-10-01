@@ -274,6 +274,10 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
                     {
                         element = prop["elements"].toMap()[key].toMap();
                     }
+                    if (prop["elements"].toMap()[key].toMap()["type"] == "video")
+                    {
+                        element = prop["elements"].toMap()[key].toMap();
+                    }
                 }
                 elements[key] = element;
             }
