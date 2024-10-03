@@ -129,6 +129,8 @@ class PropertyBase: public QObject
         void setPostIcon1(QString s);
         QString getPostIcon2(void);
         void setPostIcon2(QString s);
+        QString getFreeValue(void);
+        void setFreeValue(QString s);
     signals:
         void stateChanged(OST::State);
         void eltChanged(OST::PropertyBase*);
@@ -151,6 +153,7 @@ class PropertyBase: public QObject
         QString mPreIcon2 = "";
         QString mPostIcon1 = "";
         QString mPostIcon2 = "";
+        QString mFreeValue = "";
 
 
 

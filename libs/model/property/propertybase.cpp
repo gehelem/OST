@@ -119,5 +119,13 @@ void PropertyBase::setPostIcon2(QString s)
 {
     mPostIcon2 = s;
 }
+QString PropertyBase::getFreeValue(void)
+{
+    return mFreeValue;
+}
+void PropertyBase::setFreeValue(QString s)
+{
+    mFreeValue = s;
+}
 
 }

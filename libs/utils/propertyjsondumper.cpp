@@ -26,6 +26,7 @@ QJsonObject PropertyJsonDumper::dumpPropertyCommons(PropertyBase *pProperty)
     json["posticon1"] = pProperty->getPostIcon1();
     json["posticon2"] = pProperty->getPostIcon2();
     json["enabled"] = pProperty->isEnabled();
+    json["freevalue"] = pProperty->getFreeValue();
 
     return json;
 

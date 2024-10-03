@@ -123,6 +123,10 @@ PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVaria
     {
         pProperty->setPostIcon2(pData["posticon2"].toString());
     }
+    if (pData.contains("freevalue"))
+    {
+        pProperty->setPostIcon2(pData["freevalue"].toString());
+    }
 
     return pProperty;
 
