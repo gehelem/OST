@@ -165,8 +165,8 @@ var searchData=
   ['debayer_224',['debayer',['../classfileio.html#a7ac92268d1c6ad343c9f56d90e4eaa42',1,'fileio']]],
   ['debayer_5f16bit_225',['debayer_16bit',['../classfileio.html#a1481719a716c4a99da4bd11f601fed8f',1,'fileio']]],
   ['debayer_5f8bit_226',['debayer_8bit',['../classfileio.html#abf4e8483842b4ceca5b765fed79c41d2',1,'fileio']]],
-  ['dec_227',['DEC',['../structcatalogResult.html#a0b2937563496db674feff5cc1d4864a1',1,'catalogResult']]],
-  ['dec_228',['dec',['../classfileio.html#a1fac0d14db818718930d414152119ec1',1,'fileio']]],
+  ['dec_227',['dec',['../classfileio.html#a1fac0d14db818718930d414152119ec1',1,'fileio']]],
+  ['dec_228',['DEC',['../structcatalogResult.html#a0b2937563496db674feff5cc1d4864a1',1,'catalogResult']]],
   ['definemeasfocuser_229',['defineMeAsFocuser',['../classIndiModule.html#af401346f8edb6a6690b8f6e6ad38fcfa',1,'IndiModule']]],
   ['definemeasguider_230',['defineMeAsGuider',['../classIndiModule.html#a2f728d8048b9bf9181049cba6c23d6a8',1,'IndiModule']]],
   ['definemeasimager_231',['defineMeAsImager',['../classIndiModule.html#a535dc11fd05c679ca21c051344224bbe',1,'IndiModule']]],
@@ -195,6 +195,6 @@ var searchData=
   ['dummy_2efr_2emd_254',['dummy.fr.md',['../dummy_8fr_8md.html',1,'']]],
   ['dummy_2eh_255',['dummy.h',['../dummy_8h.html',1,'']]],
   ['dy_256',['DY',['../namespaceOST.html#a2bd59f1bb3735729a6381f7e5ec5970ca1c6038568396ad8cab8619b6960c1776',1,'OST']]],
-  ['dynlabel_257',['dynLabel',['../classOST_1_1ElementPrg.html#a2da5eea43559f58c7cf80ef42d6e6020',1,'OST::ElementPrg']]],
-  ['dynlabel_258',['dynlabel',['../structOST_1_1PrgData.html#a01a79af1d3ec35c5da3d740c603f7062',1,'OST::PrgData']]]
+  ['dynlabel_257',['dynlabel',['../structOST_1_1PrgData.html#a01a79af1d3ec35c5da3d740c603f7062',1,'OST::PrgData']]],
+  ['dynlabel_258',['dynLabel',['../classOST_1_1ElementPrg.html#a2da5eea43559f58c7cf80ef42d6e6020',1,'OST::ElementPrg']]]
 ];
