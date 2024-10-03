@@ -62,7 +62,7 @@ void IndiPanel::newProperty(INDI::Property pProperty)
             OST::IntToPermission(pProperty.getPermission()),
             pProperty.getDeviceName(),
             pProperty.getGroupName(), "", false, false);
-
+    p->setFreeValue(dev); // we keep original device name to avoid unwanted level1 device translations
 
     switch (pProperty.getType())
     {
@@ -247,8 +247,9 @@ void IndiPanel::OnMyExternalEvent(const QString &eventType, const QString  &even
         QString prop = keyprop;
         QVariantMap ostprop = m[keyprop].toMap();
         QString devcat = ostprop["level1"].toString();
+        QString realDevice = getStore()[keyprop]->getFreeValue();
         //BOOST_LOG_TRIVIAL(debug) << "DEVCAT - recv : "  << devcat.toStdString();
-        prop.replace(devcat, "");
+        prop.replace(realDevice, "");
         if (!(devcat == "Indi"))
         {
             foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
@@ -260,19 +261,21 @@ void IndiPanel::OnMyExternalEvent(const QString &eventType, const QString  &even
                 }
                 if (getStore()[keyprop]->getElt(keyelt)->getType() == "string")
                 {
-                    sendModNewText(devcat, prop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toString());
+                    sendModNewText(realDevice, prop, keyelt,
+                                   eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toString());
                 }
                 if (getStore()[keyprop]->getElt(keyelt)->getType() == "int"
                         || getStore()[keyprop]->getElt(keyelt)->getType() == "float")
                 {
-                    sendModNewNumber(devcat, prop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toFloat());
+                    sendModNewNumber(realDevice, prop, keyelt,
+                                     eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toFloat());
                 }
                 if (getStore()[keyprop]->getElt(keyelt)->getType() == "bool")
                 {
                     keyelt.toStdString();
-                    if ( eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toBool()) sendModNewSwitch(devcat, prop,
+                    if ( eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toBool()) sendModNewSwitch(realDevice, prop,
                                 keyelt, ISS_ON);
-                    if (!eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toBool()) sendModNewSwitch(devcat, prop,
+                    if (!eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toBool()) sendModNewSwitch(realDevice, prop,
                                 keyelt, ISS_OFF);
                 }
             }
