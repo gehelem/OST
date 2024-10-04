@@ -171,6 +171,11 @@ bool  PropertyMulti::setElt(QString key, QVariant val)
                 break;
         }
     }
+    if ((mElts[key]->getType() == "prg") || (mElts[key]->getType() == "img") || (mElts[key]->getType() == "video") )
+    {
+        // prg/img/video can't be updated via frontend
+        return true;
+    }
     sendError("PropertyMulti::setValue - " + key + " - can't update, unhandled type : "
               + mElts[key]->getType() + "(" + val.toString() + ")");
     return false;

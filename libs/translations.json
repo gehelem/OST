@@ -790,6 +790,57 @@
     "time": {
         "en": "time",
         "fr": "heure"
+    },
+    "Append existing sequence": {
+        "en": "Append existing sequence",
+        "fr": "Ajouter à la séquence existante"
+    },
+    "Create new sequence": {
+        "en": "Create new sequence",
+        "fr": "Créer une nouvelle séquence"
+    },
+    "Dark assistant module": {
+        "en": "Dark assistant module",
+        "fr": "Assistant dark"
+    },
+    "Delay (s)": {
+        "en": "Delay (s)",
+        "fr": "Délai (s)"
+    },
+    "Exposure (s)": {
+        "en": "Exposure (s)",
+        "fr": "Exposition (s)"
+    },
+    "Generate": {
+        "en": "Generate",
+        "fr": "Générer"
+    },
+    "Reset existing sequence": {
+        "en": "Reset existing sequence",
+        "fr": "Vider la séquence existante"
+    },
+    "Selected exposures": {
+        "en": "Selected exposures",
+        "fr": "Durées sélectionnées"
+    },
+    "Selected gains": {
+        "en": "Selected gains",
+        "fr": "Gains sélectionnés"
+    },
+    "Selected offsets": {
+        "en": "Selected offsets",
+        "fr": "Offset sélectionnés"
+    },
+    "Selected temperatures": {
+        "en": "Selected temperatures",
+        "fr": "Températures sélectionnées"
+    },
+    "State": {
+        "en": "State",
+        "fr": "Etat"
+    },
+    "Temperature": {
+        "en": "Temperature",
+        "fr": "Température"
     }
-
 }
