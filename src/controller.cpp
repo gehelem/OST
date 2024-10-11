@@ -1,5 +1,7 @@
 #include "controller.h"
 #include <QNetworkInterface>
+#include <QDirIterator>
+#include <QFileSystemWatcher>
 
 /*!
  * ... ...
@@ -87,6 +89,16 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     {
         this->startIndi();
     }
+
+    //check existing files
+    QDirIterator it(webroot, QStringList() << "*", QDir::NoFilter, QDirIterator::Subdirectories);
+    while (it.hasNext())
+    {
+        mFileList.append(it.next());
+    }
+    //watch modifications
+    mFileWatcher.addPath(webroot);
+    QObject::connect(&mFileWatcher, &QFileSystemWatcher::directoryChanged, this, &Controller::OnFileWatcherEvent);
 
 }
 
@@ -533,5 +545,35 @@ void Controller::stopIndiDriver(const QString &pDriver)
     QTextStream txtStream(&fifo);
     txtStream << "stop " + pDriver;
     fifo.close();
+
+}
+void Controller::OnFileWatcherEvent(const QString &pEvent)
+{
+    QStringList files;
+
+    //check existing files
+    QDirIterator it(_webroot, QStringList() << "*", QDir::NoFilter, QDirIterator::Subdirectories);
+    while (it.hasNext())
+    {
+        files.append(it.next());
+    }
+    QStringList::iterator i;
+    for (i = files.begin(); i != files.end(); ++i)
+    {
+        if (!mFileList.contains(*i) )
+        {
+            qDebug() << "add" << *i;
+            mFileList.append(*i);
+        }
+    }
+    QStringList::iterator j;
+    for (j = mFileList.begin(); j != mFileList.end(); ++j)
+    {
+        if (!files.contains(*j) )
+        {
+            qDebug() << "del" << *j;
+            mFileList.removeOne(*j);
+        }
+    }
 
 }
