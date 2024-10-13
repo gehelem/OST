@@ -333,6 +333,6 @@ void WShandler::processFileEvent(const QString &eventType, const QStringList &ev
 {
     QJsonObject  obj;
     obj["evt"] = eventType;
-    obj["filevent"] = QJsonArray::fromStringList(eventData);
+    obj["fileevent"] = QJsonArray::fromStringList(eventData);
     sendJsonMessage(obj);
 }

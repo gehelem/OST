@@ -47,7 +47,9 @@ class Controller : public QObject
         QZeroConf zeroConf;
         QString buildName(void);
         QFileSystemWatcher mFileWatcher;
-        QStringList mFileList;
+        QStringList mFilesList;
+        QStringList mFoldersList;
+
 
 
         bool loadModule(QString lib, QString name, QString label, QString profile);

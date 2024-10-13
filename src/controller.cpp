@@ -90,23 +90,39 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
         this->startIndi();
     }
 
-    //check existing files
+    //check existing folders
     mFileWatcher.addPath(webroot);
     QDir dir(webroot);
-    QDirIterator it(webroot, QDirIterator::Subdirectories);
-    while (it.hasNext())
+    QDirIterator itFolders(webroot, QDirIterator::Subdirectories);
+    while (itFolders.hasNext())
     {
-        QString d = it.next();
-        if (d.endsWith("/."))
+        QString d = itFolders.next();
+        d.replace(webroot, "");
+        if (d.endsWith("/.") || d.endsWith("/.."))
         {
             QString dd = d;
+            dd.replace("/..", "");
             dd.replace("/.", "");
-            mFileWatcher.addPath(dd);
+            if (!mFoldersList.contains(dd))
+            {
+                mFileWatcher.addPath(webroot + dd);
+                mFoldersList.append(dd);
+            }
         }
-        mFileList.append(d);
     }
-
-    wshandler->processFileEvent("filedump", mFileList);
+    //check existing files
+    QDirIterator itFiles(webroot, QDirIterator::Subdirectories);
+    while (itFiles.hasNext())
+    {
+        QString d = itFiles.next();
+        d.replace(webroot, "");
+        if (!d.endsWith("/.") && !d.endsWith("/..") && !mFoldersList.contains(d))
+        {
+            mFilesList.append(d);
+        }
+    }
+    wshandler->processFileEvent("foldersdump", mFoldersList);
+    wshandler->processFileEvent("filesdump", mFilesList);
 
     //watch modifications
     QObject::connect(&mFileWatcher, &QFileSystemWatcher::directoryChanged, this, &Controller::OnFileWatcherEvent);
@@ -268,7 +284,8 @@ void Controller::OnExternalEvent(const QString &pEventType, const QString  &pEve
     }
     if (pEventType == "Freadall")
     {
-        wshandler->processFileEvent("filedump", mFileList);
+        wshandler->processFileEvent("foldersdump", mFoldersList);
+        wshandler->processFileEvent("filesdump", mFilesList);
     }
 
     /* we should check here if incoming message is valid*/
@@ -566,40 +583,78 @@ void Controller::stopIndiDriver(const QString &pDriver)
 void Controller::OnFileWatcherEvent(const QString &pEvent)
 {
     QStringList files;
+    QStringList folders;
     QDir dir(_webroot);
     QDirIterator it(_webroot, QDirIterator::Subdirectories);
-    while (it.hasNext())
+
+    //check existing folders
+    QDirIterator itFolders(_webroot, QDirIterator::Subdirectories);
+    while (itFolders.hasNext())
     {
-        QString d = it.next();
-        files.append(d);
+        QString d = itFolders.next();
+        d.replace(_webroot, "");
+        if (d.endsWith("/.") || d.endsWith("/.."))
+        {
+            QString dd = d;
+            dd.replace("/..", "");
+            dd.replace("/.", "");
+            if (!folders.contains(dd))
+            {
+                folders.append(dd);
+            }
+        }
+    }
+    //check existing files
+    QDirIterator itFiles(_webroot, QDirIterator::Subdirectories);
+    while (itFiles.hasNext())
+    {
+        QString d = itFiles.next();
+        d.replace(_webroot, "");
+        if (!d.endsWith("/.") && !d.endsWith("/..") && !folders.contains(d))
+        {
+            files.append(d);
+        }
     }
 
+    // compare to already known folders
+    for (const auto &i : folders)
+    {
+        if (!mFoldersList.contains(i) )
+        {
+            wshandler->processFileEvent("folderadd", QStringList(i));
+            mFoldersList.append(i);
+            mFileWatcher.addPath(_webroot + i);
+        }
+    }
+    for (const auto &i : mFoldersList)
+    {
+        if (!folders.contains(i) )
+        {
+            wshandler->processFileEvent("folderdel", QStringList(i));
+            mFoldersList.removeOne(i);
+            mFileWatcher.removePath(_webroot + i);
+        }
+    }
+
+    // compare to already known files
     for (const auto &i : files)
     {
-        if (!mFileList.contains(i) )
+        if (!mFilesList.contains(i) )
         {
             wshandler->processFileEvent("fileadd", QStringList(i));
-            mFileList.append(i);
-            if (i.endsWith("/."))
-            {
-                QString s = i;
-                mFileWatcher.addPath(s.replace("/.", ""));
-            }
+            mFilesList.append(i);
         }
     }
-    for (const auto &j : mFileList)
+    for (const auto &i : mFilesList)
     {
-        if (!files.contains(j) )
+        if (!files.contains(i) )
         {
-            wshandler->processFileEvent("filedel", QStringList(j));
-            mFileList.removeOne(j);
-            if (j.endsWith("/."))
-            {
-                QString s = j;
-                mFileWatcher.removePath(s.replace("/.", ""));
-            }
+            wshandler->processFileEvent("filedel", QStringList(i));
+            mFilesList.removeOne(i);
         }
     }
+
+
 
 }
 void Controller::OnFileChangeEvent(const QString &pEvent)
