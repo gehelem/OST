@@ -76,6 +76,7 @@ class Controller : public QObject
         void OnMainCtlEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
                             const QVariantMap &pEventData);
         void OnFileWatcherEvent(const QString &pEvent);
+        void OnFileChangeEvent(const QString &pEvent);
 
 };
 #endif

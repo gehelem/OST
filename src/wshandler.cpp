@@ -329,3 +329,10 @@ void WShandler::sendMessage(const QString &pMessage)
     debug.noquote();
     debug << messageWithDateTime;
 }
+void WShandler::processFileEvent(const QString &eventType, const QStringList &eventData)
+{
+    QJsonObject  obj;
+    obj["evt"] = eventType;
+    obj["filevent"] = QJsonArray::fromStringList(eventData);
+    sendJsonMessage(obj);
+}
