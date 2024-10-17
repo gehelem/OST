@@ -106,10 +106,14 @@ sudo service indiwebmanager restart
 
 #OSTSERVER SERVICE
 cd
+rm ostserver_service.sh 
 wget https://raw.githubusercontent.com/gehelem/OST/main/ostserver_service.sh --no-check-certificate
-sed -i "s/ostusername/"$USER"/g" ostserver.service.sh
+sed -i "s/ostusername/"$USER"/g" ostserver_service.sh
+sudo rm /usr/bin/ostserver_service.sh 
 sudo cp ostserver_service.sh /usr/bin/
 
+cd
+rm ostserver.service
 wget https://raw.githubusercontent.com/gehelem/OST/main/ostserver.service --no-check-certificate
 sed -i "s/ostusername/"$USER"/g" ostserver.service
 sudo cp ostserver.service /etc/systemd/system/
