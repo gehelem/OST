@@ -19,7 +19,7 @@ class WShandler : public QObject
     public :
         void processModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                 const QVariantMap &eventData);
-
+        void processFileEvent(const QString &eventType, const QStringList &eventData);
 
     signals:
         void closed();
