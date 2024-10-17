@@ -47,8 +47,11 @@ sudo chmod 777 -R /usr/share/astrometry
 cd
 #rm -Rf ostmedia
 mkdir ostmedia
+#grant access
+sudo usermod -a -G $USER www-data
 
 #adapt nginx conf
+rm ostserver.nginx
 wget https://raw.githubusercontent.com/gehelem/OST/main/ostserver.nginx --no-check-certificate
 sed -i "s/ostusername/"$USER"/g" ostserver.nginx
 sudo cp ostserver.nginx /etc/nginx/sites-available
@@ -64,8 +67,8 @@ sudo mkdir /var/www/ostserver
 cd /var/www/ostserver
 sudo wget https://github.com/gehelem/ost-front/releases/download/WorkInProgress/html.tar.gz --no-check-certificate
 sudo tar -xvf html.tar.gz
-#this should be made safer ... :
-sudo chmod 777 /var/www/ostserver
+#grant access
+sudo chown -R www-data:www-data /var/www/ostserver
 
 sudo service nginx restart
 
@@ -106,10 +109,14 @@ sudo service indiwebmanager restart
 
 #OSTSERVER SERVICE
 cd
+rm ostserver_service.sh 
 wget https://raw.githubusercontent.com/gehelem/OST/main/ostserver_service.sh --no-check-certificate
-sed -i "s/ostusername/"$USER"/g" ostserver.service.sh
+sed -i "s/ostusername/"$USER"/g" ostserver_service.sh
+sudo rm /usr/bin/ostserver_service.sh 
 sudo cp ostserver_service.sh /usr/bin/
 
+cd
+rm ostserver.service
 wget https://raw.githubusercontent.com/gehelem/OST/main/ostserver.service --no-check-certificate
 sed -i "s/ostusername/"$USER"/g" ostserver.service
 sudo cp ostserver.service /etc/systemd/system/
