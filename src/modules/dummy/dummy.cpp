@@ -301,6 +301,9 @@ void Dummy::newBLOB(INDI::PropertyBlob pblob)
         OST::ImgData dta = _image->ImgStats();
         dta.mUrlJpeg = getModuleName() + QString(pblob.getDeviceName()) + ".jpeg";
         dta.mUrlFits = getModuleName() + QString(pblob.getDeviceName()) + ".FITS";
+        dta.mAlternates.clear();
+        dta.mAlternates.append(getModuleName() + QString(pblob.getDeviceName()) + ".jpeg");
+        dta.mAlternates.append(getModuleName() + QString(pblob.getDeviceName()) + ".jpeg");
         dta.isSolved = false;
         getEltImg("testimage", "image1")->setValue(dta, true);
 

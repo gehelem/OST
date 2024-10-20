@@ -200,11 +200,21 @@ void ElementJsonDumper::visit(ElementImg *pElement)
 
     //i=;
 
+
+    if (pElement->value().mAlternates.size() > 0)
+    {
+        arr = QJsonArray();
+        for (int i = 0; i < pElement->value().mAlternates.size(); i++)
+        {
+            arr.append(pElement->value().mAlternates[i]);
+        }
+        imgdata["alternates"] = arr;
+    }
+
     for (auto it = imgdata.constBegin(); it != imgdata.constEnd(); it++)
     {
         json.insert(it.key(), it.value());
     }
-
     json["type"] = "img";
 
     mResult = json;

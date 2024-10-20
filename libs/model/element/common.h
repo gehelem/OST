@@ -105,6 +105,7 @@ typedef struct ImgData
     QString mUrlFits = "";
     QString mUrlOverlay = "";
     QString mUrlThumbnail = "";
+    QVector<QString> mAlternates;
     double min[3] = {0}, max[3] = {0};  // Minimum and Maximum R, G, B pixel values in the image
     double mean[3] = {0};               // Average R, G, B value of the pixels in the image
     double stddev[3] = {0};             // Standard Deviation of the R, G, B pixel values in the image
