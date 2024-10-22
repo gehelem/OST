@@ -39,10 +39,12 @@
         "elements": {
             "module": {
                 "type":"string",
+                "order": "99",
                 "label": "Module"
             },
             "status": {
                 "type":"light",
+                "order": "99",
                 "label": "Status"
             }
         },
@@ -56,18 +58,22 @@
         "elements": {
             "extext1": {
                 "type":"string",
+                "order": "99",
                 "label": "Text 1"
             },
             "extext2": {
                 "type":"string",
+                "order": "99",
                 "label": "Text 2"
             },
             "extext3": {
                 "type":"string",
+                "order": "99",
                 "label": "Text 3"
             },
             "extext4": {
                 "type":"string",
+                "order": "99",
                 "label": "Text 4"
             }
         },
@@ -85,12 +91,14 @@
                 "type":"string",
                 "label": "Text 1",
                 "value":"aaaa",
+                "order": "99",
                 "directedit":true
             },
             "extext2": {
                 "autoupdate":true,
                 "type":"string",
                 "label": "Text 2",
+                "order": "99",
                 "value":"bbbb"
             },
             "extext3": {
@@ -99,6 +107,7 @@
                 "label": "Text 3",
                 "value":"cccc",
                 "listOfValues":"DRIVER_INTERFACE-CCD_INTERFACE",
+                "order": "99",
                 "directedit":true
             },
             "extext4": {
@@ -106,6 +115,7 @@
                 "type":"string",
                 "label": "Text 4",
                 "value":"i1",
+                "order": "99",
                 "listOfValues":[
                     ["i1","Value 1"],
                     ["i2","Value 2"]
@@ -126,6 +136,7 @@
                 "autoupdate":true,
                 "type":"int",
                 "label": "Number 1",
+                "order": "99",
                 "min": 0,
                 "max": 100,
                 "slider":1,
@@ -136,6 +147,7 @@
                 "autoupdate":true,
                 "type":"int",
                 "label": "Number 2",
+                "order": "99",
                 "min": -100,
                 "max": 100,
                 "step": 10
@@ -144,6 +156,7 @@
                 "autoupdate":true,
                 "type":"float",
                 "label": "Number 3",
+                "order": "99",
                 "listOfValues":[
                     [0.0,"Zéro virgule zéro"],
                     [0.1,"Zéro virgule un"],
@@ -154,6 +167,7 @@
                 "autoupdate":true,
                 "type":"int",
                 "label": "Number 4",
+                "order": "99",
                 "listOfValues":[
                     [0,"Zéro"],
                     [1,"Un"],
@@ -165,11 +179,13 @@
                 "autoupdate":true,
                 "type":"float",
                 "label": "Number 5",
+                "order": "99",
                 "listOfValues":"dummylov3"
             }
         },
         "group": "Numbers",
         "permission": 2,
+        "order": "99",
         "label": "Numbers example - read/write"
     },
     "boolsRW0": {
@@ -180,27 +196,32 @@
             "b1": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 1"
             },
             "b2": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 2"
             },
             "b3": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 3"
             },
             "b4": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 4"
             }
         },
         "group": "Booleans",
         "permission": 2,
-        "label": "One of many"
+        "label": "One of many",
+        "order": "99"
     },
     "boolsRW1": {
         "hasprofile":true,
@@ -210,56 +231,67 @@
             "b1": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 1"
             },
             "b2": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 2"
             },
             "b3": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 3"
             },
             "b4": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 4"
             }
         },
         "group": "Booleans",
         "permission": 2,
+        "order": "99",
         "label": "At most one"
     },
     "boolsRW2": {
         "hasprofile":true,
         "devcat": "Examples",
         "rule":2,
+        "order": "99",
         "elements": {
             "b1": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 1"
             },
             "b2": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 2"
             },
             "b3": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 3"
             },
             "b4": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 4"
             }
         },
         "group": "Booleans",
         "permission": 2,
+        "order": "99",
         "label": "Any"
     }
     ,
@@ -271,22 +303,26 @@
             "b1": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 1/3"
             },
             "b2": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 2/3"
             },
             "b3": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 3/3"
             },
             "n1": {
                 "autoupdate":true,
                 "type":"int",
                 "label": "Number 1/2",
+                "order": "99",
                 "min": 0,
                 "max": 100,
                 "step": 1
@@ -295,6 +331,7 @@
                 "autoupdate":true,
                 "type":"int",
                 "label": "Number 2/2",
+                "order": "99",
                 "min": -100,
                 "max": 100,
                 "step": 10
@@ -302,11 +339,13 @@
             "t1": {
                 "autoupdate":true,
                 "type":"string",
+                "order": "99",
                 "label": "Text mixed"
             }
         },
         "group": "Mixed",
         "permission": 2,
+        "order": "99",
         "label": "Mixed types - read/write"
     },
     "actions2": {
@@ -316,27 +355,32 @@
             "shoot": {
                 "type": "bool",
                 "label": "Shoot",
+                "order": "99",
                 "value":false
             },
             "solve": {
                 "type": "bool",
                 "label": "Solve field",
+                "order": "99",
                 "value":false
             },
             "blob": {
                 "type": "bool",
                 "label": "Set blob mode",
+                "order": "99",
                 "value":false
             },
             "extract": {
                 "type": "bool",
                 "label": "Stars extraction",
+                "order": "99",
                 "value":false
             }
 
         },
         "group": "Images",
         "permission": 2,
+        "order": "99",
         "label": "Actions"
     },
     "parameters": {
@@ -344,12 +388,14 @@
         "group": "Images",
         "permission": 2,
         "label": "Parameters",
+        "order": "99",
         "elements": {
             "indexfolderpath": {
                 "autoupdate":true,
                 "directedit":true,
                 "type": "string",
                 "label": "Astrometry index folder path",
+                "order": "99",
                 "value":"/usr/share/astrometry/"
             }
 
@@ -363,16 +409,19 @@
         "hasGrid":true,
         "showGrid":true,
         "label": "Test image",
+        "order": "99",
         "elements": {
             "image1": {
                 "type": "img",
                 "label": "First image",
+                "order": "99",
                 "urljpeg":"dummy.jpg"
             },
             "message": {
                 "type": "message",
                 "label": "Image message",
                 "level":0,
+                "order": "99",
                 "message":"Hello, this is a message",
                 "ts":"2024/03/14 15:06:53.000"
             },
@@ -388,6 +437,7 @@
                 "type": "prg",
                 "prgtype": "spinner",
                 "label": "P2",
+                "order": "99",
                 "dynlabel": "99/100",
                 "value": 99,
                 "order":2
@@ -409,6 +459,7 @@
         "permission": 2,
         "arrayLimit":5,
         "label": "Grid example",
+        "order": "99",
         "hasGrid":true,
         "showGrid":true,
         "showElts":false,
@@ -465,6 +516,7 @@
         "showGrid":true,
         "showElts":false,
         "label": "Grid example 2",
+        "order": "99",
         "elements": {
             "X": {
                 "type": "int",
@@ -493,6 +545,7 @@
         "label": "Skychart",
         "devcat": "Examples",
         "group": "Images",
+        "order": "99",
         "elements": {}
     },
     "search": {
@@ -502,11 +555,13 @@
         "permission": 2,
         "rule":0,
         "label": "",
+        "order": "99",
         "autoupdate":true,
         "elements": {
             "searchbtn": {
                 "type": "bool",
                 "label": "Search object",
+                "order": "99",
                 "value":false
             },
             "search": {
@@ -514,6 +569,7 @@
                 "type": "string",
                 "label": "Search object",
                 "value":"M13",
+                "order": "99",
                 "directedit":true
             }
         }
@@ -652,6 +708,7 @@
         "arrayLimit":10,
         "hasprofile":true,
         "label": "Grid example",
+        "order": "99",
         "hasGrid":true,
         "gridheaders": ["int","intlov","float","string","strlov","image","video","bool","progress","message"],
         "grid": [
@@ -839,6 +896,7 @@
         "permission": 2,
         "arrayLimit":5,
         "label": "Graph example - PHD",
+        "order": "99",
         "hasGrid":true,
         "showGrid":true,
         "showElts":false,
