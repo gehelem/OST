@@ -5,6 +5,7 @@
     "loadconf": {
         "devcat": "Module",
         "group": "Configurations",
+        "order": "0",
         "permission": 2,
         "rule":1,
         "label": "Load configuration",
@@ -12,6 +13,7 @@
             "name": {
                 "type": "string",
                 "label": "",
+                "order": "0",
                 "directedit":true,
                 "value":"default",
                 "listOfValues":[],
@@ -23,6 +25,7 @@
     "saveconf": {
         "devcat": "Module",
         "group": "Configurations",
+        "order": "0",
         "permission": 2,
         "rule":0,
         "label": "Save configuration",
@@ -32,6 +35,7 @@
                 "autoupdate":true,
                 "directedit":true,
                 "label": "",
+                "order": "0",
                 "value":"default",
                 "posticon":"save"
             }
@@ -48,6 +52,7 @@
             "startstop": {
                 "type": "string",
                 "label": "",
+                "order": "0",
                 "posticon":"play_arrow",
                 "preicon":"stop",
                 "value":""
@@ -58,6 +63,7 @@
         "hasArray":true,
         "devcat": "Modules",
         "group": "",
+        "order": "01",
         "permission": 0,
         "rule":0,
         "hasGrid":true,
@@ -68,21 +74,25 @@
             "name": {
                 "type": "string",
                 "label": "Internal name",
+                "order": "0",
                 "value":""
             },
             "label": {
                 "type": "string",
                 "label": "Label",
+                "order": "1",
                 "value":""
             },
             "type": {
                 "type": "string",
                 "label": "Type",
+                "order": "2",
                 "value":""
             },
             "profile": {
                 "type": "string",
                 "label": "Profile",
+                "order": "3",
                 "value":""
             }
 
@@ -97,10 +107,12 @@
         "permission": 2,
         "rule":0,
         "label": "",
+        "order": "02",
         "elements": {
             "kill": {
                 "type": "bool",
                 "label": "Kill all modules",
+                "order": "0",
                 "value":false
             }
         }

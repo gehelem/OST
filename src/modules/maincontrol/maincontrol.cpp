@@ -147,8 +147,8 @@ void Maincontrol::setAvailableModuleLibs(const QVariantMap libs)
 {
 
     OST::PropertyMulti *dynprop = new OST::PropertyMulti("load", "Available modules", OST::Permission::ReadWrite,
-            "Available modules",
-            "", "", false, false);
+            "Modules",
+            "", "00", false, false);
     foreach(QString key, libs.keys())
     {
         QVariantMap info = libs[key].toMap()["elements"].toMap();
