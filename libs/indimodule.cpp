@@ -785,13 +785,13 @@ bool IndiModule::defineMeAsFocuser()
 
     OST::PropertyMulti* pm = getProperty("actions");
     pm->setRule(OST::SwitchsRule::AtMostOne);
-    OST::ElementBool* b = new  OST::ElementBool("Abort focus", "", "");
+    OST::ElementBool* b = new  OST::ElementBool("Abort focus", "foc99", "");
     b->setValue(false, false);
     pm->addElt("abortfocus", b);
-    b = new  OST::ElementBool("Autofocus", "", "");
+    b = new  OST::ElementBool("Autofocus", "foc50", "");
     b->setValue(false, false);
     pm->addElt("autofocus", b);
-    b = new  OST::ElementBool("Loop", "", "");
+    b = new  OST::ElementBool("Loop", "foc70", "");
     b->setValue(false, false);
     pm->addElt("loop", b);
     mIsFocuser = true;
@@ -804,13 +804,13 @@ bool IndiModule::defineMeAsGuider()
 
     OST::PropertyMulti* pm = getProperty("actions");
     pm->setRule(OST::SwitchsRule::AtMostOne);
-    OST::ElementBool* b = new  OST::ElementBool("Abort guider", "", "");
+    OST::ElementBool* b = new  OST::ElementBool("Abort guider", "guid99", "");
     b->setValue(false, false);
     pm->addElt("abortguider", b);
-    b = new  OST::ElementBool("Guide", "", "");
+    b = new  OST::ElementBool("Guide", "guid50", "");
     b->setValue(false, false);
     pm->addElt("guide", b);
-    b = new  OST::ElementBool("Calibrate", "", "");
+    b = new  OST::ElementBool("Calibrate", "guid00", "");
     b->setValue(false, false);
     pm->addElt("calibrate", b);
     mIsGuider = true;
@@ -823,10 +823,10 @@ bool IndiModule::defineMeAsSequencer()
 
     OST::PropertyMulti* pm = getProperty("actions");
     pm->setRule(OST::SwitchsRule::AtMostOne);
-    OST::ElementBool* b = new  OST::ElementBool("Abort sequence", "", "");
+    OST::ElementBool* b = new  OST::ElementBool("Abort sequence", "seq99", "");
     b->setValue(false, false);
     pm->addElt("abortsequence", b);
-    b = new  OST::ElementBool("Start sequence", "", "");
+    b = new  OST::ElementBool("Start sequence", "seq00", "");
     b->setValue(false, false);
     pm->addElt("startsequence", b);
     mIsSequencer = true;
@@ -839,7 +839,7 @@ bool IndiModule::defineMeAsImager()
     if (!getStore().contains("image"))
     {
         OST::PropertyMulti* dynprop = new OST::PropertyMulti("image", "Image", OST::Permission::WriteOnly, "Control",
-                "", "Control010", false, false);
+                "", "000Control222", false, false);
         createProperty("image", dynprop);
     }
 
@@ -848,7 +848,7 @@ bool IndiModule::defineMeAsImager()
         if (!(getStore()["image"]->getElts()->contains("image")))
         {
             OST::PropertyMulti * pm = getProperty("image");
-            OST::ElementImg* img = new OST::ElementImg("", "", "");
+            OST::ElementImg* img = new OST::ElementImg("", "00", "");
             pm->addElt("image", img);
         }
 
@@ -859,7 +859,7 @@ bool IndiModule::defineMeAsImager()
 
     if (!getStore()["parms"]->getElts()->contains("exposure"))
     {
-        OST::ElementFloat* f = new  OST::ElementFloat("Exposure", "200", "");
+        OST::ElementFloat* f = new  OST::ElementFloat("Exposure", "exp000", "");
         f->setValue(0, false);
         f->setDirectEdit(true);
         f->setAutoUpdate(true);
@@ -873,7 +873,7 @@ bool IndiModule::defineMeAsImager()
 
     if (!getStore()["parms"]->getElts()->contains("gain"))
     {
-        OST::ElementInt* i  = new  OST::ElementInt("Gain", "205", "");
+        OST::ElementInt* i  = new  OST::ElementInt("Gain", "exp020", "");
         i->setValue(0, false);
         i->setDirectEdit(true);
         i->setAutoUpdate(true);
@@ -885,7 +885,7 @@ bool IndiModule::defineMeAsImager()
 
     if (!getStore()["parms"]->getElts()->contains("offset"))
     {
-        OST::ElementInt* i  = new  OST::ElementInt("Offset", "210", "");
+        OST::ElementInt* i  = new  OST::ElementInt("Offset", "exp030", "");
         i->setValue(0, false);
         i->setDirectEdit(true);
         i->setAutoUpdate(true);
@@ -906,21 +906,21 @@ bool IndiModule::defineMeAsNavigator()
 
     OST::PropertyMulti* pm  = getProperty("actions");
     pm->setRule(OST::SwitchsRule::AtMostOne);
-    OST::ElementBool* b = new  OST::ElementBool("Abort navigator", "", "");
+    OST::ElementBool* b = new  OST::ElementBool("Abort navigator", "nav99", "");
     b->setValue(false, false);
     pm->addElt("abortnavigator", b);
-    b = new  OST::ElementBool("Center target", "", "");
+    b = new  OST::ElementBool("Center target", "nav00", "");
     b->setValue(false, false);
     pm->addElt("gototarget", b);
-    OST::ElementString* s = new  OST::ElementString("Target name", "50", "");
+    OST::ElementString* s = new  OST::ElementString("Target name", "nav50", "");
     s->setDirectEdit(true);
     s->setAutoUpdate(true);
     pm->addElt("targetname", s);
-    OST::ElementFloat* f = new  OST::ElementFloat("Target RA", "51", "");
+    OST::ElementFloat* f = new  OST::ElementFloat("Target RA", "nav51", "");
     f->setDirectEdit(true);
     f->setAutoUpdate(true);
     pm->addElt("targetra", f);
-    f = new  OST::ElementFloat("Target DEC", "52", "");
+    f = new  OST::ElementFloat("Target DEC", "nav52", "");
     f->setDirectEdit(true);
     f->setAutoUpdate(true);
     pm->addElt("targetde", f);
@@ -958,7 +958,7 @@ double IndiModule::getSampling()
 bool IndiModule::giveMeADevice(QString name, QString label, INDI::BaseDevice::DRIVER_INTERFACE interface)
 {
     OST::PropertyMulti* pm = getProperty("devices");
-    OST::ElementString* s = new  OST::ElementString(label, "", "");
+    OST::ElementString* s = new  OST::ElementString(label, label, "");
     switch (interface)
     {
         case INDI::BaseDevice::DRIVER_INTERFACE::GENERAL_INTERFACE:
@@ -997,7 +997,8 @@ bool IndiModule::giveMeAnOptic()
 {
     if (getStore().contains("optic")) return false;
 
-    OST::PropertyMulti* pm = new OST::PropertyMulti("optic", "Optic", OST::ReadWrite, "Parameters", "", 0, true, false);
+    OST::PropertyMulti* pm = new OST::PropertyMulti("optic", "Optic", OST::ReadWrite, "Parameters", "", "222Parms333", true,
+            false);
     createProperty("optic", pm);
     OST::ElementFloat* f = new  OST::ElementFloat("Focal length", "1", "");
     f->setDirectEdit(true);

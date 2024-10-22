@@ -80,8 +80,9 @@ class Datastore : public Baseroot
          * @note it's only a label associated to a property, without any hierarchical effect
          * @return A boolean that reports whether it was successful, true means success.
          */
-        bool createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,
-                               const  QString &pPropertyDevcat, const QString &pPropertyGroup);
+        Q_DECL_DEPRECATED bool createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel,
+                const int &pPropertyPermission,
+                const  QString &pPropertyDevcat, const QString &pPropertyGroup);
         void emitPropertyCreation(const QString &pPropertyName);
         bool createProperty(const QString &pPropertyName,  OST::PropertyMulti* pProperty)
         {
