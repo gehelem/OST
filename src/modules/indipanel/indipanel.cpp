@@ -31,11 +31,11 @@ void IndiPanel::newDevice(INDI::BaseDevice dp)
         QString devpro = dev + pro;
         //BOOST_LOG_TRIVIAL(debug) << "Indipanel new property " << devpro.toStdString();
         QString mess;
-        if (!createOstProperty(devpro, pProperty.getLabel(), pProperty.getPermission(), pProperty.getDeviceName(),
-                               pProperty.getGroupName()))
-        {
-            sendMessage("Indipanel can't create property ");
-        }
+        OST::PropertyMulti *pm = new OST::PropertyMulti(devpro, pProperty.getLabel(),
+                OST::IntToPermission(pProperty.getPermission()),
+                pProperty.getDeviceName(),
+                pProperty.getGroupName(), "00", false, false);
+        createProperty(devpro, pm);
     }
 }
 void IndiPanel::removeDevice(INDI::BaseDevice dp)
@@ -61,7 +61,7 @@ void IndiPanel::newProperty(INDI::Property pProperty)
     OST::PropertyMulti* p = new OST::PropertyMulti(devpro, pProperty.getLabel(),
             OST::IntToPermission(pProperty.getPermission()),
             pProperty.getDeviceName(),
-            pProperty.getGroupName(), "", false, false);
+            pProperty.getGroupName(), "00", false, false);
     p->setFreeValue(dev); // we keep original device name to avoid unwanted level1 device translations
 
     switch (pProperty.getType())

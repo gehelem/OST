@@ -78,7 +78,7 @@
         "hasprofile":true,
         "devcat": "Parameters",
         "group": "",
-        "order":"06",
+        "order":"222Parms222",
         "permission": 2,
         "label": "Devices",
         "elements": {
@@ -147,7 +147,7 @@
     "actions": {
         "devcat": "Control",
         "group": "",
-        "order":"000Control",
+        "order":"000Control111",
         "permission": 2,
         "rule":1,
         "label": "Actions",
@@ -157,7 +157,7 @@
     "parms": {
         "devcat": "Parameters",
         "group": "",
-        "order":"111Parms",
+        "order":"222Parms111",
         "permission": 2,
         "hasprofile":true,
         "label": "Parameters",
