@@ -71,6 +71,7 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     pMainControl->setAvailableModuleLibs(_availableModuleLibs);
     pMainControl->setIndiDriverList(_availableIndiDrivers);
     pMainControl->sendDump();
+    pMainControl->setLng(_lng);
 
     if (_installfront != "N")
     {
