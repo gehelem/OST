@@ -169,7 +169,7 @@
     },
     "Corner size (pixels)": {
         "en": "Corner size (pixels)",
-        "fr": "Tailldu coin (pixels)"
+        "fr": "Taille du coin (pixels)"
     },
     "Corners": {
         "en": "Corners",
@@ -477,7 +477,7 @@
     },
     "Main Control": {
         "en": "Main Control",
-        "fr": "Contrôle principale"
+        "fr": "Contrôle principal"
     },
     "Max pulse (ms)": {
         "en": "Max pulse (ms)",
