@@ -169,7 +169,7 @@
     },
     "Corner size (pixels)": {
         "en": "Corner size (pixels)",
-        "fr": "Tailldu coin (pixels)"
+        "fr": "Taille du coin (pixels)"
     },
     "Corners": {
         "en": "Corners",
@@ -477,7 +477,7 @@
     },
     "Main Control": {
         "en": "Main Control",
-        "fr": "Contrôle principale"
+        "fr": "Contrôle principal"
     },
     "Max pulse (ms)": {
         "en": "Max pulse (ms)",
@@ -842,5 +842,73 @@
     "Temperature": {
         "en": "Temperature",
         "fr": "Température"
+    },
+    "Change exposure or gain": {
+        "en": "Change exposure or gain",
+        "fr": "Exposition ou gain"
+    },
+    "DE 0": {
+        "en": "DE 0",
+        "fr": "DE 0"
+    },
+    "DE 1": {
+        "en": "DE 1",
+        "fr": "DE 1"
+    },
+    "DE 2": {
+        "en": "DE 2",
+        "fr": "DE 2"
+    },
+    "Device - Property - Element": {
+        "en": "Device - Property - Element",
+        "fr": "Dispositif - Propriété - Element"
+    },
+    "Device - Property - Element (id)": {
+        "en": "Device - Property - Element (id)",
+        "fr": "Dispositif - Propriété - Element (id)"
+    },
+    "Device - Property - Element (label)": {
+        "en": "Device - Property - Element (label)",
+        "fr": "Dispositif - Propriété - Element (libellé)"
+    },
+    "Dynamic exposure/gain": {
+        "en": "Dynamic exposure/gain",
+        "fr": "Exposition/gain dynamique"
+    },
+    "Enable": {
+        "en": "Enable",
+        "fr": "Activer"
+    },
+    "Maximum value": {
+        "en": "Maximum value",
+        "fr": "Valeur maximum"
+    },
+    "Measure parm": {
+        "en": "Measure parm",
+        "fr": "Mesure"
+    },
+    "Minimum value": {
+        "en": "Minimum value",
+        "fr": "Valeur mininum"
+    },
+    "RA 0": {
+        "en": "RA 0",
+        "fr": "RA 0"
+    },
+    "RA 1": {
+        "en": "RA 1",
+        "fr": "RA 1"
+    },
+    "RA 2": {
+        "en": "RA 2",
+        "fr": "RA 2"
+    },
+    "Target value": {
+        "en": "Target value",
+        "fr": "Valeur cible"
+    },
+    "Threshold (%)": {
+        "en": "Threshold (%)",
+        "fr": "Seuil (%)"
     }
 }
