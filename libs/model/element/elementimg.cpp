@@ -25,6 +25,14 @@ QString ElementImg::getType()
 {
     return "img";
 }
+bool ElementImg::getShowStats(void)
+{
+    return mShowStats;
+}
+void ElementImg::setShowStats(bool b)
+{
+    mShowStats = b;
+}
 
 
 void ValueImg::accept(ValueVisitor* pVisitor)

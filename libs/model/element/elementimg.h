@@ -18,8 +18,10 @@ class ElementImg: public ElementTemplateNotNumeric<ImgData>
         ElementImg(const QString &label, const QString &order, const QString &hint);
         ~ElementImg();
         QString getType() override;
+        bool getShowStats(void);
+        void setShowStats(bool b);
     private:
-
+        bool mShowStats = true;
 };
 
 class ValueImg: public ValueTemplate<ImgData>
