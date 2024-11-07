@@ -131,6 +131,7 @@ void ElementJsonDumper::visit(ElementImg *pElement)
     QJsonObject json = dumpElementCommons(pElement);
 
     QJsonObject imgdata;
+    imgdata["showstats"] =  pElement->getShowStats();
     imgdata["urljpeg"] =  pElement->value().mUrlJpeg;
     imgdata["urlfits"] = pElement->value().mUrlFits;
     imgdata["urlthumbnail"] = pElement->value().mUrlThumbnail;

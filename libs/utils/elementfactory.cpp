@@ -137,7 +137,6 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
                                            );
             ImgData dta;
 
-
             if (pData.contains("urljpeg")) dta.mUrlJpeg = pData["urljpeg"].toString();
             if (pData.contains("urlfits")) dta.mUrlFits = pData["urlfits"].toString();
             if (pData.contains("urloverlay")) dta.mUrlOverlay = pData["urloverlay"].toString();
@@ -155,6 +154,7 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
             if (pData.contains("solverde")) dta.solverDE = pData["solverde"].toDouble();
 
             pElement->setValue(dta, false);
+            if (pData.contains("showstats")) pElement->setShowStats( pData["showstats"].toBool());
 
             return pElement;
         }

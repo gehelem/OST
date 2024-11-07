@@ -771,6 +771,7 @@
                 "label": "image in grid",
                 "urljpeg":"dummy.jpg",
                 "autoupdate":true,
+                "showstats":false,
                 "directedit":true,
                 "order":"4"
             },
