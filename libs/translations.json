@@ -910,5 +910,13 @@
     "Threshold (%)": {
         "en": "Threshold (%)",
         "fr": "Seuil (%)"
+    },
+    "Archives": {
+        "en": "Archives",
+        "fr": "Archives"
+    },
+    "Telescope Simulator": {
+        "en": "Telescope Simulator",
+        "fr": "Simulateur de téléscope"
     }
 }
