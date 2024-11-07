@@ -180,6 +180,7 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     connect(mod, &Basemodule::loadOtherModule, this, &Controller::loadModule);
     connect(this, &Controller::controllerEvent, mod, &Basemodule::OnExternalEvent);
     //connect(wshandler, &WShandler::externalEvent, mod, &Basemodule::OnExternalEvent);
+    mod->OnExternalEvent("afterinit", name, QString(), QVariantMap());
     mod->sendDump();
 
     QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
