@@ -341,7 +341,20 @@
                 "type":"string",
                 "order": "99",
                 "label": "Text mixed"
+            },
+            "date": {
+                "autoupdate":true,
+                "type":"date",
+                "order": "99",
+                "label": "Test Date"
+            },
+            "time": {
+                "autoupdate":true,
+                "type":"time",
+                "order": "99",
+                "label": "Test Time"
             }
+
         },
         "group": "Mixed",
         "permission": 2,
