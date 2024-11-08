@@ -352,7 +352,10 @@
                 "autoupdate":true,
                 "type":"time",
                 "order": "99",
-                "label": "Test Time"
+                "label": "Test Time",
+                "hh":13,
+                "mm":14,
+                "ss":15.15
             }
 
         },

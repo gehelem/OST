@@ -134,18 +134,18 @@ void ValueJsonDumper::visit(ValuePrg * pValue)
 void ValueJsonDumper::visit(ValueDate * pValue)
 {
     QJsonObject ob;
-    ob["year"] = pValue->value.year;
-    ob["month"] = pValue->value.month;
-    ob["day"] = pValue->value.day;
+    ob["year"] = pValue->value.year();
+    ob["month"] = pValue->value.month();
+    ob["day"] = pValue->value.day();
     mResult = ob;
 
 };
 void ValueJsonDumper::visit(ValueTime * pValue)
 {
     QJsonObject ob;
-    ob["hh"] = pValue->value.hh;
-    ob["mm"] = pValue->value.mm;
-    ob["ss"] = pValue->value.ss;
+    ob["hh"] = pValue->value.HH();
+    ob["mm"] = pValue->value.MM();
+    ob["ss"] = pValue->value.SS();
     mResult = ob;
 
 };

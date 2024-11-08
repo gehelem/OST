@@ -209,9 +209,7 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
                                              pData["hint"].toString()
                                             );
             DateData d;
-            d.year = IntToMsgLevel(pData["year"].toInt());
-            d.month = IntToMsgLevel(pData["month"].toInt());
-            d.day = IntToMsgLevel(pData["day"].toInt());
+            d.setYMD(pData["year"].toInt(), pData["month"].toInt(), pData["day"].toInt());
             pElement->setValue(d, false);
             return pElement;
         }
@@ -222,9 +220,7 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
                                              pData["hint"].toString()
                                             );
             TimeData t;
-            t.hh = IntToMsgLevel(pData["hh"].toInt());
-            t.mm = IntToMsgLevel(pData["mm"].toInt());
-            t.ss = IntToMsgLevel(pData["ss"].toFloat());
+            t.setHMS(pData["hh"].toInt(), pData["mm"].toInt(), pData["ss"].toFloat());
             pElement->setValue(t, false);
             return pElement;
         }
