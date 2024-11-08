@@ -202,6 +202,32 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
             if (pData.contains("dynlabel")) pElement->setDynLabel(pData["dynlabel"].toString(), false);
             return pElement;
         }
+        if (pData["type"].toString() == "date")
+        {
+            auto *pElement = new ElementDate(pData["label"].toString(),
+                                             pData["order"].toString(),
+                                             pData["hint"].toString()
+                                            );
+            DateData d;
+            d.year = IntToMsgLevel(pData["year"].toInt());
+            d.month = IntToMsgLevel(pData["month"].toInt());
+            d.day = IntToMsgLevel(pData["day"].toInt());
+            pElement->setValue(d, false);
+            return pElement;
+        }
+        if (pData["type"].toString() == "time")
+        {
+            auto *pElement = new ElementTime(pData["label"].toString(),
+                                             pData["order"].toString(),
+                                             pData["hint"].toString()
+                                            );
+            TimeData t;
+            t.hh = IntToMsgLevel(pData["hh"].toInt());
+            t.mm = IntToMsgLevel(pData["mm"].toInt());
+            t.ss = IntToMsgLevel(pData["ss"].toFloat());
+            pElement->setValue(t, false);
+            return pElement;
+        }
 
 
         qDebug() << "Unknown Element type " << pData["label"].toString() << ":" << pData["type"].toString() << "-" <<
@@ -267,6 +293,18 @@ ValueBase *ValueFactory::createValue(ElementBase * &pElement)
     if (pElement->getType() == "light")
     {
         auto *pValue = new ValueLight(pElement);
+        pValue->updateValue();
+        return pValue;
+    }
+    if (pElement->getType() == "date")
+    {
+        auto *pValue = new ValueDate(pElement);
+        pValue->updateValue();
+        return pValue;
+    }
+    if (pElement->getType() == "time")
+    {
+        auto *pValue = new ValueTime(pElement);
         pValue->updateValue();
         return pValue;
     }

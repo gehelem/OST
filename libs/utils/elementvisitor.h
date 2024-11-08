@@ -13,6 +13,8 @@ class ElementImg;
 class ElementVideo;
 class ElementMessage;
 class ElementPrg;
+class ElementDate;
+class ElementTime;
 
 class ElementVisitor
 {
@@ -48,6 +50,12 @@ class ElementVisitor
         virtual void visit(ElementPrg* pElement) = 0;
         virtual void visit(ElementPrg* pElement, QVariantMap &data) = 0;
         virtual void visit(ElementPrg* pElement, QString &action, QVariantMap &data) = 0;
+        virtual void visit(ElementDate* pElement) = 0;
+        virtual void visit(ElementDate* pElement, QVariantMap &data) = 0;
+        virtual void visit(ElementDate* pElement, QString &action, QVariantMap &data) = 0;
+        virtual void visit(ElementTime* pElement) = 0;
+        virtual void visit(ElementTime* pElement, QVariantMap &data) = 0;
+        virtual void visit(ElementTime* pElement, QString &action, QVariantMap &data) = 0;
 };
 
 class GridInt;
@@ -87,6 +95,8 @@ class ValueImg;
 class ValueVideo;
 class ValueMessage;
 class ValuePrg;
+class ValueDate;
+class ValueTime;
 
 
 class ValueVisitor
@@ -105,6 +115,8 @@ class ValueVisitor
         virtual void visit(ValueVideo*  pValue) = 0;
         virtual void visit(ValueMessage*  pValue) = 0;
         virtual void visit(ValuePrg* pValue) = 0;
+        virtual void visit(ValueDate* pValue) = 0;
+        virtual void visit(ValueTime* pValue) = 0;
 };
 
 }

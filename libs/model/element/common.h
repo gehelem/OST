@@ -98,6 +98,20 @@ typedef struct PrgData
     double  value = 0;
 } PrgData;
 
+typedef struct DateData
+{
+    int year = 0;
+    int month = 0;
+    int day = 0;
+} DateData;
+
+typedef struct TimeData
+{
+    int hh = 0;
+    int mm = 0;
+    float ss = 0;
+} TimeData;
+
 
 typedef struct ImgData
 {

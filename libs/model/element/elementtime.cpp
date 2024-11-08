@@ -1,71 +1,42 @@
-#include "elementprg.h"
+#include "elementtime.h"
 namespace  OST
 {
-ElementPrg::ElementPrg(const QString &label, const QString &order, const QString &hint)
+ElementTime::ElementTime(const QString &label, const QString &order, const QString &hint)
     : ElementTemplateNotNumeric(label, order, hint)
 {
 }
-ElementPrg::~ElementPrg()
+ElementTime::~ElementTime()
 {
 }
-void ElementPrg::accept(ElementVisitor *pVisitor)
+void ElementTime::accept(ElementVisitor *pVisitor)
 {
     pVisitor->visit(this);
 }
-void ElementPrg::accept(ElementVisitor *pVisitor, QVariantMap &data)
+void ElementTime::accept(ElementVisitor *pVisitor, QVariantMap &data)
 {
     pVisitor->visit(this, data);
 }
-void ElementPrg::accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data)
+void ElementTime::accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data)
 {
     pVisitor->visit(this, action, data);
 }
 
-QString ElementPrg::getType()
+QString ElementTime::getType()
 {
-    return "prg";
-}
-void ElementPrg::setPrgValue(const double &v, const bool &emitEvent)
-{
-    if ((v < 0) || (v > 100))
-    {
-        sendMessage(OST::MsgLevel::Warn, "Invalid spinner value (" + QString::number(v) + ")");
-        return;
-    }
-    PrgData d = value();
-    d.value = v;
-    ElementTemplateNotNumeric<PrgData>::setValue(d, emitEvent);
-}
-void ElementPrg::setDynLabel(const QString &s, const bool &emitEvent)
-{
-    PrgData d = value();
-    d.dynlabel = s;
-    ElementTemplateNotNumeric<PrgData>::setValue(d, emitEvent);
-}
-QString ElementPrg::dynLabel()
-{
-    return mDynLabel;
-}
-PrgType ElementPrg::prgType()
-{
-    return mType;
-}
-void ElementPrg::setPrgType(PrgType t)
-{
-    mType = t;
+    return "time";
 }
 
-void ValuePrg::accept(ValueVisitor* pVisitor)
+void ValueTime::accept(ValueVisitor* pVisitor)
 {
     pVisitor->visit(this);
 }
-void ValuePrg::updateValue()
+void ValueTime::updateValue()
 {
-    value = static_cast<ElementPrg*>(pElement)->value();
+    value = static_cast<ElementTime*>(pElement)->value();
 }
-void ValuePrg::updateElement(const bool &emitEvent)
+void ValueTime::updateElement(const bool &emitEvent)
 {
-    static_cast<ElementPrg*>(pElement)->setValue(value, emitEvent);
+    static_cast<ElementTime*>(pElement)->setValue(value, emitEvent);
 }
 
 

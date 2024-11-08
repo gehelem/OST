@@ -74,6 +74,14 @@ void ElementUpdate::visit(ElementPrg* pElement, QVariantMap &data )
 {
     Q_UNUSED(pElement)  Q_UNUSED(data)
 }
+void ElementUpdate::visit(ElementDate* pElement, QVariantMap &data )
+{
+    Q_UNUSED(pElement)  Q_UNUSED(data)
+}
+void ElementUpdate::visit(ElementTime* pElement, QVariantMap &data )
+{
+    Q_UNUSED(pElement)  Q_UNUSED(data)
+}
 void ElementUpdate::visit(ElementInt* pElement, QString &action, QVariantMap &data)
 {
     Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
@@ -107,6 +115,14 @@ void ElementUpdate::visit(ElementMessage* pElement, QString &action, QVariantMap
     Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
 }
 void ElementUpdate::visit(ElementPrg* pElement, QString &action, QVariantMap &data)
+{
+    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
+}
+void ElementUpdate::visit(ElementDate* pElement, QString &action, QVariantMap &data)
+{
+    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
+}
+void ElementUpdate::visit(ElementTime* pElement, QString &action, QVariantMap &data)
 {
     Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
 }
