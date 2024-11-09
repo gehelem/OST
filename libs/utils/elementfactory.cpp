@@ -208,8 +208,8 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
                                              pData["order"].toString(),
                                              pData["hint"].toString()
                                             );
-            DateData d;
-            d.setYMD(pData["year"].toInt(), pData["month"].toInt(), pData["day"].toInt());
+            QDate d;
+            d.setDate(pData["year"].toInt(), pData["month"].toInt(), pData["day"].toInt());
             pElement->setValue(d, false);
             return pElement;
         }
@@ -219,8 +219,8 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
                                              pData["order"].toString(),
                                              pData["hint"].toString()
                                             );
-            TimeData t;
-            t.setHMS(pData["hh"].toInt(), pData["mm"].toInt(), pData["ss"].toFloat());
+            QTime t;
+            t.setHMS(pData["hh"].toInt(), pData["mm"].toInt(), pData["ss"].toInt(), pData["ms"].toInt());
             pElement->setValue(t, false);
             return pElement;
         }

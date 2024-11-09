@@ -143,9 +143,10 @@ void ValueJsonDumper::visit(ValueDate * pValue)
 void ValueJsonDumper::visit(ValueTime * pValue)
 {
     QJsonObject ob;
-    ob["hh"] = pValue->value.HH();
-    ob["mm"] = pValue->value.MM();
-    ob["ss"] = pValue->value.SS();
+    ob["hh"] = pValue->value.hour();
+    ob["mm"] = pValue->value.minute();
+    ob["ss"] = pValue->value.second();
+    ob["ms"] = pValue->value.msec();
     mResult = ob;
 
 };

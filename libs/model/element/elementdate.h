@@ -6,7 +6,7 @@
 namespace  OST
 {
 
-class ElementDate: public ElementTemplateNotNumeric<DateData>
+class ElementDate: public ElementTemplateNotNumeric<QDate>
 {
 
         Q_OBJECT
@@ -24,14 +24,14 @@ class ElementDate: public ElementTemplateNotNumeric<DateData>
 
 };
 
-class ValueDate: public ValueTemplate<DateData>
+class ValueDate: public ValueTemplate<QDate>
 {
         Q_OBJECT
 
     public:
 
         void accept(ValueVisitor* pVisitor)  override;
-        ValueDate(ElementBase* element): ValueTemplate<DateData>(element) {}
+        ValueDate(ElementBase* element): ValueTemplate<QDate>(element) {}
         ~ValueDate() {}
         void updateValue() override;
         void updateElement(const bool &emitEvent) override;

@@ -6,7 +6,7 @@
 namespace  OST
 {
 
-class ElementTime: public ElementTemplateNotNumeric<TimeData>
+class ElementTime: public ElementTemplateNotNumeric<QTime>
 {
 
         Q_OBJECT
@@ -24,14 +24,14 @@ class ElementTime: public ElementTemplateNotNumeric<TimeData>
 
 };
 
-class ValueTime: public ValueTemplate<TimeData>
+class ValueTime: public ValueTemplate<QTime>
 {
         Q_OBJECT
 
     public:
 
         void accept(ValueVisitor* pVisitor)  override;
-        ValueTime(ElementBase* element): ValueTemplate<TimeData>(element) {}
+        ValueTime(ElementBase* element): ValueTemplate<QTime>(element) {}
         ~ValueTime() {}
         void updateValue() override;
         void updateElement(const bool &emitEvent) override;
