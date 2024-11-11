@@ -341,7 +341,26 @@
                 "type":"string",
                 "order": "99",
                 "label": "Text mixed"
+            },
+            "date": {
+                "autoupdate":true,
+                "type":"date",
+                "order": "99",
+                "label": "Test Date",
+                "year":2024,
+                "month":11,
+                "day":8
+            },
+            "time": {
+                "autoupdate":true,
+                "type":"time",
+                "order": "99",
+                "label": "Test Time",
+                "hh":13,
+                "mm":14,
+                "ss":15.15
             }
+
         },
         "group": "Mixed",
         "permission": 2,

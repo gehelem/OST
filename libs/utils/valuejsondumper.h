@@ -24,6 +24,8 @@ class ValueJsonDumper : public ValueVisitor
         void visit(ValueVideo*  pValue)override;
         void visit(ValueMessage*  pValue)override;
         void visit(ValuePrg* pValue) override;
+        void visit(ValueDate* pValue) override;
+        void visit(ValueTime* pValue) override;
 
         [[nodiscard]] const QJsonValue &getResult() const
         {

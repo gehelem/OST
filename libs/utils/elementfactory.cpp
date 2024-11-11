@@ -202,6 +202,28 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
             if (pData.contains("dynlabel")) pElement->setDynLabel(pData["dynlabel"].toString(), false);
             return pElement;
         }
+        if (pData["type"].toString() == "date")
+        {
+            auto *pElement = new ElementDate(pData["label"].toString(),
+                                             pData["order"].toString(),
+                                             pData["hint"].toString()
+                                            );
+            QDate d;
+            d.setDate(pData["year"].toInt(), pData["month"].toInt(), pData["day"].toInt());
+            pElement->setValue(d, false);
+            return pElement;
+        }
+        if (pData["type"].toString() == "time")
+        {
+            auto *pElement = new ElementTime(pData["label"].toString(),
+                                             pData["order"].toString(),
+                                             pData["hint"].toString()
+                                            );
+            QTime t;
+            t.setHMS(pData["hh"].toInt(), pData["mm"].toInt(), pData["ss"].toInt(), pData["ms"].toInt());
+            pElement->setValue(t, false);
+            return pElement;
+        }
 
 
         qDebug() << "Unknown Element type " << pData["label"].toString() << ":" << pData["type"].toString() << "-" <<
@@ -267,6 +289,18 @@ ValueBase *ValueFactory::createValue(ElementBase * &pElement)
     if (pElement->getType() == "light")
     {
         auto *pValue = new ValueLight(pElement);
+        pValue->updateValue();
+        return pValue;
+    }
+    if (pElement->getType() == "date")
+    {
+        auto *pValue = new ValueDate(pElement);
+        pValue->updateValue();
+        return pValue;
+    }
+    if (pElement->getType() == "time")
+    {
+        auto *pValue = new ValueTime(pElement);
         pValue->updateValue();
         return pValue;
     }

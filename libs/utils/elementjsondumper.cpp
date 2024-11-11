@@ -247,5 +247,26 @@ void ElementJsonDumper::visit(ElementPrg *pElement)
 
     mResult = json;
 }
+void ElementJsonDumper::visit(ElementDate *pElement)
+{
+    QJsonObject json = dumpElementCommons(pElement);
+    json["type"] = "date";
+    json["year"] = pElement->value().year();
+    json["month"] = pElement->value().month();
+    json["day"] = pElement->value().day();
+
+    mResult = json;
+}
+void ElementJsonDumper::visit(ElementTime *pElement)
+{
+    QJsonObject json = dumpElementCommons(pElement);
+    json["type"] = "time";
+    json["hh"] = pElement->value().hour();
+    json["mm"] = pElement->value().minute();
+    json["ss"] = pElement->value().second();
+    json["ms"] = pElement->value().msec();
+
+    mResult = json;
+}
 
 }

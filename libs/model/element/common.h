@@ -98,7 +98,6 @@ typedef struct PrgData
     double  value = 0;
 } PrgData;
 
-
 typedef struct ImgData
 {
     QString mUrlJpeg = "";

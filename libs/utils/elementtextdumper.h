@@ -11,6 +11,8 @@
 #include <elementvideo.h>
 #include <elementmessage.h>
 #include <elementprg.h>
+#include <elementdate.h>
+#include <elementtime.h>
 
 namespace  OST
 {
@@ -124,6 +126,30 @@ class ElementTextDumper : public ElementVisitor
             Q_UNUSED(data)
         }
         void visit(ElementPrg* pElement, QString &action, QVariantMap &data ) override
+        {
+            Q_UNUSED(pElement);
+            Q_UNUSED(action);
+            Q_UNUSED(data)
+        }
+        void visit(ElementDate *pElement) override;
+        void visit(ElementDate* pElement, QVariantMap &data ) override
+        {
+            Q_UNUSED(pElement);
+            Q_UNUSED(data)
+        }
+        void visit(ElementDate* pElement, QString &action, QVariantMap &data ) override
+        {
+            Q_UNUSED(pElement);
+            Q_UNUSED(action);
+            Q_UNUSED(data)
+        }
+        void visit(ElementTime *pElement) override;
+        void visit(ElementTime* pElement, QVariantMap &data ) override
+        {
+            Q_UNUSED(pElement);
+            Q_UNUSED(data)
+        }
+        void visit(ElementTime* pElement, QString &action, QVariantMap &data ) override
         {
             Q_UNUSED(pElement);
             Q_UNUSED(action);
