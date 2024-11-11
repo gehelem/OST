@@ -82,37 +82,40 @@ $(function() {
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="elementvideo_8h.html">elementvideo.h</a>&gt;</span></div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="elementmessage_8h.html">elementmessage.h</a>&gt;</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="elementprg_8h.html">elementprg.h</a>&gt;</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword">namespace  </span><a class="code" href="namespaceOST.html">OST</a></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;{</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="classOST_1_1ElementFactory.html">   18</a></span>&#160;<span class="keyword">class </span><a class="code" href="classOST_1_1ElementFactory.html">ElementFactory</a></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;{</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00022"></a><span class="lineno"><a class="line" href="classOST_1_1ElementFactory.html#a3c3f3da667841120ba52d544c42a9c3b">   22</a></span>&#160;        <a class="code" href="classOST_1_1ElementFactory.html#a3c3f3da667841120ba52d544c42a9c3b">ElementFactory</a>() = <span class="keyword">delete</span>;</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;        <span class="keyword">static</span> <a class="code" href="classOST_1_1ElementBase.html">ElementBase</a>* <a class="code" href="classOST_1_1ElementFactory.html#a8574ec237845cbe7bc9a7aa0ce04a410">createElement</a>(<span class="keyword">const</span> QVariantMap &amp;pData);</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;};</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="classOST_1_1ValueFactory.html">   26</a></span>&#160;<span class="keyword">class </span><a class="code" href="classOST_1_1ValueFactory.html">ValueFactory</a></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;{</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00030"></a><span class="lineno"><a class="line" href="classOST_1_1ValueFactory.html#ae413a90a983993eb1d2bf33c00a63303">   30</a></span>&#160;        <a class="code" href="classOST_1_1ValueFactory.html#ae413a90a983993eb1d2bf33c00a63303">ValueFactory</a>() = <span class="keyword">delete</span>;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        <span class="keyword">static</span> <a class="code" href="classOST_1_1ValueBase.html">ValueBase</a>* <a class="code" href="classOST_1_1ValueFactory.html#a0669f0ecd75253c94f0b362b55b72ecf">createValue</a>(<a class="code" href="classOST_1_1ElementBase.html">ElementBase</a>* &amp;pElement);</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;};</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;}</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">#endif </span><span class="comment">//OST_ELEMENTFACTORY_H</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="elementdate_8h.html">elementdate.h</a>&gt;</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="elementtime_8h.html">elementtime.h</a>&gt;</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keyword">namespace  </span><a class="code" href="namespaceOST.html">OST</a></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;{</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
+<div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="classOST_1_1ElementFactory.html">   20</a></span>&#160;<span class="keyword">class </span><a class="code" href="classOST_1_1ElementFactory.html">ElementFactory</a></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;{</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00024"></a><span class="lineno"><a class="line" href="classOST_1_1ElementFactory.html#a3c3f3da667841120ba52d544c42a9c3b">   24</a></span>&#160;        <a class="code" href="classOST_1_1ElementFactory.html#a3c3f3da667841120ba52d544c42a9c3b">ElementFactory</a>() = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;        <span class="keyword">static</span> <a class="code" href="classOST_1_1ElementBase.html">ElementBase</a>* <a class="code" href="classOST_1_1ElementFactory.html#a8574ec237845cbe7bc9a7aa0ce04a410">createElement</a>(<span class="keyword">const</span> QVariantMap &amp;pData);</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;};</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
+<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="classOST_1_1ValueFactory.html">   28</a></span>&#160;<span class="keyword">class </span><a class="code" href="classOST_1_1ValueFactory.html">ValueFactory</a></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;{</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00032"></a><span class="lineno"><a class="line" href="classOST_1_1ValueFactory.html#ae413a90a983993eb1d2bf33c00a63303">   32</a></span>&#160;        <a class="code" href="classOST_1_1ValueFactory.html#ae413a90a983993eb1d2bf33c00a63303">ValueFactory</a>() = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        <span class="keyword">static</span> <a class="code" href="classOST_1_1ValueBase.html">ValueBase</a>* <a class="code" href="classOST_1_1ValueFactory.html#a0669f0ecd75253c94f0b362b55b72ecf">createValue</a>(<a class="code" href="classOST_1_1ElementBase.html">ElementBase</a>* &amp;pElement);</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;};</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;}</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">#endif </span><span class="comment">//OST_ELEMENTFACTORY_H</span></div>
 <div class="ttc" id="aclassOST_1_1ElementBase_html"><div class="ttname"><a href="classOST_1_1ElementBase.html">OST::ElementBase</a></div><div class="ttdef"><b>Definition:</b> elementbase.h:15</div></div>
-<div class="ttc" id="aclassOST_1_1ElementFactory_html"><div class="ttname"><a href="classOST_1_1ElementFactory.html">OST::ElementFactory</a></div><div class="ttdef"><b>Definition:</b> elementfactory.h:19</div></div>
+<div class="ttc" id="aclassOST_1_1ElementFactory_html"><div class="ttname"><a href="classOST_1_1ElementFactory.html">OST::ElementFactory</a></div><div class="ttdef"><b>Definition:</b> elementfactory.h:21</div></div>
 <div class="ttc" id="aclassOST_1_1ElementFactory_html_a3c3f3da667841120ba52d544c42a9c3b"><div class="ttname"><a href="classOST_1_1ElementFactory.html#a3c3f3da667841120ba52d544c42a9c3b">OST::ElementFactory::ElementFactory</a></div><div class="ttdeci">ElementFactory()=delete</div></div>
 <div class="ttc" id="aclassOST_1_1ElementFactory_html_a8574ec237845cbe7bc9a7aa0ce04a410"><div class="ttname"><a href="classOST_1_1ElementFactory.html#a8574ec237845cbe7bc9a7aa0ce04a410">OST::ElementFactory::createElement</a></div><div class="ttdeci">static ElementBase * createElement(const QVariantMap &amp;pData)</div><div class="ttdef"><b>Definition:</b> elementfactory.cpp:5</div></div>
 <div class="ttc" id="aclassOST_1_1ValueBase_html"><div class="ttname"><a href="classOST_1_1ValueBase.html">OST::ValueBase</a></div><div class="ttdef"><b>Definition:</b> elementbase.h:68</div></div>
-<div class="ttc" id="aclassOST_1_1ValueFactory_html"><div class="ttname"><a href="classOST_1_1ValueFactory.html">OST::ValueFactory</a></div><div class="ttdef"><b>Definition:</b> elementfactory.h:27</div></div>
-<div class="ttc" id="aclassOST_1_1ValueFactory_html_a0669f0ecd75253c94f0b362b55b72ecf"><div class="ttname"><a href="classOST_1_1ValueFactory.html#a0669f0ecd75253c94f0b362b55b72ecf">OST::ValueFactory::createValue</a></div><div class="ttdeci">static ValueBase * createValue(ElementBase *&amp;pElement)</div><div class="ttdef"><b>Definition:</b> elementfactory.cpp:217</div></div>
+<div class="ttc" id="aclassOST_1_1ValueFactory_html"><div class="ttname"><a href="classOST_1_1ValueFactory.html">OST::ValueFactory</a></div><div class="ttdef"><b>Definition:</b> elementfactory.h:29</div></div>
+<div class="ttc" id="aclassOST_1_1ValueFactory_html_a0669f0ecd75253c94f0b362b55b72ecf"><div class="ttname"><a href="classOST_1_1ValueFactory.html#a0669f0ecd75253c94f0b362b55b72ecf">OST::ValueFactory::createValue</a></div><div class="ttdeci">static ValueBase * createValue(ElementBase *&amp;pElement)</div><div class="ttdef"><b>Definition:</b> elementfactory.cpp:239</div></div>
 <div class="ttc" id="aclassOST_1_1ValueFactory_html_ae413a90a983993eb1d2bf33c00a63303"><div class="ttname"><a href="classOST_1_1ValueFactory.html#ae413a90a983993eb1d2bf33c00a63303">OST::ValueFactory::ValueFactory</a></div><div class="ttdeci">ValueFactory()=delete</div></div>
 <div class="ttc" id="aelementbool_8h_html"><div class="ttname"><a href="elementbool_8h.html">elementbool.h</a></div></div>
+<div class="ttc" id="aelementdate_8h_html"><div class="ttname"><a href="elementdate_8h.html">elementdate.h</a></div></div>
 <div class="ttc" id="aelementfloat_8h_html"><div class="ttname"><a href="elementfloat_8h.html">elementfloat.h</a></div></div>
 <div class="ttc" id="aelementimg_8h_html"><div class="ttname"><a href="elementimg_8h.html">elementimg.h</a></div></div>
 <div class="ttc" id="aelementint_8h_html"><div class="ttname"><a href="elementint_8h.html">elementint.h</a></div></div>
@@ -120,6 +123,7 @@ $(function() {
 <div class="ttc" id="aelementmessage_8h_html"><div class="ttname"><a href="elementmessage_8h.html">elementmessage.h</a></div></div>
 <div class="ttc" id="aelementprg_8h_html"><div class="ttname"><a href="elementprg_8h.html">elementprg.h</a></div></div>
 <div class="ttc" id="aelementstring_8h_html"><div class="ttname"><a href="elementstring_8h.html">elementstring.h</a></div></div>
+<div class="ttc" id="aelementtime_8h_html"><div class="ttname"><a href="elementtime_8h.html">elementtime.h</a></div></div>
 <div class="ttc" id="aelementvideo_8h_html"><div class="ttname"><a href="elementvideo_8h.html">elementvideo.h</a></div></div>
 <div class="ttc" id="anamespaceOST_html"><div class="ttname"><a href="namespaceOST.html">OST</a></div><div class="ttdef"><b>Definition:</b> common.h:7</div></div>
 </div><!-- fragment --></div><!-- contents -->

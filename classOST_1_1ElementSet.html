@@ -69,7 +69,7 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classOST_1_1ElementSet-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">OST::ElementSet Class Reference</div>  </div>
+<div class="title">OST::ElementSet Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -151,6 +151,18 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a47bed704ce78658fdb8f73041179a011"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a97bb90ac807a08280ee48e5db86a86f5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ElementSet.html#a97bb90ac807a08280ee48e5db86a86f5">visit</a> (<a class="el" href="classOST_1_1ElementPrg.html">ElementPrg</a> *pElement, QString &amp;action, QVariantMap &amp;data) override</td></tr>
 <tr class="separator:a97bb90ac807a08280ee48e5db86a86f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a309415e8d5f0cca2147678708b84a21f"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ElementVisitor.html#a309415e8d5f0cca2147678708b84a21f">visit</a> (<a class="el" href="classOST_1_1ElementDate.html">ElementDate</a> *pElement)=0</td></tr>
+<tr class="separator:a309415e8d5f0cca2147678708b84a21f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87c4d78892b21efe50fd6e566c913f4e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ElementVisitor.html#a87c4d78892b21efe50fd6e566c913f4e">visit</a> (<a class="el" href="classOST_1_1ElementDate.html">ElementDate</a> *pElement, QVariantMap &amp;data)=0</td></tr>
+<tr class="separator:a87c4d78892b21efe50fd6e566c913f4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a721cb097ee16d2c8240cb872c4af0707"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ElementVisitor.html#a721cb097ee16d2c8240cb872c4af0707">visit</a> (<a class="el" href="classOST_1_1ElementDate.html">ElementDate</a> *pElement, QString &amp;action, QVariantMap &amp;data)=0</td></tr>
+<tr class="separator:a721cb097ee16d2c8240cb872c4af0707"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac752d97e786f7af04a2bfef64ca06413"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ElementVisitor.html#ac752d97e786f7af04a2bfef64ca06413">visit</a> (<a class="el" href="classOST_1_1ElementTime.html">ElementTime</a> *pElement)=0</td></tr>
+<tr class="separator:ac752d97e786f7af04a2bfef64ca06413"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5126bfe58437152fe2caa45c73e53e50"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ElementVisitor.html#a5126bfe58437152fe2caa45c73e53e50">visit</a> (<a class="el" href="classOST_1_1ElementTime.html">ElementTime</a> *pElement, QVariantMap &amp;data)=0</td></tr>
+<tr class="separator:a5126bfe58437152fe2caa45c73e53e50"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3638efbfe7c7b858744c0214d094cee9"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1ElementVisitor.html#a3638efbfe7c7b858744c0214d094cee9">visit</a> (<a class="el" href="classOST_1_1ElementTime.html">ElementTime</a> *pElement, QString &amp;action, QVariantMap &amp;data)=0</td></tr>
+<tr class="separator:a3638efbfe7c7b858744c0214d094cee9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a5b49db89613419837be3e53315b67307"></a>
@@ -180,7 +192,7 @@ Public Member Functions</h2></td></tr>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
 <a id="a5439a7b3d235b315b998bb61d62fdae1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5439a7b3d235b315b998bb61d62fdae1">&#9670;&nbsp;</a></span>visit() <span class="overload">[1/27]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a5439a7b3d235b315b998bb61d62fdae1">&#9670;&nbsp;</a></span>visit() <span class="overload">[1/33]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -208,7 +220,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="ac6f12e4b23a94489c11b773465085877"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac6f12e4b23a94489c11b773465085877">&#9670;&nbsp;</a></span>visit() <span class="overload">[2/27]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ac6f12e4b23a94489c11b773465085877">&#9670;&nbsp;</a></span>visit() <span class="overload">[2/33]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -252,7 +264,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a923c3ad545f480409ab83950d2c5faaf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a923c3ad545f480409ab83950d2c5faaf">&#9670;&nbsp;</a></span>visit() <span class="overload">[3/27]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a923c3ad545f480409ab83950d2c5faaf">&#9670;&nbsp;</a></span>visit() <span class="overload">[3/33]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -289,8 +301,118 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a309415e8d5f0cca2147678708b84a21f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a309415e8d5f0cca2147678708b84a21f">&#9670;&nbsp;</a></span>visit() <span class="overload">[4/33]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void OST::ElementVisitor::visit </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classOST_1_1ElementDate.html">ElementDate</a> *&#160;</td>
+          <td class="paramname"><em>pElement</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implemented in <a class="el" href="classOST_1_1ElementUpdate.html#a3901cb3f51f391633a38ca504c048aa4">OST::ElementUpdate</a>, <a class="el" href="classOST_1_1ElementTextDumper.html#af8a603097d98dec56179c281df99e108">OST::ElementTextDumper</a>, and <a class="el" href="classOST_1_1ElementJsonDumper.html#af6b9ded1a5225c21f345183910f1cd9a">OST::ElementJsonDumper</a>.</p>
+
+</div>
+</div>
+<a id="a721cb097ee16d2c8240cb872c4af0707"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a721cb097ee16d2c8240cb872c4af0707">&#9670;&nbsp;</a></span>visit() <span class="overload">[5/33]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void OST::ElementVisitor::visit </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classOST_1_1ElementDate.html">ElementDate</a> *&#160;</td>
+          <td class="paramname"><em>pElement</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QString &amp;&#160;</td>
+          <td class="paramname"><em>action</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QVariantMap &amp;&#160;</td>
+          <td class="paramname"><em>data</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implemented in <a class="el" href="classOST_1_1ElementUpdate.html#a8484fd8f665352ca26fea72ffedc9474">OST::ElementUpdate</a>, <a class="el" href="classOST_1_1ElementTextDumper.html#a9d2951476aae40d6c0dd735d0c4010cc">OST::ElementTextDumper</a>, and <a class="el" href="classOST_1_1ElementJsonDumper.html#a285c326f398758ed9c8d9425f3432670">OST::ElementJsonDumper</a>.</p>
+
+</div>
+</div>
+<a id="a87c4d78892b21efe50fd6e566c913f4e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a87c4d78892b21efe50fd6e566c913f4e">&#9670;&nbsp;</a></span>visit() <span class="overload">[6/33]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void OST::ElementVisitor::visit </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classOST_1_1ElementDate.html">ElementDate</a> *&#160;</td>
+          <td class="paramname"><em>pElement</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QVariantMap &amp;&#160;</td>
+          <td class="paramname"><em>data</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implemented in <a class="el" href="classOST_1_1ElementUpdate.html#a9b1cd62ee9c9f6d3e7159f947487c440">OST::ElementUpdate</a>, <a class="el" href="classOST_1_1ElementTextDumper.html#a53238d71d688914f3d1cc38c386295b9">OST::ElementTextDumper</a>, and <a class="el" href="classOST_1_1ElementJsonDumper.html#acb3ad0eb3171f1ed6cdb21d3a60f5a98">OST::ElementJsonDumper</a>.</p>
+
+</div>
+</div>
 <a id="a0e7316c117baf8d6f14078d56dc00a84"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0e7316c117baf8d6f14078d56dc00a84">&#9670;&nbsp;</a></span>visit() <span class="overload">[4/27]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a0e7316c117baf8d6f14078d56dc00a84">&#9670;&nbsp;</a></span>visit() <span class="overload">[7/33]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -318,7 +440,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a9c0d2a95013d41e8fcc6e10c8302c544"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9c0d2a95013d41e8fcc6e10c8302c544">&#9670;&nbsp;</a></span>visit() <span class="overload">[5/27]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c0d2a95013d41e8fcc6e10c8302c544">&#9670;&nbsp;</a></span>visit() <span class="overload">[8/33]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -362,7 +484,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="ae2dffdbdd8d70e5e950eca5097e970f5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae2dffdbdd8d70e5e950eca5097e970f5">&#9670;&nbsp;</a></span>visit() <span class="overload">[6/27]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2dffdbdd8d70e5e950eca5097e970f5">&#9670;&nbsp;</a></span>visit() <span class="overload">[9/33]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -400,7 +522,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a3241a930d1e75066af83ec748897d000"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3241a930d1e75066af83ec748897d000">&#9670;&nbsp;</a></span>visit() <span class="overload">[7/27]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a3241a930d1e75066af83ec748897d000">&#9670;&nbsp;</a></span>visit() <span class="overload">[10/33]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -428,7 +550,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="ad2a1eed5da0b341330b53c55d8f43ec5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad2a1eed5da0b341330b53c55d8f43ec5">&#9670;&nbsp;</a></span>visit() <span class="overload">[8/27]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ad2a1eed5da0b341330b53c55d8f43ec5">&#9670;&nbsp;</a></span>visit() <span class="overload">[11/33]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -472,7 +594,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a63df995f7f755c742e2741c989591ed7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a63df995f7f755c742e2741c989591ed7">&#9670;&nbsp;</a></span>visit() <span class="overload">[9/27]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a63df995f7f755c742e2741c989591ed7">&#9670;&nbsp;</a></span>visit() <span class="overload">[12/33]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -510,7 +632,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="aebb398485f02cc1acecd3116604127e4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aebb398485f02cc1acecd3116604127e4">&#9670;&nbsp;</a></span>visit() <span class="overload">[10/27]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aebb398485f02cc1acecd3116604127e4">&#9670;&nbsp;</a></span>visit() <span class="overload">[13/33]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -538,7 +660,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="ae3ac8be597d854bbf199419f36860573"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae3ac8be597d854bbf199419f36860573">&#9670;&nbsp;</a></span>visit() <span class="overload">[11/27]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ae3ac8be597d854bbf199419f36860573">&#9670;&nbsp;</a></span>visit() <span class="overload">[14/33]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -582,7 +704,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a3085099e8017c0a5efdcf88dbc224adb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3085099e8017c0a5efdcf88dbc224adb">&#9670;&nbsp;</a></span>visit() <span class="overload">[12/27]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a3085099e8017c0a5efdcf88dbc224adb">&#9670;&nbsp;</a></span>visit() <span class="overload">[15/33]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -620,7 +742,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="aa880454143b7654e08bb19accf892a74"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa880454143b7654e08bb19accf892a74">&#9670;&nbsp;</a></span>visit() <span class="overload">[13/27]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aa880454143b7654e08bb19accf892a74">&#9670;&nbsp;</a></span>visit() <span class="overload">[16/33]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -648,7 +770,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="af96e831768ecb6be353f6fa8bbbda767"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af96e831768ecb6be353f6fa8bbbda767">&#9670;&nbsp;</a></span>visit() <span class="overload">[14/27]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#af96e831768ecb6be353f6fa8bbbda767">&#9670;&nbsp;</a></span>visit() <span class="overload">[17/33]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -692,7 +814,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a8b1dc00c35f67e5694c7705bb1e42d4a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8b1dc00c35f67e5694c7705bb1e42d4a">&#9670;&nbsp;</a></span>visit() <span class="overload">[15/27]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a8b1dc00c35f67e5694c7705bb1e42d4a">&#9670;&nbsp;</a></span>visit() <span class="overload">[18/33]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -730,7 +852,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a682d008b66f33da9b7743a70550f6072"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a682d008b66f33da9b7743a70550f6072">&#9670;&nbsp;</a></span>visit() <span class="overload">[16/27]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a682d008b66f33da9b7743a70550f6072">&#9670;&nbsp;</a></span>visit() <span class="overload">[19/33]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -758,7 +880,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a26d31be2fd789e179c1601e36c179be7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a26d31be2fd789e179c1601e36c179be7">&#9670;&nbsp;</a></span>visit() <span class="overload">[17/27]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a26d31be2fd789e179c1601e36c179be7">&#9670;&nbsp;</a></span>visit() <span class="overload">[20/33]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -802,7 +924,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a6e2967c1cddf59bd4f1c3b32bcd09515"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6e2967c1cddf59bd4f1c3b32bcd09515">&#9670;&nbsp;</a></span>visit() <span class="overload">[18/27]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a6e2967c1cddf59bd4f1c3b32bcd09515">&#9670;&nbsp;</a></span>visit() <span class="overload">[21/33]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -840,7 +962,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a895d9f33fb80aae9f5afb247682cc2c0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a895d9f33fb80aae9f5afb247682cc2c0">&#9670;&nbsp;</a></span>visit() <span class="overload">[19/27]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a895d9f33fb80aae9f5afb247682cc2c0">&#9670;&nbsp;</a></span>visit() <span class="overload">[22/33]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -868,7 +990,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a97bb90ac807a08280ee48e5db86a86f5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a97bb90ac807a08280ee48e5db86a86f5">&#9670;&nbsp;</a></span>visit() <span class="overload">[20/27]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a97bb90ac807a08280ee48e5db86a86f5">&#9670;&nbsp;</a></span>visit() <span class="overload">[23/33]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -912,7 +1034,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a47bed704ce78658fdb8f73041179a011"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a47bed704ce78658fdb8f73041179a011">&#9670;&nbsp;</a></span>visit() <span class="overload">[21/27]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a47bed704ce78658fdb8f73041179a011">&#9670;&nbsp;</a></span>visit() <span class="overload">[24/33]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -950,7 +1072,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a833518ba336669dbc4cf5f1ce6526716"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a833518ba336669dbc4cf5f1ce6526716">&#9670;&nbsp;</a></span>visit() <span class="overload">[22/27]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a833518ba336669dbc4cf5f1ce6526716">&#9670;&nbsp;</a></span>visit() <span class="overload">[25/33]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -978,7 +1100,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a88a465a319d3240b37d2a574bc912c88"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a88a465a319d3240b37d2a574bc912c88">&#9670;&nbsp;</a></span>visit() <span class="overload">[23/27]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a88a465a319d3240b37d2a574bc912c88">&#9670;&nbsp;</a></span>visit() <span class="overload">[26/33]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1022,7 +1144,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="af29ad08280fe8bfa5bb6665b681f3ca1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af29ad08280fe8bfa5bb6665b681f3ca1">&#9670;&nbsp;</a></span>visit() <span class="overload">[24/27]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#af29ad08280fe8bfa5bb6665b681f3ca1">&#9670;&nbsp;</a></span>visit() <span class="overload">[27/33]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1059,8 +1181,118 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="ac752d97e786f7af04a2bfef64ca06413"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac752d97e786f7af04a2bfef64ca06413">&#9670;&nbsp;</a></span>visit() <span class="overload">[28/33]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void OST::ElementVisitor::visit </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classOST_1_1ElementTime.html">ElementTime</a> *&#160;</td>
+          <td class="paramname"><em>pElement</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implemented in <a class="el" href="classOST_1_1ElementUpdate.html#aeef8a4148629515ea63e73fcdb3f50b2">OST::ElementUpdate</a>, <a class="el" href="classOST_1_1ElementTextDumper.html#a43293f82847bf4bfc702da0188b1916e">OST::ElementTextDumper</a>, and <a class="el" href="classOST_1_1ElementJsonDumper.html#a05f4f6951268d94a916d526372b20093">OST::ElementJsonDumper</a>.</p>
+
+</div>
+</div>
+<a id="a3638efbfe7c7b858744c0214d094cee9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3638efbfe7c7b858744c0214d094cee9">&#9670;&nbsp;</a></span>visit() <span class="overload">[29/33]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void OST::ElementVisitor::visit </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classOST_1_1ElementTime.html">ElementTime</a> *&#160;</td>
+          <td class="paramname"><em>pElement</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QString &amp;&#160;</td>
+          <td class="paramname"><em>action</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QVariantMap &amp;&#160;</td>
+          <td class="paramname"><em>data</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implemented in <a class="el" href="classOST_1_1ElementUpdate.html#ae7dc6e8722cbdc1681b108cc4e2e19d9">OST::ElementUpdate</a>, <a class="el" href="classOST_1_1ElementTextDumper.html#aabaf0a4da96b3fc661dbca767bf192b2">OST::ElementTextDumper</a>, and <a class="el" href="classOST_1_1ElementJsonDumper.html#af08542263e9baa0f1aa7d05eca7bcd4f">OST::ElementJsonDumper</a>.</p>
+
+</div>
+</div>
+<a id="a5126bfe58437152fe2caa45c73e53e50"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5126bfe58437152fe2caa45c73e53e50">&#9670;&nbsp;</a></span>visit() <span class="overload">[30/33]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void OST::ElementVisitor::visit </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classOST_1_1ElementTime.html">ElementTime</a> *&#160;</td>
+          <td class="paramname"><em>pElement</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QVariantMap &amp;&#160;</td>
+          <td class="paramname"><em>data</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implemented in <a class="el" href="classOST_1_1ElementUpdate.html#a89eddd4a002ad0a863c37af8ae994202">OST::ElementUpdate</a>, <a class="el" href="classOST_1_1ElementTextDumper.html#a3973f8da580f8aefb458f7283ac0dce5">OST::ElementTextDumper</a>, and <a class="el" href="classOST_1_1ElementJsonDumper.html#a9c7268ba5786057df74d06d85ee0de66">OST::ElementJsonDumper</a>.</p>
+
+</div>
+</div>
 <a id="a5af5657d3c816aedcd90d325c00031bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5af5657d3c816aedcd90d325c00031bf">&#9670;&nbsp;</a></span>visit() <span class="overload">[25/27]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a5af5657d3c816aedcd90d325c00031bf">&#9670;&nbsp;</a></span>visit() <span class="overload">[31/33]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1088,7 +1320,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="ac2f43e4f5284ba7c496148b5fafed00a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac2f43e4f5284ba7c496148b5fafed00a">&#9670;&nbsp;</a></span>visit() <span class="overload">[26/27]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ac2f43e4f5284ba7c496148b5fafed00a">&#9670;&nbsp;</a></span>visit() <span class="overload">[32/33]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1132,7 +1364,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="ab525e452fb8a38e31968df7f4d3f4c28"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab525e452fb8a38e31968df7f4d3f4c28">&#9670;&nbsp;</a></span>visit() <span class="overload">[27/27]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ab525e452fb8a38e31968df7f4d3f4c28">&#9670;&nbsp;</a></span>visit() <span class="overload">[33/33]</span></h2>
 
 <div class="memitem">
 <div class="memproto">

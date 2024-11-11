@@ -95,32 +95,36 @@ $(function() {
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classOST_1_1ValueJsonDumper.html#a8b9f8aef768186d9aa7017704d5eef05">visit</a>(<a class="code" href="classOST_1_1ValueVideo.html">ValueVideo</a>*  pValue)<span class="keyword">override</span>;</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classOST_1_1ValueJsonDumper.html#a8b9f8aef768186d9aa7017704d5eef05">visit</a>(<a class="code" href="classOST_1_1ValueMessage.html">ValueMessage</a>*  pValue)<span class="keyword">override</span>;</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classOST_1_1ValueJsonDumper.html#a8b9f8aef768186d9aa7017704d5eef05">visit</a>(<a class="code" href="classOST_1_1ValuePrg.html">ValuePrg</a>* pValue) <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
-<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="classOST_1_1ValueJsonDumper.html#a9f40b51edb72b254ba4a499c329ed4c5">   28</a></span>&#160;        [[nodiscard]] <span class="keyword">const</span> QJsonValue &amp;<a class="code" href="classOST_1_1ValueJsonDumper.html#a9f40b51edb72b254ba4a499c329ed4c5">getResult</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">        </span>{</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;            <span class="keywordflow">return</span> mResult;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        }</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;        QJsonValue mResult;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;};</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;}</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="preprocessor">#endif </span><span class="comment">//OST_PROPERTYJSONDUMPER_H</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classOST_1_1ValueJsonDumper.html#a8b9f8aef768186d9aa7017704d5eef05">visit</a>(<a class="code" href="classOST_1_1ValueDate.html">ValueDate</a>* pValue) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classOST_1_1ValueJsonDumper.html#a8b9f8aef768186d9aa7017704d5eef05">visit</a>(<a class="code" href="classOST_1_1ValueTime.html">ValueTime</a>* pValue) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
+<div class="line"><a name="l00030"></a><span class="lineno"><a class="line" href="classOST_1_1ValueJsonDumper.html#a9f40b51edb72b254ba4a499c329ed4c5">   30</a></span>&#160;        [[nodiscard]] <span class="keyword">const</span> QJsonValue &amp;<a class="code" href="classOST_1_1ValueJsonDumper.html#a9f40b51edb72b254ba4a499c329ed4c5">getResult</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">        </span>{</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;            <span class="keywordflow">return</span> mResult;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        }</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        QJsonValue mResult;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;};</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;}</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="preprocessor">#endif </span><span class="comment">//OST_PROPERTYJSONDUMPER_H</span></div>
 <div class="ttc" id="aclassOST_1_1ValueBool_html"><div class="ttname"><a href="classOST_1_1ValueBool.html">OST::ValueBool</a></div><div class="ttdef"><b>Definition:</b> elementbool.h:26</div></div>
+<div class="ttc" id="aclassOST_1_1ValueDate_html"><div class="ttname"><a href="classOST_1_1ValueDate.html">OST::ValueDate</a></div><div class="ttdef"><b>Definition:</b> elementdate.h:28</div></div>
 <div class="ttc" id="aclassOST_1_1ValueFloat_html"><div class="ttname"><a href="classOST_1_1ValueFloat.html">OST::ValueFloat</a></div><div class="ttdef"><b>Definition:</b> elementfloat.h:35</div></div>
 <div class="ttc" id="aclassOST_1_1ValueImg_html"><div class="ttname"><a href="classOST_1_1ValueImg.html">OST::ValueImg</a></div><div class="ttdef"><b>Definition:</b> elementimg.h:28</div></div>
 <div class="ttc" id="aclassOST_1_1ValueInt_html"><div class="ttname"><a href="classOST_1_1ValueInt.html">OST::ValueInt</a></div><div class="ttdef"><b>Definition:</b> elementint.h:34</div></div>
 <div class="ttc" id="aclassOST_1_1ValueJsonDumper_html"><div class="ttname"><a href="classOST_1_1ValueJsonDumper.html">OST::ValueJsonDumper</a></div><div class="ttdef"><b>Definition:</b> valuejsondumper.h:13</div></div>
 <div class="ttc" id="aclassOST_1_1ValueJsonDumper_html_a01e307d97f9ff305e5bc5d5555e0f02b"><div class="ttname"><a href="classOST_1_1ValueJsonDumper.html#a01e307d97f9ff305e5bc5d5555e0f02b">OST::ValueJsonDumper::ValueJsonDumper</a></div><div class="ttdeci">ValueJsonDumper()=default</div></div>
-<div class="ttc" id="aclassOST_1_1ValueJsonDumper_html_a8b9f8aef768186d9aa7017704d5eef05"><div class="ttname"><a href="classOST_1_1ValueJsonDumper.html#a8b9f8aef768186d9aa7017704d5eef05">OST::ValueJsonDumper::visit</a></div><div class="ttdeci">void visit(ValueInt *pValue) override</div><div class="ttdef"><b>Definition:</b> valuejsondumper.cpp:22</div></div>
-<div class="ttc" id="aclassOST_1_1ValueJsonDumper_html_a9f40b51edb72b254ba4a499c329ed4c5"><div class="ttname"><a href="classOST_1_1ValueJsonDumper.html#a9f40b51edb72b254ba4a499c329ed4c5">OST::ValueJsonDumper::getResult</a></div><div class="ttdeci">const QJsonValue &amp; getResult() const</div><div class="ttdef"><b>Definition:</b> valuejsondumper.h:28</div></div>
+<div class="ttc" id="aclassOST_1_1ValueJsonDumper_html_a8b9f8aef768186d9aa7017704d5eef05"><div class="ttname"><a href="classOST_1_1ValueJsonDumper.html#a8b9f8aef768186d9aa7017704d5eef05">OST::ValueJsonDumper::visit</a></div><div class="ttdeci">void visit(ValueInt *pValue) override</div><div class="ttdef"><b>Definition:</b> valuejsondumper.cpp:24</div></div>
+<div class="ttc" id="aclassOST_1_1ValueJsonDumper_html_a9f40b51edb72b254ba4a499c329ed4c5"><div class="ttname"><a href="classOST_1_1ValueJsonDumper.html#a9f40b51edb72b254ba4a499c329ed4c5">OST::ValueJsonDumper::getResult</a></div><div class="ttdeci">const QJsonValue &amp; getResult() const</div><div class="ttdef"><b>Definition:</b> valuejsondumper.h:30</div></div>
 <div class="ttc" id="aclassOST_1_1ValueLight_html"><div class="ttname"><a href="classOST_1_1ValueLight.html">OST::ValueLight</a></div><div class="ttdef"><b>Definition:</b> elementlight.h:28</div></div>
 <div class="ttc" id="aclassOST_1_1ValueMessage_html"><div class="ttname"><a href="classOST_1_1ValueMessage.html">OST::ValueMessage</a></div><div class="ttdef"><b>Definition:</b> elementmessage.h:30</div></div>
 <div class="ttc" id="aclassOST_1_1ValuePrg_html"><div class="ttname"><a href="classOST_1_1ValuePrg.html">OST::ValuePrg</a></div><div class="ttdef"><b>Definition:</b> elementprg.h:35</div></div>
 <div class="ttc" id="aclassOST_1_1ValueString_html"><div class="ttname"><a href="classOST_1_1ValueString.html">OST::ValueString</a></div><div class="ttdef"><b>Definition:</b> elementstring.h:33</div></div>
+<div class="ttc" id="aclassOST_1_1ValueTime_html"><div class="ttname"><a href="classOST_1_1ValueTime.html">OST::ValueTime</a></div><div class="ttdef"><b>Definition:</b> elementtime.h:28</div></div>
 <div class="ttc" id="aclassOST_1_1ValueVideo_html"><div class="ttname"><a href="classOST_1_1ValueVideo.html">OST::ValueVideo</a></div><div class="ttdef"><b>Definition:</b> elementvideo.h:27</div></div>
-<div class="ttc" id="aclassOST_1_1ValueVisitor_html"><div class="ttname"><a href="classOST_1_1ValueVisitor.html">OST::ValueVisitor</a></div><div class="ttdef"><b>Definition:</b> elementvisitor.h:93</div></div>
+<div class="ttc" id="aclassOST_1_1ValueVisitor_html"><div class="ttname"><a href="classOST_1_1ValueVisitor.html">OST::ValueVisitor</a></div><div class="ttdef"><b>Definition:</b> elementvisitor.h:103</div></div>
 <div class="ttc" id="aelementbase_8h_html"><div class="ttname"><a href="elementbase_8h.html">elementbase.h</a></div></div>
 <div class="ttc" id="anamespaceOST_html"><div class="ttname"><a href="namespaceOST.html">OST</a></div><div class="ttdef"><b>Definition:</b> common.h:7</div></div>
 </div><!-- fragment --></div><!-- contents -->
