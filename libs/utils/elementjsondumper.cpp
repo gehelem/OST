@@ -16,7 +16,7 @@ QJsonObject ElementJsonDumper::dumpElementCommons(ElementBase *pElement)
     json["autoupdate"] = pElement->autoUpdate();
     json["badge"] = pElement->getBadge();
     if ((pElement->getType() == "int") || (pElement->getType() == "float") || (pElement->getType() == "string")
-            || (pElement->getType() == "bool"))
+            || (pElement->getType() == "bool") || (pElement->getType() == "date") || (pElement->getType() == "time"))
     {
         json["directedit"] = pElement->getDirectEdit();
     }

@@ -344,6 +344,7 @@
             },
             "date": {
                 "autoupdate":true,
+                "directedit":true,
                 "type":"date",
                 "order": "99",
                 "label": "Test Date",
@@ -353,6 +354,7 @@
             },
             "time": {
                 "autoupdate":true,
+                "directedit":true,
                 "type":"time",
                 "order": "99",
                 "label": "Test Time",
