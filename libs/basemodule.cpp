@@ -102,6 +102,26 @@ void Basemodule::setProfile(QVariantMap profiledata)
                                 getProperty(key)->getElt(eltkey)->accept(&v, a, m);
                             }
                         }
+                        if (getEltBase(key, eltkey)->getType() == "time")
+                        {
+                            int hh = props[key].toMap()["elements"].toMap()[eltkey].toMap()["hh"].toInt();
+                            int mm = props[key].toMap()["elements"].toMap()[eltkey].toMap()["mm"].toInt();
+                            int ss = props[key].toMap()["elements"].toMap()[eltkey].toMap()["ss"].toInt();
+                            int ms = props[key].toMap()["elements"].toMap()[eltkey].toMap()["ms"].toInt();
+                            QTime tt;
+                            tt.setHMS(hh, mm, ss, ms);
+                            getEltTime(key, eltkey)->setValue(tt, true);
+                        }
+                        if (getEltBase(key, eltkey)->getType() == "date")
+                        {
+                            int d = props[key].toMap()["elements"].toMap()[eltkey].toMap()["day"].toInt();
+                            int m = props[key].toMap()["elements"].toMap()[eltkey].toMap()["month"].toInt();
+                            int y = props[key].toMap()["elements"].toMap()[eltkey].toMap()["year"].toInt();
+                            QDate dd;
+                            dd.setDate(y, m, d);
+                            getEltDate(key, eltkey)->setValue(dd, true);
+                        }
+
                     }
                 }
 

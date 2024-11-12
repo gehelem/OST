@@ -626,6 +626,22 @@ QVariantMap Datastore::getProfile(void)
                         {
                             element["day"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["day"];
                         }
+                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("hh"))
+                        {
+                            element["hh"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["hh"];
+                        }
+                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("mm"))
+                        {
+                            element["mm"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["mm"];
+                        }
+                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("ss"))
+                        {
+                            element["ss"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["ss"];
+                        }
+                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("ms"))
+                        {
+                            element["ms"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["ms"];
+                        }
                         if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("gridvalues"))
                         {
                             element["gridvalues"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["gridvalues"];
