@@ -597,6 +597,7 @@ QVariantMap Datastore::getProfile(void)
                     QVariantMap element, elements;
                     foreach(const QString &keyelt, props[keyprop].toMap()["elements"].toMap().keys())
                     {
+                        element = QVariantMap();
                         if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("value"))
                         {
                             element["value"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
@@ -612,6 +613,18 @@ QVariantMap Datastore::getProfile(void)
                         if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("step"))
                         {
                             element["step"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["step"];
+                        }
+                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("year"))
+                        {
+                            element["year"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["year"];
+                        }
+                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("month"))
+                        {
+                            element["month"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["month"];
+                        }
+                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("day"))
+                        {
+                            element["day"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["day"];
                         }
                         if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("gridvalues"))
                         {
