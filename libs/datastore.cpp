@@ -526,9 +526,10 @@ QVariantMap Datastore::getProfile(void)
                 QVariantMap property;
                 if (props[keyprop].toMap().contains("elements"))
                 {
-                    QVariantMap element, elements;
+                    QVariantMap elements;
                     foreach(const QString &keyelt, props[keyprop].toMap()["elements"].toMap().keys())
                     {
+                        QVariantMap element;
                         if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("value"))
                         {
                             element["value"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
