@@ -278,6 +278,14 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
                     {
                         element = prop["elements"].toMap()[key].toMap();
                     }
+                    if (prop["elements"].toMap()[key].toMap()["type"] == "date")
+                    {
+                        element = prop["elements"].toMap()[key].toMap();
+                    }
+                    if (prop["elements"].toMap()[key].toMap()["type"] == "time")
+                    {
+                        element = prop["elements"].toMap()[key].toMap();
+                    }
                 }
                 elements[key] = element;
             }

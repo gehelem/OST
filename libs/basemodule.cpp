@@ -276,6 +276,18 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
                     {
                         getEltBool(keyprop, keyelt)->setValue(v.toBool(), true);
                     }
+                    if (getEltBase(keyprop, keyelt)->getType() == "date")
+                    {
+                        QDate d;
+                        d.setDate(v.toMap()["year"].toInt(), v.toMap()["month"].toInt(), v.toMap()["day"].toInt());
+                        getEltDate(keyprop, keyelt)->setValue(d, true);
+                    }
+                    if (getEltBase(keyprop, keyelt)->getType() == "time")
+                    {
+                        QTime t;
+                        t.setHMS(v.toMap()["hh"].toInt(), v.toMap()["mm"].toInt(), v.toMap()["ss"].toInt(), v.toMap()["ms"].toInt());
+                        getEltTime(keyprop, keyelt)->setValue(t, true);
+                    }
                     //sendMessage("Autoupdate - property " + keyprop + " - element " + keyelt);
                 }
             }
