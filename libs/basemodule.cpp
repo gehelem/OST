@@ -102,6 +102,26 @@ void Basemodule::setProfile(QVariantMap profiledata)
                                 getProperty(key)->getElt(eltkey)->accept(&v, a, m);
                             }
                         }
+                        if (getEltBase(key, eltkey)->getType() == "time")
+                        {
+                            int hh = props[key].toMap()["elements"].toMap()[eltkey].toMap()["hh"].toInt();
+                            int mm = props[key].toMap()["elements"].toMap()[eltkey].toMap()["mm"].toInt();
+                            int ss = props[key].toMap()["elements"].toMap()[eltkey].toMap()["ss"].toInt();
+                            int ms = props[key].toMap()["elements"].toMap()[eltkey].toMap()["ms"].toInt();
+                            QTime tt;
+                            tt.setHMS(hh, mm, ss, ms);
+                            getEltTime(key, eltkey)->setValue(tt, true);
+                        }
+                        if (getEltBase(key, eltkey)->getType() == "date")
+                        {
+                            int d = props[key].toMap()["elements"].toMap()[eltkey].toMap()["day"].toInt();
+                            int m = props[key].toMap()["elements"].toMap()[eltkey].toMap()["month"].toInt();
+                            int y = props[key].toMap()["elements"].toMap()[eltkey].toMap()["year"].toInt();
+                            QDate dd;
+                            dd.setDate(y, m, d);
+                            getEltDate(key, eltkey)->setValue(dd, true);
+                        }
+
                     }
                 }
 
@@ -275,6 +295,18 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
                     if (getEltBase(keyprop, keyelt)->getType() == "bool")
                     {
                         getEltBool(keyprop, keyelt)->setValue(v.toBool(), true);
+                    }
+                    if (getEltBase(keyprop, keyelt)->getType() == "date")
+                    {
+                        QDate d;
+                        d.setDate(v.toMap()["year"].toInt(), v.toMap()["month"].toInt(), v.toMap()["day"].toInt());
+                        getEltDate(keyprop, keyelt)->setValue(d, true);
+                    }
+                    if (getEltBase(keyprop, keyelt)->getType() == "time")
+                    {
+                        QTime t;
+                        t.setHMS(v.toMap()["hh"].toInt(), v.toMap()["mm"].toInt(), v.toMap()["ss"].toInt(), v.toMap()["ms"].toInt());
+                        getEltTime(keyprop, keyelt)->setValue(t, true);
                     }
                     //sendMessage("Autoupdate - property " + keyprop + " - element " + keyelt);
                 }

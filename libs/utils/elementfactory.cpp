@@ -210,6 +210,9 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
                                             );
             QDate d;
             d.setDate(pData["year"].toInt(), pData["month"].toInt(), pData["day"].toInt());
+            if (pData.contains("autoupdate")) pElement->setAutoUpdate(pData["autoupdate"].toBool());
+            if (pData.contains("directedit")) pElement->setDirectEdit(pData["directedit"].toBool());
+            if (pData.contains("badge")) pElement->setBadge(pData["badge"].toBool());
             pElement->setValue(d, false);
             return pElement;
         }
@@ -221,6 +224,9 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
                                             );
             QTime t;
             t.setHMS(pData["hh"].toInt(), pData["mm"].toInt(), pData["ss"].toInt(), pData["ms"].toInt());
+            if (pData.contains("autoupdate")) pElement->setAutoUpdate(pData["autoupdate"].toBool());
+            if (pData.contains("directedit")) pElement->setDirectEdit(pData["directedit"].toBool());
+            if (pData.contains("badge")) pElement->setBadge(pData["badge"].toBool());
             pElement->setValue(t, false);
             return pElement;
         }
