@@ -223,10 +223,18 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
                                              pData["hint"].toString()
                                             );
             QTime t;
-            t.setHMS(pData["hh"].toInt(), pData["mm"].toInt(), pData["ss"].toInt(), pData["ms"].toInt());
             if (pData.contains("autoupdate")) pElement->setAutoUpdate(pData["autoupdate"].toBool());
             if (pData.contains("directedit")) pElement->setDirectEdit(pData["directedit"].toBool());
             if (pData.contains("badge")) pElement->setBadge(pData["badge"].toBool());
+            if (pData.contains("usems")) pElement->setUseMs(pData["usems"].toBool());
+            if (pElement->getUseMs())
+            {
+                t.setHMS(pData["hh"].toInt(), pData["mm"].toInt(), pData["ss"].toInt(), pData["ms"].toInt());
+            }
+            else
+            {
+                t.setHMS(pData["hh"].toInt(), pData["mm"].toInt(), pData["ss"].toInt(), 0);
+            }
             pElement->setValue(t, false);
             return pElement;
         }
