@@ -546,6 +546,7 @@
                 "autoupdate":true,
                 "order": "30",
                 "label": "To",
+                "usems":true,
                 "hh":13,
                 "mm":25,
                 "ss":59,
@@ -578,6 +579,7 @@
                 "autoupdate":true,
                 "order": "30",
                 "label": "To",
+                "usems":false,
                 "hh":13,
                 "mm":25,
                 "ss":59,
@@ -594,8 +596,8 @@
         "group": "",
         "rule":0,
         "permission": 2,
-        "order": "20",
-        "label": "Times RW",
+        "order": "40",
+        "label": "Times Grid - RW ",
         "elements": {
             "time1": {
                 "type":"time",
