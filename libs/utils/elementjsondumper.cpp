@@ -264,7 +264,9 @@ void ElementJsonDumper::visit(ElementTime *pElement)
     json["hh"] = pElement->value().hour();
     json["mm"] = pElement->value().minute();
     json["ss"] = pElement->value().second();
-    json["ms"] = pElement->value().msec();
+    json["usems"] = pElement->getUseMs();
+    if (pElement->getUseMs()) json["ms"] = pElement->value().msec();
+
 
     mResult = json;
 }

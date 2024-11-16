@@ -19,8 +19,11 @@ class ElementTime: public ElementTemplateNotNumeric<QTime>
         ElementTime(const QString &label, const QString &order, const QString &hint);
         ~ElementTime();
         QString getType() override;
+        void setUseMs(bool b);
+        bool getUseMs(void);
 
     private:
+        bool mUseMs = false;
 
 };
 

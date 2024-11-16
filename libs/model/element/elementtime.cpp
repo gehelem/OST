@@ -25,7 +25,14 @@ QString ElementTime::getType()
 {
     return "time";
 }
-
+void ElementTime::setUseMs(bool b)
+{
+    mUseMs = b;
+}
+bool ElementTime::getUseMs(void)
+{
+    return mUseMs;
+}
 void ValueTime::accept(ValueVisitor* pVisitor)
 {
     pVisitor->visit(this);

@@ -369,6 +369,259 @@
         "order": "99",
         "label": "Mixed types - read/write"
     },
+    "datesreadonly": {
+        "hasprofile":true,
+        "devcat": "Dates",
+        "group": "",
+        "rule":0,
+        "permission": 0,
+        "order": "10",
+        "label": "Dates readonly",
+        "elements": {
+            "date1": {
+                "type":"date",
+                "order": "20",
+                "label": "From",
+                "year":2024,
+                "month":11,
+                "day":8
+            },
+            "date2": {
+                "type":"date",
+                "order": "30",
+                "label": "To",
+                "year":2024,
+                "month":11,
+                "day":10
+            }
+        }
+    },
+    "datesRW": {
+        "hasprofile":true,
+        "devcat": "Dates",
+        "group": "",
+        "rule":0,
+        "permission": 2,
+        "order": "20",
+        "label": "Dates RW",
+        "elements": {
+            "date1": {
+                "type":"date",
+                "directedit":false,
+                "autoupdate":true,
+                "order": "20",
+                "label": "From",
+                "year":2024,
+                "month":11,
+                "day":8
+            },
+            "date2": {
+                "type":"date",
+                "directedit":false,
+                "autoupdate":true,
+                "order": "30",
+                "label": "To",
+                "year":2024,
+                "month":11,
+                "day":10
+            }
+        }
+    },
+    "datesRWDE": {
+        "hasprofile":true,
+        "devcat": "Dates",
+        "group": "",
+        "rule":0,
+        "permission": 2,
+        "order": "30",
+        "label": "Dates direct edit",
+        "elements": {
+            "date1": {
+                "type":"date",
+                "directedit":true,
+                "autoupdate":true,
+                "order": "20",
+                "label": "From",
+                "year":2024,
+                "month":11,
+                "day":8
+            },
+            "date2": {
+                "type":"date",
+                "directedit":true,
+                "autoupdate":true,
+                "order": "30",
+                "label": "To",
+                "year":2024,
+                "month":11,
+                "day":10
+            }
+        }
+    },
+    "datesRWgrid": {
+        "hasprofile":true,
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
+        "devcat": "Dates",
+        "group": "",
+        "rule":0,
+        "permission": 2,
+        "order": "20",
+        "label": "Dates RW",
+        "elements": {
+            "date1": {
+                "type":"date",
+                "directedit":false,
+                "autoupdate":true,
+                "order": "20",
+                "label": "From",
+                "year":2024,
+                "month":11,
+                "day":8
+            },
+            "date2": {
+                "type":"date",
+                "directedit":false,
+                "autoupdate":true,
+                "order": "30",
+                "label": "To",
+                "year":2024,
+                "month":11,
+                "day":10
+            }
+        }
+    },
+    "timessreadonly": {
+        "hasprofile":true,
+        "devcat": "Times",
+        "group": "",
+        "rule":0,
+        "permission": 0,
+        "order": "10",
+        "label": "Times readonly",
+        "elements": {
+            "time1": {
+                "type":"time",
+                "order": "20",
+                "label": "From",
+                "hh":13,
+                "mm":25,
+                "ss":59
+            },
+            "time2": {
+                "type":"time",
+                "order": "30",
+                "label": "To",
+                "hh":13,
+                "mm":25,
+                "ss":59,
+                "ms":55
+            }
+        }
+    },
+
+    "timesRW": {
+        "hasprofile":true,
+        "devcat": "Times",
+        "group": "",
+        "rule":0,
+        "permission": 2,
+        "order": "20",
+        "label": "Times RW",
+        "elements": {
+            "time1": {
+                "type":"time",
+                "directedit":false,
+                "autoupdate":true,
+                "order": "20",
+                "label": "From",
+                "hh":13,
+                "mm":25,
+                "ss":59
+            },
+            "time2": {
+                "type":"time",
+                "directedit":false,
+                "autoupdate":true,
+                "order": "30",
+                "label": "To",
+                "usems":true,
+                "hh":13,
+                "mm":25,
+                "ss":59,
+                "ms":55
+            }
+        }
+    },
+    "timesRWDE": {
+        "hasprofile":true,
+        "devcat": "Times",
+        "group": "",
+        "rule":0,
+        "permission": 2,
+        "order": "30",
+        "label": "Times direct edit",
+        "elements": {
+            "time1": {
+                "type":"time",
+                "directedit":true,
+                "autoupdate":true,
+                "order": "20",
+                "label": "From",
+                "hh":13,
+                "mm":25,
+                "ss":59
+            },
+            "time2": {
+                "type":"time",
+                "directedit":true,
+                "autoupdate":true,
+                "order": "30",
+                "label": "To",
+                "usems":false,
+                "hh":13,
+                "mm":25,
+                "ss":59,
+                "ms":55
+            }
+        }
+    },
+    "timesRWgrid": {
+        "hasprofile":true,
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
+        "devcat": "Times",
+        "group": "",
+        "rule":0,
+        "permission": 2,
+        "order": "40",
+        "label": "Times Grid - RW ",
+        "elements": {
+            "time1": {
+                "type":"time",
+                "directedit":false,
+                "autoupdate":true,
+                "order": "20",
+                "label": "From",
+                "hh":13,
+                "mm":25,
+                "ss":59
+            },
+            "date2": {
+                "type":"time",
+                "directedit":false,
+                "autoupdate":true,
+                "order": "30",
+                "label": "To",
+                "hh":13,
+                "mm":25,
+                "ss":59,
+                "ms":55
+            }
+        }
+    },
     "actions2": {
         "devcat": "Examples",
         "rule":1,
