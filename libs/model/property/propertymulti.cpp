@@ -129,6 +129,23 @@ bool  PropertyMulti::setElt(QString key, QVariant val)
         getElt(key)->accept(&vu, m);
         return true;
     }
+    if (mElts[key]->getType() == "time")
+    {
+        ElementUpdate vu;
+        QVariantMap m;
+        m["value"] = val.toMap();
+        getElt(key)->accept(&vu, m);
+        return true;
+    }
+    if (mElts[key]->getType() == "date")
+    {
+        ElementUpdate vu;
+        QVariantMap m;
+        m["value"] = val.toMap();
+        getElt(key)->accept(&vu, m);
+        return true;
+    }
+
     if ((mElts[key]->getType() == "bool") && (val.canConvert<bool>()) )
     {
         ElementUpdate vu;

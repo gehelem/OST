@@ -467,8 +467,8 @@
         "group": "",
         "rule":0,
         "permission": 2,
-        "order": "20",
-        "label": "Dates RW",
+        "order": "40",
+        "label": "Dates RW - grid",
         "elements": {
             "date1": {
                 "type":"date",
@@ -609,7 +609,7 @@
                 "mm":25,
                 "ss":59
             },
-            "date2": {
+            "time2": {
                 "type":"time",
                 "directedit":false,
                 "autoupdate":true,

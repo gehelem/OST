@@ -88,6 +88,11 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     defineMeAsSequencer();
     defineMeAsNavigator();
 
+    getProperty("timesRWgrid")->push();
+    getProperty("timesRWgrid")->push();
+    getProperty("datesRWgrid")->push();
+    getProperty("datesRWgrid")->push();
+
 }
 
 Dummy::~Dummy()
