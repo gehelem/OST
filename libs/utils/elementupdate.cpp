@@ -33,6 +33,7 @@ void ElementUpdate::visit(ElementBool *pElement, QVariantMap &data )
 }
 void ElementUpdate::visit(ElementString *pElement, QVariantMap &data )
 {
+
     if (data.contains("autoupdate"))
     {
         qDebug() << "autoupdate" << pElement->label() << "/" << data;
@@ -76,11 +77,35 @@ void ElementUpdate::visit(ElementPrg* pElement, QVariantMap &data )
 }
 void ElementUpdate::visit(ElementDate* pElement, QVariantMap &data )
 {
-    Q_UNUSED(pElement)  Q_UNUSED(data)
+    if (!data.contains("value"))
+    {
+        qDebug() << "no value for " << pElement->label();
+        return;
+    }
+    QVariantMap m = data["value"].toMap();
+    QDate d;
+    d.setDate(m["year"].toInt(), m["month"].toInt(), m["day"].toInt());
+    pElement->setValue(d, false);
+
 }
 void ElementUpdate::visit(ElementTime* pElement, QVariantMap &data )
 {
-    Q_UNUSED(pElement)  Q_UNUSED(data)
+    if (!data.contains("value"))
+    {
+        qDebug() << "no value for " << pElement->label();
+        return;
+    }
+    QVariantMap m = data["value"].toMap();
+    QTime t;
+    if (pElement->getUseMs())
+    {
+        t.setHMS(m["hh"].toInt(), m["mm"].toInt(), m["ss"].toInt(), m["ms"].toInt());
+    }
+    else
+    {
+        t.setHMS(m["hh"].toInt(), m["mm"].toInt(), m["ss"].toInt(), 0);
+    }
+    pElement->setValue(t, false);
 }
 void ElementUpdate::visit(ElementInt* pElement, QString &action, QVariantMap &data)
 {
