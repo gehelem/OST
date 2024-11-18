@@ -918,5 +918,45 @@
     "Telescope Simulator": {
         "en": "Telescope Simulator",
         "fr": "Simulateur de téléscope"
+    },
+    "Daily schedule": {
+        "en": "Daily schedule",
+        "fr": "Programmation journalière"
+    },
+    "End at": {
+        "en": "End at",
+        "fr": "Fin à"
+    },
+    "Events to come": {
+        "en": "Events to come",
+        "fr": "Evènements à venir"
+    },
+    "GPS": {
+        "en": "GPS",
+        "fr": "GPS"
+    },
+    "GPS Simulator": {
+        "en": "GPS Simulator",
+        "fr": "Simulateur de GPS"
+    },
+    "Next sunrise": {
+        "en": "Next sunrise",
+        "fr": "Prochain lever de Soleil"
+    },
+    "Next sunset": {
+        "en": "Next sunset",
+        "fr": "Prochain coucher de Soleil"
+    },
+    "Schedule": {
+        "en": "Schedule",
+        "fr": "Programmation"
+    },
+    "Start at": {
+        "en": "Start at",
+        "fr": "Début à"
+    },
+    "Sunrise schedule": {
+        "en": "Sunrise schedule",
+        "fr": "Programmation sur le Soleil"
     }
 }
