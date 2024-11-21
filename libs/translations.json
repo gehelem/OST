@@ -958,5 +958,37 @@
     "Sunrise schedule": {
         "en": "Sunrise schedule",
         "fr": "Programmation sur le Soleil"
+    },
+    "Add GPS localization": {
+        "en": "Add GPS localization",
+        "fr": "Ajouter position GPS"
+    },
+    "Date (UTC)": {
+        "en": "Date (UTC)",
+        "fr": "Date (UTC)"
+    },
+    "Elevation": {
+        "en": "Elevation",
+        "fr": "Elevation"
+    },
+    "GPS localization": {
+        "en": "GPS localization",
+        "fr": "Position GPS"
+    },
+    "Latitude": {
+        "en": "Latitude",
+        "fr": "Latitude"
+    },
+    "Longitude": {
+        "en": "Longitude",
+        "fr": "Longitude"
+    },
+    "Position": {
+        "en": "Position",
+        "fr": "à traduire"
+    },
+    "Time (UTC)": {
+        "en": "Time (UTC)",
+        "fr": "Heure (UTC)"
     }
 }
