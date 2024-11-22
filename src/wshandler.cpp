@@ -117,6 +117,10 @@ void WShandler::processTextMessage(QString message)
     {
         emit externalEvent(obj["evt"].toString(), obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
     }
+    if ((obj["evt"].toString() == "Ffolderselect"))
+    {
+        emit externalEvent(obj["evt"].toString(), QString(), obj["folder"].toString(), QVariantMap());
+    }
 
 
 }

@@ -92,7 +92,8 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     }
 
     //check existing folders
-    mFileWatcher.addPath(webroot);
+    mSelectedFolder = webroot;
+    mFileWatcher.addPath(mSelectedFolder);
     QDir dir(webroot);
     QDirIterator itFolders(webroot, QDirIterator::Subdirectories);
     while (itFolders.hasNext())
@@ -106,17 +107,17 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
             dd.replace("/.", "");
             if (!mFoldersList.contains(dd))
             {
-                mFileWatcher.addPath(webroot + dd);
+                //mFileWatcher.addPath(webroot + dd);
                 mFoldersList.append(dd);
             }
         }
     }
     //check existing files
-    QDirIterator itFiles(webroot, QDirIterator::Subdirectories);
+    QDirIterator itFiles(mSelectedFolder, QDirIterator::NoIteratorFlags);
     while (itFiles.hasNext())
     {
         QString d = itFiles.next();
-        d.replace(webroot, "");
+        d.replace(mSelectedFolder, "");
         if (!d.endsWith("/.") && !d.endsWith("/..") && !mFoldersList.contains(d))
         {
             mFilesList.append(d);
@@ -288,6 +289,17 @@ void Controller::OnExternalEvent(const QString &pEventType, const QString  &pEve
     {
         wshandler->processFileEvent("foldersdump", mFoldersList);
         wshandler->processFileEvent("filesdump", mFilesList);
+    }
+    if (pEventType == "Ffolderselect")
+    {
+        for ( const auto &d : mFileWatcher.directories() )
+        {
+            mFileWatcher.removePath(d);
+        }
+        mSelectedFolder = _webroot + pEventKey;
+        mFileWatcher.addPath(mSelectedFolder);
+        OnFileWatcherEvent(QString());
+
     }
 
     /* we should check here if incoming message is valid*/
@@ -607,7 +619,7 @@ void Controller::OnFileWatcherEvent(const QString &pEvent)
         }
     }
     //check existing files
-    QDirIterator itFiles(_webroot, QDirIterator::Subdirectories);
+    QDirIterator itFiles(mSelectedFolder, QDirIterator::NoIteratorFlags);
     while (itFiles.hasNext())
     {
         QString d = itFiles.next();
@@ -625,7 +637,7 @@ void Controller::OnFileWatcherEvent(const QString &pEvent)
         {
             wshandler->processFileEvent("folderadd", QStringList(i));
             mFoldersList.append(i);
-            mFileWatcher.addPath(_webroot + i);
+            //mFileWatcher.addPath(_webroot + i);
         }
     }
     for (const auto &i : mFoldersList)
@@ -634,7 +646,7 @@ void Controller::OnFileWatcherEvent(const QString &pEvent)
         {
             wshandler->processFileEvent("folderdel", QStringList(i));
             mFoldersList.removeOne(i);
-            mFileWatcher.removePath(_webroot + i);
+            //mFileWatcher.removePath(_webroot + i);
         }
     }
 
