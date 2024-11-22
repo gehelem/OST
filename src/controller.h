@@ -49,6 +49,7 @@ class Controller : public QObject
         QFileSystemWatcher mFileWatcher;
         QStringList mFilesList;
         QStringList mFoldersList;
+        QString mSelectedFolder;
 
 
 
