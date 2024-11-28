@@ -114,17 +114,16 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
             }
             foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
             {
-                //setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
                 if (keyprop == "dynprop")
                 {
                     if (keyelt == "dyntext")
                     {
 
-                        dyntext->setValue(eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toString(), true);
+                        dyntext->setValue(eventData[keyprop].toMap()["elements"].toMap()[keyelt].toString(), true);
                     }
                     if (keyelt == "dynbool")
                     {
-                        bool val = eventData["dynprop"].toMap()["elements"].toMap()["dynbool"].toMap()["value"].toBool();
+                        bool val = eventData["dynprop"].toMap()["elements"].toMap()["dynbool"].toBool();
                         if (val)
                         {
 
@@ -148,7 +147,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                     if (keyelt == "camera")
                     {
                         if (getEltString(keyprop, keyelt)->setValue(
-                                    eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toString(), false))
+                                    eventData[keyprop].toMap()["elements"].toMap()[keyelt].toString(), false))
                         {
                             getProperty(keyprop)->setState(OST::Ok);
                             _camera = getString("devices", "camera");

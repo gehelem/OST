@@ -33,7 +33,6 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
 {
     Q_UNUSED(pEventType);
     Q_UNUSED(pEventKey);
-    //sendMessage("mainctl OnMyExternalEvent - recv : " + getModuleName() + "-" + pEventType + "-" + pEventKey);
 
     if (getModuleName() == pEventModule)
     {
@@ -78,7 +77,7 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                 if (keyelt == "name" && keyprop == "loadconf" && pEventType == "Fsetproperty")
                 {
 
-                    QString val = pEventData[keyprop].toMap()["elements"].toMap()["name"].toMap()["value"].toString();
+                    QString val = pEventData[keyprop].toMap()["elements"].toMap()["name"].toString();
                     getEltString("loadconf", "name")->setValue(val, true);
                     getEltString("saveconf", "name")->setValue(val, true);
                 }
