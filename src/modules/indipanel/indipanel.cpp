@@ -101,7 +101,7 @@ void IndiPanel::newProperty(INDI::Property pProperty)
             {
                 OST::ElementBool* v = new OST::ElementBool(s[i].label, QString(i), s[i].label);
                 if (s[i].s == 0) v->setValue(false, false);
-                if (s[i].s == 1) v->setValue(false, true);
+                if (s[i].s == 1) v->setValue(true, true);
                 p->addElt(s[i].getName(), v);
             }
             p->setRule(OST::IntToRule(s.getRule()));
