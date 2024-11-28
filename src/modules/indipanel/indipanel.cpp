@@ -262,20 +262,21 @@ void IndiPanel::OnMyExternalEvent(const QString &eventType, const QString  &even
                 if (getStore()[keyprop]->getElt(keyelt)->getType() == "string")
                 {
                     sendModNewText(realDevice, prop, keyelt,
-                                   eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toString());
+                                   eventData[keyprop].toMap()["elements"].toMap()[keyelt].toString());
                 }
                 if (getStore()[keyprop]->getElt(keyelt)->getType() == "int"
                         || getStore()[keyprop]->getElt(keyelt)->getType() == "float")
                 {
                     sendModNewNumber(realDevice, prop, keyelt,
-                                     eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toFloat());
+                                     eventData[keyprop].toMap()["elements"].toMap()[keyelt].toFloat());
                 }
                 if (getStore()[keyprop]->getElt(keyelt)->getType() == "bool")
                 {
+                    qDebug() << "bool" << keyprop << keyelt << eventData[keyprop].toMap()["elements"].toMap()[keyelt];
                     keyelt.toStdString();
-                    if ( eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toBool()) sendModNewSwitch(realDevice, prop,
+                    if ( eventData[keyprop].toMap()["elements"].toMap()[keyelt].toBool()) sendModNewSwitch(realDevice, prop,
                                 keyelt, ISS_ON);
-                    if (!eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toBool()) sendModNewSwitch(realDevice, prop,
+                    if (!eventData[keyprop].toMap()["elements"].toMap()[keyelt].toBool()) sendModNewSwitch(realDevice, prop,
                                 keyelt, ISS_OFF);
                 }
             }
