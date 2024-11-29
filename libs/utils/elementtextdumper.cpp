@@ -90,5 +90,19 @@ void ElementTextDumper::visit(ElementPrg *pElement)
     //stream << "Val = '" << pElement->value().toStdString() << "'";
     mResult = QString::fromStdString(stream.str());
 }
+void ElementTextDumper::visit(ElementDate*pElement)
+{
+    std::stringstream stream;
+    stream << "Progress Value :" << dumpElementCommons(pElement);
+    //stream << "Val = '" << pElement->value().toStdString() << "'";
+    mResult = QString::fromStdString(stream.str());
+}
+void ElementTextDumper::visit(ElementTime *pElement)
+{
+    std::stringstream stream;
+    stream << "Progress Value :" << dumpElementCommons(pElement);
+    //stream << "Val = '" << pElement->value().toStdString() << "'";
+    mResult = QString::fromStdString(stream.str());
+}
 
 }

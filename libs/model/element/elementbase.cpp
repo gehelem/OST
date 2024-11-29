@@ -5,6 +5,7 @@ namespace  OST
 ElementBase::ElementBase(const QString &label, const QString &order, const QString &hint)
     : mLabel(label), mOrder(order), mHint(hint)
 {
+    if (order == "") qDebug() << "*** ElementBase order ko *** "  << label;
 }
 ElementBase::~ElementBase()
 {

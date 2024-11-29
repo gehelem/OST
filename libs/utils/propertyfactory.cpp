@@ -88,7 +88,7 @@ PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVaria
         QJsonArray arr = pData["grid"].toJsonArray();
         if (!pData.contains("gridheaders"))
         {
-            qDebug() << "Can't initialize grid without gridheaders definitions " << pKey;
+            qDebug() << "Can't initialize grid values without gridheaders definitions " << pKey;
         }
         else
         {
@@ -103,7 +103,6 @@ PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVaria
                 pProperty->push();
 
             }
-
         }
 
     }

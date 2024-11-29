@@ -12,16 +12,19 @@
             "hash": {
                 "type": "string",
                 "label": "Hash",
+                "order":"00",
                 "value":"xxx"
             },
             "date": {
                 "type": "string",
                 "label": "Date",
+                "order":"01",
                 "value":"xxx"
             },
             "message": {
                 "type": "string",
                 "label": "Commit message",
+                "order":"02",
                 "value":"xxx"
             }
         }
@@ -29,33 +32,38 @@
     "moduleInfo": {
         "devcat": "Module",
         "group": "Info",
-        "order":"00",
+        "order":"01",
         "permission": 0,
         "label": "Module info",
         "elements": {
             "moduleDescription": {
                 "type": "string",
                 "label": "Module description",
+                "order":"00",
                 "value":"N/A"
             },
             "moduleLabel": {
                 "type": "string",
                 "label": "Module label",
+                "order":"01",
                 "value":"Base module label"
             },
             "moduleName": {
                 "type": "string",
                 "label": "Module name",
+                "order":"02",
                 "value":"basemodule"
             },
             "moduleVersion": {
                 "type": "string",
                 "label": "Version",
+                "order":"02",
                 "value":"1"
             },
             "baseVersion": {
                 "type": "int",
                 "label": "baseVersion",
+                "order":"03",
                 "value":1
             }
         }
@@ -67,6 +75,7 @@
         "permission": 2,
         "rule":1,
         "label": "Load profile",
+        "order":"00",
         "elements": {
             "name": {
                 "autoupdate":true,
@@ -74,6 +83,7 @@
                 "listOfValues":[],
                 "type": "string",
                 "label": "",
+                "order":"00",
                 "value":"default",
                 "posticon":"redo",
                 "preicon":"autorenew"
@@ -88,12 +98,14 @@
         "permission": 2,
         "rule":0,
         "label": "Save profile",
+        "order":"01",
         "elements": {
             "name": {
                 "autoupdate":true,
                 "directedit":true,
                 "type": "string",
                 "label": "",
+                "order":"00",
                 "value":"default",
                 "posticon":"save"
             }
@@ -105,11 +117,13 @@
         "devcat": "Module",
         "group": "Actions",
         "permission": 1,
+        "order":"00",
         "label": "Controls",
         "rule":2,
         "elements": {
             "kill": {
                 "type": "bool",
+                "order":"00",
                 "label": "Kill module",
                 "value":false
             }

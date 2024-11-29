@@ -88,6 +88,11 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     defineMeAsSequencer();
     defineMeAsNavigator();
 
+    getProperty("timesRWgrid")->push();
+    getProperty("timesRWgrid")->push();
+    getProperty("datesRWgrid")->push();
+    getProperty("datesRWgrid")->push();
+
 }
 
 Dummy::~Dummy()
@@ -109,17 +114,16 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
             }
             foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
             {
-                //setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
                 if (keyprop == "dynprop")
                 {
                     if (keyelt == "dyntext")
                     {
 
-                        dyntext->setValue(eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toString(), true);
+                        dyntext->setValue(eventData[keyprop].toMap()["elements"].toMap()[keyelt].toString(), true);
                     }
                     if (keyelt == "dynbool")
                     {
-                        bool val = eventData["dynprop"].toMap()["elements"].toMap()["dynbool"].toMap()["value"].toBool();
+                        bool val = eventData["dynprop"].toMap()["elements"].toMap()["dynbool"].toBool();
                         if (val)
                         {
 
@@ -132,7 +136,10 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                 {
                     if (keyelt == "b1")
                     {
-                        //refreshDeviceslovs();
+                        // test max gridlimit
+                        getProperty("secondtestgrid")->clearGrid();
+                        getProperty("secondtestgrid")->setGridLimit(1010);
+                        for ( int i = 0; i < 1010; i++)getProperty("secondtestgrid")->push();
                     }
                 }
                 if (keyprop == "devices")
@@ -140,7 +147,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                     if (keyelt == "camera")
                     {
                         if (getEltString(keyprop, keyelt)->setValue(
-                                    eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toString(), false))
+                                    eventData[keyprop].toMap()["elements"].toMap()[keyelt].toString(), false))
                         {
                             getProperty(keyprop)->setState(OST::Ok);
                             _camera = getString("devices", "camera");
@@ -301,6 +308,9 @@ void Dummy::newBLOB(INDI::PropertyBlob pblob)
         OST::ImgData dta = _image->ImgStats();
         dta.mUrlJpeg = getModuleName() + QString(pblob.getDeviceName()) + ".jpeg";
         dta.mUrlFits = getModuleName() + QString(pblob.getDeviceName()) + ".FITS";
+        dta.mAlternates.clear();
+        dta.mAlternates.append(getModuleName() + QString(pblob.getDeviceName()) + ".jpeg");
+        dta.mAlternates.append(getModuleName() + QString(pblob.getDeviceName()) + ".jpeg");
         dta.isSolved = false;
         getEltImg("testimage", "image1")->setValue(dta, true);
 

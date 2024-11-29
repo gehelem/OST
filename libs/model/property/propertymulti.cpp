@@ -89,7 +89,15 @@ void PropertyMulti::setGridLimit(int limit)
     if (limit > 0)
     {
         if (limit < mGridLimit) clearGrid();
-        mGridLimit = limit;
+        if (limit > 1000 )
+        {
+            sendWarning("gridLimit max size is 1000 " + this->label());
+            mGridLimit = 1000;
+        }
+        else
+        {
+            mGridLimit = limit;
+        }
     }
 }
 bool PropertyMulti::hasGraph()
@@ -121,6 +129,23 @@ bool  PropertyMulti::setElt(QString key, QVariant val)
         getElt(key)->accept(&vu, m);
         return true;
     }
+    if (mElts[key]->getType() == "time")
+    {
+        ElementUpdate vu;
+        QVariantMap m;
+        m["value"] = val.toMap();
+        getElt(key)->accept(&vu, m);
+        return true;
+    }
+    if (mElts[key]->getType() == "date")
+    {
+        ElementUpdate vu;
+        QVariantMap m;
+        m["value"] = val.toMap();
+        getElt(key)->accept(&vu, m);
+        return true;
+    }
+
     if ((mElts[key]->getType() == "bool") && (val.canConvert<bool>()) )
     {
         ElementUpdate vu;

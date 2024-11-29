@@ -16,7 +16,7 @@ QJsonObject ElementJsonDumper::dumpElementCommons(ElementBase *pElement)
     json["autoupdate"] = pElement->autoUpdate();
     json["badge"] = pElement->getBadge();
     if ((pElement->getType() == "int") || (pElement->getType() == "float") || (pElement->getType() == "string")
-            || (pElement->getType() == "bool"))
+            || (pElement->getType() == "bool") || (pElement->getType() == "date") || (pElement->getType() == "time"))
     {
         json["directedit"] = pElement->getDirectEdit();
     }
@@ -131,6 +131,7 @@ void ElementJsonDumper::visit(ElementImg *pElement)
     QJsonObject json = dumpElementCommons(pElement);
 
     QJsonObject imgdata;
+    imgdata["showstats"] =  pElement->getShowStats();
     imgdata["urljpeg"] =  pElement->value().mUrlJpeg;
     imgdata["urlfits"] = pElement->value().mUrlFits;
     imgdata["urlthumbnail"] = pElement->value().mUrlThumbnail;
@@ -200,11 +201,21 @@ void ElementJsonDumper::visit(ElementImg *pElement)
 
     //i=;
 
+
+    if (pElement->value().mAlternates.size() > 0)
+    {
+        arr = QJsonArray();
+        for (int i = 0; i < pElement->value().mAlternates.size(); i++)
+        {
+            arr.append(pElement->value().mAlternates[i]);
+        }
+        imgdata["alternates"] = arr;
+    }
+
     for (auto it = imgdata.constBegin(); it != imgdata.constEnd(); it++)
     {
         json.insert(it.key(), it.value());
     }
-
     json["type"] = "img";
 
     mResult = json;
@@ -233,6 +244,29 @@ void ElementJsonDumper::visit(ElementPrg *pElement)
     if (pElement->prgType() == spinner) json["prgtype"] = "spinner";
     json["dynlabel"] = pElement->value().dynlabel;
     json["value"] = pElement->value().value;
+
+    mResult = json;
+}
+void ElementJsonDumper::visit(ElementDate *pElement)
+{
+    QJsonObject json = dumpElementCommons(pElement);
+    json["type"] = "date";
+    json["year"] = pElement->value().year();
+    json["month"] = pElement->value().month();
+    json["day"] = pElement->value().day();
+
+    mResult = json;
+}
+void ElementJsonDumper::visit(ElementTime *pElement)
+{
+    QJsonObject json = dumpElementCommons(pElement);
+    json["type"] = "time";
+    json["hh"] = pElement->value().hour();
+    json["mm"] = pElement->value().minute();
+    json["ss"] = pElement->value().second();
+    json["usems"] = pElement->getUseMs();
+    if (pElement->getUseMs()) json["ms"] = pElement->value().msec();
+
 
     mResult = json;
 }

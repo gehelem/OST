@@ -94,6 +94,46 @@ OST::ElementMessage* Datastore::getEltMsg(QString pProperty, QString pElement)
     }
     return static_cast<OST::ElementMessage*>(p->getElt(pElement));
 }
+OST::ElementDate* Datastore::getEltDate(QString pProperty, QString pElement)
+{
+    OST::PropertyMulti* p = getProperty(pProperty);
+    if (p == nullptr)
+    {
+        sendWarning(" getEltDate - property " + pProperty + " not found");
+        return nullptr;
+    }
+    if (!p->getElts()->contains(pElement))
+    {
+        sendWarning("getEltDate - property " + pProperty + " : element " + pElement + " not found");
+        return nullptr;
+    }
+    if (p->getElt(pElement)->getType() != "date")
+    {
+        sendWarning("getEltDate - property " + pProperty + " : element " + pElement + " is not date");
+        return nullptr;
+    }
+    return static_cast<OST::ElementDate*>(p->getElt(pElement));
+}
+OST::ElementTime* Datastore::getEltTime(QString pProperty, QString pElement)
+{
+    OST::PropertyMulti* p = getProperty(pProperty);
+    if (p == nullptr)
+    {
+        sendWarning(" getEltTime - property " + pProperty + " not found");
+        return nullptr;
+    }
+    if (!p->getElts()->contains(pElement))
+    {
+        sendWarning("getEltTime - property " + pProperty + " : element " + pElement + " not found");
+        return nullptr;
+    }
+    if (p->getElt(pElement)->getType() != "time")
+    {
+        sendWarning("getEltTime - property " + pProperty + " : element " + pElement + " is not time");
+        return nullptr;
+    }
+    return static_cast<OST::ElementTime*>(p->getElt(pElement));
+}
 
 QString Datastore::getString(QString pProperty, QString pElement)
 {
@@ -270,6 +310,34 @@ bool Datastore::getBool(QString pProperty, QString pElement, long line)
         return 0;
     }
     OST::ValueBool* v = static_cast<OST::ValueBool*>(getProperty(pProperty)->getGrid()[line][pElement]);
+    return v->value;
+}
+QDate Datastore::getDate(QString pProperty, QString pElement)
+{
+    return getEltDate(pProperty, pElement)->value();
+}
+QDate Datastore::getDate(QString pProperty, QString pElement, long line)
+{
+    if (getProperty(pProperty)->getGrid().size() < line + 1)
+    {
+        sendWarning("getDate - property " + pProperty + " line : " + line + " does not exist" );
+        return QDate();
+    }
+    OST::ValueDate* v = static_cast<OST::ValueDate*>(getProperty(pProperty)->getGrid()[line][pElement]);
+    return v->value;
+}
+QTime Datastore::getTime(QString pProperty, QString pElement)
+{
+    return getEltTime(pProperty, pElement)->value();
+}
+QTime Datastore::getTime(QString pProperty, QString pElement, long line)
+{
+    if (getProperty(pProperty)->getGrid().size() < line + 1)
+    {
+        sendWarning("getTime - property " + pProperty + " line : " + line + " does not exist" );
+        return QTime();
+    }
+    OST::ValueTime* v = static_cast<OST::ValueTime*>(getProperty(pProperty)->getGrid()[line][pElement]);
     return v->value;
 }
 
@@ -526,9 +594,10 @@ QVariantMap Datastore::getProfile(void)
                 QVariantMap property;
                 if (props[keyprop].toMap().contains("elements"))
                 {
-                    QVariantMap element, elements;
+                    QVariantMap elements;
                     foreach(const QString &keyelt, props[keyprop].toMap()["elements"].toMap().keys())
                     {
+                        QVariantMap element;
                         if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("value"))
                         {
                             element["value"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
@@ -544,6 +613,34 @@ QVariantMap Datastore::getProfile(void)
                         if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("step"))
                         {
                             element["step"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["step"];
+                        }
+                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("year"))
+                        {
+                            element["year"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["year"];
+                        }
+                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("month"))
+                        {
+                            element["month"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["month"];
+                        }
+                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("day"))
+                        {
+                            element["day"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["day"];
+                        }
+                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("hh"))
+                        {
+                            element["hh"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["hh"];
+                        }
+                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("mm"))
+                        {
+                            element["mm"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["mm"];
+                        }
+                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("ss"))
+                        {
+                            element["ss"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["ss"];
+                        }
+                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("ms"))
+                        {
+                            element["ms"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["ms"];
                         }
                         if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("gridvalues"))
                         {

@@ -117,6 +117,10 @@ void WShandler::processTextMessage(QString message)
     {
         emit externalEvent(obj["evt"].toString(), obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
     }
+    if ((obj["evt"].toString() == "Ffolderselect"))
+    {
+        emit externalEvent(obj["evt"].toString(), QString(), obj["folder"].toString(), QVariantMap());
+    }
 
 
 }
@@ -278,6 +282,14 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
                     {
                         element = prop["elements"].toMap()[key].toMap();
                     }
+                    if (prop["elements"].toMap()[key].toMap()["type"] == "date")
+                    {
+                        element = prop["elements"].toMap()[key].toMap();
+                    }
+                    if (prop["elements"].toMap()[key].toMap()["type"] == "time")
+                    {
+                        element = prop["elements"].toMap()[key].toMap();
+                    }
                 }
                 elements[key] = element;
             }
@@ -328,4 +340,11 @@ void WShandler::sendMessage(const QString &pMessage)
     QDebug debug = qDebug();
     debug.noquote();
     debug << messageWithDateTime;
+}
+void WShandler::processFileEvent(const QString &eventType, const QStringList &eventData)
+{
+    QJsonObject  obj;
+    obj["evt"] = eventType;
+    obj["fileevent"] = QJsonArray::fromStringList(eventData);
+    sendJsonMessage(obj);
 }

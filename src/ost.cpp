@@ -34,8 +34,8 @@ int main(int argc, char *argv[])
     argParser.addHelpOption();
 
     QCommandLineOption saveAllBlobsOption("s", "Save all received blobs to /tmp");
-    QCommandLineOption webrootOption("webroot", "Web server root folder **must be writable**", "webroot");
-    webrootOption.setDefaultValue("/var/www/html");
+    QCommandLineOption webrootOption("webroot", "Web server media folder **must be writable**", "webroot");
+    webrootOption.setDefaultValue("/var/www/html/ostmedia");
     QCommandLineOption dbPathOption("dbpath", "DB path", "dbpath");
     dbPathOption.setDefaultValue("");
     QCommandLineOption libPathOption("libpath", "Modules library path", "libpath");

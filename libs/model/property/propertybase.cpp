@@ -9,6 +9,7 @@ PropertyBase::PropertyBase(const QString &key, const QString &label, const Permi
       mOrder(order), mHasProfile(hasProfile)
 {
     qRegisterMetaType<OST::MsgLevel>("MsgLevel");
+    if (order == "") qDebug() << "*** PropertyBase order ko *** "  << label << key << level1 << level2;
 }
 PropertyBase::~PropertyBase()
 {

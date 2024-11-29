@@ -46,6 +46,11 @@ class Controller : public QObject
         QMap<QString, QMap<QString, QString>> mModulesMap;
         QZeroConf zeroConf;
         QString buildName(void);
+        QFileSystemWatcher mFileWatcher;
+        QStringList mFilesList;
+        QStringList mFoldersList;
+        QString mSelectedFolder;
+
 
 
         bool loadModule(QString lib, QString name, QString label, QString profile);
@@ -73,6 +78,8 @@ class Controller : public QObject
                              const QVariantMap &pEventData);
         void OnMainCtlEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
                             const QVariantMap &pEventData);
+        void OnFileWatcherEvent(const QString &pEvent);
+        void OnFileChangeEvent(const QString &pEvent);
 
 };
 #endif

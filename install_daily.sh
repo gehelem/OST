@@ -42,14 +42,39 @@ wget http://data.astrometry.net/4200/index-4213.fits
 wget http://data.astrometry.net/4200/index-4214.fits
 sudo chmod 777 -R /usr/share/astrometry
 
+######################################################### NGINX CONF
+#create local media folder
 cd
-cd /var/www/html
+#rm -Rf ostmedia
+mkdir ostmedia
+#grant access
+sudo usermod -a -G $USER www-data
+
+#adapt nginx conf
+rm ostserver.nginx
+wget https://raw.githubusercontent.com/gehelem/OST/main/ostserver.nginx --no-check-certificate
+sed -i "s/ostusername/"$USER"/g" ostserver.nginx
+sudo cp ostserver.nginx /etc/nginx/sites-available
+cd /etc/nginx/sites-enabled
+sudo rm default
+sudo rm ostserver.nginx
+sudo ln -s /etc/nginx/sites-available/ostserver.nginx
+
+#get ostserver front
+cd
+sudo rm -Rf /var/www/ostserver
+sudo mkdir /var/www/ostserver
+cd /var/www/ostserver
 sudo wget https://github.com/gehelem/ost-front/releases/download/WorkInProgress/html.tar.gz --no-check-certificate
 sudo tar -xvf html.tar.gz
-sudo chmod 777 /var/www/html
+#grant access
+sudo chown -R www-data:www-data /var/www/ostserver
+
+sudo service nginx restart
 
 
 
+# INDIWEBMANAGER
 cd 
 sudo apt-get install -y pipenv
 mkdir indiweb
@@ -82,10 +107,16 @@ sudo systemctl daemon-reload
 sudo systemctl enable indiwebmanager.service
 sudo service indiwebmanager restart
 
+#OSTSERVER SERVICE
 cd
+rm ostserver_service.sh 
 wget https://raw.githubusercontent.com/gehelem/OST/main/ostserver_service.sh --no-check-certificate
+sed -i "s/ostusername/"$USER"/g" ostserver_service.sh
+sudo rm /usr/bin/ostserver_service.sh 
 sudo cp ostserver_service.sh /usr/bin/
 
+cd
+rm ostserver.service
 wget https://raw.githubusercontent.com/gehelem/OST/main/ostserver.service --no-check-certificate
 sed -i "s/ostusername/"$USER"/g" ostserver.service
 sudo cp ostserver.service /etc/systemd/system/
