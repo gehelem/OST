@@ -37,7 +37,7 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         bool sendModNewSwitch(QString deviceName, QString propertyName, QString elementName, ISState sw);
         bool sendModNewNumber(const QString &deviceName, const QString &propertyName, const QString &elementName,
                               const double &value);
-
+        bool requestCapture(const QString &deviceName, const double &exposure, const double &gain, const double &offset);
         bool getModNumber(const QString &deviceName, const QString &propertyName, const QString &elementName, double &value);
         bool getModSwitch(const QString &deviceName, const QString &propertyName, const QString &elementName, bool &value);
         bool getModText(const QString &deviceName, const QString &propertyName, const QString &elementName, QString &value);
@@ -47,11 +47,56 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         bool createDeviceProperty(const QString &key, const QString &label, const QString &level1,
                                   const QString &level2, const QString &order, INDI::BaseDevice::DRIVER_INTERFACE interface);
         bool refreshDeviceslovs(QString deviceName);
+        bool defineMeAsFocuser();
+        bool defineMeAsGuider();
+        bool defineMeAsSequencer();
+        bool defineMeAsImager();
+        bool defineMeAsNavigator();
+        double getPixelSize(const QString &deviceName);
+        double getSampling();
+        bool isFocuser()
+        {
+            return mIsFocuser;
+        }
+        bool isGuider()
+        {
+            return mIsGuider;
+        }
+        bool isSequencer()
+        {
+            return mIsSequencer;
+        }
+        bool isImager()
+        {
+            return mIsImager;
+        }
+        bool isNavigator()
+        {
+            return mIsNavigator;
+        }
+        bool isOptic()
+        {
+            return mIsOptic;
+        }
+        bool giveMeADevice(QString name, QString label, INDI::BaseDevice::DRIVER_INTERFACE interface);
+        bool giveMeAnOptic();
+
     private:
         void OnDispatchToIndiExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                            const QVariantMap &eventData) override;
+        bool mIsFocuser = false;
+        bool mIsGuider = false;
+        bool mIsSequencer = false;
+        bool mIsImager = false;
+        bool mIsNavigator = false;
+        bool mIsOptic = false;
+        double mFocal;
+        double mDiam;
+        double mRed;
+        double mAperture;
     signals:
         void askedFrameReset(QString devicename);
+        void requestCaptureDone();
 }
 ;
 #endif

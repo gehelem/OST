@@ -9,9 +9,9 @@ IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap
     setVerbose(false);
     //_moduletype = "IndiModule";
     loadOstPropertiesFromFile(":indimodule.json");
-    setOstElementValue("indiGit", "hash", QString::fromStdString(Version::GIT_SHA1), false);
-    setOstElementValue("indiGit", "date", QString::fromStdString(Version::GIT_DATE), false);
-    setOstElementValue("indiGit", "message", QString::fromStdString(Version::GIT_COMMIT_SUBJECT), false);
+    getEltString("indiGit", "hash")->setValue(QString::fromStdString(Version::GIT_SHA1), false);
+    getEltString("indiGit", "date")->setValue(QString::fromStdString(Version::GIT_DATE), false);
+    getEltString("indiGit", "message")->setValue(QString::fromStdString(Version::GIT_COMMIT_SUBJECT), false);
 
     OST::LovString* ls = new OST::LovString("DRIVER_INTERFACE-TELESCOPE_INTERFACE");
     createGlobLov("DRIVER_INTERFACE-TELESCOPE_INTERFACE", ls);
@@ -52,10 +52,9 @@ void IndiModule::OnDispatchToIndiExternalEvent(const QString &eventType, const Q
             //setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
             if (keyprop == "serveractions")
             {
-                setOstElementValue(keyprop, keyelt, false, false);
+                getEltBool(keyprop, keyelt)->setValue(false, false);
                 if (keyelt == "conserv")
                 {
-
                     getProperty(keyprop)->setState(OST::Busy);
                     if (connectIndi()) getProperty(keyprop)->setState(OST::Ok);
                     else getProperty(keyprop)->setState(OST::Error);
@@ -69,7 +68,7 @@ void IndiModule::OnDispatchToIndiExternalEvent(const QString &eventType, const Q
             }
             if (keyprop == "devicesactions")
             {
-                setOstElementValue(keyprop, keyelt, false, false);
+                getEltBool(keyprop, keyelt)->setValue(false, false);
                 if (!isServerConnected())
                 {
                     sendWarning("Indi server not connected");
@@ -117,7 +116,7 @@ bool IndiModule::connectIndi()
 {
     if (isServerConnected())
     {
-        sendWarning("Indi server already connected");
+        //sendWarning("Indi server already connected");
         newUniversalMessage("Indi server already connected");
         return true;
     }
@@ -156,10 +155,6 @@ bool IndiModule::connectAllDevices()
     int err = 0;
     std::vector<INDI::BaseDevice> devs = getDevices();
 
-    createDeviceProperty("camera", "Camera", "Module", "Indi", "999", INDI::BaseDevice::CCD_INTERFACE);
-    createDeviceProperty("focuser", "Focuser", "Module", "Indi", "999", INDI::BaseDevice::FOCUSER_INTERFACE);
-    createDeviceProperty("st4", "Pulses (ST4)", "Module", "Indi", "999", INDI::BaseDevice::GUIDER_INTERFACE);
-
     for(std::size_t i = 0; i < devs.size(); i++)
     {
         INDI::PropertySwitch svp = devs[i].getSwitch("CONNECTION");
@@ -186,7 +181,7 @@ bool IndiModule::connectAllDevices()
             sendNewSwitch(svp);
             if (devs[i].getDriverInterface() & INDI::BaseDevice::CCD_INTERFACE)
             {
-                sendWarning("Can't set blob mode " + QString(devs[i].getDeviceName()));
+                sendMessage("Set blob mode " + QString(devs[i].getDeviceName()));
                 setBLOBMode(B_ALSO, devs[i].getDeviceName(), nullptr);
 
             }
@@ -374,6 +369,97 @@ auto IndiModule::sendModNewNumber(const QString &deviceName, const QString &prop
     }
     sendError("Unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
     return false;
+
+}
+bool IndiModule::requestCapture(const QString &deviceName, const double &exposure, const double &gain, const double &offset)
+{
+    double wgain = gain;
+    double woffset = offset;
+    double wexpose = exposure;
+    INDI::BaseDevice dp = getDevice(deviceName.toStdString().c_str());
+    if (!dp.isValid())
+    {
+        sendError("Capture - device " + deviceName + " not found. Aborting.");
+        return false;
+    }
+    if (dp == false)
+    {
+        sendWarning("Capture - " + deviceName + " not connected, trying to connect");
+        if (!connectDevice(deviceName)) return false;
+    }
+    setBLOBMode(B_ALSO, deviceName.toStdString().c_str(), nullptr);
+    if(dp.getProperty("CCD_CONTROLS"))
+    {
+        INDI::PropertyNumber prop = dp.getNumber("CCD_CONTROLS");
+        if (wgain < prop.findWidgetByName("Gain")->min)
+        {
+            sendWarning("Capture - " + deviceName + " gain requested too low (" + QString::number(wgain) + "), setting to " +
+                        QString::number(prop.findWidgetByName("Gain")->min));
+            wgain = prop.findWidgetByName("Gain")->min;
+        }
+        if (wgain > prop.findWidgetByName("Gain")->max)
+        {
+            sendWarning("Capture - " + deviceName + " gain requested too high (" + QString::number(wgain) + "), setting to " +
+                        QString::number(prop.findWidgetByName("Gain")->max));
+            wgain = prop.findWidgetByName("Gain")->max;
+        }
+        if (woffset < prop.findWidgetByName("Offset")->min)
+        {
+            sendWarning("Capture - " + deviceName + " gain requested too low (" + QString::number(woffset) + "), setting to " +
+                        QString::number(prop.findWidgetByName("Offset")->min));
+            woffset = prop.findWidgetByName("Offset")->min;
+        }
+        if (woffset > prop.findWidgetByName("Offset")->max)
+        {
+            sendWarning("Capture - " + deviceName + " gain requested too high (" + QString::number(woffset) + "), setting to " +
+                        QString::number(prop.findWidgetByName("Offset")->max));
+            woffset = prop.findWidgetByName("Offset")->max;
+        }
+        prop.findWidgetByName("Gain")->value = wgain;
+        prop.findWidgetByName("Offset")->value = woffset;
+        sendNewNumber(prop);
+    }
+    if(dp.getProperty("CCD_GAIN"))
+    {
+        INDI::PropertyNumber prop = dp.getNumber("CCD_GAIN");
+        if (wgain < prop.findWidgetByName("GAIN")->min)
+        {
+            sendWarning("Capture - " + deviceName + " gain requested too low (" + QString::number(wgain) + "), setting to " +
+                        QString::number(prop.findWidgetByName("GAIN")->min));
+            wgain = prop.findWidgetByName("GAIN")->min;
+        }
+        if (wgain > prop.findWidgetByName("GAIN")->max)
+        {
+            sendWarning("Capture - " + deviceName + " gain requested too high (" + QString::number(wgain) + "), setting to " +
+                        QString::number(prop.findWidgetByName("GAIN")->max));
+            wgain = prop.findWidgetByName("GAIN")->max;
+        }
+        prop.findWidgetByName("GAIN")->value = wgain;
+        sendNewNumber(prop);
+    }
+    if(dp.getProperty("CCD_OFFSET"))
+    {
+        INDI::PropertyNumber prop = dp.getNumber("CCD_OFFSET");
+        if (woffset < prop.findWidgetByName("OFFSET")->min)
+        {
+            sendWarning("Capture - " + deviceName + " offset requested too low (" + QString::number(woffset) + "), setting to " +
+                        QString::number(prop.findWidgetByName("OFFSET")->min));
+            woffset = prop.findWidgetByName("OFFSET")->min;
+        }
+        if (woffset > prop.findWidgetByName("OFFSET")->max)
+        {
+            sendWarning("Capture - " + deviceName + " offset requested too high (" + QString::number(woffset) + "), setting to " +
+                        QString::number(prop.findWidgetByName("OFFSET")->max));
+            woffset = prop.findWidgetByName("OFFSET")->max;
+        }
+        prop.findWidgetByName("OFFSET")->value = woffset;
+        sendNewNumber(prop);
+    }
+
+    if (!sendModNewNumber(deviceName, "CCD_EXPOSURE", "CCD_EXPOSURE_VALUE", wexpose)) return false;
+    emit requestCaptureDone();
+    return true;
+
 
 }
 bool IndiModule::getModNumber(const QString &deviceName, const QString &propertyName, const QString  &elementName,
@@ -597,10 +683,10 @@ bool IndiModule::createDeviceProperty(const QString &key, const QString &label, 
 {
     std::vector<INDI::BaseDevice> devs = getDevices();
     OST::PropertyMulti* pm = new OST::PropertyMulti(key, label, OST::ReadWrite, level1, level2, order, true, false);
-    OST::ValueString* s = new  OST::ValueString("name", "", "");
+    OST::ElementString* s = new  OST::ElementString("name", "", "");
     s->setValue("--", false);
     s->setAutoUpdate(true);
-    pm->addValue("name", s);
+    pm->addElt("name", s);
 
     for(std::size_t i = 0; i < devs.size(); i++)
     {
@@ -693,3 +779,245 @@ bool IndiModule::refreshDeviceslovs(QString deviceName)
     }
     return true;
 }
+bool IndiModule::defineMeAsFocuser()
+{
+    defineMeAsImager();
+
+    OST::PropertyMulti* pm = getProperty("actions");
+    pm->setRule(OST::SwitchsRule::AtMostOne);
+    OST::ElementBool* b = new  OST::ElementBool("Abort focus", "foc99", "");
+    b->setValue(false, false);
+    pm->addElt("abortfocus", b);
+    b = new  OST::ElementBool("Autofocus", "foc50", "");
+    b->setValue(false, false);
+    pm->addElt("autofocus", b);
+    b = new  OST::ElementBool("Loop", "foc70", "");
+    b->setValue(false, false);
+    pm->addElt("loop", b);
+    mIsFocuser = true;
+    return true;
+
+}
+bool IndiModule::defineMeAsGuider()
+{
+    defineMeAsImager();
+
+    OST::PropertyMulti* pm = getProperty("actions");
+    pm->setRule(OST::SwitchsRule::AtMostOne);
+    OST::ElementBool* b = new  OST::ElementBool("Abort guider", "guid99", "");
+    b->setValue(false, false);
+    pm->addElt("abortguider", b);
+    b = new  OST::ElementBool("Guide", "guid50", "");
+    b->setValue(false, false);
+    pm->addElt("guide", b);
+    b = new  OST::ElementBool("Calibrate", "guid00", "");
+    b->setValue(false, false);
+    pm->addElt("calibrate", b);
+    mIsGuider = true;
+    return true;
+
+}
+bool IndiModule::defineMeAsSequencer()
+{
+    defineMeAsImager();
+
+    OST::PropertyMulti* pm = getProperty("actions");
+    pm->setRule(OST::SwitchsRule::AtMostOne);
+    OST::ElementBool* b = new  OST::ElementBool("Abort sequence", "seq99", "");
+    b->setValue(false, false);
+    pm->addElt("abortsequence", b);
+    b = new  OST::ElementBool("Start sequence", "seq00", "");
+    b->setValue(false, false);
+    pm->addElt("startsequence", b);
+    mIsSequencer = true;
+    return true;
+
+}
+bool IndiModule::defineMeAsImager()
+{
+    giveMeAnOptic();
+    if (!getStore().contains("image"))
+    {
+        OST::PropertyMulti* dynprop = new OST::PropertyMulti("image", "Image", OST::Permission::WriteOnly, "Control",
+                "", "000Control222", false, false);
+        createProperty("image", dynprop);
+    }
+
+    if (getStore().contains("image"))
+    {
+        if (!(getStore()["image"]->getElts()->contains("image")))
+        {
+            OST::PropertyMulti * pm = getProperty("image");
+            OST::ElementImg* img = new OST::ElementImg("", "00", "");
+            pm->addElt("image", img);
+        }
+
+    }
+
+    OST::PropertyMulti * pm = getProperty("parms");
+    pm->setRule(OST::SwitchsRule::Any);
+
+    if (!getStore()["parms"]->getElts()->contains("exposure"))
+    {
+        OST::ElementFloat* f = new  OST::ElementFloat("Exposure", "exp000", "");
+        f->setValue(0, false);
+        f->setDirectEdit(true);
+        f->setAutoUpdate(true);
+        f->setMinMax(0.00001, 300);
+        f->setStep(0.001);
+        f->setSlider(OST::SliderAndValue);
+        pm->addElt("exposure", f);
+    }
+
+
+
+    if (!getStore()["parms"]->getElts()->contains("gain"))
+    {
+        OST::ElementInt* i  = new  OST::ElementInt("Gain", "exp020", "");
+        i->setValue(0, false);
+        i->setDirectEdit(true);
+        i->setAutoUpdate(true);
+        i->setMinMax(0, 500);
+        i->setStep(1);
+        i->setSlider(OST::SliderAndValue);
+        pm->addElt("gain", i);
+    }
+
+    if (!getStore()["parms"]->getElts()->contains("offset"))
+    {
+        OST::ElementInt* i  = new  OST::ElementInt("Offset", "exp030", "");
+        i->setValue(0, false);
+        i->setDirectEdit(true);
+        i->setAutoUpdate(true);
+        i->setMinMax(0, 500);
+        i->setStep(1);
+        i->setSlider(OST::SliderAndValue);
+        pm->addElt("offset", i);
+    }
+
+    mIsImager = true;
+    return true;
+
+}
+bool IndiModule::defineMeAsNavigator()
+{
+    defineMeAsImager();
+
+
+    OST::PropertyMulti* pm  = getProperty("actions");
+    pm->setRule(OST::SwitchsRule::AtMostOne);
+    OST::ElementBool* b = new  OST::ElementBool("Abort navigator", "nav99", "");
+    b->setValue(false, false);
+    pm->addElt("abortnavigator", b);
+    b = new  OST::ElementBool("Center target", "nav00", "");
+    b->setValue(false, false);
+    pm->addElt("gototarget", b);
+    OST::ElementString* s = new  OST::ElementString("Target name", "nav50", "");
+    s->setDirectEdit(true);
+    s->setAutoUpdate(true);
+    pm->addElt("targetname", s);
+    OST::ElementFloat* f = new  OST::ElementFloat("Target RA", "nav51", "");
+    f->setDirectEdit(true);
+    f->setAutoUpdate(true);
+    pm->addElt("targetra", f);
+    f = new  OST::ElementFloat("Target DEC", "nav52", "");
+    f->setDirectEdit(true);
+    f->setAutoUpdate(true);
+    pm->addElt("targetde", f);
+    mIsNavigator = true;
+    return true;
+
+}
+double IndiModule::getPixelSize(const QString &deviceName)
+{
+    INDI::BaseDevice dp = getDevice(deviceName.toStdString().c_str());
+    if (!dp.isValid())
+    {
+        sendError("getPixelSize - device " + deviceName + " not found. Aborting.");
+        return 0;
+    }
+    if (!dp.isConnected())
+    {
+        sendWarning("getPixelSize - " + deviceName + " not connected, trying to connect");
+        if (!connectDevice(deviceName)) return 0;
+    }
+    INDI::PropertyNumber prop = dp.getNumber("CCD_INFO");
+    return prop.findWidgetByName("CCD_PIXEL_SIZE")->getValue();
+
+}
+double IndiModule::getSampling()
+{
+    if (!isImager())
+    {
+        sendWarning("getSampling - module is not defined as an imager - defaults to 1");
+        return 1;
+    }
+    return 206 * getPixelSize(getString("devices", "camera")) / (getFloat("optic", "fl") * getFloat("optic", "red"));
+}
+
+bool IndiModule::giveMeADevice(QString name, QString label, INDI::BaseDevice::DRIVER_INTERFACE interface)
+{
+    OST::PropertyMulti* pm = getProperty("devices");
+    OST::ElementString* s = new  OST::ElementString(label, label, "");
+    switch (interface)
+    {
+        case INDI::BaseDevice::DRIVER_INTERFACE::GENERAL_INTERFACE:
+            s->setGlobalLov("DRIVER_INTERFACE-GENERAL_INTERFACE");
+            break;
+        case INDI::BaseDevice::DRIVER_INTERFACE::CCD_INTERFACE:
+            s->setGlobalLov("DRIVER_INTERFACE-CCD_INTERFACE");
+            break;
+        case INDI::BaseDevice::DRIVER_INTERFACE::TELESCOPE_INTERFACE:
+            s->setGlobalLov("DRIVER_INTERFACE-TELESCOPE_INTERFACE");
+            break;
+        case INDI::BaseDevice::DRIVER_INTERFACE::GUIDER_INTERFACE:
+            s->setGlobalLov("DRIVER_INTERFACE-GUIDER_INTERFACE");
+            break;
+        case INDI::BaseDevice::DRIVER_INTERFACE::FOCUSER_INTERFACE:
+            s->setGlobalLov("DRIVER_INTERFACE-FOCUSER_INTERFACE");
+            break;
+        case INDI::BaseDevice::DRIVER_INTERFACE::FILTER_INTERFACE:
+            s->setGlobalLov("DRIVER_INTERFACE-FILTER_INTERFACE");
+            break;
+        case INDI::BaseDevice::DRIVER_INTERFACE::GPS_INTERFACE:
+            s->setGlobalLov("DRIVER_INTERFACE-GPS_INTERFACE");
+            break;
+        default:
+            sendWarning("giveMeADevice unhandled interface type");
+            break;
+    }
+
+    s->setDirectEdit(true);
+    s->setAutoUpdate(true);
+    pm->addElt(name, s);
+    return true;
+
+}
+bool IndiModule::giveMeAnOptic()
+{
+    if (getStore().contains("optic")) return false;
+
+    OST::PropertyMulti* pm = new OST::PropertyMulti("optic", "Optic", OST::ReadWrite, "Parameters", "", "222Parms333", true,
+            false);
+    createProperty("optic", pm);
+    OST::ElementFloat* f = new  OST::ElementFloat("Focal length", "1", "");
+    f->setDirectEdit(true);
+    f->setMinMax(1, 4000);
+    f->setAutoUpdate(true);
+    pm->addElt("fl", f);
+    OST::ElementFloat* d = new  OST::ElementFloat("Diameter", "2", "");
+    d->setDirectEdit(true);
+    d->setMinMax(1, 4000);
+    d->setAutoUpdate(true);
+    pm->addElt("diam", d);
+    OST::ElementFloat* r = new  OST::ElementFloat("Reducer", "3", "");
+    r->setDirectEdit(true);
+    r->setMinMax(0.1, 10);
+    r->setAutoUpdate(true);
+    r->setValue(1);
+    pm->addElt("red", r);
+    mIsOptic = true;
+    return true;
+
+}
+

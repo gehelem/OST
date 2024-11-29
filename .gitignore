@@ -7,7 +7,7 @@ TAGS
 
 # Ignore build directory
 build/
-build-*/
+build*/
 
 # Gedit backup files
 *~

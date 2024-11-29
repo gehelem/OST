@@ -1,0 +1,994 @@
+{
+    "": {
+        "en": "",
+        "fr": ""
+    },
+    "Actions on module startup": {
+        "en": "Actions on module startup",
+        "fr": "Actions au démarrage du module"
+    },
+    "Abort": {
+        "en": "Abort",
+        "fr": "Annuler"
+    },
+    "Abort focus": {
+        "en": "Abort focus",
+        "fr": "Annuler (focus)"
+    },
+    "Abort guider": {
+        "en": "Abort guider",
+        "fr": "Annuler (guidage)"
+    },
+    "Abort navigator": {
+        "en": "Abort navigator",
+        "fr": "Annuler (Navigator)"
+    },
+    "Abort sequence": {
+        "en": "Abort sequence",
+        "fr": "Annuler la séquence"
+    },
+    "Actions": {
+        "en": "Actions",
+        "fr": "Actions"
+    },
+    "Alias": {
+        "en": "Alias",
+        "fr": "Alias"
+    },
+    "Altitude error °": {
+        "en": "Altitude error °",
+        "fr": "Erreur ° (ALT) "
+    },
+    "Autofocus": {
+        "en": "Autofocus",
+        "fr": "Autofocus"
+    },
+    "Available indi drivers": {
+        "en": "Available indi drivers",
+        "fr": "Driver Indi disponibles"
+    },
+    "Available modules": {
+        "en": "Available modules",
+        "fr": "Modules disponibles"
+    },
+    "Average HFR ('')": {
+        "en": "Average HFR ('')",
+        "fr": "HFR moyen ('')"
+    },
+    "Average HFR result ('')": {
+        "en": "Average HFR result ('')",
+        "fr": "HFR moyen final ('')"
+    },
+    "Average over": {
+        "en": "Average over",
+        "fr": "Moyenne sur"
+    },
+    "Average over X frames": {
+        "en": "Average over X frames",
+        "fr": "Moyenne sur X images"
+    },
+    "Azimuth error °": {
+        "en": "Azimuth error °",
+        "fr": "Erreur ° (AZ)"
+    },
+    "Backlash overshoot": {
+        "en": "Backlash overshoot",
+        "fr": "Dépassement backlash"
+    },
+    "Base module git": {
+        "en": "Base module git",
+        "fr": "Git module de base"
+    },
+    "Best position": {
+        "en": "Best position",
+        "fr": "Meilleure position"
+    },
+    "Blind PEC - experimental": {
+        "en": "Blind PEC - experimental",
+        "fr": "Blind PEC - experimental"
+    },
+    "Calibrate": {
+        "en": "Calibrate",
+        "fr": "Calibrer"
+    },
+    "Calibration Parameters": {
+        "en": "Calibration Parameters",
+        "fr": "Paramètres de calibration"
+    },
+    "Calibration Pulse E": {
+        "en": "Calibration Pulse E",
+        "fr": "Calibration Pulse E"
+    },
+    "Calibration Pulse N": {
+        "en": "Calibration Pulse N",
+        "fr": "Calibration Pulse N"
+    },
+    "Calibration Pulse S": {
+        "en": "Calibration Pulse S",
+        "fr": "Calibration Pulse S"
+    },
+    "Calibration Pulse W": {
+        "en": "Calibration Pulse W",
+        "fr": "Calibration Pulse W"
+    },
+    "Calibration pulse (ms)": {
+        "en": "Calibration pulse (ms)",
+        "fr": "Calibration pulse (ms)"
+    },
+    "Camera": {
+        "en": "Camera",
+        "fr": "Caméra"
+    },
+    "Catalog": {
+        "en": "Catalog",
+        "fr": "Catalogue"
+    },
+    "Catalogue": {
+        "en": "Catalog",
+        "fr": "Catalogue"
+    },
+    "Center target": {
+        "en": "Center target",
+        "fr": "Centrer la cible"
+    },
+    "Code": {
+        "en": "Code",
+        "fr": "Code"
+    },
+    "Commit message": {
+        "en": "Commit message",
+        "fr": "Message de commit"
+    },
+    "Compute": {
+        "en": "Compute",
+        "fr": "Calculer"
+    },
+    "Configurations": {
+        "en": "Configurations",
+        "fr": "Configurations"
+    },
+    "Connect": {
+        "en": "Connect",
+        "fr": "Connecter"
+    },
+    "Connect devices": {
+        "en": "Connect devices",
+        "fr": "Connecter les appareils"
+    },
+    "Connect indi": {
+        "en": "Connect indi",
+        "fr": "Connecter indi"
+    },
+    "Control": {
+        "en": "Control",
+        "fr": "Contrôle"
+    },
+    "Controls": {
+        "en": "Controls",
+        "fr": "Contrôles"
+    },
+    "Corner size (pixels)": {
+        "en": "Corner size (pixels)",
+        "fr": "Taille du coin (pixels)"
+    },
+    "Corners": {
+        "en": "Corners",
+        "fr": "Coins"
+    },
+    "Count": {
+        "en": "Count",
+        "fr": "Count"
+    },
+    "Current exposure": {
+        "en": "Current exposure",
+        "fr": "Exposition courante"
+    },
+    "Current line": {
+        "en": "Current line",
+        "fr": "Ligne courante"
+    },
+    "DE+": {
+        "en": "DE+",
+        "fr": "DE+"
+    },
+    "DE-": {
+        "en": "DE-",
+        "fr": "DE-"
+    },
+    "DEC": {
+        "en": "DEC",
+        "fr": "DEC"
+    },
+    "DEC Agressivity": {
+        "en": "DEC Agressivity",
+        "fr": "Agressivité DEC"
+    },
+    "Date": {
+        "en": "Date",
+        "fr": "Date"
+    },
+    "Devices": {
+        "en": "Devices",
+        "fr": "Appareils"
+    },
+    "Devices actions": {
+        "en": "Devices actions",
+        "fr": "Actions sur les appareils"
+    },
+    "Diameter": {
+        "en": "Diameter",
+        "fr": "Diamètre"
+    },
+    "Disable guiding corrections": {
+        "en": "Disable guiding corrections",
+        "fr": "Désactiver les corrections"
+    },
+    "Disconnect": {
+        "en": "Disconnect",
+        "fr": "Déconnecter"
+    },
+    "Drift": {
+        "en": "Drift",
+        "fr": "Dérive"
+    },
+    "Drift (DE)": {
+        "en": "Drift (DE)",
+        "fr": "Dérive (DE)"
+    },
+    "Drift (RA)": {
+        "en": "Drift (RA)",
+        "fr": "Dérive (AD)"
+    },
+    "Exposure": {
+        "en": "Exposure",
+        "fr": "Exposition"
+    },
+    "Filter": {
+        "en": "Filter",
+        "fr": "Filtre"
+    },
+    "Filter wheel": {
+        "en": "Filter wheel",
+        "fr": "Roue à filtre"
+    },
+    "Final result": {
+        "en": "Final result",
+        "fr": "Résultat final"
+    },
+    "Focal length": {
+        "en": "Focal length",
+        "fr": "Focale"
+    },
+    "Focus (scxml)": {
+        "en": "Focus (scxml)",
+        "fr": "Focus (scxml)"
+    },
+    "Focus around actual": {
+        "en": "Focus around actual",
+        "fr": "Démarrer autour de la position actuelle"
+    },
+    "Focus parameters": {
+        "en": "Focus parameters",
+        "fr": "Paramètres de focus"
+    },
+    "Focuser": {
+        "en": "Focuser",
+        "fr": "Focuser"
+    },
+    "Focuser final position": {
+        "en": "Focuser final position",
+        "fr": "Position finale du focuser"
+    },
+    "Focuser position": {
+        "en": "Focuser position",
+        "fr": "Position du focuser"
+    },
+    "Frame interval (ms)": {
+        "en": "Frame interval (ms)",
+        "fr": "Intervalle entre les images (ms)"
+    },
+    "Frame type": {
+        "en": "Frame type",
+        "fr": "Type d'image"
+    },
+    "Full indi control panel": {
+        "en": "Indi control panel",
+        "fr": "Panneau de contrôle Indi"
+    },
+    "GO": {
+        "en": "GO",
+        "fr": "GO"
+    },
+    "Gain": {
+        "en": "Gain",
+        "fr": "Gain"
+    },
+    "Graph size": {
+        "en": "Graph size",
+        "fr": "Taille du graphique"
+    },
+    "Guide": {
+        "en": "Guide",
+        "fr": "Guide"
+    },
+    "Guide parameters": {
+        "en": "Guide parameters",
+        "fr": "Paramètres de guidage"
+    },
+    "Guide via": {
+        "en": "Guide via",
+        "fr": "Guider avec"
+    },
+    "Guider module - work in progress": {
+        "en": "Guider module - work in progress",
+        "fr": "Guider module - work in progress"
+    },
+    "Guiding graph": {
+        "en": "Guiding graph",
+        "fr": "Graphique de guidage"
+    },
+    "Hash": {
+        "en": "Hash",
+        "fr": "Hash"
+    },
+    "Host": {
+        "en": "Host",
+        "fr": "Hôte"
+    },
+    "Idle": {
+        "en": "Idle",
+        "fr": "à l'arrêt"
+    },
+    "Image": {
+        "en": "Image",
+        "fr": "Image"
+    },
+    "Image map": {
+        "en": "Image map",
+        "fr": "Carte de l'image"
+    },
+    "Indi": {
+        "en": "Indi",
+        "fr": "Indi"
+    },
+    "Module": {
+        "en": "Module",
+        "fr": "Module"
+    },
+    "Connection": {
+        "en": "Connection",
+        "fr": "Connexion"
+    },
+    "Filter Simulator": {
+        "en": "Filter Simulator",
+        "fr": "Simulateur RAF"
+    },
+    "Indi driver": {
+        "en": "Indi driver",
+        "fr": "Driver Indi"
+    },
+    "Indi module git": {
+        "en": "Indi module git",
+        "fr": "Git module Indi"
+    },
+    "Indi server": {
+        "en": "Indi server",
+        "fr": "Serveur Indi"
+    },
+    "Indi widgets to search": {
+        "en": "Indi widgets to search",
+        "fr": "Propriétés indi à chercher"
+    },
+    "Indi widgets to watch": {
+        "en": "Indi widgets to watch",
+        "fr": "Propriétés indi à surveiller"
+    },
+    "Info": {
+        "en": "Info",
+        "fr": "Info"
+    },
+    "Inspector module - work in progress": {
+        "en": "Inspector module - work in progress",
+        "fr": "Module Inspector"
+    },
+    "Internal name": {
+        "en": "Internal name",
+        "fr": "Nom interne"
+    },
+    "Iteration": {
+        "en": "Iteration",
+        "fr": "Itération"
+    },
+    "Iterations": {
+        "en": "Iterations",
+        "fr": "Itérations"
+    },
+    "Iterations / axis": {
+        "en": "Iterations / axis",
+        "fr": "Itérations par axe"
+    },
+    "Julian day": {
+        "en": "Julian day",
+        "fr": "Jour julien"
+    },
+    "Kd": {
+        "en": "Kd",
+        "fr": "Kd"
+    },
+    "Keep x values": {
+        "en": "Keep x values",
+        "fr": "Garder x valeurs"
+    },
+    "Keogram": {
+        "en": "Keogram",
+        "fr": "Keogramme"
+    },
+    "Ki": {
+        "en": "Ki",
+        "fr": "Ki"
+    },
+    "Kill all modules": {
+        "en": "Kill all modules",
+        "fr": "Fermer tous les modules"
+    },
+    "Kill module": {
+        "en": "Kill module",
+        "fr": "Fermer le module"
+    },
+    "Kp": {
+        "en": "Kp",
+        "fr": "Kp"
+    },
+    "Label": {
+        "en": "Label",
+        "fr": "Libellé"
+    },
+    "Last imgage HFR ('')": {
+        "en": "Last imgage HFR ('')",
+        "fr": "HFR dernière image ('')"
+    },
+    "Load configuration": {
+        "en": "Load configuration",
+        "fr": "Charger une configuration"
+    },
+    "Load devices conf": {
+        "en": "Load devices conf",
+        "fr": "Charger la configuration des appareils"
+    },
+    "Load profile": {
+        "en": "Load profile",
+        "fr": "Charger un profil"
+    },
+    "Loaded modules": {
+        "en": "Loaded modules",
+        "fr": "Modules chargés"
+    },
+    "Log": {
+        "en": "Log",
+        "fr": "Log"
+    },
+    "Loop": {
+        "en": "Loop",
+        "fr": "Boucle"
+    },
+    "Magnitude": {
+        "en": "Magnitude",
+        "fr": "Magnitude"
+    },
+    "Main Control": {
+        "en": "Main Control",
+        "fr": "Contrôle principal"
+    },
+    "Max pulse (ms)": {
+        "en": "Max pulse (ms)",
+        "fr": "Pulse max (ms)"
+    },
+    "Meteo module - work in progress": {
+        "en": "Meteo module - work in progress",
+        "fr": "Module Météo"
+    },
+    "Min pulse (ms)": {
+        "en": "Min pulse (ms)",
+        "fr": "Pulse min (ms)"
+    },
+    "Module description": {
+        "en": "Module description",
+        "fr": "Description du module"
+    },
+    "Module info": {
+        "en": "Module info",
+        "fr": "Informations du module"
+    },
+    "Module label": {
+        "en": "Module label",
+        "fr": "Libellé du module"
+    },
+    "Module name": {
+        "en": "Module name",
+        "fr": "Nom du module"
+    },
+    "Modules": {
+        "en": "Modules",
+        "fr": "Modules"
+    },
+    "Mount": {
+        "en": "Mount",
+        "fr": "Monture"
+    },
+    "Moving": {
+        "en": "Moving",
+        "fr": "En mouvement"
+    },
+    "N/S": {
+        "en": "N/S",
+        "fr": "N/S"
+    },
+    "Name": {
+        "en": "Name",
+        "fr": "Nom"
+    },
+    "Navigator module": {
+        "en": "Navigator module",
+        "fr": "Module Navigator"
+    },
+    "Offset": {
+        "en": "Offset",
+        "fr": "Offset"
+    },
+    "Optic": {
+        "en": "Optic",
+        "fr": "Optique"
+    },
+    "PID Parameters": {
+        "en": "PID Parameters",
+        "fr": "Paramètres PID"
+    },
+    "Parameters": {
+        "en": "Parameters",
+        "fr": "Paramètres"
+    },
+    "Pixels / sec": {
+        "en": "Pixels / sec",
+        "fr": "Pixels / sec"
+    },
+    "Pol. fit position": {
+        "en": "Pol. fit position",
+        "fr": "Position polynôme"
+    },
+    "Polar assistant": {
+        "en": "Polar assistant",
+        "fr": "Assistant MES"
+    },
+    "Polar error": {
+        "en": "Polar error",
+        "fr": "Erreur polaire"
+    },
+    "Populate catalog": {
+        "en": "Populate catalog",
+        "fr": "Alimenter le catalogue"
+    },
+    "Port": {
+        "en": "Port",
+        "fr": "Port"
+    },
+    "Profile": {
+        "en": "Profile",
+        "fr": "Profil"
+    },
+    "Profiles": {
+        "en": "Profiles",
+        "fr": "Profils"
+    },
+    "Progress": {
+        "en": "Progress",
+        "fr": "Progression"
+    },
+    "Pulse (DE)": {
+        "en": "Pulse (DE)",
+        "fr": "Pusle (DE)"
+    },
+    "Pulse (RA)": {
+        "en": "Pulse (RA)",
+        "fr": "Pulse (RA)"
+    },
+    "Pulse E": {
+        "en": "Pulse E",
+        "fr": "Pulse E"
+    },
+    "Pulse N": {
+        "en": "Pulse N",
+        "fr": "Pulse N"
+    },
+    "Pulse S": {
+        "en": "Pulse S",
+        "fr": "Pulse S"
+    },
+    "Pulse W": {
+        "en": "Pulse W",
+        "fr": "Pulse W"
+    },
+    "RA": {
+        "en": "RA",
+        "fr": "AD"
+    },
+    "RA Agressivity": {
+        "en": "RA Agressivity",
+        "fr": "Agressivité AD"
+    },
+    "RA+": {
+        "en": "RA+",
+        "fr": "AD+"
+    },
+    "RA-": {
+        "en": "RA-",
+        "fr": "AD-"
+    },
+    "Reducer": {
+        "en": "Reducer",
+        "fr": "Réducteur"
+    },
+    "Refresh interval (s)": {
+        "en": "Refresh interval (s)",
+        "fr": "Intervalle d'actualisation (s)"
+    },
+    "Results": {
+        "en": "Results",
+        "fr": "Résultats"
+    },
+    "Reverse guiding corrections": {
+        "en": "Reverse guiding corrections",
+        "fr": "Inverser les corrections de guidage"
+    },
+    "SNR": {
+        "en": "SNR",
+        "fr": "RSB"
+    },
+    "Save configuration": {
+        "en": "Save configuration",
+        "fr": "Sauvegarder la configuration"
+    },
+    "Save profile": {
+        "en": "Save profile",
+        "fr": "Sauvegarder le profil"
+    },
+    "Search": {
+        "en": "Search",
+        "fr": "Rechercher"
+    },
+    "Search object": {
+        "en": "Search object",
+        "fr": "Rechercher un objet"
+    },
+    "Selection converted to now": {
+        "en": "Selection converted to now",
+        "fr": "Sélection convertie en JNOW"
+    },
+    "Sequence": {
+        "en": "Sequence",
+        "fr": "Séquence"
+    },
+    "Sequencer module": {
+        "en": "Sequencer module",
+        "fr": "Module Sequencer"
+    },
+    "Server": {
+        "en": "Server",
+        "fr": "Serveur"
+    },
+    "Shoot": {
+        "en": "Shoot",
+        "fr": "Exposer"
+    },
+    "Shooting": {
+        "en": "Shooting",
+        "fr": "Exp. en cours"
+    },
+    "Simple allsky camera module": {
+        "en": "Simple allsky camera module",
+        "fr": "Module Allsky"
+    },
+    "Solving": {
+        "en": "Solving",
+        "fr": "Résolution"
+    },
+    "Start": {
+        "en": "Start",
+        "fr": "Démarrer"
+    },
+    "Start and stop indiserver": {
+        "en": "Start and stop indiserver",
+        "fr": "Démarrer et arrête le serveur Indi"
+    },
+    "Start position": {
+        "en": "Start position",
+        "fr": "Position de démarrage"
+    },
+    "Start sequence": {
+        "en": "Start sequence",
+        "fr": "Démarrer la séquence"
+    },
+    "States": {
+        "en": "States",
+        "fr": "Etats"
+    },
+    "Status": {
+        "en": "Status",
+        "fr": "Statut"
+    },
+    "Steps gap": {
+        "en": "Steps gap",
+        "fr": "Intervalle de pas"
+    },
+    "Target DEC": {
+        "en": "Target DEC",
+        "fr": "DEC cible"
+    },
+    "Target RA": {
+        "en": "Target RA",
+        "fr": "AD cible"
+    },
+    "Target name": {
+        "en": "Target name",
+        "fr": "nom de la cible"
+    },
+    "Test": {
+        "en": "Test",
+        "fr": "Test"
+    },
+    "Time": {
+        "en": "Time",
+        "fr": "Heure"
+    },
+    "Time 0": {
+        "en": "Time 0",
+        "fr": ""
+    },
+    "Time 1": {
+        "en": "Time 1",
+        "fr": ""
+    },
+    "Time 2": {
+        "en": "Time 2",
+        "fr": ""
+    },
+    "Timelapse": {
+        "en": "Timelapse",
+        "fr": "Timelapse"
+    },
+    "Total error °": {
+        "en": "Total error °",
+        "fr": "Erreur totale °"
+    },
+    "Type": {
+        "en": "Type",
+        "fr": "Type"
+    },
+    "Values": {
+        "en": "Values",
+        "fr": "Valeurs"
+    },
+    "Version": {
+        "en": "Version",
+        "fr": "Version"
+    },
+    "Zone id": {
+        "en": "Zone id",
+        "fr": "Id. zone"
+    },
+    "Zoning": {
+        "en": "Zoning",
+        "fr": "Zonage"
+    },
+    "Zoning results": {
+        "en": "Zoning results",
+        "fr": "Résultat du zonage"
+    },
+    "baseVersion": {
+        "en": "baseVersion",
+        "fr": "baseVersion"
+    },
+    "time": {
+        "en": "time",
+        "fr": "heure"
+    },
+    "Append existing sequence": {
+        "en": "Append existing sequence",
+        "fr": "Ajouter à la séquence existante"
+    },
+    "Create new sequence": {
+        "en": "Create new sequence",
+        "fr": "Créer une nouvelle séquence"
+    },
+    "Dark assistant module": {
+        "en": "Dark assistant module",
+        "fr": "Assistant dark"
+    },
+    "Delay (s)": {
+        "en": "Delay (s)",
+        "fr": "Délai (s)"
+    },
+    "Exposure (s)": {
+        "en": "Exposure (s)",
+        "fr": "Exposition (s)"
+    },
+    "Generate": {
+        "en": "Generate",
+        "fr": "Générer"
+    },
+    "Reset existing sequence": {
+        "en": "Reset existing sequence",
+        "fr": "Vider la séquence existante"
+    },
+    "Selected exposures": {
+        "en": "Selected exposures",
+        "fr": "Durées sélectionnées"
+    },
+    "Selected gains": {
+        "en": "Selected gains",
+        "fr": "Gains sélectionnés"
+    },
+    "Selected offsets": {
+        "en": "Selected offsets",
+        "fr": "Offset sélectionnés"
+    },
+    "Selected temperatures": {
+        "en": "Selected temperatures",
+        "fr": "Températures sélectionnées"
+    },
+    "State": {
+        "en": "State",
+        "fr": "Etat"
+    },
+    "Temperature": {
+        "en": "Temperature",
+        "fr": "Température"
+    },
+    "Change exposure or gain": {
+        "en": "Change exposure or gain",
+        "fr": "Exposition ou gain"
+    },
+    "DE 0": {
+        "en": "DE 0",
+        "fr": "DE 0"
+    },
+    "DE 1": {
+        "en": "DE 1",
+        "fr": "DE 1"
+    },
+    "DE 2": {
+        "en": "DE 2",
+        "fr": "DE 2"
+    },
+    "Device - Property - Element": {
+        "en": "Device - Property - Element",
+        "fr": "Dispositif - Propriété - Element"
+    },
+    "Device - Property - Element (id)": {
+        "en": "Device - Property - Element (id)",
+        "fr": "Dispositif - Propriété - Element (id)"
+    },
+    "Device - Property - Element (label)": {
+        "en": "Device - Property - Element (label)",
+        "fr": "Dispositif - Propriété - Element (libellé)"
+    },
+    "Dynamic exposure/gain": {
+        "en": "Dynamic exposure/gain",
+        "fr": "Exposition/gain dynamique"
+    },
+    "Enable": {
+        "en": "Enable",
+        "fr": "Activer"
+    },
+    "Maximum value": {
+        "en": "Maximum value",
+        "fr": "Valeur maximum"
+    },
+    "Measure parm": {
+        "en": "Measure parm",
+        "fr": "Mesure"
+    },
+    "Minimum value": {
+        "en": "Minimum value",
+        "fr": "Valeur mininum"
+    },
+    "RA 0": {
+        "en": "RA 0",
+        "fr": "RA 0"
+    },
+    "RA 1": {
+        "en": "RA 1",
+        "fr": "RA 1"
+    },
+    "RA 2": {
+        "en": "RA 2",
+        "fr": "RA 2"
+    },
+    "Target value": {
+        "en": "Target value",
+        "fr": "Valeur cible"
+    },
+    "Threshold (%)": {
+        "en": "Threshold (%)",
+        "fr": "Seuil (%)"
+    },
+    "Archives": {
+        "en": "Archives",
+        "fr": "Archives"
+    },
+    "Telescope Simulator": {
+        "en": "Telescope Simulator",
+        "fr": "Simulateur de téléscope"
+    },
+    "Daily schedule": {
+        "en": "Daily schedule",
+        "fr": "Programmation journalière"
+    },
+    "End at": {
+        "en": "End at",
+        "fr": "Fin à"
+    },
+    "Events to come": {
+        "en": "Events to come",
+        "fr": "Evènements à venir"
+    },
+    "GPS": {
+        "en": "GPS",
+        "fr": "GPS"
+    },
+    "GPS Simulator": {
+        "en": "GPS Simulator",
+        "fr": "Simulateur de GPS"
+    },
+    "Next sunrise": {
+        "en": "Next sunrise",
+        "fr": "Prochain lever de Soleil"
+    },
+    "Next sunset": {
+        "en": "Next sunset",
+        "fr": "Prochain coucher de Soleil"
+    },
+    "Schedule": {
+        "en": "Schedule",
+        "fr": "Programmation"
+    },
+    "Start at": {
+        "en": "Start at",
+        "fr": "Début à"
+    },
+    "Sunrise schedule": {
+        "en": "Sunrise schedule",
+        "fr": "Programmation sur le Soleil"
+    },
+    "Add GPS localization": {
+        "en": "Add GPS localization",
+        "fr": "Ajouter position GPS"
+    },
+    "Date (UTC)": {
+        "en": "Date (UTC)",
+        "fr": "Date (UTC)"
+    },
+    "Elevation": {
+        "en": "Elevation",
+        "fr": "Elevation"
+    },
+    "GPS localization": {
+        "en": "GPS localization",
+        "fr": "Position GPS"
+    },
+    "Latitude": {
+        "en": "Latitude",
+        "fr": "Latitude"
+    },
+    "Longitude": {
+        "en": "Longitude",
+        "fr": "Longitude"
+    },
+    "Position": {
+        "en": "Position",
+        "fr": "Position"
+    },
+    "Time (UTC)": {
+        "en": "Time (UTC)",
+        "fr": "Heure (UTC)"
+    }
+}

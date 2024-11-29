@@ -108,6 +108,19 @@ void WShandler::processTextMessage(QString message)
     {
         emit externalEvent(obj["evt"].toString(), obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
     }
+    if ((obj["evt"].toString() == "Fbadge"))
+    {
+        emit externalEvent(obj["evt"].toString(), obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+    }
+    if ((obj["evt"].toString() == "Fproppreicon1") || (obj["evt"].toString() == "Fproppreicon2")
+            || (obj["evt"].toString() == "Fpropposticon1") || (obj["evt"].toString() == "Fpropposticon2"))
+    {
+        emit externalEvent(obj["evt"].toString(), obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+    }
+    if ((obj["evt"].toString() == "Ffolderselect"))
+    {
+        emit externalEvent(obj["evt"].toString(), QString(), obj["folder"].toString(), QVariantMap());
+    }
 
 
 }
@@ -232,6 +245,10 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
         {
             values["status"] = prop["status"];
         }
+        if (prop.contains("enabled"))
+        {
+            values["enabled"] = prop["enabled"];
+        }
         if (prop.contains("elements"))
         {
             QVariantMap elements;
@@ -250,6 +267,29 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
                 if (prop["elements"].toMap()[key].toMap().contains("step"))
                 {
                     element["step"] = prop["elements"].toMap()[key].toMap()["step"];
+                }
+                if (prop["elements"].toMap()[key].toMap().contains("dynlabel"))
+                {
+                    element["dynlabel"] = prop["elements"].toMap()[key].toMap()["dynlabel"];
+                }
+                if (prop["elements"].toMap()[key].toMap().contains("type"))
+                {
+                    if (prop["elements"].toMap()[key].toMap()["type"] == "img")
+                    {
+                        element = prop["elements"].toMap()[key].toMap();
+                    }
+                    if (prop["elements"].toMap()[key].toMap()["type"] == "video")
+                    {
+                        element = prop["elements"].toMap()[key].toMap();
+                    }
+                    if (prop["elements"].toMap()[key].toMap()["type"] == "date")
+                    {
+                        element = prop["elements"].toMap()[key].toMap();
+                    }
+                    if (prop["elements"].toMap()[key].toMap()["type"] == "time")
+                    {
+                        element = prop["elements"].toMap()[key].toMap();
+                    }
                 }
                 elements[key] = element;
             }
@@ -300,4 +340,11 @@ void WShandler::sendMessage(const QString &pMessage)
     QDebug debug = qDebug();
     debug.noquote();
     debug << messageWithDateTime;
+}
+void WShandler::processFileEvent(const QString &eventType, const QStringList &eventData)
+{
+    QJsonObject  obj;
+    obj["evt"] = eventType;
+    obj["fileevent"] = QJsonArray::fromStringList(eventData);
+    sendJsonMessage(obj);
 }

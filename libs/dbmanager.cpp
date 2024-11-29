@@ -177,6 +177,16 @@ bool DBManager::saveDbConfiguration(const QString &pConfigName, QMap<QString, QM
         sendError("setDbConfiguration dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
         return false;
     }
+
+    QString sql = "DELETE FROM CONFIGURATIONS WHERE CONFIGNAME= '" + pConfigName + "';";
+    if (!mQuery.exec(sql))
+    {
+        sendError("setDbConfiguration - ERROR SQL =" + sql);
+        sendError("setDbConfiguration - ERROR : " + mQuery.lastError().text());
+        mDb.close();
+        return false;
+    }
+
     foreach(const QString &key, pConf.keys())
     {
         QString label = pConf[key]["label"];

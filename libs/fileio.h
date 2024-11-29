@@ -19,7 +19,7 @@
 #include "math.h"
 #include "dms.h"
 #include "bayer.h"
-
+#include <elementimg.h>
 
 
 class fileio : public QObject
@@ -43,7 +43,11 @@ class fileio : public QObject
         bool loadImage(QString fileName);
         bool loadImageBufferOnly(QString fileName);
         bool loadFits(QString fileName);
-        bool loadBlob(INDI::PropertyBlob pblob);
+        bool loadBlob(INDI::PropertyBlob pblob)
+        {
+            return loadBlob(pblob, 32);
+        }
+        bool loadBlob(INDI::PropertyBlob pblob, int histoSize);
         bool parseHeader();
         bool saveAsFITS(QString fileName, FITSImage::Statistic &imageStats, uint8_t *m_ImageBuffer, FITSImage::Solution solution,
                         QList<Record> &records, bool hasSolution);
@@ -99,7 +103,7 @@ class fileio : public QObject
         {
             return m_HistogramFrequency[channel];
         }
-
+        OST::ImgData ImgStats();
 
     private:
         QString file;
@@ -116,7 +120,7 @@ class fileio : public QObject
         void logIssue(QString messsage);
 
         QImage rawImage;
-        void CalcStats(void);
+        void CalcStats(int size);
         void generateQImage();
 
         template <typename T>
@@ -130,7 +134,7 @@ class fileio : public QObject
         template <typename T>
         QPair<double, double> getSquaredSumAndMean(uint32_t start, uint32_t stride);
         template <typename T>
-        void CalcHisto(void);
+        void CalcHisto(int size);
 
         QVector<QVector<uint32_t>> m_CumulativeFrequency;
         QVector<QVector<double>> m_HistogramIntensity;

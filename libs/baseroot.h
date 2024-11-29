@@ -1,5 +1,6 @@
 #ifndef BASEROOT_h_
 #define BASEROOT_h_
+#include "translate.h"
 #include <QObject>
 #include <QList>
 #include <QVariant>
@@ -16,60 +17,15 @@ class Baseroot : public QObject
     public:
         Baseroot();
         ~Baseroot();
-        QVariantMap getMessages(void)
-        {
-            QVariantMap map;
-            for( int i = 0; i < mMessages.count(); ++i )
-            {
-                map[QString::number(i)] = mMessages[i];
-            }
-
-            return map;
-        }
-        QVariantMap getErrors(void)
-        {
-            QVariantMap map;
-            for( int i = 0; i < mErrors.count(); ++i )
-            {
-                map[QString::number(i)] = mErrors[i];
-            }
-
-            return map;
-        }
-        QVariantMap getWarnings(void)
-        {
-            QVariantMap map;
-            for( int i = 0; i < mWarnings.count(); ++i )
-            {
-                map[QString::number(i)] = mWarnings[i];
-            }
-
-            return map;
-        }
-        void resetMessages(void)
-        {
-            mMessages.clear();
-        }
-        void resetErrors(void)
-        {
-            mErrors.clear();
-        }
-        void resetWarnings(void)
-        {
-            mWarnings.clear();
-        }
-        void setMessagesSize (int &size)
-        {
-            mMessagesSize = size;
-        }
-        void setErrorsSize (int &size)
-        {
-            mErrorsSize = size;
-        }
-        void setWarningsSize (int &size)
-        {
-            mWarningsSize = size;
-        }
+        QVariantMap getMessages(void);
+        QVariantMap getErrors(void);
+        QVariantMap getWarnings(void);
+        void resetMessages(void);
+        void resetErrors(void);
+        void resetWarnings(void);
+        void setMessagesSize (int &size);
+        void setErrorsSize (int &size);
+        void setWarningsSize (int &size);
         void sendMessage(const QString &pMessage);
         void sendError(const QString &pMessage);
         void sendWarning(const QString &pMessage);
@@ -82,6 +38,7 @@ class Baseroot : public QObject
             Q_UNUSED(pEventKey);
             Q_UNUSED(pEventData);
         };
+        void setLng(const QString &pLng);
     protected:
     private:
         QList<QVariantMap> mMessages;

@@ -1,0 +1,1232 @@
+{
+"globallov":{
+    "dummylov":{
+        "type":"string",
+        "label":"Global dummy list of strings",
+        "values":    [
+        ["glob1","Global string 1"],
+        ["glob2","Global string 2"]
+        ]
+    }
+    ,
+    "dummylov2":{
+        "type":"int",
+        "label":"Global dummy list of ints",
+        "values":    [
+        [1,"Global int 1"],
+        [2,"Global int 2"]
+        ]
+    }
+    ,
+    "dummylov3":{
+        "type":"float",
+        "label":"Global dummy list of floats",
+        "values":    [
+        [1.1,"Global float 1"],
+        [2.2,"Global float 2"]
+        ]
+    }
+},
+"properties":{
+    "modulesstatus": {
+        "devcat": "Status",
+        "group": "",
+        "badge": true,
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
+        "posticon1":"autorenew",
+        "elements": {
+            "module": {
+                "type":"string",
+                "order": "99",
+                "label": "Module"
+            },
+            "status": {
+                "type":"light",
+                "order": "99",
+                "label": "Status"
+            }
+        },
+        "permission": 2,
+        "label": "Modules status",
+        "order":"00"
+    },
+    "extextRO": {
+        "devcat": "Examples",
+        "badge": true,
+        "elements": {
+            "extext1": {
+                "type":"string",
+                "order": "99",
+                "label": "Text 1"
+            },
+            "extext2": {
+                "type":"string",
+                "order": "99",
+                "label": "Text 2"
+            },
+            "extext3": {
+                "type":"string",
+                "order": "99",
+                "label": "Text 3"
+            },
+            "extext4": {
+                "type":"string",
+                "order": "99",
+                "label": "Text 4"
+            }
+        },
+        "group": "Texts",
+        "permission": 0,
+        "label": "Text example - read only",
+        "order":"00"
+    },
+    "extextRW": {
+        "hasprofile":true,
+        "devcat": "Examples",
+        "elements": {
+            "extext1": {
+                "autoupdate":true,
+                "type":"string",
+                "label": "Text 1",
+                "value":"aaaa",
+                "order": "99",
+                "directedit":true
+            },
+            "extext2": {
+                "autoupdate":true,
+                "type":"string",
+                "label": "Text 2",
+                "order": "99",
+                "value":"bbbb"
+            },
+            "extext3": {
+                "autoupdate":true,
+                "type":"string",
+                "label": "Text 3",
+                "value":"cccc",
+                "listOfValues":"DRIVER_INTERFACE-CCD_INTERFACE",
+                "order": "99",
+                "directedit":true
+            },
+            "extext4": {
+                "autoupdate":true,
+                "type":"string",
+                "label": "Text 4",
+                "value":"i1",
+                "order": "99",
+                "listOfValues":[
+                    ["i1","Value 1"],
+                    ["i2","Value 2"]
+                ]
+            }
+        },
+        "group": "Texts",
+        "permission": 2,
+        "label": "Text example - read/write",
+        "order":"01"
+
+    },
+    "numbersRW": {
+        "hasprofile":true,
+        "devcat": "Examples",
+        "elements": {
+            "n1": {
+                "autoupdate":true,
+                "type":"int",
+                "label": "Number 1",
+                "order": "99",
+                "min": 0,
+                "max": 100,
+                "slider":1,
+                "step": 1,
+                "directedit":true
+            },
+            "n2": {
+                "autoupdate":true,
+                "type":"int",
+                "label": "Number 2",
+                "order": "99",
+                "min": -100,
+                "max": 100,
+                "step": 10
+            },
+            "n3": {
+                "autoupdate":true,
+                "type":"float",
+                "label": "Number 3",
+                "order": "99",
+                "listOfValues":[
+                    [0.0,"Zéro virgule zéro"],
+                    [0.1,"Zéro virgule un"],
+                    [0.2,"Zéro virgule deux"]
+                ]
+            },
+            "n4": {
+                "autoupdate":true,
+                "type":"int",
+                "label": "Number 4",
+                "order": "99",
+                "listOfValues":[
+                    [0,"Zéro"],
+                    [1,"Un"],
+                    [2,"Deux"]
+                ],
+                "directedit":true
+            },
+            "n5": {
+                "autoupdate":true,
+                "type":"float",
+                "label": "Number 5",
+                "order": "99",
+                "listOfValues":"dummylov3"
+            }
+        },
+        "group": "Numbers",
+        "permission": 2,
+        "order": "99",
+        "label": "Numbers example - read/write"
+    },
+    "boolsRW0": {
+        "hasprofile":true,
+        "devcat": "Examples",
+        "rule":0,
+        "elements": {
+            "b1": {
+                "autoupdate":true,
+                "type":"bool",
+                "order": "99",
+                "label": "Bool 1"
+            },
+            "b2": {
+                "autoupdate":true,
+                "type":"bool",
+                "order": "99",
+                "label": "Bool 2"
+            },
+            "b3": {
+                "autoupdate":true,
+                "type":"bool",
+                "order": "99",
+                "label": "Bool 3"
+            },
+            "b4": {
+                "autoupdate":true,
+                "type":"bool",
+                "order": "99",
+                "label": "Bool 4"
+            }
+        },
+        "group": "Booleans",
+        "permission": 2,
+        "label": "One of many",
+        "order": "99"
+    },
+    "boolsRW1": {
+        "hasprofile":true,
+        "devcat": "Examples",
+        "rule":1,
+        "elements": {
+            "b1": {
+                "autoupdate":true,
+                "type":"bool",
+                "order": "99",
+                "label": "Bool 1"
+            },
+            "b2": {
+                "autoupdate":true,
+                "type":"bool",
+                "order": "99",
+                "label": "Bool 2"
+            },
+            "b3": {
+                "autoupdate":true,
+                "type":"bool",
+                "order": "99",
+                "label": "Bool 3"
+            },
+            "b4": {
+                "autoupdate":true,
+                "type":"bool",
+                "order": "99",
+                "label": "Bool 4"
+            }
+        },
+        "group": "Booleans",
+        "permission": 2,
+        "order": "99",
+        "label": "At most one"
+    },
+    "boolsRW2": {
+        "hasprofile":true,
+        "devcat": "Examples",
+        "rule":2,
+        "order": "99",
+        "elements": {
+            "b1": {
+                "autoupdate":true,
+                "type":"bool",
+                "order": "99",
+                "label": "Bool 1"
+            },
+            "b2": {
+                "autoupdate":true,
+                "type":"bool",
+                "order": "99",
+                "label": "Bool 2"
+            },
+            "b3": {
+                "autoupdate":true,
+                "type":"bool",
+                "order": "99",
+                "label": "Bool 3"
+            },
+            "b4": {
+                "autoupdate":true,
+                "type":"bool",
+                "order": "99",
+                "label": "Bool 4"
+            }
+        },
+        "group": "Booleans",
+        "permission": 2,
+        "order": "99",
+        "label": "Any"
+    }
+    ,
+    "mixedRW": {
+        "hasprofile":true,
+        "devcat": "Examples",
+        "rule":0,
+        "elements": {
+            "b1": {
+                "autoupdate":true,
+                "type":"bool",
+                "order": "99",
+                "label": "Bool 1/3"
+            },
+            "b2": {
+                "autoupdate":true,
+                "type":"bool",
+                "order": "99",
+                "label": "Bool 2/3"
+            },
+            "b3": {
+                "autoupdate":true,
+                "type":"bool",
+                "order": "99",
+                "label": "Bool 3/3"
+            },
+            "n1": {
+                "autoupdate":true,
+                "type":"int",
+                "label": "Number 1/2",
+                "order": "99",
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },
+            "n2": {
+                "autoupdate":true,
+                "type":"int",
+                "label": "Number 2/2",
+                "order": "99",
+                "min": -100,
+                "max": 100,
+                "step": 10
+            },
+            "t1": {
+                "autoupdate":true,
+                "type":"string",
+                "order": "99",
+                "label": "Text mixed"
+            },
+            "date": {
+                "autoupdate":true,
+                "directedit":true,
+                "type":"date",
+                "order": "99",
+                "label": "Test Date",
+                "year":2024,
+                "month":11,
+                "day":8
+            },
+            "time": {
+                "autoupdate":true,
+                "directedit":true,
+                "type":"time",
+                "order": "99",
+                "label": "Test Time",
+                "hh":13,
+                "mm":14,
+                "ss":15.15
+            }
+
+        },
+        "group": "Mixed",
+        "permission": 2,
+        "order": "99",
+        "label": "Mixed types - read/write"
+    },
+    "datesreadonly": {
+        "hasprofile":true,
+        "devcat": "Dates",
+        "group": "",
+        "rule":0,
+        "permission": 0,
+        "order": "10",
+        "label": "Dates readonly",
+        "elements": {
+            "date1": {
+                "type":"date",
+                "order": "20",
+                "label": "From",
+                "year":2024,
+                "month":11,
+                "day":8
+            },
+            "date2": {
+                "type":"date",
+                "order": "30",
+                "label": "To",
+                "year":2024,
+                "month":11,
+                "day":10
+            }
+        }
+    },
+    "datesRW": {
+        "hasprofile":true,
+        "devcat": "Dates",
+        "group": "",
+        "rule":0,
+        "permission": 2,
+        "order": "20",
+        "label": "Dates RW",
+        "elements": {
+            "date1": {
+                "type":"date",
+                "directedit":false,
+                "autoupdate":true,
+                "order": "20",
+                "label": "From",
+                "year":2024,
+                "month":11,
+                "day":8
+            },
+            "date2": {
+                "type":"date",
+                "directedit":false,
+                "autoupdate":true,
+                "order": "30",
+                "label": "To",
+                "year":2024,
+                "month":11,
+                "day":10
+            }
+        }
+    },
+    "datesRWDE": {
+        "hasprofile":true,
+        "devcat": "Dates",
+        "group": "",
+        "rule":0,
+        "permission": 2,
+        "order": "30",
+        "label": "Dates direct edit",
+        "elements": {
+            "date1": {
+                "type":"date",
+                "directedit":true,
+                "autoupdate":true,
+                "order": "20",
+                "label": "From",
+                "year":2024,
+                "month":11,
+                "day":8
+            },
+            "date2": {
+                "type":"date",
+                "directedit":true,
+                "autoupdate":true,
+                "order": "30",
+                "label": "To",
+                "year":2024,
+                "month":11,
+                "day":10
+            }
+        }
+    },
+    "datesRWgrid": {
+        "hasprofile":true,
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
+        "devcat": "Dates",
+        "group": "",
+        "rule":0,
+        "permission": 2,
+        "order": "40",
+        "label": "Dates RW - grid",
+        "elements": {
+            "date1": {
+                "type":"date",
+                "directedit":false,
+                "autoupdate":true,
+                "order": "20",
+                "label": "From",
+                "year":2024,
+                "month":11,
+                "day":8
+            },
+            "date2": {
+                "type":"date",
+                "directedit":false,
+                "autoupdate":true,
+                "order": "30",
+                "label": "To",
+                "year":2024,
+                "month":11,
+                "day":10
+            }
+        }
+    },
+    "timessreadonly": {
+        "hasprofile":true,
+        "devcat": "Times",
+        "group": "",
+        "rule":0,
+        "permission": 0,
+        "order": "10",
+        "label": "Times readonly",
+        "elements": {
+            "time1": {
+                "type":"time",
+                "order": "20",
+                "label": "From",
+                "hh":13,
+                "mm":25,
+                "ss":59
+            },
+            "time2": {
+                "type":"time",
+                "order": "30",
+                "label": "To",
+                "hh":13,
+                "mm":25,
+                "ss":59,
+                "ms":55
+            }
+        }
+    },
+
+    "timesRW": {
+        "hasprofile":true,
+        "devcat": "Times",
+        "group": "",
+        "rule":0,
+        "permission": 2,
+        "order": "20",
+        "label": "Times RW",
+        "elements": {
+            "time1": {
+                "type":"time",
+                "directedit":false,
+                "autoupdate":true,
+                "order": "20",
+                "label": "From",
+                "hh":13,
+                "mm":25,
+                "ss":59
+            },
+            "time2": {
+                "type":"time",
+                "directedit":false,
+                "autoupdate":true,
+                "order": "30",
+                "label": "To",
+                "usems":true,
+                "hh":13,
+                "mm":25,
+                "ss":59,
+                "ms":55
+            }
+        }
+    },
+    "timesRWDE": {
+        "hasprofile":true,
+        "devcat": "Times",
+        "group": "",
+        "rule":0,
+        "permission": 2,
+        "order": "30",
+        "label": "Times direct edit",
+        "elements": {
+            "time1": {
+                "type":"time",
+                "directedit":true,
+                "autoupdate":true,
+                "order": "20",
+                "label": "From",
+                "hh":13,
+                "mm":25,
+                "ss":59
+            },
+            "time2": {
+                "type":"time",
+                "directedit":true,
+                "autoupdate":true,
+                "order": "30",
+                "label": "To",
+                "usems":false,
+                "hh":13,
+                "mm":25,
+                "ss":59,
+                "ms":55
+            }
+        }
+    },
+    "timesRWgrid": {
+        "hasprofile":true,
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
+        "devcat": "Times",
+        "group": "",
+        "rule":0,
+        "permission": 2,
+        "order": "40",
+        "label": "Times Grid - RW ",
+        "elements": {
+            "time1": {
+                "type":"time",
+                "directedit":false,
+                "autoupdate":true,
+                "order": "20",
+                "label": "From",
+                "hh":13,
+                "mm":25,
+                "ss":59
+            },
+            "time2": {
+                "type":"time",
+                "directedit":false,
+                "autoupdate":true,
+                "order": "30",
+                "label": "To",
+                "hh":13,
+                "mm":25,
+                "ss":59,
+                "ms":55
+            }
+        }
+    },
+    "actions2": {
+        "devcat": "Examples",
+        "rule":1,
+        "elements": {
+            "shoot": {
+                "type": "bool",
+                "label": "Shoot",
+                "order": "99",
+                "value":false
+            },
+            "solve": {
+                "type": "bool",
+                "label": "Solve field",
+                "order": "99",
+                "value":false
+            },
+            "blob": {
+                "type": "bool",
+                "label": "Set blob mode",
+                "order": "99",
+                "value":false
+            },
+            "extract": {
+                "type": "bool",
+                "label": "Stars extraction",
+                "order": "99",
+                "value":false
+            }
+
+        },
+        "group": "Images",
+        "permission": 2,
+        "order": "99",
+        "label": "Actions"
+    },
+    "parameters": {
+        "devcat": "Examples",
+        "group": "Images",
+        "permission": 2,
+        "label": "Parameters",
+        "order": "99",
+        "elements": {
+            "indexfolderpath": {
+                "autoupdate":true,
+                "directedit":true,
+                "type": "string",
+                "label": "Astrometry index folder path",
+                "order": "99",
+                "value":"/usr/share/astrometry/"
+            }
+
+
+        }
+    },
+    "testimage": {
+        "devcat": "Examples",
+        "group": "Images",
+        "permission": 0,
+        "hasGrid":true,
+        "showGrid":true,
+        "label": "Test image",
+        "order": "99",
+        "elements": {
+            "image1": {
+                "type": "img",
+                "label": "First image",
+                "order": "99",
+                "urljpeg":"dummy.jpg"
+            },
+            "message": {
+                "type": "message",
+                "label": "Image message",
+                "level":0,
+                "order": "99",
+                "message":"Hello, this is a message",
+                "ts":"2024/03/14 15:06:53.000"
+            },
+            "progress": {
+                "type": "prg",
+                "prgtype": "spinner",
+                "label": "P1",
+                "dynlabel": "55.25/100",
+                "value": 55.25,
+                "order":0
+            },
+            "progress2": {
+                "type": "prg",
+                "prgtype": "spinner",
+                "label": "P2",
+                "order": "99",
+                "dynlabel": "99/100",
+                "value": 99,
+                "order":2
+            },
+            "progress3": {
+                "type": "prg",
+                "prgtype": "bar",
+                "label": "P3",
+                "dynlabel": "80/100",
+                "value": 80,
+                "order":3
+            }
+        }
+    },
+    "testgrid": {
+        "hasArray":true,
+        "devcat": "Examples",
+        "group": "Grids",
+        "permission": 2,
+        "arrayLimit":5,
+        "label": "Grid example",
+        "order": "99",
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
+        "gridheaders": ["X","Y","Z","imgrid","prggrid"],
+        "grid": [
+            [0,0.0,"P0","",0],
+            [1,0.1,"P1","",10],
+            [2,0.4,"P2","",20],
+            [3,0.9,"P3","",30],
+            [4,0.16,"P4","",40]
+        ],
+        "elements": {
+            "X": {
+                "type": "float",
+                "label": "Abscisse",
+                "value":0,
+                "order":"B"
+            },
+            "Y": {
+                "type": "float",
+                "label": "Ordonnée",
+                "value":0,
+                "order":"C"
+            },
+            "Z": {
+                "type": "string",
+                "label": "Info",
+                "value":"Zéro",
+                "order":"A"
+            },
+            "imgrid": {
+                "type": "img",
+                "label": "image in grid",
+                "urljpeg":"dummy.jpg",
+                "order":"Z"
+            },
+            "prggrid": {
+                "type": "prg",
+                "prgtype": "spinner",
+                "label": "Progress",
+                "dynlabel": "99/100",
+                "value": 99,
+                "order":2
+            }
+        }
+    },
+    "secondtestgrid": {
+        "hasArray":true,
+        "devcat": "Examples",
+        "group": "AAAGrids",
+        "permission": 2,
+        "gridlimit":5,
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
+        "label": "Grid example 2",
+        "order": "99",
+        "elements": {
+            "X": {
+                "type": "int",
+                "label": "Abscisse",
+                "value":0,
+                "gridvalues":[],
+                "order":"B"
+            },
+            "Y": {
+                "type": "int",
+                "label": "Ordonnée",
+                "value":0,
+                "gridvalues":[],
+                "order":"C"
+            },
+            "Z": {
+                "type": "string",
+                "label": "Info",
+                "value":"Zéro",
+                "gridvalues":[],
+                "order":"A"
+            }
+        }
+    },
+    "skychart": {
+        "label": "Skychart",
+        "devcat": "Examples",
+        "group": "Images",
+        "order": "99",
+        "elements": {}
+    },
+    "search": {
+        "devcat": "Examples",
+        "order": "Catalog00",
+        "group": "Catalog",
+        "permission": 2,
+        "rule":0,
+        "label": "",
+        "order": "99",
+        "autoupdate":true,
+        "elements": {
+            "searchbtn": {
+                "type": "bool",
+                "label": "Search object",
+                "order": "99",
+                "value":false
+            },
+            "search": {
+                "autoupdate":true,
+                "type": "string",
+                "label": "Search object",
+                "value":"M13",
+                "order": "99",
+                "directedit":true
+            }
+        }
+    },
+    "results": {
+        "devcat": "Examples",
+        "order": "Catalog10",
+        "group": "Catalog",
+        "permission": 0,
+        "hasArray":true,
+        "gridlimit":255,
+        "rule":0,
+        "label": "Results",
+        "elements": {
+            "catalog": {
+                "type": "string",
+                "label": "Catalogue",
+                "order":"10",
+                "value":""
+            },
+            "code": {
+                "type": "string",
+                "label": "Code",
+                "order":"20",
+                "value":""
+            },
+            "RA": {
+                "type": "float",
+                "label": "RA",
+                "order":"30",
+                "value":0
+            },
+            "NS": {
+                "type": "string",
+                "label": "N/S",
+                "order":"50",
+                "value":""
+            },
+            "DEC": {
+                "type": "float",
+                "label": "DEC",
+                "order":"40",
+                "value":0
+            },
+            "diam": {
+                "type": "float",
+                "label": "Diameter",
+                "order":"60",
+                "value":0
+            },
+            "mag": {
+                "type": "float",
+                "label": "Magnitude",
+                "order":"70",
+                "value":0
+            },
+            "name": {
+                "type": "string",
+                "label": "Name",
+                "order":"80",
+                "value":""
+            },
+            "alias": {
+                "type": "string",
+                "label": "Alias",
+                "order":"90",
+                "value":""
+            }
+        }
+    },
+    "selection": {
+        "devcat": "Examples",
+        "order": "Catalog15",
+        "group": "Catalog",
+        "permission": 2,
+        "rule":0,
+        "label": "Selection",
+        "elements": {
+            "code": {
+                "type": "string",
+                "label": "Code",
+                "order":"10",
+                "value":""
+            },
+            "RA": {
+                "type": "float",
+                "label": "RA",
+                "order":"20",
+                "value":0
+            },
+            "NS": {
+                "type": "string",
+                "label": "N/S",
+                "order":"40",
+                "value":""
+            },
+            "DEC": {
+                "type": "float",
+                "label": "DEC",
+                "order":"30",
+                "value":0
+            }
+        }
+    },
+    "lovevents":{
+        "devcat": "Examples",
+        "order": "00",
+        "group": "List of values",
+        "permission": 2,
+        "rule":2,
+        "label": "Test list of values",
+        "elements": {
+            "code": {
+                "type": "string",
+                "label": "Code",
+                "order":"10",
+                "gridvalues":[],
+                "autoupdate":true,
+                "directedit":true,
+                "value":""
+            },
+            "btn": {
+                "type": "bool",
+                "label": "Code",
+                "order":"11",
+                "value":false
+            }
+        }
+    },
+    "agrid": {
+        "showElts":true,
+        "showGrid":true,
+        "devcat": "Grids",
+        "group": "",
+        "permission": 2,
+        "arrayLimit":10,
+        "hasprofile":true,
+        "label": "Grid example",
+        "order": "99",
+        "hasGrid":true,
+        "gridheaders": ["int","intlov","float","string","strlov","image","video","bool","progress","message"],
+        "grid": [
+            [12,1,0.12,"zéro dot 12","00",{"urljpeg":"dummy1.jpg"},{"urljpeg":"dummy1.mpeg"},true,70,"first message content"],
+            [13,2,0.13,"zéro dot 13","02",{"urljpeg":"dummy2.jpg"},{"urljpeg":"dummy3.mpeg"},false,25,"second message content"]
+        ],
+        "elements": {
+            "int": {
+                "type": "int",
+                "label": "Integer",
+                "value":0,
+                "autoupdate":true,
+                "directedit":true,
+                "order":"0"
+            },
+            "intlov": {
+                "type": "int",
+                "label": "Int with lov",
+                "value":0,
+                "autoupdate":true,
+                "directedit":true,
+                "listOfValues":[
+                    [0,"Zéro"],
+                    [1,"Un"],
+                    [2,"Deux"]
+                ],
+                "order":"1"
+            },
+            "float": {
+                "type": "float",
+                "label": "Float",
+                "value":0,
+                "autoupdate":true,
+                "directedit":true,
+                "order":"2"
+            },
+            "string": {
+                "type": "string",
+                "label": "String",
+                "value":"String value",
+                "autoupdate":true,
+                "directedit":true,
+                "order":"3"
+            },
+            "strlov": {
+                "type": "string",
+                "label": "Str with lov",
+                "value":"String value",
+                "autoupdate":true,
+                "directedit":true,
+                "listOfValues":[
+                    ["00","Zéro"],
+                    ["01","Un"],
+                    ["02","Deux"]
+                ],
+                "order":"3"
+            },
+            "image": {
+                "type": "img",
+                "label": "image in grid",
+                "urljpeg":"dummy.jpg",
+                "autoupdate":true,
+                "showstats":false,
+                "directedit":true,
+                "order":"4"
+            },
+            "video": {
+                "type": "video",
+                "label": "video in grid",
+                "urlmpeg":"dummy.mpeg",
+                "autoupdate":true,
+                "directedit":true,
+                "order":"5"
+            },
+            "bool": {
+                "type": "bool",
+                "label": "A boolean",
+                "autoupdate":true,
+                "value":false,
+                "directedit":true,
+                "order":"6"
+            },
+            "progress": {
+                "type": "prg",
+                "prgtype": "spinner",
+                "label": "Spinner",
+                "autoupdate":true,
+                "dynlabel": "99/100",
+                "value": 65,
+                "directedit":true,
+                "order":"7"
+            },
+            "message": {
+                "type": "message",
+                "label": "Message",
+                "value": "nothing interesting to say",
+                "autoupdate":true,
+                "directedit":true,
+                "order":"8"
+            }
+        }
+    },
+    "agraphXY": {
+        "hasArray":true,
+        "order":0,
+        "devcat": "Graphes",
+        "group": "",
+        "permission": 2,
+        "gridLimit":5,
+        "label": "Graph example  - X/Y",
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
+        "gridheaders": ["X","Y"],
+        "grid": [
+            [0,0.0,"P0","",0,""],
+            [1,0.1,"P1","",10,""],
+            [2,0.4,"P2","",20,""],
+            [3,0.9,"P3","",30,""],
+            [4,0.16,"P4","",40,""]
+        ],
+        "graphType":"XY",
+        "graphParams":{
+            "X":"X",
+            "Y":"Y"
+        },
+        "elements": {
+            "X": {
+                "type": "float",
+                "label": "Abscisse",
+                "value":0,
+                "order":"B"
+            },
+            "Y": {
+                "type": "float",
+                "label": "Ordonnée",
+                "value":0,
+                "order":"C"
+            }
+        }
+    },
+    "agraphDY": {
+        "hasArray":true,
+        "order":1,
+        "devcat": "Graphes",
+        "group": "",
+        "permission": 2,
+        "arrayLimit":5,
+        "label": "Graph example - Date - Y",
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
+        "gridheaders": ["X","Y"],
+        "grid": [
+            [0,0.0,"P0","",0,""],
+            [1,0.1,"P1","",10,""],
+            [2,0.4,"P2","",20,""],
+            [3,0.9,"P3","",30,""],
+            [4,0.16,"P4","",40,""]
+        ],
+        "graphType":"DY",
+        "graphParams":{
+            "D":"X",
+            "Y":"Y"
+        },
+        "elements": {
+            "X": {
+                "type": "float",
+                "label": "Abscisse",
+                "value":0,
+                "order":"B"
+            },
+            "Y": {
+                "type": "float",
+                "label": "Ordonnée",
+                "value":0,
+                "order":"C"
+            }
+        }
+    },
+    "agraphPHD": {
+        "hasArray":true,
+        "order":3,
+        "devcat": "Graphes",
+        "group": "",
+        "permission": 2,
+        "arrayLimit":5,
+        "label": "Graph example - PHD",
+        "order": "99",
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
+        "gridheaders": ["T","RA","DE","pRA","pDE"],
+        "grid": [
+            [0,0.2,0.1,200,50],
+            [1,-0.2,0.1,20,50],
+            [2,0.2,-0.1,200,500],
+            [3,0.2,0.1,-200,50],
+            [4,0.2,-0.1,20,-5],
+            [5,-0.2,0.1,200,50],
+            [6,-0.2,0.1,-50,-50],
+            [7,0.2,0.1,100,50]
+        ],
+        "graphType":"PHD",
+        "graphParams":{
+            "D":"T",
+            "RA":"RA",
+            "DE":"DE",
+            "pRA":"pRA",
+            "pDE":"pDE"
+        },
+        "elements": {
+            "T": {
+                "type": "float",
+                "label": "Time",
+                "value":0,
+                "order":1
+            },
+            "RA": {
+                "type": "float",
+                "label": "RA",
+                "value":0,
+                "order":2
+            },
+            "DE": {
+                "type": "float",
+                "label": "DE",
+                "value":0,
+                "order":3
+            },
+            "pRA": {
+                "type": "float",
+                "label": "pRA",
+                "value":0,
+                "order":4
+            },
+            "pDE": {
+                "type": "float",
+                "label": "pDE",
+                "value":0,
+                "order":5
+            }
+        }
+    }
+
+}
+}

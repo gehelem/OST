@@ -282,7 +282,7 @@ bool fileio::loadOtherFormat(QString fileName)
 }
 //This method was copied and pasted and modified from the method privateLoad in fitsdata in KStars
 //It loads a FITS file, reads the FITS Headers, and loads the data from the image
-bool fileio::loadBlob(INDI::PropertyBlob pblob)
+bool fileio::loadBlob(INDI::PropertyBlob pblob, int histoSize)
 {
     justLoadBuffer = false;
     int status = 0, anynullptr = 0;
@@ -398,7 +398,7 @@ bool fileio::loadBlob(INDI::PropertyBlob pblob)
 
         parseHeader();
         if(checkDebayer()) debayer();
-        CalcStats();
+        CalcStats(histoSize);
     }
 
     fits_close_file(fptr, &status);
@@ -1240,7 +1240,7 @@ void fileio::calculateMinMax()
         stats.max[n] = max;
     }
 }
-void fileio::CalcStats(void)
+void fileio::CalcStats(int size)
 {
     switch (stats.dataType)
     {
@@ -1248,56 +1248,56 @@ void fileio::CalcStats(void)
             calculateMinMax<uint8_t>();
             calculateMedian<uint8_t>();
             runningAverageStdDev<uint8_t>();
-            CalcHisto<uint8_t>();
+            CalcHisto<uint8_t>(size);
             break;
 
         case TSHORT:
             calculateMinMax<int16_t>();
             calculateMedian<int16_t>();
             runningAverageStdDev<int16_t>();
-            CalcHisto<int16_t>();
+            CalcHisto<int16_t>(size);
             break;
 
         case TUSHORT:
             calculateMinMax<uint16_t>();
             calculateMedian<uint16_t>();
             runningAverageStdDev<uint16_t>();
-            CalcHisto<uint16_t>();
+            CalcHisto<uint16_t>(size);
             break;
 
         case TLONG:
             calculateMinMax<int32_t>();
             calculateMedian<int32_t>();
             runningAverageStdDev<int32_t>();
-            CalcHisto<int32_t>();
+            CalcHisto<int32_t>(size);
             break;
 
         case TULONG:
             calculateMinMax<uint32_t>();
             calculateMedian<uint32_t>();
             runningAverageStdDev<uint32_t>();
-            CalcHisto<uint32_t>();
+            CalcHisto<uint32_t>(size);
             break;
 
         case TFLOAT:
             calculateMinMax<float>();
             calculateMedian<float>();
             runningAverageStdDev<float>();
-            CalcHisto<float>();
+            CalcHisto<float>(size);
             break;
 
         case TLONGLONG:
             calculateMinMax<int64_t>();
             calculateMedian<int64_t>();
             runningAverageStdDev<int64_t>();
-            CalcHisto<int64_t>();
+            CalcHisto<int64_t>(size);
             break;
 
         case TDOUBLE:
             calculateMinMax<double>();
             calculateMedian<double>();
             runningAverageStdDev<double>();
-            CalcHisto<double>();
+            CalcHisto<double>(size);
             break;
 
         default:
@@ -1403,8 +1403,11 @@ void fileio::calculateMedian()
 }
 /* taken from Kstars fitviewer FITSData */
 template <typename T>
-void fileio::CalcHisto(void)
+void fileio::CalcHisto(int size)
 {
+    double dsize = size - 1;
+    if (dsize >= 1023) dsize = 1023;
+    if (dsize <= 0) dsize = 31;
 
     m_CumulativeFrequency.resize(3);
     m_HistogramBinWidth.resize(3);
@@ -1414,9 +1417,9 @@ void fileio::CalcHisto(void)
     auto * const buffer = reinterpret_cast<T const *>(m_ImageBuffer);
     uint32_t samples = stats.width * stats.height;
     const uint32_t sampleBy = samples > 500000 ? samples / 500000 : 1;
-    m_HistogramBinCount = qMax(0., qMin(stats.max[0] - stats.min[0], 256.0));
+    m_HistogramBinCount = qMax(0., qMin(stats.max[0] - stats.min[0], dsize));
     if (m_HistogramBinCount <= 0)
-        m_HistogramBinCount = 256;
+        m_HistogramBinCount = dsize;
 
     for (int n = 0; n < stats.channels; n++)
     {
@@ -1493,4 +1496,27 @@ void fileio::sendMessage(const QString &pMessage)
     QDebug debug = qDebug();
     debug.noquote();
     debug << messageWithDateTime;
+}
+OST::ImgData fileio::ImgStats()
+{
+    OST::ImgData dta;
+    dta.dataType = stats.dataType;
+    dta.SNR = stats.SNR;
+    dta.bytesPerPixel = stats.bytesPerPixel;
+    dta.height = stats.height;
+    dta.width = stats.width;
+    dta.channels = stats.channels;
+    dta.ndim = stats.ndim;
+    dta.samples_per_channel = stats.samples_per_channel;
+    dta.size = stats.size;
+    for (int i = 0; i < stats.channels; i++)
+    {
+        dta.min[i] = stats.min[i];
+        dta.max[i] = stats.max[i];
+        dta.mean[i] = stats.mean[i];
+        dta.stddev[i] = stats.stddev[i];
+        dta.median[i] = stats.median[i];
+        dta.histogram[i] = getHistogramFrequency(i);
+    }
+    return dta;
 }

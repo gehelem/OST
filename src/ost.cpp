@@ -34,8 +34,8 @@ int main(int argc, char *argv[])
     argParser.addHelpOption();
 
     QCommandLineOption saveAllBlobsOption("s", "Save all received blobs to /tmp");
-    QCommandLineOption webrootOption("webroot", "Web server root folder **must be writable**", "webroot");
-    webrootOption.setDefaultValue("/var/www/html");
+    QCommandLineOption webrootOption("webroot", "Web server media folder **must be writable**", "webroot");
+    webrootOption.setDefaultValue("/var/www/html/ostmedia");
     QCommandLineOption dbPathOption("dbpath", "DB path", "dbpath");
     dbPathOption.setDefaultValue("");
     QCommandLineOption libPathOption("libpath", "Modules library path", "libpath");
@@ -44,6 +44,10 @@ int main(int argc, char *argv[])
     installFrontOption.setDefaultValue("N");
     QCommandLineOption configurationOption("configuration", "Load configuration", "configuration");
     configurationOption.setDefaultValue("default");
+    QCommandLineOption indiServerOption("indiserver", "Start embedded Indi server", "indiserver");
+    indiServerOption.setDefaultValue("N");
+    QCommandLineOption lngOption("lng", "Language (en-fr)", "lng");
+    lngOption.setDefaultValue("fr");
 
     argParser.addOption(saveAllBlobsOption);
     argParser.addOption(webrootOption);
@@ -51,6 +55,8 @@ int main(int argc, char *argv[])
     argParser.addOption(libPathOption);
     argParser.addOption(installFrontOption);
     argParser.addOption(configurationOption);
+    argParser.addOption(indiServerOption);
+    argParser.addOption(lngOption);
     argParser.process(app);
 
     QString webroot = argParser.value(webrootOption);
@@ -58,19 +64,25 @@ int main(int argc, char *argv[])
     QString libPath = argParser.value(libPathOption);
     QString installFront = argParser.value(installFrontOption);
     QString conf = argParser.value(configurationOption);
+    QString indiserver = argParser.value(indiServerOption);
+    QString lng = argParser.value(lngOption);
 
     sendMessage("Webroot               =" + webroot);
     sendMessage("DB Path               =" + dbPath);
     sendMessage("Modules Library Path  =" + libPath);
     sendMessage("Install front         =" + installFront);
     sendMessage("Load configuration    =" + conf);
+    sendMessage("Embedded Indi server  =" + indiserver);
+    sendMessage("Language              =" + lng);
 
     Controller controller(
         webroot,
         dbPath,
         libPath,
         installFront,
-        conf
+        conf,
+        indiserver,
+        lng
     );
 
     Q_UNUSED(controller);

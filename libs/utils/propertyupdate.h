@@ -2,7 +2,6 @@
 #define OST_PROPERTYUPDATE_H
 #include <string>
 #include <propertymulti.h>
-#include <propertyvisitor.h>
 namespace  OST
 {
 class Property;

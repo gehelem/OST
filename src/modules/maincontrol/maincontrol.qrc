@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>maincontrol.json</file>
+        <file>maincontrol.fr.md</file>
+    </qresource>
+</RCC>
