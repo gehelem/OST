@@ -2,6 +2,7 @@
 #include <QNetworkInterface>
 #include <QDirIterator>
 #include <QFileSystemWatcher>
+#include <QHostInfo>
 
 /*!
  * ... ...
@@ -512,22 +513,7 @@ void Controller::startPublish()
 {
     zeroConf.clearServiceTxtRecords();
     zeroConf.addServiceTxtRecord("OstServer", "Observatoire Sans Tete");
-    //startServicePublish(const char *name, const char *type, const char *domain, quint16 port, quint32 interface)
-    zeroConf.startServicePublish(buildName().toUtf8(), "_ostserver_ws._tcp", "local", 9624);
-}
-
-QString Controller::buildName(void)
-{
-    QString name;
-
-    QList<QNetworkInterface> list = QNetworkInterface::allInterfaces(); // now you have interfaces list
-
-    name = list.last().hardwareAddress();
-    name.remove(":");
-    name.remove(0, 6);
-    name += ')';
-    name.prepend("OstServer - " OS_NAME " (");
-    return name;
+    zeroConf.startServicePublish(QHostInfo::localHostName().toUtf8(), "_ostserver_ws._tcp", "local", 9624);
 }
 void Controller::startIndi(void)
 {
