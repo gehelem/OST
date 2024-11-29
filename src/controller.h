@@ -45,7 +45,6 @@ class Controller : public QObject
         QProcess    *_indiProcess;
         QMap<QString, QMap<QString, QString>> mModulesMap;
         QZeroConf zeroConf;
-        QString buildName(void);
         QFileSystemWatcher mFileWatcher;
         QStringList mFilesList;
         QStringList mFoldersList;

@@ -125,21 +125,24 @@
         "elements": {
             "indiatstart": {
                 "type": "bool",
+                "autoupdate":true,
                 "label": "Connect indi",
                 "order":"00",
-                "value":false
+                "value":true
             },
             "devatstart": {
                 "type": "bool",
+                "autoupdate":true,
                 "label": "Connect devices",
                 "order":"01",
-                "value":false
+                "value":true
             },
             "confsatstart": {
                 "type": "bool",
+                "autoupdate":true,
                 "label": "Load devices conf",
                 "order":"02",
-                "value":false
+                "value":true
             }
 
         }
