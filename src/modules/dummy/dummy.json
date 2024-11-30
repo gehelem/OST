@@ -670,7 +670,7 @@
                 "type": "string",
                 "label": "Astrometry index folder path",
                 "order": "99",
-                "value":"/usr/share/astrometry/"
+                "value":"/usr/share/astrometry"
             }
 
 

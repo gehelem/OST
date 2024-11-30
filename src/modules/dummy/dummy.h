@@ -18,13 +18,16 @@ class MODULE_INIT Dummy : public IndiModule
         Dummy(QString name, QString label, QString profile, QVariantMap availableModuleLibs);
         ~Dummy();
 
+
     public slots:
         void OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                const QVariantMap &eventData) override;
         void OnSucessSEP();
         void OnSucessSolve();
-        void OnSolverLog(QString &text);
+        void OnSolveFinished();
+        void OnSolverLog(QString text);
         void OnModuleStatusAnswer(const QString module, OST::ModuleStatus status) override;
+        void OnNewImage();
     private:
         void newBLOB(INDI::PropertyBlob pblob);
         void newDevice(INDI::BaseDevice bd) override;
@@ -41,6 +44,8 @@ class MODULE_INIT Dummy : public IndiModule
         OST::ElementString *dyntext;
         OST::ElementBool *dynbool;
         OST::ElementString *dyntext2;
+    signals:
+        void newImage();
 
 
 };
