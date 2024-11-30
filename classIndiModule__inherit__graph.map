@@ -1,7 +1,7 @@
 <map id="IndiModule" name="IndiModule">
 <area shape="rect" id="node1" title=" " alt="" coords="87,1365,322,1692"/>
-<area shape="rect" id="node8" href="$classDummy.html" title=" " alt="" coords="11,1740,214,1905"/>
-<area shape="rect" id="node9" href="$classIndiPanel.html" title=" " alt="" coords="238,1777,355,1869"/>
+<area shape="rect" id="node8" href="$classDummy.html" title=" " alt="" coords="11,1740,214,1935"/>
+<area shape="rect" id="node9" href="$classIndiPanel.html" title=" " alt="" coords="238,1791,355,1883"/>
 <area shape="rect" id="node2" href="$classBasemodule.html" title=" " alt="" coords="5,976,212,1317"/>
 <area shape="rect" id="node3" href="$classDBManager.html" title=" " alt="" coords="17,704,200,928"/>
 <area shape="rect" id="node4" href="$classDatastore.html" title="Class to provide properties management for OST modules." alt="" coords="47,403,170,656"/>
