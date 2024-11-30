@@ -147,29 +147,32 @@ $(function() {
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        }</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="classIndiModule.html#a2a95298af46deff52417bc1bb869ee05">giveMeADevice</a>(QString name, QString label, INDI::BaseDevice::DRIVER_INTERFACE interface);</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="classIndiModule.html#a86367c175d731d0e1e91a1585b38d702">giveMeAnOptic</a>();</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        <span class="keywordtype">void</span> OnDispatchToIndiExternalEvent(<span class="keyword">const</span> QString &amp;eventType, <span class="keyword">const</span> QString  &amp;eventModule, <span class="keyword">const</span> QString  &amp;eventKey,</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;                                           <span class="keyword">const</span> QVariantMap &amp;eventData) <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        <span class="keywordtype">bool</span> mIsFocuser = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        <span class="keywordtype">bool</span> mIsGuider = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keywordtype">bool</span> mIsSequencer = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        <span class="keywordtype">bool</span> mIsImager = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        <span class="keywordtype">bool</span> mIsNavigator = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        <span class="keywordtype">bool</span> mIsOptic = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        <span class="keywordtype">double</span> mFocal;</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;        <span class="keywordtype">double</span> mDiam;</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        <span class="keywordtype">double</span> mRed;</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        <span class="keywordtype">double</span> mAperture;</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    signals:</div>
-<div class="line"><a name="l00098"></a><span class="lineno"><a class="line" href="classIndiModule.html#a9b354c4708f9ed89f98c8842e5b309d8">   98</a></span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classIndiModule.html#a9b354c4708f9ed89f98c8842e5b309d8">askedFrameReset</a>(QString devicename);</div>
-<div class="line"><a name="l00099"></a><span class="lineno"><a class="line" href="classIndiModule.html#a2291cfd5fec48c8926dc5c0d3feb2eb0">   99</a></span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classIndiModule.html#a2291cfd5fec48c8926dc5c0d3feb2eb0">requestCaptureDone</a>();</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;}</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;;</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="classIndiModule.html#a023cd9eb1ad52901c26f333dbcb9e93b">setFocalLengthAndDiameter</a>();</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="classIndiModule.html#a023cd9eb1ad52901c26f333dbcb9e93b">setFocalLengthAndDiameter</a>(QString device, <span class="keywordtype">double</span> fl, <span class="keywordtype">double</span> diam);</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160; </div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        <span class="keywordtype">void</span> OnDispatchToIndiExternalEvent(<span class="keyword">const</span> QString &amp;eventType, <span class="keyword">const</span> QString  &amp;eventModule, <span class="keyword">const</span> QString  &amp;eventKey,</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;                                           <span class="keyword">const</span> QVariantMap &amp;eventData) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keywordtype">bool</span> mIsFocuser = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        <span class="keywordtype">bool</span> mIsGuider = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        <span class="keywordtype">bool</span> mIsSequencer = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        <span class="keywordtype">bool</span> mIsImager = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        <span class="keywordtype">bool</span> mIsNavigator = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;        <span class="keywordtype">bool</span> mIsOptic = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        <span class="keywordtype">double</span> mFocal;</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        <span class="keywordtype">double</span> mDiam;</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        <span class="keywordtype">double</span> mRed;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        <span class="keywordtype">double</span> mAperture;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    signals:</div>
+<div class="line"><a name="l00100"></a><span class="lineno"><a class="line" href="classIndiModule.html#a9b354c4708f9ed89f98c8842e5b309d8">  100</a></span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classIndiModule.html#a9b354c4708f9ed89f98c8842e5b309d8">askedFrameReset</a>(QString devicename);</div>
+<div class="line"><a name="l00101"></a><span class="lineno"><a class="line" href="classIndiModule.html#a2291cfd5fec48c8926dc5c0d3feb2eb0">  101</a></span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classIndiModule.html#a2291cfd5fec48c8926dc5c0d3feb2eb0">requestCaptureDone</a>();</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;}</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="abasemodule_8h_html"><div class="ttname"><a href="basemodule_8h.html">basemodule.h</a></div></div>
 <div class="ttc" id="aclassBasemodule_html"><div class="ttname"><a href="classBasemodule.html">Basemodule</a></div><div class="ttdef"><b>Definition:</b> basemodule.h:10</div></div>
 <div class="ttc" id="aclassIndiModule_html"><div class="ttname"><a href="classIndiModule.html">IndiModule</a></div><div class="ttdef"><b>Definition:</b> indimodule.h:13</div></div>
+<div class="ttc" id="aclassIndiModule_html_a023cd9eb1ad52901c26f333dbcb9e93b"><div class="ttname"><a href="classIndiModule.html#a023cd9eb1ad52901c26f333dbcb9e93b">IndiModule::setFocalLengthAndDiameter</a></div><div class="ttdeci">bool setFocalLengthAndDiameter()</div><div class="ttdef"><b>Definition:</b> indimodule.cpp:1023</div></div>
 <div class="ttc" id="aclassIndiModule_html_a197bab26661380fdacce7b0f77ed857f"><div class="ttname"><a href="classIndiModule.html#a197bab26661380fdacce7b0f77ed857f">IndiModule::connectDevice</a></div><div class="ttdeci">bool connectDevice(QString deviceName)</div><div class="ttdef"><b>Definition:</b> indimodule.cpp:235</div></div>
 <div class="ttc" id="aclassIndiModule_html_a1be1d0b7c7534c2e9989aa4f51352216"><div class="ttname"><a href="classIndiModule.html#a1be1d0b7c7534c2e9989aa4f51352216">IndiModule::isImager</a></div><div class="ttdeci">bool isImager()</div><div class="ttdef"><b>Definition:</b> indimodule.h:69</div></div>
 <div class="ttc" id="aclassIndiModule_html_a205dbc4abb495b104b8e16e742d458b3"><div class="ttname"><a href="classIndiModule.html#a205dbc4abb495b104b8e16e742d458b3">IndiModule::IndiModule</a></div><div class="ttdeci">IndiModule(QString name, QString label, QString profile, QVariantMap availableModuleLibs)</div><div class="ttdef"><b>Definition:</b> indimodule.cpp:6</div></div>

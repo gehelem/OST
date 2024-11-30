@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['ra_644',['RA',['../structcatalogResult.html#a661883bf690a70674ce44c60c63c80eb',1,'catalogResult']]],
-  ['ra_645',['ra',['../classfileio.html#a33bdfd996adab8b08d2a6eab8b7b6fb1',1,'fileio']]],
+  ['ra_644',['ra',['../classfileio.html#a33bdfd996adab8b08d2a6eab8b7b6fb1',1,'fileio']]],
+  ['ra_645',['RA',['../structcatalogResult.html#a661883bf690a70674ce44c60c63c80eb',1,'catalogResult']]],
   ['radians_646',['radians',['../classdms.html#a797e52a1128f524c4fbe54fcecd2510c',1,'dms']]],
   ['readme_647',['README',['../md_libs_README.html',1,'']]],
   ['readme_2emd_648',['README.md',['../README_8md.html',1,'']]],
