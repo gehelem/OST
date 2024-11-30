@@ -182,6 +182,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                             {
                                 sendModNewNumber(_camera, "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );
                             }
+                            setFocalLengthAndDiameter();
                             if (!requestCapture(_camera, getFloat("parms", "exposure"), getInt("parms", "gain"), getInt("parms", "offset")))
                             {
                                 getProperty(keyprop)->setState(OST::Error);
@@ -362,15 +363,15 @@ void Dummy::OnNewImage()
     else
     {
 
-        stats = _image->getStats();
-        _solver.ResetSolver(stats, _image->getImageBuffer());
-        QStringList folders;
-        folders.append(getString("parameters", "indexfolderpath"));
-        _solver.stellarSolver.setIndexFolderPaths(folders);
-        connect(&_solver, &Solver::successSolve, this, &Dummy::OnSucessSolve);
-        connect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
-        _solver.stellarSolver.setSearchPositionInDegrees(ra * 360 / 24, dec);
-        _solver.SolveStars(_solver.stellarSolverProfiles[0]);
+        //stats = _image->getStats();
+        //_solver.ResetSolver(stats, _image->getImageBuffer());
+        //QStringList folders;
+        //folders.append(getString("parameters", "indexfolderpath"));
+        //_solver.stellarSolver.setIndexFolderPaths(folders);
+        //connect(&_solver, &Solver::successSolve, this, &Dummy::OnSucessSolve);
+        //connect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
+        //_solver.stellarSolver.setSearchPositionInDegrees(ra * 360 / 24, dec);
+        //_solver.SolveStars(_solver.stellarSolverProfiles[0]);
     }
 }
 
