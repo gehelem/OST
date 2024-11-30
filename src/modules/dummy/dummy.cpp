@@ -314,6 +314,38 @@ void Dummy::newBLOB(INDI::PropertyBlob pblob)
         dta.isSolved = false;
         getEltImg("testimage", "image1")->setValue(dta, true);
 
+        double ra, dec;
+        if (
+            !getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "DEC", dec)
+            || !getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "RA", ra)
+        )
+        {
+            sendMessage("Can't find mount device " + getString("devices", "mount") + " solve aborted");
+        }
+        else
+        {
+            stats = _image->getStats();
+            _solver.ResetSolver(stats, _image->getImageBuffer());
+            QStringList folders;
+            folders.append(getString("parameters", "indexfolderpath"));
+            _solver.stellarSolver.setIndexFolderPaths(folders);
+            connect(&_solver, &Solver::successSolve, this, &Dummy::OnSucessSolve);
+            connect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
+            _solver.stellarSolver.setSearchPositionInDegrees(ra * 360 / 24, dec);
+            _solver.SolveStars(_solver.stellarSolverProfiles[0]);
+        }
+
+        stats = _image->getStats();
+        _solver.ResetSolver(stats, _image->getImageBuffer());
+        QStringList folders;
+        folders.append(getString("parameters", "indexfolderpath"));
+        _solver.stellarSolver.setIndexFolderPaths(folders);
+        connect(&_solver, &Solver::successSolve, this, &Dummy::OnSucessSolve);
+        connect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
+        _solver.stellarSolver.setSearchPositionInDegrees(ra * 360 / 24, dec);
+        _solver.SolveStars(_solver.stellarSolverProfiles[0]);
+
+
     }
     getProperty("actions2")->setState(OST::Ok);
     getProperty("testimage")->push();
