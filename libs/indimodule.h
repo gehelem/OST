@@ -80,6 +80,8 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         }
         bool giveMeADevice(QString name, QString label, INDI::BaseDevice::DRIVER_INTERFACE interface);
         bool giveMeAnOptic();
+        bool setFocalLengthAndDiameter();
+        bool setFocalLengthAndDiameter(QString device, double fl, double diam);
 
     private:
         void OnDispatchToIndiExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,

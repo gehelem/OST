@@ -182,6 +182,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                             {
                                 sendModNewNumber(_camera, "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );
                             }
+                            setFocalLengthAndDiameter();
                             if (!requestCapture(_camera, getFloat("parms", "exposure"), getInt("parms", "gain"), getInt("parms", "offset")))
                             {
                                 getProperty(keyprop)->setState(OST::Error);
