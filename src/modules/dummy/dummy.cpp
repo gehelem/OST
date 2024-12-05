@@ -363,15 +363,15 @@ void Dummy::OnNewImage()
     else
     {
 
-        stats = _image->getStats();
-        _solver.ResetSolver(stats, _image->getImageBuffer());
-        QStringList folders;
-        folders.append(getString("parameters", "indexfolderpath"));
-        _solver.stellarSolver.setIndexFolderPaths(folders);
-        connect(&_solver, &Solver::successSolve, this, &Dummy::OnSucessSolve);
-        connect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
-        _solver.stellarSolver.setSearchPositionInDegrees(ra * 360 / 24, dec);
-        _solver.SolveStars(_solver.stellarSolverProfiles[0]);
+        //stats = _image->getStats();
+        //_solver.ResetSolver(stats, _image->getImageBuffer());
+        //QStringList folders;
+        //folders.append(getString("parameters", "indexfolderpath"));
+        //_solver.stellarSolver.setIndexFolderPaths(folders);
+        //connect(&_solver, &Solver::successSolve, this, &Dummy::OnSucessSolve);
+        //connect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
+        //_solver.stellarSolver.setSearchPositionInDegrees(ra * 360 / 24, dec);
+        //_solver.SolveStars(_solver.stellarSolverProfiles[0]);
     }
 }
 
