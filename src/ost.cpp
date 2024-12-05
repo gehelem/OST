@@ -40,8 +40,6 @@ int main(int argc, char *argv[])
     dbPathOption.setDefaultValue("");
     QCommandLineOption libPathOption("libpath", "Modules library path", "libpath");
     libPathOption.setDefaultValue("");
-    QCommandLineOption installFrontOption("installfront", "Install default webserver structure", "installfront");
-    installFrontOption.setDefaultValue("N");
     QCommandLineOption configurationOption("configuration", "Load configuration", "configuration");
     configurationOption.setDefaultValue("default");
     QCommandLineOption indiServerOption("indiserver", "Start embedded Indi server", "indiserver");
@@ -53,7 +51,6 @@ int main(int argc, char *argv[])
     argParser.addOption(webrootOption);
     argParser.addOption(dbPathOption);
     argParser.addOption(libPathOption);
-    argParser.addOption(installFrontOption);
     argParser.addOption(configurationOption);
     argParser.addOption(indiServerOption);
     argParser.addOption(lngOption);
@@ -62,7 +59,6 @@ int main(int argc, char *argv[])
     QString webroot = argParser.value(webrootOption);
     QString dbPath = argParser.value(dbPathOption);
     QString libPath = argParser.value(libPathOption);
-    QString installFront = argParser.value(installFrontOption);
     QString conf = argParser.value(configurationOption);
     QString indiserver = argParser.value(indiServerOption);
     QString lng = argParser.value(lngOption);
@@ -70,7 +66,6 @@ int main(int argc, char *argv[])
     sendMessage("Webroot               =" + webroot);
     sendMessage("DB Path               =" + dbPath);
     sendMessage("Modules Library Path  =" + libPath);
-    sendMessage("Install front         =" + installFront);
     sendMessage("Load configuration    =" + conf);
     sendMessage("Embedded Indi server  =" + indiserver);
     sendMessage("Language              =" + lng);
@@ -79,7 +74,6 @@ int main(int argc, char *argv[])
         webroot,
         dbPath,
         libPath,
-        installFront,
         conf,
         indiserver,
         lng
