@@ -34,8 +34,8 @@ class MODULE_INIT Dummy : public IndiModule
 
         QString _camera;
         QPointer<fileio> _image;
-        Solver _solver;
-        FITSImage::Statistic stats;
+        StellarSolver stellarSolver;
+
         void updateProperty(INDI::Property property) override;
         void updateSearchList(void);
 

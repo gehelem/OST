@@ -94,6 +94,9 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     getProperty("datesRWgrid")->push();
 
     connect(this, &Dummy::newImage, this, &Dummy::OnNewImage);
+    connect(&stellarSolver, &StellarSolver::logOutput, this, &Dummy::OnSolverLog);
+    connect(&stellarSolver, &StellarSolver::ready, this, &Dummy::OnSucessSolve);
+
 
 }
 
@@ -194,11 +197,20 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                         if (getEltBool(keyprop, keyelt)->setValue(false, false))
                         {
                             getProperty(keyprop)->setState(OST::Busy);
-                            stats = _image->getStats();
-                            _solver.ResetSolver(stats, _image->getImageBuffer());
-                            connect(&_solver, &Solver::successSEP, this, &Dummy::OnSucessSEP);
-                            connect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
-                            _solver.FindStars(_solver.stellarSolverProfiles[0]);
+                            stellarSolver.loadNewImageBuffer(_image->getStats(), _image->getImageBuffer());
+                            QStringList folders;
+                            folders.append("/usr/share/astrometry/");
+                            stellarSolver.setIndexFolderPaths(folders);
+                            stellarSolver.setParameters(StellarSolver::getBuiltInProfiles()[SSolver::Parameters::DEFAULT]);
+                            stellarSolver.setProperty("ProcessType", EXTRACT_WITH_HFR);
+                            stellarSolver.setProperty("ExtractorType", EXTRACTOR_INTERNAL);
+                            stellarSolver.setProperty("SolverType", SOLVER_STELLARSOLVER);
+                            stellarSolver.setLogLevel(LOG_ALL);
+                            stellarSolver.setSSLogLevel(LOG_VERBOSE);
+                            stellarSolver.setProperty("LogToFile", true);
+                            stellarSolver.setProperty("LogFileName", "/home/gilles/projets/OST/solver.log");
+                            stellarSolver.start();
+
                         }
                     }
                     if (keyelt == "solve")
@@ -206,26 +218,40 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                         if (getEltBool(keyprop, keyelt)->setValue(false, false))
                         {
                             getProperty(keyprop)->setState(OST::Busy);
-                            double ra, dec;
+                            double ra, dec, pix, ech;
                             if (
                                 !getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "DEC", dec)
                                 || !getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "RA", ra)
+                                || !getModNumber(getString("devices", "camera"), "CCD_INFO", "CCD_PIXEL_SIZE", pix)
                             )
                             {
                                 getProperty(keyprop)->setState(OST::Error);
-                                sendMessage("Can't find mount device " + getString("devices", "mount") + " solve aborted");
+                                sendMessage("Can't find mount or camera device " + getString("devices", "mount") + "/" + getString("devices",
+                                            "camera") + " - solve aborted");
+                                return;
                             }
                             else
                             {
-                                stats = _image->getStats();
-                                _solver.ResetSolver(stats, _image->getImageBuffer());
+                                ech = 206 * pix / getFloat("optic", "fl");
+                                double wra = ra * 360 / 24;
+                                double wde = dec;
+                                stellarSolver.loadNewImageBuffer(_image->getStats(), _image->getImageBuffer());
                                 QStringList folders;
-                                folders.append(getString("parameters", "indexfolderpath"));
-                                _solver.stellarSolver.setIndexFolderPaths(folders);
-                                connect(&_solver, &Solver::successSolve, this, &Dummy::OnSucessSolve);
-                                connect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
-                                _solver.stellarSolver.setSearchPositionInDegrees(ra * 360 / 24, dec);
-                                _solver.SolveStars(_solver.stellarSolverProfiles[0]);
+                                folders.append("/usr/share/astrometry/");
+                                stellarSolver.setIndexFolderPaths(folders);
+                                stellarSolver.setProperty("UseScale", true);
+                                stellarSolver.setSearchScale(ech * 0.9, ech * 1.1, ScaleUnits::ARCSEC_PER_PIX);
+                                stellarSolver.setProperty("UsePosition", true);
+                                stellarSolver.setSearchPositionInDegrees(wra, wde);
+                                stellarSolver.setParameters(StellarSolver::getBuiltInProfiles()[SSolver::Parameters::DEFAULT]);
+                                stellarSolver.setProperty("ProcessType", SOLVE);
+                                stellarSolver.setProperty("ExtractorType", EXTRACTOR_INTERNAL);
+                                stellarSolver.setProperty("SolverType", SOLVER_STELLARSOLVER);
+                                stellarSolver.setLogLevel(LOG_ALL);
+                                stellarSolver.setSSLogLevel(LOG_VERBOSE);
+                                stellarSolver.setProperty("LogToFile", true);
+                                stellarSolver.setProperty("LogFileName", "/home/gilles/projets/OST/solver.log");
+                                stellarSolver.start();
                             }
                         }
                     }
@@ -301,7 +327,7 @@ void Dummy::newBLOB(INDI::PropertyBlob pblob)
 
         getProperty("actions2")->setState(OST::Ok);
         QList<fileio::Record> rec = _image->getRecords();
-        stats = _image->getStats();
+        FITSImage::Statistic stats = _image->getStats();
         _image->saveAsFITS(getWebroot() + "/" + getModuleName() + QString(pblob.getDeviceName()) + ".FITS", stats,
                            _image->getImageBuffer(),
                            FITSImage::Solution(), rec, false);
