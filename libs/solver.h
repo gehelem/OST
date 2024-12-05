@@ -8,7 +8,7 @@
 //Includes for this project
 #include <stellarsolver.h>
 
-class Solver : public QObject
+class QT_DEPRECATED_X("use original StellarSolver") Solver : public QObject
 {
         Q_OBJECT
     public:
