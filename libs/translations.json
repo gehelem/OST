@@ -990,5 +990,41 @@
     "Time (UTC)": {
         "en": "Time (UTC)",
         "fr": "Heure (UTC)"
+    },
+    "Fixed time": {
+        "en": "Fixed time",
+        "fr": "Heures fixes"
+    },
+    "Keep indiviual images in archives": {
+        "en": "Keep indiviual images in archives",
+        "fr": "Garder les images individuelles"
+    },
+    "Manual": {
+        "en": "Manual",
+        "fr": "Manuel"
+    },
+    "Pause": {
+        "en": "Pause",
+        "fr": "Pause"
+    },
+    "Play": {
+        "en": "Play",
+        "fr": "Activer"
+    },
+    "Schedule type": {
+        "en": "Schedule type",
+        "fr": "Type de programmation"
+    },
+    "Stack": {
+        "en": "Stack",
+        "fr": "Empilement"
+    },
+    "Stop": {
+        "en": "Stop",
+        "fr": "Stop"
+    },
+    "Sunset": {
+        "en": "Sunset",
+        "fr": "Crépuscule"
     }
 }
