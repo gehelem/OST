@@ -141,7 +141,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                         // test max gridlimit
                         getProperty("secondtestgrid")->clearGrid();
                         getProperty("secondtestgrid")->setGridLimit(1010);
-                        for ( int i = 0; i < 1010; i++)getProperty("secondtestgrid")->push();
+                        //for ( int i = 0; i < 1010; i++)getProperty("secondtestgrid")->push();
                     }
                 }
                 if (keyprop == "devices")

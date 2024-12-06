@@ -295,7 +295,9 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
                     }
                     if (getEltBase(keyprop, keyelt)->getType() == "bool")
                     {
-                        getEltBool(keyprop, keyelt)->setValue(v.toBool(), true);
+                        //a boolean need to be updated on property level because of SwitchRule's flag behaviour
+                        getProperty(keyprop)->setElt(keyelt, v);
+
                     }
                     if (getEltBase(keyprop, keyelt)->getType() == "date")
                     {

@@ -174,7 +174,7 @@ bool  PropertyMulti::setElt(QString key, QVariant val)
                     return true;
 
                 }
-                sendError("PropertyMulti::setValue - " + key + " - OneOfMany - can't just unset");
+                sendWarning("PropertyMulti::setValue - " + key + " - OneOfMany - can't just unset");
                 return false;
                 break;
             case AtMostOne:
