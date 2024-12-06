@@ -93,6 +93,8 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     getProperty("datesRWgrid")->push();
     getProperty("datesRWgrid")->push();
 
+    connect(this, &Dummy::newImage, this, &Dummy::OnNewImage);
+
 }
 
 Dummy::~Dummy()
@@ -139,7 +141,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                         // test max gridlimit
                         getProperty("secondtestgrid")->clearGrid();
                         getProperty("secondtestgrid")->setGridLimit(1010);
-                        for ( int i = 0; i < 1010; i++)getProperty("secondtestgrid")->push();
+                        //for ( int i = 0; i < 1010; i++)getProperty("secondtestgrid")->push();
                     }
                 }
                 if (keyprop == "devices")
@@ -180,6 +182,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                             {
                                 sendModNewNumber(_camera, "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );
                             }
+                            setFocalLengthAndDiameter();
                             if (!requestCapture(_camera, getFloat("parms", "exposure"), getInt("parms", "gain"), getInt("parms", "offset")))
                             {
                                 getProperty(keyprop)->setState(OST::Error);
@@ -314,6 +317,7 @@ void Dummy::newBLOB(INDI::PropertyBlob pblob)
         dta.isSolved = false;
         getEltImg("testimage", "image1")->setValue(dta, true);
 
+        emit newImage();
     }
     getProperty("actions2")->setState(OST::Ok);
     getProperty("testimage")->push();
@@ -344,8 +348,41 @@ void Dummy::OnSucessSEP()
     disconnect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
 
 }
+void Dummy::OnNewImage()
+{
+    sendMessage("New image");
+
+    double ra, dec;
+    if (
+        !getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "DEC", dec)
+        || !getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "RA", ra)
+    )
+    {
+        sendMessage("Can't find mount device " + getString("devices", "mount") + " solve aborted");
+    }
+    else
+    {
+
+        //stats = _image->getStats();
+        //_solver.ResetSolver(stats, _image->getImageBuffer());
+        //QStringList folders;
+        //folders.append(getString("parameters", "indexfolderpath"));
+        //_solver.stellarSolver.setIndexFolderPaths(folders);
+        //connect(&_solver, &Solver::successSolve, this, &Dummy::OnSucessSolve);
+        //connect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
+        //_solver.stellarSolver.setSearchPositionInDegrees(ra * 360 / 24, dec);
+        //_solver.SolveStars(_solver.stellarSolverProfiles[0]);
+    }
+}
+
+void Dummy::OnSolveFinished()
+{
+    sendMessage("Solver finished");
+}
 void Dummy::OnSucessSolve()
 {
+    sendMessage("Solver sucess");
+
     if (_solver.stellarSolver.failed())
     {
         sendMessage("Solver failed");
@@ -364,17 +401,15 @@ void Dummy::OnSucessSolve()
         dta.solverRA = _solver.stellarSolver.getSolution().ra;
         dta.solverDE = _solver.stellarSolver.getSolution().dec;
         getEltImg("testimage", "image1")->setValue(dta, true);
-
-
-
     }
     disconnect(&_solver, &Solver::successSolve, this, &Dummy::OnSucessSolve);
     disconnect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
 
 }
-void Dummy::OnSolverLog(QString &text)
+void Dummy::OnSolverLog(QString text)
 {
-    sendMessage(text);
+    //sendMessage(text);
+    qDebug() << text;
 }
 void Dummy::updateSearchList(void)
 {

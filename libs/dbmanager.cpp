@@ -64,7 +64,9 @@ void DBManager::CreateDatabaseStructure()
         }
 
     }
-
+    // add Messier and common stars
+    populateCatalog(":messier.txt", "Messier");
+    populateCatalog(":stars.txt", "Stars");
 
 }
 bool DBManager::setDbProfile(const QString &pModuleType, const QString &pProfileName, QVariantMap &profile )

@@ -2,6 +2,7 @@
 #include <QNetworkInterface>
 #include <QDirIterator>
 #include <QFileSystemWatcher>
+#include <QHostInfo>
 
 /*!
  * ... ...
@@ -25,11 +26,10 @@
 
 
 Controller::Controller(const QString &webroot, const QString &dbpath,
-                       const QString &libpath, const QString &installfront, const QString &conf, const QString &indiserver, const QString &lng)
+                       const QString &libpath, const QString &conf, const QString &indiserver, const QString &lng)
     :       _webroot(webroot),
             _dbpath(dbpath),
             _libpath(libpath),
-            _installfront(installfront),
             _conf(conf),
             _indiserver(indiserver),
             _lng(lng)
@@ -73,18 +73,7 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     pMainControl->sendDump();
     pMainControl->setLng(_lng);
 
-    if (_installfront != "N")
-    {
-        this->installFront();
-    }
-
     loadConf(_conf);
-
-    dbmanager->populateCatalog(":messier.txt", "Messier");
-    //dbmanager->populateCatalog(":ngc.txt", "NGC");
-    //dbmanager->populateCatalog(":sh2.txt", "Sh2");
-    //dbmanager->populateCatalog(":ldn.txt", "LDN");
-    //dbmanager->populateCatalog(":ic.txt", "IC");
 
     if (_indiserver != "N")
     {
@@ -418,63 +407,6 @@ void Controller::checkIndiDrivers(void)
         //sendMessage("indi driver found " + dr);
     }
 }
-void Controller::installFront(void)
-{
-    QString arch = _installfront;
-    if (arch == "Y")
-    {
-        arch = "https://github.com/gehelem/ost-front/releases/download/WorkInProgress/html.tar.gz";
-        pMainControl->sendMainMessage("download default archive " + arch);
-    }
-    else
-    {
-        pMainControl->sendMainMessage("download specific archive " + arch);
-    }
-
-    _process = new QProcess(this);
-    connect(_process, &QProcess::readyReadStandardOutput, this, &Controller::processOutput);
-    connect(_process, &QProcess::readyReadStandardError, this, &Controller::processError);
-    connect(_process, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this,
-            &Controller::processFinished);
-    pMainControl->sendMainMessage("****************************");
-    pMainControl->sendMainMessage("Install default web frontend");
-    pMainControl->sendMainMessage("****************************");
-    if (_process->state() != 0)
-    {
-        qDebug() << "can't start process";
-    }
-    else
-    {
-        QString program = "rm";
-        QStringList arguments;
-        arguments << "-rf" ;
-        arguments << _webroot + "/html.tar.gz";
-        _process->start(program, arguments);
-        _process->waitForFinished();
-        program = "wget";
-        arguments.clear();
-        arguments << arch ;
-        arguments << "--directory";
-        arguments << _webroot;
-        arguments << " && ";
-        arguments << "tar";
-        _process->start(program, arguments);
-        _process->waitForFinished();
-        program = "tar";
-        arguments.clear();
-        arguments << "-xvf";
-        arguments << _webroot + "/html.tar.gz";
-        arguments << "-C";
-        arguments << _webroot;
-        _process->start(program, arguments);
-        _process->waitForFinished();
-
-    }
-
-
-
-
-}
 void Controller::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     pMainControl->sendMainMessage("PROCESS FINISHED (" + QString::number(exitCode) + ")" + exitStatus);
@@ -512,22 +444,7 @@ void Controller::startPublish()
 {
     zeroConf.clearServiceTxtRecords();
     zeroConf.addServiceTxtRecord("OstServer", "Observatoire Sans Tete");
-    //startServicePublish(const char *name, const char *type, const char *domain, quint16 port, quint32 interface)
-    zeroConf.startServicePublish(buildName().toUtf8(), "_ostserver_ws._tcp", "local", 9624);
-}
-
-QString Controller::buildName(void)
-{
-    QString name;
-
-    QList<QNetworkInterface> list = QNetworkInterface::allInterfaces(); // now you have interfaces list
-
-    name = list.last().hardwareAddress();
-    name.remove(":");
-    name.remove(0, 6);
-    name += ')';
-    name.prepend("OstServer - " OS_NAME " (");
-    return name;
+    zeroConf.startServicePublish(QHostInfo::localHostName().toUtf8(), "_ostserver_ws._tcp", "local", 9624);
 }
 void Controller::startIndi(void)
 {

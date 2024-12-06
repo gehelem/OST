@@ -23,7 +23,7 @@ class Controller : public QObject
         Q_OBJECT
     public:
         Controller(const QString &webroot, const QString &dbpath,
-                   const QString &libpath, const QString &conf, const QString &installfront, const QString &indiserver, const QString &lng);
+                   const QString &libpath, const QString &conf, const QString &indiserver, const QString &lng);
         ~Controller() override;
     signals:
         void controllerEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
@@ -32,7 +32,6 @@ class Controller : public QObject
         QString _webroot;
         QString _dbpath;
         QString _libpath;
-        QString _installfront;
         QString _conf;
         QString _indiserver;
         QString _lng;
@@ -45,7 +44,6 @@ class Controller : public QObject
         QProcess    *_indiProcess;
         QMap<QString, QMap<QString, QString>> mModulesMap;
         QZeroConf zeroConf;
-        QString buildName(void);
         QFileSystemWatcher mFileWatcher;
         QStringList mFilesList;
         QStringList mFoldersList;
@@ -58,7 +56,6 @@ class Controller : public QObject
         void saveConf(const QString &pConf);
         void checkModules(void);
         void checkIndiDrivers(void);
-        void installFront(void);
         void processOutput();
         void processError();
         void processIndiOutput();

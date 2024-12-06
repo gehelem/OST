@@ -1020,4 +1020,20 @@ bool IndiModule::giveMeAnOptic()
     return true;
 
 }
+bool IndiModule::setFocalLengthAndDiameter()
+{
+    double fl = getFloat("optic", "fl");
+    double diam = getFloat("optic", "diam");
+    QString dev = getString("devices", "camera");
+    return setFocalLengthAndDiameter(dev, fl, diam);
+}
+
+bool IndiModule::setFocalLengthAndDiameter(QString device, double fl, double diam)
+{
+    if ((fl < 1) || (diam < 1)) return false;
+    if (!sendModNewNumber(device, "SCOPE_INFO", "APERTURE", diam)) return false;
+    if (!sendModNewNumber(device, "SCOPE_INFO", "FOCAL_LENGTH", fl)) return false;
+    return true;
+
+}
 
