@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['f_1635',['f',['../namespaceNaN.html#ac789b979b8ba3114d74b6285cbb3898d',1,'NaN']]],
-  ['filter_1636',['filter',['../structBayerParams.html#a7a465ec7567ce4f04bc9533d123e3936',1,'BayerParams']]]
+  ['eaxeavgzone_1644',['eAxeAvgZone',['../classSolver.html#ae53d9bac4f3ef95d29abcbb157c7be23',1,'Solver']]]
 ];

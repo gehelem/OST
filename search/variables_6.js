@@ -1,11 +1,8 @@
 var searchData=
 [
-  ['height_1642',['height',['../structOST_1_1ImgData.html#a65b76f1b5e4ae81cde32aa3885f79384',1,'OST::ImgData']]],
-  ['hfravg_1643',['HFRavg',['../structOST_1_1ImgData.html#ac86f8bb651872715aa62a0993c3c1a22',1,'OST::ImgData::HFRavg()'],['../classSolver.html#a8ccf9f74f078977836562134332e236c',1,'Solver::HFRavg()']]],
-  ['hfravgcount_1644',['HFRavgCount',['../classSolver.html#a1237d5c203a217ededd439d7e9efcfcc',1,'Solver']]],
-  ['hfravgzone_1645',['HFRavgZone',['../classSolver.html#a14133f13b4810da1949c7f68f5c2168d',1,'Solver']]],
-  ['hfrzones_1646',['HFRZones',['../classSolver.html#a9b869560e0a3e211fdc3547e2e770f48',1,'Solver']]],
-  ['highlights_1647',['highlights',['../structStretchParams1Channel.html#aee2b4cd865d9bc35c28943840f370fc6',1,'StretchParams1Channel']]],
-  ['highlights_5fexpansion_1648',['highlights_expansion',['../structStretchParams1Channel.html#adca1f13ebc9cc9b168b6a094e8b0a9f9',1,'StretchParams1Channel']]],
-  ['histogram_1649',['histogram',['../structOST_1_1ImgData.html#aae3a6089148d7804ef088fb3133c3eee',1,'OST::ImgData']]]
+  ['git_5fcommit_5fsubject_1647',['GIT_COMMIT_SUBJECT',['../structVersion.html#ab4f136635b4df674e59271bb4f272caa',1,'Version']]],
+  ['git_5fdate_1648',['GIT_DATE',['../structVersion.html#a01231e3c1d12e9085c14d7af8507e423',1,'Version']]],
+  ['git_5fsha1_1649',['GIT_SHA1',['../structVersion.html#a71c363beef57266995f765ecd32563c0',1,'Version']]],
+  ['green_1650',['green',['../structStretchParams.html#abfc13c3eba0758d6d664d8bb58d7c5eb',1,'StretchParams']]],
+  ['grey_5fred_1651',['grey_red',['../structStretchParams.html#a7e5b5c89533211386589d1ff28844f72',1,'StretchParams']]]
 ];
