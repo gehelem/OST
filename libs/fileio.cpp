@@ -171,7 +171,7 @@ bool fileio::loadFits(QString fileName)
             debayer();
 
         getSolverOptionsFromFITS();
-
+        CalcStats(127);
         parseHeader();
     }
 
