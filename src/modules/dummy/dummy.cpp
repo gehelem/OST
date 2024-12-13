@@ -149,9 +149,9 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                     if (keyelt == "b2")
                     {
                         qDebug() << "modlist of " << this->getModuleName() << " : ";
-                        foreach ( const auto &name, loadedModules.keys() )
+                        foreach ( const auto &name, loadedModules->keys() )
                         {
-                            qDebug() << name << loadedModules[name]->getModuleLabel();
+                            qDebug() << name ;//<< loadedModules->values()[name]->getModuleLabel();
                         }
 
 
