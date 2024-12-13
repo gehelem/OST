@@ -149,12 +149,10 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                     if (keyelt == "b2")
                     {
                         qDebug() << "modlist of " << this->getModuleName() << " : ";
-                        foreach ( const auto &name, loadedModules->keys() )
+                        for (auto i = loadedModules->begin(), end = loadedModules->end(); i != end; ++i)
                         {
-                            qDebug() << name ;//<< loadedModules->values()[name]->getModuleLabel();
+                            qDebug() << i.key() << i.value()->getModuleName();
                         }
-
-
                     }
                 }
                 if (keyprop == "devices")
