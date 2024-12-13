@@ -17,7 +17,7 @@ class MODULE_INIT Dummy : public IndiModule
     public:
         Dummy(QString name, QString label, QString profile, QVariantMap availableModuleLibs);
         ~Dummy();
-
+        void sayHello();
 
     public slots:
         void OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,

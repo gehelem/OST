@@ -152,6 +152,11 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                         for (auto i = loadedModules->begin(), end = loadedModules->end(); i != end; ++i)
                         {
                             qDebug() << i.key() << i.value()->getModuleName();
+                            if (i.key() == "Dummy2" && i.key() != getModuleName())
+                            {
+                                Basemodule* p = i.value();
+                                static_cast<Dummy*>(p)->sayHello();
+                            }
                         }
                     }
                 }
@@ -478,3 +483,7 @@ void Dummy::OnModuleStatusAnswer(const QString module, OST::ModuleStatus status)
 }
 
 
+void Dummy::sayHello()
+{
+    qDebug() << " hello from " << getModuleLabel();
+}
