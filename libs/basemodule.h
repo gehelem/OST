@@ -42,6 +42,7 @@ class Basemodule : public DBManager
          * False means ClassName has already been set, and sends a corresponding message
          */
         bool setClassName(const QString &pClassName);
+        QMap<QString, QPointer<Basemodule>> loadedModules;
 
 
     protected:

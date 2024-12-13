@@ -48,6 +48,7 @@ class Controller : public QObject
         QStringList mFilesList;
         QStringList mFoldersList;
         QString mSelectedFolder;
+        QMap<QString, QPointer<Basemodule>> loadedModules;
 
 
 

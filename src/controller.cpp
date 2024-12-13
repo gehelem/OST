@@ -172,12 +172,17 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     //connect(wshandler, &WShandler::externalEvent, mod, &Basemodule::OnExternalEvent);
     mod->OnExternalEvent("afterinit", name, QString(), QVariantMap());
     mod->sendDump();
-
+    mod->loadedModules = loadedModules;
+    loadedModules[name] = mod;
+    qDebug() << "added " << loadedModules.keys();
     QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
     for (Basemodule *othermodule : othermodules)
     {
         if (othermodule->getModuleName() != mod->getModuleName())
         {
+            othermodule->loadedModules[name] = mod;
+            qDebug() << mod->getModuleName() << " added to module " << othermodule->getModuleName() <<
+                     othermodule->loadedModules.keys();
             connect(othermodule, &Basemodule::moduleStatusRequest, mod, &Basemodule::OnModuleStatusRequest);
             connect(othermodule, &Basemodule::moduleStatusAnswer, mod, &Basemodule::OnModuleStatusAnswer);
             connect(mod, &Basemodule::moduleStatusRequest, othermodule, &Basemodule::OnModuleStatusRequest);
@@ -245,6 +250,7 @@ void Controller::OnModuleEvent(const QString &pEventType, const QString  &pEvent
             pMainControl->sendMainWarning("moduledelete Module " + pEventModule + " not in module map");
         }
         mModulesMap.remove(pEventModule);
+        loadedModules.remove(pEventModule);
         pMainControl->deldModuleData(pEventModule);
     }
     if (pEventType == "modulesavedprofile")

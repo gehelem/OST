@@ -144,6 +144,19 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                         //for ( int i = 0; i < 1010; i++)getProperty("secondtestgrid")->push();
                     }
                 }
+                if (keyprop == "boolsRW2")
+                {
+                    if (keyelt == "b2")
+                    {
+                        qDebug() << "modlist of " << this->getModuleName() << " : ";
+                        foreach ( const auto &name, loadedModules.keys() )
+                        {
+                            qDebug() << name << loadedModules[name]->getModuleLabel();
+                        }
+
+
+                    }
+                }
                 if (keyprop == "devices")
                 {
                     if (keyelt == "camera")
