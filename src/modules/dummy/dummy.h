@@ -28,6 +28,8 @@ class MODULE_INIT Dummy : public IndiModule
         void OnSolverLog(QString text);
         void OnModuleStatusAnswer(const QString module, OST::ModuleStatus status) override;
         void OnNewImage();
+    private slots:
+        void OnHello();
     private:
         void newBLOB(INDI::PropertyBlob pblob);
         void newDevice(INDI::BaseDevice bd) override;
@@ -46,6 +48,7 @@ class MODULE_INIT Dummy : public IndiModule
         OST::ElementString *dyntext2;
     signals:
         void newImage();
+        void hello();
 
 
 };

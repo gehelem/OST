@@ -155,9 +155,16 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                             if (i.key() == "Dummy2" && i.key() != getModuleName())
                             {
                                 Basemodule* p = i.value();
-                                static_cast<Dummy*>(p)->sayHello();
+                                Dummy* d = static_cast<Dummy*>(p);
+                                d->sayHello();
+                                connect(d, &Dummy::hello, this, &Dummy::OnHello);
                             }
                         }
+                    }
+                    if (keyelt == "b3")
+                    {
+                        qDebug() << "emiting hello from" << getModuleName();
+                        emit hello();
                     }
                 }
                 if (keyprop == "devices")
@@ -486,4 +493,8 @@ void Dummy::OnModuleStatusAnswer(const QString module, OST::ModuleStatus status)
 void Dummy::sayHello()
 {
     qDebug() << " hello from " << getModuleLabel();
+}
+void Dummy::OnHello()
+{
+    qDebug() << " signal hello recieved into " << getModuleName();
 }
