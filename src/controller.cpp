@@ -174,6 +174,13 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     mod->sendDump();
     loadedModules[name] = mod;
     mod->loadedModules = &loadedModules;
+    for (auto i = loadedModules.begin(), end = loadedModules.end(); i != end; ++i)
+    {
+        mod->getGlovString("LOADEDMODULES")->lovAdd(i.key(), i.value()->getModuleName());
+    }
+
+
+    //mod->getGlovString("LOADEDMODULES")->lovAdd(name,mod->getModuleName());
     qDebug() << "added " << loadedModules.keys();
     QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
     for (Basemodule *othermodule : othermodules)
@@ -183,6 +190,7 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
             //othermodule->loadedModules[name] = mod;
             //qDebug() << mod->getModuleName() << " added to module " << othermodule->getModuleName() <<
             //         othermodule->loadedModules.keys();
+            othermodule->getGlovString("LOADEDMODULES")->lovAdd(name, mod->getModuleName());
             connect(othermodule, &Basemodule::moduleStatusRequest, mod, &Basemodule::OnModuleStatusRequest);
             connect(othermodule, &Basemodule::moduleStatusAnswer, mod, &Basemodule::OnModuleStatusAnswer);
             connect(mod, &Basemodule::moduleStatusRequest, othermodule, &Basemodule::OnModuleStatusRequest);
@@ -257,7 +265,11 @@ void Controller::OnModuleEvent(const QString &pEventType, const QString  &pEvent
         //{
         //    othermodule->loadedModules.remove(pEventModule);
         //}
-
+        QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
+        for (Basemodule *othermodule : othermodules)
+        {
+            othermodule->getGlovString("LOADEDMODULES")->lovDel(pEventModule);
+        }
     }
     if (pEventType == "modulesavedprofile")
     {

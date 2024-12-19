@@ -1,5 +1,11 @@
 {
 "globallov":{
+    "othermodules":{
+        "type":"string",
+        "label":"Other loaded modules",
+        "values":    [
+        ]
+    }
 },
 "properties":{
     "baseGit": {

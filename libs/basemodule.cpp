@@ -26,6 +26,10 @@ Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap
     mStatus.message = "init";
     mStatus.state = OST::Idle;
 
+    OST::LovString* ls = new OST::LovString("LOADEDMODULES");
+    createGlobLov("LOADEDMODULES", ls);
+
+
 }
 Basemodule::~Basemodule()
 {

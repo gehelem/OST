@@ -496,5 +496,5 @@ void Dummy::sayHello()
 }
 void Dummy::OnHello()
 {
-    qDebug() << " signal hello recieved into " << getModuleName();
+    qDebug() << " signal hello received into " << getModuleName();
 }

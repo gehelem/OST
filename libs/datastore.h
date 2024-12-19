@@ -33,6 +33,7 @@ class Datastore : public Baseroot
     public:
         Datastore();
         ~Datastore();
+        OST::LovString* getGlovString(QString pLov);
     protected:
         OST::PropertyMulti* getProperty(QString pProperty);
         OST::ElementBase* getEltBase(QString pProperty, QString pElement);
@@ -68,7 +69,6 @@ class Datastore : public Baseroot
         {
             return mGlobLov;
         }
-        OST::LovString* getGlovString(QString pLov);
         /**
          * @brief createOstProperty is a method that creates a property at runtime
          * @param pPropertyName is the property internal name
