@@ -1,8 +1,13 @@
 <map id="OST::ElementMessage" name="OST::ElementMessage">
-<area shape="rect" id="node1" title=" " alt="" coords="79,804,250,999"/>
-<area shape="rect" id="node2" href="$classOST_1_1ElementTemplateNotNumeric.html" title=" " alt="" coords="39,619,290,755"/>
-<area shape="rect" id="node3" href="$classOST_1_1ElementTemplate.html" title=" " alt="" coords="61,433,268,569"/>
-<area shape="rect" id="node4" href="$classOST_1_1ElementBase.html" title=" " alt="" coords="5,132,151,371"/>
-<area shape="rect" id="node5" href="$classQObject.html" title=" " alt="" coords="41,5,115,83"/>
-<area shape="rect" id="node6" title=" " alt="" coords="175,213,213,290"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="71,852,232,1077"/>
+<area shape="rect" id="Node000002" href="$classOST_1_1ElementTemplateNotNumeric.html" title=" " alt="" coords="31,663,272,803"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="154,816,154,852,149,852,149,816"/>
+<area shape="rect" id="Node000003" href="$classOST_1_1ElementTemplate.html" title=" " alt="" coords="52,468,251,613"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="154,627,154,662,149,662,149,627"/>
+<area shape="rect" id="Node000004" href="$classOST_1_1ElementBase.html" title=" " alt="" coords="5,120,143,405"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="120,418,134,467,129,469,115,420"/>
+<area shape="rect" id="Node000005" href="$classQObject.html" title=" " alt="" coords="41,5,107,71"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="77,84,77,120,71,120,71,84"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="167,230,189,295"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="178,296,163,452,157,451,172,295"/>
 </map>

@@ -1,5 +1,7 @@
 <map id="OST::PrgData" name="OST::PrgData">
-<area shape="rect" id="node1" title=" " alt="" coords="32,145,139,223"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,5,72,83"/>
-<area shape="rect" id="node3" title=" " alt="" coords="97,5,167,83"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="38,133,137,199"/>
+<area shape="rect" id="Node000002" href="$classQString.html" title=" " alt="" coords="5,5,68,71"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="35,71,36,90,41,108,45,118,40,120,35,110,31,91,30,71"/>
+<area shape="rect" id="Node000003" href="$classdouble.html" title=" " alt="" coords="110,5,169,71"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="129,72,109,119,104,117,124,70"/>
 </map>

@@ -1,6 +1,9 @@
 <map id="OST::ModuleStatus" name="OST::ModuleStatus">
-<area shape="rect" id="node1" title=" " alt="" coords="89,145,233,223"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,5,101,83"/>
-<area shape="rect" id="node3" title=" " alt="" coords="126,5,197,83"/>
-<area shape="rect" id="node4" title=" " alt="" coords="239,5,295,83"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="53,133,189,199"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,53,71"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="46,69,69,108,78,120,74,123,64,111,41,72"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="77,5,165,71"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="124,71,124,117,119,117,119,71"/>
+<area shape="rect" id="Node000004" href="$classQString.html" title=" " alt="" coords="190,5,253,71"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="198,73,159,122,155,119,194,69"/>
 </map>

@@ -1,5 +1,7 @@
 <map id="StretchParams" name="StretchParams">
-<area shape="rect" id="node1" title=" " alt="" coords="49,373,165,451"/>
-<area shape="rect" id="node2" href="$structStretchParams1Channel.html" title=" " alt="" coords="5,204,208,281"/>
-<area shape="rect" id="node3" title=" " alt="" coords="81,5,132,83"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="48,349,156,415"/>
+<area shape="rect" id="Node000002" href="$structStretchParams1Channel.html" title=" " alt="" coords="5,192,199,257"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="105,258,105,333,99,333,99,258"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="81,5,123,71"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="105,71,105,175,99,175,99,71"/>
 </map>

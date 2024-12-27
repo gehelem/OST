@@ -1,11 +1,19 @@
 <map id="Baseroot" name="Baseroot">
-<area shape="rect" id="node1" title=" " alt="" coords="241,131,399,355"/>
-<area shape="rect" id="node3" href="$classDatastore.html" title="Class to provide properties management for OST modules." alt="" coords="259,403,381,656"/>
-<area shape="rect" id="node2" href="$classQObject.html" title=" " alt="" coords="283,5,357,83"/>
-<area shape="rect" id="node4" href="$classDBManager.html" title=" " alt="" coords="229,704,411,928"/>
-<area shape="rect" id="node5" href="$classBasemodule.html" title=" " alt="" coords="217,976,423,1317"/>
-<area shape="rect" id="node6" href="$classIndiModule.html" title=" " alt="" coords="81,1365,316,1692"/>
-<area shape="rect" id="node9" href="$classMaincontrol.html" title=" " alt="" coords="341,1402,542,1655"/>
-<area shape="rect" id="node7" href="$classDummy.html" title=" " alt="" coords="5,1740,208,1935"/>
-<area shape="rect" id="node8" href="$classIndiPanel.html" title=" " alt="" coords="232,1791,349,1883"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="232,119,383,384"/>
+<area shape="rect" id="Node000003" href="$classDatastore.html" title="Class to provide properties management for OST modules." alt="" coords="246,432,369,737"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="310,398,310,432,305,432,305,398"/>
+<area shape="rect" id="Node000002" href="$classQObject.html" title=" " alt="" coords="274,5,341,71"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="310,84,310,119,305,119,305,84"/>
+<area shape="rect" id="Node000004" href="$classDBManager.html" title=" " alt="" coords="220,785,395,1051"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="310,751,310,785,305,785,305,751"/>
+<area shape="rect" id="Node000005" href="$classBasemodule.html" title=" " alt="" coords="208,1099,407,1519"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="310,1064,310,1099,305,1099,305,1064"/>
+<area shape="rect" id="Node000006" href="$classIndiModule.html" title=" " alt="" coords="77,1567,303,1972"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="253,1533,244,1567,239,1566,248,1531"/>
+<area shape="rect" id="Node000009" href="$classMaincontrol.html" title=" " alt="" coords="328,1617,521,1922"/>
+<area shape="poly" id="edge8_Node000005_Node000009" title=" " alt="" coords="367,1531,388,1616,383,1617,362,1533"/>
+<area shape="rect" id="Node000007" href="$classDummy.html" title=" " alt="" coords="5,2020,199,2245"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="140,1986,132,2020,127,2019,135,1985"/>
+<area shape="rect" id="Node000008" href="$classIndiPanel.html" title=" " alt="" coords="223,2090,333,2175"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="245,1984,270,2089,265,2090,240,1986"/>
 </map>

@@ -1,6 +1,9 @@
 <map id="OST::LovInt" name="OST::LovInt">
-<area shape="rect" id="node1" title=" " alt="" coords="39,572,137,693"/>
-<area shape="rect" id="node2" href="$classOST_1_1LovSingle.html" title=" " alt="" coords="5,344,171,524"/>
-<area shape="rect" id="node3" href="$classOST_1_1LovBase.html" title=" " alt="" coords="31,131,145,296"/>
-<area shape="rect" id="node4" href="$classQObject.html" title=" " alt="" coords="51,5,125,83"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="39,605,129,731"/>
+<area shape="rect" id="Node000002" href="$classOST_1_1LovSingle.html" title=" " alt="" coords="5,352,163,557"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,571,87,605,81,605,81,571"/>
+<area shape="rect" id="Node000003" href="$classOST_1_1LovBase.html" title=" " alt="" coords="31,119,137,304"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="87,318,87,352,81,352,81,318"/>
+<area shape="rect" id="Node000004" href="$classQObject.html" title=" " alt="" coords="51,5,117,71"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="87,85,87,119,81,119,81,85"/>
 </map>

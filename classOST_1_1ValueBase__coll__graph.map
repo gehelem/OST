@@ -1,5 +1,8 @@
 <map id="OST::ValueBase" name="OST::ValueBase">
-<area shape="rect" id="node1" title=" " alt="" coords="5,433,152,569"/>
-<area shape="rect" id="node2" href="$classQObject.html" title=" " alt="" coords="36,5,111,83"/>
-<area shape="rect" id="node3" href="$classOST_1_1ElementBase.html" title=" " alt="" coords="95,132,241,371"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,468,143,613"/>
+<area shape="rect" id="Node000002" href="$classQObject.html" title=" " alt="" coords="35,5,102,71"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="72,84,76,468,71,468,66,85"/>
+<area shape="rect" id="Node000003" href="$classOST_1_1ElementBase.html" title=" " alt="" coords="91,120,228,405"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="89,82,104,119,99,121,84,84"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="118,406,104,453,98,451,113,405"/>
 </map>

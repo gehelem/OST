@@ -1,4 +1,5 @@
 <map id="OST::PropertyTextDumper" name="OST::PropertyTextDumper">
-<area shape="rect" id="node1" title=" " alt="" coords="5,189,195,340"/>
-<area shape="rect" id="node2" href="$classOST_1_1PropertyVisitor.html" title=" " alt="" coords="24,5,176,141"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,199,187,364"/>
+<area shape="rect" id="Node000002" href="$classOST_1_1PropertyVisitor.html" title=" " alt="" coords="24,5,168,151"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="99,165,99,198,93,198,93,165"/>
 </map>

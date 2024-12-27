@@ -1,5 +1,7 @@
 <map id="dc1394color_codings_t" name="dc1394color_codings_t">
-<area shape="rect" id="node1" title=" " alt="" coords="28,145,199,223"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,5,80,83"/>
-<area shape="rect" id="node3" title=" " alt="" coords="104,5,267,83"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="24,133,187,199"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,72,71"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="58,70,83,117,78,120,53,72"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="96,5,251,71"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="159,72,132,120,128,118,154,70"/>
 </map>

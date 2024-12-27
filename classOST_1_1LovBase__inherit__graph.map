@@ -1,13 +1,23 @@
 <map id="OST::LovBase" name="OST::LovBase">
-<area shape="rect" id="node1" title=" " alt="" coords="469,131,582,296"/>
-<area shape="rect" id="node3" href="$classOST_1_1LovSingle.html" title=" " alt="" coords="5,344,197,524"/>
-<area shape="rect" id="node5" href="$classOST_1_1LovSingle.html" title=" " alt="" coords="222,344,418,524"/>
-<area shape="rect" id="node7" href="$classOST_1_1LovSingle.html" title=" " alt="" coords="443,344,608,524"/>
-<area shape="rect" id="node9" href="$classOST_1_1LovSingle.html" title=" " alt="" coords="633,344,815,524"/>
-<area shape="rect" id="node11" href="$classOST_1_1LovSingle.html" title=" " alt="" coords="839,344,995,524"/>
-<area shape="rect" id="node2" href="$classQObject.html" title=" " alt="" coords="488,5,563,83"/>
-<area shape="rect" id="node4" href="$classOST_1_1LovFloat.html" title=" " alt="" coords="44,572,159,693"/>
-<area shape="rect" id="node6" href="$classOST_1_1LovString.html" title=" " alt="" coords="261,572,379,693"/>
-<area shape="rect" id="node8" href="$classOST_1_1LovInt.html" title=" " alt="" coords="476,572,575,693"/>
-<area shape="rect" id="node10" href="$classOST_1_1LovLight.html" title=" " alt="" coords="667,572,781,693"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="430,119,535,304"/>
+<area shape="rect" id="Node000003" href="$classOST_1_1LovSingle.html" title=" " alt="" coords="5,352,189,557"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="418,241,314,289,257,319,203,354,191,363,188,359,200,350,254,315,312,284,416,236"/>
+<area shape="rect" id="Node000005" href="$classOST_1_1LovSingle.html" title=" " alt="" coords="213,352,371,557"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="423,292,373,355,369,352,419,289"/>
+<area shape="rect" id="Node000007" href="$classOST_1_1LovSingle.html" title=" " alt="" coords="395,352,570,557"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="485,318,485,352,480,352,480,318"/>
+<area shape="rect" id="Node000009" href="$classOST_1_1LovSingle.html" title=" " alt="" coords="594,352,782,557"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="546,283,603,350,599,354,542,287"/>
+<area shape="rect" id="Node000011" href="$classOST_1_1LovSingle.html" title=" " alt="" coords="806,352,954,557"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="549,230,605,250,668,277,734,310,795,350,808,360,804,364,792,354,731,315,666,282,603,255,547,235"/>
+<area shape="rect" id="Node000002" href="$classQObject.html" title=" " alt="" coords="449,5,516,71"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="485,85,485,119,480,119,480,85"/>
+<area shape="rect" id="Node000004" href="$classOST_1_1LovFloat.html" title=" " alt="" coords="45,605,150,731"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="100,571,100,605,95,605,95,571"/>
+<area shape="rect" id="Node000006" href="$classOST_1_1LovInt.html" title=" " alt="" coords="247,605,337,731"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="295,571,295,605,289,605,289,571"/>
+<area shape="rect" id="Node000008" href="$classOST_1_1LovLight.html" title=" " alt="" coords="430,605,535,731"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="485,571,485,605,480,605,480,571"/>
+<area shape="rect" id="Node000010" href="$classOST_1_1LovString.html" title=" " alt="" coords="633,605,743,731"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="691,571,691,605,685,605,685,571"/>
 </map>

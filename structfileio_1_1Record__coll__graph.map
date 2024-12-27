@@ -1,5 +1,7 @@
 <map id="fileio::Record" name="fileio::Record">
-<area shape="rect" id="node1" title=" " alt="" coords="41,160,147,237"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,5,84,83"/>
-<area shape="rect" id="node3" title=" " alt="" coords="108,5,179,83"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="41,148,139,213"/>
+<area shape="rect" id="Node000002" href="$classQString.html" title=" " alt="" coords="5,5,68,71"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="35,71,35,97,41,123,46,133,41,136,35,125,29,98,29,71"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="109,5,180,71"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="137,72,118,125,114,134,109,132,113,123,132,70"/>
 </map>

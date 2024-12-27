@@ -1,8 +1,13 @@
 <map id="libs/stretch.h" name="libs/stretch.h">
-<area shape="rect" id="node1" title=" " alt="" coords="228,5,335,32"/>
-<area shape="rect" id="node2" href="$fileio_8h.html" title=" " alt="" coords="169,80,263,107"/>
-<area shape="rect" id="node6" href="$stretch_8cpp.html" title=" " alt="" coords="287,80,409,107"/>
-<area shape="rect" id="node3" href="$dummy_8h.html" title=" " alt="" coords="13,155,232,181"/>
-<area shape="rect" id="node5" href="$fileio_8cpp.html" title=" " alt="" coords="257,155,365,181"/>
-<area shape="rect" id="node4" href="$dummy_8cpp.html" title=" " alt="" coords="5,229,240,256"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="165,5,271,31"/>
+<area shape="rect" id="Node000002" href="$fileio_8h.html" title=" " alt="" coords="106,79,199,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="200,43,165,80,161,77,196,39"/>
+<area shape="rect" id="Node000006" href="$stretch_8cpp.html" title=" " alt="" coords="224,79,345,104"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="240,39,276,77,272,80,237,43"/>
+<area shape="rect" id="Node000003" href="$fileio_8cpp.html" title=" " alt="" coords="5,152,113,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="129,114,76,154,73,150,125,110"/>
+<area shape="rect" id="Node000004" href="$dummy_8h.html" title=" " alt="" coords="138,152,357,177"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="180,110,233,150,230,154,177,114"/>
+<area shape="rect" id="Node000005" href="$dummy_8cpp.html" title=" " alt="" coords="130,225,365,251"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="250,191,250,225,245,225,245,191"/>
 </map>

@@ -1,13 +1,27 @@
 <map id="libs/utils/lovfactory.cpp" name="libs/utils/lovfactory.cpp">
-<area shape="rect" id="node1" title=" " alt="" coords="111,5,283,32"/>
-<area shape="rect" id="node2" href="$lovfactory_8h.html" title=" " alt="" coords="147,80,246,107"/>
-<area shape="rect" id="node3" href="$lovint_8h.html" title=" " alt="" coords="5,155,76,181"/>
-<area shape="rect" id="node9" href="$lovfloat_8h.html" title=" " alt="" coords="101,155,183,181"/>
-<area shape="rect" id="node10" href="$lovstring_8h.html" title=" " alt="" coords="207,155,298,181"/>
-<area shape="rect" id="node11" href="$lovlight_8h.html" title=" " alt="" coords="322,155,405,181"/>
-<area shape="rect" id="node4" href="$lovsingle_8h.html" title=" " alt="" coords="150,229,243,256"/>
-<area shape="rect" id="node5" href="$lovbase_8h.html" title=" " alt="" coords="154,304,239,331"/>
-<area shape="rect" id="node6" href="$lovvisitor_8h.html" title=" " alt="" coords="91,379,185,405"/>
-<area shape="rect" id="node8" href="$common_8h.html" title=" " alt="" coords="210,379,301,405"/>
-<area shape="rect" id="node7" title=" " alt="" coords="163,453,230,480"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="111,5,283,31"/>
+<area shape="rect" id="Node000002" href="$lovfactory_8h.html" title=" " alt="" coords="147,79,246,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="199,31,199,65,194,65,194,31"/>
+<area shape="rect" id="Node000003" href="$lovint_8h.html" title=" " alt="" coords="5,152,76,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="173,106,80,149,78,144,171,102"/>
+<area shape="rect" id="Node000009" href="$lovfloat_8h.html" title=" " alt="" coords="101,152,183,177"/>
+<area shape="poly" id="edge9_Node000002_Node000009" title=" " alt="" coords="190,106,161,143,157,140,186,103"/>
+<area shape="rect" id="Node000010" href="$lovstring_8h.html" title=" " alt="" coords="207,152,298,177"/>
+<area shape="poly" id="edge11_Node000002_Node000010" title=" " alt="" coords="208,103,237,140,233,143,204,106"/>
+<area shape="rect" id="Node000011" href="$lovlight_8h.html" title=" " alt="" coords="322,152,405,177"/>
+<area shape="poly" id="edge13_Node000002_Node000011" title=" " alt="" coords="224,102,325,144,323,149,222,106"/>
+<area shape="rect" id="Node000004" href="$lovsingle_8h.html" title=" " alt="" coords="150,225,243,251"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="67,175,160,217,158,222,65,180"/>
+<area shape="rect" id="Node000005" href="$lovbase_8h.html" title=" " alt="" coords="154,299,239,324"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="199,251,199,285,194,285,194,251"/>
+<area shape="rect" id="Node000006" href="$lovvisitor_8h.html" title=" " alt="" coords="91,372,185,397"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="189,326,158,363,154,360,185,323"/>
+<area shape="rect" id="Node000008" href="$common_8h.html" title=" " alt="" coords="210,372,301,397"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="208,323,239,360,235,363,204,326"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="163,445,230,471"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="150,396,181,433,177,437,146,399"/>
+<area shape="poly" id="edge8_Node000008_Node000007" title=" " alt="" coords="248,399,217,437,213,433,244,396"/>
+<area shape="poly" id="edge10_Node000009_Node000004" title=" " alt="" coords="153,176,182,213,177,216,149,179"/>
+<area shape="poly" id="edge12_Node000010_Node000004" title=" " alt="" coords="246,179,216,216,212,213,241,176"/>
+<area shape="poly" id="edge14_Node000011_Node000004" title=" " alt="" coords="338,180,237,222,235,217,336,175"/>
 </map>

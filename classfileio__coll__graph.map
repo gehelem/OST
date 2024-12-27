@@ -1,7 +1,11 @@
 <map id="fileio" name="fileio">
-<area shape="rect" id="node1" title=" " alt="" coords="101,189,286,413"/>
-<area shape="rect" id="node2" href="$classQObject.html" title=" " alt="" coords="5,5,80,83"/>
-<area shape="rect" id="node3" title=" " alt="" coords="104,5,171,83"/>
-<area shape="rect" id="node4" title=" " alt="" coords="224,5,275,83"/>
-<area shape="rect" id="node5" title=" " alt="" coords="368,5,459,83"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="110,177,287,443"/>
+<area shape="rect" id="Node000002" href="$classQObject.html" title=" " alt="" coords="5,5,72,71"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="67,81,123,176,118,179,62,84"/>
+<area shape="rect" id="Node000003" href="$classbool.html" title=" " alt="" coords="96,5,139,71"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="117,71,116,110,121,153,124,161,118,163,116,154,110,111,111,71"/>
+<area shape="rect" id="Node000004" href="$classdouble.html" title=" " alt="" coords="252,5,311,71"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="276,72,255,154,252,163,247,161,249,153,271,70"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="352,5,435,71"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="389,72,376,113,356,155,330,190,301,223,297,219,326,187,351,152,371,111,384,70"/>
 </map>

@@ -1,6 +1,9 @@
 <map id="BayerParams" name="BayerParams">
-<area shape="rect" id="node1" title=" " alt="" coords="145,160,253,237"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,5,156,83"/>
-<area shape="rect" id="node3" title=" " alt="" coords="180,5,219,83"/>
-<area shape="rect" id="node4" title=" " alt="" coords="243,5,417,83"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="217,148,317,213"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,172,71"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="130,69,198,122,216,136,213,140,195,126,127,73"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="196,5,339,71"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="270,71,270,131,265,131,265,71"/>
+<area shape="rect" id="Node000004" href="$classint.html" title=" " alt="" coords="363,5,393,71"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="365,64,320,126,310,137,306,134,316,122,360,61"/>
 </map>

@@ -1,5 +1,7 @@
 <map id="OST::PropertyMulti" name="OST::PropertyMulti">
-<area shape="rect" id="node1" title=" " alt="" coords="5,403,152,700"/>
-<area shape="rect" id="node2" href="$classOST_1_1PropertyBase.html" title="Class to define common property." alt="" coords="6,131,151,355"/>
-<area shape="rect" id="node3" href="$classQObject.html" title=" " alt="" coords="41,5,116,83"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,432,143,797"/>
+<area shape="rect" id="Node000002" href="$classOST_1_1PropertyBase.html" title="Class to define common property." alt="" coords="5,119,143,384"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="77,398,77,432,71,432,71,398"/>
+<area shape="rect" id="Node000003" href="$classQObject.html" title=" " alt="" coords="41,5,107,71"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="77,84,77,119,71,119,71,84"/>
 </map>

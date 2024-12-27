@@ -1,6 +1,9 @@
 <map id="OST::ElementTemplateNumeric&lt; T &gt;" name="OST::ElementTemplateNumeric&lt; T &gt;">
-<area shape="rect" id="node1" title=" " alt="" coords="5,601,268,825"/>
-<area shape="rect" id="node2" href="$classOST_1_1ElementTemplate.html" title=" " alt="" coords="33,417,240,553"/>
-<area shape="rect" id="node3" href="$classOST_1_1ElementBase.html" title=" " alt="" coords="64,131,209,369"/>
-<area shape="rect" id="node4" href="$classQObject.html" title=" " alt="" coords="99,5,174,83"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,645,260,911"/>
+<area shape="rect" id="Node000002" href="$classOST_1_1ElementTemplate.html" title=" " alt="" coords="33,452,232,597"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="135,611,135,645,130,645,130,611"/>
+<area shape="rect" id="Node000003" href="$classOST_1_1ElementBase.html" title=" " alt="" coords="64,119,201,404"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="135,418,135,452,130,452,130,418"/>
+<area shape="rect" id="Node000004" href="$classQObject.html" title=" " alt="" coords="99,5,166,71"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="135,84,135,119,130,119,130,84"/>
 </map>

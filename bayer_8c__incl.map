@@ -1,9 +1,16 @@
 <map id="libs/bayer.c" name="libs/bayer.c">
-<area shape="rect" id="node1" title=" " alt="" coords="186,5,282,32"/>
-<area shape="rect" id="node2" href="$bayer_8h.html" title=" " alt="" coords="5,80,76,107"/>
-<area shape="rect" id="node3" title=" " alt="" coords="41,155,112,181"/>
-<area shape="rect" id="node4" title=" " alt="" coords="152,80,223,107"/>
-<area shape="rect" id="node5" title=" " alt="" coords="247,80,315,107"/>
-<area shape="rect" id="node6" title=" " alt="" coords="339,80,409,107"/>
-<area shape="rect" id="node7" title=" " alt="" coords="433,80,504,107"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="186,5,282,31"/>
+<area shape="rect" id="Node000002" href="$bayer_8h.html" title=" " alt="" coords="5,79,76,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="204,33,86,76,84,71,202,28"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="41,152,112,177"/>
+<area shape="poly" id="edge5_Node000001_Node000003" title=" " alt="" coords="213,33,178,53,142,81,115,111,93,142,89,139,111,108,139,77,175,49,210,28"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="152,79,223,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="229,32,205,69,200,66,224,30"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="247,79,315,104"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="244,30,268,66,263,69,239,32"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="339,79,409,104"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="258,28,340,70,338,75,255,33"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="433,79,504,104"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="272,28,421,73,419,78,271,33"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="49,103,67,138,62,141,44,106"/>
 </map>

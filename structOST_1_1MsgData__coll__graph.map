@@ -1,6 +1,9 @@
 <map id="OST::MsgData" name="OST::MsgData">
-<area shape="rect" id="node1" title=" " alt="" coords="105,145,218,223"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,5,101,83"/>
-<area shape="rect" id="node3" title=" " alt="" coords="126,5,197,83"/>
-<area shape="rect" id="node4" title=" " alt="" coords="225,5,309,83"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="97,133,203,199"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,81,71"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="68,69,99,108,109,120,105,123,95,111,64,73"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="106,5,194,71"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="153,71,153,117,147,117,147,71"/>
+<area shape="rect" id="Node000004" href="$classQString.html" title=" " alt="" coords="219,5,281,71"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="227,73,187,122,183,119,223,69"/>
 </map>
