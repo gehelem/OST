@@ -1026,5 +1026,33 @@
     "Sunset": {
         "en": "Sunset",
         "fr": "Crépuscule"
+    },
+    "Corners map": {
+        "en": "Corners map",
+        "fr": "Bordures"
+    },
+    "HFR map": {
+        "en": "HFR map",
+        "fr": "Carte HFR"
+    },
+    "Object": {
+        "en": "Object",
+        "fr": "Objet"
+    },
+    "Reload": {
+        "en": "Reload",
+        "fr": "Recharger"
+    },
+    "Select a file to reload": {
+        "en": "Select a file to reload",
+        "fr": "Fichier à recharger"
+    },
+    "Shape map": {
+        "en": "Shape map",
+        "fr": "Carte des déformations"
+    },
+    "Zoning parameters": {
+        "en": "Zoning parameters",
+        "fr": "Nombre de zones"
     }
 }
