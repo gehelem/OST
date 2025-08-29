@@ -19,14 +19,25 @@ stages:          # List of stages for jobs, and their order of execution
   - build
   - test
   - deploy
+  
+before_script:
+  - apt-add-repository --yes ppa:mutlaqja/ppa
+  - apt-get update --yes
+  - apt upgrade --yes
+  - apt-get install -y build-essential cmake git libindi-dev indi-dbg libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libqt5websockets5-dev libcfitsio-dev
 
 build-job:       # This job runs in the build stage, which runs first.
   stage: build
   tags:
     - cmake
   script:
-    - echo "Compiling the code..."
-    - echo "Compile complete."
+    - cd
+    - git clone https://github.com/gehelem/OST.git
+    - cd OST
+    - mkdir build
+    - cd build
+    - cmake ..
+    - make -j4
 
 unit-test-job:   # This job runs in the test stage.
   stage: test    # It only starts when the job in the build stage completes successfully.
