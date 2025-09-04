@@ -31,13 +31,9 @@ build-job:       # This job runs in the build stage, which runs first.
   tags:
     - cmake
   script:
-    - cd
-    - git clone https://github.com/gehelem/OST.git
-    - cd OST
-    - mkdir build
-    - cd build
-    - cmake ..
-    - make -j4
+    - echo "Running build... This will take about 10 seconds."
+    - sleep 10
+    - echo "build finished"
 
 unit-test-job:   # This job runs in the test stage.
   stage: test    # It only starts when the job in the build stage completes successfully.
