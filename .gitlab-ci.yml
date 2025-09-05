@@ -57,4 +57,4 @@ deploy-job:      # This job runs in the deploy stage.
   environment: production
   script:
     - echo "Deploying application..."
-    - echo "Application successfully deployed. "
+    - echo "Application successfully deployed."
