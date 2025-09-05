@@ -15,11 +15,14 @@
 # https://docs.gitlab.com/development/cicd/templates/
 # This specific template is located at:
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml 
+default:
+  image: rabits/qt:5.14-desktop
+  before_script:
+    - bundle install
 stages:          # List of stages for jobs, and their order of execution
   - build
   - test
   - deploy
-
 build-job:       # This job runs in the build stage, which runs first.
   stage: build
   tags:
