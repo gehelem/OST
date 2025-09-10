@@ -46,7 +46,7 @@ lint-test-job:   # This job also runs in the test stage.
   tags:
     - cmake
   script:
-    - echo "Linting code... This will take about 10 seconds."
+    - echo "Linting code... This will take about 10 second s."
     - sleep 10
     - echo "No lint issues found."
 
