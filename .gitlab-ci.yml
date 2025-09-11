@@ -17,8 +17,8 @@
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml 
 default:
 #  image: rabits/qt:5.15-desktop
-  before_script:
-    - bundle install
+#  before_script:
+#    - bundle install
 stages:          # List of stages for jobs, and their order of execution
   - build
   - test
