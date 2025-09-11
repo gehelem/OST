@@ -20,10 +20,10 @@ default:
   image: ubuntu:24.04
   before_script:
     - sudo apt-get update 
-    - apt-get clean
-    - apt-get install -y build-essential software-properties-common cmake git qtbase5-dev
-    - apt-add-repository ppa:mutlaqja/ppa
-    - apt-get install -y libindi-dev indi-dbg libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev zlib1g-dev
+    - sudo apt-get clean
+    - sudo apt-get install -y build-essential software-properties-common cmake git qtbase5-dev
+    - sudo apt-add-repository ppa:mutlaqja/ppa
+    - sudo apt-get install -y libindi-dev indi-dbg libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev zlib1g-dev
 stages:          # List of stages for jobs, and their order of execution
   - build
   - test
