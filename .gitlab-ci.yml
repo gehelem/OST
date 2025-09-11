@@ -16,7 +16,7 @@
 # This specific template is located at:
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml 
 default:
-  image: rabits/qt:5.15-desktop
+#  image: rabits/qt:5.15-desktop
   before_script:
     - sudo apt install software-properties-common
     - sudo apt-add-repository ppa:mutlaqja/ppa && sudo apt-get update && sudo apt upgrade && sudo apt-get install libindi-dev indi-dbg libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev
