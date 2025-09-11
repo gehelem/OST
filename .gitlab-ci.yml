@@ -37,10 +37,11 @@ build-job:       # This job runs in the build stage, which runs first.
     - mkdir build
     - cd build
     - cmake ..
-    - make -j4    
+    - make -j4
+    - cmake --install .    
     - export QT_QPA_PLATFORM=offscreen
     - mkdir media
-    - ./ostserver  --webroot=media --libpath=./
+    - ostserver  --webroot=media
     - echo "build finished"
 
 unit-test-job:   # This job runs in the test stage.
