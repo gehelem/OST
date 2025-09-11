@@ -43,7 +43,7 @@ build-job:       # This job runs in the build stage, which runs first.
     - mkdir media
     - pwd
     - ls -l
-    - ostserver  --webroot=media &&
+    - ostserver  --webroot=media &
     - echo "build finished"
 
 unit-test-job:   # This job runs in the test stage.
