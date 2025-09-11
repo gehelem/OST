@@ -26,7 +26,7 @@ find_package(CFITSIO REQUIRED)
 
 find_package(INDI REQUIRED)
 #find_package(INDI COMPONENTS clientqt5 REQUIRED)
-find_package(ZLIB REQUIRED)
+find_package(ZLIB REQUIRED "1.0")
 find_package(Threads REQUIRED)
 find_package(Nova REQUIRED)
 find_package(GSL REQUIRED)
