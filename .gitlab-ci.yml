@@ -47,7 +47,7 @@ build-job:       # This job runs in the build stage, which runs first.
     - ostserver  --webroot=media &
     - sleep 5
     - wscat -c ws://127.0.0.1:9624 >> test &
-    - sleep 5
+    - sleep 30
     - cat test
     - echo "build finished"
 
