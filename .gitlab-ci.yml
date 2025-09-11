@@ -46,6 +46,7 @@ build-job:       # This job runs in the build stage, which runs first.
     - npm install -g wscat
     - ostserver  --webroot=media &
     - wscat -c ws://127.0.0.1:9624 >> test
+    - sleep 10
     - cat test
     - echo "build finished"
 
