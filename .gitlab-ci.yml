@@ -38,6 +38,9 @@ build-job:       # This job runs in the build stage, which runs first.
     - cd build
     - cmake ..
     - make -j4    
+    - export QT_QPA_PLATFORM=offscreen
+    - mkdir media
+    - ostserver  --webroot=media
     - echo "build finished"
 
 unit-test-job:   # This job runs in the test stage.
@@ -46,10 +49,6 @@ unit-test-job:   # This job runs in the test stage.
     - cmake
   script:
     - echo "Running unit tests... "
-    - export QT_QPA_PLATFORM=offscreen
-    - cd build
-    - mkdir media
-    - ostserver  --webroot=media
     - echo "test finished"
 
 lint-test-job:   # This job also runs in the test stage.
