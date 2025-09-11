@@ -19,6 +19,7 @@ default:
 #  image: rabits/qt:5.15-desktop
   image: ubuntu:24.04
   before_script:
+    - apt-get update && apt-get clean && apt-get install -y build-essential
     - apt install software-properties-common
     - sudo apt-add-repository ppa:mutlaqja/ppa && sudo apt-get update && sudo apt upgrade && sudo apt-get install libindi-dev indi-dbg libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev
 stages:          # List of stages for jobs, and their order of execution
