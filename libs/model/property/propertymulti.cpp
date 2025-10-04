@@ -89,10 +89,10 @@ void PropertyMulti::setGridLimit(int limit)
     if (limit > 0)
     {
         if (limit < mGridLimit) clearGrid();
-        if (limit > 1000 )
+        if (limit > 5000 )
         {
-            sendWarning("gridLimit max size is 1000 " + this->label());
-            mGridLimit = 1000;
+            sendWarning("gridLimit max size is 5000 " + this->label());
+            mGridLimit = 5000;
         }
         else
         {
