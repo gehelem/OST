@@ -156,6 +156,8 @@ typedef enum
     XY, /* Basic X-Y graph */
     DY, /* X data is a timestamp */
     PHD, /* PHD-like graph */
+    SXY, /* X-Y graph with mixed series */
+    SDY, /* X data is a timestamp - mixed series*/
 } GraphType;
 inline QString GraphTypeToString(GraphType val )
 {
@@ -163,6 +165,8 @@ inline QString GraphTypeToString(GraphType val )
     if (val == XY) return "XY";
     if (val == DY) return "DY";
     if (val == PHD) return "PHD";
+    if (val == SXY) return "SXY";
+    if (val == SDY) return "SDY";
     qDebug() << "GraphTypeToString Cant convert type - return 'none' ";
     return "none";
 }
@@ -172,6 +176,8 @@ inline GraphType StringToGraphType(QString val)
     if (val == "XY") return XY;
     if (val == "DY") return DY;
     if (val == "PHD") return PHD;
+    if (val == "SXY") return SXY;
+    if (val == "SDY") return SDY;
     qDebug() << "StringToGraphType Cant convert type " << val << " - return 'none' ";
     return none;
 

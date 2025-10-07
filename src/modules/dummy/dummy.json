@@ -1087,7 +1087,7 @@
     },
     "agraphXY": {
         "hasArray":true,
-        "order":0,
+        "order":10,
         "devcat": "Graphes",
         "group": "",
         "permission": 2,
@@ -1126,7 +1126,7 @@
     },
     "agraphDY": {
         "hasArray":true,
-        "order":1,
+        "order":11,
         "devcat": "Graphes",
         "group": "",
         "permission": 2,
@@ -1165,7 +1165,7 @@
     },
     "agraphPHD": {
         "hasArray":true,
-        "order":3,
+        "order":13,
         "devcat": "Graphes",
         "group": "",
         "permission": 2,
@@ -1226,7 +1226,108 @@
                 "order":5
             }
         }
+    },
+    "agrapSXY": {
+        "hasArray":true,
+        "order":0,
+        "devcat": "Graphes",
+        "group": "",
+        "permission": 2,
+        "gridLimit":5,
+        "label": "Graph example  - Serie X/Y",
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
+        "gridheaders": ["X","Y","S"],
+        "grid": [
+            [0,0.0,"P0"],
+            [1,0.1,"P0"],
+            [2,0.4,"P0"],
+            [3,0.9,"P0"],
+            [4,0.16,"P0"],
+            [1.5,0.0,"P1"],
+            [2.5,0.1,"P1"],
+            [3.5,0.4,"P1"],
+            [4.5,0.9,"P1"],
+            [5.5,0.32,"P1"]
+        ],
+        "graphType":"SXY",
+        "graphParams":{
+            "S":"S",
+            "X":"X",
+            "Y":"Y"
+        },
+        "elements": {
+            "S": {
+                "type": "string",
+                "label": "Serie",
+                "value":0,
+                "order":"A"
+            },
+            "X": {
+                "type": "float",
+                "label": "Abscisse",
+                "value":0,
+                "order":"B"
+            },
+            "Y": {
+                "type": "float",
+                "label": "Ordonnée",
+                "value":0,
+                "order":"C"
+            }
+        }
+    },
+    "agraphSDY": {
+        "hasArray":true,
+        "order":1,
+        "devcat": "Graphes",
+        "group": "",
+        "permission": 2,
+        "arrayLimit":5,
+        "label": "Graph example - Serie - Date - Y",
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
+        "gridheaders": ["X","Y","S"],
+        "grid": [
+            [0,0.0,"P0"],
+            [1,0.1,"P0"],
+            [2,0.4,"P0"],
+            [3,0.9,"P0"],
+            [4,0.16,"P0"],
+            [1.5,0.0,"P1"],
+            [2.5,0.1,"P1"],
+            [3.5,0.4,"P1"],
+            [4.5,0.9,"P1"],
+            [5.5,0.32,"P1"]
+        ],
+        "graphType":"SDY",
+        "graphParams":{
+            "S":"S",
+            "D":"X",
+            "Y":"Y"
+        },
+        "elements": {
+            "S": {
+                "type": "string",
+                "label": "Serie",
+                "value":0,
+                "order":"A"
+            },
+            "X": {
+                "type": "float",
+                "label": "Abscisse",
+                "value":0,
+                "order":"B"
+            },
+            "Y": {
+                "type": "float",
+                "label": "Ordonnée",
+                "value":0,
+                "order":"C"
+            }
+        }
     }
-
 }
 }
