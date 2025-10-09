@@ -1107,7 +1107,8 @@
         "graphType":"XY",
         "graphParams":{
             "X":"X",
-            "Y":"Y"
+            "Y":"Y",
+            "graphColor":{"R":0,"G":255,"B":255}
         },
         "elements": {
             "X": {
@@ -1146,7 +1147,8 @@
         "graphType":"DY",
         "graphParams":{
             "D":"X",
-            "Y":"Y"
+            "Y":"Y",
+            "graphColor":{"R":0,"G":255,"B":0}
         },
         "elements": {
             "X": {
@@ -1255,7 +1257,11 @@
         "graphParams":{
             "S":"S",
             "X":"X",
-            "Y":"Y"
+            "Y":"Y",
+            "graphColors":{
+                "P0":{"R":0,"G":255,"B":0},
+                "P1":{"R":0,"G":0,"B":255}
+            }
         },
         "elements": {
             "S": {
@@ -1306,7 +1312,12 @@
         "graphParams":{
             "S":"S",
             "D":"X",
-            "Y":"Y"
+            "Y":"Y",
+            "graphColors":{
+                "P0":{"R":0,"G":255,"B":0},
+                "P1":{"R":0,"G":0,"B":255}
+            }
+
         },
         "elements": {
             "S": {
