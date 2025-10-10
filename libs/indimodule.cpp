@@ -27,6 +27,8 @@ IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap
     createGlobLov("DRIVER_INTERFACE-FILTER_INTERFACE", ls);
     ls = new OST::LovString("DRIVER_INTERFACE-GPS_INTERFACE");
     createGlobLov("DRIVER_INTERFACE-GPS_INTERFACE", ls);
+    ls = new OST::LovString("DRIVER_INTERFACE-WEATHER_INTERFACE");
+    createGlobLov("DRIVER_INTERFACE-WEATHER_INTERFACE", ls);
 
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &IndiModule::connectIndiTimer);
@@ -777,6 +779,12 @@ bool IndiModule::refreshDeviceslovs(QString deviceName)
         QString d = getDevice(deviceName.toStdString().c_str()).getDeviceName();
         getGlovString("DRIVER_INTERFACE-GPS_INTERFACE")->lovAdd(d, d);
     }
+    if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
+            INDI::BaseDevice::DRIVER_INTERFACE::WEATHER_INTERFACE)
+    {
+        QString d = getDevice(deviceName.toStdString().c_str()).getDeviceName();
+        getGlovString("DRIVER_INTERFACE-WEATHER_INTERFACE")->lovAdd(d, d);
+    }
     return true;
 }
 bool IndiModule::defineMeAsFocuser()
@@ -981,6 +989,9 @@ bool IndiModule::giveMeADevice(QString name, QString label, INDI::BaseDevice::DR
             break;
         case INDI::BaseDevice::DRIVER_INTERFACE::GPS_INTERFACE:
             s->setGlobalLov("DRIVER_INTERFACE-GPS_INTERFACE");
+            break;
+        case INDI::BaseDevice::DRIVER_INTERFACE::WEATHER_INTERFACE:
+            s->setGlobalLov("DRIVER_INTERFACE-WEATHER_INTERFACE");
             break;
         default:
             sendWarning("giveMeADevice unhandled interface type");
