@@ -9,6 +9,7 @@ PropertyBase::PropertyBase(const QString &key, const QString &label, const Permi
       mOrder(order), mHasProfile(hasProfile)
 {
     qRegisterMetaType<OST::MsgLevel>("MsgLevel");
+    if (order == "") qDebug() << "*** PropertyBase order ko *** "  << label << key << level1 << level2;
 }
 PropertyBase::~PropertyBase()
 {
@@ -118,6 +119,14 @@ QString PropertyBase::getPostIcon2(void)
 void PropertyBase::setPostIcon2(QString s)
 {
     mPostIcon2 = s;
+}
+QString PropertyBase::getFreeValue(void)
+{
+    return mFreeValue;
+}
+void PropertyBase::setFreeValue(QString s)
+{
+    mFreeValue = s;
 }
 
 }

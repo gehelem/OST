@@ -137,7 +137,6 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
                                            );
             ImgData dta;
 
-
             if (pData.contains("urljpeg")) dta.mUrlJpeg = pData["urljpeg"].toString();
             if (pData.contains("urlfits")) dta.mUrlFits = pData["urlfits"].toString();
             if (pData.contains("urloverlay")) dta.mUrlOverlay = pData["urloverlay"].toString();
@@ -155,6 +154,7 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
             if (pData.contains("solverde")) dta.solverDE = pData["solverde"].toDouble();
 
             pElement->setValue(dta, false);
+            if (pData.contains("showstats")) pElement->setShowStats( pData["showstats"].toBool());
 
             return pElement;
         }
@@ -200,6 +200,42 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
             }
             if (pData.contains("value")) pElement->setPrgValue(pData["value"].toDouble(), false);
             if (pData.contains("dynlabel")) pElement->setDynLabel(pData["dynlabel"].toString(), false);
+            return pElement;
+        }
+        if (pData["type"].toString() == "date")
+        {
+            auto *pElement = new ElementDate(pData["label"].toString(),
+                                             pData["order"].toString(),
+                                             pData["hint"].toString()
+                                            );
+            QDate d;
+            d.setDate(pData["year"].toInt(), pData["month"].toInt(), pData["day"].toInt());
+            if (pData.contains("autoupdate")) pElement->setAutoUpdate(pData["autoupdate"].toBool());
+            if (pData.contains("directedit")) pElement->setDirectEdit(pData["directedit"].toBool());
+            if (pData.contains("badge")) pElement->setBadge(pData["badge"].toBool());
+            pElement->setValue(d, false);
+            return pElement;
+        }
+        if (pData["type"].toString() == "time")
+        {
+            auto *pElement = new ElementTime(pData["label"].toString(),
+                                             pData["order"].toString(),
+                                             pData["hint"].toString()
+                                            );
+            QTime t;
+            if (pData.contains("autoupdate")) pElement->setAutoUpdate(pData["autoupdate"].toBool());
+            if (pData.contains("directedit")) pElement->setDirectEdit(pData["directedit"].toBool());
+            if (pData.contains("badge")) pElement->setBadge(pData["badge"].toBool());
+            if (pData.contains("usems")) pElement->setUseMs(pData["usems"].toBool());
+            if (pElement->getUseMs())
+            {
+                t.setHMS(pData["hh"].toInt(), pData["mm"].toInt(), pData["ss"].toInt(), pData["ms"].toInt());
+            }
+            else
+            {
+                t.setHMS(pData["hh"].toInt(), pData["mm"].toInt(), pData["ss"].toInt(), 0);
+            }
+            pElement->setValue(t, false);
             return pElement;
         }
 
@@ -267,6 +303,18 @@ ValueBase *ValueFactory::createValue(ElementBase * &pElement)
     if (pElement->getType() == "light")
     {
         auto *pValue = new ValueLight(pElement);
+        pValue->updateValue();
+        return pValue;
+    }
+    if (pElement->getType() == "date")
+    {
+        auto *pValue = new ValueDate(pElement);
+        pValue->updateValue();
+        return pValue;
+    }
+    if (pElement->getType() == "time")
+    {
+        auto *pValue = new ValueTime(pElement);
         pValue->updateValue();
         return pValue;
     }

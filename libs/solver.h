@@ -25,6 +25,11 @@ class Solver : public QObject
         int HFRZones = 1; /* default 1 : 1x1 - 2: 2x2 - 3: 3x3 ... */
         QList<float> HFRavgZone;
         QList<int> HFRavgCount;
+        QList<float> thetaAvgZone;
+        QList<float> thetaDevAvgZone; // theta deviation
+        QList<float> aAxeAvgZone;
+        QList<float> bAxeAvgZone;
+        QList<float> eAxeAvgZone; // a/b
         void ResetSolver(FITSImage::Statistic &stats, uint8_t *m_ImageBuffer);
         void ResetSolver(FITSImage::Statistic &stats, uint8_t *m_ImageBuffer, int zones);
         void FindStars(Parameters param);

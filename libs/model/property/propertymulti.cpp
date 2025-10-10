@@ -89,7 +89,15 @@ void PropertyMulti::setGridLimit(int limit)
     if (limit > 0)
     {
         if (limit < mGridLimit) clearGrid();
-        mGridLimit = limit;
+        if (limit > 5000 )
+        {
+            sendWarning("gridLimit max size is 5000 " + this->label());
+            mGridLimit = 5000;
+        }
+        else
+        {
+            mGridLimit = limit;
+        }
     }
 }
 bool PropertyMulti::hasGraph()
@@ -121,6 +129,23 @@ bool  PropertyMulti::setElt(QString key, QVariant val)
         getElt(key)->accept(&vu, m);
         return true;
     }
+    if (mElts[key]->getType() == "time")
+    {
+        ElementUpdate vu;
+        QVariantMap m;
+        m["value"] = val.toMap();
+        getElt(key)->accept(&vu, m);
+        return true;
+    }
+    if (mElts[key]->getType() == "date")
+    {
+        ElementUpdate vu;
+        QVariantMap m;
+        m["value"] = val.toMap();
+        getElt(key)->accept(&vu, m);
+        return true;
+    }
+
     if ((mElts[key]->getType() == "bool") && (val.canConvert<bool>()) )
     {
         ElementUpdate vu;
@@ -149,7 +174,7 @@ bool  PropertyMulti::setElt(QString key, QVariant val)
                     return true;
 
                 }
-                sendError("PropertyMulti::setValue - " + key + " - OneOfMany - can't just unset");
+                sendWarning("PropertyMulti::setValue - " + key + " - OneOfMany - can't just unset");
                 return false;
                 break;
             case AtMostOne:
@@ -170,6 +195,11 @@ bool  PropertyMulti::setElt(QString key, QVariant val)
                 return false;
                 break;
         }
+    }
+    if ((mElts[key]->getType() == "prg") || (mElts[key]->getType() == "img") || (mElts[key]->getType() == "video") )
+    {
+        // prg/img/video can't be updated via frontend
+        return true;
     }
     sendError("PropertyMulti::setValue - " + key + " - can't update, unhandled type : "
               + mElts[key]->getType() + "(" + val.toString() + ")");
@@ -403,6 +433,43 @@ void PropertyMulti::setGraphDefs(GraphDefs defs)
             }
             mHasGraph = true;
             break;
+        case SXY:
+            if (!defs.params.contains("S"))
+            {
+                qDebug() << "SXY graph definition error : param should contain S binding";
+                return;
+            }
+            if (!defs.params.contains("X"))
+            {
+                qDebug() << "SXY graph definition error : param should contain X binding";
+                return;
+            }
+            if (!defs.params.contains("Y"))
+            {
+                qDebug() << "SXY graph definition error : param should contain Y binding";
+                return;
+            }
+            mHasGraph = true;
+            break;
+        case SDY:
+            if (!defs.params.contains("S"))
+            {
+                qDebug() << "SDY graph definition error : param should contain S binding";
+                return;
+            }
+            if (!defs.params.contains("D"))
+            {
+                qDebug() << "SDY graph definition error : param should contain D binding";
+                return;
+            }
+            if (!defs.params.contains("Y"))
+            {
+                qDebug() << "SDY graph definition error : param should contain Y binding";
+                return;
+            }
+            mHasGraph = true;
+            break;
+
         default:
             qDebug() << "setGraphDefs unknown graph def";
             mGraphDefs.params = QVariantMap();

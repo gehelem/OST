@@ -10,6 +10,8 @@
 #include <elementvideo.h>
 #include <elementmessage.h>
 #include <elementprg.h>
+#include <elementdate.h>
+#include <elementtime.h>
 
 namespace  OST
 {
@@ -73,6 +75,18 @@ class ElementUpdate : public ElementVisitor
         }
         void visit(ElementPrg* pElement, QVariantMap &data ) override;
         void visit(ElementPrg* pElement, QString &action, QVariantMap &data) override;
+        void visit(ElementDate* pElement) override
+        {
+            Q_UNUSED(pElement)
+        }
+        void visit(ElementDate* pElement, QVariantMap &data ) override;
+        void visit(ElementDate* pElement, QString &action, QVariantMap &data) override;
+        void visit(ElementTime* pElement) override
+        {
+            Q_UNUSED(pElement)
+        }
+        void visit(ElementTime* pElement, QVariantMap &data ) override;
+        void visit(ElementTime* pElement, QString &action, QVariantMap &data) override;
 
         [[nodiscard]] const QVariantList &getGrid() const
         {

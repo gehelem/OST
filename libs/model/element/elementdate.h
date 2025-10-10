@@ -1,12 +1,12 @@
-#ifndef ELEMENTIMG_h
-#define ELEMENTIMG_h
+#ifndef ELEMENTDATE_h
+#define ELEMENTDATE_h
 
 #include <elementtemplate.h>
 
 namespace  OST
 {
 
-class ElementImg: public ElementTemplateNotNumeric<ImgData>
+class ElementDate: public ElementTemplateNotNumeric<QDate>
 {
 
         Q_OBJECT
@@ -15,26 +15,28 @@ class ElementImg: public ElementTemplateNotNumeric<ImgData>
         void accept(ElementVisitor *pVisitor) override;
         void accept(ElementVisitor *pVisitor, QVariantMap &data) override;
         void accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data) override;
-        ElementImg(const QString &label, const QString &order, const QString &hint);
-        ~ElementImg();
+
+        ElementDate(const QString &label, const QString &order, const QString &hint);
+        ~ElementDate();
         QString getType() override;
-        bool getShowStats(void);
-        void setShowStats(bool b);
+
     private:
-        bool mShowStats = true;
+
 };
 
-class ValueImg: public ValueTemplate<ImgData>
+class ValueDate: public ValueTemplate<QDate>
 {
         Q_OBJECT
 
     public:
+
         void accept(ValueVisitor* pVisitor)  override;
-        ValueImg(ElementBase* element): ValueTemplate<ImgData>(element) {}
-        ~ValueImg() {}
+        ValueDate(ElementBase* element): ValueTemplate<QDate>(element) {}
+        ~ValueDate() {}
         void updateValue() override;
         void updateElement(const bool &emitEvent) override;
 
 };
+
 }
 #endif

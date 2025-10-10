@@ -88,6 +88,13 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     defineMeAsSequencer();
     defineMeAsNavigator();
 
+    getProperty("timesRWgrid")->push();
+    getProperty("timesRWgrid")->push();
+    getProperty("datesRWgrid")->push();
+    getProperty("datesRWgrid")->push();
+
+    connect(this, &Dummy::newImage, this, &Dummy::OnNewImage);
+
 }
 
 Dummy::~Dummy()
@@ -109,17 +116,16 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
             }
             foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
             {
-                //setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
                 if (keyprop == "dynprop")
                 {
                     if (keyelt == "dyntext")
                     {
 
-                        dyntext->setValue(eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toString(), true);
+                        dyntext->setValue(eventData[keyprop].toMap()["elements"].toMap()[keyelt].toString(), true);
                     }
                     if (keyelt == "dynbool")
                     {
-                        bool val = eventData["dynprop"].toMap()["elements"].toMap()["dynbool"].toMap()["value"].toBool();
+                        bool val = eventData["dynprop"].toMap()["elements"].toMap()["dynbool"].toBool();
                         if (val)
                         {
 
@@ -132,7 +138,10 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                 {
                     if (keyelt == "b1")
                     {
-                        //refreshDeviceslovs();
+                        // test max gridlimit
+                        getProperty("secondtestgrid")->clearGrid();
+                        getProperty("secondtestgrid")->setGridLimit(1010);
+                        //for ( int i = 0; i < 1010; i++)getProperty("secondtestgrid")->push();
                     }
                 }
                 if (keyprop == "devices")
@@ -140,7 +149,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                     if (keyelt == "camera")
                     {
                         if (getEltString(keyprop, keyelt)->setValue(
-                                    eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toString(), false))
+                                    eventData[keyprop].toMap()["elements"].toMap()[keyelt].toString(), false))
                         {
                             getProperty(keyprop)->setState(OST::Ok);
                             _camera = getString("devices", "camera");
@@ -173,6 +182,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                             {
                                 sendModNewNumber(_camera, "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );
                             }
+                            setFocalLengthAndDiameter();
                             if (!requestCapture(_camera, getFloat("parms", "exposure"), getInt("parms", "gain"), getInt("parms", "offset")))
                             {
                                 getProperty(keyprop)->setState(OST::Error);
@@ -301,9 +311,13 @@ void Dummy::newBLOB(INDI::PropertyBlob pblob)
         OST::ImgData dta = _image->ImgStats();
         dta.mUrlJpeg = getModuleName() + QString(pblob.getDeviceName()) + ".jpeg";
         dta.mUrlFits = getModuleName() + QString(pblob.getDeviceName()) + ".FITS";
+        dta.mAlternates.clear();
+        dta.mAlternates.append(getModuleName() + QString(pblob.getDeviceName()) + ".jpeg");
+        dta.mAlternates.append(getModuleName() + QString(pblob.getDeviceName()) + ".jpeg");
         dta.isSolved = false;
         getEltImg("testimage", "image1")->setValue(dta, true);
 
+        emit newImage();
     }
     getProperty("actions2")->setState(OST::Ok);
     getProperty("testimage")->push();
@@ -334,8 +348,41 @@ void Dummy::OnSucessSEP()
     disconnect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
 
 }
+void Dummy::OnNewImage()
+{
+    sendMessage("New image");
+
+    double ra, dec;
+    if (
+        !getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "DEC", dec)
+        || !getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "RA", ra)
+    )
+    {
+        sendMessage("Can't find mount device " + getString("devices", "mount") + " solve aborted");
+    }
+    else
+    {
+
+        //stats = _image->getStats();
+        //_solver.ResetSolver(stats, _image->getImageBuffer());
+        //QStringList folders;
+        //folders.append(getString("parameters", "indexfolderpath"));
+        //_solver.stellarSolver.setIndexFolderPaths(folders);
+        //connect(&_solver, &Solver::successSolve, this, &Dummy::OnSucessSolve);
+        //connect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
+        //_solver.stellarSolver.setSearchPositionInDegrees(ra * 360 / 24, dec);
+        //_solver.SolveStars(_solver.stellarSolverProfiles[0]);
+    }
+}
+
+void Dummy::OnSolveFinished()
+{
+    sendMessage("Solver finished");
+}
 void Dummy::OnSucessSolve()
 {
+    sendMessage("Solver sucess");
+
     if (_solver.stellarSolver.failed())
     {
         sendMessage("Solver failed");
@@ -354,17 +401,15 @@ void Dummy::OnSucessSolve()
         dta.solverRA = _solver.stellarSolver.getSolution().ra;
         dta.solverDE = _solver.stellarSolver.getSolution().dec;
         getEltImg("testimage", "image1")->setValue(dta, true);
-
-
-
     }
     disconnect(&_solver, &Solver::successSolve, this, &Dummy::OnSucessSolve);
     disconnect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
 
 }
-void Dummy::OnSolverLog(QString &text)
+void Dummy::OnSolverLog(QString text)
 {
-    sendMessage(text);
+    //sendMessage(text);
+    qDebug() << text;
 }
 void Dummy::updateSearchList(void)
 {

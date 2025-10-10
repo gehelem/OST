@@ -104,6 +104,7 @@ class fileio : public QObject
             return m_HistogramFrequency[channel];
         }
         OST::ImgData ImgStats();
+        void generateQImage();
 
     private:
         QString file;
@@ -121,7 +122,6 @@ class fileio : public QObject
 
         QImage rawImage;
         void CalcStats(int size);
-        void generateQImage();
 
         template <typename T>
         QPair<T, T> getParitionMinMax(uint32_t start, uint32_t stride);

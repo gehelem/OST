@@ -1,12 +1,12 @@
-#ifndef ELEMENTIMG_h
-#define ELEMENTIMG_h
+#ifndef ELEMENTTIME_h
+#define ELEMENTTIME_h
 
 #include <elementtemplate.h>
 
 namespace  OST
 {
 
-class ElementImg: public ElementTemplateNotNumeric<ImgData>
+class ElementTime: public ElementTemplateNotNumeric<QTime>
 {
 
         Q_OBJECT
@@ -15,26 +15,31 @@ class ElementImg: public ElementTemplateNotNumeric<ImgData>
         void accept(ElementVisitor *pVisitor) override;
         void accept(ElementVisitor *pVisitor, QVariantMap &data) override;
         void accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data) override;
-        ElementImg(const QString &label, const QString &order, const QString &hint);
-        ~ElementImg();
+
+        ElementTime(const QString &label, const QString &order, const QString &hint);
+        ~ElementTime();
         QString getType() override;
-        bool getShowStats(void);
-        void setShowStats(bool b);
+        void setUseMs(bool b);
+        bool getUseMs(void);
+
     private:
-        bool mShowStats = true;
+        bool mUseMs = false;
+
 };
 
-class ValueImg: public ValueTemplate<ImgData>
+class ValueTime: public ValueTemplate<QTime>
 {
         Q_OBJECT
 
     public:
+
         void accept(ValueVisitor* pVisitor)  override;
-        ValueImg(ElementBase* element): ValueTemplate<ImgData>(element) {}
-        ~ValueImg() {}
+        ValueTime(ElementBase* element): ValueTemplate<QTime>(element) {}
+        ~ValueTime() {}
         void updateValue() override;
         void updateElement(const bool &emitEvent) override;
 
 };
+
 }
 #endif

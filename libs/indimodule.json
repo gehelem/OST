@@ -12,16 +12,19 @@
             "hash": {
                 "type": "string",
                 "label": "Hash",
+                "order":"00",
                 "value":"xxx"
             },
             "date": {
                 "type": "string",
                 "label": "Date",
+                "order":"01",
                 "value":"xxx"
             },
             "message": {
                 "type": "string",
                 "label": "Commit message",
+                "order":"02",
                 "value":"xxx"
             }
         }
@@ -37,11 +40,15 @@
             "host": {
                 "type": "string",
                 "label": "Host",
+                "order":"00",
+                "autoupdate":true,
                 "value": "localhost"
             },
             "port": {
                 "type": "int",
                 "label": "Port",
+                "order":"01",
+                "autoupdate":true,
                 "value": 7624
             }
 
@@ -57,13 +64,15 @@
         "elements": {
             "conserv": {
                 "type": "bool",
-                "label": "Connect"
-                ,"value":false
+                "label": "Connect",
+                "order":"00",
+                "value":false
             },
             "disconserv": {
                 "type": "bool",
-                "label": "Disconnect"
-                ,"value":false
+                "label": "Disconnect",
+                "order":"01",
+                "value":false
             }
         }
     },
@@ -71,7 +80,7 @@
         "hasprofile":true,
         "devcat": "Parameters",
         "group": "",
-        "order":"06",
+        "order":"222Parms222",
         "permission": 2,
         "label": "Devices",
         "elements": {
@@ -87,18 +96,21 @@
         "elements": {
             "condevs": {
                 "type": "bool",
-                "label": "Connect"
-                ,"value":false
+                "label": "Connect",
+                "order":"01",
+                "value":false
             },
             "discondevs": {
                 "type": "bool",
-                "label": "Disconnect"
-                ,"value":false
+                "label": "Disconnect",
+                "order":"02",
+                "value":false
             },
             "loadconfs": {
                 "type": "bool",
-                "label": "Load devices conf"
-                ,"value":false
+                "label": "Load devices conf",
+                "order":"03",
+                "value":false
             }
 
         }
@@ -115,26 +127,32 @@
         "elements": {
             "indiatstart": {
                 "type": "bool",
-                "label": "Connect indi"
-                ,"value":false
+                "autoupdate":true,
+                "label": "Connect indi",
+                "order":"00",
+                "value":true
             },
             "devatstart": {
                 "type": "bool",
-                "label": "Connect devices"
-                ,"value":false
+                "autoupdate":true,
+                "label": "Connect devices",
+                "order":"01",
+                "value":true
             },
             "confsatstart": {
                 "type": "bool",
-                "label": "Load devices conf"
-                ,"value":false
+                "autoupdate":true,
+                "label": "Load devices conf",
+                "order":"02",
+                "value":true
             }
 
         }
     },
     "actions": {
         "devcat": "Control",
-        "order":"Control000",
         "group": "",
+        "order":"000Control111",
         "permission": 2,
         "rule":1,
         "label": "Actions",
@@ -144,6 +162,7 @@
     "parms": {
         "devcat": "Parameters",
         "group": "",
+        "order":"222Parms111",
         "permission": 2,
         "hasprofile":true,
         "label": "Parameters",

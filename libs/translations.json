@@ -169,7 +169,7 @@
     },
     "Corner size (pixels)": {
         "en": "Corner size (pixels)",
-        "fr": "Tailldu coin (pixels)"
+        "fr": "Taille du coin (pixels)"
     },
     "Corners": {
         "en": "Corners",
@@ -419,9 +419,9 @@
         "en": "Keep x values",
         "fr": "Garder x valeurs"
     },
-    "Kheogram": {
-        "en": "Kheogram",
-        "fr": "Kheogramme"
+    "Keogram": {
+        "en": "Keogram",
+        "fr": "Keogramme"
     },
     "Ki": {
         "en": "Ki",
@@ -477,7 +477,7 @@
     },
     "Main Control": {
         "en": "Main Control",
-        "fr": "Contrôle principale"
+        "fr": "Contrôle principal"
     },
     "Max pulse (ms)": {
         "en": "Max pulse (ms)",
@@ -790,6 +790,269 @@
     "time": {
         "en": "time",
         "fr": "heure"
+    },
+    "Append existing sequence": {
+        "en": "Append existing sequence",
+        "fr": "Ajouter à la séquence existante"
+    },
+    "Create new sequence": {
+        "en": "Create new sequence",
+        "fr": "Créer une nouvelle séquence"
+    },
+    "Dark assistant module": {
+        "en": "Dark assistant module",
+        "fr": "Assistant dark"
+    },
+    "Delay (s)": {
+        "en": "Delay (s)",
+        "fr": "Délai (s)"
+    },
+    "Exposure (s)": {
+        "en": "Exposure (s)",
+        "fr": "Exposition (s)"
+    },
+    "Generate": {
+        "en": "Generate",
+        "fr": "Générer"
+    },
+    "Reset existing sequence": {
+        "en": "Reset existing sequence",
+        "fr": "Vider la séquence existante"
+    },
+    "Selected exposures": {
+        "en": "Selected exposures",
+        "fr": "Durées sélectionnées"
+    },
+    "Selected gains": {
+        "en": "Selected gains",
+        "fr": "Gains sélectionnés"
+    },
+    "Selected offsets": {
+        "en": "Selected offsets",
+        "fr": "Offset sélectionnés"
+    },
+    "Selected temperatures": {
+        "en": "Selected temperatures",
+        "fr": "Températures sélectionnées"
+    },
+    "State": {
+        "en": "State",
+        "fr": "Etat"
+    },
+    "Temperature": {
+        "en": "Temperature",
+        "fr": "Température"
+    },
+    "Change exposure or gain": {
+        "en": "Change exposure or gain",
+        "fr": "Exposition ou gain"
+    },
+    "DE 0": {
+        "en": "DE 0",
+        "fr": "DE 0"
+    },
+    "DE 1": {
+        "en": "DE 1",
+        "fr": "DE 1"
+    },
+    "DE 2": {
+        "en": "DE 2",
+        "fr": "DE 2"
+    },
+    "Device - Property - Element": {
+        "en": "Device - Property - Element",
+        "fr": "Dispositif - Propriété - Element"
+    },
+    "Device - Property - Element (id)": {
+        "en": "Device - Property - Element (id)",
+        "fr": "Dispositif - Propriété - Element (id)"
+    },
+    "Device - Property - Element (label)": {
+        "en": "Device - Property - Element (label)",
+        "fr": "Dispositif - Propriété - Element (libellé)"
+    },
+    "Dynamic exposure/gain": {
+        "en": "Dynamic exposure/gain",
+        "fr": "Exposition/gain dynamique"
+    },
+    "Enable": {
+        "en": "Enable",
+        "fr": "Activer"
+    },
+    "Maximum value": {
+        "en": "Maximum value",
+        "fr": "Valeur maximum"
+    },
+    "Measure parm": {
+        "en": "Measure parm",
+        "fr": "Mesure"
+    },
+    "Minimum value": {
+        "en": "Minimum value",
+        "fr": "Valeur mininum"
+    },
+    "RA 0": {
+        "en": "RA 0",
+        "fr": "RA 0"
+    },
+    "RA 1": {
+        "en": "RA 1",
+        "fr": "RA 1"
+    },
+    "RA 2": {
+        "en": "RA 2",
+        "fr": "RA 2"
+    },
+    "Target value": {
+        "en": "Target value",
+        "fr": "Valeur cible"
+    },
+    "Threshold (%)": {
+        "en": "Threshold (%)",
+        "fr": "Seuil (%)"
+    },
+    "Archives": {
+        "en": "Archives",
+        "fr": "Archives"
+    },
+    "Telescope Simulator": {
+        "en": "Telescope Simulator",
+        "fr": "Simulateur de téléscope"
+    },
+    "Daily schedule": {
+        "en": "Daily schedule",
+        "fr": "Programmation journalière"
+    },
+    "End at": {
+        "en": "End at",
+        "fr": "Fin à"
+    },
+    "Events to come": {
+        "en": "Events to come",
+        "fr": "Evènements à venir"
+    },
+    "GPS": {
+        "en": "GPS",
+        "fr": "GPS"
+    },
+    "GPS Simulator": {
+        "en": "GPS Simulator",
+        "fr": "Simulateur de GPS"
+    },
+    "Next sunrise": {
+        "en": "Next sunrise",
+        "fr": "Prochain lever de Soleil"
+    },
+    "Next sunset": {
+        "en": "Next sunset",
+        "fr": "Prochain coucher de Soleil"
+    },
+    "Schedule": {
+        "en": "Schedule",
+        "fr": "Programmation"
+    },
+    "Start at": {
+        "en": "Start at",
+        "fr": "Début à"
+    },
+    "Sunrise schedule": {
+        "en": "Sunrise schedule",
+        "fr": "Programmation sur le Soleil"
+    },
+    "Add GPS localization": {
+        "en": "Add GPS localization",
+        "fr": "Ajouter position GPS"
+    },
+    "Date (UTC)": {
+        "en": "Date (UTC)",
+        "fr": "Date (UTC)"
+    },
+    "Elevation": {
+        "en": "Elevation",
+        "fr": "Elevation"
+    },
+    "GPS localization": {
+        "en": "GPS localization",
+        "fr": "Position GPS"
+    },
+    "Latitude": {
+        "en": "Latitude",
+        "fr": "Latitude"
+    },
+    "Longitude": {
+        "en": "Longitude",
+        "fr": "Longitude"
+    },
+    "Position": {
+        "en": "Position",
+        "fr": "Position"
+    },
+    "Time (UTC)": {
+        "en": "Time (UTC)",
+        "fr": "Heure (UTC)"
+    },
+    "Fixed time": {
+        "en": "Fixed time",
+        "fr": "Heures fixes"
+    },
+    "Keep indiviual images in archives": {
+        "en": "Keep indiviual images in archives",
+        "fr": "Garder les images individuelles"
+    },
+    "Manual": {
+        "en": "Manual",
+        "fr": "Manuel"
+    },
+    "Pause": {
+        "en": "Pause",
+        "fr": "Pause"
+    },
+    "Play": {
+        "en": "Play",
+        "fr": "Activer"
+    },
+    "Schedule type": {
+        "en": "Schedule type",
+        "fr": "Type de programmation"
+    },
+    "Stack": {
+        "en": "Stack",
+        "fr": "Empilement"
+    },
+    "Stop": {
+        "en": "Stop",
+        "fr": "Stop"
+    },
+    "Sunset": {
+        "en": "Sunset",
+        "fr": "Crépuscule"
+    },
+    "Corners map": {
+        "en": "Corners map",
+        "fr": "Bordures"
+    },
+    "HFR map": {
+        "en": "HFR map",
+        "fr": "Carte HFR"
+    },
+    "Object": {
+        "en": "Object",
+        "fr": "Objet"
+    },
+    "Reload": {
+        "en": "Reload",
+        "fr": "Recharger"
+    },
+    "Select a file to reload": {
+        "en": "Select a file to reload",
+        "fr": "Fichier à recharger"
+    },
+    "Shape map": {
+        "en": "Shape map",
+        "fr": "Carte des déformations"
+    },
+    "Zoning parameters": {
+        "en": "Zoning parameters",
+        "fr": "Nombre de zones"
     }
-
 }

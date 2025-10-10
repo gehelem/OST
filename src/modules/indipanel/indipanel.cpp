@@ -31,11 +31,11 @@ void IndiPanel::newDevice(INDI::BaseDevice dp)
         QString devpro = dev + pro;
         //BOOST_LOG_TRIVIAL(debug) << "Indipanel new property " << devpro.toStdString();
         QString mess;
-        if (!createOstProperty(devpro, pProperty.getLabel(), pProperty.getPermission(), pProperty.getDeviceName(),
-                               pProperty.getGroupName()))
-        {
-            sendMessage("Indipanel can't create property ");
-        }
+        OST::PropertyMulti *pm = new OST::PropertyMulti(devpro, pProperty.getLabel(),
+                OST::IntToPermission(pProperty.getPermission()),
+                pProperty.getDeviceName(),
+                pProperty.getGroupName(), "00", false, false);
+        createProperty(devpro, pm);
     }
 }
 void IndiPanel::removeDevice(INDI::BaseDevice dp)
@@ -61,8 +61,8 @@ void IndiPanel::newProperty(INDI::Property pProperty)
     OST::PropertyMulti* p = new OST::PropertyMulti(devpro, pProperty.getLabel(),
             OST::IntToPermission(pProperty.getPermission()),
             pProperty.getDeviceName(),
-            pProperty.getGroupName(), "", false, false);
-
+            pProperty.getGroupName(), "00", false, false);
+    p->setFreeValue(dev); // we keep original device name to avoid unwanted level1 device translations
 
     switch (pProperty.getType())
     {
@@ -101,7 +101,7 @@ void IndiPanel::newProperty(INDI::Property pProperty)
             {
                 OST::ElementBool* v = new OST::ElementBool(s[i].label, QString(i), s[i].label);
                 if (s[i].s == 0) v->setValue(false, false);
-                if (s[i].s == 1) v->setValue(false, true);
+                if (s[i].s == 1) v->setValue(true, true);
                 p->addElt(s[i].getName(), v);
             }
             p->setRule(OST::IntToRule(s.getRule()));
@@ -247,8 +247,9 @@ void IndiPanel::OnMyExternalEvent(const QString &eventType, const QString  &even
         QString prop = keyprop;
         QVariantMap ostprop = m[keyprop].toMap();
         QString devcat = ostprop["level1"].toString();
+        QString realDevice = getStore()[keyprop]->getFreeValue();
         //BOOST_LOG_TRIVIAL(debug) << "DEVCAT - recv : "  << devcat.toStdString();
-        prop.replace(devcat, "");
+        prop.replace(realDevice, "");
         if (!(devcat == "Indi"))
         {
             foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
@@ -260,19 +261,22 @@ void IndiPanel::OnMyExternalEvent(const QString &eventType, const QString  &even
                 }
                 if (getStore()[keyprop]->getElt(keyelt)->getType() == "string")
                 {
-                    sendModNewText(devcat, prop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toString());
+                    sendModNewText(realDevice, prop, keyelt,
+                                   eventData[keyprop].toMap()["elements"].toMap()[keyelt].toString());
                 }
                 if (getStore()[keyprop]->getElt(keyelt)->getType() == "int"
                         || getStore()[keyprop]->getElt(keyelt)->getType() == "float")
                 {
-                    sendModNewNumber(devcat, prop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toFloat());
+                    sendModNewNumber(realDevice, prop, keyelt,
+                                     eventData[keyprop].toMap()["elements"].toMap()[keyelt].toFloat());
                 }
                 if (getStore()[keyprop]->getElt(keyelt)->getType() == "bool")
                 {
+                    qDebug() << "bool" << keyprop << keyelt << eventData[keyprop].toMap()["elements"].toMap()[keyelt];
                     keyelt.toStdString();
-                    if ( eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toBool()) sendModNewSwitch(devcat, prop,
+                    if ( eventData[keyprop].toMap()["elements"].toMap()[keyelt].toBool()) sendModNewSwitch(realDevice, prop,
                                 keyelt, ISS_ON);
-                    if (!eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toBool()) sendModNewSwitch(devcat, prop,
+                    if (!eventData[keyprop].toMap()["elements"].toMap()[keyelt].toBool()) sendModNewSwitch(realDevice, prop,
                                 keyelt, ISS_OFF);
                 }
             }

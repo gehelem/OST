@@ -45,6 +45,8 @@ class Datastore : public Baseroot
         OST::ElementVideo* getEltVideo(QString pProperty, QString pElement);
         OST::ElementPrg* getEltPrg(QString pProperty, QString pElement);
         OST::ElementMessage* getEltMsg(QString pProperty, QString pElement);
+        OST::ElementDate* getEltDate(QString pProperty, QString pElement);
+        OST::ElementTime* getEltTime(QString pProperty, QString pElement);
 
         QString getString(QString pProperty, QString pElement);
         QString getString(QString pProperty, QString pElement, long line);
@@ -54,6 +56,10 @@ class Datastore : public Baseroot
         double getFloat(QString pProperty, QString pElement, long line);
         bool getBool(QString pProperty, QString pElement);
         bool getBool(QString pProperty, QString pElement, long line);
+        QDate getDate(QString pProperty, QString pElement);
+        QDate getDate(QString pProperty, QString pElement, long line);
+        QTime getTime(QString pProperty, QString pElement);
+        QTime getTime(QString pProperty, QString pElement, long line);
         QMap<QString, OST::PropertyMulti*> getStore(void)
         {
             return mStore;
@@ -80,8 +86,9 @@ class Datastore : public Baseroot
          * @note it's only a label associated to a property, without any hierarchical effect
          * @return A boolean that reports whether it was successful, true means success.
          */
-        bool createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel, const int &pPropertyPermission,
-                               const  QString &pPropertyDevcat, const QString &pPropertyGroup);
+        Q_DECL_DEPRECATED bool createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel,
+                const int &pPropertyPermission,
+                const  QString &pPropertyDevcat, const QString &pPropertyGroup);
         void emitPropertyCreation(const QString &pPropertyName);
         bool createProperty(const QString &pPropertyName,  OST::PropertyMulti* pProperty)
         {

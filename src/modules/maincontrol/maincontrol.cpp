@@ -33,7 +33,6 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
 {
     Q_UNUSED(pEventType);
     Q_UNUSED(pEventKey);
-    //sendMessage("mainctl OnMyExternalEvent - recv : " + getModuleName() + "-" + pEventType + "-" + pEventKey);
 
     if (getModuleName() == pEventModule)
     {
@@ -78,7 +77,7 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                 if (keyelt == "name" && keyprop == "loadconf" && pEventType == "Fsetproperty")
                 {
 
-                    QString val = pEventData[keyprop].toMap()["elements"].toMap()["name"].toMap()["value"].toString();
+                    QString val = pEventData[keyprop].toMap()["elements"].toMap()["name"].toString();
                     getEltString("loadconf", "name")->setValue(val, true);
                     getEltString("saveconf", "name")->setValue(val, true);
                 }
@@ -147,13 +146,13 @@ void Maincontrol::setAvailableModuleLibs(const QVariantMap libs)
 {
 
     OST::PropertyMulti *dynprop = new OST::PropertyMulti("load", "Available modules", OST::Permission::ReadWrite,
-            "Available modules",
-            "", "", false, false);
+            "Modules",
+            "", "00", false, false);
     foreach(QString key, libs.keys())
     {
         QVariantMap info = libs[key].toMap()["elements"].toMap();
         QString lab = info["moduleDescription"].toMap()["value"].toString();
-        OST::ElementString* dyntext = new OST::ElementString(lab, "", "");
+        OST::ElementString* dyntext = new OST::ElementString(lab, lab, "");
         QString ss = key.replace("libost", "");
         ss.replace(0, 1, ss.at(0).toUpper());
         dyntext->setValue(ss, false);
@@ -235,7 +234,7 @@ void Maincontrol::setIndiDriverList(const QStringList pDrivers)
     OST::PropertyMulti *dynprop2 = new OST::PropertyMulti("indidrivers", "Available indi drivers", OST::Permission::ReadWrite,
             "Indi server",
             "", "1", false, true);
-    OST::ElementString* dyntext = new OST::ElementString("Search", "", "");
+    OST::ElementString* dyntext = new OST::ElementString("Search", "20", "");
     dyntext->setValue("*", false);
     dyntext->setAutoUpdate(true);
     dyntext->setDirectEdit(true);
@@ -244,7 +243,7 @@ void Maincontrol::setIndiDriverList(const QStringList pDrivers)
     dynprop2->setHasGrid(true);
     dynprop2->setShowGrid(true);
     dynprop2->setShowElts(true);
-    OST::ElementString* dyntext2 = new OST::ElementString("Indi driver", "", "");
+    OST::ElementString* dyntext2 = new OST::ElementString("Indi driver", "10", "");
     dyntext2->setValue("", false);
     dyntext2->setAutoUpdate(true);
     dyntext2->setDirectEdit(true);
