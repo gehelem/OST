@@ -41,12 +41,14 @@
                 "type": "string",
                 "label": "Host",
                 "order":"00",
+                "autoupdate":true,
                 "value": "localhost"
             },
             "port": {
                 "type": "int",
                 "label": "Port",
                 "order":"01",
+                "autoupdate":true,
                 "value": 7624
             }
 
