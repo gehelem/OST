@@ -739,58 +739,47 @@ void IndiModule::OnAfterIndiConnectIndiTimer()
 }
 bool IndiModule::refreshDeviceslovs(QString deviceName)
 {
-    if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
-            INDI::BaseDevice::DRIVER_INTERFACE::GENERAL_INTERFACE)
-    {
-        QString d = getDevice(deviceName.toStdString().c_str()).getDeviceName();
-        getGlovString("DRIVER_INTERFACE-GENERAL_INTERFACE")->lovAdd(d, d);
-    }
+    QString d = getDevice(deviceName.toStdString().c_str()).getDeviceName();
+    getGlovString("DRIVER_INTERFACE-GENERAL_INTERFACE")->lovAdd(d, d);
+
     if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
             INDI::BaseDevice::DRIVER_INTERFACE::CCD_INTERFACE)
     {
-        QString d = getDevice(deviceName.toStdString().c_str()).getDeviceName();
         getGlovString("DRIVER_INTERFACE-CCD_INTERFACE")->lovAdd(d, d);
     }
     if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
             INDI::BaseDevice::DRIVER_INTERFACE::TELESCOPE_INTERFACE)
     {
-        QString d = getDevice(deviceName.toStdString().c_str()).getDeviceName();
         getGlovString("DRIVER_INTERFACE-TELESCOPE_INTERFACE")->lovAdd(d, d);
     }
     if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
             INDI::BaseDevice::DRIVER_INTERFACE::GUIDER_INTERFACE)
     {
-        QString d = getDevice(deviceName.toStdString().c_str()).getDeviceName();
         getGlovString("DRIVER_INTERFACE-GUIDER_INTERFACE")->lovAdd(d, d);
     }
     if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
             INDI::BaseDevice::DRIVER_INTERFACE::FOCUSER_INTERFACE)
     {
-        QString d = getDevice(deviceName.toStdString().c_str()).getDeviceName();
         getGlovString("DRIVER_INTERFACE-FOCUSER_INTERFACE")->lovAdd(d, d);
     }
     if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
             INDI::BaseDevice::DRIVER_INTERFACE::FILTER_INTERFACE)
     {
-        QString d = getDevice(deviceName.toStdString().c_str()).getDeviceName();
         getGlovString("DRIVER_INTERFACE-FILTER_INTERFACE")->lovAdd(d, d);
     }
     if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
             INDI::BaseDevice::DRIVER_INTERFACE::GPS_INTERFACE)
     {
-        QString d = getDevice(deviceName.toStdString().c_str()).getDeviceName();
         getGlovString("DRIVER_INTERFACE-GPS_INTERFACE")->lovAdd(d, d);
     }
     if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
             INDI::BaseDevice::DRIVER_INTERFACE::WEATHER_INTERFACE)
     {
-        QString d = getDevice(deviceName.toStdString().c_str()).getDeviceName();
         getGlovString("DRIVER_INTERFACE-WEATHER_INTERFACE")->lovAdd(d, d);
     }
     if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
             INDI::BaseDevice::DRIVER_INTERFACE::AUX_INTERFACE)
     {
-        QString d = getDevice(deviceName.toStdString().c_str()).getDeviceName();
         getGlovString("DRIVER_INTERFACE-AUX_INTERFACE")->lovAdd(d, d);
     }
     return true;
