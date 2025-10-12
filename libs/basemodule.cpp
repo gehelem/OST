@@ -200,6 +200,32 @@ void Basemodule::setProfiles()
 void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
                                  const QVariantMap &pEventData)
 {
+    // Handle global lov updates from controller
+    if ( (pEventType == "globallovupdate") && (pEventModule == "*") )
+    {
+        // pEventKey contains the lov name (e.g., "loadedModules")
+        // pEventData contains the lov data with "values" list
+        if (!getGlobLovs().contains(pEventKey))
+        {
+            // Create the globallov if it doesn't exist
+            OST::LovString* newLov = new OST::LovString(pEventKey);
+            createGlobLov(pEventKey, newLov);
+        }
+
+        // Clear and repopulate the lov
+        OST::LovString* lov = getGlovString(pEventKey);
+        if (lov != nullptr)
+        {
+            lov->lovClear();
+            QVariantList values = pEventData["values"].toList();
+            for (const QVariant &item : values)
+            {
+                QVariantMap itemMap = item.toMap();
+                lov->lovAdd(itemMap["key"].toString(), itemMap["label"].toString());
+            }
+        }
+        return;
+    }
 
     if ( (pEventType == "Freadall") && ((pEventModule == "*") || (pEventModule == getModuleName())) )
     {

@@ -67,6 +67,7 @@ class Controller : public QObject
         void stopIndi(void);
         void startIndiDriver(const QString &pDriver);
         void stopIndiDriver(const QString &pDriver);
+        void updateGlobalModulesLov(void);
 
     private slots:
         void OnModuleEvent  (const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
