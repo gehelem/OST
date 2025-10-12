@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['ra_0',['ra',['../structcatalogResult.html#a661883bf690a70674ce44c60c63c80eb',1,'catalogResult::RA'],['../classfileio.html#a33bdfd996adab8b08d2a6eab8b7b6fb1',1,'fileio::ra']]],
+  ['ra_0',['ra',['../classfileio.html#a33bdfd996adab8b08d2a6eab8b7b6fb1',1,'fileio::ra'],['../structcatalogResult.html#a661883bf690a70674ce44c60c63c80eb',1,'catalogResult::RA']]],
   ['radians_1',['radians',['../classdms.html#a797e52a1128f524c4fbe54fcecd2510c',1,'dms']]],
   ['readme_2',['README',['../md_libs_2README.html',1,'']]],
   ['readme_2emd_3',['README.md',['../README_8md.html',1,'']]],
