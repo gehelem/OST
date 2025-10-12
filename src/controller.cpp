@@ -182,8 +182,8 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
             connect(othermodule, &Basemodule::moduleStatusAnswer, mod, &Basemodule::OnModuleStatusAnswer);
             connect(mod, &Basemodule::moduleStatusRequest, othermodule, &Basemodule::OnModuleStatusRequest);
             connect(mod, &Basemodule::moduleStatusAnswer, othermodule, &Basemodule::OnModuleStatusAnswer);
-            //connect(othermodule,&Basemodule::moduleEvent, mod,&Basemodule::OnExternalEvent);
-            //connect(mod,&Basemodule::moduleEvent, othermodule,&Basemodule::OnExternalEvent);
+            connect(othermodule, &Basemodule::moduleEvent, mod, &Basemodule::OnExternalEvent);
+            connect(mod, &Basemodule::moduleEvent, othermodule, &Basemodule::OnExternalEvent);
         }
     }
     QMap<QString, QString> l;
