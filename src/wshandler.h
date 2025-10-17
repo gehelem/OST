@@ -2,6 +2,8 @@
 #define WSHANDLER_h_
 #include "QtWebSockets/qwebsocketserver.h"
 #include "QtWebSockets/qwebsocket.h"
+#include <QSslCertificate>
+#include <QSslKey>
 
 QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
 QT_FORWARD_DECLARE_CLASS(QWebSocket)
@@ -14,7 +16,7 @@ class WShandler : public QObject
 {
         Q_OBJECT
     public:
-        WShandler(QObject *parent);
+        WShandler(QObject *parent, const QString &ssl = "N", const QString &sslCert = "", const QString &sslKey = "");
         ~WShandler();
     public :
         void processModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,

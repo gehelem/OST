@@ -44,6 +44,12 @@ int main(int argc, char *argv[])
     configurationOption.setDefaultValue("default");
     QCommandLineOption indiServerOption("indiserver", "Start embedded Indi server", "indiserver");
     indiServerOption.setDefaultValue("N");
+    QCommandLineOption sslOption("ssl", "Enable SSL for WebSocket server", "ssl");
+    sslOption.setDefaultValue("N");
+    QCommandLineOption sslCertOption("sslcert", "SSL certificate file path", "sslcert");
+    sslCertOption.setDefaultValue("/etc/ost/server.crt");
+    QCommandLineOption sslKeyOption("sslkey", "SSL private key file path", "sslkey");
+    sslKeyOption.setDefaultValue("/etc/ost/server.key");
     QCommandLineOption lngOption("lng", "Language (en-fr)", "lng");
     lngOption.setDefaultValue("fr");
 
@@ -53,6 +59,9 @@ int main(int argc, char *argv[])
     argParser.addOption(libPathOption);
     argParser.addOption(configurationOption);
     argParser.addOption(indiServerOption);
+    argParser.addOption(sslOption);
+    argParser.addOption(sslCertOption);
+    argParser.addOption(sslKeyOption);
     argParser.addOption(lngOption);
     argParser.process(app);
 
@@ -61,6 +70,9 @@ int main(int argc, char *argv[])
     QString libPath = argParser.value(libPathOption);
     QString conf = argParser.value(configurationOption);
     QString indiserver = argParser.value(indiServerOption);
+    QString ssl = argParser.value(sslOption);
+    QString sslCert = argParser.value(sslCertOption);
+    QString sslKey = argParser.value(sslKeyOption);
     QString lng = argParser.value(lngOption);
 
     sendMessage("Webroot               =" + webroot);
@@ -68,6 +80,12 @@ int main(int argc, char *argv[])
     sendMessage("Modules Library Path  =" + libPath);
     sendMessage("Load configuration    =" + conf);
     sendMessage("Embedded Indi server  =" + indiserver);
+    sendMessage("WebSocket SSL         =" + ssl);
+    if (ssl != "N")
+    {
+        sendMessage("SSL Certificate       =" + sslCert);
+        sendMessage("SSL Private Key       =" + sslKey);
+    }
     sendMessage("Language              =" + lng);
 
     Controller controller(
@@ -76,6 +94,9 @@ int main(int argc, char *argv[])
         libPath,
         conf,
         indiserver,
+        ssl,
+        sslCert,
+        sslKey,
         lng
     );
 

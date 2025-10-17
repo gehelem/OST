@@ -23,7 +23,8 @@ class Controller : public QObject
         Q_OBJECT
     public:
         Controller(const QString &webroot, const QString &dbpath,
-                   const QString &libpath, const QString &conf, const QString &indiserver, const QString &lng);
+                   const QString &libpath, const QString &conf, const QString &indiserver,
+                   const QString &ssl, const QString &sslCert, const QString &sslKey, const QString &lng);
         ~Controller() override;
     signals:
         void controllerEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
