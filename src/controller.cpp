@@ -37,7 +37,7 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
 {
 
     startPublish();
-    wshandler = new WShandler(this, ssl);
+    wshandler = new WShandler(this, ssl, sslCert, sslKey);
     connect(wshandler, &WShandler::externalEvent, this, &Controller::OnExternalEvent);
     dbmanager = new DBManager();
     dbmanager->dbInit(_dbpath, "controller");

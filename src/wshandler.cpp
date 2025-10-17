@@ -1,12 +1,14 @@
 #include <QCoreApplication>
 #include <QtCore>
+#include <QFile>
+#include <QSslConfiguration>
 #include "wshandler.h"
 
 /*!
 
  * ... ...
  */
-WShandler::WShandler(QObject *parent, const QString &ssl)
+WShandler::WShandler(QObject *parent, const QString &ssl, const QString &sslCert, const QString &sslKey)
 {
 
     //this->setParent(parent);
@@ -15,6 +17,62 @@ WShandler::WShandler(QObject *parent, const QString &ssl)
     QWebSocketServer::SslMode sslMode = (ssl != "N") ? QWebSocketServer::SecureMode : QWebSocketServer::NonSecureMode;
     m_pWebSocketServer = new QWebSocketServer(QStringLiteral("OST server"), sslMode, this);
 
+    // Configure SSL if enabled
+    if (sslMode == QWebSocketServer::SecureMode)
+    {
+        QSslConfiguration sslConfiguration;
+
+        // Load certificate
+        QFile certFile(sslCert);
+        if (!certFile.open(QIODevice::ReadOnly))
+        {
+            sendMessage("ERROR: Cannot open SSL certificate file: " + sslCert);
+        }
+        else
+        {
+            QSslCertificate certificate(&certFile, QSsl::Pem);
+            certFile.close();
+
+            if (certificate.isNull())
+            {
+                sendMessage("ERROR: Invalid SSL certificate in: " + sslCert);
+            }
+            else
+            {
+                sslConfiguration.setLocalCertificate(certificate);
+                sendMessage("SSL certificate loaded: " + sslCert);
+            }
+        }
+
+        // Load private key
+        QFile keyFile(sslKey);
+        if (!keyFile.open(QIODevice::ReadOnly))
+        {
+            sendMessage("ERROR: Cannot open SSL private key file: " + sslKey);
+        }
+        else
+        {
+            QSslKey privateKey(&keyFile, QSsl::Rsa, QSsl::Pem);
+            keyFile.close();
+
+            if (privateKey.isNull())
+            {
+                sendMessage("ERROR: Invalid SSL private key in: " + sslKey);
+            }
+            else
+            {
+                sslConfiguration.setPrivateKey(privateKey);
+                sendMessage("SSL private key loaded: " + sslKey);
+            }
+        }
+
+        // Set SSL protocol version
+        sslConfiguration.setPeerVerifyMode(QSslSocket::VerifyNone);
+        sslConfiguration.setProtocol(QSsl::TlsV1_2OrLater);
+
+        m_pWebSocketServer->setSslConfiguration(sslConfiguration);
+    }
+
     if (m_pWebSocketServer->listen(QHostAddress::Any, 9624))
     {
         connect(m_pWebSocketServer, &QWebSocketServer::newConnection, this, &WShandler::onNewConnection);
@@ -22,16 +80,16 @@ WShandler::WShandler(QObject *parent, const QString &ssl)
 
         if (sslMode == QWebSocketServer::SecureMode)
         {
-            sendMessage("OST WS server listening with SSL enabled");
+            sendMessage("OST WS server listening on port 9624 with SSL/TLS enabled");
         }
         else
         {
-            sendMessage("OST WS server listening (non-secure mode)");
+            sendMessage("OST WS server listening on port 9624 (non-secure mode)");
         }
     }
     else
     {
-        sendMessage("ERROR: Failed to start OST WS server");
+        sendMessage("ERROR: Failed to start OST WS server on port 9624");
     }
 }
 
