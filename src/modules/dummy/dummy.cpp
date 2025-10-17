@@ -1,4 +1,5 @@
 #include "dummy.h"
+#include "version.cc"
 
 Dummy *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
 {
@@ -16,6 +17,9 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
 
     setModuleDescription("Dummy module to show what we can do and not");
     setModuleVersion("0.1");
+    getEltString("thisGit", "hash")->setValue(QString::fromStdString(Version::GIT_SHA1), true);
+    getEltString("thisGit", "date")->setValue(QString::fromStdString(Version::GIT_DATE), true);
+    getEltString("thisGit", "message")->setValue(QString::fromStdString(Version::GIT_COMMIT_SUBJECT), true);
 
     getEltString("extextRO", "extext1")->setValue("Text read only 1");
     getEltString("extextRO", "extext2")->setValue("Text read only 2");
