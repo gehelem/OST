@@ -26,7 +26,8 @@
 
 
 Controller::Controller(const QString &webroot, const QString &dbpath,
-                       const QString &libpath, const QString &conf, const QString &indiserver, const QString &lng)
+                       const QString &libpath, const QString &conf, const QString &indiserver,
+                       const QString &ssl, const QString &sslCert, const QString &sslKey, const QString &lng)
     :       _webroot(webroot),
             _dbpath(dbpath),
             _libpath(libpath),
@@ -36,7 +37,7 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
 {
 
     startPublish();
-    wshandler = new WShandler(this);
+    wshandler = new WShandler(this, ssl);
     connect(wshandler, &WShandler::externalEvent, this, &Controller::OnExternalEvent);
     dbmanager = new DBManager();
     dbmanager->dbInit(_dbpath, "controller");

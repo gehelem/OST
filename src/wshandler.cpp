@@ -6,18 +6,33 @@
 
  * ... ...
  */
-WShandler::WShandler(QObject *parent)
+WShandler::WShandler(QObject *parent, const QString &ssl)
 {
 
     //this->setParent(parent);
     Q_UNUSED(parent);
-    m_pWebSocketServer = new QWebSocketServer(QStringLiteral("OST server"), QWebSocketServer::NonSecureMode, this);
+
+    QWebSocketServer::SslMode sslMode = (ssl != "N") ? QWebSocketServer::SecureMode : QWebSocketServer::NonSecureMode;
+    m_pWebSocketServer = new QWebSocketServer(QStringLiteral("OST server"), sslMode, this);
+
     if (m_pWebSocketServer->listen(QHostAddress::Any, 9624))
     {
         connect(m_pWebSocketServer, &QWebSocketServer::newConnection, this, &WShandler::onNewConnection);
         connect(m_pWebSocketServer, &QWebSocketServer::closed, this, &WShandler::closed);
+
+        if (sslMode == QWebSocketServer::SecureMode)
+        {
+            sendMessage("OST WS server listening with SSL enabled");
+        }
+        else
+        {
+            sendMessage("OST WS server listening (non-secure mode)");
+        }
     }
-    sendMessage("OST WS server listening");
+    else
+    {
+        sendMessage("ERROR: Failed to start OST WS server");
+    }
 }
 
 

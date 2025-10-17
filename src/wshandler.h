@@ -14,7 +14,7 @@ class WShandler : public QObject
 {
         Q_OBJECT
     public:
-        WShandler(QObject *parent);
+        WShandler(QObject *parent, const QString &ssl = "N");
         ~WShandler();
     public :
         void processModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
