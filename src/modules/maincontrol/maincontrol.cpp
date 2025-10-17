@@ -1,4 +1,5 @@
 #include "maincontrol.h"
+#include "version.cc"
 
 Maincontrol *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
 {
@@ -18,6 +19,10 @@ Maincontrol::Maincontrol(QString name, QString label, QString profile, QVariantM
     getEltString("moduleInfo", "moduleLabel")->setValue("Main control");
     getEltString("moduleInfo", "moduleDescription")->setValue("Maincontrol module - this one should always be there");
     getEltString("moduleInfo", "moduleVersion")->setValue("0.1");
+    getEltString("thisGit", "hash")->setValue(QString::fromStdString(Version::GIT_SHA1), true);
+    getEltString("thisGit", "date")->setValue(QString::fromStdString(Version::GIT_DATE), true);
+    getEltString("thisGit", "message")->setValue(QString::fromStdString(Version::GIT_COMMIT_SUBJECT), true);
+
     deleteOstProperty("saveprofile");
     deleteOstProperty("loadprofile");
     deleteOstProperty("moduleactions");

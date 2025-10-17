@@ -1,4 +1,5 @@
 #include "indipanel.h"
+#include "version.cc"
 
 IndiPanel *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
 {
@@ -12,6 +13,10 @@ IndiPanel::IndiPanel(QString name, QString label, QString profile, QVariantMap a
     setClassName(QString(metaObject()->className()).toLower());
     setModuleDescription("Full indi control panel");
     setModuleVersion("0.11");
+    getEltString("thisGit", "hash")->setValue(QString::fromStdString(Version::GIT_SHA1), true);
+    getEltString("thisGit", "date")->setValue(QString::fromStdString(Version::GIT_DATE), true);
+    getEltString("thisGit", "message")->setValue(QString::fromStdString(Version::GIT_COMMIT_SUBJECT), true);
+
     connectIndi();
 }
 
