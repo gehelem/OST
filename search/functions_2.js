@@ -10,7 +10,7 @@ var searchData=
   ['connectdevice_7',['connectDevice',['../classIndiModule.html#a197bab26661380fdacce7b0f77ed857f',1,'IndiModule']]],
   ['connectindi_8',['connectIndi',['../classIndiModule.html#a9a60e3380c1d3dcbc6aa780160de3d4c',1,'IndiModule']]],
   ['connectinditimer_9',['connectIndiTimer',['../classIndiModule.html#a9fed57e5734d61d461238e2ce3aa5c68',1,'IndiModule']]],
-  ['controller_10',['Controller',['../classController.html#abc1cb9dfc69dd9ec32be828705ad2607',1,'Controller']]],
+  ['controller_10',['Controller',['../classController.html#a8830b504b194da73ad668ddbfa69fa8d',1,'Controller']]],
   ['controllerevent_11',['controllerEvent',['../classController.html#af1e9b9852dd4b91edb5af0781d924bd7',1,'Controller']]],
   ['cos_12',['cos',['../classdms.html#a021d0a5f56f93b9d6f705c8131f4c02d',1,'dms']]],
   ['createdeviceproperty_13',['createDeviceProperty',['../classIndiModule.html#a23832b49f58369c3676e95186517c45b',1,'IndiModule']]],
