@@ -67,7 +67,7 @@ class PropertyMulti: public PropertyBase
         bool mHasGrid = false;
         bool mShowGrid = false;
         bool mShowElts = true;
-        int mGridLimit = 1000;
+        int mGridLimit = 5000;
         bool mHasGraph = false;
         GraphDefs mGraphDefs;
         SwitchsRule mRule = SwitchsRule::Any;

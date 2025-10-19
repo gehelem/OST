@@ -1087,7 +1087,7 @@
     },
     "agraphXY": {
         "hasArray":true,
-        "order":0,
+        "order":10,
         "devcat": "Graphes",
         "group": "",
         "permission": 2,
@@ -1107,7 +1107,8 @@
         "graphType":"XY",
         "graphParams":{
             "X":"X",
-            "Y":"Y"
+            "Y":"Y",
+            "graphColor":{"R":0,"G":255,"B":255}
         },
         "elements": {
             "X": {
@@ -1126,7 +1127,7 @@
     },
     "agraphDY": {
         "hasArray":true,
-        "order":1,
+        "order":11,
         "devcat": "Graphes",
         "group": "",
         "permission": 2,
@@ -1146,7 +1147,8 @@
         "graphType":"DY",
         "graphParams":{
             "D":"X",
-            "Y":"Y"
+            "Y":"Y",
+            "graphColor":{"R":0,"G":255,"B":0}
         },
         "elements": {
             "X": {
@@ -1165,7 +1167,7 @@
     },
     "agraphPHD": {
         "hasArray":true,
-        "order":3,
+        "order":13,
         "devcat": "Graphes",
         "group": "",
         "permission": 2,
@@ -1175,16 +1177,16 @@
         "hasGrid":true,
         "showGrid":true,
         "showElts":false,
-        "gridheaders": ["T","RA","DE","pRA","pDE"],
+        "gridheaders": ["T","RA","DE","pRA","pDE","RSB","RMS"],
         "grid": [
-            [0,0.2,0.1,200,50],
-            [1,-0.2,0.1,20,50],
-            [2,0.2,-0.1,200,500],
-            [3,0.2,0.1,-200,50],
-            [4,0.2,-0.1,20,-5],
-            [5,-0.2,0.1,200,50],
-            [6,-0.2,0.1,-50,-50],
-            [7,0.2,0.1,100,50]
+            [0,0.2,0.1,200,50,0,0.1],
+            [1,-0.2,0.1,20,50,2,0.2],
+            [2,0.2,-0.1,200,500,3,0.15],
+            [3,0.2,0.1,-200,50,20,0.45],
+            [4,0.2,-0.1,20,-5,15,0.23],
+            [5,-0.2,0.1,200,50,0,25,0.85],
+            [6,-0.2,0.1,-50,-50,2,0.12],
+            [7,0.2,0.1,100,50,3,0.65]
         ],
         "graphType":"PHD",
         "graphParams":{
@@ -1192,7 +1194,9 @@
             "RA":"RA",
             "DE":"DE",
             "pRA":"pRA",
-            "pDE":"pDE"
+            "pDE":"pDE",
+            "RSB":"RSB",
+            "RMS":"RMS"
         },
         "elements": {
             "T": {
@@ -1224,9 +1228,141 @@
                 "label": "pDE",
                 "value":0,
                 "order":5
+            },
+            "RSB": {
+                "type": "float",
+                "label": "RSB",
+                "value":0,
+                "order":6
+            },
+            "RMS": {
+                "type": "float",
+                "label": "RMS",
+                "value":0,
+                "order":7
+            }
+        }
+    },
+    "agrapSXY": {
+        "hasArray":true,
+        "order":0,
+        "devcat": "Graphes",
+        "group": "",
+        "permission": 2,
+        "gridLimit":20,
+        "label": "Graph example  - Serie X/Y",
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
+        "gridheaders": ["X","Y","S"],
+        "grid": [
+            [0,0.0,"P0"],
+            [1,0.1,"P0"],
+            [2,0.4,"P0"],
+            [3,0.9,"P0"],
+            [4,0.16,"P0"],
+            [1.5,0.0,"P1"],
+            [2.5,0.1,"P1"],
+            [3.5,0.4,"P1"],
+            [4.5,0.9,"P1"],
+            [5.5,0.32,"P1"]
+        ],
+        "graphType":"SXY",
+        "graphParams":{
+            "S":"S",
+            "X":"X",
+            "Y":"Y",
+            "graphColors":{
+                "P0":{"R":0,"G":255,"B":0},
+                "P1":{"R":0,"G":0,"B":255}
+            },
+            "axis":{
+                "PA":{"min":-1,"max":1,"pos":"right","text":"PAAA"},
+                "PB":{"min":-0.1,"max":0.1,"pos":"left","text":"PBBB"}
+            },
+            "mapping":{"P0":"PA","P1":"PB"}
+        },
+        "elements": {
+            "S": {
+                "type": "string",
+                "label": "Serie",
+                "value":0,
+                "order":"A"
+            },
+            "X": {
+                "type": "float",
+                "label": "Abscisse",
+                "value":0,
+                "order":"B"
+            },
+            "Y": {
+                "type": "float",
+                "label": "Ordonnée",
+                "value":0,
+                "order":"C"
+            }
+        }
+    },
+    "agraphSDY": {
+        "hasArray":true,
+        "order":1,
+        "devcat": "Graphes",
+        "group": "",
+        "permission": 2,
+        "arrayLimit":5,
+        "label": "Graph example - Serie - Date - Y",
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
+        "gridheaders": ["X","Y","S"],
+        "grid": [
+            [0,0.0,"P0"],
+            [1,0.1,"P0"],
+            [2,0.4,"P0"],
+            [3,0.9,"P0"],
+            [4,0.16,"P0"],
+            [1.5,0.0,"P1"],
+            [2.5,0.1,"P1"],
+            [3.5,0.4,"P1"],
+            [4.5,0.9,"P1"],
+            [5.5,0.32,"P1"]
+        ],
+        "graphType":"SDY",
+        "graphParams":{
+            "S":"S",
+            "D":"X",
+            "Y":"Y",
+            "graphColors":{
+                "P0":{"R":0,"G":255,"B":0},
+                "P1":{"R":0,"G":0,"B":255}
+            },
+            "axis":{
+                "PA":{"min":-10,"max":10,"pos":"right","text":"PAAA"},
+                "PB":{"min":0,"max":100,"pos":"left","text":"PBBB"},
+                "PC":{"min":0,"max":1000,"pos":"left","text":"PCCC"}
+            },
+            "mapping":{"P0":"PA","P1":"PB"}
+        },
+        "elements": {
+            "S": {
+                "type": "string",
+                "label": "Serie",
+                "value":0,
+                "order":"A"
+            },
+            "X": {
+                "type": "float",
+                "label": "Abscisse",
+                "value":0,
+                "order":"B"
+            },
+            "Y": {
+                "type": "float",
+                "label": "Ordonnée",
+                "value":0,
+                "order":"C"
             }
         }
     }
-
 }
 }

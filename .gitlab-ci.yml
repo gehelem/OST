@@ -1,0 +1,77 @@
+# This file is a template, and might need editing before it works on your project.
+# This is a sample Gi tLab CI/CD configuration file that should run without any modifications.
+# It demonstrates a basic 3 stage CI/CD pipeline. Instead of real tests or scripts,
+# it uses echo commands to simulate the pipeline execution. 
+#
+# A pipeline is composed of independent jobs that run scripts, grouped into stages.
+# Stages run in sequential order, but jobs within stages run in parallel.
+#
+# For more information, see: https://docs.gitlab.com/ee/ci/yaml/#stages
+#
+# You can copy and paste this template into a new `.gitlab-ci.yml` file.
+# You should not add this template to an existing `.gitlab-ci.yml` file by using the `include:` keyword.
+#
+# To contribute improvements to CI/CD t emplates, please follow the Development guide at:
+# https://docs.gitlab.com/development/cicd/templates/
+# This specific template is located at:
+# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml 
+default:
+#  image: rabits/qt:5.14-desktop
+  image: ubuntu:24.04
+  before_script:
+    - apt-get update 
+    - apt-get clean
+    - apt-get install -y software-properties-common
+    - apt-add-repository ppa:mutlaqja/ppa
+    - apt-get install -y build-essential software-properties-common cmake git npm qtbase5-dev libqt5websockets5-dev libindi-dev indi-dbg libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev zlib1g-dev
+stages:          # List of stages for jobs, and their order of execution
+  - build
+#  - test
+#  - deploy
+build-job:       # This job runs in the build stage, which runs first.
+  stage: build
+  tags:
+    - cmake
+  script:
+    - echo "Running build..."
+    - mkdir build
+    - cd build
+    - cmake ..
+    - make -j4
+    - cmake --install .    
+    - export QT_QPA_PLATFORM=offscreen
+    - mkdir media
+    - pwd
+    - ls -l
+    - npm install -g wscat
+    - ostserver  --webroot=media &
+    - sleep 30
+    - wscat -c ws://127.0.0.1:9624 > stdout &
+    - sleep 30
+    - echo "build finished"
+
+#unit-test-job:   # This job runs in the test stage.
+#  stage: test    # It only starts when the job in the build stage completes successfully.
+#  tags:
+#    - cmake
+#  script:
+#    - echo "Running unit tests... "
+#    - echo "test finished"
+#
+#lint-test-job:   # This job also runs in the test stage.
+#  stage: test    # It can run at the same time as unit-test-job (in parallel).
+#  tags:
+#    - cmake
+#  script:
+#    - echo "Linting code... This will take about 10 second s."
+#    - sleep 2
+#    - echo "No lint issues found."
+#
+#deploy-job:      # This job runs in the deploy stage.
+#  stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
+#  tags:
+#    - cmake
+#  environment: production
+#  script:
+#    - echo "Deploying application..."
+#    - echo "Application successfully deployed."

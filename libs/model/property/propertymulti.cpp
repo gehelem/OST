@@ -89,10 +89,10 @@ void PropertyMulti::setGridLimit(int limit)
     if (limit > 0)
     {
         if (limit < mGridLimit) clearGrid();
-        if (limit > 1000 )
+        if (limit > 5000 )
         {
-            sendWarning("gridLimit max size is 1000 " + this->label());
-            mGridLimit = 1000;
+            sendWarning("gridLimit max size is 5000 " + this->label());
+            mGridLimit = 5000;
         }
         else
         {
@@ -433,6 +433,43 @@ void PropertyMulti::setGraphDefs(GraphDefs defs)
             }
             mHasGraph = true;
             break;
+        case SXY:
+            if (!defs.params.contains("S"))
+            {
+                qDebug() << "SXY graph definition error : param should contain S binding";
+                return;
+            }
+            if (!defs.params.contains("X"))
+            {
+                qDebug() << "SXY graph definition error : param should contain X binding";
+                return;
+            }
+            if (!defs.params.contains("Y"))
+            {
+                qDebug() << "SXY graph definition error : param should contain Y binding";
+                return;
+            }
+            mHasGraph = true;
+            break;
+        case SDY:
+            if (!defs.params.contains("S"))
+            {
+                qDebug() << "SDY graph definition error : param should contain S binding";
+                return;
+            }
+            if (!defs.params.contains("D"))
+            {
+                qDebug() << "SDY graph definition error : param should contain D binding";
+                return;
+            }
+            if (!defs.params.contains("Y"))
+            {
+                qDebug() << "SDY graph definition error : param should contain Y binding";
+                return;
+            }
+            mHasGraph = true;
+            break;
+
         default:
             qDebug() << "setGraphDefs unknown graph def";
             mGraphDefs.params = QVariantMap();

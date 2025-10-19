@@ -26,7 +26,8 @@
 
 
 Controller::Controller(const QString &webroot, const QString &dbpath,
-                       const QString &libpath, const QString &conf, const QString &indiserver, const QString &lng)
+                       const QString &libpath, const QString &conf, const QString &indiserver,
+                       const QString &ssl, const QString &sslCert, const QString &sslKey, const QString &lng)
     :       _webroot(webroot),
             _dbpath(dbpath),
             _libpath(libpath),
@@ -36,7 +37,7 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
 {
 
     startPublish();
-    wshandler = new WShandler(this);
+    wshandler = new WShandler(this, ssl, sslCert, sslKey);
     connect(wshandler, &WShandler::externalEvent, this, &Controller::OnExternalEvent);
     dbmanager = new DBManager();
     dbmanager->dbInit(_dbpath, "controller");
@@ -182,8 +183,8 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
             connect(othermodule, &Basemodule::moduleStatusAnswer, mod, &Basemodule::OnModuleStatusAnswer);
             connect(mod, &Basemodule::moduleStatusRequest, othermodule, &Basemodule::OnModuleStatusRequest);
             connect(mod, &Basemodule::moduleStatusAnswer, othermodule, &Basemodule::OnModuleStatusAnswer);
-            //connect(othermodule,&Basemodule::moduleEvent, mod,&Basemodule::OnExternalEvent);
-            //connect(mod,&Basemodule::moduleEvent, othermodule,&Basemodule::OnExternalEvent);
+            connect(othermodule, &Basemodule::moduleEvent, mod, &Basemodule::OnExternalEvent);
+            connect(mod, &Basemodule::moduleEvent, othermodule, &Basemodule::OnExternalEvent);
         }
     }
     QMap<QString, QString> l;
@@ -194,6 +195,8 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
 
     pMainControl->addModuleData(name, label, lib, profile);
     pMainControl->sendMainMessage("Module  " + label + " successfully loaded");
+
+    updateGlobalModulesLov();
 
     return true;
 
@@ -246,6 +249,7 @@ void Controller::OnModuleEvent(const QString &pEventType, const QString  &pEvent
         }
         mModulesMap.remove(pEventModule);
         pMainControl->deldModuleData(pEventModule);
+        updateGlobalModulesLov();
     }
     if (pEventType == "modulesavedprofile")
     {
@@ -591,4 +595,25 @@ void Controller::OnFileWatcherEvent(const QString &pEvent)
 void Controller::OnFileChangeEvent(const QString &pEvent)
 {
     qDebug() << "****************************************** FileChanged" << pEvent;
+}
+
+void Controller::updateGlobalModulesLov(void)
+{
+    QVariantMap lovData;
+    QVariantList values;
+
+    // Add all loaded modules (excluding mainctl)
+    for(QMap<QString, QMap<QString, QString>>::const_iterator iter = mModulesMap.begin();
+            iter != mModulesMap.end(); ++iter)
+    {
+        QVariantMap item;
+        item["key"] = iter.key();
+        item["label"] = iter.value()["label"];
+        values.append(item);
+    }
+
+    lovData["values"] = values;
+
+    // Emit event to update all modules with the new list
+    emit controllerEvent("globallovupdate", "*", "loadedModules", lovData);
 }

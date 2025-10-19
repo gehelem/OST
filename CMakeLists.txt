@@ -106,6 +106,7 @@ target_link_libraries(ostserver
     Threads::Threads
     z
 )
+add_dependencies(ostserver generate_version)
 
 #########################
 #### modules libraries ##
@@ -263,6 +264,7 @@ target_link_libraries(ostbasemodule
     Threads::Threads
     z
 )
+add_dependencies(ostbasemodule generate_version)
 
 # Translate utility
 add_library(osttranslate STATIC
@@ -369,37 +371,26 @@ install(TARGETS
     PUBLIC_HEADER DESTINATION "/usr/include/ost"
 )
 
-# the commit's SHA1, and whether the building workspace was dirty or not
-execute_process(COMMAND
-  "${GIT_EXECUTABLE}" describe --match=NeVeRmAtCh --always --abbrev=40 --dirty
-  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-  OUTPUT_VARIABLE GIT_SHA1
-  ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+# Generate version.cc at build time (not configure time)
+# This ensures version information is always up-to-date with each build
 
-# the date of the commit
-execute_process(COMMAND
-  "${GIT_EXECUTABLE}" log -1 --format=%ad --date=local
-  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-  OUTPUT_VARIABLE GIT_DATE
-  ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+# Create a custom target that always runs
+add_custom_target(
+    generate_version ALL
+    COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/generate-version.sh"
+            "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/version.cc.in"
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
+    COMMENT "Generating version.cc from git information..."
+    VERBATIM
+)
 
-# the subject of the commit
-execute_process(COMMAND
-  "${GIT_EXECUTABLE}" log -1 --format=%s
-  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-  OUTPUT_VARIABLE GIT_COMMIT_SUBJECT
-  ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-# generate version.cc
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/version.cc.in" "${CMAKE_CURRENT_BINARY_DIR}/version.cc" @ONLY)
-#list(APPEND SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/version.cc" version.hh)
+# Add version.cc to sources
 list(APPEND SOURCES "${CMAKE_CURRENT_BINARY_DIR}/version.cc" version.hh)
 
-
 message(STATUS "CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR}")
-message(STATUS "GIT_SHA1=${GIT_SHA1}")
-message(STATUS "GIT_DATE=${GIT_DATE}")
-message(STATUS "GIT_COMMIT_SUBJECT=${GIT_COMMIT_SUBJECT}")
+message(STATUS "Version file will be generated at build time: ${CMAKE_CURRENT_BINARY_DIR}/version.cc")
 
 
 #get_cmake_property(_variableNames VARIABLES)

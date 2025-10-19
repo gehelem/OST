@@ -19,11 +19,21 @@ void Solver::ResetSolver(FITSImage::Statistic &stats, uint8_t *m_ImageBuffer)
 
     HFRavg = 99;
     HFRavgZone.clear();
+    thetaAvgZone.clear();
+    thetaDevAvgZone.clear();
+    aAxeAvgZone.clear();
+    bAxeAvgZone.clear();
+    eAxeAvgZone.clear();
     HFRavgCount.clear();
     for (int i = 0; i < HFRZones * HFRZones; i++ )
     {
         HFRavgCount.append(0);
         HFRavgZone.append(99);
+        thetaAvgZone.append(99);
+        thetaDevAvgZone.append(99);
+        aAxeAvgZone.append(99);
+        bAxeAvgZone.append(99);
+        eAxeAvgZone.append(99);
     }
     //delete stellarSolver;
     stellarSolver.loadNewImageBuffer(stats, m_ImageBuffer);
@@ -143,7 +153,33 @@ void Solver::ssReadySEP()
         int starLine = HFRZones * stars[i].y / mImgHeight;
         int zone = starLine * HFRZones + starColumn;
         HFRavgZone[zone] = (HFRavgCount[zone] * HFRavgZone[zone] + stars[i].HFR) / (HFRavgCount[zone] + 1);
+        thetaAvgZone[zone] = (HFRavgCount[zone] * thetaAvgZone[zone] + stars[i].theta) / (HFRavgCount[zone] + 1);
+        aAxeAvgZone[zone] = (HFRavgCount[zone] * aAxeAvgZone[zone] + stars[i].a) / (HFRavgCount[zone] + 1);
+        bAxeAvgZone[zone] = (HFRavgCount[zone] * bAxeAvgZone[zone] + stars[i].b) / (HFRavgCount[zone] + 1);
+        eAxeAvgZone[zone] = aAxeAvgZone[zone] / bAxeAvgZone[zone];
         HFRavgCount[zone]++;
+    }
+    //theta dev
+    HFRavgCount.clear();
+    for (int i = 0; i < HFRZones * HFRZones; i++ )
+    {
+        HFRavgCount.append(0);
+    }
+    for (int i = 0; i < stars.size(); i++)
+    {
+        int starColumn = HFRZones * stars[i].x / mImgWidth;
+        int starLine = HFRZones * stars[i].y / mImgHeight;
+        int zone = starLine * HFRZones + starColumn;
+
+        thetaDevAvgZone[zone] = (HFRavgCount[zone] * thetaDevAvgZone[zone] + (stars[i].theta - thetaAvgZone[zone]) *
+                                 (stars[i].theta - thetaAvgZone[zone])) /
+                                (HFRavgCount[zone] + 1);
+
+        HFRavgCount[zone]++;
+    }
+    for (int i = 0; i < HFRZones * HFRZones; i++ )
+    {
+        thetaDevAvgZone[i] = sqrt(thetaDevAvgZone[i]);
     }
     //sendMessage( "SSolver Ready : HFRavg = " + QString::number(HFRavg));
     disconnect(&stellarSolver, &StellarSolver::ready, this, &Solver::ssReadySEP);
