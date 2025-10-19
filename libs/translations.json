@@ -1054,5 +1054,162 @@
     "Zoning parameters": {
         "en": "Zoning parameters",
         "fr": "Nombre de zones"
+    },
+    "Auto-focus at sequence start": {
+        "en": "Auto-focus at sequence start",
+        "fr": "Focus au démarrage de la séquence"
+    },
+    "Auto-focus on filter change": {
+        "en": "Auto-focus on filter change",
+        "fr": "Focus au changement de filtre"
+    },
+    "Automatically trigger focus before starting the sequence (using first line filter)": {
+        "en": "Automatically trigger focus before starting the sequence (using first line filter)",
+        "fr": "Focus au démarrage de la séquence"
+    },
+    "Automatically trigger focus when filter changes during sequence": {
+        "en": "Automatically trigger focus when filter changes during sequence",
+        "fr": "Focus au changement de filtre"
+    },
+    "Calibration Values": {
+        "en": "Calibration Values",
+        "fr": "Valeurs de calibration"
+    },
+    "Centering parameters": {
+        "en": "Centering parameters",
+        "fr": "Paramètres de centrage"
+    },
+    "Centering tolerance in arcseconds": {
+        "en": "Centering tolerance in arcseconds",
+        "fr": "Tolérance de centrage (arcs)"
+    },
+    "Clouds": {
+        "en": "Clouds",
+        "fr": "Nuages"
+    },
+    "Custom Property": {
+        "en": "Custom Property",
+        "fr": "Ma propriété"
+    },
+    "Focus module instance": {
+        "en": "Focus module instance",
+        "fr": "Instance de module focus"
+    },
+    "Guider module instance": {
+        "en": "Guider module instance",
+        "fr": "Instance de module guidage"
+    },
+    "History": {
+        "en": "History",
+        "fr": "Historoique"
+    },
+    "Humidity": {
+        "en": "Humidity",
+        "fr": "Humidité"
+    },
+    "Integer value": {
+        "en": "Integer value",
+        "fr": "Valeur entière"
+    },
+    "Max iterations": {
+        "en": "Max iterations",
+        "fr": "Nombre maximum d'itérations"
+    },
+    "Maximum number of centering iterations": {
+        "en": "Maximum number of centering iterations",
+        "fr": "Nombre maximum d'itérations de centrage"
+    },
+    "Measures": {
+        "en": "Measures",
+        "fr": "Mesure"
+    },
+    "Meteo": {
+        "en": "Meteo",
+        "fr": "Météo"
+    },
+    "Météo": {
+        "en": "Météo",
+        "fr": "Météo"
+    },
+    "Name of the focus module INSTANCE to use (e.g. 'focus', 'myfocus1')": {
+        "en": "Name of the focus module INSTANCE to use (e.g. 'focus', 'myfocus1')",
+        "fr": "Instance de module focus"
+    },
+    "Name of the guider module INSTANCE to use (e.g. 'guider', 'myguider1')": {
+        "en": "Name of the guider module INSTANCE to use (e.g. 'guider', 'myguider1')",
+        "fr": "Instance de module guidage"
+    },
+    "Number of frames to calculate RMS drift": {
+        "en": "Number of frames to calculate RMS drift",
+        "fr": "Nombre de valeurs pour le calcul du RMS de la dérive"
+    },
+    "Precipitations": {
+        "en": "Precipitations",
+        "fr": "Précipitations"
+    },
+    "Pressure": {
+        "en": "Pressure",
+        "fr": "Pression"
+    },
+    "RMS": {
+        "en": "RMS",
+        "fr": "RMS"
+    },
+    "RMS DEC": {
+        "en": "RMS DEC",
+        "fr": "RMS DEC"
+    },
+    "RMS RA": {
+        "en": "RMS RA",
+        "fr": "RMS RA"
+    },
+    "RMS Total": {
+        "en": "RMS Total",
+        "fr": "RMS Total"
+    },
+    "RMS drift over x": {
+        "en": "RMS drift over x",
+        "fr": "Nombre de valeurs pour le calcul du RMS de la dérive"
+    },
+    "Resume guiding settle time (s)": {
+        "en": "Resume guiding settle time (s)",
+        "fr": "Lantence après reprise du guidage (s)"
+    },
+    "SQM": {
+        "en": "SQM",
+        "fr": "SQM"
+    },
+    "Settings": {
+        "en": "Settings",
+        "fr": "Paramètres"
+    },
+    "Suspend guiding during focus": {
+        "en": "Suspend guiding during focus",
+        "fr": "Suspendre le guidage pendant le focus"
+    },
+    "Suspend guiding when autofocus is triggered and resume after focus completes": {
+        "en": "Suspend guiding when autofocus is triggered and resume after focus completes",
+        "fr": "Suspendre le guidage pendant le focus, et reprendre après que le focus soit terminé"
+    },
+    "Template module - adapt to your needs": {
+        "en": "Template module - adapt to your needs",
+        "fr": "Modèle de module - adaptez à vos besoins"
+    },
+    "Text value": {
+        "en": "Text value",
+        "fr": "Valeur texte"
+    },
+    "This module git": {
+        "en": "This module git",
+        "fr": "Git de ce module"
+    },
+    "Tolerance (arcsec)": {
+        "en": "Tolerance (arcsec)",
+        "fr": "Tolérance (arcsec)"
+    },
+    "Wait time in seconds after resuming guiding before continuing sequence (allows guiding to stabilize)": {
+        "en": "Wait time in seconds after resuming guiding before continuing sequence (allows guiding to stabilize)",
+        "fr": "Attendre cette durée en secondes après que le guidage ait redémarré (pour que le guidage se stabilise)"
     }
+
 }
