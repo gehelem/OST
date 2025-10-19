@@ -1234,6 +1234,12 @@
                 "label": "RSB",
                 "value":0,
                 "order":6
+            },
+            "RMS": {
+                "type": "float",
+                "label": "RMS",
+                "value":0,
+                "order":7
             }
         }
     },
