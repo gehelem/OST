@@ -8,7 +8,8 @@
 
  * ... ...
  */
-WShandler::WShandler(QObject *parent, const QString &ssl, const QString &sslCert, const QString &sslKey)
+WShandler::WShandler(QObject *parent, const QString &ssl, const QString &sslCert, const QString &sslKey,
+                     const QString &grant)
 {
 
     //this->setParent(parent);
@@ -135,7 +136,6 @@ void WShandler::processTextMessage(QString message)
     _mess = _mess.replace("}\"", "}");
     _mess = _mess.replace("\"{", "{");
     QJsonDocument jsonResponse = QJsonDocument::fromJson(_mess.toUtf8()); // garder
-    emit textRcv(message);
     QJsonObject  obj = jsonResponse.object(); // garder
     sendMessage("OST server received json" + message);
     if (obj["evt"].toString() == "Freadall")

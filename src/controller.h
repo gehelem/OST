@@ -24,7 +24,7 @@ class Controller : public QObject
     public:
         Controller(const QString &webroot, const QString &dbpath,
                    const QString &libpath, const QString &conf, const QString &indiserver,
-                   const QString &ssl, const QString &sslCert, const QString &sslKey, const QString &lng);
+                   const QString &ssl, const QString &sslCert, const QString &sslKey, const QString &lng, const QString &grant);
         ~Controller() override;
     signals:
         void controllerEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
@@ -36,6 +36,7 @@ class Controller : public QObject
         QString _conf;
         QString _indiserver;
         QString _lng;
+        QString _grant;
         QVariantMap _availableModuleLibs;
         QStringList _availableIndiDrivers;
         WShandler   *wshandler;

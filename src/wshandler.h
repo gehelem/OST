@@ -16,7 +16,8 @@ class WShandler : public QObject
 {
         Q_OBJECT
     public:
-        WShandler(QObject *parent, const QString &ssl = "N", const QString &sslCert = "", const QString &sslKey = "");
+        WShandler(QObject *parent, const QString &ssl = "N", const QString &sslCert = "", const QString &sslKey = "",
+                  const QString &grant = "0");
         ~WShandler();
     public :
         void processModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
@@ -25,7 +26,6 @@ class WShandler : public QObject
 
     signals:
         void closed();
-        void textRcv(QString txt);
         void externalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                            const QVariantMap &eventData);
     private:
