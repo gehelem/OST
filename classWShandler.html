@@ -72,6 +72,7 @@ $(function() {
   <div class="summary">
 <a href="#signals">Signals</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="classWShandler-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">WShandler Class Reference</div></div>
 </div><!--header-->
@@ -93,9 +94,16 @@ Collaboration diagram for WShandler:</div>
 <div class="dyncontent">
 <div class="center"><img src="classWShandler__coll__graph.png" border="0" usemap="#aWShandler_coll__map" alt="Collaboration graph"/></div>
 <map name="aWShandler_coll__map" id="aWShandler_coll__map">
-<area shape="rect" title=" " alt="" coords="5,119,179,244"/>
-<area shape="rect" href="classQObject.html" title=" " alt="" coords="59,5,125,71"/>
-<area shape="poly" title=" " alt="" coords="95,85,95,119,89,119,89,85"/>
+<area shape="rect" title=" " alt="" coords="5,1137,179,1263"/>
+<area shape="rect" href="classQObject.html" title=" " alt="" coords="53,5,120,71"/>
+<area shape="poly" title=" " alt="" coords="84,85,77,163,73,251,73,933,78,1041,87,1137,82,1137,73,1042,68,933,68,251,72,162,79,84"/>
+<area shape="rect" href="classBaseroot.html" title=" " alt="" coords="114,120,265,385"/>
+<area shape="poly" title=" " alt="" coords="110,82,128,118,123,121,106,84"/>
+<area shape="rect" href="classDBManager.html" title=" " alt="" coords="109,789,283,1075"/>
+<area shape="poly" title=" " alt="" coords="143,1076,125,1123,120,1121,138,1074"/>
+<area shape="rect" href="classDatastore.html" title="Class to provide properties management for OST modules." alt="" coords="132,435,255,740"/>
+<area shape="poly" title=" " alt="" coords="197,754,198,789,192,789,192,754"/>
+<area shape="poly" title=" " alt="" coords="194,399,194,434,189,434,188,399"/>
 </map>
 </div>
 <table class="memberdecls">
@@ -103,27 +111,30 @@ Collaboration diagram for WShandler:</div>
 Signals</h2></td></tr>
 <tr class="memitem:aa51ccdcfcd290098520920356785bddd" id="r_aa51ccdcfcd290098520920356785bddd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classWShandler.html#aa51ccdcfcd290098520920356785bddd">closed</a> ()</td></tr>
 <tr class="separator:aa51ccdcfcd290098520920356785bddd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa62f8e0f61a833203975d1b96b098eb5" id="r_aa62f8e0f61a833203975d1b96b098eb5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classWShandler.html#aa62f8e0f61a833203975d1b96b098eb5">textRcv</a> (<a class="el" href="classQString.html">QString</a> txt)</td></tr>
-<tr class="separator:aa62f8e0f61a833203975d1b96b098eb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a46d670576797bc1ac16d1623b4758e0f" id="r_a46d670576797bc1ac16d1623b4758e0f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classWShandler.html#a46d670576797bc1ac16d1623b4758e0f">externalEvent</a> (const <a class="el" href="classQString.html">QString</a> &amp;eventType, const <a class="el" href="classQString.html">QString</a> &amp;eventModule, const <a class="el" href="classQString.html">QString</a> &amp;eventKey, const QVariantMap &amp;eventData)</td></tr>
 <tr class="separator:a46d670576797bc1ac16d1623b4758e0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a13e935c8452dd72036e2d3de6166f308" id="r_a13e935c8452dd72036e2d3de6166f308"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classWShandler.html#a13e935c8452dd72036e2d3de6166f308">WShandler</a> (<a class="el" href="classQObject.html">QObject</a> *parent, const <a class="el" href="classQString.html">QString</a> &amp;ssl=&quot;N&quot;, const <a class="el" href="classQString.html">QString</a> &amp;sslCert=&quot;&quot;, const <a class="el" href="classQString.html">QString</a> &amp;sslKey=&quot;&quot;)</td></tr>
-<tr class="separator:a13e935c8452dd72036e2d3de6166f308"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5881da00112f6340af7196a9b9cd0d7" id="r_ad5881da00112f6340af7196a9b9cd0d7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classWShandler.html#ad5881da00112f6340af7196a9b9cd0d7">WShandler</a> (<a class="el" href="classQObject.html">QObject</a> *parent, const <a class="el" href="classQString.html">QString</a> &amp;ssl=&quot;N&quot;, const <a class="el" href="classQString.html">QString</a> &amp;sslCert=&quot;&quot;, const <a class="el" href="classQString.html">QString</a> &amp;sslKey=&quot;&quot;, const <a class="el" href="classQString.html">QString</a> &amp;grant=&quot;0&quot;)</td></tr>
+<tr class="separator:ad5881da00112f6340af7196a9b9cd0d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5d846f379c9e1d12958ee2741daa8a7a" id="r_a5d846f379c9e1d12958ee2741daa8a7a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classWShandler.html#a5d846f379c9e1d12958ee2741daa8a7a">~WShandler</a> ()</td></tr>
 <tr class="separator:a5d846f379c9e1d12958ee2741daa8a7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f86f4c269a09acf451bde627a70e3fa" id="r_a9f86f4c269a09acf451bde627a70e3fa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classWShandler.html#a9f86f4c269a09acf451bde627a70e3fa">processModuleEvent</a> (const <a class="el" href="classQString.html">QString</a> &amp;eventType, const <a class="el" href="classQString.html">QString</a> &amp;eventModule, const <a class="el" href="classQString.html">QString</a> &amp;eventKey, const QVariantMap &amp;eventData)</td></tr>
 <tr class="separator:a9f86f4c269a09acf451bde627a70e3fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a25f62b93806e5138f398572ffd43cc18" id="r_a25f62b93806e5138f398572ffd43cc18"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classWShandler.html#a25f62b93806e5138f398572ffd43cc18">processFileEvent</a> (const <a class="el" href="classQString.html">QString</a> &amp;eventType, const QStringList &amp;eventData)</td></tr>
 <tr class="separator:a25f62b93806e5138f398572ffd43cc18"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:ae67ed1ea46037e06aab45dd4440da7f2" id="r_ae67ed1ea46037e06aab45dd4440da7f2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classDBManager.html">DBManager</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classWShandler.html#ae67ed1ea46037e06aab45dd4440da7f2">dbmanager</a></td></tr>
+<tr class="separator:ae67ed1ea46037e06aab45dd4440da7f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Websocket management open/close/send/receives sockets it should translate JSON messages </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a13e935c8452dd72036e2d3de6166f308" name="a13e935c8452dd72036e2d3de6166f308"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a13e935c8452dd72036e2d3de6166f308">&#9670;&#160;</a></span>WShandler()</h2>
+<a id="ad5881da00112f6340af7196a9b9cd0d7" name="ad5881da00112f6340af7196a9b9cd0d7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad5881da00112f6340af7196a9b9cd0d7">&#9670;&#160;</a></span>WShandler()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -150,7 +161,13 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="classQString.html">QString</a> &amp;&#160;</td>
-          <td class="paramname"><em>sslKey</em> = <code>&quot;&quot;</code>&#160;</td>
+          <td class="paramname"><em>sslKey</em> = <code>&quot;&quot;</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classQString.html">QString</a> &amp;&#160;</td>
+          <td class="paramname"><em>grant</em> = <code>&quot;0&quot;</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -322,28 +339,17 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="aa62f8e0f61a833203975d1b96b098eb5" name="aa62f8e0f61a833203975d1b96b098eb5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa62f8e0f61a833203975d1b96b098eb5">&#9670;&#160;</a></span>textRcv</h2>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="ae67ed1ea46037e06aab45dd4440da7f2" name="ae67ed1ea46037e06aab45dd4440da7f2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae67ed1ea46037e06aab45dd4440da7f2">&#9670;&#160;</a></span>dbmanager</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void WShandler::textRcv </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classQString.html">QString</a>&#160;</td>
-          <td class="paramname"><em>txt</em></td><td>)</td>
-          <td></td>
+          <td class="memname"><a class="el" href="classDBManager.html">DBManager</a>* WShandler::dbmanager</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">signal</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>

@@ -7,7 +7,7 @@ var searchData=
   ['datatype_4',['dataType',['../structOST_1_1ImgData.html#a7a462ba9638933dd90e51b8c9faa6557',1,'OST::ImgData']]],
   ['dbevent_5',['dbEvent',['../classDBManager.html#ab650bd44d24d6f9c45c7f3bb6fdfade4',1,'DBManager']]],
   ['dbinit_6',['dbInit',['../classDBManager.html#ac32e7d7c9949de59437b12ae7423923b',1,'DBManager']]],
-  ['dbmanager_7',['dbmanager',['../classDBManager.html',1,'DBManager'],['../classDBManager.html#afb4f09d26522754aab71b801716a8325',1,'DBManager::DBManager()']]],
+  ['dbmanager_7',['dbmanager',['../classDBManager.html',1,'DBManager'],['../classWShandler.html#ae67ed1ea46037e06aab45dd4440da7f2',1,'WShandler::dbmanager'],['../classDBManager.html#afb4f09d26522754aab71b801716a8325',1,'DBManager::DBManager()']]],
   ['dbmanager_2ecpp_8',['dbmanager.cpp',['../dbmanager_8cpp.html',1,'']]],
   ['dbmanager_2eh_9',['dbmanager.h',['../dbmanager_8h.html',1,'']]],
   ['dc1394_5fbasler_5fcorrupted_5fsff_5fchunk_10',['DC1394_BASLER_CORRUPTED_SFF_CHUNK',['../bayer_8h.html#a197fe17c786e1f915d99cb19b270e541afe6e350df89c9d983dfeadccbd72003b',1,'bayer.h']]],

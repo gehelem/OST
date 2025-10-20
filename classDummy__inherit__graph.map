@@ -1,17 +1,17 @@
 <map id="Dummy" name="Dummy">
-<area shape="rect" id="Node000001" title=" " alt="" coords="100,2020,293,2245"/>
-<area shape="rect" id="Node000002" href="$classIndiModule.html" title=" " alt="" coords="83,1567,310,1972"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="199,1986,199,2020,194,2020,194,1986"/>
-<area shape="rect" id="Node000003" href="$classBasemodule.html" title=" " alt="" coords="5,1099,204,1519"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="152,1532,159,1566,154,1567,147,1533"/>
-<area shape="rect" id="Node000004" href="$classDBManager.html" title=" " alt="" coords="17,785,192,1051"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="107,1064,107,1099,102,1099,102,1064"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="100,2040,293,2265"/>
+<area shape="rect" id="Node000002" href="$classIndiModule.html" title=" " alt="" coords="83,1587,310,1992"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="199,2006,199,2040,194,2040,194,2006"/>
+<area shape="rect" id="Node000003" href="$classBasemodule.html" title=" " alt="" coords="5,1119,204,1539"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="152,1552,159,1586,154,1587,147,1553"/>
+<area shape="rect" id="Node000004" href="$classDBManager.html" title=" " alt="" coords="17,785,192,1071"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="107,1084,107,1118,102,1118,102,1084"/>
 <area shape="rect" id="Node000005" href="$classDatastore.html" title="Class to provide properties management for OST modules." alt="" coords="43,432,166,737"/>
 <area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="107,751,107,785,102,785,102,751"/>
 <area shape="rect" id="Node000006" href="$classBaseroot.html" title=" " alt="" coords="29,119,180,384"/>
 <area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="107,398,107,432,102,432,102,398"/>
 <area shape="rect" id="Node000007" href="$classQObject.html" title=" " alt="" coords="71,5,138,71"/>
 <area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="107,84,107,119,102,119,102,84"/>
-<area shape="rect" id="Node000008" title=" " alt="" coords="229,1276,349,1341"/>
-<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="282,1356,240,1567,235,1566,277,1355"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="229,1296,349,1361"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="282,1376,240,1587,235,1586,277,1375"/>
 </map>
