@@ -140,7 +140,7 @@ Static Public Member Functions</h2></td></tr>
 <div class="line"> </div>
 <div class="line"><a class="code hl_class" href="classOST_1_1PropertyMulti.html">PropertyMulti</a>* <span class="keyword">property</span> = <a class="code hl_function" href="classOST_1_1PropertyFactory.html#ae43db65eda4bc6671ddb5adfb697d0f4">PropertyFactory::createProperty</a>(<span class="stringliteral">&quot;parameters&quot;</span>, config);</div>
 <div class="line"><span class="comment">// property is fully configured and ready to use</span></div>
-<div class="ttc" id="aclassOST_1_1PropertyFactory_html_ae43db65eda4bc6671ddb5adfb697d0f4"><div class="ttname"><a href="classOST_1_1PropertyFactory.html#ae43db65eda4bc6671ddb5adfb697d0f4">OST::PropertyFactory::createProperty</a></div><div class="ttdeci">static PropertyMulti * createProperty(const QString &amp;pKey, const QVariantMap &amp;pData)</div><div class="ttdoc">Create PropertyMulti from configuration data.</div><div class="ttdef"><b>Definition</b> propertyfactory.cpp:5</div></div>
+<div class="ttc" id="aclassOST_1_1PropertyFactory_html_ae43db65eda4bc6671ddb5adfb697d0f4"><div class="ttname"><a href="classOST_1_1PropertyFactory.html#ae43db65eda4bc6671ddb5adfb697d0f4">OST::PropertyFactory::createProperty</a></div><div class="ttdeci">static PropertyMulti * createProperty(const QString &amp;pKey, const QVariantMap &amp;pData)</div><div class="ttdoc">Create PropertyMulti from configuration data.</div><div class="ttdef"><b>Definition</b> propertyfactory.cpp:91</div></div>
 <div class="ttc" id="aclassOST_1_1PropertyMulti_html"><div class="ttname"><a href="classOST_1_1PropertyMulti.html">OST::PropertyMulti</a></div><div class="ttdoc">Concrete property class containing multiple typed elements with optional grid.</div><div class="ttdef"><b>Definition</b> propertymulti.h:71</div></div>
 </div><!-- fragment --></dd></dl>
 <dl class="section user"><dt>Restoring from Database:</dt><dd><div class="fragment"><div class="line"><span class="comment">// DBManager returns QVariantMap from saved profile</span></div>
@@ -222,6 +222,7 @@ Commented INDI-related methods are legacy code for INDI protocol conversion.</dd
 </div><div class="memdoc">
 
 <p>Create <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> from configuration data. </p>
+<p>Create <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> from configuration QVariantMap.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">pKey</td><td>Property key (unique identifier) </td></tr>
@@ -265,7 +266,81 @@ Commented INDI-related methods are legacy code for INDI protocol conversion.</dd
 Uses <a class="el" href="classOST_1_1ElementFactory.html">ElementFactory</a> internally to create elements from config.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classOST_1_1ElementFactory.html#a8574ec237845cbe7bc9a7aa0ce04a410">ElementFactory::createElement()</a> </dd>
 <dd>
-<a class="el" href="classOST_1_1PropertyMulti.html#ad4b28df72a221cde9e8f8d6f6ad9891b" title="Construct a new PropertyMulti object.">PropertyMulti::PropertyMulti()</a> </dd></dl>
+<a class="el" href="classOST_1_1PropertyMulti.html#ad4b28df72a221cde9e8f8d6f6ad9891b" title="Construct a new PropertyMulti object.">PropertyMulti::PropertyMulti()</a></dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pKey</td><td>Property unique identifier (key) </td></tr>
+    <tr><td class="paramname">pData</td><td>QVariantMap containing complete property configuration </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Pointer to newly created <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> (caller owns), or nullptr on error</dd></dl>
+<p>Factory method that constructs a fully configured <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> from serialized data. This is the primary method for restoring properties from database profiles or deserializing from JSON configuration files.</p>
+<dl class="section user"><dt>Construction Process:</dt><dd><ol type="1">
+<li>Create <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> with basic metadata (label, permission, hierarchy, profiles, grid)</li>
+<li>Configure switch rule (OneOfMany/AtMostOne/Any) if present</li>
+<li>Apply grid settings (hasGrid, showGrid, showElts, gridLimit)</li>
+<li>Validate and configure graph definitions (type + params)</li>
+<li>Set UI hints (autoupdown, autoselect, badge)</li>
+<li>Create all elements using <a class="el" href="classOST_1_1ElementFactory.html">ElementFactory</a></li>
+<li>Restore grid data if present (using gridheaders for column order)</li>
+<li>Configure icons (preIcon1/2, postIcon1/2)</li>
+<li>Set freevalue if present</li>
+</ol>
+</dd></dl>
+<dl class="section user"><dt>Required Fields in pData:</dt><dd><ul>
+<li>"label": QString - Display label</li>
+<li>"permission": int - Permission level (0/1/2)</li>
+<li>"devcat": QString - Device category (level1 hierarchy)</li>
+<li>"group": QString - Property group (level2 hierarchy)</li>
+<li>"order": QString - Sort order string</li>
+<li>"hasprofile": bool - Whether to persist in profiles</li>
+<li>"hasGrid": bool - Whether property supports grid</li>
+</ul>
+</dd></dl>
+<dl class="section user"><dt>Optional Fields in pData:</dt><dd><ul>
+<li>"rule": int - SwitchsRule (0=OneOfMany, 1=AtMostOne, 2=Any, default=Any)</li>
+<li>"elements": QVariantMap - Element definitions (key → element config)</li>
+<li>"showGrid": bool - Grid visibility (default=false)</li>
+<li>"showElts": bool - Elements visibility (default=true)</li>
+<li>"gridLimit": int - Max grid lines (default unlimited)</li>
+<li>"graphType": QString - Graph type ("xy", "dy", "phd", "sxy", "sdy")</li>
+<li>"graphParams": QVariantMap - Graph parameters</li>
+<li>"grid": QJsonArray - Grid data (requires "gridheaders")</li>
+<li>"gridheaders": QJsonArray - Column order for grid</li>
+<li>"autoupdown": bool - Auto up/down buttons</li>
+<li>"autoselect": bool - Auto-select on add</li>
+<li>"badge": bool - Show badge indicator</li>
+<li>"preicon1", "preicon2": QString - Leading icons</li>
+<li>"posticon1", "posticon2": QString - Trailing icons</li>
+<li>"freevalue": QString - Custom free value field</li>
+</ul>
+</dd></dl>
+<dl class="section user"><dt>Element Creation:</dt><dd>Elements are created using <a class="el" href="classOST_1_1ElementFactory.html#a8574ec237845cbe7bc9a7aa0ce04a410">ElementFactory::createElement()</a> from element configs: <div class="fragment"><div class="line">QVariantMap eltConfig;</div>
+<div class="line">eltConfig[<span class="stringliteral">&quot;type&quot;</span>] = <span class="stringliteral">&quot;int&quot;</span>;</div>
+<div class="line">eltConfig[<span class="stringliteral">&quot;label&quot;</span>] = <span class="stringliteral">&quot;Iterations&quot;</span>;</div>
+<div class="line">eltConfig[<span class="stringliteral">&quot;value&quot;</span>] = 10;</div>
+<div class="line">eltConfig[<span class="stringliteral">&quot;min&quot;</span>] = 1;</div>
+<div class="line">eltConfig[<span class="stringliteral">&quot;max&quot;</span>] = 20;</div>
+</div><!-- fragment --></dd></dl>
+<dl class="section user"><dt>Grid Restoration:</dt><dd>If "grid" field present, restores grid lines using gridheaders for column mapping: <div class="fragment"><div class="line"><span class="comment">// For each line in grid array:</span></div>
+<div class="line"><span class="comment">//   1. Set element values from line[j] using headers[j] as key</span></div>
+<div class="line"><span class="comment">//   2. Call property-&gt;push() to add line to grid</span></div>
+</div><!-- fragment --></dd></dl>
+<dl class="section user"><dt>Validation:</dt><dd><ul>
+<li>Warns if elements field missing (returns empty property)</li>
+<li>Warns if graph defined without grid capability</li>
+<li>Warns if graph defined without params</li>
+<li>Warns if grid data present without gridheaders</li>
+</ul>
+</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Unreachable code at line 133 (after return statement) </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Graph requires both hasGrid=true and graphType+graphParams fields</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classOST_1_1ElementFactory.html#a8574ec237845cbe7bc9a7aa0ce04a410">ElementFactory::createElement()</a> </dd>
+<dd>
+<a class="el" href="classOST_1_1PropertyMulti.html#ad4b28df72a221cde9e8f8d6f6ad9891b" title="Construct a new PropertyMulti object.">PropertyMulti::PropertyMulti()</a> </dd>
+<dd>
+<a class="el" href="classOST_1_1PropertyMulti.html#ab43d22da58aef04621e4406eafb019de" title="Push current element values to grid as new line.">PropertyMulti::push()</a> </dd></dl>
 
 </div>
 </div>

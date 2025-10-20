@@ -1,5 +1,5 @@
 <map id="libs/utils/propertyfactory.cpp" name="libs/utils/propertyfactory.cpp">
-<area shape="rect" id="Node000001" title=" " alt="" coords="839,5,1045,31"/>
+<area shape="rect" id="Node000001" title="PropertyFactory implementation for creating properties from configuration." alt="" coords="839,5,1045,31"/>
 <area shape="rect" id="Node000002" href="$propertyfactory_8h.html" title="Factory for creating properties from configuration data." alt="" coords="875,79,1009,104"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="945,31,945,65,939,65,939,31"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="1606,299,1707,324"/>

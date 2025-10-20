@@ -1,5 +1,5 @@
 <map id="libs/utils/propertytextdumper.cpp" name="libs/utils/propertytextdumper.cpp">
-<area shape="rect" id="Node000001" title=" " alt="" coords="1059,5,1297,31"/>
+<area shape="rect" id="Node000001" title="Human&#45;readable text serialization implementation." alt="" coords="1059,5,1297,31"/>
 <area shape="rect" id="Node000002" href="$propertytextdumper_8h.html" title="Human&#45;readable text serialization visitor for properties." alt="" coords="1096,79,1260,104"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1181,31,1181,65,1175,65,1175,31"/>
 <area shape="rect" id="Node000031" href="$elementtextdumper_8h.html" title=" " alt="" coords="977,225,1139,251"/>

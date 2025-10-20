@@ -349,6 +349,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Visit <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> and serialize to JSON. </p>
+<p>Serialize <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> to JSON format.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">pProperty</td><td>Pointer to <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> to serialize</td></tr>
@@ -356,7 +357,27 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 <p>Main implementation that serializes a <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> object to JSON. Walks through all elements, extracts metadata, values, LOVs, and grid data, building a complete JSON representation.</p>
-<p>Result is stored in mResult and accessible via <a class="el" href="classOST_1_1PropertyJsonDumper.html#a0680ce1c794cde6fa8d7ccb306dd0a30" title="Get serialization result.">getResult()</a>. </p>
+<p>Result is stored in mResult and accessible via <a class="el" href="classOST_1_1PropertyJsonDumper.html#a0680ce1c794cde6fa8d7ccb306dd0a30" title="Get serialization result.">getResult()</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pProperty</td><td>Pointer to <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> to serialize</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Main visitor implementation that converts a <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> to complete JSON.</p>
+<p>Serialization process:</p><ol type="1">
+<li>Extract common metadata via dumpPropertyCommons()</li>
+<li>Add multi-property specific fields (showElts, hasGrid, rule)</li>
+<li>Serialize all elements using <a class="el" href="classOST_1_1ElementJsonDumper.html">ElementJsonDumper</a> visitor</li>
+<li>Serialize grid data if present (headers + grid lines)</li>
+<li>Add graph definitions if property has graph capability</li>
+</ol>
+<p>Result stored in mResult member, accessible via <a class="el" href="classOST_1_1PropertyJsonDumper.html#a0680ce1c794cde6fa8d7ccb306dd0a30" title="Get serialization result.">getResult()</a>.</p>
+<dl class="section user"><dt>Grid Serialization:</dt><dd>Grid is converted to 2D JSON array where each line is an array of values following the order defined in gridheaders. Uses <a class="el" href="classOST_1_1ValueJsonDumper.html">ValueJsonDumper</a> to convert grid cell values.</dd></dl>
+<dl class="section user"><dt>Graph Serialization:</dt><dd>If hasGraph is true, includes graphType (as string) and graphParams (as QJsonObject from params QVariantMap).</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classOST_1_1ElementJsonDumper.html">ElementJsonDumper</a> </dd>
+<dd>
+<a class="el" href="classOST_1_1ValueJsonDumper.html">ValueJsonDumper</a> </dd></dl>
 
 <p>Implements <a class="el" href="classOST_1_1PropertyVisitor.html#a84f291604140aaaf58e77554aa2ce0e5">OST::PropertyVisitor</a>.</p>
 

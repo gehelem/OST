@@ -39,7 +39,7 @@
 <area shape="poly" id="edge33_Node000008_Node000031" title=" " alt="" coords="719,228,548,279,547,274,717,223"/>
 <area shape="rect" id="Node000011" href="$datastore_8h.html" title=" " alt="" coords="731,357,854,383"/>
 <area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="371,302,401,307,732,357,731,362,400,312,370,307"/>
-<area shape="rect" id="Node000026" href="$propertyfactory_8cpp.html" title=" " alt="" coords="189,357,396,383"/>
+<area shape="rect" id="Node000026" href="$propertyfactory_8cpp.html" title="PropertyFactory implementation for creating properties from configuration." alt="" coords="189,357,396,383"/>
 <area shape="poly" id="edge26_Node000010_Node000026" title=" " alt="" coords="295,316,295,357,290,357,290,316"/>
 <area shape="rect" id="Node000012" href="$datastore_8cpp.html" title=" " alt="" coords="619,431,758,456"/>
 <area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="766,393,707,433,704,428,763,388"/>
@@ -71,13 +71,13 @@
 <area shape="rect" id="Node000023" href="$ost_8cpp.html" title=" " alt="" coords="936,761,1028,786"/>
 <area shape="poly" id="edge23_Node000021_Node000023" title=" " alt="" coords="934,707,975,758,970,762,930,711"/>
 <area shape="poly" id="edge28_Node000027_Node000011" title=" " alt="" coords="991,309,829,360,828,355,990,304"/>
-<area shape="rect" id="Node000028" href="$propertyjsondumper_8cpp.html" title=" " alt="" coords="1509,357,1748,383"/>
+<area shape="rect" id="Node000028" href="$propertyjsondumper_8cpp.html" title="JSON serialization visitor implementation." alt="" coords="1509,357,1748,383"/>
 <area shape="poly" id="edge29_Node000027_Node000028" title=" " alt="" coords="1127,301,1164,307,1535,355,1534,360,1163,312,1126,307"/>
 <area shape="poly" id="edge31_Node000029_Node000011" title=" " alt="" coords="795,316,795,357,790,357,790,316"/>
-<area shape="rect" id="Node000030" href="$propertytextdumper_8cpp.html" title=" " alt="" coords="1071,357,1309,383"/>
+<area shape="rect" id="Node000030" href="$propertytextdumper_8cpp.html" title="Human&#45;readable text serialization implementation." alt="" coords="1071,357,1309,383"/>
 <area shape="poly" id="edge32_Node000029_Node000030" title=" " alt="" coords="864,302,1133,355,1132,360,863,307"/>
 <area shape="poly" id="edge34_Node000031_Node000011" title=" " alt="" coords="565,303,752,355,751,360,563,308"/>
-<area shape="rect" id="Node000032" href="$propertyupdate_8cpp.html" title=" " alt="" coords="421,357,629,383"/>
+<area shape="rect" id="Node000032" href="$propertyupdate_8cpp.html" title="Property update visitor implementation." alt="" coords="421,357,629,383"/>
 <area shape="poly" id="edge35_Node000031_Node000032" title=" " alt="" coords="517,315,525,357,520,358,512,316"/>
 <area shape="poly" id="edge39_Node000034_Node000011" title=" " alt="" coords="1751,302,1620,312,855,367,854,362,1619,307,1750,297"/>
 <area shape="poly" id="edge41_Node000034_Node000028" title=" " alt="" coords="1827,309,1665,360,1664,355,1826,304"/>

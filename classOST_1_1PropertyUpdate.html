@@ -354,6 +354,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Visit <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> and apply updates from data. </p>
+<p>Apply updates to <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> from QVariantMap data.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">pProperty</td><td>Pointer to <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> to update </td></tr>
@@ -367,7 +368,26 @@ Public Member Functions</h2></td></tr>
 <div class="line">data[<span class="stringliteral">&quot;elementKey&quot;</span>] = value;</div>
 <div class="line"><span class="comment">// ... other element values for the new line</span></div>
 </div><!-- fragment --><p>Updates are applied by calling appropriate element setValue() methods or property grid methods (push, updateLine, deleteLine, etc.).</p>
-<p>Emits valueSet signals to propagate changes through the system. </p>
+<p>Emits valueSet signals to propagate changes through the system.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pProperty</td><td>Pointer to <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> to update </td></tr>
+    <tr><td class="paramname">data</td><td>QVariantMap containing update data from frontend</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Main visitor implementation for applying frontend updates.</p>
+<p>Currently performs validation check for "elements" field presence. The actual update logic (commented setValue() call) would apply element value changes and grid operations from the data map.</p>
+<p>Expected data format: </p><div class="fragment"><div class="line">{</div>
+<div class="line">  <span class="stringliteral">&quot;elements&quot;</span>: {</div>
+<div class="line">    <span class="stringliteral">&quot;elementKey1&quot;</span>: newValue1,</div>
+<div class="line">    <span class="stringliteral">&quot;elementKey2&quot;</span>: newValue2</div>
+<div class="line">  },</div>
+<div class="line">  <span class="stringliteral">&quot;action&quot;</span>: <span class="stringliteral">&quot;newline&quot;</span>,  <span class="comment">// For grid operations</span></div>
+<div class="line">  <span class="comment">// ... other update fields</span></div>
+<div class="line">}</div>
+</div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>Implementation appears to be stub/placeholder code. The setValue() call is commented, suggesting this visitor may not be actively used or is under development.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd>PropertyMulti::setValue() </dd></dl>
 
 <p>Implements <a class="el" href="classOST_1_1PropertyVisitor.html#a9e24b0b68db8c7430e095adb7218fb5c">OST::PropertyVisitor</a>.</p>
 
