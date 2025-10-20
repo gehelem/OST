@@ -184,15 +184,11 @@ void WShandler::processTextMessage(QString message)
 
     if (obj["evt"].toString() == "Freadall")
     {
-        //sendAll();
-        //emit changeValue(Prop());
         emit externalEvent("Freadall", "*", "*", QVariantMap());
-
     }
-    else
-    {
+    /* ignore update messages from readonly users */
+    if (clientGrant == 1) return;
 
-    }
     if (obj["evt"].toString() == "Fsetproperty")
     {
         emit externalEvent("Fsetproperty", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
