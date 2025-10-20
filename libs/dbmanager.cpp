@@ -352,29 +352,39 @@ bool DBManager::populateCatalog(const QString &pFileName, const QString &pName)
 
 
 }
-bool DBManager::getGrants(const QString &pUser, const QString &pPW)
+QString DBManager::getGrants(const QString &pUser, const QString &pPW)
 {
+    QString result = "0";
+
     if(!mDb.open())
     {
         sendError("getGrants dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
-        return false;
+        return result;
     }
-    QString sql = "SELECT GRANT FROM  USERS WHERE ";
-    sql = sql + "    USER = '" + pUser + "'";
+    QString sql = "SELECT GRANT FROM USERS WHERE ";
+    sql = sql + "    LOGIN = '" + pUser + "'";
     sql = sql + " AND PW= '" + pPW + "'";
     if (!mQuery.exec(sql))
     {
-        sendError("getGrants - ERROR SQL =" + sql);
         sendError("getGrants - ERROR : " + mQuery.lastError().text());
         mDb.close();
-        return false;
+        return result;
     }
-    if (mQuery.size() != 1)
+    if (mQuery.size() > 1)
     {
         mDb.close();
-        return false;
+        sendError("getGrants - Returns more than one row - " + pUser);
+        return result;
     }
+    if (mQuery.size() == 0)
+    {
+        mDb.close();
+        sendError("getGrants - Invalid credentials - " + pUser);
+        return result;
+    }
+    mQuery.next();
+    result = mQuery.value(0).toString();
     mDb.close();
-    return false;
+    return result;
 
 }
