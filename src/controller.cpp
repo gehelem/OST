@@ -38,10 +38,11 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
 {
 
     startPublish();
-    wshandler = new WShandler(this, ssl, sslCert, sslKey);
+    wshandler = new WShandler(this, ssl, sslCert, sslKey, _grant);
     connect(wshandler, &WShandler::externalEvent, this, &Controller::OnExternalEvent);
     dbmanager = new DBManager();
     dbmanager->dbInit(_dbpath, "controller");
+    wshandler->dbmanager = dbmanager;
 
 
     if (_libpath == "")
