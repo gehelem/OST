@@ -1,0 +1,54 @@
+{
+    "evt": "moduledump",
+    "modules": {
+        "mainctl": {
+            "warnings": {},
+            "errors": {},
+            "globallovs": {},
+            "infos": {
+                "description": "",
+                "label": "Login page",
+                "name": "login"
+            },
+            "messages": {},
+			"properties":{
+				"login": {
+					"enabled": true,
+                    "badge": false,
+					"freevalue": "",
+					"hasGraph": false,
+					"hasGrid": false,
+					"label": "",
+					"level1": "Identification",
+					"level2": "",
+					"order": "01",
+					"permission": 2,
+					"posticon1": "",
+					"posticon2": "",
+					"preicon1": "",
+					"preicon2": "",
+					"rule": 2,
+					"showElts": true,
+					"status": 2,
+					"elements": {
+						"user": {
+							"type": "string",
+							"label": "User",
+							"order": "0",
+							"directedit":false,
+							"value":""
+						},
+						"pw": {
+							"type": "string",
+							"label": "Password",
+							"order": "50",
+							"directedit":false,
+							"value":""
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
