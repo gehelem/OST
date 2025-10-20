@@ -52,6 +52,8 @@ int main(int argc, char *argv[])
     sslKeyOption.setDefaultValue("/etc/ost/server.key");
     QCommandLineOption lngOption("lng", "Language (en-fr)", "lng");
     lngOption.setDefaultValue("fr");
+    QCommandLineOption grantOption("grant", "Security level (0 : disabled - 1 : Read only - 2 : user grants)", "grant");
+    lngOption.setDefaultValue("fr");
 
     argParser.addOption(saveAllBlobsOption);
     argParser.addOption(webrootOption);
@@ -63,6 +65,7 @@ int main(int argc, char *argv[])
     argParser.addOption(sslCertOption);
     argParser.addOption(sslKeyOption);
     argParser.addOption(lngOption);
+    argParser.addOption(grantOption);
     argParser.process(app);
 
     QString webroot = argParser.value(webrootOption);
@@ -74,6 +77,7 @@ int main(int argc, char *argv[])
     QString sslCert = argParser.value(sslCertOption);
     QString sslKey = argParser.value(sslKeyOption);
     QString lng = argParser.value(lngOption);
+    QString grant = argParser.value(grantOption);
 
     sendMessage("Webroot               =" + webroot);
     sendMessage("DB Path               =" + dbPath);
@@ -87,6 +91,7 @@ int main(int argc, char *argv[])
         sendMessage("SSL Private Key       =" + sslKey);
     }
     sendMessage("Language              =" + lng);
+    sendMessage("Security              =" + grant);
 
     Controller controller(
         webroot,
@@ -97,7 +102,8 @@ int main(int argc, char *argv[])
         ssl,
         sslCert,
         sslKey,
-        lng
+        lng,
+        grant
     );
 
     Q_UNUSED(controller);

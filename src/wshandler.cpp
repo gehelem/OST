@@ -8,7 +8,8 @@
 
  * ... ...
  */
-WShandler::WShandler(QObject *parent, const QString &ssl, const QString &sslCert, const QString &sslKey)
+WShandler::WShandler(QObject *parent, const QString &ssl, const QString &sslCert, const QString &sslKey,
+                     const QString &grant): mServerGrant(grant)
 {
 
     //this->setParent(parent);
@@ -125,24 +126,71 @@ void WShandler::onNewConnection()
     QWebSocket *pSocket = m_pWebSocketServer->nextPendingConnection();
     connect(pSocket, &QWebSocket::textMessageReceived, this, &WShandler::processTextMessage);
     connect(pSocket, &QWebSocket::disconnected, this, &WShandler::socketDisconnected);
+    qDebug() << pSocket << "-" << pSocket->peerAddress().toString();
     m_clients << pSocket;
+    mClientGrants[pSocket->peerAddress().toString()] = "0";
+
 }
 
 
 void WShandler::processTextMessage(QString message)
 {
+    QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
+    QString clientGrant = mClientGrants[pClient->peerAddress().toString()];
+    if ((clientGrant != "1") && (clientGrant != "2") && (clientGrant != "pending") && ((mServerGrant == "1")
+            || (mServerGrant == "2")))
+    {
+        sendMessage("request identification " + pClient->peerAddress().toString());
+        QFile jsonFile(":loginpage.json");
+        if (jsonFile.open(QFile::ReadOnly))
+        {
+            QJsonDocument d = QJsonDocument().fromJson(jsonFile.readAll());
+            jsonFile.close();
+            mClientGrants[pClient->peerAddress().toString()] = "pending";
+            pClient->sendTextMessage(d.toJson());
+        };
+        return;
+    }
+
     QString _mess = message.replace("\\\"", "\"");
     _mess = _mess.replace("}\"", "}");
     _mess = _mess.replace("\"{", "{");
     QJsonDocument jsonResponse = QJsonDocument::fromJson(_mess.toUtf8()); // garder
-    emit textRcv(message);
     QJsonObject  obj = jsonResponse.object(); // garder
     sendMessage("OST server received json" + message);
+
+    if (clientGrant == "pending")
+    {
+        if (
+            (obj["evt"].toString() == "Fsetproperty")
+            &&    (obj["mod"].toString() == "mainctl")
+            && obj["dta"].toVariant().toMap().contains("login")
+        )
+        {
+            QVariant v = obj["dta"].toVariant().toMap()["login"];
+            QVariant Elts = v.toMap()["elements"];
+            QString user = Elts.toMap()["user"].toString();
+            QString pw = Elts.toMap()["pw"].toString();
+            QString g = dbmanager->getGrants(user, pw);
+            if ((g == "1") || (g == "2"))
+            {
+                mClientGrants[pClient->peerAddress().toString()] = g;
+                emit externalEvent("Freadall", "*", "*", QVariantMap());
+            }
+
+        }
+        return;
+    }
+
     if (obj["evt"].toString() == "Freadall")
     {
         //sendAll();
         //emit changeValue(Prop());
         emit externalEvent("Freadall", "*", "*", QVariantMap());
+
+    }
+    else
+    {
 
     }
     if (obj["evt"].toString() == "Fsetproperty")
@@ -225,10 +273,14 @@ void WShandler::socketDisconnected()
 {
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
     sendMessage("OST client disconnected");
+    qDebug() << pClient << "-" << pClient->peerAddress().toString();
+
     if (pClient)
     {
         m_clients.removeAll(pClient);
         pClient->deleteLater();
+        mClientGrants.remove(pClient->peerAddress().toString());
+
     }
 }
 

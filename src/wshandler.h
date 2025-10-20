@@ -4,6 +4,7 @@
 #include "QtWebSockets/qwebsocket.h"
 #include <QSslCertificate>
 #include <QSslKey>
+#include "dbmanager.h"
 
 QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
 QT_FORWARD_DECLARE_CLASS(QWebSocket)
@@ -16,16 +17,17 @@ class WShandler : public QObject
 {
         Q_OBJECT
     public:
-        WShandler(QObject *parent, const QString &ssl = "N", const QString &sslCert = "", const QString &sslKey = "");
+        WShandler(QObject *parent, const QString &ssl = "N", const QString &sslCert = "", const QString &sslKey = "",
+                  const QString &grant = "0");
         ~WShandler();
     public :
         void processModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                 const QVariantMap &eventData);
         void processFileEvent(const QString &eventType, const QStringList &eventData);
+        DBManager   *dbmanager;
 
     signals:
         void closed();
-        void textRcv(QString txt);
         void externalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                            const QVariantMap &eventData);
     private:
@@ -38,6 +40,8 @@ class WShandler : public QObject
         void socketDisconnected();
         QWebSocketServer *m_pWebSocketServer;
         QList<QWebSocket *> m_clients;
+        QMap<QString, QString> mClientGrants;
+        QString mServerGrant = "0";
         void sendMessage(const QString &pMessage);
 
 
