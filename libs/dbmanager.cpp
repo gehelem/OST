@@ -352,3 +352,29 @@ bool DBManager::populateCatalog(const QString &pFileName, const QString &pName)
 
 
 }
+bool DBManager::getGrants(const QString &pUser, const QString &pPW)
+{
+    if(!mDb.open())
+    {
+        sendError("getGrants dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+        return false;
+    }
+    QString sql = "SELECT GRANT FROM  USERS WHERE ";
+    sql = sql + "    USER = '" + pUser + "'";
+    sql = sql + " AND PW= '" + pPW + "'";
+    if (!mQuery.exec(sql))
+    {
+        sendError("getGrants - ERROR SQL =" + sql);
+        sendError("getGrants - ERROR : " + mQuery.lastError().text());
+        mDb.close();
+        return false;
+    }
+    if (mQuery.size() != 1)
+    {
+        mDb.close();
+        return false;
+    }
+    mDb.close();
+    return false;
+
+}
