@@ -1,3 +1,10 @@
+/**
+ * @file propertyjsondumper.cpp
+ * @brief JSON serialization visitor implementation
+ * @author OST Development Team
+ * @version 1.0
+ */
+
 #include "propertyjsondumper.h"
 #include "elementjsondumper.h"
 #include <valuejsondumper.h>
@@ -9,6 +16,18 @@
 namespace  OST
 {
 
+/**
+ * @brief Extract common property metadata to JSON
+ * @param pProperty Pointer to property base
+ * @return QJsonObject with common metadata fields
+ *
+ * Serializes metadata common to all property types:
+ * - label (translated), order, hierarchy (level1/level2)
+ * - status, permission, hasprofile
+ * - badge, icons (pre/post), enabled state, freevalue
+ *
+ * Uses Translate singleton for i18n support.
+ */
 QJsonObject PropertyJsonDumper::dumpPropertyCommons(PropertyBase *pProperty)
 {
     QJsonObject json;
@@ -31,6 +50,34 @@ QJsonObject PropertyJsonDumper::dumpPropertyCommons(PropertyBase *pProperty)
     return json;
 
 }
+
+/**
+ * @brief Serialize PropertyMulti to JSON format
+ * @param pProperty Pointer to PropertyMulti to serialize
+ *
+ * Main visitor implementation that converts a PropertyMulti to complete JSON.
+ *
+ * Serialization process:
+ * 1. Extract common metadata via dumpPropertyCommons()
+ * 2. Add multi-property specific fields (showElts, hasGrid, rule)
+ * 3. Serialize all elements using ElementJsonDumper visitor
+ * 4. Serialize grid data if present (headers + grid lines)
+ * 5. Add graph definitions if property has graph capability
+ *
+ * Result stored in mResult member, accessible via getResult().
+ *
+ * @par Grid Serialization:
+ * Grid is converted to 2D JSON array where each line is an array of values
+ * following the order defined in gridheaders. Uses ValueJsonDumper to
+ * convert grid cell values.
+ *
+ * @par Graph Serialization:
+ * If hasGraph is true, includes graphType (as string) and graphParams
+ * (as QJsonObject from params QVariantMap).
+ *
+ * @see ElementJsonDumper
+ * @see ValueJsonDumper
+ */
 void PropertyJsonDumper::visit(PropertyMulti *pProperty)
 {
     QJsonObject json = dumpPropertyCommons(pProperty);
