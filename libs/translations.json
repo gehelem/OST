@@ -1210,6 +1210,389 @@
     "Wait time in seconds after resuming guiding before continuing sequence (allows guiding to stabilize)": {
         "en": "Wait time in seconds after resuming guiding before continuing sequence (allows guiding to stabilize)",
         "fr": "Attendre cette durée en secondes après que le guidage ait redémarré (pour que le guidage se stabilise)"
+    },
+    "A boolean": {
+        "en": "A boolean",
+        "fr": "Un booléen"
+    },
+    "AAAGrids": {
+        "en": "AAAGrids",
+        "fr": "AAAGrids"
+    },
+    "Abscisse": {
+        "en": "Abscisse",
+        "fr": "Abscisse"
+    },
+    "Any": {
+        "en": "Any",
+        "fr": "Any"
+    },
+    "Astrometry index folder path": {
+        "en": "Astrometry index folder path",
+        "fr": "Astrometry index folder path"
+    },
+    "At most one": {
+        "en": "At most one",
+        "fr": "un au plus"
+    },
+    "Bool 1": {
+        "en": "Bool 1",
+        "fr": "Bool 1"
+    },
+    "Bool 1/3": {
+        "en": "Bool 1/3",
+        "fr": "Bool 1/3"
+    },
+    "Bool 2": {
+        "en": "Bool 2",
+        "fr": "Bool 2"
+    },
+    "Bool 2/3": {
+        "en": "Bool 2/3",
+        "fr": "Bool 2/3"
+    },
+    "Bool 3": {
+        "en": "Bool 3",
+        "fr": "Bool 3"
+    },
+    "Bool 3/3": {
+        "en": "Bool 3/3",
+        "fr": "Bool 3/3"
+    },
+    "Bool 4": {
+        "en": "Bool 4",
+        "fr": "Bool 4"
+    },
+    "Booleans": {
+        "en": "Booleans",
+        "fr": "Booléens"
+    },
+    "DE": {
+        "en": "DE",
+        "fr": "traduire"
+    },
+    "Dates": {
+        "en": "Dates",
+        "fr": "Dates"
+    },
+    "Dates RW": {
+        "en": "Dates RW",
+        "fr": "Date RW"
+    },
+    "Dates RW - grid": {
+        "en": "Dates RW - grid",
+        "fr": "Dates RW - grid"
+    },
+    "Dates direct edit": {
+        "en": "Dates direct edit",
+        "fr": "Dates direct edit"
+    },
+    "Dates readonly": {
+        "en": "Dates readonly",
+        "fr": "Dates lecture seuls"
+    },
+    "Dummy module to show what we can do and not": {
+        "en": "Dummy module to show what we can do and not",
+        "fr": "Module factice pour montrer ce qu'on sait faire"
+    },
+    "Dyn bool": {
+        "en": "Dyn bool",
+        "fr": "Bool dynamique"
+    },
+    "Dyn light": {
+        "en": "Dyn light",
+        "fr": "Light dynamique"
+    },
+    "Dyn text": {
+        "en": "Dyn text",
+        "fr": "Texste dynamique"
+    },
+    "Dynamic": {
+        "en": "Dynamic",
+        "fr": "Dynamique"
+    },
+    "Dynamically instanciated": {
+        "en": "Dynamically instanciated",
+        "fr": "instancié dynamiquement"
+    },
+    "Examples": {
+        "en": "Examples",
+        "fr": "Exemples"
+    },
+    "First image": {
+        "en": "First image",
+        "fr": "Première image"
+    },
+    "Float": {
+        "en": "Float",
+        "fr": "Décimal"
+    },
+    "From": {
+        "en": "From",
+        "fr": "Depuis"
+    },
+    "Graph example  - Serie X/Y": {
+        "en": "Graph example  - Serie X/Y",
+        "fr": "Graphe - Série X/Y"
+    },
+    "Graph example  - X/Y": {
+        "en": "Graph example  - X/Y",
+        "fr": "Graphe - X/Y"
+    },
+    "Graph example - Date - Y": {
+        "en": "Graph example - Date - Y",
+        "fr": "Graphe - Date/Y"
+    },
+    "Graph example - PHD": {
+        "en": "Graph example - PHD",
+        "fr": "Graphe - PHD"
+    },
+    "Graph example - Serie - Date - Y": {
+        "en": "Graph example - Serie - Date - Y",
+        "fr": "Graphe - Série Date/Y"
+    },
+    "Graphes": {
+        "en": "Graphes",
+        "fr": "Graphes"
+    },
+    "Grid example": {
+        "en": "Grid example",
+        "fr": "Grille"
+    },
+    "Grid example 2": {
+        "en": "Grid example 2",
+        "fr": "Seconde grille"
+    },
+    "Grids": {
+        "en": "Grids",
+        "fr": "Grilles"
+    },
+    "Image message": {
+        "en": "Image message",
+        "fr": "Meessage d'image"
+    },
+    "Images": {
+        "en": "Images",
+        "fr": "Images"
+    },
+    "Int with lov": {
+        "en": "Int with lov",
+        "fr": "Entier avec liste de valeurs"
+    },
+    "Integer": {
+        "en": "Integer",
+        "fr": "Entier"
+    },
+    "List of values": {
+        "en": "List of values",
+        "fr": "Liste de valeurs"
+    },
+    "Message": {
+        "en": "Message",
+        "fr": "Message"
+    },
+    "Mixed": {
+        "en": "Mixed",
+        "fr": "Mélange"
+    },
+    "Mixed types - read/write": {
+        "en": "Mixed types - read/write",
+        "fr": "Types mélangés - RW"
+    },
+    "Modules status": {
+        "en": "Modules status",
+        "fr": "Statut du module"
+    },
+    "Multipurpose camera": {
+        "en": "Multipurpose camera",
+        "fr": "Caméra multifonction"
+    },
+    "Multipurpose mount": {
+        "en": "Multipurpose mount",
+        "fr": "Monture multifonction"
+    },
+    "Number 1": {
+        "en": "Number 1",
+        "fr": "Entier 1"
+    },
+    "Number 1/2": {
+        "en": "Number 1/2",
+        "fr": "Entier 1/2"
+    },
+    "Number 2": {
+        "en": "Number 2",
+        "fr": "Entier 2"
+    },
+    "Number 2/2": {
+        "en": "Number 2/2",
+        "fr": "Entier 2/2"
+    },
+    "Number 3": {
+        "en": "Number 3",
+        "fr": "Entier 3"
+    },
+    "Number 4": {
+        "en": "Number 4",
+        "fr": "Entier 4"
+    },
+    "Number 5": {
+        "en": "Number 5",
+        "fr": "Entier 5"
+    },
+    "Numbers": {
+        "en": "Numbers",
+        "fr": "Entiers"
+    },
+    "Numbers example - read/write": {
+        "en": "Numbers example - read/write",
+        "fr": "Exemples d'entiers - R/W"
+    },
+    "One of many": {
+        "en": "One of many",
+        "fr": "Un parmis d'autres"
+    },
+    "Ordonnée": {
+        "en": "Ordonnée",
+        "fr": "Ordonnée"
+    },
+    "P1": {
+        "en": "P1",
+        "fr": "P1"
+    },
+    "P2": {
+        "en": "P2",
+        "fr": "P2"
+    },
+    "P3": {
+        "en": "P3",
+        "fr": "P3"
+    },
+    "RSB": {
+        "en": "RSB",
+        "fr": "RSB"
+    },
+    "Selection": {
+        "en": "Selection",
+        "fr": "Sélection"
+    },
+    "Serie": {
+        "en": "Serie",
+        "fr": "Série"
+    },
+    "Set blob mode": {
+        "en": "Set blob mode",
+        "fr": "Activation mode blob"
+    },
+    "Skychart": {
+        "en": "Skychart",
+        "fr": "Carte du ciel"
+    },
+    "Solve field": {
+        "en": "Solve field",
+        "fr": "R2soudre le champ"
+    },
+    "Spinner": {
+        "en": "Spinner",
+        "fr": "Spinner"
+    },
+    "Stars extraction": {
+        "en": "Stars extraction",
+        "fr": "Extraction des étoiles"
+    },
+    "Str with lov": {
+        "en": "Str with lov",
+        "fr": "Texte avec  liste de valeur"
+    },
+    "String": {
+        "en": "String",
+        "fr": "Texte"
+    },
+    "Test Date": {
+        "en": "Test Date",
+        "fr": "Date test"
+    },
+    "Test Time": {
+        "en": "Test Time",
+        "fr": "Heure test"
+    },
+    "Test image": {
+        "en": "Test image",
+        "fr": "Image test"
+    },
+    "Test list of values": {
+        "en": "Test list of values",
+        "fr": "Test liste de valeurs"
+    },
+    "Text 1": {
+        "en": "Text 1",
+        "fr": "Tesxte 1"
+    },
+    "Text 2": {
+        "en": "Text 2",
+        "fr": "Texte 2"
+    },
+    "Text 3": {
+        "en": "Text 3",
+        "fr": "Texte 3"
+    },
+    "Text 4": {
+        "en": "Text 4",
+        "fr": "Texte 4"
+    },
+    "Text example - read only": {
+        "en": "Text example - read only",
+        "fr": "Exemple de texte lecture seule"
+    },
+    "Text example - read/write": {
+        "en": "Text example - read/write",
+        "fr": "Exemple de texte - RW"
+    },
+    "Text mixed": {
+        "en": "Text mixed",
+        "fr": "Texte mixte"
+    },
+    "Texts": {
+        "en": "Texts",
+        "fr": "Textes"
+    },
+    "Times": {
+        "en": "Times",
+        "fr": "Heures"
+    },
+    "Times Grid - RW ": {
+        "en": "Times Grid - RW ",
+        "fr": "Grille d'heures - RW"
+    },
+    "Times RW": {
+        "en": "Times RW",
+        "fr": "Heures RW"
+    },
+    "Times direct edit": {
+        "en": "Times direct edit",
+        "fr": "Heures en édition directe"
+    },
+    "Times readonly": {
+        "en": "Times readonly",
+        "fr": "Heures en lecture seule"
+    },
+    "To": {
+        "en": "To",
+        "fr": "à"
+    },
+    "image in grid": {
+        "en": "image in grid",
+        "fr": "Image dans une grille"
+    },
+    "pDE": {
+        "en": "pDE",
+        "fr": "pDE"
+    },
+    "pRA": {
+        "en": "pRA",
+        "fr": "pRA"
+    },
+    "video in grid": {
+        "en": "video in grid",
+        "fr": "Vidéo dans une grille"
     }
-
 }
