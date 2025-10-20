@@ -187,7 +187,7 @@ void WShandler::processTextMessage(QString message)
         emit externalEvent("Freadall", "*", "*", QVariantMap());
     }
     /* ignore update messages from readonly users */
-    if (clientGrant == 1) return;
+    if (clientGrant == "1") return;
 
     if (obj["evt"].toString() == "Fsetproperty")
     {
