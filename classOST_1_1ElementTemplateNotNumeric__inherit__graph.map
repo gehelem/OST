@@ -1,8 +1,8 @@
 <map id="OST::ElementTemplateNotNumeric&lt; T &gt;" name="OST::ElementTemplateNotNumeric&lt; T &gt;">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,645,283,771"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1ElementTemplate.html" title=" " alt="" coords="45,452,243,597"/>
+<area shape="rect" id="Node000001" title="Template specialization for non&#45;numeric elements (string, bool, date, time, etc.)" alt="" coords="5,645,283,771"/>
+<area shape="rect" id="Node000002" href="$classOST_1_1ElementTemplate.html" title="Base template class for all typed elements." alt="" coords="45,452,243,597"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="147,611,147,645,141,645,141,611"/>
-<area shape="rect" id="Node000003" href="$classOST_1_1ElementBase.html" title=" " alt="" coords="75,119,213,404"/>
+<area shape="rect" id="Node000003" href="$classOST_1_1ElementBase.html" title="Abstract base class for all typed elements in OST properties." alt="" coords="75,119,213,404"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="147,418,147,452,141,452,141,418"/>
 <area shape="rect" id="Node000004" href="$classQObject.html" title=" " alt="" coords="111,5,177,71"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="147,84,147,119,141,119,141,84"/>

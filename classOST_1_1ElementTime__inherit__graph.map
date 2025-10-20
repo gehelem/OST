@@ -1,10 +1,10 @@
 <map id="OST::ElementTime" name="OST::ElementTime">
-<area shape="rect" id="Node000001" title=" " alt="" coords="57,833,195,1039"/>
+<area shape="rect" id="Node000001" title="Time element for time&#45;of&#45;day selection." alt="" coords="57,833,195,1039"/>
 <area shape="rect" id="Node000002" href="$classOST_1_1ElementTemplateNotNumeric.html" title=" " alt="" coords="5,645,247,785"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="129,799,129,833,123,833,123,799"/>
-<area shape="rect" id="Node000003" href="$classOST_1_1ElementTemplate.html" title=" " alt="" coords="27,452,225,597"/>
+<area shape="rect" id="Node000003" href="$classOST_1_1ElementTemplate.html" title="Base template class for all typed elements." alt="" coords="27,452,225,597"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="129,611,129,645,123,645,123,611"/>
-<area shape="rect" id="Node000004" href="$classOST_1_1ElementBase.html" title=" " alt="" coords="57,119,195,404"/>
+<area shape="rect" id="Node000004" href="$classOST_1_1ElementBase.html" title="Abstract base class for all typed elements in OST properties." alt="" coords="57,119,195,404"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="129,418,129,452,123,452,123,418"/>
 <area shape="rect" id="Node000005" href="$classQObject.html" title=" " alt="" coords="93,5,159,71"/>
 <area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="129,84,129,119,123,119,123,84"/>

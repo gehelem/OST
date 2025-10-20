@@ -80,14 +80,17 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>Visitor that converts properties to human-readable text.  
+ <a href="classOST_1_1PropertyTextDumper.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="propertytextdumper_8h_source.html">propertytextdumper.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for OST::PropertyTextDumper:</div>
 <div class="dyncontent">
 <div class="center"><img src="classOST_1_1PropertyTextDumper__inherit__graph.png" border="0" usemap="#aOST_1_1PropertyTextDumper_inherit__map" alt="Inheritance graph"/></div>
 <map name="aOST_1_1PropertyTextDumper_inherit__map" id="aOST_1_1PropertyTextDumper_inherit__map">
-<area shape="rect" title=" " alt="" coords="5,199,187,364"/>
-<area shape="rect" href="classOST_1_1PropertyVisitor.html" title=" " alt="" coords="24,5,168,151"/>
+<area shape="rect" title="Visitor that converts properties to human&#45;readable text." alt="" coords="5,199,187,364"/>
+<area shape="rect" href="classOST_1_1PropertyVisitor.html" title="Abstract base class for property visitor pattern implementation." alt="" coords="24,5,168,151"/>
 <area shape="poly" title=" " alt="" coords="99,165,99,198,93,198,93,165"/>
 </map>
 </div>
@@ -96,8 +99,8 @@ Collaboration diagram for OST::PropertyTextDumper:</div>
 <div class="dyncontent">
 <div class="center"><img src="classOST_1_1PropertyTextDumper__coll__graph.png" border="0" usemap="#aOST_1_1PropertyTextDumper_coll__map" alt="Collaboration graph"/></div>
 <map name="aOST_1_1PropertyTextDumper_coll__map" id="aOST_1_1PropertyTextDumper_coll__map">
-<area shape="rect" title=" " alt="" coords="5,199,187,364"/>
-<area shape="rect" href="classOST_1_1PropertyVisitor.html" title=" " alt="" coords="24,5,168,151"/>
+<area shape="rect" title="Visitor that converts properties to human&#45;readable text." alt="" coords="5,199,187,364"/>
+<area shape="rect" href="classOST_1_1PropertyVisitor.html" title="Abstract base class for property visitor pattern implementation." alt="" coords="24,5,168,151"/>
 <area shape="poly" title=" " alt="" coords="99,165,99,198,93,198,93,165"/>
 </map>
 </div>
@@ -105,19 +108,65 @@ Collaboration diagram for OST::PropertyTextDumper:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a7a2f39c5ad399ffcd2ffb2ea8a951c1e" id="r_a7a2f39c5ad399ffcd2ffb2ea8a951c1e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyTextDumper.html#a7a2f39c5ad399ffcd2ffb2ea8a951c1e">PropertyTextDumper</a> ()=default</td></tr>
+<tr class="memdesc:a7a2f39c5ad399ffcd2ffb2ea8a951c1e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor.  <br /></td></tr>
 <tr class="separator:a7a2f39c5ad399ffcd2ffb2ea8a951c1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8e96449a2da5ff955bb9a302a4dd2094" id="r_a8e96449a2da5ff955bb9a302a4dd2094"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyTextDumper.html#a8e96449a2da5ff955bb9a302a4dd2094">visit</a> (<a class="el" href="classOST_1_1PropertyBase.html">PropertyBase</a> *pProperty) override</td></tr>
+<tr class="memdesc:a8e96449a2da5ff955bb9a302a4dd2094"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit <a class="el" href="classOST_1_1PropertyBase.html" title="Abstract base class for all OST properties.">PropertyBase</a> (not implemented)  <br /></td></tr>
 <tr class="separator:a8e96449a2da5ff955bb9a302a4dd2094"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a637cd5c9daf3707d4fe4d4bbd0ab5993" id="r_a637cd5c9daf3707d4fe4d4bbd0ab5993"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyTextDumper.html#a637cd5c9daf3707d4fe4d4bbd0ab5993">visit</a> (<a class="el" href="classOST_1_1PropertyBase.html">PropertyBase</a> *pProperty, QVariantMap &amp;data) override</td></tr>
+<tr class="memdesc:a637cd5c9daf3707d4fe4d4bbd0ab5993"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit <a class="el" href="classOST_1_1PropertyBase.html" title="Abstract base class for all OST properties.">PropertyBase</a> with data (not implemented)  <br /></td></tr>
 <tr class="separator:a637cd5c9daf3707d4fe4d4bbd0ab5993"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a24f311e976b2dbbcb516e3290be945ca" id="r_a24f311e976b2dbbcb516e3290be945ca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyTextDumper.html#a24f311e976b2dbbcb516e3290be945ca">visit</a> (<a class="el" href="classOST_1_1PropertyMulti.html">PropertyMulti</a> *pProperty) override</td></tr>
+<tr class="memdesc:a24f311e976b2dbbcb516e3290be945ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> and convert to text.  <br /></td></tr>
 <tr class="separator:a24f311e976b2dbbcb516e3290be945ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a406fd1644e545ea6a9987d15647f676d" id="r_a406fd1644e545ea6a9987d15647f676d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyTextDumper.html#a406fd1644e545ea6a9987d15647f676d">visit</a> (<a class="el" href="classOST_1_1PropertyMulti.html">PropertyMulti</a> *pProperty, QVariantMap &amp;data) override</td></tr>
+<tr class="memdesc:a406fd1644e545ea6a9987d15647f676d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> with data (not implemented)  <br /></td></tr>
 <tr class="separator:a406fd1644e545ea6a9987d15647f676d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a07f68af9291fd0d9c7e7e5dcf94ea7f1" id="r_a07f68af9291fd0d9c7e7e5dcf94ea7f1"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classQString.html">QString</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyTextDumper.html#a07f68af9291fd0d9c7e7e5dcf94ea7f1">getResult</a> () const</td></tr>
+<tr class="memdesc:a07f68af9291fd0d9c7e7e5dcf94ea7f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get text conversion result.  <br /></td></tr>
 <tr class="separator:a07f68af9291fd0d9c7e7e5dcf94ea7f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Visitor that converts properties to human-readable text. </p>
+<p><a class="el" href="classOST_1_1PropertyTextDumper.html" title="Visitor that converts properties to human-readable text.">PropertyTextDumper</a> implements the Visitor pattern to convert property objects and their elements into formatted text strings suitable for debugging, logging, or console output.</p>
+<p>The generated text includes:</p><ul>
+<li>Property metadata (key, label, state, permission)</li>
+<li>All elements with their types and values</li>
+<li>Indented formatting for readability</li>
+<li>Grid summary if property has grid capability</li>
+</ul>
+<dl class="section user"><dt>Usage:</dt><dd><div class="fragment"><div class="line"><a class="code hl_class" href="classOST_1_1PropertyMulti.html">PropertyMulti</a>* <span class="keyword">property</span> = ...; <span class="comment">// Your property with elements</span></div>
+<div class="line"> </div>
+<div class="line"><a class="code hl_class" href="classOST_1_1PropertyTextDumper.html">PropertyTextDumper</a> dumper;</div>
+<div class="line"><span class="keyword">property</span>-&gt;accept(&amp;dumper);     <span class="comment">// Convert property to text</span></div>
+<div class="line"> </div>
+<div class="line"><a class="code hl_class" href="classQString.html">QString</a> text = dumper.<a class="code hl_function" href="classOST_1_1PropertyTextDumper.html#a07f68af9291fd0d9c7e7e5dcf94ea7f1">getResult</a>();</div>
+<div class="line">qDebug() &lt;&lt; text;  <span class="comment">// Print to debug console</span></div>
+<div class="ttc" id="aclassOST_1_1PropertyMulti_html"><div class="ttname"><a href="classOST_1_1PropertyMulti.html">OST::PropertyMulti</a></div><div class="ttdoc">Concrete property class containing multiple typed elements with optional grid.</div><div class="ttdef"><b>Definition</b> propertymulti.h:71</div></div>
+<div class="ttc" id="aclassOST_1_1PropertyTextDumper_html"><div class="ttname"><a href="classOST_1_1PropertyTextDumper.html">OST::PropertyTextDumper</a></div><div class="ttdoc">Visitor that converts properties to human-readable text.</div><div class="ttdef"><b>Definition</b> propertytextdumper.h:67</div></div>
+<div class="ttc" id="aclassOST_1_1PropertyTextDumper_html_a07f68af9291fd0d9c7e7e5dcf94ea7f1"><div class="ttname"><a href="classOST_1_1PropertyTextDumper.html#a07f68af9291fd0d9c7e7e5dcf94ea7f1">OST::PropertyTextDumper::getResult</a></div><div class="ttdeci">const QString &amp; getResult() const</div><div class="ttdoc">Get text conversion result.</div><div class="ttdef"><b>Definition</b> propertytextdumper.h:141</div></div>
+<div class="ttc" id="aclassQString_html"><div class="ttname"><a href="classQString.html">QString</a></div></div>
+</div><!-- fragment --></dd></dl>
+<dl class="section user"><dt>Example Output:</dt><dd><div class="fragment"><div class="line">Property: parameters (Focus Parameters)</div>
+<div class="line">  <a class="code hl_enumeration" href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985a">State</a>: <a class="code hl_enumvalue" href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985aac4055be61d9eeb9e2cff30c68bc54d58">Ok</a> (1)</div>
+<div class="line">  <a class="code hl_enumeration" href="namespaceOST.html#a9be35f589fb7dd8d44169b078554ad72">Permission</a>: <a class="code hl_enumvalue" href="namespaceOST.html#a9be35f589fb7dd8d44169b078554ad72ac542d3f83c8feec61ae9a959af6043d0">ReadWrite</a> (2)</div>
+<div class="line">  Elements:</div>
+<div class="line">    iterations (<span class="keywordtype">int</span>): 10</div>
+<div class="line">    exposure (<span class="keywordtype">float</span>): 5.0</div>
+<div class="line">    enabled (<span class="keywordtype">bool</span>): true</div>
+<div class="line">  Grid: 3 lines</div>
+<div class="ttc" id="anamespaceOST_html_a96b9a9a658dc07a226a0885a3094985a"><div class="ttname"><a href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985a">OST::State</a></div><div class="ttdeci">State</div><div class="ttdoc">Runtime state enumeration for properties, elements, and operations.</div><div class="ttdef"><b>Definition</b> common.h:42</div></div>
+<div class="ttc" id="anamespaceOST_html_a96b9a9a658dc07a226a0885a3094985aac4055be61d9eeb9e2cff30c68bc54d58"><div class="ttname"><a href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985aac4055be61d9eeb9e2cff30c68bc54d58">OST::Ok</a></div><div class="ttdeci">@ Ok</div><div class="ttdef"><b>Definition</b> common.h:44</div></div>
+<div class="ttc" id="anamespaceOST_html_a9be35f589fb7dd8d44169b078554ad72"><div class="ttname"><a href="namespaceOST.html#a9be35f589fb7dd8d44169b078554ad72">OST::Permission</a></div><div class="ttdeci">Permission</div><div class="ttdoc">Frontend access permission for properties.</div><div class="ttdef"><b>Definition</b> propertybase.h:31</div></div>
+<div class="ttc" id="anamespaceOST_html_a9be35f589fb7dd8d44169b078554ad72ac542d3f83c8feec61ae9a959af6043d0"><div class="ttname"><a href="namespaceOST.html#a9be35f589fb7dd8d44169b078554ad72ac542d3f83c8feec61ae9a959af6043d0">OST::ReadWrite</a></div><div class="ttdeci">@ ReadWrite</div><div class="ttdef"><b>Definition</b> propertybase.h:34</div></div>
+</div><!-- fragment --></dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Only <a class="el" href="classOST_1_1PropertyTextDumper.html#a24f311e976b2dbbcb516e3290be945ca" title="Visit PropertyMulti and convert to text.">visit(PropertyMulti*)</a> is implemented. <a class="el" href="classOST_1_1PropertyBase.html" title="Abstract base class for all OST properties.">PropertyBase</a> visitor methods are stubs as <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> is the primary concrete property type.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classOST_1_1PropertyVisitor.html" title="Abstract base class for property visitor pattern implementation.">PropertyVisitor</a> </dd>
+<dd>
+<a class="el" href="classOST_1_1PropertyJsonDumper.html" title="Visitor that serializes properties to JSON format.">PropertyJsonDumper</a> </dd>
+<dd>
+<a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> </dd></dl>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a7a2f39c5ad399ffcd2ffb2ea8a951c1e" name="a7a2f39c5ad399ffcd2ffb2ea8a951c1e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7a2f39c5ad399ffcd2ffb2ea8a951c1e">&#9670;&#160;</a></span>PropertyTextDumper()</h2>
 
@@ -140,6 +189,8 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Default constructor. </p>
 
 </div>
 </div>
@@ -167,6 +218,16 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Get text conversion result. </p>
+<dl class="section return"><dt>Returns</dt><dd>QString containing formatted property text</dd></dl>
+<p>Returns the text representation built by the last <a class="el" href="classOST_1_1PropertyTextDumper.html#a8e96449a2da5ff955bb9a302a4dd2094" title="Visit PropertyBase (not implemented)">visit()</a> call. This string is suitable for logging or debugging output.</p>
+<dl class="section user"><dt>Example:</dt><dd><div class="fragment"><div class="line"><a class="code hl_class" href="classOST_1_1PropertyTextDumper.html">PropertyTextDumper</a> dumper;</div>
+<div class="line"><span class="keyword">property</span>-&gt;accept(&amp;dumper);</div>
+<div class="line"><a class="code hl_class" href="classQString.html">QString</a> text = dumper.<a class="code hl_function" href="classOST_1_1PropertyTextDumper.html#a07f68af9291fd0d9c7e7e5dcf94ea7f1">getResult</a>();</div>
+<div class="line">qDebug() &lt;&lt; text;</div>
+<div class="line"><span class="comment">// Or write to log file</span></div>
+</div><!-- fragment --> </dd></dl>
+
 </div>
 </div>
 <a id="a8e96449a2da5ff955bb9a302a4dd2094" name="a8e96449a2da5ff955bb9a302a4dd2094"></a>
@@ -192,6 +253,15 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Visit <a class="el" href="classOST_1_1PropertyBase.html" title="Abstract base class for all OST properties.">PropertyBase</a> (not implemented) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pProperty</td><td>Pointer to <a class="el" href="classOST_1_1PropertyBase.html" title="Abstract base class for all OST properties.">PropertyBase</a></td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Stub implementation as <a class="el" href="classOST_1_1PropertyBase.html" title="Abstract base class for all OST properties.">PropertyBase</a> is abstract. Only <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> visitor is used in practice. </p>
 
 <p>Implements <a class="el" href="classOST_1_1PropertyVisitor.html#a99eaeac9b8d4475f76f04f151f78e5f0">OST::PropertyVisitor</a>.</p>
 
@@ -231,6 +301,16 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Visit <a class="el" href="classOST_1_1PropertyBase.html" title="Abstract base class for all OST properties.">PropertyBase</a> with data (not implemented) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pProperty</td><td>Pointer to <a class="el" href="classOST_1_1PropertyBase.html" title="Abstract base class for all OST properties.">PropertyBase</a> </td></tr>
+    <tr><td class="paramname">data</td><td>QVariantMap with operation data</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Stub implementation - text dumping doesn't use data parameter. </p>
+
 <p>Implements <a class="el" href="classOST_1_1PropertyVisitor.html#ad908c12ddb6193d8c037dbc3893faaa4">OST::PropertyVisitor</a>.</p>
 
 </div>
@@ -258,6 +338,16 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Visit <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> and convert to text. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pProperty</td><td>Pointer to <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> to convert</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Main implementation that converts a <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> object to formatted text. Walks through all elements, extracts values, and builds a readable text representation.</p>
+<p>Result is stored in mResult and accessible via <a class="el" href="classOST_1_1PropertyTextDumper.html#a07f68af9291fd0d9c7e7e5dcf94ea7f1" title="Get text conversion result.">getResult()</a>. </p>
 
 <p>Implements <a class="el" href="classOST_1_1PropertyVisitor.html#a84f291604140aaaf58e77554aa2ce0e5">OST::PropertyVisitor</a>.</p>
 
@@ -296,6 +386,16 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Visit <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> with data (not implemented) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pProperty</td><td>Pointer to <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> </td></tr>
+    <tr><td class="paramname">data</td><td>QVariantMap with operation data</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Stub implementation - text dumping doesn't use data parameter. </p>
 
 <p>Implements <a class="el" href="classOST_1_1PropertyVisitor.html#a9e24b0b68db8c7430e095adb7218fb5c">OST::PropertyVisitor</a>.</p>
 

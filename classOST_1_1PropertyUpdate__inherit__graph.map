@@ -1,5 +1,5 @@
 <map id="OST::PropertyUpdate" name="OST::PropertyUpdate">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,199,155,344"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1PropertyVisitor.html" title=" " alt="" coords="8,5,152,151"/>
+<area shape="rect" id="Node000001" title="Visitor that updates properties from QVariantMap data." alt="" coords="5,199,155,344"/>
+<area shape="rect" id="Node000002" href="$classOST_1_1PropertyVisitor.html" title="Abstract base class for property visitor pattern implementation." alt="" coords="8,5,152,151"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,164,83,198,77,198,77,164"/>
 </map>

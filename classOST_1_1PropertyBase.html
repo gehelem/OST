@@ -81,7 +81,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Class to define common property.  
+<p>Abstract base class for all <a class="el" href="namespaceOST.html">OST</a> properties.  
  <a href="classOST_1_1PropertyBase.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="propertybase_8h_source.html">propertybase.h</a>&gt;</code></p>
@@ -90,8 +90,8 @@ Inheritance diagram for OST::PropertyBase:</div>
 <div class="dyncontent">
 <div class="center"><img src="classOST_1_1PropertyBase__inherit__graph.png" border="0" usemap="#aOST_1_1PropertyBase_inherit__map" alt="Inheritance graph"/></div>
 <map name="aOST_1_1PropertyBase_inherit__map" id="aOST_1_1PropertyBase_inherit__map">
-<area shape="rect" title="Class to define common property." alt="" coords="5,119,143,384"/>
-<area shape="rect" href="classOST_1_1PropertyMulti.html" title=" " alt="" coords="5,432,143,797"/>
+<area shape="rect" title="Abstract base class for all OST properties." alt="" coords="5,119,143,384"/>
+<area shape="rect" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid." alt="" coords="5,432,143,797"/>
 <area shape="poly" title=" " alt="" coords="77,398,77,432,71,432,71,398"/>
 <area shape="rect" href="classQObject.html" title=" " alt="" coords="41,5,107,71"/>
 <area shape="poly" title=" " alt="" coords="77,84,77,119,71,119,71,84"/>
@@ -102,7 +102,7 @@ Collaboration diagram for OST::PropertyBase:</div>
 <div class="dyncontent">
 <div class="center"><img src="classOST_1_1PropertyBase__coll__graph.png" border="0" usemap="#aOST_1_1PropertyBase_coll__map" alt="Collaboration graph"/></div>
 <map name="aOST_1_1PropertyBase_coll__map" id="aOST_1_1PropertyBase_coll__map">
-<area shape="rect" title="Class to define common property." alt="" coords="5,119,143,384"/>
+<area shape="rect" title="Abstract base class for all OST properties." alt="" coords="5,119,143,384"/>
 <area shape="rect" href="classQObject.html" title=" " alt="" coords="41,5,107,71"/>
 <area shape="poly" title=" " alt="" coords="77,84,77,119,71,119,71,84"/>
 </map>
@@ -111,25 +111,34 @@ Collaboration diagram for OST::PropertyBase:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="signals" name="signals"></a>
 Signals</h2></td></tr>
 <tr class="memitem:a8612c55c73eb525f791a479acb13f3cb" id="r_a8612c55c73eb525f791a479acb13f3cb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a8612c55c73eb525f791a479acb13f3cb">stateChanged</a> (<a class="el" href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985a">OST::State</a>)</td></tr>
+<tr class="memdesc:a8612c55c73eb525f791a479acb13f3cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Signal emitted when state changes.  <br /></td></tr>
 <tr class="separator:a8612c55c73eb525f791a479acb13f3cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af67b9e0d0d95691642baaee7e90c41b3" id="r_af67b9e0d0d95691642baaee7e90c41b3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#af67b9e0d0d95691642baaee7e90c41b3">eltChanged</a> (<a class="el" href="classOST_1_1PropertyBase.html">OST::PropertyBase</a> *)</td></tr>
+<tr class="memdesc:af67b9e0d0d95691642baaee7e90c41b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Signal emitted when property metadata changes.  <br /></td></tr>
 <tr class="separator:af67b9e0d0d95691642baaee7e90c41b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab519a0efa35110e3d304e79b5be21203" id="r_ab519a0efa35110e3d304e79b5be21203"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#ab519a0efa35110e3d304e79b5be21203">valueSet</a> (<a class="el" href="classOST_1_1PropertyBase.html">OST::PropertyBase</a> *)</td></tr>
+<tr class="memdesc:ab519a0efa35110e3d304e79b5be21203"><td class="mdescLeft">&#160;</td><td class="mdescRight">Signal emitted when a value in the property changes.  <br /></td></tr>
 <tr class="separator:ab519a0efa35110e3d304e79b5be21203"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aec74ba39c5f179be7d276bb02ee4ed23" id="r_aec74ba39c5f179be7d276bb02ee4ed23"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#aec74ba39c5f179be7d276bb02ee4ed23">propertyEvent</a> (<a class="el" href="classQString.html">QString</a>, <a class="el" href="classQString.html">QString</a>, <a class="el" href="classOST_1_1PropertyBase.html">OST::PropertyBase</a> *)</td></tr>
+<tr class="memdesc:aec74ba39c5f179be7d276bb02ee4ed23"><td class="mdescLeft">&#160;</td><td class="mdescRight">Signal emitted for custom property events.  <br /></td></tr>
 <tr class="separator:aec74ba39c5f179be7d276bb02ee4ed23"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0449ba5e729415a02929036bdb8773df" id="r_a0449ba5e729415a02929036bdb8773df"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a0449ba5e729415a02929036bdb8773df">sendMessage</a> (<a class="el" href="namespaceOST.html#a4f7f81902ce1709285bca0ca94e65d51">MsgLevel</a>, <a class="el" href="classQString.html">QString</a>)</td></tr>
+<tr class="memdesc:a0449ba5e729415a02929036bdb8773df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Signal emitted when sending messages.  <br /></td></tr>
 <tr class="separator:a0449ba5e729415a02929036bdb8773df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a9988088f64a56ff552173d69257a925d" id="r_a9988088f64a56ff552173d69257a925d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a9988088f64a56ff552173d69257a925d">accept</a> (<a class="el" href="classOST_1_1PropertyVisitor.html">PropertyVisitor</a> *pVisitor)=0</td></tr>
+<tr class="memdesc:a9988088f64a56ff552173d69257a925d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Accept a visitor for the Visitor pattern (const version)  <br /></td></tr>
 <tr class="separator:a9988088f64a56ff552173d69257a925d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac5b96ac2460a9125675e4e9d3e3dc8d0" id="r_ac5b96ac2460a9125675e4e9d3e3dc8d0"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#ac5b96ac2460a9125675e4e9d3e3dc8d0">accept</a> (<a class="el" href="classOST_1_1PropertyVisitor.html">PropertyVisitor</a> *pVisitor, QVariantMap &amp;data)=0</td></tr>
+<tr class="memdesc:ac5b96ac2460a9125675e4e9d3e3dc8d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Accept a visitor with data parameter.  <br /></td></tr>
 <tr class="separator:ac5b96ac2460a9125675e4e9d3e3dc8d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5e9c2941268c2ccf597dac8db389dd8e" id="r_a5e9c2941268c2ccf597dac8db389dd8e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a5e9c2941268c2ccf597dac8db389dd8e">PropertyBase</a> (const <a class="el" href="classQString.html">QString</a> &amp;<a class="el" href="classOST_1_1PropertyBase.html#a87f114f651c52ce952ec9ba5cce5b266">key</a>, const <a class="el" href="classQString.html">QString</a> &amp;<a class="el" href="classOST_1_1PropertyBase.html#a15add81dca862657c152e64d8616e70c">label</a>, const <a class="el" href="namespaceOST.html#a9be35f589fb7dd8d44169b078554ad72">Permission</a> &amp;<a class="el" href="classOST_1_1PropertyBase.html#ab2b11ec778a97bec80c7c5f6e2c7b88d">permission</a>, const <a class="el" href="classQString.html">QString</a> &amp;<a class="el" href="classOST_1_1PropertyBase.html#abaa6e5d5877cd1fd2c6d2e0c10d8677a">level1</a>, const <a class="el" href="classQString.html">QString</a> &amp;<a class="el" href="classOST_1_1PropertyBase.html#a36674830c621f90df47a65d3f66f723d">level2</a>, const <a class="el" href="classQString.html">QString</a> &amp;<a class="el" href="classOST_1_1PropertyBase.html#a3f78603c9cc0ffe1bbbbf9ada04f7437">order</a>, const <a class="el" href="classbool.html">bool</a> &amp;<a class="el" href="classOST_1_1PropertyBase.html#a50413a002af18ed28de719c4c7510010">hasProfile</a>)</td></tr>
+<tr class="memdesc:a5e9c2941268c2ccf597dac8db389dd8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new <a class="el" href="classOST_1_1PropertyBase.html" title="Abstract base class for all OST properties.">PropertyBase</a> object.  <br /></td></tr>
 <tr class="separator:a5e9c2941268c2ccf597dac8db389dd8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a89ef3153d2b3c873fad2d266f3826ef2" id="r_a89ef3153d2b3c873fad2d266f3826ef2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a89ef3153d2b3c873fad2d266f3826ef2">~PropertyBase</a> ()</td></tr>
+<tr class="memdesc:a89ef3153d2b3c873fad2d266f3826ef2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroy the <a class="el" href="classOST_1_1PropertyBase.html" title="Abstract base class for all OST properties.">PropertyBase</a> object.  <br /></td></tr>
 <tr class="separator:a89ef3153d2b3c873fad2d266f3826ef2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a87f114f651c52ce952ec9ba5cce5b266" id="r_a87f114f651c52ce952ec9ba5cce5b266"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classQString.html">QString</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a87f114f651c52ce952ec9ba5cce5b266">key</a> ()</td></tr>
 <tr class="memdesc:a87f114f651c52ce952ec9ba5cce5b266"><td class="mdescLeft">&#160;</td><td class="mdescRight">Internal property's name.  <br /></td></tr>
@@ -153,48 +162,84 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a50413a002af18ed28de719c4c7510010"><td class="mdescLeft">&#160;</td><td class="mdescRight">should values be saved in profiles ?  <br /></td></tr>
 <tr class="separator:a50413a002af18ed28de719c4c7510010"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae5e989d9098ad0a5907a949d6443e40c" id="r_ae5e989d9098ad0a5907a949d6443e40c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985a">State</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#ae5e989d9098ad0a5907a949d6443e40c">state</a> ()</td></tr>
+<tr class="memdesc:ae5e989d9098ad0a5907a949d6443e40c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get current runtime state.  <br /></td></tr>
 <tr class="separator:ae5e989d9098ad0a5907a949d6443e40c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a301c490e77dac8a961b2f8daa7841ae7" id="r_a301c490e77dac8a961b2f8daa7841ae7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a301c490e77dac8a961b2f8daa7841ae7">setState</a> (<a class="el" href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985a">State</a> <a class="el" href="classOST_1_1PropertyBase.html#ae5e989d9098ad0a5907a949d6443e40c">state</a>)</td></tr>
+<tr class="memdesc:a301c490e77dac8a961b2f8daa7841ae7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set runtime state.  <br /></td></tr>
 <tr class="separator:a301c490e77dac8a961b2f8daa7841ae7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a332a00d4f8dcdc7a38dc1c7339a3128e" id="r_a332a00d4f8dcdc7a38dc1c7339a3128e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a332a00d4f8dcdc7a38dc1c7339a3128e">isEnabled</a> ()</td></tr>
+<tr class="memdesc:a332a00d4f8dcdc7a38dc1c7339a3128e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if property is enabled.  <br /></td></tr>
 <tr class="separator:a332a00d4f8dcdc7a38dc1c7339a3128e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aac1c1af8e0b312bed2f22b3c4ae318b3" id="r_aac1c1af8e0b312bed2f22b3c4ae318b3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#aac1c1af8e0b312bed2f22b3c4ae318b3">enable</a> (void)</td></tr>
+<tr class="memdesc:aac1c1af8e0b312bed2f22b3c4ae318b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable the property.  <br /></td></tr>
 <tr class="separator:aac1c1af8e0b312bed2f22b3c4ae318b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adcb5c7d54c7b612ea0eca94b7c601c2b" id="r_adcb5c7d54c7b612ea0eca94b7c601c2b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#adcb5c7d54c7b612ea0eca94b7c601c2b">disable</a> (void)</td></tr>
+<tr class="memdesc:adcb5c7d54c7b612ea0eca94b7c601c2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable the property.  <br /></td></tr>
 <tr class="separator:adcb5c7d54c7b612ea0eca94b7c601c2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e823ed1b3e0df24dcc2fed26b19d8c0" id="r_a1e823ed1b3e0df24dcc2fed26b19d8c0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a1e823ed1b3e0df24dcc2fed26b19d8c0">getBadge</a> ()</td></tr>
+<tr class="memdesc:a1e823ed1b3e0df24dcc2fed26b19d8c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get badge status.  <br /></td></tr>
 <tr class="separator:a1e823ed1b3e0df24dcc2fed26b19d8c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a33b53ec9f9936f16daffed24341933a3" id="r_a33b53ec9f9936f16daffed24341933a3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a33b53ec9f9936f16daffed24341933a3">setBadge</a> (<a class="el" href="classbool.html">bool</a> b)</td></tr>
+<tr class="memdesc:a33b53ec9f9936f16daffed24341933a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set badge visibility.  <br /></td></tr>
 <tr class="separator:a33b53ec9f9936f16daffed24341933a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7c4d9099a97187c2dacd55a9abfc2ba6" id="r_a7c4d9099a97187c2dacd55a9abfc2ba6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a7c4d9099a97187c2dacd55a9abfc2ba6">sendInfo</a> (<a class="el" href="classQString.html">QString</a> m)</td></tr>
+<tr class="memdesc:a7c4d9099a97187c2dacd55a9abfc2ba6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send informational message.  <br /></td></tr>
 <tr class="separator:a7c4d9099a97187c2dacd55a9abfc2ba6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6a4758e6c28ae9b29eccbb50db961ebe" id="r_a6a4758e6c28ae9b29eccbb50db961ebe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a6a4758e6c28ae9b29eccbb50db961ebe">sendWarning</a> (<a class="el" href="classQString.html">QString</a> m)</td></tr>
+<tr class="memdesc:a6a4758e6c28ae9b29eccbb50db961ebe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send warning message.  <br /></td></tr>
 <tr class="separator:a6a4758e6c28ae9b29eccbb50db961ebe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2d511ae6758e6bb4ae27b1580668289f" id="r_a2d511ae6758e6bb4ae27b1580668289f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a2d511ae6758e6bb4ae27b1580668289f">sendError</a> (<a class="el" href="classQString.html">QString</a> m)</td></tr>
+<tr class="memdesc:a2d511ae6758e6bb4ae27b1580668289f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send error message.  <br /></td></tr>
 <tr class="separator:a2d511ae6758e6bb4ae27b1580668289f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a503a14efb34bf0e3cc63a998e7845c44" id="r_a503a14efb34bf0e3cc63a998e7845c44"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classQString.html">QString</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a503a14efb34bf0e3cc63a998e7845c44">getPreIcon1</a> (void)</td></tr>
+<tr class="memdesc:a503a14efb34bf0e3cc63a998e7845c44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get first prefix icon identifier.  <br /></td></tr>
 <tr class="separator:a503a14efb34bf0e3cc63a998e7845c44"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a443d046a8b2efd5aafe1b1233879ee97" id="r_a443d046a8b2efd5aafe1b1233879ee97"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a443d046a8b2efd5aafe1b1233879ee97">setPreIcon1</a> (<a class="el" href="classQString.html">QString</a> s)</td></tr>
+<tr class="memdesc:a443d046a8b2efd5aafe1b1233879ee97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set first prefix icon.  <br /></td></tr>
 <tr class="separator:a443d046a8b2efd5aafe1b1233879ee97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae3798bdc1b2949e19280640a3bbcafef" id="r_ae3798bdc1b2949e19280640a3bbcafef"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classQString.html">QString</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#ae3798bdc1b2949e19280640a3bbcafef">getPreIcon2</a> (void)</td></tr>
+<tr class="memdesc:ae3798bdc1b2949e19280640a3bbcafef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get second prefix icon identifier.  <br /></td></tr>
 <tr class="separator:ae3798bdc1b2949e19280640a3bbcafef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a369764b67d856cc2d39f81139dae0c36" id="r_a369764b67d856cc2d39f81139dae0c36"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a369764b67d856cc2d39f81139dae0c36">setPreIcon2</a> (<a class="el" href="classQString.html">QString</a> s)</td></tr>
+<tr class="memdesc:a369764b67d856cc2d39f81139dae0c36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set second prefix icon.  <br /></td></tr>
 <tr class="separator:a369764b67d856cc2d39f81139dae0c36"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e578ba447bee1049252af67a289eb2b" id="r_a9e578ba447bee1049252af67a289eb2b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classQString.html">QString</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a9e578ba447bee1049252af67a289eb2b">getPostIcon1</a> (void)</td></tr>
+<tr class="memdesc:a9e578ba447bee1049252af67a289eb2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get first postfix icon identifier.  <br /></td></tr>
 <tr class="separator:a9e578ba447bee1049252af67a289eb2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2683f96802ba45408f6114350febd8eb" id="r_a2683f96802ba45408f6114350febd8eb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a2683f96802ba45408f6114350febd8eb">setPostIcon1</a> (<a class="el" href="classQString.html">QString</a> s)</td></tr>
+<tr class="memdesc:a2683f96802ba45408f6114350febd8eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set first postfix icon.  <br /></td></tr>
 <tr class="separator:a2683f96802ba45408f6114350febd8eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a440762cc671b5f76fa8a729cc6c7fcd6" id="r_a440762cc671b5f76fa8a729cc6c7fcd6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classQString.html">QString</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a440762cc671b5f76fa8a729cc6c7fcd6">getPostIcon2</a> (void)</td></tr>
+<tr class="memdesc:a440762cc671b5f76fa8a729cc6c7fcd6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get second postfix icon identifier.  <br /></td></tr>
 <tr class="separator:a440762cc671b5f76fa8a729cc6c7fcd6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a78d80fa150a79724ddb7aaac2c78e6a5" id="r_a78d80fa150a79724ddb7aaac2c78e6a5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a78d80fa150a79724ddb7aaac2c78e6a5">setPostIcon2</a> (<a class="el" href="classQString.html">QString</a> s)</td></tr>
+<tr class="memdesc:a78d80fa150a79724ddb7aaac2c78e6a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set second postfix icon.  <br /></td></tr>
 <tr class="separator:a78d80fa150a79724ddb7aaac2c78e6a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8efdc377250ddf8fbf8a25881d29627a" id="r_a8efdc377250ddf8fbf8a25881d29627a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classQString.html">QString</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a8efdc377250ddf8fbf8a25881d29627a">getFreeValue</a> (void)</td></tr>
+<tr class="memdesc:a8efdc377250ddf8fbf8a25881d29627a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get free-form value field.  <br /></td></tr>
 <tr class="separator:a8efdc377250ddf8fbf8a25881d29627a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0ab222a7f40266fbfebfc3c76d7bdd12" id="r_a0ab222a7f40266fbfebfc3c76d7bdd12"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a0ab222a7f40266fbfebfc3c76d7bdd12">setFreeValue</a> (<a class="el" href="classQString.html">QString</a> s)</td></tr>
+<tr class="memdesc:a0ab222a7f40266fbfebfc3c76d7bdd12"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set free-form value field.  <br /></td></tr>
 <tr class="separator:a0ab222a7f40266fbfebfc3c76d7bdd12"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Class to define common property. </p>
+<div class="textblock"><p>Abstract base class for all <a class="el" href="namespaceOST.html">OST</a> properties. </p>
+<p><a class="el" href="classOST_1_1PropertyBase.html" title="Abstract base class for all OST properties.">PropertyBase</a> provides the common interface and implementation for all property types. It manages metadata (key, label, permissions, hierarchy), runtime state (Idle/Ok/Busy/Error), and UI hints (icons, badges).</p>
+<p>Properties are organized hierarchically using level1 (device/category) and level2 (group) fields, similar to INDI protocol structure.</p>
+<dl class="section user"><dt>Hierarchy Example:</dt><dd><div class="fragment"><div class="line"><a class="code hl_class" href="classOST_1_1PropertyBase.html">PropertyBase</a>(<span class="stringliteral">&quot;parameters&quot;</span>,       <span class="comment">// key</span></div>
+<div class="line">             <span class="stringliteral">&quot;Focus Parameters&quot;</span>,  <span class="comment">// label</span></div>
+<div class="line">             <a class="code hl_enumvalue" href="namespaceOST.html#a9be35f589fb7dd8d44169b078554ad72ac542d3f83c8feec61ae9a959af6043d0">ReadWrite</a>,          <span class="comment">// permission</span></div>
+<div class="line">             <span class="stringliteral">&quot;Control&quot;</span>,          <span class="comment">// level1 (tab in UI)</span></div>
+<div class="line">             <span class="stringliteral">&quot;Main&quot;</span>,             <span class="comment">// level2 (section in tab)</span></div>
+<div class="line">             <span class="stringliteral">&quot;Control010&quot;</span>,       <span class="comment">// order (alphabetic sort)</span></div>
+<div class="line">             <span class="keyword">true</span>)               <span class="comment">// hasProfile (save to DB)</span></div>
+<div class="ttc" id="aclassOST_1_1PropertyBase_html"><div class="ttname"><a href="classOST_1_1PropertyBase.html">OST::PropertyBase</a></div><div class="ttdoc">Abstract base class for all OST properties.</div><div class="ttdef"><b>Definition</b> propertybase.h:89</div></div>
+<div class="ttc" id="anamespaceOST_html_a9be35f589fb7dd8d44169b078554ad72ac542d3f83c8feec61ae9a959af6043d0"><div class="ttname"><a href="namespaceOST.html#a9be35f589fb7dd8d44169b078554ad72ac542d3f83c8feec61ae9a959af6043d0">OST::ReadWrite</a></div><div class="ttdeci">@ ReadWrite</div><div class="ttdef"><b>Definition</b> propertybase.h:34</div></div>
+</div><!-- fragment --></dd></dl>
+<dl class="section user"><dt>Visitor Pattern:</dt><dd><a class="el" href="classOST_1_1PropertyBase.html" title="Abstract base class for all OST properties.">PropertyBase</a> uses the Visitor pattern for operations like JSON serialization, text dumping, and updates from frontend. Derived classes must implement <a class="el" href="classOST_1_1PropertyBase.html#a9988088f64a56ff552173d69257a925d" title="Accept a visitor for the Visitor pattern (const version)">accept()</a>.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> </dd>
+<dd>
+<a class="el" href="classOST_1_1ElementBase.html" title="Abstract base class for all typed elements in OST properties.">ElementBase</a> </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a5e9c2941268c2ccf597dac8db389dd8e" name="a5e9c2941268c2ccf597dac8db389dd8e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5e9c2941268c2ccf597dac8db389dd8e">&#9670;&#160;</a></span>PropertyBase()</h2>
@@ -252,6 +297,21 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Construct a new <a class="el" href="classOST_1_1PropertyBase.html" title="Abstract base class for all OST properties.">PropertyBase</a> object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>Internal unique identifier (e.g., "parameters") </td></tr>
+    <tr><td class="paramname">label</td><td>Display label for frontend (e.g., "Focus Parameters") </td></tr>
+    <tr><td class="paramname">permission</td><td>Access permission (ReadOnly, WriteOnly, ReadWrite) </td></tr>
+    <tr><td class="paramname">level1</td><td>First hierarchy level - device/category (e.g., "Control") </td></tr>
+    <tr><td class="paramname">level2</td><td>Second hierarchy level - group (e.g., "Main") </td></tr>
+    <tr><td class="paramname">order</td><td>Sort order string (e.g., "Control010") </td></tr>
+    <tr><td class="paramname">hasProfile</td><td>Whether to save values in profile database</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>All parameters except hasProfile are immutable after construction </dd></dl>
+
 </div>
 </div>
 <a id="a89ef3153d2b3c873fad2d266f3826ef2" name="a89ef3153d2b3c873fad2d266f3826ef2"></a>
@@ -268,6 +328,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Destroy the <a class="el" href="classOST_1_1PropertyBase.html" title="Abstract base class for all OST properties.">PropertyBase</a> object. </p>
 
 </div>
 </div>
@@ -295,6 +357,15 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Accept a visitor for the Visitor pattern (const version) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pVisitor</td><td>Pointer to the visitor object</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Pure virtual method that must be implemented by derived classes. Used for operations like JSON serialization (<a class="el" href="classOST_1_1PropertyJsonDumper.html" title="Visitor that serializes properties to JSON format.">PropertyJsonDumper</a>), text dumping (<a class="el" href="classOST_1_1PropertyTextDumper.html" title="Visitor that converts properties to human-readable text.">PropertyTextDumper</a>), etc. </p>
 
 <p>Implemented in <a class="el" href="classOST_1_1PropertyMulti.html#a02739362084654d38c2a1fa6987c95af">OST::PropertyMulti</a>.</p>
 
@@ -334,6 +405,16 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Accept a visitor with data parameter. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pVisitor</td><td>Pointer to the visitor object </td></tr>
+    <tr><td class="paramname">data</td><td>QVariantMap containing data for the operation</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Overloaded accept method that allows passing data to the visitor. Used for operations that need external data, like updates from frontend. </p>
+
 <p>Implemented in <a class="el" href="classOST_1_1PropertyMulti.html#afd4f9980bdf69b9fc4d0b752fde0bc52">OST::PropertyMulti</a>.</p>
 
 </div>
@@ -353,6 +434,9 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Disable the property. </p>
+<p>Prevents frontend from modifying the property. Useful during operations that require property to be read-only temporarily. Emits <a class="el" href="classOST_1_1PropertyBase.html#af67b9e0d0d95691642baaee7e90c41b3" title="Signal emitted when property metadata changes.">eltChanged()</a> signal. </p>
 
 </div>
 </div>
@@ -380,6 +464,15 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Signal emitted when property metadata changes. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">prop</td><td>Pointer to the property that changed</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Emitted when non-value attributes change (e.g., enabled/disabled, badge, icons). Value changes emit <a class="el" href="classOST_1_1PropertyBase.html#ab519a0efa35110e3d304e79b5be21203" title="Signal emitted when a value in the property changes.">valueSet()</a> instead. </p>
+
 </div>
 </div>
 <a id="aac1c1af8e0b312bed2f22b3c4ae318b3" name="aac1c1af8e0b312bed2f22b3c4ae318b3"></a>
@@ -398,6 +491,9 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Enable the property. </p>
+<p>Allows frontend to interact with the property. Emits <a class="el" href="classOST_1_1PropertyBase.html#af67b9e0d0d95691642baaee7e90c41b3" title="Signal emitted when property metadata changes.">eltChanged()</a> signal. </p>
+
 </div>
 </div>
 <a id="a1e823ed1b3e0df24dcc2fed26b19d8c0" name="a1e823ed1b3e0df24dcc2fed26b19d8c0"></a>
@@ -414,6 +510,10 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Get badge status. </p>
+<dl class="section return"><dt>Returns</dt><dd>true if badge is visible, false otherwise</dd></dl>
+<p>Badge is a visual indicator (e.g., notification dot) on the property in frontend UI. Used to draw attention (e.g., calibration required). </p>
 
 </div>
 </div>
@@ -433,6 +533,10 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Get free-form value field. </p>
+<dl class="section return"><dt>Returns</dt><dd>Free value string</dd></dl>
+<p>FreeValue is a general-purpose string field for custom data. Its interpretation is left to frontend implementation. </p>
+
 </div>
 </div>
 <a id="a9e578ba447bee1049252af67a289eb2b" name="a9e578ba447bee1049252af67a289eb2b"></a>
@@ -450,6 +554,10 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Get first postfix icon identifier. </p>
+<dl class="section return"><dt>Returns</dt><dd>Icon identifier string</dd></dl>
+<p>PostIcon1 is displayed after the property label in frontend. </p>
 
 </div>
 </div>
@@ -469,6 +577,9 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Get second postfix icon identifier. </p>
+<dl class="section return"><dt>Returns</dt><dd>Icon identifier string </dd></dl>
+
 </div>
 </div>
 <a id="a503a14efb34bf0e3cc63a998e7845c44" name="a503a14efb34bf0e3cc63a998e7845c44"></a>
@@ -487,6 +598,10 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Get first prefix icon identifier. </p>
+<dl class="section return"><dt>Returns</dt><dd>Icon identifier string (e.g., "fa-camera")</dd></dl>
+<p>PreIcon1 is displayed before the property label in frontend. </p>
+
 </div>
 </div>
 <a id="ae3798bdc1b2949e19280640a3bbcafef" name="ae3798bdc1b2949e19280640a3bbcafef"></a>
@@ -504,6 +619,9 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Get second prefix icon identifier. </p>
+<dl class="section return"><dt>Returns</dt><dd>Icon identifier string </dd></dl>
 
 </div>
 </div>
@@ -542,6 +660,10 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Check if property is enabled. </p>
+<dl class="section return"><dt>Returns</dt><dd>true if enabled, false if disabled</dd></dl>
+<p>Disabled properties cannot be modified from frontend and are typically displayed as grayed out or hidden. </p>
 
 </div>
 </div>
@@ -714,6 +836,17 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Signal emitted for custom property events. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">eventType</td><td>Type of event (e.g., "Flcreate", "Fldelete") </td></tr>
+    <tr><td class="paramname">eventKey</td><td>Key identifier for the event </td></tr>
+    <tr><td class="paramname">prop</td><td>Pointer to the property</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Generic event mechanism for property-level operations like grid line creation/deletion, up/down movements, etc. </p>
+
 </div>
 </div>
 <a id="a2d511ae6758e6bb4ae27b1580668289f" name="a2d511ae6758e6bb4ae27b1580668289f"></a>
@@ -732,6 +865,15 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Send error message. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">m</td><td>Message text</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Emits <a class="el" href="classOST_1_1PropertyBase.html#a0449ba5e729415a02929036bdb8773df" title="Signal emitted when sending messages.">sendMessage()</a> signal with Err level. Errors indicate failures that may require user intervention. </p>
+
 </div>
 </div>
 <a id="a7c4d9099a97187c2dacd55a9abfc2ba6" name="a7c4d9099a97187c2dacd55a9abfc2ba6"></a>
@@ -749,6 +891,15 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Send informational message. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">m</td><td>Message text</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Emits <a class="el" href="classOST_1_1PropertyBase.html#a0449ba5e729415a02929036bdb8773df" title="Signal emitted when sending messages.">sendMessage()</a> signal with Info level. Messages are typically logged and displayed in frontend message area. </p>
 
 </div>
 </div>
@@ -786,6 +937,16 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Signal emitted when sending messages. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">level</td><td>Message level (Info, Warn, Err) </td></tr>
+    <tr><td class="paramname">message</td><td>Message text</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Messages are propagated to module level and eventually to frontend. Used by <a class="el" href="classOST_1_1PropertyBase.html#a7c4d9099a97187c2dacd55a9abfc2ba6" title="Send informational message.">sendInfo()</a>, <a class="el" href="classOST_1_1PropertyBase.html#a6a4758e6c28ae9b29eccbb50db961ebe" title="Send warning message.">sendWarning()</a>, <a class="el" href="classOST_1_1PropertyBase.html#a2d511ae6758e6bb4ae27b1580668289f" title="Send error message.">sendError()</a> methods. </p>
+
 </div>
 </div>
 <a id="a6a4758e6c28ae9b29eccbb50db961ebe" name="a6a4758e6c28ae9b29eccbb50db961ebe"></a>
@@ -803,6 +964,15 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Send warning message. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">m</td><td>Message text</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Emits <a class="el" href="classOST_1_1PropertyBase.html#a0449ba5e729415a02929036bdb8773df" title="Signal emitted when sending messages.">sendMessage()</a> signal with Warn level. Warnings indicate potential issues but don't stop execution. </p>
 
 </div>
 </div>
@@ -822,6 +992,16 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Set badge visibility. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">b</td><td>true to show badge, false to hide</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Usage Example:</dt><dd><div class="fragment"><div class="line"><span class="keyword">property</span>-&gt;setBadge(<span class="keyword">true</span>);  <span class="comment">// Show notification badge</span></div>
+</div><!-- fragment --> </dd></dl>
+
 </div>
 </div>
 <a id="a0ab222a7f40266fbfebfc3c76d7bdd12" name="a0ab222a7f40266fbfebfc3c76d7bdd12"></a>
@@ -839,6 +1019,14 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Set free-form value field. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">s</td><td>Free value string </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -858,6 +1046,14 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Set first postfix icon. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">s</td><td>Icon identifier </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a78d80fa150a79724ddb7aaac2c78e6a5" name="a78d80fa150a79724ddb7aaac2c78e6a5"></a>
@@ -875,6 +1071,14 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Set second postfix icon. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">s</td><td>Icon identifier </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -894,6 +1098,14 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Set first prefix icon. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">s</td><td>Icon identifier (e.g., FontAwesome icon name) </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a369764b67d856cc2d39f81139dae0c36" name="a369764b67d856cc2d39f81139dae0c36"></a>
@@ -911,6 +1123,14 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Set second prefix icon. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">s</td><td>Icon identifier </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -930,6 +1150,21 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Set runtime state. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">state</td><td>New State value (Idle, Ok, Busy, Error)</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Emits <a class="el" href="classOST_1_1PropertyBase.html#a8612c55c73eb525f791a479acb13f3cb" title="Signal emitted when state changes.">stateChanged()</a> signal to notify observers.</p>
+<dl class="section user"><dt>Usage Example:</dt><dd><div class="fragment"><div class="line"><span class="keyword">property</span>-&gt;setState(<a class="code hl_enumvalue" href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985aae7081daa09b8fd301aa77e4bad531a36">OST::Busy</a>);  <span class="comment">// Start operation</span></div>
+<div class="line"><span class="comment">// ... do work ...</span></div>
+<div class="line"><span class="keyword">property</span>-&gt;setState(<a class="code hl_enumvalue" href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985aac4055be61d9eeb9e2cff30c68bc54d58">OST::Ok</a>);    <span class="comment">// Success</span></div>
+<div class="ttc" id="anamespaceOST_html_a96b9a9a658dc07a226a0885a3094985aac4055be61d9eeb9e2cff30c68bc54d58"><div class="ttname"><a href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985aac4055be61d9eeb9e2cff30c68bc54d58">OST::Ok</a></div><div class="ttdeci">@ Ok</div><div class="ttdef"><b>Definition</b> common.h:44</div></div>
+<div class="ttc" id="anamespaceOST_html_a96b9a9a658dc07a226a0885a3094985aae7081daa09b8fd301aa77e4bad531a36"><div class="ttname"><a href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985aae7081daa09b8fd301aa77e4bad531a36">OST::Busy</a></div><div class="ttdeci">@ Busy</div><div class="ttdef"><b>Definition</b> common.h:45</div></div>
+</div><!-- fragment --> </dd></dl>
+
 </div>
 </div>
 <a id="ae5e989d9098ad0a5907a949d6443e40c" name="ae5e989d9098ad0a5907a949d6443e40c"></a>
@@ -946,6 +1181,11 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Get current runtime state. </p>
+<dl class="section return"><dt>Returns</dt><dd>Current State enum value (Idle, Ok, Busy, Error)</dd></dl>
+<p>State represents the runtime status of operations on this property. Frontend typically displays different colors based on state.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classOST_1_1PropertyBase.html#a301c490e77dac8a961b2f8daa7841ae7" title="Set runtime state.">setState()</a> </dd></dl>
 
 </div>
 </div>
@@ -973,6 +1213,15 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Signal emitted when state changes. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">state</td><td>New State value</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Connect to this signal to react to state changes (Idle/Ok/Busy/Error). </p>
+
 </div>
 </div>
 <a id="ab519a0efa35110e3d304e79b5be21203" name="ab519a0efa35110e3d304e79b5be21203"></a>
@@ -998,6 +1247,15 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Signal emitted when a value in the property changes. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">prop</td><td>Pointer to the property containing the changed value</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Propagated from child elements when their values change. Used to trigger frontend updates and profile saves. </p>
 
 </div>
 </div>

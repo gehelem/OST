@@ -1,14 +1,14 @@
 <map id="libs/model/property/propertybase.h" name="libs/model/property/propertybase.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="69,5,218,45"/>
-<area shape="rect" id="Node000002" href="$propertyvisitor_8h.html" title=" " alt="" coords="5,93,135,119"/>
+<area shape="rect" id="Node000001" title="Base class for OST properties with metadata and state management." alt="" coords="69,5,218,45"/>
+<area shape="rect" id="Node000002" href="$propertyvisitor_8h.html" title="Abstract visitor interface for property traversal and operations." alt="" coords="5,93,135,119"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="128,47,92,85,88,81,124,44"/>
-<area shape="rect" id="Node000004" href="$elementbase_8h.html" title=" " alt="" coords="159,93,277,119"/>
+<area shape="rect" id="Node000004" href="$elementbase_8h.html" title="Base classes for OST typed elements and their value containers." alt="" coords="159,93,277,119"/>
 <area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="163,44,199,81,195,85,159,47"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="138,240,205,265"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="74,118,81,152,98,191,117,213,140,230,137,235,114,217,93,193,76,154,69,119"/>
 <area shape="rect" id="Node000005" href="$elementvisitor_8h.html" title=" " alt="" coords="107,167,235,192"/>
 <area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="213,120,189,157,184,154,208,118"/>
-<area shape="rect" id="Node000006" href="$common_8h.html" title=" " alt="" coords="259,167,350,192"/>
+<area shape="rect" id="Node000006" href="$common_8h.html" title="Common enumerations, structures, and types for OST element system." alt="" coords="259,167,350,192"/>
 <area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="234,117,282,156,278,160,230,121"/>
 <area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="174,192,174,226,169,226,169,192"/>
 <area shape="poly" id="edge7_Node000006_Node000003" title=" " alt="" coords="284,194,206,236,204,231,282,190"/>

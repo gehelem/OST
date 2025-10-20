@@ -1,15 +1,15 @@
 <map id="OST::ValueMessage" name="OST::ValueMessage">
-<area shape="rect" id="Node000001" title=" " alt="" coords="129,825,273,971"/>
+<area shape="rect" id="Node000001" title="Message data container for grid storage." alt="" coords="129,825,273,971"/>
 <area shape="rect" id="Node000002" href="$classOST_1_1ValueTemplate.html" title=" " alt="" coords="129,676,274,776"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="204,790,204,825,199,825,199,790"/>
-<area shape="rect" id="Node000003" href="$classOST_1_1ValueBase.html" title=" " alt="" coords="61,468,198,613"/>
+<area shape="rect" id="Node000003" href="$classOST_1_1ValueBase.html" title="Abstract base class for value containers used in grid lines." alt="" coords="61,468,198,613"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="165,625,185,675,180,677,160,627"/>
 <area shape="rect" id="Node000004" href="$classQObject.html" title=" " alt="" coords="5,5,72,71"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="35,85,30,149,28,229,33,318,51,405,63,436,79,467,74,469,58,438,45,406,28,318,22,230,24,148,30,84"/>
-<area shape="rect" id="Node000005" href="$classOST_1_1ElementBase.html" title=" " alt="" coords="61,120,198,405"/>
+<area shape="rect" id="Node000005" href="$classOST_1_1ElementBase.html" title="Abstract base class for all typed elements in OST properties." alt="" coords="61,120,198,405"/>
 <area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="59,82,74,119,69,121,54,84"/>
 <area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="132,406,132,452,127,452,127,406"/>
-<area shape="rect" id="Node000006" href="$structOST_1_1MsgData.html" title=" " alt="" coords="267,508,373,573"/>
+<area shape="rect" id="Node000006" href="$structOST_1_1MsgData.html" title="Message data structure for ElementMessage." alt="" coords="267,508,373,573"/>
 <area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="302,575,244,663,240,661,297,572"/>
 <area shape="rect" id="Node000007" title=" " alt="" coords="222,230,298,295"/>
 <area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="264,295,271,364,285,443,302,492,297,494,280,445,266,365,259,296"/>

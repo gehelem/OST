@@ -1,16 +1,16 @@
 <map id="libs/model/element/elementvideo.cpp" name="libs/model/element/elementvideo.cpp">
 <area shape="rect" id="Node000001" title=" " alt="" coords="123,5,271,45"/>
-<area shape="rect" id="Node000002" href="$elementvideo_8h.html" title=" " alt="" coords="135,93,259,119"/>
+<area shape="rect" id="Node000002" href="$elementvideo_8h.html" title="Video element implementation for video stream display." alt="" coords="135,93,259,119"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="200,46,200,79,195,79,195,46"/>
-<area shape="rect" id="Node000003" href="$elementtemplate_8h.html" title=" " alt="" coords="124,167,271,192"/>
+<area shape="rect" id="Node000003" href="$elementtemplate_8h.html" title="Template classes for typed elements with numeric/non&#45;numeric specializations." alt="" coords="124,167,271,192"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="200,119,200,153,195,153,195,119"/>
-<area shape="rect" id="Node000004" href="$elementbase_8h.html" title=" " alt="" coords="75,313,194,339"/>
+<area shape="rect" id="Node000004" href="$elementbase_8h.html" title="Base classes for OST typed elements and their value containers." alt="" coords="75,313,194,339"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="195,194,148,302,143,299,190,191"/>
 <area shape="rect" id="Node000008" href="$lovsingle_8h.html" title=" " alt="" coords="204,240,297,265"/>
 <area shape="poly" id="edge8_Node000003_Node000008" title=" " alt="" coords="208,191,236,228,232,231,204,194"/>
 <area shape="rect" id="Node000005" href="$elementvisitor_8h.html" title=" " alt="" coords="5,387,133,412"/>
 <area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="126,341,91,378,87,375,122,337"/>
-<area shape="rect" id="Node000007" href="$common_8h.html" title=" " alt="" coords="157,387,248,412"/>
+<area shape="rect" id="Node000007" href="$common_8h.html" title="Common enumerations, structures, and types for OST element system." alt="" coords="157,387,248,412"/>
 <area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="148,337,184,375,180,378,144,341"/>
 <area shape="rect" id="Node000006" title=" " alt="" coords="169,460,236,485"/>
 <area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="92,410,170,451,168,456,90,414"/>

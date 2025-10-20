@@ -1,16 +1,16 @@
 <map id="libs/model/property/propertybase.cpp" name="libs/model/property/propertybase.cpp">
 <area shape="rect" id="Node000001" title=" " alt="" coords="69,5,218,45"/>
-<area shape="rect" id="Node000002" href="$propertybase_8h.html" title=" " alt="" coords="83,93,203,119"/>
+<area shape="rect" id="Node000002" href="$propertybase_8h.html" title="Base class for OST properties with metadata and state management." alt="" coords="83,93,203,119"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="146,46,146,79,141,79,141,46"/>
-<area shape="rect" id="Node000003" href="$propertyvisitor_8h.html" title=" " alt="" coords="5,167,135,192"/>
+<area shape="rect" id="Node000003" href="$propertyvisitor_8h.html" title="Abstract visitor interface for property traversal and operations." alt="" coords="5,167,135,192"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="133,121,94,159,90,155,129,117"/>
-<area shape="rect" id="Node000005" href="$elementbase_8h.html" title=" " alt="" coords="159,167,277,192"/>
+<area shape="rect" id="Node000005" href="$elementbase_8h.html" title="Base classes for OST typed elements and their value containers." alt="" coords="159,167,277,192"/>
 <area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="157,117,198,155,194,159,153,121"/>
 <area shape="rect" id="Node000004" title=" " alt="" coords="138,313,205,339"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="74,191,81,226,98,264,117,286,140,304,137,308,114,290,93,267,76,227,69,193"/>
 <area shape="rect" id="Node000006" href="$elementvisitor_8h.html" title=" " alt="" coords="107,240,235,265"/>
 <area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="213,194,189,230,184,227,208,191"/>
-<area shape="rect" id="Node000007" href="$common_8h.html" title=" " alt="" coords="259,240,350,265"/>
+<area shape="rect" id="Node000007" href="$common_8h.html" title="Common enumerations, structures, and types for OST element system." alt="" coords="259,240,350,265"/>
 <area shape="poly" id="edge7_Node000005_Node000007" title=" " alt="" coords="234,190,282,229,278,233,230,194"/>
 <area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="174,266,174,300,169,300,169,266"/>
 <area shape="poly" id="edge8_Node000007_Node000004" title=" " alt="" coords="284,268,206,309,204,304,282,263"/>

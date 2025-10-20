@@ -1,12 +1,12 @@
 <map id="OST::ValueTime" name="OST::ValueTime">
-<area shape="rect" id="Node000001" title=" " alt="" coords="65,825,203,971"/>
+<area shape="rect" id="Node000001" title="Time value container for grid storage." alt="" coords="65,825,203,971"/>
 <area shape="rect" id="Node000002" href="$classOST_1_1ValueTemplate.html" title=" " alt="" coords="61,676,207,776"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="137,790,137,825,131,825,131,790"/>
-<area shape="rect" id="Node000003" href="$classOST_1_1ValueBase.html" title=" " alt="" coords="5,468,143,613"/>
+<area shape="rect" id="Node000003" href="$classOST_1_1ValueBase.html" title="Abstract base class for value containers used in grid lines." alt="" coords="5,468,143,613"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="104,626,120,675,115,677,99,627"/>
 <area shape="rect" id="Node000004" href="$classQObject.html" title=" " alt="" coords="35,5,102,71"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="72,84,76,468,71,468,66,85"/>
-<area shape="rect" id="Node000005" href="$classOST_1_1ElementBase.html" title=" " alt="" coords="91,120,228,405"/>
+<area shape="rect" id="Node000005" href="$classOST_1_1ElementBase.html" title="Abstract base class for all typed elements in OST properties." alt="" coords="91,120,228,405"/>
 <area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="89,82,104,119,99,121,84,84"/>
 <area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="118,406,104,453,98,451,113,405"/>
 <area shape="rect" id="Node000006" href="$classQTime.html" title=" " alt="" coords="167,508,224,573"/>

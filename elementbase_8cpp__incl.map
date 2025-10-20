@@ -1,10 +1,10 @@
 <map id="libs/model/element/elementbase.cpp" name="libs/model/element/elementbase.cpp">
 <area shape="rect" id="Node000001" title=" " alt="" coords="62,5,210,45"/>
-<area shape="rect" id="Node000002" href="$elementbase_8h.html" title=" " alt="" coords="77,93,195,119"/>
+<area shape="rect" id="Node000002" href="$elementbase_8h.html" title="Base classes for OST typed elements and their value containers." alt="" coords="77,93,195,119"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,46,139,79,133,79,133,46"/>
 <area shape="rect" id="Node000003" href="$elementvisitor_8h.html" title=" " alt="" coords="5,167,133,192"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="127,121,91,158,88,155,123,117"/>
-<area shape="rect" id="Node000005" href="$common_8h.html" title=" " alt="" coords="157,167,248,192"/>
+<area shape="rect" id="Node000005" href="$common_8h.html" title="Common enumerations, structures, and types for OST element system." alt="" coords="157,167,248,192"/>
 <area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="149,117,184,155,181,158,145,121"/>
 <area shape="rect" id="Node000004" title=" " alt="" coords="103,240,169,265"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="82,191,118,228,114,232,78,194"/>

@@ -1,14 +1,14 @@
 <map id="libs/model/property/propertymulti.h" name="libs/model/property/propertymulti.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="463,5,612,45"/>
+<area shape="rect" id="Node000001" title="Multi&#45;element property implementation with grid support." alt="" coords="463,5,612,45"/>
 <area shape="rect" id="Node000002" href="$propertymulti_8cpp.html" title=" " alt="" coords="5,93,155,133"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="450,44,167,96,156,98,155,93,166,91,449,39"/>
-<area shape="rect" id="Node000003" href="$propertyfactory_8h.html" title=" " alt="" coords="891,101,1083,126"/>
+<area shape="rect" id="Node000003" href="$propertyfactory_8h.html" title="Factory for creating properties from configuration data." alt="" coords="891,101,1083,126"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="626,41,927,98,926,103,625,46"/>
-<area shape="rect" id="Node000022" href="$propertyjsondumper_8h.html" title=" " alt="" coords="179,101,403,126"/>
+<area shape="rect" id="Node000022" href="$propertyjsondumper_8h.html" title="JSON serialization visitor for properties." alt="" coords="179,101,403,126"/>
 <area shape="poly" id="edge21_Node000001_Node000022" title=" " alt="" coords="471,52,324,103,323,98,469,47"/>
-<area shape="rect" id="Node000024" href="$propertytextdumper_8h.html" title=" " alt="" coords="426,101,649,126"/>
+<area shape="rect" id="Node000024" href="$propertytextdumper_8h.html" title="Human&#45;readable text serialization visitor for properties." alt="" coords="426,101,649,126"/>
 <area shape="poly" id="edge24_Node000001_Node000024" title=" " alt="" coords="540,59,540,100,535,100,535,59"/>
-<area shape="rect" id="Node000026" href="$propertyupdate_8h.html" title=" " alt="" coords="673,101,866,126"/>
+<area shape="rect" id="Node000026" href="$propertyupdate_8h.html" title="Property update visitor for applying changes from frontend." alt="" coords="673,101,866,126"/>
 <area shape="poly" id="edge27_Node000001_Node000026" title=" " alt="" coords="602,48,739,98,738,103,600,53"/>
 <area shape="rect" id="Node000004" href="$datastore_8h.html" title=" " alt="" coords="600,181,723,207"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="927,132,709,184,708,179,925,127"/>

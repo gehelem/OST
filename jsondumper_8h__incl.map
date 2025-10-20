@@ -2,7 +2,7 @@
 <area shape="rect" id="Node000001" title=" " alt="" coords="237,5,407,31"/>
 <area shape="rect" id="Node000002" title=" " alt="" coords="5,79,76,104"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="277,33,90,80,89,75,276,28"/>
-<area shape="rect" id="Node000003" href="$propertyvisitor_8h.html" title=" " alt="" coords="100,79,229,104"/>
+<area shape="rect" id="Node000003" href="$propertyvisitor_8h.html" title="Abstract visitor interface for property traversal and operations." alt="" coords="100,79,229,104"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="298,33,204,75,202,71,296,28"/>
 <area shape="rect" id="Node000005" title=" " alt="" coords="253,79,391,104"/>
 <area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="325,31,325,65,319,65,319,31"/>

@@ -1,16 +1,16 @@
 <map id="libs/model/element/elementint.h" name="libs/model/element/elementint.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="125,5,273,45"/>
-<area shape="rect" id="Node000002" href="$elementtemplate_8h.html" title=" " alt="" coords="59,93,205,119"/>
+<area shape="rect" id="Node000001" title="Integer element implementation with LOV (List of Values) support." alt="" coords="125,5,273,45"/>
+<area shape="rect" id="Node000002" href="$elementtemplate_8h.html" title="Template classes for typed elements with numeric/non&#45;numeric specializations." alt="" coords="59,93,205,119"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,47,153,84,149,81,181,44"/>
 <area shape="rect" id="Node000010" href="$lovint_8h.html" title=" " alt="" coords="230,93,301,119"/>
 <area shape="poly" id="edge12_Node000001_Node000010" title=" " alt="" coords="217,44,249,81,245,84,213,47"/>
-<area shape="rect" id="Node000003" href="$elementbase_8h.html" title=" " alt="" coords="73,240,191,265"/>
+<area shape="rect" id="Node000003" href="$elementbase_8h.html" title="Base classes for OST typed elements and their value containers." alt="" coords="73,240,191,265"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="135,119,135,226,129,226,129,119"/>
 <area shape="rect" id="Node000007" href="$lovsingle_8h.html" title=" " alt="" coords="215,167,308,192"/>
 <area shape="poly" id="edge7_Node000002_Node000007" title=" " alt="" coords="154,116,229,157,227,162,152,121"/>
 <area shape="rect" id="Node000004" href="$elementvisitor_8h.html" title=" " alt="" coords="5,313,133,339"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="124,267,91,305,87,301,120,264"/>
-<area shape="rect" id="Node000006" href="$common_8h.html" title=" " alt="" coords="157,313,248,339"/>
+<area shape="rect" id="Node000006" href="$common_8h.html" title="Common enumerations, structures, and types for OST element system." alt="" coords="157,313,248,339"/>
 <area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="146,264,184,302,180,306,142,268"/>
 <area shape="rect" id="Node000005" title=" " alt="" coords="169,387,236,412"/>
 <area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="92,336,170,378,168,382,90,341"/>

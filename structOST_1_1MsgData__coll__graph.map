@@ -1,5 +1,5 @@
 <map id="OST::MsgData" name="OST::MsgData">
-<area shape="rect" id="Node000001" title=" " alt="" coords="97,133,203,199"/>
+<area shape="rect" id="Node000001" title="Message data structure for ElementMessage." alt="" coords="97,133,203,199"/>
 <area shape="rect" id="Node000002" title=" " alt="" coords="5,5,81,71"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="68,69,99,108,109,120,105,123,95,111,64,73"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="106,5,194,71"/>

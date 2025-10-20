@@ -1,5 +1,5 @@
 <map id="OST::ImgData" name="OST::ImgData">
-<area shape="rect" id="Node000001" title=" " alt="" coords="619,280,721,345"/>
+<area shape="rect" id="Node000001" title="Image data structure for ElementImg." alt="" coords="619,280,721,345"/>
 <area shape="rect" id="Node000002" href="$classQString.html" title=" " alt="" coords="5,5,68,71"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="29,71,20,113,16,162,24,212,33,234,48,254,75,267,128,278,281,294,456,303,602,308,602,313,456,309,280,299,127,283,74,272,44,258,29,237,19,214,11,163,15,112,24,70"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="109,5,252,71"/>

@@ -1,5 +1,5 @@
 <map id="OST::PropertyJsonDumper" name="OST::PropertyJsonDumper">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,199,187,364"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1PropertyVisitor.html" title=" " alt="" coords="24,5,168,151"/>
+<area shape="rect" id="Node000001" title="Visitor that serializes properties to JSON format." alt="" coords="5,199,187,364"/>
+<area shape="rect" id="Node000002" href="$classOST_1_1PropertyVisitor.html" title="Abstract base class for property visitor pattern implementation." alt="" coords="24,5,168,151"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="99,165,99,198,93,198,93,165"/>
 </map>

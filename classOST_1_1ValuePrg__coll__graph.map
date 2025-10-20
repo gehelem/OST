@@ -1,15 +1,15 @@
 <map id="OST::ValuePrg" name="OST::ValuePrg">
-<area shape="rect" id="Node000001" title=" " alt="" coords="125,825,262,971"/>
+<area shape="rect" id="Node000001" title="Progress data container for grid storage." alt="" coords="125,825,262,971"/>
 <area shape="rect" id="Node000002" href="$classOST_1_1ValueTemplate.html" title=" " alt="" coords="121,676,266,776"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="196,790,196,825,191,825,191,790"/>
-<area shape="rect" id="Node000003" href="$classOST_1_1ValueBase.html" title=" " alt="" coords="54,468,191,613"/>
+<area shape="rect" id="Node000003" href="$classOST_1_1ValueBase.html" title="Abstract base class for value containers used in grid lines." alt="" coords="54,468,191,613"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="158,626,177,675,172,677,153,627"/>
 <area shape="rect" id="Node000004" href="$classQObject.html" title=" " alt="" coords="5,5,72,71"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="36,85,31,148,29,229,34,317,51,405,62,436,77,466,72,469,57,438,45,406,29,318,24,229,25,148,30,84"/>
-<area shape="rect" id="Node000005" href="$classOST_1_1ElementBase.html" title=" " alt="" coords="61,120,198,405"/>
+<area shape="rect" id="Node000005" href="$classOST_1_1ElementBase.html" title="Abstract base class for all typed elements in OST properties." alt="" coords="61,120,198,405"/>
 <area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="59,82,74,119,69,121,54,84"/>
 <area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="129,406,127,452,122,452,123,406"/>
-<area shape="rect" id="Node000006" href="$structOST_1_1PrgData.html" title=" " alt="" coords="216,508,315,573"/>
+<area shape="rect" id="Node000006" href="$structOST_1_1PrgData.html" title="Progress data structure for ElementPrg." alt="" coords="216,508,315,573"/>
 <area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="255,574,221,662,216,660,250,572"/>
 <area shape="rect" id="Node000007" href="$classQString.html" title=" " alt="" coords="231,230,294,295"/>
 <area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="266,296,267,444,267,492,262,492,261,444,260,296"/>

@@ -1,12 +1,12 @@
 <map id="libs/model/element/elementtemplate.h" name="libs/model/element/elementtemplate.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="122,5,273,45"/>
-<area shape="rect" id="Node000002" href="$elementbase_8h.html" title=" " alt="" coords="75,167,194,192"/>
+<area shape="rect" id="Node000001" title="Template classes for typed elements with numeric/non&#45;numeric specializations." alt="" coords="122,5,273,45"/>
+<area shape="rect" id="Node000002" href="$elementbase_8h.html" title="Base classes for OST typed elements and their value containers." alt="" coords="75,167,194,192"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="192,47,147,155,142,153,187,45"/>
 <area shape="rect" id="Node000006" href="$lovsingle_8h.html" title=" " alt="" coords="204,93,297,119"/>
 <area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="212,44,237,80,233,83,208,47"/>
 <area shape="rect" id="Node000003" href="$elementvisitor_8h.html" title=" " alt="" coords="5,240,133,265"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="126,194,91,232,87,228,122,191"/>
-<area shape="rect" id="Node000005" href="$common_8h.html" title=" " alt="" coords="157,240,248,265"/>
+<area shape="rect" id="Node000005" href="$common_8h.html" title="Common enumerations, structures, and types for OST element system." alt="" coords="157,240,248,265"/>
 <area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="148,190,184,228,180,232,144,194"/>
 <area shape="rect" id="Node000004" title=" " alt="" coords="169,313,236,339"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="92,263,170,304,168,309,90,268"/>

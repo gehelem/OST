@@ -28,13 +28,13 @@
 <area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="1203,322,770,378,769,373,1202,317"/>
 <area shape="rect" id="Node000013" href="$baseroot_8h.html" title=" " alt="" coords="1589,445,1680,471"/>
 <area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="757,387,1575,449,1575,455,756,392"/>
-<area shape="rect" id="Node000021" href="$propertytextdumper_8h.html" title=" " alt="" coords="266,445,430,471"/>
+<area shape="rect" id="Node000021" href="$propertytextdumper_8h.html" title="Human&#45;readable text serialization visitor for properties." alt="" coords="266,445,430,471"/>
 <area shape="poly" id="edge25_Node000012_Node000021" title=" " alt="" coords="660,398,420,445,419,440,659,393"/>
-<area shape="rect" id="Node000049" href="$propertyjsondumper_8h.html" title=" " alt="" coords="455,445,620,471"/>
+<area shape="rect" id="Node000049" href="$propertyjsondumper_8h.html" title="JSON serialization visitor for properties." alt="" coords="455,445,620,471"/>
 <area shape="poly" id="edge40_Node000012_Node000049" title=" " alt="" coords="682,400,579,442,577,438,680,395"/>
-<area shape="rect" id="Node000050" href="$propertyupdate_8h.html" title=" " alt="" coords="107,445,242,471"/>
+<area shape="rect" id="Node000050" href="$propertyupdate_8h.html" title="Property update visitor for applying changes from frontend." alt="" coords="107,445,242,471"/>
 <area shape="poly" id="edge43_Node000012_Node000050" title=" " alt="" coords="660,395,256,448,255,442,660,389"/>
-<area shape="rect" id="Node000051" href="$propertyfactory_8h.html" title=" " alt="" coords="811,445,944,471"/>
+<area shape="rect" id="Node000051" href="$propertyfactory_8h.html" title="Factory for creating properties from configuration data." alt="" coords="811,445,944,471"/>
 <area shape="poly" id="edge46_Node000012_Node000051" title=" " alt="" coords="736,395,838,437,836,442,734,400"/>
 <area shape="rect" id="Node000052" href="$lovfactory_8h.html" title=" " alt="" coords="1357,665,1456,691"/>
 <area shape="poly" id="edge50_Node000012_Node000052" title=" " alt="" coords="757,389,851,408,905,423,957,443,999,467,1027,491,1055,515,1095,542,1166,578,1238,611,1361,658,1359,663,1236,615,1163,583,1092,546,1052,520,1024,495,996,471,955,448,904,428,850,413,756,395"/>
@@ -67,25 +67,25 @@
 <area shape="poly" id="edge14_Node000014_Node000015" title=" " alt="" coords="1478,546,1456,582,1452,579,1473,543"/>
 <area shape="rect" id="Node000022" title=" " alt="" coords="159,665,217,691"/>
 <area shape="poly" id="edge26_Node000021_Node000022" title=" " alt="" coords="328,473,297,493,267,520,244,554,224,590,198,654,193,652,219,588,239,551,263,517,294,489,325,469"/>
-<area shape="rect" id="Node000023" href="$propertymulti_8h.html" title=" " alt="" coords="277,519,400,544"/>
+<area shape="rect" id="Node000023" href="$propertymulti_8h.html" title="Multi&#45;element property implementation with grid support." alt="" coords="277,519,400,544"/>
 <area shape="poly" id="edge27_Node000021_Node000023" title=" " alt="" coords="349,471,345,506,339,505,344,471"/>
 <area shape="rect" id="Node000029" href="$elementfactory_8h.html" title=" " alt="" coords="847,592,979,617"/>
 <area shape="poly" id="edge28_Node000023_Node000029" title=" " alt="" coords="401,537,834,589,834,595,400,542"/>
 <area shape="rect" id="Node000030" title=" " alt="" coords="1232,665,1333,691"/>
 <area shape="poly" id="edge29_Node000029_Node000030" title=" " alt="" coords="973,615,1219,662,1218,667,972,620"/>
-<area shape="rect" id="Node000031" href="$elementint_8h.html" title=" " alt="" coords="531,665,637,691"/>
+<area shape="rect" id="Node000031" href="$elementint_8h.html" title="Integer element implementation with LOV (List of Values) support." alt="" coords="531,665,637,691"/>
 <area shape="poly" id="edge30_Node000029_Node000031" title=" " alt="" coords="861,620,650,665,649,660,860,615"/>
-<area shape="rect" id="Node000037" href="$elementfloat_8h.html" title=" " alt="" coords="391,665,508,691"/>
+<area shape="rect" id="Node000037" href="$elementfloat_8h.html" title="Floating&#45;point element implementation with LOV support." alt="" coords="391,665,508,691"/>
 <area shape="poly" id="edge32_Node000029_Node000037" title=" " alt="" coords="848,618,522,668,521,662,847,613"/>
-<area shape="rect" id="Node000039" href="$elementbool_8h.html" title=" " alt="" coords="811,665,927,691"/>
+<area shape="rect" id="Node000039" href="$elementbool_8h.html" title="Boolean element implementation." alt="" coords="811,665,927,691"/>
 <area shape="poly" id="edge34_Node000029_Node000039" title=" " alt="" coords="908,619,886,655,881,652,904,616"/>
-<area shape="rect" id="Node000040" href="$elementstring_8h.html" title=" " alt="" coords="661,665,787,691"/>
+<area shape="rect" id="Node000040" href="$elementstring_8h.html" title="String element implementation with LOV support." alt="" coords="661,665,787,691"/>
 <area shape="poly" id="edge35_Node000029_Node000040" title=" " alt="" coords="884,620,769,663,767,658,882,615"/>
-<area shape="rect" id="Node000042" href="$elementlight_8h.html" title=" " alt="" coords="952,665,1069,691"/>
+<area shape="rect" id="Node000042" href="$elementlight_8h.html" title="Light/status indicator element implementation." alt="" coords="952,665,1069,691"/>
 <area shape="poly" id="edge37_Node000029_Node000042" title=" " alt="" coords="931,615,985,655,982,659,927,620"/>
-<area shape="rect" id="Node000043" href="$elementimg_8h.html" title=" " alt="" coords="1094,665,1207,691"/>
+<area shape="rect" id="Node000043" href="$elementimg_8h.html" title="Image element implementation for astronomical image display." alt="" coords="1094,665,1207,691"/>
 <area shape="poly" id="edge38_Node000029_Node000043" title=" " alt="" coords="952,615,1100,659,1098,664,951,620"/>
-<area shape="rect" id="Node000044" href="$elementvideo_8h.html" title=" " alt="" coords="242,665,366,691"/>
+<area shape="rect" id="Node000044" href="$elementvideo_8h.html" title="Video element implementation for video stream display." alt="" coords="242,665,366,691"/>
 <area shape="poly" id="edge39_Node000029_Node000044" title=" " alt="" coords="848,618,835,620,610,644,380,668,380,663,609,638,834,615,847,613"/>
 <area shape="rect" id="Node000036" href="$lovint_8h.html" title=" " alt="" coords="549,739,619,764"/>
 <area shape="poly" id="edge31_Node000031_Node000036" title=" " alt="" coords="587,691,587,725,581,725,581,691"/>

@@ -1,11 +1,11 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classOST_1_1PropertyVisitor.html" title=" " alt="" coords="5,80,157,105"/>
+<area shape="rect" id="Node000000" href="$classOST_1_1PropertyVisitor.html" title="Abstract base class for property visitor pattern implementation." alt="" coords="5,80,157,105"/>
 <area shape="rect" id="Node000001" href="$classOST_1_1JSonDumper.html" title=" " alt="" coords="233,5,367,31"/>
 <area shape="poly" id="edge92_Node000000_Node000001" title=" " alt="" coords="122,72,204,39,243,28,245,33,206,45,124,77"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1PropertyJsonDumper.html" title=" " alt="" coords="205,55,395,80"/>
+<area shape="rect" id="Node000002" href="$classOST_1_1PropertyJsonDumper.html" title="Visitor that serializes properties to JSON format." alt="" coords="205,55,395,80"/>
 <area shape="poly" id="edge93_Node000000_Node000002" title=" " alt="" coords="171,80,205,76,206,81,171,85"/>
-<area shape="rect" id="Node000003" href="$classOST_1_1PropertyTextDumper.html" title=" " alt="" coords="205,104,395,129"/>
+<area shape="rect" id="Node000003" href="$classOST_1_1PropertyTextDumper.html" title="Visitor that converts properties to human&#45;readable text." alt="" coords="205,104,395,129"/>
 <area shape="poly" id="edge94_Node000000_Node000003" title=" " alt="" coords="171,100,206,104,205,109,171,105"/>
-<area shape="rect" id="Node000004" href="$classOST_1_1PropertyUpdate.html" title=" " alt="" coords="221,153,379,179"/>
+<area shape="rect" id="Node000004" href="$classOST_1_1PropertyUpdate.html" title="Visitor that updates properties from QVariantMap data." alt="" coords="221,153,379,179"/>
 <area shape="poly" id="edge95_Node000000_Node000004" title=" " alt="" coords="126,108,206,138,249,151,247,156,204,143,125,113"/>
 </map>

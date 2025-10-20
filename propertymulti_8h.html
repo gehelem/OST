@@ -79,6 +79,9 @@ $(function() {
   <div class="headertitle"><div class="title">propertymulti.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>Multi-element property implementation with grid support.  
+<a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="propertybase_8h_source.html">propertybase.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="elementfactory_8h_source.html">elementfactory.h</a>&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
@@ -86,48 +89,48 @@ Include dependency graph for propertymulti.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="propertymulti_8h__incl.png" border="0" usemap="#alibs_2model_2property_2propertymulti_8h" alt=""/></div>
 <map name="alibs_2model_2property_2propertymulti_8h" id="alibs_2model_2property_2propertymulti_8h">
-<area shape="rect" title=" " alt="" coords="333,5,483,45"/>
-<area shape="rect" href="propertybase_8h.html" title=" " alt="" coords="499,313,619,339"/>
+<area shape="rect" title="Multi&#45;element property implementation with grid support." alt="" coords="333,5,483,45"/>
+<area shape="rect" href="propertybase_8h.html" title="Base class for OST properties with metadata and state management." alt="" coords="499,313,619,339"/>
 <area shape="poly" title=" " alt="" coords="334,34,216,49,154,61,96,77,49,98,31,110,18,124,10,138,8,154,13,171,25,190,55,215,101,238,160,257,226,274,365,299,485,315,485,320,364,304,225,279,158,262,99,243,52,220,21,194,8,173,3,154,5,136,14,120,28,106,46,94,94,72,152,56,215,44,333,29"/>
 <area shape="rect" href="elementfactory_8h.html" title=" " alt="" coords="753,93,885,119"/>
 <area shape="poly" title=" " alt="" coords="483,38,746,88,745,93,482,44"/>
-<area shape="rect" href="propertyvisitor_8h.html" title=" " alt="" coords="494,387,623,412"/>
+<area shape="rect" href="propertyvisitor_8h.html" title="Abstract visitor interface for property traversal and operations." alt="" coords="494,387,623,412"/>
 <area shape="poly" title=" " alt="" coords="561,339,561,373,556,373,556,339"/>
-<area shape="rect" href="elementbase_8h.html" title=" " alt="" coords="686,387,805,412"/>
+<area shape="rect" href="elementbase_8h.html" title="Base classes for OST typed elements and their value containers." alt="" coords="686,387,805,412"/>
 <area shape="poly" title=" " alt="" coords="590,336,703,379,701,384,588,341"/>
 <area shape="rect" title=" " alt="" coords="693,533,760,559"/>
 <area shape="poly" title=" " alt="" coords="562,412,568,447,575,466,586,484,607,502,631,516,681,534,679,539,629,520,604,506,582,487,570,469,562,448,557,412"/>
 <area shape="rect" href="elementvisitor_8h.html" title=" " alt="" coords="596,460,724,485"/>
 <area shape="poly" title=" " alt="" coords="733,414,686,453,683,449,730,410"/>
-<area shape="rect" href="common_8h.html" title=" " alt="" coords="748,460,839,485"/>
+<area shape="rect" href="common_8h.html" title="Common enumerations, structures, and types for OST element system." alt="" coords="748,460,839,485"/>
 <area shape="poly" title=" " alt="" coords="756,411,780,447,776,450,751,414"/>
 <area shape="poly" title=" " alt="" coords="673,484,709,521,705,525,669,487"/>
 <area shape="poly" title=" " alt="" coords="784,487,749,525,745,521,780,484"/>
 <area shape="rect" title=" " alt="" coords="1483,167,1584,192"/>
 <area shape="poly" title=" " alt="" coords="885,109,1138,128,1301,144,1469,164,1468,169,1300,149,1137,133,885,114"/>
-<area shape="rect" href="elementint_8h.html" title=" " alt="" coords="1609,167,1714,192"/>
+<area shape="rect" href="elementint_8h.html" title="Integer element implementation with LOV (List of Values) support." alt="" coords="1609,167,1714,192"/>
 <area shape="poly" title=" " alt="" coords="885,108,1188,126,1389,142,1596,164,1595,169,1388,147,1188,131,885,113"/>
-<area shape="rect" href="elementfloat_8h.html" title=" " alt="" coords="35,167,152,192"/>
+<area shape="rect" href="elementfloat_8h.html" title="Floating&#45;point element implementation with LOV support." alt="" coords="35,167,152,192"/>
 <area shape="poly" title=" " alt="" coords="753,114,499,135,166,169,165,164,499,129,752,109"/>
-<area shape="rect" href="elementbool_8h.html" title=" " alt="" coords="177,167,293,192"/>
+<area shape="rect" href="elementbool_8h.html" title="Boolean element implementation." alt="" coords="177,167,293,192"/>
 <area shape="poly" title=" " alt="" coords="753,117,558,138,307,169,306,164,557,133,752,111"/>
-<area shape="rect" href="elementstring_8h.html" title=" " alt="" coords="1333,167,1459,192"/>
+<area shape="rect" href="elementstring_8h.html" title="String element implementation with LOV support." alt="" coords="1333,167,1459,192"/>
 <area shape="poly" title=" " alt="" coords="885,112,1320,164,1320,169,885,117"/>
-<area shape="rect" href="elementlight_8h.html" title=" " alt="" coords="317,167,435,192"/>
+<area shape="rect" href="elementlight_8h.html" title="Light/status indicator element implementation." alt="" coords="317,167,435,192"/>
 <area shape="poly" title=" " alt="" coords="753,121,449,169,448,164,752,115"/>
-<area shape="rect" href="elementimg_8h.html" title=" " alt="" coords="459,167,573,192"/>
+<area shape="rect" href="elementimg_8h.html" title="Image element implementation for astronomical image display." alt="" coords="459,167,573,192"/>
 <area shape="poly" title=" " alt="" coords="771,121,579,166,578,161,770,116"/>
-<area shape="rect" href="elementvideo_8h.html" title=" " alt="" coords="597,167,721,192"/>
+<area shape="rect" href="elementvideo_8h.html" title="Video element implementation for video stream display." alt="" coords="597,167,721,192"/>
 <area shape="poly" title=" " alt="" coords="794,121,698,163,696,159,792,116"/>
-<area shape="rect" href="elementmessage_8h.html" title=" " alt="" coords="745,167,892,192"/>
+<area shape="rect" href="elementmessage_8h.html" title="Message log element implementation." alt="" coords="745,167,892,192"/>
 <area shape="poly" title=" " alt="" coords="821,119,821,153,816,153,816,119"/>
-<area shape="rect" href="elementprg_8h.html" title=" " alt="" coords="916,167,1025,192"/>
+<area shape="rect" href="elementprg_8h.html" title="Progress/activity indicator element implementation." alt="" coords="916,167,1025,192"/>
 <area shape="poly" title=" " alt="" coords="844,116,935,158,933,163,842,121"/>
-<area shape="rect" href="elementdate_8h.html" title=" " alt="" coords="1049,167,1167,192"/>
+<area shape="rect" href="elementdate_8h.html" title="Date element implementation for calendar date selection." alt="" coords="1049,167,1167,192"/>
 <area shape="poly" title=" " alt="" coords="866,116,1049,161,1047,166,865,121"/>
-<area shape="rect" href="elementtime_8h.html" title=" " alt="" coords="1190,167,1309,192"/>
+<area shape="rect" href="elementtime_8h.html" title="Time element implementation for time&#45;of&#45;day selection." alt="" coords="1190,167,1309,192"/>
 <area shape="poly" title=" " alt="" coords="886,116,1177,163,1176,169,885,121"/>
-<area shape="rect" href="elementtemplate_8h.html" title=" " alt="" coords="745,240,892,265"/>
+<area shape="rect" href="elementtemplate_8h.html" title="Template classes for typed elements with numeric/non&#45;numeric specializations." alt="" coords="745,240,892,265"/>
 <area shape="poly" title=" " alt="" coords="1609,193,1596,195,1404,215,1212,231,906,250,906,245,1211,226,1403,210,1596,189,1608,188"/>
 <area shape="rect" href="lovint_8h.html" title=" " alt="" coords="1437,240,1507,265"/>
 <area shape="poly" title=" " alt="" coords="1632,195,1517,237,1515,232,1630,190"/>
@@ -164,16 +167,16 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
 <div class="center"><img src="propertymulti_8h__dep__incl.png" border="0" usemap="#alibs_2model_2property_2propertymulti_8hdep" alt=""/></div>
 <map name="alibs_2model_2property_2propertymulti_8hdep" id="alibs_2model_2property_2propertymulti_8hdep">
-<area shape="rect" title=" " alt="" coords="463,5,612,45"/>
+<area shape="rect" title="Multi&#45;element property implementation with grid support." alt="" coords="463,5,612,45"/>
 <area shape="rect" href="propertymulti_8cpp.html" title=" " alt="" coords="5,93,155,133"/>
 <area shape="poly" title=" " alt="" coords="450,44,167,96,156,98,155,93,166,91,449,39"/>
-<area shape="rect" href="propertyfactory_8h.html" title=" " alt="" coords="891,101,1083,126"/>
+<area shape="rect" href="propertyfactory_8h.html" title="Factory for creating properties from configuration data." alt="" coords="891,101,1083,126"/>
 <area shape="poly" title=" " alt="" coords="626,41,927,98,926,103,625,46"/>
-<area shape="rect" href="propertyjsondumper_8h.html" title=" " alt="" coords="179,101,403,126"/>
+<area shape="rect" href="propertyjsondumper_8h.html" title="JSON serialization visitor for properties." alt="" coords="179,101,403,126"/>
 <area shape="poly" title=" " alt="" coords="471,52,324,103,323,98,469,47"/>
-<area shape="rect" href="propertytextdumper_8h.html" title=" " alt="" coords="426,101,649,126"/>
+<area shape="rect" href="propertytextdumper_8h.html" title="Human&#45;readable text serialization visitor for properties." alt="" coords="426,101,649,126"/>
 <area shape="poly" title=" " alt="" coords="540,59,540,100,535,100,535,59"/>
-<area shape="rect" href="propertyupdate_8h.html" title=" " alt="" coords="673,101,866,126"/>
+<area shape="rect" href="propertyupdate_8h.html" title="Property update visitor for applying changes from frontend." alt="" coords="673,101,866,126"/>
 <area shape="poly" title=" " alt="" coords="602,48,739,98,738,103,600,53"/>
 <area shape="rect" href="datastore_8h.html" title=" " alt="" coords="600,181,723,207"/>
 <area shape="poly" title=" " alt="" coords="927,132,709,184,708,179,925,127"/>
@@ -228,6 +231,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyMulti.html">OST::PropertyMulti</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concrete property class containing multiple typed elements with optional grid.  <a href="classOST_1_1PropertyMulti.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="namespaces" name="namespaces"></a>
@@ -235,7 +239,12 @@ Namespaces</h2></td></tr>
 <tr class="memitem:namespaceOST" id="r_namespaceOST"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceOST.html">OST</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-</div><!-- contents -->
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Multi-element property implementation with grid support. </p>
+<dl class="section author"><dt>Author</dt><dd><a class="el" href="namespaceOST.html">OST</a> Development Team </dd></dl>
+<dl class="section version"><dt>Version</dt><dd>1.0</dd></dl>
+<p>This file defines PropertyMulti, the concrete implementation of PropertyBase that can contain multiple elements and optionally manage a grid structure for tabular data (sequences, logs, etc.). </p>
+</div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8

@@ -87,7 +87,7 @@ Inheritance diagram for OST::JSonDumper:</div>
 <div class="center"><img src="classOST_1_1JSonDumper__inherit__graph.png" border="0" usemap="#aOST_1_1JSonDumper_inherit__map" alt="Inheritance graph"/></div>
 <map name="aOST_1_1JSonDumper_inherit__map" id="aOST_1_1JSonDumper_inherit__map">
 <area shape="rect" title=" " alt="" coords="8,199,147,464"/>
-<area shape="rect" href="classOST_1_1PropertyVisitor.html" title=" " alt="" coords="5,5,149,151"/>
+<area shape="rect" href="classOST_1_1PropertyVisitor.html" title="Abstract base class for property visitor pattern implementation." alt="" coords="5,5,149,151"/>
 <area shape="poly" title=" " alt="" coords="80,164,80,198,75,198,75,164"/>
 </map>
 </div>
@@ -97,7 +97,7 @@ Collaboration diagram for OST::JSonDumper:</div>
 <div class="center"><img src="classOST_1_1JSonDumper__coll__graph.png" border="0" usemap="#aOST_1_1JSonDumper_coll__map" alt="Collaboration graph"/></div>
 <map name="aOST_1_1JSonDumper_coll__map" id="aOST_1_1JSonDumper_coll__map">
 <area shape="rect" title=" " alt="" coords="8,199,147,464"/>
-<area shape="rect" href="classOST_1_1PropertyVisitor.html" title=" " alt="" coords="5,5,149,151"/>
+<area shape="rect" href="classOST_1_1PropertyVisitor.html" title="Abstract base class for property visitor pattern implementation." alt="" coords="5,5,149,151"/>
 <area shape="poly" title=" " alt="" coords="80,164,80,198,75,198,75,164"/>
 </map>
 </div>
@@ -127,12 +127,16 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8c9c1d5be37e064f7d7d6d384751095c" id="r_a8c9c1d5be37e064f7d7d6d384751095c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classQString.html">QString</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1JSonDumper.html#a8c9c1d5be37e064f7d7d6d384751095c">getStringResult</a> ()</td></tr>
 <tr class="separator:a8c9c1d5be37e064f7d7d6d384751095c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a99eaeac9b8d4475f76f04f151f78e5f0" id="r_a99eaeac9b8d4475f76f04f151f78e5f0"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyVisitor.html#a99eaeac9b8d4475f76f04f151f78e5f0">visit</a> (<a class="el" href="classOST_1_1PropertyBase.html">PropertyBase</a> *pProperty)=0</td></tr>
+<tr class="memdesc:a99eaeac9b8d4475f76f04f151f78e5f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit a <a class="el" href="classOST_1_1PropertyBase.html" title="Abstract base class for all OST properties.">PropertyBase</a> object.  <br /></td></tr>
 <tr class="separator:a99eaeac9b8d4475f76f04f151f78e5f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad908c12ddb6193d8c037dbc3893faaa4" id="r_ad908c12ddb6193d8c037dbc3893faaa4"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyVisitor.html#ad908c12ddb6193d8c037dbc3893faaa4">visit</a> (<a class="el" href="classOST_1_1PropertyBase.html">PropertyBase</a> *pProperty, QVariantMap &amp;data)=0</td></tr>
+<tr class="memdesc:ad908c12ddb6193d8c037dbc3893faaa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit a <a class="el" href="classOST_1_1PropertyBase.html" title="Abstract base class for all OST properties.">PropertyBase</a> object with data parameter.  <br /></td></tr>
 <tr class="separator:ad908c12ddb6193d8c037dbc3893faaa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a84f291604140aaaf58e77554aa2ce0e5" id="r_a84f291604140aaaf58e77554aa2ce0e5"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyVisitor.html#a84f291604140aaaf58e77554aa2ce0e5">visit</a> (<a class="el" href="classOST_1_1PropertyMulti.html">PropertyMulti</a> *pProperty)=0</td></tr>
+<tr class="memdesc:a84f291604140aaaf58e77554aa2ce0e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit a <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> object.  <br /></td></tr>
 <tr class="separator:a84f291604140aaaf58e77554aa2ce0e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e24b0b68db8c7430e095adb7218fb5c" id="r_a9e24b0b68db8c7430e095adb7218fb5c"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyVisitor.html#a9e24b0b68db8c7430e095adb7218fb5c">visit</a> (<a class="el" href="classOST_1_1PropertyMulti.html">PropertyMulti</a> *pProperty, QVariantMap &amp;data)=0</td></tr>
+<tr class="memdesc:a9e24b0b68db8c7430e095adb7218fb5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit a <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> object with data parameter.  <br /></td></tr>
 <tr class="separator:a9e24b0b68db8c7430e095adb7218fb5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -360,6 +364,15 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Visit a <a class="el" href="classOST_1_1PropertyBase.html" title="Abstract base class for all OST properties.">PropertyBase</a> object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pProperty</td><td>Pointer to <a class="el" href="classOST_1_1PropertyBase.html" title="Abstract base class for all OST properties.">PropertyBase</a> to visit</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Pure virtual method called when visiting a <a class="el" href="classOST_1_1PropertyBase.html" title="Abstract base class for all OST properties.">PropertyBase</a>. Derived classes implement specific behavior (e.g., serialize, update). </p>
+
 <p>Implemented in <a class="el" href="classOST_1_1PropertyJsonDumper.html#a186bca93cfae4bf6761278db98de6dce">OST::PropertyJsonDumper</a>, <a class="el" href="classOST_1_1PropertyTextDumper.html#a8e96449a2da5ff955bb9a302a4dd2094">OST::PropertyTextDumper</a>, and <a class="el" href="classOST_1_1PropertyUpdate.html#a5e723fa21274db36a49a52d312c703cc">OST::PropertyUpdate</a>.</p>
 
 </div>
@@ -398,6 +411,16 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Visit a <a class="el" href="classOST_1_1PropertyBase.html" title="Abstract base class for all OST properties.">PropertyBase</a> object with data parameter. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pProperty</td><td>Pointer to <a class="el" href="classOST_1_1PropertyBase.html" title="Abstract base class for all OST properties.">PropertyBase</a> to visit </td></tr>
+    <tr><td class="paramname">data</td><td>QVariantMap containing operation data</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Overloaded visit method for operations requiring external data, such as updating property values from frontend. </p>
+
 <p>Implemented in <a class="el" href="classOST_1_1PropertyJsonDumper.html#a4e2e6396342c6c128dd86854053fc1a5">OST::PropertyJsonDumper</a>, <a class="el" href="classOST_1_1PropertyTextDumper.html#a637cd5c9daf3707d4fe4d4bbd0ab5993">OST::PropertyTextDumper</a>, and <a class="el" href="classOST_1_1PropertyUpdate.html#a12b709dc0f659a4ddca3406aced92f45">OST::PropertyUpdate</a>.</p>
 
 </div>
@@ -425,6 +448,15 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Visit a <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pProperty</td><td>Pointer to <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> to visit</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Pure virtual method called when visiting a <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a>. Provides access to elements, grid, and multi-property features. </p>
 
 <p>Implemented in <a class="el" href="classOST_1_1PropertyJsonDumper.html#ab4de79b0cdcebf3b626a6a00d19c4667">OST::PropertyJsonDumper</a>, <a class="el" href="classOST_1_1PropertyTextDumper.html#a24f311e976b2dbbcb516e3290be945ca">OST::PropertyTextDumper</a>, and <a class="el" href="classOST_1_1PropertyUpdate.html#affdaad100724d5fc89f41fade6ce6182">OST::PropertyUpdate</a>.</p>
 
@@ -463,6 +495,16 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Visit a <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> object with data parameter. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pProperty</td><td>Pointer to <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> to visit </td></tr>
+    <tr><td class="paramname">data</td><td>QVariantMap containing operation data</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Overloaded visit method for operations requiring external data. Used for grid operations, element updates, etc. </p>
 
 <p>Implemented in <a class="el" href="classOST_1_1PropertyJsonDumper.html#a50988900e8a10d4057270bb56bfca70c">OST::PropertyJsonDumper</a>, <a class="el" href="classOST_1_1PropertyTextDumper.html#a406fd1644e545ea6a9987d15647f676d">OST::PropertyTextDumper</a>, and <a class="el" href="classOST_1_1PropertyUpdate.html#abf8d1a8c9e8137a967dc9dd0b0e003b0">OST::PropertyUpdate</a>.</p>
 

@@ -81,27 +81,83 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>Factory for creating <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> objects from configuration.  
+ <a href="classOST_1_1PropertyFactory.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="propertyfactory_8h_source.html">propertyfactory.h</a>&gt;</code></p>
 <div class="dynheader">
 Collaboration diagram for OST::PropertyFactory:</div>
 <div class="dyncontent">
 <div class="center"><img src="classOST_1_1PropertyFactory__coll__graph.png" border="0" usemap="#aOST_1_1PropertyFactory_coll__map" alt="Collaboration graph"/></div>
 <map name="aOST_1_1PropertyFactory_coll__map" id="aOST_1_1PropertyFactory_coll__map">
-<area shape="rect" title=" " alt="" coords="5,5,155,91"/>
+<area shape="rect" title="Factory for creating PropertyMulti objects from configuration." alt="" coords="5,5,155,91"/>
 </map>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a83b156ee5416a916173d661ae638c947" id="r_a83b156ee5416a916173d661ae638c947"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyFactory.html#a83b156ee5416a916173d661ae638c947">PropertyFactory</a> ()=delete</td></tr>
+<tr class="memdesc:a83b156ee5416a916173d661ae638c947"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deleted constructor - static factory class only.  <br /></td></tr>
 <tr class="separator:a83b156ee5416a916173d661ae638c947"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ae43db65eda4bc6671ddb5adfb697d0f4" id="r_ae43db65eda4bc6671ddb5adfb697d0f4"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classOST_1_1PropertyMulti.html">PropertyMulti</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyFactory.html#ae43db65eda4bc6671ddb5adfb697d0f4">createProperty</a> (const <a class="el" href="classQString.html">QString</a> &amp;pKey, const QVariantMap &amp;pData)</td></tr>
+<tr class="memdesc:ae43db65eda4bc6671ddb5adfb697d0f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> from configuration data.  <br /></td></tr>
 <tr class="separator:ae43db65eda4bc6671ddb5adfb697d0f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Factory for creating <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> objects from configuration. </p>
+<p><a class="el" href="classOST_1_1PropertyFactory.html" title="Factory for creating PropertyMulti objects from configuration.">PropertyFactory</a> provides a static factory method to create fully configured <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> objects from QVariantMap data. This is typically used when restoring properties from database profiles or deserializing from JSON.</p>
+<p>The factory:</p><ul>
+<li>Creates the <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> with metadata (key, label, permission, hierarchy)</li>
+<li>Creates and adds all elements using <a class="el" href="classOST_1_1ElementFactory.html">ElementFactory</a></li>
+<li>Configures grid settings if present</li>
+<li>Configures graph definitions if present</li>
+<li>Restores element values and LOVs</li>
+</ul>
+<dl class="section user"><dt>Usage (creating from configuration):</dt><dd><div class="fragment"><div class="line">QVariantMap config;</div>
+<div class="line">config[<span class="stringliteral">&quot;key&quot;</span>] = <span class="stringliteral">&quot;parameters&quot;</span>;</div>
+<div class="line">config[<span class="stringliteral">&quot;label&quot;</span>] = <span class="stringliteral">&quot;Focus Parameters&quot;</span>;</div>
+<div class="line">config[<span class="stringliteral">&quot;permission&quot;</span>] = 2;  <span class="comment">// ReadWrite</span></div>
+<div class="line">config[<span class="stringliteral">&quot;level1&quot;</span>] = <span class="stringliteral">&quot;Control&quot;</span>;</div>
+<div class="line">config[<span class="stringliteral">&quot;level2&quot;</span>] = <span class="stringliteral">&quot;Main&quot;</span>;</div>
+<div class="line">config[<span class="stringliteral">&quot;order&quot;</span>] = <span class="stringliteral">&quot;010&quot;</span>;</div>
+<div class="line">config[<span class="stringliteral">&quot;hasprofile&quot;</span>] = <span class="keyword">true</span>;</div>
+<div class="line">config[<span class="stringliteral">&quot;hasgrid&quot;</span>] = <span class="keyword">false</span>;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Element configurations</span></div>
+<div class="line">QVariantMap elements;</div>
+<div class="line">QVariantMap iterationsElt;</div>
+<div class="line">iterationsElt[<span class="stringliteral">&quot;type&quot;</span>] = <span class="stringliteral">&quot;int&quot;</span>;</div>
+<div class="line">iterationsElt[<span class="stringliteral">&quot;label&quot;</span>] = <span class="stringliteral">&quot;Iterations&quot;</span>;</div>
+<div class="line">iterationsElt[<span class="stringliteral">&quot;order&quot;</span>] = <span class="stringliteral">&quot;10&quot;</span>;</div>
+<div class="line">iterationsElt[<span class="stringliteral">&quot;value&quot;</span>] = 10;</div>
+<div class="line">iterationsElt[<span class="stringliteral">&quot;min&quot;</span>] = 1;</div>
+<div class="line">iterationsElt[<span class="stringliteral">&quot;max&quot;</span>] = 20;</div>
+<div class="line">elements[<span class="stringliteral">&quot;iterations&quot;</span>] = iterationsElt;</div>
+<div class="line">config[<span class="stringliteral">&quot;elements&quot;</span>] = elements;</div>
+<div class="line"> </div>
+<div class="line"><a class="code hl_class" href="classOST_1_1PropertyMulti.html">PropertyMulti</a>* <span class="keyword">property</span> = <a class="code hl_function" href="classOST_1_1PropertyFactory.html#ae43db65eda4bc6671ddb5adfb697d0f4">PropertyFactory::createProperty</a>(<span class="stringliteral">&quot;parameters&quot;</span>, config);</div>
+<div class="line"><span class="comment">// property is fully configured and ready to use</span></div>
+<div class="ttc" id="aclassOST_1_1PropertyFactory_html_ae43db65eda4bc6671ddb5adfb697d0f4"><div class="ttname"><a href="classOST_1_1PropertyFactory.html#ae43db65eda4bc6671ddb5adfb697d0f4">OST::PropertyFactory::createProperty</a></div><div class="ttdeci">static PropertyMulti * createProperty(const QString &amp;pKey, const QVariantMap &amp;pData)</div><div class="ttdoc">Create PropertyMulti from configuration data.</div><div class="ttdef"><b>Definition</b> propertyfactory.cpp:5</div></div>
+<div class="ttc" id="aclassOST_1_1PropertyMulti_html"><div class="ttname"><a href="classOST_1_1PropertyMulti.html">OST::PropertyMulti</a></div><div class="ttdoc">Concrete property class containing multiple typed elements with optional grid.</div><div class="ttdef"><b>Definition</b> propertymulti.h:71</div></div>
+</div><!-- fragment --></dd></dl>
+<dl class="section user"><dt>Restoring from Database:</dt><dd><div class="fragment"><div class="line"><span class="comment">// DBManager returns QVariantMap from saved profile</span></div>
+<div class="line">QVariantMap savedConfig = dbManager-&gt;loadProperty(<span class="stringliteral">&quot;focus&quot;</span>, <span class="stringliteral">&quot;parameters&quot;</span>);</div>
+<div class="line"> </div>
+<div class="line"><a class="code hl_class" href="classOST_1_1PropertyMulti.html">PropertyMulti</a>* <span class="keyword">property</span> = <a class="code hl_function" href="classOST_1_1PropertyFactory.html#ae43db65eda4bc6671ddb5adfb697d0f4">PropertyFactory::createProperty</a>(<span class="stringliteral">&quot;parameters&quot;</span>, savedConfig);</div>
+<div class="line"><span class="comment">// Property restored with all saved values</span></div>
+</div><!-- fragment --></dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Constructor is deleted - this is a pure static factory class. </dd>
+<dd>
+Commented INDI-related methods are legacy code for INDI protocol conversion.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> </dd>
+<dd>
+<a class="el" href="classOST_1_1ElementFactory.html">ElementFactory</a> </dd>
+<dd>
+<a class="el" href="classDBManager.html">DBManager</a> </dd></dl>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a83b156ee5416a916173d661ae638c947" name="a83b156ee5416a916173d661ae638c947"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a83b156ee5416a916173d661ae638c947">&#9670;&#160;</a></span>PropertyFactory()</h2>
 
@@ -124,6 +180,9 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Deleted constructor - static factory class only. </p>
+<p><a class="el" href="classOST_1_1PropertyFactory.html" title="Factory for creating PropertyMulti objects from configuration.">PropertyFactory</a> cannot be instantiated. All methods are static. </p>
 
 </div>
 </div>
@@ -161,6 +220,52 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Create <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> from configuration data. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pKey</td><td>Property key (unique identifier) </td></tr>
+    <tr><td class="paramname">pData</td><td>QVariantMap containing property configuration </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Pointer to newly created <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> (caller owns)</dd></dl>
+<p>Creates a fully configured <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a> object from configuration data.</p>
+<dl class="section user"><dt>Required fields in pData:</dt><dd><ul>
+<li>"label": Property display label (QString)</li>
+<li>"permission": Access permission (int: 0=ReadOnly, 1=WriteOnly, 2=ReadWrite)</li>
+<li>"level1": First hierarchy level (QString)</li>
+<li>"level2": Second hierarchy level (QString)</li>
+<li>"order": Sort order (QString)</li>
+<li>"hasprofile": Whether to save in profile (bool)</li>
+<li>"hasgrid": Whether property has grid capability (bool)</li>
+</ul>
+</dd></dl>
+<dl class="section user"><dt>Optional fields in pData:</dt><dd><ul>
+<li>"elements": QVariantMap of element configurations (key → element config)</li>
+<li>"hasgraph": Whether property has graph (bool)</li>
+<li>"graphdefs": Graph configuration (QVariantMap)</li>
+<li>"showgrid": Whether grid is visible (bool)</li>
+<li>"showelts": Whether elements are visible (bool)</li>
+<li>Other property metadata fields</li>
+</ul>
+</dd></dl>
+<dl class="section user"><dt>Example element configuration:</dt><dd><div class="fragment"><div class="line">QVariantMap eltConfig;</div>
+<div class="line">eltConfig[<span class="stringliteral">&quot;type&quot;</span>] = <span class="stringliteral">&quot;int&quot;</span>;     <span class="comment">// Element type</span></div>
+<div class="line">eltConfig[<span class="stringliteral">&quot;label&quot;</span>] = <span class="stringliteral">&quot;Iterations&quot;</span>;</div>
+<div class="line">eltConfig[<span class="stringliteral">&quot;order&quot;</span>] = <span class="stringliteral">&quot;10&quot;</span>;</div>
+<div class="line">eltConfig[<span class="stringliteral">&quot;hint&quot;</span>] = <span class="stringliteral">&quot;Number of focus iterations&quot;</span>;</div>
+<div class="line">eltConfig[<span class="stringliteral">&quot;value&quot;</span>] = 10;       <span class="comment">// Initial value</span></div>
+<div class="line">eltConfig[<span class="stringliteral">&quot;min&quot;</span>] = 1;          <span class="comment">// Min value (numeric types)</span></div>
+<div class="line">eltConfig[<span class="stringliteral">&quot;max&quot;</span>] = 20;         <span class="comment">// Max value (numeric types)</span></div>
+<div class="line">eltConfig[<span class="stringliteral">&quot;lov&quot;</span>] = lovMap;     <span class="comment">// List of values (if applicable)</span></div>
+</div><!-- fragment --></dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Caller is responsible for deleting the returned <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a>. </dd>
+<dd>
+Uses <a class="el" href="classOST_1_1ElementFactory.html">ElementFactory</a> internally to create elements from config.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classOST_1_1ElementFactory.html#a8574ec237845cbe7bc9a7aa0ce04a410">ElementFactory::createElement()</a> </dd>
+<dd>
+<a class="el" href="classOST_1_1PropertyMulti.html#ad4b28df72a221cde9e8f8d6f6ad9891b" title="Construct a new PropertyMulti object.">PropertyMulti::PropertyMulti()</a> </dd></dl>
 
 </div>
 </div>

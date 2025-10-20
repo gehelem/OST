@@ -1,5 +1,5 @@
 <map id="libs/utils/propertyupdate.h" name="libs/utils/propertyupdate.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="391,5,585,31"/>
+<area shape="rect" id="Node000001" title="Property update visitor for applying changes from frontend." alt="" coords="391,5,585,31"/>
 <area shape="rect" id="Node000002" href="$datastore_8h.html" title=" " alt="" coords="332,79,455,104"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="463,41,410,81,407,76,460,37"/>
 <area shape="rect" id="Node000019" href="$propertyupdate_8cpp.html" title=" " alt="" coords="479,79,687,104"/>

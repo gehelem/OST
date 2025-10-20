@@ -1,5 +1,5 @@
 <map id="OST::ElementTemplate&lt; T &gt;" name="OST::ElementTemplate&lt; T &gt;">
-<area shape="rect" id="Node000001" title=" " alt="" coords="1619,452,1817,597"/>
+<area shape="rect" id="Node000001" title="Base template class for all typed elements." alt="" coords="1619,452,1817,597"/>
 <area shape="rect" id="Node000004" href="$classOST_1_1ElementTemplateNotNumeric.html" title=" " alt="" coords="5,715,247,855"/>
 <area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1605,528,1301,530,1110,535,908,545,710,560,527,581,372,610,310,628,259,648,214,678,176,717,172,713,210,674,257,643,308,623,371,605,526,576,709,554,908,539,1110,530,1301,525,1605,522"/>
 <area shape="rect" id="Node000006" href="$classOST_1_1ElementTemplateNotNumeric.html" title=" " alt="" coords="271,715,512,855"/>
@@ -22,34 +22,34 @@
 <area shape="poly" id="edge21_Node000001_Node000022" title=" " alt="" coords="1831,535,1973,552,2133,576,2280,606,2338,624,2382,643,2395,651,2392,656,2379,648,2336,629,2278,612,2132,581,1973,557,1831,540"/>
 <area shape="rect" id="Node000024" href="$classOST_1_1ElementTemplateNumeric.html" title=" " alt="" coords="2637,645,2855,925"/>
 <area shape="poly" id="edge23_Node000001_Node000024" title=" " alt="" coords="1831,528,2026,541,2257,562,2370,578,2474,596,2561,618,2626,643,2638,650,2635,654,2623,648,2560,623,2473,601,2370,583,2256,568,2025,546,1831,534"/>
-<area shape="rect" id="Node000026" href="$classOST_1_1ElementTemplateNotNumeric.html" title=" " alt="" coords="2879,723,3157,848"/>
+<area shape="rect" id="Node000026" href="$classOST_1_1ElementTemplateNotNumeric.html" title="Template specialization for non&#45;numeric elements (string, bool, date, time, etc.)" alt="" coords="2879,723,3157,848"/>
 <area shape="poly" id="edge25_Node000001_Node000026" title=" " alt="" coords="1831,526,2074,536,2375,556,2526,571,2664,591,2781,614,2829,628,2868,643,2897,658,2924,678,2970,720,2966,724,2920,682,2894,663,2866,648,2827,633,2780,619,2663,596,2525,577,2375,562,2073,541,1831,531"/>
-<area shape="rect" id="Node000027" href="$classOST_1_1ElementTemplateNumeric.html" title=" " alt="" coords="3181,653,3436,918"/>
+<area shape="rect" id="Node000027" href="$classOST_1_1ElementTemplateNumeric.html" title="Template specialization for numeric elements (int, float) with validation." alt="" coords="3181,653,3436,918"/>
 <area shape="poly" id="edge26_Node000001_Node000027" title=" " alt="" coords="1831,523,2133,526,2323,532,2523,542,2720,557,2902,578,3056,606,3119,623,3170,643,3184,650,3181,655,3168,648,3117,629,3055,611,2901,583,2720,562,2523,547,2323,537,2133,531,1831,528"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1ElementBase.html" title=" " alt="" coords="1649,119,1787,404"/>
+<area shape="rect" id="Node000002" href="$classOST_1_1ElementBase.html" title="Abstract base class for all typed elements in OST properties." alt="" coords="1649,119,1787,404"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1721,418,1721,452,1715,452,1715,418"/>
 <area shape="rect" id="Node000003" href="$classQObject.html" title=" " alt="" coords="1685,5,1751,71"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1721,84,1721,119,1715,119,1715,84"/>
-<area shape="rect" id="Node000005" href="$classOST_1_1ElementBool.html" title=" " alt="" coords="59,1023,193,1189"/>
+<area shape="rect" id="Node000005" href="$classOST_1_1ElementBool.html" title="Boolean element for checkboxes and switches." alt="" coords="59,1023,193,1189"/>
 <area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="129,869,129,1023,123,1023,123,869"/>
-<area shape="rect" id="Node000007" href="$classOST_1_1ElementDate.html" title=" " alt="" coords="324,1023,459,1189"/>
+<area shape="rect" id="Node000007" href="$classOST_1_1ElementDate.html" title="Date element for calendar date selection." alt="" coords="324,1023,459,1189"/>
 <area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="394,869,394,1023,389,1023,389,869"/>
-<area shape="rect" id="Node000009" href="$classOST_1_1ElementImg.html" title=" " alt="" coords="592,1003,721,1209"/>
+<area shape="rect" id="Node000009" href="$classOST_1_1ElementImg.html" title="Image element for displaying astronomical images with metadata." alt="" coords="592,1003,721,1209"/>
 <area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="659,869,659,1003,654,1003,654,869"/>
-<area shape="rect" id="Node000011" href="$classOST_1_1ElementLight.html" title=" " alt="" coords="854,1023,990,1189"/>
+<area shape="rect" id="Node000011" href="$classOST_1_1ElementLight.html" title="Status indicator light element (colored state display)" alt="" coords="854,1023,990,1189"/>
 <area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="925,869,925,1023,919,1023,919,869"/>
-<area shape="rect" id="Node000013" href="$classOST_1_1ElementMessage.html" title=" " alt="" coords="1107,993,1268,1219"/>
+<area shape="rect" id="Node000013" href="$classOST_1_1ElementMessage.html" title="Message and log display element." alt="" coords="1107,993,1268,1219"/>
 <area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="1190,869,1190,993,1185,993,1185,869"/>
-<area shape="rect" id="Node000015" href="$classOST_1_1ElementPrg.html" title=" " alt="" coords="1390,973,1515,1239"/>
+<area shape="rect" id="Node000015" href="$classOST_1_1ElementPrg.html" title="Progress and activity indicator element." alt="" coords="1390,973,1515,1239"/>
 <area shape="poly" id="edge14_Node000014_Node000015" title=" " alt="" coords="1455,869,1455,973,1450,973,1450,869"/>
-<area shape="rect" id="Node000017" href="$classOST_1_1ElementString.html" title=" " alt="" coords="1647,973,1789,1239"/>
+<area shape="rect" id="Node000017" href="$classOST_1_1ElementString.html" title="String element with LOV support." alt="" coords="1647,973,1789,1239"/>
 <area shape="poly" id="edge16_Node000016_Node000017" title=" " alt="" coords="1721,869,1721,973,1715,973,1715,869"/>
-<area shape="rect" id="Node000019" href="$classOST_1_1ElementTime.html" title=" " alt="" coords="1915,1003,2052,1209"/>
+<area shape="rect" id="Node000019" href="$classOST_1_1ElementTime.html" title="Time element for time&#45;of&#45;day selection." alt="" coords="1915,1003,2052,1209"/>
 <area shape="poly" id="edge18_Node000018_Node000019" title=" " alt="" coords="1986,869,1986,1003,1981,1003,1981,869"/>
-<area shape="rect" id="Node000021" href="$classOST_1_1ElementVideo.html" title=" " alt="" coords="2178,1023,2319,1189"/>
+<area shape="rect" id="Node000021" href="$classOST_1_1ElementVideo.html" title="Video element for displaying video streams and recordings." alt="" coords="2178,1023,2319,1189"/>
 <area shape="poly" id="edge20_Node000020_Node000021" title=" " alt="" coords="2251,869,2251,1023,2246,1023,2246,869"/>
-<area shape="rect" id="Node000023" href="$classOST_1_1ElementFloat.html" title=" " alt="" coords="2435,973,2572,1239"/>
+<area shape="rect" id="Node000023" href="$classOST_1_1ElementFloat.html" title="Floating&#45;point element with validation and LOV support." alt="" coords="2435,973,2572,1239"/>
 <area shape="poly" id="edge22_Node000022_Node000023" title=" " alt="" coords="2506,939,2506,973,2501,973,2501,939"/>
-<area shape="rect" id="Node000025" href="$classOST_1_1ElementInt.html" title=" " alt="" coords="2685,973,2807,1239"/>
+<area shape="rect" id="Node000025" href="$classOST_1_1ElementInt.html" title="Integer element with validation and LOV support." alt="" coords="2685,973,2807,1239"/>
 <area shape="poly" id="edge24_Node000024_Node000025" title=" " alt="" coords="2749,939,2749,973,2743,973,2743,939"/>
 </map>
