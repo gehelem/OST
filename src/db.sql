@@ -44,8 +44,8 @@ INSERT INTO OPTICS VALUES ('254/1000',1000.0,254.0,1.5,FALSE);
 CREATE TABLE IF NOT EXISTS USERS (
         LOGIN     TEXT NOT NULL,
         PW     TEXT NOT NULL,
-        GRANT     BOOL NOT NULL, -- false : readOnly / true : read/write
+        GRANT     TEXT NOT NULL, -- 0 : readOnly / 1 : read/write
         PRIMARY KEY("LOGIN")
 );
-INSERT INTO USERS VALUES ('GUEST','guest',false);
-INSERT INTO USERS VALUES ('ADMIN','admin',true);
+INSERT INTO USERS VALUES ('GUEST','guest','0');
+INSERT INTO USERS VALUES ('ADMIN','admin','1');

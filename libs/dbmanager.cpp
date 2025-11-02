@@ -354,7 +354,7 @@ bool DBManager::populateCatalog(const QString &pFileName, const QString &pName)
 }
 QString DBManager::getGrants(const QString &pUser, const QString &pPW)
 {
-    QString result = "0";
+    QString result = "-1";
 
     if(!mDb.open())
     {
@@ -366,7 +366,7 @@ QString DBManager::getGrants(const QString &pUser, const QString &pPW)
     sql = sql + " AND PW= '" + pPW + "'";
     if (!mQuery.exec(sql))
     {
-        sendError("getGrants - ERROR : " + mQuery.lastError().text());
+        sendError("getGrants - " + mQuery.lastError().text());
         mDb.close();
         return result;
     }
@@ -383,7 +383,16 @@ QString DBManager::getGrants(const QString &pUser, const QString &pPW)
         return result;
     }
     mQuery.next();
+    // 0 : user is read only
+    // 1 : user has full access
+    // -1 : invalid
     result = mQuery.value(0).toString();
+    if ((result != "0") && (result != "1"))
+    {
+        sendError("getGrants - Invalid credentials - " + pUser + "-" + result );
+        result = "-1";
+        return result;
+    }
     mDb.close();
     return result;
 
