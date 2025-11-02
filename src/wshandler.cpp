@@ -126,9 +126,9 @@ void WShandler::onNewConnection()
     QWebSocket *pSocket = m_pWebSocketServer->nextPendingConnection();
     connect(pSocket, &QWebSocket::textMessageReceived, this, &WShandler::processTextMessage);
     connect(pSocket, &QWebSocket::disconnected, this, &WShandler::socketDisconnected);
-    qDebug() << pSocket << "-" << pSocket->peerAddress().toString();
+    //qDebug() << pSocket << "-" << pSocket->peerAddress().toString();
     m_clients << pSocket;
-    mClientGrants[pSocket->peerAddress().toString()] = "0";
+    mClientGrants[pSocket->peerAddress().toString()] = "-1";
 
 }
 
@@ -137,8 +137,7 @@ void WShandler::processTextMessage(QString message)
 {
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
     QString clientGrant = mClientGrants[pClient->peerAddress().toString()];
-    if ((clientGrant != "1") && (clientGrant != "2") && (clientGrant != "pending") && ((mServerGrant == "1")
-            || (mServerGrant == "2")))
+    if ((clientGrant != "0") && (clientGrant != "1") && (clientGrant != "pending") && (mServerGrant == "1"))
     {
         sendMessage("request identification " + pClient->peerAddress().toString());
         QFile jsonFile(":loginpage.json");
@@ -172,12 +171,11 @@ void WShandler::processTextMessage(QString message)
             QString user = Elts.toMap()["user"].toString();
             QString pw = Elts.toMap()["pw"].toString();
             QString g = dbmanager->getGrants(user, pw);
-            if ((g == "1") || (g == "2"))
+            if ((g == "0") || (g == "1"))
             {
                 mClientGrants[pClient->peerAddress().toString()] = g;
                 emit externalEvent("Freadall", "*", "*", QVariantMap());
             }
-
         }
         return;
     }
@@ -187,7 +185,7 @@ void WShandler::processTextMessage(QString message)
         emit externalEvent("Freadall", "*", "*", QVariantMap());
     }
     /* ignore update messages from readonly users */
-    if (clientGrant == "1") return;
+    if (clientGrant == "0") return;
 
     if (obj["evt"].toString() == "Fsetproperty")
     {
