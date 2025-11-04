@@ -24,6 +24,7 @@ build-job:
   script:
     - echo "Running build..."
     - mkdir build
+    - mkdir install
     - cd build
     - cmake ..
     - make -j4
