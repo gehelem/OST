@@ -53,91 +53,55 @@ package-deb:
     - build-job
   script:
     - echo "Creating Debian package..."
-    
-    # Définir les variables du paquet
     - export PACKAGE_NAME="ostserver"
     - export PACKAGE_VERSION="${CI_COMMIT_TAG:-1.0.0}"
     - export PACKAGE_ARCH="amd64"
     - export DEB_NAME="${PACKAGE_NAME}_${PACKAGE_VERSION}_${PACKAGE_ARCH}"
-    
-    # Créer la structure du paquet Debian
     - mkdir -p ${DEB_NAME}/DEBIAN
     - mkdir -p ${DEB_NAME}/usr/bin
     - mkdir -p ${DEB_NAME}/usr/share/${PACKAGE_NAME}
     - mkdir -p ${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}
-    
-    # Copier les binaires depuis le build
     - cp -r install/* ${DEB_NAME}/usr/
-    
-    # Créer le fichier control
-    - |
-      cat > ${DEB_NAME}/DEBIAN/control << EOF
-      Package: ${PACKAGE_NAME}
-      Version: ${PACKAGE_VERSION}
-      Section: misc
-      Priority: optional
-      Architecture: ${PACKAGE_ARCH}
-      Maintainer: Gilles <gilles@ostserver.fr>
-      Depends: qtbase5-dev, libqt5websockets5, libindi1, libstellarsolver, libnova-0.16-0, libgsl27, wcslib7, libcfitsio10, libavahi-client3, libavahi-common3, zlib1g
-      Description: OST Server
-       OST Server - Astrophotography control server
-       Serveur de contrôle pour l'astrophotographie
-      EOF
-    
-    # Optionnel : Créer un fichier postinst pour les actions post-installation
-    - |
-      cat > ${DEB_NAME}/DEBIAN/postinst << EOF
-      #!/bin/bash
-      set -e
-      echo "OST Server installation completed"
-      exit 0
-      EOF
+    - echo "Package:${PACKAGE_NAME}" > ${DEB_NAME}/DEBIAN/control
+    - echo "Version:${PACKAGE_VERSION}" >> ${DEB_NAME}/DEBIAN/control
+    - echo "Section:misc" >> ${DEB_NAME}/DEBIAN/control
+    - echo "Priority:optional" >> ${DEB_NAME}/DEBIAN/control
+    - echo "Architecture:${PACKAGE_ARCH}" >> ${DEB_NAME}/DEBIAN/control
+    - echo "Maintainer:Gilles <gilles@ostserver.fr>" >> ${DEB_NAME}/DEBIAN/control
+    - echo "Depends:qtbase5-dev, libqt5websockets5, libindi1, libstellarsolver, libnova-0.16-0, libgsl27, wcslib7, libcfitsio10, libavahi-client3, libavahi-common3, zlib1g" >> ${DEB_NAME}/DEBIAN/control
+    - echo "Description:OST Server" >> ${DEB_NAME}/DEBIAN/control
+    - echo " OST Server - Astrophotography control server" >> ${DEB_NAME}/DEBIAN/control
+    - echo " Serveur de contrôle pour l'astrophotographie" >> ${DEB_NAME}/DEBIAN/control
+    - echo '#!/bin/bash' > ${DEB_NAME}/DEBIAN/postinst
+    - echo 'set -e' >> ${DEB_NAME}/DEBIAN/postinst
+    - echo 'echo "OST Server installation completed"' >> ${DEB_NAME}/DEBIAN/postinst
+    - echo 'exit 0' >> ${DEB_NAME}/DEBIAN/postinst
     - chmod 755 ${DEB_NAME}/DEBIAN/postinst
-    
-    # Créer un fichier copyright
-    - |
-      cat > ${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/copyright << EOF
-      Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-      Upstream-Name: ${PACKAGE_NAME}
-      Source: https://gitlab.ostserver.fr/gilles/OST
-      
-      Files: *
-      Copyright: $(date +%Y) Gilles
-      License: MIT
-      EOF
-    
-    # Créer le changelog
-    - |
-      cat > ${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/changelog << EOF
-      ${PACKAGE_NAME} (${PACKAGE_VERSION}) unstable; urgency=medium
-      
-        * Release ${PACKAGE_VERSION}
-      
-       -- Gilles <gilles@ostserver.fr>  $(date -R)
-      EOF
+    - echo "Format:https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/" > ${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/copyright
+    - echo "Upstream-Name:${PACKAGE_NAME}" >> ${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/copyright
+    - echo "Source:https://gitlab.ostserver.fr/gilles/OST" >> ${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/copyright
+    - echo "" >> ${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/copyright
+    - echo "Files:*" >> ${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/copyright
+    - echo "Copyright:$(date +%Y) Gilles" >> ${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/copyright
+    - echo "License:MIT" >> ${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/copyright
+    - echo "${PACKAGE_NAME} (${PACKAGE_VERSION}) unstable; urgency=medium" > ${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/changelog
+    - echo "" >> ${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/changelog
+    - echo "  * Release ${PACKAGE_VERSION}" >> ${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/changelog
+    - echo "" >> ${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/changelog
+    - echo " -- Gilles <gilles@ostserver.fr>  $(date -R)" >> ${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/changelog
     - gzip -9 ${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/changelog
-    
-    # Fixer les permissions
     - find ${DEB_NAME} -type d -exec chmod 755 {} \;
-    - find ${DEB_NAME}/usr/bin -type f -exec chmod 755 {} \;
-    
-    # Construire le paquet .deb
+    - find ${DEB_NAME}/usr/bin -type f -exec chmod 755 {} \; || true
     - dpkg-deb --build ${DEB_NAME}
-    
-    # Vérifier le paquet (optionnel, peut afficher des warnings)
     - lintian ${DEB_NAME}.deb || true
-    
-    # Créer un répertoire pour les packages
     - mkdir -p packages
     - mv ${DEB_NAME}.deb packages/
-    
-    - echo "Package created: ${DEB_NAME}.deb"
+    - echo "Package created:${DEB_NAME}.deb"
     - ls -lh packages/
   artifacts:
     paths:
       - packages/*.deb
     expire_in: 1 week
-  # Exécuter uniquement sur les tags
   only:
     - tags
 
@@ -151,40 +115,11 @@ release-assets:
     - package-deb
   script:
     - echo "Publishing release assets..."
-    
-    # Variables
     - export PACKAGE_VERSION="${CI_COMMIT_TAG}"
     - export PROJECT_ID="${CI_PROJECT_ID}"
     - export PACKAGE_NAME="ostserver_${PACKAGE_VERSION}_amd64.deb"
-    
-    # Uploader le paquet vers le Package Registry (Generic Package)
-    - |
-      curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
-           --upload-file packages/${PACKAGE_NAME} \
-           "${CI_API_V4_URL}/projects/${PROJECT_ID}/packages/generic/ostserver/${PACKAGE_VERSION}/${PACKAGE_NAME}"
-    
-    # Créer la release avec l'asset
-    - |
-      curl --request POST \
-           --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
-           --header "Content-Type: application/json" \
-           --data "{
-             \"name\": \"Release ${PACKAGE_VERSION}\",
-             \"tag_name\": \"${CI_COMMIT_TAG}\",
-             \"description\": \"## Release ${PACKAGE_VERSION}\n\nPackage Debian disponible en téléchargement.\",
-             \"assets\": {
-               \"links\": [
-                 {
-                   \"name\": \"${PACKAGE_NAME}\",
-                   \"url\": \"${CI_API_V4_URL}/projects/${PROJECT_ID}/packages/generic/ostserver/${PACKAGE_VERSION}/${PACKAGE_NAME}\",
-                   \"link_type\": \"package\"
-                 }
-               ]
-             }
-           }" \
-           "${CI_API_V4_URL}/projects/${PROJECT_ID}/releases"
-    
+    - curl --header "JOB-TOKEN:${CI_JOB_TOKEN}" --upload-file packages/${PACKAGE_NAME} "${CI_API_V4_URL}/projects/${PROJECT_ID}/packages/generic/ostserver/${PACKAGE_VERSION}/${PACKAGE_NAME}"
+    - 'curl --request POST --header "JOB-TOKEN:${CI_JOB_TOKEN}" --header "Content-Type:application/json" --data "{\"name\":\"Release ${PACKAGE_VERSION}\",\"tag_name\":\"${CI_COMMIT_TAG}\",\"description\":\"## Release ${PACKAGE_VERSION}\\n\\nPackage Debian disponible en téléchargement.\",\"assets\":{\"links\":[{\"name\":\"${PACKAGE_NAME}\",\"url\":\"${CI_API_V4_URL}/projects/${PROJECT_ID}/packages/generic/ostserver/${PACKAGE_VERSION}/${PACKAGE_NAME}\",\"link_type\":\"package\"}]}}" "${CI_API_V4_URL}/projects/${PROJECT_ID}/releases"'
     - echo "Release created with assets"
-  # Exécuter uniquement sur les tags
   only:
     - tags
