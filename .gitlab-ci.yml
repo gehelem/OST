@@ -1,34 +1,23 @@
-# This file is a template, and might need editing before it works on your project.
-# This is a sample Gi tLab CI/CD configuration file that should run without any modifications.
-# It demonstrates a basic 3 stage CI/CD pipeline. Instead of real tests or scripts,
-# it uses echo commands to simulate the pipeline execution. 
-#
-# A pipeline is composed of independent jobs that run scripts, grouped into stages.
-# Stages run in sequential order, but jobs within stages run in parallel.
-#
-# For more information, see: https://docs.gitlab.com/ee/ci/yaml/#stages
-#
-# You can copy and paste this template into a new `.gitlab-ci.yml` file.
-# You should not add this template to an existing `.gitlab-ci.yml` file by using the `include:` keyword.
-#
-# To contribute improvements to CI/CD t emplates, please follow the Development guide at:
-# https://docs.gitlab.com/development/cicd/templates/
-# This specific template is located at:
-# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml 
+# Configuration GitLab CI/CD pour construire et livrer des paquets Debian
+# Basé sur votre configuration existante avec ajout de la création de packages .deb
+
 default:
-#  image: rabits/qt:5.14-desktop
   image: ubuntu:24.04
   before_script:
     - apt-get update 
     - apt-get clean
     - apt-get install -y software-properties-common
     - apt-add-repository ppa:mutlaqja/ppa
-    - apt-get install -y build-essential software-properties-common cmake git npm qtbase5-dev libqt5websockets5-dev libindi-dev indi-dbg libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev zlib1g-dev
-stages:          # List of stages for jobs, and their order of execution
+    # Installation des dépendances de build + outils pour créer des paquets Debian
+    - apt-get install -y build-essential software-properties-common cmake git npm qtbase5-dev libqt5websockets5-dev libindi-dev indi-dbg libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev zlib1g-dev dpkg-dev debhelper dh-make devscripts lintian curl
+
+stages:
   - build
-#  - test
-#  - deploy
-build-job:       # This job runs in the build stage, which runs first.
+  - package
+  - release
+
+# Job de build (existant, légèrement modifié)
+build-job:
   stage: build
   tags:
     - cmake
@@ -38,40 +27,164 @@ build-job:       # This job runs in the build stage, which runs first.
     - cd build
     - cmake ..
     - make -j4
-    - cmake --install .    
+    - cmake --install . --prefix=../install
     - export QT_QPA_PLATFORM=offscreen
     - mkdir media
     - pwd
     - ls -l
     - npm install -g wscat
-    - ostserver  --webroot=media &
+    - ostserver --webroot=media &
     - sleep 30
     - wscat -c ws://127.0.0.1:9624 > stdout &
     - sleep 30
     - echo "build finished"
+  artifacts:
+    paths:
+      - build/
+      - install/
+    expire_in: 1 hour
 
-#unit-test-job:   # This job runs in the test stage.
-#  stage: test    # It only starts when the job in the build stage completes successfully.
-#  tags:
-#    - cmake
-#  script:
-#    - echo "Running unit tests... "
-#    - echo "test finished"
-#
-#lint-test-job:   # This job also runs in the test stage.
-#  stage: test    # It can run at the same time as unit-test-job (in parallel).
-#  tags:
-#    - cmake
-#  script:
-#    - echo "Linting code... This will take about 10 second s."
-#    - sleep 2
-#    - echo "No lint issues found."
-#
-#deploy-job:      # This job runs in the deploy stage.
-#  stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
-#  tags:
-#    - cmake
-#  environment: production
-#  script:
-#    - echo "Deploying application..."
-#    - echo "Application successfully deployed."
+# Nouveau job : Construction du paquet Debian
+package-deb:
+  stage: package
+  tags:
+    - cmake
+  dependencies:
+    - build-job
+  script:
+    - echo "Creating Debian package..."
+    
+    # Définir les variables du paquet
+    - export PACKAGE_NAME="ostserver"
+    - export PACKAGE_VERSION="${CI_COMMIT_TAG:-1.0.0}"
+    - export PACKAGE_ARCH="amd64"
+    - export DEB_NAME="${PACKAGE_NAME}_${PACKAGE_VERSION}_${PACKAGE_ARCH}"
+    
+    # Créer la structure du paquet Debian
+    - mkdir -p ${DEB_NAME}/DEBIAN
+    - mkdir -p ${DEB_NAME}/usr/bin
+    - mkdir -p ${DEB_NAME}/usr/share/${PACKAGE_NAME}
+    - mkdir -p ${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}
+    
+    # Copier les binaires depuis le build
+    - cp -r install/* ${DEB_NAME}/usr/
+    
+    # Créer le fichier control
+    - |
+      cat > ${DEB_NAME}/DEBIAN/control << EOF
+      Package: ${PACKAGE_NAME}
+      Version: ${PACKAGE_VERSION}
+      Section: misc
+      Priority: optional
+      Architecture: ${PACKAGE_ARCH}
+      Maintainer: Gilles <gilles@ostserver.fr>
+      Depends: qtbase5-dev, libqt5websockets5, libindi1, libstellarsolver, libnova-0.16-0, libgsl27, wcslib7, libcfitsio10, libavahi-client3, libavahi-common3, zlib1g
+      Description: OST Server
+       OST Server - Astrophotography control server
+       Serveur de contrôle pour l'astrophotographie
+      EOF
+    
+    # Optionnel : Créer un fichier postinst pour les actions post-installation
+    - |
+      cat > ${DEB_NAME}/DEBIAN/postinst << EOF
+      #!/bin/bash
+      set -e
+      echo "OST Server installation completed"
+      exit 0
+      EOF
+    - chmod 755 ${DEB_NAME}/DEBIAN/postinst
+    
+    # Créer un fichier copyright
+    - |
+      cat > ${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/copyright << EOF
+      Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+      Upstream-Name: ${PACKAGE_NAME}
+      Source: https://gitlab.ostserver.fr/gilles/OST
+      
+      Files: *
+      Copyright: $(date +%Y) Gilles
+      License: MIT
+      EOF
+    
+    # Créer le changelog
+    - |
+      cat > ${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/changelog << EOF
+      ${PACKAGE_NAME} (${PACKAGE_VERSION}) unstable; urgency=medium
+      
+        * Release ${PACKAGE_VERSION}
+      
+       -- Gilles <gilles@ostserver.fr>  $(date -R)
+      EOF
+    - gzip -9 ${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/changelog
+    
+    # Fixer les permissions
+    - find ${DEB_NAME} -type d -exec chmod 755 {} \;
+    - find ${DEB_NAME}/usr/bin -type f -exec chmod 755 {} \;
+    
+    # Construire le paquet .deb
+    - dpkg-deb --build ${DEB_NAME}
+    
+    # Vérifier le paquet (optionnel, peut afficher des warnings)
+    - lintian ${DEB_NAME}.deb || true
+    
+    # Créer un répertoire pour les packages
+    - mkdir -p packages
+    - mv ${DEB_NAME}.deb packages/
+    
+    - echo "Package created: ${DEB_NAME}.deb"
+    - ls -lh packages/
+  artifacts:
+    paths:
+      - packages/*.deb
+    expire_in: 1 week
+  # Exécuter uniquement sur les tags
+  only:
+    - tags
+
+# Nouveau job : Publication en tant que release asset
+release-assets:
+  stage: release
+  image: curlimages/curl:latest
+  tags:
+    - cmake
+  dependencies:
+    - package-deb
+  script:
+    - echo "Publishing release assets..."
+    
+    # Variables
+    - export PACKAGE_VERSION="${CI_COMMIT_TAG}"
+    - export PROJECT_ID="${CI_PROJECT_ID}"
+    - export PACKAGE_NAME="ostserver_${PACKAGE_VERSION}_amd64.deb"
+    
+    # Uploader le paquet vers le Package Registry (Generic Package)
+    - |
+      curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
+           --upload-file packages/${PACKAGE_NAME} \
+           "${CI_API_V4_URL}/projects/${PROJECT_ID}/packages/generic/ostserver/${PACKAGE_VERSION}/${PACKAGE_NAME}"
+    
+    # Créer la release avec l'asset
+    - |
+      curl --request POST \
+           --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
+           --header "Content-Type: application/json" \
+           --data "{
+             \"name\": \"Release ${PACKAGE_VERSION}\",
+             \"tag_name\": \"${CI_COMMIT_TAG}\",
+             \"description\": \"## Release ${PACKAGE_VERSION}\n\nPackage Debian disponible en téléchargement.\",
+             \"assets\": {
+               \"links\": [
+                 {
+                   \"name\": \"${PACKAGE_NAME}\",
+                   \"url\": \"${CI_API_V4_URL}/projects/${PROJECT_ID}/packages/generic/ostserver/${PACKAGE_VERSION}/${PACKAGE_NAME}\",
+                   \"link_type\": \"package\"
+                 }
+               ]
+             }
+           }" \
+           "${CI_API_V4_URL}/projects/${PROJECT_ID}/releases"
+    
+    - echo "Release created with assets"
+  # Exécuter uniquement sur les tags
+  only:
+    - tags
