@@ -917,6 +917,9 @@ bool IndiModule::defineMeAsNavigator()
     b = new  OST::ElementBool("Center target", "nav00", "");
     b->setValue(false, false);
     pm->addElt("gototarget", b);
+    b = new  OST::ElementBool("Add to planner", "nav20", "");
+    b->setValue(false, false);
+    pm->addElt("addtoplanner", b);
     OST::ElementString* s = new  OST::ElementString("Target name", "nav50", "");
     s->setDirectEdit(true);
     s->setAutoUpdate(true);
@@ -929,6 +932,14 @@ bool IndiModule::defineMeAsNavigator()
     f->setDirectEdit(true);
     f->setAutoUpdate(true);
     pm->addElt("targetde", f);
+
+    pm  = getProperty("parms");
+    s = new  OST::ElementString("Planner module", "nav30", "");
+    s->setDirectEdit(true);
+    s->setAutoUpdate(true);
+    s->setGlobalLov("loadedModules");
+    pm->addElt("plannermodule", s);
+
     mIsNavigator = true;
     return true;
 
