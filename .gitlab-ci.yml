@@ -49,6 +49,7 @@ test-job:
     - sleep 30
     - wscat -c ws://127.0.0.1:9624 > stdout &
     - sleep 30
+    - test -s stdout || (echo "Error: stdout is empty - test failed" && exit 1)
   artifacts:
     paths:
       - stdout
