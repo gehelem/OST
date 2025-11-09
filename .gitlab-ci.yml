@@ -51,7 +51,7 @@ test-job:
     - ps aux | grep ostserver | grep -v grep
     - echo "Testing server with WebSocket..."
     - npm install ws 2>&1 | grep -v "^npm" || true
-    - node -e "const WebSocket = require('ws'); const ws = new WebSocket('ws://127.0.0.1:9624'); ws.on('open', () => { console.log('Connected'); ws.send(JSON.stringify({evt: 'Freadall'})); }); ws.on('message', (data) => { console.log('Received:', data); ws.close(); }); ws.on('error', (err) => { console.error('Error:', err.message); process.exit(1); }); setTimeout(() => { console.error('Timeout'); process.exit(1); }, 5000);" 2>&1 | tee ws.log
+    - node -e 'const WebSocket = require("ws"); const ws = new WebSocket("ws://127.0.0.1:9624"); ws.on("open", () => { console.log("Connected"); ws.send(JSON.stringify({evt: "Freadall"})); }); ws.on("message", (data) => { console.log("Received:", data); ws.close(); }); ws.on("error", (err) => { console.error("Error:", err.message); process.exit(1); }); setTimeout(() => { console.error("Timeout"); process.exit(1); }, 5000);' 2>&1 | tee ws.log
     - echo "Server logs:"
     - tail -50 server.log
     - kill $SERVER_PID || true
