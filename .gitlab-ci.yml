@@ -42,6 +42,8 @@ test-job:
     - mkdir media
     - npm install -g wscat
     - export QT_QPA_PLATFORM=offscreen
+    - export PATH="./install/usr/bin:$PATH"
+    - export LD_LIBRARY_PATH="./install/usr/lib:$LD_LIBRARY_PATH"
     - ostserver --webroot=media &
     - sleep 30
     - wscat -c ws://127.0.0.1:9624 > stdout &
