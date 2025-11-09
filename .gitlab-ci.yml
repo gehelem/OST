@@ -67,12 +67,7 @@ package-deb:
     - test -d install && echo "install/ EXISTS" || echo "install/ NOT FOUND"
     - test -d install && ls -la install/ || true
     - export PACKAGE_NAME="ostserver"
-    - |
-      if [ -n "$CI_COMMIT_TAG" ]; then
-        export PACKAGE_VERSION="$CI_COMMIT_TAG"
-      else
-        export PACKAGE_VERSION="1.0.0-${CI_COMMIT_SHORT_SHA}"
-      fi
+    - export PACKAGE_VERSION=$([ -n "$CI_COMMIT_TAG" ] && echo "$CI_COMMIT_TAG" || echo "1.0.0-${CI_COMMIT_SHORT_SHA}")
     - export PACKAGE_ARCH="amd64"
     - export DEB_NAME="${PACKAGE_NAME}_${PACKAGE_VERSION}_${PACKAGE_ARCH}"
     - mkdir -p ${DEB_NAME}/DEBIAN
