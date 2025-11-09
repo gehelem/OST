@@ -23,10 +23,16 @@ build-job:
     - cd build
     - cmake ..
     - make -j4
-    - cmake --install . --prefix=../install
+    - echo "DEBUG: Before cmake install"
+    - ls -la ../ | grep install
+    - cmake --install . --prefix=../install --verbose
+    - echo "DEBUG: After cmake install"
+    - ls -la ../install/ || echo "install/ is empty"
+    - find ../install -type f | head -20
     - cd ..
     - mkdir media
     - pwd
+    - echo "DEBUG: Before npm/ostserver"
     - ls -la
     - npm install -g wscat
     - export QT_QPA_PLATFORM=offscreen
