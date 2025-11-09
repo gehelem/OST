@@ -45,18 +45,23 @@ test-job:
     - export QT_QPA_PLATFORM=offscreen
     - export PATH="./install/usr/bin:$PATH"
     - export LD_LIBRARY_PATH="./install/usr/lib:$LD_LIBRARY_PATH"
-    - ostserver --webroot=media --libpath=./install/usr/lib > server.log 2>&1 &
-    - sleep 30
-    - echo "DEBUG: Checking if server is running..."
-    - "ps aux | grep ostserver || echo \"ostserver not found\""
-    - echo "DEBUG: Checking port 9624..."
-    - "netstat -tlnp 2>/dev/null | grep 9624 || echo \"Port not listening\""
-    - echo "DEBUG: Attempting wscat..."
-    - wscat -c ws://127.0.0.1:9624 -x '{"evt":"Freadall"}' -w 10 > stdout 2>&1
-    - echo "DEBUG: wscat returned, checking output..."
-    - wc -c stdout
-    - cat server.log
-    - "test -s stdout || (echo \"Error: stdout is empty - test failed\" && exit 1)"
+    - cat > test.sh << 'TESTEOF'
+#!/bin/bash
+ostserver --webroot=media --libpath=./install/usr/lib > server.log 2>&1 &
+sleep 30
+echo "DEBUG: Checking if server is running..."
+ps aux | grep ostserver || echo "ostserver not found"
+echo "DEBUG: Checking port 9624..."
+netstat -tlnp 2>/dev/null | grep 9624 || echo "Port not listening"
+echo "DEBUG: Attempting wscat..."
+wscat -c ws://127.0.0.1:9624 -x '{"evt":"Freadall"}' -w 10 > stdout 2>&1
+echo "DEBUG: wscat returned, checking output..."
+wc -c stdout
+cat server.log
+test -s stdout || (echo "Error: stdout is empty - test failed" && exit 1)
+TESTEOF
+    - chmod +x test.sh
+    - ./test.sh
   artifacts:
     paths:
       - stdout
