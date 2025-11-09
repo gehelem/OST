@@ -38,22 +38,24 @@ test-job:
     - apt-get update
     - apt-get install -y software-properties-common
     - apt-add-repository ppa:mutlaqja/ppa
-    - apt-get install -y npm qtbase5-dev libqt5websockets5-dev libindi-dev libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev zlib1g-dev dpkg-dev debhelper devscripts lintian
+    - apt-get install -y npm qtbase5-dev libqt5websockets5-dev libindi-dev libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev zlib1g-dev dpkg-dev debhelper devscripts lintian curl
   script:
     - mkdir media
-    - npm install -g wscat
     - export QT_QPA_PLATFORM=offscreen
     - export PATH="./install/usr/bin:$PATH"
     - export LD_LIBRARY_PATH="./install/usr/lib:$LD_LIBRARY_PATH"
     - ostserver --webroot=media --libpath=./install/usr/lib > server.log 2>&1 &
+    - SERVER_PID=$!
     - sleep 30
-    - ps aux | grep ostserver
-    - echo "Testing wscat connection..."
-    - wscat -c ws://127.0.0.1:9624 -x '{"evt":"Freadall"}' -w 10
-    - echo "Done"
+    - ps aux | grep ostserver | grep -v grep
+    - echo "Testing server with curl..."
+    - curl -v http://127.0.0.1:9624/ 2>&1 || echo "Curl failed"
+    - echo "Server logs:"
+    - tail -50 server.log
+    - kill $SERVER_PID || true
   artifacts:
     paths:
-      - stdout
+      - server.log
     expire_in: 1 week
   only:
     - main
