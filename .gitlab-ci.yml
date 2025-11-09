@@ -28,11 +28,16 @@ build-job:
     - cd build
     - cmake ..
     - make -j4
+    - echo "DEBUG: Installing to ../install"
     - cmake --install . --prefix=../install
+    - echo "DEBUG: Install directory contents after cmake install:"
+    - ls -la ../install/ || echo "install/ not found or empty"
+    - cd ..
     - export QT_QPA_PLATFORM=offscreen
     - mkdir media
     - pwd
-    - ls -l
+    - echo "DEBUG: Root directory structure before artifacts:"
+    - ls -la
     - npm install -g wscat
     - ostserver --webroot=media &
     - sleep 30
@@ -45,7 +50,7 @@ build-job:
       - install/
     expire_in: 1 hour
 
-# Nouveau job : Construction du paquet Debian
+# Nouveau job : Construction du paquet Debian (sur main uniquement)
 package-deb:
   stage: package
   tags:
@@ -54,15 +59,28 @@ package-deb:
     - build-job
   script:
     - echo "Creating Debian package..."
+    - echo "DEBUG: Current directory:"
+    - pwd
+    - echo "DEBUG: Directory contents:"
+    - ls -la
+    - echo "DEBUG: Checking if install/ exists:"
+    - test -d install && echo "install/ EXISTS" || echo "install/ NOT FOUND"
+    - test -d install && ls -la install/ || true
     - export PACKAGE_NAME="ostserver"
-    - export PACKAGE_VERSION="1.0.0"
+    - |
+      if [ -n "$CI_COMMIT_TAG" ]; then
+        export PACKAGE_VERSION="$CI_COMMIT_TAG"
+      else
+        export PACKAGE_VERSION="1.0.0-${CI_COMMIT_SHORT_SHA}"
+      fi
     - export PACKAGE_ARCH="amd64"
     - export DEB_NAME="${PACKAGE_NAME}_${PACKAGE_VERSION}_${PACKAGE_ARCH}"
     - mkdir -p ${DEB_NAME}/DEBIAN
     - mkdir -p ${DEB_NAME}/usr/bin
     - mkdir -p ${DEB_NAME}/usr/share/${PACKAGE_NAME}
     - mkdir -p ${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}
-    - cp -r install/* ${DEB_NAME}/usr/
+    - echo "DEBUG: About to copy from install/ to ${DEB_NAME}/usr/"
+    - if [ -d install ]; then cp -r install/* ${DEB_NAME}/usr/ || { echo "Copy failed"; exit 1; }; else echo "install/ directory not found"; exit 1; fi
     - echo "Package:${PACKAGE_NAME}" > ${DEB_NAME}/DEBIAN/control
     - echo "Version:${PACKAGE_VERSION}" >> ${DEB_NAME}/DEBIAN/control
     - echo "Section:misc" >> ${DEB_NAME}/DEBIAN/control
@@ -104,6 +122,7 @@ package-deb:
       - packages/*.deb
     expire_in: 1 week
   only:
+    - main
     - tags
 
 # Nouveau job : Publication en tant que release asset
