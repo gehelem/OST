@@ -1,5 +1,6 @@
 stages:
   - build
+  - test
   - package
   - release
 
@@ -21,6 +22,23 @@ build-job:
     - make -j4
     - cmake --install . --prefix=../install
     - cd ..
+  artifacts:
+    paths:
+      - build/
+      - install/
+    expire_in: 1 hour
+
+test-job:
+  stage: test
+  image: ubuntu:24.04
+  tags:
+    - cmake
+  dependencies:
+    - build-job
+  before_script:
+    - apt-get update
+    - apt-get install -y npm
+  script:
     - mkdir media
     - npm install -g wscat
     - export QT_QPA_PLATFORM=offscreen
@@ -30,9 +48,11 @@ build-job:
     - sleep 30
   artifacts:
     paths:
-      - build/
-      - install/
-    expire_in: 1 hour
+      - stdout
+    expire_in: 1 week
+  only:
+    - main
+    - tags
 
 package-deb:
   stage: package
