@@ -1,30 +1,21 @@
 # Configuration GitLab CI/CD pour construire et livrer des paquets Debian
 
-default:
-  image: ubuntu:24.04
-  before_script:
-    - apt-get update
-    - apt-get clean
-    - apt-get install -y software-properties-common
-    - apt-add-repository ppa:mutlaqja/ppa
-    - >
-      apt-get install -y
-      build-essential cmake git npm
-      qtbase5-dev libqt5websockets5-dev libindi-dev indi-dbg
-      libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev
-      libcfitsio-dev libavahi-client-dev libavahi-common-dev
-      zlib1g-dev dpkg-dev debhelper dh-make devscripts lintian curl
-
 stages:
   - build
   - package
   - release
 
-# Job de build
 build-job:
   stage: build
+  image: ubuntu:24.04
   tags:
     - cmake
+  before_script:
+    - apt-get update
+    - apt-get clean
+    - apt-get install -y software-properties-common
+    - apt-add-repository ppa:mutlaqja/ppa
+    - apt-get install -y build-essential cmake git npm qtbase5-dev libqt5websockets5-dev libindi-dev libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev zlib1g-dev dpkg-dev debhelper devscripts lintian curl
   script:
     - echo "Running build..."
     - mkdir build
@@ -32,17 +23,13 @@ build-job:
     - cd build
     - cmake ..
     - make -j4
-    - echo "DEBUG: Installing to ../install"
     - cmake --install . --prefix=../install
-    - echo "DEBUG: Install directory contents after cmake install:"
-    - ls -la ../install/ || echo "install/ not found or empty"
     - cd ..
-    - export QT_QPA_PLATFORM=offscreen
     - mkdir media
     - pwd
-    - echo "DEBUG: Root directory structure before artifacts:"
     - ls -la
     - npm install -g wscat
+    - export QT_QPA_PLATFORM=offscreen
     - ostserver --webroot=media &
     - sleep 30
     - wscat -c ws://127.0.0.1:9624 > stdout &
@@ -54,22 +41,21 @@ build-job:
       - install/
     expire_in: 1 hour
 
-# Construction du paquet Debian (sur main et tags)
 package-deb:
   stage: package
+  image: ubuntu:24.04
   tags:
     - cmake
   dependencies:
     - build-job
+  before_script:
+    - apt-get update
+    - apt-get install -y dpkg-dev debhelper devscripts lintian
   script:
     - echo "Creating Debian package..."
-    - echo "DEBUG: Current directory:"
     - pwd
-    - echo "DEBUG: Directory contents:"
     - ls -la
-    - echo "DEBUG: Checking if install/ exists:"
     - test -d install && echo "install/ EXISTS" || echo "install/ NOT FOUND"
-    - test -d install && ls -la install/ || true
     - export PACKAGE_NAME="ostserver"
     - export PACKAGE_VERSION=$([ -n "$CI_COMMIT_TAG" ] && echo "$CI_COMMIT_TAG" || echo "1.0.0-${CI_COMMIT_SHORT_SHA}")
     - export PACKAGE_ARCH="amd64"
@@ -78,8 +64,7 @@ package-deb:
     - mkdir -p "${DEB_NAME}/usr/bin"
     - mkdir -p "${DEB_NAME}/usr/share/${PACKAGE_NAME}"
     - mkdir -p "${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}"
-    - echo "DEBUG: About to copy from install/ to ${DEB_NAME}/usr/"
-    - test -d install && cp -r install/* "${DEB_NAME}/usr/" || (echo "install/ directory not found" && exit 1)
+    - cp -r install/* "${DEB_NAME}/usr/"
     - echo "Package:${PACKAGE_NAME}" > "${DEB_NAME}/DEBIAN/control"
     - echo "Version:${PACKAGE_VERSION}" >> "${DEB_NAME}/DEBIAN/control"
     - echo "Section:misc" >> "${DEB_NAME}/DEBIAN/control"
@@ -89,32 +74,25 @@ package-deb:
     - echo "Depends:qtbase5-dev, libqt5websockets5, libindi1, libstellarsolver, libnova-0.16-0, libgsl27, wcslib7, libcfitsio10, libavahi-client3, libavahi-common3, zlib1g" >> "${DEB_NAME}/DEBIAN/control"
     - echo "Description:OST Server" >> "${DEB_NAME}/DEBIAN/control"
     - echo " OST Server - Astrophotography control server" >> "${DEB_NAME}/DEBIAN/control"
-    - echo " Serveur de contrôle pour l'astrophotographie" >> "${DEB_NAME}/DEBIAN/control"
     - echo "#!/bin/bash" > "${DEB_NAME}/DEBIAN/postinst"
     - echo "set -e" >> "${DEB_NAME}/DEBIAN/postinst"
-    - echo "echo \"OST Server installation completed\"" >> "${DEB_NAME}/DEBIAN/postinst"
     - echo "exit 0" >> "${DEB_NAME}/DEBIAN/postinst"
     - chmod 755 "${DEB_NAME}/DEBIAN/postinst"
     - echo "Format:https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/" > "${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/copyright"
     - echo "Upstream-Name:${PACKAGE_NAME}" >> "${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/copyright"
     - echo "Source:https://gitlab.ostserver.fr/gilles/OST" >> "${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/copyright"
-    - echo "" >> "${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/copyright"
     - echo "Files:*" >> "${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/copyright"
-    - echo "Copyright:$(date +%Y) Gilles" >> "${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/copyright"
+    - echo "Copyright:2025 Gilles" >> "${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/copyright"
     - echo "License:MIT" >> "${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/copyright"
     - echo "${PACKAGE_NAME} (${PACKAGE_VERSION}) unstable; urgency=medium" > "${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/changelog"
-    - echo "" >> "${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/changelog"
     - echo "  * Release ${PACKAGE_VERSION}" >> "${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/changelog"
-    - echo "" >> "${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/changelog"
     - echo " -- Gilles <gilles@ostserver.fr>  $(date -R)" >> "${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/changelog"
     - gzip -9 "${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}/changelog"
     - find "${DEB_NAME}" -type d -exec chmod 755 {} \;
-    - find "${DEB_NAME}/usr/bin" -type f -exec chmod 755 {} \; || true
     - dpkg-deb --build "${DEB_NAME}"
     - lintian "${DEB_NAME}.deb" || true
     - mkdir -p packages
     - mv "${DEB_NAME}.deb" packages/
-    - echo "Package created: ${DEB_NAME}.deb"
     - ls -lh packages/
   artifacts:
     paths:
@@ -124,7 +102,6 @@ package-deb:
     - main
     - tags
 
-# Publication en tant que release asset (seulement sur tags)
 release-assets:
   stage: release
   image: curlimages/curl:latest
@@ -137,7 +114,6 @@ release-assets:
     - export PACKAGE_VERSION="${CI_COMMIT_TAG}"
     - export PROJECT_ID="${CI_PROJECT_ID}"
     - export PACKAGE_NAME="ostserver_${PACKAGE_VERSION}_amd64.deb"
-    - echo "Uploading ${PACKAGE_NAME}..."
     - curl --header "JOB-TOKEN:${CI_JOB_TOKEN}" --upload-file "packages/${PACKAGE_NAME}" "${CI_API_V4_URL}/projects/${PROJECT_ID}/packages/generic/ostserver/${PACKAGE_VERSION}/${PACKAGE_NAME}"
     - echo "Release created with assets"
   only:
