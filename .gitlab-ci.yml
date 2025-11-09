@@ -24,7 +24,6 @@ build-job:
     - cd ..
   artifacts:
     paths:
-      - build/
       - install/
     expire_in: 1 hour
 
