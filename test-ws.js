@@ -26,5 +26,9 @@ ws.on("error", (err) => {
 });
 
 ws.on("close", () => {
+  if (messageCount === 0) {
+    console.error("FAILED: No messages received from server");
+    process.exit(1);
+  }
   process.exit(0);
 });
