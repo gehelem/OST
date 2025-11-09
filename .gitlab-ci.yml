@@ -51,7 +51,7 @@ test-job:
     - ps aux | grep ostserver | grep -v grep
     - echo "Testing server with WebSocket..."
     - wscat --version
-    - wscat -c ws://127.0.0.1:9624 -x '{"evt":"Freadall"}' -w 10 2>&1 | tee ws.log || true
+    - wscat -c ws://localhost:9624 -x '{"evt":"Freadall"}' -w 10 2>&1 | tee ws.log || true
     - sleep 30
     - echo "WebSocket log file:"
     - cat ws.log
