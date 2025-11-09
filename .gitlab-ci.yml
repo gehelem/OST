@@ -45,7 +45,7 @@ test-job:
     - export QT_QPA_PLATFORM=offscreen
     - export PATH="./install/usr/bin:$PATH"
     - export LD_LIBRARY_PATH="./install/usr/lib:$LD_LIBRARY_PATH"
-    - ostserver --webroot=media &
+    - ostserver --webroot=media --libpath=./install/usr/lib &
     - sleep 30
     - wscat -c ws://127.0.0.1:9624 > stdout &
     - sleep 30
