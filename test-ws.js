@@ -8,7 +8,7 @@ ws.on("open", () => {
 });
 
 ws.on("message", (data) => {
-  console.log("Received:", data);
+  console.log("Received:", data.toString());
   ws.close();
   process.exit(0);
 });
