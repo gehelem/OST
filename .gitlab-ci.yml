@@ -38,7 +38,8 @@ test-job:
     - apt-get update
     - apt-get install -y software-properties-common
     - apt-add-repository ppa:mutlaqja/ppa
-    - apt-get install -y npm qtbase5-dev libqt5websockets5-dev libindi-dev libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev zlib1g-dev dpkg-dev debhelper devscripts lintian curl
+    - apt-get install -y npm qtbase5-dev libqt5websockets5-dev libindi-dev libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev zlib1g-dev dpkg-dev debhelper devscripts lintian
+    - npm install -g wscat
   script:
     - mkdir media
     - export QT_QPA_PLATFORM=offscreen
@@ -48,14 +49,17 @@ test-job:
     - SERVER_PID=$!
     - sleep 30
     - ps aux | grep ostserver | grep -v grep
-    - echo "Testing server with curl..."
-    - curl -v http://127.0.0.1:9624/ 2>&1 || echo "Curl failed"
+    - echo "Testing server with WebSocket..."
+    - wscat -c ws://127.0.0.1:9624 -x '{"evt":"Freadall"}' -w 5 > ws.log 2>&1
+    - echo "WebSocket response:"
+    - cat ws.log
     - echo "Server logs:"
     - tail -50 server.log
     - kill $SERVER_PID || true
   artifacts:
     paths:
       - server.log
+      - ws.log
     expire_in: 1 week
   only:
     - main
