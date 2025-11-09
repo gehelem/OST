@@ -7,7 +7,13 @@ default:
     - apt-get clean
     - apt-get install -y software-properties-common
     - apt-add-repository ppa:mutlaqja/ppa
-    - apt-get install -y build-essential cmake git npm qtbase5-dev libqt5websockets5-dev libindi-dev indi-dbg libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev zlib1g-dev dpkg-dev debhelper dh-make devscripts lintian curl
+    - >
+      apt-get install -y
+      build-essential cmake git npm
+      qtbase5-dev libqt5websockets5-dev libindi-dev indi-dbg
+      libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev
+      libcfitsio-dev libavahi-client-dev libavahi-common-dev
+      zlib1g-dev dpkg-dev debhelper dh-make devscripts lintian curl
 
 stages:
   - build
