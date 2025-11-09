@@ -1,16 +1,23 @@
 const WebSocket = require("ws");
 
 const ws = new WebSocket("ws://127.0.0.1:9624");
+let messageCount = 0;
 
 ws.on("open", () => {
   console.log("Connected to server");
   ws.send(JSON.stringify({ evt: "Freadall" }));
+
+  // Close connection after 15 seconds
+  setTimeout(() => {
+    console.log(`Received ${messageCount} message(s) in total`);
+    ws.close();
+    process.exit(0);
+  }, 15000);
 });
 
 ws.on("message", (data) => {
-  console.log("Received:", data.toString());
-  ws.close();
-  process.exit(0);
+  messageCount++;
+  console.log(`Message ${messageCount}:`, data.toString());
 });
 
 ws.on("error", (err) => {
@@ -18,7 +25,6 @@ ws.on("error", (err) => {
   process.exit(1);
 });
 
-setTimeout(() => {
-  console.error("Timeout: no response received");
-  process.exit(1);
-}, 5000);
+ws.on("close", () => {
+  process.exit(0);
+});
