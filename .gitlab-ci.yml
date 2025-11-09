@@ -48,9 +48,9 @@ test-job:
     - ostserver --webroot=media --libpath=./install/usr/lib > server.log 2>&1 &
     - sleep 30
     - echo "DEBUG: Checking if server is running..."
-    - ps aux | grep ostserver || echo "ostserver not found"
+    - "ps aux | grep ostserver || echo \"ostserver not found\""
     - echo "DEBUG: Checking port 9624..."
-    - netstat -tlnp 2>/dev/null | grep 9624 || echo "Port not listening"
+    - "netstat -tlnp 2>/dev/null | grep 9624 || echo \"Port not listening\""
     - echo "DEBUG: Attempting wscat..."
     - wscat -c ws://127.0.0.1:9624 -x '{"evt":"Freadall"}' -w 10 > stdout 2>&1
     - echo "DEBUG: wscat returned, checking output..."
