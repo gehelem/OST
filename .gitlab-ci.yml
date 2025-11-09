@@ -36,9 +36,9 @@ test-job:
     - build-job
   before_script:
     - apt-get update
-    - apt-get install -y npm
+    - apt-get install -y software-properties-common
     - apt-add-repository ppa:mutlaqja/ppa
-    - apt-get install -y qtbase5-dev libqt5websockets5-dev libindi-dev libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev zlib1g-dev dpkg-dev debhelper devscripts lintian
+    - apt-get install -y npm qtbase5-dev libqt5websockets5-dev libindi-dev libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev zlib1g-dev dpkg-dev debhelper devscripts lintian
   script:
     - mkdir media
     - npm install -g wscat
