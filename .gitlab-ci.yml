@@ -24,11 +24,11 @@ build-job:
     - cmake ..
     - make -j4
     - echo "DEBUG: Before cmake install"
-    - ls -la ../ | grep install
+    - ls -la ../
     - cmake --install . --prefix=../install --verbose
     - echo "DEBUG: After cmake install"
-    - ls -la ../install/ || echo "install/ is empty"
-    - find ../install -type f | head -20
+    - ls -la ../install/
+    - find ../install -type f
     - cd ..
     - mkdir media
     - pwd
