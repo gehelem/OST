@@ -50,8 +50,10 @@ test-job:
     - sleep 30
     - ps aux | grep ostserver | grep -v grep
     - echo "Testing server with WebSocket..."
-    - wscat -c ws://127.0.0.1:9624 -x '{"evt":"Freadall"}' -w 5 > ws.log 2>&1
-    - echo "WebSocket response:"
+    - echo "wscat version:" && wscat --version
+    - wscat -c ws://127.0.0.1:9624 -x '{"evt":"Freadall"}' -w 10 2>&1 | tee ws.log
+    - echo "Exit code of wscat: $?"
+    - echo "WebSocket log file:"
     - cat ws.log
     - echo "Server logs:"
     - tail -50 server.log
