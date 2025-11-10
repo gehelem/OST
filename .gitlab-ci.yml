@@ -78,8 +78,8 @@ package-deb:
     - export PACKAGE_VERSION=$([ -n "$CI_COMMIT_TAG" ] && echo "$CI_COMMIT_TAG" || echo "1.0.0-${CI_COMMIT_SHORT_SHA}")
     - export PACKAGE_ARCH="amd64"
     - export DEB_NAME="${PACKAGE_NAME}_${PACKAGE_VERSION}_${PACKAGE_ARCH}"
-    - mkdir -p "${DEB_NAME}/DEBIAN" "${DEB_NAME}/usr" "${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}"
-    - cp -r install/* "${DEB_NAME}/usr/"
+    - mkdir -p "${DEB_NAME}/DEBIAN" "${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}"
+    - cp -r install/. "${DEB_NAME}/"
     - echo "Package:${PACKAGE_NAME}" > "${DEB_NAME}/DEBIAN/control"
     - echo "Version:${PACKAGE_VERSION}" >> "${DEB_NAME}/DEBIAN/control"
     - echo "Section:misc" >> "${DEB_NAME}/DEBIAN/control"
