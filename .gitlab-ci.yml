@@ -86,7 +86,7 @@ package-deb:
     - echo "Priority:optional" >> "${DEB_NAME}/DEBIAN/control"
     - echo "Architecture:${PACKAGE_ARCH}" >> "${DEB_NAME}/DEBIAN/control"
     - echo "Maintainer:Gilles <gilles@ostserver.fr>" >> "${DEB_NAME}/DEBIAN/control"
-    - echo "Depends:libqt5websockets5, libindi1, libstellarsolver, libnova-0.16-0, libgsl27, wcslib7, libcfitsio10, libavahi-client3, zlib1g" >> "${DEB_NAME}/DEBIAN/control"
+    - echo "Depends:libqt5websockets5, libindi1, libstellarsolver, libnova-0.16-0, libgsl27, libcfitsio10, libavahi-client3, zlib1g" >> "${DEB_NAME}/DEBIAN/control"
     - echo "Description:OST Server - Astrophotography control server" >> "${DEB_NAME}/DEBIAN/control"
     - echo "#!/bin/bash" > "${DEB_NAME}/DEBIAN/postinst"
     - echo "set -e" >> "${DEB_NAME}/DEBIAN/postinst"
