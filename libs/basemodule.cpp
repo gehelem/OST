@@ -266,7 +266,7 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
             if (getStore()[keyprop]->autoUpDown() && getStore()[keyprop]->isEnabled() )
             {
                 int l1 = pEventData[keyprop].toMap()["line"].toInt();
-                int l2 = l1 + 1;
+                int l2 = l1 - 1;
                 getStore()[keyprop]->swapLines(l1, l2);
             }
         }
@@ -278,7 +278,7 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
             if (getStore()[keyprop]->autoUpDown() && getStore()[keyprop]->isEnabled())
             {
                 int l1 = pEventData[keyprop].toMap()["line"].toInt();
-                int l2 = l1 - 1;
+                int l2 = l1 + 1;
                 getStore()[keyprop]->swapLines(l1, l2);
             }
         }
