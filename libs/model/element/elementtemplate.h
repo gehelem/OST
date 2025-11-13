@@ -252,6 +252,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
          */
         void setMin(const T &min)
         {
+            mUseMinMax = true;
             mMin = min;
             emit ElementBase::eltChanged(this);
         }
@@ -275,6 +276,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
          */
         void setMax(const T &max)
         {
+            mUseMinMax = true;
             mMax = max;
             emit ElementBase::eltChanged(this);
         }
