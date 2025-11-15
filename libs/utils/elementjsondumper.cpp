@@ -28,6 +28,8 @@ void ElementJsonDumper::visit(ElementBool *pElement)
 {
     QJsonObject json = dumpElementCommons(pElement);
     json["type"] = "bool";
+    if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
+    if (pElement->getPostIcon() != "") json["posticon"] = pElement->getPostIcon();
     json["value"] = pElement->value();
     mResult = json;
 }
