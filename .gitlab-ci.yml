@@ -16,15 +16,18 @@ build-job:
     - apt-add-repository ppa:mutlaqja/ppa
     - apt-get install -y build-essential cmake git npm qtbase5-dev libqt5websockets5-dev libindi-dev libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev zlib1g-dev dpkg-dev debhelper devscripts lintian
   script:
-    - mkdir build install
+    - mkdir build install packages
     - cd build
     - cmake ..
     - make -j4
-    - cmake --install . --prefix=../install
+    - cmake --install .
     - cd ..
+    - dpkg-buildpackage -us -uc
+    - mv ../*.deb  packages/
   artifacts:
     paths:
       - install/
+      - packages/
     expire_in: 1 hour
 
 test-job:
@@ -43,9 +46,10 @@ test-job:
   script:
     - mkdir media
     - export QT_QPA_PLATFORM=offscreen
-    - export PATH="./install/usr/bin:$PATH"
-    - export LD_LIBRARY_PATH="./install/usr/lib:$LD_LIBRARY_PATH"
-    - ostserver --webroot=media --libpath=./install/usr/lib > server.log 2>&1 &
+#    - export PATH="./install/usr/bin:$PATH"
+#    - export LD_LIBRARY_PATH="./install/usr/lib:$LD_LIBRARY_PATH"
+#    - ostserver --webroot=media --libpath=./install/usr/lib > server.log 2>&1 &
+    - ostserver --webroot=media > server.log 2>&1 &
     - SERVER_PID=$!
     - sleep 30
     - ps aux | grep ostserver | grep -v grep
@@ -60,8 +64,9 @@ test-job:
       - ws.log
     expire_in: 1 week
   only:
-    - main
-    - tags
+    - xxmain
+    - xxgitlab-ci
+    - xxtags
 
 package-deb:
   stage: package
@@ -100,8 +105,9 @@ package-deb:
       - packages/*.deb
     expire_in: 1 week
   only:
-    - main
-    - tags
+    - xxmain
+    - xxgitlab-ci
+    - xxtags
 
 release-assets:
   stage: release
@@ -116,4 +122,4 @@ release-assets:
     - export PACKAGE_NAME="ostserver_${PACKAGE_VERSION}_amd64.deb"
     - curl --header "JOB-TOKEN:${CI_JOB_TOKEN}" --upload-file "packages/${PACKAGE_NAME}" "${CI_API_V4_URL}/projects/${PROJECT_ID}/packages/generic/ostserver/${PACKAGE_VERSION}/${PACKAGE_NAME}"
   only:
-    - tags
+    - xxtags
