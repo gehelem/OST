@@ -40,7 +40,6 @@ build-job:
     - mv ../*.deb  packages/
   artifacts:
     paths:
-      - install/
       - packages/
       - server.log
     expire_in: 1 week
