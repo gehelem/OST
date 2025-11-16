@@ -61,6 +61,7 @@ test-job:
   script:
     - mkdir media
     - export QT_QPA_PLATFORM=offscreen
+    - dpkg -i packages/ostserver_1.0.2_amd64.deb
 #    - export PATH="./install/usr/bin:$PATH"
 #    - export LD_LIBRARY_PATH="./install/usr/lib:$LD_LIBRARY_PATH"
 #    - ostserver --webroot=media --libpath=./install/usr/lib > server.log 2>&1 &
