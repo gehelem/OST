@@ -42,7 +42,8 @@ build-job:
     paths:
       - packages/
       - server.log
-    expire_in: 1 week
+      - ws.log
+    expire_in: 2 week
 
 test-job:
   stage: test
