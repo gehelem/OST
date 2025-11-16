@@ -366,9 +366,9 @@ target_compile_definitions(ostindipanel PRIVATE INDIPANEL_MODULE)
 install(TARGETS
     ostserver
     ostbasemodule ostindimodule ostmaincontrol ostindipanel
-    RUNTIME DESTINATION "usr/bin"
-    LIBRARY DESTINATION "usr/lib"
-    PUBLIC_HEADER DESTINATION "usr/include/ost"
+    RUNTIME DESTINATION "/usr/bin"
+    LIBRARY DESTINATION "/usr/lib"
+    PUBLIC_HEADER DESTINATION "/usr/include/ost"
 )
 
 # Generate version.cc at build time (not configure time)
