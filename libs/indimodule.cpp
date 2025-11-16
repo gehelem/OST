@@ -792,12 +792,15 @@ bool IndiModule::defineMeAsFocuser()
     pm->setRule(OST::SwitchsRule::AtMostOne);
     OST::ElementBool* b = new  OST::ElementBool("Abort focus", "foc99", "");
     b->setValue(false, false);
+    b->setPreIcon("stop");
     pm->addElt("abortfocus", b);
     b = new  OST::ElementBool("Autofocus", "foc50", "");
     b->setValue(false, false);
+    b->setPreIcon("play_arrow");
     pm->addElt("autofocus", b);
     b = new  OST::ElementBool("Loop", "foc70", "");
     b->setValue(false, false);
+    b->setPreIcon("forward_media");
     pm->addElt("loop", b);
     mIsFocuser = true;
     return true;
@@ -812,11 +815,14 @@ bool IndiModule::defineMeAsGuider()
     OST::ElementBool* b = new  OST::ElementBool("Abort guider", "guid99", "");
     b->setValue(false, false);
     pm->addElt("abortguider", b);
+    b->setPreIcon("stop");
     b = new  OST::ElementBool("Guide", "guid50", "");
     b->setValue(false, false);
+    b->setPreIcon("play_arrow");
     pm->addElt("guide", b);
     b = new  OST::ElementBool("Calibrate", "guid00", "");
     b->setValue(false, false);
+    b->setPreIcon("arrows_output");
     pm->addElt("calibrate", b);
     mIsGuider = true;
     return true;
@@ -830,10 +836,12 @@ bool IndiModule::defineMeAsSequencer()
     pm->setRule(OST::SwitchsRule::AtMostOne);
     OST::ElementBool* b = new  OST::ElementBool("Abort sequence", "seq99", "");
     b->setValue(false, false);
+    b->setPreIcon("stop");
     pm->addElt("abortsequence", b);
     b = new  OST::ElementBool("Start sequence", "seq00", "");
     b->setValue(false, false);
     pm->addElt("startsequence", b);
+    b->setPreIcon("play_arrow");
     mIsSequencer = true;
     return true;
 
@@ -913,11 +921,14 @@ bool IndiModule::defineMeAsNavigator()
     pm->setRule(OST::SwitchsRule::AtMostOne);
     OST::ElementBool* b = new  OST::ElementBool("Abort navigator", "nav99", "");
     b->setValue(false, false);
+    b->setPreIcon("stop");
     pm->addElt("abortnavigator", b);
     b = new  OST::ElementBool("Center target", "nav00", "");
+    b->setPreIcon("arrows_input");
     b->setValue(false, false);
     pm->addElt("gototarget", b);
     b = new  OST::ElementBool("Add to planner", "nav20", "");
+    b->setPreIcon("event_upcoming");
     b->setValue(false, false);
     pm->addElt("addtoplanner", b);
     OST::ElementString* s = new  OST::ElementString("Target name", "nav50", "");
