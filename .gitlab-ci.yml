@@ -14,7 +14,7 @@ build-job:
     - apt-get clean
     - apt-get install -y software-properties-common
     - apt-add-repository ppa:mutlaqja/ppa
-    - apt-get install -y build-essential cmake git npm qtbase5-dev libqt5websockets5-dev libindi-dev libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev zlib1g-dev dpkg-dev debhelper devscripts lintian
+    - apt-get install -y build-essential cmake git npm qtbase5-dev libqt5websockets5-dev libindi-dev libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev zlib1g-dev dpkg-dev qtdeclarative5-dev libqt5svg5-dev kdoctools-dev libkf5doctools-dev libkf5config-dev libkf5guiaddons-dev libkf5i18n-dev libkf5newstuff-dev libkf5notifications-dev libkf5xmlgui-dev libkf5plotting-dev libkf5crash-dev libkf5notifyconfig-dev libeigen3-dev libraw-dev libsecret-1-dev debhelper devscripts lintian
   script:
     - mkdir build install packages
     - cd build
@@ -22,6 +22,20 @@ build-job:
     - make -j4
     - cmake --install .
     - cd ..
+    - echo "Quick test..."
+    - mkdir media
+    - export QT_QPA_PLATFORM=offscreen
+#    - export PATH="./install/usr/bin:$PATH"
+#    - export LD_LIBRARY_PATH="./install/usr/lib:$LD_LIBRARY_PATH"
+#    - ostserver --webroot=media --libpath=./install/usr/lib > server.log 2>&1 &
+    - ostserver --webroot=media > server.log 2>&1 &
+    - SERVER_PID=$!
+    - sleep 30
+    - ps aux | grep ostserver | grep -v grep
+    - node test-ws.js 2>&1 | tee ws.log
+    - echo "Server logs:"
+    - tail -50 server.log
+    - kill $SERVER_PID || true
     - dpkg-buildpackage -us -uc
     - mv ../*.deb  packages/
   artifacts:
