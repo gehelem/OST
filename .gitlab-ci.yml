@@ -43,7 +43,7 @@ build-job:
       - packages/
       - server.log
       - ws.log
-    expire_in: 2 week
+    expire_in: 3 week
 
 test-job:
   stage: test
