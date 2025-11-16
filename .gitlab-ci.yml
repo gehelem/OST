@@ -30,7 +30,7 @@ build-job:
 #    - ostserver --webroot=media --libpath=./install/usr/lib > server.log 2>&1 &
     - ostserver --webroot=media > server.log 2>&1 &
     - SERVER_PID=$!
-    - sleep 5
+    - sleep 7
     - ps aux | grep ostserver | grep -v grep
     - node test-ws.js 2>&1 | tee ws.log
     - echo "Server logs:"
