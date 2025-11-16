@@ -52,7 +52,7 @@ test-job:
     - cmake
   dependencies:
     - build-job
-#  before_script:
+  before_script:
     - apt-get update
     - apt-get install -y software-properties-common
     - apt-add-repository ppa:mutlaqja/ppa
