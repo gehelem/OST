@@ -42,7 +42,8 @@ build-job:
     paths:
       - install/
       - packages/
-    expire_in: 1 hour
+      - server.log
+    expire_in: 1 week
 
 test-job:
   stage: test
@@ -51,12 +52,12 @@ test-job:
     - cmake
   dependencies:
     - build-job
-  before_script:
-    - apt-get update
-    - apt-get install -y software-properties-common
-    - apt-add-repository ppa:mutlaqja/ppa
-    - apt-get install -y npm qtbase5-dev libqt5websockets5-dev libindi-dev libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev zlib1g-dev dpkg-dev debhelper devscripts lintian
-    - npm install ws
+#  before_script:
+#    - apt-get update
+#    - apt-get install -y software-properties-common
+#    - apt-add-repository ppa:mutlaqja/ppa
+#    - apt-get install -y npm qtbase5-dev libqt5websockets5-dev libindi-dev libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev zlib1g-dev dpkg-dev debhelper devscripts lintian
+#    - npm install ws
   script:
     - mkdir media
     - export QT_QPA_PLATFORM=offscreen
@@ -79,7 +80,7 @@ test-job:
     expire_in: 1 week
   only:
     - xxmain
-    - xxgitlab-ci
+    - gitlab-ci
     - xxtags
 
 package-deb:
