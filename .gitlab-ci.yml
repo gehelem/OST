@@ -14,18 +14,36 @@ build-job:
     - apt-get clean
     - apt-get install -y software-properties-common
     - apt-add-repository ppa:mutlaqja/ppa
-    - apt-get install -y build-essential cmake git npm qtbase5-dev libqt5websockets5-dev libindi-dev libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev zlib1g-dev dpkg-dev debhelper devscripts lintian
+    - apt-get install -y build-essential cmake git npm qtbase5-dev libqt5websockets5-dev libindi-dev libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev zlib1g-dev dpkg-dev qtdeclarative5-dev libqt5svg5-dev libkf5doctools-dev libkf5config-dev libkf5guiaddons-dev libkf5i18n-dev libkf5newstuff-dev libkf5notifications-dev libkf5xmlgui-dev libkf5plotting-dev libkf5crash-dev libkf5notifyconfig-dev libeigen3-dev libraw-dev libsecret-1-dev debhelper devscripts lintian autotools-dev intltool-debian extra-cmake-modules
   script:
-    - mkdir build install
+    - mkdir build install packages
     - cd build
     - cmake ..
     - make -j4
-    - cmake --install . --prefix=../install
+    - cmake --install .
     - cd ..
+    - echo "Quick test..."
+    - mkdir media
+    - export QT_QPA_PLATFORM=offscreen
+#    - export PATH="./install/usr/bin:$PATH"
+#    - export LD_LIBRARY_PATH="./install/usr/lib:$LD_LIBRARY_PATH"
+#    - ostserver --webroot=media --libpath=./install/usr/lib > server.log 2>&1 &
+    - ostserver --webroot=media > server.log 2>&1 &
+    - SERVER_PID=$!
+    - sleep 7
+    - ps aux | grep ostserver | grep -v grep
+    - node test-ws.js 2>&1 | tee ws.log
+    - echo "Server logs:"
+    - tail -50 server.log
+    - kill $SERVER_PID || true
+    - dpkg-buildpackage -us -uc
+    - mv ../*.deb  packages/
   artifacts:
     paths:
-      - install/
-    expire_in: 1 hour
+      - packages/
+      - server.log
+      - ws.log
+    expire_in: 1 week
 
 test-job:
   stage: test
@@ -39,13 +57,15 @@ test-job:
     - apt-get install -y software-properties-common
     - apt-add-repository ppa:mutlaqja/ppa
     - apt-get install -y npm qtbase5-dev libqt5websockets5-dev libindi-dev libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev zlib1g-dev dpkg-dev debhelper devscripts lintian
-    - npm install ws
+#    - npm install ws
   script:
     - mkdir media
     - export QT_QPA_PLATFORM=offscreen
-    - export PATH="./install/usr/bin:$PATH"
-    - export LD_LIBRARY_PATH="./install/usr/lib:$LD_LIBRARY_PATH"
-    - ostserver --webroot=media --libpath=./install/usr/lib > server.log 2>&1 &
+    - dpkg -i packages/ostserver_1.0.2_amd64.deb
+#    - export PATH="./install/usr/bin:$PATH"
+#    - export LD_LIBRARY_PATH="./install/usr/lib:$LD_LIBRARY_PATH"
+#    - ostserver --webroot=media --libpath=./install/usr/lib > server.log 2>&1 &
+    - ostserver --webroot=media > server.log 2>&1 &
     - SERVER_PID=$!
     - sleep 30
     - ps aux | grep ostserver | grep -v grep
@@ -58,10 +78,11 @@ test-job:
     paths:
       - server.log
       - ws.log
-    expire_in: 1 week
+    expire_in: 2 week
   only:
-    - main
-    - tags
+    - xxmain
+    - gitlab-ci
+    - xxtags
 
 package-deb:
   stage: package
@@ -100,8 +121,9 @@ package-deb:
       - packages/*.deb
     expire_in: 1 week
   only:
-    - main
-    - tags
+    - xxmain
+    - xxgitlab-ci
+    - xxtags
 
 release-assets:
   stage: release
@@ -116,4 +138,4 @@ release-assets:
     - export PACKAGE_NAME="ostserver_${PACKAGE_VERSION}_amd64.deb"
     - curl --header "JOB-TOKEN:${CI_JOB_TOKEN}" --upload-file "packages/${PACKAGE_NAME}" "${CI_API_V4_URL}/projects/${PROJECT_ID}/packages/generic/ostserver/${PACKAGE_VERSION}/${PACKAGE_NAME}"
   only:
-    - tags
+    - xxtags
