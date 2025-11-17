@@ -138,4 +138,4 @@ release-assets:
     - export PACKAGE_NAME="ostserver_${PACKAGE_VERSION}_amd64.deb"
     - curl --header "JOB-TOKEN:${CI_JOB_TOKEN}" --upload-file "packages/${PACKAGE_NAME}" "${CI_API_V4_URL}/projects/${PROJECT_ID}/packages/generic/ostserver/${PACKAGE_VERSION}/${PACKAGE_NAME}"
   only:
-    - xxtags
+    - tags
