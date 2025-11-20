@@ -1594,5 +1594,138 @@
     "video in grid": {
         "en": "video in grid",
         "fr": "Vidéo dans une grille"
+    },
+    "Add to planner": {
+        "en": "Add to planner",
+        "fr": "Ajouter au planificateur"
+    },
+    "Altitude": {
+        "en": "Altitude",
+        "fr": "Altitude"
+    },
+    "CCD Orientation": {
+        "en": "CCD Orientation",
+        "fr": "Orientation CCD"
+    },
+    "CCD rotation angle in degrees (from polynomial fit during calibration)": {
+        "en": "CCD rotation angle in degrees (from polynomial fit during calibration)",
+        "fr": "Rotation CCD (°)"
+    },
+    "Calibration Mount DEC": {
+        "en": "Calibration Mount DEC",
+        "fr": "Calibration DEC"
+    },
+    "Calibration Pier Side": {
+        "en": "Calibration Pier Side",
+        "fr": "Calibration coté"
+    },
+    "Enable pier side reverse": {
+        "en": "Enable pier side reverse",
+        "fr": "Activer l'inversion selon le coté"
+    },
+    "GPS Date and time": {
+        "en": "GPS Date and time",
+        "fr": "Date et heure GPS"
+    },
+    "GPS Location": {
+        "en": "GPS Location",
+        "fr": "Localisation GPS"
+    },
+    "General": {
+        "en": "General",
+        "fr": "Général"
+    },
+    "Guider module": {
+        "en": "Guider module",
+        "fr": "Module Guidage"
+    },
+    "Mount declination at calibration time (for proper DEC compensation)": {
+        "en": "Mount declination at calibration time (for proper DEC compensation)",
+        "fr": "Declinaison au moment de la calibration"
+    },
+    "Mount position": {
+        "en": "Mount position",
+        "fr": "Position monture"
+    },
+    "Name of the navigator module INSTANCE to use": {
+        "en": "Name of the navigator module INSTANCE to use",
+        "fr": "Instance de navigator"
+    },
+    "Name of the sequencer module INSTANCE to use": {
+        "en": "Name of the sequencer module INSTANCE to use",
+        "fr": "Instance de sequencer"
+    },
+    "Navigator instance": {
+        "en": "Navigator instance",
+        "fr": "Instance de navigator"
+    },
+    "Object DEC": {
+        "en": "Object DEC",
+        "fr": "DEC de l'objet"
+    },
+    "Object RA": {
+        "en": "Object RA",
+        "fr": "AD de l'objet"
+    },
+    "Object name": {
+        "en": "Object name",
+        "fr": "Nom de l'objet"
+    },
+    "Planner module": {
+        "en": "Planner module",
+        "fr": "Module planificateur"
+    },
+    "Planning": {
+        "en": "Planning",
+        "fr": "Planning"
+    },
+    "Reset calibration": {
+        "en": "Reset calibration",
+        "fr": "RàZ Calibration"
+    },
+    "Reverse DEC": {
+        "en": "Reverse DEC",
+        "fr": "Inverser DEC"
+    },
+    "Reverse DEC corrections (stored at calibration time)": {
+        "en": "Reverse DEC corrections (stored at calibration time)",
+        "fr": "DEC inversée"
+    },
+    "Reverse RA": {
+        "en": "Reverse RA",
+        "fr": "Inverser AD"
+    },
+    "Reverse RA corrections (stored at calibration time)": {
+        "en": "Reverse RA corrections (stored at calibration time)",
+        "fr": "RA inversée"
+    },
+    "Reverse corrections if calibration pier side differs from current pier side": {
+        "en": "Reverse corrections if calibration pier side differs from current pier side",
+        "fr": "Reverse corrections if calibration pier side differs from current pier side"
+    },
+    "Sequence instance": {
+        "en": "Sequence instance",
+        "fr": "Instance sequencer"
+    },
+    "Sequencer profile": {
+        "en": "Sequencer profile",
+        "fr": "Profil sequencer"
+    },
+    "Sync mount after sucess": {
+        "en": "Sync mount after sucess",
+        "fr": "Synchroniser la monture si OK"
+    },
+    "Synchronise mount coordinates after centering": {
+        "en": "Synchronise mount coordinates after centering",
+        "fr": "àSynchroniser la monture après le centrage"
+    },
+    "True = West, False = East (pier side at time of calibration)": {
+        "en": "True = West, False = East (pier side at time of calibration)",
+        "fr": "True = West, False = East (pier side at time of calibration)"
+    },
+    "UTC offset": {
+        "en": "UTC offset",
+        "fr": "Décalage UTC"
     }
+
 }

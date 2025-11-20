@@ -1030,9 +1030,11 @@ bool IndiModule::giveMeAnOptic()
 {
     if (getStore().contains("optic")) return false;
 
-    OST::PropertyMulti* pm = new OST::PropertyMulti("optic", "Optic", OST::ReadWrite, "Parameters", "", "222Parms333", true,
+    OST::PropertyMulti* pm = new OST::PropertyMulti("optic", "Optic", OST::ReadWrite, "Parameters", "General", "222Parms333",
+            true,
             false);
     createProperty("optic", pm);
+
     OST::ElementFloat* f = new  OST::ElementFloat("Focal length", "1", "");
     f->setDirectEdit(true);
     f->setMinMax(1, 4000);

@@ -79,7 +79,7 @@
     "devices": {
         "hasprofile":true,
         "devcat": "Parameters",
-        "group": "",
+        "group": "Devices",
         "order":"222Parms222",
         "permission": 2,
         "label": "Devices",
@@ -87,8 +87,8 @@
         }
     },
     "devicesactions": {
-        "devcat": "Module",
-        "group": "Indi",
+        "devcat": "Parameters",
+        "group": "Devices",
         "order":"04",
         "permission": 2,
         "rule":2,
@@ -161,7 +161,7 @@
     },
     "parms": {
         "devcat": "Parameters",
-        "group": "",
+        "group": "General",
         "order":"222Parms111",
         "permission": 2,
         "hasprofile":true,
