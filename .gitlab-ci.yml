@@ -1,6 +1,8 @@
 stages:
   - build
   - package
+  - upload
+  - release
 
 build-job:
   stage: build
@@ -69,5 +71,29 @@ package-tags:
     paths:
       - ostserver-${CI_COMMIT_TAG}.deb
 #    expire_in: 6 month
+  only:
+    - tags
+
+upload-tag:
+  stage: upload
+  image: curlimages/curl:latest
+  script:
+    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file ostserver-${CI_COMMIT_TAG}.deb "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/ostserver-${CI_COMMIT_TAG}.deb"'
+  only:
+    - tags
+
+upload-main:
+  stage: upload
+  image: curlimages/curl:latest
+  script:
+    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file ostserver-${CI_COMMIT_SHORT_SHA}.deb "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/ostserver-${CI_COMMIT_SHORT_SHA}.deb"'
+  only:
+    - main
+
+release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  script: 
+    - release-cli create --name release-branch-$CI_JOB_ID --description "Ostserver tagged release" --tag-name ${CI_COMMIT_TAG} --assets-link '{"name":"deb","url":"${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/ostserver-${CI_COMMIT_SHORT_SHA}.deb","link_type":"package"}'
   only:
     - tags
