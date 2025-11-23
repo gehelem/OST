@@ -8,8 +8,6 @@ stages:
 build-job:
   stage: build
   image: ubuntu:24.04
-  tags:
-    - cmake
   before_script:
     - apt-get update
     - apt-get clean
@@ -49,8 +47,6 @@ build-job:
 test-job:
   stage: test
   image: ubuntu:24.04
-  tags:
-    - cmake
   dependencies:
     - build-job
   before_script:
@@ -88,8 +84,6 @@ test-job:
 package-deb:
   stage: package
   image: ubuntu:24.04
-  tags:
-    - cmake
   dependencies:
     - build-job
   before_script:
@@ -129,8 +123,6 @@ package-deb:
 release-assets:
   stage: release
   image: curlimages/curl:latest
-  tags:
-    - cmake
   dependencies:
     - package-deb
   script:
