@@ -4,6 +4,7 @@ stages:
   - package
   - release
 
+
 build-job:
   stage: build
   image: ubuntu:24.04
