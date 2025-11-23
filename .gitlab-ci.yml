@@ -78,7 +78,7 @@ test-job:
     expire_in: 2 week
   only:
     - xxmain
-    - gitlab-ci
+    - xxgitlab-ci
     - xxtags
 
 package-deb:
@@ -114,11 +114,7 @@ package-deb:
   artifacts:
     paths:
       - packages/*.deb
-    expire_in: 1 week
-  only:
-    - xxmain
-    - xxgitlab-ci
-    - xxtags
+    expire_in: 3 week
 
 release-assets:
   stage: release
