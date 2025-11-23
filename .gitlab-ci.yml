@@ -14,7 +14,8 @@ build-job:
   script:
     - mkdir build packages media
     - dpkg-buildpackage -us -uc
-    - dpkg -i *.deb
+    - mv ../ostserver_0.0.0_amd64.deb  ./
+    - dpkg -i ostserver_0.0.0_amd64.deb
 #    - cd build
 #    - cmake ..
 #    - make -j4
@@ -33,10 +34,9 @@ build-job:
     - echo "Server logs:"
     - tail -50 server.log
     - kill $SERVER_PID || true
-    - mv ../*.deb  packages/
   artifacts:
     paths:
-      - packages/
+      - ostserver_0.0.0_amd64.deb
       - server.log
       - ws.log
     expire_in: 1 week
@@ -50,13 +50,13 @@ package-master:
   dependencies:
     - build-job
   script:
-    - mv ostserver.deb ostserver-${CI_COMMIT_SHORT_SHA}.deb
+    - cp ostserver_0.0.0_amd64.deb ostserver-${CI_COMMIT_SHORT_SHA}.deb
   artifacts:
     paths:
-      - osterix-development-${CI_COMMIT_SHORT_SHA}.apk
+      - ostserver-${CI_COMMIT_SHORT_SHA}.deb
     expire_in: 1 month
   only:
-    - xxmain
+    - main
 
 package-tags:
   stage: package
@@ -64,10 +64,10 @@ package-tags:
   dependencies:
     - build-job
   script:
-    - mv ostserver.deb ostserver-${CI_COMMIT_TAG}.deb
+    - cp ostserver_0.0.0_amd64.deb ostserver-${CI_COMMIT_TAG}.deb
   artifacts:
     paths:
       - ostserver-${CI_COMMIT_TAG}.deb
 #    expire_in: 6 month
   only:
-    - xxtags
+    - tags

@@ -1,9 +1,9 @@
 Package: ostserver
-Version: 1.0-1
+Version: 0.0.0
 Architecture: amd64
 Maintainer: gilles <gilles@joag.fr>
-Installed-Size: 2300
-Depends: libindi1, libstellarsolver, gsc
+Installed-Size: 2556
+Recommends: libavahi-client3 (>= 0.6.16), libavahi-common3 (>= 0.6.16), libc6 (>= 2.34), libcfitsio9 (>= 3.480~), libgcc-s1 (>= 3.3.1), libindi1, libqt5core5a (>= 5.15.1), libqt5gui5 (>= 5.3.0) | libqt5gui5-gles (>= 5.3.0), libqt5network5 (>= 5.0.2), libqt5sql5 (>= 5.0.2), libqt5websockets5 (>= 5.6.0), libstdc++6 (>= 9), libstellarsolver
 Section: science
 Priority: optional
 Homepage: https://github.com/gehelem/OST
