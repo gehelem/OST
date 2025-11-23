@@ -1,9 +1,6 @@
 stages:
   - build
-  - test
   - package
-  - release
-
 
 build-job:
   stage: build
@@ -15,18 +12,19 @@ build-job:
     - apt-add-repository ppa:mutlaqja/ppa
     - apt-get install -y build-essential cmake git npm qtbase5-dev libqt5websockets5-dev libindi-dev libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev zlib1g-dev dpkg-dev qtdeclarative5-dev libqt5svg5-dev libkf5doctools-dev libkf5config-dev libkf5guiaddons-dev libkf5i18n-dev libkf5newstuff-dev libkf5notifications-dev libkf5xmlgui-dev libkf5plotting-dev libkf5crash-dev libkf5notifyconfig-dev libeigen3-dev libraw-dev libsecret-1-dev debhelper devscripts lintian autotools-dev intltool-debian extra-cmake-modules
   script:
-    - mkdir build install packages
-    - cd build
-    - cmake ..
-    - make -j4
-    - cmake --install .
-    - cd ..
-    - echo "Quick test..."
-    - mkdir media
-    - export QT_QPA_PLATFORM=offscreen
+    - mkdir build packages media
+    - dpkg-buildpackage -us -uc
+    - dpkg -i *.deb
+#    - cd build
+#    - cmake ..
+#    - make -j4
+#    - cmake --install .
+#    - cd ..
 #    - export PATH="./install/usr/bin:$PATH"
 #    - export LD_LIBRARY_PATH="./install/usr/lib:$LD_LIBRARY_PATH"
 #    - ostserver --webroot=media --libpath=./install/usr/lib > server.log 2>&1 &
+    - echo "Quick test..."
+    - export QT_QPA_PLATFORM=offscreen
     - ostserver --webroot=media > server.log 2>&1 &
     - SERVER_PID=$!
     - sleep 7
@@ -35,7 +33,6 @@ build-job:
     - echo "Server logs:"
     - tail -50 server.log
     - kill $SERVER_PID || true
-    - dpkg-buildpackage -us -uc
     - mv ../*.deb  packages/
   artifacts:
     paths:
@@ -43,88 +40,34 @@ build-job:
       - server.log
       - ws.log
     expire_in: 1 week
-
-test-job:
-  stage: test
-  image: ubuntu:24.04
-  dependencies:
-    - build-job
-  before_script:
-    - apt-get update
-    - apt-get install -y software-properties-common
-    - apt-add-repository ppa:mutlaqja/ppa
-    - apt-get install -y npm qtbase5-dev libqt5websockets5-dev libindi-dev libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev zlib1g-dev dpkg-dev debhelper devscripts lintian
-#    - npm install ws
-  script:
-    - mkdir media
-    - export QT_QPA_PLATFORM=offscreen
-    - dpkg -i packages/ostserver_1.0.2_amd64.deb
-#    - export PATH="./install/usr/bin:$PATH"
-#    - export LD_LIBRARY_PATH="./install/usr/lib:$LD_LIBRARY_PATH"
-#    - ostserver --webroot=media --libpath=./install/usr/lib > server.log 2>&1 &
-    - ostserver --webroot=media > server.log 2>&1 &
-    - SERVER_PID=$!
-    - sleep 30
-    - ps aux | grep ostserver | grep -v grep
-    - echo "Testing server with WebSocket..."
-    - node test-ws.js 2>&1 | tee ws.log
-    - echo "Server logs:"
-    - tail -50 server.log
-    - kill $SERVER_PID || true
-  artifacts:
-    paths:
-      - server.log
-      - ws.log
-    expire_in: 2 week
   only:
-    - xxmain
-    - xxgitlab-ci
-    - xxtags
+    - master
+    - tags
 
-package-deb:
+package-master:
   stage: package
   image: ubuntu:24.04
   dependencies:
     - build-job
-  before_script:
-    - apt-get update
-    - apt-get install -y dpkg-dev debhelper devscripts lintian
   script:
-    - export PACKAGE_NAME="ostserver"
-    - export PACKAGE_VERSION=$([ -n "$CI_COMMIT_TAG" ] && echo "$CI_COMMIT_TAG" || echo "1.0.0-${CI_COMMIT_SHORT_SHA}")
-    - export PACKAGE_ARCH="amd64"
-    - export DEB_NAME="${PACKAGE_NAME}_${PACKAGE_VERSION}_${PACKAGE_ARCH}"
-    - mkdir -p "${DEB_NAME}/DEBIAN" "${DEB_NAME}/usr/share/doc/${PACKAGE_NAME}"
-    - cp -r install/. "${DEB_NAME}/"
-    - echo "Package:${PACKAGE_NAME}" > "${DEB_NAME}/DEBIAN/control"
-    - echo "Version:${PACKAGE_VERSION}" >> "${DEB_NAME}/DEBIAN/control"
-    - echo "Section:misc" >> "${DEB_NAME}/DEBIAN/control"
-    - echo "Priority:optional" >> "${DEB_NAME}/DEBIAN/control"
-    - echo "Architecture:${PACKAGE_ARCH}" >> "${DEB_NAME}/DEBIAN/control"
-    - echo "Maintainer:Gilles <gilles@ostserver.fr>" >> "${DEB_NAME}/DEBIAN/control"
-    - echo "Depends:libqt5websockets5, libindi1, libstellarsolver, libnova-0.16-0, libgsl27, libcfitsio10, libavahi-client3, zlib1g" >> "${DEB_NAME}/DEBIAN/control"
-    - echo "Description:OST Server - Astrophotography control server" >> "${DEB_NAME}/DEBIAN/control"
-    - echo "#!/bin/bash" > "${DEB_NAME}/DEBIAN/postinst"
-    - echo "set -e" >> "${DEB_NAME}/DEBIAN/postinst"
-    - echo "exit 0" >> "${DEB_NAME}/DEBIAN/postinst"
-    - chmod 755 "${DEB_NAME}/DEBIAN/postinst"
-    - mkdir -p packages
-    - dpkg-deb --build "${DEB_NAME}" packages/
-    - lintian packages/"${DEB_NAME}.deb" || true
+    - mv ostserver.deb ostserver-${CI_COMMIT_SHORT_SHA}.deb
   artifacts:
     paths:
-      - packages/*.deb
-    expire_in: 3 week
-
-release-assets:
-  stage: release
-  image: curlimages/curl:latest
-  dependencies:
-    - package-deb
-  script:
-    - export PACKAGE_VERSION="${CI_COMMIT_TAG}"
-    - export PROJECT_ID="${CI_PROJECT_ID}"
-    - export PACKAGE_NAME="ostserver_${PACKAGE_VERSION}_amd64.deb"
-    - curl --header "JOB-TOKEN:${CI_JOB_TOKEN}" --upload-file "packages/${PACKAGE_NAME}" "${CI_API_V4_URL}/projects/${PROJECT_ID}/packages/generic/ostserver/${PACKAGE_VERSION}/${PACKAGE_NAME}"
+      - osterix-development-${CI_COMMIT_SHORT_SHA}.apk
+    expire_in: 1 month
   only:
-    - tags
+    - xxmaster
+
+package-tags:
+  stage: package
+  image: ubuntu:24.04
+  dependencies:
+    - build-job
+  script:
+    - mv ostserver.deb ostserver-${CI_COMMIT_TAG}.deb
+  artifacts:
+    paths:
+      - ostserver-${CI_COMMIT_TAG}.deb
+#    expire_in: 6 month
+  only:
+    - xxtags
