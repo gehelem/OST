@@ -41,7 +41,7 @@ build-job:
       - ws.log
     expire_in: 1 week
   only:
-    - master
+    - main
     - tags
 
 package-master:
@@ -56,7 +56,7 @@ package-master:
       - osterix-development-${CI_COMMIT_SHORT_SHA}.apk
     expire_in: 1 month
   only:
-    - xxmaster
+    - xxmain
 
 package-tags:
   stage: package
