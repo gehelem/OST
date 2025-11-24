@@ -18,6 +18,7 @@ debug-job:
     - echo $CI_PIPELINE_SOURCE
     - echo $CI_MERGE_REQUEST_TARGET_BRANCH_NAME 
     - echo $CI_DEFAULT_BRANCH
+    - echo $CI_COMMIT_REF_NAME
     - echo ${DEB_FILE}
     - echo ${PACKAGE_REGISTRY_URL}
   rules:
@@ -39,6 +40,7 @@ build-job:
     - echo $CI_PIPELINE_SOURCE
     - echo $CI_MERGE_REQUEST_TARGET_BRANCH_NAME 
     - echo $CI_DEFAULT_BRANCH
+    - echo $CI_COMMIT_REF_NAME
     - echo ${DEB_FILE}
     - echo ${PACKAGE_REGISTRY_URL}
     - echo "hello" > ${DEB_FILE}
@@ -78,6 +80,7 @@ upload-job:
     - echo $CI_MERGE_REQUEST_TARGET_BRANCH_NAME 
     - echo $CI_DEFAULT_BRANCH
     - echo ${DEB_FILE}
+    - echo $CI_COMMIT_REF_NAME
     - echo ${PACKAGE_REGISTRY_URL}
     - echo "Uploading assets"
     - |
@@ -97,6 +100,7 @@ release-job:
     - echo $CI_PIPELINE_SOURCE
     - echo $CI_MERGE_REQUEST_TARGET_BRANCH_NAME 
     - echo $CI_DEFAULT_BRANCH
+    - echo $CI_COMMIT_REF_NAME
     - echo ${DEB_FILE}
     - echo ${PACKAGE_REGISTRY_URL}
     - |
