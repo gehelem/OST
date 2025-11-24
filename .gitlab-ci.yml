@@ -8,7 +8,7 @@ upload-test:
   stage: upload
   image: curlimages/curl:latest
   script:
-    - echo "coucou1 modified" > testupload1.txt
+    - echo "coucou1 modified again" > testupload1.txt
     - echo "coucou2" > testupload2.txt
     - echo "coucou3" > testupload3.txt
     - echo "coucou4" > testupload4.txt
@@ -111,7 +111,7 @@ upload-tag:
   script:
     - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN Content-Type: multipart/form-data" --upload-file ostserver-${CI_COMMIT_TAG}.deb "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/ostserver-${CI_COMMIT_TAG}.deb"'
   only:
-    - tags
+    - xxtags
 
 upload-main:
   stage: upload
