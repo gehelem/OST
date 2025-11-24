@@ -4,6 +4,17 @@ stages:
   - upload
   - release
 
+upload-test:
+  stage: upload
+  image: curlimages/curl:latest
+  script:
+    - echo "coucou" > testupload1.txt
+    - echo "coucou" > testupload2.txt
+    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN Content-Type: multipart/form-data" --upload-file testupload2.txt "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/testupload2.txt"'
+    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --header  "Content-Type: multipart/form-data" --upload-file testupload1.txt "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/testupload1.txt"'
+  only:
+    - testupload
+
 build-job:
   stage: build
   image: ubuntu:24.04
