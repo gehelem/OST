@@ -20,6 +20,18 @@ upload-test:
 #      curl --location --user "gitlab-ci-token: ${CI_JOB_TOKEN}" --upload-file "./testupload2.txt" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/my_package/latest/testupload2.txt"
 #    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN Content-Type: multipart/form-data" --upload-file testupload2.txt "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/testupload2.txt"'
 #    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --header  "Content-Type: multipart/form-data" --upload-file testupload1.txt "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/testupload1.txt"'
+  artifacts:
+    paths:
+      - testupload1.txt
+    only:
+      - testupload
+
+release-test:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  script: 
+#    - release-cli create --name latest --description "Ostserver tagged release" --tag-name ${CI_COMMIT_TAG} --assets-link '{"name":"test","url":"${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/ostserver-${CI_COMMIT_SHORT_SHA}.deb","link_type":"package"}'
+    - release-cli create --name latest --description "Ostserver latest release" --tag-name ${CI_COMMIT_TAG}
   only:
     - testupload
 
