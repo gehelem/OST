@@ -1,39 +1,69 @@
 stages:
-  - prepare
+  - build
+  - upload
   - release
 
 variables:
-  # Package version can only contain numbers (0-9), and dots (.).
-  # Must be in the format of X.Y.Z, i.e. should match /\A\d+\.\d+\.\d+\z/ regular expresion.
-  # See https://docs.gitlab.com/ee/user/packages/generic_packages/#publish-a-package-file
-
-  FIRST_FILE: "testupload1.txt"
+  DEB_FILE: "ostserver_${CI_COMMIT_TAG}_amd64.deb"
   PACKAGE_REGISTRY_URL: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/latest/${CI_COMMIT_TAG}"
 
-upload_job:
-  stage: prepare
-  image: curlimages/curl:latest
+build-job:
+  stage: build
+  image: ubuntu:24.04
+  before_script:
+    - apt-get update
+    - apt-get clean
+    - apt-get install -y software-properties-common
+    - apt-add-repository ppa:mutlaqja/ppa
+    - apt-get install -y build-essential cmake git npm qtbase5-dev libqt5websockets5-dev libindi-dev libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev zlib1g-dev dpkg-dev qtdeclarative5-dev libqt5svg5-dev libkf5doctools-dev libkf5config-dev libkf5guiaddons-dev libkf5i18n-dev libkf5newstuff-dev libkf5notifications-dev libkf5xmlgui-dev libkf5plotting-dev libkf5crash-dev libkf5notifyconfig-dev libeigen3-dev libraw-dev libsecret-1-dev debhelper devscripts lintian autotools-dev intltool-debian extra-cmake-modules
+  script:
+    - mkdir build packages media
+    - dpkg-buildpackage -us -uc 
+    - mv ../ostserver_0.0.0_amd64.deb  ./${DEB_FILE}
+    - dpkg -i ostserver_0.0.0_amd64.deb
+    - echo "Quick test..."
+    - export QT_QPA_PLATFORM=offscreen
+    - ostserver --webroot=media > server.log 2>&1 &
+    - SERVER_PID=$!
+    - sleep 7
+    - ps aux | grep ostserver | grep -v grep
+    - node test-ws.js 2>&1 | tee ws.log
+    - echo "Server logs:"
+    - tail -50 server.log
+    - kill $SERVER_PID || true
+  artifacts:
+    paths:
+      - ${DEB_FILE}
+      - server.log
+      - ws.log
+    expire_in: 1 week
   only:
-    variables:
-      - $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/
+    - main
+    - tags
+
+upload-job:
+  stage: upload
+  dependencies:
+    - build-job
+  image: curlimages/curl:latest
+  rules:
+      - if: $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/
+      - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
   script:
     - echo ${CI_COMMIT_TAG} > ${FIRST_FILE}
     - echo "Uploading assets"
     - |
-      curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ${FIRST_FILE} ${PACKAGE_REGISTRY_URL}/${FIRST_FILE}
+      curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ${FIRST_FILE} ${PACKAGE_REGISTRY_URL}/${DEB_FILE}
 
-release_job:
+release-job:
   stage: release
   dependencies:
-    - upload_job
-  # tags:
-  #   - docker 
+    - upload-job
   image: registry.gitlab.com/gitlab-org/release-cli:latest
-  only:
-    variables:
-      - $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/
+  rules:
+      - if: $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/
+      - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
   script:
     - |
       release-cli create --name "Release $CI_COMMIT_TAG" --tag-name $CI_COMMIT_TAG \
-        --assets-link "{\"name\":\"${FIRST_FILE}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${FIRST_FILE}\"}" 
-
+        --assets-link "{\"name\":\"${DEB_FILE}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${DEB_FILE}\"}" 
