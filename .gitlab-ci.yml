@@ -8,7 +8,7 @@ upload-test:
   stage: upload
   image: curlimages/curl:latest
   script:
-    - echo "coucou1" > testupload1.txt
+    - echo "coucou1 modified" > testupload1.txt
     - echo "coucou2" > testupload2.txt
     - echo "coucou3" > testupload3.txt
     - echo "coucou4" > testupload4.txt
@@ -17,7 +17,7 @@ upload-test:
     - |
       curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}"     --upload-file "./testupload1.txt" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/my_package/latest/testupload1.txt"
     - |
-      curl --location --user "gitlab-ci-token: ${CI_JOB_TOKEN}" --upload-file "./testupload2.txt" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/my_package/latest/testupload2.txt"
+#      curl --location --user "gitlab-ci-token: ${CI_JOB_TOKEN}" --upload-file "./testupload2.txt" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/my_package/latest/testupload2.txt"
 #    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN Content-Type: multipart/form-data" --upload-file testupload2.txt "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/testupload2.txt"'
 #    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --header  "Content-Type: multipart/form-data" --upload-file testupload1.txt "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/testupload1.txt"'
   only:
