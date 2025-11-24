@@ -15,11 +15,14 @@ upload-test:
     - cat testupload1.txt
     - echo "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/testupload1.txt"
     - |
-      curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}"     --upload-file "./testupload1.txt" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/my_package/${CI_COMMIT_TAG}/testupload1.txt"
+      curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}"     --upload-file "./testupload1.txt" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/my_package/latest/testupload1.txt"
     - |
-      curl --location --user "gitlab-ci-token: ${CI_JOB_TOKEN}" --upload-file "./testupload2.txt" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/my_package/${CI_COMMIT_TAG}/testupload2.txt"
+      curl --location --user "gitlab-ci-token: ${CI_JOB_TOKEN}" --upload-file "./testupload2.txt" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/my_package/latest/testupload2.txt"
 #    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN Content-Type: multipart/form-data" --upload-file testupload2.txt "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/testupload2.txt"'
 #    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --header  "Content-Type: multipart/form-data" --upload-file testupload1.txt "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/testupload1.txt"'
+
+PUT /projects/:id/packages/generic/:package_name/:package_version/:file_name
+
   only:
     - testupload
 
