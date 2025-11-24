@@ -24,7 +24,7 @@ upload-test:
     paths:
       - testupload1.txt
     reports:
-      - testupload1.txt
+      rawfile: testupload1.txt
   only:
     - testupload
 
