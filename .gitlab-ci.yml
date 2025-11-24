@@ -23,8 +23,6 @@ upload-test:
   artifacts:
     paths:
       - testupload1.txt
-    reports:
-      rawfile: testupload1.txt
   only:
     - testupload
 
@@ -77,7 +75,7 @@ build-job:
     expire_in: 1 week
   only:
     - main
-    - tags
+    - xxtags
 
 package-master:
   stage: package
@@ -105,7 +103,7 @@ package-tags:
       - ostserver-${CI_COMMIT_TAG}.deb
 #    expire_in: 6 month
   only:
-    - tags
+    - xxtags
 
 upload-tag:
   stage: upload
@@ -130,4 +128,4 @@ release:
   script: 
     - release-cli create --name release-branch-$CI_JOB_ID --description "Ostserver tagged release" --tag-name ${CI_COMMIT_TAG} --assets-link '{"name":"deb","url":"${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/ostserver-${CI_COMMIT_SHORT_SHA}.deb","link_type":"package"}'
   only:
-    - tags
+    - xxtags
