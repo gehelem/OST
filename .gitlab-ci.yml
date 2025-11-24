@@ -1,5 +1,4 @@
 stages:
-  - debug
   - build
   - upload
   - release
@@ -8,40 +7,15 @@ variables:
   DEB_FILE: "ostserver_${CI_COMMIT_TAG}_amd64.deb"
   PACKAGE_REGISTRY_URL: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/latest/${CI_COMMIT_TAG}"
 
-debug-job:
-  stage: debug
-  image: ubuntu:24.04
-  script:
-    - echo $CI_COMMIT_SHORT_SHA
-    - echo $CI_COMMIT_TAG
-    - echo $CI_PIPELINE_SOURCE
-    - echo $CI_MERGE_REQUEST_TARGET_BRANCH_NAME 
-    - echo $CI_DEFAULT_BRANCH
-    - echo $CI_COMMIT_REF_NAME
-    - echo ${DEB_FILE}
-    - echo ${PACKAGE_REGISTRY_URL}
-  rules:
-    - if: $CI_COMMIT_SHORT_SHA
-      when: always
-
 build-job:
   stage: build
   image: ubuntu:24.04
-  before_script:
+  script:
     - apt-get update
     - apt-get clean
     - apt-get install -y software-properties-common
     - apt-add-repository ppa:mutlaqja/ppa
     - apt-get install -y build-essential cmake git npm qtbase5-dev libqt5websockets5-dev libindi-dev libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev zlib1g-dev dpkg-dev qtdeclarative5-dev libqt5svg5-dev libkf5doctools-dev libkf5config-dev libkf5guiaddons-dev libkf5i18n-dev libkf5newstuff-dev libkf5notifications-dev libkf5xmlgui-dev libkf5plotting-dev libkf5crash-dev libkf5notifyconfig-dev libeigen3-dev libraw-dev libsecret-1-dev debhelper devscripts lintian autotools-dev intltool-debian extra-cmake-modules
-  script:
-    - echo $CI_COMMIT_SHORT_SHA
-    - echo $CI_COMMIT_TAG
-    - echo $CI_PIPELINE_SOURCE
-    - echo $CI_MERGE_REQUEST_TARGET_BRANCH_NAME 
-    - echo $CI_DEFAULT_BRANCH
-    - echo $CI_COMMIT_REF_NAME
-    - echo ${DEB_FILE}
-    - echo ${PACKAGE_REGISTRY_URL}
     - mkdir media
     - dpkg-buildpackage -us -uc 
     - mv ../ostserver_0.0.0_amd64.deb  ./${DEB_FILE}
@@ -72,15 +46,6 @@ upload-job:
     - build-job
   image: curlimages/curl:latest
   script:
-    - echo $CI_COMMIT_SHORT_SHA
-    - echo $CI_COMMIT_TAG
-    - echo $CI_PIPELINE_SOURCE
-    - echo $CI_MERGE_REQUEST_TARGET_BRANCH_NAME 
-    - echo $CI_DEFAULT_BRANCH
-    - echo ${DEB_FILE}
-    - echo $CI_COMMIT_REF_NAME
-    - echo ${PACKAGE_REGISTRY_URL}
-    - echo "Uploading assets"
     - |
       curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ${DEB_FILE} ${PACKAGE_REGISTRY_URL}/${DEB_FILE}
   rules:
@@ -92,14 +57,6 @@ release-job:
     - upload-job
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   script:
-    - echo $CI_COMMIT_SHORT_SHA
-    - echo $CI_COMMIT_TAG
-    - echo $CI_PIPELINE_SOURCE
-    - echo $CI_MERGE_REQUEST_TARGET_BRANCH_NAME 
-    - echo $CI_DEFAULT_BRANCH
-    - echo $CI_COMMIT_REF_NAME
-    - echo ${DEB_FILE}
-    - echo ${PACKAGE_REGISTRY_URL}
     - |
       release-cli create --name "Release $CI_COMMIT_TAG" --tag-name $CI_COMMIT_TAG \
         --assets-link "{\"name\":\"${DEB_FILE}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${DEB_FILE}\"}" 
