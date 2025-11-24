@@ -50,10 +50,9 @@ upload-job:
       - if: $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/
       - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
   script:
-    - echo ${CI_COMMIT_TAG} > ${FIRST_FILE}
     - echo "Uploading assets"
     - |
-      curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ${FIRST_FILE} ${PACKAGE_REGISTRY_URL}/${DEB_FILE}
+      curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ${DEB_FILE} ${PACKAGE_REGISTRY_URL}/${DEB_FILE}
 
 release-job:
   stage: release
