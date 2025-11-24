@@ -86,7 +86,8 @@ upload-job:
     - |
       curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ${DEB_FILE} ${PACKAGE_REGISTRY_URL}/${DEB_FILE}
   rules:
-      - if: $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/ && $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+#      - if: $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/ && $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+      - if: $CI_COMMIT_TAG && $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
         when: always
 
 release-job:
@@ -107,6 +108,7 @@ release-job:
       release-cli create --name "Release $CI_COMMIT_TAG" --tag-name $CI_COMMIT_TAG \
         --assets-link "{\"name\":\"${DEB_FILE}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${DEB_FILE}\"}" 
   rules:
-      - if: $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/ && $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+#      - if: $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/ && $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+      - if: $CI_COMMIT_TAG && $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
         when: always
 
