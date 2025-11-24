@@ -37,9 +37,9 @@ build-job:
       - server.log
       - ws.log
     expire_in: 1 week
-  only:
-    - main
-    - tags
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/ && $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
 
 upload-job:
   stage: upload
@@ -47,8 +47,7 @@ upload-job:
     - build-job
   image: curlimages/curl:latest
   rules:
-      - if: $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/
-      - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+      - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/ && $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
   script:
     - echo "Uploading assets"
     - |
@@ -60,8 +59,7 @@ release-job:
     - upload-job
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   rules:
-      - if: $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/
-      - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+      - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/ && $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
   script:
     - |
       release-cli create --name "Release $CI_COMMIT_TAG" --tag-name $CI_COMMIT_TAG \
