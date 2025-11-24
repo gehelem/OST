@@ -1,131 +1,38 @@
 stages:
-  - build
-  - package
-  - upload
+  - prepare
   - release
 
-upload-test:
-  stage: upload
-  image: curlimages/curl:latest
+variables:
+  # Package version can only contain numbers (0-9), and dots (.).
+  # Must be in the format of X.Y.Z, i.e. should match /\A\d+\.\d+\.\d+\z/ regular expresion.
+  # See https://docs.gitlab.com/ee/user/packages/generic_packages/#publish-a-package-file
+
+  FIRST_FILE: "testupload1.txt"
+  PACKAGE_REGISTRY_URL: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/latest/${CI_COMMIT_TAG}"
+
+upload_job:
+  stage: prepare
+  only:
+    variables:
+      - $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/
   script:
-    - echo "coucou1 modified again" > testupload1.txt
-    - echo "coucou2" > testupload2.txt
-    - echo "coucou3" > testupload3.txt
-    - echo "coucou4" > testupload4.txt
-    - cat testupload1.txt
-    - echo "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/testupload1.txt"
+    - echo ${CI_COMMIT_TAG} > ${FIRST_FILE}
+    - echo "Uploading assets"
     - |
-      curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}"  --upload-file "./testupload1.txt" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/my_package/latest/testupload1.txt"
-#    - |
-#      curl --location --user "gitlab-ci-token: ${CI_JOB_TOKEN}" --upload-file "./testupload2.txt" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/my_package/latest/testupload2.txt"
-#    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN Content-Type: multipart/form-data" --upload-file testupload2.txt "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/testupload2.txt"'
-#    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --header  "Content-Type: multipart/form-data" --upload-file testupload1.txt "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/testupload1.txt"'
-  artifacts:
-    paths:
-      - testupload1.txt
-  only:
-    - testupload
+      curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ${FIRST_FILE} ${PACKAGE_REGISTRY_URL}/${FIRST_FILE}
 
-release-test:
+release_job:
   stage: release
-  image: registry.gitlab.com/gitlab-org/release-cli:latest
-  script: 
-#    - release-cli create --name latest --description "Ostserver tagged release" --tag-name ${CI_COMMIT_TAG} --assets-link '{"name":"test","url":"${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/ostserver-${CI_COMMIT_SHORT_SHA}.deb","link_type":"package"}'
-    - release-cli create --name latest --description "Ostserver latest release" --tag-name latest
-  only:
-    - testupload
-
-build-job:
-  stage: build
-  image: ubuntu:24.04
-  before_script:
-    - apt-get update
-    - apt-get clean
-    - apt-get install -y software-properties-common
-    - apt-add-repository ppa:mutlaqja/ppa
-    - apt-get install -y build-essential cmake git npm qtbase5-dev libqt5websockets5-dev libindi-dev libstellarsolver-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev zlib1g-dev dpkg-dev qtdeclarative5-dev libqt5svg5-dev libkf5doctools-dev libkf5config-dev libkf5guiaddons-dev libkf5i18n-dev libkf5newstuff-dev libkf5notifications-dev libkf5xmlgui-dev libkf5plotting-dev libkf5crash-dev libkf5notifyconfig-dev libeigen3-dev libraw-dev libsecret-1-dev debhelper devscripts lintian autotools-dev intltool-debian extra-cmake-modules
-  script:
-    - mkdir build packages media
-    - dpkg-buildpackage -us -uc
-    - mv ../ostserver_0.0.0_amd64.deb  ./
-    - dpkg -i ostserver_0.0.0_amd64.deb
-#    - cd build
-#    - cmake ..
-#    - make -j4
-#    - cmake --install .
-#    - cd ..
-#    - export PATH="./install/usr/bin:$PATH"
-#    - export LD_LIBRARY_PATH="./install/usr/lib:$LD_LIBRARY_PATH"
-#    - ostserver --webroot=media --libpath=./install/usr/lib > server.log 2>&1 &
-    - echo "Quick test..."
-    - export QT_QPA_PLATFORM=offscreen
-    - ostserver --webroot=media > server.log 2>&1 &
-    - SERVER_PID=$!
-    - sleep 7
-    - ps aux | grep ostserver | grep -v grep
-    - node test-ws.js 2>&1 | tee ws.log
-    - echo "Server logs:"
-    - tail -50 server.log
-    - kill $SERVER_PID || true
-  artifacts:
-    paths:
-      - ostserver_0.0.0_amd64.deb
-      - server.log
-      - ws.log
-    expire_in: 1 week
-  only:
-    - main
-    - xxtags
-
-package-master:
-  stage: package
-  image: ubuntu:24.04
   dependencies:
-    - build-job
-  script:
-    - cp ostserver_0.0.0_amd64.deb ostserver-${CI_COMMIT_SHORT_SHA}.deb
-  artifacts:
-    paths:
-      - ostserver-${CI_COMMIT_SHORT_SHA}.deb
-    expire_in: 1 month
-  only:
-    - main
-
-package-tags:
-  stage: package
-  image: ubuntu:24.04
-  dependencies:
-    - build-job
-  script:
-    - cp ostserver_0.0.0_amd64.deb ostserver-${CI_COMMIT_TAG}.deb
-  artifacts:
-    paths:
-      - ostserver-${CI_COMMIT_TAG}.deb
-#    expire_in: 6 month
-  only:
-    - xxtags
-
-upload-tag:
-  stage: upload
-  image: curlimages/curl:latest
-  script:
-    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN Content-Type: multipart/form-data" --upload-file ostserver-${CI_COMMIT_TAG}.deb "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/ostserver-${CI_COMMIT_TAG}.deb"'
-  only:
-    - xxtags
-
-upload-main:
-  stage: upload
-  image: curlimages/curl:latest
-  script:
-    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN Content-Type: multipart/form-data" --upload-file ostserver-${CI_COMMIT_SHORT_SHA}.deb "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/ostserver-${CI_COMMIT_SHORT_SHA}.deb"'
-    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN Content-Type: multipart/form-data" --upload-file ostserver-${CI_COMMIT_SHORT_SHA}.deb "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/ostserver-latest.deb"'
-  only:
-    - main
-
-release:
-  stage: release
+    - upload_job
+  # tags:
+  #   - docker 
   image: registry.gitlab.com/gitlab-org/release-cli:latest
-  script: 
-    - release-cli create --name release-branch-$CI_JOB_ID --description "Ostserver tagged release" --tag-name ${CI_COMMIT_TAG} --assets-link '{"name":"deb","url":"${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/ostserver-${CI_COMMIT_SHORT_SHA}.deb","link_type":"package"}'
   only:
-    - xxtags
+    variables:
+      - $CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/
+  script:
+    - |
+      release-cli create --name "Release $CI_COMMIT_TAG" --tag-name $CI_COMMIT_TAG \
+        --assets-link "{\"name\":\"${FIRST_FILE}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${FIRST_FILE}\"}" 
+
