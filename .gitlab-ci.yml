@@ -23,8 +23,8 @@ upload-test:
   artifacts:
     paths:
       - testupload1.txt
-    only:
-      - testupload
+  only:
+    - testupload
 
 release-test:
   stage: release
