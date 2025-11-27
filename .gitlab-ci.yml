@@ -88,7 +88,7 @@ release-job-latest:
   script:
     - |
       release-cli create --name "latest" --tag-name latest \
-        --assets-link "{\"name\":\"${DEB_FILE_LATEST}\",\"url\":\"${PACKAGE_REGISTRY_TAG}/${DEB_FILE_LATEST}\"}" 
+        --assets-link "{\"name\":\"${DEB_FILE_LATEST}\",\"url\":\"${PACKAGE_REGISTRY_LATEST}/${DEB_FILE_LATEST}\"}" 
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
 
