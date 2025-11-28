@@ -25,26 +25,13 @@ build-job:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
     - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
 
-upload-job-tag:
-  stage: upload
-  dependencies:
-    - build-job
-  image: curlimages/curl:latest
-  script:
-    - |
-      curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ${DEB_FILE_TAG} ${PACKAGE_REGISTRY_TAG}/${DEB_FILE_TAG}
-  rules:
-    - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
-
 release-job-tag:
   stage: release
   dependencies:
-    - upload-job-tag
+    - build-job
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   script:
-    - |
-      release-cli create --name "Release $CI_COMMIT_TAG" --tag-name $CI_COMMIT_TAG \
-        --assets-link "{\"name\":\"${DEB_FILE_TAG}\",\"url\":\"${PACKAGE_REGISTRY_TAG}/${DEB_FILE_TAG}\"}" 
+    - sh ./CI/CI-upload-release-tag.sh
   rules:
       - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
 

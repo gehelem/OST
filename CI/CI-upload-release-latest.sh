@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# CI - Upload + Release job
+# CI - Upload + Release - Latest
 # 
 apk add curl
 curl --request DELETE --header "JOB-TOKEN: ${CI_JOB_TOKEN}" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases/latest"
