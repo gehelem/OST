@@ -65,7 +65,7 @@ release-job-latest:
     - upload-job-latest
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   script:
-    - ./CI/CI-upload-release-latest.sh
+    - sh ./CI/CI-upload-release-latest.sh
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
 
