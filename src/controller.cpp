@@ -27,14 +27,16 @@
 
 Controller::Controller(const QString &webroot, const QString &dbpath,
                        const QString &libpath, const QString &conf, const QString &indiserver,
-                       const QString &ssl, const QString &sslCert, const QString &sslKey, const QString &lng, const QString &grant)
+                       const QString &ssl, const QString &sslCert, const QString &sslKey, const QString &lng, const QString &grant,
+                       OST::Logger *logger)
     :       _webroot(webroot),
             _dbpath(dbpath),
             _libpath(libpath),
             _conf(conf),
             _indiserver(indiserver),
             _lng(lng),
-            _grant(grant)
+            _grant(grant),
+            mLogger(logger)
 {
 
     startPublish();
@@ -74,7 +76,6 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     pMainControl->setAvailableModuleLibs(_availableModuleLibs);
     pMainControl->setIndiDriverList(_availableIndiDrivers);
     pMainControl->sendDump();
-    pMainControl->setLng(_lng);
 
     loadConf(_conf);
 
@@ -165,7 +166,6 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     mod->dbInit(_dbpath, name);
     mod->setProfile(profile);
     mod->setProfiles();
-    mod->setLng(_lng);
     QVariantMap profs;
     dbmanager->getDbProfiles(mod->metaObject()->className(), profs);
     connect(mod, &Basemodule::moduleEvent, this, &Controller::OnModuleEvent);
@@ -351,7 +351,7 @@ void Controller::checkModules(void)
 {
     foreach (const QString &path, QCoreApplication::libraryPaths())
     {
-        sendMessage("Check available modules in " + path);
+        mLogger->info("Check available modules in " + path);
         QDir directory(path);
         directory.setFilter(QDir::Files);
         directory.setNameFilters(QStringList() << "libost*.so");
@@ -364,7 +364,7 @@ void Controller::checkModules(void)
                 QLibrary library(path + "/" + lib);
                 if (!library.load())
                 {
-                    sendMessage(lib + " " + library.errorString());
+                    mLogger->info(lib + " " + library.errorString());
                 }
                 else
                 {
@@ -381,13 +381,13 @@ void Controller::checkModules(void)
                             mod->setObjectName(lib);
                             QVariantMap info = mod->getModuleInfo();
                             _availableModuleLibs[tt] = info;
-                            sendMessage("found library " + path + "/" + lib) ;
+                            mLogger->info("found library " + path + "/" + lib) ;
                             delete mod;
                         }
                     }
                     else
                     {
-                        sendMessage("Could not initialize module from the loaded library : " + lib);
+                        mLogger->warning("Could not initialize module from the loaded library : " + lib);
                     }
                 }
 
@@ -403,14 +403,14 @@ void Controller::checkIndiDrivers(void)
 {
     const QString &path = "/usr/bin";
 
-    sendMessage("Check available Indi drivers in " + path);
+    mLogger->info("Check available Indi drivers in " + path);
     QDir directory(path);
     directory.setFilter(QDir::Files);
     directory.setNameFilters(QStringList() << "indi_*");
     _availableIndiDrivers = directory.entryList();
     foreach(QString dr, _availableIndiDrivers)
     {
-        //sendMessage("indi driver found " + dr);
+        //mLogger->info("indi driver found " + dr);
     }
 }
 void Controller::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
@@ -436,13 +436,6 @@ void Controller::processIndiError()
 {
     QString output = _indiProcess->readAllStandardError();
     pMainControl->sendMainError("INDI ERROR   : " + output);
-}
-void Controller::sendMessage(const QString &pMessage)
-{
-    QString messageWithDateTime = "[" + QDateTime::currentDateTime().toString(Qt::ISODateWithMs) + "]-" + pMessage;
-    QDebug debug = qDebug();
-    debug.noquote();
-    debug << messageWithDateTime;
 }
 // ---------- ZeroConf ----------
 

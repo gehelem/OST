@@ -6,7 +6,6 @@
  * Entry point
  * Should become some kind of service to start & respawn with host
  */
-void sendMessage(const QString &pMessage);
 
 int main(int argc, char *argv[])
 {
@@ -105,10 +104,9 @@ int main(int argc, char *argv[])
     mLogger.info("Language              =" + lng);
     mLogger.info("Security              =" + grant);
     mLogger.info("Log file              =" + logfile);
+    mLogger.info("Log level             =" + QString::number(loglevel));
 
     mLogger.setLogLevel(static_cast<OST::LogLevel>(loglevel));
-
-
 
     Controller controller(
         webroot,
@@ -120,7 +118,8 @@ int main(int argc, char *argv[])
         sslCert,
         sslKey,
         lng,
-        grant
+        grant,
+        &mLogger
     );
 
     Q_UNUSED(controller);
@@ -130,13 +129,4 @@ int main(int argc, char *argv[])
     return nAppReturnCode;
 
 }
-
-void sendMessage(const QString &pMessage)
-{
-    QString messageWithDateTime = "[" + QDateTime::currentDateTime().toString(Qt::ISODateWithMs) + "]-" + pMessage;
-    QDebug debug = qDebug();
-    debug.noquote();
-    debug << messageWithDateTime;
-}
-
 
