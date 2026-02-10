@@ -13,7 +13,7 @@ namespace OST
 
 TranslateManager::TranslateManager()
 {
-    // No default language, no singleton
+    // Resources are initialized in main() before this constructor is called
 }
 
 TranslateManager::~TranslateManager()
@@ -25,13 +25,16 @@ TranslateManager::~TranslateManager()
         delete translator;
     }
     mTranslators.clear();
+
+    // Note: Qt resources are NOT cleaned up here because they might be used
+    // by other parts of the application. They will be automatically freed
+    // when the application exits.
 }
 
-bool TranslateManager::loadLanguages(const QString &translationsPath, const QStringList &languages)
+bool TranslateManager::loadLanguages(const QStringList &languages)
 {
     QMutexLocker locker(&mMutex);
 
-    mTranslationsPath = translationsPath;
     int successCount = 0;
 
     for (const QString &language : languages)
@@ -39,29 +42,20 @@ bool TranslateManager::loadLanguages(const QString &translationsPath, const QStr
         // Create QTranslator for this language
         QTranslator *translator = new QTranslator();
 
-        // Load .qm file: ost_<lang>.qm
-        QString qmFile = QString("ost_%1.qm").arg(language);
-        QString qmPath = QDir(translationsPath).filePath(qmFile);
+        // Load .qm file from embedded resources: :/translations/ost_<lang>.qm
+        QString qmResourcePath = QString(":/translations/ost_%1.qm").arg(language);
 
-        if (QFile::exists(qmPath))
+        if (translator->load(qmResourcePath))
         {
-            if (translator->load(qmPath))
-            {
-                // Install translator globally (Qt uses all installed translators)
-                QCoreApplication::installTranslator(translator);
-                mTranslators[language] = translator;
-                successCount++;
-                qDebug() << "Loaded translation:" << qmPath;
-            }
-            else
-            {
-                qWarning() << "Failed to load translation:" << qmPath;
-                delete translator;
-            }
+            // Install translator globally (Qt uses all installed translators)
+            QCoreApplication::installTranslator(translator);
+            mTranslators[language] = translator;
+            successCount++;
+            qDebug() << "Loaded translation for language:" << language;
         }
         else
         {
-            qDebug() << "Translation file not found:" << qmPath;
+            qWarning() << "Failed to load translation:" << qmResourcePath;
             delete translator;
         }
 
@@ -69,7 +63,7 @@ bool TranslateManager::loadLanguages(const QString &translationsPath, const QStr
         loadExistingPendingEntries(language);
     }
 
-    qDebug() << "Loaded" << successCount << "out of" << languages.size() << "languages";
+    qDebug() << "Loaded" << successCount << "out of" << languages.size() << "translation(s)";
     return successCount > 0;
 }
 
@@ -88,10 +82,8 @@ QString TranslateManager::translate(const QString &sourceText, const QString &la
         if (!mMissingTranslationsByLang[language].contains(sourceText))
         {
             mMissingTranslationsByLang[language].insert(sourceText);
-            // Note: appendToPendingFile will be called outside mutex
-            locker.unlock();
+            // appendToPendingFile will be called with mutex already held
             appendToPendingFile(sourceText, language);
-            locker.relock();
         }
         return sourceText;
     }
@@ -112,10 +104,8 @@ QString TranslateManager::translate(const QString &sourceText, const QString &la
         mMissingTranslationsByLang[language].insert(sourceText);
         qDebug() << "Missing translation (" << language << "):" << sourceText;
 
-        // Append to pending file (unlock first to avoid deadlock)
-        locker.unlock();
+        // appendToPendingFile will be called with mutex already held
         appendToPendingFile(sourceText, language);
-        locker.relock();
     }
 
     return sourceText;
@@ -233,7 +223,7 @@ void TranslateManager::loadExistingPendingEntries(const QString &language)
 
 void TranslateManager::appendToPendingFile(const QString &sourceText, const QString &language)
 {
-    QMutexLocker locker(&mMutex);
+    // NOTE: This method is called with mMutex already locked by the caller
 
     // Check if already in file for this language
     if (mPendingFileEntriesByLang[language].contains(sourceText))

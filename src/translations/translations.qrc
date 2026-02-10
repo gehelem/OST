@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/translations">
+        <!-- Qt compiled translation files (.qm) embedded in executable -->
+        <!-- Generated from .ts files using lrelease -->
+        <file>ost_fr.qm</file>
+        <file>ost_en.qm</file>
+        <file>ost_de.qm</file>
+        <file>ost_es.qm</file>
+        <file>ost_it.qm</file>
+    </qresource>
+</RCC>

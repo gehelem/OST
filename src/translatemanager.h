@@ -46,16 +46,16 @@ class TranslateManager
         TranslateManager &operator=(const TranslateManager &) = delete;
 
         /**
-         * @brief Load multiple languages in parallel
+         * @brief Load multiple languages from embedded resources
          *
-         * Loads all specified language files (.qm) into memory at once.
+         * Loads all specified language files (.qm) from Qt resources (:/translations/).
+         * The .qm files are embedded in the executable at compile time.
          * This should be called once at startup.
          *
-         * @param translationsPath Path to directory containing ost_<lang>.qm files
          * @param languages List of ISO 639-1 language codes (e.g., {"fr", "en", "de"})
          * @return true if at least one language loaded successfully
          */
-        bool loadLanguages(const QString &translationsPath, const QStringList &languages);
+        bool loadLanguages(const QStringList &languages);
 
         /**
          * @brief Translate and apply arguments in one call (MAIN API)
@@ -99,7 +99,6 @@ class TranslateManager
         // Track pending file entries per language (avoid duplicates)
         QMap<QString, QSet<QString>> mPendingFileEntriesByLang;
 
-        QString mTranslationsPath;
         QMutex mMutex;  // Protect concurrent access
 
         /**

@@ -9,6 +9,8 @@
 
 int main(int argc, char *argv[])
 {
+    // Initialize Qt embedded resources (must be done before using them)
+    Q_INIT_RESOURCE(translations);
 
     QGuiApplication app(argc, argv, false);
     QGuiApplication::setOrganizationName("alazob.team");
@@ -73,6 +75,7 @@ int main(int argc, char *argv[])
 
     OST::Logger mLogger;
     OST::TranslateManager mTranslater;
+    mTranslater.loadLanguages({"fr", "en", "de", "it", "es"});
     mLogger.setFileLogging(true, logfile);
     mLogger.setLogLevel(OST::LogLevel::Info);
 

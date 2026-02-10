@@ -67,6 +67,42 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/QtZeroConf)
 
 include(CMakeCommon)
 
+# Generate .qm files from .ts files using lrelease
+set(TS_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/translations/ost_fr.ts
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/translations/ost_en.ts
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/translations/ost_de.ts
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/translations/ost_es.ts
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/translations/ost_it.ts
+)
+
+# Find lrelease executable
+find_program(QT_LRELEASE_EXECUTABLE NAMES lrelease lrelease-qt5)
+if(NOT QT_LRELEASE_EXECUTABLE)
+    message(FATAL_ERROR "lrelease not found. Cannot compile translation files.")
+endif()
+
+# Create custom commands to compile each .ts file to .qm
+set(QM_FILES)
+foreach(TS_FILE ${TS_FILES})
+    # Get the base name (e.g., ost_fr.ts -> ost_fr)
+    get_filename_component(TS_BASENAME ${TS_FILE} NAME_WE)
+    set(QM_FILE ${CMAKE_CURRENT_SOURCE_DIR}/src/translations/${TS_BASENAME}.qm)
+
+    # Add custom command to generate .qm from .ts
+    add_custom_command(
+        OUTPUT ${QM_FILE}
+        COMMAND ${QT_LRELEASE_EXECUTABLE} ${TS_FILE} -qm ${QM_FILE}
+        DEPENDS ${TS_FILE}
+        COMMENT "Compiling translation: ${TS_BASENAME}.ts -> ${TS_BASENAME}.qm"
+        VERBATIM
+    )
+
+    list(APPEND QM_FILES ${QM_FILE})
+endforeach()
+
+# Create a custom target that depends on all .qm files
+add_custom_target(translations ALL DEPENDS ${QM_FILES})
 
 # OST Server
 add_executable(ostserver
@@ -86,6 +122,7 @@ add_executable(ostserver
     ${CMAKE_CURRENT_SOURCE_DIR}/src/version.hh
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/resources.qrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/translations/translations.qrc
     ${CMAKE_CURRENT_SOURCE_DIR}/QtZeroConf/qzeroconfservice.h
     ${CMAKE_CURRENT_SOURCE_DIR}/QtZeroConf/qzeroconfglobal.h
     ${CMAKE_CURRENT_SOURCE_DIR}/QtZeroConf/qzeroconf.h
@@ -110,6 +147,8 @@ target_link_libraries(ostserver
     Threads::Threads
     z
 )
+# Ensure translations are compiled before linking ostserver
+add_dependencies(ostserver translations)
 #add_dependencies(ostserver generate_version)
 
 #########################

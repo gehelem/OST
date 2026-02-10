@@ -46,7 +46,7 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     dbmanager = new DBManager();
     dbmanager->dbInit(_dbpath, "controller");
     wshandler->dbmanager = dbmanager;
-    mLogger->info("TOTO", "CT");
+    logInfo("Available indi drivers");
 
 
     if (_libpath == "")
@@ -613,4 +613,16 @@ void Controller::updateGlobalModulesLov(void)
 
     // Emit event to update all modules with the new list
     emit controllerEvent("globallovupdate", "*", "loadedModules", lovData);
+}
+
+void Controller::logInfo(const QString &message)
+{
+    logInfo(message, {});
+}
+void Controller::logInfo(const QString &message, const QVariantList &args)
+{
+    QString translated = mTranslater->translateWithArgs(message, args, _lng);
+    mLogger->info(translated, "CT");
+
+
 }
