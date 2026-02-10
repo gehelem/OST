@@ -28,7 +28,7 @@
 Controller::Controller(const QString &webroot, const QString &dbpath,
                        const QString &libpath, const QString &conf, const QString &indiserver,
                        const QString &ssl, const QString &sslCert, const QString &sslKey, const QString &lng, const QString &grant,
-                       OST::Logger *logger)
+                       OST::Logger *logger, OST::TranslateManager *translate)
     :       _webroot(webroot),
             _dbpath(dbpath),
             _libpath(libpath),
@@ -36,7 +36,8 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
             _indiserver(indiserver),
             _lng(lng),
             _grant(grant),
-            mLogger(logger)
+            mLogger(logger),
+            mTranslater(translate)
 {
 
     startPublish();
@@ -45,6 +46,7 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     dbmanager = new DBManager();
     dbmanager->dbInit(_dbpath, "controller");
     wshandler->dbmanager = dbmanager;
+    mLogger->info("TOTO", "CT");
 
 
     if (_libpath == "")

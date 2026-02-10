@@ -72,6 +72,7 @@ int main(int argc, char *argv[])
     QString logfile = argParser.value(logFileOption);
 
     OST::Logger mLogger;
+    OST::TranslateManager mTranslater;
     mLogger.setFileLogging(true, logfile);
     mLogger.setLogLevel(OST::LogLevel::Info);
 
@@ -119,7 +120,8 @@ int main(int argc, char *argv[])
         sslKey,
         lng,
         grant,
-        &mLogger
+        &mLogger,
+        &mTranslater
     );
 
     Q_UNUSED(controller);

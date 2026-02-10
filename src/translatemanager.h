@@ -9,102 +9,73 @@ namespace OST
 {
 
 /**
- * @brief Hybrid translation manager supporting both custom JSON and Qt Linguist
+ * @brief Multi-language translation manager supporting concurrent clients
  *
- * Migration strategy:
- * 1. Try Qt Linguist translation first (QTranslator with tr())
- * 2. Fallback to legacy JSON translation if not found
- * 3. Mark missing translations for later migration
+ * This manager loads multiple languages in parallel at startup and provides
+ * thread-safe translation services without global state. Each translation
+ * request explicitly specifies the target language.
  *
- * Usage in C++ code:
- *   QString msg = TR("Camera");  // Simple translation
- *   QString msg = TR("iteration %1/%2").arg(current).arg(total);  // With parameters
+ * Key features:
+ * - No singleton pattern (can create multiple instances)
+ * - No default language (each call specifies language explicitly)
+ * - All languages loaded in parallel (QTranslator per language)
+ * - Thread-safe for concurrent multi-client usage
+ * - Automatic detection of missing translations per language
  *
- * Usage before WebSocket send:
- *   QString translated = TranslateManager::translateForClient(originalText);
+ * Usage:
+ *   TranslateManager manager;
+ *   manager.loadLanguages("/path/to/translations", {"fr", "en", "de"});
+ *   QString msg = manager.translateWithArgs("iteration %1/%2", {3, 10}, "fr");
+ *   // Result: "itération 3/10"
  */
-class TranslateManager : public QObject
+class TranslateManager
 {
-        Q_OBJECT
-
     public:
         /**
-         * @brief Get singleton instance
+         * @brief Constructor (public, no singleton)
          */
-        static TranslateManager* instance();
+        TranslateManager();
 
         /**
-         * @brief Set current language (e.g., "fr", "en")
-         * @param language ISO 639-1 language code
+         * @brief Destructor - cleans up all loaded translators
          */
-        void setLanguage(const QString &language);
+        ~TranslateManager();
+
+        // Delete copy/move constructors
+        TranslateManager(const TranslateManager &) = delete;
+        TranslateManager &operator=(const TranslateManager &) = delete;
 
         /**
-         * @brief Get current language
-         */
-        QString currentLanguage() const
-        {
-            return mCurrentLanguage;
-        }
-
-        /**
-         * @brief Translate text using Qt Linguist or fallback to legacy JSON
+         * @brief Load multiple languages in parallel
          *
-         * This is the main translation method. It tries Qt Linguist first,
-         * then falls back to the legacy Translate singleton.
+         * Loads all specified language files (.qm) into memory at once.
+         * This should be called once at startup.
          *
-         * @param sourceText Text to translate (English by default)
-         * @param context Translation context (usually class name)
-         * @return Translated text in current language
+         * @param translationsPath Path to directory containing ost_<lang>.qm files
+         * @param languages List of ISO 639-1 language codes (e.g., {"fr", "en", "de"})
+         * @return true if at least one language loaded successfully
          */
-        QString translate(const QString &sourceText, const char *context = nullptr);
+        bool loadLanguages(const QString &translationsPath, const QStringList &languages);
 
         /**
-         * @brief Translate with placeholder arguments
+         * @brief Translate and apply arguments in one call (MAIN API)
          *
-         * Example:
-         *   translate("iteration %1/%2", "Focus").arg(3).arg(10)
-         *   Result (fr): "itération 3/10"
-         *
-         * @param sourceText Text with %1, %2, etc. placeholders
-         * @param context Translation context
-         * @return Translated text (call .arg() on the result)
-         */
-        QString translate(const QString &sourceText, const char *context, int n);
-
-        /**
-         * @brief Check if Qt Linguist translation exists
-         * @param sourceText Source text to check
-         * @param context Translation context
-         * @return true if Qt translation exists, false if would use legacy fallback
-         */
-        bool hasQtTranslation(const QString &sourceText, const char *context = nullptr) const;
-
-        /**
-         * @brief Load Qt translation files (.qm) from directory
-         * @param translationsPath Path to directory containing .qm files
-         * @return true if loaded successfully
-         */
-        bool loadQtTranslations(const QString &translationsPath);
-
-        /**
-         * @brief Translate and apply arguments in one call
-         *
-         * This method translates the source text to the target language,
-         * then applies the arguments to create the final message.
+         * This is the primary translation method. It translates the source text
+         * to the target language, then applies the arguments to create the final message.
+         * Missing translations are automatically detected and logged.
          *
          * Example:
          *   translateWithArgs("iteration %1/%2", {3, 10}, "fr")
          *   Result: "itération 3/10"
          *
-         * @param sourceText Text with %1, %2 placeholders
-         * @param args List of arguments to substitute
-         * @param language Target language (if empty, uses current language)
+         * @param sourceText Text with %1, %2 placeholders (English source)
+         * @param args List of arguments to substitute (can be empty)
+         * @param language Target language code (REQUIRED, no default)
          * @return Fully translated and formatted text
          */
         QString translateWithArgs(const QString &sourceText,
                                   const QVariantList &args,
-                                  const QString &language = QString());
+                                  const QString &language);
 
         /**
          * @brief Apply arguments to a format string
@@ -118,48 +89,47 @@ class TranslateManager : public QObject
          */
         static QString applyArgs(const QString &format, const QVariantList &args);
 
-    signals:
-        /**
-         * @brief Emitted when language changes
-         * @param newLanguage New language code
-         */
-        void languageChanged(const QString &newLanguage);
-
     private:
-        TranslateManager();
-        ~TranslateManager();
-        TranslateManager(const TranslateManager &) = delete;
-        TranslateManager &operator=(const TranslateManager &) = delete;
+        // Map of QTranslator per language (all loaded in memory)
+        QMap<QString, QTranslator*> mTranslators;
 
-        QString mCurrentLanguage;
-        QTranslator *mQtTranslator;                // Qt Linguist translator
-        QSet<QString> mMissingTranslations;         // Track missing translations (runtime)
-        QMap<QString, QSet<QString>> mPendingFileEntriesByLang;  // Track pending entries per language
+        // Track missing translations per language (runtime detection)
+        QMap<QString, QSet<QString>> mMissingTranslationsByLang;
+
+        // Track pending file entries per language (avoid duplicates)
+        QMap<QString, QSet<QString>> mPendingFileEntriesByLang;
+
         QString mTranslationsPath;
-        QMutex mPendingMutex;
+        QMutex mMutex;  // Protect concurrent access
 
-        void saveMissingTranslations();  // Legacy (kept for compatibility)
-        void loadExistingPendingEntries(const QString &language);  // Load existing pending_<lang>.ts
-        void appendToPendingFile(const QString &sourceText, const char *context, const QString &language);  // Real-time append
-        QString getPendingFilePath(const QString &language) const;  // Get pending file path for language
+        /**
+         * @brief Internal translation method
+         * @param sourceText Text to translate
+         * @param language Target language
+         * @return Translated text (or source if not found)
+         */
+        QString translate(const QString &sourceText, const QString &language);
+
+        /**
+         * @brief Load existing pending entries to avoid duplicates
+         * @param language Target language
+         */
+        void loadExistingPendingEntries(const QString &language);
+
+        /**
+         * @brief Append missing translation to pending_<lang>.ts file
+         * @param sourceText Missing source text
+         * @param language Target language
+         */
+        void appendToPendingFile(const QString &sourceText, const QString &language);
+
+        /**
+         * @brief Get pending file path for language
+         * @param language Target language
+         * @return Path to translations_pending_<lang>.ts
+         */
+        QString getPendingFilePath(const QString &language) const;
 };
-
-/**
- * @brief Convenience macro for translation with context
- *
- * Usage:
- *   QString msg = TR("Camera");
- *   QString msg = TR("iteration %1/%2").arg(current).arg(total);
- */
-#define TR(text) TranslateManager::instance()->translate(text, "OST")
-
-/**
- * @brief Translation macro with explicit context
- *
- * Usage in classes:
- *   QString msg = TR_CTX("Focus", "Camera not connected");
- */
-#define TR_CTX(context, text) TranslateManager::instance()->translate(text, context)
 
 } // namespace OST
 

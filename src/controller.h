@@ -9,6 +9,7 @@
 #include "maincontrol.h"
 #include "wshandler.h"
 #include "logger.h"
+#include "translatemanager.h"
 
 
 /*!
@@ -24,7 +25,7 @@ class Controller : public QObject
         Controller(const QString &webroot, const QString &dbpath,
                    const QString &libpath, const QString &conf, const QString &indiserver,
                    const QString &ssl, const QString &sslCert, const QString &sslKey, const QString &lng, const QString &grant,
-                   OST::Logger *logger);
+                   OST::Logger *logger, OST::TranslateManager *translate);
         ~Controller() override;
     signals:
         void controllerEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
@@ -42,6 +43,7 @@ class Controller : public QObject
         WShandler   *wshandler;
         DBManager   *dbmanager;
         OST::Logger *mLogger;
+        OST::TranslateManager *mTranslater;
         Maincontrol *pMainControl;
         QProcess    *_process;
         QProcess    *_indiProcess;

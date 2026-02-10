@@ -11,173 +11,127 @@
 namespace OST
 {
 
-static TranslateManager *s_instance = nullptr;
-
 TranslateManager::TranslateManager()
-    : QObject(nullptr)
-    , mCurrentLanguage("fr")
-    , mQtTranslator(nullptr)
 {
-    // Initialize Qt translator
-    mQtTranslator = new QTranslator(this);
-
-    // Load existing pending entries for default language to avoid duplicates
-    loadExistingPendingEntries(mCurrentLanguage);
+    // No default language, no singleton
 }
 
 TranslateManager::~TranslateManager()
 {
-    saveMissingTranslations();
-}
-
-TranslateManager* TranslateManager::instance()
-{
-    if (s_instance == nullptr)
+    // Clean up all QTranslators
+    for (QTranslator *translator : mTranslators.values())
     {
-        s_instance = new TranslateManager();
+        QCoreApplication::removeTranslator(translator);
+        delete translator;
     }
-    return s_instance;
+    mTranslators.clear();
 }
 
-void TranslateManager::setLanguage(const QString &language)
+bool TranslateManager::loadLanguages(const QString &translationsPath, const QStringList &languages)
 {
-    if (mCurrentLanguage == language)
-        return;
+    QMutexLocker locker(&mMutex);
 
-    mCurrentLanguage = language;
+    mTranslationsPath = translationsPath;
+    int successCount = 0;
 
-    // Load pending entries for this language if not already loaded
-    if (!mPendingFileEntriesByLang.contains(language))
+    for (const QString &language : languages)
     {
+        // Create QTranslator for this language
+        QTranslator *translator = new QTranslator();
+
+        // Load .qm file: ost_<lang>.qm
+        QString qmFile = QString("ost_%1.qm").arg(language);
+        QString qmPath = QDir(translationsPath).filePath(qmFile);
+
+        if (QFile::exists(qmPath))
+        {
+            if (translator->load(qmPath))
+            {
+                // Install translator globally (Qt uses all installed translators)
+                QCoreApplication::installTranslator(translator);
+                mTranslators[language] = translator;
+                successCount++;
+                qDebug() << "Loaded translation:" << qmPath;
+            }
+            else
+            {
+                qWarning() << "Failed to load translation:" << qmPath;
+                delete translator;
+            }
+        }
+        else
+        {
+            qDebug() << "Translation file not found:" << qmPath;
+            delete translator;
+        }
+
+        // Load existing pending entries for this language (avoid duplicates)
         loadExistingPendingEntries(language);
     }
 
-    // Update Qt translator
-    if (mQtTranslator && !mTranslationsPath.isEmpty())
-    {
-        // Remove old translation
-        QCoreApplication::removeTranslator(mQtTranslator);
-
-        // Load new translation
-        QString qmFile = QString("ost_%1.qm").arg(language);
-        QString qmPath = QDir(mTranslationsPath).filePath(qmFile);
-
-        if (mQtTranslator->load(qmPath))
-        {
-            QCoreApplication::installTranslator(mQtTranslator);
-            //qDebug() << "Loaded Qt translation:" << qmPath;
-        }
-        else
-        {
-            qWarning() << "Failed to load Qt translation:" << qmPath;
-        }
-    }
-
-    emit languageChanged(language);
+    qDebug() << "Loaded" << successCount << "out of" << languages.size() << "languages";
+    return successCount > 0;
 }
 
-bool TranslateManager::loadQtTranslations(const QString &translationsPath)
-{
-    mTranslationsPath = translationsPath;
-
-    // Load translation for current language
-    QString qmFile = QString("ost_%1.qm").arg(mCurrentLanguage);
-    QString qmPath = QDir(translationsPath).filePath(qmFile);
-
-    if (QFile::exists(qmPath))
-    {
-        if (mQtTranslator->load(qmPath))
-        {
-            QCoreApplication::installTranslator(mQtTranslator);
-            //qDebug() << "Loaded Qt translation:" << qmPath;
-            return true;
-        }
-        else
-        {
-            qWarning() << "Failed to load Qt translation:" << qmPath;
-            return false;
-        }
-    }
-    else
-    {
-        qDebug() << "Qt translation file not found:" << qmPath << "(will use legacy only)";
-        return false;
-    }
-}
-
-QString TranslateManager::translate(const QString &sourceText, const char *context)
+QString TranslateManager::translate(const QString &sourceText, const QString &language)
 {
     if (sourceText.isEmpty())
         return sourceText;
 
-    // Strategy 1: Try Qt Linguist translation first
-    QString qtTranslation = QCoreApplication::translate(
-                                context ? context : "OST",
-                                sourceText.toUtf8().constData(),
-                                nullptr,
-                                -1
-                            );
+    QMutexLocker locker(&mMutex);
 
-    // Check if Qt actually translated it (not just returned source)
-    if (qtTranslation != sourceText)
+    // Check if translator exists for this language
+    if (!mTranslators.contains(language))
     {
-        // Qt found a translation
-        return qtTranslation;
+        qWarning() << "No translator loaded for language:" << language;
+        // Mark as missing and return source
+        if (!mMissingTranslationsByLang[language].contains(sourceText))
+        {
+            mMissingTranslationsByLang[language].insert(sourceText);
+            // Note: appendToPendingFile will be called outside mutex
+            locker.unlock();
+            appendToPendingFile(sourceText, language);
+            locker.relock();
+        }
+        return sourceText;
     }
 
-    // Strategy 3: Mark as missing and return source
-    if (!mMissingTranslations.contains(sourceText))
-    {
-        mMissingTranslations.insert(sourceText);
-        //qDebug() << "Missing translation (" << mCurrentLanguage << "):" << sourceText;
+    // Try to translate using the specific language's QTranslator
+    // Qt uses all installed translators, but we need to check this specific one
+    QString translation = mTranslators[language]->translate("OST", sourceText.toUtf8().constData());
 
-        // Append to pending_<lang>.ts file in real-time
-        appendToPendingFile(sourceText, context, mCurrentLanguage);
+    // Check if translation was found (QTranslator returns empty string if not found)
+    if (!translation.isEmpty())
+    {
+        return translation;
+    }
+
+    // Translation not found - mark as missing
+    if (!mMissingTranslationsByLang[language].contains(sourceText))
+    {
+        mMissingTranslationsByLang[language].insert(sourceText);
+        qDebug() << "Missing translation (" << language << "):" << sourceText;
+
+        // Append to pending file (unlock first to avoid deadlock)
+        locker.unlock();
+        appendToPendingFile(sourceText, language);
+        locker.relock();
     }
 
     return sourceText;
 }
 
-QString TranslateManager::translate(const QString &sourceText, const char *context, int n)
+QString TranslateManager::translateWithArgs(const QString &sourceText,
+        const QVariantList &args,
+        const QString &language)
 {
-    // For plural forms (not implemented yet, just forward to regular translate)
-    Q_UNUSED(n);
-    return translate(sourceText, context);
-}
+    // Translate the format string
+    QString translated = translate(sourceText, language);
 
-bool TranslateManager::hasQtTranslation(const QString &sourceText, const char *context) const
-{
-    QString qtTranslation = QCoreApplication::translate(
-                                context ? context : "OST",
-                                sourceText.toUtf8().constData(),
-                                nullptr,
-                                -1
-                            );
+    // Apply arguments
+    QString result = applyArgs(translated, args);
 
-    return (qtTranslation != sourceText);
-}
-
-void TranslateManager::saveMissingTranslations()
-{
-    if (mMissingTranslations.isEmpty())
-        return;
-
-    // Save missing translations to file for later migration
-    QFile file("translations_missing_qt.txt");
-    if (file.open(QIODevice::WriteOnly | QIODevice::Text))
-    {
-        QTextStream out(&file);
-        out << "# Missing Qt Linguist translations\n";
-        out << "# Add these to your source code with tr() and run lupdate\n\n";
-
-        for (const QString &text : mMissingTranslations)
-        {
-            out << text << "\n";
-        }
-
-        file.close();
-        //qDebug() << "Saved" << mMissingTranslations.size() << "missing translations to translations_missing_qt.txt";
-    }
+    return result;
 }
 
 QString TranslateManager::applyArgs(const QString &format, const QVariantList &args)
@@ -207,33 +161,6 @@ QString TranslateManager::applyArgs(const QString &format, const QVariantList &a
                 result = result.arg(arg.toString());
                 break;
         }
-    }
-
-    return result;
-}
-
-QString TranslateManager::translateWithArgs(const QString &sourceText,
-        const QVariantList &args,
-        const QString &language)
-{
-    // Temporarily switch language if specified
-    QString originalLanguage;
-    if (!language.isEmpty() && language != mCurrentLanguage)
-    {
-        originalLanguage = mCurrentLanguage;
-        setLanguage(language);
-    }
-
-    // Translate the format string
-    QString translated = translate(sourceText, "OST");
-
-    // Apply arguments
-    QString result = applyArgs(translated, args);
-
-    // Restore original language if changed
-    if (!originalLanguage.isEmpty())
-    {
-        setLanguage(originalLanguage);
     }
 
     return result;
@@ -298,15 +225,15 @@ void TranslateManager::loadExistingPendingEntries(const QString &language)
     }
     else
     {
-        //qDebug() << "Loaded" << count << "existing pending translations from" << pendingFilePath;
+        qDebug() << "Loaded" << count << "existing pending translations from" << pendingFilePath;
     }
 
     mPendingFileEntriesByLang[language] = entries;
 }
 
-void TranslateManager::appendToPendingFile(const QString &sourceText, const char *context, const QString &language)
+void TranslateManager::appendToPendingFile(const QString &sourceText, const QString &language)
 {
-    QMutexLocker locker(&mPendingMutex);
+    QMutexLocker locker(&mMutex);
 
     // Check if already in file for this language
     if (mPendingFileEntriesByLang[language].contains(sourceText))
@@ -317,7 +244,7 @@ void TranslateManager::appendToPendingFile(const QString &sourceText, const char
     // Mark as added to file
     mPendingFileEntriesByLang[language].insert(sourceText);
 
-    QString contextStr = context ? QString(context) : "OST";
+    QString contextStr = "OST";  // Fixed context
     QString pendingFilePath = getPendingFilePath(language);
 
     // Read existing file or create structure
