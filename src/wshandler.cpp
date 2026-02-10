@@ -128,8 +128,10 @@ void WShandler::onNewConnection()
     connect(pSocket, &QWebSocket::disconnected, this, &WShandler::socketDisconnected);
     //qDebug() << pSocket << "-" << pSocket->peerAddress().toString();
     m_clients << pSocket;
-    mClientGrants[pSocket->peerAddress().toString()] = "-1";
-
+    if (mServerGrant == "0") mClientGrants[pSocket->peerAddress().toString()] = "1"; // full access for anyone
+    if (mServerGrant == "1") mClientGrants[pSocket->peerAddress().toString()] =
+            "0"; // read only for anyone - need grants to write
+    if (mServerGrant == "2") mClientGrants[pSocket->peerAddress().toString()] = "-1"; // access grant required for anyone
 }
 
 
@@ -137,7 +139,8 @@ void WShandler::processTextMessage(QString message)
 {
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
     QString clientGrant = mClientGrants[pClient->peerAddress().toString()];
-    if ((clientGrant != "0") && (clientGrant != "1") && (clientGrant != "pending") && (mServerGrant == "1"))
+
+    if (clientGrant == "-1")
     {
         sendMessage("request identification " + pClient->peerAddress().toString());
         QFile jsonFile(":loginpage.json");

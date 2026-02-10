@@ -32,8 +32,8 @@ find_package(Nova REQUIRED)
 find_package(GSL REQUIRED)
 #find_package(OpenCV REQUIRED )
 find_package(WCSLIB REQUIRED)
-find_package(QT NAMES Qt5 COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql REQUIRED)
-find_package(Qt5 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql)
+find_package(QT NAMES Qt5 COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql Xml REQUIRED)
+find_package(Qt5 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql Xml)
 find_package(StellarSolver REQUIRED)
 find_library(avahi-client-lib avahi-client REQUIRED)
 find_library(avahi-common-lib avahi-common REQUIRED)
@@ -75,6 +75,10 @@ add_executable(ostserver
     ${CMAKE_CURRENT_SOURCE_DIR}/src/controller.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/wshandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/wshandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/logger.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/logger.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/translatemanager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/translatemanager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/datastore.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/datastore.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/dbmanager.cpp
@@ -101,12 +105,13 @@ target_link_libraries(ostserver
     Qt${QT_VERSION_MAJOR}::WebSockets
     Qt${QT_VERSION_MAJOR}::Sql
     Qt${QT_VERSION_MAJOR}::Network
+    Qt${QT_VERSION_MAJOR}::Xml
     ${avahi-client-lib}
     ${avahi-common-lib}
     Threads::Threads
     z
 )
-add_dependencies(ostserver generate_version)
+#add_dependencies(ostserver generate_version)
 
 #########################
 #### modules libraries ##
@@ -264,7 +269,7 @@ target_link_libraries(ostbasemodule
     Threads::Threads
     z
 )
-add_dependencies(ostbasemodule generate_version)
+#add_dependencies(ostbasemodule generate_version)
 
 # Translate utility
 add_library(osttranslate STATIC
@@ -375,16 +380,16 @@ install(TARGETS
 # This ensures version information is always up-to-date with each build
 
 # Create a custom target that always runs
-add_custom_target(
-    generate_version ALL
-    COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/generate-version.sh"
-            "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
-            "${CMAKE_CURRENT_SOURCE_DIR}/src/version.cc.in"
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-    BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
-    COMMENT "Generating version.cc from git information..."
-    VERBATIM
-)
+#add_custom_target(
+#    generate_version ALL
+#    COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/generate-version.sh"
+#            "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
+#            "${CMAKE_CURRENT_SOURCE_DIR}/src/version.cc.in"
+#    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+#    BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
+#    COMMENT "Generating version.cc from git information..."
+#    VERBATIM
+#)
 
 # Add version.cc to sources
 list(APPEND SOURCES "${CMAKE_CURRENT_BINARY_DIR}/version.cc" version.hh)

@@ -6,10 +6,9 @@
 #include <QtSql/QSqlQuery>
 //#include <QtSql/QSqlError>
 #include "qzeroconf.h"
-
 #include "maincontrol.h"
-
 #include "wshandler.h"
+#include "logger.h"
 
 
 /*!
@@ -41,6 +40,7 @@ class Controller : public QObject
         QStringList _availableIndiDrivers;
         WShandler   *wshandler;
         DBManager   *dbmanager;
+        OST::Logger *mLogger;
         Maincontrol *pMainControl;
         QProcess    *_process;
         QProcess    *_indiProcess;
@@ -50,8 +50,6 @@ class Controller : public QObject
         QStringList mFilesList;
         QStringList mFoldersList;
         QString mSelectedFolder;
-
-
 
         bool loadModule(QString lib, QString name, QString label, QString profile);
         void loadConf(const QString &pConf);
