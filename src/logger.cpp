@@ -1,5 +1,4 @@
 #include "logger.h"
-#include <QCoreApplication>
 #include <QDebug>
 #include <qjsonarray.h>
 #include <qjsonobject.h>
@@ -78,7 +77,7 @@ void Logger::setFileLogging(bool enabled, const QString &filePath)
         }
         else
         {
-            qCritical() << QCoreApplication::translate("Logger", "Can't open logfile") << filePath;
+            qCritical() << "Can't open logfile" << filePath;
             delete pLogFile;
             pLogFile = nullptr;
             mFileLoggingEnabled = false;
@@ -149,17 +148,17 @@ QString Logger::getLevelPrefix(LogLevel level) const
     switch (level)
     {
         case LogLevel::Debug:
-            return QCoreApplication::translate("Logger", "[DEBUG]");
+            return "[DEBUG]";
         case LogLevel::Info:
-            return QCoreApplication::translate("Logger", "[INFO]");
+            return "[INFO]";
         case LogLevel::Warning:
-            return QCoreApplication::translate("Logger", "[WARNING]");
+            return "[WARNING]";
         case LogLevel::Error:
-            return QCoreApplication::translate("Logger", "[ERROR]");
+            return "[ERROR]";
         case LogLevel::Critical:
-            return QCoreApplication::translate("Logger", "[CRITICAL]");
+            return "[CRITICAL]";
         default:
-            return QCoreApplication::translate("Logger", "[UNKNOWN]");
+            return "[UNKNOWN]";
     }
 }
 
@@ -176,7 +175,7 @@ void Logger::writeToFile(const QString &formattedMessage)
         }
         else
         {
-            qCritical() << QCoreApplication::translate("Logger", "Can't open logfile") << mLogFilePath;
+            qCritical() << "Can't open logfile" << mLogFilePath;
             delete pLogFile;
             pLogFile = nullptr;
             mFileLoggingEnabled = false;
