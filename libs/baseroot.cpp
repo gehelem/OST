@@ -1,11 +1,41 @@
 #include <QtCore>
 #include "baseroot.h"
+#include "logger.h"
 
 Baseroot::Baseroot()
 {
 }
 Baseroot::~Baseroot()
 {
+}
+
+// ============================================================================
+// NEW SYSTEM - Helper methods that emit the signal
+// ============================================================================
+
+void Baseroot::logDebug(const QString &message, const QVariantList &args)
+{
+    emit logSignal(OST::LogLevel::Debug, message, args, getModuleName());
+}
+
+void Baseroot::logInfo(const QString &message, const QVariantList &args)
+{
+    emit logSignal(OST::LogLevel::Info, message, args, getModuleName());
+}
+
+void Baseroot::logWarning(const QString &message, const QVariantList &args)
+{
+    emit logSignal(OST::LogLevel::Warning, message, args, getModuleName());
+}
+
+void Baseroot::logError(const QString &message, const QVariantList &args)
+{
+    emit logSignal(OST::LogLevel::Error, message, args, getModuleName());
+}
+
+void Baseroot::logCritical(const QString &message, const QVariantList &args)
+{
+    emit logSignal(OST::LogLevel::Critical, message, args, getModuleName());
 }
 QVariantMap Baseroot::getMessages(void)
 {

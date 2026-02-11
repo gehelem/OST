@@ -6,9 +6,13 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDateTime>
+#include <QVariantList>
 
 namespace  OST
 {
+
+// Forward declaration
+class TranslateManager;
 
 /**
  * @brief Logging levels
@@ -125,6 +129,24 @@ class Logger : public QObject
             mHistory.clear();
         };
 
+        /**
+         * @brief Configure TranslateManager to translate messages
+         * @param translator Pointer to TranslateManager
+         * @param language Language for server console
+         */
+        void setTranslateManager(OST::TranslateManager* translator, const QString& language);
+
+    public slots:
+        /**
+         * @brief Slot that listens to the universal logSignal() signal
+         * @param level Log level
+         * @param message Translation key
+         * @param args Arguments for parametric translation
+         * @param context Message context/source
+         */
+        void onLog(OST::LogLevel level, const QString &message,
+                   const QVariantList &args, const QString &context);
+
     private:
 
         /**
@@ -147,6 +169,8 @@ class Logger : public QObject
         QFile* pLogFile;
         QTextStream* pLogStream;
         QList<LogMess> mHistory;
+        OST::TranslateManager* mTranslater = nullptr;
+        QString mServerLanguage;
 };
 
 }

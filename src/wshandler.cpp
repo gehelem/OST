@@ -2,7 +2,9 @@
 #include <QtCore>
 #include <QFile>
 #include <QSslConfiguration>
+#include <QJsonDocument>
 #include "wshandler.h"
+#include "translatemanager.h"
 
 /*!
 
@@ -275,6 +277,7 @@ void WShandler::socketDisconnected()
     if (pClient)
     {
         m_clients.removeAll(pClient);
+        mClientLanguages.remove(pClient);
         pClient->deleteLater();
         mClientGrants.remove(pClient->peerAddress().toString());
 
@@ -469,4 +472,86 @@ void WShandler::processFileEvent(const QString &eventType, const QStringList &ev
     obj["evt"] = eventType;
     obj["fileevent"] = QJsonArray::fromStringList(eventData);
     sendJsonMessage(obj);
+}
+
+void WShandler::setTranslateManager(OST::TranslateManager* translator)
+{
+    mTranslater = translator;
+}
+
+void WShandler::setClientLanguage(QWebSocket* client, const QString& language)
+{
+    if (client && !language.isEmpty())
+    {
+        mClientLanguages[client] = language;
+        qDebug() << "Client" << client->peerAddress().toString() << "language set to:" << language;
+    }
+}
+
+QString WShandler::logLevelToEventType(OST::LogLevel level)
+{
+    switch (level)
+    {
+        case OST::LogLevel::Debug:
+        case OST::LogLevel::Info:
+            return "mm";  // module message
+        case OST::LogLevel::Warning:
+            return "mw";  // module warning
+        case OST::LogLevel::Error:
+        case OST::LogLevel::Critical:
+            return "me";  // module error
+        default:
+            return "mm";
+    }
+}
+
+void WShandler::onLog(OST::LogLevel level, const QString &message,
+                      const QVariantList &args, const QString &context)
+{
+    if (!mTranslater)
+    {
+        qWarning() << "WShandler: TranslateManager not set, cannot translate messages";
+        return;
+    }
+
+    QString eventType = logLevelToEventType(level);
+    QDateTime dt = QDateTime::currentDateTime();
+
+    // Broadcast to each client in their language
+    for (QWebSocket* client : m_clients)
+    {
+        // Get client language (default: "en")
+        QString clientLang = mClientLanguages.value(client, "en");
+
+        // Translate message to client's language
+        QString translatedMessage = mTranslater->translateWithArgs(message, args, clientLang);
+
+        // Build JSON
+        QJsonObject obj;
+        obj["evt"] = eventType;
+
+        QJsonObject modules;
+        QJsonObject moduleData;
+
+        if (level == OST::LogLevel::Warning)
+        {
+            moduleData["warning"] = translatedMessage;
+        }
+        else if (level == OST::LogLevel::Error || level == OST::LogLevel::Critical)
+        {
+            moduleData["error"] = translatedMessage;
+        }
+        else
+        {
+            moduleData["message"] = translatedMessage;
+        }
+
+        moduleData["datetime"] = dt.toString(Qt::ISODateWithMs);
+
+        modules[context] = moduleData;
+        obj["modules"] = modules;
+
+        // Send to client
+        client->sendTextMessage(QJsonDocument(obj).toJson(QJsonDocument::Compact));
+    }
 }

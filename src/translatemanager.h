@@ -87,7 +87,7 @@ class TranslateManager
          * @param args Arguments to substitute
          * @return Formatted string
          */
-        static QString applyArgs(const QString &format, const QVariantList &args);
+        static QString applyArgs(const QString &format, const QVariantList &args = {});
 
     private:
         // Map of QTranslator per language (all loaded in memory)

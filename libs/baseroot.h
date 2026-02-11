@@ -11,8 +11,15 @@
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
 
+namespace OST
+{
+    enum class LogLevel;
+}
+
 class Baseroot : public QObject
 {
+    Q_OBJECT
+
     public:
         Baseroot();
         ~Baseroot();
@@ -37,7 +44,33 @@ class Baseroot : public QObject
             Q_UNUSED(pEventKey);
             Q_UNUSED(pEventData);
         };
+
+    signals:
+        /**
+         * @brief Signal emitted for all log messages
+         * @param level Log level (Debug, Info, Warning, Error, Critical)
+         * @param message Translation key for the message
+         * @param args Dynamic arguments for parametric translation
+         * @param context Context/source (module name, component, etc.)
+         */
+        void logSignal(OST::LogLevel level, const QString &message,
+                       const QVariantList &args, const QString &context);
+
     protected:
+        /**
+         * @brief Helper methods to facilitate usage
+         */
+        void logDebug(const QString &message, const QVariantList &args = {});
+        void logInfo(const QString &message, const QVariantList &args = {});
+        void logWarning(const QString &message, const QVariantList &args = {});
+        void logError(const QString &message, const QVariantList &args = {});
+        void logCritical(const QString &message, const QVariantList &args = {});
+
+        /**
+         * @brief Returns the module/component name (to override in derived classes)
+         */
+        virtual QString getModuleName() const { return "Unknown"; }
+
     private:
         QList<QVariantMap> mMessages;
         QList<QVariantMap> mErrors;

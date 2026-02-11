@@ -41,12 +41,25 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
 {
 
     startPublish();
+
+    // Configure Logger with TranslateManager
+    mLogger->setTranslateManager(mTranslater, _lng);
+
+    // Configure WShandler
     wshandler = new WShandler(this, ssl, sslCert, sslKey, _grant);
+    wshandler->setTranslateManager(mTranslater);
     connect(wshandler, &WShandler::externalEvent, this, &Controller::OnExternalEvent);
+
+    // Configure DBManager
     dbmanager = new DBManager();
     dbmanager->dbInit(_dbpath, "controller");
     wshandler->dbmanager = dbmanager;
-    logInfo("Available indi drivers");
+
+    // Connect DBManager to log system
+    connect(dbmanager, &Baseroot::logSignal, mLogger, &OST::Logger::onLog);
+    connect(dbmanager, &Baseroot::logSignal, wshandler, &WShandler::onLog);
+
+    logInfo("iteration %1/%2", {10, 20});
 
 
     if (_libpath == "")
@@ -78,6 +91,10 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     pMainControl->setAvailableModuleLibs(_availableModuleLibs);
     pMainControl->setIndiDriverList(_availableIndiDrivers);
     pMainControl->sendDump();
+
+    // Connect MainControl to log system
+    connect(pMainControl, &Baseroot::logSignal, mLogger, &OST::Logger::onLog);
+    connect(pMainControl, &Baseroot::logSignal, wshandler, &WShandler::onLog);
 
     loadConf(_conf);
 
@@ -175,6 +192,11 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     connect(mod, &Basemodule::loadOtherModule, this, &Controller::loadModule);
     connect(this, &Controller::controllerEvent, mod, &Basemodule::OnExternalEvent);
     //connect(wshandler, &WShandler::externalEvent, mod, &Basemodule::OnExternalEvent);
+
+    // Connect module to log system
+    connect(mod, &Baseroot::logSignal, mLogger, &OST::Logger::onLog);
+    connect(mod, &Baseroot::logSignal, wshandler, &WShandler::onLog);
+
     mod->OnExternalEvent("afterinit", name, QString(), QVariantMap());
     mod->sendDump();
 

@@ -1,4 +1,5 @@
 #include "logger.h"
+#include "translatemanager.h"
 #include <QDebug>
 #include <qjsonarray.h>
 #include <qjsonobject.h>
@@ -201,5 +202,25 @@ QJsonArray Logger::getJsonHistory(void)
     }
     return j;
 };
+
+void Logger::setTranslateManager(OST::TranslateManager* translator, const QString& language)
+{
+    mTranslater = translator;
+    mServerLanguage = language;
+}
+
+void Logger::onLog(OST::LogLevel level, const QString &message,
+                   const QVariantList &args, const QString &context)
+{
+    // Translate the message to server language
+    QString translatedMessage = message;
+    if (mTranslater && !mServerLanguage.isEmpty())
+    {
+        translatedMessage = mTranslater->translateWithArgs(message, args, mServerLanguage);
+    }
+
+    // Log via existing system
+    log(level, translatedMessage, context);
+}
 
 }

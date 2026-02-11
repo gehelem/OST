@@ -99,6 +99,9 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
 
     connect(this, &Dummy::newImage, this, &Dummy::OnNewImage);
 
+    logInfo("Test log %1", {100});
+
+
 }
 
 Dummy::~Dummy()
@@ -109,6 +112,7 @@ Dummy::~Dummy()
 void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                               const QVariantMap &eventData)
 {
+    logInfo("Test log %1", {100});
     if (getModuleName() == eventModule )
     {
         foreach(const QString &keyprop, eventData.keys())
