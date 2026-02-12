@@ -23,6 +23,7 @@ class DBManager : public Datastore
     public:
         DBManager();
         ~DBManager();
+        QString getModuleName() const override { return "DBManager"; }
         bool dbInit(const QString &pDbPath, const QString &pConnectionName);
         bool getDbProfile(const QString &pModuleType, const QString &pProfileName, QVariantMap &result );
         bool setDbProfile(const QString &pModuleType, const QString &pProfileName, QVariantMap &profile );

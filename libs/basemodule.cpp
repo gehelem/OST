@@ -456,7 +456,7 @@ QVariantMap Basemodule::getAvailableModuleLibs(void)
 {
     return mAvailableModuleLibs;
 }
-QString Basemodule::getModuleName()
+QString Basemodule::getModuleName() const
 {
     return mModuleName;
 }

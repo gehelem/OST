@@ -99,9 +99,22 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
 
     connect(this, &Dummy::newImage, this, &Dummy::OnNewImage);
 
+
+    QTimer *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &Dummy::onTimer);
+    timer->start(2000);
+
+}
+
+void Dummy::onTimer()
+{
     logInfo("Test log %1", {100});
-
-
+    logDebug("Available indi drivers");
+    logDebug("Debug");
+    logInfo("Info");
+    logWarning("Warning");
+    logError("Error");
+    logCritical("Critical");
 }
 
 Dummy::~Dummy()
@@ -112,7 +125,6 @@ Dummy::~Dummy()
 void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                               const QVariantMap &eventData)
 {
-    logInfo("Test log %1", {100});
     if (getModuleName() == eventModule )
     {
         foreach(const QString &keyprop, eventData.keys())

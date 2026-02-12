@@ -26,7 +26,7 @@ class Basemodule : public DBManager
         QString getWebroot(void);
         QVariantMap getModuleInfo(void);
         QVariantMap getAvailableModuleLibs(void);
-        QString getModuleName();
+        QString getModuleName() const override;
         QString getModuleLabel();
         QString getModuleDescription();
         QString getModuleVersion();

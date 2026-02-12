@@ -13,12 +13,12 @@
 
 namespace OST
 {
-    enum class LogLevel;
+enum class LogLevel;
 }
 
 class Baseroot : public QObject
 {
-    Q_OBJECT
+        Q_OBJECT
 
     public:
         Baseroot();
@@ -26,6 +26,13 @@ class Baseroot : public QObject
         QVariantMap getMessages(void);
         QVariantMap getErrors(void);
         QVariantMap getWarnings(void);
+        /**
+         * @brief Returns the module/component name (to override in derived classes)
+         */
+        virtual QString getModuleName() const
+        {
+            return "Unknown";
+        }
         void resetMessages(void);
         void resetErrors(void);
         void resetWarnings(void);
@@ -66,10 +73,6 @@ class Baseroot : public QObject
         void logError(const QString &message, const QVariantList &args = {});
         void logCritical(const QString &message, const QVariantList &args = {});
 
-        /**
-         * @brief Returns the module/component name (to override in derived classes)
-         */
-        virtual QString getModuleName() const { return "Unknown"; }
 
     private:
         QList<QVariantMap> mMessages;

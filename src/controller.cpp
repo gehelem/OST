@@ -643,8 +643,9 @@ void Controller::logInfo(const QString &message)
 }
 void Controller::logInfo(const QString &message, const QVariantList &args)
 {
-    QString translated = mTranslater->translateWithArgs(message, args, _lng);
-    mLogger->info(translated, "CT");
+    // Log to console (server language)
+    mLogger->onLog(OST::LogLevel::Info, message, args, "CT");
 
-
+    // Broadcast to WebSocket clients (each in their language)
+    wshandler->onLog(OST::LogLevel::Info, message, args, "CT");
 }

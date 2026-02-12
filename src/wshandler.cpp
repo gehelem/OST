@@ -189,6 +189,19 @@ void WShandler::processTextMessage(QString message)
     {
         emit externalEvent("Freadall", "*", "*", QVariantMap());
     }
+
+    // Handle language setting from client
+    if (obj["evt"].toString() == "setlanguage")
+    {
+        QString language = obj["language"].toString();
+        if (!language.isEmpty())
+        {
+            setClientLanguage(pClient, language);
+            sendMessage("Client language set to: " + language);
+        }
+        return;
+    }
+
     /* ignore update messages from readonly users */
     if (clientGrant == "0") return;
 
@@ -479,7 +492,7 @@ void WShandler::setTranslateManager(OST::TranslateManager* translator)
     mTranslater = translator;
 }
 
-void WShandler::setClientLanguage(QWebSocket* client, const QString& language)
+void WShandler::setClientLanguage(QWebSocket* client, const QString &language)
 {
     if (client && !language.isEmpty())
     {
@@ -493,15 +506,17 @@ QString WShandler::logLevelToEventType(OST::LogLevel level)
     switch (level)
     {
         case OST::LogLevel::Debug:
+            return "md";
         case OST::LogLevel::Info:
-            return "mm";  // module message
+            return "mi";
         case OST::LogLevel::Warning:
-            return "mw";  // module warning
+            return "mw";
         case OST::LogLevel::Error:
+            return "me";
         case OST::LogLevel::Critical:
-            return "me";  // module error
+            return "mc";
         default:
-            return "mm";
+            return "mc";
     }
 }
 

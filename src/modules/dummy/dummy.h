@@ -46,6 +46,8 @@ class MODULE_INIT Dummy : public IndiModule
         OST::ElementString *dyntext2;
     signals:
         void newImage();
+    private slots:
+        void onTimer(void);
 
 
 };
