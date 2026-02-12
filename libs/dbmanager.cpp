@@ -23,7 +23,7 @@ bool DBManager::dbInit(const QString &pDbPath, const QString &pConnectionName)
         mQuery = QSqlQuery(mDb);
         if(!mDb.open())
         {
-            sendError("dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+            logError("dbOpen - ERROR: %1 - %2", {mDb.databaseName(), mDb.lastError().text()});
             return false;
         }
         if (!mDbExists) CreateDatabaseStructure();
@@ -32,7 +32,7 @@ bool DBManager::dbInit(const QString &pDbPath, const QString &pConnectionName)
     }
     else
     {
-        sendError("DatabaseConnect - ERROR: QSQLITE driver unavailable");
+        logError("DatabaseConnect - ERROR: QSQLITE driver unavailable");
         return false;
     }
     return false;
@@ -42,7 +42,7 @@ bool DBManager::dbInit(const QString &pDbPath, const QString &pConnectionName)
 void DBManager::CreateDatabaseStructure()
 {
 
-    sendMessage("OST database creation with default values");
+    logInfo("OST database creation with default values");
     QFile file;
     file.setFileName(":db.sql");
     file.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -58,8 +58,8 @@ void DBManager::CreateDatabaseStructure()
         {
             if (!mQuery.exec(sql))
             {
-                sendError("CreateDatabaseStructure ERROR SQL =" + sql);
-                sendError("CreateDatabaseStructure - ERROR : " + mQuery.lastError().text());
+                logError("CreateDatabaseStructure ERROR SQL = %1", {sql});
+                logError("CreateDatabaseStructure - ERROR : %1", {mQuery.lastError().text()});
             }
         }
 
@@ -73,7 +73,7 @@ bool DBManager::setDbProfile(const QString &pModuleType, const QString &pProfile
 {
     if(!mDb.open())
     {
-        sendError("setDbProfile dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+        logError("setDbProfile dbOpen - ERROR: %1 - %2", {mDb.databaseName(), mDb.lastError().text()});
         return false;
     }
 
@@ -85,8 +85,8 @@ bool DBManager::setDbProfile(const QString &pModuleType, const QString &pProfile
                   pProfileName + "','" + strJson + "');";
     if (!mQuery.exec(sql))
     {
-        sendError("setProfile - ERROR SQL =" + sql);
-        sendError("setProfile - ERROR : " + mQuery.lastError().text());
+        logError("setProfile - ERROR SQL = %1", {sql});
+        logError("setProfile - ERROR : %1", {mQuery.lastError().text()});
         mDb.close();
         return false;
     }
@@ -98,15 +98,15 @@ bool DBManager::getDbProfile(const QString &pModuleType, const QString &pProfile
 {
     if(!mDb.open())
     {
-        sendError("getDbProfile dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+        logError("getDbProfile dbOpen - ERROR: %1 - %2", {mDb.databaseName(), mDb.lastError().text()});
         return false;
     }
     QString sql = "SELECT ALLVALUES FROM PROFILES WHERE MODULETYPE='" + pModuleType + "' AND PROFILENAME='" + pProfileName +
                   "'";
     if (!mQuery.exec(sql))
     {
-        sendError("getProfile - ERROR SQL =" + sql);
-        sendError("getProfile - ERROR : " + mQuery.lastError().text());
+        logError("getDbProfile - ERROR SQL = %1", {sql});
+        logError("getDbProfile - ERROR : %1", {mQuery.lastError().text()});
         mDb.close();
         return false;
     }
@@ -125,14 +125,15 @@ bool DBManager::getDbProfiles(QString moduleType, QVariantMap &result )
 {
     if(!mDb.open())
     {
-        sendError("getDbProfiles dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+        logError("getDbProfiles dbOpen - ERROR: %1 - %2", {mDb.databaseName(), mDb.lastError().text()});
         return false;
     }
     QString sql = "SELECT PROFILENAME,ALLVALUES FROM PROFILES WHERE MODULETYPE='" + moduleType + "' ";
+    logInfo("SQL = %1", {sql});
     if (!mQuery.exec(sql))
     {
-        sendError("getProfiles - ERROR SQL =" + sql);
-        sendError("getProfiles - ERROR : " + mQuery.lastError().text());
+        logError("getDbProfiles - ERROR SQL = %1", {sql});
+        logError("getDbProfiles - ERROR : %1", {mQuery.lastError().text()});
         mDb.close();
         return false;
     }
@@ -151,14 +152,14 @@ bool DBManager::getDbConfiguration(const QString &pConfigName, QVariantMap &resu
 {
     if(!mDb.open())
     {
-        sendError("getDbConfiguration dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+        logError("getDbConfiguration dbOpen - ERROR: %1 - %2", {mDb.databaseName(), mDb.lastError().text()});
         return false;
     }
     QString sql = "SELECT MODULENAME,MODULETYPE,PROFILENAME FROM CONFIGURATIONS WHERE CONFIGNAME='" + pConfigName + "'";
     if (!mQuery.exec(sql))
     {
-        sendError("getConfiguration - ERROR SQL =" + sql);
-        sendError("getConfiguration - ERROR : " + mQuery.lastError().text());
+        logError("getDbConfiguration - ERROR SQL = %1", {sql});
+        logError("getDbConfiguration - ERROR : %1", {mQuery.lastError().text()});
         mDb.close();
         return false;
     }
@@ -176,15 +177,15 @@ bool DBManager::saveDbConfiguration(const QString &pConfigName, QMap<QString, QM
 {
     if(!mDb.open())
     {
-        sendError("setDbConfiguration dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+        logError("saveDbConfiguration dbOpen - ERROR: %1 - %2", {mDb.databaseName(), mDb.lastError().text()});
         return false;
     }
 
     QString sql = "DELETE FROM CONFIGURATIONS WHERE CONFIGNAME= '" + pConfigName + "';";
     if (!mQuery.exec(sql))
     {
-        sendError("setDbConfiguration - ERROR SQL =" + sql);
-        sendError("setDbConfiguration - ERROR : " + mQuery.lastError().text());
+        logError("saveDbConfiguration - ERROR SQL = %1", {sql});
+        logError("saveDbConfiguration - ERROR : %1", {mQuery.lastError().text()});
         mDb.close();
         return false;
     }
@@ -199,8 +200,8 @@ bool DBManager::saveDbConfiguration(const QString &pConfigName, QMap<QString, QM
                       + "','" + label + "','" + type + "','" + profile + "');";
         if (!mQuery.exec(sql))
         {
-            sendError("setDbConfiguration - ERROR SQL =" + sql);
-            sendError("setDbConfiguration - ERROR : " + mQuery.lastError().text());
+            logError("saveDbConfiguration - ERROR SQL = %1", {sql});
+            logError("saveDbConfiguration - ERROR : %1", {mQuery.lastError().text()});
             mDb.close();
             return false;
         }
@@ -215,14 +216,14 @@ bool DBManager::getDbConfigurations(QVariantMap &result )
 {
     if(!mDb.open())
     {
-        sendError("getDbConfigurations dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+        logError("getDbConfigurations dbOpen - ERROR: %1 - %2", {mDb.databaseName(), mDb.lastError().text()});
         return false;
     }
     QString sql = "SELECT CONFIGNAME,MODULENAME,MODULETYPE,PROFILENAME FROM CONFIGURATIONS";
     if (!mQuery.exec(sql))
     {
-        sendError("getDbConfigurations - ERROR SQL =" + sql);
-        sendError("getDbConfigurations - ERROR : " + mQuery.lastError().text());
+        logError("getDbConfigurations - ERROR SQL = %1", {sql});
+        logError("getDbConfigurations - ERROR : %1", {mQuery.lastError().text()});
         mDb.close();
         return false;
     }
@@ -241,7 +242,7 @@ bool DBManager::searchCatalog(const QString &pArgument, QList<catalogResult> &pR
 {
     if(!mDb.open())
     {
-        sendError("searchCatalog dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+        logError("searchCatalog dbOpen - ERROR: %1 - %2", {mDb.databaseName(), mDb.lastError().text()});
         return false;
     }
     QString argumentWithoutBlanks = pArgument;
@@ -252,8 +253,8 @@ bool DBManager::searchCatalog(const QString &pArgument, QList<catalogResult> &pR
     sql = sql + " OR UPPER(NAME) LIKE UPPER('%" + argumentWithoutBlanks + "%')";
     if (!mQuery.exec(sql))
     {
-        sendError("searchCatalog - ERROR SQL =" + sql);
-        sendError("searchCatalog - ERROR : " + mQuery.lastError().text());
+        logError("searchCatalog - ERROR SQL = %1", {sql});
+        logError("searchCatalog - ERROR : %1", {mQuery.lastError().text()});
         mDb.close();
         return false;
     }
@@ -279,14 +280,14 @@ bool DBManager::populateCatalog(const QString &pFileName, const QString &pName)
 {
     if(!mDb.open())
     {
-        sendError("populateCatalog dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+        logError("populateCatalog dbOpen - ERROR: %1 - %2", {mDb.databaseName(), mDb.lastError().text()});
         return false;
     }
     QString sql = "DELETE FROM CATALOGS WHERE CATALOG='" + pName + "'";
     if (!mQuery.exec(sql))
     {
-        sendError("searchCatalog - ERROR SQL =" + sql);
-        sendError("searchCatalog - ERROR : " + mQuery.lastError().text());
+        logError("searchCatalog - ERROR SQL = %1", {sql});
+        logError("searchCatalog - ERROR : %1", {mQuery.lastError().text()});
         mDb.close();
         return false;
     }
@@ -295,7 +296,7 @@ bool DBManager::populateCatalog(const QString &pFileName, const QString &pName)
     QFile inputFile(pFileName);
     if (!inputFile.open(QIODevice::ReadOnly))
     {
-        sendError("populateCatalog can't read file " + pFileName);
+        logError("populateCatalog can't read file %1", {pFileName});
         return false;
     }
     QTextStream in(&inputFile);
@@ -307,7 +308,7 @@ bool DBManager::populateCatalog(const QString &pFileName, const QString &pName)
         QStringList splitted = line.split(u';');
         if (splitted.size() >= 10)
         {
-            sendWarning("populateCatalog with file " + pFileName + " ; can't parse this line : " + line);
+            logWarning("populateCatalog with file %1 ; can't parse this line : %2", {pFileName, line});
         }
         else
         {
@@ -328,8 +329,8 @@ bool DBManager::populateCatalog(const QString &pFileName, const QString &pName)
             sql = sql + ");";
             if (!mQuery.exec(sql))
             {
-                sendWarning("searchCatalog - ERROR SQL =" + sql);
-                sendWarning("searchCatalog - ERROR : " + mQuery.lastError().text());
+                logWarning("searchCatalog - ERROR SQL = %1", {sql});
+                logWarning("searchCatalog - ERROR : %1", {mQuery.lastError().text()});
             }
 
         }
@@ -358,7 +359,7 @@ QString DBManager::getGrants(const QString &pUser, const QString &pPW)
 
     if(!mDb.open())
     {
-        sendError("getGrants dbOpen - ERROR: " + mDb.databaseName() + " - " + mDb.lastError().text());
+        logError("getGrants dbOpen - ERROR: %1 - %2", {mDb.databaseName(), mDb.lastError().text()});
         return result;
     }
     QString sql = "SELECT GRANT FROM USERS WHERE ";
@@ -366,20 +367,20 @@ QString DBManager::getGrants(const QString &pUser, const QString &pPW)
     sql = sql + " AND PW= '" + pPW + "'";
     if (!mQuery.exec(sql))
     {
-        sendError("getGrants - " + mQuery.lastError().text());
+        logError("getGrants - %1", {mQuery.lastError().text()});
         mDb.close();
         return result;
     }
     if (mQuery.size() > 1)
     {
         mDb.close();
-        sendError("getGrants - Returns more than one row - " + pUser);
+        logError("getGrants - Returns more than one row - %1", {pUser});
         return result;
     }
     if (mQuery.size() == 0)
     {
         mDb.close();
-        sendError("getGrants - Invalid credentials - " + pUser);
+        logError("getGrants - Invalid credentials - %1", {pUser});
         return result;
     }
     mQuery.next();
@@ -389,7 +390,7 @@ QString DBManager::getGrants(const QString &pUser, const QString &pPW)
     result = mQuery.value(0).toString();
     if ((result != "0") && (result != "1"))
     {
-        sendError("getGrants - Invalid credentials - " + pUser + "-" + result );
+        logError("getGrants - Invalid credentials - %1-%2", {pUser, result});
         result = "-1";
         return result;
     }
