@@ -29,7 +29,7 @@ void ElementPrg::setPrgValue(const double &v, const bool &emitEvent)
 {
     if ((v < 0) || (v > 100))
     {
-        sendMessage(OST::MsgLevel::Warn, "Invalid spinner value (" + QString::number(v) + ")");
+        sendMessage(OST::MsgLevel::Warn, "Invalid spinner value (%1)", {QString::number(v)});
         return;
     }
     PrgData d = value();

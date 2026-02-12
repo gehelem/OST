@@ -146,7 +146,7 @@ class Datastore : public Baseroot
         void onEltChanged(void);
         void onValueSet(void);
         void onPropertyEvent(QString event, QString key, OST::PropertyBase* prop);
-        void onPropertyMessage(OST::MsgLevel l, QString m);
+        void onPropertyMessage(OST::MsgLevel l, QString m, QVariantList args);
         void onLovChanged(void);
 
     private:

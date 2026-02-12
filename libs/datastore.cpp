@@ -12,7 +12,7 @@ OST::PropertyMulti* Datastore::getProperty(QString pProperty)
 {
     if (!mStore.contains(pProperty))
     {
-        sendWarning(" getProperty - property " + pProperty + " not found");
+        logWarning("getProperty - property %1 not found", {pProperty});
         //return nullptr;
     }
 
@@ -23,12 +23,12 @@ OST::ElementBase* Datastore::getEltBase(QString pProperty, QString pElement)
     OST::PropertyMulti* p = getProperty(pProperty);
     if (p == nullptr)
     {
-        sendWarning(" getEltString - property " + pProperty + " not found");
+        logWarning("getEltString - property %1 not found", {pProperty});
         return nullptr;
     }
     if (!p->getElts()->contains(pElement))
     {
-        sendWarning("getEltString - property " + pProperty + " : element " + pElement + " not found");
+        logWarning("getEltString - property %1 : element %2 not found", {pProperty, pElement});
         return nullptr;
     }
     return p->getElt(pElement);
@@ -39,17 +39,17 @@ OST::ElementString* Datastore::getEltString(QString pProperty, QString pElement)
     OST::PropertyMulti* p = getProperty(pProperty);
     if (p == nullptr)
     {
-        sendWarning(" getEltString - property " + pProperty + " not found");
+        logWarning("getEltString - property %1 not found", {pProperty});
         return nullptr;
     }
     if (!p->getElts()->contains(pElement))
     {
-        sendWarning("getEltString - property " + pProperty + " : element " + pElement + " not found");
+        logWarning("getEltString - property %1 : element %2 not found", {pProperty, pElement});
         return nullptr;
     }
     if (p->getElt(pElement)->getType() != "string")
     {
-        sendWarning("getEltString - property " + pProperty + " : element " + pElement + " is not string");
+        logWarning("getEltString - property %1 : element %2 is not string", {pProperty, pElement});
         return nullptr;
     }
     return static_cast<OST::ElementString*>(p->getElt(pElement));
@@ -59,17 +59,17 @@ OST::ElementPrg* Datastore::getEltPrg(QString pProperty, QString pElement)
     OST::PropertyMulti* p = getProperty(pProperty);
     if (p == nullptr)
     {
-        sendWarning(" getEltPrg - property " + pProperty + " not found");
+        logWarning("getEltPrg - property %1 not found", {pProperty});
         return nullptr;
     }
     if (!p->getElts()->contains(pElement))
     {
-        sendWarning("getEltPrg - property " + pProperty + " : element " + pElement + " not found");
+        logWarning("getEltPrg - property %1 : element %2 not found", {pProperty, pElement});
         return nullptr;
     }
     if (p->getElt(pElement)->getType() != "prg")
     {
-        sendWarning("getEltPrg - property " + pProperty + " : element " + pElement + " is not progress");
+        logWarning("getEltPrg - property %1 : element %2 is not progress", {pProperty, pElement});
         return nullptr;
     }
     return static_cast<OST::ElementPrg*>(p->getElt(pElement));
@@ -79,17 +79,17 @@ OST::ElementMessage* Datastore::getEltMsg(QString pProperty, QString pElement)
     OST::PropertyMulti* p = getProperty(pProperty);
     if (p == nullptr)
     {
-        sendWarning(" getEltMsg - property " + pProperty + " not found");
+        logWarning("getEltMsg - property %1 not found", {pProperty});
         return nullptr;
     }
     if (!p->getElts()->contains(pElement))
     {
-        sendWarning("getEltMsg - property " + pProperty + " : element " + pElement + " not found");
+        logWarning("getEltMsg - property %1 : element %2 not found", {pProperty, pElement});
         return nullptr;
     }
     if (p->getElt(pElement)->getType() != "message")
     {
-        sendWarning("getEltMsg - property " + pProperty + " : element " + pElement + " is not message");
+        logWarning("getEltMsg - property %1 : element %2 is not message", {pProperty, pElement});
         return nullptr;
     }
     return static_cast<OST::ElementMessage*>(p->getElt(pElement));
@@ -99,17 +99,17 @@ OST::ElementDate* Datastore::getEltDate(QString pProperty, QString pElement)
     OST::PropertyMulti* p = getProperty(pProperty);
     if (p == nullptr)
     {
-        sendWarning(" getEltDate - property " + pProperty + " not found");
+        logWarning("getEltDate - property %1 not found", {pProperty});
         return nullptr;
     }
     if (!p->getElts()->contains(pElement))
     {
-        sendWarning("getEltDate - property " + pProperty + " : element " + pElement + " not found");
+        logWarning("getEltDate - property %1 : element %2 not found", {pProperty, pElement});
         return nullptr;
     }
     if (p->getElt(pElement)->getType() != "date")
     {
-        sendWarning("getEltDate - property " + pProperty + " : element " + pElement + " is not date");
+        logWarning("getEltDate - property %1 : element %2 is not date", {pProperty, pElement});
         return nullptr;
     }
     return static_cast<OST::ElementDate*>(p->getElt(pElement));
@@ -119,17 +119,17 @@ OST::ElementTime* Datastore::getEltTime(QString pProperty, QString pElement)
     OST::PropertyMulti* p = getProperty(pProperty);
     if (p == nullptr)
     {
-        sendWarning(" getEltTime - property " + pProperty + " not found");
+        logWarning("getEltTime - property %1 not found", {pProperty});
         return nullptr;
     }
     if (!p->getElts()->contains(pElement))
     {
-        sendWarning("getEltTime - property " + pProperty + " : element " + pElement + " not found");
+        logWarning("getEltTime - property %1 : element %2 not found", {pProperty, pElement});
         return nullptr;
     }
     if (p->getElt(pElement)->getType() != "time")
     {
-        sendWarning("getEltTime - property " + pProperty + " : element " + pElement + " is not time");
+        logWarning("getEltTime - property %1 : element %2 is not time", {pProperty, pElement});
         return nullptr;
     }
     return static_cast<OST::ElementTime*>(p->getElt(pElement));
@@ -143,7 +143,7 @@ QString Datastore::getString(QString pProperty, QString pElement, long line)
 {
     if (getProperty(pProperty)->getGrid().size() < line + 1)
     {
-        sendWarning("getString - property " + pProperty + " line : " + line + " does not exist" );
+        logWarning("getString - property %1 line : %2 does not exist", {pProperty, QString::number(line)});
         return QString();
     }
     OST::ValueString* v = static_cast<OST::ValueString*>(getProperty(pProperty)->getGrid()[line][pElement]);
@@ -154,17 +154,17 @@ OST::ElementInt* Datastore::getEltInt(QString pProperty, QString pElement)
     OST::PropertyMulti* p = getProperty(pProperty);
     if (p == nullptr)
     {
-        sendWarning(" getEltInt - property " + pProperty + " not found");
+        logWarning("getEltInt - property %1 not found", {pProperty});
         return nullptr;
     }
     if (!p->getElts()->contains(pElement))
     {
-        sendWarning("getEltInt - property " + pProperty + " : element " + pElement + " not found");
+        logWarning("getEltInt - property %1 : element %2 not found", {pProperty, pElement});
         return nullptr;
     }
     if (p->getElt(pElement)->getType() != "int")
     {
-        sendWarning("getEltInt - property " + pProperty + " : element " + pElement + " is not int");
+        logWarning("getEltInt - property %1 : element %2 is not int", {pProperty, pElement});
         return nullptr;
     }
     return static_cast<OST::ElementInt*>(p->getElt(pElement));
@@ -177,7 +177,7 @@ long Datastore::getInt(QString pProperty, QString pElement, long line)
 {
     if (getProperty(pProperty)->getGrid().size() < line + 1)
     {
-        sendWarning("getInt- property " + pProperty + " line : " + line + " does not exist" );
+        logWarning("getInt- property %1 line : %2 does not exist", {pProperty, QString::number(line)});
         return 0;
     }
     OST::ValueInt* v = static_cast<OST::ValueInt*>(getProperty(pProperty)->getGrid()[line][pElement]);
@@ -188,17 +188,17 @@ OST::ElementFloat* Datastore::getEltFloat(QString pProperty, QString pElement)
     OST::PropertyMulti* p = getProperty(pProperty);
     if (p == nullptr)
     {
-        sendWarning("getEltFloat - property " + pProperty + " not found");
+        logWarning("getEltFloat - property %1 not found", {pProperty});
         return nullptr;
     }
     if (!p->getElts()->contains(pElement))
     {
-        sendWarning("getEltFloat - property " + pProperty + " : element " + pElement + " not found");
+        logWarning("getEltFloat - property %1 : element %2 not found", {pProperty, pElement});
         return nullptr;
     }
     if (p->getElt(pElement)->getType() != "float")
     {
-        sendWarning("getEltFloat - property " + pProperty + " : element " + pElement + " is not float");
+        logWarning("getEltFloat - property %1 : element %2 is not float", {pProperty, pElement});
         return nullptr;
     }
     return static_cast<OST::ElementFloat*>(p->getElt(pElement));
@@ -211,7 +211,7 @@ double Datastore::getFloat(QString pProperty, QString pElement, long line)
 {
     if (getProperty(pProperty)->getGrid().size() < line + 1)
     {
-        sendWarning("getFloat - property " + pProperty + " line : " + line + " does not exist" );
+        logWarning("getFloat - property %1 line : %2 does not exist", {pProperty, QString::number(line)});
         return 0;
     }
     OST::ValueFloat* v = static_cast<OST::ValueFloat*>(getProperty(pProperty)->getGrid()[line][pElement]);
@@ -222,17 +222,17 @@ OST::ElementLight* Datastore::getEltLight(QString pProperty, QString pElement)
     OST::PropertyMulti* p = getProperty(pProperty);
     if (p == nullptr)
     {
-        sendWarning("getEltLight - property " + pProperty + " not found");
+        logWarning("getEltLight - property %1 not found", {pProperty});
         return nullptr;
     }
     if (!p->getElts()->contains(pElement))
     {
-        sendWarning("getEltLight - property " + pProperty + " : element " + pElement + " not found");
+        logWarning("getEltLight - property %1 : element %2 not found", {pProperty, pElement});
         return nullptr;
     }
     if (p->getElt(pElement)->getType() != "light")
     {
-        sendWarning("getEltLight - property " + pProperty + " : element " + pElement + " is not light");
+        logWarning("getEltLight - property %1 : element %2 is not light", {pProperty, pElement});
         return nullptr;
     }
     return static_cast<OST::ElementLight*>(p->getElt(pElement));
@@ -243,17 +243,17 @@ OST::ElementImg* Datastore::getEltImg(QString pProperty, QString pElement)
     OST::PropertyMulti* p = getProperty(pProperty);
     if (p == nullptr)
     {
-        sendWarning("getEltImg - property " + pProperty + " not found");
+        logWarning("getEltImg - property %1 not found", {pProperty});
         return nullptr;
     }
     if (!p->getElts()->contains(pElement))
     {
-        sendWarning("getEltImg - property " + pProperty + " : element " + pElement + " not found");
+        logWarning("getEltImg - property %1 : element %2 not found", {pProperty, pElement});
         return nullptr;
     }
     if (p->getElt(pElement)->getType() != "img")
     {
-        sendWarning("getEltImg - property " + pProperty + " : element " + pElement + " is not img");
+        logWarning("getEltImg - property %1 : element %2 is not img", {pProperty, pElement});
         return nullptr;
     }
     return static_cast<OST::ElementImg*>(p->getElt(pElement));
@@ -263,17 +263,17 @@ OST::ElementVideo* Datastore::getEltVideo(QString pProperty, QString pElement)
     OST::PropertyMulti* p = getProperty(pProperty);
     if (p == nullptr)
     {
-        sendWarning("getEltVideo - property " + pProperty + " not found");
+        logWarning("getEltVideo - property %1 not found", {pProperty});
         return nullptr;
     }
     if (!p->getElts()->contains(pElement))
     {
-        sendWarning("getEltVideo - property " + pProperty + " : element " + pElement + " not found");
+        logWarning("getEltVideo - property %1 : element %2 not found", {pProperty, pElement});
         return nullptr;
     }
     if (p->getElt(pElement)->getType() != "video")
     {
-        sendWarning("getEltVideo - property " + pProperty + " : element " + pElement + " is not video");
+        logWarning("getEltVideo - property %1 : element %2 is not video", {pProperty, pElement});
         return nullptr;
     }
     return static_cast<OST::ElementVideo*>(p->getElt(pElement));
@@ -283,17 +283,17 @@ OST::ElementBool* Datastore::getEltBool(QString pProperty, QString pElement)
     OST::PropertyMulti* p = getProperty(pProperty);
     if (p == nullptr)
     {
-        sendWarning("ValueBool - property " + pProperty + " not found");
+        logWarning("ValueBool - property %1 not found", {pProperty});
         return nullptr;
     }
     if (!p->getElts()->contains(pElement))
     {
-        sendWarning("ValueBool - property " + pProperty + " : element " + pElement + " not found");
+        logWarning("ValueBool - property %1 : element %2 not found", {pProperty, pElement});
         return nullptr;
     }
     if (p->getElt(pElement)->getType() != "bool")
     {
-        sendWarning("ValueBool - property " + pProperty + " : element " + pElement + " is not bool");
+        logWarning("ValueBool - property %1 : element %2 is not bool", {pProperty, pElement});
         return nullptr;
     }
     return static_cast<OST::ElementBool*>(p->getElt(pElement));
@@ -306,7 +306,7 @@ bool Datastore::getBool(QString pProperty, QString pElement, long line)
 {
     if (getProperty(pProperty)->getGrid().size() < line + 1)
     {
-        sendWarning("getBool - property " + pProperty + " line : " + line + " does not exist" );
+        logWarning("getBool - property %1 line : %2 does not exist", {pProperty, QString::number(line)});
         return 0;
     }
     OST::ValueBool* v = static_cast<OST::ValueBool*>(getProperty(pProperty)->getGrid()[line][pElement]);
@@ -320,7 +320,7 @@ QDate Datastore::getDate(QString pProperty, QString pElement, long line)
 {
     if (getProperty(pProperty)->getGrid().size() < line + 1)
     {
-        sendWarning("getDate - property " + pProperty + " line : " + line + " does not exist" );
+        logWarning("getDate - property %1 line : %2 does not exist", {pProperty, QString::number(line)});
         return QDate();
     }
     OST::ValueDate* v = static_cast<OST::ValueDate*>(getProperty(pProperty)->getGrid()[line][pElement]);
@@ -334,7 +334,7 @@ QTime Datastore::getTime(QString pProperty, QString pElement, long line)
 {
     if (getProperty(pProperty)->getGrid().size() < line + 1)
     {
-        sendWarning("getTime - property " + pProperty + " line : " + line + " does not exist" );
+        logWarning("getTime - property %1 line : %2 does not exist", {pProperty, QString::number(line)});
         return QTime();
     }
     OST::ValueTime* v = static_cast<OST::ValueTime*>(getProperty(pProperty)->getGrid()[line][pElement]);
@@ -347,7 +347,7 @@ bool Datastore::createOstProperty(const QString &pPropertyName, const QString &p
 {
     if (mStore.contains(pPropertyName))
     {
-        sendWarning("createOstProperty - property " + pPropertyName + " already exists.");
+        logWarning("createOstProperty - property %1 already exists", {pPropertyName});
         return false;
     }
     QVariantMap prop;
@@ -414,7 +414,7 @@ bool Datastore::createOstElementText(const QString &pPropertyName, const QString
 {
     if (!mStore.contains(pPropertyName) )
     {
-        sendWarning(" createOstElementText - property " + pPropertyName + " not found");
+        logWarning("createOstElementText - property %1 not found", {pPropertyName});
         return false;
     }
 
@@ -437,7 +437,7 @@ bool Datastore::createOstElementBool(const QString &pPropertyName, const QString
 {
     if (!mStore.contains(pPropertyName) )
     {
-        sendWarning(" createOstElementBool - property " + pPropertyName + " not found");
+        logWarning("createOstElementBool - property %1 not found", {pPropertyName});
         return false;
     }
     QVariantMap pData;
@@ -460,13 +460,13 @@ bool Datastore::setOstElementValue(const QString &pPropertyName, const QString &
     Q_UNUSED(mEmitEvent)
     if (!mStore.contains(pPropertyName))
     {
-        sendWarning("setElementValue - property2 " + pPropertyName + " not found");
+        logWarning("setElementValue - property2 %1 not found", {pPropertyName});
         return false;
     }
     OST::PropertyMulti *pb = mStore[pPropertyName];
     if (!mStore[pPropertyName]->getElts()->contains(pElementName))
     {
-        sendWarning("setElementValue - property2 " + pPropertyName + " : element " + pElementName + " not found.");
+        logWarning("setElementValue - property2 %1 : element %2 not found", {pPropertyName, pElementName});
         return false;
     }
     return pb->setElt(pElementName, pElementValue);
@@ -475,17 +475,17 @@ QVariantList Datastore::getOstElementGrid(const QString &pPropertyName, const QS
 {
     if (!mStore.contains(pPropertyName))
     {
-        sendWarning("getOstElementGrid - property " + pPropertyName + " not found.");
+        logWarning("getOstElementGrid - property %1 not found", {pPropertyName});
         return QVariantList();
     }
     if (mStore[pPropertyName]->getElts()->size() == 0)
     {
-        sendWarning("getOstElementGrid - property " + pPropertyName + " contains no elements.");
+        logWarning("getOstElementGrid - property %1 contains no elements", {pPropertyName});
         return QVariantList();
     }
     if (!mStore[pPropertyName]->hasGrid())
     {
-        sendWarning("getOstElementGrid - property " + pPropertyName + " has no grid.");
+        logWarning("getOstElementGrid - property %1 has no grid", {pPropertyName});
         return QVariantList();
     }
     OST::ElementUpdate v;
@@ -673,7 +673,7 @@ void Datastore::deleteOstProperty(const QString &pPropertyName)
 {
     if (!mStore.contains(pPropertyName))
     {
-        sendWarning("Can't delete inexistant property " + pPropertyName);
+        logWarning("Can't delete inexistant property %1", {pPropertyName});
         return;
     }
     mStore.remove(pPropertyName);
@@ -709,32 +709,32 @@ OST::LovString* Datastore::getGlovString(QString pLov)
 {
     if (!getGlobLovs().contains(pLov))
     {
-        sendWarning(" getGlovString - Globallob " + pLov + " not found");
+        logWarning("getGlovString - Globallob %1 not found", {pLov});
         return nullptr;
     }
     if (getGlobLovs()[pLov]->getType() != "string")
     {
-        sendWarning(" getGlovString - Globallob " + pLov + " wrong type " + getGlobLovs()[pLov]->getType());
+        logWarning("getGlovString - Globallob %1 wrong type %2", {pLov, getGlobLovs()[pLov]->getType()});
         return nullptr;
     }
 
     return static_cast<OST::LovString*>(getGlobLovs()[pLov]);
 }
-void Datastore::onPropertyMessage(OST::MsgLevel l, QString m)
+void Datastore::onPropertyMessage(OST::MsgLevel l, QString m, QVariantList args)
 {
     switch (l)
     {
         case OST::Info:
-            sendMessage(m);
+            logInfo(m, args);
             break;
         case OST::Warn:
-            sendWarning(m);
+            logWarning(m, args);
             break;
         case OST::Err:
-            sendError(m);
+            logError(m, args);
             break;
         default:
-            sendError(m);
+            logError(m, args);
             break;
     }
 

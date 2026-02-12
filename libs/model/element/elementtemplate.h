@@ -216,13 +216,15 @@ class ElementTemplateNumeric : public ElementTemplate<T>
                 if (value < mMin)
                 {
                     emit ElementTemplate<T>::sendMessage(Warn,
-                                                         "setValue - value too low " + QString::number(value) + " min= " + QString::number(mMin) );
+                                                         "setValue - value too low %1 min= %2",
+                                                         {QString::number(value), QString::number(mMin)});
                     return false;
                 }
                 if (value > mMax)
                 {
                     emit ElementTemplate<T>::sendMessage(Warn,
-                                                         "setValue - value too high " + QString::number(value) + " max= " + QString::number(mMax) );
+                                                         "setValue - value too high %1 max= %2",
+                                                         {QString::number(value), QString::number(mMax)});
                     return false;
                 }
             }

@@ -78,15 +78,15 @@ void PropertyBase::setBadge(bool b)
 }
 void PropertyBase::sendInfo(QString m)
 {
-    emit sendMessage(Info, key() + "-" + m);
+    emit sendMessage(Info, key() + "-" + m, {});
 }
 void PropertyBase::sendWarning(QString m)
 {
-    emit sendMessage(Warn, key() + "-" + m);
+    emit sendMessage(Warn, key() + "-" + m, {});
 }
 void PropertyBase::sendError(QString m)
 {
-    emit sendMessage(Err, key() + "-" + m);
+    emit sendMessage(Err, key() + "-" + m, {});
 }
 QString PropertyBase::getPreIcon1(void)
 {

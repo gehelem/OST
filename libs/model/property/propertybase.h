@@ -403,12 +403,13 @@ class PropertyBase: public QObject
         /**
          * @brief Signal emitted when sending messages
          * @param level Message level (Info, Warn, Err)
-         * @param message Message text
+         * @param message Message text (translation key)
+         * @param args Arguments for parametric translation
          *
          * Messages are propagated to module level and eventually to frontend.
          * Used by sendInfo(), sendWarning(), sendError() methods.
          */
-        void sendMessage(MsgLevel, QString);
+        void sendMessage(MsgLevel, QString, QVariantList);
 
     private:
         // Immutable metadata (set in constructor)

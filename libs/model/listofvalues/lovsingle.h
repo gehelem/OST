@@ -26,7 +26,7 @@ class LovSingle : public LovBase
             QVariant v = val;
             if (mLov.contains(val))
             {
-                emit sendMessage(Warn, "lovAdd - key " + v.toString() + " already exists (" + mLov[val] + ").");
+                emit sendMessage(Warn, "lovAdd - key %1 already exists (%2)", {v.toString(), mLov[val]});
                 return false;
             }
             mLov[val] = label;
@@ -38,7 +38,7 @@ class LovSingle : public LovBase
             if (!mLov.contains(val))
             {
                 QVariant v = val;
-                emit sendMessage(Warn, "lovUpdate - key " + v.toString() + " doesn't exist.");
+                emit sendMessage(Warn, "lovUpdate - key %1 doesn't exist", {v.toString()});
                 return false;
             }
             mLov[val] = label;
@@ -50,7 +50,7 @@ class LovSingle : public LovBase
             if (!mLov.contains(val))
             {
                 QVariant v = val;
-                emit sendMessage(Warn, "lovDel - key " + v.toString() + " doesn't exist.");
+                emit sendMessage(Warn, "lovDel - key %1 doesn't exist", {v.toString()});
                 return false;
             }
             mLov.remove(val);
