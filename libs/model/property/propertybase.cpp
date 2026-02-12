@@ -2,6 +2,21 @@
 namespace  OST
 {
 
+// Helper function to increment all placeholder numbers in message
+// Example: "value %1 max %2" becomes "value %2 max %3"
+static QString incrementPlaceholders(const QString &msg)
+{
+    QString result = msg;
+    // Replace from highest to lowest to avoid conflicts (e.g., %1→%2 shouldn't affect original %2)
+    for (int i = 99; i >= 1; --i)
+    {
+        QString oldPlaceholder = QString("%%1").arg(i);
+        QString newPlaceholder = QString("%%1").arg(i + 1);
+        result = result.replace(oldPlaceholder, newPlaceholder);
+    }
+    return result;
+}
+
 PropertyBase::PropertyBase(const QString &key, const QString &label, const Permission &permission, const QString &level1,
                            const QString &level2,
                            const QString &order, const bool &hasProfile)
@@ -78,15 +93,24 @@ void PropertyBase::setBadge(bool b)
 }
 void PropertyBase::sendInfo(QString m, const QVariantList &args)
 {
-    emit sendMessage(Info, key() + "-" + m, args);
+    QVariantList newArgs = args;
+    newArgs.prepend(key());
+    QString newMessage = "%1 - " + incrementPlaceholders(m);
+    emit sendMessage(Info, newMessage, newArgs);
 }
 void PropertyBase::sendWarning(QString m, const QVariantList &args)
 {
-    emit sendMessage(Warn, key() + "-" + m, args);
+    QVariantList newArgs = args;
+    newArgs.prepend(key());
+    QString newMessage = "%1 - " + incrementPlaceholders(m);
+    emit sendMessage(Warn, newMessage, newArgs);
 }
 void PropertyBase::sendError(QString m, const QVariantList &args)
 {
-    emit sendMessage(Err, key() + "-" + m, args);
+    QVariantList newArgs = args;
+    newArgs.prepend(key());
+    QString newMessage = "%1 - " + incrementPlaceholders(m);
+    emit sendMessage(Err, newMessage, newArgs);
 }
 QString PropertyBase::getPreIcon1(void)
 {

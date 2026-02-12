@@ -562,19 +562,20 @@ void PropertyMulti::OnLovChanged(ElementBase*)
 }
 void PropertyMulti::OnMessage(MsgLevel l, QString m, QVariantList args)
 {
+    // Just pass through to PropertyBase methods which will add key() prefix
     switch (l)
     {
         case Info:
-            sendInfo(this->key() + "-" + m, args);
+            sendInfo(m, args);
             break;
         case Warn:
-            sendWarning(this->key() + "-" + m, args);
+            sendWarning(m, args);
             break;
         case Err:
-            sendError(this->key() + "-" + m, args);
+            sendError(m, args);
             break;
         default:
-            sendError(this->key() + "-" + m, args);
+            sendError(m, args);
             break;
     }
 }
