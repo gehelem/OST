@@ -75,7 +75,7 @@ void IndiModule::OnDispatchToIndiExternalEvent(const QString &eventType, const Q
                 getEltBool(keyprop, keyelt)->setValue(false, false);
                 if (!isServerConnected())
                 {
-                    sendWarning("Indi server not connected");
+                    logWarning("Indi server not connected");
                     getProperty(keyprop)->setState(OST::Error);
                     break;
                 }
@@ -128,26 +128,26 @@ bool IndiModule::connectIndi()
     if (connectServer())
     {
         newUniversalMessage("Indi server connected");
-        sendMessage("Indi server connected");
+        logInfo("Indi server connected");
         QTimer::singleShot(500, this, &IndiModule::OnAfterIndiConnectIndiTimer);
         return true;
     }
-    sendError("Couldn't connect to Indi server");
+    logError("Couldn't connect to Indi server");
     return false;
 }
 bool IndiModule::disconnectIndi(void)
 {
     if (!isServerConnected())
     {
-        sendWarning("Indi server already disconnected");
+        logWarning("Indi server already disconnected");
         return true;
     }
     if (!disconnectServer())
     {
-        sendError("Couldn't disconnect from Indi server");
+        logError("Couldn't disconnect from Indi server");
         return false;
     }
-    sendMessage("Indi server disconnected");
+    logInfo("Indi server disconnected");
     return true;
 
 }
@@ -165,7 +165,7 @@ bool IndiModule::connectAllDevices()
 
         if (!svp.isValid())
         {
-            sendError("Couldn't find CONNECTION switch " + QString(devs[i].getDeviceName()));
+            logError("Couldn't find CONNECTION switch %1", {QString(devs[i].getDeviceName())});
             err++;
         }
         else
@@ -185,7 +185,7 @@ bool IndiModule::connectAllDevices()
             sendNewSwitch(svp);
             if (devs[i].getDriverInterface() & INDI::BaseDevice::CCD_INTERFACE)
             {
-                sendMessage("Set blob mode " + QString(devs[i].getDeviceName()));
+                logDebug("Set blob mode %1", {QString(devs[i].getDeviceName())});
                 setBLOBMode(B_ALSO, devs[i].getDeviceName(), nullptr);
 
             }
@@ -211,7 +211,7 @@ bool IndiModule::disconnectAllDevices()
 
         if (!svp.isValid())
         {
-            sendError("Couldn't find CONNECTION switch " + QString(devs[i].getDeviceName()));
+            logError("Couldn't find CONNECTION switch %1", {QString(devs[i].getDeviceName())});
             err++;
         }
         else
@@ -240,7 +240,7 @@ bool IndiModule::connectDevice(QString deviceName)
 {
     if (!isServerConnected())
     {
-        sendWarning("Indi server is not connected");
+        logWarning("connectDevice - Indi server is not connected");
         return false;
     }
     bool _checkdevice = false;
@@ -250,7 +250,7 @@ bool IndiModule::connectDevice(QString deviceName)
     }
     if (!_checkdevice)
     {
-        sendError("Device " + deviceName + " not found");
+        logError("connectDevice - Device %1 not found", {deviceName});
         return false;
     }
 
@@ -260,7 +260,7 @@ bool IndiModule::connectDevice(QString deviceName)
 
     if (!svp.isValid())
     {
-        sendError("Couldn't find CONNECTION switch " + deviceName);
+        logError("connectDevice - Couldn't find CONNECTION switch %1", {deviceName});
         return false;
     }
     for (std::size_t  j = 0; j < svp.size(); j++)
@@ -285,7 +285,7 @@ bool IndiModule::disconnectDevice(QString deviceName)
 
     if (!svp.isValid())
     {
-        sendError("Couldn't find CONNECTION switch " + deviceName);
+        logError("disconnectDevice - Couldn't find CONNECTION switch %1", {deviceName});
         return false;
     }
     for (std::size_t j = 0; j < svp.size(); j++)
@@ -312,14 +312,14 @@ bool IndiModule::loadDevicesConfs()
     std::vector<INDI::BaseDevice> devs = getDevices();
     for(std::size_t i = 0; i < devs.size(); i++)
     {
-        sendMessage("Loading device conf " + QString(devs[i].getDeviceName()));
+        logInfo("Loading device conf %1", {QString(devs[i].getDeviceName())});
         if (devs[i].isConnected())
         {
             INDI::PropertySwitch svp = devs[i].getSwitch("CONFIG_PROCESS");
 
             if (!svp.isValid())
             {
-                sendError("Couldn't find CONFIG_PROCESS switch " + QString(devs[i].getDeviceName()));
+                logError("Couldn't find CONFIG_PROCESS switch %1", {QString(devs[i].getDeviceName())});
                 err++;
             }
             else
@@ -352,13 +352,13 @@ auto IndiModule::sendModNewNumber(const QString &deviceName, const QString &prop
 
     if (!dp.isValid())
     {
-        sendError("Unable to find " + deviceName + " device. Aborting.");
+        logError("sendModNewNumber - Unable to find %1 device. Aborting.", {deviceName});
         return false;
     }
     INDI::PropertyNumber prop = dp.getNumber(propertyName.toStdString().c_str());
     if (!prop.isValid())
     {
-        sendError("Unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
+        logError("sendModNewNumber - Unable to find %1-%2 property. Aborting.", {deviceName, propertyName});
         return false;
     }
 
@@ -371,7 +371,7 @@ auto IndiModule::sendModNewNumber(const QString &deviceName, const QString &prop
             return true;
         }
     }
-    sendError("Unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
+    logError("sendModNewNumber - Unable to find %1-%2-%3 element. Aborting.", {deviceName, propertyName, elementName});
     return false;
 
 }
@@ -383,12 +383,12 @@ bool IndiModule::requestCapture(const QString &deviceName, const double &exposur
     INDI::BaseDevice dp = getDevice(deviceName.toStdString().c_str());
     if (!dp.isValid())
     {
-        sendError("Capture - device " + deviceName + " not found. Aborting.");
+        logError("Capture - device %1 not found. Aborting.", {deviceName});
         return false;
     }
     if (dp == false)
     {
-        sendWarning("Capture - " + deviceName + " not connected, trying to connect");
+        logWarning("Capture - %1 not connected, trying to connect", {deviceName});
         if (!connectDevice(deviceName)) return false;
     }
     setBLOBMode(B_ALSO, deviceName.toStdString().c_str(), nullptr);
@@ -397,26 +397,22 @@ bool IndiModule::requestCapture(const QString &deviceName, const double &exposur
         INDI::PropertyNumber prop = dp.getNumber("CCD_CONTROLS");
         if (wgain < prop.findWidgetByName("Gain")->min)
         {
-            sendWarning("Capture - " + deviceName + " gain requested too low (" + QString::number(wgain) + "), setting to " +
-                        QString::number(prop.findWidgetByName("Gain")->min));
+            logWarning("Capture - %1 gain requested too low (%2), setting to %3", {deviceName, wgain, prop.findWidgetByName("Gain")->min});
             wgain = prop.findWidgetByName("Gain")->min;
         }
         if (wgain > prop.findWidgetByName("Gain")->max)
         {
-            sendWarning("Capture - " + deviceName + " gain requested too high (" + QString::number(wgain) + "), setting to " +
-                        QString::number(prop.findWidgetByName("Gain")->max));
+            logWarning("Capture - %1 gain requested too high (%2), setting to %3", {deviceName, wgain, prop.findWidgetByName("Gain")->max});
             wgain = prop.findWidgetByName("Gain")->max;
         }
         if (woffset < prop.findWidgetByName("Offset")->min)
         {
-            sendWarning("Capture - " + deviceName + " gain requested too low (" + QString::number(woffset) + "), setting to " +
-                        QString::number(prop.findWidgetByName("Offset")->min));
+            logWarning("Capture - %1 offset requested too low (%2), setting to %3", {deviceName, wgain, prop.findWidgetByName("Offset")->min});
             woffset = prop.findWidgetByName("Offset")->min;
         }
         if (woffset > prop.findWidgetByName("Offset")->max)
         {
-            sendWarning("Capture - " + deviceName + " gain requested too high (" + QString::number(woffset) + "), setting to " +
-                        QString::number(prop.findWidgetByName("Offset")->max));
+            logWarning("Capture - %1 offset requested too high (%2), setting to %3", {deviceName, wgain, prop.findWidgetByName("Offset")->max});
             woffset = prop.findWidgetByName("Offset")->max;
         }
         prop.findWidgetByName("Gain")->value = wgain;
@@ -428,14 +424,12 @@ bool IndiModule::requestCapture(const QString &deviceName, const double &exposur
         INDI::PropertyNumber prop = dp.getNumber("CCD_GAIN");
         if (wgain < prop.findWidgetByName("GAIN")->min)
         {
-            sendWarning("Capture - " + deviceName + " gain requested too low (" + QString::number(wgain) + "), setting to " +
-                        QString::number(prop.findWidgetByName("GAIN")->min));
+            logWarning("Capture - %1 gain requested too low (%2), setting to %3", {deviceName, wgain, prop.findWidgetByName("GAIN")->min});
             wgain = prop.findWidgetByName("GAIN")->min;
         }
         if (wgain > prop.findWidgetByName("GAIN")->max)
         {
-            sendWarning("Capture - " + deviceName + " gain requested too high (" + QString::number(wgain) + "), setting to " +
-                        QString::number(prop.findWidgetByName("GAIN")->max));
+            logWarning("Capture - %1 gain requested too high (%2), setting to %3", {deviceName, wgain, prop.findWidgetByName("GAIN")->max});
             wgain = prop.findWidgetByName("GAIN")->max;
         }
         prop.findWidgetByName("GAIN")->value = wgain;
@@ -446,14 +440,12 @@ bool IndiModule::requestCapture(const QString &deviceName, const double &exposur
         INDI::PropertyNumber prop = dp.getNumber("CCD_OFFSET");
         if (woffset < prop.findWidgetByName("OFFSET")->min)
         {
-            sendWarning("Capture - " + deviceName + " offset requested too low (" + QString::number(woffset) + "), setting to " +
-                        QString::number(prop.findWidgetByName("OFFSET")->min));
+            logWarning("Capture - %1 offset requested too low (%2), setting to %3", {deviceName, wgain, prop.findWidgetByName("OFFSET")->min});
             woffset = prop.findWidgetByName("OFFSET")->min;
         }
         if (woffset > prop.findWidgetByName("OFFSET")->max)
         {
-            sendWarning("Capture - " + deviceName + " offset requested too high (" + QString::number(woffset) + "), setting to " +
-                        QString::number(prop.findWidgetByName("OFFSET")->max));
+            logWarning("Capture - %1 offset requested too high (%2), setting to %3", {deviceName, wgain, prop.findWidgetByName("OFFSET")->max});
             woffset = prop.findWidgetByName("OFFSET")->max;
         }
         prop.findWidgetByName("OFFSET")->value = woffset;
@@ -474,13 +466,13 @@ bool IndiModule::getModNumber(const QString &deviceName, const QString &property
 
     if (!dp.isValid())
     {
-        sendError("Unable to find " + deviceName + " device. Aborting.");
+        logError("getModNumber - Unable to find %1 device. Aborting.", {deviceName});
         return false;
     }
     INDI::PropertyNumber prop = dp.getNumber(propertyName.toStdString().c_str());
     if (!prop.isValid())
     {
-        sendError("Unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
+        logError("getModNumber - Unable to find %1-%2 property. Aborting.", {deviceName, propertyName});
         return false;
     }
 
@@ -492,7 +484,8 @@ bool IndiModule::getModNumber(const QString &deviceName, const QString &property
             return true;
         }
     }
-    sendError("Unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
+    logError("getModNumber - Unable to find %1-%2-%3 element. Aborting.", {deviceName, propertyName, elementName});
+
     return false;
 }
 bool IndiModule::getModSwitch(const QString &deviceName, const QString &propertyName, const QString  &elementName,
@@ -503,13 +496,13 @@ bool IndiModule::getModSwitch(const QString &deviceName, const QString &property
 
     if (!dp.isValid())
     {
-        sendError("Unable to find " + deviceName + " device. Aborting.");
+        logError("getModSwitch - Unable to find %1 device. Aborting.", {deviceName});
         return false;
     }
     INDI::PropertySwitch prop = dp.getSwitch(propertyName.toStdString().c_str());
     if (!prop.isValid())
     {
-        sendError("Unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
+        logError("getModSwitch - Unable to find %1-%2 property. Aborting.", {deviceName, propertyName});
         return false;
     }
 
@@ -521,7 +514,7 @@ bool IndiModule::getModSwitch(const QString &deviceName, const QString &property
             return true;
         }
     }
-    sendError("Unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
+    logError("getModSwitch - Unable to find %1-%2-%3 element. Aborting.", {deviceName, propertyName, elementName});
     return false;
 }
 bool IndiModule::getModText(const QString &deviceName, const QString &propertyName, const QString  &elementName,
@@ -532,13 +525,13 @@ bool IndiModule::getModText(const QString &deviceName, const QString &propertyNa
 
     if (!dp.isValid())
     {
-        sendError("Unable to find " + deviceName + " device. Aborting.");
+        logError("getModText - Unable to find %1 device. Aborting.", {deviceName});
         return false;
     }
     INDI::PropertyText prop = dp.getText(propertyName.toStdString().c_str());
     if (!prop.isValid())
     {
-        sendError("Unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
+        logError("getModText - Unable to find %1-%2 property. Aborting.", {deviceName, propertyName});
         return false;
     }
 
@@ -550,7 +543,7 @@ bool IndiModule::getModText(const QString &deviceName, const QString &propertyNa
             return true;
         }
     }
-    sendError("Unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
+    logError("getModText - Unable to find %1-%2-%3 element. Aborting.", {deviceName, propertyName, elementName});
     return false;
 }
 bool IndiModule::sendModNewText  (QString deviceName, QString propertyName, QString elementName, QString text)
@@ -560,13 +553,13 @@ bool IndiModule::sendModNewText  (QString deviceName, QString propertyName, QStr
 
     if (!dp.isValid())
     {
-        sendError("Unable to find " + deviceName + " device. Aborting.");
+        logError("Unable to find %1 device. Aborting.", {deviceName});
         return false;
     }
     INDI::PropertyText prop = dp.getText(propertyName.toStdString().c_str());
     if (!prop.isValid())
     {
-        sendError("Unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
+        logError("Unable to find %1/%2 property. Aborting.", {deviceName, propertyName});
         return false;
     }
 
@@ -579,7 +572,7 @@ bool IndiModule::sendModNewText  (QString deviceName, QString propertyName, QStr
             return true;
         }
     }
-    sendError("Unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
+    logError("Unable to find %1/%2/%3 element. Aborting.", {deviceName, propertyName, elementName});
     return false;
 }
 bool IndiModule::sendModNewSwitch(QString deviceName, QString propertyName, QString elementName, ISState sw)
@@ -590,13 +583,13 @@ bool IndiModule::sendModNewSwitch(QString deviceName, QString propertyName, QStr
 
     if (!dp.isValid())
     {
-        sendError("Unable to find " + deviceName + " device. Aborting.");
+        logError("Unable to find %1 device. Aborting.", {deviceName});
         return false;
     }
     INDI::PropertySwitch prop = dp.getSwitch(propertyName.toStdString().c_str());
     if (!prop.isValid())
     {
-        sendError("Unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
+        logError("Unable to find %1/%2 property. Aborting.", {deviceName, propertyName});
         return false;
     }
     for (std::size_t i = 0; i < prop.size(); i++)
@@ -609,7 +602,7 @@ bool IndiModule::sendModNewSwitch(QString deviceName, QString propertyName, QStr
             return true;
         }
     }
-    sendError("Unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
+    logError("Unable to find %1/%2/%3 element. Aborting.", {deviceName, propertyName, elementName});
     return false;
 
 }
@@ -619,14 +612,14 @@ bool IndiModule::frameSet(QString devicename, double x, double y, double width, 
     INDI::BaseDevice dp = getDevice(devicename.toStdString().c_str());
     if (!dp.isValid())
     {
-        sendError("Unable to find " + devicename + " device. Aborting.");
+        logError("Unable to find %1 device. Aborting.", {devicename});
         return false;
     }
 
     INDI::PropertyNumber prop = dp.getNumber("CCD_FRAME");
     if (!prop.isValid())
     {
-        sendError("Unable to find " + devicename + "/" + "CCD_FRAME" + " property. Aborting.");
+        logError("Unable to find %1/%2 property. Aborting.", {devicename, QString("CCD_FRAME")});
         return false;
     }
 
@@ -659,14 +652,14 @@ bool IndiModule::frameReset(QString devicename)
     INDI::BaseDevice dp = getDevice(devicename.toStdString().c_str());
     if (!dp.isValid())
     {
-        sendError("Unable to find " + devicename + " device. Aborting.");
+        logError("Unable to find %1 device. Aborting.", {devicename});
         return false;
     }
 
     INDI::PropertySwitch prop = dp.getSwitch("CCD_FRAME_RESET");
     if (!prop.isValid())
     {
-        sendError("Unable to find " + devicename + "/" + "CCD_FRAME_RESET" + " property. Aborting.");
+        logError("Unable to find %1/%2 property. Aborting.", {devicename, QString("CCD_FRAME_RESET")});
         return false;
     }
 
@@ -960,12 +953,12 @@ double IndiModule::getPixelSize(const QString &deviceName)
     INDI::BaseDevice dp = getDevice(deviceName.toStdString().c_str());
     if (!dp.isValid())
     {
-        sendError("getPixelSize - device " + deviceName + " not found. Aborting.");
+        logError("getPixelSize - device %1 not found. Aborting.", {deviceName});
         return 0;
     }
     if (!dp.isConnected())
     {
-        sendWarning("getPixelSize - " + deviceName + " not connected, trying to connect");
+        logWarning("getPixelSize - %1 not connected, trying to connect", {deviceName});
         if (!connectDevice(deviceName)) return 0;
     }
     INDI::PropertyNumber prop = dp.getNumber("CCD_INFO");
@@ -976,7 +969,7 @@ double IndiModule::getSampling()
 {
     if (!isImager())
     {
-        sendWarning("getSampling - module is not defined as an imager - defaults to 1");
+        logWarning("getSampling - module is not defined as an imager - defaults to 1");
         return 1;
     }
     return 206 * getPixelSize(getString("devices", "camera")) / (getFloat("optic", "fl") * getFloat("optic", "red"));
@@ -1016,7 +1009,7 @@ bool IndiModule::giveMeADevice(QString name, QString label, INDI::BaseDevice::DR
             s->setGlobalLov("DRIVER_INTERFACE-AUX_INTERFACE");
             break;
         default:
-            sendWarning("giveMeADevice unhandled interface type");
+            logWarning("giveMeADevice unhandled interface type");
             break;
     }
 

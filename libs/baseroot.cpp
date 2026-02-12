@@ -100,7 +100,7 @@ void Baseroot::sendMessage(const QString &pMessage)
     mMessages.append(m);
     if (mMessages.size() > mMessagesSize) mMessages.removeFirst();
     OnModuleEvent("mm", QString(), QString(), m);
-    sendConsole("info " + pMessage);
+    //sendConsole("info " + pMessage);
 }
 void Baseroot::sendError(const QString &pMessage)
 {
@@ -111,7 +111,7 @@ void Baseroot::sendError(const QString &pMessage)
     mErrors.append(m);
     if (mErrors.size() > mErrorsSize) mErrors.removeFirst();
     OnModuleEvent("me", QString(), QString(), m);
-    sendConsole("error " + pMessage);
+    //sendConsole("error " + pMessage);
 }
 void Baseroot::sendWarning(const QString &pMessage)
 {
@@ -122,7 +122,7 @@ void Baseroot::sendWarning(const QString &pMessage)
     mWarnings.append(m);
     if (mWarnings.size() > mWarningsSize) mWarnings.removeFirst();
     OnModuleEvent("mw", QString(), QString(), m);
-    sendConsole("warning " + pMessage);
+    //sendConsole("warning " + pMessage);
 }
 void Baseroot::sendConsole(const QString &pMessage)
 {

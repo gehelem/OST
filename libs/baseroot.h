@@ -39,10 +39,11 @@ class Baseroot : public QObject
         void setMessagesSize (int &size);
         void setErrorsSize (int &size);
         void setWarningsSize (int &size);
-        void sendMessage(const QString &pMessage);
-        void sendError(const QString &pMessage);
-        void sendWarning(const QString &pMessage);
-        void sendConsole(const QString &pMessage);
+
+        Q_DECL_DEPRECATED        void sendMessage(const QString &pMessage);
+        Q_DECL_DEPRECATED        void sendError(const QString &pMessage);
+        Q_DECL_DEPRECATED        void sendWarning(const QString &pMessage);
+        Q_DECL_DEPRECATED        void sendConsole(const QString &pMessage);
         virtual void OnModuleEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
                                    const QVariantMap &pEventData)
         {

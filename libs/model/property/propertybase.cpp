@@ -24,7 +24,7 @@ PropertyBase::PropertyBase(const QString &key, const QString &label, const Permi
       mOrder(order), mHasProfile(hasProfile)
 {
     qRegisterMetaType<OST::LogLevel>("LogLevel");
-    if (order == "") qDebug() << "*** PropertyBase order ko *** "  << label << key << level1 << level2;
+    if (order == "") sendMessage(OST::LogLevel::Warning, "PropertyBase %1 %2 order ko (%3/%4)", {label, key, level1, level2});
 }
 PropertyBase::~PropertyBase()
 {

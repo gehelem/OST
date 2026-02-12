@@ -94,7 +94,7 @@ class Datastore : public Baseroot
         {
             if (mStore.contains(pPropertyName))
             {
-                sendWarning("createProperty - property " + pPropertyName + " already exists.");
+                logWarning("createProperty - property %1 already exists.", {pPropertyName});
                 return false;
             }
             mStore[pPropertyName] = pProperty;
@@ -111,7 +111,7 @@ class Datastore : public Baseroot
         {
             if (mGlobLov.contains(pLovName))
             {
-                sendWarning("createGlobLov - lov " + pLovName + " already exists.");
+                logWarning("createGlobLov - lov %1 already exists.", {pLovName});
                 return false;
             }
             pLov->setKey(pLovName);

@@ -129,7 +129,6 @@ bool DBManager::getDbProfiles(QString moduleType, QVariantMap &result )
         return false;
     }
     QString sql = "SELECT PROFILENAME,ALLVALUES FROM PROFILES WHERE MODULETYPE='" + moduleType + "' ";
-    logInfo("SQL = %1", {sql});
     if (!mQuery.exec(sql))
     {
         logError("getDbProfiles - ERROR SQL = %1", {sql});
