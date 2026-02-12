@@ -170,7 +170,7 @@ void Basemodule::setProfile(QVariantMap profiledata)
                             if (getEltBase(key, eltkey)->getType() == "message")
                             {
                                 OST::MsgData m;
-                                m.level = OST::IntToMsgLevel(vv.toMap()["level"].toInt());
+                                m.level = OST::IntToLogLevel(vv.toMap()["level"].toInt());
                                 m.ts = vv.toMap()["ts"].toDateTime();
                                 m.message = vv.toMap()["message"].toString();
                                 getEltMsg(key, eltkey)->setValue(m, true);

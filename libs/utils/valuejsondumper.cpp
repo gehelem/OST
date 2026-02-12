@@ -118,7 +118,7 @@ void ValueJsonDumper::visit(ValueVideo *  pValue)
 void ValueJsonDumper::visit(ValueMessage *  pValue)
 {
     QJsonObject ob;
-    ob["level"] = pValue->value.level;
+    ob["level"] = LogLevelToInt(pValue->value.level);
     ob["message"] = pValue->value.message;
     ob["ts"] = pValue->value.ts.toString("yyyy/MM/dd hh:mm:ss.zzz");;
     mResult = ob;

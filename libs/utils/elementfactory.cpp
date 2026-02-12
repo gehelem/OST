@@ -177,7 +177,7 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
                                                );
             MsgData m;
             m.message = pData["message"].toString();
-            m.level = IntToMsgLevel(pData["level"].toInt());
+            m.level = IntToLogLevel(pData["level"].toInt());
             m.ts = QDateTime::fromString(pData["ts"].toString(), "yyyy/MM/dd hh:mm:ss.zzz");
             pElement->setValue(m, false);
             return pElement;
