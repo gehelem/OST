@@ -44,12 +44,12 @@ void Basemodule::setProfile(const QString &pProfileName)
     QVariantMap prof;
     if (!getDbProfile(getClassName(), pProfileName, prof))
     {
-        sendWarning("Can't get " + pProfileName + " profile");
+        logWarning("Can't get %1 profile", {pProfileName});
         return;
     }
     setProfile(prof);
     emit moduleEvent("moduleSetProfile", getModuleName(), pProfileName, QVariantMap());
-    sendMessage(pProfileName + " profile sucessfully loaded");
+    logInfo("%1 profile sucessfully loaded", {pProfileName});
     QJsonObject ob;
     ob.fromVariantMap(prof);
 }
@@ -194,7 +194,7 @@ void Basemodule::setProfiles()
     {
         getEltString("loadprofile", "name")->lovAdd(iter.key(), iter.key());
     }
-    sendMessage("Available profiles refreshed");
+    logInfo("Available profiles refreshed");
 }
 
 void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
@@ -240,19 +240,19 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
         {
             if (!getStore().contains(keyprop) )
             {
-                sendWarning(" Fsetproperty - property " + keyprop + " not found");
+                logWarning("Fsetproperty - property %1 not found", {keyprop});
                 return;
             }
             if (!getStore()[keyprop]->isEnabled() )
             {
-                sendWarning(" Fsetproperty - property " + keyprop + " is disabled - can't update");
+                logWarning("Fsetproperty - property %1 is disabled - can't update", {keyprop});
                 return;
             }
             foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
             {
                 if (!getStore()[keyprop]->getElts()->contains(keyelt) )
                 {
-                    sendWarning(" Fsetproperty - property " + keyprop + " - element " + keyelt +  " not found");
+                    logWarning("Fsetproperty - property %1 - element %2 not found", {keyprop, keyelt});
                     return;
                 }
             }
@@ -348,7 +348,7 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
         {
             if (!getStore().contains(keyprop) )
             {
-                sendWarning(" Fbadge - property " + keyprop + " not found");
+                logWarning("Fbadge - property %1 not found", {keyprop});
                 return;
             }
             getStore()[keyprop]->setBadge(!getStore()[keyprop]->getBadge());
@@ -365,14 +365,14 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
         if (setDbProfile(getClassName(), getString("saveprofile", "name"), prof))
         {
             getProperty("saveprofile")->setState(OST::Ok);
-            sendMessage(getString("saveprofile", "name") + " profile sucessfully saved");
+            logInfo("%1 profile sucessfully saved", {getString("saveprofile", "name")});
             emit moduleEvent("modulesavedprofile", getModuleName(), getString("saveprofile", "name"),
                              QVariantMap());
         }
         else
         {
             getProperty("saveprofile")->setState(OST::Error);
-            sendWarning("Can't save " + getString("saveprofile", "name") + " profile");
+            logWarning("Can't save %1 profile", {getString("saveprofile", "name")});
         }
         return;
     }
@@ -385,7 +385,7 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
         {
             setProfile(prof);
             getProperty("loadprofile")->setState(OST::Ok);
-            sendMessage(getString("loadprofile", "name") + " profile sucessfully loaded");
+            logInfo("%1 profile sucessfully loaded", {getString("loadprofile", "name")});
             emit moduleEvent("moduleloadedprofile", getModuleName(), getString("loadprofile", "name"),
                              QVariantMap());
             getEltString("saveprofile", "name")->setValue(getString("loadprofile", "name"), true);
@@ -393,7 +393,7 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
         }
         else
         {
-            sendWarning("Can't load " + getString("loadprofile", "name") + " profile");
+            logWarning("Can't load %1 profile", {getString("loadprofile", "name")});
             getProperty("loadprofile")->setState(OST::Error);
         }
         return;
@@ -533,8 +533,7 @@ bool Basemodule::setClassName(const QString &pClassName)
     }
     else
     {
-        sendWarning("ClassName already set (" + mClassName +
-                    ") - this method must be called only once, at the begin of class constructor");
+        logWarning("ClassName already set (%1) - this method must be called only once, at the begin of class constructor", {mClassName});
         return false;
     }
 }
