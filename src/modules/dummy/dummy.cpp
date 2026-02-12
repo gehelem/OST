@@ -108,13 +108,16 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
 
 void Dummy::onTimer()
 {
-    logInfo("Test log %1", {100});
-    logDebug("Available indi drivers");
-    logDebug("Debug");
-    logInfo("Info");
-    logWarning("Warning");
-    logError("Error");
-    logCritical("Critical");
+    //logInfo("Test log %1", {100});
+    //logDebug("Available indi drivers");
+    //logDebug("Debug");
+    //logInfo("Info");
+    //logWarning("Warning");
+    //logError("Error");
+    //logCritical("Critical");
+    //getEltInt("totoRW", "toto")->setValue(12);
+    //getEltInt("numbersRW", "toto")->setValue(12);
+    getEltInt("numbersRW", "n1")->setValue(200);
 }
 
 Dummy::~Dummy()

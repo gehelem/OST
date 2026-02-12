@@ -447,10 +447,11 @@ class PropertyMulti: public PropertyBase
          * @brief Slot called when element sends message
          * @param l Message level (Info, Warn, Err)
          * @param m Message text
+         * @param args Arguments for parametric translation
          *
          * Propagates messages from elements to property level.
          */
-        void OnMessage(MsgLevel l, QString m);
+        void OnMessage(MsgLevel l, QString m, QVariantList args);
 
     private:
         // Grid configuration

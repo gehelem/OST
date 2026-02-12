@@ -560,21 +560,21 @@ void PropertyMulti::OnLovChanged(ElementBase*)
 {
     emit propertyEvent("ap", key(), this);
 }
-void PropertyMulti::OnMessage(MsgLevel l, QString m)
+void PropertyMulti::OnMessage(MsgLevel l, QString m, QVariantList args)
 {
     switch (l)
     {
         case Info:
-            sendInfo(this->key() + "-" + m);
+            sendInfo(this->key() + "-" + m, args);
             break;
         case Warn:
-            sendWarning(this->key() + "-" + m);
+            sendWarning(this->key() + "-" + m, args);
             break;
         case Err:
-            sendError(this->key() + "-" + m);
+            sendError(this->key() + "-" + m, args);
             break;
         default:
-            sendError(this->key() + "-" + m);
+            sendError(this->key() + "-" + m, args);
             break;
     }
 }

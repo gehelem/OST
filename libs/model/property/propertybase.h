@@ -271,29 +271,32 @@ class PropertyBase: public QObject
         /**
          * @brief Send informational message
          * @param m Message text
+         * @param args Arguments for parametric translation
          *
          * Emits sendMessage() signal with Info level.
          * Messages are typically logged and displayed in frontend message area.
          */
-        void sendInfo(QString m);
+        void sendInfo(QString m, const QVariantList &args = {});
 
         /**
          * @brief Send warning message
          * @param m Message text
+         * @param args Arguments for parametric translation
          *
          * Emits sendMessage() signal with Warn level.
          * Warnings indicate potential issues but don't stop execution.
          */
-        void sendWarning(QString m);
+        void sendWarning(QString m, const QVariantList &args = {});
 
         /**
          * @brief Send error message
          * @param m Message text
+         * @param args Arguments for parametric translation
          *
          * Emits sendMessage() signal with Err level.
          * Errors indicate failures that may require user intervention.
          */
-        void sendError(QString m);
+        void sendError(QString m, const QVariantList &args = {});
 
         /**
          * @brief Get first prefix icon identifier

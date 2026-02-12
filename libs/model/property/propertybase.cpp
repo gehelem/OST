@@ -76,17 +76,17 @@ void PropertyBase::setBadge(bool b)
     mBadge = b;
     emit propertyEvent("ap", key(), this);
 }
-void PropertyBase::sendInfo(QString m)
+void PropertyBase::sendInfo(QString m, const QVariantList &args)
 {
-    emit sendMessage(Info, key() + "-" + m, {});
+    emit sendMessage(Info, key() + "-" + m, args);
 }
-void PropertyBase::sendWarning(QString m)
+void PropertyBase::sendWarning(QString m, const QVariantList &args)
 {
-    emit sendMessage(Warn, key() + "-" + m, {});
+    emit sendMessage(Warn, key() + "-" + m, args);
 }
-void PropertyBase::sendError(QString m)
+void PropertyBase::sendError(QString m, const QVariantList &args)
 {
-    emit sendMessage(Err, key() + "-" + m, {});
+    emit sendMessage(Err, key() + "-" + m, args);
 }
 QString PropertyBase::getPreIcon1(void)
 {
