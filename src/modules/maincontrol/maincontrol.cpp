@@ -119,7 +119,7 @@ void Maincontrol::setConfigurations(void)
     QVariantMap confs;
     if (!getDbConfigurations( confs))
     {
-        sendError("Can't refresh available configurations");
+        logError("Can't refresh available configurations");
         return;
     }
 
@@ -128,24 +128,20 @@ void Maincontrol::setConfigurations(void)
     {
         getEltString("loadconf", "name")->lovAdd(iter.key(), iter.key());
     }
-    sendMessage("Available configurations refreshed");
+    logInfo("Available configurations refreshed");
 }
 
 void Maincontrol::sendMainMessage(const QString &pMessage)
 {
-    sendMessage(pMessage);
+    logInfo(pMessage);
 }
 void Maincontrol::sendMainError(const QString &pMessage)
 {
-    sendError(pMessage);
+    logError(pMessage);
 }
 void Maincontrol::sendMainWarning(const QString &pMessage)
 {
-    sendWarning(pMessage);
-}
-void Maincontrol::sendMainConsole(const QString &pMessage)
-{
-    sendConsole(pMessage);
+    logWarning(pMessage);
 }
 void Maincontrol::setAvailableModuleLibs(const QVariantMap libs)
 {

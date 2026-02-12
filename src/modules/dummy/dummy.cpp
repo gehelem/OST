@@ -236,7 +236,7 @@ void Dummy::OnMyExternalEvent(const QString &eventType, const QString  &eventMod
                             )
                             {
                                 getProperty(keyprop)->setState(OST::Error);
-                                sendMessage("Can't find mount device " + getString("devices", "mount") + " solve aborted");
+                                logWarning("Can't find mount device %1 solve aborted", {getString("devices", "mount")});
                             }
                             else
                             {
@@ -373,7 +373,7 @@ void Dummy::OnSucessSEP()
 }
 void Dummy::OnNewImage()
 {
-    sendMessage("New image");
+    logDebug("New image");
 
     double ra, dec;
     if (
@@ -381,7 +381,7 @@ void Dummy::OnNewImage()
         || !getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "RA", ra)
     )
     {
-        sendMessage("Can't find mount device " + getString("devices", "mount") + " solve aborted");
+        logWarning("Can't find mount device %1 solve aborted", {getString("devices", "mount")});
     }
     else
     {
@@ -400,15 +400,15 @@ void Dummy::OnNewImage()
 
 void Dummy::OnSolveFinished()
 {
-    sendMessage("Solver finished");
+    logInfo("Solver finished");
 }
 void Dummy::OnSucessSolve()
 {
-    sendMessage("Solver sucess");
+    logInfo("Solver sucess");
 
     if (_solver.stellarSolver.failed())
     {
-        sendMessage("Solver failed");
+        logWarning("Solver failed");
         getProperty("actions2")->setState(OST::Error);
         OST::ImgData dta = getEltImg("testimage", "image1")->value();
         dta.isSolved = false;
@@ -437,7 +437,7 @@ void Dummy::OnSolverLog(QString text)
 void Dummy::updateSearchList(void)
 {
     QString s = getString("search", "search");
-    sendMessage("Searching " + s);
+    logInfo("Searching %1", {s});
 
     getStore()["results"]->clearGrid();
     QList<catalogResult> results;
@@ -445,15 +445,14 @@ void Dummy::updateSearchList(void)
     searchCatalog(s, results);
     if (results.count() == 0)
     {
-        sendWarning("Searching " + s + " gives no result");
+        logWarning("Searching %1 gives no result", {s});
         return;
     }
 
     int max = 20;
     if (max < results.count())
     {
-        sendWarning("updateSearchList more than " + QString::number(max) + " objects found, limiting result to " + QString::number(
-                        max));
+        logWarning("updateSearchList more than %1 objects found, limiting result to %2", {max, max});
     }
     else
     {

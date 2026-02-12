@@ -230,7 +230,7 @@ void IndiPanel::newBLOB(IBLOB bp)
 }
 void IndiPanel::newMessage     (INDI::BaseDevice dp, int messageID)
 {
-    sendMessage(dp.getDeviceName() + QString::fromStdString(dp.messageQueue(messageID)));
+    logInfo("%1 %2", {dp.getDeviceName(), QString::fromStdString(dp.messageQueue(messageID))});
 }
 
 void IndiPanel::OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
@@ -246,7 +246,7 @@ void IndiPanel::OnMyExternalEvent(const QString &eventType, const QString  &even
     {
         if (!m.contains(keyprop))
         {
-            sendError ("OnMyExternalEvent - property " + keyprop + " does not exist (indipanel)");
+            logError("OnMyExternalEvent - property %1 does not exist (indipanel)", {keyprop});
             return;
         }
         QString prop = keyprop;
@@ -261,7 +261,7 @@ void IndiPanel::OnMyExternalEvent(const QString &eventType, const QString  &even
             {
                 if (!m[keyprop].toMap()["elements"].toMap().contains(keyelt))
                 {
-                    sendError ("OnMyExternalEvent - property " + keyprop + ", element " + keyelt + " does not exist (indipanel)");
+                    logError ("OnMyExternalEvent - property %1 element %2 does not exist (indipanel)", {keyprop, keyelt});
                     return;
                 }
                 if (getStore()[keyprop]->getElt(keyelt)->getType() == "string")
@@ -277,7 +277,7 @@ void IndiPanel::OnMyExternalEvent(const QString &eventType, const QString  &even
                 }
                 if (getStore()[keyprop]->getElt(keyelt)->getType() == "bool")
                 {
-                    qDebug() << "bool" << keyprop << keyelt << eventData[keyprop].toMap()["elements"].toMap()[keyelt];
+                    //qDebug() << "bool" << keyprop << keyelt << eventData[keyprop].toMap()["elements"].toMap()[keyelt];
                     keyelt.toStdString();
                     if ( eventData[keyprop].toMap()["elements"].toMap()[keyelt].toBool()) sendModNewSwitch(realDevice, prop,
                                 keyelt, ISS_ON);

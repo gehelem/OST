@@ -18,7 +18,6 @@ class MODULE_INIT Maincontrol : public Basemodule
         void sendMainMessage(const QString &pMessage);
         void sendMainError(const QString &pMessage);
         void sendMainWarning(const QString &pMessage);
-        void sendMainConsole(const QString &pMessage);
         void setAvailableModuleLibs(const QVariantMap libs);
         void addModuleData(const QString  &pName, const QString  &pLabel, const QString  &pType, const QString  &pProfile);
         void setModuleData(const QString  &pName, const QString  &pLabel, const QString  &pType, const QString  &pProfile);
