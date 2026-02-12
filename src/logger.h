@@ -7,24 +7,13 @@
 #include <QTextStream>
 #include <QDateTime>
 #include <QVariantList>
+#include <common.h>
 
 namespace  OST
 {
 
 // Forward declaration
 class TranslateManager;
-
-/**
- * @brief Logging levels
- */
-enum class LogLevel
-{
-    Debug = 0,
-    Info = 1,
-    Warning = 2,
-    Error = 3,
-    Critical = 4,
-};
 struct LogMess
 {
     LogLevel level = LogLevel::Info;

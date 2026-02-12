@@ -23,13 +23,15 @@ namespace  OST
  * ElementMessage is a specialized element for displaying timestamped log messages
  * with severity levels. It stores MsgData structures containing:
  * - Message text
- * - MsgLevel (Info, Warn, Err)
+ * - LogLevel (Debug, Info, Warning, Error, Critical)
  * - Timestamp (QDateTime)
  *
  * Frontend typically displays messages with color coding based on level:
+ * - Debug: Gray (verbose debug information)
  * - Info: Normal/white text (informational messages)
- * - Warn: Yellow/orange text (warnings, non-critical issues)
- * - Err: Red text (errors, critical problems)
+ * - Warning: Yellow/orange text (warnings, non-critical issues)
+ * - Error: Red text (errors, critical problems)
+ * - Critical: Red bold (severe system failures)
  *
  * Common uses:
  * - Operation status messages
@@ -95,12 +97,12 @@ namespace  OST
  * logProperty->push();  // Add second line
  * @endcode
  *
- * @note MsgData and MsgLevel are defined in common.h
+ * @note MsgData and LogLevel are defined in common.h
  * @note Timestamps are stored in QDateTime for timezone-aware display
  * @note Grid typically has limit (e.g., 5000 messages) for memory management
  *
  * @see MsgData
- * @see MsgLevel
+ * @see LogLevel
  * @see ElementTemplateNotNumeric
  * @see PropertyMulti::push()
  */
@@ -160,11 +162,11 @@ class ElementMessage: public ElementTemplateNotNumeric<MsgData>
 
         /**
          * @brief Get message severity level
-         * @return MsgLevel (Info, Warn, Err) from current MsgData value
+         * @return LogLevel (Debug, Info, Warning, Error, Critical) from current MsgData value
          *
          * Convenience method to extract severity level from value.
          */
-        MsgLevel level();
+        LogLevel level();
 
         /**
          * @brief Get message timestamp

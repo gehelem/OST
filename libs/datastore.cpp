@@ -720,18 +720,24 @@ OST::LovString* Datastore::getGlovString(QString pLov)
 
     return static_cast<OST::LovString*>(getGlobLovs()[pLov]);
 }
-void Datastore::onPropertyMessage(OST::MsgLevel l, QString m, QVariantList args)
+void Datastore::onPropertyMessage(OST::LogLevel l, QString m, QVariantList args)
 {
     switch (l)
     {
-        case OST::Info:
+        case OST::LogLevel::Debug:
+            logDebug(m, args);
+            break;
+        case OST::LogLevel::Info:
             logInfo(m, args);
             break;
-        case OST::Warn:
+        case OST::LogLevel::Warning:
             logWarning(m, args);
             break;
-        case OST::Err:
+        case OST::LogLevel::Error:
             logError(m, args);
+            break;
+        case OST::LogLevel::Critical:
+            logCritical(m, args);
             break;
         default:
             logError(m, args);

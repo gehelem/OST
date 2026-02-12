@@ -271,13 +271,13 @@ class ElementBase: public QObject
 
         /**
          * @brief Signal emitted when sending messages
-         * @param level Message level (Info, Warn, Err)
+         * @param level Message level (Debug, Info, Warning, Error, Critical)
          * @param message Message text (key)
          * @param args Arguments for parametric messages
          *
          * Propagated to property and module levels.
          */
-        void sendMessage(MsgLevel, QString, QVariantList);
+        void sendMessage(LogLevel, QString, QVariantList);
 
         /**
          * @brief Signal emitted when LOV changes

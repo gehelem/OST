@@ -6,7 +6,7 @@
  *
  * This file defines all common types, enumerations, and data structures used
  * throughout the OST element and property system. Includes:
- * - State and status enumerations (State, MsgLevel, SliderRule, SwitchsRule)
+ * - State and status enumerations (State, LogLevel, SliderRule, SwitchsRule)
  * - Data structures for specialized elements (ImgData, VideoData, MsgData, PrgData)
  * - Graph configuration types (GraphType, GraphDefs)
  * - Conversion utility functions
@@ -19,6 +19,7 @@
 
 namespace  OST
 {
+
 
 /**
  * @enum State
@@ -151,29 +152,34 @@ inline SliderRule IntToSlider(int val )
 }
 
 /**
- * @enum MsgLevel
- * @brief Message severity level enumeration
+ * @enum LogLevel
+ * @brief Log message severity level enumeration
  *
- * Defines severity levels for log messages and notifications.
- * Used by ElementMessage and message signal handlers.
+ * Defines severity levels for log messages, notifications, and console output.
+ * Used throughout OST for logging, ElementMessage, and message signal handlers.
  *
- * Frontend displays with color coding:
- * - Info: Normal/white text
- * - Warn: Yellow/orange text
- * - Err: Red text
+ * Frontend/Console displays with color coding:
+ * - Debug: Gray (verbose debug information)
+ * - Info: Normal/white text (informational messages)
+ * - Warning: Yellow/orange text (non-critical issues)
+ * - Error: Red text (critical problems)
+ * - Critical: Red bold (severe system errors)
  *
+ * @see Logger
  * @see ElementMessage
  * @see MsgData
  * @see PropertyBase::sendInfo()
  * @see PropertyBase::sendWarning()
  * @see PropertyBase::sendError()
  */
-typedef enum
+enum class LogLevel
 {
-    Info = 0,  /*!< Informational message (normal priority) */
-    Warn,      /*!< Warning message (non-critical issue) */
-    Err        /*!< Error message (critical problem) */
-} MsgLevel;
+    Debug = 0,      /*!< Debug/verbose information (lowest priority) */
+    Info = 1,       /*!< Informational message (normal priority) */
+    Warning = 2,    /*!< Warning message (non-critical issue) */
+    Error = 3,      /*!< Error message (critical problem) */
+    Critical = 4    /*!< Critical error (severe system failure) */
+};
 
 /**
  * @struct ModuleStatus
@@ -192,20 +198,34 @@ typedef struct ModuleStatus
 } ModuleStatus;
 
 /**
- * @brief Convert integer to MsgLevel enum
- * @param val Integer value (0-2)
- * @return Corresponding MsgLevel value
+ * @brief Convert integer to LogLevel enum
+ * @param val Integer value (0-4)
+ * @return Corresponding LogLevel value
  *
- * Conversion table: 0=Info, 1=Warn, 2=Err
+ * Conversion table: 0=Debug, 1=Info, 2=Warning, 3=Error, 4=Critical
  * Invalid values default to Info with debug warning.
  */
-inline MsgLevel IntToMsgLevel(int val )
+inline LogLevel IntToLogLevel(int val)
 {
-    if (val == 0) return Info;
-    if (val == 1) return Warn;
-    if (val == 2) return Err;
-    qDebug() << "Cant convert " << val << " to OST::MsgLevel (0-2) - defaults to Info";
-    return Info;
+    if (val == 0) return LogLevel::Debug;
+    if (val == 1) return LogLevel::Info;
+    if (val == 2) return LogLevel::Warning;
+    if (val == 3) return LogLevel::Error;
+    if (val == 4) return LogLevel::Critical;
+    qDebug() << "Cant convert " << val << " to OST::LogLevel (0-4) - defaults to Info";
+    return LogLevel::Info;
+}
+
+/**
+ * @brief Convert LogLevel enum to integer
+ * @param val LogLevel value
+ * @return Corresponding integer (0-4)
+ *
+ * Used for serialization and comparison.
+ */
+inline int LogLevelToInt(LogLevel val)
+{
+    return static_cast<int>(val);
 }
 
 /**
@@ -216,13 +236,13 @@ inline MsgLevel IntToMsgLevel(int val )
  * Used by ElementMessage to display messages with severity levels.
  *
  * @see ElementMessage
- * @see MsgLevel
+ * @see LogLevel
  */
 typedef struct MsgData
 {
-    MsgLevel level = Info;   /*!< Message severity level */
-    QDateTime ts;            /*!< Message timestamp */
-    QString message;         /*!< Message text content */
+    LogLevel level = LogLevel::Info;   /*!< Message severity level */
+    QDateTime ts;                      /*!< Message timestamp */
+    QString message;                   /*!< Message text content */
 } MsgData;
 
 /**

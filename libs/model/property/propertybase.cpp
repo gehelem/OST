@@ -23,7 +23,7 @@ PropertyBase::PropertyBase(const QString &key, const QString &label, const Permi
     : mKey(key), mLabel(label), mPermission(permission), mLevel1(level1), mLevel2(level2),
       mOrder(order), mHasProfile(hasProfile)
 {
-    qRegisterMetaType<OST::MsgLevel>("MsgLevel");
+    qRegisterMetaType<OST::LogLevel>("LogLevel");
     if (order == "") qDebug() << "*** PropertyBase order ko *** "  << label << key << level1 << level2;
 }
 PropertyBase::~PropertyBase()
@@ -96,21 +96,21 @@ void PropertyBase::sendInfo(QString m, const QVariantList &args)
     QVariantList newArgs = args;
     newArgs.prepend(key());
     QString newMessage = "%1 - " + incrementPlaceholders(m);
-    emit sendMessage(Info, newMessage, newArgs);
+    emit sendMessage(LogLevel::Info, newMessage, newArgs);
 }
 void PropertyBase::sendWarning(QString m, const QVariantList &args)
 {
     QVariantList newArgs = args;
     newArgs.prepend(key());
     QString newMessage = "%1 - " + incrementPlaceholders(m);
-    emit sendMessage(Warn, newMessage, newArgs);
+    emit sendMessage(LogLevel::Warning, newMessage, newArgs);
 }
 void PropertyBase::sendError(QString m, const QVariantList &args)
 {
     QVariantList newArgs = args;
     newArgs.prepend(key());
     QString newMessage = "%1 - " + incrementPlaceholders(m);
-    emit sendMessage(Err, newMessage, newArgs);
+    emit sendMessage(LogLevel::Error, newMessage, newArgs);
 }
 QString PropertyBase::getPreIcon1(void)
 {

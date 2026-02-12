@@ -29,7 +29,7 @@ QString ElementMessage::message()
 {
     return value().message;
 }
-MsgLevel ElementMessage::level()
+LogLevel ElementMessage::level()
 {
     return value().level;
 }

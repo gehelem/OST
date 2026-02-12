@@ -560,18 +560,23 @@ void PropertyMulti::OnLovChanged(ElementBase*)
 {
     emit propertyEvent("ap", key(), this);
 }
-void PropertyMulti::OnMessage(MsgLevel l, QString m, QVariantList args)
+void PropertyMulti::OnMessage(LogLevel l, QString m, QVariantList args)
 {
     // Just pass through to PropertyBase methods which will add key() prefix
     switch (l)
     {
-        case Info:
+        case LogLevel::Debug:
+            // No debug method in PropertyBase, map to Info
             sendInfo(m, args);
             break;
-        case Warn:
+        case LogLevel::Info:
+            sendInfo(m, args);
+            break;
+        case LogLevel::Warning:
             sendWarning(m, args);
             break;
-        case Err:
+        case LogLevel::Error:
+        case LogLevel::Critical:
             sendError(m, args);
             break;
         default:
