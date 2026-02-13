@@ -159,8 +159,6 @@ add_dependencies(ostserver translations)
 #qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
 add_library(ostbasemodule SHARED
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/baseroot.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/baseroot.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/datastore.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/datastore.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/dbmanager.cpp
@@ -247,7 +245,6 @@ add_library(ostbasemodule SHARED
 set(BASE_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/datastore.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/dbmanager.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/baseroot.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/fileio.h

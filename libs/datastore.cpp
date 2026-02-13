@@ -745,3 +745,31 @@ void Datastore::onPropertyMessage(OST::LogLevel l, QString m, QVariantList args)
     }
 
 }
+// ============================================================================
+// NEW SYSTEM - Helper methods that emit the signal
+// ============================================================================
+
+void Datastore::logDebug(const QString &message, const QVariantList &args)
+{
+    emit logSignal(OST::LogLevel::Debug, message, args, getModuleName());
+}
+
+void Datastore::logInfo(const QString &message, const QVariantList &args)
+{
+    emit logSignal(OST::LogLevel::Info, message, args, getModuleName());
+}
+
+void Datastore::logWarning(const QString &message, const QVariantList &args)
+{
+    emit logSignal(OST::LogLevel::Warning, message, args, getModuleName());
+}
+
+void Datastore::logError(const QString &message, const QVariantList &args)
+{
+    emit logSignal(OST::LogLevel::Error, message, args, getModuleName());
+}
+
+void Datastore::logCritical(const QString &message, const QVariantList &args)
+{
+    emit logSignal(OST::LogLevel::Critical, message, args, getModuleName());
+}

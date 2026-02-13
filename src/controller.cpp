@@ -56,8 +56,8 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     wshandler->dbmanager = dbmanager;
 
     // Connect DBManager to log system
-    connect(dbmanager, &Baseroot::logSignal, mLogger, &OST::Logger::onLog);
-    connect(dbmanager, &Baseroot::logSignal, wshandler, &WShandler::onLog);
+    connect(dbmanager, &Basemodule::logSignal, mLogger, &OST::Logger::onLog);
+    connect(dbmanager, &Basemodule::logSignal, wshandler, &WShandler::onLog);
 
     logInfo("iteration %1/%2", {10, 20});
 
@@ -93,8 +93,8 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     pMainControl->sendDump();
 
     // Connect MainControl to log system
-    connect(pMainControl, &Baseroot::logSignal, mLogger, &OST::Logger::onLog);
-    connect(pMainControl, &Baseroot::logSignal, wshandler, &WShandler::onLog);
+    connect(pMainControl, &Basemodule::logSignal, mLogger, &OST::Logger::onLog);
+    connect(pMainControl, &Basemodule::logSignal, wshandler, &WShandler::onLog);
 
     loadConf(_conf);
 
@@ -194,8 +194,8 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     //connect(wshandler, &WShandler::externalEvent, mod, &Basemodule::OnExternalEvent);
 
     // Connect module to log system
-    connect(mod, &Baseroot::logSignal, mLogger, &OST::Logger::onLog);
-    connect(mod, &Baseroot::logSignal, wshandler, &WShandler::onLog);
+    connect(mod, &Basemodule::logSignal, mLogger, &OST::Logger::onLog);
+    connect(mod, &Basemodule::logSignal, wshandler, &WShandler::onLog);
 
     mod->OnExternalEvent("afterinit", name, QString(), QVariantMap());
     mod->sendDump();

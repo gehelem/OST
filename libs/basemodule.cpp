@@ -427,12 +427,6 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
             }
         }
     }
-    if ((getModuleName() == pEventModule ) && (pEventType == "Fclearmessages") )
-    {
-        resetMessages();
-        resetWarnings();
-        resetErrors();
-    }
     /* dispatch any message to children */
     OnMyExternalEvent(pEventType, pEventModule, pEventKey, pEventData);
     OnDispatchToIndiExternalEvent(pEventType, pEventModule, pEventKey, pEventData);
@@ -510,9 +504,6 @@ void Basemodule::sendDump(void)
     dump["globallovs"] = getGlobalLovsDump();;
     dump["state"] = state;
     dump["infos"] = infos;
-    dump["messages"] = getMessages();
-    dump["warnings"] = getWarnings();
-    dump["errors"] = getErrors();
     dump["help"] = getHelpContent("fr");
     //getQtProperties();
     emit moduleEvent("moduledump", getModuleName(), "*", dump);

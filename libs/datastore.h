@@ -1,7 +1,9 @@
 #ifndef DATASTORE_h_
 #define DATASTORE_h_
-//#include "jsondumper.h"
-#include <baseroot.h>
+#include <QtSql/QSql>
+#include <QtSql/QSqlDatabase>
+#include <QtSql/QSqlQuery>
+#include <QtSql/QSqlError>
 #include <propertytextdumper.h>
 #include <propertyjsondumper.h>
 #include <propertyupdate.h>
@@ -28,11 +30,29 @@
  *  @author Gehelem
  */
 
-class Datastore : public Baseroot
+class Datastore : public QObject
 {
+        Q_OBJECT
+
     public:
         Datastore();
         ~Datastore();
+        /**
+         * @brief Returns the module/component name (to override in derived classes)
+         */
+        virtual QString getModuleName() const
+        {
+            return "Unknown";
+        }
+        virtual void OnModuleEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+                                   const QVariantMap &pEventData)
+        {
+            Q_UNUSED(pEventType);
+            Q_UNUSED(pEventModule);
+            Q_UNUSED(pEventKey);
+            Q_UNUSED(pEventData);
+        };
+
     protected:
         OST::PropertyMulti* getProperty(QString pProperty);
         OST::ElementBase* getEltBase(QString pProperty, QString pElement);
@@ -148,6 +168,28 @@ class Datastore : public Baseroot
         void onPropertyEvent(QString event, QString key, OST::PropertyBase* prop);
         void onPropertyMessage(OST::LogLevel l, QString m, QVariantList args);
         void onLovChanged(void);
+
+
+    signals:
+        /**
+         * @brief Signal emitted for all log messages
+         * @param level Log level (Debug, Info, Warning, Error, Critical)
+         * @param message Translation key for the message
+         * @param args Dynamic arguments for parametric translation
+         * @param context Context/source (module name, component, etc.)
+         */
+        void logSignal(OST::LogLevel level, const QString &message,
+                       const QVariantList &args, const QString &context);
+
+    protected:
+        /**
+         * @brief Helper methods to facilitate usage
+         */
+        void logDebug(const QString &message, const QVariantList &args = {});
+        void logInfo(const QString &message, const QVariantList &args = {});
+        void logWarning(const QString &message, const QVariantList &args = {});
+        void logError(const QString &message, const QVariantList &args = {});
+        void logCritical(const QString &message, const QVariantList &args = {});
 
     private:
         QMap<QString, OST::PropertyMulti*> mStore;
