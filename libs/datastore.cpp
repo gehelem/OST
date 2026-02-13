@@ -434,48 +434,6 @@ bool Datastore::createOstElementBool(const QString &pPropertyName, const QString
     return true;
 
 }
-bool Datastore::setOstElementValue(const QString &pPropertyName, const QString &pElementName, const QVariant &pElementValue,
-                                   bool mEmitEvent)
-{
-    Q_UNUSED(mEmitEvent)
-    if (!mStore.contains(pPropertyName))
-    {
-        logWarning("setElementValue - property2 %1 not found", {pPropertyName});
-        return false;
-    }
-    OST::PropertyMulti *pb = mStore[pPropertyName];
-    if (!mStore[pPropertyName]->getElts()->contains(pElementName))
-    {
-        logWarning("setElementValue - property2 %1 : element %2 not found", {pPropertyName, pElementName});
-        return false;
-    }
-    return pb->setElt(pElementName, pElementValue);
-}
-QVariantList Datastore::getOstElementGrid(const QString &pPropertyName, const QString &pElementName)
-{
-    if (!mStore.contains(pPropertyName))
-    {
-        logWarning("getOstElementGrid - property %1 not found", {pPropertyName});
-        return QVariantList();
-    }
-    if (mStore[pPropertyName]->getElts()->size() == 0)
-    {
-        logWarning("getOstElementGrid - property %1 contains no elements", {pPropertyName});
-        return QVariantList();
-    }
-    if (!mStore[pPropertyName]->hasGrid())
-    {
-        logWarning("getOstElementGrid - property %1 has no grid", {pPropertyName});
-        return QVariantList();
-    }
-    OST::ElementUpdate v;
-    QString action = "getgrid";
-    QVariantMap m;
-    mStore[pPropertyName]->getElt(pElementName)->accept(&v, action, m);
-    return v.getGrid();
-
-
-}
 
 void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
 {

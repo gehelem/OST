@@ -92,25 +92,14 @@ class ElementPrg: public ElementTemplateNotNumeric<PrgData>
 
     public:
         /**
-         * @brief Accept a visitor for the Visitor pattern
-         * @param pVisitor Pointer to visitor object
-         */
-        void accept(ElementVisitor *pVisitor) override;
-
-        /**
-         * @brief Accept a visitor with data parameter
-         * @param pVisitor Pointer to visitor object
-         * @param data QVariantMap with operation data
-         */
-        void accept(ElementVisitor *pVisitor, QVariantMap &data) override;
-
-        /**
          * @brief Accept a visitor with action and data parameters
          * @param pVisitor Pointer to visitor object
-         * @param action Action string (e.g., "newline", "cleargrid")
          * @param data QVariantMap with operation data
+         * @param signalType Signal dispatch
+         *
+         * Used for grid operations and custom actions.
          */
-        void accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data) override;
+        void accept(ElementVisitor *pVisitor, QVariantMap &data, SignalType &signalType) override;
 
         /**
          * @brief Construct a new ElementPrg object

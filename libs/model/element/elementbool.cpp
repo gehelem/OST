@@ -10,13 +10,9 @@ ElementBool::~ElementBool()
 {
 }
 
-void ElementBool::accept(ElementVisitor *pVisitor)
+void ElementBool::accept(ElementVisitor *pVisitor, QVariantMap &data, SignalType &signalType)
 {
-    pVisitor->visit(this);
-}
-void ElementBool::accept(ElementVisitor *pVisitor, QVariantMap &data)
-{
-    pVisitor->visit(this, data);
+    pVisitor->visit(this, data, signalType);
 }
 QString ElementBool::getType()
 {

@@ -23,66 +23,16 @@ class ElementJsonDumper : public ElementVisitor
     public:
         ElementJsonDumper() = default;
 
-        void visit(ElementBool *pElement) override;
-        void visit(ElementBool* pElement, QVariantMap &data ) override
-        {
-            Q_UNUSED(pElement);
-            Q_UNUSED(data)
-        }
-        void visit(ElementInt *pElement) override;
-        void visit(ElementInt* pElement, QVariantMap &data ) override
-        {
-            Q_UNUSED(pElement);
-            Q_UNUSED(data)
-        }
-        void visit(ElementFloat *pElement) override;
-        void visit(ElementFloat* pElement, QVariantMap &data ) override
-        {
-            Q_UNUSED(pElement);
-            Q_UNUSED(data)
-        }
-        void visit(ElementString *pElement) override;
-        void visit(ElementString* pElement, QVariantMap &data ) override
-        {
-            Q_UNUSED(pElement);
-            Q_UNUSED(data)
-        }
-        void visit(ElementLight *pElement) override;
-        void visit(ElementLight* pElement, QVariantMap &data ) override
-        {
-            Q_UNUSED(pElement);
-            Q_UNUSED(data)
-        }
-        void visit(ElementImg *pElement) override;
-        void visit(ElementImg* pElement, QVariantMap &data ) override
-        {
-            Q_UNUSED(pElement);
-            Q_UNUSED(data)
-        }
-        void visit(ElementVideo *pElement) override;
-        void visit(ElementVideo* pElement, QVariantMap &data ) override
-        {
-            Q_UNUSED(pElement);
-            Q_UNUSED(data)
-        }
-        void visit(ElementPrg *pElement) override;
-        void visit(ElementPrg* pElement, QVariantMap &data ) override
-        {
-            Q_UNUSED(pElement);
-            Q_UNUSED(data)
-        }
-        void visit(ElementDate *pElement) override;
-        void visit(ElementDate* pElement, QVariantMap &data ) override
-        {
-            Q_UNUSED(pElement);
-            Q_UNUSED(data)
-        }
-        void visit(ElementTime *pElement) override;
-        void visit(ElementTime* pElement, QVariantMap &data ) override
-        {
-            Q_UNUSED(pElement);
-            Q_UNUSED(data)
-        }
+        void visit(ElementBool* pElement, QVariantMap &data, OST::SignalType &signalType) override;
+        void visit(ElementInt* pElement, QVariantMap &data, OST::SignalType &signalType) override;
+        void visit(ElementFloat* pElement, QVariantMap &data, OST::SignalType &signalType ) override;
+        void visit(ElementString* pElement, QVariantMap &data, OST::SignalType &signalType) override;
+        void visit(ElementLight* pElement, QVariantMap &data, OST::SignalType &signalType) override;
+        void visit(ElementImg* pElement, QVariantMap &data, OST::SignalType &signalType ) override;
+        void visit(ElementVideo* pElement, QVariantMap &data, OST::SignalType &signalType) override;
+        void visit(ElementPrg* pElement, QVariantMap &data, OST::SignalType &signalType) override;
+        void visit(ElementDate* pElement, QVariantMap &data, OST::SignalType &signalType) override;
+        void visit(ElementTime* pElement, QVariantMap &data, OST::SignalType &signalType) override;
 
         [[nodiscard]] const QJsonObject &getResult() const
         {

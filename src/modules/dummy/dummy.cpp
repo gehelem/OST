@@ -55,7 +55,7 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     OST::PropertyMulti *n = getProperty("numbersRW");
     n->setState(OST::State::Error);
     OST::ElementFloat *numbersRWn3 = getEltFloat("numbersRW", "n3");
-    numbersRWn3->setValue(999666, true);
+    numbersRWn3->setValue(999666, OST::SignalType::Value);
 
     //getText("extextRW", "extext1")->setValue("Value modified");
     //OST::ElementJsonDumper d;
@@ -117,7 +117,7 @@ void Dummy::onTimer()
     //logCritical("Critical");
     //getEltInt("totoRW", "toto")->setValue(12);
     //getEltInt("numbersRW", "toto")->setValue(12);
-    getEltInt("numbersRW", "n1")->setValue(200);
+    //getEltInt("numbersRW", "n1")->setValue(200);
 }
 
 Dummy::~Dummy()

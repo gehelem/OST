@@ -20,56 +20,16 @@ class ElementUpdate : public ElementVisitor
 
     public:
         ElementUpdate() = default;
-        void visit(ElementInt* pElement) override
-        {
-            Q_UNUSED(pElement)
-        }
-        void visit(ElementInt* pElement, QVariantMap &data ) override;
-        void visit(ElementFloat* pElement) override
-        {
-            Q_UNUSED(pElement)
-        }
-        void visit(ElementFloat* pElement, QVariantMap &data ) override;
-        void visit(ElementBool* pElement) override
-        {
-            Q_UNUSED(pElement)
-        }
-        void visit(ElementBool* pElement, QVariantMap &data ) override;
-        void visit(ElementString* pElement) override
-        {
-            Q_UNUSED(pElement)
-        }
-        void visit(ElementString* pElement, QVariantMap &data ) override;
-        void visit(ElementLight* pElement) override
-        {
-            Q_UNUSED(pElement)
-        }
-        void visit(ElementLight* pElement, QVariantMap &data ) override;
-        void visit(ElementImg* pElement) override
-        {
-            Q_UNUSED(pElement)
-        }
-        void visit(ElementImg* pElement, QVariantMap &data ) override;
-        void visit(ElementVideo* pElement) override
-        {
-            Q_UNUSED(pElement)
-        }
-        void visit(ElementVideo* pElement, QVariantMap &data ) override;
-        void visit(ElementPrg* pElement) override
-        {
-            Q_UNUSED(pElement)
-        }
-        void visit(ElementPrg* pElement, QVariantMap &data ) override;
-        void visit(ElementDate* pElement) override
-        {
-            Q_UNUSED(pElement)
-        }
-        void visit(ElementDate* pElement, QVariantMap &data ) override;
-        void visit(ElementTime* pElement) override
-        {
-            Q_UNUSED(pElement)
-        }
-        void visit(ElementTime* pElement, QVariantMap &data ) override;
+        void visit(ElementInt* pElement, QVariantMap &data, OST::SignalType &signalType) override;
+        void visit(ElementFloat* pElement, QVariantMap &data, OST::SignalType &signalType ) override;
+        void visit(ElementBool* pElement, QVariantMap &data, OST::SignalType &signalType) override;
+        void visit(ElementString* pElement, QVariantMap &data, OST::SignalType &signalType ) override;
+        void visit(ElementLight* pElement, QVariantMap &data, OST::SignalType &signalType) override;
+        void visit(ElementImg* pElement, QVariantMap &data, OST::SignalType &signalType) override;
+        void visit(ElementVideo* pElement, QVariantMap &data, OST::SignalType &signalType) override;
+        void visit(ElementPrg* pElement, QVariantMap &data, OST::SignalType &signalType) override;
+        void visit(ElementDate* pElement, QVariantMap &data, OST::SignalType &signalType) override;
+        void visit(ElementTime* pElement, QVariantMap &data, OST::SignalType &signalType) override;
 
         [[nodiscard]] const QVariantList &getGrid() const
         {

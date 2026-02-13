@@ -9,13 +9,9 @@ ElementFloat::ElementFloat(const QString &label, const QString &order, const QSt
 ElementFloat::~ElementFloat()
 {
 }
-void ElementFloat::accept(ElementVisitor *pVisitor)
+void ElementFloat::accept(ElementVisitor *pVisitor, QVariantMap &data, SignalType &signalType)
 {
-    pVisitor->visit(this);
-}
-void ElementFloat::accept(ElementVisitor *pVisitor, QVariantMap &data)
-{
-    pVisitor->visit(this, data);
+    pVisitor->visit(this, data, signalType);
 }
 QString ElementFloat::getType()
 {

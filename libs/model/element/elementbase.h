@@ -70,32 +70,14 @@ class ElementBase: public QObject
 
     public:
         /**
-         * @brief Accept a visitor for the Visitor pattern
-         * @param pVisitor Pointer to visitor object
-         *
-         * Pure virtual method for Visitor pattern implementation.
-         * Used for JSON serialization, text dumping, etc.
-         */
-        virtual void accept(ElementVisitor* pVisitor) = 0;
-
-        /**
          * @brief Accept a visitor with data parameter
          * @param pVisitor Pointer to visitor object
          * @param data QVariantMap with operation data
+         * @param signalType Signal dispatch
          *
          * Overloaded accept for operations requiring external data.
          */
-        virtual void accept(ElementVisitor* pVisitor, QVariantMap &data) = 0;
-
-        /**
-         * @brief Accept a visitor with action and data parameters
-         * @param pVisitor Pointer to visitor object
-         * @param action Action string (e.g., "newline", "cleargrid")
-         * @param data QVariantMap with operation data
-         *
-         * Overloaded accept for grid operations and custom actions.
-         */
-        virtual void accept(ElementVisitor* pVisitor, QString &action, QVariantMap &data) = 0;
+        virtual void accept(ElementVisitor* pVisitor, QVariantMap &data, SignalType &signalType) = 0;
 
         /**
          * @brief Construct a new ElementBase object

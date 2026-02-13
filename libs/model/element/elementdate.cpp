@@ -8,13 +8,9 @@ ElementDate::ElementDate(const QString &label, const QString &order, const QStri
 ElementDate::~ElementDate()
 {
 }
-void ElementDate::accept(ElementVisitor *pVisitor)
+void ElementDate::accept(ElementVisitor *pVisitor, QVariantMap &data, SignalType &signalType)
 {
-    pVisitor->visit(this);
-}
-void ElementDate::accept(ElementVisitor *pVisitor, QVariantMap &data)
-{
-    pVisitor->visit(this, data);
+    pVisitor->visit(this, data, signalType);
 }
 QString ElementDate::getType()
 {

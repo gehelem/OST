@@ -8,13 +8,9 @@ ElementVideo::ElementVideo(const QString &label, const QString &order, const QSt
 ElementVideo::~ElementVideo()
 {
 }
-void ElementVideo::accept(ElementVisitor *pVisitor)
+void ElementVideo::accept(ElementVisitor *pVisitor, QVariantMap &data, SignalType &signalType)
 {
-    pVisitor->visit(this);
-}
-void ElementVideo::accept(ElementVisitor *pVisitor, QVariantMap &data)
-{
-    pVisitor->visit(this, data);
+    pVisitor->visit(this, data, signalType);
 }
 QString ElementVideo::getType()
 {

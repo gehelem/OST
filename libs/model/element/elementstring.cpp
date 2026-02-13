@@ -9,13 +9,9 @@ ElementString::ElementString(const QString &label, const QString &order, const Q
 ElementString::~ElementString()
 {
 }
-void ElementString::accept(ElementVisitor *pVisitor)
+void ElementString::accept(ElementVisitor *pVisitor, QVariantMap &data, SignalType &signalType)
 {
-    pVisitor->visit(this);
-}
-void ElementString::accept(ElementVisitor *pVisitor, QVariantMap &data)
-{
-    pVisitor->visit(this, data);
+    pVisitor->visit(this, data, signalType);
 }
 QString ElementString::getType()
 {

@@ -119,43 +119,41 @@ bool  PropertyMulti::setElt(QString key, QVariant val)
         sendError("PropertyMulti::setValue - " + key + " - not found");
         return false;
     }
+    QVariantMap m;
+    SignalType s = SignalType::Silent;
     if (((mElts[key]->getType() == "int") && (val.canConvert<long>())) ||
             ((mElts[key]->getType() == "string") && (val.canConvert<QString>())) ||
             ((mElts[key]->getType() == "float") && (val.canConvert<double>())) )
     {
         ElementUpdate vu;
-        QVariantMap m;
         m["value"] = val;
-        getElt(key)->accept(&vu, m);
+        getElt(key)->accept(&vu, m, s);
         return true;
     }
     if (mElts[key]->getType() == "time")
     {
         ElementUpdate vu;
-        QVariantMap m;
         m["value"] = val.toMap();
-        getElt(key)->accept(&vu, m);
+        getElt(key)->accept(&vu, m, s);
         return true;
     }
     if (mElts[key]->getType() == "date")
     {
         ElementUpdate vu;
-        QVariantMap m;
         m["value"] = val.toMap();
-        getElt(key)->accept(&vu, m);
+        getElt(key)->accept(&vu, m, s);
         return true;
     }
 
     if ((mElts[key]->getType() == "bool") && (val.canConvert<bool>()) )
     {
         ElementUpdate vu;
-        QVariantMap m;
 
         switch (this->rule())
         {
             case Any:
                 m["value"] = val;
-                getElt(key)->accept(&vu, m);
+                getElt(key)->accept(&vu, m, s);
                 return true;
                 break;
             case OneOfMany:
@@ -166,11 +164,11 @@ bool  PropertyMulti::setElt(QString key, QVariant val)
                         if ((mElts[elt]->getType() == "bool") && (elt != key))
                         {
                             m["value"] = false;
-                            mElts[elt]->accept(&vu, m);
+                            mElts[elt]->accept(&vu, m, s);
                         }
                     }
                     m["value"] = val;
-                    mElts[key]->accept(&vu, m);
+                    mElts[key]->accept(&vu, m, s);
                     return true;
 
                 }
@@ -183,11 +181,11 @@ bool  PropertyMulti::setElt(QString key, QVariant val)
                     if ((mElts[elt]->getType() == "bool") && (elt != key))
                     {
                         m["value"] = false;
-                        mElts[elt]->accept(&vu, m);
+                        mElts[elt]->accept(&vu, m, s);
                     }
                 }
                 m["value"] = val;
-                mElts[key]->accept(&vu, m);
+                mElts[key]->accept(&vu, m, s);
                 return true;
                 break;
             default:
@@ -273,20 +271,6 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
             }
         }
     }
-
-    foreach(const QString &elt, mElts.keys())
-    {
-
-        if ((mElts[elt]->getType() == "int") || (mElts[elt]->getType() == "float") || (mElts[elt]->getType() == "string"))
-        {
-            ElementUpdate d;
-            QString action = "newline";
-            QVariantMap m;
-            m["val"] = pValues[elt];
-            mElts[elt]->accept(&d, action, m);
-        }
-    }
-
 
     foreach(const QString &elt, mElts.keys())
     {
@@ -505,7 +489,7 @@ bool PropertyMulti::fetchLine(int l)
     }
     foreach(const QString &e, mGrid.at(l).keys())
     {
-        mGrid.at(l)[e]->updateElement(true);
+        mGrid.at(l)[e]->updateElement(SignalType::Value);
     }
     emit propertyEvent("ap", key(), this);
     return true;

@@ -866,7 +866,7 @@ bool IndiModule::defineMeAsImager()
     if (!getStore()["parms"]->getElts()->contains("exposure"))
     {
         OST::ElementFloat* f = new  OST::ElementFloat("Exposure", "exp000", "");
-        f->setValue(0, false);
+        f->setValue(0, OST::SignalType::Silent);
         f->setDirectEdit(true);
         f->setAutoUpdate(true);
         f->setMinMax(0.00001, 300);
@@ -880,7 +880,7 @@ bool IndiModule::defineMeAsImager()
     if (!getStore()["parms"]->getElts()->contains("gain"))
     {
         OST::ElementInt* i  = new  OST::ElementInt("Gain", "exp020", "");
-        i->setValue(0, false);
+        i->setValue(0, OST::SignalType::Silent);
         i->setDirectEdit(true);
         i->setAutoUpdate(true);
         i->setMinMax(0, 500);
@@ -892,7 +892,7 @@ bool IndiModule::defineMeAsImager()
     if (!getStore()["parms"]->getElts()->contains("offset"))
     {
         OST::ElementInt* i  = new  OST::ElementInt("Offset", "exp030", "");
-        i->setValue(0, false);
+        i->setValue(0, OST::SignalType::Silent);
         i->setDirectEdit(true);
         i->setAutoUpdate(true);
         i->setMinMax(0, 500);

@@ -8,13 +8,9 @@ ElementTime::ElementTime(const QString &label, const QString &order, const QStri
 ElementTime::~ElementTime()
 {
 }
-void ElementTime::accept(ElementVisitor *pVisitor)
+void ElementTime::accept(ElementVisitor *pVisitor, QVariantMap &data, SignalType &signalType)
 {
-    pVisitor->visit(this);
-}
-void ElementTime::accept(ElementVisitor *pVisitor, QVariantMap &data)
-{
-    pVisitor->visit(this, data);
+    pVisitor->visit(this, data, signalType);
 }
 QString ElementTime::getType()
 {

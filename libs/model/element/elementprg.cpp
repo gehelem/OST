@@ -8,13 +8,9 @@ ElementPrg::ElementPrg(const QString &label, const QString &order, const QString
 ElementPrg::~ElementPrg()
 {
 }
-void ElementPrg::accept(ElementVisitor *pVisitor)
+void ElementPrg::accept(ElementVisitor *pVisitor, QVariantMap &data, SignalType &signalType)
 {
-    pVisitor->visit(this);
-}
-void ElementPrg::accept(ElementVisitor *pVisitor, QVariantMap &data)
-{
-    pVisitor->visit(this, data);
+    pVisitor->visit(this, data, signalType);
 }
 QString ElementPrg::getType()
 {

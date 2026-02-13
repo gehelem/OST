@@ -9,13 +9,9 @@ ElementLight::ElementLight(const QString &label, const QString &order, const QSt
 ElementLight::~ElementLight()
 {
 }
-void ElementLight::accept(ElementVisitor *pVisitor)
+void ElementLight::accept(ElementVisitor *pVisitor, QVariantMap &data, SignalType &signalType)
 {
-    pVisitor->visit(this);
-}
-void ElementLight::accept(ElementVisitor *pVisitor, QVariantMap &data)
-{
-    pVisitor->visit(this, data);
+    pVisitor->visit(this, data, signalType);
 }
 QString ElementLight::getType()
 {

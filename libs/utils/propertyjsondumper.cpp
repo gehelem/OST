@@ -91,8 +91,9 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
     foreach(const QString &key, pProperty->getElts()->keys())
     {
         OST::ElementJsonDumper d;
-
-        pProperty->getElt(key)->accept(&d);
+        QVariantMap m;
+        SignalType s = SignalType::Silent;
+        pProperty->getElt(key)->accept(&d, m, s);
         QJsonObject value = d.getResult();
         elements[key] = value;
     }

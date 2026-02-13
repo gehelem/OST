@@ -90,7 +90,7 @@ void IndiPanel::newProperty(INDI::Property pProperty)
             for (unsigned int i = 0; i < n.count(); i++)
             {
                 OST::ElementFloat* v = new OST::ElementFloat(n[i].label, QString(i), n[i].label);
-                v->setValue(n[i].getValue(), false);
+                v->setValue(n[i].getValue(), OST::SignalType::Silent);
                 v->setMin(n[i].min);
                 v->setMax(n[i].max);
                 v->setStep(n[i].step);
@@ -169,7 +169,8 @@ void IndiPanel::updateProperty (INDI::Property property)
                 getEltFloat(devpro, n[i].name)->setMax(n[i].max);
                 getEltFloat(devpro, n[i].name)->setStep(n[i].step);
                 getEltFloat(devpro, n[i].name)->setFormat(n[i].format);
-                getEltFloat(devpro, n[i].name)->setValue(n[i].value, i == n.count() - 1);
+                if (i == n.count() - 1) getEltFloat(devpro, n[i].name)->setValue(n[i].value, OST::SignalType::AllValues);
+                else getEltFloat(devpro, n[i].name)->setValue(n[i].value, OST::SignalType::Silent);
             }
             break;
         }
@@ -178,8 +179,16 @@ void IndiPanel::updateProperty (INDI::Property property)
             INDI::PropertySwitch s = property;
             for (unsigned int i = 0; i < s.count(); i++)
             {
-                if (s[i].s == 0) getEltBool(devpro, s[i].name)->setValue(false, i == s.count() - 1);
-                if (s[i].s == 1) getEltBool(devpro, s[i].name)->setValue(true, i == s.count() - 1);
+                if (s[i].s == 0)
+                {
+                    if (i == s.count() - 1) getEltBool(devpro, s[i].name)->setValue(false, OST::SignalType::AllValues);
+                    else  getEltBool(devpro, s[i].name)->setValue(false, OST::SignalType::Silent);
+                };
+                if (s[i].s == 1)
+                {
+                    if (i == s.count() - 1) getEltBool(devpro, s[i].name)->setValue(true, OST::SignalType::AllValues);
+                    else  getEltBool(devpro, s[i].name)->setValue(true, OST::SignalType::Silent);
+                };
             }
             break;
         }
@@ -189,6 +198,8 @@ void IndiPanel::updateProperty (INDI::Property property)
             for (unsigned int i = 0; i < t.count(); i++)
             {
                 getEltString(devpro, t[i].name)->setValue(t[i].text, i == t.count() - 1);
+                if (i == t.count() - 1) getEltString(devpro, t[i].name)->setValue(t[i].text, OST::SignalType::AllValues);
+                else  getEltString(devpro, t[i].name)->setValue(t[i].text, OST::SignalType::Silent);
             }
             break;
         }
@@ -197,7 +208,7 @@ void IndiPanel::updateProperty (INDI::Property property)
             INDI::PropertyLight l = property;
             for (unsigned int i = 0; i < l.count(); i++)
             {
-                getEltLight(devpro, l[i].name)->setValue(OST::IntToState(l[i].getState()), true);
+                getEltLight(devpro, l[i].name)->setValue(OST::IntToState(l[i].getState()), OST::SignalType::Value);
             }
             break;
         }

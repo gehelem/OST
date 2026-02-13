@@ -87,21 +87,6 @@ void Basemodule::setProfile(QVariantMap profiledata)
                         {
                             getEltBool(key, eltkey)->setValue(v.toBool(), OST::SignalType::Value);
                         }
-                        if (props[key].toMap()["elements"].toMap()[eltkey].toMap().contains("gridvalues"))
-                        {
-                            //setOstElementGrid (key, eltkey, profiledata[key].toMap()["elements"].toMap()[eltkey].toMap()["gridvalues"].toList(), true);
-                            OST::ElementUpdate v;
-                            QVariantMap m;
-                            QString a = "cleargrid";
-                            getProperty(key)->getElt(eltkey)->accept(&v, a, m);
-                            int size = props[key].toMap()["elements"].toMap()[eltkey].toMap()["gridvalues"].toList().size();
-                            a = "newline";
-                            for (int i = 0; i < size; i++)
-                            {
-                                m["val"] = props[key].toMap()["elements"].toMap()[eltkey].toMap()["gridvalues"].toList()[i];
-                                getProperty(key)->getElt(eltkey)->accept(&v, a, m);
-                            }
-                        }
                         if (getEltBase(key, eltkey)->getType() == "time")
                         {
                             int hh = props[key].toMap()["elements"].toMap()[eltkey].toMap()["hh"].toInt();
@@ -301,15 +286,15 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
                     QVariantMap m = v.toMap();
                     if (getEltBase(keyprop, keyelt)->getType() == "int")
                     {
-                        getEltInt(keyprop, keyelt)->setValue(v.toInt(), true);
+                        getEltInt(keyprop, keyelt)->setValue(v.toInt(), OST::SignalType::Value);
                     }
                     if (getEltBase(keyprop, keyelt)->getType() == "float")
                     {
-                        getEltFloat(keyprop, keyelt)->setValue(v.toDouble(), true);
+                        getEltFloat(keyprop, keyelt)->setValue(v.toDouble(), OST::SignalType::Value);
                     }
                     if (getEltBase(keyprop, keyelt)->getType() == "string")
                     {
-                        getEltString(keyprop, keyelt)->setValue(v.toString(), true);
+                        getEltString(keyprop, keyelt)->setValue(v.toString(), OST::SignalType::Value);
                     }
                     if (getEltBase(keyprop, keyelt)->getType() == "bool")
                     {
@@ -321,13 +306,13 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
                     {
                         QDate d;
                         d.setDate(m["year"].toInt(), m["month"].toInt(), m["day"].toInt());
-                        getEltDate(keyprop, keyelt)->setValue(d, true);
+                        getEltDate(keyprop, keyelt)->setValue(d, OST::SignalType::Value);
                     }
                     if (getEltBase(keyprop, keyelt)->getType() == "time")
                     {
                         QTime t;
                         t.setHMS(m["hh"].toInt(), m["mm"].toInt(), m["ss"].toInt(), m["ms"].toInt());
-                        getEltTime(keyprop, keyelt)->setValue(t, true);
+                        getEltTime(keyprop, keyelt)->setValue(t, OST::SignalType::Value);
                     }
                     //sendMessage("Autoupdate - property " + keyprop + " - element " + keyelt);
                 }

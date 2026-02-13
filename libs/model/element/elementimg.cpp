@@ -8,13 +8,9 @@ ElementImg::ElementImg(const QString &label, const QString &order, const QString
 ElementImg::~ElementImg()
 {
 }
-void ElementImg::accept(ElementVisitor *pVisitor)
+void ElementImg::accept(ElementVisitor *pVisitor, QVariantMap &data, SignalType &signalType)
 {
-    pVisitor->visit(this);
-}
-void ElementImg::accept(ElementVisitor *pVisitor, QVariantMap &data)
-{
-    pVisitor->visit(this, data);
+    pVisitor->visit(this, data, signalType);
 }
 QString ElementImg::getType()
 {
