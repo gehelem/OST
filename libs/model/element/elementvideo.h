@@ -182,7 +182,7 @@ class ValueVideo: public ValueTemplate<VideoData>
          *
          * Copies this video data back into the parent element.
          */
-        void updateElement(const bool &emitEvent) override;
+        void updateElement(const SignalType &signalType) override;
 
 };
 }

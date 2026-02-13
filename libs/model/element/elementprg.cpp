@@ -16,31 +16,26 @@ void ElementPrg::accept(ElementVisitor *pVisitor, QVariantMap &data)
 {
     pVisitor->visit(this, data);
 }
-void ElementPrg::accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data)
-{
-    pVisitor->visit(this, action, data);
-}
-
 QString ElementPrg::getType()
 {
     return "prg";
 }
-void ElementPrg::setPrgValue(const double &v, const bool &emitEvent)
+void ElementPrg::setPrgValue(const double &v, const SignalType &signalType)
 {
     if ((v < 0) || (v > 100))
     {
-        sendMessage(OST::LogLevel::Warning, "Invalid spinner value (%1)", {QString::number(v)});
+        logMessage(OST::LogLevel::Warning, "Invalid spinner value (%1)", {QString::number(v)});
         return;
     }
     PrgData d = value();
     d.value = v;
-    ElementTemplateNotNumeric<PrgData>::setValue(d, emitEvent);
+    ElementTemplateNotNumeric<PrgData>::setValue(d, signalType);
 }
-void ElementPrg::setDynLabel(const QString &s, const bool &emitEvent)
+void ElementPrg::setDynLabel(const QString &s, const SignalType &signalType)
 {
     PrgData d = value();
     d.dynlabel = s;
-    ElementTemplateNotNumeric<PrgData>::setValue(d, emitEvent);
+    ElementTemplateNotNumeric<PrgData>::setValue(d, signalType);
 }
 QString ElementPrg::dynLabel()
 {
@@ -63,9 +58,9 @@ void ValuePrg::updateValue()
 {
     value = static_cast<ElementPrg*>(pElement)->value();
 }
-void ValuePrg::updateElement(const bool &emitEvent)
+void ValuePrg::updateElement(const SignalType &signalType)
 {
-    static_cast<ElementPrg*>(pElement)->setValue(value, emitEvent);
+    static_cast<ElementPrg*>(pElement)->setValue(value, signalType);
 }
 
 

@@ -167,7 +167,7 @@ class ValueDate: public ValueTemplate<QDate>
          *
          * Copies this date value back into the parent element.
          */
-        void updateElement(const bool &emitEvent) override;
+        void updateElement(const SignalType &signalType) override;
 
 };
 

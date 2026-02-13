@@ -17,11 +17,6 @@ void ElementFloat::accept(ElementVisitor *pVisitor, QVariantMap &data)
 {
     pVisitor->visit(this, data);
 }
-void ElementFloat::accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data)
-{
-    pVisitor->visit(this, action, data);
-}
-
 QString ElementFloat::getType()
 {
     return "float";
@@ -55,9 +50,9 @@ void ValueFloat::updateValue()
 {
     value = static_cast<ElementFloat*>(pElement)->value();
 }
-void ValueFloat::updateElement(const bool &emitEvent)
+void ValueFloat::updateElement(const SignalType &signalType)
 {
-    static_cast<ElementFloat*>(pElement)->setValue(value, emitEvent);
+    static_cast<ElementFloat*>(pElement)->setValue(value, signalType);
 }
 
 

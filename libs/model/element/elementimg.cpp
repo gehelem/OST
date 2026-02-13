@@ -16,11 +16,6 @@ void ElementImg::accept(ElementVisitor *pVisitor, QVariantMap &data)
 {
     pVisitor->visit(this, data);
 }
-void ElementImg::accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data)
-{
-    pVisitor->visit(this, action, data);
-}
-
 QString ElementImg::getType()
 {
     return "img";
@@ -43,8 +38,8 @@ void ValueImg::updateValue()
 {
     value = static_cast<ElementImg*>(pElement)->value();
 }
-void ValueImg::updateElement(const bool &emitEvent)
+void ValueImg::updateElement(const SignalType &signalType)
 {
-    static_cast<ElementImg*>(pElement)->setValue(value, emitEvent);
+    static_cast<ElementImg*>(pElement)->setValue(value, signalType);
 }
 }

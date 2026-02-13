@@ -230,7 +230,8 @@ class ElementBase: public QObject
         QString mLabel = "change me";     /*!< Display label for frontend */
         QString mOrder = "change me";     /*!< Sort order within property */
         QString mHint = "";               /*!< Tooltip/help text */
-        bool mAutoUpdate = false;         /*!< Auto-propagate changes to backend */
+        bool mAutoUpdate = false;         /*!< A
+to-propagate changes to backend */
         bool mDirectEdit = false;         /*!< Allow inline editing in frontend */
         bool mBadge = false;              /*!< Show notification badge */
         QString mPreIcon = "";            /*!< Prefix icon identifier */
@@ -246,6 +247,17 @@ class ElementBase: public QObject
         void OnLovChanged();
 
     signals:
+        /**
+         * @brief Signal emitted when element value changes
+         * @param elt Pointer to this element
+         * @param event Event descriptor
+         * @param signalType Signal requested
+         *
+         * Emitted by derived template classes when setValue() is called.
+         * Propagated to parent property's OnValueSet slot.
+         */
+        void eltEvent(OST::ElementBase*, OST::Event, OST::SignalType);
+
         /**
          * @brief Signal emitted when element value changes
          * @param elt Pointer to this element
@@ -277,7 +289,7 @@ class ElementBase: public QObject
          *
          * Propagated to property and module levels.
          */
-        void sendMessage(LogLevel, QString, QVariantList);
+        void logMessage(LogLevel, QString, QVariantList);
 
         /**
          * @brief Signal emitted when LOV changes
@@ -360,7 +372,7 @@ class ValueBase: public QObject
          * Copies this value back into parent element.
          * Called when fetching grid line into elements.
          */
-        virtual void updateElement(const bool &emitEvent) = 0;
+        virtual void updateElement(const SignalType &signalType) = 0;
 
     protected:
         ElementBase* pElement;  /*!< Pointer to parent element */

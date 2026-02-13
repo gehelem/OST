@@ -66,7 +66,7 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
                                             pData["order"].toString(),
                                             pData["hint"].toString()
                                            );
-            if (pData.contains("value")) pElement->setValue(pData["value"].toLongLong(), false);
+            if (pData.contains("value")) pElement->setValue(pData["value"].toLongLong(), SignalType::Silent);
             if (pData.contains("min")) pElement->setMin(pData["min"].toLongLong());
             if (pData.contains("max")) pElement->setMax(pData["max"].toLongLong());
             if (pData.contains("step")) pElement->setStep(pData["step"].toLongLong());
@@ -101,7 +101,7 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
                                               pData["order"].toString(),
                                               pData["hint"].toString()
                                              );
-            if (pData.contains("value")) pElement->setValue(pData["value"].toDouble(), false);
+            if (pData.contains("value")) pElement->setValue(pData["value"].toDouble(), SignalType::Silent);
             if (pData.contains("min")) pElement->setMin(pData["min"].toDouble());
             if (pData.contains("max")) pElement->setMax(pData["max"].toDouble());
             if (pData.contains("step")) pElement->setStep(pData["step"].toDouble());
@@ -153,7 +153,7 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
             if (pData.contains("solverra")) dta.solverRA = pData["solverra"].toDouble();
             if (pData.contains("solverde")) dta.solverDE = pData["solverde"].toDouble();
 
-            pElement->setValue(dta, false);
+            pElement->setValue(dta, SignalType::Silent);
             if (pData.contains("showstats")) pElement->setShowStats( pData["showstats"].toBool());
 
             return pElement;
@@ -165,7 +165,7 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
                                               pData["order"].toString(),
                                               pData["hint"].toString()
                                              );
-            if (pData.contains("value")) pElement->setValue(VariantMapToVideoData(pData["value"].toMap()), false);
+            if (pData.contains("value")) pElement->setValue(VariantMapToVideoData(pData["value"].toMap()), SignalType::Silent);
             return pElement;
         }
 
@@ -179,7 +179,7 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
             m.message = pData["message"].toString();
             m.level = IntToLogLevel(pData["level"].toInt());
             m.ts = QDateTime::fromString(pData["ts"].toString(), "yyyy/MM/dd hh:mm:ss.zzz");
-            pElement->setValue(m, false);
+            pElement->setValue(m, SignalType::Silent);
             return pElement;
         }
         if (pData["type"].toString() == "prg")
@@ -198,8 +198,8 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
                 if (pData["prgtype"].toString() == "bar") pElement->setPrgType(bar);
                 if (pData["prgtype"].toString() == "spinner") pElement->setPrgType(spinner);
             }
-            if (pData.contains("value")) pElement->setPrgValue(pData["value"].toDouble(), false);
-            if (pData.contains("dynlabel")) pElement->setDynLabel(pData["dynlabel"].toString(), false);
+            if (pData.contains("value")) pElement->setPrgValue(pData["value"].toDouble(), SignalType::Silent);
+            if (pData.contains("dynlabel")) pElement->setDynLabel(pData["dynlabel"].toString(), SignalType::Silent);
             return pElement;
         }
         if (pData["type"].toString() == "date")
@@ -213,7 +213,7 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
             if (pData.contains("autoupdate")) pElement->setAutoUpdate(pData["autoupdate"].toBool());
             if (pData.contains("directedit")) pElement->setDirectEdit(pData["directedit"].toBool());
             if (pData.contains("badge")) pElement->setBadge(pData["badge"].toBool());
-            pElement->setValue(d, false);
+            pElement->setValue(d, SignalType::Silent);
             return pElement;
         }
         if (pData["type"].toString() == "time")
@@ -235,7 +235,7 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
             {
                 t.setHMS(pData["hh"].toInt(), pData["mm"].toInt(), pData["ss"].toInt(), 0);
             }
-            pElement->setValue(t, false);
+            pElement->setValue(t, SignalType::Silent);
             return pElement;
         }
 

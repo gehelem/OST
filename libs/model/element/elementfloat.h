@@ -252,7 +252,7 @@ class ValueFloat: public ValueTemplate<double>
          * Copies this value back into the parent element.
          * Called by PropertyMulti::fetchLine() when restoring elements from grid.
          */
-        void updateElement(const bool &emitEvent) override;
+        void updateElement(const SignalType &signalType) override;
 
 };
 

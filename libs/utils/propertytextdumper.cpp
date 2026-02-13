@@ -6,7 +6,6 @@
  */
 
 #include "propertytextdumper.h"
-#include "elementtextdumper.h"
 #include <sstream>
 namespace  OST
 {

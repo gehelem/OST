@@ -205,7 +205,7 @@ class ValueImg: public ValueTemplate<ImgData>
          *
          * Copies this image data back into the parent element.
          */
-        void updateElement(const bool &emitEvent) override;
+        void updateElement(const SignalType &signalType) override;
 
 };
 }

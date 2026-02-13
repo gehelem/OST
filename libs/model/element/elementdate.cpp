@@ -16,11 +16,6 @@ void ElementDate::accept(ElementVisitor *pVisitor, QVariantMap &data)
 {
     pVisitor->visit(this, data);
 }
-void ElementDate::accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data)
-{
-    pVisitor->visit(this, action, data);
-}
-
 QString ElementDate::getType()
 {
     return "date";
@@ -33,9 +28,9 @@ void ValueDate::updateValue()
 {
     value = static_cast<ElementDate*>(pElement)->value();
 }
-void ValueDate::updateElement(const bool &emitEvent)
+void ValueDate::updateElement(const SignalType &signalType)
 {
-    static_cast<ElementDate*>(pElement)->setValue(value, emitEvent);
+    static_cast<ElementDate*>(pElement)->setValue(value, signalType);
 }
 
 

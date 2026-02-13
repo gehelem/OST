@@ -198,7 +198,7 @@ class ValueString: public ValueTemplate<QString>
          *
          * Copies this value back into the parent element.
          */
-        void updateElement(const bool &emitEvent) override;
+        void updateElement(const SignalType &signalType) override;
 
 };
 

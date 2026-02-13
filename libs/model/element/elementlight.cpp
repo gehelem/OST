@@ -17,17 +17,10 @@ void ElementLight::accept(ElementVisitor *pVisitor, QVariantMap &data)
 {
     pVisitor->visit(this, data);
 }
-void ElementLight::accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data)
-{
-    pVisitor->visit(this, action, data);
-}
-
 QString ElementLight::getType()
 {
     return "light";
 }
-
-
 void ValueLight::accept(ValueVisitor* pVisitor)
 {
     pVisitor->visit(this);
@@ -36,9 +29,9 @@ void ValueLight::updateValue()
 {
     value = static_cast<ElementLight*>(pElement)->value();
 }
-void ValueLight::updateElement(const bool &emitEvent)
+void ValueLight::updateElement(const SignalType &signalType)
 {
-    static_cast<ElementLight*>(pElement)->setValue(value, emitEvent);
+    static_cast<ElementLight*>(pElement)->setValue(value, signalType);
 }
 
 }

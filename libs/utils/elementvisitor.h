@@ -25,37 +25,26 @@ class ElementVisitor
     public:
         virtual void visit(ElementInt* pElement) = 0;
         virtual void visit(ElementInt* pElement, QVariantMap &data) = 0;
-        virtual void visit(ElementInt* pElement, QString &action, QVariantMap &data) = 0;
         virtual void visit(ElementBool* pElement) = 0;
         virtual void visit(ElementBool* pElement, QVariantMap &data) = 0;
-        virtual void visit(ElementBool* pElement, QString &action, QVariantMap &data) = 0;
         virtual void visit(ElementFloat* pElement) = 0;
         virtual void visit(ElementFloat* pElement, QVariantMap &data) = 0;
-        virtual void visit(ElementFloat* pElement, QString &action, QVariantMap &data) = 0;
         virtual void visit(ElementString* pElement) = 0;
         virtual void visit(ElementString* pElement, QVariantMap &data) = 0;
-        virtual void visit(ElementString* pElement, QString &action, QVariantMap &data) = 0;
         virtual void visit(ElementLight* pElement) = 0;
         virtual void visit(ElementLight* pElement, QVariantMap &data) = 0;
-        virtual void visit(ElementLight* pElement, QString &action, QVariantMap &data) = 0;
         virtual void visit(ElementImg* pElement) = 0;
         virtual void visit(ElementImg* pElement, QVariantMap &data) = 0;
-        virtual void visit(ElementImg* pElement, QString &action, QVariantMap &data) = 0;
         virtual void visit(ElementVideo* pElement) = 0;
         virtual void visit(ElementVideo* pElement, QVariantMap &data) = 0;
-        virtual void visit(ElementVideo* pElement, QString &action, QVariantMap &data) = 0;
         virtual void visit(ElementMessage* pElement) = 0;
         virtual void visit(ElementMessage* pElement, QVariantMap &data) = 0;
-        virtual void visit(ElementMessage* pElement, QString &action, QVariantMap &data) = 0;
         virtual void visit(ElementPrg* pElement) = 0;
         virtual void visit(ElementPrg* pElement, QVariantMap &data) = 0;
-        virtual void visit(ElementPrg* pElement, QString &action, QVariantMap &data) = 0;
         virtual void visit(ElementDate* pElement) = 0;
         virtual void visit(ElementDate* pElement, QVariantMap &data) = 0;
-        virtual void visit(ElementDate* pElement, QString &action, QVariantMap &data) = 0;
         virtual void visit(ElementTime* pElement) = 0;
         virtual void visit(ElementTime* pElement, QVariantMap &data) = 0;
-        virtual void visit(ElementTime* pElement, QString &action, QVariantMap &data) = 0;
 };
 
 class GridInt;

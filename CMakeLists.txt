@@ -219,16 +219,12 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuejsondumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovjsondumper.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovjsondumper.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementtextdumper.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementtextdumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementjsondumper.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementjsondumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyupdate.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyupdate.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementupdate.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementupdate.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementset.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementset.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/fileio.cpp
@@ -284,11 +280,9 @@ set(BASE_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyjsondumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/valuejsondumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/lovjsondumper.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementtextdumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementjsondumper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyupdate.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementupdate.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementset.h
 )
 set_target_properties(ostbasemodule PROPERTIES PUBLIC_HEADER "${BASE_PUBLIC_HEADERS}")
 

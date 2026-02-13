@@ -17,11 +17,6 @@ void ElementString::accept(ElementVisitor *pVisitor, QVariantMap &data)
 {
     pVisitor->visit(this, data);
 }
-void ElementString::accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data)
-{
-    pVisitor->visit(this, action, data);
-}
-
 QString ElementString::getType()
 {
     return "string";
@@ -55,9 +50,9 @@ void ValueString::updateValue()
 {
     value = static_cast<ElementString*>(pElement)->value();
 }
-void ValueString::updateElement(const bool &emitEvent)
+void ValueString::updateElement(const SignalType &signalType)
 {
-    static_cast<ElementString*>(pElement)->setValue(value, emitEvent);
+    static_cast<ElementString*>(pElement)->setValue(value, signalType);
 }
 
 

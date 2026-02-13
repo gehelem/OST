@@ -198,6 +198,42 @@ typedef struct ModuleStatus
 } ModuleStatus;
 
 /**
+ * @struct Event
+ * @brief Common event structure
+ */
+typedef struct Event
+{
+    QString type = "";
+    QString module = "";
+    QString property = "";
+    QString element = "";
+    int line = 0;
+    QVariantMap data;
+} Event;
+
+/**
+ * @brief Signal type emitted during value update
+ *
+ * Allows controlling the notification level during setValue().
+ * Used to optimize WebSocket communications by grouping
+ * multiple updates into a single message.
+ *
+ * Usage example:
+ * @code
+ * element1->setValue(val1, SignalType::Silent);    // No signal
+ * element2->setValue(val2, SignalType::Silent);    // No signal
+ * element3->setValue(val3, SignalType::AllValues); // Signal with all values
+ * @endcode
+ */
+enum class SignalType
+{
+    Silent = 0,   /*!< No signal emitted (silent update) */
+    Value,        /*!< valueChanged signal for this element only (default behavior) */
+    AllValues,    /*!< Signal with all property element values */
+    Property      /*!< Signal with complete property content (values + metadata) */
+};
+
+/**
  * @brief Convert integer to LogLevel enum
  * @param val Integer value (0-4)
  * @return Corresponding LogLevel value

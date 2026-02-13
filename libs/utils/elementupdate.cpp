@@ -107,49 +107,5 @@ void ElementUpdate::visit(ElementTime* pElement, QVariantMap &data )
     }
     pElement->setValue(t, false);
 }
-void ElementUpdate::visit(ElementInt* pElement, QString &action, QVariantMap &data)
-{
-    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
-}
-void ElementUpdate::visit(ElementFloat* pElement, QString &action, QVariantMap &data)
-{
-    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
-}
-void ElementUpdate::visit(ElementBool* pElement, QString &action, QVariantMap &data)
-{
-    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
-}
-void ElementUpdate::visit(ElementString* pElement, QString &action, QVariantMap &data)
-{
-    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
-}
-void ElementUpdate::visit(ElementLight* pElement, QString &action, QVariantMap &data)
-{
-    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
-}
-void ElementUpdate::visit(ElementImg* pElement, QString &action, QVariantMap &data)
-{
-    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
-}
-void ElementUpdate::visit(ElementVideo* pElement, QString &action, QVariantMap &data)
-{
-    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
-}
-void ElementUpdate::visit(ElementMessage* pElement, QString &action, QVariantMap &data)
-{
-    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
-}
-void ElementUpdate::visit(ElementPrg* pElement, QString &action, QVariantMap &data)
-{
-    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
-}
-void ElementUpdate::visit(ElementDate* pElement, QString &action, QVariantMap &data)
-{
-    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
-}
-void ElementUpdate::visit(ElementTime* pElement, QString &action, QVariantMap &data)
-{
-    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
-}
 
 }

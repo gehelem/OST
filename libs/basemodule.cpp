@@ -73,19 +73,19 @@ void Basemodule::setProfile(QVariantMap profiledata)
                         QVariant v = props[key].toMap()["elements"].toMap()[eltkey].toMap()["value"];
                         if (getEltBase(key, eltkey)->getType() == "int")
                         {
-                            getEltInt(key, eltkey)->setValue(v.toInt(), true);
+                            getEltInt(key, eltkey)->setValue(v.toInt(), OST::SignalType::Value);
                         }
                         if (getEltBase(key, eltkey)->getType() == "float")
                         {
-                            getEltFloat(key, eltkey)->setValue(v.toDouble(), true);
+                            getEltFloat(key, eltkey)->setValue(v.toDouble(), OST::SignalType::Value);
                         }
                         if (getEltBase(key, eltkey)->getType() == "string")
                         {
-                            getEltString(key, eltkey)->setValue(v.toString(), true);
+                            getEltString(key, eltkey)->setValue(v.toString(), OST::SignalType::Value);
                         }
                         if (getEltBase(key, eltkey)->getType() == "bool")
                         {
-                            getEltBool(key, eltkey)->setValue(v.toBool(), true);
+                            getEltBool(key, eltkey)->setValue(v.toBool(), OST::SignalType::Value);
                         }
                         if (props[key].toMap()["elements"].toMap()[eltkey].toMap().contains("gridvalues"))
                         {
@@ -138,24 +138,24 @@ void Basemodule::setProfile(QVariantMap profiledata)
                             QString eltkey = data["gridheaders"].toList().at(icol).toString();
                             if (getEltBase(key, eltkey)->getType() == "int")
                             {
-                                getEltInt(key, eltkey)->setValue(vv.toInt(), true);
+                                getEltInt(key, eltkey)->setValue(vv.toInt(), OST::SignalType::Value);
                             }
                             if (getEltBase(key, eltkey)->getType() == "float")
                             {
-                                getEltFloat(key, eltkey)->setValue(vv.toDouble(), true);
+                                getEltFloat(key, eltkey)->setValue(vv.toDouble(), OST::SignalType::Value);
                             }
                             if (getEltBase(key, eltkey)->getType() == "string")
                             {
-                                getEltString(key, eltkey)->setValue(vv.toString(), true);
+                                getEltString(key, eltkey)->setValue(vv.toString(), OST::SignalType::Value);
                             }
                             if (getEltBase(key, eltkey)->getType() == "bool")
                             {
-                                getEltBool(key, eltkey)->setValue(vv.toBool(), true);
+                                getEltBool(key, eltkey)->setValue(vv.toBool(), OST::SignalType::Value);
                             }
                             if (getEltBase(key, eltkey)->getType() == "prg")
                             {
-                                getEltPrg(key, eltkey)->setPrgValue(vv.toMap()["value"].toInt(), true);
-                                getEltPrg(key, eltkey)->setDynLabel(vv.toMap()["dynlabel"].toString(), true);
+                                getEltPrg(key, eltkey)->setPrgValue(vv.toMap()["value"].toInt(), OST::SignalType::Silent);
+                                getEltPrg(key, eltkey)->setDynLabel(vv.toMap()["dynlabel"].toString(), OST::SignalType::Value);
 
                             }
                             if (getEltBase(key, eltkey)->getType() == "img")

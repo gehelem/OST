@@ -145,7 +145,7 @@ class ElementPrg: public ElementTemplateNotNumeric<PrgData>
          * element->setPrgValue(100.0, true);  // Complete
          * @endcode
          */
-        void setPrgValue(const double &v, const bool &emitEvent);
+        void setPrgValue(const double &v, const SignalType &signalType);
 
         /**
          * @brief Set dynamic label text
@@ -162,7 +162,7 @@ class ElementPrg: public ElementTemplateNotNumeric<PrgData>
          * element->setDynLabel("Complete!", true);
          * @endcode
          */
-        void setDynLabel(const QString &s, const bool &emitEvent);
+        void setDynLabel(const QString &s, const SignalType &signalType);
 
         /**
          * @brief Get current dynamic label
@@ -260,7 +260,7 @@ class ValuePrg: public ValueTemplate<PrgData>
          *
          * Copies this progress data back into the parent element.
          */
-        void updateElement(const bool &emitEvent) override;
+        void updateElement(const SignalType &signalType) override;
 
 };
 

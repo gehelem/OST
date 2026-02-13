@@ -240,7 +240,7 @@ class ValueMessage: public ValueTemplate<MsgData>
          *
          * Copies this message data back into the parent element.
          */
-        void updateElement(const bool &emitEvent) override;
+        void updateElement(const SignalType &signalType) override;
 
 };
 }

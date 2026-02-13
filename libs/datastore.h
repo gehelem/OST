@@ -9,7 +9,6 @@
 #include <propertyupdate.h>
 #include <propertyfactory.h>
 #include <lovfactory.h>
-#include <elementset.h>
 #include <elementupdate.h>
 #include <elementjsondumper.h>
 #include <lovjsondumper.h>
