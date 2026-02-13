@@ -8,7 +8,6 @@
 #include <elementlight.h>
 #include <elementimg.h>
 #include <elementvideo.h>
-#include <elementmessage.h>
 #include <elementprg.h>
 #include <elementdate.h>
 #include <elementtime.h>
@@ -56,11 +55,6 @@ class ElementUpdate : public ElementVisitor
             Q_UNUSED(pElement)
         }
         void visit(ElementVideo* pElement, QVariantMap &data ) override;
-        void visit(ElementMessage* pElement) override
-        {
-            Q_UNUSED(pElement)
-        }
-        void visit(ElementMessage* pElement, QVariantMap &data ) override;
         void visit(ElementPrg* pElement) override
         {
             Q_UNUSED(pElement)

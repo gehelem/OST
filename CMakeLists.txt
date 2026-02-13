@@ -184,8 +184,6 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementimg.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementvideo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementvideo.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementmessage.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementmessage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementprg.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementprg.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementtime.cpp
@@ -258,7 +256,6 @@ set(BASE_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementlight.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementimg.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementvideo.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementmessage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementprg.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementdate.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementtime.h

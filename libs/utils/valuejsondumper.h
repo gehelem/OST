@@ -22,7 +22,6 @@ class ValueJsonDumper : public ValueVisitor
         void visit(ValueLight* pValue) override;
         void visit(ValueImg*  pValue) override;
         void visit(ValueVideo*  pValue)override;
-        void visit(ValueMessage*  pValue)override;
         void visit(ValuePrg* pValue) override;
         void visit(ValueDate* pValue) override;
         void visit(ValueTime* pValue) override;

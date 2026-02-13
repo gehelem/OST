@@ -220,7 +220,7 @@ void  PropertyMulti::addElt(QString key, ElementBase* pElt)
     connect(mElts[key], &ElementBase::valueSet, this, &PropertyMulti::OnValueSet);
     connect(mElts[key], &ElementBase::listChanged, this, &PropertyMulti::OnListChanged);
     connect(mElts[key], &ElementBase::lovChanged, this, &PropertyMulti::OnLovChanged);
-    connect(mElts[key], &ElementBase::sendMessage, this, &PropertyMulti::OnMessage);
+    connect(mElts[key], &ElementBase::logMessage, this, &PropertyMulti::OnMessage);
 }
 void  PropertyMulti::deleteElt(QString key)
 {

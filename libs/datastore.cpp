@@ -74,26 +74,6 @@ OST::ElementPrg* Datastore::getEltPrg(QString pProperty, QString pElement)
     }
     return static_cast<OST::ElementPrg*>(p->getElt(pElement));
 }
-OST::ElementMessage* Datastore::getEltMsg(QString pProperty, QString pElement)
-{
-    OST::PropertyMulti* p = getProperty(pProperty);
-    if (p == nullptr)
-    {
-        logWarning("getEltMsg - property %1 not found", {pProperty});
-        return nullptr;
-    }
-    if (!p->getElts()->contains(pElement))
-    {
-        logWarning("getEltMsg - property %1 : element %2 not found", {pProperty, pElement});
-        return nullptr;
-    }
-    if (p->getElt(pElement)->getType() != "message")
-    {
-        logWarning("getEltMsg - property %1 : element %2 is not message", {pProperty, pElement});
-        return nullptr;
-    }
-    return static_cast<OST::ElementMessage*>(p->getElt(pElement));
-}
 OST::ElementDate* Datastore::getEltDate(QString pProperty, QString pElement)
 {
     OST::PropertyMulti* p = getProperty(pProperty);

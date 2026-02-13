@@ -169,19 +169,6 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
             return pElement;
         }
 
-        if (pData["type"].toString() == "message")
-        {
-            auto *pElement = new ElementMessage(pData["label"].toString(),
-                                                pData["order"].toString(),
-                                                pData["hint"].toString()
-                                               );
-            MsgData m;
-            m.message = pData["message"].toString();
-            m.level = IntToLogLevel(pData["level"].toInt());
-            m.ts = QDateTime::fromString(pData["ts"].toString(), "yyyy/MM/dd hh:mm:ss.zzz");
-            pElement->setValue(m, SignalType::Silent);
-            return pElement;
-        }
         if (pData["type"].toString() == "prg")
         {
 
@@ -279,12 +266,6 @@ ValueBase *ValueFactory::createValue(ElementBase * &pElement)
     if (pElement->getType() == "prg")
     {
         auto *pValue = new ValuePrg(pElement);
-        pValue->updateValue();
-        return pValue;
-    }
-    if (pElement->getType() == "message")
-    {
-        auto *pValue = new ValueMessage(pElement);
         pValue->updateValue();
         return pValue;
     }

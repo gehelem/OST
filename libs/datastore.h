@@ -63,7 +63,6 @@ class Datastore : public QObject
         OST::ElementImg* getEltImg(QString pProperty, QString pElement);
         OST::ElementVideo* getEltVideo(QString pProperty, QString pElement);
         OST::ElementPrg* getEltPrg(QString pProperty, QString pElement);
-        OST::ElementMessage* getEltMsg(QString pProperty, QString pElement);
         OST::ElementDate* getEltDate(QString pProperty, QString pElement);
         OST::ElementTime* getEltTime(QString pProperty, QString pElement);
 

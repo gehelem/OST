@@ -9,7 +9,6 @@
 #include <elementlight.h>
 #include <elementimg.h>
 #include <elementvideo.h>
-#include <elementmessage.h>
 #include <elementprg.h>
 #include <elementdate.h>
 #include <elementtime.h>
@@ -62,12 +61,6 @@ class ElementJsonDumper : public ElementVisitor
         }
         void visit(ElementVideo *pElement) override;
         void visit(ElementVideo* pElement, QVariantMap &data ) override
-        {
-            Q_UNUSED(pElement);
-            Q_UNUSED(data)
-        }
-        void visit(ElementMessage *pElement) override;
-        void visit(ElementMessage* pElement, QVariantMap &data ) override
         {
             Q_UNUSED(pElement);
             Q_UNUSED(data)

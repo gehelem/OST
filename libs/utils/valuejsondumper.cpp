@@ -5,7 +5,6 @@
 #include "elementint.h"
 #include "elementlight.h"
 #include "elementstring.h"
-#include "elementmessage.h"
 #include "elementvideo.h"
 #include "elementprg.h"
 #include "elementdate.h"
@@ -114,14 +113,6 @@ void ValueJsonDumper::visit(ValueVideo *  pValue)
     Q_UNUSED(pValue)
     //mResult = pValue->value;
     mResult = "to be implemented";
-};
-void ValueJsonDumper::visit(ValueMessage *  pValue)
-{
-    QJsonObject ob;
-    ob["level"] = LogLevelToInt(pValue->value.level);
-    ob["message"] = pValue->value.message;
-    ob["ts"] = pValue->value.ts.toString("yyyy/MM/dd hh:mm:ss.zzz");;
-    mResult = ob;
 };
 void ValueJsonDumper::visit(ValuePrg * pValue)
 {

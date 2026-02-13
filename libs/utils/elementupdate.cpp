@@ -67,10 +67,6 @@ void ElementUpdate::visit(ElementVideo *pElement, QVariantMap &data )
 {
     Q_UNUSED(pElement) Q_UNUSED(data)
 }
-void ElementUpdate::visit(ElementMessage *pElement, QVariantMap &data )
-{
-    Q_UNUSED(pElement) Q_UNUSED(data)
-}
 void ElementUpdate::visit(ElementPrg* pElement, QVariantMap &data )
 {
     Q_UNUSED(pElement)  Q_UNUSED(data)

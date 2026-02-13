@@ -67,15 +67,6 @@ void PropertyTextDumper::visit(PropertyMulti *pProperty)
     stream << "Multi Property :" << dumpPropertyCommons(pProperty)
            << ". values=";
 
-    foreach(const QString &key, pProperty->getElts()->keys())
-    {
-        ElementTextDumper d;
-
-        pProperty->getElt(key)->accept(&d);
-        stream << " **** " << key.toStdString() << " : " << d.getResult().toStdString() << "//";
-    }
-
-
 
     stream << " #####";
     mResult = QString::fromStdString(stream.str());
