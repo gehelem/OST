@@ -691,14 +691,6 @@
                 "order": "99",
                 "urljpeg":"dummy.jpg"
             },
-            "message": {
-                "type": "message",
-                "label": "Image message",
-                "level":0,
-                "order": "99",
-                "message":"Hello, this is a message",
-                "ts":"2024/03/14 15:06:53.000"
-            },
             "progress": {
                 "type": "prg",
                 "prgtype": "spinner",
@@ -985,7 +977,7 @@
         "label": "Grid example",
         "order": "99",
         "hasGrid":true,
-        "gridheaders": ["int","intlov","float","string","strlov","image","video","bool","progress","message"],
+        "gridheaders": ["int","intlov","float","string","strlov","image","video","bool","progress"],
         "grid": [
             [12,1,0.12,"zéro dot 12","00",{"urljpeg":"dummy1.jpg"},{"urljpeg":"dummy1.mpeg"},true,70,"first message content"],
             [13,2,0.13,"zéro dot 13","02",{"urljpeg":"dummy2.jpg"},{"urljpeg":"dummy3.mpeg"},false,25,"second message content"]
@@ -1075,14 +1067,6 @@
                 "value": 65,
                 "directedit":true,
                 "order":"7"
-            },
-            "message": {
-                "type": "message",
-                "label": "Message",
-                "value": "nothing interesting to say",
-                "autoupdate":true,
-                "directedit":true,
-                "order":"8"
             }
         }
     },
