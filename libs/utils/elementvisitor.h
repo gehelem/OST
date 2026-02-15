@@ -23,16 +23,16 @@ class ElementVisitor
         ElementVisitor() = default;
 
     public:
-        virtual void visit(ElementInt* pElement, QVariantMap &data, OST::SignalType &signalType) = 0;
-        virtual void visit(ElementBool* pElement, QVariantMap &data, OST::SignalType &signalType) = 0;
-        virtual void visit(ElementFloat* pElement, QVariantMap &data, OST::SignalType &signalType) = 0;
-        virtual void visit(ElementString* pElement, QVariantMap &data, OST::SignalType &signalType) = 0;
-        virtual void visit(ElementLight* pElement, QVariantMap &data, OST::SignalType &signalType) = 0;
-        virtual void visit(ElementImg* pElement, QVariantMap &data, OST::SignalType &signalType) = 0;
-        virtual void visit(ElementVideo* pElement, QVariantMap &data, OST::SignalType &signalType) = 0;
-        virtual void visit(ElementPrg* pElement, QVariantMap &data, OST::SignalType &signalType) = 0;
-        virtual void visit(ElementDate* pElement, QVariantMap &data, OST::SignalType &signalType) = 0;
-        virtual void visit(ElementTime* pElement, QVariantMap &data, OST::SignalType &signalType) = 0;
+        virtual void visit(ElementInt* pElement, QVariantMap &data, bool &emitEvent) = 0;
+        virtual void visit(ElementBool* pElement, QVariantMap &data, bool &emitEvent) = 0;
+        virtual void visit(ElementFloat* pElement, QVariantMap &data, bool &emitEvent) = 0;
+        virtual void visit(ElementString* pElement, QVariantMap &data, bool &emitEvent) = 0;
+        virtual void visit(ElementLight* pElement, QVariantMap &data, bool &emitEvent) = 0;
+        virtual void visit(ElementImg* pElement, QVariantMap &data, bool &emitEvent) = 0;
+        virtual void visit(ElementVideo* pElement, QVariantMap &data, bool &emitEvent) = 0;
+        virtual void visit(ElementPrg* pElement, QVariantMap &data, bool &emitEvent) = 0;
+        virtual void visit(ElementDate* pElement, QVariantMap &data, bool &emitEvent) = 0;
+        virtual void visit(ElementTime* pElement, QVariantMap &data, bool &emitEvent) = 0;
 };
 
 class GridInt;

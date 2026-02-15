@@ -5,6 +5,7 @@
 #include <QSslCertificate>
 #include <QSslKey>
 #include <QVariantList>
+#include "basemodule.h"
 #include "dbmanager.h"
 #include "logger.h"
 
@@ -13,7 +14,7 @@ QT_FORWARD_DECLARE_CLASS(QWebSocket)
 
 namespace OST
 {
-    class TranslateManager;
+class TranslateManager;
 }
 /*!
  * Websocket management
@@ -44,7 +45,7 @@ class WShandler : public QObject
          * @param client Pointer to the client
          * @param language Language code (fr, en, etc.)
          */
-        void setClientLanguage(QWebSocket* client, const QString& language);
+        void setClientLanguage(QWebSocket* client, const QString &language);
 
     public slots:
         /**
@@ -56,6 +57,7 @@ class WShandler : public QObject
          */
         void onLog(OST::LogLevel level, const QString &message,
                    const QVariantList &args, const QString &context);
+        void onModuleEvent(Basemodule* module, OST::Event event);
 
     signals:
         void closed();

@@ -8,9 +8,9 @@ ElementTime::ElementTime(const QString &label, const QString &order, const QStri
 ElementTime::~ElementTime()
 {
 }
-void ElementTime::accept(ElementVisitor *pVisitor, QVariantMap &data, SignalType &signalType)
+void ElementTime::accept(ElementVisitor *pVisitor, QVariantMap &data, bool &emitEvent)
 {
-    pVisitor->visit(this, data, signalType);
+    pVisitor->visit(this, data, emitEvent);
 }
 QString ElementTime::getType()
 {
@@ -32,9 +32,9 @@ void ValueTime::updateValue()
 {
     value = static_cast<ElementTime*>(pElement)->value();
 }
-void ValueTime::updateElement(const SignalType &signalType)
+void ValueTime::updateElement(const bool &emitEvent)
 {
-    static_cast<ElementTime*>(pElement)->setValue(value, signalType);
+    static_cast<ElementTime*>(pElement)->setValue(value, emitEvent);
 }
 
 

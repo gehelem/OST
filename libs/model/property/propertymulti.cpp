@@ -120,7 +120,7 @@ bool  PropertyMulti::setElt(QString key, QVariant val)
         return false;
     }
     QVariantMap m;
-    SignalType s = SignalType::Silent;
+    bool s = false;
     if (((mElts[key]->getType() == "int") && (val.canConvert<long>())) ||
             ((mElts[key]->getType() == "string") && (val.canConvert<QString>())) ||
             ((mElts[key]->getType() == "float") && (val.canConvert<double>())) )
@@ -214,6 +214,7 @@ void  PropertyMulti::addElt(QString key, ElementBase* pElt)
     }
     mElts[key] = pElt;
     mGrid.clear();
+    connect(mElts[key], &ElementBase::eltEvent, this, &PropertyMulti::OnEltEvent);
     connect(mElts[key], &ElementBase::eltChanged, this, &PropertyMulti::OnEltChanged);
     connect(mElts[key], &ElementBase::valueSet, this, &PropertyMulti::OnValueSet);
     connect(mElts[key], &ElementBase::listChanged, this, &PropertyMulti::OnListChanged);
@@ -229,7 +230,9 @@ void  PropertyMulti::deleteElt(QString key)
     }
     mElts.remove(key);
     mGrid.clear();
-    emit propertyEvent("ap", key, this);
+    OST::Event e;
+
+    emit propertyEvent(this, {"ap", "", this->key(), "", 0, QVariantMap()});
 
 }
 
@@ -248,7 +251,7 @@ void PropertyMulti::push()
     mGrid.append(wGridLine);
     if (mGridLimit > 0 && mGrid.size() > this->mGridLimit) mGrid.removeFirst();
 
-    emit propertyEvent("ap", key(), this);
+    emit propertyEvent(this, {"ap", "", this->key(), "", 0, QVariantMap()});
 
 }
 
@@ -279,7 +282,7 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
     }
     push();
 
-    emit propertyEvent("ap", key(), this);
+    emit propertyEvent(this, {"ap", "", this->key(), "", 0, QVariantMap()});
 
 }
 bool PropertyMulti::updateLine(const int i, const QVariantMap &pValues)
@@ -323,7 +326,7 @@ bool PropertyMulti::updateLine(const int i, const QVariantMap &pValues)
         v->updateValue();
     }
 
-    emit propertyEvent("ap", key(), this);
+    emit propertyEvent(this, {"ap", "", this->key(), "", 0, QVariantMap()});
     return true;
 
 }
@@ -335,7 +338,7 @@ bool PropertyMulti::deleteLine(const int i)
         return false;
     }
     mGrid.removeAt(i);
-    emit propertyEvent("ap", key(), this);
+    emit propertyEvent(this, {"ap", "", this->key(), "", 0, QVariantMap()});
     return true;
 }
 
@@ -348,7 +351,7 @@ void PropertyMulti::clearGrid()
     }
 
     mGrid.clear();
-    emit propertyEvent("ap", key(), this);
+    emit propertyEvent(this, {"ap", "", this->key(), "", 0, QVariantMap()});
 
 }
 
@@ -476,7 +479,7 @@ bool PropertyMulti::swapLines(int l1, int l2)
         return false;
     }
     mGrid.swapItemsAt(l2, l1);
-    emit propertyEvent("ap", key(), this);
+    emit propertyEvent(this, {"ap", "", this->key(), "", 0, QVariantMap()});
     return true;
 }
 
@@ -489,9 +492,9 @@ bool PropertyMulti::fetchLine(int l)
     }
     foreach(const QString &e, mGrid.at(l).keys())
     {
-        mGrid.at(l)[e]->updateElement(SignalType::Value);
+        mGrid.at(l)[e]->updateElement(true);
     }
-    emit propertyEvent("ap", key(), this);
+    emit propertyEvent(this, {"ap", "", this->key(), "", 0, QVariantMap()});
     return true;
 }
 bool PropertyMulti::updateLine(const int i)
@@ -505,7 +508,7 @@ bool PropertyMulti::updateLine(const int i)
     {
         mGrid.at(i)[e]->updateValue();
     }
-    emit propertyEvent("ap", key(), this);
+    emit propertyEvent(this, {"ap", "", this->key(), "", 0, QVariantMap()});
     return true;
 }
 bool PropertyMulti::autoUpDown(void)
@@ -536,13 +539,19 @@ void PropertyMulti::OnEltChanged(ElementBase*)
 {
     emit eltChanged(this);
 }
+void PropertyMulti::OnEltEvent(ElementBase* e, OST::Event evt)
+{
+    qDebug() << "PropertyMulti::OnEltEvent" << e->label() << evt.type;
+    evt.property = this->key();
+    emit propertyEvent(this, evt);
+}
 void PropertyMulti::OnListChanged(ElementBase*)
 {
-    emit propertyEvent("ap", key(), this);
+    emit propertyEvent(this, {"ap", "", this->key(), "", 0, QVariantMap()});
 }
 void PropertyMulti::OnLovChanged(ElementBase*)
 {
-    emit propertyEvent("ap", key(), this);
+    emit propertyEvent(this, {"ap", "", this->key(), "", 0, QVariantMap()});
 }
 void PropertyMulti::OnMessage(LogLevel l, QString m, QVariantList args)
 {

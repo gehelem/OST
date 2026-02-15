@@ -84,7 +84,7 @@ class PropertyJsonDumper : public PropertyVisitor
         /**
          * @brief Default constructor
          */
-        PropertyJsonDumper() = default;
+        PropertyJsonDumper(const QString &type): mType(type) {;};
 
         /**
          * @brief Visit PropertyBase (not implemented)
@@ -173,6 +173,7 @@ class PropertyJsonDumper : public PropertyVisitor
          * - freeValue
          */
         QJsonObject dumpPropertyCommons(PropertyBase *pProperty);
+        QString mType = "";
 
 };
 }

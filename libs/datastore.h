@@ -51,6 +51,17 @@ class Datastore : public QObject
             Q_UNUSED(pEventKey);
             Q_UNUSED(pEventData);
         };
+        QJsonObject getPropertiesDump(void);
+        QJsonObject getGlobalLovsDump(void);
+        void setMetadata(const QString key, const QVariant value);
+        QVariant* getMetadata(const QString key)
+        {
+            return &mMetadata[key];
+        };
+        QVariantMap getAllMetadata(void)
+        {
+            return mMetadata;
+        };
 
     protected:
         OST::PropertyMulti* getProperty(QString pProperty);
@@ -116,7 +127,7 @@ class Datastore : public QObject
                 return false;
             }
             mStore[pPropertyName] = pProperty;
-            OST::PropertyJsonDumper d;
+            OST::PropertyJsonDumper d("ap");
             mStore[pPropertyName]->accept(&d);
             OnModuleEvent("cp", QString(), pPropertyName, d.getResult().toVariantMap());
             connect(mStore[pPropertyName], &OST::PropertyMulti::valueSet, this, &Datastore::onValueSet);
@@ -134,7 +145,6 @@ class Datastore : public QObject
             }
             pLov->setKey(pLovName);
             mGlobLov[pLovName] = pLov;
-            OST::PropertyJsonDumper d;
             connect(mGlobLov[pLovName], &OST::LovBase::lovChanged, this, &Datastore::onLovChanged);
             return true;
         }
@@ -153,13 +163,11 @@ class Datastore : public QObject
 
         QVariantMap getProfile(void);
 
-        QJsonObject getPropertiesDump(void);
-        QJsonObject getGlobalLovsDump(void);
 
     private slots:
         void onEltChanged(void);
         void onValueSet(void);
-        void onPropertyEvent(QString event, QString key, OST::PropertyBase* prop);
+        void onPropertyEvent(OST::PropertyBase* prop, OST::Event event);
         void onPropertyMessage(OST::LogLevel l, QString m, QVariantList args);
         void onLovChanged(void);
 
@@ -174,6 +182,16 @@ class Datastore : public QObject
          */
         void logSignal(OST::LogLevel level, const QString &message,
                        const QVariantList &args, const QString &context);
+        /**
+         * @brief Signal emitted for custom property events
+         * @param prop Pointer to the module
+         * @param event Event descriptor
+         *
+         * Generic event mechanism for property-level operations like
+         * grid line creation/deletion, up/down movements, etc.
+         */
+        void datastoreEvent(Datastore*, OST::Event);
+
 
     protected:
         /**
@@ -188,6 +206,7 @@ class Datastore : public QObject
     private:
         QMap<QString, OST::PropertyMulti*> mStore;
         QMap<QString, OST::LovBase*> mGlobLov;
+        QVariantMap mMetadata;
 
 }
 ;

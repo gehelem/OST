@@ -9,9 +9,9 @@ ElementLight::ElementLight(const QString &label, const QString &order, const QSt
 ElementLight::~ElementLight()
 {
 }
-void ElementLight::accept(ElementVisitor *pVisitor, QVariantMap &data, SignalType &signalType)
+void ElementLight::accept(ElementVisitor *pVisitor, QVariantMap &data, bool &emitEvent)
 {
-    pVisitor->visit(this, data, signalType);
+    pVisitor->visit(this, data, emitEvent);
 }
 QString ElementLight::getType()
 {
@@ -25,9 +25,9 @@ void ValueLight::updateValue()
 {
     value = static_cast<ElementLight*>(pElement)->value();
 }
-void ValueLight::updateElement(const SignalType &signalType)
+void ValueLight::updateElement(const bool &emitEvent)
 {
-    static_cast<ElementLight*>(pElement)->setValue(value, signalType);
+    static_cast<ElementLight*>(pElement)->setValue(value, emitEvent);
 }
 
 }

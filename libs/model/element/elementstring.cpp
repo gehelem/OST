@@ -9,9 +9,9 @@ ElementString::ElementString(const QString &label, const QString &order, const Q
 ElementString::~ElementString()
 {
 }
-void ElementString::accept(ElementVisitor *pVisitor, QVariantMap &data, SignalType &signalType)
+void ElementString::accept(ElementVisitor *pVisitor, QVariantMap &data, bool &emitEvent)
 {
-    pVisitor->visit(this, data, signalType);
+    pVisitor->visit(this, data, emitEvent);
 }
 QString ElementString::getType()
 {
@@ -46,9 +46,9 @@ void ValueString::updateValue()
 {
     value = static_cast<ElementString*>(pElement)->value();
 }
-void ValueString::updateElement(const SignalType &signalType)
+void ValueString::updateElement(const bool &emitEvent)
 {
-    static_cast<ElementString*>(pElement)->setValue(value, signalType);
+    static_cast<ElementString*>(pElement)->setValue(value);
 }
 
 

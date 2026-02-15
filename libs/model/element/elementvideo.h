@@ -84,7 +84,7 @@ class ElementVideo: public ElementTemplateNotNumeric<VideoData>
          *
          * Used for grid operations and custom actions.
          */
-        void accept(ElementVisitor *pVisitor, QVariantMap &data, SignalType &signalType) override;
+        void accept(ElementVisitor *pVisitor, QVariantMap &data, bool &emitEvent) override;
 
         /**
          * @brief Construct a new ElementVideo object
@@ -171,7 +171,7 @@ class ValueVideo: public ValueTemplate<VideoData>
          *
          * Copies this video data back into the parent element.
          */
-        void updateElement(const SignalType &signalType) override;
+        void updateElement(const bool  &emitEvent) override;
 
 };
 }

@@ -78,7 +78,7 @@ class ElementInt: public ElementTemplateNumeric<int>
          *
          * Used for grid operations and custom actions.
          */
-        void accept(ElementVisitor *pVisitor, QVariantMap &data, SignalType &signalType) override;
+        void accept(ElementVisitor *pVisitor, QVariantMap &data, bool &emitEvent) override;
 
         /**
          * @brief Construct a new ElementInt object
@@ -232,7 +232,7 @@ class ValueInt: public ValueTemplate<int>
          * Copies this value back into the parent element.
          * Called by PropertyMulti::fetchLine() when restoring elements from grid.
          */
-        void updateElement(const SignalType &emitEvent) override;
+        void updateElement(const bool  &emitEvent) override;
 
 };
 

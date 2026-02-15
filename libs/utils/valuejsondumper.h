@@ -13,7 +13,7 @@ class ValueJsonDumper : public ValueVisitor
 {
 
     public:
-        ValueJsonDumper() = default;
+        ValueJsonDumper(const QString &type): mType(type) {;};
 
         void visit(ValueInt *pValue) override;
         void visit(ValueBool* pValue) override;
@@ -33,6 +33,7 @@ class ValueJsonDumper : public ValueVisitor
 
     private:
         QJsonValue mResult;
+        QString mType;
 
 };
 }

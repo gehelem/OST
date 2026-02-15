@@ -296,6 +296,29 @@ void WShandler::socketDisconnected()
 
     }
 }
+void WShandler::onModuleEvent(Basemodule *module, OST::Event event)
+{
+    QJsonObject  obj;
+    obj["evt"] = event.type;
+    QJsonObject mods;
+    QJsonObject  mod;
+    if (event.type == "sv")
+    {
+    }
+    if (event.type == "moduledump")
+    {
+        mod["properties"] = module->getPropertiesDump();
+        QJsonObject  infos;
+        infos["label"] = module->getModuleLabel();
+        mod["infos"] = QJsonObject::fromVariantMap(module->getAllMetadata());
+        mod["globallovs"] = QJsonObject();
+    }
+    mods[event.module] = mod;
+    obj["modules"] = mods;
+    sendJsonMessage(obj);
+
+
+}
 
 void WShandler::processModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                    const QVariantMap &eventData)
@@ -371,7 +394,7 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
         obj["modules"] = mods;
         sendJsonMessage(obj);
     }
-    if (eventType == "sp" || eventType == "se")
+    if (eventType == "sp" || eventType == "se"  || eventType == "sv")
     {
         QVariantMap prop = eventData;
         QVariantMap values;

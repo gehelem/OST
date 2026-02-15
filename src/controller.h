@@ -74,8 +74,7 @@ class Controller : public QObject
         void logInfo(const QString &message, const QVariantList &args);
 
     private slots:
-        void OnModuleEvent  (const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
-                             const QVariantMap &pEventData);
+        void onModuleEvent(Basemodule* module, OST::Event event);
         void OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
                              const QVariantMap &pEventData);
         void OnMainCtlEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,

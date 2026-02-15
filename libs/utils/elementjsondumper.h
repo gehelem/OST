@@ -21,18 +21,18 @@ class ElementJsonDumper : public ElementVisitor
 {
 
     public:
-        ElementJsonDumper() = default;
+        ElementJsonDumper(const QString &type): mType(type) {;};
 
-        void visit(ElementBool* pElement, QVariantMap &data, OST::SignalType &signalType) override;
-        void visit(ElementInt* pElement, QVariantMap &data, OST::SignalType &signalType) override;
-        void visit(ElementFloat* pElement, QVariantMap &data, OST::SignalType &signalType ) override;
-        void visit(ElementString* pElement, QVariantMap &data, OST::SignalType &signalType) override;
-        void visit(ElementLight* pElement, QVariantMap &data, OST::SignalType &signalType) override;
-        void visit(ElementImg* pElement, QVariantMap &data, OST::SignalType &signalType ) override;
-        void visit(ElementVideo* pElement, QVariantMap &data, OST::SignalType &signalType) override;
-        void visit(ElementPrg* pElement, QVariantMap &data, OST::SignalType &signalType) override;
-        void visit(ElementDate* pElement, QVariantMap &data, OST::SignalType &signalType) override;
-        void visit(ElementTime* pElement, QVariantMap &data, OST::SignalType &signalType) override;
+        void visit(ElementBool* pElement, QVariantMap &data, bool &emitEvent) override;
+        void visit(ElementInt* pElement, QVariantMap &data, bool &emitEvent) override;
+        void visit(ElementFloat* pElement, QVariantMap &data, bool &emitEvent ) override;
+        void visit(ElementString* pElement, QVariantMap &data, bool &emitEvent) override;
+        void visit(ElementLight* pElement, QVariantMap &data, bool &emitEvent) override;
+        void visit(ElementImg* pElement, QVariantMap &data, bool &emitEvent) override;
+        void visit(ElementVideo* pElement, QVariantMap &data, bool &emitEvent) override;
+        void visit(ElementPrg* pElement, QVariantMap &data, bool &emitEvent) override;
+        void visit(ElementDate* pElement, QVariantMap &data, bool &emitEvent) override;
+        void visit(ElementTime* pElement, QVariantMap &data, bool &emitEvent) override;
 
         [[nodiscard]] const QJsonObject &getResult() const
         {
@@ -43,6 +43,7 @@ class ElementJsonDumper : public ElementVisitor
         QJsonObject mResult;
         QString mJsonString;
         QJsonObject dumpElementCommons(ElementBase *pElement);
+        QString mType;
 };
 }
 #endif //OST_ELEMENTJSONDUMPER_H

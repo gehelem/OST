@@ -8,15 +8,15 @@ ElementPrg::ElementPrg(const QString &label, const QString &order, const QString
 ElementPrg::~ElementPrg()
 {
 }
-void ElementPrg::accept(ElementVisitor *pVisitor, QVariantMap &data, SignalType &signalType)
+void ElementPrg::accept(ElementVisitor *pVisitor, QVariantMap &data, bool &emitEvent)
 {
-    pVisitor->visit(this, data, signalType);
+    pVisitor->visit(this, data, emitEvent);
 }
 QString ElementPrg::getType()
 {
     return "prg";
 }
-void ElementPrg::setPrgValue(const double &v, const SignalType &signalType)
+void ElementPrg::setPrgValue(const double &v, const bool &emitEvent)
 {
     if ((v < 0) || (v > 100))
     {
@@ -25,13 +25,13 @@ void ElementPrg::setPrgValue(const double &v, const SignalType &signalType)
     }
     PrgData d = value();
     d.value = v;
-    ElementTemplateNotNumeric<PrgData>::setValue(d, signalType);
+    ElementTemplateNotNumeric<PrgData>::setValue(d, emitEvent);
 }
-void ElementPrg::setDynLabel(const QString &s, const SignalType &signalType)
+void ElementPrg::setDynLabel(const QString &s, const bool &emitEvent)
 {
     PrgData d = value();
     d.dynlabel = s;
-    ElementTemplateNotNumeric<PrgData>::setValue(d, signalType);
+    ElementTemplateNotNumeric<PrgData>::setValue(d, emitEvent);
 }
 QString ElementPrg::dynLabel()
 {
@@ -54,9 +54,9 @@ void ValuePrg::updateValue()
 {
     value = static_cast<ElementPrg*>(pElement)->value();
 }
-void ValuePrg::updateElement(const SignalType &signalType)
+void ValuePrg::updateElement(const bool &emitEvent)
 {
-    static_cast<ElementPrg*>(pElement)->setValue(value, signalType);
+    static_cast<ElementPrg*>(pElement)->setValue(value, emitEvent);
 }
 
 

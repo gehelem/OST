@@ -394,14 +394,14 @@ class PropertyBase: public QObject
 
         /**
          * @brief Signal emitted for custom property events
-         * @param eventType Type of event (e.g., "Flcreate", "Fldelete")
-         * @param eventKey Key identifier for the event
          * @param prop Pointer to the property
+         * @param event Event descriptor
          *
          * Generic event mechanism for property-level operations like
          * grid line creation/deletion, up/down movements, etc.
          */
-        void propertyEvent(QString, QString, OST::PropertyBase*);
+        void propertyEvent(OST::PropertyBase*, OST::Event);
+
 
         /**
          * @brief Signal emitted when sending messages

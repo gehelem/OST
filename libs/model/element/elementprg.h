@@ -99,7 +99,7 @@ class ElementPrg: public ElementTemplateNotNumeric<PrgData>
          *
          * Used for grid operations and custom actions.
          */
-        void accept(ElementVisitor *pVisitor, QVariantMap &data, SignalType &signalType) override;
+        void accept(ElementVisitor *pVisitor, QVariantMap &data, bool &emitEvent) override;
 
         /**
          * @brief Construct a new ElementPrg object
@@ -134,7 +134,7 @@ class ElementPrg: public ElementTemplateNotNumeric<PrgData>
          * element->setPrgValue(100.0, true);  // Complete
          * @endcode
          */
-        void setPrgValue(const double &v, const SignalType &signalType);
+        void setPrgValue(const double &v, const bool &emitEvent);
 
         /**
          * @brief Set dynamic label text
@@ -151,7 +151,7 @@ class ElementPrg: public ElementTemplateNotNumeric<PrgData>
          * element->setDynLabel("Complete!", true);
          * @endcode
          */
-        void setDynLabel(const QString &s, const SignalType &signalType);
+        void setDynLabel(const QString &s, const bool &emitEvent);
 
         /**
          * @brief Get current dynamic label
@@ -249,7 +249,7 @@ class ValuePrg: public ValueTemplate<PrgData>
          *
          * Copies this progress data back into the parent element.
          */
-        void updateElement(const SignalType &signalType) override;
+        void updateElement(const bool  &emitEvent) override;
 
 };
 

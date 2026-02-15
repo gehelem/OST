@@ -10,9 +10,9 @@ ElementBool::~ElementBool()
 {
 }
 
-void ElementBool::accept(ElementVisitor *pVisitor, QVariantMap &data, SignalType &signalType)
+void ElementBool::accept(ElementVisitor *pVisitor, QVariantMap &data, bool &emitEvent)
 {
-    pVisitor->visit(this, data, signalType);
+    pVisitor->visit(this, data, emitEvent);
 }
 QString ElementBool::getType()
 {
@@ -27,9 +27,9 @@ void ValueBool::updateValue()
 {
     value = static_cast<ElementBool*>(pElement)->value();
 }
-void ValueBool::updateElement(const SignalType &signalType)
+void ValueBool::updateElement(const bool &emitEvent)
 {
-    static_cast<ElementBool*>(pElement)->setValue(value, signalType);
+    static_cast<ElementBool*>(pElement)->setValue(value, emitEvent);
 }
 
 

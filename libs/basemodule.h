@@ -69,10 +69,22 @@ class Basemodule : public DBManager
     signals:
         void moduleStatusRequest(void);
         void moduleStatusAnswer(const QString module, OST::ModuleStatus);
-        void moduleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                         const QVariantMap &eventData);
+        //void moduleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
+        //                 const QVariantMap &eventData);
         void loadOtherModule(QString &lib, QString &name, QString &label, QString &profile);
+        /**
+         * @brief Signal emitted for custom property events
+         * @param prop Pointer to the module
+         * @param event Event descriptor
+         *
+         * Generic event mechanism for property-level operations like
+         * grid line creation/deletion, up/down movements, etc.
+         */
+        void moduleEvent(Basemodule*, OST::Event);
+
+
     public slots:
+        void onDatastoreEvent(Datastore* datastore, OST::Event e);
         void OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
                              const QVariantMap &pEventData);
         virtual void OnMyExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,

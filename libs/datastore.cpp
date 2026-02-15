@@ -8,6 +8,16 @@ Datastore::Datastore()
 Datastore::~Datastore()
 {
 }
+void Datastore::setMetadata(const QString key, const QVariant value)
+{
+    if (mMetadata.contains(key))
+    {
+        logWarning("module %1 - setMetadata - key %2 already exists (%3)", {this->getModuleName(), key, mMetadata[key]});
+        return;
+    }
+    mMetadata[key] = value;
+}
+
 OST::PropertyMulti* Datastore::getProperty(QString pProperty)
 {
     if (!mStore.contains(pProperty))
@@ -340,7 +350,7 @@ bool Datastore::createOstProperty(const QString &pPropertyName, const QString &p
 
     OST::PropertyMulti *pm = OST::PropertyFactory::createProperty(pPropertyName, prop);
     mStore[pPropertyName] = pm;
-    OST::PropertyJsonDumper d;
+    OST::PropertyJsonDumper d("cp");
     pm->accept(&d);
     connect(mStore[pPropertyName], &OST::PropertyMulti::valueSet, this, &Datastore::onValueSet);
     connect(mStore[pPropertyName], &OST::PropertyMulti::eltChanged, this, &Datastore::onEltChanged);
@@ -351,34 +361,36 @@ bool Datastore::createOstProperty(const QString &pPropertyName, const QString &p
 }
 void Datastore::emitPropertyCreation(const QString &pPropertyName)
 {
-    OST::PropertyJsonDumper d;
+    OST::PropertyJsonDumper d("cp");
     QVariantMap result;
     mStore[pPropertyName]->accept(&d, result);
     emit OnModuleEvent("cp", QString(), pPropertyName, result);
 }
 void Datastore::onValueSet(void)
 {
-    OST::PropertyBase* obj = qobject_cast<OST::PropertyBase*>(sender());
-    OST::PropertyJsonDumper d;
-    obj->accept(&d);
-    OnModuleEvent("se", QString(), obj->key(), d.getResult().toVariantMap());
+    //    OST::PropertyBase* obj = qobject_cast<OST::PropertyBase*>(sender());
+    //    OST::PropertyJsonDumper d("sv");
+    //    obj->accept(&d);
+    //    OnModuleEvent("se", QString(), obj->key(), d.getResult().toVariantMap());
 
 }
 void Datastore::onEltChanged(void)
 {
-    OST::PropertyBase* obj = qobject_cast<OST::PropertyBase*>(sender());
-    OST::PropertyJsonDumper d;
-    obj->accept(&d);
-    OnModuleEvent("ap", QString(), obj->key(), d.getResult().toVariantMap());
+    //    OST::PropertyBase* obj = qobject_cast<OST::PropertyBase*>(sender());
+    //    OST::PropertyJsonDumper d("");
+    //    obj->accept(&d);
+    //    OnModuleEvent("ap", QString(), obj->key(), d.getResult().toVariantMap());
 
 }
-void Datastore::onPropertyEvent(QString event, QString key, OST::PropertyBase* prop)
+void Datastore::onPropertyEvent(OST::PropertyBase* prop, OST::Event event)
 {
-    Q_UNUSED(event) Q_UNUSED(key) Q_UNUSED(prop)
-    OST::PropertyBase* obj = qobject_cast<OST::PropertyBase*>(sender());
-    OST::PropertyJsonDumper d;
-    obj->accept(&d);
-    OnModuleEvent("ap", QString(), obj->key(), d.getResult().toVariantMap());
+    OST::PropertyJsonDumper d(event.type);
+    prop->accept(&d);
+    emit datastoreEvent(this, event);
+    qDebug() << "Datastore::onPropertyEvent=" << prop->key() << event.type << event.property << event.element;
+    //OnModuleEvent(event.type, QString(), prop->key(), d.getResult().toVariantMap());
+    //emit OnModuleEvent(event.type, this->getModuleName(), prop->key(), d.getResult().toVariantMap());
+
 }
 void Datastore::onLovChanged()
 {
@@ -404,7 +416,7 @@ bool Datastore::createOstElementText(const QString &pPropertyName, const QString
     OST::ElementBase *el = OST::ElementFactory::createElement(pData);
 
     mStore[pPropertyName]->addElt(pElementName, el);
-    OST::PropertyJsonDumper d;
+    OST::PropertyJsonDumper d("ap");
     mStore[pPropertyName]->accept(&d);
     //qDebug() << "createOstElementText el(" << pElementName << ")=" << d.getResult();
     if (mEmitEvent) OnModuleEvent("ce", QString(), pPropertyName, d.getResult().toVariantMap());
@@ -427,7 +439,7 @@ bool Datastore::createOstElementBool(const QString &pPropertyName, const QString
     OST::ElementBase *el = OST::ElementFactory::createElement(pData);
 
     mStore[pPropertyName]->addElt(pElementName, el);
-    OST::PropertyJsonDumper d;
+    OST::PropertyJsonDumper d("ap");
     mStore[pPropertyName]->accept(&d);
     //qDebug() << "createOstElementBool el(" << pElementName << ")=" << d.getResult();
     if (mEmitEvent) OnModuleEvent("ce", QString(), pPropertyName, d.getResult().toVariantMap());
@@ -626,7 +638,7 @@ QJsonObject Datastore::getPropertiesDump(void)
     QJsonObject properties;
     foreach(const QString &key, mStore.keys())
     {
-        OST::PropertyJsonDumper d;
+        OST::PropertyJsonDumper d("ap");
         mStore[key]->accept(&d);
         properties[key] = d.getResult();
     }

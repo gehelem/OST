@@ -77,7 +77,7 @@ class ElementBase: public QObject
          *
          * Overloaded accept for operations requiring external data.
          */
-        virtual void accept(ElementVisitor* pVisitor, QVariantMap &data, SignalType &signalType) = 0;
+        virtual void accept(ElementVisitor* pVisitor, QVariantMap &data, bool &emitEvent) = 0;
 
         /**
          * @brief Construct a new ElementBase object
@@ -238,7 +238,7 @@ to-propagate changes to backend */
          * Emitted by derived template classes when setValue() is called.
          * Propagated to parent property's OnValueSet slot.
          */
-        void eltEvent(OST::ElementBase*, OST::Event, OST::SignalType);
+        void eltEvent(OST::ElementBase*, OST::Event);
 
         /**
          * @brief Signal emitted when element value changes
@@ -354,7 +354,7 @@ class ValueBase: public QObject
          * Copies this value back into parent element.
          * Called when fetching grid line into elements.
          */
-        virtual void updateElement(const SignalType &signalType) = 0;
+        virtual void updateElement(const bool  &emitEvent) = 0;
 
     protected:
         ElementBase* pElement;  /*!< Pointer to parent element */

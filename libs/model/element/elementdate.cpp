@@ -8,9 +8,9 @@ ElementDate::ElementDate(const QString &label, const QString &order, const QStri
 ElementDate::~ElementDate()
 {
 }
-void ElementDate::accept(ElementVisitor *pVisitor, QVariantMap &data, SignalType &signalType)
+void ElementDate::accept(ElementVisitor *pVisitor, QVariantMap &data, bool &emitEvent)
 {
-    pVisitor->visit(this, data, signalType);
+    pVisitor->visit(this, data, emitEvent);
 }
 QString ElementDate::getType()
 {
@@ -24,9 +24,9 @@ void ValueDate::updateValue()
 {
     value = static_cast<ElementDate*>(pElement)->value();
 }
-void ValueDate::updateElement(const SignalType &signalType)
+void ValueDate::updateElement(const bool &emitEvent)
 {
-    static_cast<ElementDate*>(pElement)->setValue(value, signalType);
+    static_cast<ElementDate*>(pElement)->setValue(value, emitEvent);
 }
 
 

@@ -178,39 +178,18 @@ class ElementTemplateNumeric : public ElementTemplate<T>
         /**
          * @brief Set value with optional signal emission
          * @param value New value to set
-         * @param signalType Whether to emit signal
+         * @param emitEvent Whether to emit signal
          * @return true if value accepted, false if out of range
          *
          * Validates the value against min/max if set, then updates the stored value.
          *
          * @par Usage:
          * @code
-         * element->setValue(100, SignalType::Value);   // Set and notify observers
-         * element->setValue(200, SignalType::Silent);  // Set with silent notification (for multiple updates)
+         * element->setValue(100, true);   // Set and notify observers
+         * element->setValue(200, false);  // Set with silent notification (for multiple updates)
          * @endcode
          */
-        bool setValue(const T &value, const SignalType  &signalType)
-        {
-            bool r = setValue(value);
-            if (r)
-            {
-                emit ElementBase::eltEvent(this, {"sv", "", "", "", 0, QVariantMap()}, signalType);
-            }
-            return r;
-        }
-
-        /**
-         * @brief Set value without signal emission
-         * @param value New value to set
-         * @return true if value accepted, false if out of range
-         *
-         * Internal setValue that performs validation but does not emit signals.
-         * If min/max validation is enabled and value is out of range,
-         * emits a warning message and returns false without changing the value.
-         *
-         * @see setMinMax()
-         */
-        bool setValue(const T &value)
+        bool setValue(const T &value, const bool &emitEvent)
         {
             if (mUseMinMax)
             {
@@ -230,7 +209,20 @@ class ElementTemplateNumeric : public ElementTemplate<T>
                 }
             }
             ElementTemplate<T>::mValue = value;
+            if (emitEvent) emit ElementBase::eltEvent(this, {"sv", "", "", "", 0, QVariantMap()});
             return true;
+        }
+
+        /**
+         * @brief Set value with signal emission
+         * @param value New value to set
+         * @return true if value accepted, false if out of range
+         *
+         * @see setMinMax()
+         */
+        bool setValue(const T &value)
+        {
+            return setValue(value, true);
         }
 
         /**
@@ -257,7 +249,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
         {
             mUseMinMax = true;
             mMin = min;
-            emit ElementBase::eltEvent(this, {"sp", "", "", "", 0, QVariantMap()}, SignalType::Property);
+            emit ElementBase::eltEvent(this, {"sp", "", "", "", 0, QVariantMap()});
         }
 
         /**
@@ -281,7 +273,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
         {
             mUseMinMax = true;
             mMax = max;
-            emit ElementBase::eltEvent(this, {"sp", "", "", "", 0, QVariantMap()}, SignalType::Property);
+            emit ElementBase::eltEvent(this, {"sp", "", "", "", 0, QVariantMap()});
         }
 
         /**
@@ -306,7 +298,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
             mMin = min;
             mMax = max;
             mUseMinMax = true;
-            emit ElementBase::eltEvent(this, {"sp", "", "", "", 0, QVariantMap()}, SignalType::Property);
+            emit ElementBase::eltEvent(this, {"sp", "", "", "", 0, QVariantMap()});
         }
 
         /**
@@ -321,7 +313,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
             mMin = 0;
             mMax = 0;
             mUseMinMax = false;
-            emit ElementBase::eltEvent(this, {"sp", "", "", "", 0, QVariantMap()}, SignalType::Property);
+            emit ElementBase::eltEvent(this, {"sp", "", "", "", 0, QVariantMap()});
         }
 
         /**
@@ -352,7 +344,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
         void setStep(const T &step)
         {
             mStep = step;
-            emit ElementBase::eltEvent(this, {"sp", "", "", "", 0, QVariantMap()}, SignalType::Property);
+            emit ElementBase::eltEvent(this, {"sp", "", "", "", 0, QVariantMap()});
         }
 
         /**
@@ -384,7 +376,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
         void setFormat(const QString &format)
         {
             mFormat = format;
-            emit ElementBase::eltEvent(this, {"sp", "", "", "", 0, QVariantMap()}, SignalType::Property);
+            emit ElementBase::eltEvent(this, {"sp", "", "", "", 0, QVariantMap()});
         }
 
         /**
@@ -419,7 +411,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
         void setSlider(const SliderRule &s)
         {
             mSlider = s;
-            emit ElementBase::eltEvent(this, {"sp", "", "", "", 0, QVariantMap()}, SignalType::Property);
+            emit ElementBase::eltEvent(this, {"sp", "", "", "", 0, QVariantMap()});
         }
 
     private:
@@ -507,13 +499,13 @@ class ElementTemplateNotNumeric : public ElementTemplate<T>
          */
         bool setValue(const T &value, const bool &emitEvent)
         {
-            bool r = setValue(value);
-            if (r && emitEvent) emit ElementBase::valueSet(this);
-            return r;
+            ElementTemplate<T>::mValue = value;
+            if (emitEvent) emit ElementBase::valueSet(this);
+            return true;
         }
 
         /**
-         * @brief Set value with global signal emission (AllValues)
+         * @brief Set value with signal emission
          * @param value New value to set
          * @return Always returns true (no validation)
          *
@@ -522,27 +514,7 @@ class ElementTemplateNotNumeric : public ElementTemplate<T>
          */
         bool setValue(const T &value)
         {
-            setValue(value, SignalType::AllValues);
-            return true;
-        }
-
-        /**
-         * @brief Set value with optional signal emission
-         * @param value New value to set
-         * @param signalType Whether to emit signal
-         * @return Always returns true (no validation)
-         *
-         * @par Usage:
-         * @code
-         * element->setValue("AAA", SignalType::Value);   // Set and notify observers
-         * element->setValue("BBB", SignalType::Silent);  // Set with silent notification (for multiple updates)
-         * @endcode
-         */
-        bool setValue(const T &value, const SignalType  &signalType)
-        {
-            ElementTemplate<T>::mValue = value;
-            emit ElementBase::eltEvent(this, {"sv", "", "", "", 0, QVariantMap()}, signalType);
-            return true;
+            return setValue(value, true);
         }
 
 };

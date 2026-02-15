@@ -15,11 +15,11 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     setClassName(QString(metaObject()->className()).toLower());
     loadOstPropertiesFromFile(":dummy.json");
 
-    setModuleDescription("Dummy module to show what we can do and not");
-    setModuleVersion("0.1");
-    getEltString("thisGit", "hash")->setValue(QString::fromStdString(Version::GIT_SHA1), true);
-    getEltString("thisGit", "date")->setValue(QString::fromStdString(Version::GIT_DATE), true);
-    getEltString("thisGit", "message")->setValue(QString::fromStdString(Version::GIT_COMMIT_SUBJECT), true);
+    setMetadata("thisGithash", QString::fromStdString(Version::GIT_SHA1));
+    setMetadata("thisGitdate", QString::fromStdString(Version::GIT_DATE));
+    setMetadata("thisGitmessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
+    setMetadata("description", "Dummy module to show what we can do and not");
+    setMetadata("thisversion", "0.1");
 
     getEltString("extextRO", "extext1")->setValue("Text read only 1");
     getEltString("extextRO", "extext2")->setValue("Text read only 2");
@@ -55,7 +55,7 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     OST::PropertyMulti *n = getProperty("numbersRW");
     n->setState(OST::State::Error);
     OST::ElementFloat *numbersRWn3 = getEltFloat("numbersRW", "n3");
-    numbersRWn3->setValue(999666, OST::SignalType::Value);
+    numbersRWn3->setValue(999666, true);
 
     //getText("extextRW", "extext1")->setValue("Value modified");
     //OST::ElementJsonDumper d;

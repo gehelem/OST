@@ -8,9 +8,9 @@ ElementImg::ElementImg(const QString &label, const QString &order, const QString
 ElementImg::~ElementImg()
 {
 }
-void ElementImg::accept(ElementVisitor *pVisitor, QVariantMap &data, SignalType &signalType)
+void ElementImg::accept(ElementVisitor *pVisitor, QVariantMap &data, bool &emitEvent)
 {
-    pVisitor->visit(this, data, signalType);
+    pVisitor->visit(this, data, emitEvent);
 }
 QString ElementImg::getType()
 {
@@ -34,8 +34,8 @@ void ValueImg::updateValue()
 {
     value = static_cast<ElementImg*>(pElement)->value();
 }
-void ValueImg::updateElement(const SignalType &signalType)
+void ValueImg::updateElement(const bool &emitEvent)
 {
-    static_cast<ElementImg*>(pElement)->setValue(value, signalType);
+    static_cast<ElementImg*>(pElement)->setValue(value, emitEvent);
 }
 }

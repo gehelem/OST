@@ -20,16 +20,16 @@ class ElementUpdate : public ElementVisitor
 
     public:
         ElementUpdate() = default;
-        void visit(ElementInt* pElement, QVariantMap &data, OST::SignalType &signalType) override;
-        void visit(ElementFloat* pElement, QVariantMap &data, OST::SignalType &signalType ) override;
-        void visit(ElementBool* pElement, QVariantMap &data, OST::SignalType &signalType) override;
-        void visit(ElementString* pElement, QVariantMap &data, OST::SignalType &signalType ) override;
-        void visit(ElementLight* pElement, QVariantMap &data, OST::SignalType &signalType) override;
-        void visit(ElementImg* pElement, QVariantMap &data, OST::SignalType &signalType) override;
-        void visit(ElementVideo* pElement, QVariantMap &data, OST::SignalType &signalType) override;
-        void visit(ElementPrg* pElement, QVariantMap &data, OST::SignalType &signalType) override;
-        void visit(ElementDate* pElement, QVariantMap &data, OST::SignalType &signalType) override;
-        void visit(ElementTime* pElement, QVariantMap &data, OST::SignalType &signalType) override;
+        void visit(ElementInt* pElement, QVariantMap &data, bool &emitEvent) override;
+        void visit(ElementFloat* pElement, QVariantMap &data, bool &emitEvent) override;
+        void visit(ElementBool* pElement, QVariantMap &data, bool &emitEvent) override;
+        void visit(ElementString* pElement, QVariantMap &data, bool &emitEvent ) override;
+        void visit(ElementLight* pElement, QVariantMap &data, bool &emitEvent) override;
+        void visit(ElementImg* pElement, QVariantMap &data, bool &emitEvent) override;
+        void visit(ElementVideo* pElement, QVariantMap &data, bool &emitEvent) override;
+        void visit(ElementPrg* pElement, QVariantMap &data, bool &emitEvent) override;
+        void visit(ElementDate* pElement, QVariantMap &data, bool &emitEvent) override;
+        void visit(ElementTime* pElement, QVariantMap &data, bool &emitEvent) override;
 
         [[nodiscard]] const QVariantList &getGrid() const
         {

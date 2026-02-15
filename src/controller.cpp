@@ -59,9 +59,6 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     connect(dbmanager, &Basemodule::logSignal, mLogger, &OST::Logger::onLog);
     connect(dbmanager, &Basemodule::logSignal, wshandler, &WShandler::onLog);
 
-    logInfo("iteration %1/%2", {10, 20});
-
-
     if (_libpath == "")
     {
         //_libpath=QCoreApplication::applicationDirPath();
@@ -78,11 +75,12 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     checkIndiDrivers();
 
     pMainControl = new Maincontrol(QString("mainctl"), QString("Main control"), QString(), QVariantMap());
-    connect(pMainControl, &Maincontrol::moduleEvent, this, &Controller::OnModuleEvent);
-    connect(pMainControl, &Maincontrol::moduleEvent, wshandler, &WShandler::processModuleEvent);
+    connect(pMainControl, &Maincontrol::moduleEvent, this, &Controller::onModuleEvent);
+    connect(pMainControl, &Maincontrol::moduleEvent, wshandler, &WShandler::onModuleEvent);
     connect(pMainControl, &Maincontrol::loadOtherModule, this, &Controller::loadModule);
     connect(pMainControl, &Maincontrol::mainCtlEvent, this, &Controller::OnMainCtlEvent);
     connect(this, &Controller::controllerEvent, pMainControl, &Maincontrol::OnExternalEvent);
+
     pMainControl->setParent(this);
     pMainControl->setWebroot(_webroot);
     pMainControl->setObjectName("mainctl");
@@ -187,8 +185,10 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     mod->setProfiles();
     QVariantMap profs;
     dbmanager->getDbProfiles(mod->metaObject()->className(), profs);
-    connect(mod, &Basemodule::moduleEvent, this, &Controller::OnModuleEvent);
-    connect(mod, &Basemodule::moduleEvent, wshandler, &WShandler::processModuleEvent);
+    connect(mod, &Basemodule::moduleEvent, this, &Controller::onModuleEvent);
+    //connect(mod, &Datastore::moduleEvent, wshandler, &WShandler::processModuleEvent);
+    connect(mod, &Basemodule::moduleEvent, wshandler, &WShandler::onModuleEvent);
+
     connect(mod, &Basemodule::loadOtherModule, this, &Controller::loadModule);
     connect(this, &Controller::controllerEvent, mod, &Basemodule::OnExternalEvent);
     //connect(wshandler, &WShandler::externalEvent, mod, &Basemodule::OnExternalEvent);
@@ -209,8 +209,8 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
             connect(othermodule, &Basemodule::moduleStatusAnswer, mod, &Basemodule::OnModuleStatusAnswer);
             connect(mod, &Basemodule::moduleStatusRequest, othermodule, &Basemodule::OnModuleStatusRequest);
             connect(mod, &Basemodule::moduleStatusAnswer, othermodule, &Basemodule::OnModuleStatusAnswer);
-            connect(othermodule, &Basemodule::moduleEvent, mod, &Basemodule::OnExternalEvent);
-            connect(mod, &Basemodule::moduleEvent, othermodule, &Basemodule::OnExternalEvent);
+            //connect(othermodule, &Datastore::moduleEvent, mod, &Basemodule::OnExternalEvent);
+            //connect(mod, &Datastore::moduleEvent, othermodule, &Basemodule::OnExternalEvent);
         }
     }
     QMap<QString, QString> l;
@@ -256,37 +256,33 @@ void Controller::saveConf(const QString &pConf)
 
 }
 
+void Controller::onModuleEvent(Basemodule *module, OST::Event event)
 
-void Controller::OnModuleEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
-                               const QVariantMap &pEventData)
+//void Controller::OnModuleEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+//                               const QVariantMap &pEventData)
 {
-    Q_UNUSED(pEventKey);
-    Q_UNUSED(pEventData);
-    if (pEventType == "mm" || pEventType == "me" || pEventType == "mw")
-    {
-        //qDebug() << pEventModule << "-" << pEventData["message"].toString();
-    }
 
-    if (pEventType == "moduledelete")
+    if (event.type == "moduledelete")
     {
-        if (!mModulesMap.contains(pEventModule))
+        if (!mModulesMap.contains(event.module))
         {
-            pMainControl->sendMainWarning("moduledelete Module " + pEventModule + " not in module map");
+            pMainControl->sendMainWarning("moduledelete Module " + event.module + " not in module map");
+            return;
         }
-        mModulesMap.remove(pEventModule);
-        pMainControl->deldModuleData(pEventModule);
+        mModulesMap.remove(event.module);
+        pMainControl->deldModuleData(event.module);
         updateGlobalModulesLov();
     }
-    if (pEventType == "modulesavedprofile")
+    if (event.type == "modulesavedprofile")
     {
-        mModulesMap[pEventModule]["profile"] = pEventKey;
-        pMainControl->setModuleData(pEventModule, "", "", pEventKey);
+        //mModulesMap[event.module]["profile"] = pEventKey;
+        //pMainControl->setModuleData(event.module, "", "", pEventKey);
 
     }
-    if (pEventType == "moduleloadedprofile")
+    if (event.type == "moduleloadedprofile")
     {
-        mModulesMap[pEventModule]["profile"] = pEventKey;
-        pMainControl->setModuleData(pEventModule, "", "", pEventKey);
+        //mModulesMap[event.module]["profile"] = pEventKey;
+        //pMainControl->setModuleData(event.module, "", "", pEventKey);
 
     }
 

@@ -81,7 +81,7 @@ class ElementFloat: public ElementTemplateNumeric<double>
          *
          * Used for grid operations and custom actions.
          */
-        void accept(ElementVisitor *pVisitor, QVariantMap &data, SignalType &signalType) override;
+        void accept(ElementVisitor *pVisitor, QVariantMap &data, bool &emitEvent) override;
 
         /**
          * @brief Construct a new ElementFloat object
@@ -235,7 +235,7 @@ class ValueFloat: public ValueTemplate<double>
          * Copies this value back into the parent element.
          * Called by PropertyMulti::fetchLine() when restoring elements from grid.
          */
-        void updateElement(const SignalType &signalType) override;
+        void updateElement(const bool  &emitEvent) override;
 
 };
 

@@ -10,18 +10,15 @@ Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap
 {
     Q_INIT_RESOURCE(basemodule);
     Q_UNUSED(profile)
-    loadOstPropertiesFromFile(":basemodule.json");
-    mModuleDesc = getEltString("moduleInfo", "moduleDescription");
-    getEltString("moduleInfo", "moduleLabel")->setValue(label, false);
-    getEltString("moduleInfo", "moduleName")->setValue(name, false);
-    getEltString("moduleInfo", "moduleVersion")->setValue(0, false);
-    getEltString("baseGit", "hash")->setValue(QString::fromStdString(Version::GIT_SHA1), true);
-    getEltString("baseGit", "date")->setValue(QString::fromStdString(Version::GIT_DATE), true);
-    getEltString("baseGit", "message")->setValue(QString::fromStdString(Version::GIT_COMMIT_SUBJECT), true);
 
-    setModuleDescription("base module description - developer should change this message");
-    mModuleDesc->setValue("base module description - developer should change this message", false);
-    setModuleVersion("0.1");
+    connect(this, &Datastore::datastoreEvent, this, &Basemodule::onDatastoreEvent);
+
+    loadOstPropertiesFromFile(":basemodule.json");
+
+    setMetadata("baseGithash", QString::fromStdString(Version::GIT_SHA1));
+    setMetadata("baseGitdate", QString::fromStdString(Version::GIT_DATE));
+    setMetadata("baseGitmessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
+    setMetadata("baseversion", "0.1");
     mStatus.ts = QDateTime::currentDateTime();
     mStatus.message = "init";
     mStatus.state = OST::Idle;
@@ -33,7 +30,7 @@ Basemodule::~Basemodule()
     {
         deleteOstProperty(key);
     }
-    emit moduleEvent("moduledelete", getModuleName(), "*", QVariantMap());
+    emit moduleEvent(this, {"moduledelete", this->getModuleName(), "", "", 0, QVariantMap()});
     Q_CLEANUP_RESOURCE(basemodule);
 }
 
@@ -48,7 +45,8 @@ void Basemodule::setProfile(const QString &pProfileName)
         return;
     }
     setProfile(prof);
-    emit moduleEvent("moduleSetProfile", getModuleName(), pProfileName, QVariantMap());
+    emit moduleEvent(this, {"moduleSetProfile", this->getModuleName(), "", "", 0, QVariantMap()});
+
     logInfo("%1 profile sucessfully loaded", {pProfileName});
     QJsonObject ob;
     ob.fromVariantMap(prof);
@@ -73,19 +71,19 @@ void Basemodule::setProfile(QVariantMap profiledata)
                         QVariant v = props[key].toMap()["elements"].toMap()[eltkey].toMap()["value"];
                         if (getEltBase(key, eltkey)->getType() == "int")
                         {
-                            getEltInt(key, eltkey)->setValue(v.toInt(), OST::SignalType::Value);
+                            getEltInt(key, eltkey)->setValue(v.toInt(), true);
                         }
                         if (getEltBase(key, eltkey)->getType() == "float")
                         {
-                            getEltFloat(key, eltkey)->setValue(v.toDouble(), OST::SignalType::Value);
+                            getEltFloat(key, eltkey)->setValue(v.toDouble(), true);
                         }
                         if (getEltBase(key, eltkey)->getType() == "string")
                         {
-                            getEltString(key, eltkey)->setValue(v.toString(), OST::SignalType::Value);
+                            getEltString(key, eltkey)->setValue(v.toString(), true);
                         }
                         if (getEltBase(key, eltkey)->getType() == "bool")
                         {
-                            getEltBool(key, eltkey)->setValue(v.toBool(), OST::SignalType::Value);
+                            getEltBool(key, eltkey)->setValue(v.toBool(), true);
                         }
                         if (getEltBase(key, eltkey)->getType() == "time")
                         {
@@ -123,24 +121,24 @@ void Basemodule::setProfile(QVariantMap profiledata)
                             QString eltkey = data["gridheaders"].toList().at(icol).toString();
                             if (getEltBase(key, eltkey)->getType() == "int")
                             {
-                                getEltInt(key, eltkey)->setValue(vv.toInt(), OST::SignalType::Value);
+                                getEltInt(key, eltkey)->setValue(vv.toInt(), true);
                             }
                             if (getEltBase(key, eltkey)->getType() == "float")
                             {
-                                getEltFloat(key, eltkey)->setValue(vv.toDouble(), OST::SignalType::Value);
+                                getEltFloat(key, eltkey)->setValue(vv.toDouble(), true);
                             }
                             if (getEltBase(key, eltkey)->getType() == "string")
                             {
-                                getEltString(key, eltkey)->setValue(vv.toString(), OST::SignalType::Value);
+                                getEltString(key, eltkey)->setValue(vv.toString(), true);
                             }
                             if (getEltBase(key, eltkey)->getType() == "bool")
                             {
-                                getEltBool(key, eltkey)->setValue(vv.toBool(), OST::SignalType::Value);
+                                getEltBool(key, eltkey)->setValue(vv.toBool(), true);
                             }
                             if (getEltBase(key, eltkey)->getType() == "prg")
                             {
-                                getEltPrg(key, eltkey)->setPrgValue(vv.toMap()["value"].toInt(), OST::SignalType::Silent);
-                                getEltPrg(key, eltkey)->setDynLabel(vv.toMap()["dynlabel"].toString(), OST::SignalType::Value);
+                                getEltPrg(key, eltkey)->setPrgValue(vv.toMap()["value"].toInt(), false);
+                                getEltPrg(key, eltkey)->setDynLabel(vv.toMap()["dynlabel"].toString(), true);
 
                             }
                             if (getEltBase(key, eltkey)->getType() == "img")
@@ -286,15 +284,15 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
                     QVariantMap m = v.toMap();
                     if (getEltBase(keyprop, keyelt)->getType() == "int")
                     {
-                        getEltInt(keyprop, keyelt)->setValue(v.toInt(), OST::SignalType::Value);
+                        getEltInt(keyprop, keyelt)->setValue(v.toInt(), true);
                     }
                     if (getEltBase(keyprop, keyelt)->getType() == "float")
                     {
-                        getEltFloat(keyprop, keyelt)->setValue(v.toDouble(), OST::SignalType::Value);
+                        getEltFloat(keyprop, keyelt)->setValue(v.toDouble(), true);
                     }
                     if (getEltBase(keyprop, keyelt)->getType() == "string")
                     {
-                        getEltString(keyprop, keyelt)->setValue(v.toString(), OST::SignalType::Value);
+                        getEltString(keyprop, keyelt)->setValue(v.toString(), true);
                     }
                     if (getEltBase(keyprop, keyelt)->getType() == "bool")
                     {
@@ -306,13 +304,13 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
                     {
                         QDate d;
                         d.setDate(m["year"].toInt(), m["month"].toInt(), m["day"].toInt());
-                        getEltDate(keyprop, keyelt)->setValue(d, OST::SignalType::Value);
+                        getEltDate(keyprop, keyelt)->setValue(d, true);
                     }
                     if (getEltBase(keyprop, keyelt)->getType() == "time")
                     {
                         QTime t;
                         t.setHMS(m["hh"].toInt(), m["mm"].toInt(), m["ss"].toInt(), m["ms"].toInt());
-                        getEltTime(keyprop, keyelt)->setValue(t, OST::SignalType::Value);
+                        getEltTime(keyprop, keyelt)->setValue(t, true);
                     }
                     //sendMessage("Autoupdate - property " + keyprop + " - element " + keyelt);
                 }
@@ -343,8 +341,8 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
         {
             getProperty("saveprofile")->setState(OST::Ok);
             logInfo("%1 profile sucessfully saved", {getString("saveprofile", "name")});
-            emit moduleEvent("modulesavedprofile", getModuleName(), getString("saveprofile", "name"),
-                             QVariantMap());
+            emit moduleEvent(this, {"modulesavedprofile", this->getModuleName(), "", "", 0, QVariantMap()});
+
         }
         else
         {
@@ -363,8 +361,8 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
             setProfile(prof);
             getProperty("loadprofile")->setState(OST::Ok);
             logInfo("%1 profile sucessfully loaded", {getString("loadprofile", "name")});
-            emit moduleEvent("moduleloadedprofile", getModuleName(), getString("loadprofile", "name"),
-                             QVariantMap());
+            emit moduleEvent(this, {"moduleloadedprofile", this->getModuleName(), "", "", 0, QVariantMap()});
+
             getEltString("saveprofile", "name")->setValue(getString("loadprofile", "name"), true);
             sendDump();
         }
@@ -483,14 +481,14 @@ void Basemodule::sendDump(void)
     dump["infos"] = infos;
     dump["help"] = getHelpContent("fr");
     //getQtProperties();
-    emit moduleEvent("moduledump", getModuleName(), "*", dump);
+    emit moduleEvent(this, {"moduledump", this->getModuleName(), "", "", 0, QVariantMap()});
 
 }
 void Basemodule::OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                const QVariantMap &eventData)
 {
     Q_UNUSED(eventModule);
-    emit moduleEvent(eventType, this->getModuleName(), eventKey, eventData);
+    emit moduleEvent(this, {"moduledump", this->getModuleName(), "", "", 0, QVariantMap()});
 }
 bool Basemodule::setClassName(const QString &pClassName)
 {
@@ -519,5 +517,10 @@ void Basemodule::setModuleVersion(QString version)
 void Basemodule::OnModuleStatusRequest()
 {
     emit moduleStatusAnswer(this->getModuleName(), this->mStatus);
+}
+void Basemodule::onDatastoreEvent(Datastore* datastore, OST::Event e)
+{
+    Q_UNUSED(datastore)
+    emit moduleEvent(this, e);
 }
 

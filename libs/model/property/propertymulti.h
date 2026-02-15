@@ -428,6 +428,15 @@ class PropertyMulti: public PropertyBase
         void OnEltChanged(ElementBase*);
 
         /**
+         * @brief Slot called when element metadata changes
+         * @param elt Pointer to element that changed
+         * @param event Event descriptor
+         *
+         * Handles changes in element metadata (min/max, LOV, etc.).
+         */
+        void OnEltEvent(ElementBase*e, OST::Event evt);
+
+        /**
          * @brief Slot called when element list changes
          * @param elt Pointer to element whose list changed
          *

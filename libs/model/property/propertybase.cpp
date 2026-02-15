@@ -65,8 +65,7 @@ State PropertyBase::state()
 void PropertyBase::setState(State state)
 {
     mState = state;
-    emit propertyEvent("ap", key(), this);
-
+    emit propertyEvent(this, {"ap", "", key(), "", 0, QVariantMap()});
 }
 bool PropertyBase::isEnabled()
 {
@@ -75,12 +74,12 @@ bool PropertyBase::isEnabled()
 void PropertyBase::enable(void)
 {
     mIsEnabled = true;
-    emit propertyEvent("ap", key(), this);
+    emit propertyEvent(this, {"ap", "", key(), "", 0, QVariantMap()});
 }
 void PropertyBase::disable(void)
 {
     mIsEnabled = false;
-    emit propertyEvent("ap", key(), this);
+    emit propertyEvent(this, {"ap", "", key(), "", 0, QVariantMap()});
 }
 bool PropertyBase::getBadge()
 {
@@ -89,7 +88,7 @@ bool PropertyBase::getBadge()
 void PropertyBase::setBadge(bool b)
 {
     mBadge = b;
-    emit propertyEvent("ap", key(), this);
+    emit propertyEvent(this, {"ap", "", key(), "", 0, QVariantMap()});
 }
 void PropertyBase::sendInfo(QString m, const QVariantList &args)
 {

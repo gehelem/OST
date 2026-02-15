@@ -85,7 +85,7 @@ class ElementTime: public ElementTemplateNotNumeric<QTime>
          *
          * Used for grid operations and custom actions.
          */
-        void accept(ElementVisitor *pVisitor, QVariantMap &data, SignalType &signalType) override;
+        void accept(ElementVisitor *pVisitor, QVariantMap &data, bool &emitEvent) override;
 
         /**
          * @brief Construct a new ElementTime object
@@ -191,7 +191,7 @@ class ValueTime: public ValueTemplate<QTime>
          *
          * Copies this time value back into the parent element.
          */
-        void updateElement(const SignalType &signalType) override;
+        void updateElement(const bool  &emitEvent) override;
 
 };
 

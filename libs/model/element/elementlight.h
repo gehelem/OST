@@ -99,7 +99,7 @@ class ElementLight: public ElementTemplateNotNumeric<State>
          *
          * Used for grid operations and custom actions.
          */
-        void accept(ElementVisitor *pVisitor, QVariantMap &data, SignalType &signalType) override;
+        void accept(ElementVisitor *pVisitor, QVariantMap &data, bool &emitEvent) override;
 
         /**
          * @brief Construct a new ElementLight object
@@ -186,7 +186,7 @@ class ValueLight: public ValueTemplate<State>
          *
          * Copies this state value back into the parent element.
          */
-        void updateElement(const SignalType &signalType) override;
+        void updateElement(const bool  &emitEvent) override;
 
 };
 

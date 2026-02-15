@@ -9,9 +9,12 @@ IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap
     setVerbose(false);
     //_moduletype = "IndiModule";
     loadOstPropertiesFromFile(":indimodule.json");
-    getEltString("indiGit", "hash")->setValue(QString::fromStdString(Version::GIT_SHA1), false);
-    getEltString("indiGit", "date")->setValue(QString::fromStdString(Version::GIT_DATE), false);
-    getEltString("indiGit", "message")->setValue(QString::fromStdString(Version::GIT_COMMIT_SUBJECT), false);
+
+    setMetadata("baseindiGithash", QString::fromStdString(Version::GIT_SHA1));
+    setMetadata("baseindiGitdate", QString::fromStdString(Version::GIT_DATE));
+    setMetadata("baseindiGitmessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
+    setMetadata("baseindiVersion", "0.1");
+
 
     OST::LovString* ls = new OST::LovString("DRIVER_INTERFACE-TELESCOPE_INTERFACE");
     createGlobLov("DRIVER_INTERFACE-TELESCOPE_INTERFACE", ls);
@@ -866,7 +869,7 @@ bool IndiModule::defineMeAsImager()
     if (!getStore()["parms"]->getElts()->contains("exposure"))
     {
         OST::ElementFloat* f = new  OST::ElementFloat("Exposure", "exp000", "");
-        f->setValue(0, OST::SignalType::Silent);
+        f->setValue(0, false);
         f->setDirectEdit(true);
         f->setAutoUpdate(true);
         f->setMinMax(0.00001, 300);
@@ -880,7 +883,7 @@ bool IndiModule::defineMeAsImager()
     if (!getStore()["parms"]->getElts()->contains("gain"))
     {
         OST::ElementInt* i  = new  OST::ElementInt("Gain", "exp020", "");
-        i->setValue(0, OST::SignalType::Silent);
+        i->setValue(0, false);
         i->setDirectEdit(true);
         i->setAutoUpdate(true);
         i->setMinMax(0, 500);
@@ -892,7 +895,7 @@ bool IndiModule::defineMeAsImager()
     if (!getStore()["parms"]->getElts()->contains("offset"))
     {
         OST::ElementInt* i  = new  OST::ElementInt("Offset", "exp030", "");
-        i->setValue(0, OST::SignalType::Silent);
+        i->setValue(0, false);
         i->setDirectEdit(true);
         i->setAutoUpdate(true);
         i->setMinMax(0, 500);

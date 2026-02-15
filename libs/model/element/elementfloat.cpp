@@ -9,9 +9,9 @@ ElementFloat::ElementFloat(const QString &label, const QString &order, const QSt
 ElementFloat::~ElementFloat()
 {
 }
-void ElementFloat::accept(ElementVisitor *pVisitor, QVariantMap &data, SignalType &signalType)
+void ElementFloat::accept(ElementVisitor *pVisitor, QVariantMap &data, bool &emitEvent)
 {
-    pVisitor->visit(this, data, signalType);
+    pVisitor->visit(this, data, emitEvent);
 }
 QString ElementFloat::getType()
 {
@@ -46,9 +46,9 @@ void ValueFloat::updateValue()
 {
     value = static_cast<ElementFloat*>(pElement)->value();
 }
-void ValueFloat::updateElement(const SignalType &signalType)
+void ValueFloat::updateElement(const bool &emitEvent)
 {
-    static_cast<ElementFloat*>(pElement)->setValue(value, signalType);
+    static_cast<ElementFloat*>(pElement)->setValue(value, emitEvent);
 }
 
 

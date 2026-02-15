@@ -8,9 +8,9 @@ ElementVideo::ElementVideo(const QString &label, const QString &order, const QSt
 ElementVideo::~ElementVideo()
 {
 }
-void ElementVideo::accept(ElementVisitor *pVisitor, QVariantMap &data, SignalType &signalType)
+void ElementVideo::accept(ElementVisitor *pVisitor, QVariantMap &data, bool &emitEvent)
 {
-    pVisitor->visit(this, data, signalType);
+    pVisitor->visit(this, data, emitEvent);
 }
 QString ElementVideo::getType()
 {
@@ -25,9 +25,9 @@ void ValueVideo::updateValue()
 {
     value = static_cast<ElementVideo*>(pElement)->value();
 }
-void ValueVideo::updateElement(const SignalType &signalType)
+void ValueVideo::updateElement(const bool &emitEvent)
 {
-    static_cast<ElementVideo*>(pElement)->setValue(value, signalType);
+    static_cast<ElementVideo*>(pElement)->setValue(value, emitEvent);
 }
 
 
