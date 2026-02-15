@@ -500,7 +500,7 @@ class ElementTemplateNotNumeric : public ElementTemplate<T>
         bool setValue(const T &value, const bool &emitEvent)
         {
             ElementTemplate<T>::mValue = value;
-            if (emitEvent) emit ElementBase::valueSet(this);
+            if (emitEvent) emit ElementBase::eltEvent(this, {"sv", "", "", "", 0, QVariantMap()});
             return true;
         }
 

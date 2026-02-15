@@ -252,7 +252,7 @@ void IndiPanel::OnMyExternalEvent(const QString &eventType, const QString  &even
     Q_UNUSED(eventKey);
     if (eventModule != this->getModuleName()) return;
 
-    QVariantMap m = getPropertiesDump().toVariantMap();
+    QVariantMap m = getPropertiesDump(OST::Event()).toVariantMap();
     foreach(const QString &keyprop, eventData.keys())
     {
         if (!m.contains(keyprop))

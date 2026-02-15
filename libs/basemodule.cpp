@@ -14,7 +14,7 @@ Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap
     connect(this, &Datastore::datastoreEvent, this, &Basemodule::onDatastoreEvent);
 
     loadOstPropertiesFromFile(":basemodule.json");
-
+    setMetadata("label", label);
     setMetadata("baseGithash", QString::fromStdString(Version::GIT_SHA1));
     setMetadata("baseGitdate", QString::fromStdString(Version::GIT_DATE));
     setMetadata("baseGitmessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
@@ -462,12 +462,14 @@ QString Basemodule::getHelpContent(QString language)
 
 QVariantMap Basemodule::getModuleInfo(void)
 {
-    return getPropertiesDump()["moduleInfo"].toVariant().toMap();
+    return getAllMetadata();
 }
 
 void Basemodule::sendDump(void)
 {
-
+    OST::Event e;
+    e.type = "moduledump";
+    e.module = getModuleName();
     QVariantMap dump;
     QVariantMap state;
     QVariantMap infos;
@@ -475,13 +477,13 @@ void Basemodule::sendDump(void)
     infos["label"] = getModuleLabel();
     infos["description"] = getModuleDescription();
     //dump["properties"] = getProperties();
-    dump["properties"] = getPropertiesDump();;
+    dump["properties"] = getPropertiesDump(e);;
     dump["globallovs"] = getGlobalLovsDump();;
     dump["state"] = state;
     dump["infos"] = infos;
     dump["help"] = getHelpContent("fr");
     //getQtProperties();
-    emit moduleEvent(this, {"moduledump", this->getModuleName(), "", "", 0, QVariantMap()});
+    emit moduleEvent(this, e);
 
 }
 void Basemodule::OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
@@ -521,6 +523,7 @@ void Basemodule::OnModuleStatusRequest()
 void Basemodule::onDatastoreEvent(Datastore* datastore, OST::Event e)
 {
     Q_UNUSED(datastore)
+    e.module = this->getModuleName();
     emit moduleEvent(this, e);
 }
 

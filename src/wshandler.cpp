@@ -302,16 +302,14 @@ void WShandler::onModuleEvent(Basemodule *module, OST::Event event)
     obj["evt"] = event.type;
     QJsonObject mods;
     QJsonObject  mod;
-    if (event.type == "sv")
-    {
-    }
+    mod["properties"] = module->getPropertiesDump(event);
     if (event.type == "moduledump")
     {
-        mod["properties"] = module->getPropertiesDump();
         QJsonObject  infos;
         infos["label"] = module->getModuleLabel();
         mod["infos"] = QJsonObject::fromVariantMap(module->getAllMetadata());
-        mod["globallovs"] = QJsonObject();
+        mod["globallovs"] = module->getGlobalLovsDump();
+
     }
     mods[event.module] = mod;
     obj["modules"] = mods;

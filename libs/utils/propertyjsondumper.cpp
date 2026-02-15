@@ -30,7 +30,7 @@ namespace  OST
 QJsonObject PropertyJsonDumper::dumpPropertyCommons(PropertyBase *pProperty)
 {
     QJsonObject json;
-    if (mType == "sv") return json;
+    if (mEvent.type == "sv") return json;
     json["label"] = pProperty->label();
     json["order"] = pProperty->order();
     json["level1"] = pProperty->level1();
@@ -83,7 +83,7 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
     QJsonObject elements;
     foreach(const QString &key, pProperty->getElts()->keys())
     {
-        OST::ElementJsonDumper d(mType);
+        OST::ElementJsonDumper d(mEvent.type);
         QVariantMap m;
         bool b = false;
         pProperty->getElt(key)->accept(&d, m, b);
@@ -92,7 +92,7 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
     }
     json["elements"] = elements;
     mResult = json;
-    if (mType == "sv") return;
+    if (mEvent.type == "sv") return;
 
     json["showElts"] = pProperty->getShowElts();
     json["hasGrid"] = pProperty->hasGrid();
@@ -117,7 +117,7 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
             QJsonArray jLine;
             foreach(QString elt, pProperty->getGridHeaders())
             {
-                ValueJsonDumper d(mType);
+                ValueJsonDumper d(mEvent.type);
                 pProperty->getGrid()[i][elt]->accept(&d);
                 jLine.append(d.getResult());
             }

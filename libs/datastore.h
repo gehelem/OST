@@ -51,7 +51,7 @@ class Datastore : public QObject
             Q_UNUSED(pEventKey);
             Q_UNUSED(pEventData);
         };
-        QJsonObject getPropertiesDump(void);
+        QJsonObject getPropertiesDump(OST::Event evt);
         QJsonObject getGlobalLovsDump(void);
         void setMetadata(const QString key, const QVariant value);
         QVariant* getMetadata(const QString key)
@@ -127,7 +127,11 @@ class Datastore : public QObject
                 return false;
             }
             mStore[pPropertyName] = pProperty;
-            OST::PropertyJsonDumper d("ap");
+            OST::Event e;
+            e.type = "ap";
+            e.property = pPropertyName;
+            e.module = getModuleName();
+            OST::PropertyJsonDumper d(e);
             mStore[pPropertyName]->accept(&d);
             OnModuleEvent("cp", QString(), pPropertyName, d.getResult().toVariantMap());
             connect(mStore[pPropertyName], &OST::PropertyMulti::valueSet, this, &Datastore::onValueSet);
