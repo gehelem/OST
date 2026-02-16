@@ -33,21 +33,18 @@ Maincontrol::~Maincontrol()
     Q_CLEANUP_RESOURCE(maincontrol);
 }
 
-void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
-                                    const QVariantMap &pEventData)
+void Maincontrol::OnMyExternalEvent(OST::Event e)
 {
-    Q_UNUSED(pEventType);
-    Q_UNUSED(pEventKey);
 
-    if (getModuleName() == pEventModule)
+    if (getModuleName() == e.module)
     {
-        if (pEventType == "refreshConfigurations")
+        if (e.type == "refreshConfigurations")
         {
             setConfigurations();
         }
-        if ((pEventType == "Fposticon") && (pEventData.contains("load")))
+        if ((e.type == "Fposticon") && (e.data.contains("load")))
         {
-            QVariantMap m = pEventData["load"].toMap()["elements"].toMap();
+            QVariantMap m = e.data["load"].toMap()["elements"].toMap();
             QString pp = m.firstKey();
             pp.replace("libost", "");
             QString elt = getString("load", m.firstKey());
@@ -62,27 +59,27 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                                  prof);
             getProperty("load")->setState(OST::Ok);
         }
-        if ((pEventType == "Fposticon") && (pEventData.contains("saveconf")))
+        if ((e.type == "Fposticon") && (e.data.contains("saveconf")))
         {
             emit mainCtlEvent("saveconf", QString(), getString("saveconf", "name"), QVariantMap());
             setConfigurations();
         }
-        if ((pEventType == "Fposticon") && (pEventData.contains("loadconf")))
+        if ((e.type == "Fposticon") && (e.data.contains("loadconf")))
         {
             emit mainCtlEvent("loadconf", QString(), getString("loadconf", "name"), QVariantMap());
         }
-        if ((pEventType == "Fpreicon") && (pEventData.contains("loadconf")))
+        if ((e.type == "Fpreicon") && (e.data.contains("loadconf")))
         {
             setConfigurations();
         }
-        foreach(const QString &keyprop, pEventData.keys())
+        foreach(const QString &keyprop, e.data.keys())
         {
-            foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
+            foreach(const QString &keyelt, e.data[keyprop].toMap()["elements"].toMap().keys())
             {
-                if (keyelt == "name" && keyprop == "loadconf" && pEventType == "Fsetproperty")
+                if (keyelt == "name" && keyprop == "loadconf" && e.type == "Fsetproperty")
                 {
 
-                    QString val = pEventData[keyprop].toMap()["elements"].toMap()["name"].toString();
+                    QString val = e.data[keyprop].toMap()["elements"].toMap()["name"].toString();
                     getEltString("loadconf", "name")->setValue(val, true);
                     getEltString("saveconf", "name")->setValue(val, true);
                 }
@@ -90,23 +87,23 @@ void Maincontrol::OnMyExternalEvent(const QString &pEventType, const QString  &p
                 {
                     emit mainCtlEvent("killall", QString(), QString(), QVariantMap());
                 }
-                if (keyprop == "indidrivers" && keyelt == "search" && pEventType == "Fposticon")
+                if (keyprop == "indidrivers" && keyelt == "search" && e.type == "Fposticon")
                 {
                     this->searchDriver();
                 }
-                if (keyprop == "indidrivers" && keyelt == "driver" && pEventType == "Fposticon")
+                if (keyprop == "indidrivers" && keyelt == "driver" && e.type == "Fposticon")
                 {
                     emit mainCtlEvent("startindidriver", QString(), getString("indidrivers", "driver"), QVariantMap());
                 }
-                if (keyprop == "indidrivers" && keyelt == "driver" && pEventType == "Fpreicon")
+                if (keyprop == "indidrivers" && keyelt == "driver" && e.type == "Fpreicon")
                 {
                     emit mainCtlEvent("stopindidriver", QString(), keyelt, QVariantMap());
                 }
-                if (keyprop == "indiserver" && pEventType == "Fposticon")
+                if (keyprop == "indiserver" && e.type == "Fposticon")
                 {
                     emit mainCtlEvent("indiserver", QString(), "start", QVariantMap());
                 }
-                if (keyprop == "indiserver" && pEventType == "Fpreicon")
+                if (keyprop == "indiserver" && e.type == "Fpreicon")
                 {
                     emit mainCtlEvent("indiserver", QString(), "stop", QVariantMap());
                 }

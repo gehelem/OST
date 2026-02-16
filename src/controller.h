@@ -28,8 +28,7 @@ class Controller : public QObject
                    OST::Logger *logger, OST::TranslateManager *translate);
         ~Controller() override;
     signals:
-        void controllerEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                             const QVariantMap &eventData);
+        void controllerEvent(OST::Event);
     private:
         QString _webroot;
         QString _dbpath;
@@ -75,8 +74,7 @@ class Controller : public QObject
 
     private slots:
         void onModuleEvent(Basemodule* module, OST::Event event);
-        void OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
-                             const QVariantMap &pEventData);
+        void OnExternalEvent(OST::Event event);
         void OnMainCtlEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
                             const QVariantMap &pEventData);
         void OnFileWatcherEvent(const QString &pEvent);

@@ -173,46 +173,45 @@ void Basemodule::setProfiles()
     logInfo("Available profiles refreshed");
 }
 
-void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
-                                 const QVariantMap &pEventData)
+void Basemodule::OnExternalEvent(OST::Event e)
 {
     // Handle global lov updates from controller
-    if ( (pEventType == "globallovupdate") && (pEventModule == "*") )
-    {
-        // pEventKey contains the lov name (e.g., "loadedModules")
-        // pEventData contains the lov data with "values" list
-        if (!getGlobLovs().contains(pEventKey))
-        {
-            // Create the globallov if it doesn't exist
-            OST::LovString* newLov = new OST::LovString(pEventKey);
-            createGlobLov(pEventKey, newLov);
-        }
+    //if ( (e.type == "globallovupdate") && (e.module == "*") )
+    //{
+    //    // pEventKey contains the lov name (e.g., "loadedModules")
+    //    // pEventData contains the lov data with "values" list
+    //    if (!getGlobLovs().contains(pEventKey))
+    //    {
+    //        // Create the globallov if it doesn't exist
+    //        OST::LovString* newLov = new OST::LovString(pEventKey);
+    //        createGlobLov(pEventKey, newLov);
+    //    }
 
-        // Clear and repopulate the lov
-        OST::LovString* lov = getGlovString(pEventKey);
-        if (lov != nullptr)
-        {
-            lov->lovClear();
-            QVariantList values = pEventData["values"].toList();
-            for (const QVariant &item : values)
-            {
-                QVariantMap itemMap = item.toMap();
-                lov->lovAdd(itemMap["key"].toString(), itemMap["label"].toString());
-            }
-        }
-        return;
-    }
+    //    // Clear and repopulate the lov
+    //    OST::LovString* lov = getGlovString(pEventKey);
+    //    if (lov != nullptr)
+    //    {
+    //        lov->lovClear();
+    //        QVariantList values = pEventData["values"].toList();
+    //        for (const QVariant &item : values)
+    //        {
+    //            QVariantMap itemMap = item.toMap();
+    //            lov->lovAdd(itemMap["key"].toString(), itemMap["label"].toString());
+    //        }
+    //    }
+    //    return;
+    //}
 
-    if ( (pEventType == "Freadall") && ((pEventModule == "*") || (pEventModule == getModuleName())) )
+    if  (e.type == "Freadall")
     {
         sendDump();
         return;
     }
 
     /* just check if requested modification is possible */
-    if ( (pEventType == "Fsetproperty") && (pEventModule == getModuleName()) )
+    if ( (e.type == "Fsetproperty") && (e.module == getModuleName()) )
     {
-        foreach(const QString &keyprop, pEventData.keys())
+        foreach(const QString &keyprop, e.data.keys())
         {
             if (!getStore().contains(keyprop) )
             {
@@ -224,7 +223,7 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
                 logWarning("Fsetproperty - property %1 is disabled - can't update", {keyprop});
                 return;
             }
-            foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
+            foreach(const QString &keyelt,  e.data[keyprop].toMap()["elements"].toMap().keys())
             {
                 if (!getStore()[keyprop]->getElts()->contains(keyelt) )
                 {
@@ -235,37 +234,37 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
         }
     }
 
-    if ( (pEventType == "Flup") && (pEventModule == getModuleName()) )
+    if ( (e.type == "Flup") && (e.module == getModuleName()) )
     {
-        foreach(const QString &keyprop, pEventData.keys())
+        foreach(const QString &keyprop, e.data.keys())
         {
             if (getStore()[keyprop]->autoUpDown() && getStore()[keyprop]->isEnabled() )
             {
-                int l1 = pEventData[keyprop].toMap()["line"].toInt();
+                int l1 = e.data[keyprop].toMap()["line"].toInt();
                 int l2 = l1 - 1;
                 getStore()[keyprop]->swapLines(l1, l2);
             }
         }
     }
-    if ( (pEventType == "Fldown") && (pEventModule == getModuleName()) )
+    if ( (e.type == "Fldown") && (e.module == getModuleName()) )
     {
-        foreach(const QString &keyprop, pEventData.keys())
+        foreach(const QString &keyprop, e.data.keys())
         {
             if (getStore()[keyprop]->autoUpDown() && getStore()[keyprop]->isEnabled())
             {
-                int l1 = pEventData[keyprop].toMap()["line"].toInt();
+                int l1 = e.data[keyprop].toMap()["line"].toInt();
                 int l2 = l1 + 1;
                 getStore()[keyprop]->swapLines(l1, l2);
             }
         }
     }
-    if ( (pEventType == "Flselect")  && (pEventModule == getModuleName()) )
+    if ( (e.type == "Flselect")  && (e.module == getModuleName()) )
     {
-        foreach(const QString &keyprop, pEventData.keys())
+        foreach(const QString &keyprop, e.data.keys())
         {
             if (getStore()[keyprop]->autoSelect() && getStore()[keyprop]->isEnabled())
             {
-                double line = pEventData[keyprop].toMap()["line"].toDouble();
+                double line = e.data[keyprop].toMap()["line"].toDouble();
                 getStore()[keyprop]->fetchLine(line);
             }
         }
@@ -273,15 +272,15 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
 
     /* autoupdate if wanted */
 
-    if ( (pEventType == "Fsetproperty") && (pEventModule == getModuleName()) )
+    if ( (e.type == "Fsetproperty") && (e.module == getModuleName()) )
     {
-        foreach(const QString &keyprop, pEventData.keys())
+        foreach(const QString &keyprop, e.data.keys())
         {
-            foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
+            foreach(const QString &keyelt, e.data[keyprop].toMap()["elements"].toMap().keys())
             {
                 if (getStore()[keyprop]->getElt(keyelt)->autoUpdate() && getStore()[keyprop]->isEnabled() )
                 {
-                    QVariant v = pEventData[keyprop].toMap()["elements"].toMap()[keyelt];
+                    QVariant v = e.data[keyprop].toMap()["elements"].toMap()[keyelt];
                     QVariantMap m = v.toMap();
                     if (getEltBase(keyprop, keyelt)->getType() == "int")
                     {
@@ -318,9 +317,9 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
             }
         }
     }
-    if ((pEventType == "Fbadge") && pEventModule == getModuleName())
+    if ((e.type == "Fbadge") && e.module == getModuleName())
     {
-        foreach(const QString &keyprop, pEventData.keys())
+        foreach(const QString &keyprop, e.data.keys())
         {
             if (!getStore().contains(keyprop) )
             {
@@ -334,7 +333,7 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
 
 
 
-    if ((pEventType == "Fposticon") && (pEventData.contains("saveprofile")) && pEventModule == getModuleName())
+    if ((e.type == "Fposticon") && (e.data.contains("saveprofile")) && e.module == getModuleName())
     {
         getProperty("saveprofile")->setState(OST::Busy);
         QVariantMap prof = getProfile();
@@ -353,7 +352,7 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
         return;
     }
 
-    if ((pEventType == "Fposticon") && (pEventData.contains("loadprofile")) && pEventModule == getModuleName())
+    if ((e.type == "Fposticon") && (e.data.contains("loadprofile")) && e.module == getModuleName())
     {
         getProperty("loadprofile")->setState(OST::Busy);
         QVariantMap prof;
@@ -376,7 +375,7 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
 
     }
 
-    if ((pEventType == "Fpreicon") && (pEventData.contains("loadprofile")) && pEventModule == getModuleName())
+    if ((e.type == "Fpreicon") && (e.data.contains("loadprofile")) && e.module == getModuleName())
     {
         getProperty("loadprofile")->setState(OST::Busy);
         setProfiles();
@@ -385,13 +384,13 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
     }
 
 
-    if ((getModuleName() == pEventModule ) && (pEventType == "Fsetproperty") )
+    if ((getModuleName() == e.module ) && (e.type == "Fsetproperty") )
     {
-        foreach(const QString &keyprop, pEventData.keys())
+        foreach(const QString &keyprop, e.data.keys())
         {
             if (keyprop == "moduleactions")
             {
-                foreach(const QString &keyelt, pEventData[keyprop].toMap()["elements"].toMap().keys())
+                foreach(const QString &keyelt, e.data[keyprop].toMap()["elements"].toMap().keys())
                 {
                     if (keyelt == "kill")
                     {
@@ -404,8 +403,8 @@ void Basemodule::OnExternalEvent(const QString &pEventType, const QString  &pEve
         }
     }
     /* dispatch any message to children */
-    OnMyExternalEvent(pEventType, pEventModule, pEventKey, pEventData);
-    OnDispatchToIndiExternalEvent(pEventType, pEventModule, pEventKey, pEventData);
+    OnMyExternalEvent(e);
+    OnDispatchToIndiExternalEvent(e);
 
 
 }

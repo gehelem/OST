@@ -141,6 +141,7 @@ void WShandler::processTextMessage(QString message)
 {
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
     QString clientGrant = mClientGrants[pClient->peerAddress().toString()];
+    OST::Event event;
 
     if (clientGrant == "-1")
     {
@@ -179,7 +180,8 @@ void WShandler::processTextMessage(QString message)
             if ((g == "0") || (g == "1"))
             {
                 mClientGrants[pClient->peerAddress().toString()] = g;
-                emit externalEvent("Freadall", "*", "*", QVariantMap());
+                event.type = "Freadall";
+                emit externalEvent(event);
             }
         }
         return;
@@ -187,7 +189,8 @@ void WShandler::processTextMessage(QString message)
 
     if (obj["evt"].toString() == "Freadall")
     {
-        emit externalEvent("Freadall", "*", "*", QVariantMap());
+        event.type = "Freadall";
+        emit externalEvent(event);
     }
 
     // Handle language setting from client
@@ -205,56 +208,12 @@ void WShandler::processTextMessage(QString message)
     /* ignore update messages from readonly users */
     if (clientGrant == "0") return;
 
-    if (obj["evt"].toString() == "Fsetproperty")
-    {
-        emit externalEvent("Fsetproperty", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
-    }
-    if (obj["evt"].toString() == "Flcreate")
-    {
-        emit externalEvent("Flcreate", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
-    }
-    if (obj["evt"].toString() == "Flupdate")
-    {
-        emit externalEvent("Flupdate", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
-    }
-    if (obj["evt"].toString() == "Fldelete")
-    {
-        emit externalEvent("Fldelete", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
-    }
-    if (obj["evt"].toString() == "Flselect")
-    {
-        emit externalEvent("Flselect", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
-    }
-    if (obj["evt"].toString() == "Flup")
-    {
-        emit externalEvent("Flup", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
-    }
-    if (obj["evt"].toString() == "Fldown")
-    {
-        emit externalEvent("Fldown", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
-    }
-    if (obj["evt"].toString() == "Fclearmessages")
-    {
-        emit externalEvent("Fclearmessages", obj["mod"].toString(), QString(), QVariantMap());
-    }
-    if ((obj["evt"].toString() == "Fpreicon") || (obj["evt"].toString() == "Fposticon") )
-    {
-        emit externalEvent(obj["evt"].toString(), obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
-    }
-    if ((obj["evt"].toString() == "Fbadge"))
-    {
-        emit externalEvent(obj["evt"].toString(), obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
-    }
-    if ((obj["evt"].toString() == "Fproppreicon1") || (obj["evt"].toString() == "Fproppreicon2")
-            || (obj["evt"].toString() == "Fpropposticon1") || (obj["evt"].toString() == "Fpropposticon2"))
-    {
-        emit externalEvent(obj["evt"].toString(), obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
-    }
-    if ((obj["evt"].toString() == "Ffolderselect"))
-    {
-        emit externalEvent(obj["evt"].toString(), QString(), obj["folder"].toString(), QVariantMap());
-    }
+    event.type = obj["evt"].toString();
+    event.module = obj["mod"].toString();
+    event.property = obj["key"].toString();
+    event.data = obj["dta"].toVariant().toMap();
 
+    emit externalEvent(event);
 
 }
 

@@ -61,8 +61,8 @@ class WShandler : public QObject
 
     signals:
         void closed();
-        void externalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                           const QVariantMap &eventData);
+        void externalEvent(OST::Event);
+
     private:
         void onNewConnection();
         void processTextMessage(QString message);

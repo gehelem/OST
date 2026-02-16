@@ -85,7 +85,7 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     pMainControl->setWebroot(_webroot);
     pMainControl->setObjectName("mainctl");
     pMainControl->dbInit(_dbpath, "mainctl");
-    pMainControl->OnExternalEvent("refreshConfigurations", "mainctl", QString(), QVariantMap());
+    pMainControl->OnExternalEvent({"refreshConfigurations", "mainctl", QString(), QString(), 0, QVariantMap()});
     pMainControl->setAvailableModuleLibs(_availableModuleLibs);
     pMainControl->setIndiDriverList(_availableIndiDrivers);
     pMainControl->sendDump();
@@ -197,7 +197,7 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     connect(mod, &Basemodule::logSignal, mLogger, &OST::Logger::onLog);
     connect(mod, &Basemodule::logSignal, wshandler, &WShandler::onLog);
 
-    mod->OnExternalEvent("afterinit", name, QString(), QVariantMap());
+    mod->OnExternalEvent({"afterinit", name, QString(), QString(), 0, QVariantMap()});
     mod->sendDump();
 
     QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
@@ -287,38 +287,37 @@ void Controller::onModuleEvent(Basemodule *module, OST::Event event)
     }
 
 }
-void Controller::OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
-                                 const QVariantMap &pEventData)
+void Controller::OnExternalEvent(OST::Event event)
 {
-    QJsonObject obj = QJsonObject::fromVariantMap(pEventData);
+    QJsonObject obj = QJsonObject::fromVariantMap(event.data);
     QJsonDocument doc(obj);
     QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
     QString strJson = QLatin1String(docByteArray);
-    if (pEventModule == "mainctl")
+    if (event.module == "mainctl")
     {
-        pMainControl->sendMainMessage("Mainctl event : " + pEventType + " : " + pEventModule + " : " +  pEventKey + " : " +
+        pMainControl->sendMainMessage("Mainctl event : " + event.type + " : " + event.module + " : " +  " : " +
                                       strJson);
 
     }
-    if (pEventType == "Freadall")
+    if (event.type == "Freadall")
     {
         wshandler->processFileEvent("foldersdump", mFoldersList);
         wshandler->processFileEvent("filesdump", mFilesList);
     }
-    if (pEventType == "Ffolderselect")
+    if (event.type == "Ffolderselect")
     {
         for ( const auto &d : mFileWatcher.directories() )
         {
             mFileWatcher.removePath(d);
         }
-        mSelectedFolder = _webroot + pEventKey;
+        mSelectedFolder = _webroot + event.data["folder"].toString();
         mFileWatcher.addPath(mSelectedFolder);
         OnFileWatcherEvent(QString());
 
     }
 
     /* we should check here if incoming message is valid*/
-    emit controllerEvent(pEventType, pEventModule, pEventKey, pEventData);
+    emit controllerEvent(event);
 }
 void Controller::OnMainCtlEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
                                 const QVariantMap &pEventData)
@@ -630,7 +629,7 @@ void Controller::updateGlobalModulesLov(void)
     lovData["values"] = values;
 
     // Emit event to update all modules with the new list
-    emit controllerEvent("globallovupdate", "*", "loadedModules", lovData);
+    emit controllerEvent({"globallovupdate", "*", "loadedModules", QString(), 0, lovData});
 }
 
 void Controller::logInfo(const QString &message)

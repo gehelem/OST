@@ -40,21 +40,17 @@ IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap
     timer->start(2000);
 
 }
-void IndiModule::OnDispatchToIndiExternalEvent(const QString &eventType, const QString  &eventModule,
-        const QString  &eventKey, const QVariantMap &eventData)
+void IndiModule::OnDispatchToIndiExternalEvent(OST::Event e)
 
 {
-    Q_UNUSED(eventType);
-    Q_UNUSED(eventKey);
-
-    if (!(getModuleName() == eventModule))
+    if (!(getModuleName() == e.module))
     {
         return;
     }
     //sendMessage("OnIndiExternalEvent - recv : " + getModuleName()+ "-" + eventType + "-" + eventKey);
-    foreach(const QString &keyprop, eventData.keys())
+    foreach(const QString &keyprop, e.data.keys())
     {
-        foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
+        foreach(const QString &keyelt, e.data[keyprop].toMap()["elements"].toMap().keys())
         {
             //setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
             if (keyprop == "serveractions")

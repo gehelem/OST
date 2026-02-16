@@ -84,8 +84,7 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         bool setFocalLengthAndDiameter(QString device, double fl, double diam);
 
     private:
-        void OnDispatchToIndiExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                                           const QVariantMap &eventData) override;
+        void OnDispatchToIndiExternalEvent(OST::Event e) override;
         bool mIsFocuser = false;
         bool mIsGuider = false;
         bool mIsSequencer = false;

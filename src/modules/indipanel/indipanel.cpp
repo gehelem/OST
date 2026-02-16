@@ -244,16 +244,12 @@ void IndiPanel::newMessage     (INDI::BaseDevice dp, int messageID)
     logInfo("%1 %2", {dp.getDeviceName(), QString::fromStdString(dp.messageQueue(messageID))});
 }
 
-void IndiPanel::OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                                  const QVariantMap &eventData)
+void IndiPanel::OnMyExternalEvent(OST::Event e)
 {
-    Q_UNUSED(eventType);
-    Q_UNUSED(eventModule);
-    Q_UNUSED(eventKey);
-    if (eventModule != this->getModuleName()) return;
+    if (e.module != this->getModuleName()) return;
 
     QVariantMap m = getPropertiesDump(OST::Event()).toVariantMap();
-    foreach(const QString &keyprop, eventData.keys())
+    foreach(const QString &keyprop, e.data.keys())
     {
         if (!m.contains(keyprop))
         {
@@ -268,7 +264,7 @@ void IndiPanel::OnMyExternalEvent(const QString &eventType, const QString  &even
         prop.replace(realDevice, "");
         if (!(devcat == "Indi"))
         {
-            foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
+            foreach(const QString &keyelt, e.data[keyprop].toMap()["elements"].toMap().keys())
             {
                 if (!m[keyprop].toMap()["elements"].toMap().contains(keyelt))
                 {
@@ -278,21 +274,21 @@ void IndiPanel::OnMyExternalEvent(const QString &eventType, const QString  &even
                 if (getStore()[keyprop]->getElt(keyelt)->getType() == "string")
                 {
                     sendModNewText(realDevice, prop, keyelt,
-                                   eventData[keyprop].toMap()["elements"].toMap()[keyelt].toString());
+                                   e.data[keyprop].toMap()["elements"].toMap()[keyelt].toString());
                 }
                 if (getStore()[keyprop]->getElt(keyelt)->getType() == "int"
                         || getStore()[keyprop]->getElt(keyelt)->getType() == "float")
                 {
                     sendModNewNumber(realDevice, prop, keyelt,
-                                     eventData[keyprop].toMap()["elements"].toMap()[keyelt].toFloat());
+                                     e.data[keyprop].toMap()["elements"].toMap()[keyelt].toFloat());
                 }
                 if (getStore()[keyprop]->getElt(keyelt)->getType() == "bool")
                 {
                     //qDebug() << "bool" << keyprop << keyelt << eventData[keyprop].toMap()["elements"].toMap()[keyelt];
                     keyelt.toStdString();
-                    if ( eventData[keyprop].toMap()["elements"].toMap()[keyelt].toBool()) sendModNewSwitch(realDevice, prop,
+                    if ( e.data[keyprop].toMap()["elements"].toMap()[keyelt].toBool()) sendModNewSwitch(realDevice, prop,
                                 keyelt, ISS_ON);
-                    if (!eventData[keyprop].toMap()["elements"].toMap()[keyelt].toBool()) sendModNewSwitch(realDevice, prop,
+                    if (!e.data[keyprop].toMap()["elements"].toMap()[keyelt].toBool()) sendModNewSwitch(realDevice, prop,
                                 keyelt, ISS_OFF);
                 }
             }
