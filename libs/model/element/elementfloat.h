@@ -89,7 +89,7 @@ class ElementFloat: public ElementTemplateNumeric<double>
          * @param order Sort order within property (e.g., "10", "20")
          * @param hint Tooltip/help text for frontend
          */
-        ElementFloat(const QString &label, const QString &order, const QString &hint);
+        ElementFloat(const QString &key, const QString &label, const QString &order, const QString &hint);
 
         /**
          * @brief Destroy the ElementFloat object

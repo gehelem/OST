@@ -359,7 +359,7 @@ bool Datastore::createOstProperty(const QString &pPropertyName, const QString &p
     connect(mStore[pPropertyName], &OST::PropertyMulti::valueSet, this, &Datastore::onValueSet);
     connect(mStore[pPropertyName], &OST::PropertyMulti::eltChanged, this, &Datastore::onEltChanged);
     connect(mStore[pPropertyName], &OST::PropertyMulti::propertyEvent, this, &Datastore::onPropertyEvent);
-    connect(mStore[pPropertyName], &OST::PropertyMulti::sendMessage, this, &Datastore::onPropertyMessage);
+    connect(mStore[pPropertyName], &OST::PropertyMulti::logMessage, this, &Datastore::onPropertyLog);
     OnModuleEvent("cp", QString(), pPropertyName, d.getResult().toVariantMap());
     return true;
 }
@@ -422,13 +422,14 @@ bool Datastore::createOstElementText(const QString &pPropertyName, const QString
     QVariantMap pData;
     pData["label"] = pElementLabel;
     pData["type"] = "string";
-    OST::ElementBase *el = OST::ElementFactory::createElement(pData);
+    OST::ElementBase *el = OST::ElementFactory::createElement(pElementName, pData);
 
-    mStore[pPropertyName]->addElt(pElementName, el);
+    mStore[pPropertyName]->addElt(el);
     OST::Event e;
     e.type = "ap";
     e.property = pPropertyName;
     e.module = getModuleName();
+    e.element = el->key();
     OST::PropertyJsonDumper d(e);
     mStore[pPropertyName]->accept(&d);
     //qDebug() << "createOstElementText el(" << pElementName << ")=" << d.getResult();
@@ -449,13 +450,14 @@ bool Datastore::createOstElementBool(const QString &pPropertyName, const QString
     pData["label"] = pElementLabel;
     pData["type"] = "bool";
 
-    OST::ElementBase *el = OST::ElementFactory::createElement(pData);
+    OST::ElementBase *el = OST::ElementFactory::createElement(pElementName, pData);
 
-    mStore[pPropertyName]->addElt(pElementName, el);
+    mStore[pPropertyName]->addElt(el);
     OST::Event e;
     e.type = "ap";
     e.property = pPropertyName;
     e.module = getModuleName();
+    e.element = el->key();
     OST::PropertyJsonDumper d(e);
     mStore[pPropertyName]->accept(&d);
     //qDebug() << "createOstElementBool el(" << pElementName << ")=" << d.getResult();
@@ -494,7 +496,7 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
                 connect(rp, &OST::PropertyMulti::valueSet, this, &Datastore::onValueSet);
                 connect(rp, &OST::PropertyMulti::eltChanged, this, &Datastore::onEltChanged);
                 connect(rp, &OST::PropertyMulti::propertyEvent, this, &Datastore::onPropertyEvent);
-                connect(rp, &OST::PropertyMulti::sendMessage, this, &Datastore::onPropertyMessage);
+                connect(rp, &OST::PropertyMulti::logMessage, this, &Datastore::onPropertyLog);
                 mStore[key]->setState(OST::State::Idle);
 
             }
@@ -699,7 +701,7 @@ OST::LovString* Datastore::getGlovString(QString pLov)
 
     return static_cast<OST::LovString*>(getGlobLovs()[pLov]);
 }
-void Datastore::onPropertyMessage(OST::LogLevel l, QString m, QVariantList args)
+void Datastore::onPropertyLog(OST::LogLevel l, QString m, QVariantList args)
 {
     switch (l)
     {

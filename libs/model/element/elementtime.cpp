@@ -1,8 +1,8 @@
 #include "elementtime.h"
 namespace  OST
 {
-ElementTime::ElementTime(const QString &label, const QString &order, const QString &hint)
-    : ElementTemplateNotNumeric(label, order, hint)
+ElementTime::ElementTime(const QString &key, const QString &label, const QString &order, const QString &hint)
+    : ElementTemplateNotNumeric(key, label, order, hint)
 {
 }
 ElementTime::~ElementTime()

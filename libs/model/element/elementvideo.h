@@ -92,7 +92,7 @@ class ElementVideo: public ElementTemplateNotNumeric<VideoData>
          * @param order Sort order within property (e.g., "10", "20")
          * @param hint Tooltip/help text for frontend
          */
-        ElementVideo(const QString &label, const QString &order, const QString &hint);
+        ElementVideo(const QString &key, const QString &label, const QString &order, const QString &hint);
 
         /**
          * @brief Destroy the ElementVideo object

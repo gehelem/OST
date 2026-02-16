@@ -1,8 +1,8 @@
 #include "elementdate.h"
 namespace  OST
 {
-ElementDate::ElementDate(const QString &label, const QString &order, const QString &hint)
-    : ElementTemplateNotNumeric(label, order, hint)
+ElementDate::ElementDate(const QString &key, const QString &label, const QString &order, const QString &hint)
+    : ElementTemplateNotNumeric(key, label, order, hint)
 {
 }
 ElementDate::~ElementDate()

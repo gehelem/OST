@@ -85,13 +85,21 @@ class ElementBase: public QObject
          * @param order Sort order within property (e.g., "10", "20")
          * @param hint Tooltip/help text for frontend
          */
-        ElementBase(const QString &label, const QString &order, const QString &hint);
+        ElementBase(const QString &key, const QString &label, const QString &order, const QString &hint);
 
         /**
          * @brief Destroy the ElementBase object
          */
         ~ElementBase();
 
+        /**
+         * @brief Internal element's name
+         * @return returns element's name
+         *
+         * This value cannot be modified after instanciation
+         * \hidecallgraph
+         */
+        QString key();
         /**
          * @brief Get element type as string
          * @return Type identifier ("int", "float", "string", "bool", etc.)
@@ -209,6 +217,7 @@ class ElementBase: public QObject
         void setGlobalLov(QString lovName);
 
     private:
+        QString mKey = "";                              /*!< Unique internal identifier */
         QString mLabel = "change me";     /*!< Display label for frontend */
         QString mOrder = "change me";     /*!< Sort order within property */
         QString mHint = "";               /*!< Tooltip/help text */

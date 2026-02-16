@@ -107,7 +107,7 @@ class ElementPrg: public ElementTemplateNotNumeric<PrgData>
          * @param order Sort order within property (e.g., "10", "20")
          * @param hint Tooltip/help text for frontend
          */
-        ElementPrg(const QString &label, const QString &order, const QString &hint);
+        ElementPrg(const QString &key, const QString &label, const QString &order, const QString &hint);
 
         /**
          * @brief Destroy the ElementPrg object

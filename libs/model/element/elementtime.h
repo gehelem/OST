@@ -93,7 +93,7 @@ class ElementTime: public ElementTemplateNotNumeric<QTime>
          * @param order Sort order within property (e.g., "10", "20")
          * @param hint Tooltip/help text for frontend
          */
-        ElementTime(const QString &label, const QString &order, const QString &hint);
+        ElementTime(const QString &key, const QString &label, const QString &order, const QString &hint);
 
         /**
          * @brief Destroy the ElementTime object

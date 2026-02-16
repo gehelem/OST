@@ -683,10 +683,10 @@ bool IndiModule::createDeviceProperty(const QString &key, const QString &label, 
 {
     std::vector<INDI::BaseDevice> devs = getDevices();
     OST::PropertyMulti* pm = new OST::PropertyMulti(key, label, OST::ReadWrite, level1, level2, order, true, false);
-    OST::ElementString* s = new  OST::ElementString("name", "", "");
+    OST::ElementString* s = new  OST::ElementString("name", "name", "", "");
     s->setValue("--", false);
     s->setAutoUpdate(true);
-    pm->addElt("name", s);
+    pm->addElt(s);
 
     for(std::size_t i = 0; i < devs.size(); i++)
     {
@@ -786,18 +786,18 @@ bool IndiModule::defineMeAsFocuser()
 
     OST::PropertyMulti* pm = getProperty("actions");
     pm->setRule(OST::SwitchsRule::AtMostOne);
-    OST::ElementBool* b = new  OST::ElementBool("Abort focus", "foc99", "");
+    OST::ElementBool* b = new  OST::ElementBool("abortfocus", "Abort focus", "foc99", "");
     b->setValue(false, false);
     b->setPreIcon("stop");
-    pm->addElt("abortfocus", b);
-    b = new  OST::ElementBool("Autofocus", "foc50", "");
+    pm->addElt(b);
+    b = new  OST::ElementBool("autofocus", "Autofocus", "foc50", "");
     b->setValue(false, false);
     b->setPreIcon("play_arrow");
-    pm->addElt("autofocus", b);
-    b = new  OST::ElementBool("Loop", "foc70", "");
+    pm->addElt(b);
+    b = new  OST::ElementBool("loop", "Loop", "foc70", "");
     b->setValue(false, false);
     b->setPreIcon("forward_media");
-    pm->addElt("loop", b);
+    pm->addElt(b);
     mIsFocuser = true;
     return true;
 
@@ -808,18 +808,18 @@ bool IndiModule::defineMeAsGuider()
 
     OST::PropertyMulti* pm = getProperty("actions");
     pm->setRule(OST::SwitchsRule::AtMostOne);
-    OST::ElementBool* b = new  OST::ElementBool("Abort guider", "guid99", "");
+    OST::ElementBool* b = new  OST::ElementBool("abortguider", "Abort guider", "guid99", "");
     b->setValue(false, false);
-    pm->addElt("abortguider", b);
+    pm->addElt(b);
     b->setPreIcon("stop");
-    b = new  OST::ElementBool("Guide", "guid50", "");
+    b = new  OST::ElementBool("guide", "Guide", "guid50", "");
     b->setValue(false, false);
     b->setPreIcon("play_arrow");
-    pm->addElt("guide", b);
-    b = new  OST::ElementBool("Calibrate", "guid00", "");
+    pm->addElt(b);
+    b = new  OST::ElementBool("calibrate", "Calibrate", "guid00", "");
     b->setValue(false, false);
     b->setPreIcon("arrows_output");
-    pm->addElt("calibrate", b);
+    pm->addElt(b);
     mIsGuider = true;
     return true;
 
@@ -830,13 +830,13 @@ bool IndiModule::defineMeAsSequencer()
 
     OST::PropertyMulti* pm = getProperty("actions");
     pm->setRule(OST::SwitchsRule::AtMostOne);
-    OST::ElementBool* b = new  OST::ElementBool("Abort sequence", "seq99", "");
+    OST::ElementBool* b = new  OST::ElementBool("abortsequence", "Abort sequence", "seq99", "");
     b->setValue(false, false);
     b->setPreIcon("stop");
-    pm->addElt("abortsequence", b);
-    b = new  OST::ElementBool("Start sequence", "seq00", "");
+    pm->addElt(b);
+    b = new  OST::ElementBool("startsequence", "Start sequence", "seq00", "");
     b->setValue(false, false);
-    pm->addElt("startsequence", b);
+    pm->addElt(b);
     b->setPreIcon("play_arrow");
     mIsSequencer = true;
     return true;
@@ -857,8 +857,8 @@ bool IndiModule::defineMeAsImager()
         if (!(getStore()["image"]->getElts()->contains("image")))
         {
             OST::PropertyMulti * pm = getProperty("image");
-            OST::ElementImg* img = new OST::ElementImg("", "00", "");
-            pm->addElt("image", img);
+            OST::ElementImg* img = new OST::ElementImg("image", "", "00", "");
+            pm->addElt(img);
         }
 
     }
@@ -868,40 +868,40 @@ bool IndiModule::defineMeAsImager()
 
     if (!getStore()["parms"]->getElts()->contains("exposure"))
     {
-        OST::ElementFloat* f = new  OST::ElementFloat("Exposure", "exp000", "");
+        OST::ElementFloat* f = new  OST::ElementFloat("exposure", "Exposure", "exp000", "");
         f->setValue(0, false);
         f->setDirectEdit(true);
         f->setAutoUpdate(true);
         f->setMinMax(0.00001, 300);
         f->setStep(0.001);
         f->setSlider(OST::SliderAndValue);
-        pm->addElt("exposure", f);
+        pm->addElt(f);
     }
 
 
 
     if (!getStore()["parms"]->getElts()->contains("gain"))
     {
-        OST::ElementInt* i  = new  OST::ElementInt("Gain", "exp020", "");
+        OST::ElementInt* i  = new  OST::ElementInt("gain", "Gain", "exp020", "");
         i->setValue(0, false);
         i->setDirectEdit(true);
         i->setAutoUpdate(true);
         i->setMinMax(0, 500);
         i->setStep(1);
         i->setSlider(OST::SliderAndValue);
-        pm->addElt("gain", i);
+        pm->addElt(i);
     }
 
     if (!getStore()["parms"]->getElts()->contains("offset"))
     {
-        OST::ElementInt* i  = new  OST::ElementInt("Offset", "exp030", "");
+        OST::ElementInt* i  = new  OST::ElementInt("offset", "Offset", "exp030", "");
         i->setValue(0, false);
         i->setDirectEdit(true);
         i->setAutoUpdate(true);
         i->setMinMax(0, 500);
         i->setStep(1);
         i->setSlider(OST::SliderAndValue);
-        pm->addElt("offset", i);
+        pm->addElt(i);
     }
 
     mIsImager = true;
@@ -915,37 +915,37 @@ bool IndiModule::defineMeAsNavigator()
 
     OST::PropertyMulti* pm  = getProperty("actions");
     pm->setRule(OST::SwitchsRule::AtMostOne);
-    OST::ElementBool* b = new  OST::ElementBool("Abort navigator", "nav99", "");
+    OST::ElementBool* b = new  OST::ElementBool("abortnavigator", "Abort navigator", "nav99", "");
     b->setValue(false, false);
     b->setPreIcon("stop");
-    pm->addElt("abortnavigator", b);
-    b = new  OST::ElementBool("Center target", "nav00", "");
+    pm->addElt(b);
+    b = new  OST::ElementBool("gototarget", "Center target", "nav00", "");
     b->setPreIcon("arrows_input");
     b->setValue(false, false);
-    pm->addElt("gototarget", b);
-    b = new  OST::ElementBool("Add to planner", "nav20", "");
+    pm->addElt(b);
+    b = new  OST::ElementBool("addtoplanner", "Add to planner", "nav20", "");
     b->setPreIcon("event_upcoming");
     b->setValue(false, false);
-    pm->addElt("addtoplanner", b);
-    OST::ElementString* s = new  OST::ElementString("Target name", "nav50", "");
+    pm->addElt(b);
+    OST::ElementString* s = new  OST::ElementString("targetname", "Target name", "nav50", "");
     s->setDirectEdit(true);
     s->setAutoUpdate(true);
-    pm->addElt("targetname", s);
-    OST::ElementFloat* f = new  OST::ElementFloat("Target RA", "nav51", "");
+    pm->addElt(s);
+    OST::ElementFloat* f = new  OST::ElementFloat("targetra", "Target RA", "nav51", "");
     f->setDirectEdit(true);
     f->setAutoUpdate(true);
-    pm->addElt("targetra", f);
-    f = new  OST::ElementFloat("Target DEC", "nav52", "");
+    pm->addElt(f);
+    f = new  OST::ElementFloat("targetde", "Target DEC", "nav52", "");
     f->setDirectEdit(true);
     f->setAutoUpdate(true);
-    pm->addElt("targetde", f);
+    pm->addElt(f);
 
     pm  = getProperty("parms");
-    s = new  OST::ElementString("Planner module", "nav30", "");
+    s = new  OST::ElementString("plannermodule", "Planner module", "nav30", "");
     s->setDirectEdit(true);
     s->setAutoUpdate(true);
     s->setGlobalLov("loadedModules");
-    pm->addElt("plannermodule", s);
+    pm->addElt(s);
 
     mIsNavigator = true;
     return true;
@@ -981,7 +981,7 @@ double IndiModule::getSampling()
 bool IndiModule::giveMeADevice(QString name, QString label, INDI::BaseDevice::DRIVER_INTERFACE interface)
 {
     OST::PropertyMulti* pm = getProperty("devices");
-    OST::ElementString* s = new  OST::ElementString(label, label, "");
+    OST::ElementString* s = new  OST::ElementString(name, label, label, "");
     switch (interface)
     {
         case INDI::BaseDevice::DRIVER_INTERFACE::GENERAL_INTERFACE:
@@ -1018,7 +1018,7 @@ bool IndiModule::giveMeADevice(QString name, QString label, INDI::BaseDevice::DR
 
     s->setDirectEdit(true);
     s->setAutoUpdate(true);
-    pm->addElt(name, s);
+    pm->addElt(s);
     return true;
 
 }
@@ -1031,22 +1031,22 @@ bool IndiModule::giveMeAnOptic()
             false);
     createProperty("optic", pm);
 
-    OST::ElementFloat* f = new  OST::ElementFloat("Focal length", "1", "");
+    OST::ElementFloat* f = new  OST::ElementFloat("fl", "Focal length", "1", "");
     f->setDirectEdit(true);
     f->setMinMax(1, 4000);
     f->setAutoUpdate(true);
-    pm->addElt("fl", f);
-    OST::ElementFloat* d = new  OST::ElementFloat("Diameter", "2", "");
+    pm->addElt(f);
+    OST::ElementFloat* d = new  OST::ElementFloat("diam", "Diameter", "2", "");
     d->setDirectEdit(true);
     d->setMinMax(1, 4000);
     d->setAutoUpdate(true);
-    pm->addElt("diam", d);
-    OST::ElementFloat* r = new  OST::ElementFloat("Reducer", "3", "");
+    pm->addElt(d);
+    OST::ElementFloat* r = new  OST::ElementFloat("red", "Reducer", "3", "");
     r->setDirectEdit(true);
     r->setMinMax(0.1, 10);
     r->setAutoUpdate(true);
     r->setValue(1);
-    pm->addElt("red", r);
+    pm->addElt(r);
     mIsOptic = true;
     return true;
 

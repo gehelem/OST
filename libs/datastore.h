@@ -137,7 +137,7 @@ class Datastore : public QObject
             connect(mStore[pPropertyName], &OST::PropertyMulti::valueSet, this, &Datastore::onValueSet);
             connect(mStore[pPropertyName], &OST::PropertyMulti::eltChanged, this, &Datastore::onEltChanged);
             connect(mStore[pPropertyName], &OST::PropertyMulti::propertyEvent, this, &Datastore::onPropertyEvent);
-            connect(mStore[pPropertyName], &OST::PropertyMulti::sendMessage, this, &Datastore::onPropertyMessage);
+            connect(mStore[pPropertyName], &OST::PropertyMulti::logMessage, this, &Datastore::onPropertyLog);
             return true;
         }
         bool createGlobLov(const QString &pLovName,  OST::LovBase* pLov)
@@ -172,7 +172,7 @@ class Datastore : public QObject
         void onEltChanged(void);
         void onValueSet(void);
         void onPropertyEvent(OST::PropertyBase* prop, OST::Event event);
-        void onPropertyMessage(OST::LogLevel l, QString m, QVariantList args);
+        void onPropertyLog(OST::LogLevel l, QString m, QVariantList args);
         void onLovChanged(void);
 
 

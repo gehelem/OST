@@ -1,8 +1,8 @@
 #include "elementlight.h"
 namespace  OST
 {
-ElementLight::ElementLight(const QString &label, const QString &order, const QString &hint)
-    : ElementTemplateNotNumeric(label, order, hint)
+ElementLight::ElementLight(const QString &key, const QString &label, const QString &order, const QString &hint)
+    : ElementTemplateNotNumeric(key, label, order, hint)
 {
     setValue(Idle, false);
 }

@@ -81,7 +81,7 @@ class ElementDate: public ElementTemplateNotNumeric<QDate>
          * @param order Sort order within property (e.g., "10", "20")
          * @param hint Tooltip/help text for frontend
          */
-        ElementDate(const QString &label, const QString &order, const QString &hint);
+        ElementDate(const QString &key, const QString &label, const QString &order, const QString &hint);
 
         /**
          * @brief Destroy the ElementDate object

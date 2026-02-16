@@ -163,10 +163,10 @@ PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVaria
     foreach(const QString &key, elts.keys())
     {
         QVariantMap elt = elts[key].toMap();
-        ElementBase *v = ElementFactory::createElement(elt);
+        ElementBase *v = ElementFactory::createElement(key, elt);
         if (v != nullptr)
         {
-            pProperty->addElt(key, v);
+            pProperty->addElt(v);
         }
     }
     if (pData.contains("grid"))

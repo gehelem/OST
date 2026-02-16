@@ -180,7 +180,7 @@ class PropertyMulti: public PropertyBase
          *
          * @warning Do not delete element manually after adding to property
          */
-        void addElt(QString key, ElementBase* pElt);
+        void addElt(ElementBase* pElt);
 
         /**
          * @brief Delete element from property

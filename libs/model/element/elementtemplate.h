@@ -64,8 +64,8 @@ class ElementTemplate: public ElementBase
          *
          * Constructs the base element with metadata. The value is default-initialized.
          */
-        ElementTemplate(const QString &label, const QString &order, const QString &hint):
-            ElementBase(label, order, hint) {}
+        ElementTemplate(const QString &key, const QString &label, const QString &order, const QString &hint):
+            ElementBase(key, label, order, hint) {}
 
         /**
          * @brief Destroy the ElementTemplate object
@@ -165,8 +165,8 @@ class ElementTemplateNumeric : public ElementTemplate<T>
          * @param order Sort order within property (e.g., "10", "20")
          * @param hint Tooltip/help text for frontend
          */
-        ElementTemplateNumeric(const QString &label, const QString &order, const QString &hint):
-            ElementTemplate<T>(label, order, hint)
+        ElementTemplateNumeric(const QString &key, const QString &label, const QString &order, const QString &hint):
+            ElementTemplate<T>(key, label, order, hint)
         {
         }
 
@@ -472,8 +472,8 @@ class ElementTemplateNotNumeric : public ElementTemplate<T>
          * @param order Sort order within property (e.g., "10", "20")
          * @param hint Tooltip/help text for frontend
          */
-        ElementTemplateNotNumeric(const QString &label, const QString &order, const QString &hint):
-            ElementTemplate<T>(label, order, hint)
+        ElementTemplateNotNumeric(const QString &key, const QString &label, const QString &order, const QString &hint):
+            ElementTemplate<T>(key, label, order, hint)
         {
         }
 

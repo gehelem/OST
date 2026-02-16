@@ -89,7 +89,7 @@ class ElementBool: public ElementTemplateNotNumeric<bool>
          * @param order Sort order within property (e.g., "10", "20")
          * @param hint Tooltip/help text for frontend
          */
-        ElementBool(const QString &label, const QString &order, const QString &hint);
+        ElementBool(const QString &key, const QString &label, const QString &order, const QString &hint);
 
         /**
          * @brief Destroy the ElementBool object

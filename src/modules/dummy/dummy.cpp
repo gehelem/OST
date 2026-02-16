@@ -68,18 +68,18 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
 
     dynprop = new OST::PropertyMulti("dynprop", "Dynamic", OST::Permission::ReadWrite, "Examples",
                                      "Dynamically instanciated", "", true, false);
-    dynlight = new OST::ElementLight("Dyn light", "", "");
+    dynlight = new OST::ElementLight("dynlight", "Dyn light", "", "");
     dynlight->setValue(OST::State::Busy, true);
-    dynprop->addElt("dynlight", dynlight);
-    dyntext = new OST::ElementString("Dyn text", "", "");
-    dynprop->addElt("dyntext", dyntext);
+    dynprop->addElt( dynlight);
+    dyntext = new OST::ElementString("dyntext", "Dyn text", "", "");
+    dynprop->addElt(dyntext);
     createProperty("dynprop", dynprop);
     dynprop->setState(OST::State::Busy);
     dyntext->setValue("Okydoky", false);
     dynlight->setValue(OST::State::Ok, true);
 
-    dynbool = new OST::ElementBool("Dyn bool", "", "");
-    dynprop->addElt("dynbool", dynbool);
+    dynbool = new OST::ElementBool("dynbool", "Dyn bool", "", "");
+    dynprop->addElt(dynbool);
     dynbool->setValue(false, false);
 
     dyntext2 = getEltString("extextRW", "extext1");

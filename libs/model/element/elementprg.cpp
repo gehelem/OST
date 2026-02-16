@@ -1,8 +1,8 @@
 #include "elementprg.h"
 namespace  OST
 {
-ElementPrg::ElementPrg(const QString &label, const QString &order, const QString &hint)
-    : ElementTemplateNotNumeric(label, order, hint)
+ElementPrg::ElementPrg(const QString &key, const QString &label, const QString &order, const QString &hint)
+    : ElementTemplateNotNumeric(key, label, order, hint)
 {
 }
 ElementPrg::~ElementPrg()

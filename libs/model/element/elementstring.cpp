@@ -1,8 +1,8 @@
 #include "elementstring.h"
 namespace  OST
 {
-ElementString::ElementString(const QString &label, const QString &order, const QString &hint)
-    : ElementTemplateNotNumeric<QString>(label, order, hint), mLov(label)
+ElementString::ElementString(const QString &key, const QString &label, const QString &order, const QString &hint)
+    : ElementTemplateNotNumeric<QString>(key, label, order, hint), mLov(label)
 {
     connect(&mLov, &LovString::lovChanged, this, &ElementTemplate::OnLovChanged);
 }

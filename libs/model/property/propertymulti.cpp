@@ -91,7 +91,7 @@ void PropertyMulti::setGridLimit(int limit)
         if (limit < mGridLimit) clearGrid();
         if (limit > 5000 )
         {
-            sendWarning("gridLimit max size is 5000 " + this->label());
+            logWarning("gridLimit max size is 5000 " + this->label());
             mGridLimit = 5000;
         }
         else
@@ -116,7 +116,7 @@ bool  PropertyMulti::setElt(QString key, QVariant val)
 {
     if (!mElts.contains(key))
     {
-        sendError("PropertyMulti::setValue - " + key + " - not found");
+        logError("PropertyMulti::setValue - " + key + " - not found");
         return false;
     }
     QVariantMap m;
@@ -172,7 +172,7 @@ bool  PropertyMulti::setElt(QString key, QVariant val)
                     return true;
 
                 }
-                sendWarning("PropertyMulti::setValue - " + key + " - OneOfMany - can't just unset");
+                logWarning("PropertyMulti::setValue - " + key + " - OneOfMany - can't just unset");
                 return false;
                 break;
             case AtMostOne:
@@ -189,7 +189,7 @@ bool  PropertyMulti::setElt(QString key, QVariant val)
                 return true;
                 break;
             default:
-                sendError("PropertyMulti::setValue - " + key + " - can't determine SwitchRule");
+                logError("PropertyMulti::setValue - " + key + " - can't determine SwitchRule");
                 return false;
                 break;
         }
@@ -199,14 +199,15 @@ bool  PropertyMulti::setElt(QString key, QVariant val)
         // prg/img/video can't be updated via frontend
         return true;
     }
-    sendError("PropertyMulti::setValue - " + key + " - can't update, unhandled type : "
-              + mElts[key]->getType() + "(" + val.toString() + ")");
+    logError("PropertyMulti::setValue - " + key + " - can't update, unhandled type : "
+             + mElts[key]->getType() + "(" + val.toString() + ")");
     return false;
 
 
 }
-void  PropertyMulti::addElt(QString key, ElementBase* pElt)
+void  PropertyMulti::addElt(ElementBase* pElt)
 {
+    QString key = pElt->key();
     if (mElts.contains(key))
     {
         qDebug() << label() << " - addElt - element " << key << " already exists";
@@ -240,7 +241,7 @@ void PropertyMulti::push()
 {
     if (!this->hasGrid())
     {
-        sendError("PropertyMulti::Push - no array/grid defined");
+        logError("PropertyMulti::Push - no array/grid defined");
         return;
     }
     QMap<QString, ValueBase*> wGridLine;
@@ -259,7 +260,7 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
 {
     if (!this->hasGrid())
     {
-        sendError("PropertyMulti::newLine - no array/grid defined");
+        logError("PropertyMulti::newLine - no array/grid defined");
         return;
     }
     /* Check if data is valid and contains every value */
@@ -269,7 +270,7 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
         {
             if (!pValues.contains(elt))
             {
-                sendWarning("PropertyMulti::newLine incomplete values, " + elt + " missing ");
+                logWarning("PropertyMulti::newLine incomplete values, " + elt + " missing ");
                 return;
             }
         }
@@ -289,7 +290,7 @@ bool PropertyMulti::updateLine(const int i, const QVariantMap &pValues)
 {
     if (!this->hasGrid())
     {
-        sendError("PropertyMulti::updateLine - no array/grid defined");
+        logError("PropertyMulti::updateLine - no array/grid defined");
         return false;
     }
     /* Check if data is valid and contains every value */
@@ -299,7 +300,7 @@ bool PropertyMulti::updateLine(const int i, const QVariantMap &pValues)
         {
             if (!pValues.contains(elt))
             {
-                sendError("PropertyMulti::updateLine incomplete values, " + elt + " missing");
+                logError("PropertyMulti::updateLine incomplete values, " + elt + " missing");
                 return false;
             }
         }
@@ -334,7 +335,7 @@ bool PropertyMulti::deleteLine(const int i)
 {
     if (!this->hasGrid())
     {
-        sendError("PropertyMulti::Push - no array/grid defined");
+        logError("PropertyMulti::Push - no array/grid defined");
         return false;
     }
     mGrid.removeAt(i);
@@ -346,7 +347,7 @@ void PropertyMulti::clearGrid()
 {
     if (!this->hasGrid())
     {
-        sendError("PropertyMulti::Push - no array/grid defined");
+        logError("PropertyMulti::Push - no array/grid defined");
         return;
     }
 
@@ -470,12 +471,12 @@ bool PropertyMulti::swapLines(int l1, int l2)
 {
     if ((l1 >= mGrid.size()) || (l2 >= mGrid.size()))
     {
-        sendWarning("Can't swap lines" + QString::number(l1) + "/" + QString::number(l2) + " > " + QString::number(mGrid.size()));
+        logWarning("Can't swap lines" + QString::number(l1) + "/" + QString::number(l2) + " > " + QString::number(mGrid.size()));
         return false;
     }
     if ((l1 < 0) || (l2 < 0))
     {
-        sendWarning("Can't swap lines" + QString::number(l1) + "/" + QString::number(l2));
+        logWarning("Can't swap lines" + QString::number(l1) + "/" + QString::number(l2));
         return false;
     }
     mGrid.swapItemsAt(l2, l1);
@@ -487,7 +488,7 @@ bool PropertyMulti::fetchLine(int l)
 {
     if ((l >= mGrid.size()))
     {
-        sendWarning("Can't fetch line" + QString::number(l)  + " >= " + QString::number(mGrid.size()));
+        logWarning("Can't fetch line" + QString::number(l)  + " >= " + QString::number(mGrid.size()));
         return false;
     }
     foreach(const QString &e, mGrid.at(l).keys())
@@ -501,7 +502,7 @@ bool PropertyMulti::updateLine(const int i)
 {
     if ((i >= mGrid.size()))
     {
-        sendWarning("Can't update line" + QString::number(i)  + " >= " + QString::number(mGrid.size()));
+        logWarning("Can't update line" + QString::number(i)  + " >= " + QString::number(mGrid.size()));
         return false;
     }
     foreach(const QString &e, mGrid.at(i).keys())
@@ -541,7 +542,6 @@ void PropertyMulti::OnEltChanged(ElementBase*)
 }
 void PropertyMulti::OnEltEvent(ElementBase* e, OST::Event evt)
 {
-    qDebug() << "PropertyMulti::OnEltEvent" << e->label() << evt.type;
     evt.property = this->key();
     emit propertyEvent(this, evt);
 }
@@ -556,26 +556,10 @@ void PropertyMulti::OnLovChanged(ElementBase*)
 void PropertyMulti::OnMessage(LogLevel l, QString m, QVariantList args)
 {
     // Just pass through to PropertyBase methods which will add key() prefix
-    switch (l)
-    {
-        case LogLevel::Debug:
-            // No debug method in PropertyBase, map to Info
-            sendInfo(m, args);
-            break;
-        case LogLevel::Info:
-            sendInfo(m, args);
-            break;
-        case LogLevel::Warning:
-            sendWarning(m, args);
-            break;
-        case LogLevel::Error:
-        case LogLevel::Critical:
-            sendError(m, args);
-            break;
-        default:
-            sendError(m, args);
-            break;
-    }
+    QVariantList newArgs = args;
+    newArgs.prepend(key());
+    QString newMessage = "%1 - " + incrementPlaceholders(m);
+    emit logMessage(l, newMessage, newArgs);
 }
 
 

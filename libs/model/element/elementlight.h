@@ -107,7 +107,7 @@ class ElementLight: public ElementTemplateNotNumeric<State>
          * @param order Sort order within property (e.g., "10", "20")
          * @param hint Tooltip/help text for frontend
          */
-        ElementLight(const QString &label, const QString &order, const QString &hint);
+        ElementLight(const QString &key, const QString &label, const QString &order, const QString &hint);
 
         /**
          * @brief Destroy the ElementLight object

@@ -21,7 +21,7 @@ class ElementFactory
 
     public:
         ElementFactory() = delete;
-        static ElementBase* createElement(const QVariantMap &pData);
+        static ElementBase* createElement(const QString &key, const QVariantMap &pData);
 };
 
 class ValueFactory

@@ -89,13 +89,13 @@ void IndiPanel::newProperty(INDI::Property pProperty)
             }
             for (unsigned int i = 0; i < n.count(); i++)
             {
-                OST::ElementFloat* v = new OST::ElementFloat(n[i].label, QString(i), n[i].label);
+                OST::ElementFloat* v = new OST::ElementFloat(n[i].getName(), n[i].label, QString(i), n[i].label);
                 v->setValue(n[i].getValue(), false);
                 v->setMin(n[i].min);
                 v->setMax(n[i].max);
                 v->setStep(n[i].step);
                 v->setFormat(n[i].format);
-                p->addElt(n[i].getName(), v);
+                p->addElt(v);
             }
             break;
         }
@@ -104,10 +104,10 @@ void IndiPanel::newProperty(INDI::Property pProperty)
             INDI::PropertySwitch s = pProperty;
             for (unsigned int i = 0; i < s.count(); i++)
             {
-                OST::ElementBool* v = new OST::ElementBool(s[i].label, QString(i), s[i].label);
+                OST::ElementBool* v = new OST::ElementBool(s[i].getName(), s[i].label, QString(i), s[i].label);
                 if (s[i].s == 0) v->setValue(false, false);
                 if (s[i].s == 1) v->setValue(true, true);
-                p->addElt(s[i].getName(), v);
+                p->addElt(v);
             }
             p->setRule(OST::IntToRule(s.getRule()));
 
@@ -118,9 +118,9 @@ void IndiPanel::newProperty(INDI::Property pProperty)
             INDI::PropertyText t = pProperty;
             for (unsigned int i = 0; i < t.count(); i++)
             {
-                OST::ElementString* v = new OST::ElementString(t[i].label, QString(i), t[i].label);
+                OST::ElementString* v = new OST::ElementString(t[i].getName(), t[i].label, QString(i), t[i].label);
                 v->setValue(t[i].text, false);
-                p->addElt(t[i].getName(), v);
+                p->addElt(v);
             }
             break;
         }
@@ -129,9 +129,9 @@ void IndiPanel::newProperty(INDI::Property pProperty)
             INDI::PropertyLight l = pProperty;
             for (unsigned int i = 0; i < l.count(); i++)
             {
-                OST::ElementLight* v = new OST::ElementLight(l[i].label, QString(i), l[i].label);
+                OST::ElementLight* v = new OST::ElementLight(l[i].getName(), l[i].label, QString(i), l[i].label);
                 v->setValue(OST::IntToState(l[i].getState()), true);
-                p->addElt(l[i].getName(), v);
+                p->addElt(v);
             }
             break;
         }

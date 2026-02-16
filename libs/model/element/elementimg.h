@@ -92,7 +92,7 @@ class ElementImg: public ElementTemplateNotNumeric<ImgData>
          * @param order Sort order within property (e.g., "10", "20")
          * @param hint Tooltip/help text for frontend
          */
-        ElementImg(const QString &label, const QString &order, const QString &hint);
+        ElementImg(const QString &key, const QString &label, const QString &order, const QString &hint);
 
         /**
          * @brief Destroy the ElementImg object

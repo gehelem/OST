@@ -2,14 +2,15 @@
 namespace  OST
 {
 
-ElementBase *ElementFactory::createElement(const QVariantMap &pData)
+ElementBase *ElementFactory::createElement(const QString &key, const QVariantMap &pData)
 {
     //qDebug() << "ElementFactory::createElement " << "-" << pData;
     if (pData.contains("type"))
     {
         if (pData["type"].toString() == "bool")
         {
-            auto *pElement = new ElementBool(pData["label"].toString(),
+            auto *pElement = new ElementBool(key,
+                                             pData["label"].toString(),
                                              pData["order"].toString(),
                                              pData["hint"].toString()
                                             );
@@ -21,7 +22,8 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
         }
         if (pData["type"].toString() == "light")
         {
-            auto *pElement = new ElementLight(pData["label"].toString(),
+            auto *pElement = new ElementLight(key,
+                                              pData["label"].toString(),
                                               pData["order"].toString(),
                                               pData["hint"].toString()
                                              );
@@ -33,7 +35,8 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
         }
         if (pData["type"].toString() == "string")
         {
-            auto *pElement = new ElementString(pData["label"].toString(),
+            auto *pElement = new ElementString(key,
+                                               pData["label"].toString(),
                                                pData["order"].toString(),
                                                pData["hint"].toString()
                                               );
@@ -62,7 +65,8 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
         }
         if (pData["type"].toString() == "int")
         {
-            auto *pElement = new ElementInt(pData["label"].toString(),
+            auto *pElement = new ElementInt(key,
+                                            pData["label"].toString(),
                                             pData["order"].toString(),
                                             pData["hint"].toString()
                                            );
@@ -97,7 +101,8 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
         }
         if (pData["type"].toString() == "float")
         {
-            auto *pElement = new ElementFloat(pData["label"].toString(),
+            auto *pElement = new ElementFloat(key,
+                                              pData["label"].toString(),
                                               pData["order"].toString(),
                                               pData["hint"].toString()
                                              );
@@ -131,7 +136,8 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
         }
         if (pData["type"].toString() == "img")
         {
-            auto *pElement = new ElementImg(pData["label"].toString(),
+            auto *pElement = new ElementImg(key,
+                                            pData["label"].toString(),
                                             pData["order"].toString(),
                                             pData["hint"].toString()
                                            );
@@ -161,7 +167,8 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
 
         if (pData["type"].toString() == "video")
         {
-            auto *pElement = new ElementVideo(pData["label"].toString(),
+            auto *pElement = new ElementVideo(key,
+                                              pData["label"].toString(),
                                               pData["order"].toString(),
                                               pData["hint"].toString()
                                              );
@@ -172,7 +179,8 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
         if (pData["type"].toString() == "prg")
         {
 
-            auto *pElement = new ElementPrg(pData["label"].toString(),
+            auto *pElement = new ElementPrg(key,
+                                            pData["label"].toString(),
                                             pData["order"].toString(),
                                             pData["hint"].toString()
                                            );
@@ -191,7 +199,8 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
         }
         if (pData["type"].toString() == "date")
         {
-            auto *pElement = new ElementDate(pData["label"].toString(),
+            auto *pElement = new ElementDate(key,
+                                             pData["label"].toString(),
                                              pData["order"].toString(),
                                              pData["hint"].toString()
                                             );
@@ -205,7 +214,8 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
         }
         if (pData["type"].toString() == "time")
         {
-            auto *pElement = new ElementTime(pData["label"].toString(),
+            auto *pElement = new ElementTime(key,
+                                             pData["label"].toString(),
                                              pData["order"].toString(),
                                              pData["hint"].toString()
                                             );

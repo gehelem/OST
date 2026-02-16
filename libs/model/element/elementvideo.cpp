@@ -1,8 +1,8 @@
 #include "elementvideo.h"
 namespace  OST
 {
-ElementVideo::ElementVideo(const QString &label, const QString &order, const QString &hint)
-    : ElementTemplateNotNumeric(label, order, hint)
+ElementVideo::ElementVideo(const QString &key, const QString &label, const QString &order, const QString &hint)
+    : ElementTemplateNotNumeric(key, label, order, hint)
 {
 }
 ElementVideo::~ElementVideo()

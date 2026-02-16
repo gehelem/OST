@@ -1,8 +1,8 @@
 #include "elementimg.h"
 namespace  OST
 {
-ElementImg::ElementImg(const QString &label, const QString &order, const QString &hint)
-    : ElementTemplateNotNumeric(label, order, hint)
+ElementImg::ElementImg(const QString &key, const QString &label, const QString &order, const QString &hint)
+    : ElementTemplateNotNumeric(key, label, order, hint)
 {
 }
 ElementImg::~ElementImg()

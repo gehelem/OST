@@ -502,6 +502,21 @@ typedef enum
     spinner   /*!< Spinner/activity indicator (indeterminate, no percentage) */
 } PrgType;
 
+// Helper function to increment all placeholder numbers in message
+// Example: "value %1 max %2" becomes "value %2 max %3"
+inline QString incrementPlaceholders(const QString &msg)
+{
+    QString result = msg;
+    // Replace from highest to lowest to avoid conflicts (e.g., %1→%2 shouldn't affect original %2)
+    for (int i = 99; i >= 1; --i)
+    {
+        QString oldPlaceholder = QString("%%1").arg(i);
+        QString newPlaceholder = QString("%%1").arg(i + 1);
+        result = result.replace(oldPlaceholder, newPlaceholder);
+    }
+    return result;
+}
+
 }
 
 #endif

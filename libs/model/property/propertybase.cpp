@@ -2,21 +2,6 @@
 namespace  OST
 {
 
-// Helper function to increment all placeholder numbers in message
-// Example: "value %1 max %2" becomes "value %2 max %3"
-static QString incrementPlaceholders(const QString &msg)
-{
-    QString result = msg;
-    // Replace from highest to lowest to avoid conflicts (e.g., %1→%2 shouldn't affect original %2)
-    for (int i = 99; i >= 1; --i)
-    {
-        QString oldPlaceholder = QString("%%1").arg(i);
-        QString newPlaceholder = QString("%%1").arg(i + 1);
-        result = result.replace(oldPlaceholder, newPlaceholder);
-    }
-    return result;
-}
-
 PropertyBase::PropertyBase(const QString &key, const QString &label, const Permission &permission, const QString &level1,
                            const QString &level2,
                            const QString &order, const bool &hasProfile)
@@ -24,7 +9,7 @@ PropertyBase::PropertyBase(const QString &key, const QString &label, const Permi
       mOrder(order), mHasProfile(hasProfile)
 {
     qRegisterMetaType<OST::LogLevel>("LogLevel");
-    if (order == "") sendMessage(OST::LogLevel::Warning, "PropertyBase %1 %2 order ko (%3/%4)", {label, key, level1, level2});
+    if (order == "") emit logMessage(OST::LogLevel::Warning, "PropertyBase %1 %2 order ko (%3/%4)", {label, key, level1, level2});
 }
 PropertyBase::~PropertyBase()
 {
@@ -90,26 +75,40 @@ void PropertyBase::setBadge(bool b)
     mBadge = b;
     emit propertyEvent(this, {"ap", "", key(), "", 0, QVariantMap()});
 }
-void PropertyBase::sendInfo(QString m, const QVariantList &args)
+void PropertyBase::logDebug(QString m, const QVariantList &args)
 {
     QVariantList newArgs = args;
     newArgs.prepend(key());
     QString newMessage = "%1 - " + incrementPlaceholders(m);
-    emit sendMessage(LogLevel::Info, newMessage, newArgs);
+    emit logMessage(LogLevel::Debug, newMessage, newArgs);
 }
-void PropertyBase::sendWarning(QString m, const QVariantList &args)
+void PropertyBase::logInfo(QString m, const QVariantList &args)
 {
     QVariantList newArgs = args;
     newArgs.prepend(key());
     QString newMessage = "%1 - " + incrementPlaceholders(m);
-    emit sendMessage(LogLevel::Warning, newMessage, newArgs);
+    emit logMessage(LogLevel::Info, newMessage, newArgs);
 }
-void PropertyBase::sendError(QString m, const QVariantList &args)
+void PropertyBase::logWarning(QString m, const QVariantList &args)
 {
     QVariantList newArgs = args;
     newArgs.prepend(key());
     QString newMessage = "%1 - " + incrementPlaceholders(m);
-    emit sendMessage(LogLevel::Error, newMessage, newArgs);
+    emit logMessage(LogLevel::Warning, newMessage, newArgs);
+}
+void PropertyBase::logError(QString m, const QVariantList &args)
+{
+    QVariantList newArgs = args;
+    newArgs.prepend(key());
+    QString newMessage = "%1 - " + incrementPlaceholders(m);
+    emit logMessage(LogLevel::Error, newMessage, newArgs);
+}
+void PropertyBase::logCritical(QString m, const QVariantList &args)
+{
+    QVariantList newArgs = args;
+    newArgs.prepend(key());
+    QString newMessage = "%1 - " + incrementPlaceholders(m);
+    emit logMessage(LogLevel::Critical, newMessage, newArgs);
 }
 QString PropertyBase::getPreIcon1(void)
 {

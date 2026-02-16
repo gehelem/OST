@@ -84,7 +84,7 @@ class ElementString: public ElementTemplateNotNumeric<QString>
          * @param order Sort order within property (e.g., "10", "20")
          * @param hint Tooltip/help text for frontend
          */
-        ElementString(const QString &label, const QString &order, const QString &hint);
+        ElementString(const QString &key, const QString &label, const QString &order, const QString &hint);
 
         /**
          * @brief Destroy the ElementString object
