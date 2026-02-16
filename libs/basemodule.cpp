@@ -57,7 +57,7 @@ void Basemodule::setProfile(const QString &pProfileName)
 
 void Basemodule::setProfile(QVariantMap profiledata)
 {
-    QVariantMap props = profiledata["properties"].toMap();
+    QVariantMap props = profiledata["p"].toMap();
     foreach(const QString &key, props.keys())
     {
         if (getStore().contains(key))
@@ -477,7 +477,7 @@ void Basemodule::sendDump(void)
     infos["label"] = getModuleLabel();
     infos["description"] = getModuleDescription();
     //dump["properties"] = getProperties();
-    dump["properties"] = getPropertiesDump(e);;
+    dump["p"] = getPropertiesDump(e);;
     dump["globallovs"] = getGlobalLovsDump();;
     dump["state"] = state;
     dump["infos"] = infos;

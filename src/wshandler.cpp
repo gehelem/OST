@@ -261,7 +261,7 @@ void WShandler::onModuleEvent(Basemodule *module, OST::Event event)
     obj["evt"] = event.type;
     QJsonObject mods;
     QJsonObject  mod;
-    mod["properties"] = module->getPropertiesDump(event);
+    mod["p"] = module->getPropertiesDump(event);
     if (event.type == "moduledump")
     {
         QJsonObject  infos;

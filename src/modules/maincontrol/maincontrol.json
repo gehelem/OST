@@ -1,7 +1,7 @@
 {
 "globallov":{
 },
-"properties":{
+"p":{
     "loadconf": {
         "devcat": "Module",
         "group": "Configurations",
@@ -9,7 +9,7 @@
         "permission": 2,
         "rule":1,
         "label": "Load configuration",
-        "elements": {
+        "e": {
             "name": {
                 "type": "string",
                 "label": "",
@@ -29,7 +29,7 @@
         "permission": 2,
         "rule":0,
         "label": "Save configuration",
-        "elements": {
+        "e": {
             "name": {
                 "type": "string",
                 "autoupdate":true,
@@ -48,7 +48,7 @@
         "permission": 0,
         "rule":0,
         "label": "Start and stop indiserver",
-        "elements": {
+        "e": {
             "startstop": {
                 "type": "string",
                 "label": "",
@@ -70,7 +70,7 @@
         "showGrid":true,
         "showElts":false,
         "label": "Loaded modules",
-        "elements": {
+        "e": {
             "name": {
                 "type": "string",
                 "label": "Internal name",
@@ -108,7 +108,7 @@
         "rule":0,
         "label": "",
         "order": "02",
-        "elements": {
+        "e": {
             "kill": {
                 "type": "bool",
                 "label": "Kill all modules",

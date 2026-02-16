@@ -88,9 +88,10 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
         bool b = false;
         pProperty->getElt(key)->accept(&d, m, b);
         QJsonObject value = d.getResult();
-        elements[key] = value;
+        if (mEvent.type == "sv") elements[key] = value["value"];
+        else elements[key] = value;
     }
-    json["elements"] = elements;
+    json["e"] = elements;
     mResult = json;
     if (mEvent.type == "sv") return;
 

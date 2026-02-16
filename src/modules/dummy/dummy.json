@@ -27,7 +27,7 @@
         ]
     }
 },
-"properties":{
+"p":{
     "modulesstatus": {
         "devcat": "Status",
         "group": "",
@@ -36,7 +36,7 @@
         "showGrid":true,
         "showElts":false,
         "posticon1":"autorenew",
-        "elements": {
+        "e": {
             "module": {
                 "type":"string",
                 "order": "99",
@@ -55,7 +55,7 @@
     "extextRO": {
         "devcat": "Examples",
         "badge": true,
-        "elements": {
+        "e": {
             "extext1": {
                 "type":"string",
                 "order": "99",
@@ -85,7 +85,7 @@
     "extextRW": {
         "hasprofile":true,
         "devcat": "Examples",
-        "elements": {
+        "e": {
             "extext1": {
                 "autoupdate":true,
                 "type":"string",
@@ -131,7 +131,7 @@
     "numbersRW": {
         "hasprofile":true,
         "devcat": "Examples",
-        "elements": {
+        "e": {
             "n1": {
                 "autoupdate":true,
                 "type":"int",
@@ -192,7 +192,7 @@
         "hasprofile":true,
         "devcat": "Examples",
         "rule":0,
-        "elements": {
+        "e": {
             "b1": {
                 "autoupdate":true,
                 "type":"bool",
@@ -227,7 +227,7 @@
         "hasprofile":true,
         "devcat": "Examples",
         "rule":1,
-        "elements": {
+        "e": {
             "b1": {
                 "autoupdate":true,
                 "type":"bool",
@@ -263,7 +263,7 @@
         "devcat": "Examples",
         "rule":2,
         "order": "99",
-        "elements": {
+        "e": {
             "b1": {
                 "autoupdate":true,
                 "type":"bool",
@@ -299,7 +299,7 @@
         "hasprofile":true,
         "devcat": "Examples",
         "rule":0,
-        "elements": {
+        "e": {
             "b1": {
                 "autoupdate":true,
                 "type":"bool",
@@ -377,7 +377,7 @@
         "permission": 0,
         "order": "10",
         "label": "Dates readonly",
-        "elements": {
+        "e": {
             "date1": {
                 "type":"date",
                 "order": "20",
@@ -404,7 +404,7 @@
         "permission": 2,
         "order": "20",
         "label": "Dates RW",
-        "elements": {
+        "e": {
             "date1": {
                 "type":"date",
                 "directedit":false,
@@ -435,7 +435,7 @@
         "permission": 2,
         "order": "30",
         "label": "Dates direct edit",
-        "elements": {
+        "e": {
             "date1": {
                 "type":"date",
                 "directedit":true,
@@ -469,7 +469,7 @@
         "permission": 2,
         "order": "40",
         "label": "Dates RW - grid",
-        "elements": {
+        "e": {
             "date1": {
                 "type":"date",
                 "directedit":false,
@@ -500,7 +500,7 @@
         "permission": 0,
         "order": "10",
         "label": "Times readonly",
-        "elements": {
+        "e": {
             "time1": {
                 "type":"time",
                 "order": "20",
@@ -529,7 +529,7 @@
         "permission": 2,
         "order": "20",
         "label": "Times RW",
-        "elements": {
+        "e": {
             "time1": {
                 "type":"time",
                 "directedit":false,
@@ -562,7 +562,7 @@
         "permission": 2,
         "order": "30",
         "label": "Times direct edit",
-        "elements": {
+        "e": {
             "time1": {
                 "type":"time",
                 "directedit":true,
@@ -598,7 +598,7 @@
         "permission": 2,
         "order": "40",
         "label": "Times Grid - RW ",
-        "elements": {
+        "e": {
             "time1": {
                 "type":"time",
                 "directedit":false,
@@ -625,7 +625,7 @@
     "actions2": {
         "devcat": "Examples",
         "rule":1,
-        "elements": {
+        "e": {
             "shoot": {
                 "type": "bool",
                 "label": "Shoot",
@@ -663,7 +663,7 @@
         "permission": 2,
         "label": "Parameters",
         "order": "99",
-        "elements": {
+        "e": {
             "indexfolderpath": {
                 "autoupdate":true,
                 "directedit":true,
@@ -684,7 +684,7 @@
         "showGrid":true,
         "label": "Test image",
         "order": "99",
-        "elements": {
+        "e": {
             "image1": {
                 "type": "img",
                 "label": "First image",
@@ -738,7 +738,7 @@
             [3,0.9,"P3","",30],
             [4,0.16,"P4","",40]
         ],
-        "elements": {
+        "e": {
             "X": {
                 "type": "float",
                 "label": "Abscisse",
@@ -784,7 +784,7 @@
         "showElts":false,
         "label": "Grid example 2",
         "order": "99",
-        "elements": {
+        "e": {
             "X": {
                 "type": "int",
                 "label": "Abscisse",
@@ -813,7 +813,7 @@
         "devcat": "Examples",
         "group": "Images",
         "order": "99",
-        "elements": {}
+        "e": {}
     },
     "search": {
         "devcat": "Examples",
@@ -824,7 +824,7 @@
         "label": "",
         "order": "99",
         "autoupdate":true,
-        "elements": {
+        "e": {
             "searchbtn": {
                 "type": "bool",
                 "label": "Search object",
@@ -850,7 +850,7 @@
         "gridlimit":255,
         "rule":0,
         "label": "Results",
-        "elements": {
+        "e": {
             "catalog": {
                 "type": "string",
                 "label": "Catalogue",
@@ -914,7 +914,7 @@
         "permission": 2,
         "rule":0,
         "label": "Selection",
-        "elements": {
+        "e": {
             "code": {
                 "type": "string",
                 "label": "Code",
@@ -948,7 +948,7 @@
         "permission": 2,
         "rule":2,
         "label": "Test list of values",
-        "elements": {
+        "e": {
             "code": {
                 "type": "string",
                 "label": "Code",
@@ -982,7 +982,7 @@
             [12,1,0.12,"zéro dot 12","00",{"urljpeg":"dummy1.jpg"},{"urljpeg":"dummy1.mpeg"},true,70,"first message content"],
             [13,2,0.13,"zéro dot 13","02",{"urljpeg":"dummy2.jpg"},{"urljpeg":"dummy3.mpeg"},false,25,"second message content"]
         ],
-        "elements": {
+        "e": {
             "int": {
                 "type": "int",
                 "label": "Integer",
@@ -1096,7 +1096,7 @@
             "Y":"Y",
             "graphColor":{"R":0,"G":255,"B":255}
         },
-        "elements": {
+        "e": {
             "X": {
                 "type": "float",
                 "label": "Abscisse",
@@ -1136,7 +1136,7 @@
             "Y":"Y",
             "graphColor":{"R":0,"G":255,"B":0}
         },
-        "elements": {
+        "e": {
             "X": {
                 "type": "float",
                 "label": "Abscisse",
@@ -1184,7 +1184,7 @@
             "RSB":"RSB",
             "RMS":"RMS"
         },
-        "elements": {
+        "e": {
             "T": {
                 "type": "float",
                 "label": "Time",
@@ -1269,7 +1269,7 @@
             },
             "mapping":{"P0":"PA","P1":"PB"}
         },
-        "elements": {
+        "e": {
             "S": {
                 "type": "string",
                 "label": "Serie",
@@ -1330,7 +1330,7 @@
             },
             "mapping":{"P0":"PA","P1":"PB"}
         },
-        "elements": {
+        "e": {
             "S": {
                 "type": "string",
                 "label": "Serie",

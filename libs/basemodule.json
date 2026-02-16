@@ -7,14 +7,14 @@
         ]
     }
 },
-"properties":{
+"p":{
     "baseGit": {
         "devcat": "Module",
         "group": "Info",
         "order":"00",
         "permission": 0,
         "label": "Base module git",
-        "elements": {
+        "e": {
             "hash": {
                 "type": "string",
                 "label": "Hash",
@@ -41,7 +41,7 @@
         "order":"00",
         "permission": 0,
         "label": "This module git",
-        "elements": {
+        "e": {
             "hash": {
                 "type": "string",
                 "label": "Hash",
@@ -68,7 +68,7 @@
         "order":"01",
         "permission": 0,
         "label": "Module info",
-        "elements": {
+        "e": {
             "moduleDescription": {
                 "type": "string",
                 "label": "Module description",
@@ -109,7 +109,7 @@
         "rule":1,
         "label": "Load profile",
         "order":"00",
-        "elements": {
+        "e": {
             "name": {
                 "autoupdate":true,
                 "directedit":true,
@@ -132,7 +132,7 @@
         "rule":0,
         "label": "Save profile",
         "order":"01",
-        "elements": {
+        "e": {
             "name": {
                 "autoupdate":true,
                 "directedit":true,
@@ -153,7 +153,7 @@
         "order":"00",
         "label": "Controls",
         "rule":2,
-        "elements": {
+        "e": {
             "kill": {
                 "type": "bool",
                 "order":"00",

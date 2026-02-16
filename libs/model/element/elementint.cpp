@@ -47,9 +47,9 @@ void ValueInt::updateValue()
 {
     value = static_cast<ElementInt*>(pElement)->value();
 }
-void ValueInt::updateElement(const bool &signalType)
+void ValueInt::updateElement(const bool &emitEvent)
 {
-    static_cast<ElementInt*>(pElement)->setValue(value, signalType);
+    static_cast<ElementInt*>(pElement)->setValue(value, emitEvent);
 }
 
 

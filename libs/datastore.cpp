@@ -482,9 +482,9 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
     }
 
     QJsonObject data = d.object();
-    if (data.contains("properties"))
+    if (data.contains("p"))
     {
-        QJsonObject props = data["properties"].toObject();
+        QJsonObject props = data["p"].toObject();
         foreach(const QString &key, props.keys())
         {
             //qDebug() << "***** create property from file " << key;
@@ -563,63 +563,63 @@ QVariantMap Datastore::getProfile(void)
             if (props[keyprop].toMap()["hasprofile"].toBool())
             {
                 QVariantMap property;
-                if (props[keyprop].toMap().contains("elements"))
+                if (props[keyprop].toMap().contains("e"))
                 {
                     QVariantMap elements;
-                    foreach(const QString &keyelt, props[keyprop].toMap()["elements"].toMap().keys())
+                    foreach(const QString &keyelt, props[keyprop].toMap()["e"].toMap().keys())
                     {
                         QVariantMap element;
-                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("value"))
+                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("value"))
                         {
-                            element["value"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
+                            element["value"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["value"];
                         }
-                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("min"))
+                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("min"))
                         {
-                            element["min"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["min"];
+                            element["min"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["min"];
                         }
-                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("max"))
+                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("max"))
                         {
-                            element["max"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["max"];
+                            element["max"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["max"];
                         }
-                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("step"))
+                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("step"))
                         {
-                            element["step"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["step"];
+                            element["step"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["step"];
                         }
-                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("year"))
+                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("year"))
                         {
-                            element["year"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["year"];
+                            element["year"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["year"];
                         }
-                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("month"))
+                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("month"))
                         {
-                            element["month"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["month"];
+                            element["month"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["month"];
                         }
-                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("day"))
+                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("day"))
                         {
-                            element["day"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["day"];
+                            element["day"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["day"];
                         }
-                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("hh"))
+                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("hh"))
                         {
-                            element["hh"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["hh"];
+                            element["hh"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["hh"];
                         }
-                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("mm"))
+                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("mm"))
                         {
-                            element["mm"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["mm"];
+                            element["mm"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["mm"];
                         }
-                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("ss"))
+                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("ss"))
                         {
-                            element["ss"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["ss"];
+                            element["ss"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["ss"];
                         }
-                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("ms"))
+                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("ms"))
                         {
-                            element["ms"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["ms"];
+                            element["ms"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["ms"];
                         }
-                        if (props[keyprop].toMap()["elements"].toMap()[keyelt].toMap().contains("gridvalues"))
+                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("gridvalues"))
                         {
-                            element["gridvalues"] = props[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["gridvalues"];
+                            element["gridvalues"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["gridvalues"];
                         }
                         elements[keyelt] = element;
                     }
-                    property["elements"] = elements;
+                    property["e"] = elements;
                 }
                 if (props[keyprop].toMap().contains("gridheaders"))
                 {
@@ -636,7 +636,7 @@ QVariantMap Datastore::getProfile(void)
         }
     }
 
-    result["properties"] = propertiesResult;
+    result["p"] = propertiesResult;
     return result;
 }
 

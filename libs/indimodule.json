@@ -1,14 +1,14 @@
 {
 "globallov":{
 },
-"properties":{
+"p":{
     "indiGit": {
         "devcat": "Module",
         "group": "Info",
         "order":"00",
         "permission": 0,
         "label": "Indi module git",
-        "elements": {
+        "e": {
             "hash": {
                 "type": "string",
                 "label": "Hash",
@@ -36,7 +36,7 @@
         "order":"99",
         "permission": 2,
         "label": "Server",
-        "elements": {
+        "e": {
             "host": {
                 "type": "string",
                 "label": "Host",
@@ -61,7 +61,7 @@
         "permission": 2,
         "rule":2,
         "label": "Server",
-        "elements": {
+        "e": {
             "conserv": {
                 "type": "bool",
                 "label": "Connect",
@@ -83,7 +83,7 @@
         "order":"222Parms222",
         "permission": 2,
         "label": "Devices",
-        "elements": {
+        "e": {
         }
     },
     "devicesactions": {
@@ -93,7 +93,7 @@
         "permission": 2,
         "rule":2,
         "label": "Devices actions" ,
-        "elements": {
+        "e": {
             "condevs": {
                 "type": "bool",
                 "label": "Connect",
@@ -124,7 +124,7 @@
         "rule":2,
         "hasprofile":true,
         "label": "Actions on module startup",
-        "elements": {
+        "e": {
             "indiatstart": {
                 "type": "bool",
                 "autoupdate":true,
@@ -156,7 +156,7 @@
         "permission": 2,
         "rule":1,
         "label": "Actions",
-        "elements": {
+        "e": {
         }
     },
     "parms": {
@@ -166,7 +166,7 @@
         "permission": 2,
         "hasprofile":true,
         "label": "Parameters",
-        "elements": {
+        "e": {
         }
     }
 }
