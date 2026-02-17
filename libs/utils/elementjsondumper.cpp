@@ -6,7 +6,7 @@ namespace  OST
 QJsonObject ElementJsonDumper::dumpElementCommons(ElementBase *pElement)
 {
     QJsonObject json;
-    if (mType == "sv") return json;
+    if (mType == "sv" || mType == "sa") return json;
 
     json["label"] = pElement->label();
     json["order"] = pElement->order();
@@ -30,7 +30,7 @@ void ElementJsonDumper::visit(ElementBool *pElement, QVariantMap &data, bool &em
     QJsonObject json = dumpElementCommons(pElement);
     json["value"] = pElement->value();
     mResult = json;
-    if (mType == "sv") return;
+    if (mType == "sv" || mType == "sa") return;
 
     json["type"] = "bool";
     if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
@@ -44,7 +44,7 @@ void ElementJsonDumper::visit(ElementInt *pElement, QVariantMap &data, bool &emi
     QJsonObject json = dumpElementCommons(pElement);
     json["value"] = pElement->value();
     mResult = json;
-    if (mType == "sv") return;
+    if (mType == "sv" || mType == "sa") return;
 
     json["type"] = "int";
     json["value"] = qlonglong(pElement->value());
@@ -82,7 +82,7 @@ void ElementJsonDumper::visit(ElementFloat *pElement, QVariantMap &data, bool &e
     QJsonObject json = dumpElementCommons(pElement);
     json["value"] = pElement->value();
     mResult = json;
-    if (mType == "sv") return;
+    if (mType == "sv" || mType == "sa") return;
 
     json["type"] = "float";
     json["min"] = pElement->min();
@@ -118,7 +118,7 @@ void ElementJsonDumper::visit(ElementString *pElement, QVariantMap &data, bool &
     QJsonObject json = dumpElementCommons(pElement);
     json["value"] = pElement->value();
     mResult = json;
-    if (mType == "sv") return;
+    if (mType == "sv" || mType == "sa") return;
 
     json["type"] = "string";
     if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
@@ -148,7 +148,7 @@ void ElementJsonDumper::visit(ElementLight *pElement, QVariantMap &data, bool &e
     QJsonObject json = dumpElementCommons(pElement);
     json["value"] = pElement->value();
     mResult = json;
-    if (mType == "sv") return;
+    if (mType == "sv" || mType == "sa") return;
 
     json["type"] = "light";
     mResult = json;
@@ -247,7 +247,7 @@ void ElementJsonDumper::visit(ElementImg *pElement, QVariantMap &data, bool &emi
     }
     json["value"] = imgdata;
     mResult = json;
-    if (mType == "sv") return;
+    if (mType == "sv" || mType == "sa") return;
 
     json["type"] = "img";
 
@@ -270,7 +270,7 @@ void ElementJsonDumper::visit(ElementPrg *pElement, QVariantMap &data, bool &emi
     json["dynlabel"] = pElement->value().dynlabel;
     json["value"] = pElement->value().value;
     mResult = json;
-    if (mType == "sv") return;
+    if (mType == "sv" || mType == "sa") return;
 
     json["type"] = "prg";
     if (pElement->prgType() == bar) json["prgtype"] = "bar";
@@ -282,11 +282,13 @@ void ElementJsonDumper::visit(ElementDate *pElement, QVariantMap &data, bool &em
     Q_UNUSED(data);
     Q_UNUSED(emitEvent);
     QJsonObject json = dumpElementCommons(pElement);
-    json["type"] = "date";
     json["year"] = pElement->value().year();
     json["month"] = pElement->value().month();
     json["day"] = pElement->value().day();
+    mResult = json;
+    if (mType == "sv" || mType == "sa") return;
 
+    json["type"] = "date";
     mResult = json;
 }
 void ElementJsonDumper::visit(ElementTime *pElement, QVariantMap &data, bool &emitEvent)
@@ -294,14 +296,17 @@ void ElementJsonDumper::visit(ElementTime *pElement, QVariantMap &data, bool &em
     Q_UNUSED(data);
     Q_UNUSED(emitEvent);
     QJsonObject json = dumpElementCommons(pElement);
-    json["type"] = "time";
     json["hh"] = pElement->value().hour();
     json["mm"] = pElement->value().minute();
     json["ss"] = pElement->value().second();
+    mResult = json;
+    if (mType == "sv" || mType == "sa") return;
+
+    json["type"] = "time";
     json["usems"] = pElement->getUseMs();
     if (pElement->getUseMs()) json["ms"] = pElement->value().msec();
-
     mResult = json;
+
 }
 
 }

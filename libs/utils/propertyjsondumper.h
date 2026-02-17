@@ -173,6 +173,12 @@ class PropertyJsonDumper : public PropertyVisitor
          * - freeValue
          */
         QJsonObject dumpPropertyCommons(PropertyBase *pProperty);
+        QJsonObject dumpDefault(PropertyMulti* pProperty);
+        QJsonObject dumpSetValue(PropertyMulti* pProperty);
+        QJsonObject dumpSetAll(PropertyMulti* pProperty);
+        QJsonObject dumpGridCreate(PropertyMulti* pProperty);
+        QJsonObject dumpGridUpdate(PropertyMulti* pProperty);
+        QJsonObject dumpGridDelete(PropertyMulti* pProperty);
         Event mEvent;
 
 };

@@ -30,7 +30,6 @@ namespace  OST
 QJsonObject PropertyJsonDumper::dumpPropertyCommons(PropertyBase *pProperty)
 {
     QJsonObject json;
-    if (mEvent.type == "sv" || mEvent.type == "sa") return json;
     json["label"] = pProperty->label();
     json["order"] = pProperty->order();
     json["level1"] = pProperty->level1();
@@ -79,35 +78,47 @@ QJsonObject PropertyJsonDumper::dumpPropertyCommons(PropertyBase *pProperty)
  */
 void PropertyJsonDumper::visit(PropertyMulti *pProperty)
 {
+    if (mEvent.type == "sv")
+    {
+        mResult = dumpSetValue(pProperty);
+        return;
+    }
+    if (mEvent.type == "sa")
+    {
+        mResult = dumpSetAll(pProperty);
+        return;
+    }
+    if (mEvent.type == "gc")
+    {
+        mResult = dumpGridCreate(pProperty);
+        return;
+    }
+    if (mEvent.type == "gu")
+    {
+        mResult = dumpGridUpdate(pProperty);
+        return;
+    }
+    if (mEvent.type == "gd")
+    {
+        mResult = dumpGridDelete(pProperty);
+        return;
+    }
+    mResult = dumpDefault(pProperty);
+}
+QJsonObject PropertyJsonDumper::dumpDefault(PropertyMulti* pProperty)
+{
     QJsonObject json = dumpPropertyCommons(pProperty);
     QJsonObject elements;
-    if (mEvent.type != "sv")
-    {
-        foreach(const QString &key, pProperty->getElts()->keys())
-        {
-            OST::ElementJsonDumper d(mEvent.type);
-            QVariantMap m;
-            bool b = false;
-            pProperty->getElt(key)->accept(&d, m, b);
-            QJsonObject value = d.getResult();
-            if (mEvent.type == "sa") elements[key] = value["value"];
-            else elements[key] = value;
-        }
-    }
-    else
+    foreach(const QString &key, pProperty->getElts()->keys())
     {
         OST::ElementJsonDumper d(mEvent.type);
         QVariantMap m;
         bool b = false;
-        pProperty->getElt(mEvent.element)->accept(&d, m, b);
+        pProperty->getElt(key)->accept(&d, m, b);
         QJsonObject value = d.getResult();
-        elements[mEvent.element] = value["value"];
+        elements[key] = value;
     }
-
     json["e"] = elements;
-    mResult = json;
-    if (mEvent.type == "sv" || mEvent.type == "sa") return;
-
     json["showElts"] = pProperty->getShowElts();
     json["hasGrid"] = pProperty->hasGrid();
     if (pProperty->hasGrid())
@@ -147,8 +158,84 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
         json["graphParams"] = QJsonObject::fromVariantMap(pProperty->getGraphDefs().params);
     }
 
-    mResult = json;
+    return json;
+}
 
+QJsonObject PropertyJsonDumper::dumpSetValue(PropertyMulti* pProperty)
+{
+    // Minimal content, no keyword for value
+    // {"evt": "sv","m": {"Dummy1": {"p": {"testnumbers": {"e": {"i1": 12 }}}}}}
+    QJsonObject json;
+    QJsonObject elements;
+    OST::ElementJsonDumper d(mEvent.type);
+    QVariantMap m;
+    bool b = false;
+    pProperty->getElt(mEvent.element)->accept(&d, m, b);
+    QJsonObject value = d.getResult();
+    elements[mEvent.element] = value["value"];
+    json["e"] = elements;
+    return json;
+}
+QJsonObject PropertyJsonDumper::dumpSetAll(PropertyMulti* pProperty)
+{
+    // Minimal content for multiple elements
+    // {"evt": "sa","m": {"Dummy1": {"p": {"testnumbers": {"e": {"i1": 12,"i2": 15}}}}}}
+    QJsonObject json;
+    QJsonObject elements;
+    foreach(const QString &key, pProperty->getElts()->keys())
+    {
+        OST::ElementJsonDumper d(mEvent.type);
+        QVariantMap m;
+        bool b = false;
+        pProperty->getElt(key)->accept(&d, m, b);
+        QJsonObject value = d.getResult();
+        elements[key] = value;
+    }
+    json["e"] = elements;
+    return json;
+
+}
+QJsonObject PropertyJsonDumper::dumpGridCreate(PropertyMulti* pProperty)
+{
+    QJsonObject json;
+    if (pProperty->hasGrid())
+    {
+        int i = pProperty->getGrid().count() - 1;
+        QJsonObject values;
+        foreach(QString elt, pProperty->getGridHeaders())
+        {
+            ValueJsonDumper d(mEvent.type);
+            pProperty->getGrid()[i][elt]->accept(&d);
+            values[elt] = d.getResult();
+        }
+        json["values"] = values;
+        json["i"] = i;
+    }
+    return json;
+}
+QJsonObject PropertyJsonDumper::dumpGridUpdate(PropertyMulti* pProperty)
+{
+    QJsonObject json;
+    if (pProperty->hasGrid())
+    {
+        int i = mEvent.line;
+        QJsonObject values;
+        foreach(QString elt, pProperty->getGridHeaders())
+        {
+            ValueJsonDumper d(mEvent.type);
+            pProperty->getGrid()[i][elt]->accept(&d);
+            values[elt] = d.getResult();
+        }
+        json["values"] = values;
+        json["i"] = i;
+    }
+    return json;
+}
+QJsonObject PropertyJsonDumper::dumpGridDelete(PropertyMulti* pProperty)
+{
+    QJsonObject json;
+    json["i"] = mEvent.line;
+    return json;
 }
 
 }

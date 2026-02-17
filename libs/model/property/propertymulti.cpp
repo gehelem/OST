@@ -254,10 +254,14 @@ void PropertyMulti::push()
         wGridLine[elt] = ValueFactory::createValue(mElts[elt]);
     }
     mGrid.append(wGridLine);
-    if (mGridLimit > 0 && mGrid.size() > this->mGridLimit) mGrid.removeFirst();
+    if (mGridLimit > 0 && mGrid.size() > this->mGridLimit)
+    {
+        mGrid.removeFirst();
+        emit propertyEvent(this, {"gd", "", this->key(), "", 0, QVariantMap()});
 
-    emit propertyEvent(this, {"ap", "", this->key(), "", 0, QVariantMap()});
+    }
 
+    emit propertyEvent(this, {"gc", "", this->key(), "", mGrid.size() - 1, QVariantMap()});
 }
 
 void PropertyMulti::setAll(const QVariantMap &pValues)
@@ -309,9 +313,6 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
 
     }
     push();
-
-    emit propertyEvent(this, {"ap", "", this->key(), "", 0, QVariantMap()});
-
 }
 bool PropertyMulti::updateLine(const int i, const QVariantMap &pValues)
 {
@@ -354,7 +355,7 @@ bool PropertyMulti::updateLine(const int i, const QVariantMap &pValues)
         v->updateValue();
     }
 
-    emit propertyEvent(this, {"ap", "", this->key(), "", 0, QVariantMap()});
+    emit propertyEvent(this, {"gu", "", this->key(), "", i, QVariantMap()});
     return true;
 
 }
@@ -366,7 +367,7 @@ bool PropertyMulti::deleteLine(const int i)
         return false;
     }
     mGrid.removeAt(i);
-    emit propertyEvent(this, {"ap", "", this->key(), "", 0, QVariantMap()});
+    emit propertyEvent(this, {"gd", "", this->key(), "", i, QVariantMap()});
     return true;
 }
 

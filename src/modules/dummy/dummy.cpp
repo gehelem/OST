@@ -118,6 +118,8 @@ void Dummy::onTimer()
     //getEltInt("totoRW", "toto")->setValue(12);
     //getEltInt("numbersRW", "n1")->setValue(12);
     //getEltInt("numbersRW", "n1")->setValue(200);
+    getProperty("timesRWgrid")->push();
+    getProperty("timesRWgrid")->deleteLine(0);
 }
 
 Dummy::~Dummy()
