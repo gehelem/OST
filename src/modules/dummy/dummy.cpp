@@ -116,7 +116,7 @@ void Dummy::onTimer()
     //logError("Error");
     //logCritical("Critical");
     //getEltInt("totoRW", "toto")->setValue(12);
-    getEltInt("numbersRW", "n1")->setValue(12);
+    //getEltInt("numbersRW", "n1")->setValue(12);
     //getEltInt("numbersRW", "n1")->setValue(200);
 }
 

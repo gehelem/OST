@@ -163,6 +163,7 @@ class PropertyMulti: public PropertyBase
          * @brief Set element value by key
          * @param key Element key name
          * @param val New value as QVariant
+         * @param signal Wether to emit signal or not
          * @return true if successful, false if element not found or type mismatch
          *
          * Handles switch rules for boolean elements automatically.
@@ -170,6 +171,16 @@ class PropertyMulti: public PropertyBase
          */
         bool setElt(QString key, QVariant val);
 
+        /**
+         * @brief Set element value by key
+         * @param key Element key name
+         * @param val New value as QVariant
+         * @return true if successful, false if element not found or type mismatch
+         *
+         * Same as setElt(QString key, QVariant val,false) => without signal
+         */
+
+        bool setElt(QString key, QVariant val, bool emitEvent);
         /**
          * @brief Add element to property
          * @param key Element key name (must be unique)
@@ -181,6 +192,14 @@ class PropertyMulti: public PropertyBase
          * @warning Do not delete element manually after adding to property
          */
         void addElt(ElementBase* pElt);
+
+        /**
+         * @brief Set all element values by key
+         * @param pValues QVariantMap with element keys and values
+         *
+         */
+        void setAll(const QVariantMap &pValues);
+
 
         /**
          * @brief Delete element from property

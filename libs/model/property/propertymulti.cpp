@@ -114,13 +114,17 @@ GraphDefs PropertyMulti::getGraphDefs(void)
 }
 bool  PropertyMulti::setElt(QString key, QVariant val)
 {
+    return setElt(key, val, false);
+}
+bool  PropertyMulti::setElt(QString key, QVariant val, bool emitEvent)
+{
     if (!mElts.contains(key))
     {
-        logError("PropertyMulti::setValue - " + key + " - not found");
+        logError("PropertyMulti::setValue - %1 - not found", {key});
         return false;
     }
     QVariantMap m;
-    bool s = false;
+    bool s = emitEvent;
     if (((mElts[key]->getType() == "int") && (val.canConvert<long>())) ||
             ((mElts[key]->getType() == "string") && (val.canConvert<QString>())) ||
             ((mElts[key]->getType() == "float") && (val.canConvert<double>())) )
@@ -256,6 +260,29 @@ void PropertyMulti::push()
 
 }
 
+void PropertyMulti::setAll(const QVariantMap &pValues)
+{
+    /* Check if data is valid and contains every value */
+    foreach(const QString &elt, mElts.keys())
+    {
+        if ((mElts[elt]->getType() == "int") || (mElts[elt]->getType() == "float") || (mElts[elt]->getType() == "string"))
+        {
+            if (!pValues.contains(elt))
+            {
+                logWarning("PropertyMulti::setAll incomplete values, %1 missing ", {elt});
+                return;
+            }
+        }
+    }
+
+    foreach(const QString &elt, mElts.keys())
+    {
+        setElt(elt, pValues[elt], false);
+
+    }
+    emit propertyEvent(this, {"sa", "", this->key(), "", 0, QVariantMap()});
+
+}
 void PropertyMulti::newLine(const QVariantMap &pValues)
 {
     if (!this->hasGrid())
@@ -270,7 +297,7 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
         {
             if (!pValues.contains(elt))
             {
-                logWarning("PropertyMulti::newLine incomplete values, " + elt + " missing ");
+                logWarning("PropertyMulti::newLine incomplete values, %1 missing ", {elt});
                 return;
             }
         }
@@ -300,7 +327,7 @@ bool PropertyMulti::updateLine(const int i, const QVariantMap &pValues)
         {
             if (!pValues.contains(elt))
             {
-                logError("PropertyMulti::updateLine incomplete values, " + elt + " missing");
+                logError("PropertyMulti::updateLine incomplete values, %1 missing ", {elt});
                 return false;
             }
         }
@@ -543,6 +570,7 @@ void PropertyMulti::OnEltChanged(ElementBase*)
 void PropertyMulti::OnEltEvent(ElementBase* e, OST::Event evt)
 {
     evt.property = this->key();
+    evt.element = e->key();
     emit propertyEvent(this, evt);
 }
 void PropertyMulti::OnListChanged(ElementBase*)

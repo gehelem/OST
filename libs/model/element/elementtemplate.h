@@ -209,7 +209,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
                 }
             }
             ElementTemplate<T>::mValue = value;
-            if (emitEvent) emit ElementBase::eltEvent(this, {"sv", "", "", "", 0, QVariantMap()});
+            if (emitEvent) emit ElementBase::eltEvent(this, {"sv", "",  "", this->key(), 0, QVariantMap()});
             return true;
         }
 
@@ -249,7 +249,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
         {
             mUseMinMax = true;
             mMin = min;
-            emit ElementBase::eltEvent(this, {"sp", "", "", "", 0, QVariantMap()});
+            emit ElementBase::eltEvent(this, {"sp", "", "",  this->key(), 0, QVariantMap()});
         }
 
         /**
@@ -273,7 +273,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
         {
             mUseMinMax = true;
             mMax = max;
-            emit ElementBase::eltEvent(this, {"sp", "", "", "", 0, QVariantMap()});
+            emit ElementBase::eltEvent(this, {"sp", "", "",  this->key(), 0, QVariantMap()});
         }
 
         /**
@@ -298,7 +298,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
             mMin = min;
             mMax = max;
             mUseMinMax = true;
-            emit ElementBase::eltEvent(this, {"sp", "", "", "", 0, QVariantMap()});
+            emit ElementBase::eltEvent(this, {"sp", "", "",  this->key(), 0, QVariantMap()});
         }
 
         /**
@@ -313,7 +313,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
             mMin = 0;
             mMax = 0;
             mUseMinMax = false;
-            emit ElementBase::eltEvent(this, {"sp", "", "", "", 0, QVariantMap()});
+            emit ElementBase::eltEvent(this, {"sp", "", "",  this->key(), 0, QVariantMap()});
         }
 
         /**
@@ -344,7 +344,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
         void setStep(const T &step)
         {
             mStep = step;
-            emit ElementBase::eltEvent(this, {"sp", "", "", "", 0, QVariantMap()});
+            emit ElementBase::eltEvent(this, {"sp", "", "",  this->key(), 0, QVariantMap()});
         }
 
         /**
@@ -376,7 +376,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
         void setFormat(const QString &format)
         {
             mFormat = format;
-            emit ElementBase::eltEvent(this, {"sp", "", "", "", 0, QVariantMap()});
+            emit ElementBase::eltEvent(this, {"sp", "", "",  this->key(), 0, QVariantMap()});
         }
 
         /**
@@ -411,7 +411,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
         void setSlider(const SliderRule &s)
         {
             mSlider = s;
-            emit ElementBase::eltEvent(this, {"sp", "", "", "", 0, QVariantMap()});
+            emit ElementBase::eltEvent(this, {"sp", "", "",  this->key(), 0, QVariantMap()});
         }
 
     private:

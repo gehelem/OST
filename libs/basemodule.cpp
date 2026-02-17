@@ -276,43 +276,50 @@ void Basemodule::OnExternalEvent(OST::Event e)
     {
         foreach(const QString &keyprop, e.data.keys())
         {
-            foreach(const QString &keyelt, e.data[keyprop].toMap()["elements"].toMap().keys())
+            if (e.data[keyprop].toMap()["elements"].toMap().size() > 1)
             {
-                if (getStore()[keyprop]->getElt(keyelt)->autoUpdate() && getStore()[keyprop]->isEnabled() )
+                getProperty(keyprop)->setAll(e.data[keyprop].toMap()["elements"].toMap());
+            }
+            else
+            {
+                foreach(const QString &keyelt, e.data[keyprop].toMap()["elements"].toMap().keys())
                 {
-                    QVariant v = e.data[keyprop].toMap()["elements"].toMap()[keyelt];
-                    QVariantMap m = v.toMap();
-                    if (getEltBase(keyprop, keyelt)->getType() == "int")
+                    if (getStore()[keyprop]->getElt(keyelt)->autoUpdate() && getStore()[keyprop]->isEnabled() )
                     {
-                        getEltInt(keyprop, keyelt)->setValue(v.toInt(), true);
-                    }
-                    if (getEltBase(keyprop, keyelt)->getType() == "float")
-                    {
-                        getEltFloat(keyprop, keyelt)->setValue(v.toDouble(), true);
-                    }
-                    if (getEltBase(keyprop, keyelt)->getType() == "string")
-                    {
-                        getEltString(keyprop, keyelt)->setValue(v.toString(), true);
-                    }
-                    if (getEltBase(keyprop, keyelt)->getType() == "bool")
-                    {
-                        //a boolean need to be updated on property level because of SwitchRule's flag behaviour
-                        getProperty(keyprop)->setElt(keyelt, v);
+                        QVariant v = e.data[keyprop].toMap()["elements"].toMap()[keyelt];
+                        QVariantMap m = v.toMap();
+                        if (getEltBase(keyprop, keyelt)->getType() == "int")
+                        {
+                            getEltInt(keyprop, keyelt)->setValue(v.toInt(), true);
+                        }
+                        if (getEltBase(keyprop, keyelt)->getType() == "float")
+                        {
+                            getEltFloat(keyprop, keyelt)->setValue(v.toDouble(), true);
+                        }
+                        if (getEltBase(keyprop, keyelt)->getType() == "string")
+                        {
+                            getEltString(keyprop, keyelt)->setValue(v.toString(), true);
+                        }
+                        if (getEltBase(keyprop, keyelt)->getType() == "bool")
+                        {
+                            //a boolean need to be updated on property level because of SwitchRule's flag behaviour
+                            getProperty(keyprop)->setElt(keyelt, v);
 
+                        }
+                        if (getEltBase(keyprop, keyelt)->getType() == "date")
+                        {
+                            QDate d;
+                            d.setDate(m["year"].toInt(), m["month"].toInt(), m["day"].toInt());
+                            getEltDate(keyprop, keyelt)->setValue(d, true);
+                        }
+                        if (getEltBase(keyprop, keyelt)->getType() == "time")
+                        {
+                            QTime t;
+                            t.setHMS(m["hh"].toInt(), m["mm"].toInt(), m["ss"].toInt(), m["ms"].toInt());
+                            getEltTime(keyprop, keyelt)->setValue(t, true);
+                        }
+                        //sendMessage("Autoupdate - property " + keyprop + " - element " + keyelt);
                     }
-                    if (getEltBase(keyprop, keyelt)->getType() == "date")
-                    {
-                        QDate d;
-                        d.setDate(m["year"].toInt(), m["month"].toInt(), m["day"].toInt());
-                        getEltDate(keyprop, keyelt)->setValue(d, true);
-                    }
-                    if (getEltBase(keyprop, keyelt)->getType() == "time")
-                    {
-                        QTime t;
-                        t.setHMS(m["hh"].toInt(), m["mm"].toInt(), m["ss"].toInt(), m["ms"].toInt());
-                        getEltTime(keyprop, keyelt)->setValue(t, true);
-                    }
-                    //sendMessage("Autoupdate - property " + keyprop + " - element " + keyelt);
                 }
             }
         }
