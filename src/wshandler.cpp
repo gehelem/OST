@@ -271,7 +271,7 @@ void WShandler::onModuleEvent(Basemodule *module, OST::Event event)
 
     }
     mods[event.module] = mod;
-    obj["modules"] = mods;
+    obj["m"] = mods;
     sendJsonMessage(obj);
 
 
@@ -288,7 +288,7 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
         QJsonObject mods;
         QJsonObject  mod;
         mods[eventModule] = QJsonObject::fromVariantMap(eventData);
-        obj["modules"] = mods;
+        obj["m"] = mods;
         sendJsonMessage(obj);
     }
     if (eventType == "cp" || eventType == "ce" || eventType == "ap" || eventType == "ae")
@@ -299,7 +299,7 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
         prop[eventKey] = QJsonObject::fromVariantMap(eventData);
         mod["properties"] = prop;
         mods[eventModule] = mod;
-        obj["modules"] = mods;
+        obj["m"] = mods;
         sendJsonMessage(obj);
     }
     if (eventType == "lc")
@@ -310,7 +310,7 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
         lov[eventKey] = QJsonObject::fromVariantMap(eventData);
         mod["globallovs"] = lov;
         mods[eventModule] = mod;
-        obj["modules"] = mods;
+        obj["m"] = mods;
         sendJsonMessage(obj);
     }
     if (eventType == "delprop")
@@ -322,7 +322,7 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
         mod["properties"] = prop;
 
         mods[eventModule] = mod;
-        obj["modules"] = mods;
+        obj["m"] = mods;
         sendJsonMessage(obj);
     }
     if (eventType == "pushvalues")
@@ -335,7 +335,7 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
         props[eventKey] = QJsonObject::fromVariantMap(eventData);
         mod["properties"] = props;
         mods[eventModule] = mod;
-        obj["modules"] = mods;
+        obj["m"] = mods;
         sendJsonMessage(obj);
     }
     if (eventType == "resetvalues")
@@ -348,7 +348,7 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
         props[eventKey] = QJsonObject::fromVariantMap(prop);
         mod["properties"] = props;
         mods[eventModule] = mod;
-        obj["modules"] = mods;
+        obj["m"] = mods;
         sendJsonMessage(obj);
     }
     if (eventType == "sp" || eventType == "se"  || eventType == "sv")
@@ -419,7 +419,7 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
         QJsonObject  mod;
         mod["properties"] = props;
         mods[eventModule] = mod;
-        obj["modules"] = mods;
+        obj["m"] = mods;
         sendJsonMessage(obj);
     }
     if (eventType == "mm")
@@ -428,7 +428,7 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
         QJsonObject mods;
         mod["message"] = QJsonObject::fromVariantMap(eventData);;
         mods[eventModule] = mod;
-        obj["modules"] = mods;
+        obj["m"] = mods;
         sendJsonMessage(obj);
     }
     if (eventType == "me")
@@ -437,7 +437,7 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
         QJsonObject mods;
         mod["error"] = QJsonObject::fromVariantMap(eventData);;
         mods[eventModule] = mod;
-        obj["modules"] = mods;
+        obj["m"] = mods;
         sendJsonMessage(obj);
     }
     if (eventType == "mw")
@@ -446,7 +446,7 @@ void WShandler::processModuleEvent(const QString &eventType, const QString  &eve
         QJsonObject mods;
         mod["warning"] = QJsonObject::fromVariantMap(eventData);;
         mods[eventModule] = mod;
-        obj["modules"] = mods;
+        obj["m"] = mods;
         sendJsonMessage(obj);
     }
 
@@ -544,7 +544,7 @@ void WShandler::onLog(OST::LogLevel level, const QString &message,
         moduleData["datetime"] = dt.toString(Qt::ISODateWithMs);
 
         modules[context] = moduleData;
-        obj["modules"] = modules;
+        obj["m"] = modules;
 
         // Send to client
         client->sendTextMessage(QJsonDocument(obj).toJson(QJsonDocument::Compact));
