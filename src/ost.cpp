@@ -19,7 +19,6 @@ int main(int argc, char *argv[])
     QCommandLineParser argParser;
     argParser.addHelpOption();
 
-    QCommandLineOption saveAllBlobsOption("s", "Save all received blobs to /tmp");
     QCommandLineOption webrootOption("webroot", "Web server media folder **must be writable**", "webroot");
     webrootOption.setDefaultValue("/var/www/html/ostmedia");
     QCommandLineOption dbPathOption("dbpath", "DB path", "dbpath");
@@ -45,7 +44,9 @@ int main(int argc, char *argv[])
     QString filename = "ostserver_" + QDateTime().currentDateTime().toString("yyyy-MM-dd_hh-mm-ss") + ".log";
     QCommandLineOption logFileOption("logfile", "Logfile path (default ostserver-(current date).log)", "logfile", filename);
 
-    argParser.addOption(saveAllBlobsOption);
+    QCommandLineOption bannerOption("banner", "Frontend banner", "banner");
+    bannerOption.setDefaultValue("Observatoire Sans tête");
+
     argParser.addOption(webrootOption);
     argParser.addOption(dbPathOption);
     argParser.addOption(libPathOption);
@@ -58,6 +59,7 @@ int main(int argc, char *argv[])
     argParser.addOption(grantOption);
     argParser.addOption(logLevel);
     argParser.addOption(logFileOption);
+    argParser.addOption(bannerOption);
     argParser.process(app);
 
     QString webroot = argParser.value(webrootOption);
@@ -72,6 +74,7 @@ int main(int argc, char *argv[])
     QString grant = argParser.value(grantOption);
     int loglevel = argParser.value(logLevel).toInt();
     QString logfile = argParser.value(logFileOption);
+    QString banner = argParser.value(bannerOption);
 
     OST::Logger mLogger;
     OST::TranslateManager mTranslater;
@@ -109,6 +112,7 @@ int main(int argc, char *argv[])
     mLogger.info("Security              =" + grant);
     mLogger.info("Log file              =" + logfile);
     mLogger.info("Log level             =" + QString::number(loglevel));
+    mLogger.info("Banner                =" + banner);
 
     mLogger.setLogLevel(static_cast<OST::LogLevel>(loglevel));
 
@@ -124,7 +128,8 @@ int main(int argc, char *argv[])
         lng,
         grant,
         &mLogger,
-        &mTranslater
+        &mTranslater,
+        banner
     );
 
     Q_UNUSED(controller);

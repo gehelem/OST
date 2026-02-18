@@ -245,11 +245,11 @@ class ElementTemplateNumeric : public ElementTemplate<T>
          * use setMinMax() to enable min/max enforcement.
          * Emits eltChanged() signal to notify frontend of metadata change.
          */
-        void setMin(const T &min)
+        void setMin(const T &min, const bool &emitEvent)
         {
             mUseMinMax = true;
             mMin = min;
-            emit ElementBase::eltEvent(this, {"sp", "", "",  this->key(), 0, QVariantMap()});
+            if (emitEvent) emit ElementBase::eltEvent(this, {"se", "", "",  this->key(), 0, QVariantMap()});
         }
 
         /**
@@ -269,11 +269,11 @@ class ElementTemplateNumeric : public ElementTemplate<T>
          * use setMinMax() to enable min/max enforcement.
          * Emits eltChanged() signal to notify frontend of metadata change.
          */
-        void setMax(const T &max)
+        void setMax(const T &max, const bool &emitEvent)
         {
             mUseMinMax = true;
             mMax = max;
-            emit ElementBase::eltEvent(this, {"sp", "", "",  this->key(), 0, QVariantMap()});
+            if (emitEvent) emit ElementBase::eltEvent(this, {"se", "", "",  this->key(), 0, QVariantMap()});
         }
 
         /**
@@ -293,12 +293,12 @@ class ElementTemplateNumeric : public ElementTemplate<T>
          *
          * @see unSetMinMax()
          */
-        void setMinMax(const T &min, const T &max)
+        void setMinMax(const T &min, const T &max, const bool &emitEvent)
         {
             mMin = min;
             mMax = max;
             mUseMinMax = true;
-            emit ElementBase::eltEvent(this, {"sp", "", "",  this->key(), 0, QVariantMap()});
+            if (emitEvent) emit ElementBase::eltEvent(this, {"se", "", "",  this->key(), 0, QVariantMap()});
         }
 
         /**
@@ -308,12 +308,12 @@ class ElementTemplateNumeric : public ElementTemplate<T>
          * After calling this, setValue() will accept any value.
          * Emits eltChanged() signal to notify frontend.
          */
-        void unSetMinMax(void)
+        void unSetMinMax(const bool &emitEvent)
         {
             mMin = 0;
             mMax = 0;
             mUseMinMax = false;
-            emit ElementBase::eltEvent(this, {"sp", "", "",  this->key(), 0, QVariantMap()});
+            if (emitEvent) emit ElementBase::eltEvent(this, {"se", "", "",  this->key(), 0, QVariantMap()});
         }
 
         /**
@@ -341,10 +341,10 @@ class ElementTemplateNumeric : public ElementTemplate<T>
          * element->setStep(10);    // Coarse control for int
          * @endcode
          */
-        void setStep(const T &step)
+        void setStep(const T &step, const bool &emitEvent)
         {
             mStep = step;
-            emit ElementBase::eltEvent(this, {"sp", "", "",  this->key(), 0, QVariantMap()});
+            if (emitEvent) emit ElementBase::eltEvent(this, {"se", "", "",  this->key(), 0, QVariantMap()});
         }
 
         /**
@@ -373,10 +373,10 @@ class ElementTemplateNumeric : public ElementTemplate<T>
          * element->setFormat("%05d");   // Zero-padded int: 00042
          * @endcode
          */
-        void setFormat(const QString &format)
+        void setFormat(const QString &format, const bool &emitEvent)
         {
             mFormat = format;
-            emit ElementBase::eltEvent(this, {"sp", "", "",  this->key(), 0, QVariantMap()});
+            if (emitEvent) emit ElementBase::eltEvent(this, {"se", "", "",  this->key(), 0, QVariantMap()});
         }
 
         /**
@@ -408,10 +408,10 @@ class ElementTemplateNumeric : public ElementTemplate<T>
          *
          * @see SliderRule
          */
-        void setSlider(const SliderRule &s)
+        void setSlider(const SliderRule &s, const bool &emitEvent)
         {
             mSlider = s;
-            emit ElementBase::eltEvent(this, {"sp", "", "",  this->key(), 0, QVariantMap()});
+            if (emitEvent) emit ElementBase::eltEvent(this, {"se", "", "",  this->key(), 0, QVariantMap()});
         }
 
     private:

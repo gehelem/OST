@@ -517,7 +517,9 @@ inline QString incrementPlaceholders(const QString &msg)
     return result;
 }
 
+
 }
+
 
 #endif
 

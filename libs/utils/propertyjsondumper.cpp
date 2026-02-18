@@ -88,6 +88,11 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
         mResult = dumpSetAll(pProperty);
         return;
     }
+    if (mEvent.type == "se")
+    {
+        mResult = dumpSetValueWithMinMax(pProperty);
+        return;
+    }
     if (mEvent.type == "gc")
     {
         mResult = dumpGridCreate(pProperty);
@@ -176,6 +181,27 @@ QJsonObject PropertyJsonDumper::dumpSetValue(PropertyMulti* pProperty)
     json["e"] = elements;
     return json;
 }
+QJsonObject PropertyJsonDumper::dumpSetValueWithMinMax(PropertyMulti* pProperty)
+{
+    // Minimal content for multiple elements with more details, mostly for numeric details
+    // {"evt": "se","m": {"Dummy1": {"p": {"testnumbers": {"e": {"i1": {"value":12,"min":10,"max":50},"i2": ... (... )}}}}}}
+
+    QJsonObject json;
+    QJsonObject elements;
+    foreach(const QString &key, pProperty->getElts()->keys())
+    {
+        OST::ElementJsonDumper d(mEvent.type);
+        QVariantMap m;
+        bool b = false;
+        pProperty->getElt(key)->accept(&d, m, b);
+        QJsonObject value = d.getResult();
+        elements[key] = value;
+    }
+    json["e"] = elements;
+    return json;
+
+}
+
 QJsonObject PropertyJsonDumper::dumpSetAll(PropertyMulti* pProperty)
 {
     // Minimal content for multiple elements

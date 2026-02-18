@@ -868,9 +868,9 @@ bool IndiModule::defineMeAsImager()
         f->setValue(0, false);
         f->setDirectEdit(true);
         f->setAutoUpdate(true);
-        f->setMinMax(0.00001, 300);
-        f->setStep(0.001);
-        f->setSlider(OST::SliderAndValue);
+        f->setMinMax(0.00001, 300, false);
+        f->setStep(0.001, false);
+        f->setSlider(OST::SliderAndValue, false);
         pm->addElt(f);
     }
 
@@ -882,9 +882,9 @@ bool IndiModule::defineMeAsImager()
         i->setValue(0, false);
         i->setDirectEdit(true);
         i->setAutoUpdate(true);
-        i->setMinMax(0, 500);
-        i->setStep(1);
-        i->setSlider(OST::SliderAndValue);
+        i->setMinMax(0, 500, false);
+        i->setStep(1, false);
+        i->setSlider(OST::SliderAndValue, false);
         pm->addElt(i);
     }
 
@@ -894,9 +894,9 @@ bool IndiModule::defineMeAsImager()
         i->setValue(0, false);
         i->setDirectEdit(true);
         i->setAutoUpdate(true);
-        i->setMinMax(0, 500);
-        i->setStep(1);
-        i->setSlider(OST::SliderAndValue);
+        i->setMinMax(0, 500, false);
+        i->setStep(1, false);
+        i->setSlider(OST::SliderAndValue, false);
         pm->addElt(i);
     }
 
@@ -1029,17 +1029,17 @@ bool IndiModule::giveMeAnOptic()
 
     OST::ElementFloat* f = new  OST::ElementFloat("fl", "Focal length", "1", "");
     f->setDirectEdit(true);
-    f->setMinMax(1, 4000);
+    f->setMinMax(1, 4000, false);
     f->setAutoUpdate(true);
     pm->addElt(f);
     OST::ElementFloat* d = new  OST::ElementFloat("diam", "Diameter", "2", "");
     d->setDirectEdit(true);
-    d->setMinMax(1, 4000);
+    d->setMinMax(1, 4000, false);
     d->setAutoUpdate(true);
     pm->addElt(d);
     OST::ElementFloat* r = new  OST::ElementFloat("red", "Reducer", "3", "");
     r->setDirectEdit(true);
-    r->setMinMax(0.1, 10);
+    r->setMinMax(0.1, 10, false);
     r->setAutoUpdate(true);
     r->setValue(1);
     pm->addElt(r);

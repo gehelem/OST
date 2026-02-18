@@ -29,6 +29,8 @@
  *  @author Gehelem
  */
 
+Q_DECLARE_METATYPE(OST::Event)
+
 class Datastore : public QObject
 {
         Q_OBJECT

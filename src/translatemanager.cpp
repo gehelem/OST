@@ -102,7 +102,7 @@ QString TranslateManager::translate(const QString &sourceText, const QString &la
     if (!mMissingTranslationsByLang[language].contains(sourceText))
     {
         mMissingTranslationsByLang[language].insert(sourceText);
-        qDebug() << "Missing translation (" << language << "):" << sourceText;
+        //qDebug() << "Missing translation (" << language << "):" << sourceText;
 
         // appendToPendingFile will be called with mutex already held
         appendToPendingFile(sourceText, language);

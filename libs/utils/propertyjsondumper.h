@@ -175,6 +175,7 @@ class PropertyJsonDumper : public PropertyVisitor
         QJsonObject dumpPropertyCommons(PropertyBase *pProperty);
         QJsonObject dumpDefault(PropertyMulti* pProperty);
         QJsonObject dumpSetValue(PropertyMulti* pProperty);
+        QJsonObject dumpSetValueWithMinMax(PropertyMulti* pProperty);
         QJsonObject dumpSetAll(PropertyMulti* pProperty);
         QJsonObject dumpGridCreate(PropertyMulti* pProperty);
         QJsonObject dumpGridUpdate(PropertyMulti* pProperty);

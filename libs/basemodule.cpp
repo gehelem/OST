@@ -474,6 +474,7 @@ QVariantMap Basemodule::getModuleInfo(void)
 
 void Basemodule::sendDump(void)
 {
+    return;
     OST::Event e;
     e.type = "moduledump";
     e.module = getModuleName();
@@ -490,12 +491,13 @@ void Basemodule::sendDump(void)
     dump["infos"] = infos;
     dump["help"] = getHelpContent("fr");
     //getQtProperties();
-    emit moduleEvent(this, e);
 
+    emit moduleEvent(this, e);
 }
 void Basemodule::OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                const QVariantMap &eventData)
 {
+    return;
     Q_UNUSED(eventModule);
     emit moduleEvent(this, {"moduledump", this->getModuleName(), "", "", 0, QVariantMap()});
 }

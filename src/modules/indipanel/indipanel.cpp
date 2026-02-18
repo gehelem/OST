@@ -91,10 +91,10 @@ void IndiPanel::newProperty(INDI::Property pProperty)
             {
                 OST::ElementFloat* v = new OST::ElementFloat(n[i].getName(), n[i].label, QString(i), n[i].label);
                 v->setValue(n[i].getValue(), false);
-                v->setMin(n[i].min);
-                v->setMax(n[i].max);
-                v->setStep(n[i].step);
-                v->setFormat(n[i].format);
+                v->setMin(n[i].min, false);
+                v->setMax(n[i].max, false);
+                v->setStep(n[i].step, false);
+                v->setFormat(n[i].format, false);
                 p->addElt(v);
             }
             break;
@@ -165,12 +165,24 @@ void IndiPanel::updateProperty (INDI::Property property)
 
             for (unsigned int i = 0; i < n.count(); i++)
             {
-                getEltFloat(devpro, n[i].name)->setMin(n[i].min);
-                getEltFloat(devpro, n[i].name)->setMax(n[i].max);
-                getEltFloat(devpro, n[i].name)->setStep(n[i].step);
-                getEltFloat(devpro, n[i].name)->setFormat(n[i].format);
-                if (i == n.count() - 1) getEltFloat(devpro, n[i].name)->setValue(n[i].value, true);
-                else getEltFloat(devpro, n[i].name)->setValue(n[i].value, false);
+                if (i == n.count() - 1)
+                {
+                    getEltFloat(devpro, n[i].name)->setValue(n[i].value, false);
+                    getEltFloat(devpro, n[i].name)->setMin(n[i].min, false);
+                    getEltFloat(devpro, n[i].name)->setMax(n[i].max, false);
+                    getEltFloat(devpro, n[i].name)->setStep(n[i].step, false);
+                    getEltFloat(devpro, n[i].name)->setFormat(n[i].format, true); // only one event sent for all ...
+                }
+
+                else
+                {
+                    getEltFloat(devpro, n[i].name)->setValue(n[i].value, false);
+                    getEltFloat(devpro, n[i].name)->setMin(n[i].min, false);
+                    getEltFloat(devpro, n[i].name)->setMax(n[i].max, false);
+                    getEltFloat(devpro, n[i].name)->setStep(n[i].step, false);
+                    getEltFloat(devpro, n[i].name)->setFormat(n[i].format, false);
+                }
+
             }
             break;
         }

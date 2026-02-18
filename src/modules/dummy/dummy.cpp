@@ -102,7 +102,7 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
 
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &Dummy::onTimer);
-    timer->start(2000);
+    timer->start(5000);
 
 }
 
@@ -116,10 +116,35 @@ void Dummy::onTimer()
     //logError("Error");
     //logCritical("Critical");
     //getEltInt("totoRW", "toto")->setValue(12);
+
     //getEltInt("numbersRW", "n1")->setValue(12);
-    //getEltInt("numbersRW", "n1")->setValue(200);
-    getProperty("timesRWgrid")->push();
-    getProperty("timesRWgrid")->deleteLine(0);
+    ////getEltInt("numbersRW", "n1")->setValue(200);
+    //getProperty("timesRWgrid")->push();
+    //getProperty("timesRWgrid")->deleteLine(0);
+
+    //getProperty("dynprop")->enable();
+
+    //dynprop = new OST::PropertyMulti("dynprop2", "Dynamic", OST::Permission::ReadWrite, "Examples",
+    //                                 "Dynamically instanciated", "", true, false);
+    //dynlight = new OST::ElementLight("dynlight", "Dyn light", "", "");
+    //dynlight->setValue(OST::State::Busy, true);
+    //dynprop->addElt( dynlight);
+    //dyntext = new OST::ElementString("dyntext", "Dyn text", "", "");
+    //dynprop->addElt(dyntext);
+    //createProperty("dynprop2", dynprop);
+    //dynprop->setState(OST::State::Busy);
+    //dyntext->setValue("Okydoky", false);
+    //dynlight->setValue(OST::State::Ok, true);
+
+    //dynbool = new OST::ElementBool("dynbool", "Dyn bool", "", "");
+    //dynprop->addElt(dynbool);
+    //dynbool->setValue(false, true);
+
+    //deleteOstProperty("dynprop2");
+
+
+
+
 }
 
 Dummy::~Dummy()
@@ -203,7 +228,7 @@ void Dummy::OnMyExternalEvent(OST::Event e)
                         double d = getPixelSize(_camera);
                         if (_camera == "CCD Simulator")
                         {
-                            sendModNewNumber(_camera, "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );
+                            sendModNewNumber(_camera, "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.02 );
                         }
                         setFocalLengthAndDiameter();
                         if (!requestCapture(_camera, getFloat("parms", "exposure"), getInt("parms", "gain"), getInt("parms", "offset")))

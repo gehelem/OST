@@ -5,6 +5,7 @@
 #include <basedevice.h>
 
 
+
 /*!
  * This Class shouldn't be used as is
  * Every functionnal module should inherit it

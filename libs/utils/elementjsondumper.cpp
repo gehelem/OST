@@ -6,7 +6,7 @@ namespace  OST
 QJsonObject ElementJsonDumper::dumpElementCommons(ElementBase *pElement)
 {
     QJsonObject json;
-    if (mType == "sv" || mType == "sa") return json;
+    if (mType == "sv" || mType == "sa" || mType == "se") return json;
 
     json["label"] = pElement->label();
     json["order"] = pElement->order();
@@ -53,6 +53,9 @@ void ElementJsonDumper::visit(ElementInt *pElement, QVariantMap &data, bool &emi
     json["step"] = qlonglong(pElement->step());
     json["format"] = pElement->format();
     json["slider"] = pElement->slider();
+    mResult = json;
+    if (mType == "se") return;
+
     if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
     if (pElement->getPostIcon() != "") json["posticon"] = pElement->getPostIcon();
     if (pElement->getGlobalLov() != "")
@@ -90,6 +93,9 @@ void ElementJsonDumper::visit(ElementFloat *pElement, QVariantMap &data, bool &e
     json["step"] = pElement->step();
     json["format"] = pElement->format();
     json["slider"] = pElement->slider();
+    mResult = json;
+    if (mType == "se") return;
+
     if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
     if (pElement->getPostIcon() != "") json["posticon"] = pElement->getPostIcon();
     if (pElement->getGlobalLov() != "")

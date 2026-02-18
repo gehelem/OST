@@ -29,8 +29,6 @@ class WShandler : public QObject
                   const QString &grant = "0");
         ~WShandler();
     public :
-        void processModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                                const QVariantMap &eventData);
         void processFileEvent(const QString &eventType, const QStringList &eventData);
         DBManager   *dbmanager;
 
@@ -58,6 +56,7 @@ class WShandler : public QObject
         void onLog(OST::LogLevel level, const QString &message,
                    const QVariantList &args, const QString &context);
         void onModuleEvent(Basemodule* module, OST::Event event);
+        void sendJsonMessage(QJsonObject json);
 
     signals:
         void closed();
@@ -68,7 +67,6 @@ class WShandler : public QObject
         void processTextMessage(QString message);
         void processBinaryMessage(QByteArray message);
         void sendmessage(QString message);
-        void sendJsonMessage(QJsonObject json);
         void sendbinary(QByteArray *data);
         void socketDisconnected();
         QWebSocketServer *m_pWebSocketServer;
@@ -81,7 +79,5 @@ class WShandler : public QObject
         QMap<QWebSocket*, QString> mClientLanguages;  // Client → language
 
         QString logLevelToEventType(OST::LogLevel level);
-
-
 };
 #endif

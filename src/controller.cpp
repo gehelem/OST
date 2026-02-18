@@ -28,7 +28,7 @@
 Controller::Controller(const QString &webroot, const QString &dbpath,
                        const QString &libpath, const QString &conf, const QString &indiserver,
                        const QString &ssl, const QString &sslCert, const QString &sslKey, const QString &lng, const QString &grant,
-                       OST::Logger *logger, OST::TranslateManager *translate)
+                       OST::Logger *logger, OST::TranslateManager *translate, const QString &banner)
     :       _webroot(webroot),
             _dbpath(dbpath),
             _libpath(libpath),
@@ -37,7 +37,8 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
             _lng(lng),
             _grant(grant),
             mLogger(logger),
-            mTranslater(translate)
+            mTranslater(translate),
+            mBanner(banner)
 {
 
     startPublish();
@@ -297,12 +298,12 @@ void Controller::OnExternalEvent(OST::Event event)
     {
         pMainControl->sendMainMessage("Mainctl event : " + event.type + " : " + event.module + " : " +  " : " +
                                       strJson);
-
     }
     if (event.type == "Freadall")
     {
-        wshandler->processFileEvent("foldersdump", mFoldersList);
-        wshandler->processFileEvent("filesdump", mFilesList);
+        //wshandler->processFileEvent("foldersdump", mFoldersList);
+        //wshandler->processFileEvent("filesdump", mFilesList);
+        wshandler->sendJsonMessage(getModulesDump());
     }
     if (event.type == "Ffolderselect")
     {
@@ -643,4 +644,45 @@ void Controller::logInfo(const QString &message, const QVariantList &args)
 
     // Broadcast to WebSocket clients (each in their language)
     wshandler->onLog(OST::LogLevel::Info, message, args, "CT");
+}
+QJsonObject Controller::getModulesDump(void)
+{
+    QJsonObject result, dump, files, modules;
+    files["folders"] = QJsonArray::fromStringList(mFoldersList);
+    files["files"] = QJsonArray::fromStringList(mFilesList);
+    files["selectedfolder"] = mSelectedFolder;
+
+
+    QList<Basemodule *> allmodules = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
+    for (Basemodule *module : allmodules)
+    {
+        OST::Event e;
+        e.type = "moduledump";
+        e.module = module->getModuleName();
+        QVariantMap d2;
+        QVariantMap state;
+        QVariantMap infos;
+        infos["name"] = module->getModuleName();
+        infos["label"] = module->getModuleLabel();
+        infos["description"] = module->getModuleDescription();
+        //dump["properties"] = getProperties();
+        d2["p"] = module->getPropertiesDump(e);;
+        d2["globallovs"] = module->getGlobalLovsDump();;
+        d2["state"] = state;
+        d2["infos"] = infos;
+        d2["help"] = module->getHelpContent("fr");
+        d2["metadata"] = module->getAllMetadata();
+
+        modules[module->getModuleName()] = QJsonObject::fromVariantMap(d2);
+
+    }
+
+    dump["m"] = modules;
+    dump["files"] = files;
+    dump["logs"] = mLogger->getJsonHistory();
+    dump["banner"] = mBanner;
+    dump["serverlng"] = _lng;
+
+    result["d"] = dump;
+    return result;
 }

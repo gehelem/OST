@@ -71,15 +71,15 @@ ElementBase *ElementFactory::createElement(const QString &key, const QVariantMap
                                             pData["hint"].toString()
                                            );
             if (pData.contains("value")) pElement->setValue(pData["value"].toLongLong(), false);
-            if (pData.contains("min")) pElement->setMin(pData["min"].toLongLong());
-            if (pData.contains("max")) pElement->setMax(pData["max"].toLongLong());
-            if (pData.contains("step")) pElement->setStep(pData["step"].toLongLong());
-            if (pData.contains("format")) pElement->setFormat(pData["format"].toString());
+            if (pData.contains("min")) pElement->setMin(pData["min"].toLongLong(), false);
+            if (pData.contains("max")) pElement->setMax(pData["max"].toLongLong(), false);
+            if (pData.contains("step")) pElement->setStep(pData["step"].toLongLong(), false);
+            if (pData.contains("format")) pElement->setFormat(pData["format"].toString(), false);
             if (pData.contains("autoupdate")) pElement->setAutoUpdate(pData["autoupdate"].toBool());
             if (pData.contains("directedit")) pElement->setDirectEdit(pData["directedit"].toBool());
             if (pData.contains("preicon")) pElement->setPreIcon(pData["preicon"].toString());
             if (pData.contains("posticon")) pElement->setPostIcon(pData["posticon"].toString());
-            if (pData.contains("slider")) pElement->setSlider(IntToSlider(pData["slider"].toInt()));
+            if (pData.contains("slider")) pElement->setSlider(IntToSlider(pData["slider"].toInt()), false);
             if (pData.contains("listOfValues"))
             {
                 if (pData["listOfValues"].canConvert<QVariantList>())
@@ -107,15 +107,15 @@ ElementBase *ElementFactory::createElement(const QString &key, const QVariantMap
                                               pData["hint"].toString()
                                              );
             if (pData.contains("value")) pElement->setValue(pData["value"].toDouble(), false);
-            if (pData.contains("min")) pElement->setMin(pData["min"].toDouble());
-            if (pData.contains("max")) pElement->setMax(pData["max"].toDouble());
-            if (pData.contains("step")) pElement->setStep(pData["step"].toDouble());
-            if (pData.contains("format")) pElement->setFormat(pData["format"].toString());
+            if (pData.contains("min")) pElement->setMin(pData["min"].toDouble(), false);
+            if (pData.contains("max")) pElement->setMax(pData["max"].toDouble(), false);
+            if (pData.contains("step")) pElement->setStep(pData["step"].toDouble(), false);
+            if (pData.contains("format")) pElement->setFormat(pData["format"].toString(), false);
             if (pData.contains("autoupdate")) pElement->setAutoUpdate(pData["autoupdate"].toBool());
             if (pData.contains("directedit")) pElement->setDirectEdit(pData["directedit"].toBool());
             if (pData.contains("preicon")) pElement->setPreIcon(pData["preicon"].toString());
             if (pData.contains("posticon")) pElement->setPostIcon(pData["posticon"].toString());
-            if (pData.contains("slider")) pElement->setSlider(IntToSlider(pData["slider"].toInt()));
+            if (pData.contains("slider")) pElement->setSlider(IntToSlider(pData["slider"].toInt()), false);
             if (pData.contains("listOfValues"))
             {
                 if (pData["listOfValues"].canConvert<QVariantList>())

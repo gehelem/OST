@@ -25,7 +25,7 @@ class Controller : public QObject
         Controller(const QString &webroot, const QString &dbpath,
                    const QString &libpath, const QString &conf, const QString &indiserver,
                    const QString &ssl, const QString &sslCert, const QString &sslKey, const QString &lng, const QString &grant,
-                   OST::Logger *logger, OST::TranslateManager *translate);
+                   OST::Logger *logger, OST::TranslateManager *translate, const QString &banner);
         ~Controller() override;
     signals:
         void controllerEvent(OST::Event);
@@ -52,6 +52,7 @@ class Controller : public QObject
         QStringList mFilesList;
         QStringList mFoldersList;
         QString mSelectedFolder;
+        QString mBanner;
 
         bool loadModule(QString lib, QString name, QString label, QString profile);
         void loadConf(const QString &pConf);
@@ -71,6 +72,13 @@ class Controller : public QObject
         void updateGlobalModulesLov(void);
         void logInfo(const QString &message);
         void logInfo(const QString &message, const QVariantList &args);
+
+        QJsonObject getModulesDump(void);
+        QString getBanner(void)
+        {
+            return mBanner;
+        }
+
 
     private slots:
         void onModuleEvent(Basemodule* module, OST::Event event);

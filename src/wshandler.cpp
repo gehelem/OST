@@ -258,200 +258,26 @@ void WShandler::socketDisconnected()
 void WShandler::onModuleEvent(Basemodule *module, OST::Event event)
 {
     QJsonObject  obj;
-    obj["evt"] = event.type;
     QJsonObject mods;
     QJsonObject  mod;
     mod["p"] = module->getPropertiesDump(event);
-    if (event.type == "moduledump")
-    {
-        QJsonObject  infos;
-        infos["label"] = module->getModuleLabel();
-        mod["infos"] = QJsonObject::fromVariantMap(module->getAllMetadata());
-        mod["globallovs"] = module->getGlobalLovsDump();
+    //if (event.type == "moduledump")
+    //{
+    //    QJsonObject  infos;
+    //    infos["label"] = module->getModuleLabel();
+    //    mod["infos"] = QJsonObject::fromVariantMap(module->getAllMetadata());
+    //    mod["globallovs"] = module->getGlobalLovsDump();
 
-    }
+    //}
     mods[event.module] = mod;
-    obj["m"] = mods;
+    //obj["m"] = mods;
+
+    obj[event.type] = mods;
     sendJsonMessage(obj);
 
 
 }
 
-void WShandler::processModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                                   const QVariantMap &eventData)
-{
-    QJsonObject  obj;
-    obj["evt"] = eventType;
-
-    if (eventType == "moduledump")
-    {
-        QJsonObject mods;
-        QJsonObject  mod;
-        mods[eventModule] = QJsonObject::fromVariantMap(eventData);
-        obj["m"] = mods;
-        sendJsonMessage(obj);
-    }
-    if (eventType == "cp" || eventType == "ce" || eventType == "ap" || eventType == "ae")
-    {
-        QJsonObject mods;
-        QJsonObject  mod;
-        QJsonObject  prop;
-        prop[eventKey] = QJsonObject::fromVariantMap(eventData);
-        mod["properties"] = prop;
-        mods[eventModule] = mod;
-        obj["m"] = mods;
-        sendJsonMessage(obj);
-    }
-    if (eventType == "lc")
-    {
-        QJsonObject mods;
-        QJsonObject  mod;
-        QJsonObject  lov;
-        lov[eventKey] = QJsonObject::fromVariantMap(eventData);
-        mod["globallovs"] = lov;
-        mods[eventModule] = mod;
-        obj["m"] = mods;
-        sendJsonMessage(obj);
-    }
-    if (eventType == "delprop")
-    {
-        QJsonObject mods;
-        QJsonObject  mod;
-        QJsonObject  prop;
-        prop[eventKey] = QJsonObject();
-        mod["properties"] = prop;
-
-        mods[eventModule] = mod;
-        obj["m"] = mods;
-        sendJsonMessage(obj);
-    }
-    if (eventType == "pushvalues")
-    {
-        QVariantMap values;
-        QVariantMap prop;
-        QJsonObject props;
-        QJsonObject mod;
-        QJsonObject mods;
-        props[eventKey] = QJsonObject::fromVariantMap(eventData);
-        mod["properties"] = props;
-        mods[eventModule] = mod;
-        obj["m"] = mods;
-        sendJsonMessage(obj);
-    }
-    if (eventType == "resetvalues")
-    {
-        QVariantMap values;
-        QVariantMap prop;
-        QJsonObject props;
-        QJsonObject mod;
-        QJsonObject mods;
-        props[eventKey] = QJsonObject::fromVariantMap(prop);
-        mod["properties"] = props;
-        mods[eventModule] = mod;
-        obj["m"] = mods;
-        sendJsonMessage(obj);
-    }
-    if (eventType == "sp" || eventType == "se"  || eventType == "sv")
-    {
-        QVariantMap prop = eventData;
-        QVariantMap values;
-        if (prop.contains("value"))
-        {
-            values["value"] = prop["value"];
-        }
-        if (prop.contains("status"))
-        {
-            values["status"] = prop["status"];
-        }
-        if (prop.contains("enabled"))
-        {
-            values["enabled"] = prop["enabled"];
-        }
-        if (prop.contains("elements"))
-        {
-            QVariantMap elements;
-            foreach(const QString &key, prop["elements"].toMap().keys())
-            {
-                QVariantMap element;
-                element["value"] = prop["elements"].toMap()[key].toMap()["value"];
-                if (prop["elements"].toMap()[key].toMap().contains("min"))
-                {
-                    element["min"] = prop["elements"].toMap()[key].toMap()["min"];
-                }
-                if (prop["elements"].toMap()[key].toMap().contains("max"))
-                {
-                    element["max"] = prop["elements"].toMap()[key].toMap()["max"];
-                }
-                if (prop["elements"].toMap()[key].toMap().contains("step"))
-                {
-                    element["step"] = prop["elements"].toMap()[key].toMap()["step"];
-                }
-                if (prop["elements"].toMap()[key].toMap().contains("dynlabel"))
-                {
-                    element["dynlabel"] = prop["elements"].toMap()[key].toMap()["dynlabel"];
-                }
-                if (prop["elements"].toMap()[key].toMap().contains("type"))
-                {
-                    if (prop["elements"].toMap()[key].toMap()["type"] == "img")
-                    {
-                        element = prop["elements"].toMap()[key].toMap();
-                    }
-                    if (prop["elements"].toMap()[key].toMap()["type"] == "video")
-                    {
-                        element = prop["elements"].toMap()[key].toMap();
-                    }
-                    if (prop["elements"].toMap()[key].toMap()["type"] == "date")
-                    {
-                        element = prop["elements"].toMap()[key].toMap();
-                    }
-                    if (prop["elements"].toMap()[key].toMap()["type"] == "time")
-                    {
-                        element = prop["elements"].toMap()[key].toMap();
-                    }
-                }
-                elements[key] = element;
-            }
-            values["elements"] = elements;
-        }
-        QJsonObject props;
-        props[eventKey] = QJsonObject::fromVariantMap(values);
-        QJsonObject mods;
-        QJsonObject  mod;
-        mod["properties"] = props;
-        mods[eventModule] = mod;
-        obj["m"] = mods;
-        sendJsonMessage(obj);
-    }
-    if (eventType == "mm")
-    {
-        QJsonObject mod;
-        QJsonObject mods;
-        mod["message"] = QJsonObject::fromVariantMap(eventData);;
-        mods[eventModule] = mod;
-        obj["m"] = mods;
-        sendJsonMessage(obj);
-    }
-    if (eventType == "me")
-    {
-        QJsonObject mod;
-        QJsonObject mods;
-        mod["error"] = QJsonObject::fromVariantMap(eventData);;
-        mods[eventModule] = mod;
-        obj["m"] = mods;
-        sendJsonMessage(obj);
-    }
-    if (eventType == "mw")
-    {
-        QJsonObject mod;
-        QJsonObject mods;
-        mod["warning"] = QJsonObject::fromVariantMap(eventData);;
-        mods[eventModule] = mod;
-        obj["m"] = mods;
-        sendJsonMessage(obj);
-    }
-
-
-}
 void WShandler::sendMessage(const QString &pMessage)
 {
     QString messageWithDateTime = "[" + QDateTime::currentDateTime().toString(Qt::ISODateWithMs) + "]-" + pMessage;
@@ -509,7 +335,6 @@ void WShandler::onLog(OST::LogLevel level, const QString &message,
         return;
     }
 
-    QString eventType = logLevelToEventType(level);
     QDateTime dt = QDateTime::currentDateTime();
 
     // Broadcast to each client in their language
@@ -522,30 +347,14 @@ void WShandler::onLog(OST::LogLevel level, const QString &message,
         QString translatedMessage = mTranslater->translateWithArgs(message, args, clientLang);
 
         // Build JSON
+        QJsonObject log;
         QJsonObject obj;
-        obj["evt"] = eventType;
 
-        QJsonObject modules;
-        QJsonObject moduleData;
-
-        if (level == OST::LogLevel::Warning)
-        {
-            moduleData["warning"] = translatedMessage;
-        }
-        else if (level == OST::LogLevel::Error || level == OST::LogLevel::Critical)
-        {
-            moduleData["error"] = translatedMessage;
-        }
-        else
-        {
-            moduleData["message"] = translatedMessage;
-        }
-
-        moduleData["datetime"] = dt.toString(Qt::ISODateWithMs);
-
-        modules[context] = moduleData;
-        obj["m"] = modules;
-
+        log["d"] = dt.toString(Qt::ISODateWithMs);
+        log["c"] = context;
+        log["t"] = translatedMessage;
+        log["l"] = static_cast<int>(level);
+        obj["l"] = log;
         // Send to client
         client->sendTextMessage(QJsonDocument(obj).toJson(QJsonDocument::Compact));
     }

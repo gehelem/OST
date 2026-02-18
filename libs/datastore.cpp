@@ -4,6 +4,7 @@
 Datastore::Datastore()
 {
     //sendMessage("DataStore init");
+    qRegisterMetaType<OST::Event>("OST-Event");
 }
 Datastore::~Datastore()
 {
@@ -648,8 +649,11 @@ void Datastore::deleteOstProperty(const QString &pPropertyName)
         return;
     }
     mStore.remove(pPropertyName);
-    emit OnModuleEvent("delprop", QString(), pPropertyName, QVariantMap());
-
+    OST::Event event;
+    event.type = "dp";
+    event.module = this->getModuleName();
+    event.property = pPropertyName;
+    emit datastoreEvent(this, event);
 }
 
 
@@ -668,9 +672,13 @@ QJsonObject Datastore::getPropertiesDump(OST::Event evt)
     }
     else
     {
-        OST::PropertyJsonDumper d(evt);
-        mStore[evt.property ]->accept(&d);
-        properties[evt.property ] = d.getResult();
+        if (mStore.contains(evt.property))
+        {
+            OST::PropertyJsonDumper d(evt);
+            mStore[evt.property ]->accept(&d);
+            properties[evt.property] = d.getResult();
+        }
+        else properties[evt.property] = QJsonObject(); // for property deletion events
 
     }
     return properties;
