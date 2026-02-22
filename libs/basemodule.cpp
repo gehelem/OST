@@ -2,6 +2,7 @@
 #include <basedevice.h>
 #include "basemodule.h"
 #include "version.cc"
+#include "model/element/common.h"
 
 Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap params)
     : mAvailableModuleLibs(params),
@@ -10,6 +11,10 @@ Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap
 {
     Q_INIT_RESOURCE(basemodule);
     Q_UNUSED(profile)
+
+    // Register meta types for queued signal/slot connections across modules
+    qRegisterMetaType<OST::LogLevel>("OST::LogLevel");
+    qRegisterMetaType<OST::Event>("OST::Event");
 
     connect(this, &Datastore::datastoreEvent, this, &Basemodule::onDatastoreEvent);
 

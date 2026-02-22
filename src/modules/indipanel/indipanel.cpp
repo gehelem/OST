@@ -92,8 +92,8 @@ void IndiPanel::newProperty(INDI::Property pProperty)
             {
                 OST::ElementFloat* v = new OST::ElementFloat(n[i].getName(), n[i].label, QString(i), n[i].label);
                 v->setValue(n[i].getValue(), false);
-                v->setMin(n[i].min, false);
-                v->setMax(n[i].max, false);
+                //v->setMin(n[i].min, false); // commented as for example indi allows 0 with min=0.01 for CCD_EXPOSURE ... let's indi make controls
+                //v->setMax(n[i].max, false); // "  "   "   "
                 v->setStep(n[i].step, false);
                 v->setFormat(n[i].format, false);
                 p->addElt(v);
@@ -165,11 +165,12 @@ void IndiPanel::updateProperty (INDI::Property property)
 
             for (unsigned int i = 0; i < n.count(); i++)
             {
+                //qDebug() << "IndiPanel::updateProperty" << dev << pro << n[i].name << n[i].value;
                 if (i == n.count() - 1)
                 {
                     getEltFloat(devpro, n[i].name)->setValue(n[i].value, false);
-                    getEltFloat(devpro, n[i].name)->setMin(n[i].min, false);
-                    getEltFloat(devpro, n[i].name)->setMax(n[i].max, false);
+                    //getEltFloat(devpro, n[i].name)->setMin(n[i].min,false); // commented as for example indi allows 0 with min=0.01 for CCD_EXPOSURE ... let's indi make controls
+                    //getEltFloat(devpro, n[i].name)->setMax(n[i].max,false); // "  "   "
                     getEltFloat(devpro, n[i].name)->setStep(n[i].step, false);
                     getEltFloat(devpro, n[i].name)->setFormat(n[i].format, true); // only one event sent for all ...
                 }
@@ -210,8 +211,8 @@ void IndiPanel::updateProperty (INDI::Property property)
             for (unsigned int i = 0; i < t.count(); i++)
             {
                 getEltString(devpro, t[i].name)->setValue(t[i].text, i == t.count() - 1);
-                if (i == t.count() - 1) getEltString(devpro, t[i].name)->setValue(t[i].text, true);
-                else  getEltString(devpro, t[i].name)->setValue(t[i].text, false);
+                //if (i == t.count() - 1) getEltString(devpro, t[i].name)->setValue(t[i].text, true);
+                //else  getEltString(devpro, t[i].name)->setValue(t[i].text, false);
             }
             break;
         }
@@ -292,6 +293,7 @@ void IndiPanel::OnMyExternalEvent(OST::Event e)
                 if (getStore()[keyprop]->getElt(keyelt)->getType() == "int"
                         || getStore()[keyprop]->getElt(keyelt)->getType() == "float")
                 {
+                    //qDebug() << "indipanel - OnMyExternalEvent" << e.data[keyprop].toMap()["elements"].toMap()[keyelt];
                     sendModNewNumber(realDevice, prop, keyelt,
                                      e.data[keyprop].toMap()["elements"].toMap()[keyelt].toFloat());
                 }

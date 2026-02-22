@@ -1,5 +1,6 @@
 #include "logger.h"
 #include "translatemanager.h"
+#include "model/element/common.h"
 #include <QDebug>
 #include <qjsonarray.h>
 #include <qjsonobject.h>
@@ -15,6 +16,9 @@ Logger::Logger()
     , pLogFile(nullptr)
     , pLogStream(nullptr)
 {
+    // Register meta types for queued signal/slot connections
+    qRegisterMetaType<OST::LogLevel>("OST::LogLevel");
+    qRegisterMetaType<OST::Event>("OST::Event");
 }
 
 Logger::~Logger()

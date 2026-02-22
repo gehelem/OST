@@ -432,7 +432,7 @@ class PropertyBase: public QObject
          * Messages are propagated to module level and eventually to frontend.
          * Used by sendInfo(), sendWarning(), sendError() methods.
          */
-        void logMessage(LogLevel, QString, QVariantList);
+        void logMessage(OST::LogLevel, QString, QVariantList);
 
     private:
         // Immutable metadata (set in constructor)

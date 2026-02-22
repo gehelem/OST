@@ -8,7 +8,8 @@ PropertyBase::PropertyBase(const QString &key, const QString &label, const Permi
     : mKey(key), mLabel(label), mPermission(permission), mLevel1(level1), mLevel2(level2),
       mOrder(order), mHasProfile(hasProfile)
 {
-    qRegisterMetaType<OST::LogLevel>("LogLevel");
+    qRegisterMetaType<OST::Event>("OST::Event");
+    qRegisterMetaType<OST::LogLevel>("OST::LogLevel");
     if (order == "") emit logMessage(OST::LogLevel::Warning, "PropertyBase %1 %2 order ko (%3/%4)", {label, key, level1, level2});
 }
 PropertyBase::~PropertyBase()

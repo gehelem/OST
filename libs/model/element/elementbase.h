@@ -280,7 +280,7 @@ to-propagate changes to backend */
          *
          * Propagated to property and module levels.
          */
-        void logMessage(LogLevel, QString, QVariantList);
+        void logMessage(OST::LogLevel, QString, QVariantList);
 
         /**
          * @brief Signal emitted when LOV changes

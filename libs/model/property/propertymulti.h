@@ -479,7 +479,7 @@ class PropertyMulti: public PropertyBase
          *
          * Propagates messages from elements to property level.
          */
-        void OnMessage(LogLevel l, QString m, QVariantList args);
+        void OnMessage(OST::LogLevel l, QString m, QVariantList args);
 
     private:
         // Grid configuration

@@ -17,6 +17,8 @@
 
 #include <QtCore>
 
+
+
 namespace  OST
 {
 
@@ -518,7 +520,11 @@ inline QString incrementPlaceholders(const QString &msg)
 }
 
 
+
 }
+
+Q_DECLARE_METATYPE(OST::Event)
+Q_DECLARE_METATYPE(OST::LogLevel)
 
 
 #endif

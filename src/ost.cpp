@@ -1,6 +1,7 @@
 #include <QGuiApplication>
 #include "controller.h"
 #include "version.cc"
+#include "model/element/common.h"
 
 /*!
  * Entry point
@@ -11,6 +12,10 @@ int main(int argc, char *argv[])
 {
     // Initialize Qt embedded resources (must be done before using them)
     Q_INIT_RESOURCE(translations);
+
+    // Register custom types for queued signal/slot connections
+    qRegisterMetaType<OST::LogLevel>("OST::LogLevel");
+    qRegisterMetaType<OST::Event>("OST::Event");
 
     QGuiApplication app(argc, argv, false);
     QGuiApplication::setOrganizationName("alazob.team");

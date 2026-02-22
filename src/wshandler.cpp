@@ -5,6 +5,7 @@
 #include <QJsonDocument>
 #include "wshandler.h"
 #include "translatemanager.h"
+#include "model/element/common.h"
 
 /*!
 
@@ -13,6 +14,9 @@
 WShandler::WShandler(QObject *parent, const QString &ssl, const QString &sslCert, const QString &sslKey,
                      const QString &grant): mServerGrant(grant)
 {
+    // Register meta types for queued signal/slot connections
+    qRegisterMetaType<OST::LogLevel>("OST::LogLevel");
+    qRegisterMetaType<OST::Event>("OST::Event");
 
     //this->setParent(parent);
     Q_UNUSED(parent);

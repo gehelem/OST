@@ -542,7 +542,7 @@
             },
             "time2": {
                 "type":"time",
-                "directedit":false,
+                "directedit":true,
                 "autoupdate":true,
                 "order": "30",
                 "label": "To",

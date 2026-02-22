@@ -3,6 +3,7 @@
 #include <QDirIterator>
 #include <QFileSystemWatcher>
 #include <QHostInfo>
+#include "model/element/common.h"
 
 /*!
  * ... ...
@@ -40,6 +41,10 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
             mTranslater(translate),
             mBanner(banner)
 {
+    // Register meta types for queued signal/slot connections
+    // Must be done before any connect() calls that use these types
+    qRegisterMetaType<OST::LogLevel>("OST::LogLevel");
+    qRegisterMetaType<OST::Event>("OST::Event");
 
     startPublish();
 

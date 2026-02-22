@@ -4,7 +4,9 @@
 Datastore::Datastore()
 {
     //sendMessage("DataStore init");
-    qRegisterMetaType<OST::Event>("OST-Event");
+    qRegisterMetaType<OST::Event>("OST::Event");
+    qRegisterMetaType<OST::LogLevel>("OST::LogLevel");
+
 }
 Datastore::~Datastore()
 {
