@@ -109,6 +109,7 @@ void WShandler::sendmessage(QString message)
     {
         QWebSocket *pClient = m_clients[i];
         if (pClient) pClient->sendTextMessage(message);
+        //qDebug() << message;
     }
 
 }

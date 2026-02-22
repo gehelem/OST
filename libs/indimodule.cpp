@@ -58,15 +58,15 @@ void IndiModule::OnDispatchToIndiExternalEvent(OST::Event e)
                 getEltBool(keyprop, keyelt)->setValue(false, false);
                 if (keyelt == "conserv")
                 {
-                    getProperty(keyprop)->setState(OST::Busy);
-                    if (connectIndi()) getProperty(keyprop)->setState(OST::Ok);
-                    else getProperty(keyprop)->setState(OST::Error);
+                    getProperty(keyprop)->setState(OST::Busy, true);
+                    if (connectIndi()) getProperty(keyprop)->setState(OST::Ok, true);
+                    else getProperty(keyprop)->setState(OST::Error, true);
                 }
                 if (keyelt == "disconserv")
                 {
-                    getProperty(keyprop)->setState(OST::Busy);
-                    if (disconnectIndi()) getProperty(keyprop)->setState(OST::Ok);
-                    else getProperty(keyprop)->setState(OST::Error);
+                    getProperty(keyprop)->setState(OST::Busy, true);
+                    if (disconnectIndi()) getProperty(keyprop)->setState(OST::Ok, true);
+                    else getProperty(keyprop)->setState(OST::Error, true);
                 }
             }
             if (keyprop == "devicesactions")
@@ -75,26 +75,26 @@ void IndiModule::OnDispatchToIndiExternalEvent(OST::Event e)
                 if (!isServerConnected())
                 {
                     logWarning("%1 - Indi server not connected", {QString("OnDispatchToIndiExternalEvent")});
-                    getProperty(keyprop)->setState(OST::Error);
+                    getProperty(keyprop)->setState(OST::Error, true);
                     break;
                 }
                 if (keyelt == "condevs")
                 {
-                    getProperty(keyprop)->setState(OST::Busy);
-                    if (connectAllDevices()) getProperty(keyprop)->setState(OST::Ok);
-                    else getProperty(keyprop)->setState(OST::Error);
+                    getProperty(keyprop)->setState(OST::Busy, true);
+                    if (connectAllDevices()) getProperty(keyprop)->setState(OST::Ok, true);
+                    else getProperty(keyprop)->setState(OST::Error, true);
                 }
                 if (keyelt == "discondevs")
                 {
-                    getProperty(keyprop)->setState(OST::Busy);
-                    if (disconnectAllDevices()) getProperty(keyprop)->setState(OST::Ok);
-                    else getProperty(keyprop)->setState(OST::Error);
+                    getProperty(keyprop)->setState(OST::Busy, true);
+                    if (disconnectAllDevices()) getProperty(keyprop)->setState(OST::Ok, true);
+                    else getProperty(keyprop)->setState(OST::Error, true);
                 }
                 if (keyelt == "loadconfs")
                 {
-                    getProperty(keyprop)->setState(OST::Busy);
-                    if (loadDevicesConfs()) getProperty(keyprop)->setState(OST::Ok);
-                    else getProperty(keyprop)->setState(OST::Error);
+                    getProperty(keyprop)->setState(OST::Busy, true);
+                    if (loadDevicesConfs()) getProperty(keyprop)->setState(OST::Ok, true);
+                    else getProperty(keyprop)->setState(OST::Error, true);
                 }
             }
         }

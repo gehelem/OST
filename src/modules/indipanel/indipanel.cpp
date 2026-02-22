@@ -68,6 +68,7 @@ void IndiPanel::newProperty(INDI::Property pProperty)
             pProperty.getDeviceName(),
             pProperty.getGroupName(), "00", false, false);
     p->setFreeValue(dev); // we keep original device name to avoid unwanted level1 device translations
+    p->setState(OST::IntToState(pProperty.getState()), false);
 
     switch (pProperty.getType())
     {
@@ -145,7 +146,6 @@ void IndiPanel::newProperty(INDI::Property pProperty)
             break;
         }
     }
-    p->setState(OST::IntToState(pProperty.getState()));
     createProperty(devpro, p);
 
 
@@ -234,7 +234,8 @@ void IndiPanel::updateProperty (INDI::Property property)
             break;
         }
     }
-    p->setState(OST::IntToState(property.getState()));
+    /* update state only if needed */
+    if (p->state() != OST::IntToState(property.getState())) p->setState(OST::IntToState(property.getState()), true);
 }
 
 
@@ -278,7 +279,7 @@ void IndiPanel::OnMyExternalEvent(OST::Event e)
         {
             foreach(const QString &keyelt, e.data[keyprop].toMap()["elements"].toMap().keys())
             {
-                if (!m[keyprop].toMap()["elements"].toMap().contains(keyelt))
+                if (!m[keyprop].toMap()["e"].toMap().contains(keyelt))
                 {
                     logError ("OnMyExternalEvent - property %1 element %2 does not exist (indipanel)", {keyprop, keyelt});
                     return;

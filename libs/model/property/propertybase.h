@@ -220,7 +220,7 @@ class PropertyBase: public QObject
          * property->setState(OST::Ok);    // Success
          * @endcode
          */
-        void setState(State state);
+        void setState(State state, bool emitEvent);
 
         /**
          * @brief Check if property is enabled

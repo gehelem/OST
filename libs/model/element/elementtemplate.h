@@ -455,7 +455,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
  *       since there is no validation for non-numeric types.
  *
  * @see ElementString
- * @see ElementBool
+ * @see "e"l
  * @see ElementDate
  * @see ElementTime
  * @see ElementTemplate

@@ -78,17 +78,22 @@ QJsonObject PropertyJsonDumper::dumpPropertyCommons(PropertyBase *pProperty)
  */
 void PropertyJsonDumper::visit(PropertyMulti *pProperty)
 {
-    if (mEvent.type == "sv")
+    if (mEvent.type == "ps") // only property state
+    {
+        mResult = dumpPropertyState(pProperty);
+        return;
+    }
+    if (mEvent.type == "sv") // set only one element value
     {
         mResult = dumpSetValue(pProperty);
         return;
     }
-    if (mEvent.type == "sa")
+    if (mEvent.type == "sa") // set all elements values
     {
         mResult = dumpSetAll(pProperty);
         return;
     }
-    if (mEvent.type == "se")
+    if (mEvent.type == "se") // set only one element value with min & max & step & format
     {
         mResult = dumpSetValueWithMinMax(pProperty);
         return;
@@ -109,6 +114,13 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
         return;
     }
     mResult = dumpDefault(pProperty);
+}
+QJsonObject PropertyJsonDumper::dumpPropertyState(PropertyMulti* pProperty)
+{
+    QJsonObject json;
+    json["status"] = pProperty->state();
+    json["enabled"] = pProperty->isEnabled();
+    return json;
 }
 QJsonObject PropertyJsonDumper::dumpDefault(PropertyMulti* pProperty)
 {

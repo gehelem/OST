@@ -53,7 +53,7 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     getEltString("extextRW", "extext4")->lovDel("i4444");
 
     OST::PropertyMulti *n = getProperty("numbersRW");
-    n->setState(OST::State::Error);
+    n->setState(OST::State::Error, true);
     OST::ElementFloat *numbersRWn3 = getEltFloat("numbersRW", "n3");
     numbersRWn3->setValue(999666, true);
 
@@ -62,7 +62,7 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     //getText("extextRW", "extext1")->accept(&d);
     //qDebug() << d.getResult();
     OST::PropertyMulti *p = getProperty("extextRW");
-    p->setState(OST::State::Busy);
+    p->setState(OST::State::Busy, true);
     static_cast<OST::ElementString*>(p->getElt("extext1"))->setValue("Value modified2", false);
     static_cast<OST::ElementString*>(p->getElt("extext4"))->lovUpdate("i3", "another label");
 
@@ -74,7 +74,7 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     dyntext = new OST::ElementString("dyntext", "Dyn text", "", "");
     dynprop->addElt(dyntext);
     createProperty("dynprop", dynprop);
-    dynprop->setState(OST::State::Busy);
+    dynprop->setState(OST::State::Busy, true);
     dyntext->setValue("Okydoky", false);
     dynlight->setValue(OST::State::Ok, true);
 
@@ -199,7 +199,7 @@ void Dummy::OnMyExternalEvent(OST::Event e)
                     if (getEltString(keyprop, keyelt)->setValue(
                                 e.data[keyprop].toMap()["elements"].toMap()[keyelt].toString(), false))
                     {
-                        getProperty(keyprop)->setState(OST::Ok);
+                        getProperty(keyprop)->setState(OST::Ok, true);
                         _camera = getString("devices", "camera");
                     }
                 }
@@ -211,7 +211,7 @@ void Dummy::OnMyExternalEvent(OST::Event e)
                     if (getEltBool(keyprop, keyelt)->setValue(false, false))
                     {
                         connectIndi();
-                        getProperty(keyprop)->setState(OST::Ok);
+                        getProperty(keyprop)->setState(OST::Ok, true);
                         _camera = getString("devices", "camera");
                         connectDevice(_camera);
                         setBLOBMode(B_ALSO, _camera.toStdString().c_str(), nullptr);
@@ -223,7 +223,7 @@ void Dummy::OnMyExternalEvent(OST::Event e)
 
                     if (getEltBool(keyprop, keyelt)->setValue(false, false))
                     {
-                        getProperty(keyprop)->setState(OST::Busy);
+                        getProperty(keyprop)->setState(OST::Busy, true);
                         _camera = getString("devices", "camera");
                         double d = getPixelSize(_camera);
                         if (_camera == "CCD Simulator")
@@ -233,7 +233,7 @@ void Dummy::OnMyExternalEvent(OST::Event e)
                         setFocalLengthAndDiameter();
                         if (!requestCapture(_camera, getFloat("parms", "exposure"), getInt("parms", "gain"), getInt("parms", "offset")))
                         {
-                            getProperty(keyprop)->setState(OST::Error);
+                            getProperty(keyprop)->setState(OST::Error, true);
                         }
                     }
                 }
@@ -241,7 +241,7 @@ void Dummy::OnMyExternalEvent(OST::Event e)
                 {
                     if (getEltBool(keyprop, keyelt)->setValue(false, false))
                     {
-                        getProperty(keyprop)->setState(OST::Busy);
+                        getProperty(keyprop)->setState(OST::Busy, true);
                         stats = _image->getStats();
                         _solver.ResetSolver(stats, _image->getImageBuffer());
                         connect(&_solver, &Solver::successSEP, this, &Dummy::OnSucessSEP);
@@ -253,14 +253,14 @@ void Dummy::OnMyExternalEvent(OST::Event e)
                 {
                     if (getEltBool(keyprop, keyelt)->setValue(false, false))
                     {
-                        getProperty(keyprop)->setState(OST::Busy);
+                        getProperty(keyprop)->setState(OST::Busy, true);
                         double ra, dec;
                         if (
                             !getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "DEC", dec)
                             || !getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "RA", ra)
                         )
                         {
-                            getProperty(keyprop)->setState(OST::Error);
+                            getProperty(keyprop)->setState(OST::Error, true);
                             logWarning("Can't find mount device %1 solve aborted", {getString("devices", "mount")});
                         }
                         else
@@ -346,7 +346,7 @@ void Dummy::newBLOB(INDI::PropertyBlob pblob)
         _image = new fileio();
         _image->loadBlob(pblob, 0);
 
-        getProperty("actions2")->setState(OST::Ok);
+        getProperty("actions2")->setState(OST::Ok, true);
         QList<fileio::Record> rec = _image->getRecords();
         stats = _image->getStats();
         _image->saveAsFITS(getWebroot() + "/" + getModuleName() + QString(pblob.getDeviceName()) + ".FITS", stats,
@@ -366,7 +366,7 @@ void Dummy::newBLOB(INDI::PropertyBlob pblob)
 
         emit newImage();
     }
-    getProperty("actions2")->setState(OST::Ok);
+    getProperty("actions2")->setState(OST::Ok, true);
     getProperty("testimage")->push();
 
 
@@ -386,7 +386,7 @@ void Dummy::updateProperty(INDI::Property property)
 
 void Dummy::OnSucessSEP()
 {
-    getProperty("actions2")->setState(OST::Ok);
+    getProperty("actions2")->setState(OST::Ok, true);
     OST::ImgData dta = getEltImg("testimage", "image1")->value();
     dta.HFRavg = _solver.HFRavg;
     dta.starsCount = _solver.stars.size();
@@ -433,7 +433,7 @@ void Dummy::OnSucessSolve()
     if (_solver.stellarSolver.failed())
     {
         logWarning("Solver failed");
-        getProperty("actions2")->setState(OST::Error);
+        getProperty("actions2")->setState(OST::Error, true);
         OST::ImgData dta = getEltImg("testimage", "image1")->value();
         dta.isSolved = false;
         dta.solverRA = 0;
@@ -442,7 +442,7 @@ void Dummy::OnSucessSolve()
     }
     else
     {
-        getProperty("actions2")->setState(OST::Ok);
+        getProperty("actions2")->setState(OST::Ok, true);
         OST::ImgData dta = getEltImg("testimage", "image1")->value();
         dta.isSolved = true;
         dta.solverRA = _solver.stellarSolver.getSolution().ra;

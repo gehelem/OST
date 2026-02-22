@@ -57,7 +57,7 @@ void Maincontrol::OnMyExternalEvent(OST::Event e)
                                  eltwithoutblanks,
                                  elt,
                                  prof);
-            getProperty("load")->setState(OST::Ok);
+            getProperty("load")->setState(OST::Ok, true);
         }
         if ((e.type == "Fposticon") && (e.data.contains("saveconf")))
         {

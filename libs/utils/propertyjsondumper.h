@@ -173,6 +173,7 @@ class PropertyJsonDumper : public PropertyVisitor
          * - freeValue
          */
         QJsonObject dumpPropertyCommons(PropertyBase *pProperty);
+        QJsonObject dumpPropertyState(PropertyMulti* pProperty);
         QJsonObject dumpDefault(PropertyMulti* pProperty);
         QJsonObject dumpSetValue(PropertyMulti* pProperty);
         QJsonObject dumpSetValueWithMinMax(PropertyMulti* pProperty);

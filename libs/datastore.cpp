@@ -498,7 +498,7 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
                 connect(rp, &OST::PropertyMulti::eltChanged, this, &Datastore::onEltChanged);
                 connect(rp, &OST::PropertyMulti::propertyEvent, this, &Datastore::onPropertyEvent);
                 connect(rp, &OST::PropertyMulti::logMessage, this, &Datastore::onPropertyLog);
-                mStore[key]->setState(OST::State::Idle);
+                mStore[key]->setState(OST::State::Idle, true);
 
             }
             else

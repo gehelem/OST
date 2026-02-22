@@ -288,9 +288,11 @@ void ElementJsonDumper::visit(ElementDate *pElement, QVariantMap &data, bool &em
     Q_UNUSED(data);
     Q_UNUSED(emitEvent);
     QJsonObject json = dumpElementCommons(pElement);
-    json["year"] = pElement->value().year();
-    json["month"] = pElement->value().month();
-    json["day"] = pElement->value().day();
+    QJsonObject v;
+    v["year"] = pElement->value().year();
+    v["month"] = pElement->value().month();
+    v["day"] = pElement->value().day();
+    json["value"] = v;
     mResult = json;
     if (mType == "sv" || mType == "sa") return;
 
@@ -302,15 +304,17 @@ void ElementJsonDumper::visit(ElementTime *pElement, QVariantMap &data, bool &em
     Q_UNUSED(data);
     Q_UNUSED(emitEvent);
     QJsonObject json = dumpElementCommons(pElement);
-    json["hh"] = pElement->value().hour();
-    json["mm"] = pElement->value().minute();
-    json["ss"] = pElement->value().second();
+    QJsonObject v;
+    v["hh"] = pElement->value().hour();
+    v["mm"] = pElement->value().minute();
+    v["ss"] = pElement->value().second();
+    if (pElement->getUseMs()) v["ms"] = pElement->value().msec();
+    json["value"] = v;
     mResult = json;
     if (mType == "sv" || mType == "sa") return;
 
     json["type"] = "time";
     json["usems"] = pElement->getUseMs();
-    if (pElement->getUseMs()) json["ms"] = pElement->value().msec();
     mResult = json;
 
 }

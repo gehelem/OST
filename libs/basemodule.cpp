@@ -303,7 +303,7 @@ void Basemodule::OnExternalEvent(OST::Event e)
                         if (getEltBase(keyprop, keyelt)->getType() == "bool")
                         {
                             //a boolean need to be updated on property level because of SwitchRule's flag behaviour
-                            getProperty(keyprop)->setElt(keyelt, v);
+                            getProperty(keyprop)->setElt(keyelt, v, true);
 
                         }
                         if (getEltBase(keyprop, keyelt)->getType() == "date")
@@ -342,18 +342,18 @@ void Basemodule::OnExternalEvent(OST::Event e)
 
     if ((e.type == "Fposticon") && (e.data.contains("saveprofile")) && e.module == getModuleName())
     {
-        getProperty("saveprofile")->setState(OST::Busy);
+        getProperty("saveprofile")->setState(OST::Busy, true);
         QVariantMap prof = getProfile();
         if (setDbProfile(getClassName(), getString("saveprofile", "name"), prof))
         {
-            getProperty("saveprofile")->setState(OST::Ok);
+            getProperty("saveprofile")->setState(OST::Ok, true);
             logInfo("%1 profile sucessfully saved", {getString("saveprofile", "name")});
             emit moduleEvent(this, {"modulesavedprofile", this->getModuleName(), "", "", 0, QVariantMap()});
 
         }
         else
         {
-            getProperty("saveprofile")->setState(OST::Error);
+            getProperty("saveprofile")->setState(OST::Error, true);
             logWarning("Can't save %1 profile", {getString("saveprofile", "name")});
         }
         return;
@@ -361,12 +361,12 @@ void Basemodule::OnExternalEvent(OST::Event e)
 
     if ((e.type == "Fposticon") && (e.data.contains("loadprofile")) && e.module == getModuleName())
     {
-        getProperty("loadprofile")->setState(OST::Busy);
+        getProperty("loadprofile")->setState(OST::Busy, true);
         QVariantMap prof;
         if (getDbProfile(getClassName(), getString("loadprofile", "name"), prof))
         {
             setProfile(prof);
-            getProperty("loadprofile")->setState(OST::Ok);
+            getProperty("loadprofile")->setState(OST::Ok, true);
             logInfo("%1 profile sucessfully loaded", {getString("loadprofile", "name")});
             emit moduleEvent(this, {"moduleloadedprofile", this->getModuleName(), "", "", 0, QVariantMap()});
 
@@ -376,7 +376,7 @@ void Basemodule::OnExternalEvent(OST::Event e)
         else
         {
             logWarning("Can't load %1 profile", {getString("loadprofile", "name")});
-            getProperty("loadprofile")->setState(OST::Error);
+            getProperty("loadprofile")->setState(OST::Error, true);
         }
         return;
 
@@ -384,9 +384,9 @@ void Basemodule::OnExternalEvent(OST::Event e)
 
     if ((e.type == "Fpreicon") && (e.data.contains("loadprofile")) && e.module == getModuleName())
     {
-        getProperty("loadprofile")->setState(OST::Busy);
+        getProperty("loadprofile")->setState(OST::Busy, true);
         setProfiles();
-        getProperty("loadprofile")->setState(OST::Ok);
+        getProperty("loadprofile")->setState(OST::Ok, true);
         return;
     }
 

@@ -133,9 +133,7 @@ class Datastore : public QObject
             e.type = "ap";
             e.property = pPropertyName;
             e.module = getModuleName();
-            OST::PropertyJsonDumper d(e);
-            mStore[pPropertyName]->accept(&d);
-            OnModuleEvent("cp", QString(), pPropertyName, d.getResult().toVariantMap());
+            onPropertyEvent(pProperty, e); // force property creation event
             connect(mStore[pPropertyName], &OST::PropertyMulti::valueSet, this, &Datastore::onValueSet);
             connect(mStore[pPropertyName], &OST::PropertyMulti::eltChanged, this, &Datastore::onEltChanged);
             connect(mStore[pPropertyName], &OST::PropertyMulti::propertyEvent, this, &Datastore::onPropertyEvent);

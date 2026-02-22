@@ -47,10 +47,10 @@ State PropertyBase::state()
 {
     return mState;
 }
-void PropertyBase::setState(State state)
+void PropertyBase::setState(State state, bool emitEvent)
 {
     mState = state;
-    emit propertyEvent(this, {"ap", "", key(), "", 0, QVariantMap()});
+    if (emitEvent) emit propertyEvent(this, {"ps", "", key(), "", 0, QVariantMap()});
 }
 bool PropertyBase::isEnabled()
 {
