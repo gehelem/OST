@@ -26,7 +26,7 @@ class WShandler : public QObject
         Q_OBJECT
     public:
         WShandler(QObject *parent, const QString &ssl = "N", const QString &sslCert = "", const QString &sslKey = "",
-                  const QString &grant = "0");
+                  const QString &grant = "0", const QString &lng = "en");
         ~WShandler();
     public :
         void processFileEvent(const QString &eventType, const QStringList &eventData);
@@ -57,26 +57,31 @@ class WShandler : public QObject
                    const QVariantList &args, const QString &context);
         void onModuleEvent(Basemodule* module, OST::Event event);
         void sendJsonMessage(QJsonObject json);
+        void sendJsonMessage(QJsonObject json, QWebSocket* client);
 
     signals:
         void closed();
         void externalEvent(OST::Event);
+        void clientEvent(OST::Event, QWebSocket*);
 
     private:
         void onNewConnection();
         void processTextMessage(QString message);
         void processBinaryMessage(QByteArray message);
         void sendmessage(QString message);
+        void sendmessage(QString message, QWebSocket* client);
         void sendbinary(QByteArray *data);
         void socketDisconnected();
         QWebSocketServer *m_pWebSocketServer;
         QList<QWebSocket *> m_clients;
         QMap<QString, QString> mClientGrants;
+        QMap<QWebSocket*, QString> mClientLanguage;  // Client → language
         QString mServerGrant = "0";
+        QString mLng = "en";
         void sendMessage(const QString &pMessage);
+        QJsonObject translateJson(const QJsonObject pJsonObject, const QString &pLng);
 
         OST::TranslateManager* mTranslater = nullptr;
-        QMap<QWebSocket*, QString> mClientLanguages;  // Client → language
 
         QString logLevelToEventType(OST::LogLevel level);
 };

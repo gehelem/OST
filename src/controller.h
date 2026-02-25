@@ -83,6 +83,7 @@ class Controller : public QObject
     private slots:
         void onModuleEvent(Basemodule* module, OST::Event event);
         void OnExternalEvent(OST::Event event);
+        void OnClientEvent(OST::Event event, QWebSocket* client);
         void OnMainCtlEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
                             const QVariantMap &pEventData);
         void OnFileWatcherEvent(const QString &pEvent);

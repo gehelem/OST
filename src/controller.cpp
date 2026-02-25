@@ -55,6 +55,7 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     wshandler = new WShandler(this, ssl, sslCert, sslKey, _grant);
     wshandler->setTranslateManager(mTranslater);
     connect(wshandler, &WShandler::externalEvent, this, &Controller::OnExternalEvent);
+    connect(wshandler, &WShandler::clientEvent, this, &Controller::OnClientEvent);
 
     // Configure DBManager
     dbmanager = new DBManager();
@@ -293,6 +294,15 @@ void Controller::onModuleEvent(Basemodule *module, OST::Event event)
     }
 
 }
+void Controller::OnClientEvent(OST::Event event, QWebSocket* client)
+{
+    if (event.type == "Freadall" || event.type == "setlanguage" )
+    {
+        wshandler->sendJsonMessage(getModulesDump(), client);
+    }
+
+}
+
 void Controller::OnExternalEvent(OST::Event event)
 {
     QJsonObject obj = QJsonObject::fromVariantMap(event.data);
@@ -308,7 +318,7 @@ void Controller::OnExternalEvent(OST::Event event)
     {
         //wshandler->processFileEvent("foldersdump", mFoldersList);
         //wshandler->processFileEvent("filesdump", mFilesList);
-        wshandler->sendJsonMessage(getModulesDump());
+        //wshandler->sendJsonMessage(getModulesDump());
     }
     if (event.type == "Ffolderselect")
     {

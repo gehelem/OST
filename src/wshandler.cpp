@@ -12,7 +12,7 @@
  * ... ...
  */
 WShandler::WShandler(QObject *parent, const QString &ssl, const QString &sslCert, const QString &sslKey,
-                     const QString &grant): mServerGrant(grant)
+                     const QString &grant, const QString &lng): mServerGrant(grant), mLng(lng)
 {
     // Register meta types for queued signal/slot connections
     qRegisterMetaType<OST::LogLevel>("OST::LogLevel");
@@ -106,16 +106,19 @@ WShandler::~WShandler()
     m_pWebSocketServer->close();
     qDeleteAll(m_clients.begin(), m_clients.end());
 }
-
 void WShandler::sendmessage(QString message)
 {
     for (int i = 0; i < m_clients.size(); i++)
     {
         QWebSocket *pClient = m_clients[i];
-        if (pClient) pClient->sendTextMessage(message);
+        sendmessage(message, pClient);
         //qDebug() << message;
     }
+}
 
+void WShandler::sendmessage(QString message, QWebSocket *client)
+{
+    if (client) client->sendTextMessage(message);
 }
 void WShandler::sendbinary(QByteArray *data)
 {
@@ -139,6 +142,7 @@ void WShandler::onNewConnection()
     if (mServerGrant == "1") mClientGrants[pSocket->peerAddress().toString()] =
             "0"; // read only for anyone - need grants to write
     if (mServerGrant == "2") mClientGrants[pSocket->peerAddress().toString()] = "-1"; // access grant required for anyone
+    mClientLanguage[pSocket] = mLng;
 }
 
 
@@ -195,7 +199,7 @@ void WShandler::processTextMessage(QString message)
     if (obj["evt"].toString() == "Freadall")
     {
         event.type = "Freadall";
-        emit externalEvent(event);
+        emit clientEvent(event, pClient);
     }
 
     // Handle language setting from client
@@ -206,6 +210,8 @@ void WShandler::processTextMessage(QString message)
         {
             setClientLanguage(pClient, language);
             sendMessage("Client language set to: " + language);
+            event.type = "setlanguage";
+            emit clientEvent(event, pClient);
         }
         return;
     }
@@ -233,6 +239,17 @@ void WShandler::sendJsonMessage(QJsonObject json)
     sendmessage(strJson);
     //sendMessage("WS handler sends : " + strJson);
 }
+void WShandler::sendJsonMessage(QJsonObject json, QWebSocket* pClient)
+{
+    QJsonObject obj = translateJson(json, mClientLanguage.value(pClient, "en"));
+
+    QJsonDocument jsondoc;
+    jsondoc.setObject(obj);
+    //QString strJson(jsondoc.toJson(QJsonDocument::Indented)); // version lisible
+    QString strJson(jsondoc.toJson(QJsonDocument::Compact)); // version compactée
+    sendmessage(strJson, pClient);
+    //sendMessage("WS handler sends : " + strJson);
+}
 
 void WShandler::processBinaryMessage(QByteArray message)
 {
@@ -254,7 +271,7 @@ void WShandler::socketDisconnected()
     if (pClient)
     {
         m_clients.removeAll(pClient);
-        mClientLanguages.remove(pClient);
+        mClientLanguage.remove(pClient);
         pClient->deleteLater();
         mClientGrants.remove(pClient->peerAddress().toString());
 
@@ -307,7 +324,7 @@ void WShandler::setClientLanguage(QWebSocket* client, const QString &language)
 {
     if (client && !language.isEmpty())
     {
-        mClientLanguages[client] = language;
+        mClientLanguage[client] = language;
         qDebug() << "Client" << client->peerAddress().toString() << "language set to:" << language;
     }
 }
@@ -346,7 +363,7 @@ void WShandler::onLog(OST::LogLevel level, const QString &message,
     for (QWebSocket* client : m_clients)
     {
         // Get client language (default: "en")
-        QString clientLang = mClientLanguages.value(client, "en");
+        QString clientLang = mClientLanguage.value(client, "en");
 
         // Translate message to client's language
         QString translatedMessage = mTranslater->translateWithArgs(message, args, clientLang);
@@ -363,4 +380,21 @@ void WShandler::onLog(OST::LogLevel level, const QString &message,
         // Send to client
         client->sendTextMessage(QJsonDocument(obj).toJson(QJsonDocument::Compact));
     }
+}
+QJsonObject WShandler::translateJson(const QJsonObject pJsonObject, const QString &pLng)
+{
+    QJsonObject obj = pJsonObject;
+    foreach(const QString &key, obj.keys())
+    {
+        QJsonValue value = obj[key];
+        if ((key == "label" || key == "hint") && obj[key].isString())
+        {
+            obj[key] = mTranslater->translateWithArgs(obj[key].toString(), {}, pLng);
+        }
+        if (value.isObject())
+        {
+            obj[key] = translateJson(value.toObject(), pLng);
+        }
+    }
+    return obj;
 }
