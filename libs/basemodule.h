@@ -28,26 +28,8 @@ class Basemodule : public DBManager
         QVariantMap getAvailableModuleLibs(void);
         QString getModuleName() const override;
         QString getModuleLabel();
-        QString getModuleDescription();
-        QString getModuleVersion();
         QString getClassName();
         QString getHelpContent(QString language);
-        /**
-         * @brief setClassName is a method to set inherited modules classname (ideally metaObject()->className())
-         * @param pClassName is the classname
-         * @warning This is uggly, i don't know to do that differently :
-         * It's purpose is to share same profiles types between multiple instances of same module
-         * i'd like to avoid to do it within inherited module
-         * @return A boolean that reports whether it was successful, true means success.
-         * False means ClassName has already been set, and sends a corresponding message
-         */
-        bool setClassName(const QString &pClassName);
-
-
-    protected:
-
-        void setModuleDescription(QString description);
-        void setModuleVersion(QString version);
 
     private:
 
@@ -56,10 +38,6 @@ class Basemodule : public DBManager
         QString mWebroot;
         QString mModuleName;
         QString mModuleLabel;
-        QString mModuleDescription;
-        QString mModuleVersion;
-        QString mClassName = "";
-        OST::ElementString* mModuleDesc;
         OST::ModuleStatus mStatus;
 
 

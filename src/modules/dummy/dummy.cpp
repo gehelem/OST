@@ -12,7 +12,6 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
 {
 
     //Q_INIT_RESOURCE(dummy);
-    setClassName(QString(metaObject()->className()).toLower());
     loadOstPropertiesFromFile(":dummy.json");
 
     setMetadata("thisGithash", QString::fromStdString(Version::GIT_SHA1));

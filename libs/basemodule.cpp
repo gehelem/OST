@@ -445,17 +445,9 @@ QString Basemodule::getModuleLabel()
 {
     return mModuleLabel;
 }
-QString Basemodule::getModuleDescription()
-{
-    return mModuleDescription;
-}
-QString Basemodule::getModuleVersion()
-{
-    return mModuleVersion;
-}
 QString Basemodule::getClassName()
 {
-    return mClassName;
+    return metaObject()->className();
 }
 QString Basemodule::getHelpContent(QString language)
 {
@@ -486,10 +478,9 @@ void Basemodule::sendDump(void)
     QVariantMap dump;
     QVariantMap state;
     QVariantMap infos;
+    infos = getAllMetadata();
     infos["name"] = getModuleName();
     infos["label"] = getModuleLabel();
-    infos["description"] = getModuleDescription();
-    //dump["properties"] = getProperties();
     dump["p"] = getPropertiesDump(e);;
     dump["globallovs"] = getGlobalLovsDump();;
     dump["state"] = state;
@@ -505,30 +496,6 @@ void Basemodule::OnModuleEvent(const QString &eventType, const QString  &eventMo
     return;
     Q_UNUSED(eventModule);
     emit moduleEvent(this, {"moduledump", this->getModuleName(), "", "", 0, QVariantMap()});
-}
-bool Basemodule::setClassName(const QString &pClassName)
-{
-    if (getClassName() == "")
-    {
-        mClassName = pClassName;
-        return true;
-    }
-    else
-    {
-        logWarning("ClassName already set (%1) - this method must be called only once, at the begin of class constructor", {mClassName});
-        return false;
-    }
-}
-void Basemodule::setModuleDescription(QString description)
-{
-    mModuleDescription = description;
-    getEltString("moduleInfo", "moduleDescription")->setValue(description, true);
-}
-void Basemodule::setModuleVersion(QString version)
-{
-    mModuleVersion = version;
-    getEltString("moduleInfo", "moduleVersion")->setValue(version, true);
-
 }
 void Basemodule::OnModuleStatusRequest()
 {

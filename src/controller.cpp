@@ -686,10 +686,9 @@ QJsonObject Controller::getModulesDump(QString clientgrant)
         QVariantMap d2;
         QVariantMap state;
         QVariantMap infos;
+        infos = module->getAllMetadata();
         infos["name"] = module->getModuleName();
         infos["label"] = module->getModuleLabel();
-        infos["description"] = module->getModuleDescription();
-        //dump["properties"] = getProperties();
         d2["p"] = module->getPropertiesDump(e);;
         d2["globallovs"] = module->getGlobalLovsDump();;
         d2["state"] = state;
