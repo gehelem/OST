@@ -62,7 +62,7 @@ class WShandler : public QObject
     signals:
         void closed();
         void externalEvent(OST::Event);
-        void clientEvent(OST::Event, QWebSocket*);
+        void clientEvent(OST::Event, QWebSocket*, QString);
 
     private:
         void onNewConnection();

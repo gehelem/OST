@@ -152,20 +152,6 @@ void WShandler::processTextMessage(QString message)
     QString clientGrant = mClientGrants[pClient->peerAddress().toString()];
     OST::Event event;
 
-    if (clientGrant == "-1")
-    {
-        sendMessage("request identification " + pClient->peerAddress().toString());
-        QFile jsonFile(":loginpage.json");
-        if (jsonFile.open(QFile::ReadOnly))
-        {
-            QJsonDocument d = QJsonDocument().fromJson(jsonFile.readAll());
-            jsonFile.close();
-            mClientGrants[pClient->peerAddress().toString()] = "pending";
-            pClient->sendTextMessage(d.toJson());
-        };
-        return;
-    }
-
     QString _mess = message.replace("\\\"", "\"");
     _mess = _mess.replace("}\"", "}");
     _mess = _mess.replace("\"{", "{");
@@ -173,33 +159,22 @@ void WShandler::processTextMessage(QString message)
     QJsonObject  obj = jsonResponse.object(); // garder
     sendMessage("OST server received json" + message);
 
-    if (clientGrant == "pending")
+    if (obj["evt"].toString() == "login")
     {
-        if (
-            (obj["evt"].toString() == "Fsetproperty")
-            &&    (obj["mod"].toString() == "mainctl")
-            && obj["dta"].toVariant().toMap().contains("login")
-        )
-        {
-            QVariant v = obj["dta"].toVariant().toMap()["login"];
-            QVariant Elts = v.toMap()["elements"];
-            QString user = Elts.toMap()["user"].toString();
-            QString pw = Elts.toMap()["pw"].toString();
-            QString g = dbmanager->getGrants(user, pw);
-            if ((g == "0") || (g == "1"))
-            {
-                mClientGrants[pClient->peerAddress().toString()] = g;
-                event.type = "Freadall";
-                emit externalEvent(event);
-            }
-        }
+        QString user = obj["user"].toString();
+        QString pw = obj["pw"].toString();
+        QString g = dbmanager->getGrants(user, pw);
+        mClientGrants[pClient->peerAddress().toString()] = g;
+        event.type = "Freadall";
+        emit clientEvent(event, pClient, mClientGrants[pClient->peerAddress().toString()]);
         return;
     }
 
     if (obj["evt"].toString() == "Freadall")
     {
         event.type = "Freadall";
-        emit clientEvent(event, pClient);
+        emit clientEvent(event, pClient, clientGrant);
+        return;
     }
 
     // Handle language setting from client
@@ -211,7 +186,7 @@ void WShandler::processTextMessage(QString message)
             setClientLanguage(pClient, language);
             sendMessage("Client language set to: " + language);
             event.type = "setlanguage";
-            emit clientEvent(event, pClient);
+            emit clientEvent(event, pClient, clientGrant);
         }
         return;
     }

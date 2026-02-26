@@ -73,7 +73,7 @@ class Controller : public QObject
         void logInfo(const QString &message);
         void logInfo(const QString &message, const QVariantList &args);
 
-        QJsonObject getModulesDump(void);
+        QJsonObject getModulesDump(QString clientgrant);
         QString getBanner(void)
         {
             return mBanner;
@@ -83,7 +83,7 @@ class Controller : public QObject
     private slots:
         void onModuleEvent(Basemodule* module, OST::Event event);
         void OnExternalEvent(OST::Event event);
-        void OnClientEvent(OST::Event event, QWebSocket* client);
+        void OnClientEvent(OST::Event event, QWebSocket* client, QString clientgrant);
         void OnMainCtlEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
                             const QVariantMap &pEventData);
         void OnFileWatcherEvent(const QString &pEvent);

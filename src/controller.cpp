@@ -294,11 +294,11 @@ void Controller::onModuleEvent(Basemodule *module, OST::Event event)
     }
 
 }
-void Controller::OnClientEvent(OST::Event event, QWebSocket* client)
+void Controller::OnClientEvent(OST::Event event, QWebSocket* client, QString clientgrant)
 {
     if (event.type == "Freadall" || event.type == "setlanguage" )
     {
-        wshandler->sendJsonMessage(getModulesDump(), client);
+        wshandler->sendJsonMessage(getModulesDump(clientgrant), client);
     }
 
 }
@@ -660,9 +660,18 @@ void Controller::logInfo(const QString &message, const QVariantList &args)
     // Broadcast to WebSocket clients (each in their language)
     wshandler->onLog(OST::LogLevel::Info, message, args, "CT");
 }
-QJsonObject Controller::getModulesDump(void)
+QJsonObject Controller::getModulesDump(QString clientgrant)
 {
     QJsonObject result, dump, files, modules;
+    dump["grant-client"] = clientgrant;
+    dump["grant-server"] = _grant;
+
+    if (clientgrant == "-1")
+    {
+        result["d"] = dump;
+        return result;
+    }
+
     files["folders"] = QJsonArray::fromStringList(mFoldersList);
     files["files"] = QJsonArray::fromStringList(mFilesList);
     files["selectedfolder"] = mSelectedFolder;
