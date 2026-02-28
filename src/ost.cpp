@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
 
     // Register custom types for queued signal/slot connections
     qRegisterMetaType<OST::LogLevel>("OST::LogLevel");
-    qRegisterMetaType<OST::Event>("OST::Event");
+    qRegisterMetaType<OST::EvType>("OST::EvType");
 
     QGuiApplication app(argc, argv, false);
     QGuiApplication::setOrganizationName("alazob.team");

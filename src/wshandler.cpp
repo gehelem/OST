@@ -16,7 +16,7 @@ WShandler::WShandler(QObject *parent, const QString &ssl, const QString &sslCert
 {
     // Register meta types for queued signal/slot connections
     qRegisterMetaType<OST::LogLevel>("OST::LogLevel");
-    qRegisterMetaType<OST::Event>("OST::Event");
+    qRegisterMetaType<OST::EvType>("OST::EvType");
 
     //this->setParent(parent);
     Q_UNUSED(parent);

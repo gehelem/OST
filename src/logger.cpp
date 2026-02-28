@@ -18,7 +18,7 @@ Logger::Logger()
 {
     // Register meta types for queued signal/slot connections
     qRegisterMetaType<OST::LogLevel>("OST::LogLevel");
-    qRegisterMetaType<OST::Event>("OST::Event");
+    qRegisterMetaType<OST::EvType>("OST::EvType");
 }
 
 Logger::~Logger()
@@ -207,7 +207,7 @@ QJsonArray Logger::getJsonHistory(void)
     return j;
 };
 
-void Logger::setTranslateManager(OST::TranslateManager* translator, const QString& language)
+void Logger::setTranslateManager(OST::TranslateManager* translator, const QString &language)
 {
     mTranslater = translator;
     mServerLanguage = language;

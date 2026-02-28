@@ -14,7 +14,7 @@ Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap
 
     // Register meta types for queued signal/slot connections across modules
     qRegisterMetaType<OST::LogLevel>("OST::LogLevel");
-    qRegisterMetaType<OST::Event>("OST::Event");
+    qRegisterMetaType<OST::EvType>("OST::EvType");
 
     connect(this, &Datastore::datastoreEvent, this, &Basemodule::onDatastoreEvent);
 
@@ -469,27 +469,6 @@ QVariantMap Basemodule::getModuleInfo(void)
     return getAllMetadata();
 }
 
-void Basemodule::sendDump(void)
-{
-    return;
-    OST::Event e;
-    e.type = "moduledump";
-    e.module = getModuleName();
-    QVariantMap dump;
-    QVariantMap state;
-    QVariantMap infos;
-    infos = getAllMetadata();
-    infos["name"] = getModuleName();
-    infos["label"] = getModuleLabel();
-    dump["p"] = getPropertiesDump(e);;
-    dump["globallovs"] = getGlobalLovsDump();;
-    dump["state"] = state;
-    dump["infos"] = infos;
-    dump["help"] = getHelpContent("fr");
-    //getQtProperties();
-
-    emit moduleEvent(this, e);
-}
 void Basemodule::OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
                                const QVariantMap &eventData)
 {
@@ -501,10 +480,9 @@ void Basemodule::OnModuleStatusRequest()
 {
     emit moduleStatusAnswer(this->getModuleName(), this->mStatus);
 }
-void Basemodule::onDatastoreEvent(Datastore* datastore, OST::Event e)
+void Basemodule::onDatastoreEvent(OST::EvType evt, QVariant data, OST::ElementBase* elt, OST::PropertyBase* prp,
+                                  OST::LovBase* lov, Datastore* mod)
 {
-    Q_UNUSED(datastore)
-    e.module = this->getModuleName();
-    emit moduleEvent(this, e);
+    emit moduleEvent(evt, data, elt, prp, lov, this);
 }
 

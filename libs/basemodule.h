@@ -50,33 +50,24 @@ class Basemodule : public DBManager
         //void moduleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
         //                 const QVariantMap &eventData);
         void loadOtherModule(QString &lib, QString &name, QString &label, QString &profile);
+
         /**
-         * @brief Signal emitted for custom property events
-         * @param prop Pointer to the module
+         * @brief Signal emitted when datastore changes
          * @param event Event descriptor
-         *
-         * Generic event mechanism for property-level operations like
-         * grid line creation/deletion, up/down movements, etc.
+         * @param data Additional payload
+         * @param elt Pointer to element if required
+         * @param prop Pointer to property if required
+         * @param glov Pointer to globallov if required
+         * @param mod Pointer to this datastore/module
          */
-        void moduleEvent(Basemodule*, OST::Event);
+        void moduleEvent(OST::EvType, QVariant, OST::ElementBase*, OST::PropertyBase*, OST::LovBase*, Basemodule*);
 
 
     public slots:
-        void onDatastoreEvent(Datastore* datastore, OST::Event e);
-        void OnExternalEvent(OST::Event e);
-        virtual void OnMyExternalEvent(OST::Event e)
-        {
-            Q_UNUSED(e)
-        }
-        virtual void OnDispatchToIndiExternalEvent(OST::Event e)
-        {
-            Q_UNUSED(e)
-        }
-        void OnModuleStatusRequest();
-        virtual void OnModuleStatusAnswer(const QString module, OST::ModuleStatus status)
-        {
-            Q_UNUSED(module) Q_UNUSED(status)
-        };
+        void onDatastoreEvent(OST::EvType evt, QVariant data, OST::ElementBase* elt, OST::PropertyBase* prp, OST::LovBase* lov,
+                              Datastore* mod);
+
+        void OnExternalEvent(OST::ExtEvent e);
 
 }
 ;

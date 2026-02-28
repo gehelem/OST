@@ -199,19 +199,40 @@ typedef struct ModuleStatus
     QString message;         /*!< Status message text */
 } ModuleStatus;
 
-/**
- * @struct Event
- * @brief Common event structure
- */
-typedef struct Event
+
+enum class EvType
 {
-    QString type = "";
-    QString module = "";
-    QString property = "";
-    QString element = "";
-    int line = 0;
-    QVariantMap data;
-} Event;
+    zz = 0,    /*!< no dump       */
+    aa,        /*!< dump all data */
+    ee,        /*!< set one element value */
+    ea,        /*!< set all elements values (prop level) */
+    ev,        /*!< set one element value/min/max/format */
+    ps,        /*!< only property state */
+    gc,        /*!< grid new line */
+    gu,        /*!< grid update line  */
+    gd,        /*!< grid delete line  */
+    gr,        /*!< grid reset */
+    lc,        /*!< lov create */
+    lu,        /*!< lov udpate */
+    ld,        /*!< lov delete */
+};
+
+enum class ExtEvType
+{
+    DUMP  = 0,   /*!< request dump */
+    SV,        /*!< set a value of a property */
+    SA,        /*!< set all values of a property */
+    GC,        /*!< grid new line */
+    GU,        /*!< grid update line  */
+    GD,        /*!< grid delete line  */
+    GR,        /*!< grid reset */
+};
+typedef struct ExtEvent
+{
+    ExtEvType ev = ExtEvType::SV;   /*!< External event type*/
+    QVariantMap data;                  /*!< External event data */
+} ExtEvent;
+
 
 /**
  * @brief Signal type emitted during value update
@@ -523,7 +544,7 @@ inline QString incrementPlaceholders(const QString &msg)
 
 }
 
-Q_DECLARE_METATYPE(OST::Event)
+Q_DECLARE_METATYPE(OST::EvType)
 Q_DECLARE_METATYPE(OST::LogLevel)
 
 

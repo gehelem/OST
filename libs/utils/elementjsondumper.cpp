@@ -2,11 +2,23 @@
 
 namespace  OST
 {
-
+//enum class EvType
+//{
+//    aa,        /*!< dump all data */
+//    zz = 0,    /*!< no dump       */
+//    ee,        /*!< set one element value */
+//    ea,        /*!< set all elements values (prop level) */
+//    ev,        /*!< set one element value/min/max/format */
+//    ps,        /*!< only property state */
+//    gc,        /*!< grid new line */
+//    gu,        /*!< grid update line  */
+//    gd,        /*!< grid delete line  */
+//    gr,        /*!< grid reset */
+//};
 QJsonObject ElementJsonDumper::dumpElementCommons(ElementBase *pElement)
 {
     QJsonObject json;
-    if (mType == "sv" || mType == "sa" || mType == "se") return json;
+    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return json;
 
     json["label"] = pElement->label();
     json["order"] = pElement->order();
@@ -30,7 +42,7 @@ void ElementJsonDumper::visit(ElementBool *pElement, QVariantMap &data, bool &em
     QJsonObject json = dumpElementCommons(pElement);
     json["value"] = pElement->value();
     mResult = json;
-    if (mType == "sv" || mType == "sa") return;
+    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return;
 
     json["type"] = "bool";
     if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
@@ -44,7 +56,7 @@ void ElementJsonDumper::visit(ElementInt *pElement, QVariantMap &data, bool &emi
     QJsonObject json = dumpElementCommons(pElement);
     json["value"] = pElement->value();
     mResult = json;
-    if (mType == "sv" || mType == "sa") return;
+    if (mEvent == EvType::ee || mEvent == EvType::ea) return;
 
     json["type"] = "int";
     json["value"] = qlonglong(pElement->value());
@@ -54,7 +66,7 @@ void ElementJsonDumper::visit(ElementInt *pElement, QVariantMap &data, bool &emi
     json["format"] = pElement->format();
     json["slider"] = pElement->slider();
     mResult = json;
-    if (mType == "se") return;
+    if (mEvent == EvType::ev) return;
 
     if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
     if (pElement->getPostIcon() != "") json["posticon"] = pElement->getPostIcon();
@@ -85,7 +97,7 @@ void ElementJsonDumper::visit(ElementFloat *pElement, QVariantMap &data, bool &e
     QJsonObject json = dumpElementCommons(pElement);
     json["value"] = pElement->value();
     mResult = json;
-    if (mType == "sv" || mType == "sa") return;
+    if (mEvent == EvType::ee || mEvent == EvType::ea) return;
 
     json["type"] = "float";
     json["min"] = pElement->min();
@@ -94,7 +106,7 @@ void ElementJsonDumper::visit(ElementFloat *pElement, QVariantMap &data, bool &e
     json["format"] = pElement->format();
     json["slider"] = pElement->slider();
     mResult = json;
-    if (mType == "se") return;
+    if (mEvent == EvType::ev) return;
 
     if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
     if (pElement->getPostIcon() != "") json["posticon"] = pElement->getPostIcon();
@@ -124,7 +136,7 @@ void ElementJsonDumper::visit(ElementString *pElement, QVariantMap &data, bool &
     QJsonObject json = dumpElementCommons(pElement);
     json["value"] = pElement->value();
     mResult = json;
-    if (mType == "sv" || mType == "sa") return;
+    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return;
 
     json["type"] = "string";
     if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
@@ -154,7 +166,7 @@ void ElementJsonDumper::visit(ElementLight *pElement, QVariantMap &data, bool &e
     QJsonObject json = dumpElementCommons(pElement);
     json["value"] = pElement->value();
     mResult = json;
-    if (mType == "sv" || mType == "sa") return;
+    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return;
 
     json["type"] = "light";
     mResult = json;
@@ -253,7 +265,7 @@ void ElementJsonDumper::visit(ElementImg *pElement, QVariantMap &data, bool &emi
     }
     json["value"] = imgdata;
     mResult = json;
-    if (mType == "sv" || mType == "sa") return;
+    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return;
 
     json["type"] = "img";
 
@@ -276,7 +288,7 @@ void ElementJsonDumper::visit(ElementPrg *pElement, QVariantMap &data, bool &emi
     json["dynlabel"] = pElement->value().dynlabel;
     json["value"] = pElement->value().value;
     mResult = json;
-    if (mType == "sv" || mType == "sa") return;
+    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return;
 
     json["type"] = "prg";
     if (pElement->prgType() == bar) json["prgtype"] = "bar";
@@ -294,7 +306,7 @@ void ElementJsonDumper::visit(ElementDate *pElement, QVariantMap &data, bool &em
     v["day"] = pElement->value().day();
     json["value"] = v;
     mResult = json;
-    if (mType == "sv" || mType == "sa") return;
+    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return;
 
     json["type"] = "date";
     mResult = json;
@@ -311,7 +323,7 @@ void ElementJsonDumper::visit(ElementTime *pElement, QVariantMap &data, bool &em
     if (pElement->getUseMs()) v["ms"] = pElement->value().msec();
     json["value"] = v;
     mResult = json;
-    if (mType == "sv" || mType == "sa") return;
+    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return;
 
     json["type"] = "time";
     json["usems"] = pElement->getUseMs();

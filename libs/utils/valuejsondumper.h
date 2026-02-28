@@ -1,7 +1,6 @@
 #ifndef OST_VALUEJSONDUMPER_H
 #define OST_VALUEJSONDUMPER_H
 
-#include <string>
 #include <elementbase.h>
 
 namespace  OST
@@ -13,7 +12,8 @@ class ValueJsonDumper : public ValueVisitor
 {
 
     public:
-        ValueJsonDumper(const QString &type): mType(type) {;};
+        ValueJsonDumper(const OST::EvType evt, QVariant data): mEvent(evt), mData(data) {;};
+
 
         void visit(ValueInt *pValue) override;
         void visit(ValueBool* pValue) override;
@@ -33,7 +33,9 @@ class ValueJsonDumper : public ValueVisitor
 
     private:
         QJsonValue mResult;
-        QString mType;
+        /* pass event details */
+        EvType mEvent;
+        QVariant mData;
 
 };
 }

@@ -240,14 +240,14 @@ to-propagate changes to backend */
     signals:
         /**
          * @brief Signal emitted when element value changes
-         * @param elt Pointer to this element
          * @param event Event descriptor
-         * @param signalType Signal requested
+         * @param data Additional payload
+         * @param elt Pointer to this element
          *
          * Emitted by derived template classes when setValue() is called.
          * Propagated to parent property's OnValueSet slot.
          */
-        void eltEvent(OST::ElementBase*, OST::Event);
+        void eltEvent(OST::EvType, QVariant, OST::ElementBase*);
 
         /**
          * @brief Signal emitted when element list/LOV changes

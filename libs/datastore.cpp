@@ -4,7 +4,7 @@
 Datastore::Datastore()
 {
     //sendMessage("DataStore init");
-    qRegisterMetaType<OST::Event>("OST::Event");
+    qRegisterMetaType<OST::EvType>("OST::EvType");
     qRegisterMetaType<OST::LogLevel>("OST::LogLevel");
 
 }
@@ -334,139 +334,14 @@ QTime Datastore::getTime(QString pProperty, QString pElement, long line)
     return v->value;
 }
 
-bool Datastore::createOstProperty(const QString &pPropertyName, const QString &pPropertyLabel,
-                                  const int &pPropertyPermission,
-                                  const  QString &pPropertyDevcat, const QString &pPropertyGroup)
+void Datastore::onPropertyEvent(OST::EvType event, QVariant data, OST::ElementBase* e, OST::PropertyBase* p)
 {
-    if (mStore.contains(pPropertyName))
-    {
-        logWarning("createOstProperty - property %1 already exists", {pPropertyName});
-        return false;
-    }
-    QVariantMap prop;
-    prop["label"] = pPropertyLabel;
-    prop["permission"] = pPropertyPermission;
-    prop["devcat"] = pPropertyDevcat;
-    prop["group"] = pPropertyGroup;
-    prop["name"] = pPropertyName;
-    prop["elements"] = QVariantMap();
-
-    OST::PropertyMulti *pm = OST::PropertyFactory::createProperty(pPropertyName, prop);
-    mStore[pPropertyName] = pm;
-    OST::Event e;
-    e.type = "ap";
-    e.property = pPropertyName;
-    e.module = getModuleName();
-    OST::PropertyJsonDumper d(e);
-    pm->accept(&d);
-    connect(mStore[pPropertyName], &OST::PropertyMulti::valueSet, this, &Datastore::onValueSet);
-    connect(mStore[pPropertyName], &OST::PropertyMulti::eltChanged, this, &Datastore::onEltChanged);
-    connect(mStore[pPropertyName], &OST::PropertyMulti::propertyEvent, this, &Datastore::onPropertyEvent);
-    connect(mStore[pPropertyName], &OST::PropertyMulti::logMessage, this, &Datastore::onPropertyLog);
-    OnModuleEvent("cp", QString(), pPropertyName, d.getResult().toVariantMap());
-    return true;
-}
-void Datastore::emitPropertyCreation(const QString &pPropertyName)
-{
-    OST::Event e;
-    e.type = "ap";
-    e.property = pPropertyName;
-    e.module = getModuleName();
-
-    OST::PropertyJsonDumper d(e);
-    QVariantMap result;
-    mStore[pPropertyName]->accept(&d, result);
-    emit OnModuleEvent("cp", QString(), pPropertyName, result);
-}
-void Datastore::onValueSet(void)
-{
-    //    OST::PropertyBase* obj = qobject_cast<OST::PropertyBase*>(sender());
-    //    OST::PropertyJsonDumper d("sv");
-    //    obj->accept(&d);
-    //    OnModuleEvent("se", QString(), obj->key(), d.getResult().toVariantMap());
-
-}
-void Datastore::onEltChanged(void)
-{
-    //    OST::PropertyBase* obj = qobject_cast<OST::PropertyBase*>(sender());
-    //    OST::PropertyJsonDumper d("");
-    //    obj->accept(&d);
-    //    OnModuleEvent("ap", QString(), obj->key(), d.getResult().toVariantMap());
-
-}
-void Datastore::onPropertyEvent(OST::PropertyBase* prop, OST::Event event)
-{
-    event.module = this->getModuleName();
-    event.property = prop->key();
-    emit datastoreEvent(this, event);
-    //qDebug() << "Datastore::onPropertyEvent=" << prop->key() << event.type << event.property << event.element;
-    //OnModuleEvent(event.type, QString(), prop->key(), d.getResult().toVariantMap());
-    //emit OnModuleEvent(event.type, this->getModuleName(), prop->key(), d.getResult().toVariantMap());
-
+    emit datastoreEvent(event, data, e, p, nullptr, this);
 }
 void Datastore::onLovChanged()
 {
     OST::LovBase* lov = qobject_cast<OST::LovBase*>(sender());
-    OST::LovJsonDumper d;
-    lov->accept(&d);
-    OnModuleEvent("lc", QString(), lov->getKey(), d.getResult().toVariantMap());
-}
-
-bool Datastore::createOstElementText(const QString &pPropertyName, const QString &pElementName,
-                                     const QString &pElementLabel,
-                                     bool mEmitEvent)
-{
-    if (!mStore.contains(pPropertyName) )
-    {
-        logWarning("createOstElementText - property %1 not found", {pPropertyName});
-        return false;
-    }
-
-    QVariantMap pData;
-    pData["label"] = pElementLabel;
-    pData["type"] = "string";
-    OST::ElementBase *el = OST::ElementFactory::createElement(pElementName, pData);
-
-    mStore[pPropertyName]->addElt(el);
-    OST::Event e;
-    e.type = "ap";
-    e.property = pPropertyName;
-    e.module = getModuleName();
-    e.element = el->key();
-    OST::PropertyJsonDumper d(e);
-    mStore[pPropertyName]->accept(&d);
-    //qDebug() << "createOstElementText el(" << pElementName << ")=" << d.getResult();
-    if (mEmitEvent) OnModuleEvent("ce", QString(), pPropertyName, d.getResult().toVariantMap());
-    return true;
-
-}
-bool Datastore::createOstElementBool(const QString &pPropertyName, const QString &pElementName,
-                                     const QString &pElementLabel,
-                                     bool mEmitEvent)
-{
-    if (!mStore.contains(pPropertyName) )
-    {
-        logWarning("createOstElementBool - property %1 not found", {pPropertyName});
-        return false;
-    }
-    QVariantMap pData;
-    pData["label"] = pElementLabel;
-    pData["type"] = "bool";
-
-    OST::ElementBase *el = OST::ElementFactory::createElement(pElementName, pData);
-
-    mStore[pPropertyName]->addElt(el);
-    OST::Event e;
-    e.type = "ap";
-    e.property = pPropertyName;
-    e.module = getModuleName();
-    e.element = el->key();
-    OST::PropertyJsonDumper d(e);
-    mStore[pPropertyName]->accept(&d);
-    //qDebug() << "createOstElementBool el(" << pElementName << ")=" << d.getResult();
-    if (mEmitEvent) OnModuleEvent("ce", QString(), pPropertyName, d.getResult().toVariantMap());
-    return true;
-
+    emit datastoreEvent(OST::EvType::lu, lov->getKey(), nullptr, nullptr, lov, this);
 }
 
 void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
@@ -496,9 +371,7 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
             if (rp != nullptr)
             {
                 mStore[key] = rp;
-                connect(rp, &OST::PropertyMulti::valueSet, this, &Datastore::onValueSet);
-                connect(rp, &OST::PropertyMulti::eltChanged, this, &Datastore::onEltChanged);
-                connect(rp, &OST::PropertyMulti::propertyEvent, this, &Datastore::onPropertyEvent);
+                connect(rp, &OST::PropertyMulti::prpEvent, this, &Datastore::onPropertyEvent);
                 connect(rp, &OST::PropertyMulti::logMessage, this, &Datastore::onPropertyLog);
                 mStore[key]->setState(OST::State::Idle, true);
 
@@ -536,17 +409,6 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
     }
 
 
-}
-
-void Datastore::saveOstPropertiesToFile(const QString &pFileName)
-{
-    QJsonObject obj = QJsonObject::fromVariantMap(getPropertiesDump(OST::Event()).toVariantMap());
-    QJsonDocument doc(obj);
-
-    QFile jsonFile(pFileName);
-    jsonFile.open(QFile::WriteOnly);
-    jsonFile.write(doc.toJson());
-    jsonFile.close();
 }
 
 QVariantMap Datastore::getProfile(void)
@@ -659,43 +521,6 @@ void Datastore::deleteOstProperty(const QString &pPropertyName)
 }
 
 
-
-QJsonObject Datastore::getPropertiesDump(OST::Event evt)
-{
-    QJsonObject properties;
-    if (evt.property == "")
-    {
-        foreach(const QString &key, mStore.keys())
-        {
-            OST::PropertyJsonDumper d(evt);
-            mStore[key]->accept(&d);
-            properties[key] = d.getResult();
-        }
-    }
-    else
-    {
-        if (mStore.contains(evt.property))
-        {
-            OST::PropertyJsonDumper d(evt);
-            mStore[evt.property ]->accept(&d);
-            properties[evt.property] = d.getResult();
-        }
-        else properties[evt.property] = QJsonObject(); // for property deletion events
-
-    }
-    return properties;
-}
-QJsonObject Datastore::getGlobalLovsDump(void)
-{
-    QJsonObject globallov;
-    foreach(const QString &key, mGlobLov.keys())
-    {
-        OST::LovJsonDumper d;
-        mGlobLov[key]->accept(&d);
-        globallov[key] = d.getResult();
-    }
-    return globallov;
-}
 OST::LovString* Datastore::getGlovString(QString pLov)
 {
     if (!getGlobLovs().contains(pLov))

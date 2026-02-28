@@ -429,39 +429,16 @@ class PropertyMulti: public PropertyBase
 
 
     public slots:
-        /**
-         * @brief Slot called when element value changes
-         * @param elt Pointer to element that changed
-         *
-         * Propagates element valueSet signal to property level.
-         * Connected automatically when element is added via addElt().
-         */
-        void OnValueSet(ElementBase*);
 
         /**
          * @brief Slot called when element metadata changes
+         * @param e Event descriptor
+         * @param data Additional payload
          * @param elt Pointer to element that changed
          *
          * Handles changes in element metadata (min/max, LOV, etc.).
          */
-        void OnEltChanged(ElementBase*);
-
-        /**
-         * @brief Slot called when element metadata changes
-         * @param elt Pointer to element that changed
-         * @param event Event descriptor
-         *
-         * Handles changes in element metadata (min/max, LOV, etc.).
-         */
-        void OnEltEvent(ElementBase*e, OST::Event evt);
-
-        /**
-         * @brief Slot called when element list changes
-         * @param elt Pointer to element whose list changed
-         *
-         * Handles dynamic list updates (e.g., LOV modifications).
-         */
-        void OnListChanged(ElementBase*);
+        void OnEltEvent(OST::EvType e, QVariant data, OST::ElementBase* elt);
 
         /**
          * @brief Slot called when LOV changes

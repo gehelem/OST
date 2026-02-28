@@ -8,9 +8,7 @@
 #include "propertyjsondumper.h"
 #include "elementjsondumper.h"
 #include <valuejsondumper.h>
-#include "elementupdate.h"
 #include "qglobal.h"
-#include <sstream>
 
 namespace  OST
 {
@@ -76,44 +74,41 @@ QJsonObject PropertyJsonDumper::dumpPropertyCommons(PropertyBase *pProperty)
  * @see ElementJsonDumper
  * @see ValueJsonDumper
  */
+
 void PropertyJsonDumper::visit(PropertyMulti *pProperty)
 {
-    if (mEvent.type == "ps") // only property state
+    switch (mEvent)
     {
-        mResult = dumpPropertyState(pProperty);
-        return;
+        case OST::EvType::zz:
+            break;
+        case OST::EvType::aa:
+            break;
+        case OST::EvType::ee:
+            mResult = dumpSetValue(pProperty);
+            break;
+        case OST::EvType::ea:
+            mResult = dumpSetAll(pProperty);
+            break;
+        case OST::EvType::ev:
+            mResult = dumpSetValueWithMinMax(pProperty);
+            break;
+        case OST::EvType::ps:
+            mResult = dumpPropertyState(pProperty);
+            break;
+        case OST::EvType::gc:
+            mResult = dumpGridCreate(pProperty);
+            break;
+        case OST::EvType::gu:
+            mResult = dumpGridUpdate(pProperty);
+            break;
+        case OST::EvType::gd:
+            mResult = dumpGridDelete(pProperty);
+            break;
+        default:
+            mResult = dumpDefault(pProperty);
     }
-    if (mEvent.type == "sv") // set only one element value
-    {
-        mResult = dumpSetValue(pProperty);
-        return;
-    }
-    if (mEvent.type == "sa") // set all elements values
-    {
-        mResult = dumpSetAll(pProperty);
-        return;
-    }
-    if (mEvent.type == "se") // set only one element value with min & max & step & format
-    {
-        mResult = dumpSetValueWithMinMax(pProperty);
-        return;
-    }
-    if (mEvent.type == "gc")
-    {
-        mResult = dumpGridCreate(pProperty);
-        return;
-    }
-    if (mEvent.type == "gu")
-    {
-        mResult = dumpGridUpdate(pProperty);
-        return;
-    }
-    if (mEvent.type == "gd")
-    {
-        mResult = dumpGridDelete(pProperty);
-        return;
-    }
-    mResult = dumpDefault(pProperty);
+
+
 }
 QJsonObject PropertyJsonDumper::dumpPropertyState(PropertyMulti* pProperty)
 {
@@ -128,7 +123,7 @@ QJsonObject PropertyJsonDumper::dumpDefault(PropertyMulti* pProperty)
     QJsonObject elements;
     foreach(const QString &key, pProperty->getElts()->keys())
     {
-        OST::ElementJsonDumper d(mEvent.type);
+        OST::ElementJsonDumper d(mEvent, mData, pProperty->getElt(key));
         QVariantMap m;
         bool b = false;
         pProperty->getElt(key)->accept(&d, m, b);
@@ -159,7 +154,7 @@ QJsonObject PropertyJsonDumper::dumpDefault(PropertyMulti* pProperty)
             QJsonArray jLine;
             foreach(QString elt, pProperty->getGridHeaders())
             {
-                ValueJsonDumper d(mEvent.type);
+                ValueJsonDumper d(mEvent, mData);
                 pProperty->getGrid()[i][elt]->accept(&d);
                 jLine.append(d.getResult());
             }
@@ -184,12 +179,12 @@ QJsonObject PropertyJsonDumper::dumpSetValue(PropertyMulti* pProperty)
     // {"evt": "sv","m": {"Dummy1": {"p": {"testnumbers": {"e": {"i1": 12 }}}}}}
     QJsonObject json;
     QJsonObject elements;
-    OST::ElementJsonDumper d(mEvent.type);
+    OST::ElementJsonDumper d(mEvent, mData, mElt);
     QVariantMap m;
     bool b = false;
-    pProperty->getElt(mEvent.element)->accept(&d, m, b);
+    mElt->accept(&d, m, b);
     QJsonObject value = d.getResult();
-    elements[mEvent.element] = value["value"];
+    elements[mElt->key()] = value["value"];
     json["e"] = elements;
     return json;
 }
@@ -202,7 +197,7 @@ QJsonObject PropertyJsonDumper::dumpSetValueWithMinMax(PropertyMulti* pProperty)
     QJsonObject elements;
     foreach(const QString &key, pProperty->getElts()->keys())
     {
-        OST::ElementJsonDumper d(mEvent.type);
+        OST::ElementJsonDumper d(mEvent, mData, pProperty->getElt(key));
         QVariantMap m;
         bool b = false;
         pProperty->getElt(key)->accept(&d, m, b);
@@ -222,7 +217,7 @@ QJsonObject PropertyJsonDumper::dumpSetAll(PropertyMulti* pProperty)
     QJsonObject elements;
     foreach(const QString &key, pProperty->getElts()->keys())
     {
-        OST::ElementJsonDumper d(mEvent.type);
+        OST::ElementJsonDumper d(mEvent, mData, pProperty->getElt(key));
         QVariantMap m;
         bool b = false;
         pProperty->getElt(key)->accept(&d, m, b);
@@ -256,11 +251,11 @@ QJsonObject PropertyJsonDumper::dumpGridUpdate(PropertyMulti* pProperty)
     QJsonObject json;
     if (pProperty->hasGrid())
     {
-        int i = mEvent.line;
+        int i = mData.toInt();
         QJsonObject values;
         foreach(QString elt, pProperty->getGridHeaders())
         {
-            ValueJsonDumper d(mEvent.type);
+            ValueJsonDumper d(mEvent, mData);
             pProperty->getGrid()[i][elt]->accept(&d);
             values[elt] = d.getResult();
         }
@@ -272,7 +267,7 @@ QJsonObject PropertyJsonDumper::dumpGridUpdate(PropertyMulti* pProperty)
 QJsonObject PropertyJsonDumper::dumpGridDelete(PropertyMulti* pProperty)
 {
     QJsonObject json;
-    json["i"] = mEvent.line;
+    json["i"] = mData.toInt();
     return json;
 }
 

@@ -1,7 +1,6 @@
 #ifndef OST_ELEMENTJSONDUMPER_H
 #define OST_ELEMENTJSONDUMPER_H
 
-#include <string>
 #include <elementbool.h>
 #include <elementint.h>
 #include <elementfloat.h>
@@ -21,7 +20,7 @@ class ElementJsonDumper : public ElementVisitor
 {
 
     public:
-        ElementJsonDumper(const QString &type): mType(type) {;};
+        ElementJsonDumper(const OST::EvType evt, QVariant data, ElementBase *elt): mEvent(evt), mData(data), mElt(elt) {;};
 
         void visit(ElementBool* pElement, QVariantMap &data, bool &emitEvent) override;
         void visit(ElementInt* pElement, QVariantMap &data, bool &emitEvent) override;
@@ -43,7 +42,12 @@ class ElementJsonDumper : public ElementVisitor
         QJsonObject mResult;
         QString mJsonString;
         QJsonObject dumpElementCommons(ElementBase *pElement);
-        QString mType;
+
+        /* pass event details */
+        EvType mEvent;
+        QVariant mData;
+        ElementBase* mElt;
+
 };
 }
 #endif //OST_ELEMENTJSONDUMPER_H

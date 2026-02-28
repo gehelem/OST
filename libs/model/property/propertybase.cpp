@@ -8,7 +8,7 @@ PropertyBase::PropertyBase(const QString &key, const QString &label, const Permi
     : mKey(key), mLabel(label), mPermission(permission), mLevel1(level1), mLevel2(level2),
       mOrder(order), mHasProfile(hasProfile)
 {
-    qRegisterMetaType<OST::Event>("OST::Event");
+    qRegisterMetaType<OST::EvType>("OST::EvType");
     qRegisterMetaType<OST::LogLevel>("OST::LogLevel");
     if (order == "") emit logMessage(OST::LogLevel::Warning, "PropertyBase %1 %2 order ko (%3/%4)", {label, key, level1, level2});
 }
@@ -51,7 +51,7 @@ State PropertyBase::state()
 void PropertyBase::setState(State state, bool emitEvent)
 {
     mState = state;
-    if (emitEvent) emit propertyEvent(this, {"ps", "", key(), "", 0, QVariantMap()});
+    if (emitEvent) emit PropertyBase::prpEvent(OST::EvType::ps, QVariant(), nullptr, this);
 }
 bool PropertyBase::isEnabled()
 {
@@ -60,12 +60,12 @@ bool PropertyBase::isEnabled()
 void PropertyBase::enable(void)
 {
     mIsEnabled = true;
-    emit propertyEvent(this, {"ap", "", key(), "", 0, QVariantMap()});
+    emit PropertyBase::prpEvent(OST::EvType::ps, QVariant(), nullptr, this);
 }
 void PropertyBase::disable(void)
 {
     mIsEnabled = false;
-    emit propertyEvent(this, {"ap", "", key(), "", 0, QVariantMap()});
+    emit PropertyBase::prpEvent(OST::EvType::ps, QVariant(), nullptr, this);
 }
 bool PropertyBase::getBadge()
 {
@@ -74,7 +74,8 @@ bool PropertyBase::getBadge()
 void PropertyBase::setBadge(bool b)
 {
     mBadge = b;
-    emit propertyEvent(this, {"ap", "", key(), "", 0, QVariantMap()});
+    emit PropertyBase::prpEvent(OST::EvType::aa, QVariant(), nullptr, this);
+
 }
 void PropertyBase::logDebug(QString m, const QVariantList &args)
 {

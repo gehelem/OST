@@ -44,7 +44,7 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     // Register meta types for queued signal/slot connections
     // Must be done before any connect() calls that use these types
     qRegisterMetaType<OST::LogLevel>("OST::LogLevel");
-    qRegisterMetaType<OST::Event>("OST::Event");
+    qRegisterMetaType<OST::EvType>("OST::EvType");
 
     startPublish();
 
