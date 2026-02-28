@@ -105,7 +105,8 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
             mResult = dumpGridDelete(pProperty);
             break;
         default:
-            mResult = dumpDefault(pProperty);
+            //mResult = dumpDefault(pProperty);
+            mResult = QJsonObject();
     }
 
 
@@ -231,7 +232,7 @@ QJsonObject PropertyJsonDumper::dumpSetAll(PropertyMulti* pProperty)
 QJsonObject PropertyJsonDumper::dumpGridCreate(PropertyMulti* pProperty)
 {
     QJsonObject json;
-    if (pProperty->hasGrid())
+    if (pProperty->hasGrid() && pProperty->getGrid().count() > 0 )
     {
         int i = pProperty->getGrid().count() - 1;
         QJsonObject values;
@@ -249,7 +250,7 @@ QJsonObject PropertyJsonDumper::dumpGridCreate(PropertyMulti* pProperty)
 QJsonObject PropertyJsonDumper::dumpGridUpdate(PropertyMulti* pProperty)
 {
     QJsonObject json;
-    if (pProperty->hasGrid())
+    if (pProperty->hasGrid() && pProperty->getGrid().count() > 0  )
     {
         int i = mData.toInt();
         QJsonObject values;

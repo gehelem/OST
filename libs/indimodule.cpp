@@ -42,6 +42,7 @@ IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap
 }
 void IndiModule::onExternalEvent(QVariantMap extEvent)
 {
+    Basemodule::onExternalEvent(extEvent);
     qDebug() << "IndiModule::onExternalEvent" << extEvent;
 
     //    if (!(getModuleName() == e.module))

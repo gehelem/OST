@@ -24,6 +24,8 @@ class IndiModule : public Basemodule, public INDI::BaseClient
     public slots:
         void connectIndiTimer(void);
         void OnAfterIndiConnectIndiTimer(void);
+        void onExternalEvent(QVariantMap extEvent) override;
+
 
     protected:
 
@@ -85,7 +87,6 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         bool setFocalLengthAndDiameter(QString device, double fl, double diam);
 
     private:
-        void onExternalEvent(QVariantMap extEvent);
         bool mIsFocuser = false;
         bool mIsGuider = false;
         bool mIsSequencer = false;

@@ -83,7 +83,7 @@ class Controller : public QObject
     private slots:
         void onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase* elt, OST::PropertyBase* prp, OST::LovBase* lov,
                            Datastore* mod);
-        void OnExternalEvent(QVariantMap event);
+        void onExternalEvent(QVariantMap event);
         void OnClientEvent(QVariantMap event, QWebSocket* client, QString clientgrant);
         //void OnMainCtlEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
         //                    const QVariantMap &pEventData);

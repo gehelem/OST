@@ -54,7 +54,7 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     // Configure WShandler
     wshandler = new WShandler(this, ssl, sslCert, sslKey, _grant);
     wshandler->setTranslateManager(mTranslater);
-    connect(wshandler, &WShandler::externalEvent, this, &Controller::OnExternalEvent);
+    connect(wshandler, &WShandler::externalEvent, this, &Controller::onExternalEvent);
     connect(wshandler, &WShandler::clientEvent, this, &Controller::OnClientEvent);
 
     // Configure DBManager
@@ -157,6 +157,7 @@ Controller::~Controller()
 
 bool Controller::loadModule(QString lib, QString name, QString label, QString profile)
 {
+    qDebug() << "LOAD MODULE BEGIN :" << name;
     if (mModulesMap.contains(name ))
     {
         //pMainControl->sendMainError("Module " + name + " already loaded - can't load twice");
@@ -230,6 +231,7 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     //pMainControl->sendMainMessage("Module  " + label + " successfully loaded");
 
     updateGlobalModulesLov();
+    qDebug() << "LOAD MODULE END  :" << name;
 
     return true;
 
@@ -303,7 +305,7 @@ void Controller::OnClientEvent(QVariantMap event, QWebSocket* client, QString cl
 
 }
 
-void Controller::OnExternalEvent(QVariantMap event)
+void Controller::onExternalEvent(QVariantMap event)
 {
     qDebug() << "Controller::OnExternalEvent" << event;
     //QJsonObject obj = QJsonObject::fromVariantMap(event.data);

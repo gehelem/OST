@@ -60,10 +60,11 @@ class Basemodule : public DBManager
 
 
     public slots:
-        void onDatastoreEvent(OST::EvType evt, QVariant data, OST::ElementBase* elt, OST::PropertyBase* prp, OST::LovBase* lov,
+        void onDatastoreEvent(OST::EvType evt, QVariant data, OST::ElementBase* elt, OST::PropertyBase* prp,
+                              OST::LovBase* lov,
                               Datastore* mod);
 
-        void onExternalEvent(QVariantMap extEvent);
+        virtual void onExternalEvent(QVariantMap extEvent);
 
 }
 ;

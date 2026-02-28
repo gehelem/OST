@@ -121,6 +121,7 @@ void Dummy::onTimer()
     //getProperty("timesRWgrid")->push();
     //getProperty("timesRWgrid")->deleteLine(0);
 
+    //getProperty("dynprop")->disable();
     //getProperty("dynprop")->enable();
 
     //dynprop = new OST::PropertyMulti("dynprop2", "Dynamic", OST::Permission::ReadWrite, "Examples",
@@ -131,7 +132,7 @@ void Dummy::onTimer()
     //dyntext = new OST::ElementString("dyntext", "Dyn text", "", "");
     //dynprop->addElt(dyntext);
     //createProperty("dynprop2", dynprop);
-    //dynprop->setState(OST::State::Busy);
+    //dynprop->setState(OST::State::Busy, true);
     //dyntext->setValue("Okydoky", false);
     //dynlight->setValue(OST::State::Ok, true);
 
@@ -153,6 +154,7 @@ Dummy::~Dummy()
 
 void Dummy::onExternalEvent(QVariantMap extEvent)
 {
+    IndiModule::onExternalEvent(extEvent);
     qDebug() << "Dummy::onExternalEvent" << extEvent;
     //if (getModuleName() != e.module ) return;
     //foreach(const QString &keyprop, e.data.keys())

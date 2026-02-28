@@ -219,7 +219,32 @@ enum class EvType
     de,        /*!< delete/remove element  */
     dm,        /*!< delete/remove module   */
 };
-
+inline QString EvToString(EvType ev)
+{
+    switch (ev)
+    {
+        case OST::EvType::zz:
+            return "zz";
+        case OST::EvType::aa:
+            return "aa";
+        case OST::EvType::ee:
+            return "ee";
+        case OST::EvType::ea:
+            return "ea";
+        case OST::EvType::ev:
+            return "ev";
+        case OST::EvType::ps:
+            return "ps";
+        case OST::EvType::gc:
+            return "gc";
+        case OST::EvType::gu:
+            return "gu";
+        case OST::EvType::gd:
+            return "gd";
+        default:
+            return "unknown:" + QString::number(static_cast<int>(ev));
+    }
+}
 enum class ExtEvType
 {
     DUMP  = 0,   /*!< request dump */

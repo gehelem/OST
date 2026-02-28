@@ -6,7 +6,7 @@
 #include "wshandler.h"
 #include "translatemanager.h"
 #include "model/element/common.h"
-
+#include "libs/utils/modulejsondumper.h"
 /*!
 
  * ... ...
@@ -255,7 +255,7 @@ void WShandler::socketDisconnected()
 void WShandler::onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase *elt, OST::PropertyBase *prp,
                               OST::LovBase *lov, Basemodule *mod)
 {
-    qDebug() << "WShandler::onModuleEvent";
+    qDebug() << "WShandler::onModuleEvent" << static_cast<int>(evt) << data << mod->getModuleLabel();
     //    QJsonObject  obj;
     //    QJsonObject mods;
     //    QJsonObject  mod;
@@ -273,6 +273,13 @@ void WShandler::onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase *
     //
     //    obj[event.type] = mods;
     //    sendJsonMessage(obj);
+    QJsonValue m = OST::ModuleJsonDumper(evt, data, elt, prp, lov, mod);
+    QJsonObject o;
+    o[mod->getModuleName()] = m;
+
+    QJsonObject s;
+    s[EvToString(evt)] = o;
+    sendJsonMessage(s);
 
 
 }

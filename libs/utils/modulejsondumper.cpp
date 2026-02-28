@@ -6,23 +6,34 @@ QJsonValue ModuleJsonDumper(EvType evt, QVariant data, ElementBase *elt, Propert
 {
     QJsonObject result, properties, globlovs;
 
-    foreach(const QString &key, mod->getStore().keys())
+    if (prp)
     {
         OST::PropertyJsonDumper d(evt, data, elt, prp);
-        mod->getStore()[key]->accept(&d);
-        properties[key] = d.getResult();
+        mod->getStore()[prp->key()]->accept(&d);
+        properties[prp->key()] = d.getResult();
     }
-
-    foreach(const QString &key, mod->getGlobLovs().keys())
+    else
     {
-        OST::LovJsonDumper d;
-        mod->getGlobLovs()[key]->accept(&d);
-        globlovs[key] = d.getResult();
+        foreach(const QString &key, mod->getStore().keys())
+        {
+            OST::PropertyJsonDumper d(evt, data, elt, prp);
+            mod->getStore()[key]->accept(&d);
+            properties[key] = d.getResult();
+        }
     }
 
+    if (lov)
+    {
+        foreach(const QString &key, mod->getGlobLovs().keys())
+        {
+            OST::LovJsonDumper d;
+            mod->getGlobLovs()[key]->accept(&d);
+            globlovs[key] = d.getResult();
+        }
+    }
     result["p"] = properties;
-    result["l"] = globlovs;
-    result["infos"] = QJsonObject::fromVariantMap(mod->getAllMetadata());;
+    //result["l"] = globlovs;
+    //result["infos"] = QJsonObject::fromVariantMap(mod->getAllMetadata());;
     return result;
 }
 
