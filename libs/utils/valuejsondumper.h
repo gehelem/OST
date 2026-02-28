@@ -12,7 +12,7 @@ class ValueJsonDumper : public ValueVisitor
 {
 
     public:
-        ValueJsonDumper(const OST::EvType evt, QVariant data): mEvent(evt), mData(data) {;};
+        ValueJsonDumper(const OST::EvType evt, QVariant data, ElementBase *elt): mEvent(evt), mData(data), mElt(elt) {;};
 
 
         void visit(ValueInt *pValue) override;
@@ -36,6 +36,8 @@ class ValueJsonDumper : public ValueVisitor
         /* pass event details */
         EvType mEvent;
         QVariant mData;
+        ElementBase* mElt;
+
 
 };
 }

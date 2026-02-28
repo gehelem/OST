@@ -8,7 +8,7 @@ QJsonValue ModuleJsonDumper(EvType evt, QVariant data, ElementBase *elt, Propert
 
     foreach(const QString &key, mod->getStore().keys())
     {
-        OST::PropertyJsonDumper d(evt, QVariant(), nullptr, nullptr);
+        OST::PropertyJsonDumper d(evt, data, elt, prp);
         mod->getStore()[key]->accept(&d);
         properties[key] = d.getResult();
     }

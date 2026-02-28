@@ -6,7 +6,7 @@
 #include <QtSql/QSqlQuery>
 //#include <QtSql/QSqlError>
 #include "qzeroconf.h"
-#include "maincontrol.h"
+//#include "maincontrol.h"
 #include "wshandler.h"
 #include "logger.h"
 #include "translatemanager.h"
@@ -28,7 +28,7 @@ class Controller : public QObject
                    OST::Logger *logger, OST::TranslateManager *translate, const QString &banner);
         ~Controller() override;
     signals:
-        void controllerEvent(OST::Event);
+        void controllerEvent(QVariantMap event);
     private:
         QString _webroot;
         QString _dbpath;
@@ -43,7 +43,7 @@ class Controller : public QObject
         DBManager   *dbmanager;
         OST::Logger *mLogger;
         OST::TranslateManager *mTranslater;
-        Maincontrol *pMainControl;
+        //Maincontrol *pMainControl;
         QProcess    *_process;
         QProcess    *_indiProcess;
         QMap<QString, QMap<QString, QString>> mModulesMap;
@@ -81,11 +81,12 @@ class Controller : public QObject
 
 
     private slots:
-        void onModuleEvent(Basemodule* module, OST::Event event);
-        void OnExternalEvent(OST::Event event);
-        void OnClientEvent(OST::Event event, QWebSocket* client, QString clientgrant);
-        void OnMainCtlEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
-                            const QVariantMap &pEventData);
+        void onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase* elt, OST::PropertyBase* prp, OST::LovBase* lov,
+                           Datastore* mod);
+        void OnExternalEvent(QVariantMap event);
+        void OnClientEvent(QVariantMap event, QWebSocket* client, QString clientgrant);
+        //void OnMainCtlEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+        //                    const QVariantMap &pEventData);
         void OnFileWatcherEvent(const QString &pEvent);
         void OnFileChangeEvent(const QString &pEvent);
 

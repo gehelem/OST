@@ -150,7 +150,7 @@ void WShandler::processTextMessage(QString message)
 {
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
     QString clientGrant = mClientGrants[pClient->peerAddress().toString()];
-    OST::Event event;
+    // OST::Event event;
 
     QString _mess = message.replace("\\\"", "\"");
     _mess = _mess.replace("}\"", "}");
@@ -159,47 +159,47 @@ void WShandler::processTextMessage(QString message)
     QJsonObject  obj = jsonResponse.object(); // garder
     sendMessage("OST server received json" + message);
 
-    if (obj["evt"].toString() == "login")
-    {
-        QString user = obj["user"].toString();
-        QString pw = obj["pw"].toString();
-        QString g = dbmanager->getGrants(user, pw);
-        mClientGrants[pClient->peerAddress().toString()] = g;
-        event.type = "Freadall";
-        emit clientEvent(event, pClient, mClientGrants[pClient->peerAddress().toString()]);
-        return;
-    }
+    //    if (obj["evt"].toString() == "login")
+    //    {
+    //        QString user = obj["user"].toString();
+    //        QString pw = obj["pw"].toString();
+    //        QString g = dbmanager->getGrants(user, pw);
+    //        mClientGrants[pClient->peerAddress().toString()] = g;
+    //        event.type = "Freadall";
+    //        emit clientEvent(event, pClient, mClientGrants[pClient->peerAddress().toString()]);
+    //        return;
+    //    }
+    //
+    //    if (obj["evt"].toString() == "Freadall")
+    //    {
+    //        event.type = "Freadall";
+    //        emit clientEvent(event, pClient, clientGrant);
+    //        return;
+    //    }
+    //
+    //    // Handle language setting from client
+    //    if (obj["evt"].toString() == "setlanguage")
+    //    {
+    //        QString language = obj["language"].toString();
+    //        if (!language.isEmpty())
+    //        {
+    //            setClientLanguage(pClient, language);
+    //            sendMessage("Client language set to: " + language);
+    //            event.type = "setlanguage";
+    //            emit clientEvent(event, pClient, clientGrant);
+    //        }
+    //        return;
+    //    }
+    //
+    //    /* ignore update messages from readonly users */
+    //    if (clientGrant == "0") return;
+    //
+    //    event.type = obj["evt"].toString();
+    //    event.module = obj["mod"].toString();
+    //    event.property = obj["key"].toString();
+    //    event.data = obj["dta"].toVariant().toMap();
 
-    if (obj["evt"].toString() == "Freadall")
-    {
-        event.type = "Freadall";
-        emit clientEvent(event, pClient, clientGrant);
-        return;
-    }
-
-    // Handle language setting from client
-    if (obj["evt"].toString() == "setlanguage")
-    {
-        QString language = obj["language"].toString();
-        if (!language.isEmpty())
-        {
-            setClientLanguage(pClient, language);
-            sendMessage("Client language set to: " + language);
-            event.type = "setlanguage";
-            emit clientEvent(event, pClient, clientGrant);
-        }
-        return;
-    }
-
-    /* ignore update messages from readonly users */
-    if (clientGrant == "0") return;
-
-    event.type = obj["evt"].toString();
-    event.module = obj["mod"].toString();
-    event.property = obj["key"].toString();
-    event.data = obj["dta"].toVariant().toMap();
-
-    emit externalEvent(event);
+    emit externalEvent(obj.toVariantMap());
 
 }
 
@@ -252,25 +252,27 @@ void WShandler::socketDisconnected()
 
     }
 }
-void WShandler::onModuleEvent(Basemodule *module, OST::Event event)
+void WShandler::onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase *elt, OST::PropertyBase *prp,
+                              OST::LovBase *lov, Basemodule *mod)
 {
-    QJsonObject  obj;
-    QJsonObject mods;
-    QJsonObject  mod;
-    mod["p"] = module->getPropertiesDump(event);
-    //if (event.type == "moduledump")
-    //{
-    //    QJsonObject  infos;
-    //    infos["label"] = module->getModuleLabel();
-    //    mod["infos"] = QJsonObject::fromVariantMap(module->getAllMetadata());
-    //    mod["globallovs"] = module->getGlobalLovsDump();
-
-    //}
-    mods[event.module] = mod;
-    //obj["m"] = mods;
-
-    obj[event.type] = mods;
-    sendJsonMessage(obj);
+    qDebug() << "WShandler::onModuleEvent";
+    //    QJsonObject  obj;
+    //    QJsonObject mods;
+    //    QJsonObject  mod;
+    //    mod["p"] = module->getPropertiesDump(event);
+    //    //if (event.type == "moduledump")
+    //    //{
+    //    //    QJsonObject  infos;
+    //    //    infos["label"] = module->getModuleLabel();
+    //    //    mod["infos"] = QJsonObject::fromVariantMap(module->getAllMetadata());
+    //    //    mod["globallovs"] = module->getGlobalLovsDump();
+    //
+    //    //}
+    //    mods[event.module] = mod;
+    //    //obj["m"] = mods;
+    //
+    //    obj[event.type] = mods;
+    //    sendJsonMessage(obj);
 
 
 }

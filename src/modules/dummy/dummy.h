@@ -20,12 +20,11 @@ class MODULE_INIT Dummy : public IndiModule
 
 
     public slots:
-        void OnMyExternalEvent(OST::Event e) override;
+        void onExternalEvent(QVariantMap extEvent);
         void OnSucessSEP();
         void OnSucessSolve();
         void OnSolveFinished();
         void OnSolverLog(QString text);
-        void OnModuleStatusAnswer(const QString module, OST::ModuleStatus status) override;
         void OnNewImage();
     private:
         void newBLOB(INDI::PropertyBlob pblob);

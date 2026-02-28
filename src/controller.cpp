@@ -4,7 +4,7 @@
 #include <QFileSystemWatcher>
 #include <QHostInfo>
 #include "model/element/common.h"
-
+#include "libs/utils/modulejsondumper.h"
 /*!
  * ... ...
  */
@@ -81,25 +81,25 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     checkModules();
     checkIndiDrivers();
 
-    pMainControl = new Maincontrol(QString("mainctl"), QString("Main control"), QString(), QVariantMap());
-    connect(pMainControl, &Maincontrol::moduleEvent, this, &Controller::onModuleEvent);
-    connect(pMainControl, &Maincontrol::moduleEvent, wshandler, &WShandler::onModuleEvent);
-    connect(pMainControl, &Maincontrol::loadOtherModule, this, &Controller::loadModule);
-    connect(pMainControl, &Maincontrol::mainCtlEvent, this, &Controller::OnMainCtlEvent);
-    connect(this, &Controller::controllerEvent, pMainControl, &Maincontrol::OnExternalEvent);
+    //pMainControl = new Maincontrol(QString("mainctl"), QString("Main control"), QString(), QVariantMap());
+    //connect(pMainControl, &Maincontrol::moduleEvent, this, &Controller::onModuleEvent);
+    //connect(pMainControl, &Maincontrol::moduleEvent, wshandler, &WShandler::onModuleEvent);
+    //connect(pMainControl, &Maincontrol::loadOtherModule, this, &Controller::loadModule);
+    //connect(pMainControl, &Maincontrol::mainCtlEvent, this, &Controller::OnMainCtlEvent);
+    //connect(this, &Controller::controllerEvent, pMainControl, &Maincontrol::OnExternalEvent);
 
-    pMainControl->setParent(this);
-    pMainControl->setWebroot(_webroot);
-    pMainControl->setObjectName("mainctl");
-    pMainControl->dbInit(_dbpath, "mainctl");
-    pMainControl->OnExternalEvent({"refreshConfigurations", "mainctl", QString(), QString(), 0, QVariantMap()});
-    pMainControl->setAvailableModuleLibs(_availableModuleLibs);
-    pMainControl->setIndiDriverList(_availableIndiDrivers);
-    pMainControl->sendDump();
+    //pMainControl->setParent(this);
+    //pMainControl->setWebroot(_webroot);
+    //pMainControl->setObjectName("mainctl");
+    //pMainControl->dbInit(_dbpath, "mainctl");
+    //pMainControl->OnExternalEvent({"refreshConfigurations", "mainctl", QString(), QString(), 0, QVariantMap()});
+    //pMainControl->setAvailableModuleLibs(_availableModuleLibs);
+    //pMainControl->setIndiDriverList(_availableIndiDrivers);
+    //pMainControl->sendDump();
 
     // Connect MainControl to log system
-    connect(pMainControl, &Basemodule::logSignal, mLogger, &OST::Logger::onLog);
-    connect(pMainControl, &Basemodule::logSignal, wshandler, &WShandler::onLog);
+    //connect(pMainControl, &Basemodule::logSignal, mLogger, &OST::Logger::onLog);
+    //connect(pMainControl, &Basemodule::logSignal, wshandler, &WShandler::onLog);
 
     loadConf(_conf);
 
@@ -159,13 +159,13 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
 {
     if (mModulesMap.contains(name ))
     {
-        pMainControl->sendMainError("Module " + name + " already loaded - can't load twice");
+        //pMainControl->sendMainError("Module " + name + " already loaded - can't load twice");
         return false;
     }
     QLibrary library("libost" + lib);
     if (!library.load())
     {
-        pMainControl->sendMainError(name + " " + library.errorString());
+        //pMainControl->sendMainError(name + " " + library.errorString());
         return false;
     }
     //pMainControl->sendMainMessage(name + " library loaded");
@@ -174,14 +174,14 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     CreateModule createmodule = (CreateModule)library.resolve("initialize");
     if (!createmodule)
     {
-        pMainControl->sendMainError("Could not initialize module from library : " + lib);
+        //pMainControl->sendMainError("Could not initialize module from library : " + lib);
         return false;
     }
     Basemodule *mod = createmodule(name, label, profile, _availableModuleLibs);
     //QPointer<Basemodule> mod = createmodule(name,label,profile,_availableModuleLibs);
     if (!mod)
     {
-        pMainControl->sendMainError("Could not instanciate module from library : " + lib);
+        // pMainControl->sendMainError("Could not instanciate module from library : " + lib);
         return false;
     }
     mod->setParent(this);
@@ -197,25 +197,25 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     connect(mod, &Basemodule::moduleEvent, wshandler, &WShandler::onModuleEvent);
 
     connect(mod, &Basemodule::loadOtherModule, this, &Controller::loadModule);
-    connect(this, &Controller::controllerEvent, mod, &Basemodule::OnExternalEvent);
+    connect(this, &Controller::controllerEvent, mod, &Basemodule::onExternalEvent);
     //connect(wshandler, &WShandler::externalEvent, mod, &Basemodule::OnExternalEvent);
 
     // Connect module to log system
     connect(mod, &Basemodule::logSignal, mLogger, &OST::Logger::onLog);
     connect(mod, &Basemodule::logSignal, wshandler, &WShandler::onLog);
 
-    mod->OnExternalEvent({"afterinit", name, QString(), QString(), 0, QVariantMap()});
-    mod->sendDump();
+    //mod->OnExternalEvent({"afterinit", name, QString(), QString(), 0, QVariantMap()});
+    //mod->sendDump();
 
     QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
     for (Basemodule *othermodule : othermodules)
     {
         if (othermodule->getModuleName() != mod->getModuleName())
         {
-            connect(othermodule, &Basemodule::moduleStatusRequest, mod, &Basemodule::OnModuleStatusRequest);
-            connect(othermodule, &Basemodule::moduleStatusAnswer, mod, &Basemodule::OnModuleStatusAnswer);
-            connect(mod, &Basemodule::moduleStatusRequest, othermodule, &Basemodule::OnModuleStatusRequest);
-            connect(mod, &Basemodule::moduleStatusAnswer, othermodule, &Basemodule::OnModuleStatusAnswer);
+            //connect(othermodule, &Basemodule::moduleStatusRequest, mod, &Basemodule::OnModuleStatusRequest);
+            //connect(othermodule, &Basemodule::moduleStatusAnswer, mod, &Basemodule::OnModuleStatusAnswer);
+            //connect(mod, &Basemodule::moduleStatusRequest, othermodule, &Basemodule::OnModuleStatusRequest);
+            //connect(mod, &Basemodule::moduleStatusAnswer, othermodule, &Basemodule::OnModuleStatusAnswer);
             //connect(othermodule, &Datastore::moduleEvent, mod, &Basemodule::OnExternalEvent);
             //connect(mod, &Datastore::moduleEvent, othermodule, &Basemodule::OnExternalEvent);
         }
@@ -226,8 +226,8 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     l["profile"] = profile;
     mModulesMap[name] = l;
 
-    pMainControl->addModuleData(name, label, lib, profile);
-    pMainControl->sendMainMessage("Module  " + label + " successfully loaded");
+    //pMainControl->addModuleData(name, label, lib, profile);
+    //pMainControl->sendMainMessage("Module  " + label + " successfully loaded");
 
     updateGlobalModulesLov();
 
@@ -239,7 +239,7 @@ void Controller::loadConf(const QString &pConf)
     QVariantMap result;
     if (!dbmanager->getDbConfiguration(pConf, result))
     {
-        pMainControl->sendMainError("loadConf " + pConf + " failed");
+        //pMainControl->sendMainError("loadConf " + pConf + " failed");
         return;
     }
     for(QVariantMap::const_iterator iter = result.begin(); iter != result.end(); ++iter)
@@ -249,139 +249,140 @@ void Controller::loadConf(const QString &pConf)
         namewithoutblanks.replace(" ", "");
         loadModule(line["moduletype"].toString(), namewithoutblanks, iter.key(), line["profilename"].toString());
     }
-    pMainControl->sendMainMessage("loadConf " + pConf + " successful");
+    //pMainControl->sendMainMessage("loadConf " + pConf + " successful");
 }
 void Controller::saveConf(const QString &pConf)
 {
     QVariantMap result;
     if (!dbmanager->saveDbConfiguration(pConf, mModulesMap))
     {
-        pMainControl->sendMainError("saveDbConfiguration " + pConf + " failed");
+        //pMainControl->sendMainError("saveDbConfiguration " + pConf + " failed");
         return;
     }
-    pMainControl->sendMainMessage("saveDbConfiguration " + pConf + " sucessfull");
+    //pMainControl->sendMainMessage("saveDbConfiguration " + pConf + " sucessfull");
 
 }
 
-void Controller::onModuleEvent(Basemodule *module, OST::Event event)
+void Controller::onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase* elt, OST::PropertyBase* prp,
+                               OST::LovBase* lov,
+                               Datastore* mod)
 
-//void Controller::OnModuleEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
-//                               const QVariantMap &pEventData)
 {
 
-    if (event.type == "moduledelete")
-    {
-        if (!mModulesMap.contains(event.module))
-        {
-            pMainControl->sendMainWarning("moduledelete Module " + event.module + " not in module map");
-            return;
-        }
-        mModulesMap.remove(event.module);
-        pMainControl->deldModuleData(event.module);
-        updateGlobalModulesLov();
-    }
-    if (event.type == "modulesavedprofile")
-    {
-        //mModulesMap[event.module]["profile"] = pEventKey;
-        //pMainControl->setModuleData(event.module, "", "", pEventKey);
-
-    }
-    if (event.type == "moduleloadedprofile")
-    {
-        //mModulesMap[event.module]["profile"] = pEventKey;
-        //pMainControl->setModuleData(event.module, "", "", pEventKey);
-
-    }
+    //    if (event.type == "moduledelete")
+    //    {
+    //        if (!mModulesMap.contains(event.module))
+    //        {
+    //            pMainControl->sendMainWarning("moduledelete Module " + event.module + " not in module map");
+    //            return;
+    //        }
+    //        mModulesMap.remove(event.module);
+    //        pMainControl->deldModuleData(event.module);
+    //        updateGlobalModulesLov();
+    //    }
+    //    if (event.type == "modulesavedprofile")
+    //    {
+    //        //mModulesMap[event.module]["profile"] = pEventKey;
+    //        //pMainControl->setModuleData(event.module, "", "", pEventKey);
+    //
+    //    }
+    //    if (event.type == "moduleloadedprofile")
+    //    {
+    //        //mModulesMap[event.module]["profile"] = pEventKey;
+    //        //pMainControl->setModuleData(event.module, "", "", pEventKey);
+    //
+    //    }
 
 }
-void Controller::OnClientEvent(OST::Event event, QWebSocket* client, QString clientgrant)
+void Controller::OnClientEvent(QVariantMap event, QWebSocket* client, QString clientgrant)
 {
-    if (event.type == "Freadall" || event.type == "setlanguage" )
-    {
-        wshandler->sendJsonMessage(getModulesDump(clientgrant), client);
-    }
+    //if (event.type == "Freadall" || event.type == "setlanguage" )
+    //{
+    //    wshandler->sendJsonMessage(getModulesDump(clientgrant), client);
+    //}
 
 }
 
-void Controller::OnExternalEvent(OST::Event event)
+void Controller::OnExternalEvent(QVariantMap event)
 {
-    QJsonObject obj = QJsonObject::fromVariantMap(event.data);
-    QJsonDocument doc(obj);
-    QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
-    QString strJson = QLatin1String(docByteArray);
-    if (event.module == "mainctl")
-    {
-        pMainControl->sendMainMessage("Mainctl event : " + event.type + " : " + event.module + " : " +  " : " +
-                                      strJson);
-    }
-    if (event.type == "Freadall")
-    {
-        //wshandler->processFileEvent("foldersdump", mFoldersList);
-        //wshandler->processFileEvent("filesdump", mFilesList);
-        //wshandler->sendJsonMessage(getModulesDump());
-    }
-    if (event.type == "Ffolderselect")
-    {
-        for ( const auto &d : mFileWatcher.directories() )
-        {
-            mFileWatcher.removePath(d);
-        }
-        mSelectedFolder = _webroot + event.data["folder"].toString();
-        mFileWatcher.addPath(mSelectedFolder);
-        OnFileWatcherEvent(QString());
+    qDebug() << "Controller::OnExternalEvent" << event;
+    //QJsonObject obj = QJsonObject::fromVariantMap(event.data);
+    //QJsonDocument doc(obj);
+    //QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
+    //QString strJson = QLatin1String(docByteArray);
+    //if (event.module == "mainctl")
+    //{
+    //    //pMainControl->sendMainMessage("Mainctl event : " + event.type + " : " + event.module + " : " +  " : " +
+    //                                  strJson);
+    //}
+    //if (event.type == "Freadall")
+    //{
+    //    //wshandler->processFileEvent("foldersdump", mFoldersList);
+    //    //wshandler->processFileEvent("filesdump", mFilesList);
+    //    //wshandler->sendJsonMessage(getModulesDump());
+    //}
+    //if (event.type == "Ffolderselect")
+    //{
+    //    for ( const auto &d : mFileWatcher.directories() )
+    //    {
+    //        mFileWatcher.removePath(d);
+    //    }
+    //    mSelectedFolder = _webroot + event.data["folder"].toString();
+    //    mFileWatcher.addPath(mSelectedFolder);
+    //    OnFileWatcherEvent(QString());
 
-    }
+    //}
 
-    /* we should check here if incoming message is valid*/
+    ///* we should check here if incoming message is valid*/
     emit controllerEvent(event);
 }
-void Controller::OnMainCtlEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
-                                const QVariantMap &pEventData)
-{
-    Q_UNUSED(pEventModule);
-    Q_UNUSED(pEventData);
-
-    if (pEventType == "loadconf")
-    {
-        loadConf(pEventKey);
-    }
-    if (pEventType == "saveconf")
-    {
-        saveConf(pEventKey);
-    }
-    if (pEventType == "startindidriver")
-    {
-        startIndiDriver(pEventKey);
-    }
-    if (pEventType == "stopindidriver")
-    {
-        stopIndiDriver(pEventKey);
-    }
-    if (pEventType == "indiserver")
-    {
-        if (pEventKey == "start")
-        {
-            startIndi();
-        }
-        if (pEventKey == "stop")
-        {
-            stopIndi();
-        }
-    }
-    if (pEventType == "killall")
-    {
-        QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
-        for (Basemodule *othermodule : othermodules)
-        {
-            if (othermodule->getModuleName() != "mainctl")
-            {
-                othermodule->killMe();
-            }
-        }
-
-    }
-
-}
+//void Controller::OnMainCtlEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+//                                const QVariantMap &pEventData)
+//{
+//    Q_UNUSED(pEventModule);
+//    Q_UNUSED(pEventData);
+//
+//    if (pEventType == "loadconf")
+//    {
+//        loadConf(pEventKey);
+//    }
+//    if (pEventType == "saveconf")
+//    {
+//        saveConf(pEventKey);
+//    }
+//    if (pEventType == "startindidriver")
+//    {
+//        startIndiDriver(pEventKey);
+//    }
+//    if (pEventType == "stopindidriver")
+//    {
+//        stopIndiDriver(pEventKey);
+//    }
+//    if (pEventType == "indiserver")
+//    {
+//        if (pEventKey == "start")
+//        {
+//            startIndi();
+//        }
+//        if (pEventKey == "stop")
+//        {
+//            stopIndi();
+//        }
+//    }
+//    if (pEventType == "killall")
+//    {
+//        QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
+//        for (Basemodule *othermodule : othermodules)
+//        {
+//            if (othermodule->getModuleName() != "mainctl")
+//            {
+//                othermodule->killMe();
+//            }
+//        }
+//
+//    }
+//
+//}
 void Controller::checkModules(void)
 {
     foreach (const QString &path, QCoreApplication::libraryPaths())
@@ -450,27 +451,27 @@ void Controller::checkIndiDrivers(void)
 }
 void Controller::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    pMainControl->sendMainMessage("PROCESS FINISHED (" + QString::number(exitCode) + ")" + exitStatus);
+    //pMainControl->sendMainMessage("PROCESS FINISHED (" + QString::number(exitCode) + ")" + exitStatus);
 }
 void Controller::processOutput()
 {
     QString output = _process->readAllStandardOutput();
-    pMainControl->sendMainMessage("PROCESS LOG   : " + output);
+    //pMainControl->sendMainMessage("PROCESS LOG   : " + output);
 }
 void Controller::processError()
 {
     QString output = _process->readAllStandardError();
-    pMainControl->sendMainError("PROCESS ERROR   : " + output);
+    //pMainControl->sendMainError("PROCESS ERROR   : " + output);
 }
 void Controller::processIndiOutput()
 {
     QString output = _indiProcess->readAllStandardOutput();
-    pMainControl->sendMainMessage("INDI LOG   : " + output);
+    //pMainControl->sendMainMessage("INDI LOG   : " + output);
 }
 void Controller::processIndiError()
 {
     QString output = _indiProcess->readAllStandardError();
-    pMainControl->sendMainError("INDI ERROR   : " + output);
+    //pMainControl->sendMainError("INDI ERROR   : " + output);
 }
 // ---------- ZeroConf ----------
 
@@ -482,7 +483,7 @@ void Controller::startPublish()
 }
 void Controller::startIndi(void)
 {
-    pMainControl->sendMainMessage("Start Embedded indi server");
+    //pMainControl->sendMainMessage("Start Embedded indi server");
     _indiProcess = new QProcess(this);
     connect(_indiProcess, &QProcess::readyReadStandardOutput, this, &Controller::processIndiOutput);
     connect(_indiProcess, &QProcess::readyReadStandardError, this, &Controller::processIndiError);
@@ -521,13 +522,13 @@ void Controller::startIndi(void)
 }
 void Controller::stopIndi(void)
 {
-    pMainControl->sendMainMessage("Stop Embedded indi server");
+    //pMainControl->sendMainMessage("Stop Embedded indi server");
     if (_indiProcess->isOpen()) _indiProcess->kill();
 
 }
 void Controller::startIndiDriver(const QString &pDriver)
 {
-    pMainControl->sendMainMessage("Start indidriver " + pDriver);
+    //pMainControl->sendMainMessage("Start indidriver " + pDriver);
     QFile fifo("/tmp/ostserverIndiFIFO");
     fifo.open(QIODevice::WriteOnly);
     QTextStream txtStream(&fifo);
@@ -537,7 +538,7 @@ void Controller::startIndiDriver(const QString &pDriver)
 }
 void Controller::stopIndiDriver(const QString &pDriver)
 {
-    pMainControl->sendMainMessage("Stop indidriver " + pDriver);
+    //pMainControl->sendMainMessage("Stop indidriver " + pDriver);
     QFile fifo("/tmp/ostserverIndiFIFO");
     fifo.open(QIODevice::WriteOnly);
     QTextStream txtStream(&fifo);
@@ -645,7 +646,7 @@ void Controller::updateGlobalModulesLov(void)
     lovData["values"] = values;
 
     // Emit event to update all modules with the new list
-    emit controllerEvent({"globallovupdate", "*", "loadedModules", QString(), 0, lovData});
+    // emit controllerEvent({"globallovupdate", "*", "loadedModules", QString(), 0, lovData});
 }
 
 void Controller::logInfo(const QString &message)
@@ -680,22 +681,22 @@ QJsonObject Controller::getModulesDump(QString clientgrant)
     QList<Basemodule *> allmodules = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
     for (Basemodule *module : allmodules)
     {
-        OST::Event e;
-        e.type = "moduledump";
-        e.module = module->getModuleName();
+        //OST::Event e;
+        //e.type = "moduledump";
+        //e.module = module->getModuleName();
         QVariantMap d2;
-        QVariantMap state;
-        QVariantMap infos;
-        infos = module->getAllMetadata();
-        infos["name"] = module->getModuleName();
-        infos["label"] = module->getModuleLabel();
-        d2["p"] = module->getPropertiesDump(e);;
-        d2["globallovs"] = module->getGlobalLovsDump();;
-        d2["state"] = state;
-        d2["infos"] = infos;
-        d2["help"] = module->getHelpContent("fr");
-        d2["metadata"] = module->getAllMetadata();
-
+        //QVariantMap state;
+        //QVariantMap infos;
+        //infos = module->getAllMetadata();
+        //infos["name"] = module->getModuleName();
+        //infos["label"] = module->getModuleLabel();
+        //d2["p"] = module->getPropertiesDump(e);;
+        //d2["globallovs"] = module->getGlobalLovsDump();;
+        //d2["state"] = state;
+        //d2["infos"] = infos;
+        //d2["help"] = module->getHelpContent("fr");
+        //d2["metadata"] = module->getAllMetadata();
+        d2 = OST::ModuleJsonDumper(OST::EvType::aa, QVariant(), nullptr, nullptr, nullptr, module).toVariant().toMap();
         modules[module->getModuleName()] = QJsonObject::fromVariantMap(d2);
 
     }

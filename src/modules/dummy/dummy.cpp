@@ -151,184 +151,185 @@ Dummy::~Dummy()
     //Q_CLEANUP_RESOURCE(dummy);
 }
 
-void Dummy::OnMyExternalEvent(OST::Event e)
+void Dummy::onExternalEvent(QVariantMap extEvent)
 {
-    if (getModuleName() != e.module ) return;
-    foreach(const QString &keyprop, e.data.keys())
-    {
-        if ((e.type == "Fpropposticon1") && (keyprop == "modulesstatus"))
-        {
-            getProperty("modulesstatus")->clearGrid();
-            emit moduleStatusRequest();
-        }
-        foreach(const QString &keyelt, e.data[keyprop].toMap()["elements"].toMap().keys())
-        {
-            if (keyprop == "dynprop")
-            {
-                if (keyelt == "dyntext")
-                {
+    qDebug() << "Dummy::onExternalEvent" << extEvent;
+    //if (getModuleName() != e.module ) return;
+    //foreach(const QString &keyprop, e.data.keys())
+    //{
+    //    if ((e.type == "Fpropposticon1") && (keyprop == "modulesstatus"))
+    //    {
+    //        getProperty("modulesstatus")->clearGrid();
+    //        emit moduleStatusRequest();
+    //    }
+    //    foreach(const QString &keyelt, e.data[keyprop].toMap()["elements"].toMap().keys())
+    //    {
+    //        if (keyprop == "dynprop")
+    //        {
+    //            if (keyelt == "dyntext")
+    //            {
 
-                    dyntext->setValue(e.data[keyprop].toMap()["elements"].toMap()[keyelt].toString(), true);
-                }
-                if (keyelt == "dynbool")
-                {
-                    bool val = e.data["dynprop"].toMap()["elements"].toMap()["dynbool"].toBool();
-                    if (val)
-                    {
+    //                dyntext->setValue(e.data[keyprop].toMap()["elements"].toMap()[keyelt].toString(), true);
+    //            }
+    //            if (keyelt == "dynbool")
+    //            {
+    //                bool val = e.data["dynprop"].toMap()["elements"].toMap()["dynbool"].toBool();
+    //                if (val)
+    //                {
 
-                        dyntext->setValue("Changed from dynamic switch", true);
-                    }
+    //                    dyntext->setValue("Changed from dynamic switch", true);
+    //                }
 
-                }
-            }
-            if (keyprop == "boolsRW2")
-            {
-                if (keyelt == "b1")
-                {
-                    // test max gridlimit
-                    getProperty("secondtestgrid")->clearGrid();
-                    getProperty("secondtestgrid")->setGridLimit(1010);
-                    //for ( int i = 0; i < 1010; i++)getProperty("secondtestgrid")->push();
-                }
-            }
-            if (keyprop == "devices")
-            {
-                if (keyelt == "camera")
-                {
-                    if (getEltString(keyprop, keyelt)->setValue(
-                                e.data[keyprop].toMap()["elements"].toMap()[keyelt].toString(), false))
-                    {
-                        getProperty(keyprop)->setState(OST::Ok, true);
-                        _camera = getString("devices", "camera");
-                    }
-                }
-            }
-            if (keyprop == "actions2")
-            {
-                if (keyelt == "blob")
-                {
-                    if (getEltBool(keyprop, keyelt)->setValue(false, false))
-                    {
-                        connectIndi();
-                        getProperty(keyprop)->setState(OST::Ok, true);
-                        _camera = getString("devices", "camera");
-                        connectDevice(_camera);
-                        setBLOBMode(B_ALSO, _camera.toStdString().c_str(), nullptr);
-                        enableDirectBlobAccess(_camera.toStdString().c_str(), nullptr);
-                    }
-                }
-                if (keyelt == "shoot")
-                {
+    //            }
+    //        }
+    //        if (keyprop == "boolsRW2")
+    //        {
+    //            if (keyelt == "b1")
+    //            {
+    //                // test max gridlimit
+    //                getProperty("secondtestgrid")->clearGrid();
+    //                getProperty("secondtestgrid")->setGridLimit(1010);
+    //                //for ( int i = 0; i < 1010; i++)getProperty("secondtestgrid")->push();
+    //            }
+    //        }
+    //        if (keyprop == "devices")
+    //        {
+    //            if (keyelt == "camera")
+    //            {
+    //                if (getEltString(keyprop, keyelt)->setValue(
+    //                            e.data[keyprop].toMap()["elements"].toMap()[keyelt].toString(), false))
+    //                {
+    //                    getProperty(keyprop)->setState(OST::Ok, true);
+    //                    _camera = getString("devices", "camera");
+    //                }
+    //            }
+    //        }
+    //        if (keyprop == "actions2")
+    //        {
+    //            if (keyelt == "blob")
+    //            {
+    //                if (getEltBool(keyprop, keyelt)->setValue(false, false))
+    //                {
+    //                    connectIndi();
+    //                    getProperty(keyprop)->setState(OST::Ok, true);
+    //                    _camera = getString("devices", "camera");
+    //                    connectDevice(_camera);
+    //                    setBLOBMode(B_ALSO, _camera.toStdString().c_str(), nullptr);
+    //                    enableDirectBlobAccess(_camera.toStdString().c_str(), nullptr);
+    //                }
+    //            }
+    //            if (keyelt == "shoot")
+    //            {
 
-                    if (getEltBool(keyprop, keyelt)->setValue(false, false))
-                    {
-                        getProperty(keyprop)->setState(OST::Busy, true);
-                        _camera = getString("devices", "camera");
-                        double d = getPixelSize(_camera);
-                        if (_camera == "CCD Simulator")
-                        {
-                            sendModNewNumber(_camera, "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.02 );
-                        }
-                        setFocalLengthAndDiameter();
-                        if (!requestCapture(_camera, getFloat("parms", "exposure"), getInt("parms", "gain"), getInt("parms", "offset")))
-                        {
-                            getProperty(keyprop)->setState(OST::Error, true);
-                        }
-                    }
-                }
-                if (keyelt == "extract")
-                {
-                    if (getEltBool(keyprop, keyelt)->setValue(false, false))
-                    {
-                        getProperty(keyprop)->setState(OST::Busy, true);
-                        stats = _image->getStats();
-                        _solver.ResetSolver(stats, _image->getImageBuffer());
-                        connect(&_solver, &Solver::successSEP, this, &Dummy::OnSucessSEP);
-                        connect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
-                        _solver.FindStars(_solver.stellarSolverProfiles[0]);
-                    }
-                }
-                if (keyelt == "solve")
-                {
-                    if (getEltBool(keyprop, keyelt)->setValue(false, false))
-                    {
-                        getProperty(keyprop)->setState(OST::Busy, true);
-                        double ra, dec;
-                        if (
-                            !getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "DEC", dec)
-                            || !getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "RA", ra)
-                        )
-                        {
-                            getProperty(keyprop)->setState(OST::Error, true);
-                            logWarning("Can't find mount device %1 solve aborted", {getString("devices", "mount")});
-                        }
-                        else
-                        {
-                            stats = _image->getStats();
-                            _solver.ResetSolver(stats, _image->getImageBuffer());
-                            QStringList folders;
-                            folders.append(getString("parameters", "indexfolderpath"));
-                            _solver.stellarSolver.setIndexFolderPaths(folders);
-                            connect(&_solver, &Solver::successSolve, this, &Dummy::OnSucessSolve);
-                            connect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
-                            _solver.stellarSolver.setSearchPositionInDegrees(ra * 360 / 24, dec);
-                            _solver.SolveStars(_solver.stellarSolverProfiles[0]);
-                        }
-                    }
-                }
-            }
-            if (keyprop == "search")
-            {
-                if (keyelt == "searchbtn")
-                {
-                    if (getEltBool(keyprop, keyelt)->setValue(true, true))
-                    {
-                        updateSearchList();
+    //                if (getEltBool(keyprop, keyelt)->setValue(false, false))
+    //                {
+    //                    getProperty(keyprop)->setState(OST::Busy, true);
+    //                    _camera = getString("devices", "camera");
+    //                    double d = getPixelSize(_camera);
+    //                    if (_camera == "CCD Simulator")
+    //                    {
+    //                        sendModNewNumber(_camera, "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.02 );
+    //                    }
+    //                    setFocalLengthAndDiameter();
+    //                    if (!requestCapture(_camera, getFloat("parms", "exposure"), getInt("parms", "gain"), getInt("parms", "offset")))
+    //                    {
+    //                        getProperty(keyprop)->setState(OST::Error, true);
+    //                    }
+    //                }
+    //            }
+    //            if (keyelt == "extract")
+    //            {
+    //                if (getEltBool(keyprop, keyelt)->setValue(false, false))
+    //                {
+    //                    getProperty(keyprop)->setState(OST::Busy, true);
+    //                    stats = _image->getStats();
+    //                    _solver.ResetSolver(stats, _image->getImageBuffer());
+    //                    connect(&_solver, &Solver::successSEP, this, &Dummy::OnSucessSEP);
+    //                    connect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
+    //                    _solver.FindStars(_solver.stellarSolverProfiles[0]);
+    //                }
+    //            }
+    //            if (keyelt == "solve")
+    //            {
+    //                if (getEltBool(keyprop, keyelt)->setValue(false, false))
+    //                {
+    //                    getProperty(keyprop)->setState(OST::Busy, true);
+    //                    double ra, dec;
+    //                    if (
+    //                        !getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "DEC", dec)
+    //                        || !getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "RA", ra)
+    //                    )
+    //                    {
+    //                        getProperty(keyprop)->setState(OST::Error, true);
+    //                        logWarning("Can't find mount device %1 solve aborted", {getString("devices", "mount")});
+    //                    }
+    //                    else
+    //                    {
+    //                        stats = _image->getStats();
+    //                        _solver.ResetSolver(stats, _image->getImageBuffer());
+    //                        QStringList folders;
+    //                        folders.append(getString("parameters", "indexfolderpath"));
+    //                        _solver.stellarSolver.setIndexFolderPaths(folders);
+    //                        connect(&_solver, &Solver::successSolve, this, &Dummy::OnSucessSolve);
+    //                        connect(&_solver, &Solver::solverLog, this, &Dummy::OnSolverLog);
+    //                        _solver.stellarSolver.setSearchPositionInDegrees(ra * 360 / 24, dec);
+    //                        _solver.SolveStars(_solver.stellarSolverProfiles[0]);
+    //                    }
+    //                }
+    //            }
+    //        }
+    //        if (keyprop == "search")
+    //        {
+    //            if (keyelt == "searchbtn")
+    //            {
+    //                if (getEltBool(keyprop, keyelt)->setValue(true, true))
+    //                {
+    //                    updateSearchList();
 
-                    }
-                }
-            }
-            if (keyprop == "lovevents")
-            {
-                if (keyelt == "btn")
-                {
-                    getEltString("lovevents", "code")->lovClear();
-                    getEltString("lovevents", "code")->lovAdd("V1", "Value1");
-                    getEltString("lovevents", "code")->lovAdd("V2", "Value2");
-                }
-            }
+    //                }
+    //            }
+    //        }
+    //        if (keyprop == "lovevents")
+    //        {
+    //            if (keyelt == "btn")
+    //            {
+    //                getEltString("lovevents", "code")->lovClear();
+    //                getEltString("lovevents", "code")->lovAdd("V1", "Value1");
+    //                getEltString("lovevents", "code")->lovAdd("V2", "Value2");
+    //            }
+    //        }
 
 
-        }
+    //    }
 
-        if (e.type == "Fldelete")
-        {
-            double line = e.data[keyprop].toMap()["line"].toDouble();
-            getStore()[keyprop]->deleteLine(line);
-        }
-        if (e.type == "Flcreate")
-        {
-            getStore()[keyprop]->newLine(e.data[keyprop].toMap()["elements"].toMap());
-        }
-        if (e.type == "Flupdate")
-        {
-            double line = e.data[keyprop].toMap()["line"].toDouble();
-            getStore()[keyprop]->updateLine(line, e.data[keyprop].toMap()["elements"].toMap());
-        }
-        if (e.type == "Flselect" && keyprop == "results")
-        {
-            double line = e.data[keyprop].toMap()["line"].toDouble();
-            QString code = getString("results", "code", line);
-            float ra = getFloat("results", "RA", line);
-            float dec = getFloat("results", "DEC", line);
-            QString ns = getString("results", "NS", line);
-            getEltString("selection", "code")->setValue(code);
-            getEltFloat("selection", "RA")->setValue(ra);
-            getEltFloat("selection", "DEC")->setValue(dec);
-            getEltString("selection", "NS")->setValue(ns, true);
-        }
+    //    if (e.type == "Fldelete")
+    //    {
+    //        double line = e.data[keyprop].toMap()["line"].toDouble();
+    //        getStore()[keyprop]->deleteLine(line);
+    //    }
+    //    if (e.type == "Flcreate")
+    //    {
+    //        getStore()[keyprop]->newLine(e.data[keyprop].toMap()["elements"].toMap());
+    //    }
+    //    if (e.type == "Flupdate")
+    //    {
+    //        double line = e.data[keyprop].toMap()["line"].toDouble();
+    //        getStore()[keyprop]->updateLine(line, e.data[keyprop].toMap()["elements"].toMap());
+    //    }
+    //    if (e.type == "Flselect" && keyprop == "results")
+    //    {
+    //        double line = e.data[keyprop].toMap()["line"].toDouble();
+    //        QString code = getString("results", "code", line);
+    //        float ra = getFloat("results", "RA", line);
+    //        float dec = getFloat("results", "DEC", line);
+    //        QString ns = getString("results", "NS", line);
+    //        getEltString("selection", "code")->setValue(code);
+    //        getEltFloat("selection", "RA")->setValue(ra);
+    //        getEltFloat("selection", "DEC")->setValue(dec);
+    //        getEltString("selection", "NS")->setValue(ns, true);
+    //    }
 
-    }
+    //}
 }
 
 void Dummy::newBLOB(INDI::PropertyBlob pblob)
@@ -501,14 +502,4 @@ void Dummy::newDevice(INDI::BaseDevice bd)
 {
     Q_UNUSED(bd);
 }
-void Dummy::OnModuleStatusAnswer(const QString module, OST::ModuleStatus status)
-{
-    //qDebug() << "OnModuleStatusAnswer " << this->getModuleName() << " - from : " << module << " : " << status.message << "(" <<
-    //         status.state << ")";
-    getEltString("modulesstatus", "module")->setValue(module, false);
-    getEltLight("modulesstatus", "status")->setValue(status.state, true);
-    getProperty("modulesstatus")->push();
-
-}
-
 

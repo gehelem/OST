@@ -215,6 +215,9 @@ enum class EvType
     lc,        /*!< lov create */
     lu,        /*!< lov udpate */
     ld,        /*!< lov delete */
+    dp,        /*!< delete/remove property */
+    de,        /*!< delete/remove element  */
+    dm,        /*!< delete/remove module   */
 };
 
 enum class ExtEvType

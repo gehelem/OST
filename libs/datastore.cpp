@@ -415,93 +415,93 @@ QVariantMap Datastore::getProfile(void)
 {
     QVariantMap result;
     QVariantMap propertiesResult;
-    OST::Event e;
-    e.type = "moduledump";
-    QVariantMap props = getPropertiesDump(e).toVariantMap();
-    result["globallovs"] = getGlobalLovsDump().toVariantHash();
-
-
-    foreach(const QString &keyprop, props.keys())
-    {
-        if (props[keyprop].toMap().contains("hasprofile"))
-        {
-            if (props[keyprop].toMap()["hasprofile"].toBool())
-            {
-                QVariantMap property;
-                if (props[keyprop].toMap().contains("e"))
-                {
-                    QVariantMap elements;
-                    foreach(const QString &keyelt, props[keyprop].toMap()["e"].toMap().keys())
-                    {
-                        QVariantMap element;
-                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("value"))
-                        {
-                            element["value"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["value"];
-                        }
-                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("min"))
-                        {
-                            element["min"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["min"];
-                        }
-                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("max"))
-                        {
-                            element["max"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["max"];
-                        }
-                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("step"))
-                        {
-                            element["step"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["step"];
-                        }
-                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("year"))
-                        {
-                            element["year"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["year"];
-                        }
-                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("month"))
-                        {
-                            element["month"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["month"];
-                        }
-                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("day"))
-                        {
-                            element["day"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["day"];
-                        }
-                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("hh"))
-                        {
-                            element["hh"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["hh"];
-                        }
-                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("mm"))
-                        {
-                            element["mm"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["mm"];
-                        }
-                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("ss"))
-                        {
-                            element["ss"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["ss"];
-                        }
-                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("ms"))
-                        {
-                            element["ms"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["ms"];
-                        }
-                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("gridvalues"))
-                        {
-                            element["gridvalues"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["gridvalues"];
-                        }
-                        elements[keyelt] = element;
-                    }
-                    property["e"] = elements;
-                }
-                if (props[keyprop].toMap().contains("gridheaders"))
-                {
-                    property["gridheaders"] = props[keyprop].toMap()["gridheaders"].toList();
-                }
-                if (props[keyprop].toMap().contains("grid"))
-                {
-                    property["grid"] = props[keyprop].toMap()["grid"].toList();
-                }
-
-                propertiesResult[keyprop] = property;
-            }
-
-        }
-    }
-
-    result["p"] = propertiesResult;
+    //    OST::Event e;
+    //    e.type = "moduledump";
+    //    QVariantMap props = getPropertiesDump(e).toVariantMap();
+    //    result["globallovs"] = getGlobalLovsDump().toVariantHash();
+    //
+    //
+    //    foreach(const QString &keyprop, props.keys())
+    //    {
+    //        if (props[keyprop].toMap().contains("hasprofile"))
+    //        {
+    //            if (props[keyprop].toMap()["hasprofile"].toBool())
+    //            {
+    //                QVariantMap property;
+    //                if (props[keyprop].toMap().contains("e"))
+    //                {
+    //                    QVariantMap elements;
+    //                    foreach(const QString &keyelt, props[keyprop].toMap()["e"].toMap().keys())
+    //                    {
+    //                        QVariantMap element;
+    //                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("value"))
+    //                        {
+    //                            element["value"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["value"];
+    //                        }
+    //                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("min"))
+    //                        {
+    //                            element["min"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["min"];
+    //                        }
+    //                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("max"))
+    //                        {
+    //                            element["max"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["max"];
+    //                        }
+    //                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("step"))
+    //                        {
+    //                            element["step"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["step"];
+    //                        }
+    //                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("year"))
+    //                        {
+    //                            element["year"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["year"];
+    //                        }
+    //                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("month"))
+    //                        {
+    //                            element["month"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["month"];
+    //                        }
+    //                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("day"))
+    //                        {
+    //                            element["day"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["day"];
+    //                        }
+    //                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("hh"))
+    //                        {
+    //                            element["hh"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["hh"];
+    //                        }
+    //                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("mm"))
+    //                        {
+    //                            element["mm"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["mm"];
+    //                        }
+    //                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("ss"))
+    //                        {
+    //                            element["ss"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["ss"];
+    //                        }
+    //                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("ms"))
+    //                        {
+    //                            element["ms"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["ms"];
+    //                        }
+    //                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("gridvalues"))
+    //                        {
+    //                            element["gridvalues"] = props[keyprop].toMap()["e"].toMap()[keyelt].toMap()["gridvalues"];
+    //                        }
+    //                        elements[keyelt] = element;
+    //                    }
+    //                    property["e"] = elements;
+    //                }
+    //                if (props[keyprop].toMap().contains("gridheaders"))
+    //                {
+    //                    property["gridheaders"] = props[keyprop].toMap()["gridheaders"].toList();
+    //                }
+    //                if (props[keyprop].toMap().contains("grid"))
+    //                {
+    //                    property["grid"] = props[keyprop].toMap()["grid"].toList();
+    //                }
+    //
+    //                propertiesResult[keyprop] = property;
+    //            }
+    //
+    //        }
+    //    }
+    //
+    //    result["p"] = propertiesResult;
     return result;
 }
 
@@ -513,11 +513,7 @@ void Datastore::deleteOstProperty(const QString &pPropertyName)
         return;
     }
     mStore.remove(pPropertyName);
-    OST::Event event;
-    event.type = "dp";
-    event.module = this->getModuleName();
-    event.property = pPropertyName;
-    emit datastoreEvent(this, event);
+    emit datastoreEvent(OST::EvType::dp, pPropertyName, nullptr,  nullptr, nullptr, this);
 }
 
 

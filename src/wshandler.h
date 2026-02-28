@@ -55,14 +55,15 @@ class WShandler : public QObject
          */
         void onLog(OST::LogLevel level, const QString &message,
                    const QVariantList &args, const QString &context);
-        void onModuleEvent(Basemodule* module, OST::Event event);
+        void onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase* elt, OST::PropertyBase* prp, OST::LovBase* lov,
+                           Basemodule* mod);
         void sendJsonMessage(QJsonObject json);
         void sendJsonMessage(QJsonObject json, QWebSocket* client);
 
     signals:
         void closed();
-        void externalEvent(OST::Event);
-        void clientEvent(OST::Event, QWebSocket*, QString);
+        void externalEvent(QVariantMap);
+        void clientEvent(QVariantMap, QWebSocket*, QString);
 
     private:
         void onNewConnection();

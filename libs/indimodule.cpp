@@ -40,65 +40,66 @@ IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap
     timer->start(2000);
 
 }
-void IndiModule::OnDispatchToIndiExternalEvent(OST::Event e)
-
+void IndiModule::onExternalEvent(QVariantMap extEvent)
 {
-    if (!(getModuleName() == e.module))
-    {
-        return;
-    }
-    //sendMessage("OnIndiExternalEvent - recv : " + getModuleName()+ "-" + eventType + "-" + eventKey);
-    foreach(const QString &keyprop, e.data.keys())
-    {
-        foreach(const QString &keyelt, e.data[keyprop].toMap()["elements"].toMap().keys())
-        {
-            //setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
-            if (keyprop == "serveractions")
-            {
-                getEltBool(keyprop, keyelt)->setValue(false, false);
-                if (keyelt == "conserv")
-                {
-                    getProperty(keyprop)->setState(OST::Busy, true);
-                    if (connectIndi()) getProperty(keyprop)->setState(OST::Ok, true);
-                    else getProperty(keyprop)->setState(OST::Error, true);
-                }
-                if (keyelt == "disconserv")
-                {
-                    getProperty(keyprop)->setState(OST::Busy, true);
-                    if (disconnectIndi()) getProperty(keyprop)->setState(OST::Ok, true);
-                    else getProperty(keyprop)->setState(OST::Error, true);
-                }
-            }
-            if (keyprop == "devicesactions")
-            {
-                getEltBool(keyprop, keyelt)->setValue(false, false);
-                if (!isServerConnected())
-                {
-                    logWarning("%1 - Indi server not connected", {QString("OnDispatchToIndiExternalEvent")});
-                    getProperty(keyprop)->setState(OST::Error, true);
-                    break;
-                }
-                if (keyelt == "condevs")
-                {
-                    getProperty(keyprop)->setState(OST::Busy, true);
-                    if (connectAllDevices()) getProperty(keyprop)->setState(OST::Ok, true);
-                    else getProperty(keyprop)->setState(OST::Error, true);
-                }
-                if (keyelt == "discondevs")
-                {
-                    getProperty(keyprop)->setState(OST::Busy, true);
-                    if (disconnectAllDevices()) getProperty(keyprop)->setState(OST::Ok, true);
-                    else getProperty(keyprop)->setState(OST::Error, true);
-                }
-                if (keyelt == "loadconfs")
-                {
-                    getProperty(keyprop)->setState(OST::Busy, true);
-                    if (loadDevicesConfs()) getProperty(keyprop)->setState(OST::Ok, true);
-                    else getProperty(keyprop)->setState(OST::Error, true);
-                }
-            }
-        }
-    }
+    qDebug() << "IndiModule::onExternalEvent" << extEvent;
+
+    //    if (!(getModuleName() == e.module))
+    //    {
+    //        return;
+    //    }
+    //    //sendMessage("OnIndiExternalEvent - recv : " + getModuleName()+ "-" + eventType + "-" + eventKey);
+    //    foreach(const QString &keyprop, e.data.keys())
+    //    {
+    //        foreach(const QString &keyelt, e.data[keyprop].toMap()["elements"].toMap().keys())
+    //        {
+    //            //setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
+    //            if (keyprop == "serveractions")
+    //            {
+    //                getEltBool(keyprop, keyelt)->setValue(false, false);
+    //                if (keyelt == "conserv")
+    //                {
+    //                    getProperty(keyprop)->setState(OST::Busy, true);
+    //                    if (connectIndi()) getProperty(keyprop)->setState(OST::Ok, true);
+    //                    else getProperty(keyprop)->setState(OST::Error, true);
+    //                }
+    //                if (keyelt == "disconserv")
+    //                {
+    //                    getProperty(keyprop)->setState(OST::Busy, true);
+    //                    if (disconnectIndi()) getProperty(keyprop)->setState(OST::Ok, true);
+    //                    else getProperty(keyprop)->setState(OST::Error, true);
+    //                }
+    //            }
+    //            if (keyprop == "devicesactions")
+    //            {
+    //                getEltBool(keyprop, keyelt)->setValue(false, false);
+    //                if (!isServerConnected())
+    //                {
+    //                    logWarning("%1 - Indi server not connected", {QString("OnDispatchToIndiExternalEvent")});
+    //                    getProperty(keyprop)->setState(OST::Error, true);
+    //                    break;
+    //                }
+    //                if (keyelt == "condevs")
+    //                {
+    //                    getProperty(keyprop)->setState(OST::Busy, true);
+    //                    if (connectAllDevices()) getProperty(keyprop)->setState(OST::Ok, true);
+    //                    else getProperty(keyprop)->setState(OST::Error, true);
+    //                }
+    //                if (keyelt == "discondevs")
+    //                {
+    //                    getProperty(keyprop)->setState(OST::Busy, true);
+    //                    if (disconnectAllDevices()) getProperty(keyprop)->setState(OST::Ok, true);
+    //                    else getProperty(keyprop)->setState(OST::Error, true);
+    //                }
+    //                if (keyelt == "loadconfs")
+    //                {
+    //                    getProperty(keyprop)->setState(OST::Busy, true);
+    //                    if (loadDevicesConfs()) getProperty(keyprop)->setState(OST::Ok, true);
+    //                    else getProperty(keyprop)->setState(OST::Error, true);
+    //                }
+    //            }
+    //        }
+    //    }
 }
 void IndiModule::connectIndiTimer()
 {

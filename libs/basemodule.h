@@ -40,10 +40,6 @@ class Basemodule : public DBManager
         QString mModuleLabel;
         OST::ModuleStatus mStatus;
 
-
-        void OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                           const QVariantMap &eventData) override;
-
     signals:
         void moduleStatusRequest(void);
         void moduleStatusAnswer(const QString module, OST::ModuleStatus);
@@ -67,7 +63,7 @@ class Basemodule : public DBManager
         void onDatastoreEvent(OST::EvType evt, QVariant data, OST::ElementBase* elt, OST::PropertyBase* prp, OST::LovBase* lov,
                               Datastore* mod);
 
-        void OnExternalEvent(OST::ExtEvent e);
+        void onExternalEvent(QVariantMap extEvent);
 
 }
 ;

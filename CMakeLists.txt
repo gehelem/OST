@@ -48,7 +48,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol)
+#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/utils)
@@ -133,7 +133,7 @@ add_executable(ostserver
 )
 target_link_libraries(ostserver
     ostbasemodule
-    ostmaincontrol
+#    ostmaincontrol
     Qt${QT_VERSION_MAJOR}::Gui
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Widgets
@@ -351,20 +351,20 @@ target_compile_definitions(ostdummy PRIVATE dummy_LIBRARY)
 #list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.qrc)
 #qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
-add_library(ostmaincontrol SHARED
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.qrc
-)
-target_link_libraries(ostmaincontrol PRIVATE
-    ostindimodule
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Concurrent
-    Qt${QT_VERSION_MAJOR}::Widgets
-    Threads::Threads
-    z
-)
-target_compile_definitions(ostmaincontrol PRIVATE maincontrol_LIBRARY)
+#add_library(ostmaincontrol SHARED
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.h
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.cpp
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.qrc
+#)
+#target_link_libraries(ostmaincontrol PRIVATE
+#    ostindimodule
+#    Qt${QT_VERSION_MAJOR}::Core
+#    Qt${QT_VERSION_MAJOR}::Concurrent
+#    Qt${QT_VERSION_MAJOR}::Widgets
+#    Threads::Threads
+#    z
+#)
+#target_compile_definitions(ostmaincontrol PRIVATE maincontrol_LIBRARY)
 
 # Indipanel module
 add_library(ostindipanel SHARED
@@ -384,7 +384,9 @@ target_compile_definitions(ostindipanel PRIVATE INDIPANEL_MODULE)
 
 install(TARGETS
     ostserver
-    ostbasemodule ostindimodule ostmaincontrol ostindipanel
+    ostbasemodule ostindimodule
+#    ostmaincontrol
+    ostindipanel
     RUNTIME DESTINATION "/usr/bin"
     LIBRARY DESTINATION "/usr/lib"
     PUBLIC_HEADER DESTINATION "/usr/include/ost"
@@ -394,16 +396,16 @@ install(TARGETS
 # This ensures version information is always up-to-date with each build
 
 # Create a custom target that always runs
-#add_custom_target(
-#    generate_version ALL
-#    COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/generate-version.sh"
-#            "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
-#            "${CMAKE_CURRENT_SOURCE_DIR}/src/version.cc.in"
-#    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-#    BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
-#    COMMENT "Generating version.cc from git information..."
-#    VERBATIM
-#)
+add_custom_target(
+    generate_version ALL
+    COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/generate-version.sh"
+            "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/version.cc.in"
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
+    COMMENT "Generating version.cc from git information..."
+    VERBATIM
+)
 
 # Add version.cc to sources
 list(APPEND SOURCES "${CMAKE_CURRENT_BINARY_DIR}/version.cc" version.hh)

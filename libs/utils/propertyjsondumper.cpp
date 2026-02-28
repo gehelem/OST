@@ -154,7 +154,7 @@ QJsonObject PropertyJsonDumper::dumpDefault(PropertyMulti* pProperty)
             QJsonArray jLine;
             foreach(QString elt, pProperty->getGridHeaders())
             {
-                ValueJsonDumper d(mEvent, mData);
+                ValueJsonDumper d(mEvent, mData, pProperty->getElt(elt));
                 pProperty->getGrid()[i][elt]->accept(&d);
                 jLine.append(d.getResult());
             }
@@ -237,7 +237,7 @@ QJsonObject PropertyJsonDumper::dumpGridCreate(PropertyMulti* pProperty)
         QJsonObject values;
         foreach(QString elt, pProperty->getGridHeaders())
         {
-            ValueJsonDumper d(mEvent.type);
+            ValueJsonDumper d(mEvent, mData, pProperty->getElt(elt));
             pProperty->getGrid()[i][elt]->accept(&d);
             values[elt] = d.getResult();
         }
@@ -255,7 +255,7 @@ QJsonObject PropertyJsonDumper::dumpGridUpdate(PropertyMulti* pProperty)
         QJsonObject values;
         foreach(QString elt, pProperty->getGridHeaders())
         {
-            ValueJsonDumper d(mEvent, mData);
+            ValueJsonDumper d(mEvent, mData, pProperty->getElt(elt));
             pProperty->getGrid()[i][elt]->accept(&d);
             values[elt] = d.getResult();
         }

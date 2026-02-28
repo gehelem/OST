@@ -232,7 +232,7 @@ void  PropertyMulti::deleteElt(QString key)
     }
     mElts.remove(key);
     mGrid.clear();
-    emit PropertyBase::prpEvent(OST::EvType::ps, QVariant(), nullptr, this);
+    emit prpEvent(OST::EvType::de, key, nullptr,  this);
 
 }
 
