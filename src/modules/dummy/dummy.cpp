@@ -205,6 +205,14 @@ void Dummy::onTimer()
     logDebug("deleteprop :");
     deleteOstProperty("dynprop2");
 
+    logDebug("profile ");
+
+    //QJsonDocument d(this->getProfile().toObject());
+    //QByteArray ba = d.toJson(QJsonDocument::Compact);
+    //logDebug(QString(ba));
+
+
+
     //dynprop->setState(OST::State::Busy, true);
     //dyntext->setValue("Okydoky", false);
     //dynlight->setValue(OST::State::Ok, true);

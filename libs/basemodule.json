@@ -5,6 +5,12 @@
         "label":"Loaded modules",
         "values":    [
         ]
+    },
+    "profiles":{
+        "type":"string",
+        "label":"Profiles",
+        "values":    [
+        ]
     }
 },
 "p":{

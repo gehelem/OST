@@ -3,6 +3,7 @@
 #include "basemodule.h"
 #include "version.cc"
 #include "model/element/common.h"
+#include "libs/utils/modulejsondumper.h"
 
 Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap params)
     : mAvailableModuleLibs(params),
@@ -42,141 +43,8 @@ Basemodule::~Basemodule()
 
 
 
-void Basemodule::setProfile(const QString &pProfileName)
-{
-    //QVariantMap prof;
-    //if (!getDbProfile(getClassName(), pProfileName, prof))
-    //{
-    //    logWarning("Can't get %1 profile", {pProfileName});
-    //    return;
-    //}
-    //setProfile(prof);
-    //emit moduleEvent(this, {"moduleSetProfile", this->getModuleName(), "", "", 0, QVariantMap()});
-
-    //logInfo("%1 profile sucessfully loaded", {pProfileName});
-    //QJsonObject ob;
-    //ob.fromVariantMap(prof);
-}
 
 
-
-void Basemodule::setProfile(QVariantMap profiledata)
-{
-    //    QVariantMap props = profiledata["p"].toMap();
-    //    foreach(const QString &key, props.keys())
-    //    {
-    //        if (getStore().contains(key))
-    //        {
-    //            QVariantMap data = props[key].toMap();
-    //            if (getStore()[key]->hasProfile())
-    //            {
-    //                if (data.contains("elements"))
-    //                {
-    //                    foreach(const QString &eltkey, props[key].toMap()["elements"].toMap().keys())
-    //                    {
-    //                        QVariant v = props[key].toMap()["elements"].toMap()[eltkey].toMap()["value"];
-    //                        if (getEltBase(key, eltkey)->getType() == "int")
-    //                        {
-    //                            getEltInt(key, eltkey)->setValue(v.toInt(), true);
-    //                        }
-    //                        if (getEltBase(key, eltkey)->getType() == "float")
-    //                        {
-    //                            getEltFloat(key, eltkey)->setValue(v.toDouble(), true);
-    //                        }
-    //                        if (getEltBase(key, eltkey)->getType() == "string")
-    //                        {
-    //                            getEltString(key, eltkey)->setValue(v.toString(), true);
-    //                        }
-    //                        if (getEltBase(key, eltkey)->getType() == "bool")
-    //                        {
-    //                            getEltBool(key, eltkey)->setValue(v.toBool(), true);
-    //                        }
-    //                        if (getEltBase(key, eltkey)->getType() == "time")
-    //                        {
-    //                            int hh = props[key].toMap()["elements"].toMap()[eltkey].toMap()["hh"].toInt();
-    //                            int mm = props[key].toMap()["elements"].toMap()[eltkey].toMap()["mm"].toInt();
-    //                            int ss = props[key].toMap()["elements"].toMap()[eltkey].toMap()["ss"].toInt();
-    //                            int ms = props[key].toMap()["elements"].toMap()[eltkey].toMap()["ms"].toInt();
-    //                            QTime tt;
-    //                            tt.setHMS(hh, mm, ss, ms);
-    //                            getEltTime(key, eltkey)->setValue(tt, true);
-    //                        }
-    //                        if (getEltBase(key, eltkey)->getType() == "date")
-    //                        {
-    //                            int d = props[key].toMap()["elements"].toMap()[eltkey].toMap()["day"].toInt();
-    //                            int m = props[key].toMap()["elements"].toMap()[eltkey].toMap()["month"].toInt();
-    //                            int y = props[key].toMap()["elements"].toMap()[eltkey].toMap()["year"].toInt();
-    //                            QDate dd;
-    //                            dd.setDate(y, m, d);
-    //                            getEltDate(key, eltkey)->setValue(dd, true);
-    //                        }
-    //
-    //                    }
-    //                }
-    //
-    //                if (data.contains("elements") && getStore()[key]->hasGrid() && data.contains("grid") && data.contains("gridheaders"))
-    //                {
-    //                    getStore()[key]->clearGrid();
-    //                    QVariantList lines = props[key].toMap()["grid"].toList();
-    //                    foreach (const QVariant &vline, lines)
-    //                    {
-    //                        QVariantList line = vline.toList();
-    //                        int icol = 0;
-    //                        foreach(const QVariant &vv, line)
-    //                        {
-    //                            QString eltkey = data["gridheaders"].toList().at(icol).toString();
-    //                            if (getEltBase(key, eltkey)->getType() == "int")
-    //                            {
-    //                                getEltInt(key, eltkey)->setValue(vv.toInt(), true);
-    //                            }
-    //                            if (getEltBase(key, eltkey)->getType() == "float")
-    //                            {
-    //                                getEltFloat(key, eltkey)->setValue(vv.toDouble(), true);
-    //                            }
-    //                            if (getEltBase(key, eltkey)->getType() == "string")
-    //                            {
-    //                                getEltString(key, eltkey)->setValue(vv.toString(), true);
-    //                            }
-    //                            if (getEltBase(key, eltkey)->getType() == "bool")
-    //                            {
-    //                                getEltBool(key, eltkey)->setValue(vv.toBool(), true);
-    //                            }
-    //                            if (getEltBase(key, eltkey)->getType() == "prg")
-    //                            {
-    //                                getEltPrg(key, eltkey)->setPrgValue(vv.toMap()["value"].toInt(), false);
-    //                                getEltPrg(key, eltkey)->setDynLabel(vv.toMap()["dynlabel"].toString(), true);
-    //
-    //                            }
-    //                            if (getEltBase(key, eltkey)->getType() == "img")
-    //                            {
-    //                                OST::ImgData i;
-    //                                i.mUrlJpeg = vv.toMap()["urljpeg"].toString();
-    //                                i.mUrlFits = vv.toMap()["urlfits"].toString();
-    //                                i.height = vv.toMap()["height"].toInt();
-    //                                i.width = vv.toMap()["width"].toInt();
-    //                                getEltImg(key, eltkey)->setValue(i, true);
-    //                            }
-    //                            icol++;
-    //                        }
-    //                        getStore()[key]->push();
-    //                    }
-    //                }
-    //            }
-    //        }
-    //    }
-
-}
-void Basemodule::setProfiles()
-{
-    //    QVariantMap profs;
-    //    getDbProfiles(getClassName(), profs);
-    //    getEltString("loadprofile", "name")->lovClear();
-    //    for(QVariantMap::const_iterator iter = profs.begin(); iter != profs.end(); ++iter)
-    //    {
-    //        getEltString("loadprofile", "name")->lovAdd(iter.key(), iter.key());
-    //    }
-    //    logInfo("Available profiles refreshed");
-}
 
 void Basemodule::onExternalEvent(QVariantMap extEvent)
 {
@@ -476,3 +344,127 @@ void Basemodule::onDatastoreEvent(OST::EvType evt, QVariant data, OST::ElementBa
     emit moduleEvent(evt, data, elt, prp, lov, this);
 }
 
+bool Basemodule::saveProfile(const QString &pProfileName)
+{
+    QJsonObject obj = OST::ModuleJsonDumper(OST::EvType::pr, QVariant(), nullptr, nullptr, nullptr, this).toObject();
+    return this->setDbProfile(this->getClassName(), pProfileName, obj);
+}
+bool Basemodule::loadProfile(const QString &pProfileName)
+{
+    QJsonObject obj;
+    if (!this->getDbProfile(this->getClassName(), pProfileName, obj)) return false;
+    QVariantMap props = obj["p"].toVariant().toMap();
+    foreach(const QString &key, props.keys())
+    {
+        if (getStore().contains(key))
+        {
+            QVariantMap data = props[key].toMap();
+            if (getStore()[key]->hasProfile())
+            {
+                if (data.contains("e"))
+                {
+                    foreach(const QString &eltkey, props[key].toMap()["e"].toMap().keys())
+                    {
+                        QVariant v = props[key].toMap()["e"].toMap()[eltkey].toMap()["value"];
+                        if (getEltBase(key, eltkey)->getType() == "int")
+                        {
+                            getEltInt(key, eltkey)->setValue(v.toInt(), true);
+                        }
+                        if (getEltBase(key, eltkey)->getType() == "float")
+                        {
+                            getEltFloat(key, eltkey)->setValue(v.toDouble(), true);
+                        }
+                        if (getEltBase(key, eltkey)->getType() == "string")
+                        {
+                            getEltString(key, eltkey)->setValue(v.toString(), true);
+                        }
+                        if (getEltBase(key, eltkey)->getType() == "bool")
+                        {
+                            getEltBool(key, eltkey)->setValue(v.toBool(), true);
+                        }
+                        if (getEltBase(key, eltkey)->getType() == "time")
+                        {
+                            int hh = props[key].toMap()["e"].toMap()[eltkey].toMap()["hh"].toInt();
+                            int mm = props[key].toMap()["e"].toMap()[eltkey].toMap()["mm"].toInt();
+                            int ss = props[key].toMap()["e"].toMap()[eltkey].toMap()["ss"].toInt();
+                            int ms = props[key].toMap()["e"].toMap()[eltkey].toMap()["ms"].toInt();
+                            QTime tt;
+                            tt.setHMS(hh, mm, ss, ms);
+                            getEltTime(key, eltkey)->setValue(tt, true);
+                        }
+                        if (getEltBase(key, eltkey)->getType() == "date")
+                        {
+                            int d = props[key].toMap()["e"].toMap()[eltkey].toMap()["day"].toInt();
+                            int m = props[key].toMap()["e"].toMap()[eltkey].toMap()["month"].toInt();
+                            int y = props[key].toMap()["e"].toMap()[eltkey].toMap()["year"].toInt();
+                            QDate dd;
+                            dd.setDate(y, m, d);
+                            getEltDate(key, eltkey)->setValue(dd, true);
+                        }
+
+                    }
+                }
+
+                if (data.contains("e") && getStore()[key]->hasGrid() && data.contains("grid") && data.contains("gridheaders"))
+                {
+                    getStore()[key]->clearGrid();
+                    QVariantList lines = props[key].toMap()["grid"].toList();
+                    foreach (const QVariant &vline, lines)
+                    {
+                        QVariantList line = vline.toList();
+                        int icol = 0;
+                        foreach(const QVariant &vv, line)
+                        {
+                            QString eltkey = data["gridheaders"].toList().at(icol).toString();
+                            if (getEltBase(key, eltkey)->getType() == "int")
+                            {
+                                getEltInt(key, eltkey)->setValue(vv.toInt(), true);
+                            }
+                            if (getEltBase(key, eltkey)->getType() == "float")
+                            {
+                                getEltFloat(key, eltkey)->setValue(vv.toDouble(), true);
+                            }
+                            if (getEltBase(key, eltkey)->getType() == "string")
+                            {
+                                getEltString(key, eltkey)->setValue(vv.toString(), true);
+                            }
+                            if (getEltBase(key, eltkey)->getType() == "bool")
+                            {
+                                getEltBool(key, eltkey)->setValue(vv.toBool(), true);
+                            }
+                            if (getEltBase(key, eltkey)->getType() == "prg")
+                            {
+                                getEltPrg(key, eltkey)->setPrgValue(vv.toMap()["value"].toInt(), false);
+                                getEltPrg(key, eltkey)->setDynLabel(vv.toMap()["dynlabel"].toString(), true);
+
+                            }
+                            if (getEltBase(key, eltkey)->getType() == "img")
+                            {
+                                OST::ImgData i;
+                                i.mUrlJpeg = vv.toMap()["urljpeg"].toString();
+                                i.mUrlFits = vv.toMap()["urlfits"].toString();
+                                i.height = vv.toMap()["height"].toInt();
+                                i.width = vv.toMap()["width"].toInt();
+                                getEltImg(key, eltkey)->setValue(i, true);
+                            }
+                            icol++;
+                        }
+                        getStore()[key]->push();
+                    }
+                }
+            }
+        }
+    }
+
+    return true;
+}
+void Basemodule::updateProfilesLov()
+{
+    QVariantMap profs;
+    getDbProfiles(getClassName(), profs);
+    getGlovString("profiles")->lovClear();
+    for(QVariantMap::const_iterator iter = profs.begin(); iter != profs.end(); ++iter)
+    {
+        getGlovString("profiles")->lovAdd(iter.key(), iter.key());
+    }
+}

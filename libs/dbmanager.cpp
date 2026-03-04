@@ -69,7 +69,7 @@ void DBManager::CreateDatabaseStructure()
     populateCatalog(":stars.txt", "Stars");
 
 }
-bool DBManager::setDbProfile(const QString &pModuleType, const QString &pProfileName, QVariantMap &profile )
+bool DBManager::setDbProfile(const QString &pModuleType, const QString &pProfileName, QJsonObject &content )
 {
     if(!mDb.open())
     {
@@ -77,8 +77,7 @@ bool DBManager::setDbProfile(const QString &pModuleType, const QString &pProfile
         return false;
     }
 
-    QJsonObject  obj = QJsonObject::fromVariantMap(profile);
-    QJsonDocument doc(obj);
+    QJsonDocument doc(content);
     QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
     QString strJson = QLatin1String(docByteArray);
     QString sql = "INSERT OR REPLACE INTO PROFILES ('MODULETYPE','PROFILENAME','ALLVALUES') VALUES ('" + pModuleType + "','" +
@@ -94,7 +93,7 @@ bool DBManager::setDbProfile(const QString &pModuleType, const QString &pProfile
     return true;
 
 }
-bool DBManager::getDbProfile(const QString &pModuleType, const QString &pProfileName, QVariantMap &result )
+bool DBManager::getDbProfile(const QString &pModuleType, const QString &pProfileName, QJsonObject &content )
 {
     if(!mDb.open())
     {
@@ -113,8 +112,7 @@ bool DBManager::getDbProfile(const QString &pModuleType, const QString &pProfile
     while (mQuery.next())
     {
         QJsonDocument res = QJsonDocument::fromJson(mQuery.value(0).toString().toUtf8());
-        QJsonObject  obj = res.object();
-        result = obj.toVariantMap();
+        content = res.object();
         mDb.close();
         return true;
     }

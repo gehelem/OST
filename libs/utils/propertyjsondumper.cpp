@@ -148,14 +148,9 @@ QJsonObject PropertyJsonDumper::dumpDefault(PropertyMulti* pProperty)
     }
     json["rule"] = pProperty->rule();
 
-    if (pProperty->getGridHeaders().size() > 0)
-    {
-        //qDebug() << "jsondump gridheader " << pProperty->key() << "-" << pProperty->getGridHeaders();
-        json["gridheaders"] = QJsonArray::fromStringList(pProperty->getGridHeaders());
-    }
-
     if (pProperty->hasGrid())
     {
+        json["gridheaders"] = QJsonArray::fromStringList(pProperty->getGridHeaders());
         QJsonArray grid;
         for(int i = 0; i < pProperty->getGrid().count(); i++)
         {
@@ -180,7 +175,6 @@ QJsonObject PropertyJsonDumper::dumpDefault(PropertyMulti* pProperty)
 
     return json;
 }
-
 QJsonObject PropertyJsonDumper::dumpSetValue(PropertyMulti* pProperty)
 {
     // Minimal content, no keyword for value
@@ -268,14 +262,9 @@ QJsonObject PropertyJsonDumper::dumpProfile(PropertyMulti* pProperty)
     }
     json["e"] = elements;
 
-    if (pProperty->getGridHeaders().size() > 0)
-    {
-        //qDebug() << "jsondump gridheader " << pProperty->key() << "-" << pProperty->getGridHeaders();
-        json["gridheaders"] = QJsonArray::fromStringList(pProperty->getGridHeaders());
-    }
-
     if (pProperty->hasGrid())
     {
+        json["gridheaders"] = QJsonArray::fromStringList(pProperty->getGridHeaders());
         QJsonArray grid;
         for(int i = 0; i < pProperty->getGrid().count(); i++)
         {

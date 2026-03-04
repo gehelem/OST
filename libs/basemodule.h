@@ -14,9 +14,11 @@ class Basemodule : public DBManager
         Basemodule(QString name, QString label, QString profile, QVariantMap params);
         ~Basemodule();
         void setWebroot(QString webroot);
-        void setProfile(QVariantMap profiledata);
-        void setProfile(const QString &pProfileName);
-        void setProfiles();
+
+        bool saveProfile(const QString &pProfileName);
+        bool loadProfile(const QString &pProfileName);
+        void updateProfilesLov();
+
         void sendDump(void);
         void killMe(void);
         /*

@@ -189,8 +189,8 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     mod->setWebroot(_webroot);
     mod->setObjectName(name);
     mod->dbInit(_dbpath, name);
-    mod->setProfile(profile);
-    mod->setProfiles();
+    mod->loadProfile(profile);
+    mod->updateProfilesLov();
     QVariantMap profs;
     dbmanager->getDbProfiles(mod->metaObject()->className(), profs);
     connect(mod, &Basemodule::moduleEvent, this, &Controller::onModuleEvent);
