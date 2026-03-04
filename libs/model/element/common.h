@@ -218,29 +218,38 @@ enum class EvType
     dp,        /*!< delete/remove property */
     de,        /*!< delete/remove element  */
     dm,        /*!< delete/remove module   */
+    am,        /*!< add module   */
 };
 inline QString EvToString(EvType ev)
 {
     switch (ev)
     {
         case OST::EvType::zz:
-            return "zz";
+            return "zz-no dump";
         case OST::EvType::aa:
-            return "aa";
+            return "aa-dump all data";
         case OST::EvType::ee:
-            return "ee";
+            return "ee-set one element value";
         case OST::EvType::ea:
-            return "ea";
+            return "ea-set all elements values (prop level) ";
         case OST::EvType::ev:
-            return "ev";
+            return "ev-set one element value/min/max/format ";
         case OST::EvType::ps:
-            return "ps";
+            return "ps-only property state";
         case OST::EvType::gc:
-            return "gc";
+            return "gc-grid new line ";
         case OST::EvType::gu:
-            return "gu";
+            return "gu-grid update line";
         case OST::EvType::gd:
-            return "gd";
+            return "gd-grid delete line";
+        case OST::EvType::dp:
+            return "dp-delete/remove property";
+        case OST::EvType::de:
+            return "de-delete/remove element";
+        case OST::EvType::dm:
+            return "dm-delete/remove module";
+        case OST::EvType::am:
+            return "am-add module";
         default:
             return "unknown:" + QString::number(static_cast<int>(ev));
     }
@@ -252,6 +261,7 @@ enum class ExtEvType
     SA,        /*!< set all values of a property */
     GC,        /*!< grid new line */
     GU,        /*!< grid update line  */
+    GF,        /*!< grid fetch line  */
     GD,        /*!< grid delete line  */
     GR,        /*!< grid reset */
 };

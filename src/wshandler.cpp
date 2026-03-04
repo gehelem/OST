@@ -148,6 +148,7 @@ void WShandler::onNewConnection()
 
 void WShandler::processTextMessage(QString message)
 {
+    qDebug() << "WShandler::processTextMessage" << message;
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
     QString clientGrant = mClientGrants[pClient->peerAddress().toString()];
     // OST::Event event;
@@ -170,12 +171,11 @@ void WShandler::processTextMessage(QString message)
     //        return;
     //    }
     //
-    //    if (obj["evt"].toString() == "Freadall")
-    //    {
-    //        event.type = "Freadall";
-    //        emit clientEvent(event, pClient, clientGrant);
-    //        return;
-    //    }
+    if (obj.contains("Freadall"))
+    {
+        emit clientEvent(obj.toVariantMap(), pClient, clientGrant);
+        return;
+    }
     //
     //    // Handle language setting from client
     //    if (obj["evt"].toString() == "setlanguage")

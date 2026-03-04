@@ -43,7 +43,7 @@ void IndiPanel::newDevice(INDI::BaseDevice dp)
                 OST::IntToPermission(pProperty.getPermission()),
                 pProperty.getDeviceName(),
                 pProperty.getGroupName(), "00", false, false);
-        createProperty(devpro, pm);
+        createProperty(pm);
     }
 }
 void IndiPanel::removeDevice(INDI::BaseDevice dp)
@@ -149,7 +149,7 @@ void IndiPanel::newProperty(INDI::Property pProperty)
             break;
         }
     }
-    createProperty(devpro, p);
+    createProperty(p);
 
 
 }
@@ -159,17 +159,18 @@ void IndiPanel::updateProperty (INDI::Property property)
     QString pro = property.getName();
     QString devpro = dev + pro;
     OST::PropertyMulti* p = getProperty(devpro);
+    QVariantMap mm;
     switch (property.getType())
     {
 
         case INDI_NUMBER:
         {
             INDI::PropertyNumber n = property;
-
             for (unsigned int i = 0; i < n.count(); i++)
             {
                 //qDebug() << "IndiPanel::updateProperty" << dev << pro << n[i].name << n[i].value;
-                if (i == n.count() - 1)
+                mm[n[i].name] = n[i].value;
+                /*if (i == n.count() - 1)
                 {
                     getEltFloat(devpro, n[i].name)->setValue(n[i].value, false);
                     //getEltFloat(devpro, n[i].name)->setMin(n[i].min,false); // commented as for example indi allows 0 with min=0.01 for CCD_EXPOSURE ... let's indi make controls
@@ -185,9 +186,10 @@ void IndiPanel::updateProperty (INDI::Property property)
                     getEltFloat(devpro, n[i].name)->setMax(n[i].max, false);
                     getEltFloat(devpro, n[i].name)->setStep(n[i].step, false);
                     getEltFloat(devpro, n[i].name)->setFormat(n[i].format, false);
-                }
+                }*/
 
             }
+            getProperty(devpro)->setAll(mm);
             break;
         }
         case INDI_SWITCH:

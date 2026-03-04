@@ -298,16 +298,16 @@ void Controller::onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase*
 }
 void Controller::OnClientEvent(QVariantMap event, QWebSocket* client, QString clientgrant)
 {
-    //if (event.type == "Freadall" || event.type == "setlanguage" )
-    //{
-    //    wshandler->sendJsonMessage(getModulesDump(clientgrant), client);
-    //}
+    if (event.contains("Freadall") || event.contains("setlanguage") )
+    {
+        wshandler->sendJsonMessage(getModulesDump(clientgrant), client);
+    }
 
 }
 
 void Controller::onExternalEvent(QVariantMap event)
 {
-    qDebug() << "Controller::OnExternalEvent" << event;
+    qDebug() << "Controller::onExternalEvent" << event;
     //QJsonObject obj = QJsonObject::fromVariantMap(event.data);
     //QJsonDocument doc(obj);
     //QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
@@ -317,11 +317,11 @@ void Controller::onExternalEvent(QVariantMap event)
     //    //pMainControl->sendMainMessage("Mainctl event : " + event.type + " : " + event.module + " : " +  " : " +
     //                                  strJson);
     //}
-    //if (event.type == "Freadall")
+    //if (event.contains("Freadall"))
     //{
     //    //wshandler->processFileEvent("foldersdump", mFoldersList);
     //    //wshandler->processFileEvent("filesdump", mFilesList);
-    //    //wshandler->sendJsonMessage(getModulesDump());
+    //    wshandler->sendJsonMessage(getModulesDump());
     //}
     //if (event.type == "Ffolderselect")
     //{

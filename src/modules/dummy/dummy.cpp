@@ -72,7 +72,7 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     dynprop->addElt( dynlight);
     dyntext = new OST::ElementString("dyntext", "Dyn text", "", "");
     dynprop->addElt(dyntext);
-    createProperty("dynprop", dynprop);
+    createProperty(dynprop);
     dynprop->setState(OST::State::Busy, true);
     dyntext->setValue("Okydoky", false);
     dynlight->setValue(OST::State::Ok, true);
@@ -131,7 +131,7 @@ void Dummy::onTimer()
     //dynprop->addElt( dynlight);
     //dyntext = new OST::ElementString("dyntext", "Dyn text", "", "");
     //dynprop->addElt(dyntext);
-    //createProperty("dynprop2", dynprop);
+    //createProperty(dynprop);
     //dynprop->setState(OST::State::Busy, true);
     //dyntext->setValue("Okydoky", false);
     //dynlight->setValue(OST::State::Ok, true);

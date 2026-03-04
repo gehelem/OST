@@ -95,17 +95,17 @@ class Datastore : public QObject
         QTime getTime(QString pProperty, QString pElement);
         QTime getTime(QString pProperty, QString pElement, long line);
         OST::LovString* getGlovString(QString pLov);
-        Q_DECL_DEPRECATED bool createProperty(const QString &pPropertyName,  OST::PropertyMulti* pProperty)
+        bool createProperty(OST::PropertyMulti* pProperty)
         {
-            if (mStore.contains(pPropertyName))
+            if (mStore.contains(pProperty->key()))
             {
-                logWarning("createProperty - property %1 already exists.", {pPropertyName});
+                logWarning("createProperty - property %1 already exists.", {pProperty->key()});
                 return false;
             }
-            mStore[pPropertyName] = pProperty;
+            mStore[pProperty->key()] = pProperty;
+            connect(mStore[pProperty->key()], &OST::PropertyMulti::prpEvent, this, &Datastore::onPropertyEvent);
+            connect(mStore[pProperty->key()], &OST::PropertyMulti::logMessage, this, &Datastore::onPropertyLog);
             onPropertyEvent(OST::EvType::aa, QVariant(), nullptr, pProperty); // force property creation event
-            connect(mStore[pPropertyName], &OST::PropertyMulti::prpEvent, this, &Datastore::onPropertyEvent);
-            connect(mStore[pPropertyName], &OST::PropertyMulti::logMessage, this, &Datastore::onPropertyLog);
             return true;
         }
         bool createGlobLov(const QString &pLovName,  OST::LovBase* pLov)

@@ -82,6 +82,8 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
         case OST::EvType::zz:
             break;
         case OST::EvType::aa:
+        case OST::EvType::am:
+            mResult = dumpDefault(pProperty);
             break;
         case OST::EvType::ee:
             mResult = dumpSetValue(pProperty);

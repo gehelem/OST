@@ -719,7 +719,7 @@ bool IndiModule::createDeviceProperty(const QString &key, const QString &label, 
         sendMessage("----------------------------");*/
 
     }
-    createProperty(key, pm);
+    createProperty(pm);
     return true;
 }
 void IndiModule::OnAfterIndiConnectIndiTimer()
@@ -847,7 +847,7 @@ bool IndiModule::defineMeAsImager()
     {
         OST::PropertyMulti* dynprop = new OST::PropertyMulti("image", "Image", OST::Permission::WriteOnly, "Control",
                 "", "000Control222", false, false);
-        createProperty("image", dynprop);
+        createProperty(dynprop);
     }
 
     if (getStore().contains("image"))
@@ -1027,7 +1027,7 @@ bool IndiModule::giveMeAnOptic()
     OST::PropertyMulti* pm = new OST::PropertyMulti("optic", "Optic", OST::ReadWrite, "Parameters", "General", "222Parms333",
             true,
             false);
-    createProperty("optic", pm);
+    createProperty(pm);
 
     OST::ElementFloat* f = new  OST::ElementFloat("fl", "Focal length", "1", "");
     f->setDirectEdit(true);
