@@ -130,6 +130,7 @@
     },
     "numbersRW": {
         "hasprofile":true,
+        "hasGrid":true,
         "devcat": "Examples",
         "e": {
             "n1": {

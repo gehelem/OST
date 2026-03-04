@@ -85,6 +85,10 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
         case OST::EvType::am:
             mResult = dumpDefault(pProperty);
             break;
+        case OST::EvType::av:
+        case OST::EvType::pr:
+            mResult = dumpProfile(pProperty);
+            break;
         case OST::EvType::ee:
             mResult = dumpSetValue(pProperty);
             break;
@@ -109,6 +113,7 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
         default:
             //mResult = dumpDefault(pProperty);
             mResult = QJsonObject();
+            mResult["PropertyJsonDumperError"] = "Unhandled event : " +  EvToString(mEvent) ;
     }
 
 
@@ -211,7 +216,6 @@ QJsonObject PropertyJsonDumper::dumpSetValueWithMinMax(PropertyMulti* pProperty)
     return json;
 
 }
-
 QJsonObject PropertyJsonDumper::dumpSetAll(PropertyMulti* pProperty)
 {
     // Minimal content for multiple elements
@@ -247,6 +251,46 @@ QJsonObject PropertyJsonDumper::dumpGridCreate(PropertyMulti* pProperty)
         json["values"] = values;
         json["i"] = i;
     }
+    return json;
+}
+QJsonObject PropertyJsonDumper::dumpProfile(PropertyMulti* pProperty)
+{
+    QJsonObject json, elements;
+
+    foreach(const QString &key, pProperty->getElts()->keys())
+    {
+        OST::ElementJsonDumper d(EvType::ev, QVariant(), pProperty->getElt(key));
+        QVariantMap m;
+        bool b = false;
+        pProperty->getElt(key)->accept(&d, m, b);
+        QJsonObject value = d.getResult();
+        elements[key] = value;
+    }
+    json["e"] = elements;
+
+    if (pProperty->getGridHeaders().size() > 0)
+    {
+        //qDebug() << "jsondump gridheader " << pProperty->key() << "-" << pProperty->getGridHeaders();
+        json["gridheaders"] = QJsonArray::fromStringList(pProperty->getGridHeaders());
+    }
+
+    if (pProperty->hasGrid())
+    {
+        QJsonArray grid;
+        for(int i = 0; i < pProperty->getGrid().count(); i++)
+        {
+            QJsonArray jLine;
+            foreach(QString elt, pProperty->getGridHeaders())
+            {
+                ValueJsonDumper d(EvType::ev, QVariant(), pProperty->getElt(elt));
+                pProperty->getGrid()[i][elt]->accept(&d);
+                jLine.append(d.getResult());
+            }
+            grid.append(jLine);
+        }
+        json["grid"] = grid;
+    }
+
     return json;
 }
 QJsonObject PropertyJsonDumper::dumpGridUpdate(PropertyMulti* pProperty)

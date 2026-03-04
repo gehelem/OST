@@ -263,7 +263,8 @@ void PropertyMulti::setAll(const QVariantMap &pValues)
     /* Check if data is valid and contains every value */
     foreach(const QString &elt, mElts.keys())
     {
-        if ((mElts[elt]->getType() == "int") || (mElts[elt]->getType() == "float") || (mElts[elt]->getType() == "string"))
+        if ((mElts[elt]->getType() == "int") || (mElts[elt]->getType() == "float") || (mElts[elt]->getType() == "string")
+                || (mElts[elt]->getType() == "bool") || (mElts[elt]->getType() == "date") || (mElts[elt]->getType() == "time"))
         {
             if (!pValues.contains(elt))
             {
@@ -291,7 +292,8 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
     /* Check if data is valid and contains every value */
     foreach(const QString &elt, mElts.keys())
     {
-        if ((mElts[elt]->getType() == "int") || (mElts[elt]->getType() == "float") || (mElts[elt]->getType() == "string"))
+        if ((mElts[elt]->getType() == "int") || (mElts[elt]->getType() == "float") || (mElts[elt]->getType() == "string")
+                || (mElts[elt]->getType() == "bool") || (mElts[elt]->getType() == "date") || (mElts[elt]->getType() == "time"))
         {
             if (!pValues.contains(elt))
             {
@@ -315,10 +317,18 @@ bool PropertyMulti::updateLine(const int i, const QVariantMap &pValues)
         logError("PropertyMulti::updateLine - no array/grid defined");
         return false;
     }
+
+    if (i >= mGrid.size())
+    {
+        logWarning("Can't update line" + QString::number(i)  + " >= " + QString::number(mGrid.size()));
+        return false;
+    }
+
     /* Check if data is valid and contains every value */
     foreach(const QString &elt, mElts.keys())
     {
-        if (mElts[elt]->getType() == "int" || mElts[elt]->getType() == "float" || mElts[elt]->getType() == "string")
+        if ((mElts[elt]->getType() == "int") || (mElts[elt]->getType() == "float") || (mElts[elt]->getType() == "string")
+                || (mElts[elt]->getType() == "bool") || (mElts[elt]->getType() == "date") || (mElts[elt]->getType() == "time"))
         {
             if (!pValues.contains(elt))
             {
@@ -361,6 +371,12 @@ bool PropertyMulti::deleteLine(const int i)
         logError("PropertyMulti::Push - no array/grid defined");
         return false;
     }
+    if (i >= mGrid.size())
+    {
+        logWarning("Can't delete line" + QString::number(i)  + " >= " + QString::number(mGrid.size()));
+        return false;
+    }
+
     mGrid.removeAt(i);
     emit PropertyBase::prpEvent(OST::EvType::gd, i, nullptr, this);
     return true;
@@ -518,7 +534,7 @@ bool PropertyMulti::fetchLine(int l)
     {
         mGrid.at(l)[e]->updateElement(true);
     }
-    emit PropertyBase::prpEvent(OST::EvType::aa, QVariant(), nullptr, this);
+    //emit PropertyBase::prpEvent(OST::EvType::aa, QVariant(), nullptr, this); //we don't need any dedicated event : setValue is already doing it
     return true;
 }
 bool PropertyMulti::updateLine(const int i)

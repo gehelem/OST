@@ -107,6 +107,73 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
 
 void Dummy::onTimer()
 {
+
+    //    zz = 0,    /*!< no dump       */
+    //        aa,        /*!< dump all data */
+    //        ee,        /*!< set one element value */
+    //        ea,        /*!< set all elements values (prop level) */
+    //        ev,        /*!< set one element value/min/max/format */
+    //        ps,        /*!< only property state */
+    //        gc,        /*!< grid new line */
+    //        gu,        /*!< grid update line  */
+    //        gd,        /*!< grid delete line  */
+    //        gr,        /*!< grid reset */
+    //        lc,        /*!< lov create */
+    //        lu,        /*!< lov udpate */
+    //        ld,        /*!< lov delete */
+    //        dp,        /*!< delete/remove property */
+    //        de,        /*!< delete/remove element  */
+    //        dm,        /*!< delete/remove module   */
+    //        am,        /*!< add module   */
+    //
+
+    logDebug("ee :");
+    usleep(50);
+    getEltInt("numbersRW", "n1")->setValue(12, true);
+
+    logDebug("ea :");
+    usleep(50);
+    QVariantMap j;
+    j["n1"] = 1;
+    j["n2"] = 2;
+    j["n3"] = 3;
+    j["n4"] = 4;
+    j["n5"] = 5;
+    getProperty("numbersRW")->setAll(j);
+
+    logDebug("ev :");
+    usleep(50);
+    getEltInt("numbersRW", "n1")->setMinMax(0, 100, true);
+
+    logDebug("ps x3 :");
+    usleep(50);
+    getProperty("numbersRW")->disable();
+    getProperty("numbersRW")->setState(OST::State::Ok, true);
+    getProperty("numbersRW")->enable();
+
+    logDebug("gc x2:");
+    usleep(50);
+    getProperty("numbersRW")->newLine(j);
+    getProperty("numbersRW")->newLine(j);
+
+    logDebug("gu :");
+    usleep(50);
+    getProperty("numbersRW")->updateLine(1, j);
+
+    logDebug("gd :");
+    usleep(50);
+    getProperty("numbersRW")->deleteLine(1);
+
+    logDebug("fetch ?? :");
+    usleep(50);
+    getProperty("numbersRW")->fetchLine(3);
+
+    logDebug("updateline ?? :");
+    usleep(50);
+    getProperty("numbersRW")->updateLine(3);
+
+
+
     //logInfo("Test log %1", {100});
     //logDebug("Available indi drivers");
     //logDebug("Debug");
@@ -124,14 +191,20 @@ void Dummy::onTimer()
     //getProperty("dynprop")->disable();
     //getProperty("dynprop")->enable();
 
-    //dynprop = new OST::PropertyMulti("dynprop2", "Dynamic", OST::Permission::ReadWrite, "Examples",
-    //                                 "Dynamically instanciated", "", true, false);
-    //dynlight = new OST::ElementLight("dynlight", "Dyn light", "", "");
-    //dynlight->setValue(OST::State::Busy, true);
-    //dynprop->addElt( dynlight);
-    //dyntext = new OST::ElementString("dyntext", "Dyn text", "", "");
-    //dynprop->addElt(dyntext);
-    //createProperty(dynprop);
+
+    logDebug("createprop :");
+    dynprop = new OST::PropertyMulti("dynprop2", "Dynamic", OST::Permission::ReadWrite, "Examples",
+                                     "Dynamically instanciated", "", true, false);
+    dynlight = new OST::ElementLight("dynlight", "Dyn light", "", "");
+    dynlight->setValue(OST::State::Busy, false);
+    dynprop->addElt( dynlight);
+    dyntext = new OST::ElementString("dyntext", "Dyn text", "", "");
+    dynprop->addElt(dyntext);
+    createProperty(dynprop);
+
+    logDebug("deleteprop :");
+    deleteOstProperty("dynprop2");
+
     //dynprop->setState(OST::State::Busy, true);
     //dyntext->setValue("Okydoky", false);
     //dynlight->setValue(OST::State::Ok, true);

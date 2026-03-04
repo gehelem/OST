@@ -255,7 +255,7 @@ void WShandler::socketDisconnected()
 void WShandler::onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase *elt, OST::PropertyBase *prp,
                               OST::LovBase *lov, Basemodule *mod)
 {
-    qDebug() << "WShandler::onModuleEvent" << static_cast<int>(evt) << data << mod->getModuleLabel();
+    //qDebug() << "WShandler::onModuleEvent" << static_cast<int>(evt) << data << mod->getModuleLabel();
     //    QJsonObject  obj;
     //    QJsonObject mods;
     //    QJsonObject  mod;

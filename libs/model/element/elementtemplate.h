@@ -209,7 +209,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
                 }
             }
             ElementTemplate<T>::mValue = value;
-            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ev, QVariant(), this);
+            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ee, QVariant(), this);
             return true;
         }
 
@@ -249,7 +249,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
         {
             mUseMinMax = true;
             mMin = min;
-            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ee, QVariant(), this);
+            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ev, QVariant(), this);
         }
 
         /**
@@ -273,7 +273,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
         {
             mUseMinMax = true;
             mMax = max;
-            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ee, QVariant(), this);
+            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ev, QVariant(), this);
 
         }
 
@@ -299,7 +299,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
             mMin = min;
             mMax = max;
             mUseMinMax = true;
-            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ee, QVariant(), this);
+            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ev, QVariant(), this);
         }
 
         /**
@@ -314,7 +314,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
             mMin = 0;
             mMax = 0;
             mUseMinMax = false;
-            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ee, QVariant(), this);
+            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ev, QVariant(), this);
         }
 
         /**
@@ -345,7 +345,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
         void setStep(const T &step, const bool &emitEvent)
         {
             mStep = step;
-            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ee, QVariant(), this);
+            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ev, QVariant(), this);
         }
 
         /**
@@ -377,7 +377,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
         void setFormat(const QString &format, const bool &emitEvent)
         {
             mFormat = format;
-            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ee, QVariant(), this);
+            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ev, QVariant(), this);
         }
 
         /**
@@ -412,7 +412,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
         void setSlider(const SliderRule &s, const bool &emitEvent)
         {
             mSlider = s;
-            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ee, QVariant(), this);
+            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ev, QVariant(), this);
         }
 
     private:
@@ -501,7 +501,7 @@ class ElementTemplateNotNumeric : public ElementTemplate<T>
         bool setValue(const T &value, const bool &emitEvent)
         {
             ElementTemplate<T>::mValue = value;
-            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ev, QVariant(), this);
+            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ee, QVariant(), this);
             return true;
         }
 
