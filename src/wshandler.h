@@ -73,6 +73,8 @@ class WShandler : public QObject
         void sendmessage(QString message, QWebSocket* client);
         void sendbinary(QByteArray *data);
         void socketDisconnected();
+        void logToClient(OST::LogLevel level, const QString &message,
+                         const QVariantList &args, const QString &context, QWebSocket* client);
         QWebSocketServer *m_pWebSocketServer;
         QList<QWebSocket *> m_clients;
         QMap<QString, QString> mClientGrants;

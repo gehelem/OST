@@ -260,9 +260,21 @@ inline QString EvToString(EvType ev)
 }
 enum class ExtEvType
 {
-    DUMP  = 0,   /*!< request dump */
+    ZZ = 0,    /*!< invalid request */
+    DU,        /*!< request dump */
+
+    LO,        /*!< login request */
+    IL,        /*!< set client language request */
+
+    PL,        /*!< Load profile */
+    PS,        /*!< Save profile */
+
+    CL,        /*!< Load configuration */
+    CS,        /*!< Save configuration*/
+
     SV,        /*!< set a value of a property */
     SA,        /*!< set all values of a property */
+
     GC,        /*!< grid new line */
     GU,        /*!< grid update line  */
     GF,        /*!< grid fetch line  */
@@ -275,6 +287,24 @@ typedef struct ExtEvent
     QVariantMap data;                  /*!< External event data */
 } ExtEvent;
 
+inline ExtEvType StrToExtEvent(QString s)
+{
+    if (s == "DU") return  ExtEvType::DU;
+    if (s == "LO") return  ExtEvType::LO;
+    if (s == "IL") return  ExtEvType::IL;
+    if (s == "PL") return  ExtEvType::PL;
+    if (s == "PS") return  ExtEvType::PS;
+    if (s == "CL") return  ExtEvType::CL;
+    if (s == "CS") return  ExtEvType::CS;
+    if (s == "SV") return  ExtEvType::SV;
+    if (s == "SA") return  ExtEvType::SA;
+    if (s == "GC") return  ExtEvType::GC;
+    if (s == "GU") return  ExtEvType::GU;
+    if (s == "GF") return  ExtEvType::GF;
+    if (s == "GD") return  ExtEvType::GD;
+    if (s == "GR") return  ExtEvType::GR;
+    return  ExtEvType::ZZ;
+}
 
 /**
  * @brief Signal type emitted during value update

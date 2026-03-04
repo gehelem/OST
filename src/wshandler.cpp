@@ -160,6 +160,41 @@ void WShandler::processTextMessage(QString message)
     QJsonObject  obj = jsonResponse.object(); // garder
     sendMessage("OST server received json" + message);
 
+    /* check message integrity */
+
+    //message must contain only one root key
+    if (obj.size() != 1)
+    {
+        logToClient(OST::LogLevel::Error, "Invalid message size : %1", {message}, "WS", pClient);
+        return;
+    }
+
+    // message root key must be valid
+    OST::ExtEvType event = OST::StrToExtEvent(obj.begin().key());
+    if (event == OST::ExtEvType::ZZ)
+    {
+        logToClient(OST::LogLevel::Error, "Invalid message event: %1", {obj.begin().key()}, "WS", pClient);
+        return;
+    }
+
+    if (event == OST::ExtEvType::LO)
+    {
+        logToClient(OST::LogLevel::Debug, "Loginrequest: %1", {obj.begin().key()}, "WS", pClient);
+        QString user = obj["user"].toString();
+        QString pw = obj["pw"].toString();
+        QString g = dbmanager->getGrants(user, pw);
+        mClientGrants[pClient->peerAddress().toString()] = g;
+        //event.type = "Freadall";
+        //emit clientEvent(event, pClient, mClientGrants[pClient->peerAddress().toString()]);
+        //return;
+        return;
+    }
+
+    if (event == OST::ExtEvType::DU)
+    {
+        logToClient(OST::LogLevel::Debug, "Full dump request: %1", {obj.begin().key()}, "WS", pClient);
+        return;
+    }
     //    if (obj["evt"].toString() == "login")
     //    {
     //        QString user = obj["user"].toString();
@@ -171,11 +206,11 @@ void WShandler::processTextMessage(QString message)
     //        return;
     //    }
     //
-    if (obj.contains("Freadall"))
-    {
-        emit clientEvent(obj.toVariantMap(), pClient, clientGrant);
-        return;
-    }
+    //if (obj.contains("Freadall"))
+    //{
+    //    emit clientEvent(obj.toVariantMap(), pClient, clientGrant);
+    //    return;
+    //}
     //
     //    // Handle language setting from client
     //    if (obj["evt"].toString() == "setlanguage")
@@ -331,9 +366,8 @@ QString WShandler::logLevelToEventType(OST::LogLevel level)
             return "mc";
     }
 }
-
-void WShandler::onLog(OST::LogLevel level, const QString &message,
-                      const QVariantList &args, const QString &context)
+void WShandler::logToClient(OST::LogLevel level, const QString &message,
+                            const QVariantList &args, const QString &context, QWebSocket* client)
 {
     if (!mTranslater)
     {
@@ -342,27 +376,31 @@ void WShandler::onLog(OST::LogLevel level, const QString &message,
     }
 
     QDateTime dt = QDateTime::currentDateTime();
+    // Get client language (default: "en")
+    QString clientLang = mClientLanguage.value(client, "en");
 
-    // Broadcast to each client in their language
+    // Translate message to client's language
+    QString translatedMessage = mTranslater->translateWithArgs(message, args, clientLang);
+
+    // Build JSON
+    QJsonObject log;
+    QJsonObject obj;
+
+    log["d"] = dt.toString(Qt::ISODateWithMs);
+    log["c"] = context;
+    log["t"] = translatedMessage;
+    log["l"] = static_cast<int>(level);
+    obj["l"] = log;
+    // Send to client
+    client->sendTextMessage(QJsonDocument(obj).toJson(QJsonDocument::Compact));
+}
+
+void WShandler::onLog(OST::LogLevel level, const QString &message,
+                      const QVariantList &args, const QString &context)
+{
     for (QWebSocket* client : m_clients)
     {
-        // Get client language (default: "en")
-        QString clientLang = mClientLanguage.value(client, "en");
-
-        // Translate message to client's language
-        QString translatedMessage = mTranslater->translateWithArgs(message, args, clientLang);
-
-        // Build JSON
-        QJsonObject log;
-        QJsonObject obj;
-
-        log["d"] = dt.toString(Qt::ISODateWithMs);
-        log["c"] = context;
-        log["t"] = translatedMessage;
-        log["l"] = static_cast<int>(level);
-        obj["l"] = log;
-        // Send to client
-        client->sendTextMessage(QJsonDocument(obj).toJson(QJsonDocument::Compact));
+        logToClient(level, message, args, context, client);
     }
 }
 QJsonObject WShandler::translateJson(const QJsonObject pJsonObject, const QString &pLng)

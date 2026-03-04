@@ -127,50 +127,50 @@ void Dummy::onTimer()
     //        am,        /*!< add module   */
     //
 
-    logDebug("ee :");
-    usleep(50);
-    getEltInt("numbersRW", "n1")->setValue(12, true);
+    //logDebug("ee :");
+    //usleep(50);
+    //getEltInt("numbersRW", "n1")->setValue(12, true);
 
-    logDebug("ea :");
-    usleep(50);
-    QVariantMap j;
-    j["n1"] = 1;
-    j["n2"] = 2;
-    j["n3"] = 3;
-    j["n4"] = 4;
-    j["n5"] = 5;
-    getProperty("numbersRW")->setAll(j);
+    //logDebug("ea :");
+    //usleep(50);
+    //QVariantMap j;
+    //j["n1"] = 1;
+    //j["n2"] = 2;
+    //j["n3"] = 3;
+    //j["n4"] = 4;
+    //j["n5"] = 5;
+    //getProperty("numbersRW")->setAll(j);
 
-    logDebug("ev :");
-    usleep(50);
-    getEltInt("numbersRW", "n1")->setMinMax(0, 100, true);
+    //logDebug("ev :");
+    //usleep(50);
+    //getEltInt("numbersRW", "n1")->setMinMax(0, 100, true);
 
-    logDebug("ps x3 :");
-    usleep(50);
-    getProperty("numbersRW")->disable();
-    getProperty("numbersRW")->setState(OST::State::Ok, true);
-    getProperty("numbersRW")->enable();
+    //logDebug("ps x3 :");
+    //usleep(50);
+    //getProperty("numbersRW")->disable();
+    //getProperty("numbersRW")->setState(OST::State::Ok, true);
+    //getProperty("numbersRW")->enable();
 
-    logDebug("gc x2:");
-    usleep(50);
-    getProperty("numbersRW")->newLine(j);
-    getProperty("numbersRW")->newLine(j);
+    //logDebug("gc x2:");
+    //usleep(50);
+    //getProperty("numbersRW")->newLine(j);
+    //getProperty("numbersRW")->newLine(j);
 
-    logDebug("gu :");
-    usleep(50);
-    getProperty("numbersRW")->updateLine(1, j);
+    //logDebug("gu :");
+    //usleep(50);
+    //getProperty("numbersRW")->updateLine(1, j);
 
-    logDebug("gd :");
-    usleep(50);
-    getProperty("numbersRW")->deleteLine(1);
+    //logDebug("gd :");
+    //usleep(50);
+    //getProperty("numbersRW")->deleteLine(1);
 
-    logDebug("fetch ?? :");
-    usleep(50);
-    getProperty("numbersRW")->fetchLine(3);
+    //logDebug("fetch ?? :");
+    //usleep(50);
+    //getProperty("numbersRW")->fetchLine(3);
 
-    logDebug("updateline ?? :");
-    usleep(50);
-    getProperty("numbersRW")->updateLine(3);
+    //logDebug("updateline ?? :");
+    //usleep(50);
+    //getProperty("numbersRW")->updateLine(3);
 
 
 
@@ -192,20 +192,20 @@ void Dummy::onTimer()
     //getProperty("dynprop")->enable();
 
 
-    logDebug("createprop :");
-    dynprop = new OST::PropertyMulti("dynprop2", "Dynamic", OST::Permission::ReadWrite, "Examples",
-                                     "Dynamically instanciated", "", true, false);
-    dynlight = new OST::ElementLight("dynlight", "Dyn light", "", "");
-    dynlight->setValue(OST::State::Busy, false);
-    dynprop->addElt( dynlight);
-    dyntext = new OST::ElementString("dyntext", "Dyn text", "", "");
-    dynprop->addElt(dyntext);
-    createProperty(dynprop);
+    //logDebug("createprop :");
+    //dynprop = new OST::PropertyMulti("dynprop2", "Dynamic", OST::Permission::ReadWrite, "Examples",
+    //                                 "Dynamically instanciated", "", true, false);
+    //dynlight = new OST::ElementLight("dynlight", "Dyn light", "", "");
+    //dynlight->setValue(OST::State::Busy, false);
+    //dynprop->addElt( dynlight);
+    //dyntext = new OST::ElementString("dyntext", "Dyn text", "", "");
+    //dynprop->addElt(dyntext);
+    //createProperty(dynprop);
 
-    logDebug("deleteprop :");
-    deleteOstProperty("dynprop2");
+    //logDebug("deleteprop :");
+    //deleteOstProperty("dynprop2");
 
-    logDebug("profile ");
+    //logDebug("profile ");
 
     //QJsonDocument d(this->getProfile().toObject());
     //QByteArray ba = d.toJson(QJsonDocument::Compact);
