@@ -187,7 +187,7 @@ void WShandler::processTextMessage(QString message)
     /* format message */
     OST::ExtEvent event;
     event.ev = eventType;
-    event.data = obj[obj.begin().key()].toVariant().toMap();
+    event.data = obj[obj.begin().key()].toObject();
 
     /* Check if client is granted to send update requests */
     if (mClientGrants[pClient->peerAddress().toString()] != "1" && event.ev != OST::ExtEvType::DU

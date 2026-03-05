@@ -66,7 +66,7 @@ class Basemodule : public DBManager
                               OST::LovBase* lov,
                               Datastore* mod);
 
-        virtual void onExternalEvent(QVariantMap extEvent);
+        virtual void onExternalEvent(OST::ExtEvent  event);
 
 }
 ;

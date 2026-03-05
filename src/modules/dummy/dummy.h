@@ -20,7 +20,7 @@ class MODULE_INIT Dummy : public IndiModule
 
 
     public slots:
-        void onExternalEvent(QVariantMap extEvent) override;
+        void onExternalEvent(OST::ExtEvent  event) override;
         void OnSucessSEP();
         void OnSucessSolve();
         void OnSolveFinished();

@@ -233,10 +233,10 @@ Dummy::~Dummy()
     //Q_CLEANUP_RESOURCE(dummy);
 }
 
-void Dummy::onExternalEvent(QVariantMap extEvent)
+void Dummy::onExternalEvent(OST::ExtEvent event)
 {
-    IndiModule::onExternalEvent(extEvent);
-    qDebug() << "Dummy::onExternalEvent" << extEvent;
+    IndiModule::onExternalEvent(event);
+    qDebug() << "Dummy::onExternalEvent" << event.data;
     //if (getModuleName() != e.module ) return;
     //foreach(const QString &keyprop, e.data.keys())
     //{

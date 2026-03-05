@@ -46,9 +46,9 @@ Basemodule::~Basemodule()
 
 
 
-void Basemodule::onExternalEvent(QVariantMap extEvent)
+void Basemodule::onExternalEvent(OST::ExtEvent event)
 {
-    qDebug() << "Basemodule::onExternalEvent" << extEvent;
+    qDebug() << "Basemodule::onExternalEvent" << event.data;
     //    // Handle global lov updates from controller
     //    //if ( (e.type == "globallovupdate") && (e.module == "*") )
     //    //{

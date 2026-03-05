@@ -24,7 +24,7 @@ class IndiModule : public Basemodule, public INDI::BaseClient
     public slots:
         void connectIndiTimer(void);
         void OnAfterIndiConnectIndiTimer(void);
-        void onExternalEvent(QVariantMap extEvent) override;
+        void onExternalEvent(OST::ExtEvent  event) override;
 
 
     protected:

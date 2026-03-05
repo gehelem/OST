@@ -157,7 +157,6 @@ Controller::~Controller()
 
 bool Controller::loadModule(QString lib, QString name, QString label, QString profile)
 {
-    qDebug() << "LOAD MODULE BEGIN :" << name;
     if (mModulesMap.contains(name ))
     {
         //pMainControl->sendMainError("Module " + name + " already loaded - can't load twice");
@@ -198,7 +197,7 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     connect(mod, &Basemodule::moduleEvent, wshandler, &WShandler::onModuleEvent);
 
     connect(mod, &Basemodule::loadOtherModule, this, &Controller::loadModule);
-    //connect(this, &Controller::controllerEvent, mod, &Basemodule::onExternalEvent);
+    connect(this, &Controller::controllerEvent, mod, &Basemodule::onExternalEvent);
     //connect(wshandler, &WShandler::externalEvent, mod, &Basemodule::OnExternalEvent);
 
     // Connect module to log system
@@ -231,7 +230,6 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     //pMainControl->sendMainMessage("Module  " + label + " successfully loaded");
 
     updateGlobalModulesLov();
-    qDebug() << "LOAD MODULE END  :" << name;
 
     return true;
 
@@ -308,6 +306,73 @@ void Controller::OnClientEvent(OST::ExtEvent event, QWebSocket* client, QString 
 void Controller::onExternalEvent(OST::ExtEvent event)
 {
     qDebug() << "Controller::onExternalEvent" << event.data;
+    //    ZZ = 0,    /*!< invalid request */
+    //    DU,        /*!< request dump */
+    //    LO,        /*!< login request */
+    //    IL,        /*!< set client language request */
+    //    PL,        /*!< Load profile */
+    //    PS,        /*!< Save profile */
+    //    CL,        /*!< Load configuration */
+    //    CS,        /*!< Save configuration*/
+    //    SV,        /*!< set a value of a property */
+    //    SA,        /*!< set all values of a property */
+    //    GC,        /*!< grid new line */
+    //    GU,        /*!< grid update line  */
+    //    GF,        /*!< grid fetch line  */
+    //    GD,        /*!< grid delete line  */
+    //    GR,        /*!< grid reset */
+    switch (event.ev)
+    {
+        case OST::ExtEvType::ZZ:
+        case OST::ExtEvType::DU:
+        case OST::ExtEvType::LO:
+        case OST::ExtEvType::IL:
+            logError("Controller::onExternalEvent - invalid event here - %1", {OST::ExtEvToString(event.ev)});
+            return;
+        case OST::ExtEvType::FS:
+            if (!event.data.contains("folder"))
+            {
+                logError("Controller::onExternalEvent - invalid event data content - %1", {OST::ExtEvToString(event.ev)});
+                return;
+            };
+            for ( const auto &d : mFileWatcher.directories() )
+            {
+                mFileWatcher.removePath(d);
+            }
+            mSelectedFolder = _webroot + event.data["folder"].toString();
+            mFileWatcher.addPath(mSelectedFolder);
+            OnFileWatcherEvent(QString());
+            return;
+        default:
+            if (!event.data.contains("m"))
+            {
+                logError("Controller::onExternalEvent - invalid event data content - %1", {OST::ExtEvToString(event.ev)});
+                return;
+            };
+            if (event.data["m"].toObject().size() != 1)
+            {
+                logError("Controller::onExternalEvent - invalid event data size - %1", {OST::ExtEvToString(event.ev)});
+                return;
+            };
+            if (!mModulesMap.contains(event.data["m"].toObject().begin().key()))
+            {
+                logError("Controller::onExternalEvent - unknown module - %1", {event.data["m"].toObject().begin().key()});
+                return;
+            };
+
+    }
+    QString mod = event.data["m"].toObject().begin().key();
+
+    QList<Basemodule *> moduleinstances = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
+    for (Basemodule *moduleinstance : moduleinstances)
+    {
+        if (moduleinstance->getModuleName() == mod)
+        {
+            moduleinstance->onExternalEvent(event);
+        }
+    }
+
+
     //QJsonObject obj = QJsonObject::fromVariantMap(event.data);
     //QJsonDocument doc(obj);
     //QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
@@ -335,8 +400,6 @@ void Controller::onExternalEvent(OST::ExtEvent event)
 
     //}
 
-    ///* we should check here if incoming message is valid*/
-    emit controllerEvent(event);
 }
 //void Controller::OnMainCtlEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
 //                                const QVariantMap &pEventData)
@@ -662,6 +725,18 @@ void Controller::logInfo(const QString &message, const QVariantList &args)
 
     // Broadcast to WebSocket clients (each in their language)
     wshandler->onLog(OST::LogLevel::Info, message, args, "CT");
+}
+void Controller::logError(const QString &message)
+{
+    logError(message, {});
+}
+void Controller::logError(const QString &message, const QVariantList &args)
+{
+    // Log to console (server language)
+    mLogger->onLog(OST::LogLevel::Error, message, args, "CT");
+
+    // Broadcast to WebSocket clients (each in their language)
+    wshandler->onLog(OST::LogLevel::Error, message, args, "CT");
 }
 QJsonObject Controller::getModulesDump(QString clientgrant)
 {

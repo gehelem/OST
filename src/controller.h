@@ -72,6 +72,8 @@ class Controller : public QObject
         void updateGlobalModulesLov(void);
         void logInfo(const QString &message);
         void logInfo(const QString &message, const QVariantList &args);
+        void logError(const QString &message);
+        void logError(const QString &message, const QVariantList &args);
 
         QJsonObject getModulesDump(QString clientgrant);
         QString getBanner(void)

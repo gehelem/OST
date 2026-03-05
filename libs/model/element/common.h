@@ -262,29 +262,65 @@ enum class ExtEvType
 {
     ZZ = 0,    /*!< invalid request */
     DU,        /*!< request dump */
-
     LO,        /*!< login request */
     IL,        /*!< set client language request */
-
+    FS,        /*!< folder select */
     PL,        /*!< Load profile */
     PS,        /*!< Save profile */
-
     CL,        /*!< Load configuration */
     CS,        /*!< Save configuration*/
-
     SV,        /*!< set a value of a property */
     SA,        /*!< set all values of a property */
-
     GC,        /*!< grid new line */
     GU,        /*!< grid update line  */
     GF,        /*!< grid fetch line  */
     GD,        /*!< grid delete line  */
     GR,        /*!< grid reset */
 };
+inline QString ExtEvToString(ExtEvType ev)
+{
+    switch (ev)
+    {
+        case OST::ExtEvType::ZZ:
+            return "ZZ";
+        case OST::ExtEvType::DU:
+            return "DU";
+        case OST::ExtEvType::LO:
+            return "LO";
+        case OST::ExtEvType::IL:
+            return "IL";
+        case OST::ExtEvType::FS:
+            return "FS";
+        case OST::ExtEvType::PL:
+            return "PL";
+        case OST::ExtEvType::PS:
+            return "PS";
+        case OST::ExtEvType::CL:
+            return "CL";
+        case OST::ExtEvType::CS:
+            return "CS";
+        case OST::ExtEvType::SV:
+            return "SV";
+        case OST::ExtEvType::SA:
+            return "SA";
+        case OST::ExtEvType::GC:
+            return "GC";
+        case OST::ExtEvType::GU:
+            return "GU";
+        case OST::ExtEvType::GF:
+            return "GF";
+        case OST::ExtEvType::GD:
+            return "GD";
+        case OST::ExtEvType::GR:
+            return "GR";
+        default:
+            return "unknown ExtEvType:" + QString::number(static_cast<int>(ev));
+    }
+}
 typedef struct ExtEvent
 {
     ExtEvType ev = ExtEvType::ZZ;   /*!< External event type*/
-    QVariantMap data;                  /*!< External event data */
+    QJsonObject data;                  /*!< External event data */
 } ExtEvent;
 
 inline ExtEvType StrToExtEvent(QString s)
@@ -292,6 +328,7 @@ inline ExtEvType StrToExtEvent(QString s)
     if (s == "DU") return  ExtEvType::DU;
     if (s == "LO") return  ExtEvType::LO;
     if (s == "IL") return  ExtEvType::IL;
+    if (s == "FS") return  ExtEvType::FS;
     if (s == "PL") return  ExtEvType::PL;
     if (s == "PS") return  ExtEvType::PS;
     if (s == "CL") return  ExtEvType::CL;
