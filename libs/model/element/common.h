@@ -283,7 +283,7 @@ enum class ExtEvType
 };
 typedef struct ExtEvent
 {
-    ExtEvType ev = ExtEvType::SV;   /*!< External event type*/
+    ExtEvType ev = ExtEvType::ZZ;   /*!< External event type*/
     QVariantMap data;                  /*!< External event data */
 } ExtEvent;
 

@@ -198,7 +198,7 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     connect(mod, &Basemodule::moduleEvent, wshandler, &WShandler::onModuleEvent);
 
     connect(mod, &Basemodule::loadOtherModule, this, &Controller::loadModule);
-    connect(this, &Controller::controllerEvent, mod, &Basemodule::onExternalEvent);
+    //connect(this, &Controller::controllerEvent, mod, &Basemodule::onExternalEvent);
     //connect(wshandler, &WShandler::externalEvent, mod, &Basemodule::OnExternalEvent);
 
     // Connect module to log system
@@ -296,18 +296,18 @@ void Controller::onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase*
     //    }
 
 }
-void Controller::OnClientEvent(QVariantMap event, QWebSocket* client, QString clientgrant)
+void Controller::OnClientEvent(OST::ExtEvent event, QWebSocket* client, QString clientgrant)
 {
-    if (event.contains("Freadall") || event.contains("setlanguage") )
+    if (event.ev == OST::ExtEvType::DU || event.ev == OST::ExtEvType::IL )
     {
         wshandler->sendJsonMessage(getModulesDump(clientgrant), client);
     }
 
 }
 
-void Controller::onExternalEvent(QVariantMap event)
+void Controller::onExternalEvent(OST::ExtEvent event)
 {
-    qDebug() << "Controller::onExternalEvent" << event;
+    qDebug() << "Controller::onExternalEvent" << event.data;
     //QJsonObject obj = QJsonObject::fromVariantMap(event.data);
     //QJsonDocument doc(obj);
     //QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
@@ -679,28 +679,10 @@ QJsonObject Controller::getModulesDump(QString clientgrant)
     files["files"] = QJsonArray::fromStringList(mFilesList);
     files["selectedfolder"] = mSelectedFolder;
 
-
     QList<Basemodule *> allmodules = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
     for (Basemodule *module : allmodules)
     {
-        //OST::Event e;
-        //e.type = "moduledump";
-        //e.module = module->getModuleName();
-        QVariantMap d2;
-        //QVariantMap state;
-        //QVariantMap infos;
-        //infos = module->getAllMetadata();
-        //infos["name"] = module->getModuleName();
-        //infos["label"] = module->getModuleLabel();
-        //d2["p"] = module->getPropertiesDump(e);;
-        //d2["globallovs"] = module->getGlobalLovsDump();;
-        //d2["state"] = state;
-        //d2["infos"] = infos;
-        //d2["help"] = module->getHelpContent("fr");
-        //d2["metadata"] = module->getAllMetadata();
-        d2 = OST::ModuleJsonDumper(OST::EvType::aa, QVariant(), nullptr, nullptr, nullptr, module).toVariant().toMap();
-        modules[module->getModuleName()] = QJsonObject::fromVariantMap(d2);
-
+        modules[module->getModuleName()] = OST::ModuleJsonDumper(OST::EvType::aa, QVariant(), nullptr, nullptr, nullptr, module);
     }
 
     dump["m"] = modules;

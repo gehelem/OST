@@ -170,71 +170,76 @@ void WShandler::processTextMessage(QString message)
     }
 
     // message root key must be valid
-    OST::ExtEvType event = OST::StrToExtEvent(obj.begin().key());
-    if (event == OST::ExtEvType::ZZ)
+    OST::ExtEvType eventType = OST::StrToExtEvent(obj.begin().key());
+    if (eventType == OST::ExtEvType::ZZ)
     {
         logToClient(OST::LogLevel::Error, "Invalid message event: %1", {obj.begin().key()}, "WS", pClient);
         return;
     }
 
-    if (event == OST::ExtEvType::LO)
+    // message data must be valid, ie keys/values content
+    if (!obj[obj.begin().key()].isObject())
     {
-        logToClient(OST::LogLevel::Debug, "Loginrequest: %1", {obj.begin().key()}, "WS", pClient);
-        QString user = obj["user"].toString();
-        QString pw = obj["pw"].toString();
-        QString g = dbmanager->getGrants(user, pw);
-        mClientGrants[pClient->peerAddress().toString()] = g;
-        //event.type = "Freadall";
-        //emit clientEvent(event, pClient, mClientGrants[pClient->peerAddress().toString()]);
-        //return;
+        logToClient(OST::LogLevel::Error, "Invalid message data: %1", {message}, "WS", pClient);
         return;
     }
 
-    if (event == OST::ExtEvType::DU)
+    /* format message */
+    OST::ExtEvent event;
+    event.ev = eventType;
+    event.data = obj[obj.begin().key()].toVariant().toMap();
+
+    /* Check if client is granted to send update requests */
+    if (mClientGrants[pClient->peerAddress().toString()] != "1" && event.ev != OST::ExtEvType::DU
+            && event.ev != OST::ExtEvType::LO && event.ev != OST::ExtEvType::IL )
+    {
+        logToClient(OST::LogLevel::Error, "Client not granted for updates", {}, "WS", pClient);
+        return;
+    }
+
+    /* client sends login request */
+    if (event.ev == OST::ExtEvType::LO)
+    {
+        if (!event.data.contains("user") || !event.data.contains("pw") )
+        {
+            logToClient(OST::LogLevel::Error, "Invalid login data", {}, "WS", pClient);
+            return;
+        }
+
+        logToClient(OST::LogLevel::Debug, "Login request: %1", {obj.begin().key()}, "WS", pClient);
+        mClientGrants[pClient->peerAddress().toString()] = dbmanager->getGrants(event.data["user"].toString(),
+                event.data["pw"].toString());
+
+        if (event.data.contains("language")) setClientLanguage(pClient, event.data["language"].toString());
+
+        emit clientEvent(event, pClient, mClientGrants[pClient->peerAddress().toString()]);
+        return;
+    }
+
+    /* client changes its language */
+    if (event.ev == OST::ExtEvType::IL)
+    {
+        if (!event.data.contains("language"))
+        {
+            logToClient(OST::LogLevel::Error, "Invalid language data", {}, "WS", pClient);
+            return;
+        }
+        logToClient(OST::LogLevel::Debug, "Client set language: %1", {obj.begin().key()}, "WS", pClient);
+        setClientLanguage(pClient, event.data["language"].toString());
+        emit clientEvent(event, pClient, mClientGrants[pClient->peerAddress().toString()]);
+        return;
+    }
+
+    if (event.ev == OST::ExtEvType::DU)
     {
         logToClient(OST::LogLevel::Debug, "Full dump request: %1", {obj.begin().key()}, "WS", pClient);
+        emit clientEvent(event, pClient, mClientGrants[pClient->peerAddress().toString()]);
         return;
     }
-    //    if (obj["evt"].toString() == "login")
-    //    {
-    //        QString user = obj["user"].toString();
-    //        QString pw = obj["pw"].toString();
-    //        QString g = dbmanager->getGrants(user, pw);
-    //        mClientGrants[pClient->peerAddress().toString()] = g;
-    //        event.type = "Freadall";
-    //        emit clientEvent(event, pClient, mClientGrants[pClient->peerAddress().toString()]);
-    //        return;
-    //    }
-    //
-    //if (obj.contains("Freadall"))
-    //{
-    //    emit clientEvent(obj.toVariantMap(), pClient, clientGrant);
-    //    return;
-    //}
-    //
-    //    // Handle language setting from client
-    //    if (obj["evt"].toString() == "setlanguage")
-    //    {
-    //        QString language = obj["language"].toString();
-    //        if (!language.isEmpty())
-    //        {
-    //            setClientLanguage(pClient, language);
-    //            sendMessage("Client language set to: " + language);
-    //            event.type = "setlanguage";
-    //            emit clientEvent(event, pClient, clientGrant);
-    //        }
-    //        return;
-    //    }
-    //
-    //    /* ignore update messages from readonly users */
-    //    if (clientGrant == "0") return;
-    //
-    //    event.type = obj["evt"].toString();
-    //    event.module = obj["mod"].toString();
-    //    event.property = obj["key"].toString();
-    //    event.data = obj["dta"].toVariant().toMap();
 
-    emit externalEvent(obj.toVariantMap());
+    if (mClientGrants[pClient->peerAddress().toString()] != "1") return;
+
+    emit externalEvent(event);
 
 }
 
