@@ -361,8 +361,9 @@ void Controller::onExternalEvent(OST::ExtEvent event)
             };
 
     }
-    QString mod = event.data["m"].toObject().begin().key();
 
+    /* dispatch event only to target module */
+    QString mod = event.data["m"].toObject().begin().key();
     QList<Basemodule *> moduleinstances = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
     for (Basemodule *moduleinstance : moduleinstances)
     {
@@ -373,32 +374,6 @@ void Controller::onExternalEvent(OST::ExtEvent event)
     }
 
 
-    //QJsonObject obj = QJsonObject::fromVariantMap(event.data);
-    //QJsonDocument doc(obj);
-    //QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
-    //QString strJson = QLatin1String(docByteArray);
-    //if (event.module == "mainctl")
-    //{
-    //    //pMainControl->sendMainMessage("Mainctl event : " + event.type + " : " + event.module + " : " +  " : " +
-    //                                  strJson);
-    //}
-    //if (event.contains("Freadall"))
-    //{
-    //    //wshandler->processFileEvent("foldersdump", mFoldersList);
-    //    //wshandler->processFileEvent("filesdump", mFilesList);
-    //    wshandler->sendJsonMessage(getModulesDump());
-    //}
-    //if (event.type == "Ffolderselect")
-    //{
-    //    for ( const auto &d : mFileWatcher.directories() )
-    //    {
-    //        mFileWatcher.removePath(d);
-    //    }
-    //    mSelectedFolder = _webroot + event.data["folder"].toString();
-    //    mFileWatcher.addPath(mSelectedFolder);
-    //    OnFileWatcherEvent(QString());
-
-    //}
 
 }
 //void Controller::OnMainCtlEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,

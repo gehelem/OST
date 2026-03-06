@@ -42,13 +42,121 @@ Basemodule::~Basemodule()
 }
 
 
-
-
-
-
 void Basemodule::onExternalEvent(OST::ExtEvent event)
 {
     qDebug() << "Basemodule::onExternalEvent" << event.data;
+
+    switch (event.ev)
+    {
+        case OST::ExtEvType::ZZ:
+        case OST::ExtEvType::DU:
+        case OST::ExtEvType::LO:
+        case OST::ExtEvType::IL:
+        case OST::ExtEvType::FS:
+        case OST::ExtEvType::CL:
+        case OST::ExtEvType::CS:
+            logError("Basemodule::onExternalEvent - invalid event here - %1", {OST::ExtEvToString(event.ev)});
+            return;
+        default:
+            if (!event.data.contains("m") || !event.data["m"].toObject().contains(this->getModuleName()) )
+            {
+                logError("Basemodule::onExternalEvent - invalid event data content - %1", {OST::ExtEvToString(event.ev)});
+                return;
+            };
+    }
+
+    QJsonObject o = event.data["m"].toObject()[this->getModuleName()].toObject();
+
+    /* global module operations */
+    //    PL,        /*!< Load profile */
+    //    PS,        /*!< Save profile */
+
+    if (event.ev == OST::ExtEvType::PL)
+    {
+        if(!o.contains("profile"))
+        {
+            logError("Basemodule::onExternalEvent - invalid profile load data content - %1", {OST::ExtEvToString(event.ev)});
+            return;
+        }
+        this->loadProfile(o["profile"].toString());
+        return;
+    }
+    if (event.ev == OST::ExtEvType::PS)
+    {
+        if(!o.contains("profile"))
+        {
+            logError("Basemodule::onExternalEvent - invalid profile save data content - %1", {OST::ExtEvToString(event.ev)});
+            return;
+        }
+        this->saveProfile(o["profile"].toString());
+        return;
+    }
+
+    /* property target operations */
+    //    SV,        /*!< set a value of a property */
+    //    SA,        /*!< set all values of a property */
+    //    GC,        /*!< grid new line */
+    //    GU,        /*!< grid update line  */
+    //    GF,        /*!< grid fetch line  */
+    //    GD,        /*!< grid delete line  */
+    //    GR,        /*!< grid reset */
+    if(!o.contains("p"))
+    {
+        logError("Basemodule::onExternalEvent - invalid property data content - %1", {OST::ExtEvToString(event.ev)});
+        return;
+    }
+    if(!o["p"].isObject())
+    {
+        logError("Basemodule::onExternalEvent - invalid property data content - %1", {OST::ExtEvToString(event.ev)});
+        return;
+    }
+    if(o["p"].toObject().size() != 1)
+    {
+        logError("Basemodule::onExternalEvent - invalid property data content - %1", {OST::ExtEvToString(event.ev)});
+        return;
+    }
+    QJsonObject p = o["p"].toObject();
+    if (!getStore().contains(p.begin().key()) )
+    {
+        logError("Basemodule::onExternalEvent - property %1 not found", {p.begin().key()});
+        return;
+    }
+    QString prpkey = p.begin().key();
+
+    if (!getStore()[prpkey]->isEnabled())
+    {
+        logError("Basemodule::onExternalEvent - property disabled, can't update - %1", {prpkey});
+        return;
+    }
+
+    if (event.ev == OST::ExtEvType::SV)
+    {
+
+        if(!p[prpkey].toObject().contains("e"))
+        {
+            logError("Basemodule::onExternalEvent - invalid element data content - %1", {OST::ExtEvToString(event.ev)});
+            return;
+        }
+        QJsonObject e = p[prpkey].toObject()["e"].toObject();
+        if (!getStore()[prpkey]->getElts()->contains(e.begin().key()) )
+        {
+            logError("Basemodule::onExternalEvent - element %1/%2 not found", {p.begin().key(), e.begin().key()});
+            return;
+        }
+        logDebug("Basemodule::onExternalEvent - okay we can update %1/%2", {p.begin().key(), e.begin().key()});
+        QString eltkey = e.begin().key();
+        QVariantMap eltval;
+        eltval["value"] = e.begin().value().toVariant();
+        if (getStore()[prpkey]->getElt(eltkey)->autoUpdate())
+        {
+            OST::ElementUpdate u;
+            bool b = true;
+            getStore()[prpkey]->getElt(eltkey)->accept(&u, eltval, b);
+        }
+
+    }
+
+
     //    // Handle global lov updates from controller
     //    //if ( (e.type == "globallovupdate") && (e.module == "*") )
     //    //{
