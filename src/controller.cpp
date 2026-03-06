@@ -197,7 +197,7 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     connect(mod, &Basemodule::moduleEvent, wshandler, &WShandler::onModuleEvent);
 
     connect(mod, &Basemodule::loadOtherModule, this, &Controller::loadModule);
-    connect(this, &Controller::controllerEvent, mod, &Basemodule::onExternalEvent);
+    connect(this, &Controller::controllerEvent, mod, &Basemodule::onExternalEventRoot);
     //connect(wshandler, &WShandler::externalEvent, mod, &Basemodule::OnExternalEvent);
 
     // Connect module to log system
@@ -369,7 +369,7 @@ void Controller::onExternalEvent(OST::ExtEvent event)
     {
         if (moduleinstance->getModuleName() == mod)
         {
-            moduleinstance->onExternalEvent(event);
+            moduleinstance->onExternalEventRoot(event);
         }
     }
 

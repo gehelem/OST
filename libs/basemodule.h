@@ -66,7 +66,58 @@ class Basemodule : public DBManager
                               OST::LovBase* lov,
                               Datastore* mod);
 
-        virtual void onExternalEvent(OST::ExtEvent  event);
+        /**
+         * @brief Root event orchestrator (FINAL - cannot be overridden)
+         *
+         * This method is called by signal/slot connections and orchestrates
+         * the handling of external events by calling the virtual hooks in order:
+         * Base → Indi → Custom
+         *
+         * Developers should NEVER call or override this method directly.
+         * This is an internal orchestration method.
+         */
+        virtual void onExternalEventRoot(OST::ExtEvent event) final;
+
+    protected:
+        /**
+         * @brief Hook for base module event handling
+         *
+         * Called first in the event chain. Handles common events like:
+         * - Profile load/save (PL, PS)
+         * - Configuration load/save (CL, CS)
+         * - Other base module operations
+         *
+         * Override this in Basemodule descendants if you need to customize
+         * base-level event handling (rare).
+         */
+        virtual void onExternalEventBase(OST::ExtEvent event);
+
+        /**
+         * @brief Hook for INDI module event handling
+         *
+         * Called second in the event chain. Empty by default.
+         * IndiModule overrides this to handle INDI-specific events.
+         *
+         * Custom modules inheriting from IndiModule do NOT need to override this.
+         */
+        virtual void onExternalEventIndi(OST::ExtEvent event);
+
+        /**
+         * @brief Hook for custom module event handling (PRIMARY OVERRIDE POINT)
+         *
+         * Called last in the event chain. Empty by default.
+         * Custom modules (Dummy, Focus, Guider, etc.) should override this
+         * to handle module-specific events like:
+         * - Set value (SV, SA)
+         * - Grid operations (GC, GU, GD)
+         * - Custom module actions
+         *
+         * This is the PRIMARY method for module developers to implement.
+         *
+         * @note Module developers: override THIS method (onExternalEvent),
+         *       NOT onExternalEventRoot (which is final).
+         */
+        virtual void onExternalEvent(OST::ExtEvent event);
 
 }
 ;

@@ -24,7 +24,17 @@ class IndiModule : public Basemodule, public INDI::BaseClient
     public slots:
         void connectIndiTimer(void);
         void OnAfterIndiConnectIndiTimer(void);
-        void onExternalEvent(OST::ExtEvent  event) override;
+
+    protected:
+        /**
+         * @brief INDI-specific event handler (Hook 2/3)
+         *
+         * Override of Basemodule's hook to handle INDI-specific events.
+         * Called after onExternalEventBase() and before custom module's onExternalEvent().
+         *
+         * Do NOT call Basemodule::onExternalEventIndi() - it's empty by design.
+         */
+        void onExternalEventIndi(OST::ExtEvent event) override;
 
 
     protected:

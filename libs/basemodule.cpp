@@ -42,9 +42,39 @@ Basemodule::~Basemodule()
 }
 
 
-void Basemodule::onExternalEvent(OST::ExtEvent event)
+/**
+ * @brief Root event orchestrator (FINAL - Template Method pattern)
+ *
+ * This method cannot be overridden. It calls the virtual hooks in order:
+ * 1. onExternalEventBase() - Common base module handling
+ * 2. onExternalEventIndi() - INDI-specific handling (IndiModule only)
+ * 3. onExternalEvent() - Custom module handling
+ *
+ * Called by signal/slot connections. Developers should NEVER call or override this!
+ */
+void Basemodule::onExternalEventRoot(OST::ExtEvent event)
 {
-    qDebug() << "Basemodule::onExternalEvent" << event.data;
+    qDebug() << "Basemodule::onExternalEventRoot (orchestrator)" << event.data;
+
+    // Call hooks in order - each class overrides its own hook
+    onExternalEventBase(event);
+    onExternalEventIndi(event);
+    onExternalEvent(event);
+}
+
+/**
+ * @brief Base module event handler (Hook 1/3)
+ *
+ * Handles common module events:
+ * - Profile load/save (PL, PS)
+ * - Set value operations (SV, SA)
+ * - Grid operations (GC, GU, GD, GF, GR)
+ *
+ * Called first in the event chain.
+ */
+void Basemodule::onExternalEventBase(OST::ExtEvent event)
+{
+    //qDebug() << "Basemodule::onExternalEventBase" << event.data;
 
     switch (event.ev)
     {
@@ -143,7 +173,6 @@ void Basemodule::onExternalEvent(OST::ExtEvent event)
             logError("Basemodule::onExternalEvent - element %1/%2 not found", {p.begin().key(), e.begin().key()});
             return;
         }
-        logDebug("Basemodule::onExternalEvent - okay we can update %1/%2", {p.begin().key(), e.begin().key()});
         QString eltkey = e.begin().key();
         QVariantMap eltval;
         eltval["value"] = e.begin().value().toVariant();
@@ -397,6 +426,38 @@ void Basemodule::onExternalEvent(OST::ExtEvent event)
 
 
 }
+
+/**
+ * @brief INDI module event handler (Hook 2/3)
+ *
+ * Empty implementation in Basemodule.
+ * Overridden by IndiModule to handle INDI-specific events.
+ *
+ * Called second in the event chain.
+ */
+void Basemodule::onExternalEventIndi(OST::ExtEvent event)
+{
+    Q_UNUSED(event);
+    // Empty by default - IndiModule will override this
+}
+
+/**
+ * @brief Custom module event handler (Hook 3/3)
+ *
+ * Empty implementation in Basemodule.
+ * Overridden by custom modules (Dummy, Focus, Guider, etc.) to handle
+ * module-specific events.
+ *
+ * Called last in the event chain.
+ *
+ * This is the PRIMARY method for module developers to override.
+ */
+void Basemodule::onExternalEvent(OST::ExtEvent event)
+{
+    Q_UNUSED(event);
+    // Empty by default - custom modules will override this
+}
+
 void Basemodule::killMe()
 {
     this->~Basemodule();

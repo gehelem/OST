@@ -224,7 +224,7 @@ void WShandler::processTextMessage(QString message)
             logToClient(OST::LogLevel::Error, "Invalid language data", {}, "WS", pClient);
             return;
         }
-        logToClient(OST::LogLevel::Debug, "Client set language: %1", {obj.begin().key()}, "WS", pClient);
+        logToClient(OST::LogLevel::Debug, "Client set language: %1", {event.data["language"].toString()}, "WS", pClient);
         setClientLanguage(pClient, event.data["language"].toString());
         emit clientEvent(event, pClient, mClientGrants[pClient->peerAddress().toString()]);
         return;
@@ -233,6 +233,12 @@ void WShandler::processTextMessage(QString message)
     if (event.ev == OST::ExtEvType::DU)
     {
         logToClient(OST::LogLevel::Debug, "Full dump request: %1", {obj.begin().key()}, "WS", pClient);
+        if (event.data.contains("language"))
+        {
+            logToClient(OST::LogLevel::Debug, "Client set language: %1", {event.data["language"].toString()}, "WS", pClient);
+            setClientLanguage(pClient, event.data["language"].toString());
+        }
+
         emit clientEvent(event, pClient, mClientGrants[pClient->peerAddress().toString()]);
         return;
     }

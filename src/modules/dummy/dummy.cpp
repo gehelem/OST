@@ -233,10 +233,18 @@ Dummy::~Dummy()
     //Q_CLEANUP_RESOURCE(dummy);
 }
 
+/**
+ * @brief Dummy module custom event handler (Hook 3/3)
+ *
+ * Override of Basemodule's hook for Dummy-specific events.
+ * Called automatically after onExternalEventBase() and onExternalEventIndi().
+ *
+ * NO need to call IndiModule::onExternalEvent() - it's empty!
+ * Orchestration is automatic via Basemodule::onExternalEventRoot() final.
+ */
 void Dummy::onExternalEvent(OST::ExtEvent event)
 {
-    IndiModule::onExternalEvent(event);
-    qDebug() << "Dummy::onExternalEvent" << event.data;
+    //qDebug() << "Dummy::onExternalEvent" << event.data;
     //if (getModuleName() != e.module ) return;
     //foreach(const QString &keyprop, e.data.keys())
     //{
