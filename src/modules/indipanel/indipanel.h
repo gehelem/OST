@@ -27,7 +27,7 @@ class MODULE_INIT IndiPanel : public IndiModule
         void updateProperty (INDI::Property property) override;
         void newBLOB        (IBLOB bp);
         void newMessage     (INDI::BaseDevice dp, int messageID) override;
-        void onExternalEvent(QVariantMap extEvent);
+        void onExternalEvent(OST::ExtEvent event) override;
 
 };
 

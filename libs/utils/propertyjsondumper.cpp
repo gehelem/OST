@@ -223,7 +223,7 @@ QJsonObject PropertyJsonDumper::dumpSetAll(PropertyMulti* pProperty)
         bool b = false;
         pProperty->getElt(key)->accept(&d, m, b);
         QJsonObject value = d.getResult();
-        elements[key] = value;
+        elements[key] = value["value"];
     }
     json["e"] = elements;
     return json;

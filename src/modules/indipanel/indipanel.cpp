@@ -160,6 +160,7 @@ void IndiPanel::updateProperty (INDI::Property property)
     QString devpro = dev + pro;
     OST::PropertyMulti* p = getProperty(devpro);
     QVariantMap mm;
+    QVariantMap o;
     switch (property.getType())
     {
 
@@ -197,28 +198,21 @@ void IndiPanel::updateProperty (INDI::Property property)
             INDI::PropertySwitch s = property;
             for (unsigned int i = 0; i < s.count(); i++)
             {
-                if (s[i].s == 0)
-                {
-                    if (i == s.count() - 1) getEltBool(devpro, s[i].name)->setValue(false, true);
-                    else  getEltBool(devpro, s[i].name)->setValue(false, false);
-                };
-                if (s[i].s == 1)
-                {
-                    if (i == s.count() - 1) getEltBool(devpro, s[i].name)->setValue(true, true);
-                    else  getEltBool(devpro, s[i].name)->setValue(true, false);
-                };
+                if (s[i].s == 0) o[s[i].name] = false;
+                else o[s[i].name] = true;
             }
+            getProperty(devpro)->setAll(o);
             break;
         }
         case INDI_TEXT:
         {
             INDI::PropertyText t = property;
+
             for (unsigned int i = 0; i < t.count(); i++)
             {
-                getEltString(devpro, t[i].name)->setValue(t[i].text, i == t.count() - 1);
-                //if (i == t.count() - 1) getEltString(devpro, t[i].name)->setValue(t[i].text, true);
-                //else  getEltString(devpro, t[i].name)->setValue(t[i].text, false);
+                o[t[i].name] = t[i].text;
             }
+            getProperty(devpro)->setAll(o);
             break;
         }
         case INDI_LIGHT:
@@ -226,8 +220,9 @@ void IndiPanel::updateProperty (INDI::Property property)
             INDI::PropertyLight l = property;
             for (unsigned int i = 0; i < l.count(); i++)
             {
-                getEltLight(devpro, l[i].name)->setValue(OST::IntToState(l[i].getState()), true);
+                o[l[i].name] = l[i].getState();
             }
+            getProperty(devpro)->setAll(o);
             break;
         }
         case INDI_BLOB:
@@ -263,9 +258,29 @@ void IndiPanel::newMessage     (INDI::BaseDevice dp, int messageID)
     logInfo("%1 %2", {dp.getDeviceName(), QString::fromStdString(dp.messageQueue(messageID))});
 }
 
-void IndiPanel::onExternalEvent(QVariantMap extEvent)
+void IndiPanel::onExternalEvent(OST::ExtEvent event)
 {
-    qDebug() << "IndiPanel::onExternalEvent" << extEvent;
+    QJsonObject o = event.data["m"].toObject()[this->getModuleName()].toObject();
+    QJsonObject p = o["p"].toObject();
+    QString prpkey = p.begin().key();
+
+    if (event.ev == OST::ExtEvType::SV)
+    {
+        QJsonObject e = p[prpkey].toObject()["e"].toObject();
+        QString eltkey = e.begin().key();
+        //QVariantMap ostprop = m[keyprop].toMap();
+        //QString devcat = ostprop["level1"].toString();
+        QString realDevice = getStore().value(prpkey)->getFreeValue();
+        QString realprop = prpkey;
+        //BOOST_LOG_TRIVIAL(debug) << "DEVCAT - recv : "  << devcat.toStdString();
+        realprop.replace(realDevice, "");
+        if (getStore().value(prpkey)->getElt(eltkey)->getType() == "bool")
+        {
+            bool b = e.begin().value().toBool();
+            if ( b) sendModNewSwitch(realDevice, realprop, eltkey, ISS_ON);
+            if (!b) sendModNewSwitch(realDevice, realprop, eltkey, ISS_OFF);
+        }
+    }
 
     //    if (e.module != this->getModuleName()) return;
     //

@@ -296,7 +296,7 @@ void Controller::onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase*
 }
 void Controller::OnClientEvent(OST::ExtEvent event, QWebSocket* client, QString clientgrant)
 {
-    if (event.ev == OST::ExtEvType::DU || event.ev == OST::ExtEvType::IL )
+    if (event.ev == OST::ExtEvType::DU || event.ev == OST::ExtEvType::IL  || event.ev == OST::ExtEvType::LO )
     {
         wshandler->sendJsonMessage(getModulesDump(clientgrant), client);
     }
@@ -305,7 +305,7 @@ void Controller::OnClientEvent(OST::ExtEvent event, QWebSocket* client, QString 
 
 void Controller::onExternalEvent(OST::ExtEvent event)
 {
-    qDebug() << "Controller::onExternalEvent" << event.data;
+    //qDebug() << "Controller::onExternalEvent" << event.data;
     //    ZZ = 0,    /*!< invalid request */
     //    DU,        /*!< request dump */
     //    LO,        /*!< login request */

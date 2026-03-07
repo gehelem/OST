@@ -54,12 +54,26 @@ Basemodule::~Basemodule()
  */
 void Basemodule::onExternalEventRoot(OST::ExtEvent event)
 {
-    qDebug() << "Basemodule::onExternalEventRoot (orchestrator)" << event.data;
-
-    // Call hooks in order - each class overrides its own hook
     onExternalEventBase(event);
-    onExternalEventIndi(event);
-    onExternalEvent(event);
+
+    switch (event.ev)
+    {
+        case OST::ExtEvType::ZZ:
+        case OST::ExtEvType::DU:
+        case OST::ExtEvType::LO:
+        case OST::ExtEvType::IL:
+        case OST::ExtEvType::FS:
+        case OST::ExtEvType::CL:
+        case OST::ExtEvType::CS:
+        case OST::ExtEvType::PL:
+        case OST::ExtEvType::PS:
+            return;
+        default:
+            // Call hooks in order - each class overrides its own hook
+            onExternalEventIndi(event);
+            onExternalEvent(event);
+    }
+
 }
 
 /**
@@ -108,7 +122,9 @@ void Basemodule::onExternalEventBase(OST::ExtEvent event)
             logError("Basemodule::onExternalEvent - invalid profile load data content - %1", {OST::ExtEvToString(event.ev)});
             return;
         }
-        this->loadProfile(o["profile"].toString());
+        if (this->loadProfile(o["profile"].toString())) logInfo("Profile %1 loaded", {o["profile"].toString()});
+        else logError("Error loading profile %1", {o["profile"].toString()});
+
         return;
     }
     if (event.ev == OST::ExtEvType::PS)
@@ -118,7 +134,8 @@ void Basemodule::onExternalEventBase(OST::ExtEvent event)
             logError("Basemodule::onExternalEvent - invalid profile save data content - %1", {OST::ExtEvToString(event.ev)});
             return;
         }
-        this->saveProfile(o["profile"].toString());
+        if (this->saveProfile(o["profile"].toString())) logInfo("Profile %1 saved", {o["profile"].toString()});
+        else logError("Error saving profile %1", {o["profile"].toString()});
         return;
     }
 
@@ -161,7 +178,6 @@ void Basemodule::onExternalEventBase(OST::ExtEvent event)
 
     if (event.ev == OST::ExtEvType::SV)
     {
-
         if(!p[prpkey].toObject().contains("e"))
         {
             logError("Basemodule::onExternalEvent - invalid element data content - %1", {OST::ExtEvToString(event.ev)});
@@ -182,9 +198,18 @@ void Basemodule::onExternalEventBase(OST::ExtEvent event)
             bool b = true;
             getStore()[prpkey]->getElt(eltkey)->accept(&u, eltval, b);
         }
-
     }
 
+    if (event.ev == OST::ExtEvType::SA)
+    {
+        if(!p[prpkey].toObject().contains("e"))
+        {
+            logError("Basemodule::onExternalEvent - invalid element data content - %1", {OST::ExtEvToString(event.ev)});
+            return;
+        }
+        QJsonObject e = p[prpkey].toObject()["e"].toObject();
+        getStore()[prpkey]->setAll(e.toVariantMap());
+    }
 
     //    // Handle global lov updates from controller
     //    //if ( (e.type == "globallovupdate") && (e.module == "*") )
@@ -281,60 +306,7 @@ void Basemodule::onExternalEventBase(OST::ExtEvent event)
     //        }
     //    }
     //
-    //    /* autoupdate if wanted */
-    //
-    //    if ( (e.type == "Fsetproperty") && (e.module == getModuleName()) )
-    //    {
-    //        foreach(const QString &keyprop, e.data.keys())
-    //        {
-    //            if (e.data[keyprop].toMap()["elements"].toMap().size() > 1)
-    //            {
-    //                getProperty(keyprop)->setAll(e.data[keyprop].toMap()["elements"].toMap());
-    //            }
-    //            else
-    //            {
-    //                foreach(const QString &keyelt, e.data[keyprop].toMap()["elements"].toMap().keys())
-    //                {
-    //                    if (getStore()[keyprop]->getElt(keyelt)->autoUpdate() && getStore()[keyprop]->isEnabled() )
-    //                    {
-    //                        QVariant v = e.data[keyprop].toMap()["elements"].toMap()[keyelt];
-    //                        QVariantMap m = v.toMap();
-    //                        if (getEltBase(keyprop, keyelt)->getType() == "int")
-    //                        {
-    //                            getEltInt(keyprop, keyelt)->setValue(v.toInt(), true);
-    //                        }
-    //                        if (getEltBase(keyprop, keyelt)->getType() == "float")
-    //                        {
-    //                            getEltFloat(keyprop, keyelt)->setValue(v.toDouble(), true);
-    //                        }
-    //                        if (getEltBase(keyprop, keyelt)->getType() == "string")
-    //                        {
-    //                            getEltString(keyprop, keyelt)->setValue(v.toString(), true);
-    //                        }
-    //                        if (getEltBase(keyprop, keyelt)->getType() == "bool")
-    //                        {
-    //                            //a boolean need to be updated on property level because of SwitchRule's flag behaviour
-    //                            getProperty(keyprop)->setElt(keyelt, v, true);
-    //
-    //                        }
-    //                        if (getEltBase(keyprop, keyelt)->getType() == "date")
-    //                        {
-    //                            QDate d;
-    //                            d.setDate(m["year"].toInt(), m["month"].toInt(), m["day"].toInt());
-    //                            getEltDate(keyprop, keyelt)->setValue(d, true);
-    //                        }
-    //                        if (getEltBase(keyprop, keyelt)->getType() == "time")
-    //                        {
-    //                            QTime t;
-    //                            t.setHMS(m["hh"].toInt(), m["mm"].toInt(), m["ss"].toInt(), m["ms"].toInt());
-    //                            getEltTime(keyprop, keyelt)->setValue(t, true);
-    //                        }
-    //                        //sendMessage("Autoupdate - property " + keyprop + " - element " + keyelt);
-    //                    }
-    //                }
-    //            }
-    //        }
-    //    }
+
     //    if ((e.type == "Fbadge") && e.module == getModuleName())
     //    {
     //        foreach(const QString &keyprop, e.data.keys())

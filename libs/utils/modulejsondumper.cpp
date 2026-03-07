@@ -30,6 +30,7 @@ QJsonValue ModuleJsonDumper(EvType evt, QVariant data, ElementBase *elt, Propert
     if (prp)
     {
         OST::PropertyJsonDumper d(evt, data, elt, prp);
+        //qDebug() << "nnnnn" << prp->key();
         mod->getStore()[prp->key()]->accept(&d);
         properties[prp->key()] = d.getResult();
         result["p"] = properties;
