@@ -212,6 +212,10 @@ PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVaria
     {
         pProperty->setPostIcon2(pData["freevalue"].toString());
     }
+    if (pData.contains("autoupdate"))
+    {
+        pProperty->setAutoUpdate(pData["autoupdate"].toBool());
+    }
 
     return pProperty;
 

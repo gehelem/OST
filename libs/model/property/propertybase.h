@@ -222,6 +222,9 @@ class PropertyBase: public QObject
          */
         void setState(State state, bool emitEvent);
 
+        bool autoUpdate();
+        void setAutoUpdate(bool b);
+
         /**
          * @brief Check if property is enabled
          * @return true if enabled, false if disabled
@@ -448,6 +451,7 @@ class PropertyBase: public QObject
         // Runtime state (mutable)
         State mState = State::Idle;     /*!< Current runtime state (Idle/Ok/Busy/Error) */
         bool mIsEnabled = true;          /*!< Whether property is enabled for frontend */
+        bool mAutoUpdate = true;        /*!< Whether property's elements are automatically updated from external events */
 
         // UI hints (mutable)
         bool mBadge = false;             /*!< Badge visibility (notification indicator) */

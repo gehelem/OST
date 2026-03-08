@@ -152,5 +152,13 @@ void PropertyBase::setFreeValue(QString s)
 {
     mFreeValue = s;
 }
+bool PropertyBase::autoUpdate()
+{
+    return mAutoUpdate;
+}
+void PropertyBase::setAutoUpdate(bool b)
+{
+    mAutoUpdate = b;
+}
 
 }

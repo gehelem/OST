@@ -35,6 +35,7 @@ QJsonObject PropertyJsonDumper::dumpPropertyCommons(PropertyBase *pProperty)
     json["status"] = pProperty->state();
     json["permission"] = pProperty->permission();
     json["hasprofile"] = pProperty->hasProfile();
+    json["autoupdate"] = pProperty->autoUpdate();
     json["badge"] = pProperty->getBadge();
     json["preicon1"] = pProperty->getPreIcon1();
     json["preicon2"] = pProperty->getPreIcon2();
