@@ -805,6 +805,8 @@ QJsonObject Controller::getModulesDump(QString clientgrant)
         modules[module->getModuleName()] = OST::ModuleJsonDumper(OST::EvType::aa, QVariant(), nullptr, nullptr, nullptr, module);
     }
 
+
+    dump["libraries"] = QJsonObject().fromVariantMap(_availableModuleLibs);
     dump["m"] = modules;
     dump["files"] = files;
     dump["logs"] = mLogger->getJsonHistory();
