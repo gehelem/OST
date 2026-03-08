@@ -55,87 +55,75 @@ void IndiModule::onExternalEventIndi(OST::ExtEvent event)
 
     QJsonObject o = event.data["m"].toObject()[this->getModuleName()].toObject();
     QJsonObject p = o["p"].toObject();
-    QString prpkey = p.begin().key();
+    QJsonObject e = p[event.prpkey].toObject()["e"].toObject();
 
     if (event.ev == OST::ExtEvType::SV)
     {
 
-        if(!p[prpkey].toObject().contains("e"))
-        {
-            logError("IndiModule::onExternalEvent - invalid element data content - %1", {OST::ExtEvToString(event.ev)});
-            return;
-        }
-        QJsonObject e = p[prpkey].toObject()["e"].toObject();
-        if (!getStore()[prpkey]->getElts()->contains(e.begin().key()) )
-        {
-            logError("IndiModule::onExternalEvent - element %1/%2 not found", {p.begin().key(), e.begin().key()});
-            return;
-        }
-        QString eltkey = e.begin().key();
         QVariantMap eltval;
         eltval["value"] = e.begin().value().toVariant();
-        if (prpkey == "serveractions" && eltkey == "conserv")
+        if (event.prpkey == "serveractions" && event.eltkey == "conserv")
         {
-            getProperty(prpkey)->setState(OST::Busy, true);
-            if (connectIndi()) getProperty(prpkey)->setState(OST::Ok, true);
-            else getProperty(prpkey)->setState(OST::Error, true);
+            getProperty(event.prpkey)->setState(OST::Busy, true);
+            if (connectIndi()) getProperty(event.prpkey)->setState(OST::Ok, true);
+            else getProperty(event.prpkey)->setState(OST::Error, true);
 
             OST::ElementUpdate u;
             bool b = true;
-            getStore()[prpkey]->getElt(eltkey)->accept(&u, eltval, b);
+            getStore()[event.prpkey]->getElt(event.eltkey)->accept(&u, eltval, b);
             return;
         }
-        if (prpkey == "serveractions" && eltkey == "disconserv")
+        if (event.prpkey == "serveractions" && event.eltkey == "disconserv")
         {
-            getProperty(prpkey)->setState(OST::Busy, true);
-            if (disconnectIndi()) getProperty(prpkey)->setState(OST::Ok, true);
-            else getProperty(prpkey)->setState(OST::Error, true);
+            getProperty(event.prpkey)->setState(OST::Busy, true);
+            if (disconnectIndi()) getProperty(event.prpkey)->setState(OST::Ok, true);
+            else getProperty(event.prpkey)->setState(OST::Error, true);
 
             OST::ElementUpdate u;
             bool b = true;
-            getStore()[prpkey]->getElt(eltkey)->accept(&u, eltval, b);
+            getStore()[event.prpkey]->getElt(event.eltkey)->accept(&u, eltval, b);
             return;
         }
-        if (prpkey == "devicesactions" && eltkey == "condevs")
+        if (event.prpkey == "devicesactions" && event.eltkey == "condevs")
         {
             if (!isServerConnected())
             {
                 logWarning("%1 - Indi server not connected", {QString("onExternalEventIndi")});
-                getProperty(prpkey)->setState(OST::Error, true);
+                getProperty(event.prpkey)->setState(OST::Error, true);
                 return;
             }
 
-            if (eltkey == "condevs")
+            if (event.eltkey == "condevs")
             {
-                getProperty(prpkey)->setState(OST::Busy, true);
-                if (connectAllDevices()) getProperty(prpkey)->setState(OST::Ok, true);
-                else getProperty(prpkey)->setState(OST::Error, true);
+                getProperty(event.prpkey)->setState(OST::Busy, true);
+                if (connectAllDevices()) getProperty(event.prpkey)->setState(OST::Ok, true);
+                else getProperty(event.prpkey)->setState(OST::Error, true);
 
                 OST::ElementUpdate u;
                 bool b = true;
-                getStore()[prpkey]->getElt(eltkey)->accept(&u, eltval, b);
+                getStore()[event.prpkey]->getElt(event.eltkey)->accept(&u, eltval, b);
                 return;
             }
-            if (eltkey == "discondevs")
+            if (event.eltkey == "discondevs")
             {
-                getProperty(prpkey)->setState(OST::Busy, true);
-                if (disconnectAllDevices()) getProperty(prpkey)->setState(OST::Ok, true);
-                else getProperty(prpkey)->setState(OST::Error, true);
+                getProperty(event.prpkey)->setState(OST::Busy, true);
+                if (disconnectAllDevices()) getProperty(event.prpkey)->setState(OST::Ok, true);
+                else getProperty(event.prpkey)->setState(OST::Error, true);
 
                 OST::ElementUpdate u;
                 bool b = true;
-                getStore()[prpkey]->getElt(eltkey)->accept(&u, eltval, b);
+                getStore()[event.prpkey]->getElt(event.eltkey)->accept(&u, eltval, b);
                 return;
             }
-            if (eltkey == "loadconfs")
+            if (event.eltkey == "loadconfs")
             {
-                getProperty(prpkey)->setState(OST::Busy, true);
-                if (loadDevicesConfs()) getProperty(prpkey)->setState(OST::Ok, true);
-                else getProperty(prpkey)->setState(OST::Error, true);
+                getProperty(event.prpkey)->setState(OST::Busy, true);
+                if (loadDevicesConfs()) getProperty(event.prpkey)->setState(OST::Ok, true);
+                else getProperty(event.prpkey)->setState(OST::Error, true);
 
                 OST::ElementUpdate u;
                 bool b = true;
-                getStore()[prpkey]->getElt(eltkey)->accept(&u, eltval, b);
+                getStore()[event.prpkey]->getElt(event.eltkey)->accept(&u, eltval, b);
                 return;
             }
         }

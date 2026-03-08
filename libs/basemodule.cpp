@@ -148,53 +148,46 @@ void Basemodule::onExternalEventBase(OST::ExtEvent event)
     //    GF,        /*!< grid fetch line  */
     //    GD,        /*!< grid delete line  */
     //    GR,        /*!< grid reset */
-    QJsonObject p = o["p"].toObject();
-    if (!getStore().contains(p.begin().key()) )
+    if (!getStore().contains(event.prpkey) )
     {
-        logError("Basemodule::onExternalEvent - property %1 not found", {p.begin().key()});
+        logError("Basemodule::onExternalEvent - property %1 not found", {event.prpkey});
         return;
     }
-    QString prpkey = p.begin().key();
 
-    if (!getStore()[prpkey]->isEnabled())
+    if (!getStore()[event.prpkey]->isEnabled())
     {
-        logError("Basemodule::onExternalEvent - property disabled, can't update - %1", {prpkey});
+        logError("Basemodule::onExternalEvent - property %1 is disabled, can't update", {event.prpkey});
         return;
     }
+
+    if (getStore()[event.prpkey]->permission() == OST::Permission::ReadOnly)
+    {
+        logError("Basemodule::onExternalEvent - property %1 is readonly, can't update", {event.prpkey});
+        return;
+    }
+    QJsonObject p = o["p"].toObject();
+    QJsonObject e = p[event.prpkey].toObject()["e"].toObject();
 
     if (event.ev == OST::ExtEvType::SV)
     {
-        if(!p[prpkey].toObject().contains("e"))
+        if (!getStore()[event.prpkey]->getElts()->contains(event.eltkey ))
         {
-            logError("Basemodule::onExternalEvent - invalid element data content - %1", {OST::ExtEvToString(event.ev)});
+            logError("Basemodule::onExternalEvent - element %1-%2 not found", {event.prpkey, event.eltkey});
             return;
         }
-        QJsonObject e = p[prpkey].toObject()["e"].toObject();
-        if (!getStore()[prpkey]->getElts()->contains(e.begin().key()) )
-        {
-            logError("Basemodule::onExternalEvent - element %1/%2 not found", {p.begin().key(), e.begin().key()});
-            return;
-        }
-        QString eltkey = e.begin().key();
         QVariantMap eltval;
         eltval["value"] = e.begin().value().toVariant();
-        if (getStore()[prpkey]->getElt(eltkey)->autoUpdate())
+        if (getStore()[event.prpkey]->getElt(event.eltkey)->autoUpdate())
         {
             OST::ElementUpdate u;
             bool b = true;
-            getStore()[prpkey]->getElt(eltkey)->accept(&u, eltval, b);
+            getStore()[event.prpkey]->getElt(event.eltkey)->accept(&u, eltval, b);
         }
     }
 
     if (event.ev == OST::ExtEvType::SA)
     {
-        if(!p[prpkey].toObject().contains("e"))
-        {
-            logError("Basemodule::onExternalEvent - invalid element data content - %1", {OST::ExtEvToString(event.ev)});
-            return;
-        }
-        QJsonObject e = p[prpkey].toObject()["e"].toObject();
-        getStore()[prpkey]->setAll(e.toVariantMap());
+        getStore()[event.prpkey]->setAll(e.toVariantMap());
     }
 
     //    // Handle global lov updates from controller
