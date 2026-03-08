@@ -392,11 +392,13 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
         {
             QVariantMap tt = lovs[key].toVariant().toMap();
             OST::LovBase *lb = OST::LovFactory::createLov(tt);
+
             if (lb != nullptr)
             {
                 mGlobLov[key] = lb;
                 OST::LovJsonDumper d;
                 mGlobLov[key]->accept(&d);
+                connect(mGlobLov[key], &OST::LovBase::lovChanged, this, &Datastore::onLovChanged);
             }
             else
             {
@@ -521,12 +523,12 @@ OST::LovString* Datastore::getGlovString(QString pLov)
 {
     if (!getGlobLovs().contains(pLov))
     {
-        logWarning("getGlovString - Globallob %1 not found", {pLov});
+        logWarning("getGlovString - Globallov %1 not found", {pLov});
         return nullptr;
     }
     if (getGlobLovs()[pLov]->getType() != "string")
     {
-        logWarning("getGlovString - Globallob %1 wrong type %2", {pLov, getGlobLovs()[pLov]->getType()});
+        logWarning("getGlovString - Globallov %1 wrong type %2", {pLov, getGlobLovs()[pLov]->getType()});
         return nullptr;
     }
 

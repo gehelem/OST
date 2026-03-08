@@ -476,6 +476,17 @@ void Basemodule::onDatastoreEvent(OST::EvType evt, QVariant data, OST::ElementBa
                                   OST::LovBase* lov, Datastore* mod)
 {
     emit moduleEvent(evt, data, elt, prp, lov, this);
+
+    /* catch profile changes */
+    if (prp)
+    {
+        if (prp->hasProfile() && !this->mCurrentProfileChanged)
+        {
+            mCurrentProfileChanged = true;
+            emit moduleEvent(OST::EvType::fc, QVariant(), nullptr, nullptr, nullptr, this);
+
+        }
+    }
 }
 
 bool Basemodule::saveProfile(const QString &pProfileName)
@@ -487,8 +498,10 @@ bool Basemodule::saveProfile(const QString &pProfileName)
     {
         mCurrentProfile = pProfileName;
         mCurrentProfileChanged = false;
-        emit moduleEvent(OST::EvType::fs, pProfileName, nullptr,
-                         nullptr, nullptr, this);
+        if (!getGlovString("profiles")->getLov().contains(pProfileName))
+            getGlovString("profiles")->lovAdd(pProfileName, pProfileName);
+
+        emit moduleEvent(OST::EvType::fs, QVariant(), nullptr, nullptr, nullptr, this);
         return true;
     }
     return false;
@@ -602,8 +615,7 @@ bool Basemodule::loadProfile(const QString &pProfileName)
 
     mCurrentProfile = pProfileName;
     mCurrentProfileChanged = false;
-    emit moduleEvent(OST::EvType::fl, pProfileName, nullptr,
-                     nullptr, nullptr, this);
+    emit moduleEvent(OST::EvType::fl, QVariant(), nullptr, nullptr, nullptr, this);
     return true;
 }
 void Basemodule::updateProfilesLov()

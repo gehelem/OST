@@ -249,6 +249,14 @@ inline QString EvToString(EvType ev)
             return "gu-grid update line";
         case OST::EvType::gd:
             return "gd-grid delete line";
+        case OST::EvType::gr:
+            return "gd-grid reset";
+        case OST::EvType::lc:
+            return "lc-lov create";
+        case OST::EvType::lu:
+            return "lu-lov update";
+        case OST::EvType::ld:
+            return "ld-lov delete";
         case OST::EvType::dp:
             return "dp-delete/remove property";
         case OST::EvType::de:

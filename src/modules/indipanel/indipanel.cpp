@@ -30,14 +30,12 @@ IndiPanel::~IndiPanel()
 void IndiPanel::newDevice(INDI::BaseDevice dp)
 {
     auto props = dp.getProperties();
-    //BOOST_LOG_TRIVIAL(debug) << "Indipanel new device" << dp->getDeviceName();
 
     for (auto pProperty : props)
     {
         QString dev = pProperty.getDeviceName();
         QString pro = pProperty.getName();
         QString devpro = dev + pro;
-        //BOOST_LOG_TRIVIAL(debug) << "Indipanel new property " << devpro.toStdString();
         QString mess;
         OST::PropertyMulti *pm = new OST::PropertyMulti(devpro, pProperty.getLabel(),
                 OST::IntToPermission(pProperty.getPermission()),
@@ -63,7 +61,6 @@ void IndiPanel::newProperty(INDI::Property pProperty)
     QString dev = pProperty.getDeviceName();
     QString pro = pProperty.getName();
     QString devpro = dev + pro;
-    //sendMessage("Indipanel new property " + devpro);
     QString mess;
 
     OST::PropertyMulti* p = new OST::PropertyMulti(devpro, pProperty.getLabel(),
@@ -86,7 +83,6 @@ void IndiPanel::newProperty(INDI::Property pProperty)
                 INDI::BaseDevice wdp = getDevice(pProperty.getDeviceName());
                 if (wdp.getDriverInterface() & INDI::BaseDevice::CCD_INTERFACE)
                 {
-                    //BOOST_LOG_TRIVIAL(debug) << "Setting blob mode for " << _wdp->getDeviceName();
                     setBLOBMode(B_ALSO, wdp.getDeviceName(), nullptr);
                 }
 
@@ -141,7 +137,6 @@ void IndiPanel::newProperty(INDI::Property pProperty)
         }
         case INDI_BLOB:
         {
-
             break;
         }
         case INDI_UNKNOWN:
@@ -264,7 +259,9 @@ void IndiPanel::onExternalEvent(OST::ExtEvent event)
              event.eltkey << " l=" << event.lovkey << " i=" << event.line;
 
     /* don't process Indimodule specific events again */
-    if (getStore().value(event.prpkey)->level1() == "Parameters") return;
+    if (getStore().value(event.prpkey)->hasProfile()) return;
+    //if (getStore().value(event.prpkey)->level1() == "Parameters") return;
+    //if (getStore().value(event.prpkey)->level1() == "Module") return;
 
     QJsonObject o = event.data["m"].toObject()[this->getModuleName()].toObject();
     QJsonObject p = o["p"].toObject();
@@ -273,19 +270,14 @@ void IndiPanel::onExternalEvent(OST::ExtEvent event)
 
     if (event.ev == OST::ExtEvType::SV)
     {
-        QJsonObject e = p[event.prpkey].toObject()["e"].toObject();
-        QString eltkey = e.begin().key();
-        //QVariantMap ostprop = m[keyprop].toMap();
-        //QString devcat = ostprop["level1"].toString();
         QString realDevice = getStore().value(event.prpkey)->getFreeValue();
         QString realprop = event.prpkey;
-        //BOOST_LOG_TRIVIAL(debug) << "DEVCAT - recv : "  << devcat.toStdString();
         realprop.replace(realDevice, "");
-        if (getStore().value(event.prpkey)->getElt(eltkey)->getType() == "bool")
+        if (getStore().value(event.prpkey)->getElt(event.eltkey)->getType() == "bool")
         {
             bool b = e.begin().value().toBool();
-            if ( b) sendModNewSwitch(realDevice, realprop, eltkey, ISS_ON);
-            if (!b) sendModNewSwitch(realDevice, realprop, eltkey, ISS_OFF);
+            if ( b) sendModNewSwitch(realDevice, realprop, event.eltkey, ISS_ON);
+            if (!b) sendModNewSwitch(realDevice, realprop, event.eltkey, ISS_OFF);
         }
     }
 
@@ -293,11 +285,8 @@ void IndiPanel::onExternalEvent(OST::ExtEvent event)
     {
         QJsonObject e = p[event.prpkey].toObject()["e"].toObject();
         QString eltkey = e.begin().key();
-        //QVariantMap ostprop = m[keyprop].toMap();
-        //QString devcat = ostprop["level1"].toString();
         QString realDevice = getStore().value(event.prpkey)->getFreeValue();
         QString realprop = event.prpkey;
-        //BOOST_LOG_TRIVIAL(debug) << "DEVCAT - recv : "  << devcat.toStdString();
         realprop.replace(realDevice, "");
         INDI::BaseDevice dp = getDevice(realDevice.toStdString().c_str());
         if (!dp.isValid())
@@ -362,61 +351,7 @@ void IndiPanel::onExternalEvent(OST::ExtEvent event)
             }
             return;
         }
-
-
     }
-
-    //    if (e.module != this->getModuleName()) return;
-    //
-    //    QVariantMap m = getPropertiesDump(OST::Event()).toVariantMap();
-    //    foreach(const QString &keyprop, e.data.keys())
-    //    {
-    //        if (!m.contains(keyprop))
-    //        {
-    //            logError("OnMyExternalEvent - property %1 does not exist (indipanel)", {keyprop});
-    //            return;
-    //        }
-    //        QString prop = keyprop;
-    //        QVariantMap ostprop = m[keyprop].toMap();
-    //        QString devcat = ostprop["level1"].toString();
-    //        QString realDevice = getStore()[keyprop]->getFreeValue();
-    //        //BOOST_LOG_TRIVIAL(debug) << "DEVCAT - recv : "  << devcat.toStdString();
-    //        prop.replace(realDevice, "");
-    //        if (!(devcat == "Indi"))
-    //        {
-    //            foreach(const QString &keyelt, e.data[keyprop].toMap()["elements"].toMap().keys())
-    //            {
-    //                if (!m[keyprop].toMap()["e"].toMap().contains(keyelt))
-    //                {
-    //                    logError ("OnMyExternalEvent - property %1 element %2 does not exist (indipanel)", {keyprop, keyelt});
-    //                    return;
-    //                }
-    //                if (getStore()[keyprop]->getElt(keyelt)->getType() == "string")
-    //                {
-    //                    sendModNewText(realDevice, prop, keyelt,
-    //                                   e.data[keyprop].toMap()["elements"].toMap()[keyelt].toString());
-    //                }
-    //                if (getStore()[keyprop]->getElt(keyelt)->getType() == "int"
-    //                        || getStore()[keyprop]->getElt(keyelt)->getType() == "float")
-    //                {
-    //                    //qDebug() << "indipanel - OnMyExternalEvent" << e.data[keyprop].toMap()["elements"].toMap()[keyelt];
-    //                    sendModNewNumber(realDevice, prop, keyelt,
-    //                                     e.data[keyprop].toMap()["elements"].toMap()[keyelt].toFloat());
-    //                }
-    //                if (getStore()[keyprop]->getElt(keyelt)->getType() == "bool")
-    //                {
-    //                    //qDebug() << "bool" << keyprop << keyelt << eventData[keyprop].toMap()["elements"].toMap()[keyelt];
-    //                    keyelt.toStdString();
-    //                    if ( e.data[keyprop].toMap()["elements"].toMap()[keyelt].toBool()) sendModNewSwitch(realDevice, prop,
-    //                                keyelt, ISS_ON);
-    //                    if (!e.data[keyprop].toMap()["elements"].toMap()[keyelt].toBool()) sendModNewSwitch(realDevice, prop,
-    //                                keyelt, ISS_OFF);
-    //                }
-    //            }
-    //
-    //        }
-    //
-    //    }
 }
 
 
