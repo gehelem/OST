@@ -239,7 +239,12 @@ void Controller::loadConf(const QString &pConf)
     QVariantMap result;
     if (!dbmanager->getDbConfiguration(pConf, result))
     {
-        //pMainControl->sendMainError("loadConf " + pConf + " failed");
+        logError("Load configuration %1 failed", {pConf});
+        return;
+    }
+    if (result.size() == 0)
+    {
+        logError("Configuration %1 not found", {pConf});
         return;
     }
     for(QVariantMap::const_iterator iter = result.begin(); iter != result.end(); ++iter)
@@ -249,17 +254,17 @@ void Controller::loadConf(const QString &pConf)
         namewithoutblanks.replace(" ", "");
         loadModule(line["moduletype"].toString(), namewithoutblanks, iter.key(), line["profilename"].toString());
     }
-    //pMainControl->sendMainMessage("loadConf " + pConf + " successful");
+    logInfo("Load configuration %1 sucessfull", {pConf});
 }
 void Controller::saveConf(const QString &pConf)
 {
     QVariantMap result;
     if (!dbmanager->saveDbConfiguration(pConf, mModulesMap))
     {
-        //pMainControl->sendMainError("saveDbConfiguration " + pConf + " failed");
+        logError("Save configuration %1 failed", {pConf});
         return;
     }
-    //pMainControl->sendMainMessage("saveDbConfiguration " + pConf + " sucessfull");
+    logInfo("Save configuration %1 sucessfull", {pConf});
 
 }
 
@@ -305,7 +310,7 @@ void Controller::OnClientEvent(OST::ExtEvent event, QWebSocket* client, QString 
 
 void Controller::onExternalEvent(OST::ExtEvent event)
 {
-    //qDebug() << "Controller::onExternalEvent" << event.data;
+    qDebug() << "Controller::onExternalEvent" << event.data;
     //    ZZ = 0,    /*!< invalid request */
     //    DU,        /*!< request dump */
     //    LO,        /*!< login request */
@@ -328,6 +333,12 @@ void Controller::onExternalEvent(OST::ExtEvent event)
         case OST::ExtEvType::LO:
         case OST::ExtEvType::IL:
             logError("Controller::onExternalEvent - invalid event here - %1", {OST::ExtEvToString(event.ev)});
+            return;
+        case OST::ExtEvType::CS:
+            saveConf(event.data["name"].toString());
+            return;
+        case OST::ExtEvType::CL:
+            loadConf(event.data["name"].toString());
             return;
         case OST::ExtEvType::FS:
             if (!event.data.contains("folder"))
