@@ -371,7 +371,7 @@ void Controller::onExternalEvent(OST::ExtEvent event)
     /* data must contain a unique "p" key for these */
     if (event.ev == OST::ExtEvType::SV || event.ev == OST::ExtEvType::SA || event.ev == OST::ExtEvType::GC
             || event.ev == OST::ExtEvType::GU || event.ev == OST::ExtEvType::GF || event.ev == OST::ExtEvType::GD
-            || event.ev == OST::ExtEvType::GR)
+            || event.ev == OST::ExtEvType::GR || event.ev == OST::ExtEvType::GH || event.ev == OST::ExtEvType::GB)
     {
         if (!o.contains("p"))
         {
@@ -411,7 +411,8 @@ void Controller::onExternalEvent(OST::ExtEvent event)
     }
 
     /* data must contain a "i" key for these */
-    if (event.ev == OST::ExtEvType::GU || event.ev == OST::ExtEvType::GF || event.ev == OST::ExtEvType::GD)
+    if (event.ev == OST::ExtEvType::GU || event.ev == OST::ExtEvType::GF || event.ev == OST::ExtEvType::GD
+            || event.ev == OST::ExtEvType::GH || event.ev == OST::ExtEvType::GB)
     {
         if (!p[event.prpkey].toObject().contains("i"))
         {

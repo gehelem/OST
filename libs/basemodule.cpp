@@ -190,7 +190,7 @@ bool Basemodule::onExternalEventBase(OST::ExtEvent event)
         }
         QVariantMap eltval;
         eltval["value"] = e.begin().value().toVariant();
-        if (getStore()[event.prpkey]->getElt(event.eltkey)->autoUpdate())
+        if (getStore()[event.prpkey]->getElt(event.eltkey)->autoUpdate() || getStore()[event.prpkey]->autoUpdate())
         {
             OST::ElementUpdate u;
             bool b = true;
@@ -203,65 +203,59 @@ bool Basemodule::onExternalEventBase(OST::ExtEvent event)
         getStore()[event.prpkey]->setAll(e.toVariantMap());
     }
 
-    //    // Handle global lov updates from controller
-    //    //if ( (e.type == "globallovupdate") && (e.module == "*") )
-    //    //{
-    //    //    // pEventKey contains the lov name (e.g., "loadedModules")
-    //    //    // pEventData contains the lov data with "values" list
-    //    //    if (!getGlobLovs().contains(pEventKey))
-    //    //    {
-    //    //        // Create the globallov if it doesn't exist
-    //    //        OST::LovString* newLov = new OST::LovString(pEventKey);
-    //    //        createGlobLov(pEventKey, newLov);
-    //    //    }
-    //
-    //    //    // Clear and repopulate the lov
-    //    //    OST::LovString* lov = getGlovString(pEventKey);
-    //    //    if (lov != nullptr)
-    //    //    {
-    //    //        lov->lovClear();
-    //    //        QVariantList values = pEventData["values"].toList();
-    //    //        for (const QVariant &item : values)
-    //    //        {
-    //    //            QVariantMap itemMap = item.toMap();
-    //    //            lov->lovAdd(itemMap["key"].toString(), itemMap["label"].toString());
-    //    //        }
-    //    //    }
-    //    //    return;
-    //    //}
-    //
-    //    if  (e.type == "Freadall")
-    //    {
-    //        sendDump();
-    //        return;
-    //    }
-    //
-    //    /* just check if requested modification is possible */
-    //    if ( (e.type == "Fsetproperty") && (e.module == getModuleName()) )
-    //    {
-    //        foreach(const QString &keyprop, e.data.keys())
-    //        {
-    //            if (!getStore().contains(keyprop) )
-    //            {
-    //                logWarning("Fsetproperty - property %1 not found", {keyprop});
-    //                return;
-    //            }
-    //            if (!getStore()[keyprop]->isEnabled() )
-    //            {
-    //                logWarning("Fsetproperty - property %1 is disabled - can't update", {keyprop});
-    //                return;
-    //            }
-    //            foreach(const QString &keyelt,  e.data[keyprop].toMap()["elements"].toMap().keys())
-    //            {
-    //                if (!getStore()[keyprop]->getElts()->contains(keyelt) )
-    //                {
-    //                    logWarning("Fsetproperty - property %1 - element %2 not found", {keyprop, keyelt});
-    //                    return;
-    //                }
-    //            }
-    //        }
-    //    }
-    //
+    /* grid operations */
+    if (event.ev == OST::ExtEvType::GC || event.ev == OST::ExtEvType::GU || event.ev == OST::ExtEvType::GF
+            || event.ev == OST::ExtEvType::GD || event.ev == OST::ExtEvType::GH || event.ev == OST::ExtEvType::GB
+            || event.ev == OST::ExtEvType::GR)
+    {
+        /* property must have a grid */
+        if (!getStore()[event.prpkey]->hasGrid())
+        {
+            logError("Basemodule::onExternalEvent - property %1 has no grid", {event.prpkey});
+            return false;
+        }
+        /* these events need a line */
+        if (event.line < 0 && (event.ev == OST::ExtEvType::GU || event.ev == OST::ExtEvType::GF || event.ev == OST::ExtEvType::GD
+                               || event.ev == OST::ExtEvType::GH || event.ev == OST::ExtEvType::GB))
+        {
+            logError("Basemodule::onExternalEvent - missing line value", {event.prpkey});
+            return false;
+        }
+
+        if (getStore()[event.prpkey]->autoUpdate())
+        {
+            if (event.ev == OST::ExtEvType::GC)
+            {
+                getStore()[event.prpkey]->newLine(e.toVariantMap());
+            }
+            if (event.ev == OST::ExtEvType::GU)
+            {
+                getStore()[event.prpkey]->updateLine(event.line, e.toVariantMap());
+            }
+            if (event.ev == OST::ExtEvType::GF)
+            {
+                getStore()[event.prpkey]->fetchLine(event.line);
+            }
+            if (event.ev == OST::ExtEvType::GD)
+            {
+                getStore()[event.prpkey]->deleteLine(event.line);
+            }
+            if (event.ev == OST::ExtEvType::GH)
+            {
+                getStore()[event.prpkey]->swapLines(event.line, event.line - 1);
+            }
+            if (event.ev == OST::ExtEvType::GB)
+            {
+                getStore()[event.prpkey]->swapLines(event.line, event.line + 1);
+            }
+            if (event.ev == OST::ExtEvType::GR)
+            {
+                getStore()[event.prpkey]->clearGrid();
+            }
+        }
+
+    }
+
     //    if ( (e.type == "Flup") && (e.module == getModuleName()) )
     //    {
     //        foreach(const QString &keyprop, e.data.keys())

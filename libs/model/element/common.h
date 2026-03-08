@@ -293,6 +293,8 @@ enum class ExtEvType
     GF,        /*!< grid fetch line  */
     GD,        /*!< grid delete line  */
     GR,        /*!< grid reset */
+    GH,        /*!< grid line up ("Haut")*/
+    GB,        /*!< grid line down ("Bas") */
 };
 inline QString ExtEvToString(ExtEvType ev)
 {
@@ -330,6 +332,10 @@ inline QString ExtEvToString(ExtEvType ev)
             return "GD";
         case OST::ExtEvType::GR:
             return "GR";
+        case OST::ExtEvType::GH:
+            return "GH";
+        case OST::ExtEvType::GB:
+            return "GB";
         default:
             return "unknown ExtEvType:" + QString::number(static_cast<int>(ev));
     }
@@ -362,6 +368,8 @@ inline ExtEvType StrToExtEvent(QString s)
     if (s == "GF") return  ExtEvType::GF;
     if (s == "GD") return  ExtEvType::GD;
     if (s == "GR") return  ExtEvType::GR;
+    if (s == "GH") return  ExtEvType::GH;
+    if (s == "GB") return  ExtEvType::GB;
     return  ExtEvType::ZZ;
 }
 
