@@ -88,7 +88,8 @@ void Basemodule::onExternalEventRoot(OST::ExtEvent event)
  */
 void Basemodule::onExternalEventBase(OST::ExtEvent event)
 {
-    //qDebug() << "Basemodule::onExternalEventBase" << event.data;
+    qDebug() << "Basemodule::onExternalEventBase event = " << OST::ExtEvToString(event.ev) << " p=" << event.prpkey << " e=" <<
+             event.eltkey << " l=" << event.lovkey << " i=" << event.line;
 
     switch (event.ev)
     {
@@ -147,21 +148,6 @@ void Basemodule::onExternalEventBase(OST::ExtEvent event)
     //    GF,        /*!< grid fetch line  */
     //    GD,        /*!< grid delete line  */
     //    GR,        /*!< grid reset */
-    if(!o.contains("p"))
-    {
-        logError("Basemodule::onExternalEvent - invalid property data content - %1", {OST::ExtEvToString(event.ev)});
-        return;
-    }
-    if(!o["p"].isObject())
-    {
-        logError("Basemodule::onExternalEvent - invalid property data content - %1", {OST::ExtEvToString(event.ev)});
-        return;
-    }
-    if(o["p"].toObject().size() != 1)
-    {
-        logError("Basemodule::onExternalEvent - invalid property data content - %1", {OST::ExtEvToString(event.ev)});
-        return;
-    }
     QJsonObject p = o["p"].toObject();
     if (!getStore().contains(p.begin().key()) )
     {
@@ -487,8 +473,11 @@ void Basemodule::onDatastoreEvent(OST::EvType evt, QVariant data, OST::ElementBa
 
 bool Basemodule::saveProfile(const QString &pProfileName)
 {
+    /* build a values only dedicated dump */
     QJsonObject obj = OST::ModuleJsonDumper(OST::EvType::pr, QVariant(), nullptr, nullptr, nullptr, this).toObject();
-    return this->setDbProfile(this->getClassName(), pProfileName, obj);
+    /* save it */
+    if (this->setDbProfile(this->getClassName(), pProfileName, obj)) emit moduleEvent(OST::EvType::fs, pProfileName, nullptr,
+                nullptr, nullptr, this);
 }
 bool Basemodule::loadProfile(const QString &pProfileName)
 {

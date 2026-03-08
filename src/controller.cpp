@@ -362,8 +362,66 @@ void Controller::onExternalEvent(OST::ExtEvent event)
 
     }
 
-    /* dispatch event only to target module */
+    /* basic data validity checks below */
     QString mod = event.data["m"].toObject().begin().key();
+    QJsonObject o = event.data["m"].toObject()[mod].toObject();
+    QJsonObject p, e;
+    event.line = -1;
+
+    /* data must contain a unique "p" key for these */
+    if (event.ev == OST::ExtEvType::SV || event.ev == OST::ExtEvType::SA || event.ev == OST::ExtEvType::GC
+            || event.ev == OST::ExtEvType::GU || event.ev == OST::ExtEvType::GF || event.ev == OST::ExtEvType::GD
+            || event.ev == OST::ExtEvType::GR)
+    {
+        if (!o.contains("p"))
+        {
+            logError("Controller::onExternalEvent - invalid event data content - data must contain a 'p' key %1", {OST::ExtEvToString(event.ev)});
+            return;
+        }
+        p = o["p"].toObject();
+        if (o["p"].toObject().size() != 1)
+        {
+            logError("Controller::onExternalEvent - invalid event data content - 'p' key must be unique %1", {OST::ExtEvToString(event.ev)});
+            return;
+        }
+        event.prpkey = o["p"].toObject().begin().key();
+    }
+
+    /* data must contain a "e" key for these */
+    if (event.ev == OST::ExtEvType::SV || event.ev == OST::ExtEvType::SA || event.ev == OST::ExtEvType::GC
+            || event.ev == OST::ExtEvType::GU)
+    {
+        if (!p[event.prpkey].toObject().contains("e"))
+        {
+            logError("Controller::onExternalEvent - invalid event data content - data must contain a 'e' key %1", {OST::ExtEvToString(event.ev)});
+            return;
+        }
+        e = p[event.prpkey].toObject();
+    }
+
+    /* "e" key must be unique for these */
+    if (event.ev == OST::ExtEvType::SV)
+    {
+        if (e.size() != 1)
+        {
+            logError("Controller::onExternalEvent - invalid event data content size - 'e' key must be unique %1", {OST::ExtEvToString(event.ev)});
+            return;
+        }
+        event.eltkey = e.begin().key();
+    }
+
+    /* data must contain a "i" key for these */
+    if (event.ev == OST::ExtEvType::GU || event.ev == OST::ExtEvType::GF || event.ev == OST::ExtEvType::GD)
+    {
+        if (!p[event.prpkey].toObject().contains("i"))
+        {
+            logError("Controller::onExternalEvent - invalid event data content - data must contain a 'i' key  %1", {OST::ExtEvToString(event.ev)});
+            return;
+        }
+        event.line = p[event.prpkey].toObject()["i"].toInt();
+    }
+
+    /* checks ok : dispatch event only to targeted module */
     QList<Basemodule *> moduleinstances = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
     for (Basemodule *moduleinstance : moduleinstances)
     {

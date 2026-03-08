@@ -221,6 +221,8 @@ enum class EvType
     de,        /*!< delete/remove element  */
     dm,        /*!< delete/remove module   */
     am,        /*!< add module   */
+    fs,        /*!< profile saved */
+    fl,        /*!< profile loaded */
 };
 inline QString EvToString(EvType ev)
 {
@@ -254,6 +256,10 @@ inline QString EvToString(EvType ev)
             return "dm-delete/remove module";
         case OST::EvType::am:
             return "am-add module";
+        case OST::EvType::fs:
+            return "fs-profile saved";
+        case OST::EvType::fl:
+            return "fl-profile loaded";
         default:
             return "unknown:" + QString::number(static_cast<int>(ev));
     }
@@ -320,7 +326,12 @@ inline QString ExtEvToString(ExtEvType ev)
 typedef struct ExtEvent
 {
     ExtEvType ev = ExtEvType::ZZ;   /*!< External event type*/
-    QJsonObject data;                  /*!< External event data */
+    QJsonObject data;               /*!< External event data */
+    QString prpkey;                 /*!< controller updates this if needed : no control is done, just for easier and later usage in basemodule on so on */
+    QString eltkey;                 /*!< ^ ^ */
+    QString lovkey;                 /*!< ^ ^ */
+    int line;                       /*!< ^ ^ */
+
 } ExtEvent;
 
 inline ExtEvType StrToExtEvent(QString s)

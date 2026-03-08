@@ -260,9 +260,13 @@ void IndiPanel::newMessage     (INDI::BaseDevice dp, int messageID)
 
 void IndiPanel::onExternalEvent(OST::ExtEvent event)
 {
+    qDebug() << "IndiPanel::onExternalEvent event = " << OST::ExtEvToString(event.ev) << " p=" << event.prpkey << " e=" <<
+             event.eltkey << " l=" << event.lovkey << " i=" << event.line;
+
     QJsonObject o = event.data["m"].toObject()[this->getModuleName()].toObject();
     QJsonObject p = o["p"].toObject();
     QString prpkey = p.begin().key();
+
 
     if (event.ev == OST::ExtEvType::SV)
     {
@@ -279,6 +283,42 @@ void IndiPanel::onExternalEvent(OST::ExtEvent event)
             bool b = e.begin().value().toBool();
             if ( b) sendModNewSwitch(realDevice, realprop, eltkey, ISS_ON);
             if (!b) sendModNewSwitch(realDevice, realprop, eltkey, ISS_OFF);
+        }
+    }
+
+    if (event.ev == OST::ExtEvType::SA)
+    {
+        QJsonObject e = p[prpkey].toObject()["e"].toObject();
+        QString eltkey = e.begin().key();
+        //QVariantMap ostprop = m[keyprop].toMap();
+        //QString devcat = ostprop["level1"].toString();
+        QString realDevice = getStore().value(prpkey)->getFreeValue();
+        QString realprop = prpkey;
+        //BOOST_LOG_TRIVIAL(debug) << "DEVCAT - recv : "  << devcat.toStdString();
+        realprop.replace(realDevice, "");
+        if (getStore().value(prpkey)->getElt(eltkey)->getType() == "int"
+                || getStore().value(prpkey)->getElt(eltkey)->getType() == "float")
+        {
+            INDI::BaseDevice dp = getDevice(realDevice.toStdString().c_str());
+
+            if (!dp.isValid())
+            {
+                logError("Unable to find %2 device. Aborting.", {realDevice});
+                return;
+            }
+            INDI::PropertyNumber prop = dp.getNumber(realprop.toStdString().c_str());
+            if (!prop.isValid())
+            {
+                logError("Unable to find %2/%3 property. Aborting.", {realDevice, realprop});
+                return;
+            }
+
+            for (std::size_t i = 0; i < prop.size(); i++)
+            {
+                prop[i].value = e.value(prop[i].name).toDouble();
+                sendNewNumber(prop);
+            }
+            return;
         }
     }
 
