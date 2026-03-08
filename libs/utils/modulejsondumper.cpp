@@ -2,14 +2,37 @@
 namespace  OST
 {
 
-QJsonValue ModuleJsonDumper(EvType evt, QVariant data, ElementBase *elt, PropertyBase *prp, LovBase *lov, Datastore *mod)
+QJsonValue ModuleJsonDumper(EvType evt, QVariant data, ElementBase *elt, PropertyBase *prp, LovBase *lov, Basemodule *mod)
 {
     QJsonObject result, properties, globlovs;
+
+    /* minimal message for property deletion */
     if (evt == EvType::dp)
     {
         properties[data.toString()] = "";
         result["p"] = properties;
         return result;
+    }
+
+    /* profile is saved : we send back all lovs contents to retrieve profiles list */
+    if (evt == EvType::fs)
+    {
+        foreach(const QString &key, mod->getGlobLovs().keys())
+        {
+            OST::LovJsonDumper d;
+            mod->getGlobLovs()[key]->accept(&d);
+            globlovs[key] = d.getResult();
+        }
+        result["l"] = globlovs;
+    }
+
+    /* global dumps & profiles events : profile data is required */
+    if (evt == EvType::aa || evt == EvType::am  || evt == EvType::fs   || evt == EvType::fl   || evt == EvType::fc )
+    {
+        QJsonObject profile;
+        profile["name"] = mod->getCurrentProfile();
+        profile["changed"] = mod->getCurrentProfileChanged();
+        result["f"] = profile;
     }
 
     if (evt == EvType::av || evt == EvType::pr)

@@ -48,7 +48,7 @@ IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap
  *
  * NO need to call parent - orchestration is automatic!
  */
-void IndiModule::onExternalEventIndi(OST::ExtEvent event)
+bool IndiModule::onExternalEventIndi(OST::ExtEvent event)
 {
     qDebug() << "IndiModule::onExternalEventIndi event = " << OST::ExtEvToString(event.ev) << " p=" << event.prpkey << " e=" <<
              event.eltkey << " l=" << event.lovkey << " i=" << event.line;
@@ -71,7 +71,7 @@ void IndiModule::onExternalEventIndi(OST::ExtEvent event)
             OST::ElementUpdate u;
             bool b = true;
             getStore()[event.prpkey]->getElt(event.eltkey)->accept(&u, eltval, b);
-            return;
+            return true;
         }
         if (event.prpkey == "serveractions" && event.eltkey == "disconserv")
         {
@@ -82,7 +82,7 @@ void IndiModule::onExternalEventIndi(OST::ExtEvent event)
             OST::ElementUpdate u;
             bool b = true;
             getStore()[event.prpkey]->getElt(event.eltkey)->accept(&u, eltval, b);
-            return;
+            return true;
         }
         if (event.prpkey == "devicesactions" && event.eltkey == "condevs")
         {
@@ -90,7 +90,7 @@ void IndiModule::onExternalEventIndi(OST::ExtEvent event)
             {
                 logWarning("%1 - Indi server not connected", {QString("onExternalEventIndi")});
                 getProperty(event.prpkey)->setState(OST::Error, true);
-                return;
+                return true;
             }
 
             if (event.eltkey == "condevs")
@@ -102,7 +102,7 @@ void IndiModule::onExternalEventIndi(OST::ExtEvent event)
                 OST::ElementUpdate u;
                 bool b = true;
                 getStore()[event.prpkey]->getElt(event.eltkey)->accept(&u, eltval, b);
-                return;
+                return true;
             }
             if (event.eltkey == "discondevs")
             {
@@ -113,7 +113,7 @@ void IndiModule::onExternalEventIndi(OST::ExtEvent event)
                 OST::ElementUpdate u;
                 bool b = true;
                 getStore()[event.prpkey]->getElt(event.eltkey)->accept(&u, eltval, b);
-                return;
+                return true;
             }
             if (event.eltkey == "loadconfs")
             {
@@ -124,12 +124,12 @@ void IndiModule::onExternalEventIndi(OST::ExtEvent event)
                 OST::ElementUpdate u;
                 bool b = true;
                 getStore()[event.prpkey]->getElt(event.eltkey)->accept(&u, eltval, b);
-                return;
+                return true;
             }
         }
 
     }
-
+    return true;
 }
 void IndiModule::connectIndiTimer()
 {

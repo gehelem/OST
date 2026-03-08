@@ -9,7 +9,7 @@ namespace  OST
 
 QJsonValue ModuleJsonDumper(OST::EvType evt, QVariant data, OST::ElementBase* elt, OST::PropertyBase* prp,
                             OST::LovBase* lov,
-                            Datastore* mod);
+                            Basemodule* mod);
 
 }
 #endif //OST_MODULEJSONDUMPER_H

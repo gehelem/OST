@@ -34,7 +34,7 @@ class IndiModule : public Basemodule, public INDI::BaseClient
          *
          * Do NOT call Basemodule::onExternalEventIndi() - it's empty by design.
          */
-        void onExternalEventIndi(OST::ExtEvent event) override;
+        bool onExternalEventIndi(OST::ExtEvent event) override;
 
 
     protected:

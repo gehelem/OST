@@ -32,6 +32,8 @@ class Basemodule : public DBManager
         QString getModuleLabel();
         QString getClassName();
         QString getHelpContent(QString language);
+        QString getCurrentProfile();
+        bool getCurrentProfileChanged();
 
     private:
 
@@ -41,6 +43,8 @@ class Basemodule : public DBManager
         QString mModuleName;
         QString mModuleLabel;
         OST::ModuleStatus mStatus;
+        QString mCurrentProfile = "default";
+        bool mCurrentProfileChanged = false;
 
     signals:
         void moduleStatusRequest(void);
@@ -90,7 +94,7 @@ class Basemodule : public DBManager
          * Override this in Basemodule descendants if you need to customize
          * base-level event handling (rare).
          */
-        virtual void onExternalEventBase(OST::ExtEvent event);
+        virtual bool onExternalEventBase(OST::ExtEvent event);
 
         /**
          * @brief Hook for INDI module event handling
@@ -100,7 +104,7 @@ class Basemodule : public DBManager
          *
          * Custom modules inheriting from IndiModule do NOT need to override this.
          */
-        virtual void onExternalEventIndi(OST::ExtEvent event);
+        virtual bool onExternalEventIndi(OST::ExtEvent event);
 
         /**
          * @brief Hook for custom module event handling (PRIMARY OVERRIDE POINT)

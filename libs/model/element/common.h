@@ -223,6 +223,7 @@ enum class EvType
     am,        /*!< add module   */
     fs,        /*!< profile saved */
     fl,        /*!< profile loaded */
+    fc,        /*!< profile changed */
 };
 inline QString EvToString(EvType ev)
 {
@@ -235,9 +236,9 @@ inline QString EvToString(EvType ev)
         case OST::EvType::av:
             return "av-dump profile data";
         case OST::EvType::ee:
-            return "ee-set one element value";
+            return "ee";
         case OST::EvType::ea:
-            return "ea-set all elements values (prop level) ";
+            return "ea";
         case OST::EvType::ev:
             return "ev-set one element value/min/max/format ";
         case OST::EvType::ps:
@@ -260,6 +261,8 @@ inline QString EvToString(EvType ev)
             return "fs-profile saved";
         case OST::EvType::fl:
             return "fl-profile loaded";
+        case OST::EvType::fc:
+            return "fc-profile changed";
         default:
             return "unknown:" + QString::number(static_cast<int>(ev));
     }

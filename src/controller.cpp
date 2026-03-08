@@ -396,7 +396,7 @@ void Controller::onExternalEvent(OST::ExtEvent event)
             logError("Controller::onExternalEvent - invalid event data content - data must contain a 'e' key %1", {OST::ExtEvToString(event.ev)});
             return;
         }
-        e = p[event.prpkey].toObject();
+        e = p[event.prpkey].toObject()["e"].toObject();
     }
 
     /* "e" key must be unique for these */

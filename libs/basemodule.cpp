@@ -54,7 +54,7 @@ Basemodule::~Basemodule()
  */
 void Basemodule::onExternalEventRoot(OST::ExtEvent event)
 {
-    onExternalEventBase(event);
+    if (!onExternalEventBase(event)) return;
 
     switch (event.ev)
     {
@@ -70,7 +70,7 @@ void Basemodule::onExternalEventRoot(OST::ExtEvent event)
             return;
         default:
             // Call hooks in order - each class overrides its own hook
-            onExternalEventIndi(event);
+            if (!onExternalEventIndi(event)) return;
             onExternalEvent(event);
     }
 
@@ -86,7 +86,7 @@ void Basemodule::onExternalEventRoot(OST::ExtEvent event)
  *
  * Called first in the event chain.
  */
-void Basemodule::onExternalEventBase(OST::ExtEvent event)
+bool Basemodule::onExternalEventBase(OST::ExtEvent event)
 {
     qDebug() << "Basemodule::onExternalEventBase event = " << OST::ExtEvToString(event.ev) << " p=" << event.prpkey << " e=" <<
              event.eltkey << " l=" << event.lovkey << " i=" << event.line;
@@ -101,12 +101,12 @@ void Basemodule::onExternalEventBase(OST::ExtEvent event)
         case OST::ExtEvType::CL:
         case OST::ExtEvType::CS:
             logError("Basemodule::onExternalEvent - invalid event here - %1", {OST::ExtEvToString(event.ev)});
-            return;
+            return false;
         default:
             if (!event.data.contains("m") || !event.data["m"].toObject().contains(this->getModuleName()) )
             {
                 logError("Basemodule::onExternalEvent - invalid event data content - %1", {OST::ExtEvToString(event.ev)});
-                return;
+                return false;
             };
     }
 
@@ -121,23 +121,36 @@ void Basemodule::onExternalEventBase(OST::ExtEvent event)
         if(!o.contains("profile"))
         {
             logError("Basemodule::onExternalEvent - invalid profile load data content - %1", {OST::ExtEvToString(event.ev)});
-            return;
+            return false;
         }
-        if (this->loadProfile(o["profile"].toString())) logInfo("Profile %1 loaded", {o["profile"].toString()});
-        else logError("Error loading profile %1", {o["profile"].toString()});
-
-        return;
+        if (this->loadProfile(o["profile"].toString()))
+        {
+            logInfo("Profile %1 loaded", {o["profile"].toString()});
+            return true;
+        }
+        else
+        {
+            logError("Error loading profile %1", {o["profile"].toString()});
+            return false;
+        }
     }
     if (event.ev == OST::ExtEvType::PS)
     {
         if(!o.contains("profile"))
         {
             logError("Basemodule::onExternalEvent - invalid profile save data content - %1", {OST::ExtEvToString(event.ev)});
-            return;
+            return false;
         }
-        if (this->saveProfile(o["profile"].toString())) logInfo("Profile %1 saved", {o["profile"].toString()});
-        else logError("Error saving profile %1", {o["profile"].toString()});
-        return;
+        if (this->saveProfile(o["profile"].toString()))
+        {
+            logInfo("Profile %1 saved", {o["profile"].toString()});
+            return true;
+        }
+        else
+        {
+            logError("Error saving profile %1", {o["profile"].toString()});
+            return false;
+        }
     }
 
     /* property target operations */
@@ -151,19 +164,19 @@ void Basemodule::onExternalEventBase(OST::ExtEvent event)
     if (!getStore().contains(event.prpkey) )
     {
         logError("Basemodule::onExternalEvent - property %1 not found", {event.prpkey});
-        return;
+        return false;
     }
 
     if (!getStore()[event.prpkey]->isEnabled())
     {
         logError("Basemodule::onExternalEvent - property %1 is disabled, can't update", {event.prpkey});
-        return;
+        return false;
     }
 
     if (getStore()[event.prpkey]->permission() == OST::Permission::ReadOnly)
     {
         logError("Basemodule::onExternalEvent - property %1 is readonly, can't update", {event.prpkey});
-        return;
+        return false;
     }
     QJsonObject p = o["p"].toObject();
     QJsonObject e = p[event.prpkey].toObject()["e"].toObject();
@@ -173,7 +186,7 @@ void Basemodule::onExternalEventBase(OST::ExtEvent event)
         if (!getStore()[event.prpkey]->getElts()->contains(event.eltkey ))
         {
             logError("Basemodule::onExternalEvent - element %1-%2 not found", {event.prpkey, event.eltkey});
-            return;
+            return false;
         }
         QVariantMap eltval;
         eltval["value"] = e.begin().value().toVariant();
@@ -375,7 +388,7 @@ void Basemodule::onExternalEventBase(OST::ExtEvent event)
     //    OnMyExternalEvent(e);
     //    OnDispatchToIndiExternalEvent(e);
 
-
+    return true;
 }
 
 /**
@@ -386,10 +399,11 @@ void Basemodule::onExternalEventBase(OST::ExtEvent event)
  *
  * Called second in the event chain.
  */
-void Basemodule::onExternalEventIndi(OST::ExtEvent event)
+bool Basemodule::onExternalEventIndi(OST::ExtEvent event)
 {
     Q_UNUSED(event);
     // Empty by default - IndiModule will override this
+    return false;
 }
 
 /**
@@ -469,8 +483,15 @@ bool Basemodule::saveProfile(const QString &pProfileName)
     /* build a values only dedicated dump */
     QJsonObject obj = OST::ModuleJsonDumper(OST::EvType::pr, QVariant(), nullptr, nullptr, nullptr, this).toObject();
     /* save it */
-    if (this->setDbProfile(this->getClassName(), pProfileName, obj)) emit moduleEvent(OST::EvType::fs, pProfileName, nullptr,
-                nullptr, nullptr, this);
+    if (this->setDbProfile(this->getClassName(), pProfileName, obj))
+    {
+        mCurrentProfile = pProfileName;
+        mCurrentProfileChanged = false;
+        emit moduleEvent(OST::EvType::fs, pProfileName, nullptr,
+                         nullptr, nullptr, this);
+        return true;
+    }
+    return false;
 }
 bool Basemodule::loadProfile(const QString &pProfileName)
 {
@@ -579,6 +600,10 @@ bool Basemodule::loadProfile(const QString &pProfileName)
         }
     }
 
+    mCurrentProfile = pProfileName;
+    mCurrentProfileChanged = false;
+    emit moduleEvent(OST::EvType::fl, pProfileName, nullptr,
+                     nullptr, nullptr, this);
     return true;
 }
 void Basemodule::updateProfilesLov()
@@ -591,3 +616,11 @@ void Basemodule::updateProfilesLov()
         getGlovString("profiles")->lovAdd(iter.key(), iter.key());
     }
 }
+QString Basemodule::getCurrentProfile()
+{
+    return mCurrentProfile;
+}
+bool Basemodule::getCurrentProfileChanged()
+{
+    return mCurrentProfileChanged;
+};

@@ -263,22 +263,25 @@ void IndiPanel::onExternalEvent(OST::ExtEvent event)
     qDebug() << "IndiPanel::onExternalEvent event = " << OST::ExtEvToString(event.ev) << " p=" << event.prpkey << " e=" <<
              event.eltkey << " l=" << event.lovkey << " i=" << event.line;
 
+    /* don't process Indimodule specific events again */
+    if (getStore().value(event.prpkey)->level1() == "Parameters") return;
+
     QJsonObject o = event.data["m"].toObject()[this->getModuleName()].toObject();
     QJsonObject p = o["p"].toObject();
-    QString prpkey = p.begin().key();
+    QJsonObject e = p[event.prpkey].toObject()["e"].toObject();
 
 
     if (event.ev == OST::ExtEvType::SV)
     {
-        QJsonObject e = p[prpkey].toObject()["e"].toObject();
+        QJsonObject e = p[event.prpkey].toObject()["e"].toObject();
         QString eltkey = e.begin().key();
         //QVariantMap ostprop = m[keyprop].toMap();
         //QString devcat = ostprop["level1"].toString();
-        QString realDevice = getStore().value(prpkey)->getFreeValue();
-        QString realprop = prpkey;
+        QString realDevice = getStore().value(event.prpkey)->getFreeValue();
+        QString realprop = event.prpkey;
         //BOOST_LOG_TRIVIAL(debug) << "DEVCAT - recv : "  << devcat.toStdString();
         realprop.replace(realDevice, "");
-        if (getStore().value(prpkey)->getElt(eltkey)->getType() == "bool")
+        if (getStore().value(event.prpkey)->getElt(eltkey)->getType() == "bool")
         {
             bool b = e.begin().value().toBool();
             if ( b) sendModNewSwitch(realDevice, realprop, eltkey, ISS_ON);
@@ -288,24 +291,45 @@ void IndiPanel::onExternalEvent(OST::ExtEvent event)
 
     if (event.ev == OST::ExtEvType::SA)
     {
-        QJsonObject e = p[prpkey].toObject()["e"].toObject();
+        QJsonObject e = p[event.prpkey].toObject()["e"].toObject();
         QString eltkey = e.begin().key();
         //QVariantMap ostprop = m[keyprop].toMap();
         //QString devcat = ostprop["level1"].toString();
-        QString realDevice = getStore().value(prpkey)->getFreeValue();
-        QString realprop = prpkey;
+        QString realDevice = getStore().value(event.prpkey)->getFreeValue();
+        QString realprop = event.prpkey;
         //BOOST_LOG_TRIVIAL(debug) << "DEVCAT - recv : "  << devcat.toStdString();
         realprop.replace(realDevice, "");
-        if (getStore().value(prpkey)->getElt(eltkey)->getType() == "int"
-                || getStore().value(prpkey)->getElt(eltkey)->getType() == "float")
+        INDI::BaseDevice dp = getDevice(realDevice.toStdString().c_str());
+        if (!dp.isValid())
         {
-            INDI::BaseDevice dp = getDevice(realDevice.toStdString().c_str());
+            logError("Unable to find %2 device. Aborting.", {realDevice});
+            return;
+        }
 
-            if (!dp.isValid())
+        /* bools */
+        if (getStore().value(event.prpkey)->getElt(eltkey)->getType() == "bool")
+        {
+            INDI::PropertySwitch prop = dp.getSwitch(realprop.toStdString().c_str());
+            if (!prop.isValid())
             {
-                logError("Unable to find %2 device. Aborting.", {realDevice});
+                logError("Unable to find %2/%3 property. Aborting.", {realDevice, realprop});
                 return;
             }
+
+            for (std::size_t i = 0; i < prop.size(); i++)
+            {
+                bool b = e.begin().value().toBool();
+                if ( b) prop[i].setState(ISS_ON);
+                if (!b) prop[i].setState(ISS_OFF);
+                sendNewSwitch(prop);
+            }
+            return;
+        }
+
+        /* Numbers */
+        if (getStore().value(event.prpkey)->getElt(eltkey)->getType() == "int"
+                || getStore().value(event.prpkey)->getElt(eltkey)->getType() == "float")
+        {
             INDI::PropertyNumber prop = dp.getNumber(realprop.toStdString().c_str());
             if (!prop.isValid())
             {
@@ -320,6 +344,26 @@ void IndiPanel::onExternalEvent(OST::ExtEvent event)
             }
             return;
         }
+
+        /* texts */
+        if (getStore().value(event.prpkey)->getElt(eltkey)->getType() == "string")
+        {
+            INDI::PropertyText prop = dp.getText(realprop.toStdString().c_str());
+            if (!prop.isValid())
+            {
+                logError("Unable to find %2/%3 property. Aborting.", {realDevice, realprop});
+                return;
+            }
+
+            for (std::size_t i = 0; i < prop.size(); i++)
+            {
+                prop[i].setText(e.value(prop[i].name).toString().toStdString());
+                sendNewText(prop);
+            }
+            return;
+        }
+
+
     }
 
     //    if (e.module != this->getModuleName()) return;
