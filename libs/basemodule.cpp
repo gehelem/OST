@@ -69,9 +69,11 @@ void Basemodule::onExternalEventRoot(OST::ExtEvent event)
         case OST::ExtEvType::PS:
             return;
         default:
+        {
             // Call hooks in order - each class overrides its own hook
             if (!onExternalEventIndi(event)) return;
             onExternalEvent(event);
+        }
     }
 
 }
@@ -100,8 +102,10 @@ bool Basemodule::onExternalEventBase(OST::ExtEvent event)
         case OST::ExtEvType::FS:
         case OST::ExtEvType::CL:
         case OST::ExtEvType::CS:
+        {
             logError("Basemodule::onExternalEvent - invalid event here - %1", {OST::ExtEvToString(event.ev)});
             return false;
+        }
         default:
             if (!event.data.contains("m") || !event.data["m"].toObject().contains(this->getModuleName()) )
             {

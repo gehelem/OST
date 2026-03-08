@@ -282,6 +282,8 @@ enum class ExtEvType
     LO,        /*!< login request */
     IL,        /*!< set client language request */
     FS,        /*!< folder select */
+    ML,        /*!< Load module */
+    MK,        /*!< Kill module */
     PL,        /*!< Load profile */
     PS,        /*!< Save profile */
     CL,        /*!< Load configuration */
@@ -310,6 +312,10 @@ inline QString ExtEvToString(ExtEvType ev)
             return "IL";
         case OST::ExtEvType::FS:
             return "FS";
+        case OST::ExtEvType::ML:
+            return "ML";
+        case OST::ExtEvType::MK:
+            return "MK";
         case OST::ExtEvType::PL:
             return "PL";
         case OST::ExtEvType::PS:
@@ -357,6 +363,8 @@ inline ExtEvType StrToExtEvent(QString s)
     if (s == "LO") return  ExtEvType::LO;
     if (s == "IL") return  ExtEvType::IL;
     if (s == "FS") return  ExtEvType::FS;
+    if (s == "ML") return  ExtEvType::ML;
+    if (s == "MK") return  ExtEvType::MK;
     if (s == "PL") return  ExtEvType::PL;
     if (s == "PS") return  ExtEvType::PS;
     if (s == "CL") return  ExtEvType::CL;

@@ -157,31 +157,29 @@ Controller::~Controller()
 
 bool Controller::loadModule(QString lib, QString name, QString label, QString profile)
 {
-    if (mModulesMap.contains(name ))
+    if (mModulesMap.contains(name))
     {
-        //pMainControl->sendMainError("Module " + name + " already loaded - can't load twice");
+        logError("Module %1 already loaded - can't load twice", {name});
         return false;
     }
     QLibrary library("libost" + lib);
     if (!library.load())
     {
-        //pMainControl->sendMainError(name + " " + library.errorString());
+        logError("Error loadin library %1 - %2", {name, library.errorString()});
         return false;
     }
-    //pMainControl->sendMainMessage(name + " library loaded");
 
     typedef Basemodule *(*CreateModule)(QString, QString, QString, QVariantMap);
     CreateModule createmodule = (CreateModule)library.resolve("initialize");
     if (!createmodule)
     {
-        //pMainControl->sendMainError("Could not initialize module from library : " + lib);
+        logError("Could not initialize module from library %1 ", {lib});
         return false;
     }
     Basemodule *mod = createmodule(name, label, profile, _availableModuleLibs);
-    //QPointer<Basemodule> mod = createmodule(name,label,profile,_availableModuleLibs);
     if (!mod)
     {
-        // pMainControl->sendMainError("Could not instanciate module from library : " + lib);
+        logError("Could not instanciate module from library %1 ", {lib});
         return false;
     }
     mod->setParent(this);
@@ -193,19 +191,14 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
     QVariantMap profs;
     dbmanager->getDbProfiles(mod->metaObject()->className(), profs);
     connect(mod, &Basemodule::moduleEvent, this, &Controller::onModuleEvent);
-    //connect(mod, &Datastore::moduleEvent, wshandler, &WShandler::processModuleEvent);
     connect(mod, &Basemodule::moduleEvent, wshandler, &WShandler::onModuleEvent);
 
     connect(mod, &Basemodule::loadOtherModule, this, &Controller::loadModule);
     connect(this, &Controller::controllerEvent, mod, &Basemodule::onExternalEventRoot);
-    //connect(wshandler, &WShandler::externalEvent, mod, &Basemodule::OnExternalEvent);
 
     // Connect module to log system
     connect(mod, &Basemodule::logSignal, mLogger, &OST::Logger::onLog);
     connect(mod, &Basemodule::logSignal, wshandler, &WShandler::onLog);
-
-    //mod->OnExternalEvent({"afterinit", name, QString(), QString(), 0, QVariantMap()});
-    //mod->sendDump();
 
     QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
     for (Basemodule *othermodule : othermodules)
@@ -220,7 +213,7 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
             //connect(mod, &Datastore::moduleEvent, othermodule, &Basemodule::OnExternalEvent);
         }
     }
-    QMap<QString, QString> l;
+    QVariantMap l;
     l["label"] = label;
     l["type"] = lib;
     l["profile"] = profile;
@@ -231,6 +224,7 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
 
     updateGlobalModulesLov();
 
+    wshandler->onModuleEvent(OST::EvType::aa, QVariant(), nullptr, nullptr, nullptr, mod);
     return true;
 
 }
@@ -332,15 +326,37 @@ void Controller::onExternalEvent(OST::ExtEvent event)
         case OST::ExtEvType::DU:
         case OST::ExtEvType::LO:
         case OST::ExtEvType::IL:
+        {
             logError("Controller::onExternalEvent - invalid event here - %1", {OST::ExtEvToString(event.ev)});
             return;
+        }
         case OST::ExtEvType::CS:
+        {
             saveConf(event.data["name"].toString());
             return;
+        }
         case OST::ExtEvType::CL:
+        {
             loadConf(event.data["name"].toString());
             return;
+        }
+        case OST::ExtEvType::ML:
+        {
+            loadModule(event.data["lib"].toString(), event.data["name"].toString(), event.data["label"].toString(),
+                       event.data["profile"].toString());
+            return;
+        }
+        case OST::ExtEvType::MK:
+        {
+            QList<Basemodule *> mods = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
+            for (Basemodule *m : mods)
+            {
+                if (m->getModuleName() == event.data["name"].toString()) m->killMe();
+            }
+            return;
+        }
         case OST::ExtEvType::FS:
+        {
             if (!event.data.contains("folder"))
             {
                 logError("Controller::onExternalEvent - invalid event data content - %1", {OST::ExtEvToString(event.ev)});
@@ -354,7 +370,9 @@ void Controller::onExternalEvent(OST::ExtEvent event)
             mFileWatcher.addPath(mSelectedFolder);
             OnFileWatcherEvent(QString());
             return;
+        }
         default:
+        {
             if (!event.data.contains("m"))
             {
                 logError("Controller::onExternalEvent - invalid event data content - %1", {OST::ExtEvToString(event.ev)});
@@ -370,6 +388,7 @@ void Controller::onExternalEvent(OST::ExtEvent event)
                 logError("Controller::onExternalEvent - unknown module - %1", {event.data["m"].toObject().begin().key()});
                 return;
             };
+        }
 
     }
 
@@ -744,12 +763,12 @@ void Controller::updateGlobalModulesLov(void)
     QVariantList values;
 
     // Add all loaded modules (excluding mainctl)
-    for(QMap<QString, QMap<QString, QString>>::const_iterator iter = mModulesMap.begin();
+    for(QVariantMap::const_iterator iter = mModulesMap.begin();
             iter != mModulesMap.end(); ++iter)
     {
         QVariantMap item;
         item["key"] = iter.key();
-        item["label"] = iter.value()["label"];
+        item["label"] = iter.value();
         values.append(item);
     }
 
@@ -805,7 +824,7 @@ QJsonObject Controller::getModulesDump(QString clientgrant)
         modules[module->getModuleName()] = OST::ModuleJsonDumper(OST::EvType::aa, QVariant(), nullptr, nullptr, nullptr, module);
     }
 
-
+    //dump["modules"] = QJsonObject().fromVariantMap(mModulesMap); // useless, redundant with detailled (and live updated) modules data
     dump["libraries"] = QJsonObject().fromVariantMap(_availableModuleLibs);
     dump["m"] = modules;
     dump["files"] = files;

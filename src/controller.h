@@ -46,7 +46,7 @@ class Controller : public QObject
         //Maincontrol *pMainControl;
         QProcess    *_process;
         QProcess    *_indiProcess;
-        QMap<QString, QMap<QString, QString>> mModulesMap;
+        QVariantMap mModulesMap;
         QZeroConf zeroConf;
         QFileSystemWatcher mFileWatcher;
         QStringList mFilesList;

@@ -170,7 +170,7 @@ bool DBManager::getDbConfiguration(const QString &pConfigName, QVariantMap &resu
     mDb.close();
     return true;
 }
-bool DBManager::saveDbConfiguration(const QString &pConfigName, QMap<QString, QMap<QString, QString> > &pConf)
+bool DBManager::saveDbConfiguration(const QString &pConfigName, QVariantMap &pConf)
 {
     if(!mDb.open())
     {
@@ -189,9 +189,9 @@ bool DBManager::saveDbConfiguration(const QString &pConfigName, QMap<QString, QM
 
     foreach(const QString &key, pConf.keys())
     {
-        QString label = pConf[key]["label"];
-        QString type = pConf[key]["type"];
-        QString profile = pConf[key]["profile"];
+        QString label = pConf[key].toMap()["label"].toString();
+        QString type = pConf[key].toMap()["type"].toString();
+        QString profile = pConf[key].toMap()["profile"].toString();
         qDebug() << "DB conf = " << key << " label = " << label << " type = " << type << " profile = " << profile;
         QString sql = "INSERT OR REPLACE INTO CONFIGURATIONS (CONFIGNAME,MODULENAME,MODULETYPE,PROFILENAME) VALUES ('" + pConfigName
                       + "','" + label + "','" + type + "','" + profile + "');";

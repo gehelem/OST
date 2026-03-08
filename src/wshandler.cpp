@@ -320,10 +320,15 @@ void WShandler::onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase *
     //    obj[event.type] = mods;
     //    sendJsonMessage(obj);
     QJsonValue m = OST::ModuleJsonDumper(evt, data, elt, prp, lov, mod);
-    QJsonObject o;
-    o[mod->getModuleName()] = m;
-
-    QJsonObject s;
+    QJsonObject o, s;
+    if (evt != OST::EvType::dm)
+    {
+        o[mod->getModuleName()] = m;
+    }
+    else
+    {
+        o[data.toString()] = m;
+    }
     s[EvToString(evt)] = o;
     sendJsonMessage(s);
 
