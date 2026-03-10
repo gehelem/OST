@@ -25,7 +25,8 @@ class Controller : public QObject
         Controller(const QString &webroot, const QString &dbpath,
                    const QString &libpath, const QString &conf, const QString &indiserver,
                    const QString &ssl, const QString &sslCert, const QString &sslKey, const QString &lng, const QString &grant,
-                   OST::Logger *logger, OST::TranslateManager *translate, const QString &banner);
+                   OST::Logger *logger, OST::TranslateManager *translate, const QString &banner,
+                   const QString &gitSha, const QString &gitDate, const QString &gitMessage);
         ~Controller() override;
     signals:
         void controllerEvent(OST::ExtEvent  event);
@@ -53,6 +54,7 @@ class Controller : public QObject
         QStringList mFoldersList;
         QString mSelectedFolder;
         QString mBanner;
+        QVariantMap mControllerData;
 
         bool loadModule(QString lib, QString name, QString label, QString profile);
         void loadConf(const QString &pConf);

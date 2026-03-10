@@ -29,7 +29,8 @@
 Controller::Controller(const QString &webroot, const QString &dbpath,
                        const QString &libpath, const QString &conf, const QString &indiserver,
                        const QString &ssl, const QString &sslCert, const QString &sslKey, const QString &lng, const QString &grant,
-                       OST::Logger *logger, OST::TranslateManager *translate, const QString &banner)
+                       OST::Logger *logger, OST::TranslateManager *translate, const QString &banner,
+                       const QString &gitSha, const QString &gitDate, const QString &gitMessage)
     :       _webroot(webroot),
             _dbpath(dbpath),
             _libpath(libpath),
@@ -45,6 +46,12 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     // Must be done before any connect() calls that use these types
     qRegisterMetaType<OST::LogLevel>("OST::LogLevel");
     qRegisterMetaType<OST::EvType>("OST::EvType");
+
+    QVariantMap g;
+    g["Githash"] = gitSha;
+    g["Gitdate"] = gitDate;
+    g["Gitmessage"] = gitMessage;
+    mControllerData["git"] = g;
 
     startPublish();
 
@@ -831,6 +838,9 @@ QJsonObject Controller::getModulesDump(QString clientgrant)
     dump["logs"] = mLogger->getJsonHistory();
     dump["banner"] = mBanner;
     dump["serverlng"] = _lng;
+    QJsonObject o;
+    //o.fromVariantMap(mControllerData);
+    //dump["controllerdata"] = "toto";
 
     result["d"] = dump;
     return result;

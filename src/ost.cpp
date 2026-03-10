@@ -134,7 +134,10 @@ int main(int argc, char *argv[])
         grant,
         &mLogger,
         &mTranslater,
-        banner
+        banner,
+        QString::fromStdString(Version::GIT_SHA1),
+        QString::fromStdString(Version::GIT_DATE),
+        QString::fromStdString(Version::GIT_COMMIT_SUBJECT)
     );
 
     Q_UNUSED(controller);
