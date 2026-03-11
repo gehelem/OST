@@ -145,6 +145,32 @@ bool DBManager::getDbProfiles(QString moduleType, QVariantMap &result )
     mDb.close();
     return true;
 }
+bool DBManager::getDbProfiles(QVariantMap &result )
+{
+    if(!mDb.open())
+    {
+        logError("getDbProfiles dbOpen - ERROR: %1 - %2", {mDb.databaseName(), mDb.lastError().text()});
+        return false;
+    }
+    QString sql = "SELECT MODULETYPE,PROFILENAME FROM PROFILES ";
+    if (!mQuery.exec(sql))
+    {
+        logError("getDbProfiles - ERROR SQL = %1", {sql});
+        logError("getDbProfiles - ERROR : %1", {mQuery.lastError().text()});
+        mDb.close();
+        return false;
+    }
+    while (mQuery.next())
+    {
+        QString type = mQuery.value(0).toString().toUtf8();
+        QString name = mQuery.value(1).toString().toUtf8();
+        QVariantList l = result[type].toList();
+        l.append(name);
+        result[type] = l;
+    }
+    mDb.close();
+    return true;
+}
 bool DBManager::getDbConfiguration(const QString &pConfigName, QVariantMap &result )
 {
     if(!mDb.open())

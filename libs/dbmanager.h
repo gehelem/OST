@@ -31,6 +31,7 @@ class DBManager : public Datastore
         bool getDbProfile(const QString &pModuleType, const QString &pProfileName, QJsonObject &content  );
         bool setDbProfile(const QString &pModuleType, const QString &pProfileName, QJsonObject &content );
         bool getDbProfiles(QString moduleType, QVariantMap &result );
+        bool getDbProfiles(QVariantMap &result );
         bool getDbConfiguration(const QString &pConfigName, QVariantMap &result );
         bool saveDbConfiguration(const QString &pConfigName, QVariantMap &pConf);
         bool getDbConfigurations(QVariantMap &result );
