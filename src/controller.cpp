@@ -91,6 +91,10 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     checkModules();
     checkIndiDrivers();
 
+    updateControllerData("libraries", _availableModuleLibs);
+    updateControllerData("indidrivers", _availableIndiDrivers);
+
+
     //pMainControl = new Maincontrol(QString("mainctl"), QString("Main control"), QString(), QVariantMap());
     //connect(pMainControl, &Maincontrol::moduleEvent, this, &Controller::onModuleEvent);
     //connect(pMainControl, &Maincontrol::moduleEvent, wshandler, &WShandler::onModuleEvent);
