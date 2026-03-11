@@ -13,11 +13,11 @@ CREATE TABLE IF NOT EXISTS CONFIGURATIONS (
         PROFILENAME    TEXT NOT NULL,
         PRIMARY KEY("CONFIGNAME","MODULENAME")
 );
-INSERT INTO CONFIGURATIONS VALUES ('modules','Indipanel','indipanel','default');
-INSERT INTO CONFIGURATIONS VALUES ('modules','Allsky','allsky','default');
-INSERT INTO CONFIGURATIONS VALUES ('modules','CCD inspector','inspector','default');
-INSERT INTO CONFIGURATIONS VALUES ('modules','Focuser','focuser','default');
-INSERT INTO CONFIGURATIONS VALUES ('modules','Navigator','navigator','default');
+INSERT INTO CONFIGURATIONS VALUES ('modules','Indipanel','Indipanel','default');
+INSERT INTO CONFIGURATIONS VALUES ('modules','Allsky','Allsky','default');
+INSERT INTO CONFIGURATIONS VALUES ('modules','CCD inspector','Inspector','default');
+INSERT INTO CONFIGURATIONS VALUES ('modules','Focuser','Focuser','default');
+INSERT INTO CONFIGURATIONS VALUES ('modules','Navigator','Navigator','default');
 CREATE TABLE IF NOT EXISTS CATALOGS (
         CATALOG TEXT NOT NULL,
         CODE TEXT NOT NULL,
