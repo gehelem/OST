@@ -218,7 +218,6 @@ bool DBManager::saveDbConfiguration(const QString &pConfigName, QVariantMap &pCo
         QString label = pConf[key].toMap()["label"].toString();
         QString type = pConf[key].toMap()["type"].toString();
         QString profile = pConf[key].toMap()["profile"].toString();
-        qDebug() << "DB conf = " << key << " label = " << label << " type = " << type << " profile = " << profile;
         QString sql = "INSERT OR REPLACE INTO CONFIGURATIONS (CONFIGNAME,MODULENAME,MODULETYPE,PROFILENAME) VALUES ('" + pConfigName
                       + "','" + label + "','" + type + "','" + profile + "');";
         if (!mQuery.exec(sql))

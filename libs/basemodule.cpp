@@ -90,8 +90,8 @@ void Basemodule::onExternalEventRoot(OST::ExtEvent event)
  */
 bool Basemodule::onExternalEventBase(OST::ExtEvent event)
 {
-    qDebug() << "Basemodule::onExternalEventBase event = " << OST::ExtEvToString(event.ev) << " p=" << event.prpkey << " e=" <<
-             event.eltkey << " l=" << event.lovkey << " i=" << event.line;
+    //qDebug() << "Basemodule::onExternalEventBase event = " << OST::ExtEvToString(event.ev) << " p=" << event.prpkey << " e=" <<
+    //         event.eltkey << " l=" << event.lovkey << " i=" << event.line;
 
     switch (event.ev)
     {

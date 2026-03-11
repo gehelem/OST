@@ -317,7 +317,7 @@ void Controller::OnClientEvent(OST::ExtEvent event, QWebSocket* client, QString 
 
 void Controller::onExternalEvent(OST::ExtEvent event)
 {
-    qDebug() << "Controller::onExternalEvent" << event.data;
+    //qDebug() << "Controller::onExternalEvent" << event.data;
     //    ZZ = 0,    /*!< invalid request */
     //    DU,        /*!< request dump */
     //    LO,        /*!< login request */
