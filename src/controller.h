@@ -76,6 +76,7 @@ class Controller : public QObject
         void logInfo(const QString &message, const QVariantList &args);
         void logError(const QString &message);
         void logError(const QString &message, const QVariantList &args);
+        void updateControllerData(QString key, QVariant data);
 
         QJsonObject getModulesDump(QString clientgrant);
         QString getBanner(void)

@@ -436,3 +436,23 @@ QJsonObject WShandler::translateJson(const QJsonObject pJsonObject, const QStrin
     }
     return obj;
 }
+void WShandler::onControllerEvent(OST::EvType evt, QString key, QVariant data)
+{
+    QJsonObject o, s;
+    if (strcmp(data.typeName(), "QStringList") == 0)
+    {
+
+        o[key] = data.toJsonArray();
+    }
+    else if (strcmp(data.typeName(), "QVariantMap") == 0)
+    {
+
+        o[key] = data.toJsonObject();
+    }
+    else
+    {
+        o[key] = data.toJsonValue();
+    }
+    s[EvToString(evt)] = o;
+    sendJsonMessage(s);
+}

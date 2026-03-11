@@ -224,6 +224,7 @@ enum class EvType
     fs,        /*!< profile saved */
     fl,        /*!< profile loaded */
     fc,        /*!< profile changed */
+    uc,        /*!< update controller data */
 };
 inline QString EvToString(EvType ev)
 {
@@ -271,6 +272,8 @@ inline QString EvToString(EvType ev)
             return "fl-profile loaded";
         case OST::EvType::fc:
             return "fc-profile changed";
+        case OST::EvType::uc:
+            return "uc-update controller data";
         default:
             return "unknown:" + QString::number(static_cast<int>(ev));
     }

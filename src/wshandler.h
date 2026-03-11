@@ -57,6 +57,7 @@ class WShandler : public QObject
                    const QVariantList &args, const QString &context);
         void onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase* elt, OST::PropertyBase* prp, OST::LovBase* lov,
                            Basemodule* mod);
+        void onControllerEvent(OST::EvType evt, QString key, QVariant data);
         void sendJsonMessage(QJsonObject json);
         void sendJsonMessage(QJsonObject json, QWebSocket* client);
 
