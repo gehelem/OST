@@ -235,6 +235,27 @@ ElementBase *ElementFactory::createElement(const QString &key, const QVariantMap
             pElement->setValue(t, false);
             return pElement;
         }
+        if (pData["type"].toString() == "datetime")
+        {
+            auto *pElement = new ElementDateTime(key,
+                                                 pData["label"].toString(),
+                                                 pData["order"].toString(),
+                                                 pData["hint"].toString()
+                                                );
+            QDate d;
+            QTime t;
+            QDateTime dt;
+            d.setDate(pData["year"].toInt(), pData["month"].toInt(), pData["day"].toInt());
+            if (pData.contains("autoupdate")) pElement->setAutoUpdate(pData["autoupdate"].toBool());
+            if (pData.contains("directedit")) pElement->setDirectEdit(pData["directedit"].toBool());
+            if (pData.contains("badge")) pElement->setBadge(pData["badge"].toBool());
+            d.setDate(pData["year"].toInt(), pData["month"].toInt(), pData["day"].toInt());
+            t.setHMS(pData["hh"].toInt(), pData["mm"].toInt(), pData["ss"].toInt(), pData["ms"].toInt());
+            dt.setDate(d);
+            dt.setTime(t);
+            pElement->setValue(dt, false);
+            return pElement;
+        }
 
 
         qDebug() << "Unknown Element type " << pData["label"].toString() << ":" << pData["type"].toString() << "-" <<
@@ -306,6 +327,12 @@ ValueBase *ValueFactory::createValue(ElementBase * &pElement)
     if (pElement->getType() == "time")
     {
         auto *pValue = new ValueTime(pElement);
+        pValue->updateValue();
+        return pValue;
+    }
+    if (pElement->getType() == "datetime")
+    {
+        auto *pValue = new ValueDateTime(pElement);
         pValue->updateValue();
         return pValue;
     }

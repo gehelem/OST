@@ -25,6 +25,7 @@ class ValueJsonDumper : public ValueVisitor
         void visit(ValuePrg* pValue) override;
         void visit(ValueDate* pValue) override;
         void visit(ValueTime* pValue) override;
+        void visit(ValueDateTime* pValue) override;
 
         [[nodiscard]] const QJsonValue &getResult() const
         {

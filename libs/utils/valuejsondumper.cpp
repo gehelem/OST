@@ -9,6 +9,8 @@
 #include "elementprg.h"
 #include "elementdate.h"
 #include "elementtime.h"
+#include "elementdatetime.h"
+
 namespace  OST
 {
 
@@ -138,6 +140,20 @@ void ValueJsonDumper::visit(ValueTime * pValue)
     ob["mm"] = pValue->value.minute();
     ob["ss"] = pValue->value.second();
     ob["ms"] = pValue->value.msec();
+    mResult = ob;
+
+};
+void ValueJsonDumper::visit(ValueDateTime * pValue)
+{
+    QJsonObject ob;
+    ob["year"] = pValue->value.date().year();
+    ob["month"] = pValue->value.date().month();
+    ob["day"] = pValue->value.date().day();
+    ob["hh"] = pValue->value.time().hour();
+    ob["mm"] = pValue->value.time().minute();
+    ob["ss"] = pValue->value.time().second();
+    ob["ms"] = pValue->value.time().msec();
+
     mResult = ob;
 
 };

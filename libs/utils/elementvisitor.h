@@ -15,6 +15,7 @@ class ElementVideo;
 class ElementPrg;
 class ElementDate;
 class ElementTime;
+class ElementDateTime;
 
 class ElementVisitor
 {
@@ -33,6 +34,7 @@ class ElementVisitor
         virtual void visit(ElementPrg* pElement, QVariantMap &data, bool &emitEvent) = 0;
         virtual void visit(ElementDate* pElement, QVariantMap &data, bool &emitEvent) = 0;
         virtual void visit(ElementTime* pElement, QVariantMap &data, bool &emitEvent) = 0;
+        virtual void visit(ElementDateTime* pElement, QVariantMap &data, bool &emitEvent) = 0;
 };
 
 class GridInt;
@@ -71,6 +73,7 @@ class ValueVideo;
 class ValuePrg;
 class ValueDate;
 class ValueTime;
+class ValueDateTime;
 
 
 class ValueVisitor
@@ -90,6 +93,7 @@ class ValueVisitor
         virtual void visit(ValuePrg* pValue) = 0;
         virtual void visit(ValueDate* pValue) = 0;
         virtual void visit(ValueTime* pValue) = 0;
+        virtual void visit(ValueDateTime* pValue) = 0;
 };
 
 }

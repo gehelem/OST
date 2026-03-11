@@ -71,7 +71,7 @@ void ElementUpdate::visit(ElementPrg* pElement, QVariantMap &data, bool &emitEve
 {
     Q_UNUSED(pElement)  Q_UNUSED(data)  Q_UNUSED(emitEvent)
 }
-void ElementUpdate::visit(ElementDate* pElement, QVariantMap &data, bool &emitEvent)
+void ElementUpdate::visit(ElementDate *pElement, QVariantMap &data, bool &emitEvent)
 {
     if (!data.contains("value"))
     {
@@ -102,6 +102,25 @@ void ElementUpdate::visit(ElementTime* pElement, QVariantMap &data, bool &emitEv
         t.setHMS(m["hh"].toInt(), m["mm"].toInt(), m["ss"].toInt(), 0);
     }
     pElement->setValue(t, emitEvent);
+}
+void ElementUpdate::visit(ElementDateTime* pElement, QVariantMap &data, bool &emitEvent)
+{
+    if (!data.contains("value"))
+    {
+        qDebug() << "no value for " << pElement->label();
+        return;
+    }
+    QVariantMap m = data["value"].toMap();
+    QDate d;
+    d.setDate(m["year"].toInt(), m["month"].toInt(), m["day"].toInt());
+    QTime t;
+    t.setHMS(m["hh"].toInt(), m["mm"].toInt(), m["ss"].toInt(), m["ms"].toInt());
+    QDateTime dt;
+    dt.setDate(d);
+    dt.setTime(t);
+    pElement->setValue(dt, emitEvent);
+
+
 }
 
 }

@@ -190,6 +190,8 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementtime.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementdate.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementdate.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementdatetime.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/element/elementdatetime.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovbase.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovsingle.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovstring.h

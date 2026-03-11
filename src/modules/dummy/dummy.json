@@ -346,12 +346,15 @@
             "date": {
                 "autoupdate":true,
                 "directedit":true,
-                "type":"date",
+                "type":"datetime",
                 "order": "99",
                 "label": "Test Date",
                 "year":2024,
                 "month":11,
-                "day":8
+                "day":8,
+                "hh":12,
+                "mm":11,
+                "ss":8
             },
             "time": {
                 "autoupdate":true,

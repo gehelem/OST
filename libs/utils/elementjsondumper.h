@@ -11,6 +11,7 @@
 #include <elementprg.h>
 #include <elementdate.h>
 #include <elementtime.h>
+#include <elementdatetime.h>
 
 
 namespace  OST
@@ -32,6 +33,7 @@ class ElementJsonDumper : public ElementVisitor
         void visit(ElementPrg* pElement, QVariantMap &data, bool &emitEvent) override;
         void visit(ElementDate* pElement, QVariantMap &data, bool &emitEvent) override;
         void visit(ElementTime* pElement, QVariantMap &data, bool &emitEvent) override;
+        void visit(ElementDateTime* pElement, QVariantMap &data, bool &emitEvent) override;
 
         [[nodiscard]] const QJsonObject &getResult() const
         {

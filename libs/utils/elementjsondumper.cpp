@@ -330,5 +330,25 @@ void ElementJsonDumper::visit(ElementTime *pElement, QVariantMap &data, bool &em
     mResult = json;
 
 }
+void ElementJsonDumper::visit(ElementDateTime *pElement, QVariantMap &data, bool &emitEvent)
+{
+    Q_UNUSED(data);
+    Q_UNUSED(emitEvent);
+    QJsonObject json = dumpElementCommons(pElement);
+    QJsonObject v;
+    v["year"] = pElement->value().date().year();
+    v["month"] = pElement->value().date().month();
+    v["day"] = pElement->value().date().day();
+    v["hh"] = pElement->value().time().hour();
+    v["mm"] = pElement->value().time().minute();
+    v["ss"] = pElement->value().time().second();
+    v["ms"] = pElement->value().time().msec();
+    json["value"] = v;
+    mResult = json;
+    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return;
+
+    json["type"] = "datetime";
+    mResult = json;
+}
 
 }
