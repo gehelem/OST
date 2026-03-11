@@ -285,6 +285,13 @@ void Controller::onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase*
 
 {
 
+    /* refresh global profiles data when a module gives en profile event */
+    if (evt == OST::EvType::fs)
+    {
+        QVariantMap r;
+        dbmanager->getDbProfiles(r);
+        updateControllerData("profiles", r);
+    }
     //    if (event.type == "moduledelete")
     //    {
     //        if (!mModulesMap.contains(event.module))
