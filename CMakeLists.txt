@@ -32,8 +32,8 @@ find_package(Nova REQUIRED)
 find_package(GSL REQUIRED)
 #find_package(OpenCV REQUIRED )
 find_package(WCSLIB REQUIRED)
-find_package(QT NAMES Qt5 COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql Xml REQUIRED)
-find_package(Qt5 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql Xml)
+find_package(QT NAMES Qt5 COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql Scxml Xml REQUIRED)
+find_package(Qt5 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql Scxml Xml)
 find_package(StellarSolver REQUIRED)
 find_library(avahi-client-lib avahi-client REQUIRED)
 find_library(avahi-common-lib avahi-common REQUIRED)
@@ -387,16 +387,21 @@ target_compile_definitions(ostindipanel PRIVATE INDIPANEL_MODULE)
 add_library(ostfocus SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.qrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/polynomialfit.h
+
 )
-target_link_libraries(ostindipanel PRIVATE
+target_link_libraries(ostfocus PRIVATE
     ostindimodule
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::Scxml
     Threads::Threads
     z
 )
-target_compile_definitions(ostfocus PRIVATE INDIPANEL_MODULE)
+target_compile_definitions(ostfocus PRIVATE FOCUS_MODULE)
 
 
 install(TARGETS
