@@ -383,12 +383,28 @@ target_link_libraries(ostindipanel PRIVATE
 )
 target_compile_definitions(ostindipanel PRIVATE INDIPANEL_MODULE)
 
+# Focus module
+add_library(ostfocus SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/focus/focus.cpp
+)
+target_link_libraries(ostindipanel PRIVATE
+    ostindimodule
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Threads::Threads
+    z
+)
+target_compile_definitions(ostfocus PRIVATE INDIPANEL_MODULE)
+
 
 install(TARGETS
     ostserver
     ostbasemodule ostindimodule
 #    ostmaincontrol
     ostindipanel
+    ostfocus
     RUNTIME DESTINATION "/usr/bin"
     LIBRARY DESTINATION "/usr/lib"
     PUBLIC_HEADER DESTINATION "/usr/include/ost"
