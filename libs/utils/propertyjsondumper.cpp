@@ -111,6 +111,9 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
         case OST::EvType::gd:
             mResult = dumpGridDelete(pProperty);
             break;
+        case OST::EvType::gr:
+            //mResult = dumpGridCreate(pProperty);
+            break;
         default:
             //mResult = dumpDefault(pProperty);
             mResult = QJsonObject();
