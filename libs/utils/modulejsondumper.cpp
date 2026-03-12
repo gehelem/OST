@@ -80,8 +80,10 @@ QJsonValue ModuleJsonDumper(EvType evt, QVariant data, ElementBase *elt, Propert
             result["l"] = globlovs;
         }
     }
-    //result["infos"] = QJsonObject::fromVariantMap(mod->getAllMetadata());;
-
+    if (evt == EvType::aa)
+    {
+        result["infos"] = QJsonObject::fromVariantMap(mod->getAllMetadata());;
+    }
     return result;
 }
 
