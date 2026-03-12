@@ -1,6 +1,6 @@
 #include "focus.h"
 #include "polynomialfit.h"
-#include "versionModule.cc"
+#include "version.cc"
 
 Focus *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
 {
@@ -16,9 +16,9 @@ Focus::Focus(QString name, QString label, QString profile, QVariantMap available
 
     loadOstPropertiesFromFile(":focus.json");
 
-    setMetadata("thisGithash", QString::fromStdString(VersionModule::GIT_SHA1));
-    setMetadata("thisGitdate", QString::fromStdString(VersionModule::GIT_DATE));
-    setMetadata("thisGitmessage", QString::fromStdString(VersionModule::GIT_COMMIT_SUBJECT));
+    setMetadata("thisGithash", QString::fromStdString(Version::GIT_SHA1));
+    setMetadata("thisGitdate", QString::fromStdString(Version::GIT_DATE));
+    setMetadata("thisGitmessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
     setMetadata("description", "Focus (scxml)");
     setMetadata("thisversion", "0.1");
     setMetadata("template", "focus");
@@ -60,61 +60,52 @@ Focus::~Focus()
 {
 
 }
-void Focus::OnMyExternalEvent(OST::Event e)
+void Focus::onExternalEvent(OST::ExtEvent event)
 {
 
     // Handle external autofocus request from other modules (e.g., sequencer)
-    if (e.type == "requestautofocus" && getModuleName() == e.module)
-    {
-        logInfo("Autofocus requested by another module - starting");
-        getProperty("actions")->setState(OST::Busy, true);
-        startCoarse();
-        return;
-    }
-    if (getModuleName() != e.module) return;
+    //if (e.type == "requestautofocus" && getModuleName() == e.module)
+    //{
+    //    logInfo("Autofocus requested by another module - starting");
+    //    getProperty("actions")->setState(OST::Busy, true);
+    //    startCoarse();
+    //    return;
+    //}
 
-    foreach(const QString &keyprop, e.data.keys())
+    if (event.ev == OST::ExtEvType::SV && event.prpkey == "actions")
     {
-        foreach(const QString &keyelt, e.data[keyprop].toMap()["elements"].toMap().keys())
+        if (event.eltkey == "autofocus")
         {
-            QVariant val = e.data[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"];
-            if (keyprop == "actions")
+            if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
             {
-                if (keyelt == "autofocus")
-                {
-                    if (getEltBool(keyprop, keyelt)->setValue(true, true))
-                    {
-                        getEltBool("actions", "abortfocus")->setValue(false, true);
-                        getProperty(keyprop)->setState(OST::Busy, true);
-                        startCoarse();
-                    }
-                }
-                if (keyelt == "abortfocus")
-                {
-                    if (getEltBool(keyprop, keyelt)->setValue(true, true))
-                    {
-                        getEltBool("actions", "autofocus")->setValue(false, true);
-                        getProperty(keyprop)->setState(OST::Ok, true);
-                        getEltPrg("progress", "global")->setPrgValue(0, true);
-                        getEltPrg("progress", "global")->setDynLabel("Aborted", true);
-                        getProperty("parms")->enable();
-                        getProperty("devices")->enable();
-                        getProperty("parameters")->enable();
-
-                        pMachine->submitEvent("abort");
-                    }
-                }
-                if (keyelt == "loop")
-                {
-                    if (getEltBool(keyprop, keyelt)->setValue(false))
-                    {
-                        getProperty(keyprop)->setState(OST::Ok, true);
-                    }
-                }
-
+                getEltBool("actions", "abortfocus")->setValue(false, true);
+                getProperty(event.prpkey)->setState(OST::Busy, true);
+                startCoarse();
+            }
+        }
+        if (event.eltkey == "abortfocus")
+        {
+            if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
+            {
+                getEltBool("actions", "autofocus")->setValue(false, true);
+                getProperty(event.prpkey)->setState(OST::Ok, true);
+                getEltPrg("progress", "global")->setPrgValue(0, true);
+                getEltPrg("progress", "global")->setDynLabel("Aborted", true);
+                getProperty("parms")->enable();
+                getProperty("devices")->enable();
+                getProperty("parameters")->enable();
+                pMachine->submitEvent("abort");
+            }
+        }
+        if (event.eltkey == "loop")
+        {
+            if (getEltBool(event.prpkey, event.eltkey)->setValue(false, true))
+            {
+                getProperty(event.prpkey)->setState(OST::Ok, true);
             }
         }
     }
+
 }
 
 void Focus::updateProperty(INDI::Property p)

@@ -26,9 +26,17 @@ class MODULE_INIT Focus : public IndiModule
         void cameraAlert();
         void abort();
     public slots:
-        void OnMyExternalEvent(OST::Event e) override;
         void OnSucessSEP();
-
+    protected:
+        /**
+         * @brief Custom module event handler (Hook 3/3)
+         *
+         * Override of Basemodule's hook for Dummy-specific events.
+         * Called automatically after onExternalEventBase() and onExternalEventIndi().
+         *
+         * NO need to call parent - orchestration is automatic!
+         */
+        void onExternalEvent(OST::ExtEvent event) override;
     private:
         void updateProperty(INDI::Property p) override;
         void newBLOB(INDI::PropertyBlob pblob);
