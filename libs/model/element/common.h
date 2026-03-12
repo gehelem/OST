@@ -251,7 +251,7 @@ inline QString EvToString(EvType ev)
         case OST::EvType::gd:
             return "gd-grid delete line";
         case OST::EvType::gr:
-            return "gd-grid reset";
+            return "gr-grid reset";
         case OST::EvType::lc:
             return "lc-lov create";
         case OST::EvType::lu:
