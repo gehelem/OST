@@ -47,7 +47,6 @@ class Controller : public QObject
         //Maincontrol *pMainControl;
         QProcess    *_process;
         QProcess    *_indiProcess;
-        QVariantMap mModulesMap;
         QZeroConf zeroConf;
         QFileSystemWatcher mFileWatcher;
         QStringList mFilesList;
@@ -71,7 +70,6 @@ class Controller : public QObject
         void stopIndi(void);
         void startIndiDriver(const QString &pDriver);
         void stopIndiDriver(const QString &pDriver);
-        void updateGlobalModulesLov(void);
         void logInfo(const QString &message);
         void logInfo(const QString &message, const QVariantList &args);
         void logError(const QString &message);

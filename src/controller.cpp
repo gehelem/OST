@@ -174,11 +174,16 @@ Controller::~Controller()
 
 bool Controller::loadModule(QString lib, QString name, QString label, QString profile)
 {
-    if (mModulesMap.contains(name))
+    QList<Basemodule *> mods = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
+    for (Basemodule *m : mods)
     {
-        logError("Module %1 already loaded - can't load twice", {name});
-        return false;
+        if (m->getModuleName() == name)
+        {
+            logError("Module %1 already loaded - can't load twice", {name});
+            return false;
+        }
     }
+
     QString lowerlib = lib.toLower();
     QLibrary library("libost" + lowerlib);
     if (!library.load())
@@ -232,13 +237,6 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
         }
     }
 
-    QVariantMap l;
-    l["label"] = label;
-    l["type"] = mod->getClassName();
-    l["profile"] = profile;
-    mModulesMap[name] = l;
-    updateControllerData("modulesmap", mModulesMap);
-
     wshandler->onModuleEvent(OST::EvType::aa, QVariant(), nullptr, nullptr, nullptr, mod);
     return true;
 
@@ -269,8 +267,17 @@ void Controller::loadConf(const QString &pConf)
 }
 void Controller::saveConf(const QString &pConf)
 {
-    QVariantMap result;
-    if (!dbmanager->saveDbConfiguration(pConf, mModulesMap))
+    QVariantMap ms, result;
+    QList<Basemodule *> mods = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
+    for (Basemodule *m : mods)
+    {
+        QVariantMap n;
+        n["label"] = m->getModuleLabel();
+        n["profile"] = m->getCurrentProfile();
+        n["label"] = m->getClassName();
+        ms[m->getModuleName()] = n;
+    }
+    if (!dbmanager->saveDbConfiguration(pConf, ms))
     {
         logError("Save configuration %1 failed", {pConf});
         return;
@@ -378,8 +385,6 @@ void Controller::onExternalEvent(OST::ExtEvent event)
             {
                 if (m->getModuleName() == n) m->killMe();
             }
-            mModulesMap.remove(n);
-            updateControllerData("modulesmap", mModulesMap);
             return;
         }
         case OST::ExtEvType::FS:
@@ -410,7 +415,13 @@ void Controller::onExternalEvent(OST::ExtEvent event)
                 logError("Controller::onExternalEvent - invalid event data size - %1", {OST::ExtEvToString(event.ev)});
                 return;
             };
-            if (!mModulesMap.contains(event.data["m"].toObject().begin().key()))
+            QList<Basemodule *> mods = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
+            bool r = false;
+            for (Basemodule *m : mods)
+            {
+                if (m->getModuleName() == event.data["m"].toObject().begin().key()) r = true;
+            }
+            if (!r)
             {
                 logError("Controller::onExternalEvent - unknown module - %1", {event.data["m"].toObject().begin().key()});
                 return;
@@ -793,25 +804,6 @@ void Controller::OnFileWatcherEvent(const QString &pEvent)
 void Controller::OnFileChangeEvent(const QString &pEvent)
 {
     qDebug() << "****************************************** FileChanged" << pEvent;
-}
-
-void Controller::updateGlobalModulesLov(void)
-{
-    QVariantMap lovData;
-    QVariantList values;
-
-    // Add all loaded modules (excluding mainctl)
-    for(QVariantMap::const_iterator iter = mModulesMap.begin();
-            iter != mModulesMap.end(); ++iter)
-    {
-        QVariantMap item;
-        item["key"] = iter.key();
-        item["label"] = iter.value();
-        values.append(item);
-    }
-
-    lovData["values"] = values;
-    updateControllerData("modulesmap", mModulesMap);
 }
 
 void Controller::logInfo(const QString &message)
