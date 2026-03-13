@@ -478,7 +478,7 @@ void Basemodule::onDatastoreEvent(OST::EvType evt, QVariant data, OST::ElementBa
     /* catch profile changes */
     if (prp)
     {
-        if (prp->hasProfile() && !this->mCurrentProfileChanged)
+        if (prp->hasProfile() && !this->mCurrentProfileChanged && evt != OST::EvType::ps )
         {
             mCurrentProfileChanged = true;
             emit moduleEvent(OST::EvType::fc, QVariant(), nullptr, nullptr, nullptr, this);
