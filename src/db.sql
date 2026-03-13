@@ -8,16 +8,16 @@ CREATE TABLE IF NOT EXISTS PROFILES (
 --DROP TABLE IF EXISTS PROFILES;
 CREATE TABLE IF NOT EXISTS CONFIGURATIONS (
         CONFIGNAME     TEXT NOT NULL,
-        MODULENAME     TEXT NOT NULL,
+        MODULELABEL     TEXT NOT NULL,
         MODULETYPE     TEXT NOT NULL,
         PROFILENAME    TEXT NOT NULL,
-        PRIMARY KEY("CONFIGNAME","MODULENAME")
+        PRIMARY KEY("CONFIGNAME","MODULELABEL")
 );
-INSERT INTO CONFIGURATIONS VALUES ('modules','Indipanel','Indipanel','default');
-INSERT INTO CONFIGURATIONS VALUES ('modules','Allsky','Allsky','default');
-INSERT INTO CONFIGURATIONS VALUES ('modules','CCD inspector','Inspector','default');
-INSERT INTO CONFIGURATIONS VALUES ('modules','Focuser','Focuser','default');
-INSERT INTO CONFIGURATIONS VALUES ('modules','Navigator','Navigator','default');
+INSERT INTO CONFIGURATIONS VALUES ('modules','My Indipanel','Indipanel','default');
+INSERT INTO CONFIGURATIONS VALUES ('modules','My Allsky','Allsky','default');
+INSERT INTO CONFIGURATIONS VALUES ('modules','My CCD inspector','Inspector','default');
+INSERT INTO CONFIGURATIONS VALUES ('modules','My Focuser','Focus','default');
+INSERT INTO CONFIGURATIONS VALUES ('modules','My Navigator','Navigator','default');
 CREATE TABLE IF NOT EXISTS CATALOGS (
         CATALOG TEXT NOT NULL,
         CODE TEXT NOT NULL,

@@ -203,7 +203,8 @@ typedef struct ModuleStatus
 enum class EvType
 {
     zz = 0,    /*!< no dump       */
-    aa,        /*!< dump all data */
+    aa,        /*!< dump all module data */
+    ap,        /*!< dump all property data */
     av,        /*!< dump all values/grids/min/max */
     pr,        /*!< dump all values/grids/min/max - hasprofile=true */
     ee,        /*!< set one element value */
@@ -234,6 +235,8 @@ inline QString EvToString(EvType ev)
             return "zz-no dump";
         case OST::EvType::aa:
             return "aa-dump all data";
+        case OST::EvType::ap:
+            return "ap-dump all property data";
         case OST::EvType::av:
             return "av-dump profile data";
         case OST::EvType::ee:
@@ -251,7 +254,7 @@ inline QString EvToString(EvType ev)
         case OST::EvType::gd:
             return "gd-grid delete line";
         case OST::EvType::gr:
-            return "gd-grid reset";
+            return "gr-grid reset";
         case OST::EvType::lc:
             return "lc-lov create";
         case OST::EvType::lu:

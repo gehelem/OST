@@ -1,6 +1,7 @@
 #ifndef INDIPANEL_MODULE_h_
 #define INDIPANEL_MODULE_h_
 #include <indimodule.h>
+#include <fileio.h>
 
 #if defined(INDIPANEL_MODULE)
 #  define MODULE_INIT Q_DECL_EXPORT
@@ -25,9 +26,10 @@ class MODULE_INIT IndiPanel : public IndiModule
         void newProperty    (INDI::Property property) override;
         void removeProperty (INDI::Property property) override;
         void updateProperty (INDI::Property property) override;
-        void newBLOB        (IBLOB bp);
         void newMessage     (INDI::BaseDevice dp, int messageID) override;
         void onExternalEvent(OST::ExtEvent event) override;
+        QPointer<fileio> _image;
+        FITSImage::Statistic stats;
 
 };
 

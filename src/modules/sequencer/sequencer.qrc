@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>sequencer.json</file>
+        <file>sequencer.fr.md</file>
+        <file>sequencer.en.md</file>
+    </qresource>
+</RCC>

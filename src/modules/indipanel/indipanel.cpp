@@ -63,10 +63,16 @@ void IndiPanel::newProperty(INDI::Property pProperty)
     QString devpro = dev + pro;
     QString mess;
 
+    /* force group for blob types */
+    QString group;
+    if (pProperty.getType() != INDI_BLOB) group = pProperty.getGroupName();
+    else group = pProperty.getLabel();
+
+
     OST::PropertyMulti* p = new OST::PropertyMulti(devpro, pProperty.getLabel(),
             OST::IntToPermission(pProperty.getPermission()),
             pProperty.getDeviceName(),
-            pProperty.getGroupName(), "00", false, false);
+            group, "00", false, false);
     p->setFreeValue(dev); // we keep original device name to avoid unwanted level1 device translations
     p->setState(OST::IntToState(pProperty.getState()), false);
 
@@ -137,6 +143,22 @@ void IndiPanel::newProperty(INDI::Property pProperty)
         }
         case INDI_BLOB:
         {
+            INDI::PropertyBlob b = pProperty;
+            setBLOBMode(B_ALSO, b.getDeviceName(), nullptr);
+            for (unsigned int i = 0; i < b.count(); i++)
+            {
+                OST::ElementImg* ei = new OST::ElementImg(b[i].getName(), b[i].label, QString(i), b[i].label);
+                delete _image;
+                _image = new fileio();
+                _image->loadBlob(b, 64, i);
+                QImage rawImage = _image->getRawQImage();
+                rawImage.save( getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) +  b[i].label + ".jpeg", "JPG", 100);
+                OST::ImgData dta;// = _image->ImgStats();
+                dta.mUrlJpeg = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".jpeg";
+                dta.mUrlFits = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".FITS";
+                ei->setValue(dta, true);
+                p->addElt(ei);
+            }
             break;
         }
         case INDI_UNKNOWN:
@@ -145,8 +167,6 @@ void IndiPanel::newProperty(INDI::Property pProperty)
         }
     }
     createProperty(p);
-
-
 }
 void IndiPanel::updateProperty (INDI::Property property)
 {
@@ -158,7 +178,6 @@ void IndiPanel::updateProperty (INDI::Property property)
     QVariantMap o;
     switch (property.getType())
     {
-
         case INDI_NUMBER:
         {
             INDI::PropertyNumber n = property;
@@ -222,7 +241,20 @@ void IndiPanel::updateProperty (INDI::Property property)
         }
         case INDI_BLOB:
         {
-
+            INDI::PropertyBlob b = property;
+            for (unsigned int i = 0; i < b.count(); i++)
+            {
+                OST::ElementImg* ei = getEltImg(devpro, b[i].getName());
+                delete _image;
+                _image = new fileio();
+                _image->loadBlob(b, 64, i);
+                QImage rawImage = _image->getRawQImage();
+                rawImage.save( getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) + b[i].label + ".jpeg", "JPG", 100);
+                OST::ImgData dta = _image->ImgStats();
+                dta.mUrlJpeg = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".jpeg";
+                dta.mUrlFits = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".FITS";
+                ei->setValue(dta, true);
+            }
             break;
         }
         case INDI_UNKNOWN:
@@ -244,10 +276,6 @@ void IndiPanel::removeProperty(INDI::Property property)
     deleteOstProperty(devpro);
 }
 
-void IndiPanel::newBLOB(IBLOB bp)
-{
-    Q_UNUSED(bp)
-}
 void IndiPanel::newMessage     (INDI::BaseDevice dp, int messageID)
 {
     logInfo("%1 %2", {dp.getDeviceName(), QString::fromStdString(dp.messageQueue(messageID))});

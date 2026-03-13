@@ -341,7 +341,7 @@ void Datastore::onPropertyEvent(OST::EvType event, QVariant data, OST::ElementBa
 void Datastore::onLovChanged()
 {
     OST::LovBase* lov = qobject_cast<OST::LovBase*>(sender());
-    emit datastoreEvent(OST::EvType::lu, lov->getKey(), nullptr, nullptr, lov, this);
+    emit datastoreEvent(OST::EvType::lc, lov->getKey(), nullptr, nullptr, lov, this);
 }
 
 void Datastore::loadOstPropertiesFromFile(const QString &pFileName)

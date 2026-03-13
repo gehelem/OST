@@ -83,6 +83,7 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
         case OST::EvType::zz:
             break;
         case OST::EvType::aa:
+        case OST::EvType::ap:
         case OST::EvType::am:
             mResult = dumpDefault(pProperty);
             break;
@@ -110,6 +111,9 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
             break;
         case OST::EvType::gd:
             mResult = dumpGridDelete(pProperty);
+            break;
+        case OST::EvType::gr:
+            //mResult = dumpGridCreate(pProperty);
             break;
         default:
             //mResult = dumpDefault(pProperty);

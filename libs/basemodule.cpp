@@ -20,7 +20,7 @@ Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap
     connect(this, &Datastore::datastoreEvent, this, &Basemodule::onDatastoreEvent);
 
     loadOstPropertiesFromFile(":basemodule.json");
-    setMetadata("label", label);
+    setMetadata("modulelabel", label);
     setMetadata("baseGithash", QString::fromStdString(Version::GIT_SHA1));
     setMetadata("baseGitdate", QString::fromStdString(Version::GIT_DATE));
     setMetadata("baseGitmessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
@@ -478,7 +478,7 @@ void Basemodule::onDatastoreEvent(OST::EvType evt, QVariant data, OST::ElementBa
     /* catch profile changes */
     if (prp)
     {
-        if (prp->hasProfile() && !this->mCurrentProfileChanged)
+        if (prp->hasProfile() && !this->mCurrentProfileChanged && evt != OST::EvType::ps )
         {
             mCurrentProfileChanged = true;
             emit moduleEvent(OST::EvType::fc, QVariant(), nullptr, nullptr, nullptr, this);

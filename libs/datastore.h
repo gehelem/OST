@@ -105,7 +105,7 @@ class Datastore : public QObject
             mStore[pProperty->key()] = pProperty;
             connect(mStore[pProperty->key()], &OST::PropertyMulti::prpEvent, this, &Datastore::onPropertyEvent);
             connect(mStore[pProperty->key()], &OST::PropertyMulti::logMessage, this, &Datastore::onPropertyLog);
-            onPropertyEvent(OST::EvType::aa, QVariant(), nullptr, pProperty); // force property creation event
+            onPropertyEvent(OST::EvType::ap, QVariant(), nullptr, pProperty); // force property creation event
             return true;
         }
         bool createGlobLov(const QString &pLovName,  OST::LovBase* pLov)
