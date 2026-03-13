@@ -150,12 +150,15 @@ void IndiPanel::newProperty(INDI::Property pProperty)
                 OST::ElementImg* ei = new OST::ElementImg(b[i].getName(), b[i].label, QString(i), b[i].label);
                 delete _image;
                 _image = new fileio();
-                _image->loadBlob(b, 64, i);
-                QImage rawImage = _image->getRawQImage();
-                rawImage.save( getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) +  b[i].label + ".jpeg", "JPG", 100);
-                OST::ImgData dta;// = _image->ImgStats();
-                dta.mUrlJpeg = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".jpeg";
-                dta.mUrlFits = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".FITS";
+                OST::ImgData dta;
+                if (_image->loadBlob(b, 64, i))
+                {
+                    QImage rawImage = _image->getRawQImage();
+                    rawImage.save( getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) +  b[i].label + ".jpeg", "JPG", 100);
+                    dta = _image->ImgStats();
+                    dta.mUrlJpeg = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".jpeg";
+                    dta.mUrlFits = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".FITS";
+                }
                 ei->setValue(dta, true);
                 p->addElt(ei);
             }
@@ -247,12 +250,16 @@ void IndiPanel::updateProperty (INDI::Property property)
                 OST::ElementImg* ei = getEltImg(devpro, b[i].getName());
                 delete _image;
                 _image = new fileio();
-                _image->loadBlob(b, 64, i);
-                QImage rawImage = _image->getRawQImage();
-                rawImage.save( getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) + b[i].label + ".jpeg", "JPG", 100);
-                OST::ImgData dta = _image->ImgStats();
-                dta.mUrlJpeg = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".jpeg";
-                dta.mUrlFits = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".FITS";
+                OST::ImgData dta;
+
+                if (_image->loadBlob(b, 64, i))
+                {
+                    QImage rawImage = _image->getRawQImage();
+                    rawImage.save( getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) +  b[i].label + ".jpeg", "JPG", 100);
+                    dta = _image->ImgStats();
+                    dta.mUrlJpeg = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".jpeg";
+                    dta.mUrlFits = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".FITS";
+                }
                 ei->setValue(dta, true);
             }
             break;

@@ -28,14 +28,6 @@ class MODULE_INIT Focus : public IndiModule
     public slots:
         void OnSucessSEP();
     protected:
-        /**
-         * @brief Custom module event handler (Hook 3/3)
-         *
-         * Override of Basemodule's hook for Dummy-specific events.
-         * Called automatically after onExternalEventBase() and onExternalEventIndi().
-         *
-         * NO need to call parent - orchestration is automatic!
-         */
         void onExternalEvent(OST::ExtEvent event) override;
     private:
         void updateProperty(INDI::Property p) override;
