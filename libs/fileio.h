@@ -47,7 +47,11 @@ class fileio : public QObject
         {
             return loadBlob(pblob, 32);
         }
-        bool loadBlob(INDI::PropertyBlob pblob, int histoSize);
+        bool loadBlob(INDI::PropertyBlob pblob, int histoSize)
+        {
+            return loadBlob(pblob, histoSize, 0);
+        }
+        bool loadBlob(INDI::PropertyBlob pblob, int histoSize, int i);
         bool parseHeader();
         bool saveAsFITS(QString fileName, FITSImage::Statistic &imageStats, uint8_t *m_ImageBuffer, FITSImage::Solution solution,
                         QList<Record> &records, bool hasSolution);
