@@ -791,9 +791,6 @@ void Controller::OnFileWatcherEvent(const QString &pEvent)
     mControllerData["files"] = mFilesList;
     mControllerData["folders"] = mFoldersList;
 
-    qDebug() << mFilesList;
-    qDebug() << QVariant(mFilesList);
-
     wshandler->onControllerEvent(OST::EvType::uc, "files", QVariant(mFilesList));
     wshandler->onControllerEvent(OST::EvType::uc, "folders", QVariant(mFoldersList));
     QVariantMap r;
