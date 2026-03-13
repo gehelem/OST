@@ -55,7 +55,7 @@ class Controller : public QObject
         QString mBanner;
         QVariantMap mControllerData;
 
-        bool loadModule(QString lib, QString name, QString label, QString profile);
+        bool loadModule(QString lib, QString label, QString profile);
         void loadConf(const QString &pConf);
         void saveConf(const QString &pConf);
         void checkModules(void);

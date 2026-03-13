@@ -178,7 +178,7 @@ bool DBManager::getDbConfiguration(const QString &pConfigName, QVariantMap &resu
         logError("getDbConfiguration dbOpen - ERROR: %1 - %2", {mDb.databaseName(), mDb.lastError().text()});
         return false;
     }
-    QString sql = "SELECT MODULENAME,MODULETYPE,PROFILENAME FROM CONFIGURATIONS WHERE CONFIGNAME='" + pConfigName + "'";
+    QString sql = "SELECT MODULELABEL,MODULETYPE,PROFILENAME FROM CONFIGURATIONS WHERE CONFIGNAME='" + pConfigName + "'";
     if (!mQuery.exec(sql))
     {
         logError("getDbConfiguration - ERROR SQL = %1", {sql});
@@ -218,7 +218,8 @@ bool DBManager::saveDbConfiguration(const QString &pConfigName, QVariantMap &pCo
         QString label = pConf[key].toMap()["label"].toString();
         QString type = pConf[key].toMap()["type"].toString();
         QString profile = pConf[key].toMap()["profile"].toString();
-        QString sql = "INSERT OR REPLACE INTO CONFIGURATIONS (CONFIGNAME,MODULENAME,MODULETYPE,PROFILENAME) VALUES ('" + pConfigName
+        QString sql = "INSERT OR REPLACE INTO CONFIGURATIONS (CONFIGNAME,MODULELABEL,MODULETYPE,PROFILENAME) VALUES ('" +
+                      pConfigName
                       + "','" + label + "','" + type + "','" + profile + "');";
         if (!mQuery.exec(sql))
         {
@@ -241,7 +242,7 @@ bool DBManager::getDbConfigurations(QVariantMap &result )
         logError("getDbConfigurations dbOpen - ERROR: %1 - %2", {mDb.databaseName(), mDb.lastError().text()});
         return false;
     }
-    QString sql = "SELECT CONFIGNAME,MODULENAME,MODULETYPE,PROFILENAME FROM CONFIGURATIONS";
+    QString sql = "SELECT CONFIGNAME,MODULELABEL,MODULETYPE,PROFILENAME FROM CONFIGURATIONS";
     if (!mQuery.exec(sql))
     {
         logError("getDbConfigurations - ERROR SQL = %1", {sql});
@@ -252,7 +253,7 @@ bool DBManager::getDbConfigurations(QVariantMap &result )
     while (mQuery.next())
     {
         QVariantMap line;
-        line["modulename"] = mQuery.value(1).toString().toUtf8();
+        line["modulelabel"] = mQuery.value(1).toString().toUtf8();
         line["moduletype"] = mQuery.value(2).toString().toUtf8();
         line["profilename"] = mQuery.value(3).toString().toUtf8();
         result[mQuery.value(0).toString().toUtf8()] = line;

@@ -172,8 +172,11 @@ Controller::~Controller()
 }
 
 
-bool Controller::loadModule(QString lib, QString name, QString label, QString profile)
+bool Controller::loadModule(QString lib, QString label, QString profile)
 {
+    QString name = label;
+    name.replace(" ", "");
+
     QList<Basemodule *> mods = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
     for (Basemodule *m : mods)
     {
@@ -259,7 +262,7 @@ void Controller::loadConf(const QString &pConf)
         QVariantMap line = iter.value().toMap();
         QString namewithoutblanks = iter.key();
         namewithoutblanks.replace(" ", "");
-        loadModule(line["moduletype"].toString(), namewithoutblanks, iter.key(), line["profilename"].toString());
+        loadModule(line["moduletype"].toString(), iter.key(), line["profilename"].toString());
     }
     logInfo("Load configuration %1 sucessfull", {pConf});
     updateControllerData("currentconf", QVariant(pConf));
@@ -274,7 +277,7 @@ void Controller::saveConf(const QString &pConf)
         QVariantMap n;
         n["label"] = m->getModuleLabel();
         n["profile"] = m->getCurrentProfile();
-        n["label"] = m->getClassName();
+        n["type"] = m->getClassName();
         ms[m->getModuleName()] = n;
     }
     if (!dbmanager->saveDbConfiguration(pConf, ms))
@@ -373,8 +376,7 @@ void Controller::onExternalEvent(OST::ExtEvent event)
         }
         case OST::ExtEvType::ML:
         {
-            loadModule(event.data["lib"].toString(), event.data["name"].toString(), event.data["label"].toString(),
-                       event.data["profile"].toString());
+            loadModule(event.data["lib"].toString(), event.data["label"].toString(), event.data["profile"].toString());
             return;
         }
         case OST::ExtEvType::MK:
