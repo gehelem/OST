@@ -403,6 +403,21 @@ target_link_libraries(ostfocus PRIVATE
 )
 target_compile_definitions(ostfocus PRIVATE FOCUS_MODULE)
 
+# Sequence module
+add_library(ostsequencer SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/sequencer/sequencer.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/sequencer/sequencer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/sequencer/sequencer.qrc
+)
+target_link_libraries(ostsequencer PRIVATE
+    ostindimodule
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Threads::Threads
+    z
+)
+target_compile_definitions(ostsequencer PRIVATE SEQUENCER_MODULE)
 
 install(TARGETS
     ostserver
@@ -410,6 +425,7 @@ install(TARGETS
 #    ostmaincontrol
     ostindipanel
     ostfocus
+    ostsequencer
     RUNTIME DESTINATION "/usr/bin"
     LIBRARY DESTINATION "/usr/lib"
     PUBLIC_HEADER DESTINATION "/usr/include/ost"
@@ -419,16 +435,16 @@ install(TARGETS
 # This ensures version information is always up-to-date with each build
 
 # Create a custom target that always runs
-add_custom_target(
-    generate_version ALL
-    COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/generate-version.sh"
-            "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
-            "${CMAKE_CURRENT_SOURCE_DIR}/src/version.cc.in"
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-    BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
-    COMMENT "Generating version.cc from git information..."
-    VERBATIM
-)
+#add_custom_target(
+#    generate_version ALL
+#    COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/generate-version.sh"
+#            "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
+#            "${CMAKE_CURRENT_SOURCE_DIR}/src/version.cc.in"
+#    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+#    BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
+#    COMMENT "Generating version.cc from git information..."
+#    VERBATIM
+#)
 
 # Add version.cc to sources
 list(APPEND SOURCES "${CMAKE_CURRENT_BINARY_DIR}/version.cc" version.hh)
