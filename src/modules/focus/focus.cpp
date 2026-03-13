@@ -580,6 +580,7 @@ void Focus::SMFocusDone()
     getEltFloat("results", "hfr")->setValue(_solver.HFRavg * ech, true);
 
     getProperty("actions")->setState(OST::Ok, true);
+    getEltBool("actions", "autofocus")->setValue(false, true);
 
     // Emit event to notify other modules that focus is complete
     // IMPORTANT: Do this BEFORE stopping the state machine
