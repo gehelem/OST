@@ -303,6 +303,12 @@ enum class ExtEvType
     GR,        /*!< grid reset */
     GH,        /*!< grid line up ("Haut")*/
     GB,        /*!< grid line down ("Bas") */
+    I1,        /*!< property preicon1 */
+    I2,        /*!< property preicon2 */
+    I3,        /*!< property posticon1 */
+    I4,        /*!< property posticon2 */
+    J1,        /*!< element preicon */
+    J2,        /*!< element posticon */
 };
 inline QString ExtEvToString(ExtEvType ev)
 {
@@ -348,6 +354,18 @@ inline QString ExtEvToString(ExtEvType ev)
             return "GH";
         case OST::ExtEvType::GB:
             return "GB";
+        case OST::ExtEvType::I1:
+            return "I1";
+        case OST::ExtEvType::I2:
+            return "I2";
+        case OST::ExtEvType::I3:
+            return "I3";
+        case OST::ExtEvType::I4:
+            return "I4";
+        case OST::ExtEvType::J1:
+            return "J1";
+        case OST::ExtEvType::J2:
+            return "J2";
         default:
             return "unknown ExtEvType:" + QString::number(static_cast<int>(ev));
     }
@@ -384,6 +402,12 @@ inline ExtEvType StrToExtEvent(QString s)
     if (s == "GR") return  ExtEvType::GR;
     if (s == "GH") return  ExtEvType::GH;
     if (s == "GB") return  ExtEvType::GB;
+    if (s == "I1") return  ExtEvType::I1;
+    if (s == "I2") return  ExtEvType::I2;
+    if (s == "I3") return  ExtEvType::I3;
+    if (s == "I4") return  ExtEvType::I4;
+    if (s == "J1") return  ExtEvType::J1;
+    if (s == "J2") return  ExtEvType::J2;
     return  ExtEvType::ZZ;
 }
 

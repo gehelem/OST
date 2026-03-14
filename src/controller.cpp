@@ -440,6 +440,8 @@ void Controller::onExternalEvent(OST::ExtEvent event)
 
     /* data must contain a unique "p" key for these */
     if (event.ev == OST::ExtEvType::SV || event.ev == OST::ExtEvType::SA || event.ev == OST::ExtEvType::GC
+            || event.ev == OST::ExtEvType::I1 || event.ev == OST::ExtEvType::I2 || event.ev == OST::ExtEvType::I3
+            || event.ev == OST::ExtEvType::I4 || event.ev == OST::ExtEvType::J1 || event.ev == OST::ExtEvType::J2
             || event.ev == OST::ExtEvType::GU || event.ev == OST::ExtEvType::GF || event.ev == OST::ExtEvType::GD
             || event.ev == OST::ExtEvType::GR || event.ev == OST::ExtEvType::GH || event.ev == OST::ExtEvType::GB)
     {
@@ -459,6 +461,7 @@ void Controller::onExternalEvent(OST::ExtEvent event)
 
     /* data must contain a "e" key for these */
     if (event.ev == OST::ExtEvType::SV || event.ev == OST::ExtEvType::SA || event.ev == OST::ExtEvType::GC
+            || event.ev == OST::ExtEvType::J1 || event.ev == OST::ExtEvType::J2
             || event.ev == OST::ExtEvType::GU)
     {
         if (!p[event.prpkey].toObject().contains("e"))

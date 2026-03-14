@@ -50,8 +50,8 @@ IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap
  */
 bool IndiModule::onExternalEventIndi(OST::ExtEvent event)
 {
-    qDebug() << "IndiModule::onExternalEventIndi event = " << OST::ExtEvToString(event.ev) << " p=" << event.prpkey << " e=" <<
-             event.eltkey << " l=" << event.lovkey << " i=" << event.line;
+    //qDebug() << "IndiModule::onExternalEventIndi event = " << OST::ExtEvToString(event.ev) << " p=" << event.prpkey << " e=" <<
+    //         event.eltkey << " l=" << event.lovkey << " i=" << event.line;
 
     QJsonObject o = event.data["m"].toObject()[this->getModuleName()].toObject();
     QJsonObject p = o["p"].toObject();
