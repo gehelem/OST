@@ -266,6 +266,9 @@ void Controller::loadConf(const QString &pConf)
     }
     logInfo("Load configuration %1 sucessfull", {pConf});
     updateControllerData("currentconf", QVariant(pConf));
+    QVariantList confs;
+    dbmanager->getDbConfigurations(confs);
+    updateControllerData("availableconfs", QVariant(confs));
 
 }
 void Controller::saveConf(const QString &pConf)
@@ -287,6 +290,9 @@ void Controller::saveConf(const QString &pConf)
     }
     logInfo("Save configuration %1 sucessfull", {pConf});
     updateControllerData("currentconf", QVariant(pConf));
+    QVariantList confs;
+    dbmanager->getDbConfigurations(confs);
+    updateControllerData("availableconfs", QVariant(confs));
 }
 
 void Controller::onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase* elt, OST::PropertyBase* prp,

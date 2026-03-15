@@ -171,6 +171,29 @@ bool DBManager::getDbProfiles(QVariantMap &result )
     mDb.close();
     return true;
 }
+bool  DBManager::getDbConfigurations(QVariantList &result )
+{
+    if(!mDb.open())
+    {
+        logError("getDbConfigurations dbOpen - ERROR: %1 - %2", {mDb.databaseName(), mDb.lastError().text()});
+        return false;
+    }
+    QString sql = "SELECT DISTINCT CONFIGNAME FROM CONFIGURATIONS";
+    if (!mQuery.exec(sql))
+    {
+        logError("getDbConfigurations - ERROR SQL = %1", {sql});
+        logError("getDbConfigurations - ERROR : %1", {mQuery.lastError().text()});
+        mDb.close();
+        return false;
+    }
+    while (mQuery.next())
+    {
+        result.append(mQuery.value(0).toString().toUtf8());
+    }
+    mDb.close();
+    return true;
+}
+
 bool DBManager::getDbConfiguration(const QString &pConfigName, QVariantMap &result )
 {
     if(!mDb.open())

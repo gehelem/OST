@@ -33,6 +33,7 @@ class DBManager : public Datastore
         bool getDbProfiles(QString moduleType, QVariantMap &result );
         bool getDbProfiles(QVariantMap &result );
         bool getDbConfiguration(const QString &pConfigName, QVariantMap &result );
+        bool getDbConfigurations(QVariantList &result );
         bool saveDbConfiguration(const QString &pConfigName, QVariantMap &pConf);
         bool getDbConfigurations(QVariantMap &result );
         bool searchCatalog(const QString &pArgument, QList<catalogResult> &pResult);
