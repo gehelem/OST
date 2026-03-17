@@ -440,7 +440,7 @@ void Controller::onExternalEvent(OST::ExtEvent event)
     }
 
     /* "e" key must be unique for these */
-    if (event.ev == OST::ExtEvType::SV)
+    if (event.ev == OST::ExtEvType::SV || event.ev == OST::ExtEvType::J1 || event.ev == OST::ExtEvType::J2)
     {
         if (e.size() != 1)
         {
