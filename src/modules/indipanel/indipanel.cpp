@@ -27,7 +27,7 @@ IndiPanel::~IndiPanel()
 {
 
 }
-void IndiPanel::newDevice(INDI::BaseDevice dp)
+void IndiPanel::onNewDevice(INDI::BaseDevice dp)
 {
     auto props = dp.getProperties();
 
@@ -44,7 +44,7 @@ void IndiPanel::newDevice(INDI::BaseDevice dp)
         createProperty(pm);
     }
 }
-void IndiPanel::removeDevice(INDI::BaseDevice dp)
+void IndiPanel::onRemoveDevice(INDI::BaseDevice dp)
 {
     foreach(const QString &key, getStore().keys())
     {
@@ -54,10 +54,11 @@ void IndiPanel::removeDevice(INDI::BaseDevice dp)
             deleteOstProperty(key);
         }
     }
-
 }
-void IndiPanel::newProperty(INDI::Property pProperty)
+void IndiPanel::onNewProperty(INDI::Property pProperty)
 {
+    //logDebug("IndiPanel::onNewProperty %1 %2", {pProperty.getDeviceName(), pProperty.getName()});
+
     QString dev = pProperty.getDeviceName();
     QString pro = pProperty.getName();
     QString devpro = dev + pro;
@@ -171,8 +172,10 @@ void IndiPanel::newProperty(INDI::Property pProperty)
     }
     createProperty(p);
 }
-void IndiPanel::updateProperty (INDI::Property property)
+void IndiPanel::onUpdateProperty (INDI::Property property)
 {
+    //    logDebug("IndiPanel::onUpdateProperty %1 %2", {property.getDeviceName(), property.getName()});
+
     QString dev = property.getDeviceName();
     QString pro = property.getName();
     QString devpro = dev + pro;
@@ -274,8 +277,10 @@ void IndiPanel::updateProperty (INDI::Property property)
 }
 
 
-void IndiPanel::removeProperty(INDI::Property property)
+void IndiPanel::onRemoveProperty(INDI::Property property)
 {
+    //    logDebug("IndiPanel::onRemoveProperty %1 %2", {property.getDeviceName(), property.getName()});
+
     QString dev = property.getDeviceName();
     QString pro = property.getName();
     QString devpro = dev + pro;

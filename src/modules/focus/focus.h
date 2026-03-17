@@ -21,6 +21,11 @@ class MODULE_INIT Focus : public IndiModule
     public:
         Focus(QString name, QString label, QString profile, QVariantMap availableModuleLibs);
         ~Focus();
+        void onNewDevice      (INDI::BaseDevice dp) override     {} ;
+        void onRemoveDevice   (INDI::BaseDevice dp) override     {} ;
+        void onNewProperty    (INDI::Property property) override {} ;
+        void onRemoveProperty (INDI::Property property) override {} ;
+        void onUpdateProperty (INDI::Property property) override {} ;
 
     signals:
         void cameraAlert();

@@ -60,6 +60,11 @@ class MODULE_INIT Guider  : public IndiModule
     public:
         Guider (QString name, QString label, QString profile, QVariantMap availableModuleLibs);
         ~Guider();
+        void onNewDevice      (INDI::BaseDevice dp) override     {} ;
+        void onRemoveDevice   (INDI::BaseDevice dp) override     {} ;
+        void onNewProperty    (INDI::Property property) override {} ;
+        void onRemoveProperty (INDI::Property property) override {} ;
+        void onUpdateProperty (INDI::Property property) override {} ;
 
     signals:
         void InitDone();

@@ -60,8 +60,8 @@ Inspector::~Inspector()
 }
 void Inspector::onExternalEvent(OST::ExtEvent event)
 {
-    qDebug() << "Inspector::onExternalEventBase event = " << OST::ExtEvToString(event.ev) << " p=" << event.prpkey << " e=" <<
-             event.eltkey << " l=" << event.lovkey << " i=" << event.line;
+    //qDebug() << "Inspector::onExternalEventBase event = " << OST::ExtEvToString(event.ev) << " p=" << event.prpkey << " e=" <<
+    //         event.eltkey << " l=" << event.lovkey << " i=" << event.line;
 
     if (event.ev == OST::ExtEvType::SV && event.prpkey == "actions")
     {
@@ -103,11 +103,12 @@ void Inspector::onExternalEvent(OST::ExtEvent event)
         }
     }
 
-    if (event.ev == OST::ExtEvType::J1 && event.prpkey == "fileselect" && event.eltkey == "name")
+    if (event.ev == OST::ExtEvType::J2 && event.prpkey == "fileselect" && event.eltkey == "name")
     {
         getProperty("actions")->setState(OST::Ok, true);
         delete _image;
         _image = new fileio();
+        logDebug(" file = %1", {getString("fileselect", "name")});
         _image->loadFits(getString("fileselect", "name"));
         _image->generateQImage();
         stats = _image->getStats();

@@ -20,7 +20,11 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         void requestProfile(QString profileName);
         void setProfile(QVariantMap profiledata);
         bool connectIndi(void);
-
+        virtual void onNewDevice      (INDI::BaseDevice dp)     ;
+        virtual void onRemoveDevice   (INDI::BaseDevice dp)     ;
+        virtual void onNewProperty    (INDI::Property property) ;
+        virtual void onRemoveProperty (INDI::Property property) ;
+        virtual void onUpdateProperty (INDI::Property property) ;
     public slots:
         void connectIndiTimer(void);
         void OnAfterIndiConnectIndiTimer(void);
@@ -59,7 +63,7 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         bool frameReset(QString devicename);
         bool createDeviceProperty(const QString &key, const QString &label, const QString &level1,
                                   const QString &level2, const QString &order, INDI::BaseDevice::DRIVER_INTERFACE interface);
-        bool refreshDeviceslovs(QString deviceName);
+        bool refreshDeviceslovs();
         bool defineMeAsFocuser();
         bool defineMeAsGuider();
         bool defineMeAsSequencer();
@@ -97,6 +101,13 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         bool setFocalLengthAndDiameter(QString device, double fl, double diam);
 
     private:
+        void newDevice      (INDI::BaseDevice dp) override;
+        void removeDevice   (INDI::BaseDevice dp) override;
+        void newProperty    (INDI::Property property) override;
+        void removeProperty (INDI::Property property) override;
+        void updateProperty (INDI::Property property) override;
+
+
         bool mIsFocuser = false;
         bool mIsGuider = false;
         bool mIsSequencer = false;

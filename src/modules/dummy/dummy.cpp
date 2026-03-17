@@ -425,7 +425,6 @@ void Dummy::onExternalEvent(OST::ExtEvent event)
 
 void Dummy::newBLOB(INDI::PropertyBlob pblob)
 {
-    refreshDeviceslovs(pblob.getDeviceName());
 
     if (
         (QString(pblob.getDeviceName()) == _camera)
