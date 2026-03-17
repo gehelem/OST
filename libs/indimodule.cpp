@@ -140,6 +140,43 @@ void IndiModule::connectIndiTimer()
     connectIndi();
 
 }
+
+void IndiModule::newDevice(INDI::BaseDevice dp)
+{
+    //logDebug("IndiModule::newDevice %1", {dp.getDeviceName()});
+    refreshDeviceslovs();
+    onNewDevice(dp);
+}
+void IndiModule::removeDevice(INDI::BaseDevice dp)
+{
+    //logDebug("IndiModule::removeDevice %1", {dp.getDeviceName()});
+    refreshDeviceslovs();
+    onRemoveDevice(dp);
+}
+void IndiModule::newProperty(INDI::Property pProperty)
+{
+    //logDebug("IndiModule::newProperty %1 %2", {pProperty.getDeviceName(), pProperty.getName()});
+    onNewProperty(pProperty);
+}
+
+void IndiModule::updateProperty (INDI::Property property)
+{
+    //logDebug("IndiModule::updateProperty %1 %2", {property.getDeviceName(), property.getName()});
+    onUpdateProperty(property);
+
+}
+void IndiModule::removeProperty(INDI::Property property)
+{
+    //logDebug("IndiModule::removeProperty %1 %2", {property.getDeviceName(), property.getName()});
+    onRemoveProperty(property);
+}
+
+void IndiModule::onNewDevice      (INDI::BaseDevice dp)    {} ;
+void IndiModule::onRemoveDevice   (INDI::BaseDevice dp)    {} ;
+void IndiModule::onNewProperty    (INDI::Property property) {} ;
+void IndiModule::onRemoveProperty (INDI::Property property) {} ;
+void IndiModule::onUpdateProperty (INDI::Property property) {} ;
+
 /*!
  * Connects to indi server
  * Should we add host/port ??
@@ -159,7 +196,7 @@ bool IndiModule::connectIndi()
     {
         newUniversalMessage("Indi server connected");
         logInfo("Indi server connected");
-        QTimer::singleShot(500, this, &IndiModule::OnAfterIndiConnectIndiTimer);
+        QTimer::singleShot(100, this, &IndiModule::OnAfterIndiConnectIndiTimer);
         return true;
     }
     logError("%1 - Couldn't connect to Indi server", {QString("connectIndi")});
@@ -753,57 +790,51 @@ bool IndiModule::createDeviceProperty(const QString &key, const QString &label, 
 }
 void IndiModule::OnAfterIndiConnectIndiTimer()
 {
+    refreshDeviceslovs();
+}
+bool IndiModule::refreshDeviceslovs()
+{
     std::vector<INDI::BaseDevice> devs = getDevices();
     for(std::size_t i = 0; i < devs.size(); i++)
     {
-        refreshDeviceslovs(devs[i].getDeviceName());
-    }
+        QString d = devs[i].getDeviceName();
+        if (devs[i].isConnected())
+        {
+            getGlovString("DRIVER_INTERFACE-GENERAL_INTERFACE")->lovAdd(d, d);
 
-}
-bool IndiModule::refreshDeviceslovs(QString deviceName)
-{
-    QString d = getDevice(deviceName.toStdString().c_str()).getDeviceName();
-    getGlovString("DRIVER_INTERFACE-GENERAL_INTERFACE")->lovAdd(d, d);
-
-    if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
-            INDI::BaseDevice::DRIVER_INTERFACE::CCD_INTERFACE)
-    {
-        getGlovString("DRIVER_INTERFACE-CCD_INTERFACE")->lovAdd(d, d);
-    }
-    if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
-            INDI::BaseDevice::DRIVER_INTERFACE::TELESCOPE_INTERFACE)
-    {
-        getGlovString("DRIVER_INTERFACE-TELESCOPE_INTERFACE")->lovAdd(d, d);
-    }
-    if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
-            INDI::BaseDevice::DRIVER_INTERFACE::GUIDER_INTERFACE)
-    {
-        getGlovString("DRIVER_INTERFACE-GUIDER_INTERFACE")->lovAdd(d, d);
-    }
-    if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
-            INDI::BaseDevice::DRIVER_INTERFACE::FOCUSER_INTERFACE)
-    {
-        getGlovString("DRIVER_INTERFACE-FOCUSER_INTERFACE")->lovAdd(d, d);
-    }
-    if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
-            INDI::BaseDevice::DRIVER_INTERFACE::FILTER_INTERFACE)
-    {
-        getGlovString("DRIVER_INTERFACE-FILTER_INTERFACE")->lovAdd(d, d);
-    }
-    if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
-            INDI::BaseDevice::DRIVER_INTERFACE::GPS_INTERFACE)
-    {
-        getGlovString("DRIVER_INTERFACE-GPS_INTERFACE")->lovAdd(d, d);
-    }
-    if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
-            INDI::BaseDevice::DRIVER_INTERFACE::WEATHER_INTERFACE)
-    {
-        getGlovString("DRIVER_INTERFACE-WEATHER_INTERFACE")->lovAdd(d, d);
-    }
-    if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
-            INDI::BaseDevice::DRIVER_INTERFACE::AUX_INTERFACE)
-    {
-        getGlovString("DRIVER_INTERFACE-AUX_INTERFACE")->lovAdd(d, d);
+            if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::CCD_INTERFACE)
+            {
+                getGlovString("DRIVER_INTERFACE-CCD_INTERFACE")->lovAdd(d, d);
+            }
+            if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::TELESCOPE_INTERFACE)
+            {
+                getGlovString("DRIVER_INTERFACE-TELESCOPE_INTERFACE")->lovAdd(d, d);
+            }
+            if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::GUIDER_INTERFACE)
+            {
+                getGlovString("DRIVER_INTERFACE-GUIDER_INTERFACE")->lovAdd(d, d);
+            }
+            if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::FOCUSER_INTERFACE)
+            {
+                getGlovString("DRIVER_INTERFACE-FOCUSER_INTERFACE")->lovAdd(d, d);
+            }
+            if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::FILTER_INTERFACE)
+            {
+                getGlovString("DRIVER_INTERFACE-FILTER_INTERFACE")->lovAdd(d, d);
+            }
+            if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::GPS_INTERFACE)
+            {
+                getGlovString("DRIVER_INTERFACE-GPS_INTERFACE")->lovAdd(d, d);
+            }
+            if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::WEATHER_INTERFACE)
+            {
+                getGlovString("DRIVER_INTERFACE-WEATHER_INTERFACE")->lovAdd(d, d);
+            }
+            if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::AUX_INTERFACE)
+            {
+                getGlovString("DRIVER_INTERFACE-AUX_INTERFACE")->lovAdd(d, d);
+            }
+        }
     }
     return true;
 }

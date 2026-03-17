@@ -573,7 +573,8 @@ void PropertyMulti::setAutoSelect(bool b)
 /* Slots */
 void PropertyMulti::OnEltEvent(OST::EvType e, QVariant data, OST::ElementBase* elt)
 {
-    emit PropertyBase::prpEvent(e, data, elt, this);
+    if (e == OST::EvType::ee) emit PropertyBase::prpEvent(OST::EvType::ea, data, elt, this); /* force all switches send */
+    else emit PropertyBase::prpEvent(e, data, elt, this);
 }
 void PropertyMulti::OnLovChanged(ElementBase*)
 {

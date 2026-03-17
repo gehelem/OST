@@ -17,6 +17,11 @@ class MODULE_INIT Dummy : public IndiModule
     public:
         Dummy(QString name, QString label, QString profile, QVariantMap availableModuleLibs);
         ~Dummy();
+        void onNewDevice      (INDI::BaseDevice dp) override     {} ;
+        void onRemoveDevice   (INDI::BaseDevice dp) override     {} ;
+        void onNewProperty    (INDI::Property property) override {} ;
+        void onRemoveProperty (INDI::Property property) override {} ;
+        void onUpdateProperty (INDI::Property property) override {} ;
 
 
     public slots:
