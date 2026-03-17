@@ -276,10 +276,12 @@ bool DBManager::getDbConfigurations(QVariantMap &result )
     while (mQuery.next())
     {
         QVariantMap line;
+        QVariantList list = result[mQuery.value(0).toString().toUtf8()].toList();
         line["modulelabel"] = mQuery.value(1).toString().toUtf8();
         line["moduletype"] = mQuery.value(2).toString().toUtf8();
         line["profilename"] = mQuery.value(3).toString().toUtf8();
-        result[mQuery.value(0).toString().toUtf8()] = line;
+        list.append(line);
+        result[mQuery.value(0).toString().toUtf8()] = list;
     }
     mDb.close();
     return true;
