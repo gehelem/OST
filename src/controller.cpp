@@ -266,7 +266,7 @@ void Controller::loadConf(const QString &pConf)
     }
     logInfo("Load configuration %1 sucessfull", {pConf});
     updateControllerData("currentconf", QVariant(pConf));
-    QVariantList confs;
+    QVariantMap confs;
     dbmanager->getDbConfigurations(confs);
     updateControllerData("availableconfs", QVariant(confs));
 
@@ -290,7 +290,7 @@ void Controller::saveConf(const QString &pConf)
     }
     logInfo("Save configuration %1 sucessfull", {pConf});
     updateControllerData("currentconf", QVariant(pConf));
-    QVariantList confs;
+    QVariantMap confs;
     dbmanager->getDbConfigurations(confs);
     updateControllerData("availableconfs", QVariant(confs));
 }
@@ -308,29 +308,6 @@ void Controller::onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase*
         dbmanager->getDbProfiles(r);
         updateControllerData("profiles", r);
     }
-    //    if (event.type == "moduledelete")
-    //    {
-    //        if (!mModulesMap.contains(event.module))
-    //        {
-    //            pMainControl->sendMainWarning("moduledelete Module " + event.module + " not in module map");
-    //            return;
-    //        }
-    //        mModulesMap.remove(event.module);
-    //        pMainControl->deldModuleData(event.module);
-    //        updateGlobalModulesLov();
-    //    }
-    //    if (event.type == "modulesavedprofile")
-    //    {
-    //        //mModulesMap[event.module]["profile"] = pEventKey;
-    //        //pMainControl->setModuleData(event.module, "", "", pEventKey);
-    //
-    //    }
-    //    if (event.type == "moduleloadedprofile")
-    //    {
-    //        //mModulesMap[event.module]["profile"] = pEventKey;
-    //        //pMainControl->setModuleData(event.module, "", "", pEventKey);
-    //
-    //    }
 
 }
 void Controller::OnClientEvent(OST::ExtEvent event, QWebSocket* client, QString clientgrant)
@@ -344,22 +321,6 @@ void Controller::OnClientEvent(OST::ExtEvent event, QWebSocket* client, QString 
 
 void Controller::onExternalEvent(OST::ExtEvent event)
 {
-    //qDebug() << "Controller::onExternalEvent" << event.data;
-    //    ZZ = 0,    /*!< invalid request */
-    //    DU,        /*!< request dump */
-    //    LO,        /*!< login request */
-    //    IL,        /*!< set client language request */
-    //    PL,        /*!< Load profile */
-    //    PS,        /*!< Save profile */
-    //    CL,        /*!< Load configuration */
-    //    CS,        /*!< Save configuration*/
-    //    SV,        /*!< set a value of a property */
-    //    SA,        /*!< set all values of a property */
-    //    GC,        /*!< grid new line */
-    //    GU,        /*!< grid update line  */
-    //    GF,        /*!< grid fetch line  */
-    //    GD,        /*!< grid delete line  */
-    //    GR,        /*!< grid reset */
     switch (event.ev)
     {
         case OST::ExtEvType::ZZ:
@@ -514,53 +475,7 @@ void Controller::onExternalEvent(OST::ExtEvent event)
 
 
 }
-//void Controller::OnMainCtlEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
-//                                const QVariantMap &pEventData)
-//{
-//    Q_UNUSED(pEventModule);
-//    Q_UNUSED(pEventData);
-//
-//    if (pEventType == "loadconf")
-//    {
-//        loadConf(pEventKey);
-//    }
-//    if (pEventType == "saveconf")
-//    {
-//        saveConf(pEventKey);
-//    }
-//    if (pEventType == "startindidriver")
-//    {
-//        startIndiDriver(pEventKey);
-//    }
-//    if (pEventType == "stopindidriver")
-//    {
-//        stopIndiDriver(pEventKey);
-//    }
-//    if (pEventType == "indiserver")
-//    {
-//        if (pEventKey == "start")
-//        {
-//            startIndi();
-//        }
-//        if (pEventKey == "stop")
-//        {
-//            stopIndi();
-//        }
-//    }
-//    if (pEventType == "killall")
-//    {
-//        QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
-//        for (Basemodule *othermodule : othermodules)
-//        {
-//            if (othermodule->getModuleName() != "mainctl")
-//            {
-//                othermodule->killMe();
-//            }
-//        }
-//
-//    }
-//
-//}
+
 void Controller::checkModules(void)
 {
     foreach (const QString &path, QCoreApplication::libraryPaths())
@@ -811,7 +726,7 @@ void Controller::OnFileWatcherEvent(const QString &pEvent)
 }
 void Controller::OnFileChangeEvent(const QString &pEvent)
 {
-    qDebug() << "****************************************** FileChanged" << pEvent;
+    //qDebug() << "****************************************** FileChanged" << pEvent;
 }
 
 void Controller::logInfo(const QString &message)
@@ -860,7 +775,6 @@ QJsonObject Controller::getModulesDump(QString clientgrant)
         modules[module->getModuleName()] = OST::ModuleJsonDumper(OST::EvType::aa, QVariant(), nullptr, nullptr, nullptr, module);
     }
 
-    //dump["modules"] = QJsonObject().fromVariantMap(mModulesMap); // useless, redundant with detailled (and live updated) modules data
     dump["m"] = modules;
     dump["files"] = files;
     dump["logs"] = mLogger->getJsonHistory();
