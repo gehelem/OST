@@ -451,6 +451,22 @@ target_link_libraries(ostinspector PRIVATE
 )
 target_compile_definitions(ostinspector PRIVATE INSPECTOR_MODULE)
 
+# Navigator module
+add_library(ostnavigator SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/navigator/navigator.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/navigator/navigator.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/navigator/navigator.qrc
+)
+target_link_libraries(ostnavigator PRIVATE
+    ostindimodule
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Threads::Threads
+    z
+)
+target_compile_definitions(ostnavigator PRIVATE INSPECTOR_MODULE)
+
 install(TARGETS
     ostserver
     ostbasemodule ostindimodule
@@ -460,6 +476,7 @@ install(TARGETS
     ostsequencer
     ostguider
     ostinspector
+    ostnavigator
     RUNTIME DESTINATION "/usr/bin"
     LIBRARY DESTINATION "/usr/lib"
     PUBLIC_HEADER DESTINATION "/usr/include/ost"

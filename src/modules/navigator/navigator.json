@@ -1,0 +1,289 @@
+{
+"p":{
+    "centeringparams": {
+        "devcat": "Parameters",
+        "order": "Param0000",
+        "group": "",
+        "permission": 2,
+        "hasprofile":true,
+        "rule":2,
+        "label": "Centering parameters",
+        "e": {
+            "maxiterations": {
+                "autoupdate":true,
+                "directedit":true,
+                "type": "int",
+                "label": "Max iterations",
+                "order": "1",
+                "value":5,
+                "min":1,
+                "max":10,
+                "step":1,
+                "slider":2,
+                "hint":"Maximum number of centering iterations"
+            },
+            "tolerance": {
+                "autoupdate":true,
+                "directedit":true,
+                "type": "float",
+                "label": "Tolerance (arcsec)",
+                "order": "2",
+                "value":30.0,
+                "min":5.0,
+                "max":300.0,
+                "step":5.0,
+                "slider":2,
+                "format":"%.1f",
+                "hint":"Centering tolerance in arcseconds"
+            },
+            "syncafter": {
+                "autoupdate":true,
+                "directedit":true,
+                "type": "bool",
+                "label": "Sync mount after sucess",
+                "order": "3",
+                "value":false,
+                "hint":"Synchronise mount coordinates after centering"
+            }
+
+        }
+    },
+    "search": {
+        "devcat": "Control",
+        "order": "Control0000",
+        "group": "",
+        "permission": 2,
+        "hasprofile":true,
+        "rule":0,
+        "label": "Search object",
+        "e": {
+            "name": {
+                "autoupdate":true,
+                "directedit":true,
+                "type": "string",
+                "posticon": "forward",
+                "label": "",
+                "order": "1",
+                "value":"ngc281"
+            }
+        }
+    },
+    "results": {
+        "devcat": "Control",
+        "order": "Control0005",
+        "group": "",
+        "permission": 0,
+        "grid":0,
+        "gridLimit":255,
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
+        "rule":0,
+        "label": "Results",
+        "e": {
+            "catalog": {
+                "type": "string",
+                "label": "Catalogue",
+                "order":"10",
+                "value":""
+            },
+            "code": {
+                "type": "string",
+                "label": "Code",
+                "order":"20",
+                "value":""
+            },
+            "RA": {
+                "type": "float",
+                "label": "RA",
+                "order":"30",
+                "value":0
+            },
+            "NS": {
+                "type": "string",
+                "label": "N/S",
+                "order":"50",
+                "value":""
+            },
+            "DEC": {
+                "type": "float",
+                "label": "DEC",
+                "order":"40",
+                "value":0
+            },
+            "diam": {
+                "type": "float",
+                "label": "Diameter",
+                "order":"60",
+                "value":0
+            },
+            "mag": {
+                "type": "float",
+                "label": "Magnitude",
+                "order":"70",
+                "value":0
+            },
+            "name": {
+                "type": "string",
+                "label": "Name",
+                "order":"80",
+                "value":""
+            },
+            "alias": {
+                "type": "string",
+                "label": "Alias",
+                "order":"90",
+                "value":""
+            }
+        }
+    },
+    "selectnow": {
+        "devcat": "Control",
+        "order": "Control0008",
+        "group": "",
+        "permission": 0,
+        "rule":0,
+        "label": "Selection converted to now",
+        "e": {
+            "jd": {
+                "type": "string",
+                "label": "Julian day",
+                "order":"05",
+                "value":""
+            },
+            "code": {
+                "type": "string",
+                "label": "Code",
+                "order":"10",
+                "value":""
+            },
+            "RA": {
+                "type": "float",
+                "label": "RA",
+                "order":"20",
+                "value":0
+            },
+            "NS": {
+                "type": "string",
+                "label": "N/S",
+                "order":"40",
+                "value":""
+            },
+            "DEC": {
+                "type": "float",
+                "label": "DEC",
+                "order":"30",
+                "value":0
+            }
+        }
+    },
+    "popcat": {
+        "devcat": "Control",
+        "order": "Control9999",
+        "group": "",
+        "permission": 2,
+        "rule":0,
+        "label": "Populate catalog",
+        "e": {
+            "go": {
+                "type":"bool",
+                "label": "GO",
+                "order": "1",
+                "value":false
+            },
+            "catlg":{
+                "autoupdate":true,
+                "directedit":true,
+                "type":"string",
+                "label": "Catalog",
+                "order": "2",
+                "value":"messier",
+                "listOfValues":[
+                    ["messier","Messier"],
+                    ["ngc","NGC"],
+                    ["ldn","LDN"],
+                    ["sh2","SH2"],
+                    ["ic","IC"],
+                    ["stars","Stars"]
+                ]
+            }
+        }
+    },
+    "mountposition": {
+        "devcat": "Control",
+        "order": "Control0000",
+        "group": "",
+        "permission": 0,
+        "rule":0,
+        "label": "Mount position",
+        "e": {
+            "RA": {
+                "type": "float",
+                "label": "RA",
+                "order": "10",
+                "value": 0.0
+            },
+            "DEC": {
+                "type": "float",
+                "label": "DEC",
+                "order": "20",
+                "value": 0.0
+            }
+        }
+    },
+    "gpslocation": {
+        "devcat": "Control",
+        "order": "Control0050",
+        "group": "",
+        "permission": 0,
+        "rule":0,
+        "label": "GPS Location",
+        "e": {
+            "alt": {
+                "type": "float",
+                "label": "Altitude",
+                "order": "10",
+                "value": 0.0
+            },
+            "lat": {
+                "type": "float",
+                "label": "Latitude",
+                "order": "20",
+                "value": 0.0
+            },
+            "lon": {
+                "type": "float",
+                "label": "Longitude",
+                "order": "30",
+                "value": 0.0
+            }
+        }
+    },
+    "gpstime": {
+        "devcat": "Control",
+        "order": "Control0060",
+        "group": "",
+        "permission": 0,
+        "rule":0,
+        "label": "GPS Date and time",
+        "e": {
+            "offset": {
+                "type": "float",
+                "label": "UTC offset",
+                "order": "10",
+                "value": 0
+            },
+            "date": {
+                "type": "date",
+                "label": "Date",
+                "order": "20"
+            },
+            "time": {
+                "type": "time",
+                "label": "Time",
+                "order": "30"
+            }
+        }
+    }
+}
+}
