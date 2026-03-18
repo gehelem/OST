@@ -192,13 +192,9 @@ bool Basemodule::onExternalEventBase(OST::ExtEvent event)
             logError("Basemodule::onExternalEvent - element %1-%2 not found", {event.prpkey, event.eltkey});
             return false;
         }
-        QVariantMap eltval;
-        eltval["value"] = e.begin().value().toVariant();
         if (getStore()[event.prpkey]->getElt(event.eltkey)->autoUpdate() || getStore()[event.prpkey]->autoUpdate())
         {
-            OST::ElementUpdate u;
-            bool b = true;
-            getStore()[event.prpkey]->getElt(event.eltkey)->accept(&u, eltval, b);
+            getStore()[event.prpkey]->setElt(event.eltkey, e.begin().value().toVariant(), true);
         }
     }
 
