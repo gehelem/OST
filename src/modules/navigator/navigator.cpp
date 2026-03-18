@@ -108,9 +108,9 @@ void Navigator::onExternalEvent(OST::ExtEvent event)
             float ra = getFloat("results", "RA");
             float dec = getFloat("results", "DEC");
             QString ns = getString("results", "NS");
-            getEltString("actions", "targetname")->setValue(code);
-            getEltFloat("actions", "targetra")->setValue(ra);
-            getEltFloat("actions", "targetde")->setValue(dec, true);
+            getEltString("target", "targetname")->setValue(code);
+            getEltFloat("target", "targetra")->setValue(ra);
+            getEltFloat("target", "targetde")->setValue(dec, true);
             convertSelection();
         }
     }
@@ -265,7 +265,7 @@ void Navigator::OnNewImage()
         stellarSolver.start();
     }
 }
-void Navigator::updateProperty(INDI::Property property)
+void Navigator::onUpdateProperty(INDI::Property property)
 {
     //if (mState == "idle") return;
 
@@ -498,14 +498,14 @@ void Navigator::slewToSelection(void)
 
     mWaitingSlew = true;
     sendNewNumber(prop);
-    logInfo("Slewing to " + getString("actions", "targetname"));
+    logInfo("Slewing to " + getString("target", "targetname"));
 
 }
 void Navigator::convertSelection(void)
 {
-    QString code = getString("actions", "targetname");
-    mTargetRA = getFloat("actions", "targetra");
-    mTargetDEC = getFloat("actions", "targetde");
+    QString code = getString("target", "targetname");
+    mTargetRA = getFloat("target", "targetra");
+    mTargetDEC = getFloat("target", "targetde");
     double jd = ln_get_julian_from_sys();
     INDI::IEquatorialCoordinates j2000pos;
     INDI::IEquatorialCoordinates observed;
@@ -571,7 +571,7 @@ void Navigator::correctOffset(double solvedRA, double solvedDEC)
     // Apply correction
     double newRA = currentRA + deltaRA;
     double newDEC = currentDEC + deltaDEC;
-    logInfo("Slewing to " + getString("actions",
+    logInfo("Slewing to " + getString("target",
                                       "targetname") + "-" + QString::number(newRA) + "-" + QString::number(newDEC));
 
     logInfo(QString("Applying correction: RA %1h → %2h, DEC %3° → %4°")
@@ -630,9 +630,9 @@ void Navigator::addTargeToPlanner()
 {
     //{"evt":"Flcreate","mod":"Planner","dta":{"planning":{"elements":{"object":"TT","ra":10,"dec":20,"profile":"default"}}}}
     QVariantMap eltData;
-    eltData["object"] = getString("actions", "targetname");
-    eltData["ra"] = getFloat("actions", "targetra");
-    eltData["dec"] = getFloat("actions", "targetde");
+    eltData["object"] = getString("target", "targetname");
+    eltData["ra"] = getFloat("target", "targetra");
+    eltData["dec"] = getFloat("target", "targetde");
     eltData["profile"] = "default";
     QVariantMap elts;
     elts["elements"] = eltData;

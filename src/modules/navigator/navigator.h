@@ -26,7 +26,7 @@ class MODULE_INIT Navigator : public IndiModule
         void onRemoveDevice   (INDI::BaseDevice dp) override     {} ;
         void onNewProperty    (INDI::Property property) override {} ;
         void onRemoveProperty (INDI::Property property) override {} ;
-        void onUpdateProperty (INDI::Property property) override {} ;
+        void onUpdateProperty (INDI::Property property);
 
     signals:
 
@@ -40,7 +40,6 @@ class MODULE_INIT Navigator : public IndiModule
         void onExternalEvent(OST::ExtEvent event) override;
 
     private:
-        void updateProperty(INDI::Property property) override;
         void newBLOB(INDI::PropertyBlob pblob);
 
         void initIndi(void);

@@ -985,18 +985,20 @@ bool IndiModule::defineMeAsNavigator()
     b->setPreIcon("event_upcoming");
     b->setValue(false, false);
     pm->addElt(b);
+
+    OST::PropertyMulti* pmtarget  = getProperty("target");
     OST::ElementString* s = new  OST::ElementString("targetname", "Target name", "nav50", "");
     s->setDirectEdit(true);
     s->setAutoUpdate(true);
-    pm->addElt(s);
+    pmtarget->addElt(s);
     OST::ElementFloat* f = new  OST::ElementFloat("targetra", "Target RA", "nav51", "");
     f->setDirectEdit(true);
     f->setAutoUpdate(true);
-    pm->addElt(f);
+    pmtarget->addElt(f);
     f = new  OST::ElementFloat("targetde", "Target DEC", "nav52", "");
     f->setDirectEdit(true);
     f->setAutoUpdate(true);
-    pm->addElt(f);
+    pmtarget->addElt(f);
 
     pm  = getProperty("parms");
     s = new  OST::ElementString("plannermodule", "Planner module", "nav30", "");
