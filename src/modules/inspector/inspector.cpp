@@ -163,17 +163,18 @@ void Inspector::updateProperty(INDI::Property property)
 }
 void Inspector::Shoot()
 {
-    if (connectDevice(getString("devices", "camera")))
-    {
-        frameReset(getString("devices", "camera"));
-        requestCapture(getString("devices", "camera"), getFloat("parms", "exposure"), getInt("parms", "gain"), getInt("parms",
-                       "offset"));
-        getProperty("actions")->setState(OST::Busy, true);
-    }
-    else
+    if (!setFocalLengthAndDiameter())
     {
         getProperty("actions")->setState(OST::Error, true);
+        return;
     }
+    if (!requestCapture(getString("devices", "camera"), getFloat("parms", "exposure"), getInt("parms", "gain"), getInt("parms",
+                        "offset")))
+    {
+        getProperty("actions")->setState(OST::Error, true);
+        return;
+    }
+    getProperty("actions")->setState(OST::Busy, true);
 }
 void Inspector::initIndi()
 {
