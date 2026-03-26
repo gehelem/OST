@@ -1121,9 +1121,28 @@ bool IndiModule::setFocalLengthAndDiameter()
 
 bool IndiModule::setFocalLengthAndDiameter(QString device, double fl, double diam)
 {
-    if ((fl < 1) || (diam < 1)) return false;
-    if (!sendModNewNumber(device, "SCOPE_INFO", "APERTURE", diam)) return false;
-    if (!sendModNewNumber(device, "SCOPE_INFO", "FOCAL_LENGTH", fl)) return false;
+    logWarning("setFocalLengthAndDiameter %1 %2 %3", {device, fl, diam});
+
+    if (fl < 1)
+    {
+        logWarning("SetFocalLength failed, invalid focal length %1", {fl});
+        return false;
+    }
+    if (diam < 1)
+    {
+        logWarning("SetFocalLength failed, invalid diameter %1", {diam});
+        return false;
+    }
+    if (!sendModNewNumber(device, "SCOPE_INFO", "APERTURE", diam))
+    {
+        logWarning("SetFocalLength failed %1 %2 %3", {"SCOPE_INFO", "APERTURE", diam});
+        return false;
+    }
+    if (!sendModNewNumber(device, "SCOPE_INFO", "FOCAL_LENGTH", fl))
+    {
+        logWarning("SetFocalLength failed %1 %2 %3", {"SCOPE_INFO", "FOCAL_LENGTH", fl});
+        return false;
+    }
     return true;
 
 }
