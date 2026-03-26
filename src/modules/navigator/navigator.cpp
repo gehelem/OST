@@ -335,8 +335,11 @@ void Navigator::onUpdateProperty(INDI::Property property)
 }
 void Navigator::Shoot()
 {
-    logInfo("Shoot new image");
-    setFocalLengthAndDiameter();
+    if (!setFocalLengthAndDiameter())
+    {
+        emit abort();
+        return;
+    }
     if (!requestCapture(getString("devices", "camera"), getFloat("parms", "exposure"), getInt("parms", "gain"), getInt("parms",
                         "offset")))
     {
