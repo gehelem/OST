@@ -430,31 +430,34 @@ void Inspector::OnSucessSEP()
     /****************************************************************** corners */
     /****************************************************************** corners */
 
-    int s = getInt("parms", "cornersize");
     int h = rawImage.height();
     int w = rawImage.width();
+    int sw = getInt("parms", "cornersize");
+    int sh = sw*h / w;
 
-    QImage corners = QImage(3 * s, 3 * s, QImage::Format_RGB32);
+    //QImage corners = QImage(3 * s, 3 * s, QImage::Format_RGB32);
+    QImage corners = QImage(sw * 3, sh * 3, QImage::Format_RGB32);
     corners.setColorTable(rawImage.colorTable());
     corners.fill(Qt::green);
     QPainter painter(&corners);
 
-    painter.drawImage(QRect(0 * s, 0 * s, s, s), rawImage, QRect(0, 0, s, s)); //upper left
-    painter.drawImage(QRect(1 * s, 0 * s, s, s), rawImage, QRect(w / 2 - s / 2, 0, s, s)); //upper middle
-    painter.drawImage(QRect(2 * s, 0 * s, s, s), rawImage, QRect(w - s, 0, s, s)); //upper right
+    // drawImage(target, image,source)
+    painter.drawImage(QRect(0 * sw, 0 * sh, sw, sh), rawImage, QRect(0, 0, sw, sh));               //upper left
+    painter.drawImage(QRect(1 * sw, 0 * sh, sw, sh), rawImage, QRect(w / 2 - sw / 2, 0, sw, sh));  //upper middle
+    painter.drawImage(QRect(2 * sw, 0 * sh, sw, sh), rawImage, QRect(w - sw, 0, sw, sh));          //upper right
 
-    painter.drawImage(QRect(0 * s, 1 * s, s, s), rawImage, QRect(0, h / 2 - s / 2, s, s)); //middle left
-    painter.drawImage(QRect(1 * s, 1 * s, s, s), rawImage, QRect(w / 2 - s / 2, h / 2 - s / 2, s, s)); //middle middle
-    painter.drawImage(QRect(2 * s, 1 * s, s, s), rawImage, QRect(w - s, h / 2 - s / 2, s, s)); //middle right
+    painter.drawImage(QRect(0 * sw, 1 * sh, sw, sh), rawImage, QRect(0, h / 2 - sw / 2, sw, sh)); //middle left
+    painter.drawImage(QRect(1 * sw, 1 * sh, sw, sh), rawImage, QRect(w / 2 - sw / 2, h / 2 - sh / 2, sw, sh)); //middle middle
+    painter.drawImage(QRect(2 * sw, 1 * sh, sw, sh), rawImage, QRect(w - sw, h / 2 - sh / 2, sw, sh)); //middle right
 
-    painter.drawImage(QRect(0 * s, 2 * s, s, s), rawImage, QRect(0, h - s, s, s)); //lower left
-    painter.drawImage(QRect(1 * s, 2 * s, s, s), rawImage, QRect(w / 2 - s / 2, h - s, s, s)); //lower middle
-    painter.drawImage(QRect(2 * s, 2 * s, s, s), rawImage, QRect(w - s, h - s, s, s)); //lower right
+    painter.drawImage(QRect(0 * sw, 2 * sh, sw, sh), rawImage, QRect(0, h - sh, sw, sh)); //lower left
+    painter.drawImage(QRect(1 * sw, 2 * sh, sw, sh), rawImage, QRect(w / 2 - sw / 2, h - sh, sw, sh)); //lower middle
+    painter.drawImage(QRect(2 * sw, 2 * sh, sw, sh), rawImage, QRect(w - sw, h - sh, sw, sh)); //lower right
 
     painter.setPen(QPen(Qt::red));
-    painter.drawRect(QRect(s, 0, s, 3 * s - 1));
-    painter.drawRect(QRect(0, s, 3 * s - 1, s));
-    painter.drawRect(QRect(0, 0, 3 * s - 1, 3 * s - 1));
+    painter.drawRect(QRect(sw, 0, sw, 3 * sh - 1));
+    painter.drawRect(QRect(0, sh, 3 * sw - 1, sh));
+    painter.drawRect(QRect(0, 0, 3 * sw - 1, 3 * sh - 1));
 
     painter.end();
     corners.save(getWebroot() + "/" + getModuleName() + "corners.jpeg", "JPG", 100);
