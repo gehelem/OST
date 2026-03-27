@@ -10,10 +10,6 @@ IndiPanel *initialize(QString name, QString label, QString profile, QVariantMap 
 IndiPanel::IndiPanel(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
     : IndiModule(name, label, profile, availableModuleLibs)
 {
-    getEltString("thisGit", "hash")->setValue(QString::fromStdString(Version::GIT_SHA1), true);
-    getEltString("thisGit", "date")->setValue(QString::fromStdString(Version::GIT_DATE), true);
-    getEltString("thisGit", "message")->setValue(QString::fromStdString(Version::GIT_COMMIT_SUBJECT), true);
-
     setMetadata("thisGithash", QString::fromStdString(Version::GIT_SHA1));
     setMetadata("thisGitdate", QString::fromStdString(Version::GIT_DATE));
     setMetadata("thisGitmessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT));

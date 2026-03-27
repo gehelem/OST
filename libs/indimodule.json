@@ -2,33 +2,6 @@
 "globallov":{
 },
 "p":{
-    "indiGit": {
-        "devcat": "Module",
-        "group": "Info",
-        "order":"00",
-        "permission": 0,
-        "label": "Indi module git",
-        "e": {
-            "hash": {
-                "type": "string",
-                "label": "Hash",
-                "order":"00",
-                "value":"xxx"
-            },
-            "date": {
-                "type": "string",
-                "label": "Date",
-                "order":"01",
-                "value":"xxx"
-            },
-            "message": {
-                "type": "string",
-                "label": "Commit message",
-                "order":"02",
-                "value":"xxx"
-            }
-        }
-    },
     "server": {
         "hasprofile":true,
         "devcat": "Module",
