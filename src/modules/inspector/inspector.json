@@ -5,7 +5,7 @@
         "order": "000Control115",
         "group": "",
         "permission": 2,
-        "hasprofile":true,
+        "hasprofile":false,
         "rule":0,
         "label": "Select a file to reload",
         "e": {
@@ -21,8 +21,8 @@
         }
     },
     "parameters": {
-        "devcat": "Control",
-        "group": "",
+        "devcat": "Parameters",
+        "group": "General",
         "permission": 2,
         "hasprofile":true,
         "order":"000Control114",

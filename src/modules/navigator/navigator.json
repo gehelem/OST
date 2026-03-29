@@ -3,7 +3,7 @@
     "centeringparams": {
         "devcat": "Parameters",
         "order": "Param0000",
-        "group": "",
+        "group": "General",
         "permission": 2,
         "hasprofile":true,
         "rule":2,
@@ -53,7 +53,7 @@
         "order": "Control0000",
         "group": "",
         "permission": 2,
-        "hasprofile":true,
+        "hasprofile":false,
         "rule":0,
         "label": "Search object",
         "e": {
