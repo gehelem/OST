@@ -467,6 +467,22 @@ target_link_libraries(ostnavigator PRIVATE
 )
 target_compile_definitions(ostnavigator PRIVATE INSPECTOR_MODULE)
 
+# Allsky module
+add_library(ostallsky SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/allsky/allsky.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/allsky/allsky.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/allsky/allsky.qrc
+)
+target_link_libraries(ostallsky PRIVATE
+    ostindimodule
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Threads::Threads
+    z
+)
+target_compile_definitions(ostallsky PRIVATE INSPECTOR_MODULE)
+
 install(TARGETS
     ostserver
     ostbasemodule ostindimodule
@@ -477,6 +493,7 @@ install(TARGETS
     ostguider
     ostinspector
     ostnavigator
+    ostallsky
     RUNTIME DESTINATION "/usr/bin"
     LIBRARY DESTINATION "/usr/lib"
     PUBLIC_HEADER DESTINATION "/usr/include/ost"
