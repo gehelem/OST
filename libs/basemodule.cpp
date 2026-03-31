@@ -417,6 +417,11 @@ void Basemodule::onExternalEvent(OST::ExtEvent event)
     // Empty by default - custom modules will override this
 }
 
+void Basemodule::onAfterInit(void)
+{
+    // Empty by default - custom modules will override this
+}
+
 void Basemodule::killMe()
 {
     this->~Basemodule();

@@ -35,6 +35,8 @@ class Basemodule : public DBManager
         QString getCurrentProfile();
         bool getCurrentProfileChanged();
 
+        virtual void onAfterInit(void);
+
     private:
 
         QVariantMap mAvailableModuleLibs;
@@ -122,6 +124,7 @@ class Basemodule : public DBManager
          *       NOT onExternalEventRoot (which is final).
          */
         virtual void onExternalEvent(OST::ExtEvent event);
+
 
 }
 ;

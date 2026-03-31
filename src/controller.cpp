@@ -240,6 +240,7 @@ bool Controller::loadModule(QString lib, QString label, QString profile)
         }
     }
 
+    mod->onAfterInit();
     wshandler->onModuleEvent(OST::EvType::aa, QVariant(), nullptr, nullptr, nullptr, mod);
     return true;
 

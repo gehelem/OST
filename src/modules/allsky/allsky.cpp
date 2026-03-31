@@ -83,13 +83,18 @@ Allsky::Allsky(QString name, QString label, QString profile, QVariantMap availab
 
     calculateSunset();
 
-
 }
 
 Allsky::~Allsky()
 {
     //Q_CLEANUP_RESOURCE(dummy);
 }
+
+void Allsky::onAfterInit(void)
+{
+    checkArchives();
+};
+
 void Allsky::onExternalEvent(OST::ExtEvent event)
 {
     if (event.ev == OST::ExtEvType::SV && event.prpkey == "actions")
