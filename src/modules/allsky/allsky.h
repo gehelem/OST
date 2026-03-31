@@ -18,6 +18,7 @@ class MODULE_INIT Allsky : public IndiModule
     public:
         Allsky(QString name, QString label, QString profile, QVariantMap availableModuleLibs);
         ~Allsky();
+        void onAfterInit(void) override ;
 
     public slots:
         void onExternalEvent(OST::ExtEvent event) override;
@@ -32,7 +33,7 @@ class MODULE_INIT Allsky : public IndiModule
         void stopLoop();
         void startTimelapseBatch();
         void processOutput();
-        void processError();
+        void processError(QProcess::ProcessError error);
         void computeExposureOrGain(double fromValue);
         void checkArchives(void);
         void moveCurrentToArchives(void);

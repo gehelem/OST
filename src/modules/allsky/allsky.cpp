@@ -24,7 +24,7 @@ Allsky::Allsky(QString name, QString label, QString profile, QVariantMap availab
     setMetadata("thisGitmessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
     setMetadata("description", "Allsky camera module");
     setMetadata("thisversion", "0.1");
-    setMetadata("template", "allsky");
+    setMetadata("template", "default");
 
 
     giveMeADevice("camera", "Camera", INDI::BaseDevice::CCD_INTERFACE);
@@ -65,7 +65,8 @@ Allsky::Allsky(QString name, QString label, QString profile, QVariantMap availab
 
     _process = new QProcess(this);
     connect(_process, &QProcess::readyReadStandardOutput, this, &Allsky::processOutput);
-    connect(_process, &QProcess::readyReadStandardError, this, &Allsky::processError);
+    //connect(_process, &QProcess::readyReadStandardError, this, &Allsky::processError);
+    connect(_process, &QProcess::errorOccurred, this, &Allsky::processError);
     connect(_process, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this,
             &Allsky::processFinished);
 
@@ -133,9 +134,7 @@ void Allsky::onExternalEvent(OST::ExtEvent event)
 
     if (event.ev == OST::ExtEvType::SV && event.prpkey == "parms" && event.eltkey == "exposure")
     {
-        //double f = e.data["parms"].toMap()["elements"].toMap()["exposure"].toFloat();
-        double f = 1;
-        qDebug() << "############# " << event.data;
+        double f = event.data[event.eltkey].toDouble();
         int  d = getInt("parms", "delay");
         if ( f > d )
         {
@@ -149,10 +148,7 @@ void Allsky::onExternalEvent(OST::ExtEvent event)
 
     if (event.ev == OST::ExtEvType::SV && event.prpkey == "parms" && event.eltkey == "delay")
     {
-        //int d = e.data["parms"].toMap()["elements"].toMap()["delay"].toInt();
-        //int d= event.data.
-        double d = 1;
-        qDebug() << "############# " << event.data;
+        double d = event.data[event.eltkey].toInt();
         double  e = getFloat("parms", "exposure");
         if ( e > d )
         {
@@ -160,6 +156,11 @@ void Allsky::onExternalEvent(OST::ExtEvent event)
             getEltFloat("parms", "exposure")->setValue(d * 0.95, true);
         }
         getEltInt("parms", "delay")->setValue(d, true);
+    }
+
+    if (event.ev == OST::ExtEvType::GF && event.prpkey == "archives")
+    {
+        getProperty(event.prpkey)->fetchLine(event.line);
     }
 
     //    if (getModuleName() == e.module)
@@ -302,12 +303,15 @@ void Allsky::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
 void Allsky::processOutput()
 {
     QString output = _process->readAllStandardOutput();
-    //qDebug() << "PROCESS LOG   " << output;
+    logDebug("Process output log : %1", {output});
 }
-void Allsky::processError()
+void Allsky::processError(QProcess::ProcessError error)
 {
-    QString output = _process->readAllStandardError();
-    qDebug() << "Process log : " + output;
+    //QString output = _process->readAllStandardError();
+    logWarning("Process error log : %1", {static_cast<int>(error)});
+    logWarning("Timelapse failed");
+    if (!mIsLooping) moveCurrentToArchives();
+
 }
 void Allsky::newBLOB(INDI::PropertyBlob pblob)
 {
