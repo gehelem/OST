@@ -239,7 +239,7 @@ QJsonObject PropertyJsonDumper::dumpGridCreate(PropertyMulti* pProperty)
     QJsonObject json;
     if (pProperty->hasGrid() && pProperty->getGrid().count() > 0 )
     {
-        int i = pProperty->getGrid().count() - 1;
+        int i = mData.toInt();
         QJsonObject values;
         foreach(QString elt, pProperty->getGridHeaders())
         {
