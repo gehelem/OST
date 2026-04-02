@@ -1121,7 +1121,7 @@ bool IndiModule::setFocalLengthAndDiameter()
 
 bool IndiModule::setFocalLengthAndDiameter(QString device, double fl, double diam)
 {
-    logWarning("setFocalLengthAndDiameter %1 %2 %3", {device, fl, diam});
+    //logDebug("setFocalLengthAndDiameter %1 %2 %3", {device, fl, diam});
 
     if (fl < 1)
     {
