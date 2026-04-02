@@ -234,20 +234,26 @@ void Allsky::startLoop()
     setBLOBMode(B_ALSO, getString("devices", "camera").toStdString().c_str(), nullptr);
     enableDirectBlobAccess(getString("devices", "camera").toStdString().c_str(), nullptr);
 
+    if (!setFocalLengthAndDiameter())
+    {
+        getProperty("actions")->setState(OST::Error, true);
+        mIsLooping = false;
+        return;
+    }
+
     if (!requestCapture(getString("devices", "camera"), getFloat("parms", "exposure"), getInt("parms", "gain"), getInt("parms",
                         "offset")))
     {
         getProperty("actions")->setState(OST::Error, true);
         mIsLooping = false;
+        return;
     }
-    else
-    {
-        mTimer.setInterval(getInt("parms", "delay") * 1000);
-        connect(&mTimer, &QTimer::timeout, this, &Allsky::OnTimer);
-        mTimer.start();
-        getProperty("actions")->setState(OST::Busy, true);
-        mIsLooping = true;
-    }
+
+    mTimer.setInterval(getInt("parms", "delay") * 1000);
+    connect(&mTimer, &QTimer::timeout, this, &Allsky::OnTimer);
+    mTimer.start();
+    getProperty("actions")->setState(OST::Busy, true);
+    mIsLooping = true;
 
 }
 void Allsky::stopLoop()
