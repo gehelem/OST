@@ -127,6 +127,26 @@ OST::ElementTime* Datastore::getEltTime(QString pProperty, QString pElement)
     }
     return static_cast<OST::ElementTime*>(p->getElt(pElement));
 }
+OST::ElementDateTime* Datastore::getEltDateTime(QString pProperty, QString pElement)
+{
+    OST::PropertyMulti* p = getProperty(pProperty);
+    if (p == nullptr)
+    {
+        logWarning("getEltDateTime - property %1 not found", {pProperty});
+        return nullptr;
+    }
+    if (!p->getElts()->contains(pElement))
+    {
+        logWarning("getEltDateTime - property %1 : element %2 not found", {pProperty, pElement});
+        return nullptr;
+    }
+    if (p->getElt(pElement)->getType() != "datetime")
+    {
+        logWarning("getEltDateTime - property %1 : element %2 is not datetime", {pProperty, pElement});
+        return nullptr;
+    }
+    return static_cast<OST::ElementDateTime*>(p->getElt(pElement));
+}
 
 QString Datastore::getString(QString pProperty, QString pElement)
 {

@@ -480,8 +480,7 @@ void Allsky::newBLOB(INDI::PropertyBlob pblob)
         QString _n = QStringLiteral("%1").arg(_index, 10, 10, QLatin1Char('0'));
         im.save(getWebroot() + "/" + getModuleName() + "/" + mFolder + + "/images/" + _n + ".jpeg", "JPG", 100);
 
-        double tt = QDateTime::currentDateTime().toMSecsSinceEpoch();
-        getEltFloat("log", "time")->setValue(tt, false);
+        getEltDateTime("log", "time")->setValue(QDateTime::currentDateTime(), false);
         getEltFloat("log", "snr")->setValue(_image->getStats().SNR, true);
         getProperty("log")->push();
 
@@ -526,8 +525,7 @@ void Allsky::updateProperty(INDI::Property property)
         &&  (property.getName()   == std::string("WEATHER_PARAMETERS"))
     )
     {
-        double dd = QDateTime::currentDateTime().toMSecsSinceEpoch();
-        getEltFloat("history", "D")->setValue(dd, true);
+        getEltDateTime("history", "D")->setValue(QDateTime::currentDateTime(), true);
         INDI::PropertyNumber n = property;
         for (int i = 0; i < n.size(); i++)
         {

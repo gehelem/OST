@@ -81,6 +81,7 @@ class Datastore : public QObject
         OST::ElementPrg* getEltPrg(QString pProperty, QString pElement);
         OST::ElementDate* getEltDate(QString pProperty, QString pElement);
         OST::ElementTime* getEltTime(QString pProperty, QString pElement);
+        OST::ElementDateTime* getEltDateTime(QString pProperty, QString pElement);
 
         QString getString(QString pProperty, QString pElement);
         QString getString(QString pProperty, QString pElement, long line);

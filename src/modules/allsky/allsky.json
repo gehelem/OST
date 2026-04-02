@@ -123,7 +123,7 @@
         "e": {
                 "time": {
                     "label": "Time",
-                    "type": "float",
+                    "type": "datetime",
                     "order":"1",
                     "value":0
                 },
@@ -446,7 +446,7 @@
                 "order":"A"
             },
             "D": {
-                "type": "float",
+                "type": "datetime",
                 "order":"B"
             },
             "Y": {
