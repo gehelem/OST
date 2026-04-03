@@ -103,13 +103,13 @@ bool Basemodule::onExternalEventBase(OST::ExtEvent event)
         case OST::ExtEvType::CL:
         case OST::ExtEvType::CS:
         {
-            logError("Basemodule::onExternalEvent - invalid event here - %1", {OST::ExtEvToString(event.ev)});
+            logError("Basemodule::onExternalEventBase - invalid event here - %1", {OST::ExtEvToString(event.ev)});
             return false;
         }
         default:
             if (!event.data.contains("m") || !event.data["m"].toObject().contains(this->getModuleName()) )
             {
-                logError("Basemodule::onExternalEvent - invalid event data content - %1", {OST::ExtEvToString(event.ev)});
+                logError("Basemodule::onExternalEventBase - invalid event data content - %1", {OST::ExtEvToString(event.ev)});
                 return false;
             };
     }
@@ -124,7 +124,7 @@ bool Basemodule::onExternalEventBase(OST::ExtEvent event)
     {
         if(!o.contains("profile"))
         {
-            logError("Basemodule::onExternalEvent - invalid profile load data content - %1", {OST::ExtEvToString(event.ev)});
+            logError("Basemodule::onExternalEventBase - invalid profile load data content - %1", {OST::ExtEvToString(event.ev)});
             return false;
         }
         if (this->loadProfile(o["profile"].toString()))
@@ -142,7 +142,7 @@ bool Basemodule::onExternalEventBase(OST::ExtEvent event)
     {
         if(!o.contains("profile"))
         {
-            logError("Basemodule::onExternalEvent - invalid profile save data content - %1", {OST::ExtEvToString(event.ev)});
+            logError("Basemodule::onExternalEventBase - invalid profile save data content - %1", {OST::ExtEvToString(event.ev)});
             return false;
         }
         if (this->saveProfile(o["profile"].toString()))
@@ -167,19 +167,19 @@ bool Basemodule::onExternalEventBase(OST::ExtEvent event)
     //    GR,        /*!< grid reset */
     if (!getStore().contains(event.prpkey) )
     {
-        logError("Basemodule::onExternalEvent - property %1 not found", {event.prpkey});
+        logError("Basemodule::onExternalEventBase - property %1 not found", {event.prpkey});
         return false;
     }
 
     if (!getStore()[event.prpkey]->isEnabled())
     {
-        logError("Basemodule::onExternalEvent - property %1 is disabled, can't update", {event.prpkey});
+        logError("Basemodule::onExternalEventBase - property %1 is disabled, can't update", {event.prpkey});
         return false;
     }
 
     if (getStore()[event.prpkey]->permission() == OST::Permission::ReadOnly)
     {
-        logError("Basemodule::onExternalEvent - property %1 is readonly, can't update", {event.prpkey});
+        logError("Basemodule::onExternalEventBase - property %1 is readonly, can't update", {event.prpkey});
         return false;
     }
     QJsonObject p = o["p"].toObject();
@@ -189,7 +189,7 @@ bool Basemodule::onExternalEventBase(OST::ExtEvent event)
     {
         if (!getStore()[event.prpkey]->getElts()->contains(event.eltkey ))
         {
-            logError("Basemodule::onExternalEvent - element %1-%2 not found", {event.prpkey, event.eltkey});
+            logError("Basemodule::onExternalEventBase - element %1-%2 not found", {event.prpkey, event.eltkey});
             return false;
         }
         if (getStore()[event.prpkey]->getElt(event.eltkey)->autoUpdate() || getStore()[event.prpkey]->autoUpdate())
@@ -211,14 +211,14 @@ bool Basemodule::onExternalEventBase(OST::ExtEvent event)
         /* property must have a grid */
         if (!getStore()[event.prpkey]->hasGrid())
         {
-            logError("Basemodule::onExternalEvent - property %1 has no grid", {event.prpkey});
+            logError("Basemodule::onExternalEventBase - property %1 has no grid", {event.prpkey});
             return false;
         }
         /* these events need a line */
         if (event.line < 0 && (event.ev == OST::ExtEvType::GU || event.ev == OST::ExtEvType::GF || event.ev == OST::ExtEvType::GD
                                || event.ev == OST::ExtEvType::GH || event.ev == OST::ExtEvType::GB))
         {
-            logError("Basemodule::onExternalEvent - missing line value", {event.prpkey});
+            logError("Basemodule::onExternalEventBase - missing line value", {event.prpkey});
             return false;
         }
 
@@ -480,6 +480,44 @@ bool Basemodule::loadProfile(const QString &pProfileName)
                             {
                                 getEltBool(key, eltkey)->setValue(vv.toBool(), true);
                             }
+                            if (getEltBase(key, eltkey)->getType() == "time")
+                            {
+                                int hh = vv.toMap()["hh"].toInt();
+                                int mm = vv.toMap()["mm"].toInt();
+                                int ss = vv.toMap()["ss"].toInt();
+                                int ms = vv.toMap()["ms"].toInt();
+                                QTime tt;
+                                tt.setHMS(hh, mm, ss, ms);
+                                getEltTime(key, eltkey)->setValue(tt, true);
+                            }
+                            if (getEltBase(key, eltkey)->getType() == "date")
+                            {
+                                int d = vv.toMap()["day"].toInt();
+                                int m = vv.toMap()["month"].toInt();
+                                int y = vv.toMap()["year"].toInt();
+                                QDate dd;
+                                dd.setDate(y, m, d);
+                                getEltDate(key, eltkey)->setValue(dd, true);
+                            }
+                            if (getEltBase(key, eltkey)->getType() == "datetime")
+                            {
+                                int hh = vv.toMap()["hh"].toInt();
+                                int mm = vv.toMap()["mm"].toInt();
+                                int ss = vv.toMap()["ss"].toInt();
+                                int ms = vv.toMap()["ms"].toInt();
+                                int d =  vv.toMap()["day"].toInt();
+                                int m =  vv.toMap()["month"].toInt();
+                                int y =  vv.toMap()["year"].toInt();
+                                QDate dd;
+                                QTime tt;
+                                QDateTime dt;
+                                dd.setDate(y, m, d);
+                                tt.setHMS(hh, mm, ss, ms);
+                                dt.setDate(dd);
+                                dt.setTime(tt);
+                                getEltDateTime(key, eltkey)->setValue(dt, true);
+                            }
+
                             if (getEltBase(key, eltkey)->getType() == "prg")
                             {
                                 getEltPrg(key, eltkey)->setPrgValue(vv.toMap()["value"].toInt(), false);
