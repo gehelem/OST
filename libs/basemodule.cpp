@@ -557,6 +557,24 @@ bool Basemodule::loadProfile(const QString &pProfileName)
                             dd.setDate(y, m, d);
                             getEltDate(key, eltkey)->setValue(dd, true);
                         }
+                        if (getEltBase(key, eltkey)->getType() == "datetime")
+                        {
+                            int hh = props[key].toMap()["e"].toMap()[eltkey].toMap()["hh"].toInt();
+                            int mm = props[key].toMap()["e"].toMap()[eltkey].toMap()["mm"].toInt();
+                            int ss = props[key].toMap()["e"].toMap()[eltkey].toMap()["ss"].toInt();
+                            int ms = props[key].toMap()["e"].toMap()[eltkey].toMap()["ms"].toInt();
+                            int d = props[key].toMap()["e"].toMap()[eltkey].toMap()["day"].toInt();
+                            int m = props[key].toMap()["e"].toMap()[eltkey].toMap()["month"].toInt();
+                            int y = props[key].toMap()["e"].toMap()[eltkey].toMap()["year"].toInt();
+                            QDate dd;
+                            QTime tt;
+                            QDateTime dt;
+                            dd.setDate(y, m, d);
+                            tt.setHMS(hh, mm, ss, ms);
+                            dt.setDate(dd);
+                            dt.setTime(tt);
+                            getEltDateTime(key, eltkey)->setValue(dt, true);
+                        }
 
                     }
                 }
