@@ -326,7 +326,7 @@ void TranslateManager::appendToPendingFile(const QString &sourceText, const QStr
     stream << doc.toString(4);
     file.close();
 
-    qDebug() << "Added to" << pendingFilePath << ":" << sourceText;
+    //qDebug() << "Added to" << pendingFilePath << ":" << sourceText;
 }
 
 } // namespace OST
