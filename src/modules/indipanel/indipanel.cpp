@@ -291,8 +291,8 @@ void IndiPanel::newMessage     (INDI::BaseDevice dp, int messageID)
 
 void IndiPanel::onExternalEvent(OST::ExtEvent event)
 {
-    qDebug() << "IndiPanel::onExternalEvent event = " << OST::ExtEvToString(event.ev) << " p=" << event.prpkey << " e=" <<
-             event.eltkey << " l=" << event.lovkey << " i=" << event.line;
+    //qDebug() << "IndiPanel::onExternalEvent event = " << OST::ExtEvToString(event.ev) << " p=" << event.prpkey << " e=" <<
+    //         event.eltkey << " l=" << event.lovkey << " i=" << event.line;
 
     /* don't process Indimodule specific events again */
     if (getStore().value(event.prpkey)->hasProfile()) return;
