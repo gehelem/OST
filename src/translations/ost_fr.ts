@@ -1829,5 +1829,2549 @@
         <source>%1 profile sucessfully loaded</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>createProperty - property %1 already exists.</source>
+        <translation>createProperty - la propriété %1 existe déjà.</translation>
+    </message>
+    <message>
+        <source>%1 %2</source>
+        <translation>%1 %2</translation>
+    </message>
+    <message>
+        <source>ee :</source>
+        <translation>ee :</translation>
+    </message>
+    <message>
+        <source>ea :</source>
+        <translation>ea :</translation>
+    </message>
+    <message>
+        <source>ev :</source>
+        <translation>ev :</translation>
+    </message>
+    <message>
+        <source>ps x3 :</source>
+        <translation>ps x3 :</translation>
+    </message>
+    <message>
+        <source>gc :</source>
+        <translation>gc :</translation>
+    </message>
+    <message>
+        <source>%1 - PropertyMulti::newLine - no array/grid defined</source>
+        <translation>%1 - PropertyMulti::newLine - aucun tableau/grille défini</translation>
+    </message>
+    <message>
+        <source>gu :</source>
+        <translation>gu :</translation>
+    </message>
+    <message>
+        <source>%1 - PropertyMulti::updateLine - no array/grid defined</source>
+        <translation>%1 - PropertyMulti::updateLine - aucun tableau/grille défini</translation>
+    </message>
+    <message>
+        <source>gd :</source>
+        <translation>gd :</translation>
+    </message>
+    <message>
+        <source>%1 - PropertyMulti::Push - no array/grid defined</source>
+        <translation>%1 - PropertyMulti::Push - aucun tableau/grille défini</translation>
+    </message>
+    <message>
+        <source>gc x2:</source>
+        <translation>gc x2:</translation>
+    </message>
+    <message>
+        <source>fetch ?? :</source>
+        <translation>fetch ?? :</translation>
+    </message>
+    <message>
+        <source>%1 - Can't fetch line3 >= 3</source>
+        <translation>%1 - Impossible de lire ligne3 >= 3</translation>
+    </message>
+    <message>
+        <source>%1 - Can't fetch line3 >= 1</source>
+        <translation>%1 - Impossible de lire ligne3 >= 1</translation>
+    </message>
+    <message>
+        <source>updateline ?? :</source>
+        <translation>updateline ?? :</translation>
+    </message>
+    <message>
+        <source>%1 - Can't update line3 >= 1</source>
+        <translation>%1 - Impossible de mettre à jour ligne3 >= 1</translation>
+    </message>
+    <message>
+        <source>%1 - Can't fetch line3 >= 2</source>
+        <translation>%1 - Impossible de lire ligne3 >= 2</translation>
+    </message>
+    <message>
+        <source>%1 - Can't update line3 >= 2</source>
+        <translation>%1 - Impossible de mettre à jour ligne3 >= 2</translation>
+    </message>
+    <message>
+        <source>%1 - Can't update line3 >= 3</source>
+        <translation>%1 - Impossible de mettre à jour ligne3 >= 3</translation>
+    </message>
+    <message>
+        <source>createprop :</source>
+        <translation>createprop :</translation>
+    </message>
+    <message>
+        <source>deleteprop :</source>
+        <translation>deleteprop :</translation>
+    </message>
+    <message>
+        <source>profile </source>
+        <translation>profil </translation>
+    </message>
+    <message>
+        <source>DRIVER_INTERFACE-AUX_INTERFACE</source>
+        <translation>DRIVER_INTERFACE-AUX_INTERFACE</translation>
+    </message>
+    <message>
+        <source>DRIVER_INTERFACE-CCD_INTERFACE</source>
+        <translation>DRIVER_INTERFACE-CCD_INTERFACE</translation>
+    </message>
+    <message>
+        <source>DRIVER_INTERFACE-FILTER_INTERFACE</source>
+        <translation>DRIVER_INTERFACE-FILTER_INTERFACE</translation>
+    </message>
+    <message>
+        <source>DRIVER_INTERFACE-FOCUSER_INTERFACE</source>
+        <translation>DRIVER_INTERFACE-FOCUSER_INTERFACE</translation>
+    </message>
+    <message>
+        <source>DRIVER_INTERFACE-GENERAL_INTERFACE</source>
+        <translation>DRIVER_INTERFACE-GENERAL_INTERFACE</translation>
+    </message>
+    <message>
+        <source>DRIVER_INTERFACE-GPS_INTERFACE</source>
+        <translation>DRIVER_INTERFACE-GPS_INTERFACE</translation>
+    </message>
+    <message>
+        <source>DRIVER_INTERFACE-GUIDER_INTERFACE</source>
+        <translation>DRIVER_INTERFACE-GUIDER_INTERFACE</translation>
+    </message>
+    <message>
+        <source>DRIVER_INTERFACE-TELESCOPE_INTERFACE</source>
+        <translation>DRIVER_INTERFACE-TELESCOPE_INTERFACE</translation>
+    </message>
+    <message>
+        <source>DRIVER_INTERFACE-WEATHER_INTERFACE</source>
+        <translation>DRIVER_INTERFACE-WEATHER_INTERFACE</translation>
+    </message>
+    <message>
+        <source>Global dummy list of strings</source>
+        <translation>Liste globale factice de chaînes</translation>
+    </message>
+    <message>
+        <source>Global dummy list of ints</source>
+        <translation>Liste globale factice d&apos;entiers</translation>
+    </message>
+    <message>
+        <source>Global dummy list of floats</source>
+        <translation>Liste globale factice de décimaux</translation>
+    </message>
+    <message>
+        <source>Rotator</source>
+        <translation>Rotateur</translation>
+    </message>
+    <message>
+        <source>Sky Quality</source>
+        <translation>Qualité du ciel</translation>
+    </message>
+    <message>
+        <source>Telescope</source>
+        <translation>Télescope</translation>
+    </message>
+    <message>
+        <source>Snoop devices</source>
+        <translation>Surveiller les appareils</translation>
+    </message>
+    <message>
+        <source>Crash driver</source>
+        <translation>Planter le driver</translation>
+    </message>
+    <message>
+        <source>Crash</source>
+        <translation>Plantage</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Défaut</translation>
+    </message>
+    <message>
+        <source>Load</source>
+        <translation>Charger</translation>
+    </message>
+    <message>
+        <source>Purge</source>
+        <translation>Purger</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>Sauvegarder</translation>
+    </message>
+    <message>
+        <source>Configuration</source>
+        <translation>Configuration</translation>
+    </message>
+    <message>
+        <source>Disable</source>
+        <translation>Désactiver</translation>
+    </message>
+    <message>
+        <source>Exec</source>
+        <translation>Exécuter</translation>
+    </message>
+    <message>
+        <source>Interface</source>
+        <translation>Interface</translation>
+    </message>
+    <message>
+        <source>Driver Info</source>
+        <translation>Infos driver</translation>
+    </message>
+    <message>
+        <source>DEC (dd:mm:ss)</source>
+        <translation>DEC (dd:mm:ss)</translation>
+    </message>
+    <message>
+        <source>RA (hh:mm:ss)</source>
+        <translation>AD (hh:mm:ss)</translation>
+    </message>
+    <message>
+        <source>EQ PE</source>
+        <translation>EQ PE</translation>
+    </message>
+    <message>
+        <source>Period (ms)</source>
+        <translation>Période (ms)</translation>
+    </message>
+    <message>
+        <source>Polling</source>
+        <translation>Scrutation</translation>
+    </message>
+    <message>
+        <source>Disabled</source>
+        <translation>Désactivé</translation>
+    </message>
+    <message>
+        <source>Enabled</source>
+        <translation>Activé</translation>
+    </message>
+    <message>
+        <source>Bayer</source>
+        <translation>Bayer</translation>
+    </message>
+    <message>
+        <source>Limiting Mag</source>
+        <translation>Magnitude limite</translation>
+    </message>
+    <message>
+        <source>CCD Maximum ADU</source>
+        <translation>CCD ADU maximum</translation>
+    </message>
+    <message>
+        <source>CCD Noise</source>
+        <translation>Bruit CCD</translation>
+    </message>
+    <message>
+        <source>Oag Offset (arcminutes)</source>
+        <translation>Décalage OAG (arcminutes)</translation>
+    </message>
+    <message>
+        <source>PE Max (arcsec)</source>
+        <translation>EP max (arcsec)</translation>
+    </message>
+    <message>
+        <source>PE Period (seconds)</source>
+        <translation>Période EP (secondes)</translation>
+    </message>
+    <message>
+        <source>PAE (arcminutes)</source>
+        <translation>PAE (arcminutes)</translation>
+    </message>
+    <message>
+        <source>PAE Drift (minutes)</source>
+        <translation>Dérive PAE (minutes)</translation>
+    </message>
+    <message>
+        <source>CCD Rotation</source>
+        <translation>Rotation CCD</translation>
+    </message>
+    <message>
+        <source>Saturation Mag</source>
+        <translation>Magnitude de saturation</translation>
+    </message>
+    <message>
+        <source>Sky Glow (magnitudes)</source>
+        <translation>Pollution lumineuse (magnitudes)</translation>
+    </message>
+    <message>
+        <source>Time Factor (x)</source>
+        <translation>Facteur temps (x)</translation>
+    </message>
+    <message>
+        <source>CCD X resolution</source>
+        <translation>Résolution CCD en X</translation>
+    </message>
+    <message>
+        <source>CCD X Pixel Size</source>
+        <translation>Taille pixel CCD en X</translation>
+    </message>
+    <message>
+        <source>CCD Y resolution</source>
+        <translation>Résolution CCD en Y</translation>
+    </message>
+    <message>
+        <source>CCD Y Pixel Size</source>
+        <translation>Taille pixel CCD en Y</translation>
+    </message>
+    <message>
+        <source>Max. Position</source>
+        <translation>Position max.</translation>
+    </message>
+    <message>
+        <source>Focus</source>
+        <translation>Focus</translation>
+    </message>
+    <message>
+        <source>Seeing (arcsec)</source>
+        <translation>Seeing (arcsec)</translation>
+    </message>
+    <message>
+        <source>Focus Simulation</source>
+        <translation>Simulation de focus</translation>
+    </message>
+    <message>
+        <source>Serial</source>
+        <translation>Série</translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation>Réseau</translation>
+    </message>
+    <message>
+        <source>Connection Mode</source>
+        <translation>Mode de connexion</translation>
+    </message>
+    <message>
+        <source>Auto Search</source>
+        <translation>Recherche automatique</translation>
+    </message>
+    <message>
+        <source>115200</source>
+        <translation>115200</translation>
+    </message>
+    <message>
+        <source>19200</source>
+        <translation>19200</translation>
+    </message>
+    <message>
+        <source>230400</source>
+        <translation>230400</translation>
+    </message>
+    <message>
+        <source>38400</source>
+        <translation>38400</translation>
+    </message>
+    <message>
+        <source>57600</source>
+        <translation>57600</translation>
+    </message>
+    <message>
+        <source>9600</source>
+        <translation>9600</translation>
+    </message>
+    <message>
+        <source>Baud Rate</source>
+        <translation>Débit en bauds</translation>
+    </message>
+    <message>
+        <source>Ports</source>
+        <translation>Ports</translation>
+    </message>
+    <message>
+        <source>Scan Ports</source>
+        <translation>Scanner les ports</translation>
+    </message>
+    <message>
+        <source>Refresh</source>
+        <translation>Actualiser</translation>
+    </message>
+    <message>
+        <source>Absolute</source>
+        <translation>Absolu</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation>Tout</translation>
+    </message>
+    <message>
+        <source>Relative</source>
+        <translation>Relatif</translation>
+    </message>
+    <message>
+        <source>Timer</source>
+        <translation>Minuterie</translation>
+    </message>
+    <message>
+        <source>Mode</source>
+        <translation>Mode</translation>
+    </message>
+    <message>
+        <source>Timeout</source>
+        <translation>Délai d&apos;attente</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Non</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Oui</translation>
+    </message>
+    <message>
+        <source>Simulate RGB</source>
+        <translation>Simuler RGB</translation>
+    </message>
+    <message>
+        <source>CCD Bias</source>
+        <translation>Biais CCD</translation>
+    </message>
+    <message>
+        <source>DEC drift (a-s/second)</source>
+        <translation>Dérive DEC (a-s/seconde)</translation>
+    </message>
+    <message>
+        <source>Max random DEC add (a-s)</source>
+        <translation>Ajout aléatoire DEC max (a-s)</translation>
+    </message>
+    <message>
+        <source>(CP,TCP), deg</source>
+        <translation>(CP,TCP), degrés</translation>
+    </message>
+    <message>
+        <source>hour hangle, deg</source>
+        <translation>Angle horaire, degrés</translation>
+    </message>
+    <message>
+        <source>Periodic error maxval (a-s)</source>
+        <translation>Erreur périodique valeur max (a-s)</translation>
+    </message>
+    <message>
+        <source>Periodic error period (secs)</source>
+        <translation>Période erreur périodique (secondes)</translation>
+    </message>
+    <message>
+        <source>RA drift (a-s/second)</source>
+        <translation>Dérive AD (a-s/seconde)</translation>
+    </message>
+    <message>
+        <source>Max random RA add (a-s)</source>
+        <translation>Ajout aléatoire AD max (a-s)</translation>
+    </message>
+    <message>
+        <source>Rotation CW (degrees)</source>
+        <translation>Rotation horaire (degrés)</translation>
+    </message>
+    <message>
+        <source>Seeing (a-s)</source>
+        <translation>Seeing (a-s)</translation>
+    </message>
+    <message>
+        <source>Temperature (°C)</source>
+        <translation>Température (°C)</translation>
+    </message>
+    <message>
+        <source>Config</source>
+        <translation>Config</translation>
+    </message>
+    <message>
+        <source>DOME</source>
+        <translation>COUPOLE</translation>
+    </message>
+    <message>
+        <source>Dome ignored</source>
+        <translation>Coupole ignorée</translation>
+    </message>
+    <message>
+        <source>Dome locks</source>
+        <translation>Coupole verrouille</translation>
+    </message>
+    <message>
+        <source>Dome Policy</source>
+        <translation>Politique coupole</translation>
+    </message>
+    <message>
+        <source>Simulation</source>
+        <translation>Simulation</translation>
+    </message>
+    <message>
+        <source>DEC Backlash (ms)</source>
+        <translation>Backlash DEC (ms)</translation>
+    </message>
+    <message>
+        <source>DEC Backlash</source>
+        <translation>Backlash DEC</translation>
+    </message>
+    <message>
+        <source>Hour Angle (deg)</source>
+        <translation>Angle horaire (degrés)</translation>
+    </message>
+    <message>
+        <source>Flip Posn.</source>
+        <translation>Position de retournement</translation>
+    </message>
+    <message>
+        <source>Primary (Ha)</source>
+        <translation>Axe primaire (HA)</translation>
+    </message>
+    <message>
+        <source>Secondary (Dec)</source>
+        <translation>Axe secondaire (Dec)</translation>
+    </message>
+    <message>
+        <source>Mount Axes</source>
+        <translation>Axes de la monture</translation>
+    </message>
+    <message>
+        <source>Cone (CH)</source>
+        <translation>Erreur de cône (CH)</translation>
+    </message>
+    <message>
+        <source>Dec Zero (ID)</source>
+        <translation>Zéro DEC (ID)</translation>
+    </message>
+    <message>
+        <source>Ha Zero (IH)</source>
+        <translation>Zéro HA (IH)</translation>
+    </message>
+    <message>
+        <source>Pole Azm (MA)</source>
+        <translation>Azimut pôle (MA)</translation>
+    </message>
+    <message>
+        <source>Pole elev (ME)</source>
+        <translation>Élévation pôle (ME)</translation>
+    </message>
+    <message>
+        <source>Ha/Dec (NP)</source>
+        <translation>HA/Dec (NP)</translation>
+    </message>
+    <message>
+        <source>Mount Model</source>
+        <translation>Modèle de monture</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation>Désactivé</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation>Activé</translation>
+    </message>
+    <message>
+        <source>Sim Pier Side</source>
+        <translation>Côté de pier (sim.)</translation>
+    </message>
+    <message>
+        <source>Client set language: %1</source>
+        <translation>Client a défini la langue : %1</translation>
+    </message>
+    <message>
+        <source>Controller::onExternalEvent - invalid event data content - %1</source>
+        <translation>Controller::onExternalEvent - contenu de données d&apos;événement invalide - %1</translation>
+    </message>
+    <message>
+        <source>Controller::onExternalEvent - unknown module - %1</source>
+        <translation>Controller::onExternalEvent - module inconnu - %1</translation>
+    </message>
+    <message>
+        <source>Basemodule::onExternalEvent - invalid property data content - %1</source>
+        <translation>Basemodule::onExternalEvent - contenu de données de propriété invalide - %1</translation>
+    </message>
+    <message>
+        <source>Basemodule::onExternalEvent - property %1 not found</source>
+        <translation>Basemodule::onExternalEvent - propriété %1 introuvable</translation>
+    </message>
+    <message>
+        <source>Basemodule::onExternalEvent - invalid element data content - %1</source>
+        <translation>Basemodule::onExternalEvent - contenu de données d&apos;élément invalide - %1</translation>
+    </message>
+    <message>
+        <source>Basemodule::onExternalEvent - element %1/%2 not found</source>
+        <translation>Basemodule::onExternalEvent - élément %1/%2 introuvable</translation>
+    </message>
+    <message>
+        <source>Basemodule::onExternalEvent - okay we can update %1/%2</source>
+        <translation>Basemodule::onExternalEvent - mise à jour de %1/%2 possible</translation>
+    </message>
+    <message>
+        <source>IndiModule::onExternalEvent - okay we can update %1/%2</source>
+        <translation>IndiModule::onExternalEvent - mise à jour de %1/%2 possible</translation>
+    </message>
+    <message>
+        <source>%1 - Indi server disconnected</source>
+        <translation>%1 - Serveur Indi déconnecté</translation>
+    </message>
+    <message>
+        <source>IndiModule::onExternalEvent - element %1/%2 not found</source>
+        <translation>IndiModule::onExternalEvent - élément %1/%2 introuvable</translation>
+    </message>
+    <message>
+        <source>Set blob mode %1</source>
+        <translation>Définir le mode blob %1</translation>
+    </message>
+    <message>
+        <source>Image Data</source>
+        <translation>Données image</translation>
+    </message>
+    <message>
+        <source>X</source>
+        <translation>X</translation>
+    </message>
+    <message>
+        <source>Y</source>
+        <translation>Y</translation>
+    </message>
+    <message>
+        <source>Binning</source>
+        <translation>Binning</translation>
+    </message>
+    <message>
+        <source>Mono</source>
+        <translation>Mono</translation>
+    </message>
+    <message>
+        <source>Format</source>
+        <translation>Format</translation>
+    </message>
+    <message>
+        <source>Compression</source>
+        <translation>Compression</translation>
+    </message>
+    <message>
+        <source>OFF</source>
+        <translation>Désactivé</translation>
+    </message>
+    <message>
+        <source>ON</source>
+        <translation>Activé</translation>
+    </message>
+    <message>
+        <source>Cooler</source>
+        <translation>Refroidisseur</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <translation>Emplacement</translation>
+    </message>
+    <message>
+        <source>Directory</source>
+        <translation>Répertoire</translation>
+    </message>
+    <message>
+        <source>Use Dir.</source>
+        <translation>Utiliser rép.</translation>
+    </message>
+    <message>
+        <source>Duration (s)</source>
+        <translation>Durée (s)</translation>
+    </message>
+    <message>
+        <source>Expose</source>
+        <translation>Exposer</translation>
+    </message>
+    <message>
+        <source>Frames</source>
+        <translation>Images</translation>
+    </message>
+    <message>
+        <source>Fast Count</source>
+        <translation>Nombre rapide</translation>
+    </message>
+    <message>
+        <source>Fast Exposure</source>
+        <translation>Exposition rapide</translation>
+    </message>
+    <message>
+        <source>Height</source>
+        <translation>Hauteur</translation>
+    </message>
+    <message>
+        <source>Width</source>
+        <translation>Largeur</translation>
+    </message>
+    <message>
+        <source>Left </source>
+        <translation>Gauche </translation>
+    </message>
+    <message>
+        <source>Top</source>
+        <translation>Haut</translation>
+    </message>
+    <message>
+        <source>Frame</source>
+        <translation>Fenêtre</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation>Réinitialiser</translation>
+    </message>
+    <message>
+        <source>Frame Values</source>
+        <translation>Valeurs de fenêtre</translation>
+    </message>
+    <message>
+        <source>Bias</source>
+        <translation>Bias</translation>
+    </message>
+    <message>
+        <source>Dark</source>
+        <translation>Dark</translation>
+    </message>
+    <message>
+        <source>Flat</source>
+        <translation>Flat</translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation>Lumière</translation>
+    </message>
+    <message>
+        <source>value</source>
+        <translation>valeur</translation>
+    </message>
+    <message>
+        <source>Bits per pixel</source>
+        <translation>Bits par pixel</translation>
+    </message>
+    <message>
+        <source>Max. Width</source>
+        <translation>Largeur max.</translation>
+    </message>
+    <message>
+        <source>Max. Height</source>
+        <translation>Hauteur max.</translation>
+    </message>
+    <message>
+        <source>Pixel size (um)</source>
+        <translation>Taille du pixel (µm)</translation>
+    </message>
+    <message>
+        <source>Pixel size X</source>
+        <translation>Taille pixel X</translation>
+    </message>
+    <message>
+        <source>Pixel size Y</source>
+        <translation>Taille pixel Y</translation>
+    </message>
+    <message>
+        <source>CCD Information</source>
+        <translation>Informations CCD</translation>
+    </message>
+    <message>
+        <source>1280 x 1024</source>
+        <translation>1280 x 1024</translation>
+    </message>
+    <message>
+        <source>6000 x 4000</source>
+        <translation>6000 x 4000</translation>
+    </message>
+    <message>
+        <source>Custom</source>
+        <translation>Personnalisé</translation>
+    </message>
+    <message>
+        <source>Resolution</source>
+        <translation>Résolution</translation>
+    </message>
+    <message>
+        <source>MJPEG</source>
+        <translation>MJPEG</translation>
+    </message>
+    <message>
+        <source>RAW</source>
+        <translation>RAW</translation>
+    </message>
+    <message>
+        <source>Encoder</source>
+        <translation>Encodeur</translation>
+    </message>
+    <message>
+        <source>Left</source>
+        <translation>Gauche</translation>
+    </message>
+    <message>
+        <source>SER</source>
+        <translation>SER</translation>
+    </message>
+    <message>
+        <source>Recorder</source>
+        <translation>Enregistreur</translation>
+    </message>
+    <message>
+        <source>Temperature (C)</source>
+        <translation>Température (C)</translation>
+    </message>
+    <message>
+        <source>Max. dT (C/min)</source>
+        <translation>dT max. (C/min)</translation>
+    </message>
+    <message>
+        <source>Threshold (C)</source>
+        <translation>Seuil (C)</translation>
+    </message>
+    <message>
+        <source>Temp. Ramp</source>
+        <translation>Rampe de temp.</translation>
+    </message>
+    <message>
+        <source>FITS</source>
+        <translation>FITS</translation>
+    </message>
+    <message>
+        <source>Native</source>
+        <translation>Natif</translation>
+    </message>
+    <message>
+        <source>XISF</source>
+        <translation>XISF</translation>
+    </message>
+    <message>
+        <source>Encode</source>
+        <translation>Encoder</translation>
+    </message>
+    <message>
+        <source>Stream Off</source>
+        <translation>Flux arrêté</translation>
+    </message>
+    <message>
+        <source>Stream On</source>
+        <translation>Flux actif</translation>
+    </message>
+    <message>
+        <source>Video Stream</source>
+        <translation>Flux vidéo</translation>
+    </message>
+    <message>
+        <source>Convolution</source>
+        <translation>Convolution</translation>
+    </message>
+    <message>
+        <source>DFT</source>
+        <translation>DFT</translation>
+    </message>
+    <message>
+        <source>Histogram</source>
+        <translation>Histogramme</translation>
+    </message>
+    <message>
+        <source>IDFT</source>
+        <translation>IDFT</translation>
+    </message>
+    <message>
+        <source>Spectrum</source>
+        <translation>Spectre</translation>
+    </message>
+    <message>
+        <source>Wavelets</source>
+        <translation>Ondelettes</translation>
+    </message>
+    <message>
+        <source>Red</source>
+        <translation>Rouge</translation>
+    </message>
+    <message>
+        <source>Green</source>
+        <translation>Vert</translation>
+    </message>
+    <message>
+        <source>Blue</source>
+        <translation>Bleu</translation>
+    </message>
+    <message>
+        <source>H_Alpha</source>
+        <translation>H_Alpha</translation>
+    </message>
+    <message>
+        <source>SII</source>
+        <translation>SII</translation>
+    </message>
+    <message>
+        <source>OIII</source>
+        <translation>OIII</translation>
+    </message>
+    <message>
+        <source>LPR</source>
+        <translation>LPR</translation>
+    </message>
+    <message>
+        <source>Luminance</source>
+        <translation>Luminance</translation>
+    </message>
+    <message>
+        <source>Filter Slot</source>
+        <translation>Position de filtre</translation>
+    </message>
+    <message>
+        <source>Comment</source>
+        <translation>Commentaire</translation>
+    </message>
+    <message>
+        <source>Value</source>
+        <translation>Valeur</translation>
+    </message>
+    <message>
+        <source>FITS Header</source>
+        <translation>En-tête FITS</translation>
+    </message>
+    <message>
+        <source>Average (1 sec.)</source>
+        <translation>Moyenne (1 sec.)</translation>
+    </message>
+    <message>
+        <source>Instant.</source>
+        <translation>Instantané</translation>
+    </message>
+    <message>
+        <source>FPS</source>
+        <translation>FPS</translation>
+    </message>
+    <message>
+        <source>Guide Head</source>
+        <translation>Caméra de guidage</translation>
+    </message>
+    <message>
+        <source>Maximum Buffer Size (MB)</source>
+        <translation>Taille max. du tampon (Mo)</translation>
+    </message>
+    <message>
+        <source>Maximum Preview FPS</source>
+        <translation>FPS max. en prévisualisation</translation>
+    </message>
+    <message>
+        <source>Limits</source>
+        <translation>Limites</translation>
+    </message>
+    <message>
+        <source>Dir.</source>
+        <translation>Rép.</translation>
+    </message>
+    <message>
+        <source>Record File</source>
+        <translation>Fichier d&apos;enregistrement</translation>
+    </message>
+    <message>
+        <source>Duration (sec)</source>
+        <translation>Durée (sec)</translation>
+    </message>
+    <message>
+        <source>Record Options</source>
+        <translation>Options d&apos;enregistrement</translation>
+    </message>
+    <message>
+        <source>Record (Duration)</source>
+        <translation>Enregistrer (durée)</translation>
+    </message>
+    <message>
+        <source>Record (Frames)</source>
+        <translation>Enregistrer (images)</translation>
+    </message>
+    <message>
+        <source>Record Off</source>
+        <translation>Enregistrement arrêté</translation>
+    </message>
+    <message>
+        <source>Record On</source>
+        <translation>Enregistrement actif</translation>
+    </message>
+    <message>
+        <source>Video Record</source>
+        <translation>Enregistrement vidéo</translation>
+    </message>
+    <message>
+        <source>Aperture (mm)</source>
+        <translation>Ouverture (mm)</translation>
+    </message>
+    <message>
+        <source>Focal Length (mm)</source>
+        <translation>Focale (mm)</translation>
+    </message>
+    <message>
+        <source>Scope</source>
+        <translation>Télescope</translation>
+    </message>
+    <message>
+        <source>Divisor</source>
+        <translation>Diviseur</translation>
+    </message>
+    <message>
+        <source>Video Stream Delay</source>
+        <translation>Délai du flux vidéo</translation>
+    </message>
+    <message>
+        <source>North (ms)</source>
+        <translation>Nord (ms)</translation>
+    </message>
+    <message>
+        <source>South (ms)</source>
+        <translation>Sud (ms)</translation>
+    </message>
+    <message>
+        <source>Guide N/S</source>
+        <translation>Guidage N/S</translation>
+    </message>
+    <message>
+        <source>East (ms)</source>
+        <translation>Est (ms)</translation>
+    </message>
+    <message>
+        <source>West (ms)</source>
+        <translation>Ouest (ms)</translation>
+    </message>
+    <message>
+        <source>Guide E/W</source>
+        <translation>Guidage E/O</translation>
+    </message>
+    <message>
+        <source>Both</source>
+        <translation>Les deux</translation>
+    </message>
+    <message>
+        <source>Client</source>
+        <translation>Client</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>Local</translation>
+    </message>
+    <message>
+        <source>Upload</source>
+        <translation>Téléverser</translation>
+    </message>
+    <message>
+        <source>Dir</source>
+        <translation>Rép</translation>
+    </message>
+    <message>
+        <source>Prefix</source>
+        <translation>Préfixe</translation>
+    </message>
+    <message>
+        <source>Upload Settings</source>
+        <translation>Paramètres de téléversement</translation>
+    </message>
+    <message>
+        <source>WCS</source>
+        <translation>WCS</translation>
+    </message>
+    <message>
+        <source>Seconds</source>
+        <translation>Secondes</translation>
+    </message>
+    <message>
+        <source>Filter Delay</source>
+        <translation>Délai filtre</translation>
+    </message>
+    <message>
+        <source>SII0</source>
+        <translation>SII0</translation>
+    </message>
+    <message>
+        <source>OIII0</source>
+        <translation>OIII0</translation>
+    </message>
+    <message>
+        <source>LPR0</source>
+        <translation>LPR0</translation>
+    </message>
+    <message>
+        <source>Luminance0</source>
+        <translation>Luminance0</translation>
+    </message>
+    <message>
+        <source>Device</source>
+        <translation>Appareil</translation>
+    </message>
+    <message>
+        <source>Snoop Joystick</source>
+        <translation>Surveiller le joystick</translation>
+    </message>
+    <message>
+        <source>Joystick</source>
+        <translation>Joystick</translation>
+    </message>
+    <message>
+        <source>Steps</source>
+        <translation>Pas</translation>
+    </message>
+    <message>
+        <source>Absolute Position</source>
+        <translation>Position absolue</translation>
+    </message>
+    <message>
+        <source>Value (uS)</source>
+        <translation>Valeur (µs)</translation>
+    </message>
+    <message>
+        <source>Delay</source>
+        <translation>Délai</translation>
+    </message>
+    <message>
+        <source>Backlash</source>
+        <translation>Backlash</translation>
+    </message>
+    <message>
+        <source>Focus In</source>
+        <translation>Focaliser vers l&apos;intérieur</translation>
+    </message>
+    <message>
+        <source>Focus Out</source>
+        <translation>Focaliser vers l&apos;extérieur</translation>
+    </message>
+    <message>
+        <source>Direction</source>
+        <translation>Direction</translation>
+    </message>
+    <message>
+        <source>Focus Speed</source>
+        <translation>Vitesse de focus</translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation>Vitesse</translation>
+    </message>
+    <message>
+        <source>Celsius</source>
+        <translation>Celsius</translation>
+    </message>
+    <message>
+        <source>arcseconds</source>
+        <translation>arcseconds</translation>
+    </message>
+    <message>
+        <source>FWHM</source>
+        <translation>FWHM</translation>
+    </message>
+    <message>
+        <source>Preset 1</source>
+        <translation>Préréglage 1</translation>
+    </message>
+    <message>
+        <source>Preset 2</source>
+        <translation>Préréglage 2</translation>
+    </message>
+    <message>
+        <source>Preset 3</source>
+        <translation>Préréglage 3</translation>
+    </message>
+    <message>
+        <source>Goto</source>
+        <translation>Aller à</translation>
+    </message>
+    <message>
+        <source>Presets</source>
+        <translation>Préréglages</translation>
+    </message>
+    <message>
+        <source>Relative Position</source>
+        <translation>Position relative</translation>
+    </message>
+    <message>
+        <source>Seeing</source>
+        <translation>Seeing</translation>
+    </message>
+    <message>
+        <source>%1 - PropertyMulti::setAll incomplete values, %2 missing </source>
+        <translation>%1 - PropertyMulti::setAll valeurs incomplètes, %2 manquant(s)</translation>
+    </message>
+    <message>
+        <source>%1 - Unable to find %2/%3 property. Aborting.</source>
+        <translation>%1 - Propriété %2/%3 introuvable. Abandon.</translation>
+    </message>
+    <message>
+        <source>%1 - PropertyMulti::setValue - DISCONNECT - OneOfMany - can't just unset</source>
+        <translation>%1 - PropertyMulti::setValue - DISCONNECT - OneOfMany - impossible de simplement désactiver</translation>
+    </message>
+    <message>
+        <source>%1 - PropertyMulti::setValue - CONNECT - OneOfMany - can't just unset</source>
+        <translation>%1 - PropertyMulti::setValue - CONNECT - OneOfMany - impossible de simplement désactiver</translation>
+    </message>
+    <message>
+        <source>%1 - PropertyMulti::setValue - PARK - OneOfMany - can't just unset</source>
+        <translation>%1 - PropertyMulti::setValue - PARK - OneOfMany - impossible de simplement désactiver</translation>
+    </message>
+    <message>
+        <source>Basemodule::onExternalEvent - invalid profile load data content - %1</source>
+        <translation>Basemodule::onExternalEvent - contenu de chargement de profil invalide - %1</translation>
+    </message>
+    <message>
+        <source>Error loading profile %1</source>
+        <translation>Erreur lors du chargement du profil %1</translation>
+    </message>
+    <message>
+        <source>Profile %1 loaded</source>
+        <translation>Profil %1 chargé</translation>
+    </message>
+    <message>
+        <source>%1 - Unable to find %2 device. Aborting.</source>
+        <translation>%1 - Appareil %2 introuvable. Abandon.</translation>
+    </message>
+    <message>
+        <source>Controller::onExternalEvent - invalid event data content size - %1</source>
+        <translation>Controller::onExternalEvent - taille de contenu de données d&apos;événement invalide - %1</translation>
+    </message>
+    <message>
+        <source>Controller::onExternalEvent - invalid event data content size - &apos;e&apos; key must be unique %1</source>
+        <translation>Controller::onExternalEvent - taille de contenu invalide - la clé &apos;e&apos; doit être unique %1</translation>
+    </message>
+    <message>
+        <source>Controller::onExternalEvent - invalid event data content - data must contain a &apos;i&apos; key  %1</source>
+        <translation>Controller::onExternalEvent - contenu invalide - les données doivent contenir une clé &apos;i&apos; %1</translation>
+    </message>
+    <message>
+        <source>Basemodule::onExternalEvent - element %1-%2 not found</source>
+        <translation>Basemodule::onExternalEvent - élément %1-%2 introuvable</translation>
+    </message>
+    <message>
+        <source>Error saving profile %1</source>
+        <translation>Erreur lors de la sauvegarde du profil %1</translation>
+    </message>
+    <message>
+        <source>Profile %1 saved</source>
+        <translation>Profil %1 sauvegardé</translation>
+    </message>
+    <message>
+        <source>Unable to find %2 device. Aborting.</source>
+        <translation>Appareil %2 introuvable. Abandon.</translation>
+    </message>
+    <message>
+        <source>getGlovString - Globallob %1 not found</source>
+        <translation>getGlovString - GlobalBlob %1 introuvable</translation>
+    </message>
+    <message>
+        <source>%1 - Can't swap lines1/2 > 2</source>
+        <translation>%1 - Impossible d&apos;échanger les lignes 1/2 > 2</translation>
+    </message>
+    <message>
+        <source>Load configuration %1 sucessfull</source>
+        <translation>Chargement de la configuration %1 réussi</translation>
+    </message>
+    <message>
+        <source>Configuration %1 not found</source>
+        <translation>Configuration %1 introuvable</translation>
+    </message>
+    <message>
+        <source>Save configuration %1 sucessfull</source>
+        <translation>Sauvegarde de la configuration %1 réussie</translation>
+    </message>
+    <message>
+        <source>Error loadin library %1 - %2</source>
+        <translation>Erreur lors du chargement de la bibliothèque %1 - %2</translation>
+    </message>
+    <message>
+        <source>Module %1 already loaded - can't load twice</source>
+        <translation>Le module %1 est déjà chargé - impossible de charger deux fois</translation>
+    </message>
+    <message>
+        <source>Dummy</source>
+        <translation>Factice</translation>
+    </message>
+    <message>
+        <source>Dummy1</source>
+        <translation>Factice1</translation>
+    </message>
+    <message>
+        <source>Indipanel</source>
+        <translation>Panneau Indi</translation>
+    </message>
+    <message>
+        <source>libostdummy</source>
+        <translation>libostdummy</translation>
+    </message>
+    <message>
+        <source>libostindipanel</source>
+        <translation>libostindipanel</translation>
+    </message>
+    <message>
+        <source>Focus::startCoarse() begin</source>
+        <translation>Focus::startCoarse() début</translation>
+    </message>
+    <message>
+        <source>Focus::startCoarse() end</source>
+        <translation>Focus::startCoarse() fin</translation>
+    </message>
+    <message>
+        <source>Focus done</source>
+        <translation>Focus terminé</translation>
+    </message>
+    <message>
+        <source>libostfocus</source>
+        <translation>libostfocus</translation>
+    </message>
+    <message>
+        <source>getDbConfiguration - ERROR SQL = %1</source>
+        <translation>getDbConfiguration - ERREUR SQL = %1</translation>
+    </message>
+    <message>
+        <source>getDbConfiguration - ERROR : %1</source>
+        <translation>getDbConfiguration - ERREUR : %1</translation>
+    </message>
+    <message>
+        <source>Load configuration %1 failed</source>
+        <translation>Échec du chargement de la configuration %1</translation>
+    </message>
+    <message>
+        <source>%1 - Unable to find %2 device</source>
+        <translation>%1 - Appareil %2 introuvable</translation>
+    </message>
+    <message>
+        <source>Sequence completed</source>
+        <translation>Séquence terminée</translation>
+    </message>
+    <message>
+        <source>Unable to find  device.</source>
+        <translation>Appareil introuvable.</translation>
+    </message>
+    <message>
+        <source>Starting guiding</source>
+        <translation>Démarrage du guidage</translation>
+    </message>
+    <message>
+        <source>No calibration data found - starting calibration first</source>
+        <translation>Aucune donnée de calibration trouvée - démarrage de la calibration</translation>
+    </message>
+    <message>
+        <source>Failed to read mount DEC position</source>
+        <translation>Échec de la lecture de la position DEC de la monture</translation>
+    </message>
+    <message>
+        <source>Aborting guiding</source>
+        <translation>Arrêt du guidage</translation>
+    </message>
+    <message>
+        <source>Guiding aborted</source>
+        <translation>Guidage annulé</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=13.1, DEC=0.0, Pier=West</source>
+        <translation>Position monture : AD=13.1, DEC=0.0, Côté=Ouest</translation>
+    </message>
+    <message>
+        <source>Initializing calibration sequence</source>
+        <translation>Initialisation de la séquence de calibration</translation>
+    </message>
+    <message>
+        <source>Calibration ready - sending test pulses</source>
+        <translation>Calibration prête - envoi des impulsions de test</translation>
+    </message>
+    <message>
+        <source>Calibration West - step 1/2</source>
+        <translation>Calibration Ouest - étape 1/2</translation>
+    </message>
+    <message>
+        <source>Calibration West - step 2/2</source>
+        <translation>Calibration Ouest - étape 2/2</translation>
+    </message>
+    <message>
+        <source>West calibration complete: 285.00 ms/px (266.06 ms/arcsec, drift=3.76&quot;)</source>
+        <translation>Calibration Ouest terminée : 285.00 ms/px (266.06 ms/arcsec, dérive=3.76&quot;)</translation>
+    </message>
+    <message>
+        <source>Calibration East - step 1/2</source>
+        <translation>Calibration Est - étape 1/2</translation>
+    </message>
+    <message>
+        <source>Calibration East - step 2/2</source>
+        <translation>Calibration Est - étape 2/2</translation>
+    </message>
+    <message>
+        <source>East calibration complete: 286.00 ms/px (266.99 ms/arcsec, drift=3.73&quot;)</source>
+        <translation>Calibration Est terminée : 286.00 ms/px (266.99 ms/arcsec, dérive=3.73&quot;)</translation>
+    </message>
+    <message>
+        <source>Calibration North - step 1/2</source>
+        <translation>Calibration Nord - étape 1/2</translation>
+    </message>
+    <message>
+        <source>Calibration North - step 2/2</source>
+        <translation>Calibration Nord - étape 2/2</translation>
+    </message>
+    <message>
+        <source>North calibration complete: 279.00 ms/px (260.46 ms/arcsec, drift=3.83&quot;)</source>
+        <translation>Calibration Nord terminée : 279.00 ms/px (260.46 ms/arcsec, dérive=3.83&quot;)</translation>
+    </message>
+    <message>
+        <source>Calibration South - step 1/2</source>
+        <translation>Calibration Sud - étape 1/2</translation>
+    </message>
+    <message>
+        <source>Calibration South - step 2/2</source>
+        <translation>Calibration Sud - étape 2/2</translation>
+    </message>
+    <message>
+        <source>South calibration complete: 288.00 ms/px (268.86 ms/arcsec, drift=3.71&quot;)</source>
+        <translation>Calibration Sud terminée : 288.00 ms/px (268.86 ms/arcsec, dérive=3.71&quot;)</translation>
+    </message>
+    <message>
+        <source>DEC compensation applied: DEC=0.0° factor=1.000</source>
+        <translation>Compensation DEC appliquée : DEC=0.0° facteur=1.000</translation>
+    </message>
+    <message>
+        <source>Calibration completed successfully</source>
+        <translation>Calibration terminée avec succès</translation>
+    </message>
+    <message>
+        <source>Grid limits set to 10 frames (rmsOver parameter)</source>
+        <translation>Limite de grille fixée à 10 images (paramètre rmsOver)</translation>
+    </message>
+    <message>
+        <source>Applied stored corrections from calibration: revRA=false, revDE=false</source>
+        <translation>Corrections de calibration appliquées : revAD=false, revDE=false</translation>
+    </message>
+    <message>
+        <source>Calibration performed at DEC: 0.0°</source>
+        <translation>Calibration effectuée à DEC : 0.0°</translation>
+    </message>
+    <message>
+        <source>Current target DEC: 0.0°</source>
+        <translation>DEC cible actuelle : 0.0°</translation>
+    </message>
+    <message>
+        <source>Starting guiding session</source>
+        <translation>Démarrage de la session de guidage</translation>
+    </message>
+    <message>
+        <source>Current DEC: 0.0°</source>
+        <translation>DEC actuelle : 0.0°</translation>
+    </message>
+    <message>
+        <source>RA compensation factor: 1.000 (cos(0.0°))</source>
+        <translation>Facteur de compensation AD : 1.000 (cos(0.0°))</translation>
+    </message>
+    <message>
+        <source>Adjusted calibration: E=286.00 W=285.00 N=279.00 S=288.00 (pixels/sec)</source>
+        <translation>Calibration ajustée : E=286.00 O=285.00 N=279.00 S=288.00 (pixels/sec)</translation>
+    </message>
+    <message>
+        <source>Guider Image</source>
+        <translation>Image du guideur</translation>
+    </message>
+    <message>
+        <source>Eq. Coordinates</source>
+        <translation>Coordonnées éq.</translation>
+    </message>
+    <message>
+        <source>Elevation (m)</source>
+        <translation>Altitude (m)</translation>
+    </message>
+    <message>
+        <source>Lat (dd:mm:ss.s)</source>
+        <translation>Lat (dd:mm:ss.s)</translation>
+    </message>
+    <message>
+        <source>Lon (dd:mm:ss.s)</source>
+        <translation>Lon (dd:mm:ss.s)</translation>
+    </message>
+    <message>
+        <source>Scope Location</source>
+        <translation>Localisation du télescope</translation>
+    </message>
+    <message>
+        <source>N/S Rate</source>
+        <translation>Taux N/S</translation>
+    </message>
+    <message>
+        <source>W/E Rate</source>
+        <translation>Taux O/E</translation>
+    </message>
+    <message>
+        <source>Guiding Rate</source>
+        <translation>Taux de guidage</translation>
+    </message>
+    <message>
+        <source>Slew</source>
+        <translation>Pointer</translation>
+    </message>
+    <message>
+        <source>Sync</source>
+        <translation>Synchroniser</translation>
+    </message>
+    <message>
+        <source>Track</source>
+        <translation>Suivi</translation>
+    </message>
+    <message>
+        <source>On Set</source>
+        <translation>À la mise en place</translation>
+    </message>
+    <message>
+        <source>Slew Target</source>
+        <translation>Pointer la cible</translation>
+    </message>
+    <message>
+        <source>Abort Motion</source>
+        <translation>Annuler le mouvement</translation>
+    </message>
+    <message>
+        <source>Find</source>
+        <translation>Trouver</translation>
+    </message>
+    <message>
+        <source>Go</source>
+        <translation>Aller</translation>
+    </message>
+    <message>
+        <source>Set</source>
+        <translation>Définir</translation>
+    </message>
+    <message>
+        <source>Home</source>
+        <translation>Position initiale</translation>
+    </message>
+    <message>
+        <source>North</source>
+        <translation>Nord</translation>
+    </message>
+    <message>
+        <source>South</source>
+        <translation>Sud</translation>
+    </message>
+    <message>
+        <source>Motion N/S</source>
+        <translation>Mouvement N/S</translation>
+    </message>
+    <message>
+        <source>East</source>
+        <translation>Est</translation>
+    </message>
+    <message>
+        <source>West</source>
+        <translation>Ouest</translation>
+    </message>
+    <message>
+        <source>Motion W/E</source>
+        <translation>Mouvement O/E</translation>
+    </message>
+    <message>
+        <source>ALTAZ</source>
+        <translation>ALTAZ</translation>
+    </message>
+    <message>
+        <source>Fork (Eq)</source>
+        <translation>Fourche (Éq)</translation>
+    </message>
+    <message>
+        <source>GEM</source>
+        <translation>GEM</translation>
+    </message>
+    <message>
+        <source>Mount Type</source>
+        <translation>Type de monture</translation>
+    </message>
+    <message>
+        <source>Park(ed)</source>
+        <translation>Garé</translation>
+    </message>
+    <message>
+        <source>UnPark(ed)</source>
+        <translation>Dégarer</translation>
+    </message>
+    <message>
+        <source>Parking</source>
+        <translation>Mise en garage</translation>
+    </message>
+    <message>
+        <source>Current</source>
+        <translation>Actuel</translation>
+    </message>
+    <message>
+        <source>Purge Data</source>
+        <translation>Purger les données</translation>
+    </message>
+    <message>
+        <source>Write Data</source>
+        <translation>Écrire les données</translation>
+    </message>
+    <message>
+        <source>Park Options</source>
+        <translation>Options de garage</translation>
+    </message>
+    <message>
+        <source>HA (hh:mm:ss)</source>
+        <translation>AH (hh:mm:ss)</translation>
+    </message>
+    <message>
+        <source>Park Position</source>
+        <translation>Position de garage</translation>
+    </message>
+    <message>
+        <source>East (pointing west)</source>
+        <translation>Est (pointant vers l&apos;ouest)</translation>
+    </message>
+    <message>
+        <source>West (pointing east)</source>
+        <translation>Ouest (pointant vers l&apos;est)</translation>
+    </message>
+    <message>
+        <source>Pier Side</source>
+        <translation>Côté du pier</translation>
+    </message>
+    <message>
+        <source>North/South</source>
+        <translation>Nord/Sud</translation>
+    </message>
+    <message>
+        <source>West/East</source>
+        <translation>Ouest/Est</translation>
+    </message>
+    <message>
+        <source>Reverse</source>
+        <translation>Inverser</translation>
+    </message>
+    <message>
+        <source>Centering</source>
+        <translation>Centrage</translation>
+    </message>
+    <message>
+        <source>Max</source>
+        <translation>Max</translation>
+    </message>
+    <message>
+        <source>Slew Rate</source>
+        <translation>Vitesse de pointage</translation>
+    </message>
+    <message>
+        <source>Lunar</source>
+        <translation>Lunaire</translation>
+    </message>
+    <message>
+        <source>Sidereal</source>
+        <translation>Sidéral</translation>
+    </message>
+    <message>
+        <source>Solar</source>
+        <translation>Solaire</translation>
+    </message>
+    <message>
+        <source>Track Mode</source>
+        <translation>Mode de suivi</translation>
+    </message>
+    <message>
+        <source>DE (arcsecs/s)</source>
+        <translation>DE (arcsecs/s)</translation>
+    </message>
+    <message>
+        <source>RA (arcsecs/s)</source>
+        <translation>AD (arcsecs/s)</translation>
+    </message>
+    <message>
+        <source>Track Rates</source>
+        <translation>Taux de suivi</translation>
+    </message>
+    <message>
+        <source>Tracking</source>
+        <translation>Suivi en cours</translation>
+    </message>
+    <message>
+        <source>UTC Offset</source>
+        <translation>Décalage UTC</translation>
+    </message>
+    <message>
+        <source>UTC Time</source>
+        <translation>Heure UTC</translation>
+    </message>
+    <message>
+        <source>UTC</source>
+        <translation>UTC</translation>
+    </message>
+    <message>
+        <source>Resetting calibration data</source>
+        <translation>Réinitialisation des données de calibration</translation>
+    </message>
+    <message>
+        <source>Calibration data reset - recalibration required before guiding</source>
+        <translation>Données de calibration réinitialisées - recalibration requise avant le guidage</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=12.6, DEC=27.7, Pier=West</source>
+        <translation>Position monture : AD=12.6, DEC=27.7, Côté=Ouest</translation>
+    </message>
+    <message>
+        <source>West calibration complete: 319.00 ms/px (297.80 ms/arcsec, drift=3.35&quot;)</source>
+        <translation>Calibration Ouest terminée : 319.00 ms/px (297.80 ms/arcsec, dérive=3.35&quot;)</translation>
+    </message>
+    <message>
+        <source>East calibration complete: 339.00 ms/px (316.47 ms/arcsec, drift=3.16&quot;)</source>
+        <translation>Calibration Est terminée : 339.00 ms/px (316.47 ms/arcsec, dérive=3.16&quot;)</translation>
+    </message>
+    <message>
+        <source>North calibration complete: 280.00 ms/px (261.39 ms/arcsec, drift=3.82&quot;)</source>
+        <translation>Calibration Nord terminée : 280.00 ms/px (261.39 ms/arcsec, dérive=3.82&quot;)</translation>
+    </message>
+    <message>
+        <source>DEC compensation applied: DEC=27.7° factor=0.886</source>
+        <translation>Compensation DEC appliquée : DEC=27.7° facteur=0.886</translation>
+    </message>
+    <message>
+        <source>Calibration performed at DEC: 27.7°</source>
+        <translation>Calibration effectuée à DEC : 27.7°</translation>
+    </message>
+    <message>
+        <source>Current target DEC: 27.7°</source>
+        <translation>DEC cible actuelle : 27.7°</translation>
+    </message>
+    <message>
+        <source>Current DEC: 27.7°</source>
+        <translation>DEC actuelle : 27.7°</translation>
+    </message>
+    <message>
+        <source>RA compensation factor: 0.886 (cos(27.7°))</source>
+        <translation>Facteur de compensation AD : 0.886 (cos(27.7°))</translation>
+    </message>
+    <message>
+        <source>Adjusted calibration: E=338.28 W=318.79 N=280.00 S=288.00 (pixels/sec)</source>
+        <translation>Calibration ajustée : E=338.28 O=318.79 N=280.00 S=288.00 (pixels/sec)</translation>
+    </message>
+    <message>
+        <source>Adjusted calibration: E=253.26 W=252.38 N=279.00 S=288.00 (pixels/sec)</source>
+        <translation>Calibration ajustée : E=253.26 O=252.38 N=279.00 S=288.00 (pixels/sec)</translation>
+    </message>
+    <message>
+        <source>Inspector::initIndi()</source>
+        <translation>Inspector::initIndi()</translation>
+    </message>
+    <message>
+        <source>Inspector::Shoot()</source>
+        <translation>Inspector::Shoot()</translation>
+    </message>
+    <message>
+        <source>Inspector::Shoot() OK</source>
+        <translation>Inspector::Shoot() OK</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=2.0, DEC=60.3, Pier=West</source>
+        <translation>Position monture : AD=2.0, DEC=60.3, Côté=Ouest</translation>
+    </message>
+    <message>
+        <source>Current target DEC: 60.3°</source>
+        <translation>DEC cible actuelle : 60.3°</translation>
+    </message>
+    <message>
+        <source>Current DEC: 60.3°</source>
+        <translation>DEC actuelle : 60.3°</translation>
+    </message>
+    <message>
+        <source>RA compensation factor: 0.496 (cos(60.3°))</source>
+        <translation>Facteur de compensation AD : 0.496 (cos(60.3°))</translation>
+    </message>
+    <message>
+        <source>Adjusted calibration: E=141.72 W=141.22 N=279.00 S=288.00 (pixels/sec)</source>
+        <translation>Calibration ajustée : E=141.72 O=141.22 N=279.00 S=288.00 (pixels/sec)</translation>
+    </message>
+    <message>
+        <source>Starting calibration only</source>
+        <translation>Démarrage de la calibration seule</translation>
+    </message>
+    <message>
+        <source>West calibration complete: 309.00 ms/px (625.00 ms/arcsec, drift=1.60&quot;)</source>
+        <translation>Calibration Ouest terminée : 309.00 ms/px (625.00 ms/arcsec, dérive=1.60&quot;)</translation>
+    </message>
+    <message>
+        <source>East calibration complete: 239.00 ms/px (483.41 ms/arcsec, drift=2.07&quot;)</source>
+        <translation>Calibration Est terminée : 239.00 ms/px (483.41 ms/arcsec, dérive=2.07&quot;)</translation>
+    </message>
+    <message>
+        <source>North calibration complete: 145.00 ms/px (293.28 ms/arcsec, drift=3.39&quot;)</source>
+        <translation>Calibration Nord terminée : 145.00 ms/px (293.28 ms/arcsec, dérive=3.39&quot;)</translation>
+    </message>
+    <message>
+        <source>South calibration complete: 126.00 ms/px (254.85 ms/arcsec, drift=3.91&quot;)</source>
+        <translation>Calibration Sud terminée : 126.00 ms/px (254.85 ms/arcsec, dérive=3.91&quot;)</translation>
+    </message>
+    <message>
+        <source>DEC compensation applied: DEC=60.3° factor=0.496</source>
+        <translation>Compensation DEC appliquée : DEC=60.3° facteur=0.496</translation>
+    </message>
+    <message>
+        <source>Calibration performed at DEC: 60.3°</source>
+        <translation>Calibration effectuée à DEC : 60.3°</translation>
+    </message>
+    <message>
+        <source>Adjusted calibration: E=238.84 W=308.70 N=145.00 S=126.00 (pixels/sec)</source>
+        <translation>Calibration ajustée : E=238.84 O=308.70 N=145.00 S=126.00 (pixels/sec)</translation>
+    </message>
+    <message>
+        <source>Basemodule::onExternalEvent - property %1 is readonly, can't update</source>
+        <translation>Basemodule::onExternalEvent - la propriété %1 est en lecture seule, impossible de mettre à jour</translation>
+    </message>
+    <message>
+        <source>RA compensation factor: 0.495 (cos(60.3°))</source>
+        <translation>Facteur de compensation AD : 0.495 (cos(60.3°))</translation>
+    </message>
+    <message>
+        <source>Adjusted calibration: E=238.82 W=308.68 N=145.00 S=126.00 (pixels/sec)</source>
+        <translation>Calibration ajustée : E=238.82 O=308.68 N=145.00 S=126.00 (pixels/sec)</translation>
+    </message>
+    <message>
+        <source>Adjusted calibration: E=238.83 W=308.69 N=145.00 S=126.00 (pixels/sec)</source>
+        <translation>Calibration ajustée : E=238.83 O=308.69 N=145.00 S=126.00 (pixels/sec)</translation>
+    </message>
+    <message>
+        <source>West calibration complete: 248.00 ms/px (501.62 ms/arcsec, drift=1.99&quot;)</source>
+        <translation>Calibration Ouest terminée : 248.00 ms/px (501.62 ms/arcsec, dérive=1.99&quot;)</translation>
+    </message>
+    <message>
+        <source>East calibration complete: 282.00 ms/px (570.39 ms/arcsec, drift=1.75&quot;)</source>
+        <translation>Calibration Est terminée : 282.00 ms/px (570.39 ms/arcsec, dérive=1.75&quot;)</translation>
+    </message>
+    <message>
+        <source>North calibration complete: 134.00 ms/px (271.04 ms/arcsec, drift=3.67&quot;)</source>
+        <translation>Calibration Nord terminée : 134.00 ms/px (271.04 ms/arcsec, dérive=3.67&quot;)</translation>
+    </message>
+    <message>
+        <source>South calibration complete: 126.00 ms/px (254.85 ms/arcsec, drift=3.89&quot;)</source>
+        <translation>Calibration Sud terminée : 126.00 ms/px (254.85 ms/arcsec, dérive=3.89&quot;)</translation>
+    </message>
+    <message>
+        <source>DEC compensation applied: DEC=60.3° factor=0.495</source>
+        <translation>Compensation DEC appliquée : DEC=60.3° facteur=0.495</translation>
+    </message>
+    <message>
+        <source>Applied stored corrections from calibration: revRA=true, revDE=false</source>
+        <translation>Corrections de calibration appliquées : revAD=true, revDE=false</translation>
+    </message>
+    <message>
+        <source>Adjusted calibration: E=281.94 W=247.75 N=134.00 S=126.00 (pixels/sec)</source>
+        <translation>Calibration ajustée : E=281.94 O=247.75 N=134.00 S=126.00 (pixels/sec)</translation>
+    </message>
+    <message>
+        <source>Adjusted calibration: E=281.93 W=247.74 N=134.00 S=126.00 (pixels/sec)</source>
+        <translation>Calibration ajustée : E=281.93 O=247.74 N=134.00 S=126.00 (pixels/sec)</translation>
+    </message>
+    <message>
+        <source>Grid limits set to 50 frames (rmsOver parameter)</source>
+        <translation>Limite de grille fixée à 50 images (paramètre rmsOver)</translation>
+    </message>
+    <message>
+        <source>Adjusted calibration: E=281.90 W=247.71 N=134.00 S=126.00 (pixels/sec)</source>
+        <translation>Calibration ajustée : E=281.90 O=247.71 N=134.00 S=126.00 (pixels/sec)</translation>
+    </message>
+    <message>
+        <source>Adjusted calibration: E=281.73 W=247.56 N=134.00 S=126.00 (pixels/sec)</source>
+        <translation>Calibration ajustée : E=281.73 O=247.56 N=134.00 S=126.00 (pixels/sec)</translation>
+    </message>
+    <message>
+        <source>Adjusted calibration: E=281.59 W=247.44 N=134.00 S=126.00 (pixels/sec)</source>
+        <translation>Calibration ajustée : E=281.59 O=247.44 N=134.00 S=126.00 (pixels/sec)</translation>
+    </message>
+    <message>
+        <source>We need at least 3 stars to guide - abort</source>
+        <translation>Il faut au moins 3 étoiles pour guider - abandon</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=22.3, DEC=54.1, Pier=East</source>
+        <translation>Position monture : AD=22.3, DEC=54.1, Côté=Est</translation>
+    </message>
+    <message>
+        <source>Current target DEC: 54.1°</source>
+        <translation>DEC cible actuelle : 54.1°</translation>
+    </message>
+    <message>
+        <source>Current DEC: 54.1°</source>
+        <translation>DEC actuelle : 54.1°</translation>
+    </message>
+    <message>
+        <source>RA compensation factor: 0.586 (cos(54.1°))</source>
+        <translation>Facteur de compensation AD : 0.586 (cos(54.1°))</translation>
+    </message>
+    <message>
+        <source>Adjusted calibration: E=333.49 W=293.05 N=134.00 S=126.00 (pixels/sec)</source>
+        <translation>Calibration ajustée : E=333.49 O=293.05 N=134.00 S=126.00 (pixels/sec)</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=14.8, DEC=1.8, Pier=West</source>
+        <translation>Position monture : AD=14.8, DEC=1.8, Côté=Ouest</translation>
+    </message>
+    <message>
+        <source>West calibration complete: 307.00 ms/px (310.48 ms/arcsec, drift=3.21&quot;)</source>
+        <translation>Calibration Ouest terminée : 307.00 ms/px (310.48 ms/arcsec, dérive=3.21&quot;)</translation>
+    </message>
+    <message>
+        <source>East calibration complete: 235.00 ms/px (237.66 ms/arcsec, drift=4.19&quot;)</source>
+        <translation>Calibration Est terminée : 235.00 ms/px (237.66 ms/arcsec, dérive=4.19&quot;)</translation>
+    </message>
+    <message>
+        <source>North calibration complete: 273.00 ms/px (276.09 ms/arcsec, drift=3.62&quot;)</source>
+        <translation>Calibration Nord terminée : 273.00 ms/px (276.09 ms/arcsec, dérive=3.62&quot;)</translation>
+    </message>
+    <message>
+        <source>South calibration complete: 243.00 ms/px (245.75 ms/arcsec, drift=4.05&quot;)</source>
+        <translation>Calibration Sud terminée : 243.00 ms/px (245.75 ms/arcsec, dérive=4.05&quot;)</translation>
+    </message>
+    <message>
+        <source>DEC compensation applied: DEC=1.8° factor=1.000</source>
+        <translation>Compensation DEC appliquée : DEC=1.8° facteur=1.000</translation>
+    </message>
+    <message>
+        <source>Calibration performed at DEC: 1.8°</source>
+        <translation>Calibration effectuée à DEC : 1.8°</translation>
+    </message>
+    <message>
+        <source>Current target DEC: 1.8°</source>
+        <translation>DEC cible actuelle : 1.8°</translation>
+    </message>
+    <message>
+        <source>Current DEC: 1.8°</source>
+        <translation>DEC actuelle : 1.8°</translation>
+    </message>
+    <message>
+        <source>RA compensation factor: 1.000 (cos(1.8°))</source>
+        <translation>Facteur de compensation AD : 1.000 (cos(1.8°))</translation>
+    </message>
+    <message>
+        <source>Adjusted calibration: E=234.89 W=306.85 N=273.00 S=243.00 (pixels/sec)</source>
+        <translation>Calibration ajustée : E=234.89 O=306.85 N=273.00 S=243.00 (pixels/sec)</translation>
+    </message>
+    <message>
+        <source>RA compensation factor: 0.999 (cos(1.8°))</source>
+        <translation>Facteur de compensation AD : 0.999 (cos(1.8°))</translation>
+    </message>
+    <message>
+        <source>Adjusted calibration: E=234.88 W=306.84 N=273.00 S=243.00 (pixels/sec)</source>
+        <translation>Calibration ajustée : E=234.88 O=306.84 N=273.00 S=243.00 (pixels/sec)</translation>
+    </message>
+    <message>
+        <source>IndiModule::newDevice %</source>
+        <translation>IndiModule::newDevice %</translation>
+    </message>
+    <message>
+        <source>IndiModule::newDevice %1</source>
+        <translation>IndiModule::newDevice %1</translation>
+    </message>
+    <message>
+        <source>IndiModule::newProperty %1 %2</source>
+        <translation>IndiModule::newProperty %1 %2</translation>
+    </message>
+    <message>
+        <source>IndiPanel::newProperty %1 %2</source>
+        <translation>IndiPanel::newProperty %1 %2</translation>
+    </message>
+    <message>
+        <source>IndiPanel::updateProperty %1 %2</source>
+        <translation>IndiPanel::updateProperty %1 %2</translation>
+    </message>
+    <message>
+        <source>IndiPanel::removeProperty %1 %2</source>
+        <translation>IndiPanel::removeProperty %1 %2</translation>
+    </message>
+    <message>
+        <source>IndiModule::refreshDeviceslovs</source>
+        <translation>IndiModule::refreshDeviceslovs</translation>
+    </message>
+    <message>
+        <source>IndiPanel::onNewProperty %1 %2</source>
+        <translation>IndiPanel::onNewProperty %1 %2</translation>
+    </message>
+    <message>
+        <source>IndiModule::updateProperty %1 %2</source>
+        <translation>IndiModule::updateProperty %1 %2</translation>
+    </message>
+    <message>
+        <source>IndiModule::removeProperty %1 %2</source>
+        <translation>IndiModule::removeProperty %1 %2</translation>
+    </message>
+    <message>
+        <source>IndiModule::refreshDeviceslovs %1</source>
+        <translation>IndiModule::refreshDeviceslovs %1</translation>
+    </message>
+    <message>
+        <source>IndiModule::newDevice BEGIN %1</source>
+        <translation>IndiModule::newDevice DÉBUT %1</translation>
+    </message>
+    <message>
+        <source>IndiModule::newDevice END   %1</source>
+        <translation>IndiModule::newDevice FIN   %1</translation>
+    </message>
+    <message>
+        <source>IndiModule::OnAfterIndiConnectIndiTimer BEGIN </source>
+        <translation>IndiModule::OnAfterIndiConnectIndiTimer DÉBUT </translation>
+    </message>
+    <message>
+        <source>IndiModule::OnAfterIndiConnectIndiTimer END   </source>
+        <translation>IndiModule::OnAfterIndiConnectIndiTimer FIN   </translation>
+    </message>
+    <message>
+        <source>cameraAlert</source>
+        <translation>Alerte caméra</translation>
+    </message>
+    <message>
+        <source> file = %1</source>
+        <translation> fichier = %1</translation>
+    </message>
+    <message>
+        <source>Searching ngc281</source>
+        <translation>Recherche de ngc281</translation>
+    </message>
+    <message>
+        <source>Searching ngc281 gives no result</source>
+        <translation>La recherche de ngc281 ne donne aucun résultat</translation>
+    </message>
+    <message>
+        <source>Searching m31</source>
+        <translation>Recherche de m31</translation>
+    </message>
+    <message>
+        <source>Searching m31 gives 1 results</source>
+        <translation>La recherche de m31 donne 1 résultat</translation>
+    </message>
+    <message>
+        <source>Searching m13</source>
+        <translation>Recherche de m13</translation>
+    </message>
+    <message>
+        <source>Searching m13 gives 1 results</source>
+        <translation>La recherche de m13 donne 1 résultat</translation>
+    </message>
+    <message>
+        <source>getEltString - property %1 : element %2 not found</source>
+        <translation>getEltString - propriété %1 : élément %2 introuvable</translation>
+    </message>
+    <message>
+        <source>Starting goto with centering: max 5 iterations, tolerance 30.0&quot;</source>
+        <translation>Démarrage du goto avec centrage : max 5 itérations, tolérance 30.0&quot;</translation>
+    </message>
+    <message>
+        <source>Slewing to Andromeda galaxy</source>
+        <translation>Pointage vers la galaxie d&apos;Andromède</translation>
+    </message>
+    <message>
+        <source>Slew finished</source>
+        <translation>Pointage terminé</translation>
+    </message>
+    <message>
+        <source>Shoot new image</source>
+        <translation>Prendre une nouvelle image</translation>
+    </message>
+    <message>
+        <source>Solve new image</source>
+        <translation>Résoudre la nouvelle image</translation>
+    </message>
+    <message>
+        <source>Offset: RA=127.130&quot; DEC=0.468&quot; Total=127.131&quot;</source>
+        <translation>Décalage : AD=127.130&quot; DEC=0.468&quot; Total=127.131&quot;</translation>
+    </message>
+    <message>
+        <source>Centering iteration 1/5 - applying correction</source>
+        <translation>Itération de centrage 1/5 - application de la correction</translation>
+    </message>
+    <message>
+        <source>Slewing to Andromeda galaxy-0.735675-41.41</source>
+        <translation>Pointage vers la galaxie d&apos;Andromède-0.735675-41.41</translation>
+    </message>
+    <message>
+        <source>Applying correction: RA 0.7380h → 0.7357h, DEC 41.41° → 41.41°</source>
+        <translation>Application de la correction : AD 0.7380h → 0.7357h, DEC 41.41° → 41.41°</translation>
+    </message>
+    <message>
+        <source>Image NOT solved - Centering aborted</source>
+        <translation>Image NON résolue - centrage abandonné</translation>
+    </message>
+    <message>
+        <source>%1 - PropertyMulti::setValue - gototarget - can&apos;t update, unhandled type : bool()</source>
+        <translation>%1 - PropertyMulti::setValue - gototarget - impossible de mettre à jour, type non géré : bool()</translation>
+    </message>
+    <message>
+        <source>%1 - atmostone</source>
+        <translation>%1 - atmostone</translation>
+    </message>
+    <message>
+        <source>%1 - atmostone %2 %3</source>
+        <translation>%1 - atmostone %2 %3</translation>
+    </message>
+    <message>
+        <source>Searching m33</source>
+        <translation>Recherche de m33</translation>
+    </message>
+    <message>
+        <source>Searching m33 gives 1 results</source>
+        <translation>La recherche de m33 donne 1 résultat</translation>
+    </message>
+    <message>
+        <source>Slewing to Triangulum galaxy</source>
+        <translation>Pointage vers la galaxie du Triangle</translation>
+    </message>
+    <message>
+        <source>Offset: RA=-86.353&quot; DEC=0.685&quot; Total=86.355&quot;</source>
+        <translation>Décalage : AD=-86.353&quot; DEC=0.685&quot; Total=86.355&quot;</translation>
+    </message>
+    <message>
+        <source>Slewing to Triangulum galaxy-1.58995-30.7923</source>
+        <translation>Pointage vers la galaxie du Triangle-1.58995-30.7923</translation>
+    </message>
+    <message>
+        <source>Applying correction: RA 1.5883h → 1.5899h, DEC 30.79° → 30.79°</source>
+        <translation>Application de la correction : AD 1.5883h → 1.5899h, DEC 30.79° → 30.79°</translation>
+    </message>
+    <message>
+        <source>Offset: RA=170.888&quot; DEC=-0.241&quot; Total=170.888&quot;</source>
+        <translation>Décalage : AD=170.888&quot; DEC=-0.241&quot; Total=170.888&quot;</translation>
+    </message>
+    <message>
+        <source>Centering iteration 2/5 - applying correction</source>
+        <translation>Itération de centrage 2/5 - application de la correction</translation>
+    </message>
+    <message>
+        <source>Slewing to Triangulum galaxy-1.58673-30.7924</source>
+        <translation>Pointage vers la galaxie du Triangle-1.58673-30.7924</translation>
+    </message>
+    <message>
+        <source>Applying correction: RA 1.5899h → 1.5867h, DEC 30.79° → 30.79°</source>
+        <translation>Application de la correction : AD 1.5899h → 1.5867h, DEC 30.79° → 30.79°</translation>
+    </message>
+    <message>
+        <source>Offset: RA=-174.963&quot; DEC=0.233&quot; Total=174.963&quot;</source>
+        <translation>Décalage : AD=-174.963&quot; DEC=0.233&quot; Total=174.963&quot;</translation>
+    </message>
+    <message>
+        <source>Centering iteration 3/5 - applying correction</source>
+        <translation>Itération de centrage 3/5 - application de la correction</translation>
+    </message>
+    <message>
+        <source>Slewing to Triangulum galaxy-1.58994-30.7923</source>
+        <translation>Pointage vers la galaxie du Triangle-1.58994-30.7923</translation>
+    </message>
+    <message>
+        <source>Applying correction: RA 1.5867h → 1.5899h, DEC 30.79° → 30.79°</source>
+        <translation>Application de la correction : AD 1.5867h → 1.5899h, DEC 30.79° → 30.79°</translation>
+    </message>
+    <message>
+        <source>Offset: RA=169.926&quot; DEC=0.038&quot; Total=169.926&quot;</source>
+        <translation>Décalage : AD=169.926&quot; DEC=0.038&quot; Total=169.926&quot;</translation>
+    </message>
+    <message>
+        <source>Centering iteration 4/5 - applying correction</source>
+        <translation>Itération de centrage 4/5 - application de la correction</translation>
+    </message>
+    <message>
+        <source>Slewing to Triangulum galaxy-1.58673-30.7923</source>
+        <translation>Pointage vers la galaxie du Triangle-1.58673-30.7923</translation>
+    </message>
+    <message>
+        <source>Offset: RA=-176.717&quot; DEC=-0.270&quot; Total=176.717&quot;</source>
+        <translation>Décalage : AD=-176.717&quot; DEC=-0.270&quot; Total=176.717&quot;</translation>
+    </message>
+    <message>
+        <source>Centering failed after 5 iterations - tolerance not reached</source>
+        <translation>Échec du centrage après 5 itérations - tolérance non atteinte</translation>
+    </message>
+    <message>
+        <source>Offset: RA=-86.507&quot; DEC=0.789&quot; Total=86.510&quot;</source>
+        <translation>Décalage : AD=-86.507&quot; DEC=0.789&quot; Total=86.510&quot;</translation>
+    </message>
+    <message>
+        <source>Slewing to Andromeda galaxy-0.737255-41.4099</source>
+        <translation>Pointage vers la galaxie d&apos;Andromède-0.737255-41.4099</translation>
+    </message>
+    <message>
+        <source>Applying correction: RA 0.7357h → 0.7373h, DEC 41.41° → 41.41°</source>
+        <translation>Application de la correction : AD 0.7357h → 0.7373h, DEC 41.41° → 41.41°</translation>
+    </message>
+    <message>
+        <source>Offset: RA=168.443&quot; DEC=-0.326&quot; Total=168.443&quot;</source>
+        <translation>Décalage : AD=168.443&quot; DEC=-0.326&quot; Total=168.443&quot;</translation>
+    </message>
+    <message>
+        <source>Slewing to Andromeda galaxy-0.734077-41.41</source>
+        <translation>Pointage vers la galaxie d&apos;Andromède-0.734077-41.41</translation>
+    </message>
+    <message>
+        <source>Applying correction: RA 0.7372h → 0.7341h, DEC 41.41° → 41.41°</source>
+        <translation>Application de la correction : AD 0.7372h → 0.7341h, DEC 41.41° → 41.41°</translation>
+    </message>
+    <message>
+        <source>Offset: RA=-174.109&quot; DEC=0.350&quot; Total=174.109&quot;</source>
+        <translation>Décalage : AD=-174.109&quot; DEC=0.350&quot; Total=174.109&quot;</translation>
+    </message>
+    <message>
+        <source>Slewing to Andromeda galaxy-0.737251-41.4099</source>
+        <translation>Pointage vers la galaxie d&apos;Andromède-0.737251-41.4099</translation>
+    </message>
+    <message>
+        <source>Applying correction: RA 0.7340h → 0.7373h, DEC 41.41° → 41.41°</source>
+        <translation>Application de la correction : AD 0.7340h → 0.7373h, DEC 41.41° → 41.41°</translation>
+    </message>
+    <message>
+        <source>Offset: RA=169.543&quot; DEC=0.016&quot; Total=169.543&quot;</source>
+        <translation>Décalage : AD=169.543&quot; DEC=0.016&quot; Total=169.543&quot;</translation>
+    </message>
+    <message>
+        <source>Slewing to Andromeda galaxy-0.734063-41.4099</source>
+        <translation>Pointage vers la galaxie d&apos;Andromède-0.734063-41.4099</translation>
+    </message>
+    <message>
+        <source>Offset: RA=-173.169&quot; DEC=-0.013&quot; Total=173.169&quot;</source>
+        <translation>Décalage : AD=-173.169&quot; DEC=-0.013&quot; Total=173.169&quot;</translation>
+    </message>
+    <message>
+        <source>Searching M33</source>
+        <translation>Recherche de M33</translation>
+    </message>
+    <message>
+        <source>Searching M33 gives 1 results</source>
+        <translation>La recherche de M33 donne 1 résultat</translation>
+    </message>
+    <message>
+        <source>Offset: RA=-98.011&quot; DEC=0.781&quot; Total=98.014&quot;</source>
+        <translation>Décalage : AD=-98.011&quot; DEC=0.781&quot; Total=98.014&quot;</translation>
+    </message>
+    <message>
+        <source>Slewing to Triangulum galaxy-1.59016-30.7923</source>
+        <translation>Pointage vers la galaxie du Triangle-1.59016-30.7923</translation>
+    </message>
+    <message>
+        <source>Applying correction: RA 1.5883h → 1.5902h, DEC 30.79° → 30.79°</source>
+        <translation>Application de la correction : AD 1.5883h → 1.5902h, DEC 30.79° → 30.79°</translation>
+    </message>
+    <message>
+        <source>Offset: RA=193.988&quot; DEC=-0.384&quot; Total=193.989&quot;</source>
+        <translation>Décalage : AD=193.988&quot; DEC=-0.384&quot; Total=193.989&quot;</translation>
+    </message>
+    <message>
+        <source>Slewing to Triangulum galaxy-1.58652-30.7924</source>
+        <translation>Pointage vers la galaxie du Triangle-1.58652-30.7924</translation>
+    </message>
+    <message>
+        <source>Applying correction: RA 1.5901h → 1.5865h, DEC 30.79° → 30.79°</source>
+        <translation>Application de la correction : AD 1.5901h → 1.5865h, DEC 30.79° → 30.79°</translation>
+    </message>
+    <message>
+        <source>Offset: RA=-196.746&quot; DEC=0.479&quot; Total=196.747&quot;</source>
+        <translation>Décalage : AD=-196.746&quot; DEC=0.479&quot; Total=196.747&quot;</translation>
+    </message>
+    <message>
+        <source>Applying correction: RA 1.5865h → 1.5902h, DEC 30.79° → 30.79°</source>
+        <translation>Application de la correction : AD 1.5865h → 1.5902h, DEC 30.79° → 30.79°</translation>
+    </message>
+    <message>
+        <source>Offset: RA=194.809&quot; DEC=-0.341&quot; Total=194.809&quot;</source>
+        <translation>Décalage : AD=194.809&quot; DEC=-0.341&quot; Total=194.809&quot;</translation>
+    </message>
+    <message>
+        <source>Offset: RA=-198.530&quot; DEC=0.140&quot; Total=198.530&quot;</source>
+        <translation>Décalage : AD=-198.530&quot; DEC=0.140&quot; Total=198.530&quot;</translation>
+    </message>
+    <message>
+        <source>%1 - Couldn&apos;t connect to Indi server</source>
+        <translation>%1 - Impossible de se connecter au serveur Indi</translation>
+    </message>
+    <message>
+        <source>%1 - PropertyMulti::setValue - SAFETY - can&apos;t update, unhandled type : light(0)</source>
+        <translation>%1 - PropertyMulti::setValue - SAFETY - impossible de mettre à jour, type non géré : light(0)</translation>
+    </message>
+    <message>
+        <source>%1 - PropertyMulti::setValue - WEATHER_FORECAST - can&apos;t update, unhandled type : light(1)</source>
+        <translation>%1 - PropertyMulti::setValue - WEATHER_FORECAST - impossible de mettre à jour, type non géré : light(1)</translation>
+    </message>
+    <message>
+        <source>%1 - PropertyMulti::setValue - WEATHER_RAIN_HOUR - can&apos;t update, unhandled type : light(1)</source>
+        <translation>%1 - PropertyMulti::setValue - WEATHER_RAIN_HOUR - impossible de mettre à jour, type non géré : light(1)</translation>
+    </message>
+    <message>
+        <source>%1 - PropertyMulti::setValue - WEATHER_TEMPERATURE - can&apos;t update, unhandled type : light(1)</source>
+        <translation>%1 - PropertyMulti::setValue - WEATHER_TEMPERATURE - impossible de mettre à jour, type non géré : light(1)</translation>
+    </message>
+    <message>
+        <source>%1 - PropertyMulti::setValue - WEATHER_WIND_SPEED - can&apos;t update, unhandled type : light(1)</source>
+        <translation>%1 - PropertyMulti::setValue - WEATHER_WIND_SPEED - impossible de mettre à jour, type non géré : light(1)</translation>
+    </message>
+    <message>
+        <source>setFocalLengthAndDiameter %1 %2 %3</source>
+        <translation>setFocalLengthAndDiameter %1 %2 %3</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=3.2, DEC=45.0, Pier=West</source>
+        <translation>Position monture : AD=3.2, DEC=45.0, Côté=Ouest</translation>
+    </message>
+    <message>
+        <source>West calibration complete: 439.00 ms/px (443.97 ms/arcsec, drift=2.25&quot;)</source>
+        <translation>Calibration Ouest terminée : 439.00 ms/px (443.97 ms/arcsec, dérive=2.25&quot;)</translation>
+    </message>
+    <message>
+        <source>East calibration complete: 329.00 ms/px (332.73 ms/arcsec, drift=3.00&quot;)</source>
+        <translation>Calibration Est terminée : 329.00 ms/px (332.73 ms/arcsec, dérive=3.00&quot;)</translation>
+    </message>
+    <message>
+        <source>North calibration complete: 291.00 ms/px (294.30 ms/arcsec, drift=3.39&quot;)</source>
+        <translation>Calibration Nord terminée : 291.00 ms/px (294.30 ms/arcsec, dérive=3.39&quot;)</translation>
+    </message>
+    <message>
+        <source>South calibration complete: 251.00 ms/px (253.84 ms/arcsec, drift=3.94&quot;)</source>
+        <translation>Calibration Sud terminée : 251.00 ms/px (253.84 ms/arcsec, dérive=3.94&quot;)</translation>
+    </message>
+    <message>
+        <source>DEC compensation applied: DEC=45.0° factor=0.708</source>
+        <translation>Compensation DEC appliquée : DEC=45.0° facteur=0.708</translation>
+    </message>
+    <message>
+        <source>Calibration performed at DEC: 45.0°</source>
+        <translation>Calibration effectuée à DEC : 45.0°</translation>
+    </message>
+    <message>
+        <source>Current target DEC: 45.0°</source>
+        <translation>DEC cible actuelle : 45.0°</translation>
+    </message>
+    <message>
+        <source>Current DEC: 45.0°</source>
+        <translation>DEC actuelle : 45.0°</translation>
+    </message>
+    <message>
+        <source>RA compensation factor: 0.708 (cos(45.0°))</source>
+        <translation>Facteur de compensation AD : 0.708 (cos(45.0°))</translation>
+    </message>
+    <message>
+        <source>Adjusted calibration: E=328.34 W=438.73 N=291.00 S=251.00 (pixels/sec)</source>
+        <translation>Calibration ajustée : E=328.34 O=438.73 N=291.00 S=251.00 (pixels/sec)</translation>
+    </message>
+    <message>
+        <source>Adjusted calibration: E=328.33 W=438.71 N=291.00 S=251.00 (pixels/sec)</source>
+        <translation>Calibration ajustée : E=328.33 O=438.71 N=291.00 S=251.00 (pixels/sec)</translation>
+    </message>
+    <message>
+        <source>Can&apos;t do anything when start time equals stop time, daily schedule disabled.</source>
+        <translation>Impossible d&apos;agir si l&apos;heure de début est égale à l&apos;heure de fin, programmation journalière désactivée.</translation>
+    </message>
+    <message>
+        <source>Start manual schedule</source>
+        <translation>Démarrer la programmation manuelle</translation>
+    </message>
+    <message>
+        <source>Stop manual schedule</source>
+        <translation>Arrêter la programmation manuelle</translation>
+    </message>
+    <message>
+        <source>Generating timelapse</source>
+        <translation>Génération du timelapse</translation>
+    </message>
+    <message>
+        <source>Basemodule::onExternalEvent - property %1 is disabled, can&apos;t update</source>
+        <translation>Basemodule::onExternalEvent - la propriété %1 est désactivée, impossible de mettre à jour</translation>
+    </message>
+    <message>
+        <source>Slewing to UserDefined</source>
+        <translation>Pointage vers cible personnalisée</translation>
+    </message>
+    <message>
+        <source>Offset: RA=463.157&quot; DEC=0.816&quot; Total=463.158&quot;</source>
+        <translation>Décalage : AD=463.157&quot; DEC=0.816&quot; Total=463.158&quot;</translation>
+    </message>
+    <message>
+        <source>Slewing to UserDefined-1.54229--30.7067</source>
+        <translation>Pointage vers cible personnalisée-1.54229--30.7067</translation>
+    </message>
+    <message>
+        <source>Applying correction: RA 1.5509h → 1.5423h, DEC -30.71° → -30.71°</source>
+        <translation>Application de la correction : AD 1.5509h → 1.5423h, DEC -30.71° → -30.71°</translation>
+    </message>
+    <message>
+        <source>Offset: RA=-2.891&quot; DEC=-0.291&quot; Total=2.906&quot;</source>
+        <translation>Décalage : AD=-2.891&quot; DEC=-0.291&quot; Total=2.906&quot;</translation>
+    </message>
+    <message>
+        <source>Centering successful after 2 iteration(s) - within tolerance</source>
+        <translation>Centrage réussi après 2 itération(s) - dans la tolérance</translation>
+    </message>
+    <message>
+        <source>Mount successfully synchronized with solved field</source>
+        <translation>Monture synchronisée avec succès avec le champ résolu</translation>
+    </message>
+    <message>
+        <source>Offset: RA=1296461.796&quot; DEC=0.152&quot; Total=1296461.796&quot;</source>
+        <translation>Décalage : AD=1296461.796&quot; DEC=0.152&quot; Total=1296461.796&quot;</translation>
+    </message>
+    <message>
+        <source>Slewing to UserDefined--8.64868-71.701</source>
+        <translation>Pointage vers cible personnalisée--8.64868-71.701</translation>
+    </message>
+    <message>
+        <source>Applying correction: RA 15.3599h → -8.6487h, DEC 71.70° → 71.70°</source>
+        <translation>Application de la correction : AD 15.3599h → -8.6487h, DEC 71.70° → 71.70°</translation>
+    </message>
+    <message>
+        <source>Offset: RA=1295536.085&quot; DEC=0.644&quot; Total=1295536.085&quot;</source>
+        <translation>Décalage : AD=1295536.085&quot; DEC=0.644&quot; Total=1295536.085&quot;</translation>
+    </message>
+    <message>
+        <source>Slewing to UserDefined--32.6401-71.7009</source>
+        <translation>Pointage vers cible personnalisée--32.6401-71.7009</translation>
+    </message>
+    <message>
+        <source>Applying correction: RA -8.6487h → -32.6401h, DEC 71.70° → 71.70°</source>
+        <translation>Application de la correction : AD -8.6487h → -32.6401h, DEC 71.70° → 71.70°</translation>
+    </message>
+    <message>
+        <source>Offset: RA=1296461.477&quot; DEC=0.215&quot; Total=1296461.477&quot;</source>
+        <translation>Décalage : AD=1296461.477&quot; DEC=0.215&quot; Total=1296461.477&quot;</translation>
+    </message>
+    <message>
+        <source>Slewing to UserDefined--56.6486-71.7008</source>
+        <translation>Pointage vers cible personnalisée--56.6486-71.7008</translation>
+    </message>
+    <message>
+        <source>Applying correction: RA -32.6401h → -56.6486h, DEC 71.70° → 71.70°</source>
+        <translation>Application de la correction : AD -32.6401h → -56.6486h, DEC 71.70° → 71.70°</translation>
+    </message>
+    <message>
+        <source>Process error log : %1</source>
+        <translation>Journal d&apos;erreurs du processus : %1</translation>
+    </message>
+    <message>
+        <source>Timelapse failed</source>
+        <translation>Échec du timelapse</translation>
+    </message>
+    <message>
+        <source>getEltDateTime - property %1 : element %2 is not datetime</source>
+        <translation>getEltDateTime - propriété %1 : l&apos;élément %2 n&apos;est pas de type datetime</translation>
+    </message>
+    <message>
+        <source>push temp</source>
+        <translation>push temp</translation>
+    </message>
+    <message>
+        <source>push hum</source>
+        <translation>push hum</translation>
+    </message>
+    <message>
+        <source>%1 - PropertyMulti::push %2 %3</source>
+        <translation>%1 - PropertyMulti::push %2 %3</translation>
+    </message>
+    <message>
+        <source>Start daily schedule</source>
+        <translation>Démarrer la programmation journalière</translation>
+    </message>
+    <message>
+        <source>Start fixed schedule</source>
+        <translation>Démarrer la programmation fixe</translation>
+    </message>
+    <message>
+        <source>Stop daily schedule</source>
+        <translation>Arrêter la programmation journalière</translation>
+    </message>
+    <message>
+        <source>Stop fixed schedule</source>
+        <translation>Arrêter la programmation fixe</translation>
+    </message>
+    <message>
+        <source>%1 - PropertyMulti::newLine incomplete values, %2 missing </source>
+        <translation>%1 - PropertyMulti::newLine valeurs incomplètes, %2 manquant(s)</translation>
+    </message>
+    <message>
+        <source>Basemodule::onExternalEventBase - missing line value</source>
+        <translation>Basemodule::onExternalEventBase - valeur de ligne manquante</translation>
+    </message>
+    <message>
+        <source>Basemodule::onExternalEventBase - missing line value %1</source>
+        <translation>Basemodule::onExternalEventBase - valeur de ligne manquante %1</translation>
+    </message>
+    <message>
+        <source>%1 - Can't fetch line0 >= 0</source>
+        <translation>%1 - Impossible de lire ligne0 >= 0</translation>
+    </message>
+    <message>
+        <source>ValueBool - property %1 not found</source>
+        <translation>ValueBool - propriété %1 introuvable</translation>
+    </message>
+    <message>
+        <source>No GPS selected</source>
+        <translation>Aucun GPS sélectionné</translation>
+    </message>
+    <message>
+        <source>Starting planner...</source>
+        <translation>Démarrage du planificateur...</translation>
+    </message>
+    <message>
+        <source>Navigator is slewing to target testqsSD</source>
+        <translation>Le navigator pointe vers la cible testqsSD</translation>
+    </message>
+    <message>
+        <source>Operation aborted</source>
+        <translation>Opération annulée</translation>
+    </message>
+    <message>
+        <source>Operation already running</source>
+        <translation>Opération déjà en cours</translation>
+    </message>
+    <message>
+        <source>Navigator is slewing to target 60</source>
+        <translation>Le navigator pointe vers la cible 60</translation>
+    </message>
+    <message>
+        <source>Target</source>
+        <translation>Cible</translation>
+    </message>
+    <message>
+        <source>Searching m51</source>
+        <translation>Recherche de m51</translation>
+    </message>
+    <message>
+        <source>Searching m51 gives 1 results</source>
+        <translation>La recherche de m51 donne 1 résultat</translation>
+    </message>
+    <message>
+        <source>Slewing to Whirlpool galaxy</source>
+        <translation>Pointage vers la galaxie du Tourbillon</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=13.5, DEC=47.1, Pier=West</source>
+        <translation>Position monture : AD=13.5, DEC=47.1, Côté=Ouest</translation>
+    </message>
+    <message>
+        <source>West calibration complete: 423.00 ms/px (427.79 ms/arcsec, drift=2.34&quot;)</source>
+        <translation>Calibration Ouest terminée : 423.00 ms/px (427.79 ms/arcsec, dérive=2.34&quot;)</translation>
+    </message>
+    <message>
+        <source>East calibration complete: 360.00 ms/px (364.08 ms/arcsec, drift=2.74&quot;)</source>
+        <translation>Calibration Est terminée : 360.00 ms/px (364.08 ms/arcsec, dérive=2.74&quot;)</translation>
+    </message>
+    <message>
+        <source>North calibration complete: 286.00 ms/px (289.24 ms/arcsec, drift=3.45&quot;)</source>
+        <translation>Calibration Nord terminée : 286.00 ms/px (289.24 ms/arcsec, dérive=3.45&quot;)</translation>
+    </message>
+    <message>
+        <source>South calibration complete: 257.00 ms/px (259.91 ms/arcsec, drift=3.85&quot;)</source>
+        <translation>Calibration Sud terminée : 257.00 ms/px (259.91 ms/arcsec, dérive=3.85&quot;)</translation>
+    </message>
+    <message>
+        <source>DEC compensation applied: DEC=47.1° factor=0.681</source>
+        <translation>Compensation DEC appliquée : DEC=47.1° facteur=0.681</translation>
+    </message>
+    <message>
+        <source>Applied stored corrections from calibration: revRA=true, revDE=true</source>
+        <translation>Corrections de calibration appliquées : revAD=true, revDE=true</translation>
+    </message>
+    <message>
+        <source>Calibration performed at DEC: 47.1°</source>
+        <translation>Calibration effectuée à DEC : 47.1°</translation>
+    </message>
+    <message>
+        <source>Current target DEC: 47.1°</source>
+        <translation>DEC cible actuelle : 47.1°</translation>
+    </message>
+    <message>
+        <source>Current DEC: 47.1°</source>
+        <translation>DEC actuelle : 47.1°</translation>
+    </message>
+    <message>
+        <source>RA compensation factor: 0.681 (cos(47.1°))</source>
+        <translation>Facteur de compensation AD : 0.681 (cos(47.1°))</translation>
+    </message>
+    <message>
+        <source>Adjusted calibration: E=359.70 W=422.37 N=286.00 S=257.00 (pixels/sec)</source>
+        <translation>Calibration ajustée : E=359.70 O=422.37 N=286.00 S=257.00 (pixels/sec)</translation>
+    </message>
 </context>
 </TS>
