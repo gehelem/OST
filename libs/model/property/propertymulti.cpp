@@ -271,7 +271,8 @@ void PropertyMulti::setAll(const QVariantMap &pValues)
     foreach(const QString &elt, mElts.keys())
     {
         if ((mElts[elt]->getType() == "int") || (mElts[elt]->getType() == "float") || (mElts[elt]->getType() == "string")
-                || (mElts[elt]->getType() == "bool") || (mElts[elt]->getType() == "date") || (mElts[elt]->getType() == "time"))
+                || (mElts[elt]->getType() == "bool") || (mElts[elt]->getType() == "date") || (mElts[elt]->getType() == "time")
+                || (mElts[elt]->getType() == "datetime"))
         {
             if (!pValues.contains(elt))
             {
@@ -300,7 +301,9 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
     foreach(const QString &elt, mElts.keys())
     {
         if ((mElts[elt]->getType() == "int") || (mElts[elt]->getType() == "float") || (mElts[elt]->getType() == "string")
-                || (mElts[elt]->getType() == "bool") || (mElts[elt]->getType() == "date") || (mElts[elt]->getType() == "time"))
+                || (mElts[elt]->getType() == "bool") || (mElts[elt]->getType() == "date") || (mElts[elt]->getType() == "time")
+                || (mElts[elt]->getType() == "datetime"))
+
         {
             if (!pValues.contains(elt))
             {
