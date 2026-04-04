@@ -218,7 +218,7 @@ bool Basemodule::onExternalEventBase(OST::ExtEvent event)
         if (event.line < 0 && (event.ev == OST::ExtEvType::GU || event.ev == OST::ExtEvType::GF || event.ev == OST::ExtEvType::GD
                                || event.ev == OST::ExtEvType::GH || event.ev == OST::ExtEvType::GB))
         {
-            logError("Basemodule::onExternalEventBase - missing line value", {event.prpkey});
+            logError("Basemodule::onExternalEventBase - missing line value %1", {event.prpkey});
             return false;
         }
 
