@@ -483,6 +483,22 @@ target_link_libraries(ostallsky PRIVATE
 )
 target_compile_definitions(ostallsky PRIVATE INSPECTOR_MODULE)
 
+# Planner module
+add_library(ostplanner SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/planner/planner.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/planner/planner.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/planner/planner.qrc
+)
+target_link_libraries(ostplanner PRIVATE
+    ostindimodule
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Threads::Threads
+    z
+)
+target_compile_definitions(ostplanner PRIVATE PLANNER_MODULE)
+
 install(TARGETS
     ostserver
     ostbasemodule ostindimodule
@@ -494,6 +510,7 @@ install(TARGETS
     ostinspector
     ostnavigator
     ostallsky
+    ostplanner
     RUNTIME DESTINATION "/usr/bin"
     LIBRARY DESTINATION "/usr/lib"
     PUBLIC_HEADER DESTINATION "/usr/include/ost"

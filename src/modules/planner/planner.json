@@ -1,0 +1,107 @@
+{
+"p":{
+  "progress": {
+    "label": "Progress",
+    "permission": 0,
+    "devcat": "Control",
+    "group": "",
+    "order": "001",
+    "hasprofile": false,
+    "e": {
+      "global": {
+        "type": "prg",
+        "label": "Progress",
+        "order": "01",
+        "value": 0,
+        "dynlabel": "Idle"
+      }
+    }
+  },
+  "parms": {
+    "label": "Parameters",
+    "permission": 2,
+    "devcat": "Parameters",
+    "group": "",
+    "order": "100",
+    "hasprofile": true,
+    "e": {
+      "sequencemodule": {
+          "type": "string",
+          "label": "Sequence instance",
+          "listOfValues":"loadedModules",
+          "autoupdate": true,
+          "directedit": true,
+          "value": "Sequencer",
+          "order": 2,
+          "hint": "Name of the sequencer module INSTANCE to use"
+      },
+      "navigatormodule": {
+          "type": "string",
+          "label": "Navigator instance",
+          "listOfValues":"loadedModules",
+          "autoupdate": true,
+          "directedit": true,
+          "value": "Navigator",
+          "order": 4,
+          "hint": "Name of the navigator module INSTANCE to use"
+      }
+    }
+  },
+  "planning": {
+    "label": "Planning",
+    "permission": 2,
+    "devcat": "Control",
+    "group": "",
+    "autoupdate": false,
+    "order": "050",
+    "hasprofile": true,
+    "showElts":false,
+    "hasGrid": true,
+    "showGrid": true,
+    "e": {
+      "object": {
+          "type": "string",
+          "label": "Object",
+          "autoupdate": false,
+          "directedit": false,
+          "order": 0,
+          "hint": "Object name"
+      },
+      "ra": {
+          "type": "float",
+          "label": "RA",
+          "autoupdate": false,
+          "directedit": false,
+          "order": 10,
+          "hint": "Object RA"
+      },
+      "dec": {
+          "type": "float",
+          "label": "DEC",
+          "autoupdate": false,
+          "directedit": false,
+          "order": 20,
+          "hint": "Object DEC"
+      },
+      "profile": {
+          "type": "string",
+          "label": "Profile",
+          "autoupdate": false,
+          "directedit": false,
+          "order": 30,
+          "hint": "Sequencer profile"
+      },
+      "progress": {
+          "type":"prg",
+          "label": "Progress",
+          "prgtype": "spinner",
+          "dynlabel": "",
+          "order":7,
+          "value":"idle",
+          "gridvalues":[]
+      }
+    }
+  }
+
+}
+}
