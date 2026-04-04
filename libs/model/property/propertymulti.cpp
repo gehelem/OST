@@ -526,7 +526,7 @@ bool PropertyMulti::swapLines(int l1, int l2)
         return false;
     }
     mGrid.swapItemsAt(l2, l1);
-    emit PropertyBase::prpEvent(OST::EvType::aa, QVariant(), nullptr, this);
+    emit PropertyBase::prpEvent(OST::EvType::ap, QVariant(), nullptr, this);
     return true;
 }
 
@@ -541,7 +541,7 @@ bool PropertyMulti::fetchLine(int l)
     {
         mGrid.at(l)[e]->updateElement(true);
     }
-    //emit PropertyBase::prpEvent(OST::EvType::aa, QVariant(), nullptr, this); //we don't need any dedicated event : setValue is already doing it
+    //emit PropertyBase::prpEvent(OST::EvType::ap, QVariant(), nullptr, this); //we don't need any dedicated event : setValue is already doing it
     return true;
 }
 bool PropertyMulti::updateLine(const int i)
@@ -555,7 +555,7 @@ bool PropertyMulti::updateLine(const int i)
     {
         mGrid.at(i)[e]->updateValue();
     }
-    emit PropertyBase::prpEvent(OST::EvType::aa, QVariant(), nullptr, this);
+    emit PropertyBase::prpEvent(OST::EvType::ap, QVariant(), nullptr, this);
     return true;
 }
 bool PropertyMulti::autoUpDown(void)
