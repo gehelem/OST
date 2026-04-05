@@ -4710,5 +4710,81 @@
             <source>Temperature sensor: %1°C at %2h</source>
             <translation>Temperature sensor: %1°C at %2h</translation>
         </message>
-    </context>
+        <message>
+            <source>Test log %1</source>
+            <translation>Test log %1</translation>
+        </message>
+        <message>
+            <source>Critical</source>
+            <translation>Critical</translation>
+        </message>
+        <message>
+            <source>SQL = </source>
+            <translation>SQL = </translation>
+        </message>
+        <message>
+            <source>SQL = %1</source>
+            <translation>SQL = %1</translation>
+        </message>
+        <message>
+            <source>getEltInt - property %1 not found</source>
+            <translation>getEltInt - property %1 not found</translation>
+        </message>
+        <message>
+            <source>getEltInt - property %1 : element %2 not found</source>
+            <translation>getEltInt - property %1 : element %2 not found</translation>
+        </message>
+        <message>
+            <source>numbersRW-numbersRW-setValue - value too high %1 max= %2</source>
+            <translation>numbersRW-numbersRW-setValue - value too high %1 max= %2</translation>
+        </message>
+        <message>
+            <source>Couldn't connect to Indi server</source>
+            <translation>Couldn't connect to Indi server</translation>
+        </message>
+        <message>
+            <source>%1 - Couldn't connect to Indi server</source>
+            <translation>%1 - Couldn't connect to Indi server</translation>
+        </message>
+        <message>
+            <source>Module  Dummy1 successfully loaded</source>
+            <translation>Module  Dummy1 successfully loaded</translation>
+        </message>
+        <message>
+            <source>loadConf default successful</source>
+            <translation>loadConf default successful</translation>
+        </message>
+        <message>
+            <source>%1 profile sucessfully saved</source>
+            <translation>%1 profile sucessfully saved</translation>
+        </message>
+        <message>
+            <source>%1 profile sucessfully loaded</source>
+            <translation>%1 profile sucessfully loaded</translation>
+        </message>
+        <message>
+            <source>%1 - Can't fetch line3 &gt;= 1</source>
+            <translation>%1 - Can't fetch line3 &gt;= 1</translation>
+        </message>
+        <message>
+            <source>%1 - Can't update line3 &gt;= 1</source>
+            <translation>%1 - Can't update line3 &gt;= 1</translation>
+        </message>
+        <message>
+            <source>getDbConfiguration - ERROR SQL = %1</source>
+            <translation>getDbConfiguration - ERROR SQL = %1</translation>
+        </message>
+        <message>
+            <source>getDbConfiguration - ERROR : %1</source>
+            <translation>getDbConfiguration - ERROR : %1</translation>
+        </message>
+        <message>
+            <source>Load configuration %1 failed</source>
+            <translation>Load configuration %1 failed</translation>
+        </message>
+        <message>
+            <source>IndiModule::newDevice %</source>
+            <translation>IndiModule::newDevice %</translation>
+        </message>
+</context>
 </TS>

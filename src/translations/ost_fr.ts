@@ -1802,10 +1802,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 - Couldn&apos;t connect to Indi server</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Indi server connected</source>
         <translation>Serveur indi connecté</translation>
     </message>
@@ -4372,6 +4368,430 @@
     <message>
         <source>Adjusted calibration: E=359.70 W=422.37 N=286.00 S=257.00 (pixels/sec)</source>
         <translation>Calibration ajustée : E=359.70 O=422.37 N=286.00 S=257.00 (pixels/sec)</translation>
+    </message>
+    <message>
+        <source>Filter#1</source>
+        <translation>Filter#1</translation>
+    </message>
+    <message>
+        <source>Filter#2</source>
+        <translation>Filter#2</translation>
+    </message>
+    <message>
+        <source>Filter#3</source>
+        <translation>Filter#3</translation>
+    </message>
+    <message>
+        <source>Filter#4</source>
+        <translation>Filter#4</translation>
+    </message>
+    <message>
+        <source>Filter#5</source>
+        <translation>Filter#5</translation>
+    </message>
+    <message>
+        <source>Filter#6</source>
+        <translation>Filter#6</translation>
+    </message>
+    <message>
+        <source>Filter#7</source>
+        <translation>Filter#7</translation>
+    </message>
+    <message>
+        <source>Filter#8</source>
+        <translation>Filter#8</translation>
+    </message>
+    <message>
+        <source>{&quot;p&quot;:{&quot;agrapSXY&quot;:{&quot;e&quot;:{&quot;S&quot;:{&quot;value&quot;:&quot;P1&quot;},&quot;X&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:0,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;float&quot;,&quot;value&quot;:5.5},&quot;Y&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:0,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;float&quot;,&quot;value&quot;:0.32}},&quot;grid&quot;:[[&quot;P0&quot;,0,0],[&quot;P0&quot;,1,0.1],[&quot;P0&quot;,2,0.4],[&quot;P0&quot;,3,0.9],[&quot;P0&quot;,4,0.16],[&quot;P1&quot;,1.5,0],[&quot;P1&quot;,2.5,0.1],[&quot;P1&quot;,3.5,0.4],[&quot;P1&quot;,4.5,0.9],[&quot;P1&quot;,5.5,0.32]],&quot;gridheaders&quot;:[&quot;S&quot;,&quot;X&quot;,&quot;Y&quot;]},&quot;agraphXY&quot;:{&quot;e&quot;:{&quot;X&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:0,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;float&quot;,&quot;value&quot;:4},&quot;Y&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:0,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;float&quot;,&quot;value&quot;:0.16}},&quot;grid&quot;:[[0,0],[1,0.1],[2,0.4],[3,0.9],[4,0.16]],&quot;gridheaders&quot;:[&quot;X&quot;,&quot;Y&quot;]},&quot;agrid&quot;:{&quot;e&quot;:{&quot;bool&quot;:{&quot;value&quot;:false},&quot;float&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:0,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;float&quot;,&quot;value&quot;:0.13},&quot;image&quot;:{&quot;channels&quot;:1,&quot;height&quot;:0,&quot;hfravg&quot;:0,&quot;histogram&quot;:[[]],&quot;issolved&quot;:false,&quot;max&quot;:[0],&quot;mean&quot;:[0],&quot;median&quot;:[0],&quot;min&quot;:[0],&quot;showstats&quot;:false,&quot;snr&quot;:0,&quot;solverde&quot;:0,&quot;solverra&quot;:0,&quot;stars&quot;:0,&quot;stddev&quot;:[0],&quot;urlfits&quot;:&quot;&quot;,&quot;urljpeg&quot;:&quot;dummy.jpg&quot;,&quot;urloverlay&quot;:&quot;&quot;,&quot;urlthumbnail&quot;:&quot;&quot;,&quot;value&quot;:{&quot;channels&quot;:1,&quot;height&quot;:0,&quot;hfravg&quot;:0,&quot;histogram&quot;:[[]],&quot;issolved&quot;:false,&quot;max&quot;:[0],&quot;mean&quot;:[0],&quot;median&quot;:[0],&quot;min&quot;:[0],&quot;showstats&quot;:false,&quot;snr&quot;:0,&quot;solverde&quot;:0,&quot;solverra&quot;:0,&quot;stars&quot;:0,&quot;stddev&quot;:[0],&quot;urlfits&quot;:&quot;&quot;,&quot;urljpeg&quot;:&quot;dummy.jpg&quot;,&quot;urloverlay&quot;:&quot;&quot;,&quot;urlthumbnail&quot;:&quot;&quot;,&quot;width&quot;:0},&quot;width&quot;:0},&quot;int&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:0,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;int&quot;,&quot;value&quot;:13},&quot;intlov&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:0,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;int&quot;,&quot;value&quot;:2},&quot;progress&quot;:{&quot;dynlabel&quot;:&quot;99/100&quot;,&quot;value&quot;:65},&quot;string&quot;:{&quot;value&quot;:&quot;zéro dot 13&quot;},&quot;strlov&quot;:{&quot;value&quot;:&quot;02&quot;},&quot;video&quot;:{&quot;type&quot;:&quot;video&quot;,&quot;url&quot;:&quot;&quot;}},&quot;grid&quot;:[[true,0.12,{&quot;channels&quot;:1,&quot;height&quot;:0,&quot;hfravg&quot;:0,&quot;histogram&quot;:[[]],&quot;issolved&quot;:false,&quot;max&quot;:[0],&quot;mean&quot;:[0],&quot;median&quot;:[0],&quot;min&quot;:[0],&quot;snr&quot;:0,&quot;solverde&quot;:0,&quot;solverra&quot;:0,&quot;stars&quot;:0,&quot;stddev&quot;:[0],&quot;urlfits&quot;:&quot;&quot;,&quot;urljpeg&quot;:&quot;dummy.jpg&quot;,&quot;urloverlay&quot;:&quot;&quot;,&quot;urlthumbnail&quot;:&quot;&quot;,&quot;width&quot;:0},12,1,{&quot;dynlabel&quot;:&quot;99/100&quot;,&quot;value&quot;:65},&quot;zéro dot 12&quot;,&quot;00&quot;,&quot;to be implemented&quot;],[false,0.13,{&quot;channels&quot;:1,&quot;height&quot;:0,&quot;hfravg&quot;:0,&quot;histogram&quot;:[[]],&quot;issolved&quot;:false,&quot;max&quot;:[0],&quot;mean&quot;:[0],&quot;median&quot;:[0],&quot;min&quot;:[0],&quot;snr&quot;:0,&quot;solverde&quot;:0,&quot;solverra&quot;:0,&quot;stars&quot;:0,&quot;stddev&quot;:[0],&quot;urlfits&quot;:&quot;&quot;,&quot;urljpeg&quot;:&quot;dummy.jpg&quot;,&quot;urloverlay&quot;:&quot;&quot;,&quot;urlthumbnail&quot;:&quot;&quot;,&quot;width&quot;:0},13,2,{&quot;dynlabel&quot;:&quot;99/100&quot;,&quot;value&quot;:65},&quot;zéro dot 13&quot;,&quot;02&quot;,&quot;to be implemented&quot;]],&quot;gridheaders&quot;:[&quot;bool&quot;,&quot;float&quot;,&quot;image&quot;,&quot;int&quot;,&quot;intlov&quot;,&quot;progress&quot;,&quot;string&quot;,&quot;strlov&quot;,&quot;video&quot;]},&quot;boolsRW0&quot;:{&quot;e&quot;:{&quot;b1&quot;:{&quot;value&quot;:true},&quot;b2&quot;:{&quot;value&quot;:false},&quot;b3&quot;:{&quot;value&quot;:false},&quot;b4&quot;:{&quot;value&quot;:false}},&quot;gridheaders&quot;:[&quot;b1&quot;,&quot;b2&quot;,&quot;b3&quot;,&quot;b4&quot;]},&quot;boolsRW1&quot;:{&quot;e&quot;:{&quot;b1&quot;:{&quot;value&quot;:false},&quot;b2&quot;:{&quot;value&quot;:false},&quot;b3&quot;:{&quot;value&quot;:false},&quot;b4&quot;:{&quot;value&quot;:false}},&quot;gridheaders&quot;:[&quot;b1&quot;,&quot;b2&quot;,&quot;b3&quot;,&quot;b4&quot;]},&quot;boolsRW2&quot;:{&quot;e&quot;:{&quot;b1&quot;:{&quot;value&quot;:true},&quot;b2&quot;:{&quot;value&quot;:true},&quot;b3&quot;:{&quot;value&quot;:true},&quot;b4&quot;:{&quot;value&quot;:false}},&quot;gridheaders&quot;:[&quot;b1&quot;,&quot;b2&quot;,&quot;b3&quot;,&quot;b4&quot;]},&quot;datesRW&quot;:{&quot;e&quot;:{&quot;date1&quot;:{&quot;value&quot;:{&quot;day&quot;:8,&quot;month&quot;:11,&quot;year&quot;:2024}},&quot;date2&quot;:{&quot;value&quot;:{&quot;day&quot;:10,&quot;month&quot;:11,&quot;year&quot;:2024}}},&quot;gridheaders&quot;:[&quot;date1&quot;,&quot;date2&quot;]},&quot;datesRWDE&quot;:{&quot;e&quot;:{&quot;date1&quot;:{&quot;value&quot;:{&quot;day&quot;:8,&quot;month&quot;:11,&quot;year&quot;:2024}},&quot;date2&quot;:{&quot;value&quot;:{&quot;day&quot;:10,&quot;month&quot;:11,&quot;year&quot;:2024}}},&quot;gridheaders&quot;:[&quot;date1&quot;,&quot;date2&quot;]},&quot;datesRWgrid&quot;:{&quot;e&quot;:{&quot;date1&quot;:{&quot;value&quot;:{&quot;day&quot;:8,&quot;month&quot;:11,&quot;year&quot;:2024}},&quot;date2&quot;:{&quot;value&quot;:{&quot;day&quot;:10,&quot;month&quot;:11,&quot;year&quot;:2024}}},&quot;grid&quot;:[[{&quot;day&quot;:8,&quot;month&quot;:11,&quot;year&quot;:2024},{&quot;day&quot;:10,&quot;month&quot;:11,&quot;year&quot;:2024}],[{&quot;day&quot;:8,&quot;month&quot;:11,&quot;year&quot;:2024},{&quot;day&quot;:10,&quot;month&quot;:11,&quot;year&quot;:2024}]],&quot;gridheaders&quot;:[&quot;date1&quot;,&quot;date2&quot;]},&quot;datesreadonly&quot;:{&quot;e&quot;:{&quot;date1&quot;:{&quot;value&quot;:{&quot;day&quot;:8,&quot;month&quot;:11,&quot;year&quot;:2024}},&quot;date2&quot;:{&quot;value&quot;:{&quot;day&quot;:10,&quot;month&quot;:11,&quot;year&quot;:2024}}},&quot;gridheaders&quot;:[&quot;date1&quot;,&quot;date2&quot;]},&quot;devices&quot;:{&quot;e&quot;:{&quot;camera&quot;:{&quot;value&quot;:&quot;&quot;},&quot;mount&quot;:{&quot;value&quot;:&quot;&quot;}},&quot;gridheaders&quot;:[&quot;camera&quot;,&quot;mount&quot;]},&quot;dynprop&quot;:{&quot;e&quot;:{&quot;dynbool&quot;:{&quot;value&quot;:false},&quot;dynlight&quot;:{&quot;value&quot;:1},&quot;dyntext&quot;:{&quot;value&quot;:&quot;Okydoky&quot;}},&quot;gridheaders&quot;:[&quot;dynbool&quot;,&quot;dynlight&quot;,&quot;dyntext&quot;]},&quot;extextRW&quot;:{&quot;e&quot;:{&quot;extext1&quot;:{&quot;value&quot;:&quot;torototo&quot;},&quot;extext2&quot;:{&quot;value&quot;:&quot;bbbb&quot;},&quot;extext3&quot;:{&quot;value&quot;:&quot;cccc&quot;},&quot;extext4&quot;:{&quot;value&quot;:&quot;i1&quot;}},&quot;gridheaders&quot;:[&quot;extext1&quot;,&quot;extext2&quot;,&quot;extext3&quot;,&quot;extext4&quot;]},&quot;mixedRW&quot;:{&quot;e&quot;:{&quot;b1&quot;:{&quot;value&quot;:false},&quot;b2&quot;:{&quot;value&quot;:false},&quot;b3&quot;:{&quot;value&quot;:true},&quot;date&quot;:{&quot;value&quot;:{&quot;day&quot;:8,&quot;month&quot;:11,&quot;year&quot;:2024}},&quot;n1&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:100,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:1,&quot;type&quot;:&quot;int&quot;,&quot;value&quot;:10},&quot;n2&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:100,&quot;min&quot;:-100,&quot;slider&quot;:0,&quot;step&quot;:10,&quot;type&quot;:&quot;int&quot;,&quot;value&quot;:11},&quot;t1&quot;:{&quot;value&quot;:&quot;Mixed text value&quot;},&quot;time&quot;:{&quot;value&quot;:{&quot;hh&quot;:13,&quot;mm&quot;:14,&quot;ss&quot;:15}}},&quot;gridheaders&quot;:[&quot;b1&quot;,&quot;b2&quot;,&quot;b3&quot;,&quot;date&quot;,&quot;n1&quot;,&quot;n2&quot;,&quot;t1&quot;,&quot;time&quot;]},&quot;numbersRW&quot;:{&quot;e&quot;:{&quot;n1&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:100,&quot;min&quot;:0,&quot;slider&quot;:1,&quot;step&quot;:1,&quot;type&quot;:&quot;int&quot;,&quot;value&quot;:1},&quot;n2&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:100,&quot;min&quot;:-100,&quot;slider&quot;:0,&quot;step&quot;:10,&quot;type&quot;:&quot;int&quot;,&quot;value&quot;:2},&quot;n3&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:0,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;float&quot;,&quot;value&quot;:3},&quot;n4&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:0,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;int&quot;,&quot;value&quot;:4},&quot;n5&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:0,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;float&quot;,&quot;value&quot;:5}},&quot;grid&quot;:[[1,2,3,4,5],[1,2,3,4,5],[1,2,3,4,5]],&quot;gridheaders&quot;:[&quot;n1&quot;,&quot;n2&quot;,&quot;n3&quot;,&quot;n4&quot;,&quot;n5&quot;]},&quot;optic&quot;:{&quot;e&quot;:{&quot;diam&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:4000,&quot;min&quot;:1,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;float&quot;,&quot;value&quot;:8.828935787117966e+199},&quot;fl&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:4000,&quot;min&quot;:1,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;float&quot;,&quot;value&quot;:0},&quot;red&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:10,&quot;min&quot;:0.1,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;float&quot;,&quot;value&quot;:1}},&quot;gridheaders&quot;:[&quot;diam&quot;,&quot;fl&quot;,&quot;red&quot;]},&quot;parms&quot;:{&quot;e&quot;:{&quot;exposure&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:300,&quot;min&quot;:1e-05,&quot;slider&quot;:2,&quot;step&quot;:0.001,&quot;type&quot;:&quot;float&quot;,&quot;value&quot;:0},&quot;gain&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:500,&quot;min&quot;:0,&quot;slider&quot;:2,&quot;step&quot;:1,&quot;type&quot;:&quot;int&quot;,&quot;value&quot;:0},&quot;offset&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:500,&quot;min&quot;:0,&quot;slider&quot;:2,&quot;step&quot;:1,&quot;type&quot;:&quot;int&quot;,&quot;value&quot;:0},&quot;plannermodule&quot;:{&quot;value&quot;:&quot;&quot;}},&quot;gridheaders&quot;:[&quot;exposure&quot;,&quot;gain&quot;,&quot;offset&quot;,&quot;plannermodule&quot;]},&quot;server&quot;:{&quot;e&quot;:{&quot;host&quot;:{&quot;value&quot;:&quot;localhost&quot;},&quot;port&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:0,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;int&quot;,&quot;value&quot;:7624}},&quot;gridheaders&quot;:[&quot;host&quot;,&quot;port&quot;]},&quot;startup&quot;:{&quot;e&quot;:{&quot;confsatstart&quot;:{&quot;value&quot;:true},&quot;devatstart&quot;:{&quot;value&quot;:true},&quot;indiatstart&quot;:{&quot;value&quot;:true}},&quot;gridheaders&quot;:[&quot;confsatstart&quot;,&quot;devatstart&quot;,&quot;indiatstart&quot;]},&quot;testgrid&quot;:{&quot;e&quot;:{&quot;X&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:0,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;float&quot;,&quot;value&quot;:4},&quot;Y&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:0,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;float&quot;,&quot;value&quot;:0.16},&quot;Z&quot;:{&quot;value&quot;:&quot;P4&quot;},&quot;imgrid&quot;:{&quot;channels&quot;:1,&quot;height&quot;:0,&quot;hfravg&quot;:0,&quot;histogram&quot;:[[]],&quot;issolved&quot;:false,&quot;max&quot;:[0],&quot;mean&quot;:[0],&quot;median&quot;:[0],&quot;min&quot;:[0],&quot;showstats&quot;:true,&quot;snr&quot;:0,&quot;solverde&quot;:0,&quot;solverra&quot;:0,&quot;stars&quot;:0,&quot;stddev&quot;:[0],&quot;urlfits&quot;:&quot;&quot;,&quot;urljpeg&quot;:&quot;dummy.jpg&quot;,&quot;urloverlay&quot;:&quot;&quot;,&quot;urlthumbnail&quot;:&quot;&quot;,&quot;value&quot;:{&quot;channels&quot;:1,&quot;height&quot;:0,&quot;hfravg&quot;:0,&quot;histogram&quot;:[[]],&quot;issolved&quot;:false,&quot;max&quot;:[0],&quot;mean&quot;:[0],&quot;median&quot;:[0],&quot;min&quot;:[0],&quot;showstats&quot;:true,&quot;snr&quot;:0,&quot;solverde&quot;:0,&quot;solverra&quot;:0,&quot;stars&quot;:0,&quot;stddev&quot;:[0],&quot;urlfits&quot;:&quot;&quot;,&quot;urljpeg&quot;:&quot;dummy.jpg&quot;,&quot;urloverlay&quot;:&quot;&quot;,&quot;urlthumbnail&quot;:&quot;&quot;,&quot;width&quot;:0},&quot;width&quot;:0},&quot;prggrid&quot;:{&quot;dynlabel&quot;:&quot;99/100&quot;,&quot;value&quot;:99}},&quot;grid&quot;:[[0,0,&quot;P0&quot;,{&quot;channels&quot;:1,&quot;height&quot;:0,&quot;hfravg&quot;:0,&quot;histogram&quot;:[[]],&quot;issolved&quot;:false,&quot;max&quot;:[0],&quot;mean&quot;:[0],&quot;median&quot;:[0],&quot;min&quot;:[0],&quot;snr&quot;:0,&quot;solverde&quot;:0,&quot;solverra&quot;:0,&quot;stars&quot;:0,&quot;stddev&quot;:[0],&quot;urlfits&quot;:&quot;&quot;,&quot;urljpeg&quot;:&quot;dummy.jpg&quot;,&quot;urloverlay&quot;:&quot;&quot;,&quot;urlthumbnail&quot;:&quot;&quot;,&quot;width&quot;:0},{&quot;dynlabel&quot;:&quot;99/100&quot;,&quot;value&quot;:99}],[1,0.1,&quot;P1&quot;,{&quot;channels&quot;:1,&quot;height&quot;:0,&quot;hfravg&quot;:0,&quot;histogram&quot;:[[]],&quot;issolved&quot;:false,&quot;max&quot;:[0],&quot;mean&quot;:[0],&quot;median&quot;:[0],&quot;min&quot;:[0],&quot;snr&quot;:0,&quot;solverde&quot;:0,&quot;solverra&quot;:0,&quot;stars&quot;:0,&quot;stddev&quot;:[0],&quot;urlfits&quot;:&quot;&quot;,&quot;urljpeg&quot;:&quot;dummy.jpg&quot;,&quot;urloverlay&quot;:&quot;&quot;,&quot;urlthumbnail&quot;:&quot;&quot;,&quot;width&quot;:0},{&quot;dynlabel&quot;:&quot;99/100&quot;,&quot;value&quot;:99}],[2,0.4,&quot;P2&quot;,{&quot;channels&quot;:1,&quot;height&quot;:0,&quot;hfravg&quot;:0,&quot;histogram&quot;:[[]],&quot;issolved&quot;:false,&quot;max&quot;:[0],&quot;mean&quot;:[0],&quot;median&quot;:[0],&quot;min&quot;:[0],&quot;snr&quot;:0,&quot;solverde&quot;:0,&quot;solverra&quot;:0,&quot;stars&quot;:0,&quot;stddev&quot;:[0],&quot;urlfits&quot;:&quot;&quot;,&quot;urljpeg&quot;:&quot;dummy.jpg&quot;,&quot;urloverlay&quot;:&quot;&quot;,&quot;urlthumbnail&quot;:&quot;&quot;,&quot;width&quot;:0},{&quot;dynlabel&quot;:&quot;99/100&quot;,&quot;value&quot;:99}],[3,0.9,&quot;P3&quot;,{&quot;channels&quot;:1,&quot;height&quot;:0,&quot;hfravg&quot;:0,&quot;histogram&quot;:[[]],&quot;issolved&quot;:false,&quot;max&quot;:[0],&quot;mean&quot;:[0],&quot;median&quot;:[0],&quot;min&quot;:[0],&quot;snr&quot;:0,&quot;solverde&quot;:0,&quot;solverra&quot;:0,&quot;stars&quot;:0,&quot;stddev&quot;:[0],&quot;urlfits&quot;:&quot;&quot;,&quot;urljpeg&quot;:&quot;dummy.jpg&quot;,&quot;urloverlay&quot;:&quot;&quot;,&quot;urlthumbnail&quot;:&quot;&quot;,&quot;width&quot;:0},{&quot;dynlabel&quot;:&quot;99/100&quot;,&quot;value&quot;:99}],[4,0.16,&quot;P4&quot;,{&quot;channels&quot;:1,&quot;height&quot;:0,&quot;hfravg&quot;:0,&quot;histogram&quot;:[[]],&quot;issolved&quot;:false,&quot;max&quot;:[0],&quot;mean&quot;:[0],&quot;median&quot;:[0],&quot;min&quot;:[0],&quot;snr&quot;:0,&quot;solverde&quot;:0,&quot;solverra&quot;:0,&quot;stars&quot;:0,&quot;stddev&quot;:[0],&quot;urlfits&quot;:&quot;&quot;,&quot;urljpeg&quot;:&quot;dummy.jpg&quot;,&quot;urloverlay&quot;:&quot;&quot;,&quot;urlthumbnail&quot;:&quot;&quot;,&quot;width&quot;:0},{&quot;dynlabel&quot;:&quot;99/100&quot;,&quot;value&quot;:99}]],&quot;gridheaders&quot;:[&quot;X&quot;,&quot;Y&quot;,&quot;Z&quot;,&quot;imgrid&quot;,&quot;prggrid&quot;]},&quot;timesRW&quot;:{&quot;e&quot;:{&quot;time1&quot;:{&quot;value&quot;:{&quot;hh&quot;:13,&quot;mm&quot;:25,&quot;ss&quot;:59}},&quot;time2&quot;:{&quot;value&quot;:{&quot;hh&quot;:13,&quot;mm&quot;:25,&quot;ms&quot;:55,&quot;ss&quot;:59}}},&quot;gridheaders&quot;:[&quot;time1&quot;,&quot;time2&quot;]},&quot;timesRWDE&quot;:{&quot;e&quot;:{&quot;time1&quot;:{&quot;value&quot;:{&quot;hh&quot;:13,&quot;mm&quot;:25,&quot;ss&quot;:59}},&quot;time2&quot;:{&quot;value&quot;:{&quot;hh&quot;:13,&quot;mm&quot;:25,&quot;ss&quot;:59}}},&quot;gridheaders&quot;:[&quot;time1&quot;,&quot;time2&quot;]},&quot;timesRWgrid&quot;:{&quot;e&quot;:{&quot;time1&quot;:{&quot;value&quot;:{&quot;hh&quot;:13,&quot;mm&quot;:25,&quot;ss&quot;:59}},&quot;time2&quot;:{&quot;value&quot;:{&quot;hh&quot;:13,&quot;mm&quot;:25,&quot;ss&quot;:59}}},&quot;grid&quot;:[[{&quot;hh&quot;:13,&quot;mm&quot;:25,&quot;ms&quot;:0,&quot;ss&quot;:59},{&quot;hh&quot;:13,&quot;mm&quot;:25,&quot;ms&quot;:0,&quot;ss&quot;:59}],[{&quot;hh&quot;:13,&quot;mm&quot;:25,&quot;ms&quot;:0,&quot;ss&quot;:59},{&quot;hh&quot;:13,&quot;mm&quot;:25,&quot;ms&quot;:0,&quot;ss&quot;:59}]],&quot;gridheaders&quot;:[&quot;time1&quot;,&quot;time2&quot;]},&quot;timessreadonly&quot;:{&quot;e&quot;:{&quot;time1&quot;:{&quot;value&quot;:{&quot;hh&quot;:13,&quot;mm&quot;:25,&quot;ss&quot;:59}},&quot;time2&quot;:{&quot;value&quot;:{&quot;hh&quot;:13,&quot;mm&quot;:25,&quot;ss&quot;:59}}},&quot;gridheaders&quot;:[&quot;time1&quot;,&quot;time2&quot;]}}}</source>
+        <translation>{&quot;p&quot;:{&quot;agrapSXY&quot;:{&quot;e&quot;:{&quot;S&quot;:{&quot;value&quot;:&quot;P1&quot;},&quot;X&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:0,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;float&quot;,&quot;value&quot;:5.5},&quot;Y&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:0,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;float&quot;,&quot;value&quot;:0.32}},&quot;grid&quot;:[[&quot;P0&quot;,0,0],[&quot;P0&quot;,1,0.1],[&quot;P0&quot;,2,0.4],[&quot;P0&quot;,3,0.9],[&quot;P0&quot;,4,0.16],[&quot;P1&quot;,1.5,0],[&quot;P1&quot;,2.5,0.1],[&quot;P1&quot;,3.5,0.4],[&quot;P1&quot;,4.5,0.9],[&quot;P1&quot;,5.5,0.32]],&quot;gridheaders&quot;:[&quot;S&quot;,&quot;X&quot;,&quot;Y&quot;]},&quot;agraphXY&quot;:{&quot;e&quot;:{&quot;X&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:0,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;float&quot;,&quot;value&quot;:4},&quot;Y&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:0,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;float&quot;,&quot;value&quot;:0.16}},&quot;grid&quot;:[[0,0],[1,0.1],[2,0.4],[3,0.9],[4,0.16]],&quot;gridheaders&quot;:[&quot;X&quot;,&quot;Y&quot;]},&quot;agrid&quot;:{&quot;e&quot;:{&quot;bool&quot;:{&quot;value&quot;:false},&quot;float&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:0,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;float&quot;,&quot;value&quot;:0.13},&quot;image&quot;:{&quot;channels&quot;:1,&quot;height&quot;:0,&quot;hfravg&quot;:0,&quot;histogram&quot;:[[]],&quot;issolved&quot;:false,&quot;max&quot;:[0],&quot;mean&quot;:[0],&quot;median&quot;:[0],&quot;min&quot;:[0],&quot;showstats&quot;:false,&quot;snr&quot;:0,&quot;solverde&quot;:0,&quot;solverra&quot;:0,&quot;stars&quot;:0,&quot;stddev&quot;:[0],&quot;urlfits&quot;:&quot;&quot;,&quot;urljpeg&quot;:&quot;dummy.jpg&quot;,&quot;urloverlay&quot;:&quot;&quot;,&quot;urlthumbnail&quot;:&quot;&quot;,&quot;value&quot;:{&quot;channels&quot;:1,&quot;height&quot;:0,&quot;hfravg&quot;:0,&quot;histogram&quot;:[[]],&quot;issolved&quot;:false,&quot;max&quot;:[0],&quot;mean&quot;:[0],&quot;median&quot;:[0],&quot;min&quot;:[0],&quot;showstats&quot;:false,&quot;snr&quot;:0,&quot;solverde&quot;:0,&quot;solverra&quot;:0,&quot;stars&quot;:0,&quot;stddev&quot;:[0],&quot;urlfits&quot;:&quot;&quot;,&quot;urljpeg&quot;:&quot;dummy.jpg&quot;,&quot;urloverlay&quot;:&quot;&quot;,&quot;urlthumbnail&quot;:&quot;&quot;,&quot;width&quot;:0},&quot;width&quot;:0},&quot;int&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:0,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;int&quot;,&quot;value&quot;:13},&quot;intlov&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:0,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;int&quot;,&quot;value&quot;:2},&quot;progress&quot;:{&quot;dynlabel&quot;:&quot;99/100&quot;,&quot;value&quot;:65},&quot;string&quot;:{&quot;value&quot;:&quot;zéro dot 13&quot;},&quot;strlov&quot;:{&quot;value&quot;:&quot;02&quot;},&quot;video&quot;:{&quot;type&quot;:&quot;video&quot;,&quot;url&quot;:&quot;&quot;}},&quot;grid&quot;:[[true,0.12,{&quot;channels&quot;:1,&quot;height&quot;:0,&quot;hfravg&quot;:0,&quot;histogram&quot;:[[]],&quot;issolved&quot;:false,&quot;max&quot;:[0],&quot;mean&quot;:[0],&quot;median&quot;:[0],&quot;min&quot;:[0],&quot;snr&quot;:0,&quot;solverde&quot;:0,&quot;solverra&quot;:0,&quot;stars&quot;:0,&quot;stddev&quot;:[0],&quot;urlfits&quot;:&quot;&quot;,&quot;urljpeg&quot;:&quot;dummy.jpg&quot;,&quot;urloverlay&quot;:&quot;&quot;,&quot;urlthumbnail&quot;:&quot;&quot;,&quot;width&quot;:0},12,1,{&quot;dynlabel&quot;:&quot;99/100&quot;,&quot;value&quot;:65},&quot;zéro dot 12&quot;,&quot;00&quot;,&quot;to be implemented&quot;],[false,0.13,{&quot;channels&quot;:1,&quot;height&quot;:0,&quot;hfravg&quot;:0,&quot;histogram&quot;:[[]],&quot;issolved&quot;:false,&quot;max&quot;:[0],&quot;mean&quot;:[0],&quot;median&quot;:[0],&quot;min&quot;:[0],&quot;snr&quot;:0,&quot;solverde&quot;:0,&quot;solverra&quot;:0,&quot;stars&quot;:0,&quot;stddev&quot;:[0],&quot;urlfits&quot;:&quot;&quot;,&quot;urljpeg&quot;:&quot;dummy.jpg&quot;,&quot;urloverlay&quot;:&quot;&quot;,&quot;urlthumbnail&quot;:&quot;&quot;,&quot;width&quot;:0},13,2,{&quot;dynlabel&quot;:&quot;99/100&quot;,&quot;value&quot;:65},&quot;zéro dot 13&quot;,&quot;02&quot;,&quot;to be implemented&quot;]],&quot;gridheaders&quot;:[&quot;bool&quot;,&quot;float&quot;,&quot;image&quot;,&quot;int&quot;,&quot;intlov&quot;,&quot;progress&quot;,&quot;string&quot;,&quot;strlov&quot;,&quot;video&quot;]},&quot;boolsRW0&quot;:{&quot;e&quot;:{&quot;b1&quot;:{&quot;value&quot;:true},&quot;b2&quot;:{&quot;value&quot;:false},&quot;b3&quot;:{&quot;value&quot;:false},&quot;b4&quot;:{&quot;value&quot;:false}},&quot;gridheaders&quot;:[&quot;b1&quot;,&quot;b2&quot;,&quot;b3&quot;,&quot;b4&quot;]},&quot;boolsRW1&quot;:{&quot;e&quot;:{&quot;b1&quot;:{&quot;value&quot;:false},&quot;b2&quot;:{&quot;value&quot;:false},&quot;b3&quot;:{&quot;value&quot;:false},&quot;b4&quot;:{&quot;value&quot;:false}},&quot;gridheaders&quot;:[&quot;b1&quot;,&quot;b2&quot;,&quot;b3&quot;,&quot;b4&quot;]},&quot;boolsRW2&quot;:{&quot;e&quot;:{&quot;b1&quot;:{&quot;value&quot;:true},&quot;b2&quot;:{&quot;value&quot;:true},&quot;b3&quot;:{&quot;value&quot;:true},&quot;b4&quot;:{&quot;value&quot;:false}},&quot;gridheaders&quot;:[&quot;b1&quot;,&quot;b2&quot;,&quot;b3&quot;,&quot;b4&quot;]},&quot;datesRW&quot;:{&quot;e&quot;:{&quot;date1&quot;:{&quot;value&quot;:{&quot;day&quot;:8,&quot;month&quot;:11,&quot;year&quot;:2024}},&quot;date2&quot;:{&quot;value&quot;:{&quot;day&quot;:10,&quot;month&quot;:11,&quot;year&quot;:2024}}},&quot;gridheaders&quot;:[&quot;date1&quot;,&quot;date2&quot;]},&quot;datesRWDE&quot;:{&quot;e&quot;:{&quot;date1&quot;:{&quot;value&quot;:{&quot;day&quot;:8,&quot;month&quot;:11,&quot;year&quot;:2024}},&quot;date2&quot;:{&quot;value&quot;:{&quot;day&quot;:10,&quot;month&quot;:11,&quot;year&quot;:2024}}},&quot;gridheaders&quot;:[&quot;date1&quot;,&quot;date2&quot;]},&quot;datesRWgrid&quot;:{&quot;e&quot;:{&quot;date1&quot;:{&quot;value&quot;:{&quot;day&quot;:8,&quot;month&quot;:11,&quot;year&quot;:2024}},&quot;date2&quot;:{&quot;value&quot;:{&quot;day&quot;:10,&quot;month&quot;:11,&quot;year&quot;:2024}}},&quot;grid&quot;:[[{&quot;day&quot;:8,&quot;month&quot;:11,&quot;year&quot;:2024},{&quot;day&quot;:10,&quot;month&quot;:11,&quot;year&quot;:2024}],[{&quot;day&quot;:8,&quot;month&quot;:11,&quot;year&quot;:2024},{&quot;day&quot;:10,&quot;month&quot;:11,&quot;year&quot;:2024}]],&quot;gridheaders&quot;:[&quot;date1&quot;,&quot;date2&quot;]},&quot;datesreadonly&quot;:{&quot;e&quot;:{&quot;date1&quot;:{&quot;value&quot;:{&quot;day&quot;:8,&quot;month&quot;:11,&quot;year&quot;:2024}},&quot;date2&quot;:{&quot;value&quot;:{&quot;day&quot;:10,&quot;month&quot;:11,&quot;year&quot;:2024}}},&quot;gridheaders&quot;:[&quot;date1&quot;,&quot;date2&quot;]},&quot;devices&quot;:{&quot;e&quot;:{&quot;camera&quot;:{&quot;value&quot;:&quot;&quot;},&quot;mount&quot;:{&quot;value&quot;:&quot;&quot;}},&quot;gridheaders&quot;:[&quot;camera&quot;,&quot;mount&quot;]},&quot;dynprop&quot;:{&quot;e&quot;:{&quot;dynbool&quot;:{&quot;value&quot;:false},&quot;dynlight&quot;:{&quot;value&quot;:1},&quot;dyntext&quot;:{&quot;value&quot;:&quot;Okydoky&quot;}},&quot;gridheaders&quot;:[&quot;dynbool&quot;,&quot;dynlight&quot;,&quot;dyntext&quot;]},&quot;extextRW&quot;:{&quot;e&quot;:{&quot;extext1&quot;:{&quot;value&quot;:&quot;torototo&quot;},&quot;extext2&quot;:{&quot;value&quot;:&quot;bbbb&quot;},&quot;extext3&quot;:{&quot;value&quot;:&quot;cccc&quot;},&quot;extext4&quot;:{&quot;value&quot;:&quot;i1&quot;}},&quot;gridheaders&quot;:[&quot;extext1&quot;,&quot;extext2&quot;,&quot;extext3&quot;,&quot;extext4&quot;]},&quot;mixedRW&quot;:{&quot;e&quot;:{&quot;b1&quot;:{&quot;value&quot;:false},&quot;b2&quot;:{&quot;value&quot;:false},&quot;b3&quot;:{&quot;value&quot;:true},&quot;date&quot;:{&quot;value&quot;:{&quot;day&quot;:8,&quot;month&quot;:11,&quot;year&quot;:2024}},&quot;n1&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:100,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:1,&quot;type&quot;:&quot;int&quot;,&quot;value&quot;:10},&quot;n2&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:100,&quot;min&quot;:-100,&quot;slider&quot;:0,&quot;step&quot;:10,&quot;type&quot;:&quot;int&quot;,&quot;value&quot;:11},&quot;t1&quot;:{&quot;value&quot;:&quot;Mixed text value&quot;},&quot;time&quot;:{&quot;value&quot;:{&quot;hh&quot;:13,&quot;mm&quot;:14,&quot;ss&quot;:15}}},&quot;gridheaders&quot;:[&quot;b1&quot;,&quot;b2&quot;,&quot;b3&quot;,&quot;date&quot;,&quot;n1&quot;,&quot;n2&quot;,&quot;t1&quot;,&quot;time&quot;]},&quot;numbersRW&quot;:{&quot;e&quot;:{&quot;n1&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:100,&quot;min&quot;:0,&quot;slider&quot;:1,&quot;step&quot;:1,&quot;type&quot;:&quot;int&quot;,&quot;value&quot;:1},&quot;n2&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:100,&quot;min&quot;:-100,&quot;slider&quot;:0,&quot;step&quot;:10,&quot;type&quot;:&quot;int&quot;,&quot;value&quot;:2},&quot;n3&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:0,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;float&quot;,&quot;value&quot;:3},&quot;n4&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:0,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;int&quot;,&quot;value&quot;:4},&quot;n5&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:0,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;float&quot;,&quot;value&quot;:5}},&quot;grid&quot;:[[1,2,3,4,5],[1,2,3,4,5],[1,2,3,4,5]],&quot;gridheaders&quot;:[&quot;n1&quot;,&quot;n2&quot;,&quot;n3&quot;,&quot;n4&quot;,&quot;n5&quot;]},&quot;optic&quot;:{&quot;e&quot;:{&quot;diam&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:4000,&quot;min&quot;:1,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;float&quot;,&quot;value&quot;:8.828935787117966e+199},&quot;fl&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:4000,&quot;min&quot;:1,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;float&quot;,&quot;value&quot;:0},&quot;red&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:10,&quot;min&quot;:0.1,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;float&quot;,&quot;value&quot;:1}},&quot;gridheaders&quot;:[&quot;diam&quot;,&quot;fl&quot;,&quot;red&quot;]},&quot;parms&quot;:{&quot;e&quot;:{&quot;exposure&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:300,&quot;min&quot;:1e-05,&quot;slider&quot;:2,&quot;step&quot;:0.001,&quot;type&quot;:&quot;float&quot;,&quot;value&quot;:0},&quot;gain&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:500,&quot;min&quot;:0,&quot;slider&quot;:2,&quot;step&quot;:1,&quot;type&quot;:&quot;int&quot;,&quot;value&quot;:0},&quot;offset&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:500,&quot;min&quot;:0,&quot;slider&quot;:2,&quot;step&quot;:1,&quot;type&quot;:&quot;int&quot;,&quot;value&quot;:0},&quot;plannermodule&quot;:{&quot;value&quot;:&quot;&quot;}},&quot;gridheaders&quot;:[&quot;exposure&quot;,&quot;gain&quot;,&quot;offset&quot;,&quot;plannermodule&quot;]},&quot;server&quot;:{&quot;e&quot;:{&quot;host&quot;:{&quot;value&quot;:&quot;localhost&quot;},&quot;port&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:0,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;int&quot;,&quot;value&quot;:7624}},&quot;gridheaders&quot;:[&quot;host&quot;,&quot;port&quot;]},&quot;startup&quot;:{&quot;e&quot;:{&quot;confsatstart&quot;:{&quot;value&quot;:true},&quot;devatstart&quot;:{&quot;value&quot;:true},&quot;indiatstart&quot;:{&quot;value&quot;:true}},&quot;gridheaders&quot;:[&quot;confsatstart&quot;,&quot;devatstart&quot;,&quot;indiatstart&quot;]},&quot;testgrid&quot;:{&quot;e&quot;:{&quot;X&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:0,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;float&quot;,&quot;value&quot;:4},&quot;Y&quot;:{&quot;format&quot;:&quot;&quot;,&quot;max&quot;:0,&quot;min&quot;:0,&quot;slider&quot;:0,&quot;step&quot;:0,&quot;type&quot;:&quot;float&quot;,&quot;value&quot;:0.16},&quot;Z&quot;:{&quot;value&quot;:&quot;P4&quot;},&quot;imgrid&quot;:{&quot;channels&quot;:1,&quot;height&quot;:0,&quot;hfravg&quot;:0,&quot;histogram&quot;:[[]],&quot;issolved&quot;:false,&quot;max&quot;:[0],&quot;mean&quot;:[0],&quot;median&quot;:[0],&quot;min&quot;:[0],&quot;showstats&quot;:true,&quot;snr&quot;:0,&quot;solverde&quot;:0,&quot;solverra&quot;:0,&quot;stars&quot;:0,&quot;stddev&quot;:[0],&quot;urlfits&quot;:&quot;&quot;,&quot;urljpeg&quot;:&quot;dummy.jpg&quot;,&quot;urloverlay&quot;:&quot;&quot;,&quot;urlthumbnail&quot;:&quot;&quot;,&quot;value&quot;:{&quot;channels&quot;:1,&quot;height&quot;:0,&quot;hfravg&quot;:0,&quot;histogram&quot;:[[]],&quot;issolved&quot;:false,&quot;max&quot;:[0],&quot;mean&quot;:[0],&quot;median&quot;:[0],&quot;min&quot;:[0],&quot;showstats&quot;:true,&quot;snr&quot;:0,&quot;solverde&quot;:0,&quot;solverra&quot;:0,&quot;stars&quot;:0,&quot;stddev&quot;:[0],&quot;urlfits&quot;:&quot;&quot;,&quot;urljpeg&quot;:&quot;dummy.jpg&quot;,&quot;urloverlay&quot;:&quot;&quot;,&quot;urlthumbnail&quot;:&quot;&quot;,&quot;width&quot;:0},&quot;width&quot;:0},&quot;prggrid&quot;:{&quot;dynlabel&quot;:&quot;99/100&quot;,&quot;value&quot;:99}},&quot;grid&quot;:[[0,0,&quot;P0&quot;,{&quot;channels&quot;:1,&quot;height&quot;:0,&quot;hfravg&quot;:0,&quot;histogram&quot;:[[]],&quot;issolved&quot;:false,&quot;max&quot;:[0],&quot;mean&quot;:[0],&quot;median&quot;:[0],&quot;min&quot;:[0],&quot;snr&quot;:0,&quot;solverde&quot;:0,&quot;solverra&quot;:0,&quot;stars&quot;:0,&quot;stddev&quot;:[0],&quot;urlfits&quot;:&quot;&quot;,&quot;urljpeg&quot;:&quot;dummy.jpg&quot;,&quot;urloverlay&quot;:&quot;&quot;,&quot;urlthumbnail&quot;:&quot;&quot;,&quot;width&quot;:0},{&quot;dynlabel&quot;:&quot;99/100&quot;,&quot;value&quot;:99}],[1,0.1,&quot;P1&quot;,{&quot;channels&quot;:1,&quot;height&quot;:0,&quot;hfravg&quot;:0,&quot;histogram&quot;:[[]],&quot;issolved&quot;:false,&quot;max&quot;:[0],&quot;mean&quot;:[0],&quot;median&quot;:[0],&quot;min&quot;:[0],&quot;snr&quot;:0,&quot;solverde&quot;:0,&quot;solverra&quot;:0,&quot;stars&quot;:0,&quot;stddev&quot;:[0],&quot;urlfits&quot;:&quot;&quot;,&quot;urljpeg&quot;:&quot;dummy.jpg&quot;,&quot;urloverlay&quot;:&quot;&quot;,&quot;urlthumbnail&quot;:&quot;&quot;,&quot;width&quot;:0},{&quot;dynlabel&quot;:&quot;99/100&quot;,&quot;value&quot;:99}],[2,0.4,&quot;P2&quot;,{&quot;channels&quot;:1,&quot;height&quot;:0,&quot;hfravg&quot;:0,&quot;histogram&quot;:[[]],&quot;issolved&quot;:false,&quot;max&quot;:[0],&quot;mean&quot;:[0],&quot;median&quot;:[0],&quot;min&quot;:[0],&quot;snr&quot;:0,&quot;solverde&quot;:0,&quot;solverra&quot;:0,&quot;stars&quot;:0,&quot;stddev&quot;:[0],&quot;urlfits&quot;:&quot;&quot;,&quot;urljpeg&quot;:&quot;dummy.jpg&quot;,&quot;urloverlay&quot;:&quot;&quot;,&quot;urlthumbnail&quot;:&quot;&quot;,&quot;width&quot;:0},{&quot;dynlabel&quot;:&quot;99/100&quot;,&quot;value&quot;:99}],[3,0.9,&quot;P3&quot;,{&quot;channels&quot;:1,&quot;height&quot;:0,&quot;hfravg&quot;:0,&quot;histogram&quot;:[[]],&quot;issolved&quot;:false,&quot;max&quot;:[0],&quot;mean&quot;:[0],&quot;median&quot;:[0],&quot;min&quot;:[0],&quot;snr&quot;:0,&quot;solverde&quot;:0,&quot;solverra&quot;:0,&quot;stars&quot;:0,&quot;stddev&quot;:[0],&quot;urlfits&quot;:&quot;&quot;,&quot;urljpeg&quot;:&quot;dummy.jpg&quot;,&quot;urloverlay&quot;:&quot;&quot;,&quot;urlthumbnail&quot;:&quot;&quot;,&quot;width&quot;:0},{&quot;dynlabel&quot;:&quot;99/100&quot;,&quot;value&quot;:99}],[4,0.16,&quot;P4&quot;,{&quot;channels&quot;:1,&quot;height&quot;:0,&quot;hfravg&quot;:0,&quot;histogram&quot;:[[]],&quot;issolved&quot;:false,&quot;max&quot;:[0],&quot;mean&quot;:[0],&quot;median&quot;:[0],&quot;min&quot;:[0],&quot;snr&quot;:0,&quot;solverde&quot;:0,&quot;solverra&quot;:0,&quot;stars&quot;:0,&quot;stddev&quot;:[0],&quot;urlfits&quot;:&quot;&quot;,&quot;urljpeg&quot;:&quot;dummy.jpg&quot;,&quot;urloverlay&quot;:&quot;&quot;,&quot;urlthumbnail&quot;:&quot;&quot;,&quot;width&quot;:0},{&quot;dynlabel&quot;:&quot;99/100&quot;,&quot;value&quot;:99}]],&quot;gridheaders&quot;:[&quot;X&quot;,&quot;Y&quot;,&quot;Z&quot;,&quot;imgrid&quot;,&quot;prggrid&quot;]},&quot;timesRW&quot;:{&quot;e&quot;:{&quot;time1&quot;:{&quot;value&quot;:{&quot;hh&quot;:13,&quot;mm&quot;:25,&quot;ss&quot;:59}},&quot;time2&quot;:{&quot;value&quot;:{&quot;hh&quot;:13,&quot;mm&quot;:25,&quot;ms&quot;:55,&quot;ss&quot;:59}}},&quot;gridheaders&quot;:[&quot;time1&quot;,&quot;time2&quot;]},&quot;timesRWDE&quot;:{&quot;e&quot;:{&quot;time1&quot;:{&quot;value&quot;:{&quot;hh&quot;:13,&quot;mm&quot;:25,&quot;ss&quot;:59}},&quot;time2&quot;:{&quot;value&quot;:{&quot;hh&quot;:13,&quot;mm&quot;:25,&quot;ss&quot;:59}}},&quot;gridheaders&quot;:[&quot;time1&quot;,&quot;time2&quot;]},&quot;timesRWgrid&quot;:{&quot;e&quot;:{&quot;time1&quot;:{&quot;value&quot;:{&quot;hh&quot;:13,&quot;mm&quot;:25,&quot;ss&quot;:59}},&quot;time2&quot;:{&quot;value&quot;:{&quot;hh&quot;:13,&quot;mm&quot;:25,&quot;ss&quot;:59}}},&quot;grid&quot;:[[{&quot;hh&quot;:13,&quot;mm&quot;:25,&quot;ms&quot;:0,&quot;ss&quot;:59},{&quot;hh&quot;:13,&quot;mm&quot;:25,&quot;ms&quot;:0,&quot;ss&quot;:59}],[{&quot;hh&quot;:13,&quot;mm&quot;:25,&quot;ms&quot;:0,&quot;ss&quot;:59},{&quot;hh&quot;:13,&quot;mm&quot;:25,&quot;ms&quot;:0,&quot;ss&quot;:59}]],&quot;gridheaders&quot;:[&quot;time1&quot;,&quot;time2&quot;]},&quot;timessreadonly&quot;:{&quot;e&quot;:{&quot;time1&quot;:{&quot;value&quot;:{&quot;hh&quot;:13,&quot;mm&quot;:25,&quot;ss&quot;:59}},&quot;time2&quot;:{&quot;value&quot;:{&quot;hh&quot;:13,&quot;mm&quot;:25,&quot;ss&quot;:59}}},&quot;gridheaders&quot;:[&quot;time1&quot;,&quot;time2&quot;]}}}</translation>
+    </message>
+    <message>
+        <source>Invalid message size : %1</source>
+        <translation>Invalid message size : %1</translation>
+    </message>
+    <message>
+        <source>Invalid message event: %1</source>
+        <translation>Invalid message event: %1</translation>
+    </message>
+    <message>
+        <source>Full dump request: %1</source>
+        <translation>Full dump request: %1</translation>
+    </message>
+    <message>
+        <source>Client not granted for updates</source>
+        <translation>Client non autorisé pour les mises à jour</translation>
+    </message>
+    <message>
+        <source>Login request: %1</source>
+        <translation>Login request: %1</translation>
+    </message>
+    <message>
+        <source>Invalid message data: %1</source>
+        <translation>Invalid message data: %1</translation>
+    </message>
+    <message>
+        <source>Maximum ADU</source>
+        <translation>Maximum ADU</translation>
+    </message>
+    <message>
+        <source>Noise</source>
+        <translation>Noise</translation>
+    </message>
+    <message>
+        <source>Rotation Offset</source>
+        <translation>Rotation Offset</translation>
+    </message>
+    <message>
+        <source>X resolution</source>
+        <translation>X resolution</translation>
+    </message>
+    <message>
+        <source>X Pixel Size</source>
+        <translation>X Pixel Size</translation>
+    </message>
+    <message>
+        <source>Y resolution</source>
+        <translation>Y resolution</translation>
+    </message>
+    <message>
+        <source>Y Pixel Size</source>
+        <translation>Y Pixel Size</translation>
+    </message>
+    <message>
+        <source>Input</source>
+        <translation>Input</translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation>Output</translation>
+    </message>
+    <message>
+        <source>Mount ignored</source>
+        <translation>Mount ignored</translation>
+    </message>
+    <message>
+        <source>Mount locks</source>
+        <translation>Mount locks</translation>
+    </message>
+    <message>
+        <source>Mount Policy</source>
+        <translation>Mount Policy</translation>
+    </message>
+    <message>
+        <source>Lat (dd:mm:ss)</source>
+        <translation>Lat (dd:mm:ss)</translation>
+    </message>
+    <message>
+        <source>Lon (dd:mm:ss)</source>
+        <translation>Lon (dd:mm:ss)</translation>
+    </message>
+    <message>
+        <source>Period (s)</source>
+        <translation>Period (s)</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <translation>Never</translation>
+    </message>
+    <message>
+        <source>On Refresh</source>
+        <translation>On Refresh</translation>
+    </message>
+    <message>
+        <source>On Startup</source>
+        <translation>On Startup</translation>
+    </message>
+    <message>
+        <source>System Time</source>
+        <translation>System Time</translation>
+    </message>
+    <message>
+        <source>Filter Intensity</source>
+        <translation>Filter Intensity</translation>
+    </message>
+    <message>
+        <source>Observer</source>
+        <translation>Observer</translation>
+    </message>
+    <message>
+        <source>Antenna</source>
+        <translation>Antenne</translation>
+    </message>
+    <message>
+        <source>Bandwidth</source>
+        <translation>Largeur de bande</translation>
+    </message>
+    <message>
+        <source>Bits per sample</source>
+        <translation>Bits par échantillon</translation>
+    </message>
+    <message>
+        <source>Frequency</source>
+        <translation>Fréquence</translation>
+    </message>
+    <message>
+        <source>Sampling rate</source>
+        <translation>Sampling rate</translation>
+    </message>
+    <message>
+        <source>Receiver Settings</source>
+        <translation>Receiver Settings</translation>
+    </message>
+    <message>
+        <source>Sensor Continuum Blob</source>
+        <translation>Sensor Continuum Blob</translation>
+    </message>
+    <message>
+        <source>Sensor Imaginary Blob</source>
+        <translation>Sensor Imaginary Blob</translation>
+    </message>
+    <message>
+        <source>Sensor Magnitude Blob</source>
+        <translation>Sensor Magnitude Blob</translation>
+    </message>
+    <message>
+        <source>Sensor Phase Blob</source>
+        <translation>Sensor Phase Blob</translation>
+    </message>
+    <message>
+        <source>Sensor Data Real</source>
+        <translation>Sensor Data Real</translation>
+    </message>
+    <message>
+        <source>Integration Data</source>
+        <translation>Integration Data</translation>
+    </message>
+    <message>
+        <source>Integration Abort</source>
+        <translation>Integration Abort</translation>
+    </message>
+    <message>
+        <source>Time (s)</source>
+        <translation>Time (s)</translation>
+    </message>
+    <message>
+        <source>Integration</source>
+        <translation>Integration</translation>
+    </message>
+    <message>
+        <source>Angle</source>
+        <translation>Angle</translation>
+    </message>
+    <message>
+        <source>Max Range (degrees)</source>
+        <translation>Max Range (degrees)</translation>
+    </message>
+    <message>
+        <source>Period (counts)</source>
+        <translation>Period (counts)</translation>
+    </message>
+    <message>
+        <source>Freq (Hz)</source>
+        <translation>Freq (Hz)</translation>
+    </message>
+    <message>
+        <source>Quality (mag/arcsec^2)</source>
+        <translation>Quality (mag/arcsec^2)</translation>
+    </message>
+    <message>
+        <source>Readings</source>
+        <translation>Readings</translation>
+    </message>
+    <message>
+        <source>Feature</source>
+        <translation>Feature</translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation>Model</translation>
+    </message>
+    <message>
+        <source>Protocol</source>
+        <translation>Protocol</translation>
+    </message>
+    <message>
+        <source>Unit Info</source>
+        <translation>Unit Info</translation>
+    </message>
+    <message>
+        <source>Alignment Corrector</source>
+        <translation>Correcteur d&apos;alignement</translation>
+    </message>
+    <message>
+        <source>Polar Alignment Corrector</source>
+        <translation>Polar Alignment Corrector</translation>
+    </message>
+    <message>
+        <source>Safety</source>
+        <translation>Safety</translation>
+    </message>
+    <message>
+        <source>Gust</source>
+        <translation>Gust</translation>
+    </message>
+    <message>
+        <source>Precip</source>
+        <translation>Precip</translation>
+    </message>
+    <message>
+        <source>Weather</source>
+        <translation>Weather</translation>
+    </message>
+    <message>
+        <source>Wind</source>
+        <translation>Vent</translation>
+    </message>
+    <message>
+        <source>Flip alerting to in-bounds</source>
+        <translation>Flip alerting to in-bounds</translation>
+    </message>
+    <message>
+        <source>OK range max</source>
+        <translation>OK range max</translation>
+    </message>
+    <message>
+        <source>OK range min</source>
+        <translation>OK range min</translation>
+    </message>
+    <message>
+        <source>% for Warning</source>
+        <translation>% pour Avertissement</translation>
+    </message>
+    <message>
+        <source>Humidity (%)</source>
+        <translation>Humidity (%)</translation>
+    </message>
+    <message>
+        <source>Override Status</source>
+        <translation>Override Status</translation>
+    </message>
+    <message>
+        <source>Precip (mm)</source>
+        <translation>Precip (mm)</translation>
+    </message>
+    <message>
+        <source>Gust (kph)</source>
+        <translation>Gust (kph)</translation>
+    </message>
+    <message>
+        <source>Wind (kph)</source>
+        <translation>Wind (kph)</translation>
+    </message>
+    <message>
+        <source>Update</source>
+        <translation>Update</translation>
+    </message>
+    <message>
+        <source>Degrees</source>
+        <translation>Degrés</translation>
+    </message>
+    <message>
+        <source>Hour Angle</source>
+        <translation>Hour Angle</translation>
+    </message>
+    <message>
+        <source>Ignore</source>
+        <translation>Ignore</translation>
+    </message>
+    <message>
+        <source>Meridian side</source>
+        <translation>Meridian side</translation>
+    </message>
+    <message>
+        <source>Slaving</source>
+        <translation>Slaving</translation>
+    </message>
+    <message>
+        <source>Radius (m)</source>
+        <translation>Radius (m)</translation>
+    </message>
+    <message>
+        <source>E displacement (m)</source>
+        <translation>Déplacement E (m)</translation>
+    </message>
+    <message>
+        <source>N displacement (m)</source>
+        <translation>Déplacement N (m)</translation>
+    </message>
+    <message>
+        <source>OTA offset (m)</source>
+        <translation>OTA offset (m)</translation>
+    </message>
+    <message>
+        <source>Shutter width (m)</source>
+        <translation>Shutter width (m)</translation>
+    </message>
+    <message>
+        <source>Up displacement (m)</source>
+        <translation>Up displacement (m)</translation>
+    </message>
+    <message>
+        <source>Measurements</source>
+        <translation>Measurements</translation>
+    </message>
+    <message>
+        <source>Dome CCW</source>
+        <translation>Dôme sens anti-horaire</translation>
+    </message>
+    <message>
+        <source>Dome CW</source>
+        <translation>Dôme sens horaire</translation>
+    </message>
+    <message>
+        <source>Motion</source>
+        <translation>Motion</translation>
+    </message>
+    <message>
+        <source>Autosync threshold (deg)</source>
+        <translation>Seuil d&apos;autosync (degrés)</translation>
+    </message>
+    <message>
+        <source>Params</source>
+        <translation>Params</translation>
+    </message>
+    <message>
+        <source>AZ D:M:S</source>
+        <translation>AZ D:M:S</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
+    <message>
+        <source>Open</source>
+        <translation>Open</translation>
+    </message>
+    <message>
+        <source>Shutter</source>
+        <translation>Shutter</translation>
+    </message>
+    <message>
+        <source>Close On Park</source>
+        <translation>Fermer au parking</translation>
+    </message>
+    <message>
+        <source>Open On UnPark</source>
+        <translation>Open On UnPark</translation>
+    </message>
+    <message>
+        <source>Dome (deg/s)</source>
+        <translation>Dôme (deg/s)</translation>
+    </message>
+    <message>
+        <source>Shutter (m/s)</source>
+        <translation>Shutter (m/s)</translation>
+    </message>
+    <message>
+        <source>Speeds</source>
+        <translation>Speeds</translation>
+    </message>
+    <message>
+        <source>Flat Light</source>
+        <translation>Flat Light</translation>
+    </message>
+    <message>
+        <source>Brightness</source>
+        <translation>Luminosité</translation>
     </message>
 </context>
 </TS>

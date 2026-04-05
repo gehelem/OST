@@ -634,8 +634,9 @@ void Guider::SMInitGuide()
     bool storedRevDE = getBool("calibrationvalues", "revDE");
     getEltBool("revCorrections", "revRA")->setValue(storedRevRA);
     getEltBool("revCorrections", "revDE")->setValue(storedRevDE, true);
-    logInfo("Applied stored corrections from calibration: revRA=" + QString(storedRevRA ? "true" : "false") +
-            ", revDE=" + QString(storedRevDE ? "true" : "false"));
+    logInfo("Applied stored corrections from calibration: revRA=%1, revDE=%2", {QString(storedRevRA ? "true" : "false"),
+            QString(storedRevDE ? "true" : "false")
+                                                                               });
 
     // Get CURRENT mount DEC (may differ from calibration time!)
     // This is needed because target position may have changed since calibration
@@ -694,7 +695,7 @@ void Guider::SMInitGuide()
     // === DEC COMPENSATION (most critical code!) ===
 
     logInfo("Starting guiding session");
-    logInfo("Current DEC: " + QString::number(_mountDEC, 'f', 1) + "°");
+    logInfo("Current DEC: %1", {QString::number(_mountDEC, 'f', 1) + "°"});
 
     // Calculate compensation factor: cos(DEC in radians)
     // This scales RA pulses for current latitude
@@ -704,12 +705,12 @@ void Guider::SMInitGuide()
     double calPulseECompensated = _calPulseE * currentDecCompensation;
     double calPulseWCompensated = _calPulseW * currentDecCompensation;
 
-    logInfo("RA compensation factor: " + QString::number(currentDecCompensation, 'f', 3) +
-            " (cos(" + QString::number(_mountDEC, 'f', 1) + "°))");
-    logInfo("Adjusted calibration: E=" + QString::number(calPulseECompensated, 'f', 2) +
-            " W=" + QString::number(calPulseWCompensated, 'f', 2) +
-            " N=" + QString::number(_calPulseN, 'f', 2) +
-            " S=" + QString::number(_calPulseS, 'f', 2) + " (pixels/sec)");
+    logInfo("RA compensation factor: %1(cos(%2°))", {QString::number(currentDecCompensation, 'f', 3), QString::number(_mountDEC, 'f', 1)});
+    logInfo("Adjusted calibration: E=%1 W=%2 N=%3 S=%4 (pixels/sec)", {QString::number(calPulseECompensated, 'f', 2),
+            QString::number(calPulseWCompensated, 'f', 2),
+            QString::number(_calPulseN, 'f', 2),
+            QString::number(_calPulseS, 'f', 2)
+                                                                      });
 
     // Clear RMS drift history from previous guiding sessions
     // These will accumulate as new measurements come in
