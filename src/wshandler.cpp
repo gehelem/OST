@@ -148,7 +148,7 @@ void WShandler::onNewConnection()
 
 void WShandler::processTextMessage(QString message)
 {
-    qDebug() << "WShandler::processTextMessage" << message;
+    //qDebug() << "WShandler::processTextMessage" << message;
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
     QString clientGrant = mClientGrants[pClient->peerAddress().toString()];
     // OST::Event event;
@@ -287,7 +287,7 @@ void WShandler::socketDisconnected()
 {
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
     sendMessage("OST client disconnected");
-    qDebug() << pClient << "-" << pClient->peerAddress().toString();
+    //qDebug() << pClient << "-" << pClient->peerAddress().toString();
 
     if (pClient)
     {
@@ -360,7 +360,7 @@ void WShandler::setClientLanguage(QWebSocket* client, const QString &language)
     if (client && !language.isEmpty())
     {
         mClientLanguage[client] = language;
-        qDebug() << "Client" << client->peerAddress().toString() << "language set to:" << language;
+        //qDebug() << "Client" << client->peerAddress().toString() << "language set to:" << language;
     }
 }
 
