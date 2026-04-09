@@ -142,6 +142,6 @@ set(CPACK_DEBIAN_DEVELOPMENT_PACKAGE_MAINTAINER "gilles <gilles@joag.fr>")
 set(CPACK_DEBIAN_DEVELOPMENT_DESCRIPTION
     "Observatoire Sans Tête - development headers\n Headers for building OST modules")
 set(CPACK_DEBIAN_DEVELOPMENT_PACKAGE_DEPENDS
-    "ostserver (= ${OST_DEBIAN_VERSION})")
+    "ostserver (= ${OST_UPSTREAM_VERSION})")
 
 include(CPack)
