@@ -115,8 +115,9 @@ endif()
 
 # One entry per version tag
 list(LENGTH _VERSION_TAGS _NTAGS)
-math(EXPR _LAST_IDX "${_NTAGS} - 1")
 
+if(_NTAGS GREATER 0)
+math(EXPR _LAST_IDX "${_NTAGS} - 1")
 foreach(_i RANGE 0 ${_LAST_IDX})
     list(GET _VERSION_TAGS ${_i} _TAG)
 
@@ -146,6 +147,7 @@ foreach(_i RANGE 0 ${_LAST_IDX})
 
     string(APPEND _CHANGELOG "\n -- ${MAINTAINER_NAME} <${MAINTAINER_EMAIL}>  ${_TAG_DATE}\n\n")
 endforeach()
+endif() # _NTAGS GREATER 0
 
 # Fallback if no history at all
 if(_CHANGELOG STREQUAL "")
