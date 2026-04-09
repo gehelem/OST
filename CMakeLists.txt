@@ -115,12 +115,7 @@ add_executable(ostserver
     ${CMAKE_CURRENT_SOURCE_DIR}/src/logger.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/translatemanager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/translatemanager.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/datastore.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/datastore.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/dbmanager.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/dbmanager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/version.hh
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/resources.qrc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/translations/translations.qrc
     ${CMAKE_CURRENT_SOURCE_DIR}/QtZeroConf/qzeroconfservice.h
@@ -292,6 +287,7 @@ target_link_libraries(ostbasemodule
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::Sql
     ${STELLARSOLVER_LIBRARIES}
     ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${NOVA_LIBRARIES}
     ${GSL_LIBRARIES} ${ZLIB_LIBRARY}
