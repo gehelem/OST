@@ -507,9 +507,9 @@ install(TARGETS
     ostnavigator
     ostallsky
     ostplanner
-    RUNTIME DESTINATION "/usr/bin"
-    LIBRARY DESTINATION "/usr/lib"
-    PUBLIC_HEADER DESTINATION "/usr/include/ost"
+    RUNTIME DESTINATION "/usr/bin"     COMPONENT Runtime
+    LIBRARY DESTINATION "/usr/lib"     COMPONENT Runtime
+    PUBLIC_HEADER DESTINATION "/usr/include/ost" COMPONENT Development
 )
 
 # Generate version.cc at build time (not configure time)

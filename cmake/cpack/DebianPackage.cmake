@@ -92,6 +92,7 @@ add_dependencies(ostserver debian_changelog)
 install(
     FILES "${OST_CHANGELOG_GZ}"
     DESTINATION "share/doc/ostserver"
+    COMPONENT Runtime
 )
 
 # ---------------------------------------------------------------------------
@@ -102,39 +103,45 @@ set(CPACK_GENERATOR "DEB")
 # Strip debug symbols from installed binaries (equivalent to dh_strip)
 set(CPACK_STRIP_FILES TRUE)
 
-# Exclude development headers from the runtime package
-# Headers belong in a separate -dev package; cmake --install keeps them
-set(CPACK_IGNORE_FILES "/usr/include/")
+# Component-based packaging: one .deb per component
+set(CPACK_DEB_COMPONENT_INSTALL ON)
+set(CPACK_COMPONENTS_ALL Runtime Development)
 
-set(CPACK_PACKAGE_NAME        "ostserver")
+# Global package metadata
 set(CPACK_PACKAGE_VERSION     "${OST_UPSTREAM_VERSION}")
 set(CPACK_PACKAGE_RELEASE     "${OST_DEBIAN_REVISION}")
 set(CPACK_PACKAGE_CONTACT     "gilles <gilles@joag.fr>")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Observatoire Sans Tête")
-set(CPACK_PACKAGE_DESCRIPTION
-"Observatoire Sans Tête
- Light and headless astrophotography automation tool")
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/gehelem/OST")
 
-# Output filename: ostserver_0.0.2+git138.gabcdef12-1_amd64.deb
-set(CPACK_PACKAGE_FILE_NAME
-    "${CPACK_PACKAGE_NAME}_${OST_DEBIAN_VERSION}_${CMAKE_SYSTEM_PROCESSOR}")
-
-set(CPACK_DEB_COMPONENT_INSTALL OFF)
-
-set(CPACK_DEBIAN_PACKAGE_SECTION      "science")
-set(CPACK_DEBIAN_PACKAGE_PRIORITY     "optional")
-set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
-set(CPACK_DEBIAN_PACKAGE_MAINTAINER   "gilles <gilles@joag.fr>")
-set(CPACK_DEBIAN_PACKAGE_HOMEPAGE     "https://github.com/gehelem/OST")
-
-# Runtime dependencies
-set(CPACK_DEBIAN_PACKAGE_DEPENDS
+# ---------------------------------------------------------------------------
+# ostserver  (Runtime component)
+# ---------------------------------------------------------------------------
+set(CPACK_DEBIAN_RUNTIME_PACKAGE_NAME    "ostserver")
+set(CPACK_DEBIAN_RUNTIME_FILE_NAME
+    "ostserver_${OST_DEBIAN_VERSION}_${CMAKE_SYSTEM_PROCESSOR}.deb")
+set(CPACK_DEBIAN_RUNTIME_PACKAGE_SECTION   "science")
+set(CPACK_DEBIAN_RUNTIME_PACKAGE_PRIORITY  "optional")
+set(CPACK_DEBIAN_RUNTIME_PACKAGE_MAINTAINER "gilles <gilles@joag.fr>")
+set(CPACK_DEBIAN_RUNTIME_DESCRIPTION
+    "Observatoire Sans Tête\n Light and headless astrophotography automation tool")
+set(CPACK_DEBIAN_RUNTIME_PACKAGE_DEPENDS
     "libqt5core5a, libqt5network5, libqt5websockets5, libqt5sql5, libqt5sql5-sqlite")
-set(CPACK_DEBIAN_PACKAGE_RECOMMENDS
+set(CPACK_DEBIAN_RUNTIME_PACKAGE_RECOMMENDS
     "libindi1, libstellarsolver")
+set(CPACK_DEBIAN_RUNTIME_PACKAGE_SHLIBDEPS ON)
 
-# Let dpkg-shlibdeps auto-detect shared library dependencies
-set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+# ---------------------------------------------------------------------------
+# ostserver-dev  (Development component)
+# ---------------------------------------------------------------------------
+set(CPACK_DEBIAN_DEVELOPMENT_PACKAGE_NAME    "ostserver-dev")
+set(CPACK_DEBIAN_DEVELOPMENT_FILE_NAME
+    "ostserver-dev_${OST_DEBIAN_VERSION}_${CMAKE_SYSTEM_PROCESSOR}.deb")
+set(CPACK_DEBIAN_DEVELOPMENT_PACKAGE_SECTION   "libdevel")
+set(CPACK_DEBIAN_DEVELOPMENT_PACKAGE_PRIORITY  "optional")
+set(CPACK_DEBIAN_DEVELOPMENT_PACKAGE_MAINTAINER "gilles <gilles@joag.fr>")
+set(CPACK_DEBIAN_DEVELOPMENT_DESCRIPTION
+    "Observatoire Sans Tête - development headers\n Headers for building OST modules")
+set(CPACK_DEBIAN_DEVELOPMENT_PACKAGE_DEPENDS
+    "ostserver (= ${OST_DEBIAN_VERSION})")
 
 include(CPack)
