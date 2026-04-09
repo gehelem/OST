@@ -6,6 +6,8 @@ stages:
 variables:
   DEB_FILE_LATEST: "ostserver_latest_amd64.deb"
   DEB_FILE_TAG: "ostserver_${CI_COMMIT_TAG}_amd64.deb"
+  DEB_FILE_DEV_LATEST: "ostserver-dev_latest_amd64.deb"
+  DEB_FILE_DEV_TAG: "ostserver-dev_${CI_COMMIT_TAG}_amd64.deb"
   PACKAGE_REGISTRY_LATEST: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/latest/latest"
   PACKAGE_REGISTRY_TAG: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${CI_COMMIT_TAG}/${CI_COMMIT_TAG}"
 
@@ -18,6 +20,8 @@ build-job:
     paths:
       - ${DEB_FILE_LATEST}
       - ${DEB_FILE_TAG}
+      - ${DEB_FILE_DEV_LATEST}
+      - ${DEB_FILE_DEV_TAG}
       - server.log
       - ws.log
     expire_in: 1 week
