@@ -58,7 +58,9 @@ ElementBase *ElementFactory::createElement(const QString &key, const QVariantMap
                 }
                 else
                 {
-                    pElement->setGlobalLov(pData["listOfValues"].toString());
+                    bool b = false;
+                    if (pData.contains("listOfValuesIsExternal"))  b = pData["listOfValuesIsExternal"].toBool();
+                    pElement->setGlobalLov(pData["listOfValues"].toString(), b);
                 }
             }
             return pElement;
@@ -94,7 +96,9 @@ ElementBase *ElementFactory::createElement(const QString &key, const QVariantMap
                 }
                 else
                 {
-                    pElement->setGlobalLov(pData["listOfValues"].toString());
+                    bool b = false;
+                    if (pData.contains("listOfValuesIsExternal"))  b = pData["listOfValuesIsExternal"].toBool();
+                    pElement->setGlobalLov(pData["listOfValues"].toString(), b);
                 }
             }
             return pElement;
@@ -129,7 +133,9 @@ ElementBase *ElementFactory::createElement(const QString &key, const QVariantMap
                 }
                 else
                 {
-                    pElement->setGlobalLov(pData["listOfValues"].toString());
+                    bool b = false;
+                    if (pData.contains("listOfValuesIsExternal"))  b = pData["listOfValuesIsExternal"].toBool();
+                    pElement->setGlobalLov(pData["listOfValues"].toString(), b);
                 }
             }
             return pElement;

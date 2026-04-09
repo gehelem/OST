@@ -209,25 +209,47 @@ class ElementBase: public QObject
         QString getGlobalLov();
 
         /**
+         * @brief Get global LOV scope
+         * @return false if lov is handled by module, false if it's handled by controller
+         *
+         */
+        bool getGlobalLovIsExternal()
+        {
+            return mGlobLovIsExternal;
+        }
+
+        /**
          * @brief Set global LOV reference
+         * @param lovName Key of global LOV in Datastore::mGlobLov or controller
+         * @param external Bool - false if lov is managed directly by module, true if managed by controller
+         *
+         * Links element to a global LOV for dynamic dropdowns.
+         */
+        void setGlobalLov(QString lovName, bool external);
+        /**
+         * @brief Set global LOV reference - managed by module
          * @param lovName Key of global LOV in Datastore::mGlobLov
          *
          * Links element to a global LOV for dynamic dropdowns.
          */
-        void setGlobalLov(QString lovName);
+        void setGlobalLov(QString lovName)
+        {
+            setGlobalLov(lovName, false);
+        }
 
     private:
         QString mKey = "";                              /*!< Unique internal identifier */
         QString mLabel = "change me";     /*!< Display label for frontend */
         QString mOrder = "change me";     /*!< Sort order within property */
         QString mHint = "";               /*!< Tooltip/help text */
-        bool mAutoUpdate = false;         /*!< A
-to-propagate changes to backend */
+        bool mAutoUpdate = false;         /*!< Auto-propagate changes to backend */
         bool mDirectEdit = false;         /*!< Allow inline editing in frontend */
         bool mBadge = false;              /*!< Show notification badge */
         QString mPreIcon = "";            /*!< Prefix icon identifier */
         QString mPostIcon = "";           /*!< Postfix icon identifier */
         QString mGlobalLov = "";          /*!< Reference to global LOV key */
+        bool mGlobLovIsExternal =
+            false; /*!< wether if globallov is managed by module or is external to module (ie. controller ...) */
 
     public slots:
         /**

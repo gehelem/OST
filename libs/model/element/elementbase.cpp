@@ -72,9 +72,10 @@ QString ElementBase::getGlobalLov()
 {
     return mGlobalLov;
 }
-void ElementBase::setGlobalLov(QString lovName)
+void ElementBase::setGlobalLov(QString lovName, bool external)
 {
     mGlobalLov = lovName;
+    mGlobLovIsExternal = external;
 }
 
 void ElementBase::OnLovChanged()

@@ -73,6 +73,7 @@ void ElementJsonDumper::visit(ElementInt *pElement, QVariantMap &data, bool &emi
     if (pElement->getGlobalLov() != "")
     {
         json["globallov"] = pElement->getGlobalLov();
+        json["globallovIsExternal"] = pElement->getGlobalLovIsExternal();
     }
     else
     {
@@ -113,6 +114,7 @@ void ElementJsonDumper::visit(ElementFloat *pElement, QVariantMap &data, bool &e
     if (pElement->getGlobalLov() != "")
     {
         json["globallov"] = pElement->getGlobalLov();
+        json["globallovIsExternal"] = pElement->getGlobalLovIsExternal();
     }
     else
     {
@@ -144,6 +146,7 @@ void ElementJsonDumper::visit(ElementString *pElement, QVariantMap &data, bool &
     if (pElement->getGlobalLov() != "")
     {
         json["globallov"] = pElement->getGlobalLov();
+        json["globallovIsExternal"] = pElement->getGlobalLovIsExternal();
     }
     else
     {
