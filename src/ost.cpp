@@ -101,6 +101,7 @@ int main(int argc, char *argv[])
     mLogger.info("Git Hash              =" + QString::fromStdString(Version::GIT_SHA1));
     mLogger.info("Git Date              =" + QString::fromStdString(Version::GIT_DATE));
     mLogger.info("Git Commit subject    =" + QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
+    mLogger.info("Git Tag               =" + QString::fromStdString(Version::GIT_TAG));
 
     mLogger.info("Webroot               =" + webroot);
     mLogger.info("DB Path               =" + dbPath);

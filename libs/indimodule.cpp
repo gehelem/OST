@@ -13,7 +13,7 @@ IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap
     setMetadata("baseindiGithash", QString::fromStdString(Version::GIT_SHA1));
     setMetadata("baseindiGitdate", QString::fromStdString(Version::GIT_DATE));
     setMetadata("baseindiGitmessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
-    setMetadata("baseindiVersion", "0.1");
+    setMetadata("baseindiVersion", QString::fromStdString(Version::GIT_TAG));
 
 
     OST::LovString* ls = new OST::LovString("DRIVER_INTERFACE-TELESCOPE_INTERFACE");

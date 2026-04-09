@@ -507,9 +507,9 @@ install(TARGETS
     ostnavigator
     ostallsky
     ostplanner
-    RUNTIME DESTINATION "/usr/bin"
-    LIBRARY DESTINATION "/usr/lib"
-    PUBLIC_HEADER DESTINATION "/usr/include/ost"
+    RUNTIME DESTINATION "/usr/bin"     COMPONENT Runtime
+    LIBRARY DESTINATION "/usr/lib"     COMPONENT Runtime
+    PUBLIC_HEADER DESTINATION "/usr/include/ost" COMPONENT Development
 )
 
 # Generate version.cc at build time (not configure time)
@@ -534,6 +534,10 @@ list(APPEND SOURCES "${CMAKE_CURRENT_BINARY_DIR}/version.cc" version.hh)
 message(STATUS "CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR}")
 message(STATUS "Version file will be generated at build time: ${CMAKE_CURRENT_BINARY_DIR}/version.cc")
 
+# ---------------------------------------------------------------------------
+# Packaging (CPack / Debian)
+# ---------------------------------------------------------------------------
+include(cmake/cpack/DebianPackage.cmake)
 
 #get_cmake_property(_variableNames VARIABLES)
 #list (SORT _variableNames)
