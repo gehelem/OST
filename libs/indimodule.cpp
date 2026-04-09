@@ -196,7 +196,7 @@ bool IndiModule::connectIndi()
     {
         newUniversalMessage("Indi server connected");
         logInfo("Indi server connected");
-        QTimer::singleShot(100, this, &IndiModule::OnAfterIndiConnectIndiTimer);
+        QTimer::singleShot(500, this, &IndiModule::OnAfterIndiConnectIndiTimer);
         return true;
     }
     logError("%1 - Couldn't connect to Indi server", {QString("connectIndi")});
