@@ -18,7 +18,7 @@ GIT_DATE=$(git log -1 --format=%ad --date=local 2>/dev/null || echo "unknown")
 GIT_COMMIT_SUBJECT=$(git log -1 --format=%s 2>/dev/null || echo "unknown")
 
 # GIT_TAG: exact tag if on a tagged commit, otherwise short commit hash
-GIT_TAG=$(git describe --tags --exact-match --match "[0-9]*" 2>/dev/null)
+GIT_TAG=$(git describe --tags --exact-match 2>/dev/null)
 if [ -z "$GIT_TAG" ]; then
     GIT_TAG=$(git log -1 --format=%h 2>/dev/null || echo "unknown")
 fi
