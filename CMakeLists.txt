@@ -534,6 +534,10 @@ list(APPEND SOURCES "${CMAKE_CURRENT_BINARY_DIR}/version.cc" version.hh)
 message(STATUS "CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR}")
 message(STATUS "Version file will be generated at build time: ${CMAKE_CURRENT_BINARY_DIR}/version.cc")
 
+# ---------------------------------------------------------------------------
+# Packaging (CPack / Debian)
+# ---------------------------------------------------------------------------
+include(cmake/cpack/DebianPackage.cmake)
 
 #get_cmake_property(_variableNames VARIABLES)
 #list (SORT _variableNames)
