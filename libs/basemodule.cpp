@@ -24,7 +24,7 @@ Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap
     setMetadata("baseGithash", QString::fromStdString(Version::GIT_SHA1));
     setMetadata("baseGitdate", QString::fromStdString(Version::GIT_DATE));
     setMetadata("baseGitmessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
-    setMetadata("baseversion", "0.1");
+    setMetadata("baseversion", QString::fromStdString(Version::GIT_TAG));
     setMetadata("startdatetime", QDateTime::currentDateTime());
     mStatus.ts = QDateTime::currentDateTime();
     mStatus.message = "init";

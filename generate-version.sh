@@ -17,13 +17,21 @@ GIT_SHA1=$(git describe --match=NeVeRmAtCh --always --abbrev=40 --dirty 2>/dev/n
 GIT_DATE=$(git log -1 --format=%ad --date=local 2>/dev/null || echo "unknown")
 GIT_COMMIT_SUBJECT=$(git log -1 --format=%s 2>/dev/null || echo "unknown")
 
+# GIT_TAG: exact tag if on a tagged commit, otherwise short commit hash
+GIT_TAG=$(git describe --tags --exact-match --match "[0-9]*" 2>/dev/null)
+if [ -z "$GIT_TAG" ]; then
+    GIT_TAG=$(git log -1 --format=%h 2>/dev/null || echo "unknown")
+fi
+
 # Replace placeholders in template
 sed -e "s|@GIT_SHA1@|${GIT_SHA1}|g" \
     -e "s|@GIT_DATE@|${GIT_DATE}|g" \
     -e "s|@GIT_COMMIT_SUBJECT@|${GIT_COMMIT_SUBJECT}|g" \
+    -e "s|@GIT_TAG@|${GIT_TAG}|g" \
     "$TEMPLATE_FILE" > "$OUTPUT_FILE"
 
 echo "Generated $OUTPUT_FILE"
 echo "  GIT_SHA1: $GIT_SHA1"
 echo "  GIT_DATE: $GIT_DATE"
 echo "  GIT_COMMIT_SUBJECT: $GIT_COMMIT_SUBJECT"
+echo "  GIT_TAG: $GIT_TAG"
