@@ -8,7 +8,7 @@ apt-get clean
 apt-get install -y software-properties-common
 apt-add-repository ppa:mutlaqja/ppa
 apt-get update
-apt-get install -y build-essential cmake git npm \
+apt-get install -y build-essential cmake git npm file dpkg-dev \
     qtbase5-dev libqt5websockets5-dev libqt5scxml5-dev qttools5-dev-tools \
     qtdeclarative5-dev libqt5svg5-dev \
     libindi-dev libstellarsolver-dev libnova-dev libgsl-dev \
