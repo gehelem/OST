@@ -28,7 +28,8 @@
       "sequencemodule": {
           "type": "string",
           "label": "Sequence instance",
-          "listOfValues":"loadedModules",
+          "listOfValues":"loadedModules-sequencer",
+          "listOfValuesIsExternal":true,
           "autoupdate": true,
           "directedit": true,
           "value": "Sequencer",
@@ -38,7 +39,8 @@
       "navigatormodule": {
           "type": "string",
           "label": "Navigator instance",
-          "listOfValues":"loadedModules",
+          "listOfValues":"loadedModules-navigator",
+          "listOfValuesIsExternal":true,
           "autoupdate": true,
           "directedit": true,
           "value": "Navigator",

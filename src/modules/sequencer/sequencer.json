@@ -163,7 +163,8 @@
             "focusmodule": {
                 "type": "string",
                 "label": "Focus module instance",
-                "listOfValues":"loadedModules",
+                "listOfValues":"loadedModules-focus",
+                "listOfValuesIsExternal":true,
                 "autoupdate": true,
                 "directedit": true,
                 "value": "focus",
@@ -182,7 +183,8 @@
             "guidermodule": {
                 "type": "string",
                 "label": "Guider module instance",
-                "listOfValues":"loadedModules",
+                "listOfValues":"loadedModules-guider",
+                "listOfValuesIsExternal":true,
                 "autoupdate": true,
                 "directedit": true,
                 "value": "guider",

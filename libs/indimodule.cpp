@@ -1004,7 +1004,7 @@ bool IndiModule::defineMeAsNavigator()
     s = new  OST::ElementString("plannermodule", "Planner module", "nav30", "");
     s->setDirectEdit(true);
     s->setAutoUpdate(true);
-    s->setGlobalLov("loadedModules");
+    s->setGlobalLov("loadedModules-planner", true); /* loaded modules lov is handled by controller */
     pm->addElt(s);
 
     mIsNavigator = true;
