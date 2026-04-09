@@ -28,12 +28,13 @@ make -j$(nproc)
 cpack -G DEB
 cd ..
 
-DEB_FILE=$(ls build/*.deb | head -1)
-echo "Package built: ${DEB_FILE}"
-cp "${DEB_FILE}" "./${DEB_FILE_LATEST}"
-cp "${DEB_FILE}" "./${DEB_FILE_TAG}"
+DEB_RUNTIME=$(ls build/ostserver_*.deb | head -1)
+DEB_DEV=$(ls build/ostserver-dev_*.deb | head -1)
+echo "Packages built: ${DEB_RUNTIME}  ${DEB_DEV}"
+cp "${DEB_RUNTIME}" "./${DEB_FILE_LATEST}"
+cp "${DEB_RUNTIME}" "./${DEB_FILE_TAG}"
 
-dpkg -i "${DEB_FILE}"
+dpkg -i "${DEB_RUNTIME}" "${DEB_DEV}"
 
 echo "Quick test..."
 export QT_QPA_PLATFORM=offscreen
