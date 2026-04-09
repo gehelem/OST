@@ -99,6 +99,13 @@ install(
 # ---------------------------------------------------------------------------
 set(CPACK_GENERATOR "DEB")
 
+# Strip debug symbols from installed binaries (equivalent to dh_strip)
+set(CPACK_STRIP_FILES TRUE)
+
+# Exclude development headers from the runtime package
+# Headers belong in a separate -dev package; cmake --install keeps them
+set(CPACK_IGNORE_FILES "/usr/include/")
+
 set(CPACK_PACKAGE_NAME        "ostserver")
 set(CPACK_PACKAGE_VERSION     "${OST_UPSTREAM_VERSION}")
 set(CPACK_PACKAGE_RELEASE     "${OST_DEBIAN_REVISION}")
