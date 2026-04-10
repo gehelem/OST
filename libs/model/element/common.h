@@ -285,6 +285,7 @@ enum class ExtEvType
 {
     ZZ = 0,    /*!< invalid request */
     DU,        /*!< request dump */
+    DP,        /*!< request property dump */
     LO,        /*!< login request */
     IL,        /*!< set client language request */
     FS,        /*!< folder select */
@@ -318,6 +319,8 @@ inline QString ExtEvToString(ExtEvType ev)
             return "ZZ";
         case OST::ExtEvType::DU:
             return "DU";
+        case OST::ExtEvType::DP:
+            return "DP";
         case OST::ExtEvType::LO:
             return "LO";
         case OST::ExtEvType::IL:
@@ -374,6 +377,7 @@ typedef struct ExtEvent
 {
     ExtEvType ev = ExtEvType::ZZ;   /*!< External event type*/
     QJsonObject data;               /*!< External event data */
+    QString mod;                    /*!< specific to intermodules requests */
     QString prpkey;                 /*!< controller updates this if needed : no control is done, just for easier and later usage in basemodule on so on */
     QString eltkey;                 /*!< ^ ^ */
     QString lovkey;                 /*!< ^ ^ */
@@ -384,6 +388,7 @@ typedef struct ExtEvent
 inline ExtEvType StrToExtEvent(QString s)
 {
     if (s == "DU") return  ExtEvType::DU;
+    if (s == "DP") return  ExtEvType::DP;
     if (s == "LO") return  ExtEvType::LO;
     if (s == "IL") return  ExtEvType::IL;
     if (s == "FS") return  ExtEvType::FS;

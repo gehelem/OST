@@ -330,6 +330,13 @@ void Planner::startLine()
     eltData["targetname"] = getString("planning", "object");
     propData["elements"] = eltData;
     eventData["actions"] = propData;
+
+    OST::ExtEvent event;
+    event.ev = OST::ExtEvType::DP;
+    event.mod = getString("parms", "navigatormodule");
+    event.prpkey = "actions";
+    emit interModuleRequest(event);
+
     //emit moduleEvent("Fsetproperty", getString("parms", "navigatormodule"), "", eventData);
     eltData = QVariantMap();
     eltData["targetra"] = getFloat("planning", "ra");
@@ -388,11 +395,14 @@ void Planner::onOtherModuleEvent(OST::EvType ev, QVariant data, OST::ElementBase
     if (mod->getModuleName() != getString("parms", "navigatormodule")
             && mod->getModuleName() != getString("parms", "sequencemodule") ) return;
 
-    QString p;
-    if (prop) p = prop->key();
-    QString e;
-    if (elt) e = elt->key();
-    QString l;
-    if (lov) l = lov->getKey();
-    logDebug("Planner::onOthermoduleEvent %1' %2' %3 %4 %5 %6", {mod->getModuleName(), OST::EvToString(ev), p, e, l, data.toMap()});
+    if (mod->getModuleName() == getString("parms", "navigatormodule") && ev == OST::EvType::ap && prop->key() == "actions")
+    {
+        QString p;
+        if (prop) p = prop->key();
+        QString e;
+        if (elt) e = elt->key();
+        QString l;
+        if (lov) l = lov->getKey();
+        logDebug("Planner::onOthermoduleEvent %1' %2' %3 %4 %5 %6", {mod->getModuleName(), OST::EvToString(ev), p, e, l, data.toMap()});
+    }
 }

@@ -74,6 +74,8 @@ class Controller : public QObject
         void logInfo(const QString &message, const QVariantList &args);
         void logError(const QString &message);
         void logError(const QString &message, const QVariantList &args);
+        void logDebug(const QString &message);
+        void logDebug(const QString &message, const QVariantList &args);
         void updateControllerData(QString key, QVariant data);
 
         QJsonObject getModulesDump(QString clientgrant);
@@ -87,6 +89,7 @@ class Controller : public QObject
         void onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase* elt, OST::PropertyBase* prp, OST::LovBase* lov,
                            Datastore* mod);
         void onExternalEvent(OST::ExtEvent event);
+        void onInterModuleRequest(OST::ExtEvent event);
         void OnClientEvent(OST::ExtEvent event, QWebSocket* client, QString clientgrant);
         //void OnMainCtlEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
         //                    const QVariantMap &pEventData);

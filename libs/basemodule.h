@@ -66,6 +66,7 @@ class Basemodule : public DBManager
          */
         void moduleEvent(OST::EvType, QVariant, OST::ElementBase*, OST::PropertyBase*, OST::LovBase*, Basemodule*);
 
+        void interModuleRequest(OST::ExtEvent event);
 
     public slots:
         void onDatastoreEvent(OST::EvType evt, QVariant data, OST::ElementBase* elt, OST::PropertyBase* prp,

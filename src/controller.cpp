@@ -217,6 +217,7 @@ bool Controller::loadModule(QString lib, QString label, QString profile)
     QVariantMap profs;
     dbmanager->getDbProfiles(mod->metaObject()->className(), profs);
     connect(mod, &Basemodule::moduleEvent, this, &Controller::onModuleEvent);
+    connect(mod, &Basemodule::interModuleRequest, this, &Controller::onInterModuleRequest);
     connect(mod, &Basemodule::moduleEvent, wshandler, &WShandler::onModuleEvent);
 
     //connect(mod, &Basemodule::loadOtherModule, this, &Controller::loadModule);
@@ -731,6 +732,18 @@ void Controller::OnFileChangeEvent(const QString &pEvent)
     //qDebug() << "****************************************** FileChanged" << pEvent;
 }
 
+void Controller::logDebug(const QString &message)
+{
+    logDebug(message, {});
+}
+void Controller::logDebug(const QString &message, const QVariantList &args)
+{
+    // Log to console (server language)
+    mLogger->onLog(OST::LogLevel::Debug, message, args, "CT");
+
+    // Broadcast to WebSocket clients (each in their language)
+    wshandler->onLog(OST::LogLevel::Debug, message, args, "CT");
+}
 void Controller::logInfo(const QString &message)
 {
     logInfo(message, {});
@@ -790,4 +803,11 @@ void Controller::updateControllerData(QString key, QVariant data)
 {
     mControllerData[key] = data;
     wshandler->onControllerEvent(OST::EvType::uc, key, data);
+}
+void Controller::onInterModuleRequest(OST::ExtEvent event)
+{
+    Basemodule *module = qobject_cast<Basemodule *>(sender());
+    logDebug("Controller::onInterModuleRequest %1 %2 %3 %4", {OST::ExtEvToString(event.ev), event.mod, event.prpkey, event.data});
+    module->onExternalEventRoot(event);
+
 }
