@@ -21,6 +21,9 @@ class Planner : public IndiModule
 
     protected:
         void onExternalEvent(OST::ExtEvent event) override;
+    public slots:
+        void onOtherModuleEvent(OST::EvType ev, QVariant data, OST::ElementBase* elt,  OST::PropertyBase* prop, OST::LovBase* lov,
+                                Basemodule* mod) override;
 
     private slots:
         /**

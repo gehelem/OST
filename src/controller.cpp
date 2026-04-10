@@ -219,7 +219,7 @@ bool Controller::loadModule(QString lib, QString label, QString profile)
     connect(mod, &Basemodule::moduleEvent, this, &Controller::onModuleEvent);
     connect(mod, &Basemodule::moduleEvent, wshandler, &WShandler::onModuleEvent);
 
-    connect(mod, &Basemodule::loadOtherModule, this, &Controller::loadModule);
+    //connect(mod, &Basemodule::loadOtherModule, this, &Controller::loadModule);
     connect(this, &Controller::controllerEvent, mod, &Basemodule::onExternalEventRoot);
 
     // Connect module to log system
@@ -235,7 +235,8 @@ bool Controller::loadModule(QString lib, QString label, QString profile)
             //connect(othermodule, &Basemodule::moduleStatusAnswer, mod, &Basemodule::OnModuleStatusAnswer);
             //connect(mod, &Basemodule::moduleStatusRequest, othermodule, &Basemodule::OnModuleStatusRequest);
             //connect(mod, &Basemodule::moduleStatusAnswer, othermodule, &Basemodule::OnModuleStatusAnswer);
-            //connect(othermodule, &Datastore::moduleEvent, mod, &Basemodule::OnExternalEvent);
+            connect(othermodule, &Basemodule::moduleEvent, mod, &Basemodule::onOtherModuleEvent);
+            connect(mod, &Basemodule::moduleEvent, othermodule, &Basemodule::onOtherModuleEvent);
             //connect(mod, &Datastore::moduleEvent, othermodule, &Basemodule::OnExternalEvent);
         }
     }

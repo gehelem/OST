@@ -258,6 +258,12 @@ bool Basemodule::onExternalEventBase(OST::ExtEvent event)
 
     return true;
 }
+void Basemodule::onOtherModuleEvent(OST::EvType ev, QVariant data, OST::ElementBase* elt,  OST::PropertyBase* prop,
+                                    OST::LovBase* lov,
+                                    Basemodule* mod)
+{
+
+}
 
 /**
  * @brief INDI module event handler (Hook 2/3)

@@ -28,7 +28,7 @@
       "sequencemodule": {
           "type": "string",
           "label": "Sequence instance",
-          "listOfValues":"loadedModules-sequencer",
+          "listOfValues":"loadedModules-sequence",
           "listOfValuesIsExternal":true,
           "autoupdate": true,
           "directedit": true,
@@ -88,6 +88,8 @@
       "profile": {
           "type": "string",
           "label": "Profile",
+          "listOfValues":"profiles-Sequencer",
+          "listOfValuesIsExternal":true,
           "autoupdate": false,
           "directedit": false,
           "order": 30,

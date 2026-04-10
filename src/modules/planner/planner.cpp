@@ -381,3 +381,18 @@ void Planner::startLine()
     //emit moduleEvent("Fsetproperty", getString("parms", "navigatormodule"), "", eventData);
 
 }
+void Planner::onOtherModuleEvent(OST::EvType ev, QVariant data, OST::ElementBase*elt, OST::PropertyBase*prop,
+                                 OST::LovBase*lov,
+                                 Basemodule*mod)
+{
+    if (mod->getModuleName() != getString("parms", "navigatormodule")
+            && mod->getModuleName() != getString("parms", "sequencemodule") ) return;
+
+    QString p;
+    if (prop) p = prop->key();
+    QString e;
+    if (elt) e = elt->key();
+    QString l;
+    if (lov) l = lov->getKey();
+    logDebug("Planner::onOthermoduleEvent %1' %2' %3 %4 %5 %6", {mod->getModuleName(), OST::EvToString(ev), p, e, l, data.toMap()});
+}
