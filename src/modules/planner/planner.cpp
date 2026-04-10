@@ -331,11 +331,11 @@ void Planner::startLine()
     propData["elements"] = eltData;
     eventData["actions"] = propData;
 
-    OST::ExtEvent event;
-    event.ev = OST::ExtEvType::DP;
-    event.mod = getString("parms", "navigatormodule");
-    event.prpkey = "actions";
-    emit interModuleRequest(event);
+    otherModuleRequestPropertyDump(getString("parms", "navigatormodule"), "actions");
+
+    otherModuleSetValue( getString("parms", "navigatormodule"), "target", "targetra", getFloat("planning", "ra"));
+    otherModuleSetValue( getString("parms", "navigatormodule"), "target", "targetde", getFloat("planning", "dec"));
+    otherModuleSetValue( getString("parms", "navigatormodule"), "target", "targetname", getString("planning", "object"));
 
     //emit moduleEvent("Fsetproperty", getString("parms", "navigatormodule"), "", eventData);
     eltData = QVariantMap();

@@ -576,3 +576,36 @@ bool Basemodule::getCurrentProfileChanged()
 {
     return mCurrentProfileChanged;
 };
+void Basemodule::otherModuleSetValue(QString mod, QString prop, QString elt, QVariant value)
+{
+    OST::ExtEvent event;
+    event.ev = OST::ExtEvType::SV;
+    event.mod = mod;
+    event.prpkey = prop;
+    event.eltkey = elt;
+    QJsonObject e, E, p, P, m, M;
+    e[elt] = QJsonValue::fromVariant(value);
+    E["e"] = e;
+    p[prop] = E;
+    P["p"] = p;
+    m[mod] = P;
+    M["m"] = m;
+    event.data = M;
+    qDebug() << event.data;
+    emit interModuleRequest(event);
+};
+void Basemodule::otherModuleRequestPropertyDump(QString mod, QString prop)
+{
+    OST::ExtEvent event;
+    event.ev = OST::ExtEvType::DP;
+    event.mod = mod;
+    event.prpkey = prop;
+    QJsonObject p, P, m, M;
+    p[prop] = QJsonObject();
+    P["p"] = p;
+    m[mod] = P;
+    M["m"] = m;
+    event.data = M;
+    qDebug() << event.data;
+    emit interModuleRequest(event);
+}

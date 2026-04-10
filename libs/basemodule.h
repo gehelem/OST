@@ -129,6 +129,9 @@ class Basemodule : public DBManager
          */
         virtual void onExternalEvent(OST::ExtEvent event);
 
+        void otherModuleSetValue(QString mod, QString prop, QString elt, QVariant value);
+        void otherModuleRequestPropertyDump(QString mod, QString prop);
+
 
 }
 ;

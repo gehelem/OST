@@ -817,11 +817,6 @@ void Controller::onInterModuleRequest(OST::ExtEvent event)
         logError("Controller::onInterModuleRequest - problem finding module : %1 %2 ", {event.mod, modules.size()});
         return;
     }
-    QVariantMap p;
-    p[event.prpkey] = QVariantMap();
-    QVariantMap m;
-    m[event.mod] = p;
-    event.data["m"] = QJsonObject::fromVariantMap(m);
     logDebug("Controller::onInterModuleRequest %1 %2 %3 %4", {OST::ExtEvToString(event.ev), event.mod, event.prpkey, event.data});
     modules[0]->onExternalEventRoot(event);
 
