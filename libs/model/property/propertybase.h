@@ -388,6 +388,8 @@ class PropertyBase: public QObject
          */
         void setFreeValue(QString s);
 
+        void sendDump();
+
     signals:
         /**
          * @brief Signal emitted when state changes

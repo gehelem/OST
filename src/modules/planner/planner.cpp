@@ -397,12 +397,6 @@ void Planner::onOtherModuleEvent(OST::EvType ev, QVariant data, OST::ElementBase
 
     if (mod->getModuleName() == getString("parms", "navigatormodule") && ev == OST::EvType::ap && prop->key() == "actions")
     {
-        QString p;
-        if (prop) p = prop->key();
-        QString e;
-        if (elt) e = elt->key();
-        QString l;
-        if (lov) l = lov->getKey();
-        logDebug("Planner::onOthermoduleEvent %1' %2' %3 %4 %5 %6", {mod->getModuleName(), OST::EvToString(ev), p, e, l, data.toMap()});
+        logDebug("Planner::onOthermoduleEvent mod=%1 ev=%2 prop=%3 status=%4", {mod->getModuleName(), OST::EvToString(ev), prop->key(), prop->state()});
     }
 }

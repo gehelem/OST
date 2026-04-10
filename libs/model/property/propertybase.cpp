@@ -160,5 +160,8 @@ void PropertyBase::setAutoUpdate(bool b)
 {
     mAutoUpdate = b;
 }
-
+void PropertyBase::sendDump()
+{
+    emit PropertyBase::prpEvent(OST::EvType::ap, QVariant(), nullptr, this);
+}
 }

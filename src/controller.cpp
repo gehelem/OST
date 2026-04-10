@@ -806,8 +806,23 @@ void Controller::updateControllerData(QString key, QVariant data)
 }
 void Controller::onInterModuleRequest(OST::ExtEvent event)
 {
-    Basemodule *module = qobject_cast<Basemodule *>(sender());
+    QList<Basemodule *> modules = findChildren<Basemodule *>(event.mod, Qt::FindChildrenRecursively);
+    if (modules.size() == 0)
+    {
+        logError("Controller::onInterModuleRequest - module not found : %1", {event.mod});
+        return;
+    }
+    if (modules.size() > 1)
+    {
+        logError("Controller::onInterModuleRequest - problem finding module : %1 %2 ", {event.mod, modules.size()});
+        return;
+    }
+    QVariantMap p;
+    p[event.prpkey] = QVariantMap();
+    QVariantMap m;
+    m[event.mod] = p;
+    event.data["m"] = QJsonObject::fromVariantMap(m);
     logDebug("Controller::onInterModuleRequest %1 %2 %3 %4", {OST::ExtEvToString(event.ev), event.mod, event.prpkey, event.data});
-    module->onExternalEventRoot(event);
+    modules[0]->onExternalEventRoot(event);
 
 }

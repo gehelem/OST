@@ -171,6 +171,11 @@ bool Basemodule::onExternalEventBase(OST::ExtEvent event)
         return false;
     }
 
+    if (event.ev == OST::ExtEvType::DP)
+    {
+        getStore()[event.prpkey]->sendDump();
+    }
+
     if (!getStore()[event.prpkey]->isEnabled())
     {
         logError("Basemodule::onExternalEventBase - property %1 is disabled, can't update", {event.prpkey});
