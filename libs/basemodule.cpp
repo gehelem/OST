@@ -589,7 +589,6 @@ void Basemodule::otherModuleSetValue(QString mod, QString prop, QString elt, QVa
     m[mod] = P;
     M["m"] = m;
     event.data = M;
-    qDebug() << event.data;
     emit interModuleRequest(event);
 };
 void Basemodule::otherModuleCreateLine(QString mod, QString prop, QVariantMap values)
@@ -619,18 +618,18 @@ void Basemodule::otherModuleRequestPropertyDump(QString mod, QString prop)
     m[mod] = P;
     M["m"] = m;
     event.data = M;
-    qDebug() << event.data;
     emit interModuleRequest(event);
 }
 void Basemodule::otherModuleRequestProfileLoad(QString mod, QString profile)
 {
     OST::ExtEvent event;
+    //{"PL":{"m":{"seq":{"profile":"default"}}}}
     event.ev = OST::ExtEvType::PL;
     event.mod = mod;
-    QJsonObject m, M;
-    m["profile"] = profile;
+    QJsonObject m, M, p;
+    p["profile"] = profile;
+    m[mod] = p;
     M["m"] = m;
     event.data = M;
-    qDebug() << event.data;
     emit interModuleRequest(event);
 };
