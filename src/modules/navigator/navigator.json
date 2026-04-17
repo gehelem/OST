@@ -72,7 +72,7 @@
         "devcat": "Control",
         "order": "Control0005",
         "group": "",
-        "permission": 0,
+        "permission": 2,
         "grid":0,
         "gridLimit":255,
         "hasGrid":true,

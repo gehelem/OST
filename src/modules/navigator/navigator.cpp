@@ -85,6 +85,7 @@ void Navigator::onExternalEvent(OST::ExtEvent event)
         if (event.eltkey == "addtoplanner")
         {
             getProperty(event.prpkey)->setState(OST::Ok, true);
+            addTargeToPlanner();
         }
     }
 
@@ -103,20 +104,17 @@ void Navigator::onExternalEvent(OST::ExtEvent event)
         }
     }
 
-    if (event.ev == OST::ExtEvType::GF && event.prpkey == "popcat")
+    if (event.ev == OST::ExtEvType::GF && event.prpkey == "results")
     {
-        if (event.eltkey == "go")
-        {
-            getProperty("results")->fetchLine(event.line);
-            QString code = getString("results", "code");
-            float ra = getFloat("results", "RA");
-            float dec = getFloat("results", "DEC");
-            QString ns = getString("results", "NS");
-            getEltString("target", "targetname")->setValue(code);
-            getEltFloat("target", "targetra")->setValue(ra);
-            getEltFloat("target", "targetde")->setValue(dec, true);
-            convertSelection();
-        }
+        getProperty("results")->fetchLine(event.line);
+        QString code = getString("results", "code");
+        float ra = getFloat("results", "RA");
+        float dec = getFloat("results", "DEC");
+        QString ns = getString("results", "NS");
+        getEltString("target", "targetname")->setValue(code);
+        getEltFloat("target", "targetra")->setValue(ra);
+        getEltFloat("target", "targetde")->setValue(dec, true);
+        convertSelection();
     }
 
     if (event.ev == OST::ExtEvType::J2 && event.prpkey == "search" && event.eltkey == "name")
@@ -386,7 +384,7 @@ void Navigator::initIndi()
 void Navigator::OnSolverLog(QString text)
 {
     //logInfo(text);
-    qDebug() << text;
+    //qDebug() << text;
 }
 void Navigator::OnSucessSolve()
 {
@@ -399,7 +397,6 @@ void Navigator::OnSucessSolve()
         mCurrentIteration = 0;
         return;
     }
-
     // Get solved coordinates
     double solvedRA = stellarSolver.getSolution().ra * 24 / 360;
     double solvedDEC = stellarSolver.getSolution().dec;
@@ -419,12 +416,12 @@ void Navigator::OnSucessSolve()
         logInfo(QString("Centering successful after %1 iteration(s) - within tolerance")
                 .arg(mCurrentIteration));
         getProperty("actions")->setState(OST::Ok, true);
+        getEltBool("actions", "gototarget")->setValue(false, false);
+        getEltBool("actions", "abortnavigator")->setValue(false, false);
+        getEltBool("actions", "addtoplanner")->setValue(false, true);
         syncMountIfNeeded(solvedRA, solvedDEC);
         mState = "idle";
         mCurrentIteration = 0;
-        // Emit event to notify other modules that centering is complete
-        //emit moduleEvent("navigatordone", getModuleName(), "", QVariantMap());
-
         return;
     }
 
@@ -532,16 +529,13 @@ void Navigator::convertSelection(void)
 bool Navigator::checkCentering(double solvedRA, double solvedDEC, double targetRA, double targetDEC)
 {
     // Calculate angular distance in arcseconds
-    double deltaRA = (solvedRA * 360 / 24 - targetRA * 360 / 24) * 3600 ;
+    //double deltaRA = (solvedRA * 360 / 24 - targetRA * 360 / 24) * cos(solvedDEC * M_PI / 180.0) * 3600;
+    double deltaRA = (solvedRA * 360 / 24 - targetRA * 360 / 24) * 3600;
     double deltaDEC = (solvedDEC - targetDEC) * 3600 ;
 
     // Total angular distance in arcseconds
     double distance = sqrt(deltaRA * deltaRA + deltaDEC * deltaDEC);
 
-    logInfo(QString("Offset: RA=%1\" DEC=%2\" Total=%3\"")
-            .arg(deltaRA, 0, 'f', 3)
-            .arg(deltaDEC, 0, 'f', 3)
-            .arg(distance, 0, 'f', 3));
 
     // Check tolerance (convert to arcsec from JSON parameter if needed)
     return (distance <= mToleranceArcsec);
@@ -550,8 +544,10 @@ bool Navigator::checkCentering(double solvedRA, double solvedDEC, double targetR
 void Navigator::correctOffset(double solvedRA, double solvedDEC)
 {
     // Calculate correction offset
-    double deltaRA = mTargetRA - solvedRA;  // Hours
-    double deltaDEC = mTargetDEC - solvedDEC; // Degrees
+    //double deltaRA = (solvedRA  - mTargetRA) * cos(solvedDEC * M_PI / 180.0);
+    double deltaRA = solvedRA  - mTargetRA;
+    double deltaDEC = solvedDEC - mTargetDEC;
+    logInfo("Offset correction : dRA %1arcs dDEC %2arcs", {deltaRA, deltaDEC});
 
     // Get current mount position
     QString mount = getString("devices", "mount");
@@ -571,25 +567,9 @@ void Navigator::correctOffset(double solvedRA, double solvedDEC)
         return;
     }
 
-    // Read current position
-    double currentRA = prop.findWidgetByName("RA")->value;
-    double currentDEC = prop.findWidgetByName("DEC")->value;
-
-    // Apply correction
-    double newRA = currentRA + deltaRA;
-    double newDEC = currentDEC + deltaDEC;
-    logInfo("Slewing to " + getString("target",
-                                      "targetname") + "-" + QString::number(newRA) + "-" + QString::number(newDEC));
-
-    logInfo(QString("Applying correction: RA %1h → %2h, DEC %3° → %4°")
-            .arg(currentRA, 0, 'f', 4)
-            .arg(newRA, 0, 'f', 4)
-            .arg(currentDEC, 0, 'f', 2)
-            .arg(newDEC, 0, 'f', 2));
-
-    // Send corrected position to mount
-    prop.findWidgetByName("RA")->value = newRA;
-    prop.findWidgetByName("DEC")->value = newDEC;
+    // Send corrected position to mount (RA in hours, DEC in degrees)
+    prop.findWidgetByName("RA")->value  = prop.findWidgetByName("RA")->value - deltaRA;
+    prop.findWidgetByName("DEC")->value = prop.findWidgetByName("DEC")->value - deltaDEC;
     mWaitingSlew = true;
     sendNewNumber(prop);
 
@@ -619,12 +599,12 @@ void Navigator::syncMountIfNeeded(double solvedRA, double solvedDEC)
     double jd = ln_get_julian_from_sys();
     INDI::IEquatorialCoordinates j2000pos;
     INDI::IEquatorialCoordinates observed;
-    observed.rightascension = solvedRA;
-    observed.declination = solvedDEC;
-    INDI::ObservedToJ2000(&observed, jd, &j2000pos);
+    j2000pos.rightascension = solvedRA;
+    j2000pos.declination = solvedDEC;
+    INDI::J2000toObserved(&j2000pos, jd, &observed);
 
-    prop.findWidgetByName("RA")->value = j2000pos.declination;
-    prop.findWidgetByName("DEC")->value = j2000pos.rightascension;
+    prop.findWidgetByName("DEC")->value = observed.declination;
+    prop.findWidgetByName("RA")->value = observed.rightascension;
     sendNewNumber(prop);
 
     //restore slew
@@ -641,10 +621,8 @@ void Navigator::addTargeToPlanner()
     eltData["ra"] = getFloat("target", "targetra");
     eltData["dec"] = getFloat("target", "targetde");
     eltData["profile"] = "default";
-    QVariantMap elts;
-    elts["elements"] = eltData;
-    QVariantMap prop;
-    prop["planning"] = elts;
-    //emit moduleEvent("Flcreate", getString("parms", "plannermodule"), "planning", prop);
     logInfo("Current target sent to " + getString("parms", "plannermodule"));
+
+    otherModuleCreateLine(getString("parms", "plannermodule"), "planning", eltData);
+
 }
