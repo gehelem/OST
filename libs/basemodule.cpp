@@ -263,7 +263,7 @@ bool Basemodule::onExternalEventBase(OST::ExtEvent event)
 
     return true;
 }
-void Basemodule::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QString elt, QVariant data)
+void Basemodule::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QString elt, QVariant data, int line)
 {
 
 }

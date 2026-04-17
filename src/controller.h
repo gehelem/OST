@@ -30,7 +30,7 @@ class Controller : public QObject
         ~Controller() override;
     signals:
         void controllerEvent(OST::ExtEvent  event);
-        void otherModuleEvent(OST::EvType, QString, QString, QString, QVariant);
+        void otherModuleEvent(OST::EvType, QString, QString, QString, QVariant, int);
     private:
         QString _webroot;
         QString _dbpath;

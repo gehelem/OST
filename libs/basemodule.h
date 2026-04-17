@@ -84,7 +84,7 @@ class Basemodule : public DBManager
          * This is an internal orchestration method.
          */
         virtual void onExternalEventRoot(OST::ExtEvent event) final;
-        virtual void onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QString elt, QVariant data);
+        virtual void onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QString elt, QVariant data, int line);
 
     protected:
         /**
