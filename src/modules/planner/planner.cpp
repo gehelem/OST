@@ -56,13 +56,6 @@ void Planner::initProperties()
 
 void Planner::onExternalEvent(OST::ExtEvent event)
 {
-    // Check if this is a sequence completion event
-    //if (e.type == "sequencedone" && mWaitingSequence && getString("parms", "sequencemodule") == e.module )
-    //{
-    //    sequenceComplete();
-    //    return;
-    //}
-
     if (event.ev == OST::ExtEvType::SV && event.prpkey == "actions")
     {
         //getEltBool(event.prpkey, event.eltkey)->setValue(false, false);
@@ -118,27 +111,6 @@ void Planner::onExternalEvent(OST::ExtEvent event)
             getStore()[event.prpkey]->clearGrid();
         }
     }
-
-
-    // Report sequence progress
-    //if (e.type == "se" && mWaitingSequence && getString("parms", "sequencemodule") == e.module
-    //        && e.property == "progress" )
-    //{
-    //    int i = e.data["elements"].toMap()["global"].toMap()["value"].toInt();
-    //    QString s = e.data["elements"].toMap()["global"].toMap()["dynlabel"].toString();
-    //    getEltPrg("planning", "progress")->setPrgValue(i, false);
-    //    getEltPrg("planning", "progress")->setDynLabel("Seq " + s, false);
-    //    getProperty("planning")->updateLine(mCurrentLine);
-    //}
-
-    //// Check if this is a navigator completion event
-    //if (e.type == "navigatordone" && mIsRunning && mWaitingNavigator
-    //        && getString("parms", "navigatormodule") == e.module )
-    //{
-    //    navigatorComplete();
-    //    return;
-    //}
-
 }
 
 void Planner::startPlanner()
@@ -283,6 +255,9 @@ void Planner::sequenceComplete()
     if (getProperty("planning")->getGrid().count() <= mCurrentLine)
     {
         logInfo("Planning completed");
+        // update global status
+        getEltPrg("progress", "global")->setPrgValue(100, true);
+        getEltPrg("progress", "global")->setDynLabel("Finished", true);
         mIsRunning = false;
         return;
     }
@@ -294,9 +269,12 @@ void Planner::navigatorComplete()
 {
     mWaitingNavigator = false;
 
-    logInfo("Navigator went to target " + getString("planning",
-            "object") + ", starting sequence with profile " + getString("planning",
-                    "profile") );
+    logInfo("Navigator went to target %1, starting sequence with profile %2", {getString("planning", "object"), getString("planning", "profile")});
+
+    getProperty("planning")->fetchLine(mCurrentLine);
+    getEltPrg("planning", "progress")->setDynLabel("Shooting", false);
+    getEltPrg("planning", "progress")->setPrgValue(0, false);
+    getProperty("planning")->updateLine(mCurrentLine);
 
     // Ask sequence to start
     QVariantMap eltData;
@@ -305,13 +283,18 @@ void Planner::navigatorComplete()
     propData["elements"] = eltData;
     QVariantMap eventData;
     eventData["actions"] = propData;
-    //emit moduleEvent("Fsetproperty", getString("parms", "sequencemodule"), "", eventData);
+    otherModuleSetValue( getString("parms", "sequencemodule"), "actions", "startsequence", true);
 
     mWaitingSequence = true;
 
 }
 void Planner::startLine()
 {
+    // update global status
+    int pg =  100 * mCurrentLine / getProperty("planning")->getGrid().size();
+    getEltPrg("progress", "global")->setPrgValue(pg, true);
+    getEltPrg("progress", "global")->setDynLabel("Step 0/" + QString::number(getProperty("planning")->getGrid().size()), true);
+
     // update line status
     getProperty("planning")->fetchLine(mCurrentLine);
     getEltPrg("planning", "progress")->setDynLabel("Slewing", false);
@@ -323,80 +306,63 @@ void Planner::startLine()
     mWaitingSequence = false;
     mWaitingNavigator = true;
 
-    // Set navigator's target
-    QVariantMap eltData;
-    QVariantMap propData;
-    QVariantMap eventData;
-    eltData["targetname"] = getString("planning", "object");
-    propData["elements"] = eltData;
-    eventData["actions"] = propData;
-
     otherModuleRequestPropertyDump(getString("parms", "navigatormodule"), "actions");
 
+    // Set navigator's target
     otherModuleSetValue( getString("parms", "navigatormodule"), "target", "targetra", getFloat("planning", "ra"));
     otherModuleSetValue( getString("parms", "navigatormodule"), "target", "targetde", getFloat("planning", "dec"));
     otherModuleSetValue( getString("parms", "navigatormodule"), "target", "targetname", getString("planning", "object"));
 
-    //emit moduleEvent("Fsetproperty", getString("parms", "navigatormodule"), "", eventData);
-    eltData = QVariantMap();
-    eltData["targetra"] = getFloat("planning", "ra");
-    propData["elements"] = eltData;
-    eventData["actions"] = propData;
-    //emit moduleEvent("Fsetproperty", getString("parms", "navigatormodule"), "", eventData);
-    eltData = QVariantMap();
-    eltData["targetde"] = getFloat("planning", "dec");
-    propData["elements"] = eltData;
-    eventData["actions"] = propData;
-    //emit moduleEvent("Fsetproperty", getString("parms", "navigatormodule"), "", eventData);
-
-    // Set sequencer's profile
-    eltData = QVariantMap();
-    eltData["name"] = getString("planning", "profile");
-    propData = QVariantMap();
-    propData["elements"] = eltData;
-    eventData = QVariantMap();
-    eventData["loadprofile"] = propData;
-    //emit moduleEvent("Fsetproperty", getString("parms", "sequencemodule"), "", eventData); // set profile to load
-    //emit moduleEvent("Fposticon", getString("parms", "sequencemodule"), "", eventData); // load it
-
     // Set sequencer's object data
-    eltData = QVariantMap();
-    eltData["label"] = getString("planning", "object");
-    propData = QVariantMap();
-    propData["elements"] = eltData;
-    eventData = QVariantMap();
-    eventData["object"] = propData;
-    //emit moduleEvent("Fsetproperty", getString("parms", "sequencemodule"), "", eventData);
-    eventData = QVariantMap();
-    eltData["ra"] = getFloat("planning", "ra");
-    propData["elements"] = eltData;
-    eventData["object"] = propData;
-    //emit moduleEvent("Fsetproperty", getString("parms", "sequencemodule"), "", eventData);
-    eventData = QVariantMap();
-    eltData["de"] = getFloat("planning", "dec");
-    propData["elements"] = eltData;
-    eventData["object"] = propData;
-    //emit moduleEvent("Fsetproperty", getString("parms", "sequencemodule"), "", eventData);
+    otherModuleRequestProfileLoad(getString("parms", "sequencemodule"), getString("planning", "profile"));
+    otherModuleSetValue( getString("parms", "sequencemodule"), "object", "label", getString("planning", "object"));
+    otherModuleSetValue( getString("parms", "sequencemodule"), "object", "ra", getFloat("planning", "ra"));
+    otherModuleSetValue( getString("parms", "sequencemodule"), "object", "de", getFloat("planning", "dec"));
 
     // Ask navigator to slew to target
-    eltData = QVariantMap();
-    eltData["gototarget"] = true;
-    propData = QVariantMap();
-    propData["elements"] = eltData;
-    eventData = QVariantMap();
-    eventData["actions"] = propData;
-    //emit moduleEvent("Fsetproperty", getString("parms", "navigatormodule"), "", eventData);
-
+    otherModuleSetValue( getString("parms", "navigatormodule"), "actions", "gototarget", true);
 }
-void Planner::onOtherModuleEvent(OST::EvType ev, QVariant data, OST::ElementBase*elt, OST::PropertyBase*prop,
-                                 OST::LovBase*lov,
-                                 Basemodule*mod)
+void Planner::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QString elt, QVariant data, int line)
 {
-    if (mod->getModuleName() != getString("parms", "navigatormodule")
-            && mod->getModuleName() != getString("parms", "sequencemodule") ) return;
+    if (mod != getString("parms", "navigatormodule") && mod != getString("parms", "sequencemodule") ) return;
 
-    if (mod->getModuleName() == getString("parms", "navigatormodule") && ev == OST::EvType::ap && prop->key() == "actions")
+    //logDebug("Planner::onOtherModuleEvent2 mod=%1 ev=%2 prop=%3 elt=%4 data=%5", {mod, OST::EvToString(ev), prp, elt, data});
+
+    if (mod == getString("parms", "navigatormodule") && ev == OST::EvType::ps && prp == "actions")
     {
-        logDebug("Planner::onOthermoduleEvent mod=%1 ev=%2 prop=%3 status=%4", {mod->getModuleName(), OST::EvToString(ev), prop->key(), prop->state()});
+        // catch navigator completion
+        if (data.toInt() == 1)
+        {
+            navigatorComplete();
+            return;
+        }
     }
+
+    if (mod == getString("parms", "sequencemodule") && prp == "progress" && mWaitingSequence)
+    {
+        logDebug("Planner::onOtherModuleEvent2 mod=%1 ev=%2 prop=%3 elt=%4 data=%5", {mod, OST::EvToString(ev), prp, elt, data});
+        qDebug() << data;
+    }
+
+
+    // Report sequence progress
+    if (mod == getString("parms", "sequencemodule") && ev == OST::EvType::ea && prp == "progress" && mWaitingSequence)
+    {
+        int i = data.toMap()["e"].toMap()["global"].toInt();
+        //QString s = data.toMap()["e"].toMap()["global"].toMap()["dynlabel"].toString();
+        getEltPrg("planning", "progress")->setPrgValue(i, false);
+        //getEltPrg("planning", "progress")->setDynLabel("Seq " + s, false);
+        getProperty("planning")->updateLine(mCurrentLine);
+    }
+
+    if (mod == getString("parms", "sequencemodule") && ev == OST::EvType::ps && prp == "actions")
+    {
+        // catch sequencer completion
+        if (data.toInt() == 1)
+        {
+            sequenceComplete();
+            return;
+        }
+    }
+
 }
