@@ -338,13 +338,6 @@ void Planner::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QStri
         }
     }
 
-    if (mod == getString("parms", "sequencemodule") && prp == "progress" && mWaitingSequence)
-    {
-        logDebug("Planner::onOtherModuleEvent2 mod=%1 ev=%2 prop=%3 elt=%4 data=%5", {mod, OST::EvToString(ev), prp, elt, data});
-        qDebug() << data;
-    }
-
-
     // Report sequence progress
     if (mod == getString("parms", "sequencemodule") && ev == OST::EvType::ea && prp == "progress" && mWaitingSequence)
     {
