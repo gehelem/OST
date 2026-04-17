@@ -304,11 +304,16 @@ void Controller::onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase*
         case OST::EvType::dm: // "dm-delete/remove module"
         {
             v = m;
+            break;
+        }
+        case OST::EvType::ps: // "ps-only property state"
+        {
+            v = static_cast<int>(prp->state());
+            break;
         }
         case OST::EvType::dp: // "dp-delete/remove property"
         case OST::EvType::de: // "de-delete/remove element"
         case OST::EvType::ee: // "ee"
-        case OST::EvType::ps: // "ps-only property state"
         case OST::EvType::gc: // "gc-grid new line "
         case OST::EvType::gu: // "gu-grid update line"
         case OST::EvType::gd: // "gd-grid delete line"
@@ -321,6 +326,7 @@ void Controller::onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase*
             OST::PropertyJsonDumper d(evt, data, elt, prp);
             mod->getStore()[prp->key()]->accept(&d);
             v = d.getResult();
+            break;
         }
         case OST::EvType::zz: // "zz-no dump"
         case OST::EvType::av: // "av-dump profile data"
@@ -334,6 +340,7 @@ void Controller::onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase*
         case OST::EvType::uc: // "uc-update controller data"
         {
             v = OST::ModuleJsonDumper(evt, data, elt, prp, lov, static_cast<Basemodule*>(mod));
+            break;
         }
         default:
         {
