@@ -294,10 +294,15 @@ void Controller::onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase*
 
     /* dispatch event to other modules */
     QString m, p, e;
+    int line = 0;
     QJsonValue v;
     if (mod) m = mod->getModuleName();
     if (prp) p = prp->key();
     if (elt) e = elt->key();
+    if (evt == OST::EvType::gu || evt == OST::EvType::gu  )
+    {
+        line = data.toInt();
+    }
 
     switch (evt)
     {
@@ -348,7 +353,7 @@ void Controller::onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase*
         }
     };
 
-    emit otherModuleEvent(evt, m, p, e, v, 0);
+    emit otherModuleEvent(evt, m, p, e, v, line);
 }
 void Controller::OnClientEvent(OST::ExtEvent event, QWebSocket* client, QString clientgrant)
 {
