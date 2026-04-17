@@ -94,27 +94,6 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     updateControllerData("libraries", _availableModuleLibs);
     updateControllerData("indidrivers", _availableIndiDrivers);
 
-
-    //pMainControl = new Maincontrol(QString("mainctl"), QString("Main control"), QString(), QVariantMap());
-    //connect(pMainControl, &Maincontrol::moduleEvent, this, &Controller::onModuleEvent);
-    //connect(pMainControl, &Maincontrol::moduleEvent, wshandler, &WShandler::onModuleEvent);
-    //connect(pMainControl, &Maincontrol::loadOtherModule, this, &Controller::loadModule);
-    //connect(pMainControl, &Maincontrol::mainCtlEvent, this, &Controller::OnMainCtlEvent);
-    //connect(this, &Controller::controllerEvent, pMainControl, &Maincontrol::OnExternalEvent);
-
-    //pMainControl->setParent(this);
-    //pMainControl->setWebroot(_webroot);
-    //pMainControl->setObjectName("mainctl");
-    //pMainControl->dbInit(_dbpath, "mainctl");
-    //pMainControl->OnExternalEvent({"refreshConfigurations", "mainctl", QString(), QString(), 0, QVariantMap()});
-    //pMainControl->setAvailableModuleLibs();
-    //pMainControl->setIndiDriverList(_availableIndiDrivers);
-    //pMainControl->sendDump();
-
-    // Connect MainControl to log system
-    //connect(pMainControl, &Basemodule::logSignal, mLogger, &OST::Logger::onLog);
-    //connect(pMainControl, &Basemodule::logSignal, wshandler, &WShandler::onLog);
-
     loadConf(_conf);
 
     if (_indiserver != "N")
@@ -222,6 +201,7 @@ bool Controller::loadModule(QString lib, QString label, QString profile)
 
     //connect(mod, &Basemodule::loadOtherModule, this, &Controller::loadModule);
     connect(this, &Controller::controllerEvent, mod, &Basemodule::onExternalEventRoot);
+    connect(this, &Controller::otherModuleEvent, mod, &Basemodule::onOtherModuleEvent);
 
     // Connect module to log system
     connect(mod, &Basemodule::logSignal, mLogger, &OST::Logger::onLog);
@@ -236,8 +216,8 @@ bool Controller::loadModule(QString lib, QString label, QString profile)
             //connect(othermodule, &Basemodule::moduleStatusAnswer, mod, &Basemodule::OnModuleStatusAnswer);
             //connect(mod, &Basemodule::moduleStatusRequest, othermodule, &Basemodule::OnModuleStatusRequest);
             //connect(mod, &Basemodule::moduleStatusAnswer, othermodule, &Basemodule::OnModuleStatusAnswer);
-            connect(othermodule, &Basemodule::moduleEvent, mod, &Basemodule::onOtherModuleEvent);
-            connect(mod, &Basemodule::moduleEvent, othermodule, &Basemodule::onOtherModuleEvent);
+            //connect(othermodule, &Basemodule::moduleEvent, mod, &Basemodule::onOtherModuleEvent);
+            //connect(mod, &Basemodule::moduleEvent, othermodule, &Basemodule::onOtherModuleEvent);
             //connect(mod, &Datastore::moduleEvent, othermodule, &Basemodule::OnExternalEvent);
         }
     }
@@ -312,6 +292,56 @@ void Controller::onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase*
         updateControllerData("profiles", r);
     }
 
+    /* dispatch event to other modules */
+    QString m, p, e;
+    QJsonValue v;
+    if (mod) m = mod->getModuleName();
+    if (prp) p = prp->key();
+    if (elt) e = elt->key();
+
+    switch (evt)
+    {
+        case OST::EvType::dm: // "dm-delete/remove module"
+        {
+            v = m;
+        }
+        case OST::EvType::dp: // "dp-delete/remove property"
+        case OST::EvType::de: // "de-delete/remove element"
+        case OST::EvType::ee: // "ee"
+        case OST::EvType::ps: // "ps-only property state"
+        case OST::EvType::gc: // "gc-grid new line "
+        case OST::EvType::gu: // "gu-grid update line"
+        case OST::EvType::gd: // "gd-grid delete line"
+        case OST::EvType::gr: // "gr-grid reset"
+        case OST::EvType::aa: // "aa-dump all data"
+        case OST::EvType::ev: // "ev-set one element value/min/max/format "
+        case OST::EvType::ap: // "ap-dump all property data"
+        case OST::EvType::ea: // "ea"
+        {
+            OST::PropertyJsonDumper d(evt, data, elt, prp);
+            mod->getStore()[prp->key()]->accept(&d);
+            v = d.getResult();
+        }
+        case OST::EvType::zz: // "zz-no dump"
+        case OST::EvType::av: // "av-dump profile data"
+        case OST::EvType::lc: // "lc-lov create"
+        case OST::EvType::lu: // "lu-lov update"
+        case OST::EvType::ld: // "ld-lov delete"
+        case OST::EvType::am: // "am-add module"
+        case OST::EvType::fs: // "fs-profile saved"
+        case OST::EvType::fl: // "fl-profile loaded"
+        case OST::EvType::fc: // "fc-profile changed"
+        case OST::EvType::uc: // "uc-update controller data"
+        {
+            v = OST::ModuleJsonDumper(evt, data, elt, prp, lov, static_cast<Basemodule*>(mod));
+        }
+        default:
+        {
+            v = OST::ModuleJsonDumper(evt, data, elt, prp, lov, static_cast<Basemodule*>(mod));
+        }
+    };
+
+    emit otherModuleEvent(evt, m, p, e, v);
 }
 void Controller::OnClientEvent(OST::ExtEvent event, QWebSocket* client, QString clientgrant)
 {
@@ -806,7 +836,10 @@ void Controller::updateControllerData(QString key, QVariant data)
 }
 void Controller::onInterModuleRequest(OST::ExtEvent event)
 {
+    Basemodule *pSenderModule = qobject_cast<Basemodule *>(sender());
+
     QList<Basemodule *> modules = findChildren<Basemodule *>(event.mod, Qt::FindChildrenRecursively);
+
     if (modules.size() == 0)
     {
         logError("Controller::onInterModuleRequest - module not found : %1", {event.mod});
@@ -817,7 +850,11 @@ void Controller::onInterModuleRequest(OST::ExtEvent event)
         logError("Controller::onInterModuleRequest - problem finding module : %1 %2 ", {event.mod, modules.size()});
         return;
     }
+
     logDebug("Controller::onInterModuleRequest %1 %2 %3 %4", {OST::ExtEvToString(event.ev), event.mod, event.prpkey, event.data});
-    modules[0]->onExternalEventRoot(event);
+
+    Basemodule *pTargetModule = modules[0];
+    pTargetModule->onExternalEventRoot(event);
+
 
 }

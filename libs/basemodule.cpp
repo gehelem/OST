@@ -263,9 +263,7 @@ bool Basemodule::onExternalEventBase(OST::ExtEvent event)
 
     return true;
 }
-void Basemodule::onOtherModuleEvent(OST::EvType ev, QVariant data, OST::ElementBase* elt,  OST::PropertyBase* prop,
-                                    OST::LovBase* lov,
-                                    Basemodule* mod)
+void Basemodule::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QString elt, QVariant data)
 {
 
 }
@@ -594,6 +592,21 @@ void Basemodule::otherModuleSetValue(QString mod, QString prop, QString elt, QVa
     qDebug() << event.data;
     emit interModuleRequest(event);
 };
+void Basemodule::otherModuleCreateLine(QString mod, QString prop, QVariantMap values)
+{
+    OST::ExtEvent event;
+    event.ev = OST::ExtEvType::GC;
+    event.mod = mod;
+    event.prpkey = prop;
+    QJsonObject  E, p, P, m, M;
+    E["e"] = QJsonValue::fromVariant(values);
+    p[prop] = E;
+    P["p"] = p;
+    m[mod] = P;
+    M["m"] = m;
+    event.data = M;
+    emit interModuleRequest(event);
+};
 void Basemodule::otherModuleRequestPropertyDump(QString mod, QString prop)
 {
     OST::ExtEvent event;
@@ -609,3 +622,15 @@ void Basemodule::otherModuleRequestPropertyDump(QString mod, QString prop)
     qDebug() << event.data;
     emit interModuleRequest(event);
 }
+void Basemodule::otherModuleRequestProfileLoad(QString mod, QString profile)
+{
+    OST::ExtEvent event;
+    event.ev = OST::ExtEvType::PL;
+    event.mod = mod;
+    QJsonObject m, M;
+    m["profile"] = profile;
+    M["m"] = m;
+    event.data = M;
+    qDebug() << event.data;
+    emit interModuleRequest(event);
+};
