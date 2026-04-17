@@ -288,8 +288,11 @@ void ElementJsonDumper::visit(ElementPrg *pElement, QVariantMap &data, bool &emi
     Q_UNUSED(data);
     Q_UNUSED(emitEvent);
     QJsonObject json = dumpElementCommons(pElement);
-    json["dynlabel"] = pElement->value().dynlabel;
-    json["value"] = pElement->value().value;
+    QJsonObject o;
+    o["dynlabel"] = pElement->value().dynlabel; // we should fix that someday
+    o["value"] = pElement->value().value;
+    json["value"] = o;
+    json["dynlabel"] = pElement->value().dynlabel;;
     mResult = json;
     if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return;
 
