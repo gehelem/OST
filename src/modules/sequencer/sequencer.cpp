@@ -41,12 +41,6 @@ Sequencer::~Sequencer()
 void Sequencer::onExternalEvent(OST::ExtEvent event)
 {
 
-    // Check if this is a focus completion event
-    //if (e.type == "focusdone" && mWaitingForFocus)
-    //{
-    //    OnFocusDone(e.type, e.module, e.property, e.data);
-    //    return;
-    //}
 
 
     if (event.ev == OST::ExtEvType::SV && event.prpkey == "actions")
@@ -349,9 +343,6 @@ void Sequencer::StartLine()
         isSequenceRunning = false;
         previousFilter = "";
 
-        // Emit event to notify other modules that sequence is complete
-        //emit moduleEvent({"sequencedone", getModuleName(), "","",0, QVariantMap()});
-
     }
     else
     {
@@ -462,7 +453,7 @@ void Sequencer::refreshFilterLov()
 void Sequencer::requestFocus()
 {
     QString focusModule = getString("parameters", "focusmodule");
-    logInfo("Filter changed - requesting autofocus from module: " + focusModule);
+    logInfo("Filter changed - requesting autofocus from module: %1", {focusModule});
 
     mWaitingForFocus = true;
 
@@ -471,21 +462,17 @@ void Sequencer::requestFocus()
     if (suspendGuiding)
     {
         QString guiderModule = getString("parameters", "guidermodule");
-        logInfo("Suspending guiding on module: " + guiderModule);
-        //emit moduleEvent("suspendguiding", guiderModule, "", QVariantMap());
+        logInfo("Suspending guiding on module: %1", {guiderModule});
+        otherModuleSetValue( guiderModule, "actions", "abortguider", true);
     }
 
-    // Emit custom event type "requestautofocus" that focus module will handle
-    //emit moduleEvent("requestautofocus", focusModule, "", QVariantMap());
+    // Request focus
+    otherModuleSetValue( focusModule, "actions", "autofocus", true);
+
 }
 
-void Sequencer::OnFocusDone(const QString &eventType, const QString &eventModule, const QString &eventKey,
-                            const QVariantMap &eventData)
+void Sequencer::OnFocusDone(void)
 {
-    Q_UNUSED(eventType);
-    Q_UNUSED(eventModule);
-    Q_UNUSED(eventKey);
-    Q_UNUSED(eventData);
 
     logInfo("Autofocus completed - resuming sequence");
     mWaitingForFocus = false;
@@ -495,14 +482,15 @@ void Sequencer::OnFocusDone(const QString &eventType, const QString &eventModule
     if (suspendGuiding)
     {
         QString guiderModule = getString("parameters", "guidermodule");
-        logInfo("Resuming guiding on module: " + guiderModule);
-        //emit moduleEvent("resumeguiding", guiderModule, "", QVariantMap());
+        logInfo("Resuming guiding on module: %1", {guiderModule});
+        otherModuleSetValue( guiderModule, "actions", "guide", true);
+
 
         // Wait for guiding to settle before continuing
         int settleTime = getInt("parameters", "guidingsettletime");
         if (settleTime > 0)
         {
-            logInfo("Waiting " + QString::number(settleTime) + " seconds for guiding to settle...");
+            logInfo("Waiting %1 seconds for guiding to settle...", {settleTime});
             mWaitingForGuidingSettle = true;
             mGuidingSettleTimer->start(settleTime * 1000); // Convert seconds to milliseconds
             return; // OnGuidingSettleTimeout() will continue the sequence
@@ -539,4 +527,22 @@ void Sequencer::OnGuidingSettleTimeout()
         // Shoot the first image of the current line
         Shoot();
     }
+}
+void Sequencer::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QString elt, QVariant data, int line)
+{
+    if (mod != getString("parameters", "focusmodule") && mod != getString("parameters", "guidermodule") ) return;
+
+    //logDebug("Planner::onOtherModuleEvent2 mod=%1 ev=%2 prop=%3 elt=%4 data=%5", {mod, OST::EvToString(ev), prp, elt, data});
+
+    if (mod == getString("parameters", "focusmodule") && ev == OST::EvType::ps && prp == "actions"  && mWaitingForFocus)
+    {
+        // catch focus completion event
+        if (data.toInt() == 1)
+        {
+            OnFocusDone();
+            return;
+        }
+    }
+
+
 }
