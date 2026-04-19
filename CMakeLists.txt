@@ -495,6 +495,25 @@ target_link_libraries(ostplanner PRIVATE
 )
 target_compile_definitions(ostplanner PRIVATE PLANNER_MODULE)
 
+# Polar module
+add_library(ostpolar SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/polar/polar.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/polar/polar.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/polar/polar.qrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/polar/rotations.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/polar/rotations.cpp
+
+)
+target_link_libraries(ostpolar PRIVATE
+    ostindimodule
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Threads::Threads
+    z
+)
+target_compile_definitions(ostpolar PRIVATE POLAR_MODULE)
+
 install(TARGETS
     ostserver
     ostbasemodule ostindimodule
@@ -507,6 +526,7 @@ install(TARGETS
     ostnavigator
     ostallsky
     ostplanner
+    ostpolar
     RUNTIME DESTINATION "/usr/bin"     COMPONENT Runtime
     LIBRARY DESTINATION "/usr/lib"     COMPONENT Runtime
     PUBLIC_HEADER DESTINATION "/usr/include/ost" COMPONENT Development
