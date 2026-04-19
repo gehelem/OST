@@ -17,7 +17,7 @@ Inspector::Inspector(QString name, QString label, QString profile, QVariantMap a
     setMetadata("thisGitdate", QString::fromStdString(Version::GIT_DATE));
     setMetadata("thisGitmessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
     setMetadata("description", "Inspector module");
-    setMetadata("thisversion", "0.1");
+    setMetadata("thisversion", QString::fromStdString(Version::GIT_TAG));
     setMetadata("template", "inspector");
 
     giveMeADevice("camera", "Camera", INDI::BaseDevice::CCD_INTERFACE);

@@ -58,7 +58,7 @@ Guider::Guider(QString name, QString label, QString profile, QVariantMap availab
     setMetadata("thisGitdate", QString::fromStdString(Version::GIT_DATE));
     setMetadata("thisGitmessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
     setMetadata("description", "Guider module");
-    setMetadata("thisversion", "0.1");
+    setMetadata("thisversion", QString::fromStdString(Version::GIT_TAG));
     setMetadata("template", "guider");
 
     // Build the three state machines that orchestrate the guiding workflow
