@@ -25,6 +25,7 @@ Polar::Polar(QString name, QString label, QString profile, QVariantMap available
 
     giveMeADevice("camera", "Camera", INDI::BaseDevice::CCD_INTERFACE);
     giveMeADevice("mount", "Mount", INDI::BaseDevice::TELESCOPE_INTERFACE);
+    giveMeADevice("gps", "GPS", INDI::BaseDevice::GPS_INTERFACE);
     defineMeAsImager();
 
     auto* b = new OST::ElementBool("start", "Start", "0", "");
@@ -53,6 +54,7 @@ void Polar::onExternalEvent(OST::ExtEvent event)
                 connectIndi();
                 connectDevice(getString("devices", "camera"));
                 connectDevice(getString("devices", "mount"));
+                connectDevice(getString("devices", "gps"));
                 setBLOBMode(B_ALSO, getString("devices", "camera").toStdString().c_str(), nullptr);
                 if (getString("devices", "camera") == "CCD Simulator")
                 {
@@ -228,6 +230,21 @@ void Polar::SMInit()
         emit Abort();
         return;
     }
+
+    /* get observer GPS position from mount */
+    if (!getModNumber(getString("devices", "gps"), "GEOGRAPHIC_COORD", "LAT", _observerLat))
+    {
+        logWarning("Cannot read observer latitude from mount (GEOGRAPHIC_COORD/LAT)");
+        emit Abort();
+        return;
+    }
+    if (!getModNumber(getString("devices", "gps"), "GEOGRAPHIC_COORD", "LONG", _observerLon))
+    {
+        logWarning("Cannot read observer longitude from mount (GEOGRAPHIC_COORD/LONG)");
+        emit Abort();
+        return;
+    }
+    logInfo("Observer position: lat=" + QString::number(_observerLat) + " lon=" + QString::number(_observerLon));
 
     _itt = 0;
     _ra0 = 0;
@@ -415,6 +432,49 @@ void Polar::SMCompute()
     else emit PolarDone();
 
 }
+QPointF Polar::solverToAzAlt(double ra_j2000_deg, double dec_j2000_deg, double jd)
+{
+    // Step 1: J2000 -> apparent (accounts for precession, nutation, aberration)
+    INDI::IEquatorialCoordinates j2000, apparent;
+    j2000.rightascension = ra_j2000_deg * 24.0 / 360.0;  // degrees -> hours
+    j2000.declination    = dec_j2000_deg;
+    INDI::J2000toObserved(&j2000, jd, &apparent);
+    // apparent.rightascension in hours, apparent.declination in degrees
+
+    // Step 2: hour angle (LST - RA_apparent)
+    double gst = ln_get_apparent_sidereal_time(jd);       // hours, Greenwich
+    double lst = gst + _observerLon / 15.0;               // hours, local (East positive)
+    double ha  = lst - apparent.rightascension;            // hours
+    while (ha >  12.0) ha -= 24.0;
+    while (ha < -12.0) ha += 24.0;
+
+    // Step 3: equatorial -> horizontal (standard trigonometric formula)
+    // Convention: Az = 0 North, 90 East, 180 South, 270 West
+    double lat_r = _observerLat          * M_PI / 180.0;
+    double ha_r  = ha * 15.0             * M_PI / 180.0;  // hours -> degrees -> radians
+    double dec_r = apparent.declination  * M_PI / 180.0;
+
+    double sin_alt = sin(lat_r) * sin(dec_r) + cos(lat_r) * cos(dec_r) * cos(ha_r);
+    sin_alt = qBound(-1.0, sin_alt, 1.0);
+    double alt_rad = asin(sin_alt);
+
+    double cos_az_num = sin(dec_r) - sin(alt_rad) * sin(lat_r);
+    double cos_az_den = cos(alt_rad) * cos(lat_r);
+    double az_rad;
+    if (fabs(cos_az_den) < 1e-10)
+    {
+        az_rad = 0.0;  // zenith or nadir, azimuth undefined
+    }
+    else
+    {
+        double cos_az = qBound(-1.0, cos_az_num / cos_az_den, 1.0);
+        az_rad = acos(cos_az);
+        if (sin(ha_r) > 0.0) az_rad = 2.0 * M_PI - az_rad;  // quadrant correction
+    }
+
+    return QPointF(az_rad * 180.0 / M_PI, alt_rad * 180.0 / M_PI);
+}
+
 void Polar::SMComputeFinal()
 {
     logInfo("SMComputeFinal");
@@ -438,12 +498,21 @@ void Polar::SMComputeFinal()
     BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal DRA1-0 = " << dra1;
     BOOST_LOG_TRIVIAL(debug) << "SMComputeFinal DRA2-0 = " << dra2;*/
 
-    Rotations::V3 p0(Rotations::azAlt2xyz(QPointF(_ra0, _de0)));
-    Rotations::V3 p1(Rotations::azAlt2xyz(QPointF(_ra1, _de1)));
-    Rotations::V3 p2(Rotations::azAlt2xyz(QPointF(_ra2, _de2)));
-    //Rotations::V3 p0(Rotations::haDec2xyz(QPointF(_ra0, _de0),0));
-    //Rotations::V3 p1(Rotations::haDec2xyz(QPointF(_ra1, _de1),0));
-    //Rotations::V3 p2(Rotations::haDec2xyz(QPointF(_ra2, _de2),0));
+    // Convert each J2000 solution to Az/Alt using observer position and capture time
+    double jd0 = 2440587.5 + _t0 / (86400.0 * 1000.0);
+    double jd1 = 2440587.5 + _t1 / (86400.0 * 1000.0);
+    double jd2 = 2440587.5 + _t2 / (86400.0 * 1000.0);
+
+    QPointF azAlt0 = solverToAzAlt(_ra0, _de0, jd0);
+    QPointF azAlt1 = solverToAzAlt(_ra1, _de1, jd1);
+    QPointF azAlt2 = solverToAzAlt(_ra2, _de2, jd2);
+    logInfo("azAlt0: az=" + QString::number(azAlt0.x()) + " alt=" + QString::number(azAlt0.y()));
+    logInfo("azAlt1: az=" + QString::number(azAlt1.x()) + " alt=" + QString::number(azAlt1.y()));
+    logInfo("azAlt2: az=" + QString::number(azAlt2.x()) + " alt=" + QString::number(azAlt2.y()));
+
+    Rotations::V3 p0(Rotations::azAlt2xyz(azAlt0));
+    Rotations::V3 p1(Rotations::azAlt2xyz(azAlt1));
+    Rotations::V3 p2(Rotations::azAlt2xyz(azAlt2));
     Rotations::V3 axis = Rotations::getAxis(p0, p1, p2);
 
     if (axis.length() < 0.9)
@@ -454,32 +523,30 @@ void Polar::SMComputeFinal()
         return;
     }
 
-    // Need to make sure we're pointing to the right pole.
-    //if ((northernHemisphere() && (axis.x() < 0)) || (!northernHemisphere() && axis.x() > 0))
-    if (axis.x() < 0)
+    // Make sure we're pointing to the correct pole (north or south)
+    bool northernHemisphere = (_observerLat >= 0.0);
+    if ((northernHemisphere && axis.x() < 0) || (!northernHemisphere && axis.x() > 0))
     {
         axis = Rotations::V3(-axis.x(), -axis.y(), -axis.z());
     }
 
-    //BOOST_LOG_TRIVIAL(debug) << "axis.x() " << axis.x();
-    //BOOST_LOG_TRIVIAL(debug) << "axis.y() " << axis.y();
-    //BOOST_LOG_TRIVIAL(debug) << "axis.z() " << axis.z();
     QPointF azAlt = Rotations::xyz2azAlt(axis);
-    //azimuthCenter = azAlt.x();
-    //altitudeCenter = azAlt.y();
+    logInfo("axis azAlt: az=" + QString::number(azAlt.x()) + " alt=" + QString::number(azAlt.y()));
+
+    // Azimuth error: how far the axis is from due North (should be 0)
     _erraz = azAlt.x();
-    _erralt = 90 - azAlt.y();
-    //_erralt=azAlt.y();
+    // Altitude error: difference between actual axis altitude and observer latitude
+    _erralt = azAlt.y() - _observerLat;
     _errtot = sqrt(square(_erraz) + square(_erralt));
     //BOOST_LOG_TRIVIAL(debug) << "azimuthCenter "  << _erraz;
     //BOOST_LOG_TRIVIAL(debug) << "altitudeCenter " << _erralt;
     //BOOST_LOG_TRIVIAL(debug) << "PA error °"       << _errtot;
-    qDebug() << _erraz;
-    qDebug() << _erralt;
-    qDebug() << _errtot;
     getEltFloat("errors", "erraz")->setValue(_erraz, false);
     getEltFloat("errors", "erralt")->setValue(_erralt, false);
-    getEltFloat("errors", "errtot")->setValue(_errtot, true);
+    getEltFloat("errors", "errtot")->setValue(_errtot, false);
+    getEltFloat("errors", "errazmn")->setValue(_erraz * 60, false);
+    getEltFloat("errors", "erraltmn")->setValue(_erralt * 60, false);
+    getEltFloat("errors", "errtotmn")->setValue(_errtot * 60, true);
 
     getEltLight("states", "idle")->setValue(OST::Idle, false);
     getEltLight("states", "moving")->setValue(OST::Idle, false);

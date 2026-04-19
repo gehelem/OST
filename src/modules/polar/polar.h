@@ -15,6 +15,7 @@
 #include <QStateMachine>
 #include <libastro.h>
 #include <libnova/julian_day.h>
+#include <libnova/sidereal_time.h>
 
 
 class MODULE_INIT Polar : public IndiModule
@@ -91,6 +92,9 @@ class MODULE_INIT Polar : public IndiModule
         double _errtot = 0;
         int _itt = 0;
 
+        double _observerLat = 0.0;
+        double _observerLon = 0.0;
+
 
         QString _camera  = "CCD Simulator";
         QString _mount  = "Telescope Simulator";
@@ -101,6 +105,7 @@ class MODULE_INIT Polar : public IndiModule
             return value * value;
         }
 
+        QPointF solverToAzAlt(double ra_j2000_deg, double dec_j2000_deg, double jd);
         void buildStateMachine(void);
         void SMInit();
         void SMRequestExposure();

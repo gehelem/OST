@@ -90,6 +90,27 @@
                 "order":"3",
                 "value":0,
                 "format": "99.99"
+            },
+            "errazmn": {
+                "type":"float",
+                "label": "Azimuth error (arcmin)",
+                "order":"4",
+                "value":0,
+                "format": "99.99"
+            },
+            "erraltmn": {
+                "type":"float",
+                "label": "Altitude error (arcmin)",
+                "order":"5",
+                "value":0,
+                "format": "99.99"
+            },
+            "errtotmn": {
+                "type":"float",
+                "label": "Total error (arcmin)",
+                "order":"6",
+                "value":0,
+                "format": "99.99"
             }
         }
     },
