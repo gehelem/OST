@@ -1,7 +1,7 @@
 #include "polar.h"
 #include "rotations.h"
 #include <QPainter>
-#include "versionModule.cc"
+#include "version.cc"
 
 #define PI 3.14159265
 
@@ -15,13 +15,13 @@ Polar::Polar(QString name, QString label, QString profile, QVariantMap available
 {
 
     loadOstPropertiesFromFile(":polar.json");
-    setClassName(QString(metaObject()->className()).toLower());
 
-    setModuleDescription("Polar assistant");
-    setModuleVersion("0.1");
-    getEltString("thisGit", "hash")->setValue(QString::fromStdString(VersionModule::GIT_SHA1), true);
-    getEltString("thisGit", "date")->setValue(QString::fromStdString(VersionModule::GIT_DATE), true);
-    getEltString("thisGit", "message")->setValue(QString::fromStdString(VersionModule::GIT_COMMIT_SUBJECT), true);
+    setMetadata("thisGithash", QString::fromStdString(Version::GIT_SHA1));
+    setMetadata("thisGitdate", QString::fromStdString(Version::GIT_DATE));
+    setMetadata("thisGitmessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
+    setMetadata("thisversion", QString::fromStdString(Version::GIT_TAG));
+    setMetadata("description", "Polar assistant");
+    setMetadata("template", "polar");
 
     giveMeADevice("camera", "Camera", INDI::BaseDevice::CCD_INTERFACE);
     giveMeADevice("mount", "Mount", INDI::BaseDevice::TELESCOPE_INTERFACE);
@@ -42,45 +42,44 @@ Polar::~Polar()
 {
 
 }
-void Polar::OnMyExternalEvent(OST::Event e)
+void Polar::onExternalEvent(OST::ExtEvent event)
 {
-    if (getModuleName() == e.module)
+    if (event.ev == OST::ExtEvType::SV && event.prpkey == "actions")
     {
-        foreach(const QString &keyprop, e.data.keys())
+        if (event.eltkey == "start")
         {
-            foreach(const QString &keyelt, e.data[keyprop].toMap()["elements"].toMap().keys())
+            if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
             {
-                if (keyprop == "actions")
+                connectIndi();
+                connectDevice(getString("devices", "camera"));
+                connectDevice(getString("devices", "mount"));
+                setBLOBMode(B_ALSO, getString("devices", "camera").toStdString().c_str(), nullptr);
+                if (getString("devices", "camera") == "CCD Simulator")
                 {
-                    if (keyelt == "start")
-                    {
-                        connectIndi();
-                        connectDevice(getString("devices", "camera"));
-                        connectDevice(getString("devices", "mount"));
-                        setBLOBMode(B_ALSO, getString("devices", "camera").toStdString().c_str(), nullptr);
-                        if (getString("devices", "camera") == "CCD Simulator")
-                        {
-                            sendModNewNumber(getString("devices", "camera"), "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );
-                        }
-                        sendModNewNumber(getString("devices", "camera"), "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );
-                        enableDirectBlobAccess(getString("devices", "camera").toStdString().c_str(), nullptr);
-
-                        _machine.start();
-                    }
-                    if (keyelt == "abort")
-                    {
-                        emit Abort();
-                    }
-                    if (keyelt == "test")
-                    {
-                        SMComputeFinal();
-                    }
-
+                    sendModNewNumber(getString("devices", "camera"), "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );
                 }
-            }
+                sendModNewNumber(getString("devices", "camera"), "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );
+                enableDirectBlobAccess(getString("devices", "camera").toStdString().c_str(), nullptr);
 
+                _machine.start();
+            }
+        }
+        if (event.eltkey == "abort")
+        {
+            if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
+            {
+                emit Abort();
+            }
+        }
+        if (event.eltkey == "test")
+        {
+            if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
+            {
+                SMComputeFinal();
+            }
         }
     }
+
 }
 
 
