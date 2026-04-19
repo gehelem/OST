@@ -317,6 +317,10 @@ void Controller::onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase*
             break;
         }
         case OST::EvType::dp: // "dp-delete/remove property"
+        {
+            p = data.toString();
+            break;
+        }
         case OST::EvType::de: // "de-delete/remove element"
         case OST::EvType::ee: // "ee"
         case OST::EvType::gc: // "gc-grid new line "
