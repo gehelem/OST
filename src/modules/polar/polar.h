@@ -42,8 +42,6 @@ class MODULE_INIT Polar : public IndiModule
 
     protected:
         void onExternalEvent(OST::ExtEvent event) override;
-    public slots:
-        void onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QString elt, QVariant data, int line) override;
 
     public slots:
         void OnSucessSolve();
