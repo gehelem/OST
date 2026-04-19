@@ -98,7 +98,7 @@
         "group": "",
         "order":"Control055",
         "permission": 0,
-        "hasprofile":true,
+        "hasprofile":false,
         "label": "States",
         "e": {
             "idle": {
