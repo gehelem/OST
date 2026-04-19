@@ -87,7 +87,7 @@ void Polar::onExternalEvent(OST::ExtEvent event)
 
 void Polar::updateProperty(INDI::Property property)
 {
-    //if (mState == "idle") return;
+    if (!_machine.isRunning()) return;
 
     if (strcmp(property.getName(), "CCD1") == 0)
     {
@@ -95,10 +95,11 @@ void Polar::updateProperty(INDI::Property property)
     }
     if (
         (property.getDeviceName() == getString("devices", "mount"))
+        &&  (property.getName()   == std::string("EQUATORIAL_EOD_COORD"))
         &&  (property.getState() == IPS_OK)
     )
     {
-        logInfo("MoveDone");
+        logInfo("MoveDone %1", {property.getName()});
         emit MoveDone();
     }
     if (
@@ -123,6 +124,7 @@ void Polar::newBLOB(INDI::PropertyBlob  bp)
         QImage rawImage = image->getRawQImage();
         QImage im = rawImage.convertToFormat(QImage::Format_RGB32);
         im.setColorTable(rawImage.colorTable());
+        _lastRawImage = im;  // keep a copy for error overlay
         im.save(getWebroot()  + "/" + getModuleName() + ".jpeg", "JPG", 100);
         OST::ImgData dta = image->ImgStats();
         dta.mUrlJpeg = getModuleName() + ".jpeg";
@@ -147,30 +149,45 @@ void Polar::buildStateMachine(void)
     auto *RequestMove          = new QState(Polar);
     auto *WaitMove             = new QState(Polar);
     auto *FinalCompute         = new QState(Polar);
+    // Correction loop states (single-shot, no mount moves)
+    auto *CorrExposure         = new QState(Polar);
+    auto *CorrWaitExposure     = new QState(Polar);
+    auto *CorrFindStars        = new QState(Polar);
+    auto *CorrCompute          = new QState(Polar);
 
-    connect(InitInit, &QState::entered, this, &Polar::SMInit);
+    connect(InitInit,      &QState::entered, this, &Polar::SMInit);
     connect(RequestFrameReset, &QState::entered, this, &Polar::SMRequestFrameReset);
-    connect(RequestExposure, &QState::entered, this, &Polar::SMRequestExposure);
-    connect(RequestMove, &QState::entered, this, &Polar::SMRequestMove);
-    connect(FindStars, &QState::entered, this, &Polar::SMFindStars);
-    connect(Compute, &QState::entered, this, &Polar::SMCompute);
-    connect(FinalCompute, &QState::entered, this, &Polar::SMComputeFinal);
-    connect(Abort,               &QState::entered, this, &Polar::SMAbort);
+    connect(RequestExposure,   &QState::entered, this, &Polar::SMRequestExposure);
+    connect(RequestMove,       &QState::entered, this, &Polar::SMRequestMove);
+    connect(FindStars,         &QState::entered, this, &Polar::SMFindStars);
+    connect(Compute,           &QState::entered, this, &Polar::SMCompute);
+    connect(FinalCompute,      &QState::entered, this, &Polar::SMComputeFinal);
+    connect(CorrExposure,      &QState::entered, this, &Polar::SMRequestExposure);
+    connect(CorrFindStars,     &QState::entered, this, &Polar::SMFindStars);
+    connect(CorrCompute,       &QState::entered, this, &Polar::SMCorrCompute);
+    connect(Abort,             &QState::entered, this, &Polar::SMAbort);
 
     Polar->               addTransition(this, &Polar::Abort, Abort);
     Abort->               addTransition(this, &Polar::AbortDone, End);
 
-    InitInit->            addTransition(this, &Polar::InitDone, RequestFrameReset);
+    // Calibration sequence (3 shots with mount moves)
+    InitInit->            addTransition(this, &Polar::InitDone,             RequestFrameReset);
     RequestFrameReset->   addTransition(this, &Polar::RequestFrameResetDone, WaitFrameReset);
-    WaitFrameReset->      addTransition(this, &Polar::FrameResetDone, RequestExposure);
-    RequestExposure->     addTransition(this, &Polar::RequestExposureDone, WaitExposure);
-    WaitExposure->        addTransition(this, &Polar::ExposureDone, FindStars);
-    FindStars->           addTransition(this, &Polar::FindStarsDone, Compute);
-    Compute->             addTransition(this, &Polar::ComputeDone, RequestMove);
-    Compute->             addTransition(this, &Polar::PolarDone, FinalCompute);
-    RequestMove->         addTransition(this, &Polar::RequestMoveDone, WaitMove);
-    WaitMove->            addTransition(this, &Polar::MoveDone, RequestExposure);
-    FinalCompute->        addTransition(this, &Polar::ComputeFinalDone, End);
+    WaitFrameReset->      addTransition(this, &Polar::FrameResetDone,       RequestExposure);
+    RequestExposure->     addTransition(this, &Polar::RequestExposureDone,  WaitExposure);
+    WaitExposure->        addTransition(this, &Polar::ExposureDone,         FindStars);
+    FindStars->           addTransition(this, &Polar::FindStarsDone,        Compute);
+    Compute->             addTransition(this, &Polar::ComputeDone,          RequestMove);
+    Compute->             addTransition(this, &Polar::PolarDone,            FinalCompute);
+    RequestMove->         addTransition(this, &Polar::RequestMoveDone,      WaitMove);
+    WaitMove->            addTransition(this, &Polar::MoveDone,             RequestExposure);
+
+    // After calibration: enter continuous correction loop (no mount moves)
+    FinalCompute->        addTransition(this, &Polar::ComputeFinalDone,     CorrExposure);
+    CorrExposure->        addTransition(this, &Polar::RequestExposureDone,  CorrWaitExposure);
+    CorrWaitExposure->    addTransition(this, &Polar::ExposureDone,         CorrFindStars);
+    CorrFindStars->       addTransition(this, &Polar::FindStarsDone,        CorrCompute);
+    CorrCompute->         addTransition(this, &Polar::CorrComputeDone,      CorrExposure);
 
     Polar->setInitialState(InitInit);
 
@@ -548,6 +565,23 @@ void Polar::SMComputeFinal()
     getEltFloat("errors", "erraltmn")->setValue(_erralt * 60, false);
     getEltFloat("errors", "errtotmn")->setValue(_errtot * 60, true);
 
+    // Store the Az/Alt of image 3 as the reference for the correction loop
+    _refAz  = azAlt2.x();
+    _refAlt = azAlt2.y();
+    logInfo("Correction reference: refAz=" + QString::number(_refAz) + " refAlt=" + QString::number(_refAlt));
+
+    // Draw initial error overlay on the last image and publish it
+    if (!_lastRawImage.isNull())
+    {
+        QImage overlaid = _lastRawImage.copy();
+        drawErrorOverlay(overlaid, _erraz, _erralt, _errtot);
+        overlaid.save(getWebroot() + "/" + getModuleName() + ".jpeg", "JPG", 90);
+        OST::ImgData dta = image->ImgStats();
+        dta.mUrlJpeg = getModuleName() + ".jpeg";
+        dta.isSolved = true;
+        getEltImg("image", "image")->setValue(dta, true);
+    }
+
     getEltLight("states", "idle")->setValue(OST::Idle, false);
     getEltLight("states", "moving")->setValue(OST::Idle, false);
     getEltLight("states", "shooting")->setValue(OST::Idle, false);
@@ -558,6 +592,118 @@ void Polar::SMComputeFinal()
     return;
 
 }
+
+void Polar::SMCorrCompute()
+{
+    logInfo("SMCorrCompute");
+    getEltLight("states", "compute")->setValue(OST::Busy, true);
+
+    // Current J2000 position from solver
+    double currentRA  = _solver.stellarSolver.getSolution().ra;   // J2000 degrees
+    double currentDEC = _solver.stellarSolver.getSolution().dec;  // J2000 degrees
+
+    // Convert to Az/Alt using current time
+    qint64 nowMs = QDateTime::currentMSecsSinceEpoch();
+    double jdNow = 2440587.5 + nowMs / (86400.0 * 1000.0);
+    QPointF currentAzAlt = solverToAzAlt(currentRA, currentDEC, jdNow);
+
+    // Displacement in Az/Alt from the calibration reference image
+    // When the user adjusts the mount, this displacement tracks the correction applied
+    double dAz  = currentAzAlt.x() - _refAz;
+    double dAlt = currentAzAlt.y() - _refAlt;
+
+    // Remaining error = initial error minus the correction already applied
+    double remainAz  = _erraz  - dAz;
+    double remainAlt = _erralt - dAlt;
+    double remainTot = sqrt(remainAz * remainAz + remainAlt * remainAlt);
+
+    logInfo("Correction loop: dAz=" + QString::number(dAz) + " dAlt=" + QString::number(dAlt)
+            + " remainAz=" + QString::number(remainAz) + " remainAlt=" + QString::number(remainAlt));
+
+    getEltFloat("errors", "erraz")->setValue(remainAz, false);
+    getEltFloat("errors", "erralt")->setValue(remainAlt, false);
+    getEltFloat("errors", "errtot")->setValue(remainTot, false);
+    getEltFloat("errors", "errazmn")->setValue(remainAz * 60, false);
+    getEltFloat("errors", "erraltmn")->setValue(remainAlt * 60, false);
+    getEltFloat("errors", "errtotmn")->setValue(remainTot * 60, true);
+
+    // Draw overlay with remaining error on the latest image
+    if (!_lastRawImage.isNull())
+    {
+        QImage overlaid = _lastRawImage.copy();
+        drawErrorOverlay(overlaid, remainAz, remainAlt, remainTot);
+        overlaid.save(getWebroot() + "/" + getModuleName() + ".jpeg", "JPG", 90);
+        OST::ImgData dta = image->ImgStats();
+        dta.mUrlJpeg = getModuleName() + ".jpeg";
+        dta.isSolved = true;
+        getEltImg("image", "image")->setValue(dta, true);
+    }
+
+    emit CorrComputeDone();
+}
+
+void Polar::drawErrorOverlay(QImage &img, double erraz, double erralt, double errtot)
+{
+    if (img.isNull()) return;
+
+    QPainter painter(&img);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    int cx = img.width()  / 2;
+    int cy = img.height() / 2;
+
+    // Scale so the total error spans 30% of image height; minimum 50 px/degree
+    double totalDeg = qMax(fabs(errtot), 0.01);
+    double maxPx    = img.height() * 0.30;
+    double scale    = qMax(maxPx / totalDeg, 50.0);  // pixels per degree
+
+    // Triangle vertices:
+    // P1 = image center (current polar axis position)
+    // P2 = P1 + altitude correction (vertical)
+    // P3 = P2 + azimuth correction (horizontal) = target position
+    QPoint p1(cx, cy);
+    QPoint p2(cx,                          cy - qRound(erralt * scale));
+    QPoint p3(cx + qRound(erraz  * scale), cy - qRound(erralt * scale));
+
+    // Altitude error line (yellow)
+    painter.setPen(QPen(QColor(255, 220, 0), 2));
+    painter.drawLine(p1, p2);
+
+    // Azimuth error line (green)
+    painter.setPen(QPen(QColor(0, 230, 0), 2));
+    painter.drawLine(p2, p3);
+
+    // Total error line (red)
+    painter.setPen(QPen(QColor(230, 0, 0), 2));
+    painter.drawLine(p1, p3);
+
+    // Vertex dots
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(Qt::white);
+    painter.drawEllipse(p1, 4, 4);
+    painter.setBrush(QColor(255, 220, 0));
+    painter.drawEllipse(p2, 4, 4);
+    painter.setBrush(QColor(0, 230, 0));
+    painter.drawEllipse(p3, 4, 4);
+
+    // Labels (values in arcminutes)
+    QFont font = painter.font();
+    font.setPixelSize(14);
+    font.setBold(true);
+    painter.setFont(font);
+
+    painter.setPen(QColor(255, 220, 0));
+    painter.drawText(p2 + QPoint(8, 0), QString("ALT %1'").arg(erralt * 60.0, 0, 'f', 1));
+
+    painter.setPen(QColor(0, 230, 0));
+    painter.drawText(p3 + QPoint(8, 0), QString("AZ %1'").arg(erraz * 60.0, 0, 'f', 1));
+
+    painter.setPen(QColor(230, 0, 0));
+    painter.drawText((p1 + p3) / 2 + QPoint(8, -6), QString("TOT %1'").arg(errtot * 60.0, 0, 'f', 1));
+
+    painter.end();
+}
+
 void Polar::SMFindStars()
 {
 

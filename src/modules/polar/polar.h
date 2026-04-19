@@ -40,6 +40,7 @@ class MODULE_INIT Polar : public IndiModule
         void PolarDone();
         void RequestMoveDone();
         void MoveDone();
+        void CorrComputeDone();
 
     protected:
         void onExternalEvent(OST::ExtEvent event) override;
@@ -95,6 +96,10 @@ class MODULE_INIT Polar : public IndiModule
         double _observerLat = 0.0;
         double _observerLon = 0.0;
 
+        double _refAz  = 0.0;   // Az/Alt of the 3rd calibration image (correction reference)
+        double _refAlt = 0.0;
+
+        QImage _lastRawImage;
 
         QString _camera  = "CCD Simulator";
         QString _mount  = "Telescope Simulator";
@@ -106,12 +111,14 @@ class MODULE_INIT Polar : public IndiModule
         }
 
         QPointF solverToAzAlt(double ra_j2000_deg, double dec_j2000_deg, double jd);
+        void drawErrorOverlay(QImage &img, double erraz, double erralt, double errtot);
         void buildStateMachine(void);
         void SMInit();
         void SMRequestExposure();
         void SMFindStars();
         void SMCompute();
         void SMComputeFinal();
+        void SMCorrCompute();
         void SMRequestFrameReset();
         void SMRequestMove();
         void SMAbort();
