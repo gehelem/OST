@@ -189,6 +189,11 @@ void Solver::ssReadySEP()
 
 void Solver::ssReadySolve()
 {
+    if (stellarSolver.failed() || !stellarSolver.solvingDone())
+    {
+        emit failSolve();
+        return;
+    }
     emit successSolve();
 }
 void Solver::sslogOutput(QString text)

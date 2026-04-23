@@ -47,6 +47,7 @@ class MODULE_INIT Polar : public IndiModule
 
     public slots:
         void OnSucessSolve();
+        void OnFailSolve();
         void OnSolverLog(QString &text);
     private:
         void updateProperty(INDI::Property property) override;
