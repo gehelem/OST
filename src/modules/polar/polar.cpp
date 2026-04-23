@@ -316,8 +316,7 @@ void Polar::SMRequestExposure()
     getEltLight("states", "solving")->setValue(OST::Idle, false);
     getEltLight("states", "compute")->setValue(OST::Idle, true);
 
-    double t = QDateTime::currentDateTime().currentMSecsSinceEpoch();
-    //double t = ln_get_julian_from_sys();
+    double t = QDateTime::currentMSecsSinceEpoch() + _exposure * 500.0;  // mid-exposure estimate
 
     if (_itt == 0)
     {
