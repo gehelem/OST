@@ -99,7 +99,10 @@ void Polar::updateProperty(INDI::Property property)
         &&  (property.getState() == IPS_OK)
     )
     {
-        logInfo("MoveDone %1", {property.getName()});
+        getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "RA", _mountRA);
+        getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "DEC", _mountDEC);
+        logInfo("MoveDone %1 RA=%2 DE=%3", {property.getName(),_mountRA,_mountDEC});
+        qDebug() << _mountRA << _mountDEC;
         emit MoveDone();
     }
     if (
@@ -360,12 +363,12 @@ void Polar::SMRequestMove()
 
     if (_mountPointingWest)
     {
-        newRA = oldRA - 0.25;
+        newRA = oldRA - 1;
         if (newRA < 0) newRA = newRA + 24;
     }
     else
     {
-        newRA = oldRA + +0.25;
+        newRA = oldRA + +1;
         if (newRA >= 24) newRA = newRA - 24;
     }
 
@@ -734,18 +737,25 @@ void Polar::SMFindStars()
     QStringList folders;
     folders.append("/usr/share/astrometry");
     _solver.stellarSolver.setIndexFolderPaths(folders);
-    connect(&_solver, &Solver::successSolve, this, &Polar::OnSucessSolve);
-    connect(&_solver, &Solver::solverLog, this, &Polar::OnSolverLog);
+    connect(&_solver, &Solver::successSolve, this, &Polar::OnSucessSolve, Qt::UniqueConnection);
+    connect(&_solver, &Solver::failSolve,    this, &Polar::OnFailSolve,    Qt::UniqueConnection);
+    connect(&_solver, &Solver::solverLog,    this, &Polar::OnSolverLog,    Qt::UniqueConnection);
     _solver.stars.clear();
     SSolver::Parameters params = _solver.stellarSolverProfiles[0];
-    params.minwidth = 0.1 * _ccdFov / 3600;
-    params.maxwidth = 1.1 * _ccdFov / 3600;
-    params.search_radius = 2;
+    double fovWidthDeg = _ccdX * _ccdSampling / 3600.0;  // actual horizontal FOV, not diagonal
+    params.minwidth = 0.7 * fovWidthDeg;
+    params.maxwidth = 1.3 * fovWidthDeg;
+    params.search_radius = 1;
     //BOOST_LOG_TRIVIAL(debug) << "minwidth " << params.minwidth;
     //BOOST_LOG_TRIVIAL(debug) << "maxidth " << params.maxwidth;
     //_solver.setSearchScale(0.1*_ccdFov/3600,1.1*_ccdFov/3600,ScaleUnits::DEG_WIDTH);
-    //_solver.setSearchPositionInDegrees(_mountRA*360/24,_mountDEC);
-    _solver.stellarSolver.setSearchPositionInDegrees(_mountRA * 360 / 24, _mountDEC);
+    // Convert mount hint from EOD (EQUATORIAL_EOD_COORD) to J2000 — solver expects J2000
+    INDI::IEquatorialCoordinates mountEod, mountJ2000;
+    mountEod.rightascension = _mountRA;
+    mountEod.declination    = _mountDEC;
+    double jdHint = 2440587.5 + QDateTime::currentMSecsSinceEpoch() / (86400.0 * 1000.0);
+    INDI::ObservedToJ2000(&mountEod, jdHint, &mountJ2000);
+    _solver.stellarSolver.setSearchPositionInDegrees(mountJ2000.rightascension * 360.0 / 24.0, mountJ2000.declination);
     _solver.SolveStars(params);
 }
 void Polar::OnSucessSolve()
@@ -761,12 +771,21 @@ void Polar::OnSucessSolve()
     getEltImg("image", "image")->setValue(dta, true);
 
     disconnect(&_solver, &Solver::successSolve, this, &Polar::OnSucessSolve);
-    disconnect(&_solver, &Solver::solverLog, this, &Polar::OnSolverLog);
+    disconnect(&_solver, &Solver::failSolve,    this, &Polar::OnFailSolve);
+    disconnect(&_solver, &Solver::solverLog,    this, &Polar::OnSolverLog);
     emit FindStarsDone();
+}
+void Polar::OnFailSolve()
+{
+    logWarning("Solver failed to find a solution");
+    disconnect(&_solver, &Solver::successSolve, this, &Polar::OnSucessSolve);
+    disconnect(&_solver, &Solver::failSolve,    this, &Polar::OnFailSolve);
+    disconnect(&_solver, &Solver::solverLog,    this, &Polar::OnSolverLog);
+    emit Abort();
 }
 void Polar::OnSolverLog(QString &text)
 {
-    //logInfo(text);
+    //logDebug(text);
 }
 void Polar::SMAbort()
 {
