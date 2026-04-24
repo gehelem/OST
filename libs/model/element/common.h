@@ -539,6 +539,7 @@ typedef struct ImgData
     bool isSolved = false;              /*!< Whether plate solving succeeded */
     double solverRA{ 0 };               /*!< Solved Right Ascension (degrees) */
     double solverDE{ 0 };               /*!< Solved Declination (degrees) */
+    double solverOrientation{ 0 };      /*!< Solver image orientation: angle from North to image up (degrees) */
     QVector<double> histogram[3];       /*!< Histogram data for R,G,B channels */
 } ImgData;
 
