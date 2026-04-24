@@ -112,6 +112,7 @@ class MODULE_INIT Polar : public IndiModule
         }
 
         QPointF solverToAzAlt(double ra_j2000_deg, double dec_j2000_deg, double jd);
+        void syncMount(double ra_j2000_deg, double dec_j2000_deg);
         void drawErrorOverlay(QImage &img, double erraz, double erralt, double errtot);
         void buildStateMachine(void);
         void SMInit();

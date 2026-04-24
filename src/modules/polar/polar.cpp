@@ -446,10 +446,45 @@ void Polar::SMCompute()
     getEltFloat("values", "de2")->setValue(_de2, false);
     getEltFloat("values", "t2")->setValue(_t2, true);
 
+    syncMount(_solver.stellarSolver.getSolution().ra, _solver.stellarSolver.getSolution().dec);
+
     _itt++;
     if (_itt < 3) emit ComputeDone();
     else emit PolarDone();
 
+}
+void Polar::syncMount(double ra_j2000_deg, double dec_j2000_deg)
+{
+    QString mount = getString("devices", "mount");
+    INDI::BaseDevice dp = getDevice(mount.toStdString().c_str());
+    if (!dp.isValid())
+    {
+        logWarning("syncMount: mount device not found");
+        return;
+    }
+    if (!sendModNewSwitch(mount, "ON_COORD_SET", "SYNC", ISS_ON))
+    {
+        logWarning("syncMount: failed to switch to SYNC mode");
+        return;
+    }
+    INDI::PropertyNumber prop = dp.getNumber("EQUATORIAL_EOD_COORD");
+    if (!prop.isValid())
+    {
+        logWarning("syncMount: EQUATORIAL_EOD_COORD not found");
+        sendModNewSwitch(mount, "ON_COORD_SET", "SLEW", ISS_ON);
+        return;
+    }
+    INDI::IEquatorialCoordinates j2000pos, observed;
+    j2000pos.rightascension = ra_j2000_deg / 15.0;  // degrees -> hours
+    j2000pos.declination    = dec_j2000_deg;
+    double jd = ln_get_julian_from_sys();
+    INDI::J2000toObserved(&j2000pos, jd, &observed);
+    prop.findWidgetByName("RA")->value  = observed.rightascension;
+    prop.findWidgetByName("DEC")->value = observed.declination;
+    sendNewNumber(prop);
+    if (!sendModNewSwitch(mount, "ON_COORD_SET", "SLEW", ISS_ON))
+        logWarning("syncMount: failed to restore SLEW mode");
+    logInfo("Mount synced: RA=" + QString::number(observed.rightascension) + "h DEC=" + QString::number(observed.declination) + "°");
 }
 QPointF Polar::solverToAzAlt(double ra_j2000_deg, double dec_j2000_deg, double jd)
 {
