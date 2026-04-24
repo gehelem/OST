@@ -49,13 +49,9 @@ void Solver::ResetSolver(FITSImage::Statistic &stats, uint8_t *m_ImageBuffer, in
 }
 void Solver::FindStars(Parameters param)
 {
-
-    if (!connect(&stellarSolver, &StellarSolver::logOutput, this, &Solver::sslogOutput))
-        sendMessage( "Can't connect sslogOutput");
-    if (!connect(&stellarSolver, &StellarSolver::ready, this, &Solver::ssReadySEP))
-        sendMessage( "Can't connect ssReadySEP");
-    if (!connect(&stellarSolver, &StellarSolver::finished, this, &Solver::ssFinished))
-        sendMessage( "Can't connect ssFinished");
+    connect(&stellarSolver, &StellarSolver::logOutput, this, &Solver::sslogOutput,  Qt::UniqueConnection);
+    connect(&stellarSolver, &StellarSolver::ready,     this, &Solver::ssReadySEP,   Qt::UniqueConnection);
+    connect(&stellarSolver, &StellarSolver::finished,  this, &Solver::ssFinished,   Qt::UniqueConnection);
 
 
     //QList<Parameters> params = stellarSolver.getBuiltInProfiles();
@@ -92,12 +88,9 @@ void Solver::FindStars(Parameters param)
 }
 void Solver::SolveStars(Parameters param)
 {
-    if (!connect(&stellarSolver, &StellarSolver::logOutput, this, &Solver::sslogOutput))
-        sendMessage( "Can't connect sslogOutput");
-    if (!connect(&stellarSolver, &StellarSolver::ready, this, &Solver::ssReadySolve))
-        sendMessage( "Can't connect ssReadySolve");
-    if (!connect(&stellarSolver, &StellarSolver::finished, this, &Solver::ssFinished))
-        sendMessage( "Can't connect ssFinished");
+    connect(&stellarSolver, &StellarSolver::logOutput, this, &Solver::sslogOutput,  Qt::UniqueConnection);
+    connect(&stellarSolver, &StellarSolver::ready,     this, &Solver::ssReadySolve, Qt::UniqueConnection);
+    connect(&stellarSolver, &StellarSolver::finished,  this, &Solver::ssFinished,   Qt::UniqueConnection);
 
 
     //QList<Parameters> params = stellarSolver.getBuiltInProfiles();
