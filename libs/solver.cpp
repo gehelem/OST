@@ -136,8 +136,8 @@ void Solver::SolveStars(Parameters param)
 
 void Solver::ssFinished()
 {
-    //sendMessage( "solve finished";
-
+    disconnect(&stellarSolver, &StellarSolver::finished,  this, &Solver::ssFinished);
+    disconnect(&stellarSolver, &StellarSolver::logOutput, this, &Solver::sslogOutput);
 }
 void Solver::ssReadySEP()
 {
@@ -189,6 +189,7 @@ void Solver::ssReadySEP()
 
 void Solver::ssReadySolve()
 {
+    disconnect(&stellarSolver, &StellarSolver::ready, this, &Solver::ssReadySolve);
     if (stellarSolver.failed() || !stellarSolver.solvingDone())
     {
         emit failSolve();
