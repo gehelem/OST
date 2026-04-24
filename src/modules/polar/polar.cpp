@@ -644,10 +644,10 @@ void Polar::SMCorrCompute()
     double currentRA  = _solver.stellarSolver.getSolution().ra;   // J2000 degrees
     double currentDEC = _solver.stellarSolver.getSolution().dec;  // J2000 degrees
 
-    // Convert to Az/Alt using current time
-    qint64 nowMs = QDateTime::currentMSecsSinceEpoch();
-    double jdNow = 2440587.5 + nowMs / (86400.0 * 1000.0);
-    QPointF currentAzAlt = solverToAzAlt(currentRA, currentDEC, jdNow);
+    // Convert to Az/Alt using the same epoch as the reference image (_t2),
+    // so sidereal rotation cancels out and the Az/Alt delta is purely mechanical.
+    double jdRef = 2440587.5 + _t2 / (86400.0 * 1000.0);
+    QPointF currentAzAlt = solverToAzAlt(currentRA, currentDEC, jdRef);
 
     // Displacement in Az/Alt from the calibration reference image
     // When the user adjusts the mount, this displacement tracks the correction applied
