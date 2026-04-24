@@ -71,6 +71,7 @@ class MODULE_INIT Polar : public IndiModule
         double _mountDEC;
         double _mountRA;
         bool   _mountPointingWest = false;
+        bool   _slewing = false;
         double _ccdOrientation;
         double _aperture;
         double _focalLength;

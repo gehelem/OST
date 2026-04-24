@@ -96,14 +96,18 @@ void Polar::updateProperty(INDI::Property property)
     if (
         (property.getDeviceName() == getString("devices", "mount"))
         &&  (property.getName()   == std::string("EQUATORIAL_EOD_COORD"))
-        &&  (property.getState() == IPS_OK)
     )
     {
-        getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "RA", _mountRA);
-        getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "DEC", _mountDEC);
-        logInfo("MoveDone %1 RA=%2 DE=%3", {property.getName(),_mountRA,_mountDEC});
-        qDebug() << _mountRA << _mountDEC;
-        emit MoveDone();
+        if (property.getState() == IPS_BUSY)
+        {
+            _slewing = true;
+        }
+        if (property.getState() == IPS_OK && _slewing)
+        {
+            _slewing = false;
+            logInfo("MoveDone");
+            emit MoveDone();
+        }
     }
     if (
         (property.getDeviceName() == getString("devices", "camera"))
@@ -293,7 +297,10 @@ void Polar::SMInit()
 
     getEltFloat("errors", "erraz")->setValue(_erraz, false);
     getEltFloat("errors", "erralt")->setValue(_erralt, false);
-    getEltFloat("errors", "errtot")->setValue(_errtot, true);
+    getEltFloat("errors", "errtot")->setValue(_errtot, false);
+    getEltFloat("errors", "errazmn")->setValue(_erraz * 60, false);
+    getEltFloat("errors", "erraltmn")->setValue(_erralt * 60, false);
+    getEltFloat("errors", "errtotmn")->setValue(_errtot * 60, true);
 
     emit InitDone();
 }
@@ -358,20 +365,20 @@ void Polar::SMRequestMove()
         emit Abort();
         return;
     }
-    logInfo("SMRequestMove oldRA=" + QString::number(oldRA));
 
     if (_mountPointingWest)
     {
-        newRA = oldRA - 1;
+        newRA = oldRA - 0.5; // 1h = 15°
         if (newRA < 0) newRA = newRA + 24;
     }
     else
     {
-        newRA = oldRA + +1;
+        newRA = oldRA + 0.5;
         if (newRA >= 24) newRA = newRA - 24;
     }
 
-    logInfo("SMRequestMove newRA=" + QString::number(newRA));
+    _slewing = false;  // wait for IPS_BUSY before accepting IPS_OK as move done
+    logInfo("SMRequestMove oldRA=%1 newRA=%2",{oldRA,newRA});
     if (!sendModNewNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "RA", newRA))
     {
         logInfo("SMRequestMove error 2");
@@ -445,8 +452,6 @@ void Polar::SMCompute()
     getEltFloat("values", "ra2")->setValue(_ra2, false);
     getEltFloat("values", "de2")->setValue(_de2, false);
     getEltFloat("values", "t2")->setValue(_t2, true);
-
-    syncMount(_solver.stellarSolver.getSolution().ra, _solver.stellarSolver.getSolution().dec);
 
     _itt++;
     if (_itt < 3) emit ComputeDone();
@@ -777,9 +782,9 @@ void Polar::SMFindStars()
     _solver.stars.clear();
     SSolver::Parameters params = _solver.stellarSolverProfiles[0];
     double fovWidthDeg = _ccdX * _ccdSampling / 3600.0;  // actual horizontal FOV, not diagonal
-    params.minwidth = 0.7 * fovWidthDeg;
-    params.maxwidth = 1.3 * fovWidthDeg;
-    params.search_radius = 1;
+    params.minwidth = 0.5 * fovWidthDeg;
+    params.maxwidth = 1.1 * fovWidthDeg;
+    params.search_radius = 3;
     //BOOST_LOG_TRIVIAL(debug) << "minwidth " << params.minwidth;
     //BOOST_LOG_TRIVIAL(debug) << "maxidth " << params.maxwidth;
     //_solver.setSearchScale(0.1*_ccdFov/3600,1.1*_ccdFov/3600,ScaleUnits::DEG_WIDTH);
