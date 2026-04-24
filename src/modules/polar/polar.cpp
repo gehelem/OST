@@ -184,6 +184,7 @@ void Polar::buildStateMachine(void)
     RequestExposure->     addTransition(this, &Polar::RequestExposureDone,  WaitExposure);
     WaitExposure->        addTransition(this, &Polar::ExposureDone,         FindStars);
     FindStars->           addTransition(this, &Polar::FindStarsDone,        Compute);
+    FindStars->           addTransition(this, &Polar::FindStarsFailed,      Abort);
     Compute->             addTransition(this, &Polar::ComputeDone,          RequestMove);
     Compute->             addTransition(this, &Polar::PolarDone,            FinalCompute);
     RequestMove->         addTransition(this, &Polar::RequestMoveDone,      WaitMove);
@@ -194,6 +195,7 @@ void Polar::buildStateMachine(void)
     CorrExposure->        addTransition(this, &Polar::RequestExposureDone,  CorrWaitExposure);
     CorrWaitExposure->    addTransition(this, &Polar::ExposureDone,         CorrFindStars);
     CorrFindStars->       addTransition(this, &Polar::FindStarsDone,        CorrCompute);
+    CorrFindStars->       addTransition(this, &Polar::FindStarsFailed,      CorrExposure);
     CorrCompute->         addTransition(this, &Polar::CorrComputeDone,      CorrExposure);
 
     Polar->setInitialState(InitInit);
@@ -820,7 +822,7 @@ void Polar::OnFailSolve()
     disconnect(&_solver, &Solver::successSolve, this, &Polar::OnSucessSolve);
     disconnect(&_solver, &Solver::failSolve,    this, &Polar::OnFailSolve);
     disconnect(&_solver, &Solver::solverLog,    this, &Polar::OnSolverLog);
-    emit Abort();
+    emit FindStarsFailed();
 }
 void Polar::OnSolverLog(QString &text)
 {
