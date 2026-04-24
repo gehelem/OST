@@ -105,7 +105,7 @@ void Polar::updateProperty(INDI::Property property)
         if (property.getState() == IPS_OK && _slewing)
         {
             _slewing = false;
-            logInfo("MoveDone");
+            //logInfo("MoveDone");
             emit MoveDone();
         }
     }
@@ -410,6 +410,7 @@ void Polar::SMCompute()
     dta.starsCount = _solver.stars.size();
     dta.solverRA = _solver.stellarSolver.getSolution().ra;
     dta.solverDE = _solver.stellarSolver.getSolution().dec;
+    dta.solverOrientation = _solver.stellarSolver.getSolution().orientation;
     dta.isSolved = true;
     getEltImg("image", "image")->setValue(dta, true);
 
@@ -618,10 +619,12 @@ void Polar::SMComputeFinal()
     if (!_lastRawImage.isNull())
     {
         QImage overlaid = _lastRawImage.copy();
-        drawErrorOverlay(overlaid, _erraz, _erralt, _errtot);
+        drawErrorOverlay(overlaid, _erraz, _erralt, _errtot,
+                         _solver.stellarSolver.getSolution().orientation);
         overlaid.save(getWebroot() + "/" + getModuleName() + ".jpeg", "JPG", 90);
         OST::ImgData dta = image->ImgStats();
         dta.mUrlJpeg = getModuleName() + ".jpeg";
+        dta.solverOrientation = _solver.stellarSolver.getSolution().orientation;
         dta.isSolved = true;
         getEltImg("image", "image")->setValue(dta, true);
     }
@@ -675,10 +678,12 @@ void Polar::SMCorrCompute()
     if (!_lastRawImage.isNull())
     {
         QImage overlaid = _lastRawImage.copy();
-        drawErrorOverlay(overlaid, remainAz, remainAlt, remainTot);
+        drawErrorOverlay(overlaid, remainAz, remainAlt, remainTot,
+                         _solver.stellarSolver.getSolution().orientation);
         overlaid.save(getWebroot() + "/" + getModuleName() + ".jpeg", "JPG", 90);
         OST::ImgData dta = image->ImgStats();
         dta.mUrlJpeg = getModuleName() + ".jpeg";
+        dta.solverOrientation = _solver.stellarSolver.getSolution().orientation;
         dta.isSolved = true;
         getEltImg("image", "image")->setValue(dta, true);
     }
@@ -686,7 +691,7 @@ void Polar::SMCorrCompute()
     emit CorrComputeDone();
 }
 
-void Polar::drawErrorOverlay(QImage &img, double erraz, double erralt, double errtot)
+void Polar::drawErrorOverlay(QImage &img, double erraz, double erralt, double errtot, double orientation)
 {
     if (img.isNull()) return;
 
@@ -701,27 +706,26 @@ void Polar::drawErrorOverlay(QImage &img, double erraz, double erralt, double er
     double maxPx    = img.height() * 0.30;
     double scale    = qMax(maxPx / totalDeg, 50.0);  // pixels per degree
 
-    // Triangle vertices:
-    // P1 = image center (current polar axis position)
-    // P2 = P1 + altitude correction (vertical)
-    // P3 = P2 + azimuth correction (horizontal) = target position
-    QPoint p1(cx, cy);
-    QPoint p2(cx,                          cy - qRound(erralt * scale));
-    QPoint p3(cx + qRound(erraz  * scale), cy - qRound(erralt * scale));
+    // Rotate the drawing frame so that "up" aligns with celestial North in the image.
+    // orientation (degrees) is the angle from North to the image's up direction.
+    painter.translate(cx, cy);
+    painter.rotate(-orientation);
 
-    // Altitude error line (yellow)
+    // Triangle vertices in the rotated frame (origin = image center, up = North):
+    // P1 = current polar axis position
+    // P2 = P1 + altitude correction (toward North)
+    // P3 = P2 + azimuth correction (toward East) = target (pole)
+    QPoint p1(0, 0);
+    QPoint p2(0,                       -qRound(erralt * scale));
+    QPoint p3(qRound(erraz  * scale),  -qRound(erralt * scale));
+
     painter.setPen(QPen(QColor(255, 220, 0), 2));
     painter.drawLine(p1, p2);
-
-    // Azimuth error line (green)
     painter.setPen(QPen(QColor(0, 230, 0), 2));
     painter.drawLine(p2, p3);
-
-    // Total error line (red)
     painter.setPen(QPen(QColor(230, 0, 0), 2));
     painter.drawLine(p1, p3);
 
-    // Vertex dots
     painter.setPen(Qt::NoPen);
     painter.setBrush(Qt::white);
     painter.drawEllipse(p1, 4, 4);
@@ -730,20 +734,27 @@ void Polar::drawErrorOverlay(QImage &img, double erraz, double erralt, double er
     painter.setBrush(QColor(0, 230, 0));
     painter.drawEllipse(p3, 4, 4);
 
-    // Labels (values in arcminutes)
+    // Labels: reset transform to keep text readable, map rotated points back to screen coords.
+    double th = orientation * M_PI / 180.0;
+    double cosT = cos(th), sinT = sin(th);
+    auto toScreen = [&](QPoint p) -> QPointF {
+        return QPointF(cx + p.x() * cosT + p.y() * sinT,
+                       cy - p.x() * sinT + p.y() * cosT);
+    };
+
+    painter.resetTransform();
     QFont font = painter.font();
     font.setPixelSize(14);
     font.setBold(true);
     painter.setFont(font);
 
     painter.setPen(QColor(255, 220, 0));
-    painter.drawText(p2 + QPoint(8, 0), QString("ALT %1'").arg(erralt * 60.0, 0, 'f', 1));
-
+    painter.drawText(toScreen(p2) + QPointF(8, 0), QString("ALT %1'").arg(erralt * 60.0, 0, 'f', 1));
     painter.setPen(QColor(0, 230, 0));
-    painter.drawText(p3 + QPoint(8, 0), QString("AZ %1'").arg(erraz * 60.0, 0, 'f', 1));
-
+    painter.drawText(toScreen(p3) + QPointF(8, 0), QString("AZ %1'").arg(erraz * 60.0, 0, 'f', 1));
     painter.setPen(QColor(230, 0, 0));
-    painter.drawText((p1 + p3) / 2 + QPoint(8, -6), QString("TOT %1'").arg(errtot * 60.0, 0, 'f', 1));
+    painter.drawText((toScreen(p1) + toScreen(p3)) / 2.0 + QPointF(8, -6),
+                     QString("TOT %1'").arg(errtot * 60.0, 0, 'f', 1));
 
     painter.end();
 }
@@ -808,6 +819,7 @@ void Polar::OnSucessSolve()
     dta.starsCount = _solver.stars.size();
     dta.solverRA = _solver.stellarSolver.getSolution().ra;
     dta.solverDE = _solver.stellarSolver.getSolution().dec;
+    dta.solverOrientation = _solver.stellarSolver.getSolution().orientation;
     dta.isSolved = true;
     getEltImg("image", "image")->setValue(dta, true);
 
