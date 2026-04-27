@@ -83,6 +83,7 @@ class MODULE_INIT Guider  : public IndiModule
         void ComputeCalDone();
         void ComputeGuideDone();
         void CalibrationDone();
+        void DitherNow();
 
 
     public slots:
@@ -119,6 +120,7 @@ class MODULE_INIT Guider  : public IndiModule
         int _calStep = 0;       ///< Current calibration pulse direction (0-7 for 4 directions × 2 iterations)
         bool _pulseRAfinished = true;   ///< Flag: RA pulse completed on mount
         bool _pulseDECfinished = true;  ///< Flag: DEC pulse completed on mount
+        bool _doDither = false;         ///< Flag: dither requested, apply on next ComputeGuide
 
         // ==================== Drift Measurements (pixels) ====================
         double _dxFirst = 0;    ///< Drift X from first reference frame

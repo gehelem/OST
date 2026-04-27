@@ -24,6 +24,7 @@
 
 #include "guider.h"
 #include "version.cc"
+#include <QRandomGenerator>
 //#include "polynomialfit.h"
 #define PI 3.14159265
 
@@ -78,7 +79,11 @@ Guider::Guider(QString name, QString label, QString profile, QVariantMap availab
     OST::ElementBool* b = new OST::ElementBool("resetcalibration", "Reset calibration", "guid10", "");
     b->setValue(false, false);
     b->setPreIcon("block");
-    pm->addElt( b);
+    pm->addElt(b);
+    OST::ElementBool* dither = new OST::ElementBool("dither", "Dither", "guid11", "");
+    dither->setValue(false, false);
+    dither->setPreIcon("shuffle");
+    pm->addElt(dither);
 }
 
 /**
@@ -194,6 +199,21 @@ void Guider::onExternalEvent(OST::ExtEvent event)
                     disconnect(&_SMCalibration, &QStateMachine::finished, nullptr, nullptr);
                     connect(&_SMInit,           &QStateMachine::finished, &_SMGuide, &QStateMachine::start);
                     _SMInit.start();
+                }
+            }
+        }
+        if (event.eltkey == "dither")
+        {
+            if (getEltBool(event.prpkey, event.eltkey)->setValue(false, true))
+            {
+                if (_SMGuide.isRunning())
+                {
+                    _doDither = true;
+                    logInfo("Dither requested - will apply on next guide frame");
+                }
+                else
+                {
+                    logWarning("Dither ignored - guiding is not active");
                 }
             }
         }
@@ -385,34 +405,54 @@ void Guider::buildGuideStateMachines(void)
     auto *Guide  = new QState();
     auto *End   = new QFinalState();
 
-    auto *InitGuide           = new QState(Guide);
-    auto *RequestGuideExposure = new QState(Guide);
-    auto *WaitGuideExposure   = new QState(Guide);
-    auto *FindStarsGuide      = new QState(Guide);
-    auto *ComputeGuide        = new QState(Guide);
-    auto *RequestGuidePulses  = new QState(Guide);
-    auto *WaitGuidePulses     = new QState(Guide);
+    auto *InitGuide              = new QState(Guide);
+    auto *RequestGuideExposure   = new QState(Guide);
+    auto *WaitGuideExposure      = new QState(Guide);
+    auto *FindStarsGuide         = new QState(Guide);
+    auto *ComputeGuide           = new QState(Guide);
+    auto *RequestGuidePulses     = new QState(Guide);
+    auto *WaitGuidePulses        = new QState(Guide);
+    // Dither branch: send dither pulses then rebuild reference before resuming
+    auto *RequestDitherPulses    = new QState(Guide);
+    auto *WaitDitherPulses       = new QState(Guide);
+    auto *RequestRefExposure     = new QState(Guide);
+    auto *WaitRefExposure        = new QState(Guide);
+    auto *FindStarsRef           = new QState(Guide);
+    auto *ComputeNewRef          = new QState(Guide);
 
-    connect(InitGuide, &QState::entered, this, &Guider::SMInitGuide);
+    connect(InitGuide,            &QState::entered, this, &Guider::SMInitGuide);
     connect(RequestGuideExposure, &QState::entered, this, &Guider::SMRequestExposure);
-    connect(FindStarsGuide, &QState::entered, this, &Guider::SMFindStars);
-    connect(ComputeGuide, &QState::entered, this, &Guider::SMComputeGuide);
-    connect(RequestGuidePulses,  &QState::entered, this, &Guider::SMRequestPulses);
-    connect(Abort,               &QState::entered, this, &Guider::SMAbort);
+    connect(FindStarsGuide,       &QState::entered, this, &Guider::SMFindStars);
+    connect(ComputeGuide,         &QState::entered, this, &Guider::SMComputeGuide);
+    connect(RequestGuidePulses,   &QState::entered, this, &Guider::SMRequestPulses);
+    connect(RequestDitherPulses,  &QState::entered, this, &Guider::SMRequestPulses);
+    connect(RequestRefExposure,   &QState::entered, this, &Guider::SMRequestExposure);
+    connect(FindStarsRef,         &QState::entered, this, &Guider::SMFindStars);
+    connect(ComputeNewRef,        &QState::entered, this, &Guider::SMComputeFirst);
+    connect(Abort,                &QState::entered, this, &Guider::SMAbort);
 
-    Guide->               addTransition(this, &Guider::Abort, Abort);
-    Abort->               addTransition(this, &Guider::AbortDone, End);
-    InitGuide->           addTransition(this, &Guider::InitGuideDone, RequestGuideExposure);
+    Guide->                  addTransition(this, &Guider::Abort,              Abort);
+    Abort->                  addTransition(this, &Guider::AbortDone,          End);
+    InitGuide->              addTransition(this, &Guider::InitGuideDone,      RequestGuideExposure);
 
-    RequestGuideExposure->  addTransition(this, &Guider::RequestExposureDone, WaitGuideExposure);
-    WaitGuideExposure->     addTransition(this, &Guider::ExposureDone, FindStarsGuide);
-    FindStarsGuide->        addTransition(this, &Guider::FindStarsDone, ComputeGuide);
-    ComputeGuide->          addTransition(this, &Guider::ComputeGuideDone, RequestGuidePulses);
-    RequestGuidePulses->    addTransition(this, &Guider::RequestPulsesDone, WaitGuidePulses);
-    RequestGuidePulses->    addTransition(this, &Guider::PulsesDone, RequestGuideExposure);
-    WaitGuidePulses->       addTransition(this, &Guider::PulsesDone, RequestGuideExposure);
-    //ComputeGuide->          addTransition(this,&Guider::GuideDone           ,End); // useless ??
+    // Normal guiding loop
+    RequestGuideExposure->   addTransition(this, &Guider::RequestExposureDone, WaitGuideExposure);
+    WaitGuideExposure->      addTransition(this, &Guider::ExposureDone,        FindStarsGuide);
+    FindStarsGuide->         addTransition(this, &Guider::FindStarsDone,       ComputeGuide);
+    ComputeGuide->           addTransition(this, &Guider::ComputeGuideDone,    RequestGuidePulses);
+    RequestGuidePulses->     addTransition(this, &Guider::RequestPulsesDone,   WaitGuidePulses);
+    RequestGuidePulses->     addTransition(this, &Guider::PulsesDone,          RequestGuideExposure);
+    WaitGuidePulses->        addTransition(this, &Guider::PulsesDone,          RequestGuideExposure);
 
+    // Dither branch: triggered by DitherNow from ComputeGuide
+    ComputeGuide->           addTransition(this, &Guider::DitherNow,           RequestDitherPulses);
+    RequestDitherPulses->    addTransition(this, &Guider::RequestPulsesDone,   WaitDitherPulses);
+    RequestDitherPulses->    addTransition(this, &Guider::PulsesDone,          RequestRefExposure);
+    WaitDitherPulses->       addTransition(this, &Guider::PulsesDone,          RequestRefExposure);
+    RequestRefExposure->     addTransition(this, &Guider::RequestExposureDone, WaitRefExposure);
+    WaitRefExposure->        addTransition(this, &Guider::ExposureDone,        FindStarsRef);
+    FindStarsRef->           addTransition(this, &Guider::FindStarsDone,       ComputeNewRef);
+    ComputeNewRef->          addTransition(this, &Guider::ComputeFirstDone,    InitGuide);
 
     Guide->setInitialState(InitGuide);
 
@@ -717,6 +757,8 @@ void Guider::SMInitGuide()
     _dRAvector.clear();
     _dDEvector.clear();
 
+    _doDither = false;
+
     emit InitGuideDone();
 }
 void Guider::SMRequestFrameReset()
@@ -944,9 +986,6 @@ void Guider::SMComputeGuide()
     if (_trigCurrent.size() > 0)
     {
         matchIndexes(_trigFirst, _trigCurrent, _matchedCurFirst, _dxFirst, _dyFirst);
-        //_grid->append(_dxFirst,_dyFirst);
-        //_propertyStore.update(_grid);
-        //emit propertyAppended(_grid,&_modulename,0,_dxFirst,_dyFirst,0,0);
     }
     else
     {
@@ -954,6 +993,35 @@ void Guider::SMComputeGuide()
         emit ComputeGuideDone();
         return;
     }
+
+    // Dither requested: compute random displacement pulses then rebuild reference
+    if (_doDither)
+    {
+        double currentDecCompensation = cos(_mountDEC * PI / 180.0);
+        int ditherpixel = getInt("guideParams", "ditherpixel");
+        double randRA  = (QRandomGenerator::global()->generateDouble() * 2.0 - 1.0) * ditherpixel;
+        double randDEC = (QRandomGenerator::global()->generateDouble() * 2.0 - 1.0) * ditherpixel;
+
+        // RA: calPulseE/W are equatorial (DEC-normalized), apply current DEC compensation
+        if (randRA > 0)
+            _pulseW = randRA * _calPulseW * currentDecCompensation;
+        else
+            _pulseE = -randRA * _calPulseE * currentDecCompensation;
+
+        // DEC: calPulseN/S are raw ms/pixel, no compensation needed
+        if (randDEC > 0)
+            _pulseN = randDEC * _calPulseN;
+        else
+            _pulseS = -randDEC * _calPulseS;
+
+        _doDither = false;
+        logInfo(QString("Dithering: RA=%1 px DEC=%2 px -> pulseN=%3 pulseS=%4 pulseE=%5 pulseW=%6 ms")
+                .arg(randRA, 0, 'f', 1).arg(randDEC, 0, 'f', 1)
+                .arg(_pulseN).arg(_pulseS).arg(_pulseE).arg(_pulseW));
+        emit DitherNow();
+        return;
+    }
+
     double _driftRA = _dxFirst * cos(_calCcdOrientation) + _dyFirst *  sin(_calCcdOrientation);
     double _driftDE = _dxFirst * sin(_calCcdOrientation) + _dyFirst * -cos(_calCcdOrientation);
 

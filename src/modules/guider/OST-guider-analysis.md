@@ -131,6 +131,56 @@ systematic error in pulse durations.
 
 ---
 
+---
+
+## Dithering
+
+Dithering shifts the telescope to a random nearby position between science exposures, which
+helps average out fixed-pattern sensor noise across the image stack.
+
+### Parameters
+
+- `guideParams / ditherpixel` (int, default 5, range 1–50): maximum random displacement in pixels.
+
+### Trigger
+
+The `dither` button in the `actions` group. It is silently ignored if `_SMGuide` is not running.
+
+### State machine flow
+
+Dithering is integrated as a branch of `_SMGuide`. When `_doDither` is set and the current
+guide frame completes, `SMComputeGuide()` emits `DitherNow` instead of `ComputeGuideDone`:
+
+```
+ComputeGuide  --DitherNow-->  RequestDitherPulses  (SMRequestPulses)
+                              WaitDitherPulses      (waits PulsesDone)
+                              RequestRefExposure    (SMRequestExposure)
+                              WaitRefExposure       (waits ExposureDone)
+                              FindStarsRef          (SMFindStars)
+                              ComputeNewRef         (SMComputeFirst — rebuilds _trigFirst)
+                              InitGuide             (fresh start, drift history cleared)
+                              RequestGuideExposure  (normal guiding resumes)
+```
+
+`SMComputeFirst` is reused as-is: it calls `buildIndexes(_solver, _trigFirst)` which sets the
+new reference from the stars detected after the mount has moved.
+
+### Pulse calculation
+
+Random displacements `randRA` and `randDEC` are drawn uniformly from `[-ditherpixel, +ditherpixel]`.
+
+```
+// RA: calPulseE/W are equatorial (DEC-normalized), apply current DEC compensation
+if (randRA > 0)  pulseW = randRA  * calPulseW * cos(mountDEC)
+else             pulseE = -randRA * calPulseE * cos(mountDEC)
+
+// DEC: calPulseN/S are raw ms/pixel, no compensation needed
+if (randDEC > 0) pulseN = randDEC  * calPulseN
+else             pulseS = -randDEC * calPulseS
+```
+
+---
+
 ## Notes
 
 **Pier-side flip**: when guiding is started with calibration data from the opposite pier side,
