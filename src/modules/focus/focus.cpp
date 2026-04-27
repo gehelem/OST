@@ -20,7 +20,7 @@ Focus::Focus(QString name, QString label, QString profile, QVariantMap available
     setMetadata("thisGitdate", QString::fromStdString(Version::GIT_DATE));
     setMetadata("thisGitmessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
     setMetadata("description", "Focus (scxml)");
-    setMetadata("thisversion", "0.1");
+    setMetadata("thisversion", QString::fromStdString(Version::GIT_TAG));
     setMetadata("template", "focus");
 
     pMachine = QScxmlStateMachine::fromFile(":focus.scxml");

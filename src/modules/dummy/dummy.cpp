@@ -18,7 +18,7 @@ Dummy::Dummy(QString name, QString label, QString profile, QVariantMap available
     setMetadata("thisGitdate", QString::fromStdString(Version::GIT_DATE));
     setMetadata("thisGitmessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
     setMetadata("description", "Dummy module to show what we can do and not");
-    setMetadata("thisversion", "0.1");
+    setMetadata("thisversion", QString::fromStdString(Version::GIT_TAG));
 
     getEltString("extextRO", "extext1")->setValue("Text read only 1");
     getEltString("extextRO", "extext2")->setValue("Text read only 2");

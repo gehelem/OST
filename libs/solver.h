@@ -43,6 +43,7 @@ class Solver : public QObject
     signals:
         void successSEP(void);
         void successSolve(void);
+        void failSolve(void);
         void solverLog(QString &text);
     private:
         void DummyFunctionToAvoidDefinedButNotUsedWarnings(void)

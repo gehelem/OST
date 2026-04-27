@@ -14,7 +14,7 @@ IndiPanel::IndiPanel(QString name, QString label, QString profile, QVariantMap a
     setMetadata("thisGitdate", QString::fromStdString(Version::GIT_DATE));
     setMetadata("thisGitmessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
     setMetadata("description", "Indi control panel");
-    setMetadata("thisversion", "0.11");
+    setMetadata("thisversion", QString::fromStdString(Version::GIT_TAG));
 
     connectIndi();
 }

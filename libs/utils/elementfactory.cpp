@@ -164,6 +164,7 @@ ElementBase *ElementFactory::createElement(const QString &key, const QVariantMap
             if (pData.contains("issolved")) dta.isSolved = pData["issolved"].toBool();
             if (pData.contains("solverra")) dta.solverRA = pData["solverra"].toDouble();
             if (pData.contains("solverde")) dta.solverDE = pData["solverde"].toDouble();
+            if (pData.contains("solverorientation")) dta.solverOrientation = pData["solverorientation"].toDouble();
 
             pElement->setValue(dta, false);
             if (pData.contains("showstats")) pElement->setShowStats( pData["showstats"].toBool());

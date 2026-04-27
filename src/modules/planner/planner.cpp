@@ -21,8 +21,8 @@ Planner::Planner(QString name, QString label, QString profile, QVariantMap avail
     setMetadata("thisGithash", QString::fromStdString(Version::GIT_SHA1));
     setMetadata("thisGitdate", QString::fromStdString(Version::GIT_DATE));
     setMetadata("thisGitmessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
+    setMetadata("thisversion", QString::fromStdString(Version::GIT_TAG));
     setMetadata("description", "Planner module");
-    setMetadata("thisversion", "0.1");
     setMetadata("template", "planner");
 
 
