@@ -17,48 +17,47 @@ which coincides with the geographic pole direction: azimuth = 0°, altitude = la
 
 ---
 
-## 2. Coordinate conversion chain (critical)
+## 2. Coordinate conversion chain
 
 For each image, the correct path is:
 
 ```
 Image pixel
-  → WCS (astrometry / StellarSolver)
-  → RA/DEC J2000 (degrees, inertial frame)
-  → RA/DEC apparent (current epoch, via J2000toObserved: precession + nutation)
-  → Hour angle (HA = LST - RA_apparent)
-  → Azimuth / Altitude (horizontal frame, Earth-fixed)
+  → WCS (astrometry / StellarSolver)        returns J2000 degrees
+  → RA/DEC apparent (J2000toObserved)        precession + nutation
+  → Hour angle  (HA = LST - RA_apparent)     needs observer longitude + JD
+  → Azimuth / Altitude                       needs observer latitude
   → Unit vector xyz  [azAlt2xyz]
 ```
 
 Working in J2000 RA/DEC is **wrong** because that frame does not rotate with the Earth.
 The mount's RA axis is fixed in the horizontal frame (Az/Alt), not in J2000.
 
-### Implemented in `solverToAzAlt()`
+### `solverToAzAlt(ra_j2000_deg, dec_j2000_deg, jd)`
 
 ```cpp
-// Step 1: J2000 -> apparent
+// J2000 -> apparent
 INDI::J2000toObserved(&j2000, jd, &apparent);
 
-// Step 2: hour angle
+// Hour angle
 double gst = ln_get_apparent_sidereal_time(jd);
 double lst = gst + _observerLon / 15.0;
 double ha  = lst - apparent.rightascension;
 
-// Step 3: equatorial -> horizontal (standard trig formula)
-// Convention: Az = 0 North, 90 East
+// Equatorial -> horizontal (Az=0 North, 90 East)
 double sin_alt = sin(lat)*sin(dec) + cos(lat)*cos(dec)*cos(ha_rad);
 double az = acos((sin(dec) - sin(alt)*sin(lat)) / (cos(alt)*cos(lat)));
-if (sin(ha_rad) > 0) az = 2*PI - az;  // quadrant correction
+if (sin(ha_rad) > 0) az = 2*PI - az;
 ```
 
-The JD for each image uses the capture timestamp (`_t0`, `_t1`, `_t2` in ms since epoch):
+Observer position (`_observerLat`, `_observerLon`) is read from the GPS device at startup
+via `GEOGRAPHIC_COORD / LAT` and `GEOGRAPHIC_COORD / LONG`.
+
+The JD for each calibration image uses the **mid-exposure** timestamp:
 ```cpp
-double jd = 2440587.5 + _t0 / (86400.0 * 1000.0);
+double t = QDateTime::currentMSecsSinceEpoch() + _exposure * 500.0;
 ```
-
-Observer position (`_observerLat`, `_observerLon`) is read from the GPS device
-at startup via `GEOGRAPHIC_COORD / LAT` and `GEOGRAPHIC_COORD / LONG`.
+This is more accurate than using the start-of-exposure time.
 
 ---
 
@@ -67,11 +66,10 @@ at startup via `GEOGRAPHIC_COORD / LAT` and `GEOGRAPHIC_COORD / LONG`.
 ```
 p0, p1, p2 = three xyz unit vectors (from Az/Alt of each image)
 axis = getAxis(p0, p1, p2)   → plane normal = RA axis direction
-     = normalised cross product
 
 azAlt_axis = xyz2azAlt(axis)
-  → azAlt_axis.x() = azimuth of the axis  (should be 0°)
-  → azAlt_axis.y() = altitude of the axis (should equal observer latitude)
+  → x() = azimuth of the axis  (should be 0°)
+  → y() = altitude of the axis (should equal observer latitude)
 
 error_az  = azAlt_axis.x()
 error_alt = azAlt_axis.y() - _observerLat
@@ -85,9 +83,6 @@ if ((northernHemisphere && axis.x() < 0) || (!northernHemisphere && axis.x() > 0
     axis = -axis;
 ```
 
-In the southern hemisphere the RA axis points toward the south pole, whose x component
-in the `azAlt2xyz` frame is positive (x points northward), so the flip condition is inverted.
-
 ---
 
 ## 4. State machine
@@ -97,94 +92,144 @@ in the `azAlt2xyz` frame is positive (x points northward), so the flip condition
 ```
 InitInit
   → RequestFrameReset → WaitFrameReset
-  → RequestExposure → WaitExposure → FindStars → Compute
+  → RequestExposure → WaitExposure → FindStars ──[FindStarsDone]──→ Compute
+                                               └─[FindStarsFailed]─→ Abort
   → RequestMove → WaitMove
-  → RequestExposure → ... (×3 total)
+  → (repeat ×3)
   → FinalCompute
 ```
 
+**Mount rotation between shots:** 0.5 h (7.5°) in RA.
+
+**Move detection (`_slewing` flag):** `MoveDone` is only emitted after the mount
+transitions `IPS_BUSY → IPS_OK` on `EQUATORIAL_EOD_COORD`. This prevents spurious
+triggers from position-update messages received before the move starts.
+
+```cpp
+// in SMRequestMove:
+_slewing = false;  // arm the detector
+
+// in updateProperty:
+if (state == IPS_BUSY) _slewing = true;
+if (state == IPS_OK && _slewing) { _slewing = false; emit MoveDone(); }
+```
+
+**Solver position hint:** the mount reports EOD coordinates, but the solver expects J2000.
+The hint is now correctly converted:
+```cpp
+INDI::ObservedToJ2000(&mountEod, jdHint, &mountJ2000);
+_solver.stellarSolver.setSearchPositionInDegrees(mountJ2000.ra * 15.0, mountJ2000.dec);
+```
+
+**FOV hint:** uses the horizontal FOV (`_ccdX * _ccdSampling`) instead of the diagonal,
+with `minwidth = 0.5 * fovWidthDeg` and `search_radius = 3°`.
+
+**Connections:** `Qt::UniqueConnection` is used on all solver signal connections to
+prevent duplicate slots when `SMFindStars` is called multiple times in the loop.
+
 `SMCompute` accumulates `_ra0/_de0`, `_ra1/_de1`, `_ra2/_de2` (J2000 degrees) and
-`_t0`, `_t1`, `_t2` (timestamps in ms). After 3 shots it emits `PolarDone`.
+`_t0`, `_t1`, `_t2` (mid-exposure timestamps in ms). After 3 shots it emits `PolarDone`.
 
 `SMComputeFinal`:
 1. Converts each `(_raN, _deN, jdN)` to Az/Alt via `solverToAzAlt()`
 2. Feeds the 3 Az/Alt unit vectors into `getAxis()`
 3. Converts the axis to Az/Alt → computes `_erraz`, `_erralt`, `_errtot`
 4. Stores the Az/Alt of image 3 as the correction reference (`_refAz`, `_refAlt`)
-5. Draws the error overlay on the last image
+5. Draws the error overlay (with image orientation) on the last image
 6. Emits `ComputeFinalDone` → enters correction loop
 
 ### Phase 2 — correction loop (continuous, no mount moves)
 
 ```
-CorrExposure → CorrWaitExposure → CorrFindStars → CorrCompute → CorrExposure → ...
+CorrExposure → CorrWaitExposure → CorrFindStars ──[FindStarsDone]──→ CorrCompute → CorrExposure
+                                               └─[FindStarsFailed]─→ CorrExposure (retry silently)
 ```
 
-The loop runs until the user triggers `Abort`. The mount is not commanded to move —
-the user physically adjusts the altitude and azimuth knobs.
+The loop runs until the user triggers `Abort`. Solver failures during correction are
+**not fatal**: the state machine loops back to `CorrExposure` and retries.
 
 `SMCorrCompute`:
 1. Gets current J2000 from solver
-2. Converts to Az/Alt at current time
-3. Computes displacement from the reference: `dAz = currentAz - _refAz`, `dAlt = currentAlt - _refAlt`
+2. Converts to Az/Alt **using the same JD as image 3** (`_t2`):
+   ```cpp
+   double jdRef = 2440587.5 + _t2 / (86400.0 * 1000.0);
+   QPointF currentAzAlt = solverToAzAlt(currentRA, currentDEC, jdRef);
+   ```
+   Using the same epoch cancels out sidereal rotation — the Az/Alt delta is then
+   purely due to the mechanical adjustment made by the user.
+3. Displacement from reference: `dAz = currentAz - _refAz`, `dAlt = currentAlt - _refAlt`
 4. Remaining error = initial error − correction applied:
    - `remainAz  = _erraz  - dAz`
    - `remainAlt = _erralt - dAlt`
-5. Updates the error elements (degrees and arcminutes)
-6. Draws the overlay with the remaining error
-7. Emits `CorrComputeDone` → loops back to `CorrExposure`
-
-#### Principle of the displacement measurement
-
-When the user turns the altitude or azimuth adjustment screws, the whole mount tilts.
-This moves the telescope's pointing direction, which is observable in the solved Az/Alt.
-The Az/Alt displacement from the reference ≈ the polar axis correction already applied
-(valid approximation for small corrections).
+5. Updates the error elements and draws the overlay with the remaining error.
 
 ---
 
 ## 5. Image overlay (`drawErrorOverlay`)
 
-A triangle is drawn centred on the image:
+The overlay triangle is **oriented with celestial North**, using the position angle
+returned by the solver (`getSolution().orientation`):
 
-- **P1** (white dot) = image centre = current polar axis position
-- **P2** (yellow dot) = P1 + altitude error (vertical direction)
-- **P3** (green dot) = P2 + azimuth error (horizontal direction) = target position
-- Yellow line P1→P2 = altitude error
-- Green line P2→P3 = azimuth error
-- Red line P1→P3 = total error (hypotenuse)
+```cpp
+painter.translate(cx, cy);
+painter.rotate(-orientation);  // align drawing frame with the sky
+```
 
-Labels show values in arcminutes. Scale is adaptive: total error spans 30% of the image
-height, with a minimum of 50 px/degree so small errors remain visible.
+Triangle vertices in the rotated frame (origin = image centre, up = North):
+- **P1** (white) = current polar axis position
+- **P2** (yellow) = P1 + altitude correction (northward)
+- **P3** (green)  = P2 + azimuth correction (eastward) = target (geographic pole)
+- Yellow P1→P2 = altitude error
+- Green  P2→P3 = azimuth error
+- Red    P1→P3 = total error
+
+Labels are placed in screen coordinates (transform reset after drawing) to keep text
+horizontal regardless of orientation.
+
+Scale: total error spans 30% of image height, minimum 50 px/degree.
 
 ---
 
-## 6. Error elements published to the frontend
+## 6. `syncMount()` — mount model sync after solve
+
+```cpp
+void Polar::syncMount(double ra_j2000_deg, double dec_j2000_deg)
+```
+
+Sends a SYNC command to the mount with the solved J2000 position (converted to EOD):
+1. Switch mount to SYNC mode (`ON_COORD_SET / SYNC`)
+2. Send `EQUATORIAL_EOD_COORD` with observed RA/DEC
+3. Restore SLEW mode
+
+**Status:** implemented but not yet wired into the solve callback. Intended to be called
+from `OnSucessSolve` or `SMCompute` to keep the mount's pointing model accurate.
+
+---
+
+## 7. Error elements published to the frontend
 
 Property `errors`:
 
-| Element    | Unit    | Description                     |
-|------------|---------|---------------------------------|
-| `erraz`    | degrees | Azimuth error                   |
-| `erralt`   | degrees | Altitude error                  |
-| `errtot`   | degrees | Total error                     |
-| `errazmn`  | arcmin  | Azimuth error (arcminutes)      |
-| `erraltmn` | arcmin  | Altitude error (arcminutes)     |
-| `errtotmn` | arcmin  | Total error (arcminutes)        |
+| Element    | Unit    | Description                  |
+|------------|---------|------------------------------|
+| `erraz`    | degrees | Azimuth error                |
+| `erralt`   | degrees | Altitude error               |
+| `errtot`   | degrees | Total error                  |
+| `errazmn`  | arcmin  | Azimuth error (arcminutes)   |
+| `erraltmn` | arcmin  | Altitude error (arcminutes)  |
+| `errtotmn` | arcmin  | Total error (arcminutes)     |
 
 ---
 
-## 7. Known limitations and future work
+## 8. Known limitations
 
 - **Displacement approximation**: the correction loop equates Az/Alt image displacement
-  with polar axis displacement. This is valid for small errors and when the telescope
-  is pointing roughly toward the meridian. For large misalignments or at low altitude
-  the approximation degrades.
+  with polar axis displacement. Valid for small corrections; degrades for large
+  misalignments or at low altitude.
 
-- **Tracking assumption**: the computation assumes the mount is tracking during the
-  correction loop. If it is not, Earth's rotation drifts the pointing and the measured
-  displacement conflates sidereal drift with user correction.
+- **Tracking assumption**: the same-epoch trick in `SMCorrCompute` assumes the mount
+  is tracking. If it is not, residual sidereal drift will contaminate the displacement
+  measurement.
 
-- **No WCS pixel mapping**: the overlay triangle uses a fixed orientation (up = altitude,
-  right = azimuth) independent of camera rotation. A future improvement would use the
-  solver's position angle to orient the triangle correctly in the image.
+- **`syncMount` not yet called**: the method exists but is not integrated into the
+  solve flow yet.
