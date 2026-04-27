@@ -923,8 +923,8 @@ void Guider::SMComputeCal()
     {
         _pulseS = getInt("calParams", "pulse");
     }
-    double _driftRA =  _dxFirst * cos(_calCcdOrientation) + _dyFirst * sin(_calCcdOrientation);
-    double _driftDE =  _dxFirst * sin(_calCcdOrientation) + _dyFirst * cos(_calCcdOrientation);
+    double _driftRA = _dxFirst * cos(_calCcdOrientation) + _dyFirst *  sin(_calCcdOrientation);
+    double _driftDE = _dxFirst * sin(_calCcdOrientation) + _dyFirst * -cos(_calCcdOrientation);
     double ech = getSampling();
     getEltFloat("drift", "RA")->setValue(_driftRA * ech);
     getEltFloat("drift", "DEC")->setValue(_driftDE * ech);
@@ -954,8 +954,8 @@ void Guider::SMComputeGuide()
         emit ComputeGuideDone();
         return;
     }
-    double _driftRA = _dxFirst *  cos(_calCcdOrientation) + _dyFirst * sin(_calCcdOrientation);
-    double _driftDE = _dxFirst * -sin(_calCcdOrientation) + _dyFirst * cos(_calCcdOrientation);
+    double _driftRA = _dxFirst * cos(_calCcdOrientation) + _dyFirst *  sin(_calCcdOrientation);
+    double _driftDE = _dxFirst * sin(_calCcdOrientation) + _dyFirst * -cos(_calCcdOrientation);
 
     // Apply DEC compensation for current position
     // calPulseE/W are stored as "equatorial" (DEC=0), need to adjust for current DEC
