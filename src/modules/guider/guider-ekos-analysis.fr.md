@@ -3,159 +3,159 @@ title: Module - Guider
 weight : 20
 --- 
 
-# Documentation du module Guider
+# Guider Module Documentation
 
-## Référence : autoguidage interne Ekos (KStars)
+## Reference: Ekos Internal Autoguiding (KStars)
 
-Cette analyse décrit le fonctionnement de l'autoguidage interne d'Ekos, utilisé comme référence pour le développement du module guider d'OST. Les fichiers sources analysés se trouvent dans `kstars/ekos/guide/`.
+This analysis describes how Ekos internal autoguiding works, used as a reference for the OST guider module development. Source files are located in `kstars/ekos/guide/`.
 
 ---
 
-## Fichiers clés dans Ekos
+## Key files in Ekos
 
-| Fichier | Rôle |
+| File | Role |
 |---|---|
-| `calibration.h/cpp` | Structure, calculs d'angles, matrices, taux de pulsation |
-| `calibrationprocess.cpp` | Machine d'état de la séquence de calibration |
-| `gmath.h/cpp` | Cœur du traitement : détection d'étoile, drift, corrections |
-| `internalguider.h/cpp` | Orchestration : pier flip, changement de cible |
-| `vect.h`, `matr.h` | Algèbre vectorielle et matricielle |
+| `calibration.h/cpp` | Data structure, angle computation, rotation matrix, pulse rates |
+| `calibrationprocess.cpp` | Calibration sequence state machine |
+| `gmath.h/cpp` | Core processing: star detection, drift, corrections |
+| `internalguider.h/cpp` | Orchestration: pier flip, target change |
+| `vect.h`, `matr.h` | Vector and matrix algebra |
 
 ---
 
 ## 1. Calibration
 
-### Séquence (machine d'état `CalibrationProcess`)
+### Sequence (`CalibrationProcess` state machine)
 
-5 étapes dans l'ordre :
-1. **RA Outward** — pulse RA+ jusqu'à dérive > 15 px (ou max itérations)
-2. **RA Inward** — pulse RA− pour revenir à la position de départ
-3. **DEC Backlash** (optionnel) — 5 pulses DEC+ pour mesurer le jeu mécanique
-4. **DEC Outward** — idem RA+ mais pour DEC
-5. **DEC Inward** — retour à la position de départ
+5 steps in order:
+1. **RA Outward** — pulse RA+ until drift > 15 px (or max iterations)
+2. **RA Inward** — pulse RA− to return to starting position
+3. **DEC Backlash** (optional) — 5 DEC+ pulses to measure mechanical backlash
+4. **DEC Outward** — same as RA+ but for DEC
+5. **DEC Inward** — return to starting position
 
-### Calculs dans `calculate2D()`
+### Calculations in `calculate2D()`
 
-**Conversion pixels → arcseconde :**
+**Pixel to arcsecond conversion:**
 ```
-arcsec_par_pixel = binning × 206264.806 × taille_pixel_mm / focale_mm
+arcsec_per_pixel = binning × 206264.806 × pixel_size_mm / focal_length_mm
 ```
 
-**Angles de rotation pour chaque axe :**
+**Rotation angles per axis:**
 ```
-phi_RA  = atan2(-dy_RA,  dx_RA)  × (180/π)   [degrés, 0–360°]
+phi_RA  = atan2(-dy_RA,  dx_RA)  × (180/π)   [degrees, 0–360°]
 phi_DEC = atan2(-dy_DEC, dx_DEC) × (180/π)
 ```
-L'axe DEC est orienté perpendiculairement au RA : les deux rotations ±90° sont testées et la meilleure est choisie par produit scalaire.
+The DEC axis is oriented perpendicular to RA: both ±90° rotations are tested and the best one is chosen by dot product.
 
-**Angle final retenu :**
+**Final retained angle:**
 ```
 phi = (phi_RA + phi_DEC) / 2
 ```
 
-**Matrice de rotation Z construite à partir de phi :**
+**Rotation matrix Z built from phi:**
 ```
 ROT_Z = [ cos(-φ)  -sin(-φ)  0 ]
         [ sin(-φ)   cos(-φ)  0 ]
         [    0         0     1 ]
 ```
 
-**Taux de pulsation (valeurs fondamentales) :**
+**Pulse rates (fundamental values):**
 ```
-raPulseMsPerArcsecond  = durée_totale_pulse_RA  / déplacement_RA_en_arcsec
-decPulseMsPerArcsecond = durée_totale_pulse_DEC / déplacement_DEC_en_arcsec
+raPulseMsPerArcsecond  = total_RA_pulse_duration  / RA_displacement_in_arcsec
+decPulseMsPerArcsecond = total_DEC_pulse_duration / DEC_displacement_in_arcsec
 ```
 
-### Valeurs persistées après calibration
+### Values persisted after calibration
 
 - Angle φ (`calibrationAngle`)
-- `raPulseMsPerArcsecond` et `decPulseMsPerArcsecond`
-- `calibrationDecSwap` (si l'axe DEC est inversé)
-- Position RA/DEC du monture au moment de la calibration
-- Pier side au moment de la calibration
-- Binning utilisé
+- `raPulseMsPerArcsecond` and `decPulseMsPerArcsecond`
+- `calibrationDecSwap` (whether DEC axis is inverted)
+- Mount RA/DEC position at calibration time
+- Pier side at calibration time
+- Binning used
 
 ---
 
-## 2. Calcul des corrections (`gmath.cpp`)
+## 2. Correction computation (`gmath.cpp`)
 
-### Pipeline par frame
+### Per-frame pipeline
 
-**1. Détection de l'étoile** → position en pixels (centroïde ou SEP)
+**1. Star detection** → pixel position (centroid or SEP)
 
-**2. Drift brut en arcseconde :**
+**2. Raw drift in arcseconds:**
 ```
-drift_brut = (pos_étoile − pos_réticule) × arcsec_par_pixel
+raw_drift = (star_position − reticle_position) × arcsec_per_pixel
 ```
 
-**3. Rotation dans le repère RA/DEC :**
+**3. Rotation into RA/DEC frame:**
 ```
-in.x =  drift_brut.x
-in.y = −drift_brut.y   ← inversion Y (repère image vs repère céleste)
+in.x =  raw_drift.x
+in.y = −raw_drift.y   ← Y inversion (image frame vs celestial frame)
 drift_ra_dec = in × ROT_Z
 ```
 
-**4. Buffer circulaire :** les 50 derniers drifts sont stockés pour le terme intégral.
+**4. Circular buffer:** the last 50 drifts are stored for the integral term.
 
-**5. Correction PID simplifiée (par axe) :**
+**5. Simplified PID correction (per axis):**
 ```
-response_P = drift_actuel   × gain_P × ms_par_arcsec
-response_I = moy(50_derniers) × gain_I × ms_par_arcsec
-durée_pulse = min(|P + I|, max_pulse_ms)
+response_P = current_drift    × gain_P × ms_per_arcsec
+response_I = avg(last_50)     × gain_I × ms_per_arcsec
+pulse_duration = min(|P + I|, max_pulse_ms)
 ```
-Si la correction est inférieure au seuil minimum, aucun pulse n'est envoyé.
+If the correction is below the minimum threshold, no pulse is sent.
 
-**6. GPG (optionnel pour RA) :** si activé, remplace le PID par un modèle prédictif Gaussian Process.
+**6. GPG (optional for RA):** if enabled, replaces PID with a Gaussian Process predictive model.
 
 ---
 
-## 3. Application des corrections
+## 3. Applying corrections
 
-### Fonctionnement normal
+### Normal operation
 
-- Les pulses sont émis en millisecondes via le pilote INDI du monture.
-- **Premier frame** après démarrage ou slew : pas de pulse, le réticule est centré sur l'étoile (`m_isFirstFrame = true`).
+- Pulses are sent in milliseconds via the mount INDI driver.
+- **First frame** after startup or slew: no pulse, reticle is centered on the star (`m_isFirstFrame = true`).
 
-### Changement de cible (slew)
+### Target change (slew)
 
-- La calibration est **réutilisée** telle quelle.
-- `m_isFirstFrame = true` → première capture sans correction, réticule recentré.
-- Guidage reprend normalement dès la 2e frame.
+- Calibration is **reused as-is**.
+- `m_isFirstFrame = true` → first capture without correction, reticle recentered.
+- Guiding resumes normally from the 2nd frame.
 
-### Flip de méridien (`guideAfterMeridianFlip()`)
+### Meridian flip (`guideAfterMeridianFlip()`)
 
-**Option 1 — Recalibration complète** (si `resetGuideCalibration` = true) :
-- La calibration est effacée, une nouvelle calibration est requise.
+**Option 1 — Full recalibration** (if `resetGuideCalibration` = true):
+- Calibration is cleared, a new calibration is required.
 
-**Option 2 — Adaptation de la calibration** (comportement par défaut) :
+**Option 2 — Calibration adaptation** (default behavior):
 ```
-angle_nouveau = angle_calibration + 180°  (modulo 360°)
-ROT_Z recalculée avec le nouvel angle
+new_angle = calibration_angle + 180°  (modulo 360°)
+ROT_Z recomputed with the new angle
 ```
-Pour le DEC swap :
-- Si `NOT reverseDecOnPierChange` → `decSwap = !calibrationDecSwap`
-- Sinon → decSwap conservé
+For DEC swap:
+- If `NOT reverseDecOnPierChange` → `decSwap = !calibrationDecSwap`
+- Otherwise → decSwap unchanged
 
-### Corrections automatiques de la calibration restaurée
+### Automatic corrections on restored calibration
 
-**Déclinaison** si la position actuelle diffère de la position de calibration :
+**Declination** if current position differs from calibration position:
 ```
-ms_par_arcsec_corrigé = ms_par_arcsec_original × cos(dec_actuelle) / cos(dec_calibration)
+corrected_ms_per_arcsec = original_ms_per_arcsec × cos(current_dec) / cos(calibration_dec)
 ```
 
-**Binning** si le binning a changé depuis la calibration :
+**Binning** if binning has changed since calibration:
 ```
-binFactor = subBinX_actuel / subBinX_calibration
-arcsec_par_pixel_corrigé = arcsec_par_pixel_base × binFactor
+binFactor = current_subBinX / calibration_subBinX
+corrected_arcsec_per_pixel = base_arcsec_per_pixel × binFactor
 ```
 
 ---
 
-## Tableau récapitulatif
+## Summary table
 
-| Étape | Ce qui est calculé | Ce qui est retenu |
+| Step | What is computed | What is retained |
 |---|---|---|
-| **Calibration** | Déplacement angulaire sous pulse | Angle φ, `raPulseMsPerArcsec`, `decPulseMsPerArcsec`, `decSwap`, pier side, RA/DEC, binning |
-| **Guidage** | Drift pixel → arcsec → repère RA/DEC via ROT_Z → PID | Pulse en ms envoyé au monture |
-| **Pier flip** | angle + 180°, decSwap éventuellement inversé | Calibration mise à jour en mémoire |
-| **Slew** | Aucun recalcul | Calibration réutilisée, réticule recentré |
+| **Calibration** | Angular displacement under pulse | Angle φ, `raPulseMsPerArcsec`, `decPulseMsPerArcsec`, `decSwap`, pier side, RA/DEC, binning |
+| **Guiding** | Drift pixel → arcsec → RA/DEC frame via ROT_Z → PID | Pulse in ms sent to mount |
+| **Pier flip** | angle + 180°, decSwap optionally inverted | Calibration updated in memory |
+| **Slew** | No recomputation | Calibration reused, reticle recentered |
