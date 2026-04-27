@@ -974,19 +974,19 @@ void Guider::SMComputeGuide()
 
     if (revRA * _driftRA > 0 && !disRAO)
     {
-        _pulseW = getFloat("guideParams", "raAgr") * revRA * _driftRA * calPulseWCompensated;
-        if (_pulseW > getInt("guideParams", "pulsemax")) _pulseW = getInt("guideParams", "pulsemax");
-        if (_pulseW < getInt("guideParams", "pulsemin")) _pulseW = 0;
-    }
-    else _pulseW = 0;
-
-    if (revRA * _driftRA < 0 && !disRAE)
-    {
-        _pulseE = - getFloat("guideParams", "raAgr")  * revRA * _driftRA * calPulseECompensated;
+        _pulseE = getFloat("guideParams", "raAgr") * revRA * _driftRA * calPulseECompensated;
         if (_pulseE > getInt("guideParams", "pulsemax")) _pulseE = getInt("guideParams", "pulsemax");
         if (_pulseE < getInt("guideParams", "pulsemin")) _pulseE = 0;
     }
     else _pulseE = 0;
+
+    if (revRA * _driftRA < 0 && !disRAE)
+    {
+        _pulseW = -getFloat("guideParams", "raAgr") * revRA * _driftRA * calPulseWCompensated;
+        if (_pulseW > getInt("guideParams", "pulsemax")) _pulseW = getInt("guideParams", "pulsemax");
+        if (_pulseW < getInt("guideParams", "pulsemin")) _pulseW = 0;
+    }
+    else _pulseW = 0;
 
     if (revDE * _driftDE > 0 && !disDEN)
     {

@@ -1,151 +1,143 @@
 # OST Guider Module — Code Analysis
 
-Analysis of `guider.cpp` / `guider.h`. The module works but has the following bugs.
+Analysis of `guider.cpp` / `guider.h`. All issues listed below have been fixed.
 
 ---
 
-## 1. Calibration reuse issues
+## Fixes applied
 
-### 1.1 Precision loss: `_calPulseN/S/E/W` declared as `int`
+### 1. Signal `abort()` lowercase — state machine hangs
 
-`guider.h:111-114` declares the four calibration values as `int`. They are computed as floating-point in `SMComputeCal()` and silently truncated on assignment:
+`SMComputeCal()`: when no stars are found during calibration, `emit abort()` was silently ignored
+by Qt because the actual signal is `Abort()` (capital A). The state machine would hang indefinitely.
 
 ```cpp
-_calPulseN = getInt("calParams", "pulse") / sqrt(square(ddx) + square(ddy));
-// e.g. 1000 / 114.3 = 8.75 → stored as 8 → ~10% error
-```
-
-The truncation error propagates directly into guiding pulse durations.
-
-**Fix:** declare as `double` in the header; replace `getEltInt` / `getInt` with `getEltFloat` / `getFloat` for persistence.
-
----
-
-### 1.2 CCD angle: `atan` instead of `atan2`
-
-`SMComputeCal()` line 819:
-```cpp
-double a = atan(ddy / ddx);
-```
-
-Two problems: division by zero when `ddx == 0`, and result limited to `[-π/2, π/2]` instead of `[-π, π]`. If the drift vector points into the 2nd or 3rd quadrant, the angle is off by 180°.
-
-**Fix:**
-```cpp
-double a = atan2(ddy, ddx);
-```
-
----
-
-### 1.3 Wrong CCD → RA/DEC rotation matrix
-
-`SMComputeCal()` line 926 and `SMComputeGuide()` line 951:
-```cpp
-double _driftRA = _dxFirst * cos(_calCcdOrientation) + _dyFirst * sin(_calCcdOrientation);
-double _driftDE = _dxFirst * sin(_calCcdOrientation) + _dyFirst * cos(_calCcdOrientation);
-```
-
-The implicit matrix is:
-```
-[cos  sin]
-[sin  cos]
-```
-
-This is **not a rotation matrix**. The correct projection onto the RA axis and its perpendicular DEC axis is:
-```
-[cos   sin]    ← projection onto RA axis
-[-sin  cos]    ← projection onto perpendicular DEC axis
-```
-
-The sign of `sin` in the DEC line is wrong. The error is hidden for small angles (cos ≈ 1, sin ≈ 0) but introduces RA↔DEC cross-coupling for significant rotation angles.
-
-**Fix** (same change needed in both `SMComputeCal()` and `SMComputeGuide()`):
-```cpp
-double _driftRA = _dxFirst *  cos(_calCcdOrientation) + _dyFirst * sin(_calCcdOrientation);
-double _driftDE = _dxFirst * -sin(_calCcdOrientation) + _dyFirst * cos(_calCcdOrientation);
-```
-
----
-
-## 2. Error handling issues
-
-### 2.1 Signal `abort()` lowercase — never emitted
-
-`SMComputeCal()` line 782:
-```cpp
+// before
 emit abort();
-```
-
-The signal declared in `guider.h:74` is `Abort()` with a capital A. `abort()` does not exist as a Qt signal: Qt silently ignores the call. When no stars are found during calibration, the state machine hangs indefinitely instead of stopping.
-
-**Fix:**
-```cpp
+// after
 emit Abort();
 ```
 
 ---
 
-### 2.2 Division by zero in `matchIndexes()`
+### 2. Division by zero in `matchIndexes()`
 
-`matchIndexes()` lines 1238-1239:
+When no star matches between two frames, `pairs` is empty and dividing by `pairs.size()` is
+undefined behavior in C++.
+
 ```cpp
-dx = dx / pairs.size();
-dy = dy / pairs.size();
-```
-
-If no star matches between the two frames, `pairs` is empty and this is a division by zero (undefined behavior in C++).
-
-**Fix:**
-```cpp
+// added before the division
 if (pairs.isEmpty()) { dx = 0; dy = 0; return; }
-dx /= pairs.size();
-dy /= pairs.size();
 ```
 
 ---
 
-### 2.3 Stale drift used when no stars are detected
+### 3. Biased average in calibration (~50% error with default settings)
 
-`SMComputeGuide()` lines 944-953:
+The averaging loop was starting at `i = 1`, skipping the first valid measurement, but still
+dividing by the total size. With `calsteps=2` this caused a 50% systematic underestimate of
+the pulse rates.
+
 ```cpp
-if (_trigCurrent.size() > 0)
-{
-    matchIndexes(_trigFirst, _trigCurrent, _matchedCurFirst, _dxFirst, _dyFirst);
-}
-// _driftRA and _driftDE are computed unconditionally
-double _driftRA = _dxFirst * cos(...) + ...
+// before
+for (unsigned int i = 1; i < _dxvector.size(); i++)
+// after
+for (unsigned int i = 0; i < _dxvector.size(); i++)
 ```
-
-If `_trigCurrent` is empty (no stars in the frame), `_dxFirst`/`_dyFirst` retain their values from the previous frame and incorrect pulses are sent. Corrections should be skipped, or guiding aborted after N consecutive frames without stars.
 
 ---
 
-### 2.4 Biased average in calibration
+### 4. Stale drift used when no stars are detected
 
-`SMComputeCal()` lines 812-817:
+When `_trigCurrent` was empty (no stars detected in a frame), `_dxFirst`/`_dyFirst` retained
+their values from the previous frame and incorrect pulses were sent. The frame is now skipped.
+
 ```cpp
-for (unsigned int i = 1; i < _dxvector.size(); i++)  // starts at 1, skips first measurement
+else
 {
-    ddx += _dxvector[i];
-    ddy += _dyvector[i];
+    logWarning("No stars detected in current frame - skipping corrections");
+    emit ComputeGuideDone();
+    return;
 }
-ddx = ddx / (_dxvector.size());   // divides by total size, not (size - 1)
 ```
-
-The loop skips `_dxvector[0]` (the first valid measurement after the first pulse) but divides by `size` instead of `size - 1`. The computed rates are systematically underestimated by a factor of `(N-1)/N`. With `calsteps=2` this is a 50% error.
-
-**Fix:** start loop at `i = 0`, or divide by `_dxvector.size() - 1` if the intent is to skip the first sample.
 
 ---
 
-## Priority summary
+### 5. Wrong DEC rotation formula
 
-| Priority | Issue | Location |
-|---|---|---|
-| **Blocking** | `emit abort()` lowercase → state machine hangs | `SMComputeCal()` L.782 |
-| **Blocking** | Division by zero when no stars match | `matchIndexes()` L.1238 |
-| **Major** | ~50% bias in calibration average | `SMComputeCal()` L.812 |
-| **Major** | Pulses sent using stale drift (frame without stars) | `SMComputeGuide()` L.944 |
-| **Major** | Wrong DEC rotation formula (missing minus sign) | L.927, L.952 |
-| **Minor** | `atan` → `atan2` for CCD angle | `SMComputeCal()` L.819 |
-| **Minor** | `_calPulseN/S/E/W` as `int` → precision loss | `guider.h` L.111 |
+The original formula `dx·sin + dy·cos` is not a valid projection onto the DEC axis.
+Comparison with Ekos (`gmath.cpp` + `matr.cpp`) shows the correct formula is `dx·sin - dy·cos`.
+
+The error was hidden for small CCD rotation angles (sin ≈ 0) but introduced RA↔DEC
+cross-coupling for significant rotations.
+
+```cpp
+// before
+double _driftDE = _dxFirst * sin(_calCcdOrientation) + _dyFirst * cos(_calCcdOrientation);
+// after
+double _driftDE = _dxFirst * sin(_calCcdOrientation) + _dyFirst * -cos(_calCcdOrientation);
+```
+
+Applied in both `SMComputeCal()` (drift display) and `SMComputeGuide()` (active corrections).
+
+---
+
+### 6. `atan` instead of `atan2` for CCD orientation angle
+
+`atan(ddy/ddx)` has two problems: division by zero when `ddx == 0`, and the result is limited
+to `[-π/2, π/2]`. When the West-pulse displacement vector points into the 2nd or 3rd quadrant
+(i.e. `ddx < 0`, which is the typical case for a pier-West mount), the computed angle is wrong
+by 180°.
+
+```cpp
+// before
+double a = atan(ddy / ddx);
+// after
+double a = atan2(ddy, ddx);
+```
+
+---
+
+### 7. RA correction direction inverted after atan2 fix
+
+The original `atan` bug always returned an angle near 0 (regardless of the sign of `ddx`),
+which made `cos(θ) ≈ +1`. The pulse direction mapping was designed for this wrong angle.
+
+After the `atan2` fix, `θ ≈ π` for the typical pier-West setup, making `cos(θ) = -1` and
+flipping the sign of `drift_RA`. The mapping `drift_RA > 0 → pulseW` was therefore inverted.
+
+The two bugs had been cancelling each other. Fixing the angle required fixing the mapping:
+
+```cpp
+// before: drift > 0 → West,  drift < 0 → East
+// after:  drift > 0 → East,  drift < 0 → West
+if (revRA * _driftRA > 0 && !disRAO)
+    _pulseE = getFloat("guideParams", "raAgr") * revRA * _driftRA * calPulseECompensated;
+if (revRA * _driftRA < 0 && !disRAE)
+    _pulseW = -getFloat("guideParams", "raAgr") * revRA * _driftRA * calPulseWCompensated;
+```
+
+---
+
+### 8. `_calPulseN/S/E/W` declared as `int` — precision loss
+
+The four calibration rates were declared as `int` in `guider.h` and stored as `int` in the JSON.
+They are computed as `double` (pulse_ms / sqrt(dx²+dy²)) and the truncation caused up to ~10%
+systematic error in pulse durations.
+
+- `guider.h`: changed `int` → `double` for `_calPulseN/S/E/W`
+- `guider.json`: changed `"type":"int"` → `"type":"float"` for the four `calPulse*` properties
+- `guider.cpp`: replaced all `getEltInt` / `getInt` with `getEltFloat` / `getFloat` for these values
+
+---
+
+## Notes
+
+**Pier-side flip**: when guiding is started with calibration data from the opposite pier side,
+the `enablepiersidereverse` option in `guideParams` automatically inverts `revRA` and `revDE`.
+It is disabled by default.
+
+**RA/DEC inversion flags** (`revCorrections`): the `revRA` / `revDE` flags remain the primary
+mechanism for handling non-standard camera orientations. The pier-side logic always reloads
+the saved calibration flags before applying the inversion, so starting guiding multiple times
+does not compound the effect.
