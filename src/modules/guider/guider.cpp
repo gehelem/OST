@@ -778,7 +778,7 @@ void Guider::SMComputeCal()
     else
     {
         logError("No stars, can't calibrate");
-        emit abort();
+        emit Abort();
         return;
     }
     _trigPrev = _trigCurrent;
@@ -1235,6 +1235,7 @@ void Guider::matchIndexes(QVector<Trig> ref, QVector<Trig> act, QVector<MatchedP
         dx = dx + pairs[i].dx;
         dy = dy + pairs[i].dy;
     }
+    if (pairs.isEmpty()) { dx = 0; dy = 0; return; }
     dx = dx / pairs.size();
     dy = dy / pairs.size();
 
