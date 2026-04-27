@@ -107,12 +107,12 @@ class MODULE_INIT Guider  : public IndiModule
         int _pulseW = 0;  ///< Pulse to send West (negative RA, compensated for DEC)
 
         // ==================== Calibration Results (pixels/ms per 1000ms pulse) ====================
-        int _calPulseN = 300;   ///< Calibration: pixels moved per ms pulse North
-        int _calPulseS = 300;   ///< Calibration: pixels moved per ms pulse South
-        int _calPulseE = 300;   ///< Calibration: pixels moved per ms pulse East
-        int _calPulseW = 300;   ///< Calibration: pixels moved per ms pulse West
-        int _calPulseRA = 0;    ///< Calibration: result for RA (unused currently)
-        int _calPulseDEC = 0;   ///< Calibration: result for DEC (unused currently)
+        double _calPulseN = 300;   ///< Calibration: ms per pixel pulse North
+        double _calPulseS = 300;   ///< Calibration: ms per pixel pulse South
+        double _calPulseE = 300;   ///< Calibration: ms per pixel pulse East
+        double _calPulseW = 300;   ///< Calibration: ms per pixel pulse West
+        double _calPulseRA = 0;    ///< Calibration: result for RA (unused currently)
+        double _calPulseDEC = 0;   ///< Calibration: result for DEC (unused currently)
 
         // ==================== Calibration State Machine Variables ====================
         int _calState = 0;      ///< Calibration phase counter (0-2)

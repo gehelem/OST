@@ -172,10 +172,10 @@ void Guider::onExternalEvent(OST::ExtEvent event)
                 logInfo("Starting guiding");
 
                 // Check if calibration data exists
-                int calN = getInt("calibrationvalues", "calPulseN");
-                int calS = getInt("calibrationvalues", "calPulseS");
-                int calE = getInt("calibrationvalues", "calPulseE");
-                int calW = getInt("calibrationvalues", "calPulseW");
+                double calN = getFloat("calibrationvalues", "calPulseN");
+                double calS = getFloat("calibrationvalues", "calPulseS");
+                double calE = getFloat("calibrationvalues", "calPulseE");
+                double calW = getFloat("calibrationvalues", "calPulseW");
 
                 // If no calibration, must do it first
                 if (calN == 0 || calS == 0 || calE == 0 || calW == 0)
@@ -204,10 +204,10 @@ void Guider::onExternalEvent(OST::ExtEvent event)
                 getProperty(event.prpkey)->setState(OST::Ok, true);
                 logInfo("Resetting calibration data");
                 // Clear all calibration values to force recalibration
-                getEltInt("calibrationvalues", "calPulseN")->setValue(0);
-                getEltInt("calibrationvalues", "calPulseS")->setValue(0);
-                getEltInt("calibrationvalues", "calPulseE")->setValue(0);
-                getEltInt("calibrationvalues", "calPulseW")->setValue(0);
+                getEltFloat("calibrationvalues", "calPulseN")->setValue(0);
+                getEltFloat("calibrationvalues", "calPulseS")->setValue(0);
+                getEltFloat("calibrationvalues", "calPulseE")->setValue(0);
+                getEltFloat("calibrationvalues", "calPulseW")->setValue(0);
                 getEltFloat("calibrationvalues", "ccdOrientation")->setValue(0);
                 getEltFloat("calibrationvalues", "calMountDEC")->setValue(0);
                 getEltBool("calibrationvalues", "revRA")->setValue(false);
@@ -551,10 +551,10 @@ void Guider::SMInitCal()
     _calPulseW = 0;
 
     // Update UI with current (empty) calibration values
-    getEltInt("calibrationvalues", "calPulseN")->setValue(_calPulseN);
-    getEltInt("calibrationvalues", "calPulseS")->setValue(_calPulseS);
-    getEltInt("calibrationvalues", "calPulseE")->setValue(_calPulseE);
-    getEltInt("calibrationvalues", "calPulseW")->setValue(_calPulseW, true);
+    getEltFloat("calibrationvalues", "calPulseN")->setValue(_calPulseN);
+    getEltFloat("calibrationvalues", "calPulseS")->setValue(_calPulseS);
+    getEltFloat("calibrationvalues", "calPulseE")->setValue(_calPulseE);
+    getEltFloat("calibrationvalues", "calPulseW")->setValue(_calPulseW, true);
 
     // Store current pier side at calibration time (for future pier-side compensation)
     // True = West, False = East
@@ -622,10 +622,10 @@ void Guider::SMInitGuide()
     logInfo("Grid limits set to " + QString::number(rmsOver) + " frames (rmsOver parameter)");
 
     // Load calibration results from database
-    _calPulseN = getInt("calibrationvalues", "calPulseN");
-    _calPulseS = getInt("calibrationvalues", "calPulseS");
-    _calPulseE = getInt("calibrationvalues", "calPulseE");
-    _calPulseW = getInt("calibrationvalues", "calPulseW");
+    _calPulseN = getFloat("calibrationvalues", "calPulseN");
+    _calPulseS = getFloat("calibrationvalues", "calPulseS");
+    _calPulseE = getFloat("calibrationvalues", "calPulseE");
+    _calPulseW = getFloat("calibrationvalues", "calPulseW");
     _calCcdOrientation = getFloat("calibrationvalues", "ccdOrientation") * PI / 180.0;  // Convert degrees to radians
     _calMountDEC = getFloat("calibrationvalues", "calMountDEC");  // DEC at calibration time
 
@@ -816,7 +816,7 @@ void Guider::SMComputeCal()
         }
         ddx = ddx / (_dxvector.size());
         ddy = ddy / (_dyvector.size());
-        double a = atan(ddy / ddx);
+        double a = atan2(ddy, ddx);
         //ddy));
         if (_calState == 0)
         {
@@ -892,10 +892,10 @@ void Guider::SMComputeCal()
             }
 
             // Store all calibration values for persistent reuse
-            getEltInt("calibrationvalues", "calPulseN")->setValue(_calPulseN);
-            getEltInt("calibrationvalues", "calPulseS")->setValue(_calPulseS);
-            getEltInt("calibrationvalues", "calPulseE")->setValue(_calPulseE);
-            getEltInt("calibrationvalues", "calPulseW")->setValue(_calPulseW);
+            getEltFloat("calibrationvalues", "calPulseN")->setValue(_calPulseN);
+            getEltFloat("calibrationvalues", "calPulseS")->setValue(_calPulseS);
+            getEltFloat("calibrationvalues", "calPulseE")->setValue(_calPulseE);
+            getEltFloat("calibrationvalues", "calPulseW")->setValue(_calPulseW);
             getEltFloat("calibrationvalues", "ccdOrientation")->setValue(_calCcdOrientation * 180 / PI);
             getEltFloat("calibrationvalues", "calMountDEC")->setValue(_calMountDEC);
             getEltBool("calibrationvalues", "revRA")->setValue(getBool("revCorrections", "revRA"));
