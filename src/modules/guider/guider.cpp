@@ -809,7 +809,7 @@ void Guider::SMComputeCal()
     {
         double ddx = 0;
         double ddy = 0;
-        for (unsigned int i = 1; i < _dxvector.size(); i++)
+        for (unsigned int i = 0; i < _dxvector.size(); i++)
         {
             ddx = ddx + _dxvector[i];
             ddy = ddy + _dyvector[i];
@@ -948,8 +948,14 @@ void Guider::SMComputeGuide()
         //_propertyStore.update(_grid);
         //emit propertyAppended(_grid,&_modulename,0,_dxFirst,_dyFirst,0,0);
     }
-    double _driftRA = _dxFirst * cos(_calCcdOrientation) + _dyFirst * sin(_calCcdOrientation);
-    double _driftDE = _dxFirst * sin(_calCcdOrientation) + _dyFirst * cos(_calCcdOrientation);
+    else
+    {
+        logWarning("No stars detected in current frame - skipping corrections");
+        emit ComputeGuideDone();
+        return;
+    }
+    double _driftRA = _dxFirst *  cos(_calCcdOrientation) + _dyFirst * sin(_calCcdOrientation);
+    double _driftDE = _dxFirst * -sin(_calCcdOrientation) + _dyFirst * cos(_calCcdOrientation);
 
     // Apply DEC compensation for current position
     // calPulseE/W are stored as "equatorial" (DEC=0), need to adjust for current DEC
