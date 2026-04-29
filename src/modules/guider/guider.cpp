@@ -659,7 +659,7 @@ void Guider::SMInitGuide()
     int rmsOver = getInt("guideParams", "rmsOver");
     getProperty("drift")->setGridLimit(rmsOver);
     getProperty("guiding")->setGridLimit(rmsOver);
-    logInfo("Grid limits set to " + QString::number(rmsOver) + " frames (rmsOver parameter)");
+    logInfo("Grid limits set to %1 frames (rmsOver parameter)", {QString::number(rmsOver)});
 
     // Load calibration results from database
     _calPulseN = getFloat("calibrationvalues", "calPulseN");
@@ -687,8 +687,8 @@ void Guider::SMInitGuide()
     }
 
     // Show calibration reference information
-    logInfo("Calibration performed at DEC: " + QString::number(_calMountDEC, 'f', 1) + "°");
-    logInfo("Current target DEC: " + QString::number(_mountDEC, 'f', 1) + "°");
+    logInfo("Calibration performed at DEC: %1°", {QString::number(_calMountDEC, 'f', 1)});
+    logInfo("Current target DEC: %1°", {QString::number(_mountDEC, 'f', 1)});
 
     // === PIER SIDE COMPENSATION CHECK ===
 
@@ -722,8 +722,7 @@ void Guider::SMInitGuide()
             getEltBool("revCorrections", "revRA")->setValue(revRA);
             getEltBool("revCorrections", "revDE")->setValue(revDE, true);
 
-            logInfo("RA reverse: " + QString(revRA ? "true" : "false") +
-                    ", DEC reverse: " + QString(revDE ? "true" : "false"));
+            logInfo("RA reverse: %1, DEC reverse: %2", {QString(revRA ? "true" : "false"), QString(revDE ? "true" : "false")});
         }
         else
         {
@@ -844,8 +843,7 @@ void Guider::SMComputeCal()
     else if (_calState == 2) directionName = "North";
     else if (_calState == 3) directionName = "South";
 
-    logInfo("Calibration " + directionName + " - step " + QString::number(_calStep) + "/" + QString::number(
-                getInt("calParams", "calsteps")));
+    logInfo("Calibration %1 - step %2/%3", {directionName, QString::number(_calStep), QString::number(getInt("calParams", "calsteps"))});
 
     if (_calStep >= getInt("calParams", "calsteps") )
     {
@@ -868,9 +866,7 @@ void Guider::SMComputeCal()
             _calCcdOrientation = _ccdOrientation;
             double ech = getSampling();
             double drift_arcsec = sqrt(square(ddx) + square(ddy)) * ech;
-            logInfo("West calibration complete: " + QString::number(_calPulseW, 'f',
-                    2) + " ms/px (" + QString::number(_calPulseW / ech, 'f', 2) + " ms/arcsec, drift=" + QString::number(drift_arcsec, 'f',
-                            2) + "\")");
+            logInfo("West calibration complete: %1 ms/px (%2 ms/arcsec, drift=%3\")", {QString::number(_calPulseW, 'f', 2), QString::number(_calPulseW / ech, 'f', 2), QString::number(drift_arcsec, 'f', 2)});
 
             //                             ddy));
             //ddy) + square(ddy))*_ccdSampling);
@@ -880,9 +876,7 @@ void Guider::SMComputeCal()
             _calPulseE = getInt("calParams", "pulse") / sqrt(square(ddx) + square(ddy));
             double ech = getSampling();
             double drift_arcsec = sqrt(square(ddx) + square(ddy)) * ech;
-            logInfo("East calibration complete: " + QString::number(_calPulseE, 'f',
-                    2) + " ms/px (" + QString::number(_calPulseE / ech, 'f', 2) + " ms/arcsec, drift=" + QString::number(drift_arcsec, 'f',
-                            2) + "\")");
+            logInfo("East calibration complete: %1 ms/px (%2 ms/arcsec, drift=%3\")", {QString::number(_calPulseE, 'f', 2), QString::number(_calPulseE / ech, 'f', 2), QString::number(drift_arcsec, 'f', 2)});
             //                             ddy));
             //ddy) + square(ddy))*_ccdSampling);
         }
@@ -891,9 +885,7 @@ void Guider::SMComputeCal()
             _calPulseN = getInt("calParams", "pulse") / sqrt(square(ddx) + square(ddy));
             double ech = getSampling();
             double drift_arcsec = sqrt(square(ddx) + square(ddy)) * ech;
-            logInfo("North calibration complete: " + QString::number(_calPulseN, 'f',
-                    2) + " ms/px (" + QString::number(_calPulseN / ech, 'f', 2) + " ms/arcsec, drift=" + QString::number(drift_arcsec, 'f',
-                            2) + "\")");
+            logInfo("North calibration complete: %1 ms/px (%2 ms/arcsec, drift=%3\")", {QString::number(_calPulseN, 'f', 2), QString::number(_calPulseN / ech, 'f', 2), QString::number(drift_arcsec, 'f', 2)});
             //                             ddy));
             //ddy) + square(ddy))*_ccdSampling);
         }
@@ -902,9 +894,7 @@ void Guider::SMComputeCal()
             _calPulseS = getInt("calParams", "pulse") / sqrt(square(ddx) + square(ddy));
             double ech = getSampling();
             double drift_arcsec = sqrt(square(ddx) + square(ddy)) * ech;
-            logInfo("South calibration complete: " + QString::number(_calPulseS, 'f',
-                    2) + " ms/px (" + QString::number(_calPulseS / ech, 'f', 2) + " ms/arcsec, drift=" + QString::number(drift_arcsec, 'f',
-                            2) + "\")");
+            logInfo("South calibration complete: %1 ms/px (%2 ms/arcsec, drift=%3\")", {QString::number(_calPulseS, 'f', 2), QString::number(_calPulseS / ech, 'f', 2), QString::number(drift_arcsec, 'f', 2)});
             //                             ddy));
             //ddy) + square(ddy))*_ccdSampling);
         }
@@ -929,8 +919,7 @@ void Guider::SMComputeCal()
             {
                 _calPulseE = _calPulseE / decCompensation;
                 _calPulseW = _calPulseW / decCompensation;
-                logInfo("DEC compensation applied: DEC=" + QString::number(_calMountDEC, 'f',
-                        1) + "° factor=" + QString::number(decCompensation, 'f', 3));
+                logInfo("DEC compensation applied: DEC=%1° factor=%2", {QString::number(_calMountDEC, 'f', 1), QString::number(decCompensation, 'f', 3)});
             }
 
             // Store all calibration values for persistent reuse
