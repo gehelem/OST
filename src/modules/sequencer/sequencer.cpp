@@ -310,7 +310,7 @@ void Sequencer::StartSequence()
             // Only do initial focus for light or flat frames
             if (firstFrameType == "L" || firstFrameType == "F")
             {
-                logInfo("Starting sequence with autofocus using filter: " + firstFilter);
+                logInfo("Starting sequence with autofocus using filter: %1", {firstFilter});
 
                 // Set the filter to the first line's filter
                 sendModNewNumber(getString("devices", "filter"), "FILTER_SLOT", "FILTER_SLOT_VALUE", filterIndex);
@@ -359,7 +359,7 @@ void Sequencer::StartLine()
 
         if (filterChanged && autofocusEnabled && (currentFrameType == "L" || currentFrameType == "F"))
         {
-            logInfo("Filter changed from " + previousFilter + " to " + currentFilter);
+            logInfo("Filter changed from %1 to %2", {previousFilter, currentFilter});
             previousFilter = currentFilter;
 
             // First change the filter
@@ -431,13 +431,13 @@ void Sequencer::refreshFilterLov()
 
     if (!dp.isValid())
     {
-        logError("Unable to find " + getString("devices", "filter") + " device.");
+        logError("Unable to find %1 device.", {getString("devices", "filter")});
         return;
     }
     INDI::PropertyText txt = dp.getText("FILTER_NAME");
     if (!txt.isValid())
     {
-        logError("Unable to find " + getString("devices", "filter")  + "/" + "FILTER_NAME" + " property.");
+        logError("Unable to find %1/FILTER_NAME property.", {getString("devices", "filter")});
         return;
     }
 

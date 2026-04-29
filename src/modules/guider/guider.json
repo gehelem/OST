@@ -67,28 +67,28 @@
         "label": "Calibration Values",
         "e": {
             "calPulseN": {
-                "type":"int",
+                "type":"float",
                 "label": "Calibration Pulse N",
                 "order":"01",
                 "value": 0,
                 "format": "99.99"
             },
             "calPulseS": {
-                "type":"int",
+                "type":"float",
                 "label": "Calibration Pulse S",
                 "order":"02",
                 "value": 0,
                 "format": "99.99"
             },
             "calPulseE": {
-                "type":"int",
+                "type":"float",
                 "label": "Calibration Pulse E",
                 "order":"03",
                 "value": 0,
                 "format": "99.99"
             },
             "calPulseW": {
-                "type":"int",
+                "type":"float",
                 "label": "Calibration Pulse W",
                 "order":"04",
                 "value": 0,
@@ -325,6 +325,18 @@
                 "order":"06",
                 "value":false,
                 "hint": "Reverse corrections if calibration pier side differs from current pier side"
+            },
+            "ditherpixel": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Dither amplitude (px)",
+                "order":"07",
+                "value":5,
+                "format": "99",
+                "min":1,
+                "max":50,
+                "hint": "Maximum random displacement applied during dithering, in pixels"
             }
         }
     },

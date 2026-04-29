@@ -233,7 +233,7 @@ void Navigator::OnNewImage()
         !getModNumber(getString("devices", "camera"), "CCD_INFO", "CCD_PIXEL_SIZE", pix)
     )
     {
-        logInfo("Can't find camera device " + getString("devices", "camera") + " solve aborted");
+        logInfo("Can't find camera device %1 solve aborted", {getString("devices", "camera")});
     }
     ech = 206 * pix / getFloat("optic", "fl");
 
@@ -242,7 +242,7 @@ void Navigator::OnNewImage()
         || !getModNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "RA", ra)
     )
     {
-        logInfo("Can't find mount device " + getString("devices", "mount") + " solve aborted");
+        logInfo("Can't find mount device %1 solve aborted", {getString("devices", "mount")});
     }
     else
     {
@@ -443,22 +443,21 @@ void Navigator::OnSucessSolve()
 }
 void Navigator::updateSearchList(void)
 {
-    logInfo("Searching " + getString("search", "name"));
+    logInfo("Searching %1", {getString("search", "name")});
     getProperty("results")->clearGrid();
     QList<catalogResult> results;
     searchCatalog(getString("search", "name"), results);
     if (results.count() == 0)
     {
-        logWarning("Searching " + getString("search", "name") + " gives no result");
+        logWarning("Searching %1 gives no result", {getString("search", "name")});
         return;
     }
-    logInfo("Searching " + getString("search", "name") + " gives " + QString::number(results.count()) + " results");
+    logInfo("Searching %1 gives %2 results", {getString("search", "name"), QString::number(results.count())});
 
     int max = 20;
     if (max < results.count())
     {
-        logWarning("updateSearchList more than " + QString::number(max) + " objects found, limiting result to " + QString::number(
-                       max));
+        logWarning("updateSearchList more than %1 objects found, limiting result to %2", {QString::number(max), QString::number(max)});
     }
     else
     {
@@ -488,13 +487,13 @@ void Navigator::slewToSelection(void)
     INDI::BaseDevice dp = getDevice(mount.toStdString().c_str());
     if (!dp.isValid())
     {
-        logError("Error - unable to find " + mount + " device. Aborting.");
+        logError("Error - unable to find %1 device. Aborting.", {mount});
         return;
     }
     INDI::PropertyNumber prop = dp.getProperty("EQUATORIAL_EOD_COORD");
     if (!prop.isValid())
     {
-        logError("Error - unable to find " + mount + "/" + prop + " property. Aborting.");
+        logError("Error - unable to find %1/EQUATORIAL_EOD_COORD property. Aborting.", {mount});
         return;
     }
     prop.findWidgetByName("RA")->value = mTargetRAnow;
@@ -502,7 +501,7 @@ void Navigator::slewToSelection(void)
 
     mWaitingSlew = true;
     sendNewNumber(prop);
-    logInfo("Slewing to " + getString("target", "targetname"));
+    logInfo("Slewing to %1", {getString("target", "targetname")});
 
 }
 void Navigator::convertSelection(void)
@@ -554,7 +553,7 @@ void Navigator::correctOffset(double solvedRA, double solvedDEC)
     INDI::BaseDevice dp = getDevice(mount.toStdString().c_str());
     if (!dp.isValid())
     {
-        logError("Error - unable to find " + mount + " device for correction.");
+        logError("Error - unable to find %1 device for correction.", {mount});
         mState = "idle";
         return;
     }
@@ -584,7 +583,7 @@ void Navigator::syncMountIfNeeded(double solvedRA, double solvedDEC)
     INDI::BaseDevice dp = getDevice(mount.toStdString().c_str());
     if (!(dp.getDriverInterface() & INDI::BaseDevice::TELESCOPE_INTERFACE))
     {
-        logError( "Device " + mount + " has no telescope interface");
+        logError("Device %1 has no telescope interface", {mount});
         return;
     }
 
@@ -593,7 +592,7 @@ void Navigator::syncMountIfNeeded(double solvedRA, double solvedDEC)
     INDI::PropertyNumber prop = dp.getProperty("EQUATORIAL_EOD_COORD");
     if (!prop.isValid())
     {
-        logError("Error - unable to find " + mount + " / EQUATORIAL_EOD_COORD property. Aborting.");
+        logError("Error - unable to find %1 / EQUATORIAL_EOD_COORD property. Aborting.", {mount});
         return;
     }
     double jd = ln_get_julian_from_sys();
@@ -621,7 +620,7 @@ void Navigator::addTargeToPlanner()
     eltData["ra"] = getFloat("target", "targetra");
     eltData["dec"] = getFloat("target", "targetde");
     eltData["profile"] = "default";
-    logInfo("Current target sent to " + getString("parms", "plannermodule"));
+    logInfo("Current target sent to %1", {getString("parms", "plannermodule")});
 
     otherModuleCreateLine(getString("parms", "plannermodule"), "planning", eltData);
 

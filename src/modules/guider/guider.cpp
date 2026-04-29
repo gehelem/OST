@@ -24,6 +24,7 @@
 
 #include "guider.h"
 #include "version.cc"
+#include <QRandomGenerator>
 //#include "polynomialfit.h"
 #define PI 3.14159265
 
@@ -78,7 +79,11 @@ Guider::Guider(QString name, QString label, QString profile, QVariantMap availab
     OST::ElementBool* b = new OST::ElementBool("resetcalibration", "Reset calibration", "guid10", "");
     b->setValue(false, false);
     b->setPreIcon("block");
-    pm->addElt( b);
+    pm->addElt(b);
+    OST::ElementBool* dither = new OST::ElementBool("dither", "Dither", "guid11", "");
+    dither->setValue(false, false);
+    dither->setPreIcon("shuffle");
+    pm->addElt(dither);
 }
 
 /**
@@ -172,10 +177,10 @@ void Guider::onExternalEvent(OST::ExtEvent event)
                 logInfo("Starting guiding");
 
                 // Check if calibration data exists
-                int calN = getInt("calibrationvalues", "calPulseN");
-                int calS = getInt("calibrationvalues", "calPulseS");
-                int calE = getInt("calibrationvalues", "calPulseE");
-                int calW = getInt("calibrationvalues", "calPulseW");
+                double calN = getFloat("calibrationvalues", "calPulseN");
+                double calS = getFloat("calibrationvalues", "calPulseS");
+                double calE = getFloat("calibrationvalues", "calPulseE");
+                double calW = getFloat("calibrationvalues", "calPulseW");
 
                 // If no calibration, must do it first
                 if (calN == 0 || calS == 0 || calE == 0 || calW == 0)
@@ -197,6 +202,21 @@ void Guider::onExternalEvent(OST::ExtEvent event)
                 }
             }
         }
+        if (event.eltkey == "dither")
+        {
+            if (getEltBool(event.prpkey, event.eltkey)->setValue(false, true))
+            {
+                if (_SMGuide.isRunning())
+                {
+                    _doDither = true;
+                    logInfo("Dither requested - will apply on next guide frame");
+                }
+                else
+                {
+                    logWarning("Dither ignored - guiding is not active");
+                }
+            }
+        }
         if (event.eltkey == "resetcalibration")
         {
             if (getEltBool(event.prpkey, event.eltkey)->setValue(false, true))
@@ -204,10 +224,10 @@ void Guider::onExternalEvent(OST::ExtEvent event)
                 getProperty(event.prpkey)->setState(OST::Ok, true);
                 logInfo("Resetting calibration data");
                 // Clear all calibration values to force recalibration
-                getEltInt("calibrationvalues", "calPulseN")->setValue(0);
-                getEltInt("calibrationvalues", "calPulseS")->setValue(0);
-                getEltInt("calibrationvalues", "calPulseE")->setValue(0);
-                getEltInt("calibrationvalues", "calPulseW")->setValue(0);
+                getEltFloat("calibrationvalues", "calPulseN")->setValue(0);
+                getEltFloat("calibrationvalues", "calPulseS")->setValue(0);
+                getEltFloat("calibrationvalues", "calPulseE")->setValue(0);
+                getEltFloat("calibrationvalues", "calPulseW")->setValue(0);
                 getEltFloat("calibrationvalues", "ccdOrientation")->setValue(0);
                 getEltFloat("calibrationvalues", "calMountDEC")->setValue(0);
                 getEltBool("calibrationvalues", "revRA")->setValue(false);
@@ -385,34 +405,54 @@ void Guider::buildGuideStateMachines(void)
     auto *Guide  = new QState();
     auto *End   = new QFinalState();
 
-    auto *InitGuide           = new QState(Guide);
-    auto *RequestGuideExposure = new QState(Guide);
-    auto *WaitGuideExposure   = new QState(Guide);
-    auto *FindStarsGuide      = new QState(Guide);
-    auto *ComputeGuide        = new QState(Guide);
-    auto *RequestGuidePulses  = new QState(Guide);
-    auto *WaitGuidePulses     = new QState(Guide);
+    auto *InitGuide              = new QState(Guide);
+    auto *RequestGuideExposure   = new QState(Guide);
+    auto *WaitGuideExposure      = new QState(Guide);
+    auto *FindStarsGuide         = new QState(Guide);
+    auto *ComputeGuide           = new QState(Guide);
+    auto *RequestGuidePulses     = new QState(Guide);
+    auto *WaitGuidePulses        = new QState(Guide);
+    // Dither branch: send dither pulses then rebuild reference before resuming
+    auto *RequestDitherPulses    = new QState(Guide);
+    auto *WaitDitherPulses       = new QState(Guide);
+    auto *RequestRefExposure     = new QState(Guide);
+    auto *WaitRefExposure        = new QState(Guide);
+    auto *FindStarsRef           = new QState(Guide);
+    auto *ComputeNewRef          = new QState(Guide);
 
-    connect(InitGuide, &QState::entered, this, &Guider::SMInitGuide);
+    connect(InitGuide,            &QState::entered, this, &Guider::SMInitGuide);
     connect(RequestGuideExposure, &QState::entered, this, &Guider::SMRequestExposure);
-    connect(FindStarsGuide, &QState::entered, this, &Guider::SMFindStars);
-    connect(ComputeGuide, &QState::entered, this, &Guider::SMComputeGuide);
-    connect(RequestGuidePulses,  &QState::entered, this, &Guider::SMRequestPulses);
-    connect(Abort,               &QState::entered, this, &Guider::SMAbort);
+    connect(FindStarsGuide,       &QState::entered, this, &Guider::SMFindStars);
+    connect(ComputeGuide,         &QState::entered, this, &Guider::SMComputeGuide);
+    connect(RequestGuidePulses,   &QState::entered, this, &Guider::SMRequestPulses);
+    connect(RequestDitherPulses,  &QState::entered, this, &Guider::SMRequestPulses);
+    connect(RequestRefExposure,   &QState::entered, this, &Guider::SMRequestExposure);
+    connect(FindStarsRef,         &QState::entered, this, &Guider::SMFindStars);
+    connect(ComputeNewRef,        &QState::entered, this, &Guider::SMComputeFirst);
+    connect(Abort,                &QState::entered, this, &Guider::SMAbort);
 
-    Guide->               addTransition(this, &Guider::Abort, Abort);
-    Abort->               addTransition(this, &Guider::AbortDone, End);
-    InitGuide->           addTransition(this, &Guider::InitGuideDone, RequestGuideExposure);
+    Guide->                  addTransition(this, &Guider::Abort,              Abort);
+    Abort->                  addTransition(this, &Guider::AbortDone,          End);
+    InitGuide->              addTransition(this, &Guider::InitGuideDone,      RequestGuideExposure);
 
-    RequestGuideExposure->  addTransition(this, &Guider::RequestExposureDone, WaitGuideExposure);
-    WaitGuideExposure->     addTransition(this, &Guider::ExposureDone, FindStarsGuide);
-    FindStarsGuide->        addTransition(this, &Guider::FindStarsDone, ComputeGuide);
-    ComputeGuide->          addTransition(this, &Guider::ComputeGuideDone, RequestGuidePulses);
-    RequestGuidePulses->    addTransition(this, &Guider::RequestPulsesDone, WaitGuidePulses);
-    RequestGuidePulses->    addTransition(this, &Guider::PulsesDone, RequestGuideExposure);
-    WaitGuidePulses->       addTransition(this, &Guider::PulsesDone, RequestGuideExposure);
-    //ComputeGuide->          addTransition(this,&Guider::GuideDone           ,End); // useless ??
+    // Normal guiding loop
+    RequestGuideExposure->   addTransition(this, &Guider::RequestExposureDone, WaitGuideExposure);
+    WaitGuideExposure->      addTransition(this, &Guider::ExposureDone,        FindStarsGuide);
+    FindStarsGuide->         addTransition(this, &Guider::FindStarsDone,       ComputeGuide);
+    ComputeGuide->           addTransition(this, &Guider::ComputeGuideDone,    RequestGuidePulses);
+    RequestGuidePulses->     addTransition(this, &Guider::RequestPulsesDone,   WaitGuidePulses);
+    RequestGuidePulses->     addTransition(this, &Guider::PulsesDone,          RequestGuideExposure);
+    WaitGuidePulses->        addTransition(this, &Guider::PulsesDone,          RequestGuideExposure);
 
+    // Dither branch: triggered by DitherNow from ComputeGuide
+    ComputeGuide->           addTransition(this, &Guider::DitherNow,           RequestDitherPulses);
+    RequestDitherPulses->    addTransition(this, &Guider::RequestPulsesDone,   WaitDitherPulses);
+    RequestDitherPulses->    addTransition(this, &Guider::PulsesDone,          RequestRefExposure);
+    WaitDitherPulses->       addTransition(this, &Guider::PulsesDone,          RequestRefExposure);
+    RequestRefExposure->     addTransition(this, &Guider::RequestExposureDone, WaitRefExposure);
+    WaitRefExposure->        addTransition(this, &Guider::ExposureDone,        FindStarsRef);
+    FindStarsRef->           addTransition(this, &Guider::FindStarsDone,       ComputeNewRef);
+    ComputeNewRef->          addTransition(this, &Guider::ComputeFirstDone,    InitGuide);
 
     Guide->setInitialState(InitGuide);
 
@@ -551,10 +591,10 @@ void Guider::SMInitCal()
     _calPulseW = 0;
 
     // Update UI with current (empty) calibration values
-    getEltInt("calibrationvalues", "calPulseN")->setValue(_calPulseN);
-    getEltInt("calibrationvalues", "calPulseS")->setValue(_calPulseS);
-    getEltInt("calibrationvalues", "calPulseE")->setValue(_calPulseE);
-    getEltInt("calibrationvalues", "calPulseW")->setValue(_calPulseW, true);
+    getEltFloat("calibrationvalues", "calPulseN")->setValue(_calPulseN);
+    getEltFloat("calibrationvalues", "calPulseS")->setValue(_calPulseS);
+    getEltFloat("calibrationvalues", "calPulseE")->setValue(_calPulseE);
+    getEltFloat("calibrationvalues", "calPulseW")->setValue(_calPulseW, true);
 
     // Store current pier side at calibration time (for future pier-side compensation)
     // True = West, False = East
@@ -619,13 +659,13 @@ void Guider::SMInitGuide()
     int rmsOver = getInt("guideParams", "rmsOver");
     getProperty("drift")->setGridLimit(rmsOver);
     getProperty("guiding")->setGridLimit(rmsOver);
-    logInfo("Grid limits set to " + QString::number(rmsOver) + " frames (rmsOver parameter)");
+    logInfo("Grid limits set to %1 frames (rmsOver parameter)", {QString::number(rmsOver)});
 
     // Load calibration results from database
-    _calPulseN = getInt("calibrationvalues", "calPulseN");
-    _calPulseS = getInt("calibrationvalues", "calPulseS");
-    _calPulseE = getInt("calibrationvalues", "calPulseE");
-    _calPulseW = getInt("calibrationvalues", "calPulseW");
+    _calPulseN = getFloat("calibrationvalues", "calPulseN");
+    _calPulseS = getFloat("calibrationvalues", "calPulseS");
+    _calPulseE = getFloat("calibrationvalues", "calPulseE");
+    _calPulseW = getFloat("calibrationvalues", "calPulseW");
     _calCcdOrientation = getFloat("calibrationvalues", "ccdOrientation") * PI / 180.0;  // Convert degrees to radians
     _calMountDEC = getFloat("calibrationvalues", "calMountDEC");  // DEC at calibration time
 
@@ -647,8 +687,8 @@ void Guider::SMInitGuide()
     }
 
     // Show calibration reference information
-    logInfo("Calibration performed at DEC: " + QString::number(_calMountDEC, 'f', 1) + "°");
-    logInfo("Current target DEC: " + QString::number(_mountDEC, 'f', 1) + "°");
+    logInfo("Calibration performed at DEC: %1°", {QString::number(_calMountDEC, 'f', 1)});
+    logInfo("Current target DEC: %1°", {QString::number(_mountDEC, 'f', 1)});
 
     // === PIER SIDE COMPENSATION CHECK ===
 
@@ -682,8 +722,7 @@ void Guider::SMInitGuide()
             getEltBool("revCorrections", "revRA")->setValue(revRA);
             getEltBool("revCorrections", "revDE")->setValue(revDE, true);
 
-            logInfo("RA reverse: " + QString(revRA ? "true" : "false") +
-                    ", DEC reverse: " + QString(revDE ? "true" : "false"));
+            logInfo("RA reverse: %1, DEC reverse: %2", {QString(revRA ? "true" : "false"), QString(revDE ? "true" : "false")});
         }
         else
         {
@@ -716,6 +755,8 @@ void Guider::SMInitGuide()
     // These will accumulate as new measurements come in
     _dRAvector.clear();
     _dDEvector.clear();
+
+    _doDither = false;
 
     emit InitGuideDone();
 }
@@ -778,7 +819,7 @@ void Guider::SMComputeCal()
     else
     {
         logError("No stars, can't calibrate");
-        emit abort();
+        emit Abort();
         return;
     }
     _trigPrev = _trigCurrent;
@@ -802,21 +843,20 @@ void Guider::SMComputeCal()
     else if (_calState == 2) directionName = "North";
     else if (_calState == 3) directionName = "South";
 
-    logInfo("Calibration " + directionName + " - step " + QString::number(_calStep) + "/" + QString::number(
-                getInt("calParams", "calsteps")));
+    logInfo("Calibration %1 - step %2/%3", {directionName, QString::number(_calStep), QString::number(getInt("calParams", "calsteps"))});
 
     if (_calStep >= getInt("calParams", "calsteps") )
     {
         double ddx = 0;
         double ddy = 0;
-        for (unsigned int i = 1; i < _dxvector.size(); i++)
+        for (unsigned int i = 0; i < _dxvector.size(); i++)
         {
             ddx = ddx + _dxvector[i];
             ddy = ddy + _dyvector[i];
         }
         ddx = ddx / (_dxvector.size());
         ddy = ddy / (_dyvector.size());
-        double a = atan(ddy / ddx);
+        double a = atan2(ddy, ddx);
         //ddy));
         if (_calState == 0)
         {
@@ -826,9 +866,7 @@ void Guider::SMComputeCal()
             _calCcdOrientation = _ccdOrientation;
             double ech = getSampling();
             double drift_arcsec = sqrt(square(ddx) + square(ddy)) * ech;
-            logInfo("West calibration complete: " + QString::number(_calPulseW, 'f',
-                    2) + " ms/px (" + QString::number(_calPulseW / ech, 'f', 2) + " ms/arcsec, drift=" + QString::number(drift_arcsec, 'f',
-                            2) + "\")");
+            logInfo("West calibration complete: %1 ms/px (%2 ms/arcsec, drift=%3\")", {QString::number(_calPulseW, 'f', 2), QString::number(_calPulseW / ech, 'f', 2), QString::number(drift_arcsec, 'f', 2)});
 
             //                             ddy));
             //ddy) + square(ddy))*_ccdSampling);
@@ -838,9 +876,7 @@ void Guider::SMComputeCal()
             _calPulseE = getInt("calParams", "pulse") / sqrt(square(ddx) + square(ddy));
             double ech = getSampling();
             double drift_arcsec = sqrt(square(ddx) + square(ddy)) * ech;
-            logInfo("East calibration complete: " + QString::number(_calPulseE, 'f',
-                    2) + " ms/px (" + QString::number(_calPulseE / ech, 'f', 2) + " ms/arcsec, drift=" + QString::number(drift_arcsec, 'f',
-                            2) + "\")");
+            logInfo("East calibration complete: %1 ms/px (%2 ms/arcsec, drift=%3\")", {QString::number(_calPulseE, 'f', 2), QString::number(_calPulseE / ech, 'f', 2), QString::number(drift_arcsec, 'f', 2)});
             //                             ddy));
             //ddy) + square(ddy))*_ccdSampling);
         }
@@ -849,9 +885,7 @@ void Guider::SMComputeCal()
             _calPulseN = getInt("calParams", "pulse") / sqrt(square(ddx) + square(ddy));
             double ech = getSampling();
             double drift_arcsec = sqrt(square(ddx) + square(ddy)) * ech;
-            logInfo("North calibration complete: " + QString::number(_calPulseN, 'f',
-                    2) + " ms/px (" + QString::number(_calPulseN / ech, 'f', 2) + " ms/arcsec, drift=" + QString::number(drift_arcsec, 'f',
-                            2) + "\")");
+            logInfo("North calibration complete: %1 ms/px (%2 ms/arcsec, drift=%3\")", {QString::number(_calPulseN, 'f', 2), QString::number(_calPulseN / ech, 'f', 2), QString::number(drift_arcsec, 'f', 2)});
             //                             ddy));
             //ddy) + square(ddy))*_ccdSampling);
         }
@@ -860,9 +894,7 @@ void Guider::SMComputeCal()
             _calPulseS = getInt("calParams", "pulse") / sqrt(square(ddx) + square(ddy));
             double ech = getSampling();
             double drift_arcsec = sqrt(square(ddx) + square(ddy)) * ech;
-            logInfo("South calibration complete: " + QString::number(_calPulseS, 'f',
-                    2) + " ms/px (" + QString::number(_calPulseS / ech, 'f', 2) + " ms/arcsec, drift=" + QString::number(drift_arcsec, 'f',
-                            2) + "\")");
+            logInfo("South calibration complete: %1 ms/px (%2 ms/arcsec, drift=%3\")", {QString::number(_calPulseS, 'f', 2), QString::number(_calPulseS / ech, 'f', 2), QString::number(drift_arcsec, 'f', 2)});
             //                             ddy));
             //ddy) + square(ddy))*_ccdSampling);
         }
@@ -887,15 +919,14 @@ void Guider::SMComputeCal()
             {
                 _calPulseE = _calPulseE / decCompensation;
                 _calPulseW = _calPulseW / decCompensation;
-                logInfo("DEC compensation applied: DEC=" + QString::number(_calMountDEC, 'f',
-                        1) + "° factor=" + QString::number(decCompensation, 'f', 3));
+                logInfo("DEC compensation applied: DEC=%1° factor=%2", {QString::number(_calMountDEC, 'f', 1), QString::number(decCompensation, 'f', 3)});
             }
 
             // Store all calibration values for persistent reuse
-            getEltInt("calibrationvalues", "calPulseN")->setValue(_calPulseN);
-            getEltInt("calibrationvalues", "calPulseS")->setValue(_calPulseS);
-            getEltInt("calibrationvalues", "calPulseE")->setValue(_calPulseE);
-            getEltInt("calibrationvalues", "calPulseW")->setValue(_calPulseW);
+            getEltFloat("calibrationvalues", "calPulseN")->setValue(_calPulseN);
+            getEltFloat("calibrationvalues", "calPulseS")->setValue(_calPulseS);
+            getEltFloat("calibrationvalues", "calPulseE")->setValue(_calPulseE);
+            getEltFloat("calibrationvalues", "calPulseW")->setValue(_calPulseW);
             getEltFloat("calibrationvalues", "ccdOrientation")->setValue(_calCcdOrientation * 180 / PI);
             getEltFloat("calibrationvalues", "calMountDEC")->setValue(_calMountDEC);
             getEltBool("calibrationvalues", "revRA")->setValue(getBool("revCorrections", "revRA"));
@@ -923,8 +954,8 @@ void Guider::SMComputeCal()
     {
         _pulseS = getInt("calParams", "pulse");
     }
-    double _driftRA =  _dxFirst * cos(_calCcdOrientation) + _dyFirst * sin(_calCcdOrientation);
-    double _driftDE =  _dxFirst * sin(_calCcdOrientation) + _dyFirst * cos(_calCcdOrientation);
+    double _driftRA = _dxFirst * cos(_calCcdOrientation) + _dyFirst *  sin(_calCcdOrientation);
+    double _driftDE = _dxFirst * sin(_calCcdOrientation) + _dyFirst * -cos(_calCcdOrientation);
     double ech = getSampling();
     getEltFloat("drift", "RA")->setValue(_driftRA * ech);
     getEltFloat("drift", "DEC")->setValue(_driftDE * ech);
@@ -944,12 +975,44 @@ void Guider::SMComputeGuide()
     if (_trigCurrent.size() > 0)
     {
         matchIndexes(_trigFirst, _trigCurrent, _matchedCurFirst, _dxFirst, _dyFirst);
-        //_grid->append(_dxFirst,_dyFirst);
-        //_propertyStore.update(_grid);
-        //emit propertyAppended(_grid,&_modulename,0,_dxFirst,_dyFirst,0,0);
     }
-    double _driftRA = _dxFirst * cos(_calCcdOrientation) + _dyFirst * sin(_calCcdOrientation);
-    double _driftDE = _dxFirst * sin(_calCcdOrientation) + _dyFirst * cos(_calCcdOrientation);
+    else
+    {
+        logWarning("No stars detected in current frame - skipping corrections");
+        emit ComputeGuideDone();
+        return;
+    }
+
+    // Dither requested: compute random displacement pulses then rebuild reference
+    if (_doDither)
+    {
+        double currentDecCompensation = cos(_mountDEC * PI / 180.0);
+        int ditherpixel = getInt("guideParams", "ditherpixel");
+        double randRA  = (QRandomGenerator::global()->generateDouble() * 2.0 - 1.0) * ditherpixel;
+        double randDEC = (QRandomGenerator::global()->generateDouble() * 2.0 - 1.0) * ditherpixel;
+
+        // RA: calPulseE/W are equatorial (DEC-normalized), apply current DEC compensation
+        if (randRA > 0)
+            _pulseW = randRA * _calPulseW * currentDecCompensation;
+        else
+            _pulseE = -randRA * _calPulseE * currentDecCompensation;
+
+        // DEC: calPulseN/S are raw ms/pixel, no compensation needed
+        if (randDEC > 0)
+            _pulseN = randDEC * _calPulseN;
+        else
+            _pulseS = -randDEC * _calPulseS;
+
+        _doDither = false;
+        logInfo(QString("Dithering: RA=%1 px DEC=%2 px -> pulseN=%3 pulseS=%4 pulseE=%5 pulseW=%6 ms")
+                .arg(randRA, 0, 'f', 1).arg(randDEC, 0, 'f', 1)
+                .arg(_pulseN).arg(_pulseS).arg(_pulseE).arg(_pulseW));
+        emit DitherNow();
+        return;
+    }
+
+    double _driftRA = _dxFirst * cos(_calCcdOrientation) + _dyFirst *  sin(_calCcdOrientation);
+    double _driftDE = _dxFirst * sin(_calCcdOrientation) + _dyFirst * -cos(_calCcdOrientation);
 
     // Apply DEC compensation for current position
     // calPulseE/W are stored as "equatorial" (DEC=0), need to adjust for current DEC
@@ -968,19 +1031,19 @@ void Guider::SMComputeGuide()
 
     if (revRA * _driftRA > 0 && !disRAO)
     {
-        _pulseW = getFloat("guideParams", "raAgr") * revRA * _driftRA * calPulseWCompensated;
-        if (_pulseW > getInt("guideParams", "pulsemax")) _pulseW = getInt("guideParams", "pulsemax");
-        if (_pulseW < getInt("guideParams", "pulsemin")) _pulseW = 0;
-    }
-    else _pulseW = 0;
-
-    if (revRA * _driftRA < 0 && !disRAE)
-    {
-        _pulseE = - getFloat("guideParams", "raAgr")  * revRA * _driftRA * calPulseECompensated;
+        _pulseE = getFloat("guideParams", "raAgr") * revRA * _driftRA * calPulseECompensated;
         if (_pulseE > getInt("guideParams", "pulsemax")) _pulseE = getInt("guideParams", "pulsemax");
         if (_pulseE < getInt("guideParams", "pulsemin")) _pulseE = 0;
     }
     else _pulseE = 0;
+
+    if (revRA * _driftRA < 0 && !disRAE)
+    {
+        _pulseW = -getFloat("guideParams", "raAgr") * revRA * _driftRA * calPulseWCompensated;
+        if (_pulseW > getInt("guideParams", "pulsemax")) _pulseW = getInt("guideParams", "pulsemax");
+        if (_pulseW < getInt("guideParams", "pulsemin")) _pulseW = 0;
+    }
+    else _pulseW = 0;
 
     if (revDE * _driftDE > 0 && !disDEN)
     {
@@ -1235,6 +1298,7 @@ void Guider::matchIndexes(QVector<Trig> ref, QVector<Trig> act, QVector<MatchedP
         dx = dx + pairs[i].dx;
         dy = dy + pairs[i].dy;
     }
+    if (pairs.isEmpty()) { dx = 0; dy = 0; return; }
     dx = dx / pairs.size();
     dy = dy / pairs.size();
 

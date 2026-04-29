@@ -303,7 +303,7 @@ void Allsky::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
     OST::VideoData v;
     v.url = getModuleName() + "/" + mFolder + "/timelapse.mp4";
     getEltVideo("timelapse", "video1")->setValue(v, true);
-    logInfo("Timelapse ready (" + QString::number(exitCode) + ")");
+    logInfo("Timelapse ready (%1)", {QString::number(exitCode)});
     if (!mIsLooping) moveCurrentToArchives();
 }
 void Allsky::processOutput()

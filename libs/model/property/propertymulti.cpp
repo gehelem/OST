@@ -91,7 +91,7 @@ void PropertyMulti::setGridLimit(int limit)
         if (limit < mGridLimit) clearGrid();
         if (limit > 5000 )
         {
-            logWarning("gridLimit max size is 5000 " + this->label());
+            logWarning("gridLimit max size is 5000 %1", {this->label()});
             mGridLimit = 5000;
         }
         else
@@ -200,7 +200,7 @@ bool  PropertyMulti::setElt(QString key, QVariant val, bool emitEvent)
                 return true;
                 break;
             default:
-                logError("PropertyMulti::setValue - " + key + " - can't determine SwitchRule");
+                logError("PropertyMulti::setValue - %1 - can't determine SwitchRule", {key});
                 return false;
                 break;
         }
@@ -210,8 +210,7 @@ bool  PropertyMulti::setElt(QString key, QVariant val, bool emitEvent)
         // prg/img/video can't be updated via frontend
         return true;
     }
-    logError("PropertyMulti::setValue - " + key + " - can't update, unhandled type : "
-             + mElts[key]->getType() + "(" + val.toString() + ")");
+    logError("PropertyMulti::setValue - %1 - can't update, unhandled type : %2(%3)", {key, mElts[key]->getType(), val.toString()});
     return false;
 
 
@@ -330,7 +329,7 @@ bool PropertyMulti::updateLine(const int i, const QVariantMap &pValues)
 
     if (i >= mGrid.size())
     {
-        logWarning("Can't update line" + QString::number(i)  + " >= " + QString::number(mGrid.size()));
+        logWarning("Can't update line %1 >= %2", {QString::number(i), QString::number(mGrid.size())});
         return false;
     }
 
@@ -383,7 +382,7 @@ bool PropertyMulti::deleteLine(const int i)
     }
     if (i >= mGrid.size())
     {
-        logWarning("Can't delete line" + QString::number(i)  + " >= " + QString::number(mGrid.size()));
+        logWarning("Can't delete line %1 >= %2", {QString::number(i), QString::number(mGrid.size())});
         return false;
     }
 
@@ -520,12 +519,12 @@ bool PropertyMulti::swapLines(int l1, int l2)
 {
     if ((l1 >= mGrid.size()) || (l2 >= mGrid.size()))
     {
-        logWarning("Can't swap lines" + QString::number(l1) + "/" + QString::number(l2) + " > " + QString::number(mGrid.size()));
+        logWarning("Can't swap lines %1/%2 > %3", {QString::number(l1), QString::number(l2), QString::number(mGrid.size())});
         return false;
     }
     if ((l1 < 0) || (l2 < 0))
     {
-        logWarning("Can't swap lines" + QString::number(l1) + "/" + QString::number(l2));
+        logWarning("Can't swap lines %1/%2", {QString::number(l1), QString::number(l2)});
         return false;
     }
     mGrid.swapItemsAt(l2, l1);
@@ -537,7 +536,7 @@ bool PropertyMulti::fetchLine(int l)
 {
     if ((l >= mGrid.size()))
     {
-        logWarning("Can't fetch line" + QString::number(l)  + " >= " + QString::number(mGrid.size()));
+        logWarning("Can't fetch line %1 >= %2", {QString::number(l), QString::number(mGrid.size())});
         return false;
     }
     foreach(const QString &e, mGrid.at(l).keys())
@@ -551,7 +550,7 @@ bool PropertyMulti::updateLine(const int i)
 {
     if ((i >= mGrid.size()))
     {
-        logWarning("Can't update line" + QString::number(i)  + " >= " + QString::number(mGrid.size()));
+        logWarning("Can't update line %1 >= %2", {QString::number(i), QString::number(mGrid.size())});
         return false;
     }
     foreach(const QString &e, mGrid.at(i).keys())
