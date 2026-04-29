@@ -270,7 +270,7 @@ void Polar::SMInit()
         emit Abort();
         return;
     }
-    logInfo("Observer position: lat=" + QString::number(_observerLat) + " lon=" + QString::number(_observerLon));
+    logInfo("Observer position: lat=%1 lon=%2", {QString::number(_observerLat), QString::number(_observerLon)});
 
     _itt = 0;
     _ra0 = 0;
@@ -421,8 +421,8 @@ void Polar::SMCompute()
         //_de0=coord2000.declination;
         _ra0 = _solver.stellarSolver.getSolution().ra;
         _de0 = _solver.stellarSolver.getSolution().dec;
-        logInfo("ra0=" + QString::number(_ra0));
-        logInfo("de0=" + QString::number(_de0));
+        logInfo("ra0=%1", {QString::number(_ra0)});
+        logInfo("de0=%1", {QString::number(_de0)});
 
     }
     if (_itt == 1)
@@ -432,8 +432,8 @@ void Polar::SMCompute()
         //_de1=coord2000.declination;
         _ra1 = _solver.stellarSolver.getSolution().ra;
         _de1 = _solver.stellarSolver.getSolution().dec;
-        logInfo("ra1=" + QString::number(_ra1));
-        logInfo("de1=" + QString::number(_de1));
+        logInfo("ra1=%1", {QString::number(_ra1)});
+        logInfo("de1=%1", {QString::number(_de1)});
     }
     if (_itt == 2)
     {
@@ -442,8 +442,8 @@ void Polar::SMCompute()
         //_de2=coord2000.declination;
         _ra2 = _solver.stellarSolver.getSolution().ra;
         _de2 = _solver.stellarSolver.getSolution().dec;
-        logInfo("ra2=" + QString::number(_ra2));
-        logInfo("de2=" + QString::number(_de2));
+        logInfo("ra2=%1", {QString::number(_ra2)});
+        logInfo("de2=%1", {QString::number(_de2)});
     }
 
     getEltFloat("values", "ra0")->setValue(_ra0, false);
@@ -492,7 +492,7 @@ void Polar::syncMount(double ra_j2000_deg, double dec_j2000_deg)
     sendNewNumber(prop);
     if (!sendModNewSwitch(mount, "ON_COORD_SET", "SLEW", ISS_ON))
         logWarning("syncMount: failed to restore SLEW mode");
-    logInfo("Mount synced: RA=" + QString::number(observed.rightascension) + "h DEC=" + QString::number(observed.declination) + "°");
+    logInfo("Mount synced: RA=%1h DEC=%2°", {QString::number(observed.rightascension), QString::number(observed.declination)});
 }
 QPointF Polar::solverToAzAlt(double ra_j2000_deg, double dec_j2000_deg, double jd)
 {
@@ -568,9 +568,9 @@ void Polar::SMComputeFinal()
     QPointF azAlt0 = solverToAzAlt(_ra0, _de0, jd0);
     QPointF azAlt1 = solverToAzAlt(_ra1, _de1, jd1);
     QPointF azAlt2 = solverToAzAlt(_ra2, _de2, jd2);
-    logInfo("azAlt0: az=" + QString::number(azAlt0.x()) + " alt=" + QString::number(azAlt0.y()));
-    logInfo("azAlt1: az=" + QString::number(azAlt1.x()) + " alt=" + QString::number(azAlt1.y()));
-    logInfo("azAlt2: az=" + QString::number(azAlt2.x()) + " alt=" + QString::number(azAlt2.y()));
+    logInfo("azAlt0: az=%1 alt=%2", {QString::number(azAlt0.x()), QString::number(azAlt0.y())});
+    logInfo("azAlt1: az=%1 alt=%2", {QString::number(azAlt1.x()), QString::number(azAlt1.y())});
+    logInfo("azAlt2: az=%1 alt=%2", {QString::number(azAlt2.x()), QString::number(azAlt2.y())});
 
     Rotations::V3 p0(Rotations::azAlt2xyz(azAlt0));
     Rotations::V3 p1(Rotations::azAlt2xyz(azAlt1));
@@ -593,7 +593,7 @@ void Polar::SMComputeFinal()
     }
 
     QPointF azAlt = Rotations::xyz2azAlt(axis);
-    logInfo("axis azAlt: az=" + QString::number(azAlt.x()) + " alt=" + QString::number(azAlt.y()));
+    logInfo("axis azAlt: az=%1 alt=%2", {QString::number(azAlt.x()), QString::number(azAlt.y())});
 
     // Azimuth error: how far the axis is from due North (should be 0)
     _erraz = azAlt.x();
@@ -613,7 +613,7 @@ void Polar::SMComputeFinal()
     // Store the Az/Alt of image 3 as the reference for the correction loop
     _refAz  = azAlt2.x();
     _refAlt = azAlt2.y();
-    logInfo("Correction reference: refAz=" + QString::number(_refAz) + " refAlt=" + QString::number(_refAlt));
+    logInfo("Correction reference: refAz=%1 refAlt=%2", {QString::number(_refAz), QString::number(_refAlt)});
 
     // Draw initial error overlay on the last image and publish it
     if (!_lastRawImage.isNull())
@@ -664,8 +664,7 @@ void Polar::SMCorrCompute()
     double remainAlt = _erralt - dAlt;
     double remainTot = sqrt(remainAz * remainAz + remainAlt * remainAlt);
 
-    logInfo("Correction loop: dAz=" + QString::number(dAz) + " dAlt=" + QString::number(dAlt)
-            + " remainAz=" + QString::number(remainAz) + " remainAlt=" + QString::number(remainAlt));
+    logInfo("Correction loop: dAz=%1 dAlt=%2 remainAz=%3 remainAlt=%4", {QString::number(dAz), QString::number(dAlt), QString::number(remainAz), QString::number(remainAlt)});
 
     getEltFloat("errors", "erraz")->setValue(remainAz, false);
     getEltFloat("errors", "erralt")->setValue(remainAlt, false);

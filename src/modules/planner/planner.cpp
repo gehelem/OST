@@ -301,7 +301,7 @@ void Planner::startLine()
     getEltPrg("planning", "progress")->setPrgValue(0, false);
     getProperty("planning")->updateLine(mCurrentLine);
 
-    logInfo("Navigator is slewing to target " + getString("planning", "object"));
+    logInfo("Navigator is slewing to target %1", {getString("planning", "object")});
 
     mWaitingSequence = false;
     mWaitingNavigator = true;
