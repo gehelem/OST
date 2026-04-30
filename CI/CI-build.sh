@@ -10,7 +10,6 @@ apt-add-repository ppa:mutlaqja/ppa
 apt-get update
 apt-get install -y build-essential cmake git npm file dpkg-dev \
     qt6-base-dev qt6-websockets-dev qt6-scxml-dev qt6-tools-dev-tools \
-    qt6-statemachine-dev \
     libindi-dev libstellarsolver-dev libnova-dev libgsl-dev \
     wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev \
     zlib1g-dev libeigen3-dev libraw-dev libsecret-1-dev libopencv-dev \
