@@ -1025,8 +1025,8 @@ double IndiModule::getPixelSize(const QString &deviceName)
         if (!connectDevice(deviceName)) return 0;
     }
     INDI::PropertyNumber prop = dp.getNumber("CCD_INFO");
-    float f=prop.findWidgetByName("CCD_PIXEL_SIZE")->getValue();
-    logDebug("getPixelSize result : %1 %2",{deviceName,f});
+    float f = prop.findWidgetByName("CCD_PIXEL_SIZE")->getValue();
+    //logDebug("getPixelSize result : %1 %2",{deviceName,f});
     return f;
 
 }
