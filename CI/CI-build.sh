@@ -9,14 +9,11 @@ apt-get install -y software-properties-common
 apt-add-repository ppa:mutlaqja/ppa
 apt-get update
 apt-get install -y build-essential cmake git npm file dpkg-dev \
-    qtbase5-dev libqt5websockets5-dev libqt5scxml5-dev qttools5-dev-tools \
-    qtdeclarative5-dev libqt5svg5-dev \
+    qt6-base-dev qt6-websockets-dev qt6-scxml-dev qt6-tools-dev-tools \
+    qt6-statemachine-dev \
     libindi-dev libstellarsolver-dev libnova-dev libgsl-dev \
     wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev \
     zlib1g-dev libeigen3-dev libraw-dev libsecret-1-dev libopencv-dev \
-    libkf5doctools-dev libkf5config-dev libkf5guiaddons-dev libkf5i18n-dev \
-    libkf5newstuff-dev libkf5notifications-dev libkf5xmlgui-dev \
-    libkf5plotting-dev libkf5crash-dev libkf5notifyconfig-dev \
     extra-cmake-modules
 
 mkdir -p build media
