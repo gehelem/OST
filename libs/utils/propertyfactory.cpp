@@ -160,7 +160,7 @@ PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVaria
         pProperty->setBadge(pData["badge"].toBool());
     }
     QVariantMap elts = pData["e"].toMap();
-    foreach(const QString &key, elts.keys())
+    for(const QString &key : elts.keys())
     {
         QVariantMap elt = elts[key].toMap();
         ElementBase *v = ElementFactory::createElement(key, elt);

@@ -42,8 +42,7 @@ void IndiPanel::onNewDevice(INDI::BaseDevice dp)
 }
 void IndiPanel::onRemoveDevice(INDI::BaseDevice dp)
 {
-    foreach(const QString &key, getStore().keys())
-    {
+    for(const QString &key : getStore().keys())    {
         getProperty(key)->level1();
         if (strcmp(dp.getDeviceName(), getProperty(key)->level1().toStdString().c_str()) == 0)
         {

@@ -170,7 +170,7 @@ bool  PropertyMulti::setElt(QString key, QVariant val, bool emitEvent)
             case OneOfMany:
                 if (val.toBool())
                 {
-                    foreach(const QString &elt, mElts.keys())
+                    for(const QString &elt : mElts.keys())
                     {
                         if ((mElts[elt]->getType() == "bool") && (elt != key))
                         {
@@ -187,7 +187,7 @@ bool  PropertyMulti::setElt(QString key, QVariant val, bool emitEvent)
                 return false;
                 break;
             case AtMostOne:
-                foreach(const QString &elt, mElts.keys())
+                for(const QString &elt : mElts.keys())
                 {
                     if ((mElts[elt]->getType() == "bool") && (elt != key))
                     {
@@ -250,7 +250,7 @@ void PropertyMulti::push()
         return;
     }
     QMap<QString, ValueBase*> wGridLine;
-    foreach(const QString &elt, mElts.keys())
+    for(const QString &elt : mElts.keys())
     {
         wGridLine[elt] = ValueFactory::createValue(mElts[elt]);
     }
@@ -267,7 +267,7 @@ void PropertyMulti::push()
 void PropertyMulti::setAll(const QVariantMap &pValues)
 {
     /* Check if data is valid and contains every value */
-    foreach(const QString &elt, mElts.keys())
+    for(const QString &elt : mElts.keys())
     {
         if ((mElts[elt]->getType() == "int") || (mElts[elt]->getType() == "float") || (mElts[elt]->getType() == "string")
                 || (mElts[elt]->getType() == "bool") || (mElts[elt]->getType() == "date") || (mElts[elt]->getType() == "time")
@@ -281,7 +281,7 @@ void PropertyMulti::setAll(const QVariantMap &pValues)
         }
     }
 
-    foreach(const QString &elt, mElts.keys())
+    for(const QString &elt : mElts.keys())
     {
         setElt(elt, pValues[elt], false);
 
@@ -297,7 +297,7 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
         return;
     }
     /* Check if data is valid and contains every value */
-    foreach(const QString &elt, mElts.keys())
+    for(const QString &elt : mElts.keys())
     {
         if ((mElts[elt]->getType() == "int") || (mElts[elt]->getType() == "float") || (mElts[elt]->getType() == "string")
                 || (mElts[elt]->getType() == "bool") || (mElts[elt]->getType() == "date") || (mElts[elt]->getType() == "time")
@@ -312,7 +312,7 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
         }
     }
 
-    foreach(const QString &elt, mElts.keys())
+    for(const QString &elt : mElts.keys())
     {
         setElt(elt, pValues[elt]);
 
@@ -334,7 +334,7 @@ bool PropertyMulti::updateLine(const int i, const QVariantMap &pValues)
     }
 
     /* Check if data is valid and contains every value */
-    foreach(const QString &elt, mElts.keys())
+    for(const QString &elt : mElts.keys())
     {
         if ((mElts[elt]->getType() == "int") || (mElts[elt]->getType() == "float") || (mElts[elt]->getType() == "string")
                 || (mElts[elt]->getType() == "bool") || (mElts[elt]->getType() == "date") || (mElts[elt]->getType() == "time"))
@@ -346,7 +346,7 @@ bool PropertyMulti::updateLine(const int i, const QVariantMap &pValues)
             }
         }
     }
-    //foreach(const QString &elt, mElts.keys())
+    //for(const QString &elt : mElts.keys())
     //{
     //    if (mElts[elt]->getType() == "int" || mElts[elt]->getType() == "float" || mElts[elt]->getType() == "string")
     //    {
@@ -358,12 +358,12 @@ bool PropertyMulti::updateLine(const int i, const QVariantMap &pValues)
     //        mElts[elt]->accept(&d, action, m);
     //    }
     //}
-    foreach(const QString &elt, mElts.keys())
+    for(const QString &elt : mElts.keys())
     {
         setElt(elt, pValues[elt]);
     }
 
-    foreach( ValueBase* v, mGrid[i])
+    for( ValueBase* v : mGrid[i])
     {
         v->updateValue();
     }
@@ -539,7 +539,7 @@ bool PropertyMulti::fetchLine(int l)
         logWarning("Can't fetch line %1 >= %2", {QString::number(l), QString::number(mGrid.size())});
         return false;
     }
-    foreach(const QString &e, mGrid.at(l).keys())
+    for(const QString &e : mGrid.at(l).keys())
     {
         mGrid.at(l)[e]->updateElement(true);
     }
@@ -553,7 +553,7 @@ bool PropertyMulti::updateLine(const int i)
         logWarning("Can't update line %1 >= %2", {QString::number(i), QString::number(mGrid.size())});
         return false;
     }
-    foreach(const QString &e, mGrid.at(i).keys())
+    for(const QString &e : mGrid.at(i).keys())
     {
         mGrid.at(i)[e]->updateValue();
     }

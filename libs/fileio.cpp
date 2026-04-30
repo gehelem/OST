@@ -1,5 +1,6 @@
 #include "fileio.h"
 #include <QFileInfo>
+#include <QRegularExpression>
 #include <QtConcurrent>
 
 fileio::fileio()
@@ -61,7 +62,7 @@ bool fileio::loadFits(QString fileName)
 
     // Use open diskfile as it does not use extended file names which has problems opening
     // files with [ ] or ( ) in their names.
-    if (fits_open_diskfile(&fptr, file.toLocal8Bit(), READONLY, &status))
+    if (fits_open_diskfile(&fptr, file.toUtf8().constData(), READONLY, &status))
     {
         logIssue(QString("Error opening fits file %1").arg(file));
         return false;
@@ -186,7 +187,7 @@ bool fileio::loadFits(QString fileName)
 bool fileio::loadOtherFormat(QString fileName)
 {
     file = fileName;
-    QImageReader fileReader(file.toLocal8Bit());
+    QImageReader fileReader(file);
 
     if (QImageReader::supportedImageFormats().contains(fileReader.format()) == false)
     {
@@ -196,7 +197,7 @@ bool fileio::loadOtherFormat(QString fileName)
     }
 
     QImage imageFromFile;
-    if(!imageFromFile.load(file.toLocal8Bit()))
+    if(!imageFromFile.load(file))
     {
         logIssue("Failed to open image.");
         return false;
@@ -642,7 +643,7 @@ bool fileio::getSolverOptionsFromFITS()
 
     // Use open diskfile as it does not use extended file names which has problems opening
     // files with [ ] or ( ) in their names.
-    if (fits_open_diskfile(&fptr, file.toLocal8Bit(), READONLY, &status))
+    if (fits_open_diskfile(&fptr, file.toUtf8().constData(), READONLY, &status))
     {
         fits_report_error(stderr, status);
         fits_get_errstatus(status, error_status);
@@ -828,7 +829,7 @@ bool fileio::parseHeader()
         Record oneRecord;
         // Quotes cause issues for simplified below so we're removing them.
         QString record = recordList.mid(i * 80, 80).remove("'");
-        QStringList properties = record.split(QRegExp("[=/]"));
+        QStringList properties = record.split(QRegularExpression("[=/]"));
         // If it is only a comment
         if (properties.size() == 1)
         {
@@ -914,7 +915,7 @@ bool fileio::saveAsFITS(QString fileName, FITSImage::Statistic &imageStats, uint
     nelements = imageStats.samples_per_channel * channels;
 
     /* Create a new File, overwriting existing*/
-    if (fits_create_file(&new_fptr, fileName.toLocal8Bit(), &status))
+    if (fits_create_file(&new_fptr, fileName.toUtf8().constData(), &status))
     {
         fits_report_error(stderr, status);
         return false;

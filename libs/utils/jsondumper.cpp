@@ -39,7 +39,7 @@ void JSonDumper::visit(MultiProperty *pProperty)
 {
     QJsonObject json = dumpPropertyCommons(pProperty);
     QJsonObject jsonElements;
-    foreach(const QString &key, pProperty->getElts().keys())
+    for(const QString &key : pProperty->getElts().keys())
     {
         QJsonObject jsonElement;
         JSonDumper d;

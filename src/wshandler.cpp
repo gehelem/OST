@@ -430,8 +430,7 @@ void WShandler::onLog(OST::LogLevel level, const QString &message,
 QJsonObject WShandler::translateJson(const QJsonObject pJsonObject, const QString &pLng)
 {
     QJsonObject obj = pJsonObject;
-    foreach(const QString &key, obj.keys())
-    {
+    for(const QString &key : obj.keys())    {
         QJsonValue value = obj[key];
         if ((key == "label" || key == "hint") && obj[key].isString())
         {

@@ -1,7 +1,7 @@
 #ifndef WSHANDLER_h_
 #define WSHANDLER_h_
-#include "QtWebSockets/qwebsocketserver.h"
-#include "QtWebSockets/qwebsocket.h"
+#include <QWebSocketServer>
+#include <QWebSocket>
 #include <QSslCertificate>
 #include <QSslKey>
 #include <QVariantList>
