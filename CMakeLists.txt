@@ -32,7 +32,7 @@ find_package(Nova REQUIRED)
 find_package(GSL REQUIRED)
 #find_package(OpenCV REQUIRED )
 find_package(WCSLIB REQUIRED)
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql Scxml Xml REQUIRED)
+find_package(QT NAMES Qt6 COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql Scxml Xml REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql Scxml Xml)
 find_package(StellarSolver REQUIRED)
 find_library(avahi-client-lib avahi-client REQUIRED)
@@ -74,7 +74,7 @@ set(TS_FILES
 )
 
 # Find lrelease executable
-find_program(QT_LRELEASE_EXECUTABLE NAMES lrelease-qt6 lrelease-qt5 lrelease)
+find_program(QT_LRELEASE_EXECUTABLE NAMES lrelease-qt6 lrelease)
 if(NOT QT_LRELEASE_EXECUTABLE)
     message(FATAL_ERROR "lrelease not found. Cannot compile translation files.")
 endif()
