@@ -74,7 +74,11 @@ set(TS_FILES
 )
 
 # Find lrelease executable
-find_program(QT_LRELEASE_EXECUTABLE NAMES lrelease-qt6 lrelease)
+find_program(QT_LRELEASE_EXECUTABLE
+    NAMES lrelease-qt6 lrelease
+    HINTS /usr/lib/qt6/bin
+          ${Qt6_DIR}/../../../bin
+)
 if(NOT QT_LRELEASE_EXECUTABLE)
     message(FATAL_ERROR "lrelease not found. Cannot compile translation files.")
 endif()
