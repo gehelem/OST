@@ -225,7 +225,7 @@ void IndiPanel::onUpdateProperty (INDI::Property property)
 
             for (unsigned int i = 0; i < t.count(); i++)
             {
-                o[t[i].name] = t[i].text;
+                o[t[i].name] = QString::fromUtf8(t[i].text);
             }
             getProperty(devpro)->setAll(o);
             break;
