@@ -496,25 +496,26 @@ void Polar::syncMount(double ra_j2000_deg, double dec_j2000_deg)
 }
 QPointF Polar::solverToAzAlt(double ra_j2000_deg, double dec_j2000_deg, double jd)
 {
-    // Step 1: J2000 -> apparent (accounts for precession, nutation, aberration)
-    INDI::IEquatorialCoordinates j2000, apparent;
-    j2000.rightascension = ra_j2000_deg * 24.0 / 360.0;  // degrees -> hours
-    j2000.declination    = dec_j2000_deg;
-    INDI::J2000toObserved(&j2000, jd, &apparent);
-    // apparent.rightascension in hours, apparent.declination in degrees
+    // Use J2000 RA/Dec directly (no precession correction).
+    // Applying J2000→apparent precession introduces differential DEC errors between
+    // the three images (because the DEC precession rate varies strongly with RA),
+    // which distorts the arc and produces large spurious azimuth errors.
+    // Ekos/KStars uses the same J2000-direct approach.
+    double ra_h  = ra_j2000_deg * 24.0 / 360.0;   // degrees -> hours
+    double dec_d = dec_j2000_deg;                  // degrees
 
-    // Step 2: hour angle (LST - RA_apparent)
+    // Hour angle (LST - RA_J2000)
     double gst = ln_get_apparent_sidereal_time(jd);       // hours, Greenwich
     double lst = gst + _observerLon / 15.0;               // hours, local (East positive)
-    double ha  = lst - apparent.rightascension;            // hours
+    double ha  = lst - ra_h;                              // hours
     while (ha >  12.0) ha -= 24.0;
     while (ha < -12.0) ha += 24.0;
 
-    // Step 3: equatorial -> horizontal (standard trigonometric formula)
+    // Equatorial -> horizontal (standard trigonometric formula)
     // Convention: Az = 0 North, 90 East, 180 South, 270 West
-    double lat_r = _observerLat          * M_PI / 180.0;
-    double ha_r  = ha * 15.0             * M_PI / 180.0;  // hours -> degrees -> radians
-    double dec_r = apparent.declination  * M_PI / 180.0;
+    double lat_r = _observerLat * M_PI / 180.0;
+    double ha_r  = ha * 15.0   * M_PI / 180.0;   // hours -> degrees -> radians
+    double dec_r = dec_d       * M_PI / 180.0;
 
     double sin_alt = sin(lat_r) * sin(dec_r) + cos(lat_r) * cos(dec_r) * cos(ha_r);
     sin_alt = qBound(-1.0, sin_alt, 1.0);
