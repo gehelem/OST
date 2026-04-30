@@ -125,7 +125,7 @@ set(CPACK_DEBIAN_RUNTIME_PACKAGE_MAINTAINER "gilles <gilles@joag.fr>")
 set(CPACK_DEBIAN_RUNTIME_DESCRIPTION
     "Observatoire Sans Tête\n Light and headless astrophotography automation tool")
 set(CPACK_DEBIAN_RUNTIME_PACKAGE_DEPENDS
-    "libqt5core5a, libqt5network5, libqt5websockets5, libqt5sql5, libqt5sql5-sqlite")
+    "libqt6core6, libqt6network6, libqt6websockets6, libqt6sql6, libqt6sql6-sqlite")
 set(CPACK_DEBIAN_RUNTIME_PACKAGE_RECOMMENDS
     "libindi1, libstellarsolver")
 set(CPACK_DEBIAN_RUNTIME_PACKAGE_SHLIBDEPS ON)
