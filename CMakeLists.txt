@@ -32,8 +32,8 @@ find_package(Nova REQUIRED)
 find_package(GSL REQUIRED)
 #find_package(OpenCV REQUIRED )
 find_package(WCSLIB REQUIRED)
-find_package(QT NAMES Qt6 COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql Scxml Xml REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql Scxml Xml)
+find_package(QT NAMES Qt6 COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql Scxml StateMachine Xml REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql Scxml StateMachine Xml)
 find_package(StellarSolver REQUIRED)
 find_library(avahi-client-lib avahi-client REQUIRED)
 find_library(avahi-common-lib avahi-common REQUIRED)
@@ -374,6 +374,7 @@ target_link_libraries(ostfocus PRIVATE
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Scxml
+    Qt${QT_VERSION_MAJOR}::StateMachine
     Threads::Threads
     z
 )
@@ -407,7 +408,7 @@ target_link_libraries(ostguider PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Widgets
-    Qt${QT_VERSION_MAJOR}::Scxml
+    Qt${QT_VERSION_MAJOR}::StateMachine
     Threads::Threads
     z
 )
@@ -491,6 +492,7 @@ target_link_libraries(ostpolar PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::StateMachine
     Threads::Threads
     z
 )

@@ -1225,7 +1225,8 @@ void fileio::calculateMinMax()
         for (int i = 0; i < nThreads; i++)
         {
             // Run threads
-            futures.append(QtConcurrent::run(this, &fileio::getParitionMinMax<T>, tStart, (i == (nThreads - 1)) ? fStride : tStride));
+            uint32_t stride = (i == (nThreads - 1)) ? fStride : tStride;
+            futures.append(QtConcurrent::run([this, tStart, stride]() { return getParitionMinMax<T>(tStart, stride); }));
             tStart += tStride;
         }
 
@@ -1333,8 +1334,8 @@ void fileio::runningAverageStdDev()
         for (int i = 0; i < nThreads; i++)
         {
             // Run threads
-            futures.append(QtConcurrent::run(this, &fileio::getSquaredSumAndMean<T>, tStart,
-                                             (i == (nThreads - 1)) ? fStride : tStride));
+            uint32_t stride = (i == (nThreads - 1)) ? fStride : tStride;
+            futures.append(QtConcurrent::run([this, tStart, stride]() { return getSquaredSumAndMean<T>(tStart, stride); }));
             tStart += tStride;
         }
 
@@ -1374,7 +1375,7 @@ QPair<double, double> fileio::getSquaredSumAndMean(uint32_t start, uint32_t stri
         m_n++;
     }
 
-    return qMakePair<double, double>(m_newM, m_newS);
+    return qMakePair(m_newM, m_newS);
 }
 /* taken from Kstars fitviewer FITSData */
 template <typename T>
