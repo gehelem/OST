@@ -130,7 +130,13 @@ bool IndiModule::onExternalEventIndi(OST::ExtEvent event)
         }
 
     }
+
+    if (event.ev == OST::ExtEvType::J2 && event.prpkey == "devices")
+    {
+        refreshDeviceslovs();
+    }
     return true;
+
 }
 void IndiModule::connectIndiTimer()
 {
@@ -795,6 +801,17 @@ void IndiModule::OnAfterIndiConnectIndiTimer()
 }
 bool IndiModule::refreshDeviceslovs()
 {
+    getGlovString("DRIVER_INTERFACE-GENERAL_INTERFACE")->lovClear();
+    getGlovString("DRIVER_INTERFACE-CCD_INTERFACE")->lovClear();
+    getGlovString("DRIVER_INTERFACE-TELESCOPE_INTERFACE")->lovClear();
+    getGlovString("DRIVER_INTERFACE-GUIDER_INTERFACE")->lovClear();
+    getGlovString("DRIVER_INTERFACE-FOCUSER_INTERFACE")->lovClear();
+    getGlovString("DRIVER_INTERFACE-FILTER_INTERFACE")->lovClear();
+    getGlovString("DRIVER_INTERFACE-GPS_INTERFACE")->lovClear();
+    getGlovString("DRIVER_INTERFACE-WEATHER_INTERFACE")->lovClear();
+    getGlovString("DRIVER_INTERFACE-AUX_INTERFACE")->lovClear();
+
+
     std::vector<INDI::BaseDevice> devs = getDevices();
     for(std::size_t i = 0; i < devs.size(); i++)
     {
@@ -1045,6 +1062,7 @@ bool IndiModule::giveMeADevice(QString name, QString label, INDI::BaseDevice::DR
 {
     OST::PropertyMulti* pm = getProperty("devices");
     OST::ElementString* s = new  OST::ElementString(name, label, label, "");
+    s->setPostIcon("refresh");
     switch (interface)
     {
         case INDI::BaseDevice::DRIVER_INTERFACE::GENERAL_INTERFACE:
