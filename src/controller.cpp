@@ -905,7 +905,7 @@ QJsonObject Controller::getModulesDump(QString clientgrant)
         mControllerLovs[key]->accept(&d);
         lovs[key] = d.getResult();
     }
-    dump["l"] = lovs;
+    dump["lovs"] = lovs;
 
     result["d"] = dump;
     return result;

@@ -463,7 +463,7 @@ void WShandler::onControllerEvent(OST::EvType evt, QString key, QVariant data, O
         OST::LovJsonDumper d;
         lov->accept(&d);
         globlovs[lov->getKey()] = d.getResult();
-        o["l"] = globlovs;
+        o["lovs"] = globlovs;
         s[OST::EvToString(evt)] = o;
     }
     if (evt == OST::EvType::ld)
@@ -471,7 +471,7 @@ void WShandler::onControllerEvent(OST::EvType evt, QString key, QVariant data, O
         OST::LovJsonDumper d;
         lov->accept(&d);
         globlovs[key] = QJsonObject();
-        o["l"] = globlovs;
+        o["lovs"] = globlovs;
         s[OST::EvToString(evt)] = o;
     }
 
