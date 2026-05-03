@@ -49,7 +49,6 @@ ElementBase *ElementFactory::createElement(const QString &key, const QVariantMap
             {
                 if (pData["listOfValues"].canConvert<QVariantList>())
                 {
-                    QVariantMap elts = pData["listOfValues"].toMap();
                     QList ll  = pData["listOfValues"].toList();
                     foreach (auto line, ll)
                     {
@@ -86,7 +85,6 @@ ElementBase *ElementFactory::createElement(const QString &key, const QVariantMap
             {
                 if (pData["listOfValues"].canConvert<QVariantList>())
                 {
-                    QVariantMap elts = pData["listOfValues"].toMap();
                     QList ll  = pData["listOfValues"].toList();
                     foreach (auto line, ll)
                     {
@@ -124,7 +122,6 @@ ElementBase *ElementFactory::createElement(const QString &key, const QVariantMap
             {
                 if (pData["listOfValues"].canConvert<QVariantList>())
                 {
-                    QVariantMap elts = pData["listOfValues"].toMap();
                     QList ll  = pData["listOfValues"].toList();
                     foreach (auto line, ll)
                     {
