@@ -184,6 +184,20 @@ enum class LogLevel
 };
 
 /**
+ * @enum LovScope
+ * @brief Scope of a global LOV — determines who is responsible for its content
+ *
+ * Module: the LOV is owned and populated by the module itself.
+ * Controller: the LOV is owned and populated by the controller.
+ * The frontend uses this to know where to look up the LOV by name.
+ */
+enum class LovScope
+{
+    Module = 0,  /*!< LOV is managed by the module */
+    Controller   /*!< LOV is managed by the controller */
+};
+
+/**
  * @struct ModuleStatus
  * @brief Module status information structure
  *

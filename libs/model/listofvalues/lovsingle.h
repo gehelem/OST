@@ -17,6 +17,7 @@ class LovSingle : public LovBase
             mLov.clear();
         }
         ~LovSingle() {}
+
         QMap<T, QString> getLov()
         {
             return mLov;
@@ -69,7 +70,6 @@ class LovSingle : public LovBase
         }
     private:
         QMap<T, QString> mLov;
-
 
 };
 

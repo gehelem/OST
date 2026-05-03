@@ -10,50 +10,43 @@ LovBase *LovFactory::createLov(const QVariantMap &pData)
         if (pData["type"].toString() == "string")
         {
             auto *pLov = new LovString(pData["label"].toString());
-            if (pData.contains("values"))
+            if (pData.contains("values") && pData["values"].canConvert<QVariantMap>())
             {
-                QList ll  = pData["values"].toList();
-                foreach (QVariant line, ll)
+                // Object format written by LovJsonDumper: { "value": "label" }
+                QVariantMap vmap = pData["values"].toMap();
+                for (auto it = vmap.constBegin(); it != vmap.constEnd(); ++it)
                 {
-                    pLov->lovAdd(line.toList()[0].toString(), line.toList()[1].toString());
+                    pLov->lovAdd(it.key(), it.value().toString());
                 }
-
             }
-
-
             return pLov;
         }
         if (pData["type"].toString() == "int")
         {
             auto *pLov = new LovInt(pData["label"].toString());
-            if (pData.contains("values"))
+            if (pData.contains("values") && pData["values"].canConvert<QVariantMap>())
             {
-                QList ll  = pData["values"].toList();
-                foreach (QVariant line, ll)
+                // Object format written by LovJsonDumper: { "value_as_string": "label" }
+                QVariantMap vmap = pData["values"].toMap();
+                for (auto it = vmap.constBegin(); it != vmap.constEnd(); ++it)
                 {
-                    long i = line.toList()[0].toInt();
-                    pLov->lovAdd(i, line.toList()[1].toString());
+                    pLov->lovAdd(it.key().toLongLong(), it.value().toString());
                 }
-
             }
-
-
             return pLov;
         }
         if (pData["type"].toString() == "float")
         {
             auto *pLov = new LovFloat(pData["label"].toString());
-            if (pData.contains("values"))
+            if (pData.contains("values") && pData["values"].canConvert<QVariantMap>())
             {
-                QList ll  = pData["values"].toList();
-                foreach (QVariant line, ll)
+                // Object format written by LovJsonDumper: { "value_as_string": "label" }
+                QVariantMap vmap = pData["values"].toMap();
+                for (auto it = vmap.constBegin(); it != vmap.constEnd(); ++it)
                 {
-                    pLov->lovAdd(line.toList()[0].toFloat(), line.toList()[1].toString());
+                    pLov->lovAdd(it.key().toDouble(), it.value().toString());
                 }
-
             }
-
-
             return pLov;
         }
 

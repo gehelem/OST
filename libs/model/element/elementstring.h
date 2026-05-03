@@ -108,26 +108,26 @@ class ElementString: public ElementTemplateNotNumeric<QString>
 
         /**
          * @brief Add value to LOV
-         * @param val String value (key)
+         * @param val   String value (key)
          * @param label Display label for this value
          * @return true if added, false if value already exists
          */
         bool lovAdd(QString val, QString label);
 
         /**
-         * @brief Update LOV value label
-         * @param val String value to update
+         * @brief Update LOV label for an existing value
+         * @param val   String value to update
          * @param label New display label
          * @return true if updated, false if value not found
          */
-        bool lovUpdate(QString  val, QString label);
+        bool lovUpdate(QString val, QString label);
 
         /**
          * @brief Delete value from LOV
          * @param val String value to delete
          * @return true if deleted, false if value not found
          */
-        bool lovDel(QString  val);
+        bool lovDel(QString val);
 
         /**
          * @brief Clear all LOV entries

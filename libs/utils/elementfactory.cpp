@@ -57,9 +57,10 @@ ElementBase *ElementFactory::createElement(const QString &key, const QVariantMap
                 }
                 else
                 {
-                    bool b = false;
-                    if (pData.contains("listOfValuesIsExternal"))  b = pData["listOfValuesIsExternal"].toBool();
-                    pElement->setGlobalLov(pData["listOfValues"].toString(), b);
+                    LovScope scope = LovScope::Module;
+                    if (pData.contains("listOfValuesIsExternal") && pData["listOfValuesIsExternal"].toBool())
+                        scope = LovScope::Controller;
+                    pElement->setGlobalLov(pData["listOfValues"].toString(), scope);
                 }
             }
             return pElement;
@@ -94,9 +95,10 @@ ElementBase *ElementFactory::createElement(const QString &key, const QVariantMap
                 }
                 else
                 {
-                    bool b = false;
-                    if (pData.contains("listOfValuesIsExternal"))  b = pData["listOfValuesIsExternal"].toBool();
-                    pElement->setGlobalLov(pData["listOfValues"].toString(), b);
+                    LovScope scope = LovScope::Module;
+                    if (pData.contains("listOfValuesIsExternal") && pData["listOfValuesIsExternal"].toBool())
+                        scope = LovScope::Controller;
+                    pElement->setGlobalLov(pData["listOfValues"].toString(), scope);
                 }
             }
             return pElement;
@@ -130,9 +132,10 @@ ElementBase *ElementFactory::createElement(const QString &key, const QVariantMap
                 }
                 else
                 {
-                    bool b = false;
-                    if (pData.contains("listOfValuesIsExternal"))  b = pData["listOfValuesIsExternal"].toBool();
-                    pElement->setGlobalLov(pData["listOfValues"].toString(), b);
+                    LovScope scope = LovScope::Module;
+                    if (pData.contains("listOfValuesIsExternal") && pData["listOfValuesIsExternal"].toBool())
+                        scope = LovScope::Controller;
+                    pElement->setGlobalLov(pData["listOfValues"].toString(), scope);
                 }
             }
             return pElement;

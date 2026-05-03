@@ -26,11 +26,11 @@ bool ElementInt::lovAdd(int val, QString label)
 {
     return mLov.lovAdd(val, label);
 }
-bool ElementInt::lovUpdate(int  val, QString label)
+bool ElementInt::lovUpdate(int val, QString label)
 {
     return mLov.lovUpdate(val, label);
 }
-bool ElementInt::lovDel(int  val)
+bool ElementInt::lovDel(int val)
 {
     return mLov.lovDel(val);
 }

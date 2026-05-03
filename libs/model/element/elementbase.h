@@ -210,31 +210,38 @@ class ElementBase: public QObject
 
         /**
          * @brief Get global LOV scope
-         * @return false if lov is handled by module, false if it's handled by controller
-         *
+         * @return LovScope::Module if managed by the module, LovScope::Controller if managed by controller
          */
-        bool getGlobalLovIsExternal()
+        LovScope getLovScope()
         {
-            return mGlobLovIsExternal;
+            return mLovScope;
+        }
+
+        /**
+         * @brief Get whether the element value must belong to the LOV
+         * @return true if frontend should enforce selection from LOV only
+         */
+        bool getLovConstrained()
+        {
+            return mLovConstrained;
         }
 
         /**
          * @brief Set global LOV reference
-         * @param lovName Key of global LOV in Datastore::mGlobLov or controller
-         * @param external Bool - false if lov is managed directly by module, true if managed by controller
+         * @param lovName   Key of the global LOV
+         * @param scope     Who owns the LOV: LovScope::Module (default) or LovScope::Controller
          *
          * Links element to a global LOV for dynamic dropdowns.
          */
-        void setGlobalLov(QString lovName, bool external);
+        void setGlobalLov(QString lovName, LovScope scope = LovScope::Module);
+
         /**
-         * @brief Set global LOV reference - managed by module
-         * @param lovName Key of global LOV in Datastore::mGlobLov
-         *
-         * Links element to a global LOV for dynamic dropdowns.
+         * @brief Set whether the element value must be constrained to the LOV
+         * @param constrained true = frontend enforces selection from LOV only
          */
-        void setGlobalLov(QString lovName)
+        void setLovConstrained(bool constrained)
         {
-            setGlobalLov(lovName, false);
+            mLovConstrained = constrained;
         }
 
     private:
@@ -248,8 +255,8 @@ class ElementBase: public QObject
         QString mPreIcon = "";            /*!< Prefix icon identifier */
         QString mPostIcon = "";           /*!< Postfix icon identifier */
         QString mGlobalLov = "";          /*!< Reference to global LOV key */
-        bool mGlobLovIsExternal =
-            false; /*!< wether if globallov is managed by module or is external to module (ie. controller ...) */
+        LovScope mLovScope = LovScope::Module; /*!< Who is responsible for this LOV's content */
+        bool mLovConstrained = false;     /*!< Frontend hint: value must belong to the LOV */
 
     public slots:
         /**

@@ -2,6 +2,7 @@
 #include <basedevice.h>
 #include "indimodule.h"
 #include "version.cc"
+#include <common.h>
 
 IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
     : Basemodule(name, label, profile, availableModuleLibs)
@@ -1004,7 +1005,7 @@ bool IndiModule::defineMeAsNavigator()
     s = new  OST::ElementString("plannermodule", "Planner module", "nav30", "");
     s->setDirectEdit(true);
     s->setAutoUpdate(true);
-    s->setGlobalLov("loadedModules-planner", true); /* loaded modules lov is handled by controller */
+    s->setGlobalLov("loadedModules-planner", OST::LovScope::Controller);
     pm->addElt(s);
 
     mIsNavigator = true;
