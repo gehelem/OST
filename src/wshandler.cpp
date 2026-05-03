@@ -6,6 +6,7 @@
 #include "wshandler.h"
 #include "translatemanager.h"
 #include "model/element/common.h"
+#include <lovjsondumper.h>
 #include "libs/utils/modulejsondumper.h"
 /*!
 
@@ -436,23 +437,44 @@ QJsonObject WShandler::translateJson(const QJsonObject pJsonObject, const QStrin
     }
     return obj;
 }
-void WShandler::onControllerEvent(OST::EvType evt, QString key, QVariant data)
+void WShandler::onControllerEvent(OST::EvType evt, QString key, QVariant data, OST::LovBase *lov)
 {
-    QJsonObject o, s;
-    if (strcmp(data.typeName(), "QStringList") == 0)
+    QJsonObject globlovs, result, o, s;
+    if (evt == OST::EvType::uc)
     {
+        if (strcmp(data.typeName(), "QStringList") == 0)
+        {
 
-        o[key] = data.toJsonArray();
-    }
-    else if (strcmp(data.typeName(), "QVariantMap") == 0)
-    {
+            o[key] = data.toJsonArray();
+        }
+        else if (strcmp(data.typeName(), "QVariantMap") == 0)
+        {
 
-        o[key] = data.toJsonObject();
+            o[key] = data.toJsonObject();
+        }
+        else
+        {
+            o[key] = data.toJsonValue();
+        }
+        s[EvToString(evt)] = o;
     }
-    else
+    if (evt == OST::EvType::lc || evt == OST::EvType::lu)
     {
-        o[key] = data.toJsonValue();
+        OST::LovJsonDumper d;
+        lov->accept(&d);
+        globlovs[lov->getKey()] = d.getResult();
+        o["l"] = globlovs;
+        s[OST::EvToString(evt)] = o;
     }
-    s[EvToString(evt)] = o;
+    if (evt == OST::EvType::ld)
+    {
+        OST::LovJsonDumper d;
+        lov->accept(&d);
+        globlovs[key] = QJsonObject();
+        o["l"] = globlovs;
+        s[OST::EvToString(evt)] = o;
+    }
+
+
     sendJsonMessage(s);
 }

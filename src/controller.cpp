@@ -77,6 +77,13 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     connect(dbmanager, &Basemodule::logSignal, mLogger, &OST::Logger::onLog);
     connect(dbmanager, &Basemodule::logSignal, wshandler, &WShandler::onLog);
 
+    // create controller lovs
+    OST::LovString* ls = new OST::LovString("availableconfs");
+    createControllerLov("availableconfs", ls);
+
+    ls = new OST::LovString("optics");
+    createControllerLov("optics", ls);
+
     if (_libpath == "")
     {
         //_libpath=QCoreApplication::applicationDirPath();
@@ -231,6 +238,9 @@ bool Controller::loadModule(QString lib, QString label, QString profile)
 void Controller::loadConf(const QString &pConf)
 {
     QVariantMap result;
+    OST::LovString* l = static_cast<OST::LovString*>(getControllerLovs()["availableconfs"]);
+    l->lovClear();
+
     if (!dbmanager->getDbConfiguration(pConf, result))
     {
         logError("Load configuration %1 failed", {pConf});
@@ -252,11 +262,17 @@ void Controller::loadConf(const QString &pConf)
     updateControllerData("currentconf", QVariant(pConf));
     QVariantMap confs;
     dbmanager->getDbConfigurations(confs);
+    for(QVariantMap::const_iterator iter = confs.begin(); iter != confs.end(); ++iter)
+    {
+        l->lovAdd(iter.key(), iter.key());
+    }
     updateControllerData("availableconfs", QVariant(confs));
 
 }
 void Controller::saveConf(const QString &pConf)
 {
+    OST::LovString* l = static_cast<OST::LovString*>(getControllerLovs()["availableconfs"]);
+    l->lovClear();
     QVariantMap ms, result;
     QList<Basemodule *> mods = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
     for (Basemodule *m : mods)
@@ -276,7 +292,46 @@ void Controller::saveConf(const QString &pConf)
     updateControllerData("currentconf", QVariant(pConf));
     QVariantMap confs;
     dbmanager->getDbConfigurations(confs);
+    for(QVariantMap::const_iterator iter = confs.begin(); iter != confs.end(); ++iter)
+    {
+        l->lovAdd(iter.key(), iter.key());
+    }
     updateControllerData("availableconfs", QVariant(confs));
+}
+
+bool Controller::createControllerLov(const QString &lovName, OST::LovBase* pLov)
+{
+    if (mControllerLovs.contains(lovName))
+    {
+        logError("createControllerLov - lov %1 already exists", {lovName});
+        return false;
+    }
+    pLov->setKey(lovName);
+    mControllerLovs[lovName] = pLov;
+    connect(mControllerLovs[lovName], &OST::LovBase::lovChanged, this, &Controller::onControllerLovChanged);
+    wshandler->onControllerEvent(OST::EvType::lc, QString(), QString(), pLov);
+    return true;
+}
+
+bool Controller::deleteControllerLov(const QString &lovName)
+{
+    if (!mControllerLovs.contains(lovName))
+    {
+        logError("deleteControllerLov - lov %1 not found", {lovName});
+        return false;
+    }
+    OST::LovBase* pLov = mControllerLovs[lovName];
+    disconnect(pLov, &OST::LovBase::lovChanged, this, &Controller::onControllerLovChanged);
+    mControllerLovs.remove(lovName);
+    wshandler->onControllerEvent(OST::EvType::ld, lovName, QString(), nullptr);
+    delete pLov;
+    return true;
+}
+
+void Controller::onControllerLovChanged()
+{
+    OST::LovBase* lov = qobject_cast<OST::LovBase*>(sender());
+    wshandler->onControllerEvent(OST::EvType::lu, QString(), QString(), lov);
 }
 
 void Controller::onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase* elt, OST::PropertyBase* prp,
@@ -765,11 +820,11 @@ void Controller::OnFileWatcherEvent(const QString &pEvent)
     mControllerData["files"] = mFilesList;
     mControllerData["folders"] = mFoldersList;
 
-    wshandler->onControllerEvent(OST::EvType::uc, "files", QVariant(mFilesList));
-    wshandler->onControllerEvent(OST::EvType::uc, "folders", QVariant(mFoldersList));
+    wshandler->onControllerEvent(OST::EvType::uc, "files", QVariant(mFilesList), nullptr);
+    wshandler->onControllerEvent(OST::EvType::uc, "folders", QVariant(mFoldersList), nullptr);
     QVariantMap r;
     dbmanager->getDbProfiles(r);
-    wshandler->onControllerEvent(OST::EvType::uc, "profiles", r);
+    wshandler->onControllerEvent(OST::EvType::uc, "profiles", r, nullptr);
     updateControllerData("profiles", r);
 
 
@@ -843,13 +898,22 @@ QJsonObject Controller::getModulesDump(QString clientgrant)
     dump["serverlng"] = _lng;
     dump["controllerdata"] = QJsonObject().fromVariantMap(mControllerData);
 
+    QJsonObject lovs;
+    foreach(const QString &key, mControllerLovs.keys())
+    {
+        OST::LovJsonDumper d;
+        mControllerLovs[key]->accept(&d);
+        lovs[key] = d.getResult();
+    }
+    dump["l"] = lovs;
+
     result["d"] = dump;
     return result;
 }
 void Controller::updateControllerData(QString key, QVariant data)
 {
     mControllerData[key] = data;
-    wshandler->onControllerEvent(OST::EvType::uc, key, data);
+    wshandler->onControllerEvent(OST::EvType::uc, key, data, nullptr);
 }
 void Controller::onInterModuleRequest(OST::ExtEvent event)
 {

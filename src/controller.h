@@ -87,10 +87,18 @@ class Controller : public QObject
             return mBanner;
         }
 
+        QMap<QString, OST::LovBase*> getControllerLovs()
+        {
+            return mControllerLovs;
+        }
+        bool createControllerLov(const QString &lovName, OST::LovBase* pLov);
+        bool deleteControllerLov(const QString &lovName);
+
 
     private slots:
         void onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase* elt, OST::PropertyBase* prp, OST::LovBase* lov,
                            Datastore* mod);
+        void onControllerLovChanged();
         void onExternalEvent(OST::ExtEvent event);
         void onInterModuleRequest(OST::ExtEvent event);
         void OnClientEvent(OST::ExtEvent event, QWebSocket* client, QString clientgrant);
