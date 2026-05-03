@@ -48,6 +48,27 @@
 
         }
     },
+    "slaves": {
+      "label": "Parameters",
+      "permission": 2,
+      "devcat": "Parameters",
+      "group": "Slave modules",
+      "order": "100",
+      "hasprofile": true,
+      "e": {
+        "plannermodule": {
+            "type": "string",
+            "label": "Planner instance",
+            "listOfValues":"loadedModules-planner",
+            "listOfValuesIsExternal":true,
+            "autoupdate": true,
+            "directedit": true,
+            "value": "Navigator",
+            "order": 4,
+            "hint": "Name of the planner module INSTANCE to use"
+        }
+      }
+    },
     "search": {
         "devcat": "Control",
         "order": "Control0000",
