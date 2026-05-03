@@ -26,7 +26,7 @@ class Controller : public QObject
                    const QString &libpath, const QString &conf, const QString &indiserver,
                    const QString &ssl, const QString &sslCert, const QString &sslKey, const QString &lng, const QString &grant,
                    OST::Logger *logger, OST::TranslateManager *translate, const QString &banner,
-                   const QString &gitSha, const QString &gitDate, const QString &gitMessage);
+                   const QString &gitSha, const QString &gitDate, const QString &gitMessage, const QString &gitTag);
         ~Controller() override;
     signals:
         void controllerEvent(OST::ExtEvent  event);

@@ -30,7 +30,7 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
                        const QString &libpath, const QString &conf, const QString &indiserver,
                        const QString &ssl, const QString &sslCert, const QString &sslKey, const QString &lng, const QString &grant,
                        OST::Logger *logger, OST::TranslateManager *translate, const QString &banner,
-                       const QString &gitSha, const QString &gitDate, const QString &gitMessage)
+                       const QString &gitSha, const QString &gitDate, const QString &gitMessage, const QString &gitTag)
     :       _webroot(webroot),
             _dbpath(dbpath),
             _libpath(libpath),
@@ -51,6 +51,7 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     g["Githash"] = gitSha;
     g["Gitdate"] = gitDate;
     g["Gitmessage"] = gitMessage;
+    g["Gittag"] = gitTag;
     mControllerData["git"] = g;
     mControllerData["banner"] = mBanner;
     mControllerData["indiserver"] = indiserver;
