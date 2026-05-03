@@ -68,6 +68,10 @@ class LovSingle : public LovBase
         {
             return typeid(T).name();
         }
+        bool contains(T key)
+        {
+            return mLov.contains(key);
+        }
     private:
         QMap<T, QString> mLov;
 
