@@ -452,7 +452,7 @@ void Sequencer::refreshFilterLov()
 
 void Sequencer::requestFocus()
 {
-    QString focusModule = getString("parameters", "focusmodule");
+    QString focusModule = getString("slaves", "focusmodule");
     logInfo("Filter changed - requesting autofocus from module: %1", {focusModule});
 
     mWaitingForFocus = true;
@@ -461,7 +461,7 @@ void Sequencer::requestFocus()
     bool suspendGuiding = getBool("parameters", "suspendguidingduringfocus");
     if (suspendGuiding)
     {
-        QString guiderModule = getString("parameters", "guidermodule");
+        QString guiderModule = getString("slaves", "guidermodule");
         logInfo("Suspending guiding on module: %1", {guiderModule});
         otherModuleSetValue( guiderModule, "actions", "abortguider", true);
     }
@@ -481,7 +481,7 @@ void Sequencer::OnFocusDone(void)
     bool suspendGuiding = getBool("parameters", "suspendguidingduringfocus");
     if (suspendGuiding)
     {
-        QString guiderModule = getString("parameters", "guidermodule");
+        QString guiderModule = getString("slaves", "guidermodule");
         logInfo("Resuming guiding on module: %1", {guiderModule});
         otherModuleSetValue( guiderModule, "actions", "guide", true);
 
@@ -530,11 +530,11 @@ void Sequencer::OnGuidingSettleTimeout()
 }
 void Sequencer::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QString elt, QVariant data, int line)
 {
-    if (mod != getString("parameters", "focusmodule") && mod != getString("parameters", "guidermodule") ) return;
+    if (mod != getString("slaves", "focusmodule") && mod != getString("slaves", "guidermodule") ) return;
 
     //logDebug("Planner::onOtherModuleEvent2 mod=%1 ev=%2 prop=%3 elt=%4 data=%5", {mod, OST::EvToString(ev), prp, elt, data});
 
-    if (mod == getString("parameters", "focusmodule") && ev == OST::EvType::ps && prp == "actions"  && mWaitingForFocus)
+    if (mod == getString("slaves", "focusmodule") && ev == OST::EvType::ps && prp == "actions"  && mWaitingForFocus)
     {
         // catch focus completion event
         if (data.toInt() == 1)

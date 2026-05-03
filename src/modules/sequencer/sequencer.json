@@ -29,8 +29,8 @@
         "hasGrid":true,
         "showGrid":true,
         "showElts":false,
-        "devcat": "Control",
-        "group": "",
+        "devcat": "Parameters",
+        "group": "Sequence",
         "permission": 2,
         "order":1,
         "grid":0,
@@ -103,8 +103,8 @@
         }
     },
     "object":{
-            "devcat": "Control",
-            "group": "",
+            "devcat": "Parameters",
+            "group": "Sequence",
             "permission": 2,
             "order":5,
             "label":"Object",
@@ -134,9 +134,42 @@
                 }
             }
     },
+    "slaves": {
+        "label": "Parameters",
+        "permission": 2,
+        "devcat": "Parameters",
+        "group": "Slave modules",
+        "order": "100",
+        "hasprofile": true,
+        "e": {
+            "focusmodule": {
+                "type": "string",
+                "label": "Focus module instance",
+                "listOfValues":"loadedModules-focus",
+                "listOfValuesIsExternal":true,
+                "autoupdate": true,
+                "directedit": true,
+                "value": "focus",
+                "order": 2,
+                "hint": "Name of the focus module INSTANCE to use (e.g. 'focus', 'myfocus1')"
+            },
+            "guidermodule": {
+                "type": "string",
+                "label": "Guider module instance",
+                "listOfValues":"loadedModules-guider",
+                "listOfValuesIsExternal":true,
+                "autoupdate": true,
+                "directedit": true,
+                "value": "guider",
+                "order": 4,
+                "hint": "Name of the guider module INSTANCE to use (e.g. 'guider', 'myguider1')"
+            }
+        }
+    },
+
     "parameters": {
         "devcat": "Parameters",
-        "group": "General",
+        "group": "Sequence",
         "permission": 2,
         "order": 0,
         "hasprofile": true,
@@ -160,17 +193,6 @@
                 "order": 1,
                 "hint": "Automatically trigger focus when filter changes during sequence"
             },
-            "focusmodule": {
-                "type": "string",
-                "label": "Focus module instance",
-                "listOfValues":"loadedModules-focus",
-                "listOfValuesIsExternal":true,
-                "autoupdate": true,
-                "directedit": true,
-                "value": "focus",
-                "order": 2,
-                "hint": "Name of the focus module INSTANCE to use (e.g. 'focus', 'myfocus1')"
-            },
             "suspendguidingduringfocus": {
                 "type": "bool",
                 "label": "Suspend guiding during focus",
@@ -179,17 +201,6 @@
                 "value": false,
                 "order": 3,
                 "hint": "Suspend guiding when autofocus is triggered and resume after focus completes"
-            },
-            "guidermodule": {
-                "type": "string",
-                "label": "Guider module instance",
-                "listOfValues":"loadedModules-guider",
-                "listOfValuesIsExternal":true,
-                "autoupdate": true,
-                "directedit": true,
-                "value": "guider",
-                "order": 4,
-                "hint": "Name of the guider module INSTANCE to use (e.g. 'guider', 'myguider1')"
             },
             "guidingsettletime": {
                 "type": "int",

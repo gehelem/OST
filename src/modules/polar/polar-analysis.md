@@ -36,13 +36,19 @@ The mount's RA axis is fixed in the horizontal frame (Az/Alt), not in J2000.
 ### `solverToAzAlt(ra_j2000_deg, dec_j2000_deg, jd)`
 
 ```cpp
-// J2000 -> apparent
-INDI::J2000toObserved(&j2000, jd, &apparent);
+// J2000 RA/Dec used directly (no precession correction).
+// Reason: applying J2000→apparent introduces a large differential DEC error
+// between the three images (DEC precession rate varies strongly with RA:
+// -4.4'/26 yr at RA=8h but ~0 at RA=6h), which distorts the arc and causes
+// spurious azimuth errors of ~14' for a real ~3' misalignment.
+// Ekos/KStars uses the same J2000-direct approach.
+double ra_h  = ra_j2000_deg * 24.0 / 360.0;  // degrees -> hours
+double dec_d = dec_j2000_deg;                 // degrees
 
 // Hour angle
 double gst = ln_get_apparent_sidereal_time(jd);
 double lst = gst + _observerLon / 15.0;
-double ha  = lst - apparent.rightascension;
+double ha  = lst - ra_h;
 
 // Equatorial -> horizontal (Az=0 North, 90 East)
 double sin_alt = sin(lat)*sin(dec) + cos(lat)*cos(dec)*cos(ha_rad);

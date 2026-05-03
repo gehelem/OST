@@ -145,7 +145,7 @@ void Planner::startPlanner()
     connectDevice(g);
 
     // Check slaves modules
-    g = getString("parms", "sequencemodule");
+    g = getString("slaves", "sequencemodule");
     if (g.isEmpty() || g == "--")
     {
         logError("No Sequence module selected");
@@ -153,7 +153,7 @@ void Planner::startPlanner()
         abortPlanner();
         return;
     }
-    g = getString("parms", "navigatormodule");
+    g = getString("slaves", "navigatormodule");
     if (g.isEmpty() || g == "--")
     {
         logError("No Sequence module selected");
@@ -283,7 +283,7 @@ void Planner::navigatorComplete()
     propData["elements"] = eltData;
     QVariantMap eventData;
     eventData["actions"] = propData;
-    otherModuleSetValue( getString("parms", "sequencemodule"), "actions", "startsequence", true);
+    otherModuleSetValue( getString("slaves", "sequencemodule"), "actions", "startsequence", true);
 
     mWaitingSequence = true;
 
@@ -306,29 +306,29 @@ void Planner::startLine()
     mWaitingSequence = false;
     mWaitingNavigator = true;
 
-    otherModuleRequestPropertyDump(getString("parms", "navigatormodule"), "actions");
+    otherModuleRequestPropertyDump(getString("slaves", "navigatormodule"), "actions");
 
     // Set navigator's target
-    otherModuleSetValue( getString("parms", "navigatormodule"), "target", "targetra", getFloat("planning", "ra"));
-    otherModuleSetValue( getString("parms", "navigatormodule"), "target", "targetde", getFloat("planning", "dec"));
-    otherModuleSetValue( getString("parms", "navigatormodule"), "target", "targetname", getString("planning", "object"));
+    otherModuleSetValue( getString("slaves", "navigatormodule"), "target", "targetra", getFloat("planning", "ra"));
+    otherModuleSetValue( getString("slaves", "navigatormodule"), "target", "targetde", getFloat("planning", "dec"));
+    otherModuleSetValue( getString("slaves", "navigatormodule"), "target", "targetname", getString("planning", "object"));
 
     // Set sequencer's object data
-    otherModuleRequestProfileLoad(getString("parms", "sequencemodule"), getString("planning", "profile"));
-    otherModuleSetValue( getString("parms", "sequencemodule"), "object", "label", getString("planning", "object"));
-    otherModuleSetValue( getString("parms", "sequencemodule"), "object", "ra", getFloat("planning", "ra"));
-    otherModuleSetValue( getString("parms", "sequencemodule"), "object", "de", getFloat("planning", "dec"));
+    otherModuleRequestProfileLoad(getString("slaves", "sequencemodule"), getString("planning", "profile"));
+    otherModuleSetValue( getString("slaves", "sequencemodule"), "object", "label", getString("planning", "object"));
+    otherModuleSetValue( getString("slaves", "sequencemodule"), "object", "ra", getFloat("planning", "ra"));
+    otherModuleSetValue( getString("slaves", "sequencemodule"), "object", "de", getFloat("planning", "dec"));
 
     // Ask navigator to slew to target
-    otherModuleSetValue( getString("parms", "navigatormodule"), "actions", "gototarget", true);
+    otherModuleSetValue( getString("slaves", "navigatormodule"), "actions", "gototarget", true);
 }
 void Planner::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QString elt, QVariant data, int line)
 {
-    if (mod != getString("parms", "navigatormodule") && mod != getString("parms", "sequencemodule") ) return;
+    if (mod != getString("slaves", "navigatormodule") && mod != getString("slaves", "sequencemodule") ) return;
 
     //logDebug("Planner::onOtherModuleEvent2 mod=%1 ev=%2 prop=%3 elt=%4 data=%5", {mod, OST::EvToString(ev), prp, elt, data});
 
-    if (mod == getString("parms", "navigatormodule") && ev == OST::EvType::ps && prp == "actions")
+    if (mod == getString("slaves", "navigatormodule") && ev == OST::EvType::ps && prp == "actions")
     {
         // catch navigator completion
         if (data.toInt() == 1)
@@ -339,7 +339,7 @@ void Planner::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QStri
     }
 
     // Report sequence progress
-    if (mod == getString("parms", "sequencemodule") && ev == OST::EvType::ea && prp == "progress" && mWaitingSequence)
+    if (mod == getString("slaves", "sequencemodule") && ev == OST::EvType::ea && prp == "progress" && mWaitingSequence)
     {
         int i = data.toMap()["e"].toMap()["global"].toInt();
         //QString s = data.toMap()["e"].toMap()["global"].toMap()["dynlabel"].toString();
@@ -348,7 +348,7 @@ void Planner::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QStri
         getProperty("planning")->updateLine(mCurrentLine);
     }
 
-    if (mod == getString("parms", "sequencemodule") && ev == OST::EvType::ps && prp == "actions")
+    if (mod == getString("slaves", "sequencemodule") && ev == OST::EvType::ps && prp == "actions")
     {
         // catch sequencer completion
         if (data.toInt() == 1)
