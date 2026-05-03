@@ -144,7 +144,7 @@ target_link_libraries(ostserver
 )
 # Ensure translations are compiled before linking ostserver
 add_dependencies(ostserver translations)
-#add_dependencies(ostserver generate_version)
+add_dependencies(ostserver generate_version)
 
 #########################
 #### modules libraries ##
