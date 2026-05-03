@@ -232,6 +232,17 @@ bool Controller::loadModule(QString lib, QString label, QString profile)
 
     mod->onAfterInit();
     wshandler->onModuleEvent(OST::EvType::aa, QVariant(), nullptr, nullptr, nullptr, mod);
+    // This is redundant with global data, these lovs can (must? => yes) be managed at frontend level
+    //QString lovname = "loadedModules-" + lowerlib;
+    //if (!getControllerLovs().contains(lovname))
+    //{
+    //    OST::LovString* ls = new OST::LovString(lovname);
+    //    createControllerLov(lovname, ls);
+    //}
+    //OST::LovString* ls = static_cast<OST::LovString*>(getControllerLovs()[lovname]);
+    //if (!ls->contains(lovname)) ls->lovAdd(name, name);
+
+
     return true;
 
 }
@@ -457,9 +468,19 @@ void Controller::onExternalEvent(OST::ExtEvent event)
             QString n =  event.data["name"].toString();
             for (Basemodule *m : mods)
             {
-                if (m->getModuleName() == n) m->killMe();
+                if (m->getModuleName() == n)
+                {
+                    // This is redundant with global data, these lovs can (must? => yes) be managed at frontend level
+                    //QString lovname = "loadedModules-" + m->getClassName().toLower();
+                    //OST::LovString* ls = static_cast<OST::LovString*>(getControllerLovs()[lovname]);
+                    //ls->lovDel(n);
+                    m->killMe();
+                };
             }
+
+
             return;
+
         }
         case OST::ExtEvType::FS:
         {
