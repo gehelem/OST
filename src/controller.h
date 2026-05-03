@@ -10,6 +10,7 @@
 #include "wshandler.h"
 #include "logger.h"
 #include "translatemanager.h"
+#include <lovbase.h>
 
 
 /*!
@@ -55,6 +56,7 @@ class Controller : public QObject
         QString mSelectedFolder;
         QString mBanner;
         QVariantMap mControllerData;
+        QMap<QString, OST::LovBase*> mControllerLovs;
 
         bool loadModule(QString lib, QString label, QString profile);
         void loadConf(const QString &pConf);
