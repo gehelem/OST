@@ -63,13 +63,13 @@ class Planner : public IndiModule
 
 
         // Example internal state variables
-        bool mIsRunning;
+        bool mIsRunning = false;
 
         // Waiting sequence
-        bool mWaitingSequence ;
+        bool mWaitingSequence = false ;
 
         // Waiting navigator
-        bool mWaitingNavigator;
+        bool mWaitingNavigator = false ;
 
         // Current line
         int mCurrentLine;
