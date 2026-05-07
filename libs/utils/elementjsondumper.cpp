@@ -73,7 +73,8 @@ void ElementJsonDumper::visit(ElementInt *pElement, QVariantMap &data, bool &emi
     if (pElement->getGlobalLov() != "")
     {
         json["globallov"] = pElement->getGlobalLov();
-        json["globallovIsExternal"] = pElement->getGlobalLovIsExternal();
+        json["lovScope"] = (pElement->getLovScope() == LovScope::Controller) ? "controller" : "module";
+        json["lovConstrained"] = pElement->getLovConstrained();
     }
     else
     {
@@ -82,8 +83,7 @@ void ElementJsonDumper::visit(ElementInt *pElement, QVariantMap &data, bool &emi
             QJsonObject lines = QJsonObject();
             foreach(const long &key, pElement->getLov().keys())
             {
-                QString skey = QString::number(key);
-                lines[skey] = pElement->getLov()[key];
+                lines[QString::number(key)] = pElement->getLov()[key];
             }
             json["listOfValues"] = lines;
         }
@@ -114,7 +114,8 @@ void ElementJsonDumper::visit(ElementFloat *pElement, QVariantMap &data, bool &e
     if (pElement->getGlobalLov() != "")
     {
         json["globallov"] = pElement->getGlobalLov();
-        json["globallovIsExternal"] = pElement->getGlobalLovIsExternal();
+        json["lovScope"] = (pElement->getLovScope() == LovScope::Controller) ? "controller" : "module";
+        json["lovConstrained"] = pElement->getLovConstrained();
     }
     else
     {
@@ -123,8 +124,7 @@ void ElementJsonDumper::visit(ElementFloat *pElement, QVariantMap &data, bool &e
             QJsonObject lines = QJsonObject();
             foreach(const double &key, pElement->getLov().keys())
             {
-                QString skey = QString::number(key);
-                lines[skey] = pElement->getLov()[key];
+                lines[QString::number(key)] = pElement->getLov()[key];
             }
             json["listOfValues"] = lines;
         }
@@ -146,7 +146,8 @@ void ElementJsonDumper::visit(ElementString *pElement, QVariantMap &data, bool &
     if (pElement->getGlobalLov() != "")
     {
         json["globallov"] = pElement->getGlobalLov();
-        json["globallovIsExternal"] = pElement->getGlobalLovIsExternal();
+        json["lovScope"] = (pElement->getLovScope() == LovScope::Controller) ? "controller" : "module";
+        json["lovConstrained"] = pElement->getLovConstrained();
     }
     else
     {

@@ -49,7 +49,6 @@ ElementBase *ElementFactory::createElement(const QString &key, const QVariantMap
             {
                 if (pData["listOfValues"].canConvert<QVariantList>())
                 {
-                    QVariantMap elts = pData["listOfValues"].toMap();
                     QList ll  = pData["listOfValues"].toList();
                     foreach (auto line, ll)
                     {
@@ -58,9 +57,10 @@ ElementBase *ElementFactory::createElement(const QString &key, const QVariantMap
                 }
                 else
                 {
-                    bool b = false;
-                    if (pData.contains("listOfValuesIsExternal"))  b = pData["listOfValuesIsExternal"].toBool();
-                    pElement->setGlobalLov(pData["listOfValues"].toString(), b);
+                    LovScope scope = LovScope::Module;
+                    if (pData.contains("listOfValuesIsExternal") && pData["listOfValuesIsExternal"].toBool())
+                        scope = LovScope::Controller;
+                    pElement->setGlobalLov(pData["listOfValues"].toString(), scope);
                 }
             }
             return pElement;
@@ -86,7 +86,6 @@ ElementBase *ElementFactory::createElement(const QString &key, const QVariantMap
             {
                 if (pData["listOfValues"].canConvert<QVariantList>())
                 {
-                    QVariantMap elts = pData["listOfValues"].toMap();
                     QList ll  = pData["listOfValues"].toList();
                     foreach (auto line, ll)
                     {
@@ -96,9 +95,10 @@ ElementBase *ElementFactory::createElement(const QString &key, const QVariantMap
                 }
                 else
                 {
-                    bool b = false;
-                    if (pData.contains("listOfValuesIsExternal"))  b = pData["listOfValuesIsExternal"].toBool();
-                    pElement->setGlobalLov(pData["listOfValues"].toString(), b);
+                    LovScope scope = LovScope::Module;
+                    if (pData.contains("listOfValuesIsExternal") && pData["listOfValuesIsExternal"].toBool())
+                        scope = LovScope::Controller;
+                    pElement->setGlobalLov(pData["listOfValues"].toString(), scope);
                 }
             }
             return pElement;
@@ -124,7 +124,6 @@ ElementBase *ElementFactory::createElement(const QString &key, const QVariantMap
             {
                 if (pData["listOfValues"].canConvert<QVariantList>())
                 {
-                    QVariantMap elts = pData["listOfValues"].toMap();
                     QList ll  = pData["listOfValues"].toList();
                     foreach (auto line, ll)
                     {
@@ -133,9 +132,10 @@ ElementBase *ElementFactory::createElement(const QString &key, const QVariantMap
                 }
                 else
                 {
-                    bool b = false;
-                    if (pData.contains("listOfValuesIsExternal"))  b = pData["listOfValuesIsExternal"].toBool();
-                    pElement->setGlobalLov(pData["listOfValues"].toString(), b);
+                    LovScope scope = LovScope::Module;
+                    if (pData.contains("listOfValuesIsExternal") && pData["listOfValuesIsExternal"].toBool())
+                        scope = LovScope::Controller;
+                    pElement->setGlobalLov(pData["listOfValues"].toString(), scope);
                 }
             }
             return pElement;

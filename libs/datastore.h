@@ -119,6 +119,7 @@ class Datastore : public QObject
             pLov->setKey(pLovName);
             mGlobLov[pLovName] = pLov;
             connect(mGlobLov[pLovName], &OST::LovBase::lovChanged, this, &Datastore::onLovChanged);
+            connect(mGlobLov[pLovName], &OST::LovBase::sendMessage, this, &Datastore::onPropertyLog);
             emit datastoreEvent(OST::EvType::lc, pLov->getKey(), nullptr, nullptr, pLov, this);
             return true;
         }

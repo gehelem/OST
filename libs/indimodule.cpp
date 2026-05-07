@@ -2,6 +2,7 @@
 #include <basedevice.h>
 #include "indimodule.h"
 #include "version.cc"
+#include <common.h>
 
 IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
     : Basemodule(name, label, profile, availableModuleLibs)
@@ -129,7 +130,13 @@ bool IndiModule::onExternalEventIndi(OST::ExtEvent event)
         }
 
     }
+
+    if (event.ev == OST::ExtEvType::J2 && event.prpkey == "devices")
+    {
+        refreshDeviceslovs();
+    }
     return true;
+
 }
 void IndiModule::connectIndiTimer()
 {
@@ -794,6 +801,17 @@ void IndiModule::OnAfterIndiConnectIndiTimer()
 }
 bool IndiModule::refreshDeviceslovs()
 {
+    getGlovString("DRIVER_INTERFACE-GENERAL_INTERFACE")->lovClear();
+    getGlovString("DRIVER_INTERFACE-CCD_INTERFACE")->lovClear();
+    getGlovString("DRIVER_INTERFACE-TELESCOPE_INTERFACE")->lovClear();
+    getGlovString("DRIVER_INTERFACE-GUIDER_INTERFACE")->lovClear();
+    getGlovString("DRIVER_INTERFACE-FOCUSER_INTERFACE")->lovClear();
+    getGlovString("DRIVER_INTERFACE-FILTER_INTERFACE")->lovClear();
+    getGlovString("DRIVER_INTERFACE-GPS_INTERFACE")->lovClear();
+    getGlovString("DRIVER_INTERFACE-WEATHER_INTERFACE")->lovClear();
+    getGlovString("DRIVER_INTERFACE-AUX_INTERFACE")->lovClear();
+
+
     std::vector<INDI::BaseDevice> devs = getDevices();
     for(std::size_t i = 0; i < devs.size(); i++)
     {
@@ -1004,7 +1022,7 @@ bool IndiModule::defineMeAsNavigator()
     s = new  OST::ElementString("plannermodule", "Planner module", "nav30", "");
     s->setDirectEdit(true);
     s->setAutoUpdate(true);
-    s->setGlobalLov("loadedModules-planner", true); /* loaded modules lov is handled by controller */
+    s->setGlobalLov("loadedModules-planner", OST::LovScope::Controller);
     pm->addElt(s);
 
     mIsNavigator = true;
@@ -1044,6 +1062,7 @@ bool IndiModule::giveMeADevice(QString name, QString label, INDI::BaseDevice::DR
 {
     OST::PropertyMulti* pm = getProperty("devices");
     OST::ElementString* s = new  OST::ElementString(name, label, label, "");
+    s->setPostIcon("refresh");
     switch (interface)
     {
         case INDI::BaseDevice::DRIVER_INTERFACE::GENERAL_INTERFACE:

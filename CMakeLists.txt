@@ -192,7 +192,6 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovstring.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovint.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovfloat.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovlight.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertybase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertybase.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertymulti.cpp
@@ -264,7 +263,6 @@ set(BASE_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovstring.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovint.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovfloat.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues/lovlight.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertybase.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/model/property/propertymulti.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/propertyvisitor.h

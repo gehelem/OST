@@ -328,7 +328,7 @@ void Planner::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QStri
 
     //logDebug("Planner::onOtherModuleEvent2 mod=%1 ev=%2 prop=%3 elt=%4 data=%5", {mod, OST::EvToString(ev), prp, elt, data});
 
-    if (mod == getString("slaves", "navigatormodule") && ev == OST::EvType::ps && prp == "actions")
+    if (mod == getString("slaves", "navigatormodule") && ev == OST::EvType::ps && prp == "actions" && mWaitingNavigator)
     {
         // catch navigator completion
         if (data.toInt() == 1)
@@ -348,7 +348,7 @@ void Planner::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QStri
         getProperty("planning")->updateLine(mCurrentLine);
     }
 
-    if (mod == getString("slaves", "sequencemodule") && ev == OST::EvType::ps && prp == "actions")
+    if (mod == getString("slaves", "sequencemodule") && ev == OST::EvType::ps && prp == "actions" && mWaitingSequence)
     {
         // catch sequencer completion
         if (data.toInt() == 1)

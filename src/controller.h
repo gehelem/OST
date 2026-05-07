@@ -10,6 +10,7 @@
 #include "wshandler.h"
 #include "logger.h"
 #include "translatemanager.h"
+#include <lovbase.h>
 
 
 /*!
@@ -26,7 +27,7 @@ class Controller : public QObject
                    const QString &libpath, const QString &conf, const QString &indiserver,
                    const QString &ssl, const QString &sslCert, const QString &sslKey, const QString &lng, const QString &grant,
                    OST::Logger *logger, OST::TranslateManager *translate, const QString &banner,
-                   const QString &gitSha, const QString &gitDate, const QString &gitMessage);
+                   const QString &gitSha, const QString &gitDate, const QString &gitMessage, const QString &gitTag);
         ~Controller() override;
     signals:
         void controllerEvent(OST::ExtEvent  event);
@@ -55,6 +56,7 @@ class Controller : public QObject
         QString mSelectedFolder;
         QString mBanner;
         QVariantMap mControllerData;
+        QMap<QString, OST::LovBase*> mControllerLovs;
 
         bool loadModule(QString lib, QString label, QString profile);
         void loadConf(const QString &pConf);
@@ -85,10 +87,18 @@ class Controller : public QObject
             return mBanner;
         }
 
+        QMap<QString, OST::LovBase*> getControllerLovs()
+        {
+            return mControllerLovs;
+        }
+        bool createControllerLov(const QString &lovName, OST::LovBase* pLov);
+        bool deleteControllerLov(const QString &lovName);
+
 
     private slots:
         void onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase* elt, OST::PropertyBase* prp, OST::LovBase* lov,
                            Datastore* mod);
+        void onControllerLovChanged();
         void onExternalEvent(OST::ExtEvent event);
         void onInterModuleRequest(OST::ExtEvent event);
         void OnClientEvent(OST::ExtEvent event, QWebSocket* client, QString clientgrant);

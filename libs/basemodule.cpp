@@ -16,6 +16,7 @@ Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap
     // Register meta types for queued signal/slot connections across modules
     qRegisterMetaType<OST::LogLevel>("OST::LogLevel");
     qRegisterMetaType<OST::EvType>("OST::EvType");
+    qRegisterMetaType<OST::ExtEvent>("OST::ExtEvent");
 
     connect(this, &Datastore::datastoreEvent, this, &Basemodule::onDatastoreEvent);
 

@@ -6,6 +6,7 @@ Datastore::Datastore()
     //sendMessage("DataStore init");
     qRegisterMetaType<OST::EvType>("OST::EvType");
     qRegisterMetaType<OST::LogLevel>("OST::LogLevel");
+    qRegisterMetaType<OST::ExtEvent>("OST::ExtEvent");
 
 }
 Datastore::~Datastore()
@@ -419,6 +420,8 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
                 OST::LovJsonDumper d;
                 mGlobLov[key]->accept(&d);
                 connect(mGlobLov[key], &OST::LovBase::lovChanged, this, &Datastore::onLovChanged);
+                connect(mGlobLov[key], &OST::LovBase::sendMessage, this, &Datastore::onPropertyLog);
+
             }
             else
             {

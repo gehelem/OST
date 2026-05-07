@@ -25,11 +25,11 @@ bool ElementFloat::lovAdd(double val, QString label)
 {
     return mLov.lovAdd(val, label);
 }
-bool ElementFloat::lovUpdate(double  val, QString label)
+bool ElementFloat::lovUpdate(double val, QString label)
 {
     return mLov.lovUpdate(val, label);
 }
-bool ElementFloat::lovDel(double  val)
+bool ElementFloat::lovDel(double val)
 {
     return mLov.lovDel(val);
 }

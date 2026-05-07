@@ -622,6 +622,6 @@ void Navigator::addTargeToPlanner()
     eltData["profile"] = "default";
     logInfo("Current target sent to %1", {getString("parms", "plannermodule")});
 
-    otherModuleCreateLine(getString("parms", "plannermodule"), "planning", eltData);
+    otherModuleCreateLine(getString("slaves", "plannermodule"), "planning", eltData);
 
 }

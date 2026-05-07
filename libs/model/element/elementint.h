@@ -118,38 +118,30 @@ class ElementInt: public ElementTemplateNumeric<int>
 
         /**
          * @brief Add value to LOV
-         * @param val Integer value
+         * @param val   Integer value (key)
          * @param label Display label for this value
          * @return true if added, false if value already exists
-         *
-         * Adds a new option to the List of Values. If the value already exists,
-         * returns false without modifying the LOV.
          *
          * @see lovUpdate()
          */
         bool lovAdd(int val, QString label);
 
         /**
-         * @brief Update LOV value label
-         * @param val Integer value to update
+         * @brief Update LOV label for an existing value
+         * @param val   Integer value to update
          * @param label New display label
          * @return true if updated, false if value not found
          *
-         * Updates the display label for an existing LOV value.
-         * If the value doesn't exist in the LOV, returns false.
-         *
          * @see lovAdd()
          */
-        bool lovUpdate(int  val, QString label);
+        bool lovUpdate(int val, QString label);
 
         /**
          * @brief Delete value from LOV
          * @param val Integer value to delete
          * @return true if deleted, false if value not found
-         *
-         * Removes an option from the List of Values.
          */
-        bool lovDel(int  val);
+        bool lovDel(int val);
 
         /**
          * @brief Clear all LOV entries

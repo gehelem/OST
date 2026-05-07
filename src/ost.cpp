@@ -138,7 +138,8 @@ int main(int argc, char *argv[])
         banner,
         QString::fromStdString(Version::GIT_SHA1),
         QString::fromStdString(Version::GIT_DATE),
-        QString::fromStdString(Version::GIT_COMMIT_SUBJECT)
+        QString::fromStdString(Version::GIT_COMMIT_SUBJECT),
+        QString::fromStdString(Version::GIT_TAG)
     );
 
     Q_UNUSED(controller);
