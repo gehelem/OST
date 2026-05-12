@@ -84,6 +84,21 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     ls = new OST::LovString("optics");
     createControllerLov("optics", ls);
 
+    // Shared datastore — static, always available, created before any module
+    mGlobalDatastore = new GlobalDatastore("GlobalDatastore", "Global data", "default", {});
+    mGlobalDatastore->setParent(this);
+    mGlobalDatastore->dbInit(_dbpath, "GlobalDatastore");
+    mGlobalDatastore->loadProfile("default");
+    connect(mGlobalDatastore, &Basemodule::moduleEvent,  this,       &Controller::onModuleEvent);
+    connect(mGlobalDatastore, &Basemodule::moduleEvent,  wshandler,  &WShandler::onModuleEvent);
+    connect(mGlobalDatastore, &Basemodule::logSignal,    mLogger,    &OST::Logger::onLog);
+    connect(mGlobalDatastore, &Basemodule::logSignal,    wshandler,  &WShandler::onLog);
+    connect(this, &Controller::controllerEvent, mGlobalDatastore, &Basemodule::onExternalEventRoot);
+    mGlobalDatastore->onAfterInit();
+    mGlobalDatastore->registerLov("optics", "name", "name",
+                                  static_cast<OST::LovString*>(mControllerLovs["optics"]));
+    wshandler->onModuleEvent(OST::EvType::aa, QVariant(), nullptr, nullptr, nullptr, mGlobalDatastore);
+
     if (_libpath == "")
     {
         //_libpath=QCoreApplication::applicationDirPath();
@@ -197,6 +212,7 @@ bool Controller::loadModule(QString lib, QString label, QString profile)
     }
     mod->setParent(this);
     mod->setWebroot(_webroot);
+    mod->setGlobalDatastore(mGlobalDatastore);
     mod->setObjectName(name);
     mod->dbInit(_dbpath, name);
     mod->loadProfile(profile);
@@ -466,6 +482,11 @@ void Controller::onExternalEvent(OST::ExtEvent event)
         {
             QList<Basemodule *> mods = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
             QString n =  event.data["name"].toString();
+            if (n == mGlobalDatastore->getModuleName())
+            {
+                logError("GlobalDatastore cannot be killed", {});
+                return;
+            }
             for (Basemodule *m : mods)
             {
                 if (m->getModuleName() == n)

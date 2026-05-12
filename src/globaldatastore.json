@@ -1,0 +1,43 @@
+{
+"p":{
+    "optics": {
+        "label": "Optics",
+        "devcat": "Equipment",
+        "group": "",
+        "order": "Equipment010",
+        "permission": 2,
+        "hasprofile": true,
+        "hasGrid": true,
+        "showGrid": true,
+        "showElts": false,
+        "e": {
+            "name": {
+                "type": "string",
+                "label": "Name",
+                "order": "0",
+                "value": ""
+            },
+            "focal": {
+                "type": "float",
+                "label": "Focal length (mm)",
+                "order": "1",
+                "value": 0,
+                "format": "99999.9"
+            },
+            "diameter": {
+                "type": "float",
+                "label": "Diameter (mm)",
+                "order": "2",
+                "value": 0,
+                "format": "9999.9"
+            },
+            "type": {
+                "type": "string",
+                "label": "Type",
+                "order": "3",
+                "value": ""
+            }
+        }
+    }
+}
+}

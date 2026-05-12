@@ -621,6 +621,43 @@ void Basemodule::otherModuleRequestPropertyDump(QString mod, QString prop)
     event.data = M;
     emit interModuleRequest(event);
 }
+void Basemodule::setGlobalDatastore(Basemodule* gds)
+{
+    mGlobalDatastore = gds;
+}
+
+int Basemodule::findGridRow(const QString& propName, const QString& keyCol, const QString& keyValue)
+{
+    int size = getGridSize(propName);
+    for (int i = 0; i < size; i++)
+    {
+        if (getString(propName, keyCol, (long)i) == keyValue) return i;
+    }
+    return -1;
+}
+
+int Basemodule::getGridSize(const QString& propName)
+{
+    auto store = getStore();
+    if (!store.contains(propName)) return 0;
+    return store[propName]->getGrid().size();
+}
+
+QString Basemodule::getGridString(const QString& propName, const QString& colName, int line)
+{
+    return getString(propName, colName, (long)line);
+}
+
+double Basemodule::getGridFloat(const QString& propName, const QString& colName, int line)
+{
+    return getFloat(propName, colName, (long)line);
+}
+
+long Basemodule::getGridInt(const QString& propName, const QString& colName, int line)
+{
+    return getInt(propName, colName, (long)line);
+}
+
 void Basemodule::otherModuleRequestProfileLoad(QString mod, QString profile)
 {
     OST::ExtEvent event;

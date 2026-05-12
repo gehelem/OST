@@ -10,6 +10,7 @@
 #include "wshandler.h"
 #include "logger.h"
 #include "translatemanager.h"
+#include "globaldatastore.h"
 #include <lovbase.h>
 
 
@@ -57,6 +58,7 @@ class Controller : public QObject
         QString mBanner;
         QVariantMap mControllerData;
         QMap<QString, OST::LovBase*> mControllerLovs;
+        GlobalDatastore* mGlobalDatastore = nullptr;
 
         bool loadModule(QString lib, QString label, QString profile);
         void loadConf(const QString &pConf);

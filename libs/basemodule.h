@@ -132,6 +132,20 @@ class Basemodule : public DBManager
         void otherModuleRequestProfileLoad(QString mod, QString profile);
         void otherModuleCreateLine(QString mod, QString prop, QVariantMap values);
 
+    public:
+        // Shared datastore access
+        void setGlobalDatastore(Basemodule* gds);
+
+        // Grid read utilities — callable on mGlobalDatastore from any module
+        int     findGridRow  (const QString& propName, const QString& keyCol, const QString& keyValue);
+        int     getGridSize  (const QString& propName);
+        QString getGridString(const QString& propName, const QString& colName, int line);
+        double  getGridFloat (const QString& propName, const QString& colName, int line);
+        long    getGridInt   (const QString& propName, const QString& colName, int line);
+
+    protected:
+        Basemodule* mGlobalDatastore = nullptr;
+
 
 }
 ;
