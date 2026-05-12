@@ -106,6 +106,28 @@ bool IndiModule::onExternalEventIndi(OST::ExtEvent event)
             }
             setFocalLengthAndDiameter(); // Mandatory for simulators to work
         }
+        if (event.prpkey == "server")
+        {
+            disconnectIndi();
+            getEltString("server", "servers")->setValue("", true);
+            if (mGlobalDatastore && event.eltkey == "servers")
+            {
+                QString serverName = eltval["value"].toString();
+                if (!serverName.isEmpty())
+                {
+                    QString host = mGlobalDatastore->getGridString("servers", "host",    "name", serverName);
+                    int port = mGlobalDatastore->getGridInt("servers", "port", "name", serverName);
+                    if (host != "")
+                        logInfo("Servers: %1 : %2:%3", {serverName, host, port});
+                    else
+                        logWarning("Servers '%1' not found in GlobalDatastore", {serverName});
+                    getEltString("server", "host")->setValue(host);
+                    getEltInt("server", "port")->setValue(port);
+                    getEltString("server", "servers")->setValue(eltval["value"].toString());
+                }
+            }
+            connectIndi();
+        }
 
         if (event.prpkey == "devicesactions" && event.eltkey == "condevs")
         {
@@ -819,6 +841,15 @@ bool IndiModule::createDeviceProperty(const QString &key, const QString &label, 
 }
 void IndiModule::OnAfterIndiConnectIndiTimer()
 {
+    std::vector<INDI::BaseDevice> devs = getDevices();
+    for(std::size_t i = 0; i < devs.size(); i++)
+    {
+        QString d = devs[i].getDeviceName();
+        if (!devs[i].isConnected())
+        {
+            connectDevice(d);
+        }
+    }
     refreshDeviceslovs();
 }
 bool IndiModule::refreshDeviceslovs()

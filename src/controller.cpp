@@ -83,6 +83,8 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
 
     ls = new OST::LovString("optics");
     createControllerLov("optics", ls);
+    ls = new OST::LovString("servers");
+    createControllerLov("servers", ls);
 
     // Shared datastore — static, always available, created before any module
     mGlobalDatastore = new GlobalDatastore("GlobalDatastore", "Global data", "default", {});
@@ -97,6 +99,9 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     mGlobalDatastore->onAfterInit();
     mGlobalDatastore->registerLov("optics", "name", "name",
                                   static_cast<OST::LovString*>(mControllerLovs["optics"]));
+    mGlobalDatastore->registerLov("servers", "name", "name",
+                                  static_cast<OST::LovString*>(mControllerLovs["servers"]));
+
     wshandler->onModuleEvent(OST::EvType::aa, QVariant(), nullptr, nullptr, nullptr, mGlobalDatastore);
 
     if (_libpath == "")
