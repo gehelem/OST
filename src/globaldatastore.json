@@ -1,5 +1,41 @@
 {
 "p":{
+    "servers": {
+        "hasprofile":true,
+        "devcat": "Module",
+        "group": "Indi",
+        "hasprofile": true,
+        "hasGrid": true,
+        "showGrid": true,
+        "showElts": true,
+        "order":"99",
+        "permission": 2,
+        "label": "Servers",
+        "e": {
+            "name": {
+                "type": "string",
+                "label": "Name",
+                "order":"00",
+                "autoupdate":true
+            },
+            "host": {
+                "type": "string",
+                "label": "Host",
+                "order":"00",
+                "autoupdate":true,
+                "value": "localhost"
+            },
+            "port": {
+                "type": "int",
+                "label": "Port",
+                "order":"01",
+                "autoupdate":true,
+                "value": 7624
+            }
+
+        }
+    },
+
     "optics": {
         "label": "Optics",
         "devcat": "Equipment",

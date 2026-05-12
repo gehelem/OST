@@ -1,7 +1,7 @@
 #ifndef GLOBALDATASTORE_H
 #define GLOBALDATASTORE_H
 
-#include <basemodule.h>
+#include <indimodule.h>
 #include <lovbase.h>
 #include <lovstring.h>
 
@@ -17,7 +17,7 @@
  *   mGlobalDatastore->getGridString(…)
  *   etc.
  */
-class GlobalDatastore : public Basemodule
+class GlobalDatastore : public IndiModule
 {
     Q_OBJECT
 
@@ -40,7 +40,6 @@ public:
     void onAfterInit() override;
 
 protected:
-    bool onExternalEventIndi(OST::ExtEvent event) override { Q_UNUSED(event); return true; }
     void onExternalEvent(OST::ExtEvent event) override;
 
 private:

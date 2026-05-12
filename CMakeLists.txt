@@ -130,7 +130,7 @@ add_executable(ostserver
     ${CMAKE_CURRENT_SOURCE_DIR}/QtZeroConf/avahiclient.cpp
 )
 target_link_libraries(ostserver
-    ostbasemodule
+    ostindimodule
 #    ostmaincontrol
     Qt${QT_VERSION_MAJOR}::Gui
     Qt${QT_VERSION_MAJOR}::Core

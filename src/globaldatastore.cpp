@@ -2,7 +2,7 @@
 
 GlobalDatastore::GlobalDatastore(const QString &name, const QString &label,
                                  const QString &profile, const QVariantMap &params)
-    : Basemodule(name, label, profile, params)
+    : IndiModule(name, label, profile, params)
 {
     Q_INIT_RESOURCE(globaldatastore);
     loadOstPropertiesFromFile(":globaldatastore.json");
