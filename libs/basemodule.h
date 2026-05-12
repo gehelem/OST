@@ -142,6 +142,10 @@ class Basemodule : public DBManager
         QString getGridString(const QString& propName, const QString& colName, int line);
         double  getGridFloat (const QString& propName, const QString& colName, int line);
         long    getGridInt   (const QString& propName, const QString& colName, int line);
+        // Key-based overloads — look up by keyCol=keyValue, no intermediate row needed
+        QString getGridString(const QString& propName, const QString& colName, const QString& keyCol, const QString& keyValue);
+        double  getGridFloat (const QString& propName, const QString& colName, const QString& keyCol, const QString& keyValue);
+        long    getGridInt   (const QString& propName, const QString& colName, const QString& keyCol, const QString& keyValue);
 
     protected:
         Basemodule* mGlobalDatastore = nullptr;

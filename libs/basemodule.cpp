@@ -658,6 +658,27 @@ long Basemodule::getGridInt(const QString& propName, const QString& colName, int
     return getInt(propName, colName, (long)line);
 }
 
+QString Basemodule::getGridString(const QString& propName, const QString& colName, const QString& keyCol, const QString& keyValue)
+{
+    int row = findGridRow(propName, keyCol, keyValue);
+    if (row < 0) return QString();
+    return getGridString(propName, colName, row);
+}
+
+double Basemodule::getGridFloat(const QString& propName, const QString& colName, const QString& keyCol, const QString& keyValue)
+{
+    int row = findGridRow(propName, keyCol, keyValue);
+    if (row < 0) return 0.0;
+    return getGridFloat(propName, colName, row);
+}
+
+long Basemodule::getGridInt(const QString& propName, const QString& colName, const QString& keyCol, const QString& keyValue)
+{
+    int row = findGridRow(propName, keyCol, keyValue);
+    if (row < 0) return 0;
+    return getGridInt(propName, colName, row);
+}
+
 void Basemodule::otherModuleRequestProfileLoad(QString mod, QString profile)
 {
     OST::ExtEvent event;

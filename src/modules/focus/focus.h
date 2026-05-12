@@ -64,8 +64,6 @@ class MODULE_INIT Focus : public IndiModule
 
         bool    _newblob;
 
-        double _focalLength = 0.0;
-        double _diameter    = 0.0;
         int    _startpos = 30000;
         int    _backlash = 100;
         int    _iterations = 3;
