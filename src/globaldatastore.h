@@ -40,6 +40,7 @@ public:
     void onAfterInit() override;
 
 protected:
+    bool onExternalEventIndi(OST::ExtEvent event) override { Q_UNUSED(event); return true; }
     void onExternalEvent(OST::ExtEvent event) override;
 
 private:

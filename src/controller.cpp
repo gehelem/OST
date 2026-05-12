@@ -304,11 +304,14 @@ void Controller::saveConf(const QString &pConf)
     QList<Basemodule *> mods = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
     for (Basemodule *m : mods)
     {
-        QVariantMap n;
-        n["label"] = m->getModuleLabel();
-        n["profile"] = m->getCurrentProfile();
-        n["type"] = m->getClassName();
-        ms[m->getModuleName()] = n;
+        if (m->getModuleName() != "GlobalDatastore")
+        {
+            QVariantMap n;
+            n["label"] = m->getModuleLabel();
+            n["profile"] = m->getCurrentProfile();
+            n["type"] = m->getClassName();
+            ms[m->getModuleName()] = n;
+        }
     }
     if (!dbmanager->saveDbConfiguration(pConf, ms))
     {
