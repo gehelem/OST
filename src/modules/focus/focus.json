@@ -95,6 +95,16 @@
         "order":"222Parms000",
         "label": "Focus parameters",
         "e": {
+            "optics": {
+                "order":"01",
+                "autoupdate":true,
+                "directedit":true,
+                "type":"string",
+                "label": "Optics",
+                "value":"",
+                "listOfValues":"optics",
+                "listOfValuesIsExternal":true
+            },
             "startpos": {
                 "order":"10",
                 "autoupdate":true,

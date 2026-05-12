@@ -253,6 +253,24 @@ void Focus::startCoarse()
     _loopIterations =    getEltInt("parameters", "loopIterations")->value();
     _backlash =          getEltInt("parameters", "backlash")->value();
 
+    _focalLength = 0.0;
+    _diameter    = 0.0;
+    QString opticsName = getString("parameters", "optics");
+    if (mGlobalDatastore && !opticsName.isEmpty())
+    {
+        int row = mGlobalDatastore->findGridRow("optics", "name", opticsName);
+        if (row >= 0)
+        {
+            _focalLength = mGlobalDatastore->getGridFloat("optics", "focal",    row);
+            _diameter    = mGlobalDatastore->getGridFloat("optics", "diameter", row);
+            logInfo("Optics: %1 - focal %2 mm, diameter %3 mm", {opticsName, _focalLength, _diameter});
+        }
+        else
+        {
+            logWarning("Optics '%1' not found in GlobalDatastore", {opticsName});
+        }
+    }
+
     //pMachine = QScxmlStateMachine::fromFile(":focus.scxml");
 
     pMachine->init();
