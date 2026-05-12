@@ -208,22 +208,6 @@ void Focus::startCoarse()
     {
         //sendModNewNumber(getString("devices", "camera"), "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );
     }
-    if (mGlobalDatastore)
-    {
-        QString opticsName = getString("parameters", "optics");
-        if (!opticsName.isEmpty())
-        {
-            double focal    = mGlobalDatastore->getGridFloat("optics", "focal",    "name", opticsName);
-            double diameter = mGlobalDatastore->getGridFloat("optics", "diameter", "name", opticsName);
-            if (focal > 0.0)
-                logInfo("Optics: %1 - focal %2 mm, diameter %3 mm", {opticsName, focal, diameter});
-            else
-                logWarning("Optics '%1' not found in GlobalDatastore", {opticsName});
-            getEltFloat("optic", "fl")->setValue(focal);
-            getEltFloat("optic", "diam")->setValue(diameter);
-        }
-    }
-    setFocalLengthAndDiameter(); // Mandatory for simulators to work
     enableDirectBlobAccess(getString("devices", "camera").toStdString().c_str(), nullptr);
 
     _posvector.clear();

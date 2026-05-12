@@ -85,6 +85,28 @@ bool IndiModule::onExternalEventIndi(OST::ExtEvent event)
             getStore()[event.prpkey]->getElt(event.eltkey)->accept(&u, eltval, b);
             return true;
         }
+        if (event.prpkey == "optic")
+        {
+            getEltString("optic", "optic")->setValue("", true);
+            if (mGlobalDatastore && event.eltkey == "optic")
+            {
+                QString opticsName = eltval["value"].toString();
+                if (!opticsName.isEmpty())
+                {
+                    double focal    = mGlobalDatastore->getGridFloat("optics", "focal",    "name", opticsName);
+                    double diameter = mGlobalDatastore->getGridFloat("optics", "diameter", "name", opticsName);
+                    if (focal > 0.0)
+                        logInfo("Optics: %1 - focal %2 mm, diameter %3 mm", {opticsName, focal, diameter});
+                    else
+                        logWarning("Optics '%1' not found in GlobalDatastore", {opticsName});
+                    getEltFloat("optic", "fl")->setValue(focal);
+                    getEltFloat("optic", "diam")->setValue(diameter);
+                    getEltString("optic", "optic")->setValue(eltval["value"].toString());
+                }
+            }
+            setFocalLengthAndDiameter(); // Mandatory for simulators to work
+        }
+
         if (event.prpkey == "devicesactions" && event.eltkey == "condevs")
         {
             if (!isServerConnected())
@@ -1128,6 +1150,12 @@ bool IndiModule::giveMeAnOptic()
     r->setAutoUpdate(true);
     r->setValue(1);
     pm->addElt(r);
+    OST::ElementString* o = new  OST::ElementString("optic", "Global optic", "0", "");
+    o->setDirectEdit(true);
+    o->setAutoUpdate(true);
+    o->setValue("");
+    o->setGlobalLov("optics", OST::LovScope::Controller);
+    pm->addElt(o);
     mIsOptic = true;
     return true;
 
