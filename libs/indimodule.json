@@ -69,6 +69,16 @@
         "permission": 2,
         "label": "Devices",
         "e": {
+            "equipments": {
+                "order":"01",
+                "autoupdate":true,
+                "directedit":true,
+                "type":"string",
+                "label": "Global equipment set",
+                "value":"",
+                "listOfValues":"equipments",
+                "listOfValuesIsExternal":true
+            }
         }
     },
     "devicesactions": {

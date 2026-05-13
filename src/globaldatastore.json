@@ -35,7 +35,83 @@
 
         }
     },
-
+    "equipments": {
+        "label": "Equipments",
+        "hasprofile":true,
+        "devcat": "Equipment",
+        "group": "",
+        "hasprofile": true,
+        "hasGrid": true,
+        "showGrid": true,
+        "showElts": false,
+        "order":"99",
+        "permission": 2,
+        "e": {
+            "name": {
+                "type": "string",
+                "label": "Name",
+                "order":"00",
+                "autoupdate":true
+            },
+            "host": {
+                "type": "string",
+                "label": "Indi server",
+                "order":"00",
+                "listOfValues":"servers",
+                "listOfValuesIsExternal":true,
+                "autoupdate":true
+            },
+            "camera": {
+                "type": "string",
+                "label": "Camera",
+                "order":"00",
+                "listOfValues":"DRIVER_INTERFACE-CCD_INTERFACE",
+                "autoupdate":true
+            },
+            "mount": {
+                "type": "string",
+                "label": "Mount",
+                "order":"00",
+                "listOfValues":"DRIVER_INTERFACE-TELESCOPE_INTERFACE",
+                "autoupdate":true
+            },
+            "focuser": {
+                "type": "string",
+                "label": "Focuser",
+                "order":"00",
+                "listOfValues":"DRIVER_INTERFACE-FOCUSER_INTERFACE",
+                "autoupdate":true
+            },
+            "filterwheel": {
+                "type": "string",
+                "label": "Filter wheel",
+                "order":"00",
+                "listOfValues":"DRIVER_INTERFACE-FILTER_INTERFACE",
+                "autoupdate":true
+            },
+            "guidecamera": {
+                "type": "string",
+                "label": "Guide camera",
+                "order":"00",
+                "listOfValues":"DRIVER_INTERFACE-CCD_INTERFACE",
+                "autoupdate":true
+            },
+            "guidest4": {
+                "type": "string",
+                "label": "Guide through",
+                "order":"00",
+                "listOfValues":"DRIVER_INTERFACE-GUIDER_INTERFACE",
+                "autoupdate":true
+            },
+            "gps": {
+                "type": "string",
+                "label": "GPS",
+                "order":"00",
+                "listOfValues":"DRIVER_INTERFACE-GPS_INTERFACE",
+                "autoupdate":true
+            }
+        }
+    },
     "optics": {
         "label": "Optics",
         "devcat": "Equipment",
