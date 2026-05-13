@@ -82,7 +82,7 @@
                 "listOfValues":"DRIVER_INTERFACE-FOCUSER_INTERFACE",
                 "autoupdate":true
             },
-            "filterwheel": {
+            "filter": {
                 "type": "string",
                 "label": "Filter wheel",
                 "order":"00",

@@ -129,6 +129,48 @@ bool IndiModule::onExternalEventIndi(OST::ExtEvent event)
             connectIndi();
         }
 
+        if (event.prpkey == "devices"  && event.eltkey == "equipments")
+        {
+            disconnectIndi();
+            if (mGlobalDatastore)
+            {
+                QString equipmentName = eltval["value"].toString();
+                if (!equipmentName.isEmpty())
+                {
+                    if (getProperty("devices")->getElts()->contains("camera")) getEltString("devices", "camera")->setValue("");
+                    if (getProperty("devices")->getElts()->contains("mount")) getEltString("devices", "mount")->setValue("");
+                    if (getProperty("devices")->getElts()->contains("focuser")) getEltString("devices", "focuser")->setValue("");
+                    if (getProperty("devices")->getElts()->contains("filter")) getEltString("devices", "filter")->setValue("");
+                    if (getProperty("devices")->getElts()->contains("guidecamera")) getEltString("devices", "guidecamera")->setValue("");
+                    if (getProperty("devices")->getElts()->contains("guidest4")) getEltString("devices", "guidest4")->setValue("");
+                    if (getProperty("devices")->getElts()->contains("gps")) getEltString("devices", "gps")->setValue("");
+                    QString camera = mGlobalDatastore->getGridString("equipments", "camera",    "name", equipmentName);
+                    QString mount = mGlobalDatastore->getGridString("equipments", "mount",    "name", equipmentName);
+                    QString focuser = mGlobalDatastore->getGridString("equipments", "focuser",    "name", equipmentName);
+                    QString filter = mGlobalDatastore->getGridString("equipments", "filter",    "name", equipmentName);
+                    QString guidecamera = mGlobalDatastore->getGridString("equipments", "guidecamera",    "name", equipmentName);
+                    QString guidest4 = mGlobalDatastore->getGridString("equipments", "guidest4",    "name", equipmentName);
+                    QString gps = mGlobalDatastore->getGridString("equipments", "gps",    "name", equipmentName);
+                    if (camera != "")
+                        logInfo("Equipments: %1", {equipmentName});
+                    else
+                        logWarning("Equipments '%1' not found in GlobalDatastore", {equipmentName});
+                    if (getProperty("devices")->getElts()->contains("camera")) getEltString("devices", "camera")->setValue(camera);
+                    if (getProperty("devices")->getElts()->contains("mount")) getEltString("devices", "mount")->setValue(mount);
+                    if (getProperty("devices")->getElts()->contains("focuser")) getEltString("devices", "focuser")->setValue(focuser);
+                    if (getProperty("devices")->getElts()->contains("filter")) getEltString("devices", "filter")->setValue(filter);
+                    if (getProperty("devices")->getElts()->contains("guidecamera")) getEltString("devices",
+                                "guidecamera")->setValue(guidecamera);
+                    if (getProperty("devices")->getElts()->contains("guidest4")) getEltString("devices", "guidest4")->setValue(guidest4);
+                    if (getProperty("devices")->getElts()->contains("gps")) getEltString("devices", "gps")->setValue(gps);
+
+                    //getEltString("server", "servers")->setValue(eltval["value"].toString());
+                }
+            }
+            connectIndi();
+        }
+
+
         if (event.prpkey == "devicesactions" && event.eltkey == "condevs")
         {
             if (!isServerConnected())
