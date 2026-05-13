@@ -10,16 +10,6 @@
         "permission": 2,
         "label": "Server",
         "e": {
-            "servers": {
-                "order":"01",
-                "autoupdate":true,
-                "directedit":true,
-                "type":"string",
-                "label": "Global servers",
-                "value":"",
-                "listOfValues":"servers",
-                "listOfValuesIsExternal":true
-            },
             "host": {
                 "type": "string",
                 "label": "Host",

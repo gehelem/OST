@@ -106,28 +106,6 @@ bool IndiModule::onExternalEventIndi(OST::ExtEvent event)
             }
             setFocalLengthAndDiameter(); // Mandatory for simulators to work
         }
-        if (event.prpkey == "server")
-        {
-            disconnectIndi();
-            getEltString("server", "servers")->setValue("", true);
-            if (mGlobalDatastore && event.eltkey == "servers")
-            {
-                QString serverName = eltval["value"].toString();
-                if (!serverName.isEmpty())
-                {
-                    QString host = mGlobalDatastore->getGridString("servers", "host",    "name", serverName);
-                    int port = mGlobalDatastore->getGridInt("servers", "port", "name", serverName);
-                    if (host != "")
-                        logInfo("Servers: %1 : %2:%3", {serverName, host, port});
-                    else
-                        logWarning("Servers '%1' not found in GlobalDatastore", {serverName});
-                    getEltString("server", "host")->setValue(host);
-                    getEltInt("server", "port")->setValue(port);
-                    getEltString("server", "servers")->setValue(eltval["value"].toString());
-                }
-            }
-            connectIndi();
-        }
 
         if (event.prpkey == "devices"  && event.eltkey == "equipments")
         {
@@ -151,6 +129,7 @@ bool IndiModule::onExternalEventIndi(OST::ExtEvent event)
                     QString guidecamera = mGlobalDatastore->getGridString("equipments", "guidecamera",    "name", equipmentName);
                     QString guidest4 = mGlobalDatastore->getGridString("equipments", "guidest4",    "name", equipmentName);
                     QString gps = mGlobalDatastore->getGridString("equipments", "gps",    "name", equipmentName);
+                    QString hostport = mGlobalDatastore->getGridString("equipments", "host",    "name", equipmentName);
                     if (camera != "")
                         logInfo("Equipments: %1", {equipmentName});
                     else
@@ -164,7 +143,14 @@ bool IndiModule::onExternalEventIndi(OST::ExtEvent event)
                     if (getProperty("devices")->getElts()->contains("guidest4")) getEltString("devices", "guidest4")->setValue(guidest4);
                     if (getProperty("devices")->getElts()->contains("gps")) getEltString("devices", "gps")->setValue(gps);
 
-                    //getEltString("server", "servers")->setValue(eltval["value"].toString());
+                    QString host = mGlobalDatastore->getGridString("servers", "host",    "name", hostport);
+                    int port = mGlobalDatastore->getGridInt("servers", "port", "name", hostport);
+                    if (host != "")
+                        logInfo("Servers: %1 : %2:%3", {hostport, host, port});
+                    else
+                        logWarning("Servers '%1' not found in GlobalDatastore", {hostport});
+                    getEltString("server", "host")->setValue(host);
+                    getEltInt("server", "port")->setValue(port);
                 }
             }
             connectIndi();
