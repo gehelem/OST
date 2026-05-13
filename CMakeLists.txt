@@ -146,8 +146,8 @@ target_link_libraries(ostserver
     z
 )
 # Ensure translations are compiled before linking ostserver
-#add_dependencies(ostserver translations)
-#add_dependencies(ostserver generate_version)
+add_dependencies(ostserver translations)
+add_dependencies(ostserver generate_version)
 
 #########################
 #### modules libraries ##
@@ -539,16 +539,16 @@ install(TARGETS
 
 # Create a custom target that always runs
 
-#add_custom_target(
-#    generate_version ALL
-#    COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/generate-version.sh"
-#            "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
-#            "${CMAKE_CURRENT_SOURCE_DIR}/src/version.cc.in"
-#    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-#    BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
-#    COMMENT "Generating version.cc from git information..."
-#    VERBATIM
-#)
+add_custom_target(
+    generate_version ALL
+    COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/generate-version.sh"
+            "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/version.cc.in"
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
+    COMMENT "Generating version.cc from git information..."
+    VERBATIM
+)
 
 # Add version.cc to sources
 list(APPEND SOURCES "${CMAKE_CURRENT_BINARY_DIR}/version.cc" version.hh)
