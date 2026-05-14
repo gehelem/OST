@@ -74,25 +74,14 @@ class ElementBool: public ElementTemplateNotNumeric<bool>
 
     public:
         /**
-         * @brief Accept a visitor for the Visitor pattern
-         * @param pVisitor Pointer to visitor object
-         */
-        void accept(ElementVisitor *pVisitor) override;
-
-        /**
-         * @brief Accept a visitor with data parameter
-         * @param pVisitor Pointer to visitor object
-         * @param data QVariantMap with operation data
-         */
-        void accept(ElementVisitor *pVisitor, QVariantMap &data) override;
-
-        /**
          * @brief Accept a visitor with action and data parameters
          * @param pVisitor Pointer to visitor object
-         * @param action Action string (e.g., "newline", "cleargrid")
          * @param data QVariantMap with operation data
+         * @param signalType Signal dispatch
+         *
+         * Used for grid operations and custom actions.
          */
-        void accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data) override;
+        void accept(ElementVisitor *pVisitor, QVariantMap &data, bool &emitEvent) override;
 
         /**
          * @brief Construct a new ElementBool object
@@ -100,7 +89,7 @@ class ElementBool: public ElementTemplateNotNumeric<bool>
          * @param order Sort order within property (e.g., "10", "20")
          * @param hint Tooltip/help text for frontend
          */
-        ElementBool(const QString &label, const QString &order, const QString &hint);
+        ElementBool(const QString &key, const QString &label, const QString &order, const QString &hint);
 
         /**
          * @brief Destroy the ElementBool object
@@ -172,7 +161,7 @@ class ValueBool: public ValueTemplate<bool>
          *
          * Copies this value back into the parent element.
          */
-        void updateElement(const bool &emitEvent) override;
+        void updateElement(const bool  &emitEvent) override;
 
 };
 

@@ -69,25 +69,14 @@ class ElementString: public ElementTemplateNotNumeric<QString>
 
     public:
         /**
-         * @brief Accept a visitor for the Visitor pattern
-         * @param pVisitor Pointer to visitor object
-         */
-        void accept(ElementVisitor *pVisitor) override;
-
-        /**
-         * @brief Accept a visitor with data parameter
-         * @param pVisitor Pointer to visitor object
-         * @param data QVariantMap with operation data
-         */
-        void accept(ElementVisitor *pVisitor, QVariantMap &data) override;
-
-        /**
          * @brief Accept a visitor with action and data parameters
          * @param pVisitor Pointer to visitor object
-         * @param action Action string (e.g., "newline", "cleargrid")
          * @param data QVariantMap with operation data
+         * @param signalType Signal dispatch
+         *
+         * Used for grid operations and custom actions.
          */
-        void accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data) override;
+        void accept(ElementVisitor *pVisitor, QVariantMap &data, bool &emitEvent) override;
 
         /**
          * @brief Construct a new ElementString object
@@ -95,7 +84,7 @@ class ElementString: public ElementTemplateNotNumeric<QString>
          * @param order Sort order within property (e.g., "10", "20")
          * @param hint Tooltip/help text for frontend
          */
-        ElementString(const QString &label, const QString &order, const QString &hint);
+        ElementString(const QString &key, const QString &label, const QString &order, const QString &hint);
 
         /**
          * @brief Destroy the ElementString object
@@ -119,26 +108,26 @@ class ElementString: public ElementTemplateNotNumeric<QString>
 
         /**
          * @brief Add value to LOV
-         * @param val String value (key)
+         * @param val   String value (key)
          * @param label Display label for this value
          * @return true if added, false if value already exists
          */
         bool lovAdd(QString val, QString label);
 
         /**
-         * @brief Update LOV value label
-         * @param val String value to update
+         * @brief Update LOV label for an existing value
+         * @param val   String value to update
          * @param label New display label
          * @return true if updated, false if value not found
          */
-        bool lovUpdate(QString  val, QString label);
+        bool lovUpdate(QString val, QString label);
 
         /**
          * @brief Delete value from LOV
          * @param val String value to delete
          * @return true if deleted, false if value not found
          */
-        bool lovDel(QString  val);
+        bool lovDel(QString val);
 
         /**
          * @brief Clear all LOV entries
@@ -198,7 +187,7 @@ class ValueString: public ValueTemplate<QString>
          *
          * Copies this value back into the parent element.
          */
-        void updateElement(const bool &emitEvent) override;
+        void updateElement(const bool  &emitEvent) override;
 
 };
 

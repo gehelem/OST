@@ -1,6 +1,7 @@
 #ifndef INDIPANEL_MODULE_h_
 #define INDIPANEL_MODULE_h_
 #include <indimodule.h>
+#include <fileio.h>
 
 #if defined(INDIPANEL_MODULE)
 #  define MODULE_INIT Q_DECL_EXPORT
@@ -15,20 +16,20 @@ class MODULE_INIT IndiPanel : public IndiModule
     public:
         IndiPanel(QString name, QString label, QString profile, QVariantMap availableModuleLibs);
         ~IndiPanel();
+        void onNewDevice      (INDI::BaseDevice dp) override ;
+        void onRemoveDevice   (INDI::BaseDevice dp) override;
+        void onNewProperty    (INDI::Property property) override;
+        void onRemoveProperty (INDI::Property property) override;
+        void onUpdateProperty (INDI::Property property) override ;
 
     public slots:
         //void OnSetPropertyText(TextProperty* prop) override;
 
     private:
-        void newDevice      (INDI::BaseDevice dp) override;
-        void removeDevice   (INDI::BaseDevice dp) override;
-        void newProperty    (INDI::Property property) override;
-        void removeProperty (INDI::Property property) override;
-        void updateProperty (INDI::Property property) override;
-        void newBLOB        (IBLOB bp);
         void newMessage     (INDI::BaseDevice dp, int messageID) override;
-        void OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                               const QVariantMap &eventData) override;
+        void onExternalEvent(OST::ExtEvent event) override;
+        QPointer<fileio> _image;
+        FITSImage::Statistic stats;
 
 };
 

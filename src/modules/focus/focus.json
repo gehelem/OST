@@ -1,0 +1,225 @@
+{
+"p":{
+    "values": {
+        "hasGrid":true,
+        "showGrid":false,
+        "showElts":false,
+        "devcat": "Control",
+        "order":"Control100",
+        "group": "",
+        "permission": 0,
+        "label": "Values",
+        "graphType":"XY",
+        "graphParams":{
+            "X":"focpos",
+            "Y":"loopHFRavg"
+        },
+        "e": {
+            "loopHFRavg": {
+                "type":"float",
+                "label": "Average HFR ('')",
+                "order":"10",
+                "value":0,
+                "format": "99.99"
+            },
+            "focpos": {
+                "type":"int",
+                "label": "Focuser position",
+                "order":"00",
+                "value":0,
+                "step":1,
+                "format": "9999999"
+            },
+            "bestpos": {
+                "type":"int",
+                "label": "Best position",
+                "order":"20",
+                "value":0,
+                "step":1,
+                "format": "9999999"
+            },
+            "bestposfit": {
+                "type":"float",
+                "label": "Pol. fit position",
+                "order":"30",
+                "value":0,
+                "format": "9999999.99"
+            },
+            "imgHFR": {
+                "type":"float",
+                "label": "Last imgage HFR ('')",
+                "order":"40",
+                "value":0,
+                "format": "99.99"
+            },
+            "iteration": {
+                "type":"int",
+                "label": "Iteration",
+                "order":"50",
+                "value":0,
+                "step":1,
+                "format": "9999"
+            }
+        }
+    },
+    "results": {
+        "devcat": "Control",
+        "order":"Control050",
+        "group": "",
+        "permission": 0,
+        "label": "Final result",
+        "e": {
+            "hfr": {
+                "type":"float",
+                "label": "Average HFR result ('')",
+                "value":0,
+                "order":"10",
+                "format": "99.99"
+            },
+            "pos": {
+                "type":"float",
+                "label": "Focuser final position",
+                "order":"00",
+                "value":0,
+                "step":1,
+                "format": "9999999"
+            }
+
+        }
+    },
+    "parameters": {
+        "devcat": "Parameters",
+        "group": "Focus",
+        "permission": 2,
+        "hasprofile":true,
+        "order":"222Parms000",
+        "label": "Focus parameters",
+        "e": {
+            "startpos": {
+                "order":"10",
+                "autoupdate":true,
+                "directedit":true,
+                "type":"int",
+                "label": "Start position",
+                "order":"00",
+                "value":32000,
+                "format": "999999"
+            },
+            "steps": {
+                "order":"20",
+                "autoupdate":true,
+                "directedit":true,
+                "type":"int",
+                "label": "Steps gap",
+                "value":2000,
+                "format": "999999"
+            },
+            "iterations": {
+                "order":"30",
+                "autoupdate":true,
+                "directedit":true,
+                "type":"int",
+                "label": "Iterations",
+                "value":5,
+                "format": "99"
+            },
+            "loopIterations": {
+                "order":"40",
+                "autoupdate":true,
+                "directedit":true,
+                "type":"int",
+                "label": "Average over",
+                "order":"00",
+                "value":3,
+                "format": "99"
+            },
+            "aroundinitial": {
+                "order":"15",
+                "autoupdate":true,
+                "directedit":true,
+                "type":"bool",
+                "label": "Focus around actual",
+                "value":true,
+                "format": "99"
+            },
+            "backlash": {
+                "order":"60",
+                "autoupdate":true,
+                "directedit":true,
+                "type":"int",
+                "label": "Backlash overshoot",
+                "value":100,
+                "format": "99999"
+            },
+            "zoning": {
+                "order":"70",
+                "autoupdate":true,
+                "directedit":true,
+                "type":"int",
+                "label": "Zoning",
+                "value":2,
+                "format": "99999",
+                "min":1,
+                "max":64,
+                "listOfValues":[
+                    [1,"1x1"],
+                    [2,"2x2"],
+                    [3,"3x3"],
+                    [4,"4x4"],
+                    [5,"5x5"],
+                    [6,"6x6"],
+                    [7,"7x7"],
+                    [8,"8x8"],
+                    [9,"9x9"]
+                ]
+
+            }
+
+        }
+    },
+    "progress":{
+        "devcat": "Control",
+        "group": "",
+        "permission": 0,
+        "order":"Control010",
+        "label":"Progress",
+        "e": {
+            "global": {
+                "type": "prg",
+                "prgtype": "spinner",
+                "label": "",
+                "dynlabel": "",
+                "value": 0,
+                "order":0
+            }
+        }
+    },
+    "zones": {
+        "devcat": "Control",
+        "order":"Control090",
+        "group": "",
+        "permission": 0,
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
+        "label": "Zoning results",
+        "e": {
+            "zone": {
+                "order":"1",
+                "type":"string",
+                "label": "Zone id",
+                "value":0,
+                "format": "99.99"
+            },
+            "bestpos": {
+                "order":"2",
+                "type":"float",
+                "label": "Best position",
+                "value":0,
+                "format": "9999999"
+            }
+        }
+    }
+
+}
+}

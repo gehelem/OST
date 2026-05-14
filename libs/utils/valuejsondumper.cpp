@@ -5,11 +5,12 @@
 #include "elementint.h"
 #include "elementlight.h"
 #include "elementstring.h"
-#include "elementmessage.h"
 #include "elementvideo.h"
 #include "elementprg.h"
 #include "elementdate.h"
 #include "elementtime.h"
+#include "elementdatetime.h"
+
 namespace  OST
 {
 
@@ -49,6 +50,7 @@ void ValueJsonDumper::visit(ValueImg *  pValue)
     imgdata["issolved"] = pValue->value.isSolved;
     imgdata["solverra"] = pValue->value.solverRA;
     imgdata["solverde"] = pValue->value.solverDE;
+    imgdata["solverorientation"] = pValue->value.solverOrientation;
 
 
     QJsonArray arr;
@@ -115,14 +117,6 @@ void ValueJsonDumper::visit(ValueVideo *  pValue)
     //mResult = pValue->value;
     mResult = "to be implemented";
 };
-void ValueJsonDumper::visit(ValueMessage *  pValue)
-{
-    QJsonObject ob;
-    ob["level"] = pValue->value.level;
-    ob["message"] = pValue->value.message;
-    ob["ts"] = pValue->value.ts.toString("yyyy/MM/dd hh:mm:ss.zzz");;
-    mResult = ob;
-};
 void ValueJsonDumper::visit(ValuePrg * pValue)
 {
     QJsonObject ob;
@@ -147,6 +141,20 @@ void ValueJsonDumper::visit(ValueTime * pValue)
     ob["mm"] = pValue->value.minute();
     ob["ss"] = pValue->value.second();
     ob["ms"] = pValue->value.msec();
+    mResult = ob;
+
+};
+void ValueJsonDumper::visit(ValueDateTime * pValue)
+{
+    QJsonObject ob;
+    ob["year"] = pValue->value.date().year();
+    ob["month"] = pValue->value.date().month();
+    ob["day"] = pValue->value.date().day();
+    ob["hh"] = pValue->value.time().hour();
+    ob["mm"] = pValue->value.time().minute();
+    ob["ss"] = pValue->value.time().second();
+    ob["ms"] = pValue->value.time().msec();
+
     mResult = ob;
 
 };

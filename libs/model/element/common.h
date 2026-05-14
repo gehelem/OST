@@ -6,7 +6,7 @@
  *
  * This file defines all common types, enumerations, and data structures used
  * throughout the OST element and property system. Includes:
- * - State and status enumerations (State, MsgLevel, SliderRule, SwitchsRule)
+ * - State and status enumerations (State, LogLevel, SliderRule, SwitchsRule)
  * - Data structures for specialized elements (ImgData, VideoData, MsgData, PrgData)
  * - Graph configuration types (GraphType, GraphDefs)
  * - Conversion utility functions
@@ -17,8 +17,11 @@
 
 #include <QtCore>
 
+
+
 namespace  OST
 {
+
 
 /**
  * @enum State
@@ -151,29 +154,48 @@ inline SliderRule IntToSlider(int val )
 }
 
 /**
- * @enum MsgLevel
- * @brief Message severity level enumeration
+ * @enum LogLevel
+ * @brief Log message severity level enumeration
  *
- * Defines severity levels for log messages and notifications.
- * Used by ElementMessage and message signal handlers.
+ * Defines severity levels for log messages, notifications, and console output.
+ * Used throughout OST for logging, ElementMessage, and message signal handlers.
  *
- * Frontend displays with color coding:
- * - Info: Normal/white text
- * - Warn: Yellow/orange text
- * - Err: Red text
+ * Frontend/Console displays with color coding:
+ * - Debug: Gray (verbose debug information)
+ * - Info: Normal/white text (informational messages)
+ * - Warning: Yellow/orange text (non-critical issues)
+ * - Error: Red text (critical problems)
+ * - Critical: Red bold (severe system errors)
  *
+ * @see Logger
  * @see ElementMessage
  * @see MsgData
  * @see PropertyBase::sendInfo()
  * @see PropertyBase::sendWarning()
  * @see PropertyBase::sendError()
  */
-typedef enum
+enum class LogLevel
 {
-    Info = 0,  /*!< Informational message (normal priority) */
-    Warn,      /*!< Warning message (non-critical issue) */
-    Err        /*!< Error message (critical problem) */
-} MsgLevel;
+    Debug = 0,      /*!< Debug/verbose information (lowest priority) */
+    Info = 1,       /*!< Informational message (normal priority) */
+    Warning = 2,    /*!< Warning message (non-critical issue) */
+    Error = 3,      /*!< Error message (critical problem) */
+    Critical = 4    /*!< Critical error (severe system failure) */
+};
+
+/**
+ * @enum LovScope
+ * @brief Scope of a global LOV — determines who is responsible for its content
+ *
+ * Module: the LOV is owned and populated by the module itself.
+ * Controller: the LOV is owned and populated by the controller.
+ * The frontend uses this to know where to look up the LOV by name.
+ */
+enum class LovScope
+{
+    Module = 0,  /*!< LOV is managed by the module */
+    Controller   /*!< LOV is managed by the controller */
+};
 
 /**
  * @struct ModuleStatus
@@ -191,21 +213,274 @@ typedef struct ModuleStatus
     QString message;         /*!< Status message text */
 } ModuleStatus;
 
+
+enum class EvType
+{
+    zz = 0,    /*!< no dump       */
+    aa,        /*!< dump all module data */
+    ap,        /*!< dump all property data */
+    av,        /*!< dump all values/grids/min/max */
+    pr,        /*!< dump all values/grids/min/max - hasprofile=true */
+    ee,        /*!< set one element value */
+    ea,        /*!< set all elements values (prop level) */
+    ev,        /*!< set one element value/min/max/format */
+    ps,        /*!< only property state */
+    gc,        /*!< grid new line */
+    gu,        /*!< grid update line  */
+    gd,        /*!< grid delete line  */
+    gr,        /*!< grid reset */
+    lc,        /*!< lov create */
+    lu,        /*!< lov udpate */
+    ld,        /*!< lov delete */
+    dp,        /*!< delete/remove property */
+    de,        /*!< delete/remove element  */
+    dm,        /*!< delete/remove module   */
+    am,        /*!< add module   */
+    fs,        /*!< profile saved */
+    fl,        /*!< profile loaded */
+    fc,        /*!< profile changed */
+    uc,        /*!< update controller data */
+};
+inline QString EvToString(EvType ev)
+{
+    switch (ev)
+    {
+        case OST::EvType::zz:
+            return "zz-no dump";
+        case OST::EvType::aa:
+            return "aa-dump all data";
+        case OST::EvType::ap:
+            return "ap-dump all property data";
+        case OST::EvType::av:
+            return "av-dump profile data";
+        case OST::EvType::ee:
+            return "ee";
+        case OST::EvType::ea:
+            return "ea";
+        case OST::EvType::ev:
+            return "ev-set one element value/min/max/format ";
+        case OST::EvType::ps:
+            return "ps-only property state";
+        case OST::EvType::gc:
+            return "gc-grid new line ";
+        case OST::EvType::gu:
+            return "gu-grid update line";
+        case OST::EvType::gd:
+            return "gd-grid delete line";
+        case OST::EvType::gr:
+            return "gr-grid reset";
+        case OST::EvType::lc:
+            return "lc-lov create";
+        case OST::EvType::lu:
+            return "lu-lov update";
+        case OST::EvType::ld:
+            return "ld-lov delete";
+        case OST::EvType::dp:
+            return "dp-delete/remove property";
+        case OST::EvType::de:
+            return "de-delete/remove element";
+        case OST::EvType::dm:
+            return "dm-delete/remove module";
+        case OST::EvType::am:
+            return "am-add module";
+        case OST::EvType::fs:
+            return "fs-profile saved";
+        case OST::EvType::fl:
+            return "fl-profile loaded";
+        case OST::EvType::fc:
+            return "fc-profile changed";
+        case OST::EvType::uc:
+            return "uc-update controller data";
+        default:
+            return "unknown:" + QString::number(static_cast<int>(ev));
+    }
+}
+enum class ExtEvType
+{
+    ZZ = 0,    /*!< invalid request */
+    DU,        /*!< request dump */
+    DP,        /*!< request property dump */
+    LO,        /*!< login request */
+    IL,        /*!< set client language request */
+    FS,        /*!< folder select */
+    ML,        /*!< Load module */
+    MK,        /*!< Kill module */
+    PL,        /*!< Load profile */
+    PS,        /*!< Save profile */
+    CL,        /*!< Load configuration */
+    CS,        /*!< Save configuration*/
+    SV,        /*!< set a value of a property */
+    SA,        /*!< set all values of a property */
+    GC,        /*!< grid new line */
+    GU,        /*!< grid update line  */
+    GF,        /*!< grid fetch line  */
+    GD,        /*!< grid delete line  */
+    GR,        /*!< grid reset */
+    GH,        /*!< grid line up ("Haut")*/
+    GB,        /*!< grid line down ("Bas") */
+    I1,        /*!< property preicon1 */
+    I2,        /*!< property preicon2 */
+    I3,        /*!< property posticon1 */
+    I4,        /*!< property posticon2 */
+    J1,        /*!< element preicon */
+    J2,        /*!< element posticon */
+};
+inline QString ExtEvToString(ExtEvType ev)
+{
+    switch (ev)
+    {
+        case OST::ExtEvType::ZZ:
+            return "ZZ";
+        case OST::ExtEvType::DU:
+            return "DU";
+        case OST::ExtEvType::DP:
+            return "DP";
+        case OST::ExtEvType::LO:
+            return "LO";
+        case OST::ExtEvType::IL:
+            return "IL";
+        case OST::ExtEvType::FS:
+            return "FS";
+        case OST::ExtEvType::ML:
+            return "ML";
+        case OST::ExtEvType::MK:
+            return "MK";
+        case OST::ExtEvType::PL:
+            return "PL";
+        case OST::ExtEvType::PS:
+            return "PS";
+        case OST::ExtEvType::CL:
+            return "CL";
+        case OST::ExtEvType::CS:
+            return "CS";
+        case OST::ExtEvType::SV:
+            return "SV";
+        case OST::ExtEvType::SA:
+            return "SA";
+        case OST::ExtEvType::GC:
+            return "GC";
+        case OST::ExtEvType::GU:
+            return "GU";
+        case OST::ExtEvType::GF:
+            return "GF";
+        case OST::ExtEvType::GD:
+            return "GD";
+        case OST::ExtEvType::GR:
+            return "GR";
+        case OST::ExtEvType::GH:
+            return "GH";
+        case OST::ExtEvType::GB:
+            return "GB";
+        case OST::ExtEvType::I1:
+            return "I1";
+        case OST::ExtEvType::I2:
+            return "I2";
+        case OST::ExtEvType::I3:
+            return "I3";
+        case OST::ExtEvType::I4:
+            return "I4";
+        case OST::ExtEvType::J1:
+            return "J1";
+        case OST::ExtEvType::J2:
+            return "J2";
+        default:
+            return "unknown ExtEvType:" + QString::number(static_cast<int>(ev));
+    }
+}
+typedef struct ExtEvent
+{
+    ExtEvType ev = ExtEvType::ZZ;   /*!< External event type*/
+    QJsonObject data;               /*!< External event data */
+    QString mod;                    /*!< specific to intermodules requests */
+    QString prpkey;                 /*!< controller updates this if needed : no control is done, just for easier and later usage in basemodule on so on */
+    QString eltkey;                 /*!< ^ ^ */
+    QString lovkey;                 /*!< ^ ^ */
+    int line;                       /*!< ^ ^ */
+
+} ExtEvent;
+
+inline ExtEvType StrToExtEvent(QString s)
+{
+    if (s == "DU") return  ExtEvType::DU;
+    if (s == "DP") return  ExtEvType::DP;
+    if (s == "LO") return  ExtEvType::LO;
+    if (s == "IL") return  ExtEvType::IL;
+    if (s == "FS") return  ExtEvType::FS;
+    if (s == "ML") return  ExtEvType::ML;
+    if (s == "MK") return  ExtEvType::MK;
+    if (s == "PL") return  ExtEvType::PL;
+    if (s == "PS") return  ExtEvType::PS;
+    if (s == "CL") return  ExtEvType::CL;
+    if (s == "CS") return  ExtEvType::CS;
+    if (s == "SV") return  ExtEvType::SV;
+    if (s == "SA") return  ExtEvType::SA;
+    if (s == "GC") return  ExtEvType::GC;
+    if (s == "GU") return  ExtEvType::GU;
+    if (s == "GF") return  ExtEvType::GF;
+    if (s == "GD") return  ExtEvType::GD;
+    if (s == "GR") return  ExtEvType::GR;
+    if (s == "GH") return  ExtEvType::GH;
+    if (s == "GB") return  ExtEvType::GB;
+    if (s == "I1") return  ExtEvType::I1;
+    if (s == "I2") return  ExtEvType::I2;
+    if (s == "I3") return  ExtEvType::I3;
+    if (s == "I4") return  ExtEvType::I4;
+    if (s == "J1") return  ExtEvType::J1;
+    if (s == "J2") return  ExtEvType::J2;
+    return  ExtEvType::ZZ;
+}
+
 /**
- * @brief Convert integer to MsgLevel enum
- * @param val Integer value (0-2)
- * @return Corresponding MsgLevel value
+ * @brief Signal type emitted during value update
  *
- * Conversion table: 0=Info, 1=Warn, 2=Err
+ * Allows controlling the notification level during setValue().
+ * Used to optimize WebSocket communications by grouping
+ * multiple updates into a single message.
+ *
+ * Usage example:
+ * @code
+ * element1->setValue(val1, SignalType::Silent);    // No signal
+ * element2->setValue(val2, SignalType::Silent);    // No signal
+ * element3->setValue(val3, SignalType::AllValues); // Signal with all values
+ * @endcode
+ */
+enum class SignalType
+{
+    Silent = 0,   /*!< No signal emitted (silent update) */
+    Value,        /*!< valueChanged signal for this element only (default behavior) */
+    AllValues,    /*!< Signal with all property element values */
+    Property      /*!< Signal with complete property content (values + metadata) */
+};
+
+/**
+ * @brief Convert integer to LogLevel enum
+ * @param val Integer value (0-4)
+ * @return Corresponding LogLevel value
+ *
+ * Conversion table: 0=Debug, 1=Info, 2=Warning, 3=Error, 4=Critical
  * Invalid values default to Info with debug warning.
  */
-inline MsgLevel IntToMsgLevel(int val )
+inline LogLevel IntToLogLevel(int val)
 {
-    if (val == 0) return Info;
-    if (val == 1) return Warn;
-    if (val == 2) return Err;
-    qDebug() << "Cant convert " << val << " to OST::MsgLevel (0-2) - defaults to Info";
-    return Info;
+    if (val == 0) return LogLevel::Debug;
+    if (val == 1) return LogLevel::Info;
+    if (val == 2) return LogLevel::Warning;
+    if (val == 3) return LogLevel::Error;
+    if (val == 4) return LogLevel::Critical;
+    qDebug() << "Cant convert " << val << " to OST::LogLevel (0-4) - defaults to Info";
+    return LogLevel::Info;
+}
+
+/**
+ * @brief Convert LogLevel enum to integer
+ * @param val LogLevel value
+ * @return Corresponding integer (0-4)
+ *
+ * Used for serialization and comparison.
+ */
+inline int LogLevelToInt(LogLevel val)
+{
+    return static_cast<int>(val);
 }
 
 /**
@@ -216,13 +491,13 @@ inline MsgLevel IntToMsgLevel(int val )
  * Used by ElementMessage to display messages with severity levels.
  *
  * @see ElementMessage
- * @see MsgLevel
+ * @see LogLevel
  */
 typedef struct MsgData
 {
-    MsgLevel level = Info;   /*!< Message severity level */
-    QDateTime ts;            /*!< Message timestamp */
-    QString message;         /*!< Message text content */
+    LogLevel level = LogLevel::Info;   /*!< Message severity level */
+    QDateTime ts;                      /*!< Message timestamp */
+    QString message;                   /*!< Message text content */
 } MsgData;
 
 /**
@@ -278,6 +553,7 @@ typedef struct ImgData
     bool isSolved = false;              /*!< Whether plate solving succeeded */
     double solverRA{ 0 };               /*!< Solved Right Ascension (degrees) */
     double solverDE{ 0 };               /*!< Solved Declination (degrees) */
+    double solverOrientation{ 0 };      /*!< Solver image orientation: angle from North to image up (degrees) */
     QVector<double> histogram[3];       /*!< Histogram data for R,G,B channels */
 } ImgData;
 
@@ -446,7 +722,28 @@ typedef enum
     spinner   /*!< Spinner/activity indicator (indeterminate, no percentage) */
 } PrgType;
 
+// Helper function to increment all placeholder numbers in message
+// Example: "value %1 max %2" becomes "value %2 max %3"
+inline QString incrementPlaceholders(const QString &msg)
+{
+    QString result = msg;
+    // Replace from highest to lowest to avoid conflicts (e.g., %1→%2 shouldn't affect original %2)
+    for (int i = 99; i >= 1; --i)
+    {
+        QString oldPlaceholder = QString("%%1").arg(i);
+        QString newPlaceholder = QString("%%1").arg(i + 1);
+        result = result.replace(oldPlaceholder, newPlaceholder);
+    }
+    return result;
 }
+
+
+
+}
+
+Q_DECLARE_METATYPE(OST::EvType)
+Q_DECLARE_METATYPE(OST::LogLevel)
+
 
 #endif
 

@@ -6,7 +6,6 @@
  */
 
 #include "propertytextdumper.h"
-#include "elementtextdumper.h"
 #include <sstream>
 namespace  OST
 {
@@ -67,15 +66,6 @@ void PropertyTextDumper::visit(PropertyMulti *pProperty)
     std::stringstream stream;
     stream << "Multi Property :" << dumpPropertyCommons(pProperty)
            << ". values=";
-
-    foreach(const QString &key, pProperty->getElts()->keys())
-    {
-        ElementTextDumper d;
-
-        pProperty->getElt(key)->accept(&d);
-        stream << " **** " << key.toStdString() << " : " << d.getResult().toStdString() << "//";
-    }
-
 
 
     stream << " #####";

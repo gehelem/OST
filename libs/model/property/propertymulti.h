@@ -163,6 +163,7 @@ class PropertyMulti: public PropertyBase
          * @brief Set element value by key
          * @param key Element key name
          * @param val New value as QVariant
+         * @param signal Wether to emit signal or not
          * @return true if successful, false if element not found or type mismatch
          *
          * Handles switch rules for boolean elements automatically.
@@ -170,6 +171,16 @@ class PropertyMulti: public PropertyBase
          */
         bool setElt(QString key, QVariant val);
 
+        /**
+         * @brief Set element value by key
+         * @param key Element key name
+         * @param val New value as QVariant
+         * @return true if successful, false if element not found or type mismatch
+         *
+         * Same as setElt(QString key, QVariant val,false) => without signal
+         */
+
+        bool setElt(QString key, QVariant val, bool emitEvent);
         /**
          * @brief Add element to property
          * @param key Element key name (must be unique)
@@ -180,7 +191,15 @@ class PropertyMulti: public PropertyBase
          *
          * @warning Do not delete element manually after adding to property
          */
-        void addElt(QString key, ElementBase* pElt);
+        void addElt(ElementBase* pElt);
+
+        /**
+         * @brief Set all element values by key
+         * @param pValues QVariantMap with element keys and values
+         *
+         */
+        void setAll(const QVariantMap &pValues);
+
 
         /**
          * @brief Delete element from property
@@ -410,30 +429,16 @@ class PropertyMulti: public PropertyBase
 
 
     public slots:
-        /**
-         * @brief Slot called when element value changes
-         * @param elt Pointer to element that changed
-         *
-         * Propagates element valueSet signal to property level.
-         * Connected automatically when element is added via addElt().
-         */
-        void OnValueSet(ElementBase*);
 
         /**
          * @brief Slot called when element metadata changes
+         * @param e Event descriptor
+         * @param data Additional payload
          * @param elt Pointer to element that changed
          *
          * Handles changes in element metadata (min/max, LOV, etc.).
          */
-        void OnEltChanged(ElementBase*);
-
-        /**
-         * @brief Slot called when element list changes
-         * @param elt Pointer to element whose list changed
-         *
-         * Handles dynamic list updates (e.g., LOV modifications).
-         */
-        void OnListChanged(ElementBase*);
+        void OnEltEvent(OST::EvType e, QVariant data, OST::ElementBase* elt);
 
         /**
          * @brief Slot called when LOV changes
@@ -445,12 +450,13 @@ class PropertyMulti: public PropertyBase
 
         /**
          * @brief Slot called when element sends message
-         * @param l Message level (Info, Warn, Err)
+         * @param l Message level (Debug, Info, Warning, Error, Critical)
          * @param m Message text
+         * @param args Arguments for parametric translation
          *
          * Propagates messages from elements to property level.
          */
-        void OnMessage(MsgLevel l, QString m);
+        void OnMessage(OST::LogLevel l, QString m, QVariantList args);
 
     private:
         // Grid configuration

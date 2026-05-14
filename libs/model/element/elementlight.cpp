@@ -1,33 +1,22 @@
 #include "elementlight.h"
 namespace  OST
 {
-ElementLight::ElementLight(const QString &label, const QString &order, const QString &hint)
-    : ElementTemplateNotNumeric(label, order, hint)
+ElementLight::ElementLight(const QString &key, const QString &label, const QString &order, const QString &hint)
+    : ElementTemplateNotNumeric(key, label, order, hint)
 {
     setValue(Idle, false);
 }
 ElementLight::~ElementLight()
 {
 }
-void ElementLight::accept(ElementVisitor *pVisitor)
+void ElementLight::accept(ElementVisitor *pVisitor, QVariantMap &data, bool &emitEvent)
 {
-    pVisitor->visit(this);
+    pVisitor->visit(this, data, emitEvent);
 }
-void ElementLight::accept(ElementVisitor *pVisitor, QVariantMap &data)
-{
-    pVisitor->visit(this, data);
-}
-void ElementLight::accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data)
-{
-    pVisitor->visit(this, action, data);
-}
-
 QString ElementLight::getType()
 {
     return "light";
 }
-
-
 void ValueLight::accept(ValueVisitor* pVisitor)
 {
     pVisitor->visit(this);

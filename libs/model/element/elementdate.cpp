@@ -1,26 +1,17 @@
 #include "elementdate.h"
 namespace  OST
 {
-ElementDate::ElementDate(const QString &label, const QString &order, const QString &hint)
-    : ElementTemplateNotNumeric(label, order, hint)
+ElementDate::ElementDate(const QString &key, const QString &label, const QString &order, const QString &hint)
+    : ElementTemplateNotNumeric(key, label, order, hint)
 {
 }
 ElementDate::~ElementDate()
 {
 }
-void ElementDate::accept(ElementVisitor *pVisitor)
+void ElementDate::accept(ElementVisitor *pVisitor, QVariantMap &data, bool &emitEvent)
 {
-    pVisitor->visit(this);
+    pVisitor->visit(this, data, emitEvent);
 }
-void ElementDate::accept(ElementVisitor *pVisitor, QVariantMap &data)
-{
-    pVisitor->visit(this, data);
-}
-void ElementDate::accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data)
-{
-    pVisitor->visit(this, action, data);
-}
-
 QString ElementDate::getType()
 {
     return "date";

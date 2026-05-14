@@ -220,7 +220,10 @@ class PropertyBase: public QObject
          * property->setState(OST::Ok);    // Success
          * @endcode
          */
-        void setState(State state);
+        void setState(State state, bool emitEvent);
+
+        bool autoUpdate();
+        void setAutoUpdate(bool b);
 
         /**
          * @brief Check if property is enabled
@@ -269,31 +272,54 @@ class PropertyBase: public QObject
         void setBadge(bool b);
 
         /**
-         * @brief Send informational message
+         * @brief Send debug message
          * @param m Message text
+         * @param args Arguments for parametric translation
          *
          * Emits sendMessage() signal with Info level.
          * Messages are typically logged and displayed in frontend message area.
          */
-        void sendInfo(QString m);
+        void logDebug(QString m, const QVariantList &args = {});
+
+        /**
+         * @brief Send informational message
+         * @param m Message text
+         * @param args Arguments for parametric translation
+         *
+         * Emits sendMessage() signal with Info level.
+         * Messages are typically logged and displayed in frontend message area.
+         */
+        void logInfo(QString m, const QVariantList &args = {});
 
         /**
          * @brief Send warning message
          * @param m Message text
+         * @param args Arguments for parametric translation
          *
          * Emits sendMessage() signal with Warn level.
          * Warnings indicate potential issues but don't stop execution.
          */
-        void sendWarning(QString m);
+        void logWarning(QString m, const QVariantList &args = {});
 
         /**
          * @brief Send error message
          * @param m Message text
+         * @param args Arguments for parametric translation
          *
          * Emits sendMessage() signal with Err level.
          * Errors indicate failures that may require user intervention.
          */
-        void sendError(QString m);
+        void logError(QString m, const QVariantList &args = {});
+
+        /**
+         * @brief Send critical message
+         * @param m Message text
+         * @param args Arguments for parametric translation
+         *
+         * Emits sendMessage() signal with Info level.
+         * Messages are typically logged and displayed in frontend message area.
+         */
+        void logCritical(QString m, const QVariantList &args = {});
 
         /**
          * @brief Get first prefix icon identifier
@@ -362,6 +388,8 @@ class PropertyBase: public QObject
          */
         void setFreeValue(QString s);
 
+        void sendDump();
+
     signals:
         /**
          * @brief Signal emitted when state changes
@@ -390,25 +418,27 @@ class PropertyBase: public QObject
         void valueSet(OST::PropertyBase*);
 
         /**
-         * @brief Signal emitted for custom property events
-         * @param eventType Type of event (e.g., "Flcreate", "Fldelete")
-         * @param eventKey Key identifier for the event
-         * @param prop Pointer to the property
+         * @brief Signal emitted when element value changes
+         * @param event Event descriptor
+         * @param data Additional payload
+         * @param elt Pointer to this element
+         * @param prop Pointer to this property
          *
-         * Generic event mechanism for property-level operations like
-         * grid line creation/deletion, up/down movements, etc.
+         * Emitted by derived template classes when setValue() is called.
+         * Propagated to parent property's OnValueSet slot.
          */
-        void propertyEvent(QString, QString, OST::PropertyBase*);
+        void prpEvent(OST::EvType, QVariant, OST::ElementBase*, OST::PropertyBase*);
 
         /**
          * @brief Signal emitted when sending messages
-         * @param level Message level (Info, Warn, Err)
-         * @param message Message text
+         * @param level Message level (Debug, Info, Warning, Error, Critical)
+         * @param message Message text (translation key)
+         * @param args Arguments for parametric translation
          *
          * Messages are propagated to module level and eventually to frontend.
          * Used by sendInfo(), sendWarning(), sendError() methods.
          */
-        void sendMessage(MsgLevel, QString);
+        void logMessage(OST::LogLevel, QString, QVariantList);
 
     private:
         // Immutable metadata (set in constructor)
@@ -423,6 +453,7 @@ class PropertyBase: public QObject
         // Runtime state (mutable)
         State mState = State::Idle;     /*!< Current runtime state (Idle/Ok/Busy/Error) */
         bool mIsEnabled = true;          /*!< Whether property is enabled for frontend */
+        bool mAutoUpdate = true;        /*!< Whether property's elements are automatically updated from external events */
 
         // UI hints (mutable)
         bool mBadge = false;             /*!< Badge visibility (notification indicator) */

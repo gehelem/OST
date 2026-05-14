@@ -6,10 +6,12 @@
 #include <QtSql/QSqlQuery>
 //#include <QtSql/QSqlError>
 #include "qzeroconf.h"
-
-#include "maincontrol.h"
-
+//#include "maincontrol.h"
 #include "wshandler.h"
+#include "logger.h"
+#include "translatemanager.h"
+#include "globaldatastore.h"
+#include <lovbase.h>
 
 
 /*!
@@ -24,11 +26,13 @@ class Controller : public QObject
     public:
         Controller(const QString &webroot, const QString &dbpath,
                    const QString &libpath, const QString &conf, const QString &indiserver,
-                   const QString &ssl, const QString &sslCert, const QString &sslKey, const QString &lng, const QString &grant);
+                   const QString &ssl, const QString &sslCert, const QString &sslKey, const QString &lng, const QString &grant,
+                   OST::Logger *logger, OST::TranslateManager *translate, const QString &banner,
+                   const QString &gitSha, const QString &gitDate, const QString &gitMessage, const QString &gitTag);
         ~Controller() override;
     signals:
-        void controllerEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                             const QVariantMap &eventData);
+        void controllerEvent(OST::ExtEvent  event);
+        void otherModuleEvent(OST::EvType, QString, QString, QString, QVariant, int);
     private:
         QString _webroot;
         QString _dbpath;
@@ -41,19 +45,22 @@ class Controller : public QObject
         QStringList _availableIndiDrivers;
         WShandler   *wshandler;
         DBManager   *dbmanager;
-        Maincontrol *pMainControl;
+        OST::Logger *mLogger;
+        OST::TranslateManager *mTranslater;
+        //Maincontrol *pMainControl;
         QProcess    *_process;
         QProcess    *_indiProcess;
-        QMap<QString, QMap<QString, QString>> mModulesMap;
         QZeroConf zeroConf;
         QFileSystemWatcher mFileWatcher;
         QStringList mFilesList;
         QStringList mFoldersList;
         QString mSelectedFolder;
+        QString mBanner;
+        QVariantMap mControllerData;
+        QMap<QString, OST::LovBase*> mControllerLovs;
+        GlobalDatastore* mGlobalDatastore = nullptr;
 
-
-
-        bool loadModule(QString lib, QString name, QString label, QString profile);
+        bool loadModule(QString lib, QString label, QString profile);
         void loadConf(const QString &pConf);
         void saveConf(const QString &pConf);
         void checkModules(void);
@@ -63,21 +70,42 @@ class Controller : public QObject
         void processIndiOutput();
         void processIndiError();
         void processFinished(int exitCode, QProcess::ExitStatus exitStatus);
-        void sendMessage(const QString &pMessage);
         void startPublish();
         void startIndi(void);
         void stopIndi(void);
         void startIndiDriver(const QString &pDriver);
         void stopIndiDriver(const QString &pDriver);
-        void updateGlobalModulesLov(void);
+        void logInfo(const QString &message);
+        void logInfo(const QString &message, const QVariantList &args);
+        void logError(const QString &message);
+        void logError(const QString &message, const QVariantList &args);
+        void logDebug(const QString &message);
+        void logDebug(const QString &message, const QVariantList &args);
+        void updateControllerData(QString key, QVariant data);
+
+        QJsonObject getModulesDump(QString clientgrant);
+        QString getBanner(void)
+        {
+            return mBanner;
+        }
+
+        QMap<QString, OST::LovBase*> getControllerLovs()
+        {
+            return mControllerLovs;
+        }
+        bool createControllerLov(const QString &lovName, OST::LovBase* pLov);
+        bool deleteControllerLov(const QString &lovName);
+
 
     private slots:
-        void OnModuleEvent  (const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
-                             const QVariantMap &pEventData);
-        void OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
-                             const QVariantMap &pEventData);
-        void OnMainCtlEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
-                            const QVariantMap &pEventData);
+        void onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase* elt, OST::PropertyBase* prp, OST::LovBase* lov,
+                           Datastore* mod);
+        void onControllerLovChanged();
+        void onExternalEvent(OST::ExtEvent event);
+        void onInterModuleRequest(OST::ExtEvent event);
+        void OnClientEvent(OST::ExtEvent event, QWebSocket* client, QString clientgrant);
+        //void OnMainCtlEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
+        //                    const QVariantMap &pEventData);
         void OnFileWatcherEvent(const QString &pEvent);
         void OnFileChangeEvent(const QString &pEvent);
 

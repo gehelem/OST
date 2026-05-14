@@ -35,8 +35,7 @@ void LovJsonDumper::visit(LovInt *pLov)
         QJsonObject lines = QJsonObject();
         foreach(const long &key, pLov->getLov().keys())
         {
-            QString skey = QString::number(key);
-            lines[skey] = pLov->getLov()[key];
+            lines[QString::number(key)] = pLov->getLov()[key];
         }
         json["values"] = lines;
     }
@@ -50,8 +49,7 @@ void LovJsonDumper::visit(LovFloat *pLov)
         QJsonObject lines = QJsonObject();
         foreach(const double &key, pLov->getLov().keys())
         {
-            QString skey = QString::number(key);
-            lines[skey] = pLov->getLov()[key];
+            lines[QString::number(key)] = pLov->getLov()[key];
         }
         json["values"] = lines;
     }

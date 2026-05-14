@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>navigator.json</file>
+    </qresource>
+</RCC>

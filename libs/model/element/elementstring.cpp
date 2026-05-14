@@ -1,27 +1,18 @@
 #include "elementstring.h"
 namespace  OST
 {
-ElementString::ElementString(const QString &label, const QString &order, const QString &hint)
-    : ElementTemplateNotNumeric<QString>(label, order, hint), mLov(label)
+ElementString::ElementString(const QString &key, const QString &label, const QString &order, const QString &hint)
+    : ElementTemplateNotNumeric<QString>(key, label, order, hint), mLov(label)
 {
     connect(&mLov, &LovString::lovChanged, this, &ElementTemplate::OnLovChanged);
 }
 ElementString::~ElementString()
 {
 }
-void ElementString::accept(ElementVisitor *pVisitor)
+void ElementString::accept(ElementVisitor *pVisitor, QVariantMap &data, bool &emitEvent)
 {
-    pVisitor->visit(this);
+    pVisitor->visit(this, data, emitEvent);
 }
-void ElementString::accept(ElementVisitor *pVisitor, QVariantMap &data)
-{
-    pVisitor->visit(this, data);
-}
-void ElementString::accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data)
-{
-    pVisitor->visit(this, action, data);
-}
-
 QString ElementString::getType()
 {
     return "string";
@@ -34,11 +25,11 @@ bool ElementString::lovAdd(QString val, QString label)
 {
     return mLov.lovAdd(val, label);
 }
-bool ElementString::lovUpdate(QString  val, QString label)
+bool ElementString::lovUpdate(QString val, QString label)
 {
     return mLov.lovUpdate(val, label);
 }
-bool ElementString::lovDel(QString  val)
+bool ElementString::lovDel(QString val)
 {
     return mLov.lovDel(val);
 }
@@ -57,7 +48,7 @@ void ValueString::updateValue()
 }
 void ValueString::updateElement(const bool &emitEvent)
 {
-    static_cast<ElementString*>(pElement)->setValue(value, emitEvent);
+    static_cast<ElementString*>(pElement)->setValue(value);
 }
 
 

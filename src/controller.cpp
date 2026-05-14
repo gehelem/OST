@@ -3,7 +3,8 @@
 #include <QDirIterator>
 #include <QFileSystemWatcher>
 #include <QHostInfo>
-
+#include "model/element/common.h"
+#include "libs/utils/modulejsondumper.h"
 /*!
  * ... ...
  */
@@ -27,23 +28,85 @@
 
 Controller::Controller(const QString &webroot, const QString &dbpath,
                        const QString &libpath, const QString &conf, const QString &indiserver,
-                       const QString &ssl, const QString &sslCert, const QString &sslKey, const QString &lng, const QString &grant)
+                       const QString &ssl, const QString &sslCert, const QString &sslKey, const QString &lng, const QString &grant,
+                       OST::Logger *logger, OST::TranslateManager *translate, const QString &banner,
+                       const QString &gitSha, const QString &gitDate, const QString &gitMessage, const QString &gitTag)
     :       _webroot(webroot),
             _dbpath(dbpath),
             _libpath(libpath),
             _conf(conf),
             _indiserver(indiserver),
             _lng(lng),
-            _grant(grant)
+            _grant(grant),
+            mLogger(logger),
+            mTranslater(translate),
+            mBanner(banner)
 {
+    // Register meta types for queued signal/slot connections
+    // Must be done before any connect() calls that use these types
+    qRegisterMetaType<OST::LogLevel>("OST::LogLevel");
+    qRegisterMetaType<OST::EvType>("OST::EvType");
+
+    QVariantMap g;
+    g["Githash"] = gitSha;
+    g["Gitdate"] = gitDate;
+    g["Gitmessage"] = gitMessage;
+    g["Gittag"] = gitTag;
+    mControllerData["git"] = g;
+    mControllerData["banner"] = mBanner;
+    mControllerData["indiserver"] = indiserver;
+
 
     startPublish();
+
+    // Configure Logger with TranslateManager
+    mLogger->setTranslateManager(mTranslater, _lng);
+
+    // Configure WShandler
     wshandler = new WShandler(this, ssl, sslCert, sslKey, _grant);
-    connect(wshandler, &WShandler::externalEvent, this, &Controller::OnExternalEvent);
+    wshandler->setTranslateManager(mTranslater);
+    connect(wshandler, &WShandler::externalEvent, this, &Controller::onExternalEvent);
+    connect(wshandler, &WShandler::clientEvent, this, &Controller::OnClientEvent);
+
+    // Configure DBManager
     dbmanager = new DBManager();
     dbmanager->dbInit(_dbpath, "controller");
     wshandler->dbmanager = dbmanager;
 
+    // Connect DBManager to log system
+    connect(dbmanager, &Basemodule::logSignal, mLogger, &OST::Logger::onLog);
+    connect(dbmanager, &Basemodule::logSignal, wshandler, &WShandler::onLog);
+
+    // create controller lovs
+    OST::LovString* ls = new OST::LovString("availableconfs");
+    createControllerLov("availableconfs", ls);
+
+    ls = new OST::LovString("optics");
+    createControllerLov("optics", ls);
+    ls = new OST::LovString("servers");
+    createControllerLov("servers", ls);
+    ls = new OST::LovString("equipments");
+    createControllerLov("equipments", ls);
+
+    // Shared datastore — static, always available, created before any module
+    mGlobalDatastore = new GlobalDatastore("GlobalDatastore", "Global data", "default", {});
+    mGlobalDatastore->setParent(this);
+    mGlobalDatastore->dbInit(_dbpath, "GlobalDatastore");
+    mGlobalDatastore->loadProfile("default");
+    connect(mGlobalDatastore, &Basemodule::moduleEvent,  this,       &Controller::onModuleEvent);
+    connect(mGlobalDatastore, &Basemodule::moduleEvent,  wshandler,  &WShandler::onModuleEvent);
+    connect(mGlobalDatastore, &Basemodule::logSignal,    mLogger,    &OST::Logger::onLog);
+    connect(mGlobalDatastore, &Basemodule::logSignal,    wshandler,  &WShandler::onLog);
+    connect(this, &Controller::controllerEvent, mGlobalDatastore, &Basemodule::onExternalEventRoot);
+    mGlobalDatastore->onAfterInit();
+    mGlobalDatastore->registerLov("optics", "name", "name",
+                                  static_cast<OST::LovString*>(mControllerLovs["optics"]));
+    mGlobalDatastore->registerLov("servers", "name", "name",
+                                  static_cast<OST::LovString*>(mControllerLovs["servers"]));
+    mGlobalDatastore->registerLov("equipments", "name", "name",
+                                  static_cast<OST::LovString*>(mControllerLovs["equipments"]));
+
+    wshandler->onModuleEvent(OST::EvType::aa, QVariant(), nullptr, nullptr, nullptr, mGlobalDatastore);
 
     if (_libpath == "")
     {
@@ -60,21 +123,8 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     checkModules();
     checkIndiDrivers();
 
-    pMainControl = new Maincontrol(QString("mainctl"), QString("Main control"), QString(), QVariantMap());
-    connect(pMainControl, &Maincontrol::moduleEvent, this, &Controller::OnModuleEvent);
-    connect(pMainControl, &Maincontrol::moduleEvent, wshandler, &WShandler::processModuleEvent);
-    connect(pMainControl, &Maincontrol::loadOtherModule, this, &Controller::loadModule);
-    connect(pMainControl, &Maincontrol::mainCtlEvent, this, &Controller::OnMainCtlEvent);
-    connect(this, &Controller::controllerEvent, pMainControl, &Maincontrol::OnExternalEvent);
-    pMainControl->setParent(this);
-    pMainControl->setWebroot(_webroot);
-    pMainControl->setObjectName("mainctl");
-    pMainControl->dbInit(_dbpath, "mainctl");
-    pMainControl->OnExternalEvent("refreshConfigurations", "mainctl", QString(), QVariantMap());
-    pMainControl->setAvailableModuleLibs(_availableModuleLibs);
-    pMainControl->setIndiDriverList(_availableIndiDrivers);
-    pMainControl->sendDump();
-    pMainControl->setLng(_lng);
+    updateControllerData("libraries", _availableModuleLibs);
+    updateControllerData("indidrivers", _availableIndiDrivers);
 
     loadConf(_conf);
 
@@ -121,6 +171,9 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     //watch modifications
     QObject::connect(&mFileWatcher, &QFileSystemWatcher::directoryChanged, this, &Controller::OnFileWatcherEvent);
     QObject::connect(&mFileWatcher, &QFileSystemWatcher::fileChanged, this, &Controller::OnFileChangeEvent);
+    QVariantMap r;
+    dbmanager->getDbProfiles(r);
+    updateControllerData("profiles", r);
 
 }
 
@@ -130,75 +183,90 @@ Controller::~Controller()
 }
 
 
-bool Controller::loadModule(QString lib, QString name, QString label, QString profile)
+bool Controller::loadModule(QString lib, QString label, QString profile)
 {
-    if (mModulesMap.contains(name ))
+    QString name = label;
+    name.replace(" ", "");
+
+    QList<Basemodule *> mods = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
+    for (Basemodule *m : mods)
     {
-        pMainControl->sendMainError("Module " + name + " already loaded - can't load twice");
-        return false;
+        if (m->getModuleName() == name)
+        {
+            logError("Module %1 already loaded - can't load twice", {name});
+            return false;
+        }
     }
-    QLibrary library("libost" + lib);
+
+    QString lowerlib = lib.toLower();
+    QLibrary library("libost" + lowerlib);
     if (!library.load())
     {
-        pMainControl->sendMainError(name + " " + library.errorString());
+        logError("Error loadin library %1 - %2", {name, library.errorString()});
         return false;
     }
-    //pMainControl->sendMainMessage(name + " library loaded");
 
     typedef Basemodule *(*CreateModule)(QString, QString, QString, QVariantMap);
     CreateModule createmodule = (CreateModule)library.resolve("initialize");
     if (!createmodule)
     {
-        pMainControl->sendMainError("Could not initialize module from library : " + lib);
+        logError("Could not initialize module from library %1 ", {lowerlib});
         return false;
     }
     Basemodule *mod = createmodule(name, label, profile, _availableModuleLibs);
-    //QPointer<Basemodule> mod = createmodule(name,label,profile,_availableModuleLibs);
     if (!mod)
     {
-        pMainControl->sendMainError("Could not instanciate module from library : " + lib);
+        logError("Could not instanciate module from library %1 ", {lowerlib});
         return false;
     }
     mod->setParent(this);
     mod->setWebroot(_webroot);
+    mod->setGlobalDatastore(mGlobalDatastore);
     mod->setObjectName(name);
     mod->dbInit(_dbpath, name);
-    mod->setProfile(profile);
-    mod->setProfiles();
-    mod->setLng(_lng);
+    mod->loadProfile(profile);
+    mod->updateProfilesLov();
     QVariantMap profs;
     dbmanager->getDbProfiles(mod->metaObject()->className(), profs);
-    connect(mod, &Basemodule::moduleEvent, this, &Controller::OnModuleEvent);
-    connect(mod, &Basemodule::moduleEvent, wshandler, &WShandler::processModuleEvent);
-    connect(mod, &Basemodule::loadOtherModule, this, &Controller::loadModule);
-    connect(this, &Controller::controllerEvent, mod, &Basemodule::OnExternalEvent);
-    //connect(wshandler, &WShandler::externalEvent, mod, &Basemodule::OnExternalEvent);
-    mod->OnExternalEvent("afterinit", name, QString(), QVariantMap());
-    mod->sendDump();
+    connect(mod, &Basemodule::moduleEvent, this, &Controller::onModuleEvent);
+    connect(mod, &Basemodule::interModuleRequest, this, &Controller::onInterModuleRequest);
+    connect(mod, &Basemodule::moduleEvent, wshandler, &WShandler::onModuleEvent);
+
+    //connect(mod, &Basemodule::loadOtherModule, this, &Controller::loadModule);
+    connect(this, &Controller::controllerEvent, mod, &Basemodule::onExternalEventRoot);
+    connect(this, &Controller::otherModuleEvent, mod, &Basemodule::onOtherModuleEvent);
+
+    // Connect module to log system
+    connect(mod, &Basemodule::logSignal, mLogger, &OST::Logger::onLog);
+    connect(mod, &Basemodule::logSignal, wshandler, &WShandler::onLog);
 
     QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
     for (Basemodule *othermodule : othermodules)
     {
         if (othermodule->getModuleName() != mod->getModuleName())
         {
-            connect(othermodule, &Basemodule::moduleStatusRequest, mod, &Basemodule::OnModuleStatusRequest);
-            connect(othermodule, &Basemodule::moduleStatusAnswer, mod, &Basemodule::OnModuleStatusAnswer);
-            connect(mod, &Basemodule::moduleStatusRequest, othermodule, &Basemodule::OnModuleStatusRequest);
-            connect(mod, &Basemodule::moduleStatusAnswer, othermodule, &Basemodule::OnModuleStatusAnswer);
-            connect(othermodule, &Basemodule::moduleEvent, mod, &Basemodule::OnExternalEvent);
-            connect(mod, &Basemodule::moduleEvent, othermodule, &Basemodule::OnExternalEvent);
+            //connect(othermodule, &Basemodule::moduleStatusRequest, mod, &Basemodule::OnModuleStatusRequest);
+            //connect(othermodule, &Basemodule::moduleStatusAnswer, mod, &Basemodule::OnModuleStatusAnswer);
+            //connect(mod, &Basemodule::moduleStatusRequest, othermodule, &Basemodule::OnModuleStatusRequest);
+            //connect(mod, &Basemodule::moduleStatusAnswer, othermodule, &Basemodule::OnModuleStatusAnswer);
+            //connect(othermodule, &Basemodule::moduleEvent, mod, &Basemodule::onOtherModuleEvent);
+            //connect(mod, &Basemodule::moduleEvent, othermodule, &Basemodule::onOtherModuleEvent);
+            //connect(mod, &Datastore::moduleEvent, othermodule, &Basemodule::OnExternalEvent);
         }
     }
-    QMap<QString, QString> l;
-    l["label"] = label;
-    l["type"] = lib;
-    l["profile"] = profile;
-    mModulesMap[name] = l;
 
-    pMainControl->addModuleData(name, label, lib, profile);
-    pMainControl->sendMainMessage("Module  " + label + " successfully loaded");
+    mod->onAfterInit();
+    wshandler->onModuleEvent(OST::EvType::aa, QVariant(), nullptr, nullptr, nullptr, mod);
+    // This is redundant with global data, these lovs can (must? => yes) be managed at frontend level
+    //QString lovname = "loadedModules-" + lowerlib;
+    //if (!getControllerLovs().contains(lovname))
+    //{
+    //    OST::LovString* ls = new OST::LovString(lovname);
+    //    createControllerLov(lovname, ls);
+    //}
+    //OST::LovString* ls = static_cast<OST::LovString*>(getControllerLovs()[lovname]);
+    //if (!ls->contains(lovname)) ls->lovAdd(name, name);
 
-    updateGlobalModulesLov();
 
     return true;
 
@@ -206,9 +274,17 @@ bool Controller::loadModule(QString lib, QString name, QString label, QString pr
 void Controller::loadConf(const QString &pConf)
 {
     QVariantMap result;
+    OST::LovString* l = static_cast<OST::LovString*>(getControllerLovs()["availableconfs"]);
+    l->lovClear();
+
     if (!dbmanager->getDbConfiguration(pConf, result))
     {
-        pMainControl->sendMainError("loadConf " + pConf + " failed");
+        logError("Load configuration %1 failed", {pConf});
+        return;
+    }
+    if (result.size() == 0)
+    {
+        logError("Configuration %1 not found", {pConf});
         return;
     }
     for(QVariantMap::const_iterator iter = result.begin(); iter != result.end(); ++iter)
@@ -216,142 +292,354 @@ void Controller::loadConf(const QString &pConf)
         QVariantMap line = iter.value().toMap();
         QString namewithoutblanks = iter.key();
         namewithoutblanks.replace(" ", "");
-        loadModule(line["moduletype"].toString(), namewithoutblanks, iter.key(), line["profilename"].toString());
+        loadModule(line["moduletype"].toString(), iter.key(), line["profilename"].toString());
     }
-    pMainControl->sendMainMessage("loadConf " + pConf + " successful");
+    logInfo("Load configuration %1 sucessfull", {pConf});
+    updateControllerData("currentconf", QVariant(pConf));
+    QVariantMap confs;
+    dbmanager->getDbConfigurations(confs);
+    for(QVariantMap::const_iterator iter = confs.begin(); iter != confs.end(); ++iter)
+    {
+        l->lovAdd(iter.key(), iter.key());
+    }
+    updateControllerData("availableconfs", QVariant(confs));
+
 }
 void Controller::saveConf(const QString &pConf)
 {
-    QVariantMap result;
-    if (!dbmanager->saveDbConfiguration(pConf, mModulesMap))
+    OST::LovString* l = static_cast<OST::LovString*>(getControllerLovs()["availableconfs"]);
+    l->lovClear();
+    QVariantMap ms, result;
+    QList<Basemodule *> mods = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
+    for (Basemodule *m : mods)
     {
-        pMainControl->sendMainError("saveDbConfiguration " + pConf + " failed");
+        if (m->getModuleName() != "GlobalDatastore")
+        {
+            QVariantMap n;
+            n["label"] = m->getModuleLabel();
+            n["profile"] = m->getCurrentProfile();
+            n["type"] = m->getClassName();
+            ms[m->getModuleName()] = n;
+        }
+    }
+    if (!dbmanager->saveDbConfiguration(pConf, ms))
+    {
+        logError("Save configuration %1 failed", {pConf});
         return;
     }
-    pMainControl->sendMainMessage("saveDbConfiguration " + pConf + " sucessfull");
+    logInfo("Save configuration %1 sucessfull", {pConf});
+    updateControllerData("currentconf", QVariant(pConf));
+    QVariantMap confs;
+    dbmanager->getDbConfigurations(confs);
+    for(QVariantMap::const_iterator iter = confs.begin(); iter != confs.end(); ++iter)
+    {
+        l->lovAdd(iter.key(), iter.key());
+    }
+    updateControllerData("availableconfs", QVariant(confs));
+}
+
+bool Controller::createControllerLov(const QString &lovName, OST::LovBase* pLov)
+{
+    if (mControllerLovs.contains(lovName))
+    {
+        logError("createControllerLov - lov %1 already exists", {lovName});
+        return false;
+    }
+    pLov->setKey(lovName);
+    mControllerLovs[lovName] = pLov;
+    connect(mControllerLovs[lovName], &OST::LovBase::lovChanged, this, &Controller::onControllerLovChanged);
+    wshandler->onControllerEvent(OST::EvType::lc, QString(), QString(), pLov);
+    return true;
+}
+
+bool Controller::deleteControllerLov(const QString &lovName)
+{
+    if (!mControllerLovs.contains(lovName))
+    {
+        logError("deleteControllerLov - lov %1 not found", {lovName});
+        return false;
+    }
+    OST::LovBase* pLov = mControllerLovs[lovName];
+    disconnect(pLov, &OST::LovBase::lovChanged, this, &Controller::onControllerLovChanged);
+    mControllerLovs.remove(lovName);
+    wshandler->onControllerEvent(OST::EvType::ld, lovName, QString(), nullptr);
+    delete pLov;
+    return true;
+}
+
+void Controller::onControllerLovChanged()
+{
+    OST::LovBase* lov = qobject_cast<OST::LovBase*>(sender());
+    wshandler->onControllerEvent(OST::EvType::lu, QString(), QString(), lov);
+}
+
+void Controller::onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase* elt, OST::PropertyBase* prp,
+                               OST::LovBase* lov,
+                               Datastore* mod)
+
+{
+
+    /* refresh global profiles data when a module gives en profile event */
+    if (evt == OST::EvType::fs)
+    {
+        QVariantMap r;
+        dbmanager->getDbProfiles(r);
+        updateControllerData("profiles", r);
+    }
+
+    /* dispatch event to other modules */
+    QString m, p, e;
+    int line = 0;
+    QJsonValue v;
+    if (mod) m = mod->getModuleName();
+    if (prp) p = prp->key();
+    if (elt) e = elt->key();
+    if (evt == OST::EvType::gu || evt == OST::EvType::gu  )
+    {
+        line = data.toInt();
+    }
+
+    switch (evt)
+    {
+        case OST::EvType::dm: // "dm-delete/remove module"
+        {
+            v = m;
+            break;
+        }
+        case OST::EvType::ps: // "ps-only property state"
+        {
+            v = static_cast<int>(prp->state());
+            break;
+        }
+        case OST::EvType::dp: // "dp-delete/remove property"
+        {
+            p = data.toString();
+            break;
+        }
+        case OST::EvType::de: // "de-delete/remove element"
+        case OST::EvType::ee: // "ee"
+        case OST::EvType::gc: // "gc-grid new line "
+        case OST::EvType::gu: // "gu-grid update line"
+        case OST::EvType::gd: // "gd-grid delete line"
+        case OST::EvType::gr: // "gr-grid reset"
+        case OST::EvType::aa: // "aa-dump all data"
+        case OST::EvType::ev: // "ev-set one element value/min/max/format "
+        case OST::EvType::ap: // "ap-dump all property data"
+        case OST::EvType::ea: // "ea"
+        {
+            OST::PropertyJsonDumper d(evt, data, elt, prp);
+            mod->getStore()[prp->key()]->accept(&d);
+            v = d.getResult();
+            break;
+        }
+        case OST::EvType::zz: // "zz-no dump"
+        case OST::EvType::av: // "av-dump profile data"
+        case OST::EvType::lc: // "lc-lov create"
+        case OST::EvType::lu: // "lu-lov update"
+        case OST::EvType::ld: // "ld-lov delete"
+        case OST::EvType::am: // "am-add module"
+        case OST::EvType::fs: // "fs-profile saved"
+        case OST::EvType::fl: // "fl-profile loaded"
+        case OST::EvType::fc: // "fc-profile changed"
+        case OST::EvType::uc: // "uc-update controller data"
+        {
+            v = OST::ModuleJsonDumper(evt, data, elt, prp, lov, static_cast<Basemodule*>(mod));
+            break;
+        }
+        default:
+        {
+            v = OST::ModuleJsonDumper(evt, data, elt, prp, lov, static_cast<Basemodule*>(mod));
+        }
+    };
+
+    emit otherModuleEvent(evt, m, p, e, v, line);
+}
+void Controller::OnClientEvent(OST::ExtEvent event, QWebSocket* client, QString clientgrant)
+{
+    if (event.ev == OST::ExtEvType::DU || event.ev == OST::ExtEvType::IL  || event.ev == OST::ExtEvType::LO )
+    {
+        wshandler->sendJsonMessage(getModulesDump(clientgrant), client);
+    }
 
 }
 
-
-void Controller::OnModuleEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
-                               const QVariantMap &pEventData)
+void Controller::onExternalEvent(OST::ExtEvent event)
 {
-    Q_UNUSED(pEventKey);
-    Q_UNUSED(pEventData);
-    if (pEventType == "mm" || pEventType == "me" || pEventType == "mw")
+    switch (event.ev)
     {
-        //qDebug() << pEventModule << "-" << pEventData["message"].toString();
-    }
-
-    if (pEventType == "moduledelete")
-    {
-        if (!mModulesMap.contains(pEventModule))
+        case OST::ExtEvType::ZZ:
+        case OST::ExtEvType::DU:
+        case OST::ExtEvType::LO:
+        case OST::ExtEvType::IL:
         {
-            pMainControl->sendMainWarning("moduledelete Module " + pEventModule + " not in module map");
+            logError("Controller::onExternalEvent - invalid event here - %1", {OST::ExtEvToString(event.ev)});
+            return;
         }
-        mModulesMap.remove(pEventModule);
-        pMainControl->deldModuleData(pEventModule);
-        updateGlobalModulesLov();
-    }
-    if (pEventType == "modulesavedprofile")
-    {
-        mModulesMap[pEventModule]["profile"] = pEventKey;
-        pMainControl->setModuleData(pEventModule, "", "", pEventKey);
-
-    }
-    if (pEventType == "moduleloadedprofile")
-    {
-        mModulesMap[pEventModule]["profile"] = pEventKey;
-        pMainControl->setModuleData(pEventModule, "", "", pEventKey);
-
-    }
-
-}
-void Controller::OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
-                                 const QVariantMap &pEventData)
-{
-    QJsonObject obj = QJsonObject::fromVariantMap(pEventData);
-    QJsonDocument doc(obj);
-    QByteArray docByteArray = doc.toJson(QJsonDocument::Compact);
-    QString strJson = QLatin1String(docByteArray);
-    if (pEventModule == "mainctl")
-    {
-        pMainControl->sendMainMessage("Mainctl event : " + pEventType + " : " + pEventModule + " : " +  pEventKey + " : " +
-                                      strJson);
-
-    }
-    if (pEventType == "Freadall")
-    {
-        wshandler->processFileEvent("foldersdump", mFoldersList);
-        wshandler->processFileEvent("filesdump", mFilesList);
-    }
-    if (pEventType == "Ffolderselect")
-    {
-        for ( const auto &d : mFileWatcher.directories() )
+        case OST::ExtEvType::CS:
         {
-            mFileWatcher.removePath(d);
+            saveConf(event.data["name"].toString());
+            return;
         }
-        mSelectedFolder = _webroot + pEventKey;
-        mFileWatcher.addPath(mSelectedFolder);
-        OnFileWatcherEvent(QString());
-
-    }
-
-    /* we should check here if incoming message is valid*/
-    emit controllerEvent(pEventType, pEventModule, pEventKey, pEventData);
-}
-void Controller::OnMainCtlEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
-                                const QVariantMap &pEventData)
-{
-    Q_UNUSED(pEventModule);
-    Q_UNUSED(pEventData);
-
-    if (pEventType == "loadconf")
-    {
-        loadConf(pEventKey);
-    }
-    if (pEventType == "saveconf")
-    {
-        saveConf(pEventKey);
-    }
-    if (pEventType == "startindidriver")
-    {
-        startIndiDriver(pEventKey);
-    }
-    if (pEventType == "stopindidriver")
-    {
-        stopIndiDriver(pEventKey);
-    }
-    if (pEventType == "indiserver")
-    {
-        if (pEventKey == "start")
+        case OST::ExtEvType::CL:
         {
-            startIndi();
+            loadConf(event.data["name"].toString());
+            return;
         }
-        if (pEventKey == "stop")
+        case OST::ExtEvType::ML:
         {
-            stopIndi();
+            loadModule(event.data["lib"].toString(), event.data["label"].toString(), event.data["profile"].toString());
+            return;
         }
-    }
-    if (pEventType == "killall")
-    {
-        QList<Basemodule *> othermodules = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
-        for (Basemodule *othermodule : othermodules)
+        case OST::ExtEvType::MK:
         {
-            if (othermodule->getModuleName() != "mainctl")
+            QList<Basemodule *> mods = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
+            QString n =  event.data["name"].toString();
+            if (n == mGlobalDatastore->getModuleName())
             {
-                othermodule->killMe();
+                logError("GlobalDatastore cannot be killed", {});
+                return;
             }
+            for (Basemodule *m : mods)
+            {
+                if (m->getModuleName() == n)
+                {
+                    // This is redundant with global data, these lovs can (must? => yes) be managed at frontend level
+                    //QString lovname = "loadedModules-" + m->getClassName().toLower();
+                    //OST::LovString* ls = static_cast<OST::LovString*>(getControllerLovs()[lovname]);
+                    //ls->lovDel(n);
+                    m->killMe();
+                };
+            }
+
+
+            return;
+
+        }
+        case OST::ExtEvType::FS:
+        {
+            if (!event.data.contains("folder"))
+            {
+                logError("Controller::onExternalEvent - invalid event data content - %1", {OST::ExtEvToString(event.ev)});
+                return;
+            };
+            for ( const auto &d : mFileWatcher.directories() )
+            {
+                mFileWatcher.removePath(d);
+            }
+            mSelectedFolder = _webroot + event.data["folder"].toString();
+            mFileWatcher.addPath(mSelectedFolder);
+            OnFileWatcherEvent(QString());
+            return;
+        }
+        default:
+        {
+            if (!event.data.contains("m"))
+            {
+                logError("Controller::onExternalEvent - invalid event data content - %1", {OST::ExtEvToString(event.ev)});
+                return;
+            };
+            if (event.data["m"].toObject().size() != 1)
+            {
+                logError("Controller::onExternalEvent - invalid event data size - %1", {OST::ExtEvToString(event.ev)});
+                return;
+            };
+            QList<Basemodule *> mods = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
+            bool r = false;
+            for (Basemodule *m : mods)
+            {
+                if (m->getModuleName() == event.data["m"].toObject().begin().key()) r = true;
+            }
+            if (!r)
+            {
+                logError("Controller::onExternalEvent - unknown module - %1", {event.data["m"].toObject().begin().key()});
+                return;
+            };
         }
 
     }
 
+    /* basic data validity checks below */
+    QString mod = event.data["m"].toObject().begin().key();
+    QJsonObject o = event.data["m"].toObject()[mod].toObject();
+    QJsonObject p, e;
+    event.line = -1;
+
+    /* data must contain a unique "p" key for these */
+    if (event.ev == OST::ExtEvType::SV || event.ev == OST::ExtEvType::SA || event.ev == OST::ExtEvType::GC
+            || event.ev == OST::ExtEvType::I1 || event.ev == OST::ExtEvType::I2 || event.ev == OST::ExtEvType::I3
+            || event.ev == OST::ExtEvType::I4 || event.ev == OST::ExtEvType::J1 || event.ev == OST::ExtEvType::J2
+            || event.ev == OST::ExtEvType::GU || event.ev == OST::ExtEvType::GF || event.ev == OST::ExtEvType::GD
+            || event.ev == OST::ExtEvType::GR || event.ev == OST::ExtEvType::GH || event.ev == OST::ExtEvType::GB)
+    {
+        if (!o.contains("p"))
+        {
+            logError("Controller::onExternalEvent - invalid event data content - data must contain a 'p' key %1", {OST::ExtEvToString(event.ev)});
+            return;
+        }
+        p = o["p"].toObject();
+        if (o["p"].toObject().size() != 1)
+        {
+            logError("Controller::onExternalEvent - invalid event data content - 'p' key must be unique %1", {OST::ExtEvToString(event.ev)});
+            return;
+        }
+        event.prpkey = o["p"].toObject().begin().key();
+    }
+
+    /* data must contain a "e" key for these */
+    if (event.ev == OST::ExtEvType::SV || event.ev == OST::ExtEvType::SA || event.ev == OST::ExtEvType::GC
+            || event.ev == OST::ExtEvType::J1 || event.ev == OST::ExtEvType::J2
+            || event.ev == OST::ExtEvType::GU)
+    {
+        if (!p[event.prpkey].toObject().contains("e"))
+        {
+            logError("Controller::onExternalEvent - invalid event data content - data must contain a 'e' key %1", {OST::ExtEvToString(event.ev)});
+            return;
+        }
+        e = p[event.prpkey].toObject()["e"].toObject();
+    }
+
+    /* "e" key must be unique for these */
+    if (event.ev == OST::ExtEvType::SV || event.ev == OST::ExtEvType::J1 || event.ev == OST::ExtEvType::J2)
+    {
+        if (e.size() != 1)
+        {
+            logError("Controller::onExternalEvent - invalid event data content size - 'e' key must be unique %1", {OST::ExtEvToString(event.ev)});
+            return;
+        }
+        event.eltkey = e.begin().key();
+    }
+
+    /* data must contain a "i" key for these */
+    if (event.ev == OST::ExtEvType::GU || event.ev == OST::ExtEvType::GF || event.ev == OST::ExtEvType::GD
+            || event.ev == OST::ExtEvType::GH || event.ev == OST::ExtEvType::GB)
+    {
+        if (!p[event.prpkey].toObject().contains("i"))
+        {
+            logError("Controller::onExternalEvent - invalid event data content - data must contain a 'i' key  %1", {OST::ExtEvToString(event.ev)});
+            return;
+        }
+        event.line = p[event.prpkey].toObject()["i"].toInt();
+    }
+
+    /* checks ok : dispatch event only to targeted module */
+    QList<Basemodule *> moduleinstances = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
+    for (Basemodule *moduleinstance : moduleinstances)
+    {
+        if (moduleinstance->getModuleName() == mod)
+        {
+            moduleinstance->onExternalEventRoot(event);
+        }
+    }
+
+
+
 }
+
 void Controller::checkModules(void)
 {
     foreach (const QString &path, QCoreApplication::libraryPaths())
     {
-        sendMessage("Check available modules in " + path);
+        mLogger->info("Check available modules in " + path);
         QDir directory(path);
         directory.setFilter(QDir::Files);
         directory.setNameFilters(QStringList() << "libost*.so");
@@ -364,7 +652,7 @@ void Controller::checkModules(void)
                 QLibrary library(path + "/" + lib);
                 if (!library.load())
                 {
-                    sendMessage(lib + " " + library.errorString());
+                    mLogger->info(lib + " " + library.errorString());
                 }
                 else
                 {
@@ -381,13 +669,13 @@ void Controller::checkModules(void)
                             mod->setObjectName(lib);
                             QVariantMap info = mod->getModuleInfo();
                             _availableModuleLibs[tt] = info;
-                            sendMessage("found library " + path + "/" + lib) ;
+                            mLogger->info("found library " + path + "/" + lib) ;
                             delete mod;
                         }
                     }
                     else
                     {
-                        sendMessage("Could not initialize module from the loaded library : " + lib);
+                        mLogger->warning("Could not initialize module from the loaded library : " + lib);
                     }
                 }
 
@@ -403,46 +691,39 @@ void Controller::checkIndiDrivers(void)
 {
     const QString &path = "/usr/bin";
 
-    sendMessage("Check available Indi drivers in " + path);
+    mLogger->info("Check available Indi drivers in " + path);
     QDir directory(path);
     directory.setFilter(QDir::Files);
     directory.setNameFilters(QStringList() << "indi_*");
     _availableIndiDrivers = directory.entryList();
     foreach(QString dr, _availableIndiDrivers)
     {
-        //sendMessage("indi driver found " + dr);
+        //mLogger->info("indi driver found " + dr);
     }
 }
 void Controller::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    pMainControl->sendMainMessage("PROCESS FINISHED (" + QString::number(exitCode) + ")" + exitStatus);
+    //pMainControl->sendMainMessage("PROCESS FINISHED (" + QString::number(exitCode) + ")" + exitStatus);
 }
 void Controller::processOutput()
 {
     QString output = _process->readAllStandardOutput();
-    pMainControl->sendMainMessage("PROCESS LOG   : " + output);
+    //pMainControl->sendMainMessage("PROCESS LOG   : " + output);
 }
 void Controller::processError()
 {
     QString output = _process->readAllStandardError();
-    pMainControl->sendMainError("PROCESS ERROR   : " + output);
+    //pMainControl->sendMainError("PROCESS ERROR   : " + output);
 }
 void Controller::processIndiOutput()
 {
     QString output = _indiProcess->readAllStandardOutput();
-    pMainControl->sendMainMessage("INDI LOG   : " + output);
+    //pMainControl->sendMainMessage("INDI LOG   : " + output);
 }
 void Controller::processIndiError()
 {
     QString output = _indiProcess->readAllStandardError();
-    pMainControl->sendMainError("INDI ERROR   : " + output);
-}
-void Controller::sendMessage(const QString &pMessage)
-{
-    QString messageWithDateTime = "[" + QDateTime::currentDateTime().toString(Qt::ISODateWithMs) + "]-" + pMessage;
-    QDebug debug = qDebug();
-    debug.noquote();
-    debug << messageWithDateTime;
+    //pMainControl->sendMainError("INDI ERROR   : " + output);
 }
 // ---------- ZeroConf ----------
 
@@ -454,7 +735,7 @@ void Controller::startPublish()
 }
 void Controller::startIndi(void)
 {
-    pMainControl->sendMainMessage("Start Embedded indi server");
+    //pMainControl->sendMainMessage("Start Embedded indi server");
     _indiProcess = new QProcess(this);
     connect(_indiProcess, &QProcess::readyReadStandardOutput, this, &Controller::processIndiOutput);
     connect(_indiProcess, &QProcess::readyReadStandardError, this, &Controller::processIndiError);
@@ -493,13 +774,13 @@ void Controller::startIndi(void)
 }
 void Controller::stopIndi(void)
 {
-    pMainControl->sendMainMessage("Stop Embedded indi server");
+    //pMainControl->sendMainMessage("Stop Embedded indi server");
     if (_indiProcess->isOpen()) _indiProcess->kill();
 
 }
 void Controller::startIndiDriver(const QString &pDriver)
 {
-    pMainControl->sendMainMessage("Start indidriver " + pDriver);
+    //pMainControl->sendMainMessage("Start indidriver " + pDriver);
     QFile fifo("/tmp/ostserverIndiFIFO");
     fifo.open(QIODevice::WriteOnly);
     QTextStream txtStream(&fifo);
@@ -509,7 +790,7 @@ void Controller::startIndiDriver(const QString &pDriver)
 }
 void Controller::stopIndiDriver(const QString &pDriver)
 {
-    pMainControl->sendMainMessage("Stop indidriver " + pDriver);
+    //pMainControl->sendMainMessage("Stop indidriver " + pDriver);
     QFile fifo("/tmp/ostserverIndiFIFO");
     fifo.open(QIODevice::WriteOnly);
     QTextStream txtStream(&fifo);
@@ -590,32 +871,125 @@ void Controller::OnFileWatcherEvent(const QString &pEvent)
             mFilesList.removeOne(i);
         }
     }
+    mControllerData["files"] = mFilesList;
+    mControllerData["folders"] = mFoldersList;
 
+    wshandler->onControllerEvent(OST::EvType::uc, "files", QVariant(mFilesList), nullptr);
+    wshandler->onControllerEvent(OST::EvType::uc, "folders", QVariant(mFoldersList), nullptr);
+    QVariantMap r;
+    dbmanager->getDbProfiles(r);
+    wshandler->onControllerEvent(OST::EvType::uc, "profiles", r, nullptr);
+    updateControllerData("profiles", r);
 
 
 }
 void Controller::OnFileChangeEvent(const QString &pEvent)
 {
-    qDebug() << "****************************************** FileChanged" << pEvent;
+    //qDebug() << "****************************************** FileChanged" << pEvent;
 }
 
-void Controller::updateGlobalModulesLov(void)
+void Controller::logDebug(const QString &message)
 {
-    QVariantMap lovData;
-    QVariantList values;
+    logDebug(message, {});
+}
+void Controller::logDebug(const QString &message, const QVariantList &args)
+{
+    // Log to console (server language)
+    mLogger->onLog(OST::LogLevel::Debug, message, args, "CT");
 
-    // Add all loaded modules (excluding mainctl)
-    for(QMap<QString, QMap<QString, QString>>::const_iterator iter = mModulesMap.begin();
-            iter != mModulesMap.end(); ++iter)
+    // Broadcast to WebSocket clients (each in their language)
+    wshandler->onLog(OST::LogLevel::Debug, message, args, "CT");
+}
+void Controller::logInfo(const QString &message)
+{
+    logInfo(message, {});
+}
+void Controller::logInfo(const QString &message, const QVariantList &args)
+{
+    // Log to console (server language)
+    mLogger->onLog(OST::LogLevel::Info, message, args, "CT");
+
+    // Broadcast to WebSocket clients (each in their language)
+    wshandler->onLog(OST::LogLevel::Info, message, args, "CT");
+}
+void Controller::logError(const QString &message)
+{
+    logError(message, {});
+}
+void Controller::logError(const QString &message, const QVariantList &args)
+{
+    // Log to console (server language)
+    mLogger->onLog(OST::LogLevel::Error, message, args, "CT");
+
+    // Broadcast to WebSocket clients (each in their language)
+    wshandler->onLog(OST::LogLevel::Error, message, args, "CT");
+}
+QJsonObject Controller::getModulesDump(QString clientgrant)
+{
+    QJsonObject result, dump, files, modules;
+    dump["grant-client"] = clientgrant;
+    dump["grant-server"] = _grant;
+
+    if (clientgrant == "-1")
     {
-        QVariantMap item;
-        item["key"] = iter.key();
-        item["label"] = iter.value()["label"];
-        values.append(item);
+        result["d"] = dump;
+        return result;
     }
 
-    lovData["values"] = values;
+    files["folders"] = QJsonArray::fromStringList(mFoldersList);
+    files["files"] = QJsonArray::fromStringList(mFilesList);
+    files["selectedfolder"] = mSelectedFolder;
 
-    // Emit event to update all modules with the new list
-    emit controllerEvent("globallovupdate", "*", "loadedModules", lovData);
+    QList<Basemodule *> allmodules = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
+    for (Basemodule *module : allmodules)
+    {
+        modules[module->getModuleName()] = OST::ModuleJsonDumper(OST::EvType::aa, QVariant(), nullptr, nullptr, nullptr, module);
+    }
+
+    dump["m"] = modules;
+    dump["files"] = files;
+    dump["logs"] = mLogger->getJsonHistory();
+    dump["serverlng"] = _lng;
+    dump["controllerdata"] = QJsonObject().fromVariantMap(mControllerData);
+
+    QJsonObject lovs;
+    foreach(const QString &key, mControllerLovs.keys())
+    {
+        OST::LovJsonDumper d;
+        mControllerLovs[key]->accept(&d);
+        lovs[key] = d.getResult();
+    }
+    dump["lovs"] = lovs;
+
+    result["d"] = dump;
+    return result;
+}
+void Controller::updateControllerData(QString key, QVariant data)
+{
+    mControllerData[key] = data;
+    wshandler->onControllerEvent(OST::EvType::uc, key, data, nullptr);
+}
+void Controller::onInterModuleRequest(OST::ExtEvent event)
+{
+    Basemodule *pSenderModule = qobject_cast<Basemodule *>(sender());
+
+    QList<Basemodule *> modules = findChildren<Basemodule *>(event.mod, Qt::FindChildrenRecursively);
+
+    if (modules.size() == 0)
+    {
+        logError("Controller::onInterModuleRequest - module not found : %1", {event.mod});
+        return;
+    }
+    if (modules.size() > 1)
+    {
+        logError("Controller::onInterModuleRequest - problem finding module : %1 %2 ", {event.mod, modules.size()});
+        return;
+    }
+
+    logDebug("Controller::onInterModuleRequest %1 %2 %3 %4", {OST::ExtEvToString(event.ev), event.mod, event.prpkey, event.data});
+
+    Basemodule *pTargetModule = modules[0];
+    pTargetModule->onExternalEventRoot(event);
+
+
 }

@@ -1,0 +1,218 @@
+{
+"p":{
+    "progress":{
+        "devcat": "Control",
+        "group": "",
+        "permission": 0,
+        "order":2,
+        "label":"Progress",
+        "e": {
+            "global": {
+                "type": "prg",
+                "prgtype": "spinner",
+                "label": "Sequence",
+                "dynlabel": "",
+                "value": 0,
+                "order":0
+            },
+            "exposure": {
+                "type": "prg",
+                "prgtype": "spinner",
+                "label": "Current exposure",
+                "dynlabel": "",
+                "value": 0,
+                "order":2
+            }
+        }
+    },
+    "sequence": {
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
+        "devcat": "Parameters",
+        "group": "Sequence",
+        "permission": 2,
+        "order":1,
+        "grid":0,
+        "hasprofile":true,
+        "label": "Sequence",
+        "e": {
+            "frametype": {
+                "type":"string",
+                "label": "Frame type",
+                "order":1,
+                "value":"L",
+                "gridvalues":[],
+                "listOfValues":[
+                    ["L","Light"],
+                    ["B","Bias"],
+                    ["D","Dark"],
+                    ["F","Flat"]
+                ]
+            },
+            "filter": {
+                "type":"int",
+                "label": "Filter",
+                "order":2,
+                "gridvalues":[],
+                "listOfValues":[
+                ]
+            },
+            "exposure": {
+                "type":"float",
+                "label": "Exposure",
+                "order":3,
+                "value":10,
+                "gridvalues":[],
+                "format": "99"
+            },
+            "count": {
+                "type":"int",
+                "label": "Count",
+                "order":4,
+                "value":5,
+                "gridvalues":[],
+                "format": "99"
+            },
+            "gain": {
+                "type":"int",
+                "label": "Gain",
+                "order":5,
+                "value":5,
+                "gridvalues":[],
+                "format": "99"
+            },
+            "offset": {
+                "type":"int",
+                "label": "Offset",
+                "order":6,
+                "value":5,
+                "gridvalues":[],
+                "format": "99"
+            },
+            "progress": {
+                "type":"prg",
+                "label": "Progress",
+                "prgtype": "spinner",
+                "dynlabel": "",
+                "order":7,
+                "value":"idle",
+                "gridvalues":[]
+            }
+
+        }
+    },
+    "object":{
+            "devcat": "Parameters",
+            "group": "Sequence",
+            "permission": 2,
+            "order":5,
+            "label":"Object",
+            "hasprofile":true,
+            "e": {
+                "label": {
+                    "type": "string",
+                    "label": "Name",
+                    "dynlabel": "",
+                    "autoupdate":true,
+                    "directedit":true,
+                    "order":0
+                },
+                "ra": {
+                    "type": "float",
+                    "label": "RA",
+                    "autoupdate":true,
+                    "directedit":true,
+                    "order":1
+                },
+                "de": {
+                    "type": "float",
+                    "label": "DEC",
+                    "autoupdate":true,
+                    "directedit":true,
+                    "order":2
+                }
+            }
+    },
+    "slaves": {
+        "label": "Parameters",
+        "permission": 2,
+        "devcat": "Parameters",
+        "group": "Slave modules",
+        "order": "100",
+        "hasprofile": true,
+        "e": {
+            "focusmodule": {
+                "type": "string",
+                "label": "Focus module instance",
+                "listOfValues":"loadedModules-focus",
+                "listOfValuesIsExternal":true,
+                "autoupdate": true,
+                "directedit": true,
+                "value": "focus",
+                "order": 2,
+                "hint": "Name of the focus module INSTANCE to use (e.g. 'focus', 'myfocus1')"
+            },
+            "guidermodule": {
+                "type": "string",
+                "label": "Guider module instance",
+                "listOfValues":"loadedModules-guider",
+                "listOfValuesIsExternal":true,
+                "autoupdate": true,
+                "directedit": true,
+                "value": "guider",
+                "order": 4,
+                "hint": "Name of the guider module INSTANCE to use (e.g. 'guider', 'myguider1')"
+            }
+        }
+    },
+
+    "parameters": {
+        "devcat": "Parameters",
+        "group": "Sequence",
+        "permission": 2,
+        "order": 0,
+        "hasprofile": true,
+        "label": "Parameters",
+        "e": {
+            "autofocusatstart": {
+                "type": "bool",
+                "label": "Auto-focus at sequence start",
+                "autoupdate": true,
+                "directedit": true,
+                "value": true,
+                "order": 0,
+                "hint": "Automatically trigger focus before starting the sequence (using first line filter)"
+            },
+            "autofocusonfilterchange": {
+                "type": "bool",
+                "label": "Auto-focus on filter change",
+                "autoupdate": true,
+                "directedit": true,
+                "value": false,
+                "order": 1,
+                "hint": "Automatically trigger focus when filter changes during sequence"
+            },
+            "suspendguidingduringfocus": {
+                "type": "bool",
+                "label": "Suspend guiding during focus",
+                "autoupdate": true,
+                "directedit": true,
+                "value": false,
+                "order": 3,
+                "hint": "Suspend guiding when autofocus is triggered and resume after focus completes"
+            },
+            "guidingsettletime": {
+                "type": "int",
+                "label": "Resume guiding settle time (s)",
+                "autoupdate": true,
+                "directedit": true,
+                "value": 10,
+                "order": 5,
+                "format": "99",
+                "hint": "Wait time in seconds after resuming guiding before continuing sequence (allows guiding to stabilize)"
+            }
+        }
+    }
+}
+}

@@ -2,16 +2,20 @@
 namespace  OST
 {
 
-ElementBase::ElementBase(const QString &label, const QString &order, const QString &hint)
-    : mLabel(label), mOrder(order), mHint(hint)
+ElementBase::ElementBase(const QString &key, const QString &label, const QString &order, const QString &hint)
+    : mKey(key), mLabel(label), mOrder(order), mHint(hint)
 {
-    if (order == "") qDebug() << "*** ElementBase order ko *** "  << label;
+    if (order == "") logMessage(OST::LogLevel::Warning, "ElementBase %1 order ko (%2)", {label});
 }
 ElementBase::~ElementBase()
 {
 
 }
 
+QString ElementBase::key()
+{
+    return mKey;
+}
 QString ElementBase::label()
 {
     return mLabel;
@@ -68,9 +72,10 @@ QString ElementBase::getGlobalLov()
 {
     return mGlobalLov;
 }
-void ElementBase::setGlobalLov(QString lovName)
+void ElementBase::setGlobalLov(QString lovName, LovScope scope)
 {
     mGlobalLov = lovName;
+    mLovScope = scope;
 }
 
 void ElementBase::OnLovChanged()

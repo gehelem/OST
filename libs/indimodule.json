@@ -1,34 +1,7 @@
 {
 "globallov":{
 },
-"properties":{
-    "indiGit": {
-        "devcat": "Module",
-        "group": "Info",
-        "order":"00",
-        "permission": 0,
-        "label": "Indi module git",
-        "elements": {
-            "hash": {
-                "type": "string",
-                "label": "Hash",
-                "order":"00",
-                "value":"xxx"
-            },
-            "date": {
-                "type": "string",
-                "label": "Date",
-                "order":"01",
-                "value":"xxx"
-            },
-            "message": {
-                "type": "string",
-                "label": "Commit message",
-                "order":"02",
-                "value":"xxx"
-            }
-        }
-    },
+"p":{
     "server": {
         "hasprofile":true,
         "devcat": "Module",
@@ -36,10 +9,11 @@
         "order":"99",
         "permission": 2,
         "label": "Server",
-        "elements": {
+        "e": {
             "host": {
                 "type": "string",
                 "label": "Host",
+                "directedit":true,
                 "order":"00",
                 "autoupdate":true,
                 "value": "localhost"
@@ -47,6 +21,7 @@
             "port": {
                 "type": "int",
                 "label": "Port",
+                "directedit":true,
                 "order":"01",
                 "autoupdate":true,
                 "value": 7624
@@ -61,7 +36,7 @@
         "permission": 2,
         "rule":2,
         "label": "Server",
-        "elements": {
+        "e": {
             "conserv": {
                 "type": "bool",
                 "label": "Connect",
@@ -83,7 +58,17 @@
         "order":"222Parms222",
         "permission": 2,
         "label": "Devices",
-        "elements": {
+        "e": {
+            "equipments": {
+                "order":"01",
+                "autoupdate":true,
+                "directedit":true,
+                "type":"string",
+                "label": "Global equipment set",
+                "value":"",
+                "listOfValues":"equipments",
+                "listOfValuesIsExternal":true
+            }
         }
     },
     "devicesactions": {
@@ -93,7 +78,7 @@
         "permission": 2,
         "rule":2,
         "label": "Devices actions" ,
-        "elements": {
+        "e": {
             "condevs": {
                 "type": "bool",
                 "label": "Connect",
@@ -124,7 +109,7 @@
         "rule":2,
         "hasprofile":true,
         "label": "Actions on module startup",
-        "elements": {
+        "e": {
             "indiatstart": {
                 "type": "bool",
                 "autoupdate":true,
@@ -156,7 +141,17 @@
         "permission": 2,
         "rule":1,
         "label": "Actions",
-        "elements": {
+        "e": {
+        }
+    },
+    "target": {
+        "devcat": "Control",
+        "group": "",
+        "order":"000Control333",
+        "permission": 2,
+        "rule":1,
+        "label": "Target",
+        "e": {
         }
     },
     "parms": {
@@ -166,7 +161,7 @@
         "permission": 2,
         "hasprofile":true,
         "label": "Parameters",
-        "elements": {
+        "e": {
         }
     }
 }

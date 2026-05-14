@@ -2,6 +2,7 @@
 #include <basedevice.h>
 #include "indimodule.h"
 #include "version.cc"
+#include <common.h>
 
 IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
     : Basemodule(name, label, profile, availableModuleLibs)
@@ -9,9 +10,12 @@ IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap
     setVerbose(false);
     //_moduletype = "IndiModule";
     loadOstPropertiesFromFile(":indimodule.json");
-    getEltString("indiGit", "hash")->setValue(QString::fromStdString(Version::GIT_SHA1), false);
-    getEltString("indiGit", "date")->setValue(QString::fromStdString(Version::GIT_DATE), false);
-    getEltString("indiGit", "message")->setValue(QString::fromStdString(Version::GIT_COMMIT_SUBJECT), false);
+
+    setMetadata("baseindiGithash", QString::fromStdString(Version::GIT_SHA1));
+    setMetadata("baseindiGitdate", QString::fromStdString(Version::GIT_DATE));
+    setMetadata("baseindiGitmessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
+    setMetadata("baseindiVersion", QString::fromStdString(Version::GIT_TAG));
+
 
     OST::LovString* ls = new OST::LovString("DRIVER_INTERFACE-TELESCOPE_INTERFACE");
     createGlobLov("DRIVER_INTERFACE-TELESCOPE_INTERFACE", ls);
@@ -37,69 +41,174 @@ IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap
     timer->start(2000);
 
 }
-void IndiModule::OnDispatchToIndiExternalEvent(const QString &eventType, const QString  &eventModule,
-        const QString  &eventKey, const QVariantMap &eventData)
-
+/**
+ * @brief INDI module event handler (Hook 2/3)
+ *
+ * Override of Basemodule's hook. Called automatically by the orchestrator
+ * after onExternalEventBase() and before onExternalEventCustom().
+ *
+ * NO need to call parent - orchestration is automatic!
+ */
+bool IndiModule::onExternalEventIndi(OST::ExtEvent event)
 {
-    Q_UNUSED(eventType);
-    Q_UNUSED(eventKey);
+    //qDebug() << "IndiModule::onExternalEventIndi event = " << OST::ExtEvToString(event.ev) << " p=" << event.prpkey << " e=" <<
+    //         event.eltkey << " l=" << event.lovkey << " i=" << event.line;
 
-    if (!(getModuleName() == eventModule))
+    QJsonObject o = event.data["m"].toObject()[this->getModuleName()].toObject();
+    QJsonObject p = o["p"].toObject();
+    QJsonObject e = p[event.prpkey].toObject()["e"].toObject();
+
+    if (event.ev == OST::ExtEvType::SV)
     {
-        return;
-    }
-    //sendMessage("OnIndiExternalEvent - recv : " + getModuleName()+ "-" + eventType + "-" + eventKey);
-    foreach(const QString &keyprop, eventData.keys())
-    {
-        foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
+
+        QVariantMap eltval;
+        eltval["value"] = e.begin().value().toVariant();
+        if (event.prpkey == "serveractions" && event.eltkey == "conserv")
         {
-            //setOstElementValue(keyprop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"], true);
-            if (keyprop == "serveractions")
+            getProperty(event.prpkey)->setState(OST::Busy, true);
+            if (connectIndi()) getProperty(event.prpkey)->setState(OST::Ok, true);
+            else getProperty(event.prpkey)->setState(OST::Error, true);
+
+            OST::ElementUpdate u;
+            bool b = true;
+            getStore()[event.prpkey]->getElt(event.eltkey)->accept(&u, eltval, b);
+            return true;
+        }
+        if (event.prpkey == "serveractions" && event.eltkey == "disconserv")
+        {
+            getProperty(event.prpkey)->setState(OST::Busy, true);
+            if (disconnectIndi()) getProperty(event.prpkey)->setState(OST::Ok, true);
+            else getProperty(event.prpkey)->setState(OST::Error, true);
+
+            OST::ElementUpdate u;
+            bool b = true;
+            getStore()[event.prpkey]->getElt(event.eltkey)->accept(&u, eltval, b);
+            return true;
+        }
+        if (event.prpkey == "optic")
+        {
+            getEltString("optic", "optic")->setValue("", true);
+            if (mGlobalDatastore && event.eltkey == "optic")
             {
-                getEltBool(keyprop, keyelt)->setValue(false, false);
-                if (keyelt == "conserv")
+                QString opticsName = eltval["value"].toString();
+                if (!opticsName.isEmpty())
                 {
-                    getProperty(keyprop)->setState(OST::Busy);
-                    if (connectIndi()) getProperty(keyprop)->setState(OST::Ok);
-                    else getProperty(keyprop)->setState(OST::Error);
-                }
-                if (keyelt == "disconserv")
-                {
-                    getProperty(keyprop)->setState(OST::Busy);
-                    if (disconnectIndi()) getProperty(keyprop)->setState(OST::Ok);
-                    else getProperty(keyprop)->setState(OST::Error);
+                    double focal    = mGlobalDatastore->getGridFloat("optics", "focal",    "name", opticsName);
+                    double diameter = mGlobalDatastore->getGridFloat("optics", "diameter", "name", opticsName);
+                    if (focal > 0.0)
+                        logInfo("Optics: %1 - focal %2 mm, diameter %3 mm", {opticsName, focal, diameter});
+                    else
+                        logWarning("Optics '%1' not found in GlobalDatastore", {opticsName});
+                    getEltFloat("optic", "fl")->setValue(focal);
+                    getEltFloat("optic", "diam")->setValue(diameter);
+                    getEltString("optic", "optic")->setValue(eltval["value"].toString());
                 }
             }
-            if (keyprop == "devicesactions")
+            setFocalLengthAndDiameter(); // Mandatory for simulators to work
+        }
+
+        if (event.prpkey == "devices"  && event.eltkey == "equipments")
+        {
+            disconnectIndi();
+            if (mGlobalDatastore)
             {
-                getEltBool(keyprop, keyelt)->setValue(false, false);
-                if (!isServerConnected())
+                QString equipmentName = eltval["value"].toString();
+                if (!equipmentName.isEmpty())
                 {
-                    sendWarning("Indi server not connected");
-                    getProperty(keyprop)->setState(OST::Error);
-                    break;
+                    if (getProperty("devices")->getElts()->contains("camera")) getEltString("devices", "camera")->setValue("");
+                    if (getProperty("devices")->getElts()->contains("mount")) getEltString("devices", "mount")->setValue("");
+                    if (getProperty("devices")->getElts()->contains("focuser")) getEltString("devices", "focuser")->setValue("");
+                    if (getProperty("devices")->getElts()->contains("filter")) getEltString("devices", "filter")->setValue("");
+                    if (getProperty("devices")->getElts()->contains("guidecamera")) getEltString("devices", "guidecamera")->setValue("");
+                    if (getProperty("devices")->getElts()->contains("guidest4")) getEltString("devices", "guidest4")->setValue("");
+                    if (getProperty("devices")->getElts()->contains("gps")) getEltString("devices", "gps")->setValue("");
+                    QString camera = mGlobalDatastore->getGridString("equipments", "camera",    "name", equipmentName);
+                    QString mount = mGlobalDatastore->getGridString("equipments", "mount",    "name", equipmentName);
+                    QString focuser = mGlobalDatastore->getGridString("equipments", "focuser",    "name", equipmentName);
+                    QString filter = mGlobalDatastore->getGridString("equipments", "filter",    "name", equipmentName);
+                    QString guidecamera = mGlobalDatastore->getGridString("equipments", "guidecamera",    "name", equipmentName);
+                    QString guidest4 = mGlobalDatastore->getGridString("equipments", "guidest4",    "name", equipmentName);
+                    QString gps = mGlobalDatastore->getGridString("equipments", "gps",    "name", equipmentName);
+                    QString hostport = mGlobalDatastore->getGridString("equipments", "host",    "name", equipmentName);
+                    if (camera != "")
+                        logInfo("Equipments: %1", {equipmentName});
+                    else
+                        logWarning("Equipments '%1' not found in GlobalDatastore", {equipmentName});
+                    if (getProperty("devices")->getElts()->contains("camera")) getEltString("devices", "camera")->setValue(camera);
+                    if (getProperty("devices")->getElts()->contains("mount")) getEltString("devices", "mount")->setValue(mount);
+                    if (getProperty("devices")->getElts()->contains("focuser")) getEltString("devices", "focuser")->setValue(focuser);
+                    if (getProperty("devices")->getElts()->contains("filter")) getEltString("devices", "filter")->setValue(filter);
+                    if (getProperty("devices")->getElts()->contains("guidecamera")) getEltString("devices",
+                                "guidecamera")->setValue(guidecamera);
+                    if (getProperty("devices")->getElts()->contains("guidest4")) getEltString("devices", "guidest4")->setValue(guidest4);
+                    if (getProperty("devices")->getElts()->contains("gps")) getEltString("devices", "gps")->setValue(gps);
+
+                    QString host = mGlobalDatastore->getGridString("servers", "host",    "name", hostport);
+                    int port = mGlobalDatastore->getGridInt("servers", "port", "name", hostport);
+                    if (host != "")
+                        logInfo("Servers: %1 : %2:%3", {hostport, host, port});
+                    else
+                        logWarning("Servers '%1' not found in GlobalDatastore", {hostport});
+                    getEltString("server", "host")->setValue(host);
+                    getEltInt("server", "port")->setValue(port);
                 }
-                if (keyelt == "condevs")
-                {
-                    getProperty(keyprop)->setState(OST::Busy);
-                    if (connectAllDevices()) getProperty(keyprop)->setState(OST::Ok);
-                    else getProperty(keyprop)->setState(OST::Error);
-                }
-                if (keyelt == "discondevs")
-                {
-                    getProperty(keyprop)->setState(OST::Busy);
-                    if (disconnectAllDevices()) getProperty(keyprop)->setState(OST::Ok);
-                    else getProperty(keyprop)->setState(OST::Error);
-                }
-                if (keyelt == "loadconfs")
-                {
-                    getProperty(keyprop)->setState(OST::Busy);
-                    if (loadDevicesConfs()) getProperty(keyprop)->setState(OST::Ok);
-                    else getProperty(keyprop)->setState(OST::Error);
-                }
+            }
+            connectIndi();
+        }
+
+
+        if (event.prpkey == "devicesactions" && event.eltkey == "condevs")
+        {
+            if (!isServerConnected())
+            {
+                logWarning("%1 - Indi server not connected", {QString("onExternalEventIndi")});
+                getProperty(event.prpkey)->setState(OST::Error, true);
+                return true;
+            }
+
+            if (event.eltkey == "condevs")
+            {
+                getProperty(event.prpkey)->setState(OST::Busy, true);
+                if (connectAllDevices()) getProperty(event.prpkey)->setState(OST::Ok, true);
+                else getProperty(event.prpkey)->setState(OST::Error, true);
+
+                OST::ElementUpdate u;
+                bool b = true;
+                getStore()[event.prpkey]->getElt(event.eltkey)->accept(&u, eltval, b);
+                return true;
+            }
+            if (event.eltkey == "discondevs")
+            {
+                getProperty(event.prpkey)->setState(OST::Busy, true);
+                if (disconnectAllDevices()) getProperty(event.prpkey)->setState(OST::Ok, true);
+                else getProperty(event.prpkey)->setState(OST::Error, true);
+
+                OST::ElementUpdate u;
+                bool b = true;
+                getStore()[event.prpkey]->getElt(event.eltkey)->accept(&u, eltval, b);
+                return true;
+            }
+            if (event.eltkey == "loadconfs")
+            {
+                getProperty(event.prpkey)->setState(OST::Busy, true);
+                if (loadDevicesConfs()) getProperty(event.prpkey)->setState(OST::Ok, true);
+                else getProperty(event.prpkey)->setState(OST::Error, true);
+
+                OST::ElementUpdate u;
+                bool b = true;
+                getStore()[event.prpkey]->getElt(event.eltkey)->accept(&u, eltval, b);
+                return true;
             }
         }
+
     }
+
+    if (event.ev == OST::ExtEvType::J2 && event.prpkey == "devices")
+    {
+        refreshDeviceslovs();
+    }
+    return true;
+
 }
 void IndiModule::connectIndiTimer()
 {
@@ -110,6 +219,43 @@ void IndiModule::connectIndiTimer()
     connectIndi();
 
 }
+
+void IndiModule::newDevice(INDI::BaseDevice dp)
+{
+    //logDebug("IndiModule::newDevice %1", {dp.getDeviceName()});
+    refreshDeviceslovs();
+    onNewDevice(dp);
+}
+void IndiModule::removeDevice(INDI::BaseDevice dp)
+{
+    //logDebug("IndiModule::removeDevice %1", {dp.getDeviceName()});
+    refreshDeviceslovs();
+    onRemoveDevice(dp);
+}
+void IndiModule::newProperty(INDI::Property pProperty)
+{
+    //logDebug("IndiModule::newProperty %1 %2", {pProperty.getDeviceName(), pProperty.getName()});
+    onNewProperty(pProperty);
+}
+
+void IndiModule::updateProperty (INDI::Property property)
+{
+    //logDebug("IndiModule::updateProperty %1 %2", {property.getDeviceName(), property.getName()});
+    onUpdateProperty(property);
+
+}
+void IndiModule::removeProperty(INDI::Property property)
+{
+    //logDebug("IndiModule::removeProperty %1 %2", {property.getDeviceName(), property.getName()});
+    onRemoveProperty(property);
+}
+
+void IndiModule::onNewDevice      (INDI::BaseDevice dp)    {} ;
+void IndiModule::onRemoveDevice   (INDI::BaseDevice dp)    {} ;
+void IndiModule::onNewProperty    (INDI::Property property) {} ;
+void IndiModule::onRemoveProperty (INDI::Property property) {} ;
+void IndiModule::onUpdateProperty (INDI::Property property) {} ;
+
 /*!
  * Connects to indi server
  * Should we add host/port ??
@@ -128,26 +274,26 @@ bool IndiModule::connectIndi()
     if (connectServer())
     {
         newUniversalMessage("Indi server connected");
-        sendMessage("Indi server connected");
+        logInfo("Indi server connected");
         QTimer::singleShot(500, this, &IndiModule::OnAfterIndiConnectIndiTimer);
         return true;
     }
-    sendError("Couldn't connect to Indi server");
+    logError("%1 - Couldn't connect to Indi server", {QString("connectIndi")});
     return false;
 }
 bool IndiModule::disconnectIndi(void)
 {
     if (!isServerConnected())
     {
-        sendWarning("Indi server already disconnected");
+        logWarning("%1 - Indi server already disconnected", {QString("disconnectIndi")});
         return true;
     }
     if (!disconnectServer())
     {
-        sendError("Couldn't disconnect from Indi server");
+        logError("%1 - Couldn't disconnect from Indi server", {QString("disconnectIndi")});
         return false;
     }
-    sendMessage("Indi server disconnected");
+    logInfo("%1 - Indi server disconnected", {QString("disconnectIndi")});
     return true;
 
 }
@@ -165,7 +311,7 @@ bool IndiModule::connectAllDevices()
 
         if (!svp.isValid())
         {
-            sendError("Couldn't find CONNECTION switch " + QString(devs[i].getDeviceName()));
+            logError("%1 - Couldn't find CONNECTION switch for %2", {QString("connectAllDevices"), QString(devs[i].getDeviceName())});
             err++;
         }
         else
@@ -185,7 +331,7 @@ bool IndiModule::connectAllDevices()
             sendNewSwitch(svp);
             if (devs[i].getDriverInterface() & INDI::BaseDevice::CCD_INTERFACE)
             {
-                sendMessage("Set blob mode " + QString(devs[i].getDeviceName()));
+                logDebug("Set blob mode %1", {QString(devs[i].getDeviceName())});
                 setBLOBMode(B_ALSO, devs[i].getDeviceName(), nullptr);
 
             }
@@ -211,7 +357,7 @@ bool IndiModule::disconnectAllDevices()
 
         if (!svp.isValid())
         {
-            sendError("Couldn't find CONNECTION switch " + QString(devs[i].getDeviceName()));
+            logError("%1 - Couldn't find CONNECTION switch for %2", {QString("disconnectAllDevices"), QString(devs[i].getDeviceName())});
             err++;
         }
         else
@@ -240,7 +386,7 @@ bool IndiModule::connectDevice(QString deviceName)
 {
     if (!isServerConnected())
     {
-        sendWarning("Indi server is not connected");
+        logWarning("%1 - Indi server is not connected", {QString("connectDevice")});
         return false;
     }
     bool _checkdevice = false;
@@ -250,7 +396,7 @@ bool IndiModule::connectDevice(QString deviceName)
     }
     if (!_checkdevice)
     {
-        sendError("Device " + deviceName + " not found");
+        logError("%1 - Unable to find %2 device", {QString("connectDevice"), deviceName});
         return false;
     }
 
@@ -260,7 +406,7 @@ bool IndiModule::connectDevice(QString deviceName)
 
     if (!svp.isValid())
     {
-        sendError("Couldn't find CONNECTION switch " + deviceName);
+        logError("%1 - Couldn't find CONNECTION switch for %2", {QString("connectDevice"), deviceName});
         return false;
     }
     for (std::size_t  j = 0; j < svp.size(); j++)
@@ -285,7 +431,7 @@ bool IndiModule::disconnectDevice(QString deviceName)
 
     if (!svp.isValid())
     {
-        sendError("Couldn't find CONNECTION switch " + deviceName);
+        logError("%1 - Couldn't find CONNECTION switch for %2", {QString("disconnectDevice"), deviceName});
         return false;
     }
     for (std::size_t j = 0; j < svp.size(); j++)
@@ -312,14 +458,14 @@ bool IndiModule::loadDevicesConfs()
     std::vector<INDI::BaseDevice> devs = getDevices();
     for(std::size_t i = 0; i < devs.size(); i++)
     {
-        sendMessage("Loading device conf " + QString(devs[i].getDeviceName()));
+        logInfo("%1 - Loading device conf for %2", {QString("loadDevicesConfs"), QString(devs[i].getDeviceName())});
         if (devs[i].isConnected())
         {
             INDI::PropertySwitch svp = devs[i].getSwitch("CONFIG_PROCESS");
 
             if (!svp.isValid())
             {
-                sendError("Couldn't find CONFIG_PROCESS switch " + QString(devs[i].getDeviceName()));
+                logError("%1 - Couldn't find CONFIG_PROCESS switch for %2", {QString("loadDevicesConfs"), QString(devs[i].getDeviceName())});
                 err++;
             }
             else
@@ -352,13 +498,13 @@ auto IndiModule::sendModNewNumber(const QString &deviceName, const QString &prop
 
     if (!dp.isValid())
     {
-        sendError("Unable to find " + deviceName + " device. Aborting.");
+        logError("%1 - Unable to find %2 device. Aborting.", {QString("sendModNewNumber"), deviceName});
         return false;
     }
     INDI::PropertyNumber prop = dp.getNumber(propertyName.toStdString().c_str());
     if (!prop.isValid())
     {
-        sendError("Unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
+        logError("%1 - Unable to find %2/%3 property. Aborting.", {QString("sendModNewNumber"), deviceName, propertyName});
         return false;
     }
 
@@ -371,7 +517,7 @@ auto IndiModule::sendModNewNumber(const QString &deviceName, const QString &prop
             return true;
         }
     }
-    sendError("Unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
+    logError("%1 - Unable to find %2/%3/%4 element. Aborting.", {QString("sendModNewNumber"), deviceName, propertyName, elementName});
     return false;
 
 }
@@ -383,12 +529,12 @@ bool IndiModule::requestCapture(const QString &deviceName, const double &exposur
     INDI::BaseDevice dp = getDevice(deviceName.toStdString().c_str());
     if (!dp.isValid())
     {
-        sendError("Capture - device " + deviceName + " not found. Aborting.");
+        logError("%1 - Unable to find %2 device. Aborting.", {QString("requestCapture"), deviceName});
         return false;
     }
     if (dp == false)
     {
-        sendWarning("Capture - " + deviceName + " not connected, trying to connect");
+        logWarning("%1 - %2 not connected, trying to connect", {QString("requestCapture"), deviceName});
         if (!connectDevice(deviceName)) return false;
     }
     setBLOBMode(B_ALSO, deviceName.toStdString().c_str(), nullptr);
@@ -397,26 +543,22 @@ bool IndiModule::requestCapture(const QString &deviceName, const double &exposur
         INDI::PropertyNumber prop = dp.getNumber("CCD_CONTROLS");
         if (wgain < prop.findWidgetByName("Gain")->min)
         {
-            sendWarning("Capture - " + deviceName + " gain requested too low (" + QString::number(wgain) + "), setting to " +
-                        QString::number(prop.findWidgetByName("Gain")->min));
+            logWarning("%1 - %2 gain requested too low (%3), setting to %4", {QString("requestCapture"), deviceName, wgain, prop.findWidgetByName("Gain")->min});
             wgain = prop.findWidgetByName("Gain")->min;
         }
         if (wgain > prop.findWidgetByName("Gain")->max)
         {
-            sendWarning("Capture - " + deviceName + " gain requested too high (" + QString::number(wgain) + "), setting to " +
-                        QString::number(prop.findWidgetByName("Gain")->max));
+            logWarning("%1 - %2 gain requested too high (%3), setting to %4", {QString("requestCapture"), deviceName, wgain, prop.findWidgetByName("Gain")->max});
             wgain = prop.findWidgetByName("Gain")->max;
         }
         if (woffset < prop.findWidgetByName("Offset")->min)
         {
-            sendWarning("Capture - " + deviceName + " gain requested too low (" + QString::number(woffset) + "), setting to " +
-                        QString::number(prop.findWidgetByName("Offset")->min));
+            logWarning("%1 - %2 offset requested too low (%3), setting to %4", {QString("requestCapture"), deviceName, wgain, prop.findWidgetByName("Offset")->min});
             woffset = prop.findWidgetByName("Offset")->min;
         }
         if (woffset > prop.findWidgetByName("Offset")->max)
         {
-            sendWarning("Capture - " + deviceName + " gain requested too high (" + QString::number(woffset) + "), setting to " +
-                        QString::number(prop.findWidgetByName("Offset")->max));
+            logWarning("%1 - %2 offset requested too high (%3), setting to %4", {QString("requestCapture"), deviceName, wgain, prop.findWidgetByName("Offset")->max});
             woffset = prop.findWidgetByName("Offset")->max;
         }
         prop.findWidgetByName("Gain")->value = wgain;
@@ -428,14 +570,12 @@ bool IndiModule::requestCapture(const QString &deviceName, const double &exposur
         INDI::PropertyNumber prop = dp.getNumber("CCD_GAIN");
         if (wgain < prop.findWidgetByName("GAIN")->min)
         {
-            sendWarning("Capture - " + deviceName + " gain requested too low (" + QString::number(wgain) + "), setting to " +
-                        QString::number(prop.findWidgetByName("GAIN")->min));
+            logWarning("%1 - %2 gain requested too low (%3), setting to %4", {QString("requestCapture"), deviceName, wgain, prop.findWidgetByName("GAIN")->min});
             wgain = prop.findWidgetByName("GAIN")->min;
         }
         if (wgain > prop.findWidgetByName("GAIN")->max)
         {
-            sendWarning("Capture - " + deviceName + " gain requested too high (" + QString::number(wgain) + "), setting to " +
-                        QString::number(prop.findWidgetByName("GAIN")->max));
+            logWarning("%1 - %2 gain requested too high (%3), setting to %4", {QString("requestCapture"), deviceName, wgain, prop.findWidgetByName("GAIN")->max});
             wgain = prop.findWidgetByName("GAIN")->max;
         }
         prop.findWidgetByName("GAIN")->value = wgain;
@@ -446,14 +586,12 @@ bool IndiModule::requestCapture(const QString &deviceName, const double &exposur
         INDI::PropertyNumber prop = dp.getNumber("CCD_OFFSET");
         if (woffset < prop.findWidgetByName("OFFSET")->min)
         {
-            sendWarning("Capture - " + deviceName + " offset requested too low (" + QString::number(woffset) + "), setting to " +
-                        QString::number(prop.findWidgetByName("OFFSET")->min));
+            logWarning("%1 - %2 offset requested too low (%3), setting to %4", {QString("requestCapture"), deviceName, wgain, prop.findWidgetByName("OFFSET")->min});
             woffset = prop.findWidgetByName("OFFSET")->min;
         }
         if (woffset > prop.findWidgetByName("OFFSET")->max)
         {
-            sendWarning("Capture - " + deviceName + " offset requested too high (" + QString::number(woffset) + "), setting to " +
-                        QString::number(prop.findWidgetByName("OFFSET")->max));
+            logWarning("%1 - %2 offset requested too high (%3), setting to %4", {QString("requestCapture"), deviceName, wgain, prop.findWidgetByName("OFFSET")->max});
             woffset = prop.findWidgetByName("OFFSET")->max;
         }
         prop.findWidgetByName("OFFSET")->value = woffset;
@@ -474,13 +612,13 @@ bool IndiModule::getModNumber(const QString &deviceName, const QString &property
 
     if (!dp.isValid())
     {
-        sendError("Unable to find " + deviceName + " device. Aborting.");
+        logError("%1 - Unable to find %2 device. Aborting.", {QString("getModNumber"), deviceName});
         return false;
     }
     INDI::PropertyNumber prop = dp.getNumber(propertyName.toStdString().c_str());
     if (!prop.isValid())
     {
-        sendError("Unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
+        logError("%1 - Unable to find %2/%3 property. Aborting.", {QString("getModNumber"), deviceName, propertyName});
         return false;
     }
 
@@ -492,7 +630,8 @@ bool IndiModule::getModNumber(const QString &deviceName, const QString &property
             return true;
         }
     }
-    sendError("Unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
+    logError("%1 - Unable to find %2/%3/%4 element. Aborting.", {QString("getModNumber"), deviceName, propertyName, elementName});
+
     return false;
 }
 bool IndiModule::getModSwitch(const QString &deviceName, const QString &propertyName, const QString  &elementName,
@@ -503,13 +642,13 @@ bool IndiModule::getModSwitch(const QString &deviceName, const QString &property
 
     if (!dp.isValid())
     {
-        sendError("Unable to find " + deviceName + " device. Aborting.");
+        logError("%1 - Unable to find %2 device. Aborting.", {QString("getModSwitch"), deviceName});
         return false;
     }
     INDI::PropertySwitch prop = dp.getSwitch(propertyName.toStdString().c_str());
     if (!prop.isValid())
     {
-        sendError("Unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
+        logError("%1 - Unable to find %2/%3 property. Aborting.", {QString("getModSwitch"), deviceName, propertyName});
         return false;
     }
 
@@ -521,7 +660,7 @@ bool IndiModule::getModSwitch(const QString &deviceName, const QString &property
             return true;
         }
     }
-    sendError("Unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
+    logError("%1 - Unable to find %2/%3/%4 element. Aborting.", {QString("getModSwitch"), deviceName, propertyName, elementName});
     return false;
 }
 bool IndiModule::getModText(const QString &deviceName, const QString &propertyName, const QString  &elementName,
@@ -532,13 +671,13 @@ bool IndiModule::getModText(const QString &deviceName, const QString &propertyNa
 
     if (!dp.isValid())
     {
-        sendError("Unable to find " + deviceName + " device. Aborting.");
+        logError("%1 - Unable to find %2 device. Aborting.", {QString("getModText"), deviceName});
         return false;
     }
     INDI::PropertyText prop = dp.getText(propertyName.toStdString().c_str());
     if (!prop.isValid())
     {
-        sendError("Unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
+        logError("%1 - Unable to find %2/%3 property. Aborting.", {QString("getModText"), deviceName, propertyName});
         return false;
     }
 
@@ -550,7 +689,7 @@ bool IndiModule::getModText(const QString &deviceName, const QString &propertyNa
             return true;
         }
     }
-    sendError("Unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
+    logError("%1 - Unable to find %2/%3/%4 element. Aborting.", {QString("getModText"), deviceName, propertyName, elementName});
     return false;
 }
 bool IndiModule::sendModNewText  (QString deviceName, QString propertyName, QString elementName, QString text)
@@ -560,13 +699,13 @@ bool IndiModule::sendModNewText  (QString deviceName, QString propertyName, QStr
 
     if (!dp.isValid())
     {
-        sendError("Unable to find " + deviceName + " device. Aborting.");
+        logError("%1 - Unable to find %2 device. Aborting.", {QString("sendModNewText"), deviceName});
         return false;
     }
     INDI::PropertyText prop = dp.getText(propertyName.toStdString().c_str());
     if (!prop.isValid())
     {
-        sendError("Unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
+        logError("%1 - Unable to find %2/%3 property. Aborting.", {QString("sendModNewText"), deviceName, propertyName});
         return false;
     }
 
@@ -579,7 +718,7 @@ bool IndiModule::sendModNewText  (QString deviceName, QString propertyName, QStr
             return true;
         }
     }
-    sendError("Unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
+    logError("%1 - Unable to find %2/%3/%4 element. Aborting.", {QString("sendModNewText"), deviceName, propertyName, elementName});
     return false;
 }
 bool IndiModule::sendModNewSwitch(QString deviceName, QString propertyName, QString elementName, ISState sw)
@@ -590,13 +729,13 @@ bool IndiModule::sendModNewSwitch(QString deviceName, QString propertyName, QStr
 
     if (!dp.isValid())
     {
-        sendError("Unable to find " + deviceName + " device. Aborting.");
+        logError("%1 - Unable to find %2 device. Aborting.", {QString("sendModNewSwitch"), deviceName});
         return false;
     }
     INDI::PropertySwitch prop = dp.getSwitch(propertyName.toStdString().c_str());
     if (!prop.isValid())
     {
-        sendError("Unable to find " + deviceName + "/" + propertyName + " property. Aborting.");
+        logError("%1 - Unable to find %2/%3 property. Aborting.", {QString("sendModNewSwitch"), deviceName, propertyName});
         return false;
     }
     for (std::size_t i = 0; i < prop.size(); i++)
@@ -609,7 +748,7 @@ bool IndiModule::sendModNewSwitch(QString deviceName, QString propertyName, QStr
             return true;
         }
     }
-    sendError("Unable to find " + deviceName + "/" + propertyName + "/" + elementName + " element. Aborting.");
+    logError("%1 - Unable to find %2/%3/%4 element. Aborting.", {QString("sendModNewSwitch"), deviceName, propertyName, elementName});
     return false;
 
 }
@@ -619,14 +758,14 @@ bool IndiModule::frameSet(QString devicename, double x, double y, double width, 
     INDI::BaseDevice dp = getDevice(devicename.toStdString().c_str());
     if (!dp.isValid())
     {
-        sendError("Unable to find " + devicename + " device. Aborting.");
+        logError("%1 - Unable to find %2 device. Aborting.", {QString("frameSet"), devicename});
         return false;
     }
 
     INDI::PropertyNumber prop = dp.getNumber("CCD_FRAME");
     if (!prop.isValid())
     {
-        sendError("Unable to find " + devicename + "/" + "CCD_FRAME" + " property. Aborting.");
+        logError("%1 - Unable to find %2/%3 property. Aborting.", {QString("frameSet"), devicename, QString("CCD_FRAME")});
         return false;
     }
 
@@ -659,14 +798,14 @@ bool IndiModule::frameReset(QString devicename)
     INDI::BaseDevice dp = getDevice(devicename.toStdString().c_str());
     if (!dp.isValid())
     {
-        sendError("Unable to find " + devicename + " device. Aborting.");
+        logError("%1 - Unable to find %2 device. Aborting.", {QString("frameReset"), devicename});
         return false;
     }
 
     INDI::PropertySwitch prop = dp.getSwitch("CCD_FRAME_RESET");
     if (!prop.isValid())
     {
-        sendError("Unable to find " + devicename + "/" + "CCD_FRAME_RESET" + " property. Aborting.");
+        logError("%1 - Unable to find %2/%3 property. Aborting.", {QString("frameReset"), devicename, QString("CCD_FRAME_RESET")});
         return false;
     }
 
@@ -687,10 +826,10 @@ bool IndiModule::createDeviceProperty(const QString &key, const QString &label, 
 {
     std::vector<INDI::BaseDevice> devs = getDevices();
     OST::PropertyMulti* pm = new OST::PropertyMulti(key, label, OST::ReadWrite, level1, level2, order, true, false);
-    OST::ElementString* s = new  OST::ElementString("name", "", "");
+    OST::ElementString* s = new  OST::ElementString("name", "name", "", "");
     s->setValue("--", false);
     s->setAutoUpdate(true);
-    pm->addElt("name", s);
+    pm->addElt(s);
 
     for(std::size_t i = 0; i < devs.size(); i++)
     {
@@ -725,7 +864,7 @@ bool IndiModule::createDeviceProperty(const QString &key, const QString &label, 
         sendMessage("----------------------------");*/
 
     }
-    createProperty(key, pm);
+    createProperty(pm);
     return true;
 }
 void IndiModule::OnAfterIndiConnectIndiTimer()
@@ -733,54 +872,68 @@ void IndiModule::OnAfterIndiConnectIndiTimer()
     std::vector<INDI::BaseDevice> devs = getDevices();
     for(std::size_t i = 0; i < devs.size(); i++)
     {
-        refreshDeviceslovs(devs[i].getDeviceName());
+        QString d = devs[i].getDeviceName();
+        if (!devs[i].isConnected())
+        {
+            connectDevice(d);
+        }
     }
-
+    refreshDeviceslovs();
 }
-bool IndiModule::refreshDeviceslovs(QString deviceName)
+bool IndiModule::refreshDeviceslovs()
 {
-    QString d = getDevice(deviceName.toStdString().c_str()).getDeviceName();
-    getGlovString("DRIVER_INTERFACE-GENERAL_INTERFACE")->lovAdd(d, d);
+    getGlovString("DRIVER_INTERFACE-GENERAL_INTERFACE")->lovClear();
+    getGlovString("DRIVER_INTERFACE-CCD_INTERFACE")->lovClear();
+    getGlovString("DRIVER_INTERFACE-TELESCOPE_INTERFACE")->lovClear();
+    getGlovString("DRIVER_INTERFACE-GUIDER_INTERFACE")->lovClear();
+    getGlovString("DRIVER_INTERFACE-FOCUSER_INTERFACE")->lovClear();
+    getGlovString("DRIVER_INTERFACE-FILTER_INTERFACE")->lovClear();
+    getGlovString("DRIVER_INTERFACE-GPS_INTERFACE")->lovClear();
+    getGlovString("DRIVER_INTERFACE-WEATHER_INTERFACE")->lovClear();
+    getGlovString("DRIVER_INTERFACE-AUX_INTERFACE")->lovClear();
 
-    if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
-            INDI::BaseDevice::DRIVER_INTERFACE::CCD_INTERFACE)
+
+    std::vector<INDI::BaseDevice> devs = getDevices();
+    for(std::size_t i = 0; i < devs.size(); i++)
     {
-        getGlovString("DRIVER_INTERFACE-CCD_INTERFACE")->lovAdd(d, d);
-    }
-    if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
-            INDI::BaseDevice::DRIVER_INTERFACE::TELESCOPE_INTERFACE)
-    {
-        getGlovString("DRIVER_INTERFACE-TELESCOPE_INTERFACE")->lovAdd(d, d);
-    }
-    if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
-            INDI::BaseDevice::DRIVER_INTERFACE::GUIDER_INTERFACE)
-    {
-        getGlovString("DRIVER_INTERFACE-GUIDER_INTERFACE")->lovAdd(d, d);
-    }
-    if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
-            INDI::BaseDevice::DRIVER_INTERFACE::FOCUSER_INTERFACE)
-    {
-        getGlovString("DRIVER_INTERFACE-FOCUSER_INTERFACE")->lovAdd(d, d);
-    }
-    if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
-            INDI::BaseDevice::DRIVER_INTERFACE::FILTER_INTERFACE)
-    {
-        getGlovString("DRIVER_INTERFACE-FILTER_INTERFACE")->lovAdd(d, d);
-    }
-    if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
-            INDI::BaseDevice::DRIVER_INTERFACE::GPS_INTERFACE)
-    {
-        getGlovString("DRIVER_INTERFACE-GPS_INTERFACE")->lovAdd(d, d);
-    }
-    if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
-            INDI::BaseDevice::DRIVER_INTERFACE::WEATHER_INTERFACE)
-    {
-        getGlovString("DRIVER_INTERFACE-WEATHER_INTERFACE")->lovAdd(d, d);
-    }
-    if (getDevice(deviceName.toStdString().c_str()).getDriverInterface() &
-            INDI::BaseDevice::DRIVER_INTERFACE::AUX_INTERFACE)
-    {
-        getGlovString("DRIVER_INTERFACE-AUX_INTERFACE")->lovAdd(d, d);
+        QString d = devs[i].getDeviceName();
+        if (devs[i].isConnected())
+        {
+            getGlovString("DRIVER_INTERFACE-GENERAL_INTERFACE")->lovAdd(d, d);
+
+            if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::CCD_INTERFACE)
+            {
+                getGlovString("DRIVER_INTERFACE-CCD_INTERFACE")->lovAdd(d, d);
+            }
+            if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::TELESCOPE_INTERFACE)
+            {
+                getGlovString("DRIVER_INTERFACE-TELESCOPE_INTERFACE")->lovAdd(d, d);
+            }
+            if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::GUIDER_INTERFACE)
+            {
+                getGlovString("DRIVER_INTERFACE-GUIDER_INTERFACE")->lovAdd(d, d);
+            }
+            if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::FOCUSER_INTERFACE)
+            {
+                getGlovString("DRIVER_INTERFACE-FOCUSER_INTERFACE")->lovAdd(d, d);
+            }
+            if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::FILTER_INTERFACE)
+            {
+                getGlovString("DRIVER_INTERFACE-FILTER_INTERFACE")->lovAdd(d, d);
+            }
+            if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::GPS_INTERFACE)
+            {
+                getGlovString("DRIVER_INTERFACE-GPS_INTERFACE")->lovAdd(d, d);
+            }
+            if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::WEATHER_INTERFACE)
+            {
+                getGlovString("DRIVER_INTERFACE-WEATHER_INTERFACE")->lovAdd(d, d);
+            }
+            if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::AUX_INTERFACE)
+            {
+                getGlovString("DRIVER_INTERFACE-AUX_INTERFACE")->lovAdd(d, d);
+            }
+        }
     }
     return true;
 }
@@ -790,18 +943,18 @@ bool IndiModule::defineMeAsFocuser()
 
     OST::PropertyMulti* pm = getProperty("actions");
     pm->setRule(OST::SwitchsRule::AtMostOne);
-    OST::ElementBool* b = new  OST::ElementBool("Abort focus", "foc99", "");
+    OST::ElementBool* b = new  OST::ElementBool("abortfocus", "Abort focus", "foc99", "");
     b->setValue(false, false);
     b->setPreIcon("stop");
-    pm->addElt("abortfocus", b);
-    b = new  OST::ElementBool("Autofocus", "foc50", "");
+    pm->addElt(b);
+    b = new  OST::ElementBool("autofocus", "Autofocus", "foc50", "");
     b->setValue(false, false);
     b->setPreIcon("play_arrow");
-    pm->addElt("autofocus", b);
-    b = new  OST::ElementBool("Loop", "foc70", "");
+    pm->addElt(b);
+    b = new  OST::ElementBool("loop", "Loop", "foc70", "");
     b->setValue(false, false);
     b->setPreIcon("forward_media");
-    pm->addElt("loop", b);
+    pm->addElt(b);
     mIsFocuser = true;
     return true;
 
@@ -812,18 +965,18 @@ bool IndiModule::defineMeAsGuider()
 
     OST::PropertyMulti* pm = getProperty("actions");
     pm->setRule(OST::SwitchsRule::AtMostOne);
-    OST::ElementBool* b = new  OST::ElementBool("Abort guider", "guid99", "");
+    OST::ElementBool* b = new  OST::ElementBool("abortguider", "Abort guider", "guid99", "");
     b->setValue(false, false);
-    pm->addElt("abortguider", b);
+    pm->addElt(b);
     b->setPreIcon("stop");
-    b = new  OST::ElementBool("Guide", "guid50", "");
+    b = new  OST::ElementBool("guide", "Guide", "guid50", "");
     b->setValue(false, false);
     b->setPreIcon("play_arrow");
-    pm->addElt("guide", b);
-    b = new  OST::ElementBool("Calibrate", "guid00", "");
+    pm->addElt(b);
+    b = new  OST::ElementBool("calibrate", "Calibrate", "guid00", "");
     b->setValue(false, false);
     b->setPreIcon("arrows_output");
-    pm->addElt("calibrate", b);
+    pm->addElt(b);
     mIsGuider = true;
     return true;
 
@@ -834,13 +987,13 @@ bool IndiModule::defineMeAsSequencer()
 
     OST::PropertyMulti* pm = getProperty("actions");
     pm->setRule(OST::SwitchsRule::AtMostOne);
-    OST::ElementBool* b = new  OST::ElementBool("Abort sequence", "seq99", "");
+    OST::ElementBool* b = new  OST::ElementBool("abortsequence", "Abort sequence", "seq99", "");
     b->setValue(false, false);
     b->setPreIcon("stop");
-    pm->addElt("abortsequence", b);
-    b = new  OST::ElementBool("Start sequence", "seq00", "");
+    pm->addElt(b);
+    b = new  OST::ElementBool("startsequence", "Start sequence", "seq00", "");
     b->setValue(false, false);
-    pm->addElt("startsequence", b);
+    pm->addElt(b);
     b->setPreIcon("play_arrow");
     mIsSequencer = true;
     return true;
@@ -853,7 +1006,7 @@ bool IndiModule::defineMeAsImager()
     {
         OST::PropertyMulti* dynprop = new OST::PropertyMulti("image", "Image", OST::Permission::WriteOnly, "Control",
                 "", "000Control222", false, false);
-        createProperty("image", dynprop);
+        createProperty(dynprop);
     }
 
     if (getStore().contains("image"))
@@ -861,8 +1014,8 @@ bool IndiModule::defineMeAsImager()
         if (!(getStore()["image"]->getElts()->contains("image")))
         {
             OST::PropertyMulti * pm = getProperty("image");
-            OST::ElementImg* img = new OST::ElementImg("", "00", "");
-            pm->addElt("image", img);
+            OST::ElementImg* img = new OST::ElementImg("image", "", "00", "");
+            pm->addElt(img);
         }
 
     }
@@ -872,40 +1025,40 @@ bool IndiModule::defineMeAsImager()
 
     if (!getStore()["parms"]->getElts()->contains("exposure"))
     {
-        OST::ElementFloat* f = new  OST::ElementFloat("Exposure", "exp000", "");
+        OST::ElementFloat* f = new  OST::ElementFloat("exposure", "Exposure", "exp000", "");
         f->setValue(0, false);
         f->setDirectEdit(true);
         f->setAutoUpdate(true);
-        f->setMinMax(0.00001, 300);
-        f->setStep(0.001);
-        f->setSlider(OST::SliderAndValue);
-        pm->addElt("exposure", f);
+        f->setMinMax(0.00001, 300, false);
+        f->setStep(0.001, false);
+        f->setSlider(OST::SliderAndValue, false);
+        pm->addElt(f);
     }
 
 
 
     if (!getStore()["parms"]->getElts()->contains("gain"))
     {
-        OST::ElementInt* i  = new  OST::ElementInt("Gain", "exp020", "");
+        OST::ElementInt* i  = new  OST::ElementInt("gain", "Gain", "exp020", "");
         i->setValue(0, false);
         i->setDirectEdit(true);
         i->setAutoUpdate(true);
-        i->setMinMax(0, 500);
-        i->setStep(1);
-        i->setSlider(OST::SliderAndValue);
-        pm->addElt("gain", i);
+        i->setMinMax(0, 500, false);
+        i->setStep(1, false);
+        i->setSlider(OST::SliderAndValue, false);
+        pm->addElt(i);
     }
 
     if (!getStore()["parms"]->getElts()->contains("offset"))
     {
-        OST::ElementInt* i  = new  OST::ElementInt("Offset", "exp030", "");
+        OST::ElementInt* i  = new  OST::ElementInt("offset", "Offset", "exp030", "");
         i->setValue(0, false);
         i->setDirectEdit(true);
         i->setAutoUpdate(true);
-        i->setMinMax(0, 500);
-        i->setStep(1);
-        i->setSlider(OST::SliderAndValue);
-        pm->addElt("offset", i);
+        i->setMinMax(0, 500, false);
+        i->setStep(1, false);
+        i->setSlider(OST::SliderAndValue, false);
+        pm->addElt(i);
     }
 
     mIsImager = true;
@@ -919,37 +1072,39 @@ bool IndiModule::defineMeAsNavigator()
 
     OST::PropertyMulti* pm  = getProperty("actions");
     pm->setRule(OST::SwitchsRule::AtMostOne);
-    OST::ElementBool* b = new  OST::ElementBool("Abort navigator", "nav99", "");
+    OST::ElementBool* b = new  OST::ElementBool("abortnavigator", "Abort navigator", "nav99", "");
     b->setValue(false, false);
     b->setPreIcon("stop");
-    pm->addElt("abortnavigator", b);
-    b = new  OST::ElementBool("Center target", "nav00", "");
+    pm->addElt(b);
+    b = new  OST::ElementBool("gototarget", "Center target", "nav00", "");
     b->setPreIcon("arrows_input");
     b->setValue(false, false);
-    pm->addElt("gototarget", b);
-    b = new  OST::ElementBool("Add to planner", "nav20", "");
+    pm->addElt(b);
+    b = new  OST::ElementBool("addtoplanner", "Add to planner", "nav20", "");
     b->setPreIcon("event_upcoming");
     b->setValue(false, false);
-    pm->addElt("addtoplanner", b);
-    OST::ElementString* s = new  OST::ElementString("Target name", "nav50", "");
+    pm->addElt(b);
+
+    OST::PropertyMulti* pmtarget  = getProperty("target");
+    OST::ElementString* s = new  OST::ElementString("targetname", "Target name", "nav50", "");
     s->setDirectEdit(true);
     s->setAutoUpdate(true);
-    pm->addElt("targetname", s);
-    OST::ElementFloat* f = new  OST::ElementFloat("Target RA", "nav51", "");
+    pmtarget->addElt(s);
+    OST::ElementFloat* f = new  OST::ElementFloat("targetra", "Target RA", "nav51", "");
     f->setDirectEdit(true);
     f->setAutoUpdate(true);
-    pm->addElt("targetra", f);
-    f = new  OST::ElementFloat("Target DEC", "nav52", "");
+    pmtarget->addElt(f);
+    f = new  OST::ElementFloat("targetde", "Target DEC", "nav52", "");
     f->setDirectEdit(true);
     f->setAutoUpdate(true);
-    pm->addElt("targetde", f);
+    pmtarget->addElt(f);
 
     pm  = getProperty("parms");
-    s = new  OST::ElementString("Planner module", "nav30", "");
+    s = new  OST::ElementString("plannermodule", "Planner module", "nav30", "");
     s->setDirectEdit(true);
     s->setAutoUpdate(true);
-    s->setGlobalLov("loadedModules");
-    pm->addElt("plannermodule", s);
+    s->setGlobalLov("loadedModules-planner", OST::LovScope::Controller);
+    pm->addElt(s);
 
     mIsNavigator = true;
     return true;
@@ -960,23 +1115,25 @@ double IndiModule::getPixelSize(const QString &deviceName)
     INDI::BaseDevice dp = getDevice(deviceName.toStdString().c_str());
     if (!dp.isValid())
     {
-        sendError("getPixelSize - device " + deviceName + " not found. Aborting.");
+        logError("%1 - Unable to find %2 device. Aborting.", {QString("getPixelSize"), deviceName});
         return 0;
     }
     if (!dp.isConnected())
     {
-        sendWarning("getPixelSize - " + deviceName + " not connected, trying to connect");
+        logWarning("%1 - %2 not connected, trying to connect", {QString("getPixelSize"), deviceName});
         if (!connectDevice(deviceName)) return 0;
     }
     INDI::PropertyNumber prop = dp.getNumber("CCD_INFO");
-    return prop.findWidgetByName("CCD_PIXEL_SIZE")->getValue();
+    float f = prop.findWidgetByName("CCD_PIXEL_SIZE")->getValue();
+    //logDebug("getPixelSize result : %1 %2",{deviceName,f});
+    return f;
 
 }
 double IndiModule::getSampling()
 {
     if (!isImager())
     {
-        sendWarning("getSampling - module is not defined as an imager - defaults to 1");
+        logWarning("%1 - module is not defined as an imager - defaults to 1", {QString("getSampling")});
         return 1;
     }
     return 206 * getPixelSize(getString("devices", "camera")) / (getFloat("optic", "fl") * getFloat("optic", "red"));
@@ -985,7 +1142,8 @@ double IndiModule::getSampling()
 bool IndiModule::giveMeADevice(QString name, QString label, INDI::BaseDevice::DRIVER_INTERFACE interface)
 {
     OST::PropertyMulti* pm = getProperty("devices");
-    OST::ElementString* s = new  OST::ElementString(label, label, "");
+    OST::ElementString* s = new  OST::ElementString(name, label, label, "");
+    s->setPostIcon("refresh");
     switch (interface)
     {
         case INDI::BaseDevice::DRIVER_INTERFACE::GENERAL_INTERFACE:
@@ -1016,13 +1174,13 @@ bool IndiModule::giveMeADevice(QString name, QString label, INDI::BaseDevice::DR
             s->setGlobalLov("DRIVER_INTERFACE-AUX_INTERFACE");
             break;
         default:
-            sendWarning("giveMeADevice unhandled interface type");
+            logWarning("%1 - unhandled interface type", {QString("giveMeADevice")});
             break;
     }
 
     s->setDirectEdit(true);
     s->setAutoUpdate(true);
-    pm->addElt(name, s);
+    pm->addElt(s);
     return true;
 
 }
@@ -1033,24 +1191,30 @@ bool IndiModule::giveMeAnOptic()
     OST::PropertyMulti* pm = new OST::PropertyMulti("optic", "Optic", OST::ReadWrite, "Parameters", "General", "222Parms333",
             true,
             false);
-    createProperty("optic", pm);
+    createProperty(pm);
 
-    OST::ElementFloat* f = new  OST::ElementFloat("Focal length", "1", "");
+    OST::ElementFloat* f = new  OST::ElementFloat("fl", "Focal length", "1", "");
     f->setDirectEdit(true);
-    f->setMinMax(1, 4000);
+    f->setMinMax(1, 4000, false);
     f->setAutoUpdate(true);
-    pm->addElt("fl", f);
-    OST::ElementFloat* d = new  OST::ElementFloat("Diameter", "2", "");
+    pm->addElt(f);
+    OST::ElementFloat* d = new  OST::ElementFloat("diam", "Diameter", "2", "");
     d->setDirectEdit(true);
-    d->setMinMax(1, 4000);
+    d->setMinMax(1, 4000, false);
     d->setAutoUpdate(true);
-    pm->addElt("diam", d);
-    OST::ElementFloat* r = new  OST::ElementFloat("Reducer", "3", "");
+    pm->addElt(d);
+    OST::ElementFloat* r = new  OST::ElementFloat("red", "Reducer", "3", "");
     r->setDirectEdit(true);
-    r->setMinMax(0.1, 10);
+    r->setMinMax(0.1, 10, false);
     r->setAutoUpdate(true);
     r->setValue(1);
-    pm->addElt("red", r);
+    pm->addElt(r);
+    OST::ElementString* o = new  OST::ElementString("optic", "Global optic", "0", "");
+    o->setDirectEdit(true);
+    o->setAutoUpdate(true);
+    o->setValue("");
+    o->setGlobalLov("optics", OST::LovScope::Controller);
+    pm->addElt(o);
     mIsOptic = true;
     return true;
 
@@ -1065,9 +1229,28 @@ bool IndiModule::setFocalLengthAndDiameter()
 
 bool IndiModule::setFocalLengthAndDiameter(QString device, double fl, double diam)
 {
-    if ((fl < 1) || (diam < 1)) return false;
-    if (!sendModNewNumber(device, "SCOPE_INFO", "APERTURE", diam)) return false;
-    if (!sendModNewNumber(device, "SCOPE_INFO", "FOCAL_LENGTH", fl)) return false;
+    //logDebug("setFocalLengthAndDiameter %1 %2 %3", {device, fl, diam});
+
+    if (fl < 1)
+    {
+        logWarning("SetFocalLength failed, invalid focal length %1", {fl});
+        return false;
+    }
+    if (diam < 1)
+    {
+        logWarning("SetFocalLength failed, invalid diameter %1", {diam});
+        return false;
+    }
+    if (!sendModNewNumber(device, "SCOPE_INFO", "APERTURE", diam))
+    {
+        logWarning("SetFocalLength failed %1 %2 %3", {"SCOPE_INFO", "APERTURE", diam});
+        return false;
+    }
+    if (!sendModNewNumber(device, "SCOPE_INFO", "FOCAL_LENGTH", fl))
+    {
+        logWarning("SetFocalLength failed %1 %2 %3", {"SCOPE_INFO", "FOCAL_LENGTH", fl});
+        return false;
+    }
     return true;
 
 }

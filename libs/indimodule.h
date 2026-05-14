@@ -5,6 +5,7 @@
 #include <basedevice.h>
 
 
+
 /*!
  * This Class shouldn't be used as is
  * Every functionnal module should inherit it
@@ -19,10 +20,26 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         void requestProfile(QString profileName);
         void setProfile(QVariantMap profiledata);
         bool connectIndi(void);
-
+        virtual void onNewDevice      (INDI::BaseDevice dp)     ;
+        virtual void onRemoveDevice   (INDI::BaseDevice dp)     ;
+        virtual void onNewProperty    (INDI::Property property) ;
+        virtual void onRemoveProperty (INDI::Property property) ;
+        virtual void onUpdateProperty (INDI::Property property) ;
     public slots:
         void connectIndiTimer(void);
         void OnAfterIndiConnectIndiTimer(void);
+
+    protected:
+        /**
+         * @brief INDI-specific event handler (Hook 2/3)
+         *
+         * Override of Basemodule's hook to handle INDI-specific events.
+         * Called after onExternalEventBase() and before custom module's onExternalEvent().
+         *
+         * Do NOT call Basemodule::onExternalEventIndi() - it's empty by design.
+         */
+        bool onExternalEventIndi(OST::ExtEvent event) override;
+
 
     protected:
 
@@ -46,7 +63,7 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         bool frameReset(QString devicename);
         bool createDeviceProperty(const QString &key, const QString &label, const QString &level1,
                                   const QString &level2, const QString &order, INDI::BaseDevice::DRIVER_INTERFACE interface);
-        bool refreshDeviceslovs(QString deviceName);
+        bool refreshDeviceslovs();
         bool defineMeAsFocuser();
         bool defineMeAsGuider();
         bool defineMeAsSequencer();
@@ -84,8 +101,13 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         bool setFocalLengthAndDiameter(QString device, double fl, double diam);
 
     private:
-        void OnDispatchToIndiExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                                           const QVariantMap &eventData) override;
+        void newDevice      (INDI::BaseDevice dp) override;
+        void removeDevice   (INDI::BaseDevice dp) override;
+        void newProperty    (INDI::Property property) override;
+        void removeProperty (INDI::Property property) override;
+        void updateProperty (INDI::Property property) override;
+
+
         bool mIsFocuser = false;
         bool mIsGuider = false;
         bool mIsSequencer = false;

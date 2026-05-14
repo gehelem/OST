@@ -74,31 +74,14 @@ class ElementFloat: public ElementTemplateNumeric<double>
 
     public:
         /**
-         * @brief Accept a visitor for the Visitor pattern
-         * @param pVisitor Pointer to visitor object
-         *
-         * Implements Visitor pattern for operations like JSON serialization.
-         */
-        void accept(ElementVisitor *pVisitor) override;
-
-        /**
-         * @brief Accept a visitor with data parameter
-         * @param pVisitor Pointer to visitor object
-         * @param data QVariantMap with operation data
-         *
-         * Used for operations requiring external data (e.g., updates from frontend).
-         */
-        void accept(ElementVisitor *pVisitor, QVariantMap &data) override;
-
-        /**
          * @brief Accept a visitor with action and data parameters
          * @param pVisitor Pointer to visitor object
-         * @param action Action string (e.g., "newline", "cleargrid")
          * @param data QVariantMap with operation data
+         * @param signalType Signal dispatch
          *
          * Used for grid operations and custom actions.
          */
-        void accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data) override;
+        void accept(ElementVisitor *pVisitor, QVariantMap &data, bool &emitEvent) override;
 
         /**
          * @brief Construct a new ElementFloat object
@@ -106,7 +89,7 @@ class ElementFloat: public ElementTemplateNumeric<double>
          * @param order Sort order within property (e.g., "10", "20")
          * @param hint Tooltip/help text for frontend
          */
-        ElementFloat(const QString &label, const QString &order, const QString &hint);
+        ElementFloat(const QString &key, const QString &label, const QString &order, const QString &hint);
 
         /**
          * @brief Destroy the ElementFloat object
@@ -138,38 +121,30 @@ class ElementFloat: public ElementTemplateNumeric<double>
 
         /**
          * @brief Add value to LOV
-         * @param val Double value
+         * @param val   Double value (key)
          * @param label Display label for this value
          * @return true if added, false if value already exists
-         *
-         * Adds a new option to the List of Values. If the value already exists,
-         * returns false without modifying the LOV.
          *
          * @see lovUpdate()
          */
         bool lovAdd(double val, QString label);
 
         /**
-         * @brief Update LOV value label
-         * @param val Double value to update
+         * @brief Update LOV label for an existing value
+         * @param val   Double value to update
          * @param label New display label
          * @return true if updated, false if value not found
          *
-         * Updates the display label for an existing LOV value.
-         * If the value doesn't exist in the LOV, returns false.
-         *
          * @see lovAdd()
          */
-        bool lovUpdate(double  val, QString label);
+        bool lovUpdate(double val, QString label);
 
         /**
          * @brief Delete value from LOV
          * @param val Double value to delete
          * @return true if deleted, false if value not found
-         *
-         * Removes an option from the List of Values.
          */
-        bool lovDel(double  val);
+        bool lovDel(double val);
 
         /**
          * @brief Clear all LOV entries
@@ -252,7 +227,7 @@ class ValueFloat: public ValueTemplate<double>
          * Copies this value back into the parent element.
          * Called by PropertyMulti::fetchLine() when restoring elements from grid.
          */
-        void updateElement(const bool &emitEvent) override;
+        void updateElement(const bool  &emitEvent) override;
 
 };
 

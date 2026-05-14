@@ -1,7 +1,7 @@
 #include "elementupdate.h"
 namespace  OST
 {
-void ElementUpdate::visit(ElementInt *pElement, QVariantMap &data )
+void ElementUpdate::visit(ElementInt *pElement, QVariantMap &data, bool &emitEvent)
 {
     if (data.contains("autoupdate")) pElement->setAutoUpdate(data["autoupdate"].toBool());
     if (!data.contains("value"))
@@ -9,9 +9,9 @@ void ElementUpdate::visit(ElementInt *pElement, QVariantMap &data )
         qDebug() << "no value for " << pElement->label();
         return;
     }
-    pElement->setValue(data["value"].toLongLong(), true);
+    pElement->setValue(data["value"].toLongLong(), emitEvent);
 }
-void ElementUpdate::visit(ElementFloat *pElement, QVariantMap &data )
+void ElementUpdate::visit(ElementFloat *pElement, QVariantMap &data, bool &emitEvent)
 {
     if (data.contains("autoupdate")) pElement->setAutoUpdate(data["autoupdate"].toBool());
     if (!data.contains("value"))
@@ -19,9 +19,9 @@ void ElementUpdate::visit(ElementFloat *pElement, QVariantMap &data )
         qDebug() << "no value for " << pElement->label();
         return;
     }
-    pElement->setValue(data["value"].toDouble(), true);
+    pElement->setValue(data["value"].toDouble(), emitEvent);
 }
-void ElementUpdate::visit(ElementBool *pElement, QVariantMap &data )
+void ElementUpdate::visit(ElementBool *pElement, QVariantMap &data, bool &emitEvent)
 {
     if (data.contains("autoupdate")) pElement->setAutoUpdate(data["autoupdate"].toBool());
     if (!data.contains("value"))
@@ -29,9 +29,9 @@ void ElementUpdate::visit(ElementBool *pElement, QVariantMap &data )
         qDebug() << "no value for " << pElement->label();
         return;
     }
-    pElement->setValue(data["value"].toBool(), true);
+    pElement->setValue(data["value"].toBool(), emitEvent);
 }
-void ElementUpdate::visit(ElementString *pElement, QVariantMap &data )
+void ElementUpdate::visit(ElementString *pElement, QVariantMap &data, bool &emitEvent)
 {
 
     if (data.contains("autoupdate"))
@@ -44,9 +44,9 @@ void ElementUpdate::visit(ElementString *pElement, QVariantMap &data )
         qDebug() << "no value for " << pElement->label();
         return;
     }
-    pElement->setValue(data["value"].toString(), true);
+    pElement->setValue(data["value"].toString(), emitEvent);
 }
-void ElementUpdate::visit(ElementLight *pElement, QVariantMap &data )
+void ElementUpdate::visit(ElementLight *pElement, QVariantMap &data, bool &emitEvent )
 {
     if (data.contains("autoupdate")) pElement->setAutoUpdate(data["autoupdate"].toBool());
     if (!data.contains("value"))
@@ -54,28 +54,24 @@ void ElementUpdate::visit(ElementLight *pElement, QVariantMap &data )
         qDebug() << "no value for " << pElement->label();
         return;
     }
-    if (data["value"].toInt() == 0 ) pElement->setValue(Idle, true);
-    if (data["value"].toInt() == 1 ) pElement->setValue(Ok, true);
-    if (data["value"].toInt() == 2 ) pElement->setValue(Busy, true);
-    if (data["value"].toInt() == 3 ) pElement->setValue(Error, true);
+    if (data["value"].toInt() == 0 ) pElement->setValue(Idle, emitEvent);
+    if (data["value"].toInt() == 1 ) pElement->setValue(Ok, emitEvent);
+    if (data["value"].toInt() == 2 ) pElement->setValue(Busy, emitEvent);
+    if (data["value"].toInt() == 3 ) pElement->setValue(Error, emitEvent);
 }
-void ElementUpdate::visit(ElementImg *pElement, QVariantMap &data )
+void ElementUpdate::visit(ElementImg *pElement, QVariantMap &data, bool &emitEvent )
 {
-    Q_UNUSED(pElement) Q_UNUSED(data)
+    Q_UNUSED(pElement) Q_UNUSED(data)  Q_UNUSED(emitEvent)
 }
-void ElementUpdate::visit(ElementVideo *pElement, QVariantMap &data )
+void ElementUpdate::visit(ElementVideo *pElement, QVariantMap &data, bool &emitEvent)
 {
-    Q_UNUSED(pElement) Q_UNUSED(data)
+    Q_UNUSED(pElement) Q_UNUSED(data)  Q_UNUSED(emitEvent)
 }
-void ElementUpdate::visit(ElementMessage *pElement, QVariantMap &data )
+void ElementUpdate::visit(ElementPrg* pElement, QVariantMap &data, bool &emitEvent)
 {
-    Q_UNUSED(pElement) Q_UNUSED(data)
+    Q_UNUSED(pElement)  Q_UNUSED(data)  Q_UNUSED(emitEvent)
 }
-void ElementUpdate::visit(ElementPrg* pElement, QVariantMap &data )
-{
-    Q_UNUSED(pElement)  Q_UNUSED(data)
-}
-void ElementUpdate::visit(ElementDate* pElement, QVariantMap &data )
+void ElementUpdate::visit(ElementDate *pElement, QVariantMap &data, bool &emitEvent)
 {
     if (!data.contains("value"))
     {
@@ -85,10 +81,10 @@ void ElementUpdate::visit(ElementDate* pElement, QVariantMap &data )
     QVariantMap m = data["value"].toMap();
     QDate d;
     d.setDate(m["year"].toInt(), m["month"].toInt(), m["day"].toInt());
-    pElement->setValue(d, false);
+    pElement->setValue(d, emitEvent);
 
 }
-void ElementUpdate::visit(ElementTime* pElement, QVariantMap &data )
+void ElementUpdate::visit(ElementTime* pElement, QVariantMap &data, bool &emitEvent)
 {
     if (!data.contains("value"))
     {
@@ -105,51 +101,26 @@ void ElementUpdate::visit(ElementTime* pElement, QVariantMap &data )
     {
         t.setHMS(m["hh"].toInt(), m["mm"].toInt(), m["ss"].toInt(), 0);
     }
-    pElement->setValue(t, false);
+    pElement->setValue(t, emitEvent);
 }
-void ElementUpdate::visit(ElementInt* pElement, QString &action, QVariantMap &data)
+void ElementUpdate::visit(ElementDateTime* pElement, QVariantMap &data, bool &emitEvent)
 {
-    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
-}
-void ElementUpdate::visit(ElementFloat* pElement, QString &action, QVariantMap &data)
-{
-    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
-}
-void ElementUpdate::visit(ElementBool* pElement, QString &action, QVariantMap &data)
-{
-    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
-}
-void ElementUpdate::visit(ElementString* pElement, QString &action, QVariantMap &data)
-{
-    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
-}
-void ElementUpdate::visit(ElementLight* pElement, QString &action, QVariantMap &data)
-{
-    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
-}
-void ElementUpdate::visit(ElementImg* pElement, QString &action, QVariantMap &data)
-{
-    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
-}
-void ElementUpdate::visit(ElementVideo* pElement, QString &action, QVariantMap &data)
-{
-    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
-}
-void ElementUpdate::visit(ElementMessage* pElement, QString &action, QVariantMap &data)
-{
-    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
-}
-void ElementUpdate::visit(ElementPrg* pElement, QString &action, QVariantMap &data)
-{
-    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
-}
-void ElementUpdate::visit(ElementDate* pElement, QString &action, QVariantMap &data)
-{
-    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
-}
-void ElementUpdate::visit(ElementTime* pElement, QString &action, QVariantMap &data)
-{
-    Q_UNUSED(pElement) Q_UNUSED(action) Q_UNUSED(data)
+    if (!data.contains("value"))
+    {
+        qDebug() << "no value for " << pElement->label();
+        return;
+    }
+    QVariantMap m = data["value"].toMap();
+    QDate d;
+    d.setDate(m["year"].toInt(), m["month"].toInt(), m["day"].toInt());
+    QTime t;
+    t.setHMS(m["hh"].toInt(), m["mm"].toInt(), m["ss"].toInt(), m["ms"].toInt());
+    QDateTime dt;
+    dt.setDate(d);
+    dt.setTime(t);
+    pElement->setValue(dt, emitEvent);
+
+
 }
 
 }

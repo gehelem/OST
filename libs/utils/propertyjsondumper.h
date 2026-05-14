@@ -84,7 +84,8 @@ class PropertyJsonDumper : public PropertyVisitor
         /**
          * @brief Default constructor
          */
-        PropertyJsonDumper() = default;
+        PropertyJsonDumper(EvType evt, QVariant data, ElementBase *elt, PropertyBase *prp): mEvent(evt), mData(data), mElt(elt),
+            mPrp(prp) {;};
 
         /**
          * @brief Visit PropertyBase (not implemented)
@@ -173,6 +174,21 @@ class PropertyJsonDumper : public PropertyVisitor
          * - freeValue
          */
         QJsonObject dumpPropertyCommons(PropertyBase *pProperty);
+        QJsonObject dumpPropertyState(PropertyMulti* pProperty);
+        QJsonObject dumpDefault(PropertyMulti* pProperty);
+        QJsonObject dumpSetValue(PropertyMulti* pProperty);
+        QJsonObject dumpSetValueWithMinMax(PropertyMulti* pProperty);
+        QJsonObject dumpSetAll(PropertyMulti* pProperty);
+        QJsonObject dumpProfile(PropertyMulti* pProperty);
+        QJsonObject dumpGridCreate(PropertyMulti* pProperty);
+        QJsonObject dumpGridUpdate(PropertyMulti* pProperty);
+        QJsonObject dumpGridDelete(PropertyMulti* pProperty);
+
+        /* pass event details */
+        EvType mEvent;
+        QVariant mData;
+        ElementBase* mElt;
+        PropertyBase* mPrp;
 
 };
 }

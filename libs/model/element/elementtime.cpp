@@ -1,26 +1,17 @@
 #include "elementtime.h"
 namespace  OST
 {
-ElementTime::ElementTime(const QString &label, const QString &order, const QString &hint)
-    : ElementTemplateNotNumeric(label, order, hint)
+ElementTime::ElementTime(const QString &key, const QString &label, const QString &order, const QString &hint)
+    : ElementTemplateNotNumeric(key, label, order, hint)
 {
 }
 ElementTime::~ElementTime()
 {
 }
-void ElementTime::accept(ElementVisitor *pVisitor)
+void ElementTime::accept(ElementVisitor *pVisitor, QVariantMap &data, bool &emitEvent)
 {
-    pVisitor->visit(this);
+    pVisitor->visit(this, data, emitEvent);
 }
-void ElementTime::accept(ElementVisitor *pVisitor, QVariantMap &data)
-{
-    pVisitor->visit(this, data);
-}
-void ElementTime::accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data)
-{
-    pVisitor->visit(this, action, data);
-}
-
 QString ElementTime::getType()
 {
     return "time";

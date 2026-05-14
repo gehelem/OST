@@ -282,15 +282,15 @@ bool fileio::loadOtherFormat(QString fileName)
 }
 //This method was copied and pasted and modified from the method privateLoad in fitsdata in KStars
 //It loads a FITS file, reads the FITS Headers, and loads the data from the image
-bool fileio::loadBlob(INDI::PropertyBlob pblob, int histoSize)
+bool fileio::loadBlob(INDI::PropertyBlob pblob, int histoSize, int i)
 {
     justLoadBuffer = false;
     int status = 0, anynullptr = 0;
     long naxes[3];
 
-    size_t bsize = static_cast<size_t>(pblob[0].getBlobLen());
+    size_t bsize = static_cast<size_t>(pblob[i].getBlobLen());
 
-    if (fits_open_memfile(&fptr, "", READONLY, &pblob[0].cast()->blob, &bsize, 0, NULL, &status) )
+    if (fits_open_memfile(&fptr, "", READONLY, &pblob[i].cast()->blob, &bsize, 0, NULL, &status) )
 
     {
         sendMessage("IMG Unsupported type or read error loading FITS blob");

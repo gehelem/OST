@@ -64,8 +64,8 @@ class ElementTemplate: public ElementBase
          *
          * Constructs the base element with metadata. The value is default-initialized.
          */
-        ElementTemplate(const QString &label, const QString &order, const QString &hint):
-            ElementBase(label, order, hint) {}
+        ElementTemplate(const QString &key, const QString &label, const QString &order, const QString &hint):
+            ElementBase(key, label, order, hint) {}
 
         /**
          * @brief Destroy the ElementTemplate object
@@ -165,8 +165,8 @@ class ElementTemplateNumeric : public ElementTemplate<T>
          * @param order Sort order within property (e.g., "10", "20")
          * @param hint Tooltip/help text for frontend
          */
-        ElementTemplateNumeric(const QString &label, const QString &order, const QString &hint):
-            ElementTemplate<T>(label, order, hint)
+        ElementTemplateNumeric(const QString &key, const QString &label, const QString &order, const QString &hint):
+            ElementTemplate<T>(key, label, order, hint)
         {
         }
 
@@ -178,56 +178,51 @@ class ElementTemplateNumeric : public ElementTemplate<T>
         /**
          * @brief Set value with optional signal emission
          * @param value New value to set
-         * @param emitEvent Whether to emit valueSet() signal
+         * @param emitEvent Whether to emit signal
          * @return true if value accepted, false if out of range
          *
          * Validates the value against min/max if set, then updates the stored value.
-         * If emitEvent is true and validation succeeds, emits valueSet() signal
-         * to notify observers.
          *
          * @par Usage:
          * @code
          * element->setValue(100, true);   // Set and notify observers
-         * element->setValue(200, false);  // Set without notification (e.g., during init)
+         * element->setValue(200, false);  // Set with silent notification (for multiple updates)
          * @endcode
          */
         bool setValue(const T &value, const bool &emitEvent)
-        {
-            bool r = setValue(value);
-            if (r && emitEvent) emit ElementBase::valueSet(this);
-            return r;
-        }
-
-        /**
-         * @brief Set value without signal emission
-         * @param value New value to set
-         * @return true if value accepted, false if out of range
-         *
-         * Internal setValue that performs validation but does not emit signals.
-         * If min/max validation is enabled and value is out of range,
-         * emits a warning message and returns false without changing the value.
-         *
-         * @see setMinMax()
-         */
-        bool setValue(const T &value)
         {
             if (mUseMinMax)
             {
                 if (value < mMin)
                 {
-                    emit ElementTemplate<T>::sendMessage(Warn,
-                                                         "setValue - value too low " + QString::number(value) + " min= " + QString::number(mMin) );
+                    emit ElementTemplate<T>::logMessage(LogLevel::Warning,
+                                                        "setValue - value too low %1 min= %2",
+                    {QString::number(value), QString::number(mMin)});
                     return false;
                 }
                 if (value > mMax)
                 {
-                    emit ElementTemplate<T>::sendMessage(Warn,
-                                                         "setValue - value too high " + QString::number(value) + " max= " + QString::number(mMax) );
+                    emit ElementTemplate<T>::logMessage(LogLevel::Warning,
+                                                        "setValue - value too high %1 max= %2",
+                    {QString::number(value), QString::number(mMax)});
                     return false;
                 }
             }
             ElementTemplate<T>::mValue = value;
+            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ee, QVariant(), this);
             return true;
+        }
+
+        /**
+         * @brief Set value with signal emission
+         * @param value New value to set
+         * @return true if value accepted, false if out of range
+         *
+         * @see setMinMax()
+         */
+        bool setValue(const T &value)
+        {
+            return setValue(value, true);
         }
 
         /**
@@ -250,11 +245,11 @@ class ElementTemplateNumeric : public ElementTemplate<T>
          * use setMinMax() to enable min/max enforcement.
          * Emits eltChanged() signal to notify frontend of metadata change.
          */
-        void setMin(const T &min)
+        void setMin(const T &min, const bool &emitEvent)
         {
             mUseMinMax = true;
             mMin = min;
-            emit ElementBase::eltChanged(this);
+            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ev, QVariant(), this);
         }
 
         /**
@@ -274,11 +269,12 @@ class ElementTemplateNumeric : public ElementTemplate<T>
          * use setMinMax() to enable min/max enforcement.
          * Emits eltChanged() signal to notify frontend of metadata change.
          */
-        void setMax(const T &max)
+        void setMax(const T &max, const bool &emitEvent)
         {
             mUseMinMax = true;
             mMax = max;
-            emit ElementBase::eltChanged(this);
+            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ev, QVariant(), this);
+
         }
 
         /**
@@ -298,12 +294,12 @@ class ElementTemplateNumeric : public ElementTemplate<T>
          *
          * @see unSetMinMax()
          */
-        void setMinMax(const T &min, const T &max)
+        void setMinMax(const T &min, const T &max, const bool &emitEvent)
         {
             mMin = min;
             mMax = max;
             mUseMinMax = true;
-            emit ElementBase::eltChanged(this);
+            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ev, QVariant(), this);
         }
 
         /**
@@ -313,12 +309,12 @@ class ElementTemplateNumeric : public ElementTemplate<T>
          * After calling this, setValue() will accept any value.
          * Emits eltChanged() signal to notify frontend.
          */
-        void unSetMinMax(void)
+        void unSetMinMax(const bool &emitEvent)
         {
             mMin = 0;
             mMax = 0;
             mUseMinMax = false;
-            emit ElementBase::eltChanged(this);
+            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ev, QVariant(), this);
         }
 
         /**
@@ -346,10 +342,10 @@ class ElementTemplateNumeric : public ElementTemplate<T>
          * element->setStep(10);    // Coarse control for int
          * @endcode
          */
-        void setStep(const T &step)
+        void setStep(const T &step, const bool &emitEvent)
         {
             mStep = step;
-            emit ElementBase::eltChanged(this);
+            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ev, QVariant(), this);
         }
 
         /**
@@ -378,10 +374,10 @@ class ElementTemplateNumeric : public ElementTemplate<T>
          * element->setFormat("%05d");   // Zero-padded int: 00042
          * @endcode
          */
-        void setFormat(const QString &format)
+        void setFormat(const QString &format, const bool &emitEvent)
         {
             mFormat = format;
-            emit ElementBase::eltChanged(this);
+            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ev, QVariant(), this);
         }
 
         /**
@@ -413,10 +409,10 @@ class ElementTemplateNumeric : public ElementTemplate<T>
          *
          * @see SliderRule
          */
-        void setSlider(const SliderRule &s)
+        void setSlider(const SliderRule &s, const bool &emitEvent)
         {
             mSlider = s;
-            emit ElementBase::eltChanged(this);
+            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ev, QVariant(), this);
         }
 
     private:
@@ -460,7 +456,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
  *       since there is no validation for non-numeric types.
  *
  * @see ElementString
- * @see ElementBool
+ * @see "e"l
  * @see ElementDate
  * @see ElementTime
  * @see ElementTemplate
@@ -477,8 +473,8 @@ class ElementTemplateNotNumeric : public ElementTemplate<T>
          * @param order Sort order within property (e.g., "10", "20")
          * @param hint Tooltip/help text for frontend
          */
-        ElementTemplateNotNumeric(const QString &label, const QString &order, const QString &hint):
-            ElementTemplate<T>(label, order, hint)
+        ElementTemplateNotNumeric(const QString &key, const QString &label, const QString &order, const QString &hint):
+            ElementTemplate<T>(key, label, order, hint)
         {
         }
 
@@ -504,23 +500,22 @@ class ElementTemplateNotNumeric : public ElementTemplate<T>
          */
         bool setValue(const T &value, const bool &emitEvent)
         {
-            bool r = setValue(value);
-            if (r && emitEvent) emit ElementBase::valueSet(this);
-            return r;
+            ElementTemplate<T>::mValue = value;
+            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ee, QVariant(), this);
+            return true;
         }
 
         /**
-         * @brief Set value without signal emission
+         * @brief Set value with signal emission
          * @param value New value to set
          * @return Always returns true (no validation)
          *
-         * Internal setValue that updates the value without validation or signals.
+         * Internal setValue that updates the value without validation
          * Always succeeds since non-numeric types have no validation rules.
          */
         bool setValue(const T &value)
         {
-            ElementTemplate<T>::mValue = value;
-            return true;
+            return setValue(value, true);
         }
 
 };

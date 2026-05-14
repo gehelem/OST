@@ -70,32 +70,14 @@ class ElementBase: public QObject
 
     public:
         /**
-         * @brief Accept a visitor for the Visitor pattern
-         * @param pVisitor Pointer to visitor object
-         *
-         * Pure virtual method for Visitor pattern implementation.
-         * Used for JSON serialization, text dumping, etc.
-         */
-        virtual void accept(ElementVisitor* pVisitor) = 0;
-
-        /**
          * @brief Accept a visitor with data parameter
          * @param pVisitor Pointer to visitor object
          * @param data QVariantMap with operation data
+         * @param signalType Signal dispatch
          *
          * Overloaded accept for operations requiring external data.
          */
-        virtual void accept(ElementVisitor* pVisitor, QVariantMap &data) = 0;
-
-        /**
-         * @brief Accept a visitor with action and data parameters
-         * @param pVisitor Pointer to visitor object
-         * @param action Action string (e.g., "newline", "cleargrid")
-         * @param data QVariantMap with operation data
-         *
-         * Overloaded accept for grid operations and custom actions.
-         */
-        virtual void accept(ElementVisitor* pVisitor, QString &action, QVariantMap &data) = 0;
+        virtual void accept(ElementVisitor* pVisitor, QVariantMap &data, bool &emitEvent) = 0;
 
         /**
          * @brief Construct a new ElementBase object
@@ -103,13 +85,21 @@ class ElementBase: public QObject
          * @param order Sort order within property (e.g., "10", "20")
          * @param hint Tooltip/help text for frontend
          */
-        ElementBase(const QString &label, const QString &order, const QString &hint);
+        ElementBase(const QString &key, const QString &label, const QString &order, const QString &hint);
 
         /**
          * @brief Destroy the ElementBase object
          */
         ~ElementBase();
 
+        /**
+         * @brief Internal element's name
+         * @return returns element's name
+         *
+         * This value cannot be modified after instanciation
+         * \hidecallgraph
+         */
+        QString key();
         /**
          * @brief Get element type as string
          * @return Type identifier ("int", "float", "string", "bool", etc.)
@@ -219,14 +209,43 @@ class ElementBase: public QObject
         QString getGlobalLov();
 
         /**
+         * @brief Get global LOV scope
+         * @return LovScope::Module if managed by the module, LovScope::Controller if managed by controller
+         */
+        LovScope getLovScope()
+        {
+            return mLovScope;
+        }
+
+        /**
+         * @brief Get whether the element value must belong to the LOV
+         * @return true if frontend should enforce selection from LOV only
+         */
+        bool getLovConstrained()
+        {
+            return mLovConstrained;
+        }
+
+        /**
          * @brief Set global LOV reference
-         * @param lovName Key of global LOV in Datastore::mGlobLov
+         * @param lovName   Key of the global LOV
+         * @param scope     Who owns the LOV: LovScope::Module (default) or LovScope::Controller
          *
          * Links element to a global LOV for dynamic dropdowns.
          */
-        void setGlobalLov(QString lovName);
+        void setGlobalLov(QString lovName, LovScope scope = LovScope::Module);
+
+        /**
+         * @brief Set whether the element value must be constrained to the LOV
+         * @param constrained true = frontend enforces selection from LOV only
+         */
+        void setLovConstrained(bool constrained)
+        {
+            mLovConstrained = constrained;
+        }
 
     private:
+        QString mKey = "";                              /*!< Unique internal identifier */
         QString mLabel = "change me";     /*!< Display label for frontend */
         QString mOrder = "change me";     /*!< Sort order within property */
         QString mHint = "";               /*!< Tooltip/help text */
@@ -236,6 +255,8 @@ class ElementBase: public QObject
         QString mPreIcon = "";            /*!< Prefix icon identifier */
         QString mPostIcon = "";           /*!< Postfix icon identifier */
         QString mGlobalLov = "";          /*!< Reference to global LOV key */
+        LovScope mLovScope = LovScope::Module; /*!< Who is responsible for this LOV's content */
+        bool mLovConstrained = false;     /*!< Frontend hint: value must belong to the LOV */
 
     public slots:
         /**
@@ -248,20 +269,14 @@ class ElementBase: public QObject
     signals:
         /**
          * @brief Signal emitted when element value changes
+         * @param event Event descriptor
+         * @param data Additional payload
          * @param elt Pointer to this element
          *
          * Emitted by derived template classes when setValue() is called.
          * Propagated to parent property's OnValueSet slot.
          */
-        void valueSet(OST::ElementBase*);
-
-        /**
-         * @brief Signal emitted when element metadata changes
-         * @param elt Pointer to this element
-         *
-         * Emitted when non-value attributes change (min/max, LOV, icons, etc.).
-         */
-        void eltChanged(OST::ElementBase*);
+        void eltEvent(OST::EvType, QVariant, OST::ElementBase*);
 
         /**
          * @brief Signal emitted when element list/LOV changes
@@ -271,12 +286,13 @@ class ElementBase: public QObject
 
         /**
          * @brief Signal emitted when sending messages
-         * @param level Message level (Info, Warn, Err)
-         * @param message Message text
+         * @param level Message level (Debug, Info, Warning, Error, Critical)
+         * @param message Message text (key)
+         * @param args Arguments for parametric messages
          *
          * Propagated to property and module levels.
          */
-        void sendMessage(MsgLevel, QString);
+        void logMessage(OST::LogLevel, QString, QVariantList);
 
         /**
          * @brief Signal emitted when LOV changes
@@ -359,7 +375,7 @@ class ValueBase: public QObject
          * Copies this value back into parent element.
          * Called when fetching grid line into elements.
          */
-        virtual void updateElement(const bool &emitEvent) = 0;
+        virtual void updateElement(const bool  &emitEvent) = 0;
 
     protected:
         ElementBase* pElement;  /*!< Pointer to parent element */

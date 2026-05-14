@@ -17,6 +17,7 @@ class LovSingle : public LovBase
             mLov.clear();
         }
         ~LovSingle() {}
+
         QMap<T, QString> getLov()
         {
             return mLov;
@@ -26,7 +27,7 @@ class LovSingle : public LovBase
             QVariant v = val;
             if (mLov.contains(val))
             {
-                emit sendMessage(Warn, "lovAdd - key " + v.toString() + " already exists (" + mLov[val] + ").");
+                emit sendMessage(LogLevel::Warning, "lovAdd - key %1 already exists (%2)", {v.toString(), mLov[val]});
                 return false;
             }
             mLov[val] = label;
@@ -38,7 +39,7 @@ class LovSingle : public LovBase
             if (!mLov.contains(val))
             {
                 QVariant v = val;
-                emit sendMessage(Warn, "lovUpdate - key " + v.toString() + " doesn't exist.");
+                emit sendMessage(LogLevel::Warning, "lovUpdate - key %1 doesn't exist", {v.toString()});
                 return false;
             }
             mLov[val] = label;
@@ -50,7 +51,7 @@ class LovSingle : public LovBase
             if (!mLov.contains(val))
             {
                 QVariant v = val;
-                emit sendMessage(Warn, "lovDel - key " + v.toString() + " doesn't exist.");
+                emit sendMessage(LogLevel::Warning, "lovDel - key %1 doesn't exist", {v.toString()});
                 return false;
             }
             mLov.remove(val);
@@ -67,9 +68,12 @@ class LovSingle : public LovBase
         {
             return typeid(T).name();
         }
+        bool contains(T key)
+        {
+            return mLov.contains(key);
+        }
     private:
         QMap<T, QString> mLov;
-
 
 };
 

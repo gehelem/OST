@@ -41,7 +41,7 @@ namespace  OST
  *
  * @par Optional Fields in pData:
  * - "rule": int - SwitchsRule (0=OneOfMany, 1=AtMostOne, 2=Any, default=Any)
- * - "elements": QVariantMap - Element definitions (key → element config)
+ * - "e": QVariantMap - Element definitions (key → element config)
  * - "showGrid": bool - Grid visibility (default=false)
  * - "showElts": bool - Elements visibility (default=true)
  * - "gridLimit": int - Max grid lines (default unlimited)
@@ -108,7 +108,7 @@ PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVaria
     {
         pProperty->setRule(Any);
     }
-    if (!pData.contains("elements"))
+    if (!pData.contains("e"))
     {
         qDebug() << "Multiproperty defined without elements " << pData;
         return pProperty;
@@ -159,14 +159,14 @@ PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVaria
     {
         pProperty->setBadge(pData["badge"].toBool());
     }
-    QVariantMap elts = pData["elements"].toMap();
+    QVariantMap elts = pData["e"].toMap();
     foreach(const QString &key, elts.keys())
     {
         QVariantMap elt = elts[key].toMap();
-        ElementBase *v = ElementFactory::createElement(elt);
+        ElementBase *v = ElementFactory::createElement(key, elt);
         if (v != nullptr)
         {
-            pProperty->addElt(key, v);
+            pProperty->addElt(v);
         }
     }
     if (pData.contains("grid"))
@@ -211,6 +211,10 @@ PropertyMulti *PropertyFactory::createProperty(const QString &pKey, const QVaria
     if (pData.contains("freevalue"))
     {
         pProperty->setPostIcon2(pData["freevalue"].toString());
+    }
+    if (pData.contains("autoupdate"))
+    {
+        pProperty->setAutoUpdate(pData["autoupdate"].toBool());
     }
 
     return pProperty;

@@ -5,7 +5,7 @@ let messageCount = 0;
 
 ws.on("open", () => {
   console.log("Connected to server");
-  ws.send(JSON.stringify({ evt: "Freadall" }));
+  ws.send(JSON.stringify({"DU":{"language":"en"}}));
 
   // Close connection after 15 seconds
   setTimeout(() => {

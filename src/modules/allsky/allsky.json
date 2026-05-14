@@ -1,0 +1,460 @@
+{
+"p":{
+    "timelapse": {
+        "devcat": "Results",
+        "group": "",
+        "order":"AAAResults200",
+        "permission": 0,
+        "label": "Timelapse",
+        "e": {
+            "video1": {
+                "type": "video",
+                "order":"1",
+                "label": "Timelapse"
+            }
+        }
+
+    },
+    "autoparms": {
+        "devcat": "Parameters",
+        "group": "General",
+        "order":"222Parms115",
+        "permission": 2,
+        "rule":2,
+        "hasprofile":true,
+        "label": "Dynamic exposure/gain",
+        "e": {
+            "enabled": {
+                "type": "bool",
+                "label": "Enable",
+                "autoupdate":true,
+                "directedit":true,
+                "value":false,
+                "order":"0"
+            },
+            "expgain": {
+                "type": "string",
+                "label": "Change exposure or gain",
+                "autoupdate":true,
+                "directedit":true,
+                "value":"exp",
+                "listOfValues":[
+                    ["exp","Exposure"],
+                    ["gain","Gain"]
+                ],
+                "order":"1"
+            },
+            "min": {
+                "type": "float",
+                "label": "Minimum value",
+                "autoupdate":true,
+                "directedit":true,
+                "value":0,
+                "order":"2"
+            },
+            "max": {
+                "type": "float",
+                "label": "Maximum value",
+                "autoupdate":true,
+                "directedit":true,
+                "value":0,
+                "order":"3"
+            },
+            "measure": {
+                "type": "string",
+                "label": "Measure parm",
+                "autoupdate":true,
+                "directedit":true,
+                "value":"exp",
+                "listOfValues":[
+                    ["mean","Mean"],
+                    ["median","Median"]
+                ],
+                "order":"4"
+            },
+            "target": {
+                "type": "float",
+                "label": "Target value",
+                "autoupdate":true,
+                "directedit":true,
+                "value":0,
+                "order":"5"
+            },
+            "threshold": {
+                "type": "float",
+                "label": "Threshold (%)",
+                "autoupdate":true,
+                "directedit":true,
+                "value":0,
+                "order":"6"
+            }
+        }
+    },
+    "keogram": {
+        "devcat": "Results",
+        "group": "",
+        "order":"AAAResults999",
+        "permission": 0,
+        "label": "Keogram",
+        "e": {
+            "image1": {
+                "type": "img",
+                "label": "Keogram",
+                "order":"1",
+                "showstats":false,
+                "urljpeg":"./dummy.jpg"
+            }
+        }
+
+    },
+    "log": {
+        "devcat": "Results",
+        "rule":0,
+        "order":"AAAResults100",
+        "hasGrid":true,
+        "showGrid":false,
+        "showElts":true,
+        "gridLimit":50,
+        "graphType":"DY",
+        "graphParams":{
+            "D":"time",
+            "Y":"snr"
+        },
+        "e": {
+                "time": {
+                    "label": "Time",
+                    "type": "datetime",
+                    "order":"1",
+                    "value":0
+                },
+                "snr": {
+                    "label": "SNR",
+                    "order":"2",
+                    "type": "float",
+                    "value":0
+                }
+        },
+        "group": "",
+        "permission": 0,
+        "label": "Log"
+    },
+    "archives": {
+        "devcat": "Archives",
+        "group": "",
+        "order":"CCCArchives",
+        "permission": 2,
+        "autoupdate": false,
+        "label": "Archives",
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":true,
+        "e": {
+            "date": {
+                "label": "Date",
+                "type": "string",
+                "order":"10"
+            },
+            "keogram": {
+                "type": "img",
+                "label": "Keogram",
+                "showstats":false,
+                "order":"20"
+            },
+            "stack": {
+                "type": "img",
+                "label": "Stack",
+                "showstats":false,
+                "order":"30"
+            },
+            "timelapse": {
+                "label": "Timelapse",
+                "type": "video",
+                "order":"40"
+            }
+        }
+    },
+    "type": {
+        "devcat": "Parameters",
+        "group": "Schedule",
+        "order":"BBBSchedule0",
+        "permission": 2,
+        "hasprofile":true,
+        "label": "Schedule type",
+        "rule":0,
+        "e": {
+            "manual": {
+                "label": "Manual",
+                "type": "bool",
+                "autoupdate":true,
+                "order":"10",
+                "value":false
+            },
+            "fixed": {
+                "label": "Fixed time",
+                "type": "bool",
+                "autoupdate":true,
+                "order":"20",
+                "value":true
+            },
+            "sunset": {
+                "label": "Sunset",
+                "type": "bool",
+                "autoupdate":true,
+                "order":"30",
+                "value":false
+            }
+        }
+    },
+    "daily": {
+        "devcat": "Parameters",
+        "group": "Schedule",
+        "order":"BBBSchedule1",
+        "permission": 2,
+        "hasprofile":true,
+        "label": "Daily schedule",
+        "e": {
+            "begin": {
+                "label": "Start at",
+                "type": "time",
+                "autoupdate":true,
+                "directedit":true,
+                "order":"20"
+            },
+            "end": {
+                "type": "time",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "End at",
+                "order":"30"
+            }
+        }
+    },
+    "coming": {
+        "devcat": "Parameters",
+        "group": "Schedule",
+        "order":"BBBSchedule3",
+        "permission": 0,
+        "label": "Events to come",
+        "e": {
+            "sunrise": {
+                "label": "Next sunrise",
+                "type": "time",
+                "order":"20"
+            },
+            "sunset": {
+                "type": "time",
+                "label": "Next sunset",
+                "order":"30"
+            }
+        }
+    },
+    "geo": {
+        "devcat": "Parameters",
+        "group": "Schedule",
+        "order":"BBBSchedule4",
+        "permission": 2,
+        "hasprofile":true,
+        "label": "Position",
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":true,
+        "e": {
+            "id": {
+                "label": "Label",
+                "type": "string",
+                "autoupdate":true,
+                "directedit":true,
+                "order":"05",
+                "value":"Default"
+            },
+            "lat": {
+                "label": "Latitude",
+                "type": "float",
+                "autoupdate":true,
+                "directedit":true,
+                "order":"10",
+                "value":50
+            },
+            "long": {
+                "label": "Longitude",
+                "type": "float",
+                "autoupdate":true,
+                "directedit":true,
+                "order":"20",
+                "value":2
+            }
+        }
+    },
+    "gps": {
+        "devcat": "Parameters",
+        "group": "Schedule",
+        "order":"BBBSchedule5",
+        "permission": 2,
+        "hasprofile":false,
+        "label": "GPS",
+        "enabled":false,
+        "e": {
+            "add": {
+                "label": "Add GPS localization",
+                "type": "bool",
+                "autoupdate":false,
+                "order":"10",
+                "value":false
+            }
+        }
+    },
+    "geogps": {
+        "devcat": "Parameters",
+        "group": "Schedule",
+        "order":"BBBSchedule6",
+        "permission": 0,
+        "hasprofile":false,
+        "enabled":false,
+        "label": "GPS localization",
+        "e": {
+            "lat": {
+                "label": "Latitude",
+                "type": "float",
+                "order":"10"
+            },
+            "long": {
+                "label": "Longitude",
+                "type": "float",
+                "order":"20"
+            },
+            "elev": {
+                "label": "Elevation",
+                "type": "float",
+                "order":"30"
+            },
+            "date": {
+                "label": "Date (UTC)",
+                "type": "date",
+                "order":"35"
+            },
+            "time": {
+                "label": "Time (UTC)",
+                "type": "time",
+                "order":"40"
+            },
+            "offset": {
+                "label": "Offset",
+                "type": "string",
+                "order":"50"
+            }
+        }
+    },
+    "keepimages": {
+        "devcat": "Parameters",
+        "group": "Schedule",
+        "order":"BBBSchedule6",
+        "permission": 2,
+        "hasprofile":true,
+        "label": "Keep indiviual images in archives",
+        "e": {
+            "enable": {
+                "label": "Enable",
+                "type": "bool",
+                "autoupdate":true,
+                "order":"10",
+                "value":false
+            }
+        }
+    },
+    "measures": {
+        "devcat": "Meteo",
+        "group": "",
+        "order":"CCCMeteo010",
+        "permission": 0,
+        "hasprofile":false,
+        "label": "Measures",
+        "e": {
+            "temp": {
+                "label": "Temperature",
+                "type": "float",
+                "order":"10"
+            },
+            "hum": {
+                "label": "Humidity",
+                "type": "float",
+                "order":"20"
+            },
+            "clouds": {
+                "label": "Clouds",
+                "type": "float",
+                "order":"30"
+            },
+            "precip": {
+                "label": "Precipitations",
+                "type": "float",
+                "order":"40"
+            },
+            "press": {
+                "label": "Pressure",
+                "type": "float",
+                "order":"60"
+            },
+            "sqm": {
+                "label": "SQM",
+                "type": "float",
+                "order":"50"
+            }
+        }
+    },
+    "history": {
+        "devcat": "Meteo",
+        "group": "",
+        "order":"CCCMeteo020",
+        "permission": 0,
+        "hasprofile":false,
+        "label": "History",
+        "hasGrid":true,
+        "showGrid":false,
+        "showElts":false,
+        "graphType":"SDY",
+        "graphParams":{
+            "S":"S",
+            "D":"D",
+            "Y":"Y",
+            "graphColors":{
+                "temp":{"R":255,"G":0,"B":0},
+                "hum":{"R":0,"G":255,"B":0},
+                "press":{"R":0,"G":0,"B":255},
+                "clouds":{"R":0,"G":0,"B":255},
+                "precip":{"R":255,"G":255,"B":0},
+                "sqm":{"R":0,"G":255,"B":255}
+            },
+            "axis":{
+                "temp":{"min":-15,"max":35,"pos":"right","text":"Temperature"},
+                "hum-clouds":{"min":0,"max":100,"pos":"right","text":"Humidity/Clouds"},
+                "pressure":{"min":950,"max":1050,"pos":"right","text":"Pressure"},
+                "precip":{"min":0,"max":10,"pos":"left","text":"Rain"},
+                "sqm":{"min":0,"max":30,"pos":"left","text":"SQM"}
+            },
+            "mapping":{
+                "temp":"temp",
+                "hum":"hum-clouds",
+                "press":"pressure",
+                "clouds":"hum-clouds",
+                "precip":"precip",
+                "sqm":"sqm"
+            }
+        },
+        "e": {
+            "S": {
+                "type": "string",
+                "order":"A"
+            },
+            "D": {
+                "type": "datetime",
+                "order":"B"
+            },
+            "Y": {
+                "type": "float",
+                "order":"C"
+            }
+        }
+    }
+
+}
+}

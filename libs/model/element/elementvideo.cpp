@@ -1,26 +1,17 @@
 #include "elementvideo.h"
 namespace  OST
 {
-ElementVideo::ElementVideo(const QString &label, const QString &order, const QString &hint)
-    : ElementTemplateNotNumeric(label, order, hint)
+ElementVideo::ElementVideo(const QString &key, const QString &label, const QString &order, const QString &hint)
+    : ElementTemplateNotNumeric(key, label, order, hint)
 {
 }
 ElementVideo::~ElementVideo()
 {
 }
-void ElementVideo::accept(ElementVisitor *pVisitor)
+void ElementVideo::accept(ElementVisitor *pVisitor, QVariantMap &data, bool &emitEvent)
 {
-    pVisitor->visit(this);
+    pVisitor->visit(this, data, emitEvent);
 }
-void ElementVideo::accept(ElementVisitor *pVisitor, QVariantMap &data)
-{
-    pVisitor->visit(this, data);
-}
-void ElementVideo::accept(ElementVisitor *pVisitor, QString &action, QVariantMap &data)
-{
-    pVisitor->visit(this, action, data);
-}
-
 QString ElementVideo::getType()
 {
     return "video";

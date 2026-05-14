@@ -44,7 +44,8 @@ Rules-Requires-Root: no
 Package: ostserver
 Architecture: any
 Section: science
-Recommends: ${shlibs:Depends}, ${misc:Depends}, libindi1, libstellarsolver
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqt5sql5, libqt5sql5-sqlite
+Recommends: libindi1, libstellarsolver
 Description: Observatoire Sans Tête
  Light and headless astrophotography automation tool
 
