@@ -4787,5 +4787,293 @@
             <source>IndiModule::newDevice %</source>
             <translation>IndiModule::newDevice %</translation>
         </message>
+        <message>
+            <source>Navigator is slewing to target %1</source>
+            <translation>Il navigatore si sta spostando verso il bersaglio %1</translation>
+        </message>
+        <message>
+            <source>Controller::onInterModuleRequest %1 %2 %3 %4</source>
+            <translation>Controller::onInterModuleRequest %1 %2 %3 %4</translation>
+        </message>
+        <message>
+            <source>Message DP %1</source>
+            <translation>Message DP %1</translation>
+        </message>
+        <message>
+            <source>Slewing to %1</source>
+            <translation>Puntamento verso %1</translation>
+        </message>
+        <message>
+            <source>Centering successful after 1 iteration(s) - within tolerance</source>
+            <translation>Centratura riuscita dopo 1 iterazione/i - entro la tolleranza</translation>
+        </message>
+        <message>
+            <source>Navigator went to target %1, starting sequence with profile %2</source>
+            <translation>Il navigatore ha raggiunto il bersaglio %1, avvio sequenza con profilo %2</translation>
+        </message>
+        <message>
+            <source>Starting sequence with autofocus using filter: %1</source>
+            <translation>Avvio sequenza con autofocus usando il filtro: %1</translation>
+        </message>
+        <message>
+            <source>Filter changed - requesting autofocus from module: %1</source>
+            <translation>Filtro cambiato - richiesta autofocus al modulo: %1</translation>
+        </message>
+        <message>
+            <source>Suspending guiding on module: %1</source>
+            <translation>Sospensione della guida sul modulo: %1</translation>
+        </message>
+        <message>
+            <source>Autofocus completed - resuming sequence</source>
+            <translation>Autofocus completato - ripresa della sequenza</translation>
+        </message>
+        <message>
+            <source>Resuming guiding on module: %1</source>
+            <translation>Ripresa della guida sul modulo: %1</translation>
+        </message>
+        <message>
+            <source>Waiting %1 seconds for guiding to settle...</source>
+            <translation>Attesa di %1 secondi per la stabilizzazione della guida...</translation>
+        </message>
+        <message>
+            <source>Mount position: RA=13.4, DEC=54.8, Pier=East</source>
+            <translation>Posizione montatura: AR=13.4, DEC=54.8, Lato=Est</translation>
+        </message>
+        <message>
+            <source>Grid limits set to %1 frames (rmsOver parameter)</source>
+            <translation>Limiti griglia impostati a %1 frame (parametro rmsOver)</translation>
+        </message>
+        <message>
+            <source>Applied stored corrections from calibration: revRA=%1, revDE=%2</source>
+            <translation>Correzioni memorizzate dalla calibrazione applicate: revRA=%1, revDE=%2</translation>
+        </message>
+        <message>
+            <source>Calibration performed at DEC: %1°</source>
+            <translation>Calibrazione eseguita a DEC: %1°</translation>
+        </message>
+        <message>
+            <source>Current target DEC: %1°</source>
+            <translation>DEC bersaglio corrente: %1°</translation>
+        </message>
+        <message>
+            <source>Current DEC: %1</source>
+            <translation>DEC corrente: %1</translation>
+        </message>
+        <message>
+            <source>RA compensation factor: %1(cos(%2°))</source>
+            <translation>Fattore di compensazione AR: %1(cos(%2°))</translation>
+        </message>
+        <message>
+            <source>Adjusted calibration: E=%1 W=%2 N=%3 S=%4 (pixels/sec)</source>
+            <translation>Calibrazione adeguata: E=%1 O=%2 N=%3 S=%4 (pixel/sec)</translation>
+        </message>
+        <message>
+            <source>Guiding settle time completed - continuing sequence</source>
+            <translation>Tempo di stabilizzazione della guida completato - proseguimento della sequenza</translation>
+        </message>
+        <message>
+            <source>Starting sequence</source>
+            <translation>Avvio sequenza</translation>
+        </message>
+        <message>
+            <source>Filter changed from %1 to %2</source>
+            <translation>Filtro cambiato da %1 a %2</translation>
+        </message>
+        <message>
+            <source>Searching %1</source>
+            <translation>Ricerca di %1</translation>
+        </message>
+        <message>
+            <source>Searching %1 gives %2 results</source>
+            <translation>La ricerca di %1 restituisce %2 risultati</translation>
+        </message>
+        <message>
+            <source>Searching %1 gives no result</source>
+            <translation>La ricerca di %1 non restituisce alcun risultato</translation>
+        </message>
+        <message>
+            <source>Current target sent to %1</source>
+            <translation>Bersaglio corrente inviato a %1</translation>
+        </message>
+        <message>
+            <source>Mount position: RA=13.4, DEC=54.8, Pier=West</source>
+            <translation>Posizione montatura: AR=13.4, DEC=54.8, Lato=Ovest</translation>
+        </message>
+        <message>
+            <source>Mount position: RA=12.3, DEC=56.9, Pier=West</source>
+            <translation>Posizione montatura: AR=12.3, DEC=56.9, Lato=Ovest</translation>
+        </message>
+        <message>
+            <source>Mount position: RA=12.9, DEC=55.8, Pier=West</source>
+            <translation>Posizione montatura: AR=12.9, DEC=55.8, Lato=Ovest</translation>
+        </message>
+        <message>
+            <source>Mount position: RA=11.1, DEC=61.6, Pier=West</source>
+            <translation>Posizione montatura: AR=11.1, DEC=61.6, Lato=Ovest</translation>
+        </message>
+        <message>
+            <source>Planning completed</source>
+            <translation>Pianificazione completata</translation>
+        </message>
+        <message>
+            <source>Pier side calibration differs from actual position, reversing RA/DEC</source>
+            <translation>La calibrazione del lato pilastro differisce dalla posizione reale, inversione AR/DEC</translation>
+        </message>
+        <message>
+            <source>RA reverse: %1, DEC reverse: %2</source>
+            <translation>AR invertita: %1, DEC invertita: %2</translation>
+        </message>
+        <message>
+            <source>getEltString - property %1 not found</source>
+            <translation>getEltString - proprietà %1 non trovata</translation>
+        </message>
+        <message>
+            <source>Basemodule::onExternalEventBase - property %1 is readonly, can't update</source>
+            <translation>Basemodule::onExternalEventBase - la proprietà %1 è in sola lettura, aggiornamento non possibile</translation>
+        </message>
+        <message>
+            <source>setDbProfile dbOpen - ERROR: %1 - %2</source>
+            <translation>setDbProfile dbOpen - ERRORE: %1 - %2</translation>
+        </message>
+        <message>
+            <source>getDbConfiguration dbOpen - ERROR: %1 - %2</source>
+            <translation>getDbConfiguration dbOpen - ERRORE: %1 - %2</translation>
+        </message>
+        <message>
+            <source>getDbProfiles dbOpen - ERROR: %1 - %2</source>
+            <translation>getDbProfiles dbOpen - ERRORE: %1 - %2</translation>
+        </message>
+        <message>
+            <source>Unable to find %1/FILTER_NAME property.</source>
+            <translation>Impossibile trovare la proprietà %1/FILTER_NAME.</translation>
+        </message>
+        <message>
+            <source>createGlobLov - lov %1 already exists.</source>
+            <translation>createGlobLov - la LOV %1 esiste già.</translation>
+        </message>
+        <message>
+            <source>%1 - PropertyMulti::setValue - %2 - can't update, unhandled type : %3(%4)</source>
+            <translation>%1 - PropertyMulti::setValue - %2 - aggiornamento non possibile, tipo non gestito: %3(%4)</translation>
+        </message>
+        <message>
+            <source>Global</source>
+            <translation>Globale</translation>
+        </message>
+        <message>
+            <source>Dither</source>
+            <translation>Dithering</translation>
+        </message>
+        <message>
+            <source>Maximum random displacement applied during dithering, in pixels</source>
+            <translation>Spostamento casuale massimo applicato durante il dithering, in pixel</translation>
+        </message>
+        <message>
+            <source>Dither amplitude (px)</source>
+            <translation>Ampiezza del dithering (px)</translation>
+        </message>
+        <message>
+            <source>Name of the planner module INSTANCE to use</source>
+            <translation>Nome dell'ISTANZA del modulo pianificatore da utilizzare</translation>
+        </message>
+        <message>
+            <source>Planner instance</source>
+            <translation>Istanza del pianificatore</translation>
+        </message>
+        <message>
+            <source>Altitude error (arcmin)</source>
+            <translation>Errore in altitudine (arcmin)</translation>
+        </message>
+        <message>
+            <source>Azimuth error (arcmin)</source>
+            <translation>Errore in azimut (arcmin)</translation>
+        </message>
+        <message>
+            <source>Total error (arcmin)</source>
+            <translation>Errore totale (arcmin)</translation>
+        </message>
+        <message>
+            <source>Available configurations</source>
+            <translation>Configurazioni disponibili</translation>
+        </message>
+        <message>
+            <source>Available equipment sets</source>
+            <translation>Set di attrezzatura disponibili</translation>
+        </message>
+        <message>
+            <source>Indi servers</source>
+            <translation>Server Indi</translation>
+        </message>
+        <message>
+            <source>Available optics</source>
+            <translation>Ottiche disponibili</translation>
+        </message>
+        <message>
+            <source>Guide camera</source>
+            <translation>Fotocamera guida</translation>
+        </message>
+        <message>
+            <source>Guide ST4</source>
+            <translation>Guida ST4</translation>
+        </message>
+        <message>
+            <source>Equipment sets</source>
+            <translation>Set di attrezzatura</translation>
+        </message>
+        <message>
+            <source>host</source>
+            <translation>Host</translation>
+        </message>
+        <message>
+            <source>Library</source>
+            <translation>Libreria</translation>
+        </message>
+        <message>
+            <source>Diameter (mm)</source>
+            <translation>Diametro (mm)</translation>
+        </message>
+        <message>
+            <source>Optics</source>
+            <translation>Ottica</translation>
+        </message>
+        <message>
+            <source>Optics: %1 - focal %2 mm, diameter %3 mm</source>
+            <translation>Ottica: %1 - focale %2 mm, diametro %3 mm</translation>
+        </message>
+        <message>
+            <source>Servers: %1 : %2:%3</source>
+            <translation>Server: %1 : %2:%3</translation>
+        </message>
+        <message>
+            <source>IndiModule::refreshDeviceslovs() </source>
+            <translation>IndiModule::refreshDeviceslovs() </translation>
+        </message>
+        <message>
+            <source>IndiModule::refreshDeviceslovs() %1</source>
+            <translation>IndiModule::refreshDeviceslovs() %1</translation>
+        </message>
+        <message>
+            <source>Equipments: %1</source>
+            <translation>Attrezzatura: %1</translation>
+        </message>
+        <message>
+            <source>Servers '%1' not found in GlobalDatastore</source>
+            <translation>Server '%1' non trovati nel GlobalDatastore</translation>
+        </message>
+        <message>
+            <source>%1 - Indi server already disconnected</source>
+            <translation>%1 - Server Indi già disconnesso</translation>
+        </message>
+        <message>
+            <source>We need at least 1 stars to  focus - abort</source>
+            <translation>È necessaria almeno 1 stella per la messa a fuoco - interruzione</translation>
+        </message>
+        <message>
+            <source>Controller::onInterModuleRequest - module not found : %1</source>
+            <translation>Controller::onInterModuleRequest - modulo non trovato: %1</translation>
+        </message>
+        <message>
+            <source>Unable to find %1 device.</source>
+            <translation>Impossibile trovare il dispositivo %1.</translation>
+        </message>
 </context>
 </TS>

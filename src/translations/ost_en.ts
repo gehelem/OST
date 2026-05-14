@@ -4786,5 +4786,421 @@
             <source>IndiModule::newDevice %</source>
             <translation>IndiModule::newDevice %</translation>
         </message>
+        <message>
+            <source>Navigator is slewing to target %1</source>
+            <translation>Navigator is slewing to target %1</translation>
+        </message>
+        <message>
+            <source>Controller::onInterModuleRequest %1 %2 %3 %4</source>
+            <translation>Controller::onInterModuleRequest %1 %2 %3 %4</translation>
+        </message>
+        <message>
+            <source>Message DP %1</source>
+            <translation>Message DP %1</translation>
+        </message>
+        <message>
+            <source>Slewing to %1</source>
+            <translation>Slewing to %1</translation>
+        </message>
+        <message>
+            <source>Centering successful after 1 iteration(s) - within tolerance</source>
+            <translation>Centering successful after 1 iteration(s) - within tolerance</translation>
+        </message>
+        <message>
+            <source>Navigator went to target %1, starting sequence with profile %2</source>
+            <translation>Navigator went to target %1, starting sequence with profile %2</translation>
+        </message>
+        <message>
+            <source>Starting sequence with autofocus using filter: %1</source>
+            <translation>Starting sequence with autofocus using filter: %1</translation>
+        </message>
+        <message>
+            <source>Filter changed - requesting autofocus from module: %1</source>
+            <translation>Filter changed - requesting autofocus from module: %1</translation>
+        </message>
+        <message>
+            <source>Suspending guiding on module: %1</source>
+            <translation>Suspending guiding on module: %1</translation>
+        </message>
+        <message>
+            <source>Autofocus completed - resuming sequence</source>
+            <translation>Autofocus completed - resuming sequence</translation>
+        </message>
+        <message>
+            <source>Resuming guiding on module: %1</source>
+            <translation>Resuming guiding on module: %1</translation>
+        </message>
+        <message>
+            <source>Waiting %1 seconds for guiding to settle...</source>
+            <translation>Waiting %1 seconds for guiding to settle...</translation>
+        </message>
+        <message>
+            <source>Mount position: RA=13.4, DEC=54.8, Pier=East</source>
+            <translation>Mount position: RA=13.4, DEC=54.8, Pier=East</translation>
+        </message>
+        <message>
+            <source>Grid limits set to %1 frames (rmsOver parameter)</source>
+            <translation>Grid limits set to %1 frames (rmsOver parameter)</translation>
+        </message>
+        <message>
+            <source>Applied stored corrections from calibration: revRA=%1, revDE=%2</source>
+            <translation>Applied stored corrections from calibration: revRA=%1, revDE=%2</translation>
+        </message>
+        <message>
+            <source>Calibration performed at DEC: %1°</source>
+            <translation>Calibration performed at DEC: %1°</translation>
+        </message>
+        <message>
+            <source>Current target DEC: %1°</source>
+            <translation>Current target DEC: %1°</translation>
+        </message>
+        <message>
+            <source>Current DEC: %1</source>
+            <translation>Current DEC: %1</translation>
+        </message>
+        <message>
+            <source>RA compensation factor: %1(cos(%2°))</source>
+            <translation>RA compensation factor: %1(cos(%2°))</translation>
+        </message>
+        <message>
+            <source>Adjusted calibration: E=%1 W=%2 N=%3 S=%4 (pixels/sec)</source>
+            <translation>Adjusted calibration: E=%1 W=%2 N=%3 S=%4 (pixels/sec)</translation>
+        </message>
+        <message>
+            <source>Guiding settle time completed - continuing sequence</source>
+            <translation>Guiding settle time completed - continuing sequence</translation>
+        </message>
+        <message>
+            <source>Starting sequence</source>
+            <translation>Starting sequence</translation>
+        </message>
+        <message>
+            <source>Filter changed from %1 to %2</source>
+            <translation>Filter changed from %1 to %2</translation>
+        </message>
+        <message>
+            <source>Searching %1</source>
+            <translation>Searching %1</translation>
+        </message>
+        <message>
+            <source>Searching %1 gives %2 results</source>
+            <translation>Searching %1 gives %2 results</translation>
+        </message>
+        <message>
+            <source>Searching %1 gives no result</source>
+            <translation>Searching %1 gives no result</translation>
+        </message>
+        <message>
+            <source>Current target sent to %1</source>
+            <translation>Current target sent to %1</translation>
+        </message>
+        <message>
+            <source>Mount position: RA=13.4, DEC=54.8, Pier=West</source>
+            <translation>Mount position: RA=13.4, DEC=54.8, Pier=West</translation>
+        </message>
+        <message>
+            <source>Mount position: RA=12.3, DEC=56.9, Pier=West</source>
+            <translation>Mount position: RA=12.3, DEC=56.9, Pier=West</translation>
+        </message>
+        <message>
+            <source>Mount position: RA=12.9, DEC=55.8, Pier=West</source>
+            <translation>Mount position: RA=12.9, DEC=55.8, Pier=West</translation>
+        </message>
+        <message>
+            <source>Mount position: RA=11.1, DEC=61.6, Pier=West</source>
+            <translation>Mount position: RA=11.1, DEC=61.6, Pier=West</translation>
+        </message>
+        <message>
+            <source>Planning completed</source>
+            <translation>Planning completed</translation>
+        </message>
+        <message>
+            <source>Pier side calibration differs from actual position, reversing RA/DEC</source>
+            <translation>Pier side calibration differs from actual position, reversing RA/DEC</translation>
+        </message>
+        <message>
+            <source>RA reverse: %1, DEC reverse: %2</source>
+            <translation>RA reverse: %1, DEC reverse: %2</translation>
+        </message>
+        <message>
+            <source>getEltString - property %1 not found</source>
+            <translation>getEltString - property %1 not found</translation>
+        </message>
+        <message>
+            <source>Basemodule::onExternalEventBase - property %1 is readonly, can't update</source>
+            <translation>Basemodule::onExternalEventBase - property %1 is readonly, can't update</translation>
+        </message>
+        <message>
+            <source>setDbProfile dbOpen - ERROR: %1 - %2</source>
+            <translation>setDbProfile dbOpen - ERROR: %1 - %2</translation>
+        </message>
+        <message>
+            <source>getDbConfiguration dbOpen - ERROR: %1 - %2</source>
+            <translation>getDbConfiguration dbOpen - ERROR: %1 - %2</translation>
+        </message>
+        <message>
+            <source>getDbProfiles dbOpen - ERROR: %1 - %2</source>
+            <translation>getDbProfiles dbOpen - ERROR: %1 - %2</translation>
+        </message>
+        <message>
+            <source>Unable to find %1/FILTER_NAME property.</source>
+            <translation>Unable to find %1/FILTER_NAME property.</translation>
+        </message>
+        <message>
+            <source>createGlobLov - lov %1 already exists.</source>
+            <translation>createGlobLov - lov %1 already exists.</translation>
+        </message>
+        <message>
+            <source>%1 - PropertyMulti::setValue - %2 - can't update, unhandled type : %3(%4)</source>
+            <translation>%1 - PropertyMulti::setValue - %2 - can't update, unhandled type : %3(%4)</translation>
+        </message>
+        <message>
+            <source>Global</source>
+            <translation>Global</translation>
+        </message>
+        <message>
+            <source>Dither</source>
+            <translation>Dither</translation>
+        </message>
+        <message>
+            <source>Maximum random displacement applied during dithering, in pixels</source>
+            <translation>Maximum random displacement applied during dithering, in pixels</translation>
+        </message>
+        <message>
+            <source>Dither amplitude (px)</source>
+            <translation>Dither amplitude (px)</translation>
+        </message>
+        <message>
+            <source>Name of the planner module INSTANCE to use</source>
+            <translation>Name of the planner module INSTANCE to use</translation>
+        </message>
+        <message>
+            <source>Planner instance</source>
+            <translation>Planner instance</translation>
+        </message>
+        <message>
+            <source>Altitude error (arcmin)</source>
+            <translation>Altitude error (arcmin)</translation>
+        </message>
+        <message>
+            <source>Azimuth error (arcmin)</source>
+            <translation>Azimuth error (arcmin)</translation>
+        </message>
+        <message>
+            <source>Total error (arcmin)</source>
+            <translation>Total error (arcmin)</translation>
+        </message>
+        <message>
+            <source>Available configurations</source>
+            <translation>Available configurations</translation>
+        </message>
+        <message>
+            <source>Available equipment sets</source>
+            <translation>Available equipment sets</translation>
+        </message>
+        <message>
+            <source>Indi servers</source>
+            <translation>Indi servers</translation>
+        </message>
+        <message>
+            <source>Available optics</source>
+            <translation>Available optics</translation>
+        </message>
+        <message>
+            <source>Guide camera</source>
+            <translation>Guide camera</translation>
+        </message>
+        <message>
+            <source>Guide ST4</source>
+            <translation>Guide ST4</translation>
+        </message>
+        <message>
+            <source>Equipment sets</source>
+            <translation>Equipment sets</translation>
+        </message>
+        <message>
+            <source>host</source>
+            <translation>host</translation>
+        </message>
+        <message>
+            <source>Library</source>
+            <translation>Library</translation>
+        </message>
+        <message>
+            <source>Diameter (mm)</source>
+            <translation>Diameter (mm)</translation>
+        </message>
+        <message>
+            <source>Optics</source>
+            <translation>Optics</translation>
+        </message>
+        <message>
+            <source>Optics: %1 - focal %2 mm, diameter %3 mm</source>
+            <translation>Optics: %1 - focal %2 mm, diameter %3 mm</translation>
+        </message>
+        <message>
+            <source>Servers: %1 : %2:%3</source>
+            <translation>Servers: %1 : %2:%3</translation>
+        </message>
+        <message>
+            <source>IndiModule::refreshDeviceslovs() </source>
+            <translation>IndiModule::refreshDeviceslovs() </translation>
+        </message>
+        <message>
+            <source>IndiModule::refreshDeviceslovs() %1</source>
+            <translation>IndiModule::refreshDeviceslovs() %1</translation>
+        </message>
+        <message>
+            <source>Equipments: %1</source>
+            <translation>Equipments: %1</translation>
+        </message>
+        <message>
+            <source>Servers '%1' not found in GlobalDatastore</source>
+            <translation>Servers '%1' not found in GlobalDatastore</translation>
+        </message>
+        <message>
+            <source>%1 - Indi server already disconnected</source>
+            <translation>%1 - Indi server already disconnected</translation>
+        </message>
+        <message>
+            <source>We need at least 1 stars to  focus - abort</source>
+            <translation>We need at least 1 star to focus - abort</translation>
+        </message>
+        <message>
+            <source>Controller::onInterModuleRequest - module not found : %1</source>
+            <translation>Controller::onInterModuleRequest - module not found : %1</translation>
+        </message>
+        <message>
+            <source>Unable to find %1 device.</source>
+            <translation>Unable to find %1 device.</translation>
+        </message>
+        <message>
+            <source>availableconfs</source>
+            <translation>availableconfs</translation>
+        </message>
+        <message>
+            <source>optics</source>
+            <translation>optics</translation>
+        </message>
+        <message>
+            <source>pProperty.getLabel()</source>
+            <translation>pProperty.getLabel()</translation>
+        </message>
+        <message>
+            <source>testelementlabel</source>
+            <translation>testelementlabel</translation>
+        </message>
+        <message>
+            <source>testproplabel</source>
+            <translation>testproplabel</translation>
+        </message>
+        <message>
+            <source>Focal length (mm)</source>
+            <translation>Focal length (mm)</translation>
+        </message>
+        <message>
+            <source>Global optic</source>
+            <translation>Global optic</translation>
+        </message>
+        <message>
+            <source>Global servers</source>
+            <translation>Global servers</translation>
+        </message>
+        <message>
+            <source>Servers</source>
+            <translation>Servers</translation>
+        </message>
+        <message>
+            <source>servers</source>
+            <translation>servers</translation>
+        </message>
+        <message>
+            <source>equipmentsets</source>
+            <translation>equipmentsets</translation>
+        </message>
+        <message>
+            <source>equipments</source>
+            <translation>equipments</translation>
+        </message>
+        <message>
+            <source>Global equipment set</source>
+            <translation>Global equipment set</translation>
+        </message>
+        <message>
+            <source>Guide through</source>
+            <translation>Guide through</translation>
+        </message>
+        <message>
+            <source>Equipments</source>
+            <translation>Equipments</translation>
+        </message>
+        <message>
+            <source>toto</source>
+            <translation>toto</translation>
+        </message>
+        <message>
+            <source>Correct</source>
+            <translation>Correct</translation>
+        </message>
+        <message>
+            <source>Alignment Correction</source>
+            <translation>Alignment Correction</translation>
+        </message>
+        <message>
+            <source>Altitude Error (deg)</source>
+            <translation>Altitude Error (deg)</translation>
+        </message>
+        <message>
+            <source>Azimuth Error (deg)</source>
+            <translation>Azimuth Error (deg)</translation>
+        </message>
+        <message>
+            <source>Correction Error</source>
+            <translation>Correction Error</translation>
+        </message>
+        <message>
+            <source>Correction Status</source>
+            <translation>Correction Status</translation>
+        </message>
+        <message>
+            <source>Gain (%)</source>
+            <translation>Gain (%)</translation>
+        </message>
+        <message>
+            <source>Correction Gain</source>
+            <translation>Correction Gain</translation>
+        </message>
+        <message>
+            <source>Operation</source>
+            <translation>Operation</translation>
+        </message>
+        <message>
+            <source>Altitude Step (deg)</source>
+            <translation>Altitude Step (deg)</translation>
+        </message>
+        <message>
+            <source>Azimuth Step (deg)</source>
+            <translation>Azimuth Step (deg)</translation>
+        </message>
+        <message>
+            <source>Manual Adjustment</source>
+            <translation>Manual Adjustment</translation>
+        </message>
+        <message>
+            <source>Rouge</source>
+            <translation>Rouge</translation>
+        </message>
+        <message>
+            <source>Vert</source>
+            <translation>Vert</translation>
+        </message>
+        <message>
+            <source>Bleu</source>
+            <translation>Bleu</translation>
+        </message>
+        <message>
+            <source>H?</source>
+            <translation>H?</translation>
+        </message>
 </context>
 </TS>
