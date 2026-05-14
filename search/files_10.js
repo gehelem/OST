@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['wshandler_2ecpp_0',['wshandler.cpp',['../wshandler_8cpp.html',1,'']]],
-  ['wshandler_2eh_1',['wshandler.h',['../wshandler_8h.html',1,'']]]
+  ['translatemanager_2ecpp_0',['translatemanager.cpp',['../translatemanager_8cpp.html',1,'']]],
+  ['translatemanager_2eh_1',['translatemanager.h',['../translatemanager_8h.html',1,'']]]
 ];

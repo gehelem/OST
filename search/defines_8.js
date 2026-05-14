@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['ts_0',['TS',['../bayer_8c.html#aaade3232ef08cf18b4f3a20a0a2c6fb6',1,'bayer.c']]]
+  ['sqr_0',['SQR',['../bayer_8c.html#aa7866fa5e4e0ee9b034e9dab6599a9cc',1,'bayer.c']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['qobject_0',['QObject',['../classQObject.html',1,'']]]
+  ['navigator_0',['Navigator',['../classNavigator.html',1,'']]]
 ];

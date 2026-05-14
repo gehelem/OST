@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['sqr_0',['SQR',['../bayer_8c.html#aa7866fa5e4e0ee9b034e9dab6599a9cc',1,'bayer.c']]]
+  ['pi_0',['pi',['../guider_8cpp.html#a598a3330b3c21701223ee0ca14316eca',1,'PI:&#160;guider.cpp'],['../navigator_8h.html#a598a3330b3c21701223ee0ca14316eca',1,'PI:&#160;navigator.h'],['../polar_8cpp.html#a598a3330b3c21701223ee0ca14316eca',1,'PI:&#160;polar.cpp']]]
 ];

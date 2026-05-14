@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['msglevel_0',['MsgLevel',['../namespaceOST.html#a4f7f81902ce1709285bca0ca94e65d51',1,'OST']]]
+  ['graphtype_0',['GraphType',['../namespaceOST.html#a2bd59f1bb3735729a6381f7e5ec5970c',1,'OST']]]
 ];

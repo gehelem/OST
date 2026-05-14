@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['permission_0',['Permission',['../namespaceOST.html#a9be35f589fb7dd8d44169b078554ad72',1,'OST']]],
-  ['prgtype_1',['PrgType',['../namespaceOST.html#a4f0f6d56fa87488f90f09dc5a77ecfd7',1,'OST']]]
+  ['loglevel_0',['LogLevel',['../namespaceOST.html#abfdb6d02db64443c1b99449b3b945ec4',1,'OST']]],
+  ['lovscope_1',['LovScope',['../namespaceOST.html#a21df97880469ec5a401e1d26e4f49254',1,'OST']]]
 ];

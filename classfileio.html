@@ -135,6 +135,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ae1200df7fc966b7f30a7bbd009ed1a7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae83ee5350fb41d186ae1320ef9b5fd02" id="r_ae83ee5350fb41d186ae1320ef9b5fd02"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfileio.html#ae83ee5350fb41d186ae1320ef9b5fd02">loadBlob</a> (INDI::PropertyBlob pblob, <a class="el" href="classint.html">int</a> histoSize)</td></tr>
 <tr class="separator:ae83ee5350fb41d186ae1320ef9b5fd02"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aceb2d77ad20e70bf19e4f86224dc219e" id="r_aceb2d77ad20e70bf19e4f86224dc219e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfileio.html#aceb2d77ad20e70bf19e4f86224dc219e">loadBlob</a> (INDI::PropertyBlob pblob, <a class="el" href="classint.html">int</a> histoSize, <a class="el" href="classint.html">int</a> i)</td></tr>
+<tr class="separator:aceb2d77ad20e70bf19e4f86224dc219e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad58922db52d367a8ff7721012ae667e3" id="r_ad58922db52d367a8ff7721012ae667e3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfileio.html#ad58922db52d367a8ff7721012ae667e3">parseHeader</a> ()</td></tr>
 <tr class="separator:ad58922db52d367a8ff7721012ae667e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af71ade1bfcf0cca2f2ee1854a9d4cc3c" id="r_af71ade1bfcf0cca2f2ee1854a9d4cc3c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfileio.html#af71ade1bfcf0cca2f2ee1854a9d4cc3c">saveAsFITS</a> (<a class="el" href="classQString.html">QString</a> fileName, FITSImage::Statistic &amp;imageStats, uint8_t *m_ImageBuffer, FITSImage::Solution solution, QList&lt; <a class="el" href="structfileio_1_1Record.html">Record</a> &gt; &amp;records, <a class="el" href="classbool.html">bool</a> hasSolution)</td></tr>
@@ -538,7 +540,7 @@ Public Attributes</h2></td></tr>
 </div>
 </div>
 <a id="ae1200df7fc966b7f30a7bbd009ed1a7d" name="ae1200df7fc966b7f30a7bbd009ed1a7d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae1200df7fc966b7f30a7bbd009ed1a7d">&#9670;&#160;</a></span>loadBlob() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ae1200df7fc966b7f30a7bbd009ed1a7d">&#9670;&#160;</a></span>loadBlob() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -564,7 +566,43 @@ Public Attributes</h2></td></tr>
 </div>
 </div>
 <a id="ae83ee5350fb41d186ae1320ef9b5fd02" name="ae83ee5350fb41d186ae1320ef9b5fd02"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae83ee5350fb41d186ae1320ef9b5fd02">&#9670;&#160;</a></span>loadBlob() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ae83ee5350fb41d186ae1320ef9b5fd02">&#9670;&#160;</a></span>loadBlob() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> fileio::loadBlob </td>
+          <td>(</td>
+          <td class="paramtype">INDI::PropertyBlob&#160;</td>
+          <td class="paramname"><em>pblob</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classint.html">int</a>&#160;</td>
+          <td class="paramname"><em>histoSize</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aceb2d77ad20e70bf19e4f86224dc219e" name="aceb2d77ad20e70bf19e4f86224dc219e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aceb2d77ad20e70bf19e4f86224dc219e">&#9670;&#160;</a></span>loadBlob() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -579,7 +617,13 @@ Public Attributes</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="classint.html">int</a>&#160;</td>
-          <td class="paramname"><em>histoSize</em>&#160;</td>
+          <td class="paramname"><em>histoSize</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classint.html">int</a>&#160;</td>
+          <td class="paramname"><em>i</em>&#160;</td>
         </tr>
         <tr>
           <td></td>

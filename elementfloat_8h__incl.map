@@ -1,25 +1,26 @@
 <map id="libs/model/element/elementfloat.h" name="libs/model/element/elementfloat.h">
-<area shape="rect" id="Node000001" title="Floating&#45;point element implementation with LOV support." alt="" coords="127,5,275,45"/>
-<area shape="rect" id="Node000002" href="$elementtemplate_8h.html" title="Template classes for typed elements with numeric/non&#45;numeric specializations." alt="" coords="59,93,205,119"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="187,47,154,84,150,81,183,44"/>
-<area shape="rect" id="Node000010" href="$lovfloat_8h.html" title=" " alt="" coords="229,93,312,119"/>
-<area shape="poly" id="edge12_Node000001_Node000010" title=" " alt="" coords="220,44,253,81,249,84,216,47"/>
-<area shape="rect" id="Node000003" href="$elementbase_8h.html" title="Base classes for OST typed elements and their value containers." alt="" coords="73,240,191,265"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="135,119,135,226,129,226,129,119"/>
-<area shape="rect" id="Node000007" href="$lovsingle_8h.html" title=" " alt="" coords="215,167,308,192"/>
-<area shape="poly" id="edge7_Node000002_Node000007" title=" " alt="" coords="154,116,229,157,227,162,152,121"/>
-<area shape="rect" id="Node000004" href="$elementvisitor_8h.html" title=" " alt="" coords="5,313,133,339"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="124,267,91,305,87,301,120,264"/>
-<area shape="rect" id="Node000006" href="$common_8h.html" title="Common enumerations, structures, and types for OST element system." alt="" coords="157,313,248,339"/>
-<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="146,264,184,302,180,306,142,268"/>
-<area shape="rect" id="Node000005" title=" " alt="" coords="169,387,236,412"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="92,336,170,378,168,382,90,341"/>
-<area shape="poly" id="edge6_Node000006_Node000005" title=" " alt="" coords="205,339,205,373,200,373,200,339"/>
-<area shape="rect" id="Node000008" href="$lovbase_8h.html" title=" " alt="" coords="219,240,304,265"/>
-<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="264,192,264,226,259,226,259,192"/>
-<area shape="poly" id="edge11_Node000008_Node000006" title=" " alt="" coords="254,267,223,305,219,301,250,264"/>
-<area shape="rect" id="Node000009" href="$lovvisitor_8h.html" title=" " alt="" coords="273,313,367,339"/>
-<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="273,264,304,301,300,305,269,267"/>
-<area shape="poly" id="edge10_Node000009_Node000005" title=" " alt="" coords="303,341,235,382,232,377,300,336"/>
-<area shape="poly" id="edge13_Node000010_Node000007" title=" " alt="" coords="272,119,267,154,262,153,266,119"/>
+<area shape="rect" id="Node000001" title="Floating&#45;point element implementation with LOV support." alt="" coords="121,5,269,45"/>
+<area shape="rect" id="Node000002" href="$elementtemplate_8h.html" title="Template classes for typed elements with numeric/non&#45;numeric specializations." alt="" coords="52,93,199,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="180,47,147,84,143,81,176,44"/>
+<area shape="rect" id="Node000010" href="$lovfloat_8h.html" title=" " alt="" coords="223,93,305,119"/>
+<area shape="poly" id="edge13_Node000001_Node000010" title=" " alt="" coords="213,44,246,81,242,84,209,47"/>
+<area shape="rect" id="Node000003" href="$elementbase_8h.html" title="Base classes for OST typed elements and their value containers." alt="" coords="66,167,185,192"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="128,119,128,153,123,153,123,119"/>
+<area shape="rect" id="Node000007" href="$lovsingle_8h.html" title=" " alt="" coords="213,167,307,192"/>
+<area shape="poly" id="edge8_Node000002_Node000007" title=" " alt="" coords="148,116,227,158,225,162,146,121"/>
+<area shape="rect" id="Node000004" href="$elementvisitor_8h.html" title=" " alt="" coords="5,240,133,265"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="118,194,89,231,85,228,114,191"/>
+<area shape="rect" id="Node000005" href="$common_8h.html" title="Common enumerations, structures, and types for OST element system." alt="" coords="107,313,197,339"/>
+<area shape="poly" id="edge7_Node000003_Node000005" title=" " alt="" coords="133,191,148,239,154,299,149,300,143,241,128,193"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="84,263,130,302,126,306,81,267"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="119,387,185,412"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="74,265,81,299,97,337,112,358,129,375,125,379,108,361,92,340,76,300,68,266"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="155,339,155,373,149,373,149,339"/>
+<area shape="rect" id="Node000008" href="$lovbase_8h.html" title=" " alt="" coords="217,240,303,265"/>
+<area shape="poly" id="edge9_Node000007_Node000008" title=" " alt="" coords="263,192,263,226,257,226,257,192"/>
+<area shape="poly" id="edge12_Node000008_Node000005" title=" " alt="" coords="244,268,183,308,180,303,241,263"/>
+<area shape="rect" id="Node000009" href="$lovvisitor_8h.html" title=" " alt="" coords="222,313,317,339"/>
+<area shape="poly" id="edge10_Node000008_Node000009" title=" " alt="" coords="264,265,269,299,263,300,259,266"/>
+<area shape="poly" id="edge11_Node000009_Node000006" title=" " alt="" coords="252,341,184,382,182,377,249,336"/>
+<area shape="poly" id="edge14_Node000010_Node000007" title=" " alt="" coords="266,119,264,153,259,153,261,119"/>
 </map>

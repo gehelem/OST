@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['jsondumper_0',['JSonDumper',['../classOST_1_1JSonDumper.html',1,'OST']]],
-  ['jsondumper_2ecpp_1',['jsondumper.cpp',['../jsondumper_8cpp.html',1,'']]],
-  ['jsondumper_2eh_2',['jsondumper.h',['../jsondumper_8h.html',1,'']]]
+  ['_5fcalpulsen_20s_20e_20w_20tt_20declared_20as_20tt_20int_20tt_20—_20precision_20loss_0',['8. &lt;tt&gt;_calPulseN/S/E/W&lt;/tt&gt; declared as &lt;tt&gt;int&lt;/tt&gt; — precision loss',['../md_src_2modules_2guider_2OST-guider-analysis.html#autotoc_md45',1,'']]]
 ];

@@ -1,5 +1,5 @@
 <map id="OST::ElementString" name="OST::ElementString">
-<area shape="rect" id="Node000001" title="String element with LOV support." alt="" coords="55,833,197,1099"/>
+<area shape="rect" id="Node000001" title="String element with LOV support." alt="" coords="55,833,197,1059"/>
 <area shape="rect" id="Node000002" href="$classOST_1_1ElementTemplateNotNumeric.html" title=" " alt="" coords="5,645,247,785"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="129,799,129,833,123,833,123,799"/>
 <area shape="rect" id="Node000003" href="$classOST_1_1ElementTemplate.html" title="Base template class for all typed elements." alt="" coords="27,452,225,597"/>

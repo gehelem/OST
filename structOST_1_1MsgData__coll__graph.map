@@ -1,9 +1,9 @@
 <map id="OST::MsgData" name="OST::MsgData">
-<area shape="rect" id="Node000001" title="Message data structure for ElementMessage." alt="" coords="97,133,203,199"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,81,71"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="68,69,99,108,109,120,105,123,95,111,64,73"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="106,5,194,71"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="153,71,153,117,147,117,147,71"/>
-<area shape="rect" id="Node000004" href="$classQString.html" title=" " alt="" coords="219,5,281,71"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="227,73,187,122,183,119,223,69"/>
+<area shape="rect" id="Node000001" title="Message data structure for ElementMessage." alt="" coords="93,133,198,199"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,77,71"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="65,69,94,108,105,120,101,123,90,111,61,72"/>
+<area shape="rect" id="Node000003" href="$classQDateTime.html" title=" " alt="" coords="101,5,189,71"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="148,71,148,117,143,117,143,71"/>
+<area shape="rect" id="Node000004" href="$classQString.html" title=" " alt="" coords="214,5,277,71"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="222,73,183,122,179,119,218,69"/>
 </map>

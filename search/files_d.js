@@ -1,7 +1,25 @@
 var searchData=
 [
-  ['solver_2ecpp_0',['solver.cpp',['../solver_8cpp.html',1,'']]],
-  ['solver_2eh_1',['solver.h',['../solver_8h.html',1,'']]],
-  ['stretch_2ecpp_2',['stretch.cpp',['../stretch_8cpp.html',1,'']]],
-  ['stretch_2eh_3',['stretch.h',['../stretch_8h.html',1,'']]]
+  ['planner_2ecpp_0',['planner.cpp',['../planner_8cpp.html',1,'']]],
+  ['planner_2eh_1',['planner.h',['../planner_8h.html',1,'']]],
+  ['planner_2emd_2',['planner.md',['../planner_8md.html',1,'']]],
+  ['polar_2danalysis_2emd_3',['polar-analysis.md',['../polar-analysis_8md.html',1,'']]],
+  ['polar_2ecpp_4',['polar.cpp',['../polar_8cpp.html',1,'']]],
+  ['polar_2efr_2emd_5',['polar.fr.md',['../polar_8fr_8md.html',1,'']]],
+  ['polar_2eh_6',['polar.h',['../polar_8h.html',1,'']]],
+  ['polynomialfit_2ecpp_7',['polynomialfit.cpp',['../guider_2polynomialfit_8cpp.html',1,'(Global Namespace)'],['../focus_2polynomialfit_8cpp.html',1,'(Global Namespace)']]],
+  ['polynomialfit_2eh_8',['polynomialfit.h',['../guider_2polynomialfit_8h.html',1,'(Global Namespace)'],['../focus_2polynomialfit_8h.html',1,'(Global Namespace)']]],
+  ['propertybase_2ecpp_9',['propertybase.cpp',['../propertybase_8cpp.html',1,'']]],
+  ['propertybase_2eh_10',['propertybase.h',['../propertybase_8h.html',1,'']]],
+  ['propertyfactory_2ecpp_11',['propertyfactory.cpp',['../propertyfactory_8cpp.html',1,'']]],
+  ['propertyfactory_2eh_12',['propertyfactory.h',['../propertyfactory_8h.html',1,'']]],
+  ['propertyjsondumper_2ecpp_13',['propertyjsondumper.cpp',['../propertyjsondumper_8cpp.html',1,'']]],
+  ['propertyjsondumper_2eh_14',['propertyjsondumper.h',['../propertyjsondumper_8h.html',1,'']]],
+  ['propertymulti_2ecpp_15',['propertymulti.cpp',['../propertymulti_8cpp.html',1,'']]],
+  ['propertymulti_2eh_16',['propertymulti.h',['../propertymulti_8h.html',1,'']]],
+  ['propertytextdumper_2ecpp_17',['propertytextdumper.cpp',['../propertytextdumper_8cpp.html',1,'']]],
+  ['propertytextdumper_2eh_18',['propertytextdumper.h',['../propertytextdumper_8h.html',1,'']]],
+  ['propertyupdate_2ecpp_19',['propertyupdate.cpp',['../propertyupdate_8cpp.html',1,'']]],
+  ['propertyupdate_2eh_20',['propertyupdate.h',['../propertyupdate_8h.html',1,'']]],
+  ['propertyvisitor_2eh_21',['propertyvisitor.h',['../propertyvisitor_8h.html',1,'']]]
 ];

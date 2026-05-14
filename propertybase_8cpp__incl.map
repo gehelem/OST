@@ -1,17 +1,18 @@
 <map id="libs/model/property/propertybase.cpp" name="libs/model/property/propertybase.cpp">
-<area shape="rect" id="Node000001" title=" " alt="" coords="69,5,218,45"/>
-<area shape="rect" id="Node000002" href="$propertybase_8h.html" title="Base class for OST properties with metadata and state management." alt="" coords="83,93,203,119"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="146,46,146,79,141,79,141,46"/>
-<area shape="rect" id="Node000003" href="$propertyvisitor_8h.html" title="Abstract visitor interface for property traversal and operations." alt="" coords="5,167,135,192"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="133,121,94,159,90,155,129,117"/>
-<area shape="rect" id="Node000005" href="$elementbase_8h.html" title="Base classes for OST typed elements and their value containers." alt="" coords="159,167,277,192"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="157,117,198,155,194,159,153,121"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="138,313,205,339"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="74,191,81,226,98,264,117,286,140,304,137,308,114,290,93,267,76,227,69,193"/>
-<area shape="rect" id="Node000006" href="$elementvisitor_8h.html" title=" " alt="" coords="107,240,235,265"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="213,194,189,230,184,227,208,191"/>
-<area shape="rect" id="Node000007" href="$common_8h.html" title="Common enumerations, structures, and types for OST element system." alt="" coords="259,240,350,265"/>
-<area shape="poly" id="edge7_Node000005_Node000007" title=" " alt="" coords="234,190,282,229,278,233,230,194"/>
-<area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="174,266,174,300,169,300,169,266"/>
-<area shape="poly" id="edge8_Node000007_Node000004" title=" " alt="" coords="284,268,206,309,204,304,282,263"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="71,5,221,45"/>
+<area shape="rect" id="Node000002" href="$propertybase_8h.html" title="Base class for OST properties with metadata and state management." alt="" coords="86,93,206,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="149,46,149,79,143,79,143,46"/>
+<area shape="rect" id="Node000003" href="$propertyvisitor_8h.html" title="Abstract visitor interface for property traversal and operations." alt="" coords="5,240,135,265"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="142,120,85,229,80,227,137,118"/>
+<area shape="rect" id="Node000005" href="$elementbase_8h.html" title="Base classes for OST typed elements and their value containers." alt="" coords="164,167,283,192"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="160,117,202,155,199,159,157,121"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="149,387,215,412"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="81,264,167,374,163,378,77,267"/>
+<area shape="rect" id="Node000006" href="$elementvisitor_8h.html" title=" " alt="" coords="159,240,287,265"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="226,192,226,226,221,226,221,192"/>
+<area shape="rect" id="Node000007" href="$common_8h.html" title="Common enumerations, structures, and types for OST element system." alt="" coords="219,313,310,339"/>
+<area shape="poly" id="edge9_Node000005_Node000007" title=" " alt="" coords="249,190,278,210,291,223,302,239,306,256,303,273,287,304,282,301,298,272,300,256,297,241,287,226,275,214,246,194"/>
+<area shape="poly" id="edge8_Node000006_Node000004" title=" " alt="" coords="223,267,192,374,186,373,217,265"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="232,264,253,300,249,303,228,267"/>
+<area shape="poly" id="edge7_Node000007_Node000004" title=" " alt="" coords="253,341,208,380,204,375,250,337"/>
 </map>

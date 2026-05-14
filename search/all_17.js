@@ -1,4 +1,29 @@
 var searchData=
 [
-  ['xy_0',['XY',['../namespaceOST.html#a2bd59f1bb3735729a6381f7e5ec5970ca82f3168f8e45f61a0137f35d55221fbe',1,'OST']]]
+  ['name_0',['name',['../structcatalogResult.html#a3268ef97bec6205c4de2d5bfa6acb30f',1,'catalogResult']]],
+  ['nan_1',['NaN',['../namespaceNaN.html',1,'']]],
+  ['nan_2eh_2',['nan.h',['../nan_8h.html',1,'']]],
+  ['navigator_3',['navigator',['../classNavigator.html#ad988b455cbef43c56b15276a553ff037',1,'Navigator::Navigator()'],['../classNavigator.html',1,'Navigator']]],
+  ['navigator_20fr_4',['@page md_src_2modules_2navigator_2navigator_8fr navigator.fr',['..//home/runner/work/OST/OST/src/modules/navigator/navigator.fr.md#autotoc_md57',1,'']]],
+  ['navigator_2ecpp_5',['navigator.cpp',['../navigator_8cpp.html',1,'']]],
+  ['navigator_2efr_2emd_6',['navigator.fr.md',['../navigator_8fr_8md.html',1,'']]],
+  ['navigator_2eh_7',['navigator.h',['../navigator_8h.html',1,'']]],
+  ['ndim_8',['ndim',['../structOST_1_1ImgData.html#ad06ec79489a1188edc3fa932621411cc',1,'OST::ImgData']]],
+  ['ne_20démarre_20pas_9',['La séquence ne démarre pas',['..//home/runner/work/OST/OST/src/modules/sequencer/sequencer.fr.md#autotoc_md164',1,'']]],
+  ['ne_20reprend_20pas_10',['Le guidage ne reprend pas',['..//home/runner/work/OST/OST/src/modules/sequencer/sequencer.fr.md#autotoc_md166',1,'']]],
+  ['ne_20sont_20pas_20sauvegardés_11',['Les fichiers ne sont pas sauvegardés',['..//home/runner/work/OST/OST/src/modules/sequencer/sequencer.fr.md#autotoc_md167',1,'']]],
+  ['newimage_12',['newimage',['../classDummy.html#ababd11e0e6c1f739459384c11aafb686',1,'Dummy::newImage()'],['../classInspector.html#a13d3464d2f956a8d43ea07cd33a66dda',1,'Inspector::newImage()'],['../classNavigator.html#a1628d3467ed1a6885a237bf4b06e3b4f',1,'Navigator::newImage()']]],
+  ['newline_13',['newLine',['../classOST_1_1PropertyMulti.html#aef6e05aff8694390fc8c343ca9572245',1,'OST::PropertyMulti']]],
+  ['nextframe_14',['nextframe',['../classSequencer.html#a219843a63427d0747d7fd896a87f1fb9',1,'Sequencer::NextFrame()'],['../classInspector.html#af36df955ed63f5148f45a01845e290b0',1,'Inspector::NextFrame()']]],
+  ['nextloop_15',['nextloop',['../classSequencer.html#aa823f226bd377ea3abc7219e62a7a082',1,'Sequencer::NextLoop()'],['../classInspector.html#a0940f6beac03017254e33ac25618249c',1,'Inspector::NextLoop()']]],
+  ['no_20mount_20moves_16',['Phase 2 — correction loop (continuous, no mount moves)',['../md_src_2modules_2polar_2polar-analysis.html#autotoc_md81',1,'']]],
+  ['no_20stars_20are_20detected_17',['4. Stale drift used when no stars are detected',['../md_src_2modules_2guider_2OST-guider-analysis.html#autotoc_md37',1,'']]],
+  ['none_18',['none',['../namespaceOST.html#a2bd59f1bb3735729a6381f7e5ec5970ca2a8a0ee258ef065c233f4121b7abd738',1,'OST']]],
+  ['normal_19',['normal',['../classRotations_1_1V3.html#ad4ed81b579ff2215995b3f00add45488',1,'Rotations::V3']]],
+  ['normal_20operation_20',['Normal operation',['..//home/runner/work/OST/OST/src/modules/guider/guider-ekos-analysis.fr.md#autotoc_md20',1,'']]],
+  ['not_20saved_21',['Files Are Not Saved',['..//home/runner/work/OST/OST/src/modules/sequencer/sequencer.en.md#autotoc_md128',1,'']]],
+  ['notes_22',['notes',['../md_src_2modules_2guider_2OST-guider-analysis.html#autotoc_md54',1,'Notes'],['../md_src_2modules_2polar_2polar-analysis.html',1,'Polar alignment — analysis and implementation notes']]],
+  ['notes_20techniques_23',['Notes techniques',['../md_src_2modules_2planner_2planner.html#autotoc_md68',1,'']]],
+  ['ns_24',['NS',['../structcatalogResult.html#ab6d098686bd66bac73eb466ff1f88e80',1,'catalogResult']]],
+  ['num_25',['num',['../structdc1394color__codings__t.html#aa765ff8efb4ec2326f33a361a0e06228',1,'dc1394color_codings_t::num'],['../structdc1394video__modes__t.html#ad8c936b5f408666f56d544a5d207f253',1,'dc1394video_modes_t::num']]]
 ];

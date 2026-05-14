@@ -1,14 +1,10 @@
 var searchData=
 [
-  ['lovbase_2eh_0',['lovbase.h',['../lovbase_8h.html',1,'']]],
-  ['lovfactory_2ecpp_1',['lovfactory.cpp',['../lovfactory_8cpp.html',1,'']]],
-  ['lovfactory_2eh_2',['lovfactory.h',['../lovfactory_8h.html',1,'']]],
-  ['lovfloat_2eh_3',['lovfloat.h',['../lovfloat_8h.html',1,'']]],
-  ['lovint_2eh_4',['lovint.h',['../lovint_8h.html',1,'']]],
-  ['lovjsondumper_2ecpp_5',['lovjsondumper.cpp',['../lovjsondumper_8cpp.html',1,'']]],
-  ['lovjsondumper_2eh_6',['lovjsondumper.h',['../lovjsondumper_8h.html',1,'']]],
-  ['lovlight_2eh_7',['lovlight.h',['../lovlight_8h.html',1,'']]],
-  ['lovsingle_2eh_8',['lovsingle.h',['../lovsingle_8h.html',1,'']]],
-  ['lovstring_2eh_9',['lovstring.h',['../lovstring_8h.html',1,'']]],
-  ['lovvisitor_2eh_10',['lovvisitor.h',['../lovvisitor_8h.html',1,'']]]
+  ['indimodule_2ecpp_0',['indimodule.cpp',['../indimodule_8cpp.html',1,'']]],
+  ['indimodule_2eh_1',['indimodule.h',['../indimodule_8h.html',1,'']]],
+  ['indipanel_2ecpp_2',['indipanel.cpp',['../indipanel_8cpp.html',1,'']]],
+  ['indipanel_2eh_3',['indipanel.h',['../indipanel_8h.html',1,'']]],
+  ['inspector_2ecpp_4',['inspector.cpp',['../inspector_8cpp.html',1,'']]],
+  ['inspector_2efr_2emd_5',['inspector.fr.md',['../inspector_8fr_8md.html',1,'']]],
+  ['inspector_2eh_6',['inspector.h',['../inspector_8h.html',1,'']]]
 ];

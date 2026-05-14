@@ -91,7 +91,7 @@ Inheritance diagram for OST::PropertyBase:</div>
 <div class="center"><img src="classOST_1_1PropertyBase__inherit__graph.png" border="0" usemap="#aOST_1_1PropertyBase_inherit__map" alt="Inheritance graph"/></div>
 <map name="aOST_1_1PropertyBase_inherit__map" id="aOST_1_1PropertyBase_inherit__map">
 <area shape="rect" title="Abstract base class for all OST properties." alt="" coords="5,119,143,384"/>
-<area shape="rect" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid." alt="" coords="5,432,143,797"/>
+<area shape="rect" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid." alt="" coords="5,432,143,757"/>
 <area shape="poly" title=" " alt="" coords="77,398,77,432,71,432,71,398"/>
 <area shape="rect" href="classQObject.html" title=" " alt="" coords="41,5,107,71"/>
 <area shape="poly" title=" " alt="" coords="77,84,77,119,71,119,71,84"/>
@@ -119,12 +119,12 @@ Signals</h2></td></tr>
 <tr class="memitem:ab519a0efa35110e3d304e79b5be21203" id="r_ab519a0efa35110e3d304e79b5be21203"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#ab519a0efa35110e3d304e79b5be21203">valueSet</a> (<a class="el" href="classOST_1_1PropertyBase.html">OST::PropertyBase</a> *)</td></tr>
 <tr class="memdesc:ab519a0efa35110e3d304e79b5be21203"><td class="mdescLeft">&#160;</td><td class="mdescRight">Signal emitted when a value in the property changes.  <br /></td></tr>
 <tr class="separator:ab519a0efa35110e3d304e79b5be21203"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec74ba39c5f179be7d276bb02ee4ed23" id="r_aec74ba39c5f179be7d276bb02ee4ed23"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#aec74ba39c5f179be7d276bb02ee4ed23">propertyEvent</a> (<a class="el" href="classQString.html">QString</a>, <a class="el" href="classQString.html">QString</a>, <a class="el" href="classOST_1_1PropertyBase.html">OST::PropertyBase</a> *)</td></tr>
-<tr class="memdesc:aec74ba39c5f179be7d276bb02ee4ed23"><td class="mdescLeft">&#160;</td><td class="mdescRight">Signal emitted for custom property events.  <br /></td></tr>
-<tr class="separator:aec74ba39c5f179be7d276bb02ee4ed23"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0449ba5e729415a02929036bdb8773df" id="r_a0449ba5e729415a02929036bdb8773df"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a0449ba5e729415a02929036bdb8773df">sendMessage</a> (<a class="el" href="namespaceOST.html#a4f7f81902ce1709285bca0ca94e65d51">MsgLevel</a>, <a class="el" href="classQString.html">QString</a>)</td></tr>
-<tr class="memdesc:a0449ba5e729415a02929036bdb8773df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Signal emitted when sending messages.  <br /></td></tr>
-<tr class="separator:a0449ba5e729415a02929036bdb8773df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23a8d90d6372523be1ea5e5038a2c6f0" id="r_a23a8d90d6372523be1ea5e5038a2c6f0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a23a8d90d6372523be1ea5e5038a2c6f0">prpEvent</a> (<a class="el" href="namespaceOST.html#a0751cbe531343f15a2486bbbdaa84c56">OST::EvType</a>, QVariant, <a class="el" href="classOST_1_1ElementBase.html">OST::ElementBase</a> *, <a class="el" href="classOST_1_1PropertyBase.html">OST::PropertyBase</a> *)</td></tr>
+<tr class="memdesc:a23a8d90d6372523be1ea5e5038a2c6f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Signal emitted when element value changes.  <br /></td></tr>
+<tr class="separator:a23a8d90d6372523be1ea5e5038a2c6f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a387153175d80bf31556615dc4c6bd34b" id="r_a387153175d80bf31556615dc4c6bd34b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a387153175d80bf31556615dc4c6bd34b">logMessage</a> (<a class="el" href="namespaceOST.html#abfdb6d02db64443c1b99449b3b945ec4">OST::LogLevel</a>, <a class="el" href="classQString.html">QString</a>, QVariantList)</td></tr>
+<tr class="memdesc:a387153175d80bf31556615dc4c6bd34b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Signal emitted when sending messages.  <br /></td></tr>
+<tr class="separator:a387153175d80bf31556615dc4c6bd34b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -164,9 +164,13 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae5e989d9098ad0a5907a949d6443e40c" id="r_ae5e989d9098ad0a5907a949d6443e40c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985a">State</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#ae5e989d9098ad0a5907a949d6443e40c">state</a> ()</td></tr>
 <tr class="memdesc:ae5e989d9098ad0a5907a949d6443e40c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get current runtime state.  <br /></td></tr>
 <tr class="separator:ae5e989d9098ad0a5907a949d6443e40c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a301c490e77dac8a961b2f8daa7841ae7" id="r_a301c490e77dac8a961b2f8daa7841ae7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a301c490e77dac8a961b2f8daa7841ae7">setState</a> (<a class="el" href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985a">State</a> <a class="el" href="classOST_1_1PropertyBase.html#ae5e989d9098ad0a5907a949d6443e40c">state</a>)</td></tr>
-<tr class="memdesc:a301c490e77dac8a961b2f8daa7841ae7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set runtime state.  <br /></td></tr>
-<tr class="separator:a301c490e77dac8a961b2f8daa7841ae7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4386be375259e0fa94e7b112bb7cf432" id="r_a4386be375259e0fa94e7b112bb7cf432"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a4386be375259e0fa94e7b112bb7cf432">setState</a> (<a class="el" href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985a">State</a> <a class="el" href="classOST_1_1PropertyBase.html#ae5e989d9098ad0a5907a949d6443e40c">state</a>, <a class="el" href="classbool.html">bool</a> emitEvent)</td></tr>
+<tr class="memdesc:a4386be375259e0fa94e7b112bb7cf432"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set runtime state.  <br /></td></tr>
+<tr class="separator:a4386be375259e0fa94e7b112bb7cf432"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b866576cbdc1d2b86754defcfd47613" id="r_a3b866576cbdc1d2b86754defcfd47613"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a3b866576cbdc1d2b86754defcfd47613">autoUpdate</a> ()</td></tr>
+<tr class="separator:a3b866576cbdc1d2b86754defcfd47613"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6801f070bfd0d9c9a93ddcca127b16f3" id="r_a6801f070bfd0d9c9a93ddcca127b16f3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a6801f070bfd0d9c9a93ddcca127b16f3">setAutoUpdate</a> (<a class="el" href="classbool.html">bool</a> b)</td></tr>
+<tr class="separator:a6801f070bfd0d9c9a93ddcca127b16f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a332a00d4f8dcdc7a38dc1c7339a3128e" id="r_a332a00d4f8dcdc7a38dc1c7339a3128e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbool.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a332a00d4f8dcdc7a38dc1c7339a3128e">isEnabled</a> ()</td></tr>
 <tr class="memdesc:a332a00d4f8dcdc7a38dc1c7339a3128e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if property is enabled.  <br /></td></tr>
 <tr class="separator:a332a00d4f8dcdc7a38dc1c7339a3128e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -182,15 +186,21 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a33b53ec9f9936f16daffed24341933a3" id="r_a33b53ec9f9936f16daffed24341933a3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a33b53ec9f9936f16daffed24341933a3">setBadge</a> (<a class="el" href="classbool.html">bool</a> b)</td></tr>
 <tr class="memdesc:a33b53ec9f9936f16daffed24341933a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set badge visibility.  <br /></td></tr>
 <tr class="separator:a33b53ec9f9936f16daffed24341933a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7c4d9099a97187c2dacd55a9abfc2ba6" id="r_a7c4d9099a97187c2dacd55a9abfc2ba6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a7c4d9099a97187c2dacd55a9abfc2ba6">sendInfo</a> (<a class="el" href="classQString.html">QString</a> m)</td></tr>
-<tr class="memdesc:a7c4d9099a97187c2dacd55a9abfc2ba6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send informational message.  <br /></td></tr>
-<tr class="separator:a7c4d9099a97187c2dacd55a9abfc2ba6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6a4758e6c28ae9b29eccbb50db961ebe" id="r_a6a4758e6c28ae9b29eccbb50db961ebe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a6a4758e6c28ae9b29eccbb50db961ebe">sendWarning</a> (<a class="el" href="classQString.html">QString</a> m)</td></tr>
-<tr class="memdesc:a6a4758e6c28ae9b29eccbb50db961ebe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send warning message.  <br /></td></tr>
-<tr class="separator:a6a4758e6c28ae9b29eccbb50db961ebe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d511ae6758e6bb4ae27b1580668289f" id="r_a2d511ae6758e6bb4ae27b1580668289f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a2d511ae6758e6bb4ae27b1580668289f">sendError</a> (<a class="el" href="classQString.html">QString</a> m)</td></tr>
-<tr class="memdesc:a2d511ae6758e6bb4ae27b1580668289f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send error message.  <br /></td></tr>
-<tr class="separator:a2d511ae6758e6bb4ae27b1580668289f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad8f83709d778cda403156a5ea46f26a6" id="r_ad8f83709d778cda403156a5ea46f26a6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#ad8f83709d778cda403156a5ea46f26a6">logDebug</a> (<a class="el" href="classQString.html">QString</a> m, const QVariantList &amp;args={})</td></tr>
+<tr class="memdesc:ad8f83709d778cda403156a5ea46f26a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send debug message.  <br /></td></tr>
+<tr class="separator:ad8f83709d778cda403156a5ea46f26a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a62eac24ca38b657b5ce003139377d2b2" id="r_a62eac24ca38b657b5ce003139377d2b2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a62eac24ca38b657b5ce003139377d2b2">logInfo</a> (<a class="el" href="classQString.html">QString</a> m, const QVariantList &amp;args={})</td></tr>
+<tr class="memdesc:a62eac24ca38b657b5ce003139377d2b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send informational message.  <br /></td></tr>
+<tr class="separator:a62eac24ca38b657b5ce003139377d2b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a527b18876183ed2b274271bff055d177" id="r_a527b18876183ed2b274271bff055d177"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a527b18876183ed2b274271bff055d177">logWarning</a> (<a class="el" href="classQString.html">QString</a> m, const QVariantList &amp;args={})</td></tr>
+<tr class="memdesc:a527b18876183ed2b274271bff055d177"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send warning message.  <br /></td></tr>
+<tr class="separator:a527b18876183ed2b274271bff055d177"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac148292a8f40d2f14d31a7a020baa7e2" id="r_ac148292a8f40d2f14d31a7a020baa7e2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#ac148292a8f40d2f14d31a7a020baa7e2">logError</a> (<a class="el" href="classQString.html">QString</a> m, const QVariantList &amp;args={})</td></tr>
+<tr class="memdesc:ac148292a8f40d2f14d31a7a020baa7e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send error message.  <br /></td></tr>
+<tr class="separator:ac148292a8f40d2f14d31a7a020baa7e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac7863f2669dd3f9306873603a9b5c0fd" id="r_ac7863f2669dd3f9306873603a9b5c0fd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#ac7863f2669dd3f9306873603a9b5c0fd">logCritical</a> (<a class="el" href="classQString.html">QString</a> m, const QVariantList &amp;args={})</td></tr>
+<tr class="memdesc:ac7863f2669dd3f9306873603a9b5c0fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send critical message.  <br /></td></tr>
+<tr class="separator:ac7863f2669dd3f9306873603a9b5c0fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a503a14efb34bf0e3cc63a998e7845c44" id="r_a503a14efb34bf0e3cc63a998e7845c44"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classQString.html">QString</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a503a14efb34bf0e3cc63a998e7845c44">getPreIcon1</a> (void)</td></tr>
 <tr class="memdesc:a503a14efb34bf0e3cc63a998e7845c44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get first prefix icon identifier.  <br /></td></tr>
 <tr class="separator:a503a14efb34bf0e3cc63a998e7845c44"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -221,6 +231,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a0ab222a7f40266fbfebfc3c76d7bdd12" id="r_a0ab222a7f40266fbfebfc3c76d7bdd12"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a0ab222a7f40266fbfebfc3c76d7bdd12">setFreeValue</a> (<a class="el" href="classQString.html">QString</a> s)</td></tr>
 <tr class="memdesc:a0ab222a7f40266fbfebfc3c76d7bdd12"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set free-form value field.  <br /></td></tr>
 <tr class="separator:a0ab222a7f40266fbfebfc3c76d7bdd12"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a92161b68e846035e943decc9c4327867" id="r_a92161b68e846035e943decc9c4327867"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOST_1_1PropertyBase.html#a92161b68e846035e943decc9c4327867">sendDump</a> ()</td></tr>
+<tr class="separator:a92161b68e846035e943decc9c4327867"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Abstract base class for all <a class="el" href="namespaceOST.html">OST</a> properties. </p>
@@ -416,6 +428,23 @@ Public Member Functions</h2></td></tr>
 <p>Overloaded accept method that allows passing data to the visitor. Used for operations that need external data, like updates from frontend. </p>
 
 <p>Implemented in <a class="el" href="classOST_1_1PropertyMulti.html#afd4f9980bdf69b9fc4d0b752fde0bc52">OST::PropertyMulti</a>.</p>
+
+</div>
+</div>
+<a id="a3b866576cbdc1d2b86754defcfd47613" name="a3b866576cbdc1d2b86754defcfd47613"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3b866576cbdc1d2b86754defcfd47613">&#9670;&#160;</a></span>autoUpdate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbool.html">bool</a> OST::PropertyBase::autoUpdate </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -753,6 +782,249 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="ac7863f2669dd3f9306873603a9b5c0fd" name="ac7863f2669dd3f9306873603a9b5c0fd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac7863f2669dd3f9306873603a9b5c0fd">&#9670;&#160;</a></span>logCritical()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyBase::logCritical </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classQString.html">QString</a>&#160;</td>
+          <td class="paramname"><em>m</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const QVariantList &amp;&#160;</td>
+          <td class="paramname"><em>args</em> = <code>{}</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Send critical message. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">m</td><td>Message text </td></tr>
+    <tr><td class="paramname">args</td><td>Arguments for parametric translation</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Emits sendMessage() signal with Info level. Messages are typically logged and displayed in frontend message area. </p>
+
+</div>
+</div>
+<a id="ad8f83709d778cda403156a5ea46f26a6" name="ad8f83709d778cda403156a5ea46f26a6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad8f83709d778cda403156a5ea46f26a6">&#9670;&#160;</a></span>logDebug()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyBase::logDebug </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classQString.html">QString</a>&#160;</td>
+          <td class="paramname"><em>m</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const QVariantList &amp;&#160;</td>
+          <td class="paramname"><em>args</em> = <code>{}</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Send debug message. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">m</td><td>Message text </td></tr>
+    <tr><td class="paramname">args</td><td>Arguments for parametric translation</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Emits sendMessage() signal with Info level. Messages are typically logged and displayed in frontend message area. </p>
+
+</div>
+</div>
+<a id="ac148292a8f40d2f14d31a7a020baa7e2" name="ac148292a8f40d2f14d31a7a020baa7e2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac148292a8f40d2f14d31a7a020baa7e2">&#9670;&#160;</a></span>logError()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyBase::logError </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classQString.html">QString</a>&#160;</td>
+          <td class="paramname"><em>m</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const QVariantList &amp;&#160;</td>
+          <td class="paramname"><em>args</em> = <code>{}</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Send error message. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">m</td><td>Message text </td></tr>
+    <tr><td class="paramname">args</td><td>Arguments for parametric translation</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Emits sendMessage() signal with Err level. Errors indicate failures that may require user intervention. </p>
+
+</div>
+</div>
+<a id="a62eac24ca38b657b5ce003139377d2b2" name="a62eac24ca38b657b5ce003139377d2b2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a62eac24ca38b657b5ce003139377d2b2">&#9670;&#160;</a></span>logInfo()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyBase::logInfo </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classQString.html">QString</a>&#160;</td>
+          <td class="paramname"><em>m</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const QVariantList &amp;&#160;</td>
+          <td class="paramname"><em>args</em> = <code>{}</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Send informational message. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">m</td><td>Message text </td></tr>
+    <tr><td class="paramname">args</td><td>Arguments for parametric translation</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Emits sendMessage() signal with Info level. Messages are typically logged and displayed in frontend message area. </p>
+
+</div>
+</div>
+<a id="a387153175d80bf31556615dc4c6bd34b" name="a387153175d80bf31556615dc4c6bd34b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a387153175d80bf31556615dc4c6bd34b">&#9670;&#160;</a></span>logMessage</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyBase::logMessage </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceOST.html#abfdb6d02db64443c1b99449b3b945ec4">OST::LogLevel</a>&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classQString.html">QString</a>&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QVariantList&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">signal</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Signal emitted when sending messages. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">level</td><td>Message level (Debug, Info, Warning, Error, Critical) </td></tr>
+    <tr><td class="paramname">message</td><td>Message text (translation key) </td></tr>
+    <tr><td class="paramname">args</td><td>Arguments for parametric translation</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Messages are propagated to module level and eventually to frontend. Used by sendInfo(), sendWarning(), sendError() methods. </p>
+
+</div>
+</div>
+<a id="a527b18876183ed2b274271bff055d177" name="a527b18876183ed2b274271bff055d177"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a527b18876183ed2b274271bff055d177">&#9670;&#160;</a></span>logWarning()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OST::PropertyBase::logWarning </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classQString.html">QString</a>&#160;</td>
+          <td class="paramname"><em>m</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const QVariantList &amp;&#160;</td>
+          <td class="paramname"><em>args</em> = <code>{}</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Send warning message. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">m</td><td>Message text </td></tr>
+    <tr><td class="paramname">args</td><td>Arguments for parametric translation</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Emits sendMessage() signal with Warn level. Warnings indicate potential issues but don't stop execution. </p>
+
+</div>
+</div>
 <a id="a3f78603c9cc0ffe1bbbbf9ada04f7437" name="a3f78603c9cc0ffe1bbbbf9ada04f7437"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3f78603c9cc0ffe1bbbbf9ada04f7437">&#9670;&#160;</a></span>order()</h2>
 
@@ -796,8 +1068,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="aec74ba39c5f179be7d276bb02ee4ed23" name="aec74ba39c5f179be7d276bb02ee4ed23"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aec74ba39c5f179be7d276bb02ee4ed23">&#9670;&#160;</a></span>propertyEvent</h2>
+<a id="a23a8d90d6372523be1ea5e5038a2c6f0" name="a23a8d90d6372523be1ea5e5038a2c6f0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a23a8d90d6372523be1ea5e5038a2c6f0">&#9670;&#160;</a></span>prpEvent</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -806,15 +1078,21 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void OST::PropertyBase::propertyEvent </td>
+          <td class="memname">void OST::PropertyBase::prpEvent </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classQString.html">QString</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="namespaceOST.html#a0751cbe531343f15a2486bbbdaa84c56">OST::EvType</a>&#160;</td>
           <td class="paramname">, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classQString.html">QString</a>&#160;</td>
+          <td class="paramtype">QVariant&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classOST_1_1ElementBase.html">OST::ElementBase</a> *&#160;</td>
           <td class="paramname">, </td>
         </tr>
         <tr>
@@ -836,143 +1114,52 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Signal emitted for custom property events. </p>
+<p>Signal emitted when element value changes. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">eventType</td><td>Type of event (e.g., "Flcreate", "Fldelete") </td></tr>
-    <tr><td class="paramname">eventKey</td><td>Key identifier for the event </td></tr>
-    <tr><td class="paramname">prop</td><td>Pointer to the property</td></tr>
+    <tr><td class="paramname">event</td><td>Event descriptor </td></tr>
+    <tr><td class="paramname">data</td><td>Additional payload </td></tr>
+    <tr><td class="paramname">elt</td><td>Pointer to this element </td></tr>
+    <tr><td class="paramname">prop</td><td>Pointer to this property</td></tr>
   </table>
   </dd>
 </dl>
-<p>Generic event mechanism for property-level operations like grid line creation/deletion, up/down movements, etc. </p>
+<p>Emitted by derived template classes when setValue() is called. Propagated to parent property's OnValueSet slot. </p>
 
 </div>
 </div>
-<a id="a2d511ae6758e6bb4ae27b1580668289f" name="a2d511ae6758e6bb4ae27b1580668289f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2d511ae6758e6bb4ae27b1580668289f">&#9670;&#160;</a></span>sendError()</h2>
+<a id="a92161b68e846035e943decc9c4327867" name="a92161b68e846035e943decc9c4327867"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a92161b68e846035e943decc9c4327867">&#9670;&#160;</a></span>sendDump()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void OST::PropertyBase::sendError </td>
+          <td class="memname">void OST::PropertyBase::sendDump </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classQString.html">QString</a>&#160;</td>
-          <td class="paramname"><em>m</em></td><td>)</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Send error message. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">m</td><td>Message text</td></tr>
-  </table>
-  </dd>
-</dl>
-<p>Emits <a class="el" href="classOST_1_1PropertyBase.html#a0449ba5e729415a02929036bdb8773df" title="Signal emitted when sending messages.">sendMessage()</a> signal with Err level. Errors indicate failures that may require user intervention. </p>
-
 </div>
 </div>
-<a id="a7c4d9099a97187c2dacd55a9abfc2ba6" name="a7c4d9099a97187c2dacd55a9abfc2ba6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7c4d9099a97187c2dacd55a9abfc2ba6">&#9670;&#160;</a></span>sendInfo()</h2>
+<a id="a6801f070bfd0d9c9a93ddcca127b16f3" name="a6801f070bfd0d9c9a93ddcca127b16f3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6801f070bfd0d9c9a93ddcca127b16f3">&#9670;&#160;</a></span>setAutoUpdate()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void OST::PropertyBase::sendInfo </td>
+          <td class="memname">void OST::PropertyBase::setAutoUpdate </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classQString.html">QString</a>&#160;</td>
-          <td class="paramname"><em>m</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="classbool.html">bool</a>&#160;</td>
+          <td class="paramname"><em>b</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Send informational message. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">m</td><td>Message text</td></tr>
-  </table>
-  </dd>
-</dl>
-<p>Emits <a class="el" href="classOST_1_1PropertyBase.html#a0449ba5e729415a02929036bdb8773df" title="Signal emitted when sending messages.">sendMessage()</a> signal with Info level. Messages are typically logged and displayed in frontend message area. </p>
-
-</div>
-</div>
-<a id="a0449ba5e729415a02929036bdb8773df" name="a0449ba5e729415a02929036bdb8773df"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0449ba5e729415a02929036bdb8773df">&#9670;&#160;</a></span>sendMessage</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void OST::PropertyBase::sendMessage </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="namespaceOST.html#a4f7f81902ce1709285bca0ca94e65d51">MsgLevel</a>&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classQString.html">QString</a>&#160;</td>
-          <td class="paramname">&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">signal</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Signal emitted when sending messages. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">level</td><td>Message level (Info, Warn, Err) </td></tr>
-    <tr><td class="paramname">message</td><td>Message text</td></tr>
-  </table>
-  </dd>
-</dl>
-<p>Messages are propagated to module level and eventually to frontend. Used by <a class="el" href="classOST_1_1PropertyBase.html#a7c4d9099a97187c2dacd55a9abfc2ba6" title="Send informational message.">sendInfo()</a>, <a class="el" href="classOST_1_1PropertyBase.html#a6a4758e6c28ae9b29eccbb50db961ebe" title="Send warning message.">sendWarning()</a>, <a class="el" href="classOST_1_1PropertyBase.html#a2d511ae6758e6bb4ae27b1580668289f" title="Send error message.">sendError()</a> methods. </p>
-
-</div>
-</div>
-<a id="a6a4758e6c28ae9b29eccbb50db961ebe" name="a6a4758e6c28ae9b29eccbb50db961ebe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6a4758e6c28ae9b29eccbb50db961ebe">&#9670;&#160;</a></span>sendWarning()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void OST::PropertyBase::sendWarning </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classQString.html">QString</a>&#160;</td>
-          <td class="paramname"><em>m</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Send warning message. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">m</td><td>Message text</td></tr>
-  </table>
-  </dd>
-</dl>
-<p>Emits <a class="el" href="classOST_1_1PropertyBase.html#a0449ba5e729415a02929036bdb8773df" title="Signal emitted when sending messages.">sendMessage()</a> signal with Warn level. Warnings indicate potential issues but don't stop execution. </p>
 
 </div>
 </div>
@@ -1134,8 +1321,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a301c490e77dac8a961b2f8daa7841ae7" name="a301c490e77dac8a961b2f8daa7841ae7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a301c490e77dac8a961b2f8daa7841ae7">&#9670;&#160;</a></span>setState()</h2>
+<a id="a4386be375259e0fa94e7b112bb7cf432" name="a4386be375259e0fa94e7b112bb7cf432"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4386be375259e0fa94e7b112bb7cf432">&#9670;&#160;</a></span>setState()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1144,8 +1331,18 @@ Public Member Functions</h2></td></tr>
           <td class="memname">void OST::PropertyBase::setState </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985a">State</a>&#160;</td>
-          <td class="paramname"><em>state</em></td><td>)</td>
+          <td class="paramname"><em>state</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="classbool.html">bool</a>&#160;</td>
+          <td class="paramname"><em>emitEvent</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1161,8 +1358,8 @@ Public Member Functions</h2></td></tr>
 <dl class="section user"><dt>Usage Example:</dt><dd><div class="fragment"><div class="line"><span class="keyword">property</span>-&gt;setState(<a class="code hl_enumvalue" href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985aae7081daa09b8fd301aa77e4bad531a36">OST::Busy</a>);  <span class="comment">// Start operation</span></div>
 <div class="line"><span class="comment">// ... do work ...</span></div>
 <div class="line"><span class="keyword">property</span>-&gt;setState(<a class="code hl_enumvalue" href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985aac4055be61d9eeb9e2cff30c68bc54d58">OST::Ok</a>);    <span class="comment">// Success</span></div>
-<div class="ttc" id="anamespaceOST_html_a96b9a9a658dc07a226a0885a3094985aac4055be61d9eeb9e2cff30c68bc54d58"><div class="ttname"><a href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985aac4055be61d9eeb9e2cff30c68bc54d58">OST::Ok</a></div><div class="ttdeci">@ Ok</div><div class="ttdef"><b>Definition</b> common.h:44</div></div>
-<div class="ttc" id="anamespaceOST_html_a96b9a9a658dc07a226a0885a3094985aae7081daa09b8fd301aa77e4bad531a36"><div class="ttname"><a href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985aae7081daa09b8fd301aa77e4bad531a36">OST::Busy</a></div><div class="ttdeci">@ Busy</div><div class="ttdef"><b>Definition</b> common.h:45</div></div>
+<div class="ttc" id="anamespaceOST_html_a96b9a9a658dc07a226a0885a3094985aac4055be61d9eeb9e2cff30c68bc54d58"><div class="ttname"><a href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985aac4055be61d9eeb9e2cff30c68bc54d58">OST::Ok</a></div><div class="ttdeci">@ Ok</div><div class="ttdef"><b>Definition</b> common.h:47</div></div>
+<div class="ttc" id="anamespaceOST_html_a96b9a9a658dc07a226a0885a3094985aae7081daa09b8fd301aa77e4bad531a36"><div class="ttname"><a href="namespaceOST.html#a96b9a9a658dc07a226a0885a3094985aae7081daa09b8fd301aa77e4bad531a36">OST::Busy</a></div><div class="ttdeci">@ Busy</div><div class="ttdef"><b>Definition</b> common.h:48</div></div>
 </div><!-- fragment --> </dd></dl>
 
 </div>
@@ -1185,7 +1382,7 @@ Public Member Functions</h2></td></tr>
 <p>Get current runtime state. </p>
 <dl class="section return"><dt>Returns</dt><dd>Current State enum value (Idle, Ok, Busy, Error)</dd></dl>
 <p>State represents the runtime status of operations on this property. Frontend typically displays different colors based on state.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classOST_1_1PropertyBase.html#a301c490e77dac8a961b2f8daa7841ae7" title="Set runtime state.">setState()</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classOST_1_1PropertyBase.html#a4386be375259e0fa94e7b112bb7cf432" title="Set runtime state.">setState()</a> </dd></dl>
 
 </div>
 </div>

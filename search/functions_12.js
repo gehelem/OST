@@ -2,6 +2,6 @@ var searchData=
 [
   ['todmsstring_0',['toDMSString',['../classdms.html#a504ca5421c5e46a8f44ca3cfbf302074',1,'dms']]],
   ['tohmsstring_1',['toHMSString',['../classdms.html#a61313ada5bc7418dfbeef21c9bf8c0d1',1,'dms']]],
-  ['translate_2',['translate',['../classOST_1_1Translate.html#a13457d43403888a2fa9c95759a1d2efe',1,'OST::Translate::Translate(void)'],['../classOST_1_1Translate.html#a002d6e6417636ac716981c1226ef5834',1,'OST::Translate::Translate(Translate &amp;other)=delete'],['../classOST_1_1Translate.html#a48c8929d9e61948d9166d290a762b807',1,'OST::Translate::translate(QString val)']]],
-  ['ts_3',['ts',['../classOST_1_1ElementMessage.html#a6a4f98b11ae1743ec7ca4835a0cfa7d6',1,'OST::ElementMessage']]]
+  ['translatemanager_2',['translatemanager',['../classOST_1_1TranslateManager.html#ae8116b7d1232c593193aa9729668d540',1,'OST::TranslateManager::TranslateManager()'],['../classOST_1_1TranslateManager.html#ac926455041a7094e8bf28a83f3f0f18c',1,'OST::TranslateManager::TranslateManager(const TranslateManager &amp;)=delete']]],
+  ['translatewithargs_3',['translateWithArgs',['../classOST_1_1TranslateManager.html#aa97d3e1266ea5764cdf318c3748a4fbb',1,'OST::TranslateManager']]]
 ];

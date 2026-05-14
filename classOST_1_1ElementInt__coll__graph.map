@@ -1,5 +1,5 @@
 <map id="OST::ElementInt" name="OST::ElementInt">
-<area shape="rect" id="Node000001" title="Integer element with validation and LOV support." alt="" coords="91,992,212,1257"/>
+<area shape="rect" id="Node000001" title="Integer element with validation and LOV support." alt="" coords="91,992,212,1217"/>
 <area shape="rect" id="Node000002" href="$classOST_1_1ElementTemplateNumeric.html" title=" " alt="" coords="42,663,261,943"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="154,956,154,992,149,992,149,956"/>
 <area shape="rect" id="Node000003" href="$classOST_1_1ElementTemplate.html" title="Base template class for all typed elements." alt="" coords="52,468,251,613"/>

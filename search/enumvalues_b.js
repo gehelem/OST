@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['warn_0',['Warn',['../namespaceOST.html#a4f7f81902ce1709285bca0ca94e65d51af13f0858a825328e241e051b7f179a26',1,'OST']]],
-  ['writeonly_1',['WriteOnly',['../namespaceOST.html#a9be35f589fb7dd8d44169b078554ad72a78dd3ff2982e959be4f01327797af13e',1,'OST']]]
+  ['none_0',['none',['../namespaceOST.html#a2bd59f1bb3735729a6381f7e5ec5970ca2a8a0ee258ef065c233f4121b7abd738',1,'OST']]]
 ];

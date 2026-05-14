@@ -1,7 +1,7 @@
 <map id="OST::LovString" name="OST::LovString">
-<area shape="rect" id="Node000001" title=" " alt="" coords="44,605,155,731"/>
-<area shape="rect" id="Node000002" href="$classOST_1_1LovSingle.html" title=" " alt="" coords="5,352,193,557"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,571,102,605,97,605,97,571"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="44,625,155,751"/>
+<area shape="rect" id="Node000002" href="$classOST_1_1LovSingle.html" title=" " alt="" coords="5,352,193,577"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,591,102,625,97,625,97,591"/>
 <area shape="rect" id="Node000003" href="$classOST_1_1LovBase.html" title=" " alt="" coords="47,119,152,304"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="102,318,102,352,97,352,97,318"/>
 <area shape="rect" id="Node000004" href="$classQObject.html" title=" " alt="" coords="66,5,133,71"/>

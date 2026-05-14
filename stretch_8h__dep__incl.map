@@ -1,13 +1,45 @@
 <map id="libs/stretch.h" name="libs/stretch.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="165,5,271,31"/>
-<area shape="rect" id="Node000002" href="$fileio_8h.html" title=" " alt="" coords="106,79,199,104"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="200,43,165,80,161,77,196,39"/>
-<area shape="rect" id="Node000006" href="$stretch_8cpp.html" title=" " alt="" coords="224,79,345,104"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="240,39,276,77,272,80,237,43"/>
-<area shape="rect" id="Node000003" href="$fileio_8cpp.html" title=" " alt="" coords="5,152,113,177"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="129,114,76,154,73,150,125,110"/>
-<area shape="rect" id="Node000004" href="$dummy_8h.html" title=" " alt="" coords="138,152,357,177"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="180,110,233,150,230,154,177,114"/>
-<area shape="rect" id="Node000005" href="$dummy_8cpp.html" title=" " alt="" coords="130,225,365,251"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="250,191,250,225,245,225,245,191"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="938,5,1045,31"/>
+<area shape="rect" id="Node000002" href="$fileio_8h.html" title=" " alt="" coords="879,79,973,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="973,43,939,80,935,77,969,39"/>
+<area shape="rect" id="Node000022" href="$stretch_8cpp.html" title=" " alt="" coords="997,79,1119,104"/>
+<area shape="poly" id="edge21_Node000001_Node000022" title=" " alt="" coords="1014,39,1049,77,1045,80,1010,43"/>
+<area shape="rect" id="Node000003" href="$fileio_8cpp.html" title=" " alt="" coords="5,159,113,185"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="866,96,732,99,548,107,337,125,125,155,95,162,94,157,124,149,337,120,547,102,732,93,866,90"/>
+<area shape="rect" id="Node000004" href="$allsky_8h.html" title=" " alt="" coords="137,152,280,192"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="866,98,616,117,455,133,293,155,280,157,280,152,292,149,454,128,615,111,866,93"/>
+<area shape="rect" id="Node000006" href="$dummy_8h.html" title=" " alt="" coords="305,159,523,185"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="866,104,536,155,488,162,487,157,535,149,865,99"/>
+<area shape="rect" id="Node000008" href="$focus_8h.html" title=" " alt="" coords="548,159,739,185"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="873,110,685,162,684,157,871,105"/>
+<area shape="rect" id="Node000010" href="$guider_8h.html" title=" " alt="" coords="763,152,910,192"/>
+<area shape="poly" id="edge9_Node000002_Node000010" title=" " alt="" coords="904,115,860,154,856,150,901,111"/>
+<area shape="rect" id="Node000012" href="$indipanel_8h.html" title=" " alt="" coords="934,152,1099,192"/>
+<area shape="poly" id="edge11_Node000002_Node000012" title=" " alt="" coords="951,111,997,150,993,154,948,115"/>
+<area shape="rect" id="Node000014" href="$inspector_8h.html" title=" " alt="" coords="1123,152,1289,192"/>
+<area shape="poly" id="edge13_Node000002_Node000014" title=" " alt="" coords="981,105,1139,149,1138,154,979,110"/>
+<area shape="rect" id="Node000016" href="$navigator_8h.html" title=" " alt="" coords="1313,152,1480,192"/>
+<area shape="poly" id="edge15_Node000002_Node000016" title=" " alt="" coords="987,102,1146,126,1301,149,1313,152,1312,157,1300,155,1145,131,986,107"/>
+<area shape="rect" id="Node000018" href="$polar_8h.html" title=" " alt="" coords="1509,159,1695,185"/>
+<area shape="poly" id="edge17_Node000002_Node000018" title=" " alt="" coords="986,101,1129,118,1241,126,1351,134,1492,149,1540,157,1539,162,1491,155,1351,139,1240,132,1129,123,986,107"/>
+<area shape="rect" id="Node000020" href="$sequencer_8h.html" title=" " alt="" coords="1727,152,1899,192"/>
+<area shape="poly" id="edge19_Node000002_Node000020" title=" " alt="" coords="986,101,1190,120,1349,126,1507,131,1708,149,1727,152,1726,157,1707,155,1507,137,1348,131,1189,126,986,107"/>
+<area shape="rect" id="Node000005" href="$allsky_8cpp.html" title=" " alt="" coords="105,240,248,280"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="199,206,186,241,181,239,194,204"/>
+<area shape="rect" id="Node000007" href="$dummy_8cpp.html" title=" " alt="" coords="273,247,507,273"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="410,199,396,248,391,246,404,197"/>
+<area shape="rect" id="Node000009" href="$focus_8cpp.html" title=" " alt="" coords="532,247,739,273"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="644,199,639,247,634,247,638,198"/>
+<area shape="rect" id="Node000011" href="$guider_8cpp.html" title="Autoguiding module for OST &#45; Corrects telescope tracking drift." alt="" coords="763,240,910,280"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="839,206,839,240,834,240,834,206"/>
+<area shape="rect" id="Node000013" href="$indipanel_8cpp.html" title=" " alt="" coords="934,240,1099,280"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="1019,206,1019,240,1014,240,1014,206"/>
+<area shape="rect" id="Node000015" href="$inspector_8cpp.html" title=" " alt="" coords="1123,240,1289,280"/>
+<area shape="poly" id="edge14_Node000014_Node000015" title=" " alt="" coords="1209,206,1209,240,1203,240,1203,206"/>
+<area shape="rect" id="Node000017" href="$navigator_8cpp.html" title=" " alt="" coords="1313,240,1480,280"/>
+<area shape="poly" id="edge16_Node000016_Node000017" title=" " alt="" coords="1399,206,1399,240,1394,240,1394,206"/>
+<area shape="rect" id="Node000019" href="$polar_8cpp.html" title=" " alt="" coords="1504,247,1705,273"/>
+<area shape="poly" id="edge18_Node000018_Node000019" title=" " alt="" coords="1605,198,1607,247,1602,247,1600,199"/>
+<area shape="rect" id="Node000021" href="$sequencer_8cpp.html" title=" " alt="" coords="1729,240,1901,280"/>
+<area shape="poly" id="edge20_Node000020_Node000021" title=" " alt="" coords="1816,206,1817,240,1812,240,1811,206"/>
 </map>

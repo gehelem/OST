@@ -1,7 +1,5 @@
 <map id="Datastore" name="Datastore">
-<area shape="rect" id="Node000001" title="Class to provide properties management for OST modules." alt="" coords="19,432,142,737"/>
-<area shape="rect" id="Node000002" href="$classBaseroot.html" title=" " alt="" coords="5,119,156,384"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,398,83,432,78,432,78,398"/>
-<area shape="rect" id="Node000003" href="$classQObject.html" title=" " alt="" coords="47,5,114,71"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="83,84,83,119,78,119,78,84"/>
+<area shape="rect" id="Node000001" title="Class to provide properties management for OST modules." alt="" coords="5,119,152,564"/>
+<area shape="rect" id="Node000002" href="$classQObject.html" title=" " alt="" coords="45,5,112,71"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="81,84,81,118,76,118,76,84"/>
 </map>

@@ -1,5 +1,5 @@
 <map id="OST::ElementTime" name="OST::ElementTime">
-<area shape="rect" id="Node000001" title="Time element for time&#45;of&#45;day selection." alt="" coords="57,833,195,1039"/>
+<area shape="rect" id="Node000001" title="Time element for time&#45;of&#45;day selection." alt="" coords="57,833,195,999"/>
 <area shape="rect" id="Node000002" href="$classOST_1_1ElementTemplateNotNumeric.html" title=" " alt="" coords="5,645,247,785"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="129,799,129,833,123,833,123,799"/>
 <area shape="rect" id="Node000003" href="$classOST_1_1ElementTemplate.html" title="Base template class for all typed elements." alt="" coords="27,452,225,597"/>

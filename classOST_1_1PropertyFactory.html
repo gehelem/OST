@@ -264,7 +264,7 @@ Commented INDI-related methods are legacy code for INDI protocol conversion.</dd
 <dl class="section note"><dt>Note</dt><dd>Caller is responsible for deleting the returned <a class="el" href="classOST_1_1PropertyMulti.html" title="Concrete property class containing multiple typed elements with optional grid.">PropertyMulti</a>. </dd>
 <dd>
 Uses <a class="el" href="classOST_1_1ElementFactory.html">ElementFactory</a> internally to create elements from config.</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classOST_1_1ElementFactory.html#a8574ec237845cbe7bc9a7aa0ce04a410">ElementFactory::createElement()</a> </dd>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classOST_1_1ElementFactory.html#a52aa267604013089c4b0068c9892575c">ElementFactory::createElement()</a> </dd>
 <dd>
 <a class="el" href="classOST_1_1PropertyMulti.html#ad4b28df72a221cde9e8f8d6f6ad9891b" title="Construct a new PropertyMulti object.">PropertyMulti::PropertyMulti()</a></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -300,7 +300,7 @@ Uses <a class="el" href="classOST_1_1ElementFactory.html">ElementFactory</a> int
 </dd></dl>
 <dl class="section user"><dt>Optional Fields in pData:</dt><dd><ul>
 <li>"rule": int - SwitchsRule (0=OneOfMany, 1=AtMostOne, 2=Any, default=Any)</li>
-<li>"elements": QVariantMap - Element definitions (key → element config)</li>
+<li>"e": QVariantMap - Element definitions (key → element config)</li>
 <li>"showGrid": bool - Grid visibility (default=false)</li>
 <li>"showElts": bool - Elements visibility (default=true)</li>
 <li>"gridLimit": int - Max grid lines (default unlimited)</li>
@@ -316,7 +316,7 @@ Uses <a class="el" href="classOST_1_1ElementFactory.html">ElementFactory</a> int
 <li>"freevalue": QString - Custom free value field</li>
 </ul>
 </dd></dl>
-<dl class="section user"><dt>Element Creation:</dt><dd>Elements are created using <a class="el" href="classOST_1_1ElementFactory.html#a8574ec237845cbe7bc9a7aa0ce04a410">ElementFactory::createElement()</a> from element configs: <div class="fragment"><div class="line">QVariantMap eltConfig;</div>
+<dl class="section user"><dt>Element Creation:</dt><dd>Elements are created using <a class="el" href="classOST_1_1ElementFactory.html#a52aa267604013089c4b0068c9892575c">ElementFactory::createElement()</a> from element configs: <div class="fragment"><div class="line">QVariantMap eltConfig;</div>
 <div class="line">eltConfig[<span class="stringliteral">&quot;type&quot;</span>] = <span class="stringliteral">&quot;int&quot;</span>;</div>
 <div class="line">eltConfig[<span class="stringliteral">&quot;label&quot;</span>] = <span class="stringliteral">&quot;Iterations&quot;</span>;</div>
 <div class="line">eltConfig[<span class="stringliteral">&quot;value&quot;</span>] = 10;</div>
@@ -336,7 +336,7 @@ Uses <a class="el" href="classOST_1_1ElementFactory.html">ElementFactory</a> int
 </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>Unreachable code at line 133 (after return statement) </dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>Graph requires both hasGrid=true and graphType+graphParams fields</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classOST_1_1ElementFactory.html#a8574ec237845cbe7bc9a7aa0ce04a410">ElementFactory::createElement()</a> </dd>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classOST_1_1ElementFactory.html#a52aa267604013089c4b0068c9892575c">ElementFactory::createElement()</a> </dd>
 <dd>
 <a class="el" href="classOST_1_1PropertyMulti.html#ad4b28df72a221cde9e8f8d6f6ad9891b" title="Construct a new PropertyMulti object.">PropertyMulti::PropertyMulti()</a> </dd>
 <dd>
