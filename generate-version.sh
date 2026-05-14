@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Generate version.cc from git information
-# This script is called automatically during 'make' build
+# Falls back to debian changelog when building outside a git repository (e.g. Launchpad)
 #
 
 OUTPUT_FILE="$1"
@@ -12,18 +12,25 @@ if [ -z "$OUTPUT_FILE" ] || [ -z "$TEMPLATE_FILE" ]; then
     exit 1
 fi
 
-# Get git information
-GIT_SHA1=$(git describe --match=NeVeRmAtCh --always --abbrev=40 --dirty 2>/dev/null || echo "unknown")
-GIT_DATE=$(git log -1 --format=%ad --date=local 2>/dev/null || echo "unknown")
-GIT_COMMIT_SUBJECT=$(git log -1 --format=%s 2>/dev/null || echo "unknown")
-
-# GIT_TAG: exact tag if on a tagged commit, otherwise short commit hash
-GIT_TAG=$(git describe --tags --exact-match 2>/dev/null)
-if [ -z "$GIT_TAG" ]; then
-    GIT_TAG=$(git log -1 --format=%h 2>/dev/null || echo "unknown")
+if git rev-parse --git-dir > /dev/null 2>&1; then
+    # Inside a git repository — use git metadata
+    GIT_SHA1=$(git describe --match=NeVeRmAtCh --always --abbrev=40 --dirty 2>/dev/null || echo "unknown")
+    GIT_DATE=$(git log -1 --format=%ad --date=local 2>/dev/null || echo "unknown")
+    GIT_COMMIT_SUBJECT=$(git log -1 --format=%s 2>/dev/null || echo "unknown")
+    GIT_TAG=$(git describe --tags --exact-match 2>/dev/null)
+    if [ -z "$GIT_TAG" ]; then
+        GIT_TAG=$(git log -1 --format=%h 2>/dev/null || echo "unknown")
+    fi
+else
+    # Not a git repository (e.g. Launchpad source tarball) — fall back to debian changelog
+    DEB_VERSION=$(dpkg-parsechangelog --show-field Version 2>/dev/null || echo "unknown")
+    DEB_DATE=$(dpkg-parsechangelog --show-field Date 2>/dev/null || echo "unknown")
+    GIT_SHA1="unknown"
+    GIT_DATE="$DEB_DATE"
+    GIT_COMMIT_SUBJECT="Launchpad build"
+    GIT_TAG="$DEB_VERSION"
 fi
 
-# Replace placeholders in template
 sed -e "s|@GIT_SHA1@|${GIT_SHA1}|g" \
     -e "s|@GIT_DATE@|${GIT_DATE}|g" \
     -e "s|@GIT_COMMIT_SUBJECT@|${GIT_COMMIT_SUBJECT}|g" \
