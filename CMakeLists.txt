@@ -296,7 +296,7 @@ target_link_libraries(ostbasemodule
     Threads::Threads
     z
 )
-#add_dependencies(ostbasemodule generate_version)
+add_dependencies(ostbasemodule generate_version)
 
 # Indi module
 #list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.qrc)
@@ -324,6 +324,7 @@ target_link_libraries(ostindimodule
     Threads::Threads
     z
 )
+add_dependencies(ostindimodule generate_version)
 
 
 
