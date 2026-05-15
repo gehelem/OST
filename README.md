@@ -1,120 +1,86 @@
 [![CMake](https://github.com/gehelem/OST/actions/workflows/cmake.yml/badge.svg)](https://github.com/gehelem/OST/actions/workflows/cmake.yml)
+[![GitLab CI](https://gitlab.ostserver.fr/gilles/OST/badges/main/pipeline.svg)](https://gitlab.ostserver.fr/gilles/OST/-/pipelines)
 
 See documentation site :
 
-https://documentation.ostserver.fr/fr/presentation/index.html
+https://documentation.ostserver.fr/
 
 # OST - Observatoire Sans Tête
-/!\ be carefull, all this is a work in progess.
-Very small parts are working, but you are welcome to come and play with me
-(me = pretentious guy to think he can get away with this thing ...)
 
-What am i trying to build here ?
---------------------------------
-"Observatoire Sans Tête" is a joke with my friend René, a french word-to-word translation for "Headless Observatory".
-OST is heavily inspired by two great projects  :
-- https://astrophotoplus.gulinux.net/
-- https://github.com/pludov/mobindi
- 
-I've been playing with both, i'm definitely convinced this is the way things should be done.
-- Unfortunately 1 : both are talking Python/Javascript, wich is certainly fine and fancy, but completely unapproachable for my poor brain
-- Unfortunately 2 : both are using hidden desktops to run PHD2- i don't want that.
+> /!\ Work in progress — functional but evolving fast.
 
-My goal is multiple
-- OST doesn't require any GUI, nor any desktop 
-- OST must be declared as some kind of service
-- OST is talking to hardware through Indi client protocol
-- OST is talking to human through network, with any frontend understanding OST's language
-- OST is modular
-- OST must be autonomous
+"Observatoire Sans Tête" is a joke with my friend Bob, a word-for-word French translation of "Headless Observatory".
+The goal: a server you control remotely from any browser, with no screen or keyboard attached to the machine running it.
 
-What do i expect from a module ?
---------------------------------
-A module is loaded and controlled with OST.
-A module doesn't have to care to render data.
-A module achieves some specific tasks, like :
-- Autofocus
-- Guiding
-- Sequencer
-- Slewing/goto/ ...
-- Meteo alerts
-- Timelapses 
-- Order beers
-- (...)
+OST is inspired by great open-source projects like [AstroPhoto Plus](https://astrophotoplus.gulinux.net/) and [MobIndi](https://github.com/pludov/mobindi), and by commercial solutions like ASIAIR and Stellarmate.
+The main difference: it's written in C++/Qt, talks to hardware through INDI, and exposes everything over WebSocket + JSON to any browser-based frontend.
 
-Modules can communicate between each other (eg. autofocus <-> sequencer)
+## What it does
 
-Why that way ?
---------------
-I really want to make it easy for any buddy like me to build his own module, 
-without having to care with GUi or rebuild what's have been build so many times.
-Some way, i'd like OST to be the client equivalent of indiserver, where you can play to build your own driver and seemlessly make it work with any client.
+OST runs as a background service and orchestrates a full astrophotography session:
 
+| Module | Function |
+|---|---|
+| **Focus** | Autofocus via V-curve and HFR minimisation (SCXML state machine) |
+| **Guider** | Autoguiding via PHD2, drift monitoring and correction |
+| **Sequencer** | Automated acquisition sequences (frame type, filter, gain, exposure) |
+| **Navigator** | Plate solving (StellarSolver) and automatic field centering |
+| **Planner** | Orchestrates Navigator + Sequencer for a list of objects |
+| **Polar** | Polar alignment via the 3-image method |
+| **Inspector** | Optical quality analysis: HFR map, aberration map, corner mosaic |
+| **Allsky** | All-sky camera: keogram, max stacking, timelapse, weather overlay |
+| **IndiPanel** | Raw control panel for all connected INDI devices |
 
-What did i choose ?
--------------------
-Choosing C++ was easy, has it's the only thing i understand a little.
-Qt is helpling me a lot, with all it's programming fancies (not sure...).
-Websocket is the first network protocol i've been able to use, it's doing what i expect, we'll keep that as long as it works...
-Json descriptions for frontend/backend dialogs also seems to work like i expect ... (in fact, i expect to understand what i'm doing)
-JQuery for frontend is also the first web frontend i've been able to play with. I also like the fact that it's quite old and lightweight, and provides a mobile version.
+Modules communicate with each other (e.g. Sequencer triggers autofocus, suspends guiding during focus).
 
-How i'm i trying to build my code ?
------------------------------------
-OST executable is a controller that instanciate modules.
-Each module inherits the same communication structure with controller.
-OST is also dealing with websockets messages, and translates incoming and outgoing messages from and to modules.
+## Architecture
 
-Where to play ?
----------------
+- **Backend**: C++17 / Qt, communicates with hardware via INDI protocol
+- **Frontend**: Angular web app, served by Nginx, talks to the backend over WebSocket
+- **Protocol**: JSON messages over WebSocket
+- **Packaging**: Ubuntu PPA (Launchpad) for 22.04 and 24.04
 
-Any Linux distribution should work, or any OS supporting Qt (windows ? iOs ??) 
-I use Kubuntu at the moment, and also playing with various VM, RPi(4) and some small Nucs.
-You don't need any desktop, all this should work without any graphic interface :
-Command line is your friend, as long as you know how to build stuff that way.
+## Installing from PPA
 
-Prerequisites to build
-----------------------
-This list below needs to be cleaned, some ppas might not be required anymore, i'll have a look at that someday...
-
-```
-sudo apt-add-repository ppa:mutlaqja/ppa
-sudo apt-get update
-sudo apt upgrade
-sudo apt-get install build-essential cmake git libstellarsolver-dev libeigen3-dev libcfitsio-dev zlib1g-dev libindi-dev extra-cmake-modules libkf5plotting-dev libqt5svg5-dev libkf5xmlgui-dev libkf5kio-dev kinit-dev libkf5newstuff-dev kdoctools-dev libkf5notifications-dev qtdeclarative5-dev libkf5crash-dev gettext libnova-dev libgsl-dev libraw-dev libkf5notifyconfig-dev wcslib-dev libqt5websockets5-dev xplanet xplanet-images qt5keychain-dev libsecret-1-dev breeze-icon-theme indi-full libindi-dev cimg-dev libnova-dev build-essential nginx libgsl-dev wcslib-dev libcfitsio-dev qt5-default libcurl4-gnutls-dev libfftw3-dev imagemagick graphicsmagick libboost-all-dev
+```shell
+sudo add-apt-repository ppa:gehelem/ostserver-daily
+sudo apt update
+sudo apt install ostserver
 ```
 
-If you really want to play the "headless way" (wich is the goal), add this at the end of .bashrc to avoid Qt looking for graphical diplays 
-`export QT_QPA_PLATFORM=offscreen`
+## Building from source
 
+```shell
+sudo add-apt-repository ppa:mutlaqja/ppa
+sudo apt update
+sudo apt install build-essential cmake git \
+    libstellarsolver-dev libeigen3-dev libcfitsio-dev \
+    zlib1g-dev libindi-dev libnova-dev libgsl-dev libraw-dev \
+    wcslib-dev libqt5websockets5-dev libqt5svg5-dev \
+    libqt5scxml5-dev qttools5-dev-tools qtdeclarative5-dev \
+    libsecret-1-dev libavahi-client-dev libavahi-common-dev \
+    nginx indi-bin
 
-News
-====
-09/12/2021
-----------
-Well, i think we'll keep on trying this way to deal with properties. I still don't understand Deufrai's implementation, but i've managed to use it ...
-Big problem :
-Someone on Webastro french forum told me that Indigo software is exactly doing what i'm trying to achieve ... OMG OMG OMG
-https://www.indigo-astronomy.org/
-What should i do ? I've tried : it's really a nice toy.
-Problems with it :
-- Not GPL
-- Not Indi (despite partial compatibility)
-- Only two (very active and obvioulsy talentuous) developers 
-> I think i'll continue to play this game my way, just for fun.
+mkdir build && cd build
+cmake ..
+make -j$(nproc)
+```
 
+If running headless (no display), add this to `.bashrc`:
+```shell
+export QT_QPA_PLATFORM=offscreen
+```
 
-28/11/2021
-----------
-We can instanciate modules dynamicaly, they can be built separately
-Controller is responsible to store modules properties.
-I've come to the opinion that this is not the good place to do so. We'll see.
-We only have one specific module to control OST (just a skeleton at the moment).
-My JQuery frontend (./HTML foler) is really messy.
-It's really a pain for me to make this one do what i want. But it somehow works to test.
-My great problem is modules properties, my implementation is uggly and not convenient.
-I have to understand Deufrai's way to see things.
-The Autofocus module is working quite well with indi simulators.
-I have to say that Qt statemachines are really a great way to build things like that.
+## Running
 
+```shell
+ostserver --webroot=/path/to/media --libpath=/path/to/modules \
+          --lng=fr --loglevel=2 --grant=0
+```
 
+Then open `http://<your-machine-ip>` in any browser.
+
+## Platforms
+
+Tested on Raspberry Pi 4, small NUCs, and VMs (VirtualBox/VMware) running Ubuntu 22.04 and 24.04.
+Any Linux supporting Qt5 + INDI should work.
