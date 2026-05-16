@@ -151,7 +151,7 @@ bool  PropertyMulti::setElt(QString key, QVariant val, bool emitEvent)
     if (mElts[key]->getType() == "light")
     {
         ElementUpdate vu;
-        m["value"] = val.toMap();
+        m["value"] = val;
         getElt(key)->accept(&vu, m, s);
         return true;
     }
@@ -271,7 +271,7 @@ void PropertyMulti::setAll(const QVariantMap &pValues)
     {
         if ((mElts[elt]->getType() == "int") || (mElts[elt]->getType() == "float") || (mElts[elt]->getType() == "string")
                 || (mElts[elt]->getType() == "bool") || (mElts[elt]->getType() == "date") || (mElts[elt]->getType() == "time")
-                || (mElts[elt]->getType() == "datetime"))
+                || (mElts[elt]->getType() == "datetime") || (mElts[elt]->getType() == "light"))
         {
             if (!pValues.contains(elt))
             {
