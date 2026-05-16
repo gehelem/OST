@@ -534,6 +534,16 @@ void Sequencer::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QSt
 
     //logDebug("Planner::onOtherModuleEvent2 mod=%1 ev=%2 prop=%3 elt=%4 data=%5", {mod, OST::EvToString(ev), prp, elt, data});
 
+    if (mod == getString("slaves", "focusmodule") && ev == OST::EvType::ea && prp == "signals"  /*&& mWaitingForFocus*/)
+    {
+        QJsonObject o = data.toJsonValue().toObject()["e"].toObject();
+        int s = o["state"].toInt();
+        QString sd = o["statedescription"].toString();
+        QString e = o["event"].toString();
+        QString ed = o["eventdescription"].toString();
+        logDebug("catching signals event from focuser %1 %2 %3 %4 %5", {OST::EvToString(ev), s, sd, e, ed});
+    }
+
     if (mod == getString("slaves", "focusmodule") && ev == OST::EvType::ps && prp == "actions"  && mWaitingForFocus)
     {
         // catch focus completion event
