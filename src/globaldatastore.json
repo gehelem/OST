@@ -21,14 +21,14 @@
             "host": {
                 "type": "string",
                 "label": "Host",
-                "order":"00",
+                "order":"10",
                 "autoupdate":true,
                 "value": "localhost"
             },
             "port": {
                 "type": "int",
                 "label": "Port",
-                "order":"01",
+                "order":"20",
                 "autoupdate":true,
                 "value": 7624
             }
@@ -56,7 +56,7 @@
             "host": {
                 "type": "string",
                 "label": "Indi server",
-                "order":"00",
+                "order":"10",
                 "listOfValues":"servers",
                 "listOfValuesIsExternal":true,
                 "autoupdate":true
@@ -64,49 +64,49 @@
             "camera": {
                 "type": "string",
                 "label": "Camera",
-                "order":"00",
+                "order":"20",
                 "listOfValues":"DRIVER_INTERFACE-CCD_INTERFACE",
                 "autoupdate":true
             },
             "mount": {
                 "type": "string",
                 "label": "Mount",
-                "order":"00",
+                "order":"30",
                 "listOfValues":"DRIVER_INTERFACE-TELESCOPE_INTERFACE",
                 "autoupdate":true
             },
             "focuser": {
                 "type": "string",
                 "label": "Focuser",
-                "order":"00",
+                "order":"40",
                 "listOfValues":"DRIVER_INTERFACE-FOCUSER_INTERFACE",
                 "autoupdate":true
             },
             "filter": {
                 "type": "string",
                 "label": "Filter wheel",
-                "order":"00",
+                "order":"50",
                 "listOfValues":"DRIVER_INTERFACE-FILTER_INTERFACE",
                 "autoupdate":true
             },
             "guidecamera": {
                 "type": "string",
                 "label": "Guide camera",
-                "order":"00",
+                "order":"60",
                 "listOfValues":"DRIVER_INTERFACE-CCD_INTERFACE",
                 "autoupdate":true
             },
             "guidest4": {
                 "type": "string",
                 "label": "Guide through",
-                "order":"00",
+                "order":"70",
                 "listOfValues":"DRIVER_INTERFACE-GUIDER_INTERFACE",
                 "autoupdate":true
             },
             "gps": {
                 "type": "string",
                 "label": "GPS",
-                "order":"00",
+                "order":"80",
                 "listOfValues":"DRIVER_INTERFACE-GPS_INTERFACE",
                 "autoupdate":true
             }
@@ -126,27 +126,34 @@
             "name": {
                 "type": "string",
                 "label": "Name",
-                "order": "0",
+                "order": "00",
                 "value": ""
             },
             "focal": {
                 "type": "float",
                 "label": "Focal length (mm)",
-                "order": "1",
+                "order": "10",
                 "value": 0,
                 "format": "99999.9"
             },
             "diameter": {
                 "type": "float",
                 "label": "Diameter (mm)",
-                "order": "2",
+                "order": "20",
                 "value": 0,
+                "format": "9999.9"
+            },
+            "red": {
+                "type": "float",
+                "label": "Reducer (x)",
+                "order": "30",
+                "value": 1,
                 "format": "9999.9"
             },
             "type": {
                 "type": "string",
                 "label": "Type",
-                "order": "3",
+                "order": "40",
                 "value": ""
             }
         }
