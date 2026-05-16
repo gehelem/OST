@@ -28,7 +28,7 @@
                 "label": "Global state",
                 "order":"00"
             },
-            "statestring": {
+            "statedescription": {
                 "type": "string",
                 "autoupdate":true,
                 "label": "State description",
@@ -44,7 +44,7 @@
                 "type": "string",
                 "autoupdate":true,
                 "label": "Event description",
-                "order":"02"
+                "order":"03"
             }
         }
     }

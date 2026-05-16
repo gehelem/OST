@@ -626,7 +626,7 @@ void Basemodule::setGlobalDatastore(Basemodule* gds)
     mGlobalDatastore = gds;
 }
 
-int Basemodule::findGridRow(const QString& propName, const QString& keyCol, const QString& keyValue)
+int Basemodule::findGridRow(const QString &propName, const QString &keyCol, const QString &keyValue)
 {
     int size = getGridSize(propName);
     for (int i = 0; i < size; i++)
@@ -636,43 +636,45 @@ int Basemodule::findGridRow(const QString& propName, const QString& keyCol, cons
     return -1;
 }
 
-int Basemodule::getGridSize(const QString& propName)
+int Basemodule::getGridSize(const QString &propName)
 {
     auto store = getStore();
     if (!store.contains(propName)) return 0;
     return store[propName]->getGrid().size();
 }
 
-QString Basemodule::getGridString(const QString& propName, const QString& colName, int line)
+QString Basemodule::getGridString(const QString &propName, const QString &colName, int line)
 {
     return getString(propName, colName, (long)line);
 }
 
-double Basemodule::getGridFloat(const QString& propName, const QString& colName, int line)
+double Basemodule::getGridFloat(const QString &propName, const QString &colName, int line)
 {
     return getFloat(propName, colName, (long)line);
 }
 
-long Basemodule::getGridInt(const QString& propName, const QString& colName, int line)
+long Basemodule::getGridInt(const QString &propName, const QString &colName, int line)
 {
     return getInt(propName, colName, (long)line);
 }
 
-QString Basemodule::getGridString(const QString& propName, const QString& colName, const QString& keyCol, const QString& keyValue)
+QString Basemodule::getGridString(const QString &propName, const QString &colName, const QString &keyCol,
+                                  const QString &keyValue)
 {
     int row = findGridRow(propName, keyCol, keyValue);
     if (row < 0) return QString();
     return getGridString(propName, colName, row);
 }
 
-double Basemodule::getGridFloat(const QString& propName, const QString& colName, const QString& keyCol, const QString& keyValue)
+double Basemodule::getGridFloat(const QString &propName, const QString &colName, const QString &keyCol,
+                                const QString &keyValue)
 {
     int row = findGridRow(propName, keyCol, keyValue);
     if (row < 0) return 0.0;
     return getGridFloat(propName, colName, row);
 }
 
-long Basemodule::getGridInt(const QString& propName, const QString& colName, const QString& keyCol, const QString& keyValue)
+long Basemodule::getGridInt(const QString &propName, const QString &colName, const QString &keyCol, const QString &keyValue)
 {
     int row = findGridRow(propName, keyCol, keyValue);
     if (row < 0) return 0;
@@ -692,3 +694,12 @@ void Basemodule::otherModuleRequestProfileLoad(QString mod, QString profile)
     event.data = M;
     emit interModuleRequest(event);
 };
+void Basemodule::setStateEvent(OST::State state, QString statedescription, QString event, QString eventdescription)
+{
+    QVariantMap m;
+    m["state"] = OST::StateToInt(state);
+    m["statedescription"] = statedescription;
+    m["event"] = event;
+    m["eventdescription"] = eventdescription;
+    getProperty("signals")->setAll(m);
+}
