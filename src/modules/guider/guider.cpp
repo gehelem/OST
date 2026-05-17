@@ -478,6 +478,7 @@ void Guider::buildGuideStateMachines(void)
  */
 void Guider::SMInitInit()
 {
+    setStateEvent(OST::Busy, "init", "intialisation", "Guider initialize");
     // Connect camera device (required)
     if (connectDevice(getString("devices", "camera")))
     {
@@ -512,6 +513,7 @@ void Guider::SMInitInit()
     {
         // Failed to connect camera
         getProperty("actions")->setState(OST::Error, true);
+        setStateEvent(OST::Error, "error", "devicefailed", "camera failed");
         logError("Failed to connect camera device");
         emit Abort();
         return;
@@ -525,6 +527,7 @@ void Guider::SMInitInit()
     if (!getModNumber(getString("devices", "guider"), "EQUATORIAL_EOD_COORD", "DEC", _mountDEC))
     {
         logError("Failed to read mount DEC position");
+        setStateEvent(OST::Error, "error", "devicefailed", "mount failed");
         emit Abort();
         return;
     }
@@ -533,6 +536,7 @@ void Guider::SMInitInit()
     if (!getModNumber(getString("devices", "guider"), "EQUATORIAL_EOD_COORD", "RA", _mountRA))
     {
         logError("Failed to read mount RA position");
+        setStateEvent(OST::Error, "error", "devicefailed", "mount failed");
         emit Abort();
         return;
     }
@@ -542,6 +546,7 @@ void Guider::SMInitInit()
     if (!getModSwitch(getString("devices", "guider"), "TELESCOPE_PIER_SIDE", "PIER_WEST", _mountPointingWest))
     {
         logError("Failed to read mount pier side");
+        setStateEvent(OST::Error, "error", "devicefailed", "mount failed");
         emit Abort();
         return;
     }
@@ -552,6 +557,7 @@ void Guider::SMInitInit()
             .arg(_mountPointingWest ? "West" : "East"));
 
     // Initialization complete - transition to exposure
+    setStateEvent(OST::Busy, "initdone", "intialized", "Guider initialized");
     emit InitDone();
 }
 /**
@@ -573,6 +579,7 @@ void Guider::SMInitInit()
  */
 void Guider::SMInitCal()
 {
+    setStateEvent(OST::Busy, "initcal", "initcal", "init calibration start");
     logInfo("Initializing calibration sequence");
     getEltBool("actions", "calibrate")->setValue(false, false);
     getEltBool("actions", "abortguider")->setValue(false, false);
@@ -623,6 +630,8 @@ void Guider::SMInitCal()
 
     logInfo("Calibration ready - sending test pulses");
     emit InitCalDone();
+    setStateEvent(OST::Busy, "initcal", "initcaldone", "init calibration done");
+
 }
 /**
  * @brief PHASE 3: Guiding initialization - Load calibration and setup DEC compensation
@@ -645,6 +654,7 @@ void Guider::SMInitCal()
  */
 void Guider::SMInitGuide()
 {
+    setStateEvent(OST::Busy, "guiding", "startguiding", "startguiding");
     getEltBool("actions", "calibrate")->setValue(false, false);
     getEltBool("actions", "abortguider")->setValue(false, false);
     getEltBool("actions", "guide")->setValue(false, false);
@@ -759,6 +769,8 @@ void Guider::SMInitGuide()
     _doDither = false;
 
     emit InitGuideDone();
+    setStateEvent(OST::Busy, "initguidedone", "initguidedone", "init guide done");
+
 }
 void Guider::SMRequestFrameReset()
 {
@@ -819,6 +831,7 @@ void Guider::SMComputeCal()
     else
     {
         logError("No stars, can't calibrate");
+        setStateEvent(OST::Error, "error", "nostars", "no stars");
         emit Abort();
         return;
     }
@@ -867,9 +880,7 @@ void Guider::SMComputeCal()
             double ech = getSampling();
             double drift_arcsec = sqrt(square(ddx) + square(ddy)) * ech;
             logInfo("West calibration complete: %1 ms/px (%2 ms/arcsec, drift=%3\")", {QString::number(_calPulseW, 'f', 2), QString::number(_calPulseW / ech, 'f', 2), QString::number(drift_arcsec, 'f', 2)});
-
-            //                             ddy));
-            //ddy) + square(ddy))*_ccdSampling);
+            setStateEvent(OST::Busy, "cal", "westcomplete", "westcomplete");
         }
         if (_calState == 1)
         {
@@ -877,8 +888,7 @@ void Guider::SMComputeCal()
             double ech = getSampling();
             double drift_arcsec = sqrt(square(ddx) + square(ddy)) * ech;
             logInfo("East calibration complete: %1 ms/px (%2 ms/arcsec, drift=%3\")", {QString::number(_calPulseE, 'f', 2), QString::number(_calPulseE / ech, 'f', 2), QString::number(drift_arcsec, 'f', 2)});
-            //                             ddy));
-            //ddy) + square(ddy))*_ccdSampling);
+            setStateEvent(OST::Busy, "cal", "estcomplete", "estcomplete");
         }
         if (_calState == 2)
         {
@@ -886,8 +896,7 @@ void Guider::SMComputeCal()
             double ech = getSampling();
             double drift_arcsec = sqrt(square(ddx) + square(ddy)) * ech;
             logInfo("North calibration complete: %1 ms/px (%2 ms/arcsec, drift=%3\")", {QString::number(_calPulseN, 'f', 2), QString::number(_calPulseN / ech, 'f', 2), QString::number(drift_arcsec, 'f', 2)});
-            //                             ddy));
-            //ddy) + square(ddy))*_ccdSampling);
+            setStateEvent(OST::Busy, "cal", "northcomplete", "northcomplete");
         }
         if (_calState == 3)
         {
@@ -895,8 +904,7 @@ void Guider::SMComputeCal()
             double ech = getSampling();
             double drift_arcsec = sqrt(square(ddx) + square(ddy)) * ech;
             logInfo("South calibration complete: %1 ms/px (%2 ms/arcsec, drift=%3\")", {QString::number(_calPulseS, 'f', 2), QString::number(_calPulseS / ech, 'f', 2), QString::number(drift_arcsec, 'f', 2)});
-            //                             ddy));
-            //ddy) + square(ddy))*_ccdSampling);
+            setStateEvent(OST::Busy, "cal", "southcomplete", "southcomplete");
         }
 
         _calStep = 0;
@@ -934,6 +942,7 @@ void Guider::SMComputeCal()
             logInfo("Calibration completed successfully");
             getProperty("actions")->setState(OST::Ok, true);
             emit CalibrationDone();
+            setStateEvent(OST::Busy, "caldone", "calcompleted", "calibration completed");
             _trigFirst = _trigCurrent;
             return;
         }
@@ -1008,6 +1017,7 @@ void Guider::SMComputeGuide()
                 .arg(randRA, 0, 'f', 1).arg(randDEC, 0, 'f', 1)
                 .arg(_pulseN).arg(_pulseS).arg(_pulseE).arg(_pulseW));
         emit DitherNow();
+        setStateEvent(OST::Busy, "dithering", "ditherrequest", "dither requested");
         return;
     }
 
@@ -1250,6 +1260,7 @@ void Guider::SMAbort()
     _SMGuide.stop();
 
     emit AbortDone();
+    setStateEvent(OST::Ok, "ready", "abortguide", "Abort guide");
     logInfo("Guiding aborted");
 
 }
@@ -1298,7 +1309,12 @@ void Guider::matchIndexes(QVector<Trig> ref, QVector<Trig> act, QVector<MatchedP
         dx = dx + pairs[i].dx;
         dy = dy + pairs[i].dy;
     }
-    if (pairs.isEmpty()) { dx = 0; dy = 0; return; }
+    if (pairs.isEmpty())
+    {
+        dx = 0;
+        dy = 0;
+        return;
+    }
     dx = dx / pairs.size();
     dy = dy / pairs.size();
 

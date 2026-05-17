@@ -192,7 +192,6 @@ void Focus::SMAbort()
 
 void Focus::startCoarse()
 {
-    logDebug("Focus::startCoarse() begin");
     getEltBool("actions", "autofocus")->setValue(true, false);
     getEltBool("actions", "abortfocus")->setValue(false, true);
     getProperty("values")->clearGrid();
@@ -206,7 +205,7 @@ void Focus::startCoarse()
     setBLOBMode(B_ALSO, getString("devices", "camera").toStdString().c_str(), nullptr);
     if (getString("devices", "camera") == "CCD Simulator")
     {
-        //sendModNewNumber(getString("devices", "camera"), "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );
+        sendModNewNumber(getString("devices", "camera"), "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );
     }
     enableDirectBlobAccess(getString("devices", "camera").toStdString().c_str(), nullptr);
 
@@ -254,13 +253,11 @@ void Focus::startCoarse()
 
 
     //pMachine = QScxmlStateMachine::fromFile(":focus.scxml");
-
+    setStateEvent(OST::Busy, "focusing", "startfocus", "start focusing");
     pMachine->init();
     pMachine->start();
     getEltPrg("progress", "global")->setPrgValue(0, true);
     getEltPrg("progress", "global")->setDynLabel("0/" + QString::number(_iterations), true);
-    logDebug("Focus::startCoarse() end");
-
 }
 
 void Focus::SMRequestFrameReset()
@@ -582,4 +579,6 @@ void Focus::SMFocusDone()
     getProperty("actions")->setState(OST::Ok, true); // this will inform other modules
     getEltBool("actions", "autofocus")->setValue(false, true);
     pMachine->stop();
+    setStateEvent(OST::Ok, "ready", "focusdone", "focus finished");
+
 }

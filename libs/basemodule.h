@@ -137,20 +137,19 @@ class Basemodule : public DBManager
         void setGlobalDatastore(Basemodule* gds);
 
         // Grid read utilities — callable on mGlobalDatastore from any module
-        int     findGridRow  (const QString& propName, const QString& keyCol, const QString& keyValue);
-        int     getGridSize  (const QString& propName);
-        QString getGridString(const QString& propName, const QString& colName, int line);
-        double  getGridFloat (const QString& propName, const QString& colName, int line);
-        long    getGridInt   (const QString& propName, const QString& colName, int line);
+        int     findGridRow  (const QString &propName, const QString &keyCol, const QString &keyValue);
+        int     getGridSize  (const QString &propName);
+        QString getGridString(const QString &propName, const QString &colName, int line);
+        double  getGridFloat (const QString &propName, const QString &colName, int line);
+        long    getGridInt   (const QString &propName, const QString &colName, int line);
         // Key-based overloads — look up by keyCol=keyValue, no intermediate row needed
-        QString getGridString(const QString& propName, const QString& colName, const QString& keyCol, const QString& keyValue);
-        double  getGridFloat (const QString& propName, const QString& colName, const QString& keyCol, const QString& keyValue);
-        long    getGridInt   (const QString& propName, const QString& colName, const QString& keyCol, const QString& keyValue);
+        QString getGridString(const QString &propName, const QString &colName, const QString &keyCol, const QString &keyValue);
+        double  getGridFloat (const QString &propName, const QString &colName, const QString &keyCol, const QString &keyValue);
+        long    getGridInt   (const QString &propName, const QString &colName, const QString &keyCol, const QString &keyValue);
 
     protected:
         Basemodule* mGlobalDatastore = nullptr;
-
-
+        void setStateEvent(OST::State state, QString statedescription, QString event, QString eventdescription);
 }
 ;
 #endif

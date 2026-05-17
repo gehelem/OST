@@ -267,6 +267,7 @@ void Sequencer::OnSucessSEP()
 void Sequencer::StartSequence()
 {
 
+    setStateEvent(OST::Busy, "running", "startsequence", "Start sequence");
     currentLine = -1;
     isSequenceRunning = true;
     mObjectName = getString("object", "label");
@@ -329,6 +330,7 @@ void Sequencer::StartSequence()
     else
     {
         getProperty("actions")->setState(OST::Error, true);
+        setStateEvent(OST::Error, "error", "deviceerror", "Device error");
     }
 
 }
@@ -342,10 +344,11 @@ void Sequencer::StartLine()
         getProperty("actions")->setState(OST::Ok, true);
         isSequenceRunning = false;
         previousFilter = "";
-
+        setStateEvent(OST::Ok, "ready", "sequencedone", "Sequence done");
     }
     else
     {
+        setStateEvent(OST::Busy, "running", "startline", "Start line");
         getProperty("sequence")->fetchLine(currentLine);
         currentCount = getInt("sequence", "count");
         currentExposure = getFloat("sequence", "exposure");
@@ -534,15 +537,40 @@ void Sequencer::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QSt
 
     //logDebug("Planner::onOtherModuleEvent2 mod=%1 ev=%2 prop=%3 elt=%4 data=%5", {mod, OST::EvToString(ev), prp, elt, data});
 
-    if (mod == getString("slaves", "focusmodule") && ev == OST::EvType::ps && prp == "actions"  && mWaitingForFocus)
+    if (mod == getString("slaves", "focusmodule") && ev == OST::EvType::ea && prp == "signals"  && mWaitingForFocus)
     {
-        // catch focus completion event
-        if (data.toInt() == 1)
+        QJsonObject o = data.toJsonValue().toObject()["e"].toObject();
+        int s = o["state"].toInt();
+        QString sd = o["statedescription"].toString();
+        QString e = o["event"].toString();
+        QString ed = o["eventdescription"].toString();
+        logDebug("catching signals event from %6 : %1 %2 %3 %4 %5", {OST::EvToString(ev), s, sd, e, ed, mod});
+        if (OST::IntToState(s) == OST::Ok && sd == "ready")
         {
             OnFocusDone();
             return;
         }
     }
 
+    if (mod == getString("slaves", "guidermodule") && ev == OST::EvType::ea && prp == "signals")
+    {
+        QJsonObject o = data.toJsonValue().toObject()["e"].toObject();
+        int s = o["state"].toInt();
+        QString sd = o["statedescription"].toString();
+        QString e = o["event"].toString();
+        QString ed = o["eventdescription"].toString();
+        logDebug("catching signals event from %6 : %1 %2 %3 %4 %5", {OST::EvToString(ev), s, sd, e, ed, mod});
+        if (OST::IntToState(s) == OST::Busy && sd == "guiding")
+        {
+            //(...)
+        }
+    }
+
+    // Report Guider RMS
+    if (mod == getString("slaves", "guidermodule") && ev == OST::EvType::ea && prp == "values")
+    {
+        float f = data.toMap()["e"].toMap()["rmsTotal"].toFloat();
+        //logDebug("RMS : %1", {f});
+    }
 
 }

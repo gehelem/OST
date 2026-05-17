@@ -14,5 +14,39 @@
     }
 },
 "p":{
+    "signals": {
+        "devcat": "Module",
+        "group": "",
+        "order":"10",
+        "permission": 0,
+        "rule":2,
+        "hasprofile":true,
+        "label": "State and signals",
+        "e": {
+            "state": {
+                "type": "light",
+                "label": "Global state",
+                "order":"00"
+            },
+            "statedescription": {
+                "type": "string",
+                "autoupdate":true,
+                "label": "State description",
+                "order":"01"
+            },
+            "event": {
+                "type": "string",
+                "autoupdate":true,
+                "label": "Global event",
+                "order":"02"
+            },
+            "eventdescription": {
+                "type": "string",
+                "autoupdate":true,
+                "label": "Event description",
+                "order":"03"
+            }
+        }
+    }
 }
 }

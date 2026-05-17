@@ -393,6 +393,7 @@ void Navigator::OnSucessSolve()
         logError("Image NOT solved - Centering aborted");
         stellarSolver.abort();
         getProperty("actions")->setState(OST::Error, true);
+        setStateEvent(OST::Error, "error", "solverfailed", "Solver failed");
         mState = "idle";
         mCurrentIteration = 0;
         return;
@@ -416,6 +417,7 @@ void Navigator::OnSucessSolve()
         logInfo(QString("Centering successful after %1 iteration(s) - within tolerance")
                 .arg(mCurrentIteration));
         getProperty("actions")->setState(OST::Ok, true);
+        setStateEvent(OST::Ok, "ready", "navigatordone", "Navigator done");
         getEltBool("actions", "gototarget")->setValue(false, false);
         getEltBool("actions", "abortnavigator")->setValue(false, false);
         getEltBool("actions", "addtoplanner")->setValue(false, true);
@@ -431,6 +433,7 @@ void Navigator::OnSucessSolve()
         logError(QString("Centering failed after %1 iterations - tolerance not reached")
                  .arg(mMaxIterations));
         getProperty("actions")->setState(OST::Error, true);
+        setStateEvent(OST::Error, "error", "navigatorfailed", "Navigator failed");
         mState = "idle";
         mCurrentIteration = 0;
         return;
@@ -439,6 +442,8 @@ void Navigator::OnSucessSolve()
     // Need correction - continue centering loop
     logInfo(QString("Centering iteration %1/%2 - applying correction")
             .arg(mCurrentIteration).arg(mMaxIterations));
+    setStateEvent(OST::Busy, "centering", "correction", "Correction needed");
+
     correctOffset(solvedRA, solvedDEC);
 }
 void Navigator::updateSearchList(void)
@@ -488,12 +493,14 @@ void Navigator::slewToSelection(void)
     if (!dp.isValid())
     {
         logError("Error - unable to find %1 device. Aborting.", {mount});
+        setStateEvent(OST::Error, "error", "devicefailed", "Device failed");
         return;
     }
     INDI::PropertyNumber prop = dp.getProperty("EQUATORIAL_EOD_COORD");
     if (!prop.isValid())
     {
         logError("Error - unable to find %1/EQUATORIAL_EOD_COORD property. Aborting.", {mount});
+        setStateEvent(OST::Error, "error", "devicefailed", "Device failed");
         return;
     }
     prop.findWidgetByName("RA")->value = mTargetRAnow;
@@ -502,7 +509,7 @@ void Navigator::slewToSelection(void)
     mWaitingSlew = true;
     sendNewNumber(prop);
     logInfo("Slewing to %1", {getString("target", "targetname")});
-
+    setStateEvent(OST::Busy, "slewing", "slew", "Slew");
 }
 void Navigator::convertSelection(void)
 {
@@ -554,6 +561,7 @@ void Navigator::correctOffset(double solvedRA, double solvedDEC)
     if (!dp.isValid())
     {
         logError("Error - unable to find %1 device for correction.", {mount});
+        setStateEvent(OST::Error, "error", "devicefailed", "Device failed");
         mState = "idle";
         return;
     }
@@ -562,6 +570,7 @@ void Navigator::correctOffset(double solvedRA, double solvedDEC)
     if (!prop.isValid())
     {
         logError("Error - unable to find mount coordinates for correction.");
+        setStateEvent(OST::Error, "error", "devicefailed", "Device failed");
         mState = "idle";
         return;
     }
@@ -578,12 +587,14 @@ void Navigator::correctOffset(double solvedRA, double solvedDEC)
 void Navigator::syncMountIfNeeded(double solvedRA, double solvedDEC)
 {
 
+    setStateEvent(OST::Busy, "synchronise", "syncrequest", "Sync requested");
     // Get mount device
     QString mount = getString("devices", "mount");
     INDI::BaseDevice dp = getDevice(mount.toStdString().c_str());
     if (!(dp.getDriverInterface() & INDI::BaseDevice::TELESCOPE_INTERFACE))
     {
         logError("Device %1 has no telescope interface", {mount});
+        setStateEvent(OST::Error, "error", "devicefailed", "Device failed");
         return;
     }
 
@@ -593,6 +604,7 @@ void Navigator::syncMountIfNeeded(double solvedRA, double solvedDEC)
     if (!prop.isValid())
     {
         logError("Error - unable to find %1 / EQUATORIAL_EOD_COORD property. Aborting.", {mount});
+        setStateEvent(OST::Error, "error", "devicefailed", "Device failed");
         return;
     }
     double jd = ln_get_julian_from_sys();
@@ -610,6 +622,7 @@ void Navigator::syncMountIfNeeded(double solvedRA, double solvedDEC)
     if (!sendModNewSwitch(mount, "ON_COORD_SET", "SLEW", ISS_ON)) return;
 
     logInfo("Mount successfully synchronized with solved field");
+
 
 }
 void Navigator::addTargeToPlanner()

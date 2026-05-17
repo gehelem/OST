@@ -328,10 +328,15 @@ void Planner::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QStri
 
     //logDebug("Planner::onOtherModuleEvent2 mod=%1 ev=%2 prop=%3 elt=%4 data=%5", {mod, OST::EvToString(ev), prp, elt, data});
 
-    if (mod == getString("slaves", "navigatormodule") && ev == OST::EvType::ps && prp == "actions" && mWaitingNavigator)
+    if (mod == getString("slaves", "navigatormodule") && ev == OST::EvType::ea && prp == "signals"  && mWaitingNavigator)
     {
-        // catch navigator completion
-        if (data.toInt() == 1)
+        QJsonObject o = data.toJsonValue().toObject()["e"].toObject();
+        int s = o["state"].toInt();
+        QString sd = o["statedescription"].toString();
+        QString e = o["event"].toString();
+        QString ed = o["eventdescription"].toString();
+        logDebug("catching signals event from %6 : %1 %2 %3 %4 %5", {OST::EvToString(ev), s, sd, e, ed, mod});
+        if (OST::IntToState(s) == OST::Ok && sd == "ready")
         {
             navigatorComplete();
             return;
@@ -342,16 +347,19 @@ void Planner::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QStri
     if (mod == getString("slaves", "sequencemodule") && ev == OST::EvType::ea && prp == "progress" && mWaitingSequence)
     {
         int i = data.toMap()["e"].toMap()["global"].toInt();
-        //QString s = data.toMap()["e"].toMap()["global"].toMap()["dynlabel"].toString();
         getEltPrg("planning", "progress")->setPrgValue(i, false);
-        //getEltPrg("planning", "progress")->setDynLabel("Seq " + s, false);
         getProperty("planning")->updateLine(mCurrentLine);
     }
 
-    if (mod == getString("slaves", "sequencemodule") && ev == OST::EvType::ps && prp == "actions" && mWaitingSequence)
+    if (mod == getString("slaves", "sequencemodule") && ev == OST::EvType::ea && prp == "signals"  && mWaitingSequence)
     {
-        // catch sequencer completion
-        if (data.toInt() == 1)
+        QJsonObject o = data.toJsonValue().toObject()["e"].toObject();
+        int s = o["state"].toInt();
+        QString sd = o["statedescription"].toString();
+        QString e = o["event"].toString();
+        QString ed = o["eventdescription"].toString();
+        logDebug("catching signals event from %6 : %1 %2 %3 %4 %5", {OST::EvToString(ev), s, sd, e, ed, mod});
+        if (OST::IntToState(s) == OST::Ok && sd == "ready")
         {
             sequenceComplete();
             return;
