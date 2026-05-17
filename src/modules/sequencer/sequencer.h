@@ -3,6 +3,7 @@
 #include <indimodule.h>
 #include <fileio.h>
 #include <solver.h>
+#include <QScxmlStateMachine>
 
 #if defined(SEQUENCER_MODULE)
 #  define MODULE_INIT Q_DECL_EXPORT
@@ -17,97 +18,64 @@ class MODULE_INIT Sequencer: public IndiModule
     public:
         Sequencer(QString name, QString label, QString profile, QVariantMap availableModuleLibs);
         ~Sequencer();
-        void onNewDevice      (INDI::BaseDevice dp) override     {} ;
-        void onRemoveDevice   (INDI::BaseDevice dp) override     {} ;
-        void onNewProperty    (INDI::Property property) override {} ;
-        void onRemoveProperty (INDI::Property property) override {} ;
-        void onUpdateProperty (INDI::Property property) override {} ;
+        void onNewDevice      (INDI::BaseDevice dp) override     {};
+        void onRemoveDevice   (INDI::BaseDevice dp) override     {};
+        void onNewProperty    (INDI::Property property) override {};
+        void onRemoveProperty (INDI::Property property) override {};
+        void onUpdateProperty (INDI::Property property) override {};
 
     signals:
-
-        void RequestFrameResetDone();
-        void FrameResetDone();
-        void RequestExposureDone();
-        void ExposureDone();
-        void FindStarsDone();
-        void NextLoop();
-        void LoopFinished();
-        void ComputeDone();
-        void InitDone();
-
-        void RequestExposureBestDone();
-        void ExposureBestDone();
-        void ComputeResultDone();
-        void InitLoopFrameDone();
-        void LoopFrameDone();
-        void NextFrame();
-
-        void blobloaded();
         void cameraAlert();
-        void AbortDone();
         void Abort();
+
     protected:
         void onExternalEvent(OST::ExtEvent event) override;
+
     public slots:
         void onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QString elt, QVariant data, int line) override;
 
+    private slots:
+        // State machine entry points
+        void SMInitLine();
+        void SMChangingFilter();
+        void SMFocusing();
+        void SMStartingGuider();
+        void SMGuidingSettling();
+        void SMExposing();
+        void SMProcessShot();
+        void SMDone();
+        void SMAborted();
 
-    public slots:
-        void OnSucessSEP();
-        void OnFocusDone(void);
-        void OnGuidingSettleTimeout();
+        // Timer
+        void onGuidingSettleTimeout();
 
     private:
         void newBLOB(INDI::PropertyBlob pblob);
         void newProperty(INDI::Property property) override;
         void updateProperty(INDI::Property property) override;
         void newExp(INDI::PropertyNumber exp);
-
-        void Shoot();
-        void SMAlert();
-        //void SMLoadblob(IBLOB *bp);
-        void SMLoadblob();
-        void SMAbort();
-
-        void StartSequence();
-        void StartLine();
-
         void refreshFilterLov();
-        void requestFocus();
+        void setupOutputFolder();
 
-        bool    _newblob;
+        QScxmlStateMachine *pMachine = nullptr;
+        QTimer              *mSettleTimer = nullptr;
 
-        QPointer<fileio> _image;
-        Solver _solver;
-        FITSImage::Statistic stats;
-
-        int    _iterations = 3;
-        int    _steps = 3000;
-        int    _loopIterations = 2;
-        int    _loopIteration;
-        double _loopHFRavg;
-
-        int currentLine = 0;
-        int currentCount = 0;
-        double currentExposure = 0;
-        int currentGain = 0;
-        int currentOffset = 0;
-        QString currentFilter = "";
-        QString previousFilter = "";
-        QString currentFrameType = "";
-        QString currentStatus = "";
-        QString currentFolder = "";
-
-        QVariantMap mActiveSeq;
-        bool isSequenceRunning = false;
-        bool mWaitingForFocus = false;
-        bool mWaitingForGuidingSettle = false;
-        QTimer *mGuidingSettleTimer = nullptr;
+        // Sequence runtime state
+        int     mCurrentLine      = -1;
+        int     mShotCount        = 0;
+        bool    mFilterChanged    = false;
+        bool    mSuspendedGuiding = false;
+        QString mCurrentFilter;
+        QString mPreviousFilter;
+        QString mCurrentFrameType;
+        QString mCurrentFolder;
         QString mObjectName = "default";
         QString mDate;
 
-
-
+        // Image processing
+        QPointer<fileio>    _image;
+        Solver              _solver;
+        FITSImage::Statistic stats;
 };
 
 extern "C" MODULE_INIT Sequencer *initialize(QString name, QString label, QString profile,

@@ -11,219 +11,373 @@ Sequencer *initialize(QString name, QString label, QString profile, QVariantMap 
 
 Sequencer::Sequencer(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
     : IndiModule(name, label, profile, availableModuleLibs)
-
 {
-    setMetadata("thisGithash", QString::fromStdString(Version::GIT_SHA1));
-    setMetadata("thisGitdate", QString::fromStdString(Version::GIT_DATE));
+    setMetadata("thisGithash",    QString::fromStdString(Version::GIT_SHA1));
+    setMetadata("thisGitdate",    QString::fromStdString(Version::GIT_DATE));
     setMetadata("thisGitmessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
-    setMetadata("description", "Sequencer module");
-    setMetadata("thisversion", QString::fromStdString(Version::GIT_TAG));
-    setMetadata("template", "sequence");
+    setMetadata("description",    "Sequencer module");
+    setMetadata("thisversion",    QString::fromStdString(Version::GIT_TAG));
+    setMetadata("template",       "sequence");
 
     loadOstPropertiesFromFile(":sequencer.json");
 
-    giveMeADevice("camera", "Camera", INDI::BaseDevice::CCD_INTERFACE);
+    giveMeADevice("camera", "Camera",       INDI::BaseDevice::CCD_INTERFACE);
     giveMeADevice("filter", "Filter wheel", INDI::BaseDevice::FILTER_INTERFACE);
     defineMeAsSequencer();
     refreshFilterLov();
 
-    // Initialize guiding settle timer
-    mGuidingSettleTimer = new QTimer(this);
-    mGuidingSettleTimer->setSingleShot(true);
-    connect(mGuidingSettleTimer, &QTimer::timeout, this, &Sequencer::OnGuidingSettleTimeout);
+    mSettleTimer = new QTimer(this);
+    mSettleTimer->setSingleShot(true);
+    connect(mSettleTimer, &QTimer::timeout, this, &Sequencer::onGuidingSettleTimeout);
 
+    pMachine = QScxmlStateMachine::fromFile(":sequencer.scxml");
+    pMachine->connectToState("InitLine",        QScxmlStateMachine::onEntry(this, &Sequencer::SMInitLine));
+    pMachine->connectToState("ChangingFilter",  QScxmlStateMachine::onEntry(this, &Sequencer::SMChangingFilter));
+    pMachine->connectToState("Focusing",        QScxmlStateMachine::onEntry(this, &Sequencer::SMFocusing));
+    pMachine->connectToState("StartingGuider",  QScxmlStateMachine::onEntry(this, &Sequencer::SMStartingGuider));
+    pMachine->connectToState("GuidingSettling", QScxmlStateMachine::onEntry(this, &Sequencer::SMGuidingSettling));
+    pMachine->connectToState("Exposing",        QScxmlStateMachine::onEntry(this, &Sequencer::SMExposing));
+    pMachine->connectToState("ProcessShot",     QScxmlStateMachine::onEntry(this, &Sequencer::SMProcessShot));
+    pMachine->connectToState("Done",            QScxmlStateMachine::onEntry(this, &Sequencer::SMDone));
+    pMachine->connectToState("Aborted",         QScxmlStateMachine::onEntry(this, &Sequencer::SMAborted));
 }
 
-Sequencer::~Sequencer()
-{
+Sequencer::~Sequencer() {}
 
-}
+// =============================================================================
+// External events (frontend → sequencer)
+// =============================================================================
+
 void Sequencer::onExternalEvent(OST::ExtEvent event)
 {
-
-
-
     if (event.ev == OST::ExtEvType::SV && event.prpkey == "actions")
     {
-        if (event.eltkey == "startsequence")
+        if (event.eltkey == "startsequence" && getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
         {
-            if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
+            mCurrentLine      = -1;
+            mPreviousFilter.clear();
+            mSuspendedGuiding = false;
+            mObjectName       = getString("object", "label");
+            mDate             = QDateTime::currentDateTime().toString("yyyyMMdd-hh-mm-ss");
+
+            QDir dir;
+            dir.mkdir(getWebroot() + "/" + getModuleName());
+            dir.mkdir(getWebroot() + "/" + getModuleName() + "/" + mObjectName);
+
+            connectIndi();
+            if (!connectDevice(getString("devices", "camera")))
             {
-                StartSequence();
+                setStateEvent(OST::Error, "error", "deviceerror", "Device error");
+                return;
             }
+            setBLOBMode(B_ALSO, getString("devices", "camera").toStdString().c_str(), nullptr);
+            frameReset(getString("devices", "camera"));
+
+            if (getString("devices", "camera") == "CCD Simulator")
+                sendModNewNumber(getString("devices", "camera"), "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 1);
+
+            getProperty("actions")->setState(OST::Busy, true);
+
+            // Reset all line progress indicators
+            for (int i = 0; i < getProperty("sequence")->getGrid().count(); i++)
+            {
+                getProperty("sequence")->fetchLine(i);
+                getEltPrg("sequence", "progress")->setDynLabel("Queued", false);
+                getEltPrg("sequence", "progress")->setPrgValue(0, false);
+                getProperty("sequence")->updateLine(i);
+            }
+
+            setStateEvent(OST::Busy, "running", "startsequence", "Start sequence");
+            pMachine->init();
+            pMachine->start();
+            pMachine->submitEvent("startsequence");
         }
-        if (event.eltkey == "abortsequence")
+
+        if (event.eltkey == "abortsequence" && getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
         {
-            if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
-            {
-                emit Abort();
-                isSequenceRunning = false;
-                mWaitingForFocus = false;
-                mWaitingForGuidingSettle = false;
-                if (mGuidingSettleTimer->isActive())
-                {
-                    mGuidingSettleTimer->stop();
-                }
-            }
+            mSettleTimer->stop();
+            pMachine->submitEvent("abort");
         }
     }
 
-    if (event.prpkey == "devices" ) refreshFilterLov();
-
-
-    //if (getModuleName() == e.module)
-    //{
-    //    foreach(const QString &keyprop, e.data.keys())
-    //    {
-    //        foreach(const QString &keyelt, e.data[keyprop].toMap()["elements"].toMap().keys())
-    //        {
-    //        }
-    //        if (e.type == "Fldelete")
-    //        {
-    //            double line = e.data[keyprop].toMap()["line"].toDouble();
-    //            getProperty(keyprop)->deleteLine(line);
-    //        }
-    //        if (e.type == "Flcreate")
-    //        {
-    //            QVariantMap m = e.data[keyprop].toMap()["elements"].toMap();
-    //            getProperty(keyprop)->newLine(m);
-    //            getEltPrg(keyprop, "progress")->setPrgValue(0, false);
-    //            //getEltPrg(keyprop, "progress")->setDynLabel("Added", false);
-    //            getProperty(keyprop)->updateLine(getProperty(keyprop)->getGrid().count() - 1);
-    //        }
-    //        if (e.type == "Flupdate")
-    //        {
-    //            double line = e.data[keyprop].toMap()["line"].toDouble();
-    //            QVariantMap m = e.data[keyprop].toMap()["elements"].toMap();
-    //            getProperty(keyprop)->updateLine(line, m);
-    //            getEltPrg(keyprop, "progress")->setPrgValue(0, false);
-    //            //getEltPrg(keyprop, "progress")->setDynLabel("Updated", false);
-    //            getProperty(keyprop)->updateLine(line);
-
-    //        }
-    //    }
-    //}
+    if (event.prpkey == "devices")
+        refreshFilterLov();
 }
+
+// =============================================================================
+// State machine — pre-line phase
+// =============================================================================
+
+void Sequencer::SMInitLine()
+{
+    mCurrentLine++;
+
+    if (mCurrentLine >= getProperty("sequence")->getGrid().count())
+    {
+        pMachine->submitEvent("SequenceDone");
+        return;
+    }
+
+    setStateEvent(OST::Busy, "running", "startline", "Starting line");
+
+    getProperty("sequence")->fetchLine(mCurrentLine);
+    mShotCount        = getInt("sequence", "count");
+    int filterIndex   = getInt("sequence", "filter");
+    mCurrentFilter    = getEltInt("sequence", "filter")->getLov()[filterIndex];
+    mCurrentFrameType = getString("sequence", "frametype");
+
+    pMachine->submitEvent("LineLoaded");
+}
+
+void Sequencer::SMChangingFilter()
+{
+    int filterIndex  = getInt("sequence", "filter");
+    mFilterChanged   = !mPreviousFilter.isEmpty() && (mPreviousFilter != mCurrentFilter);
+    mPreviousFilter  = mCurrentFilter;
+
+    setupOutputFolder();
+
+    if (mFilterChanged)
+        logInfo("Changing filter from %1 to %2", {mPreviousFilter, mCurrentFilter});
+
+    // Always send the filter command.
+    // INDI replies with FILTER_SLOT OK → updateProperty() submits "FilterReady".
+    sendModNewNumber(getString("devices", "filter"), "FILTER_SLOT", "FILTER_SLOT_VALUE", filterIndex);
+}
+
+void Sequencer::SMFocusing()
+{
+    bool isLightOrFlat = (mCurrentFrameType == "L" || mCurrentFrameType == "F");
+    bool needsFocus    = false;
+
+    if (isLightOrFlat)
+    {
+        if (mCurrentLine == 0 && getBool("parameters", "autofocusatstart"))
+            needsFocus = true;
+        else if (mFilterChanged && getBool("parameters", "autofocusonfilterchange"))
+            needsFocus = true;
+    }
+
+    if (!needsFocus)
+    {
+        mSuspendedGuiding = false;
+        pMachine->submitEvent("FocusReady");
+        return;
+    }
+
+    logInfo("Requesting autofocus from %1", {getString("slaves", "focusmodule")});
+
+    mSuspendedGuiding = getBool("parameters", "suspendguidingduringfocus");
+    if (mSuspendedGuiding)
+    {
+        logInfo("Suspending guiding on %1", {getString("slaves", "guidermodule")});
+        otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "abortguider", true);
+    }
+
+    otherModuleSetValue(getString("slaves", "focusmodule"), "actions", "autofocus", true);
+    // Wait for FocusReady — submitted by onOtherModuleEvent when focus signals Ok/"ready"
+}
+
+void Sequencer::SMStartingGuider()
+{
+    if (!mSuspendedGuiding)
+    {
+        pMachine->submitEvent("GuiderStarted");
+        return;
+    }
+
+    logInfo("Resuming guiding on %1 — waiting for confirmation", {getString("slaves", "guidermodule")});
+    otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "guide", true);
+    // Wait for GuiderStarted — submitted by onOtherModuleEvent when guider signals Busy/"guiding"
+}
+
+void Sequencer::SMGuidingSettling()
+{
+    int settleTime = getInt("parameters", "guidingsettletime");
+
+    if (settleTime <= 0)
+    {
+        pMachine->submitEvent("SettleDone");
+        return;
+    }
+
+    logInfo("Waiting %1 s for guiding to settle", {settleTime});
+    mSettleTimer->start(settleTime * 1000);
+    // Wait for SettleDone — submitted by onGuidingSettleTimeout()
+}
+
+// =============================================================================
+// State machine — capture phase
+// =============================================================================
+
+void Sequencer::SMExposing()
+{
+    double exp    = getFloat("sequence", "exposure");
+    int    gain   = getInt("sequence", "gain");
+    int    offset = getInt("sequence", "offset");
+    requestCapture(getString("devices", "camera"), exp, gain, offset);
+
+    int total = getInt("sequence", "count");
+    int done  = total - mShotCount + 1;
+    getEltPrg("sequence", "progress")->setPrgValue(100.0 * done / total, false);
+    getEltPrg("sequence", "progress")->setDynLabel(QString::number(done) + "/" + QString::number(total), false);
+    getProperty("sequence")->updateLine(mCurrentLine);
+
+    int lineTotal = getProperty("sequence")->getGrid().size();
+    getEltPrg("progress", "global")->setPrgValue(100.0 * (mCurrentLine + 1) / lineTotal, false);
+    getEltPrg("progress", "global")->setDynLabel(
+        QString::number(mCurrentLine + 1) + "/" + QString::number(lineTotal), true);
+    // Wait for ExposureDone — submitted by newBLOB()
+}
+
+void Sequencer::SMProcessShot()
+{
+    mShotCount--;
+
+    if (mShotCount > 0)
+        pMachine->submitEvent("NextShot");
+    else
+        pMachine->submitEvent("LineDone");
+}
+
+// =============================================================================
+// State machine — terminal states
+// =============================================================================
+
+void Sequencer::SMDone()
+{
+    logInfo("Sequence completed");
+    getProperty("actions")->setState(OST::Ok, true);
+    setStateEvent(OST::Ok, "ready", "sequencedone", "Sequence done");
+    pMachine->stop();
+}
+
+void Sequencer::SMAborted()
+{
+    logInfo("Sequence aborted");
+    mSettleTimer->stop();
+    getProperty("actions")->setState(OST::Ok, true);
+    setStateEvent(OST::Ok, "ready", "abortdone", "Sequence aborted");
+    pMachine->stop();
+}
+
+// =============================================================================
+// Timer
+// =============================================================================
+
+void Sequencer::onGuidingSettleTimeout()
+{
+    logInfo("Guiding settle complete");
+    pMachine->submitEvent("SettleDone");
+}
+
+// =============================================================================
+// Inter-module events (focus / guider → sequencer)
+// =============================================================================
+
+void Sequencer::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QString elt, QVariant data, int line)
+{
+    if (mod != getString("slaves", "focusmodule") && mod != getString("slaves", "guidermodule"))
+        return;
+
+    if (ev != OST::EvType::ea || prp != "signals")
+        return;
+
+    QJsonObject o  = data.toJsonValue().toObject()["e"].toObject();
+    int         s  = o["state"].toInt();
+    QString     sd = o["statedescription"].toString();
+
+    if (mod == getString("slaves", "focusmodule"))
+    {
+        if (OST::IntToState(s) == OST::Ok && sd == "ready" && pMachine->isActive("Focusing"))
+        {
+            logInfo("Focus completed");
+            pMachine->submitEvent("FocusReady");
+        }
+        return;
+    }
+
+    if (mod == getString("slaves", "guidermodule"))
+    {
+        if (OST::IntToState(s) == OST::Busy && sd == "guiding" && pMachine->isActive("StartingGuider"))
+        {
+            logInfo("Guider confirmed guiding");
+            pMachine->submitEvent("GuiderStarted");
+        }
+    }
+}
+
+// =============================================================================
+// INDI callbacks
+// =============================================================================
 
 void Sequencer::newBLOB(INDI::PropertyBlob pblob)
 {
-    if (
-        (QString(pblob.getDeviceName()) == getString("devices", "camera"))
-        && isSequenceRunning
-        && !mWaitingForFocus  // Don't process images while focus is running
-    )
-    {
-        delete _image;
-        _image = new fileio();
-        _image->loadBlob(pblob, 64);
-        stats = _image->getStats();
-        //qDebug() << "1";
-        //_solver.ResetSolver(stats, _image->getImageBuffer());
-        //qDebug() << "2";
-        //connect(&_solver, &Solver::successSEP, this, &Sequencer::OnSucessSEP);
-        //qDebug() << "3";
-        //_solver.FindStars(_solver.stellarSolverProfiles[0]);
-        //qDebug() << "4";
-        QImage rawImage = _image->getRawQImage();
-        QImage im = rawImage.convertToFormat(QImage::Format_RGB32);
-        im.setColorTable(rawImage.colorTable());
-        im.save( getWebroot() + "/" + getModuleName() + ".jpeg", "JPG", 100);
+    if (QString(pblob.getDeviceName()) != getString("devices", "camera"))
+        return;
+    if (!pMachine->isRunning() || !pMachine->isActive("Exposing"))
+        return;
 
-        QString tt = QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss_zzz");
-        _image->saveAsFITSSimple(currentFolder + "/" + mObjectName + "-" + currentFrameType + "-"  + currentFilter + "-" + tt +
-                                 ".FITS");
-        OST::ImgData dta = _image->ImgStats();
-        dta.mUrlJpeg = getModuleName() + ".jpeg";
-        //dta.mUrlFits = getModuleName() + "-" + currentFilter + "-" + tt + ".FITS";
-        getEltImg("image", "image")->setValue(dta, true);
+    delete _image;
+    _image = new fileio();
+    _image->loadBlob(pblob, 64);
+    stats = _image->getStats();
 
-        currentCount--;
-        //logInfo("RVC frame " + QString::number(currentLine) + "/" + QString::number(currentCount));
-        if(currentCount == 0)
-        {
-            //getEltString("sequence", "status")->setValue("Finished");
-            //getProperty("sequence")->updateLine(currentLine);
-            // Don't start next line if waiting for focus to complete
-            if (!mWaitingForFocus)
-            {
-                StartLine();
-            }
-        }
-        else
-        {
-            Shoot();
-        }
+    QImage rawImage = _image->getRawQImage();
+    QImage im = rawImage.convertToFormat(QImage::Format_RGB32);
+    im.setColorTable(rawImage.colorTable());
+    im.save(getWebroot() + "/" + getModuleName() + ".jpeg", "JPG", 100);
 
-    }
+    QString tt = QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss_zzz");
+    _image->saveAsFITSSimple(
+        mCurrentFolder + "/" + mObjectName + "-" + mCurrentFrameType + "-" + mCurrentFilter + "-" + tt + ".FITS");
+
+    OST::ImgData dta = _image->ImgStats();
+    dta.mUrlJpeg = getModuleName() + ".jpeg";
+    getEltImg("image", "image")->setValue(dta, true);
+
+    pMachine->submitEvent("ExposureDone");
 }
+
 void Sequencer::newProperty(INDI::Property property)
 {
-
-    if (
-        (property.getDeviceName()  == getString("devices", "filter"))
-        &&  (QString(property.getName())   == "FILTER_NAME")
-    )
+    if (property.getDeviceName() == getString("devices", "filter") &&
+        QString(property.getName()) == "FILTER_NAME")
     {
         refreshFilterLov();
     }
-    if (
-        (property.getDeviceName()  == getString("devices", "filter"))
-        &&  (QString(property.getName())   == "FILTER_SLOT")
-        &&  (property.getState() == IPS_OK)
-        && isSequenceRunning
-        && !mWaitingForFocus  // Don't shoot if waiting for focus
-    )
-    {
-        Shoot();
-    }
-
 }
 
 void Sequencer::updateProperty(INDI::Property property)
 {
-
     if (strcmp(property.getName(), "CCD1") == 0)
     {
         newBLOB(property);
+        return;
     }
-    if (
-        (property.getDeviceName() == getString("devices", "camera"))
-        &&  (property.getState() == IPS_ALERT)
-    )
+
+    if (property.getDeviceName() == getString("devices", "camera") &&
+        property.getState() == IPS_ALERT)
     {
-        logInfo("cameraAlert");
+        logInfo("Camera alert — aborting sequence");
         emit cameraAlert();
+        if (pMachine->isRunning())
+            pMachine->submitEvent("abort");
+        return;
     }
 
-
-    if (
-        (property.getDeviceName()  == getString("devices", "camera"))
-        &&  (QString(property.getName())   == "CCD_FRAME_RESET")
-        &&  (property.getState()  == IPS_OK)
-    )
+    if (property.getDeviceName() == getString("devices", "filter") &&
+        QString(property.getName()) == "FILTER_SLOT" &&
+        property.getState() == IPS_OK &&
+        pMachine->isRunning())
     {
-        //logInfo("FrameResetDone");
-        emit FrameResetDone();
+        pMachine->submitEvent("FilterReady");
+        return;
     }
 
-    if (
-        (property.getDeviceName()  == getString("devices", "filter"))
-        &&  (QString(property.getName())   == "FILTER_SLOT")
-        &&  (property.getState() == IPS_OK)
-        && isSequenceRunning
-        && !mWaitingForFocus  // Don't shoot if waiting for focus
-    )
-    {
-        //logInfo("Filter OK");
-        Shoot();
-    }
-    if (
-        (property.getDeviceName()  == getString("devices", "camera"))
-        &&  (QString(property.getName())   == "CCD_EXPOSURE")
-        //&&  (property.getState() == IPS_OK)
-        && isSequenceRunning
-        && !mWaitingForFocus  // Don't update exposure progress while focus is running
-    )
+    if (property.getDeviceName() == getString("devices", "camera") &&
+        QString(property.getName()) == "CCD_EXPOSURE" &&
+        pMachine->isActive("Exposing"))
     {
         newExp(property);
     }
@@ -232,345 +386,56 @@ void Sequencer::updateProperty(INDI::Property property)
 void Sequencer::newExp(INDI::PropertyNumber exp)
 {
     double etot = getFloat("sequence", "exposure");
-    double ex = exp.findWidgetByName("CCD_EXPOSURE_VALUE")->value;
-    getEltPrg("progress", "exposure")->setPrgValue(100 * (etot - ex) / etot, true);
-}
-void Sequencer::Shoot()
-{
-    double exp = getFloat("sequence", "exposure");
-    double gain = getInt("sequence", "gain");
-    double offset = getInt("sequence", "offset");
-    requestCapture(getString("devices", "camera"), exp, gain, offset);
-
-    double i = getInt("sequence", "count");
-    getEltPrg("sequence", "progress")->setPrgValue(100 * (i - currentCount + 1) / i, false);
-    getEltPrg("sequence", "progress")->setDynLabel(QString::number(i - currentCount + 1) + "/" + QString::number(i), false);
-
-
-    getProperty("sequence")->updateLine(currentLine);
-
-    int tot = getProperty("sequence")->getGrid().size();
-    getEltPrg("progress", "global")->setPrgValue(100 * (currentLine + 1) / (tot), false);
-    getEltPrg("progress", "global")->setDynLabel(QString::number(currentLine + 1) + "/" + QString::number(tot), true);
+    double ex   = exp.findWidgetByName("CCD_EXPOSURE_VALUE")->value;
+    getEltPrg("progress", "exposure")->setPrgValue(100.0 * (etot - ex) / etot, true);
 }
 
-void Sequencer::OnSucessSEP()
+// =============================================================================
+// Helpers
+// =============================================================================
+
+void Sequencer::setupOutputFolder()
 {
-    disconnect(&_solver, &Solver::successSEP, this, &Sequencer::OnSucessSEP);
-    OST::ImgData dta = _image->ImgStats();
-    dta.HFRavg = _solver.HFRavg;
-    dta.starsCount = _solver.stars.size();
-    getEltImg("image", "image")->setValue(dta, true);
-}
-
-
-void Sequencer::StartSequence()
-{
-
-    setStateEvent(OST::Busy, "running", "startsequence", "Start sequence");
-    currentLine = -1;
-    isSequenceRunning = true;
-    mObjectName = getString("object", "label");
-    mDate = QDateTime::currentDateTime().toString("yyyyMMdd-hh-mm-ss");
-
-
     QDir dir;
-    dir.mkdir(getWebroot() + "/" + getModuleName());
-    dir.mkdir(getWebroot() + "/" + getModuleName() + "/" + mObjectName);
+    QString base = getWebroot() + "/" + getModuleName() + "/" + mObjectName;
 
-    connectIndi();
-    if (connectDevice(getString("devices", "camera")))
+    if (mCurrentFrameType == "L")
     {
-        setBLOBMode(B_ALSO, getString("devices", "camera").toStdString().c_str(), nullptr);
-        frameReset(getString("devices", "camera"));
-        if (getString("devices", "camera") == "CCD Simulator")
-        {
-            sendModNewNumber(getString("devices", "camera"), "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 1 );
-        }
-        getProperty("actions")->setState(OST::Busy, true);
-
-        for (int i = 0; i < getProperty("sequence")->getGrid().count(); i++)
-        {
-            getProperty("sequence")->fetchLine(i);
-            getEltPrg("sequence", "progress")->setDynLabel("Queued", false);
-            getEltPrg("sequence", "progress")->setPrgValue(0, false);
-            getProperty("sequence")->updateLine(i);
-        }
-
-        // Check if autofocus at sequence start is enabled
-        bool autofocusAtStart = getBool("parameters", "autofocusatstart");
-
-        if (autofocusAtStart && getProperty("sequence")->getGrid().count() > 0)
-        {
-            // Get first line filter information
-            getProperty("sequence")->fetchLine(0);
-            int filterIndex = getInt("sequence", "filter");
-            QString firstFilter = getEltInt("sequence", "filter")->getLov()[filterIndex];
-            QString firstFrameType = getString("sequence", "frametype");
-
-            // Only do initial focus for light or flat frames
-            if (firstFrameType == "L" || firstFrameType == "F")
-            {
-                logInfo("Starting sequence with autofocus using filter: %1", {firstFilter});
-
-                // Set the filter to the first line's filter
-                sendModNewNumber(getString("devices", "filter"), "FILTER_SLOT", "FILTER_SLOT_VALUE", filterIndex);
-
-                // Initialize previousFilter so first line doesn't trigger another focus
-                previousFilter = firstFilter;
-
-                // Request focus before starting sequence
-                requestFocus();
-                return;  // StartLine() will be called after focus completes
-            }
-        }
-
-        StartLine();
+        sendModNewSwitch(getString("devices", "camera"), "CCD_FRAME_TYPE", "FRAME_LIGHT", ISS_ON);
+        mCurrentFolder = base + "/LIGHT/" + mCurrentFilter;
+        dir.mkpath(mCurrentFolder);
     }
-    else
+    else if (mCurrentFrameType == "F")
     {
-        getProperty("actions")->setState(OST::Error, true);
-        setStateEvent(OST::Error, "error", "deviceerror", "Device error");
+        sendModNewSwitch(getString("devices", "camera"), "CCD_FRAME_TYPE", "FRAME_FLAT", ISS_ON);
+        mCurrentFolder = base + "/FLAT/" + mCurrentFilter;
+        dir.mkpath(mCurrentFolder);
     }
-
-}
-void Sequencer::StartLine()
-{
-
-    currentLine++;
-    if (currentLine >= getProperty("sequence")->getGrid().count())
+    else if (mCurrentFrameType == "B")
     {
-        logInfo("Sequence completed");
-        getProperty("actions")->setState(OST::Ok, true);
-        isSequenceRunning = false;
-        previousFilter = "";
-        setStateEvent(OST::Ok, "ready", "sequencedone", "Sequence done");
+        sendModNewSwitch(getString("devices", "camera"), "CCD_FRAME_TYPE", "FRAME_BIAS", ISS_ON);
+        mCurrentFolder = base + "/BIAS";
+        dir.mkpath(mCurrentFolder);
     }
-    else
+    else if (mCurrentFrameType == "D")
     {
-        setStateEvent(OST::Busy, "running", "startline", "Start line");
-        getProperty("sequence")->fetchLine(currentLine);
-        currentCount = getInt("sequence", "count");
-        currentExposure = getFloat("sequence", "exposure");
-        int i = getInt("sequence", "filter");
-        currentFilter = getEltInt("sequence", "filter")->getLov()[i];
-        currentFrameType = getString("sequence", "frametype");
-
-        // Check if filter has changed and autofocus is enabled
-        bool filterChanged = (!previousFilter.isEmpty() && previousFilter != currentFilter);
-        bool autofocusEnabled = getBool("parameters", "autofocusonfilterchange");
-
-        if (filterChanged && autofocusEnabled && (currentFrameType == "L" || currentFrameType == "F"))
-        {
-            logInfo("Filter changed from %1 to %2", {previousFilter, currentFilter});
-            previousFilter = currentFilter;
-
-            // First change the filter
-            sendModNewNumber(getString("devices", "filter"), "FILTER_SLOT", "FILTER_SLOT_VALUE", i);
-
-            // Setup folders before requesting focus
-            QDir dir;
-            currentFolder = getWebroot() + "/" + getModuleName() + "/" + mObjectName + "";
-            dir.mkdir(currentFolder);
-            if (currentFrameType == "L")
-            {
-                sendModNewSwitch(getString("devices", "camera"), "CCD_FRAME_TYPE", "FRAME_LIGHT", ISS_ON);
-                currentFolder = getWebroot() + "/" + getModuleName() + "/" + mObjectName + "/LIGHT";
-                dir.mkdir(currentFolder);
-                currentFolder = getWebroot() + "/" + getModuleName() + "/" + mObjectName + "/LIGHT/" + currentFilter;
-            }
-            if (currentFrameType == "F")
-            {
-                sendModNewSwitch(getString("devices", "camera"), "CCD_FRAME_TYPE", "FRAME_FLAT", ISS_ON);
-                currentFolder = getWebroot() + "/" + getModuleName() + "/" + mObjectName + "/FLAT";
-                dir.mkdir(currentFolder);
-                currentFolder = getWebroot() + "/" + getModuleName() + "/" + mObjectName + "/FLAT/" + currentFilter;
-            }
-            dir.mkdir(currentFolder);
-
-            // Request focus and return - Shoot() will be called after focus completes
-            requestFocus();
-            return;
-        }
-
-        // Update previous filter for next iteration
-        previousFilter = currentFilter;
-
-        sendModNewNumber(getString("devices", "filter"), "FILTER_SLOT", "FILTER_SLOT_VALUE", i);
-        QDir dir;
-        currentFolder = getWebroot() + "/" + getModuleName() + "/" + mObjectName + "";
-        dir.mkdir(currentFolder);
-        if (currentFrameType == "L")
-        {
-            sendModNewSwitch(getString("devices", "camera"), "CCD_FRAME_TYPE", "FRAME_LIGHT", ISS_ON);
-            currentFolder = getWebroot() + "/" + getModuleName() + "/" + mObjectName + "/LIGHT";
-            dir.mkdir(currentFolder);
-            currentFolder = getWebroot() + "/" + getModuleName() + "/" + mObjectName + "/LIGHT/" + currentFilter;
-        }
-        if (currentFrameType == "F")
-        {
-            sendModNewSwitch(getString("devices", "camera"), "CCD_FRAME_TYPE", "FRAME_FLAT", ISS_ON);
-            currentFolder = getWebroot() + "/" + getModuleName() + "/" + mObjectName + "/FLAT";
-            dir.mkdir(currentFolder);
-            currentFolder = getWebroot() + "/" + getModuleName() + "/" + mObjectName + "/FLAT/" + currentFilter;
-        }
-
-        if (currentFrameType == "B")
-        {
-            sendModNewSwitch(getString("devices", "camera"), "CCD_FRAME_TYPE", "FRAME_BIAS", ISS_ON);
-            currentFolder = getWebroot() + "/" + getModuleName() + "/" + mObjectName + "/BIAS";
-        }
-        if (currentFrameType == "D")
-        {
-            sendModNewSwitch(getString("devices", "camera"), "CCD_FRAME_TYPE", "FRAME_DARK", ISS_ON);
-            currentFolder = getWebroot() + "/" + getModuleName() + "/" + mObjectName + "/DARK";
-        }
-        dir.mkdir(currentFolder);
+        sendModNewSwitch(getString("devices", "camera"), "CCD_FRAME_TYPE", "FRAME_DARK", ISS_ON);
+        mCurrentFolder = base + "/DARK";
+        dir.mkpath(mCurrentFolder);
     }
 }
+
 void Sequencer::refreshFilterLov()
 {
     INDI::BaseDevice dp = getDevice(getString("devices", "filter").toStdString().c_str());
-
     if (!dp.isValid())
-    {
-        logError("Unable to find %1 device.", {getString("devices", "filter")});
         return;
-    }
+
     INDI::PropertyText txt = dp.getText("FILTER_NAME");
     if (!txt.isValid())
-    {
-        logError("Unable to find %1/FILTER_NAME property.", {getString("devices", "filter")});
         return;
-    }
 
     getEltInt("sequence", "filter")->lovClear();
-    for (unsigned int i = 0; i < txt.count(); i++ )
-    {
-        txt[i].getText();
+    for (unsigned int i = 0; i < txt.count(); i++)
         getEltInt("sequence", "filter")->lovAdd(i + 1, txt[i].getText());
-    }
-
-}
-
-void Sequencer::requestFocus()
-{
-    QString focusModule = getString("slaves", "focusmodule");
-    logInfo("Filter changed - requesting autofocus from module: %1", {focusModule});
-
-    mWaitingForFocus = true;
-
-    // Suspend guiding if option is enabled
-    bool suspendGuiding = getBool("parameters", "suspendguidingduringfocus");
-    if (suspendGuiding)
-    {
-        QString guiderModule = getString("slaves", "guidermodule");
-        logInfo("Suspending guiding on module: %1", {guiderModule});
-        otherModuleSetValue( guiderModule, "actions", "abortguider", true);
-    }
-
-    // Request focus
-    otherModuleSetValue( focusModule, "actions", "autofocus", true);
-
-}
-
-void Sequencer::OnFocusDone(void)
-{
-
-    logInfo("Autofocus completed - resuming sequence");
-    mWaitingForFocus = false;
-
-    // Resume guiding if it was suspended
-    bool suspendGuiding = getBool("parameters", "suspendguidingduringfocus");
-    if (suspendGuiding)
-    {
-        QString guiderModule = getString("slaves", "guidermodule");
-        logInfo("Resuming guiding on module: %1", {guiderModule});
-        otherModuleSetValue( guiderModule, "actions", "guide", true);
-
-
-        // Wait for guiding to settle before continuing
-        int settleTime = getInt("parameters", "guidingsettletime");
-        if (settleTime > 0)
-        {
-            logInfo("Waiting %1 seconds for guiding to settle...", {settleTime});
-            mWaitingForGuidingSettle = true;
-            mGuidingSettleTimer->start(settleTime * 1000); // Convert seconds to milliseconds
-            return; // OnGuidingSettleTimeout() will continue the sequence
-        }
-    }
-
-    // Continue sequence immediately if no settle time needed
-    // If currentLine is -1, focus was done at sequence start, so start the first line
-    if (currentLine == -1)
-    {
-        logInfo("Initial autofocus completed - starting sequence");
-        StartLine();
-    }
-    else
-    {
-        // After focus completes during sequence, shoot the first image of the current line
-        Shoot();
-    }
-}
-
-void Sequencer::OnGuidingSettleTimeout()
-{
-    logInfo("Guiding settle time completed - continuing sequence");
-    mWaitingForGuidingSettle = false;
-
-    // Continue sequence after settle time
-    if (currentLine == -1)
-    {
-        logInfo("Starting sequence");
-        StartLine();
-    }
-    else
-    {
-        // Shoot the first image of the current line
-        Shoot();
-    }
-}
-void Sequencer::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QString elt, QVariant data, int line)
-{
-    if (mod != getString("slaves", "focusmodule") && mod != getString("slaves", "guidermodule") ) return;
-
-    //logDebug("Planner::onOtherModuleEvent2 mod=%1 ev=%2 prop=%3 elt=%4 data=%5", {mod, OST::EvToString(ev), prp, elt, data});
-
-    if (mod == getString("slaves", "focusmodule") && ev == OST::EvType::ea && prp == "signals"  && mWaitingForFocus)
-    {
-        QJsonObject o = data.toJsonValue().toObject()["e"].toObject();
-        int s = o["state"].toInt();
-        QString sd = o["statedescription"].toString();
-        QString e = o["event"].toString();
-        QString ed = o["eventdescription"].toString();
-        logDebug("catching signals event from %6 : %1 %2 %3 %4 %5", {OST::EvToString(ev), s, sd, e, ed, mod});
-        if (OST::IntToState(s) == OST::Ok && sd == "ready")
-        {
-            OnFocusDone();
-            return;
-        }
-    }
-
-    if (mod == getString("slaves", "guidermodule") && ev == OST::EvType::ea && prp == "signals")
-    {
-        QJsonObject o = data.toJsonValue().toObject()["e"].toObject();
-        int s = o["state"].toInt();
-        QString sd = o["statedescription"].toString();
-        QString e = o["event"].toString();
-        QString ed = o["eventdescription"].toString();
-        logDebug("catching signals event from %6 : %1 %2 %3 %4 %5", {OST::EvToString(ev), s, sd, e, ed, mod});
-        if (OST::IntToState(s) == OST::Busy && sd == "guiding")
-        {
-            //(...)
-        }
-    }
-
-    // Report Guider RMS
-    if (mod == getString("slaves", "guidermodule") && ev == OST::EvType::ea && prp == "values")
-    {
-        float f = data.toMap()["e"].toMap()["rmsTotal"].toFloat();
-        //logDebug("RMS : %1", {f});
-    }
-
 }

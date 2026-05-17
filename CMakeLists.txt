@@ -48,7 +48,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules/dummy)
-#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/utils)
@@ -413,6 +412,7 @@ target_link_libraries(ostsequencer PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::Scxml
     Threads::Threads
     z
 )
@@ -429,6 +429,7 @@ target_link_libraries(ostguider PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::Scxml
     Threads::Threads
     z
 )

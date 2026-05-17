@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scxml xmlns="http://www.w3.org/2005/07/scxml" version="1.0" binding="early" xmlns:qt="http://www.qt.io/2015/02/scxml-ext" name="SMSequencer" qt:editorversion="17.0.1" initial="Idle">
+
+    <final id="Final">
+        <qt:editorinfo geometry="0;900;-20;-20;40;40" scenegeometry="0;900;-20;880;40;40"/>
+    </final>
+
+    <!-- Waiting for user to start the sequence -->
+    <state id="Idle">
+        <qt:editorinfo geometry="0;-700;-90;-40;180;80" scenegeometry="0;-700;-90;-740;180;80"/>
+        <transition event="startsequence" target="Running"/>
+    </state>
+
+    <!-- Sequence in progress -->
+    <state id="Running" initial="InitLine">
+        <qt:editorinfo geometry="0;50;-180;-530;360;1060" stateColor="#a2d700" scenegeometry="0;50;-180;-480;360;1060"/>
+
+        <!-- Abort is handled from any sub-state -->
+        <transition event="abort" target="Aborted"/>
+
+        <!-- ── PRE-LINE PHASE ──────────────────────────────────────────── -->
+
+        <state id="InitLine">
+            <qt:editorinfo geometry="0;-450;-110;-40;220;80" scenegeometry="0;-400;-110;-440;220;80"/>
+            <transition event="SequenceDone" target="Done"/>
+            <transition event="LineLoaded"   target="ChangingFilter"/>
+        </state>
+
+        <state id="ChangingFilter">
+            <qt:editorinfo geometry="0;-330;-110;-40;220;80" scenegeometry="0;-280;-110;-320;220;80"/>
+            <transition event="FilterReady" target="Focusing"/>
+        </state>
+
+        <state id="Focusing">
+            <qt:editorinfo geometry="0;-210;-110;-40;220;80" scenegeometry="0;-160;-110;-200;220;80"/>
+            <transition event="FocusReady" target="StartingGuider"/>
+        </state>
+
+        <!-- GuiderStarted fired by onOtherModuleEvent when guider signals Busy/"guiding" -->
+        <state id="StartingGuider">
+            <qt:editorinfo geometry="0;-90;-110;-40;220;80" scenegeometry="0;-40;-110;-80;220;80"/>
+            <transition event="GuiderStarted" target="GuidingSettling"/>
+        </state>
+
+        <state id="GuidingSettling">
+            <qt:editorinfo geometry="0;30;-110;-40;220;80" scenegeometry="0;80;-110;40;220;80"/>
+            <transition event="SettleDone" target="Exposing"/>
+        </state>
+
+        <!-- ── CAPTURE PHASE ───────────────────────────────────────────── -->
+
+        <state id="Exposing">
+            <qt:editorinfo geometry="0;150;-110;-40;220;80" scenegeometry="0;200;-110;160;220;80"/>
+            <transition event="ExposureDone" target="ProcessShot"/>
+        </state>
+
+        <state id="ProcessShot">
+            <qt:editorinfo geometry="0;270;-110;-40;220;80" scenegeometry="0;320;-110;280;220;80"/>
+            <transition event="NextShot"  target="Exposing"/>
+            <transition event="LineDone"  target="InitLine"/>
+        </state>
+
+    </state>
+
+    <state id="Done">
+        <qt:editorinfo geometry="300;700;-70;-40;140;80" scenegeometry="300;700;230;660;140;80"/>
+    </state>
+
+    <state id="Aborted">
+        <qt:editorinfo geometry="-300;700;-70;-40;140;80" scenegeometry="-300;700;-370;660;140;80"/>
+    </state>
+
+</scxml>
