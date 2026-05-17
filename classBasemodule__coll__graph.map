@@ -1,6 +1,6 @@
 <map id="Basemodule" name="Basemodule">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,1009,224,1504"/>
-<area shape="poly" id="edge4_Node000001_Node000001" title=" " alt="" coords="226,1210,244,1228,251,1257,248,1277,240,1292,235,1290,243,1275,245,1257,239,1230,223,1214"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,1009,224,1524"/>
+<area shape="poly" id="edge4_Node000001_Node000001" title=" " alt="" coords="226,1219,244,1237,251,1267,248,1287,240,1303,235,1301,243,1286,245,1267,239,1239,223,1223"/>
 <area shape="rect" id="Node000002" href="$classDBManager.html" title=" " alt="" coords="27,615,202,960"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="117,974,117,1009,112,1009,112,974"/>
 <area shape="rect" id="Node000003" href="$classDatastore.html" title="Class to provide properties management for OST modules." alt="" coords="41,120,188,565"/>
