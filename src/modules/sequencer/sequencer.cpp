@@ -31,15 +31,26 @@ Sequencer::Sequencer(QString name, QString label, QString profile, QVariantMap a
     connect(mSettleTimer, &QTimer::timeout, this, &Sequencer::onGuidingSettleTimeout);
 
     pMachine = QScxmlStateMachine::fromFile(":sequencer.scxml");
-    pMachine->connectToState("InitLine",        QScxmlStateMachine::onEntry(this, &Sequencer::SMInitLine));
-    pMachine->connectToState("ChangingFilter",  QScxmlStateMachine::onEntry(this, &Sequencer::SMChangingFilter));
-    pMachine->connectToState("Focusing",        QScxmlStateMachine::onEntry(this, &Sequencer::SMFocusing));
-    pMachine->connectToState("StartingGuider",  QScxmlStateMachine::onEntry(this, &Sequencer::SMStartingGuider));
-    pMachine->connectToState("GuidingSettling", QScxmlStateMachine::onEntry(this, &Sequencer::SMGuidingSettling));
-    pMachine->connectToState("Exposing",        QScxmlStateMachine::onEntry(this, &Sequencer::SMExposing));
-    pMachine->connectToState("ProcessShot",     QScxmlStateMachine::onEntry(this, &Sequencer::SMProcessShot));
-    pMachine->connectToState("Done",            QScxmlStateMachine::onEntry(this, &Sequencer::SMDone));
-    pMachine->connectToState("Aborted",         QScxmlStateMachine::onEntry(this, &Sequencer::SMAborted));
+
+    // SequenceCtrl
+    pMachine->connectToState("InitLine",      QScxmlStateMachine::onEntry(this, &Sequencer::SMInitLine));
+    pMachine->connectToState("FilterStep",    QScxmlStateMachine::onEntry(this, &Sequencer::SMFilterStep));
+    pMachine->connectToState("FocusGate",     QScxmlStateMachine::onEntry(this, &Sequencer::SMFocusGate));
+    pMachine->connectToState("GuideGate",     QScxmlStateMachine::onEntry(this, &Sequencer::SMGuideGate));
+    pMachine->connectToState("DitherGate",    QScxmlStateMachine::onEntry(this, &Sequencer::SMDitherGate));
+    pMachine->connectToState("WaitSettle",    QScxmlStateMachine::onEntry(this, &Sequencer::SMWaitSettle));
+    pMachine->connectToState("Exposing",      QScxmlStateMachine::onEntry(this, &Sequencer::SMExposing));
+    pMachine->connectToState("EvalShot",      QScxmlStateMachine::onEntry(this, &Sequencer::SMEvalShot));
+    // FocusCtrl
+    pMachine->connectToState("Focusing",      QScxmlStateMachine::onEntry(this, &Sequencer::SMFocusing));
+    // GuideCtrl
+    pMachine->connectToState("GuideStarting", QScxmlStateMachine::onEntry(this, &Sequencer::SMGuideStarting));
+    pMachine->connectToState("Dithering",     QScxmlStateMachine::onEntry(this, &Sequencer::SMDithering));
+    pMachine->connectToState("Recalibrating", QScxmlStateMachine::onEntry(this, &Sequencer::SMRecalibrating));
+    // Terminal
+    pMachine->connectToState("Done",          QScxmlStateMachine::onEntry(this, &Sequencer::SMDone));
+    pMachine->connectToState("Aborted",       QScxmlStateMachine::onEntry(this, &Sequencer::SMAborted));
+    pMachine->connectToState("Error",         QScxmlStateMachine::onEntry(this, &Sequencer::SMError));
 }
 
 Sequencer::~Sequencer() {}
@@ -54,11 +65,17 @@ void Sequencer::onExternalEvent(OST::ExtEvent event)
     {
         if (event.eltkey == "startsequence" && getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
         {
-            mCurrentLine      = -1;
+            mCurrentLine          = -1;
+            mShotCount            = 0;
+            mShotsSinceDither     = 0;
+            mFilterChanged        = false;
+            mGuiderActive         = false;
+            mGuiderWasSuspended   = false;
+            mLastHFR              = 0.0;
+            mMaxRMSDuringExposure = 0.0;
             mPreviousFilter.clear();
-            mSuspendedGuiding = false;
-            mObjectName       = getString("object", "label");
-            mDate             = QDateTime::currentDateTime().toString("yyyyMMdd-hh-mm-ss");
+            mObjectName = getString("object", "label");
+            mDate       = QDateTime::currentDateTime().toString("yyyyMMdd-hh-mm-ss");
 
             QDir dir;
             dir.mkdir(getWebroot() + "/" + getModuleName());
@@ -78,7 +95,6 @@ void Sequencer::onExternalEvent(OST::ExtEvent event)
 
             getProperty("actions")->setState(OST::Busy, true);
 
-            // Reset all line progress indicators
             for (int i = 0; i < getProperty("sequence")->getGrid().count(); i++)
             {
                 getProperty("sequence")->fetchLine(i);
@@ -105,7 +121,7 @@ void Sequencer::onExternalEvent(OST::ExtEvent event)
 }
 
 // =============================================================================
-// State machine — pre-line phase
+// SequenceCtrl entry points
 // =============================================================================
 
 void Sequencer::SMInitLine()
@@ -121,20 +137,22 @@ void Sequencer::SMInitLine()
     setStateEvent(OST::Busy, "running", "startline", "Starting line");
 
     getProperty("sequence")->fetchLine(mCurrentLine);
-    mShotCount        = getInt("sequence", "count");
-    int filterIndex   = getInt("sequence", "filter");
-    const auto &lov   = getEltInt("sequence", "filter")->getLov();
-    mCurrentFilter    = lov.contains(filterIndex) ? lov[filterIndex] : QString();
-    mCurrentFrameType = getString("sequence", "frametype");
+    mShotCount            = getInt("sequence", "count");
+    int filterIndex       = getInt("sequence", "filter");
+    const auto &lov       = getEltInt("sequence", "filter")->getLov();
+    mCurrentFilter        = lov.contains(filterIndex) ? lov[filterIndex] : QString();
+    mCurrentFrameType     = getString("sequence", "frametype");
+    mLastHFR              = 0.0;
+    mMaxRMSDuringExposure = 0.0;
 
     pMachine->submitEvent("LineLoaded");
 }
 
-void Sequencer::SMChangingFilter()
+void Sequencer::SMFilterStep()
 {
-    int filterIndex  = getInt("sequence", "filter");
-    mFilterChanged   = !mPreviousFilter.isEmpty() && (mPreviousFilter != mCurrentFilter);
-    mPreviousFilter  = mCurrentFilter;
+    int filterIndex = getInt("sequence", "filter");
+    mFilterChanged  = !mPreviousFilter.isEmpty() && (mPreviousFilter != mCurrentFilter);
+    mPreviousFilter = mCurrentFilter;
 
     setupOutputFolder();
 
@@ -142,18 +160,17 @@ void Sequencer::SMChangingFilter()
         logInfo("Changing filter from %1 to %2", {mPreviousFilter, mCurrentFilter});
 
     QString filterDevice = getString("devices", "filter");
-    INDI::BaseDevice dp  = getDevice(filterDevice.toStdString().c_str());
-    if (!dp.isValid())
+    if (!getDevice(filterDevice.toStdString().c_str()).isValid())
     {
         pMachine->submitEvent("FilterReady");
         return;
     }
 
-    // Send filter command; INDI replies with FILTER_SLOT OK → updateProperty() submits "FilterReady".
+    // INDI FILTER_SLOT OK → updateProperty() submits FilterReady
     sendModNewNumber(filterDevice, "FILTER_SLOT", "FILTER_SLOT_VALUE", filterIndex);
 }
 
-void Sequencer::SMFocusing()
+void Sequencer::SMFocusGate()
 {
     bool isLightOrFlat = (mCurrentFrameType == "L" || mCurrentFrameType == "F");
     bool needsFocus    = false;
@@ -166,40 +183,42 @@ void Sequencer::SMFocusing()
             needsFocus = true;
     }
 
-    if (!needsFocus)
-    {
-        mSuspendedGuiding = false;
-        pMachine->submitEvent("FocusReady");
-        return;
-    }
-
-    logInfo("Requesting autofocus from %1", {getString("slaves", "focusmodule")});
-
-    mSuspendedGuiding = getBool("parameters", "suspendguidingduringfocus");
-    if (mSuspendedGuiding)
-    {
-        logInfo("Suspending guiding on %1", {getString("slaves", "guidermodule")});
-        otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "abortguider", true);
-    }
-
-    otherModuleSetValue(getString("slaves", "focusmodule"), "actions", "autofocus", true);
-    // Wait for FocusReady — submitted by onOtherModuleEvent when focus signals Ok/"ready"
+    // DoFocus: SequenceCtrl → WaitFocus  AND  FocusCtrl.FocusIdle → Focusing
+    // SkipFocus: SequenceCtrl → GuideGate, FocusCtrl unchanged
+    pMachine->submitEvent(needsFocus ? "DoFocus" : "SkipFocus");
 }
 
-void Sequencer::SMStartingGuider()
+void Sequencer::SMGuideGate()
 {
-    if (!mSuspendedGuiding)
+    // The sequencer never starts the guider on its own initiative.
+    // We only restart it if WE suspended it earlier for focus.
+    if (!mGuiderWasSuspended)
     {
-        pMachine->submitEvent("GuiderStarted");
+        pMachine->submitEvent("SkipGuide");
         return;
     }
 
-    logInfo("Resuming guiding on %1 — waiting for confirmation", {getString("slaves", "guidermodule")});
-    otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "guide", true);
-    // Wait for GuiderStarted — submitted by onOtherModuleEvent when guider signals Busy/"guiding"
+    mGuiderWasSuspended = false;
+    // StartGuide: SequenceCtrl → WaitGuide  AND  GuideCtrl.GuideIdle → GuideStarting
+    pMachine->submitEvent("StartGuide");
 }
 
-void Sequencer::SMGuidingSettling()
+void Sequencer::SMDitherGate()
+{
+    int ditherevery = getInt("parameters", "ditherevery");
+
+    if (ditherevery > 0 && mShotsSinceDither >= ditherevery && mGuiderActive)
+    {
+        // DoDither: SequenceCtrl → WaitDither  AND  GuideCtrl.GuideIdle → Dithering
+        pMachine->submitEvent("DoDither");
+    }
+    else
+    {
+        pMachine->submitEvent("SkipDither");
+    }
+}
+
+void Sequencer::SMWaitSettle()
 {
     int settleTime = getInt("parameters", "guidingsettletime");
 
@@ -211,15 +230,12 @@ void Sequencer::SMGuidingSettling()
 
     logInfo("Waiting %1 s for guiding to settle", {settleTime});
     mSettleTimer->start(settleTime * 1000);
-    // Wait for SettleDone — submitted by onGuidingSettleTimeout()
 }
-
-// =============================================================================
-// State machine — capture phase
-// =============================================================================
 
 void Sequencer::SMExposing()
 {
+    mMaxRMSDuringExposure = 0.0;
+
     double exp    = getFloat("sequence", "exposure");
     int    gain   = getInt("sequence", "gain");
     int    offset = getInt("sequence", "offset");
@@ -235,21 +251,95 @@ void Sequencer::SMExposing()
     getEltPrg("progress", "global")->setPrgValue(100.0 * (mCurrentLine + 1) / lineTotal, false);
     getEltPrg("progress", "global")->setDynLabel(
         QString::number(mCurrentLine + 1) + "/" + QString::number(lineTotal), true);
-    // Wait for ExposureDone — submitted by newBLOB()
 }
 
-void Sequencer::SMProcessShot()
+void Sequencer::SMEvalShot()
 {
     mShotCount--;
+    mShotsSinceDither++;
 
     if (mShotCount > 0)
+    {
+        double hfrThreshold = getFloat("parameters", "hfrthreshold");
+        if (hfrThreshold > 0.0 && mLastHFR > hfrThreshold)
+        {
+            logInfo("HFR %1 exceeds threshold %2 — refocusing",
+                    {QString::number(mLastHFR, 'f', 2), QString::number(hfrThreshold, 'f', 2)});
+            // DoFocus: SequenceCtrl.EvalShot → WaitFocus  AND  FocusCtrl.FocusIdle → Focusing
+            pMachine->submitEvent("DoFocus");
+            return;
+        }
+
+        double rmsThreshold = getFloat("parameters", "rmsthreshold");
+        if (rmsThreshold > 0.0 && mMaxRMSDuringExposure > rmsThreshold && mGuiderActive)
+        {
+            logInfo("Peak RMS %1 px exceeded threshold %2 px — recalibrating",
+                    {QString::number(mMaxRMSDuringExposure, 'f', 2), QString::number(rmsThreshold, 'f', 2)});
+            // DoRecal: SequenceCtrl.EvalShot → WaitRecal  AND  GuideCtrl.GuideActive → Recalibrating
+            pMachine->submitEvent("DoRecal");
+            return;
+        }
+
         pMachine->submitEvent("NextShot");
+    }
     else
+    {
+        getEltPrg("sequence", "progress")->setDynLabel("Done", false);
+        getEltPrg("sequence", "progress")->setPrgValue(100, false);
+        getProperty("sequence")->updateLine(mCurrentLine);
         pMachine->submitEvent("LineDone");
+    }
 }
 
 // =============================================================================
-// State machine — terminal states
+// FocusCtrl entry points
+// =============================================================================
+
+void Sequencer::SMFocusing()
+{
+    logInfo("Requesting autofocus from %1", {getString("slaves", "focusmodule")});
+
+    if (mGuiderActive && getBool("parameters", "suspendguidingduringfocus"))
+    {
+        logInfo("Suspending guiding on %1", {getString("slaves", "guidermodule")});
+        mGuiderWasSuspended = true;
+        mGuiderActive       = false;
+        otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "abortguider", true);
+        // GuideCtrl stays in GuideIdle — GuiderLost is not submitted for an intentional abort
+    }
+
+    otherModuleSetValue(getString("slaves", "focusmodule"), "actions", "autofocus", true);
+    // FocusDone submitted by onOtherModuleEvent when focus module signals Ok/"ready"
+}
+
+// =============================================================================
+// GuideCtrl entry points
+// =============================================================================
+
+void Sequencer::SMGuideStarting()
+{
+    logInfo("Starting guider on %1", {getString("slaves", "guidermodule")});
+    otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "guide", true);
+    // GuideDone submitted by onOtherModuleEvent when guider signals Busy/"guiding"
+}
+
+void Sequencer::SMDithering()
+{
+    logInfo("Dithering (shot %1 since last dither)", {mShotsSinceDither});
+    mShotsSinceDither = 0;
+    otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "dither", true);
+    // DitherDone submitted by onOtherModuleEvent when guider returns to Busy/"guiding"
+}
+
+void Sequencer::SMRecalibrating()
+{
+    logInfo("RMS-triggered recalibration on %1", {getString("slaves", "guidermodule")});
+    otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "calguide", true);
+    // RecalDone submitted by onOtherModuleEvent when guider returns to Busy/"guiding"
+}
+
+// =============================================================================
+// Terminal states
 // =============================================================================
 
 void Sequencer::SMDone()
@@ -269,6 +359,15 @@ void Sequencer::SMAborted()
     pMachine->stop();
 }
 
+void Sequencer::SMError()
+{
+    logInfo("Sequence error");
+    mSettleTimer->stop();
+    getProperty("actions")->setState(OST::Error, true);
+    setStateEvent(OST::Error, "error", "sequenceerror", "Sequence error");
+    pMachine->stop();
+}
+
 // =============================================================================
 // Timer
 // =============================================================================
@@ -285,33 +384,82 @@ void Sequencer::onGuidingSettleTimeout()
 
 void Sequencer::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QString elt, QVariant data, int line)
 {
-    if (mod != getString("slaves", "focusmodule") && mod != getString("slaves", "guidermodule"))
+    bool isFocuser = (!mod.isEmpty() && mod == getString("slaves", "focusmodule"));
+    bool isGuider  = (!mod.isEmpty() && mod == getString("slaves", "guidermodule"));
+
+    if (!isFocuser && !isGuider)
         return;
 
-    if (ev != OST::EvType::ea || prp != "signals")
-        return;
-
-    QJsonObject o  = data.toJsonValue().toObject()["e"].toObject();
-    int         s  = o["state"].toInt();
-    QString     sd = o["statedescription"].toString();
-
-    if (mod == getString("slaves", "focusmodule"))
+    // ── Focus module ──────────────────────────────────────────────────────────
+    if (isFocuser && ev == OST::EvType::ea && prp == "signals")
     {
+        QJsonObject o  = data.toJsonValue().toObject()["e"].toObject();
+        int         s  = o["state"].toInt();
+        QString     sd = o["statedescription"].toString();
+
         if (OST::IntToState(s) == OST::Ok && sd == "ready" && pMachine->isActive("Focusing"))
         {
             logInfo("Focus completed");
-            pMachine->submitEvent("FocusReady");
+            // FocusDone: FocusCtrl.Focusing → FocusIdle  AND  SequenceCtrl.WaitFocus → GuideGate
+            pMachine->submitEvent("FocusDone");
         }
         return;
     }
 
-    if (mod == getString("slaves", "guidermodule"))
+    // ── Guider module — state signals ─────────────────────────────────────────
+    // Early-out when guiding integration is disabled: mGuiderActive stays false,
+    // which silently disables dithering, RMS checks, and focus suspension.
+    if (isGuider && !getBool("parameters", "useguiding"))
+        return;
+
+    if (isGuider && ev == OST::EvType::ea && prp == "signals")
     {
-        if (OST::IntToState(s) == OST::Busy && sd == "guiding" && pMachine->isActive("StartingGuider"))
+        QJsonObject o  = data.toJsonValue().toObject()["e"].toObject();
+        int         s  = o["state"].toInt();
+        QString     sd = o["statedescription"].toString();
+
+        if (OST::IntToState(s) == OST::Busy && sd == "guiding")
         {
-            logInfo("Guider confirmed guiding");
-            pMachine->submitEvent("GuiderStarted");
+            mGuiderActive = true;
+
+            // Only notify the SM when it is actively waiting for one of these
+            if (pMachine->isActive("GuideStarting"))
+            {
+                logInfo("Guider resumed after focus");
+                // GuideDone: GuideCtrl.GuideStarting→GuideIdle AND SequenceCtrl.WaitGuide→DitherGate
+                pMachine->submitEvent("GuideDone");
+            }
+            else if (pMachine->isActive("Dithering"))
+            {
+                logInfo("Dither complete");
+                // DitherDone: GuideCtrl.Dithering→GuideIdle AND SequenceCtrl.WaitDither→WaitSettle
+                pMachine->submitEvent("DitherDone");
+            }
+            else if (pMachine->isActive("Recalibrating"))
+            {
+                logInfo("Recalibration complete");
+                // RecalDone: GuideCtrl.Recalibrating→GuideIdle AND SequenceCtrl.WaitRecal→WaitSettle
+                pMachine->submitEvent("RecalDone");
+            }
+            // else: guider running externally — just track via mGuiderActive
         }
+        else if (OST::IntToState(s) == OST::Ok && mGuiderActive && !mGuiderWasSuspended)
+        {
+            // Unexpected guider stop (not caused by us for focus)
+            mGuiderActive = false;
+            logInfo("Guider stopped unexpectedly");
+            if (pMachine->isRunning())
+                pMachine->submitEvent("GuiderLost");
+        }
+        return;
+    }
+
+    // ── Guider module — live RMS (tracked during exposure only) ──────────────
+    if (isGuider && ev == OST::EvType::ea && prp == "values" && elt == "rmsTotal")
+    {
+        if (pMachine->isActive("Exposing"))
+            mMaxRMSDuringExposure = qMax(mMaxRMSDuringExposure, data.toDouble());
+        return;
     }
 }
 
@@ -341,7 +489,8 @@ void Sequencer::newBLOB(INDI::PropertyBlob pblob)
         mCurrentFolder + "/" + mObjectName + "-" + mCurrentFrameType + "-" + mCurrentFilter + "-" + tt + ".FITS");
 
     OST::ImgData dta = _image->ImgStats();
-    dta.mUrlJpeg = getModuleName() + ".jpeg";
+    mLastHFR         = dta.HFRavg;
+    dta.mUrlJpeg     = getModuleName() + ".jpeg";
     getEltImg("image", "image")->setValue(dta, true);
 
     pMachine->submitEvent("ExposureDone");
@@ -370,14 +519,14 @@ void Sequencer::updateProperty(INDI::Property property)
         logInfo("Camera alert — aborting sequence");
         emit cameraAlert();
         if (pMachine->isRunning())
-            pMachine->submitEvent("abort");
+            pMachine->submitEvent("CameraAlert");
         return;
     }
 
     if (property.getDeviceName() == getString("devices", "filter") &&
         QString(property.getName()) == "FILTER_SLOT" &&
         property.getState() == IPS_OK &&
-        pMachine->isRunning())
+        pMachine->isActive("FilterStep"))
     {
         pMachine->submitEvent("FilterReady");
         return;

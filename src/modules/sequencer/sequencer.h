@@ -26,7 +26,6 @@ class MODULE_INIT Sequencer: public IndiModule
 
     signals:
         void cameraAlert();
-        void Abort();
 
     protected:
         void onExternalEvent(OST::ExtEvent event) override;
@@ -35,16 +34,28 @@ class MODULE_INIT Sequencer: public IndiModule
         void onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QString elt, QVariant data, int line) override;
 
     private slots:
-        // State machine entry points
+        // ── SequenceCtrl entry points ───────────────────────────────────────
         void SMInitLine();
-        void SMChangingFilter();
-        void SMFocusing();
-        void SMStartingGuider();
-        void SMGuidingSettling();
+        void SMFilterStep();
+        void SMFocusGate();       // immediate: DoFocus or SkipFocus
+        void SMGuideGate();       // immediate: StartGuide or SkipGuide
+        void SMDitherGate();      // immediate: DoDither or SkipDither
+        void SMWaitSettle();
         void SMExposing();
-        void SMProcessShot();
+        void SMEvalShot();        // immediate: NextShot | LineDone | DoFocus | DoRecal
+
+        // ── FocusCtrl entry points ──────────────────────────────────────────
+        void SMFocusing();
+
+        // ── GuideCtrl entry points ──────────────────────────────────────────
+        void SMGuideStarting();
+        void SMDithering();
+        void SMRecalibrating();
+
+        // ── Terminal states ─────────────────────────────────────────────────
         void SMDone();
         void SMAborted();
+        void SMError();
 
         // Timer
         void onGuidingSettleTimeout();
@@ -57,24 +68,30 @@ class MODULE_INIT Sequencer: public IndiModule
         void refreshFilterLov();
         void setupOutputFolder();
 
-        QScxmlStateMachine *pMachine = nullptr;
+        QScxmlStateMachine  *pMachine     = nullptr;
         QTimer              *mSettleTimer = nullptr;
 
-        // Sequence runtime state
-        int     mCurrentLine      = -1;
-        int     mShotCount        = 0;
-        bool    mFilterChanged    = false;
-        bool    mSuspendedGuiding = false;
+        // ── Per-sequence state ──────────────────────────────────────────────
+        int     mCurrentLine           = -1;
+        int     mShotCount             = 0;
+        int     mShotsSinceDither      = 0;
+        bool    mFilterChanged         = false;
+        bool    mGuiderActive          = false; // true when guider module is confirmed guiding
+        bool    mGuiderWasSuspended    = false; // true when WE aborted the guider for focus
         QString mCurrentFilter;
         QString mPreviousFilter;
         QString mCurrentFrameType;
         QString mCurrentFolder;
-        QString mObjectName = "default";
+        QString mObjectName           = "default";
         QString mDate;
 
-        // Image processing
-        QPointer<fileio>    _image;
-        Solver              _solver;
+        // ── Per-exposure monitoring ─────────────────────────────────────────
+        double  mLastHFR              = 0.0;
+        double  mMaxRMSDuringExposure = 0.0;
+
+        // ── Image processing ────────────────────────────────────────────────
+        QPointer<fileio>     _image;
+        Solver               _solver;
         FITSImage::Statistic stats;
 };
 

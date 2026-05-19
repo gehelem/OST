@@ -193,13 +193,22 @@
                 "order": 1,
                 "hint": "Automatically trigger focus when filter changes during sequence"
             },
+            "useguiding": {
+                "type": "bool",
+                "label": "Use guiding",
+                "autoupdate": true,
+                "directedit": true,
+                "value": false,
+                "order": 3,
+                "hint": "Enable guider integration (dithering, settle, RMS monitoring, focus suspension). The guider must be started manually before the sequence."
+            },
             "suspendguidingduringfocus": {
                 "type": "bool",
                 "label": "Suspend guiding during focus",
                 "autoupdate": true,
                 "directedit": true,
                 "value": false,
-                "order": 3,
+                "order": 4,
                 "hint": "Suspend guiding when autofocus is triggered and resume after focus completes"
             },
             "guidingsettletime": {
@@ -211,6 +220,36 @@
                 "order": 5,
                 "format": "99",
                 "hint": "Wait time in seconds after resuming guiding before continuing sequence (allows guiding to stabilize)"
+            },
+            "ditherevery": {
+                "type": "int",
+                "label": "Dither every N shots (0=disabled)",
+                "autoupdate": true,
+                "directedit": true,
+                "value": 0,
+                "order": 6,
+                "format": "99",
+                "hint": "Dither the guider every N captured frames; 0 disables dithering"
+            },
+            "hfrthreshold": {
+                "type": "float",
+                "label": "HFR refocus threshold (0=disabled)",
+                "autoupdate": true,
+                "directedit": true,
+                "value": 0,
+                "order": 7,
+                "format": "9.9",
+                "hint": "Trigger an autofocus when the measured HFR exceeds this value; 0 disables the check"
+            },
+            "rmsthreshold": {
+                "type": "float",
+                "label": "RMS recalibration threshold px (0=disabled)",
+                "autoupdate": true,
+                "directedit": true,
+                "value": 0,
+                "order": 8,
+                "format": "9.9",
+                "hint": "Trigger a guider recalibration when the peak RMS during an exposure exceeds this value in pixels; 0 disables the check"
             }
         }
     }
