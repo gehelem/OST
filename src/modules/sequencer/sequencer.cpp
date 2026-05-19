@@ -123,7 +123,8 @@ void Sequencer::SMInitLine()
     getProperty("sequence")->fetchLine(mCurrentLine);
     mShotCount        = getInt("sequence", "count");
     int filterIndex   = getInt("sequence", "filter");
-    mCurrentFilter    = getEltInt("sequence", "filter")->getLov()[filterIndex];
+    const auto &lov   = getEltInt("sequence", "filter")->getLov();
+    mCurrentFilter    = lov.contains(filterIndex) ? lov[filterIndex] : QString();
     mCurrentFrameType = getString("sequence", "frametype");
 
     pMachine->submitEvent("LineLoaded");
@@ -140,9 +141,16 @@ void Sequencer::SMChangingFilter()
     if (mFilterChanged)
         logInfo("Changing filter from %1 to %2", {mPreviousFilter, mCurrentFilter});
 
-    // Always send the filter command.
-    // INDI replies with FILTER_SLOT OK → updateProperty() submits "FilterReady".
-    sendModNewNumber(getString("devices", "filter"), "FILTER_SLOT", "FILTER_SLOT_VALUE", filterIndex);
+    QString filterDevice = getString("devices", "filter");
+    INDI::BaseDevice dp  = getDevice(filterDevice.toStdString().c_str());
+    if (!dp.isValid())
+    {
+        pMachine->submitEvent("FilterReady");
+        return;
+    }
+
+    // Send filter command; INDI replies with FILTER_SLOT OK → updateProperty() submits "FilterReady".
+    sendModNewNumber(filterDevice, "FILTER_SLOT", "FILTER_SLOT_VALUE", filterIndex);
 }
 
 void Sequencer::SMFocusing()
