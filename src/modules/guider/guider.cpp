@@ -547,7 +547,7 @@ void Guider::SMInitInit()
     {
         logError("Failed to read mount pier side");
         setStateEvent(OST::Error, "error", "devicefailed", "mount failed");
-        emit Abort();
+        ;
         return;
     }
 
@@ -777,6 +777,7 @@ void Guider::SMRequestFrameReset()
     //logInfo("SMRequestFrameReset");
     if (!frameReset(getString("devices", "camera")))
     {
+        setStateEvent(OST::Error, "error", "devicefailed", "camera failed");
         emit Abort();
         return;
     }
@@ -790,6 +791,7 @@ void Guider::SMRequestExposure()
     if (!requestCapture(getString("devices", "camera"), getFloat("parms", "exposure"), getInt("parms", "gain"), getInt("parms",
                         "offset")))
     {
+        setStateEvent(OST::Error, "error", "devicefailed", "camera failed");
         emit Abort();
         return;
     }
@@ -1233,6 +1235,7 @@ void Guider::OnSucessSEP()
     if (_solver.stars.size() < 3 )
     {
         logError("We need at least 3 stars to guide - abort");
+        setStateEvent(OST::Error, "error", "nostars", "no stars found");
         emit Abort();
         return;
     }
