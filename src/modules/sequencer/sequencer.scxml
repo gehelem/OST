@@ -17,18 +17,19 @@
 
     GuideCtrl — owns all guiding logic.
       Activates on StartGuide; manages dithering and recalibration autonomously.
-      Transitions GuideActive → GuideOff on GuiderLost (intentional or not).
-      Error only propagates when GuiderLost is caught in SequenceCtrl.Exposing.
 
     Shared events (one submission, two simultaneous transitions):
       DoFocus    : SequenceCtrl.FocusGate→WaitFocus  + FocusCtrl.FocusIdle→Focusing
       FocusDone  : SequenceCtrl.WaitFocus→GuideGate  + FocusCtrl.Focusing→FocusIdle
-      StartGuide : SequenceCtrl.GuideGate→WaitGuide  + GuideCtrl.GuideOff→GuideStarting
-      GuideDone  : SequenceCtrl.WaitGuide→DitherGate + GuideCtrl.GuideStarting→GuideActive
-      DoDither   : SequenceCtrl.DitherGate→WaitDither+ GuideCtrl.GuideActive→Dithering
-      DitherDone : SequenceCtrl.WaitDither→WaitSettle+ GuideCtrl.Dithering→GuideActive
-      DoRecal    : SequenceCtrl.EvalShot→WaitRecal   + GuideCtrl.GuideActive→Recalibrating
-      RecalDone  : SequenceCtrl.WaitRecal→WaitSettle + GuideCtrl.Recalibrating→GuideActive
+      StartGuide : SequenceCtrl.GuideGate→WaitGuide  + GuideCtrl.GuideIdle→GuideStarting
+      GuideDone  : SequenceCtrl.WaitGuide→Exposing   + GuideCtrl.GuideStarting→GuideIdle
+      DoDither   : SequenceCtrl.DitherGate→WaitDither+ GuideCtrl.GuideIdle→Dithering
+      DitherDone : SequenceCtrl.WaitDither→WaitSettle+ GuideCtrl.Dithering→GuideIdle
+      DoRecal    : SequenceCtrl.EvalShot→WaitRecal   + GuideCtrl.GuideIdle→Recalibrating
+      RecalDone  : SequenceCtrl.WaitRecal→WaitSettle + GuideCtrl.Recalibrating→GuideIdle
+
+    Termination: C++ submits SequenceDoneAll (not done.state.X — Qt SCXML parallel
+      done-event propagation is unreliable). Active catches it directly → Done.
     -->
 
     <final id="Final">
@@ -37,38 +38,53 @@
 
     <state id="Idle">
         <qt:editorinfo geometry="0;-900;-90;-40;180;80" scenegeometry="0;-900;-90;-940;180;80"/>
+        <onentry><!--log label="Idle entry"/--></onentry>
+        <onexit><!--log label="Idle exit"/--></onexit>
         <transition event="startsequence" target="Active"/>
     </state>
 
     <state id="Active" initial="Running">
         <qt:editorinfo geometry="0;100;-520;-880;1040;1760" scenegeometry="0;100;-520;-780;1040;1760"/>
+        <onentry><!--log label="Active entry"/--></onentry>
+        <onexit><!--log label="Active exit"/--></onexit>
 
-        <transition event="abort"              target="Aborted"/>
-        <transition event="CameraAlert"        target="Error"/>
-        <transition event="done.state.Running" target="Done"/>
+        <transition event="abort"            target="Aborted"/>
+        <transition event="CameraAlert"      target="Error"/>
+        <!-- SequenceDoneAll submitted by C++ SMInitLine when all lines are done.
+             We do NOT use done.state.Running — Qt SCXML parallel done-event
+             propagation re-enters the parallel state instead of exiting it. -->
+        <transition event="SequenceDoneAll"  target="Done"/>
 
         <!-- ═══════════════════════════════════════ -->
         <parallel id="Running">
             <qt:editorinfo geometry="0;-100;-490;-820;980;1640" scenegeometry="0;0;-490;-820;980;1640"/>
+            <onentry><!--log label="Running entry"/--></onentry>
+            <onexit><!--log label="Running exit"/--></onexit>
 
             <!-- ─────────────────────────────────────
                  SequenceCtrl : capture pipeline
                  ───────────────────────────────────── -->
             <state id="SequenceCtrl" initial="InitLine">
                 <qt:editorinfo geometry="-300;0;-220;-810;440;1600" scenegeometry="-300;0;-790;-820;440;1600"/>
+                <onentry><!--log label="SequenceCtrl entry"/--></onentry>
+                <onexit><!--log label="SequenceCtrl exit"/--></onexit>
 
                 <state id="InitLine">
                     <qt:editorinfo geometry="0;-710;-110;-40;220;80" scenegeometry="-300;-710;-520;-750;220;80"/>
-                    <transition event="SequenceDone" target="SeqFlowDone"/>
-                    <transition event="LineLoaded"   target="FilterStep"/>
+                    <onentry><!--log label="InitLine entry"/--></onentry>
+                    <onexit><!--log label="InitLine exit"/--></onexit>
+                    <!-- SequenceDoneAll bubbles up to Active — no transition needed here -->
+                    <transition event="LineLoaded" target="FilterStep"/>
                 </state>
 
                 <state id="FilterStep">
                     <qt:editorinfo geometry="0;-610;-110;-40;220;80" scenegeometry="-300;-610;-520;-650;220;80"/>
                     <onentry>
+                        <!--log label="FilterStep entry"/-->
                         <send id="t_filter" event="FilterTimeout" delay="30s"/>
                     </onentry>
                     <onexit>
+                        <!--log label="FilterStep exit"/-->
                         <cancel sendid="t_filter"/>
                     </onexit>
                     <transition event="FilterReady"   target="FocusGate"/>
@@ -78,63 +94,81 @@
                 <!-- FocusGate: C++ immediately submits DoFocus or SkipFocus -->
                 <state id="FocusGate">
                     <qt:editorinfo geometry="0;-510;-110;-40;220;80" scenegeometry="-300;-510;-520;-550;220;80"/>
+                    <onentry><!--log label="FocusGate entry"/--></onentry>
+                    <onexit><!--log label="FocusGate exit"/--></onexit>
                     <transition event="DoFocus"   target="WaitFocus"/>
                     <transition event="SkipFocus" target="GuideGate"/>
                 </state>
 
                 <state id="WaitFocus">
                     <qt:editorinfo geometry="0;-410;-110;-40;220;80" scenegeometry="-300;-410;-520;-450;220;80"/>
+                    <onentry><!--log label="WaitFocus entry"/--></onentry>
+                    <onexit><!--log label="WaitFocus exit"/--></onexit>
                     <transition event="FocusDone" target="GuideGate"/>
                 </state>
 
                 <!-- GuideGate: C++ immediately submits StartGuide or SkipGuide -->
                 <state id="GuideGate">
                     <qt:editorinfo geometry="0;-310;-110;-40;220;80" scenegeometry="-300;-310;-520;-350;220;80"/>
+                    <onentry><!--log label="GuideGate entry"/--></onentry>
+                    <onexit><!--log label="GuideGate exit"/--></onexit>
                     <transition event="StartGuide" target="WaitGuide"/>
-                    <transition event="SkipGuide"  target="DitherGate"/>
+                    <transition event="SkipGuide"  target="Exposing"/>
                 </state>
 
                 <state id="WaitGuide">
                     <qt:editorinfo geometry="0;-210;-110;-40;220;80" scenegeometry="-300;-210;-520;-250;220;80"/>
-                    <transition event="GuideDone" target="DitherGate"/>
+                    <onentry><!--log label="WaitGuide entry"/--></onentry>
+                    <onexit><!--log label="WaitGuide exit"/--></onexit>
+                    <transition event="GuideDone" target="WaitSettle"/>
                 </state>
 
-                <!-- DitherGate: C++ immediately submits DoDither or SkipDither -->
-                <state id="DitherGate">
-                    <qt:editorinfo geometry="0;-110;-110;-40;220;80" scenegeometry="-300;-110;-520;-150;220;80"/>
-                    <transition event="DoDither"   target="WaitDither"/>
-                    <transition event="SkipDither" target="WaitSettle"/>
-                </state>
-
-                <state id="WaitDither">
-                    <qt:editorinfo geometry="0;-10;-110;-40;220;80" scenegeometry="-300;-10;-520;-50;220;80"/>
-                    <transition event="DitherDone"  target="WaitSettle"/>
-                    <transition event="GuiderLost"  target="Error"/>
-                </state>
-
-                <!-- WaitSettle: timer-based, 0s → immediate SettleDone -->
+                <!-- WaitSettle: timer-based, 0s → immediate SettleDone.
+                     Only reached after: guider start, dithering, or recalibration. -->
                 <state id="WaitSettle">
-                    <qt:editorinfo geometry="0;90;-110;-40;220;80" scenegeometry="-300;90;-520;50;220;80"/>
+                    <qt:editorinfo geometry="0;-110;-110;-40;220;80" scenegeometry="-300;-110;-520;-150;220;80"/>
+                    <onentry><!--log label="WaitSettle entry"/--></onentry>
+                    <onexit><!--log label="WaitSettle exit"/--></onexit>
                     <transition event="SettleDone" target="Exposing"/>
                 </state>
 
+                <!-- DitherGate: C++ immediately submits DoDither or SkipDither. -->
+                <state id="DitherGate">
+                    <qt:editorinfo geometry="0;290;-110;-40;220;80" scenegeometry="-300;290;-520;250;220;80"/>
+                    <onentry><!--log label="DitherGate entry"/--></onentry>
+                    <onexit><!--log label="DitherGate exit"/--></onexit>
+                    <transition event="DoDither"   target="WaitDither"/>
+                    <transition event="SkipDither" target="Exposing"/>
+                </state>
+
+                <state id="WaitDither">
+                    <qt:editorinfo geometry="0;390;-110;-40;220;80" scenegeometry="-300;390;-520;350;220;80"/>
+                    <onentry><!--log label="WaitDither entry"/--></onentry>
+                    <onexit><!--log label="WaitDither exit"/--></onexit>
+                    <transition event="DitherDone" target="WaitSettle"/>
+                    <transition event="GuiderLost" target="Error"/>
+                </state>
+
                 <state id="Exposing">
-                    <qt:editorinfo geometry="0;190;-110;-40;220;80" scenegeometry="-300;190;-520;150;220;80"/>
+                    <qt:editorinfo geometry="0;90;-110;-40;220;80" scenegeometry="-300;90;-520;50;220;80"/>
                     <onentry>
+                        <!--log label="Exposing entry"/-->
                         <send id="t_exposure" event="ExposureTimeout" delay="600s"/>
                     </onentry>
                     <onexit>
+                        <!--log label="Exposing exit"/-->
                         <cancel sendid="t_exposure"/>
                     </onexit>
                     <transition event="ExposureDone"    target="EvalShot"/>
                     <transition event="ExposureTimeout" target="Error"/>
-                    <!-- Guider lost during exposure is a hard error -->
                     <transition event="GuiderLost"      target="Error"/>
                 </state>
 
                 <!-- EvalShot: C++ immediately submits NextShot|LineDone|DoFocus|DoRecal -->
                 <state id="EvalShot">
-                    <qt:editorinfo geometry="0;290;-110;-40;220;80" scenegeometry="-300;290;-520;250;220;80"/>
+                    <qt:editorinfo geometry="0;190;-110;-40;220;80" scenegeometry="-300;190;-520;150;220;80"/>
+                    <onentry><!--log label="EvalShot entry"/--></onentry>
+                    <onexit><!--log label="EvalShot exit"/--></onexit>
                     <transition event="NextShot"  target="DitherGate"/>
                     <transition event="LineDone"  target="InitLine"/>
                     <transition event="DoFocus"   target="WaitFocus"/>
@@ -142,66 +176,60 @@
                 </state>
 
                 <state id="WaitRecal">
-                    <qt:editorinfo geometry="0;390;-110;-40;220;80" scenegeometry="-300;390;-520;350;220;80"/>
+                    <qt:editorinfo geometry="0;490;-110;-40;220;80" scenegeometry="-300;490;-520;450;220;80"/>
+                    <onentry><!--log label="WaitRecal entry"/--></onentry>
+                    <onexit><!--log label="WaitRecal exit"/--></onexit>
                     <transition event="RecalDone" target="WaitSettle"/>
                 </state>
 
-                <final id="SeqFlowDone">
-                    <qt:editorinfo geometry="0;490;-20;-20;40;40" scenegeometry="-300;490;-320;470;40;40"/>
-                </final>
             </state>
 
             <!-- ─────────────────────────────────────
                  FocusCtrl : autofocus protocol
+                 No final state — terminated by SequenceDoneAll exiting Running.
                  ───────────────────────────────────── -->
             <state id="FocusCtrl" initial="FocusIdle">
                 <qt:editorinfo geometry="0;0;-110;-440;220;880" scenegeometry="0;0;-110;-440;220;880"/>
-
-                <!-- Terminate alongside SequenceCtrl -->
-                <transition event="done.state.SequenceCtrl" target="FocusCtrlDone"/>
+                <onentry><!--log label="FocusCtrl entry"/--></onentry>
+                <onexit><!--log label="FocusCtrl exit"/--></onexit>
 
                 <state id="FocusIdle">
                     <qt:editorinfo geometry="0;-310;-110;-40;220;80" scenegeometry="0;-310;-220;-350;220;80"/>
+                    <onentry><!--log label="FocusIdle entry"/--></onentry>
+                    <onexit><!--log label="FocusIdle exit"/--></onexit>
                     <transition event="DoFocus" target="Focusing"/>
                 </state>
 
                 <state id="Focusing">
                     <qt:editorinfo geometry="0;-210;-110;-40;220;80" scenegeometry="0;-210;-220;-250;220;80"/>
                     <onentry>
+                        <!--log label="Focusing entry"/-->
                         <send id="t_focus" event="FocusTimeout" delay="180s"/>
                     </onentry>
                     <onexit>
+                        <!--log label="Focusing exit"/-->
                         <cancel sendid="t_focus"/>
                     </onexit>
-                    <!-- FocusDone transitions both this state and SequenceCtrl.WaitFocus -->
                     <transition event="FocusDone"    target="FocusIdle"/>
                     <transition event="FocusTimeout" target="Error"/>
                 </state>
 
-                <final id="FocusCtrlDone">
-                    <qt:editorinfo geometry="0;-90;-20;-20;40;40" scenegeometry="0;-90;-20;-110;40;40"/>
-                </final>
             </state>
 
             <!-- ─────────────────────────────────────
                  GuideCtrl : guiding operations
-                 The sequencer never starts the guider on its own initiative.
-                 mGuiderActive (C++ flag) tracks whether guiding is running.
-                 GuideCtrl only manages: restart after focus suspension,
-                 dithering, and recalibration — all on explicit request.
+                 No final state — terminated by SequenceDoneAll exiting Running.
                  ───────────────────────────────────── -->
             <state id="GuideCtrl" initial="GuideIdle">
                 <qt:editorinfo geometry="300;0;-200;-580;400;1160" scenegeometry="300;0;100;-580;400;1160"/>
+                <onentry><!--log label="GuideCtrl entry"/--></onentry>
+                <onexit><!--log label="GuideCtrl exit"/--></onexit>
 
-                <!-- Terminate alongside SequenceCtrl -->
-                <transition event="done.state.SequenceCtrl" target="GuideCtrlDone"/>
-
-                <!-- Idle: ready to accept any guiding operation -->
                 <state id="GuideIdle">
                     <qt:editorinfo geometry="0;-470;-110;-40;220;80" scenegeometry="300;-470;190;-510;220;80"/>
-                    <!-- StartGuide: only submitted when WE suspended the guider for focus -->
+                    <onentry><!--log label="GuideIdle entry"/--></onentry>
+                    <onexit><!--log label="GuideIdle exit"/--></onexit>
                     <transition event="StartGuide" target="GuideStarting"/>
-                    <!-- DoDither/DoRecal: only submitted when mGuiderActive is true (C++ guard) -->
                     <transition event="DoDither"   target="Dithering"/>
                     <transition event="DoRecal"    target="Recalibrating"/>
                 </state>
@@ -209,12 +237,13 @@
                 <state id="GuideStarting">
                     <qt:editorinfo geometry="0;-370;-110;-40;220;80" scenegeometry="300;-370;190;-410;220;80"/>
                     <onentry>
+                        <!--log label="GuideStarting entry"/-->
                         <send id="t_guider" event="GuiderTimeout" delay="120s"/>
                     </onentry>
                     <onexit>
+                        <!--log label="GuideStarting exit"/-->
                         <cancel sendid="t_guider"/>
                     </onexit>
-                    <!-- GuideDone: GuideCtrl→GuideIdle AND SequenceCtrl.WaitGuide→DitherGate -->
                     <transition event="GuideDone"     target="GuideIdle"/>
                     <transition event="GuiderTimeout" target="Error"/>
                 </state>
@@ -222,12 +251,13 @@
                 <state id="Dithering">
                     <qt:editorinfo geometry="0;-270;-110;-40;220;80" scenegeometry="300;-270;190;-310;220;80"/>
                     <onentry>
+                        <!--log label="Dithering entry"/-->
                         <send id="t_dither" event="DitherTimeout" delay="90s"/>
                     </onentry>
                     <onexit>
+                        <!--log label="Dithering exit"/-->
                         <cancel sendid="t_dither"/>
                     </onexit>
-                    <!-- DitherDone: GuideCtrl→GuideIdle AND SequenceCtrl.WaitDither→WaitSettle -->
                     <transition event="DitherDone"    target="GuideIdle"/>
                     <transition event="DitherTimeout" target="Error"/>
                 </state>
@@ -235,19 +265,17 @@
                 <state id="Recalibrating">
                     <qt:editorinfo geometry="0;-170;-110;-40;220;80" scenegeometry="300;-170;190;-210;220;80"/>
                     <onentry>
+                        <!--log label="Recalibrating entry"/-->
                         <send id="t_recal" event="RecalTimeout" delay="300s"/>
                     </onentry>
                     <onexit>
+                        <!--log label="Recalibrating exit"/-->
                         <cancel sendid="t_recal"/>
                     </onexit>
-                    <!-- RecalDone: GuideCtrl→GuideIdle AND SequenceCtrl.WaitRecal→WaitSettle -->
                     <transition event="RecalDone"    target="GuideIdle"/>
                     <transition event="RecalTimeout" target="Error"/>
                 </state>
 
-                <final id="GuideCtrlDone">
-                    <qt:editorinfo geometry="0;-50;-20;-20;40;40" scenegeometry="300;-50;280;-70;40;40"/>
-                </final>
             </state>
 
         </parallel>
@@ -255,12 +283,15 @@
         <!-- Terminal states -->
         <state id="Done">
             <qt:editorinfo geometry="350;750;-90;-40;180;80" scenegeometry="350;850;-170;810;180;80"/>
+            <onentry><!--log label="Done entry"/--></onentry>
         </state>
         <state id="Aborted">
             <qt:editorinfo geometry="0;750;-90;-40;180;80" scenegeometry="0;850;-90;810;180;80"/>
+            <onentry><!--log label="Aborted entry"/--></onentry>
         </state>
         <state id="Error">
             <qt:editorinfo geometry="-350;750;-90;-40;180;80" scenegeometry="-350;850;-440;810;180;80"/>
+            <onentry><!--log label="Error entry"/--></onentry>
         </state>
 
     </state>

@@ -112,7 +112,8 @@ void Sequencer::onExternalEvent(OST::ExtEvent event)
         if (event.eltkey == "abortsequence" && getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
         {
             mSettleTimer->stop();
-            pMachine->submitEvent("abort");
+            if (pMachine->isRunning())
+                pMachine->submitEvent("abort");
         }
     }
 
@@ -126,11 +127,14 @@ void Sequencer::onExternalEvent(OST::ExtEvent event)
 
 void Sequencer::SMInitLine()
 {
+    //qDebug() << "SMInitLine";
     mCurrentLine++;
 
     if (mCurrentLine >= getProperty("sequence")->getGrid().count())
     {
-        pMachine->submitEvent("SequenceDone");
+        // SequenceDoneAll bubbles up through Running to Active → Done.
+        // We avoid done.state.Running — Qt SCXML re-enters the parallel state instead of exiting it.
+        pMachine->submitEvent("SequenceDoneAll");
         return;
     }
 
@@ -150,6 +154,7 @@ void Sequencer::SMInitLine()
 
 void Sequencer::SMFilterStep()
 {
+    //qDebug() << "SMFilterStep";
     int filterIndex = getInt("sequence", "filter");
     mFilterChanged  = !mPreviousFilter.isEmpty() && (mPreviousFilter != mCurrentFilter);
     mPreviousFilter = mCurrentFilter;
@@ -172,6 +177,7 @@ void Sequencer::SMFilterStep()
 
 void Sequencer::SMFocusGate()
 {
+    //qDebug() << "SMFocusGate";
     bool isLightOrFlat = (mCurrentFrameType == "L" || mCurrentFrameType == "F");
     bool needsFocus    = false;
 
@@ -190,10 +196,17 @@ void Sequencer::SMFocusGate()
 
 void Sequencer::SMGuideGate()
 {
-    // The sequencer never starts the guider on its own initiative.
-    // We only restart it if WE suspended it earlier for focus.
-    if (!mGuiderWasSuspended)
+    //qDebug() << "SMGuideGate";
+
+    if (!getBool("parameters", "useguiding"))
     {
+        pMachine->submitEvent("SkipGuide");
+        return;
+    }
+
+    if (mGuiderActive && !mGuiderWasSuspended)
+    {
+        // Guider already running (e.g. between shots on the same line)
         pMachine->submitEvent("SkipGuide");
         return;
     }
@@ -205,6 +218,7 @@ void Sequencer::SMGuideGate()
 
 void Sequencer::SMDitherGate()
 {
+    //qDebug() << "SMDitherGate";
     int ditherevery = getInt("parameters", "ditherevery");
 
     if (ditherevery > 0 && mShotsSinceDither >= ditherevery && mGuiderActive)
@@ -220,6 +234,7 @@ void Sequencer::SMDitherGate()
 
 void Sequencer::SMWaitSettle()
 {
+    //qDebug() << "SMWaitSettle";
     int settleTime = getInt("parameters", "guidingsettletime");
 
     if (settleTime <= 0)
@@ -234,6 +249,7 @@ void Sequencer::SMWaitSettle()
 
 void Sequencer::SMExposing()
 {
+    //qDebug() << "SMExposing";
     mMaxRMSDuringExposure = 0.0;
 
     double exp    = getFloat("sequence", "exposure");
@@ -255,6 +271,7 @@ void Sequencer::SMExposing()
 
 void Sequencer::SMEvalShot()
 {
+    //qDebug() << "SMEvalShot";
     mShotCount--;
     mShotsSinceDither++;
 
@@ -264,7 +281,7 @@ void Sequencer::SMEvalShot()
         if (hfrThreshold > 0.0 && mLastHFR > hfrThreshold)
         {
             logInfo("HFR %1 exceeds threshold %2 — refocusing",
-                    {QString::number(mLastHFR, 'f', 2), QString::number(hfrThreshold, 'f', 2)});
+            {QString::number(mLastHFR, 'f', 2), QString::number(hfrThreshold, 'f', 2)});
             // DoFocus: SequenceCtrl.EvalShot → WaitFocus  AND  FocusCtrl.FocusIdle → Focusing
             pMachine->submitEvent("DoFocus");
             return;
@@ -274,7 +291,7 @@ void Sequencer::SMEvalShot()
         if (rmsThreshold > 0.0 && mMaxRMSDuringExposure > rmsThreshold && mGuiderActive)
         {
             logInfo("Peak RMS %1 px exceeded threshold %2 px — recalibrating",
-                    {QString::number(mMaxRMSDuringExposure, 'f', 2), QString::number(rmsThreshold, 'f', 2)});
+            {QString::number(mMaxRMSDuringExposure, 'f', 2), QString::number(rmsThreshold, 'f', 2)});
             // DoRecal: SequenceCtrl.EvalShot → WaitRecal  AND  GuideCtrl.GuideActive → Recalibrating
             pMachine->submitEvent("DoRecal");
             return;
@@ -297,6 +314,7 @@ void Sequencer::SMEvalShot()
 
 void Sequencer::SMFocusing()
 {
+    //qDebug() << "SMFocusing";
     logInfo("Requesting autofocus from %1", {getString("slaves", "focusmodule")});
 
     if (mGuiderActive && getBool("parameters", "suspendguidingduringfocus"))
@@ -318,6 +336,7 @@ void Sequencer::SMFocusing()
 
 void Sequencer::SMGuideStarting()
 {
+    //qDebug() << "SMGuideStarting";
     logInfo("Starting guider on %1", {getString("slaves", "guidermodule")});
     otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "guide", true);
     // GuideDone submitted by onOtherModuleEvent when guider signals Busy/"guiding"
@@ -325,6 +344,7 @@ void Sequencer::SMGuideStarting()
 
 void Sequencer::SMDithering()
 {
+    //qDebug() << "SMDithering";
     logInfo("Dithering (shot %1 since last dither)", {mShotsSinceDither});
     mShotsSinceDither = 0;
     otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "dither", true);
@@ -333,6 +353,7 @@ void Sequencer::SMDithering()
 
 void Sequencer::SMRecalibrating()
 {
+    //qDebug() << "SMRecalibrating";
     logInfo("RMS-triggered recalibration on %1", {getString("slaves", "guidermodule")});
     otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "calguide", true);
     // RecalDone submitted by onOtherModuleEvent when guider returns to Busy/"guiding"
@@ -344,26 +365,35 @@ void Sequencer::SMRecalibrating()
 
 void Sequencer::SMDone()
 {
+    //qDebug() << "SMDone";
     logInfo("Sequence completed");
     getProperty("actions")->setState(OST::Ok, true);
+    getEltBool("actions", "startsequence")->setValue(false, true);
+    getEltBool("actions", "abortsequence")->setValue(false, true);
     setStateEvent(OST::Ok, "ready", "sequencedone", "Sequence done");
     pMachine->stop();
 }
 
 void Sequencer::SMAborted()
 {
+    //qDebug() << "SMAborted";
     logInfo("Sequence aborted");
     mSettleTimer->stop();
     getProperty("actions")->setState(OST::Ok, true);
+    getEltBool("actions", "startsequence")->setValue(false, true);
+    getEltBool("actions", "abortsequence")->setValue(false, true);
     setStateEvent(OST::Ok, "ready", "abortdone", "Sequence aborted");
     pMachine->stop();
 }
 
 void Sequencer::SMError()
 {
+    //qDebug() << "SMError";
     logInfo("Sequence error");
     mSettleTimer->stop();
     getProperty("actions")->setState(OST::Error, true);
+    getEltBool("actions", "startsequence")->setValue(false, true);
+    getEltBool("actions", "abortsequence")->setValue(false, true);
     setStateEvent(OST::Error, "error", "sequenceerror", "Sequence error");
     pMachine->stop();
 }
@@ -457,6 +487,11 @@ void Sequencer::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QSt
     // ── Guider module — live RMS (tracked during exposure only) ──────────────
     if (isGuider && ev == OST::EvType::ea && prp == "values" && elt == "rmsTotal")
     {
+        // rmsTotal is ground truth: guiding is definitely running.
+        mGuiderActive = true;
+        // If we were waiting for the guider to start, confirm it now.
+        if (pMachine->isActive("GuideStarting"))
+            pMachine->submitEvent("GuideDone");
         if (pMachine->isActive("Exposing"))
             mMaxRMSDuringExposure = qMax(mMaxRMSDuringExposure, data.toDouble());
         return;
@@ -499,7 +534,7 @@ void Sequencer::newBLOB(INDI::PropertyBlob pblob)
 void Sequencer::newProperty(INDI::Property property)
 {
     if (property.getDeviceName() == getString("devices", "filter") &&
-        QString(property.getName()) == "FILTER_NAME")
+            QString(property.getName()) == "FILTER_NAME")
     {
         refreshFilterLov();
     }
@@ -514,7 +549,7 @@ void Sequencer::updateProperty(INDI::Property property)
     }
 
     if (property.getDeviceName() == getString("devices", "camera") &&
-        property.getState() == IPS_ALERT)
+            property.getState() == IPS_ALERT)
     {
         logInfo("Camera alert — aborting sequence");
         emit cameraAlert();
@@ -524,17 +559,17 @@ void Sequencer::updateProperty(INDI::Property property)
     }
 
     if (property.getDeviceName() == getString("devices", "filter") &&
-        QString(property.getName()) == "FILTER_SLOT" &&
-        property.getState() == IPS_OK &&
-        pMachine->isActive("FilterStep"))
+            QString(property.getName()) == "FILTER_SLOT" &&
+            property.getState() == IPS_OK &&
+            pMachine->isActive("FilterStep"))
     {
         pMachine->submitEvent("FilterReady");
         return;
     }
 
     if (property.getDeviceName() == getString("devices", "camera") &&
-        QString(property.getName()) == "CCD_EXPOSURE" &&
-        pMachine->isActive("Exposing"))
+            QString(property.getName()) == "CCD_EXPOSURE" &&
+            pMachine->isActive("Exposing"))
     {
         newExp(property);
     }
