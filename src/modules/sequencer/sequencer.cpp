@@ -255,6 +255,10 @@ void Sequencer::SMExposing()
     double exp    = getFloat("sequence", "exposure");
     int    gain   = getInt("sequence", "gain");
     int    offset = getInt("sequence", "offset");
+    if (getString("devices", "camera") == "CCD Simulator")
+    {
+        sendModNewNumber(getString("devices", "camera"), "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 1 );
+    }
     requestCapture(getString("devices", "camera"), exp, gain, offset);
 
     int total = getInt("sequence", "count");
@@ -284,16 +288,6 @@ void Sequencer::SMEvalShot()
             {QString::number(mLastHFR, 'f', 2), QString::number(hfrThreshold, 'f', 2)});
             // DoFocus: SequenceCtrl.EvalShot → WaitFocus  AND  FocusCtrl.FocusIdle → Focusing
             pMachine->submitEvent("DoFocus");
-            return;
-        }
-
-        double rmsThreshold = getFloat("parameters", "rmsthreshold");
-        if (rmsThreshold > 0.0 && mMaxRMSDuringExposure > rmsThreshold && mGuiderActive)
-        {
-            logInfo("Peak RMS %1 px exceeded threshold %2 px — recalibrating",
-            {QString::number(mMaxRMSDuringExposure, 'f', 2), QString::number(rmsThreshold, 'f', 2)});
-            // DoRecal: SequenceCtrl.EvalShot → WaitRecal  AND  GuideCtrl.GuideActive → Recalibrating
-            pMachine->submitEvent("DoRecal");
             return;
         }
 
@@ -355,7 +349,8 @@ void Sequencer::SMRecalibrating()
 {
     //qDebug() << "SMRecalibrating";
     logInfo("RMS-triggered recalibration on %1", {getString("slaves", "guidermodule")});
-    otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "calguide", true);
+    otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "resetcalibration", true);
+    otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "guide", true);
     // RecalDone submitted by onOtherModuleEvent when guider returns to Busy/"guiding"
 }
 
@@ -473,27 +468,62 @@ void Sequencer::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QSt
             }
             // else: guider running externally — just track via mGuiderActive
         }
-        else if (OST::IntToState(s) == OST::Ok && mGuiderActive && !mGuiderWasSuspended)
+        else if (OST::IntToState(s) == OST::Ok && sd == "ready")
         {
-            // Unexpected guider stop (not caused by us for focus)
-            mGuiderActive = false;
-            logInfo("Guider stopped unexpectedly");
-            if (pMachine->isRunning())
-                pMachine->submitEvent("GuiderLost");
+            if (pMachine->isActive("WaitGuide"))
+            {
+                // Guider confirmed abort after RMS alert — reset calibration and restart
+                logInfo("Guider stopped — resetting calibration and restarting");
+                otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "resetcalibration", true);
+                otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "guide", true);
+            }
+            else if (mGuiderActive && !mGuiderWasSuspended)
+            {
+                // Unexpected guider stop
+                mGuiderActive = false;
+                logInfo("Guider stopped unexpectedly");
+                if (pMachine->isRunning())
+                    pMachine->submitEvent("GuiderLost");
+            }
+            else
+            {
+                mGuiderActive = false;
+            }
         }
         return;
     }
 
-    // ── Guider module — live RMS (tracked during exposure only) ──────────────
+    // ── Guider module — live RMS ──────────────────────────────────────────────
     if (isGuider && ev == OST::EvType::ea && prp == "values" && elt == "rmsTotal")
     {
         // rmsTotal is ground truth: guiding is definitely running.
         mGuiderActive = true;
-        // If we were waiting for the guider to start, confirm it now.
-        if (pMachine->isActive("GuideStarting"))
+
+        // Confirm guider started (both from GuideStarting and from WaitGuide after RMSAlert).
+        if (pMachine->isActive("GuideStarting") || pMachine->isActive("WaitGuide"))
+        {
             pMachine->submitEvent("GuideDone");
+            return;
+        }
+
         if (pMachine->isActive("Exposing"))
-            mMaxRMSDuringExposure = qMax(mMaxRMSDuringExposure, data.toDouble());
+        {
+            QJsonObject o  = data.toJsonValue().toObject()["e"].toObject();
+            double rms = o["rmsTotal"].toDouble();
+            mMaxRMSDuringExposure = qMax(mMaxRMSDuringExposure, rms);
+
+            double rmsThreshold = getFloat("parameters", "rmsthreshold");
+            if (rmsThreshold > 0.0 && rms > rmsThreshold)
+            {
+                logInfo("RMS %1 px exceeded threshold %2 px — aborting exposure and guider",
+                {QString::number(rms, 'f', 2), QString::number(rmsThreshold, 'f', 2)});
+                mMaxRMSDuringExposure = 0.0;
+                mGuiderActive = false;
+                sendModNewSwitch(getString("devices", "camera"), "CCD_ABORT_EXPOSURE", "ABORT", ISS_ON);
+                otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "abortguider", true);
+                pMachine->submitEvent("RMSAlert");
+            }
+        }
         return;
     }
 }

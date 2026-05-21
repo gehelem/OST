@@ -162,6 +162,8 @@
                     <transition event="ExposureDone"    target="EvalShot"/>
                     <transition event="ExposureTimeout" target="Error"/>
                     <transition event="GuiderLost"      target="Error"/>
+                    <!-- RMS exceeded: exposure aborted by C++, wait for guider to recalibrate -->
+                    <transition event="RMSAlert"        target="WaitGuide"/>
                 </state>
 
                 <!-- EvalShot: C++ immediately submits NextShot|LineDone|DoFocus|DoRecal -->
