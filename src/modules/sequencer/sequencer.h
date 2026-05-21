@@ -42,6 +42,7 @@ class MODULE_INIT Sequencer: public IndiModule
         void SMDitherGate();      // immediate: DoDither or SkipDither
         void SMWaitSettle();
         void SMExposing();
+        void SMFindStars();
         void SMEvalShot();        // immediate: NextShot | LineDone | DoFocus | DoRecal
 
         // ── FocusCtrl entry points ──────────────────────────────────────────
@@ -62,6 +63,7 @@ class MODULE_INIT Sequencer: public IndiModule
 
     private:
         void newBLOB(INDI::PropertyBlob pblob);
+        void OnSucessSEP();
         void newProperty(INDI::Property property) override;
         void updateProperty(INDI::Property property) override;
         void newExp(INDI::PropertyNumber exp);

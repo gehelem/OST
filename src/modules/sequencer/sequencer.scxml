@@ -159,11 +159,20 @@
                         <!--log label="Exposing exit"/-->
                         <cancel sendid="t_exposure"/>
                     </onexit>
-                    <transition event="ExposureDone"    target="EvalShot"/>
+                    <transition event="ExposureDone"    target="FindingStars"/>
                     <transition event="ExposureTimeout" target="Error"/>
                     <transition event="GuiderLost"      target="Error"/>
                     <!-- RMS exceeded: exposure aborted by C++, wait for guider to recalibrate -->
                     <transition event="RMSAlert"        target="WaitGuide"/>
+                </state>
+
+                <!-- FindingStars: SEP star detection runs on main thread (async).
+                     C++ submits FindStarsDone when OnSucessSEP fires. -->
+                <state id="FindingStars">
+                    <qt:editorinfo geometry="0;140;-110;-40;220;80" scenegeometry="-300;140;-520;100;220;80"/>
+                    <onentry><!--log label="FindingStars entry"/--></onentry>
+                    <onexit><!--log label="FindingStars exit"/--></onexit>
+                    <transition event="FindStarsDone" target="EvalShot"/>
                 </state>
 
                 <!-- EvalShot: C++ immediately submits NextShot|LineDone|DoFocus|DoRecal -->

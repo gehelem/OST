@@ -40,6 +40,7 @@ Sequencer::Sequencer(QString name, QString label, QString profile, QVariantMap a
     pMachine->connectToState("DitherGate",    QScxmlStateMachine::onEntry(this, &Sequencer::SMDitherGate));
     pMachine->connectToState("WaitSettle",    QScxmlStateMachine::onEntry(this, &Sequencer::SMWaitSettle));
     pMachine->connectToState("Exposing",      QScxmlStateMachine::onEntry(this, &Sequencer::SMExposing));
+    pMachine->connectToState("FindingStars",  QScxmlStateMachine::onEntry(this, &Sequencer::SMFindStars));
     pMachine->connectToState("EvalShot",      QScxmlStateMachine::onEntry(this, &Sequencer::SMEvalShot));
     // FocusCtrl
     pMachine->connectToState("Focusing",      QScxmlStateMachine::onEntry(this, &Sequencer::SMFocusing));
@@ -549,16 +550,40 @@ void Sequencer::newBLOB(INDI::PropertyBlob pblob)
     im.setColorTable(rawImage.colorTable());
     im.save(getWebroot() + "/" + getModuleName() + ".jpeg", "JPG", 100);
 
+    OST::ImgData dta  = _image->ImgStats();
+    dta.mUrlJpeg      = getModuleName() + ".jpeg";
+    getEltImg("image", "image")->setValue(dta, true);
     QString tt = QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss_zzz");
     _image->saveAsFITSSimple(
         mCurrentFolder + "/" + mObjectName + "-" + mCurrentFrameType + "-" + mCurrentFilter + "-" + tt + ".FITS");
 
-    OST::ImgData dta = _image->ImgStats();
-    mLastHFR         = dta.HFRavg;
-    dta.mUrlJpeg     = getModuleName() + ".jpeg";
+    // newBLOB runs in the INDI thread — only do I/O here.
+    // The state machine submits ExposureDone which triggers FindingStars on the main thread.
+    if (pMachine->isRunning())
+        pMachine->submitEvent("ExposureDone");
+}
+
+void Sequencer::SMFindStars()
+{
+    // Runs on the main thread (state machine entry callback).
+    _solver.ResetSolver(stats, _image->getImageBuffer());
+    connect(&_solver, &Solver::successSEP, this, &Sequencer::OnSucessSEP);
+    _solver.FindStars(_solver.stellarSolverProfiles[0]);
+}
+
+void Sequencer::OnSucessSEP()
+{
+    disconnect(&_solver, &Solver::successSEP, this, &Sequencer::OnSucessSEP);
+
+    OST::ImgData dta = getEltImg("image", "image")->value();
+    double ech       = getSampling();
+    dta.HFRavg       = _solver.HFRavg * ech;
+    dta.starsCount   = _solver.stars.size();
     getEltImg("image", "image")->setValue(dta, true);
 
-    pMachine->submitEvent("ExposureDone");
+    mLastHFR = dta.HFRavg;
+
+    pMachine->submitEvent("FindStarsDone");
 }
 
 void Sequencer::newProperty(INDI::Property property)
