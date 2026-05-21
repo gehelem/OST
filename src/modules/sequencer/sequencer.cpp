@@ -158,12 +158,13 @@ void Sequencer::SMFilterStep()
     //qDebug() << "SMFilterStep";
     int filterIndex = getInt("sequence", "filter");
     mFilterChanged  = !mPreviousFilter.isEmpty() && (mPreviousFilter != mCurrentFilter);
-    mPreviousFilter = mCurrentFilter;
-
-    setupOutputFolder();
 
     if (mFilterChanged)
         logInfo("Changing filter from %1 to %2", {mPreviousFilter, mCurrentFilter});
+
+    mPreviousFilter = mCurrentFilter;
+
+    setupOutputFolder();
 
     QString filterDevice = getString("devices", "filter");
     if (!getDevice(filterDevice.toStdString().c_str()).isValid())
