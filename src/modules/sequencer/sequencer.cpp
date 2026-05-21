@@ -159,7 +159,9 @@ void Sequencer::SMFilterStep()
     int filterIndex = getInt("sequence", "filter");
     mFilterChanged  = !mPreviousFilter.isEmpty() && (mPreviousFilter != mCurrentFilter);
 
-    if (mFilterChanged)
+    if (mPreviousFilter.isEmpty())
+        logInfo("Set filter to %1", {mCurrentFilter});
+    else if (mFilterChanged)
         logInfo("Changing filter from %1 to %2", {mPreviousFilter, mCurrentFilter});
 
     mPreviousFilter = mCurrentFilter;
