@@ -143,8 +143,8 @@ void Sequencer::SMInitLine()
 
     getProperty("sequence")->fetchLine(mCurrentLine);
     mShotCount            = getInt("sequence", "count");
-    int filterIndex       = getInt("sequence", "filter");
-    const auto &lov       = getEltInt("sequence", "filter")->getLov();
+    QString filterIndex       = getString("sequence", "filter");
+    const auto &lov       = getEltString("sequence", "filter")->getLov();
     mCurrentFilter        = lov.contains(filterIndex) ? lov[filterIndex] : QString();
     mCurrentFrameType     = getString("sequence", "frametype");
     mLastHFR              = 0.0;
@@ -156,10 +156,10 @@ void Sequencer::SMInitLine()
 void Sequencer::SMFilterStep()
 {
     //qDebug() << "SMFilterStep";
-    int filterIndex = getInt("sequence", "filter");
+    QString filterIndex = getString("sequence", "filter");
     mFilterChanged  = !mPreviousFilter.isEmpty() && (mPreviousFilter != mCurrentFilter);
 
-    if (mPreviousFilter.isEmpty())
+    if (mPreviousFilter.isEmpty() && !mCurrentFilter.isEmpty())
         logInfo("Set filter to %1", {mCurrentFilter});
     else if (mFilterChanged)
         logInfo("Changing filter from %1 to %2", {mPreviousFilter, mCurrentFilter});
@@ -176,7 +176,7 @@ void Sequencer::SMFilterStep()
     }
 
     // INDI FILTER_SLOT OK → updateProperty() submits FilterReady
-    sendModNewNumber(filterDevice, "FILTER_SLOT", "FILTER_SLOT_VALUE", filterIndex);
+    sendModNewNumber(filterDevice, "FILTER_SLOT", "FILTER_SLOT_VALUE", filterIndex.toInt());
 }
 
 void Sequencer::SMFocusGate()
@@ -685,7 +685,9 @@ void Sequencer::refreshFilterLov()
     if (!txt.isValid())
         return;
 
-    getEltInt("sequence", "filter")->lovClear();
+    getEltString("sequence", "filter")->lovClear();
     for (unsigned int i = 0; i < txt.count(); i++)
-        getEltInt("sequence", "filter")->lovAdd(i + 1, txt[i].getText());
+    {
+        getEltString("sequence", "filter")->lovAdd(QString::number(i + 1), txt[i].getText());
+    }
 }
