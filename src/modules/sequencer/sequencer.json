@@ -51,7 +51,7 @@
                 ]
             },
             "filter": {
-                "type":"int",
+                "type":"string",
                 "label": "Filter",
                 "order":2,
                 "gridvalues":[],
@@ -108,7 +108,7 @@
             "permission": 2,
             "order":5,
             "label":"Object",
-            "hasprofile":true,
+            "hasprofile":false,
             "e": {
                 "label": {
                     "type": "string",
@@ -243,13 +243,13 @@
             },
             "rmsthreshold": {
                 "type": "float",
-                "label": "RMS recalibration threshold px (0=disabled)",
+                "label": "RMS recalibration threshold (0=disabled)",
                 "autoupdate": true,
                 "directedit": true,
                 "value": 0,
                 "order": 8,
                 "format": "9.9",
-                "hint": "Trigger a guider recalibration when the peak RMS during an exposure exceeds this value in pixels; 0 disables the check"
+                "hint": "Trigger a guider recalibration when the peak RMS during an exposure exceeds this value in arcs; 0 disables the check"
             }
         }
     }

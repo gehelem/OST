@@ -40,6 +40,7 @@ Sequencer::Sequencer(QString name, QString label, QString profile, QVariantMap a
     pMachine->connectToState("DitherGate",    QScxmlStateMachine::onEntry(this, &Sequencer::SMDitherGate));
     pMachine->connectToState("WaitSettle",    QScxmlStateMachine::onEntry(this, &Sequencer::SMWaitSettle));
     pMachine->connectToState("Exposing",      QScxmlStateMachine::onEntry(this, &Sequencer::SMExposing));
+    pMachine->connectToState("FindingStars",  QScxmlStateMachine::onEntry(this, &Sequencer::SMFindStars));
     pMachine->connectToState("EvalShot",      QScxmlStateMachine::onEntry(this, &Sequencer::SMEvalShot));
     // FocusCtrl
     pMachine->connectToState("Focusing",      QScxmlStateMachine::onEntry(this, &Sequencer::SMFocusing));
@@ -112,7 +113,8 @@ void Sequencer::onExternalEvent(OST::ExtEvent event)
         if (event.eltkey == "abortsequence" && getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
         {
             mSettleTimer->stop();
-            pMachine->submitEvent("abort");
+            if (pMachine->isRunning())
+                pMachine->submitEvent("abort");
         }
     }
 
@@ -126,11 +128,14 @@ void Sequencer::onExternalEvent(OST::ExtEvent event)
 
 void Sequencer::SMInitLine()
 {
+    //qDebug() << "SMInitLine";
     mCurrentLine++;
 
     if (mCurrentLine >= getProperty("sequence")->getGrid().count())
     {
-        pMachine->submitEvent("SequenceDone");
+        // SequenceDoneAll bubbles up through Running to Active → Done.
+        // We avoid done.state.Running — Qt SCXML re-enters the parallel state instead of exiting it.
+        pMachine->submitEvent("SequenceDoneAll");
         return;
     }
 
@@ -138,8 +143,8 @@ void Sequencer::SMInitLine()
 
     getProperty("sequence")->fetchLine(mCurrentLine);
     mShotCount            = getInt("sequence", "count");
-    int filterIndex       = getInt("sequence", "filter");
-    const auto &lov       = getEltInt("sequence", "filter")->getLov();
+    QString filterIndex       = getString("sequence", "filter");
+    const auto &lov       = getEltString("sequence", "filter")->getLov();
     mCurrentFilter        = lov.contains(filterIndex) ? lov[filterIndex] : QString();
     mCurrentFrameType     = getString("sequence", "frametype");
     mLastHFR              = 0.0;
@@ -150,14 +155,18 @@ void Sequencer::SMInitLine()
 
 void Sequencer::SMFilterStep()
 {
-    int filterIndex = getInt("sequence", "filter");
+    //qDebug() << "SMFilterStep";
+    QString filterIndex = getString("sequence", "filter");
     mFilterChanged  = !mPreviousFilter.isEmpty() && (mPreviousFilter != mCurrentFilter);
+
+    if (mPreviousFilter.isEmpty() && !mCurrentFilter.isEmpty())
+        logInfo("Set filter to %1", {mCurrentFilter});
+    else if (mFilterChanged)
+        logInfo("Changing filter from %1 to %2", {mPreviousFilter, mCurrentFilter});
+
     mPreviousFilter = mCurrentFilter;
 
     setupOutputFolder();
-
-    if (mFilterChanged)
-        logInfo("Changing filter from %1 to %2", {mPreviousFilter, mCurrentFilter});
 
     QString filterDevice = getString("devices", "filter");
     if (!getDevice(filterDevice.toStdString().c_str()).isValid())
@@ -167,11 +176,12 @@ void Sequencer::SMFilterStep()
     }
 
     // INDI FILTER_SLOT OK → updateProperty() submits FilterReady
-    sendModNewNumber(filterDevice, "FILTER_SLOT", "FILTER_SLOT_VALUE", filterIndex);
+    sendModNewNumber(filterDevice, "FILTER_SLOT", "FILTER_SLOT_VALUE", filterIndex.toInt());
 }
 
 void Sequencer::SMFocusGate()
 {
+    //qDebug() << "SMFocusGate";
     bool isLightOrFlat = (mCurrentFrameType == "L" || mCurrentFrameType == "F");
     bool needsFocus    = false;
 
@@ -190,10 +200,17 @@ void Sequencer::SMFocusGate()
 
 void Sequencer::SMGuideGate()
 {
-    // The sequencer never starts the guider on its own initiative.
-    // We only restart it if WE suspended it earlier for focus.
-    if (!mGuiderWasSuspended)
+    //qDebug() << "SMGuideGate";
+
+    if (!getBool("parameters", "useguiding"))
     {
+        pMachine->submitEvent("SkipGuide");
+        return;
+    }
+
+    if (mGuiderActive && !mGuiderWasSuspended)
+    {
+        // Guider already running (e.g. between shots on the same line)
         pMachine->submitEvent("SkipGuide");
         return;
     }
@@ -205,6 +222,7 @@ void Sequencer::SMGuideGate()
 
 void Sequencer::SMDitherGate()
 {
+    //qDebug() << "SMDitherGate";
     int ditherevery = getInt("parameters", "ditherevery");
 
     if (ditherevery > 0 && mShotsSinceDither >= ditherevery && mGuiderActive)
@@ -220,6 +238,7 @@ void Sequencer::SMDitherGate()
 
 void Sequencer::SMWaitSettle()
 {
+    //qDebug() << "SMWaitSettle";
     int settleTime = getInt("parameters", "guidingsettletime");
 
     if (settleTime <= 0)
@@ -234,11 +253,16 @@ void Sequencer::SMWaitSettle()
 
 void Sequencer::SMExposing()
 {
+    //qDebug() << "SMExposing";
     mMaxRMSDuringExposure = 0.0;
 
     double exp    = getFloat("sequence", "exposure");
     int    gain   = getInt("sequence", "gain");
     int    offset = getInt("sequence", "offset");
+    if (getString("devices", "camera") == "CCD Simulator")
+    {
+        sendModNewNumber(getString("devices", "camera"), "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 1 );
+    }
     requestCapture(getString("devices", "camera"), exp, gain, offset);
 
     int total = getInt("sequence", "count");
@@ -255,6 +279,7 @@ void Sequencer::SMExposing()
 
 void Sequencer::SMEvalShot()
 {
+    //qDebug() << "SMEvalShot";
     mShotCount--;
     mShotsSinceDither++;
 
@@ -264,19 +289,9 @@ void Sequencer::SMEvalShot()
         if (hfrThreshold > 0.0 && mLastHFR > hfrThreshold)
         {
             logInfo("HFR %1 exceeds threshold %2 — refocusing",
-                    {QString::number(mLastHFR, 'f', 2), QString::number(hfrThreshold, 'f', 2)});
+            {QString::number(mLastHFR, 'f', 2), QString::number(hfrThreshold, 'f', 2)});
             // DoFocus: SequenceCtrl.EvalShot → WaitFocus  AND  FocusCtrl.FocusIdle → Focusing
             pMachine->submitEvent("DoFocus");
-            return;
-        }
-
-        double rmsThreshold = getFloat("parameters", "rmsthreshold");
-        if (rmsThreshold > 0.0 && mMaxRMSDuringExposure > rmsThreshold && mGuiderActive)
-        {
-            logInfo("Peak RMS %1 px exceeded threshold %2 px — recalibrating",
-                    {QString::number(mMaxRMSDuringExposure, 'f', 2), QString::number(rmsThreshold, 'f', 2)});
-            // DoRecal: SequenceCtrl.EvalShot → WaitRecal  AND  GuideCtrl.GuideActive → Recalibrating
-            pMachine->submitEvent("DoRecal");
             return;
         }
 
@@ -297,6 +312,7 @@ void Sequencer::SMEvalShot()
 
 void Sequencer::SMFocusing()
 {
+    //qDebug() << "SMFocusing";
     logInfo("Requesting autofocus from %1", {getString("slaves", "focusmodule")});
 
     if (mGuiderActive && getBool("parameters", "suspendguidingduringfocus"))
@@ -318,6 +334,7 @@ void Sequencer::SMFocusing()
 
 void Sequencer::SMGuideStarting()
 {
+    //qDebug() << "SMGuideStarting";
     logInfo("Starting guider on %1", {getString("slaves", "guidermodule")});
     otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "guide", true);
     // GuideDone submitted by onOtherModuleEvent when guider signals Busy/"guiding"
@@ -325,6 +342,7 @@ void Sequencer::SMGuideStarting()
 
 void Sequencer::SMDithering()
 {
+    //qDebug() << "SMDithering";
     logInfo("Dithering (shot %1 since last dither)", {mShotsSinceDither});
     mShotsSinceDither = 0;
     otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "dither", true);
@@ -333,8 +351,10 @@ void Sequencer::SMDithering()
 
 void Sequencer::SMRecalibrating()
 {
+    //qDebug() << "SMRecalibrating";
     logInfo("RMS-triggered recalibration on %1", {getString("slaves", "guidermodule")});
-    otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "calguide", true);
+    otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "resetcalibration", true);
+    otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "guide", true);
     // RecalDone submitted by onOtherModuleEvent when guider returns to Busy/"guiding"
 }
 
@@ -344,26 +364,35 @@ void Sequencer::SMRecalibrating()
 
 void Sequencer::SMDone()
 {
+    //qDebug() << "SMDone";
     logInfo("Sequence completed");
     getProperty("actions")->setState(OST::Ok, true);
+    getEltBool("actions", "startsequence")->setValue(false, true);
+    getEltBool("actions", "abortsequence")->setValue(false, true);
     setStateEvent(OST::Ok, "ready", "sequencedone", "Sequence done");
     pMachine->stop();
 }
 
 void Sequencer::SMAborted()
 {
+    //qDebug() << "SMAborted";
     logInfo("Sequence aborted");
     mSettleTimer->stop();
     getProperty("actions")->setState(OST::Ok, true);
+    getEltBool("actions", "startsequence")->setValue(false, true);
+    getEltBool("actions", "abortsequence")->setValue(false, true);
     setStateEvent(OST::Ok, "ready", "abortdone", "Sequence aborted");
     pMachine->stop();
 }
 
 void Sequencer::SMError()
 {
+    //qDebug() << "SMError";
     logInfo("Sequence error");
     mSettleTimer->stop();
     getProperty("actions")->setState(OST::Error, true);
+    getEltBool("actions", "startsequence")->setValue(false, true);
+    getEltBool("actions", "abortsequence")->setValue(false, true);
     setStateEvent(OST::Error, "error", "sequenceerror", "Sequence error");
     pMachine->stop();
 }
@@ -443,22 +472,62 @@ void Sequencer::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QSt
             }
             // else: guider running externally — just track via mGuiderActive
         }
-        else if (OST::IntToState(s) == OST::Ok && mGuiderActive && !mGuiderWasSuspended)
+        else if (OST::IntToState(s) == OST::Ok && sd == "ready")
         {
-            // Unexpected guider stop (not caused by us for focus)
-            mGuiderActive = false;
-            logInfo("Guider stopped unexpectedly");
-            if (pMachine->isRunning())
-                pMachine->submitEvent("GuiderLost");
+            if (pMachine->isActive("WaitGuide"))
+            {
+                // Guider confirmed abort after RMS alert — reset calibration and restart
+                logInfo("Guider stopped — resetting calibration and restarting");
+                otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "resetcalibration", true);
+                otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "guide", true);
+            }
+            else if (mGuiderActive && !mGuiderWasSuspended)
+            {
+                // Unexpected guider stop
+                mGuiderActive = false;
+                logInfo("Guider stopped unexpectedly");
+                if (pMachine->isRunning())
+                    pMachine->submitEvent("GuiderLost");
+            }
+            else
+            {
+                mGuiderActive = false;
+            }
         }
         return;
     }
 
-    // ── Guider module — live RMS (tracked during exposure only) ──────────────
+    // ── Guider module — live RMS ──────────────────────────────────────────────
     if (isGuider && ev == OST::EvType::ea && prp == "values" && elt == "rmsTotal")
     {
+        // rmsTotal is ground truth: guiding is definitely running.
+        mGuiderActive = true;
+
+        // Confirm guider started (both from GuideStarting and from WaitGuide after RMSAlert).
+        if (pMachine->isActive("GuideStarting") || pMachine->isActive("WaitGuide"))
+        {
+            pMachine->submitEvent("GuideDone");
+            return;
+        }
+
         if (pMachine->isActive("Exposing"))
-            mMaxRMSDuringExposure = qMax(mMaxRMSDuringExposure, data.toDouble());
+        {
+            QJsonObject o  = data.toJsonValue().toObject()["e"].toObject();
+            double rms = o["rmsTotal"].toDouble();
+            mMaxRMSDuringExposure = qMax(mMaxRMSDuringExposure, rms);
+
+            double rmsThreshold = getFloat("parameters", "rmsthreshold");
+            if (rmsThreshold > 0.0 && rms > rmsThreshold)
+            {
+                logInfo("RMS %1 px exceeded threshold %2 px — aborting exposure and guider",
+                {QString::number(rms, 'f', 2), QString::number(rmsThreshold, 'f', 2)});
+                mMaxRMSDuringExposure = 0.0;
+                mGuiderActive = false;
+                sendModNewSwitch(getString("devices", "camera"), "CCD_ABORT_EXPOSURE", "ABORT", ISS_ON);
+                otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "abortguider", true);
+                pMachine->submitEvent("RMSAlert");
+            }
+        }
         return;
     }
 }
@@ -484,22 +553,46 @@ void Sequencer::newBLOB(INDI::PropertyBlob pblob)
     im.setColorTable(rawImage.colorTable());
     im.save(getWebroot() + "/" + getModuleName() + ".jpeg", "JPG", 100);
 
+    OST::ImgData dta  = _image->ImgStats();
+    dta.mUrlJpeg      = getModuleName() + ".jpeg";
+    getEltImg("image", "image")->setValue(dta, true);
     QString tt = QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss_zzz");
     _image->saveAsFITSSimple(
         mCurrentFolder + "/" + mObjectName + "-" + mCurrentFrameType + "-" + mCurrentFilter + "-" + tt + ".FITS");
 
-    OST::ImgData dta = _image->ImgStats();
-    mLastHFR         = dta.HFRavg;
-    dta.mUrlJpeg     = getModuleName() + ".jpeg";
+    // newBLOB runs in the INDI thread — only do I/O here.
+    // The state machine submits ExposureDone which triggers FindingStars on the main thread.
+    if (pMachine->isRunning())
+        pMachine->submitEvent("ExposureDone");
+}
+
+void Sequencer::SMFindStars()
+{
+    // Runs on the main thread (state machine entry callback).
+    _solver.ResetSolver(stats, _image->getImageBuffer());
+    connect(&_solver, &Solver::successSEP, this, &Sequencer::OnSucessSEP);
+    _solver.FindStars(_solver.stellarSolverProfiles[0]);
+}
+
+void Sequencer::OnSucessSEP()
+{
+    disconnect(&_solver, &Solver::successSEP, this, &Sequencer::OnSucessSEP);
+
+    OST::ImgData dta = getEltImg("image", "image")->value();
+    double ech       = getSampling();
+    dta.HFRavg       = _solver.HFRavg * ech;
+    dta.starsCount   = _solver.stars.size();
     getEltImg("image", "image")->setValue(dta, true);
 
-    pMachine->submitEvent("ExposureDone");
+    mLastHFR = dta.HFRavg;
+
+    pMachine->submitEvent("FindStarsDone");
 }
 
 void Sequencer::newProperty(INDI::Property property)
 {
     if (property.getDeviceName() == getString("devices", "filter") &&
-        QString(property.getName()) == "FILTER_NAME")
+            QString(property.getName()) == "FILTER_NAME")
     {
         refreshFilterLov();
     }
@@ -514,7 +607,7 @@ void Sequencer::updateProperty(INDI::Property property)
     }
 
     if (property.getDeviceName() == getString("devices", "camera") &&
-        property.getState() == IPS_ALERT)
+            property.getState() == IPS_ALERT)
     {
         logInfo("Camera alert — aborting sequence");
         emit cameraAlert();
@@ -524,17 +617,17 @@ void Sequencer::updateProperty(INDI::Property property)
     }
 
     if (property.getDeviceName() == getString("devices", "filter") &&
-        QString(property.getName()) == "FILTER_SLOT" &&
-        property.getState() == IPS_OK &&
-        pMachine->isActive("FilterStep"))
+            QString(property.getName()) == "FILTER_SLOT" &&
+            property.getState() == IPS_OK &&
+            pMachine->isActive("FilterStep"))
     {
         pMachine->submitEvent("FilterReady");
         return;
     }
 
     if (property.getDeviceName() == getString("devices", "camera") &&
-        QString(property.getName()) == "CCD_EXPOSURE" &&
-        pMachine->isActive("Exposing"))
+            QString(property.getName()) == "CCD_EXPOSURE" &&
+            pMachine->isActive("Exposing"))
     {
         newExp(property);
     }
@@ -592,7 +685,9 @@ void Sequencer::refreshFilterLov()
     if (!txt.isValid())
         return;
 
-    getEltInt("sequence", "filter")->lovClear();
+    getEltString("sequence", "filter")->lovClear();
     for (unsigned int i = 0; i < txt.count(); i++)
-        getEltInt("sequence", "filter")->lovAdd(i + 1, txt[i].getText());
+    {
+        getEltString("sequence", "filter")->lovAdd(QString::number(i + 1), txt[i].getText());
+    }
 }

@@ -1263,8 +1263,12 @@ void Guider::SMAbort()
     _SMGuide.stop();
 
     emit AbortDone();
-    setStateEvent(OST::Ok, "ready", "abortguide", "Abort guide");
-    logInfo("Guiding aborted");
+    // Defer the "ready" notification so the queued Abort→End transition
+    // is fully processed before the sequencer can call guide/start again.
+    QTimer::singleShot(0, this, [this]() {
+        setStateEvent(OST::Ok, "ready", "abortguide", "Abort guide");
+        logInfo("Guiding aborted");
+    });
 
 }
 
