@@ -20,7 +20,7 @@
         "order":"10",
         "permission": 0,
         "rule":2,
-        "hasprofile":true,
+        "hasprofile":false,
         "label": "State and signals",
         "e": {
             "state": {
