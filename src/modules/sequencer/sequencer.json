@@ -29,8 +29,8 @@
         "hasGrid":true,
         "showGrid":true,
         "showElts":false,
-        "devcat": "Parameters",
-        "group": "Sequence",
+        "devcat": "Sequence",
+        "group": "",
         "permission": 2,
         "order":1,
         "grid":0,
@@ -135,10 +135,10 @@
             }
     },
     "slaves": {
-        "label": "Parameters",
+        "label": "Slaves",
         "permission": 2,
-        "devcat": "Parameters",
-        "group": "Slave modules",
+        "devcat": "Slaves",
+        "group": "",
         "order": "100",
         "hasprofile": true,
         "e": {
@@ -168,8 +168,8 @@
     },
 
     "parameters": {
-        "devcat": "Parameters",
-        "group": "Sequence",
+        "devcat": "Sequence",
+        "group": "",
         "permission": 2,
         "order": 0,
         "hasprofile": true,

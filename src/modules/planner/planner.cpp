@@ -16,7 +16,7 @@ Planner::Planner(QString name, QString label, QString profile, QVariantMap avail
       mIsRunning(false)
 {
     Q_INIT_RESOURCE(planner);
-
+    giveMeAnActions();
     loadOstPropertiesFromFile(":planner.json");
     setMetadata("thisGithash", QString::fromStdString(Version::GIT_SHA1));
     setMetadata("thisGitdate", QString::fromStdString(Version::GIT_DATE));
@@ -178,7 +178,7 @@ void Planner::startPlanner()
     logInfo("Starting planner...");
 
     // Disable properties during operation (optional)
-    getProperty("parms")->disable();
+    //getProperty("parms")->disable();
     getProperty("devices")->disable();
 
     // Update progress

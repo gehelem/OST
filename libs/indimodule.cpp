@@ -939,7 +939,10 @@ bool IndiModule::refreshDeviceslovs()
 }
 bool IndiModule::defineMeAsFocuser()
 {
+    giveMeAParms();
+    giveMeAState();
     defineMeAsImager();
+    giveMeAnActions();
 
     OST::PropertyMulti* pm = getProperty("actions");
     pm->setRule(OST::SwitchsRule::AtMostOne);
@@ -961,7 +964,10 @@ bool IndiModule::defineMeAsFocuser()
 }
 bool IndiModule::defineMeAsGuider()
 {
+    giveMeAParms();
+    giveMeAState();
     defineMeAsImager();
+    giveMeAnActions();
 
     OST::PropertyMulti* pm = getProperty("actions");
     pm->setRule(OST::SwitchsRule::AtMostOne);
@@ -983,7 +989,10 @@ bool IndiModule::defineMeAsGuider()
 }
 bool IndiModule::defineMeAsSequencer()
 {
+    giveMeAParms();
+    giveMeAState();
     defineMeAsImager();
+    giveMeAnActions();
 
     OST::PropertyMulti* pm = getProperty("actions");
     pm->setRule(OST::SwitchsRule::AtMostOne);
@@ -1067,8 +1076,11 @@ bool IndiModule::defineMeAsImager()
 }
 bool IndiModule::defineMeAsNavigator()
 {
+    giveMeAParms();
+    giveMeAState();
     defineMeAsImager();
-
+    giveMeATarget();
+    giveMeAnActions();
 
     OST::PropertyMulti* pm  = getProperty("actions");
     pm->setRule(OST::SwitchsRule::AtMostOne);
@@ -1098,13 +1110,6 @@ bool IndiModule::defineMeAsNavigator()
     f->setDirectEdit(true);
     f->setAutoUpdate(true);
     pmtarget->addElt(f);
-
-    pm  = getProperty("parms");
-    s = new  OST::ElementString("plannermodule", "Planner module", "nav30", "");
-    s->setDirectEdit(true);
-    s->setAutoUpdate(true);
-    s->setGlobalLov("loadedModules-planner", OST::LovScope::Controller);
-    pm->addElt(s);
 
     mIsNavigator = true;
     return true;
@@ -1141,6 +1146,8 @@ double IndiModule::getSampling()
 
 bool IndiModule::giveMeADevice(QString name, QString label, INDI::BaseDevice::DRIVER_INTERFACE interface)
 {
+    giveMeAnEquipment();
+
     OST::PropertyMulti* pm = getProperty("devices");
     OST::ElementString* s = new  OST::ElementString(name, label, label, "");
     s->setPostIcon("refresh");
@@ -1188,7 +1195,7 @@ bool IndiModule::giveMeAnOptic()
 {
     if (getStore().contains("optic")) return false;
 
-    OST::PropertyMulti* pm = new OST::PropertyMulti("optic", "Optic", OST::ReadWrite, "Parameters", "General", "222Parms333",
+    OST::PropertyMulti* pm = new OST::PropertyMulti("optic", "Optic", OST::ReadWrite, "Optic", "", "",
             true,
             false);
     createProperty(pm);
@@ -1255,3 +1262,46 @@ bool IndiModule::setFocalLengthAndDiameter(QString device, double fl, double dia
 
 }
 
+bool IndiModule::giveMeAnEquipment()
+{
+
+    if (!getStore().contains("devices"))
+    {
+        OST::PropertyMulti* pm = new OST::PropertyMulti("devices", "Devices", OST::ReadWrite, "Devices", "", "222Parms333",
+                true,
+                false);
+        createProperty(pm);
+    }
+    if (!getProperty("devices")->getElts()->contains("equipments"))
+    {
+        OST::ElementString* e = new  OST::ElementString("equipments", "Global equipment set", "01", "");
+        e->setGlobalLov("equipments", OST::LovScope::Controller);
+        e->setDirectEdit(true);
+        e->setAutoUpdate(true);
+        getProperty("devices")->addElt(e);
+
+    }
+    return true;
+}
+bool IndiModule::giveMeAnActions()
+{
+    if (!getStore().contains("actions"))
+    {
+        OST::PropertyMulti* pm = new OST::PropertyMulti("actions", "Actions", OST::ReadWrite, "Actions", "", "0000",
+                false,
+                false);
+        createProperty(pm);
+    }
+
+}
+bool IndiModule::giveMeATarget()
+{
+    if (!getStore().contains("target"))
+    {
+        OST::PropertyMulti* pm = new OST::PropertyMulti("target", "Target", OST::ReadWrite, "Target", "", "0500",
+                true,
+                false);
+        createProperty(pm);
+    }
+
+};

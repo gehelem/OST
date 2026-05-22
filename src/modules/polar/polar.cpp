@@ -14,6 +14,7 @@ Polar::Polar(QString name, QString label, QString profile, QVariantMap available
     : IndiModule(name, label, profile, availableModuleLibs)
 {
 
+    giveMeAnActions();
     loadOstPropertiesFromFile(":polar.json");
 
     setMetadata("thisGithash", QString::fromStdString(Version::GIT_SHA1));
@@ -26,6 +27,7 @@ Polar::Polar(QString name, QString label, QString profile, QVariantMap available
     giveMeADevice("camera", "Camera", INDI::BaseDevice::CCD_INTERFACE);
     giveMeADevice("mount", "Mount", INDI::BaseDevice::TELESCOPE_INTERFACE);
     giveMeADevice("gps", "GPS", INDI::BaseDevice::GPS_INTERFACE);
+    giveMeAParms();
     defineMeAsImager();
 
     auto* b = new OST::ElementBool("start", "Start", "0", "");
@@ -380,7 +382,7 @@ void Polar::SMRequestMove()
     }
 
     _slewing = false;  // wait for IPS_BUSY before accepting IPS_OK as move done
-    logInfo("SMRequestMove oldRA=%1 newRA=%2",{oldRA,newRA});
+    logInfo("SMRequestMove oldRA=%1 newRA=%2", {oldRA, newRA});
     if (!sendModNewNumber(getString("devices", "mount"), "EQUATORIAL_EOD_COORD", "RA", newRA))
     {
         logInfo("SMRequestMove error 2");
@@ -737,7 +739,8 @@ void Polar::drawErrorOverlay(QImage &img, double erraz, double erralt, double er
     // Labels: reset transform to keep text readable, map rotated points back to screen coords.
     double th = orientation * M_PI / 180.0;
     double cosT = cos(th), sinT = sin(th);
-    auto toScreen = [&](QPoint p) -> QPointF {
+    auto toScreen = [&](QPoint p) -> QPointF
+    {
         return QPointF(cx + p.x() * cosT + p.y() * sinT,
                        cy - p.x() * sinT + p.y() * cosT);
     };

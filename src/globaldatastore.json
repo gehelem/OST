@@ -2,8 +2,8 @@
 "p":{
     "servers": {
         "hasprofile":true,
-        "devcat": "Module",
-        "group": "Indi",
+        "devcat": "Indi",
+        "group": "",
         "hasprofile": true,
         "hasGrid": true,
         "showGrid": true,

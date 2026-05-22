@@ -22,7 +22,7 @@
     },
     "parameters": {
         "devcat": "Parameters",
-        "group": "General",
+        "group": "",
         "permission": 2,
         "hasprofile":true,
         "order":"000Control114",

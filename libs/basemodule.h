@@ -131,6 +131,9 @@ class Basemodule : public DBManager
         void otherModuleRequestPropertyDump(QString mod, QString prop);
         void otherModuleRequestProfileLoad(QString mod, QString profile);
         void otherModuleCreateLine(QString mod, QString prop, QVariantMap values);
+        bool giveMeAState();
+        bool giveMeAParms();
+
 
     public:
         // Shared datastore access

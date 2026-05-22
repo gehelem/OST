@@ -88,8 +88,8 @@
         }
     },
     "parameters": {
-        "devcat": "Parameters",
-        "group": "Focus",
+        "devcat": "Focus",
+        "group": "",
         "permission": 2,
         "hasprofile":true,
         "order":"222Parms000",
