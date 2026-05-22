@@ -112,16 +112,6 @@
             }
 
         }
-    },
-    "parms": {
-        "devcat": "Parameters",
-        "group": "General",
-        "order":"222Parms111",
-        "permission": 2,
-        "hasprofile":true,
-        "label": "Parameters",
-        "e": {
-        }
     }
 }
 }

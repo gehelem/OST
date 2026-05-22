@@ -3,7 +3,7 @@
     "centeringparams": {
         "devcat": "Parameters",
         "order": "Param0000",
-        "group": "General",
+        "group": "",
         "permission": 2,
         "hasprofile":true,
         "rule":2,
@@ -49,10 +49,10 @@
         }
     },
     "slaves": {
-      "label": "Parameters",
+      "label": "Slaves",
       "permission": 2,
-      "devcat": "Parameters",
-      "group": "Slave modules",
+      "devcat": "Slaves",
+      "group": "",
       "order": "100",
       "hasprofile": true,
       "e": {

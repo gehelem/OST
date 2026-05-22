@@ -178,7 +178,7 @@ void Planner::startPlanner()
     logInfo("Starting planner...");
 
     // Disable properties during operation (optional)
-    getProperty("parms")->disable();
+    //getProperty("parms")->disable();
     getProperty("devices")->disable();
 
     // Update progress

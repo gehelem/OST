@@ -59,8 +59,8 @@
         }
     },
     "calibrationvalues": {
-        "devcat": "Parameters",
-        "group": "Calibration",
+        "devcat": "Calibration",
+        "group": "",
         "order":"Control850",
         "permission": 0,
         "hasprofile": true,
@@ -233,8 +233,8 @@
         }
     },
     "calParams": {
-        "devcat": "Parameters",
-        "group": "Calibration",
+        "devcat": "Calibration",
+        "group": "",
         "order":"Parameters100",
         "permission": 2,
         "hasprofile":true,
@@ -262,8 +262,8 @@
         }
     },
     "guideParams": {
-        "devcat": "Parameters",
-        "group": "Guiding",
+        "devcat": "Guiding",
+        "group": "",
         "order":"Parameters200",
         "permission": 2,
         "rule":2,
@@ -341,8 +341,8 @@
         }
     },
     "revCorrections": {
-        "devcat": "Parameters",
-        "group": "Guiding",
+        "devcat": "Guiding",
+        "group": "",
         "order":"Parameters300",
         "permission": 2,
         "rule":2,
@@ -366,8 +366,8 @@
         }
     },
         "disCorrections": {
-            "devcat": "Parameters",
-            "group": "Guiding",
+            "devcat": "Guiding",
+            "group": "",
             "permission": 2,
             "order":"Parameters400",
             "rule":2,

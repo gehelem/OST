@@ -27,6 +27,7 @@ Polar::Polar(QString name, QString label, QString profile, QVariantMap available
     giveMeADevice("camera", "Camera", INDI::BaseDevice::CCD_INTERFACE);
     giveMeADevice("mount", "Mount", INDI::BaseDevice::TELESCOPE_INTERFACE);
     giveMeADevice("gps", "GPS", INDI::BaseDevice::GPS_INTERFACE);
+    giveMeAParms();
     defineMeAsImager();
 
     auto* b = new OST::ElementBool("start", "Start", "0", "");

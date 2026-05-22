@@ -939,6 +939,8 @@ bool IndiModule::refreshDeviceslovs()
 }
 bool IndiModule::defineMeAsFocuser()
 {
+    giveMeAParms();
+    giveMeAState();
     defineMeAsImager();
     giveMeAnActions();
 
@@ -962,6 +964,8 @@ bool IndiModule::defineMeAsFocuser()
 }
 bool IndiModule::defineMeAsGuider()
 {
+    giveMeAParms();
+    giveMeAState();
     defineMeAsImager();
     giveMeAnActions();
 
@@ -985,6 +989,8 @@ bool IndiModule::defineMeAsGuider()
 }
 bool IndiModule::defineMeAsSequencer()
 {
+    giveMeAParms();
+    giveMeAState();
     defineMeAsImager();
     giveMeAnActions();
 
@@ -1070,6 +1076,8 @@ bool IndiModule::defineMeAsImager()
 }
 bool IndiModule::defineMeAsNavigator()
 {
+    giveMeAParms();
+    giveMeAState();
     defineMeAsImager();
     giveMeATarget();
     giveMeAnActions();
@@ -1102,13 +1110,6 @@ bool IndiModule::defineMeAsNavigator()
     f->setDirectEdit(true);
     f->setAutoUpdate(true);
     pmtarget->addElt(f);
-
-    pm  = getProperty("parms");
-    s = new  OST::ElementString("plannermodule", "Planner module", "nav30", "");
-    s->setDirectEdit(true);
-    s->setAutoUpdate(true);
-    s->setGlobalLov("loadedModules-planner", OST::LovScope::Controller);
-    pm->addElt(s);
 
     mIsNavigator = true;
     return true;
@@ -1194,7 +1195,7 @@ bool IndiModule::giveMeAnOptic()
 {
     if (getStore().contains("optic")) return false;
 
-    OST::PropertyMulti* pm = new OST::PropertyMulti("optic", "Optic", OST::ReadWrite, "Parameters", "General", "222Parms333",
+    OST::PropertyMulti* pm = new OST::PropertyMulti("optic", "Optic", OST::ReadWrite, "Optic", "", "",
             true,
             false);
     createProperty(pm);

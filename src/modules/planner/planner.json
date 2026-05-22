@@ -18,10 +18,10 @@
     }
   },
   "slaves": {
-    "label": "Parameters",
+    "label": "Slaves",
     "permission": 2,
-    "devcat": "Parameters",
-    "group": "Slave modules",
+    "devcat": "Slaves",
+    "group": "",
     "order": "100",
     "hasprofile": true,
     "e": {
@@ -52,8 +52,8 @@
   "planning": {
     "label": "Planning",
     "permission": 2,
-    "devcat": "Parameters",
-    "group": "Planning",
+    "devcat": "Planning",
+    "group": "",
     "autoupdate": false,
     "order": "050",
     "hasprofile": true,
