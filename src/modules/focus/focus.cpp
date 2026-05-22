@@ -133,6 +133,7 @@ void Focus::updateProperty(INDI::Property p)
             pMachine->submitEvent("BacklashDone");
             pMachine->submitEvent("GotoNextDone");
             pMachine->submitEvent("GotoStartDone");
+            getEltFloat("results", "pos")->setValue(n[0].value, true);
         }
     }
     if (
@@ -192,6 +193,7 @@ void Focus::SMAbort()
 
 void Focus::startCoarse()
 {
+    logInfo("Start focus");
     getEltBool("actions", "autofocus")->setValue(true, false);
     getEltBool("actions", "abortfocus")->setValue(false, true);
     getProperty("values")->clearGrid();
@@ -275,7 +277,7 @@ void Focus::SMRequestFrameReset()
 
 void Focus::SMRequestBacklash()
 {
-    //sendMessage("SMRequestBacklash");
+    logInfo("Moving to start position - backlash %1", {_startpos - _backlash});
     if (!sendModNewNumber(getString("devices", "focuser"), "ABS_FOCUS_POSITION", "FOCUS_ABSOLUTE_POSITION",
                           _startpos - _backlash))
     {
@@ -288,7 +290,7 @@ void Focus::SMRequestBacklash()
 
 void Focus::SMRequestGotoStart()
 {
-    //sendMessage("SMRequestGotoStart");
+    logInfo("Moving to start position %1", {_startpos});
     if (!sendModNewNumber(getString("devices", "focuser"), "ABS_FOCUS_POSITION", "FOCUS_ABSOLUTE_POSITION", _startpos))
     {
         pMachine->submitEvent("abort");
@@ -300,6 +302,7 @@ void Focus::SMRequestGotoStart()
 
 void Focus::SMRequestExposure()
 {
+    logInfo("Exposure %1", {getFloat("parms", "exposure")});
     if (!requestCapture(getString("devices", "camera"), getFloat("parms", "exposure"), getInt("parms", "gain"), getInt("parms",
                         "offset")))
     {
@@ -312,7 +315,6 @@ void Focus::SMRequestExposure()
 
 void Focus::SMFindStars()
 {
-    //sendMessage("SMFindStars");
     stats = _image->getStats();
     _solver.ResetSolver(stats, _image->getImageBuffer(), getInt("parameters", "zoning"));
     connect(&_solver, &Solver::successSEP, this, &Focus::OnSucessSEP);
@@ -327,12 +329,17 @@ void Focus::OnSucessSEP()
     dta.HFRavg = _solver.HFRavg * ech;
     dta.starsCount = _solver.stars.size();
     getEltImg("image", "image")->setValue(dta, true);
+    getEltFloat("results", "hfr")->setValue(dta.HFRavg, true);
+
     if (_solver.stars.size() < 1 )
     {
         logError("We need at least 1 stars to  focus - abort");
         pMachine->submitEvent("abort");
+        setStateEvent(OST::Error, "error", "nostars", "no stars");
+
         return;
     }
+    logInfo("%1 stars found - HFR: %2", {dta.starsCount, dta.HFRavg });
 
     pMachine->submitEvent("FindStarsDone");
 }
@@ -399,9 +406,9 @@ void Focus::SMCompute()
 
 void Focus::SMRequestGotoNext()
 {
-    //sendMessage("SMRequestGotoNext");
-    if (!sendModNewNumber(getString("devices", "focuser"), "ABS_FOCUS_POSITION", "FOCUS_ABSOLUTE_POSITION",
-                          _startpos + _iteration * _steps))
+    int pos = _startpos + _iteration * _steps;
+    logInfo("Moving to position  1 %1", {pos});
+    if (!sendModNewNumber(getString("devices", "focuser"), "ABS_FOCUS_POSITION", "FOCUS_ABSOLUTE_POSITION", pos))
     {
         pMachine->submitEvent("abort");
         return;
@@ -411,9 +418,10 @@ void Focus::SMRequestGotoNext()
 
 void Focus::SMRequestBacklashBest()
 {
-    //sendMessage("SMRequestBacklashBest");
+    int pos = _bestpos - _backlash;
+    logInfo("Moving to position 2 %1", {pos});
     if (!sendModNewNumber(getString("devices", "focuser"), "ABS_FOCUS_POSITION", "FOCUS_ABSOLUTE_POSITION",
-                          _bestpos - _backlash))
+                          pos))
     {
         pMachine->submitEvent("abort");
         return;
@@ -423,9 +431,9 @@ void Focus::SMRequestBacklashBest()
 
 void Focus::SMRequestGotoBest()
 {
-    //sendMessage("SMRequestGotoBest");
     if (_bestposfit == 99 ) _bestposfit = _bestpos;
-    if (!sendModNewNumber(getString("devices", "focuser"), "ABS_FOCUS_POSITION", "FOCUS_ABSOLUTE_POSITION", _bestposfit))
+    logInfo("Moving to position 3 %1", {_bestposfit});
+    if (!sendModNewNumber(getString("devices", "focuser"), "ABS_FOCUS_POSITION", "FOCUS_ABSOLUTE_POSITION", int(_bestposfit)))
     {
         pMachine->submitEvent("abort");
         return;
@@ -435,7 +443,7 @@ void Focus::SMRequestGotoBest()
 
 void Focus::SMRequestExposureBest()
 {
-    //sendMessage("SMRequestExposureBest");
+    logInfo("Exposure %1", {getFloat("parms", "exposure")});
     if (!sendModNewNumber(getString("devices", "camera"), "CCD_EXPOSURE", "CCD_EXPOSURE_VALUE", getEltFloat("parms",
                           "exposure")->value()))
     {
@@ -448,7 +456,7 @@ void Focus::SMRequestExposureBest()
         pMachine->submitEvent("abort");
         return;
     }
-    getEltFloat("results", "pos")->setValue(mFinalPos, true);
+    //getEltFloat("results", "pos")->setValue(mFinalPos, true);
     pMachine->submitEvent("RequestExposureBestDone");
 }
 
@@ -458,6 +466,7 @@ void Focus::SMComputeResult()
     double ech = getSampling();
     getEltFloat("values", "imgHFR")->setValue(_solver.HFRavg * ech, true);
     getEltFloat("results", "hfr")->setValue(_solver.HFRavg * ech, true);
+    //getEltFloat("results", "pos")->setValue(int(_bestposfit), true);
 
     OST::ImgData dta = getEltImg("image", "image")->value();
     dta.HFRavg = _solver.HFRavg * ech;
@@ -566,14 +575,15 @@ void Focus::SMComputeLoopFrame()
 
 void Focus::SMAlert()
 {
-    logDebug("SMAlert");
+    logError("SMAlert");
+    setStateEvent(OST::Error, "error", "SMAlert", "SMAlert");
     pMachine->submitEvent("abort");
 }
 
 void Focus::SMFocusDone()
 {
     double ech = getSampling();
-    logDebug("Focus done");
+    logInfo("Focus done");
     getEltFloat("results", "hfr")->setValue(_solver.HFRavg * ech, true);
 
     getProperty("actions")->setState(OST::Ok, true); // this will inform other modules
