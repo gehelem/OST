@@ -732,9 +732,9 @@ bool Basemodule::giveMeAState()
         OST::ElementString* e = new  OST::ElementString("event", "Global event", "30", "");
         getProperty("signals")->addElt(e);
     }
-    if (!getProperty("signals")->getElts()->contains("statedescription"))
+    if (!getProperty("signals")->getElts()->contains("eventdescription"))
     {
-        OST::ElementString* e = new  OST::ElementString("statedescription", "Event description", "40", "");
+        OST::ElementString* e = new  OST::ElementString("eventdescription", "Event description", "40", "");
         getProperty("signals")->addElt(e);
     }
 
