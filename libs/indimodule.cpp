@@ -1292,7 +1292,7 @@ bool IndiModule::giveMeAnActions()
                 false);
         createProperty(pm);
     }
-
+    return true;
 }
 bool IndiModule::giveMeATarget()
 {
@@ -1303,5 +1303,5 @@ bool IndiModule::giveMeATarget()
                 false);
         createProperty(pm);
     }
-
-};
+    return true;
+}

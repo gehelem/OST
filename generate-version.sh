@@ -31,10 +31,12 @@ else
     GIT_TAG="$DEB_VERSION"
 fi
 
-sed -e "s|@GIT_SHA1@|${GIT_SHA1}|g" \
-    -e "s|@GIT_DATE@|${GIT_DATE}|g" \
-    -e "s|@GIT_COMMIT_SUBJECT@|${GIT_COMMIT_SUBJECT}|g" \
-    -e "s|@GIT_TAG@|${GIT_TAG}|g" \
+escape_sed() { printf '%s\n' "$1" | sed 's/[|&\]/\\&/g'; }
+
+sed -e "s|@GIT_SHA1@|$(escape_sed "${GIT_SHA1}")|g" \
+    -e "s|@GIT_DATE@|$(escape_sed "${GIT_DATE}")|g" \
+    -e "s|@GIT_COMMIT_SUBJECT@|$(escape_sed "${GIT_COMMIT_SUBJECT}")|g" \
+    -e "s|@GIT_TAG@|$(escape_sed "${GIT_TAG}")|g" \
     "$TEMPLATE_FILE" > "$OUTPUT_FILE"
 
 echo "Generated $OUTPUT_FILE"
