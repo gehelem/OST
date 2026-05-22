@@ -1141,6 +1141,8 @@ double IndiModule::getSampling()
 
 bool IndiModule::giveMeADevice(QString name, QString label, INDI::BaseDevice::DRIVER_INTERFACE interface)
 {
+    giveMeAnEquipment();
+
     OST::PropertyMulti* pm = getProperty("devices");
     OST::ElementString* s = new  OST::ElementString(name, label, label, "");
     s->setPostIcon("refresh");
@@ -1255,3 +1257,24 @@ bool IndiModule::setFocalLengthAndDiameter(QString device, double fl, double dia
 
 }
 
+bool IndiModule::giveMeAnEquipment()
+{
+
+    if (!getStore().contains("devices"))
+    {
+        OST::PropertyMulti* pm = new OST::PropertyMulti("devices", "Devices", OST::ReadWrite, "Devices", "", "222Parms333",
+                true,
+                false);
+        createProperty(pm);
+    }
+    if (!getProperty("devices")->getElts()->contains("equipments"))
+    {
+        OST::ElementString* e = new  OST::ElementString("equipments", "Global equipment set", "01", "");
+        e->setGlobalLov("equipments", OST::LovScope::Controller);
+        e->setDirectEdit(true);
+        e->setAutoUpdate(true);
+        getProperty("devices")->addElt(e);
+
+    }
+    return true;
+}
