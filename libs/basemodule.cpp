@@ -406,59 +406,63 @@ bool Basemodule::loadProfile(const QString &pProfileName)
                     foreach(const QString &eltkey, props[key].toMap()["e"].toMap().keys())
                     {
                         QVariant v = props[key].toMap()["e"].toMap()[eltkey].toMap()["value"];
-                        if (getEltBase(key, eltkey)->getType() == "int")
+                        if (getProperty(key)->getElts()->contains(eltkey))
                         {
-                            getEltInt(key, eltkey)->setValue(v.toInt(), true);
+                            if (getEltBase(key, eltkey)->getType() == "int")
+                            {
+                                getEltInt(key, eltkey)->setValue(v.toInt(), true);
+                            }
+                            if (getEltBase(key, eltkey)->getType() == "float")
+                            {
+                                getEltFloat(key, eltkey)->setValue(v.toDouble(), true);
+                            }
+                            if (getEltBase(key, eltkey)->getType() == "string")
+                            {
+                                getEltString(key, eltkey)->setValue(v.toString(), true);
+                            }
+                            if (getEltBase(key, eltkey)->getType() == "bool")
+                            {
+                                getEltBool(key, eltkey)->setValue(v.toBool(), true);
+                            }
+                            if (getEltBase(key, eltkey)->getType() == "time")
+                            {
+                                int hh = props[key].toMap()["e"].toMap()[eltkey].toMap()["hh"].toInt();
+                                int mm = props[key].toMap()["e"].toMap()[eltkey].toMap()["mm"].toInt();
+                                int ss = props[key].toMap()["e"].toMap()[eltkey].toMap()["ss"].toInt();
+                                int ms = props[key].toMap()["e"].toMap()[eltkey].toMap()["ms"].toInt();
+                                QTime tt;
+                                tt.setHMS(hh, mm, ss, ms);
+                                getEltTime(key, eltkey)->setValue(tt, true);
+                            }
+                            if (getEltBase(key, eltkey)->getType() == "date")
+                            {
+                                int d = props[key].toMap()["e"].toMap()[eltkey].toMap()["day"].toInt();
+                                int m = props[key].toMap()["e"].toMap()[eltkey].toMap()["month"].toInt();
+                                int y = props[key].toMap()["e"].toMap()[eltkey].toMap()["year"].toInt();
+                                QDate dd;
+                                dd.setDate(y, m, d);
+                                getEltDate(key, eltkey)->setValue(dd, true);
+                            }
+                            if (getEltBase(key, eltkey)->getType() == "datetime")
+                            {
+                                int hh = props[key].toMap()["e"].toMap()[eltkey].toMap()["hh"].toInt();
+                                int mm = props[key].toMap()["e"].toMap()[eltkey].toMap()["mm"].toInt();
+                                int ss = props[key].toMap()["e"].toMap()[eltkey].toMap()["ss"].toInt();
+                                int ms = props[key].toMap()["e"].toMap()[eltkey].toMap()["ms"].toInt();
+                                int d = props[key].toMap()["e"].toMap()[eltkey].toMap()["day"].toInt();
+                                int m = props[key].toMap()["e"].toMap()[eltkey].toMap()["month"].toInt();
+                                int y = props[key].toMap()["e"].toMap()[eltkey].toMap()["year"].toInt();
+                                QDate dd;
+                                QTime tt;
+                                QDateTime dt;
+                                dd.setDate(y, m, d);
+                                tt.setHMS(hh, mm, ss, ms);
+                                dt.setDate(dd);
+                                dt.setTime(tt);
+                                getEltDateTime(key, eltkey)->setValue(dt, true);
+                            }
                         }
-                        if (getEltBase(key, eltkey)->getType() == "float")
-                        {
-                            getEltFloat(key, eltkey)->setValue(v.toDouble(), true);
-                        }
-                        if (getEltBase(key, eltkey)->getType() == "string")
-                        {
-                            getEltString(key, eltkey)->setValue(v.toString(), true);
-                        }
-                        if (getEltBase(key, eltkey)->getType() == "bool")
-                        {
-                            getEltBool(key, eltkey)->setValue(v.toBool(), true);
-                        }
-                        if (getEltBase(key, eltkey)->getType() == "time")
-                        {
-                            int hh = props[key].toMap()["e"].toMap()[eltkey].toMap()["hh"].toInt();
-                            int mm = props[key].toMap()["e"].toMap()[eltkey].toMap()["mm"].toInt();
-                            int ss = props[key].toMap()["e"].toMap()[eltkey].toMap()["ss"].toInt();
-                            int ms = props[key].toMap()["e"].toMap()[eltkey].toMap()["ms"].toInt();
-                            QTime tt;
-                            tt.setHMS(hh, mm, ss, ms);
-                            getEltTime(key, eltkey)->setValue(tt, true);
-                        }
-                        if (getEltBase(key, eltkey)->getType() == "date")
-                        {
-                            int d = props[key].toMap()["e"].toMap()[eltkey].toMap()["day"].toInt();
-                            int m = props[key].toMap()["e"].toMap()[eltkey].toMap()["month"].toInt();
-                            int y = props[key].toMap()["e"].toMap()[eltkey].toMap()["year"].toInt();
-                            QDate dd;
-                            dd.setDate(y, m, d);
-                            getEltDate(key, eltkey)->setValue(dd, true);
-                        }
-                        if (getEltBase(key, eltkey)->getType() == "datetime")
-                        {
-                            int hh = props[key].toMap()["e"].toMap()[eltkey].toMap()["hh"].toInt();
-                            int mm = props[key].toMap()["e"].toMap()[eltkey].toMap()["mm"].toInt();
-                            int ss = props[key].toMap()["e"].toMap()[eltkey].toMap()["ss"].toInt();
-                            int ms = props[key].toMap()["e"].toMap()[eltkey].toMap()["ms"].toInt();
-                            int d = props[key].toMap()["e"].toMap()[eltkey].toMap()["day"].toInt();
-                            int m = props[key].toMap()["e"].toMap()[eltkey].toMap()["month"].toInt();
-                            int y = props[key].toMap()["e"].toMap()[eltkey].toMap()["year"].toInt();
-                            QDate dd;
-                            QTime tt;
-                            QDateTime dt;
-                            dd.setDate(y, m, d);
-                            tt.setHMS(hh, mm, ss, ms);
-                            dt.setDate(dd);
-                            dt.setTime(tt);
-                            getEltDateTime(key, eltkey)->setValue(dt, true);
-                        }
+
 
                     }
                 }
@@ -702,4 +706,50 @@ void Basemodule::setStateEvent(OST::State state, QString statedescription, QStri
     m["event"] = event;
     m["eventdescription"] = eventdescription;
     getProperty("signals")->setAll(m);
+
+}
+bool Basemodule::giveMeAState()
+{
+    if (!getStore().contains("signals"))
+    {
+        OST::PropertyMulti* pm = new OST::PropertyMulti("signals", "State and signals", OST::ReadOnly, "Module", "", "",
+                false,
+                false);
+        createProperty(pm);
+    }
+    if (!getProperty("signals")->getElts()->contains("state"))
+    {
+        OST::ElementLight* e = new  OST::ElementLight("state", "Global state", "10", "");
+        getProperty("signals")->addElt(e);
+    }
+    if (!getProperty("signals")->getElts()->contains("statedescription"))
+    {
+        OST::ElementString* e = new  OST::ElementString("statedescription", "State description", "20", "");
+        getProperty("signals")->addElt(e);
+    }
+    if (!getProperty("signals")->getElts()->contains("event"))
+    {
+        OST::ElementString* e = new  OST::ElementString("event", "Global event", "30", "");
+        getProperty("signals")->addElt(e);
+    }
+    if (!getProperty("signals")->getElts()->contains("statedescription"))
+    {
+        OST::ElementString* e = new  OST::ElementString("statedescription", "Event description", "40", "");
+        getProperty("signals")->addElt(e);
+    }
+
+    return true;
+}
+
+bool Basemodule::giveMeAParms()
+{
+    if (!getStore().contains("parms"))
+    {
+        OST::PropertyMulti* pm = new OST::PropertyMulti("parms", "Parameters", OST::ReadWrite, "Parameters", "", "",
+                true,
+                false);
+        createProperty(pm);
+    }
+
+    return true;
 }
