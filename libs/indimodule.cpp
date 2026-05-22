@@ -940,6 +940,7 @@ bool IndiModule::refreshDeviceslovs()
 bool IndiModule::defineMeAsFocuser()
 {
     defineMeAsImager();
+    giveMeAnActions();
 
     OST::PropertyMulti* pm = getProperty("actions");
     pm->setRule(OST::SwitchsRule::AtMostOne);
@@ -962,6 +963,7 @@ bool IndiModule::defineMeAsFocuser()
 bool IndiModule::defineMeAsGuider()
 {
     defineMeAsImager();
+    giveMeAnActions();
 
     OST::PropertyMulti* pm = getProperty("actions");
     pm->setRule(OST::SwitchsRule::AtMostOne);
@@ -984,6 +986,7 @@ bool IndiModule::defineMeAsGuider()
 bool IndiModule::defineMeAsSequencer()
 {
     defineMeAsImager();
+    giveMeAnActions();
 
     OST::PropertyMulti* pm = getProperty("actions");
     pm->setRule(OST::SwitchsRule::AtMostOne);
@@ -1068,7 +1071,8 @@ bool IndiModule::defineMeAsImager()
 bool IndiModule::defineMeAsNavigator()
 {
     defineMeAsImager();
-
+    giveMeATarget();
+    giveMeAnActions();
 
     OST::PropertyMulti* pm  = getProperty("actions");
     pm->setRule(OST::SwitchsRule::AtMostOne);
@@ -1278,3 +1282,25 @@ bool IndiModule::giveMeAnEquipment()
     }
     return true;
 }
+bool IndiModule::giveMeAnActions()
+{
+    if (!getStore().contains("actions"))
+    {
+        OST::PropertyMulti* pm = new OST::PropertyMulti("actions", "Actions", OST::ReadWrite, "Actions", "", "0000",
+                false,
+                false);
+        createProperty(pm);
+    }
+
+}
+bool IndiModule::giveMeATarget()
+{
+    if (!getStore().contains("target"))
+    {
+        OST::PropertyMulti* pm = new OST::PropertyMulti("target", "Target", OST::ReadWrite, "Target", "", "0500",
+                true,
+                false);
+        createProperty(pm);
+    }
+
+};

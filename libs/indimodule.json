@@ -113,26 +113,6 @@
 
         }
     },
-    "actions": {
-        "devcat": "Control",
-        "group": "",
-        "order":"000Control111",
-        "permission": 2,
-        "rule":1,
-        "label": "Actions",
-        "e": {
-        }
-    },
-    "target": {
-        "devcat": "Control",
-        "group": "",
-        "order":"000Control333",
-        "permission": 2,
-        "rule":1,
-        "label": "Target",
-        "e": {
-        }
-    },
     "parms": {
         "devcat": "Parameters",
         "group": "General",

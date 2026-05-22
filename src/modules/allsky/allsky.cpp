@@ -16,7 +16,7 @@ Allsky *initialize(QString name, QString label, QString profile, QVariantMap ava
 Allsky::Allsky(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
     : IndiModule(name, label, profile, availableModuleLibs)
 {
-    loadOstPropertiesFromFile(":allsky.json");
+    giveMeAnActions();
 
     loadOstPropertiesFromFile(":allsky.json");
     setMetadata("thisGithash", QString::fromStdString(Version::GIT_SHA1));
