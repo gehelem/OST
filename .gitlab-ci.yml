@@ -1,5 +1,6 @@
 stages:
   - build
+  - test
 #  - upload
   - release
 
@@ -22,6 +23,21 @@ build-job:
       - ${DEB_FILE_TAG}
       - ${DEB_FILE_DEV_LATEST}
       - ${DEB_FILE_DEV_TAG}
+    expire_in: 4 week
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+
+test-job:
+  stage: test
+  image: ubuntu:24.04
+  dependencies:
+    - build-job
+  script:
+    - ./CI/CI-test.sh
+  artifacts:
+    paths:
       - server.log
       - ws.log
     expire_in: 4 week

@@ -1,5 +1,6 @@
 [![CMake](https://github.com/gehelem/OST/actions/workflows/cmake.yml/badge.svg)](https://github.com/gehelem/OST/actions/workflows/cmake.yml)
-[![GitLab CI](https://gitlab.ostserver.fr/gilles/OST/badges/main/pipeline.svg)](https://gitlab.ostserver.fr/gilles/OST/-/pipelines)
+[![GitLab build](https://gitlab.ostserver.fr/gilles/OST/badges/main/pipeline.svg?key_text=build&key_width=40)](https://gitlab.ostserver.fr/gilles/OST/-/pipelines)
+[![GitLab test](https://gitlab.ostserver.fr/gilles/OST/badges/main/pipeline.svg?key_text=test&key_width=35)](https://gitlab.ostserver.fr/gilles/OST/-/pipelines)
 
 See documentation site :
 

@@ -36,15 +36,4 @@ cp "${DEB_RUNTIME}" "./${DEB_FILE_TAG}"
 cp "${DEB_DEV}" "./${DEB_FILE_DEV_LATEST}"
 cp "${DEB_DEV}" "./${DEB_FILE_DEV_TAG}"
 
-dpkg -i "${DEB_RUNTIME}" "${DEB_DEV}"
-
-echo "Quick test..."
-export QT_QPA_PLATFORM=offscreen
-ostserver --webroot=media > server.log 2>&1 &
-SERVER_PID=$!
-sleep 7
-ps aux | grep ostserver | grep -v grep
-node test-ws.js 2>&1 | tee ws.log
-echo "Server logs:"
-tail -50 server.log
-kill $SERVER_PID || true
+echo "Build complete: ${DEB_RUNTIME}  ${DEB_DEV}"
