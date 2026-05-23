@@ -41,6 +41,22 @@ fi
 
 node test-ws.js 2>&1 | tee ws.log
 
+echo "Validating WebSocket messages..."
+MSG_COUNT=$(grep -c "^Message" ws.log || true)
+if [ "${MSG_COUNT}" -lt 2 ]; then
+    echo "ERROR: expected multiple messages, got ${MSG_COUNT}"
+    cat ws.log
+    kill $SERVER_PID || true
+    exit 1
+fi
+if ! grep -q "{" ws.log || ! grep -q ":" ws.log; then
+    echo "ERROR: messages do not look like JSON"
+    cat ws.log
+    kill $SERVER_PID || true
+    exit 1
+fi
+echo "OK: received ${MSG_COUNT} JSON message(s)"
+
 echo "Server logs:"
 tail -50 server.log
 
