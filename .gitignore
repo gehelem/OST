@@ -69,3 +69,11 @@ debian/debhelper-build-stamp
 *.qm
 
 testws.html
+
+node_modules/
+
+package-lock.json
+
+package.json
+
+ws.log
