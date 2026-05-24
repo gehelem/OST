@@ -633,7 +633,7 @@ void Navigator::addTargeToPlanner()
     eltData["ra"] = getFloat("target", "targetra");
     eltData["dec"] = getFloat("target", "targetde");
     eltData["profile"] = "default";
-    logInfo("Current target sent to %1", {getString("parms", "plannermodule")});
+    logInfo("Current target sent to %1", {getString("slaves", "plannermodule")});
 
     otherModuleCreateLine(getString("slaves", "plannermodule"), "planning", eltData);
 
