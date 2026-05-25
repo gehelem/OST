@@ -59,6 +59,7 @@ class MODULE_INIT Focus : public IndiModule
         //void SMLoadblob(IBLOB *bp);
         void SMLoadblob();
         void SMAbort();
+        void setupMachineConnections();
         void startCoarse();
 
 
