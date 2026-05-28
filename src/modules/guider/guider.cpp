@@ -796,7 +796,7 @@ void Guider::SMComputeFirst()
 {
     _trigFirst.clear();
     buildIndexes(_solver, _trigFirst);
-
+    starsFirst = _solver.stars;
 
     emit ComputeFirstDone();
 }
@@ -988,7 +988,12 @@ void Guider::SMComputeGuide()
         emit ComputeGuideDone();
         return;
     }
-
+    if (_matchedCurFirst.size() < 2 )
+    {
+        logError("Can't compare current image with reference  - Abort");
+        emit Abort();
+        return;
+    }
     // Dither requested: compute random displacement pulses then rebuild reference
     if (_doDither)
     {
@@ -1233,8 +1238,14 @@ void Guider::OnSucessSEP()
     im.setColorTable(rawImage.colorTable());
     {
         QPainter painter(&im);
-        painter.setPen(QPen(Qt::green, 2));
+        painter.setPen(QPen(Qt::red, 2));
         for (const FITSImage::Star &star : _solver.stars)
+        {
+            double r = star.HFR * 3;
+            painter.drawEllipse(QPointF(star.x / 2.0, star.y / 2.0), r, r);
+        }
+        painter.setPen(QPen(Qt::green, 2));
+        for (const FITSImage::Star &star : starsFirst)
         {
             double r = star.HFR * 3;
             painter.drawEllipse(QPointF(star.x / 2.0, star.y / 2.0), r, r);
