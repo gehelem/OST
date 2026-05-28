@@ -499,7 +499,7 @@ void Guider::SMInitInit()
         // For simulator, speed up exposure time
         if (getString("devices", "camera") == "CCD Simulator")
         {
-            sendModNewNumber(getString("devices", "camera"), "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01);
+            //sendModNewNumber(getString("devices", "camera"), "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01);
         }
 
         // Set UI state to "busy"
@@ -1265,7 +1265,8 @@ void Guider::SMAbort()
     emit AbortDone();
     // Defer the "ready" notification so the queued Abort→End transition
     // is fully processed before the sequencer can call guide/start again.
-    QTimer::singleShot(0, this, [this]() {
+    QTimer::singleShot(0, this, [this]()
+    {
         setStateEvent(OST::Ok, "ready", "abortguide", "Abort guide");
         logInfo("Guiding aborted");
     });

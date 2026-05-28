@@ -331,11 +331,19 @@ bool DBManager::populateCatalog(const QString &pFileName, const QString &pName)
         logError("populateCatalog dbOpen - ERROR: %1 - %2", {mDb.databaseName(), mDb.lastError().text()});
         return false;
     }
-    QString sql = "DELETE FROM CATALOGS WHERE CATALOG='" + pName + "'";
+    QString sql = "BEGIN TRANSACTION;";
     if (!mQuery.exec(sql))
     {
-        logError("searchCatalog - ERROR SQL = %1", {sql});
-        logError("searchCatalog - ERROR : %1", {mQuery.lastError().text()});
+        logError("populateCatalog - ERROR SQL = %1", {sql});
+        logError("populateCatalog - ERROR : %1", {mQuery.lastError().text()});
+        mDb.close();
+        return false;
+    }
+    sql = "DELETE FROM CATALOGS WHERE CATALOG='" + pName + "'";
+    if (!mQuery.exec(sql))
+    {
+        logError("populateCatalog - ERROR SQL = %1", {sql});
+        logError("populateCatalog - ERROR : %1", {mQuery.lastError().text()});
         mDb.close();
         return false;
     }
@@ -377,12 +385,21 @@ bool DBManager::populateCatalog(const QString &pFileName, const QString &pName)
             sql = sql + ");";
             if (!mQuery.exec(sql))
             {
-                logWarning("searchCatalog - ERROR SQL = %1", {sql});
-                logWarning("searchCatalog - ERROR : %1", {mQuery.lastError().text()});
+                logWarning("populateCatalog - ERROR SQL = %1", {sql});
+                logWarning("populateCatalog - ERROR : %1", {mQuery.lastError().text()});
             }
 
         }
     }
+    sql = "COMMIT;";
+    if (!mQuery.exec(sql))
+    {
+        logError("populateCatalog - ERROR SQL = %1", {sql});
+        logError("populateCatalog - ERROR : %1", {mQuery.lastError().text()});
+        mDb.close();
+        return false;
+    }
+
     mDb.close();
     inputFile.close();
     return true;

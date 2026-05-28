@@ -212,7 +212,7 @@ void Planner::abortPlanner()
     logInfo("Operation aborted");
 
     // Re-enable properties
-    getProperty("parms")->enable();
+    //getProperty("parms")->enable();
     getProperty("devices")->enable();
 
     // Reset progress
@@ -229,7 +229,7 @@ void Planner::onOperationComplete()
     mIsRunning = false;
 
     // Re-enable properties
-    getProperty("parms")->enable();
+    //getProperty("parms")->enable();
     getProperty("devices")->enable();
 
     // Update progress to 100%

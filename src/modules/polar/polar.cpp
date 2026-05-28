@@ -60,9 +60,9 @@ void Polar::onExternalEvent(OST::ExtEvent event)
                 setBLOBMode(B_ALSO, getString("devices", "camera").toStdString().c_str(), nullptr);
                 if (getString("devices", "camera") == "CCD Simulator")
                 {
-                    sendModNewNumber(getString("devices", "camera"), "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );
+                    //sendModNewNumber(getString("devices", "camera"), "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );
                 }
-                sendModNewNumber(getString("devices", "camera"), "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );
+                //sendModNewNumber(getString("devices", "camera"), "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );
                 enableDirectBlobAccess(getString("devices", "camera").toStdString().c_str(), nullptr);
 
                 _machine.start();
