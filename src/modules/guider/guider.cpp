@@ -25,6 +25,7 @@
 #include "guider.h"
 #include "version.cc"
 #include <QRandomGenerator>
+#include <QPainter>
 //#include "polynomialfit.h"
 #define PI 3.14159265
 
@@ -300,12 +301,6 @@ void Guider::newBLOB(INDI::PropertyBlob pblob)
         QImage rawImage = _image->getRawQImage();
         QImage im = rawImage.convertToFormat(QImage::Format_RGB32);
         im.setColorTable(rawImage.colorTable());
-
-        im.save(getWebroot() + "/" + getModuleName() + ".jpeg", "JPG", 100);
-        OST::ImgData dta = _image->ImgStats();
-        dta.mUrlJpeg = getModuleName() + ".jpeg";
-        getEltImg("image", "image")->setValue(dta, true);
-
 
         emit ExposureDone();
     }
@@ -801,7 +796,7 @@ void Guider::SMComputeFirst()
 {
     _trigFirst.clear();
     buildIndexes(_solver, _trigFirst);
-
+    starsFirst = _solver.stars;
 
     emit ComputeFirstDone();
 }
@@ -993,7 +988,12 @@ void Guider::SMComputeGuide()
         emit ComputeGuideDone();
         return;
     }
-
+    if (_matchedCurFirst.size() < 2 )
+    {
+        logError("Can't compare current image with reference  - Abort");
+        emit Abort();
+        return;
+    }
     // Dither requested: compute random displacement pulses then rebuild reference
     if (_doDither)
     {
@@ -1226,10 +1226,34 @@ void Guider::SMFindStars()
 
 void Guider::OnSucessSEP()
 {
-    OST::ImgData dta = getEltImg("image", "image")->value();
+    OST::ImgData dta = _image->ImgStats();
+
     double ech = getSampling();
     dta.HFRavg = _solver.HFRavg * ech;
     dta.starsCount = _solver.stars.size();
+
+    // Draw star circles (radius = 2 × HFR) on the image and refresh the JPEG
+    QImage rawImage = _image->getRawQImage();
+    QImage im = rawImage.convertToFormat(QImage::Format_RGB32);
+    im.setColorTable(rawImage.colorTable());
+    {
+        QPainter painter(&im);
+        painter.setPen(QPen(Qt::red, 2));
+        for (const FITSImage::Star &star : _solver.stars)
+        {
+            double r = star.HFR * 3;
+            painter.drawEllipse(QPointF(star.x / 2.0, star.y / 2.0), r, r);
+        }
+        painter.setPen(QPen(Qt::green, 2));
+        for (const FITSImage::Star &star : starsFirst)
+        {
+            double r = star.HFR * 3;
+            painter.drawEllipse(QPointF(star.x / 2.0, star.y / 2.0), r, r);
+        }
+    }
+    im.save(getWebroot() + "/" + getModuleName() + ".jpeg", "JPG", 100);
+    dta.mUrlJpeg = getModuleName() + ".jpeg";
+
     getEltImg("image", "image")->setValue(dta, true);
 
     if (_solver.stars.size() < 3 )

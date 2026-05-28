@@ -100,6 +100,7 @@ class MODULE_INIT Guider  : public IndiModule
         QPointer<fileio> _image;       ///< Current image from CCD
         Solver _solver;                ///< Star detection and centroid solver
         FITSImage::Statistic stats;    ///< Image statistics
+        QList<FITSImage::Star> starsFirst; ///< image reference stars
 
         // ==================== Current Guiding Pulses (ms) ====================
         int _pulseN = 0;  ///< Pulse to send North (positive DEC)
