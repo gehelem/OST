@@ -96,6 +96,7 @@ class Controller : public QObject
         }
         bool createControllerLov(const QString &lovName, OST::LovBase* pLov);
         bool deleteControllerLov(const QString &lovName);
+        void forceAdminPassword(const QString &pw);
 
 
     private slots:

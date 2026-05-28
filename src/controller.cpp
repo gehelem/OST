@@ -72,6 +72,7 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     // Configure DBManager
     dbmanager = new DBManager();
     dbmanager->dbInit(_dbpath, "controller");
+    forceAdminPassword(mSetAdminPassword);
     wshandler->dbmanager = dbmanager;
 
     // Connect DBManager to log system
@@ -993,4 +994,42 @@ void Controller::onInterModuleRequest(OST::ExtEvent event)
     pTargetModule->onExternalEventRoot(event);
 
 
+}
+void Controller::forceAdminPassword(const QString &pw)
+{
+    /* We do this at controller level to forbid DBmanager inherited instances to do it ... */
+    if (pw == "") return;
+    if(!QSqlDatabase::isDriverAvailable("QSQLITE"))
+    {
+        logError("forceAdminPassword - ERROR: QSQLITE driver unavailable");
+        return;
+    }
+    QString dbfile = _dbpath + "ost.db";
+    bool mDbExists = QFile::exists(dbfile);
+    if (!mDbExists)
+    {
+        logError("forceAdminPassword - db file not found %1", {dbfile});
+        return;
+    }
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "TEMP");
+    db.setDatabaseName(dbfile);
+
+    QSqlQuery query = QSqlQuery(db);
+    if(!db.open())
+    {
+        logError("forceAdminPassword - ERROR: %1 - %2", {db.databaseName(), db.lastError().text()});
+        return ;
+    }
+    QString sql = "UPDATE USERS SET PW='" + pw + "' WHERE LOGIN='ADMIN';";
+    if (!query.exec(sql))
+    {
+        logError("forceAdminPassword - ERROR SQL = %1", {sql});
+        logError("forceAdminPassword - ERROR : %1", {query.lastError().text()});
+    }
+    else
+    {
+        logInfo("forceAdminPassword - OK");
+    }
+
+    db.close();
 }
