@@ -29,7 +29,7 @@
 Controller::Controller(const QString &webroot, const QString &dbpath,
                        const QString &libpath, const QString &conf, const QString &indiserver,
                        const QString &ssl, const QString &sslCert, const QString &sslKey, const QString &lng, const QString &grant,
-                       OST::Logger *logger, OST::TranslateManager *translate, const QString &banner,
+                       OST::Logger *logger, OST::TranslateManager *translate, const QString &banner, const QString &setAdminPassword,
                        const QString &gitSha, const QString &gitDate, const QString &gitMessage, const QString &gitTag)
     :       _webroot(webroot),
             _dbpath(dbpath),
@@ -40,7 +40,8 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
             _grant(grant),
             mLogger(logger),
             mTranslater(translate),
-            mBanner(banner)
+            mBanner(banner),
+            mSetAdminPassword(setAdminPassword)
 {
     // Register meta types for queued signal/slot connections
     // Must be done before any connect() calls that use these types
@@ -71,6 +72,7 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     // Configure DBManager
     dbmanager = new DBManager();
     dbmanager->dbInit(_dbpath, "controller");
+    forceAdminPassword(mSetAdminPassword);
     wshandler->dbmanager = dbmanager;
 
     // Connect DBManager to log system
@@ -992,4 +994,42 @@ void Controller::onInterModuleRequest(OST::ExtEvent event)
     pTargetModule->onExternalEventRoot(event);
 
 
+}
+void Controller::forceAdminPassword(const QString &pw)
+{
+    /* We do this at controller level to forbid DBmanager inherited instances to do it ... */
+    if (pw == "") return;
+    if(!QSqlDatabase::isDriverAvailable("QSQLITE"))
+    {
+        logError("forceAdminPassword - ERROR: QSQLITE driver unavailable");
+        return;
+    }
+    QString dbfile = _dbpath + "ost.db";
+    bool mDbExists = QFile::exists(dbfile);
+    if (!mDbExists)
+    {
+        logError("forceAdminPassword - db file not found %1", {dbfile});
+        return;
+    }
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "TEMP");
+    db.setDatabaseName(dbfile);
+
+    QSqlQuery query = QSqlQuery(db);
+    if(!db.open())
+    {
+        logError("forceAdminPassword - ERROR: %1 - %2", {db.databaseName(), db.lastError().text()});
+        return ;
+    }
+    QString sql = "UPDATE USERS SET PW='" + pw + "' WHERE LOGIN='ADMIN';";
+    if (!query.exec(sql))
+    {
+        logError("forceAdminPassword - ERROR SQL = %1", {sql});
+        logError("forceAdminPassword - ERROR : %1", {query.lastError().text()});
+    }
+    else
+    {
+        logInfo("forceAdminPassword - OK");
+    }
+
+    db.close();
 }

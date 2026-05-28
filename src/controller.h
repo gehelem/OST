@@ -27,7 +27,7 @@ class Controller : public QObject
         Controller(const QString &webroot, const QString &dbpath,
                    const QString &libpath, const QString &conf, const QString &indiserver,
                    const QString &ssl, const QString &sslCert, const QString &sslKey, const QString &lng, const QString &grant,
-                   OST::Logger *logger, OST::TranslateManager *translate, const QString &banner,
+                   OST::Logger *logger, OST::TranslateManager *translate, const QString &banner, const QString &setAdminPassword,
                    const QString &gitSha, const QString &gitDate, const QString &gitMessage, const QString &gitTag);
         ~Controller() override;
     signals:
@@ -56,6 +56,7 @@ class Controller : public QObject
         QStringList mFoldersList;
         QString mSelectedFolder;
         QString mBanner;
+        QString mSetAdminPassword;
         QVariantMap mControllerData;
         QMap<QString, OST::LovBase*> mControllerLovs;
         GlobalDatastore* mGlobalDatastore = nullptr;
@@ -95,6 +96,7 @@ class Controller : public QObject
         }
         bool createControllerLov(const QString &lovName, OST::LovBase* pLov);
         bool deleteControllerLov(const QString &lovName);
+        void forceAdminPassword(const QString &pw);
 
 
     private slots:
