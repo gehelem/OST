@@ -51,6 +51,8 @@ int main(int argc, char *argv[])
 
     QCommandLineOption bannerOption("banner", "Frontend banner", "banner");
     bannerOption.setDefaultValue("Observatoire Sans tête");
+    QCommandLineOption setAdminPasswordOption("setadminpassword", "Set admin password", "setadminpassword");
+    setAdminPasswordOption.setDefaultValue("");
 
     argParser.addOption(webrootOption);
     argParser.addOption(dbPathOption);
@@ -65,6 +67,7 @@ int main(int argc, char *argv[])
     argParser.addOption(logLevel);
     argParser.addOption(logFileOption);
     argParser.addOption(bannerOption);
+    argParser.addOption(setAdminPasswordOption);
     argParser.process(app);
 
     QString webroot = argParser.value(webrootOption);
@@ -80,6 +83,7 @@ int main(int argc, char *argv[])
     int loglevel = argParser.value(logLevel).toInt();
     QString logfile = argParser.value(logFileOption);
     QString banner = argParser.value(bannerOption);
+    QString setAdminPassword = argParser.value(setAdminPasswordOption);
 
     OST::Logger mLogger;
     OST::TranslateManager mTranslater;
@@ -119,6 +123,7 @@ int main(int argc, char *argv[])
     mLogger.info("Log file              =" + logfile);
     mLogger.info("Log level             =" + QString::number(loglevel));
     mLogger.info("Banner                =" + banner);
+    if (setAdminPassword != "") mLogger.info("Set ADMIN password    = [hidden]");
 
     mLogger.setLogLevel(static_cast<OST::LogLevel>(loglevel));
 
@@ -136,6 +141,7 @@ int main(int argc, char *argv[])
         &mLogger,
         &mTranslater,
         banner,
+        setAdminPassword,
         QString::fromStdString(Version::GIT_SHA1),
         QString::fromStdString(Version::GIT_DATE),
         QString::fromStdString(Version::GIT_COMMIT_SUBJECT),

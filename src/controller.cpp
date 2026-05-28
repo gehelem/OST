@@ -29,7 +29,7 @@
 Controller::Controller(const QString &webroot, const QString &dbpath,
                        const QString &libpath, const QString &conf, const QString &indiserver,
                        const QString &ssl, const QString &sslCert, const QString &sslKey, const QString &lng, const QString &grant,
-                       OST::Logger *logger, OST::TranslateManager *translate, const QString &banner,
+                       OST::Logger *logger, OST::TranslateManager *translate, const QString &banner, const QString &setAdminPassword,
                        const QString &gitSha, const QString &gitDate, const QString &gitMessage, const QString &gitTag)
     :       _webroot(webroot),
             _dbpath(dbpath),
@@ -40,7 +40,8 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
             _grant(grant),
             mLogger(logger),
             mTranslater(translate),
-            mBanner(banner)
+            mBanner(banner),
+            mSetAdminPassword(setAdminPassword)
 {
     // Register meta types for queued signal/slot connections
     // Must be done before any connect() calls that use these types
