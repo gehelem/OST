@@ -3,6 +3,11 @@
 #include "version.cc"
 #include <cmath>
 #include <algorithm>
+#include <limits>
+#include <QPainter>
+#include <gsl/gsl_vector.h>
+#include <gsl/gsl_matrix.h>
+#include <gsl/gsl_multifit.h>
 
 Focus *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
 {
@@ -161,7 +166,7 @@ void Focus::newBLOB(INDI::PropertyBlob b)
         OST::ImgData dta = _image->ImgStats();
         dta.mUrlJpeg = getModuleName() + QString(b.getDeviceName()) + ".jpeg";
         dta.mUrlFits = getModuleName() + QString(b.getDeviceName()) + ".FITS";
-        getEltImg("image", "image")->setValue(dta, true);
+        getEltImg("image", "image")->setValue(dta, false);
 
         if (pMachine->isRunning())
         {
@@ -574,7 +579,332 @@ void Focus::SMComputeResult()
     getProperty("devices")->enable();
     getProperty("parameters")->enable();
 
+    // Tilt heatmap image
+    if (mZoning >= 2)
+    {
+        double minPos =  std::numeric_limits<double>::max();
+        double maxPos = -std::numeric_limits<double>::max();
+        for (int i = 0; i < mZoning * mZoning; i++)
+        {
+            if (_zoneBestposfit[i] != 0)
+            {
+                minPos = std::min(minPos, _zoneBestposfit[i]);
+                maxPos = std::max(maxPos, _zoneBestposfit[i]);
+            }
+        }
 
+        // Cell size preserving sensor aspect ratio
+        // Target: long side ~480px, but ensure short side >= 40px/cell
+        int imgW      = (stats.width  > 0) ? stats.width  : mZoning;
+        int imgH      = (stats.height > 0) ? stats.height : mZoning;
+        double scl    = 480.0 / std::max(imgW, imgH);
+        double minScl = 40.0  * mZoning / std::min(imgW, imgH);
+        scl           = std::max(scl, minScl);
+        int cellW     = std::max(1, (int)(imgW * scl / mZoning));
+        int cellH     = std::max(1, (int)(imgH * scl / mZoning));
+        int iw        = cellW * mZoning;
+        int ih        = cellH * mZoning;
+        int fontSz    = std::max(8, std::min(cellW, cellH) / 8);
+
+        QImage tiltImage(iw, ih, QImage::Format_RGB32);
+        tiltImage.fill(Qt::black);
+        QPainter painter(&tiltImage);
+        painter.setRenderHint(QPainter::Antialiasing, false);
+
+        for (int row = 0; row < mZoning; row++)
+        {
+            for (int col = 0; col < mZoning; col++)
+            {
+                double val = _zoneBestposfit[row * mZoning + col];
+                QRect cell(col * cellW, row * cellH, cellW, cellH);
+
+                if (val == 0 || maxPos <= minPos)
+                {
+                    painter.fillRect(cell, QColor(80, 80, 80));
+                }
+                else
+                {
+                    double t = (val - minPos) / (maxPos - minPos);
+                    // Blue (min) → Cyan → Green → Yellow → Red (max)
+                    QColor color = QColor::fromHsvF(0.666 * (1.0 - t), 1.0, 1.0);
+                    painter.fillRect(cell, color);
+                }
+
+                // Zone value label
+                painter.setPen(Qt::white);
+                QFont font = painter.font();
+                font.setPixelSize(fontSz);
+                font.setBold(true);
+                painter.setFont(font);
+                painter.drawText(cell, Qt::AlignCenter, QString::number((int)val));
+
+                // Cell border
+                painter.setPen(QPen(Qt::black, 2));
+                painter.drawRect(cell);
+            }
+        }
+        painter.end();
+
+
+        QString file = getModuleName() + getString("devices", "camera") + "rawTilt.jpeg";
+        tiltImage.save(getWebroot() + "/" + file, "JPG", 100);
+        logInfo("Tilt heatmap saved (range: %1 - %2 steps)", {(int)minPos, (int)maxPos});
+        dta.mAlternates.clear();
+        dta.mAlternates.append(file);
+        getEltImg("image", "image")->setValue(dta, false);
+
+        // Bilinear interpolation image
+        // Zone (col, row) is treated as a control point at pixel center (col*cellW + cellW/2, row*cellH + cellH/2)
+        // Invalid zones (bestposfit==0) fall back to _bestposfit
+        auto zoneVal = [&](int col, int row) -> double
+        {
+            col = std::clamp(col, 0, mZoning - 1);
+            row = std::clamp(row, 0, mZoning - 1);
+            double v = _zoneBestposfit[row * mZoning + col];
+            return (v != 0) ? v : _bestposfit;
+        };
+
+        QImage tiltInterp(iw, ih, QImage::Format_RGB32);
+
+        for (int py = 0; py < ih; py++)
+        {
+            for (int px = 0; px < iw; px++)
+            {
+                // Map pixel center to zone-grid coordinates (zone centers at 0,1,...,mZoning-1)
+                double zx = (px + 0.5) / cellW - 0.5;
+                double zy = (py + 0.5) / cellH - 0.5;
+
+                int c0 = (int)std::floor(zx);
+                int r0 = (int)std::floor(zy);
+                double fx = zx - c0;
+                double fy = zy - r0;
+
+                double v = (1 - fx) * (1 - fy) * zoneVal(c0,   r0)
+                           +    fx * (1 - fy) * zoneVal(c0 + 1, r0)
+                           + (1 - fx) *   fy  * zoneVal(c0,   r0 + 1)
+                           +    fx *   fy  * zoneVal(c0 + 1, r0 + 1);
+
+                double t = (maxPos > minPos) ? std::clamp((v - minPos) / (maxPos - minPos), 0.0, 1.0) : 0.5;
+                tiltInterp.setPixel(px, py, QColor::fromHsvF(0.666 * (1.0 - t), 1.0, 1.0).rgb());
+            }
+        }
+
+        // Overlay zone borders and values on the interpolated image
+        QPainter painterInterp(&tiltInterp);
+        painterInterp.setRenderHint(QPainter::Antialiasing, false);
+        QFont font = painterInterp.font();
+        font.setPixelSize(fontSz);
+        font.setBold(true);
+        painterInterp.setFont(font);
+        for (int row = 0; row < mZoning; row++)
+        {
+            for (int col = 0; col < mZoning; col++)
+            {
+                QRect cell(col * cellW, row * cellH, cellW, cellH);
+                double val = _zoneBestposfit[row * mZoning + col];
+                painterInterp.setPen(Qt::white);
+                painterInterp.drawText(cell, Qt::AlignCenter, QString::number((int)val));
+                painterInterp.setPen(QPen(QColor(0, 0, 0, 120), 1));
+                painterInterp.drawRect(cell);
+            }
+        }
+        painterInterp.end();
+
+        file = getModuleName() + getString("devices", "camera") + "localTiltLinear.jpeg";
+        tiltInterp.save(getWebroot() + "/" + file, "JPG", 100);
+        dta.mAlternates.append(file);
+        getEltImg("image", "image")->setValue(dta, false);
+
+        // Global plane fit: z = c[0] + c[1]*col + c[2]*row  (least squares over all valid zones)
+        QList<int> validIdx;
+        for (int i = 0; i < mZoning * mZoning; i++)
+            if (_zoneBestposfit[i] != 0) validIdx.append(i);
+
+        if (validIdx.size() >= 3)
+        {
+            int n = validIdx.size();
+            gsl_matrix *X   = gsl_matrix_alloc(n, 3);
+            gsl_vector *zv  = gsl_vector_alloc(n);
+            gsl_vector *c   = gsl_vector_alloc(3);
+            gsl_matrix *cov = gsl_matrix_alloc(3, 3);
+            double chisq;
+
+            for (int k = 0; k < n; k++)
+            {
+                int col = validIdx[k] % mZoning;
+                int row = validIdx[k] / mZoning;
+                gsl_matrix_set(X, k, 0, 1.0);
+                gsl_matrix_set(X, k, 1, col);
+                gsl_matrix_set(X, k, 2, row);
+                gsl_vector_set(zv, k, _zoneBestposfit[validIdx[k]]);
+            }
+
+            gsl_multifit_linear_workspace *ws = gsl_multifit_linear_alloc(n, 3);
+            gsl_multifit_linear(X, zv, c, cov, &chisq, ws);
+
+            double c0 = gsl_vector_get(c, 0);
+            double c1 = gsl_vector_get(c, 1); // gradient X (steps/zone)
+            double c2 = gsl_vector_get(c, 2); // gradient Y (steps/zone)
+            logInfo("Global tilt plane: gradX=%1 steps/zone  gradY=%2 steps/zone", {c1, c2});
+
+            // Color scale = plane range over the full image extent (corners)
+            double zxMin = -0.5,               zxMax = mZoning - 0.5;
+            double zyMin = -0.5,               zyMax = mZoning - 0.5;
+            double planMin = std::min({c0 + c1 * zxMin + c2 * zyMin,
+                                       c0 + c1 * zxMax + c2 * zyMin,
+                                       c0 + c1 * zxMin + c2 * zyMax,
+                                       c0 + c1 * zxMax + c2 * zyMax});
+            double planMax = std::max({c0 + c1 * zxMin + c2 * zyMin,
+                                       c0 + c1 * zxMax + c2 * zyMin,
+                                       c0 + c1 * zxMin + c2 * zyMax,
+                                       c0 + c1 * zxMax + c2 * zyMax});
+
+            QImage globalTilt(iw, ih, QImage::Format_RGB32);
+            for (int py = 0; py < ih; py++)
+            {
+                for (int px = 0; px < iw; px++)
+                {
+                    double zx = (px + 0.5) / cellW - 0.5;
+                    double zy = (py + 0.5) / cellH - 0.5;
+                    double v  = c0 + c1 * zx + c2 * zy;
+                    double t  = (planMax > planMin) ? std::clamp((v - planMin) / (planMax - planMin), 0.0, 1.0) : 0.5;
+                    globalTilt.setPixel(px, py, QColor::fromHsvF(0.666 * (1.0 - t), 1.0, 1.0).rgb());
+                }
+            }
+
+            // Overlay zone borders, measured values and residuals
+            QPainter painterGT(&globalTilt);
+            font.setPixelSize(fontSz);
+            painterGT.setFont(font);
+            for (int row = 0; row < mZoning; row++)
+            {
+                for (int col = 0; col < mZoning; col++)
+                {
+                    QRect cell(col * cellW, row * cellH, cellW, cellH);
+                    double val      = _zoneBestposfit[row * mZoning + col];
+                    double fitted   = c0 + c1 * col + c2 * row;
+                    double residual = (val != 0) ? val - fitted : 0;
+                    painterGT.setPen(Qt::white);
+                    painterGT.drawText(cell.adjusted(0, 4, 0, -cell.height() / 2),
+                                       Qt::AlignCenter, QString::number((int)val));
+                    painterGT.setPen(QColor(255, 220, 100));
+                    painterGT.drawText(cell.adjusted(0, cell.height() / 2, 0, -4),
+                                       Qt::AlignCenter, (residual >= 0 ? "+" : "") + QString::number((int)residual));
+                    painterGT.setPen(QPen(QColor(0, 0, 0, 120), 1));
+                    painterGT.drawRect(cell);
+                }
+            }
+            painterGT.end();
+            QString file = getModuleName() + getString("devices", "camera") + "globalTiltLinear.jpeg";
+            globalTilt.save( getWebroot() + "/" + file, "JPG", 100);
+            dta.mAlternates.append(file);
+            getEltImg("image", "image")->setValue(dta, false);
+
+            gsl_multifit_linear_free(ws);
+            gsl_matrix_free(X);
+            gsl_vector_free(zv);
+            gsl_vector_free(c);
+            gsl_matrix_free(cov);
+        }
+
+        // Quadratic surface fit: z = c0 + c1*x + c2*y + c3*x² + c4*y² + c5*x*y
+        if (validIdx.size() >= 6)
+        {
+            int n = validIdx.size();
+            gsl_matrix *X   = gsl_matrix_alloc(n, 6);
+            gsl_vector *zv  = gsl_vector_alloc(n);
+            gsl_vector *c   = gsl_vector_alloc(6);
+            gsl_matrix *cov = gsl_matrix_alloc(6, 6);
+            double chisq;
+
+            for (int k = 0; k < n; k++)
+            {
+                double x = validIdx[k] % mZoning;
+                double y = validIdx[k] / mZoning;
+                gsl_matrix_set(X, k, 0, 1.0);
+                gsl_matrix_set(X, k, 1, x);
+                gsl_matrix_set(X, k, 2, y);
+                gsl_matrix_set(X, k, 3, x * x);
+                gsl_matrix_set(X, k, 4, y * y);
+                gsl_matrix_set(X, k, 5, x * y);
+                gsl_vector_set(zv, k, _zoneBestposfit[validIdx[k]]);
+            }
+
+            gsl_multifit_linear_workspace *ws = gsl_multifit_linear_alloc(n, 6);
+            gsl_multifit_linear(X, zv, c, cov, &chisq, ws);
+
+            double c0 = gsl_vector_get(c, 0);
+            double c1 = gsl_vector_get(c, 1);
+            double c2 = gsl_vector_get(c, 2);
+            double c3 = gsl_vector_get(c, 3);
+            double c4 = gsl_vector_get(c, 4);
+            double c5 = gsl_vector_get(c, 5);
+
+            auto quadVal = [&](double x, double y)
+            {
+                return c0 + c1 * x + c2 * y + c3 * x * x + c4 * y * y + c5 * x * y;
+            };
+
+            // Two-pass: first find min/max of the surface over all pixels
+            double qMin =  std::numeric_limits<double>::max();
+            double qMax = -std::numeric_limits<double>::max();
+            for (int py = 0; py < ih; py++)
+            {
+                for (int px = 0; px < iw; px++)
+                {
+                    double v = quadVal((px + 0.5) / cellW - 0.5, (py + 0.5) / cellH - 0.5);
+                    qMin = std::min(qMin, v);
+                    qMax = std::max(qMax, v);
+                }
+            }
+
+            QImage quadTilt(iw, ih, QImage::Format_RGB32);
+            for (int py = 0; py < ih; py++)
+            {
+                for (int px = 0; px < iw; px++)
+                {
+                    double v = quadVal((px + 0.5) / cellW - 0.5, (py + 0.5) / cellH - 0.5);
+                    double t = (qMax > qMin) ? std::clamp((v - qMin) / (qMax - qMin), 0.0, 1.0) : 0.5;
+                    quadTilt.setPixel(px, py, QColor::fromHsvF(0.666 * (1.0 - t), 1.0, 1.0).rgb());
+                }
+            }
+
+            // Overlay zone borders, measured values and residuals
+            QPainter painterQ(&quadTilt);
+            font.setPixelSize(fontSz);
+            painterQ.setFont(font);
+            for (int row = 0; row < mZoning; row++)
+            {
+                for (int col = 0; col < mZoning; col++)
+                {
+                    QRect cell(col * cellW, row * cellH, cellW, cellH);
+                    double val      = _zoneBestposfit[row * mZoning + col];
+                    double fitted   = quadVal(col, row);
+                    double residual = (val != 0) ? val - fitted : 0;
+                    painterQ.setPen(Qt::white);
+                    painterQ.drawText(cell.adjusted(0, 4, 0, -cell.height() / 2),
+                                      Qt::AlignCenter, QString::number((int)val));
+                    painterQ.setPen(QColor(255, 220, 100));
+                    painterQ.drawText(cell.adjusted(0, cell.height() / 2, 0, -4),
+                                      Qt::AlignCenter, (residual >= 0 ? "+" : "") + QString::number((int)residual));
+                    painterQ.setPen(QPen(QColor(0, 0, 0, 120), 1));
+                    painterQ.drawRect(cell);
+                }
+            }
+            painterQ.end();
+
+            file = getModuleName() + getString("devices", "camera") + "globalTiltQuadratic.jpeg";
+            quadTilt.save( getWebroot() + "/" + file, "JPG", 100);
+            dta.mAlternates.append(file);
+            getEltImg("image", "image")->setValue(dta, true);
+
+            gsl_multifit_linear_free(ws);
+            gsl_matrix_free(X);
+            gsl_vector_free(zv);
+            gsl_vector_free(c);
+            gsl_matrix_free(cov);
+        }
+    }
 }
 
 
