@@ -54,7 +54,14 @@
             },
             "khi": {
                 "type":"float",
-                "label": "Polynomial fit",
+                "label": "Polynomial fit (Khi)",
+                "order":"45",
+                "value":0,
+                "format": "99.99"
+            },
+            "r2": {
+                "type":"float",
+                "label": "Polynomial fit (R2)",
                 "order":"45",
                 "value":0,
                 "format": "99.99"

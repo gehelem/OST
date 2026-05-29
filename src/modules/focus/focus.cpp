@@ -232,6 +232,7 @@ void Focus::startCoarse()
     _besthfr = 99;
     _bestposfit = 0;
     _khi = 0;
+    _r2 = 0;
     _zoneBestposfit.clear();
 
     mZoning =  getInt("parameters", "zoning");
@@ -377,6 +378,15 @@ void Focus::SMCompute()
         polynomialfit(_posvector.size(), 3, _posvector.data(), _hfdvector.data(), coeff, &khi);
         _bestposfit = -coeff[1] / (2 * coeff[2]);
         _khi = khi;
+
+        int n = _posvector.size();
+        double meanHFR = 0;
+        for (double v : _hfdvector) meanHFR += v;
+        meanHFR /= n;
+        double tss = 0;
+        for (double v : _hfdvector) tss += (v - meanHFR) * (v - meanHFR);
+        _r2 = (tss > 0) ? (1.0 - khi / tss) : 1.0;
+        qDebug() << "khi=" << khi << "r2=" << _r2 << "rms=" << std::sqrt(khi / n);
     }
 
     for (int i = 0; i < mZoning * mZoning; i++)
@@ -395,15 +405,16 @@ void Focus::SMCompute()
         _bestpos = _startpos + _iteration * _steps;
     }
 
-    getEltFloat("values", "loopHFRavg")->setValue(_loopHFRavg);
-    getEltInt("values", "bestpos")->setValue(_bestpos);
-    getEltFloat("values", "bestposfit")->setValue(_bestposfit);
-    getEltInt("values", "focpos")->setValue(_startpos + _iteration * _steps);
+    getEltFloat("values", "loopHFRavg")->setValue(_loopHFRavg, false);
+    getEltInt("values", "bestpos")->setValue(_bestpos, false);
+    getEltFloat("values", "bestposfit")->setValue(_bestposfit, false);
+    getEltInt("values", "focpos")->setValue(_startpos + _iteration * _steps, false);
     getEltInt("values", "iteration")->setValue(_iteration, false);
-    getEltFloat("values", "khi")->setValue(khi, true);
+    getEltFloat("values", "khi")->setValue(khi, false);
+    getEltFloat("values", "r2")->setValue(_r2, true);
 
     getStore()["values"]->push();
-    getEltPrg("progress", "global")->setPrgValue(100 * _iteration / _iterations, true);
+    getEltPrg("progress", "global")->setPrgValue(100 * _iteration / _iterations, false);
     getEltPrg("progress", "global")->setDynLabel(QString::number(_iteration + 1) + "/" + QString::number(_iterations), true);
 
     if (_iteration + 1 < _iterations )
@@ -451,13 +462,11 @@ void Focus::SMRequestGotoBest()
 
     if (fitValid)
     {
-        // RMS residual in HFR units: sqrt(RSS/n)
-        double khiRms = std::sqrt(_khi / n);
-        // Accept fit only if RMS residual < 20% of the minimum measured HFR
-        double threshold = 0.2 * _besthfr;
-        if (khiRms > threshold)
+        // Reject if R² is too low (poor parabolic fit)
+        const double r2Threshold = 0.95;
+        if (_r2 < r2Threshold)
         {
-            logWarning("Polynomial fit unreliable (RMS=%1 > threshold=%2) - using measured minimum", {khiRms, threshold});
+            logWarning("Polynomial fit unreliable (R²=%1 < %2) - using measured minimum", {_r2, r2Threshold});
             fitValid = false;
         }
 
@@ -469,7 +478,7 @@ void Focus::SMRequestGotoBest()
             logWarning("Fit vertex %1 outside measured range [%2, %3] - using measured minimum", {_bestposfit, rangeMin, rangeMax});
             fitValid = false;
         }
-        logInfo("Polynomial fit reliability :  RMS=%1 threshold=%2", {khiRms, threshold});
+        logInfo("Polynomial fit reliability (bad / 0.95 / good / 0.99 / excellent)  : R²=%1", {_r2});
     }
 
     if (!fitValid)
