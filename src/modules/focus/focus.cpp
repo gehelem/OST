@@ -625,7 +625,7 @@ void Focus::SMComputeResult()
         }
         painter.end();
 
-        tiltImage.save(getWebroot() + "/" + getModuleName() + getString("devices", "camera") + "TILT.jpeg", "JPG", 100);
+        tiltImage.save(getWebroot() + "/" + getModuleName() + getString("devices", "camera") + "rawTilt.jpeg", "JPG", 100);
         logInfo("Tilt heatmap saved (range: %1 - %2 steps)", {(int)minPos, (int)maxPos});
 
         // Bilinear interpolation image
@@ -682,7 +682,7 @@ void Focus::SMComputeResult()
         }
         painterInterp.end();
 
-        tiltInterp.save(getWebroot() + "/" + getModuleName() + getString("devices", "camera") + "TILTINTERP.jpeg", "JPG", 100);
+        tiltInterp.save(getWebroot() + "/" + getModuleName() + getString("devices", "camera") + "localTiltLinear.jpeg", "JPG", 100);
 
         // Global plane fit: z = c[0] + c[1]*col + c[2]*row  (least squares over all valid zones)
         QList<int> validIdx;
@@ -759,7 +759,93 @@ void Focus::SMComputeResult()
             }
             painterGT.end();
 
-            globalTilt.save(getWebroot() + "/" + getModuleName() + getString("devices", "camera") + "GLOBALTILTINTERP.jpeg", "JPG", 100);
+            globalTilt.save(getWebroot() + "/" + getModuleName() + getString("devices", "camera") + "globalTiltLinear.jpeg", "JPG", 100);
+
+            gsl_multifit_linear_free(ws);
+            gsl_matrix_free(X);
+            gsl_vector_free(zv);
+            gsl_vector_free(c);
+            gsl_matrix_free(cov);
+        }
+
+        // Quadratic surface fit: z = c0 + c1*x + c2*y + c3*x² + c4*y² + c5*x*y
+        if (validIdx.size() >= 6) {
+            int n = validIdx.size();
+            gsl_matrix *X   = gsl_matrix_alloc(n, 6);
+            gsl_vector *zv  = gsl_vector_alloc(n);
+            gsl_vector *c   = gsl_vector_alloc(6);
+            gsl_matrix *cov = gsl_matrix_alloc(6, 6);
+            double chisq;
+
+            for (int k = 0; k < n; k++) {
+                double x = validIdx[k] % mZoning;
+                double y = validIdx[k] / mZoning;
+                gsl_matrix_set(X, k, 0, 1.0);
+                gsl_matrix_set(X, k, 1, x);
+                gsl_matrix_set(X, k, 2, y);
+                gsl_matrix_set(X, k, 3, x * x);
+                gsl_matrix_set(X, k, 4, y * y);
+                gsl_matrix_set(X, k, 5, x * y);
+                gsl_vector_set(zv, k, _zoneBestposfit[validIdx[k]]);
+            }
+
+            gsl_multifit_linear_workspace *ws = gsl_multifit_linear_alloc(n, 6);
+            gsl_multifit_linear(X, zv, c, cov, &chisq, ws);
+
+            double c0 = gsl_vector_get(c, 0);
+            double c1 = gsl_vector_get(c, 1);
+            double c2 = gsl_vector_get(c, 2);
+            double c3 = gsl_vector_get(c, 3);
+            double c4 = gsl_vector_get(c, 4);
+            double c5 = gsl_vector_get(c, 5);
+
+            auto quadVal = [&](double x, double y) {
+                return c0 + c1*x + c2*y + c3*x*x + c4*y*y + c5*x*y;
+            };
+
+            // Two-pass: first find min/max of the surface over all pixels
+            double qMin =  std::numeric_limits<double>::max();
+            double qMax = -std::numeric_limits<double>::max();
+            for (int py = 0; py < ih; py++) {
+                for (int px = 0; px < iw; px++) {
+                    double v = quadVal((px + 0.5) / cellSize - 0.5, (py + 0.5) / cellSize - 0.5);
+                    qMin = std::min(qMin, v);
+                    qMax = std::max(qMax, v);
+                }
+            }
+
+            QImage quadTilt(iw, ih, QImage::Format_RGB32);
+            for (int py = 0; py < ih; py++) {
+                for (int px = 0; px < iw; px++) {
+                    double v = quadVal((px + 0.5) / cellSize - 0.5, (py + 0.5) / cellSize - 0.5);
+                    double t = (qMax > qMin) ? std::clamp((v - qMin) / (qMax - qMin), 0.0, 1.0) : 0.5;
+                    quadTilt.setPixel(px, py, QColor::fromHsvF(0.666 * (1.0 - t), 1.0, 1.0).rgb());
+                }
+            }
+
+            // Overlay zone borders, measured values and residuals
+            QPainter painterQ(&quadTilt);
+            font.setPixelSize(12);
+            painterQ.setFont(font);
+            for (int row = 0; row < mZoning; row++) {
+                for (int col = 0; col < mZoning; col++) {
+                    QRect cell(col * cellSize, row * cellSize, cellSize, cellSize);
+                    double val      = _zoneBestposfit[row * mZoning + col];
+                    double fitted   = quadVal(col, row);
+                    double residual = (val != 0) ? val - fitted : 0;
+                    painterQ.setPen(Qt::white);
+                    painterQ.drawText(cell.adjusted(0, 4, 0, -cell.height()/2),
+                                      Qt::AlignCenter, QString::number((int)val));
+                    painterQ.setPen(QColor(255, 220, 100));
+                    painterQ.drawText(cell.adjusted(0, cell.height()/2, 0, -4),
+                                      Qt::AlignCenter, (residual >= 0 ? "+" : "") + QString::number((int)residual));
+                    painterQ.setPen(QPen(QColor(0, 0, 0, 120), 1));
+                    painterQ.drawRect(cell);
+                }
+            }
+            painterQ.end();
+
+            quadTilt.save(getWebroot() + "/" + getModuleName() + getString("devices", "camera") + "globalTiltQuadratic.jpeg", "JPG", 100);
 
             gsl_multifit_linear_free(ws);
             gsl_matrix_free(X);
