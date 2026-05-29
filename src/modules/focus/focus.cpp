@@ -410,7 +410,10 @@ void Focus::SMCompute()
     getEltInt("values", "focpos")->setValue(_startpos + _iteration * _steps, false);
     getEltInt("values", "iteration")->setValue(_iteration, false);
     getEltFloat("values", "khi")->setValue(khi, false);
-    getEltFloat("values", "r2")->setValue(_r2, true);
+    getEltFloat("values", "r2")->setValue(_r2, false);
+    getEltFloat("values", "fitk0")->setValue(coeff[0], false);
+    getEltFloat("values", "fitk1")->setValue(coeff[1], false);
+    getEltFloat("values", "fitk2")->setValue(coeff[2], true);
 
     getStore()["values"]->push();
     getEltPrg("progress", "global")->setPrgValue(100 * _iteration / _iterations, false);
