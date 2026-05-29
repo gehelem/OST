@@ -52,6 +52,13 @@
                 "value":0,
                 "format": "99.99"
             },
+            "khi": {
+                "type":"float",
+                "label": "Polynomial fit",
+                "order":"45",
+                "value":0,
+                "format": "99.99"
+            },
             "iteration": {
                 "type":"int",
                 "label": "Iteration",

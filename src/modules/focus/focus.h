@@ -81,6 +81,7 @@ class MODULE_INIT Focus : public IndiModule
         double _bestposfit;
         QList<double> _zoneBestposfit;
         double _besthfr;
+        double _khi;
         double  _focuserPosition;
         QScxmlStateMachine *pMachine;
 

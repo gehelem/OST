@@ -1,6 +1,8 @@
 #include "focus.h"
 #include "polynomialfit.h"
 #include "version.cc"
+#include <cmath>
+#include <algorithm>
 
 Focus *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
 {
@@ -229,6 +231,7 @@ void Focus::startCoarse()
     _iteration = 0;
     _besthfr = 99;
     _bestposfit = 0;
+    _khi = 0;
     _zoneBestposfit.clear();
 
     mZoning =  getInt("parameters", "zoning");
@@ -368,19 +371,20 @@ void Focus::SMCompute()
         }
     }
 
+    double coeff[3], khi = 0;
     if (_posvector.size() > 2)
     {
-        double coeff[3];
-        polynomialfit(_posvector.size(), 3, _posvector.data(), _hfdvector.data(), coeff);
+        polynomialfit(_posvector.size(), 3, _posvector.data(), _hfdvector.data(), coeff, &khi);
         _bestposfit = -coeff[1] / (2 * coeff[2]);
+        _khi = khi;
     }
 
     for (int i = 0; i < mZoning * mZoning; i++)
     {
         if (_zoneHfdvector[i].size() > 2)
         {
-            double coeff[3];
-            polynomialfit(_posvector.size(), 3, _posvector.data(), _zoneHfdvector[i].data(), coeff);
+            double coeff[3], zkhi;
+            polynomialfit(_posvector.size(), 3, _posvector.data(), _zoneHfdvector[i].data(), coeff, &zkhi);
             _zoneBestposfit[i] = -coeff[1] / (2 * coeff[2]);
         }
     }
@@ -395,7 +399,8 @@ void Focus::SMCompute()
     getEltInt("values", "bestpos")->setValue(_bestpos);
     getEltFloat("values", "bestposfit")->setValue(_bestposfit);
     getEltInt("values", "focpos")->setValue(_startpos + _iteration * _steps);
-    getEltInt("values", "iteration")->setValue(_iteration, true);
+    getEltInt("values", "iteration")->setValue(_iteration, false);
+    getEltFloat("values", "khi")->setValue(khi, true);
 
     getStore()["values"]->push();
     getEltPrg("progress", "global")->setPrgValue(100 * _iteration / _iterations, true);
@@ -439,8 +444,41 @@ void Focus::SMRequestBacklashBest()
 
 void Focus::SMRequestGotoBest()
 {
-    if (_bestposfit == 99 ) _bestposfit = _bestpos;
-    logInfo("Moving to position 3 %1", {_bestposfit});
+    int n = _posvector.size();
+
+    // Validate polynomial fit quality before using _bestposfit
+    bool fitValid = (n > 2);
+
+    if (fitValid)
+    {
+        // RMS residual in HFR units: sqrt(RSS/n)
+        double khiRms = std::sqrt(_khi / n);
+        // Accept fit only if RMS residual < 20% of the minimum measured HFR
+        double threshold = 0.2 * _besthfr;
+        if (khiRms > threshold)
+        {
+            logWarning("Polynomial fit unreliable (RMS=%1 > threshold=%2) - using measured minimum", {khiRms, threshold});
+            fitValid = false;
+        }
+
+        // Reject if vertex is outside the measured range (extrapolation is unreliable)
+        double rangeMin = std::min(_startpos + 0.0, _startpos + (n - 1.0) * _steps);
+        double rangeMax = std::max(_startpos + 0.0, _startpos + (n - 1.0) * _steps);
+        if (_bestposfit < rangeMin || _bestposfit > rangeMax)
+        {
+            logWarning("Fit vertex %1 outside measured range [%2, %3] - using measured minimum", {_bestposfit, rangeMin, rangeMax});
+            fitValid = false;
+        }
+        logInfo("Polynomial fit reliability :  RMS=%1 threshold=%2", {khiRms, threshold});
+    }
+
+    if (!fitValid)
+    {
+        logWarning("Falling back to measured minimum position %1", {_bestpos});
+        _bestposfit = _bestpos;
+    }
+
+    logInfo("Moving to best position %1", {(int)_bestposfit});
     if (!sendModNewNumber(getString("devices", "focuser"), "ABS_FOCUS_POSITION", "FOCUS_ABSOLUTE_POSITION", int(_bestposfit)))
     {
         pMachine->submitEvent("abort");
