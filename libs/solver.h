@@ -22,8 +22,10 @@ class Solver : public QObject
         QList<FITSImage::Star> stars;
 
         float HFRavg;
+        float HFRavgDev;
         int HFRZones = 1; /* default 1 : 1x1 - 2: 2x2 - 3: 3x3 ... */
         QList<float> HFRavgZone;
+        QList<float> HFRavgDevZone;
         QList<int> HFRavgCount;
         QList<float> thetaAvgZone;
         QList<float> thetaDevAvgZone; // theta deviation
