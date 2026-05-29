@@ -518,7 +518,8 @@ void Focus::SMComputeResult()
 {
     //sendMessage("SMComputeResult");
     double ech = getSampling();
-    getEltFloat("values", "imgHFR")->setValue(_solver.HFRavg * ech, true);
+    getEltFloat("values", "imgHFR")->setValue(_solver.HFRavg * ech, false);
+    getEltFloat("values", "imgHFRdev")->setValue(_solver.HFRavgDev * ech, true);
     getEltFloat("results", "hfr")->setValue(_solver.HFRavg * ech, true);
     //getEltFloat("results", "pos")->setValue(int(_bestposfit), true);
 
@@ -613,7 +614,8 @@ void Focus::SMComputeLoopFrame()
         }
     }
     getEltFloat("values", "loopHFRavg")->setValue(_loopHFRavg, true);
-    getEltFloat("values", "imgHFR")->setValue(_solver.HFRavg, true);
+    getEltFloat("values", "imgHFR")->setValue(_solver.HFRavg, false);
+    getEltFloat("values", "imgHFRdev")->setValue(_solver.HFRavgDev * ech, true);
 
     //qDebug() << "Loop    " << _loopIteration << "/" << _loopIterations << " = " <<  _solver.HFRavg;
 

@@ -52,6 +52,13 @@
                 "value":0,
                 "format": "99.99"
             },
+            "imgHFRdev": {
+                "type":"float",
+                "label": "Last imgage HFR deviation ('')",
+                "order":"40",
+                "value":0,
+                "format": "99.99"
+            },
             "khi": {
                 "type":"float",
                 "label": "Polynomial fit (Khi)",
