@@ -192,6 +192,7 @@ void ElementJsonDumper::visit(ElementImg *pElement, QVariantMap &data, bool &emi
     imgdata["height"] = pElement->value().height;
     imgdata["snr"] = pElement->value().SNR;
     imgdata["hfravg"] = pElement->value().HFRavg;
+    imgdata["hfravgdev"] = pElement->value().HFRavgDev;
     imgdata["stars"] = pElement->value().starsCount;
     imgdata["issolved"] = pElement->value().isSolved;
     imgdata["solverra"] = pElement->value().solverRA;

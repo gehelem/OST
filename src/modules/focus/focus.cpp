@@ -386,7 +386,6 @@ void Focus::SMCompute()
         double tss = 0;
         for (double v : _hfdvector) tss += (v - meanHFR) * (v - meanHFR);
         _r2 = (tss > 0) ? (1.0 - khi / tss) : 1.0;
-        qDebug() << "khi=" << khi << "r2=" << _r2 << "rms=" << std::sqrt(khi / n);
     }
 
     for (int i = 0; i < mZoning * mZoning; i++)
@@ -525,6 +524,7 @@ void Focus::SMComputeResult()
 
     OST::ImgData dta = getEltImg("image", "image")->value();
     dta.HFRavg = _solver.HFRavg * ech;
+    dta.HFRavgDev = _solver.HFRavgDev * ech;
     dta.starsCount = _solver.stars.size();
     getEltImg("image", "image")->setValue(dta, true);
 
