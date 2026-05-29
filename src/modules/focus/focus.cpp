@@ -593,8 +593,20 @@ void Focus::SMComputeResult()
             }
         }
 
-        const int cellSize = 120;
-        QImage tiltImage(mZoning * cellSize, mZoning * cellSize, QImage::Format_RGB32);
+        // Cell size preserving sensor aspect ratio
+        // Target: long side ~480px, but ensure short side >= 40px/cell
+        int imgW      = (stats.width  > 0) ? stats.width  : mZoning;
+        int imgH      = (stats.height > 0) ? stats.height : mZoning;
+        double scl    = 480.0 / std::max(imgW, imgH);
+        double minScl = 40.0  * mZoning / std::min(imgW, imgH);
+        scl           = std::max(scl, minScl);
+        int cellW     = std::max(1, (int)(imgW * scl / mZoning));
+        int cellH     = std::max(1, (int)(imgH * scl / mZoning));
+        int iw        = cellW * mZoning;
+        int ih        = cellH * mZoning;
+        int fontSz    = std::max(8, std::min(cellW, cellH) / 8);
+
+        QImage tiltImage(iw, ih, QImage::Format_RGB32);
         tiltImage.fill(Qt::black);
         QPainter painter(&tiltImage);
         painter.setRenderHint(QPainter::Antialiasing, false);
@@ -604,7 +616,7 @@ void Focus::SMComputeResult()
             for (int col = 0; col < mZoning; col++)
             {
                 double val = _zoneBestposfit[row * mZoning + col];
-                QRect cell(col * cellSize, row * cellSize, cellSize, cellSize);
+                QRect cell(col * cellW, row * cellH, cellW, cellH);
 
                 if (val == 0 || maxPos <= minPos)
                 {
@@ -621,7 +633,7 @@ void Focus::SMComputeResult()
                 // Zone value label
                 painter.setPen(Qt::white);
                 QFont font = painter.font();
-                font.setPixelSize(14);
+                font.setPixelSize(fontSz);
                 font.setBold(true);
                 painter.setFont(font);
                 painter.drawText(cell, Qt::AlignCenter, QString::number((int)val));
@@ -642,7 +654,7 @@ void Focus::SMComputeResult()
         getEltImg("image", "image")->setValue(dta, false);
 
         // Bilinear interpolation image
-        // Zone (col, row) is treated as a control point at pixel center (col*cellSize + cellSize/2)
+        // Zone (col, row) is treated as a control point at pixel center (col*cellW + cellW/2, row*cellH + cellH/2)
         // Invalid zones (bestposfit==0) fall back to _bestposfit
         auto zoneVal = [&](int col, int row) -> double
         {
@@ -652,8 +664,6 @@ void Focus::SMComputeResult()
             return (v != 0) ? v : _bestposfit;
         };
 
-        const int iw = mZoning * cellSize;
-        const int ih = mZoning * cellSize;
         QImage tiltInterp(iw, ih, QImage::Format_RGB32);
 
         for (int py = 0; py < ih; py++)
@@ -661,8 +671,8 @@ void Focus::SMComputeResult()
             for (int px = 0; px < iw; px++)
             {
                 // Map pixel center to zone-grid coordinates (zone centers at 0,1,...,mZoning-1)
-                double zx = (px + 0.5) / cellSize - 0.5;
-                double zy = (py + 0.5) / cellSize - 0.5;
+                double zx = (px + 0.5) / cellW - 0.5;
+                double zy = (py + 0.5) / cellH - 0.5;
 
                 int c0 = (int)std::floor(zx);
                 int r0 = (int)std::floor(zy);
@@ -683,14 +693,14 @@ void Focus::SMComputeResult()
         QPainter painterInterp(&tiltInterp);
         painterInterp.setRenderHint(QPainter::Antialiasing, false);
         QFont font = painterInterp.font();
-        font.setPixelSize(14);
+        font.setPixelSize(fontSz);
         font.setBold(true);
         painterInterp.setFont(font);
         for (int row = 0; row < mZoning; row++)
         {
             for (int col = 0; col < mZoning; col++)
             {
-                QRect cell(col * cellSize, row * cellSize, cellSize, cellSize);
+                QRect cell(col * cellW, row * cellH, cellW, cellH);
                 double val = _zoneBestposfit[row * mZoning + col];
                 painterInterp.setPen(Qt::white);
                 painterInterp.drawText(cell, Qt::AlignCenter, QString::number((int)val));
@@ -754,8 +764,8 @@ void Focus::SMComputeResult()
             {
                 for (int px = 0; px < iw; px++)
                 {
-                    double zx = (px + 0.5) / cellSize - 0.5;
-                    double zy = (py + 0.5) / cellSize - 0.5;
+                    double zx = (px + 0.5) / cellW - 0.5;
+                    double zy = (py + 0.5) / cellH - 0.5;
                     double v  = c0 + c1 * zx + c2 * zy;
                     double t  = (planMax > planMin) ? std::clamp((v - planMin) / (planMax - planMin), 0.0, 1.0) : 0.5;
                     globalTilt.setPixel(px, py, QColor::fromHsvF(0.666 * (1.0 - t), 1.0, 1.0).rgb());
@@ -764,13 +774,13 @@ void Focus::SMComputeResult()
 
             // Overlay zone borders, measured values and residuals
             QPainter painterGT(&globalTilt);
-            font.setPixelSize(12);
+            font.setPixelSize(fontSz);
             painterGT.setFont(font);
             for (int row = 0; row < mZoning; row++)
             {
                 for (int col = 0; col < mZoning; col++)
                 {
-                    QRect cell(col * cellSize, row * cellSize, cellSize, cellSize);
+                    QRect cell(col * cellW, row * cellH, cellW, cellH);
                     double val      = _zoneBestposfit[row * mZoning + col];
                     double fitted   = c0 + c1 * col + c2 * row;
                     double residual = (val != 0) ? val - fitted : 0;
@@ -842,7 +852,7 @@ void Focus::SMComputeResult()
             {
                 for (int px = 0; px < iw; px++)
                 {
-                    double v = quadVal((px + 0.5) / cellSize - 0.5, (py + 0.5) / cellSize - 0.5);
+                    double v = quadVal((px + 0.5) / cellW - 0.5, (py + 0.5) / cellH - 0.5);
                     qMin = std::min(qMin, v);
                     qMax = std::max(qMax, v);
                 }
@@ -853,7 +863,7 @@ void Focus::SMComputeResult()
             {
                 for (int px = 0; px < iw; px++)
                 {
-                    double v = quadVal((px + 0.5) / cellSize - 0.5, (py + 0.5) / cellSize - 0.5);
+                    double v = quadVal((px + 0.5) / cellW - 0.5, (py + 0.5) / cellH - 0.5);
                     double t = (qMax > qMin) ? std::clamp((v - qMin) / (qMax - qMin), 0.0, 1.0) : 0.5;
                     quadTilt.setPixel(px, py, QColor::fromHsvF(0.666 * (1.0 - t), 1.0, 1.0).rgb());
                 }
@@ -861,13 +871,13 @@ void Focus::SMComputeResult()
 
             // Overlay zone borders, measured values and residuals
             QPainter painterQ(&quadTilt);
-            font.setPixelSize(12);
+            font.setPixelSize(fontSz);
             painterQ.setFont(font);
             for (int row = 0; row < mZoning; row++)
             {
                 for (int col = 0; col < mZoning; col++)
                 {
-                    QRect cell(col * cellSize, row * cellSize, cellSize, cellSize);
+                    QRect cell(col * cellW, row * cellH, cellW, cellH);
                     double val      = _zoneBestposfit[row * mZoning + col];
                     double fitted   = quadVal(col, row);
                     double residual = (val != 0) ? val - fitted : 0;
