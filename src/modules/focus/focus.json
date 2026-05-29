@@ -52,10 +52,52 @@
                 "value":0,
                 "format": "99.99"
             },
+            "imgHFRdev": {
+                "type":"float",
+                "label": "Last imgage HFR deviation ('')",
+                "order":"41",
+                "value":0,
+                "format": "99.99"
+            },
+            "khi": {
+                "type":"float",
+                "label": "Polynomial fit (Khi)",
+                "order":"45",
+                "value":0,
+                "format": "99.99"
+            },
+            "r2": {
+                "type":"float",
+                "label": "Polynomial fit (R2)",
+                "order":"46",
+                "value":0,
+                "format": "99.99"
+            },
+            "fitk0": {
+                "type":"float",
+                "label": "Polynomial fit coef 0",
+                "order":"47",
+                "value":0,
+                "format": "99.99"
+            },
+            "fitk1": {
+                "type":"float",
+                "label": "Polynomial fit coef 1",
+                "order":"48",
+                "value":0,
+                "format": "99.99"
+            },
+            "fitk2": {
+                "type":"float",
+                "label": "Polynomial fit coef 2",
+                "order":"49",
+                "value":0,
+                "format": "99.99"
+            },
             "iteration": {
                 "type":"int",
                 "label": "Iteration",
-                "order":"50",
+                "order":"60",
                 "value":0,
                 "step":1,
                 "format": "9999"

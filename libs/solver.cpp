@@ -1,4 +1,5 @@
 #include "solver.h"
+#include <cmath>
 /*!
  * ... ...
  */
@@ -18,7 +19,9 @@ void Solver::ResetSolver(FITSImage::Statistic &stats, uint8_t *m_ImageBuffer)
     mImgHeight = stats.height;
 
     HFRavg = 99;
+    HFRavgDev = 0;
     HFRavgZone.clear();
+    HFRavgDevZone.clear();
     thetaAvgZone.clear();
     thetaDevAvgZone.clear();
     aAxeAvgZone.clear();
@@ -29,6 +32,7 @@ void Solver::ResetSolver(FITSImage::Statistic &stats, uint8_t *m_ImageBuffer)
     {
         HFRavgCount.append(0);
         HFRavgZone.append(99);
+        HFRavgDevZone.append(0);
         thetaAvgZone.append(99);
         thetaDevAvgZone.append(99);
         aAxeAvgZone.append(99);
@@ -137,21 +141,34 @@ void Solver::ssReadySEP()
 
     //sendMessage( "SSolver ready SEP";
     stars = stellarSolver.getStarList();
+    double hfrMean = 0, hfrM2 = 0;
+    QVector<double> hfrZoneM2(HFRZones * HFRZones, 0.0);
     for (int i = 0; i < stars.size(); i++)
     {
-        HFRavg = (i * HFRavg + stars[i].HFR) / (i + 1);
+        /* global Welford */
+        double delta = stars[i].HFR - hfrMean;
+        hfrMean += delta / (i + 1);
+        hfrM2   += delta * (stars[i].HFR - hfrMean);
 
         /* zoning */
         int starColumn = HFRZones * stars[i].x / mImgWidth;
         int starLine = HFRZones * stars[i].y / mImgHeight;
         int zone = starLine * HFRZones + starColumn;
+
+        double zoneDelta = stars[i].HFR - HFRavgZone[zone];
         HFRavgZone[zone] = (HFRavgCount[zone] * HFRavgZone[zone] + stars[i].HFR) / (HFRavgCount[zone] + 1);
+        hfrZoneM2[zone] += zoneDelta * (stars[i].HFR - HFRavgZone[zone]);
+
         thetaAvgZone[zone] = (HFRavgCount[zone] * thetaAvgZone[zone] + stars[i].theta) / (HFRavgCount[zone] + 1);
         aAxeAvgZone[zone] = (HFRavgCount[zone] * aAxeAvgZone[zone] + stars[i].a) / (HFRavgCount[zone] + 1);
         bAxeAvgZone[zone] = (HFRavgCount[zone] * bAxeAvgZone[zone] + stars[i].b) / (HFRavgCount[zone] + 1);
         eAxeAvgZone[zone] = aAxeAvgZone[zone] / bAxeAvgZone[zone];
         HFRavgCount[zone]++;
     }
+    HFRavg    = static_cast<float>(hfrMean);
+    HFRavgDev = static_cast<float>(stars.size() > 1 ? std::sqrt(hfrM2 / stars.size()) : 0.0);
+    for (int i = 0; i < HFRZones * HFRZones; i++)
+        HFRavgDevZone[i] = static_cast<float>(HFRavgCount[i] > 1 ? std::sqrt(hfrZoneM2[i] / HFRavgCount[i]) : 0.0);
     //theta dev
     HFRavgCount.clear();
     for (int i = 0; i < HFRZones * HFRZones; i++ )

@@ -549,6 +549,7 @@ typedef struct ImgData
     uint16_t height { 0 };              /*!< Image height in pixels */
     uint8_t channels { 1 };             /*!< Number of color channels (1=mono, 3=RGB) */
     double HFRavg{ 0 };                 /*!< Average Half-Flux Radius (focus quality metric) */
+    double HFRavgDev{ 0 };              /*!< Average deviation Half-Flux Radius (HFR RMS dev)*/
     double starsCount{ 0 };             /*!< Number of detected stars */
     bool isSolved = false;              /*!< Whether plate solving succeeded */
     double solverRA{ 0 };               /*!< Solved Right Ascension (degrees) */

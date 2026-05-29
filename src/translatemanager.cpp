@@ -142,7 +142,7 @@ QString TranslateManager::applyArgs(const QString &format, const QVariantList &a
                 break;
             case QMetaType::Double:
             case QMetaType::Float:
-                result = result.arg(arg.toDouble(), 0, 'f', 2);
+                result = result.arg(arg.toDouble(), 0, 'f', 6);
                 break;
             case QMetaType::Bool:
                 result = result.arg(arg.toBool() ? "true" : "false");
