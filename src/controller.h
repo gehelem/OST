@@ -58,6 +58,7 @@ class Controller : public QObject
         //Maincontrol *pMainControl;
         QProcess    *_process;
         QProcess    *_indiProcess;
+        pid_t        _indiPid = 0;
         QZeroConf zeroConf;
         QFileSystemWatcher mFileWatcher;
         QStringList mFilesList;

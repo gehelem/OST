@@ -9,6 +9,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <cerrno>
+#include <csignal>
 #include <cstring>
 #include "model/element/common.h"
 #include "libs/utils/modulejsondumper.h"
@@ -155,8 +156,10 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
         this->startIndiDriver("indi_simulator_telescope");
         this->startIndiDriver("indi_simulator_focus");
         this->startIndiDriver("indi_simulator_ccd");
+        this->startIndiDriver("indi_simulator_guide");
         this->startIndiDriver("indi_simulator_wheel");
         this->startIndiDriver("indi_simulator_dummy");
+        this->startIndiDriver("indi_simulator_gps");
     }
 
     //check existing folders
@@ -833,6 +836,7 @@ void Controller::startPublish()
 }
 void Controller::startIndi(void)
 {
+    // Clean up our own QProcess if still alive
     if (_indiProcess)
     {
         if (_indiProcess->state() != QProcess::NotRunning)
@@ -842,6 +846,27 @@ void Controller::startIndi(void)
         }
         delete _indiProcess;
         _indiProcess = nullptr;
+    }
+    _indiPid = 0;
+
+    // Check for an orphaned indiserver (ostserver crashed, indiserver survived)
+    QProcess pgrep;
+    pgrep.start("pgrep", {"-x", "indiserver"});
+    pgrep.waitForFinished(1000);
+    QString pidStr = pgrep.readAllStandardOutput().trimmed().split('\n').first();
+    if (!pidStr.isEmpty())
+    {
+        int fd = ::open("/tmp/ostserverIndiFIFO", O_WRONLY | O_NONBLOCK);
+        if (fd >= 0)
+        {
+            ::close(fd);
+            _indiPid = pidStr.toInt();
+            mLogger->info("Reusing orphaned indiserver (PID " + pidStr + ")");
+            return;
+        }
+        mLogger->warning("Orphaned indiserver found but FIFO unusable — restarting");
+        ::kill(pidStr.toInt(), SIGKILL);
+        QThread::msleep(300);
     }
 
     QProcess::execute("rm",    {"-f", "/tmp/ostserverIndiFIFO"});
@@ -855,17 +880,21 @@ void Controller::startIndi(void)
 
     _indiProcess->start("indiserver", {"-f", "/tmp/ostserverIndiFIFO", "-m", "1000"});
 
-    if (!_indiProcess->waitForStarted(3000)) {
+    if (!_indiProcess->waitForStarted(3000))
+    {
         mLogger->error("indiserver failed to start");
         return;
     }
-    mLogger->info("indiserver started (PID " + QString::number(_indiProcess->processId()) + ")");
+    _indiPid = _indiProcess->processId();
+    mLogger->info("indiserver started (PID " + QString::number(_indiPid) + ")");
 
     bool fifoReady = false;
-    for (int i = 0; i < 30 && !fifoReady; ++i) {
+    for (int i = 0; i < 30 && !fifoReady; ++i)
+    {
         QThread::msleep(100);
         int fd = ::open("/tmp/ostserverIndiFIFO", O_WRONLY | O_NONBLOCK);
-        if (fd >= 0) {
+        if (fd >= 0)
+        {
             ::close(fd);
             fifoReady = true;
         }
@@ -883,6 +912,12 @@ void Controller::stopIndi(void)
         _indiProcess->waitForFinished(3000);
         mLogger->info("indiserver stopped");
     }
+    else if (_indiPid > 0)
+    {
+        ::kill(_indiPid, SIGKILL);
+        mLogger->info("Orphaned indiserver stopped (PID " + QString::number(_indiPid) + ")");
+    }
+    _indiPid = 0;
 }
 void Controller::startIndiDriver(const QString &pDriver)
 {
