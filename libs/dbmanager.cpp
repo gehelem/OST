@@ -286,6 +286,55 @@ bool DBManager::getDbConfigurations(QVariantMap &result )
     mDb.close();
     return true;
 }
+bool DBManager::getIndiConfiguration(const QString &pConfigName, QStringList &drivers)
+{
+    if (!mDb.open())
+    {
+        logError("getIndiConfiguration dbOpen - ERROR: %1 - %2", {mDb.databaseName(), mDb.lastError().text()});
+        return false;
+    }
+    QString sql = "SELECT DRIVERS FROM INDICONFIGURATIONS WHERE CONFIGNAME='" + pConfigName + "'";
+    if (!mQuery.exec(sql))
+    {
+        logError("getIndiConfiguration - ERROR SQL = %1", {sql});
+        logError("getIndiConfiguration - ERROR : %1", {mQuery.lastError().text()});
+        mDb.close();
+        return false;
+    }
+    while (mQuery.next())
+        drivers.append(mQuery.value(0).toString());
+    mDb.close();
+    return true;
+}
+bool DBManager::saveIndiConfiguration(const QString &pConfigName, const QStringList &drivers)
+{
+    if (!mDb.open())
+    {
+        logError("saveIndiConfiguration dbOpen - ERROR: %1 - %2", {mDb.databaseName(), mDb.lastError().text()});
+        return false;
+    }
+    QString sql = "DELETE FROM INDICONFIGURATIONS WHERE CONFIGNAME='" + pConfigName + "'";
+    if (!mQuery.exec(sql))
+    {
+        logError("saveIndiConfiguration - ERROR SQL = %1", {sql});
+        logError("saveIndiConfiguration - ERROR : %1", {mQuery.lastError().text()});
+        mDb.close();
+        return false;
+    }
+    for (const QString &driver : drivers)
+    {
+        sql = "INSERT INTO INDICONFIGURATIONS (CONFIGNAME, DRIVERS) VALUES ('" + pConfigName + "','" + driver + "')";
+        if (!mQuery.exec(sql))
+        {
+            logError("saveIndiConfiguration - ERROR SQL = %1", {sql});
+            logError("saveIndiConfiguration - ERROR : %1", {mQuery.lastError().text()});
+            mDb.close();
+            return false;
+        }
+    }
+    mDb.close();
+    return true;
+}
 bool DBManager::searchCatalog(const QString &pArgument, QList<catalogResult> &pResult)
 {
     if(!mDb.open())

@@ -148,12 +148,12 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
         updateControllerData("indidrivers", driverList);
     }
 
-    loadConf(_conf);
-
     if (_indiserver != "N")
     {
         this->startIndi();
     }
+
+    loadConf(_conf);
 
     //check existing folders
     mSelectedFolder = webroot;
@@ -317,6 +317,21 @@ void Controller::loadConf(const QString &pConf)
         loadModule(line["moduletype"].toString(), iter.key(), line["profilename"].toString());
     }
     logInfo("Load configuration %1 sucessfull", {pConf});
+
+    QStringList driverLabels;
+    if (dbmanager->getIndiConfiguration(pConf, driverLabels) && !driverLabels.isEmpty())
+    {
+        for (const QString &label : driverLabels)
+        {
+            auto it = std::find_if(_indiDrivers.begin(), _indiDrivers.end(),
+                                   [&](const IndiDriverInfo &d) { return d.label == label; });
+            if (it != _indiDrivers.end())
+                startIndiDriver(it->binary);
+            else
+                logError("INDI driver not found in XML registry: %1", {label});
+        }
+    }
+
     updateControllerData("currentconf", QVariant(pConf));
     QVariantMap confs;
     dbmanager->getDbConfigurations(confs);
@@ -350,6 +365,13 @@ void Controller::saveConf(const QString &pConf)
         return;
     }
     logInfo("Save configuration %1 sucessfull", {pConf});
+
+    QStringList driverLabels;
+    for (const IndiDriverInfo &drv : _activeIndiDrivers)
+        driverLabels.append(drv.label);
+    if (!dbmanager->saveIndiConfiguration(pConf, driverLabels))
+        logError("Save INDI configuration %1 failed", {pConf});
+
     updateControllerData("currentconf", QVariant(pConf));
     QVariantMap confs;
     dbmanager->getDbConfigurations(confs);
@@ -947,6 +969,13 @@ void Controller::stopIndi(void)
 }
 void Controller::startIndiDriver(const QString &pDriver)
 {
+    if (std::find_if(_activeIndiDrivers.begin(), _activeIndiDrivers.end(),
+                     [&](const IndiDriverInfo &d) { return d.binary == pDriver; }) != _activeIndiDrivers.end())
+    {
+        mLogger->info("Driver already active, skipping: " + pDriver);
+        return;
+    }
+
     int fd = ::open("/tmp/ostserverIndiFIFO", O_WRONLY | O_NONBLOCK);
     if (fd < 0)
     {
