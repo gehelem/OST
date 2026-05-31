@@ -153,13 +153,6 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     if (_indiserver != "N")
     {
         this->startIndi();
-        this->startIndiDriver("indi_simulator_telescope");
-        this->startIndiDriver("indi_simulator_focus");
-        this->startIndiDriver("indi_simulator_ccd");
-        this->startIndiDriver("indi_simulator_guide");
-        this->startIndiDriver("indi_simulator_wheel");
-        this->startIndiDriver("indi_simulator_dummy");
-        this->startIndiDriver("indi_simulator_gps");
     }
 
     //check existing folders
@@ -892,6 +885,7 @@ void Controller::startIndi(void)
             ::close(fd);
             _indiPid = pidStr.toInt();
             mLogger->info("Reusing orphaned indiserver (PID " + pidStr + ")");
+            queryActiveIndiDrivers();
             return;
         }
         mLogger->warning("Orphaned indiserver found but FIFO unusable — restarting");
@@ -948,6 +942,8 @@ void Controller::stopIndi(void)
         mLogger->info("Orphaned indiserver stopped (PID " + QString::number(_indiPid) + ")");
     }
     _indiPid = 0;
+    _activeIndiDrivers.clear();
+    updateControllerData("indiactivedrivers", QVariantList());
 }
 void Controller::startIndiDriver(const QString &pDriver)
 {
@@ -960,7 +956,22 @@ void Controller::startIndiDriver(const QString &pDriver)
     QByteArray cmd = ("start " + pDriver + "\n").toLocal8Bit();
     ::write(fd, cmd.constData(), cmd.size());
     ::close(fd);
+
+    auto it = std::find_if(_indiDrivers.begin(), _indiDrivers.end(),
+                           [&](const IndiDriverInfo & d)
+    {
+        return d.binary == pDriver;
+    });
+    if (it != _indiDrivers.end() &&
+            std::find_if(_activeIndiDrivers.begin(), _activeIndiDrivers.end(),
+                         [&](const IndiDriverInfo & d)
+{
+    return d.binary == pDriver;
+}) == _activeIndiDrivers.end())
+    _activeIndiDrivers.append(*it);
+
     mLogger->info("Sent start command for driver: " + pDriver);
+    updateControllerData("indiactivedrivers", activeIndiDriversToVariant());
 }
 void Controller::stopIndiDriver(const QString &pDriver)
 {
@@ -973,7 +984,52 @@ void Controller::stopIndiDriver(const QString &pDriver)
     QByteArray cmd = ("stop " + pDriver + "\n").toLocal8Bit();
     ::write(fd, cmd.constData(), cmd.size());
     ::close(fd);
+
+    _activeIndiDrivers.erase(
+        std::remove_if(_activeIndiDrivers.begin(), _activeIndiDrivers.end(),
+                       [&](const IndiDriverInfo & d)
+    {
+        return d.binary == pDriver;
+    }),
+    _activeIndiDrivers.end());
+
     mLogger->info("Sent stop command for driver: " + pDriver);
+    updateControllerData("indiactivedrivers", activeIndiDriversToVariant());
+}
+void Controller::queryActiveIndiDrivers()
+{
+    _activeIndiDrivers.clear();
+
+    QProcess proc;
+    proc.start("indi_getprop", {"-t", "2", "*.CONNECTION.CONNECT"});
+    proc.waitForFinished(4000);
+
+    for (const QString &line : QString(proc.readAllStandardOutput()).split('\n'))
+    {
+        QString trimmed = line.trimmed();
+        if (trimmed.isEmpty()) continue;
+
+        QString deviceLabel = trimmed.section('.', 0, 0);
+        if (deviceLabel.isEmpty()) continue;
+
+        auto it = std::find_if(_indiDrivers.begin(), _indiDrivers.end(),
+                               [&](const IndiDriverInfo & d)
+        {
+            return d.label == deviceLabel;
+        });
+        if (it != _indiDrivers.end())
+        {
+            _activeIndiDrivers.append(*it);
+            mLogger->info("Recovered active driver: " + it->label + " (" + it->binary + ")");
+        }
+        else
+        {
+            mLogger->warning("Active driver not found in XML registry: " + deviceLabel);
+        }
+    }
+
+    mLogger->info(QString::number(_activeIndiDrivers.size()) + " active INDI driver(s) recovered");
+    updateControllerData("indiactivedrivers", activeIndiDriversToVariant());
 }
 void Controller::OnFileWatcherEvent(const QString &pEvent)
 {

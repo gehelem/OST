@@ -51,14 +51,15 @@ class Controller : public QObject
         QString _grant;
         QVariantMap _availableModuleLibs;
         QList<IndiDriverInfo> _indiDrivers;
+        QList<IndiDriverInfo> _activeIndiDrivers;
         WShandler   *wshandler;
         DBManager   *dbmanager;
         OST::Logger *mLogger;
         OST::TranslateManager *mTranslater;
         //Maincontrol *pMainControl;
-        QProcess    *_process;
-        QProcess    *_indiProcess;
-        pid_t        _indiPid = 0;
+        QProcess    *_process     = nullptr;
+        QProcess    *_indiProcess = nullptr;
+        pid_t        _indiPid     = 0;
         QZeroConf zeroConf;
         QFileSystemWatcher mFileWatcher;
         QStringList mFilesList;
@@ -85,6 +86,19 @@ class Controller : public QObject
         void stopIndi(void);
         void startIndiDriver(const QString &pDriver);
         void stopIndiDriver(const QString &pDriver);
+        void queryActiveIndiDrivers();
+        QVariantList activeIndiDriversToVariant() const
+        {
+            QVariantList list;
+            for (const auto &drv : _activeIndiDrivers) {
+                QVariantMap m;
+                m["label"]  = drv.label;
+                m["binary"] = drv.binary;
+                m["family"] = drv.family;
+                list.append(m);
+            }
+            return list;
+        }
         void logInfo(const QString &message);
         void logInfo(const QString &message, const QVariantList &args);
         void logError(const QString &message);
