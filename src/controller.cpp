@@ -560,6 +560,36 @@ void Controller::onExternalEvent(OST::ExtEvent event)
             OnFileWatcherEvent(QString());
             return;
         }
+        case OST::ExtEvType::YA:
+        {
+            startIndi();
+            return;
+        }
+        case OST::ExtEvType::YZ:
+        {
+            stopIndi();
+            return;
+        }
+        case OST::ExtEvType::YL:
+        {
+            if (!event.data.contains("driver"))
+            {
+                logError("Controller::onExternalEvent - invalid event data content - %1", {OST::ExtEvToString(event.ev)});
+                return;
+            };
+            startIndiDriver(event.data["driver"].toString());
+            return;
+        }
+        case OST::ExtEvType::YS:
+        {
+            if (!event.data.contains("driver"))
+            {
+                logError("Controller::onExternalEvent - invalid event data content - %1", {OST::ExtEvToString(event.ev)});
+                return;
+            };
+            stopIndiDriver(event.data["driver"].toString());
+            return;
+        }
         default:
         {
             if (!event.data.contains("m"))
