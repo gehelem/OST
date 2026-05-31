@@ -293,10 +293,10 @@ bool DBManager::getIndiConfiguration(const QString &pConfigName, QStringList &dr
         logError("getIndiConfiguration dbOpen - ERROR: %1 - %2", {mDb.databaseName(), mDb.lastError().text()});
         return false;
     }
-    QString sql = "SELECT DRIVERS FROM INDICONFIGURATIONS WHERE CONFIGNAME='" + pConfigName + "'";
-    if (!mQuery.exec(sql))
+    mQuery.prepare("SELECT DRIVERS FROM INDICONFIGURATIONS WHERE CONFIGNAME = ?");
+    mQuery.addBindValue(pConfigName);
+    if (!mQuery.exec())
     {
-        logError("getIndiConfiguration - ERROR SQL = %1", {sql});
         logError("getIndiConfiguration - ERROR : %1", {mQuery.lastError().text()});
         mDb.close();
         return false;
@@ -313,20 +313,21 @@ bool DBManager::saveIndiConfiguration(const QString &pConfigName, const QStringL
         logError("saveIndiConfiguration dbOpen - ERROR: %1 - %2", {mDb.databaseName(), mDb.lastError().text()});
         return false;
     }
-    QString sql = "DELETE FROM INDICONFIGURATIONS WHERE CONFIGNAME='" + pConfigName + "'";
-    if (!mQuery.exec(sql))
+    mQuery.prepare("DELETE FROM INDICONFIGURATIONS WHERE CONFIGNAME = ?");
+    mQuery.addBindValue(pConfigName);
+    if (!mQuery.exec())
     {
-        logError("saveIndiConfiguration - ERROR SQL = %1", {sql});
         logError("saveIndiConfiguration - ERROR : %1", {mQuery.lastError().text()});
         mDb.close();
         return false;
     }
     for (const QString &driver : drivers)
     {
-        sql = "INSERT INTO INDICONFIGURATIONS (CONFIGNAME, DRIVERS) VALUES ('" + pConfigName + "','" + driver + "')";
-        if (!mQuery.exec(sql))
+        mQuery.prepare("INSERT INTO INDICONFIGURATIONS (CONFIGNAME, DRIVERS) VALUES (?, ?)");
+        mQuery.addBindValue(pConfigName);
+        mQuery.addBindValue(driver);
+        if (!mQuery.exec())
         {
-            logError("saveIndiConfiguration - ERROR SQL = %1", {sql});
             logError("saveIndiConfiguration - ERROR : %1", {mQuery.lastError().text()});
             mDb.close();
             return false;
@@ -342,15 +343,16 @@ bool DBManager::searchCatalog(const QString &pArgument, QList<catalogResult> &pR
         logError("searchCatalog dbOpen - ERROR: %1 - %2", {mDb.databaseName(), mDb.lastError().text()});
         return false;
     }
-    QString argumentWithoutBlanks = pArgument;
-    argumentWithoutBlanks.replace(" ", "");
-    QString sql = "SELECT CATALOG,CODE,RA,NS,DEC,DIAM,MAG,NAME,ALIAS FROM CATALOGS WHERE ";
-    sql = sql + "    UPPER(CODE) LIKE UPPER('%" + argumentWithoutBlanks + "%')";
-    sql = sql + " OR UPPER(ALIAS) LIKE UPPER('%" + argumentWithoutBlanks + "%')";
-    sql = sql + " OR UPPER(NAME) LIKE UPPER('%" + argumentWithoutBlanks + "%')";
-    if (!mQuery.exec(sql))
+    QString pattern = "%" + QString(pArgument).replace(" ", "") + "%";
+    mQuery.prepare("SELECT CATALOG,CODE,RA,NS,DEC,DIAM,MAG,NAME,ALIAS FROM CATALOGS WHERE "
+                   "    UPPER(CODE)  LIKE UPPER(?) "
+                   " OR UPPER(ALIAS) LIKE UPPER(?) "
+                   " OR UPPER(NAME)  LIKE UPPER(?)");
+    mQuery.addBindValue(pattern);
+    mQuery.addBindValue(pattern);
+    mQuery.addBindValue(pattern);
+    if (!mQuery.exec())
     {
-        logError("searchCatalog - ERROR SQL = %1", {sql});
         logError("searchCatalog - ERROR : %1", {mQuery.lastError().text()});
         mDb.close();
         return false;
@@ -476,10 +478,10 @@ QString DBManager::getGrants(const QString &pUser, const QString &pPW)
         logError("getGrants dbOpen - ERROR: %1 - %2", {mDb.databaseName(), mDb.lastError().text()});
         return result;
     }
-    QString sql = "SELECT GRANT FROM USERS WHERE ";
-    sql = sql + "    LOGIN = '" + pUser + "'";
-    sql = sql + " AND PW= '" + pPW + "'";
-    if (!mQuery.exec(sql))
+    mQuery.prepare("SELECT GRANT FROM USERS WHERE LOGIN = ? AND PW = ?");
+    mQuery.addBindValue(pUser);
+    mQuery.addBindValue(pPW);
+    if (!mQuery.exec())
     {
         logError("getGrants - %1", {mQuery.lastError().text()});
         mDb.close();
