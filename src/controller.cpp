@@ -4,6 +4,7 @@
 #include <QFileSystemWatcher>
 #include <QHostInfo>
 #include <QDomDocument>
+#include <QThread>
 #include <algorithm>
 #include <fcntl.h>
 #include <unistd.h>
@@ -151,6 +152,11 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     if (_indiserver != "N")
     {
         this->startIndi();
+        this->startIndiDriver("indi_simulator_telescope");
+        this->startIndiDriver("indi_simulator_focus");
+        this->startIndiDriver("indi_simulator_ccd");
+        this->startIndiDriver("indi_simulator_wheel");
+        this->startIndiDriver("indi_simulator_dummy");
     }
 
     //check existing folders
@@ -807,13 +813,15 @@ void Controller::processError()
 }
 void Controller::processIndiOutput()
 {
-    QString output = _indiProcess->readAllStandardOutput();
-    //pMainControl->sendMainMessage("INDI LOG   : " + output);
+    for (const QString &line : QString(_indiProcess->readAllStandardOutput()).split('\n'))
+        if (!line.trimmed().isEmpty())
+            mLogger->info("[indiserver] " + line.trimmed());
 }
 void Controller::processIndiError()
 {
-    QString output = _indiProcess->readAllStandardError();
-    //pMainControl->sendMainError("INDI ERROR   : " + output);
+    for (const QString &line : QString(_indiProcess->readAllStandardError()).split('\n'))
+        if (!line.trimmed().isEmpty())
+            mLogger->warning("[indiserver] " + line.trimmed());
 }
 // ---------- ZeroConf ----------
 
@@ -847,11 +855,25 @@ void Controller::startIndi(void)
 
     _indiProcess->start("indiserver", {"-f", "/tmp/ostserverIndiFIFO", "-m", "1000"});
 
-    if (!_indiProcess->waitForStarted(3000))
+    if (!_indiProcess->waitForStarted(3000)) {
         mLogger->error("indiserver failed to start");
+        return;
+    }
+    mLogger->info("indiserver started (PID " + QString::number(_indiProcess->processId()) + ")");
+
+    bool fifoReady = false;
+    for (int i = 0; i < 30 && !fifoReady; ++i) {
+        QThread::msleep(100);
+        int fd = ::open("/tmp/ostserverIndiFIFO", O_WRONLY | O_NONBLOCK);
+        if (fd >= 0) {
+            ::close(fd);
+            fifoReady = true;
+        }
+    }
+    if (!fifoReady)
+        mLogger->warning("indiserver FIFO not ready after 3 seconds");
     else
-        mLogger->info("indiserver started (PID " + QString::number(
-                          _indiProcess->processId()) + ")");
+        mLogger->info("indiserver FIFO ready");
 }
 void Controller::stopIndi(void)
 {
