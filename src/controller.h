@@ -13,6 +13,14 @@
 #include "globaldatastore.h"
 #include <lovbase.h>
 
+struct IndiDriverInfo {
+    QString label;
+    QString binary;
+    QString family;
+    QString skeleton;
+    bool    mdpd = false;
+};
+
 
 /*!
  * This class is the heart of OST
@@ -42,7 +50,7 @@ class Controller : public QObject
         QString _lng;
         QString _grant;
         QVariantMap _availableModuleLibs;
-        QStringList _availableIndiDrivers;
+        QList<IndiDriverInfo> _indiDrivers;
         WShandler   *wshandler;
         DBManager   *dbmanager;
         OST::Logger *mLogger;
