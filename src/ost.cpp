@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
     mLogger.info("Log file              =" + logfile);
     mLogger.info("Log level             =" + QString::number(loglevel));
     mLogger.info("Banner                =" + banner);
-    mLogger.info("System watch interval =" + QString::number(systemWatchInterval) + "s");
+    mLogger.info("System watch interval =" + QString::number(systemWatchInterval) + "s (0 to disable)");
     if (setAdminPassword != "") mLogger.info("Set ADMIN password    = [hidden]");
 
     mLogger.setLogLevel(static_cast<OST::LogLevel>(loglevel));

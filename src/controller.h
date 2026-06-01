@@ -70,8 +70,8 @@ class Controller : public QObject
         QString mSelectedFolder;
         QString mBanner;
         QString mSetAdminPassword;
-        int mSystemWatchInterval;
-        QTimer mSystemWatchTimer;
+        int     mSystemWatchInterval;
+        QTimer  mSystemWatchTimer;
         QVariantMap mControllerData;
         QMap<QString, OST::LovBase*> mControllerLovs;
         GlobalDatastore* mGlobalDatastore = nullptr;

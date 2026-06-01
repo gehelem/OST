@@ -11,6 +11,9 @@
 #include <cerrno>
 #include <csignal>
 #include <cstring>
+#include <sys/statvfs.h>
+#include <QRegularExpression>
+#include <QSet>
 #include "model/element/common.h"
 #include "libs/utils/modulejsondumper.h"
 /*!
@@ -1271,6 +1274,68 @@ void Controller::onInterModuleRequest(OST::ExtEvent event)
 }
 void Controller::onSystemWatch()
 {
+    // --- RAM ---
+    {
+        QFile f("/proc/meminfo");
+        if (f.open(QIODevice::ReadOnly))
+        {
+            quint64 memTotal = 0, memAvailable = 0;
+            const QStringList lines = QString(f.readAll()).split('\n');
+            f.close();
+            for (const QString &raw : lines)
+            {
+                const QString     line  = raw.simplified();
+                const QStringList parts = line.split(' ');
+                if (line.startsWith("MemTotal:"))          memTotal     = parts.value(1).toULongLong();
+                else if (line.startsWith("MemAvailable:")) memAvailable = parts.value(1).toULongLong();
+            }
+            logDebug("RAM: %1 MB / %2 MB", {(memTotal - memAvailable) / 1024, memTotal / 1024});
+        }
+    }
+
+    // --- CPU (load average 1 min) ---
+    {
+        QFile f("/proc/loadavg");
+        if (f.open(QIODevice::ReadOnly))
+        {
+            const QStringList p = QString(f.readAll()).simplified().split(' ');
+            f.close();
+            if (!p.isEmpty())
+                logDebug("CPU load: %1 (1m) %2 (5m) %3 (15m)", {p.value(0), p.value(1), p.value(2)});
+        }
+    }
+
+    // --- Disks ---
+    {
+        QFile f("/proc/mounts");
+        if (f.open(QIODevice::ReadOnly))
+        {
+            const QStringList lines = QString(f.readAll()).split('\n');
+            f.close();
+            QStringList seen;
+            for (const QString &raw : lines)
+            {
+                const QStringList parts = raw.split(' ');
+                if (parts.size() < 3) continue;
+                const QString device     = parts[0];
+                const QString mountpoint = parts[1];
+                if (!device.startsWith("/dev/") || device.startsWith("/dev/loop")) continue;
+                if (seen.contains(device)) continue;
+                seen.append(device);
+                struct statvfs st;
+                if (::statvfs(mountpoint.toLocal8Bit().constData(), &st) == 0)
+                {
+                    const quint64 total = (quint64)st.f_blocks * st.f_frsize;
+                    const quint64 used  = total - (quint64)st.f_bavail * st.f_frsize;
+                    logDebug("Disk %1 (%2): %3 GB / %4 GB", {
+                        device, mountpoint,
+                        QString::number(used  / 1073741824.0, 'f', 1),
+                        QString::number(total / 1073741824.0, 'f', 1)
+                    });
+                }
+            }
+        }
+    }
 }
 
 void Controller::forceAdminPassword(const QString &pw)
