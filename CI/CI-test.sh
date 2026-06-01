@@ -9,6 +9,7 @@ apt-get update -qq
 apt-get install -y software-properties-common nodejs npm
 apt-add-repository ppa:mutlaqja/ppa
 apt-get update -qq
+apt-get install -y libindi1
 dpkg -i "${DEB_FILE_LATEST}" || true
 apt-get install -f -y
 
@@ -18,7 +19,7 @@ mkdir -p media
 
 echo "Starting server..."
 export QT_QPA_PLATFORM=offscreen
-ostserver --webroot=media > server.log 2>&1 &
+ostserver --webroot=media --indiserver=Y > server.log 2>&1 &
 SERVER_PID=$!
 
 sleep 7

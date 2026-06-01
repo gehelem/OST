@@ -11,6 +11,9 @@
 #include <cerrno>
 #include <csignal>
 #include <cstring>
+#include <sys/statvfs.h>
+#include <QRegularExpression>
+#include <QSet>
 #include "model/element/common.h"
 #include "libs/utils/modulejsondumper.h"
 /*!
@@ -38,7 +41,8 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
                        const QString &libpath, const QString &conf, const QString &indiserver,
                        const QString &ssl, const QString &sslCert, const QString &sslKey, const QString &lng, const QString &grant,
                        OST::Logger *logger, OST::TranslateManager *translate, const QString &banner, const QString &setAdminPassword,
-                       const QString &gitSha, const QString &gitDate, const QString &gitMessage, const QString &gitTag)
+                       const QString &gitSha, const QString &gitDate, const QString &gitMessage, const QString &gitTag,
+                       const int systemWatchInterval)
     :       _webroot(webroot),
             _dbpath(dbpath),
             _libpath(libpath),
@@ -49,7 +53,8 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
             mLogger(logger),
             mTranslater(translate),
             mBanner(banner),
-            mSetAdminPassword(setAdminPassword)
+            mSetAdminPassword(setAdminPassword),
+            mSystemWatchInterval(systemWatchInterval)
 {
     // Register meta types for queued signal/slot connections
     // Must be done before any connect() calls that use these types
@@ -197,6 +202,12 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     dbmanager->getDbProfiles(r);
     updateControllerData("profiles", r);
 
+    if (mSystemWatchInterval > 0)
+    {
+        connect(&mSystemWatchTimer, &QTimer::timeout, this, &Controller::onSystemWatch);
+        mSystemWatchTimer.start(mSystemWatchInterval * 1000);
+        logInfo("System watch started, interval: %1s", {mSystemWatchInterval});
+    }
 }
 
 
@@ -324,7 +335,10 @@ void Controller::loadConf(const QString &pConf)
         for (const QString &label : driverLabels)
         {
             auto it = std::find_if(_indiDrivers.begin(), _indiDrivers.end(),
-                                   [&](const IndiDriverInfo &d) { return d.label == label; });
+                                   [&](const IndiDriverInfo & d)
+            {
+                return d.label == label;
+            });
             if (it != _indiDrivers.end())
                 startIndiDriver(it->binary);
             else
@@ -970,7 +984,10 @@ void Controller::stopIndi(void)
 void Controller::startIndiDriver(const QString &pDriver)
 {
     if (std::find_if(_activeIndiDrivers.begin(), _activeIndiDrivers.end(),
-                     [&](const IndiDriverInfo &d) { return d.binary == pDriver; }) != _activeIndiDrivers.end())
+                     [&](const IndiDriverInfo & d)
+{
+    return d.binary == pDriver;
+}) != _activeIndiDrivers.end())
     {
         mLogger->info("Driver already active, skipping: " + pDriver);
         return;
@@ -1248,13 +1265,92 @@ void Controller::onInterModuleRequest(OST::ExtEvent event)
         return;
     }
 
-    logDebug("Controller::onInterModuleRequest %1 %2 %3 %4", {OST::ExtEvToString(event.ev), event.mod, event.prpkey, event.data});
+    //logDebug("Controller::onInterModuleRequest %1 %2 %3 %4", {OST::ExtEvToString(event.ev), event.mod, event.prpkey, event.data});
 
     Basemodule *pTargetModule = modules[0];
     pTargetModule->onExternalEventRoot(event);
 
 
 }
+void Controller::onSystemWatch()
+{
+    QVariantMap data;
+
+    // --- RAM ---
+    {
+        QFile f("/proc/meminfo");
+        if (f.open(QIODevice::ReadOnly))
+        {
+            quint64 memTotal = 0, memAvailable = 0;
+            const QStringList lines = QString(f.readAll()).split('\n');
+            f.close();
+            for (const QString &raw : lines)
+            {
+                const QString     line  = raw.simplified();
+                const QStringList parts = line.split(' ');
+                if (line.startsWith("MemTotal:"))          memTotal     = parts.value(1).toULongLong();
+                else if (line.startsWith("MemAvailable:")) memAvailable = parts.value(1).toULongLong();
+            }
+            QVariantMap ram;
+            ram["used_mb"]  = (quint64)((memTotal - memAvailable) / 1024);
+            ram["total_mb"] = (quint64)(memTotal / 1024);
+            data["ram"] = ram;
+        }
+    }
+
+    // --- CPU (load averages) ---
+    {
+        QFile f("/proc/loadavg");
+        if (f.open(QIODevice::ReadOnly))
+        {
+            const QStringList p = QString(f.readAll()).simplified().split(' ');
+            f.close();
+            QVariantMap cpu;
+            cpu["load_1m"]  = p.value(0).toDouble();
+            cpu["load_5m"]  = p.value(1).toDouble();
+            cpu["load_15m"] = p.value(2).toDouble();
+            data["cpu"] = cpu;
+        }
+    }
+
+    // --- Disks ---
+    {
+        QFile f("/proc/mounts");
+        if (f.open(QIODevice::ReadOnly))
+        {
+            const QStringList lines = QString(f.readAll()).split('\n');
+            f.close();
+            QStringList    seen;
+            QVariantList   disks;
+            for (const QString &raw : lines)
+            {
+                const QStringList parts = raw.split(' ');
+                if (parts.size() < 3) continue;
+                const QString device     = parts[0];
+                const QString mountpoint = parts[1];
+                if (!device.startsWith("/dev/") || device.startsWith("/dev/loop")) continue;
+                if (seen.contains(device)) continue;
+                seen.append(device);
+                struct statvfs st;
+                if (::statvfs(mountpoint.toLocal8Bit().constData(), &st) == 0)
+                {
+                    const quint64 total = (quint64)st.f_blocks * st.f_frsize;
+                    const quint64 used  = total - (quint64)st.f_bavail * st.f_frsize;
+                    QVariantMap disk;
+                    disk["device"]     = device;
+                    disk["mountpoint"] = mountpoint;
+                    disk["used_gb"]    = QString::number(used  / 1073741824.0, 'f', 1).toDouble();
+                    disk["total_gb"]   = QString::number(total / 1073741824.0, 'f', 1).toDouble();
+                    disks.append(disk);
+                }
+            }
+            data["disks"] = disks;
+        }
+    }
+
+    updateControllerData("systemwatcher", data);
+}
+
 void Controller::forceAdminPassword(const QString &pw)
 {
     /* We do this at controller level to forbid DBmanager inherited instances to do it ... */

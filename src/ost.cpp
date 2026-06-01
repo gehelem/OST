@@ -53,6 +53,9 @@ int main(int argc, char *argv[])
     bannerOption.setDefaultValue("Observatoire Sans tête");
     QCommandLineOption setAdminPasswordOption("setadminpassword", "Set admin password", "setadminpassword");
     setAdminPasswordOption.setDefaultValue("");
+    QCommandLineOption systemWatchIntervalOption("systemwatchinterval", "System watch interval (s)", "systemwatchinterval");
+    systemWatchIntervalOption.setDefaultValue("10");
+
 
     argParser.addOption(webrootOption);
     argParser.addOption(dbPathOption);
@@ -68,6 +71,7 @@ int main(int argc, char *argv[])
     argParser.addOption(logFileOption);
     argParser.addOption(bannerOption);
     argParser.addOption(setAdminPasswordOption);
+    argParser.addOption(systemWatchIntervalOption);
     argParser.process(app);
 
     QString webroot = argParser.value(webrootOption);
@@ -84,6 +88,7 @@ int main(int argc, char *argv[])
     QString logfile = argParser.value(logFileOption);
     QString banner = argParser.value(bannerOption);
     QString setAdminPassword = argParser.value(setAdminPasswordOption);
+    int systemWatchInterval = argParser.value(systemWatchIntervalOption).toInt();
 
     OST::Logger mLogger;
     OST::TranslateManager mTranslater;
@@ -123,6 +128,7 @@ int main(int argc, char *argv[])
     mLogger.info("Log file              =" + logfile);
     mLogger.info("Log level             =" + QString::number(loglevel));
     mLogger.info("Banner                =" + banner);
+    mLogger.info("System watch interval =" + QString::number(systemWatchInterval) + "s (0 to disable)");
     if (setAdminPassword != "") mLogger.info("Set ADMIN password    = [hidden]");
 
     mLogger.setLogLevel(static_cast<OST::LogLevel>(loglevel));
@@ -145,7 +151,8 @@ int main(int argc, char *argv[])
         QString::fromStdString(Version::GIT_SHA1),
         QString::fromStdString(Version::GIT_DATE),
         QString::fromStdString(Version::GIT_COMMIT_SUBJECT),
-        QString::fromStdString(Version::GIT_TAG)
+        QString::fromStdString(Version::GIT_TAG),
+        systemWatchInterval
     );
 
     Q_UNUSED(controller);
