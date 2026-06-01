@@ -240,6 +240,7 @@ enum class EvType
     fl,        /*!< profile loaded */
     fc,        /*!< profile changed */
     uc,        /*!< update controller data */
+    xx,        /*!< client ping acknowledgement */
 };
 inline QString EvToString(EvType ev)
 {
@@ -247,6 +248,8 @@ inline QString EvToString(EvType ev)
     {
         case OST::EvType::zz:
             return "zz-no dump";
+        case OST::EvType::xx:
+            return "xx";
         case OST::EvType::aa:
             return "aa-dump all data";
         case OST::EvType::ap:

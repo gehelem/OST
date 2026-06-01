@@ -177,11 +177,6 @@ void WShandler::processTextMessage(QString message)
         logToClient(OST::LogLevel::Error, "Invalid message event: %1", {obj.begin().key()}, "WS", pClient);
         return;
     }
-    if (eventType == OST::ExtEvType::XX)
-    {
-        /* just a ping request - we'll see later if we need sometimes to acknowledge */
-        return;
-    }
 
     // message data must be valid, ie keys/values content
     if (!obj[obj.begin().key()].isObject())
@@ -194,6 +189,13 @@ void WShandler::processTextMessage(QString message)
     OST::ExtEvent event;
     event.ev = eventType;
     event.data = obj[obj.begin().key()].toObject();
+
+    if (eventType == OST::ExtEvType::XX)
+    {
+        /* just a ping request - we'll see later if we need sometimes to acknowledge */
+        emit clientEvent(event, pClient, mClientGrants[pClient->peerAddress().toString()]);
+        return;
+    }
 
     /* Check if client is granted to send update requests */
     if (mClientGrants[pClient->peerAddress().toString()] != "1" && event.ev != OST::ExtEvType::DU

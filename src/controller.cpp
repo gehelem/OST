@@ -518,6 +518,12 @@ void Controller::OnClientEvent(OST::ExtEvent event, QWebSocket* client, QString 
     {
         wshandler->sendJsonMessage(getModulesDump(clientgrant), client);
     }
+    if (event.ev == OST::ExtEvType::XX )
+    {
+        QJsonObject o;
+        o[EvToString(OST::EvType::xx)] = QJsonObject();
+        wshandler->sendJsonMessage(o, client);
+    }
 
 }
 
