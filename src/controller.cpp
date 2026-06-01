@@ -324,7 +324,10 @@ void Controller::loadConf(const QString &pConf)
         for (const QString &label : driverLabels)
         {
             auto it = std::find_if(_indiDrivers.begin(), _indiDrivers.end(),
-                                   [&](const IndiDriverInfo &d) { return d.label == label; });
+                                   [&](const IndiDriverInfo & d)
+            {
+                return d.label == label;
+            });
             if (it != _indiDrivers.end())
                 startIndiDriver(it->binary);
             else
@@ -970,7 +973,10 @@ void Controller::stopIndi(void)
 void Controller::startIndiDriver(const QString &pDriver)
 {
     if (std::find_if(_activeIndiDrivers.begin(), _activeIndiDrivers.end(),
-                     [&](const IndiDriverInfo &d) { return d.binary == pDriver; }) != _activeIndiDrivers.end())
+                     [&](const IndiDriverInfo & d)
+{
+    return d.binary == pDriver;
+}) != _activeIndiDrivers.end())
     {
         mLogger->info("Driver already active, skipping: " + pDriver);
         return;
@@ -1248,7 +1254,7 @@ void Controller::onInterModuleRequest(OST::ExtEvent event)
         return;
     }
 
-    logDebug("Controller::onInterModuleRequest %1 %2 %3 %4", {OST::ExtEvToString(event.ev), event.mod, event.prpkey, event.data});
+    //logDebug("Controller::onInterModuleRequest %1 %2 %3 %4", {OST::ExtEvToString(event.ev), event.mod, event.prpkey, event.data});
 
     Basemodule *pTargetModule = modules[0];
     pTargetModule->onExternalEventRoot(event);

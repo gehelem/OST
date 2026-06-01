@@ -54,7 +54,7 @@ void Navigator::onExternalEvent(OST::ExtEvent event)
 {
     if (event.ev == OST::ExtEvType::DP)
     {
-        logDebug("Message DP %1", {event.prpkey});
+        //logDebug("Message DP %1", {event.prpkey});
     }
 
     if (event.ev == OST::ExtEvType::SV && event.prpkey == "actions")

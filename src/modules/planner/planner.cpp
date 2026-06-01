@@ -335,7 +335,7 @@ void Planner::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QStri
         QString sd = o["statedescription"].toString();
         QString e = o["event"].toString();
         QString ed = o["eventdescription"].toString();
-        logDebug("catching signals event from %6 : %1 %2 %3 %4 %5", {OST::EvToString(ev), s, sd, e, ed, mod});
+        //logDebug("catching signals event from %6 : %1 %2 %3 %4 %5", {OST::EvToString(ev), s, sd, e, ed, mod});
         if (OST::IntToState(s) == OST::Ok && sd == "ready")
         {
             navigatorComplete();
@@ -358,7 +358,7 @@ void Planner::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QStri
         QString sd = o["statedescription"].toString();
         QString e = o["event"].toString();
         QString ed = o["eventdescription"].toString();
-        logDebug("catching signals event from %6 : %1 %2 %3 %4 %5", {OST::EvToString(ev), s, sd, e, ed, mod});
+        //logDebug("catching signals event from %6 : %1 %2 %3 %4 %5", {OST::EvToString(ev), s, sd, e, ed, mod});
         if (OST::IntToState(s) == OST::Ok && sd == "ready")
         {
             sequenceComplete();
