@@ -13,7 +13,8 @@
 #include "globaldatastore.h"
 #include <lovbase.h>
 
-struct IndiDriverInfo {
+struct IndiDriverInfo
+{
     QString label;
     QString binary;
     QString family;
@@ -36,7 +37,8 @@ class Controller : public QObject
                    const QString &libpath, const QString &conf, const QString &indiserver,
                    const QString &ssl, const QString &sslCert, const QString &sslKey, const QString &lng, const QString &grant,
                    OST::Logger *logger, OST::TranslateManager *translate, const QString &banner, const QString &setAdminPassword,
-                   const QString &gitSha, const QString &gitDate, const QString &gitMessage, const QString &gitTag);
+                   const QString &gitSha, const QString &gitDate, const QString &gitMessage, const QString &gitTag,
+                   const int systemWatchInterval);
         ~Controller() override;
     signals:
         void controllerEvent(OST::ExtEvent  event);
@@ -67,6 +69,7 @@ class Controller : public QObject
         QString mSelectedFolder;
         QString mBanner;
         QString mSetAdminPassword;
+        int mSystemWatchInterval;
         QVariantMap mControllerData;
         QMap<QString, OST::LovBase*> mControllerLovs;
         GlobalDatastore* mGlobalDatastore = nullptr;
@@ -90,7 +93,8 @@ class Controller : public QObject
         QVariantList activeIndiDriversToVariant() const
         {
             QVariantList list;
-            for (const auto &drv : _activeIndiDrivers) {
+            for (const auto &drv : _activeIndiDrivers)
+            {
                 QVariantMap m;
                 m["label"]  = drv.label;
                 m["binary"] = drv.binary;
