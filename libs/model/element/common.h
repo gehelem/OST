@@ -298,6 +298,7 @@ inline QString EvToString(EvType ev)
 enum class ExtEvType
 {
     ZZ = 0,    /*!< invalid request */
+    XX,        /*!< client ping */
     DU,        /*!< request dump */
     DP,        /*!< request property dump */
     LO,        /*!< login request */
@@ -335,6 +336,8 @@ inline QString ExtEvToString(ExtEvType ev)
     {
         case OST::ExtEvType::ZZ:
             return "ZZ";
+        case OST::ExtEvType::XX:
+            return "XX";
         case OST::ExtEvType::DU:
             return "DU";
         case OST::ExtEvType::DP:
@@ -413,6 +416,7 @@ typedef struct ExtEvent
 
 inline ExtEvType StrToExtEvent(QString s)
 {
+    if (s == "XX") return  ExtEvType::XX;
     if (s == "DU") return  ExtEvType::DU;
     if (s == "DP") return  ExtEvType::DP;
     if (s == "LO") return  ExtEvType::LO;
