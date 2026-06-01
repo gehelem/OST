@@ -199,6 +199,12 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     dbmanager->getDbProfiles(r);
     updateControllerData("profiles", r);
 
+    if (mSystemWatchInterval > 0)
+    {
+        connect(&mSystemWatchTimer, &QTimer::timeout, this, &Controller::onSystemWatch);
+        mSystemWatchTimer.start(mSystemWatchInterval * 1000);
+        logInfo("System watch started, interval: %1s", {mSystemWatchInterval});
+    }
 }
 
 
@@ -1263,6 +1269,10 @@ void Controller::onInterModuleRequest(OST::ExtEvent event)
 
 
 }
+void Controller::onSystemWatch()
+{
+}
+
 void Controller::forceAdminPassword(const QString &pw)
 {
     /* We do this at controller level to forbid DBmanager inherited instances to do it ... */

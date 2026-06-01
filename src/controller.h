@@ -1,6 +1,7 @@
 #ifndef CONTROLLER_h_
 #define CONTROLLER_h_
 #include <QCoreApplication>
+#include <QTimer>
 #include <QtSql/QSql>
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
@@ -70,6 +71,7 @@ class Controller : public QObject
         QString mBanner;
         QString mSetAdminPassword;
         int mSystemWatchInterval;
+        QTimer mSystemWatchTimer;
         QVariantMap mControllerData;
         QMap<QString, OST::LovBase*> mControllerLovs;
         GlobalDatastore* mGlobalDatastore = nullptr;
@@ -137,6 +139,7 @@ class Controller : public QObject
         //                    const QVariantMap &pEventData);
         void OnFileWatcherEvent(const QString &pEvent);
         void OnFileChangeEvent(const QString &pEvent);
+        void onSystemWatch();
 
 };
 #endif
