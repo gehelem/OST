@@ -1274,6 +1274,8 @@ void Controller::onInterModuleRequest(OST::ExtEvent event)
 }
 void Controller::onSystemWatch()
 {
+    QVariantMap data;
+
     // --- RAM ---
     {
         QFile f("/proc/meminfo");
@@ -1289,19 +1291,25 @@ void Controller::onSystemWatch()
                 if (line.startsWith("MemTotal:"))          memTotal     = parts.value(1).toULongLong();
                 else if (line.startsWith("MemAvailable:")) memAvailable = parts.value(1).toULongLong();
             }
-            logDebug("RAM: %1 MB / %2 MB", {(memTotal - memAvailable) / 1024, memTotal / 1024});
+            QVariantMap ram;
+            ram["used_mb"]  = (quint64)((memTotal - memAvailable) / 1024);
+            ram["total_mb"] = (quint64)(memTotal / 1024);
+            data["ram"] = ram;
         }
     }
 
-    // --- CPU (load average 1 min) ---
+    // --- CPU (load averages) ---
     {
         QFile f("/proc/loadavg");
         if (f.open(QIODevice::ReadOnly))
         {
             const QStringList p = QString(f.readAll()).simplified().split(' ');
             f.close();
-            if (!p.isEmpty())
-                logDebug("CPU load: %1 (1m) %2 (5m) %3 (15m)", {p.value(0), p.value(1), p.value(2)});
+            QVariantMap cpu;
+            cpu["load_1m"]  = p.value(0).toDouble();
+            cpu["load_5m"]  = p.value(1).toDouble();
+            cpu["load_15m"] = p.value(2).toDouble();
+            data["cpu"] = cpu;
         }
     }
 
@@ -1312,7 +1320,8 @@ void Controller::onSystemWatch()
         {
             const QStringList lines = QString(f.readAll()).split('\n');
             f.close();
-            QStringList seen;
+            QStringList    seen;
+            QVariantList   disks;
             for (const QString &raw : lines)
             {
                 const QStringList parts = raw.split(' ');
@@ -1327,15 +1336,19 @@ void Controller::onSystemWatch()
                 {
                     const quint64 total = (quint64)st.f_blocks * st.f_frsize;
                     const quint64 used  = total - (quint64)st.f_bavail * st.f_frsize;
-                    logDebug("Disk %1 (%2): %3 GB / %4 GB", {
-                        device, mountpoint,
-                        QString::number(used  / 1073741824.0, 'f', 1),
-                        QString::number(total / 1073741824.0, 'f', 1)
-                    });
+                    QVariantMap disk;
+                    disk["device"]     = device;
+                    disk["mountpoint"] = mountpoint;
+                    disk["used_gb"]    = QString::number(used  / 1073741824.0, 'f', 1).toDouble();
+                    disk["total_gb"]   = QString::number(total / 1073741824.0, 'f', 1).toDouble();
+                    disks.append(disk);
                 }
             }
+            data["disks"] = disks;
         }
     }
+
+    updateControllerData("systemwatcher", data);
 }
 
 void Controller::forceAdminPassword(const QString &pw)
