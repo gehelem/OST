@@ -123,7 +123,7 @@ void Logger::log(LogLevel level, const QString &message, const QString &context)
     formattedMessage += message;
 
     mHistory.append({level, dt, context, message});
-    if (mHistory.size() > 100) mHistory.removeFirst();
+    if (mHistory.size() > 1000) mHistory.removeFirst();
 
     switch (level)
     {

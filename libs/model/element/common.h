@@ -324,6 +324,10 @@ enum class ExtEvType
     I4,        /*!< property posticon2 */
     J1,        /*!< element preicon */
     J2,        /*!< element posticon */
+    YA,        /*!< Embedded Indi server : start server  */
+    YZ,        /*!< Embedded Indi server : stop  server  */
+    YL,        /*!< Embedded Indi server : load driver  */
+    YS,        /*!< Embedded Indi server : stop driver */
 };
 inline QString ExtEvToString(ExtEvType ev)
 {
@@ -383,6 +387,14 @@ inline QString ExtEvToString(ExtEvType ev)
             return "J1";
         case OST::ExtEvType::J2:
             return "J2";
+        case OST::ExtEvType::YA:
+            return "YA";
+        case OST::ExtEvType::YZ:
+            return "YZ";
+        case OST::ExtEvType::YL:
+            return "YL";
+        case OST::ExtEvType::YS:
+            return "YS";
         default:
             return "unknown ExtEvType:" + QString::number(static_cast<int>(ev));
     }
@@ -427,6 +439,10 @@ inline ExtEvType StrToExtEvent(QString s)
     if (s == "I4") return  ExtEvType::I4;
     if (s == "J1") return  ExtEvType::J1;
     if (s == "J2") return  ExtEvType::J2;
+    if (s == "YA") return  ExtEvType::YA;
+    if (s == "YZ") return  ExtEvType::YZ;
+    if (s == "YL") return  ExtEvType::YL;
+    if (s == "YS") return  ExtEvType::YS;
     return  ExtEvType::ZZ;
 }
 

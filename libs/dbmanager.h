@@ -39,6 +39,8 @@ class DBManager : public Datastore
         bool searchCatalog(const QString &pArgument, QList<catalogResult> &pResult);
         bool populateCatalog(const QString &pFileName, const QString &pName);
         QString getGrants(const QString &pUser, const QString &pPW);
+        bool getIndiConfiguration(const QString &pConfigName, QStringList &drivers);
+        bool saveIndiConfiguration(const QString &pConfigName, const QStringList &drivers);
 
     private:
         void CreateDatabaseStructure();
