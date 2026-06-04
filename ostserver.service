@@ -4,7 +4,8 @@ After=network.target
 
 [Service]
 Environment=QT_QPA_PLATFORM=offscreen
-ExecStart=/usr/bin/ostserver --webroot=/var/lib/osterix/media
+WorkingDirectory=/home/ostserver/.ost
+ExecStart=/usr/bin/ostserver --webroot=/var/lib/osterix/media --indiserver=Y --loglevel=0 --grant=0
 Restart=on-failure
 RestartSec=5
 User=ostserver
