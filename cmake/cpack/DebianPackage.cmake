@@ -129,6 +129,9 @@ set(CPACK_DEBIAN_RUNTIME_PACKAGE_DEPENDS
 set(CPACK_DEBIAN_RUNTIME_PACKAGE_RECOMMENDS
     "libindi1, libstellarsolver")
 set(CPACK_DEBIAN_RUNTIME_PACKAGE_SHLIBDEPS ON)
+set(CPACK_DEBIAN_RUNTIME_PACKAGE_CONTROL_EXTRA
+    "${CMAKE_CURRENT_LIST_DIR}/postinst"
+    "${CMAKE_CURRENT_LIST_DIR}/prerm")
 
 # ---------------------------------------------------------------------------
 # ostserver-dev  (Development component)

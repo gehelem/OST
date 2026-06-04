@@ -130,7 +130,6 @@ add_executable(ostserver
 )
 target_link_libraries(ostserver
     ostindimodule
-#    ostmaincontrol
     Qt${QT_VERSION_MAJOR}::Gui
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Widgets
@@ -347,25 +346,6 @@ target_link_libraries(ostdummy PRIVATE
 )
 target_compile_definitions(ostdummy PRIVATE dummy_LIBRARY)
 
-# Maincontrol module
-#list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.qrc)
-#qt5_add_resources (RCC_SOURCES ${RESOURCES})
-
-#add_library(ostmaincontrol SHARED
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.h
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/maincontrol/maincontrol.qrc
-#)
-#target_link_libraries(ostmaincontrol PRIVATE
-#    ostindimodule
-#    Qt${QT_VERSION_MAJOR}::Core
-#    Qt${QT_VERSION_MAJOR}::Concurrent
-#    Qt${QT_VERSION_MAJOR}::Widgets
-#    Threads::Threads
-#    z
-#)
-#target_compile_definitions(ostmaincontrol PRIVATE maincontrol_LIBRARY)
-
 # Indipanel module
 add_library(ostindipanel SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indipanel/indipanel.h
@@ -521,7 +501,6 @@ target_compile_definitions(ostpolar PRIVATE POLAR_MODULE)
 install(TARGETS
     ostserver
     ostbasemodule ostindimodule
-#    ostmaincontrol
     ostindipanel
     ostfocus
     ostsequencer
@@ -534,6 +513,12 @@ install(TARGETS
     RUNTIME DESTINATION "/usr/bin"     COMPONENT Runtime
     LIBRARY DESTINATION "/usr/lib"     COMPONENT Runtime
     PUBLIC_HEADER DESTINATION "/usr/include/ost" COMPONENT Development
+)
+
+install(
+    FILES "${CMAKE_CURRENT_SOURCE_DIR}/ostserver.service"
+    DESTINATION "lib/systemd/system"
+    COMPONENT Runtime
 )
 
 # Generate version.cc at build time (not configure time)
