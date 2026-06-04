@@ -13,13 +13,17 @@ const commands = [
   // login
   { label: "login",  msg: {"LO":{"user":"ADMIN","pw":"admin"}} },
   // stop all
-  { label: "stop navigator", msg: {"SV":{"m":{"MyNavigator":{"p":{"actions":{"e":{"abortnavigator":true}}}}}}} },
-  { label: "stop planner",   msg: {"SV":{"m":{"MyPlanner":{"p":{"actions":{"e":{"stop":true}}}}}}} },
+  { label: "stop MyNavigator", msg: {"SV":{"m":{"MyNavigator":{"p":{"actions":{"e":{"abortnavigator":true}}}}}}} },
+  { label: "stop MyPlanner", msg: {"SV":{"m":{"MyPlanner":{"p":{"actions":{"e":{"stop":true}}}}}}} },
+  { label: "stop MyFocuser", msg: {"SV":{"m":{"MyFocuser":{"p":{"actions":{"e":{"abortfocus":true}}}}}}} },
+  { label: "stop MySequencer", msg: {"SV":{"m":{"MySequencer":{"p":{"actions":{"e":{"abortsequence":true}}}}}}} },
+  { label: "stop MyGuider", msg: {"SV":{"m":{"MyGuider":{"p":{"actions":{"e":{"abortguider":true}}}}}}} },
+
   // start planner
   { label: "start planner",  msg: {"SV":{"m":{"MyPlanner":{"p":{"actions":{"e":{"start":true}}}}}}} },
 ];
 
-const DELAY_BETWEEN_COMMANDS_MS = 1000;
+const DELAY_BETWEEN_COMMANDS_MS = 300;
 const LISTEN_AFTER_LAST_MS = 5000;
 
 let messageCount = 0;
