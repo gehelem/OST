@@ -190,6 +190,13 @@ void WShandler::processTextMessage(QString message)
     event.ev = eventType;
     event.data = obj[obj.begin().key()].toObject();
 
+    if (eventType == OST::ExtEvType::XX)
+    {
+        /* just a ping request - we'll see later if we need sometimes to acknowledge */
+        emit clientEvent(event, pClient, mClientGrants[pClient->peerAddress().toString()]);
+        return;
+    }
+
     /* Check if client is granted to send update requests */
     if (mClientGrants[pClient->peerAddress().toString()] != "1" && event.ev != OST::ExtEvType::DU
             && event.ev != OST::ExtEvType::LO && event.ev != OST::ExtEvType::IL )
