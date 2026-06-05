@@ -47,7 +47,7 @@ ElementBase *ElementFactory::createElement(const QString &key, const QVariantMap
             if (pData.contains("posticon")) pElement->setPostIcon(pData["posticon"].toString());
             if (pData.contains("listOfValues"))
             {
-                if (pData["listOfValues"].canConvert<QVariantList>())
+                if (pData["listOfValues"].typeId() == QMetaType::QVariantList)
                 {
                     QList ll  = pData["listOfValues"].toList();
                     foreach (auto line, ll)
@@ -84,7 +84,7 @@ ElementBase *ElementFactory::createElement(const QString &key, const QVariantMap
             if (pData.contains("slider")) pElement->setSlider(IntToSlider(pData["slider"].toInt()), false);
             if (pData.contains("listOfValues"))
             {
-                if (pData["listOfValues"].canConvert<QVariantList>())
+                if (pData["listOfValues"].typeId() == QMetaType::QVariantList)
                 {
                     QList ll  = pData["listOfValues"].toList();
                     foreach (auto line, ll)
@@ -122,7 +122,7 @@ ElementBase *ElementFactory::createElement(const QString &key, const QVariantMap
             if (pData.contains("slider")) pElement->setSlider(IntToSlider(pData["slider"].toInt()), false);
             if (pData.contains("listOfValues"))
             {
-                if (pData["listOfValues"].canConvert<QVariantList>())
+                if (pData["listOfValues"].typeId() == QMetaType::QVariantList)
                 {
                     QList ll  = pData["listOfValues"].toList();
                     foreach (auto line, ll)
