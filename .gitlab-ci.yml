@@ -55,8 +55,8 @@ build-job-2604:
       - "ostserver_*_2604_amd64.deb"
       - "ostserver-dev_*_2604_amd64.deb"
     expire_in: 4 week
-  rules:
-    - when: manual
+  allow_failure: true
+  <<: *build-rules
 
 test-job-2404:
   stage: test
@@ -88,8 +88,8 @@ test-job-2604:
       - server.log
       - ws.log
     expire_in: 4 week
-  rules:
-    - when: manual
+  allow_failure: true
+  <<: *test-rules
 
 release-job-tag:
   stage: release
