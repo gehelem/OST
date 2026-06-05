@@ -141,9 +141,10 @@ libcfitsio10t64 | libcfitsio10, \
 libgsl27t64 | libgsl27, \
 libavahi-client3, \
 libavahi-common3, \
-libsecret-1-0")
+libsecret-1-0, \
+libwcs8t64 | libwcs8")
 set(CPACK_DEBIAN_RUNTIME_PACKAGE_RECOMMENDS
-    "libwcs8t64 | libwcs8, libraw23t64 | libraw23")
+    "libraw23t64 | libraw23")
 set(CPACK_DEBIAN_RUNTIME_PACKAGE_SHLIBDEPS OFF)
 set(CPACK_DEBIAN_RUNTIME_PACKAGE_CONTROL_EXTRA
     "${CMAKE_CURRENT_LIST_DIR}/postinst"
