@@ -125,10 +125,22 @@ set(CPACK_DEBIAN_RUNTIME_PACKAGE_MAINTAINER "gilles <gilles@joag.fr>")
 set(CPACK_DEBIAN_RUNTIME_DESCRIPTION
     "Observatoire Sans Tête\n Light and headless astrophotography automation tool")
 set(CPACK_DEBIAN_RUNTIME_PACKAGE_DEPENDS
-    "libqt6core6, libqt6network6, libqt6websockets6, libqt6sql6, libqt6sql6-sqlite")
+    "libqt6core6t64 | libqt6core6, \
+libqt6network6t64 | libqt6network6, \
+libqt6websockets6t64 | libqt6websockets6, \
+libqt6sql6t64 | libqt6sql6, \
+libqt6sql6-sqlite, \
+libqt6scxml6t64 | libqt6scxml6, \
+libindi1, \
+libnova-0.16-0, \
+libcfitsio10t64 | libcfitsio10, \
+libgsl27t64 | libgsl27, \
+libavahi-client3, \
+libavahi-common3, \
+libsecret-1-0")
 set(CPACK_DEBIAN_RUNTIME_PACKAGE_RECOMMENDS
-    "libindi1, libstellarsolver")
-set(CPACK_DEBIAN_RUNTIME_PACKAGE_SHLIBDEPS ON)
+    "libwcs8t64 | libwcs8, libraw23t64 | libraw23")
+set(CPACK_DEBIAN_RUNTIME_PACKAGE_SHLIBDEPS OFF)
 set(CPACK_DEBIAN_RUNTIME_PACKAGE_CONTROL_EXTRA
     "${CMAKE_CURRENT_LIST_DIR}/postinst"
     "${CMAKE_CURRENT_LIST_DIR}/prerm")

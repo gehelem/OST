@@ -10,7 +10,7 @@ set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-add_compile_options(-fno-sized-deallocation)
+add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-fno-sized-deallocation>)
 add_compile_options(-fPIC)
 
 #get_cmake_property(_variableNames VARIABLES)
@@ -42,6 +42,7 @@ set(STELLARSOLVER_INCLUDE_DIR
     ${CMAKE_BINARY_DIR}/libs/stellarsolver
 )
 set(STELLARSOLVER_LIBRARIES stellarsolver)
+install(TARGETS stellarsolver LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Runtime)
 find_library(avahi-client-lib avahi-client REQUIRED)
 find_library(avahi-common-lib avahi-common REQUIRED)
 find_path(avahi-client-includes avahi-client/client.h REQUIRED)
