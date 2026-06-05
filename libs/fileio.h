@@ -7,8 +7,8 @@
 #include <QVariant>
 #include <basedevice.h>
 #include <baseclient.h>
-#include <libstellarsolver/parameters.h>
-#include <libstellarsolver/structuredefinitions.h>
+#include <parameters.h>
+#include <structuredefinitions.h>
 
 //CFitsio Includes
 #include "longnam.h"

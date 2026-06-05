@@ -34,7 +34,14 @@ find_package(GSL REQUIRED)
 find_package(WCSLIB REQUIRED)
 find_package(QT NAMES Qt6 COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql Scxml StateMachine Xml REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql Scxml StateMachine Xml)
-find_package(StellarSolver REQUIRED)
+add_subdirectory(libs/stellarsolver)
+set(STELLARSOLVER_INCLUDE_DIR
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/stellarsolver/stellarsolver
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/stellarsolver/stellarsolver/astrometry/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/stellarsolver/stellarsolver/astrometry/include/astrometry
+    ${CMAKE_BINARY_DIR}/libs/stellarsolver
+)
+set(STELLARSOLVER_LIBRARIES stellarsolver)
 find_library(avahi-client-lib avahi-client REQUIRED)
 find_library(avahi-common-lib avahi-common REQUIRED)
 find_path(avahi-client-includes avahi-client/client.h REQUIRED)
