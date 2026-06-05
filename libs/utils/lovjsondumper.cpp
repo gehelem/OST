@@ -33,7 +33,7 @@ void LovJsonDumper::visit(LovInt *pLov)
     if (pLov->getLov().size() > 0)
     {
         QJsonObject lines = QJsonObject();
-        for(const long &key : pLov->getLov().keys())
+        for(const int &key : pLov->getLov().keys())
         {
             lines[QString::number(key)] = pLov->getLov()[key];
         }

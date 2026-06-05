@@ -81,7 +81,7 @@ void ElementJsonDumper::visit(ElementInt *pElement, QVariantMap &data, bool &emi
         if (pElement->getLov().size() > 0)
         {
             QJsonObject lines = QJsonObject();
-            for(const long &key : pElement->getLov().keys()) {
+            for(const int &key : pElement->getLov().keys()) {
                 lines[QString::number(key)] = pElement->getLov()[key];
             }
             json["listOfValues"] = lines;

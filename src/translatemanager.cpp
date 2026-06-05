@@ -130,7 +130,7 @@ QString TranslateManager::applyArgs(const QString &format, const QVariantList &a
 
     for (const QVariant &arg : args)
     {
-        switch (static_cast<QMetaType::Type>(arg.type()))
+        switch (static_cast<QMetaType::Type>(arg.typeId()))
         {
             case QMetaType::Int:
             case QMetaType::LongLong:

@@ -856,13 +856,13 @@ bool fileio::parseHeader()
             // Is it Integer?
             oneRecord.value.toInt(&ok);
             if (ok)
-                oneRecord.value.convert(QMetaType::Int);
+                oneRecord.value.convert(QMetaType(QMetaType::Int));
             else
             {
                 // Is it double?
                 oneRecord.value.toDouble(&ok);
                 if (ok)
-                    oneRecord.value.convert(QMetaType::Double);
+                    oneRecord.value.convert(QMetaType(QMetaType::Double));
             }
         }
 
@@ -985,23 +985,23 @@ bool fileio::saveAsFITS(QString fileName, FITSImage::Statistic &imageStats, uint
                 key == "BSCALE")
             continue;
 
-        switch (value.type())
+        switch (value.typeId())
         {
-            case QVariant::Int:
+            case QMetaType::Int:
             {
                 int number = value.toInt();
                 fits_write_key(fptr, TINT, key.toLatin1().constData(), &number, comment.toLatin1().constData(), &status);
             }
             break;
 
-            case QVariant::Double:
+            case QMetaType::Double:
             {
                 double number = value.toDouble();
                 fits_write_key(fptr, TDOUBLE, key.toLatin1().constData(), &number, comment.toLatin1().constData(), &status);
             }
             break;
 
-            case QVariant::String:
+            case QMetaType::QString:
             default:
             {
                 if(key == "COMMENT" && (value.toString().contains("FITS (Flexible Image Transport System) format") ||
