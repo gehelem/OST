@@ -32,8 +32,8 @@ find_package(Nova REQUIRED)
 find_package(GSL REQUIRED)
 #find_package(OpenCV REQUIRED )
 find_package(WCSLIB REQUIRED)
-find_package(QT NAMES Qt6 COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql Scxml StateMachine Xml REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql Scxml StateMachine Xml)
+find_package(QT NAMES Qt6 COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql Scxml StateMachine Xml LinguistTools REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql Scxml StateMachine Xml LinguistTools)
 add_subdirectory(libs/stellarsolver)
 set(STELLARSOLVER_INCLUDE_DIR
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/stellarsolver/stellarsolver
@@ -81,14 +81,16 @@ set(TS_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/translations/ost_it.ts
 )
 
-# Find lrelease executable
-find_program(QT_LRELEASE_EXECUTABLE
-    NAMES lrelease-qt6 lrelease
-    HINTS /usr/lib/qt6/bin
-          ${Qt6_DIR}/../../../bin
-)
+get_target_property(QT_LRELEASE_EXECUTABLE Qt${QT_VERSION_MAJOR}::lrelease IMPORTED_LOCATION)
 if(NOT QT_LRELEASE_EXECUTABLE)
-    message(FATAL_ERROR "lrelease not found. Cannot compile translation files.")
+    find_program(QT_LRELEASE_EXECUTABLE
+        NAMES lrelease-qt6 lrelease
+        HINTS /usr/lib/qt6/bin /usr/lib/x86_64-linux-gnu/qt6/bin
+        NO_DEFAULT_PATH
+    )
+endif()
+if(NOT QT_LRELEASE_EXECUTABLE)
+    message(FATAL_ERROR "lrelease not found. Install qt6-tools-dev-tools.")
 endif()
 
 # Create custom commands to compile each .ts file to .qm
