@@ -19,7 +19,4 @@ export DEB_LDFLAGS_MAINT_APPEND = -Wl,--no-as-needed -fPIC
 	dh $@ --buildsystem=cmake
 
 override_dh_auto_configure:
-	if [ -d .git ]; then git submodule update --init --recursive; fi
-	test -f libs/stellarsolver/CMakeLists.txt || \
-		{ echo "ERROR: libs/stellarsolver not populated. Add nest directive to Launchpad recipe."; exit 1; }
 	dh_auto_configure
