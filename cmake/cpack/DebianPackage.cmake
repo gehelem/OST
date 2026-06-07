@@ -124,28 +124,12 @@ set(CPACK_DEBIAN_RUNTIME_PACKAGE_PRIORITY  "optional")
 set(CPACK_DEBIAN_RUNTIME_PACKAGE_MAINTAINER "gilles <gilles@joag.fr>")
 set(CPACK_DEBIAN_RUNTIME_DESCRIPTION
     "Observatoire Sans Tête\n Light and headless astrophotography automation tool")
-set(CPACK_DEBIAN_RUNTIME_PACKAGE_DEPENDS
-    "libqt6core6t64 | libqt6core6, \
-libqt6gui6t64 | libqt6gui6, \
-libqt6widgets6t64 | libqt6widgets6, \
-libqt6network6t64 | libqt6network6, \
-libqt6websockets6t64 | libqt6websockets6, \
-libqt6sql6t64 | libqt6sql6, \
-libqt6sql6-sqlite, \
-libqt6scxml6t64 | libqt6scxml6, \
-libqt6statemachine6t64 | libqt6statemachine6, \
-libqt6xml6t64 | libqt6xml6, \
-libindi1, \
-libnova-0.16-0, \
-libcfitsio10t64 | libcfitsio10, \
-libgsl27t64 | libgsl27, \
-libavahi-client3, \
-libavahi-common3, \
-libsecret-1-0, \
-libwcs8t64 | libwcs8")
-set(CPACK_DEBIAN_RUNTIME_PACKAGE_RECOMMENDS
-    "libraw23t64 | libraw23")
-set(CPACK_DEBIAN_RUNTIME_PACKAGE_SHLIBDEPS OFF)
+set(CPACK_DEBIAN_RUNTIME_PACKAGE_SHLIBDEPS ON)
+# shlibdeps auto-detects shared library deps from ELF NEEDED entries, using
+# the build platform's package database — correct names regardless of Ubuntu version.
+# Only add what shlibdeps cannot detect: Qt SQL plugins are loaded at runtime
+# via Qt's plugin mechanism and have no ELF NEEDED entry in the binary.
+set(CPACK_DEBIAN_RUNTIME_PACKAGE_DEPENDS "libqt6sql6-sqlite")
 set(CPACK_DEBIAN_RUNTIME_PACKAGE_CONTROL_EXTRA
     "${CMAKE_CURRENT_LIST_DIR}/postinst"
     "${CMAKE_CURRENT_LIST_DIR}/prerm")
