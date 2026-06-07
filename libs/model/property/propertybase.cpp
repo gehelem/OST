@@ -8,7 +8,10 @@ PropertyBase::PropertyBase(const QString &key, const QString &label, const Permi
     : mKey(key), mLabel(label), mPermission(permission), mLevel1(level1), mLevel2(level2),
       mOrder(order), mHasProfile(hasProfile)
 {
-    qRegisterMetaType<OST::MsgLevel>("MsgLevel");
+    qRegisterMetaType<OST::EvType>("OST::EvType");
+    qRegisterMetaType<OST::LogLevel>("OST::LogLevel");
+    qRegisterMetaType<OST::ExtEvent>("OST::ExtEvent");
+    if (order == "") emit logMessage(OST::LogLevel::Warning, "PropertyBase %1 %2 order ko (%3/%4)", {label, key, level1, level2});
 }
 PropertyBase::~PropertyBase()
 {
@@ -46,11 +49,10 @@ State PropertyBase::state()
 {
     return mState;
 }
-void PropertyBase::setState(State state)
+void PropertyBase::setState(State state, bool emitEvent)
 {
     mState = state;
-    emit propertyEvent("ap", key(), this);
-
+    if (emitEvent) emit PropertyBase::prpEvent(OST::EvType::ps, QVariant(), nullptr, this);
 }
 bool PropertyBase::isEnabled()
 {
@@ -59,12 +61,12 @@ bool PropertyBase::isEnabled()
 void PropertyBase::enable(void)
 {
     mIsEnabled = true;
-    emit propertyEvent("ap", key(), this);
+    emit PropertyBase::prpEvent(OST::EvType::ps, QVariant(), nullptr, this);
 }
 void PropertyBase::disable(void)
 {
     mIsEnabled = false;
-    emit propertyEvent("ap", key(), this);
+    emit PropertyBase::prpEvent(OST::EvType::ps, QVariant(), nullptr, this);
 }
 bool PropertyBase::getBadge()
 {
@@ -73,19 +75,43 @@ bool PropertyBase::getBadge()
 void PropertyBase::setBadge(bool b)
 {
     mBadge = b;
-    emit propertyEvent("ap", key(), this);
+    emit PropertyBase::prpEvent(OST::EvType::aa, QVariant(), nullptr, this);
+
 }
-void PropertyBase::sendInfo(QString m)
+void PropertyBase::logDebug(QString m, const QVariantList &args)
 {
-    emit sendMessage(Info, key() + "-" + m);
+    QVariantList newArgs = args;
+    newArgs.prepend(key());
+    QString newMessage = "%1 - " + incrementPlaceholders(m);
+    emit logMessage(LogLevel::Debug, newMessage, newArgs);
 }
-void PropertyBase::sendWarning(QString m)
+void PropertyBase::logInfo(QString m, const QVariantList &args)
 {
-    emit sendMessage(Warn, key() + "-" + m);
+    QVariantList newArgs = args;
+    newArgs.prepend(key());
+    QString newMessage = "%1 - " + incrementPlaceholders(m);
+    emit logMessage(LogLevel::Info, newMessage, newArgs);
 }
-void PropertyBase::sendError(QString m)
+void PropertyBase::logWarning(QString m, const QVariantList &args)
 {
-    emit sendMessage(Err, key() + "-" + m);
+    QVariantList newArgs = args;
+    newArgs.prepend(key());
+    QString newMessage = "%1 - " + incrementPlaceholders(m);
+    emit logMessage(LogLevel::Warning, newMessage, newArgs);
+}
+void PropertyBase::logError(QString m, const QVariantList &args)
+{
+    QVariantList newArgs = args;
+    newArgs.prepend(key());
+    QString newMessage = "%1 - " + incrementPlaceholders(m);
+    emit logMessage(LogLevel::Error, newMessage, newArgs);
+}
+void PropertyBase::logCritical(QString m, const QVariantList &args)
+{
+    QVariantList newArgs = args;
+    newArgs.prepend(key());
+    QString newMessage = "%1 - " + incrementPlaceholders(m);
+    emit logMessage(LogLevel::Critical, newMessage, newArgs);
 }
 QString PropertyBase::getPreIcon1(void)
 {
@@ -119,5 +145,24 @@ void PropertyBase::setPostIcon2(QString s)
 {
     mPostIcon2 = s;
 }
-
+QString PropertyBase::getFreeValue(void)
+{
+    return mFreeValue;
+}
+void PropertyBase::setFreeValue(QString s)
+{
+    mFreeValue = s;
+}
+bool PropertyBase::autoUpdate()
+{
+    return mAutoUpdate;
+}
+void PropertyBase::setAutoUpdate(bool b)
+{
+    mAutoUpdate = b;
+}
+void PropertyBase::sendDump()
+{
+    emit PropertyBase::prpEvent(OST::EvType::ap, QVariant(), nullptr, this);
+}
 }

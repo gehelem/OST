@@ -41,7 +41,7 @@ class LovBase: public QObject
         QString mKey = "";
     signals:
         void lovChanged(OST::LovBase*);
-        void sendMessage(OST::MsgLevel, QString);
+        void sendMessage(OST::LogLevel, QString, QVariantList);
 
 
 

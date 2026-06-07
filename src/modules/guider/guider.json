@@ -1,0 +1,408 @@
+{
+"p":{
+    "values": {
+        "devcat": "Control",
+        "group": "",
+        "order":"Control800",
+        "permission": 0,
+        "label": "Values",
+        "e": {
+            "pulseN": {
+                "type":"int",
+                "label": "Pulse N",
+                "order":"01",
+                "value": 0,
+                "format": "99.99"
+            },
+            "pulseS": {
+                "type":"int",
+                "label": "Pulse S",
+                "order":"02",
+                "value": 0,
+                "format": "99.99"
+            },
+            "pulseE": {
+                "type":"int",
+                "label": "Pulse E",
+                "order":"03",
+                "value": 0,
+                "format": "99.99"
+            },
+            "pulseW": {
+                "type":"int",
+                "label": "Pulse W",
+                "order":"04",
+                "value": 0,
+                "format": "99.99"
+            },
+            "rmsRA": {
+                "type":"float",
+                "label": "RMS RA",
+                "order":"05",
+                "value": 0,
+                "format": "99.99"
+            },
+            "rmsDEC": {
+                "type":"float",
+                "label": "RMS DEC",
+                "order":"06",
+                "value": 0,
+                "format": "99.99"
+            },
+            "rmsTotal": {
+                "type":"float",
+                "label": "RMS Total",
+                "order":"07",
+                "value": 0,
+                "format": "99.99"
+            }
+        }
+    },
+    "calibrationvalues": {
+        "devcat": "Calibration",
+        "group": "",
+        "order":"Control850",
+        "permission": 0,
+        "hasprofile": true,
+        "label": "Calibration Values",
+        "e": {
+            "calPulseN": {
+                "type":"float",
+                "label": "Calibration Pulse N",
+                "order":"01",
+                "value": 0,
+                "format": "99.99"
+            },
+            "calPulseS": {
+                "type":"float",
+                "label": "Calibration Pulse S",
+                "order":"02",
+                "value": 0,
+                "format": "99.99"
+            },
+            "calPulseE": {
+                "type":"float",
+                "label": "Calibration Pulse E",
+                "order":"03",
+                "value": 0,
+                "format": "99.99"
+            },
+            "calPulseW": {
+                "type":"float",
+                "label": "Calibration Pulse W",
+                "order":"04",
+                "value": 0,
+                "format": "99.99"
+            },
+            "calPier": {
+                "type":"bool",
+                "label": "Calibration Pier Side",
+                "order":"05",
+                "value": false,
+                "hint": "True = West, False = East (pier side at time of calibration)"
+            },
+            "ccdOrientation": {
+                "type":"float",
+                "label": "CCD Orientation",
+                "order":"06",
+                "value": 0,
+                "format": "99.99",
+                "hint": "CCD rotation angle in degrees (from polynomial fit during calibration)"
+            },
+            "revRA": {
+                "type":"bool",
+                "label": "Reverse RA",
+                "order":"07",
+                "value": false,
+                "hint": "Reverse RA corrections (stored at calibration time)"
+            },
+            "revDE": {
+                "type":"bool",
+                "label": "Reverse DEC",
+                "order":"08",
+                "value": false,
+                "hint": "Reverse DEC corrections (stored at calibration time)"
+            },
+            "calMountDEC": {
+                "type":"float",
+                "label": "Calibration Mount DEC",
+                "order":"09",
+                "value": 0,
+                "format": "99.99",
+                "hint": "Mount declination at calibration time (for proper DEC compensation)"
+            }
+        }
+    },
+    "drift": {
+        "devcat": "Control",
+        "group": "",
+        "order":"Control350",
+        "permission": 0,
+        "label": "Drift",
+        "hasGrid":true,
+        "showElts":false,
+        "showGrid":false,
+        "gridLimit":200,
+        "graphType":"XY",
+        "graphParams":{
+            "X":"RA",
+            "Y":"DEC",
+            "Xmin":-5,
+            "Xmax":5,
+            "Ymin":-5,
+            "Ymax":5
+        },
+        "e": {
+            "RA": {
+                "type":"float",
+                "label": "RA",
+                "order":"01",
+                "format": "99.99"
+            },
+            "DEC": {
+                "type":"float",
+                "label": "DEC",
+                "order":"02",
+                "format": "99.99"
+            }
+        }
+    },
+    "guiding": {
+        "devcat": "Control",
+        "group": "",
+        "order":"Control100",
+        "permission": 0,
+        "label": "Guiding graph",
+        "hasGrid":true,
+        "showElts":false,
+        "showGrid":false,
+        "gridLimit":20,
+        "graphType":"PHD",
+        "graphParams":{
+            "D":"time",
+            "RA":"RA",
+            "DE":"DE",
+            "pRA":"pRA",
+            "pDE":"pDE",
+            "RSB":"SNR",
+            "RMS":"RMS"
+        },
+        "e": {
+            "time": {
+                "type":"float",
+                "label": "time",
+                "order":"01",
+                "value":0
+            },
+            "RA": {
+                "type":"float",
+                "label": "Drift (RA)",
+                "order":"02",
+                "format": "99.99"
+            },
+            "DE": {
+                "type":"float",
+                "label": "Drift (DE)",
+                "order":"03",
+                "format": "99.99"
+            },
+            "pRA": {
+                "type":"float",
+                "label": "Pulse (RA)",
+                "order":"04",
+                "format": "99.99"
+            },
+            "pDE": {
+                "type":"float",
+                "label": "Pulse (DE)",
+                "order":"05",
+                "format": "99.99"
+            },
+            "SNR": {
+                "type": "float",
+                "label": "SNR",
+                "value":0,
+                "order":6
+            },
+            "RMS": {
+                "type": "float",
+                "label": "RMS",
+                "value":0,
+                "order":7
+            }
+        }
+    },
+    "calParams": {
+        "devcat": "Calibration",
+        "group": "",
+        "order":"Parameters100",
+        "permission": 2,
+        "hasprofile":true,
+        "label": "Calibration Parameters",
+        "e": {
+            "pulse": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Calibration pulse (ms)",
+                "order":"01",
+                "value":1000,
+                "format": "99"
+            },
+            "calsteps": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Iterations / axis",
+                "order":"02",
+                "value":2,
+                "format": "99"
+            }
+
+        }
+    },
+    "guideParams": {
+        "devcat": "Guiding",
+        "group": "",
+        "order":"Parameters200",
+        "permission": 2,
+        "rule":2,
+        "hasprofile":true,
+        "label": "Guide parameters",
+        "e": {
+            "pulsemax": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Max pulse (ms)",
+                "order":"02",
+                "value":2000,
+                "format": "99"
+            },
+            "pulsemin": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Min pulse (ms)",
+                "order":"01",
+                "value":20,
+                "format": "99"
+            },
+            "raAgr": {
+                "type":"float",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "RA Agressivity",
+                "order":"03",
+                "value":0.8,
+                "format": "99.99"
+            },
+            "deAgr": {
+                "type":"float",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "DEC Agressivity",
+                "order":"04",
+                "value":0.8,
+                "format": "99"
+            },
+            "rmsOver": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "RMS drift over x",
+                "order":"05",
+                "value":10,
+                "format": "99",
+                "min":2,
+                "max":100,
+                "hint": "Number of frames to calculate RMS drift"
+            },
+            "enablepiersidereverse": {
+                "type":"bool",
+                "autoupdate":true,
+                "label": "Enable pier side reverse",
+                "order":"06",
+                "value":false,
+                "hint": "Reverse corrections if calibration pier side differs from current pier side"
+            },
+            "ditherpixel": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Dither amplitude (px)",
+                "order":"07",
+                "value":5,
+                "format": "99",
+                "min":1,
+                "max":50,
+                "hint": "Maximum random displacement applied during dithering, in pixels"
+            }
+        }
+    },
+    "revCorrections": {
+        "devcat": "Guiding",
+        "group": "",
+        "order":"Parameters300",
+        "permission": 2,
+        "rule":2,
+        "hasprofile":true,
+        "label": "Reverse guiding corrections",
+        "e": {
+            "revRA": {
+                "type":"bool",
+                "label": "RA",
+                "order":"01",
+                "autoupdate":true,
+                "value":false
+            },
+            "revDE": {
+                "type":"bool",
+                "label": "DEC",
+                "order":"02",
+                "autoupdate":true,
+                "value":false
+            }
+        }
+    },
+        "disCorrections": {
+            "devcat": "Guiding",
+            "group": "",
+            "permission": 2,
+            "order":"Parameters400",
+            "rule":2,
+            "hasprofile":true,
+            "label": "Disable guiding corrections",
+            "e": {
+                "disRA+": {
+                    "autoupdate":true,
+                    "type":"bool",
+                    "label": "RA+",
+                    "order":"01",
+                    "value":false
+                },
+                "disRA-": {
+                    "autoupdate":true,
+                    "type":"bool",
+                    "label": "RA-",
+                    "order":"02",
+                    "value":false
+                },
+                "disDE+": {
+                    "type":"bool",
+                    "autoupdate":true,
+                    "label": "DE+",
+                    "order":"03",
+                    "value":false
+                },
+                "disDE-": {
+                    "type":"bool",
+                    "autoupdate":true,
+                    "label": "DE-",
+                    "order":"04",
+                    "value":false
+                }
+            }
+    }
+}
+}

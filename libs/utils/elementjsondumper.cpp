@@ -1,22 +1,33 @@
 #include "elementjsondumper.h"
-#include "translate.h"
 
 namespace  OST
 {
-
+//enum class EvType
+//{
+//    aa,        /*!< dump all data */
+//    zz = 0,    /*!< no dump       */
+//    ee,        /*!< set one element value */
+//    ea,        /*!< set all elements values (prop level) */
+//    ev,        /*!< set one element value/min/max/format */
+//    ps,        /*!< only property state */
+//    gc,        /*!< grid new line */
+//    gu,        /*!< grid update line  */
+//    gd,        /*!< grid delete line  */
+//    gr,        /*!< grid reset */
+//};
 QJsonObject ElementJsonDumper::dumpElementCommons(ElementBase *pElement)
 {
     QJsonObject json;
+    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return json;
 
-    Translate* t = Translate::GetInstance();
-    json["label"] = t->translate(pElement->label());
+    json["label"] = pElement->label();
     json["order"] = pElement->order();
-    json["hint"] = t->translate(pElement->hint());
+    json["hint"] = pElement->hint();
     json["type"] = "undefined";
     json["autoupdate"] = pElement->autoUpdate();
     json["badge"] = pElement->getBadge();
     if ((pElement->getType() == "int") || (pElement->getType() == "float") || (pElement->getType() == "string")
-            || (pElement->getType() == "bool"))
+            || (pElement->getType() == "bool") || (pElement->getType() == "date") || (pElement->getType() == "time"))
     {
         json["directedit"] = pElement->getDirectEdit();
     }
@@ -24,16 +35,29 @@ QJsonObject ElementJsonDumper::dumpElementCommons(ElementBase *pElement)
     return json;
 
 }
-void ElementJsonDumper::visit(ElementBool *pElement)
+void ElementJsonDumper::visit(ElementBool *pElement, QVariantMap &data, bool &emitEvent)
 {
+    Q_UNUSED(data);
+    Q_UNUSED(emitEvent);
     QJsonObject json = dumpElementCommons(pElement);
-    json["type"] = "bool";
     json["value"] = pElement->value();
     mResult = json;
+    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return;
+
+    json["type"] = "bool";
+    if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
+    if (pElement->getPostIcon() != "") json["posticon"] = pElement->getPostIcon();
+    mResult = json;
 }
-void ElementJsonDumper::visit(ElementInt *pElement)
+void ElementJsonDumper::visit(ElementInt *pElement, QVariantMap &data, bool &emitEvent)
 {
+    Q_UNUSED(data);
+    Q_UNUSED(emitEvent);
     QJsonObject json = dumpElementCommons(pElement);
+    json["value"] = pElement->value();
+    mResult = json;
+    if (mEvent == EvType::ee || mEvent == EvType::ea) return;
+
     json["type"] = "int";
     json["value"] = qlonglong(pElement->value());
     json["min"] = qlonglong(pElement->min());
@@ -41,21 +65,24 @@ void ElementJsonDumper::visit(ElementInt *pElement)
     json["step"] = qlonglong(pElement->step());
     json["format"] = pElement->format();
     json["slider"] = pElement->slider();
+    mResult = json;
+    if (mEvent == EvType::ev) return;
+
     if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
     if (pElement->getPostIcon() != "") json["posticon"] = pElement->getPostIcon();
     if (pElement->getGlobalLov() != "")
     {
         json["globallov"] = pElement->getGlobalLov();
+        json["lovScope"] = (pElement->getLovScope() == LovScope::Controller) ? "controller" : "module";
+        json["lovConstrained"] = pElement->getLovConstrained();
     }
     else
     {
         if (pElement->getLov().size() > 0)
         {
             QJsonObject lines = QJsonObject();
-            foreach(const long &key, pElement->getLov().keys())
-            {
-                QString skey = QString::number(key);
-                lines[skey] = pElement->getLov()[key];
+            for(const int &key : pElement->getLov().keys()) {
+                lines[QString::number(key)] = pElement->getLov()[key];
             }
             json["listOfValues"] = lines;
         }
@@ -63,55 +90,69 @@ void ElementJsonDumper::visit(ElementInt *pElement)
     }
     mResult = json;
 }
-void ElementJsonDumper::visit(ElementFloat *pElement)
+void ElementJsonDumper::visit(ElementFloat *pElement, QVariantMap &data, bool &emitEvent)
 {
+    Q_UNUSED(data);
+    Q_UNUSED(emitEvent);
     QJsonObject json = dumpElementCommons(pElement);
-    json["type"] = "float";
     json["value"] = pElement->value();
+    mResult = json;
+    if (mEvent == EvType::ee || mEvent == EvType::ea) return;
+
+    json["type"] = "float";
     json["min"] = pElement->min();
     json["max"] = pElement->max();
     json["step"] = pElement->step();
     json["format"] = pElement->format();
     json["slider"] = pElement->slider();
+    mResult = json;
+    if (mEvent == EvType::ev) return;
+
     if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
     if (pElement->getPostIcon() != "") json["posticon"] = pElement->getPostIcon();
     if (pElement->getGlobalLov() != "")
     {
         json["globallov"] = pElement->getGlobalLov();
+        json["lovScope"] = (pElement->getLovScope() == LovScope::Controller) ? "controller" : "module";
+        json["lovConstrained"] = pElement->getLovConstrained();
     }
     else
     {
         if (!pElement->getLov().isEmpty())
         {
             QJsonObject lines = QJsonObject();
-            foreach(const double &key, pElement->getLov().keys())
-            {
-                QString skey = QString::number(key);
-                lines[skey] = pElement->getLov()[key];
+            for(const double &key : pElement->getLov().keys()) {
+                lines[QString::number(key)] = pElement->getLov()[key];
             }
             json["listOfValues"] = lines;
         }
     }
     mResult = json;
 }
-void ElementJsonDumper::visit(ElementString *pElement)
+void ElementJsonDumper::visit(ElementString *pElement, QVariantMap &data, bool &emitEvent)
 {
+    Q_UNUSED(data);
+    Q_UNUSED(emitEvent);
     QJsonObject json = dumpElementCommons(pElement);
-    json["type"] = "string";
     json["value"] = pElement->value();
+    mResult = json;
+    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return;
+
+    json["type"] = "string";
     if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
     if (pElement->getPostIcon() != "") json["posticon"] = pElement->getPostIcon();
     if (pElement->getGlobalLov() != "")
     {
         json["globallov"] = pElement->getGlobalLov();
+        json["lovScope"] = (pElement->getLovScope() == LovScope::Controller) ? "controller" : "module";
+        json["lovConstrained"] = pElement->getLovConstrained();
     }
     else
     {
         if (pElement->getLov().size() > 0)
         {
             QJsonObject lines = QJsonObject();
-            foreach(const QString &key, pElement->getLov().keys())
-            {
+            for(const QString &key : pElement->getLov().keys())            {
                 lines[key] = pElement->getLov()[key];
             }
             json["listOfValues"] = lines;
@@ -119,18 +160,26 @@ void ElementJsonDumper::visit(ElementString *pElement)
     }
     mResult = json;
 }
-void ElementJsonDumper::visit(ElementLight *pElement)
+void ElementJsonDumper::visit(ElementLight *pElement, QVariantMap &data, bool &emitEvent)
 {
+    Q_UNUSED(data);
+    Q_UNUSED(emitEvent);
     QJsonObject json = dumpElementCommons(pElement);
+    json["value"] = pElement->value();
+    mResult = json;
+    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return;
+
     json["type"] = "light";
-    json["value"] = StateToInt(pElement->value());
     mResult = json;
 }
-void ElementJsonDumper::visit(ElementImg *pElement)
+void ElementJsonDumper::visit(ElementImg *pElement, QVariantMap &data, bool &emitEvent)
 {
-    QJsonObject json = dumpElementCommons(pElement);
+    Q_UNUSED(data);
+    Q_UNUSED(emitEvent);
 
+    QJsonObject json = dumpElementCommons(pElement);
     QJsonObject imgdata;
+    imgdata["showstats"] =  pElement->getShowStats();
     imgdata["urljpeg"] =  pElement->value().mUrlJpeg;
     imgdata["urlfits"] = pElement->value().mUrlFits;
     imgdata["urlthumbnail"] = pElement->value().mUrlThumbnail;
@@ -140,10 +189,12 @@ void ElementJsonDumper::visit(ElementImg *pElement)
     imgdata["height"] = pElement->value().height;
     imgdata["snr"] = pElement->value().SNR;
     imgdata["hfravg"] = pElement->value().HFRavg;
+    imgdata["hfravgdev"] = pElement->value().HFRavgDev;
     imgdata["stars"] = pElement->value().starsCount;
     imgdata["issolved"] = pElement->value().isSolved;
     imgdata["solverra"] = pElement->value().solverRA;
     imgdata["solverde"] = pElement->value().solverDE;
+    imgdata["solverorientation"] = pElement->value().solverOrientation;
 
 
     QJsonArray arr;
@@ -200,40 +251,108 @@ void ElementJsonDumper::visit(ElementImg *pElement)
 
     //i=;
 
+
+    if (pElement->value().mAlternates.size() > 0)
+    {
+        arr = QJsonArray();
+        for (int i = 0; i < pElement->value().mAlternates.size(); i++)
+        {
+            arr.append(pElement->value().mAlternates[i]);
+        }
+        imgdata["alternates"] = arr;
+    }
+
     for (auto it = imgdata.constBegin(); it != imgdata.constEnd(); it++)
     {
         json.insert(it.key(), it.value());
     }
+    json["value"] = imgdata;
+    mResult = json;
+    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return;
 
     json["type"] = "img";
 
     mResult = json;
 }
-void ElementJsonDumper::visit(ElementVideo *pElement)
+void ElementJsonDumper::visit(ElementVideo *pElement, QVariantMap &data, bool &emitEvent)
 {
+    Q_UNUSED(data);
+    Q_UNUSED(emitEvent);
     QJsonObject json = dumpElementCommons(pElement);
     json["type"] = "video";
     json["url"] = pElement->value().url;
     mResult = json;
 }
-void ElementJsonDumper::visit(ElementMessage *pElement)
+void ElementJsonDumper::visit(ElementPrg *pElement, QVariantMap &data, bool &emitEvent)
 {
+    Q_UNUSED(data);
+    Q_UNUSED(emitEvent);
     QJsonObject json = dumpElementCommons(pElement);
-    json["type"] = "message";
-    json["level"] = pElement->value().level;
-    json["ts"] = pElement->value().ts.toString("yyyy/MM/dd hh:mm:ss.zzz");
-    json["message"] = pElement->value().message;
+    QJsonObject o;
+    o["dynlabel"] = pElement->value().dynlabel;
+    o["value"] = pElement->value().value;
+    json["value"] = o;
     mResult = json;
-}
-void ElementJsonDumper::visit(ElementPrg *pElement)
-{
-    QJsonObject json = dumpElementCommons(pElement);
+    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return;
+
     json["type"] = "prg";
     if (pElement->prgType() == bar) json["prgtype"] = "bar";
     if (pElement->prgType() == spinner) json["prgtype"] = "spinner";
-    json["dynlabel"] = pElement->value().dynlabel;
-    json["value"] = pElement->value().value;
+    mResult = json;
+}
+void ElementJsonDumper::visit(ElementDate *pElement, QVariantMap &data, bool &emitEvent)
+{
+    Q_UNUSED(data);
+    Q_UNUSED(emitEvent);
+    QJsonObject json = dumpElementCommons(pElement);
+    QJsonObject v;
+    v["year"] = pElement->value().year();
+    v["month"] = pElement->value().month();
+    v["day"] = pElement->value().day();
+    json["value"] = v;
+    mResult = json;
+    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return;
 
+    json["type"] = "date";
+    mResult = json;
+}
+void ElementJsonDumper::visit(ElementTime *pElement, QVariantMap &data, bool &emitEvent)
+{
+    Q_UNUSED(data);
+    Q_UNUSED(emitEvent);
+    QJsonObject json = dumpElementCommons(pElement);
+    QJsonObject v;
+    v["hh"] = pElement->value().hour();
+    v["mm"] = pElement->value().minute();
+    v["ss"] = pElement->value().second();
+    if (pElement->getUseMs()) v["ms"] = pElement->value().msec();
+    json["value"] = v;
+    mResult = json;
+    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return;
+
+    json["type"] = "time";
+    json["usems"] = pElement->getUseMs();
+    mResult = json;
+
+}
+void ElementJsonDumper::visit(ElementDateTime *pElement, QVariantMap &data, bool &emitEvent)
+{
+    Q_UNUSED(data);
+    Q_UNUSED(emitEvent);
+    QJsonObject json = dumpElementCommons(pElement);
+    QJsonObject v;
+    v["year"] = pElement->value().date().year();
+    v["month"] = pElement->value().date().month();
+    v["day"] = pElement->value().date().day();
+    v["hh"] = pElement->value().time().hour();
+    v["mm"] = pElement->value().time().minute();
+    v["ss"] = pElement->value().time().second();
+    v["ms"] = pElement->value().time().msec();
+    json["value"] = v;
+    mResult = json;
+    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return;
+
+    json["type"] = "datetime";
     mResult = json;
 }
 

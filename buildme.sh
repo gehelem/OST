@@ -3,9 +3,6 @@ sudo apt-add-repository --yes ppa:mutlaqja/ppa
 sudo apt-get update
 sudo apt upgrade
 sudo apt-get install -y \
-build-essential \
-cmake \
-git \
 libindi-dev \
 indi-dbg \
 libstellarsolver-dev \
@@ -22,5 +19,6 @@ mkdir build
 cd build
 cmake ..
 make -j4
+# sudo cmake --install . --prefix=/
 
 

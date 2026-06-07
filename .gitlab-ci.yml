@@ -1,0 +1,115 @@
+stages:
+  - build
+  - test
+#  - upload
+  - release
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+  PACKAGE_REGISTRY_LATEST: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/latest/latest"
+  PACKAGE_REGISTRY_TAG: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${CI_COMMIT_TAG}/${CI_COMMIT_TAG}"
+
+.build-rules: &build-rules
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+
+.test-rules: &test-rules
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+
+build-job-2404:
+  stage: build
+  image: ubuntu:24.04
+  variables:
+    DEB_FILE_LATEST: "ostserver_latest_amd64.deb"
+    DEB_FILE_TAG: "ostserver_${CI_COMMIT_TAG}_amd64.deb"
+    DEB_FILE_DEV_LATEST: "ostserver-dev_latest_amd64.deb"
+    DEB_FILE_DEV_TAG: "ostserver-dev_${CI_COMMIT_TAG}_amd64.deb"
+  script:
+    - ./CI/CI-build.sh
+  artifacts:
+    paths:
+      - "ostserver_latest_amd64.deb"
+      - "ostserver_*_amd64.deb"
+      - "ostserver-dev_latest_amd64.deb"
+      - "ostserver-dev_*_amd64.deb"
+    expire_in: 4 week
+  <<: *build-rules
+
+build-job-2604:
+  stage: build
+  image: ubuntu:26.04
+  variables:
+    DEB_FILE_LATEST: "ostserver_latest_2604_amd64.deb"
+    DEB_FILE_TAG: "ostserver_${CI_COMMIT_TAG}_2604_amd64.deb"
+    DEB_FILE_DEV_LATEST: "ostserver-dev_latest_2604_amd64.deb"
+    DEB_FILE_DEV_TAG: "ostserver-dev_${CI_COMMIT_TAG}_2604_amd64.deb"
+  script:
+    - ./CI/CI-build.sh
+  artifacts:
+    paths:
+      - "ostserver_*_2604_amd64.deb"
+      - "ostserver-dev_*_2604_amd64.deb"
+    expire_in: 4 week
+  allow_failure: true
+  <<: *build-rules
+
+test-job-2404:
+  stage: test
+  image: ubuntu:24.04
+  dependencies:
+    - build-job-2404
+  variables:
+    DEB_FILE_LATEST: "ostserver_latest_amd64.deb"
+  script:
+    - ./CI/CI-test.sh
+  artifacts:
+    paths:
+      - server.log
+      - ws.log
+    expire_in: 4 week
+  <<: *test-rules
+
+test-job-2604:
+  stage: test
+  image: ubuntu:26.04
+  dependencies:
+    - build-job-2604
+  variables:
+    DEB_FILE_LATEST: "ostserver_latest_2604_amd64.deb"
+  script:
+    - ./CI/CI-test.sh
+  artifacts:
+    paths:
+      - server.log
+      - ws.log
+    expire_in: 4 week
+  allow_failure: true
+  <<: *test-rules
+
+release-job-tag:
+  stage: release
+  dependencies:
+    - build-job-2404
+    - build-job-2604
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  script:
+    - sh ./CI/CI-upload-release-tag.sh
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
+
+release-job-latest:
+  stage: release
+  dependencies:
+    - build-job-2404
+    - build-job-2604
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  script:
+    - sh ./CI/CI-upload-release-latest.sh
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "push"'

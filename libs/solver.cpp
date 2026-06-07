@@ -1,4 +1,5 @@
 #include "solver.h"
+#include <cmath>
 /*!
  * ... ...
  */
@@ -18,12 +19,25 @@ void Solver::ResetSolver(FITSImage::Statistic &stats, uint8_t *m_ImageBuffer)
     mImgHeight = stats.height;
 
     HFRavg = 99;
+    HFRavgDev = 0;
     HFRavgZone.clear();
+    HFRavgDevZone.clear();
+    thetaAvgZone.clear();
+    thetaDevAvgZone.clear();
+    aAxeAvgZone.clear();
+    bAxeAvgZone.clear();
+    eAxeAvgZone.clear();
     HFRavgCount.clear();
     for (int i = 0; i < HFRZones * HFRZones; i++ )
     {
         HFRavgCount.append(0);
         HFRavgZone.append(99);
+        HFRavgDevZone.append(0);
+        thetaAvgZone.append(99);
+        thetaDevAvgZone.append(99);
+        aAxeAvgZone.append(99);
+        bAxeAvgZone.append(99);
+        eAxeAvgZone.append(99);
     }
     //delete stellarSolver;
     stellarSolver.loadNewImageBuffer(stats, m_ImageBuffer);
@@ -39,13 +53,9 @@ void Solver::ResetSolver(FITSImage::Statistic &stats, uint8_t *m_ImageBuffer, in
 }
 void Solver::FindStars(Parameters param)
 {
-
-    if (!connect(&stellarSolver, &StellarSolver::logOutput, this, &Solver::sslogOutput))
-        sendMessage( "Can't connect sslogOutput");
-    if (!connect(&stellarSolver, &StellarSolver::ready, this, &Solver::ssReadySEP))
-        sendMessage( "Can't connect ssReadySEP");
-    if (!connect(&stellarSolver, &StellarSolver::finished, this, &Solver::ssFinished))
-        sendMessage( "Can't connect ssFinished");
+    connect(&stellarSolver, &StellarSolver::logOutput, this, &Solver::sslogOutput,  Qt::UniqueConnection);
+    connect(&stellarSolver, &StellarSolver::ready,     this, &Solver::ssReadySEP,   Qt::UniqueConnection);
+    connect(&stellarSolver, &StellarSolver::finished,  this, &Solver::ssFinished,   Qt::UniqueConnection);
 
 
     //QList<Parameters> params = stellarSolver.getBuiltInProfiles();
@@ -82,12 +92,9 @@ void Solver::FindStars(Parameters param)
 }
 void Solver::SolveStars(Parameters param)
 {
-    if (!connect(&stellarSolver, &StellarSolver::logOutput, this, &Solver::sslogOutput))
-        sendMessage( "Can't connect sslogOutput");
-    if (!connect(&stellarSolver, &StellarSolver::ready, this, &Solver::ssReadySolve))
-        sendMessage( "Can't connect ssReadySolve");
-    if (!connect(&stellarSolver, &StellarSolver::finished, this, &Solver::ssFinished))
-        sendMessage( "Can't connect ssFinished");
+    connect(&stellarSolver, &StellarSolver::logOutput, this, &Solver::sslogOutput,  Qt::UniqueConnection);
+    connect(&stellarSolver, &StellarSolver::ready,     this, &Solver::ssReadySolve, Qt::UniqueConnection);
+    connect(&stellarSolver, &StellarSolver::finished,  this, &Solver::ssFinished,   Qt::UniqueConnection);
 
 
     //QList<Parameters> params = stellarSolver.getBuiltInProfiles();
@@ -126,24 +133,63 @@ void Solver::SolveStars(Parameters param)
 
 void Solver::ssFinished()
 {
-    //sendMessage( "solve finished";
-
+    disconnect(&stellarSolver, &StellarSolver::finished,  this, &Solver::ssFinished);
+    disconnect(&stellarSolver, &StellarSolver::logOutput, this, &Solver::sslogOutput);
 }
 void Solver::ssReadySEP()
 {
 
     //sendMessage( "SSolver ready SEP";
     stars = stellarSolver.getStarList();
+    double hfrMean = 0, hfrM2 = 0;
+    QVector<double> hfrZoneM2(HFRZones * HFRZones, 0.0);
     for (int i = 0; i < stars.size(); i++)
     {
-        HFRavg = (i * HFRavg + stars[i].HFR) / (i + 1);
+        /* global Welford */
+        double delta = stars[i].HFR - hfrMean;
+        hfrMean += delta / (i + 1);
+        hfrM2   += delta * (stars[i].HFR - hfrMean);
 
         /* zoning */
         int starColumn = HFRZones * stars[i].x / mImgWidth;
         int starLine = HFRZones * stars[i].y / mImgHeight;
         int zone = starLine * HFRZones + starColumn;
+
+        double zoneDelta = stars[i].HFR - HFRavgZone[zone];
         HFRavgZone[zone] = (HFRavgCount[zone] * HFRavgZone[zone] + stars[i].HFR) / (HFRavgCount[zone] + 1);
+        hfrZoneM2[zone] += zoneDelta * (stars[i].HFR - HFRavgZone[zone]);
+
+        thetaAvgZone[zone] = (HFRavgCount[zone] * thetaAvgZone[zone] + stars[i].theta) / (HFRavgCount[zone] + 1);
+        aAxeAvgZone[zone] = (HFRavgCount[zone] * aAxeAvgZone[zone] + stars[i].a) / (HFRavgCount[zone] + 1);
+        bAxeAvgZone[zone] = (HFRavgCount[zone] * bAxeAvgZone[zone] + stars[i].b) / (HFRavgCount[zone] + 1);
+        eAxeAvgZone[zone] = aAxeAvgZone[zone] / bAxeAvgZone[zone];
         HFRavgCount[zone]++;
+    }
+    HFRavg    = static_cast<float>(hfrMean);
+    HFRavgDev = static_cast<float>(stars.size() > 1 ? std::sqrt(hfrM2 / stars.size()) : 0.0);
+    for (int i = 0; i < HFRZones * HFRZones; i++)
+        HFRavgDevZone[i] = static_cast<float>(HFRavgCount[i] > 1 ? std::sqrt(hfrZoneM2[i] / HFRavgCount[i]) : 0.0);
+    //theta dev
+    HFRavgCount.clear();
+    for (int i = 0; i < HFRZones * HFRZones; i++ )
+    {
+        HFRavgCount.append(0);
+    }
+    for (int i = 0; i < stars.size(); i++)
+    {
+        int starColumn = HFRZones * stars[i].x / mImgWidth;
+        int starLine = HFRZones * stars[i].y / mImgHeight;
+        int zone = starLine * HFRZones + starColumn;
+
+        thetaDevAvgZone[zone] = (HFRavgCount[zone] * thetaDevAvgZone[zone] + (stars[i].theta - thetaAvgZone[zone]) *
+                                 (stars[i].theta - thetaAvgZone[zone])) /
+                                (HFRavgCount[zone] + 1);
+
+        HFRavgCount[zone]++;
+    }
+    for (int i = 0; i < HFRZones * HFRZones; i++ )
+    {
+        thetaDevAvgZone[i] = sqrt(thetaDevAvgZone[i]);
     }
     //sendMessage( "SSolver Ready : HFRavg = " + QString::number(HFRavg));
     disconnect(&stellarSolver, &StellarSolver::ready, this, &Solver::ssReadySEP);
@@ -153,6 +199,12 @@ void Solver::ssReadySEP()
 
 void Solver::ssReadySolve()
 {
+    disconnect(&stellarSolver, &StellarSolver::ready, this, &Solver::ssReadySolve);
+    if (stellarSolver.failed() || !stellarSolver.solvingDone())
+    {
+        emit failSolve();
+        return;
+    }
     emit successSolve();
 }
 void Solver::sslogOutput(QString text)

@@ -7,7 +7,6 @@ namespace  OST
 class LovInt;
 class LovFloat;
 class LovString;
-class LovLight;
 
 class LovVisitor
 {
@@ -19,7 +18,6 @@ class LovVisitor
         virtual void visit(LovInt* pLov) = 0;
         virtual void visit(LovFloat* pLov) = 0;
         virtual void visit(LovString* pLov) = 0;
-        virtual void visit(LovLight* pLov) = 0;
 };
 
 }

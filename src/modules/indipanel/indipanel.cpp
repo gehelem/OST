@@ -1,4 +1,5 @@
 #include "indipanel.h"
+#include "version.cc"
 
 IndiPanel *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
 {
@@ -9,9 +10,12 @@ IndiPanel *initialize(QString name, QString label, QString profile, QVariantMap 
 IndiPanel::IndiPanel(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
     : IndiModule(name, label, profile, availableModuleLibs)
 {
-    setClassName(QString(metaObject()->className()).toLower());
-    setModuleDescription("Full indi control panel");
-    setModuleVersion("0.11");
+    setMetadata("thisGithash", QString::fromStdString(Version::GIT_SHA1));
+    setMetadata("thisGitdate", QString::fromStdString(Version::GIT_DATE));
+    setMetadata("thisGitmessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
+    setMetadata("description", "Indi control panel");
+    setMetadata("thisversion", QString::fromStdString(Version::GIT_TAG));
+
     connectIndi();
 }
 
@@ -19,50 +23,54 @@ IndiPanel::~IndiPanel()
 {
 
 }
-void IndiPanel::newDevice(INDI::BaseDevice dp)
+void IndiPanel::onNewDevice(INDI::BaseDevice dp)
 {
     auto props = dp.getProperties();
-    //BOOST_LOG_TRIVIAL(debug) << "Indipanel new device" << dp->getDeviceName();
 
     for (auto pProperty : props)
     {
         QString dev = pProperty.getDeviceName();
         QString pro = pProperty.getName();
         QString devpro = dev + pro;
-        //BOOST_LOG_TRIVIAL(debug) << "Indipanel new property " << devpro.toStdString();
         QString mess;
-        if (!createOstProperty(devpro, pProperty.getLabel(), pProperty.getPermission(), pProperty.getDeviceName(),
-                               pProperty.getGroupName()))
-        {
-            sendMessage("Indipanel can't create property ");
-        }
+        OST::PropertyMulti *pm = new OST::PropertyMulti(devpro, pProperty.getLabel(),
+                OST::IntToPermission(pProperty.getPermission()),
+                pProperty.getDeviceName(),
+                pProperty.getGroupName(), "00", false, false);
+        createProperty(pm);
     }
 }
-void IndiPanel::removeDevice(INDI::BaseDevice dp)
+void IndiPanel::onRemoveDevice(INDI::BaseDevice dp)
 {
-    foreach(const QString &key, getStore().keys())
-    {
+    for(const QString &key : getStore().keys())    {
         getProperty(key)->level1();
         if (strcmp(dp.getDeviceName(), getProperty(key)->level1().toStdString().c_str()) == 0)
         {
             deleteOstProperty(key);
         }
     }
-
 }
-void IndiPanel::newProperty(INDI::Property pProperty)
+void IndiPanel::onNewProperty(INDI::Property pProperty)
 {
+    //logDebug("IndiPanel::onNewProperty %1 %2", {pProperty.getDeviceName(), pProperty.getName()});
+
     QString dev = pProperty.getDeviceName();
     QString pro = pProperty.getName();
     QString devpro = dev + pro;
-    //sendMessage("Indipanel new property " + devpro);
     QString mess;
+
+    /* force group for blob types */
+    QString group;
+    if (pProperty.getType() != INDI_BLOB) group = pProperty.getGroupName();
+    else group = pProperty.getLabel();
+
 
     OST::PropertyMulti* p = new OST::PropertyMulti(devpro, pProperty.getLabel(),
             OST::IntToPermission(pProperty.getPermission()),
             pProperty.getDeviceName(),
-            pProperty.getGroupName(), "", false, false);
-
+            group, "00", false, false);
+    p->setFreeValue(dev); // we keep original device name to avoid unwanted level1 device translations
+    p->setState(OST::IntToState(pProperty.getState()), false);
 
     switch (pProperty.getType())
     {
@@ -77,20 +85,19 @@ void IndiPanel::newProperty(INDI::Property pProperty)
                 INDI::BaseDevice wdp = getDevice(pProperty.getDeviceName());
                 if (wdp.getDriverInterface() & INDI::BaseDevice::CCD_INTERFACE)
                 {
-                    //BOOST_LOG_TRIVIAL(debug) << "Setting blob mode for " << _wdp->getDeviceName();
                     setBLOBMode(B_ALSO, wdp.getDeviceName(), nullptr);
                 }
 
             }
             for (unsigned int i = 0; i < n.count(); i++)
             {
-                OST::ElementFloat* v = new OST::ElementFloat(n[i].label, QString(i), n[i].label);
+                OST::ElementFloat* v = new OST::ElementFloat(n[i].getName(), n[i].label, QString::number(i), n[i].label);
                 v->setValue(n[i].getValue(), false);
-                v->setMin(n[i].min);
-                v->setMax(n[i].max);
-                v->setStep(n[i].step);
-                v->setFormat(n[i].format);
-                p->addElt(n[i].getName(), v);
+                //v->setMin(n[i].min, false); // commented as for example indi allows 0 with min=0.01 for CCD_EXPOSURE ... let's indi make controls
+                //v->setMax(n[i].max, false); // "  "   "   "
+                v->setStep(n[i].step, false);
+                v->setFormat(n[i].format, false);
+                p->addElt(v);
             }
             break;
         }
@@ -99,10 +106,10 @@ void IndiPanel::newProperty(INDI::Property pProperty)
             INDI::PropertySwitch s = pProperty;
             for (unsigned int i = 0; i < s.count(); i++)
             {
-                OST::ElementBool* v = new OST::ElementBool(s[i].label, QString(i), s[i].label);
+                OST::ElementBool* v = new OST::ElementBool(s[i].getName(), s[i].label, QString::number(i), s[i].label);
                 if (s[i].s == 0) v->setValue(false, false);
-                if (s[i].s == 1) v->setValue(false, true);
-                p->addElt(s[i].getName(), v);
+                if (s[i].s == 1) v->setValue(true, true);
+                p->addElt(v);
             }
             p->setRule(OST::IntToRule(s.getRule()));
 
@@ -113,9 +120,9 @@ void IndiPanel::newProperty(INDI::Property pProperty)
             INDI::PropertyText t = pProperty;
             for (unsigned int i = 0; i < t.count(); i++)
             {
-                OST::ElementString* v = new OST::ElementString(t[i].label, QString(i), t[i].label);
+                OST::ElementString* v = new OST::ElementString(t[i].getName(), t[i].label, QString::number(i), t[i].label);
                 v->setValue(t[i].text, false);
-                p->addElt(t[i].getName(), v);
+                p->addElt(v);
             }
             break;
         }
@@ -124,15 +131,33 @@ void IndiPanel::newProperty(INDI::Property pProperty)
             INDI::PropertyLight l = pProperty;
             for (unsigned int i = 0; i < l.count(); i++)
             {
-                OST::ElementLight* v = new OST::ElementLight(l[i].label, QString(i), l[i].label);
+                OST::ElementLight* v = new OST::ElementLight(l[i].getName(), l[i].label, QString::number(i), l[i].label);
                 v->setValue(OST::IntToState(l[i].getState()), true);
-                p->addElt(l[i].getName(), v);
+                p->addElt(v);
             }
             break;
         }
         case INDI_BLOB:
         {
-
+            INDI::PropertyBlob b = pProperty;
+            setBLOBMode(B_ALSO, b.getDeviceName(), nullptr);
+            for (unsigned int i = 0; i < b.count(); i++)
+            {
+                OST::ElementImg* ei = new OST::ElementImg(b[i].getName(), b[i].label, QString::number(i), b[i].label);
+                delete _image;
+                _image = new fileio();
+                OST::ImgData dta;
+                if (_image->loadBlob(b, 64, i))
+                {
+                    QImage rawImage = _image->getRawQImage();
+                    rawImage.save( getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) +  b[i].label + ".jpeg", "JPG", 100);
+                    dta = _image->ImgStats();
+                    dta.mUrlJpeg = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".jpeg";
+                    dta.mUrlFits = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".FITS";
+                }
+                ei->setValue(dta, true);
+                p->addElt(ei);
+            }
             break;
         }
         case INDI_UNKNOWN:
@@ -140,32 +165,47 @@ void IndiPanel::newProperty(INDI::Property pProperty)
             break;
         }
     }
-    p->setState(OST::IntToState(pProperty.getState()));
-    createProperty(devpro, p);
-
-
+    createProperty(p);
 }
-void IndiPanel::updateProperty (INDI::Property property)
+void IndiPanel::onUpdateProperty (INDI::Property property)
 {
+    //    logDebug("IndiPanel::onUpdateProperty %1 %2", {property.getDeviceName(), property.getName()});
+
     QString dev = property.getDeviceName();
     QString pro = property.getName();
     QString devpro = dev + pro;
     OST::PropertyMulti* p = getProperty(devpro);
+    QVariantMap mm;
+    QVariantMap o;
     switch (property.getType())
     {
-
         case INDI_NUMBER:
         {
             INDI::PropertyNumber n = property;
-
             for (unsigned int i = 0; i < n.count(); i++)
             {
-                getEltFloat(devpro, n[i].name)->setMin(n[i].min);
-                getEltFloat(devpro, n[i].name)->setMax(n[i].max);
-                getEltFloat(devpro, n[i].name)->setStep(n[i].step);
-                getEltFloat(devpro, n[i].name)->setFormat(n[i].format);
-                getEltFloat(devpro, n[i].name)->setValue(n[i].value, i == n.count() - 1);
+                //qDebug() << "IndiPanel::updateProperty" << dev << pro << n[i].name << n[i].value;
+                mm[n[i].name] = n[i].value;
+                /*if (i == n.count() - 1)
+                {
+                    getEltFloat(devpro, n[i].name)->setValue(n[i].value, false);
+                    //getEltFloat(devpro, n[i].name)->setMin(n[i].min,false); // commented as for example indi allows 0 with min=0.01 for CCD_EXPOSURE ... let's indi make controls
+                    //getEltFloat(devpro, n[i].name)->setMax(n[i].max,false); // "  "   "
+                    getEltFloat(devpro, n[i].name)->setStep(n[i].step, false);
+                    getEltFloat(devpro, n[i].name)->setFormat(n[i].format, true); // only one event sent for all ...
+                }
+
+                else
+                {
+                    getEltFloat(devpro, n[i].name)->setValue(n[i].value, false);
+                    getEltFloat(devpro, n[i].name)->setMin(n[i].min, false);
+                    getEltFloat(devpro, n[i].name)->setMax(n[i].max, false);
+                    getEltFloat(devpro, n[i].name)->setStep(n[i].step, false);
+                    getEltFloat(devpro, n[i].name)->setFormat(n[i].format, false);
+                }*/
+
             }
+            getProperty(devpro)->setAll(mm);
             break;
         }
         case INDI_SWITCH:
@@ -173,18 +213,21 @@ void IndiPanel::updateProperty (INDI::Property property)
             INDI::PropertySwitch s = property;
             for (unsigned int i = 0; i < s.count(); i++)
             {
-                if (s[i].s == 0) getEltBool(devpro, s[i].name)->setValue(false, i == s.count() - 1);
-                if (s[i].s == 1) getEltBool(devpro, s[i].name)->setValue(true, i == s.count() - 1);
+                if (s[i].s == 0) o[s[i].name] = false;
+                else o[s[i].name] = true;
             }
+            getProperty(devpro)->setAll(o);
             break;
         }
         case INDI_TEXT:
         {
             INDI::PropertyText t = property;
+
             for (unsigned int i = 0; i < t.count(); i++)
             {
-                getEltString(devpro, t[i].name)->setValue(t[i].text, i == t.count() - 1);
+                o[t[i].name] = QString::fromUtf8(t[i].text);
             }
+            getProperty(devpro)->setAll(o);
             break;
         }
         case INDI_LIGHT:
@@ -192,13 +235,31 @@ void IndiPanel::updateProperty (INDI::Property property)
             INDI::PropertyLight l = property;
             for (unsigned int i = 0; i < l.count(); i++)
             {
-                getEltLight(devpro, l[i].name)->setValue(OST::IntToState(l[i].getState()), true);
+                o[l[i].name] = l[i].getState();
             }
+            getProperty(devpro)->setAll(o);
             break;
         }
         case INDI_BLOB:
         {
+            INDI::PropertyBlob b = property;
+            for (unsigned int i = 0; i < b.count(); i++)
+            {
+                OST::ElementImg* ei = getEltImg(devpro, b[i].getName());
+                delete _image;
+                _image = new fileio();
+                OST::ImgData dta;
 
+                if (_image->loadBlob(b, 64, i))
+                {
+                    QImage rawImage = _image->getRawQImage();
+                    rawImage.save( getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) +  b[i].label + ".jpeg", "JPG", 100);
+                    dta = _image->ImgStats();
+                    dta.mUrlJpeg = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".jpeg";
+                    dta.mUrlFits = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".FITS";
+                }
+                ei->setValue(dta, true);
+            }
             break;
         }
         case INDI_UNKNOWN:
@@ -206,12 +267,15 @@ void IndiPanel::updateProperty (INDI::Property property)
             break;
         }
     }
-    p->setState(OST::IntToState(property.getState()));
+    /* update state only if needed */
+    if (p->state() != OST::IntToState(property.getState())) p->setState(OST::IntToState(property.getState()), true);
 }
 
 
-void IndiPanel::removeProperty(INDI::Property property)
+void IndiPanel::onRemoveProperty(INDI::Property property)
 {
+    //    logDebug("IndiPanel::onRemoveProperty %1 %2", {property.getDeviceName(), property.getName()});
+
     QString dev = property.getDeviceName();
     QString pro = property.getName();
     QString devpro = dev + pro;
@@ -219,66 +283,109 @@ void IndiPanel::removeProperty(INDI::Property property)
     deleteOstProperty(devpro);
 }
 
-void IndiPanel::newBLOB(IBLOB bp)
-{
-    Q_UNUSED(bp)
-}
 void IndiPanel::newMessage     (INDI::BaseDevice dp, int messageID)
 {
-    sendMessage(dp.getDeviceName() + QString::fromStdString(dp.messageQueue(messageID)));
+    logInfo("%1 %2", {dp.getDeviceName(), QString::fromStdString(dp.messageQueue(messageID))});
 }
 
-void IndiPanel::OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                                  const QVariantMap &eventData)
+void IndiPanel::onExternalEvent(OST::ExtEvent event)
 {
-    Q_UNUSED(eventType);
-    Q_UNUSED(eventModule);
-    Q_UNUSED(eventKey);
-    if (eventModule != this->getModuleName()) return;
+    //qDebug() << "IndiPanel::onExternalEvent event = " << OST::ExtEvToString(event.ev) << " p=" << event.prpkey << " e=" <<
+    //         event.eltkey << " l=" << event.lovkey << " i=" << event.line;
 
-    QVariantMap m = getPropertiesDump().toVariantMap();
-    foreach(const QString &keyprop, eventData.keys())
+    /* don't process Indimodule specific events again */
+    if (getStore().value(event.prpkey)->hasProfile()) return;
+    //if (getStore().value(event.prpkey)->level1() == "Parameters") return;
+    //if (getStore().value(event.prpkey)->level1() == "Module") return;
+
+    QJsonObject o = event.data["m"].toObject()[this->getModuleName()].toObject();
+    QJsonObject p = o["p"].toObject();
+    QJsonObject e = p[event.prpkey].toObject()["e"].toObject();
+
+
+    if (event.ev == OST::ExtEvType::SV)
     {
-        if (!m.contains(keyprop))
+        QString realDevice = getStore().value(event.prpkey)->getFreeValue();
+        QString realprop = event.prpkey;
+        realprop.replace(realDevice, "");
+        if (getStore().value(event.prpkey)->getElt(event.eltkey)->getType() == "bool")
         {
-            sendError ("OnMyExternalEvent - property " + keyprop + " does not exist (indipanel)");
+            bool b = e.begin().value().toBool();
+            if ( b) sendModNewSwitch(realDevice, realprop, event.eltkey, ISS_ON);
+            if (!b) sendModNewSwitch(realDevice, realprop, event.eltkey, ISS_OFF);
+        }
+    }
+
+    if (event.ev == OST::ExtEvType::SA)
+    {
+        QJsonObject e = p[event.prpkey].toObject()["e"].toObject();
+        QString eltkey = e.begin().key();
+        QString realDevice = getStore().value(event.prpkey)->getFreeValue();
+        QString realprop = event.prpkey;
+        realprop.replace(realDevice, "");
+        INDI::BaseDevice dp = getDevice(realDevice.toStdString().c_str());
+        if (!dp.isValid())
+        {
+            logError("Unable to find %2 device. Aborting.", {realDevice});
             return;
         }
-        QString prop = keyprop;
-        QVariantMap ostprop = m[keyprop].toMap();
-        QString devcat = ostprop["level1"].toString();
-        //BOOST_LOG_TRIVIAL(debug) << "DEVCAT - recv : "  << devcat.toStdString();
-        prop.replace(devcat, "");
-        if (!(devcat == "Indi"))
+
+        /* bools */
+        if (getStore().value(event.prpkey)->getElt(eltkey)->getType() == "bool")
         {
-            foreach(const QString &keyelt, eventData[keyprop].toMap()["elements"].toMap().keys())
+            INDI::PropertySwitch prop = dp.getSwitch(realprop.toStdString().c_str());
+            if (!prop.isValid())
             {
-                if (!m[keyprop].toMap()["elements"].toMap().contains(keyelt))
-                {
-                    sendError ("OnMyExternalEvent - property " + keyprop + ", element " + keyelt + " does not exist (indipanel)");
-                    return;
-                }
-                if (getStore()[keyprop]->getElt(keyelt)->getType() == "string")
-                {
-                    sendModNewText(devcat, prop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toString());
-                }
-                if (getStore()[keyprop]->getElt(keyelt)->getType() == "int"
-                        || getStore()[keyprop]->getElt(keyelt)->getType() == "float")
-                {
-                    sendModNewNumber(devcat, prop, keyelt, eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toFloat());
-                }
-                if (getStore()[keyprop]->getElt(keyelt)->getType() == "bool")
-                {
-                    keyelt.toStdString();
-                    if ( eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toBool()) sendModNewSwitch(devcat, prop,
-                                keyelt, ISS_ON);
-                    if (!eventData[keyprop].toMap()["elements"].toMap()[keyelt].toMap()["value"].toBool()) sendModNewSwitch(devcat, prop,
-                                keyelt, ISS_OFF);
-                }
+                logError("Unable to find %2/%3 property. Aborting.", {realDevice, realprop});
+                return;
             }
 
+            for (std::size_t i = 0; i < prop.size(); i++)
+            {
+                bool b = e.begin().value().toBool();
+                if ( b) prop[i].setState(ISS_ON);
+                if (!b) prop[i].setState(ISS_OFF);
+                sendNewSwitch(prop);
+            }
+            return;
         }
 
+        /* Numbers */
+        if (getStore().value(event.prpkey)->getElt(eltkey)->getType() == "int"
+                || getStore().value(event.prpkey)->getElt(eltkey)->getType() == "float")
+        {
+            INDI::PropertyNumber prop = dp.getNumber(realprop.toStdString().c_str());
+            if (!prop.isValid())
+            {
+                logError("Unable to find %2/%3 property. Aborting.", {realDevice, realprop});
+                return;
+            }
+
+            for (std::size_t i = 0; i < prop.size(); i++)
+            {
+                prop[i].value = e.value(prop[i].name).toDouble();
+                sendNewNumber(prop);
+            }
+            return;
+        }
+
+        /* texts */
+        if (getStore().value(event.prpkey)->getElt(eltkey)->getType() == "string")
+        {
+            INDI::PropertyText prop = dp.getText(realprop.toStdString().c_str());
+            if (!prop.isValid())
+            {
+                logError("Unable to find %2/%3 property. Aborting.", {realDevice, realprop});
+                return;
+            }
+
+            for (std::size_t i = 0; i < prop.size(); i++)
+            {
+                prop[i].setText(e.value(prop[i].name).toString().toStdString());
+                sendNewText(prop);
+            }
+            return;
+        }
     }
 }
 

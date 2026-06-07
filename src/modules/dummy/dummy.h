@@ -17,14 +17,19 @@ class MODULE_INIT Dummy : public IndiModule
     public:
         Dummy(QString name, QString label, QString profile, QVariantMap availableModuleLibs);
         ~Dummy();
+        void onNewDevice      (INDI::BaseDevice dp) override     {} ;
+        void onRemoveDevice   (INDI::BaseDevice dp) override     {} ;
+        void onNewProperty    (INDI::Property property) override {} ;
+        void onRemoveProperty (INDI::Property property) override {} ;
+        void onUpdateProperty (INDI::Property property) override {} ;
+
 
     public slots:
-        void OnMyExternalEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                               const QVariantMap &eventData) override;
         void OnSucessSEP();
         void OnSucessSolve();
-        void OnSolverLog(QString &text);
-        void OnModuleStatusAnswer(const QString module, OST::ModuleStatus status) override;
+        void OnSolveFinished();
+        void OnSolverLog(QString text);
+        void OnNewImage();
     private:
         void newBLOB(INDI::PropertyBlob pblob);
         void newDevice(INDI::BaseDevice bd) override;
@@ -41,6 +46,21 @@ class MODULE_INIT Dummy : public IndiModule
         OST::ElementString *dyntext;
         OST::ElementBool *dynbool;
         OST::ElementString *dyntext2;
+    signals:
+        void newImage();
+    protected:
+        /**
+         * @brief Custom module event handler (Hook 3/3)
+         *
+         * Override of Basemodule's hook for Dummy-specific events.
+         * Called automatically after onExternalEventBase() and onExternalEventIndi().
+         *
+         * NO need to call parent - orchestration is automatic!
+         */
+        void onExternalEvent(OST::ExtEvent event) override;
+
+    private slots:
+        void onTimer(void);
 
 
 };

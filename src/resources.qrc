@@ -7,5 +7,6 @@
         <file>ngc.txt</file>
         <file>sh2.txt</file>
         <file>stars.txt</file>
+		<file>loginpage.json</file>
     </qresource>
 </RCC>

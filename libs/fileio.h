@@ -7,8 +7,8 @@
 #include <QVariant>
 #include <basedevice.h>
 #include <baseclient.h>
-#include <libstellarsolver/parameters.h>
-#include <libstellarsolver/structuredefinitions.h>
+#include <parameters.h>
+#include <structuredefinitions.h>
 
 //CFitsio Includes
 #include "longnam.h"
@@ -47,7 +47,11 @@ class fileio : public QObject
         {
             return loadBlob(pblob, 32);
         }
-        bool loadBlob(INDI::PropertyBlob pblob, int histoSize);
+        bool loadBlob(INDI::PropertyBlob pblob, int histoSize)
+        {
+            return loadBlob(pblob, histoSize, 0);
+        }
+        bool loadBlob(INDI::PropertyBlob pblob, int histoSize, int i);
         bool parseHeader();
         bool saveAsFITS(QString fileName, FITSImage::Statistic &imageStats, uint8_t *m_ImageBuffer, FITSImage::Solution solution,
                         QList<Record> &records, bool hasSolution);
@@ -104,6 +108,7 @@ class fileio : public QObject
             return m_HistogramFrequency[channel];
         }
         OST::ImgData ImgStats();
+        void generateQImage();
 
     private:
         QString file;
@@ -121,7 +126,6 @@ class fileio : public QObject
 
         QImage rawImage;
         void CalcStats(int size);
-        void generateQImage();
 
         template <typename T>
         QPair<T, T> getParitionMinMax(uint32_t start, uint32_t stride);

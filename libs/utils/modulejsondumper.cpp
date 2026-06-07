@@ -1,0 +1,88 @@
+#include "modulejsondumper.h"
+namespace  OST
+{
+
+QJsonValue ModuleJsonDumper(EvType evt, QVariant data, ElementBase *elt, PropertyBase *prp, LovBase *lov, Basemodule *mod)
+{
+    QJsonObject result, properties, globlovs;
+
+    /* minimal message for property deletion */
+    if (evt == EvType::dp)
+    {
+        properties[data.toString()] = "";
+        result["p"] = properties;
+        return result;
+    }
+
+    /* global dumps & profiles events : profile data is required */
+    if (evt == EvType::aa || evt == EvType::am  || evt == EvType::fs   || evt == EvType::fl   || evt == EvType::fc )
+    {
+        QJsonObject profile;
+        profile["name"] = mod->getCurrentProfile();
+        profile["changed"] = mod->getCurrentProfileChanged();
+        result["f"] = profile;
+    }
+
+    if (evt == EvType::av || evt == EvType::pr)
+    {
+        for(const QString &key : mod->getStore().keys())        {
+            if (evt == EvType::av || mod->getStore()[key]->hasProfile())
+            {
+                OST::PropertyJsonDumper d(evt, data, elt, prp);
+                mod->getStore()[key]->accept(&d);
+                properties[key] = d.getResult();
+            }
+        }
+        result["p"] = properties;
+        return result;
+    }
+
+    if (prp)
+    {
+        OST::PropertyJsonDumper d(evt, data, elt, prp);
+        //qDebug() << "nnnnn" << prp->key();
+        mod->getStore()[prp->key()]->accept(&d);
+        properties[prp->key()] = d.getResult();
+        result["p"] = properties;
+    }
+    else
+    {
+        if (!lov && (evt == EvType::aa || evt == EvType::am))
+        {
+            for(const QString &key : mod->getStore().keys())            {
+                OST::PropertyJsonDumper d(evt, data, elt, prp);
+                mod->getStore()[key]->accept(&d);
+                properties[key] = d.getResult();
+            }
+            result["p"] = properties;
+        }
+    }
+
+    if (lov)
+    {
+        OST::LovJsonDumper d;
+        lov->accept(&d);
+        globlovs[lov->getKey()] = d.getResult();
+        result["l"] = globlovs;
+    }
+    else
+    {
+        if (!prp && (evt == EvType::aa || evt == EvType::am))
+        {
+            for(const QString &key : mod->getGlobLovs().keys())            {
+                OST::LovJsonDumper d;
+                mod->getGlobLovs()[key]->accept(&d);
+                globlovs[key] = d.getResult();
+            }
+            result["l"] = globlovs;
+        }
+    }
+    if (evt == EvType::aa)
+    {
+        result["infos"] = QJsonObject::fromVariantMap(mod->getAllMetadata());;
+    }
+    return result;
+}
+
+
+}

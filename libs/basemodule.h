@@ -14,9 +14,11 @@ class Basemodule : public DBManager
         Basemodule(QString name, QString label, QString profile, QVariantMap params);
         ~Basemodule();
         void setWebroot(QString webroot);
-        void setProfile(QVariantMap profiledata);
-        void setProfile(const QString &pProfileName);
-        void setProfiles();
+
+        bool saveProfile(const QString &pProfileName);
+        bool loadProfile(const QString &pProfileName);
+        void updateProfilesLov();
+
         void sendDump(void);
         void killMe(void);
         /*
@@ -26,28 +28,14 @@ class Basemodule : public DBManager
         QString getWebroot(void);
         QVariantMap getModuleInfo(void);
         QVariantMap getAvailableModuleLibs(void);
-        QString getModuleName();
+        QString getModuleName() const override;
         QString getModuleLabel();
-        QString getModuleDescription();
-        QString getModuleVersion();
         QString getClassName();
         QString getHelpContent(QString language);
-        /**
-         * @brief setClassName is a method to set inherited modules classname (ideally metaObject()->className())
-         * @param pClassName is the classname
-         * @warning This is uggly, i don't know to do that differently :
-         * It's purpose is to share same profiles types between multiple instances of same module
-         * i'd like to avoid to do it within inherited module
-         * @return A boolean that reports whether it was successful, true means success.
-         * False means ClassName has already been set, and sends a corresponding message
-         */
-        bool setClassName(const QString &pClassName);
+        QString getCurrentProfile();
+        bool getCurrentProfileChanged();
 
-
-    protected:
-
-        void setModuleDescription(QString description);
-        void setModuleVersion(QString version);
+        virtual void onAfterInit(void);
 
     private:
 
@@ -56,42 +44,115 @@ class Basemodule : public DBManager
         QString mWebroot;
         QString mModuleName;
         QString mModuleLabel;
-        QString mModuleDescription;
-        QString mModuleVersion;
-        QString mClassName = "";
-        OST::ElementString* mModuleDesc;
         OST::ModuleStatus mStatus;
-
-
-        void OnModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                           const QVariantMap &eventData) override;
+        QString mCurrentProfile = "default";
+        bool mCurrentProfileChanged = false;
 
     signals:
         void moduleStatusRequest(void);
         void moduleStatusAnswer(const QString module, OST::ModuleStatus);
-        void moduleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                         const QVariantMap &eventData);
+        //void moduleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
+        //                 const QVariantMap &eventData);
         void loadOtherModule(QString &lib, QString &name, QString &label, QString &profile);
-    public slots:
-        void OnExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
-                             const QVariantMap &pEventData);
-        virtual void OnMyExternalEvent(const QString &pEventType, const QString  &pEventModule, const QString  &pEventKey,
-                                       const QVariantMap &pEventData)
-        {
-            Q_UNUSED(pEventType) Q_UNUSED(pEventModule) Q_UNUSED(pEventKey) Q_UNUSED(pEventData)
-        }
-        virtual void OnDispatchToIndiExternalEvent(const QString &pEventType, const QString  &pEventModule,
-                const QString  &pEventKey,
-                const QVariantMap &pEventData)
-        {
-            Q_UNUSED(pEventType) Q_UNUSED(pEventModule) Q_UNUSED(pEventKey) Q_UNUSED(pEventData)
-        }
-        void OnModuleStatusRequest();
-        virtual void OnModuleStatusAnswer(const QString module, OST::ModuleStatus status)
-        {
-            Q_UNUSED(module) Q_UNUSED(status)
-        };
 
+        /**
+         * @brief Signal emitted when datastore changes
+         * @param event Event descriptor
+         * @param data Additional payload
+         * @param elt Pointer to element if required
+         * @param prop Pointer to property if required
+         * @param glov Pointer to globallov if required
+         * @param mod Pointer to this datastore/module
+         */
+        void moduleEvent(OST::EvType, QVariant, OST::ElementBase*, OST::PropertyBase*, OST::LovBase*, Basemodule*);
+
+        void interModuleRequest(OST::ExtEvent event);
+
+    public slots:
+        void onDatastoreEvent(OST::EvType evt, QVariant data, OST::ElementBase* elt, OST::PropertyBase* prp,
+                              OST::LovBase* lov,
+                              Datastore* mod);
+
+        /**
+         * @brief Root event orchestrator (FINAL - cannot be overridden)
+         *
+         * This method is called by signal/slot connections and orchestrates
+         * the handling of external events by calling the virtual hooks in order:
+         * Base → Indi → Custom
+         *
+         * Developers should NEVER call or override this method directly.
+         * This is an internal orchestration method.
+         */
+        virtual void onExternalEventRoot(OST::ExtEvent event) final;
+        virtual void onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QString elt, QVariant data, int line);
+
+    protected:
+        /**
+         * @brief Hook for base module event handling
+         *
+         * Called first in the event chain. Handles common events like:
+         * - Profile load/save (PL, PS)
+         * - Configuration load/save (CL, CS)
+         * - Other base module operations
+         *
+         * Override this in Basemodule descendants if you need to customize
+         * base-level event handling (rare).
+         */
+        virtual bool onExternalEventBase(OST::ExtEvent event);
+
+        /**
+         * @brief Hook for INDI module event handling
+         *
+         * Called second in the event chain. Empty by default.
+         * IndiModule overrides this to handle INDI-specific events.
+         *
+         * Custom modules inheriting from IndiModule do NOT need to override this.
+         */
+        virtual bool onExternalEventIndi(OST::ExtEvent event);
+
+        /**
+         * @brief Hook for custom module event handling (PRIMARY OVERRIDE POINT)
+         *
+         * Called last in the event chain. Empty by default.
+         * Custom modules (Dummy, Focus, Guider, etc.) should override this
+         * to handle module-specific events like:
+         * - Set value (SV, SA)
+         * - Grid operations (GC, GU, GD)
+         * - Custom module actions
+         *
+         * This is the PRIMARY method for module developers to implement.
+         *
+         * @note Module developers: override THIS method (onExternalEvent),
+         *       NOT onExternalEventRoot (which is final).
+         */
+        virtual void onExternalEvent(OST::ExtEvent event);
+
+        void otherModuleSetValue(QString mod, QString prop, QString elt, QVariant value);
+        void otherModuleRequestPropertyDump(QString mod, QString prop);
+        void otherModuleRequestProfileLoad(QString mod, QString profile);
+        void otherModuleCreateLine(QString mod, QString prop, QVariantMap values);
+        bool giveMeAState();
+        bool giveMeAParms();
+
+
+    public:
+        // Shared datastore access
+        void setGlobalDatastore(Basemodule* gds);
+
+        // Grid read utilities — callable on mGlobalDatastore from any module
+        int     findGridRow  (const QString &propName, const QString &keyCol, const QString &keyValue);
+        int     getGridSize  (const QString &propName);
+        QString getGridString(const QString &propName, const QString &colName, int line);
+        double  getGridFloat (const QString &propName, const QString &colName, int line);
+        long    getGridInt   (const QString &propName, const QString &colName, int line);
+        // Key-based overloads — look up by keyCol=keyValue, no intermediate row needed
+        QString getGridString(const QString &propName, const QString &colName, const QString &keyCol, const QString &keyValue);
+        double  getGridFloat (const QString &propName, const QString &colName, const QString &keyCol, const QString &keyValue);
+        long    getGridInt   (const QString &propName, const QString &colName, const QString &keyCol, const QString &keyValue);
+
+    protected:
+        Basemodule* mGlobalDatastore = nullptr;
+        void setStateEvent(OST::State state, QString statedescription, QString event, QString eventdescription);
 }
 ;
 #endif

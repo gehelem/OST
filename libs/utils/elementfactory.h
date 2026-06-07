@@ -9,8 +9,10 @@
 #include <elementlight.h>
 #include <elementimg.h>
 #include <elementvideo.h>
-#include <elementmessage.h>
 #include <elementprg.h>
+#include <elementdate.h>
+#include <elementtime.h>
+#include <elementdatetime.h>
 
 namespace  OST
 {
@@ -20,7 +22,7 @@ class ElementFactory
 
     public:
         ElementFactory() = delete;
-        static ElementBase* createElement(const QVariantMap &pData);
+        static ElementBase* createElement(const QString &key, const QVariantMap &pData);
 };
 
 class ValueFactory

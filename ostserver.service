@@ -1,18 +1,14 @@
 [Unit]
-Description=Ostserver  service
+Description=OST — Observatoire Sans Tête
+After=network.target
 
 [Service]
-WorkingDirectory=/home/ostusername
-Type=simple
-User=ostusername
-Group=ostusername
-TimeoutStartSec=0
+Environment=QT_QPA_PLATFORM=offscreen
+WorkingDirectory=/home/ostserver/.ost
+ExecStart=/usr/bin/ostserver --webroot=/var/lib/osterix/media --indiserver=Y --loglevel=0 --grant=0
 Restart=on-failure
-RestartSec=30s
-#ExecStartPre=
-ExecStart=/bin/bash /usr/bin/ostserver_service.sh
-SyslogIdentifier=Ostserver
-#ExecStop=
+RestartSec=5
+User=ostserver
 
 [Install]
 WantedBy=multi-user.target

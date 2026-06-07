@@ -1,23 +1,104 @@
 #include <QCoreApplication>
 #include <QtCore>
+#include <QFile>
+#include <QSslConfiguration>
+#include <QJsonDocument>
 #include "wshandler.h"
-
+#include "translatemanager.h"
+#include "model/element/common.h"
+#include <lovjsondumper.h>
+#include "libs/utils/modulejsondumper.h"
 /*!
 
  * ... ...
  */
-WShandler::WShandler(QObject *parent)
+WShandler::WShandler(QObject *parent, const QString &ssl, const QString &sslCert, const QString &sslKey,
+                     const QString &grant, const QString &lng): mServerGrant(grant), mLng(lng)
 {
+    // Register meta types for queued signal/slot connections
+    qRegisterMetaType<OST::LogLevel>("OST::LogLevel");
+    qRegisterMetaType<OST::EvType>("OST::EvType");
 
     //this->setParent(parent);
     Q_UNUSED(parent);
-    m_pWebSocketServer = new QWebSocketServer(QStringLiteral("OST server"), QWebSocketServer::NonSecureMode, this);
+
+    QWebSocketServer::SslMode sslMode = (ssl != "N") ? QWebSocketServer::SecureMode : QWebSocketServer::NonSecureMode;
+    m_pWebSocketServer = new QWebSocketServer(QStringLiteral("OST server"), sslMode, this);
+
+    // Configure SSL if enabled
+    if (sslMode == QWebSocketServer::SecureMode)
+    {
+        QSslConfiguration sslConfiguration;
+
+        // Load certificate
+        QFile certFile(sslCert);
+        if (!certFile.open(QIODevice::ReadOnly))
+        {
+            sendMessage("ERROR: Cannot open SSL certificate file: " + sslCert);
+        }
+        else
+        {
+            QSslCertificate certificate(&certFile, QSsl::Pem);
+            certFile.close();
+
+            if (certificate.isNull())
+            {
+                sendMessage("ERROR: Invalid SSL certificate in: " + sslCert);
+            }
+            else
+            {
+                sslConfiguration.setLocalCertificate(certificate);
+                sendMessage("SSL certificate loaded: " + sslCert);
+            }
+        }
+
+        // Load private key
+        QFile keyFile(sslKey);
+        if (!keyFile.open(QIODevice::ReadOnly))
+        {
+            sendMessage("ERROR: Cannot open SSL private key file: " + sslKey);
+        }
+        else
+        {
+            QSslKey privateKey(&keyFile, QSsl::Rsa, QSsl::Pem);
+            keyFile.close();
+
+            if (privateKey.isNull())
+            {
+                sendMessage("ERROR: Invalid SSL private key in: " + sslKey);
+            }
+            else
+            {
+                sslConfiguration.setPrivateKey(privateKey);
+                sendMessage("SSL private key loaded: " + sslKey);
+            }
+        }
+
+        // Set SSL protocol version
+        sslConfiguration.setPeerVerifyMode(QSslSocket::VerifyNone);
+        sslConfiguration.setProtocol(QSsl::TlsV1_2OrLater);
+
+        m_pWebSocketServer->setSslConfiguration(sslConfiguration);
+    }
+
     if (m_pWebSocketServer->listen(QHostAddress::Any, 9624))
     {
         connect(m_pWebSocketServer, &QWebSocketServer::newConnection, this, &WShandler::onNewConnection);
         connect(m_pWebSocketServer, &QWebSocketServer::closed, this, &WShandler::closed);
+
+        if (sslMode == QWebSocketServer::SecureMode)
+        {
+            sendMessage("OST WS server listening on port 9624 with SSL/TLS enabled");
+        }
+        else
+        {
+            sendMessage("OST WS server listening on port 9624 (non-secure mode)");
+        }
     }
-    sendMessage("OST WS server listening");
+    else
+    {
+        sendMessage("ERROR: Failed to start OST WS server on port 9624");
+    }
 }
 
 
@@ -26,15 +107,19 @@ WShandler::~WShandler()
     m_pWebSocketServer->close();
     qDeleteAll(m_clients.begin(), m_clients.end());
 }
-
 void WShandler::sendmessage(QString message)
 {
     for (int i = 0; i < m_clients.size(); i++)
     {
         QWebSocket *pClient = m_clients[i];
-        if (pClient) pClient->sendTextMessage(message);
+        sendmessage(message, pClient);
+        //qDebug() << message;
     }
+}
 
+void WShandler::sendmessage(QString message, QWebSocket *client)
+{
+    if (client) client->sendTextMessage(message);
 }
 void WShandler::sendbinary(QByteArray *data)
 {
@@ -52,72 +137,123 @@ void WShandler::onNewConnection()
     QWebSocket *pSocket = m_pWebSocketServer->nextPendingConnection();
     connect(pSocket, &QWebSocket::textMessageReceived, this, &WShandler::processTextMessage);
     connect(pSocket, &QWebSocket::disconnected, this, &WShandler::socketDisconnected);
+    //qDebug() << pSocket << "-" << pSocket->peerAddress().toString();
     m_clients << pSocket;
+    if (mServerGrant == "0") mClientGrants[pSocket->peerAddress().toString()] = "1"; // full access for anyone
+    if (mServerGrant == "1") mClientGrants[pSocket->peerAddress().toString()] =
+            "0"; // read only for anyone - need grants to write
+    if (mServerGrant == "2") mClientGrants[pSocket->peerAddress().toString()] = "-1"; // access grant required for anyone
+    mClientLanguage[pSocket] = mLng;
 }
 
 
 void WShandler::processTextMessage(QString message)
 {
+    //qDebug() << "WShandler::processTextMessage" << message;
+    QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
+    QString clientGrant = mClientGrants[pClient->peerAddress().toString()];
+    // OST::Event event;
+
     QString _mess = message.replace("\\\"", "\"");
     _mess = _mess.replace("}\"", "}");
     _mess = _mess.replace("\"{", "{");
     QJsonDocument jsonResponse = QJsonDocument::fromJson(_mess.toUtf8()); // garder
-    emit textRcv(message);
     QJsonObject  obj = jsonResponse.object(); // garder
     sendMessage("OST server received json" + message);
-    if (obj["evt"].toString() == "Freadall")
-    {
-        //sendAll();
-        //emit changeValue(Prop());
-        emit externalEvent("Freadall", "*", "*", QVariantMap());
 
-    }
-    if (obj["evt"].toString() == "Fsetproperty")
+    /* check message integrity */
+
+    //message must contain only one root key
+    if (obj.size() != 1)
     {
-        emit externalEvent("Fsetproperty", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
-    }
-    if (obj["evt"].toString() == "Flcreate")
-    {
-        emit externalEvent("Flcreate", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
-    }
-    if (obj["evt"].toString() == "Flupdate")
-    {
-        emit externalEvent("Flupdate", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
-    }
-    if (obj["evt"].toString() == "Fldelete")
-    {
-        emit externalEvent("Fldelete", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
-    }
-    if (obj["evt"].toString() == "Flselect")
-    {
-        emit externalEvent("Flselect", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
-    }
-    if (obj["evt"].toString() == "Flup")
-    {
-        emit externalEvent("Flup", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
-    }
-    if (obj["evt"].toString() == "Fldown")
-    {
-        emit externalEvent("Fldown", obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
-    }
-    if (obj["evt"].toString() == "Fclearmessages")
-    {
-        emit externalEvent("Fclearmessages", obj["mod"].toString(), QString(), QVariantMap());
-    }
-    if ((obj["evt"].toString() == "Fpreicon") || (obj["evt"].toString() == "Fposticon") )
-    {
-        emit externalEvent(obj["evt"].toString(), obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
-    }
-    if ((obj["evt"].toString() == "Fbadge"))
-    {
-        emit externalEvent(obj["evt"].toString(), obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
-    }
-    if ((obj["evt"].toString() == "Fproppreicon1") || (obj["evt"].toString() == "Fproppreicon2")
-            || (obj["evt"].toString() == "Fpropposticon1") || (obj["evt"].toString() == "Fpropposticon2"))
-    {
-        emit externalEvent(obj["evt"].toString(), obj["mod"].toString(), obj["key"].toString(), obj["dta"].toVariant().toMap());
+        logToClient(OST::LogLevel::Error, "Invalid message size : %1", {message}, "WS", pClient);
+        return;
     }
 
+    // message root key must be valid
+    OST::ExtEvType eventType = OST::StrToExtEvent(obj.begin().key());
+    if (eventType == OST::ExtEvType::ZZ)
+    {
+        logToClient(OST::LogLevel::Error, "Invalid message event: %1", {obj.begin().key()}, "WS", pClient);
+        return;
+    }
+
+    // message data must be valid, ie keys/values content
+    if (!obj[obj.begin().key()].isObject())
+    {
+        logToClient(OST::LogLevel::Error, "Invalid message data: %1", {message}, "WS", pClient);
+        return;
+    }
+
+    /* format message */
+    OST::ExtEvent event;
+    event.ev = eventType;
+    event.data = obj[obj.begin().key()].toObject();
+
+    if (eventType == OST::ExtEvType::XX)
+    {
+        /* just a ping request - we'll see later if we need sometimes to acknowledge */
+        emit clientEvent(event, pClient, mClientGrants[pClient->peerAddress().toString()]);
+        return;
+    }
+
+    /* Check if client is granted to send update requests */
+    if (mClientGrants[pClient->peerAddress().toString()] != "1" && event.ev != OST::ExtEvType::DU
+            && event.ev != OST::ExtEvType::LO && event.ev != OST::ExtEvType::IL )
+    {
+        logToClient(OST::LogLevel::Error, "Client not granted for updates", {}, "WS", pClient);
+        return;
+    }
+
+    /* client sends login request */
+    if (event.ev == OST::ExtEvType::LO)
+    {
+        if (!event.data.contains("user") || !event.data.contains("pw") )
+        {
+            logToClient(OST::LogLevel::Error, "Invalid login data", {}, "WS", pClient);
+            return;
+        }
+
+        logToClient(OST::LogLevel::Debug, "Login request: %1", {obj.begin().key()}, "WS", pClient);
+        mClientGrants[pClient->peerAddress().toString()] = dbmanager->getGrants(event.data["user"].toString(),
+                event.data["pw"].toString());
+
+        if (event.data.contains("language")) setClientLanguage(pClient, event.data["language"].toString());
+
+        emit clientEvent(event, pClient, mClientGrants[pClient->peerAddress().toString()]);
+        return;
+    }
+
+    /* client changes its language */
+    if (event.ev == OST::ExtEvType::IL)
+    {
+        if (!event.data.contains("language"))
+        {
+            logToClient(OST::LogLevel::Error, "Invalid language data", {}, "WS", pClient);
+            return;
+        }
+        logToClient(OST::LogLevel::Debug, "Client set language: %1", {event.data["language"].toString()}, "WS", pClient);
+        setClientLanguage(pClient, event.data["language"].toString());
+        emit clientEvent(event, pClient, mClientGrants[pClient->peerAddress().toString()]);
+        return;
+    }
+
+    if (event.ev == OST::ExtEvType::DU)
+    {
+        logToClient(OST::LogLevel::Debug, "Full dump request: %1", {obj.begin().key()}, "WS", pClient);
+        if (event.data.contains("language"))
+        {
+            logToClient(OST::LogLevel::Debug, "Client set language: %1", {event.data["language"].toString()}, "WS", pClient);
+            setClientLanguage(pClient, event.data["language"].toString());
+        }
+
+        emit clientEvent(event, pClient, mClientGrants[pClient->peerAddress().toString()]);
+        return;
+    }
+
+    if (mClientGrants[pClient->peerAddress().toString()] != "1") return;
+
+    emit externalEvent(event);
 
 }
 
@@ -130,6 +266,17 @@ void WShandler::sendJsonMessage(QJsonObject json)
     //QString strJson(jsondoc.toJson(QJsonDocument::Indented)); // version lisible
     QString strJson(jsondoc.toJson(QJsonDocument::Compact)); // version compactée
     sendmessage(strJson);
+    //sendMessage("WS handler sends : " + strJson);
+}
+void WShandler::sendJsonMessage(QJsonObject json, QWebSocket* pClient)
+{
+    QJsonObject obj = translateJson(json, mClientLanguage.value(pClient, "en"));
+
+    QJsonDocument jsondoc;
+    jsondoc.setObject(obj);
+    //QString strJson(jsondoc.toJson(QJsonDocument::Indented)); // version lisible
+    QString strJson(jsondoc.toJson(QJsonDocument::Compact)); // version compactée
+    sendmessage(strJson, pClient);
     //sendMessage("WS handler sends : " + strJson);
 }
 
@@ -148,180 +295,192 @@ void WShandler::socketDisconnected()
 {
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
     sendMessage("OST client disconnected");
+    //qDebug() << pClient << "-" << pClient->peerAddress().toString();
+
     if (pClient)
     {
         m_clients.removeAll(pClient);
+        mClientLanguage.remove(pClient);
         pClient->deleteLater();
+        mClientGrants.remove(pClient->peerAddress().toString());
+
     }
 }
-
-void WShandler::processModuleEvent(const QString &eventType, const QString  &eventModule, const QString  &eventKey,
-                                   const QVariantMap &eventData)
+void WShandler::onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase *elt, OST::PropertyBase *prp,
+                              OST::LovBase *lov, Basemodule *mod)
 {
-    QJsonObject  obj;
-    obj["evt"] = eventType;
-
-    if (eventType == "moduledump")
+    //qDebug() << "WShandler::onModuleEvent" << static_cast<int>(evt) << data << mod->getModuleLabel();
+    //    QJsonObject  obj;
+    //    QJsonObject mods;
+    //    QJsonObject  mod;
+    //    mod["p"] = module->getPropertiesDump(event);
+    //    //if (event.type == "moduledump")
+    //    //{
+    //    //    QJsonObject  infos;
+    //    //    infos["label"] = module->getModuleLabel();
+    //    //    mod["infos"] = QJsonObject::fromVariantMap(module->getAllMetadata());
+    //    //    mod["globallovs"] = module->getGlobalLovsDump();
+    //
+    //    //}
+    //    mods[event.module] = mod;
+    //    //obj["m"] = mods;
+    //
+    //    obj[event.type] = mods;
+    //    sendJsonMessage(obj);
+    QJsonValue m = OST::ModuleJsonDumper(evt, data, elt, prp, lov, mod);
+    QJsonObject o, s;
+    if (evt != OST::EvType::dm)
     {
-        QJsonObject mods;
-        QJsonObject  mod;
-        mods[eventModule] = QJsonObject::fromVariantMap(eventData);
-        obj["modules"] = mods;
-        sendJsonMessage(obj);
+        o[mod->getModuleName()] = m;
     }
-    if (eventType == "cp" || eventType == "ce" || eventType == "ap" || eventType == "ae")
+    else
     {
-        QJsonObject mods;
-        QJsonObject  mod;
-        QJsonObject  prop;
-        prop[eventKey] = QJsonObject::fromVariantMap(eventData);
-        mod["properties"] = prop;
-        mods[eventModule] = mod;
-        obj["modules"] = mods;
-        sendJsonMessage(obj);
+        o[data.toString()] = m;
     }
-    if (eventType == "lc")
-    {
-        QJsonObject mods;
-        QJsonObject  mod;
-        QJsonObject  lov;
-        lov[eventKey] = QJsonObject::fromVariantMap(eventData);
-        mod["globallovs"] = lov;
-        mods[eventModule] = mod;
-        obj["modules"] = mods;
-        sendJsonMessage(obj);
-    }
-    if (eventType == "delprop")
-    {
-        QJsonObject mods;
-        QJsonObject  mod;
-        QJsonObject  prop;
-        prop[eventKey] = QJsonObject();
-        mod["properties"] = prop;
-
-        mods[eventModule] = mod;
-        obj["modules"] = mods;
-        sendJsonMessage(obj);
-    }
-    if (eventType == "pushvalues")
-    {
-        QVariantMap values;
-        QVariantMap prop;
-        QJsonObject props;
-        QJsonObject mod;
-        QJsonObject mods;
-        props[eventKey] = QJsonObject::fromVariantMap(eventData);
-        mod["properties"] = props;
-        mods[eventModule] = mod;
-        obj["modules"] = mods;
-        sendJsonMessage(obj);
-    }
-    if (eventType == "resetvalues")
-    {
-        QVariantMap values;
-        QVariantMap prop;
-        QJsonObject props;
-        QJsonObject mod;
-        QJsonObject mods;
-        props[eventKey] = QJsonObject::fromVariantMap(prop);
-        mod["properties"] = props;
-        mods[eventModule] = mod;
-        obj["modules"] = mods;
-        sendJsonMessage(obj);
-    }
-    if (eventType == "sp" || eventType == "se")
-    {
-        QVariantMap prop = eventData;
-        QVariantMap values;
-        if (prop.contains("value"))
-        {
-            values["value"] = prop["value"];
-        }
-        if (prop.contains("status"))
-        {
-            values["status"] = prop["status"];
-        }
-        if (prop.contains("enabled"))
-        {
-            values["enabled"] = prop["enabled"];
-        }
-        if (prop.contains("elements"))
-        {
-            QVariantMap elements;
-            foreach(const QString &key, prop["elements"].toMap().keys())
-            {
-                QVariantMap element;
-                element["value"] = prop["elements"].toMap()[key].toMap()["value"];
-                if (prop["elements"].toMap()[key].toMap().contains("min"))
-                {
-                    element["min"] = prop["elements"].toMap()[key].toMap()["min"];
-                }
-                if (prop["elements"].toMap()[key].toMap().contains("max"))
-                {
-                    element["max"] = prop["elements"].toMap()[key].toMap()["max"];
-                }
-                if (prop["elements"].toMap()[key].toMap().contains("step"))
-                {
-                    element["step"] = prop["elements"].toMap()[key].toMap()["step"];
-                }
-                if (prop["elements"].toMap()[key].toMap().contains("dynlabel"))
-                {
-                    element["dynlabel"] = prop["elements"].toMap()[key].toMap()["dynlabel"];
-                }
-                if (prop["elements"].toMap()[key].toMap().contains("type"))
-                {
-                    if (prop["elements"].toMap()[key].toMap()["type"] == "img")
-                    {
-                        element = prop["elements"].toMap()[key].toMap();
-                    }
-                }
-                elements[key] = element;
-            }
-            values["elements"] = elements;
-        }
-        QJsonObject props;
-        props[eventKey] = QJsonObject::fromVariantMap(values);
-        QJsonObject mods;
-        QJsonObject  mod;
-        mod["properties"] = props;
-        mods[eventModule] = mod;
-        obj["modules"] = mods;
-        sendJsonMessage(obj);
-    }
-    if (eventType == "mm")
-    {
-        QJsonObject mod;
-        QJsonObject mods;
-        mod["message"] = QJsonObject::fromVariantMap(eventData);;
-        mods[eventModule] = mod;
-        obj["modules"] = mods;
-        sendJsonMessage(obj);
-    }
-    if (eventType == "me")
-    {
-        QJsonObject mod;
-        QJsonObject mods;
-        mod["error"] = QJsonObject::fromVariantMap(eventData);;
-        mods[eventModule] = mod;
-        obj["modules"] = mods;
-        sendJsonMessage(obj);
-    }
-    if (eventType == "mw")
-    {
-        QJsonObject mod;
-        QJsonObject mods;
-        mod["warning"] = QJsonObject::fromVariantMap(eventData);;
-        mods[eventModule] = mod;
-        obj["modules"] = mods;
-        sendJsonMessage(obj);
-    }
+    s[EvToString(evt)] = o;
+    sendJsonMessage(s);
 
 
 }
+
 void WShandler::sendMessage(const QString &pMessage)
 {
     QString messageWithDateTime = "[" + QDateTime::currentDateTime().toString(Qt::ISODateWithMs) + "]-" + pMessage;
     QDebug debug = qDebug();
     debug.noquote();
     debug << messageWithDateTime;
+}
+void WShandler::processFileEvent(const QString &eventType, const QStringList &eventData)
+{
+    QJsonObject  obj;
+    obj["evt"] = eventType;
+    obj["fileevent"] = QJsonArray::fromStringList(eventData);
+    sendJsonMessage(obj);
+}
+
+void WShandler::setTranslateManager(OST::TranslateManager* translator)
+{
+    mTranslater = translator;
+}
+
+void WShandler::setClientLanguage(QWebSocket* client, const QString &language)
+{
+    if (client && !language.isEmpty())
+    {
+        mClientLanguage[client] = language;
+        //qDebug() << "Client" << client->peerAddress().toString() << "language set to:" << language;
+    }
+}
+
+QString WShandler::logLevelToEventType(OST::LogLevel level)
+{
+    switch (level)
+    {
+        case OST::LogLevel::Debug:
+            return "md";
+        case OST::LogLevel::Info:
+            return "mi";
+        case OST::LogLevel::Warning:
+            return "mw";
+        case OST::LogLevel::Error:
+            return "me";
+        case OST::LogLevel::Critical:
+            return "mc";
+        default:
+            return "mc";
+    }
+}
+void WShandler::logToClient(OST::LogLevel level, const QString &message,
+                            const QVariantList &args, const QString &context, QWebSocket* client)
+{
+    if (!mTranslater)
+    {
+        qWarning() << "WShandler: TranslateManager not set, cannot translate messages";
+        return;
+    }
+
+    QDateTime dt = QDateTime::currentDateTime();
+    // Get client language (default: "en")
+    QString clientLang = mClientLanguage.value(client, "en");
+
+    // Translate message to client's language
+    QString translatedMessage = mTranslater->translateWithArgs(message, args, clientLang);
+
+    // Build JSON
+    QJsonObject log;
+    QJsonObject obj;
+
+    log["d"] = dt.toString(Qt::ISODateWithMs);
+    log["c"] = context;
+    log["t"] = translatedMessage;
+    log["l"] = static_cast<int>(level);
+    obj["l"] = log;
+    // Send to client
+    client->sendTextMessage(QJsonDocument(obj).toJson(QJsonDocument::Compact));
+}
+
+void WShandler::onLog(OST::LogLevel level, const QString &message,
+                      const QVariantList &args, const QString &context)
+{
+    for (QWebSocket* client : m_clients)
+    {
+        logToClient(level, message, args, context, client);
+    }
+}
+QJsonObject WShandler::translateJson(const QJsonObject pJsonObject, const QString &pLng)
+{
+    QJsonObject obj = pJsonObject;
+    for(const QString &key : obj.keys())    {
+        QJsonValue value = obj[key];
+        if ((key == "label" || key == "hint") && obj[key].isString())
+        {
+            obj[key] = mTranslater->translateWithArgs(obj[key].toString(), {}, pLng);
+        }
+        if (value.isObject())
+        {
+            obj[key] = translateJson(value.toObject(), pLng);
+        }
+    }
+    return obj;
+}
+void WShandler::onControllerEvent(OST::EvType evt, QString key, QVariant data, OST::LovBase *lov)
+{
+    QJsonObject globlovs, result, o, s;
+    if (evt == OST::EvType::uc)
+    {
+        if (strcmp(data.typeName(), "QStringList") == 0)
+        {
+
+            o[key] = data.toJsonArray();
+        }
+        else if (strcmp(data.typeName(), "QVariantMap") == 0)
+        {
+
+            o[key] = data.toJsonObject();
+        }
+        else
+        {
+            o[key] = data.toJsonValue();
+        }
+        s[EvToString(evt)] = o;
+    }
+    if (evt == OST::EvType::lc || evt == OST::EvType::lu)
+    {
+        OST::LovJsonDumper d;
+        lov->accept(&d);
+        globlovs[lov->getKey()] = d.getResult();
+        o["lovs"] = globlovs;
+        s[OST::EvToString(evt)] = o;
+    }
+    if (evt == OST::EvType::ld)
+    {
+        OST::LovJsonDumper d;
+        lov->accept(&d);
+        globlovs[key] = QJsonObject();
+        o["lovs"] = globlovs;
+        s[OST::EvToString(evt)] = o;
+    }
+
+
+    sendJsonMessage(s);
 }

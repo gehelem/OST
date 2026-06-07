@@ -1,0 +1,153 @@
+{
+"p":{
+    "values": {
+        "devcat": "Control",
+        "order":"Control100",
+        "group": "",
+        "permission": 0,
+        "label": "Values",
+        "e": {
+            "ra0": {
+                "type":"float",
+                "label": "RA 0",
+                "order":"00",
+                "format": "99.99"
+            },
+            "de0": {
+                "type":"float",
+                "label": "DE 0",
+                "order":"01",
+                "format": "99.99"
+            },
+            "t0": {
+                "type":"float",
+                "label": "Time 0",
+                "order":"03",
+                "format": "99.99"
+            },
+            "ra1": {
+                "type":"float",
+                "label": "RA 1",
+                "order":"11",
+                "format": "99.99"
+            },
+            "de1": {
+                "type":"float",
+                "label": "DE 1",
+                "order":"12",
+                "format": "99.99"
+            },
+            "t1": {
+                "type":"float",
+                "label": "Time 1",
+                "order":"13",
+                "format": "99.99"
+            },
+            "ra2": {
+                "type":"float",
+                "label": "RA 2",
+                "order":"21",
+                "format": "99.99"
+            },
+            "de2": {
+                "type":"float",
+                "label": "DE 2",
+                "order":"22",
+                "format": "99.99"
+            },
+            "t2": {
+                "type":"float",
+                "label": "Time 2",
+                "order":"23",
+                "format": "99.99"
+            }
+        }
+    },
+    "errors": {
+        "devcat": "Control",
+        "order":"Control050",
+        "group": "",
+        "permission": 0,
+        "label": "Polar error",
+        "e": {
+            "erraz": {
+                "type":"float",
+                "label": "Azimuth error °",
+                "order":"1",
+                "value":0,
+                "format": "99.99"
+            },
+            "erralt": {
+                "type":"float",
+                "label": "Altitude error °",
+                "order":"2",
+                "value":0,
+                "format": "99.99"
+            },
+            "errtot": {
+                "type":"float",
+                "label": "Total error °",
+                "order":"3",
+                "value":0,
+                "format": "99.99"
+            },
+            "errazmn": {
+                "type":"float",
+                "label": "Azimuth error (arcmin)",
+                "order":"4",
+                "value":0,
+                "format": "99.99"
+            },
+            "erraltmn": {
+                "type":"float",
+                "label": "Altitude error (arcmin)",
+                "order":"5",
+                "value":0,
+                "format": "99.99"
+            },
+            "errtotmn": {
+                "type":"float",
+                "label": "Total error (arcmin)",
+                "order":"6",
+                "value":0,
+                "format": "99.99"
+            }
+        }
+    },
+    "states": {
+        "devcat": "Control",
+        "group": "",
+        "order":"Control055",
+        "permission": 0,
+        "hasprofile":false,
+        "label": "States",
+        "e": {
+            "idle": {
+                "type":"light",
+                "order":"1",
+                "label": "Idle"
+            },
+            "moving": {
+                "type":"light",
+                "order":"2",
+                "label": "Moving"
+            },
+            "shooting": {
+                "type":"light",
+                "order":"3",
+                "label": "Shooting"
+            },
+            "solving": {
+                "type":"light",
+                "order":"4",
+                "label": "Solving"
+            },
+            "compute": {
+                "type":"light",
+                "order":"5",
+                "label": "Compute"
+            }
+        }
+    }
+}
+}

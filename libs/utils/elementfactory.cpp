@@ -2,14 +2,15 @@
 namespace  OST
 {
 
-ElementBase *ElementFactory::createElement(const QVariantMap &pData)
+ElementBase *ElementFactory::createElement(const QString &key, const QVariantMap &pData)
 {
     //qDebug() << "ElementFactory::createElement " << "-" << pData;
     if (pData.contains("type"))
     {
         if (pData["type"].toString() == "bool")
         {
-            auto *pElement = new ElementBool(pData["label"].toString(),
+            auto *pElement = new ElementBool(key,
+                                             pData["label"].toString(),
                                              pData["order"].toString(),
                                              pData["hint"].toString()
                                             );
@@ -21,7 +22,8 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
         }
         if (pData["type"].toString() == "light")
         {
-            auto *pElement = new ElementLight(pData["label"].toString(),
+            auto *pElement = new ElementLight(key,
+                                              pData["label"].toString(),
                                               pData["order"].toString(),
                                               pData["hint"].toString()
                                              );
@@ -33,7 +35,8 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
         }
         if (pData["type"].toString() == "string")
         {
-            auto *pElement = new ElementString(pData["label"].toString(),
+            auto *pElement = new ElementString(key,
+                                               pData["label"].toString(),
                                                pData["order"].toString(),
                                                pData["hint"].toString()
                                               );
@@ -44,9 +47,8 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
             if (pData.contains("posticon")) pElement->setPostIcon(pData["posticon"].toString());
             if (pData.contains("listOfValues"))
             {
-                if (pData["listOfValues"].canConvert<QVariantList>())
+                if (pData["listOfValues"].typeId() == QMetaType::QVariantList)
                 {
-                    QVariantMap elts = pData["listOfValues"].toMap();
                     QList ll  = pData["listOfValues"].toList();
                     foreach (auto line, ll)
                     {
@@ -55,32 +57,35 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
                 }
                 else
                 {
-                    pElement->setGlobalLov(pData["listOfValues"].toString());
+                    LovScope scope = LovScope::Module;
+                    if (pData.contains("listOfValuesIsExternal") && pData["listOfValuesIsExternal"].toBool())
+                        scope = LovScope::Controller;
+                    pElement->setGlobalLov(pData["listOfValues"].toString(), scope);
                 }
             }
             return pElement;
         }
         if (pData["type"].toString() == "int")
         {
-            auto *pElement = new ElementInt(pData["label"].toString(),
+            auto *pElement = new ElementInt(key,
+                                            pData["label"].toString(),
                                             pData["order"].toString(),
                                             pData["hint"].toString()
                                            );
             if (pData.contains("value")) pElement->setValue(pData["value"].toLongLong(), false);
-            if (pData.contains("min")) pElement->setMin(pData["min"].toLongLong());
-            if (pData.contains("max")) pElement->setMax(pData["max"].toLongLong());
-            if (pData.contains("step")) pElement->setStep(pData["step"].toLongLong());
-            if (pData.contains("format")) pElement->setFormat(pData["format"].toString());
+            if (pData.contains("min")) pElement->setMin(pData["min"].toLongLong(), false);
+            if (pData.contains("max")) pElement->setMax(pData["max"].toLongLong(), false);
+            if (pData.contains("step")) pElement->setStep(pData["step"].toLongLong(), false);
+            if (pData.contains("format")) pElement->setFormat(pData["format"].toString(), false);
             if (pData.contains("autoupdate")) pElement->setAutoUpdate(pData["autoupdate"].toBool());
             if (pData.contains("directedit")) pElement->setDirectEdit(pData["directedit"].toBool());
             if (pData.contains("preicon")) pElement->setPreIcon(pData["preicon"].toString());
             if (pData.contains("posticon")) pElement->setPostIcon(pData["posticon"].toString());
-            if (pData.contains("slider")) pElement->setSlider(IntToSlider(pData["slider"].toInt()));
+            if (pData.contains("slider")) pElement->setSlider(IntToSlider(pData["slider"].toInt()), false);
             if (pData.contains("listOfValues"))
             {
-                if (pData["listOfValues"].canConvert<QVariantList>())
+                if (pData["listOfValues"].typeId() == QMetaType::QVariantList)
                 {
-                    QVariantMap elts = pData["listOfValues"].toMap();
                     QList ll  = pData["listOfValues"].toList();
                     foreach (auto line, ll)
                     {
@@ -90,32 +95,35 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
                 }
                 else
                 {
-                    pElement->setGlobalLov(pData["listOfValues"].toString());
+                    LovScope scope = LovScope::Module;
+                    if (pData.contains("listOfValuesIsExternal") && pData["listOfValuesIsExternal"].toBool())
+                        scope = LovScope::Controller;
+                    pElement->setGlobalLov(pData["listOfValues"].toString(), scope);
                 }
             }
             return pElement;
         }
         if (pData["type"].toString() == "float")
         {
-            auto *pElement = new ElementFloat(pData["label"].toString(),
+            auto *pElement = new ElementFloat(key,
+                                              pData["label"].toString(),
                                               pData["order"].toString(),
                                               pData["hint"].toString()
                                              );
             if (pData.contains("value")) pElement->setValue(pData["value"].toDouble(), false);
-            if (pData.contains("min")) pElement->setMin(pData["min"].toDouble());
-            if (pData.contains("max")) pElement->setMax(pData["max"].toDouble());
-            if (pData.contains("step")) pElement->setStep(pData["step"].toDouble());
-            if (pData.contains("format")) pElement->setFormat(pData["format"].toString());
+            if (pData.contains("min")) pElement->setMin(pData["min"].toDouble(), false);
+            if (pData.contains("max")) pElement->setMax(pData["max"].toDouble(), false);
+            if (pData.contains("step")) pElement->setStep(pData["step"].toDouble(), false);
+            if (pData.contains("format")) pElement->setFormat(pData["format"].toString(), false);
             if (pData.contains("autoupdate")) pElement->setAutoUpdate(pData["autoupdate"].toBool());
             if (pData.contains("directedit")) pElement->setDirectEdit(pData["directedit"].toBool());
             if (pData.contains("preicon")) pElement->setPreIcon(pData["preicon"].toString());
             if (pData.contains("posticon")) pElement->setPostIcon(pData["posticon"].toString());
-            if (pData.contains("slider")) pElement->setSlider(IntToSlider(pData["slider"].toInt()));
+            if (pData.contains("slider")) pElement->setSlider(IntToSlider(pData["slider"].toInt()), false);
             if (pData.contains("listOfValues"))
             {
-                if (pData["listOfValues"].canConvert<QVariantList>())
+                if (pData["listOfValues"].typeId() == QMetaType::QVariantList)
                 {
-                    QVariantMap elts = pData["listOfValues"].toMap();
                     QList ll  = pData["listOfValues"].toList();
                     foreach (auto line, ll)
                     {
@@ -124,19 +132,22 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
                 }
                 else
                 {
-                    pElement->setGlobalLov(pData["listOfValues"].toString());
+                    LovScope scope = LovScope::Module;
+                    if (pData.contains("listOfValuesIsExternal") && pData["listOfValuesIsExternal"].toBool())
+                        scope = LovScope::Controller;
+                    pElement->setGlobalLov(pData["listOfValues"].toString(), scope);
                 }
             }
             return pElement;
         }
         if (pData["type"].toString() == "img")
         {
-            auto *pElement = new ElementImg(pData["label"].toString(),
+            auto *pElement = new ElementImg(key,
+                                            pData["label"].toString(),
                                             pData["order"].toString(),
                                             pData["hint"].toString()
                                            );
             ImgData dta;
-
 
             if (pData.contains("urljpeg")) dta.mUrlJpeg = pData["urljpeg"].toString();
             if (pData.contains("urlfits")) dta.mUrlFits = pData["urlfits"].toString();
@@ -153,15 +164,18 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
             if (pData.contains("issolved")) dta.isSolved = pData["issolved"].toBool();
             if (pData.contains("solverra")) dta.solverRA = pData["solverra"].toDouble();
             if (pData.contains("solverde")) dta.solverDE = pData["solverde"].toDouble();
+            if (pData.contains("solverorientation")) dta.solverOrientation = pData["solverorientation"].toDouble();
 
             pElement->setValue(dta, false);
+            if (pData.contains("showstats")) pElement->setShowStats( pData["showstats"].toBool());
 
             return pElement;
         }
 
         if (pData["type"].toString() == "video")
         {
-            auto *pElement = new ElementVideo(pData["label"].toString(),
+            auto *pElement = new ElementVideo(key,
+                                              pData["label"].toString(),
                                               pData["order"].toString(),
                                               pData["hint"].toString()
                                              );
@@ -169,23 +183,11 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
             return pElement;
         }
 
-        if (pData["type"].toString() == "message")
-        {
-            auto *pElement = new ElementMessage(pData["label"].toString(),
-                                                pData["order"].toString(),
-                                                pData["hint"].toString()
-                                               );
-            MsgData m;
-            m.message = pData["message"].toString();
-            m.level = IntToMsgLevel(pData["level"].toInt());
-            m.ts = QDateTime::fromString(pData["ts"].toString(), "yyyy/MM/dd hh:mm:ss.zzz");
-            pElement->setValue(m, false);
-            return pElement;
-        }
         if (pData["type"].toString() == "prg")
         {
 
-            auto *pElement = new ElementPrg(pData["label"].toString(),
+            auto *pElement = new ElementPrg(key,
+                                            pData["label"].toString(),
                                             pData["order"].toString(),
                                             pData["hint"].toString()
                                            );
@@ -200,6 +202,65 @@ ElementBase *ElementFactory::createElement(const QVariantMap &pData)
             }
             if (pData.contains("value")) pElement->setPrgValue(pData["value"].toDouble(), false);
             if (pData.contains("dynlabel")) pElement->setDynLabel(pData["dynlabel"].toString(), false);
+            return pElement;
+        }
+        if (pData["type"].toString() == "date")
+        {
+            auto *pElement = new ElementDate(key,
+                                             pData["label"].toString(),
+                                             pData["order"].toString(),
+                                             pData["hint"].toString()
+                                            );
+            QDate d;
+            d.setDate(pData["year"].toInt(), pData["month"].toInt(), pData["day"].toInt());
+            if (pData.contains("autoupdate")) pElement->setAutoUpdate(pData["autoupdate"].toBool());
+            if (pData.contains("directedit")) pElement->setDirectEdit(pData["directedit"].toBool());
+            if (pData.contains("badge")) pElement->setBadge(pData["badge"].toBool());
+            pElement->setValue(d, false);
+            return pElement;
+        }
+        if (pData["type"].toString() == "time")
+        {
+            auto *pElement = new ElementTime(key,
+                                             pData["label"].toString(),
+                                             pData["order"].toString(),
+                                             pData["hint"].toString()
+                                            );
+            QTime t;
+            if (pData.contains("autoupdate")) pElement->setAutoUpdate(pData["autoupdate"].toBool());
+            if (pData.contains("directedit")) pElement->setDirectEdit(pData["directedit"].toBool());
+            if (pData.contains("badge")) pElement->setBadge(pData["badge"].toBool());
+            if (pData.contains("usems")) pElement->setUseMs(pData["usems"].toBool());
+            if (pElement->getUseMs())
+            {
+                t.setHMS(pData["hh"].toInt(), pData["mm"].toInt(), pData["ss"].toInt(), pData["ms"].toInt());
+            }
+            else
+            {
+                t.setHMS(pData["hh"].toInt(), pData["mm"].toInt(), pData["ss"].toInt(), 0);
+            }
+            pElement->setValue(t, false);
+            return pElement;
+        }
+        if (pData["type"].toString() == "datetime")
+        {
+            auto *pElement = new ElementDateTime(key,
+                                                 pData["label"].toString(),
+                                                 pData["order"].toString(),
+                                                 pData["hint"].toString()
+                                                );
+            QDate d;
+            QTime t;
+            QDateTime dt;
+            d.setDate(pData["year"].toInt(), pData["month"].toInt(), pData["day"].toInt());
+            if (pData.contains("autoupdate")) pElement->setAutoUpdate(pData["autoupdate"].toBool());
+            if (pData.contains("directedit")) pElement->setDirectEdit(pData["directedit"].toBool());
+            if (pData.contains("badge")) pElement->setBadge(pData["badge"].toBool());
+            d.setDate(pData["year"].toInt(), pData["month"].toInt(), pData["day"].toInt());
+            t.setHMS(pData["hh"].toInt(), pData["mm"].toInt(), pData["ss"].toInt(), pData["ms"].toInt());
+            dt.setDate(d);
+            dt.setTime(t);
+            pElement->setValue(dt, false);
             return pElement;
         }
 
@@ -246,12 +307,6 @@ ValueBase *ValueFactory::createValue(ElementBase * &pElement)
         pValue->updateValue();
         return pValue;
     }
-    if (pElement->getType() == "message")
-    {
-        auto *pValue = new ValueMessage(pElement);
-        pValue->updateValue();
-        return pValue;
-    }
     if (pElement->getType() == "video")
     {
         auto *pValue = new ValueVideo(pElement);
@@ -267,6 +322,24 @@ ValueBase *ValueFactory::createValue(ElementBase * &pElement)
     if (pElement->getType() == "light")
     {
         auto *pValue = new ValueLight(pElement);
+        pValue->updateValue();
+        return pValue;
+    }
+    if (pElement->getType() == "date")
+    {
+        auto *pValue = new ValueDate(pElement);
+        pValue->updateValue();
+        return pValue;
+    }
+    if (pElement->getType() == "time")
+    {
+        auto *pValue = new ValueTime(pElement);
+        pValue->updateValue();
+        return pValue;
+    }
+    if (pElement->getType() == "datetime")
+    {
+        auto *pValue = new ValueDateTime(pElement);
         pValue->updateValue();
         return pValue;
     }

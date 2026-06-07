@@ -1,0 +1,16 @@
+server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+        root /var/www/ostserver;
+        index index.html;
+        server_name _;
+        location / {
+                try_files $uri $uri/ =404;
+        }
+    location /ostmedia/ {
+        root /home/ostusername;
+            #try_files $uri $uri/ =404;
+                        autoindex on;
+    }
+}
+ 

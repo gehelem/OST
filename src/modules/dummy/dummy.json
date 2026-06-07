@@ -27,7 +27,7 @@
         ]
     }
 },
-"properties":{
+"p":{
     "modulesstatus": {
         "devcat": "Status",
         "group": "",
@@ -36,13 +36,15 @@
         "showGrid":true,
         "showElts":false,
         "posticon1":"autorenew",
-        "elements": {
+        "e": {
             "module": {
                 "type":"string",
+                "order": "99",
                 "label": "Module"
             },
             "status": {
                 "type":"light",
+                "order": "99",
                 "label": "Status"
             }
         },
@@ -53,21 +55,25 @@
     "extextRO": {
         "devcat": "Examples",
         "badge": true,
-        "elements": {
+        "e": {
             "extext1": {
                 "type":"string",
+                "order": "99",
                 "label": "Text 1"
             },
             "extext2": {
                 "type":"string",
+                "order": "99",
                 "label": "Text 2"
             },
             "extext3": {
                 "type":"string",
+                "order": "99",
                 "label": "Text 3"
             },
             "extext4": {
                 "type":"string",
+                "order": "99",
                 "label": "Text 4"
             }
         },
@@ -79,18 +85,20 @@
     "extextRW": {
         "hasprofile":true,
         "devcat": "Examples",
-        "elements": {
+        "e": {
             "extext1": {
                 "autoupdate":true,
                 "type":"string",
                 "label": "Text 1",
                 "value":"aaaa",
+                "order": "99",
                 "directedit":true
             },
             "extext2": {
                 "autoupdate":true,
                 "type":"string",
                 "label": "Text 2",
+                "order": "99",
                 "value":"bbbb"
             },
             "extext3": {
@@ -99,6 +107,7 @@
                 "label": "Text 3",
                 "value":"cccc",
                 "listOfValues":"DRIVER_INTERFACE-CCD_INTERFACE",
+                "order": "99",
                 "directedit":true
             },
             "extext4": {
@@ -106,6 +115,7 @@
                 "type":"string",
                 "label": "Text 4",
                 "value":"i1",
+                "order": "99",
                 "listOfValues":[
                     ["i1","Value 1"],
                     ["i2","Value 2"]
@@ -120,12 +130,14 @@
     },
     "numbersRW": {
         "hasprofile":true,
+        "hasGrid":true,
         "devcat": "Examples",
-        "elements": {
+        "e": {
             "n1": {
                 "autoupdate":true,
                 "type":"int",
                 "label": "Number 1",
+                "order": "99",
                 "min": 0,
                 "max": 100,
                 "slider":1,
@@ -136,6 +148,7 @@
                 "autoupdate":true,
                 "type":"int",
                 "label": "Number 2",
+                "order": "99",
                 "min": -100,
                 "max": 100,
                 "step": 10
@@ -144,6 +157,7 @@
                 "autoupdate":true,
                 "type":"float",
                 "label": "Number 3",
+                "order": "99",
                 "listOfValues":[
                     [0.0,"Zéro virgule zéro"],
                     [0.1,"Zéro virgule un"],
@@ -154,6 +168,7 @@
                 "autoupdate":true,
                 "type":"int",
                 "label": "Number 4",
+                "order": "99",
                 "listOfValues":[
                     [0,"Zéro"],
                     [1,"Un"],
@@ -165,101 +180,119 @@
                 "autoupdate":true,
                 "type":"float",
                 "label": "Number 5",
+                "order": "99",
                 "listOfValues":"dummylov3"
             }
         },
         "group": "Numbers",
         "permission": 2,
+        "order": "99",
         "label": "Numbers example - read/write"
     },
     "boolsRW0": {
         "hasprofile":true,
         "devcat": "Examples",
         "rule":0,
-        "elements": {
+        "e": {
             "b1": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 1"
             },
             "b2": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 2"
             },
             "b3": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 3"
             },
             "b4": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 4"
             }
         },
         "group": "Booleans",
         "permission": 2,
-        "label": "One of many"
+        "label": "One of many",
+        "order": "99"
     },
     "boolsRW1": {
         "hasprofile":true,
         "devcat": "Examples",
         "rule":1,
-        "elements": {
+        "e": {
             "b1": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 1"
             },
             "b2": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 2"
             },
             "b3": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 3"
             },
             "b4": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 4"
             }
         },
         "group": "Booleans",
         "permission": 2,
+        "order": "99",
         "label": "At most one"
     },
     "boolsRW2": {
         "hasprofile":true,
         "devcat": "Examples",
         "rule":2,
-        "elements": {
+        "order": "99",
+        "e": {
             "b1": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 1"
             },
             "b2": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 2"
             },
             "b3": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 3"
             },
             "b4": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 4"
             }
         },
         "group": "Booleans",
         "permission": 2,
+        "order": "99",
         "label": "Any"
     }
     ,
@@ -267,26 +300,30 @@
         "hasprofile":true,
         "devcat": "Examples",
         "rule":0,
-        "elements": {
+        "e": {
             "b1": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 1/3"
             },
             "b2": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 2/3"
             },
             "b3": {
                 "autoupdate":true,
                 "type":"bool",
+                "order": "99",
                 "label": "Bool 3/3"
             },
             "n1": {
                 "autoupdate":true,
                 "type":"int",
                 "label": "Number 1/2",
+                "order": "99",
                 "min": 0,
                 "max": 100,
                 "step": 1
@@ -295,6 +332,7 @@
                 "autoupdate":true,
                 "type":"int",
                 "label": "Number 2/2",
+                "order": "99",
                 "min": -100,
                 "max": 100,
                 "step": 10
@@ -302,41 +340,325 @@
             "t1": {
                 "autoupdate":true,
                 "type":"string",
+                "order": "99",
                 "label": "Text mixed"
+            },
+            "date": {
+                "autoupdate":true,
+                "directedit":true,
+                "type":"datetime",
+                "order": "99",
+                "label": "Test Date",
+                "year":2024,
+                "month":11,
+                "day":8,
+                "hh":12,
+                "mm":11,
+                "ss":8
+            },
+            "time": {
+                "autoupdate":true,
+                "directedit":true,
+                "type":"time",
+                "order": "99",
+                "label": "Test Time",
+                "hh":13,
+                "mm":14,
+                "ss":15.15
             }
+
         },
         "group": "Mixed",
         "permission": 2,
+        "order": "99",
         "label": "Mixed types - read/write"
+    },
+    "datesreadonly": {
+        "hasprofile":true,
+        "devcat": "Dates",
+        "group": "",
+        "rule":0,
+        "permission": 0,
+        "order": "10",
+        "label": "Dates readonly",
+        "e": {
+            "date1": {
+                "type":"date",
+                "order": "20",
+                "label": "From",
+                "year":2024,
+                "month":11,
+                "day":8
+            },
+            "date2": {
+                "type":"date",
+                "order": "30",
+                "label": "To",
+                "year":2024,
+                "month":11,
+                "day":10
+            }
+        }
+    },
+    "datesRW": {
+        "hasprofile":true,
+        "devcat": "Dates",
+        "group": "",
+        "rule":0,
+        "permission": 2,
+        "order": "20",
+        "label": "Dates RW",
+        "e": {
+            "date1": {
+                "type":"date",
+                "directedit":false,
+                "autoupdate":true,
+                "order": "20",
+                "label": "From",
+                "year":2024,
+                "month":11,
+                "day":8
+            },
+            "date2": {
+                "type":"date",
+                "directedit":false,
+                "autoupdate":true,
+                "order": "30",
+                "label": "To",
+                "year":2024,
+                "month":11,
+                "day":10
+            }
+        }
+    },
+    "datesRWDE": {
+        "hasprofile":true,
+        "devcat": "Dates",
+        "group": "",
+        "rule":0,
+        "permission": 2,
+        "order": "30",
+        "label": "Dates direct edit",
+        "e": {
+            "date1": {
+                "type":"date",
+                "directedit":true,
+                "autoupdate":true,
+                "order": "20",
+                "label": "From",
+                "year":2024,
+                "month":11,
+                "day":8
+            },
+            "date2": {
+                "type":"date",
+                "directedit":true,
+                "autoupdate":true,
+                "order": "30",
+                "label": "To",
+                "year":2024,
+                "month":11,
+                "day":10
+            }
+        }
+    },
+    "datesRWgrid": {
+        "hasprofile":true,
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
+        "devcat": "Dates",
+        "group": "",
+        "rule":0,
+        "permission": 2,
+        "order": "40",
+        "label": "Dates RW - grid",
+        "e": {
+            "date1": {
+                "type":"date",
+                "directedit":false,
+                "autoupdate":true,
+                "order": "20",
+                "label": "From",
+                "year":2024,
+                "month":11,
+                "day":8
+            },
+            "date2": {
+                "type":"date",
+                "directedit":false,
+                "autoupdate":true,
+                "order": "30",
+                "label": "To",
+                "year":2024,
+                "month":11,
+                "day":10
+            }
+        }
+    },
+    "timessreadonly": {
+        "hasprofile":true,
+        "devcat": "Times",
+        "group": "",
+        "rule":0,
+        "permission": 0,
+        "order": "10",
+        "label": "Times readonly",
+        "e": {
+            "time1": {
+                "type":"time",
+                "order": "20",
+                "label": "From",
+                "hh":13,
+                "mm":25,
+                "ss":59
+            },
+            "time2": {
+                "type":"time",
+                "order": "30",
+                "label": "To",
+                "hh":13,
+                "mm":25,
+                "ss":59,
+                "ms":55
+            }
+        }
+    },
+
+    "timesRW": {
+        "hasprofile":true,
+        "devcat": "Times",
+        "group": "",
+        "rule":0,
+        "permission": 2,
+        "order": "20",
+        "label": "Times RW",
+        "e": {
+            "time1": {
+                "type":"time",
+                "directedit":false,
+                "autoupdate":true,
+                "order": "20",
+                "label": "From",
+                "hh":13,
+                "mm":25,
+                "ss":59
+            },
+            "time2": {
+                "type":"time",
+                "directedit":true,
+                "autoupdate":true,
+                "order": "30",
+                "label": "To",
+                "usems":true,
+                "hh":13,
+                "mm":25,
+                "ss":59,
+                "ms":55
+            }
+        }
+    },
+    "timesRWDE": {
+        "hasprofile":true,
+        "devcat": "Times",
+        "group": "",
+        "rule":0,
+        "permission": 2,
+        "order": "30",
+        "label": "Times direct edit",
+        "e": {
+            "time1": {
+                "type":"time",
+                "directedit":true,
+                "autoupdate":true,
+                "order": "20",
+                "label": "From",
+                "hh":13,
+                "mm":25,
+                "ss":59
+            },
+            "time2": {
+                "type":"time",
+                "directedit":true,
+                "autoupdate":true,
+                "order": "30",
+                "label": "To",
+                "usems":false,
+                "hh":13,
+                "mm":25,
+                "ss":59,
+                "ms":55
+            }
+        }
+    },
+    "timesRWgrid": {
+        "hasprofile":true,
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
+        "devcat": "Times",
+        "group": "",
+        "rule":0,
+        "permission": 2,
+        "order": "40",
+        "label": "Times Grid - RW ",
+        "e": {
+            "time1": {
+                "type":"time",
+                "directedit":false,
+                "autoupdate":true,
+                "order": "20",
+                "label": "From",
+                "hh":13,
+                "mm":25,
+                "ss":59
+            },
+            "time2": {
+                "type":"time",
+                "directedit":false,
+                "autoupdate":true,
+                "order": "30",
+                "label": "To",
+                "hh":13,
+                "mm":25,
+                "ss":59,
+                "ms":55
+            }
+        }
     },
     "actions2": {
         "devcat": "Examples",
         "rule":1,
-        "elements": {
+        "e": {
             "shoot": {
                 "type": "bool",
                 "label": "Shoot",
+                "order": "99",
                 "value":false
             },
             "solve": {
                 "type": "bool",
                 "label": "Solve field",
+                "order": "99",
                 "value":false
             },
             "blob": {
                 "type": "bool",
                 "label": "Set blob mode",
+                "order": "99",
                 "value":false
             },
             "extract": {
                 "type": "bool",
                 "label": "Stars extraction",
+                "order": "99",
                 "value":false
             }
 
         },
         "group": "Images",
         "permission": 2,
+        "order": "99",
         "label": "Actions"
     },
     "parameters": {
@@ -344,13 +666,15 @@
         "group": "Images",
         "permission": 2,
         "label": "Parameters",
-        "elements": {
+        "order": "99",
+        "e": {
             "indexfolderpath": {
                 "autoupdate":true,
                 "directedit":true,
                 "type": "string",
                 "label": "Astrometry index folder path",
-                "value":"/usr/share/astrometry/"
+                "order": "99",
+                "value":"/usr/share/astrometry"
             }
 
 
@@ -363,18 +687,13 @@
         "hasGrid":true,
         "showGrid":true,
         "label": "Test image",
-        "elements": {
+        "order": "99",
+        "e": {
             "image1": {
                 "type": "img",
                 "label": "First image",
+                "order": "99",
                 "urljpeg":"dummy.jpg"
-            },
-            "message": {
-                "type": "message",
-                "label": "Image message",
-                "level":0,
-                "message":"Hello, this is a message",
-                "ts":"2024/03/14 15:06:53.000"
             },
             "progress": {
                 "type": "prg",
@@ -388,6 +707,7 @@
                 "type": "prg",
                 "prgtype": "spinner",
                 "label": "P2",
+                "order": "99",
                 "dynlabel": "99/100",
                 "value": 99,
                 "order":2
@@ -409,7 +729,9 @@
         "permission": 2,
         "arrayLimit":5,
         "label": "Grid example",
+        "order": "99",
         "hasGrid":true,
+        "hasprofile":true,
         "showGrid":true,
         "showElts":false,
         "gridheaders": ["X","Y","Z","imgrid","prggrid"],
@@ -420,7 +742,7 @@
             [3,0.9,"P3","",30],
             [4,0.16,"P4","",40]
         ],
-        "elements": {
+        "e": {
             "X": {
                 "type": "float",
                 "label": "Abscisse",
@@ -465,7 +787,8 @@
         "showGrid":true,
         "showElts":false,
         "label": "Grid example 2",
-        "elements": {
+        "order": "99",
+        "e": {
             "X": {
                 "type": "int",
                 "label": "Abscisse",
@@ -493,7 +816,8 @@
         "label": "Skychart",
         "devcat": "Examples",
         "group": "Images",
-        "elements": {}
+        "order": "99",
+        "e": {}
     },
     "search": {
         "devcat": "Examples",
@@ -502,11 +826,13 @@
         "permission": 2,
         "rule":0,
         "label": "",
+        "order": "99",
         "autoupdate":true,
-        "elements": {
+        "e": {
             "searchbtn": {
                 "type": "bool",
                 "label": "Search object",
+                "order": "99",
                 "value":false
             },
             "search": {
@@ -514,6 +840,7 @@
                 "type": "string",
                 "label": "Search object",
                 "value":"M13",
+                "order": "99",
                 "directedit":true
             }
         }
@@ -527,7 +854,7 @@
         "gridlimit":255,
         "rule":0,
         "label": "Results",
-        "elements": {
+        "e": {
             "catalog": {
                 "type": "string",
                 "label": "Catalogue",
@@ -591,7 +918,7 @@
         "permission": 2,
         "rule":0,
         "label": "Selection",
-        "elements": {
+        "e": {
             "code": {
                 "type": "string",
                 "label": "Code",
@@ -625,7 +952,7 @@
         "permission": 2,
         "rule":2,
         "label": "Test list of values",
-        "elements": {
+        "e": {
             "code": {
                 "type": "string",
                 "label": "Code",
@@ -652,13 +979,14 @@
         "arrayLimit":10,
         "hasprofile":true,
         "label": "Grid example",
+        "order": "99",
         "hasGrid":true,
-        "gridheaders": ["int","intlov","float","string","strlov","image","video","bool","progress","message"],
+        "gridheaders": ["int","intlov","float","string","strlov","image","video","bool","progress"],
         "grid": [
             [12,1,0.12,"zéro dot 12","00",{"urljpeg":"dummy1.jpg"},{"urljpeg":"dummy1.mpeg"},true,70,"first message content"],
             [13,2,0.13,"zéro dot 13","02",{"urljpeg":"dummy2.jpg"},{"urljpeg":"dummy3.mpeg"},false,25,"second message content"]
         ],
-        "elements": {
+        "e": {
             "int": {
                 "type": "int",
                 "label": "Integer",
@@ -714,6 +1042,7 @@
                 "label": "image in grid",
                 "urljpeg":"dummy.jpg",
                 "autoupdate":true,
+                "showstats":false,
                 "directedit":true,
                 "order":"4"
             },
@@ -742,26 +1071,19 @@
                 "value": 65,
                 "directedit":true,
                 "order":"7"
-            },
-            "message": {
-                "type": "message",
-                "label": "Message",
-                "value": "nothing interesting to say",
-                "autoupdate":true,
-                "directedit":true,
-                "order":"8"
             }
         }
     },
     "agraphXY": {
         "hasArray":true,
-        "order":0,
+        "order":10,
         "devcat": "Graphes",
         "group": "",
         "permission": 2,
         "gridLimit":5,
         "label": "Graph example  - X/Y",
         "hasGrid":true,
+        "hasprofile":true,
         "showGrid":true,
         "showElts":false,
         "gridheaders": ["X","Y"],
@@ -775,9 +1097,10 @@
         "graphType":"XY",
         "graphParams":{
             "X":"X",
-            "Y":"Y"
+            "Y":"Y",
+            "graphColor":{"R":0,"G":255,"B":255}
         },
-        "elements": {
+        "e": {
             "X": {
                 "type": "float",
                 "label": "Abscisse",
@@ -794,7 +1117,7 @@
     },
     "agraphDY": {
         "hasArray":true,
-        "order":1,
+        "order":11,
         "devcat": "Graphes",
         "group": "",
         "permission": 2,
@@ -814,9 +1137,10 @@
         "graphType":"DY",
         "graphParams":{
             "D":"X",
-            "Y":"Y"
+            "Y":"Y",
+            "graphColor":{"R":0,"G":255,"B":0}
         },
-        "elements": {
+        "e": {
             "X": {
                 "type": "float",
                 "label": "Abscisse",
@@ -833,25 +1157,26 @@
     },
     "agraphPHD": {
         "hasArray":true,
-        "order":3,
+        "order":13,
         "devcat": "Graphes",
         "group": "",
         "permission": 2,
         "arrayLimit":5,
         "label": "Graph example - PHD",
+        "order": "99",
         "hasGrid":true,
         "showGrid":true,
         "showElts":false,
-        "gridheaders": ["T","RA","DE","pRA","pDE"],
+        "gridheaders": ["T","RA","DE","pRA","pDE","RSB","RMS"],
         "grid": [
-            [0,0.2,0.1,200,50],
-            [1,-0.2,0.1,20,50],
-            [2,0.2,-0.1,200,500],
-            [3,0.2,0.1,-200,50],
-            [4,0.2,-0.1,20,-5],
-            [5,-0.2,0.1,200,50],
-            [6,-0.2,0.1,-50,-50],
-            [7,0.2,0.1,100,50]
+            [0,0.2,0.1,200,50,0,0.1],
+            [1,-0.2,0.1,20,50,2,0.2],
+            [2,0.2,-0.1,200,500,3,0.15],
+            [3,0.2,0.1,-200,50,20,0.45],
+            [4,0.2,-0.1,20,-5,15,0.23],
+            [5,-0.2,0.1,200,50,0,25,0.85],
+            [6,-0.2,0.1,-50,-50,2,0.12],
+            [7,0.2,0.1,100,50,3,0.65]
         ],
         "graphType":"PHD",
         "graphParams":{
@@ -859,9 +1184,11 @@
             "RA":"RA",
             "DE":"DE",
             "pRA":"pRA",
-            "pDE":"pDE"
+            "pDE":"pDE",
+            "RSB":"RSB",
+            "RMS":"RMS"
         },
-        "elements": {
+        "e": {
             "T": {
                 "type": "float",
                 "label": "Time",
@@ -891,9 +1218,142 @@
                 "label": "pDE",
                 "value":0,
                 "order":5
+            },
+            "RSB": {
+                "type": "float",
+                "label": "RSB",
+                "value":0,
+                "order":6
+            },
+            "RMS": {
+                "type": "float",
+                "label": "RMS",
+                "value":0,
+                "order":7
+            }
+        }
+    },
+    "agrapSXY": {
+        "hasArray":true,
+        "order":0,
+        "devcat": "Graphes",
+        "group": "",
+        "permission": 2,
+        "gridLimit":20,
+        "label": "Graph example  - Serie X/Y",
+        "hasGrid":true,
+        "hasprofile":true,
+        "showGrid":true,
+        "showElts":false,
+        "gridheaders": ["X","Y","S"],
+        "grid": [
+            [0,0.0,"P0"],
+            [1,0.1,"P0"],
+            [2,0.4,"P0"],
+            [3,0.9,"P0"],
+            [4,0.16,"P0"],
+            [1.5,0.0,"P1"],
+            [2.5,0.1,"P1"],
+            [3.5,0.4,"P1"],
+            [4.5,0.9,"P1"],
+            [5.5,0.32,"P1"]
+        ],
+        "graphType":"SXY",
+        "graphParams":{
+            "S":"S",
+            "X":"X",
+            "Y":"Y",
+            "graphColors":{
+                "P0":{"R":0,"G":255,"B":0},
+                "P1":{"R":0,"G":0,"B":255}
+            },
+            "axis":{
+                "PA":{"min":-1,"max":1,"pos":"right","text":"PAAA"},
+                "PB":{"min":-0.1,"max":0.1,"pos":"left","text":"PBBB"}
+            },
+            "mapping":{"P0":"PA","P1":"PB"}
+        },
+        "e": {
+            "S": {
+                "type": "string",
+                "label": "Serie",
+                "value":0,
+                "order":"A"
+            },
+            "X": {
+                "type": "float",
+                "label": "Abscisse",
+                "value":0,
+                "order":"B"
+            },
+            "Y": {
+                "type": "float",
+                "label": "Ordonnée",
+                "value":0,
+                "order":"C"
+            }
+        }
+    },
+    "agraphSDY": {
+        "hasArray":true,
+        "order":1,
+        "devcat": "Graphes",
+        "group": "",
+        "permission": 2,
+        "arrayLimit":5,
+        "label": "Graph example - Serie - Date - Y",
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
+        "gridheaders": ["X","Y","S"],
+        "grid": [
+            [0,0.0,"P0"],
+            [1,0.1,"P0"],
+            [2,0.4,"P0"],
+            [3,0.9,"P0"],
+            [4,0.16,"P0"],
+            [1.5,0.0,"P1"],
+            [2.5,0.1,"P1"],
+            [3.5,0.4,"P1"],
+            [4.5,0.9,"P1"],
+            [5.5,0.32,"P1"]
+        ],
+        "graphType":"SDY",
+        "graphParams":{
+            "S":"S",
+            "D":"X",
+            "Y":"Y",
+            "graphColors":{
+                "P0":{"R":0,"G":255,"B":0},
+                "P1":{"R":0,"G":0,"B":255}
+            },
+            "axis":{
+                "PA":{"min":-10,"max":10,"pos":"right","text":"PAAA"},
+                "PB":{"min":0,"max":100,"pos":"left","text":"PBBB"},
+                "PC":{"min":0,"max":1000,"pos":"left","text":"PCCC"}
+            },
+            "mapping":{"P0":"PA","P1":"PB"}
+        },
+        "e": {
+            "S": {
+                "type": "string",
+                "label": "Serie",
+                "value":0,
+                "order":"A"
+            },
+            "X": {
+                "type": "float",
+                "label": "Abscisse",
+                "value":0,
+                "order":"B"
+            },
+            "Y": {
+                "type": "float",
+                "label": "Ordonnée",
+                "value":0,
+                "order":"C"
             }
         }
     }
-
 }
 }

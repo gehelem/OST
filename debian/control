@@ -3,28 +3,19 @@ Section: science
 Priority: optional
 Maintainer: gilles <gilles@joag.fr>
 Build-Depends: cmake,
-               debhelper (>= 8.0.0),
-               debhelper-compat (= 11),
+               git,
+               debhelper (>= 13),
+               debhelper-compat (= 13),
                pkg-config,
-               extra-cmake-modules (>= 1.7.0),
-               qtbase5-dev,
-               qtdeclarative5-dev,
-               libqt5websockets5-dev,
-               libqt5svg5-dev,
-               libqt5sql5-sqlite,
-               kdoctools-dev | libkf5doctools-dev,
-               libkf5config-dev,
-               libkf5guiaddons-dev,
-               libkf5i18n-dev,
-               libkf5newstuff-dev,
-               libkf5notifications-dev,
-               libkf5xmlgui-dev,
-               libkf5plotting-dev,
-               libkf5crash-dev,
-               libkf5notifyconfig-dev,
+               qt6-base-dev,
+               qt6-tools-dev-tools,
+               qt6-l10n-tools,
+               libgl-dev,
+               qt6-websockets-dev | libqt6websockets6-dev,
+               qt6-scxml-dev,
                libeigen3-dev,
                zlib1g-dev,
-               libcfitsio3-dev|libcfitsio-dev,
+               libcfitsio-dev,
                libnova-dev,
                libindi-dev (>= 1.6.1),
                indi-bin (>= 1.6.1),
@@ -32,7 +23,6 @@ Build-Depends: cmake,
                libraw-dev,
                libgsl-dev,
                libsecret-1-dev,
-               libstellarsolver-dev,
                libavahi-client-dev,
                libavahi-common-dev
 Standards-Version: 4.6.0
@@ -44,7 +34,7 @@ Rules-Requires-Root: no
 Package: ostserver
 Architecture: any
 Section: science
-Recommends: ${shlibs:Depends}, ${misc:Depends}, libindi1, libstellarsolver
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqt6sql6-sqlite
 Description: Observatoire Sans Tête
  Light and headless astrophotography automation tool
 

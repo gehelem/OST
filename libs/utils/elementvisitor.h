@@ -1,5 +1,6 @@
 #ifndef OST_ELEMENTVISITOR_H
 #define OST_ELEMENTVISITOR_H
+#include "common.h"
 #include <QtCore>
 namespace  OST
 {
@@ -11,8 +12,10 @@ class ElementString;
 class ElementLight;
 class ElementImg;
 class ElementVideo;
-class ElementMessage;
 class ElementPrg;
+class ElementDate;
+class ElementTime;
+class ElementDateTime;
 
 class ElementVisitor
 {
@@ -21,33 +24,17 @@ class ElementVisitor
         ElementVisitor() = default;
 
     public:
-        virtual void visit(ElementInt* pElement) = 0;
-        virtual void visit(ElementInt* pElement, QVariantMap &data) = 0;
-        virtual void visit(ElementInt* pElement, QString &action, QVariantMap &data) = 0;
-        virtual void visit(ElementBool* pElement) = 0;
-        virtual void visit(ElementBool* pElement, QVariantMap &data) = 0;
-        virtual void visit(ElementBool* pElement, QString &action, QVariantMap &data) = 0;
-        virtual void visit(ElementFloat* pElement) = 0;
-        virtual void visit(ElementFloat* pElement, QVariantMap &data) = 0;
-        virtual void visit(ElementFloat* pElement, QString &action, QVariantMap &data) = 0;
-        virtual void visit(ElementString* pElement) = 0;
-        virtual void visit(ElementString* pElement, QVariantMap &data) = 0;
-        virtual void visit(ElementString* pElement, QString &action, QVariantMap &data) = 0;
-        virtual void visit(ElementLight* pElement) = 0;
-        virtual void visit(ElementLight* pElement, QVariantMap &data) = 0;
-        virtual void visit(ElementLight* pElement, QString &action, QVariantMap &data) = 0;
-        virtual void visit(ElementImg* pElement) = 0;
-        virtual void visit(ElementImg* pElement, QVariantMap &data) = 0;
-        virtual void visit(ElementImg* pElement, QString &action, QVariantMap &data) = 0;
-        virtual void visit(ElementVideo* pElement) = 0;
-        virtual void visit(ElementVideo* pElement, QVariantMap &data) = 0;
-        virtual void visit(ElementVideo* pElement, QString &action, QVariantMap &data) = 0;
-        virtual void visit(ElementMessage* pElement) = 0;
-        virtual void visit(ElementMessage* pElement, QVariantMap &data) = 0;
-        virtual void visit(ElementMessage* pElement, QString &action, QVariantMap &data) = 0;
-        virtual void visit(ElementPrg* pElement) = 0;
-        virtual void visit(ElementPrg* pElement, QVariantMap &data) = 0;
-        virtual void visit(ElementPrg* pElement, QString &action, QVariantMap &data) = 0;
+        virtual void visit(ElementInt* pElement, QVariantMap &data, bool &emitEvent) = 0;
+        virtual void visit(ElementBool* pElement, QVariantMap &data, bool &emitEvent) = 0;
+        virtual void visit(ElementFloat* pElement, QVariantMap &data, bool &emitEvent) = 0;
+        virtual void visit(ElementString* pElement, QVariantMap &data, bool &emitEvent) = 0;
+        virtual void visit(ElementLight* pElement, QVariantMap &data, bool &emitEvent) = 0;
+        virtual void visit(ElementImg* pElement, QVariantMap &data, bool &emitEvent) = 0;
+        virtual void visit(ElementVideo* pElement, QVariantMap &data, bool &emitEvent) = 0;
+        virtual void visit(ElementPrg* pElement, QVariantMap &data, bool &emitEvent) = 0;
+        virtual void visit(ElementDate* pElement, QVariantMap &data, bool &emitEvent) = 0;
+        virtual void visit(ElementTime* pElement, QVariantMap &data, bool &emitEvent) = 0;
+        virtual void visit(ElementDateTime* pElement, QVariantMap &data, bool &emitEvent) = 0;
 };
 
 class GridInt;
@@ -57,7 +44,6 @@ class GridString;
 class GridLight;
 class GridImg;
 class GridVideo;
-class GridMessage;
 class GridPrg;
 
 
@@ -75,7 +61,6 @@ class GridVisitor
         virtual void visit(GridLight* pGrid, QString &action, int &line) = 0;
         virtual void visit(GridImg* pGrid, QString &action, int &line) = 0;
         virtual void visit(GridVideo* pGrid, QString &action, int &line) = 0;
-        virtual void visit(GridMessage* pGrid, QString &action, int &line) = 0;
         virtual void visit(GridPrg* pGrid, QString &action, int &line) = 0;
 };
 class ValueInt;
@@ -85,8 +70,10 @@ class ValueString;
 class ValueLight;
 class ValueImg;
 class ValueVideo;
-class ValueMessage;
 class ValuePrg;
+class ValueDate;
+class ValueTime;
+class ValueDateTime;
 
 
 class ValueVisitor
@@ -103,8 +90,10 @@ class ValueVisitor
         virtual void visit(ValueLight* pValue) = 0;
         virtual void visit(ValueImg*  pValue) = 0;
         virtual void visit(ValueVideo*  pValue) = 0;
-        virtual void visit(ValueMessage*  pValue) = 0;
         virtual void visit(ValuePrg* pValue) = 0;
+        virtual void visit(ValueDate* pValue) = 0;
+        virtual void visit(ValueTime* pValue) = 0;
+        virtual void visit(ValueDateTime* pValue) = 0;
 };
 
 }

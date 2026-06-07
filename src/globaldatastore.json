@@ -1,0 +1,162 @@
+{
+"p":{
+    "servers": {
+        "hasprofile":true,
+        "devcat": "Indi",
+        "group": "",
+        "hasprofile": true,
+        "hasGrid": true,
+        "showGrid": true,
+        "showElts": true,
+        "order":"99",
+        "permission": 2,
+        "label": "Servers",
+        "e": {
+            "name": {
+                "type": "string",
+                "label": "Name",
+                "order":"00",
+                "autoupdate":true
+            },
+            "host": {
+                "type": "string",
+                "label": "Host",
+                "order":"10",
+                "autoupdate":true,
+                "value": "localhost"
+            },
+            "port": {
+                "type": "int",
+                "label": "Port",
+                "order":"20",
+                "autoupdate":true,
+                "value": 7624
+            }
+
+        }
+    },
+    "equipments": {
+        "label": "Equipments",
+        "hasprofile":true,
+        "devcat": "Equipment",
+        "group": "",
+        "hasprofile": true,
+        "hasGrid": true,
+        "showGrid": true,
+        "showElts": false,
+        "order":"99",
+        "permission": 2,
+        "e": {
+            "name": {
+                "type": "string",
+                "label": "Name",
+                "order":"00",
+                "autoupdate":true
+            },
+            "host": {
+                "type": "string",
+                "label": "Indi server",
+                "order":"10",
+                "listOfValues":"servers",
+                "listOfValuesIsExternal":true,
+                "autoupdate":true
+            },
+            "camera": {
+                "type": "string",
+                "label": "Camera",
+                "order":"20",
+                "listOfValues":"DRIVER_INTERFACE-CCD_INTERFACE",
+                "autoupdate":true
+            },
+            "mount": {
+                "type": "string",
+                "label": "Mount",
+                "order":"30",
+                "listOfValues":"DRIVER_INTERFACE-TELESCOPE_INTERFACE",
+                "autoupdate":true
+            },
+            "focuser": {
+                "type": "string",
+                "label": "Focuser",
+                "order":"40",
+                "listOfValues":"DRIVER_INTERFACE-FOCUSER_INTERFACE",
+                "autoupdate":true
+            },
+            "filter": {
+                "type": "string",
+                "label": "Filter wheel",
+                "order":"50",
+                "listOfValues":"DRIVER_INTERFACE-FILTER_INTERFACE",
+                "autoupdate":true
+            },
+            "guidecamera": {
+                "type": "string",
+                "label": "Guide camera",
+                "order":"60",
+                "listOfValues":"DRIVER_INTERFACE-CCD_INTERFACE",
+                "autoupdate":true
+            },
+            "guidest4": {
+                "type": "string",
+                "label": "Guide through",
+                "order":"70",
+                "listOfValues":"DRIVER_INTERFACE-GUIDER_INTERFACE",
+                "autoupdate":true
+            },
+            "gps": {
+                "type": "string",
+                "label": "GPS",
+                "order":"80",
+                "listOfValues":"DRIVER_INTERFACE-GPS_INTERFACE",
+                "autoupdate":true
+            }
+        }
+    },
+    "optics": {
+        "label": "Optics",
+        "devcat": "Equipment",
+        "group": "",
+        "order": "Equipment010",
+        "permission": 2,
+        "hasprofile": true,
+        "hasGrid": true,
+        "showGrid": true,
+        "showElts": false,
+        "e": {
+            "name": {
+                "type": "string",
+                "label": "Name",
+                "order": "00",
+                "value": ""
+            },
+            "focal": {
+                "type": "float",
+                "label": "Focal length (mm)",
+                "order": "10",
+                "value": 0,
+                "format": "99999.9"
+            },
+            "diameter": {
+                "type": "float",
+                "label": "Diameter (mm)",
+                "order": "20",
+                "value": 0,
+                "format": "9999.9"
+            },
+            "red": {
+                "type": "float",
+                "label": "Reducer (x)",
+                "order": "30",
+                "value": 1,
+                "format": "9999.9"
+            },
+            "type": {
+                "type": "string",
+                "label": "Type",
+                "order": "40",
+                "value": ""
+            }
+        }
+    }
+}
+}
