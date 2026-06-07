@@ -173,7 +173,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
         /**
          * @brief Destroy the ElementTemplateNumeric object
          */
-        ~ElementTemplateNumeric<T>() {}
+        ~ElementTemplateNumeric() {}
 
         /**
          * @brief Set value with optional signal emission
@@ -481,7 +481,7 @@ class ElementTemplateNotNumeric : public ElementTemplate<T>
         /**
          * @brief Destroy the ElementTemplateNotNumeric object
          */
-        ~ElementTemplateNotNumeric<T>() {}
+        ~ElementTemplateNotNumeric() {}
 
         /**
          * @brief Set value with optional signal emission

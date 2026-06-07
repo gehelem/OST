@@ -25,8 +25,7 @@ QJsonValue ModuleJsonDumper(EvType evt, QVariant data, ElementBase *elt, Propert
 
     if (evt == EvType::av || evt == EvType::pr)
     {
-        foreach(const QString &key, mod->getStore().keys())
-        {
+        for(const QString &key : mod->getStore().keys())        {
             if (evt == EvType::av || mod->getStore()[key]->hasProfile())
             {
                 OST::PropertyJsonDumper d(evt, data, elt, prp);
@@ -50,8 +49,7 @@ QJsonValue ModuleJsonDumper(EvType evt, QVariant data, ElementBase *elt, Propert
     {
         if (!lov && (evt == EvType::aa || evt == EvType::am))
         {
-            foreach(const QString &key, mod->getStore().keys())
-            {
+            for(const QString &key : mod->getStore().keys())            {
                 OST::PropertyJsonDumper d(evt, data, elt, prp);
                 mod->getStore()[key]->accept(&d);
                 properties[key] = d.getResult();
@@ -71,8 +69,7 @@ QJsonValue ModuleJsonDumper(EvType evt, QVariant data, ElementBase *elt, Propert
     {
         if (!prp && (evt == EvType::aa || evt == EvType::am))
         {
-            foreach(const QString &key, mod->getGlobLovs().keys())
-            {
+            for(const QString &key : mod->getGlobLovs().keys())            {
                 OST::LovJsonDumper d;
                 mod->getGlobLovs()[key]->accept(&d);
                 globlovs[key] = d.getResult();

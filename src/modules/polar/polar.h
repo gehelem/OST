@@ -13,6 +13,8 @@
 #include <QtCore>
 #include <QtConcurrent>
 #include <QStateMachine>
+#include <QFinalState>
+#include <QState>
 #include <libastro.h>
 #include <libnova/julian_day.h>
 #include <libnova/sidereal_time.h>

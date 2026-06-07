@@ -34,7 +34,7 @@ Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap
 }
 Basemodule::~Basemodule()
 {
-    foreach(const QString &key, getStore().keys())
+    for(const QString &key : getStore().keys())
     {
         deleteOstProperty(key);
     }
@@ -394,7 +394,7 @@ bool Basemodule::loadProfile(const QString &pProfileName)
     QJsonObject obj;
     if (!this->getDbProfile(this->getClassName(), pProfileName, obj)) return false;
     QVariantMap props = obj["p"].toVariant().toMap();
-    foreach(const QString &key, props.keys())
+    for(const QString &key : props.keys())
     {
         if (getStore().contains(key))
         {
@@ -403,7 +403,7 @@ bool Basemodule::loadProfile(const QString &pProfileName)
             {
                 if (data.contains("e"))
                 {
-                    foreach(const QString &eltkey, props[key].toMap()["e"].toMap().keys())
+                    for(const QString &eltkey : props[key].toMap()["e"].toMap().keys())
                     {
                         QVariant v = props[key].toMap()["e"].toMap()[eltkey].toMap()["value"];
                         if (getProperty(key)->getElts()->contains(eltkey))
@@ -475,7 +475,7 @@ bool Basemodule::loadProfile(const QString &pProfileName)
                     {
                         QVariantList line = vline.toList();
                         int icol = 0;
-                        foreach(const QVariant &vv, line)
+                        for(const QVariant &vv : line)
                         {
                             QString eltkey = data["gridheaders"].toList().at(icol).toString();
                             if (getEltBase(key, eltkey)->getType() == "int")

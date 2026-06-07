@@ -1,5 +1,6 @@
 #include "fileio.h"
 #include <QFileInfo>
+#include <QRegularExpression>
 #include <QtConcurrent>
 
 fileio::fileio()
@@ -61,7 +62,7 @@ bool fileio::loadFits(QString fileName)
 
     // Use open diskfile as it does not use extended file names which has problems opening
     // files with [ ] or ( ) in their names.
-    if (fits_open_diskfile(&fptr, file.toLocal8Bit(), READONLY, &status))
+    if (fits_open_diskfile(&fptr, file.toUtf8().constData(), READONLY, &status))
     {
         logIssue(QString("Error opening fits file %1").arg(file));
         return false;
@@ -186,7 +187,7 @@ bool fileio::loadFits(QString fileName)
 bool fileio::loadOtherFormat(QString fileName)
 {
     file = fileName;
-    QImageReader fileReader(file.toLocal8Bit());
+    QImageReader fileReader(file);
 
     if (QImageReader::supportedImageFormats().contains(fileReader.format()) == false)
     {
@@ -196,7 +197,7 @@ bool fileio::loadOtherFormat(QString fileName)
     }
 
     QImage imageFromFile;
-    if(!imageFromFile.load(file.toLocal8Bit()))
+    if(!imageFromFile.load(file))
     {
         logIssue("Failed to open image.");
         return false;
@@ -642,7 +643,7 @@ bool fileio::getSolverOptionsFromFITS()
 
     // Use open diskfile as it does not use extended file names which has problems opening
     // files with [ ] or ( ) in their names.
-    if (fits_open_diskfile(&fptr, file.toLocal8Bit(), READONLY, &status))
+    if (fits_open_diskfile(&fptr, file.toUtf8().constData(), READONLY, &status))
     {
         fits_report_error(stderr, status);
         fits_get_errstatus(status, error_status);
@@ -828,7 +829,7 @@ bool fileio::parseHeader()
         Record oneRecord;
         // Quotes cause issues for simplified below so we're removing them.
         QString record = recordList.mid(i * 80, 80).remove("'");
-        QStringList properties = record.split(QRegExp("[=/]"));
+        QStringList properties = record.split(QRegularExpression("[=/]"));
         // If it is only a comment
         if (properties.size() == 1)
         {
@@ -855,13 +856,13 @@ bool fileio::parseHeader()
             // Is it Integer?
             oneRecord.value.toInt(&ok);
             if (ok)
-                oneRecord.value.convert(QMetaType::Int);
+                oneRecord.value.convert(QMetaType(QMetaType::Int));
             else
             {
                 // Is it double?
                 oneRecord.value.toDouble(&ok);
                 if (ok)
-                    oneRecord.value.convert(QMetaType::Double);
+                    oneRecord.value.convert(QMetaType(QMetaType::Double));
             }
         }
 
@@ -914,7 +915,7 @@ bool fileio::saveAsFITS(QString fileName, FITSImage::Statistic &imageStats, uint
     nelements = imageStats.samples_per_channel * channels;
 
     /* Create a new File, overwriting existing*/
-    if (fits_create_file(&new_fptr, fileName.toLocal8Bit(), &status))
+    if (fits_create_file(&new_fptr, fileName.toUtf8().constData(), &status))
     {
         fits_report_error(stderr, status);
         return false;
@@ -984,23 +985,23 @@ bool fileio::saveAsFITS(QString fileName, FITSImage::Statistic &imageStats, uint
                 key == "BSCALE")
             continue;
 
-        switch (value.type())
+        switch (value.typeId())
         {
-            case QVariant::Int:
+            case QMetaType::Int:
             {
                 int number = value.toInt();
                 fits_write_key(fptr, TINT, key.toLatin1().constData(), &number, comment.toLatin1().constData(), &status);
             }
             break;
 
-            case QVariant::Double:
+            case QMetaType::Double:
             {
                 double number = value.toDouble();
                 fits_write_key(fptr, TDOUBLE, key.toLatin1().constData(), &number, comment.toLatin1().constData(), &status);
             }
             break;
 
-            case QVariant::String:
+            case QMetaType::QString:
             default:
             {
                 if(key == "COMMENT" && (value.toString().contains("FITS (Flexible Image Transport System) format") ||
@@ -1224,7 +1225,8 @@ void fileio::calculateMinMax()
         for (int i = 0; i < nThreads; i++)
         {
             // Run threads
-            futures.append(QtConcurrent::run(this, &fileio::getParitionMinMax<T>, tStart, (i == (nThreads - 1)) ? fStride : tStride));
+            uint32_t stride = (i == (nThreads - 1)) ? fStride : tStride;
+            futures.append(QtConcurrent::run([this, tStart, stride]() { return getParitionMinMax<T>(tStart, stride); }));
             tStart += tStride;
         }
 
@@ -1332,8 +1334,8 @@ void fileio::runningAverageStdDev()
         for (int i = 0; i < nThreads; i++)
         {
             // Run threads
-            futures.append(QtConcurrent::run(this, &fileio::getSquaredSumAndMean<T>, tStart,
-                                             (i == (nThreads - 1)) ? fStride : tStride));
+            uint32_t stride = (i == (nThreads - 1)) ? fStride : tStride;
+            futures.append(QtConcurrent::run([this, tStart, stride]() { return getSquaredSumAndMean<T>(tStart, stride); }));
             tStart += tStride;
         }
 
@@ -1373,7 +1375,7 @@ QPair<double, double> fileio::getSquaredSumAndMean(uint32_t start, uint32_t stri
         m_n++;
     }
 
-    return qMakePair<double, double>(m_newM, m_newS);
+    return qMakePair(m_newM, m_newS);
 }
 /* taken from Kstars fitviewer FITSData */
 template <typename T>

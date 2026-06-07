@@ -533,7 +533,7 @@ void Allsky::updateProperty(INDI::Property property)
     {
         getEltDateTime("history", "D")->setValue(QDateTime::currentDateTime(), true);
         INDI::PropertyNumber n = property;
-        for (int i = 0; i < n.size(); i++)
+        for (size_t i = 0; i < n.size(); i++)
         {
             if (n[i].getName() == std::string("WEATHER_TEMPERATURE"))
             {

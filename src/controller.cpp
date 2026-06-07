@@ -731,15 +731,13 @@ void Controller::onExternalEvent(OST::ExtEvent event)
 
 void Controller::checkModules(void)
 {
-    foreach (const QString &path, QCoreApplication::libraryPaths())
-    {
+    for(const QString &path : QCoreApplication::libraryPaths())    {
         mLogger->info("Check available modules in " + path);
         QDir directory(path);
         directory.setFilter(QDir::Files);
         directory.setNameFilters(QStringList() << "libost*.so");
         QStringList libs = directory.entryList();
-        foreach(QString lib, libs)
-        {
+        for(QString lib : libs)        {
             QString tt = lib.replace(".so", "");
             if (!((tt == "libostmaincontrol" ) || (tt == "libostbasemodule" ) || (tt == "libostindimodule" )))
             {

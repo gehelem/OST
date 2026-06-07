@@ -134,8 +134,7 @@ QJsonObject PropertyJsonDumper::dumpDefault(PropertyMulti* pProperty)
 {
     QJsonObject json = dumpPropertyCommons(pProperty);
     QJsonObject elements;
-    foreach(const QString &key, pProperty->getElts()->keys())
-    {
+    for(const QString &key : pProperty->getElts()->keys())    {
         OST::ElementJsonDumper d(mEvent, mData, pProperty->getElt(key));
         QVariantMap m;
         bool b = false;
@@ -160,8 +159,7 @@ QJsonObject PropertyJsonDumper::dumpDefault(PropertyMulti* pProperty)
         for(int i = 0; i < pProperty->getGrid().count(); i++)
         {
             QJsonArray jLine;
-            foreach(QString elt, pProperty->getGridHeaders())
-            {
+            for(QString elt : pProperty->getGridHeaders())            {
                 ValueJsonDumper d(mEvent, mData, pProperty->getElt(elt));
                 pProperty->getGrid()[i][elt]->accept(&d);
                 jLine.append(d.getResult());
@@ -202,8 +200,7 @@ QJsonObject PropertyJsonDumper::dumpSetValueWithMinMax(PropertyMulti* pProperty)
 
     QJsonObject json;
     QJsonObject elements;
-    foreach(const QString &key, pProperty->getElts()->keys())
-    {
+    for(const QString &key : pProperty->getElts()->keys())    {
         OST::ElementJsonDumper d(mEvent, mData, pProperty->getElt(key));
         QVariantMap m;
         bool b = false;
@@ -221,8 +218,7 @@ QJsonObject PropertyJsonDumper::dumpSetAll(PropertyMulti* pProperty)
     // {"evt": "sa","m": {"Dummy1": {"p": {"testnumbers": {"e": {"i1": 12,"i2": 15}}}}}}
     QJsonObject json;
     QJsonObject elements;
-    foreach(const QString &key, pProperty->getElts()->keys())
-    {
+    for(const QString &key : pProperty->getElts()->keys())    {
         OST::ElementJsonDumper d(mEvent, mData, pProperty->getElt(key));
         QVariantMap m;
         bool b = false;
@@ -241,8 +237,7 @@ QJsonObject PropertyJsonDumper::dumpGridCreate(PropertyMulti* pProperty)
     {
         int i = mData.toInt();
         QJsonObject values;
-        foreach(QString elt, pProperty->getGridHeaders())
-        {
+        for(QString elt : pProperty->getGridHeaders())        {
             ValueJsonDumper d(mEvent, mData, pProperty->getElt(elt));
             pProperty->getGrid()[i][elt]->accept(&d);
             values[elt] = d.getResult();
@@ -256,8 +251,7 @@ QJsonObject PropertyJsonDumper::dumpProfile(PropertyMulti* pProperty)
 {
     QJsonObject json, elements;
 
-    foreach(const QString &key, pProperty->getElts()->keys())
-    {
+    for(const QString &key : pProperty->getElts()->keys())    {
         OST::ElementJsonDumper d(EvType::ev, QVariant(), pProperty->getElt(key));
         QVariantMap m;
         bool b = false;
@@ -274,8 +268,7 @@ QJsonObject PropertyJsonDumper::dumpProfile(PropertyMulti* pProperty)
         for(int i = 0; i < pProperty->getGrid().count(); i++)
         {
             QJsonArray jLine;
-            foreach(QString elt, pProperty->getGridHeaders())
-            {
+            for(QString elt : pProperty->getGridHeaders())            {
                 ValueJsonDumper d(EvType::ev, QVariant(), pProperty->getElt(elt));
                 pProperty->getGrid()[i][elt]->accept(&d);
                 jLine.append(d.getResult());
@@ -294,8 +287,7 @@ QJsonObject PropertyJsonDumper::dumpGridUpdate(PropertyMulti* pProperty)
     {
         int i = mData.toInt();
         QJsonObject values;
-        foreach(QString elt, pProperty->getGridHeaders())
-        {
+        for(QString elt : pProperty->getGridHeaders())        {
             ValueJsonDumper d(mEvent, mData, pProperty->getElt(elt));
             pProperty->getGrid()[i][elt]->accept(&d);
             values[elt] = d.getResult();

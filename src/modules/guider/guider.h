@@ -13,6 +13,8 @@
 #include <QtCore>
 #include <QtConcurrent>
 #include <QStateMachine>
+#include <QFinalState>
+#include <QState>
 
 
 /**

@@ -130,7 +130,7 @@ QString TranslateManager::applyArgs(const QString &format, const QVariantList &a
 
     for (const QVariant &arg : args)
     {
-        switch (static_cast<QMetaType::Type>(arg.type()))
+        switch (static_cast<QMetaType::Type>(arg.typeId()))
         {
             case QMetaType::Int:
             case QMetaType::LongLong:
@@ -188,20 +188,20 @@ void TranslateManager::loadExistingPendingEntries(const QString &language)
     {
         xml.readNext();
 
-        if (xml.isStartElement() && xml.name() == "message")
+        if (xml.isStartElement() && xml.name() == u"message")
         {
             // Read until we find <source>
             while (!xml.atEnd())
             {
                 xml.readNext();
-                if (xml.isStartElement() && xml.name() == "source")
+                if (xml.isStartElement() && xml.name() == u"source")
                 {
                     QString sourceText = xml.readElementText();
                     entries.insert(sourceText);
                     count++;
                     break;
                 }
-                if (xml.isEndElement() && xml.name() == "message")
+                if (xml.isEndElement() && xml.name() == u"message")
                     break;
             }
         }
@@ -322,7 +322,6 @@ void TranslateManager::appendToPendingFile(const QString &sourceText, const QStr
     }
 
     QTextStream stream(&file);
-    stream.setCodec("UTF-8");
     stream << doc.toString(4);
     file.close();
 

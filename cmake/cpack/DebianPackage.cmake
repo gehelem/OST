@@ -124,11 +124,12 @@ set(CPACK_DEBIAN_RUNTIME_PACKAGE_PRIORITY  "optional")
 set(CPACK_DEBIAN_RUNTIME_PACKAGE_MAINTAINER "gilles <gilles@joag.fr>")
 set(CPACK_DEBIAN_RUNTIME_DESCRIPTION
     "Observatoire Sans Tête\n Light and headless astrophotography automation tool")
-set(CPACK_DEBIAN_RUNTIME_PACKAGE_DEPENDS
-    "libqt5core5a, libqt5network5, libqt5websockets5, libqt5sql5, libqt5sql5-sqlite")
-set(CPACK_DEBIAN_RUNTIME_PACKAGE_RECOMMENDS
-    "libindi1, libstellarsolver")
 set(CPACK_DEBIAN_RUNTIME_PACKAGE_SHLIBDEPS ON)
+# shlibdeps auto-detects shared library deps from ELF NEEDED entries, using
+# the build platform's package database — correct names regardless of Ubuntu version.
+# Only add what shlibdeps cannot detect: Qt SQL plugins are loaded at runtime
+# via Qt's plugin mechanism and have no ELF NEEDED entry in the binary.
+set(CPACK_DEBIAN_RUNTIME_PACKAGE_DEPENDS "libqt6sql6-sqlite")
 set(CPACK_DEBIAN_RUNTIME_PACKAGE_CONTROL_EXTRA
     "${CMAKE_CURRENT_LIST_DIR}/postinst"
     "${CMAKE_CURRENT_LIST_DIR}/prerm")

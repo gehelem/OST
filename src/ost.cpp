@@ -10,9 +10,9 @@
 
 int main(int argc, char *argv[])
 {
+    qDebug() << "MAIN 0";
     // Initialize Qt embedded resources (must be done before using them)
     Q_INIT_RESOURCE(translations);
-
     // Register custom types for queued signal/slot connections
     qRegisterMetaType<OST::LogLevel>("OST::LogLevel");
     qRegisterMetaType<OST::EvType>("OST::EvType");
@@ -158,7 +158,7 @@ int main(int argc, char *argv[])
     Q_UNUSED(controller);
 
     int nAppReturnCode = QGuiApplication::exec();
-    mLogger.info("OST app terminated with status : " + QString(nAppReturnCode));
+    mLogger.info("OST app terminated with status : " + QString::number(nAppReturnCode));
     return nAppReturnCode;
 
 }

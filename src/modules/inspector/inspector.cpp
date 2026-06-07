@@ -353,8 +353,7 @@ void Inspector::OnSucessSEP()
     /*surround stars*/
     p2.begin(&imHFR);
     p2.setPen(QPen(Qt::blue, 10));
-    foreach( FITSImage::Star s, _solver.stars )
-    {
+    for( FITSImage::Star s : _solver.stars )    {
         QPainter p2;
         int x = s.x;
         int y = s.y;
@@ -378,8 +377,7 @@ void Inspector::OnSucessSEP()
     lowerLeftHFR = 0;
     upperRightHFR = 0;
     lowerRightHFR = 0;
-    foreach( FITSImage::Star s, _solver.stars )
-    {
+    for( FITSImage::Star s : _solver.stars )    {
         if ( (s.x < (im.width() / 2)) && (s.y < (im.height() / 2) ))
         {
             upperLeftHFR = ( upperLeftI * upperLeftHFR + s.HFR * ech) / (upperLeftI + 1);

@@ -236,7 +236,7 @@ bool DBManager::saveDbConfiguration(const QString &pConfigName, QVariantMap &pCo
         return false;
     }
 
-    foreach(const QString &key, pConf.keys())
+    for(const QString &key : pConf.keys())
     {
         QString label = pConf[key].toMap()["label"].toString();
         QString type = pConf[key].toMap()["type"].toString();
@@ -461,7 +461,7 @@ bool DBManager::populateCatalog(const QString &pFileName, const QString &pName)
     file.close();
     QJsonDocument d = QJsonDocument::fromJson(content.toUtf8());
     QJsonObject props = d.object();
-    foreach(const QString &key, props.keys())
+    for(const QString &key : props.keys())
     {
         QVariant tt = props[key].toVariant();
         mProperties[key] = tt.toMap();

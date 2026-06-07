@@ -10,7 +10,7 @@ set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-add_compile_options(-fno-sized-deallocation)
+add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-fno-sized-deallocation>)
 add_compile_options(-fPIC)
 
 #get_cmake_property(_variableNames VARIABLES)
@@ -32,9 +32,17 @@ find_package(Nova REQUIRED)
 find_package(GSL REQUIRED)
 #find_package(OpenCV REQUIRED )
 find_package(WCSLIB REQUIRED)
-find_package(QT NAMES Qt5 COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql Scxml Xml REQUIRED)
-find_package(Qt5 REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql Scxml Xml)
-find_package(StellarSolver REQUIRED)
+find_package(QT NAMES Qt6 COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql Scxml StateMachine Xml REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql Scxml StateMachine Xml)
+add_subdirectory(libs/stellarsolver)
+set(STELLARSOLVER_INCLUDE_DIR
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/stellarsolver/stellarsolver
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/stellarsolver/stellarsolver/astrometry/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/stellarsolver/stellarsolver/astrometry/include/astrometry
+    ${CMAKE_BINARY_DIR}/libs/stellarsolver
+)
+set(STELLARSOLVER_LIBRARIES stellarsolver)
+install(TARGETS stellarsolver LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Runtime)
 find_library(avahi-client-lib avahi-client REQUIRED)
 find_library(avahi-common-lib avahi-common REQUIRED)
 find_path(avahi-client-includes avahi-client/client.h REQUIRED)
@@ -58,9 +66,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/model/listofvalues)
 include_directories(${INDI_INCLUDE_DIR})
 include_directories(${CFITSIO_INCLUDE_DIR})
 include_directories(${GSL_INCLUDE_DIRS})
-include_directories(${Qt5_DIR})
-include_directories(${QT5Declarative_INCLUDE_LIBRARIES} )
-include_directories(${QT5Declarative_INCLUDE_DIRS} )
+include_directories(${Qt${QT_VERSION_MAJOR}_DIR})
 include_directories(${STELLARSOLVER_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/QtZeroConf)
 
@@ -76,7 +82,11 @@ set(TS_FILES
 )
 
 # Find lrelease executable
-find_program(QT_LRELEASE_EXECUTABLE NAMES lrelease lrelease-qt5)
+find_program(QT_LRELEASE_EXECUTABLE
+    NAMES lrelease-qt6 lrelease
+    HINTS /usr/lib/qt6/bin
+          ${Qt6_DIR}/../../../bin
+)
 if(NOT QT_LRELEASE_EXECUTABLE)
     message(FATAL_ERROR "lrelease not found. Cannot compile translation files.")
 endif()
@@ -376,6 +386,7 @@ target_link_libraries(ostfocus PRIVATE
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Scxml
+    Qt${QT_VERSION_MAJOR}::StateMachine
     Threads::Threads
     z
 )
@@ -409,7 +420,7 @@ target_link_libraries(ostguider PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Widgets
-    Qt${QT_VERSION_MAJOR}::Scxml
+    Qt${QT_VERSION_MAJOR}::StateMachine
     Threads::Threads
     z
 )
@@ -493,6 +504,7 @@ target_link_libraries(ostpolar PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::StateMachine
     Threads::Threads
     z
 )

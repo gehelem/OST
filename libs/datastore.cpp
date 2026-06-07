@@ -384,8 +384,7 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
     if (data.contains("p"))
     {
         QJsonObject props = data["p"].toObject();
-        foreach(const QString &key, props.keys())
-        {
+        for(const QString &key : props.keys())        {
             //qDebug() << "***** create property from file " << key;
             QVariantMap tt = props[key].toVariant().toMap();
             OST::PropertyMulti *rp = OST::PropertyFactory::createProperty(key, tt);
@@ -409,8 +408,7 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
     if (data.contains("globallov"))
     {
         QJsonObject lovs = data["globallov"].toObject();
-        foreach(const QString &key, lovs.keys())
-        {
+        for(const QString &key : lovs.keys())        {
             QVariantMap tt = lovs[key].toVariant().toMap();
             OST::LovBase *lb = OST::LovFactory::createLov(tt);
 
@@ -446,8 +444,7 @@ QVariantMap Datastore::getProfile(void)
     //    result["globallovs"] = getGlobalLovsDump().toVariantHash();
     //
     //
-    //    foreach(const QString &keyprop, props.keys())
-    //    {
+    //    for(const QString &keyprop : props.keys())    //    {
     //        if (props[keyprop].toMap().contains("hasprofile"))
     //        {
     //            if (props[keyprop].toMap()["hasprofile"].toBool())
@@ -456,8 +453,7 @@ QVariantMap Datastore::getProfile(void)
     //                if (props[keyprop].toMap().contains("e"))
     //                {
     //                    QVariantMap elements;
-    //                    foreach(const QString &keyelt, props[keyprop].toMap()["e"].toMap().keys())
-    //                    {
+    //                    for(const QString &keyelt : props[keyprop].toMap()["e"].toMap().keys())    //                    {
     //                        QVariantMap element;
     //                        if (props[keyprop].toMap()["e"].toMap()[keyelt].toMap().contains("value"))
     //                        {
