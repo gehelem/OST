@@ -6,16 +6,13 @@ Build-Depends: cmake,
                debhelper (>= 13),
                debhelper-compat (= 13),
                pkg-config,
-               qtbase5-dev,
-               qtdeclarative5-dev,
-               qttools5-dev-tools,
-               libqt5websockets5-dev,
-               libqt5svg5-dev,
-               libqt5scxml5-dev,
-               libqt5sql5-sqlite,
+               qt6-base-dev,
+               qt6-tools-dev-tools,
+               libqt6websockets6-dev,
+               libqt6scxml6-dev,
                libeigen3-dev,
                zlib1g-dev,
-               libcfitsio3-dev|libcfitsio-dev,
+               libcfitsio-dev,
                libnova-dev,
                libindi-dev (>= 1.6.1),
                indi-bin (>= 1.6.1),
@@ -23,7 +20,6 @@ Build-Depends: cmake,
                libraw-dev,
                libgsl-dev,
                libsecret-1-dev,
-               libstellarsolver-dev,
                libavahi-client-dev,
                libavahi-common-dev
 Standards-Version: 4.6.0
@@ -35,8 +31,7 @@ Rules-Requires-Root: no
 Package: ostserver
 Architecture: any
 Section: science
-Depends: ${shlibs:Depends}, ${misc:Depends}, libqt5sql5, libqt5sql5-sqlite
-Recommends: libindi1, libstellarsolver
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqt6sql6-sqlite
 Description: Observatoire Sans Tête
  Light and headless astrophotography automation tool
 
