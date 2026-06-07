@@ -126,11 +126,15 @@ set(CPACK_DEBIAN_RUNTIME_DESCRIPTION
     "Observatoire Sans Tête\n Light and headless astrophotography automation tool")
 set(CPACK_DEBIAN_RUNTIME_PACKAGE_DEPENDS
     "libqt6core6t64 | libqt6core6, \
+libqt6gui6t64 | libqt6gui6, \
+libqt6widgets6t64 | libqt6widgets6, \
 libqt6network6t64 | libqt6network6, \
 libqt6websockets6t64 | libqt6websockets6, \
 libqt6sql6t64 | libqt6sql6, \
 libqt6sql6-sqlite, \
 libqt6scxml6t64 | libqt6scxml6, \
+libqt6statemachine6t64 | libqt6statemachine6, \
+libqt6xml6t64 | libqt6xml6, \
 libindi1, \
 libnova-0.16-0, \
 libcfitsio10t64 | libcfitsio10, \
