@@ -19,5 +19,8 @@ export DEB_LDFLAGS_MAINT_APPEND = -Wl,--no-as-needed -fPIC
 	dh $@ --buildsystem=cmake
 
 override_dh_auto_configure:
-	git submodule update --init --recursive
+	if [ ! -f libs/stellarsolver/CMakeLists.txt ]; then \
+		git clone https://github.com/rlancaste/stellarsolver.git libs/stellarsolver && \
+		git -C libs/stellarsolver checkout ce7dace760b028a3041dc1373deeafa1de597411; \
+	fi
 	dh_auto_configure
