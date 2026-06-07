@@ -3,11 +3,13 @@ Section: science
 Priority: optional
 Maintainer: gilles <gilles@joag.fr>
 Build-Depends: cmake,
+               git,
                debhelper (>= 13),
                debhelper-compat (= 13),
                pkg-config,
                qt6-base-dev,
                qt6-tools-dev-tools,
+               libgl-dev,
                qt6-websockets-dev | libqt6websockets6-dev,
                qt6-scxml-dev,
                libeigen3-dev,
