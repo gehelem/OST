@@ -57,7 +57,6 @@ build-job-2604:
     expire_in: 4 week
   rules:
     - when: manual
-      allow_failure: true
 
 test-job-2404:
   stage: test
@@ -91,7 +90,6 @@ test-job-2604:
     expire_in: 4 week
   rules:
     - when: manual
-      allow_failure: true
 
 release-job-tag:
   stage: release
