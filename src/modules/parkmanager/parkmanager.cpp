@@ -1,5 +1,9 @@
 #include "parkmanager.h"
 #include <QPainter>
+#include <libnova/solar.h>
+#include <libnova/julian_day.h>
+#include <libnova/rise_set.h>
+#include <libnova/transform.h>
 #include "version.cc"
 
 Parkmanager *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
@@ -51,11 +55,20 @@ Parkmanager::Parkmanager(QString name, QString label, QString profile, QVariantM
     connectIndi();
     connectAllDevices();
 
+    QTimer *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &Parkmanager::onTimer);
+    timer->start(2000);
+
+
 }
 
 Parkmanager::~Parkmanager()
 {
 
+}
+
+void Parkmanager::onAfterInit(void)
+{
 }
 
 void Parkmanager::onExternalEvent(OST::ExtEvent event)
@@ -104,7 +117,7 @@ void Parkmanager::onUpdateProperty(INDI::Property property)
 {
     //if (mState == "idle") return;
 
-    if (property.getDeviceName() == getString("devices", "mount"))
+    /*if (property.getDeviceName() == getString("devices", "mount"))
     {
         if (property.getName()   == std::string("EQUATORIAL_EOD_COORD"))
         {
@@ -115,13 +128,11 @@ void Parkmanager::onUpdateProperty(INDI::Property property)
         }
         if (property.getName()   == std::string("TELESCOPE_TRACK_STATE"))
         {
-            // Update mount position
             INDI::PropertySwitch prop = property;
             getEltBool("mountstate", "tracking")->setValue(prop.findWidgetByName("TRACK_ON")->s, false);
         }
         if (property.getName()   == std::string("TELESCOPE_PARK"))
         {
-            // Update mount position
             INDI::PropertySwitch prop = property;
             getEltBool("mountstate", "parked")->setValue(prop.findWidgetByName("PARK")->s, false);
         }
@@ -175,7 +186,7 @@ void Parkmanager::onUpdateProperty(INDI::Property property)
         getEltDate("gpsstate", "date")->setValue(dt.date(), false);
         getEltTime("gpsstate", "time")->setValue(dt.time(), false);
         getEltFloat("gpsstate", "offset")->setValue(offset.toFloat(), true);
-    }
+    }*/
 }
 void Parkmanager::initIndi()
 {
@@ -201,6 +212,87 @@ void Parkmanager::initIndi()
     getEltTime("gpsstate", "time")->setValue(dt.time(), false);
     getEltFloat("gpsstate", "offset")->setValue(offset.toFloat(), true);
 
+}
 
+void Parkmanager::onTimer(void)
+{
+    refreshDriversData();
+    calculateSunset();
+}
+void Parkmanager::refreshDriversData(void)
+{
+    this->sendModNewSwitch(getString("devices", "gps").toStdString().c_str(), "GPS_REFRESH", "REFRESH", ISS_ON);
+
+    // Update GPS Coords
+    INDI::PropertyNumber pn = getDevice(getString("devices", "gps").toStdString().c_str()).getProperty("GEOGRAPHIC_COORD",
+                              INDI_NUMBER);
+    getEltFloat("gpsstate", "alt")->setValue(pn.findWidgetByName("ELEV")->value, false);
+    getEltFloat("gpsstate", "lat")->setValue(pn.findWidgetByName("LAT")->value, false);
+    getEltFloat("gpsstate", "lon")->setValue(pn.findWidgetByName("LONG")->value, true);
+
+    // Update GPS Time and date
+    INDI::PropertyText pt = getDevice(getString("devices", "gps").toStdString().c_str()).getProperty("TIME_UTC", INDI_TEXT);
+    QDateTime dt;
+    QString strdt = pt.findWidgetByName("UTC")->text;
+    QString offset = pt.findWidgetByName("OFFSET")->text;
+    dt = dt.fromString(strdt, Qt::ISODate);
+    getEltDate("gpsstate", "date")->setValue(dt.date(), false);
+    getEltTime("gpsstate", "time")->setValue(dt.time(), false);
+    getEltFloat("gpsstate", "offset")->setValue(offset.toFloat(), true);
+
+    // Update mount position
+    pn = getDevice(getString("devices",
+                             "mount").toStdString().c_str()).getProperty("EQUATORIAL_EOD_COORD", INDI_NUMBER);
+    getEltFloat("mountstate", "RA")->setValue(pn.findWidgetByName("RA")->value, false);
+    getEltFloat("mountstate", "DEC")->setValue(pn.findWidgetByName("DEC")->value, true);
+
+    // Update mount states
+    INDI::PropertySwitch ps = getDevice(getString("devices",
+                                        "mount").toStdString().c_str()).getProperty("TELESCOPE_TRACK_STATE", INDI_SWITCH);
+    getEltBool("mountstate", "tracking")->setValue(ps.findWidgetByName("TRACK_ON")->s, false);
+
+    ps = getDevice(getString("devices", "mount").toStdString().c_str()).getProperty("TELESCOPE_PARK", INDI_SWITCH);
+    getEltBool("mountstate", "parked")->setValue(ps.findWidgetByName("PARK")->s, false);
+
+    //update dome states
+    ps = getDevice(getString("devices", "dome").toStdString().c_str()).getProperty("DOME_SHUTTER", INDI_SWITCH);
+    getEltBool("domestate", "shutterclosed")->setValue(ps.findWidgetByName("SHUTTER_CLOSE")->s, true);
+    ps = getDevice(getString("devices", "dome").toStdString().c_str()).getProperty("DOME_PARK", INDI_SWITCH);
+    getEltBool("domestate", "parked")->setValue(ps.findWidgetByName("PARK")->s, true);
+
+    //update weather state
+    INDI::PropertyLight pl = getDevice(getString("devices",
+                                       "weather").toStdString().c_str()).getProperty("WEATHER_STATUS", INDI_LIGHT);
+    getEltLight("weatherstate", "global")->setValue(OST::IntToState(pl.findWidgetByName("WEATHER_FORECAST")->s), true);
+
+
+
+}
+
+void Parkmanager::calculateSunset(void)
+{
+    double JD = ln_get_julian_from_sys();
+
+    ln_rst_time rst;
+    ln_zonedate rise, set, transit;
+    ln_lnlat_posn observer;
+    observer.lat = getFloat("gpsstate", "lat");
+    observer.lng = getFloat("gpsstate", "lon");
+    if (ln_get_solar_rst(JD, &observer, &rst) != 0)
+    {
+        logError("Sun is circumpolar");
+        return;
+    }
+    else
+    {
+        ln_get_local_date(rst.rise, &rise);
+        ln_get_local_date(rst.transit, &transit);
+        ln_get_local_date(rst.set, &set);
+        QTime t;
+        t.setHMS(rise.hours, rise.minutes, rise.seconds);
+        getEltTime("coming", "sunrise")->setValue(t, false);
+        t.setHMS(set.hours, set.minutes, set.seconds);
+        getEltTime("coming", "sunset")->setValue(t, true);
+    }
 
 }

@@ -22,11 +22,12 @@ class MODULE_INIT Parkmanager : public IndiModule
     public:
         Parkmanager(QString name, QString label, QString profile, QVariantMap availableModuleLibs);
         ~Parkmanager();
-        void onNewDevice      (INDI::BaseDevice dp) override     {} ;
-        void onRemoveDevice   (INDI::BaseDevice dp) override     {} ;
-        void onNewProperty    (INDI::Property property) override {} ;
-        void onRemoveProperty (INDI::Property property) override {} ;
-        void onUpdateProperty (INDI::Property property);
+        void onNewDevice      (INDI::BaseDevice ) override     {} ;
+        void onRemoveDevice   (INDI::BaseDevice ) override     {} ;
+        void onNewProperty    (INDI::Property ) override {} ;
+        void onRemoveProperty (INDI::Property ) override {} ;
+        void onUpdateProperty (INDI::Property property)override;
+        void onAfterInit(void) override;
 
     signals:
 
@@ -35,12 +36,11 @@ class MODULE_INIT Parkmanager : public IndiModule
         void onExternalEvent(OST::ExtEvent event) override;
 
     private:
-
+        void onTimer(void);
+        void refreshDriversData(void);
         void initIndi(void);
+        void calculateSunset(void);
 
-        void SMAlert();
-
-        QString mState = "idle";
 
 };
 

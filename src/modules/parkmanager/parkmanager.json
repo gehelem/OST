@@ -138,6 +138,25 @@
 
         }
     },
+    "coming": {
+        "devcat": "Control",
+        "group": "",
+        "order":"",
+        "permission": 0,
+        "label": "Events to come",
+        "e": {
+            "sunrise": {
+                "label": "Next sunrise",
+                "type": "time",
+                "order":"20"
+            },
+            "sunset": {
+                "type": "time",
+                "label": "Next sunset",
+                "order":"30"
+            }
+        }
+    },
     "weatherrules": {
         "devcat": "Behaviour",
         "order": "01",
