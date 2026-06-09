@@ -69,16 +69,52 @@ void Parkmanager::onUpdateProperty(INDI::Property property)
 {
     //if (mState == "idle") return;
 
-    if (
-        (property.getDeviceName() == getString("devices", "mount"))
-        &&  (property.getName()   == std::string("EQUATORIAL_EOD_COORD"))
-    )
+    if (property.getDeviceName() == getString("devices", "mount"))
     {
-        // Update mount position
-        INDI::PropertyNumber prop = property;
-        getEltFloat("mountposition", "RA")->setValue(prop.findWidgetByName("RA")->value, false);
-        getEltFloat("mountposition", "DEC")->setValue(prop.findWidgetByName("DEC")->value, true);
+        if (property.getName()   == std::string("EQUATORIAL_EOD_COORD"))
+        {
+            // Update mount position
+            INDI::PropertyNumber prop = property;
+            getEltFloat("mountstate", "RA")->setValue(prop.findWidgetByName("RA")->value, false);
+            getEltFloat("mountstate", "DEC")->setValue(prop.findWidgetByName("DEC")->value, true);
+        }
+        if (property.getName()   == std::string("TELESCOPE_TRACK_STATE"))
+        {
+            // Update mount position
+            INDI::PropertySwitch prop = property;
+            getEltBool("mountstate", "tracking")->setValue(prop.findWidgetByName("TRACK_ON")->s, false);
+        }
+        if (property.getName()   == std::string("TELESCOPE_PARK"))
+        {
+            // Update mount position
+            INDI::PropertySwitch prop = property;
+            getEltBool("mountstate", "parked")->setValue(prop.findWidgetByName("PARK")->s, false);
+        }
     }
+
+    if (property.getDeviceName() == getString("devices", "dome"))
+    {
+        if (property.getName()   == std::string("DOME_SHUTTER"))
+        {
+            INDI::PropertySwitch prop = property;
+            getEltBool("domestate", "shutterclosed")->setValue(prop.findWidgetByName("SHUTTER_CLOSE")->s, true);
+        }
+        if (property.getName()   == std::string("DOME_PARK"))
+        {
+            INDI::PropertySwitch prop = property;
+            getEltBool("domestate", "parked")->setValue(prop.findWidgetByName("PARK")->s, true);
+        }
+    }
+
+    if (property.getDeviceName() == getString("devices", "weather"))
+    {
+        if (property.getName()   == std::string("WEATHER_STATUS"))
+        {
+            INDI::PropertyLight prop = property;
+            getEltLight("weatherstate", "global")->setValue(OST::IntToState(prop.findWidgetByName("WEATHER_FORECAST")->s), true);
+        }
+    }
+
     if (
         (property.getDeviceName() == getString("devices", "gps"))
         &&  (property.getName()   == std::string("GEOGRAPHIC_COORD"))
@@ -86,9 +122,9 @@ void Parkmanager::onUpdateProperty(INDI::Property property)
     {
         // Update GPS Coords
         INDI::PropertyNumber prop = property;
-        getEltFloat("gpslocation", "alt")->setValue(prop.findWidgetByName("ELEV")->value, false);
-        getEltFloat("gpslocation", "lat")->setValue(prop.findWidgetByName("LAT")->value, false);
-        getEltFloat("gpslocation", "lon")->setValue(prop.findWidgetByName("LONG")->value, true);
+        getEltFloat("gpsstate", "alt")->setValue(prop.findWidgetByName("ELEV")->value, false);
+        getEltFloat("gpsstate", "lat")->setValue(prop.findWidgetByName("LAT")->value, false);
+        getEltFloat("gpsstate", "lon")->setValue(prop.findWidgetByName("LONG")->value, true);
     }
     if (
         (property.getDeviceName() == getString("devices", "gps"))
@@ -101,46 +137,34 @@ void Parkmanager::onUpdateProperty(INDI::Property property)
         QString strdt = prop.findWidgetByName("UTC")->text;
         QString offset = prop.findWidgetByName("OFFSET")->text;
         dt = dt.fromString(strdt, Qt::ISODate);
-        getEltDate("gpstime", "date")->setValue(dt.date(), false);
-        getEltTime("gpstime", "time")->setValue(dt.time(), false);
-        getEltFloat("gpstime", "offset")->setValue(offset.toFloat(), true);
-    }
-    if (
-        (property.getDeviceName() == getString("devices", "mount"))
-        &&  (property.getName()   == std::string("EQUATORIAL_EOD_COORD"))
-        &&  (property.getState() == IPS_OK)
-        && mState == "running"
-    )
-    {
+        getEltDate("gpsstate", "date")->setValue(dt.date(), false);
+        getEltTime("gpsstate", "time")->setValue(dt.time(), false);
+        getEltFloat("gpsstate", "offset")->setValue(offset.toFloat(), true);
     }
 }
 void Parkmanager::initIndi()
 {
     connectIndi();
-    connectDevice(getString("devices", "camera"));
+    connectDevice(getString("devices", "gps"));
     connectDevice(getString("devices", "mount"));
-    setBLOBMode(B_ALSO, getString("devices", "camera").toStdString().c_str(), nullptr);
-    if (getString("devices", "camera") == "CCD Simulator")
-    {
-        //sendModNewNumber(getString("devices", "camera"), "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 0.01 );
-    }
-    enableDirectBlobAccess(getString("devices", "camera").toStdString().c_str(), nullptr);
+    connectDevice(getString("devices", "weather"));
+    connectDevice(getString("devices", "dome"));
 
     // Update GPS Coords
     INDI::PropertyNumber pn = getDevice(getString("devices", "gps").toStdString().c_str()).getProperty("GEOGRAPHIC_COORD",
                               INDI_NUMBER);
-    getEltFloat("gpslocation", "alt")->setValue(pn.findWidgetByName("ELEV")->value, false);
-    getEltFloat("gpslocation", "lat")->setValue(pn.findWidgetByName("LAT")->value, false);
-    getEltFloat("gpslocation", "lon")->setValue(pn.findWidgetByName("LONG")->value, true);
+    getEltFloat("gpsstate", "alt")->setValue(pn.findWidgetByName("ELEV")->value, false);
+    getEltFloat("gpsstate", "lat")->setValue(pn.findWidgetByName("LAT")->value, false);
+    getEltFloat("gpsstate", "lon")->setValue(pn.findWidgetByName("LONG")->value, true);
     // Update GPS Time and date
     INDI::PropertyText pt = getDevice(getString("devices", "gps").toStdString().c_str()).getProperty("TIME_UTC", INDI_TEXT);
     QDateTime dt;
     QString strdt = pt.findWidgetByName("UTC")->text;
     QString offset = pt.findWidgetByName("OFFSET")->text;
     dt = dt.fromString(strdt, Qt::ISODate);
-    getEltDate("gpstime", "date")->setValue(dt.date(), false);
-    getEltTime("gpstime", "time")->setValue(dt.time(), false);
-    getEltFloat("gpstime", "offset")->setValue(offset.toFloat(), true);
+    getEltDate("gpsstate", "date")->setValue(dt.date(), false);
+    getEltTime("gpsstate", "time")->setValue(dt.time(), false);
+    getEltFloat("gpsstate", "offset")->setValue(offset.toFloat(), true);
 
 
 
