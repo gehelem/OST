@@ -109,7 +109,22 @@
                 "order":"80",
                 "listOfValues":"DRIVER_INTERFACE-GPS_INTERFACE",
                 "autoupdate":true
+            },
+            "dome": {
+                "type": "string",
+                "label": "Dome",
+                "order":"90",
+                "listOfValues":"DRIVER_INTERFACE-DOME_INTERFACE",
+                "autoupdate":true
+            },
+            "weather": {
+                "type": "string",
+                "label": "Weather",
+                "order":"95",
+                "listOfValues":"DRIVER_INTERFACE-WEATHER_INTERFACE",
+                "autoupdate":true
             }
+
         }
     },
     "optics": {

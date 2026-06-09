@@ -33,6 +33,8 @@ IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap
     createGlobLov("DRIVER_INTERFACE-GPS_INTERFACE", ls);
     ls = new OST::LovString("DRIVER_INTERFACE-WEATHER_INTERFACE");
     createGlobLov("DRIVER_INTERFACE-WEATHER_INTERFACE", ls);
+    ls = new OST::LovString("DRIVER_INTERFACE-DOME_INTERFACE");
+    createGlobLov("DRIVER_INTERFACE-DOME_INTERFACE", ls);
     ls = new OST::LovString("DRIVER_INTERFACE-AUX_INTERFACE");
     createGlobLov("DRIVER_INTERFACE-AUX_INTERFACE", ls);
 
@@ -122,6 +124,8 @@ bool IndiModule::onExternalEventIndi(OST::ExtEvent event)
                     if (getProperty("devices")->getElts()->contains("guidecamera")) getEltString("devices", "guidecamera")->setValue("");
                     if (getProperty("devices")->getElts()->contains("guidest4")) getEltString("devices", "guidest4")->setValue("");
                     if (getProperty("devices")->getElts()->contains("gps")) getEltString("devices", "gps")->setValue("");
+                    if (getProperty("devices")->getElts()->contains("dome")) getEltString("devices", "dome")->setValue("");
+                    if (getProperty("devices")->getElts()->contains("weather")) getEltString("devices", "weather")->setValue("");
                     QString camera = mGlobalDatastore->getGridString("equipments", "camera",    "name", equipmentName);
                     QString mount = mGlobalDatastore->getGridString("equipments", "mount",    "name", equipmentName);
                     QString focuser = mGlobalDatastore->getGridString("equipments", "focuser",    "name", equipmentName);
@@ -129,12 +133,16 @@ bool IndiModule::onExternalEventIndi(OST::ExtEvent event)
                     QString guidecamera = mGlobalDatastore->getGridString("equipments", "guidecamera",    "name", equipmentName);
                     QString guidest4 = mGlobalDatastore->getGridString("equipments", "guidest4",    "name", equipmentName);
                     QString gps = mGlobalDatastore->getGridString("equipments", "gps",    "name", equipmentName);
+                    QString dome = mGlobalDatastore->getGridString("equipments", "dome",    "name", equipmentName);
+                    QString weather = mGlobalDatastore->getGridString("equipments", "weather",    "name", equipmentName);
                     QString hostport = mGlobalDatastore->getGridString("equipments", "host",    "name", equipmentName);
                     if (camera != "")
                         logInfo("Equipments: %1", {equipmentName});
                     else
                         logWarning("Equipments '%1' not found in GlobalDatastore", {equipmentName});
                     if (getProperty("devices")->getElts()->contains("camera")) getEltString("devices", "camera")->setValue(camera);
+                    if (getProperty("devices")->getElts()->contains("dome")) getEltString("devices", "dome")->setValue(dome);
+                    if (getProperty("devices")->getElts()->contains("weather")) getEltString("devices", "weather")->setValue(weather);
                     if (getProperty("devices")->getElts()->contains("mount")) getEltString("devices", "mount")->setValue(mount);
                     if (getProperty("devices")->getElts()->contains("focuser")) getEltString("devices", "focuser")->setValue(focuser);
                     if (getProperty("devices")->getElts()->contains("filter")) getEltString("devices", "filter")->setValue(filter);
@@ -837,32 +845,6 @@ bool IndiModule::createDeviceProperty(const QString &key, const QString &label, 
         {
             s->lovAdd(devs[i].getDeviceName(), devs[i].getDeviceName());
         }
-        /*sendMessage("------------ list devs " + QString(devs[i].getDeviceName()));
-        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::GENERAL_INTERFACE) sendMessage("GENERAL_INTERFACE");
-        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::TELESCOPE_INTERFACE)
-            sendMessage("TELESCOPE_INTERFACE");
-        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::CCD_INTERFACE) sendMessage("CCD_INTERFACE");
-        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::GUIDER_INTERFACE) sendMessage("GUIDER_INTERFACE");
-        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::FOCUSER_INTERFACE) sendMessage("FOCUSER_INTERFACE");
-        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::FILTER_INTERFACE) sendMessage("FILTER_INTERFACE");
-        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::DOME_INTERFACE) sendMessage("DOME_INTERFACE");
-        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::GPS_INTERFACE) sendMessage("GPS_INTERFACE");
-        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::WEATHER_INTERFACE) sendMessage("WEATHER_INTERFACE");
-        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::AO_INTERFACE) sendMessage("AO_INTERFACE");
-        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::DUSTCAP_INTERFACE) sendMessage("DUSTCAP_INTERFACE");
-        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::LIGHTBOX_INTERFACE)
-            sendMessage("LIGHTBOX_INTERFACE");
-        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::DETECTOR_INTERFACE)
-            sendMessage("DETECTOR_INTERFACE");
-        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::ROTATOR_INTERFACE) sendMessage("ROTATOR_INTERFACE");
-        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::SPECTROGRAPH_INTERFACE)
-            sendMessage("SPECTROGRAPH_INTERFACE");
-        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::CORRELATOR_INTERFACE)
-            sendMessage("CORRELATOR_INTERFACE");
-        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::AUX_INTERFACE) sendMessage("AUX_INTERFACE");
-        if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::SENSOR_INTERFACE) sendMessage("SENSOR_INTERFACE");
-        sendMessage("----------------------------");*/
-
     }
     createProperty(pm);
     return true;
@@ -890,6 +872,7 @@ bool IndiModule::refreshDeviceslovs()
     getGlovString("DRIVER_INTERFACE-FILTER_INTERFACE")->lovClear();
     getGlovString("DRIVER_INTERFACE-GPS_INTERFACE")->lovClear();
     getGlovString("DRIVER_INTERFACE-WEATHER_INTERFACE")->lovClear();
+    getGlovString("DRIVER_INTERFACE-DOME_INTERFACE")->lovClear();
     getGlovString("DRIVER_INTERFACE-AUX_INTERFACE")->lovClear();
 
 
@@ -928,6 +911,10 @@ bool IndiModule::refreshDeviceslovs()
             if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::WEATHER_INTERFACE)
             {
                 getGlovString("DRIVER_INTERFACE-WEATHER_INTERFACE")->lovAdd(d, d);
+            }
+            if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::DOME_INTERFACE)
+            {
+                getGlovString("DRIVER_INTERFACE-DOME_INTERFACE")->lovAdd(d, d);
             }
             if (devs[i].getDriverInterface() & INDI::BaseDevice::DRIVER_INTERFACE::AUX_INTERFACE)
             {
@@ -1176,6 +1163,9 @@ bool IndiModule::giveMeADevice(QString name, QString label, INDI::BaseDevice::DR
             break;
         case INDI::BaseDevice::DRIVER_INTERFACE::WEATHER_INTERFACE:
             s->setGlobalLov("DRIVER_INTERFACE-WEATHER_INTERFACE");
+            break;
+        case INDI::BaseDevice::DRIVER_INTERFACE::DOME_INTERFACE:
+            s->setGlobalLov("DRIVER_INTERFACE-DOME_INTERFACE");
             break;
         case INDI::BaseDevice::DRIVER_INTERFACE::AUX_INTERFACE:
             s->setGlobalLov("DRIVER_INTERFACE-AUX_INTERFACE");
