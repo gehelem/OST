@@ -137,6 +137,67 @@
             }
 
         }
+    },
+    "weatherrules": {
+        "devcat": "Behaviour",
+        "order": "01",
+        "group": "",
+        "permission": 2,
+        "rule":2,
+        "hasprofile":true,
+        "label": "Weather rules",
+        "e": {
+            "mustbeok": {
+                "type": "bool",
+                "label": "Must be OK",
+                "autoupdate":true,
+                "order": "10"
+            }
+        }
+    },
+    "timerules": {
+        "devcat": "Behaviour",
+        "order": "01",
+        "group": "",
+        "permission": 2,
+        "rule":0,
+        "hasprofile":true,
+        "label": "Time rules",
+        "e": {
+            "fixed": {
+                "type": "bool",
+                "label": "Fixed time",
+                "autoupdate":true,
+                "order": "10"
+            },
+            "fixedstart": {
+                "type": "time",
+                "label": "Fixed time : start",
+                "autoupdate":true,
+                "directedit":true,
+                "order": "20"
+            },
+            "fixedend": {
+                "type": "time",
+                "label": "Fixed time : end",
+                "autoupdate":true,
+                "directedit":true,
+                "order": "30"
+            },
+            "duskdawn": {
+                "type": "bool",
+                "label": "Dust and dawn",
+                "autoupdate":true,
+                "order": "40"
+            },
+            "anytime": {
+                "type": "bool",
+                "label": "Anytime",
+                "autoupdate":true,
+                "order": "50"
+            }
+        }
     }
+
 }
 }
