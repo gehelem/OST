@@ -13,6 +13,27 @@ Parkmanager::Parkmanager(QString name, QString label, QString profile, QVariantM
 {
 
     loadOstPropertiesFromFile(":parkmanager.json");
+    giveMeAnActions();
+
+    OST::PropertyMulti* pm = getProperty("actions");
+    pm->setRule(OST::SwitchsRule::OneOfMany);
+    OST::ElementBool* b = new  OST::ElementBool("open", "Open all", "10", "");
+    b->setPreIcon("play_arrow");
+    pm->addElt(b);
+
+    b = new  OST::ElementBool("close", "Close all", "20", "");
+    b->setPreIcon("stop");
+    pm->addElt(b);
+
+    b = new  OST::ElementBool("auto", "Automate", "30", "");
+    b->setPreIcon("hdr_auto");
+    pm->addElt(b);
+
+    b = new  OST::ElementBool("abort", "Abort motion", "40", "");
+    b->setPreIcon("close");
+    pm->addElt(b);
+    b->setValue(false, true);
+
 
     setMetadata("thisGithash", QString::fromStdString(Version::GIT_SHA1));
     setMetadata("thisGitdate", QString::fromStdString(Version::GIT_DATE));
@@ -46,8 +67,22 @@ void Parkmanager::onExternalEvent(OST::ExtEvent event)
 
     if (event.ev == OST::ExtEvType::SV && event.prpkey == "actions")
     {
-        if (event.eltkey == "xxx")
+        bool b = event.data["m"][this->getModuleName()]["p"][event.prpkey]["e"][event.eltkey].toBool();
+        if (b && event.eltkey == "open")
         {
+            logInfo("Open request");
+        }
+        if (b && event.eltkey == "close")
+        {
+            logInfo("Close request");
+        }
+        if (b && event.eltkey == "auto")
+        {
+            logInfo("Auto request");
+        }
+        if (b && event.eltkey == "abort")
+        {
+            logInfo("Abort request");
         }
     }
 
