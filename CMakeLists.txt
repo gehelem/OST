@@ -514,6 +514,22 @@ target_link_libraries(ostpolar PRIVATE
 )
 target_compile_definitions(ostpolar PRIVATE POLAR_MODULE)
 
+# Parkmanager module
+add_library(ostparkmanager SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/parkmanager/parkmanager.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/parkmanager/parkmanager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/parkmanager/parkmanager.qrc
+)
+target_link_libraries(ostparkmanager PRIVATE
+    ostindimodule
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Threads::Threads
+    z
+)
+target_compile_definitions(ostparkmanager PRIVATE PARKMANAGER_MODULE)
+
 install(TARGETS
     ostserver
     ostbasemodule ostindimodule
@@ -526,6 +542,7 @@ install(TARGETS
     ostallsky
     ostplanner
     ostpolar
+    ostparkmanager
     RUNTIME DESTINATION "/usr/bin"     COMPONENT Runtime
     LIBRARY DESTINATION "/usr/lib"     COMPONENT Runtime
     PUBLIC_HEADER DESTINATION "/usr/include/ost" COMPONENT Development

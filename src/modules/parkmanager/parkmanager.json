@@ -1,0 +1,101 @@
+{
+"p":{
+    "slaves": {
+      "label": "Slaves",
+      "permission": 2,
+      "devcat": "Slaves",
+      "group": "",
+      "order": "100",
+      "hasprofile": true,
+      "e": {
+        "plannermodule": {
+            "type": "string",
+            "label": "Planner instance",
+            "listOfValues":"loadedModules-planner",
+            "listOfValuesIsExternal":true,
+            "autoupdate": true,
+            "directedit": true,
+            "value": "Navigator",
+            "order": 4,
+            "hint": "Name of the planner module INSTANCE to use"
+        }
+      }
+    },
+    "mountposition": {
+        "devcat": "Control",
+        "order": "Control0000",
+        "group": "",
+        "permission": 0,
+        "rule":0,
+        "label": "Mount position",
+        "e": {
+            "RA": {
+                "type": "float",
+                "label": "RA",
+                "order": "10",
+                "value": 0.0
+            },
+            "DEC": {
+                "type": "float",
+                "label": "DEC",
+                "order": "20",
+                "value": 0.0
+            }
+        }
+    },
+    "gpslocation": {
+        "devcat": "Control",
+        "order": "Control0050",
+        "group": "",
+        "permission": 0,
+        "rule":0,
+        "label": "GPS Location",
+        "e": {
+            "alt": {
+                "type": "float",
+                "label": "Altitude",
+                "order": "10",
+                "value": 0.0
+            },
+            "lat": {
+                "type": "float",
+                "label": "Latitude",
+                "order": "20",
+                "value": 0.0
+            },
+            "lon": {
+                "type": "float",
+                "label": "Longitude",
+                "order": "30",
+                "value": 0.0
+            }
+        }
+    },
+    "gpstime": {
+        "devcat": "Control",
+        "order": "Control0060",
+        "group": "",
+        "permission": 0,
+        "rule":0,
+        "label": "GPS Date and time",
+        "e": {
+            "offset": {
+                "type": "float",
+                "label": "UTC offset",
+                "order": "10",
+                "value": 0
+            },
+            "date": {
+                "type": "date",
+                "label": "Date",
+                "order": "20"
+            },
+            "time": {
+                "type": "time",
+                "label": "Time",
+                "order": "30"
+            }
+        }
+    }
+}
+}
