@@ -33,11 +33,17 @@ Parkmanager::Parkmanager(QString name, QString label, QString profile, QVariantM
     b->setPreIcon("hdr_auto");
     pm->addElt(b);
 
+
     b = new  OST::ElementBool("abort", "Abort motion", "40", "");
     b->setPreIcon("close");
     pm->addElt(b);
-    b->setValue(false, true);
 
+    b = new  OST::ElementBool("idle", "Idle", "50", "");
+    b->setPreIcon("mode_standby");
+    pm->addElt(b);
+
+    getEltBool("actions", "idle")->setValue(true, true);
+    getEltBool("weatherrules", "disabled")->setValue(true, true);
 
     setMetadata("thisGithash", QString::fromStdString(Version::GIT_SHA1));
     setMetadata("thisGitdate", QString::fromStdString(Version::GIT_DATE));
@@ -94,6 +100,10 @@ void Parkmanager::onExternalEvent(OST::ExtEvent event)
             logInfo("Auto request");
         }
         if (b && event.eltkey == "abort")
+        {
+            logInfo("Abort request");
+        }
+        if (b && event.eltkey == "idle")
         {
             logInfo("Abort request");
         }
@@ -222,6 +232,7 @@ void Parkmanager::onTimer(void)
 void Parkmanager::refreshDriversData(void)
 {
     this->sendModNewSwitch(getString("devices", "gps").toStdString().c_str(), "GPS_REFRESH", "REFRESH", ISS_ON);
+    this->sendModNewSwitch(getString("devices", "weather").toStdString().c_str(), "WEATHER_REFRESH", "REFRESH", ISS_ON);
 
     // Update GPS Coords
     INDI::PropertyNumber pn = getDevice(getString("devices", "gps").toStdString().c_str()).getProperty("GEOGRAPHIC_COORD",

@@ -162,7 +162,7 @@
         "order": "01",
         "group": "",
         "permission": 2,
-        "rule":2,
+        "rule":0,
         "hasprofile":true,
         "label": "Weather rules",
         "e": {
@@ -171,6 +171,12 @@
                 "label": "Must be OK",
                 "autoupdate":true,
                 "order": "10"
+            },
+            "disabled": {
+                "type": "bool",
+                "label": "Disabled",
+                "autoupdate":true,
+                "order": "20"
             }
         }
     },
