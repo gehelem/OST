@@ -1310,11 +1310,13 @@ bool IndiModule::giveMeALocation()
         pm->addElt(e);
 
         OST::ElementFloat* f = new  OST::ElementFloat("lat", "Latitude", "10", "");
+        f->setMinMax(-90, 90, false);
         f->setDirectEdit(true);
         f->setAutoUpdate(true);
         pm->addElt(f);
 
         f = new  OST::ElementFloat("lon", "Longitude", "20", "");
+        f->setMinMax(-180, 180, false);
         f->setDirectEdit(true);
         f->setAutoUpdate(true);
         pm->addElt(f);
