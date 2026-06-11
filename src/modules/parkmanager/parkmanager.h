@@ -30,18 +30,47 @@ class MODULE_INIT Parkmanager : public IndiModule
         void onAfterInit(void) override;
 
     signals:
-
         void cameraAlert();
+
     protected:
         void onExternalEvent(OST::ExtEvent event) override;
 
     private:
+        enum class Mode  { Idle, Open, Close, Auto, Abort };
+        enum class Phase {
+            Idle,
+            // Opening sequence
+            OpeningDome, WaitingDomeOpen,
+            UnparkingMount, WaitingUnpark,
+            StartingTracking,
+            OpenMonitoring,
+            // Closing sequence
+            StoppingTracking,
+            GoingHome, WaitingHome,
+            ParkingMount, WaitingPark,
+            ClosingDome, WaitingDomeClose,
+            // Emergency
+            EmergencyStopping
+        };
+
+        Mode  mMode  = Mode::Idle;
+        Phase mPhase = Phase::Idle;
+
         void onTimer(void);
         void refreshDriversData(void);
         void initIndi(void);
         void calculateSunset(void);
 
+        void startOpenSequence(void);
+        void startCloseSequence(void);
+        void processPhase(void);
+        void checkAutoMode(void);
+        void goIdle(void);
 
+        bool isTimeInWindow(QTime now, QTime start, QTime end);
+        bool isWeatherOk(void);
+        bool hasDome(void);
+        bool hasMount(void);
 };
 
 extern "C" MODULE_INIT Parkmanager *initialize(QString name, QString label, QString profile,

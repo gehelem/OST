@@ -1,5 +1,6 @@
 #include "parkmanager.h"
 #include <QPainter>
+#include <QTime>
 #include <libnova/solar.h>
 #include <libnova/julian_day.h>
 #include <libnova/rise_set.h>
@@ -15,31 +16,30 @@ Parkmanager *initialize(QString name, QString label, QString profile, QVariantMa
 Parkmanager::Parkmanager(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
     : IndiModule(name, label, profile, availableModuleLibs)
 {
-
     loadOstPropertiesFromFile(":parkmanager.json");
     giveMeAnActions();
     giveMeALocation();
 
     OST::PropertyMulti* pm = getProperty("actions");
     pm->setRule(OST::SwitchsRule::OneOfMany);
-    OST::ElementBool* b = new  OST::ElementBool("open", "Open all", "10", "");
+
+    OST::ElementBool* b = new OST::ElementBool("open", "Open all", "10", "");
     b->setPreIcon("play_arrow");
     pm->addElt(b);
 
-    b = new  OST::ElementBool("close", "Close all", "20", "");
+    b = new OST::ElementBool("close", "Close all", "20", "");
     b->setPreIcon("stop");
     pm->addElt(b);
 
-    b = new  OST::ElementBool("auto", "Automate", "30", "");
+    b = new OST::ElementBool("auto", "Automate", "30", "");
     b->setPreIcon("hdr_auto");
     pm->addElt(b);
 
-
-    b = new  OST::ElementBool("abort", "Abort motion", "40", "");
+    b = new OST::ElementBool("abort", "Abort motion", "40", "");
     b->setPreIcon("close");
     pm->addElt(b);
 
-    b = new  OST::ElementBool("idle", "Idle", "50", "");
+    b = new OST::ElementBool("idle", "Idle", "50", "");
     b->setPreIcon("mode_standby");
     pm->addElt(b);
 
@@ -53,7 +53,6 @@ Parkmanager::Parkmanager(QString name, QString label, QString profile, QVariantM
     setMetadata("thisversion", QString::fromStdString(Version::GIT_TAG));
     setMetadata("template", "parkmanager");
 
-
     giveMeADevice("dome", "Dome", INDI::BaseDevice::DOME_INTERFACE);
     giveMeADevice("mount", "Mount", INDI::BaseDevice::TELESCOPE_INTERFACE);
     giveMeADevice("weather", "Weather", INDI::BaseDevice::WEATHER_INTERFACE);
@@ -64,129 +63,316 @@ Parkmanager::Parkmanager(QString name, QString label, QString profile, QVariantM
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &Parkmanager::onTimer);
     timer->start(2000);
-
-
 }
 
-Parkmanager::~Parkmanager()
+Parkmanager::~Parkmanager() {}
+
+void Parkmanager::onAfterInit(void) {}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+bool Parkmanager::hasDome(void)
 {
-
+    return !getString("devices", "dome").isEmpty();
 }
 
-void Parkmanager::onAfterInit(void)
+bool Parkmanager::hasMount(void)
 {
+    return !getString("devices", "mount").isEmpty();
 }
+
+bool Parkmanager::isWeatherOk(void)
+{
+    return getEltLight("weatherstate", "global")->value() == OST::Ok;
+}
+
+bool Parkmanager::isTimeInWindow(QTime now, QTime start, QTime end)
+{
+    if (start <= end)
+        return now >= start && now < end;
+    // Overnight window (e.g. 22:00 → 05:00)
+    return now >= start || now < end;
+}
+
+void Parkmanager::goIdle(void)
+{
+    mMode  = Mode::Idle;
+    mPhase = Phase::Idle;
+    getEltBool("actions", "idle")->setValue(true, true);
+}
+
+// ---------------------------------------------------------------------------
+// User actions
+// ---------------------------------------------------------------------------
 
 void Parkmanager::onExternalEvent(OST::ExtEvent event)
 {
-    if (event.ev == OST::ExtEvType::DP)
-    {
-        //logDebug("Message DP %1", {event.prpkey});
-    }
-
     if (event.ev == OST::ExtEvType::SV && event.prpkey == "actions")
     {
         bool b = event.data["m"][this->getModuleName()]["p"][event.prpkey]["e"][event.eltkey].toBool();
-        if (b && event.eltkey == "open")
+        if (!b) return;
+
+        if (event.eltkey == "open")
         {
-            logInfo("Open request");
+            mMode = Mode::Open;
+            startOpenSequence();
         }
-        if (b && event.eltkey == "close")
+        else if (event.eltkey == "close")
         {
-            logInfo("Close request");
+            mMode = Mode::Close;
+            startCloseSequence();
         }
-        if (b && event.eltkey == "auto")
+        else if (event.eltkey == "auto")
         {
-            logInfo("Auto request");
+            mMode  = Mode::Auto;
+            mPhase = Phase::Idle;
+            logInfo("Auto mode engaged");
         }
-        if (b && event.eltkey == "abort")
+        else if (event.eltkey == "abort")
         {
-            logInfo("Abort request");
+            mMode  = Mode::Abort;
+            mPhase = Phase::EmergencyStopping;
+            logWarning("Emergency abort requested");
         }
-        if (b && event.eltkey == "idle")
+        else if (event.eltkey == "idle")
         {
-            logInfo("Abort request");
+            logInfo("Going idle");
+            goIdle();
         }
     }
+}
 
-    if (event.ev == OST::ExtEvType::SV && event.prpkey == "zzz")
+// ---------------------------------------------------------------------------
+// Sequences
+// ---------------------------------------------------------------------------
+
+void Parkmanager::startOpenSequence(void)
+{
+    if (getEltBool("weatherrules", "mustbeok")->value() && !isWeatherOk())
     {
-        if (event.eltkey == "yyy")
-        {
-            if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
+        logWarning("Weather is not OK, open sequence aborted");
+        goIdle();
+        return;
+    }
+
+    if (hasDome())
+        mPhase = Phase::OpeningDome;
+    else if (hasMount())
+        mPhase = Phase::UnparkingMount;
+    else
+    {
+        logWarning("No dome and no mount configured");
+        goIdle();
+    }
+}
+
+void Parkmanager::startCloseSequence(void)
+{
+    if (hasMount())
+        mPhase = Phase::StoppingTracking;
+    else if (hasDome())
+        mPhase = Phase::ClosingDome;
+    else
+    {
+        logWarning("No dome and no mount configured");
+        goIdle();
+    }
+}
+
+// ---------------------------------------------------------------------------
+// State machine — driven by the 2s timer
+// ---------------------------------------------------------------------------
+
+void Parkmanager::processPhase(void)
+{
+    QString mount = getString("devices", "mount");
+    QString dome  = getString("devices", "dome");
+
+    switch (mPhase)
+    {
+        case Phase::Idle:
+            break;
+
+        // ---- Opening sequence ------------------------------------------------
+
+        case Phase::OpeningDome:
+            logInfo("Opening dome shutter");
+            sendModNewSwitch(dome.toStdString().c_str(), "DOME_SHUTTER", "SHUTTER_OPEN", ISS_ON);
+            mPhase = Phase::WaitingDomeOpen;
+            break;
+
+        case Phase::WaitingDomeOpen:
+            if (!getEltBool("domestate", "shutterclosed")->value())
             {
+                logInfo("Dome open — unparking mount");
+                mPhase = hasMount() ? Phase::UnparkingMount : Phase::OpenMonitoring;
             }
+            break;
 
-        }
+        case Phase::UnparkingMount:
+            logInfo("Unparking mount");
+            sendModNewSwitch(mount.toStdString().c_str(), "TELESCOPE_PARK", "UNPARK", ISS_ON);
+            mPhase = Phase::WaitingUnpark;
+            break;
+
+        case Phase::WaitingUnpark:
+            if (!getEltBool("mountstate", "parked")->value())
+            {
+                logInfo("Mount unparked — starting tracking");
+                mPhase = Phase::StartingTracking;
+            }
+            break;
+
+        case Phase::StartingTracking:
+            logInfo("Starting mount tracking");
+            sendModNewSwitch(mount.toStdString().c_str(), "TELESCOPE_TRACK_STATE", "TRACK_ON", ISS_ON);
+            if (!getBool("mountstate", "home")) getEltBool("mountstate", "home")->setValue(true, true);
+            mPhase = Phase::OpenMonitoring;
+            logInfo("Open sequence complete");
+            break;
+
+        case Phase::OpenMonitoring:
+            if (getEltBool("weatherrules", "mustbeok")->value() && !isWeatherOk())
+            {
+                logWarning("Weather degraded — triggering close sequence");
+                mMode = Mode::Close;
+                startCloseSequence();
+            }
+            break;
+
+        // ---- Closing sequence ------------------------------------------------
+
+        case Phase::StoppingTracking:
+            logInfo("Stopping mount tracking");
+            sendModNewSwitch(mount.toStdString().c_str(), "TELESCOPE_TRACK_STATE", "TRACK_OFF", ISS_ON);
+            mPhase = Phase::GoingHome;
+            break;
+
+        case Phase::GoingHome:
+            getEltBool("mountstate", "home")->setValue(false, false);
+            logInfo("Sending mount to home position");
+            sendModNewSwitch(mount.toStdString().c_str(), "TELESCOPE_HOME", "GO", ISS_ON);
+            mPhase = Phase::WaitingHome;
+            break;
+
+        case Phase::WaitingHome:
+            if (getEltBool("mountstate", "home")->value())
+            {
+                logInfo("Mount at home — parking");
+                mPhase = Phase::ParkingMount;
+            }
+            break;
+
+        case Phase::ParkingMount:
+            logInfo("Parking mount");
+            sendModNewSwitch(mount.toStdString().c_str(), "TELESCOPE_PARK", "PARK", ISS_ON);
+            mPhase = Phase::WaitingPark;
+            break;
+
+        case Phase::WaitingPark:
+            if (getEltBool("mountstate", "parked")->value())
+            {
+                if (hasDome())
+                {
+                    logInfo("Mount parked — closing dome");
+                    mPhase = Phase::ClosingDome;
+                }
+                else
+                {
+                    logInfo("Close sequence complete");
+                    goIdle();
+                }
+            }
+            break;
+
+        case Phase::ClosingDome:
+            logInfo("Closing dome shutter");
+            sendModNewSwitch(dome.toStdString().c_str(), "DOME_SHUTTER", "SHUTTER_CLOSE", ISS_ON);
+            mPhase = Phase::WaitingDomeClose;
+            break;
+
+        case Phase::WaitingDomeClose:
+            if (getEltBool("domestate", "shutterclosed")->value())
+            {
+                logInfo("Close sequence complete");
+                goIdle();
+            }
+            break;
+
+        // ---- Emergency -------------------------------------------------------
+
+        case Phase::EmergencyStopping:
+            logWarning("Emergency stop — aborting all motion");
+            if (hasMount())
+                sendModNewSwitch(mount.toStdString().c_str(), "TELESCOPE_ABORT_MOTION", "ABORT", ISS_ON);
+            if (hasDome())
+                sendModNewSwitch(dome.toStdString().c_str(), "DOME_ABORT_MOTION", "ABORT", ISS_ON);
+            goIdle();
+            break;
     }
-
-
 }
 
-void Parkmanager::onUpdateProperty(INDI::Property property)
+// ---------------------------------------------------------------------------
+// Auto mode — check time rules and trigger sequences
+// ---------------------------------------------------------------------------
+
+void Parkmanager::checkAutoMode(void)
 {
-    //if (mState == "idle") return;
+    if (mMode != Mode::Auto) return;
 
-    /*if (property.getDeviceName() == getString("devices", "mount"))
+    // Only act when idle (waiting to open) or monitoring (waiting to close)
+    if (mPhase != Phase::Idle && mPhase != Phase::OpenMonitoring) return;
+
+    QTime now = QTime::currentTime();
+    bool shouldBeOpen = false;
+
+    if (getEltBool("timerules", "anytime")->value())
     {
-        if (property.getName()   == std::string("EQUATORIAL_EOD_COORD"))
-        {
-            // Update mount position
-            INDI::PropertyNumber prop = property;
-            getEltFloat("mountstate", "RA")->setValue(prop.findWidgetByName("RA")->value, false);
-            getEltFloat("mountstate", "DEC")->setValue(prop.findWidgetByName("DEC")->value, true);
-        }
-        if (property.getName()   == std::string("TELESCOPE_TRACK_STATE"))
-        {
-            INDI::PropertySwitch prop = property;
-            getEltBool("mountstate", "tracking")->setValue(prop.findWidgetByName("TRACK_ON")->s, false);
-        }
-        if (property.getName()   == std::string("TELESCOPE_PARK"))
-        {
-            INDI::PropertySwitch prop = property;
-            getEltBool("mountstate", "parked")->setValue(prop.findWidgetByName("PARK")->s, false);
-        }
+        shouldBeOpen = true;
+    }
+    else if (getEltBool("timerules", "duskdawn")->value())
+    {
+        QTime sunset  = getEltTime("coming", "sunset")->value();
+        QTime sunrise = getEltTime("coming", "sunrise")->value();
+        shouldBeOpen = isTimeInWindow(now, sunset, sunrise);
+    }
+    else if (getEltBool("timerules", "fixed")->value())
+    {
+        QTime start = getEltTime("timerules", "fixedstart")->value();
+        QTime end   = getEltTime("timerules", "fixedend")->value();
+        shouldBeOpen = isTimeInWindow(now, start, end);
     }
 
-    if (property.getDeviceName() == getString("devices", "dome"))
+    if (shouldBeOpen && mPhase == Phase::Idle)
     {
-        if (property.getName()   == std::string("DOME_SHUTTER"))
-        {
-            INDI::PropertySwitch prop = property;
-            getEltBool("domestate", "shutterclosed")->setValue(prop.findWidgetByName("SHUTTER_CLOSE")->s, true);
-        }
-        if (property.getName()   == std::string("DOME_PARK"))
-        {
-            INDI::PropertySwitch prop = property;
-            getEltBool("domestate", "parked")->setValue(prop.findWidgetByName("PARK")->s, true);
-        }
+        logInfo("Auto mode: opening window started");
+        startOpenSequence();
     }
-
-    if (property.getDeviceName() == getString("devices", "weather"))
+    else if (!shouldBeOpen && mPhase == Phase::OpenMonitoring)
     {
-        if (property.getName()   == std::string("WEATHER_STATUS"))
-        {
-            INDI::PropertyLight prop = property;
-            getEltLight("weatherstate", "global")->setValue(OST::IntToState(prop.findWidgetByName("WEATHER_FORECAST")->s), true);
-        }
+        logInfo("Auto mode: opening window ended, closing");
+        startCloseSequence();
     }
-
-    */
 }
-void Parkmanager::initIndi()
-{
-    connectIndi();
-    connectDevice(getString("devices", "mount"));
-    connectDevice(getString("devices", "weather"));
-    connectDevice(getString("devices", "dome"));
 
-}
+// ---------------------------------------------------------------------------
+// Timer
+// ---------------------------------------------------------------------------
 
 void Parkmanager::onTimer(void)
 {
     refreshDriversData();
     calculateSunset();
+    checkAutoMode();
+    processPhase();
 }
+
+// ---------------------------------------------------------------------------
+// INDI data refresh
+// ---------------------------------------------------------------------------
+
 void Parkmanager::refreshDriversData(void)
 {
     if (!getString("devices", "weather").isEmpty())
@@ -200,15 +386,15 @@ void Parkmanager::refreshDriversData(void)
     }
     else
     {
-        // Update mount position
         INDI::PropertyNumber pn = getDevice(getString("devices",
                                             "mount").toStdString().c_str()).getProperty("EQUATORIAL_EOD_COORD", INDI_NUMBER);
         getEltFloat("mountstate", "RA")->setValue(pn.findWidgetByName("RA")->value, false);
         getEltFloat("mountstate", "DEC")->setValue(pn.findWidgetByName("DEC")->value, true);
-        // Update mount states
+
         INDI::PropertySwitch ps = getDevice(getString("devices",
                                             "mount").toStdString().c_str()).getProperty("TELESCOPE_TRACK_STATE", INDI_SWITCH);
         getEltBool("mountstate", "tracking")->setValue(ps.findWidgetByName("TRACK_ON")->s, false);
+
         ps = getDevice(getString("devices", "mount").toStdString().c_str()).getProperty("TELESCOPE_PARK", INDI_SWITCH);
         getEltBool("mountstate", "parked")->setValue(ps.findWidgetByName("PARK")->s, false);
     }
@@ -219,25 +405,20 @@ void Parkmanager::refreshDriversData(void)
     }
     else
     {
-        //update dome states
         INDI::PropertySwitch ps = getDevice(getString("devices", "dome").toStdString().c_str()).getProperty("DOME_SHUTTER",
                                   INDI_SWITCH);
         getEltBool("domestate", "shutterclosed")->setValue(ps.findWidgetByName("SHUTTER_CLOSE")->s, true);
+
         ps = getDevice(getString("devices", "dome").toStdString().c_str()).getProperty("DOME_PARK", INDI_SWITCH);
         getEltBool("domestate", "parked")->setValue(ps.findWidgetByName("PARK")->s, true);
     }
 
     if (!getString("devices", "weather").isEmpty())
     {
-        //update weather state
         INDI::PropertyLight pl = getDevice(getString("devices",
                                            "weather").toStdString().c_str()).getProperty("WEATHER_STATUS", INDI_LIGHT);
         getEltLight("weatherstate", "global")->setValue(OST::IntToState(pl.findWidgetByName("WEATHER_FORECAST")->s), true);
     }
-
-
-
-
 }
 
 void Parkmanager::calculateSunset(void)
@@ -254,16 +435,34 @@ void Parkmanager::calculateSunset(void)
         logError("Sun is circumpolar");
         return;
     }
-    else
-    {
-        ln_get_local_date(rst.rise, &rise);
-        ln_get_local_date(rst.transit, &transit);
-        ln_get_local_date(rst.set, &set);
-        QTime t;
-        t.setHMS(rise.hours, rise.minutes, rise.seconds);
-        getEltTime("coming", "sunrise")->setValue(t, false);
-        t.setHMS(set.hours, set.minutes, set.seconds);
-        getEltTime("coming", "sunset")->setValue(t, true);
-    }
 
+    ln_get_local_date(rst.rise, &rise);
+    ln_get_local_date(rst.transit, &transit);
+    ln_get_local_date(rst.set, &set);
+
+    QTime t;
+    t.setHMS(rise.hours, rise.minutes, rise.seconds);
+    getEltTime("coming", "sunrise")->setValue(t, false);
+    t.setHMS(set.hours, set.minutes, set.seconds);
+    getEltTime("coming", "sunset")->setValue(t, true);
+}
+
+void Parkmanager::onUpdateProperty(INDI::Property property)
+{
+    if (
+        (property.getDeviceName() == getString("devices", "mount"))
+        &&  (property.getName()   == std::string("TELESCOPE_HOME"))
+        &&  (property.getState() == IPS_OK)
+    )
+    {
+        if (!getBool("mountstate", "home")) getEltBool("mountstate", "home")->setValue(true, true);
+    }
+}
+
+void Parkmanager::initIndi()
+{
+    connectIndi();
+    connectDevice(getString("devices", "mount"));
+    connectDevice(getString("devices", "weather"));
+    connectDevice(getString("devices", "dome"));
 }
