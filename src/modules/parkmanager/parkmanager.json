@@ -93,51 +93,6 @@
             }
         }
     },
-    "gpsstate": {
-        "devcat": "Control",
-        "order": "Control0050",
-        "group": "",
-        "permission": 0,
-        "rule":0,
-        "label": "GPS state",
-        "e": {
-            "alt": {
-                "type": "float",
-                "label": "Altitude",
-                "order": "10",
-                "value": 0.0
-            },
-            "lat": {
-                "type": "float",
-                "label": "Latitude",
-                "order": "20",
-                "value": 0.0
-            },
-            "lon": {
-                "type": "float",
-                "label": "Longitude",
-                "order": "30",
-                "value": 0.0
-            },
-            "offset": {
-                "type": "float",
-                "label": "UTC offset",
-                "order": "40",
-                "value": 0
-            },
-            "date": {
-                "type": "date",
-                "label": "Date",
-                "order": "50"
-            },
-            "time": {
-                "type": "time",
-                "label": "Time",
-                "order": "60"
-            }
-
-        }
-    },
     "coming": {
         "devcat": "Control",
         "group": "",
