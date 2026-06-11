@@ -55,7 +55,6 @@ Parkmanager::Parkmanager(QString name, QString label, QString profile, QVariantM
 
 
     giveMeADevice("dome", "Dome", INDI::BaseDevice::DOME_INTERFACE);
-    giveMeADevice("gps", "GPS", INDI::BaseDevice::GPS_INTERFACE);
     giveMeADevice("mount", "Mount", INDI::BaseDevice::TELESCOPE_INTERFACE);
     giveMeADevice("weather", "Weather", INDI::BaseDevice::WEATHER_INTERFACE);
 
@@ -172,56 +171,14 @@ void Parkmanager::onUpdateProperty(INDI::Property property)
         }
     }
 
-    if (
-        (property.getDeviceName() == getString("devices", "gps"))
-        &&  (property.getName()   == std::string("GEOGRAPHIC_COORD"))
-    )
-    {
-        // Update GPS Coords
-        INDI::PropertyNumber prop = property;
-        getEltFloat("gpsstate", "alt")->setValue(prop.findWidgetByName("ELEV")->value, false);
-        getEltFloat("gpsstate", "lat")->setValue(prop.findWidgetByName("LAT")->value, false);
-        getEltFloat("gpsstate", "lon")->setValue(prop.findWidgetByName("LONG")->value, true);
-    }
-    if (
-        (property.getDeviceName() == getString("devices", "gps"))
-        &&  (property.getName()   == std::string("TIME_UTC"))
-    )
-    {
-        // Update GPS Time and date
-        INDI::PropertyText prop = property;
-        QDateTime dt;
-        QString strdt = prop.findWidgetByName("UTC")->text;
-        QString offset = prop.findWidgetByName("OFFSET")->text;
-        dt = dt.fromString(strdt, Qt::ISODate);
-        getEltDate("gpsstate", "date")->setValue(dt.date(), false);
-        getEltTime("gpsstate", "time")->setValue(dt.time(), false);
-        getEltFloat("gpsstate", "offset")->setValue(offset.toFloat(), true);
-    }*/
+    */
 }
 void Parkmanager::initIndi()
 {
     connectIndi();
-    connectDevice(getString("devices", "gps"));
     connectDevice(getString("devices", "mount"));
     connectDevice(getString("devices", "weather"));
     connectDevice(getString("devices", "dome"));
-
-    // Update GPS Coords
-    INDI::PropertyNumber pn = getDevice(getString("devices", "gps").toStdString().c_str()).getProperty("GEOGRAPHIC_COORD",
-                              INDI_NUMBER);
-    getEltFloat("gpsstate", "alt")->setValue(pn.findWidgetByName("ELEV")->value, false);
-    getEltFloat("gpsstate", "lat")->setValue(pn.findWidgetByName("LAT")->value, false);
-    getEltFloat("gpsstate", "lon")->setValue(pn.findWidgetByName("LONG")->value, true);
-    // Update GPS Time and date
-    INDI::PropertyText pt = getDevice(getString("devices", "gps").toStdString().c_str()).getProperty("TIME_UTC", INDI_TEXT);
-    QDateTime dt;
-    QString strdt = pt.findWidgetByName("UTC")->text;
-    QString offset = pt.findWidgetByName("OFFSET")->text;
-    dt = dt.fromString(strdt, Qt::ISODate);
-    getEltDate("gpsstate", "date")->setValue(dt.date(), false);
-    getEltTime("gpsstate", "time")->setValue(dt.time(), false);
-    getEltFloat("gpsstate", "offset")->setValue(offset.toFloat(), true);
 
 }
 
@@ -232,29 +189,11 @@ void Parkmanager::onTimer(void)
 }
 void Parkmanager::refreshDriversData(void)
 {
-    this->sendModNewSwitch(getString("devices", "gps").toStdString().c_str(), "GPS_REFRESH", "REFRESH", ISS_ON);
     this->sendModNewSwitch(getString("devices", "weather").toStdString().c_str(), "WEATHER_REFRESH", "REFRESH", ISS_ON);
 
-    // Update GPS Coords
-    INDI::PropertyNumber pn = getDevice(getString("devices", "gps").toStdString().c_str()).getProperty("GEOGRAPHIC_COORD",
-                              INDI_NUMBER);
-    getEltFloat("gpsstate", "alt")->setValue(pn.findWidgetByName("ELEV")->value, false);
-    getEltFloat("gpsstate", "lat")->setValue(pn.findWidgetByName("LAT")->value, false);
-    getEltFloat("gpsstate", "lon")->setValue(pn.findWidgetByName("LONG")->value, true);
-
-    // Update GPS Time and date
-    INDI::PropertyText pt = getDevice(getString("devices", "gps").toStdString().c_str()).getProperty("TIME_UTC", INDI_TEXT);
-    QDateTime dt;
-    QString strdt = pt.findWidgetByName("UTC")->text;
-    QString offset = pt.findWidgetByName("OFFSET")->text;
-    dt = dt.fromString(strdt, Qt::ISODate);
-    getEltDate("gpsstate", "date")->setValue(dt.date(), false);
-    getEltTime("gpsstate", "time")->setValue(dt.time(), false);
-    getEltFloat("gpsstate", "offset")->setValue(offset.toFloat(), true);
-
     // Update mount position
-    pn = getDevice(getString("devices",
-                             "mount").toStdString().c_str()).getProperty("EQUATORIAL_EOD_COORD", INDI_NUMBER);
+    INDI::PropertyNumber pn = getDevice(getString("devices",
+                                        "mount").toStdString().c_str()).getProperty("EQUATORIAL_EOD_COORD", INDI_NUMBER);
     getEltFloat("mountstate", "RA")->setValue(pn.findWidgetByName("RA")->value, false);
     getEltFloat("mountstate", "DEC")->setValue(pn.findWidgetByName("DEC")->value, true);
 
@@ -288,8 +227,8 @@ void Parkmanager::calculateSunset(void)
     ln_rst_time rst;
     ln_zonedate rise, set, transit;
     ln_lnlat_posn observer;
-    observer.lat = getFloat("gpsstate", "lat");
-    observer.lng = getFloat("gpsstate", "lon");
+    observer.lat = getFloat("location", "lat");
+    observer.lng = getFloat("location", "lon");
     if (ln_get_solar_rst(JD, &observer, &rst) != 0)
     {
         logError("Sun is circumpolar");
