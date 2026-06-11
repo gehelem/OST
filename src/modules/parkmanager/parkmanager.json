@@ -125,12 +125,14 @@
                 "type": "bool",
                 "label": "Must be OK",
                 "autoupdate":true,
+                "value":false,
                 "order": "10"
             },
             "disabled": {
                 "type": "bool",
                 "label": "Disabled",
                 "autoupdate":true,
+                "value":true,
                 "order": "20"
             }
         }
