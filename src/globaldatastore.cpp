@@ -6,6 +6,7 @@ GlobalDatastore::GlobalDatastore(const QString &name, const QString &label,
 {
     Q_INIT_RESOURCE(globaldatastore);
     loadOstPropertiesFromFile(":globaldatastore.json");
+    giveMeADevice("gps", "GPS", INDI::BaseDevice::GPS_INTERFACE);
 }
 
 void GlobalDatastore::onAfterInit()
@@ -36,12 +37,44 @@ void GlobalDatastore::rebuildLov(const QString &propName)
 
 void GlobalDatastore::onExternalEvent(OST::ExtEvent event)
 {
+    /* add current location to stored list */
+    if (event.ev == OST::ExtEvType::I4)
+    {
+        getProperty("locations")->push();
+    }
+
     // After any grid modification, keep managed LOVs in sync
     if (event.ev == OST::ExtEvType::GC || event.ev == OST::ExtEvType::GU ||
             event.ev == OST::ExtEvType::GD || event.ev == OST::ExtEvType::GH ||
-            event.ev == OST::ExtEvType::GB || event.ev == OST::ExtEvType::GR)
+            event.ev == OST::ExtEvType::GB || event.ev == OST::ExtEvType::GR || event.ev == OST::ExtEvType::I4)
     {
         if (mManagedLovs.contains(event.prpkey))
             rebuildLov(event.prpkey);
     }
+
+    /* retrieve current location from GPS if available */
+    if (event.ev == OST::ExtEvType::I3)
+    {
+        getGPSData();
+    }
+}
+void GlobalDatastore::getGPSData(void)
+{
+    logInfo("Retrieve GPS data");
+    QString gpsDevice = getString("devices", "gps");
+    if (gpsDevice.isEmpty())
+    {
+        logWarning("Please select a GPS device");
+        return;
+    }
+
+    // Update GPS Coords
+    INDI::PropertyNumber pn = getDevice(gpsDevice.toStdString().c_str()).getProperty("GEOGRAPHIC_COORD", INDI_NUMBER);
+    QString name = "GPS - " + QDateTime::currentDateTime().toString("[yyyy-MM-dd]");
+
+    getEltString("locations", "name")->setValue(name, false);
+    getEltFloat("locations", "alt")->setValue(pn.findWidgetByName("ELEV")->value, false);
+    getEltFloat("locations", "lat")->setValue(pn.findWidgetByName("LAT")->value, false);
+    getEltFloat("locations", "lon")->setValue(pn.findWidgetByName("LONG")->value, true);
+
 }

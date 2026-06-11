@@ -18,6 +18,7 @@ Parkmanager::Parkmanager(QString name, QString label, QString profile, QVariantM
 
     loadOstPropertiesFromFile(":parkmanager.json");
     giveMeAnActions();
+    giveMeALocation();
 
     OST::PropertyMulti* pm = getProperty("actions");
     pm->setRule(OST::SwitchsRule::OneOfMany);
