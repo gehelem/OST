@@ -108,6 +108,25 @@ bool IndiModule::onExternalEventIndi(OST::ExtEvent event)
             }
             setFocalLengthAndDiameter(); // Mandatory for simulators to work
         }
+        if (event.prpkey == "location")
+        {
+            getEltString("location", "location")->setValue("", true);
+            if (mGlobalDatastore && event.eltkey == "location")
+            {
+                QString locationName = eltval["value"].toString();
+                if (!locationName.isEmpty())
+                {
+                    double lat    = mGlobalDatastore->getGridFloat("locations", "lat",    "name", locationName);
+                    double lon    = mGlobalDatastore->getGridFloat("locations", "lon",    "name", locationName);
+                    double alt    = mGlobalDatastore->getGridFloat("locations", "alt",    "name", locationName);
+                    getEltFloat("location", "lat")->setValue(lat);
+                    getEltFloat("location", "lon")->setValue(lon);
+                    getEltFloat("location", "alt")->setValue(alt);
+                    getEltString("location", "location")->setValue(eltval["value"].toString());
+
+                }
+            }
+        }
 
         if (event.prpkey == "devices"  && event.eltkey == "equipments")
         {
@@ -998,6 +1017,7 @@ bool IndiModule::defineMeAsSequencer()
 bool IndiModule::defineMeAsImager()
 {
     giveMeAnOptic();
+
     if (!getStore().contains("image"))
     {
         OST::PropertyMulti* dynprop = new OST::PropertyMulti("image", "Image", OST::Permission::WriteOnly, "Control",
@@ -1068,6 +1088,7 @@ bool IndiModule::defineMeAsNavigator()
     defineMeAsImager();
     giveMeATarget();
     giveMeAnActions();
+    giveMeALocation();
 
     OST::PropertyMulti* pm  = getProperty("actions");
     pm->setRule(OST::SwitchsRule::AtMostOne);
@@ -1273,6 +1294,41 @@ bool IndiModule::giveMeAnEquipment()
     }
     return true;
 }
+bool IndiModule::giveMeALocation()
+{
+    if (!getStore().contains("location"))
+    {
+        OST::PropertyMulti* pm = new OST::PropertyMulti("location", "Location", OST::ReadWrite, "Location", "", "222Parms333",
+                true,
+                false);
+        createProperty(pm);
+
+        OST::ElementString* e = new  OST::ElementString("location", "Available locations", "01", "");
+        e->setGlobalLov("locations", OST::LovScope::Controller);
+        e->setDirectEdit(true);
+        e->setAutoUpdate(true);
+        pm->addElt(e);
+
+        OST::ElementFloat* f = new  OST::ElementFloat("lat", "Latitude", "10", "");
+        f->setDirectEdit(true);
+        f->setAutoUpdate(true);
+        pm->addElt(f);
+
+        f = new  OST::ElementFloat("lon", "Longitude", "20", "");
+        f->setDirectEdit(true);
+        f->setAutoUpdate(true);
+        pm->addElt(f);
+
+        f = new  OST::ElementFloat("alt", "Altitude", "30", "");
+        f->setDirectEdit(true);
+        f->setAutoUpdate(true);
+        pm->addElt(f);
+
+    }
+    return true;
+
+}
+
 bool IndiModule::giveMeAnActions()
 {
     if (!getStore().contains("actions"))
