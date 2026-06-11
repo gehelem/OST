@@ -189,32 +189,52 @@ void Parkmanager::onTimer(void)
 }
 void Parkmanager::refreshDriversData(void)
 {
-    this->sendModNewSwitch(getString("devices", "weather").toStdString().c_str(), "WEATHER_REFRESH", "REFRESH", ISS_ON);
+    if (!getString("devices", "weather").isEmpty())
+    {
+        sendModNewSwitch(getString("devices", "weather").toStdString().c_str(), "WEATHER_REFRESH", "REFRESH", ISS_ON);
+    }
 
-    // Update mount position
-    INDI::PropertyNumber pn = getDevice(getString("devices",
-                                        "mount").toStdString().c_str()).getProperty("EQUATORIAL_EOD_COORD", INDI_NUMBER);
-    getEltFloat("mountstate", "RA")->setValue(pn.findWidgetByName("RA")->value, false);
-    getEltFloat("mountstate", "DEC")->setValue(pn.findWidgetByName("DEC")->value, true);
+    if (getString("devices", "mount").isEmpty())
+    {
+        logWarning("Mount device missing");
+    }
+    else
+    {
+        // Update mount position
+        INDI::PropertyNumber pn = getDevice(getString("devices",
+                                            "mount").toStdString().c_str()).getProperty("EQUATORIAL_EOD_COORD", INDI_NUMBER);
+        getEltFloat("mountstate", "RA")->setValue(pn.findWidgetByName("RA")->value, false);
+        getEltFloat("mountstate", "DEC")->setValue(pn.findWidgetByName("DEC")->value, true);
+        // Update mount states
+        INDI::PropertySwitch ps = getDevice(getString("devices",
+                                            "mount").toStdString().c_str()).getProperty("TELESCOPE_TRACK_STATE", INDI_SWITCH);
+        getEltBool("mountstate", "tracking")->setValue(ps.findWidgetByName("TRACK_ON")->s, false);
+        ps = getDevice(getString("devices", "mount").toStdString().c_str()).getProperty("TELESCOPE_PARK", INDI_SWITCH);
+        getEltBool("mountstate", "parked")->setValue(ps.findWidgetByName("PARK")->s, false);
+    }
 
-    // Update mount states
-    INDI::PropertySwitch ps = getDevice(getString("devices",
-                                        "mount").toStdString().c_str()).getProperty("TELESCOPE_TRACK_STATE", INDI_SWITCH);
-    getEltBool("mountstate", "tracking")->setValue(ps.findWidgetByName("TRACK_ON")->s, false);
+    if (getString("devices", "dome").isEmpty())
+    {
+        logWarning("Dome device missing");
+    }
+    else
+    {
+        //update dome states
+        INDI::PropertySwitch ps = getDevice(getString("devices", "dome").toStdString().c_str()).getProperty("DOME_SHUTTER",
+                                  INDI_SWITCH);
+        getEltBool("domestate", "shutterclosed")->setValue(ps.findWidgetByName("SHUTTER_CLOSE")->s, true);
+        ps = getDevice(getString("devices", "dome").toStdString().c_str()).getProperty("DOME_PARK", INDI_SWITCH);
+        getEltBool("domestate", "parked")->setValue(ps.findWidgetByName("PARK")->s, true);
+    }
 
-    ps = getDevice(getString("devices", "mount").toStdString().c_str()).getProperty("TELESCOPE_PARK", INDI_SWITCH);
-    getEltBool("mountstate", "parked")->setValue(ps.findWidgetByName("PARK")->s, false);
+    if (!getString("devices", "weather").isEmpty())
+    {
+        //update weather state
+        INDI::PropertyLight pl = getDevice(getString("devices",
+                                           "weather").toStdString().c_str()).getProperty("WEATHER_STATUS", INDI_LIGHT);
+        getEltLight("weatherstate", "global")->setValue(OST::IntToState(pl.findWidgetByName("WEATHER_FORECAST")->s), true);
+    }
 
-    //update dome states
-    ps = getDevice(getString("devices", "dome").toStdString().c_str()).getProperty("DOME_SHUTTER", INDI_SWITCH);
-    getEltBool("domestate", "shutterclosed")->setValue(ps.findWidgetByName("SHUTTER_CLOSE")->s, true);
-    ps = getDevice(getString("devices", "dome").toStdString().c_str()).getProperty("DOME_PARK", INDI_SWITCH);
-    getEltBool("domestate", "parked")->setValue(ps.findWidgetByName("PARK")->s, true);
-
-    //update weather state
-    INDI::PropertyLight pl = getDevice(getString("devices",
-                                       "weather").toStdString().c_str()).getProperty("WEATHER_STATUS", INDI_LIGHT);
-    getEltLight("weatherstate", "global")->setValue(OST::IntToState(pl.findWidgetByName("WEATHER_FORECAST")->s), true);
 
 
 
