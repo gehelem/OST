@@ -98,9 +98,12 @@ bool Parkmanager::isTimeInWindow(QTime now, QTime start, QTime end)
 
 void Parkmanager::goIdle(void)
 {
-    mMode  = Mode::Idle;
     mPhase = Phase::Idle;
-    getEltBool("actions", "idle")->setValue(true, true);
+    if (mMode != Mode::Auto)
+    {
+        mMode = Mode::Idle;
+        getEltBool("actions", "idle")->setValue(true, true);
+    }
 }
 
 // ---------------------------------------------------------------------------
