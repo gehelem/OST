@@ -5081,5 +5081,237 @@
         <source>Unable to find %1 device.</source>
         <translation>Impossible de trouver le périphérique %1.</translation>
     </message>
+    <message>
+        <source>System watch started, interval: %1s</source>
+        <translation>Surveillance système démarrée, intervalle : %1s</translation>
+    </message>
+    <message>
+        <source>availableconfs</source>
+        <translation>Configurations disponibles</translation>
+    </message>
+    <message>
+        <source>equipments</source>
+        <translation>Équipements</translation>
+    </message>
+    <message>
+        <source>locations</source>
+        <translation>Emplacements</translation>
+    </message>
+    <message>
+        <source>optics</source>
+        <translation>Optiques</translation>
+    </message>
+    <message>
+        <source>servers</source>
+        <translation>Serveurs</translation>
+    </message>
+    <message>
+        <source>DRIVER_INTERFACE-DOME_INTERFACE</source>
+        <translation>Interface coupole</translation>
+    </message>
+    <message>
+        <source>Global equipment set</source>
+        <translation>Jeu d&apos;équipements global</translation>
+    </message>
+    <message>
+        <source>Dome</source>
+        <translation>Coupole</translation>
+    </message>
+    <message>
+        <source>Guide through</source>
+        <translation>Guider via</translation>
+    </message>
+    <message>
+        <source>Equipments</source>
+        <translation>Équipements</translation>
+    </message>
+    <message>
+        <source>Locations</source>
+        <translation>Emplacements</translation>
+    </message>
+    <message>
+        <source>Focal length (mm)</source>
+        <translation>Longueur focale (mm)</translation>
+    </message>
+    <message>
+        <source>Reducer (x)</source>
+        <translation>Réducteur (x)</translation>
+    </message>
+    <message>
+        <source>Servers</source>
+        <translation>Serveurs</translation>
+    </message>
+    <message>
+        <source>Global optic</source>
+        <translation>Optique globale</translation>
+    </message>
+    <message>
+        <source>Global event</source>
+        <translation>Événement global</translation>
+    </message>
+    <message>
+        <source>Event description</source>
+        <translation>Description de l&apos;événement</translation>
+    </message>
+    <message>
+        <source>Global state</source>
+        <translation>État global</translation>
+    </message>
+    <message>
+        <source>State description</source>
+        <translation>Description de l&apos;état</translation>
+    </message>
+    <message>
+        <source>State and signals</source>
+        <translation>État et signaux</translation>
+    </message>
+    <message>
+        <source>Polynomial fit coef 0</source>
+        <translation>Coef. ajustement polynomial 0</translation>
+    </message>
+    <message>
+        <source>Polynomial fit coef 1</source>
+        <translation>Coef. ajustement polynomial 1</translation>
+    </message>
+    <message>
+        <source>Polynomial fit coef 2</source>
+        <translation>Coef. ajustement polynomial 2</translation>
+    </message>
+    <message>
+        <source>Last imgage HFR deviation (&apos;&apos;)</source>
+        <translation>Écart HFR dernière image (&apos;&apos;)</translation>
+    </message>
+    <message>
+        <source>Polynomial fit (Khi)</source>
+        <translation>Ajustement polynomial (Khi)</translation>
+    </message>
+    <message>
+        <source>Polynomial fit (R2)</source>
+        <translation>Ajustement polynomial (R2)</translation>
+    </message>
+    <message>
+        <source>Available locations</source>
+        <translation>Emplacements disponibles</translation>
+    </message>
+    <message>
+        <source>Slaves</source>
+        <translation>Subordonnés</translation>
+    </message>
+    <message>
+        <source>Abort motion</source>
+        <translation>Arrêt d&apos;urgence</translation>
+    </message>
+    <message>
+        <source>Automate</source>
+        <translation>Automatiser</translation>
+    </message>
+    <message>
+        <source>Close all</source>
+        <translation>Tout fermer</translation>
+    </message>
+    <message>
+        <source>Open all</source>
+        <translation>Tout ouvrir</translation>
+    </message>
+    <message>
+        <source>Dome is parked</source>
+        <translation>Coupole parquée</translation>
+    </message>
+    <message>
+        <source>Dome shutter is closed</source>
+        <translation>Volet de la coupole fermé</translation>
+    </message>
+    <message>
+        <source>Dome state</source>
+        <translation>État de la coupole</translation>
+    </message>
+    <message>
+        <source>Mount DEC</source>
+        <translation>DEC monture</translation>
+    </message>
+    <message>
+        <source>Mount RA</source>
+        <translation>AD monture</translation>
+    </message>
+    <message>
+        <source>Mount is at home</source>
+        <translation>Monture en position home</translation>
+    </message>
+    <message>
+        <source>Mount is parked</source>
+        <translation>Monture parquée</translation>
+    </message>
+    <message>
+        <source>Mount is tracking</source>
+        <translation>Monture en suivi</translation>
+    </message>
+    <message>
+        <source>Mount state</source>
+        <translation>État de la monture</translation>
+    </message>
+    <message>
+        <source>Anytime</source>
+        <translation>En permanence</translation>
+    </message>
+    <message>
+        <source>Dust and dawn</source>
+        <translation>Crépuscule et aube</translation>
+    </message>
+    <message>
+        <source>Fixed time : end</source>
+        <translation>Heure fixe : fin</translation>
+    </message>
+    <message>
+        <source>Fixed time : start</source>
+        <translation>Heure fixe : début</translation>
+    </message>
+    <message>
+        <source>Time rules</source>
+        <translation>Règles horaires</translation>
+    </message>
+    <message>
+        <source>Must be OK</source>
+        <translation>Doit être OK</translation>
+    </message>
+    <message>
+        <source>Weather rules</source>
+        <translation>Règles météo</translation>
+    </message>
+    <message>
+        <source>Weather state</source>
+        <translation>État météo</translation>
+    </message>
+    <message>
+        <source>Dither the guider every N captured frames; 0 disables dithering</source>
+        <translation>Dithering du guidage toutes les N images capturées ; 0 désactive le dithering</translation>
+    </message>
+    <message>
+        <source>Dither every N shots (0=disabled)</source>
+        <translation>Dithering toutes les N prises (0=désactivé)</translation>
+    </message>
+    <message>
+        <source>Trigger an autofocus when the measured HFR exceeds this value; 0 disables the check</source>
+        <translation>Déclencher un autofocus si le HFR mesuré dépasse cette valeur ; 0 désactive la vérification</translation>
+    </message>
+    <message>
+        <source>HFR refocus threshold (0=disabled)</source>
+        <translation>Seuil HFR refocus (0=désactivé)</translation>
+    </message>
+    <message>
+        <source>Trigger a guider recalibration when the peak RMS during an exposure exceeds this value in arcs; 0 disables the check</source>
+        <translation>Déclencher une recalibration du guidage si le RMS de crête dépasse cette valeur en secondes d&apos;arc ; 0 désactive la vérification</translation>
+    </message>
+    <message>
+        <source>RMS recalibration threshold (0=disabled)</source>
+        <translation>Seuil RMS recalibration (0=désactivé)</translation>
+    </message>
+    <message>
+        <source>Enable guider integration (dithering, settle, RMS monitoring, focus suspension). The guider must be started manually before the sequence.</source>
+        <translation>Activer l&apos;intégration du guidage (dithering, stabilisation, surveillance RMS, suspension focus). Le guidage doit être démarré manuellement avant la séquence.</translation>
+    </message>
+    <message>
+        <source>Use guiding</source>
+        <translation>Utiliser le guidage</translation>
+    </message>
 </context>
 </TS>

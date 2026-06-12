@@ -5202,5 +5202,194 @@
             <source>H?</source>
             <translation>H?</translation>
         </message>
-</context>
+        <message>
+            <source>locations</source>
+            <translation type="unfinished">locations</translation>
+        </message>
+        <message>
+            <source>DRIVER_INTERFACE-DOME_INTERFACE</source>
+            <translation type="unfinished">Dome interface</translation>
+        </message>
+        <message>
+            <source>Dome</source>
+            <translation type="unfinished">Dome</translation>
+        </message>
+        <message>
+            <source>Locations</source>
+            <translation type="unfinished">Locations</translation>
+        </message>
+        <message>
+            <source>Reducer (x)</source>
+            <translation type="unfinished">Reducer (x)</translation>
+        </message>
+        <message>
+            <source>Global event</source>
+            <translation type="unfinished">Global event</translation>
+        </message>
+        <message>
+            <source>Event description</source>
+            <translation type="unfinished">Event description</translation>
+        </message>
+        <message>
+            <source>Global state</source>
+            <translation type="unfinished">Global state</translation>
+        </message>
+        <message>
+            <source>State description</source>
+            <translation type="unfinished">State description</translation>
+        </message>
+        <message>
+            <source>State and signals</source>
+            <translation type="unfinished">State and signals</translation>
+        </message>
+        <message>
+            <source>Polynomial fit coef 0</source>
+            <translation type="unfinished">Polynomial fit coef 0</translation>
+        </message>
+        <message>
+            <source>Polynomial fit coef 1</source>
+            <translation type="unfinished">Polynomial fit coef 1</translation>
+        </message>
+        <message>
+            <source>Polynomial fit coef 2</source>
+            <translation type="unfinished">Polynomial fit coef 2</translation>
+        </message>
+        <message>
+            <source>Last imgage HFR deviation (&apos;&apos;)</source>
+            <translation type="unfinished">Last image HFR deviation (&apos;&apos;)</translation>
+        </message>
+        <message>
+            <source>Polynomial fit (Khi)</source>
+            <translation type="unfinished">Polynomial fit (Khi)</translation>
+        </message>
+        <message>
+            <source>Polynomial fit (R2)</source>
+            <translation type="unfinished">Polynomial fit (R2)</translation>
+        </message>
+        <message>
+            <source>Available locations</source>
+            <translation type="unfinished">Available locations</translation>
+        </message>
+        <message>
+            <source>Slaves</source>
+            <translation type="unfinished">Slaves</translation>
+        </message>
+        <message>
+            <source>Abort motion</source>
+            <translation type="unfinished">Abort motion</translation>
+        </message>
+        <message>
+            <source>Automate</source>
+            <translation type="unfinished">Automate</translation>
+        </message>
+        <message>
+            <source>Close all</source>
+            <translation type="unfinished">Close all</translation>
+        </message>
+        <message>
+            <source>Open all</source>
+            <translation type="unfinished">Open all</translation>
+        </message>
+        <message>
+            <source>Dome is parked</source>
+            <translation type="unfinished">Dome is parked</translation>
+        </message>
+        <message>
+            <source>Dome shutter is closed</source>
+            <translation type="unfinished">Dome shutter is closed</translation>
+        </message>
+        <message>
+            <source>Dome state</source>
+            <translation type="unfinished">Dome state</translation>
+        </message>
+        <message>
+            <source>Mount DEC</source>
+            <translation type="unfinished">Mount DEC</translation>
+        </message>
+        <message>
+            <source>Mount RA</source>
+            <translation type="unfinished">Mount RA</translation>
+        </message>
+        <message>
+            <source>Mount is at home</source>
+            <translation type="unfinished">Mount is at home</translation>
+        </message>
+        <message>
+            <source>Mount is parked</source>
+            <translation type="unfinished">Mount is parked</translation>
+        </message>
+        <message>
+            <source>Mount is tracking</source>
+            <translation type="unfinished">Mount is tracking</translation>
+        </message>
+        <message>
+            <source>Mount state</source>
+            <translation type="unfinished">Mount state</translation>
+        </message>
+        <message>
+            <source>Anytime</source>
+            <translation type="unfinished">Anytime</translation>
+        </message>
+        <message>
+            <source>Dust and dawn</source>
+            <translation type="unfinished">Dusk and dawn</translation>
+        </message>
+        <message>
+            <source>Fixed time : end</source>
+            <translation type="unfinished">Fixed time : end</translation>
+        </message>
+        <message>
+            <source>Fixed time : start</source>
+            <translation type="unfinished">Fixed time : start</translation>
+        </message>
+        <message>
+            <source>Time rules</source>
+            <translation type="unfinished">Time rules</translation>
+        </message>
+        <message>
+            <source>Must be OK</source>
+            <translation type="unfinished">Must be OK</translation>
+        </message>
+        <message>
+            <source>Weather rules</source>
+            <translation type="unfinished">Weather rules</translation>
+        </message>
+        <message>
+            <source>Weather state</source>
+            <translation type="unfinished">Weather state</translation>
+        </message>
+        <message>
+            <source>Dither the guider every N captured frames; 0 disables dithering</source>
+            <translation type="unfinished">Dither the guider every N captured frames; 0 disables dithering</translation>
+        </message>
+        <message>
+            <source>Dither every N shots (0=disabled)</source>
+            <translation type="unfinished">Dither every N shots (0=disabled)</translation>
+        </message>
+        <message>
+            <source>Trigger an autofocus when the measured HFR exceeds this value; 0 disables the check</source>
+            <translation type="unfinished">Trigger an autofocus when the measured HFR exceeds this value; 0 disables the check</translation>
+        </message>
+        <message>
+            <source>HFR refocus threshold (0=disabled)</source>
+            <translation type="unfinished">HFR refocus threshold (0=disabled)</translation>
+        </message>
+        <message>
+            <source>Trigger a guider recalibration when the peak RMS during an exposure exceeds this value in arcs; 0 disables the check</source>
+            <translation type="unfinished">Trigger a guider recalibration when the peak RMS during an exposure exceeds this value in arcs; 0 disables the check</translation>
+        </message>
+        <message>
+            <source>RMS recalibration threshold (0=disabled)</source>
+            <translation type="unfinished">RMS recalibration threshold (0=disabled)</translation>
+        </message>
+        <message>
+            <source>Enable guider integration (dithering, settle, RMS monitoring, focus suspension). The guider must be started manually before the sequence.</source>
+            <translation type="unfinished">Enable guider integration (dithering, settle, RMS monitoring, focus suspension). The guider must be started manually before the sequence.</translation>
+        </message>
+        <message>
+            <source>Use guiding</source>
+            <translation type="unfinished">Use guiding</translation>
+        </message>
+    </context>
 </TS>
+

@@ -5075,5 +5075,233 @@
             <source>Unable to find %1 device.</source>
             <translation>No se puede encontrar el dispositivo %1.</translation>
         </message>
+        <message>
+            <source>availableconfs</source>
+            <translation>Configuraciones disponibles</translation>
+        </message>
+        <message>
+            <source>equipments</source>
+            <translation>Equipos</translation>
+        </message>
+        <message>
+            <source>locations</source>
+            <translation>Ubicaciones</translation>
+        </message>
+        <message>
+            <source>optics</source>
+            <translation>Ópticas</translation>
+        </message>
+        <message>
+            <source>servers</source>
+            <translation>Servidores</translation>
+        </message>
+        <message>
+            <source>DRIVER_INTERFACE-DOME_INTERFACE</source>
+            <translation>Interfaz cúpula</translation>
+        </message>
+        <message>
+            <source>Global equipment set</source>
+            <translation>Conjunto de equipos global</translation>
+        </message>
+        <message>
+            <source>Dome</source>
+            <translation>Cúpula</translation>
+        </message>
+        <message>
+            <source>Guide through</source>
+            <translation>Guiar a través de</translation>
+        </message>
+        <message>
+            <source>Equipments</source>
+            <translation>Equipos</translation>
+        </message>
+        <message>
+            <source>Locations</source>
+            <translation>Ubicaciones</translation>
+        </message>
+        <message>
+            <source>Focal length (mm)</source>
+            <translation>Longitud focal (mm)</translation>
+        </message>
+        <message>
+            <source>Reducer (x)</source>
+            <translation>Reductor (x)</translation>
+        </message>
+        <message>
+            <source>Servers</source>
+            <translation>Servidores</translation>
+        </message>
+        <message>
+            <source>Global optic</source>
+            <translation>Óptica global</translation>
+        </message>
+        <message>
+            <source>Global event</source>
+            <translation>Evento global</translation>
+        </message>
+        <message>
+            <source>Event description</source>
+            <translation>Descripción del evento</translation>
+        </message>
+        <message>
+            <source>Global state</source>
+            <translation>Estado global</translation>
+        </message>
+        <message>
+            <source>State description</source>
+            <translation>Descripción del estado</translation>
+        </message>
+        <message>
+            <source>State and signals</source>
+            <translation>Estado y señales</translation>
+        </message>
+        <message>
+            <source>Polynomial fit coef 0</source>
+            <translation>Coef. ajuste polinómico 0</translation>
+        </message>
+        <message>
+            <source>Polynomial fit coef 1</source>
+            <translation>Coef. ajuste polinómico 1</translation>
+        </message>
+        <message>
+            <source>Polynomial fit coef 2</source>
+            <translation>Coef. ajuste polinómico 2</translation>
+        </message>
+        <message>
+            <source>Last imgage HFR deviation (&apos;&apos;)</source>
+            <translation>Desviación HFR última imagen (&apos;&apos;)</translation>
+        </message>
+        <message>
+            <source>Polynomial fit (Khi)</source>
+            <translation>Ajuste polinómico (Khi)</translation>
+        </message>
+        <message>
+            <source>Polynomial fit (R2)</source>
+            <translation>Ajuste polinómico (R2)</translation>
+        </message>
+        <message>
+            <source>Available locations</source>
+            <translation>Ubicaciones disponibles</translation>
+        </message>
+        <message>
+            <source>Slaves</source>
+            <translation>Subordinados</translation>
+        </message>
+        <message>
+            <source>Abort motion</source>
+            <translation>Abortar movimiento</translation>
+        </message>
+        <message>
+            <source>Automate</source>
+            <translation>Automatizar</translation>
+        </message>
+        <message>
+            <source>Close all</source>
+            <translation>Cerrar todo</translation>
+        </message>
+        <message>
+            <source>Open all</source>
+            <translation>Abrir todo</translation>
+        </message>
+        <message>
+            <source>Dome is parked</source>
+            <translation>Cúpula aparcada</translation>
+        </message>
+        <message>
+            <source>Dome shutter is closed</source>
+            <translation>Obturador de cúpula cerrado</translation>
+        </message>
+        <message>
+            <source>Dome state</source>
+            <translation>Estado de la cúpula</translation>
+        </message>
+        <message>
+            <source>Mount DEC</source>
+            <translation>DEC montura</translation>
+        </message>
+        <message>
+            <source>Mount RA</source>
+            <translation>AR montura</translation>
+        </message>
+        <message>
+            <source>Mount is at home</source>
+            <translation>Montura en posición home</translation>
+        </message>
+        <message>
+            <source>Mount is parked</source>
+            <translation>Montura aparcada</translation>
+        </message>
+        <message>
+            <source>Mount is tracking</source>
+            <translation>Montura en seguimiento</translation>
+        </message>
+        <message>
+            <source>Mount state</source>
+            <translation>Estado de la montura</translation>
+        </message>
+        <message>
+            <source>Anytime</source>
+            <translation>En cualquier momento</translation>
+        </message>
+        <message>
+            <source>Dust and dawn</source>
+            <translation>Crepúsculo y amanecer</translation>
+        </message>
+        <message>
+            <source>Fixed time : end</source>
+            <translation>Hora fija : fin</translation>
+        </message>
+        <message>
+            <source>Fixed time : start</source>
+            <translation>Hora fija : inicio</translation>
+        </message>
+        <message>
+            <source>Time rules</source>
+            <translation>Reglas de tiempo</translation>
+        </message>
+        <message>
+            <source>Must be OK</source>
+            <translation>Debe estar OK</translation>
+        </message>
+        <message>
+            <source>Weather rules</source>
+            <translation>Reglas meteorológicas</translation>
+        </message>
+        <message>
+            <source>Weather state</source>
+            <translation>Estado meteorológico</translation>
+        </message>
+        <message>
+            <source>Dither the guider every N captured frames; 0 disables dithering</source>
+            <translation>Dithering del guiado cada N fotogramas capturados; 0 desactiva el dithering</translation>
+        </message>
+        <message>
+            <source>Dither every N shots (0=disabled)</source>
+            <translation>Dithering cada N tomas (0=desactivado)</translation>
+        </message>
+        <message>
+            <source>Trigger an autofocus when the measured HFR exceeds this value; 0 disables the check</source>
+            <translation>Activar autofoco cuando el HFR medido supere este valor; 0 desactiva la comprobación</translation>
+        </message>
+        <message>
+            <source>HFR refocus threshold (0=disabled)</source>
+            <translation>Umbral HFR refoco (0=desactivado)</translation>
+        </message>
+        <message>
+            <source>Trigger a guider recalibration when the peak RMS during an exposure exceeds this value in arcs; 0 disables the check</source>
+            <translation>Activar recalibración del guiado cuando el RMS pico durante una exposición supere este valor en arcosegundos; 0 desactiva la comprobación</translation>
+        </message>
+        <message>
+            <source>RMS recalibration threshold (0=disabled)</source>
+            <translation>Umbral RMS recalibración (0=desactivado)</translation>
+        </message>
+        <message>
+            <source>Enable guider integration (dithering, settle, RMS monitoring, focus suspension). The guider must be started manually before the sequence.</source>
+            <translation>Activar integración del guiado (dithering, estabilización, monitoreo RMS, suspensión de foco). El guiado debe iniciarse manualmente antes de la secuencia.</translation>
+        </message>
+        <message>
+            <source>Use guiding</source>
+            <translation>Usar guiado</translation>
+        </message>
 </context>
 </TS>
