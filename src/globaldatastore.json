@@ -109,6 +109,75 @@
                 "order":"80",
                 "listOfValues":"DRIVER_INTERFACE-GPS_INTERFACE",
                 "autoupdate":true
+            },
+            "dome": {
+                "type": "string",
+                "label": "Dome",
+                "order":"90",
+                "listOfValues":"DRIVER_INTERFACE-DOME_INTERFACE",
+                "autoupdate":true
+            },
+            "weather": {
+                "type": "string",
+                "label": "Weather",
+                "order":"95",
+                "listOfValues":"DRIVER_INTERFACE-WEATHER_INTERFACE",
+                "autoupdate":true
+            }
+
+        }
+    },
+    "locations": {
+        "devcat": "Location",
+        "order": "",
+        "group": "",
+        "permission": 2,
+        "hasprofile": true,
+        "hasGrid": true,
+        "showGrid": true,
+        "showElts": true,
+        "rule":0,
+        "label": "Locations",
+        "posticon1":"refresh",
+        "posticon2":"add",
+        "e": {
+            "name": {
+                "type": "string",
+                "label": "Name",
+                "order": "10",
+                "autoupdate":true,
+                "directedit":true,
+                "value": "default"
+            },
+            "alt": {
+                "type": "float",
+                "label": "Altitude",
+                "order": "40",
+                "min":0,
+                "max":8000,
+                "autoupdate":true,
+                "directedit":true,
+                "value": 140
+            },
+            "lat": {
+                "type": "float",
+                "label": "Latitude",
+                "order": "20",
+                "min":-90,
+                "max":90,
+                "autoupdate":true,
+                "directedit":true,
+                "value": 48.650002
+            },
+            "lon": {
+                "type": "float",
+                "label": "Longitude",
+                "order": "30",
+                "min":-180,
+                "max":180,
+                "autoupdate":true,
+                "directedit":true,
+                "value": 1.833330
             }
         }
     },

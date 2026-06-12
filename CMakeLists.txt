@@ -159,7 +159,7 @@ target_link_libraries(ostserver
 )
 # Ensure translations are compiled before linking ostserver
 add_dependencies(ostserver translations)
-add_dependencies(ostserver generate_version)
+#add_dependencies(ostserver generate_version)
 
 #########################
 #### modules libraries ##
@@ -308,7 +308,7 @@ target_link_libraries(ostbasemodule
     Threads::Threads
     z
 )
-add_dependencies(ostbasemodule generate_version)
+#add_dependencies(ostbasemodule generate_version)
 
 # Indi module
 #list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.qrc)
@@ -336,7 +336,7 @@ target_link_libraries(ostindimodule
     Threads::Threads
     z
 )
-add_dependencies(ostindimodule generate_version)
+#add_dependencies(ostindimodule generate_version)
 
 
 
@@ -514,6 +514,22 @@ target_link_libraries(ostpolar PRIVATE
 )
 target_compile_definitions(ostpolar PRIVATE POLAR_MODULE)
 
+# Parkmanager module
+add_library(ostparkmanager SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/parkmanager/parkmanager.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/parkmanager/parkmanager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/parkmanager/parkmanager.qrc
+)
+target_link_libraries(ostparkmanager PRIVATE
+    ostindimodule
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Threads::Threads
+    z
+)
+target_compile_definitions(ostparkmanager PRIVATE PARKMANAGER_MODULE)
+
 install(TARGETS
     ostserver
     ostbasemodule ostindimodule
@@ -526,6 +542,7 @@ install(TARGETS
     ostallsky
     ostplanner
     ostpolar
+    ostparkmanager
     RUNTIME DESTINATION "/usr/bin"     COMPONENT Runtime
     LIBRARY DESTINATION "/usr/lib"     COMPONENT Runtime
     PUBLIC_HEADER DESTINATION "/usr/include/ost" COMPONENT Development

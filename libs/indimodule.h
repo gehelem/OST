@@ -98,6 +98,7 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         bool giveMeADevice(QString name, QString label, INDI::BaseDevice::DRIVER_INTERFACE interface);
         bool giveMeAnOptic();
         bool giveMeAnEquipment();
+        bool giveMeALocation();
         bool giveMeAnActions();
         bool giveMeATarget();
         bool setFocalLengthAndDiameter();

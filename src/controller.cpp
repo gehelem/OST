@@ -102,6 +102,8 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     createControllerLov("servers", ls);
     ls = new OST::LovString("equipments");
     createControllerLov("equipments", ls);
+    ls = new OST::LovString("locations");
+    createControllerLov("locations", ls);
 
     // Shared datastore — static, always available, created before any module
     mGlobalDatastore = new GlobalDatastore("GlobalDatastore", "Global data", "default", {});
@@ -120,6 +122,8 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
                                   static_cast<OST::LovString*>(mControllerLovs["servers"]));
     mGlobalDatastore->registerLov("equipments", "name", "name",
                                   static_cast<OST::LovString*>(mControllerLovs["equipments"]));
+    mGlobalDatastore->registerLov("locations", "name", "name",
+                                  static_cast<OST::LovString*>(mControllerLovs["locations"]));
 
     wshandler->onModuleEvent(OST::EvType::aa, QVariant(), nullptr, nullptr, nullptr, mGlobalDatastore);
 
@@ -731,13 +735,15 @@ void Controller::onExternalEvent(OST::ExtEvent event)
 
 void Controller::checkModules(void)
 {
-    for(const QString &path : QCoreApplication::libraryPaths())    {
+    for(const QString &path : QCoreApplication::libraryPaths())
+    {
         mLogger->info("Check available modules in " + path);
         QDir directory(path);
         directory.setFilter(QDir::Files);
         directory.setNameFilters(QStringList() << "libost*.so");
         QStringList libs = directory.entryList();
-        for(QString lib : libs)        {
+        for(QString lib : libs)
+        {
             QString tt = lib.replace(".so", "");
             if (!((tt == "libostmaincontrol" ) || (tt == "libostbasemodule" ) || (tt == "libostindimodule" )))
             {

@@ -17,6 +17,7 @@ Planner::Planner(QString name, QString label, QString profile, QVariantMap avail
 {
     Q_INIT_RESOURCE(planner);
     giveMeAnActions();
+    giveMeALocation();
     loadOstPropertiesFromFile(":planner.json");
     setMetadata("thisGithash", QString::fromStdString(Version::GIT_SHA1));
     setMetadata("thisGitdate", QString::fromStdString(Version::GIT_DATE));

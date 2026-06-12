@@ -1,0 +1,185 @@
+{
+"p":{
+    "slaves": {
+      "label": "Slaves",
+      "permission": 2,
+      "devcat": "Slaves",
+      "group": "",
+      "order": "100",
+      "hasprofile": true,
+      "e": {
+        "plannermodule": {
+            "type": "string",
+            "label": "Planner instance",
+            "listOfValues":"loadedModules-planner",
+            "listOfValuesIsExternal":true,
+            "autoupdate": true,
+            "directedit": true,
+            "value": "Navigator",
+            "order": 4,
+            "hint": "Name of the planner module INSTANCE to use"
+        }
+      }
+    },
+    "mountstate": {
+        "devcat": "Control",
+        "order": "Control0000",
+        "group": "",
+        "permission": 0,
+        "rule":2,
+        "label": "Mount state",
+        "e": {
+            "RA": {
+                "type": "float",
+                "label": "Mount RA",
+                "order": "10",
+                "value": 0.0
+            },
+            "DEC": {
+                "type": "float",
+                "label": "Mount DEC",
+                "order": "20",
+                "value": 0.0
+            },
+            "home": {
+                "type": "bool",
+                "label": "Mount is at home",
+                "order": "30"
+            },
+            "parked": {
+                "type": "bool",
+                "label": "Mount is parked",
+                "order": "40"
+            },
+            "tracking": {
+                "type": "bool",
+                "label": "Mount is tracking",
+                "order": "50"
+            }
+        }
+    },
+    "domestate": {
+        "devcat": "Control",
+        "order": "Control0000",
+        "group": "",
+        "permission": 0,
+        "rule":2,
+        "label": "Dome state",
+        "e": {
+            "parked": {
+                "type": "bool",
+                "label": "Dome is parked",
+                "order": "40"
+            },
+            "shutterclosed": {
+                "type": "bool",
+                "label": "Dome shutter is closed",
+                "order": "60"
+            }
+        }
+    },
+    "weatherstate": {
+        "devcat": "Control",
+        "order": "Control0000",
+        "group": "",
+        "permission": 0,
+        "rule":2,
+        "label": "Weather state",
+        "e": {
+            "global": {
+                "type": "light",
+                "label": "Global",
+                "order": "10"
+            }
+        }
+    },
+    "coming": {
+        "devcat": "Control",
+        "group": "",
+        "order":"",
+        "permission": 0,
+        "label": "Events to come",
+        "e": {
+            "sunrise": {
+                "label": "Next sunrise",
+                "type": "time",
+                "order":"20"
+            },
+            "sunset": {
+                "type": "time",
+                "label": "Next sunset",
+                "order":"30"
+            }
+        }
+    },
+    "weatherrules": {
+        "devcat": "Behaviour",
+        "order": "01",
+        "group": "",
+        "permission": 2,
+        "rule":0,
+        "hasprofile":true,
+        "label": "Weather rules",
+        "e": {
+            "mustbeok": {
+                "type": "bool",
+                "label": "Must be OK",
+                "autoupdate":true,
+                "value":false,
+                "order": "10"
+            },
+            "disabled": {
+                "type": "bool",
+                "label": "Disabled",
+                "autoupdate":true,
+                "value":true,
+                "order": "20"
+            }
+        }
+    },
+    "timerules": {
+        "devcat": "Behaviour",
+        "order": "01",
+        "group": "",
+        "permission": 2,
+        "rule":0,
+        "hasprofile":true,
+        "label": "Time rules",
+        "e": {
+            "fixed": {
+                "type": "bool",
+                "label": "Fixed time",
+                "autoupdate":true,
+                "order": "10"
+            },
+            "fixedstart": {
+                "type": "time",
+                "label": "Fixed time : start",
+                "autoupdate":true,
+                "directedit":true,
+                "order": "20"
+            },
+            "fixedend": {
+                "type": "time",
+                "label": "Fixed time : end",
+                "autoupdate":true,
+                "directedit":true,
+                "order": "30"
+            },
+            "duskdawn": {
+                "type": "bool",
+                "label": "Dust and dawn",
+                "autoupdate":true,
+                "order": "40"
+            },
+            "anytime": {
+                "type": "bool",
+                "label": "Anytime",
+                "autoupdate":true,
+                "order": "50"
+            }
+        }
+    }
+
+}
+}
