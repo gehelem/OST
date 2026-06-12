@@ -765,12 +765,17 @@ bool IndiModule::sendModNewSwitch(QString deviceName, QString propertyName, QStr
         logError("%1 - Unable to find %2/%3 property. Aborting.", {QString("sendModNewSwitch"), deviceName, propertyName});
         return false;
     }
+    //logDebug("%1 - %2/%3/%4 - %5", {QString("sendModNewSwitch"), deviceName, propertyName, elementName, sw});
+    if (prop.getRule() == ISR_1OFMANY)
+    {
+        //logDebug("ISR_1OFMANY");
+        for (std::size_t i = 0; i < prop.size(); i++) prop[i].s = ISS_OFF;
+    }
     for (std::size_t i = 0; i < prop.size(); i++)
     {
-        if (prop.getRule() == ISR_1OFMANY) prop[i].s = ISS_OFF;
         if (strcmp(prop[i].name, elementName.toStdString().c_str()) == 0)
         {
-            prop.findWidgetByName(elementName.toStdString().c_str())->setState(sw);
+            prop[i].setState(sw);
             sendNewSwitch(prop);
             return true;
         }

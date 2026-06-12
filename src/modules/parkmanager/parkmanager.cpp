@@ -199,7 +199,13 @@ void Parkmanager::processPhase(void)
 
         case Phase::OpeningDome:
             logInfo("Opening dome shutter");
-            sendModNewSwitch(dome.toStdString().c_str(), "DOME_SHUTTER", "SHUTTER_OPEN", ISS_ON);
+            {
+                INDI::BaseDevice dp = getDevice(dome.toStdString().c_str());
+                INDI::PropertySwitch prop = dp.getSwitch("DOME_SHUTTER");
+                prop.findWidgetByName("SHUTTER_CLOSE")->setState(ISS_OFF);
+                prop.findWidgetByName("SHUTTER_OPEN")->setState(ISS_ON);
+                sendNewSwitch(prop);
+            }
             mPhase = Phase::WaitingDomeOpen;
             break;
 
@@ -289,7 +295,13 @@ void Parkmanager::processPhase(void)
 
         case Phase::ClosingDome:
             logInfo("Closing dome shutter");
-            sendModNewSwitch(dome.toStdString().c_str(), "DOME_SHUTTER", "SHUTTER_CLOSE", ISS_ON);
+            {
+                INDI::BaseDevice dp = getDevice(dome.toStdString().c_str());
+                INDI::PropertySwitch prop = dp.getSwitch("DOME_SHUTTER");
+                prop.findWidgetByName("SHUTTER_CLOSE")->setState(ISS_ON);
+                prop.findWidgetByName("SHUTTER_OPEN")->setState(ISS_OFF);
+                sendNewSwitch(prop);
+            }
             mPhase = Phase::WaitingDomeClose;
             break;
 
