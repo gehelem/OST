@@ -521,6 +521,12 @@ auto IndiModule::sendModNewNumber(const QString &deviceName, const QString &prop
                                   const double &value) -> bool
 {
     //qDebug() << "sendModNewNumber" << " " << deviceName << "-" << propertyName << "-" << elementName << "-" << value;
+    if (!isServerConnected())
+    {
+        logError("Indi server is not connected");
+        return false;
+    }
+
     INDI::BaseDevice dp = getDevice(deviceName.toStdString().c_str());
 
     if (!dp.isValid())
@@ -722,6 +728,12 @@ bool IndiModule::getModText(const QString &deviceName, const QString &propertyNa
 bool IndiModule::sendModNewText  (QString deviceName, QString propertyName, QString elementName, QString text)
 {
     //qDebug() << "sendModNewText" << "-" << deviceName << "-" << propertyName<< "-" << elementName;
+    if (!isServerConnected())
+    {
+        logError("Indi server is not connected");
+        return false;
+    }
+
     INDI::BaseDevice dp = getDevice(deviceName.toStdString().c_str());
 
     if (!dp.isValid())
@@ -751,6 +763,11 @@ bool IndiModule::sendModNewText  (QString deviceName, QString propertyName, QStr
 bool IndiModule::sendModNewSwitch(QString deviceName, QString propertyName, QString elementName, ISState sw)
 {
     //qDebug() << "sendModNewswitch " << "-" << deviceName << "-" << propertyName<< "-" << elementName;
+    if (!isServerConnected())
+    {
+        logError("Indi server is not connected");
+        return false;
+    }
 
     INDI::BaseDevice dp = getDevice(deviceName.toStdString().c_str());
 

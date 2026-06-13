@@ -34,7 +34,7 @@
         "group": "",
         "order":"20",
         "permission": 2,
-        "rule":2,
+        "rule":0,
         "label": "Server",
         "e": {
             "conserv": {

@@ -62,7 +62,7 @@ Parkmanager::Parkmanager(QString name, QString label, QString profile, QVariantM
 
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &Parkmanager::onTimer);
-    timer->start(2000);
+    timer->start(60000);
 }
 
 Parkmanager::~Parkmanager() {}
@@ -192,6 +192,12 @@ void Parkmanager::processPhase(void)
 {
     QString mount = getString("devices", "mount");
     QString dome  = getString("devices", "dome");
+
+    if (!isServerConnected())
+    {
+        logError("Indi server is not connected");
+        return;
+    }
 
     switch (mPhase)
     {
@@ -390,6 +396,12 @@ void Parkmanager::onTimer(void)
 
 void Parkmanager::refreshDriversData(void)
 {
+    if (!isServerConnected())
+    {
+        logError("Indi server is not connected");
+        return;
+    }
+
     if (!getString("devices", "weather").isEmpty())
     {
         sendModNewSwitch(getString("devices", "weather").toStdString().c_str(), "WEATHER_REFRESH", "REFRESH", ISS_ON);
