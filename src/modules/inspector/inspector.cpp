@@ -2,6 +2,13 @@
 #include <QPainter>
 #include "version.cc"
 
+static void atomicSaveJpeg(const QImage &img, const QString &finalPath)
+{
+    const QString tmp = finalPath + ".tmp";
+    if (img.save(tmp, "JPG", 100))
+        QFile::rename(tmp, finalPath);
+}
+
 Inspector *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
 {
     Inspector *basemodule = new Inspector(name, label, profile, availableModuleLibs);
@@ -421,7 +428,7 @@ void Inspector::OnSucessSEP()
 
     p.end();
 
-    imHFR.save(getWebroot() + "/" + getModuleName() + "HFR.jpeg", "JPG", 100);
+    atomicSaveJpeg(imHFR, getWebroot() + "/" + getModuleName() + "HFR.jpeg");
 
     /****************************************************************** corners */
     /****************************************************************** corners */
@@ -458,8 +465,8 @@ void Inspector::OnSucessSEP()
     painter.drawRect(QRect(0, 0, 3 * sw - 1, 3 * sh - 1));
 
     painter.end();
-    corners.save(getWebroot() + "/" + getModuleName() + "corners.jpeg", "JPG", 100);
-    im.save(getWebroot()  + "/" + getModuleName() + ".jpeg", "JPG", 100);
+    atomicSaveJpeg(corners, getWebroot() + "/" + getModuleName() + "corners.jpeg");
+    atomicSaveJpeg(im, getWebroot() + "/" + getModuleName() + ".jpeg");
 
     /****************************************************************** aberations */
     /****************************************************************** aberations */
@@ -504,7 +511,7 @@ void Inspector::OnSucessSEP()
         }
     }
     p2.end();
-    imShape.save(getWebroot() + "/" + getModuleName() + "shape.jpeg", "JPG", 100);
+    atomicSaveJpeg(imShape, getWebroot() + "/" + getModuleName() + "shape.jpeg");
 
 
     OST::ImgData dta = _image->ImgStats();

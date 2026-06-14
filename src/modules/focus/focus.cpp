@@ -1,6 +1,13 @@
 #include "focus.h"
 #include "polynomialfit.h"
 #include "version.cc"
+
+static void atomicSaveJpeg(const QImage &img, const QString &finalPath)
+{
+    const QString tmp = finalPath + ".tmp";
+    if (img.save(tmp, "JPG", 100))
+        QFile::rename(tmp, finalPath);
+}
 #include <cmath>
 #include <algorithm>
 #include <limits>
@@ -162,7 +169,7 @@ void Focus::newBLOB(INDI::PropertyBlob b)
         getProperty("image")->setState(OST::Ok, true);
 
         QImage rawImage = _image->getRawQImage();
-        rawImage.save( getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) + ".jpeg", "JPG", 100);
+        atomicSaveJpeg(rawImage, getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) + ".jpeg");
         OST::ImgData dta = _image->ImgStats();
         dta.mUrlJpeg = getModuleName() + QString(b.getDeviceName()) + ".jpeg";
         dta.mUrlFits = getModuleName() + QString(b.getDeviceName()) + ".FITS";
@@ -647,7 +654,7 @@ void Focus::SMComputeResult()
 
 
         QString file = getModuleName() + getString("devices", "camera") + "rawTilt.jpeg";
-        tiltImage.save(getWebroot() + "/" + file, "JPG", 100);
+        atomicSaveJpeg(tiltImage, getWebroot() + "/" + file);
         logInfo("Tilt heatmap saved (range: %1 - %2 steps)", {(int)minPos, (int)maxPos});
         dta.mAlternates.clear();
         dta.mAlternates.append(file);
@@ -711,7 +718,7 @@ void Focus::SMComputeResult()
         painterInterp.end();
 
         file = getModuleName() + getString("devices", "camera") + "localTiltLinear.jpeg";
-        tiltInterp.save(getWebroot() + "/" + file, "JPG", 100);
+        atomicSaveJpeg(tiltInterp, getWebroot() + "/" + file);
         dta.mAlternates.append(file);
         getEltImg("image", "image")->setValue(dta, false);
 
@@ -796,7 +803,7 @@ void Focus::SMComputeResult()
             }
             painterGT.end();
             QString file = getModuleName() + getString("devices", "camera") + "globalTiltLinear.jpeg";
-            globalTilt.save( getWebroot() + "/" + file, "JPG", 100);
+            atomicSaveJpeg(globalTilt, getWebroot() + "/" + file);
             dta.mAlternates.append(file);
             getEltImg("image", "image")->setValue(dta, false);
 
@@ -894,7 +901,7 @@ void Focus::SMComputeResult()
             painterQ.end();
 
             file = getModuleName() + getString("devices", "camera") + "globalTiltQuadratic.jpeg";
-            quadTilt.save( getWebroot() + "/" + file, "JPG", 100);
+            atomicSaveJpeg(quadTilt, getWebroot() + "/" + file);
             dta.mAlternates.append(file);
             getEltImg("image", "image")->setValue(dta, true);
 
