@@ -12,7 +12,7 @@ static void atomicSaveJpeg(const QImage &img, const QString &finalPath)
 {
     const QString tmp = finalPath + ".tmp";
     if (img.save(tmp, "JPG", 100))
-        QFile::rename(tmp, finalPath);
+        ::rename(tmp.toLocal8Bit().constData(), finalPath.toLocal8Bit().constData());
 }
 
 Allsky *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)

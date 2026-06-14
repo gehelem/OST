@@ -6,7 +6,7 @@ static void atomicSaveJpeg(const QImage &img, const QString &finalPath)
 {
     const QString tmp = finalPath + ".tmp";
     if (img.save(tmp, "JPG", 100))
-        QFile::rename(tmp, finalPath);
+        ::rename(tmp.toLocal8Bit().constData(), finalPath.toLocal8Bit().constData());
 }
 #include <cmath>
 #include <algorithm>
