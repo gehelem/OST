@@ -3,6 +3,13 @@
 #include <QTimer>
 #include "version.cc"
 
+static void atomicSaveJpeg(const QImage &img, const QString &finalPath)
+{
+    const QString tmp = finalPath + ".tmp";
+    if (img.save(tmp, "JPG", 100))
+        ::rename(tmp.toLocal8Bit().constData(), finalPath.toLocal8Bit().constData());
+}
+
 Sequencer *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
 {
     Sequencer *basemodule = new Sequencer(name, label, profile, availableModuleLibs);
@@ -551,7 +558,7 @@ void Sequencer::newBLOB(INDI::PropertyBlob pblob)
     QImage rawImage = _image->getRawQImage();
     QImage im = rawImage.convertToFormat(QImage::Format_RGB32);
     im.setColorTable(rawImage.colorTable());
-    im.save(getWebroot() + "/" + getModuleName() + ".jpeg", "JPG", 100);
+    atomicSaveJpeg(im, getWebroot() + "/" + getModuleName() + ".jpeg");
 
     OST::ImgData dta  = _image->ImgStats();
     dta.mUrlJpeg      = getModuleName() + ".jpeg";

@@ -42,6 +42,9 @@ IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap
     connect(timer, &QTimer::timeout, this, &IndiModule::connectIndiTimer);
     timer->start(2000);
 
+    getEltBool("devicesactions","condevs")->setValue(false,false);
+    getEltBool("devicesactions","discondevs" )->setValue(false,false);
+
 }
 /**
  * @brief INDI module event handler (Hook 2/3)
@@ -65,26 +68,22 @@ bool IndiModule::onExternalEventIndi(OST::ExtEvent event)
 
         QVariantMap eltval;
         eltval["value"] = e.begin().value().toVariant();
-        if (event.prpkey == "serveractions" && event.eltkey == "conserv")
+        if (event.prpkey == "serveractions" && event.eltkey == "conserv" && eltval["value"].toBool())
         {
             getProperty(event.prpkey)->setState(OST::Busy, true);
             if (connectIndi()) getProperty(event.prpkey)->setState(OST::Ok, true);
             else getProperty(event.prpkey)->setState(OST::Error, true);
-
-            OST::ElementUpdate u;
-            bool b = true;
-            getStore()[event.prpkey]->getElt(event.eltkey)->accept(&u, eltval, b);
+            getEltBool("serveractions","conserv")->setValue(true,false);
+            getEltBool("serveractions","disconserv" )->setValue(false,true);
             return true;
         }
-        if (event.prpkey == "serveractions" && event.eltkey == "disconserv")
+        if (event.prpkey == "serveractions" && event.eltkey == "disconserv" && eltval["value"].toBool())
         {
             getProperty(event.prpkey)->setState(OST::Busy, true);
             if (disconnectIndi()) getProperty(event.prpkey)->setState(OST::Ok, true);
             else getProperty(event.prpkey)->setState(OST::Error, true);
-
-            OST::ElementUpdate u;
-            bool b = true;
-            getStore()[event.prpkey]->getElt(event.eltkey)->accept(&u, eltval, b);
+            getEltBool("serveractions","conserv")->setValue(false,false);
+            getEltBool("serveractions","disconserv" )->setValue(true,true);
             return true;
         }
         if (event.prpkey == "optic")
@@ -184,7 +183,7 @@ bool IndiModule::onExternalEventIndi(OST::ExtEvent event)
         }
 
 
-        if (event.prpkey == "devicesactions" && event.eltkey == "condevs")
+        if (event.prpkey == "devicesactions")
         {
             if (!isServerConnected())
             {
@@ -193,37 +192,31 @@ bool IndiModule::onExternalEventIndi(OST::ExtEvent event)
                 return true;
             }
 
-            if (event.eltkey == "condevs")
+            if (event.eltkey == "condevs" && eltval["value"].toBool())
             {
                 getProperty(event.prpkey)->setState(OST::Busy, true);
                 if (connectAllDevices()) getProperty(event.prpkey)->setState(OST::Ok, true);
                 else getProperty(event.prpkey)->setState(OST::Error, true);
-
-                OST::ElementUpdate u;
-                bool b = true;
-                getStore()[event.prpkey]->getElt(event.eltkey)->accept(&u, eltval, b);
+                getEltBool("devicesactions","condevs")->setValue(true,false);
+                getEltBool("devicesactions","discondevs" )->setValue(false,true);
                 return true;
             }
-            if (event.eltkey == "discondevs")
+            if (event.eltkey == "discondevs" && eltval["value"].toBool())
             {
                 getProperty(event.prpkey)->setState(OST::Busy, true);
                 if (disconnectAllDevices()) getProperty(event.prpkey)->setState(OST::Ok, true);
                 else getProperty(event.prpkey)->setState(OST::Error, true);
-
-                OST::ElementUpdate u;
-                bool b = true;
-                getStore()[event.prpkey]->getElt(event.eltkey)->accept(&u, eltval, b);
+                getEltBool("devicesactions","condevs")->setValue(false,false);
+                getEltBool("devicesactions","discondevs" )->setValue(true,true);
                 return true;
             }
-            if (event.eltkey == "loadconfs")
+            if (event.eltkey == "loadconfs"  && eltval["value"].toBool())
             {
                 getProperty(event.prpkey)->setState(OST::Busy, true);
+                getEltBool("devicesactions","loadconfs")->setValue(true,true);
                 if (loadDevicesConfs()) getProperty(event.prpkey)->setState(OST::Ok, true);
                 else getProperty(event.prpkey)->setState(OST::Error, true);
-
-                OST::ElementUpdate u;
-                bool b = true;
-                getStore()[event.prpkey]->getElt(event.eltkey)->accept(&u, eltval, b);
+                getEltBool("devicesactions","loadconfs" )->setValue(false,true);
                 return true;
             }
         }
@@ -244,7 +237,6 @@ void IndiModule::connectIndiTimer()
         return;
     }
     connectIndi();
-
 }
 
 void IndiModule::newDevice(INDI::BaseDevice dp)
@@ -295,6 +287,11 @@ bool IndiModule::connectIndi()
     {
         //sendWarning("Indi server already connected");
         newUniversalMessage("Indi server already connected");
+        if (!getBool("serveractions","conserv"))
+        {
+            getEltBool("serveractions","conserv")->setValue(true,false);
+            getEltBool("serveractions","disconserv" )->setValue(false,true);
+        }
         return true;
     }
     setServer(getString("server", "host").toStdString().c_str(), getInt("server", "port"));
@@ -303,9 +300,13 @@ bool IndiModule::connectIndi()
         newUniversalMessage("Indi server connected");
         logInfo("Indi server connected");
         QTimer::singleShot(500, this, &IndiModule::OnAfterIndiConnectIndiTimer);
+        getEltBool("serveractions","conserv")->setValue(true,false);
+        getEltBool("serveractions","disconserv" )->setValue(false,true);
         return true;
     }
     logError("%1 - Couldn't connect to Indi server", {QString("connectIndi")});
+    getEltBool("serveractions","conserv")->setValue(false,false);
+    getEltBool("serveractions","disconserv" )->setValue(true,true);
     return false;
 }
 bool IndiModule::disconnectIndi(void)
@@ -334,33 +335,23 @@ bool IndiModule::connectAllDevices()
 
     for(std::size_t i = 0; i < devs.size(); i++)
     {
-        INDI::PropertySwitch svp = devs[i].getSwitch("CONNECTION");
+        INDI::BaseDevice dp = getDevice(devs[i].getDeviceName());
+        INDI::PropertySwitch prop = dp.getSwitch("CONNECTION");
 
-        if (!svp.isValid())
+        if (!prop.isValid())
         {
             logError("%1 - Couldn't find CONNECTION switch for %2", {QString("connectAllDevices"), QString(devs[i].getDeviceName())});
             err++;
         }
         else
         {
-            for (std::size_t j = 0; j < svp.size(); j++)
-            {
-                if (strcmp(svp[j].name, "CONNECT") == 0)
-                {
-                    svp[j].s = ISS_ON;
-                }
-                else
-                {
-                    svp[j].s  = ISS_OFF;
-                }
-            }
-
-            sendNewSwitch(svp);
+            prop.findWidgetByName("CONNECT")->setState(ISS_ON);
+            prop.findWidgetByName("DISCONNECT")->setState(ISS_OFF);
+            sendNewSwitch(prop);
             if (devs[i].getDriverInterface() & INDI::BaseDevice::CCD_INTERFACE)
             {
                 logDebug("Set blob mode %1", {QString(devs[i].getDeviceName())});
                 setBLOBMode(B_ALSO, devs[i].getDeviceName(), nullptr);
-
             }
 
         }
@@ -380,27 +371,19 @@ bool IndiModule::disconnectAllDevices()
 
     for(std::size_t i = 0; i < devs.size(); i++)
     {
-        INDI::PropertySwitch svp = devs[i].getSwitch("CONNECTION");
+        INDI::BaseDevice dp = getDevice(devs[i].getDeviceName());
+        INDI::PropertySwitch prop = dp.getSwitch("CONNECTION");
 
-        if (!svp.isValid())
+        if (!prop.isValid())
         {
             logError("%1 - Couldn't find CONNECTION switch for %2", {QString("disconnectAllDevices"), QString(devs[i].getDeviceName())});
             err++;
         }
         else
         {
-            for (std::size_t j = 0; j < svp.size(); j++)
-            {
-                if (strcmp(svp[j].name, "DISCONNECT") == 0)
-                {
-                    svp[j].s = ISS_ON;
-                }
-                else
-                {
-                    svp[j].s = ISS_OFF;
-                }
-            }
-            sendNewSwitch(svp);
+            prop.findWidgetByName("CONNECT")->setState(ISS_OFF);
+            prop.findWidgetByName("DISCONNECT")->setState(ISS_ON);
+            sendNewSwitch(prop);
 
         }
 
@@ -521,6 +504,12 @@ auto IndiModule::sendModNewNumber(const QString &deviceName, const QString &prop
                                   const double &value) -> bool
 {
     //qDebug() << "sendModNewNumber" << " " << deviceName << "-" << propertyName << "-" << elementName << "-" << value;
+    if (!isServerConnected())
+    {
+        logError("Indi server is not connected");
+        return false;
+    }
+
     INDI::BaseDevice dp = getDevice(deviceName.toStdString().c_str());
 
     if (!dp.isValid())
@@ -722,6 +711,12 @@ bool IndiModule::getModText(const QString &deviceName, const QString &propertyNa
 bool IndiModule::sendModNewText  (QString deviceName, QString propertyName, QString elementName, QString text)
 {
     //qDebug() << "sendModNewText" << "-" << deviceName << "-" << propertyName<< "-" << elementName;
+    if (!isServerConnected())
+    {
+        logError("Indi server is not connected");
+        return false;
+    }
+
     INDI::BaseDevice dp = getDevice(deviceName.toStdString().c_str());
 
     if (!dp.isValid())
@@ -751,6 +746,11 @@ bool IndiModule::sendModNewText  (QString deviceName, QString propertyName, QStr
 bool IndiModule::sendModNewSwitch(QString deviceName, QString propertyName, QString elementName, ISState sw)
 {
     //qDebug() << "sendModNewswitch " << "-" << deviceName << "-" << propertyName<< "-" << elementName;
+    if (!isServerConnected())
+    {
+        logError("Indi server is not connected");
+        return false;
+    }
 
     INDI::BaseDevice dp = getDevice(deviceName.toStdString().c_str());
 

@@ -629,6 +629,16 @@ void Controller::onExternalEvent(OST::ExtEvent event)
             stopIndiDriver(event.data["driver"].toString());
             return;
         }
+        case OST::ExtEvType::YR:
+        {
+            if (!event.data.contains("driver"))
+            {
+                logError("Controller::onExternalEvent - invalid event data content - %1", {OST::ExtEvToString(event.ev)});
+                return;
+            };
+            reloadIndiDriver(event.data["driver"].toString());
+            return;
+        }
         default:
         {
             if (!event.data.contains("m"))
@@ -1052,6 +1062,16 @@ void Controller::stopIndiDriver(const QString &pDriver)
     mLogger->info("Sent stop command for driver: " + pDriver);
     updateControllerData("indiactivedrivers", activeIndiDriversToVariant());
 }
+void Controller::reloadIndiDriver(const QString &pDriver)
+{
+    stopIndiDriver(pDriver);
+    QTimer::singleShot(500, this, [this, pDriver]()
+    {
+        startIndiDriver(pDriver);
+    });
+    mLogger->info("Reload requested for driver: " + pDriver);
+}
+
 void Controller::queryActiveIndiDrivers()
 {
     _activeIndiDrivers.clear();

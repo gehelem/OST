@@ -26,6 +26,13 @@
 #include "version.cc"
 #include <QRandomGenerator>
 #include <QPainter>
+
+static void atomicSaveJpeg(const QImage &img, const QString &finalPath)
+{
+    const QString tmp = finalPath + ".tmp";
+    if (img.save(tmp, "JPG", 100))
+        ::rename(tmp.toLocal8Bit().constData(), finalPath.toLocal8Bit().constData());
+}
 //#include "polynomialfit.h"
 #define PI 3.14159265
 
@@ -1251,7 +1258,7 @@ void Guider::OnSucessSEP()
             painter.drawEllipse(QPointF(star.x / 2.0, star.y / 2.0), r, r);
         }
     }
-    im.save(getWebroot() + "/" + getModuleName() + ".jpeg", "JPG", 100);
+    atomicSaveJpeg(im, getWebroot() + "/" + getModuleName() + ".jpeg");
     dta.mUrlJpeg = getModuleName() + ".jpeg";
 
     getEltImg("image", "image")->setValue(dta, true);

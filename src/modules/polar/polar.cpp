@@ -3,6 +3,13 @@
 #include <QPainter>
 #include "version.cc"
 
+static void atomicSaveJpeg(const QImage &img, const QString &finalPath, int quality = 100)
+{
+    const QString tmp = finalPath + ".tmp";
+    if (img.save(tmp, "JPG", quality))
+        ::rename(tmp.toLocal8Bit().constData(), finalPath.toLocal8Bit().constData());
+}
+
 #define PI 3.14159265
 
 Polar *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
@@ -134,7 +141,7 @@ void Polar::newBLOB(INDI::PropertyBlob  bp)
         QImage im = rawImage.convertToFormat(QImage::Format_RGB32);
         im.setColorTable(rawImage.colorTable());
         _lastRawImage = im;  // keep a copy for error overlay
-        im.save(getWebroot()  + "/" + getModuleName() + ".jpeg", "JPG", 100);
+        atomicSaveJpeg(im, getWebroot() + "/" + getModuleName() + ".jpeg");
         OST::ImgData dta = image->ImgStats();
         dta.mUrlJpeg = getModuleName() + ".jpeg";
         getEltImg("image", "image")->setValue(dta, true);
@@ -624,7 +631,7 @@ void Polar::SMComputeFinal()
         QImage overlaid = _lastRawImage.copy();
         drawErrorOverlay(overlaid, _erraz, _erralt, _errtot,
                          _solver.stellarSolver.getSolution().orientation);
-        overlaid.save(getWebroot() + "/" + getModuleName() + ".jpeg", "JPG", 90);
+        atomicSaveJpeg(overlaid, getWebroot() + "/" + getModuleName() + ".jpeg", 90);
         OST::ImgData dta = image->ImgStats();
         dta.mUrlJpeg = getModuleName() + ".jpeg";
         dta.solverOrientation = _solver.stellarSolver.getSolution().orientation;
@@ -682,7 +689,7 @@ void Polar::SMCorrCompute()
         QImage overlaid = _lastRawImage.copy();
         drawErrorOverlay(overlaid, remainAz, remainAlt, remainTot,
                          _solver.stellarSolver.getSolution().orientation);
-        overlaid.save(getWebroot() + "/" + getModuleName() + ".jpeg", "JPG", 90);
+        atomicSaveJpeg(overlaid, getWebroot() + "/" + getModuleName() + ".jpeg", 90);
         OST::ImgData dta = image->ImgStats();
         dta.mUrlJpeg = getModuleName() + ".jpeg";
         dta.solverOrientation = _solver.stellarSolver.getSolution().orientation;

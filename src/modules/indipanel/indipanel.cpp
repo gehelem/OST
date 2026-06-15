@@ -1,6 +1,13 @@
 #include "indipanel.h"
 #include "version.cc"
 
+static void atomicSaveJpeg(const QImage &img, const QString &finalPath)
+{
+    const QString tmp = finalPath + ".tmp";
+    if (img.save(tmp, "JPG", 100))
+        ::rename(tmp.toLocal8Bit().constData(), finalPath.toLocal8Bit().constData());
+}
+
 IndiPanel *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
 {
     IndiPanel *basemodule = new IndiPanel(name, label, profile, availableModuleLibs);
@@ -150,7 +157,7 @@ void IndiPanel::onNewProperty(INDI::Property pProperty)
                 if (_image->loadBlob(b, 64, i))
                 {
                     QImage rawImage = _image->getRawQImage();
-                    rawImage.save( getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) +  b[i].label + ".jpeg", "JPG", 100);
+                    atomicSaveJpeg(rawImage, getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) + b[i].label + ".jpeg");
                     dta = _image->ImgStats();
                     dta.mUrlJpeg = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".jpeg";
                     dta.mUrlFits = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".FITS";
@@ -253,7 +260,7 @@ void IndiPanel::onUpdateProperty (INDI::Property property)
                 if (_image->loadBlob(b, 64, i))
                 {
                     QImage rawImage = _image->getRawQImage();
-                    rawImage.save( getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) +  b[i].label + ".jpeg", "JPG", 100);
+                    atomicSaveJpeg(rawImage, getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) + b[i].label + ".jpeg");
                     dta = _image->ImgStats();
                     dta.mUrlJpeg = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".jpeg";
                     dta.mUrlFits = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".FITS";

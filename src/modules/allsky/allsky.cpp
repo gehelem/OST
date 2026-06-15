@@ -7,6 +7,14 @@
 #include <algorithm>
 #include "version.cc"
 
+// Write to a .tmp file then rename() atomically so nginx never serves a partially-written file.
+static void atomicSaveJpeg(const QImage &img, const QString &finalPath)
+{
+    const QString tmp = finalPath + ".tmp";
+    if (img.save(tmp, "JPG", 100))
+        ::rename(tmp.toLocal8Bit().constData(), finalPath.toLocal8Bit().constData());
+}
+
 Allsky *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
 {
     Allsky *basemodule = new Allsky(name, label, profile, availableModuleLibs);
@@ -365,7 +373,7 @@ void Allsky::newBLOB(INDI::PropertyBlob pblob)
                 }
             }
         }
-        imageStacked.save(getWebroot() +  "/" + getModuleName() + "/" + mFolder + "/stacked" + ".jpeg", "JPG", 100);
+        atomicSaveJpeg(imageStacked, getWebroot() + "/" + getModuleName() + "/" + mFolder + "/stacked.jpeg");
 
 
         QImage image1 = mKeog;
@@ -427,7 +435,7 @@ void Allsky::newBLOB(INDI::PropertyBlob pblob)
         painter.drawImage(mKeog.width(), 0, image2);
         mKeog = result;
 
-        mKeog.save(getWebroot() +  "/" + getModuleName() + "/" + mFolder + "/keogram" + ".jpeg", "JPG", 100);
+        atomicSaveJpeg(mKeog, getWebroot() + "/" + getModuleName() + "/" + mFolder + "/keogram.jpeg");
         OST::ImgData keo;
         keo.mUrlJpeg = getModuleName() + "/" + mFolder + "/keogram" + ".jpeg";
         getEltImg("keogram", "image1")->setValue(keo, true);
@@ -475,7 +483,7 @@ void Allsky::newBLOB(INDI::PropertyBlob pblob)
 
 
 
-        im.save(getWebroot() + "/" + getModuleName() + QString(pblob.getDeviceName()) + ".jpeg", "JPG", 100);
+        atomicSaveJpeg(im, getWebroot() + "/" + getModuleName() + QString(pblob.getDeviceName()) + ".jpeg");
         OST::ImgData dta = _image->ImgStats();
         dta.mUrlJpeg = getModuleName() + QString(pblob.getDeviceName()) + ".jpeg";
         dta.mAlternates.clear();
