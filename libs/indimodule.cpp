@@ -68,8 +68,7 @@ bool IndiModule::onExternalEventIndi(OST::ExtEvent event)
 
         QVariantMap eltval;
         eltval["value"] = e.begin().value().toVariant();
-
-        if (event.eltkey == "serveractions" && event.eltkey == "conserv" && eltval["value"].toBool())
+        if (event.prpkey == "serveractions" && event.eltkey == "conserv" && eltval["value"].toBool())
         {
             getProperty(event.prpkey)->setState(OST::Busy, true);
             if (connectIndi()) getProperty(event.prpkey)->setState(OST::Ok, true);
@@ -78,7 +77,7 @@ bool IndiModule::onExternalEventIndi(OST::ExtEvent event)
             getEltBool("serveractions","disconserv" )->setValue(false,true);
             return true;
         }
-        if (event.eltkey == "serveractions" && event.eltkey == "disconserv" && eltval["value"].toBool())
+        if (event.prpkey == "serveractions" && event.eltkey == "disconserv" && eltval["value"].toBool())
         {
             getProperty(event.prpkey)->setState(OST::Busy, true);
             if (disconnectIndi()) getProperty(event.prpkey)->setState(OST::Ok, true);
@@ -238,7 +237,6 @@ void IndiModule::connectIndiTimer()
         return;
     }
     connectIndi();
-
 }
 
 void IndiModule::newDevice(INDI::BaseDevice dp)
@@ -289,6 +287,11 @@ bool IndiModule::connectIndi()
     {
         //sendWarning("Indi server already connected");
         newUniversalMessage("Indi server already connected");
+        if (!getBool("serveractions","conserv"))
+        {
+            getEltBool("serveractions","conserv")->setValue(true,false);
+            getEltBool("serveractions","disconserv" )->setValue(false,true);
+        }
         return true;
     }
     setServer(getString("server", "host").toStdString().c_str(), getInt("server", "port"));
@@ -297,9 +300,13 @@ bool IndiModule::connectIndi()
         newUniversalMessage("Indi server connected");
         logInfo("Indi server connected");
         QTimer::singleShot(500, this, &IndiModule::OnAfterIndiConnectIndiTimer);
+        getEltBool("serveractions","conserv")->setValue(true,false);
+        getEltBool("serveractions","disconserv" )->setValue(false,true);
         return true;
     }
     logError("%1 - Couldn't connect to Indi server", {QString("connectIndi")});
+    getEltBool("serveractions","conserv")->setValue(false,false);
+    getEltBool("serveractions","disconserv" )->setValue(true,true);
     return false;
 }
 bool IndiModule::disconnectIndi(void)
