@@ -331,6 +331,7 @@ enum class ExtEvType
     YA,        /*!< Embedded Indi server : start server  */
     YZ,        /*!< Embedded Indi server : stop  server  */
     YL,        /*!< Embedded Indi server : load driver  */
+    YR,        /*!< Embedded Indi server : reload driver  */
     YS,        /*!< Embedded Indi server : stop driver */
 };
 inline QString ExtEvToString(ExtEvType ev)
@@ -399,6 +400,8 @@ inline QString ExtEvToString(ExtEvType ev)
             return "YZ";
         case OST::ExtEvType::YL:
             return "YL";
+        case OST::ExtEvType::YR:
+            return "YR";
         case OST::ExtEvType::YS:
             return "YS";
         default:
@@ -449,6 +452,7 @@ inline ExtEvType StrToExtEvent(QString s)
     if (s == "YA") return  ExtEvType::YA;
     if (s == "YZ") return  ExtEvType::YZ;
     if (s == "YL") return  ExtEvType::YL;
+    if (s == "YR") return  ExtEvType::YR;
     if (s == "YS") return  ExtEvType::YS;
     return  ExtEvType::ZZ;
 }
