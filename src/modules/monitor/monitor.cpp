@@ -30,8 +30,18 @@ Monitor::~Monitor()
 void Monitor::appendEvent(const QString &module, const QString &type,
                           const QString &key, double valNum, const QString &valStr)
 {
+    QDateTime now = QDateTime::currentDateTime();
+    QVariantMap ts;
+    ts["year"]  = now.date().year();
+    ts["month"] = now.date().month();
+    ts["day"]   = now.date().day();
+    ts["hh"]    = now.time().hour();
+    ts["mm"]    = now.time().minute();
+    ts["ss"]    = now.time().second();
+    ts["ms"]    = now.time().msec();
+
     QVariantMap row;
-    row["ts"]      = QDateTime::currentDateTime();
+    row["ts"]      = ts;
     row["module"]  = module;
     row["type"]    = type;
     row["key"]     = key;
