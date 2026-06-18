@@ -1,0 +1,20 @@
+{
+"p":{
+    "status": {
+        "label": "Status",
+        "devcat": "Monitor",
+        "order": "100",
+        "group": "",
+        "permission": 0,
+        "rule": 0,
+        "e": {
+            "state": {
+                "type": "string",
+                "label": "State",
+                "order": "10",
+                "value": "idle"
+            }
+        }
+    }
+}
+}
