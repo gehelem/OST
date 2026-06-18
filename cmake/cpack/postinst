@@ -1,27 +1,29 @@
 #!/bin/sh
 set -e
 
-# Use the user who invoked sudo, fallback to current user
-INSTALL_USER="${SUDO_USER:-${USER:-root}}"
-USER_HOME=$(getent passwd "${INSTALL_USER}" | cut -d: -f6)
-OST_DIR="${USER_HOME}/.ost"
+case "$1" in
+    configure)
+        # Use the user who invoked sudo, fallback to current user
+        INSTALL_USER="${SUDO_USER:-${USER:-root}}"
+        USER_HOME=$(getent passwd "${INSTALL_USER}" | cut -d: -f6)
+        OST_DIR="${USER_HOME}/.ost"
 
-# Patch the service file with the actual user and working directory
-sed -i "s/^User=.*/User=${INSTALL_USER}/" /usr/lib/systemd/system/ostserver.service
-sed -i "s|^WorkingDirectory=.*|WorkingDirectory=${OST_DIR}|" /usr/lib/systemd/system/ostserver.service
+        # Patch the service file with the actual user and working directory
+        sed -i "s/^User=.*/User=${INSTALL_USER}/" /usr/lib/systemd/system/ostserver.service
+        sed -i "s|^WorkingDirectory=.*|WorkingDirectory=${OST_DIR}|" /usr/lib/systemd/system/ostserver.service
 
-# Create working directory and set ownership
-mkdir -p "${OST_DIR}"
-chown "${INSTALL_USER}" "${OST_DIR}"
+        # Create working directory and set ownership
+        mkdir -p "${OST_DIR}"
+        chown "${INSTALL_USER}" "${OST_DIR}"
 
-# Create media directory and set ownership
-mkdir -p /var/lib/osterix/media
-chown -R "${INSTALL_USER}" /var/lib/osterix
+        # Create media directory and set ownership
+        mkdir -p /var/lib/osterix/media
+        chown -R "${INSTALL_USER}" /var/lib/osterix
 
-# Create default parms file if it does not exist yet
-PARMS_FILE="${OST_DIR}/ostserver.parms"
-if [ ! -f "${PARMS_FILE}" ]; then
-    cat > "${PARMS_FILE}" << 'EOF'
+        # Create default parms file if it does not exist yet
+        PARMS_FILE="${OST_DIR}/ostserver.parms"
+        if [ ! -f "${PARMS_FILE}" ]; then
+            cat > "${PARMS_FILE}" << 'EOF'
 # ostserver startup options — one argument per line
 # This file is read at service startup and will not be overwritten on upgrade.
 # Remove the leading # to activate an option.
@@ -67,12 +69,16 @@ if [ ! -f "${PARMS_FILE}" ]; then
 # Set admin password (applied at startup, then remove this line)
 #--setadminpassword=
 EOF
-    chown "${INSTALL_USER}" "${PARMS_FILE}"
-fi
+            chown "${INSTALL_USER}" "${PARMS_FILE}"
+        fi
 
-# Enable and start the service
-if [ -d /run/systemd/system ]; then
-    systemctl daemon-reload
-    systemctl enable ostserver.service
-    systemctl start ostserver.service || true
-fi
+        # Enable and start the service (CPack builds only — debhelper uses #DEBHELPER#)
+        if [ -d /run/systemd/system ]; then
+            systemctl daemon-reload
+            systemctl enable ostserver.service
+            systemctl start ostserver.service || true
+        fi
+    ;;
+esac
+
+#DEBHELPER#
