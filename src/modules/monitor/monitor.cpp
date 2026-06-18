@@ -19,8 +19,6 @@ Monitor::Monitor(QString name, QString label, QString profile, QVariantMap avail
     setMetadata("description",    "Session activity monitor");
     setMetadata("template",       "monitor");
 
-    connect(&mTimer, &QTimer::timeout, this, &Monitor::onHeartbeat);
-    mTimer.start(1000);
 }
 
 Monitor::~Monitor()
@@ -48,11 +46,6 @@ void Monitor::appendEvent(const QString &module, const QString &type,
     row["val_num"] = valNum;
     row["val_str"] = valStr;
     getStore()["events"]->newLine(row);
-}
-
-void Monitor::onHeartbeat()
-{
-    appendEvent("monitor", "heartbeat", "tick", 0.0, "");
 }
 
 void Monitor::onExternalEvent(OST::ExtEvent event)
