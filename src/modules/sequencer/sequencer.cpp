@@ -570,9 +570,8 @@ void Sequencer::newBLOB(INDI::PropertyBlob pblob)
     qint64 totalBytes = storage.bytesTotal();
     if (totalBytes > 0 && freeBytes * 100 / totalBytes < getMinFreePercent())
     {
-        logWarning("Sequencer: disk too full (" +
-                   QString::number(freeBytes / (1024 * 1024)) + " MB free, threshold " +
-                   QString::number(getMinFreePercent()) + "%) — FITS not saved: " + mCurrentFolder);
+        logWarning("Sequencer: disk too full (%1 MB free, threshold %2%) — FITS not saved: %3",
+                   {freeBytes / (1024 * 1024), getMinFreePercent(), mCurrentFolder});
     }
     else
     {

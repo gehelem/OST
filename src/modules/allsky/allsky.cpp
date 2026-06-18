@@ -1,5 +1,6 @@
 #include "allsky.h"
 #include <QPainter>
+#include <QStorageInfo>
 #include <libnova/solar.h>
 #include <libnova/julian_day.h>
 #include <libnova/rise_set.h>
@@ -334,6 +335,16 @@ void Allsky::newBLOB(INDI::PropertyBlob pblob)
         (QString(pblob.getDeviceName()) == getString("devices", "camera"))
     )
     {
+        QStorageInfo storage(getWebroot());
+        qint64 freeBytes  = storage.bytesFree();
+        qint64 totalBytes = storage.bytesTotal();
+        if (totalBytes > 0 && freeBytes * 100 / totalBytes < getMinFreePercent())
+        {
+            logWarning("Allsky: disk too full (%1 MB free, threshold %2%) — frame not saved",
+                       {freeBytes / (1024 * 1024), getMinFreePercent()});
+            return;
+        }
+
         getProperty("actions")->setState(OST::Ok, true);
         delete _image;
         _image = new fileio();
