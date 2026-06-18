@@ -148,6 +148,13 @@ bool  PropertyMulti::setElt(QString key, QVariant val, bool emitEvent)
         getElt(key)->accept(&vu, m, s);
         return true;
     }
+    if (mElts[key]->getType() == "datetime")
+    {
+        ElementUpdate vu;
+        m["value"] = val.toMap();
+        getElt(key)->accept(&vu, m, s);
+        return true;
+    }
     if (mElts[key]->getType() == "light")
     {
         ElementUpdate vu;
