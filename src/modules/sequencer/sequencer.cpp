@@ -1,6 +1,7 @@
 #include "sequencer.h"
 #include <QPainter>
 #include <QTimer>
+#include <QStorageInfo>
 #include "version.cc"
 
 static void atomicSaveJpeg(const QImage &img, const QString &finalPath)
@@ -564,8 +565,20 @@ void Sequencer::newBLOB(INDI::PropertyBlob pblob)
     dta.mUrlJpeg      = getModuleName() + ".jpeg";
     getEltImg("image", "image")->setValue(dta, true);
     QString tt = QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss_zzz");
-    _image->saveAsFITSSimple(
-        mCurrentFolder + "/" + mObjectName + "-" + mCurrentFrameType + "-" + mCurrentFilter + "-" + tt + ".FITS");
+    QStorageInfo storage(mCurrentFolder);
+    qint64 freeBytes  = storage.bytesFree();
+    qint64 totalBytes = storage.bytesTotal();
+    if (totalBytes > 0 && freeBytes * 100 / totalBytes < getMinFreePercent())
+    {
+        logWarning("Sequencer: disk too full (" +
+                   QString::number(freeBytes / (1024 * 1024)) + " MB free, threshold " +
+                   QString::number(getMinFreePercent()) + "%) — FITS not saved: " + mCurrentFolder);
+    }
+    else
+    {
+        _image->saveAsFITSSimple(
+            mCurrentFolder + "/" + mObjectName + "-" + mCurrentFrameType + "-" + mCurrentFilter + "-" + tt + ".FITS");
+    }
 
     // newBLOB runs in the INDI thread — only do I/O here.
     // The state machine submits ExposureDone which triggers FindingStars on the main thread.

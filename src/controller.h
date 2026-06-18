@@ -39,7 +39,7 @@ class Controller : public QObject
                    const QString &ssl, const QString &sslCert, const QString &sslKey, const QString &lng, const QString &grant,
                    OST::Logger *logger, OST::TranslateManager *translate, const QString &banner, const QString &setAdminPassword,
                    const QString &gitSha, const QString &gitDate, const QString &gitMessage, const QString &gitTag,
-                   const int systemWatchInterval);
+                   const int systemWatchInterval, const int minFreePercent);
         ~Controller() override;
     signals:
         void controllerEvent(OST::ExtEvent  event);
@@ -71,6 +71,7 @@ class Controller : public QObject
         QString mBanner;
         QString mSetAdminPassword;
         int     mSystemWatchInterval;
+        int     mMinFreePercent;
         QTimer  mSystemWatchTimer;
         QVariantMap mControllerData;
         QMap<QString, OST::LovBase*> mControllerLovs;

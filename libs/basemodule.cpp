@@ -319,6 +319,16 @@ QString Basemodule::getWebroot(void)
 {
     return mWebroot;
 }
+
+void Basemodule::setMinFreePercent(int percent)
+{
+    mMinFreePercent = percent;
+}
+
+int Basemodule::getMinFreePercent() const
+{
+    return mMinFreePercent;
+}
 QVariantMap Basemodule::getAvailableModuleLibs(void)
 {
     return mAvailableModuleLibs;
