@@ -1,18 +1,44 @@
 {
 "p":{
-    "status": {
-        "label": "Status",
+    "events": {
+        "label": "Events",
         "devcat": "Monitor",
         "order": "100",
         "group": "",
         "permission": 0,
-        "rule": 0,
+        "showElts": false,
+        "hasGrid": true,
+        "showGrid": true,
         "e": {
-            "state": {
+            "ts": {
+                "type": "datetime",
+                "label": "Timestamp",
+                "order": "10"
+            },
+            "module": {
                 "type": "string",
-                "label": "State",
-                "order": "10",
-                "value": "idle"
+                "label": "Module",
+                "order": "20"
+            },
+            "type": {
+                "type": "string",
+                "label": "Type",
+                "order": "30"
+            },
+            "key": {
+                "type": "string",
+                "label": "Key",
+                "order": "40"
+            },
+            "val_num": {
+                "type": "float",
+                "label": "Value",
+                "order": "50"
+            },
+            "val_str": {
+                "type": "string",
+                "label": "Detail",
+                "order": "60"
             }
         }
     }

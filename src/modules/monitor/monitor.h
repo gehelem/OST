@@ -26,6 +26,9 @@ class MODULE_INIT Monitor : public IndiModule
         void onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QString elt, QVariant data, int line) override;
 
     private:
+        void appendEvent(const QString &module, const QString &type,
+                         const QString &key, double valNum, const QString &valStr);
+
         QString mState = "idle";
 };
 

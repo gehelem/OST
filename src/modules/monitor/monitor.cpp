@@ -24,6 +24,19 @@ Monitor::~Monitor()
 {
 }
 
+void Monitor::appendEvent(const QString &module, const QString &type,
+                          const QString &key, double valNum, const QString &valStr)
+{
+    QVariantMap row;
+    row["ts"]      = QDateTime::currentDateTime();
+    row["module"]  = module;
+    row["type"]    = type;
+    row["key"]     = key;
+    row["val_num"] = valNum;
+    row["val_str"] = valStr;
+    getStore()["events"]->newLine(row);
+}
+
 void Monitor::onExternalEvent(OST::ExtEvent event)
 {
     Q_UNUSED(event)
