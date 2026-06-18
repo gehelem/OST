@@ -1,6 +1,7 @@
 #ifndef MONITOR_MODULE_h_
 #define MONITOR_MODULE_h_
 #include <indimodule.h>
+#include <QTimer>
 
 #if defined(MONITOR_MODULE)
 #  define MODULE_INIT Q_DECL_EXPORT
@@ -25,10 +26,14 @@ class MODULE_INIT Monitor : public IndiModule
         void onExternalEvent(OST::ExtEvent event) override;
         void onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QString elt, QVariant data, int line) override;
 
+    private slots:
+        void onHeartbeat();
+
     private:
         void appendEvent(const QString &module, const QString &type,
                          const QString &key, double valNum, const QString &valStr);
 
+        QTimer  mTimer;
         QString mState = "idle";
 };
 
