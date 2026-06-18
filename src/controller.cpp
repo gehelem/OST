@@ -42,7 +42,7 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
                        const QString &ssl, const QString &sslCert, const QString &sslKey, const QString &lng, const QString &grant,
                        OST::Logger *logger, OST::TranslateManager *translate, const QString &banner, const QString &setAdminPassword,
                        const QString &gitSha, const QString &gitDate, const QString &gitMessage, const QString &gitTag,
-                       const int systemWatchInterval)
+                       const int systemWatchInterval, const int minFreePercent)
     :       _webroot(webroot),
             _dbpath(dbpath),
             _libpath(libpath),
@@ -54,7 +54,8 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
             mTranslater(translate),
             mBanner(banner),
             mSetAdminPassword(setAdminPassword),
-            mSystemWatchInterval(systemWatchInterval)
+            mSystemWatchInterval(systemWatchInterval),
+            mMinFreePercent(minFreePercent)
 {
     // Register meta types for queued signal/slot connections
     // Must be done before any connect() calls that use these types
@@ -258,6 +259,7 @@ bool Controller::loadModule(QString lib, QString label, QString profile)
     }
     mod->setParent(this);
     mod->setWebroot(_webroot);
+    mod->setMinFreePercent(mMinFreePercent);
     mod->setGlobalDatastore(mGlobalDatastore);
     mod->setObjectName(name);
     mod->dbInit(_dbpath, name);

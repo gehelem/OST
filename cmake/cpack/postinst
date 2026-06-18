@@ -61,6 +61,9 @@ case "$1" in
 # System resource watch interval in seconds (0 to disable)
 #--systemwatchinterval=10
 
+# Minimum free disk space before skipping image write (%, 0-99, default: 10)
+#--minfree=10
+
 # Enable SSL for WebSocket server (Y/N)
 #--ssl=N
 #--sslcert=/etc/ost/server.crt

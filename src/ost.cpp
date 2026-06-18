@@ -55,6 +55,8 @@ int main(int argc, char *argv[])
     setAdminPasswordOption.setDefaultValue("");
     QCommandLineOption systemWatchIntervalOption("systemwatchinterval", "System watch interval (s)", "systemwatchinterval");
     systemWatchIntervalOption.setDefaultValue("10");
+    QCommandLineOption minFreePercentOption("minfree", "Minimum free disk space before skipping image write (%, 0-99)", "minfree");
+    minFreePercentOption.setDefaultValue("10");
 
 
     argParser.addOption(webrootOption);
@@ -72,6 +74,7 @@ int main(int argc, char *argv[])
     argParser.addOption(bannerOption);
     argParser.addOption(setAdminPasswordOption);
     argParser.addOption(systemWatchIntervalOption);
+    argParser.addOption(minFreePercentOption);
     argParser.process(app);
 
     QString webroot = argParser.value(webrootOption);
@@ -89,6 +92,7 @@ int main(int argc, char *argv[])
     QString banner = argParser.value(bannerOption);
     QString setAdminPassword = argParser.value(setAdminPasswordOption);
     int systemWatchInterval = argParser.value(systemWatchIntervalOption).toInt();
+    int minFreePercent      = qBound(0, argParser.value(minFreePercentOption).toInt(), 99);
 
     OST::Logger mLogger;
     OST::TranslateManager mTranslater;
@@ -129,6 +133,7 @@ int main(int argc, char *argv[])
     mLogger.info("Log level             =" + QString::number(loglevel));
     mLogger.info("Banner                =" + banner);
     mLogger.info("System watch interval =" + QString::number(systemWatchInterval) + "s (0 to disable)");
+    mLogger.info("Min free disk space   =" + QString::number(minFreePercent) + "%");
     if (setAdminPassword != "") mLogger.info("Set ADMIN password    = [hidden]");
 
     mLogger.setLogLevel(static_cast<OST::LogLevel>(loglevel));
@@ -152,7 +157,8 @@ int main(int argc, char *argv[])
         QString::fromStdString(Version::GIT_DATE),
         QString::fromStdString(Version::GIT_COMMIT_SUBJECT),
         QString::fromStdString(Version::GIT_TAG),
-        systemWatchInterval
+        systemWatchInterval,
+        minFreePercent
     );
 
     Q_UNUSED(controller);

@@ -14,6 +14,8 @@ class Basemodule : public DBManager
         Basemodule(QString name, QString label, QString profile, QVariantMap params);
         ~Basemodule();
         void setWebroot(QString webroot);
+        void setMinFreePercent(int percent);
+        int  getMinFreePercent() const;
 
         bool saveProfile(const QString &pProfileName);
         bool loadProfile(const QString &pProfileName);
@@ -42,6 +44,7 @@ class Basemodule : public DBManager
         QVariantMap mAvailableModuleLibs;
         QVariantMap mAvailableProfiles;
         QString mWebroot;
+        int     mMinFreePercent = 10;
         QString mModuleName;
         QString mModuleLabel;
         OST::ModuleStatus mStatus;
