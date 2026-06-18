@@ -15,6 +15,57 @@ case "$1" in
 
         mkdir -p /var/lib/osterix/media
         chown -R "${INSTALL_USER}" /var/lib/osterix
+
+        PARMS_FILE="${OST_DIR}/ostserver.parms"
+        if [ ! -f "${PARMS_FILE}" ]; then
+            cat > "${PARMS_FILE}" << 'EOF'
+# ostserver startup options — one argument per line
+# This file is read at service startup and will not be overwritten on upgrade.
+# Remove the leading # to activate an option.
+
+# Web server media folder (must be writable)
+--webroot=/var/lib/osterix/media
+
+# Start embedded INDI server (Y/N)
+--indiserver=Y
+
+# Log level: 0=debug, 1=info, 2=warning, 3=error, 4=critical
+--loglevel=1
+
+# Log file path (default: ostserver_YYYY-MM-DD_hh-mm-ss.log in working directory)
+#--logfile=/home/user/.ost/ostserver.log
+
+# Security level: 0=disabled, 1=read only, 2=user grants
+--grant=0
+
+# Language (fr/en/de/it/es)
+#--lng=fr
+
+# Frontend banner text
+#--banner=Observatoire Sans tête
+
+# Load a specific configuration name (default: default)
+#--configuration=default
+
+# Modules library path (default: system path)
+#--libpath=
+
+# Database path (default: working directory)
+#--dbpath=
+
+# System resource watch interval in seconds (0 to disable)
+#--systemwatchinterval=10
+
+# Enable SSL for WebSocket server (Y/N)
+#--ssl=N
+#--sslcert=/etc/ost/server.crt
+#--sslkey=/etc/ost/server.key
+
+# Set admin password (applied at startup, then remove this line)
+#--setadminpassword=
+EOF
+            chown "${INSTALL_USER}" "${PARMS_FILE}"
+        fi
     ;;
 esac
 
