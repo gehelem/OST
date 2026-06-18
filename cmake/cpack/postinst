@@ -46,7 +46,7 @@ case "$1" in
 # Language (fr/en/de/it/es)
 #--lng=fr
 
-# Frontend banner text
+# Frontend banner text (spaces are allowed, no quoting needed)
 #--banner=Observatoire Sans tête
 
 # Load a specific configuration name (default: default)

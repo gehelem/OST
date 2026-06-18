@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Environment=QT_QPA_PLATFORM=offscreen
 WorkingDirectory=/home/ostserver/.ost
-ExecStart=/bin/sh -c 'exec /usr/bin/ostserver $(cat "$HOME/.ost/ostserver.parms" 2>/dev/null)'
+ExecStart=/bin/sh -c 'grep -v "^[[:space:]]*#" "$HOME/.ost/ostserver.parms" 2>/dev/null | grep -v "^[[:space:]]*$" | xargs -d "\n" /usr/bin/ostserver'
 Restart=on-failure
 RestartSec=5
 User=ostserver
