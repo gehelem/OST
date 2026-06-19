@@ -155,7 +155,7 @@ class Basemodule : public DBManager
 
     protected:
         Basemodule* mGlobalDatastore = nullptr;
-        void setStateEvent(OST::State state, QString statedescription, QString event, QString eventdescription);
+        void setStateEvent(OST::State state, QString statedescription, QString event, QString eventdescription, double valNum = 0.0, int valInt = 0, QString valStr = "");
 }
 ;
 #endif

@@ -29,9 +29,8 @@ class MODULE_INIT Monitor : public IndiModule
     private:
         bool isWatchedModule(const QString &mod);
         void appendEvent(const QString &module, const QString &type,
-                         const QString &key, double valNum, const QString &valStr);
+                         const QString &key, double valNum, int valInt, const QString &valStr);
 
-        QMap<QString, double> mPendingHFR;
 };
 
 extern "C" MODULE_INIT Monitor *initialize(QString name, QString label, QString profile,

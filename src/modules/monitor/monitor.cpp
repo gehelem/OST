@@ -35,7 +35,7 @@ bool Monitor::isWatchedModule(const QString &mod)
 }
 
 void Monitor::appendEvent(const QString &module, const QString &type,
-                          const QString &key, double valNum, const QString &valStr)
+                          const QString &key, double valNum, int valInt, const QString &valStr)
 {
     QDateTime now = QDateTime::currentDateTime();
     QVariantMap ts;
@@ -53,6 +53,7 @@ void Monitor::appendEvent(const QString &module, const QString &type,
     row["type"]    = type;
     row["key"]     = key;
     row["val_num"] = valNum;
+    row["val_int"] = valInt;
     row["val_str"] = valStr;
     getStore()["events"]->newLine(row);
 }
@@ -64,6 +65,7 @@ void Monitor::onExternalEvent(OST::ExtEvent event)
 
 void Monitor::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QString elt, QVariant data, int line)
 {
+    Q_UNUSED(elt)
     Q_UNUSED(line)
 
     if (ev != OST::EvType::ea) return;
@@ -71,24 +73,8 @@ void Monitor::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QStri
 
     QJsonObject e = data.toJsonValue().toObject()["e"].toObject();
 
-    if (prp == "signals")
-    {
-        QString event = e["event"].toString();
-        appendEvent(mod, e["statedescription"].toString(), event,
-                    e["state"].toInt(), e["eventdescription"].toString());
-        if (event == "focusdone" && mPendingHFR.contains(mod))
-        {
-            appendEvent(mod, "metric", "hfr", mPendingHFR.take(mod), "");
-        }
-    }
-    else if (prp == "values" && elt == "rmsTotal")
-    {
-        appendEvent(mod, "metric", "rmsRA",    e["rmsRA"].toDouble(),    "");
-        appendEvent(mod, "metric", "rmsDEC",   e["rmsDEC"].toDouble(),   "");
-        appendEvent(mod, "metric", "rmsTotal", e["rmsTotal"].toDouble(), "");
-    }
-    else if (prp == "results" && elt == "hfr")
-    {
-        mPendingHFR[mod] = e["hfr"].toDouble();
-    }
+    if (prp != "signals") return;
+
+    appendEvent(mod, e["statedescription"].toString(), e["event"].toString(),
+                e["val_num"].toDouble(), e["val_int"].toInt(), e["val_str"].toString());
 }

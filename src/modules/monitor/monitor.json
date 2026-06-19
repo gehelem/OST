@@ -130,13 +130,18 @@
             },
             "val_num": {
                 "type": "float",
-                "label": "Value",
+                "label": "Float value",
                 "order": "50"
+            },
+            "val_int": {
+                "type": "int",
+                "label": "Int value",
+                "order": "60"
             },
             "val_str": {
                 "type": "string",
                 "label": "Detail",
-                "order": "60"
+                "order": "70"
             }
         }
     }
