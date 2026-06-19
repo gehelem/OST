@@ -1,5 +1,6 @@
 #include "monitor.h"
 #include "version.cc"
+#include <valuejsondumper.h>
 
 Monitor *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
 {
@@ -18,6 +19,17 @@ Monitor::Monitor(QString name, QString label, QString profile, QVariantMap avail
     setMetadata("thisversion",    QString::fromStdString(Version::GIT_TAG));
     setMetadata("description",    "Session activity monitor");
     setMetadata("template",       "monitor");
+
+    giveMeAnActions();
+    giveMeAState();
+
+    OST::PropertyMulti* pm = getProperty("actions");
+    OST::ElementBool* b = new OST::ElementBool("start", "Start", "010", "");
+    b->setValue(false, false);
+    pm->addElt(b);
+    b = new OST::ElementBool("stop", "Stop", "020", "");
+    b->setValue(false, false);
+    pm->addElt(b);
 }
 
 Monitor::~Monitor()
@@ -58,9 +70,63 @@ void Monitor::appendEvent(const QString &module, const QString &type,
     getStore()["events"]->newLine(row);
 }
 
+void Monitor::startSession()
+{
+    mSessionStart = QDateTime::currentDateTime();
+    getStore()["events"]->clearGrid();
+    getProperty("actions")->setState(OST::Busy, true);
+    getEltBool("actions", "start")->setValue(true,  false);
+    getEltBool("actions", "stop") ->setValue(false, true);
+    setStateEvent(OST::Busy, "recording", "sessionstart", "Session started");
+}
+
+void Monitor::stopSession()
+{
+    setStateEvent(OST::Ok, "ready", "sessionstop", "Session stopped");
+    getProperty("actions")->setState(OST::Ok, true);
+    getEltBool("actions", "start")->setValue(false, false);
+    getEltBool("actions", "stop") ->setValue(false, true);
+
+    if (!mSessionStart.isValid()) return;
+
+    QDir().mkpath(getWebroot() + "/monitor");
+    QString filename = getWebroot() + "/monitor/" +
+                       mSessionStart.toString("yyyyMMdd-HHmmss") + ".json";
+
+    auto *prop     = getStore()["events"];
+    auto  grid     = prop->getGrid();
+    auto  headers  = prop->getGridHeaders();
+
+    QJsonArray rows;
+    for (auto &row : grid)
+    {
+        QJsonObject rowObj;
+        for (const QString &key : headers)
+        {
+            OST::ValueJsonDumper d(OST::EvType::gc, QVariant(), prop->getElt(key));
+            row[key]->accept(&d);
+            rowObj[key] = d.getResult()["value"];
+        }
+        rows.append(rowObj);
+    }
+
+    QJsonObject root;
+    root["session_start"] = mSessionStart.toString(Qt::ISODate);
+    root["module"]        = getModuleName();
+    root["events"]        = rows;
+
+    QFile file(filename);
+    if (file.open(QIODevice::WriteOnly))
+        file.write(QJsonDocument(root).toJson());
+}
+
 void Monitor::onExternalEvent(OST::ExtEvent event)
 {
-    Q_UNUSED(event)
+    if (event.ev == OST::ExtEvType::SV && event.prpkey == "actions")
+    {
+        if (event.eltkey == "start") startSession();
+        if (event.eltkey == "stop")  stopSession();
+    }
 }
 
 void Monitor::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QString elt, QVariant data, int line)

@@ -30,7 +30,10 @@ class MODULE_INIT Monitor : public IndiModule
         bool isWatchedModule(const QString &mod);
         void appendEvent(const QString &module, const QString &type,
                          const QString &key, double valNum, int valInt, const QString &valStr);
+        void startSession();
+        void stopSession();
 
+        QDateTime mSessionStart;
 };
 
 extern "C" MODULE_INIT Monitor *initialize(QString name, QString label, QString profile,
