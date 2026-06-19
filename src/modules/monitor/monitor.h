@@ -32,8 +32,10 @@ class MODULE_INIT Monitor : public IndiModule
                          const QString &key, double valNum, int valInt, const QString &valStr);
         void startSession();
         void stopSession();
+        void refreshView();
 
-        QDateTime mSessionStart;
+        QDateTime             mSessionStart;
+        QVector<QVariantMap>  mEvents;
 };
 
 extern "C" MODULE_INIT Monitor *initialize(QString name, QString label, QString profile,

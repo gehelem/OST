@@ -1,5 +1,42 @@
 {
 "p":{
+    "filter": {
+        "label": "View filter",
+        "permission": 2,
+        "devcat": "Configuration",
+        "group": "",
+        "order": "20",
+        "hasprofile": false,
+        "e": {
+            "filtermodule": {
+                "type": "string",
+                "label": "Module",
+                "autoupdate": true,
+                "directedit": true,
+                "value": "",
+                "order": 10,
+                "hint": "Filter by module name (empty = all)"
+            },
+            "filtertype": {
+                "type": "string",
+                "label": "Event type",
+                "autoupdate": true,
+                "directedit": true,
+                "value": "",
+                "order": 20,
+                "hint": "Filter by event type (empty = all)"
+            },
+            "maxrows": {
+                "type": "int",
+                "label": "Max rows",
+                "autoupdate": true,
+                "directedit": true,
+                "value": 200,
+                "order": 30,
+                "hint": "Maximum number of rows to display"
+            }
+        }
+    },
     "slaves": {
         "label": "Monitored modules",
         "permission": 2,

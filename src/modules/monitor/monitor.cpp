@@ -1,6 +1,5 @@
 #include "monitor.h"
 #include "version.cc"
-#include <propertyjsondumper.h>
 
 Monitor *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
 {
@@ -67,12 +66,13 @@ void Monitor::appendEvent(const QString &module, const QString &type,
     row["val_num"] = valNum;
     row["val_int"] = valInt;
     row["val_str"] = valStr;
-    getStore()["events"]->newLine(row);
+    mEvents.append(row);
 }
 
 void Monitor::startSession()
 {
     mSessionStart = QDateTime::currentDateTime();
+    mEvents.clear();
     getStore()["events"]->clearGrid();
     getProperty("actions")->setState(OST::Busy, true);
     getEltBool("actions", "start")->setValue(true,  false);
@@ -87,32 +87,68 @@ void Monitor::stopSession()
     getEltBool("actions", "start")->setValue(false, false);
     getEltBool("actions", "stop") ->setValue(false, true);
 
-    if (!mSessionStart.isValid()) return;
+    if (!mSessionStart.isValid() || mEvents.isEmpty()) return;
 
     QDir().mkpath(getWebroot() + "/monitor");
     QString filename = getWebroot() + "/monitor/" +
                        mSessionStart.toString("yyyyMMdd-HHmmss") + ".json";
 
-    auto *prop = getStore()["events"];
-    OST::PropertyJsonDumper dumper(OST::EvType::av, QVariant(), nullptr, prop);
-    prop->accept(&dumper);
+    QJsonArray grid;
+    for (const QVariantMap &row : mEvents)
+    {
+        QJsonArray jRow;
+        jRow.append(QJsonObject::fromVariantMap(row["ts"].toMap()));
+        jRow.append(row["module"].toString());
+        jRow.append(row["type"].toString());
+        jRow.append(row["key"].toString());
+        jRow.append(row["val_num"].toDouble());
+        jRow.append(row["val_int"].toInt());
+        jRow.append(row["val_str"].toString());
+        grid.append(jRow);
+    }
 
     QJsonObject root;
     root["session_start"] = mSessionStart.toString(Qt::ISODate);
     root["module"]        = getModuleName();
-    root["events"]        = dumper.getResult();
+    root["gridheaders"]   = QJsonArray({"ts", "module", "type", "key", "val_num", "val_int", "val_str"});
+    root["grid"]          = grid;
 
     QFile file(filename);
     if (file.open(QIODevice::WriteOnly))
         file.write(QJsonDocument(root).toJson());
 }
 
+void Monitor::refreshView()
+{
+    QString filterModule = getString("filter", "filtermodule");
+    QString filterType   = getString("filter", "filtertype");
+    int     maxRows      = getInt("filter", "maxrows");
+    if (maxRows <= 0) maxRows = 200;
+
+    QVector<const QVariantMap*> matching;
+    for (const QVariantMap &row : mEvents)
+    {
+        if (!filterModule.isEmpty() && row["module"].toString() != filterModule) continue;
+        if (!filterType.isEmpty()   && row["type"].toString()   != filterType)   continue;
+        matching.append(&row);
+    }
+
+    getStore()["events"]->clearGrid();
+    int start = qMax(0, matching.size() - maxRows);
+    for (int i = start; i < matching.size(); ++i)
+        getStore()["events"]->newLine(*matching[i]);
+}
+
 void Monitor::onExternalEvent(OST::ExtEvent event)
 {
-    if (event.ev == OST::ExtEvType::SV && event.prpkey == "actions")
+    if (event.ev == OST::ExtEvType::SV)
     {
-        if (event.eltkey == "start") startSession();
-        if (event.eltkey == "stop")  stopSession();
+        if (event.prpkey == "actions")
+        {
+            if (event.eltkey == "start") startSession();
+            if (event.eltkey == "stop")  stopSession();
+        }
+        if (event.prpkey == "filter") refreshView();
     }
 }
 
