@@ -1,6 +1,6 @@
 #include "monitor.h"
 #include "version.cc"
-#include <valuejsondumper.h>
+#include <propertyjsondumper.h>
 
 Monitor *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
 {
@@ -93,27 +93,14 @@ void Monitor::stopSession()
     QString filename = getWebroot() + "/monitor/" +
                        mSessionStart.toString("yyyyMMdd-HHmmss") + ".json";
 
-    auto *prop     = getStore()["events"];
-    auto  grid     = prop->getGrid();
-    auto  headers  = prop->getGridHeaders();
-
-    QJsonArray rows;
-    for (auto &row : grid)
-    {
-        QJsonObject rowObj;
-        for (const QString &key : headers)
-        {
-            OST::ValueJsonDumper d(OST::EvType::gc, QVariant(), prop->getElt(key));
-            row[key]->accept(&d);
-            rowObj[key] = d.getResult()["value"];
-        }
-        rows.append(rowObj);
-    }
+    auto *prop = getStore()["events"];
+    OST::PropertyJsonDumper dumper(OST::EvType::av, QVariant(), nullptr, prop);
+    prop->accept(&dumper);
 
     QJsonObject root;
     root["session_start"] = mSessionStart.toString(Qt::ISODate);
     root["module"]        = getModuleName();
-    root["events"]        = rows;
+    root["events"]        = dumper.getResult();
 
     QFile file(filename);
     if (file.open(QIODevice::WriteOnly))
