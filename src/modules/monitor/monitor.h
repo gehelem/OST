@@ -31,7 +31,7 @@ class MODULE_INIT Monitor : public IndiModule
         void appendEvent(const QString &module, const QString &type,
                          const QString &key, double valNum, const QString &valStr);
 
-        QString mState = "idle";
+        QMap<QString, double> mPendingHFR;
 };
 
 extern "C" MODULE_INIT Monitor *initialize(QString name, QString label, QString profile,

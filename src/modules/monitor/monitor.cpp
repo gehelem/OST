@@ -64,17 +64,31 @@ void Monitor::onExternalEvent(OST::ExtEvent event)
 
 void Monitor::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QString elt, QVariant data, int line)
 {
-    Q_UNUSED(elt)
     Q_UNUSED(line)
 
-    if (ev != OST::EvType::ea || prp != "signals") return;
+    if (ev != OST::EvType::ea) return;
     if (!isWatchedModule(mod)) return;
 
-    QJsonObject o = data.toJsonValue().toObject()["e"].toObject();
-    QString statedescription = o["statedescription"].toString();
-    QString event             = o["event"].toString();
-    QString eventdescription  = o["eventdescription"].toString();
-    int     state             = o["state"].toInt();
+    QJsonObject e = data.toJsonValue().toObject()["e"].toObject();
 
-    appendEvent(mod, statedescription, event, state, eventdescription);
+    if (prp == "signals")
+    {
+        QString event = e["event"].toString();
+        appendEvent(mod, e["statedescription"].toString(), event,
+                    e["state"].toInt(), e["eventdescription"].toString());
+        if (event == "focusdone" && mPendingHFR.contains(mod))
+        {
+            appendEvent(mod, "metric", "hfr", mPendingHFR.take(mod), "");
+        }
+    }
+    else if (prp == "values" && elt == "rmsTotal")
+    {
+        appendEvent(mod, "metric", "rmsRA",    e["rmsRA"].toDouble(),    "");
+        appendEvent(mod, "metric", "rmsDEC",   e["rmsDEC"].toDouble(),   "");
+        appendEvent(mod, "metric", "rmsTotal", e["rmsTotal"].toDouble(), "");
+    }
+    else if (prp == "results" && elt == "hfr")
+    {
+        mPendingHFR[mod] = e["hfr"].toDouble();
+    }
 }
