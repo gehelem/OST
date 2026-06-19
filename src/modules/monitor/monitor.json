@@ -1,5 +1,103 @@
 {
 "p":{
+    "slaves": {
+        "label": "Monitored modules",
+        "permission": 2,
+        "devcat": "Configuration",
+        "group": "",
+        "order": "10",
+        "hasprofile": true,
+        "e": {
+            "guider": {
+                "type": "string",
+                "label": "Guider instance",
+                "listOfValues": "loadedModules-guider",
+                "listOfValuesIsExternal": true,
+                "autoupdate": true,
+                "directedit": true,
+                "value": "",
+                "order": 10,
+                "hint": "Guider module instance to monitor"
+            },
+            "sequencer": {
+                "type": "string",
+                "label": "Sequencer instance",
+                "listOfValues": "loadedModules-sequence",
+                "listOfValuesIsExternal": true,
+                "autoupdate": true,
+                "directedit": true,
+                "value": "",
+                "order": 20,
+                "hint": "Sequencer module instance to monitor"
+            },
+            "focus": {
+                "type": "string",
+                "label": "Focus instance",
+                "listOfValues": "loadedModules-focus",
+                "listOfValuesIsExternal": true,
+                "autoupdate": true,
+                "directedit": true,
+                "value": "",
+                "order": 30,
+                "hint": "Focus module instance to monitor"
+            },
+            "navigator": {
+                "type": "string",
+                "label": "Navigator instance",
+                "listOfValues": "loadedModules-navigator",
+                "listOfValuesIsExternal": true,
+                "autoupdate": true,
+                "directedit": true,
+                "value": "",
+                "order": 40,
+                "hint": "Navigator module instance to monitor"
+            },
+            "planner": {
+                "type": "string",
+                "label": "Planner instance",
+                "listOfValues": "loadedModules-planner",
+                "listOfValuesIsExternal": true,
+                "autoupdate": true,
+                "directedit": true,
+                "value": "",
+                "order": 50,
+                "hint": "Planner module instance to monitor"
+            },
+            "parkmanager": {
+                "type": "string",
+                "label": "Park manager instance",
+                "listOfValues": "loadedModules-parkmanager",
+                "listOfValuesIsExternal": true,
+                "autoupdate": true,
+                "directedit": true,
+                "value": "",
+                "order": 60,
+                "hint": "Park manager module instance to monitor"
+            },
+            "polar": {
+                "type": "string",
+                "label": "Polar instance",
+                "listOfValues": "loadedModules-polar",
+                "listOfValuesIsExternal": true,
+                "autoupdate": true,
+                "directedit": true,
+                "value": "",
+                "order": 70,
+                "hint": "Polar module instance to monitor"
+            },
+            "inspector": {
+                "type": "string",
+                "label": "Inspector instance",
+                "listOfValues": "loadedModules-inspector",
+                "listOfValuesIsExternal": true,
+                "autoupdate": true,
+                "directedit": true,
+                "value": "",
+                "order": 80,
+                "hint": "Inspector module instance to monitor"
+            }
+        }
+    },
     "events": {
         "label": "Events",
         "devcat": "Monitor",

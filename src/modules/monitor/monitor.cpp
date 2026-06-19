@@ -18,11 +18,20 @@ Monitor::Monitor(QString name, QString label, QString profile, QVariantMap avail
     setMetadata("thisversion",    QString::fromStdString(Version::GIT_TAG));
     setMetadata("description",    "Session activity monitor");
     setMetadata("template",       "monitor");
-
 }
 
 Monitor::~Monitor()
 {
+}
+
+bool Monitor::isWatchedModule(const QString &mod)
+{
+    auto *elts = getProperty("slaves")->getElts();
+    for (auto it = elts->begin(); it != elts->end(); ++it)
+    {
+        if (getString("slaves", it.key()) == mod) return true;
+    }
+    return false;
 }
 
 void Monitor::appendEvent(const QString &module, const QString &type,
@@ -55,10 +64,17 @@ void Monitor::onExternalEvent(OST::ExtEvent event)
 
 void Monitor::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QString elt, QVariant data, int line)
 {
-    Q_UNUSED(ev)
-    Q_UNUSED(mod)
-    Q_UNUSED(prp)
     Q_UNUSED(elt)
-    Q_UNUSED(data)
     Q_UNUSED(line)
+
+    if (ev != OST::EvType::ea || prp != "signals") return;
+    if (!isWatchedModule(mod)) return;
+
+    QJsonObject o = data.toJsonValue().toObject()["e"].toObject();
+    QString statedescription = o["statedescription"].toString();
+    QString event             = o["event"].toString();
+    QString eventdescription  = o["eventdescription"].toString();
+    int     state             = o["state"].toInt();
+
+    appendEvent(mod, statedescription, event, state, eventdescription);
 }
