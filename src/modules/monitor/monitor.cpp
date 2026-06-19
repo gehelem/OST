@@ -67,12 +67,16 @@ void Monitor::appendEvent(const QString &module, const QString &type,
     row["val_int"] = valInt;
     row["val_str"] = valStr;
     mEvents.append(row);
+    getStore()["events"]->newLine(row);
 }
 
 void Monitor::startSession()
 {
     mSessionStart = QDateTime::currentDateTime();
     mEvents.clear();
+    int maxRows = getInt("filter", "maxrows");
+    if (maxRows <= 0) maxRows = 200;
+    getStore()["events"]->setGridLimit(maxRows);
     getStore()["events"]->clearGrid();
     getProperty("actions")->setState(OST::Busy, true);
     getEltBool("actions", "start")->setValue(true,  false);
@@ -120,16 +124,19 @@ void Monitor::stopSession()
 
 void Monitor::refreshView()
 {
-    QString filterModule = getString("filter", "filtermodule");
-    QString filterType   = getString("filter", "filtertype");
-    int     maxRows      = getInt("filter", "maxrows");
+    QDateTime tsStart = getEltDateTime("filter", "ts_start")->value();
+    QDateTime tsEnd   = getEltDateTime("filter", "ts_end")->value();
+    int       maxRows = getInt("filter", "maxrows");
     if (maxRows <= 0) maxRows = 200;
 
     QVector<const QVariantMap*> matching;
     for (const QVariantMap &row : mEvents)
     {
-        if (!filterModule.isEmpty() && row["module"].toString() != filterModule) continue;
-        if (!filterType.isEmpty()   && row["type"].toString()   != filterType)   continue;
+        QVariantMap ts = row["ts"].toMap();
+        QDateTime dt(QDate(ts["year"].toInt(), ts["month"].toInt(), ts["day"].toInt()),
+                     QTime(ts["hh"].toInt(),   ts["mm"].toInt(),   ts["ss"].toInt(), ts["ms"].toInt()));
+        if (tsStart.isValid() && dt < tsStart) continue;
+        if (tsEnd.isValid()   && dt > tsEnd)   continue;
         matching.append(&row);
     }
 

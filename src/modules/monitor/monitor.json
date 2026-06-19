@@ -8,23 +8,19 @@
         "order": "20",
         "hasprofile": false,
         "e": {
-            "filtermodule": {
-                "type": "string",
-                "label": "Module",
+            "ts_start": {
+                "type": "datetime",
+                "label": "From",
                 "autoupdate": true,
-                "directedit": true,
-                "value": "",
                 "order": 10,
-                "hint": "Filter by module name (empty = all)"
+                "hint": "Show events from this timestamp (empty = no lower bound)"
             },
-            "filtertype": {
-                "type": "string",
-                "label": "Event type",
+            "ts_end": {
+                "type": "datetime",
+                "label": "To",
                 "autoupdate": true,
-                "directedit": true,
-                "value": "",
                 "order": 20,
-                "hint": "Filter by event type (empty = all)"
+                "hint": "Show events up to this timestamp (empty = no upper bound)"
             },
             "maxrows": {
                 "type": "int",
