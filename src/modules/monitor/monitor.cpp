@@ -21,6 +21,7 @@ Monitor::Monitor(QString name, QString label, QString profile, QVariantMap avail
 
     giveMeAnActions();
     giveMeAState();
+    QTimer::singleShot(1000, this, &Monitor::onAutoStart);
 
     OST::PropertyMulti* pm = getProperty("actions");
     OST::ElementBool* b = new OST::ElementBool("start", "Start", "010", "");
@@ -33,6 +34,12 @@ Monitor::Monitor(QString name, QString label, QString profile, QVariantMap avail
 
 Monitor::~Monitor()
 {
+}
+
+void Monitor::onAutoStart()
+{
+    if (getBool("parms", "autostart"))
+        startSession();
 }
 
 bool Monitor::isWatchedModule(const QString &mod)

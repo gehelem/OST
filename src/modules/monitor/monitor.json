@@ -1,5 +1,22 @@
 {
 "p":{
+    "parms": {
+        "label": "Parameters",
+        "permission": 2,
+        "devcat": "Configuration",
+        "group": "",
+        "order": "10",
+        "hasprofile": true,
+        "e": {
+            "autostart": {
+                "type": "bool",
+                "label": "Auto-start on load",
+                "value": false,
+                "order": 10,
+                "hint": "Automatically start a new session when the module loads"
+            }
+        }
+    },
     "filter": {
         "label": "View filter",
         "permission": 2,

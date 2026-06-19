@@ -26,6 +26,9 @@ class MODULE_INIT Monitor : public IndiModule
         void onExternalEvent(OST::ExtEvent event) override;
         void onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QString elt, QVariant data, int line) override;
 
+    private slots:
+        void onAutoStart();
+
     private:
         bool isWatchedModule(const QString &mod);
         void appendEvent(const QString &module, const QString &type,
