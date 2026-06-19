@@ -159,7 +159,7 @@ target_link_libraries(ostserver
 )
 # Ensure translations are compiled before linking ostserver
 add_dependencies(ostserver translations)
-#add_dependencies(ostserver generate_version)
+add_dependencies(ostserver generate_version)
 
 #########################
 #### modules libraries ##
@@ -308,7 +308,7 @@ target_link_libraries(ostbasemodule
     Threads::Threads
     z
 )
-#add_dependencies(ostbasemodule generate_version)
+add_dependencies(ostbasemodule generate_version)
 
 # Indi module
 #list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.qrc)
@@ -336,7 +336,7 @@ target_link_libraries(ostindimodule
     Threads::Threads
     z
 )
-#add_dependencies(ostindimodule generate_version)
+add_dependencies(ostindimodule generate_version)
 
 
 
@@ -576,16 +576,16 @@ install(
 
 # Create a custom target that always runs
 
-#add_custom_target(
-#    generate_version ALL
-#    COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/generate-version.sh"
-#            "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
-#            "${CMAKE_CURRENT_SOURCE_DIR}/src/version.cc.in"
-#    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-#    BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
-#    COMMENT "Generating version.cc from git information..."
-#    VERBATIM
-#)
+add_custom_target(
+    generate_version ALL
+    COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/generate-version.sh"
+            "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/version.cc.in"
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
+    COMMENT "Generating version.cc from git information..."
+    VERBATIM
+)
 
 # Add version.cc to sources
 list(APPEND SOURCES "${CMAKE_CURRENT_BINARY_DIR}/version.cc" version.hh)
