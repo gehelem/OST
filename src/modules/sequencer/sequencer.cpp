@@ -604,6 +604,7 @@ void Sequencer::OnSucessSEP()
     getEltImg("image", "image")->setValue(dta, true);
 
     mLastHFR = dta.HFRavg;
+    setStateEvent(OST::Busy, "running", "imagehfr", "image HFR", dta.HFRavg);
 
     pMachine->submitEvent("FindStarsDone");
 }

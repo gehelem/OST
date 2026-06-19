@@ -986,6 +986,6 @@ void Focus::SMFocusDone()
     getProperty("actions")->setState(OST::Ok, true); // this will inform other modules
     getEltBool("actions", "autofocus")->setValue(false, true);
     pMachine->stop();
-    setStateEvent(OST::Ok, "ready", "focusdone", "focus finished");
+    setStateEvent(OST::Ok, "ready", "focusdone", "focus finished", _solver.HFRavg * ech);
 
 }
