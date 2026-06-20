@@ -30,6 +30,8 @@ Monitor::Monitor(QString name, QString label, QString profile, QVariantMap avail
     b = new OST::ElementBool("stop", "Stop", "020", "");
     b->setValue(false, false);
     pm->addElt(b);
+
+    getProperty("events")->setGridLimit(1000000);
 }
 
 Monitor::~Monitor()
@@ -89,8 +91,9 @@ void Monitor::loadArchive(int line)
         row["val_int"] = arr[5].toInt();
         row["val_str"] = arr[6].toString();
         mEvents.append(row);
-        getStore()["events"]->newLine(row);
+        getStore()["events"]->newLine(row, true);
     }
+    getStore()["events"]->emitAll();
 }
 
 bool Monitor::isWatchedModule(const QString &mod)
