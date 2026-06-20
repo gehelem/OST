@@ -27,7 +27,8 @@ QJsonObject ElementJsonDumper::dumpElementCommons(ElementBase *pElement)
     json["autoupdate"] = pElement->autoUpdate();
     json["badge"] = pElement->getBadge();
     if ((pElement->getType() == "int") || (pElement->getType() == "float") || (pElement->getType() == "string")
-            || (pElement->getType() == "bool") || (pElement->getType() == "date") || (pElement->getType() == "time"))
+            || (pElement->getType() == "bool") || (pElement->getType() == "date") || (pElement->getType() == "time"
+                    || pElement->getType() == "datetime"))
     {
         json["directedit"] = pElement->getDirectEdit();
     }
@@ -81,7 +82,8 @@ void ElementJsonDumper::visit(ElementInt *pElement, QVariantMap &data, bool &emi
         if (pElement->getLov().size() > 0)
         {
             QJsonObject lines = QJsonObject();
-            for(const int &key : pElement->getLov().keys()) {
+            for(const int &key : pElement->getLov().keys())
+            {
                 lines[QString::number(key)] = pElement->getLov()[key];
             }
             json["listOfValues"] = lines;
@@ -121,7 +123,8 @@ void ElementJsonDumper::visit(ElementFloat *pElement, QVariantMap &data, bool &e
         if (!pElement->getLov().isEmpty())
         {
             QJsonObject lines = QJsonObject();
-            for(const double &key : pElement->getLov().keys()) {
+            for(const double &key : pElement->getLov().keys())
+            {
                 lines[QString::number(key)] = pElement->getLov()[key];
             }
             json["listOfValues"] = lines;
@@ -152,7 +155,8 @@ void ElementJsonDumper::visit(ElementString *pElement, QVariantMap &data, bool &
         if (pElement->getLov().size() > 0)
         {
             QJsonObject lines = QJsonObject();
-            for(const QString &key : pElement->getLov().keys())            {
+            for(const QString &key : pElement->getLov().keys())
+            {
                 lines[key] = pElement->getLov()[key];
             }
             json["listOfValues"] = lines;
