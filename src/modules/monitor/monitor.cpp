@@ -38,8 +38,28 @@ Monitor::~Monitor()
 
 void Monitor::onAutoStart()
 {
+    scanArchive();
     if (getBool("parms", "autostart"))
         startSession();
+}
+
+void Monitor::scanArchive()
+{
+    QDir dir(getWebroot() + "/monitor");
+    if (!dir.exists()) return;
+
+    QFileInfoList files = dir.entryInfoList({"*.json"}, QDir::Files, QDir::Name | QDir::Reversed);
+
+    getStore()["archive"]->clearGrid();
+    for (const QFileInfo &fi : files)
+    {
+        QDateTime dt = QDateTime::fromString(fi.baseName(), "yyyyMMdd-HHmmss");
+        QVariantMap row;
+        row["date"]     = dt.isValid() ? dt.toString("yyyy-MM-dd HH:mm:ss") : fi.baseName();
+        row["filename"] = fi.fileName();
+        row["size"]     = (int)(fi.size() / 1024);
+        getStore()["archive"]->newLine(row);
+    }
 }
 
 bool Monitor::isWatchedModule(const QString &mod)
@@ -127,6 +147,8 @@ void Monitor::stopSession()
     QFile file(filename);
     if (file.open(QIODevice::WriteOnly))
         file.write(QJsonDocument(root).toJson());
+
+    scanArchive();
 }
 
 void Monitor::refreshView()

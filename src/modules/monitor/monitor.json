@@ -148,6 +148,33 @@
             }
         }
     },
+    "archive": {
+        "label": "Archived sessions",
+        "devcat": "Archive",
+        "order": "90",
+        "group": "",
+        "permission": 0,
+        "showElts": false,
+        "hasGrid": true,
+        "showGrid": true,
+        "e": {
+            "date": {
+                "type": "string",
+                "label": "Date",
+                "order": "10"
+            },
+            "filename": {
+                "type": "string",
+                "label": "File",
+                "order": "20"
+            },
+            "size": {
+                "type": "int",
+                "label": "Size (KB)",
+                "order": "30"
+            }
+        }
+    },
     "events": {
         "label": "Events",
         "devcat": "Monitor",

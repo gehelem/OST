@@ -36,6 +36,7 @@ class MODULE_INIT Monitor : public IndiModule
         void startSession();
         void stopSession();
         void refreshView();
+        void scanArchive();
 
         QDateTime             mSessionStart;
         QVector<QVariantMap>  mEvents;
