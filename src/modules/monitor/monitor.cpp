@@ -149,7 +149,8 @@ void Monitor::appendEvent(const QString &module, const QString &type,
     if (!kChartKeys.contains(key)) return;
     mEvents.append(row);
     getStore()["events"]->newLine(row);
-    getEltDateTime("filter", "ts_end")->setValue(now, true);
+    if (mSessionActive)
+        getEltDateTime("filter", "ts_end")->setValue(now, true);
 }
 
 void Monitor::startSession()
