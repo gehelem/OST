@@ -1,6 +1,8 @@
 #include "monitor.h"
 #include "version.cc"
 
+static const QSet<QString> kChartKeys = { "guideRMS", "guideSNR", "imagehfr", "focusdone" };
+
 Monitor *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
 {
     Monitor *basemodule = new Monitor(name, label, profile, availableModuleLibs);
@@ -75,8 +77,6 @@ void Monitor::loadArchive(int line)
 
     QJsonArray grid = QJsonDocument::fromJson(file.readAll()).object()["grid"].toArray();
 
-    static const QSet<QString> kChartKeys = { "guideRMS", "guideSNR", "imagehfr", "focusdone" };
-
     mEvents.clear();
     for (const QJsonValue &jRow : grid)
     {
@@ -127,6 +127,7 @@ void Monitor::appendEvent(const QString &module, const QString &type,
     row["val_num"] = valNum;
     row["val_int"] = valInt;
     row["val_str"] = valStr;
+    if (!kChartKeys.contains(key)) return;
     mEvents.append(row);
     getStore()["events"]->newLine(row);
 }
@@ -191,8 +192,8 @@ void Monitor::refreshView()
 {
     QDateTime tsStart = getEltDateTime("filter", "ts_start")->value();
     QDateTime tsEnd   = getEltDateTime("filter", "ts_end")->value();
-    int       maxRows = getInt("filter", "maxrows");
-    if (maxRows <= 0) maxRows = 200;
+    int maxRows = getInt("filter", "maxrows");
+    if (maxRows <= 0 || maxRows > 2000) maxRows = 2000;
 
     QVector<const QVariantMap*> matching;
     for (const QVariantMap &row : mEvents)
