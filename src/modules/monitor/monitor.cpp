@@ -186,6 +186,38 @@ void Monitor::onExternalEvent(OST::ExtEvent event)
         }
         if (event.prpkey == "filter") refreshView();
     }
+    if (event.ev == OST::ExtEvType::GF && event.prpkey == "archive")
+    {
+        getProperty("archive")->fetchLine(event.line);
+        QString filename = getString("archive", "filename");
+        if (filename.isEmpty()) return;
+
+        QFile file(getWebroot() + "/monitor/" + filename);
+        if (!file.open(QIODevice::ReadOnly)) return;
+
+        QJsonObject root = QJsonDocument::fromJson(file.readAll()).object();
+        QJsonArray  grid = root["grid"].toArray();
+
+        mEvents.clear();
+        getStore()["events"]->clearGrid();
+
+        for (const QJsonValue &jRow : grid)
+        {
+            QJsonArray arr = jRow.toArray();
+            if (arr.size() < 7) continue;
+            QVariantMap row;
+            row["ts"]      = arr[0].toObject().toVariantMap();
+            row["module"]  = arr[1].toString();
+            row["type"]    = arr[2].toString();
+            row["key"]     = arr[3].toString();
+            row["val_num"] = arr[4].toDouble();
+            row["val_int"] = arr[5].toInt();
+            row["val_str"] = arr[6].toString();
+            mEvents.append(row);
+            getStore()["events"]->newLine(row);
+        }
+    }
+
 }
 
 void Monitor::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QString elt, QVariant data, int line)
