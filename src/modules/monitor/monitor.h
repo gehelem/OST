@@ -41,6 +41,7 @@ class MODULE_INIT Monitor : public IndiModule
 
         QDateTime             mSessionStart;
         QVector<QVariantMap>  mEvents;
+        bool                  mSessionActive = false;
 };
 
 extern "C" MODULE_INIT Monitor *initialize(QString name, QString label, QString profile,

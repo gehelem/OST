@@ -130,7 +130,8 @@ void Monitor::appendEvent(const QString &module, const QString &type,
 
 void Monitor::startSession()
 {
-    mSessionStart = QDateTime::currentDateTime();
+    mSessionStart  = QDateTime::currentDateTime();
+    mSessionActive = true;
     mEvents.clear();
     int maxRows = getInt("filter", "maxrows");
     if (maxRows <= 0) maxRows = 200;
@@ -144,6 +145,7 @@ void Monitor::startSession()
 
 void Monitor::stopSession()
 {
+    mSessionActive = false;
     setStateEvent(OST::Ok, "ready", "sessionstop", "Session stopped");
     getProperty("actions")->setState(OST::Ok, true);
     getEltBool("actions", "start")->setValue(false, false);
@@ -217,7 +219,7 @@ void Monitor::onExternalEvent(OST::ExtEvent event)
         }
         if (event.prpkey == "filter") refreshView();
     }
-    if (event.ev == OST::ExtEvType::GF && event.prpkey == "archive")
+    if (event.ev == OST::ExtEvType::GF && event.prpkey == "archive" && !mSessionActive)
         loadArchive(event.line);
 
 }
