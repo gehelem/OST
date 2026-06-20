@@ -149,6 +149,7 @@ void Monitor::appendEvent(const QString &module, const QString &type,
     if (!kChartKeys.contains(key)) return;
     mEvents.append(row);
     getStore()["events"]->newLine(row);
+    getEltDateTime("filter", "ts_end")->setValue(now, true);
 }
 
 void Monitor::startSession()
@@ -156,6 +157,8 @@ void Monitor::startSession()
     mSessionStart  = QDateTime::currentDateTime();
     mSessionActive = true;
     mEvents.clear();
+    getEltDateTime("filter", "ts_start")->setValue(mSessionStart, true);
+    getEltDateTime("filter", "ts_end")->setValue(mSessionStart, true);
     int maxRows = getInt("filter", "maxrows");
     if (maxRows <= 0) maxRows = 200;
     getStore()["events"]->setGridLimit(maxRows);
