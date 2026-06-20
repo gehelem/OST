@@ -93,6 +93,25 @@ void Monitor::loadArchive(int line)
         row["val_str"] = arr[6].toString();
         mEvents.append(row);
     }
+
+    if (!mEvents.isEmpty())
+    {
+        auto tsToDateTime = [](const QVariantMap &ts) {
+            return QDateTime(QDate(ts["year"].toInt(), ts["month"].toInt(), ts["day"].toInt()),
+                             QTime(ts["hh"].toInt(), ts["mm"].toInt(), ts["ss"].toInt(), ts["ms"].toInt()));
+        };
+        QDateTime tsMin = tsToDateTime(mEvents.first()["ts"].toMap());
+        QDateTime tsMax = tsMin;
+        for (const QVariantMap &row : mEvents)
+        {
+            QDateTime dt = tsToDateTime(row["ts"].toMap());
+            if (dt < tsMin) tsMin = dt;
+            if (dt > tsMax) tsMax = dt;
+        }
+        getEltDateTime("filter", "ts_start")->setValue(tsMin, true);
+        getEltDateTime("filter", "ts_end")->setValue(tsMax, true);
+    }
+
     refreshView();
 }
 
