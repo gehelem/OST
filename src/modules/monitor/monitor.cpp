@@ -219,8 +219,13 @@ void Monitor::onExternalEvent(OST::ExtEvent event)
         }
         if (event.prpkey == "filter") refreshView();
     }
-    if (event.ev == OST::ExtEvType::GF && event.prpkey == "archive" && !mSessionActive)
-        loadArchive(event.line);
+    if (event.ev == OST::ExtEvType::GF && event.prpkey == "archive")
+    {
+        if (mSessionActive)
+            logWarning("Cannot load archive while a session is active");
+        else
+            loadArchive(event.line);
+    }
 
 }
 
