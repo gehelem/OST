@@ -153,7 +153,7 @@
         "devcat": "Archive",
         "order": "90",
         "group": "",
-        "permission": 0,
+        "permission": 2,
         "showElts": false,
         "hasGrid": true,
         "showGrid": true,
@@ -161,16 +161,19 @@
             "date": {
                 "type": "string",
                 "label": "Date",
+                "autoupdate": false,
                 "order": "10"
             },
             "filename": {
                 "type": "string",
                 "label": "File",
+                "autoupdate": false,
                 "order": "20"
             },
             "size": {
                 "type": "int",
                 "label": "Size (KB)",
+                "autoupdate": false,
                 "order": "30"
             }
         }
