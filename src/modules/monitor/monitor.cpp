@@ -75,13 +75,14 @@ void Monitor::loadArchive(int line)
 
     QJsonArray grid = QJsonDocument::fromJson(file.readAll()).object()["grid"].toArray();
 
-    mEvents.clear();
-    getStore()["events"]->clearGrid();
+    static const QSet<QString> kChartKeys = { "guideRMS", "guideSNR", "imagehfr", "focusdone" };
 
+    mEvents.clear();
     for (const QJsonValue &jRow : grid)
     {
         QJsonArray arr = jRow.toArray();
         if (arr.size() < 7) continue;
+        if (!kChartKeys.contains(arr[3].toString())) continue;
         QVariantMap row;
         row["ts"]      = arr[0].toObject().toVariantMap();
         row["module"]  = arr[1].toString();
@@ -91,9 +92,8 @@ void Monitor::loadArchive(int line)
         row["val_int"] = arr[5].toInt();
         row["val_str"] = arr[6].toString();
         mEvents.append(row);
-        getStore()["events"]->newLine(row, true);
     }
-    getStore()["events"]->emitAll();
+    refreshView();
 }
 
 bool Monitor::isWatchedModule(const QString &mod)
@@ -208,7 +208,8 @@ void Monitor::refreshView()
     getStore()["events"]->clearGrid();
     int start = qMax(0, matching.size() - maxRows);
     for (int i = start; i < matching.size(); ++i)
-        getStore()["events"]->newLine(*matching[i]);
+        getStore()["events"]->newLine(*matching[i], true);
+    getStore()["events"]->emitAll();
 }
 
 void Monitor::onExternalEvent(OST::ExtEvent event)
