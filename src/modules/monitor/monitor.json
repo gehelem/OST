@@ -14,6 +14,14 @@
                 "value": false,
                 "order": 10,
                 "hint": "Automatically start a new session when the module loads"
+            },
+            "guiderms_sampling": {
+                "type": "int",
+                "label": "Guide RMS sampling",
+                "directedit": true,
+                "value": 10,
+                "order": 20,
+                "hint": "Number of guideRMS samples to average before recording an event"
             }
         }
     },

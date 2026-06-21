@@ -173,6 +173,7 @@ void Monitor::startSession()
     mSessionStart  = QDateTime::currentDateTime();
     mSessionActive = true;
     mEvents.clear();
+    mGuideRmsBuf.clear();
     getEltDateTime("filter", "ts_start")->setValue(mSessionStart, true);
     getEltDateTime("filter", "ts_end")->setValue(mSessionStart, true);
     int maxRows = getInt("filter", "maxrows");
@@ -293,8 +294,35 @@ void Monitor::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QStri
 
     if (prp != "signals") return;
 
-    appendEvent(mod, e["statedescription"].toString(), e["event"].toString(),
-                e["val_num"].toDouble(), 0, 0,
-                e["val_int"].toInt(), 0, 0,
-                e["val_str"].toString());
+    QString key  = e["event"].toString();
+    double  num  = e["val_num"].toDouble();
+
+    if (key == "guideRMS")
+    {
+        int sampling = getInt("parms", "guiderms_sampling");
+        if (sampling <= 1)
+        {
+            appendEvent(mod, e["statedescription"].toString(), key, num);
+        }
+        else
+        {
+            mGuideRmsModule = mod;
+            mGuideRmsType   = e["statedescription"].toString();
+            mGuideRmsBuf.append(num);
+            if (mGuideRmsBuf.size() >= sampling)
+            {
+                double sum = 0;
+                for (double v : mGuideRmsBuf) sum += v;
+                appendEvent(mGuideRmsModule, mGuideRmsType, key, sum / mGuideRmsBuf.size());
+                mGuideRmsBuf.clear();
+            }
+        }
+    }
+    else
+    {
+        appendEvent(mod, e["statedescription"].toString(), key,
+                    num, 0, 0,
+                    e["val_int"].toInt(), 0, 0,
+                    e["val_str"].toString());
+    }
 }
