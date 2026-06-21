@@ -1,5 +1,7 @@
 #include "monitor.h"
 #include "version.cc"
+#include <algorithm>
+#include <cmath>
 
 static const QSet<QString> kChartKeys = { "guideRMS", "guideSNR", "imagehfr", "focusdone" };
 
@@ -81,7 +83,7 @@ void Monitor::loadArchive(int line)
     for (const QJsonValue &jRow : grid)
     {
         QJsonArray arr = jRow.toArray();
-        if (arr.size() < 13) continue;
+        if (arr.size() < 18) continue;
         if (!kChartKeys.contains(arr[3].toString())) continue;
         QVariantMap row;
         row["ts"]       = arr[0].toObject().toVariantMap();
@@ -91,12 +93,17 @@ void Monitor::loadArchive(int line)
         row["val_num1"] = arr[4].toDouble();
         row["val_num2"] = arr[5].toDouble();
         row["val_num3"] = arr[6].toDouble();
-        row["val_int1"] = arr[7].toInt();
-        row["val_int2"] = arr[8].toInt();
-        row["val_int3"] = arr[9].toInt();
-        row["val_str1"] = arr[10].toString();
-        row["val_str2"] = arr[11].toString();
-        row["val_str3"] = arr[12].toString();
+        row["val_num4"] = arr[7].toDouble();
+        row["val_num5"] = arr[8].toDouble();
+        row["val_num6"] = arr[9].toDouble();
+        row["val_num7"] = arr[10].toDouble();
+        row["val_num8"] = arr[11].toDouble();
+        row["val_int1"] = arr[12].toInt();
+        row["val_int2"] = arr[13].toInt();
+        row["val_int3"] = arr[14].toInt();
+        row["val_str1"] = arr[15].toString();
+        row["val_str2"] = arr[16].toString();
+        row["val_str3"] = arr[17].toString();
         mEvents.append(row);
     }
 
@@ -133,6 +140,8 @@ bool Monitor::isWatchedModule(const QString &mod)
 
 void Monitor::appendEvent(const QString &module, const QString &type, const QString &key,
                           double valNum1, double valNum2, double valNum3,
+                          double valNum4, double valNum5, double valNum6,
+                          double valNum7, double valNum8,
                           int valInt1, int valInt2, int valInt3,
                           const QString &valStr1, const QString &valStr2, const QString &valStr3)
 {
@@ -156,6 +165,11 @@ void Monitor::appendEvent(const QString &module, const QString &type, const QStr
     row["val_num1"] = valNum1;
     row["val_num2"] = valNum2;
     row["val_num3"] = valNum3;
+    row["val_num4"] = valNum4;
+    row["val_num5"] = valNum5;
+    row["val_num6"] = valNum6;
+    row["val_num7"] = valNum7;
+    row["val_num8"] = valNum8;
     row["val_int1"] = valInt1;
     row["val_int2"] = valInt2;
     row["val_int3"] = valInt3;
@@ -211,6 +225,11 @@ void Monitor::stopSession()
         jRow.append(row["val_num1"].toDouble());
         jRow.append(row["val_num2"].toDouble());
         jRow.append(row["val_num3"].toDouble());
+        jRow.append(row["val_num4"].toDouble());
+        jRow.append(row["val_num5"].toDouble());
+        jRow.append(row["val_num6"].toDouble());
+        jRow.append(row["val_num7"].toDouble());
+        jRow.append(row["val_num8"].toDouble());
         jRow.append(row["val_int1"].toInt());
         jRow.append(row["val_int2"].toInt());
         jRow.append(row["val_int3"].toInt());
@@ -224,7 +243,8 @@ void Monitor::stopSession()
     root["session_start"] = mSessionStart.toString(Qt::ISODate);
     root["module"]        = getModuleName();
     root["gridheaders"]   = QJsonArray({"ts", "module", "type", "key",
-                                        "val_num1", "val_num2", "val_num3",
+                                        "val_num1", "val_num2", "val_num3", "val_num4",
+                                        "val_num5", "val_num6", "val_num7", "val_num8",
                                         "val_int1", "val_int2", "val_int3",
                                         "val_str1", "val_str2", "val_str3"});
     root["grid"]          = grid;
@@ -311,9 +331,21 @@ void Monitor::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QStri
             mGuideRmsBuf.append(num);
             if (mGuideRmsBuf.size() >= sampling)
             {
-                double sum = 0;
-                for (double v : mGuideRmsBuf) sum += v;
-                appendEvent(mGuideRmsModule, mGuideRmsType, key, sum / mGuideRmsBuf.size());
+                QVector<double> sorted = mGuideRmsBuf;
+                std::sort(sorted.begin(), sorted.end());
+                double mean = 0;
+                for (double v : sorted) mean += v;
+                mean /= sorted.size();
+                double vmin   = sorted.first();
+                double vmax   = sorted.last();
+                double median = sorted.size() % 2 == 0
+                    ? (sorted[sorted.size()/2 - 1] + sorted[sorted.size()/2]) / 2.0
+                    : sorted[sorted.size()/2];
+                double variance = 0;
+                for (double v : sorted) variance += (v - mean) * (v - mean);
+                double stddev = std::sqrt(variance / sorted.size());
+                appendEvent(mGuideRmsModule, mGuideRmsType, key,
+                            mean, vmin, vmax, median, stddev);
                 mGuideRmsBuf.clear();
             }
         }

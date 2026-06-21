@@ -220,18 +220,43 @@
             },
             "val_num1": {
                 "type": "float",
-                "label": "Float 1",
+                "label": "Mean",
                 "order": "50"
             },
             "val_num2": {
                 "type": "float",
-                "label": "Float 2",
+                "label": "Min",
                 "order": "51"
             },
             "val_num3": {
                 "type": "float",
-                "label": "Float 3",
+                "label": "Max",
                 "order": "52"
+            },
+            "val_num4": {
+                "type": "float",
+                "label": "Median",
+                "order": "53"
+            },
+            "val_num5": {
+                "type": "float",
+                "label": "Std dev",
+                "order": "54"
+            },
+            "val_num6": {
+                "type": "float",
+                "label": "Float 6",
+                "order": "55"
+            },
+            "val_num7": {
+                "type": "float",
+                "label": "Float 7",
+                "order": "56"
+            },
+            "val_num8": {
+                "type": "float",
+                "label": "Float 8",
+                "order": "57"
             },
             "val_int1": {
                 "type": "int",
