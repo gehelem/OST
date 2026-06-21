@@ -81,16 +81,22 @@ void Monitor::loadArchive(int line)
     for (const QJsonValue &jRow : grid)
     {
         QJsonArray arr = jRow.toArray();
-        if (arr.size() < 7) continue;
+        if (arr.size() < 13) continue;
         if (!kChartKeys.contains(arr[3].toString())) continue;
         QVariantMap row;
-        row["ts"]      = arr[0].toObject().toVariantMap();
-        row["module"]  = arr[1].toString();
-        row["type"]    = arr[2].toString();
-        row["key"]     = arr[3].toString();
-        row["val_num"] = arr[4].toDouble();
-        row["val_int"] = arr[5].toInt();
-        row["val_str"] = arr[6].toString();
+        row["ts"]       = arr[0].toObject().toVariantMap();
+        row["module"]   = arr[1].toString();
+        row["type"]     = arr[2].toString();
+        row["key"]      = arr[3].toString();
+        row["val_num1"] = arr[4].toDouble();
+        row["val_num2"] = arr[5].toDouble();
+        row["val_num3"] = arr[6].toDouble();
+        row["val_int1"] = arr[7].toInt();
+        row["val_int2"] = arr[8].toInt();
+        row["val_int3"] = arr[9].toInt();
+        row["val_str1"] = arr[10].toString();
+        row["val_str2"] = arr[11].toString();
+        row["val_str3"] = arr[12].toString();
         mEvents.append(row);
     }
 
@@ -125,9 +131,13 @@ bool Monitor::isWatchedModule(const QString &mod)
     return false;
 }
 
-void Monitor::appendEvent(const QString &module, const QString &type,
-                          const QString &key, double valNum, int valInt, const QString &valStr)
+void Monitor::appendEvent(const QString &module, const QString &type, const QString &key,
+                          double valNum1, double valNum2, double valNum3,
+                          int valInt1, int valInt2, int valInt3,
+                          const QString &valStr1, const QString &valStr2, const QString &valStr3)
 {
+    if (!kChartKeys.contains(key)) return;
+
     QDateTime now = QDateTime::currentDateTime();
     QVariantMap ts;
     ts["year"]  = now.date().year();
@@ -139,14 +149,19 @@ void Monitor::appendEvent(const QString &module, const QString &type,
     ts["ms"]    = now.time().msec();
 
     QVariantMap row;
-    row["ts"]      = ts;
-    row["module"]  = module;
-    row["type"]    = type;
-    row["key"]     = key;
-    row["val_num"] = valNum;
-    row["val_int"] = valInt;
-    row["val_str"] = valStr;
-    if (!kChartKeys.contains(key)) return;
+    row["ts"]       = ts;
+    row["module"]   = module;
+    row["type"]     = type;
+    row["key"]      = key;
+    row["val_num1"] = valNum1;
+    row["val_num2"] = valNum2;
+    row["val_num3"] = valNum3;
+    row["val_int1"] = valInt1;
+    row["val_int2"] = valInt2;
+    row["val_int3"] = valInt3;
+    row["val_str1"] = valStr1;
+    row["val_str2"] = valStr2;
+    row["val_str3"] = valStr3;
     mEvents.append(row);
     getStore()["events"]->newLine(row);
     if (mSessionActive)
@@ -192,16 +207,25 @@ void Monitor::stopSession()
         jRow.append(row["module"].toString());
         jRow.append(row["type"].toString());
         jRow.append(row["key"].toString());
-        jRow.append(row["val_num"].toDouble());
-        jRow.append(row["val_int"].toInt());
-        jRow.append(row["val_str"].toString());
+        jRow.append(row["val_num1"].toDouble());
+        jRow.append(row["val_num2"].toDouble());
+        jRow.append(row["val_num3"].toDouble());
+        jRow.append(row["val_int1"].toInt());
+        jRow.append(row["val_int2"].toInt());
+        jRow.append(row["val_int3"].toInt());
+        jRow.append(row["val_str1"].toString());
+        jRow.append(row["val_str2"].toString());
+        jRow.append(row["val_str3"].toString());
         grid.append(jRow);
     }
 
     QJsonObject root;
     root["session_start"] = mSessionStart.toString(Qt::ISODate);
     root["module"]        = getModuleName();
-    root["gridheaders"]   = QJsonArray({"ts", "module", "type", "key", "val_num", "val_int", "val_str"});
+    root["gridheaders"]   = QJsonArray({"ts", "module", "type", "key",
+                                        "val_num1", "val_num2", "val_num3",
+                                        "val_int1", "val_int2", "val_int3",
+                                        "val_str1", "val_str2", "val_str3"});
     root["grid"]          = grid;
 
     QFile file(filename);
@@ -270,5 +294,7 @@ void Monitor::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QStri
     if (prp != "signals") return;
 
     appendEvent(mod, e["statedescription"].toString(), e["event"].toString(),
-                e["val_num"].toDouble(), e["val_int"].toInt(), e["val_str"].toString());
+                e["val_num"].toDouble(), 0, 0,
+                e["val_int"].toInt(), 0, 0,
+                e["val_str"].toString());
 }

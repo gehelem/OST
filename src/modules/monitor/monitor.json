@@ -210,20 +210,50 @@
                 "label": "Key",
                 "order": "40"
             },
-            "val_num": {
+            "val_num1": {
                 "type": "float",
-                "label": "Float value",
+                "label": "Float 1",
                 "order": "50"
             },
-            "val_int": {
+            "val_num2": {
+                "type": "float",
+                "label": "Float 2",
+                "order": "51"
+            },
+            "val_num3": {
+                "type": "float",
+                "label": "Float 3",
+                "order": "52"
+            },
+            "val_int1": {
                 "type": "int",
-                "label": "Int value",
+                "label": "Int 1",
                 "order": "60"
             },
-            "val_str": {
+            "val_int2": {
+                "type": "int",
+                "label": "Int 2",
+                "order": "61"
+            },
+            "val_int3": {
+                "type": "int",
+                "label": "Int 3",
+                "order": "62"
+            },
+            "val_str1": {
                 "type": "string",
-                "label": "Detail",
+                "label": "String 1",
                 "order": "70"
+            },
+            "val_str2": {
+                "type": "string",
+                "label": "String 2",
+                "order": "71"
+            },
+            "val_str3": {
+                "type": "string",
+                "label": "String 3",
+                "order": "72"
             }
         }
     }

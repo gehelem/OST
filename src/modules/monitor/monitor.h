@@ -31,8 +31,10 @@ class MODULE_INIT Monitor : public IndiModule
 
     private:
         bool isWatchedModule(const QString &mod);
-        void appendEvent(const QString &module, const QString &type,
-                         const QString &key, double valNum, int valInt, const QString &valStr);
+        void appendEvent(const QString &module, const QString &type, const QString &key,
+                         double valNum1 = 0, double valNum2 = 0, double valNum3 = 0,
+                         int valInt1 = 0, int valInt2 = 0, int valInt3 = 0,
+                         const QString &valStr1 = {}, const QString &valStr2 = {}, const QString &valStr3 = {});
         void startSession();
         void stopSession();
         void refreshView();
