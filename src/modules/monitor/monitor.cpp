@@ -112,6 +112,10 @@ void Monitor::loadArchive(int line)
         mEvents.append(row);
     }
 
+    int maxRows = getInt("parms", "maxrows");
+    if (maxRows > 0 && mEvents.size() > maxRows)
+        logWarning("Archive %1 contains %2 events, exceeding current max rows (%3) — display may be truncated", {filename, mEvents.size(), maxRows});
+
     if (!mEvents.isEmpty())
     {
         auto tsToDateTime = [](const QVariantMap & ts)
