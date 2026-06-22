@@ -121,8 +121,6 @@ void Monitor::loadArchive(int line)
             if (dt < tsMin) tsMin = dt;
             if (dt > tsMax) tsMax = dt;
         }
-        getEltDateTime("filter", "ts_start")->setValue(tsMin, true);
-        getEltDateTime("filter", "ts_end")->setValue(tsMax, true);
     }
 
     refreshView();
@@ -178,8 +176,6 @@ void Monitor::appendEvent(const QString &module, const QString &type, const QStr
     row["val_str3"] = valStr3;
     mEvents.append(row);
     getStore()["events"]->newLine(row);
-    if (mSessionActive)
-        getEltDateTime("filter", "ts_end")->setValue(now, true);
 }
 
 void Monitor::startSession()
@@ -189,8 +185,6 @@ void Monitor::startSession()
     mEvents.clear();
     mGuideRmsBuf.clear();
     mGuideSNRBuf.clear();
-    getEltDateTime("filter", "ts_start")->setValue(mSessionStart, true);
-    getEltDateTime("filter", "ts_end")->setValue(mSessionStart, true);
     int maxRows = getInt("filter", "maxrows");
     if (maxRows <= 0) maxRows = 200;
     getStore()["events"]->setGridLimit(maxRows);
@@ -259,21 +253,12 @@ void Monitor::stopSession()
 
 void Monitor::refreshView()
 {
-    QDateTime tsStart = getEltDateTime("filter", "ts_start")->value();
-    QDateTime tsEnd   = getEltDateTime("filter", "ts_end")->value();
     int maxRows = getInt("filter", "maxrows");
     if (maxRows <= 0 || maxRows > 2000) maxRows = 2000;
 
     QVector<const QVariantMap*> matching;
     for (const QVariantMap &row : mEvents)
-    {
-        QVariantMap ts = row["ts"].toMap();
-        QDateTime dt(QDate(ts["year"].toInt(), ts["month"].toInt(), ts["day"].toInt()),
-                     QTime(ts["hh"].toInt(),   ts["mm"].toInt(),   ts["ss"].toInt(), ts["ms"].toInt()));
-        if (tsStart.isValid() && dt < tsStart) continue;
-        if (tsEnd.isValid()   && dt > tsEnd)   continue;
         matching.append(&row);
-    }
 
     getStore()["events"]->clearGrid();
     int start = qMax(0, matching.size() - maxRows);
