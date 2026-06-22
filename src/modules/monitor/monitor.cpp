@@ -146,6 +146,7 @@ void Monitor::appendEvent(const QString &module, const QString &type, const QStr
                           const QString &valStr1, const QString &valStr2, const QString &valStr3)
 {
     if (!kChartKeys.contains(key)) return;
+    if (!mSessionActive) return;
 
     QDateTime now = QDateTime::currentDateTime();
     QVariantMap ts;
@@ -179,15 +180,12 @@ void Monitor::appendEvent(const QString &module, const QString &type, const QStr
     mEvents.append(row);
     getStore()["events"]->newLine(row);
 
-    if (mSessionActive)
+    int maxRows = getInt("parms", "maxrows");
+    if (maxRows > 0 && mEvents.size() >= maxRows)
     {
-        int maxRows = getInt("parms", "maxrows");
-        if (maxRows > 0 && mEvents.size() >= maxRows)
-        {
-            logInfo("Session reached max rows limit (%1), archiving and starting new session", {maxRows});
-            stopSession();
-            startSession();
-        }
+        logInfo("Session reached max rows limit (%1), archiving and starting new session", {maxRows});
+        stopSession();
+        startSession();
     }
 }
 
