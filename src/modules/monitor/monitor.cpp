@@ -52,7 +52,7 @@ void Monitor::onAutoStart()
 
 void Monitor::scanArchive()
 {
-    QDir dir(getWebroot() + "/monitor");
+    QDir dir(getWebroot() + "/monitor-data");
     if (!dir.exists()) return;
 
     QFileInfoList files = dir.entryInfoList({"*.json"}, QDir::Files, QDir::Name | QDir::Reversed);
@@ -60,9 +60,13 @@ void Monitor::scanArchive()
     getStore()["archive"]->clearGrid();
     for (const QFileInfo &fi : files)
     {
-        QDateTime dt = QDateTime::fromString(fi.baseName(), "yyyyMMdd-HHmmss");
+        QString base     = fi.baseName();
+        int sep          = base.indexOf('_');
+        QString instance = (sep >= 0) ? base.left(sep)     : QString();
+        QString datePart = (sep >= 0) ? base.mid(sep + 1)  : base;
+        QDateTime dt     = QDateTime::fromString(datePart, "yyyyMMdd-HHmmss");
         QVariantMap row;
-        row["date"]     = dt.isValid() ? dt.toString("yyyy-MM-dd HH:mm:ss") : fi.baseName();
+        row["date"]     = dt.isValid() ? dt.toString("yyyy-MM-dd HH:mm:ss") : datePart;
         row["filename"] = fi.fileName();
         row["size"]     = (int)(fi.size() / 1024);
         getStore()["archive"]->newLine(row);
@@ -75,7 +79,7 @@ void Monitor::loadArchive(int line)
     QString filename = getString("archive", "filename");
     if (filename.isEmpty()) return;
 
-    QFile file(getWebroot() + "/monitor/" + filename);
+    QFile file(getWebroot() + "/monitor-data/" + filename);
     if (!file.open(QIODevice::ReadOnly)) return;
 
     QJsonArray grid = QJsonDocument::fromJson(file.readAll()).object()["grid"].toArray();
@@ -216,9 +220,9 @@ void Monitor::stopSession()
 
     if (!mSessionStart.isValid() || mEvents.isEmpty()) return;
 
-    QDir().mkpath(getWebroot() + "/monitor");
-    QString filename = getWebroot() + "/monitor/" +
-                       mSessionStart.toString("yyyyMMdd-HHmmss") + ".json";
+    QDir().mkpath(getWebroot() + "/monitor-data");
+    QString filename = getWebroot() + "/monitor-data/" +
+                       getModuleName() + "_" + mSessionStart.toString("yyyyMMdd-HHmmss") + ".json";
 
     QJsonArray grid;
     for (const QVariantMap &row : mEvents)
