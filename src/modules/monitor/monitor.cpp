@@ -188,6 +188,7 @@ void Monitor::startSession()
     mSessionActive = true;
     mEvents.clear();
     mGuideRmsBuf.clear();
+    mGuideSNRBuf.clear();
     getEltDateTime("filter", "ts_start")->setValue(mSessionStart, true);
     getEltDateTime("filter", "ts_end")->setValue(mSessionStart, true);
     int maxRows = getInt("filter", "maxrows");
@@ -317,43 +318,49 @@ void Monitor::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QStri
     QString key  = e["event"].toString();
     double  num  = e["val_num"].toDouble();
 
-    if (key == "guideRMS")
+    auto flushBuf = [&](QVector<double> &buf, const QString &bufMod, const QString &bufType, const QString &bufKey)
     {
-        int sampling = getInt("parms", "guiderms_sampling");
+        QVector<double> sorted = buf;
+        std::sort(sorted.begin(), sorted.end());
+        double mean = 0;
+        for (double v : sorted) mean += v;
+        mean /= sorted.size();
+        double vmin   = sorted.first();
+        double vmax   = sorted.last();
+        double median = sorted.size() % 2 == 0
+            ? (sorted[sorted.size()/2 - 1] + sorted[sorted.size()/2]) / 2.0
+            : sorted[sorted.size()/2];
+        double variance = 0;
+        for (double v : sorted) variance += (v - mean) * (v - mean);
+        double stddev = std::sqrt(variance / sorted.size());
+        appendEvent(bufMod, bufType, bufKey, mean, vmin, vmax, median, stddev);
+        buf.clear();
+    };
+
+    int sampling = getInt("parms", "monitor_sampling");
+
+    if (key == "guideRMS" || key == "guideSNR")
+    {
+        QVector<double> &buf    = (key == "guideRMS") ? mGuideRmsBuf    : mGuideSNRBuf;
+        QString         &bufMod = (key == "guideRMS") ? mGuideRmsModule  : mGuideSNRModule;
+        QString         &bufType= (key == "guideRMS") ? mGuideRmsType    : mGuideSNRType;
         if (sampling <= 1)
         {
             appendEvent(mod, e["statedescription"].toString(), key, num);
         }
         else
         {
-            mGuideRmsModule = mod;
-            mGuideRmsType   = e["statedescription"].toString();
-            mGuideRmsBuf.append(num);
-            if (mGuideRmsBuf.size() >= sampling)
-            {
-                QVector<double> sorted = mGuideRmsBuf;
-                std::sort(sorted.begin(), sorted.end());
-                double mean = 0;
-                for (double v : sorted) mean += v;
-                mean /= sorted.size();
-                double vmin   = sorted.first();
-                double vmax   = sorted.last();
-                double median = sorted.size() % 2 == 0
-                    ? (sorted[sorted.size()/2 - 1] + sorted[sorted.size()/2]) / 2.0
-                    : sorted[sorted.size()/2];
-                double variance = 0;
-                for (double v : sorted) variance += (v - mean) * (v - mean);
-                double stddev = std::sqrt(variance / sorted.size());
-                appendEvent(mGuideRmsModule, mGuideRmsType, key,
-                            mean, vmin, vmax, median, stddev);
-                mGuideRmsBuf.clear();
-            }
+            bufMod  = mod;
+            bufType = e["statedescription"].toString();
+            buf.append(num);
+            if (buf.size() >= sampling)
+                flushBuf(buf, bufMod, bufType, key);
         }
     }
     else
     {
         appendEvent(mod, e["statedescription"].toString(), key,
-                    num, 0, 0,
+                    num, 0, 0, 0, 0, 0, 0, 0,
                     e["val_int"].toInt(), 0, 0,
                     e["val_str"].toString());
     }

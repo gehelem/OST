@@ -15,9 +15,9 @@
                 "order": 10,
                 "hint": "Automatically start a new session when the module loads"
             },
-            "guiderms_sampling": {
+            "monitor_sampling": {
                 "type": "int",
-                "label": "Guide RMS sampling",
+                "label": "Monitor sampling",
                 "directedit": true,
                 "value": 10,
                 "order": 20,

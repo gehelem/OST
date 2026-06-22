@@ -47,10 +47,13 @@ class MODULE_INIT Monitor : public IndiModule
         QVector<QVariantMap>  mEvents;
         bool                  mSessionActive = false;
 
-        // guideRMS accumulator
+        // guideRMS / guideSNR accumulators
         QVector<double>       mGuideRmsBuf;
         QString               mGuideRmsModule;
         QString               mGuideRmsType;
+        QVector<double>       mGuideSNRBuf;
+        QString               mGuideSNRModule;
+        QString               mGuideSNRType;
 };
 
 extern "C" MODULE_INIT Monitor *initialize(QString name, QString label, QString profile,
