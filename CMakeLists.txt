@@ -530,6 +530,22 @@ target_link_libraries(ostparkmanager PRIVATE
 )
 target_compile_definitions(ostparkmanager PRIVATE PARKMANAGER_MODULE)
 
+# Monitor module
+add_library(ostmonitor SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/monitor/monitor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/monitor/monitor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/monitor/monitor.qrc
+)
+target_link_libraries(ostmonitor PRIVATE
+    ostindimodule
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Threads::Threads
+    z
+)
+target_compile_definitions(ostmonitor PRIVATE MONITOR_MODULE)
+
 install(TARGETS
     ostserver
     ostbasemodule ostindimodule
@@ -543,6 +559,7 @@ install(TARGETS
     ostplanner
     ostpolar
     ostparkmanager
+    ostmonitor
     RUNTIME DESTINATION "/usr/bin"     COMPONENT Runtime
     LIBRARY DESTINATION "/usr/lib"     COMPONENT Runtime
     PUBLIC_HEADER DESTINATION "/usr/include/ost" COMPONENT Development

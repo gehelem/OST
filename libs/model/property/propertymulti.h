@@ -227,16 +227,20 @@ class PropertyMulti: public PropertyBase
          * @see newLine()
          * @see clearGrid()
          */
-        void push();
+        void push(bool silent = false);
 
         /**
-         * @brief Create new grid line from values map
+         * @brief Create new grid line from values map.
          * @param pValues QVariantMap with element keys and values
-         *
-         * Alternative to push() that creates line directly from map
-         * without modifying base elements.
+         * @param silent  If true, suppresses the WebSocket event. Call emitAll() afterwards.
          */
-        void newLine(const QVariantMap &pValues);
+        void newLine(const QVariantMap &pValues, bool silent = false);
+
+        /**
+         * @brief Emit a full property dump (ap event) to all clients.
+         * Call once after a batch of newLineSilent() calls.
+         */
+        void emitAll();
 
         /**
          * @brief Update existing grid line with values map

@@ -1,0 +1,278 @@
+{
+"p":{
+    "parms": {
+        "label": "Parameters",
+        "permission": 2,
+        "devcat": "Configuration",
+        "group": "",
+        "order": "10",
+        "hasprofile": true,
+        "e": {
+            "autostart": {
+                "type": "bool",
+                "label": "Auto-start on load",
+                "value": false,
+                "order": 10,
+                "hint": "Automatically start a new session when the module loads"
+            },
+            "monitor_sampling": {
+                "type": "int",
+                "label": "Monitor sampling",
+                "directedit": true,
+                "value": 10,
+                "order": 20,
+                "hint": "Number of guideRMS samples to average before recording an event"
+            },
+            "maxrows": {
+                "type": "int",
+                "label": "Max rows",
+                "autoupdate": true,
+                "directedit": true,
+                "value": 200,
+                "order": 30,
+                "hint": "Maximum number of rows to store"
+            }
+        }
+    },
+    "filter": {
+        "label": "View filter",
+        "permission": 2,
+        "devcat": "Configuration",
+        "group": "",
+        "order": "20",
+        "hasprofile": false,
+        "e": {
+        }
+    },
+    "slaves": {
+        "label": "Monitored modules",
+        "permission": 2,
+        "devcat": "Configuration",
+        "group": "",
+        "order": "10",
+        "hasprofile": true,
+        "e": {
+            "guider": {
+                "type": "string",
+                "label": "Guider instance",
+                "listOfValues": "loadedModules-guider",
+                "listOfValuesIsExternal": true,
+                "autoupdate": true,
+                "directedit": true,
+                "value": "",
+                "order": 10,
+                "hint": "Guider module instance to monitor"
+            },
+            "sequencer": {
+                "type": "string",
+                "label": "Sequencer instance",
+                "listOfValues": "loadedModules-sequence",
+                "listOfValuesIsExternal": true,
+                "autoupdate": true,
+                "directedit": true,
+                "value": "",
+                "order": 20,
+                "hint": "Sequencer module instance to monitor"
+            },
+            "focus": {
+                "type": "string",
+                "label": "Focus instance",
+                "listOfValues": "loadedModules-focus",
+                "listOfValuesIsExternal": true,
+                "autoupdate": true,
+                "directedit": true,
+                "value": "",
+                "order": 30,
+                "hint": "Focus module instance to monitor"
+            },
+            "navigator": {
+                "type": "string",
+                "label": "Navigator instance",
+                "listOfValues": "loadedModules-navigator",
+                "listOfValuesIsExternal": true,
+                "autoupdate": true,
+                "directedit": true,
+                "value": "",
+                "order": 40,
+                "hint": "Navigator module instance to monitor"
+            },
+            "planner": {
+                "type": "string",
+                "label": "Planner instance",
+                "listOfValues": "loadedModules-planner",
+                "listOfValuesIsExternal": true,
+                "autoupdate": true,
+                "directedit": true,
+                "value": "",
+                "order": 50,
+                "hint": "Planner module instance to monitor"
+            },
+            "parkmanager": {
+                "type": "string",
+                "label": "Park manager instance",
+                "listOfValues": "loadedModules-parkmanager",
+                "listOfValuesIsExternal": true,
+                "autoupdate": true,
+                "directedit": true,
+                "value": "",
+                "order": 60,
+                "hint": "Park manager module instance to monitor"
+            },
+            "polar": {
+                "type": "string",
+                "label": "Polar instance",
+                "listOfValues": "loadedModules-polar",
+                "listOfValuesIsExternal": true,
+                "autoupdate": true,
+                "directedit": true,
+                "value": "",
+                "order": 70,
+                "hint": "Polar module instance to monitor"
+            },
+            "inspector": {
+                "type": "string",
+                "label": "Inspector instance",
+                "listOfValues": "loadedModules-inspector",
+                "listOfValuesIsExternal": true,
+                "autoupdate": true,
+                "directedit": true,
+                "value": "",
+                "order": 80,
+                "hint": "Inspector module instance to monitor"
+            }
+        }
+    },
+    "archive": {
+        "label": "Archived sessions",
+        "devcat": "Archive",
+        "order": "90",
+        "group": "",
+        "permission": 2,
+        "showElts": false,
+        "hasGrid": true,
+        "showGrid": true,
+        "e": {
+            "date": {
+                "type": "string",
+                "label": "Date",
+                "autoupdate": false,
+                "order": "10"
+            },
+            "filename": {
+                "type": "string",
+                "label": "File",
+                "autoupdate": false,
+                "order": "20"
+            },
+            "size": {
+                "type": "int",
+                "label": "Size (KB)",
+                "autoupdate": false,
+                "order": "30"
+            }
+        }
+    },
+    "events": {
+        "label": "Events",
+        "devcat": "Monitor",
+        "order": "100",
+        "group": "",
+        "permission": 0,
+        "showElts": false,
+        "hasGrid": true,
+        "showGrid": true,
+        "e": {
+            "ts": {
+                "type": "datetime",
+                "label": "Timestamp",
+                "order": "10"
+            },
+            "module": {
+                "type": "string",
+                "label": "Module",
+                "order": "20"
+            },
+            "type": {
+                "type": "string",
+                "label": "Type",
+                "order": "30"
+            },
+            "key": {
+                "type": "string",
+                "label": "Key",
+                "order": "40"
+            },
+            "val_num1": {
+                "type": "float",
+                "label": "Mean",
+                "order": "50"
+            },
+            "val_num2": {
+                "type": "float",
+                "label": "Min",
+                "order": "51"
+            },
+            "val_num3": {
+                "type": "float",
+                "label": "Max",
+                "order": "52"
+            },
+            "val_num4": {
+                "type": "float",
+                "label": "Median",
+                "order": "53"
+            },
+            "val_num5": {
+                "type": "float",
+                "label": "Std dev",
+                "order": "54"
+            },
+            "val_num6": {
+                "type": "float",
+                "label": "Float 6",
+                "order": "55"
+            },
+            "val_num7": {
+                "type": "float",
+                "label": "Float 7",
+                "order": "56"
+            },
+            "val_num8": {
+                "type": "float",
+                "label": "Float 8",
+                "order": "57"
+            },
+            "val_int1": {
+                "type": "int",
+                "label": "Int 1",
+                "order": "60"
+            },
+            "val_int2": {
+                "type": "int",
+                "label": "Int 2",
+                "order": "61"
+            },
+            "val_int3": {
+                "type": "int",
+                "label": "Int 3",
+                "order": "62"
+            },
+            "val_str1": {
+                "type": "string",
+                "label": "String 1",
+                "order": "70"
+            },
+            "val_str2": {
+                "type": "string",
+                "label": "String 2",
+                "order": "71"
+            },
+            "val_str3": {
+                "type": "string",
+                "label": "String 3",
+                "order": "72"
+            }
+        }
+    }
+}
+}

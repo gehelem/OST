@@ -1139,6 +1139,11 @@ void Guider::SMComputeGuide()
     getEltFloat("guiding", "RMS")->setValue(rmsTotal);
     getProperty("guiding")->push();
 
+    setStateEvent(OST::Busy, "guiding", "guideRMS", "guide RMS",
+                  rmsTotal);
+    setStateEvent(OST::Busy, "guiding", "guideSNR", "guide SNR",
+                  qRound(_image->getStats().SNR));
+
     emit ComputeGuideDone();
 }
 void Guider::SMRequestPulses()

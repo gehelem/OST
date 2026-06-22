@@ -148,6 +148,13 @@ bool  PropertyMulti::setElt(QString key, QVariant val, bool emitEvent)
         getElt(key)->accept(&vu, m, s);
         return true;
     }
+    if (mElts[key]->getType() == "datetime")
+    {
+        ElementUpdate vu;
+        m["value"] = val.toMap();
+        getElt(key)->accept(&vu, m, s);
+        return true;
+    }
     if (mElts[key]->getType() == "light")
     {
         ElementUpdate vu;
@@ -242,7 +249,7 @@ void  PropertyMulti::deleteElt(QString key)
 
 }
 
-void PropertyMulti::push()
+void PropertyMulti::push(bool silent)
 {
     if (!this->hasGrid())
     {
@@ -258,10 +265,10 @@ void PropertyMulti::push()
     if (mGridLimit > 0 && mGrid.size() > this->mGridLimit)
     {
         mGrid.removeFirst();
-        emit PropertyBase::prpEvent(OST::EvType::gd, 0, nullptr, this);
+        if (!silent) emit PropertyBase::prpEvent(OST::EvType::gd, 0, nullptr, this);
     }
 
-    emit PropertyBase::prpEvent(OST::EvType::gc, mGrid.size() - 1, nullptr, this);
+    if (!silent) emit PropertyBase::prpEvent(OST::EvType::gc, mGrid.size() - 1, nullptr, this);
 }
 
 void PropertyMulti::setAll(const QVariantMap &pValues)
@@ -289,20 +296,18 @@ void PropertyMulti::setAll(const QVariantMap &pValues)
     emit PropertyBase::prpEvent(OST::EvType::ea, QVariant(), nullptr, this);
 
 }
-void PropertyMulti::newLine(const QVariantMap &pValues)
+void PropertyMulti::newLine(const QVariantMap &pValues, bool silent)
 {
     if (!this->hasGrid())
     {
         logError("PropertyMulti::newLine - no array/grid defined");
         return;
     }
-    /* Check if data is valid and contains every value */
     for(const QString &elt : mElts.keys())
     {
         if ((mElts[elt]->getType() == "int") || (mElts[elt]->getType() == "float") || (mElts[elt]->getType() == "string")
                 || (mElts[elt]->getType() == "bool") || (mElts[elt]->getType() == "date") || (mElts[elt]->getType() == "time")
                 || (mElts[elt]->getType() == "datetime"))
-
         {
             if (!pValues.contains(elt))
             {
@@ -311,14 +316,16 @@ void PropertyMulti::newLine(const QVariantMap &pValues)
             }
         }
     }
-
     for(const QString &elt : mElts.keys())
-    {
-        setElt(elt, pValues[elt]);
-
-    }
-    push();
+        setElt(elt, pValues[elt], !silent);
+    push(silent);
 }
+
+void PropertyMulti::emitAll()
+{
+    emit PropertyBase::prpEvent(OST::EvType::ap, QVariant(), nullptr, this);
+}
+
 bool PropertyMulti::updateLine(const int i, const QVariantMap &pValues)
 {
     if (!this->hasGrid())

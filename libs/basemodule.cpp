@@ -708,15 +708,17 @@ void Basemodule::otherModuleRequestProfileLoad(QString mod, QString profile)
     event.data = M;
     emit interModuleRequest(event);
 };
-void Basemodule::setStateEvent(OST::State state, QString statedescription, QString event, QString eventdescription)
+void Basemodule::setStateEvent(OST::State state, QString statedescription, QString event, QString eventdescription, double valNum, int valInt, QString valStr)
 {
     QVariantMap m;
     m["state"] = OST::StateToInt(state);
     m["statedescription"] = statedescription;
     m["event"] = event;
     m["eventdescription"] = eventdescription;
+    m["val_num"] = valNum;
+    m["val_int"] = valInt;
+    m["val_str"] = valStr;
     getProperty("signals")->setAll(m);
-
 }
 bool Basemodule::giveMeAState()
 {
@@ -745,6 +747,21 @@ bool Basemodule::giveMeAState()
     if (!getProperty("signals")->getElts()->contains("eventdescription"))
     {
         OST::ElementString* e = new  OST::ElementString("eventdescription", "Event description", "40", "");
+        getProperty("signals")->addElt(e);
+    }
+    if (!getProperty("signals")->getElts()->contains("val_num"))
+    {
+        OST::ElementFloat* e = new OST::ElementFloat("val_num", "Float value", "50", "");
+        getProperty("signals")->addElt(e);
+    }
+    if (!getProperty("signals")->getElts()->contains("val_int"))
+    {
+        OST::ElementInt* e = new OST::ElementInt("val_int", "Integer value", "60", "");
+        getProperty("signals")->addElt(e);
+    }
+    if (!getProperty("signals")->getElts()->contains("val_str"))
+    {
+        OST::ElementString* e = new OST::ElementString("val_str", "String value", "70", "");
         getProperty("signals")->addElt(e);
     }
 
