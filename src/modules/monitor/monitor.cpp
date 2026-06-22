@@ -36,6 +36,7 @@ Monitor::Monitor(QString name, QString label, QString profile, QVariantMap avail
     pm->addElt(b);
 
     getProperty("events")->setGridLimit(1000000);
+    getEltBool("actions", "stop") ->setValue(true, true);
 }
 
 Monitor::~Monitor()
@@ -109,7 +110,8 @@ void Monitor::loadArchive(int line)
 
     if (!mEvents.isEmpty())
     {
-        auto tsToDateTime = [](const QVariantMap &ts) {
+        auto tsToDateTime = [](const QVariantMap & ts)
+        {
             return QDateTime(QDate(ts["year"].toInt(), ts["month"].toInt(), ts["day"].toInt()),
                              QTime(ts["hh"].toInt(), ts["mm"].toInt(), ts["ss"].toInt(), ts["ms"].toInt()));
         };
@@ -176,6 +178,17 @@ void Monitor::appendEvent(const QString &module, const QString &type, const QStr
     row["val_str3"] = valStr3;
     mEvents.append(row);
     getStore()["events"]->newLine(row);
+
+    if (mSessionActive)
+    {
+        int maxRows = getInt("parms", "maxrows");
+        if (maxRows > 0 && mEvents.size() >= maxRows)
+        {
+            logInfo("Session reached max rows limit (%1), archiving and starting new session", {maxRows});
+            stopSession();
+            startSession();
+        }
+    }
 }
 
 void Monitor::startSession()
@@ -185,7 +198,7 @@ void Monitor::startSession()
     mEvents.clear();
     mGuideRmsBuf.clear();
     mGuideSNRBuf.clear();
-    int maxRows = getInt("filter", "maxrows");
+    int maxRows = getInt("parms", "maxrows");
     if (maxRows <= 0) maxRows = 200;
     getStore()["events"]->setGridLimit(maxRows);
     getStore()["events"]->clearGrid();
@@ -201,7 +214,7 @@ void Monitor::stopSession()
     setStateEvent(OST::Ok, "ready", "sessionstop", "Session stopped");
     getProperty("actions")->setState(OST::Ok, true);
     getEltBool("actions", "start")->setValue(false, false);
-    getEltBool("actions", "stop") ->setValue(false, true);
+    getEltBool("actions", "stop") ->setValue(true, true);
 
     if (!mSessionStart.isValid() || mEvents.isEmpty()) return;
 
@@ -253,7 +266,7 @@ void Monitor::stopSession()
 
 void Monitor::refreshView()
 {
-    int maxRows = getInt("filter", "maxrows");
+    int maxRows = getInt("parms", "maxrows");
     if (maxRows <= 0 || maxRows > 2000) maxRows = 2000;
 
     QVector<const QVariantMap*> matching;
@@ -276,7 +289,6 @@ void Monitor::onExternalEvent(OST::ExtEvent event)
             if (event.eltkey == "start") startSession();
             if (event.eltkey == "stop")  stopSession();
         }
-        if (event.prpkey == "filter") refreshView();
     }
     if (event.ev == OST::ExtEvType::GF && event.prpkey == "archive")
     {
@@ -303,7 +315,7 @@ void Monitor::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QStri
     QString key  = e["event"].toString();
     double  num  = e["val_num"].toDouble();
 
-    auto flushBuf = [&](QVector<double> &buf, const QString &bufMod, const QString &bufType, const QString &bufKey)
+    auto flushBuf = [&](QVector<double> &buf, const QString & bufMod, const QString & bufType, const QString & bufKey)
     {
         QVector<double> sorted = buf;
         std::sort(sorted.begin(), sorted.end());
@@ -313,8 +325,8 @@ void Monitor::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QStri
         double vmin   = sorted.first();
         double vmax   = sorted.last();
         double median = sorted.size() % 2 == 0
-            ? (sorted[sorted.size()/2 - 1] + sorted[sorted.size()/2]) / 2.0
-            : sorted[sorted.size()/2];
+                        ? (sorted[sorted.size() / 2 - 1] + sorted[sorted.size() / 2]) / 2.0
+                        : sorted[sorted.size() / 2];
         double variance = 0;
         for (double v : sorted) variance += (v - mean) * (v - mean);
         double stddev = std::sqrt(variance / sorted.size());
@@ -328,7 +340,7 @@ void Monitor::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QStri
     {
         QVector<double> &buf    = (key == "guideRMS") ? mGuideRmsBuf    : mGuideSNRBuf;
         QString         &bufMod = (key == "guideRMS") ? mGuideRmsModule  : mGuideSNRModule;
-        QString         &bufType= (key == "guideRMS") ? mGuideRmsType    : mGuideSNRType;
+        QString         &bufType = (key == "guideRMS") ? mGuideRmsType    : mGuideSNRType;
         if (sampling <= 1)
         {
             appendEvent(mod, e["statedescription"].toString(), key, num);

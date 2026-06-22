@@ -22,6 +22,15 @@
                 "value": 10,
                 "order": 20,
                 "hint": "Number of guideRMS samples to average before recording an event"
+            },
+            "maxrows": {
+                "type": "int",
+                "label": "Max rows",
+                "autoupdate": true,
+                "directedit": true,
+                "value": 200,
+                "order": 30,
+                "hint": "Maximum number of rows to store"
             }
         }
     },
@@ -33,15 +42,6 @@
         "order": "20",
         "hasprofile": false,
         "e": {
-            "maxrows": {
-                "type": "int",
-                "label": "Max rows",
-                "autoupdate": true,
-                "directedit": true,
-                "value": 200,
-                "order": 30,
-                "hint": "Maximum number of rows to display"
-            }
         }
     },
     "slaves": {
