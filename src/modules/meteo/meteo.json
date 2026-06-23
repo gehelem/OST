@@ -16,7 +16,7 @@
             "dpv": {
                 "type":"string",
                 "label": "Device - Property - Element",
-                "order": "1",
+                "order": "10",
                 "value":"",
                 "listOfValues":{
                 }
@@ -24,7 +24,7 @@
             "commongraph": {
                 "type":"string",
                 "label": "Common graph",
-                "order": "1",
+                "order": "20",
                 "value":"",
                 "listOfValues":[
                     ["temp","Temperature"],
@@ -38,7 +38,7 @@
             "rgb-r": {
                 "type":"int",
                 "label": "RGB : Red",
-                "order": "1",
+                "order": "110",
                 "value":255,
                 "min":0,
                 "max":255
@@ -46,7 +46,7 @@
             "rgb-g": {
                 "type":"int",
                 "label": "RGB : Green",
-                "order": "1",
+                "order": "120",
                 "value":255,
                 "min":0,
                 "max":255
@@ -54,7 +54,7 @@
             "rgb-b": {
                 "type":"int",
                 "label": "RGB : Blue",
-                "order": "1",
+                "order": "130",
                 "value":255,
                 "min":0,
                 "max":255
