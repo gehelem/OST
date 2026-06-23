@@ -31,8 +31,33 @@
                     ["hum-clouds","Percentage"],
                     ["pressure","Pressure"],
                     ["precip","Precip (mm)"],
+                    ["other","Other"],
                     ["sqm","SQM"]
                 ]
+            },
+            "rgb-r": {
+                "type":"int",
+                "label": "RGB : Red",
+                "order": "1",
+                "value":255,
+                "min":0,
+                "max":255
+            },
+            "rgb-g": {
+                "type":"int",
+                "label": "RGB : Green",
+                "order": "1",
+                "value":255,
+                "min":0,
+                "max":255
+            },
+            "rgb-b": {
+                "type":"int",
+                "label": "RGB : Blue",
+                "order": "1",
+                "value":255,
+                "min":0,
+                "max":255
             }
         }
     },
@@ -96,7 +121,8 @@
                 "hum-clouds":{"pos":"right","text":"Humidity/Clouds"},
                 "pressure":{"min":950,"max":1050,"pos":"right","text":"Pressure"},
                 "precip":{"min":0,"max":10,"pos":"left","text":"Rain"},
-                "sqm":{"min":0,"max":30,"pos":"left","text":"SQM"}
+                "sqm":{"min":0,"max":30,"pos":"left","text":"SQM"},
+                "other":{"pos":"left","text":"Other"}
             },
             "mapping":{
                 "temp":"temp",

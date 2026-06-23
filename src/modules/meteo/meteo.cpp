@@ -171,8 +171,12 @@ void Meteo::OnTimer()
                 QVariantMap gp = gd.params;
                 QVariantMap mapping = gp["mapping"].toMap();
                 QVariantMap graphColors = gp["graphColors"].toMap();
+                QVariantMap colors;
+                colors["R"] = (int)getInt("selection", "rgb-r", i);
+                colors["G"] = (int)getInt("selection", "rgb-g", i);
+                colors["B"] = (int)getInt("selection", "rgb-b", i);
                 mapping[propname] = commongraph;
-                graphColors[propname] = graphColors[commongraph] ;
+                graphColors[propname] = colors ;
                 gp["mapping"] = mapping;
                 gp["graphColors"] = graphColors;
                 gd.params = gp;
