@@ -1,0 +1,151 @@
+{
+"p":{
+    "selection": {
+        "devcat": "Control",
+        "order": "Control000",
+        "group": "",
+        "permission": 2,
+        "rule":0,
+        "label": "Indi widgets to watch",
+        "gridLimit":2000,
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":true,
+        "hasprofile":true,
+        "e": {
+            "dpv": {
+                "type":"string",
+                "label": "Device - Property - Element",
+                "order": "10",
+                "value":"",
+                "listOfValues":{
+                }
+            },
+            "commongraph": {
+                "type":"string",
+                "label": "Common graph",
+                "order": "20",
+                "value":"",
+                "listOfValues":[
+                    ["temp","Temperature"],
+                    ["hum-clouds","Percentage"],
+                    ["pressure","Pressure"],
+                    ["precip","Precip (mm)"],
+                    ["other","Other"],
+                    ["sqm","SQM"]
+                ]
+            },
+            "rgb-r": {
+                "type":"int",
+                "label": "RGB : Red",
+                "order": "110",
+                "value":255,
+                "min":0,
+                "max":255
+            },
+            "rgb-g": {
+                "type":"int",
+                "label": "RGB : Green",
+                "order": "120",
+                "value":255,
+                "min":0,
+                "max":255
+            },
+            "rgb-b": {
+                "type":"int",
+                "label": "RGB : Blue",
+                "order": "130",
+                "value":255,
+                "min":0,
+                "max":255
+            }
+        }
+    },
+    "search": {
+        "devcat": "Control",
+        "order": "Control000",
+        "group": "",
+        "permission": 2,
+        "rule":0,
+        "label": "Indi widgets to search",
+        "gridLimit":2000,
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":true,
+        "hasprofile":false,
+        "posticon1":"autorenew",
+        "posticon2":"check_circle_outline",
+        "e": {
+            "dpvsearchid": {
+                "directedit":true,
+                "autoupdate":true,
+                "type":"string",
+                "order": "1",
+                "label": "Device - Property - Element (id)"
+            },
+            "dpvsearchlab": {
+                "directedit":true,
+                "autoupdate":true,
+                "type":"string",
+                "order": "2",
+                "label": "Device - Property - Element (label)"
+            }
+
+        }
+    },
+    "commongraph": {
+        "devcat": "Common graph",
+        "group": "",
+        "order":"CCCMeteo020",
+        "permission": 0,
+        "hasprofile":false,
+        "label": "History",
+        "hasGrid":true,
+        "showGrid":false,
+        "showElts":false,
+        "graphType":"SDY",
+        "graphParams":{
+            "S":"S",
+            "D":"D",
+            "Y":"Y",
+            "graphColors":{
+                "temp":{"R":255,"G":0,"B":0},
+                "hum":{"R":0,"G":255,"B":0},
+                "press":{"R":0,"G":0,"B":255},
+                "clouds":{"R":0,"G":0,"B":255},
+                "precip":{"R":255,"G":255,"B":0},
+                "sqm":{"R":0,"G":255,"B":255}
+            },
+            "axis":{
+                "temp":{"pos":"right","text":"Temperature"},
+                "hum-clouds":{"pos":"right","text":"Humidity/Clouds"},
+                "pressure":{"min":950,"max":1050,"pos":"right","text":"Pressure"},
+                "precip":{"min":0,"max":10,"pos":"left","text":"Rain"},
+                "sqm":{"min":0,"max":30,"pos":"left","text":"SQM"},
+                "other":{"pos":"left","text":"Other"}
+            },
+            "mapping":{
+                "temp":"temp",
+                "hum":"hum-clouds",
+                "press":"pressure",
+                "clouds":"hum-clouds",
+                "precip":"precip",
+                "sqm":"sqm"
+            }
+        },
+        "e": {
+            "S": {
+                "type": "string",
+                "order":"A"
+            },
+            "D": {
+                "type": "datetime",
+                "order":"B"
+            },
+            "Y": {
+                "type": "float",
+                "order":"C"
+            }
+        }
+    }}
+}

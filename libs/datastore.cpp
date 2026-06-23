@@ -26,6 +26,7 @@ OST::PropertyMulti* Datastore::getProperty(QString pProperty)
 {
     if (!mStore.contains(pProperty))
     {
+        qDebug() << "getProperty - property not found :" << pProperty;
         logWarning("getProperty - property %1 not found", {pProperty});
         //return nullptr;
     }
