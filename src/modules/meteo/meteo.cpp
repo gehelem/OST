@@ -21,6 +21,7 @@ Meteo::Meteo(QString name, QString label, QString profile, QVariantMap available
     setMetadata("template", "meteo");
 
     giveMeAParms();
+    giveMeAnActions();
     connectIndi();
     connectAllDevices();
 
@@ -34,6 +35,13 @@ Meteo::Meteo(QString name, QString label, QString profile, QVariantMap available
     i->setDirectEdit(true);
     i->setAutoUpdate(true);
     getProperty("parms")->addElt( i);
+
+    OST::ElementBool* b = new OST::ElementBool("reset", "Reset", "0", "");
+    getProperty("actions")->addElt( b);
+    b->setValue(false, false);
+    b->setAutoUpdate(true);
+
+
     connect(&mTimer, &QTimer::timeout, this, &Meteo::OnTimer);
     mTimer.start(getInt("parms", "interval") * 1000);
 
@@ -46,12 +54,32 @@ Meteo::~Meteo()
 void Meteo::onExternalEvent(OST::ExtEvent event)
 {
 
+    if (event.ev == OST::ExtEvType::SV && event.prpkey == "actions")
+    {
+        getProperty("actions")->setState(OST::Busy, true);
+        getEltBool("actions", "reset")->setValue(true, true);
+        if (event.eltkey == "reset")
+        {
+            getEltBool("actions", "reset")->setValue(false, true);
+            getProperty("commongraph")->clearGrid();
+            for (int i = 0; i < getProperty("selection")->getGrid().size(); i++)
+            {
+                QString propname = getString("selection", "dpv", i);
+                getProperty(propname)->clearGrid();
+            }
+            logInfo("History data cleared");
+        }
+        getEltBool("actions", "reset")->setValue(false, true);
+        getProperty("actions")->setState(OST::Ok, true);
+
+    }
+
     if (event.ev == OST::ExtEvType::SV && event.prpkey == "parms")
     {
         if (event.eltkey == "interval")
         {
-                mTimer.stop();
-                mTimer.start(getInt("parms", "interval") * 1000);
+            mTimer.stop();
+            mTimer.start(getInt("parms", "interval") * 1000);
         }
     }
 
