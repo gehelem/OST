@@ -1,5 +1,5 @@
 ﻿#include "meteo.h"
-#include "versionModule.cc"
+#include "version.cc"
 
 Meteo *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
 {
@@ -13,17 +13,18 @@ Meteo::Meteo(QString name, QString label, QString profile, QVariantMap available
 {
 
     loadOstPropertiesFromFile(":meteo.json");
-    setMetadata("thisGithash", QString::fromStdString(VersionModule::GIT_SHA1));
-    setMetadata("thisGitdate", QString::fromStdString(VersionModule::GIT_DATE));
-    setMetadata("thisGitmessage", QString::fromStdString(VersionModule::GIT_COMMIT_SUBJECT));
+    setMetadata("thisGithash", QString::fromStdString(Version::GIT_SHA1));
+    setMetadata("thisGitdate", QString::fromStdString(Version::GIT_DATE));
+    setMetadata("thisGitmessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
     setMetadata("description", "Meteo module");
-    setMetadata("thisversion", QString::fromStdString(VersionModule::GIT_TAG));
-    setMetadata("template", "default");
+    setMetadata("thisversion", QString::fromStdString(Version::GIT_TAG));
+    setMetadata("template", "meteo");
 
+    giveMeAParms();
     connectIndi();
     connectAllDevices();
 
-    auto* i = new OST::ElementInt("interval", "Refresh interval (s)", "0", "");
+    OST::ElementInt* i = new OST::ElementInt("interval", "Refresh interval (s)", "0", "");
     i->setValue(5, false);
     i->setDirectEdit(true);
     i->setAutoUpdate(true);
@@ -203,17 +204,20 @@ void Meteo::declareNewGraph(const QString  &pName)
 
     createProperty(pm);
 
+    pm->sendDump();
+
 }
 void Meteo::updateSearchList(void)
 {
     QString sid = getString("search", "dpvsearchid");
     QString slab = getString("search", "dpvsearchlab");
+    qDebug() << "updateSearchList" << sid << slab;
     logInfo("Searching " + sid + "/" + slab);
     getProperty("search")->clearGrid();
 
     for (auto i = mAvailableMeasures.cbegin(), end = mAvailableMeasures.cend(); i != end; ++i)
     {
-        if ((i.key().contains(sid)) && (i.value().contains(slab)))
+        if ((i.key().toUpper().contains(sid)) || (i.value().toUpper().contains(slab)))
         {
             getEltString("search", "dpvsearchid")->setValue(i.key(), false);
             getEltString("search", "dpvsearchlab")->setValue(i.value(), false);
