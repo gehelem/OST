@@ -92,8 +92,8 @@
                 "sqm":{"R":0,"G":255,"B":255}
             },
             "axis":{
-                "temp":{"min":-15,"max":35,"pos":"right","text":"Temperature"},
-                "hum-clouds":{"min":0,"max":100,"pos":"right","text":"Humidity/Clouds"},
+                "temp":{"pos":"right","text":"Temperature"},
+                "hum-clouds":{"pos":"right","text":"Humidity/Clouds"},
                 "pressure":{"min":950,"max":1050,"pos":"right","text":"Pressure"},
                 "precip":{"min":0,"max":10,"pos":"left","text":"Rain"},
                 "sqm":{"min":0,"max":30,"pos":"left","text":"SQM"}
