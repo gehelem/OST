@@ -154,26 +154,36 @@ void Meteo::initIndi()
 }
 void Meteo::OnTimer()
 {
-    //QVariantList propnames = getOstElementGrid("selection", "dpv");
-    QStringList propnames;
 
     for (int i = 0; i < getProperty("selection")->getGrid().size(); i++)
     {
-        propnames.append(getString("selection", "dpv", i));
-    }
-    for (int i = 0; i < propnames.count(); i++)
-    {
-        QString propname = propnames[i];
+        QString propname = getString("selection", "dpv", i);
+        QString commongraph = getString("selection", "commongraph", i);
         declareNewGraph(propname);
         if (getStore().contains(propname))
         {
             getProperty(propname)->setGridLimit(getInt("parms", "histo"));
             getEltFloat(propname, "time")->setValue(QDateTime::currentDateTime().toMSecsSinceEpoch(), true);
             getProperty(propname)->push();
+            if (!commongraph.isEmpty())
+            {
+                OST::GraphDefs gd = getProperty("commongraph")->getGraphDefs();
+                QVariantMap gp = gd.params;
+                QVariantMap mapping = gp["mapping"].toMap();
+                QVariantMap graphColors = gp["graphColors"].toMap();
+                mapping[propname] = commongraph;
+                graphColors[propname] = graphColors[commongraph] ;
+                gp["mapping"] = mapping;
+                gp["graphColors"] = graphColors;
+                gd.params = gp;
+                getProperty("commongraph")->setGraphDefs(gd);
+                getEltDateTime("commongraph", "D")->setValue(QDateTime::currentDateTime(), false);
+                getEltString("commongraph", "S")->setValue(propname, false);
+                getEltFloat("commongraph", "Y")->setValue(getFloat(propname, propname));
+                getProperty("commongraph")->push();
+            }
         }
     }
-
-
 }
 void Meteo::declareNewGraph(const QString  &pName)
 {
