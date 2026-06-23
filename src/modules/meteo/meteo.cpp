@@ -50,12 +50,8 @@ void Meteo::onExternalEvent(OST::ExtEvent event)
     {
         if (event.eltkey == "interval")
         {
-            if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
-            {
                 mTimer.stop();
                 mTimer.start(getInt("parms", "interval") * 1000);
-            }
-
         }
     }
 
