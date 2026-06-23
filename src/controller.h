@@ -2,6 +2,7 @@
 #define CONTROLLER_h_
 #include <QCoreApplication>
 #include <QTimer>
+#include <QElapsedTimer>
 #include <QtSql/QSql>
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
@@ -73,6 +74,9 @@ class Controller : public QObject
         int     mSystemWatchInterval;
         int     mMinFreePercent;
         QTimer  mSystemWatchTimer;
+        QMap<QString, quint64> mNetPrevRx;
+        QMap<QString, quint64> mNetPrevTx;
+        QElapsedTimer          mNetTimer;
         QVariantMap mControllerData;
         QMap<QString, OST::LovBase*> mControllerLovs;
         GlobalDatastore* mGlobalDatastore = nullptr;
