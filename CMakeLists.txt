@@ -546,6 +546,22 @@ target_link_libraries(ostmonitor PRIVATE
 )
 target_compile_definitions(ostmonitor PRIVATE MONITOR_MODULE)
 
+# Meteo module
+add_library(ostmeteo SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/meteo/meteo.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/meteo/meteo.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/meteo/meteo.qrc
+)
+target_link_libraries(ostmeteo PRIVATE
+    ostindimodule
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Threads::Threads
+    z
+)
+target_compile_definitions(ostmeteo PRIVATE METEO_MODULE)
+
 install(TARGETS
     ostserver
     ostbasemodule ostindimodule
@@ -560,6 +576,7 @@ install(TARGETS
     ostpolar
     ostparkmanager
     ostmonitor
+    ostmeteo
     RUNTIME DESTINATION "/usr/bin"     COMPONENT Runtime
     LIBRARY DESTINATION "/usr/lib"     COMPONENT Runtime
     PUBLIC_HEADER DESTINATION "/usr/include/ost" COMPONENT Development
