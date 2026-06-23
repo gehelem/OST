@@ -1,0 +1,60 @@
+{
+"p":{
+    "selection": {
+        "devcat": "Control",
+        "order": "Control000",
+        "group": "",
+        "permission": 2,
+        "rule":0,
+        "label": "Indi widgets to watch",
+        "gridLimit":2000,
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":true,
+        "hasprofile":true,
+        "e": {
+            "dpv": {
+                "type":"string",
+                "label": "Device - Property - Element",
+                "order": "1",
+                "value":"",
+                "listOfValues":{
+                }
+            }
+        }
+    },
+    "search": {
+        "devcat": "Control",
+        "order": "Control000",
+        "group": "",
+        "permission": 2,
+        "rule":0,
+        "label": "Indi widgets to search",
+        "gridLimit":2000,
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":true,
+        "hasprofile":false,
+        "posticon1":"autorenew",
+        "posticon2":"check_circle_outline",
+        "e": {
+            "dpvsearchid": {
+                "directedit":true,
+                "autoupdate":true,
+                "type":"string",
+                "order": "1",
+                "label": "Device - Property - Element (id)"
+            },
+            "dpvsearchlab": {
+                "directedit":true,
+                "autoupdate":true,
+                "type":"string",
+                "order": "2",
+                "label": "Device - Property - Element (label)"
+            }
+
+        }
+    }
+
+}
+}
