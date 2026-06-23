@@ -211,6 +211,7 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     {
         connect(&mSystemWatchTimer, &QTimer::timeout, this, &Controller::onSystemWatch);
         mSystemWatchTimer.start(mSystemWatchInterval * 1000);
+        mNetTimer.start();
         logInfo("System watch started, interval: %1s", {mSystemWatchInterval});
     }
 }
@@ -1343,6 +1344,89 @@ void Controller::onSystemWatch()
             cpu["load_15m"] = p.value(2).toDouble();
             data["cpu"] = cpu;
         }
+    }
+
+    // --- Network (throughput) ---
+    {
+        QFile f("/proc/net/dev");
+        if (f.open(QIODevice::ReadOnly))
+        {
+            const double elapsedSec = mNetTimer.restart() / 1000.0;
+            const QStringList lines = QString(f.readAll()).split('\n');
+            f.close();
+            QVariantList interfaces;
+            for (const QString &raw : lines)
+            {
+                const QString line = raw.simplified();
+                if (!line.contains(':')) continue;
+                const QString iface = line.section(':', 0, 0).simplified();
+                if (iface == "lo") continue;
+                const QStringList fields = line.section(':', 1).simplified().split(' ');
+                if (fields.size() < 9) continue;
+                const quint64 rx = fields.value(0).toULongLong();
+                const quint64 tx = fields.value(8).toULongLong();
+                QVariantMap net;
+                net["iface"] = iface;
+                if (mNetPrevRx.contains(iface) && elapsedSec > 0)
+                {
+                    net["rx_kbps"] = (rx - mNetPrevRx[iface]) / 1024.0 / elapsedSec;
+                    net["tx_kbps"] = (tx - mNetPrevTx[iface]) / 1024.0 / elapsedSec;
+                }
+                else
+                {
+                    net["rx_kbps"] = 0.0;
+                    net["tx_kbps"] = 0.0;
+                }
+                mNetPrevRx[iface] = rx;
+                mNetPrevTx[iface] = tx;
+                interfaces.append(net);
+            }
+            data["network"] = interfaces;
+        }
+    }
+
+    // --- CPU Temperature (hwmon: coretemp=Intel, k10temp=AMD) ---
+    {
+        static const QStringList cpuSensors = {"coretemp", "k10temp"};
+        QDir hwmonDir("/sys/class/hwmon");
+        const QStringList hwmons = hwmonDir.entryList(QStringList() << "hwmon*", QDir::Dirs);
+        QVariantList temperatures;
+        for (const QString &hwmon : hwmons)
+        {
+            const QString base = "/sys/class/hwmon/" + hwmon;
+            QFile nameFile(base + "/name");
+            if (!nameFile.open(QIODevice::ReadOnly)) continue;
+            const QString name = QString(nameFile.readAll()).simplified();
+            nameFile.close();
+            if (!cpuSensors.contains(name)) continue;
+
+            // Read all temp*_input files in this hwmon
+            QDir dir(base);
+            const QStringList inputs = dir.entryList(QStringList() << "temp*_input", QDir::Files);
+            for (const QString &inputFile : inputs)
+            {
+                QFile tempFile(base + "/" + inputFile);
+                if (!tempFile.open(QIODevice::ReadOnly)) continue;
+                const int milliC = QString(tempFile.readAll()).simplified().toInt();
+                tempFile.close();
+
+                // Try to read the matching label (temp1_input -> temp1_label)
+                QString label = name;
+                const QString labelName = QString(inputFile).replace("_input", "_label");
+                QFile labelFile(base + "/" + labelName);
+                if (labelFile.open(QIODevice::ReadOnly))
+                {
+                    label = QString(labelFile.readAll()).simplified();
+                    labelFile.close();
+                }
+
+                QVariantMap t;
+                t["type"]   = label;
+                t["temp_c"] = milliC / 1000.0;
+                temperatures.append(t);
+            }
+        }
+        data["temperatures"] = temperatures;
     }
 
     // --- Disks ---
