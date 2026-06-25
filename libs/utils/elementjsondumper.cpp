@@ -282,9 +282,11 @@ void ElementJsonDumper::visit(ElementVideo *pElement, QVariantMap &data, bool &e
 {
     Q_UNUSED(data);
     Q_UNUSED(emitEvent);
+    QJsonObject videodata;
     QJsonObject json = dumpElementCommons(pElement);
+    videodata["url"] = pElement->value().url;
     json["type"] = "video";
-    json["url"] = pElement->value().url;
+    json["value"] = videodata;
     mResult = json;
 }
 void ElementJsonDumper::visit(ElementPrg *pElement, QVariantMap &data, bool &emitEvent)

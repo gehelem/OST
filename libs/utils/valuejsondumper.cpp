@@ -113,9 +113,9 @@ void ValueJsonDumper::visit(ValueImg *  pValue)
 };
 void ValueJsonDumper::visit(ValueVideo *  pValue)
 {
-    Q_UNUSED(pValue)
-    //mResult = pValue->value;
-    mResult = "to be implemented";
+    QJsonObject ob;
+    ob["url"] = pValue->value.url;
+    mResult = ob;
 };
 void ValueJsonDumper::visit(ValuePrg * pValue)
 {
