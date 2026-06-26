@@ -1,0 +1,13 @@
+<map id="libs/stellarsolver/stellarsolver/sep/convolve.cpp" name="libs/stellarsolver/stellarsolver/sep/convolve.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="18,5,242,45"/>
+<area shape="rect" id="Node000002" href="$sep_8h.html" title=" " alt="" coords="5,93,63,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="108,48,60,87,57,82,105,43"/>
+<area shape="rect" id="Node000003" href="$sepcore_8h.html" title=" " alt="" coords="87,93,173,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="133,46,133,79,127,79,127,46"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="197,93,260,119"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="156,43,205,82,202,87,152,48"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="49,167,115,192"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="124,121,100,157,95,154,120,118"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="139,167,217,192"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="140,118,165,154,160,157,136,121"/>
+</map>

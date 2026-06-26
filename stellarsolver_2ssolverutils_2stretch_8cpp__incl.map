@@ -1,0 +1,17 @@
+<map id="libs/stellarsolver/ssolverutils/stretch.cpp" name="libs/stellarsolver/ssolverutils/stretch.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="175,5,352,45"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,93,113,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="215,48,103,91,101,86,214,43"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="137,93,205,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="243,48,197,86,194,82,239,44"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="230,93,297,119"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="266,46,266,79,261,79,261,46"/>
+<area shape="rect" id="Node000005" href="$sep_8h.html" title=" " alt="" coords="321,93,405,119"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="289,43,339,82,336,87,286,48"/>
+<area shape="rect" id="Node000006" href="$stellarsolver_2ssolverutils_2stretch_8h.html" title=" " alt="" coords="429,93,508,119"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="313,43,426,86,425,91,312,48"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="381,167,455,192"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="462,121,436,157,432,154,458,117"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="479,167,557,192"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="479,117,504,154,500,157,475,121"/>
+</map>

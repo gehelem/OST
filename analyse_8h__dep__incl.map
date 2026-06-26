@@ -1,0 +1,11 @@
+<map id="libs/stellarsolver/stellarsolver/sep/analyse.h" name="libs/stellarsolver/stellarsolver/sep/analyse.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="373,5,574,45"/>
+<area shape="rect" id="Node000002" href="$analyse_8cpp.html" title=" " alt="" coords="5,93,221,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="382,51,193,96,192,91,381,46"/>
+<area shape="rect" id="Node000003" href="$deblend_8cpp.html" title=" " alt="" coords="246,93,463,133"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="437,56,382,95,379,91,434,51"/>
+<area shape="rect" id="Node000004" href="$extract_8cpp.html" title=" " alt="" coords="488,93,699,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="513,51,568,91,565,95,510,56"/>
+<area shape="rect" id="Node000005" href="$lutz_8cpp.html" title=" " alt="" coords="723,93,912,133"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="563,46,743,91,741,96,561,51"/>
+</map>

@@ -1,0 +1,15 @@
+<map id="FITSImage::Statistic" name="FITSImage::Statistic">
+<area shape="rect" id="Node000001" title=" " alt="" coords="305,207,449,272"/>
+<area shape="rect" id="Node000002" href="$classdouble.html" title=" " alt="" coords="5,5,64,71"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="31,71,28,98,29,128,36,156,51,181,67,192,89,202,149,217,220,227,289,232,289,238,220,232,148,222,87,207,64,197,47,184,31,158,24,128,23,98,25,71"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="93,5,160,71"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="122,71,118,98,118,127,124,156,138,181,161,196,198,209,290,226,289,231,197,214,159,201,134,184,119,158,113,127,113,97,116,70"/>
+<area shape="rect" id="Node000004" href="$classint.html" title=" " alt="" coords="295,5,326,71"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="304,71,298,125,300,154,309,182,316,193,312,196,304,184,295,155,293,125,299,70"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="408,5,467,71"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="439,71,434,125,419,184,414,193,409,191,413,182,429,124,434,71"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="491,5,557,71"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="524,72,512,127,501,157,483,184,465,202,461,198,479,181,496,155,507,126,519,71"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="583,5,641,71"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="616,71,610,128,600,158,582,184,557,205,528,220,497,230,466,237,465,231,496,225,526,215,554,201,578,181,595,156,605,127,611,71"/>
+</map>

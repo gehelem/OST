@@ -1,0 +1,17 @@
+<map id="libs/stellarsolver/stellarsolver/astrometry/util/os&#45;features.c" name="libs/stellarsolver/stellarsolver/astrometry/util/os&#45;features.c">
+<area shape="rect" id="Node000001" title=" " alt="" coords="139,5,321,60"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,108,76,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="173,62,79,105,77,100,171,58"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="100,108,171,133"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="203,62,160,101,156,97,199,58"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="195,108,265,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="233,60,233,94,227,94,227,60"/>
+<area shape="rect" id="Node000005" href="$os-features_8h.html" title=" " alt="" coords="289,108,397,133"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="266,58,318,97,315,102,263,62"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="422,108,497,133"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="301,58,417,101,415,106,299,63"/>
+<area shape="rect" id="Node000006" href="$os-features-config_8h.html" title=" " alt="" coords="176,181,348,221"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="333,135,293,174,289,170,329,132"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="372,189,475,214"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="357,132,403,177,400,181,353,135"/>
+</map>

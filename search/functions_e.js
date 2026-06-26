@@ -1,23 +1,13 @@
 var searchData=
 [
-  ['parseheader_0',['parseHeader',['../classfileio.html#ad58922db52d367a8ff7721012ae667e3',1,'fileio']]],
-  ['permission_1',['permission',['../classOST_1_1PropertyBase.html#ab2b11ec778a97bec80c7c5f6e2c7b88d',1,'OST::PropertyBase']]],
-  ['planner_2',['Planner',['../classPlanner.html#aca149aeddccdee035bb0cbc6e0c8835b',1,'Planner']]],
-  ['polar_3',['Polar',['../classPolar.html#ad9ac0a592609b6884bd7b3c6e04180b4',1,'Polar']]],
-  ['polardone_4',['PolarDone',['../classPolar.html#ac080629482d42f2b4fd13041edbb7da6',1,'Polar']]],
-  ['polynomialfit_5',['polynomialfit',['../guider_2polynomialfit_8h.html#ac0c22927c76cb505b3a94793f85e2878',1,'polynomialfit(int obs, int degree, double *dx, double *dy, double *store):&#160;polynomialfit.cpp'],['../guider_2polynomialfit_8cpp.html#ac0c22927c76cb505b3a94793f85e2878',1,'polynomialfit(int obs, int degree, double *dx, double *dy, double *store):&#160;polynomialfit.cpp'],['../focus_2polynomialfit_8h.html#ac0c22927c76cb505b3a94793f85e2878',1,'polynomialfit(int obs, int degree, double *dx, double *dy, double *store):&#160;polynomialfit.cpp'],['../focus_2polynomialfit_8cpp.html#ac0c22927c76cb505b3a94793f85e2878',1,'polynomialfit(int obs, int degree, double *dx, double *dy, double *store):&#160;polynomialfit.cpp']]],
-  ['populatecatalog_6',['populateCatalog',['../classDBManager.html#acc862d62263e85e4340d28dd22ed5466',1,'DBManager']]],
-  ['prgtype_7',['prgType',['../classOST_1_1ElementPrg.html#a2458578f721ba95ef4afdf9336ebd7f4',1,'OST::ElementPrg']]],
-  ['processfileevent_8',['processFileEvent',['../classWShandler.html#a25f62b93806e5138f398572ffd43cc18',1,'WShandler']]],
-  ['processfinished_9',['processFinished',['../classAllsky.html#a8b9964de209ae954cb7255a9f7e4bf70',1,'Allsky']]],
-  ['propertybase_10',['PropertyBase',['../classOST_1_1PropertyBase.html#a5e9c2941268c2ccf597dac8db389dd8e',1,'OST::PropertyBase']]],
-  ['propertyfactory_11',['PropertyFactory',['../classOST_1_1PropertyFactory.html#a83b156ee5416a916173d661ae638c947',1,'OST::PropertyFactory']]],
-  ['propertyjsondumper_12',['PropertyJsonDumper',['../classOST_1_1PropertyJsonDumper.html#a8e56c944cfad8def0eb6ba45522a844f',1,'OST::PropertyJsonDumper']]],
-  ['propertymulti_13',['PropertyMulti',['../classOST_1_1PropertyMulti.html#ad4b28df72a221cde9e8f8d6f6ad9891b',1,'OST::PropertyMulti']]],
-  ['propertytextdumper_14',['PropertyTextDumper',['../classOST_1_1PropertyTextDumper.html#a7a2f39c5ad399ffcd2ffb2ea8a951c1e',1,'OST::PropertyTextDumper']]],
-  ['propertyupdate_15',['PropertyUpdate',['../classOST_1_1PropertyUpdate.html#a2f16911b6e39789e9b8cb6fd6f5dec7c',1,'OST::PropertyUpdate']]],
-  ['propertyvisitor_16',['PropertyVisitor',['../classOST_1_1PropertyVisitor.html#ac8822107e867c4ed401f3d8b6a7bb38d',1,'OST::PropertyVisitor']]],
-  ['prpevent_17',['prpEvent',['../classOST_1_1PropertyBase.html#a23a8d90d6372523be1ea5e5038a2c6f0',1,'OST::PropertyBase']]],
-  ['pulsesdone_18',['PulsesDone',['../classGuider.html#af297342c2c56d9a5ab08ece680e9db54',1,'Guider']]],
-  ['push_19',['push',['../classOST_1_1PropertyMulti.html#ab43d22da58aef04621e4406eafb019de',1,'OST::PropertyMulti']]]
+  ['navigator_0',['Navigator',['../classNavigator.html#ad988b455cbef43c56b15276a553ff037',1,'Navigator']]],
+  ['new_1',['new',['../bl-nl_8h.html#afaadc5c4f34be39fc30fb9e4b2a55625',1,'new(int blocksize):&#160;bl-nl.c'],['../bl-nl_8c.html#a4626590725af6eadd988bb6a7f403e8e',1,'new(int blocksize):&#160;bl-nl.c']]],
+  ['new_5fexisting_2',['new_existing',['../bl-nl_8h.html#a3f65eb47f334ec4560a5d9de7fca2d65',1,'new_existing(nl *list, int blocksize):&#160;bl-nl.c'],['../bl-nl_8c.html#a3f65eb47f334ec4560a5d9de7fca2d65',1,'new_existing(nl *list, int blocksize):&#160;bl-nl.c']]],
+  ['newimage_3',['newimage',['../classDummy.html#ababd11e0e6c1f739459384c11aafb686',1,'Dummy::newImage()'],['../classInspector.html#a13d3464d2f956a8d43ea07cd33a66dda',1,'Inspector::newImage()'],['../classNavigator.html#a1628d3467ed1a6885a237bf4b06e3b4f',1,'Navigator::newImage()']]],
+  ['newline_4',['newLine',['../classOST_1_1PropertyMulti.html#a510189387b03ced03e2486ea3af3fbfd',1,'OST::PropertyMulti']]],
+  ['nextframe_5',['NextFrame',['../classInspector.html#af36df955ed63f5148f45a01845e290b0',1,'Inspector']]],
+  ['nextloop_6',['NextLoop',['../classInspector.html#a0940f6beac03017254e33ac25618249c',1,'Inspector']]],
+  ['normal_7',['normal',['../classRotations_1_1V3.html#ad4ed81b579ff2215995b3f00add45488',1,'Rotations::V3']]],
+  ['normalize_8',['normalize',['../mathutil_8h.html#afcbc2508770de0d12c1470fd3387c8d5',1,'mathutil.h']]],
+  ['normalize_5f3_9',['normalize_3',['../mathutil_8h.html#ad93ca9505349e8d284cf0b90d629077b',1,'mathutil.h']]]
 ];

@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['loglevel_0',['LogLevel',['../namespaceOST.html#abfdb6d02db64443c1b99449b3b945ec4',1,'OST']]],
-  ['lovscope_1',['LovScope',['../namespaceOST.html#a21df97880469ec5a401e1d26e4f49254',1,'OST']]]
+  ['evtype_0',['EvType',['../namespaceOST.html#a0751cbe531343f15a2486bbbdaa84c56',1,'OST']]],
+  ['extevtype_1',['ExtEvType',['../namespaceOST.html#a85e4aeb46582453a0f92d05a44e857a4',1,'OST']]],
+  ['extractortype_2',['ExtractorType',['../namespaceSSolver.html#a302b1d45f14b506cf70f1b16b8918841',1,'SSolver']]]
 ];

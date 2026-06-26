@@ -1,0 +1,26 @@
+<map id="libs/stellarsolver/stellarsolver/sep/extract.c" name="libs/stellarsolver/stellarsolver/sep/extract.c">
+<area shape="rect" id="Node000001" title=" " alt="" coords="222,5,417,45"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,93,73,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="253,48,88,94,86,89,252,43"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="98,93,165,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="275,48,173,90,171,85,273,43"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="189,93,260,119"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="298,48,251,86,248,82,295,43"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="284,93,355,119"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="322,46,322,79,317,79,317,46"/>
+<area shape="rect" id="Node000006" href="$sep_8h.html" title=" " alt="" coords="341,167,399,192"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="339,44,355,66,369,92,375,123,375,153,370,153,369,124,363,94,351,69,335,47"/>
+<area shape="rect" id="Node000007" href="$sepcore_8h.html" title=" " alt="" coords="423,167,509,192"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="342,44,391,91,449,154,445,158,387,95,338,47"/>
+<area shape="rect" id="Node000010" href="$extract_8h.html" title=" " alt="" coords="481,93,561,119"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="369,43,479,86,477,91,367,48"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="513,240,579,265"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="481,190,525,229,521,233,477,194"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="411,240,489,265"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="466,193,458,227,453,226,461,192"/>
+<area shape="poly" id="edge10_Node000010_Node000006" title=" " alt="" coords="498,121,408,163,406,158,495,116"/>
+<area shape="poly" id="edge11_Node000010_Node000007" title=" " alt="" coords="514,121,485,157,481,154,510,117"/>
+<area shape="poly" id="edge13_Node000010_Node000008" title=" " alt="" coords="525,119,544,226,539,227,520,120"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="584,167,655,192"/>
+<area shape="poly" id="edge12_Node000010_Node000011" title=" " alt="" coords="538,117,594,156,591,161,535,121"/>
+</map>

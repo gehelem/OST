@@ -1,0 +1,16 @@
+<map id="libs/stellarsolver/stellarsolver/parameters.h" name="libs/stellarsolver/stellarsolver/parameters.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="18,5,217,45"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,93,80,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,47,65,85,61,81,97,44"/>
+<area shape="rect" id="Node000003" href="$stellarsolver__export_8h.html" title=" " alt="" coords="23,167,187,192"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="118,46,110,153,105,153,113,46"/>
+<area shape="rect" id="Node000004" href="$structuredefinitions_8h.html" title=" " alt="" coords="167,93,327,119"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="150,43,217,84,215,88,147,48"/>
+<area shape="poly" id="edge7_Node000004_Node000003" title=" " alt="" coords="225,121,142,163,139,158,223,116"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="211,167,282,192"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="249,119,249,153,244,153,244,119"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="306,167,374,192"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="263,117,316,156,312,160,260,121"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="398,167,469,192"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="278,116,391,159,389,164,276,121"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="ExtractorSolver" name="ExtractorSolver">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,119,227,844"/>
+<area shape="rect" id="Node000003" href="$classInternalExtractorSolver.html" title=" " alt="" coords="10,892,222,1217"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="119,857,119,892,113,892,113,857"/>
+<area shape="rect" id="Node000002" href="$classQThread.html" title=" " alt="" coords="81,5,151,71"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="119,84,119,118,113,118,113,84"/>
+<area shape="rect" id="Node000004" href="$classExternalExtractorSolver.html" title=" " alt="" coords="13,1265,219,1845"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="119,1231,119,1265,113,1265,113,1231"/>
+<area shape="rect" id="Node000005" href="$classOnlineSolver.html" title=" " alt="" coords="42,1893,190,2079"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="119,1859,119,1893,113,1893,113,1859"/>
+</map>

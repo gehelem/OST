@@ -1,0 +1,32 @@
+<map id="libs/stellarsolver/stellarsolver/astrometry/include/astrometry/fitsioutils.h" name="libs/stellarsolver/stellarsolver/astrometry/include/astrometry/fitsioutils.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="280,5,505,60"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="170,108,241,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="337,62,244,105,242,100,334,58"/>
+<area shape="rect" id="Node000003" href="$qfits__header_8h.html" title=" " alt="" coords="235,181,424,207"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="380,61,358,109,339,169,333,167,353,107,375,59"/>
+<area shape="rect" id="Node000008" href="$qfits__image_8h.html" title=" " alt="" coords="24,181,211,207"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="361,62,312,99,254,136,162,179,160,174,251,131,309,94,358,58"/>
+<area shape="rect" id="Node000009" href="$qfits__table_8h.html" title=" " alt="" coords="367,108,546,133"/>
+<area shape="poly" id="edge12_Node000001_Node000009" title=" " alt="" coords="414,58,442,95,437,99,410,62"/>
+<area shape="rect" id="Node000010" href="$keywords_8h.html" title=" " alt="" coords="570,108,742,133"/>
+<area shape="poly" id="edge18_Node000001_Node000010" title=" " alt="" coords="474,58,609,101,607,106,472,63"/>
+<area shape="rect" id="Node000011" href="$an-bool_8h.html" title=" " alt="" coords="766,108,925,133"/>
+<area shape="poly" id="edge19_Node000001_Node000011" title=" " alt="" coords="506,53,772,103,771,108,505,58"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="84,255,151,280"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="297,209,165,253,163,248,295,204"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="294,255,365,280"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="332,207,332,241,327,241,327,207"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="200,255,270,280"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="316,209,263,248,260,244,313,205"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="390,255,464,280"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="347,205,401,244,398,248,344,209"/>
+<area shape="poly" id="edge8_Node000008_Node000004" title=" " alt="" coords="120,207,120,241,115,241,115,207"/>
+<area shape="poly" id="edge9_Node000008_Node000005" title=" " alt="" coords="153,204,283,248,282,253,151,209"/>
+<area shape="poly" id="edge10_Node000008_Node000006" title=" " alt="" coords="138,204,205,245,203,250,135,209"/>
+<area shape="poly" id="edge11_Node000008_Node000007" title=" " alt="" coords="168,204,377,252,375,257,167,209"/>
+<area shape="poly" id="edge17_Node000009_Node000003" title=" " alt="" coords="437,136,364,177,361,172,435,131"/>
+<area shape="poly" id="edge13_Node000009_Node000004" title=" " alt="" coords="367,130,152,151,61,166,30,174,14,183,9,192,9,201,20,218,44,234,73,248,71,253,41,239,17,222,3,202,4,191,11,179,28,169,60,161,152,145,367,125"/>
+<area shape="poly" id="edge15_Node000009_Node000005" title=" " alt="" coords="468,132,486,167,489,188,483,208,466,222,441,235,379,256,378,251,439,230,463,218,478,205,484,188,481,169,463,135"/>
+<area shape="poly" id="edge14_Node000009_Node000006" title=" " alt="" coords="460,134,457,170,450,190,438,209,417,219,378,232,285,257,283,252,376,227,415,214,435,205,445,188,451,169,454,133"/>
+<area shape="poly" id="edge16_Node000009_Node000007" title=" " alt="" coords="481,131,503,145,524,163,537,184,538,196,533,208,509,235,479,252,476,248,506,230,529,205,532,195,532,186,520,166,500,149,478,136"/>
+</map>

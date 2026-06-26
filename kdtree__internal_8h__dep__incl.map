@@ -1,0 +1,23 @@
+<map id="libs/stellarsolver/stellarsolver/astrometry/libkd/kdtree_internal.h" name="libs/stellarsolver/stellarsolver/astrometry/libkd/kdtree_internal.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="315,5,497,60"/>
+<area shape="rect" id="Node000002" href="$kdtree_8c.html" title=" " alt="" coords="5,108,188,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="313,67,178,110,176,105,312,62"/>
+<area shape="rect" id="Node000003" href="$kdtree__dim_8c.html" title=" " alt="" coords="212,108,395,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="371,72,332,110,328,106,368,68"/>
+<area shape="rect" id="Node000004" href="$kdtree__fits__io_8c.html" title=" " alt="" coords="419,108,601,163"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="445,68,485,106,481,110,441,72"/>
+<area shape="rect" id="Node000005" href="$kdtree__internal_8c.html" title=" " alt="" coords="625,108,808,163"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="501,62,637,105,635,110,499,67"/>
+<area shape="rect" id="Node000006" href="$kdint__ddd_8c.html" title=" " alt="" coords="108,211,291,265"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="612,166,525,181,456,190,389,198,304,213,292,216,291,211,303,208,388,193,456,184,524,175,611,160"/>
+<area shape="rect" id="Node000007" href="$kdint__dds_8c.html" title=" " alt="" coords="315,211,497,265"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="623,169,488,213,486,208,622,164"/>
+<area shape="rect" id="Node000008" href="$kdint__ddu_8c.html" title=" " alt="" coords="521,211,704,265"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="681,174,642,212,638,209,678,170"/>
+<area shape="rect" id="Node000009" href="$kdint__dss_8c.html" title=" " alt="" coords="728,211,911,265"/>
+<area shape="poly" id="edge8_Node000005_Node000009" title=" " alt="" coords="755,170,794,209,791,212,751,174"/>
+<area shape="rect" id="Node000010" href="$kdint__duu_8c.html" title=" " alt="" coords="935,211,1117,265"/>
+<area shape="poly" id="edge9_Node000005_Node000010" title=" " alt="" coords="811,164,946,208,945,213,809,169"/>
+<area shape="rect" id="Node000011" href="$kdint__fff_8c.html" title=" " alt="" coords="1141,211,1324,265"/>
+<area shape="poly" id="edge10_Node000005_Node000011" title=" " alt="" coords="822,151,969,176,1131,208,1142,210,1140,216,1129,213,968,181,821,156"/>
+</map>

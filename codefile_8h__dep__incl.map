@@ -1,0 +1,10 @@
+<map id="libs/stellarsolver/stellarsolver/astrometry/include/astrometry/codefile.h" name="libs/stellarsolver/stellarsolver/astrometry/include/astrometry/codefile.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="54,5,270,60"/>
+<area shape="rect" id="Node000002" href="$quad-utils_8c.html" title=" " alt="" coords="5,225,188,280"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="142,73,126,109,110,171,102,225,97,224,105,170,121,107,137,71"/>
+<area shape="rect" id="Node000003" href="$quad-utils_8h.html" title=" " alt="" coords="135,108,320,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="188,71,209,106,205,109,183,74"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="178,188,130,227,127,223,175,184"/>
+<area shape="rect" id="Node000004" href="$solver_8c.html" title=" " alt="" coords="212,225,395,280"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="261,187,287,224,283,227,257,190"/>
+</map>

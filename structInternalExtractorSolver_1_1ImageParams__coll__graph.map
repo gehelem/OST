@@ -1,0 +1,12 @@
+<map id="InternalExtractorSolver::ImageParams" name="InternalExtractorSolver::ImageParams">
+<area shape="rect" id="Node000001" title=" " alt="" coords="75,379,239,459"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,48,71"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="21,71,10,144,10,186,19,227,35,266,57,303,107,365,103,368,53,306,30,268,13,229,5,187,4,144,15,71"/>
+<area shape="rect" id="Node000004" href="$structFITSImage_1_1Background.html" title=" " alt="" coords="73,163,241,228"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="39,70,55,104,77,137,91,151,87,154,73,140,50,106,35,72"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="265,163,332,228"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="299,229,287,291,275,325,257,356,245,369,241,366,252,353,270,323,282,289,294,228"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="160,228,160,362,155,362,155,228"/>
+<area shape="rect" id="Node000005" href="$classint.html" title=" " alt="" coords="142,5,173,71"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="160,71,160,146,155,146,155,71"/>
+</map>

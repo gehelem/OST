@@ -1,0 +1,22 @@
+<map id="libs/stellarsolver/stellarsolver/wcsdata.h" name="libs/stellarsolver/stellarsolver/wcsdata.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="157,5,335,45"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,93,79,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="198,48,86,91,84,86,196,43"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="103,93,157,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="219,48,160,88,157,83,216,43"/>
+<area shape="rect" id="Node000004" href="$sip_8h.html" title=" " alt="" coords="181,93,311,119"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="249,46,249,79,243,79,243,46"/>
+<area shape="rect" id="Node000006" href="$stellarsolver__export_8h.html" title=" " alt="" coords="267,167,431,192"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="276,44,301,65,324,92,339,122,347,152,342,154,334,124,320,95,298,69,273,48"/>
+<area shape="rect" id="Node000007" href="$structuredefinitions_8h.html" title=" " alt="" coords="410,93,570,119"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="305,43,442,86,440,92,304,48"/>
+<area shape="rect" id="Node000005" href="$an-bool_8h.html" title=" " alt="" coords="84,167,243,192"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="234,121,189,160,186,155,231,117"/>
+<area shape="poly" id="edge10_Node000007_Node000006" title=" " alt="" coords="468,121,385,163,383,158,466,116"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="455,167,525,192"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="493,119,493,153,487,153,487,119"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="549,167,617,192"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="507,117,559,156,556,160,503,121"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="641,167,712,192"/>
+<area shape="poly" id="edge9_Node000007_Node000010" title=" " alt="" coords="521,116,634,159,633,164,519,121"/>
+</map>

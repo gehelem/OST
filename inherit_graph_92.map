@@ -1,0 +1,11 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$classQThread.html" title=" " alt="" coords="5,5,83,31"/>
+<area shape="rect" id="Node000001" href="$classExtractorSolver.html" title=" " alt="" coords="131,5,253,31"/>
+<area shape="poly" id="edge118_Node000000_Node000001" title=" " alt="" coords="96,15,130,15,130,21,96,21"/>
+<area shape="rect" id="Node000002" href="$classInternalExtractorSolver.html" title=" " alt="" coords="301,5,473,31"/>
+<area shape="poly" id="edge119_Node000001_Node000002" title=" " alt="" coords="267,15,301,15,301,21,267,21"/>
+<area shape="rect" id="Node000003" href="$classExternalExtractorSolver.html" title=" " alt="" coords="521,5,697,31"/>
+<area shape="poly" id="edge120_Node000002_Node000003" title=" " alt="" coords="487,15,521,15,521,21,487,21"/>
+<area shape="rect" id="Node000004" href="$classOnlineSolver.html" title=" " alt="" coords="745,5,851,31"/>
+<area shape="poly" id="edge121_Node000003_Node000004" title=" " alt="" coords="711,15,745,15,745,21,711,21"/>
+</map>

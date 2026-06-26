@@ -1,0 +1,25 @@
+<map id="libs/stellarsolver/stellarsolver/astrometry/include/astrometry/qfits_error.h" name="libs/stellarsolver/stellarsolver/astrometry/include/astrometry/qfits_error.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="1039,5,1221,75"/>
+<area shape="rect" id="Node000002" href="$anqfits_8c.html" title=" " alt="" coords="5,123,188,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1025,48,864,56,658,70,429,93,200,125,189,127,188,122,199,120,429,88,658,65,864,51,1024,42"/>
+<area shape="rect" id="Node000003" href="$qfits__card_8c.html" title=" " alt="" coords="212,123,395,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1025,51,745,77,575,98,406,125,396,127,394,122,406,120,575,93,744,72,1025,46"/>
+<area shape="rect" id="Node000004" href="$qfits__convert_8c.html" title=" " alt="" coords="419,123,601,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1025,58,833,86,613,125,602,128,601,122,612,120,832,81,1024,52"/>
+<area shape="rect" id="Node000005" href="$qfits__error_8c.html" title=" " alt="" coords="625,123,808,177"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1026,71,809,127,807,122,1024,66"/>
+<area shape="rect" id="Node000006" href="$qfits__header_8c.html" title=" " alt="" coords="832,123,1015,177"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1055,83,975,125,973,120,1052,79"/>
+<area shape="rect" id="Node000007" href="$qfits__image_8c.html" title=" " alt="" coords="1039,123,1221,177"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1133,88,1133,122,1127,122,1127,88"/>
+<area shape="rect" id="Node000008" href="$qfits__memory_8c.html" title=" " alt="" coords="1245,123,1428,177"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1208,79,1287,120,1285,125,1205,83"/>
+<area shape="rect" id="Node000009" href="$qfits__rw_8c.html" title=" " alt="" coords="1452,123,1635,177"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1236,66,1453,122,1451,127,1234,71"/>
+<area shape="rect" id="Node000010" href="$qfits__table_8c.html" title=" " alt="" coords="1659,123,1841,177"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1236,52,1428,81,1648,120,1659,122,1658,128,1647,125,1427,86,1235,58"/>
+<area shape="rect" id="Node000011" href="$qfits__tools_8c.html" title=" " alt="" coords="1865,123,2048,177"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1235,46,1516,72,1685,93,1854,120,1866,122,1864,127,1854,125,1685,98,1515,77,1235,51"/>
+<area shape="rect" id="Node000012" href="$fitsioutils_8c.html" title=" " alt="" coords="2072,123,2255,177"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="1236,42,1396,51,1602,65,1831,88,2061,120,2072,122,2071,127,2060,125,1831,93,1602,70,1396,56,1235,48"/>
+</map>

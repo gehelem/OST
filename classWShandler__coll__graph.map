@@ -1,10 +1,10 @@
 <map id="WShandler" name="WShandler">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,1023,180,1268"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,943,180,1188"/>
 <area shape="rect" id="Node000002" href="$classQObject.html" title=" " alt="" coords="54,5,121,71"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="90,85,95,1022,89,1022,85,85"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="90,85,95,942,89,942,85,85"/>
 <area shape="rect" id="Node000004" href="$classDatastore.html" title="Class to provide properties management for OST modules." alt="" coords="115,120,262,565"/>
 <area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="105,83,118,121,113,123,100,85"/>
-<area shape="rect" id="Node000003" href="$classDBManager.html" title=" " alt="" coords="109,615,284,960"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="149,961,135,1008,130,1006,144,959"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="196,579,196,614,191,614,190,579"/>
+<area shape="rect" id="Node000003" href="$classDBManager.html" title=" " alt="" coords="109,615,281,880"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="155,881,140,928,135,926,150,879"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="195,579,196,614,190,614,190,579"/>
 </map>

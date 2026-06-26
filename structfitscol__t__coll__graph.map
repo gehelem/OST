@@ -1,0 +1,9 @@
+<map id="fitscol_t" name="fitscol_t">
+<area shape="rect" id="Node000001" title=" " alt="" coords="133,192,198,257"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,48,71"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="39,70,59,118,90,166,121,194,117,198,86,170,55,120,34,72"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="73,5,258,71"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="168,71,168,175,163,175,163,71"/>
+<area shape="rect" id="Node000004" href="$classint.html" title=" " alt="" coords="282,5,313,71"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="288,72,266,120,234,170,213,192,209,188,230,166,261,117,283,70"/>
+</map>

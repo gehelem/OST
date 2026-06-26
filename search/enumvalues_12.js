@@ -1,5 +1,21 @@
 var searchData=
 [
-  ['warning_0',['Warning',['../namespaceOST.html#abfdb6d02db64443c1b99449b3b945ec4a0eaadb4fcb48a0a0ed7bc9868be9fbaa',1,'OST']]],
-  ['writeonly_1',['WriteOnly',['../namespaceOST.html#a9be35f589fb7dd8d44169b078554ad72a78dd3ff2982e959be4f01327797af13e',1,'OST']]]
+  ['tfits_5fascii_5ftype_5fa_0',['TFITS_ASCII_TYPE_A',['../qfits__table_8h.html#a8038859097effa54bc5fc1c1074d9844a471d4a4632b2d2c1a8e9cfd4bed29dd1',1,'qfits_table.h']]],
+  ['tfits_5fascii_5ftype_5fd_1',['TFITS_ASCII_TYPE_D',['../qfits__table_8h.html#a8038859097effa54bc5fc1c1074d9844af67cc9c9f9f1b8b53c3a1994f7ba8e03',1,'qfits_table.h']]],
+  ['tfits_5fascii_5ftype_5fe_2',['TFITS_ASCII_TYPE_E',['../qfits__table_8h.html#a8038859097effa54bc5fc1c1074d9844a69e803a4002fa102244c73035b0077b4',1,'qfits_table.h']]],
+  ['tfits_5fascii_5ftype_5ff_3',['TFITS_ASCII_TYPE_F',['../qfits__table_8h.html#a8038859097effa54bc5fc1c1074d9844a1d3baf48bc5a8b1061e922ebb9b1a45f',1,'qfits_table.h']]],
+  ['tfits_5fascii_5ftype_5fi_4',['TFITS_ASCII_TYPE_I',['../qfits__table_8h.html#a8038859097effa54bc5fc1c1074d9844a293d2b56401e53ddabddc91b947eb607',1,'qfits_table.h']]],
+  ['tfits_5fbin_5ftype_5fa_5',['TFITS_BIN_TYPE_A',['../qfits__table_8h.html#a8038859097effa54bc5fc1c1074d9844a440826129fb511c74a75be244509cdee',1,'qfits_table.h']]],
+  ['tfits_5fbin_5ftype_5fb_6',['TFITS_BIN_TYPE_B',['../qfits__table_8h.html#a8038859097effa54bc5fc1c1074d9844abab42cdf8e863ea5e8c4610088da47e6',1,'qfits_table.h']]],
+  ['tfits_5fbin_5ftype_5fc_7',['TFITS_BIN_TYPE_C',['../qfits__table_8h.html#a8038859097effa54bc5fc1c1074d9844a27b560b68f0ec664dfdd3a7be822aa2a',1,'qfits_table.h']]],
+  ['tfits_5fbin_5ftype_5fd_8',['TFITS_BIN_TYPE_D',['../qfits__table_8h.html#a8038859097effa54bc5fc1c1074d9844ac93e1a0b4a1e5d67fdd5dea4bf41b67a',1,'qfits_table.h']]],
+  ['tfits_5fbin_5ftype_5fe_9',['TFITS_BIN_TYPE_E',['../qfits__table_8h.html#a8038859097effa54bc5fc1c1074d9844a655e84d4046310fe4d0a95e69c67b9b9',1,'qfits_table.h']]],
+  ['tfits_5fbin_5ftype_5fi_10',['TFITS_BIN_TYPE_I',['../qfits__table_8h.html#a8038859097effa54bc5fc1c1074d9844a8a1993054bb72181e6a04ca21f09bcaa',1,'qfits_table.h']]],
+  ['tfits_5fbin_5ftype_5fj_11',['TFITS_BIN_TYPE_J',['../qfits__table_8h.html#a8038859097effa54bc5fc1c1074d9844a79527303ee2c987208a302a442b73324',1,'qfits_table.h']]],
+  ['tfits_5fbin_5ftype_5fk_12',['TFITS_BIN_TYPE_K',['../qfits__table_8h.html#a8038859097effa54bc5fc1c1074d9844ae061c2a47199d41a4388b3b4516cea3f',1,'qfits_table.h']]],
+  ['tfits_5fbin_5ftype_5fl_13',['TFITS_BIN_TYPE_L',['../qfits__table_8h.html#a8038859097effa54bc5fc1c1074d9844a4bcc73a064563fde1ddb9a8da7b76dbd',1,'qfits_table.h']]],
+  ['tfits_5fbin_5ftype_5fm_14',['TFITS_BIN_TYPE_M',['../qfits__table_8h.html#a8038859097effa54bc5fc1c1074d9844a589a9df237d2d65c0bcc3953499685ab',1,'qfits_table.h']]],
+  ['tfits_5fbin_5ftype_5fp_15',['TFITS_BIN_TYPE_P',['../qfits__table_8h.html#a8038859097effa54bc5fc1c1074d9844aa1b70a272ce303d1b708897238d89486',1,'qfits_table.h']]],
+  ['tfits_5fbin_5ftype_5funknown_16',['TFITS_BIN_TYPE_UNKNOWN',['../qfits__table_8h.html#a8038859097effa54bc5fc1c1074d9844a468c44eba38682840244650f40f1e1b6',1,'qfits_table.h']]],
+  ['tfits_5fbin_5ftype_5fx_17',['TFITS_BIN_TYPE_X',['../qfits__table_8h.html#a8038859097effa54bc5fc1c1074d9844a6b8bd6bd1cb10e732942c71ad0401b18',1,'qfits_table.h']]]
 ];

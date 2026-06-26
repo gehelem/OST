@@ -1,0 +1,11 @@
+<map id="libs/stellarsolver/stellarsolver/astrometry/include/astrometry/log.h" name="libs/stellarsolver/stellarsolver/astrometry/include/astrometry/log.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="111,5,297,60"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,108,72,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="155,62,74,104,72,99,152,58"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="96,108,171,133"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="184,62,154,99,150,96,180,58"/>
+<area shape="rect" id="Node000004" href="$an-bool_8h.html" title=" " alt="" coords="195,108,354,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="228,58,258,96,254,99,224,62"/>
+<area shape="rect" id="Node000005" href="$astrometrylogger_8h.html" title=" " alt="" coords="379,108,525,133"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="281,58,407,101,405,106,279,63"/>
+</map>

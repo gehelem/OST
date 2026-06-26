@@ -1,0 +1,19 @@
+<map id="StellarSolverCliQuery" name="StellarSolverCliQuery">
+<area shape="rect" id="Node000001" title=" " alt="" coords="419,163,573,228"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,91,71"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="70,69,100,106,119,123,140,136,187,152,254,166,403,184,403,189,253,171,185,158,137,141,116,127,97,109,66,73"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="115,5,240,71"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="210,69,250,104,299,136,350,158,404,174,402,179,349,163,296,141,247,108,206,73"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="264,5,405,71"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="339,70,347,105,354,122,365,137,383,154,405,167,403,171,380,158,361,140,350,125,342,107,334,72"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="429,5,480,71"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="453,71,453,104,459,138,463,148,458,150,453,139,447,104,448,71"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="504,5,619,71"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="550,72,518,148,513,146,545,70"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="651,5,733,71"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="694,71,687,107,680,125,669,140,651,156,632,168,589,184,588,179,629,163,648,151,665,137,675,122,682,105,689,70"/>
+<area shape="rect" id="Node000008" href="$classQString.html" title=" " alt="" coords="758,5,821,71"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="784,72,768,108,757,126,742,141,707,163,668,178,628,188,590,194,589,189,627,183,666,173,704,158,738,137,752,122,764,105,779,70"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="871,5,1001,71"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="935,72,923,108,913,126,899,141,876,154,845,164,765,180,674,190,589,195,589,189,674,184,764,175,843,159,874,149,896,137,909,123,918,106,930,70"/>
+</map>

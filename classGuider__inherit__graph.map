@@ -1,15 +1,15 @@
 <map id="Guider" name="Guider">
-<area shape="rect" id="Node000001" title=" " alt="" coords="129,2121,293,2347"/>
-<area shape="rect" id="Node000002" href="$classIndiModule.html" title=" " alt="" coords="97,1568,324,2073"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="213,2088,213,2121,208,2121,208,2088"/>
-<area shape="rect" id="Node000003" href="$classBasemodule.html" title=" " alt="" coords="5,1005,224,1520"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="164,1533,170,1568,165,1568,159,1534"/>
-<area shape="rect" id="Node000004" href="$classDBManager.html" title=" " alt="" coords="27,612,202,957"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="117,971,117,1005,112,1005,112,971"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="129,2081,293,2307"/>
+<area shape="rect" id="Node000002" href="$classIndiModule.html" title=" " alt="" coords="97,1528,324,2033"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="213,2048,213,2081,208,2081,208,2048"/>
+<area shape="rect" id="Node000003" href="$classBasemodule.html" title=" " alt="" coords="5,925,224,1480"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="166,1493,171,1527,166,1528,160,1494"/>
+<area shape="rect" id="Node000004" href="$classDBManager.html" title=" " alt="" coords="29,612,201,877"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="117,891,117,925,112,925,112,891"/>
 <area shape="rect" id="Node000005" href="$classDatastore.html" title="Class to provide properties management for OST modules." alt="" coords="41,119,188,564"/>
 <area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="117,578,117,612,112,612,112,578"/>
 <area shape="rect" id="Node000006" href="$classQObject.html" title=" " alt="" coords="81,5,148,71"/>
 <area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="117,84,117,118,112,118,112,84"/>
-<area shape="rect" id="Node000007" title=" " alt="" coords="248,1230,368,1295"/>
-<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="303,1309,257,1568,252,1567,298,1308"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="248,1170,368,1235"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="303,1249,256,1528,251,1527,298,1248"/>
 </map>

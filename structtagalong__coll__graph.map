@@ -1,0 +1,11 @@
+<map id="tagalong" name="tagalong">
+<area shape="rect" id="Node000001" title=" " alt="" coords="245,177,316,243"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,191,71"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="115,70,139,111,173,151,201,172,231,187,229,192,198,176,170,155,135,114,110,72"/>
+<area shape="rect" id="Node000003" href="$classint.html" title=" " alt="" coords="215,5,245,71"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="227,71,226,111,234,152,239,162,234,164,229,154,220,111,222,71"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="311,5,354,71"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="328,72,306,154,303,163,298,161,301,153,323,70"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="390,5,443,71"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="415,72,403,113,393,135,380,155,358,176,332,191,329,187,354,172,376,152,389,133,398,112,410,70"/>
+</map>

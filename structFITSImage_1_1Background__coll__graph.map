@@ -1,0 +1,7 @@
+<map id="FITSImage::Background" name="FITSImage::Background">
+<area shape="rect" id="Node000001" title=" " alt="" coords="23,163,191,228"/>
+<area shape="rect" id="Node000002" href="$classint.html" title=" " alt="" coords="5,5,36,71"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="16,71,15,105,18,122,24,137,33,150,29,153,20,140,13,123,10,105,11,71"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="174,5,217,71"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="193,72,184,106,168,140,159,152,155,149,164,137,179,104,188,70"/>
+</map>

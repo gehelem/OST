@@ -1,0 +1,7 @@
+<map id="SEP::intersections" name="SEP::intersections">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,291,136,356"/>
+<area shape="rect" id="Node000002" href="$structSEP_1_1point.html" title=" " alt="" coords="31,148,110,213"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="73,213,73,274,68,274,68,213"/>
+<area shape="rect" id="Node000003" href="$classdouble.html" title=" " alt="" coords="41,5,100,71"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="73,71,73,131,68,131,68,71"/>
+</map>

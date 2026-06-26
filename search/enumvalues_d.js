@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['phd_0',['PHD',['../namespaceOST.html#a2bd59f1bb3735729a6381f7e5ec5970ca234638c4c2fb40fb207e6d1216d3193f',1,'OST']]],
-  ['pl_1',['PL',['../namespaceOST.html#a85e4aeb46582453a0f92d05a44e857a4a9b7d173b068dc4d5517bfae92d676437',1,'OST']]],
-  ['pr_2',['pr',['../namespaceOST.html#a0751cbe531343f15a2486bbbdaa84c56a64e1e1cbe1ca8e88ef3a838a3e7b57d6',1,'OST']]],
-  ['property_3',['Property',['../namespaceOST.html#abf84646f5719c77acb8d28232e102620a5ad234cb2cde4266195252a23ca7d84e',1,'OST']]],
-  ['ps_4',['ps',['../namespaceOST.html#a85e4aeb46582453a0f92d05a44e857a4ad3d4c5deb455ac79dd5ff47c88bd65d9',1,'OST::PS'],['../namespaceOST.html#a0751cbe531343f15a2486bbbdaa84c56a8812c36aa5ae336c2a77bf63211d899a',1,'OST::ps']]]
+  ['negative_0',['NEGATIVE',['../namespaceFITSImage.html#a29980d1c51dd35208b67b3f53c8faebda9dbb7ec03b558b173098a6b33a45920b',1,'FITSImage']]],
+  ['no_5fstage_1',['NO_STAGE',['../classOnlineSolver.html#a63c5c14f5b11f161f285b7ddc9073ef3a46e2fcd68ff8655379b3e7f3454f4551',1,'OnlineSolver']]],
+  ['none_2',['none',['../namespaceOST.html#a2bd59f1bb3735729a6381f7e5ec5970ca2a8a0ee258ef065c233f4121b7abd738',1,'OST']]],
+  ['nonobject_3',['NONOBJECT',['../namespaceSEP.html#a7c6c1216b8e64f32b65b40efa6c06c56acea5e4146aac4417989af3a1770c04c7',1,'SEP']]],
+  ['not_5fmulti_4',['NOT_MULTI',['../namespaceSSolver.html#ab8ee856ed2895c455a577da5e80fdcfcaa13aefa96f868975354d1f57fb673308',1,'SSolver']]]
 ];

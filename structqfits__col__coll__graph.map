@@ -1,0 +1,11 @@
+<map id="qfits_col" name="qfits_col">
+<area shape="rect" id="Node000001" title="Column object." alt="" coords="183,221,251,287"/>
+<area shape="rect" id="Node000002" href="$classint.html" title=" " alt="" coords="5,5,36,71"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="18,71,16,101,18,134,26,167,43,196,69,218,101,234,135,243,167,248,166,254,133,249,99,239,66,223,39,199,21,169,13,135,11,101,13,71"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="61,5,247,71"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="153,71,153,131,158,164,168,196,175,208,170,211,164,198,153,166,148,131,148,71"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="271,5,314,71"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="288,72,271,141,254,198,249,208,245,205,249,196,266,140,283,70"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="350,5,393,71"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="376,71,376,100,372,134,362,168,344,199,328,215,308,228,268,245,265,240,306,223,324,211,340,196,357,166,366,133,370,100,371,71"/>
+</map>

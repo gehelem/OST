@@ -1,0 +1,30 @@
+<map id="libs/stellarsolver/stellarsolver/astrometry/libkd/kdtree_internal_dualtree.c" name="libs/stellarsolver/stellarsolver/astrometry/libkd/kdtree_internal_dualtree.c">
+<area shape="rect" id="Node000001" title=" " alt="" coords="299,5,532,60"/>
+<area shape="rect" id="Node000002" href="$bl_8h.html" title=" " alt="" coords="268,181,315,207"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="397,62,311,172,307,169,393,59"/>
+<area shape="rect" id="Node000010" href="$errors_8h.html" title=" " alt="" coords="503,108,575,133"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="455,58,512,98,509,102,452,62"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="263,255,338,280"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="296,207,300,241,295,242,290,207"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="363,255,433,280"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="310,204,371,245,368,249,307,209"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="494,255,569,280"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="316,200,328,204,481,249,480,254,327,209,314,205"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="5,255,76,280"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="268,205,90,255,89,250,267,199"/>
+<area shape="rect" id="Node000007" href="$keywords_8h.html" title=" " alt="" coords="612,255,784,280"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="316,201,328,204,469,232,599,251,598,257,468,237,327,209,314,206"/>
+<area shape="rect" id="Node000008" href="$bl-nl_8h.html" title=" " alt="" coords="101,255,239,280"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="273,209,203,250,200,245,270,204"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="97,328,243,353"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="173,280,173,314,167,314,167,280"/>
+<area shape="poly" id="edge14_Node000010_Node000002" title=" " alt="" coords="504,134,329,184,327,179,502,129"/>
+<area shape="poly" id="edge10_Node000010_Node000005" title=" " alt="" coords="571,131,597,144,622,162,637,183,638,195,634,208,611,234,582,251,579,247,607,230,629,205,633,195,632,185,618,165,595,149,569,136"/>
+<area shape="poly" id="edge15_Node000010_Node000007" title=" " alt="" coords="573,131,614,150,653,179,676,210,691,240,687,243,672,212,649,183,611,155,571,136"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="745,181,811,207"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="576,130,732,176,730,181,575,135"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="339,181,435,207"/>
+<area shape="poly" id="edge12_Node000010_Node000012" title=" " alt="" coords="516,136,425,178,423,173,514,131"/>
+<area shape="rect" id="Node000013" href="$an-bool_8h.html" title=" " alt="" coords="460,181,619,207"/>
+<area shape="poly" id="edge13_Node000010_Node000013" title=" " alt="" coords="542,134,542,168,537,168,537,134"/>
+</map>

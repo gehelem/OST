@@ -1,0 +1,23 @@
+<map id="libs/stellarsolver/stellarsolver/astrometry/include/astrometry/mathutil.h" name="libs/stellarsolver/stellarsolver/astrometry/include/astrometry/mathutil.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="916,5,1136,60"/>
+<area shape="rect" id="Node000002" href="$blind_8c.html" title=" " alt="" coords="5,108,188,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="902,42,583,63,391,83,200,111,189,113,188,107,199,105,390,78,582,58,902,36"/>
+<area shape="rect" id="Node000003" href="$solver_8c.html" title=" " alt="" coords="212,108,395,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="902,47,671,71,538,89,406,111,396,113,394,108,406,105,537,84,671,66,902,41"/>
+<area shape="rect" id="Node000004" href="$tweak2_8c.html" title=" " alt="" coords="419,108,601,163"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="903,56,763,81,613,111,602,113,601,108,612,105,762,76,902,51"/>
+<area shape="rect" id="Node000005" href="$verify_8c.html" title=" " alt="" coords="625,108,808,163"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="933,67,798,110,796,105,932,62"/>
+<area shape="rect" id="Node000006" href="$fit-wcs_8c.html" title=" " alt="" coords="832,108,1015,163"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="991,72,952,110,948,106,988,68"/>
+<area shape="rect" id="Node000007" href="$healpix_8c.html" title=" " alt="" coords="1039,108,1221,163"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1065,68,1105,106,1101,110,1061,72"/>
+<area shape="rect" id="Node000008" href="$mathutil_8c.html" title=" " alt="" coords="1245,108,1428,163"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1121,62,1257,105,1255,110,1119,67"/>
+<area shape="rect" id="Node000009" href="$sip-utils_8c.html" title=" " alt="" coords="1452,108,1635,163"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1150,51,1290,76,1441,105,1452,108,1451,113,1440,111,1289,81,1149,56"/>
+<area shape="rect" id="Node000010" href="$sip_8c.html" title=" " alt="" coords="1659,108,1841,163"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1150,41,1382,66,1515,84,1648,105,1659,108,1658,113,1647,111,1515,89,1381,71,1149,47"/>
+<area shape="rect" id="Node000011" href="$starutil_8c.html" title=" " alt="" coords="1865,108,2048,163"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1150,36,1470,58,1663,78,1854,105,1866,107,1865,113,1854,111,1662,83,1470,63,1150,42"/>
+</map>

@@ -1,0 +1,16 @@
+<map id="libs/stellarsolver/stellarsolver/internalextractorsolver.h" name="libs/stellarsolver/stellarsolver/internalextractorsolver.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="438,5,709,45"/>
+<area shape="rect" id="Node000002" href="$externalextractorsolver_8h.html" title=" " alt="" coords="284,93,559,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="529,54,456,96,453,91,527,50"/>
+<area shape="rect" id="Node000007" href="$internalextractorsolver_8cpp.html" title=" " alt="" coords="583,93,870,133"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="620,50,694,91,692,96,618,54"/>
+<area shape="rect" id="Node000003" href="$externalextractorsolver_8cpp.html" title=" " alt="" coords="5,181,296,221"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="350,140,211,184,209,179,348,135"/>
+<area shape="rect" id="Node000004" href="$onlinesolver_8h.html" title=" " alt="" coords="320,181,523,221"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="424,147,424,181,419,181,419,147"/>
+<area shape="rect" id="Node000006" href="$stellarsolver_8cpp.html" title=" " alt="" coords="451,269,669,309"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="486,138,513,156,537,180,549,202,557,226,563,269,557,270,552,227,544,204,533,183,510,160,483,142"/>
+<area shape="rect" id="Node000005" href="$onlinesolver_8cpp.html" title=" " alt="" coords="209,269,426,309"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="389,232,342,271,339,267,386,228"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="465,226,531,267,528,272,462,231"/>
+</map>

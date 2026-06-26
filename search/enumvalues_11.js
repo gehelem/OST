@@ -1,4 +1,23 @@
 var searchData=
 [
-  ['value_0',['Value',['../namespaceOST.html#abf84646f5719c77acb8d28232e102620a689202409e48743b914713f96d93947c',1,'OST']]]
+  ['sa_0',['SA',['../namespaceOST.html#a85e4aeb46582453a0f92d05a44e857a4a3dd6b9265ff18f31dc30df59304b0ca7',1,'OST']]],
+  ['sdy_1',['SDY',['../namespaceOST.html#a2bd59f1bb3735729a6381f7e5ec5970cad556fd81bf4fb5d95ef013b8bf9affd2',1,'OST']]],
+  ['shape_5fauto_2',['SHAPE_AUTO',['../namespaceSSolver.html#a445dd6cfef8c5ffb3ef24af511280e73afa91ec5118c4ef9b376e87a65df52460',1,'SSolver']]],
+  ['shape_5fcircle_3',['SHAPE_CIRCLE',['../namespaceSSolver.html#a445dd6cfef8c5ffb3ef24af511280e73a38385f6a8600fd971fcf9e6daa7f414c',1,'SSolver']]],
+  ['shape_5fellipse_4',['SHAPE_ELLIPSE',['../namespaceSSolver.html#a445dd6cfef8c5ffb3ef24af511280e73a0d6b98ed66a97e22b6448248197d051d',1,'SSolver']]],
+  ['silent_5',['Silent',['../namespaceOST.html#abf84646f5719c77acb8d28232e102620a1e3332b2cd20d2d3db407a20f6913d0d',1,'OST']]],
+  ['single_5fthread_5fsolving_6',['SINGLE_THREAD_SOLVING',['../classSSolver_1_1Parameters.html#a49699a060c622f1ae020aa3cb7010c2ba39062b02cdbfb72b1e67469b82d95fef',1,'SSolver::Parameters']]],
+  ['sliderandvalue_7',['SliderAndValue',['../namespaceOST.html#ad6965fa6b47814dd2ed9a7215368f131a81981a99b5110ce75695f7a376b1136a',1,'OST']]],
+  ['slidernone_8',['SliderNone',['../namespaceOST.html#ad6965fa6b47814dd2ed9a7215368f131a3141ca269caf89a5330ddf85ee458e18',1,'OST']]],
+  ['slideronly_9',['SliderOnly',['../namespaceOST.html#ad6965fa6b47814dd2ed9a7215368f131a041c20ba72b0b02fb32a5ccd6d1eaa23',1,'OST']]],
+  ['small_5fstars_10',['SMALL_STARS',['../classSSolver_1_1Parameters.html#a49699a060c622f1ae020aa3cb7010c2ba9e3aec1efce91fe73522ffd5e329892f',1,'SSolver::Parameters']]],
+  ['solve_11',['SOLVE',['../namespaceSSolver.html#a7f38f610ed80421706e2730de4ced223a131bda25f0f389b00eb8e9e4991a7b55',1,'SSolver']]],
+  ['solver_5fastap_12',['SOLVER_ASTAP',['../namespaceSSolver.html#aaf16ecd9808b4997c794d9c8a6537924a82905329248cce445c87c5021e8b34c2',1,'SSolver']]],
+  ['solver_5flocalastrometry_13',['SOLVER_LOCALASTROMETRY',['../namespaceSSolver.html#aaf16ecd9808b4997c794d9c8a6537924a6cfa95c8acc8b739bd8cdffbf9e9164a',1,'SSolver']]],
+  ['solver_5fonlineastrometry_14',['SOLVER_ONLINEASTROMETRY',['../namespaceSSolver.html#aaf16ecd9808b4997c794d9c8a6537924a4a67535ce0b23e413465cff7928423c4',1,'SSolver']]],
+  ['solver_5fstellarsolver_15',['SOLVER_STELLARSOLVER',['../namespaceSSolver.html#aaf16ecd9808b4997c794d9c8a6537924a3e0e1b112f538f0cedb679489d5c804b',1,'SSolver']]],
+  ['solver_5fwatneyastrometry_16',['SOLVER_WATNEYASTROMETRY',['../namespaceSSolver.html#aaf16ecd9808b4997c794d9c8a6537924a66c1ea6ce4cfd8dccd3c108534150ae2',1,'SSolver']]],
+  ['spinner_17',['spinner',['../namespaceOST.html#a4f0f6d56fa87488f90f09dc5a77ecfd7a14878ee4737a35c57507a4fd28f7d9ef',1,'OST']]],
+  ['sv_18',['SV',['../namespaceOST.html#a85e4aeb46582453a0f92d05a44e857a4ad38212a0c0e98f678feaaa5a8b9167f5',1,'OST']]],
+  ['sxy_19',['SXY',['../namespaceOST.html#a2bd59f1bb3735729a6381f7e5ec5970cae871ecb3128117978e4ade283b3fcd63',1,'OST']]]
 ];

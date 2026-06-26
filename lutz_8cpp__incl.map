@@ -1,0 +1,29 @@
+<map id="libs/stellarsolver/stellarsolver/sep/lutz.cpp" name="libs/stellarsolver/stellarsolver/sep/lutz.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="182,5,372,45"/>
+<area shape="rect" id="Node000002" href="$lutz_8h.html" title=" " alt="" coords="90,93,149,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="240,48,156,89,154,85,238,43"/>
+<area shape="rect" id="Node000004" href="$sep_8h.html" title=" " alt="" coords="168,240,226,265"/>
+<area shape="poly" id="edge10_Node000001_Node000004" title=" " alt="" coords="271,46,225,168,206,227,201,226,220,166,267,45"/>
+<area shape="rect" id="Node000005" href="$sepcore_8h.html" title=" " alt="" coords="250,240,336,265"/>
+<area shape="poly" id="edge14_Node000001_Node000005" title=" " alt="" coords="289,44,314,98,334,166,336,179,334,193,325,213,314,230,310,228,321,210,329,191,331,179,329,167,309,100,284,47"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="97,313,164,339"/>
+<area shape="poly" id="edge17_Node000001_Node000006" title=" " alt="" coords="183,45,129,64,103,78,80,95,49,128,32,159,21,195,12,241,8,253,11,264,25,281,44,294,84,312,82,317,41,299,22,285,7,267,3,253,6,239,16,193,27,157,45,125,76,91,100,74,126,59,181,40"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="312,313,389,339"/>
+<area shape="poly" id="edge16_Node000001_Node000007" title=" " alt="" coords="298,44,317,66,334,92,353,148,361,205,360,259,357,300,351,300,355,258,355,206,348,149,329,94,313,69,294,47"/>
+<area shape="rect" id="Node000009" href="$analyse_8h.html" title=" " alt="" coords="234,167,320,192"/>
+<area shape="poly" id="edge11_Node000001_Node000009" title=" " alt="" coords="280,46,280,153,274,153,274,46"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="446,93,511,119"/>
+<area shape="poly" id="edge15_Node000001_Node000010" title=" " alt="" coords="326,43,437,86,435,91,324,48"/>
+<area shape="rect" id="Node000003" href="$extract_8h.html" title=" " alt="" coords="80,167,160,192"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="122,119,122,153,117,153,117,119"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="22,240,92,265"/>
+<area shape="poly" id="edge9_Node000002_Node000008" title=" " alt="" coords="107,121,87,141,70,168,62,197,59,227,54,226,56,197,65,166,83,138,104,117"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="134,190,176,229,172,232,130,194"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="148,190,253,232,251,237,146,194"/>
+<area shape="poly" id="edge8_Node000003_Node000006" title=" " alt="" coords="123,192,131,299,126,300,118,193"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="111,194,78,231,74,228,107,191"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="268,268,171,310,168,305,266,263"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="304,264,334,301,330,304,300,267"/>
+<area shape="poly" id="edge12_Node000009_Node000004" title=" " alt="" coords="266,194,222,233,218,229,262,190"/>
+<area shape="poly" id="edge13_Node000009_Node000005" title=" " alt="" coords="282,192,290,226,285,227,277,193"/>
+</map>

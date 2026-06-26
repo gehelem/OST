@@ -1,0 +1,31 @@
+<map id="libs/stellarsolver/stellarsolver/astrometry/include/astrometry/permutedsort.h" name="libs/stellarsolver/stellarsolver/astrometry/include/astrometry/permutedsort.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="172,5,425,60"/>
+<area shape="rect" id="Node000002" href="$ioutils_8h.html" title=" " alt="" coords="261,108,336,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="301,60,301,94,296,94,296,60"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,181,72,207"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="262,135,86,182,85,177,260,130"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="174,255,245,280"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="261,126,229,131,195,141,162,158,137,183,132,200,140,216,156,232,176,246,173,250,153,236,136,219,127,200,132,180,159,154,193,136,228,126,261,121"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="147,181,243,207"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="283,136,225,175,222,171,280,131"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="267,181,331,207"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="301,134,301,168,296,168,296,134"/>
+<area shape="rect" id="Node000007" href="$an-bool_8h.html" title=" " alt="" coords="355,181,514,207"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="322,131,402,173,399,177,319,136"/>
+<area shape="rect" id="Node000008" href="$bl_8h.html" title=" " alt="" coords="539,181,661,207"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="337,128,539,176,538,181,336,133"/>
+<area shape="rect" id="Node000012" href="$keywords_8h.html" title=" " alt="" coords="759,255,931,280"/>
+<area shape="poly" id="edge15_Node000002_Node000012" title=" " alt="" coords="336,122,486,138,580,154,674,179,752,211,816,245,814,250,750,216,672,184,579,160,485,143,336,127"/>
+<area shape="poly" id="edge11_Node000008_Node000004" title=" " alt="" coords="539,209,259,260,258,255,538,204"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="303,255,377,280"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="559,209,391,255,390,250,558,204"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="402,255,473,280"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="575,209,478,251,475,247,573,204"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="497,255,572,280"/>
+<area shape="poly" id="edge10_Node000008_Node000011" title=" " alt="" coords="591,209,556,246,553,243,587,205"/>
+<area shape="poly" id="edge12_Node000008_Node000012" title=" " alt="" coords="640,204,793,248,792,253,639,209"/>
+<area shape="rect" id="Node000013" href="$bl-nl_8h.html" title=" " alt="" coords="596,255,735,280"/>
+<area shape="poly" id="edge13_Node000008_Node000013" title=" " alt="" coords="613,205,647,243,644,246,609,209"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="592,328,739,353"/>
+<area shape="poly" id="edge14_Node000013_Node000014" title=" " alt="" coords="668,280,668,314,663,314,663,280"/>
+</map>

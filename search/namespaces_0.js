@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['nan_0',['NaN',['../namespaceNaN.html',1,'']]]
+  ['fitsimage_0',['FITSImage',['../namespaceFITSImage.html',1,'']]]
 ];

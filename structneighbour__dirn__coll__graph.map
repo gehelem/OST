@@ -1,0 +1,5 @@
+<map id="neighbour_dirn" name="neighbour_dirn">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,177,116,243"/>
+<area shape="rect" id="Node000002" href="$classdouble.html" title=" " alt="" coords="31,5,90,71"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="63,71,63,161,58,161,58,71"/>
+</map>

@@ -1,0 +1,13 @@
+<map id="libs/stellarsolver/stellarsolver/astrometry/include/astrometry/qfits_rw.h" name="libs/stellarsolver/stellarsolver/astrometry/include/astrometry/qfits_rw.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="71,5,286,60"/>
+<area shape="rect" id="Node000002" href="$qfits__header_8h.html" title=" " alt="" coords="84,108,273,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="181,60,181,94,176,94,176,60"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,181,72,207"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="157,136,75,177,72,173,155,131"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="97,181,167,207"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="173,135,149,171,145,168,169,132"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="191,181,262,207"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="189,132,214,169,209,172,184,135"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="287,181,361,207"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="203,131,289,173,287,178,201,136"/>
+</map>

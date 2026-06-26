@@ -84,8 +84,8 @@ $(document).ready(function() { init_codefold(0); });
 <a href="allsky_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#ifndef ALLSKY_MODULE_h_</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#define ALLSKY_MODULE_h_</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &lt;<a class="code" href="indimodule_8h.html">indimodule.h</a>&gt;</span></div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;<a class="code" href="fileio_8h.html">fileio.h</a>&gt;</span></div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &lt;<a class="code" href="solver_8h.html">solver.h</a>&gt;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;fileio.h&gt;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &lt;solver.h&gt;</span></div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#if defined(ALLSKY_MODULE)</span></div>
@@ -97,28 +97,28 @@ $(document).ready(function() { init_codefold(0); });
 <div class="foldopen" id="foldopen00014" data-start="{" data-end="};">
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno"><a class="line" href="classAllsky.html">   14</a></span><span class="keyword">class </span><a class="code hl_define" href="allsky_8h.html#a2ebb6a7af8bcf088b781e5b3a3c449e4">MODULE_INIT</a> <a class="code hl_class" href="classAllsky.html">Allsky</a> : <span class="keyword">public</span> <a class="code hl_class" href="classIndiModule.html">IndiModule</a></div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>{</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>        Q_OBJECT</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>        <a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">Q_OBJECT</a></div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>    <span class="keyword">public</span>:</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>        <a class="code hl_class" href="classAllsky.html">Allsky</a>(<a class="code hl_class" href="classQString.html">QString</a> name, <a class="code hl_class" href="classQString.html">QString</a> label, <a class="code hl_class" href="classQString.html">QString</a> profile, QVariantMap availableModuleLibs);</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>        <a class="code hl_class" href="classAllsky.html">Allsky</a>(<a class="code hl_class" href="classQString.html">QString</a> name, <a class="code hl_class" href="classQString.html">QString</a> label, <a class="code hl_class" href="classQString.html">QString</a> profile, QVariantMap <a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">availableModuleLibs</a>);</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>        <a class="code hl_class" href="classAllsky.html">~Allsky</a>();</div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>        <span class="keywordtype">void</span> <a class="code hl_function" href="classBasemodule.html#aa437e94e55df13a35a221f6c8357c446">onAfterInit</a>(<span class="keywordtype">void</span>) <span class="keyword">override</span> ;</div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    <span class="keyword">public</span> slots:</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>        <span class="keywordtype">void</span> <a class="code hl_function" href="classBasemodule.html#a0381e25b1020ae16f42a48fd6a573765">onExternalEvent</a>(<a class="code hl_struct" href="structOST_1_1ExtEvent.html">OST::ExtEvent</a> event) <span class="keyword">override</span>;</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>        <span class="keywordtype">void</span> processFinished(<span class="keywordtype">int</span> exitCode, QProcess::ExitStatus exitStatus);</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    <span class="keyword">private</span> slots:</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    <span class="keyword">public</span> <a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">slots</a>:</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>        <span class="keywordtype">void</span> <a class="code hl_function" href="classBasemodule.html#a0381e25b1020ae16f42a48fd6a573765">onExternalEvent</a>(<a class="code hl_struct" href="structOST_1_1ExtEvent.html">OST::ExtEvent</a> <a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">event</a>) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>        <span class="keywordtype">void</span> processFinished(<span class="keywordtype">int</span> <a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">exitCode</a>, QProcess::ExitStatus <a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">exitStatus</a>);</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    <span class="keyword">private</span> <a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">slots</a>:</div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>        <span class="keywordtype">void</span> OnTimer(<span class="keywordtype">void</span>);</div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>        <span class="keywordtype">void</span> OnScheduleTimer(<span class="keywordtype">void</span>);</div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    <span class="keyword">private</span>:</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>        <span class="keywordtype">void</span> newBLOB(INDI::PropertyBlob pblob);</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>        <span class="keywordtype">void</span> updateProperty(INDI::Property property) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>        <span class="keywordtype">void</span> newBLOB(INDI::PropertyBlob <a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">pblob</a>);</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>        <span class="keywordtype">void</span> updateProperty(INDI::Property <a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">property</a>) <span class="keyword">override</span>;</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>        <span class="keywordtype">void</span> startLoop();</div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>        <span class="keywordtype">void</span> stopLoop();</div>
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>        <span class="keywordtype">void</span> startTimelapseBatch();</div>
 <div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>        <span class="keywordtype">void</span> processOutput();</div>
 <div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>        <span class="keywordtype">void</span> processError(QProcess::ProcessError error);</div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>        <span class="keywordtype">void</span> computeExposureOrGain(<span class="keywordtype">double</span> fromValue);</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>        <span class="keywordtype">void</span> computeExposureOrGain(<span class="keywordtype">double</span> <a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">fromValue</a>);</div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>        <span class="keywordtype">void</span> checkArchives(<span class="keywordtype">void</span>);</div>
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>        <span class="keywordtype">void</span> moveCurrentToArchives(<span class="keywordtype">void</span>);</div>
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>        <span class="keywordtype">void</span> calculateSunset(<span class="keywordtype">void</span>);</div>
@@ -129,9 +129,9 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>        QImage imageStacked;</div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        <span class="keywordtype">bool</span> firstStack = <span class="keyword">true</span>;</div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>        <a class="code hl_class" href="classSolver.html">Solver</a> _solver;</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>        FITSImage::Statistic stats;</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>        <a class="code hl_struct" href="structFITSImage_1_1Statistic.html">FITSImage::Statistic</a> stats;</div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>        <span class="keywordtype">long</span> _index;</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>        QProcess *_process;</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>        <a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">QProcess</a> *_process;</div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>        QImage mKeog;</div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>        QTimer mTimer;</div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>        <span class="keywordtype">bool</span> mIsLooping = <span class="keyword">false</span>;</div>
@@ -141,21 +141,21 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>};</div>
 </div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><span class="keyword">extern</span> <span class="stringliteral">&quot;C&quot;</span> <a class="code hl_define" href="allsky_8h.html#a2ebb6a7af8bcf088b781e5b3a3c449e4">MODULE_INIT</a> <a class="code hl_class" href="classAllsky.html">Allsky</a> *<a class="code hl_function" href="allsky_8h.html#a2ffabe6c53145487ab745ec70442096e">initialize</a>(<a class="code hl_class" href="classQString.html">QString</a> name, <a class="code hl_class" href="classQString.html">QString</a> label, <a class="code hl_class" href="classQString.html">QString</a> profile, QVariantMap availableModuleLibs);</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><span class="keyword">extern</span> <span class="stringliteral">&quot;C&quot;</span> <a class="code hl_define" href="allsky_8h.html#a2ebb6a7af8bcf088b781e5b3a3c449e4">MODULE_INIT</a> <a class="code hl_class" href="classAllsky.html">Allsky</a> *<a class="code hl_function" href="allsky_8h.html#a2ffabe6c53145487ab745ec70442096e">initialize</a>(<a class="code hl_class" href="classQString.html">QString</a> name, <a class="code hl_class" href="classQString.html">QString</a> label, <a class="code hl_class" href="classQString.html">QString</a> profile, QVariantMap <a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">availableModuleLibs</a>);</div>
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span><span class="preprocessor">#endif</span></div>
 <div class="ttc" id="aallsky_8h_html_a2ebb6a7af8bcf088b781e5b3a3c449e4"><div class="ttname"><a href="allsky_8h.html#a2ebb6a7af8bcf088b781e5b3a3c449e4">MODULE_INIT</a></div><div class="ttdeci">#define MODULE_INIT</div><div class="ttdef"><b>Definition</b> allsky.h:11</div></div>
-<div class="ttc" id="aallsky_8h_html_a2ffabe6c53145487ab745ec70442096e"><div class="ttname"><a href="allsky_8h.html#a2ffabe6c53145487ab745ec70442096e">initialize</a></div><div class="ttdeci">MODULE_INIT Allsky * initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)</div><div class="ttdoc">Plugin entry point - called by OST to load module.</div><div class="ttdef"><b>Definition</b> allsky.cpp:10</div></div>
+<div class="ttc" id="aallsky_8h_html_a2ffabe6c53145487ab745ec70442096e"><div class="ttname"><a href="allsky_8h.html#a2ffabe6c53145487ab745ec70442096e">initialize</a></div><div class="ttdeci">MODULE_INIT Allsky * initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)</div><div class="ttdoc">Plugin entry point - called by OST to load module.</div><div class="ttdef"><b>Definition</b> allsky.cpp:19</div></div>
 <div class="ttc" id="aclassAllsky_html"><div class="ttname"><a href="classAllsky.html">Allsky</a></div><div class="ttdef"><b>Definition</b> allsky.h:15</div></div>
 <div class="ttc" id="aclassBasemodule_html_a0381e25b1020ae16f42a48fd6a573765"><div class="ttname"><a href="classBasemodule.html#a0381e25b1020ae16f42a48fd6a573765">Basemodule::onExternalEvent</a></div><div class="ttdeci">virtual void onExternalEvent(OST::ExtEvent event)</div><div class="ttdoc">Hook for custom module event handling (PRIMARY OVERRIDE POINT)</div><div class="ttdef"><b>Definition</b> basemodule.cpp:298</div></div>
 <div class="ttc" id="aclassBasemodule_html_aa437e94e55df13a35a221f6c8357c446"><div class="ttname"><a href="classBasemodule.html#aa437e94e55df13a35a221f6c8357c446">Basemodule::onAfterInit</a></div><div class="ttdeci">virtual void onAfterInit(void)</div><div class="ttdef"><b>Definition</b> basemodule.cpp:304</div></div>
 <div class="ttc" id="aclassIndiModule_html"><div class="ttname"><a href="classIndiModule.html">IndiModule</a></div><div class="ttdef"><b>Definition</b> indimodule.h:14</div></div>
 <div class="ttc" id="aclassQString_html"><div class="ttname"><a href="classQString.html">QString</a></div></div>
 <div class="ttc" id="aclassSolver_html"><div class="ttname"><a href="classSolver.html">Solver</a></div><div class="ttdef"><b>Definition</b> solver.h:12</div></div>
-<div class="ttc" id="afileio_8h_html"><div class="ttname"><a href="fileio_8h.html">fileio.h</a></div></div>
 <div class="ttc" id="aindimodule_8h_html"><div class="ttname"><a href="indimodule_8h.html">indimodule.h</a></div></div>
-<div class="ttc" id="asolver_8h_html"><div class="ttname"><a href="solver_8h.html">solver.h</a></div></div>
-<div class="ttc" id="astructOST_1_1ExtEvent_html"><div class="ttname"><a href="structOST_1_1ExtEvent.html">OST::ExtEvent</a></div><div class="ttdef"><b>Definition</b> common.h:391</div></div>
+<div class="ttc" id="aqfits__error_8c_html_a76f11d9a0a47b94f72c2d0e77fb32240"><div class="ttname"><a href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">n</a></div><div class="ttdeci">int n</div><div class="ttdef"><b>Definition</b> qfits_error.c:71</div></div>
+<div class="ttc" id="astructFITSImage_1_1Statistic_html"><div class="ttname"><a href="structFITSImage_1_1Statistic.html">FITSImage::Statistic</a></div><div class="ttdef"><b>Definition</b> structuredefinitions.h:61</div></div>
+<div class="ttc" id="astructOST_1_1ExtEvent_html"><div class="ttname"><a href="structOST_1_1ExtEvent.html">OST::ExtEvent</a></div><div class="ttdef"><b>Definition</b> common.h:412</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

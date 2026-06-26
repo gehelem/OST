@@ -80,15 +80,16 @@ Fixes applied</h1>
 1. Signal &lt;tt&gt;abort()&lt;/tt&gt; lowercase — state machine hangs</h2>
 <p><code>SMComputeCal()</code>: when no stars are found during calibration, <code>emit abort()</code> was silently ignored by Qt because the actual signal is <code>Abort()</code> (capital A). The state machine would hang indefinitely.</p>
 <div class="fragment"><div class="line"><span class="comment">// before</span></div>
-<div class="line">emit abort();</div>
+<div class="line"><a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">emit</a> abort();</div>
 <div class="line"><span class="comment">// after</span></div>
-<div class="line">emit Abort();</div>
+<div class="line"><a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">emit</a> Abort();</div>
+<div class="ttc" id="aqfits__error_8c_html_a76f11d9a0a47b94f72c2d0e77fb32240"><div class="ttname"><a href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">n</a></div><div class="ttdeci">int n</div><div class="ttdef"><b>Definition</b> qfits_error.c:71</div></div>
 </div><!-- fragment --><hr  />
 <h2><a class="anchor" id="autotoc_md33"></a>
 2. Division by zero in &lt;tt&gt;matchIndexes()&lt;/tt&gt;</h2>
 <p>When no star matches between two frames, <code>pairs</code> is empty and dividing by <code>pairs.size()</code> is undefined behavior in C++.</p>
 <div class="fragment"><div class="line"><span class="comment">// added before the division</span></div>
-<div class="line"><span class="keywordflow">if</span> (pairs.isEmpty()) { dx = 0; dy = 0; <span class="keywordflow">return</span>; }</div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">pairs</a>.isEmpty()) { dx = 0; dy = 0; <span class="keywordflow">return</span>; }</div>
 </div><!-- fragment --><hr  />
 <h2><a class="anchor" id="autotoc_md35"></a>
 3. Biased average in calibration (~50% error with default settings)</h2>
@@ -104,7 +105,7 @@ Fixes applied</h1>
 <div class="fragment"><div class="line"><span class="keywordflow">else</span></div>
 <div class="line">{</div>
 <div class="line">    logWarning(<span class="stringliteral">&quot;No stars detected in current frame - skipping corrections&quot;</span>);</div>
-<div class="line">    emit ComputeGuideDone();</div>
+<div class="line">    <a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">emit</a> ComputeGuideDone();</div>
 <div class="line">    <span class="keywordflow">return</span>;</div>
 <div class="line">}</div>
 </div><!-- fragment --><hr  />
@@ -113,18 +114,18 @@ Fixes applied</h1>
 <p>The original formula <code>dx·sin + dy·cos</code> is not a valid projection onto the DEC axis. Comparison with Ekos (<code>gmath.cpp</code> + <code>matr.cpp</code>) shows the correct formula is <code>dx·sin - dy·cos</code>.</p>
 <p>The error was hidden for small CCD rotation angles (sin ≈ 0) but introduced RA↔DEC cross-coupling for significant rotations.</p>
 <div class="fragment"><div class="line"><span class="comment">// before</span></div>
-<div class="line"><span class="keywordtype">double</span> _driftDE = _dxFirst * sin(_calCcdOrientation) + _dyFirst * cos(_calCcdOrientation);</div>
+<div class="line"><span class="keywordtype">double</span> <a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">_driftDE</a> = _dxFirst * sin(_calCcdOrientation) + _dyFirst * cos(_calCcdOrientation);</div>
 <div class="line"><span class="comment">// after</span></div>
-<div class="line"><span class="keywordtype">double</span> _driftDE = _dxFirst * sin(_calCcdOrientation) + _dyFirst * -cos(_calCcdOrientation);</div>
+<div class="line"><span class="keywordtype">double</span> <a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">_driftDE</a> = _dxFirst * sin(_calCcdOrientation) + _dyFirst * -cos(_calCcdOrientation);</div>
 </div><!-- fragment --><p>Applied in both <code>SMComputeCal()</code> (drift display) and <code>SMComputeGuide()</code> (active corrections).</p>
 <hr  />
 <h2><a class="anchor" id="autotoc_md41"></a>
 6. &lt;tt&gt;atan&lt;/tt&gt; instead of &lt;tt&gt;atan2&lt;/tt&gt; for CCD orientation angle</h2>
 <p><code>atan(ddy/ddx)</code> has two problems: division by zero when <code>ddx == 0</code>, and the result is limited to <code>[-π/2, π/2]</code>. When the West-pulse displacement vector points into the 2nd or 3rd quadrant (i.e. <code>ddx &lt; 0</code>, which is the typical case for a pier-West mount), the computed angle is wrong by 180°.</p>
 <div class="fragment"><div class="line"><span class="comment">// before</span></div>
-<div class="line"><span class="keywordtype">double</span> a = atan(ddy / ddx);</div>
+<div class="line"><span class="keywordtype">double</span> a = <a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">atan</a>(<a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">ddy</a> / <a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">ddx</a>);</div>
 <div class="line"><span class="comment">// after</span></div>
-<div class="line"><span class="keywordtype">double</span> a = atan2(ddy, ddx);</div>
+<div class="line"><span class="keywordtype">double</span> a = <a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">atan2</a>(<a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">ddy</a>, <a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">ddx</a>);</div>
 </div><!-- fragment --><hr  />
 <h2><a class="anchor" id="autotoc_md43"></a>
 7. RA correction direction inverted after atan2 fix</h2>
@@ -133,10 +134,10 @@ Fixes applied</h1>
 <p>The two bugs had been cancelling each other. Fixing the angle required fixing the mapping:</p>
 <div class="fragment"><div class="line"><span class="comment">// before: drift &gt; 0 → West,  drift &lt; 0 → East</span></div>
 <div class="line"><span class="comment">// after:  drift &gt; 0 → East,  drift &lt; 0 → West</span></div>
-<div class="line"><span class="keywordflow">if</span> (revRA * _driftRA &gt; 0 &amp;&amp; !disRAO)</div>
-<div class="line">    _pulseE = getFloat(<span class="stringliteral">&quot;guideParams&quot;</span>, <span class="stringliteral">&quot;raAgr&quot;</span>) * revRA * _driftRA * calPulseECompensated;</div>
-<div class="line"><span class="keywordflow">if</span> (revRA * _driftRA &lt; 0 &amp;&amp; !disRAE)</div>
-<div class="line">    _pulseW = -getFloat(<span class="stringliteral">&quot;guideParams&quot;</span>, <span class="stringliteral">&quot;raAgr&quot;</span>) * revRA * _driftRA * calPulseWCompensated;</div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">revRA</a> * <a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">_driftRA</a> &gt; 0 &amp;&amp; !<a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">disRAO</a>)</div>
+<div class="line">    _pulseE = getFloat(<span class="stringliteral">&quot;guideParams&quot;</span>, <span class="stringliteral">&quot;raAgr&quot;</span>) * <a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">revRA</a> * <a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">_driftRA</a> * <a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">calPulseECompensated</a>;</div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">revRA</a> * <a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">_driftRA</a> &lt; 0 &amp;&amp; !<a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">disRAE</a>)</div>
+<div class="line">    _pulseW = -getFloat(<span class="stringliteral">&quot;guideParams&quot;</span>, <span class="stringliteral">&quot;raAgr&quot;</span>) * <a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">revRA</a> * <a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">_driftRA</a> * <a class="code hl_variable" href="qfits__error_8c.html#a76f11d9a0a47b94f72c2d0e77fb32240">calPulseWCompensated</a>;</div>
 </div><!-- fragment --><hr  />
 <h2><a class="anchor" id="autotoc_md45"></a>
 8. &lt;tt&gt;_calPulseN/S/E/W&lt;/tt&gt; declared as &lt;tt&gt;int&lt;/tt&gt; — precision loss</h2>

@@ -1,0 +1,15 @@
+<map id="qfits_table" name="qfits_table">
+<area shape="rect" id="Node000001" title="Table object." alt="" coords="123,349,206,415"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="165,5,207,71"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="187,71,170,333,165,333,181,71"/>
+<area shape="rect" id="Node000004" href="$structqfits__col.html" title="Column object." alt="" coords="263,221,331,287"/>
+<area shape="poly" id="edge6_Node000004_Node000002" title=" " alt="" coords="193,71,206,131,219,165,235,196,252,217,248,220,230,199,214,167,201,133,187,72"/>
+<area shape="rect" id="Node000003" href="$classint.html" title=" " alt="" coords="5,5,36,71"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="19,71,17,131,20,164,29,196,46,236,70,273,122,336,117,339,66,276,42,239,23,198,15,165,12,131,14,71"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="27,70,34,101,46,135,64,168,89,195,108,207,126,213,161,214,199,211,220,213,244,219,249,220,247,225,243,224,219,218,199,216,161,219,125,219,106,212,86,199,60,171,41,137,29,102,22,72"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="265,289,212,340,208,336,262,285"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="345,5,531,71"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="427,72,398,133,356,199,344,213,340,209,352,196,393,130,422,70"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="278,5,321,71"/>
+<area shape="poly" id="edge7_Node000004_Node000006" title=" " alt="" coords="302,71,300,205,295,205,296,71"/>
+</map>

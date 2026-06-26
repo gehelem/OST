@@ -1,0 +1,23 @@
+<map id="libs/stellarsolver/stellarsolver/astrometry/blind/windirent.h" name="libs/stellarsolver/stellarsolver/astrometry/blind/windirent.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="397,5,579,60"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,108,96,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="397,54,110,110,109,105,396,49"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="120,108,187,133"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="397,60,201,110,200,105,396,55"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="211,108,285,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="416,63,294,106,292,101,414,58"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="309,108,381,133"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="446,62,377,103,375,99,443,58"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="406,108,477,133"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="476,61,457,97,452,95,471,59"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="501,108,571,133"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="505,59,525,95,520,97,500,61"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="595,108,674,133"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="534,58,604,99,602,103,531,62"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="699,108,795,133"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="568,58,700,101,699,106,566,63"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="819,108,904,133"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="580,52,806,104,804,109,579,58"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="929,108,997,133"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="580,45,733,71,916,105,915,111,732,76,579,51"/>
+</map>

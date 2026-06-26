@@ -1,109 +1,111 @@
 <map id="libs/utils/elementfactory.h" name="libs/utils/elementfactory.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="365,5,556,31"/>
-<area shape="rect" id="Node000002" href="$propertymulti_8h.html" title="Multi&#45;element property implementation with grid support." alt="" coords="386,79,535,119"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="463,44,463,79,458,79,458,44"/>
-<area shape="rect" id="Node000004" href="$propertyfactory_8h.html" title="Factory for creating properties from configuration data." alt="" coords="65,174,257,199"/>
-<area shape="poly" id="edge58_Node000001_Node000004" title=" " alt="" coords="430,40,183,176,180,172,427,35"/>
-<area shape="rect" id="Node000049" href="$elementfactory_8cpp.html" title=" " alt="" coords="560,86,767,111"/>
-<area shape="poly" id="edge57_Node000001_Node000049" title=" " alt="" coords="504,33,635,83,633,88,502,38"/>
-<area shape="rect" id="Node000003" href="$propertymulti_8cpp.html" title=" " alt="" coords="281,167,430,207"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="429,129,380,169,377,164,425,125"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="383,125,201,177,200,171,381,120"/>
-<area shape="rect" id="Node000043" href="$propertyjsondumper_8h.html" title="JSON serialization visitor for properties." alt="" coords="454,174,678,199"/>
-<area shape="poly" id="edge47_Node000002_Node000043" title=" " alt="" coords="496,126,553,171,550,176,493,130"/>
-<area shape="rect" id="Node000045" href="$propertytextdumper_8h.html" title="Human&#45;readable text serialization visitor for properties." alt="" coords="701,174,924,199"/>
-<area shape="poly" id="edge51_Node000002_Node000045" title=" " alt="" coords="549,119,766,171,765,177,548,124"/>
-<area shape="rect" id="Node000047" href="$propertyupdate_8h.html" title="Property update visitor for applying changes from frontend." alt="" coords="948,174,1141,199"/>
-<area shape="poly" id="edge54_Node000002_Node000047" title=" " alt="" coords="549,116,659,132,744,142,936,164,982,171,981,177,935,169,743,147,658,138,549,121"/>
-<area shape="rect" id="Node000005" href="$datastore_8h.html" title=" " alt="" coords="657,255,779,280"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="238,199,269,204,456,229,644,252,657,254,656,259,643,257,456,234,268,209,237,204"/>
-<area shape="rect" id="Node000042" href="$propertyfactory_8cpp.html" title="PropertyFactory implementation for creating properties from configuration." alt="" coords="57,255,264,280"/>
-<area shape="poly" id="edge46_Node000004_Node000042" title=" " alt="" coords="163,213,163,254,158,254,158,213"/>
-<area shape="rect" id="Node000006" href="$datastore_8cpp.html" title=" " alt="" coords="702,328,841,353"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="737,289,765,326,761,329,733,293"/>
-<area shape="rect" id="Node000007" href="$dbmanager_8h.html" title=" " alt="" coords="543,328,677,353"/>
-<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="691,290,629,330,626,326,688,285"/>
-<area shape="rect" id="Node000008" href="$basemodule_8h.html" title=" " alt="" coords="431,401,573,427"/>
-<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="583,363,521,403,518,399,580,359"/>
-<area shape="rect" id="Node000040" href="$wshandler_8h.html" title=" " alt="" coords="545,475,667,500"/>
-<area shape="poly" id="edge45_Node000007_Node000040" title=" " alt="" coords="612,367,609,475,604,474,607,367"/>
-<area shape="rect" id="Node000041" href="$dbmanager_8cpp.html" title=" " alt="" coords="647,401,797,427"/>
-<area shape="poly" id="edge44_Node000007_Node000041" title=" " alt="" coords="641,359,705,399,702,403,638,363"/>
-<area shape="rect" id="Node000009" href="$basemodule_8cpp.html" title=" " alt="" coords="315,555,471,581"/>
-<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="501,441,494,471,479,502,448,534,415,558,412,553,444,530,474,498,489,469,496,439"/>
-<area shape="rect" id="Node000010" href="$indimodule_8h.html" title=" " alt="" coords="1689,475,1824,500"/>
-<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="587,420,636,424,1247,460,1689,481,1689,486,1246,465,635,429,586,426"/>
-<area shape="rect" id="Node000037" href="$modulejsondumper_8h.html" title=" " alt="" coords="246,475,465,500"/>
-<area shape="poly" id="edge36_Node000008_Node000037" title=" " alt="" coords="468,435,380,477,378,472,465,430"/>
-<area shape="poly" id="edge41_Node000008_Node000040" title=" " alt="" coords="532,432,590,472,587,477,529,437"/>
-<area shape="rect" id="Node000011" href="$indimodule_8cpp.html" title=" " alt="" coords="2618,555,2767,581"/>
-<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="1838,488,2174,503,2389,520,2606,545,2646,553,2645,558,2606,551,2389,525,2173,509,1838,493"/>
-<area shape="rect" id="Node000012" href="$globaldatastore_8h.html" title=" " alt="" coords="709,555,868,581"/>
-<area shape="poly" id="edge11_Node000010_Node000012" title=" " alt="" coords="1676,494,1334,511,1114,527,892,551,845,558,845,553,891,545,1113,522,1334,506,1676,489"/>
-<area shape="rect" id="Node000017" href="$allsky_8h.html" title=" " alt="" coords="2451,548,2593,588"/>
-<area shape="poly" id="edge16_Node000010_Node000017" title=" " alt="" coords="1838,490,2106,507,2273,523,2440,545,2451,547,2450,553,2439,551,2272,529,2106,513,1838,495"/>
-<area shape="rect" id="Node000019" href="$dummy_8h.html" title=" " alt="" coords="2791,555,3010,581"/>
-<area shape="poly" id="edge18_Node000010_Node000019" title=" " alt="" coords="1838,488,2243,505,2510,522,2780,545,2834,553,2834,558,2779,551,2509,527,2243,510,1838,493"/>
-<area shape="rect" id="Node000021" href="$focus_8h.html" title=" " alt="" coords="904,555,1095,581"/>
-<area shape="poly" id="edge20_Node000010_Node000021" title=" " alt="" coords="1676,497,1424,517,1112,551,1063,558,1062,553,1111,545,1423,512,1675,492"/>
-<area shape="rect" id="Node000023" href="$guider_8h.html" title=" " alt="" coords="1502,548,1649,588"/>
-<area shape="poly" id="edge22_Node000010_Node000023" title=" " alt="" coords="1719,508,1620,550,1618,545,1717,503"/>
-<area shape="rect" id="Node000025" href="$indipanel_8h.html" title=" " alt="" coords="1123,548,1289,588"/>
-<area shape="poly" id="edge24_Node000010_Node000025" title=" " alt="" coords="1676,500,1503,521,1301,551,1290,553,1289,547,1300,545,1503,516,1675,495"/>
-<area shape="rect" id="Node000027" href="$inspector_8h.html" title=" " alt="" coords="1313,548,1478,588"/>
-<area shape="poly" id="edge26_Node000010_Node000027" title=" " alt="" coords="1692,505,1479,551,1477,546,1691,500"/>
-<area shape="rect" id="Node000029" href="$navigator_8h.html" title=" " alt="" coords="1673,548,1840,588"/>
-<area shape="poly" id="edge28_Node000010_Node000029" title=" " alt="" coords="1759,514,1759,548,1754,548,1754,514"/>
-<area shape="rect" id="Node000031" href="$planner_8h.html" title=" " alt="" coords="1865,548,2019,588"/>
-<area shape="poly" id="edge30_Node000010_Node000031" title=" " alt="" coords="1797,503,1898,545,1896,550,1795,508"/>
-<area shape="rect" id="Node000033" href="$polar_8h.html" title=" " alt="" coords="2043,555,2230,581"/>
-<area shape="poly" id="edge32_Node000010_Node000033" title=" " alt="" coords="1826,500,2082,553,2081,558,1825,505"/>
-<area shape="rect" id="Node000035" href="$sequencer_8h.html" title=" " alt="" coords="2255,548,2427,588"/>
-<area shape="poly" id="edge34_Node000010_Node000035" title=" " alt="" coords="1838,494,2024,515,2242,545,2255,547,2254,553,2242,551,2023,521,1838,500"/>
-<area shape="rect" id="Node000013" href="$controller_8h.html" title=" " alt="" coords="551,643,669,669"/>
-<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="754,589,635,645,633,641,751,584"/>
-<area shape="rect" id="Node000016" href="$globaldatastore_8cpp.html" title=" " alt="" coords="693,643,868,669"/>
-<area shape="poly" id="edge15_Node000012_Node000016" title=" " alt="" coords="789,595,784,643,779,643,784,594"/>
-<area shape="rect" id="Node000014" href="$controller_8cpp.html" title=" " alt="" coords="309,724,442,749"/>
-<area shape="poly" id="edge13_Node000013_Node000014" title=" " alt="" coords="564,675,410,727,409,721,562,670"/>
-<area shape="rect" id="Node000015" href="$ost_8cpp.html" title=" " alt="" coords="564,724,656,749"/>
-<area shape="poly" id="edge14_Node000013_Node000015" title=" " alt="" coords="613,682,613,724,607,724,607,682"/>
-<area shape="rect" id="Node000018" href="$allsky_8cpp.html" title=" " alt="" coords="2465,636,2608,676"/>
-<area shape="poly" id="edge17_Node000017_Node000018" title=" " alt="" coords="2530,601,2536,635,2531,636,2525,602"/>
-<area shape="rect" id="Node000020" href="$dummy_8cpp.html" title=" " alt="" coords="2783,643,3018,669"/>
-<area shape="poly" id="edge19_Node000019_Node000020" title=" " alt="" coords="2903,595,2903,643,2898,643,2898,595"/>
-<area shape="rect" id="Node000022" href="$focus_8cpp.html" title=" " alt="" coords="892,643,1099,669"/>
-<area shape="poly" id="edge21_Node000021_Node000022" title=" " alt="" coords="1001,595,999,643,993,643,995,594"/>
-<area shape="rect" id="Node000024" href="$guider_8cpp.html" title="Autoguiding module for OST &#45; Corrects telescope tracking drift." alt="" coords="1502,636,1649,676"/>
-<area shape="poly" id="edge23_Node000023_Node000024" title=" " alt="" coords="1578,602,1578,636,1573,636,1573,602"/>
-<area shape="rect" id="Node000026" href="$indipanel_8cpp.html" title=" " alt="" coords="1123,636,1289,676"/>
-<area shape="poly" id="edge25_Node000025_Node000026" title=" " alt="" coords="1209,602,1209,636,1203,636,1203,602"/>
-<area shape="rect" id="Node000028" href="$inspector_8cpp.html" title=" " alt="" coords="1313,636,1478,676"/>
-<area shape="poly" id="edge27_Node000027_Node000028" title=" " alt="" coords="1398,602,1398,636,1393,636,1393,602"/>
-<area shape="rect" id="Node000030" href="$navigator_8cpp.html" title=" " alt="" coords="1673,636,1840,676"/>
-<area shape="poly" id="edge29_Node000029_Node000030" title=" " alt="" coords="1759,602,1759,636,1754,636,1754,602"/>
-<area shape="rect" id="Node000032" href="$planner_8cpp.html" title=" " alt="" coords="1865,636,2019,676"/>
-<area shape="poly" id="edge31_Node000031_Node000032" title=" " alt="" coords="1945,602,1945,636,1939,636,1939,602"/>
-<area shape="rect" id="Node000034" href="$polar_8cpp.html" title=" " alt="" coords="2044,643,2245,669"/>
-<area shape="poly" id="edge33_Node000033_Node000034" title=" " alt="" coords="2142,594,2146,643,2141,643,2136,595"/>
-<area shape="rect" id="Node000036" href="$sequencer_8cpp.html" title=" " alt="" coords="2269,636,2441,676"/>
-<area shape="poly" id="edge35_Node000035_Node000036" title=" " alt="" coords="2349,601,2355,635,2349,636,2344,602"/>
-<area shape="poly" id="edge37_Node000037_Node000009" title=" " alt="" coords="369,511,390,554,385,556,364,514"/>
-<area shape="poly" id="edge39_Node000037_Node000014" title=" " alt="" coords="332,511,316,529,304,549,301,568,305,587,318,628,336,666,370,722,365,725,331,669,313,630,299,589,295,568,300,547,312,526,328,508"/>
-<area shape="rect" id="Node000038" href="$modulejsondumper_8cpp.html" title=" " alt="" coords="5,555,239,581"/>
-<area shape="poly" id="edge38_Node000037_Node000038" title=" " alt="" coords="310,507,157,558,155,553,308,502"/>
-<area shape="rect" id="Node000039" href="$wshandler_8cpp.html" title=" " alt="" coords="495,555,634,581"/>
-<area shape="poly" id="edge40_Node000037_Node000039" title=" " alt="" coords="400,502,535,553,533,558,398,507"/>
-<area shape="poly" id="edge42_Node000040_Node000013" title=" " alt="" coords="628,509,640,527,649,547,652,568,649,589,636,620,621,645,616,642,631,617,643,587,647,568,643,549,635,530,623,512"/>
-<area shape="poly" id="edge43_Node000040_Node000039" title=" " alt="" coords="596,513,573,556,568,554,591,511"/>
-<area shape="poly" id="edge48_Node000043_Node000005" title=" " alt="" coords="602,203,697,252,694,257,599,208"/>
-<area shape="poly" id="edge49_Node000043_Node000037" title=" " alt="" coords="465,205,420,225,400,239,383,256,366,283,355,313,349,345,347,376,349,434,355,474,350,475,344,434,341,376,344,344,350,312,361,281,379,253,396,235,417,220,463,201"/>
-<area shape="rect" id="Node000044" href="$propertyjsondumper_8cpp.html" title="JSON serialization visitor implementation." alt="" coords="393,255,632,280"/>
-<area shape="poly" id="edge50_Node000043_Node000044" title=" " alt="" coords="553,212,523,256,518,253,548,209"/>
-<area shape="poly" id="edge52_Node000045_Node000005" title=" " alt="" coords="790,210,734,257,730,252,786,206"/>
-<area shape="rect" id="Node000046" href="$propertytextdumper_8cpp.html" title="Human&#45;readable text serialization implementation." alt="" coords="804,255,1043,280"/>
-<area shape="poly" id="edge53_Node000045_Node000046" title=" " alt="" coords="842,205,908,252,905,257,839,210"/>
-<area shape="poly" id="edge55_Node000047_Node000005" title=" " alt="" coords="984,205,766,257,765,252,983,200"/>
-<area shape="rect" id="Node000048" href="$propertyupdate_8cpp.html" title="Property update visitor implementation." alt="" coords="1067,255,1275,280"/>
-<area shape="poly" id="edge56_Node000047_Node000048" title=" " alt="" coords="1076,204,1154,252,1151,257,1074,209"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="2847,5,3037,31"/>
+<area shape="rect" id="Node000002" href="$propertymulti_8h.html" title="Multi&#45;element property implementation with grid support." alt="" coords="2867,79,3017,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="2945,44,2945,79,2939,79,2939,44"/>
+<area shape="rect" id="Node000004" href="$propertyfactory_8h.html" title="Factory for creating properties from configuration data." alt="" coords="2498,174,2690,199"/>
+<area shape="poly" id="edge59_Node000001_Node000004" title=" " alt="" coords="2907,39,2619,176,2617,171,2905,34"/>
+<area shape="rect" id="Node000055" href="$elementfactory_8cpp.html" title=" " alt="" coords="3041,86,3248,111"/>
+<area shape="poly" id="edge58_Node000001_Node000055" title=" " alt="" coords="2985,33,3116,83,3114,88,2983,38"/>
+<area shape="rect" id="Node000003" href="$propertymulti_8cpp.html" title=" " alt="" coords="3179,167,3329,207"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="3024,120,3186,164,3185,169,3023,125"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="2854,124,2641,176,2640,171,2853,119"/>
+<area shape="rect" id="Node000049" href="$propertyjsondumper_8h.html" title="JSON serialization visitor for properties." alt="" coords="3353,174,3577,199"/>
+<area shape="poly" id="edge48_Node000002_Node000049" title=" " alt="" coords="3031,116,3390,171,3389,177,3030,121"/>
+<area shape="rect" id="Node000051" href="$propertytextdumper_8h.html" title="Human&#45;readable text serialization visitor for properties." alt="" coords="2715,174,2937,199"/>
+<area shape="poly" id="edge52_Node000002_Node000051" title=" " alt="" coords="2907,129,2843,176,2840,172,2903,125"/>
+<area shape="rect" id="Node000053" href="$propertyupdate_8h.html" title="Property update visitor for applying changes from frontend." alt="" coords="2961,174,3155,199"/>
+<area shape="poly" id="edge55_Node000002_Node000053" title=" " alt="" coords="2981,125,3044,172,3041,176,2977,129"/>
+<area shape="rect" id="Node000005" href="$datastore_8h.html" title=" " alt="" coords="2970,255,3093,280"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="2671,199,2970,252,2969,258,2670,204"/>
+<area shape="rect" id="Node000048" href="$propertyfactory_8cpp.html" title="PropertyFactory implementation for creating properties from configuration." alt="" coords="2476,255,2683,280"/>
+<area shape="poly" id="edge47_Node000004_Node000048" title=" " alt="" coords="2592,213,2584,255,2579,254,2587,212"/>
+<area shape="rect" id="Node000006" href="$datastore_8cpp.html" title=" " alt="" coords="2962,328,3101,353"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="3034,294,3034,328,3029,328,3029,294"/>
+<area shape="rect" id="Node000007" href="$dbmanager_8h.html" title=" " alt="" coords="3128,328,3263,353"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="3071,283,3170,325,3167,330,3069,288"/>
+<area shape="rect" id="Node000008" href="$basemodule_8h.html" title=" " alt="" coords="2957,401,3098,427"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="3157,361,3056,404,3054,399,3155,356"/>
+<area shape="rect" id="Node000046" href="$wshandler_8h.html" title=" " alt="" coords="3091,475,3214,500"/>
+<area shape="poly" id="edge46_Node000007_Node000046" title=" " alt="" coords="3238,357,3261,371,3280,387,3290,406,3290,417,3286,428,3271,445,3253,459,3212,477,3210,472,3250,455,3267,442,3281,425,3285,416,3285,408,3276,390,3257,375,3235,362"/>
+<area shape="rect" id="Node000047" href="$dbmanager_8cpp.html" title=" " alt="" coords="3122,401,3271,427"/>
+<area shape="poly" id="edge45_Node000007_Node000047" title=" " alt="" coords="3198,367,3199,401,3194,401,3193,367"/>
+<area shape="rect" id="Node000009" href="$basemodule_8cpp.html" title=" " alt="" coords="2956,555,3112,581"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="3031,440,3036,555,3031,555,3026,441"/>
+<area shape="rect" id="Node000010" href="$indimodule_8h.html" title=" " alt="" coords="1508,475,1643,500"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="2943,422,1643,485,1643,480,2943,417"/>
+<area shape="rect" id="Node000043" href="$modulejsondumper_8h.html" title=" " alt="" coords="3251,475,3470,500"/>
+<area shape="poly" id="edge37_Node000008_Node000043" title=" " alt="" coords="3095,427,3307,472,3306,477,3094,432"/>
+<area shape="poly" id="edge42_Node000008_Node000046" title=" " alt="" coords="3061,431,3133,472,3131,477,3058,436"/>
+<area shape="rect" id="Node000011" href="$indimodule_8cpp.html" title=" " alt="" coords="1762,555,1911,581"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="1627,501,1799,553,1798,558,1625,506"/>
+<area shape="rect" id="Node000012" href="$globaldatastore_8h.html" title=" " alt="" coords="2773,555,2932,581"/>
+<area shape="poly" id="edge11_Node000010_Node000012" title=" " alt="" coords="1657,486,1853,488,2127,496,2442,514,2603,528,2761,545,2804,553,2803,558,2760,551,2603,533,2441,520,2126,502,1853,493,1657,491"/>
+<area shape="rect" id="Node000017" href="$allsky_8h.html" title=" " alt="" coords="1595,548,1737,588"/>
+<area shape="poly" id="edge16_Node000010_Node000017" title=" " alt="" coords="1601,507,1646,546,1642,550,1597,511"/>
+<area shape="rect" id="Node000019" href="$dummy_8h.html" title=" " alt="" coords="2125,555,2343,581"/>
+<area shape="poly" id="edge18_Node000010_Node000019" title=" " alt="" coords="1657,494,1864,516,2113,545,2164,553,2163,558,2112,551,1863,521,1656,499"/>
+<area shape="rect" id="Node000021" href="$focus_8h.html" title=" " alt="" coords="2368,555,2559,581"/>
+<area shape="poly" id="edge20_Node000010_Node000021" title=" " alt="" coords="1657,490,1964,508,2159,524,2356,545,2404,553,2403,558,2355,551,2159,530,1964,514,1656,495"/>
+<area shape="rect" id="Node000023" href="$guider_8h.html" title=" " alt="" coords="430,548,577,588"/>
+<area shape="poly" id="edge22_Node000010_Node000023" title=" " alt="" coords="1494,492,1328,496,1103,505,848,522,589,551,577,552,576,547,588,545,847,517,1103,499,1328,490,1494,487"/>
+<area shape="rect" id="Node000025" href="$indipanel_8h.html" title=" " alt="" coords="1935,548,2101,588"/>
+<area shape="poly" id="edge24_Node000010_Node000025" title=" " alt="" coords="1656,499,1924,545,1935,548,1934,553,1923,551,1656,504"/>
+<area shape="rect" id="Node000027" href="$inspector_8h.html" title=" " alt="" coords="2583,548,2749,588"/>
+<area shape="poly" id="edge26_Node000010_Node000027" title=" " alt="" coords="1657,487,1824,492,2051,502,2309,519,2570,545,2583,547,2582,552,2570,551,2309,524,2051,507,1824,497,1657,493"/>
+<area shape="rect" id="Node000029" href="$meteo_8h.html" title=" " alt="" coords="17,555,222,581"/>
+<area shape="poly" id="edge28_Node000010_Node000029" title=" " alt="" coords="1494,492,1276,495,965,504,604,521,237,551,183,558,182,553,236,545,604,516,965,498,1276,490,1494,486"/>
+<area shape="rect" id="Node000031" href="$monitor_8h.html" title=" " alt="" coords="249,548,405,588"/>
+<area shape="poly" id="edge30_Node000010_Node000031" title=" " alt="" coords="1494,491,1303,494,1036,502,729,520,572,533,418,551,406,552,405,547,418,545,572,528,729,515,1036,497,1303,488,1494,486"/>
+<area shape="rect" id="Node000033" href="$navigator_8h.html" title=" " alt="" coords="601,548,768,588"/>
+<area shape="poly" id="edge32_Node000010_Node000033" title=" " alt="" coords="1494,494,1181,512,982,528,781,551,769,552,768,547,780,545,981,523,1180,506,1494,489"/>
+<area shape="rect" id="Node000035" href="$parkmanager_8h.html" title=" " alt="" coords="793,548,985,588"/>
+<area shape="poly" id="edge33_Node000010_Node000035" title=" " alt="" coords="1495,498,1270,519,997,551,986,552,985,547,996,545,1270,513,1494,493"/>
+<area shape="rect" id="Node000037" href="$planner_8h.html" title=" " alt="" coords="1009,548,1163,588"/>
+<area shape="poly" id="edge34_Node000010_Node000037" title=" " alt="" coords="1495,502,1346,523,1176,551,1164,553,1163,548,1175,545,1345,518,1494,497"/>
+<area shape="rect" id="Node000039" href="$polar_8h.html" title=" " alt="" coords="1187,555,1374,581"/>
+<area shape="poly" id="edge35_Node000010_Node000039" title=" " alt="" coords="1520,506,1324,558,1323,553,1519,501"/>
+<area shape="rect" id="Node000041" href="$sequencer_8h.html" title=" " alt="" coords="1399,548,1571,588"/>
+<area shape="poly" id="edge36_Node000010_Node000041" title=" " alt="" coords="1553,511,1508,550,1505,546,1550,507"/>
+<area shape="rect" id="Node000013" href="$controller_8h.html" title=" " alt="" coords="3091,643,3209,669"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="2907,582,3111,641,3109,646,2905,587"/>
+<area shape="rect" id="Node000016" href="$globaldatastore_8cpp.html" title=" " alt="" coords="2781,643,2956,669"/>
+<area shape="poly" id="edge15_Node000012_Node000016" title=" " alt="" coords="2860,594,2869,642,2864,643,2855,595"/>
+<area shape="rect" id="Node000014" href="$controller_8cpp.html" title=" " alt="" coords="3387,724,3521,749"/>
+<area shape="poly" id="edge13_Node000013_Node000014" title=" " alt="" coords="3208,669,3410,721,3409,727,3207,675"/>
+<area shape="rect" id="Node000015" href="$ost_8cpp.html" title=" " alt="" coords="3104,724,3196,749"/>
+<area shape="poly" id="edge14_Node000013_Node000015" title=" " alt="" coords="3153,682,3153,724,3147,724,3147,682"/>
+<area shape="rect" id="Node000018" href="$allsky_8cpp.html" title=" " alt="" coords="1595,636,1737,676"/>
+<area shape="poly" id="edge17_Node000017_Node000018" title=" " alt="" coords="1669,602,1669,636,1663,636,1663,602"/>
+<area shape="rect" id="Node000020" href="$dummy_8cpp.html" title=" " alt="" coords="2101,643,2335,669"/>
+<area shape="poly" id="edge19_Node000019_Node000020" title=" " alt="" coords="2232,595,2223,643,2218,642,2227,594"/>
+<area shape="rect" id="Node000022" href="$focus_8cpp.html" title=" " alt="" coords="2360,643,2567,669"/>
+<area shape="poly" id="edge21_Node000021_Node000022" title=" " alt="" coords="2466,595,2466,643,2461,643,2461,595"/>
+<area shape="rect" id="Node000024" href="$guider_8cpp.html" title="Autoguiding module for OST &#45; Corrects telescope tracking drift." alt="" coords="430,636,577,676"/>
+<area shape="poly" id="edge23_Node000023_Node000024" title=" " alt="" coords="506,602,506,636,501,636,501,602"/>
+<area shape="rect" id="Node000026" href="$indipanel_8cpp.html" title=" " alt="" coords="1911,636,2077,676"/>
+<area shape="poly" id="edge25_Node000025_Node000026" title=" " alt="" coords="2012,602,2002,637,1997,635,2006,600"/>
+<area shape="rect" id="Node000028" href="$inspector_8cpp.html" title=" " alt="" coords="2591,636,2757,676"/>
+<area shape="poly" id="edge27_Node000027_Node000028" title=" " alt="" coords="2672,601,2675,636,2670,636,2666,602"/>
+<area shape="rect" id="Node000030" href="$meteo_8cpp.html" title=" " alt="" coords="5,643,225,669"/>
+<area shape="poly" id="edge29_Node000029_Node000030" title=" " alt="" coords="121,595,119,643,113,643,115,594"/>
+<area shape="rect" id="Node000032" href="$monitor_8cpp.html" title=" " alt="" coords="249,636,405,676"/>
+<area shape="poly" id="edge31_Node000031_Node000032" title=" " alt="" coords="330,602,330,636,325,636,325,602"/>
+<area shape="poly" id="edge38_Node000043_Node000009" title=" " alt="" coords="3300,506,3082,558,3081,553,3299,501"/>
+<area shape="poly" id="edge40_Node000043_Node000014" title=" " alt="" coords="3466,500,3546,518,3578,531,3599,546,3611,573,3609,600,3596,626,3576,652,3524,695,3476,726,3473,722,3521,691,3572,648,3592,624,3604,599,3606,574,3595,550,3576,535,3545,523,3465,505"/>
+<area shape="rect" id="Node000044" href="$modulejsondumper_8cpp.html" title=" " alt="" coords="3351,555,3584,581"/>
+<area shape="poly" id="edge39_Node000043_Node000044" title=" " alt="" coords="3389,506,3453,553,3450,557,3386,510"/>
+<area shape="rect" id="Node000045" href="$wshandler_8cpp.html" title=" " alt="" coords="3187,555,3326,581"/>
+<area shape="poly" id="edge41_Node000043_Node000045" title=" " alt="" coords="3336,510,3274,557,3270,553,3333,506"/>
+<area shape="poly" id="edge43_Node000046_Node000013" title=" " alt="" coords="3155,514,3153,643,3148,643,3150,514"/>
+<area shape="poly" id="edge44_Node000046_Node000045" title=" " alt="" coords="3180,506,3243,553,3240,557,3177,510"/>
+<area shape="poly" id="edge49_Node000049_Node000005" title=" " alt="" coords="3389,204,3093,258,3092,252,3388,199"/>
+<area shape="poly" id="edge50_Node000049_Node000043" title=" " alt="" coords="3435,209,3411,230,3391,256,3378,285,3369,317,3360,380,3359,436,3362,474,3357,475,3354,436,3355,380,3364,316,3373,284,3386,253,3407,226,3432,205"/>
+<area shape="rect" id="Node000050" href="$propertyjsondumper_8cpp.html" title="JSON serialization visitor implementation." alt="" coords="3400,255,3639,280"/>
+<area shape="poly" id="edge51_Node000049_Node000050" title=" " alt="" coords="3483,209,3513,253,3509,256,3478,212"/>
+<area shape="poly" id="edge53_Node000051_Node000005" title=" " alt="" coords="2869,202,3002,252,3000,257,2868,207"/>
+<area shape="rect" id="Node000052" href="$propertytextdumper_8cpp.html" title="Human&#45;readable text serialization implementation." alt="" coords="2707,255,2945,280"/>
+<area shape="poly" id="edge54_Node000051_Node000052" title=" " alt="" coords="2829,213,2829,254,2823,254,2823,213"/>
+<area shape="poly" id="edge56_Node000053_Node000005" title=" " alt="" coords="3052,213,3038,255,3033,254,3047,211"/>
+<area shape="rect" id="Node000054" href="$propertyupdate_8cpp.html" title="Property update visitor implementation." alt="" coords="3117,255,3325,280"/>
+<area shape="poly" id="edge57_Node000053_Node000054" title=" " alt="" coords="3095,203,3198,252,3196,257,3093,208"/>
 </map>

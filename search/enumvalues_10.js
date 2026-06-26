@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['uc_0',['uc',['../namespaceOST.html#a0751cbe531343f15a2486bbbdaa84c56ad38af049e086eb7b59102bcf0c93974c',1,'OST']]]
+  ['readonly_0',['ReadOnly',['../namespaceOST.html#a9be35f589fb7dd8d44169b078554ad72aa26b509f5dfe567dbc33a5bb4f771664',1,'OST']]],
+  ['readwrite_1',['ReadWrite',['../namespaceOST.html#a9be35f589fb7dd8d44169b078554ad72ac542d3f83c8feec61ae9a959af6043d0',1,'OST']]],
+  ['red_2',['RED',['../namespaceFITSImage.html#ac5eaadf0fcd767a4171dd3a736a44278a610ebf6c18f12c52929f9456bcd15845',1,'FITSImage']]]
 ];
