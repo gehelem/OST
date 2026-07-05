@@ -1,13 +1,11 @@
 name: Generate Doxygen API
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
   deploy:
+    if: false
     runs-on: ubuntu-latest
     steps:
       - uses: DenverCoder1/doxygen-github-pages-action@v1.3.0
