@@ -82,15 +82,12 @@ set(TS_FILES
 )
 
 find_program(QT_LRELEASE_EXECUTABLE
-    NAMES lrelease-qt6
+    NAMES lrelease-qt6 lrelease
+    HINTS
+        /usr/lib/qt6/bin
+        /usr/lib/x86_64-linux-gnu/qt6/bin
+        $ENV{QT_ROOT_DIR}/bin
 )
-if(NOT QT_LRELEASE_EXECUTABLE)
-    find_program(QT_LRELEASE_EXECUTABLE
-        NAMES lrelease
-        HINTS /usr/lib/qt6/bin /usr/lib/x86_64-linux-gnu/qt6/bin
-        NO_DEFAULT_PATH
-    )
-endif()
 if(NOT QT_LRELEASE_EXECUTABLE)
     message(FATAL_ERROR "lrelease (Qt6) not found. Install qt6-tools-dev-tools.")
 endif()
@@ -158,8 +155,8 @@ target_link_libraries(ostserver
     z
 )
 # Ensure translations are compiled before linking ostserver
-add_dependencies(ostserver translations)
-add_dependencies(ostserver generate_version)
+#add_dependencies(ostserver translations)
+#add_dependencies(ostserver generate_version)
 
 #########################
 #### modules libraries ##
@@ -308,7 +305,7 @@ target_link_libraries(ostbasemodule
     Threads::Threads
     z
 )
-add_dependencies(ostbasemodule generate_version)
+#add_dependencies(ostbasemodule generate_version)
 
 # Indi module
 #list (APPEND RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/indimodule/indimodule.qrc)
@@ -336,7 +333,7 @@ target_link_libraries(ostindimodule
     Threads::Threads
     z
 )
-add_dependencies(ostindimodule generate_version)
+#add_dependencies(ostindimodule generate_version)
 
 
 
@@ -593,16 +590,16 @@ install(
 
 # Create a custom target that always runs
 
-add_custom_target(
-    generate_version ALL
-    COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/generate-version.sh"
-            "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
-            "${CMAKE_CURRENT_SOURCE_DIR}/src/version.cc.in"
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-    BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
-    COMMENT "Generating version.cc from git information..."
-    VERBATIM
-)
+#add_custom_target(
+#    generate_version ALL
+#    COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/generate-version.sh"
+#            "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
+#            "${CMAKE_CURRENT_SOURCE_DIR}/src/version.cc.in"
+#    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+#    BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
+#    COMMENT "Generating version.cc from git information..."
+#    VERBATIM
+#)
 
 # Add version.cc to sources
 list(APPEND SOURCES "${CMAKE_CURRENT_BINARY_DIR}/version.cc" version.hh)
