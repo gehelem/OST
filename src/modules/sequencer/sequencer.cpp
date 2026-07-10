@@ -31,6 +31,8 @@ Sequencer::Sequencer(QString name, QString label, QString profile, QVariantMap a
 
     giveMeADevice("camera", "Camera",       INDI::BaseDevice::CCD_INTERFACE);
     giveMeADevice("filter", "Filter wheel", INDI::BaseDevice::FILTER_INTERFACE);
+    getEltString("devices", "camera")->setLovConstrained(true);
+    getEltString("devices", "filter")->setLovConstrained(true);
     getEltString("devices", "filter")->setNullable(true);
     defineMeAsSequencer();
     refreshFilterLov();
@@ -576,8 +578,13 @@ void Sequencer::newBLOB(INDI::PropertyBlob pblob)
     }
     else
     {
-        _image->saveAsFITSSimple(
-            mCurrentFolder + "/" + mObjectName + "-" + mCurrentFrameType + "-" + mCurrentFilter + "-" + tt + ".FITS");
+        // Skip empty segments (object name, filter) instead of leaving a bare "--"
+        QStringList nameParts;
+        if (!mObjectName.isEmpty()) nameParts << mObjectName;
+        nameParts << mCurrentFrameType;
+        if (!mCurrentFilter.isEmpty()) nameParts << mCurrentFilter;
+        nameParts << tt;
+        _image->saveAsFITSSimple(mCurrentFolder + "/" + nameParts.join("-") + ".FITS");
     }
 
     // newBLOB runs in the INDI thread — only do I/O here.
@@ -668,18 +675,24 @@ void Sequencer::newExp(INDI::PropertyNumber exp)
 void Sequencer::setupOutputFolder()
 {
     QDir dir;
-    QString base = getWebroot() + "/" + getModuleName() + "/" + mObjectName;
+    QString base = getWebroot() + "/" + getModuleName();
+    if (!mObjectName.isEmpty())
+        base += "/" + mObjectName;
 
     if (mCurrentFrameType == "L")
     {
         sendModNewSwitch(getString("devices", "camera"), "CCD_FRAME_TYPE", "FRAME_LIGHT", ISS_ON);
-        mCurrentFolder = base + "/LIGHT/" + mCurrentFilter;
+        mCurrentFolder = base + "/LIGHT";
+        if (!mCurrentFilter.isEmpty())
+            mCurrentFolder += "/" + mCurrentFilter;
         dir.mkpath(mCurrentFolder);
     }
     else if (mCurrentFrameType == "F")
     {
         sendModNewSwitch(getString("devices", "camera"), "CCD_FRAME_TYPE", "FRAME_FLAT", ISS_ON);
-        mCurrentFolder = base + "/FLAT/" + mCurrentFilter;
+        mCurrentFolder = base + "/FLAT";
+        if (!mCurrentFilter.isEmpty())
+            mCurrentFolder += "/" + mCurrentFilter;
         dir.mkpath(mCurrentFolder);
     }
     else if (mCurrentFrameType == "B")
