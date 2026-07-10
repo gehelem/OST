@@ -237,11 +237,33 @@ class ElementBase: public QObject
 
         /**
          * @brief Set whether the element value must be constrained to the LOV
-         * @param constrained true = frontend enforces selection from LOV only
+         * @param constrained true = frontend enforces selection from LOV only,
+         *                    false = LOV is a suggestion, free typing is allowed
          */
         void setLovConstrained(bool constrained)
         {
             mLovConstrained = constrained;
+        }
+
+        /**
+         * @brief Get whether the element may be left empty
+         * @return true if the frontend should offer a "none" choice
+         *
+         * Independent from getLovConstrained(): a nullable element can still
+         * require its non-empty value to come from the LOV.
+         */
+        bool getNullable()
+        {
+            return mNullable;
+        }
+
+        /**
+         * @brief Set whether the element may be left empty
+         * @param nullable true = frontend offers a "none" choice in addition to the LOV
+         */
+        void setNullable(bool nullable)
+        {
+            mNullable = nullable;
         }
 
     private:
@@ -257,6 +279,7 @@ class ElementBase: public QObject
         QString mGlobalLov = "";          /*!< Reference to global LOV key */
         LovScope mLovScope = LovScope::Module; /*!< Who is responsible for this LOV's content */
         bool mLovConstrained = false;     /*!< Frontend hint: value must belong to the LOV */
+        bool mNullable = false;           /*!< Frontend hint: value may be left empty */
 
     public slots:
         /**

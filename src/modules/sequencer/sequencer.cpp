@@ -31,6 +31,7 @@ Sequencer::Sequencer(QString name, QString label, QString profile, QVariantMap a
 
     giveMeADevice("camera", "Camera",       INDI::BaseDevice::CCD_INTERFACE);
     giveMeADevice("filter", "Filter wheel", INDI::BaseDevice::FILTER_INTERFACE);
+    getEltString("devices", "filter")->setNullable(true);
     defineMeAsSequencer();
     refreshFilterLov();
 
@@ -571,7 +572,7 @@ void Sequencer::newBLOB(INDI::PropertyBlob pblob)
     if (totalBytes > 0 && freeBytes * 100 / totalBytes < getMinFreePercent())
     {
         logWarning("Sequencer: disk too full (%1 MB free, threshold %2%) — FITS not saved: %3",
-                   {freeBytes / (1024 * 1024), getMinFreePercent(), mCurrentFolder});
+        {freeBytes / (1024 * 1024), getMinFreePercent(), mCurrentFolder});
     }
     else
     {
@@ -697,6 +698,11 @@ void Sequencer::setupOutputFolder()
 
 void Sequencer::refreshFilterLov()
 {
+    // Always clear first: a filter device that was unassigned or went
+    // invalid must not leave stale filter names in the LOV (mCurrentFilter
+    // must fall back to empty, not resolve to a phantom stale entry).
+    getEltString("sequence", "filter")->lovClear();
+
     INDI::BaseDevice dp = getDevice(getString("devices", "filter").toStdString().c_str());
     if (!dp.isValid())
         return;
@@ -705,7 +711,6 @@ void Sequencer::refreshFilterLov()
     if (!txt.isValid())
         return;
 
-    getEltString("sequence", "filter")->lovClear();
     for (unsigned int i = 0; i < txt.count(); i++)
     {
         getEltString("sequence", "filter")->lovAdd(QString::number(i + 1), txt[i].getText());
