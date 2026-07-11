@@ -209,6 +209,7 @@ class ElementTemplateNumeric : public ElementTemplate<T>
                 }
             }
             ElementTemplate<T>::mValue = value;
+            ElementBase::setNull(false);
             if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ee, QVariant(), this);
             return true;
         }
@@ -501,6 +502,7 @@ class ElementTemplateNotNumeric : public ElementTemplate<T>
         bool setValue(const T &value, const bool &emitEvent)
         {
             ElementTemplate<T>::mValue = value;
+            ElementBase::setNull(false);
             if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ee, QVariant(), this);
             return true;
         }

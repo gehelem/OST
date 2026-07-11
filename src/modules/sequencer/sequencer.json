@@ -250,6 +250,25 @@
                 "order": 8,
                 "format": "9.9",
                 "hint": "Trigger a guider recalibration when the peak RMS during an exposure exceeds this value in arcs; 0 disables the check"
+            },
+            "enablecooling": {
+                "type": "bool",
+                "label": "Enable camera cooling",
+                "autoupdate": true,
+                "directedit": true,
+                "value": false,
+                "order": 9,
+                "hint": "Request camera cooling to the target temperature before starting the sequence, and wait until it is reached"
+            },
+            "targettemperature": {
+                "type": "float",
+                "label": "Target temperature (°C)",
+                "autoupdate": true,
+                "directedit": true,
+                "value": -10,
+                "order": 10,
+                "format": "9.9",
+                "hint": "Sensor target temperature in °C; the sequence waits until this is reached before starting"
             }
         }
     }

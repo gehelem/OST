@@ -34,6 +34,9 @@ class MODULE_INIT Sequencer: public IndiModule
         void onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QString elt, QVariant data, int line) override;
 
     private slots:
+        // ── Pre-sequence entry points ───────────────────────────────────────
+        void SMWaitCooling();     // immediate skip, or waits for CCD_TEMPERATURE IPS_OK
+
         // ── SequenceCtrl entry points ───────────────────────────────────────
         void SMInitLine();
         void SMFilterStep();

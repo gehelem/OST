@@ -76,6 +76,7 @@ void ElementJsonDumper::visit(ElementInt *pElement, QVariantMap &data, bool &emi
         json["globallov"] = pElement->getGlobalLov();
         json["lovScope"] = (pElement->getLovScope() == LovScope::Controller) ? "controller" : "module";
         json["lovConstrained"] = pElement->getLovConstrained();
+        json["nullable"] = pElement->getNullable();
     }
     else
     {
@@ -117,6 +118,7 @@ void ElementJsonDumper::visit(ElementFloat *pElement, QVariantMap &data, bool &e
         json["globallov"] = pElement->getGlobalLov();
         json["lovScope"] = (pElement->getLovScope() == LovScope::Controller) ? "controller" : "module";
         json["lovConstrained"] = pElement->getLovConstrained();
+        json["nullable"] = pElement->getNullable();
     }
     else
     {
@@ -149,6 +151,7 @@ void ElementJsonDumper::visit(ElementString *pElement, QVariantMap &data, bool &
         json["globallov"] = pElement->getGlobalLov();
         json["lovScope"] = (pElement->getLovScope() == LovScope::Controller) ? "controller" : "module";
         json["lovConstrained"] = pElement->getLovConstrained();
+        json["nullable"] = pElement->getNullable();
     }
     else
     {
