@@ -43,6 +43,8 @@ Sequencer::Sequencer(QString name, QString label, QString profile, QVariantMap a
 
     pMachine = QScxmlStateMachine::fromFile(":sequencer.scxml");
 
+    // Pre-sequence
+    pMachine->connectToState("WaitCooling",   QScxmlStateMachine::onEntry(this, &Sequencer::SMWaitCooling));
     // SequenceCtrl
     pMachine->connectToState("InitLine",      QScxmlStateMachine::onEntry(this, &Sequencer::SMInitLine));
     pMachine->connectToState("FilterStep",    QScxmlStateMachine::onEntry(this, &Sequencer::SMFilterStep));
@@ -131,6 +133,32 @@ void Sequencer::onExternalEvent(OST::ExtEvent event)
 
     if (event.prpkey == "devices")
         refreshFilterLov();
+}
+
+// =============================================================================
+// Pre-sequence entry points
+// =============================================================================
+
+void Sequencer::SMWaitCooling()
+{
+    //qDebug() << "SMWaitCooling";
+    if (!getBool("parameters", "enablecooling"))
+    {
+        pMachine->submitEvent("CoolingReady");
+        return;
+    }
+
+    QString camera = getString("devices", "camera");
+    if (!getDevice(camera.toStdString().c_str()).isValid())
+    {
+        pMachine->submitEvent("CoolingReady");
+        return;
+    }
+
+    double target = getFloat("parameters", "targettemperature");
+    logInfo("Requesting camera cooling to %1°C", {QString::number(target, 'f', 1)});
+    sendModNewNumber(camera, "CCD_TEMPERATURE", "CCD_TEMPERATURE_VALUE", target);
+    // CoolingReady submitted by updateProperty() when CCD_TEMPERATURE reaches IPS_OK
 }
 
 // =============================================================================
@@ -641,6 +669,16 @@ void Sequencer::updateProperty(INDI::Property property)
         emit cameraAlert();
         if (pMachine->isRunning())
             pMachine->submitEvent("CameraAlert");
+        return;
+    }
+
+    if (property.getDeviceName() == getString("devices", "camera") &&
+            QString(property.getName()) == "CCD_TEMPERATURE" &&
+            property.getState() == IPS_OK &&
+            pMachine->isActive("WaitCooling"))
+    {
+        logInfo("Camera temperature reached");
+        pMachine->submitEvent("CoolingReady");
         return;
     }
 
