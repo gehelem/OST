@@ -37,6 +37,17 @@ bool ElementString::lovClear()
 {
     return mLov.lovClear();
 }
+bool ElementString::setValue(const QString &value, const bool &emitEvent)
+{
+    ElementTemplate<QString>::mValue = value;
+    setNull(value.isEmpty());
+    if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ee, QVariant(), this);
+    return true;
+}
+bool ElementString::setValue(const QString &value)
+{
+    return setValue(value, true);
+}
 
 void ValueString::accept(ValueVisitor* pVisitor)
 {

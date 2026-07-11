@@ -266,6 +266,31 @@ class ElementBase: public QObject
             mNullable = nullable;
         }
 
+        /**
+         * @brief Check whether the element's current value should be treated as absent
+         * @return true if the element is currently "null" (no value)
+         *
+         * Independent from the underlying typed value (mValue in ElementTemplate<T>):
+         * a null element keeps whatever value it last held, but code should treat it
+         * as unset. Only meaningful when getNullable() is true.
+         */
+        bool isNull()
+        {
+            return mIsNull;
+        }
+
+        /**
+         * @brief Mark the element's current value as absent (or clear that state)
+         * @param isNull true = element is now "null" (no value), false = has a real value
+         *
+         * Does not touch the underlying typed value — callers that set a real value
+         * should also call setNull(false) to un-mark it.
+         */
+        void setNull(bool isNull)
+        {
+            mIsNull = isNull;
+        }
+
     private:
         QString mKey = "";                              /*!< Unique internal identifier */
         QString mLabel = "change me";     /*!< Display label for frontend */
@@ -280,6 +305,7 @@ class ElementBase: public QObject
         LovScope mLovScope = LovScope::Module; /*!< Who is responsible for this LOV's content */
         bool mLovConstrained = false;     /*!< Frontend hint: value must belong to the LOV */
         bool mNullable = false;           /*!< Frontend hint: value may be left empty */
+        bool mIsNull = false;             /*!< Current value should be treated as absent */
 
     public slots:
         /**

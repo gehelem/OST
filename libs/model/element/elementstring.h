@@ -135,6 +135,28 @@ class ElementString: public ElementTemplateNotNumeric<QString>
          */
         bool lovClear();
 
+        /**
+         * @brief Set value with optional signal emission
+         * @param value New value to set
+         * @param emitEvent Whether to emit valueSet() signal
+         * @return Always returns true (no validation for strings)
+         *
+         * Overrides ElementTemplateNotNumeric<QString>::setValue() to special-case
+         * the empty string: unlike every other element type (where any setValue()
+         * call clears isNull()), assigning "" to an ElementString keeps/marks it
+         * null. This is how the frontend represents "no selection" for optional
+         * string LOVs (e.g. an unset device) — the empty string IS the null state,
+         * not just an ordinary value.
+         */
+        bool setValue(const QString &value, const bool &emitEvent);
+
+        /**
+         * @brief Set value with signal emission
+         * @param value New value to set
+         * @return Always returns true (no validation for strings)
+         */
+        bool setValue(const QString &value);
+
     private:
         LovString mLov;  /*!< List of Values for dropdown/radio selection */
 
