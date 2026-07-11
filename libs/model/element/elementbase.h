@@ -237,11 +237,58 @@ class ElementBase: public QObject
 
         /**
          * @brief Set whether the element value must be constrained to the LOV
-         * @param constrained true = frontend enforces selection from LOV only
+         * @param constrained true = frontend enforces selection from LOV only,
+         *                    false = LOV is a suggestion, free typing is allowed
          */
         void setLovConstrained(bool constrained)
         {
             mLovConstrained = constrained;
+        }
+
+        /**
+         * @brief Get whether the element may be left empty
+         * @return true if the frontend should offer a "none" choice
+         *
+         * Independent from getLovConstrained(): a nullable element can still
+         * require its non-empty value to come from the LOV.
+         */
+        bool getNullable()
+        {
+            return mNullable;
+        }
+
+        /**
+         * @brief Set whether the element may be left empty
+         * @param nullable true = frontend offers a "none" choice in addition to the LOV
+         */
+        void setNullable(bool nullable)
+        {
+            mNullable = nullable;
+        }
+
+        /**
+         * @brief Check whether the element's current value should be treated as absent
+         * @return true if the element is currently "null" (no value)
+         *
+         * Independent from the underlying typed value (mValue in ElementTemplate<T>):
+         * a null element keeps whatever value it last held, but code should treat it
+         * as unset. Only meaningful when getNullable() is true.
+         */
+        bool isNull()
+        {
+            return mIsNull;
+        }
+
+        /**
+         * @brief Mark the element's current value as absent (or clear that state)
+         * @param isNull true = element is now "null" (no value), false = has a real value
+         *
+         * Does not touch the underlying typed value — callers that set a real value
+         * should also call setNull(false) to un-mark it.
+         */
+        void setNull(bool isNull)
+        {
+            mIsNull = isNull;
         }
 
     private:
@@ -257,6 +304,8 @@ class ElementBase: public QObject
         QString mGlobalLov = "";          /*!< Reference to global LOV key */
         LovScope mLovScope = LovScope::Module; /*!< Who is responsible for this LOV's content */
         bool mLovConstrained = false;     /*!< Frontend hint: value must belong to the LOV */
+        bool mNullable = false;           /*!< Frontend hint: value may be left empty */
+        bool mIsNull = false;             /*!< Current value should be treated as absent */
 
     public slots:
         /**

@@ -43,7 +43,7 @@
         <transition event="startsequence" target="Active"/>
     </state>
 
-    <state id="Active" initial="Running">
+    <state id="Active" initial="WaitCooling">
         <qt:editorinfo geometry="0;100;-520;-880;1040;1760" scenegeometry="0;100;-520;-780;1040;1760"/>
         <onentry><!--log label="Active entry"/--></onentry>
         <onexit><!--log label="Active exit"/--></onexit>
@@ -54,6 +54,23 @@
              We do NOT use done.state.Running — Qt SCXML parallel done-event
              propagation re-enters the parallel state instead of exiting it. -->
         <transition event="SequenceDoneAll"  target="Done"/>
+
+        <!-- WaitCooling: C++ immediately submits CoolingReady if cooling is
+             disabled or the camera device is invalid. Otherwise waits for
+             updateProperty() to see CCD_TEMPERATURE reach IPS_OK. -->
+        <state id="WaitCooling">
+            <qt:editorinfo geometry="0;-800;-110;-40;220;80" scenegeometry="0;-800;-90;-840;220;80"/>
+            <onentry>
+                <!--log label="WaitCooling entry"/-->
+                <send id="t_cooling" event="CoolingTimeout" delay="1200s"/>
+            </onentry>
+            <onexit>
+                <!--log label="WaitCooling exit"/-->
+                <cancel sendid="t_cooling"/>
+            </onexit>
+            <transition event="CoolingReady"   target="Running"/>
+            <transition event="CoolingTimeout" target="Error"/>
+        </state>
 
         <!-- ═══════════════════════════════════════ -->
         <parallel id="Running">

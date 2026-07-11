@@ -31,6 +31,9 @@ Sequencer::Sequencer(QString name, QString label, QString profile, QVariantMap a
 
     giveMeADevice("camera", "Camera",       INDI::BaseDevice::CCD_INTERFACE);
     giveMeADevice("filter", "Filter wheel", INDI::BaseDevice::FILTER_INTERFACE);
+    getEltString("devices", "camera")->setLovConstrained(true);
+    getEltString("devices", "filter")->setLovConstrained(true);
+    getEltString("devices", "filter")->setNullable(true);
     defineMeAsSequencer();
     refreshFilterLov();
 
@@ -40,6 +43,8 @@ Sequencer::Sequencer(QString name, QString label, QString profile, QVariantMap a
 
     pMachine = QScxmlStateMachine::fromFile(":sequencer.scxml");
 
+    // Pre-sequence
+    pMachine->connectToState("WaitCooling",   QScxmlStateMachine::onEntry(this, &Sequencer::SMWaitCooling));
     // SequenceCtrl
     pMachine->connectToState("InitLine",      QScxmlStateMachine::onEntry(this, &Sequencer::SMInitLine));
     pMachine->connectToState("FilterStep",    QScxmlStateMachine::onEntry(this, &Sequencer::SMFilterStep));
@@ -128,6 +133,32 @@ void Sequencer::onExternalEvent(OST::ExtEvent event)
 
     if (event.prpkey == "devices")
         refreshFilterLov();
+}
+
+// =============================================================================
+// Pre-sequence entry points
+// =============================================================================
+
+void Sequencer::SMWaitCooling()
+{
+    //qDebug() << "SMWaitCooling";
+    if (!getBool("parameters", "enablecooling"))
+    {
+        pMachine->submitEvent("CoolingReady");
+        return;
+    }
+
+    QString camera = getString("devices", "camera");
+    if (!getDevice(camera.toStdString().c_str()).isValid())
+    {
+        pMachine->submitEvent("CoolingReady");
+        return;
+    }
+
+    double target = getFloat("parameters", "targettemperature");
+    logInfo("Requesting camera cooling to %1°C", {QString::number(target, 'f', 1)});
+    sendModNewNumber(camera, "CCD_TEMPERATURE", "CCD_TEMPERATURE_VALUE", target);
+    // CoolingReady submitted by updateProperty() when CCD_TEMPERATURE reaches IPS_OK
 }
 
 // =============================================================================
@@ -571,12 +602,17 @@ void Sequencer::newBLOB(INDI::PropertyBlob pblob)
     if (totalBytes > 0 && freeBytes * 100 / totalBytes < getMinFreePercent())
     {
         logWarning("Sequencer: disk too full (%1 MB free, threshold %2%) — FITS not saved: %3",
-                   {freeBytes / (1024 * 1024), getMinFreePercent(), mCurrentFolder});
+        {freeBytes / (1024 * 1024), getMinFreePercent(), mCurrentFolder});
     }
     else
     {
-        _image->saveAsFITSSimple(
-            mCurrentFolder + "/" + mObjectName + "-" + mCurrentFrameType + "-" + mCurrentFilter + "-" + tt + ".FITS");
+        // Skip empty segments (object name, filter) instead of leaving a bare "--"
+        QStringList nameParts;
+        if (!mObjectName.isEmpty()) nameParts << mObjectName;
+        nameParts << mCurrentFrameType;
+        if (!mCurrentFilter.isEmpty()) nameParts << mCurrentFilter;
+        nameParts << tt;
+        _image->saveAsFITSSimple(mCurrentFolder + "/" + nameParts.join("-") + ".FITS");
     }
 
     // newBLOB runs in the INDI thread — only do I/O here.
@@ -636,6 +672,16 @@ void Sequencer::updateProperty(INDI::Property property)
         return;
     }
 
+    if (property.getDeviceName() == getString("devices", "camera") &&
+            QString(property.getName()) == "CCD_TEMPERATURE" &&
+            property.getState() == IPS_OK &&
+            pMachine->isActive("WaitCooling"))
+    {
+        logInfo("Camera temperature reached");
+        pMachine->submitEvent("CoolingReady");
+        return;
+    }
+
     if (property.getDeviceName() == getString("devices", "filter") &&
             QString(property.getName()) == "FILTER_SLOT" &&
             property.getState() == IPS_OK &&
@@ -667,18 +713,24 @@ void Sequencer::newExp(INDI::PropertyNumber exp)
 void Sequencer::setupOutputFolder()
 {
     QDir dir;
-    QString base = getWebroot() + "/" + getModuleName() + "/" + mObjectName;
+    QString base = getWebroot() + "/" + getModuleName();
+    if (!mObjectName.isEmpty())
+        base += "/" + mObjectName;
 
     if (mCurrentFrameType == "L")
     {
         sendModNewSwitch(getString("devices", "camera"), "CCD_FRAME_TYPE", "FRAME_LIGHT", ISS_ON);
-        mCurrentFolder = base + "/LIGHT/" + mCurrentFilter;
+        mCurrentFolder = base + "/LIGHT";
+        if (!mCurrentFilter.isEmpty())
+            mCurrentFolder += "/" + mCurrentFilter;
         dir.mkpath(mCurrentFolder);
     }
     else if (mCurrentFrameType == "F")
     {
         sendModNewSwitch(getString("devices", "camera"), "CCD_FRAME_TYPE", "FRAME_FLAT", ISS_ON);
-        mCurrentFolder = base + "/FLAT/" + mCurrentFilter;
+        mCurrentFolder = base + "/FLAT";
+        if (!mCurrentFilter.isEmpty())
+            mCurrentFolder += "/" + mCurrentFilter;
         dir.mkpath(mCurrentFolder);
     }
     else if (mCurrentFrameType == "B")
@@ -697,6 +749,11 @@ void Sequencer::setupOutputFolder()
 
 void Sequencer::refreshFilterLov()
 {
+    // Always clear first: a filter device that was unassigned or went
+    // invalid must not leave stale filter names in the LOV (mCurrentFilter
+    // must fall back to empty, not resolve to a phantom stale entry).
+    getEltString("sequence", "filter")->lovClear();
+
     INDI::BaseDevice dp = getDevice(getString("devices", "filter").toStdString().c_str());
     if (!dp.isValid())
         return;
@@ -705,7 +762,6 @@ void Sequencer::refreshFilterLov()
     if (!txt.isValid())
         return;
 
-    getEltString("sequence", "filter")->lovClear();
     for (unsigned int i = 0; i < txt.count(); i++)
     {
         getEltString("sequence", "filter")->lovAdd(QString::number(i + 1), txt[i].getText());
