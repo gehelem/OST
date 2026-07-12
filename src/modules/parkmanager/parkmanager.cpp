@@ -187,6 +187,7 @@ void Parkmanager::disableAllCooling(void)
 void Parkmanager::startCloseSequence(void)
 {
     disableAllCooling();
+    otherModuleSetValue(getString("slaves", "plannermodule"), "actions", "stop", true);
 
     if (hasMount())
         mPhase = Phase::StoppingTracking;

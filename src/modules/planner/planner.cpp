@@ -203,6 +203,9 @@ void Planner::abortPlanner()
     getEltBool("actions", "start")->setValue(false, false);
     getEltBool("actions", "stop")->setValue(true, true);
 
+    otherModuleSetValue(getString("slaves", "sequencemodule"), "actions", "abortsequence", true);
+    otherModuleSetValue(getString("slaves", "navigatormodule"), "actions", "abortnavigator", true);
+
     if (!mIsRunning)
         return;
 
