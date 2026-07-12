@@ -90,6 +90,7 @@ class MODULE_INIT Sequencer: public IndiModule
         bool    mGuiderActive          = false; // true when guider module is confirmed guiding
         bool    mGuiderWasSuspended    = false; // true when WE aborted the guider for focus
         QString mCurrentFilter;
+        QString mCurrentFilterIndex;   // raw LOV key (sequence.filter), for focusprofiles lookup
         QString mPreviousFilter;
         QString mCurrentFrameType;
         QString mCurrentFolder;
