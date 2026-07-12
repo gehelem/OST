@@ -177,82 +177,15 @@
         "permission": 2,
         "order": 0,
         "hasprofile": true,
-        "label": "Parameters",
+        "label": "Sequence parameters",
         "e": {
-            "autofocusonfilterchange": {
-                "type": "bool",
-                "label": "Auto-focus on filter change",
-                "autoupdate": true,
-                "directedit": true,
-                "value": true,
-                "order": 0,
-                "hint": "Automatically trigger focus when the filter changes, including the first line of the sequence (no focus has happened yet since the module started) — and skips it if the last focus already matches the current filter"
-            },
-            "useguiding": {
-                "type": "bool",
-                "label": "Use guiding",
-                "autoupdate": true,
-                "directedit": true,
-                "value": false,
-                "order": 3,
-                "hint": "Enable guider integration (dithering, settle, RMS monitoring, focus suspension). The guider must be started manually before the sequence."
-            },
-            "suspendguidingduringfocus": {
-                "type": "bool",
-                "label": "Suspend guiding during focus",
-                "autoupdate": true,
-                "directedit": true,
-                "value": false,
-                "order": 4,
-                "hint": "Suspend guiding when autofocus is triggered and resume after focus completes"
-            },
-            "guidingsettletime": {
-                "type": "int",
-                "label": "Resume guiding settle time (s)",
-                "autoupdate": true,
-                "directedit": true,
-                "value": 10,
-                "order": 5,
-                "format": "99",
-                "hint": "Wait time in seconds after resuming guiding before continuing sequence (allows guiding to stabilize)"
-            },
-            "ditherevery": {
-                "type": "int",
-                "label": "Dither every N shots (0=disabled)",
-                "autoupdate": true,
-                "directedit": true,
-                "value": 0,
-                "order": 6,
-                "format": "99",
-                "hint": "Dither the guider every N captured frames; 0 disables dithering"
-            },
-            "hfrthreshold": {
-                "type": "float",
-                "label": "HFR refocus threshold (0=disabled)",
-                "autoupdate": true,
-                "directedit": true,
-                "value": 0,
-                "order": 7,
-                "format": "9.9",
-                "hint": "Trigger an autofocus when the measured HFR exceeds this value; 0 disables the check"
-            },
-            "rmsthreshold": {
-                "type": "float",
-                "label": "RMS recalibration threshold (0=disabled)",
-                "autoupdate": true,
-                "directedit": true,
-                "value": 0,
-                "order": 8,
-                "format": "9.9",
-                "hint": "Trigger a guider recalibration when the peak RMS during an exposure exceeds this value in arcs; 0 disables the check"
-            },
             "enablecooling": {
                 "type": "bool",
                 "label": "Enable camera cooling",
                 "autoupdate": true,
                 "directedit": true,
                 "value": false,
-                "order": 9,
+                "order": 0,
                 "hint": "Request camera cooling to the target temperature before starting the sequence, and wait until it is reached"
             },
             "targettemperature": {
@@ -261,7 +194,7 @@
                 "autoupdate": true,
                 "directedit": true,
                 "value": -10,
-                "order": 10,
+                "order": 1,
                 "format": "9.9",
                 "hint": "Sensor target temperature in °C; the sequence waits until this is reached before starting"
             },
@@ -271,7 +204,7 @@
                 "autoupdate": true,
                 "directedit": true,
                 "value": "L",
-                "order": 11,
+                "order": 2,
                 "listOfValues": [
                     ["L", "Light"],
                     ["B", "Bias"],
@@ -286,7 +219,7 @@
                 "autoupdate": true,
                 "directedit": true,
                 "value": 5,
-                "order": 12,
+                "order": 3,
                 "format": "99",
                 "hint": "Camera gain for every line of this sequence"
             },
@@ -296,9 +229,98 @@
                 "autoupdate": true,
                 "directedit": true,
                 "value": 5,
-                "order": 13,
+                "order": 4,
                 "format": "99",
                 "hint": "Camera offset for every line of this sequence"
+            }
+        }
+    },
+
+    "guideparameters": {
+        "devcat": "Guide",
+        "group": "",
+        "permission": 2,
+        "order": 0,
+        "hasprofile": true,
+        "label": "Guide parameters",
+        "e": {
+            "useguiding": {
+                "type": "bool",
+                "label": "Use guiding",
+                "autoupdate": true,
+                "directedit": true,
+                "value": false,
+                "order": 0,
+                "hint": "Enable guider integration (dithering, settle, RMS monitoring, focus suspension). The guider must be started manually before the sequence."
+            },
+            "guidingsettletime": {
+                "type": "int",
+                "label": "Resume guiding settle time (s)",
+                "autoupdate": true,
+                "directedit": true,
+                "value": 10,
+                "order": 1,
+                "format": "99",
+                "hint": "Wait time in seconds after resuming guiding before continuing sequence (allows guiding to stabilize)"
+            },
+            "ditherevery": {
+                "type": "int",
+                "label": "Dither every N shots (0=disabled)",
+                "autoupdate": true,
+                "directedit": true,
+                "value": 0,
+                "order": 2,
+                "format": "99",
+                "hint": "Dither the guider every N captured frames; 0 disables dithering"
+            },
+            "rmsthreshold": {
+                "type": "float",
+                "label": "RMS recalibration threshold (0=disabled)",
+                "autoupdate": true,
+                "directedit": true,
+                "value": 0,
+                "order": 3,
+                "format": "9.9",
+                "hint": "Trigger a guider recalibration when the peak RMS during an exposure exceeds this value in arcs; 0 disables the check"
+            }
+        }
+    },
+
+    "focusparameters": {
+        "devcat": "Focus",
+        "group": "",
+        "permission": 2,
+        "order": 0,
+        "hasprofile": true,
+        "label": "Focus parameters",
+        "e": {
+            "autofocusonfilterchange": {
+                "type": "bool",
+                "label": "Auto-focus on filter change",
+                "autoupdate": true,
+                "directedit": true,
+                "value": true,
+                "order": 0,
+                "hint": "Automatically trigger focus when the filter changes, including the first line of the sequence (no focus has happened yet since the module started) — and skips it if the last focus already matches the current filter"
+            },
+            "suspendguidingduringfocus": {
+                "type": "bool",
+                "label": "Suspend guiding during focus",
+                "autoupdate": true,
+                "directedit": true,
+                "value": false,
+                "order": 1,
+                "hint": "Suspend guiding when autofocus is triggered and resume after focus completes"
+            },
+            "hfrthreshold": {
+                "type": "float",
+                "label": "HFR refocus threshold (0=disabled)",
+                "autoupdate": true,
+                "directedit": true,
+                "value": 0,
+                "order": 2,
+                "format": "9.9",
+                "hint": "Trigger an autofocus when the measured HFR exceeds this value; 0 disables the check"
             },
             "focusprofile": {
                 "type": "string",
@@ -308,14 +330,14 @@
                 "autoupdate": true,
                 "directedit": true,
                 "value": "",
-                "order": 14,
+                "order": 3,
                 "hint": "Profile to load on the focus module before requesting autofocus; leave empty to keep whatever profile is currently loaded there"
             }
         }
     },
     "focusprofiles": {
-        "devcat": "Parameters",
-        "group": "Focus",
+        "devcat": "Focus",
+        "group": "",
         "permission": 2,
         "order": 6,
         "hasGrid": true,

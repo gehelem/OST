@@ -34,8 +34,8 @@ Sequencer::Sequencer(QString name, QString label, QString profile, QVariantMap a
     getEltString("devices", "camera")->setLovConstrained(true);
     getEltString("devices", "filter")->setLovConstrained(true);
     getEltString("devices", "filter")->setNullable(true);
-    getEltString("parameters", "focusprofile")->setLovConstrained(true);
-    getEltString("parameters", "focusprofile")->setNullable(true);
+    getEltString("focusparameters", "focusprofile")->setLovConstrained(true);
+    getEltString("focusparameters", "focusprofile")->setNullable(true);
     defineMeAsSequencer();
     refreshFilterLov();
 
@@ -243,7 +243,7 @@ void Sequencer::SMFocusGate()
     bool isLightOrFlat = (mCurrentFrameType == "L" || mCurrentFrameType == "F");
     bool needsFocus    = false;
 
-    if (isLightOrFlat && getBool("parameters", "autofocusonfilterchange"))
+    if (isLightOrFlat && getBool("focusparameters", "autofocusonfilterchange"))
     {
         // mHasFocusedOnce is false until the first focus of this module's
         // lifetime (not reset on sequence start) — that undetermined state
@@ -262,7 +262,7 @@ void Sequencer::SMGuideGate()
 {
     //qDebug() << "SMGuideGate";
 
-    if (!getBool("parameters", "useguiding"))
+    if (!getBool("guideparameters", "useguiding"))
     {
         pMachine->submitEvent("SkipGuide");
         return;
@@ -283,7 +283,7 @@ void Sequencer::SMGuideGate()
 void Sequencer::SMDitherGate()
 {
     //qDebug() << "SMDitherGate";
-    int ditherevery = getInt("parameters", "ditherevery");
+    int ditherevery = getInt("guideparameters", "ditherevery");
 
     if (ditherevery > 0 && mShotsSinceDither >= ditherevery && mGuiderActive)
     {
@@ -299,7 +299,7 @@ void Sequencer::SMDitherGate()
 void Sequencer::SMWaitSettle()
 {
     //qDebug() << "SMWaitSettle";
-    int settleTime = getInt("parameters", "guidingsettletime");
+    int settleTime = getInt("guideparameters", "guidingsettletime");
 
     if (settleTime <= 0)
     {
@@ -345,7 +345,7 @@ void Sequencer::SMEvalShot()
 
     if (mShotCount > 0)
     {
-        double hfrThreshold = getFloat("parameters", "hfrthreshold");
+        double hfrThreshold = getFloat("focusparameters", "hfrthreshold");
         if (hfrThreshold > 0.0 && mLastHFR > hfrThreshold)
         {
             logInfo("HFR %1 exceeds threshold %2 — refocusing",
@@ -377,7 +377,7 @@ void Sequencer::SMFocusing()
     // single fallback profile (parameters.focusprofile).
     QString focusProfile = getGridString("focusprofiles", "profile", "filter", mCurrentFilterIndex);
     if (focusProfile.isEmpty())
-        focusProfile = getString("parameters", "focusprofile");
+        focusProfile = getString("focusparameters", "focusprofile");
 
     if (!focusProfile.isEmpty())
     {
@@ -385,7 +385,7 @@ void Sequencer::SMFocusing()
         otherModuleRequestProfileLoad(getString("slaves", "focusmodule"), focusProfile);
     }
 
-    if (mGuiderActive && getBool("parameters", "suspendguidingduringfocus"))
+    if (mGuiderActive && getBool("focusparameters", "suspendguidingduringfocus"))
     {
         logInfo("Suspending guiding on %1", {getString("slaves", "guidermodule")});
         mGuiderWasSuspended = true;
@@ -526,7 +526,7 @@ void Sequencer::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QSt
     // ── Guider module — state signals ─────────────────────────────────────────
     // Early-out when guiding integration is disabled: mGuiderActive stays false,
     // which silently disables dithering, RMS checks, and focus suspension.
-    if (isGuider && !getBool("parameters", "useguiding"))
+    if (isGuider && !getBool("guideparameters", "useguiding"))
         return;
 
     if (isGuider && ev == OST::EvType::ea && prp == "signals")
@@ -610,7 +610,7 @@ void Sequencer::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QSt
             double rms = o["rmsTotal"].toDouble();
             mMaxRMSDuringExposure = qMax(mMaxRMSDuringExposure, rms);
 
-            double rmsThreshold = getFloat("parameters", "rmsthreshold");
+            double rmsThreshold = getFloat("guideparameters", "rmsthreshold");
             if (rmsThreshold > 0.0 && rms > rmsThreshold)
             {
                 logInfo("RMS %1 px exceeded threshold %2 px — aborting exposure and guider",
