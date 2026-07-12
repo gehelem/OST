@@ -90,6 +90,13 @@ class MODULE_INIT Sequencer: public IndiModule
         QString mObjectName           = "default";
         QString mDate;
 
+        // ── Focus memory (module lifetime — NOT reset on sequence start) ─────
+        // Lets "focus on filter change" also cover the very first line of a
+        // sequence, and skip a redundant focus if the same sequence is
+        // re-launched without the filter having changed since the last focus.
+        bool    mHasFocusedOnce   = false;
+        QString mLastFocusedFilter;
+
         // ── Per-exposure monitoring ─────────────────────────────────────────
         double  mLastHFR              = 0.0;
         double  mMaxRMSDuringExposure = 0.0;
