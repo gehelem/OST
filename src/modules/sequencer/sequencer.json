@@ -30,6 +30,41 @@
                 "dynlabel": "",
                 "value": 0,
                 "order":2
+            },
+            "theoreticaltotal": {
+                "type": "string",
+                "label": "Theoretical total duration",
+                "value": "",
+                "order":3,
+                "hint": "Sum of count x exposure over every line of the grid, recalculated whenever the grid changes"
+            },
+            "theoreticalremaining": {
+                "type": "string",
+                "label": "Theoretical remaining duration",
+                "value": "",
+                "order":4,
+                "hint": "Theoretical total duration minus the time already accounted for by completed/in-progress shots"
+            },
+            "realelapsed": {
+                "type": "string",
+                "label": "Real elapsed duration",
+                "value": "",
+                "order":5,
+                "hint": "Wall-clock time since the sequence was started, reset to zero at each start"
+            },
+            "avgfocusduration": {
+                "type": "string",
+                "label": "Average focus duration",
+                "value": "",
+                "order":6,
+                "hint": "Average time spent waiting for autofocus, since this module was loaded"
+            },
+            "avgguideduration": {
+                "type": "string",
+                "label": "Average guide-start duration",
+                "value": "",
+                "order":7,
+                "hint": "Average time spent waiting for the guider to start, since this module was loaded"
             }
         }
     },

@@ -4,6 +4,8 @@
 #include <fileio.h>
 #include <solver.h>
 #include <QScxmlStateMachine>
+#include <QElapsedTimer>
+#include <QDateTime>
 
 #if defined(SEQUENCER_MODULE)
 #  define MODULE_INIT Q_DECL_EXPORT
@@ -63,6 +65,7 @@ class MODULE_INIT Sequencer: public IndiModule
 
         // Timer
         void onGuidingSettleTimeout();
+        void onElapsedTimerTick();
 
     private:
         void newBLOB(INDI::PropertyBlob pblob);
@@ -72,10 +75,12 @@ class MODULE_INIT Sequencer: public IndiModule
         void newExp(INDI::PropertyNumber exp);
         void refreshFilterLov();
         void setupOutputFolder();
+        void recomputeSequenceTotals();
         static QString formatDuration(double seconds);
 
         QScxmlStateMachine  *pMachine     = nullptr;
         QTimer              *mSettleTimer = nullptr;
+        QTimer              *mElapsedTimer = nullptr;
 
         // ── Per-sequence state ──────────────────────────────────────────────
         int     mCurrentLine           = -1;
@@ -92,10 +97,11 @@ class MODULE_INIT Sequencer: public IndiModule
         QString mDate;
 
         // ── Whole-sequence progress (computed at start, updated per shot) ────
-        int     mTotalShots           = 0;
-        int     mShotsCompleted       = 0;
-        double  mTotalEstimatedSeconds = 0.0;
-        double  mSecondsCompleted     = 0.0;
+        int      mTotalShots           = 0;
+        int      mShotsCompleted       = 0;
+        double   mTotalEstimatedSeconds = 0.0;
+        double   mSecondsCompleted     = 0.0;
+        QDateTime mSequenceStartTime;
 
         // ── Focus memory (module lifetime — NOT reset on sequence start) ─────
         // Lets "focus on filter change" also cover the very first line of a
@@ -103,6 +109,15 @@ class MODULE_INIT Sequencer: public IndiModule
         // re-launched without the filter having changed since the last focus.
         bool    mHasFocusedOnce   = false;
         QString mLastFocusedFilter;
+
+        // ── Focus/guide wait timing (module lifetime — NOT reset on sequence
+        //    start, only when the module itself is (re)loaded) ────────────────
+        QElapsedTimer mFocusTimer;
+        double        mFocusDurationSum = 0.0;
+        int           mFocusSamples     = 0;
+        QElapsedTimer mGuideStartTimer;
+        double        mGuideDurationSum = 0.0;
+        int           mGuideSamples     = 0;
 
         // ── Per-exposure monitoring ─────────────────────────────────────────
         double  mLastHFR              = 0.0;

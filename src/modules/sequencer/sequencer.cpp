@@ -41,6 +41,12 @@ Sequencer::Sequencer(QString name, QString label, QString profile, QVariantMap a
     mSettleTimer->setSingleShot(true);
     connect(mSettleTimer, &QTimer::timeout, this, &Sequencer::onGuidingSettleTimeout);
 
+    mElapsedTimer = new QTimer(this);
+    mElapsedTimer->setInterval(1000);
+    connect(mElapsedTimer, &QTimer::timeout, this, &Sequencer::onElapsedTimerTick);
+
+    recomputeSequenceTotals();
+
     pMachine = QScxmlStateMachine::fromFile(":sequencer.scxml");
 
     // Pre-sequence
@@ -109,18 +115,13 @@ void Sequencer::onExternalEvent(OST::ExtEvent event)
 
             getProperty("actions")->setState(OST::Busy, true);
 
-            mShotsCompleted        = 0;
-            mSecondsCompleted      = 0.0;
-            mTotalShots            = 0;
-            mTotalEstimatedSeconds = 0.0;
-            for (int i = 0; i < getProperty("sequence")->getGrid().count(); i++)
-            {
-                getProperty("sequence")->fetchLine(i);
-                int    c = getInt("sequence", "count");
-                double e = getFloat("sequence", "exposure");
-                mTotalShots            += c;
-                mTotalEstimatedSeconds += c * e;
-            }
+            mShotsCompleted   = 0;
+            mSecondsCompleted = 0.0;
+            recomputeSequenceTotals();
+
+            mSequenceStartTime = QDateTime::currentDateTime();
+            getEltString("progress", "realelapsed")->setValue(formatDuration(0), true);
+            mElapsedTimer->start();
 
             setStateEvent(OST::Busy, "running", "startsequence", "Start sequence");
             pMachine->init();
@@ -138,6 +139,16 @@ void Sequencer::onExternalEvent(OST::ExtEvent event)
 
     if (event.prpkey == "devices")
         refreshFilterLov();
+
+    // Grid edited (line created/updated/deleted/reordered/reset): the theoretical
+    // duration shown in "progress" must reflect the grid even before the sequence runs.
+    if (event.prpkey == "sequence" &&
+            (event.ev == OST::ExtEvType::GC || event.ev == OST::ExtEvType::GU ||
+             event.ev == OST::ExtEvType::GD || event.ev == OST::ExtEvType::GH ||
+             event.ev == OST::ExtEvType::GB || event.ev == OST::ExtEvType::GR))
+    {
+        recomputeSequenceTotals();
+    }
 }
 
 // =============================================================================
@@ -357,6 +368,7 @@ void Sequencer::SMFocusing()
 {
     //qDebug() << "SMFocusing";
     logInfo("Requesting autofocus from %1", {getString("slaves", "focusmodule")});
+    mFocusTimer.start();
 
     if (mGuiderActive && getBool("parameters", "suspendguidingduringfocus"))
     {
@@ -379,6 +391,7 @@ void Sequencer::SMGuideStarting()
 {
     //qDebug() << "SMGuideStarting";
     logInfo("Starting guider on %1", {getString("slaves", "guidermodule")});
+    mGuideStartTimer.start();
     otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "guide", true);
     // GuideDone submitted by onOtherModuleEvent when guider signals Busy/"guiding"
 }
@@ -409,6 +422,7 @@ void Sequencer::SMDone()
 {
     //qDebug() << "SMDone";
     logInfo("Sequence completed");
+    mElapsedTimer->stop();
     getProperty("actions")->setState(OST::Ok, true);
     getEltBool("actions", "startsequence")->setValue(false, true);
     getEltBool("actions", "abortsequence")->setValue(false, true);
@@ -421,6 +435,7 @@ void Sequencer::SMAborted()
     //qDebug() << "SMAborted";
     logInfo("Sequence aborted");
     mSettleTimer->stop();
+    mElapsedTimer->stop();
     getProperty("actions")->setState(OST::Ok, true);
     getEltBool("actions", "startsequence")->setValue(false, true);
     getEltBool("actions", "abortsequence")->setValue(false, true);
@@ -433,6 +448,7 @@ void Sequencer::SMError()
     //qDebug() << "SMError";
     logInfo("Sequence error");
     mSettleTimer->stop();
+    mElapsedTimer->stop();
     getProperty("actions")->setState(OST::Error, true);
     getEltBool("actions", "startsequence")->setValue(false, true);
     getEltBool("actions", "abortsequence")->setValue(false, true);
@@ -448,6 +464,12 @@ void Sequencer::onGuidingSettleTimeout()
 {
     logInfo("Guiding settle complete");
     pMachine->submitEvent("SettleDone");
+}
+
+void Sequencer::onElapsedTimerTick()
+{
+    double elapsed = mSequenceStartTime.msecsTo(QDateTime::currentDateTime()) / 1000.0;
+    getEltString("progress", "realelapsed")->setValue(formatDuration(elapsed), true);
 }
 
 // =============================================================================
@@ -474,6 +496,12 @@ void Sequencer::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QSt
             logInfo("Focus completed");
             mHasFocusedOnce    = true;
             mLastFocusedFilter = mCurrentFilter;
+
+            mFocusDurationSum += mFocusTimer.elapsed() / 1000.0;
+            mFocusSamples++;
+            getEltString("progress", "avgfocusduration")->setValue(
+                formatDuration(mFocusDurationSum / mFocusSamples), true);
+
             // FocusDone: FocusCtrl.Focusing → FocusIdle  AND  SequenceCtrl.WaitFocus → GuideGate
             pMachine->submitEvent("FocusDone");
         }
@@ -500,6 +528,12 @@ void Sequencer::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QSt
             if (pMachine->isActive("GuideStarting"))
             {
                 logInfo("Guider resumed after focus");
+
+                mGuideDurationSum += mGuideStartTimer.elapsed() / 1000.0;
+                mGuideSamples++;
+                getEltString("progress", "avgguideduration")->setValue(
+                    formatDuration(mGuideDurationSum / mGuideSamples), true);
+
                 // GuideDone: GuideCtrl.GuideStarting→GuideIdle AND SequenceCtrl.WaitGuide→DitherGate
                 pMachine->submitEvent("GuideDone");
             }
@@ -721,12 +755,36 @@ void Sequencer::newExp(INDI::PropertyNumber exp)
         getEltPrg("progress", "totaltime")->setPrgValue(100.0 * liveSeconds / mTotalEstimatedSeconds, false);
         getEltPrg("progress", "totaltime")->setDynLabel(
             formatDuration(liveSeconds) + " / " + formatDuration(mTotalEstimatedSeconds), true);
+
+        double remaining = qMax(0.0, mTotalEstimatedSeconds - liveSeconds);
+        getEltString("progress", "theoreticalremaining")->setValue(formatDuration(remaining), true);
     }
 }
 
 // =============================================================================
 // Helpers
 // =============================================================================
+
+void Sequencer::recomputeSequenceTotals()
+{
+    int    totalShots   = 0;
+    double totalSeconds = 0.0;
+    for (int i = 0; i < getProperty("sequence")->getGrid().count(); i++)
+    {
+        getProperty("sequence")->fetchLine(i);
+        int    c = getInt("sequence", "count");
+        double e = getFloat("sequence", "exposure");
+        totalShots   += c;
+        totalSeconds += c * e;
+    }
+    mTotalShots            = totalShots;
+    mTotalEstimatedSeconds = totalSeconds;
+
+    getEltString("progress", "theoreticaltotal")->setValue(formatDuration(mTotalEstimatedSeconds), true);
+
+    double remaining = qMax(0.0, mTotalEstimatedSeconds - mSecondsCompleted);
+    getEltString("progress", "theoreticalremaining")->setValue(formatDuration(remaining), true);
+}
 
 void Sequencer::setupOutputFolder()
 {
