@@ -312,6 +312,34 @@
                 "hint": "Profile to load on the focus module before requesting autofocus; leave empty to keep whatever profile is currently loaded there"
             }
         }
+    },
+    "focusprofiles": {
+        "devcat": "Parameters",
+        "group": "Focus",
+        "permission": 2,
+        "order": 6,
+        "hasGrid": true,
+        "showGrid": true,
+        "showElts": false,
+        "hasprofile": true,
+        "label": "Focus profile per filter",
+        "e": {
+            "filter": {
+                "type": "string",
+                "label": "Filter",
+                "order": 1,
+                "gridvalues": [],
+                "listOfValues": []
+            },
+            "profile": {
+                "type": "string",
+                "label": "Focus profile",
+                "order": 2,
+                "gridvalues": [],
+                "listOfValues": "profiles-Focus",
+                "listOfValuesIsExternal": true
+            }
+        }
     }
 }
 }

@@ -203,6 +203,7 @@ void Sequencer::SMInitLine()
     QString filterIndex       = getString("sequence", "filter");
     const auto &lov       = getEltString("sequence", "filter")->getLov();
     mCurrentFilter        = lov.contains(filterIndex) ? lov[filterIndex] : QString();
+    mCurrentFilterIndex   = filterIndex;
     mCurrentFrameType     = getString("parameters", "frametype");
     mLastHFR              = 0.0;
     mMaxRMSDuringExposure = 0.0;
@@ -372,7 +373,12 @@ void Sequencer::SMFocusing()
     logInfo("Requesting autofocus from %1", {getString("slaves", "focusmodule")});
     mFocusTimer.start();
 
-    QString focusProfile = getString("parameters", "focusprofile");
+    // Per-filter override (focusprofiles grid) takes priority over the
+    // single fallback profile (parameters.focusprofile).
+    QString focusProfile = getGridString("focusprofiles", "profile", "filter", mCurrentFilterIndex);
+    if (focusProfile.isEmpty())
+        focusProfile = getString("parameters", "focusprofile");
+
     if (!focusProfile.isEmpty())
     {
         logInfo("Requesting focus profile %1 on %2", {focusProfile, getString("slaves", "focusmodule")});
@@ -837,7 +843,10 @@ void Sequencer::refreshFilterLov()
     // Always clear first: a filter device that was unassigned or went
     // invalid must not leave stale filter names in the LOV (mCurrentFilter
     // must fall back to empty, not resolve to a phantom stale entry).
+    // Shared by "sequence" (per-line filter) and "focusprofiles" (per-filter
+    // focus profile override) — same physical filter wheel, same LOV.
     getEltString("sequence", "filter")->lovClear();
+    getEltString("focusprofiles", "filter")->lovClear();
 
     INDI::BaseDevice dp = getDevice(getString("devices", "filter").toStdString().c_str());
     if (!dp.isValid())
@@ -850,6 +859,7 @@ void Sequencer::refreshFilterLov()
     for (unsigned int i = 0; i < txt.count(); i++)
     {
         getEltString("sequence", "filter")->lovAdd(QString::number(i + 1), txt[i].getText());
+        getEltString("focusprofiles", "filter")->lovAdd(QString::number(i + 1), txt[i].getText());
     }
 }
 
