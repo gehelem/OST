@@ -136,6 +136,9 @@ void Sequencer::onExternalEvent(OST::ExtEvent event)
             mSettleTimer->stop();
             if (pMachine->isRunning())
                 pMachine->submitEvent("abort");
+
+            otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "abortguider", true);
+            otherModuleSetValue(getString("slaves", "focusmodule"), "actions", "abortfocus", true);
         }
     }
 
