@@ -34,6 +34,8 @@ Sequencer::Sequencer(QString name, QString label, QString profile, QVariantMap a
     getEltString("devices", "camera")->setLovConstrained(true);
     getEltString("devices", "filter")->setLovConstrained(true);
     getEltString("devices", "filter")->setNullable(true);
+    getEltString("parameters", "focusprofile")->setLovConstrained(true);
+    getEltString("parameters", "focusprofile")->setNullable(true);
     defineMeAsSequencer();
     refreshFilterLov();
 
@@ -369,6 +371,13 @@ void Sequencer::SMFocusing()
     //qDebug() << "SMFocusing";
     logInfo("Requesting autofocus from %1", {getString("slaves", "focusmodule")});
     mFocusTimer.start();
+
+    QString focusProfile = getString("parameters", "focusprofile");
+    if (!focusProfile.isEmpty())
+    {
+        logInfo("Requesting focus profile %1 on %2", {focusProfile, getString("slaves", "focusmodule")});
+        otherModuleRequestProfileLoad(getString("slaves", "focusmodule"), focusProfile);
+    }
 
     if (mGuiderActive && getBool("parameters", "suspendguidingduringfocus"))
     {

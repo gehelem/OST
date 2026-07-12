@@ -299,6 +299,17 @@
                 "order": 13,
                 "format": "99",
                 "hint": "Camera offset for every line of this sequence"
+            },
+            "focusprofile": {
+                "type": "string",
+                "label": "Focus profile to load",
+                "listOfValues": "profiles-Focus",
+                "listOfValuesIsExternal": true,
+                "autoupdate": true,
+                "directedit": true,
+                "value": "",
+                "order": 14,
+                "hint": "Profile to load on the focus module before requesting autofocus; leave empty to keep whatever profile is currently loaded there"
             }
         }
     }
