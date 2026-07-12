@@ -175,23 +175,14 @@
         "hasprofile": true,
         "label": "Parameters",
         "e": {
-            "autofocusatstart": {
-                "type": "bool",
-                "label": "Auto-focus at sequence start",
-                "autoupdate": true,
-                "directedit": true,
-                "value": true,
-                "order": 0,
-                "hint": "Automatically trigger focus before starting the sequence (using first line filter)"
-            },
             "autofocusonfilterchange": {
                 "type": "bool",
                 "label": "Auto-focus on filter change",
                 "autoupdate": true,
                 "directedit": true,
-                "value": false,
-                "order": 1,
-                "hint": "Automatically trigger focus when filter changes during sequence"
+                "value": true,
+                "order": 0,
+                "hint": "Automatically trigger focus when the filter changes, including the first line of the sequence (no focus has happened yet since the module started) — and skips it if the last focus already matches the current filter"
             },
             "useguiding": {
                 "type": "bool",
