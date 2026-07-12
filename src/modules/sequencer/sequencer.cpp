@@ -224,11 +224,13 @@ void Sequencer::SMFocusGate()
     bool isLightOrFlat = (mCurrentFrameType == "L" || mCurrentFrameType == "F");
     bool needsFocus    = false;
 
-    if (isLightOrFlat)
+    if (isLightOrFlat && getBool("parameters", "autofocusonfilterchange"))
     {
-        if (mCurrentLine == 0 && getBool("parameters", "autofocusatstart"))
-            needsFocus = true;
-        else if (mFilterChanged && getBool("parameters", "autofocusonfilterchange"))
+        // mHasFocusedOnce is false until the first focus of this module's
+        // lifetime (not reset on sequence start) — that undetermined state
+        // always counts as a filter change, so the first line of a sequence
+        // gets focused too, without a separate "focus at start" option.
+        if (!mHasFocusedOnce || mLastFocusedFilter != mCurrentFilter)
             needsFocus = true;
     }
 
@@ -468,6 +470,8 @@ void Sequencer::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QSt
         if (OST::IntToState(s) == OST::Ok && sd == "ready" && pMachine->isActive("Focusing"))
         {
             logInfo("Focus completed");
+            mHasFocusedOnce    = true;
+            mLastFocusedFilter = mCurrentFilter;
             // FocusDone: FocusCtrl.Focusing → FocusIdle  AND  SequenceCtrl.WaitFocus → GuideGate
             pMachine->submitEvent("FocusDone");
         }
