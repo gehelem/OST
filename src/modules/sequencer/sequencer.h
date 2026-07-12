@@ -72,6 +72,7 @@ class MODULE_INIT Sequencer: public IndiModule
         void newExp(INDI::PropertyNumber exp);
         void refreshFilterLov();
         void setupOutputFolder();
+        static QString formatDuration(double seconds);
 
         QScxmlStateMachine  *pMachine     = nullptr;
         QTimer              *mSettleTimer = nullptr;
@@ -89,6 +90,12 @@ class MODULE_INIT Sequencer: public IndiModule
         QString mCurrentFolder;
         QString mObjectName           = "default";
         QString mDate;
+
+        // ── Whole-sequence progress (computed at start, updated per shot) ────
+        int     mTotalShots           = 0;
+        int     mShotsCompleted       = 0;
+        double  mTotalEstimatedSeconds = 0.0;
+        double  mSecondsCompleted     = 0.0;
 
         // ── Focus memory (module lifetime — NOT reset on sequence start) ─────
         // Lets "focus on filter change" also cover the very first line of a

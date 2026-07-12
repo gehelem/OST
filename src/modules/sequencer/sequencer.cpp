@@ -109,12 +109,17 @@ void Sequencer::onExternalEvent(OST::ExtEvent event)
 
             getProperty("actions")->setState(OST::Busy, true);
 
+            mShotsCompleted        = 0;
+            mSecondsCompleted      = 0.0;
+            mTotalShots            = 0;
+            mTotalEstimatedSeconds = 0.0;
             for (int i = 0; i < getProperty("sequence")->getGrid().count(); i++)
             {
                 getProperty("sequence")->fetchLine(i);
-                getEltPrg("sequence", "progress")->setDynLabel("Queued", false);
-                getEltPrg("sequence", "progress")->setPrgValue(0, false);
-                getProperty("sequence")->updateLine(i);
+                int    c = getInt("sequence", "count");
+                double e = getFloat("sequence", "exposure");
+                mTotalShots            += c;
+                mTotalEstimatedSeconds += c * e;
             }
 
             setStateEvent(OST::Busy, "running", "startsequence", "Start sequence");
@@ -185,7 +190,7 @@ void Sequencer::SMInitLine()
     QString filterIndex       = getString("sequence", "filter");
     const auto &lov       = getEltString("sequence", "filter")->getLov();
     mCurrentFilter        = lov.contains(filterIndex) ? lov[filterIndex] : QString();
-    mCurrentFrameType     = getString("sequence", "frametype");
+    mCurrentFrameType     = getString("parameters", "frametype");
     mLastHFR              = 0.0;
     mMaxRMSDuringExposure = 0.0;
 
@@ -298,24 +303,22 @@ void Sequencer::SMExposing()
     mMaxRMSDuringExposure = 0.0;
 
     double exp    = getFloat("sequence", "exposure");
-    int    gain   = getInt("sequence", "gain");
-    int    offset = getInt("sequence", "offset");
+    int    gain   = getInt("parameters", "gain");
+    int    offset = getInt("parameters", "offset");
     if (getString("devices", "camera") == "CCD Simulator")
     {
         sendModNewNumber(getString("devices", "camera"), "SIMULATOR_SETTINGS", "SIM_TIME_FACTOR", 1 );
     }
     requestCapture(getString("devices", "camera"), exp, gain, offset);
 
-    int total = getInt("sequence", "count");
-    int done  = total - mShotCount + 1;
-    getEltPrg("sequence", "progress")->setPrgValue(100.0 * done / total, false);
-    getEltPrg("sequence", "progress")->setDynLabel(QString::number(done) + "/" + QString::number(total), false);
-    getProperty("sequence")->updateLine(mCurrentLine);
-
-    int lineTotal = getProperty("sequence")->getGrid().size();
-    getEltPrg("progress", "global")->setPrgValue(100.0 * (mCurrentLine + 1) / lineTotal, false);
-    getEltPrg("progress", "global")->setDynLabel(
-        QString::number(mCurrentLine + 1) + "/" + QString::number(lineTotal), true);
+    // Whole-sequence progress, in shots: this exposure is shot (mShotsCompleted+1) of mTotalShots
+    if (mTotalShots > 0)
+    {
+        int current = mShotsCompleted + 1;
+        getEltPrg("progress", "global")->setPrgValue(100.0 * current / mTotalShots, false);
+        getEltPrg("progress", "global")->setDynLabel(
+            QString::number(current) + "/" + QString::number(mTotalShots), true);
+    }
 }
 
 void Sequencer::SMEvalShot()
@@ -323,6 +326,8 @@ void Sequencer::SMEvalShot()
     //qDebug() << "SMEvalShot";
     mShotCount--;
     mShotsSinceDither++;
+    mShotsCompleted++;
+    mSecondsCompleted += getFloat("sequence", "exposure");
 
     if (mShotCount > 0)
     {
@@ -340,9 +345,6 @@ void Sequencer::SMEvalShot()
     }
     else
     {
-        getEltPrg("sequence", "progress")->setDynLabel("Done", false);
-        getEltPrg("sequence", "progress")->setPrgValue(100, false);
-        getProperty("sequence")->updateLine(mCurrentLine);
         pMachine->submitEvent("LineDone");
     }
 }
@@ -707,7 +709,19 @@ void Sequencer::newExp(INDI::PropertyNumber exp)
 {
     double etot = getFloat("sequence", "exposure");
     double ex   = exp.findWidgetByName("CCD_EXPOSURE_VALUE")->value;
-    getEltPrg("progress", "exposure")->setPrgValue(100.0 * (etot - ex) / etot, true);
+    double elapsedInShot = etot - ex;
+    getEltPrg("progress", "exposure")->setPrgValue(100.0 * elapsedInShot / etot, true);
+
+    // Whole-sequence progress, in time: reuses the same CCD_EXPOSURE_VALUE
+    // ticks as above, no extra polling — smooth within the current shot,
+    // then mSecondsCompleted jumps at each shot's completion (SMEvalShot).
+    if (mTotalEstimatedSeconds > 0.0)
+    {
+        double liveSeconds = mSecondsCompleted + elapsedInShot;
+        getEltPrg("progress", "totaltime")->setPrgValue(100.0 * liveSeconds / mTotalEstimatedSeconds, false);
+        getEltPrg("progress", "totaltime")->setDynLabel(
+            formatDuration(liveSeconds) + " / " + formatDuration(mTotalEstimatedSeconds), true);
+    }
 }
 
 // =============================================================================
@@ -770,4 +784,16 @@ void Sequencer::refreshFilterLov()
     {
         getEltString("sequence", "filter")->lovAdd(QString::number(i + 1), txt[i].getText());
     }
+}
+
+QString Sequencer::formatDuration(double seconds)
+{
+    int total = qRound(seconds);
+    int h     = total / 3600;
+    int m     = (total % 3600) / 60;
+    int s     = total % 60;
+
+    if (h > 0)
+        return QString("%1:%2:%3").arg(h).arg(m, 2, 10, QChar('0')).arg(s, 2, 10, QChar('0'));
+    return QString("%1:%2").arg(m).arg(s, 2, 10, QChar('0'));
 }

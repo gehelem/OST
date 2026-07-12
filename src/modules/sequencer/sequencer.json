@@ -10,10 +10,18 @@
             "global": {
                 "type": "prg",
                 "prgtype": "spinner",
-                "label": "Sequence",
+                "label": "Sequence (shots)",
                 "dynlabel": "",
                 "value": 0,
                 "order":0
+            },
+            "totaltime": {
+                "type": "prg",
+                "prgtype": "spinner",
+                "label": "Sequence (time)",
+                "dynlabel": "",
+                "value": 0,
+                "order":1
             },
             "exposure": {
                 "type": "prg",
@@ -37,23 +45,10 @@
         "hasprofile":true,
         "label": "Sequence",
         "e": {
-            "frametype": {
-                "type":"string",
-                "label": "Frame type",
-                "order":1,
-                "value":"L",
-                "gridvalues":[],
-                "listOfValues":[
-                    ["L","Light"],
-                    ["B","Bias"],
-                    ["D","Dark"],
-                    ["F","Flat"]
-                ]
-            },
             "filter": {
                 "type":"string",
                 "label": "Filter",
-                "order":2,
+                "order":1,
                 "gridvalues":[],
                 "listOfValues":[
                 ]
@@ -61,7 +56,7 @@
             "exposure": {
                 "type":"float",
                 "label": "Exposure",
-                "order":3,
+                "order":2,
                 "value":10,
                 "gridvalues":[],
                 "format": "99"
@@ -69,37 +64,11 @@
             "count": {
                 "type":"int",
                 "label": "Count",
-                "order":4,
+                "order":3,
                 "value":5,
                 "gridvalues":[],
                 "format": "99"
-            },
-            "gain": {
-                "type":"int",
-                "label": "Gain",
-                "order":5,
-                "value":5,
-                "gridvalues":[],
-                "format": "99"
-            },
-            "offset": {
-                "type":"int",
-                "label": "Offset",
-                "order":6,
-                "value":5,
-                "gridvalues":[],
-                "format": "99"
-            },
-            "progress": {
-                "type":"prg",
-                "label": "Progress",
-                "prgtype": "spinner",
-                "dynlabel": "",
-                "order":7,
-                "value":"idle",
-                "gridvalues":[]
             }
-
         }
     },
     "object":{
@@ -260,6 +229,41 @@
                 "order": 10,
                 "format": "9.9",
                 "hint": "Sensor target temperature in °C; the sequence waits until this is reached before starting"
+            },
+            "frametype": {
+                "type": "string",
+                "label": "Frame type",
+                "autoupdate": true,
+                "directedit": true,
+                "value": "L",
+                "order": 11,
+                "listOfValues": [
+                    ["L", "Light"],
+                    ["B", "Bias"],
+                    ["D", "Dark"],
+                    ["F", "Flat"]
+                ],
+                "hint": "Frame type for every line of this sequence"
+            },
+            "gain": {
+                "type": "int",
+                "label": "Gain",
+                "autoupdate": true,
+                "directedit": true,
+                "value": 5,
+                "order": 12,
+                "format": "99",
+                "hint": "Camera gain for every line of this sequence"
+            },
+            "offset": {
+                "type": "int",
+                "label": "Offset",
+                "autoupdate": true,
+                "directedit": true,
+                "value": 5,
+                "order": 13,
+                "format": "99",
+                "hint": "Camera offset for every line of this sequence"
             }
         }
     }
