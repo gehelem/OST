@@ -34,6 +34,8 @@ Sequencer::Sequencer(QString name, QString label, QString profile, QVariantMap a
     getEltString("devices", "camera")->setLovConstrained(true);
     getEltString("devices", "filter")->setLovConstrained(true);
     getEltString("devices", "filter")->setNullable(true);
+    getEltString("focusparameters", "focusprofile")->setLovConstrained(true);
+    getEltString("focusparameters", "focusprofile")->setNullable(true);
     defineMeAsSequencer();
     refreshFilterLov();
 
@@ -201,6 +203,7 @@ void Sequencer::SMInitLine()
     QString filterIndex       = getString("sequence", "filter");
     const auto &lov       = getEltString("sequence", "filter")->getLov();
     mCurrentFilter        = lov.contains(filterIndex) ? lov[filterIndex] : QString();
+    mCurrentFilterIndex   = filterIndex;
     mCurrentFrameType     = getString("parameters", "frametype");
     mLastHFR              = 0.0;
     mMaxRMSDuringExposure = 0.0;
@@ -240,7 +243,7 @@ void Sequencer::SMFocusGate()
     bool isLightOrFlat = (mCurrentFrameType == "L" || mCurrentFrameType == "F");
     bool needsFocus    = false;
 
-    if (isLightOrFlat && getBool("parameters", "autofocusonfilterchange"))
+    if (isLightOrFlat && getBool("focusparameters", "autofocusonfilterchange"))
     {
         // mHasFocusedOnce is false until the first focus of this module's
         // lifetime (not reset on sequence start) — that undetermined state
@@ -259,7 +262,7 @@ void Sequencer::SMGuideGate()
 {
     //qDebug() << "SMGuideGate";
 
-    if (!getBool("parameters", "useguiding"))
+    if (!getBool("guideparameters", "useguiding"))
     {
         pMachine->submitEvent("SkipGuide");
         return;
@@ -280,7 +283,7 @@ void Sequencer::SMGuideGate()
 void Sequencer::SMDitherGate()
 {
     //qDebug() << "SMDitherGate";
-    int ditherevery = getInt("parameters", "ditherevery");
+    int ditherevery = getInt("guideparameters", "ditherevery");
 
     if (ditherevery > 0 && mShotsSinceDither >= ditherevery && mGuiderActive)
     {
@@ -296,7 +299,7 @@ void Sequencer::SMDitherGate()
 void Sequencer::SMWaitSettle()
 {
     //qDebug() << "SMWaitSettle";
-    int settleTime = getInt("parameters", "guidingsettletime");
+    int settleTime = getInt("guideparameters", "guidingsettletime");
 
     if (settleTime <= 0)
     {
@@ -342,7 +345,7 @@ void Sequencer::SMEvalShot()
 
     if (mShotCount > 0)
     {
-        double hfrThreshold = getFloat("parameters", "hfrthreshold");
+        double hfrThreshold = getFloat("focusparameters", "hfrthreshold");
         if (hfrThreshold > 0.0 && mLastHFR > hfrThreshold)
         {
             logInfo("HFR %1 exceeds threshold %2 — refocusing",
@@ -370,7 +373,19 @@ void Sequencer::SMFocusing()
     logInfo("Requesting autofocus from %1", {getString("slaves", "focusmodule")});
     mFocusTimer.start();
 
-    if (mGuiderActive && getBool("parameters", "suspendguidingduringfocus"))
+    // Per-filter override (focusprofiles grid) takes priority over the
+    // single fallback profile (parameters.focusprofile).
+    QString focusProfile = getGridString("focusprofiles", "profile", "filter", mCurrentFilterIndex);
+    if (focusProfile.isEmpty())
+        focusProfile = getString("focusparameters", "focusprofile");
+
+    if (!focusProfile.isEmpty())
+    {
+        logInfo("Requesting focus profile %1 on %2", {focusProfile, getString("slaves", "focusmodule")});
+        otherModuleRequestProfileLoad(getString("slaves", "focusmodule"), focusProfile);
+    }
+
+    if (mGuiderActive && getBool("focusparameters", "suspendguidingduringfocus"))
     {
         logInfo("Suspending guiding on %1", {getString("slaves", "guidermodule")});
         mGuiderWasSuspended = true;
@@ -511,7 +526,7 @@ void Sequencer::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QSt
     // ── Guider module — state signals ─────────────────────────────────────────
     // Early-out when guiding integration is disabled: mGuiderActive stays false,
     // which silently disables dithering, RMS checks, and focus suspension.
-    if (isGuider && !getBool("parameters", "useguiding"))
+    if (isGuider && !getBool("guideparameters", "useguiding"))
         return;
 
     if (isGuider && ev == OST::EvType::ea && prp == "signals")
@@ -595,7 +610,7 @@ void Sequencer::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QSt
             double rms = o["rmsTotal"].toDouble();
             mMaxRMSDuringExposure = qMax(mMaxRMSDuringExposure, rms);
 
-            double rmsThreshold = getFloat("parameters", "rmsthreshold");
+            double rmsThreshold = getFloat("guideparameters", "rmsthreshold");
             if (rmsThreshold > 0.0 && rms > rmsThreshold)
             {
                 logInfo("RMS %1 px exceeded threshold %2 px — aborting exposure and guider",
@@ -828,7 +843,10 @@ void Sequencer::refreshFilterLov()
     // Always clear first: a filter device that was unassigned or went
     // invalid must not leave stale filter names in the LOV (mCurrentFilter
     // must fall back to empty, not resolve to a phantom stale entry).
+    // Shared by "sequence" (per-line filter) and "focusprofiles" (per-filter
+    // focus profile override) — same physical filter wheel, same LOV.
     getEltString("sequence", "filter")->lovClear();
+    getEltString("focusprofiles", "filter")->lovClear();
 
     INDI::BaseDevice dp = getDevice(getString("devices", "filter").toStdString().c_str());
     if (!dp.isValid())
@@ -841,6 +859,7 @@ void Sequencer::refreshFilterLov()
     for (unsigned int i = 0; i < txt.count(); i++)
     {
         getEltString("sequence", "filter")->lovAdd(QString::number(i + 1), txt[i].getText());
+        getEltString("focusprofiles", "filter")->lovAdd(QString::number(i + 1), txt[i].getText());
     }
 }
 
