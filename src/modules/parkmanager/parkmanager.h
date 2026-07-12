@@ -63,6 +63,7 @@ class MODULE_INIT Parkmanager : public IndiModule
 
         void startOpenSequence(void);
         void startCloseSequence(void);
+        void disableAllCooling(void);
         void processPhase(void);
         void checkAutoMode(void);
         void goIdle(void);

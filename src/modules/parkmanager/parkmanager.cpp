@@ -171,8 +171,24 @@ void Parkmanager::startOpenSequence(void)
     }
 }
 
+void Parkmanager::disableAllCooling(void)
+{
+    for (const INDI::BaseDevice &dp : getDevices())
+    {
+        INDI::PropertySwitch prop = dp.getSwitch("CCD_COOLER");
+        if (!prop.isValid())
+            continue;
+
+        logInfo("Disabling cooling on %1", {QString(dp.getDeviceName())});
+        sendModNewSwitch(dp.getDeviceName(), "CCD_COOLER", "COOLER_OFF", ISS_ON);
+    }
+}
+
 void Parkmanager::startCloseSequence(void)
 {
+    disableAllCooling();
+    otherModuleSetValue(getString("slaves", "plannermodule"), "actions", "stop", true);
+
     if (hasMount())
         mPhase = Phase::StoppingTracking;
     else if (hasDome())
