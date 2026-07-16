@@ -183,7 +183,6 @@ class ElementPrg: public ElementTemplateNotNumeric<PrgData>
 
     private:
         PrgType mType = spinner;      /*!< Progress indicator type (spinner or progressbar) */
-        QString mDynLabel = "";       /*!< Dynamic status label text */
 
 };
 

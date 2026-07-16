@@ -52,6 +52,12 @@ class Planner : public IndiModule
         void sequenceComplete();
 
         /**
+         * @brief What to do when the sequence was manually cancelled rather than
+         * completed - move on to the next line without marking this one Finished
+         */
+        void sequenceCancelled();
+
+        /**
          * @brief What to do after navigator is completed
          */
         void navigatorComplete();

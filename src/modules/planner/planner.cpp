@@ -262,6 +262,21 @@ void Planner::sequenceComplete()
 
     advanceToNextLine();
 }
+
+void Planner::sequenceCancelled()
+{
+    mWaitingSequence = false;
+    mWaitingNavigator = false;
+
+    logWarning("Sequence for target %1 was cancelled - moving on", {getString("planning", "object")});
+
+    getProperty("planning")->fetchLine(mCurrentLine);
+    getEltPrg("planning", "progress")->setDynLabel("Cancelled", false);
+    getEltPrg("planning", "progress")->setPrgValue(0, false);
+    getProperty("planning")->updateLine(mCurrentLine);
+
+    advanceToNextLine();
+}
 void Planner::navigatorComplete()
 {
     mWaitingNavigator = false;
@@ -372,7 +387,7 @@ void Planner::advanceToNextLine()
         int idx = (mCurrentLine + i) % count;
         getProperty("planning")->fetchLine(idx);
         QString label = getEltPrg("planning", "progress")->dynLabel();
-        if (label != "Finished" && !label.startsWith("Failed"))
+        if (label != "Finished" && label != "Cancelled" && !label.startsWith("Failed"))
         {
             mCurrentLine = idx;
             startLine();
@@ -488,6 +503,11 @@ void Planner::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QStri
         QString e = o["event"].toString();
         QString ed = o["eventdescription"].toString();
         //logDebug("catching signals event from %6 : %1 %2 %3 %4 %5", {OST::EvToString(ev), s, sd, e, ed, mod});
+        if (OST::IntToState(s) == OST::Ok && sd == "ready" && e == "abortdone")
+        {
+            sequenceCancelled();
+            return;
+        }
         if (OST::IntToState(s) == OST::Ok && sd == "ready")
         {
             sequenceComplete();
