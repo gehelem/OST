@@ -68,6 +68,7 @@ void Basemodule::onExternalEventRoot(OST::ExtEvent event)
         case OST::ExtEvType::CS:
         case OST::ExtEvType::PL:
         case OST::ExtEvType::PS:
+        case OST::ExtEvType::QY:
             return;
         default:
         {
@@ -156,6 +157,23 @@ bool Basemodule::onExternalEventBase(OST::ExtEvent event)
             logError("Error saving profile %1", {o["profile"].toString()});
             return false;
         }
+    }
+
+    if (event.ev == OST::ExtEvType::QY)
+    {
+        if (!o.contains("query"))
+        {
+            logError("Basemodule::onExternalEventBase - invalid query data content - %1", {OST::ExtEvToString(event.ev)});
+            return false;
+        }
+        QString queryName = o["query"].toString();
+        QVariantMap params = o["params"].toObject().toVariantMap();
+        QVariantMap result = this->onModuleQuery(queryName, params);
+        QVariantMap answer;
+        answer["query"]  = queryName;
+        answer["result"] = result;
+        emit moduleEvent(OST::EvType::qa, answer, nullptr, nullptr, nullptr, this);
+        return true;
     }
 
     /* property target operations */
@@ -299,6 +317,14 @@ void Basemodule::onExternalEvent(OST::ExtEvent event)
 {
     Q_UNUSED(event);
     // Empty by default - custom modules will override this
+}
+
+QVariantMap Basemodule::onModuleQuery(const QString &queryName, const QVariantMap &params)
+{
+    Q_UNUSED(queryName);
+    Q_UNUSED(params);
+    // Empty by default - custom modules override this to answer the query names they support
+    return QVariantMap();
 }
 
 void Basemodule::onAfterInit(void)
@@ -703,6 +729,20 @@ void Basemodule::otherModuleRequestProfileLoad(QString mod, QString profile)
     event.mod = mod;
     QJsonObject m, M, p;
     p["profile"] = profile;
+    m[mod] = p;
+    M["m"] = m;
+    event.data = M;
+    emit interModuleRequest(event);
+};
+void Basemodule::otherModuleQuery(QString mod, QString queryName, QVariantMap params)
+{
+    OST::ExtEvent event;
+    //{"QY":{"m":{"seq":{"query":"profileduration","params":{"profile":"default"}}}}}
+    event.ev = OST::ExtEvType::QY;
+    event.mod = mod;
+    QJsonObject m, M, p;
+    p["query"] = queryName;
+    p["params"] = QJsonObject::fromVariantMap(params);
     m[mod] = p;
     M["m"] = m;
     event.data = M;
