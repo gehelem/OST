@@ -83,6 +83,15 @@
           "value": 30,
           "order": 3,
           "hint": "Rejected only if the target is closer than this AND the moon illumination exceeds the threshold above"
+      },
+      "maxretries": {
+          "type": "int",
+          "label": "Max retries before giving up",
+          "autoupdate": true,
+          "directedit": true,
+          "value": 3,
+          "order": 4,
+          "hint": "A line that fails the visibility/moon check this many times is marked Failed and is no longer retried"
       }
     }
   },

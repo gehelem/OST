@@ -67,7 +67,7 @@ class Planner : public IndiModule
         void proceedToSlew();
 
         /**
-         * @brief Mark the current line as skipped and move on to the next one
+         * @brief Mark the current line as skipped (or failed, past the retry limit) and move on
          */
         void skipLine(const QString &reason);
 
@@ -77,6 +77,13 @@ class Planner : public IndiModule
          * @param reason filled with a human-readable explanation when returning false
          */
         bool checkVisibility(double ra, double dec, double durationSeconds, QString &reason);
+
+        /**
+         * @brief Move on to the next line still worth attempting (not Finished/Failed),
+         * wrapping around the grid so skipped lines get retried once every other line
+         * has had its turn. Ends the planning when nothing is left to attempt.
+         */
+        void advanceToNextLine();
 
 
         // Example internal state variables
@@ -93,6 +100,9 @@ class Planner : public IndiModule
 
         // Current line
         int mCurrentLine;
+
+        // Number of times each line (by grid index) has been skipped this run
+        QMap<int, int> mSkipCounts;
 
 };
 

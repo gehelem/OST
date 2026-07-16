@@ -198,6 +198,7 @@ void Planner::startPlanner()
     }
 
     mCurrentLine = 0;
+    mSkipCounts.clear();
     startLine();
 
 }
@@ -259,20 +260,7 @@ void Planner::sequenceComplete()
     getEltPrg("planning", "progress")->setPrgValue(100, false);
     getProperty("planning")->updateLine(mCurrentLine);
 
-
-    mCurrentLine++;
-    if (getProperty("planning")->getGrid().count() <= mCurrentLine)
-    {
-        logInfo("Planning completed");
-        // update global status
-        getEltPrg("progress", "global")->setPrgValue(100, true);
-        getEltPrg("progress", "global")->setDynLabel("Finished", true);
-        mIsRunning = false;
-        return;
-    }
-
-    startLine();
-
+    advanceToNextLine();
 }
 void Planner::navigatorComplete()
 {
@@ -353,24 +341,49 @@ void Planner::proceedToSlew()
 
 void Planner::skipLine(const QString &reason)
 {
-    logWarning("Skipping target %1: %2", {getString("planning", "object"), reason});
+    int attempts    = ++mSkipCounts[mCurrentLine];
+    int maxRetries  = getInt("visibility", "maxretries");
 
-    getProperty("planning")->fetchLine(mCurrentLine);
-    getEltPrg("planning", "progress")->setDynLabel("Skipped: " + reason, false);
-    getEltPrg("planning", "progress")->setPrgValue(0, false);
-    getProperty("planning")->updateLine(mCurrentLine);
-
-    mCurrentLine++;
-    if (getProperty("planning")->getGrid().count() <= mCurrentLine)
+    if (attempts >= maxRetries)
     {
-        logInfo("Planning completed");
-        getEltPrg("progress", "global")->setPrgValue(100, true);
-        getEltPrg("progress", "global")->setDynLabel("Finished", true);
-        mIsRunning = false;
-        return;
+        logWarning("Giving up on target %1 after %2 attempts: %3", {getString("planning", "object"), QString::number(attempts), reason});
+        getProperty("planning")->fetchLine(mCurrentLine);
+        getEltPrg("planning", "progress")->setDynLabel("Failed: " + reason, false);
+        getEltPrg("planning", "progress")->setPrgValue(0, false);
+        getProperty("planning")->updateLine(mCurrentLine);
+    }
+    else
+    {
+        logWarning("Skipping target %1 (attempt %2/%3): %4", {getString("planning", "object"), QString::number(attempts), QString::number(maxRetries), reason});
+        getProperty("planning")->fetchLine(mCurrentLine);
+        getEltPrg("planning", "progress")->setDynLabel("Skipped: " + reason, false);
+        getEltPrg("planning", "progress")->setPrgValue(0, false);
+        getProperty("planning")->updateLine(mCurrentLine);
     }
 
-    startLine();
+    advanceToNextLine();
+}
+
+void Planner::advanceToNextLine()
+{
+    int count = getProperty("planning")->getGrid().count();
+    for (int i = 1; i <= count; i++)
+    {
+        int idx = (mCurrentLine + i) % count;
+        getProperty("planning")->fetchLine(idx);
+        QString label = getEltPrg("planning", "progress")->dynLabel();
+        if (label != "Finished" && !label.startsWith("Failed"))
+        {
+            mCurrentLine = idx;
+            startLine();
+            return;
+        }
+    }
+
+    logInfo("Planning completed");
+    getEltPrg("progress", "global")->setPrgValue(100, true);
+    getEltPrg("progress", "global")->setDynLabel("Finished", true);
+    mIsRunning = false;
 }
 
 bool Planner::checkVisibility(double ra, double dec, double durationSeconds, QString &reason)
