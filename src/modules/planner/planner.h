@@ -57,9 +57,26 @@ class Planner : public IndiModule
         void navigatorComplete();
 
         /**
-         * @brief Start current planning line
+         * @brief Start current planning line: kicks off the visibility check
          */
         void startLine();
+
+        /**
+         * @brief Slew and start the sequence, once the line has passed the visibility check
+         */
+        void proceedToSlew();
+
+        /**
+         * @brief Mark the current line as skipped and move on to the next one
+         */
+        void skipLine(const QString &reason);
+
+        /**
+         * @brief Check whether a target stays above the configured minimum elevation
+         * for the whole estimated sequence duration, and clear of the moon.
+         * @param reason filled with a human-readable explanation when returning false
+         */
+        bool checkVisibility(double ra, double dec, double durationSeconds, QString &reason);
 
 
         // Example internal state variables
@@ -70,6 +87,9 @@ class Planner : public IndiModule
 
         // Waiting navigator
         bool mWaitingNavigator = false ;
+
+        // Waiting for the sequencer's profileduration query answer
+        bool mWaitingDuration = false ;
 
         // Current line
         int mCurrentLine;
