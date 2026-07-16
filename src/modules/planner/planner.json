@@ -49,6 +49,52 @@
       }
     }
   },
+  "visibility": {
+    "label": "Visibility constraints",
+    "permission": 2,
+    "devcat": "Visibility",
+    "group": "",
+    "order": "060",
+    "hasprofile": true,
+    "e": {
+      "minelevation": {
+          "type": "float",
+          "label": "Minimum elevation (°)",
+          "autoupdate": true,
+          "directedit": true,
+          "value": 20,
+          "order": 1,
+          "hint": "Target must stay above this elevation for the whole estimated sequence duration, otherwise the line is skipped"
+      },
+      "moonilluminationthreshold": {
+          "type": "float",
+          "label": "Moon illumination threshold (%)",
+          "autoupdate": true,
+          "directedit": true,
+          "value": 50,
+          "order": 2,
+          "hint": "Moon avoidance only applies when the moon's illuminated fraction is above this percentage"
+      },
+      "moonseparationthreshold": {
+          "type": "float",
+          "label": "Moon separation threshold (°)",
+          "autoupdate": true,
+          "directedit": true,
+          "value": 30,
+          "order": 3,
+          "hint": "Rejected only if the target is closer than this AND the moon illumination exceeds the threshold above"
+      },
+      "maxretries": {
+          "type": "int",
+          "label": "Max retries before giving up",
+          "autoupdate": true,
+          "directedit": true,
+          "value": 3,
+          "order": 4,
+          "hint": "A line that fails the visibility/moon check this many times is marked Failed and is no longer retried"
+      }
+    }
+  },
   "planning": {
     "label": "Planning",
     "permission": 2,

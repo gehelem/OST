@@ -507,6 +507,7 @@ void Controller::onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase*
         case OST::EvType::fl: // "fl-profile loaded"
         case OST::EvType::fc: // "fc-profile changed"
         case OST::EvType::uc: // "uc-update controller data"
+        case OST::EvType::qa: // "qa-query answer"
         {
             v = OST::ModuleJsonDumper(evt, data, elt, prp, lov, static_cast<Basemodule*>(mod));
             break;

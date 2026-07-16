@@ -130,10 +130,25 @@ class Basemodule : public DBManager
          */
         virtual void onExternalEvent(OST::ExtEvent event);
 
+        /**
+         * @brief Answer a named query from another module (generic RPC-style hook)
+         *
+         * Override this in modules that expose derived/computed information other
+         * modules may need without loading a profile or duplicating properties
+         * (e.g. "what would the theoretical duration of profile X be").
+         * Empty by default - custom modules override this to answer the query
+         * names they support, returning an empty map for anything else.
+         *
+         * The answer is sent back to the asking module as a moduleEvent of type
+         * OST::EvType::qa, received through its onOtherModuleEvent.
+         */
+        virtual QVariantMap onModuleQuery(const QString &queryName, const QVariantMap &params);
+
         void otherModuleSetValue(QString mod, QString prop, QString elt, QVariant value);
         void otherModuleRequestPropertyDump(QString mod, QString prop);
         void otherModuleRequestProfileLoad(QString mod, QString profile);
         void otherModuleCreateLine(QString mod, QString prop, QVariantMap values);
+        void otherModuleQuery(QString mod, QString queryName, QVariantMap params);
         bool giveMeAState();
         bool giveMeAParms();
 

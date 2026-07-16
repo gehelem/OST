@@ -35,7 +35,7 @@ void ElementPrg::setDynLabel(const QString &s, const bool &emitEvent)
 }
 QString ElementPrg::dynLabel()
 {
-    return mDynLabel;
+    return value().dynlabel;
 }
 PrgType ElementPrg::prgType()
 {

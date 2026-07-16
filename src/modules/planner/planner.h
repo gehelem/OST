@@ -52,14 +52,44 @@ class Planner : public IndiModule
         void sequenceComplete();
 
         /**
+         * @brief What to do when the sequence was manually cancelled rather than
+         * completed - move on to the next line without marking this one Finished
+         */
+        void sequenceCancelled();
+
+        /**
          * @brief What to do after navigator is completed
          */
         void navigatorComplete();
 
         /**
-         * @brief Start current planning line
+         * @brief Start current planning line: kicks off the visibility check
          */
         void startLine();
+
+        /**
+         * @brief Slew and start the sequence, once the line has passed the visibility check
+         */
+        void proceedToSlew();
+
+        /**
+         * @brief Mark the current line as skipped (or failed, past the retry limit) and move on
+         */
+        void skipLine(const QString &reason);
+
+        /**
+         * @brief Check whether a target stays above the configured minimum elevation
+         * for the whole estimated sequence duration, and clear of the moon.
+         * @param reason filled with a human-readable explanation when returning false
+         */
+        bool checkVisibility(double ra, double dec, double durationSeconds, QString &reason);
+
+        /**
+         * @brief Move on to the next line still worth attempting (not Finished/Failed),
+         * wrapping around the grid so skipped lines get retried once every other line
+         * has had its turn. Ends the planning when nothing is left to attempt.
+         */
+        void advanceToNextLine();
 
 
         // Example internal state variables
@@ -71,8 +101,14 @@ class Planner : public IndiModule
         // Waiting navigator
         bool mWaitingNavigator = false ;
 
+        // Waiting for the sequencer's profileduration query answer
+        bool mWaitingDuration = false ;
+
         // Current line
         int mCurrentLine;
+
+        // Number of times each line (by grid index) has been skipped this run
+        QMap<int, int> mSkipCounts;
 
 };
 

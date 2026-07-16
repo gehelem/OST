@@ -31,6 +31,7 @@ class MODULE_INIT Sequencer: public IndiModule
 
     protected:
         void onExternalEvent(OST::ExtEvent event) override;
+        QVariantMap onModuleQuery(const QString &queryName, const QVariantMap &params) override;
 
     public slots:
         void onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QString elt, QVariant data, int line) override;
