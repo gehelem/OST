@@ -592,6 +592,7 @@ void Guider::SMInitCal()
     // Reset calibration loop counters
     _calState = 0;   // Calibration phase (0-2)
     _calStep = 0;    // Pulse direction counter (0-7 for 4 directions × 2 iterations)
+    _calAwaitingKick = false;
 
     // Clear previous calibration results
     _calPulseN = 0;  // Will be filled by calibration
@@ -666,6 +667,10 @@ void Guider::SMInitGuide()
     // Clear drift history from calibration phase
     getProperty("drift")->clearGrid();
     getProperty("guiding")->clearGrid();
+
+    // Reset DEC backlash compensation state for this new guiding session
+    _lastDecDir          = 0;
+    _decBacklashLearning = false;
 
     // Set grid limits to match RMS buffer size for consistent visualization
     int rmsOver = getInt("guideParams", "rmsOver");
@@ -822,8 +827,14 @@ void Guider::SMComputeCal()
         //_grid->append(_dxFirst,_dyFirst);
         //_propertyStore.update(_grid);
         //emit propertyAppended(_grid,&_modulename,0,_dxFirst,_dyFirst,0,0);
-        _dxvector.push_back(_dxPrev);
-        _dyvector.push_back(_dyPrev);
+        // The DEC backlash kick's own resulting movement isn't a clean measurement
+        // (that's the point - it's meant to be absorbed by mechanical backlash),
+        // so it's excluded from the rate calculation below.
+        if (!_calAwaitingKick)
+        {
+            _dxvector.push_back(_dxPrev);
+            _dyvector.push_back(_dyPrev);
+        }
         /*if (_dxvector.size() > 1)
         {
             polynomialfit(_dxvector.size(), 2, _dxvector.data(), _dyvector.data(), coeff);
@@ -847,10 +858,16 @@ void Guider::SMComputeCal()
     if (_calState==2) {
         BOOST_LOG_TRIVIAL(debug) << "DEC drift " << sqrt(square(_avdx)+square(_avdy)) << " drift / ms = " << 1000*sqrt(square(_avdx)+square(_avdy))/_pulseNTot;
     }*/
+    bool wasKick = _calAwaitingKick;
+    _calAwaitingKick = false;
+
     _pulseN = 0;
     _pulseS = 0;
     _pulseE = 0;
     _pulseW = 0;
+
+    if (!wasKick)
+    {
     _calStep++;
 
     // Send progress messages during calibration
@@ -950,7 +967,27 @@ void Guider::SMComputeCal()
             _trigFirst = _trigCurrent;
             return;
         }
+
+        // Entering the North or South pass: take up mechanical backlash first,
+        // so the timed measurement pulses that follow aren't partially wasted
+        // engaging the gears.
+        if (_calState == 2 || _calState == 3)
+        {
+            int kick = getInt("calParams", "decbacklashkick");
+            if (kick > 0)
+            {
+                if (_calState == 2) _pulseN = kick;
+                else                _pulseS = kick;
+                _calAwaitingKick = true;
+                logInfo("Sending %1ms DEC backlash kick before the %2 calibration pass",
+                {QString::number(kick), _calState == 2 ? "North" : "South"});
+            }
+        }
     }
+    }
+
+    if (!_calAwaitingKick)
+    {
     if (_calState == 0)
     {
         _pulseW = getInt("calParams", "pulse");
@@ -966,6 +1003,7 @@ void Guider::SMComputeCal()
     if (_calState == 3)
     {
         _pulseS = getInt("calParams", "pulse");
+    }
     }
     double _driftRA = _dxFirst * cos(_calCcdOrientation) + _dyFirst *  sin(_calCcdOrientation);
     double _driftDE = _dxFirst * sin(_calCcdOrientation) + _dyFirst * -cos(_calCcdOrientation);
@@ -1064,7 +1102,43 @@ void Guider::SMComputeGuide()
     }
     else _pulseW = 0;
 
-    if (revDE * _driftDE > 0 && !disDEN)
+    // DEC backlash compensation - step 1: learn from the previous reversal pulse's
+    // effect (if one is pending), before deciding this cycle's pulse.
+    if (_decBacklashLearning)
+    {
+        double calPulse = (_decBacklashDir > 0) ? _calPulseN : _calPulseS;
+        double expectedReductionPx = (calPulse > 0) ? (_decBacklashCorrection / calPulse) : 0;
+        double actualReductionPx   = qAbs(_decBacklashLastDriftDE) - qAbs(_driftDE);
+
+        int amount = getInt("backlash", "amount");
+        int step   = getInt("backlash", "step");
+        int minAmt = getInt("backlash", "min");
+        int maxAmt = getInt("backlash", "max");
+
+        if (actualReductionPx < 0.8 * expectedReductionPx)
+            amount = qMin(amount + step, maxAmt);
+        else if (actualReductionPx > 1.2 * expectedReductionPx)
+            amount = qMax(amount - step, minAmt);
+
+        getEltInt("backlash", "amount")->setValue(amount, true);
+        logInfo("DEC backlash compensation: expected %1px reduction, got %2px -> now %3ms",
+        {
+            QString::number(expectedReductionPx, 'f', 2),
+            QString::number(actualReductionPx, 'f', 2),
+            QString::number(amount)
+        });
+
+        _decBacklashLearning = false;
+    }
+
+    // DEC backlash compensation - step 2: decide this cycle's pulse and, if the
+    // direction reversed compared to the last pulse actually sent, add the current
+    // compensation estimate on top and remember enough to learn from it next cycle.
+    int decDir = 0; // -1 = South needed, +1 = North needed, 0 = none
+    if (revDE * _driftDE > 0 && !disDEN) decDir = -1;
+    else if (revDE * _driftDE < 0 && !disDES) decDir = 1;
+
+    if (decDir == -1)
     {
         _pulseS = getFloat("guideParams", "deAgr")  * revDE * _driftDE * _calPulseS;
         if (_pulseS > getInt("guideParams", "pulsemax")) _pulseS = getInt("guideParams", "pulsemax");
@@ -1072,13 +1146,32 @@ void Guider::SMComputeGuide()
     }
     else _pulseS = 0;
 
-    if (revDE * _driftDE < 0 && !disDES)
+    if (decDir == 1)
     {
         _pulseN = -getFloat("guideParams", "deAgr") * revDE * _driftDE * _calPulseN;
         if (_pulseN > getInt("guideParams", "pulsemax")) _pulseN = getInt("guideParams", "pulsemax");
         if (_pulseN < getInt("guideParams", "pulsemin")) _pulseN = 0;
     }
     else _pulseN = 0;
+
+    if (getBool("backlash", "enable") && decDir != 0 && _lastDecDir != 0 && decDir != _lastDecDir)
+    {
+        int amount = getInt("backlash", "amount");
+        double correctionMs = (decDir == -1) ? _pulseS : _pulseN;
+
+        logInfo("DEC direction reversed to %1 - adding %2ms backlash compensation (current estimate)",
+        {decDir == -1 ? "South" : "North", QString::number(amount)});
+
+        if (decDir == -1) _pulseS += amount;
+        else               _pulseN += amount;
+
+        _decBacklashLearning    = true;
+        _decBacklashDir         = decDir;
+        _decBacklashCorrection  = correctionMs;
+        _decBacklashLastDriftDE = _driftDE;
+    }
+
+    if (decDir != 0) _lastDecDir = decDir;
 
     _itt++;
 
