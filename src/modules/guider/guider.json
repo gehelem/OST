@@ -257,6 +257,16 @@
                 "order":"02",
                 "value":2,
                 "format": "99"
+            },
+            "decbacklashkick": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "DEC backlash kick (ms)",
+                "order":"03",
+                "value":500,
+                "format": "9999",
+                "hint": "Extra pulse sent before the North pass and before the South pass, to take up mechanical backlash so the timed calibration pulses aren't partially wasted engaging the gears"
             }
 
         }

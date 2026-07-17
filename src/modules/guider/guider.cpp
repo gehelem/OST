@@ -592,6 +592,7 @@ void Guider::SMInitCal()
     // Reset calibration loop counters
     _calState = 0;   // Calibration phase (0-2)
     _calStep = 0;    // Pulse direction counter (0-7 for 4 directions × 2 iterations)
+    _calAwaitingKick = false;
 
     // Clear previous calibration results
     _calPulseN = 0;  // Will be filled by calibration
@@ -826,8 +827,14 @@ void Guider::SMComputeCal()
         //_grid->append(_dxFirst,_dyFirst);
         //_propertyStore.update(_grid);
         //emit propertyAppended(_grid,&_modulename,0,_dxFirst,_dyFirst,0,0);
-        _dxvector.push_back(_dxPrev);
-        _dyvector.push_back(_dyPrev);
+        // The DEC backlash kick's own resulting movement isn't a clean measurement
+        // (that's the point - it's meant to be absorbed by mechanical backlash),
+        // so it's excluded from the rate calculation below.
+        if (!_calAwaitingKick)
+        {
+            _dxvector.push_back(_dxPrev);
+            _dyvector.push_back(_dyPrev);
+        }
         /*if (_dxvector.size() > 1)
         {
             polynomialfit(_dxvector.size(), 2, _dxvector.data(), _dyvector.data(), coeff);
@@ -851,10 +858,16 @@ void Guider::SMComputeCal()
     if (_calState==2) {
         BOOST_LOG_TRIVIAL(debug) << "DEC drift " << sqrt(square(_avdx)+square(_avdy)) << " drift / ms = " << 1000*sqrt(square(_avdx)+square(_avdy))/_pulseNTot;
     }*/
+    bool wasKick = _calAwaitingKick;
+    _calAwaitingKick = false;
+
     _pulseN = 0;
     _pulseS = 0;
     _pulseE = 0;
     _pulseW = 0;
+
+    if (!wasKick)
+    {
     _calStep++;
 
     // Send progress messages during calibration
@@ -954,7 +967,27 @@ void Guider::SMComputeCal()
             _trigFirst = _trigCurrent;
             return;
         }
+
+        // Entering the North or South pass: take up mechanical backlash first,
+        // so the timed measurement pulses that follow aren't partially wasted
+        // engaging the gears.
+        if (_calState == 2 || _calState == 3)
+        {
+            int kick = getInt("calParams", "decbacklashkick");
+            if (kick > 0)
+            {
+                if (_calState == 2) _pulseN = kick;
+                else                _pulseS = kick;
+                _calAwaitingKick = true;
+                logInfo("Sending %1ms DEC backlash kick before the %2 calibration pass",
+                {QString::number(kick), _calState == 2 ? "North" : "South"});
+            }
+        }
     }
+    }
+
+    if (!_calAwaitingKick)
+    {
     if (_calState == 0)
     {
         _pulseW = getInt("calParams", "pulse");
@@ -970,6 +1003,7 @@ void Guider::SMComputeCal()
     if (_calState == 3)
     {
         _pulseS = getInt("calParams", "pulse");
+    }
     }
     double _driftRA = _dxFirst * cos(_calCcdOrientation) + _dyFirst *  sin(_calCcdOrientation);
     double _driftDE = _dxFirst * sin(_calCcdOrientation) + _dyFirst * -cos(_calCcdOrientation);

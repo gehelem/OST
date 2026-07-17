@@ -131,6 +131,7 @@ class MODULE_INIT Guider  : public IndiModule
         bool _pulseRAfinished = true;   ///< Flag: RA pulse completed on mount
         bool _pulseDECfinished = true;  ///< Flag: DEC pulse completed on mount
         bool _doDither = false;         ///< Flag: dither requested, apply on next ComputeGuide
+        bool _calAwaitingKick = false;  ///< Flag: last pulse was a DEC backlash kick, discard its measurement
 
         // ==================== Drift Measurements (pixels) ====================
         double _dxFirst = 0;    ///< Drift X from first reference frame
