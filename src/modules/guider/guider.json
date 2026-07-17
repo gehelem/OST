@@ -403,6 +403,63 @@
                     "value":false
                 }
             }
+    },
+    "backlash": {
+        "devcat": "Guiding",
+        "group": "",
+        "order":"Parameters500",
+        "permission": 2,
+        "rule":2,
+        "hasprofile":true,
+        "label": "DEC backlash compensation",
+        "e": {
+            "enable": {
+                "type":"bool",
+                "autoupdate":true,
+                "label": "Enable",
+                "order":"01",
+                "value":false,
+                "hint": "Add an adaptive extra pulse whenever the DEC guide direction reverses, to take up mechanical backlash before the real correction takes effect"
+            },
+            "amount": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Current compensation (ms)",
+                "order":"02",
+                "value":0,
+                "format": "9999",
+                "hint": "Adaptive estimate, adjusted automatically after each DEC direction reversal - set an initial guess if you know it, otherwise leave at 0 and let it learn"
+            },
+            "min": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Minimum compensation (ms)",
+                "order":"03",
+                "value":0,
+                "format": "9999"
+            },
+            "max": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Maximum compensation (ms)",
+                "order":"04",
+                "value":3000,
+                "format": "9999"
+            },
+            "step": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Adjustment step (ms)",
+                "order":"05",
+                "value":10,
+                "format": "999",
+                "hint": "How much the estimate is nudged up or down after each reversal, based on measured over/undershoot"
+            }
+        }
     }
 }
 }

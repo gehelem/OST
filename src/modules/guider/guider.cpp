@@ -667,6 +667,10 @@ void Guider::SMInitGuide()
     getProperty("drift")->clearGrid();
     getProperty("guiding")->clearGrid();
 
+    // Reset DEC backlash compensation state for this new guiding session
+    _lastDecDir          = 0;
+    _decBacklashLearning = false;
+
     // Set grid limits to match RMS buffer size for consistent visualization
     int rmsOver = getInt("guideParams", "rmsOver");
     getProperty("drift")->setGridLimit(rmsOver);
@@ -1064,7 +1068,43 @@ void Guider::SMComputeGuide()
     }
     else _pulseW = 0;
 
-    if (revDE * _driftDE > 0 && !disDEN)
+    // DEC backlash compensation - step 1: learn from the previous reversal pulse's
+    // effect (if one is pending), before deciding this cycle's pulse.
+    if (_decBacklashLearning)
+    {
+        double calPulse = (_decBacklashDir > 0) ? _calPulseN : _calPulseS;
+        double expectedReductionPx = (calPulse > 0) ? (_decBacklashCorrection / calPulse) : 0;
+        double actualReductionPx   = qAbs(_decBacklashLastDriftDE) - qAbs(_driftDE);
+
+        int amount = getInt("backlash", "amount");
+        int step   = getInt("backlash", "step");
+        int minAmt = getInt("backlash", "min");
+        int maxAmt = getInt("backlash", "max");
+
+        if (actualReductionPx < 0.8 * expectedReductionPx)
+            amount = qMin(amount + step, maxAmt);
+        else if (actualReductionPx > 1.2 * expectedReductionPx)
+            amount = qMax(amount - step, minAmt);
+
+        getEltInt("backlash", "amount")->setValue(amount, true);
+        logInfo("DEC backlash compensation: expected %1px reduction, got %2px -> now %3ms",
+        {
+            QString::number(expectedReductionPx, 'f', 2),
+            QString::number(actualReductionPx, 'f', 2),
+            QString::number(amount)
+        });
+
+        _decBacklashLearning = false;
+    }
+
+    // DEC backlash compensation - step 2: decide this cycle's pulse and, if the
+    // direction reversed compared to the last pulse actually sent, add the current
+    // compensation estimate on top and remember enough to learn from it next cycle.
+    int decDir = 0; // -1 = South needed, +1 = North needed, 0 = none
+    if (revDE * _driftDE > 0 && !disDEN) decDir = -1;
+    else if (revDE * _driftDE < 0 && !disDES) decDir = 1;
+
+    if (decDir == -1)
     {
         _pulseS = getFloat("guideParams", "deAgr")  * revDE * _driftDE * _calPulseS;
         if (_pulseS > getInt("guideParams", "pulsemax")) _pulseS = getInt("guideParams", "pulsemax");
@@ -1072,13 +1112,32 @@ void Guider::SMComputeGuide()
     }
     else _pulseS = 0;
 
-    if (revDE * _driftDE < 0 && !disDES)
+    if (decDir == 1)
     {
         _pulseN = -getFloat("guideParams", "deAgr") * revDE * _driftDE * _calPulseN;
         if (_pulseN > getInt("guideParams", "pulsemax")) _pulseN = getInt("guideParams", "pulsemax");
         if (_pulseN < getInt("guideParams", "pulsemin")) _pulseN = 0;
     }
     else _pulseN = 0;
+
+    if (getBool("backlash", "enable") && decDir != 0 && _lastDecDir != 0 && decDir != _lastDecDir)
+    {
+        int amount = getInt("backlash", "amount");
+        double correctionMs = (decDir == -1) ? _pulseS : _pulseN;
+
+        logInfo("DEC direction reversed to %1 - adding %2ms backlash compensation (current estimate)",
+        {decDir == -1 ? "South" : "North", QString::number(amount)});
+
+        if (decDir == -1) _pulseS += amount;
+        else               _pulseN += amount;
+
+        _decBacklashLearning    = true;
+        _decBacklashDir         = decDir;
+        _decBacklashCorrection  = correctionMs;
+        _decBacklashLastDriftDE = _driftDE;
+    }
+
+    if (decDir != 0) _lastDecDir = decDir;
 
     _itt++;
 

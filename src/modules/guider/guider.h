@@ -110,6 +110,13 @@ class MODULE_INIT Guider  : public IndiModule
         int _pulseE = 0;  ///< Pulse to send East (positive RA, compensated for DEC)
         int _pulseW = 0;  ///< Pulse to send West (negative RA, compensated for DEC)
 
+        // ==================== DEC Backlash Compensation State ====================
+        int    _lastDecDir            = 0;     ///< Direction of the last DEC pulse actually sent: -1 South, +1 North, 0 none yet
+        bool   _decBacklashLearning   = false;  ///< True while waiting to measure the effect of a reversal pulse
+        int    _decBacklashDir        = 0;      ///< Direction of the pending reversal pulse being learned from
+        double _decBacklashCorrection = 0;      ///< Correction-only portion (ms, before backlash was added) of that pulse
+        double _decBacklashLastDriftDE = 0;     ///< DEC drift (px) measured just before that pulse was sent
+
         // ==================== Calibration Results (pixels/ms per 1000ms pulse) ====================
         double _calPulseN = 300;   ///< Calibration: ms per pixel pulse North
         double _calPulseS = 300;   ///< Calibration: ms per pixel pulse South
