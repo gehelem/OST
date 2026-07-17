@@ -593,6 +593,7 @@ void Navigator::correctOffset(double solvedRA, double solvedDEC)
 }
 void Navigator::syncMountIfNeeded(double solvedRA, double solvedDEC)
 {
+    if (!getBool("centeringparams", "syncafter")) return;
 
     setStateEvent(OST::Busy, "synchronise", "syncrequest", "Sync requested");
     // Get mount device
@@ -630,7 +631,7 @@ void Navigator::syncMountIfNeeded(double solvedRA, double solvedDEC)
 
     logInfo("Mount successfully synchronized with solved field");
 
-
+    setStateEvent(OST::Ok, "ready", "syncdone", "Mount synchronized");
 }
 void Navigator::addTargeToPlanner()
 {

@@ -240,6 +240,7 @@ enum class EvType
     fl,        /*!< profile loaded */
     fc,        /*!< profile changed */
     uc,        /*!< update controller data */
+    qa,        /*!< answer to another module's query (see onModuleQuery) */
     xx,        /*!< client ping acknowledgement */
 };
 inline QString EvToString(EvType ev)
@@ -294,6 +295,8 @@ inline QString EvToString(EvType ev)
             return "fc-profile changed";
         case OST::EvType::uc:
             return "uc-update controller data";
+        case OST::EvType::qa:
+            return "qa-query answer";
         default:
             return "unknown:" + QString::number(static_cast<int>(ev));
     }
@@ -311,6 +314,7 @@ enum class ExtEvType
     MK,        /*!< Kill module */
     PL,        /*!< Load profile */
     PS,        /*!< Save profile */
+    QY,        /*!< Query another module (generic request/answer, see onModuleQuery) */
     CL,        /*!< Load configuration */
     CS,        /*!< Save configuration*/
     SV,        /*!< set a value of a property */
@@ -360,6 +364,8 @@ inline QString ExtEvToString(ExtEvType ev)
             return "PL";
         case OST::ExtEvType::PS:
             return "PS";
+        case OST::ExtEvType::QY:
+            return "QY";
         case OST::ExtEvType::CL:
             return "CL";
         case OST::ExtEvType::CS:

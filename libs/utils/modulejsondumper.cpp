@@ -14,6 +14,13 @@ QJsonValue ModuleJsonDumper(EvType evt, QVariant data, ElementBase *elt, Propert
         return result;
     }
 
+    /* generic query answer (see Basemodule::onModuleQuery) */
+    if (evt == EvType::qa)
+    {
+        result["q"] = QJsonObject::fromVariantMap(data.toMap());
+        return result;
+    }
+
     /* global dumps & profiles events : profile data is required */
     if (evt == EvType::aa || evt == EvType::am  || evt == EvType::fs   || evt == EvType::fl   || evt == EvType::fc )
     {

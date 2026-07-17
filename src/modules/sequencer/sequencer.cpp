@@ -804,6 +804,42 @@ void Sequencer::recomputeSequenceTotals()
     getEltString("progress", "theoreticalremaining")->setValue(formatDuration(remaining), true);
 }
 
+QVariantMap Sequencer::onModuleQuery(const QString &queryName, const QVariantMap &params)
+{
+    if (queryName == "profileduration")
+    {
+        // Peek at a stored profile's "sequence" grid without loading it,
+        // so this can be asked about any profile regardless of what is
+        // currently active (e.g. by the planner, before starting a line).
+        double totalSeconds = 0.0;
+        QJsonObject obj;
+        if (getDbProfile(getClassName(), params["profile"].toString(), obj))
+        {
+            QJsonObject seqProp = obj["p"].toObject()["sequence"].toObject();
+            QJsonArray  headers = seqProp["gridheaders"].toArray();
+            QJsonArray  grid    = seqProp["grid"].toArray();
+
+            int ci = -1, ei = -1;
+            for (int i = 0; i < headers.size(); i++)
+            {
+                if (headers[i].toString() == "count")    ci = i;
+                if (headers[i].toString() == "exposure") ei = i;
+            }
+
+            if (ci != -1 && ei != -1)
+            {
+                for (const QJsonValue &vline : grid)
+                {
+                    QJsonArray line = vline.toArray();
+                    totalSeconds += line[ci].toInt() * line[ei].toDouble();
+                }
+            }
+        }
+        return { {"seconds", totalSeconds} };
+    }
+    return Basemodule::onModuleQuery(queryName, params);
+}
+
 void Sequencer::setupOutputFolder()
 {
     QDir dir;

@@ -1,5 +1,9 @@
 #include "planner.h"
 #include "version.cc"
+#include <libnova/julian_day.h>
+#include <libnova/transform.h>
+#include <libnova/lunar.h>
+#include <libnova/angular_separation.h>
 
 /**
  * @brief Required export function for dynamic module loading
@@ -194,6 +198,7 @@ void Planner::startPlanner()
     }
 
     mCurrentLine = 0;
+    mSkipCounts.clear();
     startLine();
 
 }
@@ -212,6 +217,7 @@ void Planner::abortPlanner()
     mIsRunning = false;
     mWaitingSequence = false;
     mWaitingNavigator = false;
+    mWaitingDuration = false;
 
     logInfo("Operation aborted");
 
@@ -254,20 +260,22 @@ void Planner::sequenceComplete()
     getEltPrg("planning", "progress")->setPrgValue(100, false);
     getProperty("planning")->updateLine(mCurrentLine);
 
+    advanceToNextLine();
+}
 
-    mCurrentLine++;
-    if (getProperty("planning")->getGrid().count() <= mCurrentLine)
-    {
-        logInfo("Planning completed");
-        // update global status
-        getEltPrg("progress", "global")->setPrgValue(100, true);
-        getEltPrg("progress", "global")->setDynLabel("Finished", true);
-        mIsRunning = false;
-        return;
-    }
+void Planner::sequenceCancelled()
+{
+    mWaitingSequence = false;
+    mWaitingNavigator = false;
 
-    startLine();
+    logWarning("Sequence for target %1 was cancelled - moving on", {getString("planning", "object")});
 
+    getProperty("planning")->fetchLine(mCurrentLine);
+    getEltPrg("planning", "progress")->setDynLabel("Cancelled", false);
+    getEltPrg("planning", "progress")->setPrgValue(0, false);
+    getProperty("planning")->updateLine(mCurrentLine);
+
+    advanceToNextLine();
 }
 void Planner::navigatorComplete()
 {
@@ -301,6 +309,25 @@ void Planner::startLine()
 
     // update line status
     getProperty("planning")->fetchLine(mCurrentLine);
+    getEltPrg("planning", "progress")->setDynLabel("Checking visibility", false);
+    getEltPrg("planning", "progress")->setPrgValue(0, false);
+    getProperty("planning")->updateLine(mCurrentLine);
+
+    logInfo("Checking visibility for target %1", {getString("planning", "object")});
+
+    mWaitingSequence  = false;
+    mWaitingNavigator = false;
+    mWaitingDuration   = true;
+
+    // Ask the sequencer how long the requested profile would theoretically take,
+    // so the visibility check covers the whole sequence, not just this instant.
+    otherModuleQuery(getString("slaves", "sequencemodule"), "profileduration",
+    {{"profile", getString("planning", "profile")}});
+}
+
+void Planner::proceedToSlew()
+{
+    getProperty("planning")->fetchLine(mCurrentLine);
     getEltPrg("planning", "progress")->setDynLabel("Slewing", false);
     getEltPrg("planning", "progress")->setPrgValue(0, false);
     getProperty("planning")->updateLine(mCurrentLine);
@@ -326,11 +353,124 @@ void Planner::startLine()
     // Ask navigator to slew to target
     otherModuleSetValue( getString("slaves", "navigatormodule"), "actions", "gototarget", true);
 }
+
+void Planner::skipLine(const QString &reason)
+{
+    int attempts    = ++mSkipCounts[mCurrentLine];
+    int maxRetries  = getInt("visibility", "maxretries");
+
+    if (attempts >= maxRetries)
+    {
+        logWarning("Giving up on target %1 after %2 attempts: %3", {getString("planning", "object"), QString::number(attempts), reason});
+        getProperty("planning")->fetchLine(mCurrentLine);
+        getEltPrg("planning", "progress")->setDynLabel("Failed: " + reason, false);
+        getEltPrg("planning", "progress")->setPrgValue(0, false);
+        getProperty("planning")->updateLine(mCurrentLine);
+    }
+    else
+    {
+        logWarning("Skipping target %1 (attempt %2/%3): %4", {getString("planning", "object"), QString::number(attempts), QString::number(maxRetries), reason});
+        getProperty("planning")->fetchLine(mCurrentLine);
+        getEltPrg("planning", "progress")->setDynLabel("Skipped: " + reason, false);
+        getEltPrg("planning", "progress")->setPrgValue(0, false);
+        getProperty("planning")->updateLine(mCurrentLine);
+    }
+
+    advanceToNextLine();
+}
+
+void Planner::advanceToNextLine()
+{
+    int count = getProperty("planning")->getGrid().count();
+    for (int i = 1; i <= count; i++)
+    {
+        int idx = (mCurrentLine + i) % count;
+        getProperty("planning")->fetchLine(idx);
+        QString label = getEltPrg("planning", "progress")->dynLabel();
+        if (label != "Finished" && label != "Cancelled" && !label.startsWith("Failed"))
+        {
+            mCurrentLine = idx;
+            startLine();
+            return;
+        }
+    }
+
+    logInfo("Planning completed");
+    getEltPrg("progress", "global")->setPrgValue(100, true);
+    getEltPrg("progress", "global")->setDynLabel("Finished", true);
+    mIsRunning = false;
+}
+
+bool Planner::checkVisibility(double ra, double dec, double durationSeconds, QString &reason)
+{
+    ln_lnlat_posn observer;
+    observer.lat = getFloat("location", "lat");
+    observer.lng = getFloat("location", "lon");
+
+    ln_equ_posn target;
+    target.ra  = ra * 15.0; // stored in hours, libnova expects degrees
+    target.dec = dec;
+
+    double jdNow = ln_get_julian_from_sys();
+    double jdEnd = jdNow + (durationSeconds / 86400.0);
+
+    ln_hrz_posn hrzNow, hrzEnd;
+    ln_get_hrz_from_equ(&target, &observer, jdNow, &hrzNow);
+    ln_get_hrz_from_equ(&target, &observer, jdEnd,  &hrzEnd);
+
+    double minElevation = getFloat("visibility", "minelevation");
+    double worstAlt = qMin(hrzNow.alt, hrzEnd.alt);
+    if (worstAlt < minElevation)
+    {
+        reason = QString("elevation %1° below minimum %2°")
+                 .arg(worstAlt, 0, 'f', 1)
+                 .arg(minElevation, 0, 'f', 1);
+        return false;
+    }
+
+    ln_equ_posn moonEqu;
+    ln_get_lunar_equ_coords(jdNow, &moonEqu);
+    double illumination = ln_get_lunar_disk(jdNow) * 100.0;
+    double separation    = ln_get_angular_separation(&target, &moonEqu);
+
+    double illumThreshold = getFloat("visibility", "moonilluminationthreshold");
+    double sepThreshold   = getFloat("visibility", "moonseparationthreshold");
+    if (illumination > illumThreshold && separation < sepThreshold)
+    {
+        reason = QString("moon %1% illuminated, only %2° away")
+                 .arg(illumination, 0, 'f', 0)
+                 .arg(separation, 0, 'f', 1);
+        return false;
+    }
+
+    return true;
+}
 void Planner::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QString elt, QVariant data, int line)
 {
     if (mod != getString("slaves", "navigatormodule") && mod != getString("slaves", "sequencemodule") ) return;
 
     //logDebug("Planner::onOtherModuleEvent2 mod=%1 ev=%2 prop=%3 elt=%4 data=%5", {mod, OST::EvToString(ev), prp, elt, data});
+
+    if (mod == getString("slaves", "sequencemodule") && ev == OST::EvType::qa && mWaitingDuration)
+    {
+        QJsonObject q = data.toJsonValue().toObject()["q"].toObject();
+        if (q["query"].toString() == "profileduration")
+        {
+            mWaitingDuration = false;
+            double seconds = q["result"].toObject()["seconds"].toDouble();
+
+            QString reason;
+            if (checkVisibility(getFloat("planning", "ra"), getFloat("planning", "dec"), seconds, reason))
+            {
+                proceedToSlew();
+            }
+            else
+            {
+                skipLine(reason);
+            }
+        }
+        return;
+    }
 
     if (mod == getString("slaves", "navigatormodule") && ev == OST::EvType::ea && prp == "signals"  && mWaitingNavigator)
     {
@@ -363,6 +503,11 @@ void Planner::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QStri
         QString e = o["event"].toString();
         QString ed = o["eventdescription"].toString();
         //logDebug("catching signals event from %6 : %1 %2 %3 %4 %5", {OST::EvToString(ev), s, sd, e, ed, mod});
+        if (OST::IntToState(s) == OST::Ok && sd == "ready" && e == "abortdone")
+        {
+            sequenceCancelled();
+            return;
+        }
         if (OST::IntToState(s) == OST::Ok && sd == "ready")
         {
             sequenceComplete();
