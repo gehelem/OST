@@ -30,7 +30,7 @@ find_package(ZLIB REQUIRED)
 find_package(Threads REQUIRED)
 find_package(Nova REQUIRED)
 find_package(GSL REQUIRED)
-#find_package(OpenCV REQUIRED )
+find_package(OpenCV REQUIRED)
 find_package(WCSLIB REQUIRED)
 find_package(QT NAMES Qt6 COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql Scxml StateMachine Xml REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql Scxml StateMachine Xml)
@@ -565,12 +565,14 @@ add_library(ostcollimator SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/collimator/collimator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/collimator/collimator.qrc
 )
+target_include_directories(ostcollimator PRIVATE ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(ostcollimator PRIVATE
     ostindimodule
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Widgets
     Threads::Threads
+    ${OpenCV_LIBS}
     z
 )
 target_compile_definitions(ostcollimator PRIVATE COLLIMATOR_MODULE)

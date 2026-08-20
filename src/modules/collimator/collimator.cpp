@@ -1,5 +1,7 @@
 #include "collimator.h"
 #include "version.cc"
+#include <opencv2/opencv.hpp>
+#include <cmath>
 
 static void atomicSaveJpeg(const QImage &img, const QString &finalPath)
 {
@@ -143,14 +145,11 @@ void Collimator::newBLOB(INDI::PropertyBlob pblob)
         mImage = new fileio();
         mImage->loadBlob(pblob, 64);
         QImage rawImage = mImage->getRawQImage();
-        QImage im = rawImage.convertToFormat(QImage::Format_RGB32);
-        im.setColorTable(rawImage.colorTable());
-        atomicSaveJpeg(im, getWebroot() + "/" + getModuleName() + ".jpeg");
-        OST::ImgData dta = mImage->ImgStats();
-        dta.mUrlJpeg = getModuleName() + ".jpeg";
-        dta.isSolved = false;
-        getEltImg("image", "image")->setValue(dta, true);
+        mRawImage = rawImage.convertToFormat(QImage::Format_RGB32);
+        mRawImage.setColorTable(rawImage.colorTable());
 
+        // Published once analysis is done, with the deformation overlay drawn
+        // on top -- see analyzeFrame().
         emit newImage();
     }
 }
@@ -171,10 +170,299 @@ void Collimator::OnNewImage(void)
 
 void Collimator::analyzeFrame(void)
 {
-    // TODO: OpenCV-based multi-star donut detection and deformation-field fit
-    // (cf. collimator-spec.md "Principe retenu pour l'algo d'analyse"). Not
-    // implemented yet -- this is the step after the UI data model is in place.
-    logInfo("Collimator::analyzeFrame not implemented yet");
+    if (!mImage)
+        return;
+
+    FITSImage::Statistic stats = mImage->getStats();
+    uint8_t *buffer = mImage->getImageBuffer();
+    if (!buffer || stats.width == 0 || stats.height == 0)
+        return;
+
+    // Wrap the raw buffer as an OpenCV Mat. v1 assumes a mono camera (the
+    // usual case for collimation/guide cameras) -- color/Bayer is not
+    // handled here.
+    cv::Mat raw;
+    if (stats.bytesPerPixel == 2)
+        raw = cv::Mat(stats.height, stats.width, CV_16UC1, buffer);
+    else
+        raw = cv::Mat(stats.height, stats.width, CV_8UC1, buffer);
+
+    // Stretch to 8-bit for thresholding/contour work.
+    double lo = stats.min[0];
+    double hi = stats.max[0];
+    if (hi <= lo)
+        hi = lo + 1;
+    cv::Mat img8;
+    raw.convertTo(img8, CV_8UC1, 255.0 / (hi - lo), -255.0 * lo / (hi - lo));
+
+    cv::Mat bin;
+    cv::threshold(img8, bin, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+
+    // RETR_CCOMP gives a 2-level hierarchy: each donut's outer contour at the
+    // top level, with the secondary's shadow (if detected) as its direct
+    // child -- exactly the "contour externe + ombre du secondaire" pair from
+    // collimator-spec.md, with no extra bookkeeping needed.
+    std::vector<std::vector<cv::Point>> contours;
+    std::vector<cv::Vec4i> hierarchy;
+    cv::findContours(bin, contours, hierarchy, cv::RETR_CCOMP, cv::CHAIN_APPROX_SIMPLE);
+
+    getProperty("stars")->clearGrid();
+
+    double const minArea = 30.0; // reject noise speckles
+    double const cx0 = stats.width / 2.0;
+    double const cy0 = stats.height / 2.0;
+
+    // Pixels -> arcsec, same convention as polar/navigator. Computed up front:
+    // needed both for the per-star overlay color coding and the final fit.
+    double pixelSize = 0;
+    getModNumber(getString("devices", "camera"), "CCD_INFO", "CCD_PIXEL_SIZE", pixelSize);
+    double focalLength = getFloat("optic", "fl");
+    double scale = (focalLength > 0) ? 206.3 * pixelSize / focalLength : 0; // arcsec/px
+
+    QImage overlay = mRawImage.copy();
+    QPainter painter(&overlay);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    // The display image (mRawImage, via fileio::generateQImage()) is
+    // downsampled relative to the full-resolution analysis buffer -- scale
+    // every drawn coordinate down to match, while keeping all the reported
+    // property values (stars grid, correction, convergence point) in true
+    // full-resolution pixels.
+    double const overlaySx = overlay.width() > 0 ? overlay.width() / static_cast<double>(stats.width) : 1.0;
+    double const overlaySy = overlay.height() > 0 ? overlay.height() / static_cast<double>(stats.height) : 1.0;
+
+    std::vector<cv::Point2d> starPos;  // donut center, absolute image px
+    std::vector<cv::Point2d> deform;   // deformation vector, px
+
+    for (size_t i = 0; i < contours.size(); i++)
+    {
+        if (hierarchy[i][3] != -1)
+            continue; // only top-level (outer) contours
+
+        double area = cv::contourArea(contours[i]);
+        if (area < minArea)
+            continue;
+
+        cv::Moments outerM = cv::moments(contours[i]);
+        if (outerM.m00 <= 0)
+            continue;
+        cv::Point2d center(outerM.m10 / outerM.m00, outerM.m01 / outerM.m00);
+
+        cv::Rect box = cv::boundingRect(contours[i]) & cv::Rect(0, 0, img8.cols, img8.rows);
+        if (box.width <= 0 || box.height <= 0)
+            continue;
+
+        // Ring mask: filled outer contour minus every hole found inside it.
+        cv::Mat mask = cv::Mat::zeros(box.size(), CV_8UC1);
+        std::vector<cv::Point> outerShifted = contours[i];
+        for (cv::Point &pt : outerShifted)
+            pt -= box.tl();
+        cv::drawContours(mask, std::vector<std::vector<cv::Point>> {outerShifted}, 0, cv::Scalar(255), cv::FILLED);
+
+        for (int child = hierarchy[i][2]; child != -1; child = hierarchy[child][0])
+        {
+            std::vector<cv::Point> holeShifted = contours[child];
+            for (cv::Point &pt : holeShifted)
+                pt -= box.tl();
+            cv::drawContours(mask, std::vector<std::vector<cv::Point>> {holeShifted}, 0, cv::Scalar(0), cv::FILLED);
+        }
+
+        // Deformation vector: intensity-weighted centroid of the ring alone
+        // (excluding the shadow) versus the outer contour's own geometric
+        // center. This stays meaningful for a strongly comatic/"V"-shaped
+        // ring, unlike comparing two fitted ellipse centers.
+        cv::Mat roi = img8(box);
+        double sumI = 0, sumX = 0, sumY = 0;
+        for (int y = 0; y < mask.rows; y++)
+        {
+            const uchar *mrow = mask.ptr<uchar>(y);
+            const uchar *irow = roi.ptr<uchar>(y);
+            for (int x = 0; x < mask.cols; x++)
+            {
+                if (mrow[x])
+                {
+                    double v = irow[x];
+                    sumI += v;
+                    sumX += v * (x + box.x);
+                    sumY += v * (y + box.y);
+                }
+            }
+        }
+        if (sumI <= 0)
+            continue;
+
+        cv::Point2d weighted(sumX / sumI, sumY / sumI);
+        cv::Point2d d = weighted - center;
+
+        starPos.push_back(center);
+        deform.push_back(d);
+
+        getProperty("stars")->newLine(
+        {
+            {"x", center.x}, {"y", center.y}, {"dx", d.x}, {"dy", d.y}
+        }, true);
+
+        drawStarOverlay(painter, contours[i], center, d, scale, overlaySx, overlaySy);
+    }
+    getProperty("stars")->emitAll();
+
+    if (starPos.size() < 2)
+    {
+        getEltLight("correction", "quality")->setValue(OST::Error, true);
+        drawConvergenceOverlay(painter, cx0, cy0, 0, 0, false, scale, overlaySx, overlaySy);
+        painter.end();
+        atomicSaveJpeg(overlay, getWebroot() + "/" + getModuleName() + ".jpeg");
+        OST::ImgData dta = mImage->ImgStats();
+        dta.mUrlJpeg = getModuleName() + ".jpeg";
+        dta.isSolved = false;
+        getEltImg("image", "image")->setValue(dta, true);
+        return;
+    }
+
+    // Fit D(P) = C - k*P by least squares (P relative to the image center),
+    // cf. collimator-spec.md "Principe retenu pour l'algo d'analyse". SVD
+    // handles the few-stars / ill-conditioned cases gracefully rather than
+    // failing outright.
+    int const n = static_cast<int>(starPos.size());
+    cv::Mat A(2 * n, 3, CV_64F);
+    cv::Mat b(2 * n, 1, CV_64F);
+    for (int i = 0; i < n; i++)
+    {
+        double px = starPos[i].x - cx0;
+        double py = starPos[i].y - cy0;
+        A.at<double>(2 * i, 0) = 1;
+        A.at<double>(2 * i, 1) = 0;
+        A.at<double>(2 * i, 2) = -px;
+        b.at<double>(2 * i, 0) = deform[i].x;
+        A.at<double>(2 * i + 1, 0) = 0;
+        A.at<double>(2 * i + 1, 1) = 1;
+        A.at<double>(2 * i + 1, 2) = -py;
+        b.at<double>(2 * i + 1, 0) = deform[i].y;
+    }
+    cv::Mat sol;
+    cv::solve(A, b, sol, cv::DECOMP_SVD);
+    double Cx = sol.at<double>(0, 0);
+    double Cy = sol.at<double>(1, 0);
+    double k  = sol.at<double>(2, 0);
+
+    double amplitudeArcsec = std::hypot(Cx, Cy) * scale;
+
+    getEltFloat("correction", "cx")->setValue(Cx, false);
+    getEltFloat("correction", "cy")->setValue(Cy, false);
+    getEltFloat("correction", "amplitude")->setValue(amplitudeArcsec, false);
+
+    bool hasConvergence = std::fabs(k) > 1e-9;
+    double convX = cx0;
+    double convY = cy0;
+    if (hasConvergence)
+    {
+        convX = cx0 + Cx / k;
+        convY = cy0 + Cy / k;
+        getEltFloat("correction", "convergencex")->setValue(convX, false);
+        getEltFloat("correction", "convergencey")->setValue(convY, false);
+    }
+
+    OST::State quality = OST::Ok;
+    if (amplitudeArcsec > 120)
+        quality = OST::Error;
+    else if (amplitudeArcsec > 30)
+        quality = OST::Busy;
+    getEltLight("correction", "quality")->setValue(quality, true);
+
+    // Project the collimation vector onto the 3 screws. v1 simplification
+    // (cf. collimator-spec.md "Convention mecanique"): fixed 120 deg spacing,
+    // no auto-detection of the screws' actual orientation in the image, so
+    // screw 1 is arbitrarily "up" (+Y). Correction is -C projected on each
+    // screw's axis: dialing in that amount should null the observed error.
+    for (int s = 0; s < 3; s++)
+    {
+        double angle = (M_PI / 2.0) + s * (2.0 * M_PI / 3.0);
+        double ux = std::cos(angle);
+        double uy = std::sin(angle);
+        double proj = -(Cx * ux + Cy * uy) * scale;
+        getEltFloat("screws", QString("screw%1").arg(s + 1))->setValue(proj, s == 2);
+    }
+
+    drawConvergenceOverlay(painter, cx0, cy0, convX, convY, hasConvergence, scale, overlaySx, overlaySy);
+    painter.end();
+
+    atomicSaveJpeg(overlay, getWebroot() + "/" + getModuleName() + ".jpeg");
+    OST::ImgData dta = mImage->ImgStats();
+    dta.mUrlJpeg = getModuleName() + ".jpeg";
+    dta.isSolved = false;
+    getEltImg("image", "image")->setValue(dta, true);
+}
+
+void Collimator::drawStarOverlay(QPainter &painter, const std::vector<cv::Point> &contour,
+                                  const cv::Point2d &center, const cv::Point2d &deform, double scale,
+                                  double sx, double sy)
+{
+    // All coordinates below are in full-resolution analysis pixels; sx/sy
+    // convert them down to the (possibly subsampled) overlay image's own
+    // pixel grid -- see the comment in analyzeFrame().
+    QPolygon poly;
+    for (const cv::Point &p : contour)
+        poly << QPoint(qRound(p.x * sx), qRound(p.y * sy));
+    painter.setPen(QPen(QColor(80, 160, 255), 1));
+    painter.setBrush(Qt::NoBrush);
+    painter.drawPolygon(poly);
+
+    // Deformation arrow, exaggerated for visibility -- raw offsets are a few
+    // pixels at most, invisible if drawn at true scale.
+    double const arrowScale = 8.0;
+    QPointF from(center.x * sx, center.y * sy);
+    QPointF to((center.x + deform.x * arrowScale) * sx, (center.y + deform.y * arrowScale) * sy);
+
+    double amplitudeArcsec = std::hypot(deform.x, deform.y) * scale;
+    QColor color(0, 220, 0);
+    if (amplitudeArcsec > 5)
+        color = QColor(230, 0, 0);
+    else if (amplitudeArcsec > 1)
+        color = QColor(255, 160, 0);
+
+    painter.setPen(QPen(color, 2));
+    painter.drawLine(from, to);
+
+    double angle = std::atan2(to.y() - from.y(), to.x() - from.x());
+    double const headLen = 6.0;
+    QPointF h1 = to - QPointF(headLen * std::cos(angle - M_PI / 6.0), headLen * std::sin(angle - M_PI / 6.0));
+    QPointF h2 = to - QPointF(headLen * std::cos(angle + M_PI / 6.0), headLen * std::sin(angle + M_PI / 6.0));
+    painter.drawLine(to, h1);
+    painter.drawLine(to, h2);
+
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(color);
+    painter.drawEllipse(from, 3, 3);
+}
+
+void Collimator::drawConvergenceOverlay(QPainter &painter, double cx0, double cy0, double convX, double convY,
+                                         bool hasConvergence, double scale, double sx, double sy)
+{
+    QPointF center(cx0 * sx, cy0 * sy);
+    double const radiusScale = (sx + sy) / 2.0;
+
+    // Bullseye: tolerance rings at the same amplitude thresholds used for the
+    // "quality" light (30"/120").
+    painter.setPen(QPen(QColor(255, 255, 255), 1, Qt::DashLine));
+    painter.setBrush(Qt::NoBrush);
+    if (scale > 0)
+    {
+        painter.drawEllipse(center, 30.0 / scale * radiusScale, 30.0 / scale * radiusScale);
+        painter.drawEllipse(center, 120.0 / scale * radiusScale, 120.0 / scale * radiusScale);
+    }
+    painter.setPen(QPen(QColor(255, 255, 255), 1));
+    painter.drawLine(center - QPointF(10, 0), center + QPointF(10, 0));
+    painter.drawLine(center - QPointF(0, 10), center + QPointF(0, 10));
+
+    if (!hasConvergence)
+        return;
+
+    QPointF conv(convX * sx, convY * sy);
+    painter.setPen(QPen(QColor(255, 0, 255), 2));
+    painter.drawLine(center, conv);
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(QColor(255, 0, 255));
+    painter.drawEllipse(conv, 5, 5);
 }
 
 void Collimator::Shoot(void)
