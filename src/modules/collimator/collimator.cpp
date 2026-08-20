@@ -10,6 +10,37 @@ static void atomicSaveJpeg(const QImage &img, const QString &finalPath)
         ::rename(tmp.toLocal8Bit().constData(), finalPath.toLocal8Bit().constData());
 }
 
+// Robust circle fit (Kasa's algebraic method) through a set of boundary
+// points. Unlike a filled-area centroid/moments, this tolerates a partial
+// arc -- it still recovers something close to the true center when the ring
+// is reduced to a crescent (badly decollimated donut whose shadow eats into
+// the outer boundary, breaking the usual "hole inside a ring" topology).
+static bool fitCircleKasa(const std::vector<cv::Point> &pts, cv::Point2d &center)
+{
+    int const n = static_cast<int>(pts.size());
+    if (n < 8)
+        return false;
+
+    cv::Mat A(n, 3, CV_64F);
+    cv::Mat b(n, 1, CV_64F);
+    for (int i = 0; i < n; i++)
+    {
+        double x = pts[i].x;
+        double y = pts[i].y;
+        A.at<double>(i, 0) = 2.0 * x;
+        A.at<double>(i, 1) = 2.0 * y;
+        A.at<double>(i, 2) = 1.0;
+        b.at<double>(i, 0) = x * x + y * y;
+    }
+    cv::Mat sol;
+    if (!cv::solve(A, b, sol, cv::DECOMP_SVD))
+        return false;
+
+    center.x = sol.at<double>(0, 0);
+    center.y = sol.at<double>(1, 0);
+    return true;
+}
+
 Collimator *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
 {
     Collimator *basemodule = new Collimator(name, label, profile, availableModuleLibs);
@@ -195,16 +226,22 @@ void Collimator::analyzeFrame(void)
     cv::Mat img8;
     raw.convertTo(img8, CV_8UC1, 255.0 / (hi - lo), -255.0 * lo / (hi - lo));
 
-    cv::Mat bin;
-    cv::threshold(img8, bin, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+    // Coarse candidate detection. A single global Otsu threshold picks one
+    // brightness level for the whole frame, so a field with donuts of very
+    // different brightness loses the faint ones under the bright one's
+    // threshold. Adaptive threshold compares each pixel to its own local
+    // neighborhood instead, so it catches both. Morphological close/open
+    // bridges small gaps in a ring's edge and removes speckle noise before
+    // contour extraction.
+    int const blockSize = std::max(21, (std::min(stats.width, stats.height) / 8) | 1); // odd
+    cv::Mat coarseBin;
+    cv::adaptiveThreshold(img8, coarseBin, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, blockSize, -5);
+    cv::Mat const morphKernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(3, 3));
+    cv::morphologyEx(coarseBin, coarseBin, cv::MORPH_CLOSE, morphKernel);
+    cv::morphologyEx(coarseBin, coarseBin, cv::MORPH_OPEN, morphKernel);
 
-    // RETR_CCOMP gives a 2-level hierarchy: each donut's outer contour at the
-    // top level, with the secondary's shadow (if detected) as its direct
-    // child -- exactly the "contour externe + ombre du secondaire" pair from
-    // collimator-spec.md, with no extra bookkeeping needed.
-    std::vector<std::vector<cv::Point>> contours;
-    std::vector<cv::Vec4i> hierarchy;
-    cv::findContours(bin, contours, hierarchy, cv::RETR_CCOMP, cv::CHAIN_APPROX_SIMPLE);
+    std::vector<std::vector<cv::Point>> candidates;
+    cv::findContours(coarseBin, candidates, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
     getProperty("stars")->clearGrid();
 
@@ -234,44 +271,74 @@ void Collimator::analyzeFrame(void)
     std::vector<cv::Point2d> starPos;  // donut center, absolute image px
     std::vector<cv::Point2d> deform;   // deformation vector, px
 
-    for (size_t i = 0; i < contours.size(); i++)
+    for (const std::vector<cv::Point> &candidate : candidates)
     {
-        if (hierarchy[i][3] != -1)
-            continue; // only top-level (outer) contours
-
-        double area = cv::contourArea(contours[i]);
-        if (area < minArea)
+        if (cv::contourArea(candidate) < minArea)
             continue;
 
-        cv::Moments outerM = cv::moments(contours[i]);
-        if (outerM.m00 <= 0)
-            continue;
-        cv::Point2d center(outerM.m10 / outerM.m00, outerM.m01 / outerM.m00);
-
-        cv::Rect box = cv::boundingRect(contours[i]) & cv::Rect(0, 0, img8.cols, img8.rows);
+        // Local refinement: re-threshold (Otsu) just this candidate's own
+        // neighborhood, expanded a bit around its coarse bounding box. This
+        // gives each star its own brightness-appropriate binary mask instead
+        // of inheriting a one-size-fits-all threshold, and RETR_CCOMP on that
+        // local patch recovers the outer/hole contour pair cleanly.
+        cv::Rect coarseBox = cv::boundingRect(candidate);
+        int const marginX = coarseBox.width / 4 + 4;
+        int const marginY = coarseBox.height / 4 + 4;
+        cv::Rect box(coarseBox.x - marginX, coarseBox.y - marginY,
+                     coarseBox.width + 2 * marginX, coarseBox.height + 2 * marginY);
+        box &= cv::Rect(0, 0, img8.cols, img8.rows);
         if (box.width <= 0 || box.height <= 0)
             continue;
 
-        // Ring mask: filled outer contour minus every hole found inside it.
-        cv::Mat mask = cv::Mat::zeros(box.size(), CV_8UC1);
-        std::vector<cv::Point> outerShifted = contours[i];
-        for (cv::Point &pt : outerShifted)
-            pt -= box.tl();
-        cv::drawContours(mask, std::vector<std::vector<cv::Point>> {outerShifted}, 0, cv::Scalar(255), cv::FILLED);
+        cv::Mat roi = img8(box);
+        cv::Mat localBin;
+        cv::threshold(roi, localBin, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
 
-        for (int child = hierarchy[i][2]; child != -1; child = hierarchy[child][0])
+        std::vector<std::vector<cv::Point>> localContours;
+        std::vector<cv::Vec4i> localHierarchy;
+        cv::findContours(localBin, localContours, localHierarchy, cv::RETR_CCOMP, cv::CHAIN_APPROX_SIMPLE);
+
+        int bestIdx = -1;
+        double bestArea = 0;
+        for (size_t j = 0; j < localContours.size(); j++)
         {
-            std::vector<cv::Point> holeShifted = contours[child];
-            for (cv::Point &pt : holeShifted)
-                pt -= box.tl();
-            cv::drawContours(mask, std::vector<std::vector<cv::Point>> {holeShifted}, 0, cv::Scalar(0), cv::FILLED);
+            if (localHierarchy[j][3] != -1)
+                continue; // top-level only
+            double a = cv::contourArea(localContours[j]);
+            if (a > bestArea)
+            {
+                bestArea = a;
+                bestIdx = static_cast<int>(j);
+            }
         }
+        if (bestIdx < 0 || bestArea < minArea)
+            continue;
+
+        // Circle fit through the outer boundary rather than its filled-area
+        // centroid: tolerates a partial arc, so it still recovers something
+        // close to the star's true position even when the shadow has eaten
+        // into the outer boundary (crescent case, no separate child/hole
+        // contour) -- see fitCircleKasa() above.
+        std::vector<cv::Point> outerFull = localContours[bestIdx];
+        for (cv::Point &pt : outerFull)
+            pt += box.tl();
+
+        cv::Point2d center;
+        if (!fitCircleKasa(outerFull, center))
+            continue;
+
+        // Ring mask: filled outer contour minus every hole found inside it,
+        // in the local ROI's own coordinate space.
+        cv::Mat mask = cv::Mat::zeros(box.size(), CV_8UC1);
+        cv::drawContours(mask, localContours, bestIdx, cv::Scalar(255), cv::FILLED);
+        for (int child = localHierarchy[bestIdx][2]; child != -1; child = localHierarchy[child][0])
+            cv::drawContours(mask, localContours, child, cv::Scalar(0), cv::FILLED);
 
         // Deformation vector: intensity-weighted centroid of the ring alone
-        // (excluding the shadow) versus the outer contour's own geometric
-        // center. This stays meaningful for a strongly comatic/"V"-shaped
-        // ring, unlike comparing two fitted ellipse centers.
-        cv::Mat roi = img8(box);
+        // (excluding the shadow, when one was detected) versus the fitted
+        // circle center above. This stays meaningful both for a strongly
+        // comatic/"V"-shaped ring and for a crescent (shadow eating into the
+        // boundary), unlike comparing two fitted ellipse centers.
         double sumI = 0, sumX = 0, sumY = 0;
         for (int y = 0; y < mask.rows; y++)
         {
@@ -302,7 +369,7 @@ void Collimator::analyzeFrame(void)
             {"x", center.x}, {"y", center.y}, {"dx", d.x}, {"dy", d.y}
         }, true);
 
-        drawStarOverlay(painter, contours[i], center, d, scale, overlaySx, overlaySy);
+        drawStarOverlay(painter, outerFull, center, d, scale, overlaySx, overlaySy);
     }
     getProperty("stars")->emitAll();
 
