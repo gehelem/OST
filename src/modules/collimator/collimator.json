@@ -1,0 +1,182 @@
+{
+"p":{
+    "focusparams": {
+        "devcat": "Parameters",
+        "group": "",
+        "permission": 2,
+        "hasprofile": true,
+        "order": "Parameters100",
+        "label": "Defocus parameters",
+        "e": {
+            "offset": {
+                "type": "int",
+                "label": "Focuser offset (steps)",
+                "order": "1",
+                "directedit": true,
+                "autoupdate": true,
+                "value": 500,
+                "min": 0,
+                "max": 100000,
+                "format": "99999"
+            },
+            "slewspeed": {
+                "type": "int",
+                "label": "Slew speed (initial pointing)",
+                "order": "2",
+                "directedit": true,
+                "autoupdate": true,
+                "value": 2,
+                "listOfValues": [
+                    [1, "x1"],
+                    [2, "x2"],
+                    [4, "x4"],
+                    [8, "x8"]
+                ]
+            }
+        }
+    },
+    "states": {
+        "devcat": "Control",
+        "group": "",
+        "order": "Control050",
+        "permission": 0,
+        "hasprofile": false,
+        "label": "States",
+        "e": {
+            "idle": {
+                "type": "light",
+                "order": "1",
+                "label": "Idle"
+            },
+            "shooting": {
+                "type": "light",
+                "order": "2",
+                "label": "Shooting"
+            },
+            "analyzing": {
+                "type": "light",
+                "order": "3",
+                "label": "Analyzing"
+            }
+        }
+    },
+    "correction": {
+        "devcat": "Control",
+        "group": "",
+        "order": "Control060",
+        "permission": 0,
+        "hasprofile": false,
+        "label": "Collimation vector",
+        "e": {
+            "cx": {
+                "type": "float",
+                "label": "C.x (px)",
+                "order": "1",
+                "value": 0,
+                "format": "9999.99"
+            },
+            "cy": {
+                "type": "float",
+                "label": "C.y (px)",
+                "order": "2",
+                "value": 0,
+                "format": "9999.99"
+            },
+            "amplitude": {
+                "type": "float",
+                "label": "Amplitude (arcsec)",
+                "order": "3",
+                "value": 0,
+                "format": "9999.99"
+            },
+            "convergencex": {
+                "type": "float",
+                "label": "Convergence point x (px)",
+                "order": "4",
+                "value": 0,
+                "format": "9999.99"
+            },
+            "convergencey": {
+                "type": "float",
+                "label": "Convergence point y (px)",
+                "order": "5",
+                "value": 0,
+                "format": "9999.99"
+            },
+            "quality": {
+                "type": "light",
+                "label": "Quality",
+                "order": "6"
+            }
+        }
+    },
+    "screws": {
+        "devcat": "Control",
+        "group": "",
+        "order": "Control070",
+        "permission": 0,
+        "hasprofile": false,
+        "label": "Screw corrections",
+        "e": {
+            "screw1": {
+                "type": "float",
+                "label": "Screw 1 (turns, + = tighten)",
+                "order": "1",
+                "value": 0,
+                "format": "99.999"
+            },
+            "screw2": {
+                "type": "float",
+                "label": "Screw 2 (turns, + = tighten)",
+                "order": "2",
+                "value": 0,
+                "format": "99.999"
+            },
+            "screw3": {
+                "type": "float",
+                "label": "Screw 3 (turns, + = tighten)",
+                "order": "3",
+                "value": 0,
+                "format": "99.999"
+            }
+        }
+    },
+    "stars": {
+        "hasGrid": true,
+        "showGrid": true,
+        "showElts": false,
+        "devcat": "Control",
+        "group": "",
+        "order": "Control080",
+        "permission": 0,
+        "hasprofile": false,
+        "label": "Detected stars",
+        "e": {
+            "x": {
+                "type": "float",
+                "label": "X (px)",
+                "order": "1",
+                "gridvalues": []
+            },
+            "y": {
+                "type": "float",
+                "label": "Y (px)",
+                "order": "2",
+                "gridvalues": []
+            },
+            "dx": {
+                "type": "float",
+                "label": "Deformation X (px)",
+                "order": "3",
+                "gridvalues": []
+            },
+            "dy": {
+                "type": "float",
+                "label": "Deformation Y (px)",
+                "order": "4",
+                "gridvalues": []
+            }
+        }
+    }
+}
+}
