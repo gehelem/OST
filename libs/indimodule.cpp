@@ -42,8 +42,8 @@ IndiModule::IndiModule(QString name, QString label, QString profile, QVariantMap
     connect(timer, &QTimer::timeout, this, &IndiModule::connectIndiTimer);
     timer->start(2000);
 
-    getEltBool("devicesactions","condevs")->setValue(false,false);
-    getEltBool("devicesactions","discondevs" )->setValue(false,false);
+    getEltBool("devicesactions", "condevs")->setValue(false, false);
+    getEltBool("devicesactions", "discondevs" )->setValue(false, false);
 
 }
 /**
@@ -73,8 +73,8 @@ bool IndiModule::onExternalEventIndi(OST::ExtEvent event)
             getProperty(event.prpkey)->setState(OST::Busy, true);
             if (connectIndi()) getProperty(event.prpkey)->setState(OST::Ok, true);
             else getProperty(event.prpkey)->setState(OST::Error, true);
-            getEltBool("serveractions","conserv")->setValue(true,false);
-            getEltBool("serveractions","disconserv" )->setValue(false,true);
+            getEltBool("serveractions", "conserv")->setValue(true, false);
+            getEltBool("serveractions", "disconserv" )->setValue(false, true);
             return true;
         }
         if (event.prpkey == "serveractions" && event.eltkey == "disconserv" && eltval["value"].toBool())
@@ -82,8 +82,8 @@ bool IndiModule::onExternalEventIndi(OST::ExtEvent event)
             getProperty(event.prpkey)->setState(OST::Busy, true);
             if (disconnectIndi()) getProperty(event.prpkey)->setState(OST::Ok, true);
             else getProperty(event.prpkey)->setState(OST::Error, true);
-            getEltBool("serveractions","conserv")->setValue(false,false);
-            getEltBool("serveractions","disconserv" )->setValue(true,true);
+            getEltBool("serveractions", "conserv")->setValue(false, false);
+            getEltBool("serveractions", "disconserv" )->setValue(true, true);
             return true;
         }
         if (event.prpkey == "optic")
@@ -197,8 +197,8 @@ bool IndiModule::onExternalEventIndi(OST::ExtEvent event)
                 getProperty(event.prpkey)->setState(OST::Busy, true);
                 if (connectAllDevices()) getProperty(event.prpkey)->setState(OST::Ok, true);
                 else getProperty(event.prpkey)->setState(OST::Error, true);
-                getEltBool("devicesactions","condevs")->setValue(true,false);
-                getEltBool("devicesactions","discondevs" )->setValue(false,true);
+                getEltBool("devicesactions", "condevs")->setValue(true, false);
+                getEltBool("devicesactions", "discondevs" )->setValue(false, true);
                 return true;
             }
             if (event.eltkey == "discondevs" && eltval["value"].toBool())
@@ -206,17 +206,17 @@ bool IndiModule::onExternalEventIndi(OST::ExtEvent event)
                 getProperty(event.prpkey)->setState(OST::Busy, true);
                 if (disconnectAllDevices()) getProperty(event.prpkey)->setState(OST::Ok, true);
                 else getProperty(event.prpkey)->setState(OST::Error, true);
-                getEltBool("devicesactions","condevs")->setValue(false,false);
-                getEltBool("devicesactions","discondevs" )->setValue(true,true);
+                getEltBool("devicesactions", "condevs")->setValue(false, false);
+                getEltBool("devicesactions", "discondevs" )->setValue(true, true);
                 return true;
             }
             if (event.eltkey == "loadconfs"  && eltval["value"].toBool())
             {
                 getProperty(event.prpkey)->setState(OST::Busy, true);
-                getEltBool("devicesactions","loadconfs")->setValue(true,true);
+                getEltBool("devicesactions", "loadconfs")->setValue(true, true);
                 if (loadDevicesConfs()) getProperty(event.prpkey)->setState(OST::Ok, true);
                 else getProperty(event.prpkey)->setState(OST::Error, true);
-                getEltBool("devicesactions","loadconfs" )->setValue(false,true);
+                getEltBool("devicesactions", "loadconfs" )->setValue(false, true);
                 return true;
             }
         }
@@ -287,10 +287,10 @@ bool IndiModule::connectIndi()
     {
         //sendWarning("Indi server already connected");
         newUniversalMessage("Indi server already connected");
-        if (!getBool("serveractions","conserv"))
+        if (!getBool("serveractions", "conserv"))
         {
-            getEltBool("serveractions","conserv")->setValue(true,false);
-            getEltBool("serveractions","disconserv" )->setValue(false,true);
+            getEltBool("serveractions", "conserv")->setValue(true, false);
+            getEltBool("serveractions", "disconserv" )->setValue(false, true);
         }
         return true;
     }
@@ -300,13 +300,13 @@ bool IndiModule::connectIndi()
         newUniversalMessage("Indi server connected");
         logInfo("Indi server connected");
         QTimer::singleShot(500, this, &IndiModule::OnAfterIndiConnectIndiTimer);
-        getEltBool("serveractions","conserv")->setValue(true,false);
-        getEltBool("serveractions","disconserv" )->setValue(false,true);
+        getEltBool("serveractions", "conserv")->setValue(true, false);
+        getEltBool("serveractions", "disconserv" )->setValue(false, true);
         return true;
     }
     logError("%1 - Couldn't connect to Indi server", {QString("connectIndi")});
-    getEltBool("serveractions","conserv")->setValue(false,false);
-    getEltBool("serveractions","disconserv" )->setValue(true,true);
+    getEltBool("serveractions", "conserv")->setValue(false, false);
+    getEltBool("serveractions", "disconserv" )->setValue(true, true);
     return false;
 }
 bool IndiModule::disconnectIndi(void)
@@ -1021,6 +1021,7 @@ bool IndiModule::defineMeAsSequencer()
 }
 bool IndiModule::defineMeAsImager()
 {
+    giveMeAParms();
     giveMeAnOptic();
 
     if (!getStore().contains("image"))
