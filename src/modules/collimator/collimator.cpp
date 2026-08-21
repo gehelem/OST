@@ -125,28 +125,39 @@ void Collimator::onExternalEvent(OST::ExtEvent event)
     {
         if (event.eltkey == "start")
         {
-            if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
+            // Only (re)start if it wasn't already running -- setValue()
+            // returns false when the value doesn't actually change, which
+            // guards against re-triggering initIndi()/Shoot() on a redundant
+            // "start" event while the loop is already active.
+            bool const changed = getEltBool("actions", "start")->setValue(true, false);
+            getEltBool("actions", "stop")->setValue(false, true);
+            if (changed)
                 startLoop();
         }
         if (event.eltkey == "stop")
         {
-            if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
+            getEltBool("actions", "start")->setValue(false, false);
+            bool const changed = getEltBool("actions", "stop")->setValue(true, true);
+            if (changed)
                 stopLoop();
         }
         if (event.eltkey == "gohome")
         {
-            if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
-                goHome();
+            getEltBool(event.prpkey, event.eltkey)->setValue(true, true);
+            goHome();
+            getEltBool(event.prpkey, event.eltkey)->setValue(false, true);
         }
         if (event.eltkey == "gointra")
         {
-            if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
-                goIntra();
+            getEltBool(event.prpkey, event.eltkey)->setValue(true, true);
+            goIntra();
+            getEltBool(event.prpkey, event.eltkey)->setValue(false, true);
         }
         if (event.eltkey == "goextra")
         {
-            if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
-                goExtra();
+            getEltBool(event.prpkey, event.eltkey)->setValue(true, true);
+            goExtra();
+            getEltBool(event.prpkey, event.eltkey)->setValue(false, true);
         }
     }
 }
@@ -461,8 +472,8 @@ void Collimator::analyzeFrame(void)
 }
 
 void Collimator::drawStarOverlay(QPainter &painter, const std::vector<cv::Point> &contour,
-                                  const cv::Point2d &center, const cv::Point2d &deform, double scale,
-                                  double sx, double sy)
+                                 const cv::Point2d &center, const cv::Point2d &deform, double scale,
+                                 double sx, double sy)
 {
     // All coordinates below are in full-resolution analysis pixels; sx/sy
     // convert them down to the (possibly subsampled) overlay image's own
@@ -503,7 +514,7 @@ void Collimator::drawStarOverlay(QPainter &painter, const std::vector<cv::Point>
 }
 
 void Collimator::drawConvergenceOverlay(QPainter &painter, double cx0, double cy0, double convX, double convY,
-                                         bool hasConvergence, double scale, double sx, double sy)
+                                        bool hasConvergence, double scale, double sx, double sy)
 {
     QPointF center(cx0 * sx, cy0 * sy);
     double const radiusScale = (sx + sy) / 2.0;
@@ -540,7 +551,7 @@ void Collimator::Shoot(void)
         return;
     }
     if (!requestCapture(getString("devices", "camera"), getFloat("parms", "exposure"), getInt("parms", "gain"),
-                         getInt("parms", "offset")))
+                        getInt("parms", "offset")))
     {
         stopLoop();
         return;
@@ -585,7 +596,7 @@ void Collimator::goIntra(void)
     }
     sendModNewSwitch(getString("devices", "focuser"), "FOCUS_MOTION", "FOCUS_INWARD", ISS_ON);
     sendModNewNumber(getString("devices", "focuser"), "REL_FOCUS_POSITION", "FOCUS_RELATIVE_POSITION",
-                      getInt("focusparams", "offset"));
+                     getInt("focusparams", "offset"));
     getProperty("actions")->setState(OST::Ok, true);
 }
 
@@ -598,6 +609,6 @@ void Collimator::goExtra(void)
     }
     sendModNewSwitch(getString("devices", "focuser"), "FOCUS_MOTION", "FOCUS_OUTWARD", ISS_ON);
     sendModNewNumber(getString("devices", "focuser"), "REL_FOCUS_POSITION", "FOCUS_RELATIVE_POSITION",
-                      getInt("focusparams", "offset"));
+                     getInt("focusparams", "offset"));
     getProperty("actions")->setState(OST::Ok, true);
 }
