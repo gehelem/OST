@@ -15,6 +15,12 @@ apt-get install -y build-essential cmake git npm file dpkg-dev \
     zlib1g-dev libeigen3-dev libraw-dev libsecret-1-dev libopencv-dev \
     extra-cmake-modules
 
+INDI_VERSION=$(dpkg-query -W -f='${Version}' libindi-dev)
+if ! dpkg --compare-versions "${INDI_VERSION}" ge "2.0~"; then
+    echo "ERROR: libindi-dev ${INDI_VERSION} is older than 2.0 (ppa:mutlaqja/ppa may not be publishing for this Ubuntu series right now, falling back to the outdated archive package)." >&2
+    exit 1
+fi
+
 mkdir -p build media
 cd build
 cmake .. \
