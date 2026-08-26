@@ -291,7 +291,7 @@ bool fileio::loadBlob(INDI::PropertyBlob pblob, int histoSize, int i)
 
     size_t bsize = static_cast<size_t>(pblob[i].getBlobLen());
 
-    if (fits_open_memfile(&fptr, "", READONLY, &pblob[i].cast()->blob, &bsize, 0, NULL, &status) )
+    if (fits_open_memfile(&fptr, "", READONLY, &pblob[i].blob, &bsize, 0, NULL, &status) )
 
     {
         sendMessage("IMG Unsupported type or read error loading FITS blob");
