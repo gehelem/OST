@@ -22,6 +22,7 @@ Build-Depends: cmake,
                wcslib-dev,
                libraw-dev,
                libgsl-dev,
+               libopencv-dev,
                libsecret-1-dev,
                libavahi-client-dev,
                libavahi-common-dev
