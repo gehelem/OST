@@ -79,6 +79,28 @@
             }
         }
     },
+    "focushome": {
+        "devcat": "Control",
+        "group": "",
+        "order": "Control045",
+        "permission": 0,
+        "hasprofile": false,
+        "label": "Focuser home",
+        "e": {
+            "defined": {
+                "type": "light",
+                "order": "1",
+                "label": "Home defined"
+            },
+            "position": {
+                "type": "float",
+                "order": "2",
+                "label": "Home position (steps)",
+                "value": 0,
+                "format": "99999"
+            }
+        }
+    },
     "states": {
         "devcat": "Control",
         "group": "",

@@ -71,6 +71,7 @@ class MODULE_INIT Inspector : public IndiModule
         void publishCollimationImages(const QImage &overlay);
 
         // focuser helpers (manual defocus for the collimation workflow)
+        void setHome(void);
         void goHome(void);
         void goIntra(void);
         void goExtra(void);
@@ -90,6 +91,10 @@ class MODULE_INIT Inspector : public IndiModule
         // blank the images of an analysis that has just been switched off.
         bool mPrevInspect = false;
         bool mPrevCollim = false;
+        // Focuser "home" position, set explicitly by the user via "Set home".
+        // Not read at start-up (see setHome()).
+        bool mHomeDefined = false;
+        double mHomePosition = 0;
         double upperLeftHFR;
         double lowerLeftHFR;
         double upperRightHFR;

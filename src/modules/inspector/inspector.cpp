@@ -101,6 +101,9 @@ Inspector::Inspector(QString name, QString label, QString profile, QVariantMap a
     pm->addElt(b);
 
     // Focuser helpers -- manual defocus for the collimation workflow.
+    b = new OST::ElementBool("sethome", "Set home", "65", "");
+    pm->addElt(b);
+
     b = new OST::ElementBool("gohome", "Go home", "70", "");
     pm->addElt(b);
 
@@ -119,6 +122,7 @@ Inspector::Inspector(QString name, QString label, QString profile, QVariantMap a
     getProperty("parms")->addElt(i);
 
     getEltLight("states", "idle")->setValue(OST::Ok, true);
+    getEltLight("focushome", "defined")->setValue(OST::Idle, true);
 
     connectIndi();
     connectAllDevices();
@@ -188,6 +192,12 @@ void Inspector::onExternalEvent(OST::ExtEvent event)
         if (event.eltkey == "collimator")
             getEltBool("actions", "collimator")->setValue(!getBool("actions", "collimator"), true);*/
 
+        if (event.eltkey == "sethome")
+        {
+            getEltBool(event.prpkey, event.eltkey)->setValue(true, true);
+            setHome();
+            getEltBool(event.prpkey, event.eltkey)->setValue(false, true);
+        }
         if (event.eltkey == "gohome")
         {
             getEltBool(event.prpkey, event.eltkey)->setValue(true, true);
@@ -1084,6 +1094,31 @@ void Inspector::drawConvergenceOverlay(QPainter &painter, double cx0, double cy0
     painter.drawEllipse(conv, 5, 5);
 }
 
+// Record the focuser's current absolute position as the "home" to return to.
+// There is deliberately no auto-read at module start: nothing tells us the
+// focus is even roughly right, so the user must set it explicitly.
+void Inspector::setHome(void)
+{
+    if (!hasFocuser())
+    {
+        getProperty("actions")->setState(OST::Error, true);
+        return;
+    }
+    double pos = 0;
+    if (!getModNumber(getString("devices", "focuser"), "ABS_FOCUS_POSITION", "FOCUS_ABSOLUTE_POSITION", pos))
+    {
+        logWarning("setHome - could not read the focuser position");
+        getProperty("actions")->setState(OST::Error, true);
+        return;
+    }
+    mHomePosition = pos;
+    mHomeDefined = true;
+    getEltFloat("focushome", "position")->setValue(pos, true);
+    getEltLight("focushome", "defined")->setValue(OST::Ok, true);
+    logInfo("setHome - focuser home set to %1", {QString::number(pos)});
+    getProperty("actions")->setState(OST::Ok, true);
+}
+
 void Inspector::goHome(void)
 {
     if (!hasFocuser())
@@ -1091,7 +1126,13 @@ void Inspector::goHome(void)
         getProperty("actions")->setState(OST::Error, true);
         return;
     }
-    // TODO: restore the focuser position recorded before defocusing.
+    if (!mHomeDefined)
+    {
+        logWarning("goHome - home undefined, use 'Set home' first");
+        getProperty("actions")->setState(OST::Ok, true);
+        return;
+    }
+    sendModNewNumber(getString("devices", "focuser"), "ABS_FOCUS_POSITION", "FOCUS_ABSOLUTE_POSITION", mHomePosition);
     getProperty("actions")->setState(OST::Ok, true);
 }
 
