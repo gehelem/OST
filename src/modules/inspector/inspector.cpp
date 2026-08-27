@@ -198,23 +198,24 @@ void Inspector::onExternalEvent(OST::ExtEvent event)
             setHome();
             getEltBool(event.prpkey, event.eltkey)->setValue(false, true);
         }
-        if (event.eltkey == "gohome")
+        // Focuser move buttons: press now, and either release immediately (no
+        // command sent) or keep pressed until ABS_FOCUS_POSITION settles, which
+        // onUpdateProperty() watches for.
+        if (event.eltkey == "gohome" || event.eltkey == "gointra" || event.eltkey == "goextra")
         {
             getEltBool(event.prpkey, event.eltkey)->setValue(true, true);
-            goHome();
-            getEltBool(event.prpkey, event.eltkey)->setValue(false, true);
-        }
-        if (event.eltkey == "gointra")
-        {
-            getEltBool(event.prpkey, event.eltkey)->setValue(true, true);
-            goIntra();
-            getEltBool(event.prpkey, event.eltkey)->setValue(false, true);
-        }
-        if (event.eltkey == "goextra")
-        {
-            getEltBool(event.prpkey, event.eltkey)->setValue(true, true);
-            goExtra();
-            getEltBool(event.prpkey, event.eltkey)->setValue(false, true);
+            bool sent = false;
+            if (event.eltkey == "gohome")
+                sent = goHome();
+            else if (event.eltkey == "gointra")
+                sent = goIntra();
+            else
+                sent = goExtra();
+
+            if (sent)
+                mFocuserButton = event.eltkey;
+            else
+                getEltBool(event.prpkey, event.eltkey)->setValue(false, true);
         }
     }
 
@@ -234,6 +235,23 @@ void Inspector::onExternalEvent(OST::ExtEvent event)
 
 void Inspector::onUpdateProperty(INDI::Property property)
 {
+    // Focuser move tracking. Watch ONLY ABS_FOCUS_POSITION: while the focuser
+    // is moving it stays BUSY, then goes back to OK (or ALERT on failure).
+    // Release the pressed gohome/gointra/goextra button on that transition.
+    // Done before the mState guard: the focuser buttons work while idle.
+    if (!mFocuserButton.isEmpty()
+            && QString(property.getDeviceName()) == getString("devices", "focuser")
+            && QString(property.getName()) == "ABS_FOCUS_POSITION")
+    {
+        IPState st = property.getState();
+        if (st == IPS_OK || st == IPS_ALERT)
+        {
+            getEltBool("actions", mFocuserButton)->setValue(false, true);
+            getProperty("actions")->setState(st == IPS_OK ? OST::Ok : OST::Error, true);
+            mFocuserButton.clear();
+        }
+    }
+
     if (mState == "idle") return;
 
     if (strcmp(property.getName(), "CCD1") == 0)
@@ -1119,45 +1137,48 @@ void Inspector::setHome(void)
     getProperty("actions")->setState(OST::Ok, true);
 }
 
-void Inspector::goHome(void)
+bool Inspector::goHome(void)
 {
     if (!hasFocuser())
     {
         getProperty("actions")->setState(OST::Error, true);
-        return;
+        return false;
     }
     if (!mHomeDefined)
     {
         logWarning("goHome - home undefined, use 'Set home' first");
         getProperty("actions")->setState(OST::Ok, true);
-        return;
+        return false;
     }
     sendModNewNumber(getString("devices", "focuser"), "ABS_FOCUS_POSITION", "FOCUS_ABSOLUTE_POSITION", mHomePosition);
-    getProperty("actions")->setState(OST::Ok, true);
+    getProperty("actions")->setState(OST::Busy, true);
+    return true;
 }
 
-void Inspector::goIntra(void)
+bool Inspector::goIntra(void)
 {
     if (!hasFocuser())
     {
         getProperty("actions")->setState(OST::Error, true);
-        return;
+        return false;
     }
     sendModNewSwitch(getString("devices", "focuser"), "FOCUS_MOTION", "FOCUS_INWARD", ISS_ON);
     sendModNewNumber(getString("devices", "focuser"), "REL_FOCUS_POSITION", "FOCUS_RELATIVE_POSITION",
                      getInt("focusparams", "offset"));
-    getProperty("actions")->setState(OST::Ok, true);
+    getProperty("actions")->setState(OST::Busy, true);
+    return true;
 }
 
-void Inspector::goExtra(void)
+bool Inspector::goExtra(void)
 {
     if (!hasFocuser())
     {
         getProperty("actions")->setState(OST::Error, true);
-        return;
+        return false;
     }
     sendModNewSwitch(getString("devices", "focuser"), "FOCUS_MOTION", "FOCUS_OUTWARD", ISS_ON);
     sendModNewNumber(getString("devices", "focuser"), "REL_FOCUS_POSITION", "FOCUS_RELATIVE_POSITION",
                      getInt("focusparams", "offset"));
-    getProperty("actions")->setState(OST::Ok, true);
+    getProperty("actions")->setState(OST::Busy, true);
+    return true;
 }

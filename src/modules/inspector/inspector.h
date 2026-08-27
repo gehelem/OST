@@ -70,11 +70,14 @@ class MODULE_INIT Inspector : public IndiModule
                                     bool hasConvergence, double scale, double sx, double sy);
         void publishCollimationImages(const QImage &overlay);
 
-        // focuser helpers (manual defocus for the collimation workflow)
+        // focuser helpers (manual defocus for the collimation workflow).
+        // goHome/goIntra/goExtra return true when a move command was actually
+        // sent to the focuser, so the caller can keep the action button pressed
+        // until ABS_FOCUS_POSITION settles (see onUpdateProperty()).
         void setHome(void);
-        void goHome(void);
-        void goIntra(void);
-        void goExtra(void);
+        bool goHome(void);
+        bool goIntra(void);
+        bool goExtra(void);
         bool hasFocuser(void);
 
         void publishRawImage(void);
@@ -95,6 +98,10 @@ class MODULE_INIT Inspector : public IndiModule
         // Not read at start-up (see setHome()).
         bool mHomeDefined = false;
         double mHomePosition = 0;
+        // "gohome" / "gointra" / "goextra" while a focuser move it triggered is
+        // still running; empty otherwise. The button stays pressed until
+        // ABS_FOCUS_POSITION leaves the BUSY state.
+        QString mFocuserButton;
         double upperLeftHFR;
         double lowerLeftHFR;
         double upperRightHFR;
