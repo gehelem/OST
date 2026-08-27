@@ -3,6 +3,9 @@
 #include <indimodule.h>
 #include <fileio.h>
 #include <solver.h>
+#include <QPainter>
+#include <opencv2/core.hpp>
+#include <vector>
 
 #if defined(INSPECTOR_MODULE)
 #  define MODULE_INIT Q_DECL_EXPORT
@@ -10,6 +13,14 @@
 #  define MODULE_INIT Q_DECL_IMPORT
 #endif
 
+// Image analysis module. Two independent, non-exclusive analyses can be run on
+// each captured (or reloaded) frame, selected by the "inspector" / "collimator"
+// toggle actions:
+//  - inspector : StellarSolver on a focused frame -> HFR / shape / corners maps
+//                (tilt, field curvature, aberrations)
+//  - collimator: OpenCV on a defocused frame -> per-donut deformation vectors,
+//                collimation vector C by field-convergence fit, per-screw
+//                corrections (cf. collimator-spec.md)
 class MODULE_INIT Inspector : public IndiModule
 {
         Q_OBJECT
@@ -21,75 +32,61 @@ class MODULE_INIT Inspector : public IndiModule
         void onRemoveDevice   (INDI::BaseDevice dp) override     {} ;
         void onNewProperty    (INDI::Property property) override {} ;
         void onRemoveProperty (INDI::Property property) override {} ;
-        void onUpdateProperty (INDI::Property property) override {} ;
+        void onUpdateProperty (INDI::Property property) override;
 
     signals:
-
-        void RequestFrameResetDone();
         void FrameResetDone();
-        void RequestExposureDone();
-        void ExposureDone();
         void FindStarsDone();
-        void NextLoop();
-        void LoopFinished();
-        void ComputeDone();
-        void InitDone();
-
-        void RequestExposureBestDone();
-        void ExposureBestDone();
-        void ComputeResultDone();
-        void InitLoopFrameDone();
-        void LoopFrameDone();
-        void NextFrame();
-
-        void blobloaded();
         void cameraAlert();
-        void AbortDone();
         void Abort();
         void newImage();
 
     public slots:
         void OnSucessSEP();
         void OnNewImage();
+
     protected:
         void onExternalEvent(OST::ExtEvent event) override;
 
-
     private:
-        void updateProperty(INDI::Property property) override;
         void newBLOB(INDI::PropertyBlob pblob);
 
         void initIndi(void);
+        void Shoot(void);
+        void finishSingle(void);
 
-        void Shoot();
-        void SMAlert();
-        //void SMLoadblob(IBLOB *bp);
-        void SMLoadblob();
-        void SMAbort();
-        void startCoarse();
+        // inspector analysis (focused frame, StellarSolver) -- see OnSucessSEP()
+        void runInspection(void);
 
-        bool    _newblob;
+        // collimator analysis (defocused frame, OpenCV). For every donut in the
+        // frame, compute a local deformation vector, then fit the linear field
+        // D(P) = C - k*P across all of them. C (the collimation vector) feeds
+        // the per-screw corrections. cf. collimator-spec.md.
+        void analyzeFrame(void);
+        void drawStarOverlay(QPainter &painter, const std::vector<cv::Point> &contour,
+                             const cv::Point2d &center, const cv::Point2d &deform, double scale,
+                             double sx, double sy);
+        void drawConvergenceOverlay(QPainter &painter, double cx0, double cy0, double convX, double convY,
+                                    bool hasConvergence, double scale, double sx, double sy);
+        void publishCollimationImages(const QImage &overlay);
+
+        // focuser helpers (manual defocus for the collimation workflow)
+        void goHome(void);
+        void goIntra(void);
+        void goExtra(void);
+        bool hasFocuser(void);
+
+        void publishRawImage(void);
 
         QPointer<fileio> _image;
         Solver _solver;
         FITSImage::Statistic stats;
 
-        int    _iterations = 3;
-        int    _steps = 3000;
-        int    _loopIterations = 2;
-        int    _loopIteration;
-        double _loopHFRavg;
-
-        int    _iteration;
-        double _bestpos;
-        double _bestposfit;
-        double _besthfr;
         QString mState = "idle";
         double upperLeftHFR;
         double lowerLeftHFR;
         double upperRightHFR;
         double lowerRightHFR;
-
 };
 
 extern "C" MODULE_INIT Inspector *initialize(QString name, QString label, QString profile,

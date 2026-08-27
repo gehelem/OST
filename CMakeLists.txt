@@ -433,12 +433,14 @@ add_library(ostinspector SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/inspector/inspector.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/inspector/inspector.qrc
 )
+target_include_directories(ostinspector PRIVATE ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(ostinspector PRIVATE
     ostindimodule
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Widgets
     Threads::Threads
+    ${OpenCV_LIBS}
     z
 )
 target_compile_definitions(ostinspector PRIVATE INSPECTOR_MODULE)
