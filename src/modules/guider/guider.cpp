@@ -7,8 +7,9 @@
  *   2. CALIBRATION: Measure how many pixels correspond to 1ms pulse in each direction
  *   3. GUIDING: Continuous loop - detect drift, send correcting pulses
  *
- * Algorithm: Trigonometric matching uses triangle indices from star triangles.
- * Triangles are invariant under translation/rotation/scaling, making them robust.
+ * Algorithm: the star field drift between frames is measured by voting for the
+ * dominant translation between the two star lists, then a robust refit (see
+ * startracker.{h,cpp}).
  *
  * Workflow:
  *   User clicks "Calibrate & Guide" → SMInit → SMCalibration → SMGuide (loops)
@@ -33,7 +34,17 @@ static void atomicSaveJpeg(const QImage &img, const QString &finalPath)
     if (img.save(tmp, "JPG", 100))
         ::rename(tmp.toLocal8Bit().constData(), finalPath.toLocal8Bit().constData());
 }
-//#include "polynomialfit.h"
+
+/// Convert a solver star list to the star-tracker's lightweight representation.
+static QVector<startracker::Star> toTrackStars(const QList<FITSImage::Star> &in)
+{
+    QVector<startracker::Star> out;
+    out.reserve(in.size());
+    for (const FITSImage::Star &s : in)
+        out.push_back({s.x, s.y, s.flux});
+    return out;
+}
+
 #define PI 3.14159265
 
 /**
@@ -576,8 +587,8 @@ void Guider::SMInitInit()
  *  calPulseN, calPulseS, calPulseE, calPulseW = pixels moved per ms of pulse
  *  These are used to convert pixel drift → pulse duration in guiding phase
  *
- * This handler initializes counters and loads the reference star field (_trigFirst)
- * from the initialization phase.
+ * This handler initializes counters and seeds the per-pulse reference
+ * (_prevStars) from the initialization phase's star field.
  */
 void Guider::SMInitCal()
 {
@@ -617,14 +628,17 @@ void Guider::SMInitCal()
     _pulseE = 0;
     _pulseW = getInt("calParams", "pulse");  // Load calibration pulse duration (default 1000ms)
 
-    // Prepare triangle indices for matching
-    _trigCurrent.clear();  // Will be filled as we take exposures
-    _trigPrev = _trigFirst; // Use reference from initialization phase
+    // The per-pulse increment is measured against the previous calibration
+    // frame; seed it with the initialization reference.
+    _prevStars = starsFirst;
+    _dxPrev = 0;
+    _dyPrev = 0;
+    _dxFirst = 0;
+    _dyFirst = 0;
 
-    // Clear polynomial fitting data (for CCD orientation calculation - currently unused)
+    // Clear per-axis drift accumulators used for the pulse-rate calculation
     _dxvector.clear();
     _dyvector.clear();
-    _coefficients.clear();
 
     // Reset flags
     _itt = 0;
@@ -671,6 +685,11 @@ void Guider::SMInitGuide()
     // Reset DEC backlash compensation state for this new guiding session
     _lastDecDir          = 0;
     _decBacklashLearning = false;
+    _consecutiveMatchFail = 0;
+    // starsFirst is the fresh reference (just set by calibration or SMComputeFirst);
+    // drift vs it starts at zero.
+    _dxFirst = 0;
+    _dyFirst = 0;
 
     // Set grid limits to match RMS buffer size for consistent visualization
     int rmsOver = getInt("guideParams", "rmsOver");
@@ -804,10 +823,20 @@ void Guider::SMRequestExposure()
     }
     emit RequestExposureDone();
 }
+startracker::Params Guider::trackParams()
+{
+    startracker::Params p;   // startracker's own defaults if a param is missing
+    if (getEltInt("guideParams", "matchmaxstars"))   p.maxStars   = getInt("guideParams", "matchmaxstars");
+    if (getEltInt("guideParams", "matchmininliers")) p.minInliers = getInt("guideParams", "matchmininliers");
+    if (getEltInt("guideParams", "matchgate"))       p.coarseGate = getInt("guideParams", "matchgate");
+    p.fineGate = qBound(0.4, p.coarseGate * 0.3, 2.0);
+    return p;
+}
+
 void Guider::SMComputeFirst()
 {
-    _trigFirst.clear();
-    buildIndexes(_solver, _trigFirst);
+    // Snapshot the current star field as the fixed reference. The star-tracker
+    // works directly on star positions, no pre-indexing needed.
     starsFirst = _solver.stars;
 
     emit ComputeFirstDone();
@@ -815,42 +844,54 @@ void Guider::SMComputeFirst()
 void Guider::SMComputeCal()
 {
     //qDebug()  << "SMComputeCal" << _calStep << _calState;
-    buildIndexes(_solver, _trigCurrent);
     _ccdOrientation = 0;
 
-    double coeff[2];
-    Q_UNUSED(coeff);
-    if (_trigCurrent.size() > 0)
-    {
-        matchIndexes(_trigPrev, _trigCurrent, _matchedCurPrev, _dxPrev, _dyPrev);
-        matchIndexes(_trigFirst, _trigCurrent, _matchedCurFirst, _dxFirst, _dyFirst);
-        //_grid->append(_dxFirst,_dyFirst);
-        //_propertyStore.update(_grid);
-        //emit propertyAppended(_grid,&_modulename,0,_dxFirst,_dyFirst,0,0);
-        // The DEC backlash kick's own resulting movement isn't a clean measurement
-        // (that's the point - it's meant to be absorbed by mechanical backlash),
-        // so it's excluded from the rate calculation below.
-        if (!_calAwaitingKick)
-        {
-            _dxvector.push_back(_dxPrev);
-            _dyvector.push_back(_dyPrev);
-        }
-        /*if (_dxvector.size() > 1)
-        {
-            polynomialfit(_dxvector.size(), 2, _dxvector.data(), _dyvector.data(), coeff);
-            BOOST_LOG_TRIVIAL(debug) << "Coeffs " << coeff[0] << "-" <<  coeff[1] << " CCD Orientation = " << atan(coeff[1])*180/PI;
-        }*/
+    const QVector<startracker::Star> cur = toTrackStars(_solver.stars);
+    const startracker::Params tp = trackParams();
 
+    // Per-pulse increment: current vs previous calibration frame (drives the
+    // pulse-rate calculation).
+    startracker::MatchResult inc = startracker::match(toTrackStars(_prevStars), cur,
+                                                     _dxPrev, _dyPrev, tp);
+    // Total drift vs the initialization reference (display only).
+    startracker::MatchResult tot = startracker::match(toTrackStars(starsFirst), cur,
+                                                     0.0, 0.0, tp);
 
-    }
-    else
+    if (!inc.ok)
     {
-        logError("No stars, can't calibrate");
-        setStateEvent(OST::Error, "error", "nostars", "no stars");
+        logError("Calibration: lost star correlation (ref=%1 cur=%2 matched=%3, need %4) - abort",
+        {
+            QString::number(inc.nRef), QString::number(inc.nCur),
+            QString::number(inc.nInliers), QString::number(tp.minInliers)
+        });
+        setStateEvent(OST::Error, "error", "nostars", "no correlation");
         emit Abort();
         return;
     }
-    _trigPrev = _trigCurrent;
+    logInfo("Calibration match: d=(%1,%2)px  matched %3/%4  rms=%5px",
+    {
+        QString::number(inc.dx, 'f', 2), QString::number(inc.dy, 'f', 2),
+        QString::number(inc.nInliers), QString::number(inc.nCur),
+        QString::number(inc.rms, 'f', 2)
+    });
+    _dxPrev = inc.dx;
+    _dyPrev = inc.dy;
+    if (tot.ok)
+    {
+        _dxFirst = tot.dx;
+        _dyFirst = tot.dy;
+    }
+
+    // The DEC backlash kick's own resulting movement isn't a clean measurement
+    // (that's the point - it's meant to be absorbed by mechanical backlash),
+    // so it's excluded from the rate calculation below.
+    if (!_calAwaitingKick)
+    {
+        _dxvector.push_back(_dxPrev);
+        _dyvector.push_back(_dyPrev);
+    }
+
+    _prevStars = _solver.stars;
 
     /*if (_calState==0) {
         BOOST_LOG_TRIVIAL(debug) << "RA drift " << sqrt(square(_avdx)+square(_avdy)) << " drift / ms = " << 1000*sqrt(square(_avdx)+square(_avdy))/_pulseWTot;
@@ -933,7 +974,6 @@ void Guider::SMComputeCal()
         //if (_calState==2) {
         _dxvector.clear();
         _dyvector.clear();
-        _coefficients.clear();
         //}
         if (_calState >= 4)
         {
@@ -964,7 +1004,8 @@ void Guider::SMComputeCal()
             getProperty("actions")->setState(OST::Ok, true);
             emit CalibrationDone();
             setStateEvent(OST::Busy, "caldone", "calcompleted", "calibration completed");
-            _trigFirst = _trigCurrent;
+            // The post-calibration position becomes the guiding reference.
+            starsFirst = _solver.stars;
             return;
         }
 
@@ -1021,24 +1062,34 @@ void Guider::SMComputeGuide()
     _pulseE = 0;
     _pulseN = 0;
     _pulseS = 0;
-    buildIndexes(_solver, _trigCurrent);
 
-    if (_trigCurrent.size() > 0)
+    // Measure drift vs the fixed reference, seeded with the previous frame's
+    // drift for stability. A transient loss of correlation just skips the frame
+    // (no pulse); only a run of consecutive failures aborts.
+    startracker::MatchResult m = startracker::match(toTrackStars(starsFirst),
+                                                   toTrackStars(_solver.stars),
+                                                   _dxFirst, _dyFirst, trackParams());
+    if (!m.ok)
     {
-        matchIndexes(_trigFirst, _trigCurrent, _matchedCurFirst, _dxFirst, _dyFirst);
-    }
-    else
-    {
-        logWarning("No stars detected in current frame - skipping corrections");
-        emit ComputeGuideDone();
+        _consecutiveMatchFail++;
+        int maxFail = getInt("guideParams", "maxmatchfail");
+        logWarning("No star correlation with reference (%1/%2) - skipping frame [ref=%3 cur=%4 matched=%5]",
+        {
+            QString::number(_consecutiveMatchFail), QString::number(maxFail),
+            QString::number(m.nRef), QString::number(m.nCur), QString::number(m.nInliers)
+        });
+        if (_consecutiveMatchFail >= maxFail)
+        {
+            logError("Lost star correlation for %1 consecutive frames - Abort", {QString::number(_consecutiveMatchFail)});
+            emit Abort();
+            return;
+        }
+        emit ComputeGuideDone();   // pulses are all 0 -> this frame sends nothing
         return;
     }
-    if (_matchedCurFirst.size() < 2 )
-    {
-        logError("Can't compare current image with reference  - Abort");
-        emit Abort();
-        return;
-    }
+    _consecutiveMatchFail = 0;
+    _dxFirst = m.dx;
+    _dyFirst = m.dy;
     // Dither requested: compute random displacement pulses then rebuild reference
     if (_doDither)
     {
@@ -1402,99 +1453,3 @@ void Guider::SMAbort()
 
 }
 
-void Guider::matchIndexes(QVector<Trig> ref, QVector<Trig> act, QVector<MatchedPair> &pairs, double &dx, double &dy)
-{
-    pairs.clear();
-
-    foreach (Trig r, ref)
-    {
-        foreach (Trig a, act)
-        {
-            if (
-                (r.s < a.s * 1.001 ) && (r.s > a.s * 0.999 ) && (r.p < a.p * 1.001 ) && (r.p > a.p * 0.999 )
-                && (r.d12 < a.d12 * 1.001) && (r.d12 > a.d12 * 0.999)
-                && (r.d13 < a.d13 * 1.001) && (r.d13 > a.d13 * 0.999)
-                && (r.d23 < a.d23 * 1.001) && (r.d23 > a.d23 * 0.999)
-            )
-            {
-                bool found;
-                found = false;
-                foreach (MatchedPair pair, pairs)
-                {
-                    if ( (pair.xr == r.x1) && (pair.yr == r.y1) ) found = true;
-                }
-                if (!found) pairs.append({r.x1, r.y1, a.x1, a.y1, r.x1 - a.x1, r.y1 - a.y1});
-                found = false;
-                foreach (MatchedPair pair, pairs)
-                {
-                    if ( (pair.xr == r.x2) && (pair.yr == r.y2) ) found = true;
-                }
-                if (!found) pairs.append({r.x2, r.y2, a.x2, a.y2, r.x2 - a.x2, r.y2 - a.y2});
-                found = false;
-                foreach (MatchedPair pair, pairs)
-                {
-                    if ( (pair.xr == r.x3) && (pair.yr == r.y3) ) found = true;
-                }
-                if (!found) pairs.append({r.x3, r.y3, a.x3, a.y3, r.x3 - a.x3, r.y3 - a.y3});
-            }
-        }
-    }
-    dx = 0;
-    dy = 0;
-    for (int i = 0 ; i < pairs.size(); i++ )
-    {
-        dx = dx + pairs[i].dx;
-        dy = dy + pairs[i].dy;
-    }
-    if (pairs.isEmpty())
-    {
-        dx = 0;
-        dy = 0;
-        return;
-    }
-    dx = dx / pairs.size();
-    dy = dy / pairs.size();
-
-
-
-    /*foreach (MatchedPair pair, _matchedPairs) {
-            BOOST_LOG_TRIVIAL(debug) << "Matched pair =  " << pair.dx << "-" << pair.dy;
-    }*/
-
-}
-void Guider::buildIndexes(Solver &solver, QVector<Trig> &trig)
-{
-    int nb = solver.stars.size();
-    if (nb > 10) nb = 10;
-    trig.clear();
-
-    for (int i = 0; i < nb; i++)
-    {
-        for (int j = i + 1; j < nb; j++)
-        {
-            for (int k = j + 1; k < nb; k++)
-            {
-                double dij, dik, djk, p, s;
-                dij = sqrt(square(solver.stars[i].x - solver.stars[j].x) + square(solver.stars[i].y - solver.stars[j].y));
-                dik = sqrt(square(solver.stars[i].x - solver.stars[k].x) + square(solver.stars[i].y - solver.stars[k].y));
-                djk = sqrt(square(solver.stars[j].x - solver.stars[k].x) + square(solver.stars[j].y - solver.stars[k].y));
-                p = dij + dik + djk;
-                s = sqrt(p * (p - dij) * (p - dik) * (p - djk));
-                trig.append(
-                {
-                    solver.stars[i].x,
-                    solver.stars[i].y,
-                    solver.stars[j].x,
-                    solver.stars[j].y,
-                    solver.stars[k].x,
-                    solver.stars[k].y,
-                    dij, dik, djk,
-                    p, s, s / p
-                });
-
-            }
-        }
-
-    }
-
-}

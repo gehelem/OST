@@ -347,6 +347,54 @@
                 "min":1,
                 "max":50,
                 "hint": "Maximum random displacement applied during dithering, in pixels"
+            },
+            "maxmatchfail": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Max consecutive lost frames",
+                "order":"08",
+                "value":5,
+                "format": "99",
+                "min":1,
+                "max":50,
+                "hint": "When the star field can't be correlated with the reference, the guide frame is skipped (no pulse); guiding is aborted only after this many in a row"
+            },
+            "matchgate": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Star match gate (px)",
+                "order":"09",
+                "value":4,
+                "format": "99",
+                "min":1,
+                "max":30,
+                "hint": "Search radius when matching a reference star to the current frame. Larger tolerates more centroid noise / small field rotation; the sub-pixel refit tightens it afterwards."
+            },
+            "matchmininliers": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Min matched stars",
+                "order":"10",
+                "value":3,
+                "format": "99",
+                "min":2,
+                "max":30,
+                "hint": "Fewest reference stars that must be recovered in the current frame for the drift measurement to be trusted"
+            },
+            "matchmaxstars": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Max stars used",
+                "order":"11",
+                "value":30,
+                "format": "999",
+                "min":5,
+                "max":200,
+                "hint": "Cap on the brightest stars taken from each frame for matching"
             }
         }
     },

@@ -3,6 +3,7 @@
 #include <indimodule.h>
 #include <fileio.h>
 #include <solver.h>
+#include "startracker.h"
 
 #if defined(GUIDER_MODULE)
 #  define MODULE_INIT Q_DECL_EXPORT
@@ -16,44 +17,6 @@
 #include <QFinalState>
 #include <QState>
 
-
-/**
- * @struct Trig
- * @brief Represents a triangle formed by 3 stars for invariant-based matching
- *
- * Used in trigonometric matching algorithm to identify the same stars across
- * multiple exposures. Triangles are invariant under translation, rotation, and
- * scaling, making them robust for tracking star field changes.
- *
- * The ratio (surface/perimeter) is a unique fingerprint for each triangle.
- */
-struct Trig
-{
-    double x1, y1;      // Position of first star
-    double x2, y2;      // Position of second star
-    double x3, y3;      // Position of third star
-    double d12;         // Distance between star 1 and 2
-    double d13;         // Distance between star 1 and 3
-    double d23;         // Distance between star 2 and 3
-    double p;           // Perimeter of triangle (d12 + d13 + d23)
-    double s;           // Surface area of triangle
-    double ratio;       // Fingerprint = surface/perimeter (invariant under scaling)
-};
-
-/**
- * @struct MatchedPair
- * @brief Represents a successfully matched star between reference and current frame
- *
- * When a star is found in both reference frame and current frame, we record
- * the drift (dx, dy) which is used to calculate telescope tracking error.
- */
-struct MatchedPair
-{
-    double xr, yr;      // Reference frame star position
-    double xc, yc;      // Current frame star position
-    double dx;          // Drift in X axis (pixels) = xc - xr
-    double dy;          // Drift in Y axis (pixels) = yc - yr
-};
 
 class MODULE_INIT Guider  : public IndiModule
 {
@@ -102,7 +65,9 @@ class MODULE_INIT Guider  : public IndiModule
         QPointer<fileio> _image;       ///< Current image from CCD
         Solver _solver;                ///< Star detection and centroid solver
         FITSImage::Statistic stats;    ///< Image statistics
-        QList<FITSImage::Star> starsFirst; ///< image reference stars
+        QList<FITSImage::Star> starsFirst;  ///< fixed reference star field (also the green overlay)
+        QList<FITSImage::Star> _prevStars;  ///< previous calibration frame (for the per-pulse increment)
+        int _consecutiveMatchFail = 0;      ///< consecutive lost-correlation frames during guiding
 
         // ==================== Current Guiding Pulses (ms) ====================
         int _pulseN = 0;  ///< Pulse to send North (positive DEC)
@@ -156,17 +121,9 @@ class MODULE_INIT Guider  : public IndiModule
         QStateMachine _SMCalibration;   ///< State machine: Calibration (measure pulse offsets)
         QStateMachine _SMGuide;         ///< State machine: Continuous guiding loop
 
-        // ==================== Trigonometric Indices (for star matching) ====================
-        QVector<Trig> _trigFirst;       ///< Triangle indices from FIRST image (reference)
-        QVector<Trig> _trigPrev;        ///< Triangle indices from PREVIOUS image (calibration)
-        QVector<Trig> _trigCurrent;     ///< Triangle indices from CURRENT image
-        QVector<MatchedPair> _matchedCurPrev;   ///< Stars matched: current vs previous
-        QVector<MatchedPair> _matchedCurFirst;  ///< Stars matched: current vs first (overall drift)
-
         // ==================== Calibration Data Collection (for polynomial fitting) ====================
-        std::vector<double> _dxvector;     ///< X drifts during calibration (for orientation calc)
+        std::vector<double> _dxvector;     ///< X drifts during calibration (for rate + orientation calc)
         std::vector<double> _dyvector;     ///< Y drifts during calibration
-        std::vector<double> _coefficients; ///< Polynomial coefficients (for CCD orientation)
 
         // ==================== RMS Tracking (for statistics) ====================
         std::vector<double> _dRAvector;    ///< RMS history of RA drifts (bounded by rmsOver parameter from guideParams)
@@ -174,24 +131,14 @@ class MODULE_INIT Guider  : public IndiModule
 
         // ==================== Private Methods ====================
 
-        /// @brief Build triangle indices from detected stars using solver
-        /// @param solver Star detection engine
-        /// @param trig Output: vector of triangles (will be cleared and filled)
-        void buildIndexes(Solver &solver, QVector<Trig> &trig);
-
-        /// @brief Match reference triangles with current triangles and calculate drift
-        /// @param ref Reference frame triangles
-        /// @param act Current frame triangles
-        /// @param pairs Output: matched star pairs with drift values
-        /// @param dx Output: mean X drift (pixels)
-        /// @param dy Output: mean Y drift (pixels)
-        void matchIndexes(QVector<Trig> ref, QVector<Trig> act, QVector<MatchedPair> &pairs, double &dx, double &dy);
-
         /// @brief Helper: compute v²
         inline double square(double value)
         {
             return value * value;
         }
+
+        /// @brief Build the star-tracker tuning from the live guideParams.
+        startracker::Params trackParams();
 
         // ==================== State Machine Builders ====================
         void buildInitStateMachines(void);          ///< Build _SMInit state machine
