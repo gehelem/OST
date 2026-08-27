@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>collimator.json</file>
-    </qresource>
-</RCC>
