@@ -328,10 +328,29 @@ void Inspector::publishRawImage(void)
     getEltImg("image", "image")->setValue(dta, true);
 }
 
+void Inspector::blankImage(const QString &prop)
+{
+    getEltImg(prop, "image")->setValue(OST::ImgData(), true);
+}
+
 void Inspector::OnNewImage()
 {
     bool const doInspect = getBool("actions", "inspector");
     bool const doCollim  = getBool("actions", "collimator");
+
+    // A selection change mid-loop must not leave a stale map on screen next to
+    // a fresh one built from a different source frame: as soon as an analysis
+    // is switched off, blank its result images.
+    if (mPrevInspect && !doInspect)
+    {
+        blankImage("hfr");
+        blankImage("shape");
+        blankImage("corners");
+    }
+    if (mPrevCollim && !doCollim)
+        blankImage("collim");
+    mPrevInspect = doInspect;
+    mPrevCollim = doCollim;
 
     getEltLight("states", "shooting")->setValue(OST::Idle, false);
     getEltLight("states", "analyzing")->setValue(OST::Busy, true);

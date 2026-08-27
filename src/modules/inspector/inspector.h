@@ -78,11 +78,18 @@ class MODULE_INIT Inspector : public IndiModule
 
         void publishRawImage(void);
 
+        // Reset an image element to a blank URL so the frontend stops showing it.
+        void blankImage(const QString &prop);
+
         QPointer<fileio> _image;
         Solver _solver;
         FITSImage::Statistic stats;
 
         QString mState = "idle";
+        // Previous frame's analysis selection, to detect a mid-loop change and
+        // blank the images of an analysis that has just been switched off.
+        bool mPrevInspect = false;
+        bool mPrevCollim = false;
         double upperLeftHFR;
         double lowerLeftHFR;
         double upperRightHFR;
