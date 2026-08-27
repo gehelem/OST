@@ -89,16 +89,8 @@ Inspector::Inspector(QString name, QString label, QString profile, QVariantMap a
     b->setValue(false, false);
     pm->addElt(b);
 
-    // Analysis selectors -- non-exclusive: each captured (or reloaded) frame is
-    // run through the inspection pipeline and/or the collimation pipeline
-    // depending on which of these is set.
-    b = new OST::ElementBool("inspector", "Inspector analysis", "50", "");
-    b->setValue(false, false);
-    pm->addElt(b);
-
-    b = new OST::ElementBool("collimator", "Collimator analysis", "60", "");
-    b->setValue(false, false);
-    pm->addElt(b);
+    // The non-exclusive "inspector" / "collimator" analysis selectors live in
+    // their own persistent "analysis" property (see inspector.json), not here.
 
     // Focuser helpers -- manual defocus for the collimation workflow.
     b = new OST::ElementBool("sethome", "Set home", "65", "");
@@ -186,12 +178,6 @@ void Inspector::onExternalEvent(OST::ExtEvent event)
             getEltLight("states", "idle")->setValue(OST::Ok, true);
             getProperty("actions")->setState(OST::Ok, true);
         }
-        // Persistent toggles: flip on every press.
-        /*if (event.eltkey == "inspector")
-            getEltBool("actions", "inspector")->setValue(!getBool("actions", "inspector"), true);
-        if (event.eltkey == "collimator")
-            getEltBool("actions", "collimator")->setValue(!getBool("actions", "collimator"), true);*/
-
         if (event.eltkey == "sethome")
         {
             getEltBool(event.prpkey, event.eltkey)->setValue(true, true);
@@ -363,8 +349,8 @@ void Inspector::blankImage(const QString &prop)
 
 void Inspector::OnNewImage()
 {
-    bool const doInspect = getBool("actions", "inspector");
-    bool const doCollim  = getBool("actions", "collimator");
+    bool const doInspect = getBool("analysis", "inspector");
+    bool const doCollim  = getBool("analysis", "collimator");
 
     // A selection change mid-loop must not leave a stale map on screen next to
     // a fresh one built from a different source frame: as soon as an analysis

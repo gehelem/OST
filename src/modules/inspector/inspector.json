@@ -1,5 +1,32 @@
 {
 "p":{
+    "analysis": {
+        "devcat": "Parameters",
+        "group": "",
+        "order": "Parameters200",
+        "permission": 2,
+        "hasprofile": true,
+        "rule": 2,
+        "label": "Analysis selection",
+        "e": {
+            "inspector": {
+                "type": "bool",
+                "label": "Inspector analysis",
+                "order": "1",
+                "directedit": true,
+                "autoupdate": true,
+                "value": false
+            },
+            "collimator": {
+                "type": "bool",
+                "label": "Collimator analysis",
+                "order": "2",
+                "directedit": true,
+                "autoupdate": true,
+                "value": false
+            }
+        }
+    },
     "fileselect": {
         "devcat": "Control",
         "order": "000Control115",
