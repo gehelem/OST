@@ -554,6 +554,7 @@ bool IndiModule::requestCapture(const QString &deviceName, const double &exposur
         if (!connectDevice(deviceName)) return false;
     }
     setBLOBMode(B_ALSO, deviceName.toStdString().c_str(), nullptr);
+    setCaptureFormat(deviceName);
     if(dp.getProperty("CCD_CONTROLS"))
     {
         INDI::PropertyNumber prop = dp.getNumber("CCD_CONTROLS");
@@ -619,6 +620,53 @@ bool IndiModule::requestCapture(const QString &deviceName, const double &exposur
     return true;
 
 
+}
+// Best-effort 8/16-bit capture-format selection from the module's own
+// "parms/bitdepth" element.
+//
+// There is no universal INDI property for pixel bit depth. CCD_CAPTURE_FORMAT
+// (libindi >= 1.9.7) is the closest: most CMOS drivers expose it with
+// INDI_RAW8 / INDI_RAW16 widgets, but it is absent on others -- the CCD
+// Simulator and most DSLR drivers -- which then simply capture at their
+// native depth. A missing property, or no INDI_RAW8/16 widget, is logged as
+// info and is not treated as an error.
+bool IndiModule::setCaptureFormat(const QString &deviceName)
+{
+    if (!getStore().contains("parms") || !getStore()["parms"]->getElts()->contains("bitdepth"))
+        return false;
+
+    long const bits = getInt("parms", "bitdepth");
+    if (bits != 8 && bits != 16)
+        return false;
+
+    INDI::BaseDevice dp = getDevice(deviceName.toStdString().c_str());
+    if (!dp.isValid())
+        return false;
+
+    INDI::PropertySwitch prop = dp.getSwitch("CCD_CAPTURE_FORMAT");
+    if (!prop.isValid())
+    {
+        //logInfo("setCaptureFormat - %1 has no CCD_CAPTURE_FORMAT, keeping native depth", {deviceName});
+        return false;
+    }
+
+    const char *want = (bits == 16) ? "INDI_RAW16" : "INDI_RAW8";
+    bool found = false;
+    for (std::size_t i = 0; i < prop.size(); i++)
+    {
+        if (strcmp(prop[i].name, want) == 0)
+        {
+            found = true;
+            break;
+        }
+    }
+    if (!found)
+    {
+        //logInfo("setCaptureFormat - %1 has no %2 capture format, keeping current", {deviceName, QString(want)});
+        return false;
+    }
+
+    return sendModNewSwitch(deviceName, "CCD_CAPTURE_FORMAT", QString(want), ISS_ON);
 }
 bool IndiModule::getModNumber(const QString &deviceName, const QString &propertyName, const QString  &elementName,
                               double &value)
@@ -1080,6 +1128,22 @@ bool IndiModule::defineMeAsImager()
         i->setMinMax(0, 500, false);
         i->setStep(1, false);
         i->setSlider(OST::SliderAndValue, false);
+        pm->addElt(i);
+    }
+
+    if (!getStore()["parms"]->getElts()->contains("bitdepth"))
+    {
+        // OST-side 8/16-bit selector. There is no universal INDI property for
+        // pixel bit depth, so this is applied best-effort at capture time via
+        // CCD_CAPTURE_FORMAT when the driver supports it -- see
+        // setCaptureFormat(). Cameras without it keep their native depth.
+        OST::ElementInt* i = new  OST::ElementInt("bitdepth", "Bit depth", "exp040", "");
+        i->setValue(16, false);
+        i->setDirectEdit(true);
+        i->setAutoUpdate(true);
+        i->lovAdd(8, "8 bits");
+        i->lovAdd(16, "16 bits");
+        i->setLovConstrained(true);
         pm->addElt(i);
     }
 
