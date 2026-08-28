@@ -1045,6 +1045,33 @@ void Guider::SMComputeCal()
             _calCcdOrientation = atan2(sin(angleRA) + sin(angleDE), cos(angleRA) + cos(angleDE));
             _ccdOrientation = _calCcdOrientation;
 
+            // --- B2 test: is the drift -> RA/DEC transform a correct rotation? ---
+            // It's coded as a reflection: [cos, sin ; sin, -cos] (det = -1),
+            // meant to fold in the image Y-flip. Feed the two clean calibration
+            // vectors through it: a pure-RA move must come out ~(+-|RA|, 0), a
+            // pure-DEC move ~(0, +-|DEC|). Cross-leak, or an RA/DEC axis
+            // separation far from +-90 deg, means theta or the image handedness
+            // is wrong.
+            {
+                const double c = cos(_calCcdOrientation), s = sin(_calCcdOrientation);
+                double raOnRA =  dRAx * c + dRAy * s,  deOnRA = dRAx * s - dRAy * c;
+                double raOnDE =  dDEx * c + dDEy * s,  deOnDE = dDEx * s - dDEy * c;
+                // physical image-plane angle between the two calibration axes
+                double dirDE = atan2(dDEy, dDEx);
+                double sep = atan2(sin(dirDE - angleRA), cos(dirDE - angleRA)) * 180.0 / PI;
+                logInfo("B2 test: rot(RAaxis)=(%1,%2) [want (+-%3,~0)]  rot(DECaxis)=(%4,%5) [want (~0,+-%6)]",
+                {
+                    QString::number(raOnRA, 'f', 2), QString::number(deOnRA, 'f', 2), QString::number(magRA, 'f', 2),
+                    QString::number(raOnDE, 'f', 2), QString::number(deOnDE, 'f', 2), QString::number(magDE, 'f', 2)
+                });
+                logInfo("B2 test: RA-DEC axis separation=%1 deg (want +-90)  RA-axis DEC-leak=%2%%  DEC-axis RA-leak=%3%%",
+                {
+                    QString::number(sep, 'f', 1),
+                    QString::number(magRA > 1e-6 ? 100.0 * fabs(deOnRA) / magRA : 0, 'f', 1),
+                    QString::number(magDE > 1e-6 ? 100.0 * fabs(raOnDE) / magDE : 0, 'f', 1)
+                });
+            }
+
             // Calibration quality: how much of each per-pulse increment was the
             // constant background drift (tracking / polar-alignment error) rather
             // than the pulse itself. High ratio -> the differenced rates rest on
