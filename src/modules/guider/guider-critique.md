@@ -99,6 +99,12 @@ is used (for the N/S rate); the direction is thrown away. Half the calibration
 information is unused, and the orientation rests on one noisy 2-sample mean.
 
 ### B2. The rotation "matrix" is a reflection
+> **Checked (non-mirror case OK).** Calibration now logs the axis-decoupling:
+> feeding dRA / dDE through the transform gives ~2% cross-leak and a -92 deg
+> axis separation on the sim (the 2.3 deg non-orthogonality accounts for the
+> leak). So theta / handedness are right for a non-mirrored train. The
+> mirrored-optics failure mode (star diagonal / Newtonian) is still untested -
+> would need real optics or a sim-mirror toggle.
 ```
 driftRA =  dx·cos θ + dy·sin θ
 driftDE =  dx·sin θ + dy·(−cos θ)
