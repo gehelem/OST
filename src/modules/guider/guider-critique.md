@@ -11,6 +11,11 @@ declinations / pier sides before acting.
 ## A. Correctness — candidate bugs
 
 ### A1. DEC-transfer compensation looks inverted **(bench)**
+> **Done — confirmed and fixed.** Sim test: calibrated at DEC 5.7 deg, guiding
+> at 61.6 deg used 128 ms/px vs the correct 565 (`code/expected = 0.228 =
+> cos^2(cur)/cos^2(cal)`); RA ran away until the integral saturated. Both signs
+> flipped: store `R_meas * cos(calDEC)` (equatorial), use `/ cos(curDEC)` at
+> guide time (+ dither + logs), near-pole guard. Re-test held RA to ~0.2 px.
 The RA calibration rate is stored "normalised to the equator" and re-scaled to
 the current declination when guiding. Both steps have the wrong sign; they
 cancel when you guide at the calibration declination (the usual case — which is
