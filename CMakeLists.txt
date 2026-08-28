@@ -414,6 +414,8 @@ target_compile_definitions(ostsequencer PRIVATE SEQUENCER_MODULE)
 add_library(ostguider SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/guider.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/guider.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/startracker.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/startracker.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/guider.qrc
 )
 target_link_libraries(ostguider PRIVATE
