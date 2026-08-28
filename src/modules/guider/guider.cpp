@@ -143,16 +143,12 @@ Guider::~Guider()
 /**
  * @brief Handle external events from other modules (mainly sequencer)
  *
- * Two main types of events:
- *   1. Suspend/Resume guiding - from sequencer during autofocus
- *   2. Action buttons - from UI (calguide, calibrate, guide, abortguider, resetcalibration)
- *
- * State machine orchestration:
- *   calguide:   Init → Calibration → Guide (full workflow)
- *   calibrate:  Init → Calibration only
- *   guide:      Init → Guide (or Init → Calibration → Guide if no prior calib)
- *   abortguider: Stop all state machines
- *   resetcalibration: Clear calibration data (forces recalibration)
+ * Action buttons (from the UI / sequencer):
+ *   calibrate:        Init → Calibration only
+ *   guide:            Init → Guide (or Init → Calibration → Guide if no prior calib)
+ *   dither:           request a dither on the next guide frame
+ *   abortguider:      stop all state machines
+ *   resetcalibration: clear calibration data (forces recalibration)
  */
 void Guider::onExternalEvent(OST::ExtEvent event)
 {
@@ -182,20 +178,6 @@ void Guider::onExternalEvent(OST::ExtEvent event)
 
     if (event.ev == OST::ExtEvType::SV && event.prpkey == "actions")
     {
-        if (event.eltkey == "calguide")
-        {
-            if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
-            {
-                getProperty(event.prpkey)->setState(OST::Busy, true);
-                logInfo("Starting full calibration and guiding");
-                // Wire state machines: Init → Calibration → Guide
-                disconnect(&_SMInit,        &QStateMachine::finished, nullptr, nullptr);
-                disconnect(&_SMCalibration, &QStateMachine::finished, nullptr, nullptr);
-                connect(&_SMInit,           &QStateMachine::finished, &_SMCalibration, &QStateMachine::start);
-                connect(&_SMCalibration,    &QStateMachine::finished, &_SMGuide, &QStateMachine::start);
-                _SMInit.start();
-            }
-        }
         if (event.eltkey == "abortguider")
         {
             if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
@@ -282,7 +264,7 @@ void Guider::onExternalEvent(OST::ExtEvent event)
     }
 }
 
-void Guider::updateProperty(INDI::Property property)
+void Guider::onUpdateProperty(INDI::Property property)
 {
     if (strcmp(property.getName(), "CCD1") == 0)
     {
@@ -727,6 +709,7 @@ void Guider::SMInitGuide()
     _intDE = 0;
     _intRAsat = false;
     _intDEsat = false;
+    _firstGuideFrame = true;   // settle: no correction on the first frame
 
     // Set grid limits to match RMS buffer size for consistent visualization
     int rmsOver = getInt("guideParams", "rmsOver");
@@ -904,8 +887,6 @@ void Guider::SMComputeFirst()
 void Guider::SMComputeCal()
 {
     //qDebug()  << "SMComputeCal" << _calStep << _calState;
-    _ccdOrientation = 0;
-
     const QVector<startracker::Star> cur = toTrackStars(_solver.stars);
     const startracker::Params tp = trackParams();
 
@@ -940,6 +921,21 @@ void Guider::SMComputeCal()
     {
         _dxFirst = tot.dx;
         _dyFirst = tot.dy;
+
+        // Safety: the passes only pulse in one direction, so with a large pulse
+        // or a bad mount the star can walk off the sensor. Abort while it is
+        // still trackable rather than losing it mid-pass.
+        double excursion = sqrt(square(_dxFirst) + square(_dyFirst));
+        double maxExc = getFloat("calParams", "calmaxexcursion")
+                        * qMin<double>(stats.width, stats.height);
+        if (maxExc > 0 && excursion > maxExc)
+        {
+            logError("Calibration: star has drifted %1 px from start (limit %2) - Abort. Reduce the calibration pulse or check tracking.",
+            {QString::number(excursion, 'f', 0), QString::number(maxExc, 'f', 0)});
+            setStateEvent(OST::Error, "error", "caloffframe", "star drifted too far");
+            emit Abort();
+            return;
+        }
     }
 
     // The DEC backlash kick's own resulting movement isn't a clean measurement
@@ -953,12 +949,6 @@ void Guider::SMComputeCal()
 
     _prevStars = _solver.stars;
 
-    /*if (_calState==0) {
-        BOOST_LOG_TRIVIAL(debug) << "RA drift " << sqrt(square(_avdx)+square(_avdy)) << " drift / ms = " << 1000*sqrt(square(_avdx)+square(_avdy))/_pulseWTot;
-    }
-    if (_calState==2) {
-        BOOST_LOG_TRIVIAL(debug) << "DEC drift " << sqrt(square(_avdx)+square(_avdy)) << " drift / ms = " << 1000*sqrt(square(_avdx)+square(_avdy))/_pulseNTot;
-    }*/
     bool wasKick = _calAwaitingKick;
     _calAwaitingKick = false;
 
@@ -1043,7 +1033,6 @@ void Guider::SMComputeCal()
             if (fabs(atan2(sin(angleDE - angleRA), cos(angleDE - angleRA))) > PI / 2.0)
                 angleDE += PI;                     // resolve the 180-deg ambiguity against the RA axis
             _calCcdOrientation = atan2(sin(angleRA) + sin(angleDE), cos(angleRA) + cos(angleDE));
-            _ccdOrientation = _calCcdOrientation;
 
             // --- B2 test: is the drift -> RA/DEC transform a correct rotation? ---
             // It's coded as a reflection: [cos, sin ; sin, -cos] (det = -1),
@@ -1245,6 +1234,18 @@ void Guider::SMComputeGuide()
     _consecutiveMatchFail = 0;
     _dxFirst = m.dx;
     _dyFirst = m.dy;
+
+    // First frame of the session: the star may not sit exactly on the fresh
+    // reference (a few px of setup / slew settle). Measure it, don't correct.
+    if (_firstGuideFrame)
+    {
+        _firstGuideFrame = false;
+        logInfo("First guide frame: settling, no correction (drift = (%1,%2) px)",
+        {QString::number(_dxFirst, 'f', 2), QString::number(_dyFirst, 'f', 2)});
+        emit ComputeGuideDone();   // pulses all 0
+        return;
+    }
+
     // Dither requested: compute random displacement pulses then rebuild reference
     if (_doDither)
     {
@@ -1297,13 +1298,14 @@ void Guider::SMComputeGuide()
     double driftRAeff = _driftRA + kiRA * _intRA;
     double driftDEeff = _driftDE + kiDE * _intDE;
 
-    logInfo("Guide: dxy(ref-cur)=(%1,%2)px  drift RA/DE=(%3,%4)px  I=(%5,%6)  matched=%7",
-    {
-        QString::number(_dxFirst, 'f', 2), QString::number(_dyFirst, 'f', 2),
-        QString::number(_driftRA, 'f', 2), QString::number(_driftDE, 'f', 2),
-        QString::number(kiRA * _intRA, 'f', 2), QString::number(kiDE * _intDE, 'f', 2),
-        QString::number(m.nInliers)
-    });
+    // Per-frame diagnostic - kept but silenced, it floods the log.
+    // logInfo("Guide: dxy(ref-cur)=(%1,%2)px  drift RA/DE=(%3,%4)px  I=(%5,%6)  matched=%7",
+    // {
+    //     QString::number(_dxFirst, 'f', 2), QString::number(_dyFirst, 'f', 2),
+    //     QString::number(_driftRA, 'f', 2), QString::number(_driftDE, 'f', 2),
+    //     QString::number(kiRA * _intRA, 'f', 2), QString::number(kiDE * _intDE, 'f', 2),
+    //     QString::number(m.nInliers)
+    // });
 
     // _calPulseRA is the equatorial (DEC=0) rate; the rate needed at the current
     // declination is _calPulseRA / cos(curDEC).

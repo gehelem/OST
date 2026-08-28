@@ -29,7 +29,7 @@ class MODULE_INIT Guider  : public IndiModule
         void onRemoveDevice   (INDI::BaseDevice dp) override     {} ;
         void onNewProperty    (INDI::Property property) override {} ;
         void onRemoveProperty (INDI::Property property) override {} ;
-        void onUpdateProperty (INDI::Property property) override {} ;
+        void onUpdateProperty (INDI::Property property) override;
 
     signals:
         void InitDone();
@@ -58,7 +58,6 @@ class MODULE_INIT Guider  : public IndiModule
         void onExternalEvent(OST::ExtEvent event) override;
     private:
         // ==================== INDI Integration ====================
-        void updateProperty(INDI::Property p) override;  ///< Handle INDI property updates
         void newBLOB(INDI::PropertyBlob pblob);          ///< Handle incoming CCD images
 
         // ==================== Image Processing ====================
@@ -107,6 +106,7 @@ class MODULE_INIT Guider  : public IndiModule
         bool _pulseRAfinished = true;   ///< Flag: RA pulse completed on mount
         bool _pulseDECfinished = true;  ///< Flag: DEC pulse completed on mount
         bool _doDither = false;         ///< Flag: dither requested, apply on next ComputeGuide
+        bool _firstGuideFrame = false;  ///< first frame of a guiding session: measure, don't correct
         bool _calAwaitingKick = false;  ///< Flag: last pulse was a DEC backlash kick, discard its measurement
 
         // ==================== Drift Measurements (pixels) ====================
@@ -120,14 +120,11 @@ class MODULE_INIT Guider  : public IndiModule
         double _mountRA;                    ///< Current mount RA (degrees)
         bool _mountPointingWest = false;    ///< True if pier side = West (affects CCD orientation)
         bool _calMountPointingWest = false; ///< Pier side at time of calibration
-        double _ccdOrientation;             ///< CCD rotation angle (degrees, from polynomial fit)
-        double _calCcdOrientation;          ///< CCD orientation at time of calibration
+        double _calCcdOrientation = 0;      ///< CCD orientation (radians) from calibration
         double _calMountDEC = 0;            ///< Mount DEC at calibration time (for compensation)
-        double _ccdSampling = 206 * 5.2 / 800;  ///< arcsec/pixel (telescope-dependent, may need config)
         int _itt = 0;  ///< Iteration counter
 
         // ==================== State Machines (3 phases: Init → Calibration → Guiding) ====================
-        QStateMachine *_machine;        ///< Pointer to active state machine (unused currently)
         QStateMachine _SMInit;          ///< State machine: Connection and star reference detection
         QStateMachine _SMCalibration;   ///< State machine: Calibration (measure pulse offsets)
         QStateMachine _SMGuide;         ///< State machine: Continuous guiding loop

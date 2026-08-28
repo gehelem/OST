@@ -313,6 +313,18 @@
                 "min":0,
                 "max":10,
                 "hint": "How many times to restart calibration when it is rejected for poor quality before giving up"
+            },
+            "calmaxexcursion": {
+                "type":"float",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Max star excursion",
+                "order":"06",
+                "value":0.35,
+                "format": "9.99",
+                "min":0,
+                "max":1,
+                "hint": "Abort calibration if the star drifts further than this fraction of the smaller frame dimension from its start, before it leaves the sensor. 0 disables."
             }
 
         }

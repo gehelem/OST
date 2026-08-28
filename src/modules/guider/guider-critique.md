@@ -122,7 +122,11 @@ inverted vs sky, like Ekos' `in.y = −raw_drift.y`), and note `OST-guider-analy
 > rate asymmetry on the sim - gone after the fix). Guiding uses one RA rate
 > and one DEC rate (`calPulseRA` / `calPulseDE`); the raw per-direction values
 > are kept for diagnostics. Still not done: bounding the star excursion / a
-> minimum-drift gate / a max-iteration safety.
+> minimum-drift gate.
+>
+> **Excursion guard added:** calibration aborts if the star drifts more than
+> `calParams/calmaxexcursion` (default 0.35) of the smaller frame dimension
+> from its start, before it can leave the sensor.
 `calsteps` (default **2**) pulses per direction, W→E→N→S, no return-to-origin,
 no "pulse until drift > N px" gate, no max-excursion / off-sensor check, no
 per-sample consistency check. Ekos pulses until drift > 15 px (capped) *and*
@@ -133,6 +137,7 @@ returns to start. Consequences:
   (only caught afterwards as "no stars, abort").
 
 ### B4. No first-frame settle
+> **Done.** `_firstGuideFrame` (set in SMInitGuide): the first successful guide frame is measured and logged but sends no pulse.
 Ekos skips the correction on the first frame after start/slew and just
 re-centres the reticle. Here the first `SMComputeGuide` immediately sends a real
 pulse for the full offset between the post-calibration reference and the current
@@ -173,6 +178,11 @@ can abort a sub + trigger a full recalibration.
 
 ## C. Dead / stale code
 
+> **Done.** Deleted `guider/polynomialfit.{cpp,h}`, the `calguide` handler, the
+> dead members `_machine` / `_ccdSampling` / `_ccdOrientation`, and a stale
+> commented `BOOST_LOG_TRIVIAL` block. Signals were all live (state-machine
+> transitions) - kept.
+
 | Item | Status |
 |---|---|
 | `src/modules/guider/polynomialfit.{cpp,h}` | **Not compiled** (only `focus/polynomialfit.*` is in CMakeLists), `#include` commented (line 36), sole call site inside a `/* */` block (line 840). Fully dead — delete. |
@@ -184,6 +194,7 @@ can abort a sub + trigger a full recalibration.
 | `#define PI 3.14159265` | 8 digits; use `M_PI` |
 
 ### C1. Inconsistent action-button guard
+> **Done.** Resolved by removing the dead `calguide` handler (it was the odd one using `setValue(true, true)`).
 `calguide` → `setValue(true, true)`; `calibrate` and `guide` → `setValue(false, true)`.
 `ElementBool::setValue` always returns true (in range), so all three "work", but
 `calibrate` / `guide` immediately switch their own button back off while
@@ -204,6 +215,7 @@ a migration that seems to have stalled for the guider. One hierarchical
 machine (or the `.scxml` route) would be far more inspectable.
 
 ### D2. `updateProperty` overridden privately
+> **Done.** Moved the logic to the `onUpdateProperty` hook; removed the private `updateProperty` override.
 Bypasses the `onUpdateProperty` hook the post-refactor modules use
 (inspector, etc.). Works, but inconsistent.
 
