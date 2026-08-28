@@ -811,12 +811,17 @@ void Guider::SMInitGuide()
     // This scales RA pulses for current latitude
     double currentDecCompensation = cos(_mountDEC * PI / 180.0);
 
-    logInfo("RA compensation factor: %1 (cos(%2 deg))", {QString::number(currentDecCompensation, 'f', 3), QString::number(_mountDEC, 'f', 1)});
-    logInfo("Guide rates: RA=%1 ms/px (compensated %2), DEC=%3 ms/px",
+    // _calPulseRA is the equatorial RA rate (R_meas * cos(calDEC), see
+    // SMComputeCal). The rate needed at the current declination is
+    // R_equatorial / cos(curDEC).
+    double decDiv = qMax(currentDecCompensation, 0.05);   // guard near the pole
+    logInfo("RA compensation factor: 1/%1 (1/cos(%2 deg))", {QString::number(decDiv, 'f', 3), QString::number(_mountDEC, 'f', 1)});
+    logInfo("Guide rates: RA equatorial=%1 ms/px -> at curDEC %2 ms/px  |  DEC=%3 ms/px  (calDEC=%4)",
     {
         QString::number(_calPulseRA, 'f', 1),
-        QString::number(_calPulseRA * currentDecCompensation, 'f', 1),
-        QString::number(_calPulseDEC, 'f', 1)
+        QString::number(_calPulseRA / decDiv, 'f', 1),
+        QString::number(_calPulseDEC, 'f', 1),
+        QString::number(_calMountDEC, 'f', 1)
     });
 
     // Clear RMS drift history from previous guiding sessions
@@ -1096,11 +1101,19 @@ void Guider::SMComputeCal()
 
             _calMountDEC = _mountDEC;
             double decCompensation = cos(_calMountDEC * PI / 180.0);
-            if (decCompensation > 0.1)  // avoid blow-up near the pole
+            double calPulseRAmeas = _calPulseRA;   // rate as measured at the calibration declination
+            if (decCompensation > 0.1)  // skip near the pole (RA barely moves there)
             {
-                _calPulseRA = _calPulseRA / decCompensation;
-                logInfo("DEC compensation applied: DEC=%1 deg factor=%2",
-                {QString::number(_calMountDEC, 'f', 1), QString::number(decCompensation, 'f', 3)});
+                // Normalise the RA rate to the equator: a pulse at declination d
+                // moves the star by rate*pulse*cos(d) on the sensor, so ms/px
+                // scales as 1/cos(d). Store R_meas * cos(calDEC); SMComputeGuide
+                // divides by cos(curDEC).
+                _calPulseRA = _calPulseRA * decCompensation;
+                logInfo("DEC normalisation: RA rate %1 ms/px at calDEC=%2 deg -> equatorial %3 ms/px (factor %4)",
+                {
+                    QString::number(calPulseRAmeas, 'f', 1), QString::number(_calMountDEC, 'f', 1),
+                    QString::number(_calPulseRA, 'f', 1), QString::number(decCompensation, 'f', 3)
+                });
             }
 
             // Persist: RA/DE are the rates used for guiding; N/S/E/W kept as raw
@@ -1208,16 +1221,17 @@ void Guider::SMComputeGuide()
     // Dither requested: compute random displacement pulses then rebuild reference
     if (_doDither)
     {
-        double currentDecCompensation = cos(_mountDEC * PI / 180.0);
+        double decDiv = qMax(cos(_mountDEC * PI / 180.0), 0.05);
         int ditherpixel = getInt("guideParams", "ditherpixel");
         double randRA  = (QRandomGenerator::global()->generateDouble() * 2.0 - 1.0) * ditherpixel;
         double randDEC = (QRandomGenerator::global()->generateDouble() * 2.0 - 1.0) * ditherpixel;
 
-        // RA: calPulseRA is DEC-normalised, apply current DEC compensation
+        // RA: _calPulseRA is the equatorial rate, so ms/px at the current DEC is
+        // _calPulseRA / cos(curDEC).
         if (randRA > 0)
-            _pulseW = randRA * _calPulseRA * currentDecCompensation;
+            _pulseW = randRA * _calPulseRA / decDiv;
         else
-            _pulseE = -randRA * _calPulseRA * currentDecCompensation;
+            _pulseE = -randRA * _calPulseRA / decDiv;
 
         // DEC: calPulseDEC is raw ms/pixel, no compensation needed
         if (randDEC > 0)
@@ -1264,10 +1278,9 @@ void Guider::SMComputeGuide()
         QString::number(m.nInliers)
     });
 
-    // Apply DEC compensation for current position
-    // _calPulseRA is stored "equatorial" (DEC=0), adjust for the current DEC
-    double currentDecCompensation = cos(_mountDEC * PI / 180.0);
-    double calPulseRACompensated = _calPulseRA * currentDecCompensation;
+    // _calPulseRA is the equatorial (DEC=0) rate; the rate needed at the current
+    // declination is _calPulseRA / cos(curDEC).
+    double calPulseRACompensated = _calPulseRA / qMax(cos(_mountDEC * PI / 180.0), 0.05);
 
     int  revRA = 1;
     if (getBool("revCorrections", "revRA")) revRA = -1;
