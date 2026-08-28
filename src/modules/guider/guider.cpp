@@ -103,6 +103,34 @@ Guider::Guider(QString name, QString label, QString profile, QVariantMap availab
     dither->setValue(false, false);
     dither->setPreIcon("shuffle");
     pm->addElt(dither);
+
+    // Watchdog: the state machines wait on INDI callbacks (exposure BLOB, pulse
+    // completion, frame reset, SEP). If one never arrives the machine would hang
+    // forever - fire an Abort instead. It is single-shot and re-armed at every
+    // hardware step (start() restarts it), so it is never stopped from the INDI
+    // / solver callback threads - only from SMAbort (module thread). A stray
+    // fire after a sequence finished cleanly just no-ops.
+    _watchdog.setSingleShot(true);
+    connect(&_watchdog, &QTimer::timeout, this, [this]()
+    {
+        if (!_SMInit.isRunning() && !_SMCalibration.isRunning() && !_SMGuide.isRunning())
+            return;
+        logError("Watchdog: no hardware response for %1 s - aborting", {QString::number(_watchdog.interval() / 1000)});
+        setStateEvent(OST::Error, "error", "timeout", "hardware timeout");
+        emit Abort();
+    });
+}
+
+void Guider::armWatchdog()
+{
+    int t = getInt("guideParams", "watchdog");
+    if (t > 0)
+        _watchdog.start(t * 1000);
+}
+
+void Guider::disarmWatchdog()
+{
+    _watchdog.stop();   // module thread only (SMAbort)
 }
 
 /**
@@ -195,14 +223,9 @@ void Guider::onExternalEvent(OST::ExtEvent event)
                 getProperty(event.prpkey)->setState(OST::Ok, true);
                 logInfo("Starting guiding");
 
-                // Check if calibration data exists
-                double calN = getFloat("calibrationvalues", "calPulseN");
-                double calS = getFloat("calibrationvalues", "calPulseS");
-                double calE = getFloat("calibrationvalues", "calPulseE");
-                double calW = getFloat("calibrationvalues", "calPulseW");
-
                 // If no calibration, must do it first
-                if (calN == 0 || calS == 0 || calE == 0 || calW == 0)
+                if (getFloat("calibrationvalues", "calPulseRA") == 0
+                        || getFloat("calibrationvalues", "calPulseDE") == 0)
                 {
                     logInfo("No calibration data found - starting calibration first");
                     disconnect(&_SMInit,        &QStateMachine::finished, nullptr, nullptr);
@@ -243,6 +266,8 @@ void Guider::onExternalEvent(OST::ExtEvent event)
                 getProperty(event.prpkey)->setState(OST::Ok, true);
                 logInfo("Resetting calibration data");
                 // Clear all calibration values to force recalibration
+                getEltFloat("calibrationvalues", "calPulseRA")->setValue(0);
+                getEltFloat("calibrationvalues", "calPulseDE")->setValue(0);
                 getEltFloat("calibrationvalues", "calPulseN")->setValue(0);
                 getEltFloat("calibrationvalues", "calPulseS")->setValue(0);
                 getEltFloat("calibrationvalues", "calPulseE")->setValue(0);
@@ -300,7 +325,8 @@ void Guider::updateProperty(INDI::Property property)
 
     )
     {
-        if (_pulseRAfinished && _pulseDECfinished) emit PulsesDone();
+        if (_pulseRAfinished && _pulseDECfinished)
+            emit PulsesDone();
     }
 
 
@@ -308,21 +334,22 @@ void Guider::updateProperty(INDI::Property property)
 
 void Guider::newBLOB(INDI::PropertyBlob pblob)
 {
-    if (
-        (QString(pblob.getDeviceName()) == getString("devices", "camera"))
-    )
-    {
-        delete _image;
-        _image = new fileio();
-        _image->loadBlob(pblob, 64);
-        stats = _image->getStats();
-        QImage rawImage = _image->getRawQImage();
-        QImage im = rawImage.convertToFormat(QImage::Format_RGB32);
-        im.setColorTable(rawImage.colorTable());
+    // Only consume a frame we actually asked for: ignore stray/late BLOBs
+    // (e.g. one arriving after an abort, or from another module sharing the
+    // camera) so they can't advance a state machine unexpectedly.
+    if (!_expectingFrame)
+        return;
+    if (QString(pblob.getDeviceName()) != getString("devices", "camera"))
+        return;
 
-        emit ExposureDone();
-    }
+    _expectingFrame = false;
 
+    delete _image;
+    _image = new fileio();
+    _image->loadBlob(pblob, 64);
+    stats = _image->getStats();
+
+    emit ExposureDone();
 }
 
 void Guider::buildInitStateMachines(void)
@@ -554,14 +581,13 @@ void Guider::SMInitInit()
         return;
     }
 
-    // Get pier side (West or East of pier)
-    // Affects CCD orientation if optical tube is flipped
+    // Get pier side (West or East of pier). Optional: only the
+    // enablepiersidereverse feature uses it (off by default), and fork / alt-az
+    // mounts don't expose TELESCOPE_PIER_SIDE. A read failure is not fatal -
+    // keep the previous value and carry on (do NOT hang init here).
     if (!getModSwitch(getString("devices", "guider"), "TELESCOPE_PIER_SIDE", "PIER_WEST", _mountPointingWest))
     {
-        logError("Failed to read mount pier side");
-        setStateEvent(OST::Error, "error", "devicefailed", "mount failed");
-        ;
-        return;
+        logWarning("Could not read mount pier side - pier-side reversal disabled for this session");
     }
 
     logInfo(QString("Mount position: RA=%1, DEC=%2, Pier=%3")
@@ -604,14 +630,21 @@ void Guider::SMInitCal()
     _calState = 0;   // Calibration phase (0-2)
     _calStep = 0;    // Pulse direction counter (0-7 for 4 directions × 2 iterations)
     _calAwaitingKick = false;
+    _calRetry = 0;
+    getEltLight("calibrationvalues", "calqual")->setValue(OST::Idle, true);
 
     // Clear previous calibration results
-    _calPulseN = 0;  // Will be filled by calibration
+    _calPulseRA = 0;
+    _calPulseDEC = 0;
+    _calPulseN = 0;  // filled by calibration
     _calPulseS = 0;
     _calPulseE = 0;
     _calPulseW = 0;
+    for (int i = 0; i < 4; i++) _calPassMean[i][0] = _calPassMean[i][1] = 0;
 
     // Update UI with current (empty) calibration values
+    getEltFloat("calibrationvalues", "calPulseRA")->setValue(_calPulseRA);
+    getEltFloat("calibrationvalues", "calPulseDE")->setValue(_calPulseDEC);
     getEltFloat("calibrationvalues", "calPulseN")->setValue(_calPulseN);
     getEltFloat("calibrationvalues", "calPulseS")->setValue(_calPulseS);
     getEltFloat("calibrationvalues", "calPulseE")->setValue(_calPulseE);
@@ -690,6 +723,10 @@ void Guider::SMInitGuide()
     // drift vs it starts at zero.
     _dxFirst = 0;
     _dyFirst = 0;
+    _intRA = 0;
+    _intDE = 0;
+    _intRAsat = false;
+    _intDEsat = false;
 
     // Set grid limits to match RMS buffer size for consistent visualization
     int rmsOver = getInt("guideParams", "rmsOver");
@@ -698,10 +735,8 @@ void Guider::SMInitGuide()
     logInfo("Grid limits set to %1 frames (rmsOver parameter)", {QString::number(rmsOver)});
 
     // Load calibration results from database
-    _calPulseN = getFloat("calibrationvalues", "calPulseN");
-    _calPulseS = getFloat("calibrationvalues", "calPulseS");
-    _calPulseE = getFloat("calibrationvalues", "calPulseE");
-    _calPulseW = getFloat("calibrationvalues", "calPulseW");
+    _calPulseRA  = getFloat("calibrationvalues", "calPulseRA");
+    _calPulseDEC = getFloat("calibrationvalues", "calPulseDE");
     _calCcdOrientation = getFloat("calibrationvalues", "ccdOrientation") * PI / 180.0;  // Convert degrees to radians
     _calMountDEC = getFloat("calibrationvalues", "calMountDEC");  // DEC at calibration time
 
@@ -776,16 +811,13 @@ void Guider::SMInitGuide()
     // This scales RA pulses for current latitude
     double currentDecCompensation = cos(_mountDEC * PI / 180.0);
 
-    // Show what the compensation does
-    double calPulseECompensated = _calPulseE * currentDecCompensation;
-    double calPulseWCompensated = _calPulseW * currentDecCompensation;
-
-    logInfo("RA compensation factor: %1(cos(%2°))", {QString::number(currentDecCompensation, 'f', 3), QString::number(_mountDEC, 'f', 1)});
-    logInfo("Adjusted calibration: E=%1 W=%2 N=%3 S=%4 (pixels/sec)", {QString::number(calPulseECompensated, 'f', 2),
-            QString::number(calPulseWCompensated, 'f', 2),
-            QString::number(_calPulseN, 'f', 2),
-            QString::number(_calPulseS, 'f', 2)
-                                                                      });
+    logInfo("RA compensation factor: %1 (cos(%2 deg))", {QString::number(currentDecCompensation, 'f', 3), QString::number(_mountDEC, 'f', 1)});
+    logInfo("Guide rates: RA=%1 ms/px (compensated %2), DEC=%3 ms/px",
+    {
+        QString::number(_calPulseRA, 'f', 1),
+        QString::number(_calPulseRA * currentDecCompensation, 'f', 1),
+        QString::number(_calPulseDEC, 'f', 1)
+    });
 
     // Clear RMS drift history from previous guiding sessions
     // These will accumulate as new measurements come in
@@ -793,6 +825,26 @@ void Guider::SMInitGuide()
     _dDEvector.clear();
 
     _doDither = false;
+
+    // TEST AID (guideParams/simflip): the INDI CCD Simulator doesn't rotate its
+    // field with TELESCOPE_PIER_SIDE, so meridian-flip handling can't be tested
+    // end to end. A meridian flip's effect on the guider is that the drift ->
+    // RA/DEC mapping rotates 180 deg (adding PI to the calibration angle, which
+    // is exactly revRA = revDE = -1). Simulate that here: with simflip set,
+    // guiding should run away UNLESS both reverse flags are on - that verifies
+    // the "flip both rev bits" handling.
+    if (getBool("guideParams", "simflip"))
+    {
+        _calCcdOrientation += PI;
+        logWarning("SIM: calibration angle rotated 180 deg (meridian-flip test aid) - expect to need revRA+revDE");
+    }
+
+    logInfo("Guide start: ccdOrientation=%1 deg  revRA=%2 revDE=%3",
+    {
+        QString::number(_calCcdOrientation * 180.0 / PI, 'f', 1),
+        QString(getBool("revCorrections", "revRA") ? "on" : "off"),
+        QString(getBool("revCorrections", "revDE") ? "on" : "off")
+    });
 
     emit InitGuideDone();
     setStateEvent(OST::Busy, "initguidedone", "initguidedone", "init guide done");
@@ -807,6 +859,7 @@ void Guider::SMRequestFrameReset()
         emit Abort();
         return;
     }
+    armWatchdog();   // waiting for CCD_FRAME_RESET -> IPS_OK
     emit RequestFrameResetDone();
 }
 
@@ -821,6 +874,8 @@ void Guider::SMRequestExposure()
         emit Abort();
         return;
     }
+    _expectingFrame = true;
+    armWatchdog();   // waiting for the exposure BLOB
     emit RequestExposureDone();
 }
 startracker::Params Guider::trackParams()
@@ -931,67 +986,127 @@ void Guider::SMComputeCal()
         }
         ddx = ddx / (_dxvector.size());
         ddy = ddy / (_dyvector.size());
-        double a = atan2(ddy, ddx);
-        //ddy));
-        if (_calState == 0)
+
+        // Keep each pass' mean (ref-cur) increment; the axis rates and the CCD
+        // orientation are derived below from the antisymmetric combinations
+        // West-East and North-South, which cancel the sidereal / periodic-error
+        // drift that otherwise biases every one-directional pass.
+        _calPassMean[_calState][0] = ddx;
+        _calPassMean[_calState][1] = ddy;
+
+        double ech = getSampling();
+        double rawMag = sqrt(square(ddx) + square(ddy));
+        double rawRate = (rawMag > 1e-6) ? getInt("calParams", "pulse") / rawMag : 0;
+        const char *dir = (_calState == 0) ? "West" : (_calState == 1) ? "East"
+                          : (_calState == 2) ? "North" : "South";
+        const char *evk = (_calState == 0) ? "westcomplete" : (_calState == 1) ? "estcomplete"
+                          : (_calState == 2) ? "northcomplete" : "southcomplete";
+        if (_calState == 0) { _calPulseW = rawRate; _calMountPointingWest = _mountPointingWest; }
+        else if (_calState == 1) _calPulseE = rawRate;
+        else if (_calState == 2) _calPulseN = rawRate;
+        else                     _calPulseS = rawRate;
+        logInfo("%1 pass: increment (ref-cur)=(%2,%3)px  raw %4 ms/px (drift=%5\")",
         {
-            _calPulseW = getInt("calParams", "pulse") / sqrt(square(ddx) + square(ddy));
-            _ccdOrientation = a;
-            _calMountPointingWest = _mountPointingWest;
-            _calCcdOrientation = _ccdOrientation;
-            double ech = getSampling();
-            double drift_arcsec = sqrt(square(ddx) + square(ddy)) * ech;
-            logInfo("West calibration complete: %1 ms/px (%2 ms/arcsec, drift=%3\")", {QString::number(_calPulseW, 'f', 2), QString::number(_calPulseW / ech, 'f', 2), QString::number(drift_arcsec, 'f', 2)});
-            setStateEvent(OST::Busy, "cal", "westcomplete", "westcomplete");
-        }
-        if (_calState == 1)
-        {
-            _calPulseE = getInt("calParams", "pulse") / sqrt(square(ddx) + square(ddy));
-            double ech = getSampling();
-            double drift_arcsec = sqrt(square(ddx) + square(ddy)) * ech;
-            logInfo("East calibration complete: %1 ms/px (%2 ms/arcsec, drift=%3\")", {QString::number(_calPulseE, 'f', 2), QString::number(_calPulseE / ech, 'f', 2), QString::number(drift_arcsec, 'f', 2)});
-            setStateEvent(OST::Busy, "cal", "estcomplete", "estcomplete");
-        }
-        if (_calState == 2)
-        {
-            _calPulseN = getInt("calParams", "pulse") / sqrt(square(ddx) + square(ddy));
-            double ech = getSampling();
-            double drift_arcsec = sqrt(square(ddx) + square(ddy)) * ech;
-            logInfo("North calibration complete: %1 ms/px (%2 ms/arcsec, drift=%3\")", {QString::number(_calPulseN, 'f', 2), QString::number(_calPulseN / ech, 'f', 2), QString::number(drift_arcsec, 'f', 2)});
-            setStateEvent(OST::Busy, "cal", "northcomplete", "northcomplete");
-        }
-        if (_calState == 3)
-        {
-            _calPulseS = getInt("calParams", "pulse") / sqrt(square(ddx) + square(ddy));
-            double ech = getSampling();
-            double drift_arcsec = sqrt(square(ddx) + square(ddy)) * ech;
-            logInfo("South calibration complete: %1 ms/px (%2 ms/arcsec, drift=%3\")", {QString::number(_calPulseS, 'f', 2), QString::number(_calPulseS / ech, 'f', 2), QString::number(drift_arcsec, 'f', 2)});
-            setStateEvent(OST::Busy, "cal", "southcomplete", "southcomplete");
-        }
+            QString(dir), QString::number(ddx, 'f', 2), QString::number(ddy, 'f', 2),
+            QString::number(rawRate, 'f', 1), QString::number(rawMag * ech, 'f', 2)
+        });
+        setStateEvent(OST::Busy, "cal", evk, evk);
 
         _calStep = 0;
         _calState++;
-        //if (_calState==2) {
         _dxvector.clear();
         _dyvector.clear();
-        //}
+
         if (_calState >= 4)
         {
+            // --- combine the 4 passes -------------------------------------------
+            double dRAx = (_calPassMean[0][0] - _calPassMean[1][0]) / 2.0;
+            double dRAy = (_calPassMean[0][1] - _calPassMean[1][1]) / 2.0;
+            double dDEx = (_calPassMean[2][0] - _calPassMean[3][0]) / 2.0;
+            double dDEy = (_calPassMean[2][1] - _calPassMean[3][1]) / 2.0;
+            double bgx  = (_calPassMean[0][0] + _calPassMean[1][0]) / 2.0;  // background drift estimate
+            double bgy  = (_calPassMean[0][1] + _calPassMean[1][1]) / 2.0;
 
-            // Store calibration DEC for later compensation
-            _calMountDEC = _mountDEC;
+            double magRA = sqrt(square(dRAx) + square(dRAy));
+            double magDE = sqrt(square(dDEx) + square(dDEy));
+            _calPulseRA  = (magRA > 1e-6) ? getInt("calParams", "pulse") / magRA : 0;
+            _calPulseDEC = (magDE > 1e-6) ? getInt("calParams", "pulse") / magDE : 0;
 
-            // Compensate RA calibration values for declination
-            // Store as "equatorial" values (compensated to DEC=0)
-            double decCompensation = cos(_calMountDEC * PI / 180.0);
-            if (decCompensation > 0.1)  // Avoid division by zero near poles
+            // CCD orientation from BOTH axes (Ekos-style two-estimate average).
+            double angleRA = atan2(dRAy, dRAx);
+            double angleDE = atan2(-dDEx, dDEy);   // DEC axis expressed in the RA-axis convention
+            if (fabs(atan2(sin(angleDE - angleRA), cos(angleDE - angleRA))) > PI / 2.0)
+                angleDE += PI;                     // resolve the 180-deg ambiguity against the RA axis
+            _calCcdOrientation = atan2(sin(angleRA) + sin(angleDE), cos(angleRA) + cos(angleDE));
+            _ccdOrientation = _calCcdOrientation;
+
+            // Calibration quality: how much of each per-pulse increment was the
+            // constant background drift (tracking / polar-alignment error) rather
+            // than the pulse itself. High ratio -> the differenced rates rest on
+            // a shaky assumption and the mount's polar alignment is likely poor.
+            double bgMag = sqrt(square(bgx) + square(bgy));
+            double sigMin = qMin(magRA, magDE);
+            double driftRatio = (sigMin > 1e-6) ? bgMag / sigMin : 999.0;
+            double maxRatio = getFloat("calParams", "calmaxdriftratio");
+
+            logInfo("Calibration: RA %1 ms/px, DEC %2 ms/px, angle %3 deg (RA %4 / DE %5), background drift (%6,%7) px/frame, drift ratio %8",
             {
-                _calPulseE = _calPulseE / decCompensation;
-                _calPulseW = _calPulseW / decCompensation;
-                logInfo("DEC compensation applied: DEC=%1° factor=%2", {QString::number(_calMountDEC, 'f', 1), QString::number(decCompensation, 'f', 3)});
+                QString::number(_calPulseRA, 'f', 1), QString::number(_calPulseDEC, 'f', 1),
+                QString::number(_calCcdOrientation * 180.0 / PI, 'f', 1),
+                QString::number(angleRA * 180.0 / PI, 'f', 1), QString::number(angleDE * 180.0 / PI, 'f', 1),
+                QString::number(bgx, 'f', 2), QString::number(bgy, 'f', 2),
+                QString::number(driftRatio, 'f', 2)
+            });
+
+            OST::State qual = (driftRatio < 0.30) ? OST::Ok
+                              : (maxRatio <= 0 || driftRatio < maxRatio) ? OST::Busy : OST::Error;
+            getEltLight("calibrationvalues", "calqual")->setValue(qual, true);
+
+            if (maxRatio > 0 && driftRatio > maxRatio)
+            {
+                _calRetry++;
+                int maxRetry = getInt("calParams", "calmaxretries");
+                logWarning("Calibration quality poor: background drift is %1x the pulse signal (limit %2) - check the mount's polar alignment",
+                {QString::number(driftRatio, 'f', 2), QString::number(maxRatio, 'f', 2)});
+
+                if (_calRetry <= maxRetry)
+                {
+                    logWarning("Retrying calibration (%1/%2)", {QString::number(_calRetry), QString::number(maxRetry)});
+                    _calState = 0;
+                    _calStep = 0;
+                    _calAwaitingKick = false;
+                    _dxvector.clear();
+                    _dyvector.clear();
+                    for (int i = 0; i < 4; i++) _calPassMean[i][0] = _calPassMean[i][1] = 0;
+                    _dxPrev = 0;
+                    _dyPrev = 0;
+                    _pulseW = getInt("calParams", "pulse");   // restart the West pass
+                    setStateEvent(OST::Busy, "cal", "calretry", "calibration retry");
+                    emit ComputeCalDone();                     // -> RequestCalPulses
+                    return;
+                }
+
+                logError("Calibration failed: still poor after %1 retries - Abort. Fix the mount's polar alignment.",
+                {QString::number(maxRetry)});
+                setStateEvent(OST::Error, "error", "calbad", "calibration quality too poor");
+                emit Abort();
+                return;
+            }
+            _calRetry = 0;
+
+            _calMountDEC = _mountDEC;
+            double decCompensation = cos(_calMountDEC * PI / 180.0);
+            if (decCompensation > 0.1)  // avoid blow-up near the pole
+            {
+                _calPulseRA = _calPulseRA / decCompensation;
+                logInfo("DEC compensation applied: DEC=%1 deg factor=%2",
+                {QString::number(_calMountDEC, 'f', 1), QString::number(decCompensation, 'f', 3)});
             }
 
-            // Store all calibration values for persistent reuse
+            // Persist: RA/DE are the rates used for guiding; N/S/E/W kept as raw
+            // per-direction diagnostics (they still carry the background drift).
+            getEltFloat("calibrationvalues", "calPulseRA")->setValue(_calPulseRA);
+            getEltFloat("calibrationvalues", "calPulseDE")->setValue(_calPulseDEC);
             getEltFloat("calibrationvalues", "calPulseN")->setValue(_calPulseN);
             getEltFloat("calibrationvalues", "calPulseS")->setValue(_calPulseS);
             getEltFloat("calibrationvalues", "calPulseE")->setValue(_calPulseE);
@@ -1098,17 +1213,17 @@ void Guider::SMComputeGuide()
         double randRA  = (QRandomGenerator::global()->generateDouble() * 2.0 - 1.0) * ditherpixel;
         double randDEC = (QRandomGenerator::global()->generateDouble() * 2.0 - 1.0) * ditherpixel;
 
-        // RA: calPulseE/W are equatorial (DEC-normalized), apply current DEC compensation
+        // RA: calPulseRA is DEC-normalised, apply current DEC compensation
         if (randRA > 0)
-            _pulseW = randRA * _calPulseW * currentDecCompensation;
+            _pulseW = randRA * _calPulseRA * currentDecCompensation;
         else
-            _pulseE = -randRA * _calPulseE * currentDecCompensation;
+            _pulseE = -randRA * _calPulseRA * currentDecCompensation;
 
-        // DEC: calPulseN/S are raw ms/pixel, no compensation needed
+        // DEC: calPulseDEC is raw ms/pixel, no compensation needed
         if (randDEC > 0)
-            _pulseN = randDEC * _calPulseN;
+            _pulseN = randDEC * _calPulseDEC;
         else
-            _pulseS = -randDEC * _calPulseS;
+            _pulseS = -randDEC * _calPulseDEC;
 
         _doDither = false;
         logInfo(QString("Dithering: RA=%1 px DEC=%2 px -> pulseN=%3 pulseS=%4 pulseE=%5 pulseW=%6 ms")
@@ -1122,11 +1237,37 @@ void Guider::SMComputeGuide()
     double _driftRA = _dxFirst * cos(_calCcdOrientation) + _dyFirst *  sin(_calCcdOrientation);
     double _driftDE = _dxFirst * sin(_calCcdOrientation) + _dyFirst * -cos(_calCcdOrientation);
 
+    // Integral term: a proportional-only law cannot null a constant drift
+    // (tracking / polar-alignment error) - it settles at error = drift / gain.
+    // Accumulate the raw residual and add Ki * accumulator to the correction;
+    // a true integrator drives the steady-state residual to zero. The
+    // accumulator is clamped (anti-windup) and frozen for an axis whose pulse
+    // saturated last frame; it is reset at guide start / after a dither.
+    double intMax = getFloat("guideParams", "intmax");
+    if (!_intRAsat) _intRA += _driftRA;
+    if (!_intDEsat) _intDE += _driftDE;
+    if (intMax > 0)
+    {
+        _intRA = qBound(-intMax, _intRA, intMax);
+        _intDE = qBound(-intMax, _intDE, intMax);
+    }
+    double kiRA = getFloat("guideParams", "raintgain");
+    double kiDE = getFloat("guideParams", "deintgain");
+    double driftRAeff = _driftRA + kiRA * _intRA;
+    double driftDEeff = _driftDE + kiDE * _intDE;
+
+    logInfo("Guide: dxy(ref-cur)=(%1,%2)px  drift RA/DE=(%3,%4)px  I=(%5,%6)  matched=%7",
+    {
+        QString::number(_dxFirst, 'f', 2), QString::number(_dyFirst, 'f', 2),
+        QString::number(_driftRA, 'f', 2), QString::number(_driftDE, 'f', 2),
+        QString::number(kiRA * _intRA, 'f', 2), QString::number(kiDE * _intDE, 'f', 2),
+        QString::number(m.nInliers)
+    });
+
     // Apply DEC compensation for current position
-    // calPulseE/W are stored as "equatorial" (DEC=0), need to adjust for current DEC
+    // _calPulseRA is stored "equatorial" (DEC=0), adjust for the current DEC
     double currentDecCompensation = cos(_mountDEC * PI / 180.0);
-    double calPulseECompensated = _calPulseE * currentDecCompensation;
-    double calPulseWCompensated = _calPulseW * currentDecCompensation;
+    double calPulseRACompensated = _calPulseRA * currentDecCompensation;
 
     int  revRA = 1;
     if (getBool("revCorrections", "revRA")) revRA = -1;
@@ -1137,17 +1278,17 @@ void Guider::SMComputeGuide()
     bool disDEN = getBool("disCorrections", "disDE+");
     bool disDES = getBool("disCorrections", "disDE-");
 
-    if (revRA * _driftRA > 0 && !disRAO)
+    if (revRA * driftRAeff > 0 && !disRAO)
     {
-        _pulseE = getFloat("guideParams", "raAgr") * revRA * _driftRA * calPulseECompensated;
+        _pulseE = getFloat("guideParams", "raAgr") * revRA * driftRAeff * calPulseRACompensated;
         if (_pulseE > getInt("guideParams", "pulsemax")) _pulseE = getInt("guideParams", "pulsemax");
         if (_pulseE < getInt("guideParams", "pulsemin")) _pulseE = 0;
     }
     else _pulseE = 0;
 
-    if (revRA * _driftRA < 0 && !disRAE)
+    if (revRA * driftRAeff < 0 && !disRAE)
     {
-        _pulseW = -getFloat("guideParams", "raAgr") * revRA * _driftRA * calPulseWCompensated;
+        _pulseW = -getFloat("guideParams", "raAgr") * revRA * driftRAeff * calPulseRACompensated;
         if (_pulseW > getInt("guideParams", "pulsemax")) _pulseW = getInt("guideParams", "pulsemax");
         if (_pulseW < getInt("guideParams", "pulsemin")) _pulseW = 0;
     }
@@ -1157,7 +1298,7 @@ void Guider::SMComputeGuide()
     // effect (if one is pending), before deciding this cycle's pulse.
     if (_decBacklashLearning)
     {
-        double calPulse = (_decBacklashDir > 0) ? _calPulseN : _calPulseS;
+        double calPulse = _calPulseDEC;
         double expectedReductionPx = (calPulse > 0) ? (_decBacklashCorrection / calPulse) : 0;
         double actualReductionPx   = qAbs(_decBacklashLastDriftDE) - qAbs(_driftDE);
 
@@ -1186,12 +1327,12 @@ void Guider::SMComputeGuide()
     // direction reversed compared to the last pulse actually sent, add the current
     // compensation estimate on top and remember enough to learn from it next cycle.
     int decDir = 0; // -1 = South needed, +1 = North needed, 0 = none
-    if (revDE * _driftDE > 0 && !disDEN) decDir = -1;
-    else if (revDE * _driftDE < 0 && !disDES) decDir = 1;
+    if (revDE * driftDEeff > 0 && !disDEN) decDir = -1;
+    else if (revDE * driftDEeff < 0 && !disDES) decDir = 1;
 
     if (decDir == -1)
     {
-        _pulseS = getFloat("guideParams", "deAgr")  * revDE * _driftDE * _calPulseS;
+        _pulseS = getFloat("guideParams", "deAgr")  * revDE * driftDEeff * _calPulseDEC;
         if (_pulseS > getInt("guideParams", "pulsemax")) _pulseS = getInt("guideParams", "pulsemax");
         if (_pulseS < getInt("guideParams", "pulsemin")) _pulseS = 0;
     }
@@ -1199,7 +1340,7 @@ void Guider::SMComputeGuide()
 
     if (decDir == 1)
     {
-        _pulseN = -getFloat("guideParams", "deAgr") * revDE * _driftDE * _calPulseN;
+        _pulseN = -getFloat("guideParams", "deAgr") * revDE * driftDEeff * _calPulseDEC;
         if (_pulseN > getInt("guideParams", "pulsemax")) _pulseN = getInt("guideParams", "pulsemax");
         if (_pulseN < getInt("guideParams", "pulsemin")) _pulseN = 0;
     }
@@ -1223,6 +1364,11 @@ void Guider::SMComputeGuide()
     }
 
     if (decDir != 0) _lastDecDir = decDir;
+
+    // Anti-windup: stop integrating an axis whose correction is already maxed out.
+    int pmax = getInt("guideParams", "pulsemax");
+    _intRAsat = (_pulseE >= pmax || _pulseW >= pmax);
+    _intDEsat = (_pulseN >= pmax || _pulseS >= pmax);
 
     _itt++;
 
@@ -1364,9 +1510,12 @@ void Guider::SMRequestPulses()
 
     if ((_pulseN == 0) && (_pulseS == 0) && (_pulseE == 0) && (_pulseW == 0))
     {
-        emit PulsesDone();
+        emit PulsesDone();   // nothing to send this cycle
     }
-
+    else
+    {
+        armWatchdog();       // waiting for TELESCOPE_TIMED_GUIDE_* -> IPS_IDLE
+    }
 }
 
 void Guider::SMFindStars()
@@ -1377,6 +1526,7 @@ void Guider::SMFindStars()
     _solver.ResetSolver(stats, _image->getImageBuffer());
     connect(&_solver, &Solver::successSEP, this, &Guider::OnSucessSEP);
     _solver.stars.clear();
+    armWatchdog();   // waiting for the SEP extraction to finish
     _solver.FindStars(_solver.stellarSolverProfiles[0]);
 }
 
@@ -1428,6 +1578,8 @@ void Guider::OnSucessSEP()
 void Guider::SMAbort()
 {
     logInfo("Aborting guiding");
+    disarmWatchdog();
+    _expectingFrame = false;
     getEltBool("actions", "calibrate")->setValue(false, false);
     getEltBool("actions", "abortguider")->setValue(false, false);
     getEltBool("actions", "guide")->setValue(false, false);

@@ -34,6 +34,9 @@ The comment describes the right algorithm; the code implements it in the wrong
 units without flipping the compensation.
 
 ### A2. `SMInitInit` — pier-side read failure doesn't abort
+> **Done.** Now `logWarning` + continue (pier side is optional; fork/alt-az
+> mounts don't expose it). The stray `;` + misleading error-state + `return`
+> that hung init are gone.
 `guider.cpp` ~549-554:
 ```cpp
 if (!getModSwitch(..., "TELESCOPE_PIER_SIDE", "PIER_WEST", _mountPointingWest))
@@ -48,6 +51,10 @@ This one falls through and continues initialising with whatever
 `_mountPointingWest` happened to contain.
 
 ### A3. No watchdog on pulse completion — state machine can hang forever
+> **Done.** Single-shot `_watchdog` armed at each hardware wait (exposure,
+> pulse, frame reset, SEP), disarmed on the matching callback / on abort;
+> timeout -> `emit Abort()`. Configurable via `guideParams/watchdog` (s, 0 = off,
+> default 30).
 `_pulseRAfinished` / `_pulseDECfinished` are cleared when a pulse is sent and
 only set back on `TELESCOPE_TIMED_GUIDE_*` → `IPS_IDLE`. If that INDI update
 never arrives (driver quirk, disconnect, dropped event) `PulsesDone` is never
@@ -57,6 +64,8 @@ the guider is driven by the sequencer. Stand-alone guiding just freezes.
 Same class of risk on the exposure / frame-reset waits.
 
 ### A4. `newBLOB` has no ownership / state guard
+> **Done.** `_expectingFrame` gate: set in `SMRequestExposure`, cleared on the
+> consumed BLOB and on abort. Stray/late BLOBs are ignored.
 ```cpp
 void Guider::newBLOB(INDI::PropertyBlob pblob)
 {
@@ -73,6 +82,9 @@ camera. There is no `mState`, no "expecting a frame" flag.
 ## B. Algorithm weaknesses
 
 ### B1. CCD orientation from a single vector
+> **Done (with B3).** Orientation now averages two estimates - `atan2(dRA)` and
+> the DEC axis rotated into the same convention - with the 180-deg ambiguity
+> resolved against the RA axis. `dRA = (West - East)/2`, `dDE = (North - South)/2`.
 `_calCcdOrientation = atan2(mean_dx, mean_dy)` of the **West pass only**
 (`SMComputeCal`, `_calState == 0`). Ekos averages an independent RA and DEC
 angle estimate, and disambiguates the DEC axis by testing both ±90° and picking
@@ -92,6 +104,14 @@ inverted vs sky, like Ekos' `in.y = −raw_drift.y`), and note `OST-guider-analy
 θ's sign convention, which comes from the fragile single-vector estimate in B1.
 
 ### B3. Calibration walks the star and never returns
+> **Partly done.** Instead of return-to-origin, the rates and orientation are
+> now taken from the antisymmetric combinations `(West-East)/2` and
+> `(North-South)/2`, which cancel the constant sidereal / periodic-error drift
+> that was biasing each one-directional pass (seen as a 78% N/S and 29% E/W
+> rate asymmetry on the sim - gone after the fix). Guiding uses one RA rate
+> and one DEC rate (`calPulseRA` / `calPulseDE`); the raw per-direction values
+> are kept for diagnostics. Still not done: bounding the star excursion / a
+> minimum-drift gate / a max-iteration safety.
 `calsteps` (default **2**) pulses per direction, W→E→N→S, no return-to-origin,
 no "pulse until drift > N px" gate, no max-excursion / off-sensor check, no
 per-sample consistency check. Ekos pulses until drift > 15 px (capped) *and*
@@ -122,6 +142,10 @@ be a sizeable kick.
   work per match, run 2–3×/frame. Works, but heavier than it needs to be.
 
 ### B6. Control law is P-only, and the history buffer isn't used for control
+> **Done.** Added a true integral term per axis (clamped accumulator, frozen on
+> pulse saturation, reset at guide start / dither). `guideParams/raintgain` +
+> `deintgain` (def 0.15, 0 = pure P), `guideParams/intmax` (px, anti-windup).
+> Nulls the steady-state offset a P-only law leaves against a constant drift.
 `_pulseX = agr · drift · rate`, clamped to `[pulsemin, pulsemax]`. No integral
 term, no dead-band beyond `pulsemin`. `_dRAvector` / `_dDEvector` (last `rmsOver`
 drifts) exist but feed only the RMS *display* — Ekos uses its 50-sample buffer
@@ -315,6 +339,10 @@ reloads the snapshot first), but it's very hard to follow.
 That removes the "which `revRA` is the real one" question entirely.
 
 ### Testing without a rotating simulator
+> **Point 3 done:** `guideParams/simflip` — rotates `starsFirst` 180 deg about
+> the frame centre at guide start, so the flip / rev-bit math is testable
+> against the CCD Simulator. Points 1-2 need no code; point 4 (sim patch) not
+> done. The rev-bit simplification (derive, don't store-and-mutate) is still TODO.
 
 The INDI CCD Simulator does **not** rotate its field with `TELESCOPE_PIER_SIDE`,
 so you can't validate flip handling end-to-end with it. Workarounds:

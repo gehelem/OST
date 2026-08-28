@@ -66,9 +66,31 @@
         "hasprofile": true,
         "label": "Calibration Values",
         "e": {
+            "calqual": {
+                "type":"light",
+                "label": "Calibration quality",
+                "order":"00",
+                "hint": "green = clean, orange = usable but background drift is significant, red = rejected (poor polar alignment)"
+            },
+            "calPulseRA": {
+                "type":"float",
+                "label": "RA rate (ms/px)",
+                "order":"00a",
+                "value": 0,
+                "format": "9999.99",
+                "hint": "Rate used for guiding - West/East combined, background drift removed"
+            },
+            "calPulseDE": {
+                "type":"float",
+                "label": "DEC rate (ms/px)",
+                "order":"00b",
+                "value": 0,
+                "format": "9999.99",
+                "hint": "Rate used for guiding - North/South combined"
+            },
             "calPulseN": {
                 "type":"float",
-                "label": "Calibration Pulse N",
+                "label": "raw N (ms/px, diag)",
                 "order":"01",
                 "value": 0,
                 "format": "99.99"
@@ -267,6 +289,30 @@
                 "value":500,
                 "format": "9999",
                 "hint": "Extra pulse sent before the North pass and before the South pass, to take up mechanical backlash so the timed calibration pulses aren't partially wasted engaging the gears"
+            },
+            "calmaxdriftratio": {
+                "type":"float",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Max background drift ratio",
+                "order":"04",
+                "value":1.0,
+                "format": "9.99",
+                "min":0,
+                "max":10,
+                "hint": "Calibration is rejected if the constant background drift (tracking / polar-alignment error) exceeds this fraction of the pulse displacement. A high value here usually means the mount is poorly polar-aligned. 0 disables the check."
+            },
+            "calmaxretries": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Calibration retries",
+                "order":"05",
+                "value":2,
+                "format": "99",
+                "min":0,
+                "max":10,
+                "hint": "How many times to restart calibration when it is rejected for poor quality before giving up"
             }
 
         }
@@ -315,6 +361,42 @@
                 "order":"04",
                 "value":0.8,
                 "format": "99"
+            },
+            "raintgain": {
+                "type":"float",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "RA integral gain",
+                "order":"04a",
+                "value":0.15,
+                "format": "9.999",
+                "min":0,
+                "max":2,
+                "hint": "Gain on the accumulated RA residual. A true integrator nulls the steady-state lag a proportional-only controller leaves against a constant drift (tracking / polar-alignment error). 0 = pure proportional. Too high oscillates."
+            },
+            "deintgain": {
+                "type":"float",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "DEC integral gain",
+                "order":"04b",
+                "value":0.15,
+                "format": "9.999",
+                "min":0,
+                "max":2,
+                "hint": "Same as RA integral gain, for the DEC axis. 0 = pure proportional."
+            },
+            "intmax": {
+                "type":"float",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Integral clamp (px)",
+                "order":"04c",
+                "value":20,
+                "format": "999.9",
+                "min":0,
+                "max":500,
+                "hint": "Anti-windup: the integral accumulator is clamped to this magnitude (pixels). 0 disables the clamp."
             },
             "rmsOver": {
                 "type":"int",
@@ -395,6 +477,26 @@
                 "min":5,
                 "max":200,
                 "hint": "Cap on the brightest stars taken from each frame for matching"
+            },
+            "watchdog": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Hardware timeout (s)",
+                "order":"12",
+                "value":30,
+                "format": "999",
+                "min":0,
+                "max":600,
+                "hint": "Abort if the camera or mount stops responding for this long (exposure, pulse, frame reset, star extraction). 0 disables the watchdog."
+            },
+            "simflip": {
+                "type":"bool",
+                "autoupdate":true,
+                "label": "SIM: fake meridian flip",
+                "order":"13",
+                "value":false,
+                "hint": "Test aid only. Adds 180 deg to the calibration angle at guide start (the effect a real meridian flip has on the drift->RA/DEC mapping), so reverse-correction handling can be exercised against the CCD Simulator, which never rotates its own field. With this ON, stable guiding should require revRA AND revDE both ON. Leave OFF in real use."
             }
         }
     },

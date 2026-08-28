@@ -69,6 +69,15 @@ class MODULE_INIT Guider  : public IndiModule
         QList<FITSImage::Star> _prevStars;  ///< previous calibration frame (for the per-pulse increment)
         int _consecutiveMatchFail = 0;      ///< consecutive lost-correlation frames during guiding
 
+        QTimer _watchdog;                   ///< aborts if an INDI callback never comes back
+        bool _expectingFrame = false;       ///< true between an exposure request and its BLOB
+
+        // PI controller integral accumulators (pixels), reset at guide start / dither
+        double _intRA = 0;
+        double _intDE = 0;
+        bool   _intRAsat = false;           ///< RA pulse saturated last frame -> freeze the RA integrator
+        bool   _intDEsat = false;
+
         // ==================== Current Guiding Pulses (ms) ====================
         int _pulseN = 0;  ///< Pulse to send North (positive DEC)
         int _pulseS = 0;  ///< Pulse to send South (negative DEC)
@@ -82,17 +91,19 @@ class MODULE_INIT Guider  : public IndiModule
         double _decBacklashCorrection = 0;      ///< Correction-only portion (ms, before backlash was added) of that pulse
         double _decBacklashLastDriftDE = 0;     ///< DEC drift (px) measured just before that pulse was sent
 
-        // ==================== Calibration Results (pixels/ms per 1000ms pulse) ====================
-        double _calPulseN = 300;   ///< Calibration: ms per pixel pulse North
-        double _calPulseS = 300;   ///< Calibration: ms per pixel pulse South
-        double _calPulseE = 300;   ///< Calibration: ms per pixel pulse East
-        double _calPulseW = 300;   ///< Calibration: ms per pixel pulse West
-        double _calPulseRA = 0;    ///< Calibration: result for RA (unused currently)
-        double _calPulseDEC = 0;   ///< Calibration: result for DEC (unused currently)
+        // ==================== Calibration Results (ms per pixel) ====================
+        double _calPulseRA = 0;    ///< RA rate used for guiding (drift-cancelled, West-East combination)
+        double _calPulseDEC = 0;   ///< DEC rate used for guiding (North-South combination)
+        double _calPulseN = 300;   ///< raw per-direction rate, diagnostic only (still carries background drift)
+        double _calPulseS = 300;
+        double _calPulseE = 300;
+        double _calPulseW = 300;
+        double _calPassMean[4][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}}; ///< mean (ref-cur) increment per pass: 0=W 1=E 2=N 3=S
 
         // ==================== Calibration State Machine Variables ====================
         int _calState = 0;      ///< Calibration phase counter (0-2)
         int _calStep = 0;       ///< Current calibration pulse direction (0-7 for 4 directions × 2 iterations)
+        int _calRetry = 0;      ///< consecutive calibration attempts rejected for poor quality
         bool _pulseRAfinished = true;   ///< Flag: RA pulse completed on mount
         bool _pulseDECfinished = true;  ///< Flag: DEC pulse completed on mount
         bool _doDither = false;         ///< Flag: dither requested, apply on next ComputeGuide
@@ -139,6 +150,9 @@ class MODULE_INIT Guider  : public IndiModule
 
         /// @brief Build the star-tracker tuning from the live guideParams.
         startracker::Params trackParams();
+
+        void armWatchdog();     ///< start the hardware-response timeout (no-op if guideParams/watchdog == 0)
+        void disarmWatchdog();  ///< the awaited callback arrived
 
         // ==================== State Machine Builders ====================
         void buildInitStateMachines(void);          ///< Build _SMInit state machine
