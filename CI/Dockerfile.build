@@ -1,0 +1,44 @@
+# OST build environment: toolchain + Qt6 + INDI/XISF/GSC, one image per Ubuntu
+# series. Built and pushed by CI/ci-images.yml, consumed by build-job-* and
+# test-job-* in .gitlab-ci.yml as $CI_REGISTRY_IMAGE/ci-build:<series>.
+#
+# Local build:
+#   docker build -f CI/Dockerfile.build \
+#     --build-arg UBUNTU_VERSION=24.04 \
+#     --build-arg INDI_DEPS_TAR=indi-deps-noble.tar \
+#     -t gitlab.ostserver.fr:5050/ost/ostserver/ci-build:24.04 CI/
+#
+# INDI, XISF and GSC come from a pre-built .deb bundle in this project's generic
+# package registry (salvaged from ppa:mutlaqja/ppa, which stopped publishing for
+# anything but 26.04 in August 2026). apt pulls the remaining runtime
+# dependencies from the Ubuntu "universe" pocket.
+
+ARG UBUNTU_VERSION=24.04
+FROM ubuntu:${UBUNTU_VERSION}
+
+# Per-series bundle: indi-deps-jammy.tar / indi-deps-noble.tar / indi-deps-resolute.tar
+ARG INDI_DEPS_TAR=indi-deps-noble.tar
+ARG INDI_DEPS_URL=https://gitlab.ostserver.fr/api/v4/projects/1/packages/generic/indi-deps/2.2.4
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# OST build dependencies - kept in sync with what CI/CI-build.sh used to install.
+RUN apt-get update && apt-get install -y \
+        build-essential cmake git npm file dpkg-dev ca-certificates wget \
+        qt6-base-dev qt6-websockets-dev qt6-scxml-dev qt6-tools-dev-tools \
+        libnova-dev libgsl-dev wcslib-dev libcfitsio-dev \
+        libavahi-client-dev libavahi-common-dev \
+        zlib1g-dev libeigen3-dev libraw-dev libsecret-1-dev libopencv-dev \
+        extra-cmake-modules \
+ && rm -rf /var/lib/apt/lists/*
+
+# INDI + XISF + GSC from the salvaged bundle (+ universe for the rest).
+RUN cd /tmp \
+ && wget -q "${INDI_DEPS_URL}/${INDI_DEPS_TAR}" \
+ && tar xf "${INDI_DEPS_TAR}" \
+ && apt-get update \
+ && apt-get install -y ./indi-deps/*.deb \
+ && rm -rf "/tmp/${INDI_DEPS_TAR}" /tmp/indi-deps /var/lib/apt/lists/*
+
+# Fail the image build if INDI did not land properly.
+RUN dpkg --compare-versions "$(dpkg-query -W -f='${Version}' libindi-dev)" ge "2.0~"

@@ -1,15 +1,14 @@
 #!/bin/bash
 #
 # CI - test job
-# Requires: DEB_FILE_LATEST artifact from build-job
+# Requires: DEB_FILE_LATEST artifact from build-job.
+#
+# The CI image ($CI_REGISTRY_IMAGE/ci-build:<series>) already provides
+# indiserver + drivers (indi-bin), GSC and node/npm.
 #
 set -e
 
 apt-get update -qq
-apt-get install -y software-properties-common nodejs npm
-apt-add-repository ppa:mutlaqja/ppa
-apt-get update -qq
-apt-get install -y libindi1
 dpkg -i "${DEB_FILE_LATEST}" || true
 apt-get install -f -y
 
