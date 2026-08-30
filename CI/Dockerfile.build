@@ -23,13 +23,21 @@ ARG INDI_DEPS_URL=https://gitlab.ostserver.fr/api/v4/projects/1/packages/generic
 ENV DEBIAN_FRONTEND=noninteractive
 
 # OST build dependencies - kept in sync with what CI/CI-build.sh used to install.
+# Qt6 module packages were renamed between 22.04 (libqt6<mod>6-dev) and 24.04+
+# (qt6-<mod>-dev), so the Qt list is chosen from the running series.
 RUN apt-get update && apt-get install -y \
         build-essential cmake git npm file dpkg-dev ca-certificates wget \
-        qt6-base-dev qt6-websockets-dev qt6-scxml-dev qt6-tools-dev-tools \
+        qt6-base-dev qt6-tools-dev-tools \
         libnova-dev libgsl-dev wcslib-dev libcfitsio-dev \
         libavahi-client-dev libavahi-common-dev \
         zlib1g-dev libeigen3-dev libraw-dev libsecret-1-dev libopencv-dev \
         extra-cmake-modules \
+ && . /etc/os-release \
+ && if dpkg --compare-versions "$VERSION_ID" lt 24.04; then \
+        apt-get install -y libqt6websockets6-dev libqt6scxml6-dev ; \
+    else \
+        apt-get install -y qt6-websockets-dev qt6-scxml-dev ; \
+    fi \
  && rm -rf /var/lib/apt/lists/*
 
 # INDI + XISF + GSC from the salvaged bundle (+ universe for the rest).
