@@ -30,7 +30,7 @@ find_package(ZLIB REQUIRED)
 find_package(Threads REQUIRED)
 find_package(Nova REQUIRED)
 find_package(GSL REQUIRED)
-#find_package(OpenCV REQUIRED )
+find_package(OpenCV REQUIRED)
 find_package(WCSLIB REQUIRED)
 find_package(QT NAMES Qt6 COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql Scxml StateMachine Xml REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui Widgets Core Concurrent Network WebSockets Sql Scxml StateMachine Xml)
@@ -414,6 +414,8 @@ target_compile_definitions(ostsequencer PRIVATE SEQUENCER_MODULE)
 add_library(ostguider SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/guider.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/guider.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/startracker.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/startracker.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/guider/guider.qrc
 )
 target_link_libraries(ostguider PRIVATE
@@ -433,12 +435,14 @@ add_library(ostinspector SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/inspector/inspector.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/inspector/inspector.qrc
 )
+target_include_directories(ostinspector PRIVATE ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(ostinspector PRIVATE
     ostindimodule
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Widgets
     Threads::Threads
+    ${OpenCV_LIBS}
     z
 )
 target_compile_definitions(ostinspector PRIVATE INSPECTOR_MODULE)
