@@ -47,18 +47,16 @@ build-job-2404:
   stage: build
   image: $CI_REGISTRY_IMAGE/ci-build:24.04
   variables:
-    DEB_FILE_LATEST: "ostserver_latest_amd64.deb"
-    DEB_FILE_TAG: "ostserver_${CI_COMMIT_TAG}_amd64.deb"
-    DEB_FILE_DEV_LATEST: "ostserver-dev_latest_amd64.deb"
-    DEB_FILE_DEV_TAG: "ostserver-dev_${CI_COMMIT_TAG}_amd64.deb"
+    DEB_FILE_LATEST: "ostserver_latest_2404_amd64.deb"
+    DEB_FILE_TAG: "ostserver_${CI_COMMIT_TAG}_2404_amd64.deb"
+    DEB_FILE_DEV_LATEST: "ostserver-dev_latest_2404_amd64.deb"
+    DEB_FILE_DEV_TAG: "ostserver-dev_${CI_COMMIT_TAG}_2404_amd64.deb"
   script:
     - ./CI/CI-build.sh
   artifacts:
     paths:
-      - "ostserver_latest_amd64.deb"
-      - "ostserver_*_amd64.deb"
-      - "ostserver-dev_latest_amd64.deb"
-      - "ostserver-dev_*_amd64.deb"
+      - "ostserver_*_2404_amd64.deb"
+      - "ostserver-dev_*_2404_amd64.deb"
     expire_in: 4 week
   allow_failure: true
   <<: *build-rules
@@ -103,7 +101,7 @@ test-job-2404:
   dependencies:
     - build-job-2404
   variables:
-    DEB_FILE_LATEST: "ostserver_latest_amd64.deb"
+    DEB_FILE_LATEST: "ostserver_latest_2404_amd64.deb"
   script:
     - ./CI/CI-test.sh
   artifacts:
