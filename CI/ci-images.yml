@@ -1,0 +1,40 @@
+# Build the per-series OST build images and push them to this project's
+# container registry. Runs only when a pipeline is started with the variable
+# BUILD_CI_IMAGES = true  (Pipelines -> Run pipeline -> Variables). Normal
+# push / merge-request pipelines are unaffected.
+#
+# Produces $CI_REGISTRY_IMAGE/ci-build:{22.04,24.04,26.04}.
+# Note: Ubuntu 22.04 ships Qt6 6.2 - build-job-2204 is allow_failure until
+# confirmed OST compiles against it.
+#
+# Rebuild after editing CI/Dockerfile.build or bumping the indi-deps bundle
+# version referenced in it.
+#
+# Kaniko is used so no docker-in-docker / privileged runner is required.
+
+build-ci-image:
+  stage: images
+  image:
+    name: gcr.io/kaniko-project/executor:v1.23.2-debug
+    entrypoint: [""]
+  rules:
+    - if: '$BUILD_CI_IMAGES == "true"'
+  parallel:
+    matrix:
+      - SERIES: "22.04"
+        INDI_DEPS_TAR: "indi-deps-jammy.tar"
+      - SERIES: "24.04"
+        INDI_DEPS_TAR: "indi-deps-noble.tar"
+      - SERIES: "26.04"
+        INDI_DEPS_TAR: "indi-deps-resolute.tar"
+  script:
+    - mkdir -p /kaniko/.docker
+    - |
+      echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf '%s:%s' "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+    - >-
+      /kaniko/executor
+      --context "${CI_PROJECT_DIR}/CI"
+      --dockerfile "${CI_PROJECT_DIR}/CI/Dockerfile.build"
+      --build-arg "UBUNTU_VERSION=${SERIES}"
+      --build-arg "INDI_DEPS_TAR=${INDI_DEPS_TAR}"
+      --destination "${CI_REGISTRY_IMAGE}/ci-build:${SERIES}"
