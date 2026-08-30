@@ -15,7 +15,7 @@
 # Kaniko is used so no docker-in-docker / privileged runner is required.
 
 build-ci-image:
-  stage: .pre
+  stage: images
   image:
     name: gcr.io/kaniko-project/executor:v1.23.2-debug
     entrypoint: [""]

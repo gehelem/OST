@@ -2,6 +2,7 @@ include:
   - local: CI/ci-images.yml
 
 stages:
+  - images
   - build
   - test
 #  - upload
