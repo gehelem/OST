@@ -2,22 +2,16 @@
 #
 # CI - build job
 #
+# The build environment (toolchain, Qt6, INDI/XISF/GSC) is pre-baked in the
+# image $CI_REGISTRY_IMAGE/ci-build:<series>, built from CI/Dockerfile.build by
+# CI/ci-images.yml. Nothing is installed here anymore.
+#
 set -e
-apt-get update
-apt-get clean
-apt-get install -y software-properties-common
-apt-add-repository ppa:mutlaqja/ppa
-apt-get update
-apt-get install -y build-essential cmake git npm file dpkg-dev \
-    qt6-base-dev qt6-websockets-dev qt6-scxml-dev qt6-tools-dev-tools \
-    libindi-dev libnova-dev libgsl-dev \
-    wcslib-dev libcfitsio-dev libavahi-client-dev libavahi-common-dev \
-    zlib1g-dev libeigen3-dev libraw-dev libsecret-1-dev libopencv-dev \
-    extra-cmake-modules
 
+# Fail early if the image is stale / missing INDI.
 INDI_VERSION=$(dpkg-query -W -f='${Version}' libindi-dev)
 if ! dpkg --compare-versions "${INDI_VERSION}" ge "2.0~"; then
-    echo "ERROR: libindi-dev ${INDI_VERSION} is older than 2.0 (ppa:mutlaqja/ppa may not be publishing for this Ubuntu series right now, falling back to the outdated archive package)." >&2
+    echo "ERROR: libindi-dev ${INDI_VERSION} is older than 2.0 - CI image out of date?" >&2
     exit 1
 fi
 
