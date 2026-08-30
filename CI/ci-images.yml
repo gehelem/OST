@@ -3,11 +3,9 @@
 # BUILD_CI_IMAGES = true  (Pipelines -> Run pipeline -> Variables). Normal
 # push / merge-request pipelines are unaffected.
 #
-# Produces:
-#   $CI_REGISTRY_IMAGE/ci-build:24.04
-#   $CI_REGISTRY_IMAGE/ci-build:26.04
-#   ($CI_REGISTRY_IMAGE/ci-build:22.04 - see the commented matrix entry;
-#    Ubuntu 22.04 ships Qt6 6.2, which may be too old for OST.)
+# Produces $CI_REGISTRY_IMAGE/ci-build:{22.04,24.04,26.04}.
+# Note: Ubuntu 22.04 ships Qt6 6.2 - build-job-2204 is allow_failure until
+# confirmed OST compiles against it.
 #
 # Rebuild after editing CI/Dockerfile.build or bumping the indi-deps bundle
 # version referenced in it.
@@ -23,12 +21,12 @@ build-ci-image:
     - if: '$BUILD_CI_IMAGES == "true"'
   parallel:
     matrix:
+      - SERIES: "22.04"
+        INDI_DEPS_TAR: "indi-deps-jammy.tar"
       - SERIES: "24.04"
         INDI_DEPS_TAR: "indi-deps-noble.tar"
       - SERIES: "26.04"
         INDI_DEPS_TAR: "indi-deps-resolute.tar"
-      # - SERIES: "22.04"
-      #   INDI_DEPS_TAR: "indi-deps-jammy.tar"
   script:
     - mkdir -p /kaniko/.docker
     - |
