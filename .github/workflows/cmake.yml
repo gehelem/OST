@@ -6,23 +6,37 @@ on:
   pull_request:
     branches: [ "main", "release" ]
 
+permissions:
+  contents: write        # create / update the "latest" release
+
 env:
   BUILD_TYPE: Release
+  DEB_RUNTIME: ostserver_latest_2604_amd64.deb
+  DEB_DEV: ostserver-dev_latest_2604_amd64.deb
 
 jobs:
   build:
-    # Minimal presence build. Ubuntu 26.04 is the only series ppa:mutlaqja/ppa
-    # still publishes INDI for; the full per-series matrix lives in GitLab CI.
+    # Minimal presence build on 26.04 (the only series ppa:mutlaqja/ppa still
+    # publishes INDI for). The full per-series matrix lives in GitLab CI.
     runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: Install dependencies
+      - name: Add ppa:mutlaqja/ppa
         run: |
           sudo add-apt-repository -y ppa:mutlaqja/ppa
-          sudo apt-get update
+          echo "--- PPA source file(s) ---"
+          grep -rH . /etc/apt/sources.list.d/ | grep -i mutlaqja || true
+          # --error-on=any: fail loudly if the PPA (or any repo) can't be fetched
+          # instead of silently falling back to universe.
+          sudo apt-get update --error-on=any
+          echo "--- libindi-dev candidates ---"
+          apt-cache policy libindi-dev
+
+      - name: Install dependencies
+        run: |
           sudo apt-get install -y \
             build-essential cmake git file dpkg-dev \
             qt6-base-dev qt6-websockets-dev qt6-scxml-dev qt6-tools-dev-tools \
@@ -31,12 +45,41 @@ jobs:
             zlib1g-dev libeigen3-dev libraw-dev libsecret-1-dev libopencv-dev \
             extra-cmake-modules
 
+      - name: Check INDI version
+        run: |
+          v=$(dpkg-query -W -f='${Version}' libindi-dev)
+          echo "libindi-dev $v"
+          dpkg --compare-versions "$v" ge "2.0~" || {
+            echo "::error::libindi-dev $v (< 2.0) - ppa:mutlaqja/ppa did not provide a package for this series (fell back to universe)"
+            exit 1
+          }
+
       - name: Configure CMake
-        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        run: cmake -B build -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_INSTALL_PREFIX=/usr
 
       - name: Build
-        run: cmake --build ${{github.workspace}}/build -j$(nproc)
+        run: cmake --build build -j$(nproc)
 
       - name: Test
-        working-directory: ${{github.workspace}}/build
+        working-directory: build
         run: ctest --output-on-failure --no-tests=ignore
+
+      - name: Package
+        run: |
+          cd build
+          cpack -G DEB
+          cp "$(ls ostserver_*_amd64.deb | head -1)" "$DEB_RUNTIME"
+          cp "$(ls ostserver-dev_*_amd64.deb | head -1)" "$DEB_DEV"
+          ls -l "$DEB_RUNTIME" "$DEB_DEV"
+
+      - name: Release "latest"
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: latest
+          prerelease: true
+          body: "Rolling build of the default branch. Ubuntu 26.04 only - see GitLab for the full set."
+          files: |
+            build/${{ env.DEB_RUNTIME }}
+            build/${{ env.DEB_DEV }}
