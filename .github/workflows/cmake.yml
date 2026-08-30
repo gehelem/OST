@@ -16,28 +16,32 @@ env:
 
 jobs:
   build:
-    # Minimal presence build on 26.04 (the only series ppa:mutlaqja/ppa still
-    # publishes INDI for). The full per-series matrix lives in GitLab CI.
-    runs-on: ubuntu-26.04
+    # Minimal presence build. Runs inside a plain ubuntu:26.04 container (not the
+    # amd64v3 hosted runner) so ppa:mutlaqja/ppa - which only publishes amd64 -
+    # resolves normally, exactly like a real install. Full matrix is on GitLab.
+    runs-on: ubuntu-latest
+    container: ubuntu:26.04
     steps:
+      - name: Base tools
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            ca-certificates git wget software-properties-common
+
       - uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - name: Add ppa:mutlaqja/ppa
         run: |
-          sudo add-apt-repository -y ppa:mutlaqja/ppa
-          echo "--- PPA source file(s) ---"
-          grep -rH . /etc/apt/sources.list.d/ | grep -i mutlaqja || true
-          # --error-on=any: fail loudly if the PPA (or any repo) can't be fetched
-          # instead of silently falling back to universe.
-          sudo apt-get update --error-on=any
+          add-apt-repository -y ppa:mutlaqja/ppa
+          apt-get update --error-on=any
           echo "--- libindi-dev candidates ---"
           apt-cache policy libindi-dev
 
       - name: Install dependencies
         run: |
-          sudo apt-get install -y \
+          apt-get install -y \
             build-essential cmake git file dpkg-dev \
             qt6-base-dev qt6-websockets-dev qt6-scxml-dev qt6-tools-dev-tools \
             libindi-dev libnova-dev libgsl-dev wcslib-dev libcfitsio-dev \
@@ -50,7 +54,7 @@ jobs:
           v=$(dpkg-query -W -f='${Version}' libindi-dev)
           echo "libindi-dev $v"
           dpkg --compare-versions "$v" ge "2.0~" || {
-            echo "::error::libindi-dev $v (< 2.0) - ppa:mutlaqja/ppa did not provide a package for this series (fell back to universe)"
+            echo "::error::libindi-dev $v (< 2.0) - ppa:mutlaqja/ppa did not provide a package for this series"
             exit 1
           }
 
