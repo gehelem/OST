@@ -31,6 +31,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+          fetch-depth: 0        # full history: the version string is derived from git
 
       - name: Add ppa:mutlaqja/ppa
         run: |
@@ -71,9 +72,10 @@ jobs:
       - name: Package
         run: |
           cd build
-          cpack -G DEB
-          cp "$(ls ostserver_*_amd64.deb | head -1)" "$DEB_RUNTIME"
-          cp "$(ls ostserver-dev_*_amd64.deb | head -1)" "$DEB_DEV"
+          cpack -G DEB -D CPACK_DEBIAN_PACKAGE_ARCHITECTURE=amd64
+          cp "$(ls ostserver_*.deb | head -1)" "$DEB_RUNTIME"
+          cp "$(ls ostserver-dev_*.deb | head -1)" "$DEB_DEV"
+          dpkg-deb -f "$DEB_RUNTIME" Package Version Architecture
           ls -l "$DEB_RUNTIME" "$DEB_DEV"
 
       - name: Release "latest"
