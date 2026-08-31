@@ -23,10 +23,15 @@ rpm-poc:
     - rpm -q libindi-devel qt6-qtbase-devel cfitsio-devel
     - cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
     - cmake --build build -j$(nproc)
-    - cd build && cpack -G RPM
+    - cd build
+    - >-
+      cpack -G RPM
+      -D CPACK_RPM_COMPONENT_INSTALL=ON
+      -D CPACK_RPM_RUNTIME_PACKAGE_NAME=ostserver
+      -D CPACK_RPM_DEVELOPMENT_PACKAGE_NAME=ostserver-devel
+      -D CPACK_RPM_PACKAGE_URL=https://gitlab.ostserver.fr/ost/ostserver/
     - echo "=== produced ===" && ls -l *.rpm
-    - echo "=== metadata ===" && rpm -qpi *.rpm
-    - echo "=== payload (ostserver) ===" && rpm -qpl ostserver-*.rpm
+    - for f in *.rpm; do echo "=== $f ==="; rpm -qpi "$f"; echo "--- requires ---"; rpm -qp --requires "$f"; echo "--- payload ---"; rpm -qpl "$f"; done
   artifacts:
     paths:
       - "build/*.rpm"
