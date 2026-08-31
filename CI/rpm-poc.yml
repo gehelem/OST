@@ -1,0 +1,33 @@
+# RPM proof-of-concept. Runs only when a pipeline is started with the variable
+# BUILD_RPM_POC = true. Plain fedora container, no prebuilt image yet - iterate
+# on the dnf list / cpack config here, then bake it into a CI/Dockerfile.build.rpm
+# once it is green.
+
+rpm-poc:
+  stage: build
+  image: fedora:latest
+  variables:
+    GIT_DEPTH: "0"      # the version string is derived from git history
+  rules:
+    - if: '$BUILD_RPM_POC == "true"'
+  allow_failure: true
+  script:
+    - |
+      dnf -y install \
+        gcc-c++ make cmake git file rpm-build \
+        qt6-qtbase-devel qt6-qtwebsockets-devel qt6-qtscxml-devel qt6-qttools-devel \
+        mesa-libGL-devel \
+        libindi-devel libnova-devel gsl-devel wcslib-devel cfitsio-devel \
+        avahi-devel zlib-devel eigen3-devel LibRaw-devel libsecret-devel opencv-devel \
+        extra-cmake-modules nodejs npm
+    - rpm -q libindi-devel qt6-qtbase-devel cfitsio-devel
+    - cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
+    - cmake --build build -j$(nproc)
+    - cd build && cpack -G RPM
+    - echo "=== produced ===" && ls -l *.rpm
+    - echo "=== metadata ===" && rpm -qpi *.rpm
+    - echo "=== payload (ostserver) ===" && rpm -qpl ostserver-*.rpm
+  artifacts:
+    paths:
+      - "build/*.rpm"
+    expire_in: 1 week

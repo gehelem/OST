@@ -1,5 +1,6 @@
 include:
   - local: CI/ci-images.yml
+  - local: CI/rpm-poc.yml
 
 stages:
   - images
