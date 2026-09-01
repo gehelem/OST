@@ -100,7 +100,7 @@
                 "order":"05",
                 "value": 0,
                 "format": "9.9999",
-                "hint": "display only; needs the mount guide rate to be known"
+                "hint": "sidereal_rate / V from step 1 (15.041 arcsec/s divided by the measured drift px/s). Independent of the microscope optics"
             },
             "guideRateK": {
                 "type":"float",

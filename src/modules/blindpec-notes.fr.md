@@ -478,17 +478,25 @@ Hypothèse : **la monture suit au sidéral** pendant toute la calibration.
    `calParams/chardur` s (défaut 60 ; « quelques dizaines de s » = `V` grossier,
    ≥ 1 période de ver = `V` propre). `fitDriftLine()` = pentes MCO de `x(t)` et
    `y(t)` → **`θ` = `atan2(sy, sx)`** (orientation de l'axe AD dans l'image) et
-   **`V` = `hypot(sx, sy)`** (px/s). Le résidu autour de la droite = la courbe de
-   PE (pas encore exploité). Persiste `V`, `theta`.
+   **`V` = `hypot(sx, sy)`** (px/s).
+   **Échelle** : l'axe AD tourne au taux sidéral (~15,041 arcsec/s *de rotation
+   d'axe*), donc **`arcsecPerPx = 15,041 / V`**. C'est la **seule** source de
+   l'échelle — aucune focale / grandissement / taux de guidage monture : tout ça
+   est déjà encapsulé dans `V` (px/s). Ex. 30 px en 10 s → `V = 3 px/s` →
+   `150 arcsec / 30 px = 5 arcsec/px` (diviser par les **pixels**, pas les
+   secondes). Le résidu autour de la droite = courbe de PE (pas encore exploité).
+   Persiste `V`, `theta`, `arcsecPerPx`.
 2. **PhGainCal (étape 2)** — `calsteps` pulses W **et** `calsteps` pulses E,
    alternés. Pour chaque pulse : `effet = Δp_proj − V·Δτ` (projection sur `θ`,
    dérive sidérale retirée grâce à `V`). `moveW = moy(effetsW)`,
    `moveE = moy(effetsE)` (signes opposés). `Gpx = (|moveW|+|moveE|)/2` →
-   **`G = calpulse / Gpx`** (ms/px), **`wDir = signe(moveW)`**,
-   `arcsecPerPx = (k·15.04·calpulse/1000) / Gpx`. Warning si asymétrie
-   `|moveW|` vs `|moveE|` > 50 % (backlash ou `V` faux). Persiste `G`, `wdir`,
-   `arcsecPerPx`, `guideRateK`. Bouton *calibrate* : s'arrête ici. `guide` avec
-   `G` déjà stocké : saute cette étape (mais refait toujours l'étape 1).
+   **`G = calpulse / Gpx`** (ms/px), **`wDir = signe(moveW)`**. Warning si
+   asymétrie `|moveW|` vs `|moveE|` > 50 % (backlash ou `V` faux). Le taux de
+   guidage monture `k` (`GUIDE_RATE`, fallback 0,5) ne sert **plus qu'à un log de
+   contrôle croisé** (px/pulse mesuré vs attendu), pas au calcul. Persiste `G`,
+   `wdir`, `guideRateK`. Bouton *calibrate* : s'arrête ici. `guide` avec `G` déjà
+   stocké : saute cette étape (mais refait toujours l'étape 1 → `θ`, `V`, échelle
+   re-mesurés).
 3. **PhGuide** — mesure projetée sur `θ` : `p = projRA`, `cross = projCross`
    (signal de santé). `résidu = p − V·t`. Dither RA seul en biais de consigne ;
    `blankframes` après un pulse ; **`V` adaptatif** (`alphaV`) ; P+I(+D) → effort

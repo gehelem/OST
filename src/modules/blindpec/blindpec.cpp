@@ -531,17 +531,26 @@ void BlindPec::computeCharacterize()
 
     fitDriftLine();
 
+    // Scale from the drift alone: the RA axis turns at the sidereal rate
+    // (~15.04 arcsec/s of axis rotation), so arcsec/px = sidereal_rate / V.
+    // This is the ONLY thing that sets the scale - no optics / focal length /
+    // magnification / mount guide rate involved (they are all already folded into
+    // the measured V in px/s).
+    if (_V > 1e-6)
+        _arcsecPerPx = SIDEREAL_ARCSEC_PER_S / _V;
+
     const double dTot = std::hypot(_charX.back() - _charX.front(), _charY.back() - _charY.front());
-    logInfo("Characterization: %1 frames over %2 s, image moved %3 px -> theta=%4 deg, V=%5 px/s (%6 arcsec/s)",
+    logInfo("Characterization: %1 frames over %2 s, image moved %3 px -> theta=%4 deg, V=%5 px/s, scale=%6 arcsec/px",
     {
         QString::number(_charFrames), QString::number(span, 'f', 1), QString::number(dTot, 'f', 2),
         QString::number(_theta * 180.0 / M_PI, 'f', 1), QString::number(_V, 'f', 4),
-        QString::number(_V * _arcsecPerPx, 'f', 3)
+        QString::number(_arcsecPerPx, 'f', 3)
     });
     if (_V < 1e-3)
         logWarning("Drift rate V is ~0: is the mount tracking? is the microscope on a "
                    "moving surface? Calibration / guiding will do nothing useful.");
     getEltFloat("calibrationvalues", "V")->setValue(_V);
+    getEltFloat("calibrationvalues", "arcsecPerPx")->setValue(_arcsecPerPx);
     getEltFloat("calibrationvalues", "theta")->setValue(_theta * 180.0 / M_PI, true);
 
     if (_skipGainCal)
@@ -635,23 +644,34 @@ void BlindPec::computeGainCal()
 
     _G    = calpulse / gpx;                       // ms per px
     _wDir = (mW >= 0.0) ? +1 : -1;
-    _arcsecPerPx = (_guideRateK * SIDEREAL_ARCSEC_PER_S * calpulse / 1000.0) / gpx;
 
     const double asym = std::fabs(std::fabs(mW) - std::fabs(mE)) / gpx;
-    logInfo("Gain: G=%1 ms/px | wDir=%2 | W=%3 E=%4 px/pulse | asym %5%% | scale %6 arcsec/px (rate %7x)",
+    logInfo("Gain: G=%1 ms/px | wDir=%2 | W=%3 E=%4 px/pulse | asym %5%%",
     {
         QString::number(_G, 'f', 2), QString::number(_wDir),
         QString::number(mW, 'f', 2), QString::number(mE, 'f', 2),
-        QString::number(asym * 100.0, 'f', 0),
-        QString::number(_arcsecPerPx, 'f', 4), QString::number(_guideRateK, 'f', 2)
+        QString::number(asym * 100.0, 'f', 0)
     });
     if (asym > 0.5)
         logWarning("Gain calibration: W and E effects differ by %1%% - possible backlash "
                    "or a wrong V. Guiding may be rough.", {QString::number(asym * 100.0, 'f', 0)});
 
+    // Cross-check only (the scale itself comes from step 1): a calpulse-ms pulse
+    // at k x sidereal should move the axis by k*15.04*calpulse/1000 arcsec, i.e.
+    // that / arcsecPerPx px. Compare to what we measured.
+    if (_arcsecPerPx > 1e-6)
+    {
+        const double expectPx = (_guideRateK * SIDEREAL_ARCSEC_PER_S * calpulse / 1000.0) / _arcsecPerPx;
+        logInfo("Gain cross-check: measured %1 px/pulse vs %2 expected at guide rate %3x (%4%% off)",
+        {
+            QString::number(gpx, 'f', 2), QString::number(expectPx, 'f', 2),
+            QString::number(_guideRateK, 'f', 2),
+            QString::number(expectPx > 1e-6 ? 100.0 * (gpx - expectPx) / expectPx : 0.0, 'f', 0)
+        });
+    }
+
     getEltFloat("calibrationvalues", "G")->setValue(_G);
     getEltInt("calibrationvalues", "wdir")->setValue(_wDir);
-    getEltFloat("calibrationvalues", "arcsecPerPx")->setValue(_arcsecPerPx);
     getEltFloat("calibrationvalues", "guideRateK")->setValue(_guideRateK, true);
 
     if (_stopAfterGainCal)
