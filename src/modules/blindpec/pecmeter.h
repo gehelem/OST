@@ -26,9 +26,14 @@ namespace pecmeter
 struct Params
 {
     bool   hann         = true;  ///< apply a Hann window before correlation (kills edge wrap-around)
+    double preBlur      = 1.0;   ///< Gaussian sigma (px) applied before correlation; 0 = off. A little blur cuts pixel-locking
+    bool   eccRefine    = true;  ///< refine the sub-pixel shift with findTransformECC (interpolation-based, low pixel-locking)
+    int    eccIters     = 60;    ///< ECC max iterations
+    double eccEps       = 1e-4;  ///< ECC convergence epsilon (on the correlation coefficient)
+    int    eccGaussFilt = 5;     ///< ECC internal Gaussian kernel size (images + gradients); larger = smoother, less pixel-locking
     double reanchorFrac  = 0.35; ///< re-anchor once |shift vs anchor| exceeds this * min(w,h)/2
     double maxStepPx     = 40.0; ///< reject a frame whose move since the last accepted one exceeds this (vibration / glitch)
-    double minResponse   = 0.10; ///< phaseCorrelate response below this -> frame not trusted
+    double minResponse   = 0.10; ///< correlation response below this -> frame not trusted (ECC coeff when eccRefine, else phaseCorrelate response)
 };
 
 struct Sample
@@ -38,6 +43,8 @@ struct Sample
     double y          = 0;      ///< cumulative displacement along image Y since reset(), px
     double stepX      = 0;      ///< move along X since the previous accepted frame, px
     double stepY      = 0;      ///< move along Y since the previous accepted frame, px
+    double shiftX     = 0;      ///< raw phaseCorrelate shift vs the current anchor, px (for pixel-locking diagnosis)
+    double shiftY     = 0;
     double response   = 0;      ///< phaseCorrelate response (peak sharpness / confidence)
     bool   reanchored = false;  ///< this frame dropped a fresh anchor
 };
@@ -69,7 +76,8 @@ class Meter
         void dropAnchor(const cv::Mat &f32, double originX, double originY);
 
         Params  _params;
-        cv::Mat _anchor;        ///< CV_32F reference frame (already windowed if hann)
+        cv::Mat _anchor;        ///< CV_32F reference frame (already windowed if hann), for phaseCorrelate
+        cv::Mat _anchorRaw;     ///< CV_32F reference frame, un-windowed, for ECC
         cv::Mat _hannWin;       ///< cached Hann window for the working size
         cv::Size _size {0, 0};  ///< working frame size (0,0 until first frame)
 

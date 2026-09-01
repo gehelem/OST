@@ -100,6 +100,7 @@ class MODULE_INIT BlindPec : public IndiModule
         double                 _measX = 0;            ///< cumulative displacement, image X (px)
         double                 _measY = 0;            ///< cumulative displacement, image Y (cross axis, px)
         double                 _measResp = 0;         ///< last correlation response
+        double                 _shiftX = 0, _shiftY = 0; ///< last raw phaseCorrelate shift vs anchor (pixel-locking diag)
         bool                   _measOk = false;
         bool                   _reanchored = false;
         int                    _consecutiveBad = 0;   ///< consecutive untrusted frames
@@ -114,7 +115,8 @@ class MODULE_INIT BlindPec : public IndiModule
         enum Phase { PhInit, PhCharacterize, PhGainCal, PhGuide };
         Phase _phase = PhInit;
         bool  _calibrateOnly    = false;               ///< "calibrate" button pressed
-        bool  _skipGainCal      = false;               ///< reuse a stored gain (guide with existing calibration)
+        bool  _skipChar         = false;               ///< reuse a full stored calibration -> straight to guiding
+        bool  _skipGainCal      = false;               ///< reuse a stored gain
         bool  _stopAfterGainCal = false;               ///< calibration-only run
         bool  _finishOk         = false;               ///< SMAbort reached from a clean finish, not an abort
 
@@ -137,6 +139,7 @@ class MODULE_INIT BlindPec : public IndiModule
         double _charFitRmsPerp  = 0;                   ///< free-run fit residual perpendicular (px) - should be small
         double _charPPAlong     = 0;                   ///< free-run along-axis residual peak-to-peak (px) = PE p2p over the window
         std::vector<double> _charResidAlong;           ///< per-sample along-axis residual (px), parallel to _charT
+        std::vector<double> _charShiftFrac;            ///< per-sample frac(shift vs anchor) (px) - pixel-locking diag
         void   fitDriftLine();                         ///< (_charT,_charX,_charY) -> _theta, _V, fit residuals + PE curve
 
         // ---- step 2: pulse gain calibration ----

@@ -248,12 +248,28 @@ Conséquences :
 3. Texture (features 3–10 px ≈ optimal), éclairage stable, filé / rolling shutter
    (planchers mineurs).
 
-### Reco
+### Pixel-locking — constaté sur le banc (22:22), corrigé
 
-- **Primaire : `phaseCorrelate`** (Hann), subpixel natif, rapide (FFT),
-  `response` pour le gating.
-- **Validateur bring-up : `findTransformECC`** `MOTION_TRANSLATION`, comparer sur
-  images réelles.
+Le sous-pixel de `phaseCorrelate` = **centroïde pondéré 5×5** du pic de
+corrélation → **biais en S (peak-locking)**, fonction de la partie fractionnaire
+du décalage, période 1 px. Comme le décalage vs l'ancre croît de ~1 px/frame, ce
+biais **change de signe à chaque frame** → créneau alterné ±0,25 px. Sur la
+courbe PE `observeonly` : `-2,13 / +1,38 / -2,73 / +1,29 …` une frame sur deux.
+La vraie PE de la monture (±20") est **complètement noyée** à ce timescale. Le
+« peak-to-peak 0,85 px » mesuré = uniquement l'artefact.
+
+**Correctif appliqué** (`pecmeter`, commit à venir) :
+1. **pré-flou gaussien** `guideParams/preblur` (σ défaut 1 px) — élargit le pic,
+   coupe le pixel-locking de tout centroïde ;
+2. `phaseCorrelate` ne sert plus qu'au **décalage grossier** (amorce) ;
+3. **`cv::findTransformECC` `MOTION_TRANSLATION`** amorcé avec ce décalage → sous-
+   pixel par optimisation d'un critère continu + interpolation bilinéaire →
+   biais en S bien plus doux. `response` = coeff. ECC ∈ [0,1]. `guideParams/eccrefine`
+   (défaut on) pour revenir à `phaseCorrelate` seul. ECC reçoit les images **non
+   fenêtrées** (pas de FFT → pas de wrap-around → le Hann le gênerait).
+4. Fallback `phaseCorrelate` si ECC diverge.
+
+Si insuffisant → DFT sur-échantillonnée (Guizar-Sicairos), remède lourd.
 - `matchTemplate` + `CV_SubPix` gardé seulement si compétitif au bench — alors
   `TM_CCOEFF_NORMED` + upsampling ×4–8 de la ROI avant le fit.
 - **Mesurer le plancher réel** : axe bloqué, 500 frames, RMS du déplacement
@@ -502,13 +518,26 @@ Hypothèse : **la monture suit au sidéral** pendant toute la calibration.
    asymétrie `|moveW|` vs `|moveE|` > 50 % (backlash ou `V` faux). Le taux de
    guidage monture `k` (`GUIDE_RATE`, fallback 0,5) ne sert **plus qu'à un log de
    contrôle croisé** (px/pulse mesuré vs attendu), pas au calcul. Persiste `G`,
-   `wdir`, `guideRateK`. Bouton *calibrate* : s'arrête ici. `guide` avec `G` déjà
-   stocké : saute cette étape (mais refait toujours l'étape 1 → `θ`, `V`, échelle
-   re-mesurés).
+   `wdir`, `guideRateK`.
+
+**Calibration = une fois (montage physique).** `θ`, `V`, `arcsecPerPx` sont
+**géométriques** (orientation du microscope, rayon × grandissement) et `V` est
+lié au sidéral, pas à la thermique — donc constants tant que le microscope ne
+bouge pas. Flux :
+- **`calibrate`** → étape 1 + étape 2, persiste les 5 valeurs, s'arrête.
+- **`guide`** avec calibration complète stockée (`arcsecPerPx>0 && V>0 && G>0`) →
+  charge `θ/V/échelle/G/wDir` et va **directement au guidage** (pas d'étape 1 ni
+  2). `SMInitInit` appelle `enterGuide()` d'emblée.
+- **`guide`** sans calibration → étape 1 + étape 2 + guidage.
+- **`resetcalibration`** efface les 5 → force une re-calibration complète.
+La dérive thermique résiduelle en session est absorbée par `alphaV` (adaptatif),
+qui part de la `V` stockée.
 3. **PhGuide** — mesure projetée sur `θ` : `p = projRA`, `cross = projCross`
    (signal de santé). **Consigne incrémentale** : `setpoint += V·dt` à chaque
    frame (1ʳᵉ frame → `setpoint = p`), `résidu = p − setpoint`. (Pas `p − V·t` :
-   changer `V` réécrivait rétroactivement toute la ligne de base.) Dither RA seul
+   changer `V` réécrivait rétroactivement toute la ligne de base.) RMS calculé à
+   **chaque** frame (blank incluses — c'est un vrai résidu, juste pas corrigé ;
+   avant, les blank poussaient `RMS = 0` dans le graphe → yoyo). Dither RA seul
    en biais de consigne ; `blankframes` après un pulse ; P+I(+D) → effort `u` →
    `needPx = −u` (flip par `revRA` manuel) → sens W/E via `wDir`, magnitude via
    `G` ; clamp `pulsemin/pulsemax` ; masque `disCorrections` ; anti-windup

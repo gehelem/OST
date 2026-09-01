@@ -123,9 +123,14 @@ void BlindPec::setActionRunning(const QString &running)
 pecmeter::Params BlindPec::meterParams()
 {
     pecmeter::Params p;
-    if (getEltFloat("guideParams", "reanchorfrac")) p.reanchorFrac = getFloat("guideParams", "reanchorfrac");
-    if (getEltFloat("guideParams", "maxsteppx"))    p.maxStepPx    = getFloat("guideParams", "maxsteppx");
-    if (getEltFloat("guideParams", "minresponse"))  p.minResponse  = getFloat("guideParams", "minresponse");
+    if (getEltFloat("measParams", "reanchorfrac")) p.reanchorFrac = getFloat("measParams", "reanchorfrac");
+    if (getEltFloat("measParams", "maxsteppx"))    p.maxStepPx    = getFloat("measParams", "maxsteppx");
+    if (getEltFloat("measParams", "minresponse"))  p.minResponse  = getFloat("measParams", "minresponse");
+    if (getEltFloat("measParams", "preblur"))      p.preBlur      = getFloat("measParams", "preblur");
+    if (getEltBool("measParams", "eccrefine"))     p.eccRefine    = getBool("measParams", "eccrefine");
+    if (getEltInt("measParams", "ecciters"))       p.eccIters     = getInt("measParams", "ecciters");
+    if (getEltFloat("measParams", "ecceps"))       p.eccEps       = getFloat("measParams", "ecceps");
+    if (getEltInt("measParams", "eccgauss"))       p.eccGaussFilt = getInt("measParams", "eccgauss");
     return p;
 }
 
@@ -157,27 +162,38 @@ void BlindPec::onExternalEvent(OST::ExtEvent event)
         _calibrateOnly = (event.eltkey == "calibrate");
         _finishOk = false;
 
+        _theta       = getFloat("calibrationvalues", "theta") * M_PI / 180.0;
+        _V           = getFloat("calibrationvalues", "V");
+        _arcsecPerPx = getFloat("calibrationvalues", "arcsecPerPx");
         _G           = getFloat("calibrationvalues", "G");
         _wDir        = getInt("calibrationvalues", "wdir");
         if (_wDir == 0) _wDir = -1;
-        _arcsecPerPx = getFloat("calibrationvalues", "arcsecPerPx");
         _guideRateK  = getFloat("calibrationvalues", "guideRateK");
         if (_guideRateK <= 0) _guideRateK = 0.5;
 
-        // Always run step 1 (free-run characterization: theta + V, needed to
-        // decontaminate the gain and always re-measured since V drifts with
-        // temperature). "calibrate" then does step 2 and stops. "guide" does
-        // step 2 unless a stored gain can be reused.
-        _phase             = PhCharacterize;
-        _stopAfterGainCal  = _calibrateOnly;
-        _skipGainCal       = (!_calibrateOnly && _G > 0.0);
+        // theta / V / scale are geometric (microscope mounting, axis radius,
+        // magnification) - fixed until the setup moves. G / wDir depend on the
+        // mount guide output. So a full stored calibration is reused as-is:
+        //   "guide" + full calibration -> straight to guiding
+        //   "guide" without one, or "calibrate" -> characterize (+ gain cal)
+        // resetcalibration clears it and forces a fresh characterization.
+        const bool haveCal = (_arcsecPerPx > 0.0 && _V > 0.0 && _G > 0.0);
+
+        _skipChar         = (!_calibrateOnly && haveCal);
+        _skipGainCal      = (!_calibrateOnly && haveCal);
+        _stopAfterGainCal = _calibrateOnly;
+        _phase            = PhCharacterize;   // SMInitInit switches to PhGuide if _skipChar
 
         if (_calibrateOnly)
-            logInfo("BlindPEC: calibration only");
-        else if (_skipGainCal)
-            logInfo("BlindPEC: guide, reusing stored gain G=%1 ms/px", {QString::number(_G, 'f', 1)});
+            logInfo("BlindPEC: calibration (characterize + gain)");
+        else if (_skipChar)
+            logInfo("BlindPEC: guide, using stored calibration (theta=%1 deg, V=%2 px/s, scale=%3 arcsec/px, G=%4 ms/px)",
+        {
+            QString::number(_theta * 180.0 / M_PI, 'f', 1), QString::number(_V, 'f', 4),
+            QString::number(_arcsecPerPx, 'f', 3), QString::number(_G, 'f', 1)
+        });
         else
-            logInfo("BlindPEC: calibrate + guide");
+            logInfo("BlindPEC: no stored calibration - characterize + gain + guide");
         _sm.start();
         return;
     }
@@ -388,18 +404,29 @@ void BlindPec::SMInitInit()
     else
         logWarning("Could not read mount GUIDE_RATE - assuming %1x sidereal", {QString::number(_guideRateK, 'f', 2)});
 
-    // Step 1: free-run characterization.
     _meter = pecmeter::Meter(meterParams());
     _consecutiveBad = 0;
-    _phase = PhCharacterize;
-    _phaseT0 = nowMs();
-    _charFrames = 0;
-    _charT.clear();
-    _charX.clear();
-    _charY.clear();
-    _measX = _measY = 0;
-    logInfo("Phase: characterization (free-run drift, %1 s) - mount must be tracking sidereal",
-    {QString::number(getFloat("calParams", "chardur"), 'f', 0)});
+
+    if (_skipChar)
+    {
+        // Full calibration reused - go straight to guiding (theta/V/scale/G/wDir
+        // were loaded in onExternalEvent). The mount must still be tracking.
+        enterGuide();
+    }
+    else
+    {
+        // Step 1: free-run characterization.
+        _phase = PhCharacterize;
+        _phaseT0 = nowMs();
+        _charFrames = 0;
+        _charT.clear();
+        _charX.clear();
+        _charY.clear();
+        _charShiftFrac.clear();
+        _measX = _measY = 0;
+        logInfo("Phase: characterization (free-run drift, %1 s) - mount must be tracking sidereal",
+        {QString::number(getFloat("calParams", "chardur"), 'f', 0)});
+    }
 
     setStateEvent(OST::Busy, "initdone", "initialized", "BlindPEC initialized");
     emit InitDone();
@@ -463,6 +490,8 @@ void BlindPec::SMMeasure()
     _measOk     = s.ok;
     _measResp   = s.response;
     _reanchored = s.reanchored;
+    _shiftX = s.shiftX;
+    _shiftY = s.shiftY;
     if (s.ok)
     {
         _measX = s.x;
@@ -513,6 +542,7 @@ void BlindPec::computeCharacterize()
         _charT.push_back((nowMs() - _phaseT0) / 1000.0);
         _charX.push_back(_measX);
         _charY.push_back(_measY);
+        _charShiftFrac.push_back(_shiftX - std::round(_shiftX));
         _charFrames++;
     }
 
@@ -560,11 +590,12 @@ void BlindPec::computeCharacterize()
         const int n = (int)_charResidAlong.size();
         const int step = std::max(1, n / 40);
         for (int i = 0; i < n; i += step)
-            logInfo("PE  t=%1 s  along=%2 arcsec  (%3 px)",
+            logInfo("PE  t=%1 s  along=%2 arcsec  (%3 px)  sfrac=%4",
         {
             QString::number(_charT[i], 'f', 1),
             QString::number(_charResidAlong[i] * _arcsecPerPx, 'f', 2),
-            QString::number(_charResidAlong[i], 'f', 3)
+            QString::number(_charResidAlong[i], 'f', 3),
+            QString::number(i < (int)_charShiftFrac.size() ? _charShiftFrac[i] : 0.0, 'f', 2)
         });
     }
     if (_V < 1e-3)
@@ -765,7 +796,7 @@ void BlindPec::computeGuide()
     if (!_measOk)
     {
         _consecutiveBad++;
-        int maxFail = getInt("guideParams", "maxmatchfail");
+        int maxFail = getInt("measParams", "maxmatchfail");
         logWarning("Untrusted frame (%1/%2, response %3) - skipping",
         {QString::number(_consecutiveBad), QString::number(maxFail), QString::number(_measResp, 'f', 3)});
         if (_consecutiveBad >= maxFail)
@@ -811,90 +842,87 @@ void BlindPec::computeGuide()
     }
     const double err = _residual - _ditherOffset;
 
-    // Right after a pulse, or on the first frame: measure, advance state, don't
-    // correct (skip the mechanical transient / define the origin).
-    if (_blank > 0)
-    {
-        _blank--;
-        _residualPrev = err;
-        _pPrev = p;
-        pushGuiding(err * _arcsecPerPx, 0);
-        emit ComputeDone();
-        return;
-    }
-
-    // Both corrections disabled -> pure observation: the loop measures and logs
-    // the residual (= the periodic error) but sends nothing, adapts nothing.
-    const bool observe = getBool("disCorrections", "disRA+") && getBool("disCorrections", "disRA-");
-
-    // Adaptive rate (PI on V): a wrong V shows up as a SUSTAINED residual that
-    // the P+I loop can only fight with a permanent pulse bias / integrator DC.
-    // Nudge V by the residual VALUE (not its noisy derivative): a persistent err
-    // moves V, a zero-mean err leaves it alone -> stable negative feedback.
-    // Clamped to +-20% of the characterized rate as a safety rail. 0 = fixed V.
-    const double alphaV = getFloat("guideParams", "alphaV");
-    if (alphaV > 0 && !observe)
-    {
-        _V += alphaV * err;
-        _V = qBound(_V0 * 0.8, _V, _V0 * 1.2);
-    }
-
-    // P + I (+ D) on the error, in px. `u` is the control effort; we want the
-    // pulse to move the projected position by -u (oppose the error).
-    double kp = getFloat("pid", "kp");
-    double ki = getFloat("pid", "ki");
-    double kd = getFloat("pid", "kd");
-    double intMax = getFloat("guideParams", "intmax");
-    if (intMax <= 0) intMax = 50.0;
-    if (!_intRsat && !observe) _intR += err;
-    _intR = qBound(-intMax, _intR, intMax);
-    double u = observe ? 0.0 : (kp * err + ki * _intR + kd * (err - _residualPrev));
-
-    double needPx = -u;
-    if (getBool("revCorrections", "revRA")) needPx = -needPx;
-
-    // A W pulse moves the projected position by sign _wDir; E by -_wDir. Pick the
-    // direction that pushes towards needPx; magnitude in ms via _G (ms/px).
-    double pulseMs = std::fabs(needPx) * _G;
-    int dir = ((needPx >= 0) == (_wDir > 0)) ? -1 : +1;   // -1 = W, +1 = E
-
-    const int pmin = getInt("guideParams", "pulsemin");
-    const int pmax = getInt("guideParams", "pulsemax");
-    if (pulseMs < pmin) pulseMs = 0;
-    if (pulseMs > pmax) pulseMs = pmax;
-
-    const bool disP = getBool("disCorrections", "disRA+");
-    const bool disM = getBool("disCorrections", "disRA-");
-    if (dir < 0 && !disM) _pulseW = (int)pulseMs;
-    if (dir > 0 && !disP) _pulseE = (int)pulseMs;
-
-    _intRsat = (_pulseE >= pmax || _pulseW >= pmax);
-    if (_pulseE > 0 || _pulseW > 0)
-    {
-        _blank = getInt("guideParams", "blankframes");
-        _lastPulseDir = dir;
-    }
-
-    // RMS of the residual (arcsec), bounded by rmsOver.
-    int rmsOver = getInt("guideParams", "rmsOver");
+    // RMS of the residual (arcsec) over rmsOver frames - computed EVERY frame,
+    // blank frames included (a blank frame is still a real pointing error, it is
+    // only excluded from *correction*, not from the statistic / the graph).
+    const int rmsOver = getInt("guideParams", "rmsOver");
     _rmsBuf.push_back(err * _arcsecPerPx);
     while ((int)_rmsBuf.size() > rmsOver) _rmsBuf.erase(_rmsBuf.begin());
     double rms = 0;
     for (double v : _rmsBuf) rms += square(v);
     rms = _rmsBuf.empty() ? 0 : std::sqrt(rms / _rmsBuf.size());
 
-    // Periodic numeric summary (not per frame). 0 = off.
     _guideFrame++;
+
+    // "blank": the frame right after a pulse (or the first frame) - measure and
+    // publish, but do not compute a correction (skip the mechanical transient).
+    const bool blank = (_blank > 0);
+    if (blank) _blank--;
+
+    // Both corrections disabled -> pure observation: measure/publish only.
+    const bool observe = getBool("disCorrections", "disRA+") && getBool("disCorrections", "disRA-");
+
+    double u = 0.0;
+    if (!blank && !observe)
+    {
+        // Adaptive rate (PI on V): a wrong V shows up as a SUSTAINED residual the
+        // P+I loop can only fight with a permanent pulse bias / integrator DC.
+        // Nudge V by the residual VALUE - a persistent err moves V, a zero-mean
+        // err leaves it alone. Clamped to +-20% of the characterized rate.
+        const double alphaV = getFloat("guideParams", "alphaV");
+        if (alphaV > 0)
+        {
+            _V += alphaV * err;
+            _V = qBound(_V0 * 0.8, _V, _V0 * 1.2);
+        }
+
+        // P + I (+ D) on the error, in px.
+        const double kp = getFloat("pid", "kp");
+        const double ki = getFloat("pid", "ki");
+        const double kd = getFloat("pid", "kd");
+        double intMax = getFloat("guideParams", "intmax");
+        if (intMax <= 0) intMax = 50.0;
+        if (!_intRsat) _intR += err;
+        _intR = qBound(-intMax, _intR, intMax);
+        u = kp * err + ki * _intR + kd * (err - _residualPrev);
+
+        double needPx = -u;
+        if (getBool("revCorrections", "revRA")) needPx = -needPx;
+
+        // A W pulse moves the projected position by sign _wDir; E by -_wDir.
+        double pulseMs = std::fabs(needPx) * _G;
+        const int dir = ((needPx >= 0) == (_wDir > 0)) ? -1 : +1;   // -1 = W, +1 = E
+
+        const int pmin = getInt("guideParams", "pulsemin");
+        const int pmax = getInt("guideParams", "pulsemax");
+        if (pulseMs < pmin) pulseMs = 0;
+        if (pulseMs > pmax) pulseMs = pmax;
+
+        if (dir < 0 && !getBool("disCorrections", "disRA-")) _pulseW = (int)pulseMs;
+        if (dir > 0 && !getBool("disCorrections", "disRA+")) _pulseE = (int)pulseMs;
+
+        _intRsat = (_pulseE >= pmax || _pulseW >= pmax);
+        if (_pulseE > 0 || _pulseW > 0)
+        {
+            _blank = getInt("guideParams", "blankframes");
+            _lastPulseDir = dir;
+        }
+    }
+
+    // Periodic numeric summary (not per frame). 0 = off.
     const int logEvery = getInt("guideParams", "logevery");
     if (logEvery > 0 && (_guideFrame % logEvery) == 0)
     {
         const int spulse = (_pulseE > 0) ? _pulseE : (_pulseW > 0) ? -_pulseW : 0;
-        logInfo("guide #%1 t=%2s dt=%3 | p=%4 sp=%5 dp=%6 | resid=%7 px (%8\") cross=%9 px | V=%10 | u=%11 pulse=%12 ms | I=%13 | rms=%14\" resp=%15",
+        const double sfrac = _shiftX - std::round(_shiftX);   // pixel-locking diagnostic
+        logInfo("guide #%1 t=%2s dt=%3%4 | p=%5 sp=%6 dp=%7 | resid=%8 px (%9\") cross=%10 | sfrac=%11 | V=%12 | u=%13 pulse=%14 ms | I=%15 | rms=%16\" resp=%17",
         {
             QString::number(_guideFrame), QString::number(t, 'f', 0), QString::number(dt, 'f', 2),
+            blank ? " BLANK" : "",
             QString::number(p, 'f', 2), QString::number(_setpoint, 'f', 2), QString::number(p - _pPrev, 'f', 2),
             QString::number(err, 'f', 2), QString::number(err * _arcsecPerPx, 'f', 2),
             QString::number(cross, 'f', 2),
+            QString::number(sfrac, 'f', 2),
             QString::number(_V, 'f', 4),
             QString::number(u, 'f', 2), QString::number(spulse),
             QString::number(_intR, 'f', 2),
