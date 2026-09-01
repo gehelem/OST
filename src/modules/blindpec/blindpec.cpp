@@ -172,10 +172,12 @@ void BlindPec::onExternalEvent(OST::ExtEvent event)
         _stopAfterGainCal  = _calibrateOnly;
         _skipGainCal       = (!_calibrateOnly && _G > 0.0);
 
-        logInfo(_calibrateOnly ? "BlindPEC: calibration only"
-                : _skipGainCal ? "BlindPEC: guide (reusing stored gain G=%1 ms/px)"
-                : "BlindPEC: calibrate + guide",
-        {QString::number(_G, 'f', 1)});
+        if (_calibrateOnly)
+            logInfo("BlindPEC: calibration only");
+        else if (_skipGainCal)
+            logInfo("BlindPEC: guide, reusing stored gain G=%1 ms/px", {QString::number(_G, 'f', 1)});
+        else
+            logInfo("BlindPEC: calibrate + guide");
         _sm.start();
         return;
     }
@@ -540,18 +542,46 @@ void BlindPec::computeCharacterize()
         _arcsecPerPx = SIDEREAL_ARCSEC_PER_S / _V;
 
     const double dTot = std::hypot(_charX.back() - _charX.front(), _charY.back() - _charY.front());
-    logInfo("Characterization: %1 frames over %2 s, image moved %3 px -> theta=%4 deg, V=%5 px/s, scale=%6 arcsec/px",
+    logInfo("Characterization: %1 frames / %2 s | moved %3 px (dx=%4 dy=%5) | theta=%6 deg | V=%7 px/s | scale=%8 arcsec/px",
     {
         QString::number(_charFrames), QString::number(span, 'f', 1), QString::number(dTot, 'f', 2),
+        QString::number(_charX.back() - _charX.front(), 'f', 2), QString::number(_charY.back() - _charY.front(), 'f', 2),
         QString::number(_theta * 180.0 / M_PI, 'f', 1), QString::number(_V, 'f', 4),
         QString::number(_arcsecPerPx, 'f', 3)
     });
+    logInfo("Periodic error over the window: peak-to-peak %1 px (%2 arcsec), RMS %3 px (%4 arcsec) | perpendicular RMS %5 px (%6 arcsec, should be small)",
+    {
+        QString::number(_charPPAlong, 'f', 2), QString::number(_charPPAlong * _arcsecPerPx, 'f', 1),
+        QString::number(_charFitRmsAlong, 'f', 3), QString::number(_charFitRmsAlong * _arcsecPerPx, 'f', 2),
+        QString::number(_charFitRmsPerp, 'f', 3), QString::number(_charFitRmsPerp * _arcsecPerPx, 'f', 2)
+    });
+    // Decimated PE curve so it can be read / plotted from the log (cap ~40 lines).
+    {
+        const int n = (int)_charResidAlong.size();
+        const int step = std::max(1, n / 40);
+        for (int i = 0; i < n; i += step)
+            logInfo("PE  t=%1 s  along=%2 arcsec  (%3 px)",
+        {
+            QString::number(_charT[i], 'f', 1),
+            QString::number(_charResidAlong[i] * _arcsecPerPx, 'f', 2),
+            QString::number(_charResidAlong[i], 'f', 3)
+        });
+    }
     if (_V < 1e-3)
         logWarning("Drift rate V is ~0: is the mount tracking? is the microscope on a "
                    "moving surface? Calibration / guiding will do nothing useful.");
     getEltFloat("calibrationvalues", "V")->setValue(_V);
     getEltFloat("calibrationvalues", "arcsecPerPx")->setValue(_arcsecPerPx);
     getEltFloat("calibrationvalues", "theta")->setValue(_theta * 180.0 / M_PI, true);
+
+    if (getBool("calParams", "observeonly"))
+    {
+        logInfo("BlindPEC: observe-only run complete (no gain calibration, no guiding)");
+        _finishOk = true;
+        setStateEvent(OST::Ok, "caldone", "calcompleted", "observation completed");
+        emit Abort();
+        return;
+    }
 
     if (_skipGainCal)
     {
@@ -642,15 +672,23 @@ void BlindPec::computeGainCal()
         return;
     }
 
+    auto sd = [](const std::vector<double> &v, double m)
+    {
+        double s = 0;
+        for (double x : v) s += (x - m) * (x - m);
+        return v.empty() ? 0.0 : std::sqrt(s / v.size());
+    };
+
     _G    = calpulse / gpx;                       // ms per px
     _wDir = (mW >= 0.0) ? +1 : -1;
 
     const double asym = std::fabs(std::fabs(mW) - std::fabs(mE)) / gpx;
-    logInfo("Gain: G=%1 ms/px | wDir=%2 | W=%3 E=%4 px/pulse | asym %5%%",
+    logInfo("Gain: G=%1 ms/px | wDir=%2 | W=%3 +-%4 px  E=%5 +-%6 px  (per %7 ms pulse) | asym %8%%",
     {
         QString::number(_G, 'f', 2), QString::number(_wDir),
-        QString::number(mW, 'f', 2), QString::number(mE, 'f', 2),
-        QString::number(asym * 100.0, 'f', 0)
+        QString::number(mW, 'f', 2), QString::number(sd(_gainWeff, mW), 'f', 2),
+        QString::number(mE, 'f', 2), QString::number(sd(_gainEeff, mE), 'f', 2),
+        QString::number(calpulse), QString::number(asym * 100.0, 'f', 0)
     });
     if (asym > 0.5)
         logWarning("Gain calibration: W and E effects differ by %1%% - possible backlash "
@@ -690,6 +728,7 @@ void BlindPec::enterGuide()
 {
     _phase = PhGuide;
     setActionRunning("guide");   // switch the lit button from calibrate to guide
+    _V0 = _V;                    // freeze the characterized rate for the adaptive clamp
     _meter.reset();
     _measX = _measY = 0;
     _t0Guide = nowMs();
@@ -703,6 +742,10 @@ void BlindPec::enterGuide()
     _ditherPending = false;
     _rmsBuf.clear();
     _consecutiveBad = 0;
+    _guideFrame = 0;
+    _pPrev = 0;
+    _setpoint = 0;
+    _setpointInit = false;
     getProperty("drift")->clearGrid();
     getProperty("guiding")->clearGrid();
     const int rmsOver = getInt("guideParams", "rmsOver");
@@ -737,14 +780,27 @@ void BlindPec::computeGuide()
     }
     _consecutiveBad = 0;
 
-    const double t = (nowMs() - _t0Guide) / 1000.0;
+    const double t     = (nowMs() - _t0Guide) / 1000.0;
+    const double dt    = (t > _tPrev) ? (t - _tPrev) : 0.0;
+    _tPrev = t;
     const double p     = projRA(_measX, _measY);     // along the calibrated RA axis
     const double cross = projCross(_measX, _measY);  // health signal, should stay ~0
 
-    _residual = p - _V * t;
+    // Incremental setpoint: it advances at the current rate estimate. Unlike
+    // p - V*t, changing V later does NOT retroactively jump the residual.
+    if (!_setpointInit)
+    {
+        _setpoint = p;               // first trusted frame: no correction, define the origin
+        _setpointInit = true;
+    }
+    else
+    {
+        _setpoint += _V * dt;
+    }
+    _residual = p - _setpoint;
 
-    // RA-only dither: bias the target position by a random pixel offset, then
-    // let the loop chase it. DEC component of a sequencer dither is a no-op here.
+    // RA-only dither: bias the setpoint by a random pixel offset, then let the
+    // loop chase it. DEC component of a sequencer dither is a no-op here.
     if (_ditherPending)
     {
         int amp = getInt("guideParams", "ditherpixel");
@@ -755,22 +811,33 @@ void BlindPec::computeGuide()
     }
     const double err = _residual - _ditherOffset;
 
-    // Right after a pulse: measure but don't correct (skip the mechanical transient).
+    // Right after a pulse, or on the first frame: measure, advance state, don't
+    // correct (skip the mechanical transient / define the origin).
     if (_blank > 0)
     {
         _blank--;
-        _residualPrev = _residual;
+        _residualPrev = err;
+        _pPrev = p;
         pushGuiding(err * _arcsecPerPx, 0);
         emit ComputeDone();
         return;
     }
 
-    // Adaptive target rate: a wrong V shows up as a slow ramp in `err`; nudge V
-    // to flatten it so the integrator never has to carry the DC. (notes s.3/s.8)
-    double alphaV = getFloat("guideParams", "alphaV");
-    if (alphaV > 0)
-        _V += alphaV * (err - _residualPrev) / std::max(0.001, t - _tPrev);
-    _tPrev = t;
+    // Both corrections disabled -> pure observation: the loop measures and logs
+    // the residual (= the periodic error) but sends nothing, adapts nothing.
+    const bool observe = getBool("disCorrections", "disRA+") && getBool("disCorrections", "disRA-");
+
+    // Adaptive rate (PI on V): a wrong V shows up as a SUSTAINED residual that
+    // the P+I loop can only fight with a permanent pulse bias / integrator DC.
+    // Nudge V by the residual VALUE (not its noisy derivative): a persistent err
+    // moves V, a zero-mean err leaves it alone -> stable negative feedback.
+    // Clamped to +-20% of the characterized rate as a safety rail. 0 = fixed V.
+    const double alphaV = getFloat("guideParams", "alphaV");
+    if (alphaV > 0 && !observe)
+    {
+        _V += alphaV * err;
+        _V = qBound(_V0 * 0.8, _V, _V0 * 1.2);
+    }
 
     // P + I (+ D) on the error, in px. `u` is the control effort; we want the
     // pulse to move the projected position by -u (oppose the error).
@@ -779,9 +846,9 @@ void BlindPec::computeGuide()
     double kd = getFloat("pid", "kd");
     double intMax = getFloat("guideParams", "intmax");
     if (intMax <= 0) intMax = 50.0;
-    if (!_intRsat) _intR += err;
+    if (!_intRsat && !observe) _intR += err;
     _intR = qBound(-intMax, _intR, intMax);
-    double u = kp * err + ki * _intR + kd * (err - _residualPrev);
+    double u = observe ? 0.0 : (kp * err + ki * _intR + kd * (err - _residualPrev));
 
     double needPx = -u;
     if (getBool("revCorrections", "revRA")) needPx = -needPx;
@@ -815,6 +882,26 @@ void BlindPec::computeGuide()
     double rms = 0;
     for (double v : _rmsBuf) rms += square(v);
     rms = _rmsBuf.empty() ? 0 : std::sqrt(rms / _rmsBuf.size());
+
+    // Periodic numeric summary (not per frame). 0 = off.
+    _guideFrame++;
+    const int logEvery = getInt("guideParams", "logevery");
+    if (logEvery > 0 && (_guideFrame % logEvery) == 0)
+    {
+        const int spulse = (_pulseE > 0) ? _pulseE : (_pulseW > 0) ? -_pulseW : 0;
+        logInfo("guide #%1 t=%2s dt=%3 | p=%4 sp=%5 dp=%6 | resid=%7 px (%8\") cross=%9 px | V=%10 | u=%11 pulse=%12 ms | I=%13 | rms=%14\" resp=%15",
+        {
+            QString::number(_guideFrame), QString::number(t, 'f', 0), QString::number(dt, 'f', 2),
+            QString::number(p, 'f', 2), QString::number(_setpoint, 'f', 2), QString::number(p - _pPrev, 'f', 2),
+            QString::number(err, 'f', 2), QString::number(err * _arcsecPerPx, 'f', 2),
+            QString::number(cross, 'f', 2),
+            QString::number(_V, 'f', 4),
+            QString::number(u, 'f', 2), QString::number(spulse),
+            QString::number(_intR, 'f', 2),
+            QString::number(rms, 'f', 2), QString::number(_measResp, 'f', 3)
+        });
+    }
+    _pPrev = p;
 
     getEltInt("values", "pulseE")->setValue(_pulseE);
     getEltInt("values", "pulseW")->setValue(_pulseW);
@@ -856,10 +943,35 @@ void BlindPec::fitDriftLine()
         return;
     const double slopeX = (n * stx - st * sx) / denom;
     const double slopeY = (n * sty - st * sy) / denom;
+    const double interX = (sx - slopeX * st) / n;
+    const double interY = (sy - slopeY * st) / n;
 
     _V = std::hypot(slopeX, slopeY);
     if (_V > 1e-6)
         _theta = std::atan2(slopeY, slopeX);
+
+    // Residuals of the point cloud around the fitted line, split into the
+    // along-axis part (periodic error + noise) and the perpendicular part
+    // (should be small; large -> theta wrong / CD wobble / non-planar surface).
+    const double ct = std::cos(_theta), sn = std::sin(_theta);
+    double sa = 0, sp = 0, amin = 1e30, amax = -1e30;
+    _charResidAlong.clear();
+    _charResidAlong.reserve(n);
+    for (size_t i = 0; i < n; ++i)
+    {
+        const double rx = _charX[i] - (interX + slopeX * _charT[i]);
+        const double ry = _charY[i] - (interY + slopeY * _charT[i]);
+        const double a =  rx * ct + ry * sn;   // along axis = periodic error + noise
+        const double p = -rx * sn + ry * ct;   // perpendicular
+        _charResidAlong.push_back(a);
+        sa += a * a;
+        sp += p * p;
+        if (a < amin) amin = a;
+        if (a > amax) amax = a;
+    }
+    _charFitRmsAlong = std::sqrt(sa / n);
+    _charFitRmsPerp  = std::sqrt(sp / n);
+    _charPPAlong     = amax - amin;   // peak-to-peak along-axis = PE peak-to-peak over the window
 }
 
 // ======================================================================

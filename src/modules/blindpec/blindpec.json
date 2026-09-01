@@ -200,7 +200,15 @@
                 "format": "99999.9",
                 "min":5,
                 "max":100000,
-                "hint": "step 1: observe the free-run sidereal drift for this long (mount tracking, no pulses) to get the RA axis direction and rate. A rough value needs a few tens of s; a clean one needs >= one worm period"
+                "hint": "step 1: observe the free-run sidereal drift for this long (mount tracking, no pulses) to get the RA axis direction and rate. A rough value needs a few tens of s; a clean one (and a real PE measurement) needs >= one worm period"
+            },
+            "observeonly": {
+                "type":"bool",
+                "autoupdate":true,
+                "label": "Observe only (no gain cal, no guiding)",
+                "order":"01a",
+                "value":false,
+                "hint": "run step 1 alone: measure the free-run drift + periodic error over 'chardur' seconds, log the PE peak-to-peak and a decimated PE curve, then stop. Set chardur >= one worm period"
             },
             "calpulse": {
                 "type":"int",
@@ -240,9 +248,9 @@
                 "directedit":true,
                 "label": "Kp",
                 "order":"01",
-                "value":0.6,
+                "value":0.5,
                 "format": "9.999",
-                "hint": "proportional gain on the residual (px -> px of correction)"
+                "hint": "proportional gain on the residual. kp=1 tries to fully null the error in one pulse (deadbeat) and rings given the ~1-2 s loop period; use 0.3-0.6"
             },
             "ki": {
                 "type":"float",
@@ -261,7 +269,8 @@
                 "label": "Kd",
                 "order":"03",
                 "value":0,
-                "format": "9.999"
+                "format": "9.999",
+                "hint": "derivative gain. Leave at 0: on a slow (~2 fps) noisy loop the D term mostly amplifies measurement noise"
             }
         }
     },
@@ -310,11 +319,11 @@
                 "directedit":true,
                 "label": "V adaptation gain",
                 "order":"05",
-                "value":0.02,
+                "value":0.005,
                 "format": "9.9999",
                 "min":0,
                 "max":1,
-                "hint": "online correction of the target rate V from the residual ramp. 0 = fixed V. Small = slow, stable"
+                "hint": "PI on the target rate: V += alphaV * residual_px each frame, clamped to +-20% of the characterized V. Corrects a V biased by a too-short characterization. 0 = fixed V. 0.002-0.02 typical"
             },
             "intmax": {
                 "type":"float",
@@ -407,6 +416,18 @@
                 "min":0,
                 "max":600,
                 "hint": "abort if the camera or mount stops responding for this long. 0 disables"
+            },
+            "logevery": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Guide log every N frames",
+                "order":"13",
+                "value":10,
+                "format": "999",
+                "min":0,
+                "max":10000,
+                "hint": "print a numeric guiding summary (p, residual, cross, V, pulse, I, rms) every N frames. 0 = off"
             }
         }
     },

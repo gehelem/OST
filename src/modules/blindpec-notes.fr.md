@@ -476,9 +476,17 @@ Hypothèse : **la monture suit au sidéral** pendant toute la calibration.
 
 1. **PhCharacterize (étape 1)** — dérive libre, aucun pulse, pendant
    `calParams/chardur` s (défaut 60 ; « quelques dizaines de s » = `V` grossier,
-   ≥ 1 période de ver = `V` propre). `fitDriftLine()` = pentes MCO de `x(t)` et
-   `y(t)` → **`θ` = `atan2(sy, sx)`** (orientation de l'axe AD dans l'image) et
-   **`V` = `hypot(sx, sy)`** (px/s).
+   ≥ 1 période de ver = `V` propre + vraie mesure de PE). `fitDriftLine()` =
+   pentes MCO de `x(t)` et `y(t)` → **`θ` = `atan2(sy, sx)`** (orientation de
+   l'axe AD dans l'image) et **`V` = `hypot(sx, sy)`** (px/s). Résidu autour de
+   la droite décomposé en **along-axis** (= erreur périodique + bruit) et
+   **perpendiculaire** (doit rester petit). Loggé : PE peak-to-peak + RMS (arcsec)
+   + courbe PE décimée (`PE t=.. along=.. arcsec`, ≤ 40 lignes).
+   **`calParams/observeonly`** : fait l'étape 1 seule puis s'arrête proprement
+   (pas de gain-cal, pas de guidage) → pour mesurer/visualiser la PE.
+   En guidage, **`disRA+` ET `disRA-` cochés = mode observation** : la boucle
+   mesure et logge `resid` (= PE) mais n'envoie rien, n'adapte rien (intégrale +
+   `V` gelés).
    **Échelle** : l'axe AD tourne au taux sidéral (~15,041 arcsec/s *de rotation
    d'axe*), donc **`arcsecPerPx = 15,041 / V`**. C'est la **seule** source de
    l'échelle — aucune focale / grandissement / taux de guidage monture : tout ça
@@ -498,11 +506,28 @@ Hypothèse : **la monture suit au sidéral** pendant toute la calibration.
    stocké : saute cette étape (mais refait toujours l'étape 1 → `θ`, `V`, échelle
    re-mesurés).
 3. **PhGuide** — mesure projetée sur `θ` : `p = projRA`, `cross = projCross`
-   (signal de santé). `résidu = p − V·t`. Dither RA seul en biais de consigne ;
-   `blankframes` après un pulse ; **`V` adaptatif** (`alphaV`) ; P+I(+D) → effort
-   `u` → `needPx = −u` (flip par `revRA` manuel) → sens W/E choisi via `wDir`,
-   magnitude via `G` ; clamp `pulsemin/pulsemax` ; masque `disCorrections` ;
-   anti-windup (`intmax`) ; RMS glissant.
+   (signal de santé). **Consigne incrémentale** : `setpoint += V·dt` à chaque
+   frame (1ʳᵉ frame → `setpoint = p`), `résidu = p − setpoint`. (Pas `p − V·t` :
+   changer `V` réécrivait rétroactivement toute la ligne de base.) Dither RA seul
+   en biais de consigne ; `blankframes` après un pulse ; P+I(+D) → effort `u` →
+   `needPx = −u` (flip par `revRA` manuel) → sens W/E via `wDir`, magnitude via
+   `G` ; clamp `pulsemin/pulsemax` ; masque `disCorrections` ; anti-windup
+   (`intmax`) ; RMS glissant.
+   **`V` adaptatif = PI sur `V`** : `V += alphaV·résidu` chaque frame, borné à
+   ±20 % du `V` caractérisé (`_V0`). Piloté par la *valeur* du résidu (un résidu
+   soutenu déplace `V`, un résidu de moyenne nulle le laisse) → contre-réaction
+   négative stable. Corrige un `V` biaisé par une caractérisation trop courte.
+   Défaut `alphaV = 0.005` (**activé**). L'ancienne loi `(err − errPrev)/dt`
+   (dérivée) chassait le bruit → supprimée.
+   **`kp` défaut 0,5**, **`kd` défaut 0** (le terme D n'amplifie que du bruit sur
+   une boucle lente ~2 fps). `kp = 1` = deadbeat → sonne avec la période de
+   boucle.
+
+**Diag banc (21:24)** : caractérisation 30 s → `V = 2.2249` biaisé haut de
+~7,5 % (phase de PE). Symptômes : gain-cal asym W/E 56 % (`W = g−δ`, `E = g+δ` ;
+la moyenne `(|W|+|E|)/2` annule `δ` → `G` reste bon), et en guidage l'intégrale
+qui s'accumule (`I : −0.08 → −1.66`) + pulses W permanents. → c'est ce que le
+`V` adaptatif corrige.
 
 ### Pas d'hypothèse horizontale/verticale
 

@@ -131,8 +131,13 @@ class MODULE_INIT BlindPec : public IndiModule
         std::vector<double> _charY;                    ///< cumulative image displacement, Y (px)
         double _phaseT0     = 0;                       ///< epoch (ms) of the current phase start
         double _theta       = 0;                       ///< RA axis direction in the image (rad), from the free-run drift
-        double _V           = 0;                       ///< target rate along +theta, px/s (>= 0)
-        void   fitDriftLine();                         ///< (_charT,_charX,_charY) -> _theta, _V
+        double _V           = 0;                       ///< target rate along +theta, px/s (>= 0); adapts during guiding
+        double _V0          = 0;                       ///< characterized rate (fixed reference for the adaptive clamp)
+        double _charFitRmsAlong = 0;                   ///< free-run fit residual along the axis (px) - PE + noise
+        double _charFitRmsPerp  = 0;                   ///< free-run fit residual perpendicular (px) - should be small
+        double _charPPAlong     = 0;                   ///< free-run along-axis residual peak-to-peak (px) = PE p2p over the window
+        std::vector<double> _charResidAlong;           ///< per-sample along-axis residual (px), parallel to _charT
+        void   fitDriftLine();                         ///< (_charT,_charX,_charY) -> _theta, _V, fit residuals + PE curve
 
         // ---- step 2: pulse gain calibration ----
         int    _gainStep    = 0;                       ///< pulses sent so far (alternating W,E,W,E,...)
@@ -157,6 +162,10 @@ class MODULE_INIT BlindPec : public IndiModule
         int    _lastPulseDir = 0;                      ///< -1 = W, +1 = E, 0 = none
         bool   _ditherPending = false;                 ///< dither requested, apply on the next guide frame
         double _ditherOffset  = 0;                     ///< current RA target bias from dithering (px)
+        int    _guideFrame   = 0;                      ///< guide-frame counter (for the periodic summary log)
+        double _pPrev        = 0;                      ///< previous frame's projected position (px)
+        double _setpoint     = 0;                      ///< incremental target position, advances at _V (px)
+        bool   _setpointInit = false;                  ///< false until the first trusted guide frame defines the origin
 
         // ==================== Current pulses (ms) ====================
         int _pulseE = 0;                               ///< speed up RA
