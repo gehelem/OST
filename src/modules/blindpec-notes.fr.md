@@ -258,18 +258,36 @@ courbe PE `observeonly` : `-2,13 / +1,38 / -2,73 / +1,29 …` une frame sur deux
 La vraie PE de la monture (±20") est **complètement noyée** à ce timescale. Le
 « peak-to-peak 0,85 px » mesuré = uniquement l'artefact.
 
-**Correctif appliqué** (`pecmeter`, commit à venir) :
-1. **pré-flou gaussien** `guideParams/preblur` (σ défaut 1 px) — élargit le pic,
-   coupe le pixel-locking de tout centroïde ;
+**Correctif appliqué** (`pecmeter`, params dans `measParams`) :
+1. **pré-flou gaussien** `preblur` (σ défaut 1 px) — élargit le pic, coupe le
+   pixel-locking de tout centroïde ;
 2. `phaseCorrelate` ne sert plus qu'au **décalage grossier** (amorce) ;
 3. **`cv::findTransformECC` `MOTION_TRANSLATION`** amorcé avec ce décalage → sous-
-   pixel par optimisation d'un critère continu + interpolation bilinéaire →
-   biais en S bien plus doux. `response` = coeff. ECC ∈ [0,1]. `guideParams/eccrefine`
-   (défaut on) pour revenir à `phaseCorrelate` seul. ECC reçoit les images **non
-   fenêtrées** (pas de FFT → pas de wrap-around → le Hann le gênerait).
-4. Fallback `phaseCorrelate` si ECC diverge.
+   pixel par critère continu + interpolation bilinéaire → biais en S bien plus
+   doux. `response` = coeff. ECC ∈ [0,1]. `eccrefine`/`ecciters`/`ecceps`/`eccgauss`.
+   ECC reçoit les images **non fenêtrées** (pas de FFT). Fallback `phaseCorrelate`
+   si ECC diverge.
+4. **Calibration de la S-curve résiduelle** (`scurve`, défaut on) : **une fois**,
+   au 1ᵉʳ dépôt d'ancre, `pecmeter` génère `scurvepoints` copies de l'ancre
+   décalées de fractions de pixel connues par **décalage de Fourier** (exact, sans
+   biais d'interpolation), mesure `biais = estimé − vrai` vs `frac`, l'ajuste en
+   `scurveharm` harmoniques (`Σ aₖ·sin(2πkf) + cₖ·cos(2πkf)`), et **soustrait**
+   `biais(frac(shift))` de chaque mesure. Fonctionne aussi bien (mieux) avec
+   `eccrefine=off` → c'est la méthode « estimateur simple + courbe de réponse ».
+   Coût : ~1–2 s sur la 1ʳᵉ frame. Loggé : peak-to-peak de la courbe ajustée.
+   Désactivé auto si l'ajustement est dégénéré ou > 0,8 px.
 
-Si insuffisant → DFT sur-échantillonnée (Guizar-Sicairos), remède lourd.
+Reste en réserve si insuffisant : DFT sur-échantillonnée (Guizar-Sicairos),
+mesure **frame-à-frame** (le biais devient un quasi-constant absorbé par `V`).
+
+**Piste : estimateur sélectionnable.** La calibration S-curve est **agnostique
+de l'estimateur** — elle calibre ce que fait `measureShift()`. On pourrait
+exposer `measParams/estimator` (`phasecorr` / `phasecorr+ecc` / `matchtemplate`)
+et garder la même S-curve par-dessus dans tous les cas. Ça permettrait de
+retrouver l'approche d'origine (`matchTemplate TM_CCOEFF` + parabole `CV_SubPix`
++ courbe de réponse) et de la comparer. ~20 lignes (un `switch` dans
+`measureShift`, `CV_SubPix.{h,cpp}` déjà présents dans le vieux module à
+récupérer). Non fait — à voir si le duo ECC + S-curve ne suffit pas.
 - `matchTemplate` + `CV_SubPix` gardé seulement si compétitif au bench — alors
   `TM_CCOEFF_NORMED` + upsampling ×4–8 de la ROI avant le fit.
 - **Mesurer le plancher réel** : axe bloqué, 500 frames, RMS du déplacement

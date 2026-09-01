@@ -19,6 +19,7 @@
 #pragma once
 
 #include <opencv2/opencv.hpp>
+#include <vector>
 
 namespace pecmeter
 {
@@ -31,6 +32,9 @@ struct Params
     int    eccIters     = 60;    ///< ECC max iterations
     double eccEps       = 1e-4;  ///< ECC convergence epsilon (on the correlation coefficient)
     int    eccGaussFilt = 5;     ///< ECC internal Gaussian kernel size (images + gradients); larger = smoother, less pixel-locking
+    bool   sCurve       = true;  ///< measure the estimator's pixel-locking S-curve (once) and subtract it at runtime
+    int    sCurvePoints = 32;    ///< fractional-shift samples per axis for the S-curve fit
+    int    sCurveHarm   = 3;     ///< number of harmonics in the S-curve fit (1 hump/px dominates, 2-3 is plenty)
     double reanchorFrac  = 0.35; ///< re-anchor once |shift vs anchor| exceeds this * min(w,h)/2
     double maxStepPx     = 40.0; ///< reject a frame whose move since the last accepted one exceeds this (vibration / glitch)
     double minResponse   = 0.10; ///< correlation response below this -> frame not trusted (ECC coeff when eccRefine, else phaseCorrelate response)
@@ -72,12 +76,25 @@ class Meter
         double cumX() const { return _cumX; }
         double cumY() const { return _cumY; }
 
+        /// S-curve (pixel-locking) calibration state, for the caller to log.
+        bool   haveSCurve() const { return _haveCurve; }
+        double sCurvePeakToPeakX() const { return _sCurvePPx; } ///< px
+        double sCurvePeakToPeakY() const { return _sCurvePPy; } ///< px
+
     private:
         void dropAnchor(const cv::Mat &f32, double originX, double originY);
 
+        /// Sub-pixel shift of `curRaw` w.r.t. the anchor (phaseCorrelate coarse +
+        /// optional ECC). `curWin` is the Hann-windowed version for phaseCorrelate.
+        cv::Point2d measureShift(const cv::Mat &curWin, const cv::Mat &curRaw, double &response) const;
+
+        /// One-time: measure the estimator's pixel-locking bias vs fractional
+        /// shift (Fourier-shifted copies of the anchor) and fit it with harmonics.
+        void calibrateSCurve();
+
         Params  _params;
         cv::Mat _anchor;        ///< CV_32F reference frame (already windowed if hann), for phaseCorrelate
-        cv::Mat _anchorRaw;     ///< CV_32F reference frame, un-windowed, for ECC
+        cv::Mat _anchorRaw;     ///< CV_32F reference frame, un-windowed, for ECC + S-curve generation
         cv::Mat _hannWin;       ///< cached Hann window for the working size
         cv::Size _size {0, 0};  ///< working frame size (0,0 until first frame)
 
@@ -85,6 +102,11 @@ class Meter
         double _anchorOriginY = 0;
         double _cumX = 0, _cumY = 0; ///< last accepted cumulative displacement
         bool   _haveAnchor = false;
+
+        std::vector<double> _biasCoefX; ///< S-curve harmonic coefficients [a1,c1,a2,c2,...] for the X shift
+        std::vector<double> _biasCoefY;
+        bool   _haveCurve  = false;
+        double _sCurvePPx  = 0, _sCurvePPy = 0; ///< fitted S-curve peak-to-peak (px), diagnostic
 };
 
 } // namespace pecmeter

@@ -94,6 +94,7 @@ class MODULE_INIT BlindPec : public IndiModule
         void   disarmWatchdog();
 
         bool   _trace = false;                         ///< verbose per-frame state / property tracing (bring-up only)
+        bool   _sCurveLogged = false;                  ///< the S-curve calibration result has been logged once
 
         // ==================== Measurement core ====================
         pecmeter::Meter        _meter {};
@@ -128,6 +129,7 @@ class MODULE_INIT BlindPec : public IndiModule
 
         // ---- step 1: free-run characterization ----
         int    _charFrames  = 0;                       ///< frames collected in the Characterize phase
+        int    _charRejected = 0;                      ///< frames dropped by the trust gate during Characterize
         std::vector<double> _charT;                    ///< time samples (s since phase start)
         std::vector<double> _charX;                    ///< cumulative image displacement, X (px)
         std::vector<double> _charY;                    ///< cumulative image displacement, Y (px)

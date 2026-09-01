@@ -451,17 +451,49 @@
                 "max":31,
                 "hint": "size of the Gaussian ECC applies to images and gradients each iteration (forced odd). Larger = smoother gradients, less pixel-locking, slightly less sharp. Stacks with preblur"
             },
+            "scurve": {
+                "type":"bool",
+                "autoupdate":true,
+                "label": "Pixel-locking S-curve correction",
+                "order":"05a",
+                "value":true,
+                "hint": "once, at the first anchor: probe the estimator's residual pixel-locking bias with Fourier-shifted copies of the anchor, fit it, and subtract it from every shift. Targets exactly the frame-to-frame yo-yo. Adds ~1-2 s to the first frame"
+            },
+            "scurvepoints": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "S-curve samples / axis",
+                "order":"05b",
+                "value":32,
+                "format": "999",
+                "min":8,
+                "max":200,
+                "hint": "number of fractional-shift probes per axis for the S-curve fit. More = smoother curve, longer one-time calibration"
+            },
+            "scurveharm": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "S-curve harmonics",
+                "order":"05c",
+                "value":3,
+                "format": "99",
+                "min":1,
+                "max":8,
+                "hint": "harmonics in the S-curve fit. The 1-hump-per-pixel term dominates; 2-3 is plenty"
+            },
             "minresponse": {
                 "type":"float",
                 "autoupdate":true,
                 "directedit":true,
-                "label": "Min correlation response",
+                "label": "Min correlation (NCC)",
                 "order":"06",
-                "value":0.10,
+                "value":0.5,
                 "format": "9.999",
                 "min":0,
                 "max":1,
-                "hint": "reject a frame below this. With ECC on it is the ECC coefficient (0-1); ~0.3-0.5 is a reasonable floor once you know the typical range"
+                "hint": "reject a frame whose normalised cross-correlation with the anchor at the found shift is below this. Estimator-independent (0-1). A good textured surface gives 0.8-0.97; 0.5 is a safe floor"
             },
             "reanchorfrac": {
                 "type":"float",

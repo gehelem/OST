@@ -131,6 +131,9 @@ pecmeter::Params BlindPec::meterParams()
     if (getEltInt("measParams", "ecciters"))       p.eccIters     = getInt("measParams", "ecciters");
     if (getEltFloat("measParams", "ecceps"))       p.eccEps       = getFloat("measParams", "ecceps");
     if (getEltInt("measParams", "eccgauss"))       p.eccGaussFilt = getInt("measParams", "eccgauss");
+    if (getEltBool("measParams", "scurve"))        p.sCurve       = getBool("measParams", "scurve");
+    if (getEltInt("measParams", "scurvepoints"))   p.sCurvePoints = getInt("measParams", "scurvepoints");
+    if (getEltInt("measParams", "scurveharm"))     p.sCurveHarm   = getInt("measParams", "scurveharm");
     return p;
 }
 
@@ -161,6 +164,7 @@ void BlindPec::onExternalEvent(OST::ExtEvent event)
 
         _calibrateOnly = (event.eltkey == "calibrate");
         _finishOk = false;
+        _sCurveLogged = false;
 
         _theta       = getFloat("calibrationvalues", "theta") * M_PI / 180.0;
         _V           = getFloat("calibrationvalues", "V");
@@ -419,6 +423,7 @@ void BlindPec::SMInitInit()
         _phase = PhCharacterize;
         _phaseT0 = nowMs();
         _charFrames = 0;
+        _charRejected = 0;
         _charT.clear();
         _charX.clear();
         _charY.clear();
@@ -487,6 +492,18 @@ void BlindPec::SMMeasure()
 
     pecmeter::Sample s = _meter.update(raw);
 
+    // The S-curve (pixel-locking) calibration runs once inside the first update();
+    // log its result the first time it becomes available.
+    if (!_sCurveLogged && _meter.haveSCurve())
+    {
+        _sCurveLogged = true;
+        logInfo("Pixel-locking S-curve calibrated: peak-to-peak X=%1 px, Y=%2 px - now subtracted from every shift",
+        {
+            QString::number(_meter.sCurvePeakToPeakX(), 'f', 3),
+            QString::number(_meter.sCurvePeakToPeakY(), 'f', 3)
+        });
+    }
+
     _measOk     = s.ok;
     _measResp   = s.response;
     _reanchored = s.reanchored;
@@ -545,6 +562,18 @@ void BlindPec::computeCharacterize()
         _charShiftFrac.push_back(_shiftX - std::round(_shiftX));
         _charFrames++;
     }
+    else
+    {
+        _charRejected++;
+        if ((_charRejected % 10) == 1)
+            logWarning("Characterize: frame not trusted (NCC %1 < %2, step (%3,%4) px) - %5 rejected so far",
+        {
+            QString::number(_measResp, 'f', 3),
+            QString::number(getFloat("measParams", "minresponse"), 'f', 2),
+            QString::number(_shiftX, 'f', 1), QString::number(_shiftY, 'f', 1),
+            QString::number(_charRejected)
+        });
+    }
 
     const double span = _charT.empty() ? 0.0 : (_charT.back() - _charT.front());
 
@@ -572,9 +601,10 @@ void BlindPec::computeCharacterize()
         _arcsecPerPx = SIDEREAL_ARCSEC_PER_S / _V;
 
     const double dTot = std::hypot(_charX.back() - _charX.front(), _charY.back() - _charY.front());
-    logInfo("Characterization: %1 frames / %2 s | moved %3 px (dx=%4 dy=%5) | theta=%6 deg | V=%7 px/s | scale=%8 arcsec/px",
+    logInfo("Characterization: %1 frames kept / %2 rejected / %3 s | moved %4 px (dx=%5 dy=%6) | theta=%7 deg | V=%8 px/s | scale=%9 arcsec/px",
     {
-        QString::number(_charFrames), QString::number(span, 'f', 1), QString::number(dTot, 'f', 2),
+        QString::number(_charFrames), QString::number(_charRejected),
+        QString::number(span, 'f', 1), QString::number(dTot, 'f', 2),
         QString::number(_charX.back() - _charX.front(), 'f', 2), QString::number(_charY.back() - _charY.front(), 'f', 2),
         QString::number(_theta * 180.0 / M_PI, 'f', 1), QString::number(_V, 'f', 4),
         QString::number(_arcsecPerPx, 'f', 3)
