@@ -1,0 +1,440 @@
+{
+"p":{
+    "values": {
+        "devcat": "Control",
+        "group": "",
+        "order":"Control800",
+        "permission": 0,
+        "label": "Values",
+        "e": {
+            "pulseE": {
+                "type":"int",
+                "label": "Pulse E",
+                "order":"01",
+                "value": 0,
+                "format": "99.99"
+            },
+            "pulseW": {
+                "type":"int",
+                "label": "Pulse W",
+                "order":"02",
+                "value": 0,
+                "format": "99.99"
+            },
+            "rmsRA": {
+                "type":"float",
+                "label": "RMS RA",
+                "order":"03",
+                "value": 0,
+                "format": "99.99"
+            },
+            "residual": {
+                "type":"float",
+                "label": "Residual (px)",
+                "order":"04",
+                "value": 0,
+                "format": "999.99",
+                "hint": "p - V.t on the RA axis: the periodic error plus what is left of the tracking drift"
+            },
+            "response": {
+                "type":"float",
+                "label": "Correlation response",
+                "order":"05",
+                "value": 0,
+                "format": "9.999",
+                "hint": "phaseCorrelate peak sharpness; low = frame not trusted"
+            },
+            "crossaxis": {
+                "type":"float",
+                "label": "Cross-axis (px)",
+                "order":"06",
+                "value": 0,
+                "format": "999.99",
+                "hint": "displacement on the image axis orthogonal to RA; should stay near 0 (health signal: CD slip / tilt)"
+            }
+        }
+    },
+    "calibrationvalues": {
+        "devcat": "Calibration",
+        "group": "",
+        "order":"Control850",
+        "permission": 0,
+        "hasprofile": true,
+        "label": "Calibration Values",
+        "e": {
+            "G": {
+                "type":"float",
+                "label": "Gain (ms/px)",
+                "order":"01",
+                "value": 0,
+                "format": "9999.99",
+                "hint": "ms of W/E guide pulse per px of image displacement"
+            },
+            "V": {
+                "type":"float",
+                "label": "Target rate (px/s)",
+                "order":"02",
+                "value": 0,
+                "format": "9.9999",
+                "hint": "image speed for perfect sidereal tracking; refined online (adaptive)"
+            },
+            "arcsecPerPx": {
+                "type":"float",
+                "label": "Scale (arcsec/px)",
+                "order":"03",
+                "value": 0,
+                "format": "9.9999",
+                "hint": "display only; needs the mount guide rate to be known"
+            },
+            "guideRateK": {
+                "type":"float",
+                "label": "Mount guide rate (x sidereal)",
+                "order":"04",
+                "value": 0.5,
+                "format": "9.999"
+            },
+            "revRA": {
+                "type":"bool",
+                "label": "Reverse RA",
+                "order":"05",
+                "value": false,
+                "hint": "flip the sense of the RA correction (set at commissioning)"
+            }
+        }
+    },
+    "drift": {
+        "devcat": "Control",
+        "group": "",
+        "order":"Control350",
+        "permission": 0,
+        "label": "Drift",
+        "hasGrid":true,
+        "showElts":false,
+        "showGrid":false,
+        "gridLimit":200,
+        "graphType":"XY",
+        "graphParams":{
+            "X":"RA",
+            "Y":"DEC",
+            "Xmin":-5,
+            "Xmax":5,
+            "Ymin":-5,
+            "Ymax":5
+        },
+        "e": {
+            "RA": {
+                "type":"float",
+                "label": "RA",
+                "order":"01",
+                "format": "99.99"
+            },
+            "DEC": {
+                "type":"float",
+                "label": "DEC",
+                "order":"02",
+                "format": "99.99"
+            }
+        }
+    },
+    "guiding": {
+        "devcat": "Control",
+        "group": "",
+        "order":"Control100",
+        "permission": 0,
+        "label": "Guiding graph",
+        "hasGrid":true,
+        "showElts":false,
+        "showGrid":false,
+        "gridLimit":20,
+        "graphType":"PHD",
+        "graphParams":{
+            "D":"time",
+            "RA":"RA",
+            "DE":"DE",
+            "pRA":"pRA",
+            "pDE":"pDE",
+            "RSB":"SNR",
+            "RMS":"RMS"
+        },
+        "e": {
+            "time": { "type":"float", "label": "time", "order":"01", "value":0 },
+            "RA":   { "type":"float", "label": "Drift (RA)", "order":"02", "format": "99.99" },
+            "DE":   { "type":"float", "label": "Cross axis", "order":"03", "format": "99.99" },
+            "pRA":  { "type":"float", "label": "Pulse (RA)", "order":"04", "format": "99.99" },
+            "pDE":  { "type":"float", "label": "Pulse (DE)", "order":"05", "format": "99.99" },
+            "SNR":  { "type":"float", "label": "Response",   "order":"06", "value":0 },
+            "RMS":  { "type":"float", "label": "RMS",        "order":"07", "value":0 }
+        }
+    },
+    "calParams": {
+        "devcat": "Calibration",
+        "group": "",
+        "order":"Parameters100",
+        "permission": 2,
+        "hasprofile":true,
+        "label": "Calibration Parameters",
+        "e": {
+            "calpulse": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Gain-cal pulse (ms)",
+                "order":"01",
+                "value":800,
+                "format": "9999",
+                "hint": "W pulse sent during gain calibration; must move the image by a clearly measurable amount"
+            },
+            "calsteps": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Gain-cal pulses",
+                "order":"02",
+                "value":4,
+                "format": "99",
+                "min":2,
+                "max":20
+            }
+        }
+    },
+    "pid": {
+        "devcat": "Guiding",
+        "group": "",
+        "order":"Parameters150",
+        "permission": 2,
+        "hasprofile":true,
+        "label": "Control law",
+        "e": {
+            "kp": {
+                "type":"float",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Kp",
+                "order":"01",
+                "value":0.6,
+                "format": "9.999",
+                "hint": "proportional gain on the residual (px -> px of correction)"
+            },
+            "ki": {
+                "type":"float",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Ki",
+                "order":"02",
+                "value":0.05,
+                "format": "9.999",
+                "hint": "integral gain (px.s). Nulls a steady offset a P-only law would leave; 0 = pure P"
+            },
+            "kd": {
+                "type":"float",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Kd",
+                "order":"03",
+                "value":0,
+                "format": "9.999"
+            }
+        }
+    },
+    "guideParams": {
+        "devcat": "Guiding",
+        "group": "",
+        "order":"Parameters200",
+        "permission": 2,
+        "rule":2,
+        "hasprofile":true,
+        "label": "Guide parameters",
+        "e": {
+            "pulsemin": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Min pulse (ms)",
+                "order":"01",
+                "value":20,
+                "format": "9999"
+            },
+            "pulsemax": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Max pulse (ms)",
+                "order":"02",
+                "value":1500,
+                "format": "9999"
+            },
+            "warmupframes": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Characterization frames",
+                "order":"03",
+                "value":60,
+                "format": "9999",
+                "min":5,
+                "max":100000,
+                "hint": "track-only frames used to fit the target rate V before guiding starts"
+            },
+            "charminsecs": {
+                "type":"float",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Characterization min duration (s)",
+                "order":"03a",
+                "value":30,
+                "format": "9999.9",
+                "min":1,
+                "max":100000,
+                "hint": "characterization also waits at least this long: a slow sidereal drift cannot be fitted over a fraction of a second. Ideally >= one worm period"
+            },
+            "blankframes": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Blank frames after a pulse",
+                "order":"04",
+                "value":1,
+                "format": "99",
+                "min":0,
+                "max":10,
+                "hint": "frames measured but not corrected right after a pulse, to skip the mechanical transient"
+            },
+            "alphaV": {
+                "type":"float",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "V adaptation gain",
+                "order":"05",
+                "value":0.02,
+                "format": "9.9999",
+                "min":0,
+                "max":1,
+                "hint": "online correction of the target rate V from the residual ramp. 0 = fixed V. Small = slow, stable"
+            },
+            "rmsOver": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "RMS over x frames",
+                "order":"06",
+                "value":20,
+                "format": "999",
+                "min":2,
+                "max":1000
+            },
+            "reanchorfrac": {
+                "type":"float",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Re-anchor fraction",
+                "order":"07",
+                "value":0.35,
+                "format": "9.999",
+                "min":0.05,
+                "max":0.9,
+                "hint": "re-drop the correlation anchor once the running shift exceeds this fraction of half the frame"
+            },
+            "maxsteppx": {
+                "type":"float",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Max step (px)",
+                "order":"08",
+                "value":40,
+                "format": "9999.9",
+                "hint": "reject a frame whose move since the last accepted one exceeds this (vibration / glitch)"
+            },
+            "minresponse": {
+                "type":"float",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Min correlation response",
+                "order":"09",
+                "value":0.10,
+                "format": "9.999",
+                "min":0,
+                "max":1
+            },
+            "maxmatchfail": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Max consecutive bad frames",
+                "order":"10",
+                "value":10,
+                "format": "999",
+                "min":1,
+                "max":1000,
+                "hint": "guiding is aborted after this many untrusted frames in a row"
+            },
+            "ditherpixel": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Dither amplitude (px)",
+                "order":"11",
+                "value":5,
+                "format": "99",
+                "min":0,
+                "max":50,
+                "hint": "RA-only dither (DEC component of a sequencer dither request is a no-op here)"
+            },
+            "watchdog": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Hardware timeout (s)",
+                "order":"12",
+                "value":30,
+                "format": "999",
+                "min":0,
+                "max":600,
+                "hint": "abort if the camera or mount stops responding for this long. 0 disables"
+            }
+        }
+    },
+    "revCorrections": {
+        "devcat": "Guiding",
+        "group": "",
+        "order":"Parameters300",
+        "permission": 2,
+        "rule":2,
+        "hasprofile":true,
+        "label": "Reverse guiding corrections",
+        "e": {
+            "revRA": {
+                "type":"bool",
+                "label": "RA",
+                "order":"01",
+                "autoupdate":true,
+                "value":false
+            }
+        }
+    },
+    "disCorrections": {
+        "devcat": "Guiding",
+        "group": "",
+        "permission": 2,
+        "order":"Parameters400",
+        "rule":2,
+        "hasprofile":true,
+        "label": "Disable guiding corrections",
+        "e": {
+            "disRA+": {
+                "autoupdate":true,
+                "type":"bool",
+                "label": "RA+",
+                "order":"01",
+                "value":false
+            },
+            "disRA-": {
+                "autoupdate":true,
+                "type":"bool",
+                "label": "RA-",
+                "order":"02",
+                "value":false
+            }
+        }
+    }
+}
+}
