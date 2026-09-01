@@ -78,10 +78,26 @@
                 "format": "9.9999",
                 "hint": "image speed for perfect sidereal tracking; refined online (adaptive)"
             },
+            "theta": {
+                "type":"float",
+                "label": "RA axis angle (deg)",
+                "order":"03",
+                "value": 0,
+                "format": "999.99",
+                "hint": "direction of the RA axis in the microscope image, from the free-run sidereal drift"
+            },
+            "wdir": {
+                "type":"int",
+                "label": "W pulse sign",
+                "order":"04",
+                "value": -1,
+                "format": "99",
+                "hint": "sign of a West pulse's effect along +theta (+1 or -1), from gain calibration"
+            },
             "arcsecPerPx": {
                 "type":"float",
                 "label": "Scale (arcsec/px)",
-                "order":"03",
+                "order":"05",
                 "value": 0,
                 "format": "9.9999",
                 "hint": "display only; needs the mount guide rate to be known"
@@ -89,16 +105,16 @@
             "guideRateK": {
                 "type":"float",
                 "label": "Mount guide rate (x sidereal)",
-                "order":"04",
+                "order":"06",
                 "value": 0.5,
                 "format": "9.999"
             },
             "revRA": {
                 "type":"bool",
                 "label": "Reverse RA",
-                "order":"05",
+                "order":"07",
                 "value": false,
-                "hint": "flip the sense of the RA correction (set at commissioning)"
+                "hint": "manual override: flip the sense of the RA correction (normally wdir handles it)"
             }
         }
     },
@@ -174,26 +190,39 @@
         "hasprofile":true,
         "label": "Calibration Parameters",
         "e": {
+            "chardur": {
+                "type":"float",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Characterization duration (s)",
+                "order":"01",
+                "value":60,
+                "format": "99999.9",
+                "min":5,
+                "max":100000,
+                "hint": "step 1: observe the free-run sidereal drift for this long (mount tracking, no pulses) to get the RA axis direction and rate. A rough value needs a few tens of s; a clean one needs >= one worm period"
+            },
             "calpulse": {
                 "type":"int",
                 "autoupdate":true,
                 "directedit":true,
                 "label": "Gain-cal pulse (ms)",
-                "order":"01",
+                "order":"02",
                 "value":800,
                 "format": "9999",
-                "hint": "W pulse sent during gain calibration; must move the image by a clearly measurable amount"
+                "hint": "step 2: W/E pulse length; must move the image by a clearly measurable amount"
             },
             "calsteps": {
                 "type":"int",
                 "autoupdate":true,
                 "directedit":true,
-                "label": "Gain-cal pulses",
-                "order":"02",
+                "label": "Gain-cal pulses per direction",
+                "order":"03",
                 "value":4,
                 "format": "99",
                 "min":2,
-                "max":20
+                "max":20,
+                "hint": "step 2 sends this many W pulses and this many E pulses, alternating"
             }
         }
     },
@@ -263,30 +292,6 @@
                 "value":1500,
                 "format": "9999"
             },
-            "warmupframes": {
-                "type":"int",
-                "autoupdate":true,
-                "directedit":true,
-                "label": "Characterization frames",
-                "order":"03",
-                "value":60,
-                "format": "9999",
-                "min":5,
-                "max":100000,
-                "hint": "track-only frames used to fit the target rate V before guiding starts"
-            },
-            "charminsecs": {
-                "type":"float",
-                "autoupdate":true,
-                "directedit":true,
-                "label": "Characterization min duration (s)",
-                "order":"03a",
-                "value":30,
-                "format": "9999.9",
-                "min":1,
-                "max":100000,
-                "hint": "characterization also waits at least this long: a slow sidereal drift cannot be fitted over a fraction of a second. Ideally >= one worm period"
-            },
             "blankframes": {
                 "type":"int",
                 "autoupdate":true,
@@ -310,6 +315,18 @@
                 "min":0,
                 "max":1,
                 "hint": "online correction of the target rate V from the residual ramp. 0 = fixed V. Small = slow, stable"
+            },
+            "intmax": {
+                "type":"float",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Integral clamp (px)",
+                "order":"05a",
+                "value":50,
+                "format": "999.9",
+                "min":0,
+                "max":5000,
+                "hint": "anti-windup: the integral accumulator is clamped to this magnitude. 0 -> default 50"
             },
             "rmsOver": {
                 "type":"int",

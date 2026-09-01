@@ -58,6 +58,18 @@ BlindPec::BlindPec(QString name, QString label, QString profile, QVariantMap ava
 
     defineMeAsGuider();
 
+    // Extra action buttons (defineMeAsGuider() creates calibrate / guide /
+    // abortguider; add dither and reset-calibration like the guider does).
+    OST::PropertyMulti *pm = getProperty("actions");
+    OST::ElementBool *rc = new OST::ElementBool("resetcalibration", "Reset calibration", "bpec10", "");
+    rc->setValue(false, false);
+    rc->setPreIcon("block");
+    pm->addElt(rc);
+    OST::ElementBool *di = new OST::ElementBool("dither", "Dither", "bpec11", "");
+    di->setValue(false, false);
+    di->setPreIcon("shuffle");
+    pm->addElt(di);
+
     // Single-shot hardware watchdog, re-armed at every hardware wait, disarmed on
     // the matching callback or on abort. Same pattern as guider.
     _watchdog.setSingleShot(true);
@@ -88,6 +100,26 @@ void BlindPec::disarmWatchdog()
     _watchdog.stop();
 }
 
+// Clear every action button, then light the one that is now running and mark the
+// property Busy (guider pattern). Pass "" to leave all cleared and mark it Ok.
+void BlindPec::setActionRunning(const QString &running)
+{
+    getEltBool("actions", "calibrate")->setValue(false, false);
+    getEltBool("actions", "guide")->setValue(false, false);
+    getEltBool("actions", "abortguider")->setValue(false, false);
+    getEltBool("actions", "dither")->setValue(false, false);
+    getEltBool("actions", "resetcalibration")->setValue(false, false);
+    if (!running.isEmpty())
+    {
+        getEltBool("actions", running)->setValue(true, false);
+        getProperty("actions")->setState(OST::Busy, true);
+    }
+    else
+    {
+        getProperty("actions")->setState(OST::Ok, true);
+    }
+}
+
 pecmeter::Params BlindPec::meterParams()
 {
     pecmeter::Params p;
@@ -116,20 +148,34 @@ void BlindPec::onExternalEvent(OST::ExtEvent event)
     {
         if (!getEltBool(event.prpkey, event.eltkey)->setValue(false, true))
             return;
-        getProperty(event.prpkey)->setState(OST::Ok, true);
+        if (_sm.isRunning())
+        {
+            logWarning("BlindPEC already running - ignoring %1", {event.eltkey});
+            return;
+        }
 
         _calibrateOnly = (event.eltkey == "calibrate");
+        _finishOk = false;
 
         _G           = getFloat("calibrationvalues", "G");
+        _wDir        = getInt("calibrationvalues", "wdir");
+        if (_wDir == 0) _wDir = -1;
         _arcsecPerPx = getFloat("calibrationvalues", "arcsecPerPx");
         _guideRateK  = getFloat("calibrationvalues", "guideRateK");
         if (_guideRateK <= 0) _guideRateK = 0.5;
 
-        // "calibrate" always redoes the gain. "guide" reuses a stored gain if we
-        // have one (and always re-characterizes V, which drifts with temperature).
-        _phase = (_calibrateOnly || _G <= 0.0) ? PhGainCal : PhCharacterize;
+        // Always run step 1 (free-run characterization: theta + V, needed to
+        // decontaminate the gain and always re-measured since V drifts with
+        // temperature). "calibrate" then does step 2 and stops. "guide" does
+        // step 2 unless a stored gain can be reused.
+        _phase             = PhCharacterize;
+        _stopAfterGainCal  = _calibrateOnly;
+        _skipGainCal       = (!_calibrateOnly && _G > 0.0);
 
-        logInfo(_calibrateOnly ? "BlindPEC: calibration only" : "BlindPEC: calibrate + guide");
+        logInfo(_calibrateOnly ? "BlindPEC: calibration only"
+                : _skipGainCal ? "BlindPEC: guide (reusing stored gain G=%1 ms/px)"
+                : "BlindPEC: calibrate + guide",
+        {QString::number(_G, 'f', 1)});
         _sm.start();
         return;
     }
@@ -147,6 +193,21 @@ void BlindPec::onExternalEvent(OST::ExtEvent event)
             {
                 logWarning("Dither ignored - BlindPEC is not guiding");
             }
+        }
+        return;
+    }
+
+    if (event.eltkey == "resetcalibration")
+    {
+        if (getEltBool(event.prpkey, event.eltkey)->setValue(false, true))
+        {
+            getProperty(event.prpkey)->setState(OST::Ok, true);
+            getEltFloat("calibrationvalues", "G")->setValue(0);
+            getEltInt("calibrationvalues", "wdir")->setValue(-1);
+            getEltFloat("calibrationvalues", "theta")->setValue(0);
+            getEltFloat("calibrationvalues", "V")->setValue(0);
+            getEltFloat("calibrationvalues", "arcsecPerPx")->setValue(0, true);
+            logInfo("BlindPEC: calibration data cleared - a full calibrate is required before guiding");
         }
         return;
     }
@@ -170,7 +231,7 @@ void BlindPec::onUpdateProperty(INDI::Property property)
             && QString(property.getName()) == "CCD_FRAME_RESET"
             && property.getState() == IPS_OK)
     {
-        logInfo("FrameResetDone (CCD_FRAME_RESET -> IPS_OK)");
+        if (_trace) logInfo("FrameResetDone (CCD_FRAME_RESET -> IPS_OK)");
         emit FrameResetDone();
     }
 
@@ -218,7 +279,8 @@ void BlindPec::newBLOB(INDI::PropertyBlob pblob)
     _image->loadBlob(pblob, 64);
     stats = _image->getStats();
 
-    logInfo("frame received: %1x%2 bpp=%3 ch=%4",
+    if (_trace)
+        logInfo("frame received: %1x%2 bpp=%3 ch=%4",
     {
         QString::number(stats.width), QString::number(stats.height),
         QString::number(stats.bytesPerPixel), QString::number(stats.channels)
@@ -306,7 +368,7 @@ void BlindPec::SMInitInit()
     frameReset(getString("devices", "camera"));
     setFocalLengthAndDiameter();
 
-    getProperty("actions")->setState(OST::Busy, true);
+    setActionRunning(_calibrateOnly ? "calibrate" : "guide");
     getProperty("drift")->clearGrid();
     getProperty("guiding")->clearGrid();
 
@@ -324,28 +386,18 @@ void BlindPec::SMInitInit()
     else
         logWarning("Could not read mount GUIDE_RATE - assuming %1x sidereal", {QString::number(_guideRateK, 'f', 2)});
 
-    // Prepare the phase we were told to run.
+    // Step 1: free-run characterization.
     _meter = pecmeter::Meter(meterParams());
     _consecutiveBad = 0;
+    _phase = PhCharacterize;
     _phaseT0 = nowMs();
-
-    if (_phase == PhGainCal)
-    {
-        _gainStep = 0;
-        _gainDeltas.clear();
-        _gainPulseMs = getInt("calParams", "calpulse");
-        _G = 0;
-        logInfo("Phase: gain calibration (%1 x %2 ms W pulses)",
-        {QString::number(getInt("calParams", "calsteps")), QString::number((int)_gainPulseMs)});
-    }
-    else
-    {
-        _charFrames = 0;
-        _charT.clear();
-        _charP.clear();
-        logInfo("Phase: characterization (%1 frames), gain G = %2 ms/px (loaded)",
-        {QString::number(getInt("guideParams", "warmupframes")), QString::number(_G, 'f', 1)});
-    }
+    _charFrames = 0;
+    _charT.clear();
+    _charX.clear();
+    _charY.clear();
+    _measX = _measY = 0;
+    logInfo("Phase: characterization (free-run drift, %1 s) - mount must be tracking sidereal",
+    {QString::number(getFloat("calParams", "chardur"), 'f', 0)});
 
     setStateEvent(OST::Busy, "initdone", "initialized", "BlindPEC initialized");
     emit InitDone();
@@ -353,7 +405,7 @@ void BlindPec::SMInitInit()
 
 void BlindPec::SMRequestFrameReset()
 {
-    logInfo("SM: RequestFrameReset");
+    if (_trace) logInfo("SM: RequestFrameReset");
     if (!frameReset(getString("devices", "camera")))
     {
         setStateEvent(OST::Error, "error", "devicefailed", "camera failed");
@@ -369,7 +421,7 @@ void BlindPec::SMRequestFrameReset()
     // property update hasn't already advanced us.
     QTimer::singleShot(1500, this, [this]()
     {
-        logInfo("FrameResetDone (fallback timer)");
+        if (_trace) logInfo("FrameResetDone (fallback timer)");
         emit FrameResetDone();
     });
 }
@@ -379,7 +431,8 @@ void BlindPec::SMRequestExposure()
     double exp = getFloat("parms", "exposure");
     int gain = getInt("parms", "gain");
     int offset = getInt("parms", "offset");
-    logInfo("SM: RequestExposure exp=%1s gain=%2 offset=%3",
+    if (_trace)
+        logInfo("SM: RequestExposure exp=%1s gain=%2 offset=%3",
     {QString::number(exp, 'f', 3), QString::number(gain), QString::number(offset)});
 
     if (!requestCapture(getString("devices", "camera"), exp, gain, offset))
@@ -414,7 +467,8 @@ void BlindPec::SMMeasure()
         _measY = s.y;
     }
 
-    logInfo("SM: Measure %1x%2 -> ok=%3 resp=%4 x=%5 y=%6 step=(%7,%8)%9",
+    if (_trace)
+        logInfo("SM: Measure %1x%2 -> ok=%3 resp=%4 x=%5 y=%6 step=(%7,%8)%9",
     {
         QString::number(stats.width), QString::number(stats.height),
         s.ok ? "yes" : "NO", QString::number(s.response, 'f', 3),
@@ -444,154 +498,202 @@ void BlindPec::SMCompute()
     }
 }
 
-// ---- Phase: gain calibration -----------------------------------------------
-void BlindPec::computeGainCal()
-{
-    const int calsteps = getInt("calParams", "calsteps");
-
-    // Record the effect of the pulse sent on the previous cycle.
-    if (_gainStep > 0 && _measOk)
-    {
-        const double moved = std::hypot(_measX - _gainRefX, _measY - _gainRefY);
-        _gainDeltas.push_back(moved);
-        logInfo("Gain cal %1/%2: pulse %3 ms -> moved %4 px",
-        {
-            QString::number(_gainStep), QString::number(calsteps),
-            QString::number((int)_gainPulseMs), QString::number(moved, 'f', 2)
-        });
-    }
-    else if (_gainStep > 0 && !_measOk)
-    {
-        logWarning("Gain cal %1: frame not trusted (response %2) - repeating",
-        {QString::number(_gainStep), QString::number(_measResp, 'f', 3)});
-        _gainStep--;   // retry this step
-    }
-
-    if ((int)_gainDeltas.size() < calsteps)
-    {
-        _gainRefX = _measX;
-        _gainRefY = _measY;
-        _pulseW = (int)_gainPulseMs;   // measured next cycle
-        _gainStep++;
-        emit ComputeDone();
-        return;
-    }
-
-    // Combine.
-    double mean = 0;
-    for (double d : _gainDeltas) mean += d;
-    mean /= _gainDeltas.size();
-
-    if (mean < 1e-3)
-    {
-        logError("Gain calibration: pulses produced no measurable motion - abort. "
-                 "Increase calpulse or check the mount / illumination.");
-        setStateEvent(OST::Error, "error", "calbad", "no motion");
-        emit Abort();
-        return;
-    }
-
-    _G = _gainPulseMs / mean;   // ms of pulse per px
-    // Target rate from the gain (notes s.3 method 1): a P-ms pulse at k x sidereal
-    // moves the image by `mean` px, so V = mean * 1000 / (k * P)  [px/s].
-    _V = mean * 1000.0 / (_guideRateK * _gainPulseMs);
-    _arcsecPerPx = (_guideRateK * SIDEREAL_ARCSEC_PER_S * _gainPulseMs / 1000.0) / mean;
-
-    logInfo("Gain: G = %1 ms/px | seed V = %2 px/s | scale = %3 arcsec/px (guideRate %4x)",
-    {
-        QString::number(_G, 'f', 2), QString::number(_V, 'f', 4),
-        QString::number(_arcsecPerPx, 'f', 4), QString::number(_guideRateK, 'f', 2)
-    });
-
-    getEltFloat("calibrationvalues", "G")->setValue(_G);
-    getEltFloat("calibrationvalues", "arcsecPerPx")->setValue(_arcsecPerPx);
-    getEltFloat("calibrationvalues", "guideRateK")->setValue(_guideRateK, true);
-
-    // Move on to characterization.
-    _phase = PhCharacterize;
-    _charFrames = 0;
-    _charT.clear();
-    _charP.clear();
-    _meter.reset();
-    _measX = _measY = 0;
-    _phaseT0 = nowMs();
-    setStateEvent(OST::Busy, "cal", "gaindone", "gain calibrated");
-    emit ComputeDone();
-}
-
-// ---- Phase: characterization (fit the target rate V) ----------------------
+// ---- Step 1: free-run characterization (mount tracking, no pulses) ---------
+// Observe the sidereal drift for a user-set duration. The drift direction gives
+// the RA axis orientation in the image (_theta); its rate gives the target rate
+// (_V). The residual around the fitted line is the periodic error (not used yet).
 void BlindPec::computeCharacterize()
 {
-    const int    want = getInt("guideParams", "warmupframes");
-    const double  minSecs = getFloat("guideParams", "charminsecs");
+    const double dur = getFloat("calParams", "chardur");
 
     if (_measOk)
     {
         _charT.push_back((nowMs() - _phaseT0) / 1000.0);
-        _charP.push_back(_measX);
+        _charX.push_back(_measX);
+        _charY.push_back(_measY);
         _charFrames++;
     }
 
     const double span = _charT.empty() ? 0.0 : (_charT.back() - _charT.front());
 
-    // Need BOTH: enough frames AND enough wall-clock time. A slow sidereal drift
-    // (a few px/s at most) cannot be measured over a fraction of a second even
-    // with hundreds of frames.
-    if (_charFrames < want || span < minSecs)
+    if (span < dur || _charFrames < 10)
     {
-        if (_trace && (_charFrames % 20) == 0)
-            logInfo("Characterize: %1/%2 frames, span %3 s / %4 s, p=%5 px",
+        if (_trace && _charFrames > 0 && (_charFrames % 20) == 0)
+            logInfo("Characterize: %1 frames, %2 s / %3 s, xy=(%4,%5) px",
         {
-            QString::number(_charFrames), QString::number(want),
-            QString::number(span, 'f', 1), QString::number(minSecs, 'f', 0),
-            QString::number(_measX, 'f', 2)
+            QString::number(_charFrames), QString::number(span, 'f', 1),
+            QString::number(dur, 'f', 0),
+            QString::number(_measX, 'f', 2), QString::number(_measY, 'f', 2)
         });
         emit ComputeDone();   // no pulse
         return;
     }
 
-    fitTargetRate();
+    fitDriftLine();
 
-    const double dP = _charP.empty() ? 0.0 : (_charP.back() - _charP.front());
-    logInfo("Characterization: %1 frames over %2 s, image moved %3 px -> V = %4 px/s (%5 arcsec/s)",
+    const double dTot = std::hypot(_charX.back() - _charX.front(), _charY.back() - _charY.front());
+    logInfo("Characterization: %1 frames over %2 s, image moved %3 px -> theta=%4 deg, V=%5 px/s (%6 arcsec/s)",
     {
-        QString::number(_charFrames), QString::number(span, 'f', 1),
-        QString::number(dP, 'f', 2), QString::number(_V, 'f', 4),
+        QString::number(_charFrames), QString::number(span, 'f', 1), QString::number(dTot, 'f', 2),
+        QString::number(_theta * 180.0 / M_PI, 'f', 1), QString::number(_V, 'f', 4),
         QString::number(_V * _arcsecPerPx, 'f', 3)
     });
-    if (std::fabs(_V) < 1e-3)
-        logWarning("Target rate V is ~0: is the mount actually tracking? is the "
-                   "microscope on a moving surface? Guiding will do nothing useful.");
-    getEltFloat("calibrationvalues", "V")->setValue(_V, true);
+    if (_V < 1e-3)
+        logWarning("Drift rate V is ~0: is the mount tracking? is the microscope on a "
+                   "moving surface? Calibration / guiding will do nothing useful.");
+    getEltFloat("calibrationvalues", "V")->setValue(_V);
+    getEltFloat("calibrationvalues", "theta")->setValue(_theta * 180.0 / M_PI, true);
 
-    if (_calibrateOnly)
+    if (_skipGainCal)
     {
-        logInfo("BlindPEC: calibration complete");
-        getProperty("actions")->setState(OST::Ok, true);
-        setStateEvent(OST::Ok, "caldone", "calcompleted", "calibration completed");
-        emit Abort();   // TODO: a proper clean stop instead of reusing Abort
+        logInfo("Reusing stored gain G=%1 ms/px, wDir=%2 - skipping gain calibration",
+        {QString::number(_G, 'f', 1), QString::number(_wDir)});
+        enterGuide();
+        emit ComputeDone();
         return;
     }
 
-    // Enter guiding.
+    // Step 2 next.
+    _phase = PhGainCal;
+    _gainStep = 0;
+    _gainPending = 0;
+    _gainWeff.clear();
+    _gainEeff.clear();
+    logInfo("Phase: gain calibration (%1 W + %1 E pulses of %2 ms, drift removed with V)",
+    {QString::number(getInt("calParams", "calsteps")), QString::number(getInt("calParams", "calpulse"))});
+    emit ComputeDone();
+}
+
+// ---- Step 2: pulse gain calibration (mount still tracking) ----------------
+// Alternate W and E pulses. For each, the projected image move minus the known
+// sidereal contribution (V * elapsed) is the pulse-only effect. The antisymmetric
+// mean |W|,|E| cancels any residual slow drift; its sign gives the W direction.
+void BlindPec::computeGainCal()
+{
+    const int    calsteps = getInt("calParams", "calsteps");
+    const int    calpulse = getInt("calParams", "calpulse");
+    const int    total    = 2 * calsteps;
+
+    // Close out the pulse sent on the previous cycle.
+    if (_gainPending != 0)
+    {
+        if (_measOk)
+        {
+            const double dP   = projRA(_measX, _measY) - _gainSnapP;
+            const double dTau = (nowMs() - _gainSnapT) / 1000.0;
+            const double eff  = dP - _V * dTau;   // pulse-only, signed along +theta
+            if (_gainPending < 0) _gainWeff.push_back(eff);
+            else                  _gainEeff.push_back(eff);
+            logInfo("Gain cal %1/%2: %3 %4 ms -> %5 px (raw %6, drift -%7)",
+            {
+                QString::number((int)(_gainWeff.size() + _gainEeff.size())), QString::number(total),
+                _gainPending < 0 ? "W" : "E", QString::number(calpulse),
+                QString::number(eff, 'f', 2), QString::number(dP, 'f', 2),
+                QString::number(_V * dTau, 'f', 2)
+            });
+        }
+        else
+        {
+            logWarning("Gain cal: frame not trusted (response %1) - repeating this pulse",
+            {QString::number(_measResp, 'f', 3)});
+        }
+        _gainPending = 0;
+    }
+
+    if ((int)(_gainWeff.size() + _gainEeff.size()) < total)
+    {
+        const int dir = (_gainStep % 2 == 0) ? -1 : +1;   // W, E, W, E, ...
+        _gainSnapP = projRA(_measX, _measY);
+        _gainSnapT = nowMs();
+        if (dir < 0) _pulseW = calpulse;
+        else         _pulseE = calpulse;
+        _gainPending = dir;
+        _gainStep++;
+        emit ComputeDone();
+        return;
+    }
+
+    // --- combine ---------------------------------------------------------
+    auto mean = [](const std::vector<double> &v)
+    {
+        double s = 0;
+        for (double x : v) s += x;
+        return v.empty() ? 0.0 : s / v.size();
+    };
+    const double mW = mean(_gainWeff);
+    const double mE = mean(_gainEeff);
+    const double gpx = (std::fabs(mW) + std::fabs(mE)) / 2.0;   // px per calpulse ms
+
+    if (gpx < 1e-3)
+    {
+        logError("Gain calibration: pulses produced no measurable motion - abort. "
+                 "Increase calpulse, or check the mount guide output / illumination.");
+        setStateEvent(OST::Error, "error", "calbad", "no motion");
+        emit Abort();
+        return;
+    }
+
+    _G    = calpulse / gpx;                       // ms per px
+    _wDir = (mW >= 0.0) ? +1 : -1;
+    _arcsecPerPx = (_guideRateK * SIDEREAL_ARCSEC_PER_S * calpulse / 1000.0) / gpx;
+
+    const double asym = std::fabs(std::fabs(mW) - std::fabs(mE)) / gpx;
+    logInfo("Gain: G=%1 ms/px | wDir=%2 | W=%3 E=%4 px/pulse | asym %5%% | scale %6 arcsec/px (rate %7x)",
+    {
+        QString::number(_G, 'f', 2), QString::number(_wDir),
+        QString::number(mW, 'f', 2), QString::number(mE, 'f', 2),
+        QString::number(asym * 100.0, 'f', 0),
+        QString::number(_arcsecPerPx, 'f', 4), QString::number(_guideRateK, 'f', 2)
+    });
+    if (asym > 0.5)
+        logWarning("Gain calibration: W and E effects differ by %1%% - possible backlash "
+                   "or a wrong V. Guiding may be rough.", {QString::number(asym * 100.0, 'f', 0)});
+
+    getEltFloat("calibrationvalues", "G")->setValue(_G);
+    getEltInt("calibrationvalues", "wdir")->setValue(_wDir);
+    getEltFloat("calibrationvalues", "arcsecPerPx")->setValue(_arcsecPerPx);
+    getEltFloat("calibrationvalues", "guideRateK")->setValue(_guideRateK, true);
+
+    if (_stopAfterGainCal)
+    {
+        _finishOk = true;   // SMAbort: clean finish, don't light abortguider
+        setStateEvent(OST::Ok, "caldone", "calcompleted", "calibration completed");
+        emit Abort();
+        return;
+    }
+
+    enterGuide();
+    emit ComputeDone();
+}
+
+void BlindPec::enterGuide()
+{
     _phase = PhGuide;
+    setActionRunning("guide");   // switch the lit button from calibrate to guide
     _meter.reset();
     _measX = _measY = 0;
     _t0Guide = nowMs();
+    _tPrev = 0;
     _residual = _residualPrev = 0;
     _intR = 0;
     _intRsat = false;
     _blank = 0;
     _lastPulseDir = 0;
+    _ditherOffset = 0;
+    _ditherPending = false;
     _rmsBuf.clear();
     _consecutiveBad = 0;
     getProperty("drift")->clearGrid();
     getProperty("guiding")->clearGrid();
-    int rmsOver = getInt("guideParams", "rmsOver");
+    const int rmsOver = getInt("guideParams", "rmsOver");
     getProperty("drift")->setGridLimit(rmsOver);
     getProperty("guiding")->setGridLimit(rmsOver);
+    logInfo("Phase: guiding (theta=%1 deg, V=%2 px/s, G=%3 ms/px, wDir=%4)",
+    {
+        QString::number(_theta * 180.0 / M_PI, 'f', 1), QString::number(_V, 'f', 4),
+        QString::number(_G, 'f', 1), QString::number(_wDir)
+    });
     setStateEvent(OST::Busy, "guiding", "startguiding", "start guiding");
-    emit ComputeDone();
 }
 
 // ---- Phase: guiding ------------------------------------------------------
@@ -616,8 +718,8 @@ void BlindPec::computeGuide()
     _consecutiveBad = 0;
 
     const double t = (nowMs() - _t0Guide) / 1000.0;
-    const double p = _measX;                 // RA axis = image X for v1
-    const double cross = _measY;             // health signal, should stay ~0
+    const double p     = projRA(_measX, _measY);     // along the calibrated RA axis
+    const double cross = projCross(_measX, _measY);  // health signal, should stay ~0
 
     _residual = p - _V * t;
 
@@ -638,7 +740,7 @@ void BlindPec::computeGuide()
     {
         _blank--;
         _residualPrev = _residual;
-        pushGuiding(err * _arcsecPerPx, cross * _arcsecPerPx, 0);
+        pushGuiding(err * _arcsecPerPx, 0);
         emit ComputeDone();
         return;
     }
@@ -650,29 +752,34 @@ void BlindPec::computeGuide()
         _V += alphaV * (err - _residualPrev) / std::max(0.001, t - _tPrev);
     _tPrev = t;
 
-    // P + I (+ D) on the error, in px.
+    // P + I (+ D) on the error, in px. `u` is the control effort; we want the
+    // pulse to move the projected position by -u (oppose the error).
     double kp = getFloat("pid", "kp");
     double ki = getFloat("pid", "ki");
     double kd = getFloat("pid", "kd");
-    double intMax = getInt("guideParams", "pulsemax") * 0.0 + 50.0; // TODO: expose intmax; 50 px clamp for now
+    double intMax = getFloat("guideParams", "intmax");
+    if (intMax <= 0) intMax = 50.0;
     if (!_intRsat) _intR += err;
     _intR = qBound(-intMax, _intR, intMax);
-    double corrPx = kp * err + ki * _intR + kd * (err - _residualPrev);
+    double u = kp * err + ki * _intR + kd * (err - _residualPrev);
 
-    // px -> ms, then sense.
-    double pulseMs = std::fabs(corrPx) * _G;
-    int dir = (corrPx > 0) ? +1 : -1;
-    if (getBool("revCorrections", "revRA")) dir = -dir;
+    double needPx = -u;
+    if (getBool("revCorrections", "revRA")) needPx = -needPx;
 
-    int pmin = getInt("guideParams", "pulsemin");
-    int pmax = getInt("guideParams", "pulsemax");
+    // A W pulse moves the projected position by sign _wDir; E by -_wDir. Pick the
+    // direction that pushes towards needPx; magnitude in ms via _G (ms/px).
+    double pulseMs = std::fabs(needPx) * _G;
+    int dir = ((needPx >= 0) == (_wDir > 0)) ? -1 : +1;   // -1 = W, +1 = E
+
+    const int pmin = getInt("guideParams", "pulsemin");
+    const int pmax = getInt("guideParams", "pulsemax");
     if (pulseMs < pmin) pulseMs = 0;
     if (pulseMs > pmax) pulseMs = pmax;
 
-    bool disP = getBool("disCorrections", "disRA+");
-    bool disM = getBool("disCorrections", "disRA-");
-    if (dir > 0 && !disP) _pulseE = (int)pulseMs;
+    const bool disP = getBool("disCorrections", "disRA+");
+    const bool disM = getBool("disCorrections", "disRA-");
     if (dir < 0 && !disM) _pulseW = (int)pulseMs;
+    if (dir > 0 && !disP) _pulseE = (int)pulseMs;
 
     _intRsat = (_pulseE >= pmax || _pulseW >= pmax);
     if (_pulseE > 0 || _pulseW > 0)
@@ -696,37 +803,43 @@ void BlindPec::computeGuide()
     getEltFloat("values", "response")->setValue(_measResp);
     getEltFloat("values", "crossaxis")->setValue(cross, true);
 
-    pushGuiding(err * _arcsecPerPx, cross * _arcsecPerPx, rms);
+    pushGuiding(err * _arcsecPerPx, rms);
 
     _residualPrev = err;
     emit ComputeDone();
 }
 
-void BlindPec::fitTargetRate()
+void BlindPec::fitDriftLine()
 {
-    // v1: ordinary least-squares slope of (t, p). TODO: Theil-Sen / window to an
-    // integer number of worm periods to kill the PE bias.
+    // Ordinary least-squares slope of x(t) and y(t) over the free run. The drift
+    // velocity vector (sx, sy) IS the RA axis: theta = atan2(sy, sx), V = |(sx,sy)|.
+    // TODO: Theil-Sen and/or windowing to an integer number of worm periods to
+    // remove the periodic-error bias.
     const size_t n = _charT.size();
     if (n < 3)
     {
-        logWarning("Characterization: too few samples (%1) - keeping seed V = %2",
-        {QString::number((int)n), QString::number(_V, 'f', 4)});
+        logWarning("Characterization: only %1 samples - keeping theta/V unchanged", {QString::number((int)n)});
         return;
     }
-    double st = 0, sp = 0, stt = 0, stp = 0;
+    double st = 0, sx = 0, sy = 0, stt = 0, stx = 0, sty = 0;
     for (size_t i = 0; i < n; ++i)
     {
-        st += _charT[i];
-        sp += _charP[i];
+        st  += _charT[i];
+        sx  += _charX[i];
+        sy  += _charY[i];
         stt += _charT[i] * _charT[i];
-        stp += _charT[i] * _charP[i];
+        stx += _charT[i] * _charX[i];
+        sty += _charT[i] * _charY[i];
     }
-    double denom = n * stt - st * st;
+    const double denom = n * stt - st * st;
     if (std::fabs(denom) < 1e-9)
         return;
-    double slope = (n * stp - st * sp) / denom;
-    if (std::isfinite(slope) && slope != 0.0)
-        _V = slope;
+    const double slopeX = (n * stx - st * sx) / denom;
+    const double slopeY = (n * sty - st * sy) / denom;
+
+    _V = std::hypot(slopeX, slopeY);
+    if (_V > 1e-6)
+        _theta = std::atan2(slopeY, slopeX);
 }
 
 // ======================================================================
@@ -734,7 +847,7 @@ void BlindPec::fitTargetRate()
 // ======================================================================
 void BlindPec::SMRequestPulses()
 {
-    if (_pulseE > 0 || _pulseW > 0)
+    if (_trace && (_pulseE > 0 || _pulseW > 0))
         logInfo("SM: RequestPulses E=%1 W=%2 ms", {QString::number(_pulseE), QString::number(_pulseW)});
 
     INDI::BaseDevice dp = getDevice(getString("devices", "guider").toStdString().c_str());
@@ -793,15 +906,19 @@ void BlindPec::publishFrame()
     getEltImg("image", "image")->setValue(dta, true);
 }
 
-void BlindPec::pushGuiding(double raArcsec, double deArcsec, double rms)
+// BlindPEC is single-axis: only the RA residual is a guiding quantity. The DEC /
+// DE fields of the reused guider graphs are pinned to 0 so nothing reads as a
+// second controlled axis. The perpendicular ("cross-axis") component is a health
+// signal only and is published as values/crossaxis, not on these graphs.
+void BlindPec::pushGuiding(double raArcsec, double rms)
 {
     getEltFloat("drift", "RA")->setValue(raArcsec);
-    getEltFloat("drift", "DEC")->setValue(deArcsec, true);
+    getEltFloat("drift", "DEC")->setValue(0, true);
     getProperty("drift")->push();
 
     getEltFloat("guiding", "time")->setValue(nowMs());
     getEltFloat("guiding", "RA")->setValue(raArcsec);
-    getEltFloat("guiding", "DE")->setValue(deArcsec);
+    getEltFloat("guiding", "DE")->setValue(0);
     getEltFloat("guiding", "pRA")->setValue(_pulseE - _pulseW);
     getEltFloat("guiding", "pDE")->setValue(0);
     getEltFloat("guiding", "SNR")->setValue(_measResp);
@@ -816,23 +933,34 @@ void BlindPec::pushGuiding(double raArcsec, double deArcsec, double rms)
 // ======================================================================
 void BlindPec::SMAbort()
 {
-    logInfo("Aborting BlindPEC");
+    const bool ok = _finishOk;   // true = we reached here from a clean finish
+    _finishOk = false;
+
+    logInfo(ok ? "BlindPEC: stopping (calibration done)" : "Aborting BlindPEC");
     disarmWatchdog();
     _expectingFrame = false;
     _pulseE = _pulseW = 0;
 
-    getEltBool("actions", "calibrate")->setValue(false, false);
-    getEltBool("actions", "guide")->setValue(false, false);
-    getEltBool("actions", "abortguider")->setValue(false, false);
-    getEltBool("actions", "abortguider")->setValue(true, true);
-    getProperty("actions")->setState(OST::Ok, true);
+    // Clear every action button; on a real abort also light abortguider (guider
+    // pattern), on a clean finish leave them all off.
+    setActionRunning("");
+    if (!ok)
+        getEltBool("actions", "abortguider")->setValue(true, true);
 
     _sm.stop();
 
     emit AbortDone();
-    QTimer::singleShot(0, this, [this]()
+    QTimer::singleShot(0, this, [this, ok]()
     {
-        setStateEvent(OST::Ok, "ready", "abortguide", "BlindPEC ready");
-        logInfo("BlindPEC aborted");
+        if (ok)
+        {
+            setStateEvent(OST::Ok, "ready", "calcompleted", "BlindPEC calibration done");
+            logInfo("BlindPEC calibration done");
+        }
+        else
+        {
+            setStateEvent(OST::Ok, "ready", "abortguide", "BlindPEC ready");
+            logInfo("BlindPEC aborted");
+        }
     });
 }

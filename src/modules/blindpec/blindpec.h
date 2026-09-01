@@ -49,6 +49,7 @@
 #include <QState>
 #include <QFinalState>
 #include <vector>
+#include <cmath>
 
 class MODULE_INIT BlindPec : public IndiModule
 {
@@ -92,7 +93,7 @@ class MODULE_INIT BlindPec : public IndiModule
         void   armWatchdog();
         void   disarmWatchdog();
 
-        bool   _trace = true;                          ///< verbose state / frame tracing during bring-up
+        bool   _trace = false;                         ///< verbose per-frame state / property tracing (bring-up only)
 
         // ==================== Measurement core ====================
         pecmeter::Meter        _meter {};
@@ -106,29 +107,44 @@ class MODULE_INIT BlindPec : public IndiModule
         pecmeter::Params       meterParams();          ///< build the meter tuning from live guideParams
 
         // ==================== Phases ====================
-        enum Phase { PhInit, PhGainCal, PhCharacterize, PhGuide };
+        // Flow: Init -> Characterize (step 1: free-run drift -> theta + V)
+        //            -> GainCal    (step 2: W/E pulses, decontaminated with V -> G)
+        //            -> Guide
+        // "calibrate" stops after GainCal; "guide" with a stored G skips GainCal.
+        enum Phase { PhInit, PhCharacterize, PhGainCal, PhGuide };
         Phase _phase = PhInit;
-        bool  _calibrateOnly = false;                  ///< "calibrate" button: stop after characterization
+        bool  _calibrateOnly    = false;               ///< "calibrate" button pressed
+        bool  _skipGainCal      = false;               ///< reuse a stored gain (guide with existing calibration)
+        bool  _stopAfterGainCal = false;               ///< calibration-only run
+        bool  _finishOk         = false;               ///< SMAbort reached from a clean finish, not an abort
 
-        void computeGainCal();
+        void  setActionRunning(const QString &running);///< clear all action buttons, light `running` (guider pattern)
+
         void computeCharacterize();
+        void computeGainCal();
         void computeGuide();
 
-        // ---- gain calibration ----
-        int    _gainStep   = 0;                        ///< current gain-cal pulse index
-        double _gainPulseMs = 0;                       ///< pulse length used for gain cal (ms)
-        double _gainRefX = 0, _gainRefY = 0;           ///< displacement snapshot before the current gain-cal pulse
-        std::vector<double> _gainDeltas;               ///< measured |step| per gain-cal pulse (px)
-        double _G          = 0;                        ///< gain, ms of W/E pulse per px of image move
-        double _arcsecPerPx = 0;                       ///< display-only scale (needs mount guide rate)
-        double _guideRateK  = 0.5;                     ///< mount guide rate, x sidereal (fallback 0.5)
-
-        // ---- characterization / target rate ----
+        // ---- step 1: free-run characterization ----
         int    _charFrames  = 0;                       ///< frames collected in the Characterize phase
         std::vector<double> _charT;                    ///< time samples (s since phase start)
-        std::vector<double> _charP;                    ///< displacement samples (px, RA axis)
-        double _V           = 0;                       ///< target rate, px/s for perfect sidereal tracking
+        std::vector<double> _charX;                    ///< cumulative image displacement, X (px)
+        std::vector<double> _charY;                    ///< cumulative image displacement, Y (px)
         double _phaseT0     = 0;                       ///< epoch (ms) of the current phase start
+        double _theta       = 0;                       ///< RA axis direction in the image (rad), from the free-run drift
+        double _V           = 0;                       ///< target rate along +theta, px/s (>= 0)
+        void   fitDriftLine();                         ///< (_charT,_charX,_charY) -> _theta, _V
+
+        // ---- step 2: pulse gain calibration ----
+        int    _gainStep    = 0;                       ///< pulses sent so far (alternating W,E,W,E,...)
+        int    _gainPending  = 0;                      ///< direction of the pulse awaiting measurement: -1 W, +1 E, 0 none
+        double _gainSnapP   = 0;                       ///< projected position snapshot before that pulse (px)
+        double _gainSnapT   = 0;                       ///< epoch (ms) of that snapshot
+        std::vector<double> _gainWeff;                 ///< W pulse-only effects (px per calpulse ms, signed along +theta)
+        std::vector<double> _gainEeff;                 ///< E pulse-only effects
+        double _G           = 0;                       ///< gain magnitude, ms of pulse per px along the RA axis
+        int    _wDir        = -1;                      ///< sign of a W pulse's effect along +theta (+1 or -1)
+        double _arcsecPerPx = 0;                       ///< display-only scale (needs mount guide rate)
+        double _guideRateK  = 0.5;                     ///< mount guide rate, x sidereal (fallback 0.5)
 
         // ---- guiding control ----
         double _t0Guide     = 0;                       ///< epoch (ms) of guiding start
@@ -171,9 +187,11 @@ class MODULE_INIT BlindPec : public IndiModule
 
         // helpers
         void   publishFrame();                          ///< jpeg preview + image property
-        void   pushGuiding(double raArcsec, double deArcsec, double rms);
+        void   pushGuiding(double raArcsec, double rms);
         double nowMs() const { return QDateTime::currentDateTime().toMSecsSinceEpoch(); }
-        void   fitTargetRate();                         ///< robust slope of (_charT, _charP) -> _V
+        double projRA(double x, double y)    const { return  x * std::cos(_theta) + y * std::sin(_theta); }
+        double projCross(double x, double y) const { return -x * std::sin(_theta) + y * std::cos(_theta); }
+        void   enterGuide();                            ///< reset the guiding state and switch to PhGuide
 };
 
 extern "C" MODULE_INIT BlindPec *initialize(QString name, QString label, QString profile,

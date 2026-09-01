@@ -469,23 +469,55 @@ unused-param seulement, comme la classe de base) :
 | `blindpec.json`, `blindpec.qrc` | Props : `values`, `calibrationvalues` (G, V, arcsecPerPx, guideRateK, revRA), `drift`, `guiding`, `calParams` (calpulse/calsteps), `pid` (kp/ki/kd), `guideParams`, `revCorrections`, `disCorrections`. |
 | `CMakeLists.txt` | Cible `ostblindpec` (lie OpenCV comme `inspector` + `Qt::StateMachine`) ajoutée à la liste `install`. |
 
-### Phases implémentées (enum `Phase` dans `SMCompute`)
+### Phases implémentées (enum `Phase` dans `SMCompute`) — calibration 2 étapes
 
-1. **PhGainCal** — envoie `calsteps` pulses W de `calpulse` ms, mesure le saut px
-   à chaque fois → `G = calpulse / moyenne(Δpx)` (ms/px). Amorce
-   `V = moyenne(Δpx)·1000 / (k·calpulse)` (notes §3 méthode 1) et
-   `arcsecPerPx` (via `k` = `GUIDE_RATE/GUIDE_RATE_WE`, fallback 0,5).
-2. **PhCharacterize** — `warmupframes` frames en suivi seul, accumule `(t, p)`,
-   `fitTargetRate()` = pente MCO → `V`. (bouton *calibrate* : s'arrête ici.)
-3. **PhGuide** — `résidu = p − V·t` ; dither RA seul en biais de consigne ;
-   `blankframes` après un pulse ; **`V` adaptatif** (`alphaV·d(err)/dt`) ; P+I(+D)
-   sur l'erreur → px → ms via `G` → pulse E/W (sens via `revRA`, masque
-   `disCorrections`) ; anti-windup ; RMS glissant ; push graphes.
+Ordre : **Init → Characterize (étape 1) → GainCal (étape 2) → Guide.**
+Hypothèse : **la monture suit au sidéral** pendant toute la calibration.
+
+1. **PhCharacterize (étape 1)** — dérive libre, aucun pulse, pendant
+   `calParams/chardur` s (défaut 60 ; « quelques dizaines de s » = `V` grossier,
+   ≥ 1 période de ver = `V` propre). `fitDriftLine()` = pentes MCO de `x(t)` et
+   `y(t)` → **`θ` = `atan2(sy, sx)`** (orientation de l'axe AD dans l'image) et
+   **`V` = `hypot(sx, sy)`** (px/s). Le résidu autour de la droite = la courbe de
+   PE (pas encore exploité). Persiste `V`, `theta`.
+2. **PhGainCal (étape 2)** — `calsteps` pulses W **et** `calsteps` pulses E,
+   alternés. Pour chaque pulse : `effet = Δp_proj − V·Δτ` (projection sur `θ`,
+   dérive sidérale retirée grâce à `V`). `moveW = moy(effetsW)`,
+   `moveE = moy(effetsE)` (signes opposés). `Gpx = (|moveW|+|moveE|)/2` →
+   **`G = calpulse / Gpx`** (ms/px), **`wDir = signe(moveW)`**,
+   `arcsecPerPx = (k·15.04·calpulse/1000) / Gpx`. Warning si asymétrie
+   `|moveW|` vs `|moveE|` > 50 % (backlash ou `V` faux). Persiste `G`, `wdir`,
+   `arcsecPerPx`, `guideRateK`. Bouton *calibrate* : s'arrête ici. `guide` avec
+   `G` déjà stocké : saute cette étape (mais refait toujours l'étape 1).
+3. **PhGuide** — mesure projetée sur `θ` : `p = projRA`, `cross = projCross`
+   (signal de santé). `résidu = p − V·t`. Dither RA seul en biais de consigne ;
+   `blankframes` après un pulse ; **`V` adaptatif** (`alphaV`) ; P+I(+D) → effort
+   `u` → `needPx = −u` (flip par `revRA` manuel) → sens W/E choisi via `wDir`,
+   magnitude via `G` ; clamp `pulsemin/pulsemax` ; masque `disCorrections` ;
+   anti-windup (`intmax`) ; RMS glissant.
+
+### Pas d'hypothèse horizontale/verticale
+
+`fitDriftLine()` ajuste les pentes de `x(t)` **et** `y(t)` → `θ = atan2(sy, sx)`
+= la vraie direction de dérive (angle quelconque). Toutes les mesures suivantes
+sont **projetées sur `θ`** (`projRA` / `projCross`). L'axe AD dans l'image est
+calibré, on ne suppose ni X ni Y. Seul le vecteur de déplacement dessiné dans le
+preview est encore en X/Y bruts (cosmétique).
+
+### Affichage : mono-axe
+
+`drift` (scatter XY) et `guiding` (PHD) sont réutilisés du template `guider` mais
+BlindPEC n'a qu'un axe : `DEC` / `DE` / `pDE` sont **forcés à 0** (rien ne doit
+se lire comme un 2ᵉ axe asservi). La composante perpendiculaire (`cross`) reste
+publiée **uniquement** dans `values/crossaxis` — lecture de santé numérique
+(glissement / basculement du CD, turbulence), pas une trace de guidage.
 
 ### Bring-up
 
-- `_trace = true` dans `blindpec.h` : logs verbeux (transitions SM, arrivée des
-  frames, mesures, pulses). À repasser à `false` une fois stabilisé.
+- `_trace` dans `blindpec.h` : **`false` par défaut** (le per-frame floodait).
+  Passe-le à `true` pour ré-activer les traces verbeuses (`prop <-`, `newBLOB`,
+  `SM: Request/Wait/Measure/Compute`, pulses). Restent visibles sans `_trace` :
+  transitions de phase, résultats de calibration, warnings/errors, abort.
 - **Frame-reset** : `CCD_FRAME_RESET` ne repasse pas toujours à `IPS_OK` selon le
   driver. `SMRequestFrameReset` a maintenant un `QTimer::singleShot` de 1,5 s qui
   émet `FrameResetDone` en filet de sécurité (le `guider` a le même point faible,
@@ -504,24 +536,20 @@ unused-param seulement, comme la classe de base) :
   effort, warning + fallback `k = 0.5`, pas d'abort.
 - **Driver « INDI Webcam »** : frames OK (640×480, `bpp=1 ch=3` → on prend le
   plan R, corrélation `resp≈0.999`, très bonne texture).
-- **Caractérisation trop rapide** : 60 frames avalées en < 1 s → pente `(t,p)`
-  dans le bruit, `V ≈ 0`. Corrigé : `computeCharacterize` attend maintenant
-  `warmupframes` **ET** `guideParams/charminsecs` (défaut 30 s, idéalement ≥ 1
-  période de ver). Logs enrichis : span, Δp, « image moved X px », warning si
-  `V ≈ 0` (monture qui ne suit pas / microscope pas sur une surface mobile).
-- **Sélection de phase corrigée** : bouton `calibrate` refait **toujours** le
-  gain (`PhGainCal`) ; `guide` réutilise un `G` stocké s'il existe.
+- **Caractérisation trop rapide** (v0 initiale) : 60 frames en < 1 s → `V ≈ 0`.
+  **Refondue** en calibration 2 étapes (cf. § « Phases implémentées ») : étape 1
+  = dérive libre pendant `calParams/chardur` s → `θ` + `V` ; étape 2 = pulses
+  W/E décontaminés par `V`.
 
-### Raccourcis / dette assumée dans cette v0 (à reprendre)
+### Raccourcis / dette assumée (à reprendre)
 
 - **Timestamp = `QDateTime::currentDateTime()` à l'arrivée du BLOB**, pas
   `DATE-OBS + t_exp/2` de l'en-tête. → à câbler (cf. §4, c'est *le* point dur).
-- `fitTargetRate()` = MCO simple, **pas** Theil–Sen ni fenêtrage sur période de
-  ver entière → biais PE résiduel sur `V`.
-- `intMax` du clamp intégral **codé en dur à 50 px**, pas de param JSON.
+- `fitDriftLine()` = MCO simple sur `x(t)` / `y(t)`, **pas** Theil–Sen ni
+  fenêtrage sur période de ver entière → biais PE résiduel sur `θ` et `V`.
+- `chardur` : paramètre fixe utilisateur ; pas de détection auto de `T_worm` ni
+  de fenêtrage entier (prévu plus tard).
 - Ré-ancrage sans **vérification croisée** (corréler ancienne vs nouvelle ancre).
-- Axe RA supposé = axe **X image** ; pas d'angle calibré → composante d'axe
-  croisé publiée en `crossaxis` comme signal de santé mais pas exploitée.
 - Pas de gestion multi-canal FITS (prend le 1ᵉʳ plan si `channels==3`).
 - Bouton *calibrate*-only : réutilise `emit Abort()` pour s'arrêter (log
   « Aborting ») au lieu d'un arrêt propre.
@@ -536,13 +564,12 @@ unused-param seulement, comme la classe de base) :
 - [ ] Timestamp `DATE-OBS + t_exp/2` par frame (remplacer `nowMs()`).
 - [ ] `matchTemplate`+`CV_SubPix` vs `phaseCorrelate` vs `findTransformECC` :
       bench sur images réelles (le code part sur `phaseCorrelate`).
-- [ ] `fitTargetRate` robuste : Theil–Sen + fenêtre = multiple entier de `T_worm`.
-- [ ] Estimation de `T_worm` : paramètre manuel + détection auto (FFT/autocorr).
+- [ ] `fitDriftLine` robuste : Theil–Sen + fenêtre = multiple entier de `T_worm`.
+- [ ] Estimation de `T_worm` : détection auto (FFT/autocorr) du résidu étape 1.
 - [ ] Pilotage ROI + binning (`CCD_FRAME`, `CCD_BINNING`).
-- [ ] `intmax` en paramètre JSON ; revoir les défauts `pid` (kp/ki) sur le banc.
+- [ ] Revoir les défauts `pid` (kp/ki) sur le banc.
 - [ ] Vérification croisée du ré-ancrage.
-- [ ] Angle RA↔image calibré (projeter sur la direction calibrée, exploiter la
-      composante croisée).
+- [ ] Exploiter la composante d'axe croisé (`crossaxis`) comme diagnostic actif.
 - [ ] Arrêt propre pour *calibrate*-only (ne pas réutiliser `Abort`).
 - [ ] Référence de phase du ver pour la table PEC : dispo côté INDI monture ?
 - [ ] Audit des points de contact sequencer ↔ « guider » avec la classe
