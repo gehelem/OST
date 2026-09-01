@@ -1,6 +1,6 @@
 include:
   - local: CI/ci-images.yml
-  - local: CI/rpm-poc.yml
+  - local: CI/fedora.yml
 
 stages:
   - images
@@ -135,6 +135,7 @@ release-job-tag:
     - build-job-2204
     - build-job-2404
     - build-job-2604
+    - build-job-fedora
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   script:
     - sh ./CI/CI-upload-release-tag.sh
@@ -147,6 +148,7 @@ release-job-latest:
     - build-job-2204
     - build-job-2404
     - build-job-2604
+    - build-job-fedora
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   script:
     - sh ./CI/CI-upload-release-latest.sh
