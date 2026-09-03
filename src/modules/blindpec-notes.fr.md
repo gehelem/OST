@@ -41,7 +41,11 @@ p(t) = V·t + e(t) + n(t)
 | terme | sens |
 |---|---|
 | `V·t`  | rampe constante = rotation horaire voulue (sidérale). C'est la constante `pixsec`. |
+<<<<<<< HEAD
 | `e(t)` | erreur périodique (vis sans fin), **moyenne nulle sur une période de ver `T_worm`**. |
+=======
+| `e(t)` | erreur périodique (vis sans fin), **moyenne nulle sur une période de VSF `T_vsf`**. |
+>>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
 | `n(t)` | bruit : corrélation + turbulence résiduelle + marche aléatoire des ré-ancrages. |
 
 Guider en aveugle = tenir `e(t) + n(t) → 0`, c.-à-d. asservir `dp/dt` sur `V`.
@@ -58,7 +62,11 @@ Guider en aveugle = tenir `e(t) + n(t) → 0`, c.-à-d. asservir `dp/dt` sur `V`
 
 **V — la pente de consigne** : px/s quand le suivi est parfait.
 - La partie difficile : **toute mesure courte est polluée par `e(t)`**. Ajuster
+<<<<<<< HEAD
   la pente sur un nombre non entier de périodes de ver → PE non compensée →
+=======
+  la pente sur un nombre non entier de périodes de VSF → PE non compensée →
+>>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
   pente biaisée. (C'est ça qui a toujours été fait à tâtons via `pixsec`.)
 
 ### Méthodes pour V (du plus simple au meilleur)
@@ -72,17 +80,30 @@ Guider en aveugle = tenir `e(t) + n(t) → 0`, c.-à-d. asservir `dp/dt` sur `V`
    faut juste `k`. `ω_sid = 2π / 86164.09 s = 7.2921e-5 rad/s`.
 
 2. **Ajustement robuste sur rampe libre.** Capture non guidée ≥ 3–5 périodes de
+<<<<<<< HEAD
    ver ; régression de `p(t)` cumulé vs `t` par Theil–Sen ou moindres carrés
    totaux (robuste aux frames où la corrélation a sauté). Fenêtre idéale =
    multiple entier de `T_worm`. Biais PE décroît en `1/N_périodes`.
 
 3. **Moyenne sur période de ver.** `V = Δp sur N·T_worm / (N·T_worm)`. La PE de
    moyenne nulle s'annule exactement. `T_worm` : doc monture, ou
+=======
+   VSF ; régression de `p(t)` cumulé vs `t` par Theil–Sen ou moindres carrés
+   totaux (robuste aux frames où la corrélation a sauté). Fenêtre idéale =
+   multiple entier de `T_vsf`. Biais PE décroît en `1/N_périodes`.
+
+3. **Moyenne sur période de VSF.** `V = Δp sur N·T_vsf / (N·T_vsf)`. La PE de
+   moyenne nulle s'annule exactement. `T_vsf` : doc monture, ou
+>>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
    autocorrélation / FFT de `p(t)` détendancé.
 
 4. **Adaptatif — supprime le tâtonnement.** Amorce avec (1) ou une louche.
    Lancer la boucle. Surveiller le **biais moyen de correction (E−W)** sur une
+<<<<<<< HEAD
    fenêtre glissante d'une période de ver : biais persistant `b` → `V += α·b`.
+=======
+   fenêtre glissante d'une période de VSF : biais persistant `b` → `V += α·b`.
+>>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
    Convergence en quelques périodes. Le feed-forward `V` s'auto-cale ;
    l'intégrateur ne se bat plus que contre la PE.
 
@@ -99,9 +120,15 @@ tant que la mécanique ne bouge pas.
 
 ### Bonus : table PEC verrouillée en phase
 
+<<<<<<< HEAD
 Résidu `e(t)` détendancé → FFT → période de ver + harmoniques → table PEC
 verrouillée en phase. La boucle devient prédictive (rejouer la PE connue) +
 petite correction de trim. Nécessite une référence de phase du ver (index INDI
+=======
+Résidu `e(t)` détendancé → FFT → période de VSF + harmoniques → table PEC
+verrouillée en phase. La boucle devient prédictive (rejouer la PE connue) +
+petite correction de trim. Nécessite une référence de phase de la VSF (index INDI
+>>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
 `PEC`, ou phase libre asservie sur la composante périodique).
 
 ---
@@ -219,8 +246,13 @@ Conséquences :
   (gauchissement) → **2/tour**, période ~12 h. Sur une session de quelques
   heures : **dérive lente légèrement courbée** → pollue l'estimation de `V`, pas
   la PE (100–600 s). **Le `V` adaptatif (§3 méthode 4) les absorbe** si sa
+<<<<<<< HEAD
   constante de temps ≈ quelques périodes de ver. Atout de conception.
 - **Mouvement tangentiel en arc** : sur une période de ver, flèche `r·θ²/8`
+=======
+  constante de temps ≈ quelques périodes de VSF. Atout de conception.
+- **Mouvement tangentiel en arc** : sur une période de VSF, flèche `r·θ²/8`
+>>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
   < nm → **localement une droite**, aucune correction géométrique.
 - **Gain** = `r · θ · (échelle px)`. `r` grand → meilleure résolution ;
   `r ≲ 50 mm` sur un CD (FOV doit rester sur le disque). À `r = 50 mm` +
@@ -230,8 +262,13 @@ Conséquences :
   dans l'image (grain 600–800 si trop gros, ou baisser le grandissement).
 
 **Watch-items résiduels :**
+<<<<<<< HEAD
 1. **Jeu axial (end-float) de l'axe AD** : une composante axiale *à la période du
    ver* aliaserait dans la PE. À vérifier sur la monture cible.
+=======
+1. **Jeu axial (end-float) de l'axe AD** : une composante axiale *à la période de
+   la VSF* aliaserait dans la PE. À vérifier sur la monture cible.
+>>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
 2. **Adhérence du CD sur l'axe** : serrage force → zéro glissement sous couple
    (sinon fausse rotation injectée directement). Goutte de colle en sécurité.
 
@@ -243,7 +280,11 @@ Conséquences :
    couplage support/vibration reste **LA limite** dans la bande PE.
 2. **Marche aléatoire des ré-ancrages** : 0,02 px/frame sur 1000 frames → 0,6 px.
    Approche par ancre, mais chaque ré-ancrage réinjecte ~0,02 px ; sur une
+<<<<<<< HEAD
    période de ver, quelques à quelques dizaines de ré-ancrages → bruit cumulé
+=======
+   période de VSF, quelques à quelques dizaines de ré-ancrages → bruit cumulé
+>>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
    ~0,05–0,15 px. **Terme d'erreur dominant côté algo.**
 3. Texture (features 3–10 px ≈ optimal), éclairage stable, filé / rolling shutter
    (planchers mineurs).
@@ -412,9 +453,15 @@ capture), un seul axe.
   quelque chose de solidaire de l'axe.
 - **Incrémental, pas d'index.** On mesure une variation, pas l'angle absolu.
   Parfait pour la correction PE en **feedback**. Pour du **feed-forward**
+<<<<<<< HEAD
   (rejouer une table PE) il faut une **phase du ver** : index PEC de la monture
   (propriété INDI `PEC` si dispo) ou estimateur de phase verrouillé sur la
   composante périodique (valide après >1 période, dérive si le ver n'est pas
+=======
+  (rejouer une table PE) il faut une **phase de la VSF** : index PEC de la monture
+  (propriété INDI `PEC` si dispo) ou estimateur de phase verrouillé sur la
+  composante périodique (valide après >1 période, dérive si la VSF n'est pas
+>>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
   stable). → contrainte sur l'ambition table PEC.
 
 ### Domaine de validité (à écrire noir sur blanc dans la doc module)
@@ -438,12 +485,20 @@ Boucle active, `V` statique faux de 0,1 % : le résidu *contrôlé* ne s'emballe
 
 Dérive thermique (graisse qui refroidit), terme disque à 1/tour, erreur de taux
 moyen : **tout tombe dans la même bande lente** → un seul mécanisme (`V`
+<<<<<<< HEAD
 adaptatif, τ ≈ quelques périodes de ver) traite l'ensemble.
+=======
+adaptatif, τ ≈ quelques périodes de VSF) traite l'ensemble.
+>>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
 
 ### Robustesse
 
 - **Phase de caractérisation au démarrage** : suivi seul, mesure ≥ dizaines de s
+<<<<<<< HEAD
   (idéalement 1 période de ver) **avant** de corriger → amorce `V`, amorce la
+=======
+  (idéalement 1 période de VSF) **avant** de corriger → amorce `V`, amorce la
+>>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
   phase PE si feed-forward. Pas de settle stellaire (pas de slew) mais ce
   warm-up est nécessaire.
 - **Gate anti-outlier / vibration** : résonance du support + vent + pas au sol →
@@ -510,7 +565,11 @@ Hypothèse : **la monture suit au sidéral** pendant toute la calibration.
 
 1. **PhCharacterize (étape 1)** — dérive libre, aucun pulse, pendant
    `calParams/chardur` s (défaut 60 ; « quelques dizaines de s » = `V` grossier,
+<<<<<<< HEAD
    ≥ 1 période de ver = `V` propre + vraie mesure de PE). `fitDriftLine()` =
+=======
+   ≥ 1 période de VSF = `V` propre + vraie mesure de PE). `fitDriftLine()` =
+>>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
    pentes MCO de `x(t)` et `y(t)` → **`θ` = `atan2(sy, sx)`** (orientation de
    l'axe AD dans l'image) et **`V` = `hypot(sx, sy)`** (px/s). Résidu autour de
    la droite décomposé en **along-axis** (= erreur périodique + bruit) et
@@ -626,8 +685,13 @@ publiée **uniquement** dans `values/crossaxis` — lecture de santé numérique
 - **Timestamp = `QDateTime::currentDateTime()` à l'arrivée du BLOB**, pas
   `DATE-OBS + t_exp/2` de l'en-tête. → à câbler (cf. §4, c'est *le* point dur).
 - `fitDriftLine()` = MCO simple sur `x(t)` / `y(t)`, **pas** Theil–Sen ni
+<<<<<<< HEAD
   fenêtrage sur période de ver entière → biais PE résiduel sur `θ` et `V`.
 - `chardur` : paramètre fixe utilisateur ; pas de détection auto de `T_worm` ni
+=======
+  fenêtrage sur période de VSF entière → biais PE résiduel sur `θ` et `V`.
+- `chardur` : paramètre fixe utilisateur ; pas de détection auto de `T_vsf` ni
+>>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
   de fenêtrage entier (prévu plus tard).
 - Ré-ancrage sans **vérification croisée** (corréler ancienne vs nouvelle ancre).
 - Pas de gestion multi-canal FITS (prend le 1ᵉʳ plan si `channels==3`).
@@ -644,14 +708,23 @@ publiée **uniquement** dans `values/crossaxis` — lecture de santé numérique
 - [ ] Timestamp `DATE-OBS + t_exp/2` par frame (remplacer `nowMs()`).
 - [ ] `matchTemplate`+`CV_SubPix` vs `phaseCorrelate` vs `findTransformECC` :
       bench sur images réelles (le code part sur `phaseCorrelate`).
+<<<<<<< HEAD
 - [ ] `fitDriftLine` robuste : Theil–Sen + fenêtre = multiple entier de `T_worm`.
 - [ ] Estimation de `T_worm` : détection auto (FFT/autocorr) du résidu étape 1.
+=======
+- [ ] `fitDriftLine` robuste : Theil–Sen + fenêtre = multiple entier de `T_vsf`.
+- [ ] Estimation de `T_vsf` : détection auto (FFT/autocorr) du résidu étape 1.
+>>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
 - [ ] Pilotage ROI + binning (`CCD_FRAME`, `CCD_BINNING`).
 - [ ] Revoir les défauts `pid` (kp/ki) sur le banc.
 - [ ] Vérification croisée du ré-ancrage.
 - [ ] Exploiter la composante d'axe croisé (`crossaxis`) comme diagnostic actif.
 - [ ] Arrêt propre pour *calibrate*-only (ne pas réutiliser `Abort`).
+<<<<<<< HEAD
 - [ ] Référence de phase du ver pour la table PEC : dispo côté INDI monture ?
+=======
+- [ ] Référence de phase de la VSF pour la table PEC : dispo côté INDI monture ?
+>>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
 - [ ] Audit des points de contact sequencer ↔ « guider » avec la classe
       `blindpec` (cf. §7).
 - [ ] Test unitaire `pecmeter` (2 `cv::Mat` synthétiques translatées → `dx/dy`).
