@@ -1,0 +1,41 @@
+# Fedora RPM build + test + release input.
+#
+# Inline dnf for now (no prebuilt image): the C++ compile dominates the job
+# time, the dnf layer is ~1-2 min. Bake a CI/Dockerfile.build.rpm + a matrix
+# later if pipeline time becomes a concern.
+
+build-job-fedora:
+  extends: .build-rules
+  stage: build
+  image: fedora:latest
+  variables:
+    GIT_DEPTH: "0"      # the version string is derived from git history
+    RPM_FILE_LATEST: "ostserver_latest_fc_x86_64.rpm"
+    RPM_FILE_TAG: "ostserver_${CI_COMMIT_TAG}_fc_x86_64.rpm"
+    RPM_FILE_DEV_LATEST: "ostserver-devel_latest_fc_x86_64.rpm"
+    RPM_FILE_DEV_TAG: "ostserver-devel_${CI_COMMIT_TAG}_fc_x86_64.rpm"
+  script:
+    - ./CI/CI-build-rpm.sh
+  artifacts:
+    paths:
+      - "ostserver_*_fc_x86_64.rpm"
+      - "ostserver-devel_*_fc_x86_64.rpm"
+    expire_in: 4 week
+  allow_failure: true
+
+test-job-fedora:
+  extends: .test-rules
+  stage: test
+  image: fedora:latest
+  dependencies:
+    - build-job-fedora
+  variables:
+    RPM_FILE_LATEST: "ostserver_latest_fc_x86_64.rpm"
+  script:
+    - ./CI/CI-test-rpm.sh
+  artifacts:
+    paths:
+      - server.log
+      - ws.log
+    expire_in: 4 week
+  allow_failure: true

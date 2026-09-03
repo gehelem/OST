@@ -429,6 +429,27 @@ target_link_libraries(ostguider PRIVATE
 )
 target_compile_definitions(ostguider PRIVATE GUIDER_MODULE)
 
+# BlindPEC module (optical-encoder RA guiding from a microscope on the RA axis)
+add_library(ostblindpec SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/blindpec/blindpec.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/blindpec/blindpec.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/blindpec/pecmeter.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/blindpec/pecmeter.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/blindpec/blindpec.qrc
+)
+target_include_directories(ostblindpec PRIVATE ${OpenCV_INCLUDE_DIRS})
+target_link_libraries(ostblindpec PRIVATE
+    ostindimodule
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::StateMachine
+    Threads::Threads
+    ${OpenCV_LIBS}
+    z
+)
+target_compile_definitions(ostblindpec PRIVATE BLINDPEC_MODULE)
+
 # Inspector module
 add_library(ostinspector SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/inspector/inspector.h
@@ -570,6 +591,7 @@ install(TARGETS
     ostfocus
     ostsequencer
     ostguider
+    ostblindpec
     ostinspector
     ostnavigator
     ostallsky
