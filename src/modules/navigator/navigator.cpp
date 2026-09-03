@@ -118,6 +118,9 @@ void Navigator::onExternalEvent(OST::ExtEvent event)
         float ra = getFloat("results", "RA");
         float dec = getFloat("results", "DEC");
         QString ns = getString("results", "NS");
+        // DEC is stored as a magnitude; the hemisphere sign lives in NS ("-"/"S")
+        if (ns.startsWith('-') || ns.startsWith('S', Qt::CaseInsensitive))
+            dec = -dec;
         getEltString("target", "targetname")->setValue(code);
         getEltFloat("target", "targetra")->setValue(ra);
         getEltFloat("target", "targetde")->setValue(dec, true);
