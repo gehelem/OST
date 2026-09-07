@@ -134,6 +134,8 @@ pecmeter::Params BlindPec::meterParams()
     if (getEltBool("measParams", "scurve"))        p.sCurve       = getBool("measParams", "scurve");
     if (getEltInt("measParams", "scurvepoints"))   p.sCurvePoints = getInt("measParams", "scurvepoints");
     if (getEltInt("measParams", "scurveharm"))     p.sCurveHarm   = getInt("measParams", "scurveharm");
+    if (getEltBool("measParams", "dftshift"))      p.dftShift     = getBool("measParams", "dftshift");
+    if (getEltInt("measParams", "upsamplefactor")) p.upsampleFactor = getInt("measParams", "upsamplefactor");
     return p;
 }
 

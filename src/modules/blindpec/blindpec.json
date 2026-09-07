@@ -395,6 +395,26 @@
         "hasprofile":true,
         "label": "Image measurement (correlation / sub-pixel)",
         "e": {
+            "dftshift": {
+                "type":"bool",
+                "autoupdate":true,
+                "label": "Upsampled-DFT sub-pixel",
+                "order":"00",
+                "value":true,
+                "hint": "sub-pixel shift by upsampled-DFT cross-correlation (Guizar-Sicairos): no interpolation, no pixel-locking, deterministic, no start-up calibration. ON = ignores eccrefine/scurve. OFF = legacy phaseCorrelate + ECC + S-curve"
+            },
+            "upsamplefactor": {
+                "type":"int",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "DFT upsample factor (kappa)",
+                "order":"00a",
+                "value":50,
+                "format": "999",
+                "min":5,
+                "max":500,
+                "hint": "local zoom resolution = 1/kappa px (50 -> 0.02 px, well under the noise). CPU cost grows ~kappa^2; 50 is a good default, 100 if a Pi-class CPU keeps up"
+            },
             "preblur": {
                 "type":"float",
                 "autoupdate":true,

@@ -35,6 +35,8 @@ struct Params
     bool   sCurve       = true;  ///< measure the estimator's pixel-locking S-curve (once) and subtract it at runtime
     int    sCurvePoints = 32;    ///< fractional-shift samples per axis for the S-curve fit
     int    sCurveHarm   = 3;     ///< number of harmonics in the S-curve fit (1 hump/px dominates, 2-3 is plenty)
+    bool   dftShift       = true; ///< sub-pixel shift by upsampled-DFT cross-correlation (Guizar-Sicairos); false = phaseCorrelate + ECC + S-curve
+    int    upsampleFactor = 50;   ///< upsampled-DFT: 1/factor px resolution of the local zoom (kappa). CPU ~ factor^2
     double reanchorFrac  = 0.35; ///< re-anchor once |shift vs anchor| exceeds this * min(w,h)/2
     double maxStepPx     = 40.0; ///< reject a frame whose move since the last accepted one exceeds this (vibration / glitch)
     double minResponse   = 0.10; ///< correlation response below this -> frame not trusted (ECC coeff when eccRefine, else phaseCorrelate response)
@@ -87,6 +89,11 @@ class Meter
         /// Sub-pixel shift of `curRaw` w.r.t. the anchor (phaseCorrelate coarse +
         /// optional ECC). `curWin` is the Hann-windowed version for phaseCorrelate.
         cv::Point2d measureShift(const cv::Mat &curWin, const cv::Mat &curRaw, double &response) const;
+
+        /// Sub-pixel shift of `curWin` w.r.t. the anchor by upsampled-DFT
+        /// cross-correlation (Guizar-Sicairos). Both images CV_32F, same size,
+        /// already Hann-windowed. Deterministic, no calibration, one parameter.
+        cv::Point2d upsampledShift(const cv::Mat &refWin, const cv::Mat &curWin) const;
 
         /// One-time: measure the estimator's pixel-locking bias vs fractional
         /// shift (Fourier-shifted copies of the anchor) and fit it with harmonics.
