@@ -492,7 +492,9 @@ void BlindPec::SMMeasure()
     const int cvType = (stats.bytesPerPixel <= 1) ? CV_8UC1 : CV_16UC1;
     cv::Mat raw((int)stats.height, (int)stats.width, cvType, _image->getImageBuffer());
 
+    const double _t0meas = nowMs();
     pecmeter::Sample s = _meter.update(raw);
+    _measMs = nowMs() - _t0meas;   // wall-clock cost of the measurement, ms
 
     // The S-curve (pixel-locking) calibration runs once inside the first update();
     // log its result the first time it becomes available.
@@ -581,12 +583,13 @@ void BlindPec::computeCharacterize()
 
     if (span < dur || _charFrames < 10)
     {
-        if (_trace && _charFrames > 0 && (_charFrames % 20) == 0)
-            logInfo("Characterize: %1 frames, %2 s / %3 s, xy=(%4,%5) px",
+        if (_charFrames > 0 && (_charFrames % 20) == 0)
+            logInfo("Characterize: %1 frames, %2 s / %3 s (%4 s/frame, meas %5 ms)",
         {
             QString::number(_charFrames), QString::number(span, 'f', 1),
             QString::number(dur, 'f', 0),
-            QString::number(_measX, 'f', 2), QString::number(_measY, 'f', 2)
+            QString::number(_charFrames > 1 ? span / (_charFrames - 1) : 0.0, 'f', 2),
+            QString::number(_measMs, 'f', 0)
         });
         emit ComputeDone();   // no pulse
         return;
@@ -947,17 +950,15 @@ void BlindPec::computeGuide()
     {
         const int spulse = (_pulseE > 0) ? _pulseE : (_pulseW > 0) ? -_pulseW : 0;
         const double sfrac = _shiftX - std::round(_shiftX);   // pixel-locking diagnostic
-        logInfo("guide #%1 t=%2s dt=%3%4 | p=%5 sp=%6 dp=%7 | resid=%8 px (%9\") cross=%10 | sfrac=%11 | V=%12 | u=%13 pulse=%14 ms | I=%15 | rms=%16\" resp=%17",
+        logInfo("guide #%1 t=%2s dt=%3s meas=%4ms%5 | resid=%6 px (%7\") | sfrac=%8 | u=%9 pulse=%10 ms | I=%11 | rms=%12\" resp=%13",
         {
             QString::number(_guideFrame), QString::number(t, 'f', 0), QString::number(dt, 'f', 2),
+            QString::number(_measMs, 'f', 0),
             blank ? " BLANK" : "",
-            QString::number(p, 'f', 2), QString::number(_setpoint, 'f', 2), QString::number(p - _pPrev, 'f', 2),
             QString::number(err, 'f', 2), QString::number(err * _arcsecPerPx, 'f', 2),
-            QString::number(cross, 'f', 2),
             QString::number(sfrac, 'f', 2),
-            QString::number(_V, 'f', 4),
             QString::number(u, 'f', 2), QString::number(spulse),
-            QString::number(_intR, 'f', 2),
+            QString::number(_intR, 'f', 1),
             QString::number(rms, 'f', 2), QString::number(_measResp, 'f', 3)
         });
     }

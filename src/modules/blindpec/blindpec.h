@@ -101,6 +101,7 @@ class MODULE_INIT BlindPec : public IndiModule
         double                 _measX = 0;            ///< cumulative displacement, image X (px)
         double                 _measY = 0;            ///< cumulative displacement, image Y (cross axis, px)
         double                 _measResp = 0;         ///< last correlation response
+        double                 _measMs = 0;           ///< wall-clock cost of the last _meter.update() call, ms
         double                 _shiftX = 0, _shiftY = 0; ///< last raw phaseCorrelate shift vs anchor (pixel-locking diag)
         bool                   _measOk = false;
         bool                   _reanchored = false;
