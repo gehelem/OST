@@ -800,6 +800,7 @@ void BlindPec::enterGuide()
     _t0Guide = nowMs();
     _tPrev = 0;
     _residual = _residualPrev = 0;
+    _errRate = 0;
     _intR = 0;
     _intRsat = false;
     _blank = 0;
@@ -877,6 +878,15 @@ void BlindPec::computeGuide()
     }
     const double err = _residual - _ditherOffset;
 
+    // Smoothed error rate (px/s) for lead compensation. A raw (err - errPrev)/dt
+    // is pure noise; low-pass it over ~1 s (frame-rate independent).
+    if (dt > 1e-3)
+    {
+        const double instRate = (err - _residualPrev) / dt;
+        const double beta = 1.0 - std::exp(-dt / 1.0);   // 1 s smoothing
+        _errRate += beta * (instRate - _errRate);
+    }
+
     // RMS of the residual (arcsec) over rmsOver frames - computed EVERY frame,
     // blank frames included (a blank frame is still a real pointing error, it is
     // only excluded from *correction*, not from the statistic / the graph).
@@ -919,7 +929,16 @@ void BlindPec::computeGuide()
         if (intMax <= 0) intMax = 50.0;
         if (!_intRsat) _intR += err;
         _intR = qBound(-intMax, _intR, intMax);
-        u = kp * err + ki * _intR + kd * (err - _residualPrev);
+
+        // Lead compensation: correct for where the error WILL be ~1 s from now
+        // (the measurement -> pulse-effect latency), using the smoothed rate.
+        // This is what lets a slow loop keep pace with a smooth periodic error
+        // without a phase-locked table. The setpoint still advances at the fixed
+        // V, so `err` stays the true axis error (no "follow the PE" trap).
+        const double LEAD = 1.0;   // s
+        const double errLead = err + _errRate * LEAD;
+
+        u = kp * errLead + ki * _intR + kd * _errRate;
 
         double needPx = -u;
         if (getBool("revCorrections", "revRA")) needPx = -needPx;
@@ -950,13 +969,14 @@ void BlindPec::computeGuide()
     {
         const int spulse = (_pulseE > 0) ? _pulseE : (_pulseW > 0) ? -_pulseW : 0;
         const double sfrac = _shiftX - std::round(_shiftX);   // pixel-locking diagnostic
-        logInfo("guide #%1 t=%2s dt=%3s meas=%4ms%5 | resid=%6 px (%7\") | sfrac=%8 | u=%9 pulse=%10 ms | I=%11 | rms=%12\" resp=%13",
+        logInfo("guide #%1 t=%2s dt=%3s meas=%4ms%5 | resid=%6 px (%7\") | sfrac=%8 | eR=%9 px/s | u=%10 pulse=%11 ms | I=%12 | rms=%13\" resp=%14",
         {
             QString::number(_guideFrame), QString::number(t, 'f', 0), QString::number(dt, 'f', 2),
             QString::number(_measMs, 'f', 0),
             blank ? " BLANK" : "",
             QString::number(err, 'f', 2), QString::number(err * _arcsecPerPx, 'f', 2),
             QString::number(sfrac, 'f', 2),
+            QString::number(_errRate, 'f', 3),
             QString::number(u, 'f', 2), QString::number(spulse),
             QString::number(_intR, 'f', 1),
             QString::number(rms, 'f', 2), QString::number(_measResp, 'f', 3)

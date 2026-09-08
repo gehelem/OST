@@ -625,9 +625,17 @@ qui part de la `V` stockée.
    négative stable. Corrige un `V` biaisé par une caractérisation trop courte.
    Défaut `alphaV = 0.005` (**activé**). L'ancienne loi `(err − errPrev)/dt`
    (dérivée) chassait le bruit → supprimée.
-   **`kp` défaut 0,5**, **`kd` défaut 0** (le terme D n'amplifie que du bruit sur
-   une boucle lente ~2 fps). `kp = 1` = deadbeat → sonne avec la période de
-   boucle.
+   **`kp` défaut 0,5**, **`kd` défaut 0** (le terme D brut n'amplifie que du bruit).
+   `kp = 1` = deadbeat → sonne avec la période de boucle.
+   **Compensation par anticipation (lead)** — 2026-09-08, sans paramètre exposé.
+   La boucle est limitée par la **latence** (~1 s mesure → effet du pulse) : elle
+   corrige où l'erreur *était*. On lisse `d(err)/dt` sur ~1 s (`_errRate`, EMA
+   indépendante de la cadence) et on corrige sur `errLead = err + _errRate·LEAD`
+   avec `LEAD = 1 s` codé en dur (= la latence). `u = kp·errLead + ki·I + kd·_errRate`
+   (le terme `kd` agit maintenant sur le taux *lissé*, plus sur `err − errPrev`
+   brut). **La consigne avance toujours à `V` fixe** → `err` reste la vraie
+   erreur d'axe : pas de piège « suivre la PE » (contrairement à un FF de vitesse
+   sur la consigne, qui serait le même défaut que `alphaV`). Loggé : `eR=` (px/s).
 
 **Diag banc (21:24)** : caractérisation 30 s → `V = 2.2249` biaisé haut de
 ~7,5 % (phase de PE). Symptômes : gain-cal asym W/E 56 % (`W = g−δ`, `E = g+δ` ;

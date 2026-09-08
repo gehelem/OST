@@ -162,6 +162,7 @@ class MODULE_INIT BlindPec : public IndiModule
         double _tPrev       = 0;                       ///< previous guide-frame time (s since guiding start)
         double _residual    = 0;                       ///< p - V.t on the RA axis (px)
         double _residualPrev = 0;                      ///< previous frame's error (residual - dither offset)
+        double _errRate      = 0;                      ///< smoothed d(err)/dt (px/s), for lead compensation
         double _intR        = 0;                       ///< integral accumulator (px.s)
         bool   _intRsat     = false;                   ///< pulse saturated last frame -> freeze the integrator
         int    _blank       = 0;                       ///< frames left to skip after a pulse (settle)
