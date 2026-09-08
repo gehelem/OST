@@ -688,6 +688,24 @@ publiée **uniquement** dans `values/crossaxis` — lecture de santé numérique
   = dérive libre pendant `calParams/chardur` s → `θ` + `V` ; étape 2 = pulses
   W/E décontaminés par `V`.
 
+### Sortie GuideLog PHD2
+
+`enterGuide()` ouvre `getWebroot()/PHD2_GuideLog_<yyyy-MM-dd_HHmmss>.txt` (même
+répertoire que le JPEG `<module>.jpeg`), y écrit un en-tête PHD2 minimal
+(`Guiding Begins at`, `Pixel scale = <arcsecPerPx> arc-sec/px`, ligne
+`Mount = "Mount", …, xAngle = θ°, xRate = 1000/G px/s, …`, puis la ligne des
+18 colonnes). `computeGuide()` ajoute une ligne par frame de guidage (frames
+`blank` et mode *observe* inclus → une session *observe* produit une trace PE
+pure ouvrable dans PHD Log Viewer). `SMAbort()` écrit `Guiding Ends at` +
+`Log closed at` et ferme le fichier. Toujours actif, pas de paramètre.
+
+Conventions : axe unique RA, toutes les colonnes DEC à `0` / vide. Signe PHD
+respecté : `RARawDistance > 0 ⇔ pulse W`, dérivé de la direction qui annule
+l'erreur courante (donc défini même sur les frames `blank`), avec les mêmes
+bascules `wDir` / `revRA` que la boucle. `dx,dy` = résidu reprojeté en repère
+caméra (pour le nuage de points PHD). `SNR` = métrique NCC ×100 ; `StarMass`
+sans équivalent (constante). `Frame`/`Time` repartent de 0 à chaque session.
+
 ### Raccourcis / dette assumée (à reprendre)
 
 - **Timestamp = `QDateTime::currentDateTime()` à l'arrivée du BLOB**, pas
