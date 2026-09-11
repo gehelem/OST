@@ -96,6 +96,9 @@ class MODULE_INIT BlindPec : public IndiModule
         bool   _trace = false;                         ///< verbose per-frame state / property tracing (bring-up only)
         bool   _sCurveLogged = false;                  ///< the S-curve calibration result has been logged once
 
+        bool   _dumpRaw  = false;                      ///< save every incoming frame as lossless FITS (bring-up / bench only)
+        int    _dumpRawN = 0;                          ///< running counter for _dumpRaw file names
+
         // ==================== Measurement core ====================
         pecmeter::Meter        _meter {};
         double                 _measX = 0;            ///< cumulative displacement, image X (px)

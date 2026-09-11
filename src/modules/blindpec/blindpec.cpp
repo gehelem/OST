@@ -303,6 +303,12 @@ void BlindPec::newBLOB(INDI::PropertyBlob pblob)
     _image->loadBlob(pblob, 64);
     stats = _image->getStats();
 
+    // Bring-up / bench only: dump every frame as lossless FITS (the webroot
+    // preview is a re-encoded JPEG, lossy - fine for a live view, not for
+    // precision sub-pixel comparisons). Off by default, same pattern as _trace.
+    if (_dumpRaw)
+        _image->saveAsFITSSimple(getWebroot() + QString("/blindpec_raw_%1.fits").arg(++_dumpRawN, 5, 10, QChar('0')));
+
     if (_trace)
         logInfo("frame received: %1x%2 bpp=%3 ch=%4",
     {

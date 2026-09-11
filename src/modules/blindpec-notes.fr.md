@@ -676,13 +676,101 @@ s'aplatit au lieu de se renforcer. L'estimateur 2D existant (ECC+S-curve ou
 DFT 2D) exploite déjà toute l'information utile de l'image - la réduire en 1D
 en jette une partie.
 
-**Conclusion pratique :** on a fait le tour raisonnable des méthodes de
-mesure sub-pixel pour ce capteur/cette texture (cf. §5 pixel-locking, et la
-branche `blindpec-dftshift`). Le plancher de mesure actuel (~0,03 px, S-curve
-ECC) n'est pas là où chercher du gain. `pecmeter1d.h/.cpp` reste dans le repo
-comme trace documentée de ce cul-de-sac (non compilé, hors CMake) ; les bancs
-(`bench1d.cpp`, `bench1d_real.cpp`) sont restés en scratchpad, comme pour
-`dfttest.cpp`.
+### Piste explorée et abandonnée : estimateur différentiel (gradient, façon flux optique)
+
+**Idée :** `It ≈ -(Ix·dx + Iy·dy)` linéarisé, restreint à 1 DDL le long de `θ`,
+résolu en moindres carrés fermés - pas de FFT, pas d'itération, donc a priori
+bien moins cher que la corrélation.
+
+**Verdict, sur les vraies frames BlindPEC :**
+- **En un coup : trop imprécis.** Écart systématique ~0,49 px vs la 2D en
+  prod - la linéarisation ne tient pas pour le pas réel entre deux frames
+  guidées (~1,5 px, dominé par le suivi sidéral voulu, pas l'erreur).
+- **Avec 3-5 itérations de recalage** (warp-back exact par Fourier +
+  relinéarisation) : redevient compétitif (~0,005-0,03 px sur banc
+  synthétique à l'échelle réelle du dataset). Mais coûte alors **autant de
+  FFT** que ce qui existe déjà, et compare **frame à frame** au lieu de
+  frame-contre-ancre - réintroduit la marche aléatoire que `pecmeter.h`
+  évite délibérément (cf. son propre commentaire de conception). Poussé
+  jusqu'à convergence contre une ancre plutôt que la frame précédente, ça
+  redevient une réimplémentation d'ECC, sans la normalisation photométrique.
+
+**Conclusion : pas un vrai concurrent** - soit trop imprécis, soit converge
+vers ce qui tourne déjà en prod. Resté en scratchpad (`bench_diff.cpp`), pas
+promu en code du repo.
+
+### Piste explorée et abandonnée : détection de bord sub-pixel façon Devernay
+
+**Idée :** parabole à travers 3 échantillons de magnitude de gradient autour
+d'un maximum local (`λ = (a-c)/(2a-4b+2c)`, formule de Devernay/Canny amélioré)
+pour localiser un bord (une rayure) au sub-pixel, puis suivre ce bord d'une
+frame à l'autre.
+
+**Verdict : même piège que le pixel-locking déjà résolu pour `phaseCorrelate`,
+confirmé sur les vraies frames.** Une interpolation parabolique à 3 points est
+un mauvais modèle local pour la vraie forme d'un pic de gradient - biais
+périodique garanti, quel que soit le pic interpolé (corrélation ou gradient).
+Mesuré (protocole S-curve, décalage Fourier exact d'un vrai profil) : biais
+crête-à-crête **0,05 à ~1,0 px selon la ligne de balayage testée** - pas
+juste présent, très variable d'un bord à l'autre (chaque bord a sa propre
+courbe de biais - calibration bord-par-bord nécessaire, plus dur que la
+S-curve globale déjà en place). Resté en scratchpad (`bench_devernay.cpp`).
+
+### Expérience matérielle : mouchetis peint plutôt que rayures poncées
+
+**Idée :** remplacer la surface poncée (rayures directionnelles) par un CD
+peint au mouchetis aléatoire (façon speckle DIC/PIV) - supprimer la
+dépendance directionnelle constatée avec Devernay ci-dessus.
+
+**Banc synthétique d'abord :** confirme que l'isotropie s'améliore nettement,
+mais révèle un point critique **indépendant du fait que le mouchetis soit
+directionnel ou pas** : des points **mous** (flou gaussien, comme un nuage de
+peinture en voile fin) donnent un pic de corrélation large et un estimateur
+2D en prod **bien pire sous bruit** (0,57-0,80 px d'erreur, contre 0,005-0,02
+sans mouchetis) - texture basse fréquence = signal faible = grande sensibilité
+au bruit. Des points **nets et denses** (bord franc, façon gouttelettes qui
+sèchent distinctement) renversent la situation : 0,005-0,012 px, aussi bon ou
+meilleur que les rayures, et indépendant de l'angle.
+
+**Testé en vrai** (surface peinte réelle, 151 frames capturées) : le mouchetis
+obtenu est **mou**, pas net (halo visible autour de chaque point, confirmé par
+l'autocorrélation directionnelle qui reste haute jusqu'à 20 px, contre ~8 px
+sur les rayures). Isotropie gagnée, mais l'estimateur 2D en prod est
+**comparable à σ=8 (0,012-0,015 px vs 0,008 px), nettement pire à σ=20
+(0,05-0,06 px vs 0,02 px)**. Devernay bord-à-bord : nettement pire aussi
+(0,28-0,99 px), sans conséquence puisque non utilisé en prod.
+
+**Conclusion : pas de gain avec cette réalisation.** Un mouchetis ne vaut le
+coup que si l'application donne des points à bord franc (pas un voile fin) et
+dense - sinon on perd plus (bruit) qu'on ne gagne (isotropie, que l'estimateur
+actuel gère déjà correctement à l'angle courant). Pas retesté en version
+"nette" - gain jugé incrémental même dans le meilleur cas synthétique, ne
+justifie pas un nouvel essai matériel dans l'immédiat. Bancs en scratchpad
+(`bench_speckle.cpp` synthétique, `bench_speckle_real.cpp` sur les vraies
+frames).
+
+### Conclusion pratique (les quatre pistes ci-dessus)
+
+On a fait le tour raisonnable des méthodes de mesure sub-pixel pour ce
+capteur/cette texture (cf. §5 pixel-locking, et la branche
+`blindpec-dftshift`) : projection 1D, différentiel/gradient, détection de
+bord façon Devernay, changement de texture de surface. Aucune ne bat
+l'existant (ECC+S-curve, ou DFT 2D) ; les deux détecteurs à base de pics
+interpolés (corrélation, gradient) partagent le même biais de pixel-locking
+de fond, et les méthodes qui s'en sortent (ECC, DFT suréchantillonnée)
+convergent toutes vers la même famille. Le plancher de mesure actuel
+(~0,013-0,03 px) n'est pas là où chercher du gain. `pecmeter1d.h/.cpp` reste
+dans le repo comme trace documentée du premier cul-de-sac (non compilé, hors
+CMake) ; tous les autres bancs (`bench1d.cpp`, `bench1d_real.cpp`,
+`bench_diff.cpp`, `bench_devernay.cpp`, `bench_speckle.cpp`,
+`bench_speckle_real.cpp`) sont restés en scratchpad, comme `dfttest.cpp`
+avant eux.
+
+Outil créé au passage : `_dumpRaw` (`blindpec.h`/`.cpp`, off par défaut, même
+pattern que `_trace`) - sauve chaque frame en FITS brut via
+`fileio::saveAsFITSSimple()`, pour éviter la recompression JPEG du preview
+webroot si une future comparaison a besoin de plus de rigueur (les bancs
+ci-dessus tournent tous sur le JPEG qualité 100 du preview, pas sur du FITS).
 
 ### Raccourcis / dette assumée (à reprendre)
 
