@@ -772,6 +772,56 @@ pattern que `_trace`) - sauve chaque frame en FITS brut via
 webroot si une future comparaison a besoin de plus de rigueur (les bancs
 ci-dessus tournent tous sur le JPEG qualité 100 du preview, pas sur du FITS).
 
+**Correctif de la conclusion ci-dessus, voir section suivante :** le
+"plancher ~0,013-0,03 px" tenait pour le microscope d'origine. Avec un
+microscope différent (mêmes rayures), il chute nettement - ce n'était donc
+pas un plancher de méthode, mais un plancher d'optique.
+
+### Nouveau microscope (960×540 vs 320×240) : vrai gain confirmé sur les rayures
+
+**Contexte :** l'ancien microscope (320×240) donnait ~0,005-0,02 px selon le
+bruit (cf. ci-dessus). Un microscope différent, plus résolu (960×540, ×3 en
+linéaire), a été branché pour test - **montage instable sur la monture
+actuelle, pas encore utilisable en session réelle**, mais assez pour capturer
+une série d'images et faire tourner les mêmes bancs.
+
+**Test 1 - scène statique (pas de mouvement, capture dédiée) :** bruit
+temporel réel mesuré par différence de frames consécutives (pas d'hypothèse
+de σ comme dans les bancs précédents) : **σ ≈ 3,3 DN** sur une moyenne de
+72,6 (4,5%). Texture du moment (mouchetis) : autocorrélation directionnelle
+molle (0,92→0,81 de 1 à 20 px, comme le mouchetis flou d'avant), mais à bruit
+*égal* (σ=8/20, comparaison texture pure) l'estimateur ECC/DFT en prod fait
+**mieux que tout ce qui avait été testé jusque-là** (0,0054/0,0179 px contre
+0,0079/0,0196 sur les rayures à l'ancien scope, et 0,012-0,015/0,050-0,060 sur
+le mouchetis mou à l'ancien scope). Diagnostic : le gain ne vient pas de la
+texture (aussi molle qu'avant en pixels) mais du fait qu'une texture
+identique, vue à plus fort grandissement, occupe plus de pixels - donc
+décorrèle plus lentement *en pixels* tout en étant mieux résolue *en
+micromètres*.
+
+**Test 2 - vraies rayures sous ce microscope (mouvement réel, capture
+dédiée) :** confirmation nette, et plus forte que prévu.
+- Autocorrélation directionnelle **beaucoup plus rapide** qu'à l'ancien scope
+  (0,344 contre 0,754 à 1 px, theta=0) - pas un effet de grandissement cette
+  fois (qui ralentirait la décroissance), une vraie texture plus fine résolue
+  que l'ancien scope noyait dans le flou.
+- Précision ECC/DFT en prod (kappa=50) : **quasi plate à ~0,005 px, quel que
+  soit le bruit injecté (σ=0/8/20)** - là où toutes les configurations
+  testées jusqu'ici (rayures ou mouchetis, ancien ou nouveau scope) se
+  dégradaient nettement avec le bruit. Meilleur résultat de toute
+  l'exploration sub-pixel, et de loin.
+
+**Conclusion : le vrai levier était l'optique, pas la texture ni
+l'algorithme.** Tout ce détour (projection 1D, différentiel, Devernay,
+mouchetis) cherchait un gain de méthode sur un signal plafonné par le flou du
+premier microscope - en améliorant l'optique elle-même le plancher recule
+largement. Reste à faire, avant de pouvoir l'exploiter en session réelle :
+**une fixation mécanique stable** sur la monture (le point bloquant actuel),
+et **une vraie caractérisation** (`calParams`, phase 1) pour obtenir la
+nouvelle échelle `arcsecPerPx` - le gain en pixels ci-dessus ne se traduit en
+gain angulaire réel qu'une fois `r·M` (rayon × grandissement) mesuré avec ce
+microscope, pas supposé.
+
 ### Raccourcis / dette assumée (à reprendre)
 
 - **Timestamp = `QDateTime::currentDateTime()` à l'arrivée du BLOB**, pas
@@ -792,6 +842,11 @@ ci-dessus tournent tous sur le JPEG qualité 100 du preview, pas sur du FITS).
 
 ## 10. Points ouverts
 
+- [ ] **Nouveau microscope (960×540) : trouver une fixation mécanique stable
+      sur la monture**, puis relancer une caractérisation complète (étape 1)
+      pour mesurer la vraie échelle `arcsecPerPx` - gain confirmé en pixels
+      (cf. §9), pas encore quantifié en arcsec réel. Priorité haute : c'est le
+      meilleur résultat de toute l'exploration sub-pixel.
 - [ ] Timestamp `DATE-OBS + t_exp/2` par frame (remplacer `nowMs()`).
 - [ ] `matchTemplate`+`CV_SubPix` vs `phaseCorrelate` vs `findTransformECC` :
       bench sur images réelles (le code part sur `phaseCorrelate`).
