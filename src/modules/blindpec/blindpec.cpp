@@ -1029,6 +1029,7 @@ void BlindPec::computeGuide()
 
     double u = 0.0;
     double needPx = 0.0;   // commanded correction along the RA axis (px), post revRA
+    double lead = 0.0;     // lead-compensation horizon actually used this frame (s)
     if (!blank && !observe)
     {
         // Adaptive rate (PI on V): a wrong V shows up as a SUSTAINED residual the
@@ -1051,13 +1052,19 @@ void BlindPec::computeGuide()
         if (!_intRsat) _intR += err;
         _intR = qBound(-intMax, _intR, intMax);
 
-        // Lead compensation: correct for where the error WILL be ~1 s from now
-        // (the measurement -> pulse-effect latency), using the smoothed rate.
-        // This is what lets a slow loop keep pace with a smooth periodic error
-        // without a phase-locked table. The setpoint still advances at the fixed
-        // V, so `err` stays the true axis error (no "follow the PE" trap).
-        const double LEAD = 1.0;   // s
-        const double errLead = err + _errRate * LEAD;
+        // Lead compensation: correct for where the error WILL be, not where it
+        // was, using the smoothed rate. This is what lets a slow loop keep pace
+        // with a smooth periodic error without a phase-locked table. The
+        // setpoint still advances at the fixed V, so `err` stays the true axis
+        // error (no "follow the PE" trap).
+        //
+        // The horizon is the loop's own structural latency: this frame's period
+        // times the blanked frames it takes before the next correction can even
+        // be evaluated - measured, not guessed, so it tracks whatever frame rate
+        // the hardware actually delivers instead of a fixed constant. Clamped to
+        // a sane range so one outlier dt can't blow up the prediction.
+        lead = qBound(0.2, dt * (getInt("guideParams", "blankframes") + 1), 5.0);
+        const double errLead = err + _errRate * lead;
 
         u = kp * errLead + ki * _intR + kd * _errRate;
 
@@ -1090,14 +1097,14 @@ void BlindPec::computeGuide()
     {
         const int spulse = (_pulseE > 0) ? _pulseE : (_pulseW > 0) ? -_pulseW : 0;
         const double sfrac = _shiftX - std::round(_shiftX);   // pixel-locking diagnostic
-        logInfo("guide #%1 t=%2s dt=%3s meas=%4ms%5 | resid=%6 px (%7\") | sfrac=%8 | eR=%9 px/s | u=%10 pulse=%11 ms | I=%12 | rms=%13\" resp=%14",
+        logInfo("guide #%1 t=%2s dt=%3s meas=%4ms%5 | resid=%6 px (%7\") | sfrac=%8 | eR=%9 px/s lead=%10s | u=%11 pulse=%12 ms | I=%13 | rms=%14\" resp=%15",
         {
             QString::number(_guideFrame), QString::number(t, 'f', 0), QString::number(dt, 'f', 2),
             QString::number(_measMs, 'f', 0),
             blank ? " BLANK" : "",
             QString::number(err, 'f', 2), QString::number(err * _arcsecPerPx, 'f', 2),
             QString::number(sfrac, 'f', 2),
-            QString::number(_errRate, 'f', 3),
+            QString::number(_errRate, 'f', 3), QString::number(lead, 'f', 2),
             QString::number(u, 'f', 2), QString::number(spulse),
             QString::number(_intR, 'f', 1),
             QString::number(rms, 'f', 2), QString::number(_measResp, 'f', 3)
