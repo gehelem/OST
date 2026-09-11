@@ -647,6 +647,43 @@ bascules `wDir` / `revRA` que la boucle. `dx,dy` = résidu reprojeté en repère
 caméra (pour le nuage de points PHD). `SNR` = métrique NCC ×100 ; `StarMass`
 sans équivalent (constante). `Frame`/`Time` repartent de 0 à chaque session.
 
+### Piste explorée et abandonnée : projection 1D avant corrélation
+
+**Idée (branche `blindpec-1dproj`, hors build, non câblée) :** puisque seul le
+déplacement le long de `θ` compte, sommer les lignes perpendiculaires à l'axe
+pour obtenir un profil 1D avant corrélation - gain de SNR "gratuit" façon
+binning logiciel, plus un zoom DFT suréchantillonné 1D bien moins cher que la
+version 2D (`measParams/dftshift`, coûteuse à `-O0`). Code : `pecmeter1d.h/.cpp`
+(`project()` + `upsampledShift()` façon Guizar-Sicairos 1D), isolé, sans
+dépendance Qt/INDI, même convention que `pecmeter.cpp`.
+
+**Verdict : idée fausse, invalidée par le banc, deux fois.**
+1. Banc synthétique (texture isotrope, même recette que le banc DFT 2D) :
+   le 1D est **2,6 à 130× pire** que le 2D selon bruit/angle, biais dès θ≠0
+   même sans bruit (artefact de rotation `warpAffine`).
+2. Banc sur **vraies frames BlindPEC** (2 frames indépendantes, 320×240,
+   bandeau overlay retiré) : confirmé et pire - **2,3 à 32× pire**, jusqu'à
+   ~90× à certains angles, y compris à bruit nul.
+
+**Pourquoi :** le raisonnement de départ suppose la texture invariante selon
+l'axe perpendiculaire (alors sommer les lignes accumule le signal en cohérent
+pendant que le bruit s'annule en `√N` - un vrai filtre adapté). C'est faux
+pour une surface poncée : l'autocorrélation directionnelle mesurée sur les
+vraies frames tombe de ~0,75-0,82 à 1 px à ~0,2-0,3 dès 8-12 px - le grain
+n'est cohérent que sur quelques pixels, pas sur les ~100 lignes sommées.
+Sommer moyenne le signal aussi vite que le bruit ; le pic de corrélation
+s'aplatit au lieu de se renforcer. L'estimateur 2D existant (ECC+S-curve ou
+DFT 2D) exploite déjà toute l'information utile de l'image - la réduire en 1D
+en jette une partie.
+
+**Conclusion pratique :** on a fait le tour raisonnable des méthodes de
+mesure sub-pixel pour ce capteur/cette texture (cf. §5 pixel-locking, et la
+branche `blindpec-dftshift`). Le plancher de mesure actuel (~0,03 px, S-curve
+ECC) n'est pas là où chercher du gain. `pecmeter1d.h/.cpp` reste dans le repo
+comme trace documentée de ce cul-de-sac (non compilé, hors CMake) ; les bancs
+(`bench1d.cpp`, `bench1d_real.cpp`) sont restés en scratchpad, comme pour
+`dfttest.cpp`.
+
 ### Raccourcis / dette assumée (à reprendre)
 
 - **Timestamp = `QDateTime::currentDateTime()` à l'arrivée du BLOB**, pas
