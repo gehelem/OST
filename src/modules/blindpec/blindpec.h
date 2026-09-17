@@ -96,11 +96,15 @@ class MODULE_INIT BlindPec : public IndiModule
         bool   _trace = false;                         ///< verbose per-frame state / property tracing (bring-up only)
         bool   _sCurveLogged = false;                  ///< the S-curve calibration result has been logged once
 
+        bool   _dumpRaw  = false;                      ///< save every incoming frame as lossless FITS (bring-up / bench only)
+        int    _dumpRawN = 0;                          ///< running counter for _dumpRaw file names
+
         // ==================== Measurement core ====================
         pecmeter::Meter        _meter {};
         double                 _measX = 0;            ///< cumulative displacement, image X (px)
         double                 _measY = 0;            ///< cumulative displacement, image Y (cross axis, px)
         double                 _measResp = 0;         ///< last correlation response
+        double                 _measMs = 0;           ///< wall-clock cost of the last _meter.update() call, ms
         double                 _shiftX = 0, _shiftY = 0; ///< last raw phaseCorrelate shift vs anchor (pixel-locking diag)
         bool                   _measOk = false;
         bool                   _reanchored = false;
@@ -161,6 +165,7 @@ class MODULE_INIT BlindPec : public IndiModule
         double _tPrev       = 0;                       ///< previous guide-frame time (s since guiding start)
         double _residual    = 0;                       ///< p - V.t on the RA axis (px)
         double _residualPrev = 0;                      ///< previous frame's error (residual - dither offset)
+        double _errRate      = 0;                      ///< smoothed d(err)/dt (px/s), for lead compensation
         double _intR        = 0;                       ///< integral accumulator (px.s)
         bool   _intRsat     = false;                   ///< pulse saturated last frame -> freeze the integrator
         int    _blank       = 0;                       ///< frames left to skip after a pulse (settle)
@@ -183,6 +188,18 @@ class MODULE_INIT BlindPec : public IndiModule
 
         // ==================== RMS (display) ====================
         std::vector<double> _rmsBuf;
+
+        // ==================== PHD2-format GuideLog ====================
+        // A PHD2-compatible guide log, written to getWebroot() (next to the JPEG
+        // preview) so it can be opened directly in PHD Log Viewer. One
+        // "Guiding Begins ... Guiding Ends" block per guiding run. RA axis only:
+        // every DEC column is 0 / empty.
+        QFile  _guideLog;
+        int    _glFrame = 0;                            ///< per-session frame counter (PHD2 "Frame" column)
+        double _glT0    = 0;                            ///< epoch (ms) of "Guiding Begins" (PHD2 "Time" origin)
+        void   openGuideLog();                          ///< create the file + PHD2 header (from enterGuide)
+        void   writeGuideLogRow(double raErr, double crossErr, double needPx);
+        void   closeGuideLog();                         ///< "Guiding Ends" / "Log closed" + close (from SMAbort)
 
         inline double square(double v) { return v * v; }
 

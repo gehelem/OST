@@ -134,6 +134,8 @@ pecmeter::Params BlindPec::meterParams()
     if (getEltBool("measParams", "scurve"))        p.sCurve       = getBool("measParams", "scurve");
     if (getEltInt("measParams", "scurvepoints"))   p.sCurvePoints = getInt("measParams", "scurvepoints");
     if (getEltInt("measParams", "scurveharm"))     p.sCurveHarm   = getInt("measParams", "scurveharm");
+    if (getEltBool("measParams", "dftshift"))      p.dftShift     = getBool("measParams", "dftshift");
+    if (getEltInt("measParams", "upsamplefactor")) p.upsampleFactor = getInt("measParams", "upsamplefactor");
     return p;
 }
 
@@ -300,6 +302,12 @@ void BlindPec::newBLOB(INDI::PropertyBlob pblob)
     _image = new fileio();
     _image->loadBlob(pblob, 64);
     stats = _image->getStats();
+
+    // Bring-up / bench only: dump every frame as lossless FITS (the webroot
+    // preview is a re-encoded JPEG, lossy - fine for a live view, not for
+    // precision sub-pixel comparisons). Off by default, same pattern as _trace.
+    if (_dumpRaw)
+        _image->saveAsFITSSimple(getWebroot() + QString("/blindpec_raw_%1.fits").arg(++_dumpRawN, 5, 10, QChar('0')));
 
     if (_trace)
         logInfo("frame received: %1x%2 bpp=%3 ch=%4",
@@ -490,7 +498,9 @@ void BlindPec::SMMeasure()
     const int cvType = (stats.bytesPerPixel <= 1) ? CV_8UC1 : CV_16UC1;
     cv::Mat raw((int)stats.height, (int)stats.width, cvType, _image->getImageBuffer());
 
+    const double _t0meas = nowMs();
     pecmeter::Sample s = _meter.update(raw);
+    _measMs = nowMs() - _t0meas;   // wall-clock cost of the measurement, ms
 
     // The S-curve (pixel-locking) calibration runs once inside the first update();
     // log its result the first time it becomes available.
@@ -579,12 +589,13 @@ void BlindPec::computeCharacterize()
 
     if (span < dur || _charFrames < 10)
     {
-        if (_trace && _charFrames > 0 && (_charFrames % 20) == 0)
-            logInfo("Characterize: %1 frames, %2 s / %3 s, xy=(%4,%5) px",
+        if (_charFrames > 0 && (_charFrames % 20) == 0)
+            logInfo("Characterize: %1 frames, %2 s / %3 s (%4 s/frame, meas %5 ms)",
         {
             QString::number(_charFrames), QString::number(span, 'f', 1),
             QString::number(dur, 'f', 0),
-            QString::number(_measX, 'f', 2), QString::number(_measY, 'f', 2)
+            QString::number(_charFrames > 1 ? span / (_charFrames - 1) : 0.0, 'f', 2),
+            QString::number(_measMs, 'f', 0)
         });
         emit ComputeDone();   // no pulse
         return;
@@ -795,6 +806,7 @@ void BlindPec::enterGuide()
     _t0Guide = nowMs();
     _tPrev = 0;
     _residual = _residualPrev = 0;
+    _errRate = 0;
     _intR = 0;
     _intRsat = false;
     _blank = 0;
@@ -817,7 +829,127 @@ void BlindPec::enterGuide()
         QString::number(_theta * 180.0 / M_PI, 'f', 1), QString::number(_V, 'f', 4),
         QString::number(_G, 'f', 1), QString::number(_wDir)
     });
+    openGuideLog();
     setStateEvent(OST::Busy, "guiding", "startguiding", "start guiding");
+}
+
+// ======================================================================
+//  PHD2-format GuideLog (written to getWebroot(), openable in PHD Log Viewer)
+// ======================================================================
+//
+// Only a subset of PHD2's header is emitted - PHD Log Viewer tolerates the
+// missing INFO / calibration / summary sections. What must be right: the
+// "Guiding Begins at", the "Pixel scale =" line, the "Mount = ..." line with
+// xAngle / xRate, the exact 18-column header, per-frame rows with Frame/Time
+// reset per session, the sign convention (positive RARawDistance -> W pulse),
+// and the closing "Guiding Ends at". DEC is not guided here: every DEC column
+// is 0 / empty.
+void BlindPec::openGuideLog()
+{
+    if (_guideLog.isOpen())
+        _guideLog.close();
+
+    const QString ts    = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+    const QString fname  = getWebroot() + "/PHD2_GuideLog_" +
+                           QDateTime::currentDateTime().toString("yyyy-MM-dd_HHmmss") + ".txt";
+    _guideLog.setFileName(fname);
+    if (!_guideLog.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text))
+    {
+        logWarning("Could not open GuideLog %1 - PHD2-format logging disabled", {fname});
+        return;
+    }
+    _glFrame = 0;
+    _glT0    = nowMs();
+
+    // C-locale number formatting (QString::number never localises; unlike arg()).
+    auto n = [](double v, int p) { return QString::number(v, 'f', p); };
+
+    const double xAngle   = _theta * 180.0 / M_PI;
+    const double xRate    = (_G > 1e-6) ? 1000.0 / _G : 0.0;                 // px/s during a guide pulse
+    const double minMove  = (_G > 1e-6) ? getInt("guideParams", "pulsemin") / _G : 0.0;
+    const int    expMs    = (int)std::lround(getFloat("parms", "exposure") * 1000.0);
+    const double raSpeed  = _guideRateK * SIDEREAL_ARCSEC_PER_S;            // a-s/s
+
+    QString h;
+    h += "PHD2 version 2.6.13 [OST BlindPEC], Log version 2.5. Log enabled at " + ts + "\n";
+    h += "\n";
+    h += "Guiding Begins at " + ts + "\n";
+    h += "Equipment Profile = BlindPEC\n";
+    h += "Dither = RA only, Dither scale = 1.000, Image noise reduction = none, Guide-frame time lapse = 0, Server disabled\n";
+    h += "Pixel scale = " + n(_arcsecPerPx, 2) + " arc-sec/px, Binning = 1, Focal length = 800 mm\n";
+    h += "Exposure = " + QString::number(expMs) + " ms\n";
+    h += "Mount = \"Mount\", connected, guiding enabled, xAngle = " + n(xAngle, 1) +
+         ", xRate = " + n(xRate, 3) + ", yAngle = " + n(xAngle - 90.0, 1) +
+         ", yRate = " + n(xRate, 3) + ", parity = +/+\n";
+    h += "X guide algorithm = Lead-compensated PI, Minimum move = " + n(minMove, 3) + "\n";
+    h += "Y guide algorithm = None, Minimum move = 0.000\n";
+    h += "Max RA duration = " + QString::number(getInt("guideParams", "pulsemax")) +
+         ", Max DEC duration = 0, DEC guide mode = Off\n";
+    h += "RA Guide Speed = " + n(raSpeed, 1) + " a-s/s, Dec Guide Speed = N/A, Cal Dec = 0.0, "
+         "Last Cal Issue = None, Timestamp = " + ts + "\n";
+    h += "RA = " + n(_mountRA, 2) + " hr, Dec = " + n(_mountDEC, 1) +
+         " deg, Hour angle = N/A hr, Pier side = N/A, Rotator pos = N/A, Alt = " + n(_mountALT, 1) +
+         " deg, Az = " + n(_mountAZ, 1) + " deg\n";
+    h += "Lock position = 0.000, 0.000, Star position = 0.000, 0.000, HFD = 2.00 px\n";
+    h += "Frame,Time,mount,dx,dy,RARawDistance,DECRawDistance,RAGuideDistance,DECGuideDistance,"
+         "RADuration,RADirection,DECDuration,DECDirection,XStep,YStep,StarMass,SNR,ErrorCode\n";
+
+    _guideLog.write(h.toUtf8());
+    _guideLog.flush();
+    logInfo("PHD2 GuideLog: %1", {fname});
+}
+
+void BlindPec::writeGuideLogRow(double raErr, double crossErr, double needPx)
+{
+    if (!_guideLog.isOpen())
+        return;
+    _glFrame++;
+
+    auto n = [](double v, int p) { return QString::number(v, 'f', p); };
+
+    // dx,dy are camera-frame in PHD; rebuild them from the along/cross residual
+    // so PHD Log Viewer's scatter plot stays meaningful.
+    const double ct = std::cos(_theta), sn = std::sin(_theta);
+    const double dx = raErr * ct - crossErr * sn;
+    const double dy = raErr * sn + crossErr * ct;
+
+    // PHD sign convention: positive RARawDistance <=> a West pulse. Derive the
+    // sign from the direction that nulls the current error (so it is defined
+    // even on blank / deadband frames), applying the same wDir / revRA flips the
+    // control loop uses.
+    double raRawSigned = -raErr * _wDir;
+    if (getBool("revCorrections", "revRA"))
+        raRawSigned = -raRawSigned;
+    const double s = (raRawSigned >= 0.0) ? 1.0 : -1.0;
+
+    const double raRaw   = s * std::fabs(raErr);
+    const double raGuide = s * std::fabs(needPx);
+    const int    raDurMs = (_pulseW > 0) ? _pulseW : (_pulseE > 0) ? _pulseE : 0;
+    const char  *raDir   = (_pulseW > 0) ? "W" : (_pulseE > 0) ? "E" : "";
+
+    // NCC trust metric [~0..1] shown on PHD's SNR axis; StarMass has no analogue.
+    const double snr      = _measResp * 100.0;
+    const double starMass = 1000.0;
+    const double tSec     = (nowMs() - _glT0) / 1000.0;
+
+    QString row = QString::number(_glFrame) + "," + n(tSec, 3) + ",\"Mount\"," +
+                  n(dx, 3) + "," + n(dy, 3) + "," +
+                  n(raRaw, 3) + ",0.000," + n(raGuide, 3) + ",0.000," +
+                  QString::number(raDurMs) + "," + raDir + ",0,,,," +
+                  n(starMass, 0) + "," + n(snr, 2) + ",0\n";
+
+    _guideLog.write(row.toUtf8());
+    _guideLog.flush();
+}
+
+void BlindPec::closeGuideLog()
+{
+    if (!_guideLog.isOpen())
+        return;
+    const QString ts = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+    _guideLog.write(QString("Guiding Ends at " + ts + "\n\nLog closed at " + ts + "\n").toUtf8());
+    _guideLog.flush();
+    _guideLog.close();
 }
 
 // ---- Phase: guiding ------------------------------------------------------
@@ -872,6 +1004,15 @@ void BlindPec::computeGuide()
     }
     const double err = _residual - _ditherOffset;
 
+    // Smoothed error rate (px/s) for lead compensation. A raw (err - errPrev)/dt
+    // is pure noise; low-pass it over ~1 s (frame-rate independent).
+    if (dt > 1e-3)
+    {
+        const double instRate = (err - _residualPrev) / dt;
+        const double beta = 1.0 - std::exp(-dt / 1.0);   // 1 s smoothing
+        _errRate += beta * (instRate - _errRate);
+    }
+
     // RMS of the residual (arcsec) over rmsOver frames - computed EVERY frame,
     // blank frames included (a blank frame is still a real pointing error, it is
     // only excluded from *correction*, not from the statistic / the graph).
@@ -893,6 +1034,8 @@ void BlindPec::computeGuide()
     const bool observe = getBool("disCorrections", "disRA+") && getBool("disCorrections", "disRA-");
 
     double u = 0.0;
+    double needPx = 0.0;   // commanded correction along the RA axis (px), post revRA
+    double lead = 0.0;     // lead-compensation horizon actually used this frame (s)
     if (!blank && !observe)
     {
         // Adaptive rate (PI on V): a wrong V shows up as a SUSTAINED residual the
@@ -914,9 +1057,24 @@ void BlindPec::computeGuide()
         if (intMax <= 0) intMax = 50.0;
         if (!_intRsat) _intR += err;
         _intR = qBound(-intMax, _intR, intMax);
-        u = kp * err + ki * _intR + kd * (err - _residualPrev);
 
-        double needPx = -u;
+        // Lead compensation: correct for where the error WILL be, not where it
+        // was, using the smoothed rate. This is what lets a slow loop keep pace
+        // with a smooth periodic error without a phase-locked table. The
+        // setpoint still advances at the fixed V, so `err` stays the true axis
+        // error (no "follow the PE" trap).
+        //
+        // The horizon is the loop's own structural latency: this frame's period
+        // times the blanked frames it takes before the next correction can even
+        // be evaluated - measured, not guessed, so it tracks whatever frame rate
+        // the hardware actually delivers instead of a fixed constant. Clamped to
+        // a sane range so one outlier dt can't blow up the prediction.
+        lead = qBound(0.2, dt * (getInt("guideParams", "blankframes") + 1), 5.0);
+        const double errLead = err + _errRate * lead;
+
+        u = kp * errLead + ki * _intR + kd * _errRate;
+
+        needPx = -u;
         if (getBool("revCorrections", "revRA")) needPx = -needPx;
 
         // A W pulse moves the projected position by sign _wDir; E by -_wDir.
@@ -945,17 +1103,16 @@ void BlindPec::computeGuide()
     {
         const int spulse = (_pulseE > 0) ? _pulseE : (_pulseW > 0) ? -_pulseW : 0;
         const double sfrac = _shiftX - std::round(_shiftX);   // pixel-locking diagnostic
-        logInfo("guide #%1 t=%2s dt=%3%4 | p=%5 sp=%6 dp=%7 | resid=%8 px (%9\") cross=%10 | sfrac=%11 | V=%12 | u=%13 pulse=%14 ms | I=%15 | rms=%16\" resp=%17",
+        logInfo("guide #%1 t=%2s dt=%3s meas=%4ms%5 | resid=%6 px (%7\") | sfrac=%8 | eR=%9 px/s lead=%10s | u=%11 pulse=%12 ms | I=%13 | rms=%14\" resp=%15",
         {
             QString::number(_guideFrame), QString::number(t, 'f', 0), QString::number(dt, 'f', 2),
+            QString::number(_measMs, 'f', 0),
             blank ? " BLANK" : "",
-            QString::number(p, 'f', 2), QString::number(_setpoint, 'f', 2), QString::number(p - _pPrev, 'f', 2),
             QString::number(err, 'f', 2), QString::number(err * _arcsecPerPx, 'f', 2),
-            QString::number(cross, 'f', 2),
             QString::number(sfrac, 'f', 2),
-            QString::number(_V, 'f', 4),
+            QString::number(_errRate, 'f', 3), QString::number(lead, 'f', 2),
             QString::number(u, 'f', 2), QString::number(spulse),
-            QString::number(_intR, 'f', 2),
+            QString::number(_intR, 'f', 1),
             QString::number(rms, 'f', 2), QString::number(_measResp, 'f', 3)
         });
     }
@@ -969,6 +1126,8 @@ void BlindPec::computeGuide()
     getEltFloat("values", "crossaxis")->setValue(cross, true);
 
     pushGuiding(err * _arcsecPerPx, rms);
+
+    writeGuideLogRow(err, cross, needPx);
 
     _residualPrev = err;
     emit ComputeDone();
@@ -1128,6 +1287,7 @@ void BlindPec::SMAbort()
 
     logInfo(ok ? "BlindPEC: stopping (calibration done)" : "Aborting BlindPEC");
     disarmWatchdog();
+    closeGuideLog();
     _expectingFrame = false;
     _pulseE = _pulseW = 0;
 

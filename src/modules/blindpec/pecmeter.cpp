@@ -134,6 +134,35 @@ double curvePeakToPeak(const std::vector<double> &c)
     return hi - lo;
 }
 
+// ---- upsampled-DFT sub-pixel registration (Guizar-Sicairos) --------------
+
+/// Signed DFT frequency of bin k for an n-point transform (Nyquist bin = -n/2).
+inline double dftFreq(int k, int n)
+{
+    return (2 * k < n) ? static_cast<double>(k) : static_cast<double>(k - n);
+}
+
+/// Phase kernel for the upsampled inverse DFT, following the reference `dftups`
+/// (Guizar-Sicairos MATLAB code): kernel entries are exp(-i.2pi.(...)), the sign
+/// is pinned to the reference so there is nothing to guess. Shape S x n, CV_64FC2.
+///   K[s, k] = exp( -i.2pi / (n.kappa) * (s - offset) * dftFreq(k, n) )
+cv::Mat phaseKernel(int n, int S, double kappa, double offset)
+{
+    cv::Mat K(S, n, CV_64FC2);
+    const double scale = -2.0 * CV_PI / (n * kappa);
+    for (int s = 0; s < S; ++s)
+    {
+        cv::Vec2d *row = K.ptr<cv::Vec2d>(s);
+        const double a = (s - offset) * scale;
+        for (int k = 0; k < n; ++k)
+        {
+            const double ph = a * dftFreq(k, n);
+            row[k] = cv::Vec2d(std::cos(ph), std::sin(ph));
+        }
+    }
+    return K;
+}
+
 } // namespace
 
 Meter::Meter(const Params &p)
@@ -168,8 +197,9 @@ void Meter::dropAnchor(const cv::Mat &f32, double originX, double originY)
 
     // The pixel-locking S-curve is a property of the estimator + the surface
     // texture, which does not change - so calibrate it once and reuse it for
-    // every later anchor.
-    if (_params.sCurve && !_haveCurve && !_anchorRaw.empty())
+    // every later anchor. Not needed with the upsampled-DFT estimator (no
+    // interpolation -> no S-curve).
+    if (_params.sCurve && !_params.dftShift && !_haveCurve && !_anchorRaw.empty())
         calibrateSCurve();
 }
 
@@ -203,6 +233,77 @@ cv::Point2d Meter::measureShift(const cv::Mat &curWin, const cv::Mat &curRaw, do
     // sub-pixel method.
     response = nccAtShift(_anchorRaw, curRaw, shift);
     return shift;
+}
+
+cv::Point2d Meter::upsampledShift(const cv::Mat &refWin, const cv::Mat &curWin) const
+{
+    const int M = refWin.rows, N = refWin.cols;
+
+    // --- normalised cross-power spectrum  R = F_cur . conj(F_ref) -----------
+    cv::Mat Fr, Fc;
+    cv::dft(refWin, Fr, cv::DFT_COMPLEX_OUTPUT);
+    cv::dft(curWin, Fc, cv::DFT_COMPLEX_OUTPUT);
+
+    cv::Mat R;
+    cv::mulSpectrums(Fc, Fr, R, 0, /*conjB=*/true);   // F_cur . conj(F_ref)
+    {
+        std::vector<cv::Mat> ch(2);
+        cv::split(R, ch);
+        cv::Mat mag;
+        cv::magnitude(ch[0], ch[1], mag);
+        mag += 1e-12f;
+        cv::divide(ch[0], mag, ch[0]);
+        cv::divide(ch[1], mag, ch[1]);
+        cv::merge(ch, R);
+    }
+
+    // --- coarse integer peak --------------------------------------------
+    cv::Mat cc;
+    cv::idft(R, cc, cv::DFT_REAL_OUTPUT | cv::DFT_SCALE);
+    cv::Point peak;
+    cv::minMaxLoc(cc, nullptr, nullptr, nullptr, &peak);
+    const double dy0 = (peak.y > M / 2) ? peak.y - M : peak.y;
+    const double dx0 = (peak.x > N / 2) ? peak.x - N : peak.x;
+
+    // --- local upsampled zoom around the coarse peak ------------------
+    const double kappa = std::max(1.0, static_cast<double>(_params.upsampleFactor));
+    const int    S     = std::max(3, static_cast<int>(std::ceil(1.5 * kappa)));
+    const int    dc    = S / 2;                      // grid centre (dftshift)
+    const double roff  = dc - dy0 * kappa;
+    const double coff  = dc - dx0 * kappa;
+
+    // The coarse peak above used R = F_cur.conj(F_ref), whose IDFT peaks at +shift
+    // (the module's convention). The matrix-DFT zoom that follows needs the
+    // conjugate so that its phase ramp cancels R's the same way (verified on the
+    // Fourier-shift bench: without the conj the zoom peak leaves the grid).
+    cv::Mat R64;
+    {
+        std::vector<cv::Mat> ch(2);
+        cv::split(R, ch);
+        ch[1] *= -1.0f;                    // conj(R)
+        cv::Mat Rc;
+        cv::merge(ch, Rc);
+        Rc.convertTo(R64, CV_64FC2);
+    }
+
+    const cv::Mat Krow = phaseKernel(M, S, kappa, roff);        // S x M
+    const cv::Mat Kcol = phaseKernel(N, S, kappa, coff).t();    // N x S
+
+    cv::Mat tmp, out;
+    cv::gemm(R64, Kcol, 1.0, cv::noArray(), 0.0, tmp);          // M x S
+    cv::gemm(Krow, tmp, 1.0, cv::noArray(), 0.0, out);          // S x S
+
+    cv::Mat ccAbs;
+    {
+        std::vector<cv::Mat> ch(2);
+        cv::split(out, ch);
+        cv::magnitude(ch[0], ch[1], ccAbs);   // |conj(x)| == |x|, no need to conjugate
+    }
+    cv::Point up;
+    cv::minMaxLoc(ccAbs, nullptr, nullptr, nullptr, &up);
+
+    return cv::Point2d(dx0 + static_cast<double>(up.x - dc) / kappa,
+                       dy0 + static_cast<double>(up.y - dc) / kappa);
 }
 
 void Meter::calibrateSCurve()
@@ -308,9 +409,18 @@ Sample Meter::update(const cv::Mat &frame)
         cur = f32;
 
     double response = 0.0;
-    cv::Point2d shift = measureShift(cur, f32, response);
+    cv::Point2d shift;
+    if (_params.dftShift)
+    {
+        shift = upsampledShift(_anchor, cur);
+        response = nccAtShift(_anchorRaw, f32, shift);
+    }
+    else
+    {
+        shift = measureShift(cur, f32, response);
+    }
 
-    // --- subtract the calibrated pixel-locking S-curve ----------------------
+    // --- subtract the calibrated pixel-locking S-curve (legacy path only) --
     if (_haveCurve)
     {
         shift.x -= biasEval(_biasCoefX, shift.x - std::floor(shift.x));

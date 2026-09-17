@@ -41,11 +41,7 @@ p(t) = V·t + e(t) + n(t)
 | terme | sens |
 |---|---|
 | `V·t`  | rampe constante = rotation horaire voulue (sidérale). C'est la constante `pixsec`. |
-<<<<<<< HEAD
-| `e(t)` | erreur périodique (vis sans fin), **moyenne nulle sur une période de ver `T_worm`**. |
-=======
 | `e(t)` | erreur périodique (vis sans fin), **moyenne nulle sur une période de VSF `T_vsf`**. |
->>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
 | `n(t)` | bruit : corrélation + turbulence résiduelle + marche aléatoire des ré-ancrages. |
 
 Guider en aveugle = tenir `e(t) + n(t) → 0`, c.-à-d. asservir `dp/dt` sur `V`.
@@ -62,11 +58,7 @@ Guider en aveugle = tenir `e(t) + n(t) → 0`, c.-à-d. asservir `dp/dt` sur `V`
 
 **V — la pente de consigne** : px/s quand le suivi est parfait.
 - La partie difficile : **toute mesure courte est polluée par `e(t)`**. Ajuster
-<<<<<<< HEAD
-  la pente sur un nombre non entier de périodes de ver → PE non compensée →
-=======
   la pente sur un nombre non entier de périodes de VSF → PE non compensée →
->>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
   pente biaisée. (C'est ça qui a toujours été fait à tâtons via `pixsec`.)
 
 ### Méthodes pour V (du plus simple au meilleur)
@@ -80,30 +72,17 @@ Guider en aveugle = tenir `e(t) + n(t) → 0`, c.-à-d. asservir `dp/dt` sur `V`
    faut juste `k`. `ω_sid = 2π / 86164.09 s = 7.2921e-5 rad/s`.
 
 2. **Ajustement robuste sur rampe libre.** Capture non guidée ≥ 3–5 périodes de
-<<<<<<< HEAD
-   ver ; régression de `p(t)` cumulé vs `t` par Theil–Sen ou moindres carrés
-   totaux (robuste aux frames où la corrélation a sauté). Fenêtre idéale =
-   multiple entier de `T_worm`. Biais PE décroît en `1/N_périodes`.
-
-3. **Moyenne sur période de ver.** `V = Δp sur N·T_worm / (N·T_worm)`. La PE de
-   moyenne nulle s'annule exactement. `T_worm` : doc monture, ou
-=======
    VSF ; régression de `p(t)` cumulé vs `t` par Theil–Sen ou moindres carrés
    totaux (robuste aux frames où la corrélation a sauté). Fenêtre idéale =
    multiple entier de `T_vsf`. Biais PE décroît en `1/N_périodes`.
 
 3. **Moyenne sur période de VSF.** `V = Δp sur N·T_vsf / (N·T_vsf)`. La PE de
    moyenne nulle s'annule exactement. `T_vsf` : doc monture, ou
->>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
    autocorrélation / FFT de `p(t)` détendancé.
 
 4. **Adaptatif — supprime le tâtonnement.** Amorce avec (1) ou une louche.
    Lancer la boucle. Surveiller le **biais moyen de correction (E−W)** sur une
-<<<<<<< HEAD
-   fenêtre glissante d'une période de ver : biais persistant `b` → `V += α·b`.
-=======
    fenêtre glissante d'une période de VSF : biais persistant `b` → `V += α·b`.
->>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
    Convergence en quelques périodes. Le feed-forward `V` s'auto-cale ;
    l'intégrateur ne se bat plus que contre la PE.
 
@@ -120,15 +99,9 @@ tant que la mécanique ne bouge pas.
 
 ### Bonus : table PEC verrouillée en phase
 
-<<<<<<< HEAD
-Résidu `e(t)` détendancé → FFT → période de ver + harmoniques → table PEC
-verrouillée en phase. La boucle devient prédictive (rejouer la PE connue) +
-petite correction de trim. Nécessite une référence de phase du ver (index INDI
-=======
 Résidu `e(t)` détendancé → FFT → période de VSF + harmoniques → table PEC
 verrouillée en phase. La boucle devient prédictive (rejouer la PE connue) +
 petite correction de trim. Nécessite une référence de phase de la VSF (index INDI
->>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
 `PEC`, ou phase libre asservie sur la composante périodique).
 
 ---
@@ -246,13 +219,8 @@ Conséquences :
   (gauchissement) → **2/tour**, période ~12 h. Sur une session de quelques
   heures : **dérive lente légèrement courbée** → pollue l'estimation de `V`, pas
   la PE (100–600 s). **Le `V` adaptatif (§3 méthode 4) les absorbe** si sa
-<<<<<<< HEAD
-  constante de temps ≈ quelques périodes de ver. Atout de conception.
-- **Mouvement tangentiel en arc** : sur une période de ver, flèche `r·θ²/8`
-=======
   constante de temps ≈ quelques périodes de VSF. Atout de conception.
 - **Mouvement tangentiel en arc** : sur une période de VSF, flèche `r·θ²/8`
->>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
   < nm → **localement une droite**, aucune correction géométrique.
 - **Gain** = `r · θ · (échelle px)`. `r` grand → meilleure résolution ;
   `r ≲ 50 mm` sur un CD (FOV doit rester sur le disque). À `r = 50 mm` +
@@ -262,13 +230,8 @@ Conséquences :
   dans l'image (grain 600–800 si trop gros, ou baisser le grandissement).
 
 **Watch-items résiduels :**
-<<<<<<< HEAD
-1. **Jeu axial (end-float) de l'axe AD** : une composante axiale *à la période du
-   ver* aliaserait dans la PE. À vérifier sur la monture cible.
-=======
 1. **Jeu axial (end-float) de l'axe AD** : une composante axiale *à la période de
    la VSF* aliaserait dans la PE. À vérifier sur la monture cible.
->>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
 2. **Adhérence du CD sur l'axe** : serrage force → zéro glissement sous couple
    (sinon fausse rotation injectée directement). Goutte de colle en sécurité.
 
@@ -280,11 +243,7 @@ Conséquences :
    couplage support/vibration reste **LA limite** dans la bande PE.
 2. **Marche aléatoire des ré-ancrages** : 0,02 px/frame sur 1000 frames → 0,6 px.
    Approche par ancre, mais chaque ré-ancrage réinjecte ~0,02 px ; sur une
-<<<<<<< HEAD
-   période de ver, quelques à quelques dizaines de ré-ancrages → bruit cumulé
-=======
    période de VSF, quelques à quelques dizaines de ré-ancrages → bruit cumulé
->>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
    ~0,05–0,15 px. **Terme d'erreur dominant côté algo.**
 3. Texture (features 3–10 px ≈ optimal), éclairage stable, filé / rolling shutter
    (planchers mineurs).
@@ -453,15 +412,9 @@ capture), un seul axe.
   quelque chose de solidaire de l'axe.
 - **Incrémental, pas d'index.** On mesure une variation, pas l'angle absolu.
   Parfait pour la correction PE en **feedback**. Pour du **feed-forward**
-<<<<<<< HEAD
-  (rejouer une table PE) il faut une **phase du ver** : index PEC de la monture
-  (propriété INDI `PEC` si dispo) ou estimateur de phase verrouillé sur la
-  composante périodique (valide après >1 période, dérive si le ver n'est pas
-=======
   (rejouer une table PE) il faut une **phase de la VSF** : index PEC de la monture
   (propriété INDI `PEC` si dispo) ou estimateur de phase verrouillé sur la
   composante périodique (valide après >1 période, dérive si la VSF n'est pas
->>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
   stable). → contrainte sur l'ambition table PEC.
 
 ### Domaine de validité (à écrire noir sur blanc dans la doc module)
@@ -485,20 +438,12 @@ Boucle active, `V` statique faux de 0,1 % : le résidu *contrôlé* ne s'emballe
 
 Dérive thermique (graisse qui refroidit), terme disque à 1/tour, erreur de taux
 moyen : **tout tombe dans la même bande lente** → un seul mécanisme (`V`
-<<<<<<< HEAD
-adaptatif, τ ≈ quelques périodes de ver) traite l'ensemble.
-=======
 adaptatif, τ ≈ quelques périodes de VSF) traite l'ensemble.
->>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
 
 ### Robustesse
 
 - **Phase de caractérisation au démarrage** : suivi seul, mesure ≥ dizaines de s
-<<<<<<< HEAD
-  (idéalement 1 période de ver) **avant** de corriger → amorce `V`, amorce la
-=======
   (idéalement 1 période de VSF) **avant** de corriger → amorce `V`, amorce la
->>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
   phase PE si feed-forward. Pas de settle stellaire (pas de slew) mais ce
   warm-up est nécessaire.
 - **Gate anti-outlier / vibration** : résonance du support + vent + pas au sol →
@@ -565,11 +510,7 @@ Hypothèse : **la monture suit au sidéral** pendant toute la calibration.
 
 1. **PhCharacterize (étape 1)** — dérive libre, aucun pulse, pendant
    `calParams/chardur` s (défaut 60 ; « quelques dizaines de s » = `V` grossier,
-<<<<<<< HEAD
-   ≥ 1 période de ver = `V` propre + vraie mesure de PE). `fitDriftLine()` =
-=======
    ≥ 1 période de VSF = `V` propre + vraie mesure de PE). `fitDriftLine()` =
->>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
    pentes MCO de `x(t)` et `y(t)` → **`θ` = `atan2(sy, sx)`** (orientation de
    l'axe AD dans l'image) et **`V` = `hypot(sx, sy)`** (px/s). Résidu autour de
    la droite décomposé en **along-axis** (= erreur périodique + bruit) et
@@ -625,9 +566,17 @@ qui part de la `V` stockée.
    négative stable. Corrige un `V` biaisé par une caractérisation trop courte.
    Défaut `alphaV = 0.005` (**activé**). L'ancienne loi `(err − errPrev)/dt`
    (dérivée) chassait le bruit → supprimée.
-   **`kp` défaut 0,5**, **`kd` défaut 0** (le terme D n'amplifie que du bruit sur
-   une boucle lente ~2 fps). `kp = 1` = deadbeat → sonne avec la période de
-   boucle.
+   **`kp` défaut 0,5**, **`kd` défaut 0** (le terme D brut n'amplifie que du bruit).
+   `kp = 1` = deadbeat → sonne avec la période de boucle.
+   **Compensation par anticipation (lead)** — 2026-09-08, sans paramètre exposé.
+   La boucle est limitée par la **latence** (~1 s mesure → effet du pulse) : elle
+   corrige où l'erreur *était*. On lisse `d(err)/dt` sur ~1 s (`_errRate`, EMA
+   indépendante de la cadence) et on corrige sur `errLead = err + _errRate·LEAD`
+   avec `LEAD = 1 s` codé en dur (= la latence). `u = kp·errLead + ki·I + kd·_errRate`
+   (le terme `kd` agit maintenant sur le taux *lissé*, plus sur `err − errPrev`
+   brut). **La consigne avance toujours à `V` fixe** → `err` reste la vraie
+   erreur d'axe : pas de piège « suivre la PE » (contrairement à un FF de vitesse
+   sur la consigne, qui serait le même défaut que `alphaV`). Loggé : `eR=` (px/s).
 
 **Diag banc (21:24)** : caractérisation 30 s → `V = 2.2249` biaisé haut de
 ~7,5 % (phase de PE). Symptômes : gain-cal asym W/E 56 % (`W = g−δ`, `E = g+δ` ;
@@ -680,18 +629,206 @@ publiée **uniquement** dans `values/crossaxis` — lecture de santé numérique
   = dérive libre pendant `calParams/chardur` s → `θ` + `V` ; étape 2 = pulses
   W/E décontaminés par `V`.
 
+### Sortie GuideLog PHD2
+
+`enterGuide()` ouvre `getWebroot()/PHD2_GuideLog_<yyyy-MM-dd_HHmmss>.txt` (même
+répertoire que le JPEG `<module>.jpeg`), y écrit un en-tête PHD2 minimal
+(`Guiding Begins at`, `Pixel scale = <arcsecPerPx> arc-sec/px`, ligne
+`Mount = "Mount", …, xAngle = θ°, xRate = 1000/G px/s, …`, puis la ligne des
+18 colonnes). `computeGuide()` ajoute une ligne par frame de guidage (frames
+`blank` et mode *observe* inclus → une session *observe* produit une trace PE
+pure ouvrable dans PHD Log Viewer). `SMAbort()` écrit `Guiding Ends at` +
+`Log closed at` et ferme le fichier. Toujours actif, pas de paramètre.
+
+Conventions : axe unique RA, toutes les colonnes DEC à `0` / vide. Signe PHD
+respecté : `RARawDistance > 0 ⇔ pulse W`, dérivé de la direction qui annule
+l'erreur courante (donc défini même sur les frames `blank`), avec les mêmes
+bascules `wDir` / `revRA` que la boucle. `dx,dy` = résidu reprojeté en repère
+caméra (pour le nuage de points PHD). `SNR` = métrique NCC ×100 ; `StarMass`
+sans équivalent (constante). `Frame`/`Time` repartent de 0 à chaque session.
+
+### Piste explorée et abandonnée : projection 1D avant corrélation
+
+**Idée (branche `blindpec-1dproj`, hors build, non câblée) :** puisque seul le
+déplacement le long de `θ` compte, sommer les lignes perpendiculaires à l'axe
+pour obtenir un profil 1D avant corrélation - gain de SNR "gratuit" façon
+binning logiciel, plus un zoom DFT suréchantillonné 1D bien moins cher que la
+version 2D (`measParams/dftshift`, coûteuse à `-O0`). Code : `pecmeter1d.h/.cpp`
+(`project()` + `upsampledShift()` façon Guizar-Sicairos 1D), isolé, sans
+dépendance Qt/INDI, même convention que `pecmeter.cpp`.
+
+**Verdict : idée fausse, invalidée par le banc, deux fois.**
+1. Banc synthétique (texture isotrope, même recette que le banc DFT 2D) :
+   le 1D est **2,6 à 130× pire** que le 2D selon bruit/angle, biais dès θ≠0
+   même sans bruit (artefact de rotation `warpAffine`).
+2. Banc sur **vraies frames BlindPEC** (2 frames indépendantes, 320×240,
+   bandeau overlay retiré) : confirmé et pire - **2,3 à 32× pire**, jusqu'à
+   ~90× à certains angles, y compris à bruit nul.
+
+**Pourquoi :** le raisonnement de départ suppose la texture invariante selon
+l'axe perpendiculaire (alors sommer les lignes accumule le signal en cohérent
+pendant que le bruit s'annule en `√N` - un vrai filtre adapté). C'est faux
+pour une surface poncée : l'autocorrélation directionnelle mesurée sur les
+vraies frames tombe de ~0,75-0,82 à 1 px à ~0,2-0,3 dès 8-12 px - le grain
+n'est cohérent que sur quelques pixels, pas sur les ~100 lignes sommées.
+Sommer moyenne le signal aussi vite que le bruit ; le pic de corrélation
+s'aplatit au lieu de se renforcer. L'estimateur 2D existant (ECC+S-curve ou
+DFT 2D) exploite déjà toute l'information utile de l'image - la réduire en 1D
+en jette une partie.
+
+### Piste explorée et abandonnée : estimateur différentiel (gradient, façon flux optique)
+
+**Idée :** `It ≈ -(Ix·dx + Iy·dy)` linéarisé, restreint à 1 DDL le long de `θ`,
+résolu en moindres carrés fermés - pas de FFT, pas d'itération, donc a priori
+bien moins cher que la corrélation.
+
+**Verdict, sur les vraies frames BlindPEC :**
+- **En un coup : trop imprécis.** Écart systématique ~0,49 px vs la 2D en
+  prod - la linéarisation ne tient pas pour le pas réel entre deux frames
+  guidées (~1,5 px, dominé par le suivi sidéral voulu, pas l'erreur).
+- **Avec 3-5 itérations de recalage** (warp-back exact par Fourier +
+  relinéarisation) : redevient compétitif (~0,005-0,03 px sur banc
+  synthétique à l'échelle réelle du dataset). Mais coûte alors **autant de
+  FFT** que ce qui existe déjà, et compare **frame à frame** au lieu de
+  frame-contre-ancre - réintroduit la marche aléatoire que `pecmeter.h`
+  évite délibérément (cf. son propre commentaire de conception). Poussé
+  jusqu'à convergence contre une ancre plutôt que la frame précédente, ça
+  redevient une réimplémentation d'ECC, sans la normalisation photométrique.
+
+**Conclusion : pas un vrai concurrent** - soit trop imprécis, soit converge
+vers ce qui tourne déjà en prod. Resté en scratchpad (`bench_diff.cpp`), pas
+promu en code du repo.
+
+### Piste explorée et abandonnée : détection de bord sub-pixel façon Devernay
+
+**Idée :** parabole à travers 3 échantillons de magnitude de gradient autour
+d'un maximum local (`λ = (a-c)/(2a-4b+2c)`, formule de Devernay/Canny amélioré)
+pour localiser un bord (une rayure) au sub-pixel, puis suivre ce bord d'une
+frame à l'autre.
+
+**Verdict : même piège que le pixel-locking déjà résolu pour `phaseCorrelate`,
+confirmé sur les vraies frames.** Une interpolation parabolique à 3 points est
+un mauvais modèle local pour la vraie forme d'un pic de gradient - biais
+périodique garanti, quel que soit le pic interpolé (corrélation ou gradient).
+Mesuré (protocole S-curve, décalage Fourier exact d'un vrai profil) : biais
+crête-à-crête **0,05 à ~1,0 px selon la ligne de balayage testée** - pas
+juste présent, très variable d'un bord à l'autre (chaque bord a sa propre
+courbe de biais - calibration bord-par-bord nécessaire, plus dur que la
+S-curve globale déjà en place). Resté en scratchpad (`bench_devernay.cpp`).
+
+### Expérience matérielle : mouchetis peint plutôt que rayures poncées
+
+**Idée :** remplacer la surface poncée (rayures directionnelles) par un CD
+peint au mouchetis aléatoire (façon speckle DIC/PIV) - supprimer la
+dépendance directionnelle constatée avec Devernay ci-dessus.
+
+**Banc synthétique d'abord :** confirme que l'isotropie s'améliore nettement,
+mais révèle un point critique **indépendant du fait que le mouchetis soit
+directionnel ou pas** : des points **mous** (flou gaussien, comme un nuage de
+peinture en voile fin) donnent un pic de corrélation large et un estimateur
+2D en prod **bien pire sous bruit** (0,57-0,80 px d'erreur, contre 0,005-0,02
+sans mouchetis) - texture basse fréquence = signal faible = grande sensibilité
+au bruit. Des points **nets et denses** (bord franc, façon gouttelettes qui
+sèchent distinctement) renversent la situation : 0,005-0,012 px, aussi bon ou
+meilleur que les rayures, et indépendant de l'angle.
+
+**Testé en vrai** (surface peinte réelle, 151 frames capturées) : le mouchetis
+obtenu est **mou**, pas net (halo visible autour de chaque point, confirmé par
+l'autocorrélation directionnelle qui reste haute jusqu'à 20 px, contre ~8 px
+sur les rayures). Isotropie gagnée, mais l'estimateur 2D en prod est
+**comparable à σ=8 (0,012-0,015 px vs 0,008 px), nettement pire à σ=20
+(0,05-0,06 px vs 0,02 px)**. Devernay bord-à-bord : nettement pire aussi
+(0,28-0,99 px), sans conséquence puisque non utilisé en prod.
+
+**Conclusion : pas de gain avec cette réalisation.** Un mouchetis ne vaut le
+coup que si l'application donne des points à bord franc (pas un voile fin) et
+dense - sinon on perd plus (bruit) qu'on ne gagne (isotropie, que l'estimateur
+actuel gère déjà correctement à l'angle courant). Pas retesté en version
+"nette" - gain jugé incrémental même dans le meilleur cas synthétique, ne
+justifie pas un nouvel essai matériel dans l'immédiat. Bancs en scratchpad
+(`bench_speckle.cpp` synthétique, `bench_speckle_real.cpp` sur les vraies
+frames).
+
+### Conclusion pratique (les quatre pistes ci-dessus)
+
+On a fait le tour raisonnable des méthodes de mesure sub-pixel pour ce
+capteur/cette texture (cf. §5 pixel-locking, et la branche
+`blindpec-dftshift`) : projection 1D, différentiel/gradient, détection de
+bord façon Devernay, changement de texture de surface. Aucune ne bat
+l'existant (ECC+S-curve, ou DFT 2D) ; les deux détecteurs à base de pics
+interpolés (corrélation, gradient) partagent le même biais de pixel-locking
+de fond, et les méthodes qui s'en sortent (ECC, DFT suréchantillonnée)
+convergent toutes vers la même famille. Le plancher de mesure actuel
+(~0,013-0,03 px) n'est pas là où chercher du gain. `pecmeter1d.h/.cpp` reste
+dans le repo comme trace documentée du premier cul-de-sac (non compilé, hors
+CMake) ; tous les autres bancs (`bench1d.cpp`, `bench1d_real.cpp`,
+`bench_diff.cpp`, `bench_devernay.cpp`, `bench_speckle.cpp`,
+`bench_speckle_real.cpp`) sont restés en scratchpad, comme `dfttest.cpp`
+avant eux.
+
+Outil créé au passage : `_dumpRaw` (`blindpec.h`/`.cpp`, off par défaut, même
+pattern que `_trace`) - sauve chaque frame en FITS brut via
+`fileio::saveAsFITSSimple()`, pour éviter la recompression JPEG du preview
+webroot si une future comparaison a besoin de plus de rigueur (les bancs
+ci-dessus tournent tous sur le JPEG qualité 100 du preview, pas sur du FITS).
+
+**Correctif de la conclusion ci-dessus, voir section suivante :** le
+"plancher ~0,013-0,03 px" tenait pour le microscope d'origine. Avec un
+microscope différent (mêmes rayures), il chute nettement - ce n'était donc
+pas un plancher de méthode, mais un plancher d'optique.
+
+### Nouveau microscope (960×540 vs 320×240) : vrai gain confirmé sur les rayures
+
+**Contexte :** l'ancien microscope (320×240) donnait ~0,005-0,02 px selon le
+bruit (cf. ci-dessus). Un microscope différent, plus résolu (960×540, ×3 en
+linéaire), a été branché pour test - **montage instable sur la monture
+actuelle, pas encore utilisable en session réelle**, mais assez pour capturer
+une série d'images et faire tourner les mêmes bancs.
+
+**Test 1 - scène statique (pas de mouvement, capture dédiée) :** bruit
+temporel réel mesuré par différence de frames consécutives (pas d'hypothèse
+de σ comme dans les bancs précédents) : **σ ≈ 3,3 DN** sur une moyenne de
+72,6 (4,5%). Texture du moment (mouchetis) : autocorrélation directionnelle
+molle (0,92→0,81 de 1 à 20 px, comme le mouchetis flou d'avant), mais à bruit
+*égal* (σ=8/20, comparaison texture pure) l'estimateur ECC/DFT en prod fait
+**mieux que tout ce qui avait été testé jusque-là** (0,0054/0,0179 px contre
+0,0079/0,0196 sur les rayures à l'ancien scope, et 0,012-0,015/0,050-0,060 sur
+le mouchetis mou à l'ancien scope). Diagnostic : le gain ne vient pas de la
+texture (aussi molle qu'avant en pixels) mais du fait qu'une texture
+identique, vue à plus fort grandissement, occupe plus de pixels - donc
+décorrèle plus lentement *en pixels* tout en étant mieux résolue *en
+micromètres*.
+
+**Test 2 - vraies rayures sous ce microscope (mouvement réel, capture
+dédiée) :** confirmation nette, et plus forte que prévu.
+- Autocorrélation directionnelle **beaucoup plus rapide** qu'à l'ancien scope
+  (0,344 contre 0,754 à 1 px, theta=0) - pas un effet de grandissement cette
+  fois (qui ralentirait la décroissance), une vraie texture plus fine résolue
+  que l'ancien scope noyait dans le flou.
+- Précision ECC/DFT en prod (kappa=50) : **quasi plate à ~0,005 px, quel que
+  soit le bruit injecté (σ=0/8/20)** - là où toutes les configurations
+  testées jusqu'ici (rayures ou mouchetis, ancien ou nouveau scope) se
+  dégradaient nettement avec le bruit. Meilleur résultat de toute
+  l'exploration sub-pixel, et de loin.
+
+**Conclusion : le vrai levier était l'optique, pas la texture ni
+l'algorithme.** Tout ce détour (projection 1D, différentiel, Devernay,
+mouchetis) cherchait un gain de méthode sur un signal plafonné par le flou du
+premier microscope - en améliorant l'optique elle-même le plancher recule
+largement. Reste à faire, avant de pouvoir l'exploiter en session réelle :
+**une fixation mécanique stable** sur la monture (le point bloquant actuel),
+et **une vraie caractérisation** (`calParams`, phase 1) pour obtenir la
+nouvelle échelle `arcsecPerPx` - le gain en pixels ci-dessus ne se traduit en
+gain angulaire réel qu'une fois `r·M` (rayon × grandissement) mesuré avec ce
+microscope, pas supposé.
+
 ### Raccourcis / dette assumée (à reprendre)
 
 - **Timestamp = `QDateTime::currentDateTime()` à l'arrivée du BLOB**, pas
   `DATE-OBS + t_exp/2` de l'en-tête. → à câbler (cf. §4, c'est *le* point dur).
 - `fitDriftLine()` = MCO simple sur `x(t)` / `y(t)`, **pas** Theil–Sen ni
-<<<<<<< HEAD
-  fenêtrage sur période de ver entière → biais PE résiduel sur `θ` et `V`.
-- `chardur` : paramètre fixe utilisateur ; pas de détection auto de `T_worm` ni
-=======
   fenêtrage sur période de VSF entière → biais PE résiduel sur `θ` et `V`.
 - `chardur` : paramètre fixe utilisateur ; pas de détection auto de `T_vsf` ni
->>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
   de fenêtrage entier (prévu plus tard).
 - Ré-ancrage sans **vérification croisée** (corréler ancienne vs nouvelle ancre).
 - Pas de gestion multi-canal FITS (prend le 1ᵉʳ plan si `channels==3`).
@@ -705,26 +842,22 @@ publiée **uniquement** dans `values/crossaxis` — lecture de santé numérique
 
 ## 10. Points ouverts
 
+- [ ] **Nouveau microscope (960×540) : trouver une fixation mécanique stable
+      sur la monture**, puis relancer une caractérisation complète (étape 1)
+      pour mesurer la vraie échelle `arcsecPerPx` - gain confirmé en pixels
+      (cf. §9), pas encore quantifié en arcsec réel. Priorité haute : c'est le
+      meilleur résultat de toute l'exploration sub-pixel.
 - [ ] Timestamp `DATE-OBS + t_exp/2` par frame (remplacer `nowMs()`).
 - [ ] `matchTemplate`+`CV_SubPix` vs `phaseCorrelate` vs `findTransformECC` :
       bench sur images réelles (le code part sur `phaseCorrelate`).
-<<<<<<< HEAD
-- [ ] `fitDriftLine` robuste : Theil–Sen + fenêtre = multiple entier de `T_worm`.
-- [ ] Estimation de `T_worm` : détection auto (FFT/autocorr) du résidu étape 1.
-=======
 - [ ] `fitDriftLine` robuste : Theil–Sen + fenêtre = multiple entier de `T_vsf`.
 - [ ] Estimation de `T_vsf` : détection auto (FFT/autocorr) du résidu étape 1.
->>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
 - [ ] Pilotage ROI + binning (`CCD_FRAME`, `CCD_BINNING`).
 - [ ] Revoir les défauts `pid` (kp/ki) sur le banc.
 - [ ] Vérification croisée du ré-ancrage.
 - [ ] Exploiter la composante d'axe croisé (`crossaxis`) comme diagnostic actif.
 - [ ] Arrêt propre pour *calibrate*-only (ne pas réutiliser `Abort`).
-<<<<<<< HEAD
-- [ ] Référence de phase du ver pour la table PEC : dispo côté INDI monture ?
-=======
 - [ ] Référence de phase de la VSF pour la table PEC : dispo côté INDI monture ?
->>>>>>> a1c7ee82 (Auto stash before merge of "OST@Github/main" and "blindPEC2026")
 - [ ] Audit des points de contact sequencer ↔ « guider » avec la classe
       `blindpec` (cf. §7).
 - [ ] Test unitaire `pecmeter` (2 `cv::Mat` synthétiques translatées → `dx/dy`).
