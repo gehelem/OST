@@ -1,6 +1,26 @@
+# Doxygen API doc, injected into public/api/ by build-doc (see
+# documentation/CI/CI-build.sh) so it ships as
+# documentation.ostserver.fr/api/ - no new domain/DNS needed.
+build-doxygen:
+  stage: build
+  image: ubuntu:24.04
+  script:
+    - apt-get update && apt-get install -y --no-install-recommends doxygen graphviz
+    - doxygen Doxyfile
+  artifacts:
+    paths:
+      - doc/html
+    expire_in: 1 week
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+
 build-doc:
   stage: build
   image: "hugomods/hugo:exts-0.122.0"
+  needs:
+    - build-doxygen
   variables:
     DOC_FILE_LATEST: "documentation_latest.tar.gz"
   script:
