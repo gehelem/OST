@@ -137,6 +137,7 @@ release-job-tag:
     - build-job-2404
     - build-job-2604
     - build-job-fedora
+    - build-doc
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   script:
     - sh ./CI/CI-upload-release-tag.sh
