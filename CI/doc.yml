@@ -20,3 +20,20 @@ build-doc:
 # A separate release-doc-latest used to race release-job-latest for the
 # same "latest" release (both delete+recreate it) - whichever ran last
 # silently wiped the other's assets.
+
+# GitLab Pages: the job MUST be named "pages" and its artifact MUST
+# contain a top-level public/ directory - that's GitLab's only
+# requirement, it then serves that directory automatically. Custom
+# domain (documentation.ostserver.fr) is configured separately in
+# Settings > Pages, not here.
+pages:
+  stage: release
+  image: "hugomods/hugo:exts-0.122.0"
+  script:
+    - cd documentation
+    - HUGO_PARAMS_VERSION=$(git rev-parse --short HEAD) hugo --gc --minify --destination ../public
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
