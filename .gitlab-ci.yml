@@ -27,6 +27,9 @@ variables:
     - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
     - if: '$CI_PIPELINE_SOURCE == "push"'
 
+# SUSPENDED 2026-09-17 (Gilles): more effort than it's worth for now.
+# Kept intact (rules: never) rather than deleted - see
+# notes/NOTES-ci-overview.md and notes/NOTES-process-release-lifecycle.md.
 build-job-2204:
   stage: build
   image: $CI_REGISTRY_IMAGE/ci-build:22.04
@@ -43,7 +46,8 @@ build-job-2204:
       - "ostserver-dev_*_2204_amd64.deb"
     expire_in: 4 week
   allow_failure: true
-  <<: *build-rules
+  rules:
+    - when: never
 
 build-job-2404:
   stage: build
@@ -80,6 +84,7 @@ build-job-2604:
     expire_in: 4 week
   <<: *build-rules
 
+# SUSPENDED 2026-09-17 (Gilles): see build-job-2204 above.
 test-job-2204:
   stage: test
   image: $CI_REGISTRY_IMAGE/ci-build:22.04
@@ -95,7 +100,8 @@ test-job-2204:
       - ws.log
     expire_in: 4 week
   allow_failure: true
-  <<: *test-rules
+  rules:
+    - when: never
 
 test-job-2404:
   stage: test
