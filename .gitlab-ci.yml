@@ -150,7 +150,10 @@ release-job-latest:
     - build-job-2404
     - build-job-2604
     - build-job-fedora
+    - build-doc
   image: registry.gitlab.com/gitlab-org/release-cli:latest
+  variables:
+    DOC_FILE_LATEST: "documentation_latest.tar.gz"
   script:
     - sh ./CI/CI-upload-release-latest.sh
   rules:

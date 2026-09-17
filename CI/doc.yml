@@ -15,15 +15,8 @@ build-doc:
     - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
     - if: '$CI_PIPELINE_SOURCE == "push"'
 
-release-doc-latest:
-  stage: release
-  image: registry.gitlab.com/gitlab-org/release-cli:latest
-  variables:
-    DOC_FILE_LATEST: "documentation_latest.tar.gz"
-  dependencies:
-    - build-doc
-  script:
-    - cd documentation
-    - sh ./CI/CI-release-latest.sh
-  rules:
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+# No standalone release job here: the doc tarball rides along in
+# release-job-latest (.gitlab-ci.yml), next to the ostserver packages.
+# A separate release-doc-latest used to race release-job-latest for the
+# same "latest" release (both delete+recreate it) - whichever ran last
+# silently wiped the other's assets.
