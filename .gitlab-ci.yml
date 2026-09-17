@@ -1,6 +1,7 @@
 include:
   - local: CI/ci-images.yml
   - local: CI/fedora.yml
+  - local: CI/doc.yml
 
 stages:
   - images

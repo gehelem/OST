@@ -1,0 +1,57 @@
+baseURL = 'https://documentation.ostserver.fr/'
+languageCode = 'fr-FR'
+title = 'Observatoire Sans Tête'
+# Change the default theme to be use when building the site with Hugo
+theme = "hugo-theme-relearn"
+
+#
+# For search functionality
+[outputs]
+home = [ "HTML", "RSS", "SEARCH"]
+
+[params]
+  # Change default color scheme with a variant one.
+
+  [[params.themeVariant]]
+    identifier = "relearn-light"
+  [[params.themeVariant]]
+    identifier = "relearn-dark"
+
+
+defaultContentLanguage = "fr"
+
+[languages]
+
+[languages.fr]
+title = 'Observatoire Sans Tête'
+weight = 1
+languageName = "Français"
+
+[languages.en]
+title = 'Observatoire Sans Tête'
+weight = 2
+languageName = "English"
+
+[[menu.shortcuts]]
+name = "<i class='fab fa-fw fa-gitlab'></i>GitLab"
+identifier = "gl"
+url = "https://gitlab.ostserver.fr"
+weight = 5
+
+[[menu.shortcuts]]
+name = "<i class='fab fa-fw fa-github'></i>GitHub"
+identifier = "gh"
+url = "https://github.com/gehelem/OST"
+weight = 10
+
+[[menu.shortcuts]]
+name = "<i class='fab fa-fw fa-discord'></i>Discord Astro-Fr"
+identifier = "dc"
+url = "https://bit.ly/ASTRO-FR"
+weight = 15
+
+[[menu.shortcuts]]
+name = "<i class='fas fa-fw fa-bookmark'></i>Genèse sur Webastro"
+identifier = "webastro"
+url = "https://www.webastro.net/forums/topic/180582-ost-observatoire-sans-t%C3%AAte/"
+weight = 20

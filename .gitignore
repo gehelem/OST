@@ -32,7 +32,6 @@ cmake_install.cmake
 CTestTestfile.cmake
 Testing
 doxygen_warnings.txt
-documentation
 *.cbp
 install_manifest.txt
 .idea
@@ -77,3 +76,9 @@ package-lock.json
 package.json
 
 ws.log
+
+# Hugo doc site build artifacts
+documentation/public/
+documentation/resources/
+documentation/.hugo_build.lock
+documentation/documentation_latest.tar.gz

@@ -1,0 +1,27 @@
+build-doc:
+  stage: build
+  image: "hugomods/hugo:exts-0.122.0"
+  variables:
+    DOC_FILE_LATEST: "documentation_latest.tar.gz"
+  script:
+    - cd documentation
+    - sh ./CI/CI-build.sh
+  artifacts:
+    paths:
+      - documentation/documentation_latest.tar.gz
+    expire_in: 1 week
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+
+release-doc-latest:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  variables:
+    DOC_FILE_LATEST: "documentation_latest.tar.gz"
+  dependencies:
+    - build-doc
+  script:
+    - cd documentation
+    - sh ./CI/CI-release-latest.sh
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
