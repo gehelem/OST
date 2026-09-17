@@ -1,11 +1,16 @@
 # Fedora RPM build + test + release input.
 #
+# SUSPENDED 2026-09-17 (Gilles): more noise than signal for now. Target
+# architectures/distros are an open question, currently Ubuntu-only in
+# practice - see notes/NOTES-ci-overview.md and
+# notes/NOTES-process-release-lifecycle.md. Kept intact (rules: never)
+# rather than deleted, for a cheap re-enable once that's settled.
+#
 # Inline dnf for now (no prebuilt image): the C++ compile dominates the job
 # time, the dnf layer is ~1-2 min. Bake a CI/Dockerfile.build.rpm + a matrix
 # later if pipeline time becomes a concern.
 
 build-job-fedora:
-  extends: .build-rules
   stage: build
   image: fedora:latest
   variables:
@@ -22,9 +27,10 @@ build-job-fedora:
       - "ostserver-devel_*_fc_x86_64.rpm"
     expire_in: 4 week
   allow_failure: true
+  rules:
+    - when: never
 
 test-job-fedora:
-  extends: .test-rules
   stage: test
   image: fedora:latest
   dependencies:
@@ -39,3 +45,5 @@ test-job-fedora:
       - ws.log
     expire_in: 4 week
   allow_failure: true
+  rules:
+    - when: never
