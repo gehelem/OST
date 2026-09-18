@@ -1,5 +1,5 @@
 ---
-title: Pattern d'architecture client
+title: Principes d'architecture client
 weight: 50
 description: "Comment structurer un client OST : datastore unique, écriture via WS uniquement"
 ---
@@ -88,4 +88,4 @@ toutes les 30 secondes, le serveur répond `xx` (sans payload utile).
   `DU` ? état côté serveur conservé ou non ?) — rien trouvé de
   documenté sur ce point précis, contrairement au reste de cette page.
 - Exemple de code minimal (pseudo-code ou extrait réel d'OstErix) pour
-  illustrer le pattern, pas juste le décrire en prose
+  illustrer ces principes, pas juste les décrire en prose
