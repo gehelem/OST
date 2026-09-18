@@ -3,7 +3,7 @@
 # CI - Upload + Release - TAG
 #
 set -e
-apk add curl
+apk add curl jq
 echo "upload packages"
 [ -f ostserver_${CI_COMMIT_TAG}_2404_amd64.deb ] && curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ostserver_${CI_COMMIT_TAG}_2404_amd64.deb "${PACKAGE_REGISTRY_TAG}/ostserver_${CI_COMMIT_TAG}_2404_amd64.deb"
 [ -f ostserver_${CI_COMMIT_TAG}_2204_amd64.deb ] && curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ostserver_${CI_COMMIT_TAG}_2204_amd64.deb "${PACKAGE_REGISTRY_TAG}/ostserver_${CI_COMMIT_TAG}_2204_amd64.deb"
@@ -18,4 +18,24 @@ ASSETS="--assets-link {\"name\":\"ostserver_${CI_COMMIT_TAG}_2604_amd64.deb\",\"
 [ -f ostserver_${CI_COMMIT_TAG}_fc_x86_64.rpm ] && ASSETS="$ASSETS --assets-link {\"name\":\"ostserver_${CI_COMMIT_TAG}_fc_x86_64.rpm\",\"url\":\"${PACKAGE_REGISTRY_TAG}/ostserver_${CI_COMMIT_TAG}_fc_x86_64.rpm\"}"
 [ -f ostserver-devel_${CI_COMMIT_TAG}_fc_x86_64.rpm ] && ASSETS="$ASSETS --assets-link {\"name\":\"ostserver-devel_${CI_COMMIT_TAG}_fc_x86_64.rpm\",\"url\":\"${PACKAGE_REGISTRY_TAG}/ostserver-devel_${CI_COMMIT_TAG}_fc_x86_64.rpm\"}"
 [ -f documentation/documentation_${CI_COMMIT_TAG}.tar.gz ] && ASSETS="$ASSETS --assets-link {\"name\":\"documentation_${CI_COMMIT_TAG}.tar.gz\",\"url\":\"${PACKAGE_REGISTRY_TAG}/documentation_${CI_COMMIT_TAG}.tar.gz\"}"
-release-cli create --name "Release $CI_COMMIT_TAG" --tag-name $CI_COMMIT_TAG $ASSETS
+
+echo "generate changelog"
+# GitLab auto-detects the range against the previous semver tag when only
+# "version" is given. Only commits carrying a "Changelog:" trailer show up.
+# Never let this break the release: on any failure, fall through with no
+# description, same as before this was added.
+CHANGELOG_NOTES=""
+if curl -fsS --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
+    --get --data-urlencode "version=${CI_COMMIT_TAG}" \
+    "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/repository/changelog" \
+    -o /tmp/changelog_response.json
+then
+    CHANGELOG_NOTES=$(jq -r '.notes // empty' /tmp/changelog_response.json 2>/dev/null || true)
+fi
+
+echo "create release"
+if [ -n "$CHANGELOG_NOTES" ]; then
+    release-cli create --name "Release $CI_COMMIT_TAG" --tag-name $CI_COMMIT_TAG --description "$CHANGELOG_NOTES" $ASSETS
+else
+    release-cli create --name "Release $CI_COMMIT_TAG" --tag-name $CI_COMMIT_TAG $ASSETS
+fi
