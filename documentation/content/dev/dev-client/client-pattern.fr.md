@@ -149,6 +149,3 @@ setPropertyOneElement(module: string, property: string, elements: { [key: string
 }
 ```
 
-## À vérifier avant publication
-
-- Version anglaise (`client-pattern.en.md`)
