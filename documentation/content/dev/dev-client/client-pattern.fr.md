@@ -48,6 +48,12 @@ valeur**, pas les métadonnées. Le client doit :
 1. Conserver les métadonnées du dernier dump complet.
 2. Sur une mise à jour partielle, ne patcher **que** la valeur, sans
    jamais supposer que les métadonnées ont changé.
+
+Si les métadonnées elles-mêmes changent (min/max/format d'un élément),
+le serveur le signale explicitement via un message distinct, `ev`
+(voir [Serveur → Client]({{% relref "server-messages.fr.md" %}})) — ce
+n'est jamais silencieux. Le client n'a donc qu'à réagir au type de
+message reçu, sans avoir à deviner ce qui a changé.
 {{% /notice %}}
 
 {{% notice style="warning" title="Piège connu : les mises à jour de GlobalLOV" %}}
@@ -67,14 +73,19 @@ le client met en place de son côté, seulement si sa technologie
 l'exige, pour garder la connexion WebSocket active (certains
 navigateurs, proxys ou plateformes ferment une connexion jugée
 inactive). Un client qui n'en a pas besoin peut s'en passer entièrement.
+
+Le mécanisme existe côté protocole pour qui en a besoin : envoyer `XX`
+toutes les 30 secondes, le serveur répond `xx` (sans payload utile).
+```json
+→ {"XX": {}}
+← {"xx": {}}
+```
 {{% /notice %}}
 
 ## À vérifier avant publication
 
-- Liste exhaustive des types de messages de mise à jour partielle
-  (`ee`/`ea` cités ici, mais [Serveur → Client]({{% relref "server-messages.fr.md" %}})
-  en liste d'autres — `cp`, `ap`, `dp`, etc. — à croiser pour être complet)
-- Comportement à la reconnexion après une coupure (redemander `DU` ?
-  état côté serveur conservé ou non ?)
+- Comportement à la reconnexion après une coupure réelle (redemander
+  `DU` ? état côté serveur conservé ou non ?) — rien trouvé de
+  documenté sur ce point précis, contrairement au reste de cette page.
 - Exemple de code minimal (pseudo-code ou extrait réel d'OstErix) pour
   illustrer le pattern, pas juste le décrire en prose
