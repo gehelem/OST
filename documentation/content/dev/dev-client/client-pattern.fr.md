@@ -100,7 +100,36 @@ préserver entre deux connexions d'un même client : c'est une
 contrainte purement côté client.
 {{% /notice %}}
 
+## Exemple : lecture et écriture dans OstErix
+
+Extraits réels illustrant la séparation lecture/écriture de tête de
+cette page.
+
+**Lecture** — `datastore.service.ts`, un simple accès à l'état interne :
+```typescript
+getProperty(moduleName: string, propertyName: string): Observable<any> {
+  return new Observable(subscriber => {
+    const subscription = this.changed$.subscribe(() => {
+      const module = this.modules[moduleName];
+      const prop = (module as any)?.properties?.[propertyName] || null;
+      subscriber.next(prop);
+    });
+    subscriber.next(this.modules[moduleName]?.properties?.[propertyName] || null);
+    return () => subscription.unsubscribe();
+  });
+}
+```
+
+**Écriture** — `websocket.service.ts`, aucune mutation locale, juste
+l'envoi du message :
+```typescript
+setPropertyOneElement(module: string, property: string, elements: { [key: string]: any }): void {
+  this.send({
+    SV: { m: { [module]: { p: { [property]: { e: elements } } } } }
+  });
+}
+```
+
 ## À vérifier avant publication
 
-- Exemple de code minimal (pseudo-code ou extrait réel d'OstErix) pour
-  illustrer ces principes, pas juste les décrire en prose
+- Version anglaise (`client-pattern.en.md`)
