@@ -15,12 +15,9 @@ courant (modules → propriétés → éléments). Toute l'UI **lit** cette
 structure ; rien d'autre ne la modifie que les messages reçus du serveur.
 
 ```
-        lit                envoie SV/SA
-  UI ────────► Datastore         UI ────────► Serveur
-        ▲                                        │
-        │              met à jour                │
-        └──────── Datastore ◄─────────────────────┘
-                     (uniquement sur retour serveur)
+Lecture  :  Datastore ────────────► UI
+
+Écriture :  UI ─── SV/SA ───► Serveur ─── update ───► Datastore
 ```
 
 - **Pas de duplication** : si un composant a besoin d'une valeur, il la lit
