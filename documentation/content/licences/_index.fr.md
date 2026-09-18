@@ -20,3 +20,4 @@ title: Licences
 - GSL — GNU Scientific Library {{% badge style="green" %}}GPL3{{% /badge %}} https://www.gnu.org/software/gsl/
 - Avahi {{% badge style="green" %}}LGPL2.1{{% /badge %}} https://avahi.org/
 - libsecret {{% badge style="green" %}}LGPL2.1{{% /badge %}} https://gitlab.gnome.org/GNOME/libsecret
+- OpenCV {{% badge style="green" %}}Apache 2{{% /badge %}} https://github.com/opencv/opencv/blob/4.x/LICENSE

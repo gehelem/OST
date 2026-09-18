@@ -32,6 +32,21 @@ title = 'Observatoire Sans Tête'
 weight = 2
 languageName = "English"
 
+[languages.it]
+title = 'Observatoire Sans Tête'
+weight = 3
+languageName = "Italiano"
+
+[languages.de]
+title = 'Observatoire Sans Tête'
+weight = 4
+languageName = "Deutsch"
+
+[languages.es]
+title = 'Observatoire Sans Tête'
+weight = 5
+languageName = "Español"
+
 [[menu.shortcuts]]
 name = "<i class='fab fa-fw fa-gitlab'></i>GitLab"
 identifier = "gl"
