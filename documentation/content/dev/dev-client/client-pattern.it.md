@@ -1,0 +1,151 @@
+---
+title: Principi di architettura client
+weight: 50
+description: "Come strutturare un client OST: datastore unico, scrittura solo via WS"
+---
+
+Questa pagina descrive **come deve essere strutturato un client**, non il formato
+dei messaggi scambiati (vedi [Modello dati]({{% relref "structure.it.md" %}})
+e le pagine precedenti per quello).
+
+## Principio: un datastore unico detiene la verità
+
+Il client mantiene **un'unica struttura di dati** che rappresenta lo stato
+corrente (moduli → proprietà → elementi). Tutta la UI **legge** questa
+struttura; nulla altro la modifica se non i messaggi ricevuti dal server.
+
+```
+Lettura   :  Datastore ────────────► UI
+
+Scrittura :  UI ─── SV/SA ───► Server ─── update ───► Datastore
+```
+
+- **Nessuna duplicazione**: se un componente ha bisogno di un valore, lo legge
+  dal datastore, non lo conserva per proprio conto.
+- **Nessuna scrittura diretta**: la UI non modifica mai il datastore da sola,
+  nemmeno per una visualizzazione ottimistica.
+
+{{% notice style="tip" title="Scrittura: sempre tramite il server" %}}
+Un'azione dell'utente (cambiare un valore, cliccare un pulsante) attiva
+l'invio di un messaggio al server (`SV`/`SA` — vedi
+[Client → Server]({{% relref "client-messages.it.md" %}})). Il datastore
+locale **cambia solo in risposta**, quando il server risponde con
+l'aggiornamento confermato. Il client non presume mai il risultato.
+{{% /notice %}}
+
+## Dump completo vs aggiornamenti parziali
+
+Alla connessione, il client invia `DU`; il server risponde con un dump
+completo (`d`) contenente tutti i moduli con i loro metadati completi
+(label, tipo, min/max, LOV, ecc.).
+
+{{% notice style="tip" title="Gli aggiornamenti parziali portano solo il valore" %}}
+I messaggi che arrivano successivamente (`ee`, `ea`) contengono **solo il
+valore**, non i metadati. Il client deve:
+1. Conservare i metadati dell'ultimo dump completo.
+2. Su un aggiornamento parziale, applicare la patch **solo** al valore, senza
+   mai supporre che i metadati siano cambiati.
+
+Se i metadati stessi cambiano (min/max/formato di un elemento), il server
+lo segnala esplicitamente tramite un messaggio distinto, `ev`
+(vedi [Server → Client]({{% relref "server-messages.it.md" %}})) — questo
+non è mai silenzioso. Il client deve quindi solo reagire al tipo di
+messaggio ricevuto, senza doverla indovinare cosa è cambiato.
+{{% /notice %}}
+
+{{% notice style="warning" title="Trappola conosciuta: gli aggiornamenti di GlobalLOV" %}}
+Quando una proprietà fa riferimento a una LOV globale e questa cambia, il
+server invia l'aggiornamento **senza il campo `value`**. Il client non deve
+**mai preservare il vecchio valore** in questo caso preciso — bisogna
+applicare esattamente ciò che il server invia, inclusa l'assenza di
+valore. Il server fa fede; non tentare mai di "riempire" un campo
+mancante con il vecchio stato locale.
+{{% /notice %}}
+
+## Heartbeat
+
+{{% notice style="note" title="Facoltativo" %}}
+Il heartbeat non è imposto dal protocollo. È un meccanismo che il client
+mette in atto per proprio conto, solo se la sua tecnologia lo richiede,
+per mantenere attiva la connessione WebSocket (alcuni browser, proxy o
+piattaforme chiudono una connessione ritenuta inattiva). Un client che
+non ne ha bisogno può farne completamente a meno.
+
+Il meccanismo esiste a livello di protocollo per chi ne ha bisogno:
+inviare `XX` ogni 30 secondi, il server risponde `xx` (senza payload
+utile).
+```json
+→ {"XX": {}}
+← {"xx": {}}
+```
+{{% /notice %}}
+
+## Riconnessione
+
+{{% notice style="tip" title="Ripartire sempre da un dump completo" %}}
+Alla minima interruzione, il client deve **svuotare interamente il suo
+datastore** — nessuno stato parziale può essere considerato affidabile
+dopo una disconnessione.
+
+Ciò che il client fa dopo (ritentare automaticamente N volte, proporre
+all'utente di riavviare la connessione, rinunciare...) riguarda solo lui:
+non è specificato dal protocollo, ogni client è libero della propria
+strategia.
+
+Ma una volta (ri)connesso, rinviare `DU` per ottenere un nuovo dump
+completo non è quasi opzionale: ricostruire uno stato utilizzabile a
+partire dai soli aggiornamenti parziali che arriverebbero in seguito
+(`ee`/`ea`/`ev`) è impossibile — questi danno solo una vista
+frammentaria, mai uno stato completo. Sul lato server, nulla deve
+essere preservato tra due connessioni dello stesso client: è un vincolo
+puramente lato client.
+{{% /notice %}}
+
+## Esempio minimo: primo scambio
+
+Senza framework, solo il primissimo scambio (connessione → `DU` →
+ascolto) — estratto da `test-ws-advanced.js`, lo script usato per il
+health-check orario del server:
+
+```javascript
+const ws = new WebSocket("ws://127.0.0.1:9624");
+
+ws.on("open", () => {
+  ws.send(JSON.stringify({ "DU": { "language": "en" } }));
+});
+
+ws.on("message", (data) => {
+  console.log("received:", data.toString());
+});
+```
+
+## Esempio: lettura e scrittura in OstErix
+
+Estratti reali che illustrano la separazione lettura/scrittura vista in
+cima a questa pagina, una volta che un client reale (qui OstErix, in
+Angular) è costruito attorno a questo principio.
+
+**Lettura** — `datastore.service.ts`, un semplice accesso allo stato interno:
+```typescript
+getProperty(moduleName: string, propertyName: string): Observable<any> {
+  return new Observable(subscriber => {
+    const subscription = this.changed$.subscribe(() => {
+      const module = this.modules[moduleName];
+      const prop = (module as any)?.properties?.[propertyName] || null;
+      subscriber.next(prop);
+    });
+    subscriber.next(this.modules[moduleName]?.properties?.[propertyName] || null);
+    return () => subscription.unsubscribe();
+  });
+}
+```
+
+**Scrittura** — `websocket.service.ts`, nessuna mutazione locale, solo
+l'invio del messaggio:
+```typescript
+setPropertyOneElement(module: string, property: string, elements: { [key: string]: any }): void {
+  this.send({
+    SV: { m: { [module]: { p: { [property]: { e: elements } } } } }
+  });
+}
+```

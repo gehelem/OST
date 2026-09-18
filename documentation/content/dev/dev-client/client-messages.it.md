@@ -1,0 +1,487 @@
+---
+title: Messaggi Client → Server
+weight: 30
+description: "Tutti i messaggi JSON che i client possono inviare al server OST"
+---
+
+## Formato dei messaggi
+
+Ogni messaggio è un oggetto JSON con **una sola chiave di primo livello** che identifica il comando. Il valore è un oggetto la cui struttura dipende dal comando.
+
+Tutte le chiavi dei comandi client sono in **MAIUSCOLO** (es. `DU`, `SV`, `SA`, `GC`).
+
+---
+
+## Indice dei comandi
+
+| Chiave | Descrizione |
+|---|---|
+| [`DU`](#du) | Richiedere il dump completo |
+| [`XX`](#xx) | Heartbeat / keepalive |
+| [`LO`](#lo) | Connessione |
+| [`IL`](#il) | Cambiare la lingua |
+| [`SV`](#sv) | Inviare il valore di un singolo elemento |
+| [`SA`](#sa) | Inviare tutti i valori degli elementi |
+| [`I1`](#i1) | Clic su preicon1 di proprietà |
+| [`I2`](#i2) | Clic su preicon2 di proprietà |
+| [`I3`](#i3) | Clic su posticon1 di proprietà |
+| [`I4`](#i4) | Clic su posticon2 di proprietà |
+| [`J1`](#j1) | Clic su preicon di elemento |
+| [`J2`](#j2) | Clic su posticon di elemento |
+| [`PL`](#pl) | Caricare un profilo |
+| [`PS`](#ps) | Salvare un profilo |
+| [`GC`](#gc) | Creare una riga di griglia |
+| [`GU`](#gu) | Aggiornare una riga di griglia |
+| [`GD`](#gd) | Eliminare una riga di griglia |
+| [`GF`](#gf) | Selezionare una riga di griglia |
+| [`GH`](#gh) | Spostare in alto una riga di griglia |
+| [`GB`](#gb) | Spostare in basso una riga di griglia |
+| [`ML`](#ml) | Caricare un modulo |
+| [`MK`](#mk) | Scaricare un modulo |
+| [`YA`](#indi) | Avviare il server INDI integrato |
+| [`YZ`](#indi) | Arrestare il server INDI integrato |
+| [`YL`](#indi) | Caricare un driver INDI |
+| [`YR`](#indi) | Ricaricare un driver INDI |
+| [`YS`](#indi) | Arrestare un driver INDI |
+
+---
+
+Tutti i messaggi destinati a un modulo o una proprietà usano il seguente involucro:
+
+```json
+{
+  "COMANDO": {
+    "m": {
+      "NomeDelModulo": {
+        "p": {
+          "nomeDellaProprietà": { ... }
+        }
+      }
+    }
+  }
+}
+```
+
+dove `m` indica *modules* e `p` indica *properties*.
+
+---
+
+## Gestione della sessione
+
+### `DU` — Richiedere il dump completo {#du}
+
+Deve essere inviato immediatamente dopo la connessione. Il server risponde con un messaggio `d` contenente tutti i moduli.
+
+```json
+{ "DU": { "language": "it" } }
+```
+
+| Campo | Descrizione |
+|---|---|
+| `language` | Lingua preferita per le etichette tradotte (`"en"`, `"it"`, ecc.) |
+
+---
+
+### `XX` — Heartbeat {#xx}
+
+Da inviare ogni 30 secondi per mantenere attiva la connessione. Il server risponde con `xx`.
+
+```json
+{ "XX": {} }
+```
+
+---
+
+### `LO` — Connessione {#lo}
+
+Richiesto quando il server ha il controllo degli accessi attivato (`grant-client` vale `"-1"` nella risposta dump).
+
+```json
+{
+  "LO": {
+    "user": "username",
+    "pw": "password",
+    "language": "it"
+  }
+}
+```
+
+---
+
+### `IL` — Cambiare la lingua {#il}
+
+Modifica la lingua delle etichette tradotte senza riconnettersi.
+
+```json
+{ "IL": { "language": "it" } }
+```
+
+---
+
+## Aggiornamento dei valori di proprietà
+
+### `SV` — Inviare il valore di un singolo elemento {#sv}
+
+Da usare quando `directedit` è `true` sull'elemento — invia immediatamente il valore di un singolo elemento.
+
+```json
+{
+  "SV": {
+    "m": {
+      "Focus": {
+        "p": {
+          "parameters": {
+            "e": {
+              "iterations": 7
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+`e` contiene una sola coppia `nomeElemento: valore`.
+
+---
+
+### `SA` — Inviare tutti i valori degli elementi {#sa}
+
+Usato per inviare tutti gli elementi editabili di una proprietà in una volta (es. da un form). Usato anche quando `directedit` è `false`.
+
+```json
+{
+  "SA": {
+    "m": {
+      "Focus": {
+        "p": {
+          "parameters": {
+            "e": {
+              "iterations": 7,
+              "exposure": 3.5,
+              "active": true
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+## Azioni sulle icone
+
+Le icone di proprietà (preicon / posticon) attivano azioni backend come il salvataggio di un profilo, il caricamento di un profilo o l'avvio di un processo. Gli eventi di clic vengono inviati tramite i seguenti comandi.
+
+### `I1` — Clic su preicon1 di proprietà {#i1}
+
+```json
+{
+  "I1": {
+    "m": {
+      "Focus": {
+        "p": {
+          "saveprofile": {}
+        }
+      }
+    }
+  }
+}
+```
+
+### `I2` — Clic su preicon2 di proprietà {#i2}
+
+```json
+{
+  "I2": {
+    "m": {
+      "Focus": {
+        "p": {
+          "loadprofile": {}
+        }
+      }
+    }
+  }
+}
+```
+
+### `I3` — Clic su posticon1 di proprietà {#i3}
+
+Stessa struttura di `I1` / `I2`.
+
+### `I4` — Clic su posticon2 di proprietà {#i4}
+
+Stessa struttura di `I1` / `I2`.
+
+---
+
+### `J1` — Clic su preicon di elemento {#j1}
+
+```json
+{
+  "J1": {
+    "m": {
+      "Focus": {
+        "p": {
+          "devices": {
+            "e": {
+              "myDevice": {}
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### `J2` — Clic su posticon di elemento {#j2}
+
+Stessa struttura di `J1`.
+
+---
+
+## Gestione dei profili
+
+### `PL` — Caricare un profilo {#pl}
+
+```json
+{
+  "PL": {
+    "m": {
+      "Focus": {
+        "profile": "myProfile"
+      }
+    }
+  }
+}
+```
+
+Il server risponde con un messaggio `fl` (profilo caricato) poi invia i valori delle proprietà aggiornati.
+
+---
+
+### `PS` — Salvare un profilo {#ps}
+
+```json
+{
+  "PS": {
+    "m": {
+      "Focus": {
+        "profile": "myProfile"
+      }
+    }
+  }
+}
+```
+
+Il server risponde con un messaggio `fs` (profilo salvato).
+
+---
+
+## Operazioni sulle griglie
+
+I comandi di griglia sono destinati a una proprietà specifica all'interno di un modulo. Tutti usano l'involucro `m` / `p`.
+
+### `GC` — Creare una riga di griglia {#gc}
+
+Aggiunge una nuova riga alla griglia con i valori degli elementi forniti.
+
+```json
+{
+  "GC": {
+    "m": {
+      "Sequencer": {
+        "p": {
+          "sequence": {
+            "e": {
+              "target": "M31",
+              "exposure": 120,
+              "count": 10
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+Il server risponde con un messaggio `gc` che confirma l'indice della nuova riga.
+
+---
+
+### `GU` — Aggiornare una riga di griglia {#gu}
+
+Aggiorna una riga specifica (indice a base zero `i`) con nuovi valori degli elementi.
+
+```json
+{
+  "GU": {
+    "m": {
+      "Sequencer": {
+        "p": {
+          "sequence": {
+            "i": 1,
+            "e": {
+              "target": "M42",
+              "exposure": 60
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+### `GD` — Eliminare una riga di griglia {#gd}
+
+Elimina la riga all'indice `i` (base zero).
+
+```json
+{
+  "GD": {
+    "m": {
+      "Sequencer": {
+        "p": {
+          "sequence": {
+            "i": 0
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+### `GF` — Selezionare una riga di griglia {#gf}
+
+Chiede al server di caricare una riga della griglia negli elementi editabili della proprietà (usato quando si clicca su una riga per modificarla).
+
+```json
+{
+  "GF": {
+    "m": {
+      "Sequencer": {
+        "p": {
+          "sequence": {
+            "i": 2
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+### `GH` — Spostare in alto una riga di griglia {#gh}
+
+Sposta la riga all'indice `i` di una posizione verso l'alto.
+
+```json
+{
+  "GH": {
+    "m": {
+      "Sequencer": {
+        "p": {
+          "sequence": {
+            "i": 3
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+### `GB` — Spostare in basso una riga di griglia {#gb}
+
+Sposta la riga all'indice `i` di una posizione verso il basso.
+
+```json
+{
+  "GB": {
+    "m": {
+      "Sequencer": {
+        "p": {
+          "sequence": {
+            "i": 2
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+## Ciclo di vita dei moduli
+
+### `ML` — Caricare un modulo {#ml}
+
+Chiede al server di caricare dinamicamente un modulo.
+
+```json
+{
+  "ML": {
+    "m": {
+      "ModuleName": {}
+    }
+  }
+}
+```
+
+---
+
+### `MK` — Scaricare un modulo {#mk}
+
+Chiede al server di scaricare un modulo in esecuzione.
+
+```json
+{
+  "MK": {
+    "m": {
+      "ModuleName": {}
+    }
+  }
+}
+```
+
+---
+
+## Controllo del server INDI integrato {#indi}
+
+Questi comandi sono disponibili solo quando il server dispone di un'istanza INDI integrata.
+
+| Comando | Descrizione |
+|---|---|
+| `YA` | Avviare il server INDI integrato |
+| `YZ` | Arrestare il server INDI integrato |
+| `YL` | Caricare un driver INDI |
+| `YR` | Ricaricare un driver INDI |
+| `YS` | Arrestare un driver INDI |
+
+---
+
+## Riepilogo del controllo degli accessi
+
+| Valore grant server | Comandi autorizzati |
+|---|---|
+| `grant-client: "1"` | Tutti i comandi |
+| `grant-client: "0"` | Solo `DU`, `LO`, `IL` |
+| `grant-client: "-1"` | Solo `LO` (autenticazione richiesta) |
+
+I comandi inviati senza diritti sufficienti vengono silenziosamente ignorati dal server.
