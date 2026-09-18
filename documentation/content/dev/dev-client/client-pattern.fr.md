@@ -28,7 +28,7 @@ structure ; rien d'autre ne la modifie que les messages reçus du serveur.
 - **Pas d'écriture directe** : l'UI ne modifie jamais le datastore
   elle-même, même pour un affichage optimiste.
 
-{{% notice style="warning" title="Écriture : toujours via le serveur" %}}
+{{% notice style="tip" title="Écriture : toujours via le serveur" %}}
 Une action utilisateur (changer une valeur, cliquer un bouton) déclenche
 l'envoi d'un message au serveur (`SV`/`SA` — voir
 [Client → Serveur]({{% relref "client-messages.fr.md" %}})). Le datastore
@@ -82,10 +82,28 @@ toutes les 30 secondes, le serveur répond `xx` (sans payload utile).
 ```
 {{% /notice %}}
 
+## Reconnexion
+
+{{% notice style="tip" title="Toujours repartir d'un dump complet" %}}
+À la moindre coupure, le client doit **vider entièrement son
+datastore** — aucun état partiel ne peut être considéré fiable après
+une déconnexion.
+
+Ce que le client fait ensuite (retenter automatiquement N fois,
+proposer à l'utilisateur de relancer la connexion, abandonner...) ne
+regarde que lui : ce n'est pas spécifié par le protocole, chaque
+client est libre de sa propre stratégie.
+
+Mais une fois (re)connecté, renvoyer `DU` pour obtenir un nouveau dump
+complet n'est quasiment pas optionnel : reconstruire un état exploitable
+à partir des seules mises à jour partielles qui arriveraient ensuite
+(`ee`/`ea`/`ev`) est impossible — elles ne donnent qu'une vue
+fragmentaire, jamais un état complet. Côté serveur, rien n'est à
+préserver entre deux connexions d'un même client : c'est une
+contrainte purement côté client.
+{{% /notice %}}
+
 ## À vérifier avant publication
 
-- Comportement à la reconnexion après une coupure réelle (redemander
-  `DU` ? état côté serveur conservé ou non ?) — rien trouvé de
-  documenté sur ce point précis, contrairement au reste de cette page.
 - Exemple de code minimal (pseudo-code ou extrait réel d'OstErix) pour
   illustrer ces principes, pas juste les décrire en prose
