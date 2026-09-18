@@ -100,10 +100,29 @@ préserver entre deux connexions d'un même client : c'est une
 contrainte purement côté client.
 {{% /notice %}}
 
+## Exemple minimal : premier échange
+
+Sans framework, juste le tout premier échange (connexion → `DU` →
+écoute) — extrait de `test-ws-advanced.js`, le script utilisé pour le
+health-check horaire du serveur :
+
+```javascript
+const ws = new WebSocket("ws://127.0.0.1:9624");
+
+ws.on("open", () => {
+  ws.send(JSON.stringify({ "DU": { "language": "en" } }));
+});
+
+ws.on("message", (data) => {
+  console.log("received:", data.toString());
+});
+```
+
 ## Exemple : lecture et écriture dans OstErix
 
 Extraits réels illustrant la séparation lecture/écriture de tête de
-cette page.
+cette page, une fois qu'un vrai client (ici OstErix, en Angular) est
+construit autour de ce principe.
 
 **Lecture** — `datastore.service.ts`, un simple accès à l'état interne :
 ```typescript
