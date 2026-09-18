@@ -59,11 +59,14 @@ valeur. Le serveur fait foi ; ne jamais tenter de "combler" un champ
 manquant avec l'ancien état local.
 {{% /notice %}}
 
-## Reconnexion
+## Heartbeat
 
-{{% notice style="note" title="À compléter" %}}
-Mécanique de heartbeat/reconnexion à vérifier contre le protocole réel
-avant de la décrire ici.
+{{% notice style="note" title="Facultatif" %}}
+Le heartbeat n'est pas imposé par le protocole. C'est un mécanisme que
+le client met en place de son côté, seulement si sa technologie
+l'exige, pour garder la connexion WebSocket active (certains
+navigateurs, proxys ou plateformes ferment une connexion jugée
+inactive). Un client qui n'en a pas besoin peut s'en passer entièrement.
 {{% /notice %}}
 
 ## À vérifier avant publication
@@ -71,6 +74,7 @@ avant de la décrire ici.
 - Liste exhaustive des types de messages de mise à jour partielle
   (`ee`/`ea` cités ici, mais [Serveur → Client]({{% relref "server-messages.fr.md" %}})
   en liste d'autres — `cp`, `ap`, `dp`, etc. — à croiser pour être complet)
-- Mécanique de heartbeat/reconnexion réelle
+- Comportement à la reconnexion après une coupure (redemander `DU` ?
+  état côté serveur conservé ou non ?)
 - Exemple de code minimal (pseudo-code ou extrait réel d'OstErix) pour
   illustrer le pattern, pas juste le décrire en prose
