@@ -39,3 +39,15 @@ if [ -n "$CHANGELOG_NOTES" ]; then
 else
     release-cli create --name "Release $CI_COMMIT_TAG" --tag-name $CI_COMMIT_TAG $ASSETS
 fi
+
+echo "commit changelog to CHANGELOG.md"
+# Same data as above, but this variant (POST) commits a Markdown section
+# to CHANGELOG.md on the default branch server-side - no git push from
+# the runner involved. Lands as a commit *after* the tag, on main.
+# Non-fatal: a failure here must never be mistaken for a failed release,
+# the release itself is already created above.
+curl -fsS --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
+    --request POST \
+    --data-urlencode "version=${CI_COMMIT_TAG}" \
+    "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/repository/changelog" \
+    || echo "changelog commit failed (non-fatal, release already created)"
