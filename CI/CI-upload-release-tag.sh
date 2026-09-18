@@ -41,13 +41,33 @@ else
 fi
 
 echo "commit changelog to CHANGELOG.md"
-# Same data as above, but this variant (POST) commits a Markdown section
-# to CHANGELOG.md on the default branch server-side - no git push from
-# the runner involved. Lands as a commit *after* the tag, on main.
-# Non-fatal: a failure here must never be mistaken for a failed release,
-# the release itself is already created above.
-curl -fsS --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
-    --request POST \
-    --data-urlencode "version=${CI_COMMIT_TAG}" \
-    "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/repository/changelog" \
-    || echo "changelog commit failed (non-fatal, release already created)"
+# The repository/changelog POST endpoint (server-side commit, no git
+# push needed) looked simpler but CI_JOB_TOKEN can't use it: GitLab
+# deliberately restricts job tokens to GET on this endpoint, a real
+# "git push" instead. Requires "Allow Git push requests to the
+# repository" enabled under Settings > CI/CD > Job token permissions
+# (done 2026-09-18). The job token then pushes with the triggering
+# user's own permissions, and GitLab does not re-trigger a pipeline for
+# a push made with a job token - no [skip ci] needed, no loop risk.
+# Whole sequence isolated in a subshell: if any step fails, the release
+# (already created above) is never affected.
+if [ -n "$CHANGELOG_NOTES" ]; then
+    (
+        set -e
+        git config user.email "gilles@joag.fr"
+        git config user.name "gilles"
+        git fetch origin main
+        git checkout main
+        if [ -f CHANGELOG.md ]; then
+            { echo "$CHANGELOG_NOTES"; echo; cat CHANGELOG.md; } > CHANGELOG.md.new
+            mv CHANGELOG.md.new CHANGELOG.md
+        else
+            echo "$CHANGELOG_NOTES" > CHANGELOG.md
+        fi
+        git add CHANGELOG.md
+        git commit -m "Add changelog for version ${CI_COMMIT_TAG}"
+        git push origin main
+    ) || echo "changelog commit/push failed (non-fatal, release already created)"
+else
+    echo "no changelog notes, skipping CHANGELOG.md commit"
+fi
