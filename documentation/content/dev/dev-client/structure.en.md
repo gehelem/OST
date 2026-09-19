@@ -30,10 +30,9 @@ Its identifier is its internal name (no spaces).
 
 | Field | Type | Description |
 |---|---|---|
-| `infos.label` | string | Human-readable module label |
-| `infos.name` | string | Internal module name |
+| `infos.modulelabel` | string | Human-readable module label |
 | `infos.description` | string | Module description |
-| `infos.template` | string | Module template/type (e.g. `"focus"`, `"guider"`) |
+| `infos.template` | string | Module template/type (e.g. `"focus"`, `"guider"`) — may be absent |
 | `properties` | object | Map of property name → property object |
 | `globallovs` | object | Map of LOV key → LOV object (module-level lists of values) |
 | `profile.name` | string | Currently active profile name |
@@ -41,6 +40,10 @@ Its identifier is its internal name (no spaces).
 
 {{% notice style="info" title="Wire format" %}}
 In the JSON wire format, `properties` is abbreviated as `p`, `globallovs` as `l`, and `profile` as `f`. Clients must handle these abbreviated keys.
+{{% /notice %}}
+
+{{% notice style="note" title="Internal fields" %}}
+`infos` also carries a number of internal build/version fields (`baseGithash`, `thisversion`, `startdatetime`, and others) — implementation detail, not part of the stable client contract, and not documented individually here.
 {{% /notice %}}
 
 ---
@@ -68,6 +71,20 @@ A property groups related elements. Properties are displayed hierarchically usin
 | `freevalue` | string | Arbitrary free-text field |
 | `rule` | int | Bool element grouping rule: `0` OneOfMany (radio) · `1` AtMostOne · `2` Any |
 | `elements` | object | Map of element name → element object |
+
+{{% notice style="tip" title="`level1`/`level2`/`order` are advisory, not a contract" %}}
+These fields are purely informative — the backend never enforces them, and a client is free to honor them partially or not at all. They only express how a given module's developer imagined organizing its own properties. This is exactly what lets generic clients (OstErix, ostnoctua) work with any module without custom UI per module.
+
+The reference client (OstErix) groups properties this way, for clients that want a similar generic layout:
+1. Empty `level1` → property shown outside any tab (rendered directly, sorted by `order`).
+2. Non-empty `level1` → grouped into a tab named `level1`. Inside it, empty `level2` → shown directly under the tab; non-empty `level2` → shown inside a collapsible group named `level2`.
+3. Tab order (and group order within a tab) isn't a separate field — it's derived from the *smallest* `order` value among the properties in that group.
+4. Within a group, properties are sorted by their own `order`.
+
+Two things worth knowing if you build something similar:
+- `level1`/`level2` form a "fake hierarchy" by design choice, not a guaranteed two-level structure — nothing stops a module from leaving `level1` empty while setting `level2` (OstErix doesn't even handle that combination specially; the property just lands in the "no level1" bucket, `level2` ignored).
+- `level1`/`level2` are translatable labels, going through the same mechanism as `label`/`hint`. Keying UI state (e.g. an expanded/collapsed panel) off the raw string value is fragile across a client's language changes — not a bug, just worth avoiding.
+{{% /notice %}}
 
 **Grid properties** (when `hasGrid: true`):
 
@@ -107,12 +124,22 @@ An element holds a single typed value. There are 11 element types.
 | `hint` | string | Tooltip/help text |
 | `autoupdate` | bool | Internal backend flag; not used by clients |
 | `badge` | bool | Whether the element is in the favourites list |
-| `directedit` | bool | `true` = send `SV` on change; `false` = batch with `SA` |
+| `directedit` | bool | Whether this element can be written alone via `SV` — see below |
 | `preicon` | string | Icon before the element (optional) |
 | `posticon` | string | Icon after the element (optional) |
 
 {{% notice style="warning" title="Partial updates" %}}
 In `ee` and `ea` update messages, elements contain **only their value** — no metadata fields. Clients must preserve metadata from the last full dump.
+{{% /notice %}}
+
+{{% notice style="tip" title="Field omission" %}}
+`directedit` may be omitted entirely for elements where it doesn't apply — treat a missing `directedit` as `false`. This keeps dumps lighter for properties that don't need it.
+{{% /notice %}}
+
+{{% notice style="note" title="`directedit` meaning" %}}
+`true` means this element can be updated on its own, independently of the property's other elements — send `SV` for it (`SA` also works). `false` means the client must submit **every** element of the property together — always use `SA`, never `SV` for that element alone. A good example: RA/Dec coordinates, where both values must be given together.
+
+This is currently a convention the client is expected to follow, **not enforced by the backend** — sending an `SV` for a `directedit: false` element is not rejected today. A backend change to actually enforce this is planned but not yet implemented.
 {{% /notice %}}
 
 ---
@@ -131,6 +158,7 @@ In `ee` and `ea` update messages, elements contain **only their value** — no m
 | `globallov` | string | Optional: key referencing a module or controller LOV |
 | `lovScope` | string | `"module"` or `"controller"` — where the globallov is defined |
 | `lovConstrained` | bool | Whether value must belong to the LOV |
+| `nullable` | bool | Whether the element may be left empty (frontend should offer a "none" choice) |
 
 ### Type: `float`
 
@@ -150,6 +178,8 @@ Same fields as `int`, with floating-point `value`, `min`, `max`, `step`.
 | `listOfValues` | object | Optional: `{"key": "Label"}` map of allowed values |
 | `globallov` | string | Optional: key referencing a LOV |
 | `lovScope` | string | `"module"` or `"controller"` |
+| `lovConstrained` | bool | Whether value must belong to the LOV |
+| `nullable` | bool | Whether the element may be left empty (frontend should offer a "none" choice) |
 
 ### Type: `date`
 
@@ -188,13 +218,43 @@ The `value` field is an object with image metadata:
 | `issolved` | bool | Whether plate solving succeeded |
 | `solverra` / `solverde` | float | Solved RA/Dec coordinates |
 | `solverorientation` | float | Solved field rotation angle |
-| `min` / `max` / `mean` / `median` / `stddev` | float[] | Per-channel statistics |
-| `histogram` | array | Per-channel histogram data |
+| `min` / `max` / `mean` / `median` / `stddev` | float[] | Per-channel statistics (see below) |
+| `histogram` | array | Per-channel histogram data (see below) |
 | `alternates` | string[] | Optional: alternative versions of the image |
+
+**Per-channel statistics**: `min`/`max`/`mean`/`median`/`stddev` are
+**fixed 3-slot arrays**, regardless of the actual number of channels —
+index `0` is the single channel (mono image) or red (R), `1` is green
+(G), `2` is blue (B). Only the first `channels` slots are meaningful;
+beyond that, values are zero and carry no meaning (a mono image only
+has index `0` populated).
+
+{{% notice style="note" title="Histogram: bin structure" %}}
+`histogram` follows the same per-channel logic (one array per channel,
+only the first `channels` used), but has two quirks worth knowing
+before using it:
+
+- **Each bin is itself wrapped in a one-element array**:
+  `histogram[channel][bin]` is `[frequency]`, not `frequency` directly
+  — an artifact of the current backend serialization, not a client
+  parsing error.
+- **The pixel value each bin represents is not sent directly**, only
+  the frequency is. The number of bins varies per image
+  (`histogram[channel].length`); the pixel value of bin `i` is
+  recomputed from that same channel's `min`/`max`:
+  ```
+  bin_width = (max[channel] - min[channel]) / (bin_count - 1)
+  value(i)  = min[channel] + i × bin_width
+  ```
+{{% /notice %}}
 
 {{% notice style="tip" title="Media URLs" %}}
 All image/video paths are relative. Prepend `http(s)://hostname/ostmedia/` to get the full URL.  
 Example: `"urljpeg": "Focus/frame.jpeg"` → `http://hostname/ostmedia/Focus/frame.jpeg`
+{{% /notice %}}
+
+{{% notice style="warning" title="Media is served separately from the WebSocket port" %}}
+That `hostname` is **not derivable from the protocol** — no field in the dump gives it to you, and it is **not** the WebSocket connection you just made. In the reference deployment (see [Fresh install]({{% relref "fresh.en.md" %}})), media is served by a separate web server (nginx, port 80 by default, 443 behind SSL) — a completely different port from the WebSocket server (9624). A client must already know, or let the user configure, the OST server's hostname independently of the WebSocket URL, and build media URLs against that hostname's HTTP port — not against the page's own origin, and not against the WebSocket port. A client that just prepends a bare `/ostmedia/` path (resolving it against wherever its own files happen to be served) will get broken images.
 {{% /notice %}}
 
 ### Type: `video`

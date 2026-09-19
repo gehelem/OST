@@ -14,6 +14,10 @@ OST is an autonomous astrophotography platform. It runs as a background service 
 
 The goal is to run a complete observation session from a couch, another room, or remotely over VPN: polar alignment, pointing, focusing, guiding, acquisition, and night documentation.
 
+{{% notice style="warning" title="Local network or VPN — not for direct internet exposure" %}}
+OST's built-in access control is basic (a simple grant level: disabled, read-only, or full access) and isn't meant to withstand a hostile internet-facing deployment. The recommended usage is on your local network, or reached remotely over a VPN — not exposed directly to the internet without deliberate, informed security hardening on your part. The SSL/reverse-proxy setup used for the public demo site was built to keep that specific demo clean, not as a security guarantee for a real deployment.
+{{% /notice %}}
+
 ## Architecture
 
 OST is built on a client-server architecture:

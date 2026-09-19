@@ -251,6 +251,10 @@ Actualiza el valor de un solo elemento. Mismo formato que `ea` pero para un solo
 }
 ```
 
+{{% notice style="note" title="`ee` solo tiene origen en el backend" %}}
+`ee` solo se envía por iniciativa propia del backend (ej. un cambio de valor originado por un dispositivo, un sondeo interno) — nunca como respuesta directa a una escritura del cliente. Cualquier respuesta a un `SV` o `SA` iniciado por el cliente es siempre un `ea` de toda la propiedad, sin importar cuántos elementos hayan cambiado realmente.
+{{% /notice %}}
+
 ---
 
 ## `ev` — Actualización de un elemento con metadatos {#ev}

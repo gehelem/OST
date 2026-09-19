@@ -30,10 +30,9 @@ Son identifiant est son nom interne (sans espaces).
 
 | Champ | Type | Description |
 |---|---|---|
-| `infos.label` | string | Nom affiché du module |
-| `infos.name` | string | Nom interne du module |
+| `infos.modulelabel` | string | Nom affiché du module |
 | `infos.description` | string | Description du module |
-| `infos.template` | string | Type de module (ex. `"focus"`, `"guider"`) |
+| `infos.template` | string | Type de module (ex. `"focus"`, `"guider"`) — peut être absent |
 | `properties` | object | Map nom de propriété → objet propriété |
 | `globallovs` | object | Map clé LOV → objet LOV (listes de valeurs au niveau module) |
 | `profile.name` | string | Nom du profil actif |
@@ -41,6 +40,13 @@ Son identifiant est son nom interne (sans espaces).
 
 {{% notice style="info" title="Format wire" %}}
 Dans le format JSON sur le réseau, `properties` est abrégé en `p`, `globallovs` en `l`, et `profile` en `f`. Les clients doivent gérer ces clés abrégées.
+{{% /notice %}}
+
+{{% notice style="note" title="Champs internes" %}}
+`infos` porte aussi plusieurs champs internes de build/version
+(`baseGithash`, `thisversion`, `startdatetime`, et d'autres) — détail
+d'implémentation, ne fait pas partie du contrat stable côté client,
+pas documenté individuellement ici.
 {{% /notice %}}
 
 ---
@@ -68,6 +74,20 @@ Une propriété regroupe des éléments liés. Les propriétés sont affichées 
 | `freevalue` | string | Champ texte libre arbitraire |
 | `rule` | int | Règle de groupement des éléments bool : `0` UnParmi (radio) · `1` AuPlusUn · `2` Quelconque |
 | `elements` | object | Map nom d'élément → objet élément |
+
+{{% notice style="tip" title="`level1`/`level2`/`order` sont informatifs, pas un contrat" %}}
+Ces champs sont purement informatifs — le backend ne les impose jamais, et un client est libre de les respecter partiellement ou pas du tout. Ils expriment seulement la façon dont le développeur d'un module a envisagé d'organiser ses propriétés. C'est précisément ce qui permet à des clients génériques (OstErix, ostnoctua) de s'adapter à n'importe quel module sans UI dédiée par module.
+
+Le client de référence (OstErix) regroupe les propriétés ainsi, pour un client qui viserait une mise en page générique similaire :
+1. `level1` vide → propriété affichée hors de tout onglet (rendue directement, triée par `order`).
+2. `level1` renseigné → regroupée dans un onglet nommé `level1`. À l'intérieur, `level2` vide → affichée directement sous l'onglet ; `level2` renseigné → dans un groupe repliable nommé `level2`.
+3. L'ordre des onglets (et des groupes à l'intérieur d'un onglet) n'est pas un champ séparé — il se déduit de la plus petite valeur `order` parmi les propriétés de ce groupe.
+4. À l'intérieur d'un groupe, les propriétés sont triées par leur propre `order`.
+
+Deux choses à connaître si vous construisez quelque chose de similaire :
+- `level1`/`level2` forment une "fausse hiérarchie" par choix de conception, pas une structure à deux niveaux garantie — rien n'empêche un module de laisser `level1` vide tout en renseignant `level2` (OstErix ne gère même pas ce cas particulier : la propriété atterrit simplement dans le groupe "sans level1", `level2` étant ignoré).
+- `level1`/`level2` sont des libellés traduits, passant par le même mécanisme que `label`/`hint`. Utiliser la valeur brute de la chaîne comme clé d'état d'interface (ex. un panneau replié/déplié) est fragile d'un changement de langue à l'autre côté client — pas un bug, juste à éviter.
+{{% /notice %}}
 
 **Propriétés avec grille** (quand `hasGrid: true`) :
 
@@ -107,12 +127,22 @@ Un élément contient une valeur typée unique. Il existe 11 types d'éléments.
 | `hint` | string | Texte d'aide / infobulle |
 | `autoupdate` | bool | Indicateur interne du backend ; ignoré par les clients |
 | `badge` | bool | Indique si l'élément est dans la liste des favoris |
-| `directedit` | bool | `true` = envoyer `SV` à chaque modification ; `false` = grouper avec `SA` |
+| `directedit` | bool | Indique si cet élément peut être écrit seul via `SV` — voir ci-dessous |
 | `preicon` | string | Icône avant l'élément (optionnel) |
 | `posticon` | string | Icône après l'élément (optionnel) |
 
 {{% notice style="warning" title="Mises à jour partielles" %}}
 Dans les messages de mise à jour `ee` et `ea`, les éléments ne contiennent **que leur valeur** — sans les champs de métadonnées. Les clients doivent conserver les métadonnées du dernier dump complet.
+{{% /notice %}}
+
+{{% notice style="tip" title="Omission de champ" %}}
+`directedit` peut être totalement absent pour les éléments où il ne s'applique pas — considérer une absence comme `false`. Ça allège les dumps des propriétés qui n'en ont pas besoin.
+{{% /notice %}}
+
+{{% notice style="note" title="Signification de `directedit`" %}}
+`true` signifie que cet élément peut être mis à jour seul, indépendamment des autres éléments de la propriété — envoyer `SV` pour lui (`SA` fonctionne aussi). `false` signifie que le client doit soumettre **tous** les éléments de la propriété ensemble — toujours utiliser `SA`, jamais `SV` pour cet élément seul. Exemple parlant : des coordonnées RA/Déc, où les deux valeurs doivent être données ensemble.
+
+C'est actuellement une convention que le client doit respecter, **pas imposée par le backend** — envoyer un `SV` sur un élément à `directedit: false` n'est pas rejeté aujourd'hui. Une évolution du backend pour vraiment l'imposer est prévue, pas encore faite.
 {{% /notice %}}
 
 ---
@@ -131,6 +161,7 @@ Dans les messages de mise à jour `ee` et `ea`, les éléments ne contiennent **
 | `globallov` | string | Optionnel : clé référençant un LOV de module ou de contrôleur |
 | `lovScope` | string | `"module"` ou `"controller"` — où est défini le globallov |
 | `lovConstrained` | bool | Indique si la valeur doit appartenir au LOV |
+| `nullable` | bool | Indique si l'élément peut être laissé vide (le frontend doit proposer un choix "aucun") |
 
 ### Type : `float`
 
@@ -150,6 +181,8 @@ Mêmes champs que `int`, avec `value`, `min`, `max`, `step` en virgule flottante
 | `listOfValues` | object | Optionnel : map `{"clé": "Libellé"}` des valeurs autorisées |
 | `globallov` | string | Optionnel : clé référençant un LOV |
 | `lovScope` | string | `"module"` ou `"controller"` |
+| `lovConstrained` | bool | Indique si la valeur doit appartenir au LOV |
+| `nullable` | bool | Indique si l'élément peut être laissé vide (le frontend doit proposer un choix "aucun") |
 
 ### Type : `date`
 
@@ -188,13 +221,43 @@ Le champ `value` est un objet contenant les métadonnées de l'image :
 | `issolved` | bool | Indique si la résolution de champ a réussi |
 | `solverra` / `solverde` | float | Coordonnées AR/Déc résolues |
 | `solverorientation` | float | Angle de rotation du champ résolu |
-| `min` / `max` / `mean` / `median` / `stddev` | float[] | Statistiques par canal |
-| `histogram` | array | Données d'histogramme par canal |
+| `min` / `max` / `mean` / `median` / `stddev` | float[] | Statistiques par canal (voir détail ci-dessous) |
+| `histogram` | array | Données d'histogramme par canal (voir détail ci-dessous) |
 | `alternates` | string[] | Optionnel : versions alternatives de l'image |
+
+**Statistiques par canal** : `min`/`max`/`mean`/`median`/`stddev` sont
+des tableaux à **3 emplacements fixes**, quel que soit le nombre réel
+de canaux — index `0` = canal unique (image mono) ou rouge (R), `1` =
+vert (G), `2` = bleu (B). Seuls les `channels` premiers emplacements
+sont significatifs ; au-delà, les valeurs sont à zéro et sans
+signification (une image mono n'a que l'index `0` de renseigné).
+
+{{% notice style="note" title="Histogramme : structure des bins" %}}
+`histogram` suit la même logique de canaux (un tableau par canal,
+seuls les `channels` premiers utilisés), mais avec deux particularités
+à connaître avant de l'exploiter :
+
+- **Chaque bin est lui-même encapsulé dans un tableau à un élément** :
+  `histogram[canal][bin]` vaut `[fréquence]`, pas directement
+  `fréquence` — un artefact de la sérialisation actuelle côté
+  backend, pas une erreur de lecture côté client.
+- **La valeur de pixel que représente chaque bin n'est pas transmise
+  directement**, seule la fréquence l'est. Le nombre de bins varie
+  d'une image à l'autre (`histogram[canal].length`) ; la valeur de
+  pixel du bin `i` se recalcule à partir de `min`/`max` du même canal :
+  ```
+  largeur_bin = (max[canal] - min[canal]) / (nombre_de_bins - 1)
+  valeur(i)   = min[canal] + i × largeur_bin
+  ```
+{{% /notice %}}
 
 {{% notice style="tip" title="URLs media" %}}
 Tous les chemins image/vidéo sont relatifs. Préfixer avec `http(s)://hostname/ostmedia/` pour obtenir l'URL complète.  
 Exemple : `"urljpeg": "Focus/frame.jpeg"` → `http://hostname/ostmedia/Focus/frame.jpeg`
+{{% /notice %}}
+
+{{% notice style="warning" title="Les médias sont servis séparément du port WebSocket" %}}
+Ce `hostname` n'est **pas déductible du protocole** — aucun champ du dump ne le donne, et ce n'est **pas** l'hôte de la connexion WebSocket que vous venez d'établir. Dans le déploiement de référence (voir [Installation propre]({{% relref "fresh.fr.md" %}})), les médias sont servis par un serveur web séparé (nginx, port 80 par défaut, 443 derrière SSL) — un port complètement différent du serveur WebSocket (9624). Un client doit déjà connaître, ou faire configurer par l'utilisateur, le hostname du serveur OST indépendamment de l'URL WebSocket, et construire les URLs media à partir du port HTTP de ce hostname — pas de l'origine de ses propres fichiers, ni du port WebSocket. Un client qui se contente de préfixer un chemin `/ostmedia/` nu (résolu par rapport à l'endroit où ses propres fichiers sont servis) obtiendra des images cassées.
 {{% /notice %}}
 
 ### Type : `video`

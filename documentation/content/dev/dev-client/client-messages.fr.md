@@ -170,6 +170,10 @@ Utilisé pour soumettre tous les éléments éditables d'une propriété en une 
 }
 ```
 
+{{% notice style="warning" title="Toujours envoyer tous les éléments" %}}
+Un `SA` doit contenir tous les éléments éditables de la propriété. Si un seul manque, le backend n'applique rien du tout — pas même les éléments présents — et journalise un avertissement côté serveur (visible côté client via un message `l`). Ce n'est pas un cas à gérer avec une dégradation gracieuse : c'est le signe d'un bug dans le client, qui doit toujours envoyer l'ensemble complet des éléments.
+{{% /notice %}}
+
 ---
 
 ## Actions sur les icônes
@@ -311,6 +315,10 @@ Ajoute une nouvelle ligne à la grille avec les valeurs d'éléments fournies.
 ```
 
 Le serveur répond avec un message `gc` confirmant l'index de la nouvelle ligne.
+
+{{% notice style="note" title="Les éléments de base se mettent à jour avant la ligne de grille" %}}
+Créer une ligne de grille applique d'abord les valeurs soumises aux éléments de base de la propriété (chacun émettant son propre `ea`), puis ajoute la ligne et émet `gc`. Si une propriété affiche à la fois ses éléments de base et sa grille (`showElts` et `showGrid` tous les deux actifs — combinaison rare), un client qui affiche en direct verra brièvement les éléments de base refléter les valeurs de la nouvelle ligne avant que la ligne elle-même n'apparaisse. C'est le vrai état du datastore, pas un bug — adaptez votre affichage à ce comportement plutôt que de chercher à le filtrer, et surtout ne faites jamais de polling pour le contourner.
+{{% /notice %}}
 
 ---
 

@@ -251,6 +251,10 @@ Updates a single element's value. Same format as `ea` but for one element only. 
 }
 ```
 
+{{% notice style="note" title="`ee` is backend-initiated only" %}}
+`ee` is only ever sent on the backend's own initiative (e.g. a device-driven value change, internal polling) — never as a direct response to a client write. Any response to a client-initiated `SV` or `SA` is always a full-property `ea`, regardless of how many elements actually changed.
+{{% /notice %}}
+
 ---
 
 ## `ev` — Set element with metadata {#ev}

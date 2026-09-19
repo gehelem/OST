@@ -170,6 +170,10 @@ Wird verwendet, um alle editierbaren Elemente einer Property auf einmal zu über
 }
 ```
 
+{{% notice style="warning" title="Immer alle Elemente senden" %}}
+Ein `SA` muss alle editierbaren Elemente der Property enthalten. Fehlt auch nur eines, wendet das Backend gar nichts an — nicht einmal die vorhandenen Elemente — und protokolliert serverseitig eine Warnung (für den Client sichtbar über eine `l`-Nachricht). Das ist kein Laufzeitfall, der elegant abgefangen werden soll: Es zeigt einen Bug im Client an, der immer den vollständigen Satz an Elementen senden muss.
+{{% /notice %}}
+
 ---
 
 ## Icon-Aktionen
@@ -311,6 +315,10 @@ Fügt der Grid eine neue Zeile mit den übergebenen Elementwerten hinzu.
 ```
 
 Der Server antwortet mit einer `gc`-Nachricht, die den Index der neuen Zeile bestätigt.
+
+{{% notice style="note" title="Basis-Elemente aktualisieren sich vor der Grid-Zeile" %}}
+Das Erstellen einer Grid-Zeile wendet die übermittelten Werte zuerst auf die Basis-Elemente der Property an (jedes sendet sein eigenes `ea`), fügt dann die Zeile hinzu und sendet `gc`. Zeigt eine Property gleichzeitig ihre Basis-Elemente und ihr Grid an (`showElts` und `showGrid` beide aktiv — eine unübliche Kombination), sieht ein live-rendernder Client kurz, wie die Basis-Elemente die Werte der neuen Zeile widerspiegeln, bevor die Zeile selbst erscheint. Das ist der echte Datastore-Zustand, kein Bug — die Darstellung sollte sich daran anpassen, statt es herauszufiltern, und vor allem niemals Polling einsetzen, um das zu umgehen.
+{{% /notice %}}
 
 ---
 

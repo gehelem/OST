@@ -251,6 +251,10 @@ Met à jour la valeur d'un seul élément. Même format que `ea` mais pour un se
 }
 ```
 
+{{% notice style="note" title="`ee` est d'origine backend uniquement" %}}
+`ee` n'est envoyé que sur l'initiative du backend lui-même (ex. un changement de valeur venant d'un device, un polling interne) — jamais en réponse directe à une écriture client. Toute réponse à un `SV` ou un `SA` initié par le client est toujours un `ea` de toute la propriété, quel que soit le nombre d'éléments réellement modifiés.
+{{% /notice %}}
+
 ---
 
 ## `ev` — Mise à jour d'un élément avec métadonnées {#ev}

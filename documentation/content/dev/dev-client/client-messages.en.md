@@ -170,6 +170,10 @@ Use to submit all editable elements of a property at once (e.g. from a form). Al
 }
 ```
 
+{{% notice style="warning" title="Always send every element" %}}
+An `SA` must include every editable element of the property. If any is missing, the backend applies nothing at all — not even the elements that were present — and logs a warning server-side (visible to the client via an `l` message). This is not a runtime condition to handle gracefully: it signals a bug in the client, which must always submit the complete set of elements.
+{{% /notice %}}
+
 ---
 
 ## Icon actions
@@ -311,6 +315,10 @@ Adds a new row to the grid with the provided element values.
 ```
 
 The server replies with a `gc` message confirming the new row index.
+
+{{% notice style="note" title="Base elements update before the grid line does" %}}
+Creating a grid line applies the submitted values to the property's base elements first (each emitting its own `ea`), then appends the row and emits `gc`. If a property shows both its base elements and its grid at the same time (`showElts` and `showGrid` both true — an uncommon combination), a live-rendering client will see the base elements briefly reflect the new row's values before the row itself appears. This is the real datastore state, not a bug — adapt your rendering to it rather than filtering it out, and never poll to work around it.
+{{% /notice %}}
 
 ---
 
