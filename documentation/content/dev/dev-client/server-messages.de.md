@@ -251,6 +251,10 @@ Aktualisiert den Wert eines einzelnen Elements. Gleiches Format wie `ea`, aber f
 }
 ```
 
+{{% notice style="note" title="`ee` kommt nur vom Backend aus" %}}
+`ee` wird ausschließlich auf Initiative des Backends selbst gesendet (z. B. eine geräteseitige Wertänderung, internes Polling) — nie als direkte Antwort auf einen Client-Schreibvorgang. Jede Antwort auf ein clientseitig ausgelöstes `SV` oder `SA` ist immer ein `ea` der gesamten Property, unabhängig davon, wie viele Elemente sich tatsächlich geändert haben.
+{{% /notice %}}
+
 ---
 
 ## `ev` — Update eines Elements mit Metadaten {#ev}
