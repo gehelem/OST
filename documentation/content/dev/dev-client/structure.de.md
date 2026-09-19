@@ -115,6 +115,10 @@ Ein Element enthält einen einzigen typisierten Wert. Es gibt 11 Elementtypen.
 In den Update-Nachrichten `ee` und `ea` enthalten Elemente **nur ihren Wert** — ohne die Metadatenfelder. Clients müssen die Metadaten des letzten vollständigen Dumps behalten.
 {{% /notice %}}
 
+{{% notice style="tip" title="Feldauslassung" %}}
+`directedit` kann bei Elementen, auf die es nicht zutrifft, ganz fehlen — ein fehlendes `directedit` als `false` behandeln. Das hält die Dumps von Properties, die es nicht brauchen, schlanker.
+{{% /notice %}}
+
 ---
 
 ### Typ: `int`
@@ -131,6 +135,7 @@ In den Update-Nachrichten `ee` und `ea` enthalten Elemente **nur ihren Wert** �
 | `globallov` | string | Optional: Schlüssel, der auf eine Modul- oder Controller-LOV verweist |
 | `lovScope` | string | `"module"` oder `"controller"` — wo die globallov definiert ist |
 | `lovConstrained` | bool | Zeigt an, ob der Wert zur LOV gehören muss |
+| `nullable` | bool | Zeigt an, ob das Element leer bleiben darf (Frontend sollte eine "keine"-Option anbieten) |
 
 ### Typ: `float`
 
@@ -150,6 +155,8 @@ Gleiche Felder wie `int`, mit `value`, `min`, `max`, `step` als Gleitkommazahl.
 | `listOfValues` | object | Optional: Map `{"Schlüssel": "Bezeichnung"}` der erlaubten Werte |
 | `globallov` | string | Optional: Schlüssel, der auf eine LOV verweist |
 | `lovScope` | string | `"module"` oder `"controller"` |
+| `lovConstrained` | bool | Zeigt an, ob der Wert zur LOV gehören muss |
+| `nullable` | bool | Zeigt an, ob das Element leer bleiben darf (Frontend sollte eine "keine"-Option anbieten) |
 
 ### Typ: `date`
 

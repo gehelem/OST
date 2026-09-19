@@ -115,6 +115,10 @@ An element holds a single typed value. There are 11 element types.
 In `ee` and `ea` update messages, elements contain **only their value** — no metadata fields. Clients must preserve metadata from the last full dump.
 {{% /notice %}}
 
+{{% notice style="tip" title="Field omission" %}}
+`directedit` may be omitted entirely for elements where it doesn't apply — treat a missing `directedit` as `false`. This keeps dumps lighter for properties that don't need it.
+{{% /notice %}}
+
 ---
 
 ### Type: `int`
@@ -131,6 +135,7 @@ In `ee` and `ea` update messages, elements contain **only their value** — no m
 | `globallov` | string | Optional: key referencing a module or controller LOV |
 | `lovScope` | string | `"module"` or `"controller"` — where the globallov is defined |
 | `lovConstrained` | bool | Whether value must belong to the LOV |
+| `nullable` | bool | Whether the element may be left empty (frontend should offer a "none" choice) |
 
 ### Type: `float`
 
@@ -150,6 +155,8 @@ Same fields as `int`, with floating-point `value`, `min`, `max`, `step`.
 | `listOfValues` | object | Optional: `{"key": "Label"}` map of allowed values |
 | `globallov` | string | Optional: key referencing a LOV |
 | `lovScope` | string | `"module"` or `"controller"` |
+| `lovConstrained` | bool | Whether value must belong to the LOV |
+| `nullable` | bool | Whether the element may be left empty (frontend should offer a "none" choice) |
 
 ### Type: `date`
 

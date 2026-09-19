@@ -115,6 +115,10 @@ Un élément contient une valeur typée unique. Il existe 11 types d'éléments.
 Dans les messages de mise à jour `ee` et `ea`, les éléments ne contiennent **que leur valeur** — sans les champs de métadonnées. Les clients doivent conserver les métadonnées du dernier dump complet.
 {{% /notice %}}
 
+{{% notice style="tip" title="Omission de champ" %}}
+`directedit` peut être totalement absent pour les éléments où il ne s'applique pas — considérer une absence comme `false`. Ça allège les dumps des propriétés qui n'en ont pas besoin.
+{{% /notice %}}
+
 ---
 
 ### Type : `int`
@@ -131,6 +135,7 @@ Dans les messages de mise à jour `ee` et `ea`, les éléments ne contiennent **
 | `globallov` | string | Optionnel : clé référençant un LOV de module ou de contrôleur |
 | `lovScope` | string | `"module"` ou `"controller"` — où est défini le globallov |
 | `lovConstrained` | bool | Indique si la valeur doit appartenir au LOV |
+| `nullable` | bool | Indique si l'élément peut être laissé vide (le frontend doit proposer un choix "aucun") |
 
 ### Type : `float`
 
@@ -150,6 +155,8 @@ Mêmes champs que `int`, avec `value`, `min`, `max`, `step` en virgule flottante
 | `listOfValues` | object | Optionnel : map `{"clé": "Libellé"}` des valeurs autorisées |
 | `globallov` | string | Optionnel : clé référençant un LOV |
 | `lovScope` | string | `"module"` ou `"controller"` |
+| `lovConstrained` | bool | Indique si la valeur doit appartenir au LOV |
+| `nullable` | bool | Indique si l'élément peut être laissé vide (le frontend doit proposer un choix "aucun") |
 
 ### Type : `date`
 

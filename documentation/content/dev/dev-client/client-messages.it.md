@@ -170,6 +170,10 @@ Usato per inviare tutti gli elementi editabili di una proprietà in una volta (e
 }
 ```
 
+{{% notice style="warning" title="Inviare sempre tutti gli elementi" %}}
+Un `SA` deve contenere tutti gli elementi editabili della proprietà. Se anche uno solo manca, il backend non applica nulla — nemmeno gli elementi presenti — e registra un avviso lato server (visibile al client tramite un messaggio `l`). Non è un caso da gestire con una degradazione elegante: indica un bug nel client, che deve sempre inviare l'insieme completo degli elementi.
+{{% /notice %}}
+
 ---
 
 ## Azioni sulle icone
@@ -311,6 +315,10 @@ Aggiunge una nuova riga alla griglia con i valori degli elementi forniti.
 ```
 
 Il server risponde con un messaggio `gc` che confirma l'indice della nuova riga.
+
+{{% notice style="note" title="Gli elementi di base si aggiornano prima della riga di griglia" %}}
+Creare una riga di griglia applica prima i valori inviati agli elementi di base della proprietà (ognuno emette il proprio `ea`), poi aggiunge la riga ed emette `gc`. Se una proprietà mostra sia i suoi elementi di base sia la sua griglia contemporaneamente (`showElts` e `showGrid` entrambi attivi — combinazione rara), un client che visualizza in diretta vedrà brevemente gli elementi di base riflettere i valori della nuova riga prima che la riga stessa appaia. Questo è il vero stato del datastore, non un bug — adattate la visualizzazione a questo comportamento invece di cercare di filtrarlo, e soprattutto non fate mai polling per aggirarlo.
+{{% /notice %}}
 
 ---
 

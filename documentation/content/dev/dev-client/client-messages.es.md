@@ -170,6 +170,10 @@ Usado para enviar todos los elementos editables de una propiedad de una vez (ej.
 }
 ```
 
+{{% notice style="warning" title="Enviar siempre todos los elementos" %}}
+Un `SA` debe incluir todos los elementos editables de la propiedad. Si falta uno solo, el backend no aplica absolutamente nada — ni siquiera los elementos presentes — y registra una advertencia en el servidor (visible para el cliente mediante un mensaje `l`). No es un caso a gestionar con una degradación elegante: indica un error en el cliente, que siempre debe enviar el conjunto completo de elementos.
+{{% /notice %}}
+
 ---
 
 ## Acciones sobre los iconos
@@ -311,6 +315,10 @@ Añade una nueva línea a la cuadrícula con los valores de elementos proporcion
 ```
 
 El servidor responde con un mensaje `gc` confirmando el índice de la nueva línea.
+
+{{% notice style="note" title="Los elementos base se actualizan antes que la línea de la cuadrícula" %}}
+Crear una línea de cuadrícula aplica primero los valores enviados a los elementos base de la propiedad (cada uno emite su propio `ea`), y luego añade la línea y emite `gc`. Si una propiedad muestra a la vez sus elementos base y su cuadrícula (`showElts` y `showGrid` ambos activos — combinación poco habitual), un cliente que renderiza en directo verá brevemente los elementos base reflejar los valores de la nueva línea antes de que la línea misma aparezca. Este es el estado real del datastore, no un error — adapte su renderizado a este comportamiento en lugar de intentar filtrarlo, y sobre todo nunca haga polling para evitarlo.
+{{% /notice %}}
 
 ---
 
