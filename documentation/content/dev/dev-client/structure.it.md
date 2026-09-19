@@ -188,9 +188,35 @@ Il campo `value` è un oggetto contenente i metadati dell'immagine:
 | `issolved` | bool | Indica se la risoluzione di campo è riuscita |
 | `solverra` / `solverde` | float | Coordinate RA/DEC risolte |
 | `solverorientation` | float | Angolo di rotazione del campo risolto |
-| `min` / `max` / `mean` / `median` / `stddev` | float[] | Statistiche per canale |
-| `histogram` | array | Dati dell'istogramma per canale |
+| `min` / `max` / `mean` / `median` / `stddev` | float[] | Statistiche per canale (vedi sotto) |
+| `histogram` | array | Dati dell'istogramma per canale (vedi sotto) |
 | `alternates` | string[] | Opzionale: versioni alternative dell'immagine |
+
+**Statistiche per canale**: `min`/`max`/`mean`/`median`/`stddev` sono
+array a **3 posizioni fisse**, indipendentemente dal numero reale di
+canali — indice `0` = canale unico (immagine mono) o rosso (R), `1` =
+verde (G), `2` = blu (B). Solo le prime `channels` posizioni sono
+significative; oltre, i valori sono a zero e privi di significato
+(un'immagine mono ha valorizzato solo l'indice `0`).
+
+{{% notice style="note" title="Istogramma: struttura dei bin" %}}
+`histogram` segue la stessa logica per canale (un array per canale,
+solo le prime `channels` posizioni usate), ma con due particolarità
+da conoscere prima di usarlo:
+
+- **Ogni bin è a sua volta incapsulato in un array di un elemento**:
+  `histogram[canale][bin]` vale `[frequenza]`, non direttamente
+  `frequenza` — un artefatto dell'attuale serializzazione lato
+  backend, non un errore di lettura lato client.
+- **Il valore di pixel rappresentato da ogni bin non viene trasmesso
+  direttamente**, solo la frequenza lo è. Il numero di bin varia da
+  un'immagine all'altra (`histogram[canale].length`); il valore di
+  pixel del bin `i` si ricalcola da `min`/`max` dello stesso canale:
+  ```
+  larghezza_bin = (max[canale] - min[canale]) / (numero_di_bin - 1)
+  valore(i)     = min[canale] + i × larghezza_bin
+  ```
+{{% /notice %}}
 
 {{% notice style="tip" title="URL media" %}}
 Tutti i percorsi immagine/video sono relativi. Aggiungere il prefisso `http(s)://hostname/ostmedia/` per ottenere l'URL completo.  

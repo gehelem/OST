@@ -188,9 +188,35 @@ Das Feld `value` ist ein Objekt mit den Bild-Metadaten:
 | `issolved` | bool | Zeigt an, ob die Plate-Solving-Auflösung erfolgreich war |
 | `solverra` / `solverde` | float | Aufgelöste RA/Dec-Koordinaten |
 | `solverorientation` | float | Rotationswinkel des aufgelösten Feldes |
-| `min` / `max` / `mean` / `median` / `stddev` | float[] | Statistiken pro Kanal |
-| `histogram` | array | Histogrammdaten pro Kanal |
+| `min` / `max` / `mean` / `median` / `stddev` | float[] | Statistiken pro Kanal (siehe unten) |
+| `histogram` | array | Histogrammdaten pro Kanal (siehe unten) |
 | `alternates` | string[] | Optional: alternative Versionen des Bildes |
+
+**Statistiken pro Kanal**: `min`/`max`/`mean`/`median`/`stddev` sind
+Arrays mit **3 festen Plätzen**, unabhängig von der tatsächlichen
+Kanalzahl — Index `0` = einzelner Kanal (Mono-Bild) oder Rot (R),
+`1` = Grün (G), `2` = Blau (B). Nur die ersten `channels` Plätze sind
+aussagekräftig; darüber hinaus sind die Werte null und bedeutungslos
+(ein Mono-Bild hat nur Index `0` befüllt).
+
+{{% notice style="note" title="Histogramm: Bin-Struktur" %}}
+`histogram` folgt derselben Kanal-Logik (ein Array pro Kanal, nur die
+ersten `channels` verwendet), hat aber zwei Besonderheiten, die man
+vor der Nutzung kennen sollte:
+
+- **Jeder Bin ist selbst in ein Array mit einem Element verpackt**:
+  `histogram[Kanal][Bin]` ist `[Häufigkeit]`, nicht direkt
+  `Häufigkeit` — ein Artefakt der aktuellen Backend-Serialisierung,
+  kein Lesefehler auf Client-Seite.
+- **Der Pixelwert, den jeder Bin repräsentiert, wird nicht direkt
+  übertragen**, nur die Häufigkeit. Die Anzahl der Bins variiert je
+  Bild (`histogram[Kanal].length`); der Pixelwert von Bin `i` wird aus
+  `min`/`max` desselben Kanals neu berechnet:
+  ```
+  bin_breite = (max[Kanal] - min[Kanal]) / (bin_anzahl - 1)
+  wert(i)    = min[Kanal] + i × bin_breite
+  ```
+{{% /notice %}}
 
 {{% notice style="tip" title="Media-URLs" %}}
 Alle Bild-/Video-Pfade sind relativ. Mit `http(s)://hostname/ostmedia/` voranstellen, um die vollständige URL zu erhalten.  

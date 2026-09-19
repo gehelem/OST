@@ -188,9 +188,35 @@ Le champ `value` est un objet contenant les métadonnées de l'image :
 | `issolved` | bool | Indique si la résolution de champ a réussi |
 | `solverra` / `solverde` | float | Coordonnées AR/Déc résolues |
 | `solverorientation` | float | Angle de rotation du champ résolu |
-| `min` / `max` / `mean` / `median` / `stddev` | float[] | Statistiques par canal |
-| `histogram` | array | Données d'histogramme par canal |
+| `min` / `max` / `mean` / `median` / `stddev` | float[] | Statistiques par canal (voir détail ci-dessous) |
+| `histogram` | array | Données d'histogramme par canal (voir détail ci-dessous) |
 | `alternates` | string[] | Optionnel : versions alternatives de l'image |
+
+**Statistiques par canal** : `min`/`max`/`mean`/`median`/`stddev` sont
+des tableaux à **3 emplacements fixes**, quel que soit le nombre réel
+de canaux — index `0` = canal unique (image mono) ou rouge (R), `1` =
+vert (G), `2` = bleu (B). Seuls les `channels` premiers emplacements
+sont significatifs ; au-delà, les valeurs sont à zéro et sans
+signification (une image mono n'a que l'index `0` de renseigné).
+
+{{% notice style="note" title="Histogramme : structure des bins" %}}
+`histogram` suit la même logique de canaux (un tableau par canal,
+seuls les `channels` premiers utilisés), mais avec deux particularités
+à connaître avant de l'exploiter :
+
+- **Chaque bin est lui-même encapsulé dans un tableau à un élément** :
+  `histogram[canal][bin]` vaut `[fréquence]`, pas directement
+  `fréquence` — un artefact de la sérialisation actuelle côté
+  backend, pas une erreur de lecture côté client.
+- **La valeur de pixel que représente chaque bin n'est pas transmise
+  directement**, seule la fréquence l'est. Le nombre de bins varie
+  d'une image à l'autre (`histogram[canal].length`) ; la valeur de
+  pixel du bin `i` se recalcule à partir de `min`/`max` du même canal :
+  ```
+  largeur_bin = (max[canal] - min[canal]) / (nombre_de_bins - 1)
+  valeur(i)   = min[canal] + i × largeur_bin
+  ```
+{{% /notice %}}
 
 {{% notice style="tip" title="URLs media" %}}
 Tous les chemins image/vidéo sont relatifs. Préfixer avec `http(s)://hostname/ostmedia/` pour obtenir l'URL complète.  

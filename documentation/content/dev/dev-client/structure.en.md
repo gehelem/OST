@@ -188,9 +188,35 @@ The `value` field is an object with image metadata:
 | `issolved` | bool | Whether plate solving succeeded |
 | `solverra` / `solverde` | float | Solved RA/Dec coordinates |
 | `solverorientation` | float | Solved field rotation angle |
-| `min` / `max` / `mean` / `median` / `stddev` | float[] | Per-channel statistics |
-| `histogram` | array | Per-channel histogram data |
+| `min` / `max` / `mean` / `median` / `stddev` | float[] | Per-channel statistics (see below) |
+| `histogram` | array | Per-channel histogram data (see below) |
 | `alternates` | string[] | Optional: alternative versions of the image |
+
+**Per-channel statistics**: `min`/`max`/`mean`/`median`/`stddev` are
+**fixed 3-slot arrays**, regardless of the actual number of channels —
+index `0` is the single channel (mono image) or red (R), `1` is green
+(G), `2` is blue (B). Only the first `channels` slots are meaningful;
+beyond that, values are zero and carry no meaning (a mono image only
+has index `0` populated).
+
+{{% notice style="note" title="Histogram: bin structure" %}}
+`histogram` follows the same per-channel logic (one array per channel,
+only the first `channels` used), but has two quirks worth knowing
+before using it:
+
+- **Each bin is itself wrapped in a one-element array**:
+  `histogram[channel][bin]` is `[frequency]`, not `frequency` directly
+  — an artifact of the current backend serialization, not a client
+  parsing error.
+- **The pixel value each bin represents is not sent directly**, only
+  the frequency is. The number of bins varies per image
+  (`histogram[channel].length`); the pixel value of bin `i` is
+  recomputed from that same channel's `min`/`max`:
+  ```
+  bin_width = (max[channel] - min[channel]) / (bin_count - 1)
+  value(i)  = min[channel] + i × bin_width
+  ```
+{{% /notice %}}
 
 {{% notice style="tip" title="Media URLs" %}}
 All image/video paths are relative. Prepend `http(s)://hostname/ostmedia/` to get the full URL.  
