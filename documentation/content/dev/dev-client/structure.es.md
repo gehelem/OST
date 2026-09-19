@@ -197,6 +197,10 @@ Todas las rutas de imagen/vídeo son relativas. Añadir como prefijo `http(s)://
 Ejemplo: `"urljpeg": "Focus/frame.jpeg"` → `http://hostname/ostmedia/Focus/frame.jpeg`
 {{% /notice %}}
 
+{{% notice style="warning" title="Los medios se sirven por separado del puerto WebSocket" %}}
+Ese `hostname` **no se puede deducir del protocolo** — ningún campo del dump lo proporciona, y no es el host de la conexión WebSocket que se acaba de establecer. En el despliegue de referencia (ver [Instalación limpia]({{% relref "fresh.es.md" %}})), los medios se sirven mediante un servidor web separado (nginx, puerto 80 por defecto, 443 detrás de SSL) — un puerto completamente distinto del servidor WebSocket (9624). Un cliente debe conocer de antemano, o dejar que el usuario configure, el hostname del servidor OST de forma independiente de la URL WebSocket, y construir las URLs de medios usando el puerto HTTP de ese hostname — no el origen de sus propios ficheros, ni el puerto WebSocket. Un cliente que simplemente antepone una ruta `/ostmedia/` desnuda (resuelta respecto a dónde se sirven sus propios ficheros) obtendrá imágenes rotas.
+{{% /notice %}}
+
 ### Tipo: `video`
 
 | Campo | Tipo | Descripción |

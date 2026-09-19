@@ -197,6 +197,10 @@ Tutti i percorsi immagine/video sono relativi. Aggiungere il prefisso `http(s):/
 Esempio: `"urljpeg": "Focus/frame.jpeg"` → `http://hostname/ostmedia/Focus/frame.jpeg`
 {{% /notice %}}
 
+{{% notice style="warning" title="I media sono serviti separatamente dalla porta WebSocket" %}}
+Questo `hostname` **non è deducibile dal protocollo** — nessun campo del dump lo fornisce, e non è l'host della connessione WebSocket appena stabilita. Nel deployment di riferimento (vedi [Installazione pulita]({{% relref "fresh.it.md" %}})), i media sono serviti da un server web separato (nginx, porta 80 di default, 443 dietro SSL) — una porta completamente diversa dal server WebSocket (9624). Un client deve già conoscere, o far configurare all'utente, l'hostname del server OST indipendentemente dall'URL WebSocket, e costruire gli URL dei media usando la porta HTTP di quell'hostname — non l'origine dei propri file, né la porta WebSocket. Un client che si limita ad anteporre un percorso `/ostmedia/` nudo (risolto rispetto a dove sono serviti i propri file) otterrà immagini rotte.
+{{% /notice %}}
+
 ### Tipo: `video`
 
 | Campo | Tipo | Descrizione |

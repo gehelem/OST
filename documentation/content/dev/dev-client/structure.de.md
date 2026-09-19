@@ -197,6 +197,10 @@ Alle Bild-/Video-Pfade sind relativ. Mit `http(s)://hostname/ostmedia/` voranste
 Beispiel: `"urljpeg": "Focus/frame.jpeg"` → `http://hostname/ostmedia/Focus/frame.jpeg`
 {{% /notice %}}
 
+{{% notice style="warning" title="Medien werden getrennt vom WebSocket-Port bereitgestellt" %}}
+Dieser `hostname` ist **nicht aus dem Protokoll ableitbar** — kein Feld im Dump liefert ihn, und es ist **nicht** der Host der gerade aufgebauten WebSocket-Verbindung. In der Referenz-Installation (siehe [Neuinstallation]({{% relref "fresh.de.md" %}})) werden Medien von einem separaten Webserver bereitgestellt (nginx, standardmäßig Port 80, 443 hinter SSL) — ein völlig anderer Port als der WebSocket-Server (9624). Ein Client muss den Hostname des OST-Servers bereits kennen, oder ihn vom Nutzer konfigurieren lassen, unabhängig von der WebSocket-URL, und Medien-URLs gegen den HTTP-Port dieses Hostnamens aufbauen — nicht gegen den eigenen Ursprung der Seite und nicht gegen den WebSocket-Port. Ein Client, der einfach einen nackten `/ostmedia/`-Pfad voranstellt (aufgelöst relativ zu seinem eigenen Serving-Ursprung), bekommt kaputte Bilder.
+{{% /notice %}}
+
 ### Typ: `video`
 
 | Feld | Typ | Beschreibung |

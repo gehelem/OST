@@ -197,6 +197,10 @@ All image/video paths are relative. Prepend `http(s)://hostname/ostmedia/` to ge
 Example: `"urljpeg": "Focus/frame.jpeg"` → `http://hostname/ostmedia/Focus/frame.jpeg`
 {{% /notice %}}
 
+{{% notice style="warning" title="Media is served separately from the WebSocket port" %}}
+That `hostname` is **not derivable from the protocol** — no field in the dump gives it to you, and it is **not** the WebSocket connection you just made. In the reference deployment (see [Fresh install]({{% relref "fresh.en.md" %}})), media is served by a separate web server (nginx, port 80 by default, 443 behind SSL) — a completely different port from the WebSocket server (9624). A client must already know, or let the user configure, the OST server's hostname independently of the WebSocket URL, and build media URLs against that hostname's HTTP port — not against the page's own origin, and not against the WebSocket port. A client that just prepends a bare `/ostmedia/` path (resolving it against wherever its own files happen to be served) will get broken images.
+{{% /notice %}}
+
 ### Type: `video`
 
 | Field | Type | Description |
