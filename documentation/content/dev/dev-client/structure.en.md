@@ -30,10 +30,9 @@ Its identifier is its internal name (no spaces).
 
 | Field | Type | Description |
 |---|---|---|
-| `infos.label` | string | Human-readable module label |
-| `infos.name` | string | Internal module name |
+| `infos.modulelabel` | string | Human-readable module label |
 | `infos.description` | string | Module description |
-| `infos.template` | string | Module template/type (e.g. `"focus"`, `"guider"`) |
+| `infos.template` | string | Module template/type (e.g. `"focus"`, `"guider"`) — may be absent |
 | `properties` | object | Map of property name → property object |
 | `globallovs` | object | Map of LOV key → LOV object (module-level lists of values) |
 | `profile.name` | string | Currently active profile name |
@@ -41,6 +40,10 @@ Its identifier is its internal name (no spaces).
 
 {{% notice style="info" title="Wire format" %}}
 In the JSON wire format, `properties` is abbreviated as `p`, `globallovs` as `l`, and `profile` as `f`. Clients must handle these abbreviated keys.
+{{% /notice %}}
+
+{{% notice style="note" title="Internal fields" %}}
+`infos` also carries a number of internal build/version fields (`baseGithash`, `thisversion`, `startdatetime`, and others) — implementation detail, not part of the stable client contract, and not documented individually here.
 {{% /notice %}}
 
 ---
@@ -68,6 +71,20 @@ A property groups related elements. Properties are displayed hierarchically usin
 | `freevalue` | string | Arbitrary free-text field |
 | `rule` | int | Bool element grouping rule: `0` OneOfMany (radio) · `1` AtMostOne · `2` Any |
 | `elements` | object | Map of element name → element object |
+
+{{% notice style="tip" title="`level1`/`level2`/`order` are advisory, not a contract" %}}
+These fields are purely informative — the backend never enforces them, and a client is free to honor them partially or not at all. They only express how a given module's developer imagined organizing its own properties. This is exactly what lets generic clients (OstErix, ostnoctua) work with any module without custom UI per module.
+
+The reference client (OstErix) groups properties this way, for clients that want a similar generic layout:
+1. Empty `level1` → property shown outside any tab (rendered directly, sorted by `order`).
+2. Non-empty `level1` → grouped into a tab named `level1`. Inside it, empty `level2` → shown directly under the tab; non-empty `level2` → shown inside a collapsible group named `level2`.
+3. Tab order (and group order within a tab) isn't a separate field — it's derived from the *smallest* `order` value among the properties in that group.
+4. Within a group, properties are sorted by their own `order`.
+
+Two things worth knowing if you build something similar:
+- `level1`/`level2` form a "fake hierarchy" by design choice, not a guaranteed two-level structure — nothing stops a module from leaving `level1` empty while setting `level2` (OstErix doesn't even handle that combination specially; the property just lands in the "no level1" bucket, `level2` ignored).
+- `level1`/`level2` are translatable labels, going through the same mechanism as `label`/`hint`. Keying UI state (e.g. an expanded/collapsed panel) off the raw string value is fragile across a client's language changes — not a bug, just worth avoiding.
+{{% /notice %}}
 
 **Grid properties** (when `hasGrid: true`):
 
@@ -107,7 +124,7 @@ An element holds a single typed value. There are 11 element types.
 | `hint` | string | Tooltip/help text |
 | `autoupdate` | bool | Internal backend flag; not used by clients |
 | `badge` | bool | Whether the element is in the favourites list |
-| `directedit` | bool | `true` = send `SV` on change; `false` = batch with `SA` |
+| `directedit` | bool | Whether this element can be written alone via `SV` — see below |
 | `preicon` | string | Icon before the element (optional) |
 | `posticon` | string | Icon after the element (optional) |
 
@@ -117,6 +134,12 @@ In `ee` and `ea` update messages, elements contain **only their value** — no m
 
 {{% notice style="tip" title="Field omission" %}}
 `directedit` may be omitted entirely for elements where it doesn't apply — treat a missing `directedit` as `false`. This keeps dumps lighter for properties that don't need it.
+{{% /notice %}}
+
+{{% notice style="note" title="`directedit` meaning" %}}
+`true` means this element can be updated on its own, independently of the property's other elements — send `SV` for it (`SA` also works). `false` means the client must submit **every** element of the property together — always use `SA`, never `SV` for that element alone. A good example: RA/Dec coordinates, where both values must be given together.
+
+This is currently a convention the client is expected to follow, **not enforced by the backend** — sending an `SV` for a `directedit: false` element is not rejected today. A backend change to actually enforce this is planned but not yet implemented.
 {{% /notice %}}
 
 ---

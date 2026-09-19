@@ -30,10 +30,9 @@ Il suo identificatore è il suo nome interno (senza spazi).
 
 | Campo | Tipo | Descrizione |
 |---|---|---|
-| `infos.label` | string | Nome visualizzato del modulo |
-| `infos.name` | string | Nome interno del modulo |
+| `infos.modulelabel` | string | Nome visualizzato del modulo |
 | `infos.description` | string | Descrizione del modulo |
-| `infos.template` | string | Tipo di modulo (es. `"focus"`, `"guider"`) |
+| `infos.template` | string | Tipo di modulo (es. `"focus"`, `"guider"`) — può essere assente |
 | `properties` | object | Mappa nome proprietà → oggetto proprietà |
 | `globallovs` | object | Mappa chiave LOV → oggetto LOV (liste di valori a livello modulo) |
 | `profile.name` | string | Nome del profilo attivo |
@@ -41,6 +40,10 @@ Il suo identificatore è il suo nome interno (senza spazi).
 
 {{% notice style="info" title="Formato wire" %}}
 Nel formato JSON di rete, `properties` è abbreviato in `p`, `globallovs` in `l`, e `profile` in `f`. I client devono gestire queste chiavi abbreviate.
+{{% /notice %}}
+
+{{% notice style="note" title="Campi interni" %}}
+`infos` porta anche diversi campi interni di build/versione (`baseGithash`, `thisversion`, `startdatetime`, e altri) — dettaglio implementativo, non fa parte del contratto stabile lato client, non documentato individualmente qui.
 {{% /notice %}}
 
 ---
@@ -68,6 +71,20 @@ Una proprietà raggruppa elementi collegati. Le proprietà sono mostrate in modo
 | `freevalue` | string | Campo di testo libero arbitrario |
 | `rule` | int | Regola di raggruppamento degli elementi bool: `0` UnoTra (radio) · `1` AlPiùUno · `2` Qualsiasi |
 | `elements` | object | Mappa nome elemento → oggetto elemento |
+
+{{% notice style="tip" title="`level1`/`level2`/`order` sono informativi, non un contratto" %}}
+Questi campi sono puramente informativi — il backend non li impone mai, e un client è libero di rispettarli parzialmente o per niente. Esprimono solo il modo in cui lo sviluppatore di un modulo ha pensato di organizzare le proprie proprietà. È esattamente ciò che permette a client generici (OstErix, ostnoctua) di adattarsi a qualsiasi modulo senza UI dedicata per modulo.
+
+Il client di riferimento (OstErix) raggruppa le proprietà così, per un client che punti a un layout generico simile:
+1. `level1` vuoto → proprietà mostrata fuori da qualsiasi scheda (renderizzata direttamente, ordinata per `order`).
+2. `level1` valorizzato → raggruppata in una scheda chiamata `level1`. Al suo interno, `level2` vuoto → mostrata direttamente sotto la scheda; `level2` valorizzato → in un gruppo comprimibile chiamato `level2`.
+3. L'ordine delle schede (e dei gruppi all'interno di una scheda) non è un campo separato — si deduce dal valore `order` più piccolo tra le proprietà di quel gruppo.
+4. All'interno di un gruppo, le proprietà sono ordinate per il proprio `order`.
+
+Due cose da sapere se si costruisce qualcosa di simile:
+- `level1`/`level2` formano una "falsa gerarchia" per scelta di progettazione, non una struttura a due livelli garantita — nulla impedisce a un modulo di lasciare `level1` vuoto valorizzando `level2` (OstErix non gestisce nemmeno questa combinazione: la proprietà finisce semplicemente nel gruppo "senza level1", `level2` ignorato).
+- `level1`/`level2` sono etichette tradotte, tramite lo stesso meccanismo di `label`/`hint`. Usare il valore grezzo della stringa come chiave di stato dell'interfaccia (es. un pannello espanso/compresso) è fragile al cambio di lingua lato client — non un bug, solo da evitare.
+{{% /notice %}}
 
 **Proprietà con griglia** (quando `hasGrid: true`):
 
@@ -107,7 +124,7 @@ Un elemento contiene un unico valore tipizzato. Esistono 11 tipi di elementi.
 | `hint` | string | Testo di aiuto / tooltip |
 | `autoupdate` | bool | Indicatore interno del backend; ignorato dai client |
 | `badge` | bool | Indica se l'elemento è nell'elenco dei preferiti |
-| `directedit` | bool | `true` = inviare `SV` a ogni modifica; `false` = raggruppare con `SA` |
+| `directedit` | bool | Indica se questo elemento può essere scritto da solo via `SV` — vedi sotto |
 | `preicon` | string | Icona prima dell'elemento (opzionale) |
 | `posticon` | string | Icona dopo l'elemento (opzionale) |
 
@@ -117,6 +134,12 @@ Nei messaggi di aggiornamento `ee` e `ea`, gli elementi contengono **solo il lor
 
 {{% notice style="tip" title="Omissione del campo" %}}
 `directedit` può essere del tutto assente per gli elementi in cui non si applica — considerare un'assenza come `false`. Questo alleggerisce i dump delle proprietà che non ne hanno bisogno.
+{{% /notice %}}
+
+{{% notice style="note" title="Significato di `directedit`" %}}
+`true` significa che questo elemento può essere aggiornato da solo, indipendentemente dagli altri elementi della proprietà — inviare `SV` per esso (funziona anche `SA`). `false` significa che il client deve inviare **tutti** gli elementi della proprietà insieme — usare sempre `SA`, mai `SV` per quell'elemento da solo. Un esempio significativo: coordinate RA/Dec, dove entrambi i valori devono essere dati insieme.
+
+Attualmente è una convenzione che il client deve rispettare, **non imposta dal backend** — inviare un `SV` su un elemento con `directedit: false` non viene rifiutato oggi. Un'evoluzione del backend per imporla realmente è prevista, non ancora fatta.
 {{% /notice %}}
 
 ---

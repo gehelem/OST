@@ -30,10 +30,9 @@ Seine Kennung ist sein interner Name (ohne Leerzeichen).
 
 | Feld | Typ | Beschreibung |
 |---|---|---|
-| `infos.label` | string | Angezeigter Name des Moduls |
-| `infos.name` | string | Interner Name des Moduls |
+| `infos.modulelabel` | string | Angezeigter Name des Moduls |
 | `infos.description` | string | Beschreibung des Moduls |
-| `infos.template` | string | Modultyp (z. B. `"focus"`, `"guider"`) |
+| `infos.template` | string | Modultyp (z. B. `"focus"`, `"guider"`) — kann fehlen |
 | `properties` | object | Map von Property-Name → Property-Objekt |
 | `globallovs` | object | Map von LOV-Schlüssel → LOV-Objekt (Wertelisten auf Modulebene) |
 | `profile.name` | string | Name des aktiven Profils |
@@ -41,6 +40,10 @@ Seine Kennung ist sein interner Name (ohne Leerzeichen).
 
 {{% notice style="info" title="Wire-Format" %}}
 Im JSON-Format über das Netzwerk wird `properties` zu `p`, `globallovs` zu `l` und `profile` zu `f` abgekürzt. Clients müssen diese abgekürzten Schlüssel verarbeiten können.
+{{% /notice %}}
+
+{{% notice style="note" title="Interne Felder" %}}
+`infos` enthält außerdem mehrere interne Build-/Versionsfelder (`baseGithash`, `thisversion`, `startdatetime` und andere) — Implementierungsdetail, nicht Teil des stabilen Client-Vertrags, hier nicht einzeln dokumentiert.
 {{% /notice %}}
 
 ---
@@ -68,6 +71,20 @@ Eine Property gruppiert zusammengehörige Elemente. Properties werden hierarchis
 | `freevalue` | string | Beliebiges Freitextfeld |
 | `rule` | int | Gruppierungsregel für bool-Elemente: `0` GenauEines (Radio) · `1` HöchstensEines · `2` Beliebig |
 | `elements` | object | Map von Elementname → Element-Objekt |
+
+{{% notice style="tip" title="`level1`/`level2`/`order` sind informativ, kein Vertrag" %}}
+Diese Felder sind rein informativ — das Backend erzwingt sie nie, und ein Client kann sie teilweise oder gar nicht befolgen. Sie drücken nur aus, wie sich der Entwickler eines Moduls die Organisation seiner eigenen Properties vorgestellt hat. Genau das ermöglicht generischen Clients (OstErix, ostnoctua), sich an jedes Modul anzupassen, ohne modulspezifische UI.
+
+Der Referenz-Client (OstErix) gruppiert Properties so, für einen Client, der ein ähnliches generisches Layout anstrebt:
+1. `level1` leer → Property außerhalb jedes Tabs angezeigt (direkt gerendert, nach `order` sortiert).
+2. `level1` gesetzt → in einem Tab namens `level1` gruppiert. Darin: `level2` leer → direkt unter dem Tab angezeigt; `level2` gesetzt → in einer einklappbaren Gruppe namens `level2`.
+3. Die Reihenfolge der Tabs (und der Gruppen innerhalb eines Tabs) ist kein eigenes Feld — sie ergibt sich aus dem *kleinsten* `order`-Wert unter den Properties dieser Gruppe.
+4. Innerhalb einer Gruppe werden Properties nach ihrem eigenen `order` sortiert.
+
+Zwei Dinge, die man kennen sollte, wenn man etwas Ähnliches baut:
+- `level1`/`level2` bilden bewusst eine "unechte Hierarchie", keine garantierte zweistufige Struktur — nichts hindert ein Modul daran, `level1` leer zu lassen und trotzdem `level2` zu setzen (OstErix behandelt diese Kombination nicht einmal gesondert; die Property landet einfach im "kein level1"-Topf, `level2` wird ignoriert).
+- `level1`/`level2` sind übersetzte Bezeichnungen, die denselben Mechanismus wie `label`/`hint` durchlaufen. Den rohen String-Wert als UI-Zustandsschlüssel zu verwenden (z. B. für ein auf-/zugeklapptes Panel) ist über Sprachwechsel des Clients hinweg brüchig — kein Bug, nur etwas, das man vermeiden sollte.
+{{% /notice %}}
 
 **Properties mit Grid** (wenn `hasGrid: true`):
 
@@ -107,7 +124,7 @@ Ein Element enthält einen einzigen typisierten Wert. Es gibt 11 Elementtypen.
 | `hint` | string | Hilfetext / Tooltip |
 | `autoupdate` | bool | Interner Backend-Indikator; von Clients ignoriert |
 | `badge` | bool | Zeigt an, ob das Element in der Favoritenliste steht |
-| `directedit` | bool | `true` = bei jeder Änderung `SV` senden; `false` = mit `SA` gruppieren |
+| `directedit` | bool | Zeigt an, ob dieses Element allein per `SV` geschrieben werden kann — siehe unten |
 | `preicon` | string | Icon vor dem Element (optional) |
 | `posticon` | string | Icon nach dem Element (optional) |
 
@@ -117,6 +134,12 @@ In den Update-Nachrichten `ee` und `ea` enthalten Elemente **nur ihren Wert** �
 
 {{% notice style="tip" title="Feldauslassung" %}}
 `directedit` kann bei Elementen, auf die es nicht zutrifft, ganz fehlen — ein fehlendes `directedit` als `false` behandeln. Das hält die Dumps von Properties, die es nicht brauchen, schlanker.
+{{% /notice %}}
+
+{{% notice style="note" title="Bedeutung von `directedit`" %}}
+`true` bedeutet, dieses Element kann für sich allein aktualisiert werden, unabhängig von den anderen Elementen der Property — dafür `SV` senden (`SA` funktioniert auch). `false` bedeutet, der Client muss **alle** Elemente der Property zusammen übermitteln — dafür immer `SA` verwenden, nie `SV` für dieses einzelne Element. Ein anschauliches Beispiel: RA/Dec-Koordinaten, bei denen beide Werte zusammen angegeben werden müssen.
+
+Das ist derzeit eine Konvention, an die sich der Client halten soll, **vom Backend nicht erzwungen** — ein `SV` für ein Element mit `directedit: false` wird heute nicht abgelehnt. Eine Backend-Änderung, die das tatsächlich durchsetzt, ist geplant, aber noch nicht umgesetzt.
 {{% /notice %}}
 
 ---
