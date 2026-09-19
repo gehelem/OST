@@ -415,6 +415,7 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
 
             if (lb != nullptr)
             {
+                lb->setKey(key);
                 mGlobLov[key] = lb;
                 OST::LovJsonDumper d;
                 mGlobLov[key]->accept(&d);
