@@ -269,10 +269,6 @@ void ElementJsonDumper::visit(ElementImg *pElement, QVariantMap &data, bool &emi
         imgdata["alternates"] = arr;
     }
 
-    for (auto it = imgdata.constBegin(); it != imgdata.constEnd(); it++)
-    {
-        json.insert(it.key(), it.value());
-    }
     json["value"] = imgdata;
     mResult = json;
     if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return;
