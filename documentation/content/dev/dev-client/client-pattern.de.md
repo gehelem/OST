@@ -63,6 +63,41 @@ Wertes. Der Server ist maßgeblich; ein fehlendes Feld darf niemals mit dem
 alten lokalen Zustand "aufgefüllt" werden.
 {{% /notice %}}
 
+## Rendering: Aktualisierungen auf die geänderte Property beschränken
+
+{{% notice style="warning" title="Verpflichtend: niemals mehr als die geänderte Property neu rendern" %}}
+Manche Module können mehrere `ee`/`ea`-Updates **pro Sekunde** senden
+(zum Beispiel ein Modul, das kontinuierlich ein Gerät abfragt). Ein
+Client, der bei jedem eingehenden Update seine gesamte UI neu rendert
+— oder auch nur das gesamte angezeigte Modul —, wird unter dieser Last
+unbenutzbar: Verlust des Eingabefokus, Flackern, im schlimmsten Fall
+reagiert die UI überhaupt nicht mehr auf Eingaben.
+
+Das ist kein Grenzfall, gegen den man sich "vorsichtshalber" absichert:
+Es ist reales, aktuelles Backend-Verhalten, und Clients **müssen** von
+Anfang an dafür gebaut sein:
+1. Bei jedem Update darf nur das JS-/Datenobjekt der geänderten
+   Property ersetzt/verändert werden. Die Referenz jeder anderen
+   Property muss exakt gleich bleiben, solange sie nicht betroffen ist.
+2. Das UI-Rendering muss anhand der Identität der Property (oder des
+   Moduls) indiziert sein — eine Liste von Properties sollte über
+   mehrere Render-Durchläufe hinweg dasselbe UI-Element für dieselbe
+   Property wiederverwenden, niemals zerstören und neu erzeugen, damit
+   ein nicht betroffenes Eingabefeld niemals angefasst wird, egal was
+   anderswo gerade passiert.
+3. Nur die **Häufigkeit** des Renderns zu begrenzen (Debounce/Throttle)
+   reicht nicht aus, wenn das Rendering selbst weiterhin unbeteiligte
+   UI neu aufbaut — die Lösung liegt im **Umfang** dessen, was neu
+   aufgebaut wird, nicht nur in dessen Häufigkeit.
+
+OstErix (das Produktions-Frontend) setzt dieses Prinzip von Grund auf
+um: Ein eingehendes Update ersetzt im Store nur die Referenz der
+betroffenen Property, und jede Liste von Properties wird mit einem
+stabilen Schlüssel pro Property gerendert. Dadurch wird die UI nicht
+betroffener Properties niemals gestört, egal wie schnell sich eine
+andere Property anderswo aktualisiert.
+{{% /notice %}}
+
 ## Heartbeat
 
 {{% notice style="note" title="Optional" %}}

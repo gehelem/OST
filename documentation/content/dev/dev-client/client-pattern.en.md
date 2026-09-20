@@ -63,6 +63,38 @@ authoritative; never try to "fill in" a missing field with the previous
 local state.
 {{% /notice %}}
 
+## Rendering: scope updates to the property that changed
+
+{{% notice style="warning" title="Mandatory: never re-render more broadly than the changed property" %}}
+Some modules can send several `ee`/`ea` updates **per second** (for
+example a module continuously polling a device). A client that reacts
+to every incoming update by re-rendering its whole UI — or even just
+the whole displayed module — becomes unusable under this load: lost
+input focus, flicker, and in the worst case the UI stops responding to
+input entirely.
+
+This is not an edge case to defend against "just in case": it is real,
+current backend behavior, and clients **must** be built to handle it
+from the start:
+1. On each update, only the JS/data object of the property that
+   changed should be replaced/mutated. Every other property's
+   reference must stay exactly the same as long as it isn't affected.
+2. UI rendering must be keyed by property (or module) identity — a
+   list of properties should reuse the same UI element for the same
+   property across renders, never destroy and recreate it, so an
+   unrelated input is never touched no matter what else is happening.
+3. Limiting the **rate** of rendering (debounce/throttle) is not
+   enough on its own if the render itself still rebuilds unrelated UI
+   — the fix is in the **scope** of what gets rebuilt, not just how
+   often.
+
+OstErix (the production frontend) implements this by design: an
+incoming update only replaces the touched property's reference in the
+store, and every list of properties is rendered with a stable
+per-property key. As a result, unrelated properties' UI is never
+disturbed, no matter how fast another property updates elsewhere.
+{{% /notice %}}
+
 ## Heartbeat
 
 {{% notice style="note" title="Optional" %}}

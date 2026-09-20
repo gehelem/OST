@@ -62,6 +62,42 @@ valeur. Le serveur fait foi ; ne jamais tenter de "combler" un champ
 manquant avec l'ancien état local.
 {{% /notice %}}
 
+## Rendu : ne rafraîchir que la propriété modifiée
+
+{{% notice style="warning" title="Impératif : ne jamais re-render plus large que la propriété modifiée" %}}
+Certains modules peuvent envoyer plusieurs mises à jour `ee`/`ea` **par
+seconde** (par exemple un module qui interroge en continu un
+périphérique). Un client qui réagit à chaque mise à jour reçue en
+redessinant toute son UI — ou même juste tout le module affiché —
+devient inutilisable sous cette charge : perte du focus de saisie,
+clignotement, et dans le pire cas l'UI cesse totalement de répondre
+aux interactions.
+
+Ce n'est pas un cas limite à anticiper "par précaution" : c'est un
+comportement réel et actuel du backend, et les clients **doivent**
+être construits pour l'encaisser dès le départ :
+1. À chaque mise à jour, seul l'objet JS/données de la propriété
+   modifiée doit être remplacé/muté. La référence de toute autre
+   propriété doit rester strictement identique tant qu'elle n'est pas
+   concernée.
+2. Le rendu de l'UI doit être indexé par l'identité de la propriété
+   (ou du module) — une liste de propriétés doit réutiliser le même
+   élément d'UI pour la même propriété d'un rendu à l'autre, jamais le
+   détruire et le recréer, afin qu'un champ de saisie non concerné ne
+   soit jamais touché, quoi qu'il se passe par ailleurs.
+3. Limiter la **fréquence** des rendus (debounce/throttle) ne suffit
+   pas si le rendu lui-même reconstruit de l'UI non concernée — le
+   correctif est dans le **périmètre** de ce qui est reconstruit, pas
+   seulement dans sa fréquence.
+
+OstErix (le frontend de production) implémente ce principe par
+construction : une mise à jour entrante ne remplace que la référence
+de la propriété concernée dans le store, et toute liste de propriétés
+est rendue avec une clé stable par propriété. Résultat : l'UI des
+propriétés non concernées n'est jamais perturbée, quelle que soit la
+vitesse à laquelle une autre propriété se met à jour en parallèle.
+{{% /notice %}}
+
 ## Heartbeat
 
 {{% notice style="note" title="Facultatif" %}}
