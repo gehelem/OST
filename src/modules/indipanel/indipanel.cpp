@@ -349,11 +349,11 @@ void IndiPanel::onExternalEvent(OST::ExtEvent event)
 
             for (std::size_t i = 0; i < prop.size(); i++)
             {
-                bool b = e.begin().value().toBool();
-                if ( b) prop[i].setState(ISS_ON);
-                if (!b) prop[i].setState(ISS_OFF);
-                sendNewSwitch(prop);
+                QString name = QString::fromLocal8Bit(prop[i].getName());
+                if (!e.contains(name)) continue;
+                prop[i].setState(e.value(name).toBool() ? ISS_ON : ISS_OFF);
             }
+            sendNewSwitch(prop);
             return;
         }
 
