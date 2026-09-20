@@ -57,7 +57,7 @@ if [ -n "$CHANGELOG_NOTES" ]; then
         git config user.email "gilles@joag.fr"
         git config user.name "gilles"
         git fetch origin main
-        git checkout main
+        git checkout -B main FETCH_HEAD
         if [ -f CHANGELOG.md ]; then
             { echo "$CHANGELOG_NOTES"; echo; cat CHANGELOG.md; } > CHANGELOG.md.new
             mv CHANGELOG.md.new CHANGELOG.md
