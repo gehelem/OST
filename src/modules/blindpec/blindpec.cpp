@@ -63,10 +63,12 @@ BlindPec::BlindPec(QString name, QString label, QString profile, QVariantMap ava
     OST::PropertyMulti *pm = getProperty("actions");
     OST::ElementBool *rc = new OST::ElementBool("resetcalibration", "Reset calibration", "bpec10", "");
     rc->setValue(false, false);
+    rc->setDirectEdit(true);
     rc->setPreIcon("block");
     pm->addElt(rc);
     OST::ElementBool *di = new OST::ElementBool("dither", "Dither", "bpec11", "");
     di->setValue(false, false);
+    di->setDirectEdit(true);
     di->setPreIcon("shuffle");
     pm->addElt(di);
 
@@ -349,9 +351,18 @@ void BlindPec::buildStateMachine()
     // Lightweight state tracing while bringing the module up.
     if (_trace)
     {
-        connect(WaitFrameReset, &QState::entered, this, [this]() { logInfo("SM: WaitFrameReset"); });
-        connect(WaitExposure,   &QState::entered, this, [this]() { logInfo("SM: WaitExposure"); });
-        connect(WaitPulses,     &QState::entered, this, [this]() { logInfo("SM: WaitPulses"); });
+        connect(WaitFrameReset, &QState::entered, this, [this]()
+        {
+            logInfo("SM: WaitFrameReset");
+        });
+        connect(WaitExposure,   &QState::entered, this, [this]()
+        {
+            logInfo("SM: WaitExposure");
+        });
+        connect(WaitPulses,     &QState::entered, this, [this]()
+        {
+            logInfo("SM: WaitPulses");
+        });
     }
 
     Run->addTransition(this, &BlindPec::Abort, Abort);
@@ -549,10 +560,18 @@ void BlindPec::SMCompute()
 
     switch (_phase)
     {
-        case PhGainCal:      computeGainCal();      break;
-        case PhCharacterize: computeCharacterize(); break;
-        case PhGuide:        computeGuide();        break;
-        default:             emit ComputeDone();    break;
+        case PhGainCal:
+            computeGainCal();
+            break;
+        case PhCharacterize:
+            computeCharacterize();
+            break;
+        case PhGuide:
+            computeGuide();
+            break;
+        default:
+            emit ComputeDone();
+            break;
     }
 }
 
@@ -862,7 +881,10 @@ void BlindPec::openGuideLog()
     _glT0    = nowMs();
 
     // C-locale number formatting (QString::number never localises; unlike arg()).
-    auto n = [](double v, int p) { return QString::number(v, 'f', p); };
+    auto n = [](double v, int p)
+    {
+        return QString::number(v, 'f', p);
+    };
 
     const double xAngle   = _theta * 180.0 / M_PI;
     const double xRate    = (_G > 1e-6) ? 1000.0 / _G : 0.0;                 // px/s during a guide pulse
@@ -905,7 +927,10 @@ void BlindPec::writeGuideLogRow(double raErr, double crossErr, double needPx)
         return;
     _glFrame++;
 
-    auto n = [](double v, int p) { return QString::number(v, 'f', p); };
+    auto n = [](double v, int p)
+    {
+        return QString::number(v, 'f', p);
+    };
 
     // dx,dy are camera-frame in PHD; rebuild them from the along/cross residual
     // so PHD Log Viewer's scatter plot stays meaningful.

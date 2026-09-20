@@ -38,10 +38,13 @@ Polar::Polar(QString name, QString label, QString profile, QVariantMap available
     defineMeAsImager();
 
     auto* b = new OST::ElementBool("start", "Start", "0", "");
+    b->setDirectEdit(true);
     getProperty("actions")->addElt( b);
     b = new OST::ElementBool("abort", "Abort", "2", "");
+    b->setDirectEdit(true);
     getProperty("actions")->addElt( b);
     b = new OST::ElementBool("test", "Test", "4", "");
+    b->setDirectEdit(true);
     getProperty("actions")->addElt( b);
 
 

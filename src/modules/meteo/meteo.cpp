@@ -39,6 +39,7 @@ Meteo::Meteo(QString name, QString label, QString profile, QVariantMap available
     OST::ElementBool* b = new OST::ElementBool("reset", "Reset", "0", "");
     getProperty("actions")->addElt( b);
     b->setValue(false, false);
+    b->setDirectEdit(true);
     b->setAutoUpdate(true);
 
 
