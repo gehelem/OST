@@ -122,7 +122,7 @@ Changes the language for translated labels without re-connecting.
 
 ### `SV` — Set single element value {#sv}
 
-Use when `directedit` is `true` on the element — sends only one element's value immediately.
+Use when `directedit` is `true` on the element — sends only one element's value immediately. On a `directedit: false` element the backend rejects it (error in the module log, nothing applied): use `SA` instead.
 
 ```json
 {

@@ -139,7 +139,13 @@ Nei messaggi di aggiornamento `ee` e `ea`, gli elementi contengono **solo il lor
 {{% notice style="note" title="Significato di `directedit`" %}}
 `true` significa che questo elemento può essere aggiornato da solo, indipendentemente dagli altri elementi della proprietà — inviare `SV` per esso (funziona anche `SA`). `false` significa che il client deve inviare **tutti** gli elementi della proprietà insieme — usare sempre `SA`, mai `SV` per quell'elemento da solo. Un esempio significativo: coordinate RA/Dec, dove entrambi i valori devono essere dati insieme.
 
-Attualmente è una convenzione che il client deve rispettare, **non imposta dal backend** — inviare un `SV` su un elemento con `directedit: false` non viene rifiutato oggi. Un'evoluzione del backend per imporla realmente è prevista, non ancora fatta.
+Il backend lo impone: un `SV` su un elemento con `directedit: false` viene rifiutato con un errore nel log del modulo e non viene applicato nulla. `SA` è sempre accettato.
+
+Scegliere il valore in base al comportamento dell'elemento, non a quanto «sembra legato» ai vicini:
+- **`true` per un elemento indipendente** — un `bool` che può essere vero indipendentemente dai fratelli (pulsante d'azione come start/abort/loop, interruttore) deve avere `directedit: true`. Un valore simile riflette spesso un'attività in corso e più valori possono essere veri insieme (es. un ciclo di acquisizione in corso mentre si richiede un focus out). Dichiararlo `false` affermerebbe a torto che gli elementi vanno inviati in gruppo, e un client che segue questa pagina invierebbe `SA`, aggirando i moduli che gestiscono solo `SV`.
+- **`false` solo per un vero gruppo** — elementi che hanno senso solo insieme: coordinate RA/Dec, o un vettore di switch INDI riprodotto uno a uno.
+
+Per un gruppo `false` di elementi `bool` con regola esclusiva (`OneOfMany` o `AtMostOne`), selezionare un elemento significa inviargli `true` e **tutti i fratelli `false`** nello stesso `SA` — mai rinviare i valori correnti dei fratelli, altrimenti due elementi finiscono `true`.
 {{% /notice %}}
 
 ---

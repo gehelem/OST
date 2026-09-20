@@ -139,7 +139,13 @@ In den Update-Nachrichten `ee` und `ea` enthalten Elemente **nur ihren Wert** �
 {{% notice style="note" title="Bedeutung von `directedit`" %}}
 `true` bedeutet, dieses Element kann für sich allein aktualisiert werden, unabhängig von den anderen Elementen der Property — dafür `SV` senden (`SA` funktioniert auch). `false` bedeutet, der Client muss **alle** Elemente der Property zusammen übermitteln — dafür immer `SA` verwenden, nie `SV` für dieses einzelne Element. Ein anschauliches Beispiel: RA/Dec-Koordinaten, bei denen beide Werte zusammen angegeben werden müssen.
 
-Das ist derzeit eine Konvention, an die sich der Client halten soll, **vom Backend nicht erzwungen** — ein `SV` für ein Element mit `directedit: false` wird heute nicht abgelehnt. Eine Backend-Änderung, die das tatsächlich durchsetzt, ist geplant, aber noch nicht umgesetzt.
+Das Backend erzwingt dies: Ein `SV` auf ein Element mit `directedit: false` wird mit einem Fehler im Modul-Log abgelehnt, und nichts wird angewendet. `SA` wird immer akzeptiert.
+
+Den Wert nach dem Verhalten des Elements wählen, nicht danach, ob es sich mit seinen Nachbarn „zusammengehörig anfühlt“:
+- **`true` für ein unabhängiges Element** — ein `bool`, das unabhängig von seinen Geschwistern wahr sein kann (Aktions-Button wie start/abort/loop, Schalter), muss `directedit: true` haben. Ein solcher Wert spiegelt oft eine laufende Aktivität wider, und mehrere können gleichzeitig wahr sein (z. B. eine laufende Aufnahmeschleife, während ein Focus-out angefordert wird). `false` zu setzen würde fälschlich behaupten, die Elemente müssten als Gruppe übermittelt werden, und ein Client, der dieser Seite folgt, würde `SA` senden und Module umgehen, die nur `SV` verarbeiten.
+- **`false` nur für eine echte Gruppe** — Elemente, die nur zusammen sinnvoll sind: RA/Dec-Koordinaten oder ein 1:1 gespiegelter INDI-Switch-Vektor.
+
+Bei einer `false`-Gruppe aus `bool`-Elementen mit exklusiver Regel (`OneOfMany` oder `AtMostOne`) bedeutet die Auswahl eines Elements, ihm `true` und **allen Geschwistern `false`** im selben `SA` zu senden — niemals die aktuellen Werte der Geschwister erneut senden, sonst sind zwei Elemente `true`.
 {{% /notice %}}
 
 ---

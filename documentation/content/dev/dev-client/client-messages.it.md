@@ -122,7 +122,7 @@ Modifica la lingua delle etichette tradotte senza riconnettersi.
 
 ### `SV` — Inviare il valore di un singolo elemento {#sv}
 
-Da usare quando `directedit` è `true` sull'elemento — invia immediatamente il valore di un singolo elemento.
+Da usare quando `directedit` è `true` sull'elemento — invia immediatamente il valore di un singolo elemento. Su un elemento con `directedit: false` il backend lo rifiuta (errore nel log del modulo, nulla viene applicato): usare invece `SA`.
 
 ```json
 {

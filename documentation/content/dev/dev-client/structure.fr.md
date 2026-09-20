@@ -142,7 +142,13 @@ Dans les messages de mise à jour `ee` et `ea`, les éléments ne contiennent **
 {{% notice style="note" title="Signification de `directedit`" %}}
 `true` signifie que cet élément peut être mis à jour seul, indépendamment des autres éléments de la propriété — envoyer `SV` pour lui (`SA` fonctionne aussi). `false` signifie que le client doit soumettre **tous** les éléments de la propriété ensemble — toujours utiliser `SA`, jamais `SV` pour cet élément seul. Exemple parlant : des coordonnées RA/Déc, où les deux valeurs doivent être données ensemble.
 
-C'est actuellement une convention que le client doit respecter, **pas imposée par le backend** — envoyer un `SV` sur un élément à `directedit: false` n'est pas rejeté aujourd'hui. Une évolution du backend pour vraiment l'imposer est prévue, pas encore faite.
+Le backend l'impose : un `SV` sur un élément à `directedit: false` est rejeté avec une erreur dans le log du module, et rien n'est appliqué. `SA` est toujours accepté.
+
+Choisir la valeur selon le comportement de l'élément, pas selon qu'il « semble lié » à ses voisins :
+- **`true` pour un élément indépendant** — un `bool` qui peut être vrai indépendamment de ses voisins (bouton d'action type start/abort/loop, interrupteur) doit avoir `directedit: true`. Une telle valeur reflète souvent une activité en cours, et plusieurs peuvent être vraies en même temps (ex. une boucle de capture en cours pendant qu'on demande un focus out). Le déclarer `false` prétendrait à tort que les éléments doivent être soumis en groupe, et un client qui suit cette page enverrait `SA`, contournant les modules qui ne traitent que `SV`.
+- **`false` seulement pour un vrai groupe** — des éléments qui n'ont de sens qu'ensemble : coordonnées RA/Déc, ou un vecteur de switches INDI reproduit à l'identique.
+
+Pour un groupe `false` d'éléments `bool` sous une règle exclusive (`OneOfMany` ou `AtMostOne`), sélectionner un élément revient à lui envoyer `true` et **tous ses voisins à `false`** dans le même `SA` — ne jamais renvoyer les valeurs courantes des voisins, sinon deux éléments finissent à `true`.
 {{% /notice %}}
 
 ---
