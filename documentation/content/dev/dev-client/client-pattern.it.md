@@ -62,6 +62,44 @@ valore. Il server fa fede; non tentare mai di "riempire" un campo
 mancante con il vecchio stato locale.
 {{% /notice %}}
 
+## Rendering: limitare gli aggiornamenti alla proprietà modificata
+
+{{% notice style="warning" title="Obbligatorio: mai un re-render più ampio della proprietà modificata" %}}
+Alcuni moduli possono inviare più aggiornamenti `ee`/`ea` **al
+secondo** (ad esempio un modulo che interroga continuamente un
+dispositivo). Un client che reagisce a ogni aggiornamento in arrivo
+ridisegnando tutta la sua UI — o anche solo l'intero modulo
+visualizzato — diventa inutilizzabile sotto questo carico: perdita del
+focus di digitazione, sfarfallio, e nel peggiore dei casi l'UI smette
+del tutto di rispondere agli input.
+
+Non è un caso limite da gestire "per precauzione": è un comportamento
+reale e attuale del backend, e i client **devono** essere costruiti
+per gestirlo fin dall'inizio:
+1. Ad ogni aggiornamento, deve essere sostituito/mutato solo l'oggetto
+   JS/dati della proprietà modificata. Il riferimento di ogni altra
+   proprietà deve rimanere esattamente identico finché non è
+   coinvolta.
+2. Il rendering della UI deve essere indicizzato sull'identità della
+   proprietà (o del modulo) — un elenco di proprietà dovrebbe
+   riutilizzare lo stesso elemento UI per la stessa proprietà tra un
+   rendering e l'altro, senza mai distruggerlo e ricrearlo, così un
+   campo non coinvolto non viene mai toccato, qualunque cosa succeda
+   altrove.
+3. Limitare solo la **frequenza** dei rendering (debounce/throttle)
+   non basta se il rendering stesso continua a ricostruire UI non
+   coinvolta — la soluzione sta nel **perimetro** di ciò che viene
+   ricostruito, non solo nella sua frequenza.
+
+Rooster (il frontend di produzione) implementa questo principio per
+costruzione: un aggiornamento in arrivo sostituisce solo il
+riferimento della proprietà coinvolta nello store, e ogni elenco di
+proprietà viene renderizzato con una chiave stabile per proprietà. Il
+risultato è che la UI delle proprietà non coinvolte non viene mai
+disturbata, indipendentemente dalla velocità con cui un'altra
+proprietà si aggiorna altrove.
+{{% /notice %}}
+
 ## Heartbeat
 
 {{% notice style="note" title="Facoltativo" %}}
@@ -119,10 +157,10 @@ ws.on("message", (data) => {
 });
 ```
 
-## Esempio: lettura e scrittura in OstErix
+## Esempio: lettura e scrittura in Rooster
 
 Estratti reali che illustrano la separazione lettura/scrittura vista in
-cima a questa pagina, una volta che un client reale (qui OstErix, in
+cima a questa pagina, una volta che un client reale (qui Rooster, in
 Angular) è costruito attorno a questo principio.
 
 **Lettura** — `datastore.service.ts`, un semplice accesso allo stato interno:

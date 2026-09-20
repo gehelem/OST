@@ -62,6 +62,43 @@ valor. El servidor es la autoridad; nunca intentar "rellenar" un campo
 ausente con el estado local anterior.
 {{% /notice %}}
 
+## Renderizado: limitar las actualizaciones a la propiedad modificada
+
+{{% notice style="warning" title="Obligatorio: nunca renderizar más allá de la propiedad modificada" %}}
+Algunos módulos pueden enviar varias actualizaciones `ee`/`ea` **por
+segundo** (por ejemplo, un módulo que consulta continuamente un
+dispositivo). Un cliente que reacciona a cada actualización recibida
+volviendo a renderizar toda su UI — o incluso solo todo el módulo
+mostrado — se vuelve inutilizable bajo esa carga: pérdida del foco de
+entrada, parpadeo y, en el peor de los casos, la UI deja de responder
+por completo a la interacción.
+
+Esto no es un caso límite a prevenir "por si acaso": es un
+comportamiento real y actual del backend, y los clientes **deben**
+construirse para soportarlo desde el principio:
+1. En cada actualización, solo debe reemplazarse/mutarse el objeto
+   JS/datos de la propiedad modificada. La referencia de cualquier
+   otra propiedad debe permanecer exactamente igual mientras no esté
+   afectada.
+2. El renderizado de la UI debe estar indexado por la identidad de la
+   propiedad (o del módulo) — una lista de propiedades debería
+   reutilizar el mismo elemento de UI para la misma propiedad entre
+   renderizados, sin destruirlo y recrearlo nunca, de forma que un
+   campo no afectado nunca se vea alterado, pase lo que pase en otro
+   lugar.
+3. Limitar solo la **frecuencia** de renderizado (debounce/throttle)
+   no es suficiente si el propio renderizado sigue reconstruyendo UI
+   no afectada — la solución está en el **alcance** de lo que se
+   reconstruye, no solo en su frecuencia.
+
+Rooster (el frontend de producción) implementa este principio por
+diseño: una actualización entrante solo reemplaza la referencia de la
+propiedad afectada en el store, y cada lista de propiedades se
+renderiza con una clave estable por propiedad. Como resultado, la UI
+de las propiedades no afectadas nunca se ve perturbada, sin importar
+la velocidad a la que otra propiedad se actualice en otro lugar.
+{{% /notice %}}
+
 ## Heartbeat
 
 {{% notice style="note" title="Opcional" %}}
@@ -118,10 +155,10 @@ ws.on("message", (data) => {
 });
 ```
 
-## Ejemplo: lectura y escritura en OstErix
+## Ejemplo: lectura y escritura en Rooster
 
 Extractos reales que ilustran la separación lectura/escritura del inicio
-de esta página, una vez que se construye un cliente real (aquí OstErix, en Angular)
+de esta página, una vez que se construye un cliente real (aquí Rooster, en Angular)
 alrededor de este principio.
 
 **Lectura** — `datastore.service.ts`, un simple acceso al estado interno:

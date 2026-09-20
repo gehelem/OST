@@ -76,16 +76,16 @@ Une propriété regroupe des éléments liés. Les propriétés sont affichées 
 | `elements` | object | Map nom d'élément → objet élément |
 
 {{% notice style="tip" title="`level1`/`level2`/`order` sont informatifs, pas un contrat" %}}
-Ces champs sont purement informatifs — le backend ne les impose jamais, et un client est libre de les respecter partiellement ou pas du tout. Ils expriment seulement la façon dont le développeur d'un module a envisagé d'organiser ses propriétés. C'est précisément ce qui permet à des clients génériques (OstErix, ostnoctua) de s'adapter à n'importe quel module sans UI dédiée par module.
+Ces champs sont purement informatifs — le backend ne les impose jamais, et un client est libre de les respecter partiellement ou pas du tout. Ils expriment seulement la façon dont le développeur d'un module a envisagé d'organiser ses propriétés. C'est précisément ce qui permet à des clients génériques (Rooster, ostnoctua) de s'adapter à n'importe quel module sans UI dédiée par module.
 
-Le client de référence (OstErix) regroupe les propriétés ainsi, pour un client qui viserait une mise en page générique similaire :
+Le client de référence (Rooster) regroupe les propriétés ainsi, pour un client qui viserait une mise en page générique similaire :
 1. `level1` vide → propriété affichée hors de tout onglet (rendue directement, triée par `order`).
 2. `level1` renseigné → regroupée dans un onglet nommé `level1`. À l'intérieur, `level2` vide → affichée directement sous l'onglet ; `level2` renseigné → dans un groupe repliable nommé `level2`.
 3. L'ordre des onglets (et des groupes à l'intérieur d'un onglet) n'est pas un champ séparé — il se déduit de la plus petite valeur `order` parmi les propriétés de ce groupe.
 4. À l'intérieur d'un groupe, les propriétés sont triées par leur propre `order`.
 
 Deux choses à connaître si vous construisez quelque chose de similaire :
-- `level1`/`level2` forment une "fausse hiérarchie" par choix de conception, pas une structure à deux niveaux garantie — rien n'empêche un module de laisser `level1` vide tout en renseignant `level2` (OstErix ne gère même pas ce cas particulier : la propriété atterrit simplement dans le groupe "sans level1", `level2` étant ignoré).
+- `level1`/`level2` forment une "fausse hiérarchie" par choix de conception, pas une structure à deux niveaux garantie — rien n'empêche un module de laisser `level1` vide tout en renseignant `level2` (Rooster ne gère même pas ce cas particulier : la propriété atterrit simplement dans le groupe "sans level1", `level2` étant ignoré).
 - `level1`/`level2` sont des libellés traduits, passant par le même mécanisme que `label`/`hint`. Utiliser la valeur brute de la chaîne comme clé d'état d'interface (ex. un panneau replié/déplié) est fragile d'un changement de langue à l'autre côté client — pas un bug, juste à éviter.
 {{% /notice %}}
 

@@ -73,16 +73,16 @@ A property groups related elements. Properties are displayed hierarchically usin
 | `elements` | object | Map of element name → element object |
 
 {{% notice style="tip" title="`level1`/`level2`/`order` are advisory, not a contract" %}}
-These fields are purely informative — the backend never enforces them, and a client is free to honor them partially or not at all. They only express how a given module's developer imagined organizing its own properties. This is exactly what lets generic clients (OstErix, ostnoctua) work with any module without custom UI per module.
+These fields are purely informative — the backend never enforces them, and a client is free to honor them partially or not at all. They only express how a given module's developer imagined organizing its own properties. This is exactly what lets generic clients (Rooster, ostnoctua) work with any module without custom UI per module.
 
-The reference client (OstErix) groups properties this way, for clients that want a similar generic layout:
+The reference client (Rooster) groups properties this way, for clients that want a similar generic layout:
 1. Empty `level1` → property shown outside any tab (rendered directly, sorted by `order`).
 2. Non-empty `level1` → grouped into a tab named `level1`. Inside it, empty `level2` → shown directly under the tab; non-empty `level2` → shown inside a collapsible group named `level2`.
 3. Tab order (and group order within a tab) isn't a separate field — it's derived from the *smallest* `order` value among the properties in that group.
 4. Within a group, properties are sorted by their own `order`.
 
 Two things worth knowing if you build something similar:
-- `level1`/`level2` form a "fake hierarchy" by design choice, not a guaranteed two-level structure — nothing stops a module from leaving `level1` empty while setting `level2` (OstErix doesn't even handle that combination specially; the property just lands in the "no level1" bucket, `level2` ignored).
+- `level1`/`level2` form a "fake hierarchy" by design choice, not a guaranteed two-level structure — nothing stops a module from leaving `level1` empty while setting `level2` (Rooster doesn't even handle that combination specially; the property just lands in the "no level1" bucket, `level2` ignored).
 - `level1`/`level2` are translatable labels, going through the same mechanism as `label`/`hint`. Keying UI state (e.g. an expanded/collapsed panel) off the raw string value is fragile across a client's language changes — not a bug, just worth avoiding.
 {{% /notice %}}
 

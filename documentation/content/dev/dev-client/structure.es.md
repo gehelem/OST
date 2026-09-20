@@ -73,16 +73,16 @@ Una propiedad agrupa elementos relacionados. Las propiedades se muestran jerárq
 | `elements` | object | Mapa nombre de elemento → objeto elemento |
 
 {{% notice style="tip" title="`level1`/`level2`/`order` son informativos, no un contrato" %}}
-Estos campos son puramente informativos — el backend nunca los impone, y un cliente es libre de respetarlos parcialmente o no respetarlos en absoluto. Solo expresan cómo el desarrollador de un módulo imaginó organizar sus propias propiedades. Esto es exactamente lo que permite a clientes genéricos (OstErix, ostnoctua) adaptarse a cualquier módulo sin una UI dedicada por módulo.
+Estos campos son puramente informativos — el backend nunca los impone, y un cliente es libre de respetarlos parcialmente o no respetarlos en absoluto. Solo expresan cómo el desarrollador de un módulo imaginó organizar sus propias propiedades. Esto es exactamente lo que permite a clientes genéricos (Rooster, ostnoctua) adaptarse a cualquier módulo sin una UI dedicada por módulo.
 
-El cliente de referencia (OstErix) agrupa las propiedades así, para un cliente que busque un diseño genérico similar:
+El cliente de referencia (Rooster) agrupa las propiedades así, para un cliente que busque un diseño genérico similar:
 1. `level1` vacío → propiedad mostrada fuera de cualquier pestaña (renderizada directamente, ordenada por `order`).
 2. `level1` con valor → agrupada en una pestaña llamada `level1`. Dentro de ella, `level2` vacío → mostrada directamente bajo la pestaña; `level2` con valor → dentro de un grupo plegable llamado `level2`.
 3. El orden de las pestañas (y de los grupos dentro de una pestaña) no es un campo aparte — se deduce del valor `order` más pequeño entre las propiedades de ese grupo.
 4. Dentro de un grupo, las propiedades se ordenan por su propio `order`.
 
 Dos cosas a tener en cuenta si se construye algo similar:
-- `level1`/`level2` forman una "falsa jerarquía" por decisión de diseño, no una estructura de dos niveles garantizada — nada impide que un módulo deje `level1` vacío mientras asigna `level2` (OstErix ni siquiera gestiona esa combinación de forma especial; la propiedad simplemente cae en el grupo "sin level1", ignorando `level2`).
+- `level1`/`level2` forman una "falsa jerarquía" por decisión de diseño, no una estructura de dos niveles garantizada — nada impide que un módulo deje `level1` vacío mientras asigna `level2` (Rooster ni siquiera gestiona esa combinación de forma especial; la propiedad simplemente cae en el grupo "sin level1", ignorando `level2`).
 - `level1`/`level2` son etiquetas traducidas, que pasan por el mismo mecanismo que `label`/`hint`. Usar el valor bruto de la cadena como clave de estado de la interfaz (ej. un panel expandido/plegado) es frágil ante cambios de idioma del cliente — no es un error, solo algo a evitar.
 {{% /notice %}}
 
