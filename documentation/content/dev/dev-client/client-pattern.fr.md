@@ -90,7 +90,7 @@ comportement réel et actuel du backend, et les clients **doivent**
    correctif est dans le **périmètre** de ce qui est reconstruit, pas
    seulement dans sa fréquence.
 
-OstErix (le frontend de production) implémente ce principe par
+Rooster (le frontend de production) implémente ce principe par
 construction : une mise à jour entrante ne remplace que la référence
 de la propriété concernée dans le store, et toute liste de propriétés
 est rendue avec une clé stable par propriété. Résultat : l'UI des
@@ -154,10 +154,10 @@ ws.on("message", (data) => {
 });
 ```
 
-## Exemple : lecture et écriture dans OstErix
+## Exemple : lecture et écriture dans Rooster
 
 Extraits réels illustrant la séparation lecture/écriture de tête de
-cette page, une fois qu'un vrai client (ici OstErix, en Angular) est
+cette page, une fois qu'un vrai client (ici Rooster, en Angular) est
 construit autour de ce principe.
 
 **Lecture** — `datastore.service.ts`, un simple accès à l'état interne :

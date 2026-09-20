@@ -91,7 +91,7 @@ construirse para soportarlo desde el principio:
    no afectada — la solución está en el **alcance** de lo que se
    reconstruye, no solo en su frecuencia.
 
-OstErix (el frontend de producción) implementa este principio por
+Rooster (el frontend de producción) implementa este principio por
 diseño: una actualización entrante solo reemplaza la referencia de la
 propiedad afectada en el store, y cada lista de propiedades se
 renderiza con una clave estable por propiedad. Como resultado, la UI
@@ -155,10 +155,10 @@ ws.on("message", (data) => {
 });
 ```
 
-## Ejemplo: lectura y escritura en OstErix
+## Ejemplo: lectura y escritura en Rooster
 
 Extractos reales que ilustran la separación lectura/escritura del inicio
-de esta página, una vez que se construye un cliente real (aquí OstErix, en Angular)
+de esta página, una vez que se construye un cliente real (aquí Rooster, en Angular)
 alrededor de este principio.
 
 **Lectura** — `datastore.service.ts`, un simple acceso al estado interno:

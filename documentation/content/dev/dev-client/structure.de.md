@@ -73,16 +73,16 @@ Eine Property gruppiert zusammengehörige Elemente. Properties werden hierarchis
 | `elements` | object | Map von Elementname → Element-Objekt |
 
 {{% notice style="tip" title="`level1`/`level2`/`order` sind informativ, kein Vertrag" %}}
-Diese Felder sind rein informativ — das Backend erzwingt sie nie, und ein Client kann sie teilweise oder gar nicht befolgen. Sie drücken nur aus, wie sich der Entwickler eines Moduls die Organisation seiner eigenen Properties vorgestellt hat. Genau das ermöglicht generischen Clients (OstErix, ostnoctua), sich an jedes Modul anzupassen, ohne modulspezifische UI.
+Diese Felder sind rein informativ — das Backend erzwingt sie nie, und ein Client kann sie teilweise oder gar nicht befolgen. Sie drücken nur aus, wie sich der Entwickler eines Moduls die Organisation seiner eigenen Properties vorgestellt hat. Genau das ermöglicht generischen Clients (Rooster, ostnoctua), sich an jedes Modul anzupassen, ohne modulspezifische UI.
 
-Der Referenz-Client (OstErix) gruppiert Properties so, für einen Client, der ein ähnliches generisches Layout anstrebt:
+Der Referenz-Client (Rooster) gruppiert Properties so, für einen Client, der ein ähnliches generisches Layout anstrebt:
 1. `level1` leer → Property außerhalb jedes Tabs angezeigt (direkt gerendert, nach `order` sortiert).
 2. `level1` gesetzt → in einem Tab namens `level1` gruppiert. Darin: `level2` leer → direkt unter dem Tab angezeigt; `level2` gesetzt → in einer einklappbaren Gruppe namens `level2`.
 3. Die Reihenfolge der Tabs (und der Gruppen innerhalb eines Tabs) ist kein eigenes Feld — sie ergibt sich aus dem *kleinsten* `order`-Wert unter den Properties dieser Gruppe.
 4. Innerhalb einer Gruppe werden Properties nach ihrem eigenen `order` sortiert.
 
 Zwei Dinge, die man kennen sollte, wenn man etwas Ähnliches baut:
-- `level1`/`level2` bilden bewusst eine "unechte Hierarchie", keine garantierte zweistufige Struktur — nichts hindert ein Modul daran, `level1` leer zu lassen und trotzdem `level2` zu setzen (OstErix behandelt diese Kombination nicht einmal gesondert; die Property landet einfach im "kein level1"-Topf, `level2` wird ignoriert).
+- `level1`/`level2` bilden bewusst eine "unechte Hierarchie", keine garantierte zweistufige Struktur — nichts hindert ein Modul daran, `level1` leer zu lassen und trotzdem `level2` zu setzen (Rooster behandelt diese Kombination nicht einmal gesondert; die Property landet einfach im "kein level1"-Topf, `level2` wird ignoriert).
 - `level1`/`level2` sind übersetzte Bezeichnungen, die denselben Mechanismus wie `label`/`hint` durchlaufen. Den rohen String-Wert als UI-Zustandsschlüssel zu verwenden (z. B. für ein auf-/zugeklapptes Panel) ist über Sprachwechsel des Clients hinweg brüchig — kein Bug, nur etwas, das man vermeiden sollte.
 {{% /notice %}}
 

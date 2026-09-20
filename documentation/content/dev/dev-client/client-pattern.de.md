@@ -90,7 +90,7 @@ Anfang an dafür gebaut sein:
    UI neu aufbaut — die Lösung liegt im **Umfang** dessen, was neu
    aufgebaut wird, nicht nur in dessen Häufigkeit.
 
-OstErix (das Produktions-Frontend) setzt dieses Prinzip von Grund auf
+Rooster (das Produktions-Frontend) setzt dieses Prinzip von Grund auf
 um: Ein eingehendes Update ersetzt im Store nur die Referenz der
 betroffenen Property, und jede Liste von Properties wird mit einem
 stabilen Schlüssel pro Property gerendert. Dadurch wird die UI nicht
@@ -155,10 +155,10 @@ ws.on("message", (data) => {
 });
 ```
 
-## Beispiel: Lesen und Schreiben in OstErix
+## Beispiel: Lesen und Schreiben in Rooster
 
 Reale Ausschnitte, die die eingangs beschriebene Trennung von Lesen und
-Schreiben veranschaulichen, sobald ein tatsächlicher Client (hier OstErix,
+Schreiben veranschaulichen, sobald ein tatsächlicher Client (hier Rooster,
 in Angular) nach diesem Grundsatz aufgebaut ist.
 
 **Lesen** — `datastore.service.ts`, ein einfacher Zugriff auf den internen

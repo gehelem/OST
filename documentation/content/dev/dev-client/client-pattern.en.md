@@ -88,7 +88,7 @@ from the start:
    — the fix is in the **scope** of what gets rebuilt, not just how
    often.
 
-OstErix (the production frontend) implements this by design: an
+Rooster (the production frontend) implements this by design: an
 incoming update only replaces the touched property's reference in the
 store, and every list of properties is rendered with a stable
 per-property key. As a result, unrelated properties' UI is never
@@ -149,10 +149,10 @@ ws.on("message", (data) => {
 });
 ```
 
-## Example: reading and writing in OstErix
+## Example: reading and writing in Rooster
 
 Real excerpts illustrating the read/write separation from the top of
-this page, once an actual client (here OstErix, in Angular) is built
+this page, once an actual client (here Rooster, in Angular) is built
 around this principle.
 
 **Read** — `datastore.service.ts`, a plain access to the internal state:

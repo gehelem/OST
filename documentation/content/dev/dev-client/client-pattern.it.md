@@ -91,7 +91,7 @@ per gestirlo fin dall'inizio:
    coinvolta — la soluzione sta nel **perimetro** di ciò che viene
    ricostruito, non solo nella sua frequenza.
 
-OstErix (il frontend di produzione) implementa questo principio per
+Rooster (il frontend di produzione) implementa questo principio per
 costruzione: un aggiornamento in arrivo sostituisce solo il
 riferimento della proprietà coinvolta nello store, e ogni elenco di
 proprietà viene renderizzato con una chiave stabile per proprietà. Il
@@ -157,10 +157,10 @@ ws.on("message", (data) => {
 });
 ```
 
-## Esempio: lettura e scrittura in OstErix
+## Esempio: lettura e scrittura in Rooster
 
 Estratti reali che illustrano la separazione lettura/scrittura vista in
-cima a questa pagina, una volta che un client reale (qui OstErix, in
+cima a questa pagina, una volta che un client reale (qui Rooster, in
 Angular) è costruito attorno a questo principio.
 
 **Lettura** — `datastore.service.ts`, un semplice accesso allo stato interno:
