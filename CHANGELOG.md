@@ -1,3 +1,9 @@
+## 0.0.14 (2026-09-20)
+
+### other (1 change)
+
+- [Document directedit enforcement and the independent-bool principle](https://gitlab.ostserver.fr/ost/ostserver/-/commit/53da9fe9a666c5704bd23a427dbdd010c2187977) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/248))
+
 ## 0.0.12 (2026-09-19)
 
 ### fixed (2 changes)
