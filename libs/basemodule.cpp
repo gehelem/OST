@@ -216,6 +216,11 @@ bool Basemodule::onExternalEventBase(OST::ExtEvent event)
             logError("Basemodule::onExternalEventBase - element %1-%2 not found", {event.prpkey, event.eltkey});
             return false;
         }
+        if (!getStore()[event.prpkey]->getElt(event.eltkey)->getDirectEdit())
+        {
+            logError("Basemodule::onExternalEventBase - element %1-%2 requires SA (directedit=false)", {event.prpkey, event.eltkey});
+            return false;
+        }
         if (getStore()[event.prpkey]->getElt(event.eltkey)->autoUpdate() || getStore()[event.prpkey]->autoUpdate())
         {
             getStore()[event.prpkey]->setElt(event.eltkey, e.begin().value().toVariant(), true);
