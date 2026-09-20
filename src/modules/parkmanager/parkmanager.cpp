@@ -25,22 +25,27 @@ Parkmanager::Parkmanager(QString name, QString label, QString profile, QVariantM
 
     OST::ElementBool* b = new OST::ElementBool("open", "Open all", "10", "");
     b->setPreIcon("play_arrow");
+    b->setDirectEdit(true);
     pm->addElt(b);
 
     b = new OST::ElementBool("close", "Close all", "20", "");
     b->setPreIcon("stop");
+    b->setDirectEdit(true);
     pm->addElt(b);
 
     b = new OST::ElementBool("auto", "Automate", "30", "");
     b->setPreIcon("hdr_auto");
+    b->setDirectEdit(true);
     pm->addElt(b);
 
     b = new OST::ElementBool("abort", "Abort motion", "40", "");
     b->setPreIcon("close");
+    b->setDirectEdit(true);
     pm->addElt(b);
 
     b = new OST::ElementBool("idle", "Idle", "50", "");
     b->setPreIcon("mode_standby");
+    b->setDirectEdit(true);
     pm->addElt(b);
 
     getEltBool("actions", "idle")->setValue(true, true);

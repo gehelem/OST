@@ -209,6 +209,7 @@
             "go": {
                 "type":"bool",
                 "label": "GO",
+                "directedit":true,
                 "order": "1",
                 "value":false
             },

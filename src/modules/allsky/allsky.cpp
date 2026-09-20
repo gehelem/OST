@@ -49,11 +49,14 @@ Allsky::Allsky(QString name, QString label, QString profile, QVariantMap availab
 
     OST::ElementBool* b = new OST::ElementBool("loop", "Play", "0", "");
     getProperty("actions")->addElt( b);
+    b->setDirectEdit(true);
     b->setAutoUpdate(true);
     b = new OST::ElementBool("abort", "Stop", "2", "");
     getProperty("actions")->addElt( b);
+    b->setDirectEdit(true);
     b->setAutoUpdate(true);
     b = new OST::ElementBool("pause", "Pause", "1", "");
+    b->setDirectEdit(true);
     b->setAutoUpdate(true);
     getProperty("actions")->addElt(b);
     getProperty("actions")->deleteElt("startsequence");
@@ -341,7 +344,7 @@ void Allsky::newBLOB(INDI::PropertyBlob pblob)
         if (totalBytes > 0 && freeBytes * 100 / totalBytes < getMinFreePercent())
         {
             logWarning("Allsky: disk too full (%1 MB free, threshold %2%) — frame not saved",
-                       {freeBytes / (1024 * 1024), getMinFreePercent()});
+            {freeBytes / (1024 * 1024), getMinFreePercent()});
             return;
         }
 

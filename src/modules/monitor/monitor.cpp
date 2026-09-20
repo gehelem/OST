@@ -30,9 +30,11 @@ Monitor::Monitor(QString name, QString label, QString profile, QVariantMap avail
     OST::PropertyMulti* pm = getProperty("actions");
     OST::ElementBool* b = new OST::ElementBool("start", "Start", "010", "");
     b->setValue(false, false);
+    b->setDirectEdit(true);
     pm->addElt(b);
     b = new OST::ElementBool("stop", "Stop", "020", "");
     b->setValue(false, false);
+    b->setDirectEdit(true);
     pm->addElt(b);
 
     getProperty("events")->setGridLimit(1000000);

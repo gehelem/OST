@@ -97,10 +97,12 @@ Guider::Guider(QString name, QString label, QString profile, QVariantMap availab
     OST::PropertyMulti* pm = getProperty("actions");
     OST::ElementBool* b = new OST::ElementBool("resetcalibration", "Reset calibration", "guid10", "");
     b->setValue(false, false);
+    b->setDirectEdit(true);
     b->setPreIcon("block");
     pm->addElt(b);
     OST::ElementBool* dither = new OST::ElementBool("dither", "Dither", "guid11", "");
     dither->setValue(false, false);
+    dither->setDirectEdit(true);
     dither->setPreIcon("shuffle");
     pm->addElt(dither);
 
@@ -893,10 +895,10 @@ void Guider::SMComputeCal()
     // Per-pulse increment: current vs previous calibration frame (drives the
     // pulse-rate calculation).
     startracker::MatchResult inc = startracker::match(toTrackStars(_prevStars), cur,
-                                                     _dxPrev, _dyPrev, tp);
+                                   _dxPrev, _dyPrev, tp);
     // Total drift vs the initialization reference (display only).
     startracker::MatchResult tot = startracker::match(toTrackStars(starsFirst), cur,
-                                                     0.0, 0.0, tp);
+                                   0.0, 0.0, tp);
 
     if (!inc.ok)
     {
@@ -959,236 +961,240 @@ void Guider::SMComputeCal()
 
     if (!wasKick)
     {
-    _calStep++;
+        _calStep++;
 
-    // Send progress messages during calibration
-    QString directionName;
-    if (_calState == 0) directionName = "West";
-    else if (_calState == 1) directionName = "East";
-    else if (_calState == 2) directionName = "North";
-    else if (_calState == 3) directionName = "South";
+        // Send progress messages during calibration
+        QString directionName;
+        if (_calState == 0) directionName = "West";
+        else if (_calState == 1) directionName = "East";
+        else if (_calState == 2) directionName = "North";
+        else if (_calState == 3) directionName = "South";
 
-    logInfo("Calibration %1 - step %2/%3", {directionName, QString::number(_calStep), QString::number(getInt("calParams", "calsteps"))});
+        logInfo("Calibration %1 - step %2/%3", {directionName, QString::number(_calStep), QString::number(getInt("calParams", "calsteps"))});
 
-    if (_calStep >= getInt("calParams", "calsteps") )
-    {
-        double ddx = 0;
-        double ddy = 0;
-        for (unsigned int i = 0; i < _dxvector.size(); i++)
+        if (_calStep >= getInt("calParams", "calsteps") )
         {
-            ddx = ddx + _dxvector[i];
-            ddy = ddy + _dyvector[i];
-        }
-        ddx = ddx / (_dxvector.size());
-        ddy = ddy / (_dyvector.size());
-
-        // Keep each pass' mean (ref-cur) increment; the axis rates and the CCD
-        // orientation are derived below from the antisymmetric combinations
-        // West-East and North-South, which cancel the sidereal / periodic-error
-        // drift that otherwise biases every one-directional pass.
-        _calPassMean[_calState][0] = ddx;
-        _calPassMean[_calState][1] = ddy;
-
-        double ech = getSampling();
-        double rawMag = sqrt(square(ddx) + square(ddy));
-        double rawRate = (rawMag > 1e-6) ? getInt("calParams", "pulse") / rawMag : 0;
-        const char *dir = (_calState == 0) ? "West" : (_calState == 1) ? "East"
-                          : (_calState == 2) ? "North" : "South";
-        const char *evk = (_calState == 0) ? "westcomplete" : (_calState == 1) ? "estcomplete"
-                          : (_calState == 2) ? "northcomplete" : "southcomplete";
-        if (_calState == 0) { _calPulseW = rawRate; _calMountPointingWest = _mountPointingWest; }
-        else if (_calState == 1) _calPulseE = rawRate;
-        else if (_calState == 2) _calPulseN = rawRate;
-        else                     _calPulseS = rawRate;
-        logInfo("%1 pass: increment (ref-cur)=(%2,%3)px  raw %4 ms/px (drift=%5\")",
-        {
-            QString(dir), QString::number(ddx, 'f', 2), QString::number(ddy, 'f', 2),
-            QString::number(rawRate, 'f', 1), QString::number(rawMag * ech, 'f', 2)
-        });
-        setStateEvent(OST::Busy, "cal", evk, evk);
-
-        _calStep = 0;
-        _calState++;
-        _dxvector.clear();
-        _dyvector.clear();
-
-        if (_calState >= 4)
-        {
-            // --- combine the 4 passes -------------------------------------------
-            double dRAx = (_calPassMean[0][0] - _calPassMean[1][0]) / 2.0;
-            double dRAy = (_calPassMean[0][1] - _calPassMean[1][1]) / 2.0;
-            double dDEx = (_calPassMean[2][0] - _calPassMean[3][0]) / 2.0;
-            double dDEy = (_calPassMean[2][1] - _calPassMean[3][1]) / 2.0;
-            double bgx  = (_calPassMean[0][0] + _calPassMean[1][0]) / 2.0;  // background drift estimate
-            double bgy  = (_calPassMean[0][1] + _calPassMean[1][1]) / 2.0;
-
-            double magRA = sqrt(square(dRAx) + square(dRAy));
-            double magDE = sqrt(square(dDEx) + square(dDEy));
-            _calPulseRA  = (magRA > 1e-6) ? getInt("calParams", "pulse") / magRA : 0;
-            _calPulseDEC = (magDE > 1e-6) ? getInt("calParams", "pulse") / magDE : 0;
-
-            // CCD orientation from BOTH axes (Ekos-style two-estimate average).
-            double angleRA = atan2(dRAy, dRAx);
-            double angleDE = atan2(-dDEx, dDEy);   // DEC axis expressed in the RA-axis convention
-            if (fabs(atan2(sin(angleDE - angleRA), cos(angleDE - angleRA))) > PI / 2.0)
-                angleDE += PI;                     // resolve the 180-deg ambiguity against the RA axis
-            _calCcdOrientation = atan2(sin(angleRA) + sin(angleDE), cos(angleRA) + cos(angleDE));
-
-            // --- B2 test: is the drift -> RA/DEC transform a correct rotation? ---
-            // It's coded as a reflection: [cos, sin ; sin, -cos] (det = -1),
-            // meant to fold in the image Y-flip. Feed the two clean calibration
-            // vectors through it: a pure-RA move must come out ~(+-|RA|, 0), a
-            // pure-DEC move ~(0, +-|DEC|). Cross-leak, or an RA/DEC axis
-            // separation far from +-90 deg, means theta or the image handedness
-            // is wrong.
+            double ddx = 0;
+            double ddy = 0;
+            for (unsigned int i = 0; i < _dxvector.size(); i++)
             {
-                const double c = cos(_calCcdOrientation), s = sin(_calCcdOrientation);
-                double raOnRA =  dRAx * c + dRAy * s,  deOnRA = dRAx * s - dRAy * c;
-                double raOnDE =  dDEx * c + dDEy * s,  deOnDE = dDEx * s - dDEy * c;
-                // physical image-plane angle between the two calibration axes
-                double dirDE = atan2(dDEy, dDEx);
-                double sep = atan2(sin(dirDE - angleRA), cos(dirDE - angleRA)) * 180.0 / PI;
-                logInfo("B2 test: rot(RAaxis)=(%1,%2) [want (+-%3,~0)]  rot(DECaxis)=(%4,%5) [want (~0,+-%6)]",
-                {
-                    QString::number(raOnRA, 'f', 2), QString::number(deOnRA, 'f', 2), QString::number(magRA, 'f', 2),
-                    QString::number(raOnDE, 'f', 2), QString::number(deOnDE, 'f', 2), QString::number(magDE, 'f', 2)
-                });
-                logInfo("B2 test: RA-DEC axis separation=%1 deg (want +-90)  RA-axis DEC-leak=%2%%  DEC-axis RA-leak=%3%%",
-                {
-                    QString::number(sep, 'f', 1),
-                    QString::number(magRA > 1e-6 ? 100.0 * fabs(deOnRA) / magRA : 0, 'f', 1),
-                    QString::number(magDE > 1e-6 ? 100.0 * fabs(raOnDE) / magDE : 0, 'f', 1)
-                });
+                ddx = ddx + _dxvector[i];
+                ddy = ddy + _dyvector[i];
             }
+            ddx = ddx / (_dxvector.size());
+            ddy = ddy / (_dyvector.size());
 
-            // Calibration quality: how much of each per-pulse increment was the
-            // constant background drift (tracking / polar-alignment error) rather
-            // than the pulse itself. High ratio -> the differenced rates rest on
-            // a shaky assumption and the mount's polar alignment is likely poor.
-            double bgMag = sqrt(square(bgx) + square(bgy));
-            double sigMin = qMin(magRA, magDE);
-            double driftRatio = (sigMin > 1e-6) ? bgMag / sigMin : 999.0;
-            double maxRatio = getFloat("calParams", "calmaxdriftratio");
+            // Keep each pass' mean (ref-cur) increment; the axis rates and the CCD
+            // orientation are derived below from the antisymmetric combinations
+            // West-East and North-South, which cancel the sidereal / periodic-error
+            // drift that otherwise biases every one-directional pass.
+            _calPassMean[_calState][0] = ddx;
+            _calPassMean[_calState][1] = ddy;
 
-            logInfo("Calibration: RA %1 ms/px, DEC %2 ms/px, angle %3 deg (RA %4 / DE %5), background drift (%6,%7) px/frame, drift ratio %8",
+            double ech = getSampling();
+            double rawMag = sqrt(square(ddx) + square(ddy));
+            double rawRate = (rawMag > 1e-6) ? getInt("calParams", "pulse") / rawMag : 0;
+            const char *dir = (_calState == 0) ? "West" : (_calState == 1) ? "East"
+                              : (_calState == 2) ? "North" : "South";
+            const char *evk = (_calState == 0) ? "westcomplete" : (_calState == 1) ? "estcomplete"
+                              : (_calState == 2) ? "northcomplete" : "southcomplete";
+            if (_calState == 0)
             {
-                QString::number(_calPulseRA, 'f', 1), QString::number(_calPulseDEC, 'f', 1),
-                QString::number(_calCcdOrientation * 180.0 / PI, 'f', 1),
-                QString::number(angleRA * 180.0 / PI, 'f', 1), QString::number(angleDE * 180.0 / PI, 'f', 1),
-                QString::number(bgx, 'f', 2), QString::number(bgy, 'f', 2),
-                QString::number(driftRatio, 'f', 2)
+                _calPulseW = rawRate;
+                _calMountPointingWest = _mountPointingWest;
+            }
+            else if (_calState == 1) _calPulseE = rawRate;
+            else if (_calState == 2) _calPulseN = rawRate;
+            else                     _calPulseS = rawRate;
+            logInfo("%1 pass: increment (ref-cur)=(%2,%3)px  raw %4 ms/px (drift=%5\")",
+            {
+                QString(dir), QString::number(ddx, 'f', 2), QString::number(ddy, 'f', 2),
+                QString::number(rawRate, 'f', 1), QString::number(rawMag * ech, 'f', 2)
             });
+            setStateEvent(OST::Busy, "cal", evk, evk);
 
-            OST::State qual = (driftRatio < 0.30) ? OST::Ok
-                              : (maxRatio <= 0 || driftRatio < maxRatio) ? OST::Busy : OST::Error;
-            getEltLight("calibrationvalues", "calqual")->setValue(qual, true);
+            _calStep = 0;
+            _calState++;
+            _dxvector.clear();
+            _dyvector.clear();
 
-            if (maxRatio > 0 && driftRatio > maxRatio)
+            if (_calState >= 4)
             {
-                _calRetry++;
-                int maxRetry = getInt("calParams", "calmaxretries");
-                logWarning("Calibration quality poor: background drift is %1x the pulse signal (limit %2) - check the mount's polar alignment",
-                {QString::number(driftRatio, 'f', 2), QString::number(maxRatio, 'f', 2)});
+                // --- combine the 4 passes -------------------------------------------
+                double dRAx = (_calPassMean[0][0] - _calPassMean[1][0]) / 2.0;
+                double dRAy = (_calPassMean[0][1] - _calPassMean[1][1]) / 2.0;
+                double dDEx = (_calPassMean[2][0] - _calPassMean[3][0]) / 2.0;
+                double dDEy = (_calPassMean[2][1] - _calPassMean[3][1]) / 2.0;
+                double bgx  = (_calPassMean[0][0] + _calPassMean[1][0]) / 2.0;  // background drift estimate
+                double bgy  = (_calPassMean[0][1] + _calPassMean[1][1]) / 2.0;
 
-                if (_calRetry <= maxRetry)
+                double magRA = sqrt(square(dRAx) + square(dRAy));
+                double magDE = sqrt(square(dDEx) + square(dDEy));
+                _calPulseRA  = (magRA > 1e-6) ? getInt("calParams", "pulse") / magRA : 0;
+                _calPulseDEC = (magDE > 1e-6) ? getInt("calParams", "pulse") / magDE : 0;
+
+                // CCD orientation from BOTH axes (Ekos-style two-estimate average).
+                double angleRA = atan2(dRAy, dRAx);
+                double angleDE = atan2(-dDEx, dDEy);   // DEC axis expressed in the RA-axis convention
+                if (fabs(atan2(sin(angleDE - angleRA), cos(angleDE - angleRA))) > PI / 2.0)
+                    angleDE += PI;                     // resolve the 180-deg ambiguity against the RA axis
+                _calCcdOrientation = atan2(sin(angleRA) + sin(angleDE), cos(angleRA) + cos(angleDE));
+
+                // --- B2 test: is the drift -> RA/DEC transform a correct rotation? ---
+                // It's coded as a reflection: [cos, sin ; sin, -cos] (det = -1),
+                // meant to fold in the image Y-flip. Feed the two clean calibration
+                // vectors through it: a pure-RA move must come out ~(+-|RA|, 0), a
+                // pure-DEC move ~(0, +-|DEC|). Cross-leak, or an RA/DEC axis
+                // separation far from +-90 deg, means theta or the image handedness
+                // is wrong.
                 {
-                    logWarning("Retrying calibration (%1/%2)", {QString::number(_calRetry), QString::number(maxRetry)});
-                    _calState = 0;
-                    _calStep = 0;
-                    _calAwaitingKick = false;
-                    _dxvector.clear();
-                    _dyvector.clear();
-                    for (int i = 0; i < 4; i++) _calPassMean[i][0] = _calPassMean[i][1] = 0;
-                    _dxPrev = 0;
-                    _dyPrev = 0;
-                    _pulseW = getInt("calParams", "pulse");   // restart the West pass
-                    setStateEvent(OST::Busy, "cal", "calretry", "calibration retry");
-                    emit ComputeCalDone();                     // -> RequestCalPulses
-                    return;
+                    const double c = cos(_calCcdOrientation), s = sin(_calCcdOrientation);
+                    double raOnRA =  dRAx * c + dRAy * s,  deOnRA = dRAx * s - dRAy * c;
+                    double raOnDE =  dDEx * c + dDEy * s,  deOnDE = dDEx * s - dDEy * c;
+                    // physical image-plane angle between the two calibration axes
+                    double dirDE = atan2(dDEy, dDEx);
+                    double sep = atan2(sin(dirDE - angleRA), cos(dirDE - angleRA)) * 180.0 / PI;
+                    logInfo("B2 test: rot(RAaxis)=(%1,%2) [want (+-%3,~0)]  rot(DECaxis)=(%4,%5) [want (~0,+-%6)]",
+                    {
+                        QString::number(raOnRA, 'f', 2), QString::number(deOnRA, 'f', 2), QString::number(magRA, 'f', 2),
+                        QString::number(raOnDE, 'f', 2), QString::number(deOnDE, 'f', 2), QString::number(magDE, 'f', 2)
+                    });
+                    logInfo("B2 test: RA-DEC axis separation=%1 deg (want +-90)  RA-axis DEC-leak=%2%%  DEC-axis RA-leak=%3%%",
+                    {
+                        QString::number(sep, 'f', 1),
+                        QString::number(magRA > 1e-6 ? 100.0 * fabs(deOnRA) / magRA : 0, 'f', 1),
+                        QString::number(magDE > 1e-6 ? 100.0 * fabs(raOnDE) / magDE : 0, 'f', 1)
+                    });
                 }
 
-                logError("Calibration failed: still poor after %1 retries - Abort. Fix the mount's polar alignment.",
-                {QString::number(maxRetry)});
-                setStateEvent(OST::Error, "error", "calbad", "calibration quality too poor");
-                emit Abort();
+                // Calibration quality: how much of each per-pulse increment was the
+                // constant background drift (tracking / polar-alignment error) rather
+                // than the pulse itself. High ratio -> the differenced rates rest on
+                // a shaky assumption and the mount's polar alignment is likely poor.
+                double bgMag = sqrt(square(bgx) + square(bgy));
+                double sigMin = qMin(magRA, magDE);
+                double driftRatio = (sigMin > 1e-6) ? bgMag / sigMin : 999.0;
+                double maxRatio = getFloat("calParams", "calmaxdriftratio");
+
+                logInfo("Calibration: RA %1 ms/px, DEC %2 ms/px, angle %3 deg (RA %4 / DE %5), background drift (%6,%7) px/frame, drift ratio %8",
+                {
+                    QString::number(_calPulseRA, 'f', 1), QString::number(_calPulseDEC, 'f', 1),
+                    QString::number(_calCcdOrientation * 180.0 / PI, 'f', 1),
+                    QString::number(angleRA * 180.0 / PI, 'f', 1), QString::number(angleDE * 180.0 / PI, 'f', 1),
+                    QString::number(bgx, 'f', 2), QString::number(bgy, 'f', 2),
+                    QString::number(driftRatio, 'f', 2)
+                });
+
+                OST::State qual = (driftRatio < 0.30) ? OST::Ok
+                                  : (maxRatio <= 0 || driftRatio < maxRatio) ? OST::Busy : OST::Error;
+                getEltLight("calibrationvalues", "calqual")->setValue(qual, true);
+
+                if (maxRatio > 0 && driftRatio > maxRatio)
+                {
+                    _calRetry++;
+                    int maxRetry = getInt("calParams", "calmaxretries");
+                    logWarning("Calibration quality poor: background drift is %1x the pulse signal (limit %2) - check the mount's polar alignment",
+                    {QString::number(driftRatio, 'f', 2), QString::number(maxRatio, 'f', 2)});
+
+                    if (_calRetry <= maxRetry)
+                    {
+                        logWarning("Retrying calibration (%1/%2)", {QString::number(_calRetry), QString::number(maxRetry)});
+                        _calState = 0;
+                        _calStep = 0;
+                        _calAwaitingKick = false;
+                        _dxvector.clear();
+                        _dyvector.clear();
+                        for (int i = 0; i < 4; i++) _calPassMean[i][0] = _calPassMean[i][1] = 0;
+                        _dxPrev = 0;
+                        _dyPrev = 0;
+                        _pulseW = getInt("calParams", "pulse");   // restart the West pass
+                        setStateEvent(OST::Busy, "cal", "calretry", "calibration retry");
+                        emit ComputeCalDone();                     // -> RequestCalPulses
+                        return;
+                    }
+
+                    logError("Calibration failed: still poor after %1 retries - Abort. Fix the mount's polar alignment.",
+                    {QString::number(maxRetry)});
+                    setStateEvent(OST::Error, "error", "calbad", "calibration quality too poor");
+                    emit Abort();
+                    return;
+                }
+                _calRetry = 0;
+
+                _calMountDEC = _mountDEC;
+                double decCompensation = cos(_calMountDEC * PI / 180.0);
+                double calPulseRAmeas = _calPulseRA;   // rate as measured at the calibration declination
+                if (decCompensation > 0.1)  // skip near the pole (RA barely moves there)
+                {
+                    // Normalise the RA rate to the equator: a pulse at declination d
+                    // moves the star by rate*pulse*cos(d) on the sensor, so ms/px
+                    // scales as 1/cos(d). Store R_meas * cos(calDEC); SMComputeGuide
+                    // divides by cos(curDEC).
+                    _calPulseRA = _calPulseRA * decCompensation;
+                    logInfo("DEC normalisation: RA rate %1 ms/px at calDEC=%2 deg -> equatorial %3 ms/px (factor %4)",
+                    {
+                        QString::number(calPulseRAmeas, 'f', 1), QString::number(_calMountDEC, 'f', 1),
+                        QString::number(_calPulseRA, 'f', 1), QString::number(decCompensation, 'f', 3)
+                    });
+                }
+
+                // Persist: RA/DE are the rates used for guiding; N/S/E/W kept as raw
+                // per-direction diagnostics (they still carry the background drift).
+                getEltFloat("calibrationvalues", "calPulseRA")->setValue(_calPulseRA);
+                getEltFloat("calibrationvalues", "calPulseDE")->setValue(_calPulseDEC);
+                getEltFloat("calibrationvalues", "calPulseN")->setValue(_calPulseN);
+                getEltFloat("calibrationvalues", "calPulseS")->setValue(_calPulseS);
+                getEltFloat("calibrationvalues", "calPulseE")->setValue(_calPulseE);
+                getEltFloat("calibrationvalues", "calPulseW")->setValue(_calPulseW);
+                getEltFloat("calibrationvalues", "ccdOrientation")->setValue(_calCcdOrientation * 180 / PI);
+                getEltFloat("calibrationvalues", "calMountDEC")->setValue(_calMountDEC);
+                getEltBool("calibrationvalues", "revRA")->setValue(getBool("revCorrections", "revRA"));
+                getEltBool("calibrationvalues", "revDE")->setValue(getBool("revCorrections", "revDE"), true);
+                logInfo("Calibration completed successfully");
+                getProperty("actions")->setState(OST::Ok, true);
+                emit CalibrationDone();
+                setStateEvent(OST::Busy, "caldone", "calcompleted", "calibration completed");
+                // The post-calibration position becomes the guiding reference.
+                starsFirst = _solver.stars;
                 return;
             }
-            _calRetry = 0;
 
-            _calMountDEC = _mountDEC;
-            double decCompensation = cos(_calMountDEC * PI / 180.0);
-            double calPulseRAmeas = _calPulseRA;   // rate as measured at the calibration declination
-            if (decCompensation > 0.1)  // skip near the pole (RA barely moves there)
+            // Entering the North or South pass: take up mechanical backlash first,
+            // so the timed measurement pulses that follow aren't partially wasted
+            // engaging the gears.
+            if (_calState == 2 || _calState == 3)
             {
-                // Normalise the RA rate to the equator: a pulse at declination d
-                // moves the star by rate*pulse*cos(d) on the sensor, so ms/px
-                // scales as 1/cos(d). Store R_meas * cos(calDEC); SMComputeGuide
-                // divides by cos(curDEC).
-                _calPulseRA = _calPulseRA * decCompensation;
-                logInfo("DEC normalisation: RA rate %1 ms/px at calDEC=%2 deg -> equatorial %3 ms/px (factor %4)",
+                int kick = getInt("calParams", "decbacklashkick");
+                if (kick > 0)
                 {
-                    QString::number(calPulseRAmeas, 'f', 1), QString::number(_calMountDEC, 'f', 1),
-                    QString::number(_calPulseRA, 'f', 1), QString::number(decCompensation, 'f', 3)
-                });
-            }
-
-            // Persist: RA/DE are the rates used for guiding; N/S/E/W kept as raw
-            // per-direction diagnostics (they still carry the background drift).
-            getEltFloat("calibrationvalues", "calPulseRA")->setValue(_calPulseRA);
-            getEltFloat("calibrationvalues", "calPulseDE")->setValue(_calPulseDEC);
-            getEltFloat("calibrationvalues", "calPulseN")->setValue(_calPulseN);
-            getEltFloat("calibrationvalues", "calPulseS")->setValue(_calPulseS);
-            getEltFloat("calibrationvalues", "calPulseE")->setValue(_calPulseE);
-            getEltFloat("calibrationvalues", "calPulseW")->setValue(_calPulseW);
-            getEltFloat("calibrationvalues", "ccdOrientation")->setValue(_calCcdOrientation * 180 / PI);
-            getEltFloat("calibrationvalues", "calMountDEC")->setValue(_calMountDEC);
-            getEltBool("calibrationvalues", "revRA")->setValue(getBool("revCorrections", "revRA"));
-            getEltBool("calibrationvalues", "revDE")->setValue(getBool("revCorrections", "revDE"), true);
-            logInfo("Calibration completed successfully");
-            getProperty("actions")->setState(OST::Ok, true);
-            emit CalibrationDone();
-            setStateEvent(OST::Busy, "caldone", "calcompleted", "calibration completed");
-            // The post-calibration position becomes the guiding reference.
-            starsFirst = _solver.stars;
-            return;
-        }
-
-        // Entering the North or South pass: take up mechanical backlash first,
-        // so the timed measurement pulses that follow aren't partially wasted
-        // engaging the gears.
-        if (_calState == 2 || _calState == 3)
-        {
-            int kick = getInt("calParams", "decbacklashkick");
-            if (kick > 0)
-            {
-                if (_calState == 2) _pulseN = kick;
-                else                _pulseS = kick;
-                _calAwaitingKick = true;
-                logInfo("Sending %1ms DEC backlash kick before the %2 calibration pass",
-                {QString::number(kick), _calState == 2 ? "North" : "South"});
+                    if (_calState == 2) _pulseN = kick;
+                    else                _pulseS = kick;
+                    _calAwaitingKick = true;
+                    logInfo("Sending %1ms DEC backlash kick before the %2 calibration pass",
+                    {QString::number(kick), _calState == 2 ? "North" : "South"});
+                }
             }
         }
-    }
     }
 
     if (!_calAwaitingKick)
     {
-    if (_calState == 0)
-    {
-        _pulseW = getInt("calParams", "pulse");
-    }
-    if (_calState == 1)
-    {
-        _pulseE = getInt("calParams", "pulse");
-    }
-    if (_calState == 2)
-    {
-        _pulseN = getInt("calParams", "pulse");
-    }
-    if (_calState == 3)
-    {
-        _pulseS = getInt("calParams", "pulse");
-    }
+        if (_calState == 0)
+        {
+            _pulseW = getInt("calParams", "pulse");
+        }
+        if (_calState == 1)
+        {
+            _pulseE = getInt("calParams", "pulse");
+        }
+        if (_calState == 2)
+        {
+            _pulseN = getInt("calParams", "pulse");
+        }
+        if (_calState == 3)
+        {
+            _pulseS = getInt("calParams", "pulse");
+        }
     }
     double _driftRA = _dxFirst * cos(_calCcdOrientation) + _dyFirst *  sin(_calCcdOrientation);
     double _driftDE = _dxFirst * sin(_calCcdOrientation) + _dyFirst * -cos(_calCcdOrientation);
@@ -1211,8 +1217,8 @@ void Guider::SMComputeGuide()
     // drift for stability. A transient loss of correlation just skips the frame
     // (no pulse); only a run of consecutive failures aborts.
     startracker::MatchResult m = startracker::match(toTrackStars(starsFirst),
-                                                   toTrackStars(_solver.stars),
-                                                   _dxFirst, _dyFirst, trackParams());
+                                 toTrackStars(_solver.stars),
+                                 _dxFirst, _dyFirst, trackParams());
     if (!m.ok)
     {
         _consecutiveMatchFail++;

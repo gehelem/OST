@@ -72,21 +72,25 @@ Inspector::Inspector(QString name, QString label, QString profile, QVariantMap a
     // Capture drivers.
     OST::ElementBool *b = new OST::ElementBool("shoot", "Shoot", "10", "");
     b->setValue(false, false);
+    b->setDirectEdit(true);
     b->setPreIcon("photo_camera");
     pm->addElt(b);
 
     b = new OST::ElementBool("loop", "Loop", "20", "");
     b->setValue(false, false);
+    b->setDirectEdit(true);
     b->setPreIcon("loop");
     pm->addElt(b);
 
     b = new OST::ElementBool("stop", "Stop", "30", "");
     b->setValue(false, false);
+    b->setDirectEdit(true);
     b->setPreIcon("stop");
     pm->addElt(b);
 
     b = new OST::ElementBool("reload", "Reload", "40", "");
     b->setValue(false, false);
+    b->setDirectEdit(true);
     pm->addElt(b);
 
     // The non-exclusive "inspector" / "collimator" analysis selectors live in
@@ -94,15 +98,19 @@ Inspector::Inspector(QString name, QString label, QString profile, QVariantMap a
 
     // Focuser helpers -- manual defocus for the collimation workflow.
     b = new OST::ElementBool("sethome", "Set home", "65", "");
+    b->setDirectEdit(true);
     pm->addElt(b);
 
     b = new OST::ElementBool("gohome", "Go home", "70", "");
+    b->setDirectEdit(true);
     pm->addElt(b);
 
     b = new OST::ElementBool("gointra", "Go intra", "80", "");
+    b->setDirectEdit(true);
     pm->addElt(b);
 
     b = new OST::ElementBool("goextra", "Go extra", "90", "");
+    b->setDirectEdit(true);
     pm->addElt(b);
 
     auto *i = new OST::ElementInt("cornersize", "Corner size (pixels)", "50", "");
