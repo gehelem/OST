@@ -139,7 +139,13 @@ In `ee` and `ea` update messages, elements contain **only their value** — no m
 {{% notice style="note" title="`directedit` meaning" %}}
 `true` means this element can be updated on its own, independently of the property's other elements — send `SV` for it (`SA` also works). `false` means the client must submit **every** element of the property together — always use `SA`, never `SV` for that element alone. A good example: RA/Dec coordinates, where both values must be given together.
 
-This is currently a convention the client is expected to follow, **not enforced by the backend** — sending an `SV` for a `directedit: false` element is not rejected today. A backend change to actually enforce this is planned but not yet implemented.
+The backend enforces this: an `SV` on a `directedit: false` element is rejected with an error in the module log, and nothing is applied. `SA` is always accepted.
+
+Choose the value by how the element behaves, not by whether it feels "related" to its neighbours:
+- **`true` for an independent element** — a `bool` that can be true regardless of its siblings (an action button such as start/abort/loop, a toggle) must be `directedit: true`. Such a value often reflects an ongoing activity, and several can legitimately be true at once (e.g. a capture loop running while a focus-out is requested). Declaring it `false` would wrongly claim the elements must be submitted as a group, and a client following this page would send `SA`, bypassing modules that only handle `SV`.
+- **`false` only for a real group** — elements that are only meaningful together: RA/Dec coordinates, or an INDI switch vector mirrored one-to-one.
+
+For a `false` group of `bool` elements under an exclusive rule (`OneOfMany` or `AtMostOne`), selecting one element means sending it `true` and **every sibling `false`** in the same `SA` — never resend the siblings' current values, or two elements end up `true`.
 {{% /notice %}}
 
 ---

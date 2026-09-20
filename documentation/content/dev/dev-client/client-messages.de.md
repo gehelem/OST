@@ -122,7 +122,7 @@ Erforderlich, wenn der Server die Zugriffskontrolle aktiviert hat (`grant-client
 
 ### `SV` — Wert eines einzelnen Elements senden {#sv}
 
-Zu verwenden, wenn `directedit` beim Element `true` ist — sendet den Wert eines einzelnen Elements sofort.
+Zu verwenden, wenn `directedit` beim Element `true` ist — sendet den Wert eines einzelnen Elements sofort. Bei einem Element mit `directedit: false` lehnt das Backend es ab (Fehler im Modul-Log, nichts wird angewendet): stattdessen `SA` verwenden.
 
 ```json
 {

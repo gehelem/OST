@@ -122,7 +122,7 @@ Modifie la langue des libellés traduits sans se reconnecter.
 
 ### `SV` — Envoyer la valeur d'un seul élément {#sv}
 
-À utiliser lorsque `directedit` est `true` sur l'élément — envoie immédiatement la valeur d'un seul élément.
+À utiliser lorsque `directedit` est `true` sur l'élément — envoie immédiatement la valeur d'un seul élément. Sur un élément à `directedit: false`, le backend le rejette (erreur dans le log du module, rien n'est appliqué) : utiliser `SA` à la place.
 
 ```json
 {
