@@ -36,6 +36,9 @@ All client command keys are **UPPERCASE** (e.g. `DU`, `SV`, `SA`, `GC`).
 | [`GF`](#gf) | Fetch/select grid line |
 | [`GH`](#gh) | Move grid line up |
 | [`GB`](#gb) | Move grid line down |
+| [`CL`](#cl) | Load a module configuration |
+| [`CS`](#cs) | Save the current configuration |
+| [`FS`](#fs) | Select the watched file folder |
 | [`ML`](#ml) | Load module |
 | [`MK`](#mk) | Kill (unload) module |
 | [`YA`](#indi) | Start embedded INDI server |
@@ -438,35 +441,65 @@ Moves the row at index `i` down by one position.
 
 ## Module lifecycle
 
-### `ML` — Load module {#ml}
+### `CL` — Load a configuration {#cl}
 
-Requests the server to dynamically load a module.
+Loads all the modules of a saved configuration (list in `controllerdata.availableconfs`, see [Controller]({{% relref "controller.en.md" %}})).
 
 ```json
-{
-  "ML": {
-    "m": {
-      "ModuleName": {}
-    }
-  }
-}
+{ "CL": { "name": "modules" } }
 ```
+
+---
+
+### `CS` — Save the current configuration {#cs}
+
+Saves the set of currently loaded modules under the given name (`GlobalDatastore` is never included).
+
+```json
+{ "CS": { "name": "modules" } }
+```
+
+---
+
+### `ML` — Load module {#ml}
+
+Requests the server to dynamically load a module. These commands target the controller: the payload does **not** use the `m`/`p` envelope.
+
+```json
+{ "ML": { "lib": "focus", "label": "MyFocuser", "profile": "default" } }
+```
+
+| Field | Description |
+|---|---|
+| `lib` | Module library **without** the `libost` prefix (the server adds it): `focus` for `libostfocus`. Available libraries are the keys of `controllerdata.libraries` |
+| `label` | Label of this instance; the **module name** is this label without spaces. If a module with that name is already loaded, the request is refused |
+| `profile` | Profile name to load (optional) |
 
 ---
 
 ### `MK` — Kill (unload) module {#mk}
 
-Requests the server to unload a running module.
+Requests the server to unload a running module, identified by its name.
 
 ```json
-{
-  "MK": {
-    "m": {
-      "ModuleName": {}
-    }
-  }
-}
+{ "MK": { "name": "MyFocuser" } }
 ```
+
+`GlobalDatastore` cannot be unloaded: the request is refused (error message in the logs).
+
+---
+
+## File system
+
+### `FS` — Select the watched folder {#fs}
+
+Selects the folder whose file list the server publishes (see [File system]({{% relref "controller.en.md" %}}#fichiers)). The path is **relative to the webroot**; the empty string designates the root.
+
+```json
+{ "FS": { "folder": "/Sequencer/gam Cyg/LIGHT/Luminance" } }
+```
+
+The change is **server-wide** (all clients see the new list). The path is not validated: a non-existent folder yields an empty list.
 
 ---
 
@@ -478,9 +511,11 @@ These commands are only available when the server has an embedded INDI instance.
 |---|---|
 | `YA` | Start the embedded INDI server |
 | `YZ` | Stop the embedded INDI server |
-| `YL` | Load an INDI driver |
-| `YR` | Reload an INDI driver |
-| `YS` | Stop an INDI driver |
+| `YL` | Load an INDI driver (`{"YL": {"driver": "<binary>"}}`) |
+| `YR` | Reload an INDI driver (`{"YR": {"driver": "<binary>"}}`) |
+| `YS` | Stop an INDI driver (`{"YS": {"driver": "<binary>"}}`) |
+
+`YA` and `YZ` have no payload (`{"YA": {}}`). For `YL`, `YR` and `YS`, `driver` is the `binary` field of an entry of `controllerdata.indidrivers`.
 
 ---
 

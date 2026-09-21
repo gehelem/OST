@@ -1,0 +1,170 @@
+---
+title: Controller, GlobalDatastore e file
+weight: 35
+description: "Ciò che non è un modulo ordinario: dati del controller, carico di sistema, configurazioni, modulo GlobalDatastore, file system"
+---
+
+Questa pagina descrive ciò che esce dallo schema « moduli → proprietà → elementi » delle pagine precedenti: i **dati del controller**, il modulo centrale **`GlobalDatastore`** e il **file system** del server. Un client che si limita a mostrare i moduli non ne ha bisogno; un client che vuole offrire ciò che propone una pagina di parametri globali (configurazioni, driver INDI, carico del server, attrezzatura, immagini) deve gestirli.
+
+## I dati del controller (`controllerdata`)
+
+Il controller è il componente del server che carica i moduli e pilota il server INDI integrato. Espone i propri dati nel dump, sotto la chiave `controllerdata` (vedi [`d`]({{% relref "server-messages.it.md" %}}#d)), poi li mantiene aggiornati con messaggi [`uc`]({{% relref "server-messages.it.md" %}}#uc).
+
+| Chiave | Contenuto |
+|---|---|
+| `availableconfs` | Configurazioni di moduli salvate: oggetto `nome della configurazione → elenco di {modulelabel, moduletype, profilename}` |
+| `currentconf` | Nome della configurazione corrente |
+| `banner` | Banner del server (testo libero, opzione `--banner`) |
+| `git` | Versione del server: `Gitdate`, `Githash`, `Gitmessage`, `Gittag` |
+| `libraries` | Librerie di moduli disponibili, un oggetto di metadati per libreria |
+| `profiles` | Profili disponibili: oggetto `nome della classe del modulo → elenco di nomi di profilo` |
+| `indiserver` | `"Y"` se il server INDI integrato è attivato, `"N"` altrimenti |
+| `indidrivers` | Catalogo dei driver INDI installati: elenco di `{binary, family, label, mdpd}` |
+| `indiactivedrivers` | Driver INDI attualmente avviati |
+| `systemwatcher` | Carico del server, vedi più avanti |
+| `files`, `folders` | Copia di `d.files.files` e `d.files.folders`, vedi [File system](#fichiers) |
+
+{{% notice style="warning" title="`uc`: una chiave per messaggio, valore sostituito in blocco" %}}
+Un messaggio `uc` porta **una sola chiave** di `controllerdata`, e il suo valore sostituisce **interamente** quello precedente (nessuna fusione). Un client che legge solo la prima chiave del payload (come fa Rooster) è quindi corretto finché il server invia una sola chiave per messaggio, il che oggi è vero.
+{{% /notice %}}
+
+### `systemwatcher`: carico del server
+
+Il server misura il proprio carico a intervalli regolari e lo diffonde a tutti i client. L'intervallo si regola con l'opzione `--systemwatchinterval` (secondi, **10 per impostazione predefinita**, `0` disattiva). Il messaggio è un normale `uc`, e l'ultimo valore è presente anche in `controllerdata.systemwatcher` del dump.
+
+```json
+{
+  "uc-update controller data": {
+    "systemwatcher": {
+      "cpu": { "load_1m": 10.42, "load_5m": 9.79, "load_15m": 4.51 },
+      "ram": { "used_mb": 12194, "total_mb": 31941 },
+      "disks": [
+        { "device": "/dev/nvme0n1p2", "mountpoint": "/", "used_gb": 789.4, "total_gb": 915.3 }
+      ],
+      "network": [
+        { "iface": "enp4s0", "rx_kbps": 16.27, "tx_kbps": 448.8 }
+      ],
+      "temperatures": [
+        { "type": "Tctl", "temp_c": 75.375 }
+      ]
+    }
+  }
+}
+```
+
+| Campo | Significato |
+|---|---|
+| `cpu.load_1m` / `load_5m` / `load_15m` | **Carico medio** del sistema (come `/proc/loadavg`), **non una percentuale di utilizzo**: 1.0 = un core saturo in media |
+| `ram.used_mb` / `total_mb` | Memoria utilizzata (totale − disponibile) e totale, in MB |
+| `disks[]` | Un elemento per dispositivo di archiviazione montato (`/dev/*`, esclusi i `loop`): `device`, `mountpoint`, `used_gb`, `total_gb` |
+| `network[]` | Un elemento per interfaccia (escluso `lo`): velocità `rx_kbps` / `tx_kbps` misurate tra due messaggi; la prima misura di un'interfaccia vale 0 |
+| `temperatures[]` | Sensori hardware del processore: `type`, `temp_c`. **L'elenco può essere vuoto** a seconda della macchina (vengono letti solo i sensori Intel `coretemp` e AMD `k10temp`) |
+
+{{% notice style="tip" title="Non presumere che gli array siano popolati" %}}
+`disks`, `network` e soprattutto `temperatures` possono essere vuoti. Un client deve nascondere la sezione corrispondente invece di mostrare una tabella vuota. Il protocollo non fornisce il numero di core del server: un indicatore di CPU non può quindi essere una vera percentuale, il valore va mostrato come carico.
+{{% /notice %}}
+
+## Configurazioni e ciclo di vita dei moduli
+
+Una **configurazione** è un insieme denominato di moduli (libreria, etichetta, profilo) che il server può ricaricare in un colpo solo. L'elenco si trova in `controllerdata.availableconfs`, la configurazione attiva in `controllerdata.currentconf`.
+
+| Azione | Comando | Dettaglio |
+|---|---|---|
+| Caricare una configurazione | [`CL`]({{% relref "client-messages.it.md" %}}#cl) | Carica tutti i moduli della configurazione |
+| Salvare la configurazione corrente | [`CS`]({{% relref "client-messages.it.md" %}}#cs) | Con il nome indicato |
+| Caricare un modulo | [`ML`]({{% relref "client-messages.it.md" %}}#ml) | Libreria, etichetta, profilo facoltativo |
+| Scaricare un modulo | [`MK`]({{% relref "client-messages.it.md" %}}#mk) | Per nome del modulo |
+
+I moduli effettivamente caricati sono quelli del dump (`d.m`); compaiono e scompaiono tramite [`aa`]({{% relref "server-messages.it.md" %}}#aa) e [`dm`]({{% relref "server-messages.it.md" %}}#dm). La configurazione **non contiene mai** `GlobalDatastore` (vedi sotto), che è sempre presente.
+
+### Server INDI e driver
+
+Se `controllerdata.indiserver` vale `"Y"`, il server pilota un'istanza INDI integrata. I comandi [`YA`/`YZ`/`YL`/`YR`/`YS`]({{% relref "client-messages.it.md" %}}#indi) la avviano, la arrestano e gestiscono i driver; `controllerdata.indidrivers` fornisce il catalogo disponibile e `controllerdata.indiactivedrivers` ciò che è in esecuzione. `binary` è il valore da passare come `driver` in `YL`, `YR` e `YS`.
+
+## Il modulo `GlobalDatastore` {#globaldatastore}
+
+`GlobalDatastore` è un modulo **come gli altri nel dump** (`d.m.GlobalDatastore`, con proprietà, elementi, griglie, profili), ma il suo ruolo è centrale:
+
+- è creato dal server **prima di tutti gli altri moduli** ed è **sempre presente**: `MK` su di esso viene rifiutato, e non è mai incluso in una configurazione;
+- contiene il **riferimento condiviso dell'attrezzatura**, che tutti gli altri moduli consultano: ottiche, località, attrezzature (set di dispositivi) e server INDI.
+
+Le sue griglie servono da sorgente per elenchi di scelta (LOV) con lo stesso nome, presenti in `d.lovs` (`optics`, `locations`, `equipments`, `servers`) e ricostruiti a ogni modifica della griglia. Gli altri moduli le usano così: scegliere un'ottica compila la focale e il diametro, scegliere una località compila latitudine, longitudine e altitudine, scegliere un set di attrezzature risolve i dispositivi (camera, montatura, focheggiatore, ruota portafiltri, camera di guida, GPS, cupola, meteo) e il server INDI da contattare.
+
+Proprietà esposte:
+
+| Proprietà | Ruolo |
+|---|---|
+| `devices` | Set di attrezzature e GPS selezionati (`equipments`, `gps`) |
+| `devicesactions` | Pulsanti: connettere/disconnettere i dispositivi, caricare le configurazioni (`condevs`, `discondevs`, `loadconfs`) |
+| `server` | Host e porta del server INDI (`host`, `port`) |
+| `serveractions` | Pulsanti: connettere/disconnettere il server INDI (`conserv`, `disconserv`) |
+| `startup` | Caselle di avvio automatico (`indiatstart`, `devatstart`, `confsatstart`) |
+| `equipments` | Griglia dei set di attrezzature |
+| `locations` | Griglia delle località (icone `refresh` = leggere il GPS, `add` = aggiungere la riga corrente) |
+| `optics` | Griglia delle ottiche |
+| `servers` | Griglia dei server INDI |
+
+Tutte le sue proprietà si manipolano con i messaggi standard (`SV`, `SA`, `GC`…, `I3`/`I4` su `locations`); un client generico le mostra come qualsiasi altro modulo. Rooster le presenta in una scheda dedicata della sua pagina di parametri, mantenendo le proprietà che hanno un profilo (`hasprofile`) e raggruppandole per `level1`/`level2`.
+
+## File system {#fichiers}
+
+Il server pubblica l'elenco dei file prodotti (immagini, sequenze, archivi) nella cartella `--webroot`, senza che il client debba interrogarlo. Questo meccanismo è indipendente dai moduli.
+
+### Nel dump: `d.files`
+
+```json
+"files": {
+  "folders": ["", "/Allsky", "/Sequencer/gam Cyg/LIGHT/Luminance"],
+  "files": ["/image1.jpeg", "/rapport.txt"],
+  "selectedfolder": "/home/gilles/ostmedia"
+}
+```
+
+| Campo | Contenuto |
+|---|---|
+| `folders` | **Tutte** le sottocartelle del webroot, ricorsivamente, percorsi relativi al webroot che iniziano con `/`. La radice è la stringa vuota `""`. Non ordinato. |
+| `files` | I file **della sola cartella selezionata** (non ricorsivo), percorsi relativi al webroot che iniziano con `/`. Tutti i file, senza filtro di estensione. |
+| `selectedfolder` | La cartella selezionata, come **percorso assoluto del file system del server** (e non relativo). |
+
+Non ci sono né paginazione né limite di dimensione: su un webroot molto pieno l'elenco può essere lungo.
+
+### Scegliere la cartella: `FS`
+
+[`FS`]({{% relref "client-messages.it.md" %}}#fs) indica la cartella di cui si vuole l'elenco dei file. Il server sorveglia **una sola** cartella alla volta.
+
+{{% notice style="warning" title="La cartella selezionata è globale per il server" %}}
+Non esiste una cartella per client: un `FS` cambia l'elenco di file visto da **tutti** i client connessi (gli eventi seguenti sono diffusi a tutti). Un client non deve usarlo per una semplice navigazione «locale» se altri client possono essere connessi.
+
+Il server **non valida** il percorso: una cartella inesistente restituisce semplicemente un elenco vuoto, senza errore.
+{{% /notice %}}
+
+### Aggiornamenti: `evt`
+
+Quando il contenuto della cartella selezionata cambia (file creato, eliminato o rinominato), o dopo un `FS`, il server invia eventi di primo livello `evt`:
+
+```json
+{ "evt": "fileadd", "fileevent": ["/Sequencer/gam Cyg/LIGHT/Luminance/img_001.FITS"] }
+{ "evt": "filedel", "fileevent": ["/rapport.txt"] }
+```
+
+| Valore di `evt` | Significato |
+|---|---|
+| `fileadd` | File apparso/i nella cartella selezionata |
+| `filedel` | File scomparso/i dalla cartella selezionata |
+| `folderadd` / `folderdel` | Sottocartella creata / eliminata nel webroot (stessa forma, `fileevent` contiene i percorsi delle cartelle) |
+
+`fileevent` è **sempre un array**; oggi contiene un solo percorso per messaggio (N file = N messaggi). Dopo un `FS`, il client riceve un `filedel` per ogni file della vecchia cartella, poi un `fileadd` per ogni file della nuova: **non** c'è alcun messaggio che annuncia il nuovo `selectedfolder`, che esiste solo nel dump.
+
+A ogni passaggio il server invia inoltre messaggi [`uc`]({{% relref "server-messages.it.md" %}}#uc) `files` e `folders` contenenti gli elenchi **completi**: un client può quindi applicare gli eventi `evt` uno per uno, oppure semplicemente sostituire i propri elenchi con questi `uc`.
+
+{{% notice style="warning" title="Trappola: `evt` inizia con `ev`" %}}
+La regola abituale è confrontare i primi 1 o 2 caratteri della chiave. Ora, `evt` inizia con `ev`, il tipo degli [aggiornamenti di elemento con metadati]({{% relref "server-messages.it.md" %}}#ev), il cui payload è un oggetto e non una stringa. Un client che smista sul prefisso deve **verificare l'uguaglianza esatta con `evt` prima** di verificare `ev`, altrimenti scambierà un evento di file per un aggiornamento di elemento.
+{{% /notice %}}
+
+### Costruire l'URL di un file
+
+I percorsi di `files` sono relativi al webroot e iniziano con `/`. L'URL di un file è l'URL di base dei media del server (`http(s)://hostname/ostmedia/`, vedi la nota « URL media » del [Modello dati]({{% relref "structure.it.md" %}})) seguita dal percorso. Attenzione alla `/` iniziale: concatenarla a una base che termina già con `/` dà una doppia `//`.
+
+### Ciò che l'evento non fa
+
+Il server rileva l'**aggiunta, l'eliminazione e la ridenominazione** di file, non la modifica del contenuto di un file esistente: un'immagine riscritta con lo stesso nome non produce alcun evento. È il caso delle immagini di anteprima dei moduli, il cui URL resta identico a ogni ripresa: un client deve aggiungere un parametro di cache-busting (`?t=` + marca temporale) quando ricarica un'immagine dopo un aggiornamento della sua proprietà.

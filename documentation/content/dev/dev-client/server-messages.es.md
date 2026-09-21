@@ -18,6 +18,10 @@ Los clientes deben comparar los **1 o 2 primeros caracteres** de la clave, no la
 
 Todas las claves de eventos enviadas por el servidor están en **minúsculas** (ej. `d`, `ea`, `ap`, `gc`).
 
+{{% notice style="warning" title="Excepción: `evt` empieza por `ev`" %}}
+La clave [`evt`](#evt) (eventos de archivos) empieza por los mismos dos caracteres que [`ev`](#ev). Comparar primero la igualdad exacta con `evt` y solo después los prefijos; de lo contrario, un evento de archivo se toma por una actualización de elemento.
+{{% /notice %}}
+
 ---
 
 ## Índice de tipos de eventos
@@ -45,13 +49,14 @@ Todas las claves de eventos enviadas por el servidor están en **minúsculas** (
 | [`fc`](#fs) | Perfil modificado (modificaciones no guardadas) |
 | [`l`](#l) | Entrada de log |
 | [`uc`](#uc) | Actualización de los datos del controlador |
+| [`evt`](#evt) | Evento de archivo o de carpeta (alta/baja) |
 | [`xx`](#xx) | Pong keepalive |
 
 ---
 
 ## `d` — Dump inicial completo {#d}
 
-Enviado como respuesta a una petición `DU`. Contiene todo: todos los módulos, los logs, las listas de archivos y los datos del controlador.
+Enviado como respuesta a una petición `DU`. Contiene todo: todos los módulos, los logs, las listas de archivos y los datos del controlador. El detalle de las claves de `controllerdata` y de `files` está en [Controlador, GlobalDatastore y archivos]({{% relref "controller.es.md" %}}); el ejemplo siguiente solo muestra algunas.
 
 ```json
 {
@@ -105,9 +110,9 @@ Enviado como respuesta a una petición `DU`. Contiene todo: todos los módulos, 
       }
     },
     "files": {
-      "folders": ["Allsky/archives"],
-      "files": ["Allsky/archives/image.fits"],
-      "selectedfolder": ""
+      "folders": ["", "/Allsky", "/Allsky/archives"],
+      "files": ["/image.jpeg"],
+      "selectedfolder": "/home/user/ostmedia"
     },
     "logs": [
       { "d": "2024-01-01T12:00:00.000", "c": "Focus", "t": "Module loaded", "l": 1 }
@@ -115,7 +120,8 @@ Enviado como respuesta a una petición `DU`. Contiene todo: todos los módulos, 
     "controllerdata": {
       "profiles": {
         "Focus": ["default", "test"]
-      }
+      },
+      "currentconf": "default"
     },
     "lovs": {
       "sharedLov": { "label": "Shared LOV", "type": "string", "values": {} }
@@ -530,7 +536,7 @@ Enviado para cada mensaje de log generado por el servidor. La clave es exactamen
 
 ## `uc` — Actualización de los datos del controlador {#uc}
 
-Enviado cuando cambian los datos globales del controlador (ej. lista de archivos, perfiles). La clave empieza por `"uc"`.
+Enviado cuando cambian los datos globales del controlador: perfiles, configuraciones, drivers INDI activos, listas de archivos (`files`, `folders`), carga del sistema (`systemwatcher`, cada 10 s por defecto). La clave empieza por `"uc"`. Las claves posibles se describen en [Controlador, GlobalDatastore y archivos]({{% relref "controller.es.md" %}}).
 
 ```json
 {
@@ -543,7 +549,26 @@ Enviado cuando cambian los datos globales del controlador (ej. lista de archivos
 }
 ```
 
-El payload es `{"clave": valor}` donde `valor` puede ser una cadena, un array o un objeto.
+El payload es `{"clave": valor}` donde `valor` puede ser una cadena, un array o un objeto. Cada mensaje lleva **una sola clave**, y su valor **reemplaza por completo** al anterior.
+
+---
+
+## `evt` — Evento de archivo o de carpeta {#evt}
+
+Enviado a todos los clientes cuando cambia el contenido de la carpeta de archivos vigilada (ver [Sistema de archivos]({{% relref "controller.es.md" %}}#fichiers)). A diferencia de los demás mensajes, la clave es exactamente `evt` y su **valor es una cadena** que indica el tipo de evento; las rutas van en un campo hermano `fileevent`.
+
+```json
+{ "evt": "fileadd", "fileevent": ["/Allsky/image_001.jpeg"] }
+```
+
+| `evt` | Significado |
+|---|---|
+| `fileadd` | Archivo(s) añadido(s) a la carpeta seleccionada |
+| `filedel` | Archivo(s) eliminado(s) de la carpeta seleccionada |
+| `folderadd` | Subcarpeta añadida al webroot |
+| `folderdel` | Subcarpeta eliminada del webroot |
+
+`fileevent` es siempre un array de rutas relativas al webroot (que empiezan por `/`).
 
 ---
 

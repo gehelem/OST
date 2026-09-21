@@ -36,6 +36,9 @@ Alle Client-Befehlsschlüssel stehen in **GROSSBUCHSTABEN** (z. B. `DU`, `SV`, `
 | [`GF`](#gf) | Grid-Zeile auswählen |
 | [`GH`](#gh) | Grid-Zeile nach oben verschieben |
 | [`GB`](#gb) | Grid-Zeile nach unten verschieben |
+| [`CL`](#cl) | Modulkonfiguration laden |
+| [`CS`](#cs) | Aktuelle Konfiguration speichern |
+| [`FS`](#fs) | Überwachten Dateiordner wählen |
 | [`ML`](#ml) | Modul laden |
 | [`MK`](#mk) | Modul entladen |
 | [`YA`](#indi) | Eingebetteten INDI-Server starten |
@@ -438,35 +441,65 @@ Verschiebt die Zeile mit Index `i` um eine Position nach unten.
 
 ## Modul-Lebenszyklus
 
-### `ML` — Modul laden {#ml}
+### `CL` — Konfiguration laden {#cl}
 
-Fordert den Server auf, ein Modul dynamisch zu laden.
+Lädt alle Module einer gespeicherten Konfiguration (Liste in `controllerdata.availableconfs`, siehe [Controller]({{% relref "controller.de.md" %}})).
 
 ```json
-{
-  "ML": {
-    "m": {
-      "ModuleName": {}
-    }
-  }
-}
+{ "CL": { "name": "modules" } }
 ```
+
+---
+
+### `CS` — Aktuelle Konfiguration speichern {#cs}
+
+Speichert die Menge der aktuell geladenen Module unter dem angegebenen Namen (`GlobalDatastore` ist nie enthalten).
+
+```json
+{ "CS": { "name": "modules" } }
+```
+
+---
+
+### `ML` — Modul laden {#ml}
+
+Fordert den Server auf, ein Modul dynamisch zu laden. Diese Befehle richten sich an den Controller: der Payload verwendet **nicht** den `m`/`p`-Umschlag.
+
+```json
+{ "ML": { "lib": "focus", "label": "MyFocuser", "profile": "default" } }
+```
+
+| Feld | Beschreibung |
+|---|---|
+| `lib` | Bibliothek des Moduls, **ohne** das Präfix `libost` (der Server fügt es hinzu): `focus` für `libostfocus`. Die verfügbaren Bibliotheken sind die Schlüssel von `controllerdata.libraries` |
+| `label` | Label dieser Instanz; der **Modulname** ist dieses Label ohne Leerzeichen. Ist ein Modul dieses Namens bereits geladen, wird die Anfrage abgelehnt |
+| `profile` | Name des zu ladenden Profils (optional) |
 
 ---
 
 ### `MK` — Modul entladen {#mk}
 
-Fordert den Server auf, ein laufendes Modul zu entladen.
+Fordert den Server auf, ein laufendes Modul zu entladen, bezeichnet durch seinen Namen.
 
 ```json
-{
-  "MK": {
-    "m": {
-      "ModuleName": {}
-    }
-  }
-}
+{ "MK": { "name": "MyFocuser" } }
 ```
+
+`GlobalDatastore` kann nicht entladen werden: die Anfrage wird abgelehnt (Fehlermeldung in den Logs).
+
+---
+
+## Dateisystem
+
+### `FS` — Überwachten Ordner wählen {#fs}
+
+Bestimmt den Ordner, dessen Dateiliste der Server veröffentlicht (siehe [Dateisystem]({{% relref "controller.de.md" %}}#fichiers)). Der Pfad ist **relativ zum Webroot**; die leere Zeichenkette bezeichnet das Wurzelverzeichnis.
+
+```json
+{ "FS": { "folder": "/Sequencer/gam Cyg/LIGHT/Luminance" } }
+```
+
+Die Änderung gilt **global für den Server** (alle Clients sehen die neue Liste). Der Pfad wird nicht validiert: ein nicht existierender Ordner ergibt eine leere Liste.
 
 ---
 
@@ -478,9 +511,11 @@ Diese Befehle sind nur verfügbar, wenn der Server über eine eingebettete INDI-
 |---|---|
 | `YA` | Eingebetteten INDI-Server starten |
 | `YZ` | Eingebetteten INDI-Server stoppen |
-| `YL` | INDI-Treiber laden |
-| `YR` | INDI-Treiber neu laden |
-| `YS` | INDI-Treiber stoppen |
+| `YL` | INDI-Treiber laden (`{"YL": {"driver": "<binary>"}}`) |
+| `YR` | INDI-Treiber neu laden (`{"YR": {"driver": "<binary>"}}`) |
+| `YS` | INDI-Treiber stoppen (`{"YS": {"driver": "<binary>"}}`) |
+
+`YA` und `YZ` haben keinen Payload (`{"YA": {}}`). Bei `YL`, `YR` und `YS` ist `driver` das Feld `binary` eines Eintrags aus `controllerdata.indidrivers`.
 
 ---
 

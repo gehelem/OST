@@ -36,6 +36,9 @@ Todas las claves de comandos de cliente están en **MAYÚSCULAS** (ej. `DU`, `SV
 | [`GF`](#gf) | Seleccionar una línea de cuadrícula |
 | [`GH`](#gh) | Subir una línea de cuadrícula |
 | [`GB`](#gb) | Bajar una línea de cuadrícula |
+| [`CL`](#cl) | Cargar una configuración de módulos |
+| [`CS`](#cs) | Guardar la configuración actual |
+| [`FS`](#fs) | Elegir la carpeta de archivos vigilada |
 | [`ML`](#ml) | Cargar un módulo |
 | [`MK`](#mk) | Descargar un módulo |
 | [`YA`](#indi) | Iniciar el servidor INDI embebido |
@@ -438,35 +441,65 @@ Desplaza la línea en el índice `i` una posición hacia abajo.
 
 ## Ciclo de vida de los módulos
 
-### `ML` — Cargar un módulo {#ml}
+### `CL` — Cargar una configuración {#cl}
 
-Solicita al servidor cargar dinámicamente un módulo.
+Carga todos los módulos de una configuración guardada (lista en `controllerdata.availableconfs`, ver [Controlador]({{% relref "controller.es.md" %}})).
 
 ```json
-{
-  "ML": {
-    "m": {
-      "ModuleName": {}
-    }
-  }
-}
+{ "CL": { "name": "modules" } }
 ```
+
+---
+
+### `CS` — Guardar la configuración actual {#cs}
+
+Registra el conjunto de módulos actualmente cargados con el nombre indicado (`GlobalDatastore` nunca se incluye).
+
+```json
+{ "CS": { "name": "modules" } }
+```
+
+---
+
+### `ML` — Cargar un módulo {#ml}
+
+Pide al servidor que cargue dinámicamente un módulo. Estos comandos se dirigen al controlador: el payload **no** usa la envoltura `m`/`p`.
+
+```json
+{ "ML": { "lib": "focus", "label": "MyFocuser", "profile": "default" } }
+```
+
+| Campo | Descripción |
+|---|---|
+| `lib` | Biblioteca del módulo, **sin** el prefijo `libost` (lo añade el servidor): `focus` para `libostfocus`. Las bibliotecas disponibles son las claves de `controllerdata.libraries` |
+| `label` | Etiqueta de esta instancia; el **nombre del módulo** es esa etiqueta sin espacios. Si ya hay cargado un módulo con ese nombre, la petición se rechaza |
+| `profile` | Nombre del perfil a cargar (opcional) |
 
 ---
 
 ### `MK` — Descargar un módulo {#mk}
 
-Solicita al servidor descargar un módulo en ejecución.
+Pide al servidor que descargue un módulo en ejecución, designado por su nombre.
 
 ```json
-{
-  "MK": {
-    "m": {
-      "ModuleName": {}
-    }
-  }
-}
+{ "MK": { "name": "MyFocuser" } }
 ```
+
+`GlobalDatastore` no puede descargarse: la petición se rechaza (mensaje de error en los logs).
+
+---
+
+## Sistema de archivos
+
+### `FS` — Elegir la carpeta vigilada {#fs}
+
+Designa la carpeta cuya lista de archivos publica el servidor (ver [Sistema de archivos]({{% relref "controller.es.md" %}}#fichiers)). La ruta es **relativa al webroot**; la cadena vacía designa la raíz.
+
+```json
+{ "FS": { "folder": "/Sequencer/gam Cyg/LIGHT/Luminance" } }
+```
+
+El cambio es **global en el servidor** (todos los clientes ven la nueva lista). La ruta no se valida: una carpeta inexistente da una lista vacía.
 
 ---
 
@@ -478,9 +511,11 @@ Estos comandos solo están disponibles cuando el servidor dispone de una instanc
 |---|---|
 | `YA` | Iniciar el servidor INDI embebido |
 | `YZ` | Detener el servidor INDI embebido |
-| `YL` | Cargar un driver INDI |
-| `YR` | Recargar un driver INDI |
-| `YS` | Detener un driver INDI |
+| `YL` | Cargar un driver INDI (`{"YL": {"driver": "<binary>"}}`) |
+| `YR` | Recargar un driver INDI (`{"YR": {"driver": "<binary>"}}`) |
+| `YS` | Detener un driver INDI (`{"YS": {"driver": "<binary>"}}`) |
+
+`YA` y `YZ` no tienen payload (`{"YA": {}}`). Para `YL`, `YR` y `YS`, `driver` es el campo `binary` de una entrada de `controllerdata.indidrivers`.
 
 ---
 

@@ -18,6 +18,10 @@ I client devono confrontare i **primi 1 o 2 caratteri** della chiave, non l'inte
 
 Tutte le chiavi degli eventi inviate dal server sono in **minuscolo** (es. `d`, `ea`, `ap`, `gc`).
 
+{{% notice style="warning" title="Eccezione: `evt` inizia con `ev`" %}}
+La chiave [`evt`](#evt) (eventi di file) inizia con gli stessi due caratteri di [`ev`](#ev). Confrontare prima l'uguaglianza esatta con `evt`, e solo dopo i prefissi, altrimenti un evento di file viene scambiato per un aggiornamento di elemento.
+{{% /notice %}}
+
 ---
 
 ## Indice dei tipi di evento
@@ -45,13 +49,14 @@ Tutte le chiavi degli eventi inviate dal server sono in **minuscolo** (es. `d`, 
 | [`fc`](#fs) | Profilo modificato (modifiche non salvate) |
 | [`l`](#l) | Voce di log |
 | [`uc`](#uc) | Aggiornamento dei dati del controller |
+| [`evt`](#evt) | Evento di file o di cartella (aggiunta/eliminazione) |
 | [`xx`](#xx) | Pong keepalive |
 
 ---
 
 ## `d` — Dump iniziale completo {#d}
 
-Inviato in risposta a una richiesta `DU`. Contiene tutto: tutti i moduli, i log, gli elenchi di file e i dati del controller.
+Inviato in risposta a una richiesta `DU`. Contiene tutto: tutti i moduli, i log, gli elenchi di file e i dati del controller. Il dettaglio delle chiavi di `controllerdata` e di `files` è in [Controller, GlobalDatastore e file]({{% relref "controller.it.md" %}}); l'esempio seguente ne mostra solo alcune.
 
 ```json
 {
@@ -105,9 +110,9 @@ Inviato in risposta a una richiesta `DU`. Contiene tutto: tutti i moduli, i log,
       }
     },
     "files": {
-      "folders": ["Allsky/archives"],
-      "files": ["Allsky/archives/image.fits"],
-      "selectedfolder": ""
+      "folders": ["", "/Allsky", "/Allsky/archives"],
+      "files": ["/image.jpeg"],
+      "selectedfolder": "/home/user/ostmedia"
     },
     "logs": [
       { "d": "2024-01-01T12:00:00.000", "c": "Focus", "t": "Module loaded", "l": 1 }
@@ -115,7 +120,8 @@ Inviato in risposta a una richiesta `DU`. Contiene tutto: tutti i moduli, i log,
     "controllerdata": {
       "profiles": {
         "Focus": ["default", "test"]
-      }
+      },
+      "currentconf": "default"
     },
     "lovs": {
       "sharedLov": { "label": "Shared LOV", "type": "string", "values": {} }
@@ -530,7 +536,7 @@ Inviato per ogni messaggio di log generato dal server. La chiave è esattamente 
 
 ## `uc` — Aggiornamento dei dati del controller {#uc}
 
-Inviato quando i dati globali del controller cambiano (es. elenco file, profili). La chiave inizia con `"uc"`.
+Inviato quando i dati globali del controller cambiano: profili, configurazioni, driver INDI attivi, elenchi di file (`files`, `folders`), carico del sistema (`systemwatcher`, ogni 10 s per impostazione predefinita). La chiave inizia con `"uc"`. Le chiavi possibili sono descritte in [Controller, GlobalDatastore e file]({{% relref "controller.it.md" %}}).
 
 ```json
 {
@@ -543,7 +549,26 @@ Inviato quando i dati globali del controller cambiano (es. elenco file, profili)
 }
 ```
 
-Il payload è `{"chiave": valore}` dove `valore` può essere una stringa, un array o un oggetto.
+Il payload è `{"chiave": valore}` dove `valore` può essere una stringa, un array o un oggetto. Ogni messaggio porta **una sola chiave** e il suo valore **sostituisce interamente** quello precedente.
+
+---
+
+## `evt` — Evento di file o di cartella {#evt}
+
+Inviato a tutti i client quando il contenuto della cartella di file sorvegliata cambia (vedi [File system]({{% relref "controller.it.md" %}}#fichiers)). A differenza degli altri messaggi, la chiave è esattamente `evt` e il suo **valore è una stringa** che indica il tipo di evento; i percorsi si trovano in un campo affiancato `fileevent`.
+
+```json
+{ "evt": "fileadd", "fileevent": ["/Allsky/image_001.jpeg"] }
+```
+
+| `evt` | Significato |
+|---|---|
+| `fileadd` | File aggiunto/i alla cartella selezionata |
+| `filedel` | File eliminato/i dalla cartella selezionata |
+| `folderadd` | Sottocartella aggiunta al webroot |
+| `folderdel` | Sottocartella eliminata dal webroot |
+
+`fileevent` è sempre un array di percorsi relativi al webroot (che iniziano con `/`).
 
 ---
 

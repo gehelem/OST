@@ -18,6 +18,10 @@ Clients müssen die **ersten 1 oder 2 Zeichen** des Schlüssels abgleichen, nich
 
 Alle vom Server gesendeten Ereignisschlüssel sind **klein geschrieben** (z. B. `d`, `ea`, `ap`, `gc`).
 
+{{% notice style="warning" title="Ausnahme: `evt` beginnt mit `ev`" %}}
+Der Schlüssel [`evt`](#evt) (Dateiereignisse) beginnt mit denselben zwei Zeichen wie [`ev`](#ev). Zuerst auf exakte Gleichheit mit `evt` prüfen, erst danach die Präfixe, sonst wird ein Dateiereignis für ein Element-Update gehalten.
+{{% /notice %}}
+
 ---
 
 ## Übersicht der Ereignistypen
@@ -45,13 +49,14 @@ Alle vom Server gesendeten Ereignisschlüssel sind **klein geschrieben** (z. B. 
 | [`fc`](#fs) | Profil geändert (nicht gespeicherte Änderungen) |
 | [`l`](#l) | Log-Eintrag |
 | [`uc`](#uc) | Update der Controller-Daten |
+| [`evt`](#evt) | Datei- oder Ordnerereignis (Hinzufügen/Löschen) |
 | [`xx`](#xx) | Keepalive-Pong |
 
 ---
 
 ## `d` — Vollständiger initialer Dump {#d}
 
-Wird als Antwort auf eine `DU`-Anfrage gesendet. Enthält alles: alle Module, Logs, Dateilisten und Controller-Daten.
+Wird als Antwort auf eine `DU`-Anfrage gesendet. Enthält alles: alle Module, Logs, Dateilisten und Controller-Daten. Die Details der Schlüssel von `controllerdata` und `files` stehen in [Controller, GlobalDatastore und Dateien]({{% relref "controller.de.md" %}}); das Beispiel unten zeigt nur einige davon.
 
 ```json
 {
@@ -105,9 +110,9 @@ Wird als Antwort auf eine `DU`-Anfrage gesendet. Enthält alles: alle Module, Lo
       }
     },
     "files": {
-      "folders": ["Allsky/archives"],
-      "files": ["Allsky/archives/image.fits"],
-      "selectedfolder": ""
+      "folders": ["", "/Allsky", "/Allsky/archives"],
+      "files": ["/image.jpeg"],
+      "selectedfolder": "/home/user/ostmedia"
     },
     "logs": [
       { "d": "2024-01-01T12:00:00.000", "c": "Focus", "t": "Module loaded", "l": 1 }
@@ -115,7 +120,8 @@ Wird als Antwort auf eine `DU`-Anfrage gesendet. Enthält alles: alle Module, Lo
     "controllerdata": {
       "profiles": {
         "Focus": ["default", "test"]
-      }
+      },
+      "currentconf": "default"
     },
     "lovs": {
       "sharedLov": { "label": "Shared LOV", "type": "string", "values": {} }
@@ -530,7 +536,7 @@ Wird für jede vom Server erzeugte Log-Nachricht gesendet. Der Schlüssel ist ge
 
 ## `uc` — Update der Controller-Daten {#uc}
 
-Wird gesendet, wenn sich globale Controller-Daten ändern (z. B. Dateiliste, Profile). Der Schlüssel beginnt mit `"uc"`.
+Wird gesendet, wenn sich globale Controller-Daten ändern: Profile, Konfigurationen, aktive INDI-Treiber, Dateilisten (`files`, `folders`), Systemlast (`systemwatcher`, standardmäßig alle 10 s). Der Schlüssel beginnt mit `"uc"`. Die möglichen Schlüssel sind in [Controller, GlobalDatastore und Dateien]({{% relref "controller.de.md" %}}) beschrieben.
 
 ```json
 {
@@ -543,7 +549,26 @@ Wird gesendet, wenn sich globale Controller-Daten ändern (z. B. Dateiliste, Pro
 }
 ```
 
-Der Payload ist `{"Schlüssel": Wert}`, wobei `Wert` eine Zeichenkette, ein Array oder ein Objekt sein kann.
+Der Payload ist `{"Schlüssel": Wert}`, wobei `Wert` eine Zeichenkette, ein Array oder ein Objekt sein kann. Jede Nachricht trägt **einen einzigen Schlüssel**, und ihr Wert **ersetzt den alten vollständig**.
+
+---
+
+## `evt` — Datei- oder Ordnerereignis {#evt}
+
+Wird an alle Clients gesendet, wenn sich der Inhalt des überwachten Dateiordners ändert (siehe [Dateisystem]({{% relref "controller.de.md" %}}#fichiers)). Anders als bei den anderen Nachrichten lautet der Schlüssel genau `evt`, und sein **Wert ist eine Zeichenkette**, die den Ereignistyp angibt; die Pfade stehen in einem Geschwisterfeld `fileevent`.
+
+```json
+{ "evt": "fileadd", "fileevent": ["/Allsky/image_001.jpeg"] }
+```
+
+| `evt` | Bedeutung |
+|---|---|
+| `fileadd` | Datei(en) zum ausgewählten Ordner hinzugefügt |
+| `filedel` | Datei(en) aus dem ausgewählten Ordner gelöscht |
+| `folderadd` | Unterordner zum Webroot hinzugefügt |
+| `folderdel` | Unterordner aus dem Webroot gelöscht |
+
+`fileevent` ist immer ein Array von Pfaden relativ zum Webroot (mit führendem `/`).
 
 ---
 
