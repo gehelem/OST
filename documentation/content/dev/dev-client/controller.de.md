@@ -16,7 +16,7 @@ Der Controller ist die Komponente des Servers, die die Module lädt und den eing
 | `currentconf` | Name der aktuellen Konfiguration |
 | `banner` | Banner des Servers (Freitext, Option `--banner`) |
 | `git` | Version des Servers: `Gitdate`, `Githash`, `Gitmessage`, `Gittag` |
-| `libraries` | Verfügbare Modulbibliotheken, ein Metadatenobjekt pro Bibliothek |
+| `libraries` | Verfügbare Modulbibliotheken, ein Metadatenobjekt pro Bibliothek — Schlüssel sind **mit `libost` präfigiert** (`libostfocus`, `libostdummy`...); das Präfix vor der Übergabe an [`ML`]({{% relref "client-messages.de.md" %}}#ml) entfernen |
 | `profiles` | Verfügbare Profile: Objekt `transformierter Bibliotheksname → Liste von Profilnamen` — siehe die Schlüsselkonvention unten |
 | `indiserver` | `"Y"`, wenn der eingebettete INDI-Server aktiviert ist, sonst `"N"` |
 | `indidrivers` | Katalog der installierten INDI-Treiber: Liste von `{binary, family, label, mdpd}` |

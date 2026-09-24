@@ -16,7 +16,7 @@ Le contrôleur est le composant du serveur qui charge les modules et pilote le s
 | `currentconf` | Nom de la configuration courante |
 | `banner` | Bannière du serveur (texte libre, option `--banner`) |
 | `git` | Version du serveur : `Gitdate`, `Githash`, `Gitmessage`, `Gittag` |
-| `libraries` | Bibliothèques de modules disponibles, un objet de métadonnées par bibliothèque |
+| `libraries` | Bibliothèques de modules disponibles, un objet de métadonnées par bibliothèque — les clés sont **préfixées par `libost`** (`libostfocus`, `libostdummy`...) ; retirer ce préfixe avant de le passer à [`ML`]({{% relref "client-messages.fr.md" %}}#ml) |
 | `profiles` | Profils disponibles : objet `nom de bibliothèque transformé → liste de noms de profils` — voir la convention de clé ci-dessous |
 | `indiserver` | `"Y"` si le serveur INDI embarqué est activé, `"N"` sinon |
 | `indidrivers` | Catalogue des drivers INDI installés : liste de `{binary, family, label, mdpd}` |

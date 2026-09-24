@@ -524,6 +524,23 @@ Requests the server to dynamically load a module. These commands target the cont
 | `label` | Label of this instance; the **module name** is this label without spaces. If a module with that name is already loaded, the request is refused |
 | `profile` | Profile name to load (optional) |
 
+{{% notice style="warning" title="Don't pass a controllerdata.libraries key as-is" %}}
+The keys of `controllerdata.libraries` are already prefixed (`libostfocus`, `libostdummy`...). The server prepends `libost` again unconditionally, so forwarding a key straight through double-prefixes it and fails:
+
+```json
+{ "ML": { "lib": "libostdummy", "label": "MyDummy" } }
+```
+```
+Error loading library MyDummy - Cannot load library libostlibostdummy: cannot open shared object file: No such file or directory
+```
+
+Strip the `libost` prefix from the key first (same transform `profiles`' keying convention relies on, see [Controller data]({{% relref "controller.en.md" %}})):
+
+```json
+{ "ML": { "lib": "dummy", "label": "MyDummy" } }
+```
+{{% /notice %}}
+
 ---
 
 ### `MK` — Kill (unload) module {#mk}

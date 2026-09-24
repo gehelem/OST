@@ -16,7 +16,7 @@ Il controller è il componente del server che carica i moduli e pilota il server
 | `currentconf` | Nome della configurazione corrente |
 | `banner` | Banner del server (testo libero, opzione `--banner`) |
 | `git` | Versione del server: `Gitdate`, `Githash`, `Gitmessage`, `Gittag` |
-| `libraries` | Librerie di moduli disponibili, un oggetto di metadati per libreria |
+| `libraries` | Librerie di moduli disponibili, un oggetto di metadati per libreria — le chiavi sono **con prefisso `libost`** (`libostfocus`, `libostdummy`...); rimuoverlo prima di passarlo a [`ML`]({{% relref "client-messages.it.md" %}}#ml) |
 | `profiles` | Profili disponibili: oggetto `nome libreria trasformato → elenco di nomi di profilo` — vedi la convenzione di chiave qui sotto |
 | `indiserver` | `"Y"` se il server INDI integrato è attivato, `"N"` altrimenti |
 | `indidrivers` | Catalogo dei driver INDI installati: elenco di `{binary, family, label, mdpd}` |

@@ -16,7 +16,7 @@ El controlador es el componente del servidor que carga los módulos y gestiona e
 | `currentconf` | Nombre de la configuración actual |
 | `banner` | Banner del servidor (texto libre, opción `--banner`) |
 | `git` | Versión del servidor: `Gitdate`, `Githash`, `Gitmessage`, `Gittag` |
-| `libraries` | Bibliotecas de módulos disponibles, un objeto de metadatos por biblioteca |
+| `libraries` | Bibliotecas de módulos disponibles, un objeto de metadatos por biblioteca — las claves están **prefijadas con `libost`** (`libostfocus`, `libostdummy`...); quitar el prefijo antes de pasarlo a [`ML`]({{% relref "client-messages.es.md" %}}#ml) |
 | `profiles` | Perfiles disponibles: objeto `nombre de biblioteca transformado → lista de nombres de perfil` — ver la convención de claves más abajo |
 | `indiserver` | `"Y"` si el servidor INDI embebido está activado, `"N"` en caso contrario |
 | `indidrivers` | Catálogo de drivers INDI instalados: lista de `{binary, family, label, mdpd}` |

@@ -16,7 +16,7 @@ The controller is the server component that loads the modules and drives the emb
 | `currentconf` | Name of the current configuration |
 | `banner` | Server banner (free text, `--banner` option) |
 | `git` | Server version: `Gitdate`, `Githash`, `Gitmessage`, `Gittag` |
-| `libraries` | Available module libraries, one metadata object per library |
+| `libraries` | Available module libraries, one metadata object per library — keys are **prefixed with `libost`** (`libostfocus`, `libostdummy`...); strip it before passing to [`ML`]({{% relref "client-messages.en.md" %}}#ml) |
 | `profiles` | Available profiles: object `transformed library name → list of profile names` — see the keying convention below |
 | `indiserver` | `"Y"` if the embedded INDI server is enabled, `"N"` otherwise |
 | `indidrivers` | Catalogue of installed INDI drivers: list of `{binary, family, label, mdpd}` |

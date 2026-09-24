@@ -524,6 +524,23 @@ Pide al servidor que cargue dinámicamente un módulo. Estos comandos se dirigen
 | `label` | Etiqueta de esta instancia; el **nombre del módulo** es esa etiqueta sin espacios. Si ya hay cargado un módulo con ese nombre, la petición se rechaza |
 | `profile` | Nombre del perfil a cargar (opcional) |
 
+{{% notice style="warning" title="No pasar tal cual una clave de controllerdata.libraries" %}}
+Las claves de `controllerdata.libraries` ya están prefijadas (`libostfocus`, `libostdummy`...). El servidor vuelve a anteponer `libost` incondicionalmente, así que reenviar una clave tal cual la duplica y falla:
+
+```json
+{ "ML": { "lib": "libostdummy", "label": "MyDummy" } }
+```
+```
+Error loading library MyDummy - Cannot load library libostlibostdummy: cannot open shared object file: No such file or directory
+```
+
+Quitar primero el prefijo `libost` de la clave (misma transformación de la que depende la convención de claves de `profiles`, ver [Datos del controlador]({{% relref "controller.es.md" %}})):
+
+```json
+{ "ML": { "lib": "dummy", "label": "MyDummy" } }
+```
+{{% /notice %}}
+
 ---
 
 ### `MK` — Descargar un módulo {#mk}

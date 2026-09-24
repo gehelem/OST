@@ -524,6 +524,23 @@ Fordert den Server auf, ein Modul dynamisch zu laden. Diese Befehle richten sich
 | `label` | Label dieser Instanz; der **Modulname** ist dieses Label ohne Leerzeichen. Ist ein Modul dieses Namens bereits geladen, wird die Anfrage abgelehnt |
 | `profile` | Name des zu ladenden Profils (optional) |
 
+{{% notice style="warning" title="Keinen controllerdata.libraries-Schlüssel unverändert übernehmen" %}}
+Die Schlüssel von `controllerdata.libraries` sind bereits präfigiert (`libostfocus`, `libostdummy`...). Der Server stellt `libost` bedingungslos erneut voran, sodass ein direkt weitergereichter Schlüssel doppelt präfigiert wird und fehlschlägt:
+
+```json
+{ "ML": { "lib": "libostdummy", "label": "MyDummy" } }
+```
+```
+Error loading library MyDummy - Cannot load library libostlibostdummy: cannot open shared object file: No such file or directory
+```
+
+Das Präfix `libost` zuerst vom Schlüssel entfernen (dieselbe Transformation, auf die sich die Schlüsselkonvention von `profiles` stützt, siehe [Controller-Daten]({{% relref "controller.de.md" %}})):
+
+```json
+{ "ML": { "lib": "dummy", "label": "MyDummy" } }
+```
+{{% /notice %}}
+
 ---
 
 ### `MK` — Modul entladen {#mk}

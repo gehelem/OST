@@ -524,6 +524,23 @@ Chiede al server di caricare dinamicamente un modulo. Questi comandi si rivolgon
 | `label` | Etichetta di questa istanza; il **nome del modulo** è questa etichetta senza spazi. Se un modulo con questo nome è già caricato, la richiesta viene rifiutata |
 | `profile` | Nome del profilo da caricare (facoltativo) |
 
+{{% notice style="warning" title="Non passare una chiave di controllerdata.libraries così com'è" %}}
+Le chiavi di `controllerdata.libraries` sono già con prefisso (`libostfocus`, `libostdummy`...). Il server aggiunge di nuovo `libost` incondizionatamente, quindi inoltrare una chiave direttamente la prefissa due volte e fallisce:
+
+```json
+{ "ML": { "lib": "libostdummy", "label": "MyDummy" } }
+```
+```
+Error loading library MyDummy - Cannot load library libostlibostdummy: cannot open shared object file: No such file or directory
+```
+
+Rimuovere prima il prefisso `libost` dalla chiave (stessa trasformazione su cui si basa la convenzione di chiave di `profiles`, vedi [Controller data]({{% relref "controller.it.md" %}})):
+
+```json
+{ "ML": { "lib": "dummy", "label": "MyDummy" } }
+```
+{{% /notice %}}
+
 ---
 
 ### `MK` — Scaricare un modulo {#mk}

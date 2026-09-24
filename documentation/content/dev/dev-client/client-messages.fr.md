@@ -524,6 +524,23 @@ Demande au serveur de charger dynamiquement un module. Ces commandes visent le c
 | `label` | Libellé de cette instance ; le **nom du module** est ce libellé sans les espaces. Si un module de ce nom est déjà chargé, la demande est refusée |
 | `profile` | Nom de profil à charger (optionnel) |
 
+{{% notice style="warning" title="Ne pas passer telle quelle une clé de controllerdata.libraries" %}}
+Les clés de `controllerdata.libraries` sont déjà préfixées (`libostfocus`, `libostdummy`...). Le serveur ajoute `libost` une nouvelle fois, sans condition : transmettre la clé telle quelle double le préfixe et échoue :
+
+```json
+{ "ML": { "lib": "libostdummy", "label": "MyDummy" } }
+```
+```
+Error loading library MyDummy - Cannot load library libostlibostdummy: cannot open shared object file: No such file or directory
+```
+
+Retirer d'abord le préfixe `libost` de la clé (même transformation que celle sur laquelle s'appuie la convention de clé de `profiles`, voir [Données du contrôleur]({{% relref "controller.fr.md" %}})) :
+
+```json
+{ "ML": { "lib": "dummy", "label": "MyDummy" } }
+```
+{{% /notice %}}
+
 ---
 
 ### `MK` — Décharger un module {#mk}
