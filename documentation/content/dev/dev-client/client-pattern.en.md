@@ -42,6 +42,12 @@ This directly affects icon rendering: [`preicon1`/`preicon2`/`posticon1`/`postic
 
 The same goes for anything else a client might be tempted to pull from a CDN: a JS framework, a charting library, a web font for the UI itself. If the client needs it to run, it ships with the client.
 
+## Strong recommendation: support at least a dark and a light theme
+
+OST clients are commonly used at the eyepiece or next to a telescope, at night — a full-brightness, white-background UI is not just a stylistic mismatch there, it actively ruins the operator's night vision. A client should offer **at minimum both a dark and a light theme**, not hardcode one or the other.
+
+This is not part of the wire protocol — nothing here is enforced or even visible server-side — but it is a strong recommendation for anything meant to be used for real astrophotography sessions, not just as a demo or a desk-testing tool.
+
 ## Full dump vs partial updates
 
 On connection, the client sends `DU`; the server responds with a full dump

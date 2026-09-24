@@ -41,6 +41,12 @@ Questo riguarda direttamente il rendering delle icone: [`preicon1`/`preicon2`/`p
 
 Lo stesso vale per qualsiasi altra cosa che un client potesse essere tentato di prelevare da un CDN: un framework JS, una libreria di grafici, un web font per l'interfaccia stessa. Se serve al client per funzionare, viaggia insieme al client.
 
+## Raccomandazione forte: supportare almeno un tema scuro e uno chiaro
+
+I client OST vengono usati comunemente all'oculare o accanto a un telescopio, di notte — un'interfaccia a piena luminosità, con sfondo bianco, lì non è solo una discordanza stilistica: rovina attivamente la visione notturna dell'operatore. Un client dovrebbe offrire **come minimo sia un tema scuro sia uno chiaro**, senza fissarne uno in modo rigido nel codice.
+
+Questo non fa parte del protocollo di comunicazione — qui non c'è nulla che sia imposto o anche solo visibile lato server — ma è una raccomandazione forte per qualsiasi cosa pensata per essere usata in vere sessioni di astrofotografia, non solo come demo o strumento di test da scrivania.
+
 ## Dump completo vs aggiornamenti parziali
 
 Alla connessione, il client invia `DU`; il server risponde con un dump

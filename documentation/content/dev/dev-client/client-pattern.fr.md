@@ -41,6 +41,12 @@ Un serveur OST tourne souvent sur un réseau local isolé — un site d'observat
 
 Ça vaut aussi pour tout ce qu'un client pourrait être tenté de tirer d'un CDN : un framework JS, une bibliothèque de graphes, une police web pour l'UI elle-même. Si le client en a besoin pour fonctionner, ça part avec le client.
 
+## Recommandation forte : proposer au moins un thème sombre et un thème clair
+
+Les clients OST sont couramment utilisés à l'oculaire ou à côté d'un télescope, de nuit — une interface pleine luminosité à fond blanc n'est pas qu'un décalage de style dans ce contexte, elle détruit purement et simplement la vision nocturne de l'opérateur. Un client doit proposer **au minimum un thème sombre et un thème clair**, et non figer l'un ou l'autre en dur.
+
+Ce n'est pas une exigence du protocole filaire — rien ici n'est imposé ni même visible côté serveur — mais c'est une recommandation forte pour tout ce qui est destiné à être utilisé lors de vraies sessions d'astrophotographie, pas seulement comme démo ou outil de test de bureau.
+
 ## Dump complet vs mises à jour partielles
 
 À la connexion, le client envoie `DU` ; le serveur répond avec un dump

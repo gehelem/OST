@@ -42,6 +42,12 @@ Das betrifft direkt das Rendering der Icons: [`preicon1`/`preicon2`/`posticon1`/
 
 Dasselbe gilt für alles andere, was ein Client versucht sein könnte, von einem CDN zu laden: ein JS-Framework, eine Diagramm-Bibliothek, eine Web-Schriftart für die UI selbst. Wenn der Client es zum Laufen braucht, wird es mit ausgeliefert.
 
+## Starke Empfehlung: mindestens ein dunkles und ein helles Theme unterstützen
+
+OST-Clients werden häufig am Okular oder neben einem Teleskop genutzt, nachts — eine UI mit voller Helligkeit und weißem Hintergrund ist dort nicht nur ein stilistischer Missgriff, sie ruiniert aktiv die Nachtsicht des Anwenders. Ein Client sollte **mindestens sowohl ein dunkles als auch ein helles Theme** anbieten, statt eines der beiden fest zu verdrahten.
+
+Das ist nicht Teil des Wire-Protokolls — nichts davon wird serverseitig erzwungen oder ist dort überhaupt sichtbar —, aber es ist eine starke Empfehlung für alles, was für echte Astrofotografie-Sessions gedacht ist, nicht nur als Demo oder Schreibtisch-Testwerkzeug.
+
 ## Vollständiger Dump vs. teilweise Updates
 
 Bei der Verbindung sendet der Client `DU`; der Server antwortet mit einem
