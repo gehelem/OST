@@ -144,28 +144,25 @@ Non esiste una cartella per client: un `FS` cambia l'elenco di file visto da **t
 Il server **non valida** il percorso: una cartella inesistente restituisce semplicemente un elenco vuoto, senza errore.
 {{% /notice %}}
 
-### Aggiornamenti: `evt`
+### Aggiornamenti: `af` / `df` / `ad` / `dd`
 
-Quando il contenuto della cartella selezionata cambia (file creato, eliminato o rinominato), o dopo un `FS`, il server invia eventi di primo livello `evt`:
+Quando il contenuto della cartella selezionata cambia (file creato, eliminato o rinominato), o dopo un `FS`, il server invia un messaggio per ogni percorso interessato — il valore è il percorso nudo stesso, non racchiuso in un oggetto o array:
 
 ```json
-{ "evt": "fileadd", "fileevent": ["/Sequencer/gam Cyg/LIGHT/Luminance/img_001.FITS"] }
-{ "evt": "filedel", "fileevent": ["/rapport.txt"] }
+{ "af": "/Sequencer/gam Cyg/LIGHT/Luminance/img_001.FITS" }
+{ "df": "/rapport.txt" }
 ```
 
-| Valore di `evt` | Significato |
+| Chiave | Significato |
 |---|---|
-| `fileadd` | File apparso/i nella cartella selezionata |
-| `filedel` | File scomparso/i dalla cartella selezionata |
-| `folderadd` / `folderdel` | Sottocartella creata / eliminata nel webroot (stessa forma, `fileevent` contiene i percorsi delle cartelle) |
+| `af` | File apparso nella cartella selezionata |
+| `df` | File scomparso dalla cartella selezionata |
+| `ad` | Sottocartella creata nel webroot |
+| `dd` | Sottocartella eliminata dal webroot |
 
-`fileevent` è **sempre un array**; oggi contiene un solo percorso per messaggio (N file = N messaggi). Dopo un `FS`, il client riceve un `filedel` per ogni file della vecchia cartella, poi un `fileadd` per ogni file della nuova: **non** c'è alcun messaggio che annuncia il nuovo `selectedfolder`, che esiste solo nel dump.
+Ogni messaggio porta esattamente un percorso (N file = N messaggi) — vedi [`af`/`df`/`ad`/`dd`]({{% relref "server-messages.it.md" %}}#af) per il riferimento completo. Dopo un `FS`, il client riceve un `df` per ogni file della vecchia cartella, poi un `af` per ogni file della nuova: **non** c'è alcun messaggio che annuncia il nuovo `selectedfolder`, che esiste solo nel dump.
 
-A ogni passaggio il server invia inoltre messaggi [`uc`]({{% relref "server-messages.it.md" %}}#uc) `files` e `folders` contenenti gli elenchi **completi**: un client può quindi applicare gli eventi `evt` uno per uno, oppure semplicemente sostituire i propri elenchi con questi `uc`.
-
-{{% notice style="warning" title="Trappola: `evt` inizia con `ev`" %}}
-La regola abituale è confrontare i primi 1 o 2 caratteri della chiave. Ora, `evt` inizia con `ev`, il tipo degli [aggiornamenti di elemento con metadati]({{% relref "server-messages.it.md" %}}#ev), il cui payload è un oggetto e non una stringa. Un client che smista sul prefisso deve **verificare l'uguaglianza esatta con `evt` prima** di verificare `ev`, altrimenti scambierà un evento di file per un aggiornamento di elemento.
-{{% /notice %}}
+A ogni passaggio il server invia inoltre messaggi [`uc`]({{% relref "server-messages.it.md" %}}#uc) `files` e `folders` contenenti gli elenchi **completi**: un client può quindi applicare gli eventi uno per uno, oppure semplicemente sostituire i propri elenchi con questi `uc`.
 
 ### Costruire l'URL di un file
 

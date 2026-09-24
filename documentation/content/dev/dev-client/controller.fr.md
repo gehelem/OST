@@ -144,28 +144,25 @@ Il n'y a pas de dossier par client : un `FS` change la liste de fichiers vue par
 Le serveur **ne valide pas** le chemin : un dossier inexistant renvoie simplement une liste vide, sans erreur.
 {{% /notice %}}
 
-### Mises à jour : `evt`
+### Mises à jour : `af` / `df` / `ad` / `dd`
 
-Quand le contenu du dossier sélectionné change (fichier créé, supprimé ou renommé), ou après un `FS`, le serveur envoie des événements de premier niveau `evt` :
+Quand le contenu du dossier sélectionné change (fichier créé, supprimé ou renommé), ou après un `FS`, le serveur envoie un message par chemin concerné — la valeur est le chemin brut lui-même, sans être enveloppé dans un objet ou un tableau :
 
 ```json
-{ "evt": "fileadd", "fileevent": ["/Sequencer/gam Cyg/LIGHT/Luminance/img_001.FITS"] }
-{ "evt": "filedel", "fileevent": ["/rapport.txt"] }
+{ "af": "/Sequencer/gam Cyg/LIGHT/Luminance/img_001.FITS" }
+{ "df": "/rapport.txt" }
 ```
 
-| Valeur de `evt` | Signification |
+| Clé | Signification |
 |---|---|
-| `fileadd` | Fichier(s) apparu(s) dans le dossier sélectionné |
-| `filedel` | Fichier(s) disparu(s) du dossier sélectionné |
-| `folderadd` / `folderdel` | Sous-dossier créé / supprimé dans le webroot (même forme, `fileevent` contient les chemins de dossiers) |
+| `af` | Fichier apparu dans le dossier sélectionné |
+| `df` | Fichier disparu du dossier sélectionné |
+| `ad` | Sous-dossier créé dans le webroot |
+| `dd` | Sous-dossier supprimé du webroot |
 
-`fileevent` est **toujours un tableau** ; aujourd'hui il contient un seul chemin par message (N fichiers = N messages). Après un `FS`, le client reçoit un `filedel` pour chaque fichier de l'ancien dossier puis un `fileadd` pour chaque fichier du nouveau : il n'y a **pas** de message annonçant le nouveau `selectedfolder`, qui n'existe que dans le dump.
+Chaque message porte exactement un chemin (N fichiers = N messages) — voir [`af`/`df`/`ad`/`dd`]({{% relref "server-messages.fr.md" %}}#af) pour la référence complète. Après un `FS`, le client reçoit un `df` pour chaque fichier de l'ancien dossier puis un `af` pour chaque fichier du nouveau : il n'y a **pas** de message annonçant le nouveau `selectedfolder`, qui n'existe que dans le dump.
 
-Le serveur envoie en plus, à chaque passage, des messages [`uc`]({{% relref "server-messages.fr.md" %}}#uc) `files` et `folders` contenant les listes **complètes** : un client peut donc soit appliquer les événements `evt` un par un, soit simplement remplacer ses listes avec ces `uc`.
-
-{{% notice style="warning" title="Piège : `evt` commence par `ev`" %}}
-La règle habituelle est de comparer les 1 ou 2 premiers caractères de la clé. Or `evt` commence par `ev`, le type des [mises à jour d'élément avec métadonnées]({{% relref "server-messages.fr.md" %}}#ev), dont le payload est un objet et non une chaîne. Un client qui dispatche sur le préfixe doit **tester l'égalité exacte avec `evt` avant** de tester `ev`, sinon il prendra un événement de fichier pour une mise à jour d'élément.
-{{% /notice %}}
+Le serveur envoie en plus, à chaque passage, des messages [`uc`]({{% relref "server-messages.fr.md" %}}#uc) `files` et `folders` contenant les listes **complètes** : un client peut donc soit appliquer les événements un par un, soit simplement remplacer ses listes avec ces `uc`.
 
 ### Construire l'URL d'un fichier
 

@@ -144,28 +144,25 @@ There is no per-client folder: an `FS` changes the file list seen by **all** con
 The server **does not validate** the path: a non-existent folder simply returns an empty list, without an error.
 {{% /notice %}}
 
-### Updates: `evt`
+### Updates: `af` / `df` / `ad` / `dd`
 
-When the content of the selected folder changes (file created, deleted or renamed), or after an `FS`, the server sends top-level `evt` events:
+When the content of the selected folder changes (file created, deleted or renamed), or after an `FS`, the server sends one message per affected path — the value is the bare path itself, not wrapped in an object or array:
 
 ```json
-{ "evt": "fileadd", "fileevent": ["/Sequencer/gam Cyg/LIGHT/Luminance/img_001.FITS"] }
-{ "evt": "filedel", "fileevent": ["/report.txt"] }
+{ "af": "/Sequencer/gam Cyg/LIGHT/Luminance/img_001.FITS" }
+{ "df": "/report.txt" }
 ```
 
-| `evt` value | Meaning |
+| Key | Meaning |
 |---|---|
-| `fileadd` | File(s) appeared in the selected folder |
-| `filedel` | File(s) disappeared from the selected folder |
-| `folderadd` / `folderdel` | Sub-folder created / deleted in the webroot (same shape, `fileevent` contains folder paths) |
+| `af` | File appeared in the selected folder |
+| `df` | File disappeared from the selected folder |
+| `ad` | Sub-folder created in the webroot |
+| `dd` | Sub-folder deleted from the webroot |
 
-`fileevent` is **always an array**; today it contains a single path per message (N files = N messages). After an `FS`, the client receives a `filedel` for each file of the old folder, then a `fileadd` for each file of the new one: there is **no** message announcing the new `selectedfolder`, which only exists in the dump.
+Each message carries exactly one path (N files = N messages) — see [`af`/`df`/`ad`/`dd`]({{% relref "server-messages.en.md" %}}#af) for the full reference. After an `FS`, the client receives a `df` for each file of the old folder, then an `af` for each file of the new one: there is **no** message announcing the new `selectedfolder`, which only exists in the dump.
 
-On every pass the server also sends [`uc`]({{% relref "server-messages.en.md" %}}#uc) messages `files` and `folders` containing the **complete** lists: a client can therefore either apply the `evt` events one by one, or simply replace its lists with these `uc` messages.
-
-{{% notice style="warning" title="Pitfall: `evt` starts with `ev`" %}}
-The usual rule is to compare the first 1 or 2 characters of the key. But `evt` starts with `ev`, the type of [element updates with metadata]({{% relref "server-messages.en.md" %}}#ev), whose payload is an object and not a string. A client that dispatches on the prefix must **test for an exact match with `evt` before** testing for `ev`, otherwise it will mistake a file event for an element update.
-{{% /notice %}}
+On every pass the server also sends [`uc`]({{% relref "server-messages.en.md" %}}#uc) messages `files` and `folders` containing the **complete** lists: a client can therefore either apply the events one by one, or simply replace its lists with these `uc` messages.
 
 ### Building a file URL
 

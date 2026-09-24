@@ -18,10 +18,6 @@ Clients should match on the **first 1 or 2 characters** of the key, not the full
 
 All server-sent event keys are **lowercase** (e.g. `d`, `ea`, `ap`, `gc`).
 
-{{% notice style="warning" title="Exception: `evt` starts with `ev`" %}}
-The [`evt`](#evt) key (file events) starts with the same two characters as [`ev`](#ev). Check for an exact match with `evt` first, and only then fall back to prefixes, otherwise a file event is mistaken for an element update.
-{{% /notice %}}
-
 ---
 
 ## Event type index
@@ -49,7 +45,10 @@ The [`evt`](#evt) key (file events) starts with the same two characters as [`ev`
 | [`fc`](#fs) | Profile has unsaved changes |
 | [`l`](#l) | Log entry |
 | [`uc`](#uc) | Controller data update |
-| [`evt`](#evt) | File or folder event (added/removed) |
+| [`af`](#af) | File added |
+| [`df`](#af) | File deleted |
+| [`ad`](#af) | Directory added |
+| [`dd`](#af) | Directory deleted |
 | [`xx`](#xx) | Keepalive pong |
 
 ---
@@ -553,22 +552,21 @@ The payload is `{"key": value}` where `value` can be a string, array, or object.
 
 ---
 
-## `evt` — File or folder event {#evt}
+## `af` / `df` / `ad` / `dd` — File and folder events {#af}
 
-Sent to all clients when the content of the watched file folder changes (see [File system]({{% relref "controller.en.md" %}}#fichiers)). Unlike the other messages, the key is exactly `evt` and its **value is a string** giving the event type; the paths are in a sibling `fileevent` field.
+Sent to all clients when the content of the watched file folder changes (see [File system]({{% relref "controller.en.md" %}}#fichiers)). Unlike other messages, the value is a **bare string**: the affected path, not wrapped in an object or array — the server only ever reports one path per message.
 
 ```json
-{ "evt": "fileadd", "fileevent": ["/Allsky/image_001.jpeg"] }
+{ "af": "/Allsky/image_001.jpeg" }
+{ "df": "/Allsky/old_image.jpeg" }
 ```
 
-| `evt` | Meaning |
+| Key | Meaning |
 |---|---|
-| `fileadd` | File(s) added to the selected folder |
-| `filedel` | File(s) removed from the selected folder |
-| `folderadd` | Sub-folder added to the webroot |
-| `folderdel` | Sub-folder removed from the webroot |
-
-`fileevent` is always an array of paths relative to the webroot (starting with `/`).
+| `af` | File added to the selected folder |
+| `df` | File removed from the selected folder |
+| `ad` | Sub-folder added to the webroot |
+| `dd` | Sub-folder removed from the webroot |
 
 ---
 

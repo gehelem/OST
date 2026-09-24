@@ -144,28 +144,25 @@ No hay carpeta por cliente: un `FS` cambia la lista de archivos que ven **todos*
 El servidor **no valida** la ruta: una carpeta inexistente devuelve simplemente una lista vacía, sin error.
 {{% /notice %}}
 
-### Actualizaciones: `evt`
+### Actualizaciones: `af` / `df` / `ad` / `dd`
 
-Cuando cambia el contenido de la carpeta seleccionada (archivo creado, eliminado o renombrado), o tras un `FS`, el servidor envía eventos de primer nivel `evt`:
+Cuando cambia el contenido de la carpeta seleccionada (archivo creado, eliminado o renombrado), o tras un `FS`, el servidor envía un mensaje por cada ruta afectada — el valor es la ruta en sí, sin envolver en un objeto ni en un array:
 
 ```json
-{ "evt": "fileadd", "fileevent": ["/Sequencer/gam Cyg/LIGHT/Luminance/img_001.FITS"] }
-{ "evt": "filedel", "fileevent": ["/rapport.txt"] }
+{ "af": "/Sequencer/gam Cyg/LIGHT/Luminance/img_001.FITS" }
+{ "df": "/rapport.txt" }
 ```
 
-| Valor de `evt` | Significado |
+| Clave | Significado |
 |---|---|
-| `fileadd` | Archivo(s) aparecido(s) en la carpeta seleccionada |
-| `filedel` | Archivo(s) desaparecido(s) de la carpeta seleccionada |
-| `folderadd` / `folderdel` | Subcarpeta creada / eliminada en el webroot (misma forma, `fileevent` contiene las rutas de carpetas) |
+| `af` | Archivo aparecido en la carpeta seleccionada |
+| `df` | Archivo desaparecido de la carpeta seleccionada |
+| `ad` | Subcarpeta creada en el webroot |
+| `dd` | Subcarpeta eliminada del webroot |
 
-`fileevent` es **siempre un array**; hoy contiene una sola ruta por mensaje (N archivos = N mensajes). Tras un `FS`, el cliente recibe un `filedel` por cada archivo de la carpeta anterior y luego un `fileadd` por cada archivo de la nueva: **no** hay ningún mensaje que anuncie el nuevo `selectedfolder`, que solo existe en el dump.
+Cada mensaje lleva exactamente una ruta (N archivos = N mensajes) — ver [`af`/`df`/`ad`/`dd`]({{% relref "server-messages.es.md" %}}#af) para la referencia completa. Tras un `FS`, el cliente recibe un `df` por cada archivo de la carpeta anterior y luego un `af` por cada archivo de la nueva: **no** hay ningún mensaje que anuncie el nuevo `selectedfolder`, que solo existe en el dump.
 
-El servidor envía además, en cada pasada, mensajes [`uc`]({{% relref "server-messages.es.md" %}}#uc) `files` y `folders` con las listas **completas**: un cliente puede por tanto aplicar los eventos `evt` uno a uno, o simplemente reemplazar sus listas con esos `uc`.
-
-{{% notice style="warning" title="Trampa: `evt` empieza por `ev`" %}}
-La regla habitual es comparar los 1 o 2 primeros caracteres de la clave. Pero `evt` empieza por `ev`, el tipo de las [actualizaciones de elemento con metadatos]({{% relref "server-messages.es.md" %}}#ev), cuyo payload es un objeto y no una cadena. Un cliente que despacha por prefijo debe **comprobar la igualdad exacta con `evt` antes** de comprobar `ev`; de lo contrario tomará un evento de archivo por una actualización de elemento.
-{{% /notice %}}
+El servidor envía además, en cada pasada, mensajes [`uc`]({{% relref "server-messages.es.md" %}}#uc) `files` y `folders` con las listas **completas**: un cliente puede por tanto aplicar los eventos uno a uno, o simplemente reemplazar sus listas con esos `uc`.
 
 ### Construir la URL de un archivo
 

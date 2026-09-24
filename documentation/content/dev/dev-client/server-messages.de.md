@@ -18,10 +18,6 @@ Clients müssen die **ersten 1 oder 2 Zeichen** des Schlüssels abgleichen, nich
 
 Alle vom Server gesendeten Ereignisschlüssel sind **klein geschrieben** (z. B. `d`, `ea`, `ap`, `gc`).
 
-{{% notice style="warning" title="Ausnahme: `evt` beginnt mit `ev`" %}}
-Der Schlüssel [`evt`](#evt) (Dateiereignisse) beginnt mit denselben zwei Zeichen wie [`ev`](#ev). Zuerst auf exakte Gleichheit mit `evt` prüfen, erst danach die Präfixe, sonst wird ein Dateiereignis für ein Element-Update gehalten.
-{{% /notice %}}
-
 ---
 
 ## Übersicht der Ereignistypen
@@ -49,7 +45,10 @@ Der Schlüssel [`evt`](#evt) (Dateiereignisse) beginnt mit denselben zwei Zeiche
 | [`fc`](#fs) | Profil geändert (nicht gespeicherte Änderungen) |
 | [`l`](#l) | Log-Eintrag |
 | [`uc`](#uc) | Update der Controller-Daten |
-| [`evt`](#evt) | Datei- oder Ordnerereignis (Hinzufügen/Löschen) |
+| [`af`](#af) | Datei hinzugefügt |
+| [`df`](#af) | Datei gelöscht |
+| [`ad`](#af) | Verzeichnis hinzugefügt |
+| [`dd`](#af) | Verzeichnis gelöscht |
 | [`xx`](#xx) | Keepalive-Pong |
 
 ---
@@ -553,22 +552,21 @@ Der Payload ist `{"Schlüssel": Wert}`, wobei `Wert` eine Zeichenkette, ein Arra
 
 ---
 
-## `evt` — Datei- oder Ordnerereignis {#evt}
+## `af` / `df` / `ad` / `dd` — Datei- und Ordnerereignisse {#af}
 
-Wird an alle Clients gesendet, wenn sich der Inhalt des überwachten Dateiordners ändert (siehe [Dateisystem]({{% relref "controller.de.md" %}}#fichiers)). Anders als bei den anderen Nachrichten lautet der Schlüssel genau `evt`, und sein **Wert ist eine Zeichenkette**, die den Ereignistyp angibt; die Pfade stehen in einem Geschwisterfeld `fileevent`.
+Wird an alle Clients gesendet, wenn sich der Inhalt des überwachten Dateiordners ändert (siehe [Dateisystem]({{% relref "controller.de.md" %}}#fichiers)). Anders als bei anderen Nachrichten ist der Wert eine **reine Zeichenkette**: der betroffene Pfad, nicht in ein Objekt oder Array verpackt — der Server meldet immer nur einen Pfad pro Nachricht.
 
 ```json
-{ "evt": "fileadd", "fileevent": ["/Allsky/image_001.jpeg"] }
+{ "af": "/Allsky/image_001.jpeg" }
+{ "df": "/Allsky/old_image.jpeg" }
 ```
 
-| `evt` | Bedeutung |
+| Schlüssel | Bedeutung |
 |---|---|
-| `fileadd` | Datei(en) zum ausgewählten Ordner hinzugefügt |
-| `filedel` | Datei(en) aus dem ausgewählten Ordner gelöscht |
-| `folderadd` | Unterordner zum Webroot hinzugefügt |
-| `folderdel` | Unterordner aus dem Webroot gelöscht |
-
-`fileevent` ist immer ein Array von Pfaden relativ zum Webroot (mit führendem `/`).
+| `af` | Datei zum ausgewählten Ordner hinzugefügt |
+| `df` | Datei aus dem ausgewählten Ordner entfernt |
+| `ad` | Unterordner zum Webroot hinzugefügt |
+| `dd` | Unterordner aus dem Webroot entfernt |
 
 ---
 

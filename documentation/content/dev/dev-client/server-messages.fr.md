@@ -18,10 +18,6 @@ Les clients doivent comparer sur les **1 ou 2 premiers caractères** de la clé,
 
 Toutes les clés d'événements envoyées par le serveur sont en **minuscules** (ex. `d`, `ea`, `ap`, `gc`).
 
-{{% notice style="warning" title="Exception : `evt` commence par `ev`" %}}
-La clé [`evt`](#evt) (événements de fichiers) commence par les mêmes deux caractères que [`ev`](#ev). Comparer d'abord l'égalité exacte avec `evt`, puis seulement les préfixes, sinon un événement de fichier est pris pour une mise à jour d'élément.
-{{% /notice %}}
-
 ---
 
 ## Index des types d'événements
@@ -49,7 +45,10 @@ La clé [`evt`](#evt) (événements de fichiers) commence par les mêmes deux ca
 | [`fc`](#fs) | Profil modifié (modifications non sauvegardées) |
 | [`l`](#l) | Entrée de log |
 | [`uc`](#uc) | Mise à jour des données du contrôleur |
-| [`evt`](#evt) | Événement de fichier ou de dossier (ajout/suppression) |
+| [`af`](#af) | Fichier ajouté |
+| [`df`](#af) | Fichier supprimé |
+| [`ad`](#af) | Dossier ajouté |
+| [`dd`](#af) | Dossier supprimé |
 | [`xx`](#xx) | Pong keepalive |
 
 ---
@@ -553,22 +552,21 @@ Le payload est `{"clé": valeur}` où `valeur` peut être une chaîne, un tablea
 
 ---
 
-## `evt` — Événement de fichier ou de dossier {#evt}
+## `af` / `df` / `ad` / `dd` — Événements de fichier ou de dossier {#af}
 
-Envoyé à tous les clients quand le contenu du dossier de fichiers surveillé change (voir [Système de fichiers]({{% relref "controller.fr.md" %}}#fichiers)). Contrairement aux autres messages, la clé est exactement `evt` et sa **valeur est une chaîne** qui donne le type d'événement ; les chemins sont dans un champ frère `fileevent`.
+Envoyé à tous les clients quand le contenu du dossier de fichiers surveillé change (voir [Système de fichiers]({{% relref "controller.fr.md" %}}#fichiers)). Contrairement aux autres messages, la valeur est une **chaîne brute** : le chemin concerné, sans être enveloppé dans un objet ou un tableau — le serveur ne signale jamais qu'un seul chemin par message.
 
 ```json
-{ "evt": "fileadd", "fileevent": ["/Allsky/image_001.jpeg"] }
+{ "af": "/Allsky/image_001.jpeg" }
+{ "df": "/Allsky/old_image.jpeg" }
 ```
 
-| `evt` | Signification |
+| Clé | Signification |
 |---|---|
-| `fileadd` | Fichier(s) ajouté(s) au dossier sélectionné |
-| `filedel` | Fichier(s) supprimé(s) du dossier sélectionné |
-| `folderadd` | Sous-dossier ajouté au webroot |
-| `folderdel` | Sous-dossier supprimé du webroot |
-
-`fileevent` est toujours un tableau de chemins relatifs au webroot (commençant par `/`).
+| `af` | Fichier ajouté au dossier sélectionné |
+| `df` | Fichier supprimé du dossier sélectionné |
+| `ad` | Sous-dossier ajouté au webroot |
+| `dd` | Sous-dossier supprimé du webroot |
 
 ---
 

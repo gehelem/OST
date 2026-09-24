@@ -144,28 +144,25 @@ Es gibt keinen Ordner pro Client: ein `FS` ändert die Dateiliste, die **alle** 
 Der Server **validiert den Pfad nicht**: ein nicht existierender Ordner liefert einfach eine leere Liste, ohne Fehler.
 {{% /notice %}}
 
-### Aktualisierungen: `evt`
+### Aktualisierungen: `af` / `df` / `ad` / `dd`
 
-Wenn sich der Inhalt des ausgewählten Ordners ändert (Datei erstellt, gelöscht oder umbenannt) oder nach einem `FS`, sendet der Server `evt`-Ereignisse auf oberster Ebene:
+Wenn sich der Inhalt des ausgewählten Ordners ändert (Datei erstellt, gelöscht oder umbenannt) oder nach einem `FS`, sendet der Server eine Nachricht pro betroffenem Pfad — der Wert ist der reine Pfad selbst, nicht in ein Objekt oder Array verpackt:
 
 ```json
-{ "evt": "fileadd", "fileevent": ["/Sequencer/gam Cyg/LIGHT/Luminance/img_001.FITS"] }
-{ "evt": "filedel", "fileevent": ["/rapport.txt"] }
+{ "af": "/Sequencer/gam Cyg/LIGHT/Luminance/img_001.FITS" }
+{ "df": "/rapport.txt" }
 ```
 
-| Wert von `evt` | Bedeutung |
+| Schlüssel | Bedeutung |
 |---|---|
-| `fileadd` | Datei(en) im ausgewählten Ordner hinzugekommen |
-| `filedel` | Datei(en) aus dem ausgewählten Ordner verschwunden |
-| `folderadd` / `folderdel` | Unterordner im Webroot erstellt / gelöscht (gleiche Form, `fileevent` enthält die Ordnerpfade) |
+| `af` | Datei im ausgewählten Ordner hinzugekommen |
+| `df` | Datei aus dem ausgewählten Ordner verschwunden |
+| `ad` | Unterordner im Webroot erstellt |
+| `dd` | Unterordner aus dem Webroot gelöscht |
 
-`fileevent` ist **immer ein Array**; heute enthält es einen einzigen Pfad pro Nachricht (N Dateien = N Nachrichten). Nach einem `FS` erhält der Client für jede Datei des alten Ordners ein `filedel` und dann für jede Datei des neuen ein `fileadd`: es gibt **keine** Nachricht, die den neuen `selectedfolder` ankündigt, der nur im Dump existiert.
+Jede Nachricht trägt genau einen Pfad (N Dateien = N Nachrichten) — siehe [`af`/`df`/`ad`/`dd`]({{% relref "server-messages.de.md" %}}#af) für die vollständige Referenz. Nach einem `FS` erhält der Client für jede Datei des alten Ordners ein `df` und dann für jede Datei des neuen ein `af`: es gibt **keine** Nachricht, die den neuen `selectedfolder` ankündigt, der nur im Dump existiert.
 
-Zusätzlich sendet der Server bei jedem Durchlauf [`uc`]({{% relref "server-messages.de.md" %}}#uc)-Nachrichten `files` und `folders` mit den **vollständigen** Listen: ein Client kann also entweder die `evt`-Ereignisse einzeln anwenden oder seine Listen einfach mit diesen `uc` ersetzen.
-
-{{% notice style="warning" title="Falle: `evt` beginnt mit `ev`" %}}
-Die übliche Regel ist, die ersten 1 oder 2 Zeichen des Schlüssels zu vergleichen. `evt` beginnt jedoch mit `ev`, dem Typ der [Element-Updates mit Metadaten]({{% relref "server-messages.de.md" %}}#ev), deren Payload ein Objekt und keine Zeichenkette ist. Ein Client, der über das Präfix verzweigt, muss **vor** dem Test auf `ev` auf **exakte Gleichheit mit `evt`** prüfen, sonst hält er ein Dateiereignis für ein Element-Update.
-{{% /notice %}}
+Zusätzlich sendet der Server bei jedem Durchlauf [`uc`]({{% relref "server-messages.de.md" %}}#uc)-Nachrichten `files` und `folders` mit den **vollständigen** Listen: ein Client kann also entweder die Ereignisse einzeln anwenden oder seine Listen einfach mit diesen `uc` ersetzen.
 
 ### Die URL einer Datei bilden
 

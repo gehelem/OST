@@ -18,10 +18,6 @@ I client devono confrontare i **primi 1 o 2 caratteri** della chiave, non l'inte
 
 Tutte le chiavi degli eventi inviate dal server sono in **minuscolo** (es. `d`, `ea`, `ap`, `gc`).
 
-{{% notice style="warning" title="Eccezione: `evt` inizia con `ev`" %}}
-La chiave [`evt`](#evt) (eventi di file) inizia con gli stessi due caratteri di [`ev`](#ev). Confrontare prima l'uguaglianza esatta con `evt`, e solo dopo i prefissi, altrimenti un evento di file viene scambiato per un aggiornamento di elemento.
-{{% /notice %}}
-
 ---
 
 ## Indice dei tipi di evento
@@ -49,7 +45,10 @@ La chiave [`evt`](#evt) (eventi di file) inizia con gli stessi due caratteri di 
 | [`fc`](#fs) | Profilo modificato (modifiche non salvate) |
 | [`l`](#l) | Voce di log |
 | [`uc`](#uc) | Aggiornamento dei dati del controller |
-| [`evt`](#evt) | Evento di file o di cartella (aggiunta/eliminazione) |
+| [`af`](#af) | File aggiunto |
+| [`df`](#af) | File eliminato |
+| [`ad`](#af) | Cartella aggiunta |
+| [`dd`](#af) | Cartella eliminata |
 | [`xx`](#xx) | Pong keepalive |
 
 ---
@@ -553,22 +552,21 @@ Il payload è `{"chiave": valore}` dove `valore` può essere una stringa, un arr
 
 ---
 
-## `evt` — Evento di file o di cartella {#evt}
+## `af` / `df` / `ad` / `dd` — Eventi di file e cartella {#af}
 
-Inviato a tutti i client quando il contenuto della cartella di file sorvegliata cambia (vedi [File system]({{% relref "controller.it.md" %}}#fichiers)). A differenza degli altri messaggi, la chiave è esattamente `evt` e il suo **valore è una stringa** che indica il tipo di evento; i percorsi si trovano in un campo affiancato `fileevent`.
+Inviato a tutti i client quando il contenuto della cartella di file sorvegliata cambia (vedi [File system]({{% relref "controller.it.md" %}}#fichiers)). A differenza degli altri messaggi, il valore è una **stringa nuda**: il percorso interessato, non racchiuso in un oggetto o array — il server segnala sempre un solo percorso per messaggio.
 
 ```json
-{ "evt": "fileadd", "fileevent": ["/Allsky/image_001.jpeg"] }
+{ "af": "/Allsky/image_001.jpeg" }
+{ "df": "/Allsky/old_image.jpeg" }
 ```
 
-| `evt` | Significato |
+| Chiave | Significato |
 |---|---|
-| `fileadd` | File aggiunto/i alla cartella selezionata |
-| `filedel` | File eliminato/i dalla cartella selezionata |
-| `folderadd` | Sottocartella aggiunta al webroot |
-| `folderdel` | Sottocartella eliminata dal webroot |
-
-`fileevent` è sempre un array di percorsi relativi al webroot (che iniziano con `/`).
+| `af` | File aggiunto alla cartella selezionata |
+| `df` | File eliminato dalla cartella selezionata |
+| `ad` | Sottocartella aggiunta al webroot |
+| `dd` | Sottocartella eliminata dal webroot |
 
 ---
 

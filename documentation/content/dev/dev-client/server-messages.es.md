@@ -18,10 +18,6 @@ Los clientes deben comparar los **1 o 2 primeros caracteres** de la clave, no la
 
 Todas las claves de eventos enviadas por el servidor están en **minúsculas** (ej. `d`, `ea`, `ap`, `gc`).
 
-{{% notice style="warning" title="Excepción: `evt` empieza por `ev`" %}}
-La clave [`evt`](#evt) (eventos de archivos) empieza por los mismos dos caracteres que [`ev`](#ev). Comparar primero la igualdad exacta con `evt` y solo después los prefijos; de lo contrario, un evento de archivo se toma por una actualización de elemento.
-{{% /notice %}}
-
 ---
 
 ## Índice de tipos de eventos
@@ -49,7 +45,10 @@ La clave [`evt`](#evt) (eventos de archivos) empieza por los mismos dos caracter
 | [`fc`](#fs) | Perfil modificado (modificaciones no guardadas) |
 | [`l`](#l) | Entrada de log |
 | [`uc`](#uc) | Actualización de los datos del controlador |
-| [`evt`](#evt) | Evento de archivo o de carpeta (alta/baja) |
+| [`af`](#af) | Archivo añadido |
+| [`df`](#af) | Archivo eliminado |
+| [`ad`](#af) | Carpeta añadida |
+| [`dd`](#af) | Carpeta eliminada |
 | [`xx`](#xx) | Pong keepalive |
 
 ---
@@ -553,22 +552,21 @@ El payload es `{"clave": valor}` donde `valor` puede ser una cadena, un array o 
 
 ---
 
-## `evt` — Evento de archivo o de carpeta {#evt}
+## `af` / `df` / `ad` / `dd` — Eventos de archivo y de carpeta {#af}
 
-Enviado a todos los clientes cuando cambia el contenido de la carpeta de archivos vigilada (ver [Sistema de archivos]({{% relref "controller.es.md" %}}#fichiers)). A diferencia de los demás mensajes, la clave es exactamente `evt` y su **valor es una cadena** que indica el tipo de evento; las rutas van en un campo hermano `fileevent`.
+Enviado a todos los clientes cuando cambia el contenido de la carpeta de archivos vigilada (ver [Sistema de archivos]({{% relref "controller.es.md" %}}#fichiers)). A diferencia de los demás mensajes, el valor es una **cadena simple**: la ruta afectada, sin envolver en un objeto ni en un array — el servidor solo reporta una ruta por mensaje.
 
 ```json
-{ "evt": "fileadd", "fileevent": ["/Allsky/image_001.jpeg"] }
+{ "af": "/Allsky/image_001.jpeg" }
+{ "df": "/Allsky/old_image.jpeg" }
 ```
 
-| `evt` | Significado |
+| Clave | Significado |
 |---|---|
-| `fileadd` | Archivo(s) añadido(s) a la carpeta seleccionada |
-| `filedel` | Archivo(s) eliminado(s) de la carpeta seleccionada |
-| `folderadd` | Subcarpeta añadida al webroot |
-| `folderdel` | Subcarpeta eliminada del webroot |
-
-`fileevent` es siempre un array de rutas relativas al webroot (que empiezan por `/`).
+| `af` | Archivo añadido a la carpeta seleccionada |
+| `df` | Archivo eliminado de la carpeta seleccionada |
+| `ad` | Subcarpeta añadida al webroot |
+| `dd` | Subcarpeta eliminada del webroot |
 
 ---
 
