@@ -2,6 +2,7 @@
 #include <QNetworkInterface>
 #include <QDirIterator>
 #include <QFileSystemWatcher>
+#include <QFileInfo>
 #include <QHostInfo>
 #include <QDomDocument>
 #include <QThread>
@@ -594,11 +595,24 @@ void Controller::onExternalEvent(OST::ExtEvent event)
                 logError("Controller::onExternalEvent - invalid event data content - %1", {OST::ExtEvToString(event.ev)});
                 return;
             };
+            QFileInfo requestedInfo(_webroot + event.data["folder"].toString());
+            if (!requestedInfo.isDir())
+            {
+                logError("Controller::onExternalEvent - folder %1 does not exist", {event.data["folder"].toString()});
+                return;
+            }
+            QString canonicalWebroot = QFileInfo(_webroot).canonicalFilePath();
+            QString canonicalRequested = requestedInfo.canonicalFilePath();
+            if (canonicalRequested != canonicalWebroot && !canonicalRequested.startsWith(canonicalWebroot + "/"))
+            {
+                logError("Controller::onExternalEvent - folder %1 is outside the webroot", {event.data["folder"].toString()});
+                return;
+            }
             for ( const auto &d : mFileWatcher.directories() )
             {
                 mFileWatcher.removePath(d);
             }
-            mSelectedFolder = _webroot + event.data["folder"].toString();
+            mSelectedFolder = canonicalRequested;
             mFileWatcher.addPath(mSelectedFolder);
             OnFileWatcherEvent(QString());
             return;
