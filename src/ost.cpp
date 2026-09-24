@@ -11,15 +11,18 @@
 int main(int argc, char *argv[])
 {
     qDebug() << "MAIN 0";
-    // Initialize Qt embedded resources (must be done before using them)
-    Q_INIT_RESOURCE(translations);
-    // Register custom types for queued signal/slot connections
-    qRegisterMetaType<OST::LogLevel>("OST::LogLevel");
-    qRegisterMetaType<OST::EvType>("OST::EvType");
 
-    QGuiApplication app(argc, argv, false);
-    QGuiApplication::setOrganizationName("alazob.team");
-    QGuiApplication::setApplicationName("ost");
+    // Parse arguments before constructing QGuiApplication: on an unknown
+    // option or --help, we want a plain `return` from main() with no
+    // QGuiApplication ever having existed. Constructing one only to have
+    // it torn down almost immediately (no event loop ever run) reliably
+    // corrupted the heap on exit ("double free or corruption") - true even
+    // with a clean return letting destructors run normally, so it's not
+    // about skipping destructors, something about this app's very early
+    // teardown itself is the problem. Simplest robust fix: don't create it
+    // at all on an early-exit path.
+    QStringList cliArgs;
+    for (int i = 0; i < argc; ++i) cliArgs << QString::fromLocal8Bit(argv[i]);
 
     QCommandLineParser argParser;
     argParser.addHelpOption();
@@ -75,7 +78,27 @@ int main(int argc, char *argv[])
     argParser.addOption(setAdminPasswordOption);
     argParser.addOption(systemWatchIntervalOption);
     argParser.addOption(minFreePercentOption);
-    argParser.process(app);
+    if (!argParser.parse(cliArgs))
+    {
+        fputs(qPrintable(argParser.errorText()), stderr);
+        fputs("\n", stderr);
+        return 1;
+    }
+    if (argParser.isSet("help"))
+    {
+        fputs(qPrintable(argParser.helpText()), stdout);
+        return 0;
+    }
+
+    // Only now, past every early-exit path, construct the application.
+    QGuiApplication app(argc, argv, false);
+    QGuiApplication::setOrganizationName("alazob.team");
+    QGuiApplication::setApplicationName("ost");
+    // Initialize Qt embedded resources (must be done before using them)
+    Q_INIT_RESOURCE(translations);
+    // Register custom types for queued signal/slot connections
+    qRegisterMetaType<OST::LogLevel>("OST::LogLevel");
+    qRegisterMetaType<OST::EvType>("OST::EvType");
 
     QString webroot = argParser.value(webrootOption);
     QString dbPath = argParser.value(dbPathOption);
