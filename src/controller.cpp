@@ -2,6 +2,7 @@
 #include <QNetworkInterface>
 #include <QDirIterator>
 #include <QFileSystemWatcher>
+#include <QFileInfo>
 #include <QHostInfo>
 #include <QDomDocument>
 #include <QThread>
@@ -524,7 +525,7 @@ void Controller::OnClientEvent(OST::ExtEvent event, QWebSocket* client, QString 
 {
     if (event.ev == OST::ExtEvType::DU || event.ev == OST::ExtEvType::IL  || event.ev == OST::ExtEvType::LO )
     {
-        wshandler->sendJsonMessage(getModulesDump(clientgrant), client);
+        wshandler->sendJsonMessage(getModulesDump(clientgrant, wshandler->getClientLanguage(client)), client);
     }
     if (event.ev == OST::ExtEvType::XX )
     {
@@ -594,11 +595,24 @@ void Controller::onExternalEvent(OST::ExtEvent event)
                 logError("Controller::onExternalEvent - invalid event data content - %1", {OST::ExtEvToString(event.ev)});
                 return;
             };
+            QFileInfo requestedInfo(_webroot + event.data["folder"].toString());
+            if (!requestedInfo.isDir())
+            {
+                logError("Controller::onExternalEvent - folder %1 does not exist", {event.data["folder"].toString()});
+                return;
+            }
+            QString canonicalWebroot = QFileInfo(_webroot).canonicalFilePath();
+            QString canonicalRequested = requestedInfo.canonicalFilePath();
+            if (canonicalRequested != canonicalWebroot && !canonicalRequested.startsWith(canonicalWebroot + "/"))
+            {
+                logError("Controller::onExternalEvent - folder %1 is outside the webroot", {event.data["folder"].toString()});
+                return;
+            }
             for ( const auto &d : mFileWatcher.directories() )
             {
                 mFileWatcher.removePath(d);
             }
-            mSelectedFolder = _webroot + event.data["folder"].toString();
+            mSelectedFolder = canonicalRequested;
             mFileWatcher.addPath(mSelectedFolder);
             OnFileWatcherEvent(QString());
             return;
@@ -1237,7 +1251,7 @@ void Controller::logError(const QString &message, const QVariantList &args)
     // Broadcast to WebSocket clients (each in their language)
     wshandler->onLog(OST::LogLevel::Error, message, args, "CT");
 }
-QJsonObject Controller::getModulesDump(QString clientgrant)
+QJsonObject Controller::getModulesDump(QString clientgrant, QString clientLanguage)
 {
     QJsonObject result, dump, files, modules;
     dump["grant-client"] = clientgrant;
@@ -1261,7 +1275,7 @@ QJsonObject Controller::getModulesDump(QString clientgrant)
 
     dump["m"] = modules;
     dump["files"] = files;
-    dump["logs"] = mLogger->getJsonHistory();
+    dump["logs"] = mLogger->getJsonHistory(clientLanguage);
     dump["serverlng"] = _lng;
     dump["controllerdata"] = QJsonObject().fromVariantMap(mControllerData);
 

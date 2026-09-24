@@ -19,6 +19,15 @@ LovBase *LovFactory::createLov(const QVariantMap &pData)
                     pLov->lovAdd(it.key(), it.value().toString());
                 }
             }
+            else if (pData.contains("values") && pData["values"].canConvert<QVariantList>())
+            {
+                // Array-of-pairs format written by module .json files: [ ["value", "label"], ... ]
+                for (const QVariant &pair : pData["values"].toList())
+                {
+                    QVariantList pl = pair.toList();
+                    if (pl.size() == 2) pLov->lovAdd(pl[0].toString(), pl[1].toString());
+                }
+            }
             return pLov;
         }
         if (pData["type"].toString() == "int")
@@ -33,6 +42,15 @@ LovBase *LovFactory::createLov(const QVariantMap &pData)
                     pLov->lovAdd(it.key().toLongLong(), it.value().toString());
                 }
             }
+            else if (pData.contains("values") && pData["values"].canConvert<QVariantList>())
+            {
+                // Array-of-pairs format written by module .json files: [ [value, "label"], ... ]
+                for (const QVariant &pair : pData["values"].toList())
+                {
+                    QVariantList pl = pair.toList();
+                    if (pl.size() == 2) pLov->lovAdd(pl[0].toLongLong(), pl[1].toString());
+                }
+            }
             return pLov;
         }
         if (pData["type"].toString() == "float")
@@ -45,6 +63,15 @@ LovBase *LovFactory::createLov(const QVariantMap &pData)
                 for (auto it = vmap.constBegin(); it != vmap.constEnd(); ++it)
                 {
                     pLov->lovAdd(it.key().toDouble(), it.value().toString());
+                }
+            }
+            else if (pData.contains("values") && pData["values"].canConvert<QVariantList>())
+            {
+                // Array-of-pairs format written by module .json files: [ [value, "label"], ... ]
+                for (const QVariant &pair : pData["values"].toList())
+                {
+                    QVariantList pl = pair.toList();
+                    if (pl.size() == 2) pLov->lovAdd(pl[0].toDouble(), pl[1].toString());
                 }
             }
             return pLov;

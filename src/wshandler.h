@@ -60,6 +60,7 @@ class WShandler : public QObject
         void onControllerEvent(OST::EvType evt, QString key, QVariant data, OST::LovBase* lov);
         void sendJsonMessage(QJsonObject json);
         void sendJsonMessage(QJsonObject json, QWebSocket* client);
+        QString getClientLanguage(QWebSocket* client) const;
 
     signals:
         void closed();

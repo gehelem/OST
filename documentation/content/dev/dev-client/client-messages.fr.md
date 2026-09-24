@@ -36,6 +36,9 @@ Toutes les clés de commandes client sont en **MAJUSCULES** (ex. `DU`, `SV`, `SA
 | [`GF`](#gf) | Sélectionner une ligne de grille |
 | [`GH`](#gh) | Monter une ligne de grille |
 | [`GB`](#gb) | Descendre une ligne de grille |
+| [`CL`](#cl) | Charger une configuration de modules |
+| [`CS`](#cs) | Sauvegarder la configuration courante |
+| [`FS`](#fs) | Choisir le dossier de fichiers surveillé |
 | [`ML`](#ml) | Charger un module |
 | [`MK`](#mk) | Décharger un module |
 | [`YA`](#indi) | Démarrer le serveur INDI embarqué |
@@ -438,35 +441,65 @@ Déplace la ligne à l'index `i` d'une position vers le bas.
 
 ## Cycle de vie des modules
 
-### `ML` — Charger un module {#ml}
+### `CL` — Charger une configuration {#cl}
 
-Demande au serveur de charger dynamiquement un module.
+Charge tous les modules d'une configuration sauvegardée (liste dans `controllerdata.availableconfs`, voir [Contrôleur]({{% relref "controller.fr.md" %}})).
 
 ```json
-{
-  "ML": {
-    "m": {
-      "ModuleName": {}
-    }
-  }
-}
+{ "CL": { "name": "modules" } }
 ```
+
+---
+
+### `CS` — Sauvegarder la configuration courante {#cs}
+
+Enregistre l'ensemble des modules actuellement chargés sous le nom donné (`GlobalDatastore` n'est jamais inclus).
+
+```json
+{ "CS": { "name": "modules" } }
+```
+
+---
+
+### `ML` — Charger un module {#ml}
+
+Demande au serveur de charger dynamiquement un module. Ces commandes visent le contrôleur : le payload n'utilise **pas** l'enveloppe `m`/`p`.
+
+```json
+{ "ML": { "lib": "focus", "label": "MyFocuser", "profile": "default" } }
+```
+
+| Champ | Description |
+|---|---|
+| `lib` | Bibliothèque du module, **sans** le préfixe `libost` (le serveur l'ajoute) : `focus` pour `libostfocus`. Les bibliothèques disponibles sont les clés de `controllerdata.libraries` |
+| `label` | Libellé de cette instance ; le **nom du module** est ce libellé sans les espaces. Si un module de ce nom est déjà chargé, la demande est refusée |
+| `profile` | Nom de profil à charger (optionnel) |
 
 ---
 
 ### `MK` — Décharger un module {#mk}
 
-Demande au serveur de décharger un module en cours d'exécution.
+Demande au serveur de décharger un module en cours d'exécution, désigné par son nom.
 
 ```json
-{
-  "MK": {
-    "m": {
-      "ModuleName": {}
-    }
-  }
-}
+{ "MK": { "name": "MyFocuser" } }
 ```
+
+`GlobalDatastore` ne peut pas être déchargé : la demande est refusée (message d'erreur dans les logs).
+
+---
+
+## Système de fichiers
+
+### `FS` — Choisir le dossier surveillé {#fs}
+
+Désigne le dossier dont le serveur publie la liste de fichiers (voir [Système de fichiers]({{% relref "controller.fr.md" %}}#fichiers)). Le chemin est **relatif au webroot** ; la chaîne vide désigne la racine.
+
+```json
+{ "FS": { "folder": "/Sequencer/gam Cyg/LIGHT/Luminance" } }
+```
+
+Le changement est **global au serveur** (tous les clients voient la nouvelle liste). Le chemin n'est pas validé : un dossier inexistant donne une liste vide.
 
 ---
 
@@ -478,9 +511,11 @@ Ces commandes ne sont disponibles que lorsque le serveur dispose d'une instance 
 |---|---|
 | `YA` | Démarrer le serveur INDI embarqué |
 | `YZ` | Arrêter le serveur INDI embarqué |
-| `YL` | Charger un driver INDI |
-| `YR` | Recharger un driver INDI |
-| `YS` | Arrêter un driver INDI |
+| `YL` | Charger un driver INDI (`{"YL": {"driver": "<binary>"}}`) |
+| `YR` | Recharger un driver INDI (`{"YR": {"driver": "<binary>"}}`) |
+| `YS` | Arrêter un driver INDI (`{"YS": {"driver": "<binary>"}}`) |
+
+`YA` et `YZ` n'ont pas de payload (`{"YA": {}}`). Pour `YL`, `YR` et `YS`, `driver` est le champ `binary` d'une entrée de `controllerdata.indidrivers`.
 
 ---
 

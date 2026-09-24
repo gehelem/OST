@@ -103,9 +103,16 @@ void Navigator::onExternalEvent(OST::ExtEvent event)
             if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
             {
                 getProperty(event.prpkey)->setState(OST::Busy, true);
+                QString catlg = getString("popcat", "catlg");
+                // "catlg" is the LOV key (e.g. "messier"), matching the resource
+                // filename; the catalog name stored in CATALOGS uses the LOV's
+                // display label (e.g. "Messier") - using the raw key here caused
+                // duplicate catalogs under a different case (issue #225).
+                QString catalogName = getEltString("popcat", "catlg")->getLov().value(catlg, catlg);
                 /* we should avoid this, and do this in a different thread. We'll see later */
-                populateCatalog(":" + getString("popcat", "catlg") + ".txt", getString("popcat", "catlg"));
+                populateCatalog(":" + catlg + ".txt", catalogName);
                 getProperty(event.prpkey)->setState(OST::Ok, true);
+                getEltBool(event.prpkey, event.eltkey)->setValue(false, true);
             }
 
         }
@@ -118,6 +125,7 @@ void Navigator::onExternalEvent(OST::ExtEvent event)
         float ra = getFloat("results", "RA");
         float dec = getFloat("results", "DEC");
         QString ns = getString("results", "NS");
+        if (ns == "S") dec = -dec;
         getEltString("target", "targetname")->setValue(code);
         getEltFloat("target", "targetra")->setValue(ra);
         getEltFloat("target", "targetde")->setValue(dec, true);

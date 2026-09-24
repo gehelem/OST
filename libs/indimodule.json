@@ -39,12 +39,14 @@
         "e": {
             "conserv": {
                 "type": "bool",
+                "directedit": true,
                 "label": "Connect",
                 "order":"00",
                 "value":false
             },
             "disconserv": {
                 "type": "bool",
+                "directedit": true,
                 "label": "Disconnect",
                 "order":"01",
                 "value":false
@@ -61,18 +63,21 @@
         "e": {
             "condevs": {
                 "type": "bool",
+                "directedit": true,
                 "label": "Connect",
                 "order":"01",
                 "value":false
             },
             "discondevs": {
                 "type": "bool",
+                "directedit": true,
                 "label": "Disconnect",
                 "order":"02",
                 "value":false
             },
             "loadconfs": {
                 "type": "bool",
+                "directedit": true,
                 "label": "Load devices conf",
                 "order":"03",
                 "value":false
@@ -91,6 +96,7 @@
         "e": {
             "indiatstart": {
                 "type": "bool",
+                "directedit": true,
                 "autoupdate":true,
                 "label": "Connect indi",
                 "order":"00",
@@ -98,6 +104,7 @@
             },
             "devatstart": {
                 "type": "bool",
+                "directedit": true,
                 "autoupdate":true,
                 "label": "Connect devices",
                 "order":"01",
@@ -105,6 +112,7 @@
             },
             "confsatstart": {
                 "type": "bool",
+                "directedit": true,
                 "autoupdate":true,
                 "label": "Load devices conf",
                 "order":"02",

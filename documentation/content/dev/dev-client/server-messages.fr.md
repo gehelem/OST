@@ -18,6 +18,10 @@ Les clients doivent comparer sur les **1 ou 2 premiers caractères** de la clé,
 
 Toutes les clés d'événements envoyées par le serveur sont en **minuscules** (ex. `d`, `ea`, `ap`, `gc`).
 
+{{% notice style="warning" title="Exception : `evt` commence par `ev`" %}}
+La clé [`evt`](#evt) (événements de fichiers) commence par les mêmes deux caractères que [`ev`](#ev). Comparer d'abord l'égalité exacte avec `evt`, puis seulement les préfixes, sinon un événement de fichier est pris pour une mise à jour d'élément.
+{{% /notice %}}
+
 ---
 
 ## Index des types d'événements
@@ -45,13 +49,14 @@ Toutes les clés d'événements envoyées par le serveur sont en **minuscules** 
 | [`fc`](#fs) | Profil modifié (modifications non sauvegardées) |
 | [`l`](#l) | Entrée de log |
 | [`uc`](#uc) | Mise à jour des données du contrôleur |
+| [`evt`](#evt) | Événement de fichier ou de dossier (ajout/suppression) |
 | [`xx`](#xx) | Pong keepalive |
 
 ---
 
 ## `d` — Dump initial complet {#d}
 
-Envoyé en réponse à une requête `DU`. Contient tout : tous les modules, les logs, les listes de fichiers et les données du contrôleur.
+Envoyé en réponse à une requête `DU`. Contient tout : tous les modules, les logs, les listes de fichiers et les données du contrôleur. Le détail des clés de `controllerdata` et de `files` est dans [Contrôleur, GlobalDatastore et fichiers]({{% relref "controller.fr.md" %}}) ; l'exemple ci-dessous n'en montre que quelques-unes.
 
 ```json
 {
@@ -105,9 +110,9 @@ Envoyé en réponse à une requête `DU`. Contient tout : tous les modules, les 
       }
     },
     "files": {
-      "folders": ["Allsky/archives"],
-      "files": ["Allsky/archives/image.fits"],
-      "selectedfolder": ""
+      "folders": ["", "/Allsky", "/Allsky/archives"],
+      "files": ["/image.jpeg"],
+      "selectedfolder": "/home/user/ostmedia"
     },
     "logs": [
       { "d": "2024-01-01T12:00:00.000", "c": "Focus", "t": "Module loaded", "l": 1 }
@@ -115,7 +120,8 @@ Envoyé en réponse à une requête `DU`. Contient tout : tous les modules, les 
     "controllerdata": {
       "profiles": {
         "Focus": ["default", "test"]
-      }
+      },
+      "currentconf": "default"
     },
     "lovs": {
       "sharedLov": { "label": "Shared LOV", "type": "string", "values": {} }
@@ -530,7 +536,7 @@ Envoyé pour chaque message de log généré par le serveur. La clé est exactem
 
 ## `uc` — Mise à jour des données du contrôleur {#uc}
 
-Envoyé lorsque les données globales du contrôleur changent (ex. liste de fichiers, profils). La clé commence par `"uc"`.
+Envoyé lorsque les données globales du contrôleur changent : profils, configurations, drivers INDI actifs, listes de fichiers (`files`, `folders`), charge système (`systemwatcher`, toutes les 10 s par défaut). La clé commence par `"uc"`. Les clés possibles sont décrites dans [Contrôleur, GlobalDatastore et fichiers]({{% relref "controller.fr.md" %}}).
 
 ```json
 {
@@ -543,7 +549,26 @@ Envoyé lorsque les données globales du contrôleur changent (ex. liste de fich
 }
 ```
 
-Le payload est `{"clé": valeur}` où `valeur` peut être une chaîne, un tableau ou un objet.
+Le payload est `{"clé": valeur}` où `valeur` peut être une chaîne, un tableau ou un objet. Chaque message porte **une seule clé**, et sa valeur **remplace entièrement** l'ancienne.
+
+---
+
+## `evt` — Événement de fichier ou de dossier {#evt}
+
+Envoyé à tous les clients quand le contenu du dossier de fichiers surveillé change (voir [Système de fichiers]({{% relref "controller.fr.md" %}}#fichiers)). Contrairement aux autres messages, la clé est exactement `evt` et sa **valeur est une chaîne** qui donne le type d'événement ; les chemins sont dans un champ frère `fileevent`.
+
+```json
+{ "evt": "fileadd", "fileevent": ["/Allsky/image_001.jpeg"] }
+```
+
+| `evt` | Signification |
+|---|---|
+| `fileadd` | Fichier(s) ajouté(s) au dossier sélectionné |
+| `filedel` | Fichier(s) supprimé(s) du dossier sélectionné |
+| `folderadd` | Sous-dossier ajouté au webroot |
+| `folderdel` | Sous-dossier supprimé du webroot |
+
+`fileevent` est toujours un tableau de chemins relatifs au webroot (commençant par `/`).
 
 ---
 
