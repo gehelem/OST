@@ -125,6 +125,7 @@ void Navigator::onExternalEvent(OST::ExtEvent event)
         float ra = getFloat("results", "RA");
         float dec = getFloat("results", "DEC");
         QString ns = getString("results", "NS");
+        if (ns == "S") dec = -dec;
         getEltString("target", "targetname")->setValue(code);
         getEltFloat("target", "targetra")->setValue(ra);
         getEltFloat("target", "targetde")->setValue(dec, true);
