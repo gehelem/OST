@@ -96,28 +96,6 @@ void Navigator::onExternalEvent(OST::ExtEvent event)
         }
     }
 
-    if (event.ev == OST::ExtEvType::SV && event.prpkey == "popcat")
-    {
-        if (event.eltkey == "go")
-        {
-            if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
-            {
-                getProperty(event.prpkey)->setState(OST::Busy, true);
-                QString catlg = getString("popcat", "catlg");
-                // "catlg" is the LOV key (e.g. "messier"), matching the resource
-                // filename; the catalog name stored in CATALOGS uses the LOV's
-                // display label (e.g. "Messier") - using the raw key here caused
-                // duplicate catalogs under a different case (issue #225).
-                QString catalogName = getEltString("popcat", "catlg")->getLov().value(catlg, catlg);
-                /* we should avoid this, and do this in a different thread. We'll see later */
-                populateCatalog(":" + catlg + ".txt", catalogName);
-                getProperty(event.prpkey)->setState(OST::Ok, true);
-                getEltBool(event.prpkey, event.eltkey)->setValue(false, true);
-            }
-
-        }
-    }
-
     if (event.ev == OST::ExtEvType::GF && event.prpkey == "results")
     {
         getProperty("results")->fetchLine(event.line);

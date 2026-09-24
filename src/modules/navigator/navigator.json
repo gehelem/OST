@@ -198,39 +198,6 @@
             }
         }
     },
-    "popcat": {
-        "devcat": "Control",
-        "order": "Control9999",
-        "group": "",
-        "permission": 2,
-        "rule":0,
-        "label": "Populate catalog",
-        "e": {
-            "go": {
-                "type":"bool",
-                "label": "GO",
-                "directedit":true,
-                "order": "1",
-                "value":false
-            },
-            "catlg":{
-                "autoupdate":true,
-                "directedit":true,
-                "type":"string",
-                "label": "Catalog",
-                "order": "2",
-                "value":"messier",
-                "listOfValues":[
-                    ["messier","Messier"],
-                    ["ngc","NGC"],
-                    ["ldn","LDN"],
-                    ["sh2","SH2"],
-                    ["ic","IC"],
-                    ["stars","Stars"]
-                ]
-            }
-        }
-    },
     "mountposition": {
         "devcat": "Control",
         "order": "Control0000",
