@@ -18,7 +18,22 @@ Module
 
 ## Connessione e stato iniziale
 
-Il server può essere scoperto sulla rete locale tramite mDNS/Zeroconf: si annuncia con il tipo di servizio `_ostserver_ws._tcp` nel dominio `local`, con un record TXT `OstServer=Observatoire Sans Tete`. La porta annunciata è sempre `9624` (la porta WebSocket non è configurabile). La scoperta è opzionale — un client che conosce già l'host può connettersi direttamente.
+### Trovare il server
+
+Un client **web** è servito *dal* server OST stesso, quindi conosce già il proprio host — l'URL WebSocket deve essere derivato dall'URL della pagina, non chiesto all'utente:
+
+| URL della pagina | URL WebSocket |
+|---|---|
+| `http://<host>/` | `ws://<host>:9624` (diretto, porta fissa) |
+| `https://<host>/` | `wss://<host>/ws/` (porta 443 implicita, tramite un percorso proxy inverso — le installazioni SSL non espongono direttamente la porta 9624) |
+
+È una convenzione, non qualcosa imposto dal protocollo — ma tutti i client esistenti la seguono, e un client che invece chiede all'utente di digitare a mano un URL WebSocket risolve un problema che nel caso web non esiste.
+
+Un client **non-web** (mobile, desktop) non ha un URL di pagina da cui derivare nulla, e ha bisogno che l'host gli venga fornito in altro modo:
+- **mDNS/Zeroconf**: il server si annuncia sulla rete locale con il tipo di servizio `_ostserver_ws._tcp` nel dominio `local`, con un record TXT `OstServer=Observatoire Sans Tete`. La porta annunciata è sempre `9624`. Questo permette a un client di **scansionare i server disponibili** sulla rete invece di richiedere che l'utente conosca un IP — utile per una prima connessione, o ogni volta che potrebbe esserci più di un server OST nelle vicinanze.
+- **Inserimento manuale, memorizzato**: sia esso scoperto o digitato, un client dovrebbe mantenere una piccola cronologia dei server già usati (host/porta/sicuro) in modo che riconnettersi in seguito non richieda di ripetere la scoperta o l'inserimento. È una comodità lato client, non parte del protocollo.
+
+In ogni caso, l'URL di base dei **media** (per immagini/video, vedi la nota "URL dei media" più sotto) segue lo stesso host, con la porta HTTP(S) standard (80/443) anziché 9624 — un client non-web ha bisogno anche di questo host, esattamente per la stessa ragione per cui ha bisogno dell'host WebSocket.
 
 Alla connessione, inviare una richiesta `DU` (vedi [Client → Server]({{< relref "client-messages.it.md" >}})).  
 Il server risponde con un messaggio dump completo (`d`) contenente tutti i moduli, i dati del controller e gli elenchi di file.
@@ -104,9 +119,31 @@ Due cose da sapere se si costruisce qualcosa di simile:
 
 | Campo | Tipo | Descrizione |
 |---|---|---|
-| `hasGraph` | bool | La proprietà contiene un grafico |
-| `graphType` | string | `"XY"` · `"DY"` (asse temporale) · `"PHD"` (guida) |
-| `graphParams` | object | Configurazione del grafico |
+| `hasGraph` | bool | La proprietà contiene un grafico — **sempre presente**, anche quando `false` |
+| `graphType` | string | `"XY"` · `"DY"` · `"SXY"` · `"SDY"` · `"PHD"` — vedi sotto |
+| `graphParams` | object | Quale elemento fornisce quale ruolo del grafico — vedi sotto |
+
+Una proprietà con grafico è sempre anche una proprietà a griglia (`hasGrid: true`, vedi sopra): ogni riga della griglia è un punto dati, e `graphParams` associa un ruolo astratto del grafico alla **chiave dell'elemento** (uno dei `gridheaders`) il cui valore, in quella riga, fornisce quel ruolo.
+
+| `graphType` | Forma | Ruoli di `graphParams` |
+|---|---|---|
+| `XY` | Una sola serie a dispersione, limiti degli assi fissi | `X`, `Y`, `Xmin`, `Xmax`, `Ymin`, `Ymax` |
+| `DY` | Una sola serie, data/ora sull'asse X | `D` (elemento data/ora), `Y` |
+| `SXY` | Più serie a dispersione, raggruppate da una chiave di serie | `S` (elemento nome serie), `X`, `Y`, più opzionalmente `graphColors`/`axis`/`mapping` (sotto) |
+| `SDY` | Più serie, data/ora sull'asse X, raggruppate da una chiave di serie | `S`, `D`, `Y`, più opzionalmente `graphColors`/`axis`/`mapping` |
+| `PHD` | Grafico di guida dedicato in stile PHD2 (deriva + SNR + RMS) | `D`, `RA`, `DE`, `pRA`, `pDE`, `RSB`, `RMS` — ruoli fissi, specifici per questo uso |
+
+Campi opzionali di `graphParams`, usati dai tipi multi-serie (`SXY`/`SDY`):
+
+| Campo | Descrizione |
+|---|---|
+| `graphColors` | `{"<serie>": {"R": int, "G": int, "B": int}}` — colore per serie |
+| `axis` | `{"<nome>": {"min": number, "max": number, "pos": "left"\|"right", "text": string}}` — uno o più assi Y |
+| `mapping` | `{"<serie>": "<nome asse>"}` — su quale voce di `axis` viene tracciata ciascuna serie |
+
+{{% notice style="warning" title="`PHD` non è un tipo di grafico generico" %}}
+A differenza di `XY`/`DY`/`SXY`/`SDY`, i cui ruoli sono abbastanza generici da poter guidare un unico componente grafico riutilizzabile, `PHD` ha ruoli fissi e specifici per un grafico di guida in stile PHD2 (usato dal modulo `guider`). Un client che costruisce un componente grafico generico per gli altri quattro tipi avrà probabilmente bisogno di un'implementazione dedicata per `PHD`, o dovrà tralasciarlo — è quello che fa attualmente Rooster (solo `SXY`/`SDY`/`XY`/`DY`, `PHD` non gestito).
+{{% /notice %}}
 
 {{% notice style="info" title="Formato wire" %}}
 Nel formato JSON di rete, `elements` è abbreviato in `e`.

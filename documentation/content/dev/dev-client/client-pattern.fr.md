@@ -120,6 +120,15 @@ C'est ce qui permet à un client de rester pleinement fonctionnel face
 à un type de module qu'il n'a jamais vu — un module nouveau ou tiers
 s'affiche toujours via l'écran générique — tout en offrant un écran
 soigné et dédié pour les types de modules qui le méritent.
+
+L'écran `"default"` n'est pas un repli minimal symbolique : c'est le
+**seul** écran que certains types de modules auront jamais, il doit
+donc rendre tout ce qu'une propriété/élément générique peut porter —
+status, `hint`, pré/posticônes, grilles, graphes, LOV, tout — pas
+seulement les valeurs. Un écran dédié par template peut être plus
+sélectif (masquer des champs, réorganiser la mise en page), mais
+l'écran par défaut ne doit pas faire disparaître silencieusement de
+l'information faute d'un écran dédié écrit pour ce module.
 {{% /notice %}}
 
 {{% notice style="tip" title="Recommandé : un seul composant de rendu de propriété, réutilisé partout" %}}
@@ -142,6 +151,18 @@ fait une seule fois à cet endroit (par exemple gérer correctement un
 groupe de switches exclusifs) s'applique partout automatiquement,
 écrans dédiés compris.
 {{% /notice %}}
+
+## Formulaires de propriété : `SA`, obligatoire pour `directedit: false`
+
+Au-delà du `SV` champ par champ, une propriété éditable a besoin d'un **chemin formulaire** : un écran listant tous ses éléments éditables à la fois, soumis ensemble via [`SA`]({{% relref "client-messages.fr.md" %}}#sa).
+
+{{% notice style="warning" title="Pas optionnel pour un élément `directedit: false`" %}}
+`SV` est rejeté par le backend pour tout élément avec `directedit: false` (voir [Modèle de données]({{% relref "structure.fr.md" %}})). `SA` est le **seul** moyen de jamais mettre à jour un tel élément — un client sans chemin formulaire ne peut tout simplement pas écrire sur cet élément, quelle que soit la qualité du reste de son UI.
+{{% /notice %}}
+
+Seuls les éléments **éditables** ont leur place dans ce formulaire — les types d'affichage seul (`img`, `video`, `light`, `prg`, `message`) sont rendus, jamais soumis ; à exclure complètement du payload plutôt que d'y envoyer une valeur sans sens.
+
+La même forme « soumettre un ensemble d'éléments à la fois » est réutilisée par la création de ligne de grille ([`GC`]({{% relref "client-messages.fr.md" %}}#gc)) et sa mise à jour ([`GU`]({{% relref "client-messages.fr.md" %}}#gu)) — les deux prennent une map `e` exactement comme `SA`. Ça vaut le coup de construire **un seul** composant formulaire réutilisable qui serve à la fois le formulaire de propriété, la boîte de création de ligne de grille et celle d'édition de ligne, plutôt que trois implémentations séparées d'une logique essentiellement identique (« rendre des éléments éditables, collecter leurs valeurs »). C'est ce que fait Rooster.
 
 ## Heartbeat
 

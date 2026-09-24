@@ -18,7 +18,22 @@ Module
 
 ## Verbindung und Anfangszustand
 
-Der Server kann im lokalen Netzwerk über mDNS/Zeroconf gefunden werden: er meldet sich als Diensttyp `_ostserver_ws._tcp` in der Domäne `local`, mit einem TXT-Eintrag `OstServer=Observatoire Sans Tete`. Der angekündigte Port ist immer `9624` (der WebSocket-Port ist nicht konfigurierbar). Die Erkennung ist optional — ein Client, der den Host bereits kennt, kann sich auch direkt verbinden.
+### Den Server finden
+
+Ein **Web**-Client wird *vom* OST-Server selbst ausgeliefert und kennt daher bereits seinen Host — die WebSocket-URL sollte von der URL der Seite selbst abgeleitet werden, nicht vom Benutzer erfragt:
+
+| Seiten-URL | WebSocket-URL |
+|---|---|
+| `http://<host>/` | `ws://<host>:9624` (direkt, fester Port) |
+| `https://<host>/` | `wss://<host>/ws/` (impliziter Port 443, über einen Reverse-Proxy-Pfad — SSL-Setups legen Port 9624 nicht direkt offen) |
+
+Das ist eine Konvention, keine vom Protokoll erzwungene Regel — aber jeder existierende Client folgt ihr, und ein Client, der stattdessen den Benutzer bittet, eine WebSocket-URL manuell einzugeben, löst ein Problem, das im Web-Fall gar nicht existiert.
+
+Ein **Nicht-Web**-Client (Mobile, Desktop) hat keine Seiten-URL, von der er etwas ableiten könnte, und braucht den Host auf andere Weise:
+- **mDNS/Zeroconf**: der Server meldet sich im lokalen Netzwerk als Diensttyp `_ostserver_ws._tcp` in der Domäne `local`, mit einem TXT-Eintrag `OstServer=Observatoire Sans Tete`. Der angekündigte Port ist immer `9624`. Das erlaubt einem Client, **verfügbare Server im Netzwerk zu scannen**, statt vom Benutzer eine IP-Adresse zu verlangen — nützlich für eine erste Verbindung, oder wann immer mehr als ein OST-Server in der Nähe sein könnte.
+- **Manuelle Eingabe, gemerkt**: ob entdeckt oder eingegeben, ein Client sollte eine kleine Historie bereits genutzter Server (Host/Port/sicher) führen, damit eine spätere Wiederverbindung nicht die Erkennung oder Eingabe wiederholen muss. Das ist ein clientseitiger Komfort, kein Teil des Protokolls.
+
+In jedem Fall folgt die Basis-URL der **Medien** (für Bilder/Videos, siehe die Notiz „Media-URLs" weiter unten) demselben Host, mit dem üblichen HTTP(S)-Port (80/443) statt 9624 — ein Nicht-Web-Client braucht diesen Host ebenfalls, aus genau demselben Grund wie den WebSocket-Host.
 
 Bei der Verbindung eine `DU`-Anfrage senden (siehe [Client → Server]({{< relref "client-messages.de.md" >}})).  
 Der Server antwortet mit einer vollständigen Dump-Nachricht (`d`), die alle Module, die Controller-Daten und die Dateilisten enthält.
@@ -104,9 +119,31 @@ Zwei Dinge, die man kennen sollte, wenn man etwas Ähnliches baut:
 
 | Feld | Typ | Beschreibung |
 |---|---|---|
-| `hasGraph` | bool | Die Property enthält einen Graph |
-| `graphType` | string | `"XY"` · `"DY"` (Zeitachse) · `"PHD"` (Guiding) |
-| `graphParams` | object | Konfiguration des Graphen |
+| `hasGraph` | bool | Die Property enthält einen Graph — **immer vorhanden**, auch wenn `false` |
+| `graphType` | string | `"XY"` · `"DY"` · `"SXY"` · `"SDY"` · `"PHD"` — siehe unten |
+| `graphParams` | object | Welches Element welche Rolle im Graph liefert — siehe unten |
+
+Eine Property mit Graph ist immer auch eine Grid-Property (`hasGrid: true`, siehe oben): jede Grid-Zeile ist ein Datenpunkt, und `graphParams` ordnet einer abstrakten Graph-Rolle den **Element-Schlüssel** zu (einer aus `gridheaders`), dessen Wert in dieser Zeile die Rolle liefert.
+
+| `graphType` | Form | Rollen in `graphParams` |
+|---|---|---|
+| `XY` | Eine Streudiagramm-Serie, feste Achsengrenzen | `X`, `Y`, `Xmin`, `Xmax`, `Ymin`, `Ymax` |
+| `DY` | Eine Serie, Datum/Zeit auf X | `D` (Datum/Zeit-Element), `Y` |
+| `SXY` | Mehrere Streudiagramm-Serien, gruppiert nach einem Serienschlüssel | `S` (Serienname-Element), `X`, `Y`, optional zusätzlich `graphColors`/`axis`/`mapping` (unten) |
+| `SDY` | Mehrere Serien, Datum/Zeit auf X, gruppiert nach einem Serienschlüssel | `S`, `D`, `Y`, optional zusätzlich `graphColors`/`axis`/`mapping` |
+| `PHD` | Eigener PHD2-artiger Guiding-Graph (Drift + SNR + RMS) | `D`, `RA`, `DE`, `pRA`, `pDE`, `RSB`, `RMS` — feste, zweckgebundene Rollen |
+
+Optionale Felder in `graphParams`, verwendet von den Mehrfach-Serien-Typen (`SXY`/`SDY`):
+
+| Feld | Beschreibung |
+|---|---|
+| `graphColors` | `{"<Serie>": {"R": int, "G": int, "B": int}}` — Farbe pro Serie |
+| `axis` | `{"<Name>": {"min": number, "max": number, "pos": "left"\|"right", "text": string}}` — eine oder mehrere Y-Achsen |
+| `mapping` | `{"<Serie>": "<Achsenname>"}` — gegen welchen Eintrag von `axis` jede Serie geplottet wird |
+
+{{% notice style="warning" title="`PHD` ist kein generischer Graph-Typ" %}}
+Anders als `XY`/`DY`/`SXY`/`SDY`, deren Rollen generisch genug sind, um eine einzige wiederverwendbare Graph-Komponente zu steuern, hat `PHD` feste, zweckgebundene Rollen für einen PHD2-artigen Guiding-Graphen (verwendet vom `guider`-Modul). Ein Client, der eine generische Graph-Komponente für die anderen vier Typen baut, braucht für `PHD` wahrscheinlich eine eigene Implementierung — oder lässt es weg. Rooster tut Letzteres (nur `SXY`/`SDY`/`XY`/`DY`, `PHD` nicht behandelt).
+{{% /notice %}}
 
 {{% notice style="info" title="Wire-Format" %}}
 Im JSON-Format über das Netzwerk wird `elements` zu `e` abgekürzt.

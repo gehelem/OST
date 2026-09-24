@@ -18,7 +18,22 @@ Module
 
 ## Connection and initial state
 
-The server can be discovered on the local network via mDNS/Zeroconf: it advertises itself as service type `_ostserver_ws._tcp` in the `local` domain, with a TXT record `OstServer=Observatoire Sans Tete`. The advertised port is always `9624` (the WebSocket port is not configurable). Discovery is optional — a client that already knows the host can just connect directly.
+### Finding the server
+
+A **web** client is served *by* the OST server itself, so it already knows its host — the WebSocket URL should be derived from the page's own URL, not asked from the user:
+
+| Page URL | WebSocket URL |
+|---|---|
+| `http://<host>/` | `ws://<host>:9624` (direct, fixed port) |
+| `https://<host>/` | `wss://<host>/ws/` (implicit port 443, through a reverse proxy path — SSL setups don't expose 9624 directly) |
+
+This is a convention, not something the protocol enforces — but every existing client follows it, and a client that instead asks the user to type a WebSocket URL by hand is solving a problem that doesn't exist for the web case.
+
+A **non-web** client (mobile, desktop) has no page URL to derive anything from, and needs the host to be supplied some other way:
+- **mDNS/Zeroconf**: the server advertises itself on the local network as service type `_ostserver_ws._tcp` in the `local` domain, with a TXT record `OstServer=Observatoire Sans Tete`. The advertised port is always `9624`. This lets a client **scan for available servers** on the network rather than requiring the user to know an IP — useful for a first connection, or whenever there may be more than one OST server around.
+- **Manual entry, remembered**: whether discovered or typed in, a client should keep a small history of previously-used servers (host/port/secure) so reconnecting later doesn't require repeating the discovery or entry step. This is a client-side convenience, not part of the protocol.
+
+Either way, the **media** base URL (for images/video, see the "Media URLs" note further down) follows the same host, with the standard HTTP(S) port (80/443) rather than 9624 — a non-web client needs this host too, for exactly the same reason it needs the WebSocket host.
 
 On connection, send a `DU` request (see [Client → Server]({{< relref "client-messages.en.md" >}})).  
 The server replies with a full dump message (`d`) containing all modules, controller data, and file lists.
@@ -104,9 +119,31 @@ Two things worth knowing if you build something similar:
 
 | Field | Type | Description |
 |---|---|---|
-| `hasGraph` | bool | Property has a graph |
-| `graphType` | string | `"XY"` · `"DY"` (time-axis) · `"PHD"` (guiding) |
-| `graphParams` | object | Graph configuration |
+| `hasGraph` | bool | Property has a graph — **always present**, even when `false` |
+| `graphType` | string | `"XY"` · `"DY"` · `"SXY"` · `"SDY"` · `"PHD"` — see below |
+| `graphParams` | object | Which element supplies which chart role — see below |
+
+A graph property is always also a grid property (`hasGrid: true`, see above): each grid row is one data point, and `graphParams` maps an abstract chart role to the **element key** (one of `gridheaders`) whose value in that row supplies it.
+
+| `graphType` | Shape | `graphParams` roles |
+|---|---|---|
+| `XY` | Single scatter series, fixed axis bounds | `X`, `Y`, `Xmin`, `Xmax`, `Ymin`, `Ymax` |
+| `DY` | Single series, date/time on X | `D` (date/time element), `Y` |
+| `SXY` | Multiple scatter series, grouped by a series key | `S` (series-name element), `X`, `Y`, plus optionally `graphColors`/`axis`/`mapping` (below) |
+| `SDY` | Multiple series, date/time on X, grouped by a series key | `S`, `D`, `Y`, plus optionally `graphColors`/`axis`/`mapping` |
+| `PHD` | Dedicated PHD2-style guiding graph (drift + SNR + RMS) | `D`, `RA`, `DE`, `pRA`, `pDE`, `RSB`, `RMS` — fixed, purpose-specific roles |
+
+Optional `graphParams` fields, used by the multi-series types (`SXY`/`SDY`):
+
+| Field | Description |
+|---|---|
+| `graphColors` | `{"<series>": {"R": int, "G": int, "B": int}}` — color per series |
+| `axis` | `{"<name>": {"min": number, "max": number, "pos": "left"\|"right", "text": string}}` — one or more Y axes |
+| `mapping` | `{"<series>": "<axis name>"}` — which entry of `axis` each series plots against |
+
+{{% notice style="warning" title="`PHD` is not a generic chart type" %}}
+Unlike `XY`/`DY`/`SXY`/`SDY`, whose roles are generic enough to drive a single reusable chart component, `PHD` has fixed, purpose-built roles for a PHD2-style guiding graph (used by the `guider` module). A client building one generic graph component for the other four types will likely need a dedicated implementation for `PHD`, or to skip it — Rooster currently does the latter (`SXY`/`SDY`/`XY`/`DY` only, `PHD` unhandled).
+{{% /notice %}}
 
 {{% notice style="info" title="Wire format" %}}
 In the JSON wire format, `elements` is abbreviated as `e`.

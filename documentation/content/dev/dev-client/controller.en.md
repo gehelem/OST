@@ -83,6 +83,14 @@ A **configuration** is a named set of modules (library, label, profile) that the
 
 The modules actually loaded are those of the dump (`d.m`); they appear and disappear through [`aa`]({{% relref "server-messages.en.md" %}}#aa) and [`dm`]({{% relref "server-messages.en.md" %}}#dm). A configuration **never** contains `GlobalDatastore` (see below), which is always present.
 
+{{% notice style="warning" title="A configuration silently includes the active INDI drivers" %}}
+`CS` also saves the currently running INDI drivers alongside the module list, and `CL` restarts them — but this is invisible in `controllerdata.availableconfs`, whose shape only describes modules (`{modulelabel, moduletype, profilename}`), never drivers. A client building a configuration editor that only shows/edits the module list is not showing the whole picture of what will actually happen on `CL`.
+{{% /notice %}}
+
+{{% notice style="note" title="No delete operation" %}}
+There is no command to remove a saved configuration — `CL` and `CS` are the only two operations. A configuration a client no longer wants stays in `controllerdata.availableconfs` indefinitely (it can only be overwritten under the same name by another `CS`).
+{{% /notice %}}
+
 ### INDI server and drivers
 
 If `controllerdata.indiserver` is `"Y"`, the server drives an embedded INDI instance. The [`YA`/`YZ`/`YL`/`YR`/`YS`]({{% relref "client-messages.en.md" %}}#indi) commands start it, stop it and manage the drivers; `controllerdata.indidrivers` gives the available catalogue and `controllerdata.indiactivedrivers` what is running. `binary` is the value to pass as `driver` in `YL`, `YR` and `YS`.

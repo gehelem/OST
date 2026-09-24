@@ -18,7 +18,22 @@ Module
 
 ## Connexion et état initial
 
-Le serveur peut être découvert sur le réseau local via mDNS/Zeroconf : il s'annonce avec le type de service `_ostserver_ws._tcp` dans le domaine `local`, avec un enregistrement TXT `OstServer=Observatoire Sans Tete`. Le port annoncé est toujours `9624` (le port WebSocket n'est pas configurable). La découverte est optionnelle — un client qui connaît déjà l'hôte peut se connecter directement.
+### Trouver le serveur
+
+Un client **web** est servi *par* le serveur OST lui-même, il connaît donc déjà son hôte — l'URL WebSocket doit être dérivée de l'URL de la page, pas demandée à l'utilisateur :
+
+| URL de la page | URL WebSocket |
+|---|---|
+| `http://<hôte>/` | `ws://<hôte>:9624` (direct, port fixe) |
+| `https://<hôte>/` | `wss://<hôte>/ws/` (port 443 implicite, via un chemin proxy inverse — les installations SSL n'exposent pas directement le 9624) |
+
+C'est une convention, pas quelque chose imposé par le protocole — mais tous les clients existants la suivent, et un client qui demande à l'utilisateur de saisir une URL WebSocket à la main résout un problème qui n'existe pas dans le cas web.
+
+Un client **non-web** (mobile, desktop) n'a pas d'URL de page dont dériver quoi que ce soit, et a besoin que l'hôte lui soit fourni autrement :
+- **mDNS/Zeroconf** : le serveur s'annonce sur le réseau local avec le type de service `_ostserver_ws._tcp` dans le domaine `local`, avec un enregistrement TXT `OstServer=Observatoire Sans Tete`. Le port annoncé est toujours `9624`. Cela permet à un client de **scanner les serveurs disponibles** sur le réseau plutôt que d'exiger que l'utilisateur connaisse une IP — utile pour une première connexion, ou dès qu'il peut y avoir plus d'un serveur OST à proximité.
+- **Saisie manuelle, mémorisée** : qu'il soit découvert ou saisi, un client devrait garder un petit historique des serveurs déjà utilisés (hôte/port/sécurisé) pour que la reconnexion ultérieure ne nécessite pas de répéter la découverte ou la saisie. C'est un confort côté client, pas une partie du protocole.
+
+Dans tous les cas, l'URL de base des **médias** (pour images/vidéos, voir la note « URLs media » plus bas) suit le même hôte, avec le port HTTP(S) standard (80/443) plutôt que 9624 — un client non-web a besoin de cet hôte aussi, exactement pour la même raison qu'il a besoin de l'hôte WebSocket.
 
 À la connexion, envoyer une requête `DU` (voir [Client → Serveur]({{< relref "client-messages.fr.md" >}})).  
 Le serveur répond avec un message dump complet (`d`) contenant tous les modules, les données du contrôleur et les listes de fichiers.
@@ -107,9 +122,31 @@ Deux choses à connaître si vous construisez quelque chose de similaire :
 
 | Champ | Type | Description |
 |---|---|---|
-| `hasGraph` | bool | La propriété contient un graphe |
-| `graphType` | string | `"XY"` · `"DY"` (axe temporel) · `"PHD"` (guidage) |
-| `graphParams` | object | Configuration du graphe |
+| `hasGraph` | bool | La propriété contient un graphe — **toujours présent**, même à `false` |
+| `graphType` | string | `"XY"` · `"DY"` · `"SXY"` · `"SDY"` · `"PHD"` — voir plus bas |
+| `graphParams` | object | Quel élément fournit quel rôle du graphe — voir plus bas |
+
+Une propriété avec graphe est toujours aussi une propriété grille (`hasGrid: true`, voir ci-dessus) : chaque ligne de la grille est un point de données, et `graphParams` associe un rôle abstrait du graphe à la **clé d'élément** (l'un des `gridheaders`) dont la valeur, dans cette ligne, fournit ce rôle.
+
+| `graphType` | Forme | Rôles de `graphParams` |
+|---|---|---|
+| `XY` | Une seule série en nuage de points, bornes d'axe fixes | `X`, `Y`, `Xmin`, `Xmax`, `Ymin`, `Ymax` |
+| `DY` | Une seule série, date/heure en X | `D` (élément date/heure), `Y` |
+| `SXY` | Plusieurs séries en nuage de points, regroupées par une clé de série | `S` (élément nom de série), `X`, `Y`, plus optionnellement `graphColors`/`axis`/`mapping` (ci-dessous) |
+| `SDY` | Plusieurs séries, date/heure en X, regroupées par une clé de série | `S`, `D`, `Y`, plus optionnellement `graphColors`/`axis`/`mapping` |
+| `PHD` | Graphe de guidage dédié façon PHD2 (dérive + SNR + RMS) | `D`, `RA`, `DE`, `pRA`, `pDE`, `RSB`, `RMS` — rôles fixes, spécifiques à cet usage |
+
+Champs optionnels de `graphParams`, utilisés par les types multi-séries (`SXY`/`SDY`) :
+
+| Champ | Description |
+|---|---|
+| `graphColors` | `{"<série>": {"R": int, "G": int, "B": int}}` — couleur par série |
+| `axis` | `{"<nom>": {"min": number, "max": number, "pos": "left"\|"right", "text": string}}` — un ou plusieurs axes Y |
+| `mapping` | `{"<série>": "<nom d'axe>"}` — sur quelle entrée de `axis` chaque série se trace |
+
+{{% notice style="warning" title="`PHD` n'est pas un type de graphe générique" %}}
+Contrairement à `XY`/`DY`/`SXY`/`SDY`, dont les rôles sont assez génériques pour piloter un seul composant de graphe réutilisable, `PHD` a des rôles fixes et spécifiques à un graphe de guidage façon PHD2 (utilisé par le module `guider`). Un client qui construit un composant de graphe générique pour les quatre autres types aura probablement besoin d'une implémentation dédiée pour `PHD`, ou devra le laisser de côté — c'est ce que fait actuellement Rooster (`SXY`/`SDY`/`XY`/`DY` seulement, `PHD` non géré).
+{{% /notice %}}
 
 {{% notice style="info" title="Format wire" %}}
 Dans le format JSON sur le réseau, `elements` est abrégé en `e`.

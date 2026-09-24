@@ -122,6 +122,16 @@ ante un tipo de módulo que nunca ha visto — un módulo nuevo o de
 terceros siempre se muestra mediante la pantalla genérica — a la vez
 que ofrece una pantalla cuidada y dedicada para los tipos de módulo
 que merecen la inversión.
+
+La pantalla `"default"` no es un repliegue mínimo simbólico: para
+algunos tipos de módulo es la **única** pantalla que tendrán jamás, así
+que debe renderizar todo lo que una propiedad/elemento genérico puede
+llevar — estado, `hint`, pre/posticonos, cuadrículas, gráficos, LOV,
+todo — no solo los valores. Una pantalla dedicada por plantilla puede
+ser más selectiva (ocultar campos, reorganizar el diseño), pero la
+pantalla por defecto no debería hacer desaparecer información
+silenciosamente solo porque nadie ha escrito aún una pantalla dedicada
+para ese módulo.
 {{% /notice %}}
 
 {{% notice style="tip" title="Recomendado: un único componente de renderizado de propiedad, reutilizado en todas partes" %}}
@@ -144,6 +154,18 @@ repliegue — una corrección hecha una sola vez ahí (por ejemplo,
 gestionar correctamente un grupo de interruptores exclusivos) se
 aplica automáticamente en todas partes, pantallas dedicadas incluidas.
 {{% /notice %}}
+
+## Formularios de propiedad: `SA`, obligatorio para `directedit: false`
+
+Más allá del `SV` campo a campo, una propiedad editable necesita un **camino de formulario**: una pantalla que liste todos sus elementos editables a la vez, enviados juntos vía [`SA`]({{% relref "client-messages.es.md" %}}#sa).
+
+{{% notice style="warning" title="No opcional para un elemento con `directedit: false`" %}}
+`SV` es rechazado por el backend para cualquier elemento con `directedit: false` (ver [Modelo de datos]({{% relref "structure.es.md" %}})). `SA` es la **única** forma de actualizar jamás ese elemento — un cliente sin camino de formulario simplemente no puede escribir en ese elemento, por bien construido que esté el resto de su interfaz.
+{{% /notice %}}
+
+Solo los elementos **editables** pertenecen a este formulario — los tipos de solo visualización (`img`, `video`, `light`, `prg`, `message`) se renderizan, nunca se envían; hay que excluirlos por completo del payload en lugar de enviarles un valor sin sentido.
+
+La misma forma de "enviar un conjunto de elementos a la vez" se reutiliza en la creación de línea de cuadrícula ([`GC`]({{% relref "client-messages.es.md" %}}#gc)) y su actualización ([`GU`]({{% relref "client-messages.es.md" %}}#gu)) — ambas toman un mapa `e` exactamente igual que `SA`. Vale la pena construir **un único** componente de formulario reutilizable que sirva tanto al formulario de propiedad simple como al diálogo de creación de fila de cuadrícula y al de edición de fila — en lugar de tres implementaciones separadas de esencialmente la misma lógica ("renderizar elementos editables, recoger sus valores"). Es lo que hace Rooster.
 
 ## Heartbeat
 

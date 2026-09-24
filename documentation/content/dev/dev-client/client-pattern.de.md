@@ -123,6 +123,16 @@ Drittanbieter-Modul wird immer über den generischen Bildschirm
 dargestellt —, während er trotzdem einen ausgefeilten, zweckgebundenen
 Bildschirm für die Modultypen bieten kann, in die es sich lohnt zu
 investieren.
+
+Der `"default"`-Bildschirm ist kein rein symbolischer Minimal-Fallback:
+er ist für manche Modultypen der **einzige** Bildschirm, den sie je
+bekommen, und muss deshalb alles rendern, was eine generische
+Property/Element tragen kann — Status, `hint`, Prä-/Posticons, Grids,
+Graphen, LOVs, alles — nicht nur Werte. Ein eigener Bildschirm pro
+Template darf kuratierter sein (Felder ausblenden, Layout
+umorganisieren), aber der Standard-Bildschirm sollte keine
+Information stillschweigend fallen lassen, nur weil noch niemand einen
+eigenen Bildschirm für dieses Modul geschrieben hat.
 {{% /notice %}}
 
 {{% notice style="tip" title="Empfehlung: eine einzige, überall wiederverwendete Property-Rendering-Komponente" %}}
@@ -145,6 +155,18 @@ verwendet — ein Fix, der dort einmal gemacht wird (z. B. eine exklusive
 Switch-Gruppe korrekt zu behandeln), wirkt automatisch überall,
 eigene Bildschirme eingeschlossen.
 {{% /notice %}}
+
+## Property-Formulare: `SA`, verpflichtend bei `directedit: false`
+
+Über das feldweise `SV` hinaus braucht eine editierbare Property einen **Formular-Pfad**: einen Bildschirm, der alle ihre editierbaren Elemente auf einmal auflistet und zusammen über [`SA`]({{% relref "client-messages.de.md" %}}#sa) sendet.
+
+{{% notice style="warning" title="Nicht optional bei einem Element mit `directedit: false`" %}}
+`SV` wird vom Backend für jedes Element mit `directedit: false` abgelehnt (siehe [Datenmodell]({{% relref "structure.de.md" %}})). `SA` ist der **einzige** Weg, ein solches Element jemals zu aktualisieren — ein Client ohne Formular-Pfad kann auf dieses Element schlicht nicht schreiben, egal wie gut der Rest seiner UI ist.
+{{% /notice %}}
+
+Nur **editierbare** Elemente gehören in dieses Formular — reine Anzeige-Typen (`img`, `video`, `light`, `prg`, `message`) werden gerendert, nie gesendet; sie sollten ganz aus dem Payload weggelassen werden, statt ihnen einen bedeutungslosen Wert zu geben.
+
+Dieselbe „mehrere Elemente auf einmal senden"-Form wird auch von der Grid-Zeilen-Erstellung ([`GC`]({{% relref "client-messages.de.md" %}}#gc)) und -Aktualisierung ([`GU`]({{% relref "client-messages.de.md" %}}#gu)) verwendet — beide nehmen eine `e`-Map genau wie `SA`. Es lohnt sich, **eine** wiederverwendbare Formular-Komponente zu bauen, die sowohl das reine Property-Formular als auch den Grid-Zeile-erstellen- und den Grid-Zeile-bearbeiten-Dialog bedient, statt drei getrennte Implementierungen derselben Logik („editierbare Elemente rendern, ihre Werte sammeln"). Rooster macht das so.
 
 ## Heartbeat
 

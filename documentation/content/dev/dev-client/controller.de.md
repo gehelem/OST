@@ -83,6 +83,14 @@ Eine **Konfiguration** ist eine benannte Menge von Modulen (Bibliothek, Label, P
 
 Die tatsächlich geladenen Module sind die des Dumps (`d.m`); sie erscheinen und verschwinden über [`aa`]({{% relref "server-messages.de.md" %}}#aa) und [`dm`]({{% relref "server-messages.de.md" %}}#dm). Die Konfiguration enthält **niemals** `GlobalDatastore` (siehe unten), das immer vorhanden ist.
 
+{{% notice style="warning" title="Eine Konfiguration enthält stillschweigend die aktiven INDI-Treiber" %}}
+`CS` speichert neben der Modulliste auch die gerade laufenden INDI-Treiber, und `CL` startet sie wieder — das ist aber in `controllerdata.availableconfs` unsichtbar, dessen Form nur Module beschreibt (`{modulelabel, moduletype, profilename}`), niemals Treiber. Ein Client, der einen Konfigurationseditor baut, der nur die Modulliste zeigt/bearbeitet, zeigt nicht das vollständige Bild dessen, was bei `CL` tatsächlich passiert.
+{{% /notice %}}
+
+{{% notice style="note" title="Keine Löschoperation" %}}
+Es gibt keinen Befehl, um eine gespeicherte Konfiguration zu entfernen — `CL` und `CS` sind die einzigen beiden Operationen. Eine Konfiguration, die ein Client nicht mehr will, bleibt dauerhaft in `controllerdata.availableconfs` (sie kann nur unter demselben Namen durch ein weiteres `CS` überschrieben werden).
+{{% /notice %}}
+
 ### INDI-Server und Treiber
 
 Wenn `controllerdata.indiserver` den Wert `"Y"` hat, steuert der Server eine eingebettete INDI-Instanz. Die Befehle [`YA`/`YZ`/`YL`/`YR`/`YS`]({{% relref "client-messages.de.md" %}}#indi) starten und stoppen sie und verwalten die Treiber; `controllerdata.indidrivers` liefert den verfügbaren Katalog und `controllerdata.indiactivedrivers` das, was läuft. `binary` ist der Wert, der als `driver` in `YL`, `YR` und `YS` übergeben wird.

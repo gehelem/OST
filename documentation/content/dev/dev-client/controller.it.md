@@ -83,6 +83,14 @@ Una **configurazione** è un insieme denominato di moduli (libreria, etichetta, 
 
 I moduli effettivamente caricati sono quelli del dump (`d.m`); compaiono e scompaiono tramite [`aa`]({{% relref "server-messages.it.md" %}}#aa) e [`dm`]({{% relref "server-messages.it.md" %}}#dm). La configurazione **non contiene mai** `GlobalDatastore` (vedi sotto), che è sempre presente.
 
+{{% notice style="warning" title="Una configurazione include silenziosamente i driver INDI attivi" %}}
+`CS` salva anche i driver INDI attualmente in esecuzione oltre all'elenco dei moduli, e `CL` li riavvia — ma ciò è invisibile in `controllerdata.availableconfs`, la cui forma descrive solo i moduli (`{modulelabel, moduletype, profilename}`), mai i driver. Un client che costruisce un editor di configurazioni limitandosi all'elenco dei moduli non mostra il quadro completo di ciò che accadrà realmente al `CL`.
+{{% /notice %}}
+
+{{% notice style="note" title="Nessuna operazione di eliminazione" %}}
+Non esiste alcun comando per rimuovere una configurazione salvata — `CL` e `CS` sono le uniche due operazioni. Una configurazione che un client non vuole più resta indefinitamente in `controllerdata.availableconfs` (può solo essere sovrascritta con lo stesso nome da un altro `CS`).
+{{% /notice %}}
+
 ### Server INDI e driver
 
 Se `controllerdata.indiserver` vale `"Y"`, il server pilota un'istanza INDI integrata. I comandi [`YA`/`YZ`/`YL`/`YR`/`YS`]({{% relref "client-messages.it.md" %}}#indi) la avviano, la arrestano e gestiscono i driver; `controllerdata.indidrivers` fornisce il catalogo disponibile e `controllerdata.indiactivedrivers` ciò che è in esecuzione. `binary` è il valore da passare come `driver` in `YL`, `YR` e `YS`.

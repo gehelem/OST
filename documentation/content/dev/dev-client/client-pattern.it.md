@@ -124,6 +124,16 @@ di fronte a un tipo di modulo mai visto prima — un modulo nuovo o di
 terze parti viene sempre renderizzato tramite la schermata generica —
 pur offrendo una schermata curata e mirata per i tipi di modulo che
 meritano l'investimento.
+
+La schermata `"default"` non è un fallback minimo simbolico: per
+alcuni tipi di modulo è l'**unica** schermata che avranno mai, quindi
+deve renderizzare tutto ciò che una proprietà/elemento generico può
+portare — status, `hint`, pre/posticone, griglie, grafici, LOV, tutto —
+non solo i valori. Una schermata dedicata per template può essere più
+curata (nascondere campi, riorganizzare il layout), ma quella di
+default non dovrebbe far sparire silenziosamente informazioni solo
+perché nessuno ha ancora scritto una schermata dedicata per quel
+modulo.
 {{% /notice %}}
 
 {{% notice style="tip" title="Consigliato: un unico componente di rendering delle proprietà, riusato ovunque" %}}
@@ -145,6 +155,18 @@ schermata di fallback — una correzione fatta lì una sola volta (ad
 esempio la corretta gestione di un gruppo di switch esclusivi) si
 applica automaticamente ovunque, schermate personalizzate comprese.
 {{% /notice %}}
+
+## Form di proprietà: `SA`, obbligatorio per `directedit: false`
+
+Oltre a `SV` campo per campo, una proprietà editabile ha bisogno di un **percorso form**: una schermata che elenca tutti i suoi elementi editabili in una volta, inviati insieme tramite [`SA`]({{% relref "client-messages.it.md" %}}#sa).
+
+{{% notice style="warning" title="Non opzionale per un elemento con `directedit: false`" %}}
+`SV` viene rifiutato dal backend per qualsiasi elemento con `directedit: false` (vedi [Modello dati]({{% relref "structure.it.md" %}})). `SA` è l'**unico** modo per aggiornare mai un tale elemento — un client senza percorso form semplicemente non può scrivere su quell'elemento, per quanto ben fatto sia il resto della sua UI.
+{{% /notice %}}
+
+Solo gli elementi **editabili** appartengono a questo form — i tipi di sola visualizzazione (`img`, `video`, `light`, `prg`, `message`) vengono renderizzati, mai inviati; vanno esclusi del tutto dal payload piuttosto che inviare loro un valore privo di senso.
+
+La stessa forma "inviare un insieme di elementi in una volta" è riusata dalla creazione di riga di griglia ([`GC`]({{% relref "client-messages.it.md" %}}#gc)) e dal suo aggiornamento ([`GU`]({{% relref "client-messages.it.md" %}}#gu)) — entrambi prendono una mappa `e` esattamente come `SA`. Vale la pena costruire **un unico** componente form riutilizzabile che serva sia il form della proprietà semplice, sia la finestra di creazione riga di griglia, sia quella di modifica riga — invece di tre implementazioni separate della stessa logica di fondo ("renderizzare elementi editabili, raccoglierne i valori"). È quello che fa Rooster.
 
 ## Heartbeat
 

@@ -117,6 +117,15 @@ This is what lets a client stay fully functional against a module type
 it has never seen before — a new or third-party module always renders
 through the generic screen — while still offering a polished, purpose-built
 screen for the module types worth investing in.
+
+The `"default"` screen is not a token minimal fallback: it is the
+**only** screen some module types will ever get, so it has to render
+everything a generic property/element can carry — status, `hint`,
+pre/posticons, grids, graphs, LOVs, the lot — not just values. A
+custom per-template screen is free to be more curated (hide fields,
+reorganize layout), but the default one should not silently drop
+information because no one wrote a dedicated screen for that module
+yet.
 {{% /notice %}}
 
 {{% notice style="tip" title="Recommended: one single property-rendering component, reused everywhere" %}}
@@ -136,6 +145,18 @@ the same generic property component the fallback screen uses — a fix
 made once there (e.g. correctly handling an exclusive switch group)
 applies everywhere automatically, custom screens included.
 {{% /notice %}}
+
+## Property forms: `SA`, mandatory for `directedit: false`
+
+Beyond field-by-field `SV`, an editable property needs a **form path**: a screen listing all its editable elements at once, submitted together via [`SA`]({{% relref "client-messages.en.md" %}}#sa).
+
+{{% notice style="warning" title="Not optional for a `directedit: false` element" %}}
+`SV` is rejected by the backend for any element with `directedit: false` (see [Data model]({{% relref "structure.en.md" %}})). `SA` is the **only** way to ever update such an element — a client with no form path simply cannot write to that element at all, no matter how the rest of its UI is built.
+{{% /notice %}}
+
+Only **editable** elements belong in this form — display-only types (`img`, `video`, `light`, `prg`, `message`) are rendered, never submitted; leave them out of the payload entirely rather than sending a meaningless value for them.
+
+The same "submit a set of elements at once" shape is reused by grid line creation ([`GC`]({{% relref "client-messages.en.md" %}}#gc)) and update ([`GU`]({{% relref "client-messages.en.md" %}}#gu)) — both take an `e` map exactly like `SA` does. It is worth building **one** reusable form component that serves the plain-property form, the grid-row-create dialog and the grid-row-edit dialog alike, rather than three separate implementations of essentially the same "render editable elements, collect their values" logic. Rooster does this.
 
 ## Heartbeat
 
