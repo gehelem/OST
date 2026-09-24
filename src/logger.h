@@ -19,7 +19,9 @@ struct LogMess
     LogLevel level = LogLevel::Info;
     QDateTime datetime;
     QString context;
-    QString message;
+    QString message;         /*!< translated to the server language, used for console/file output */
+    QString sourceMessage;   /*!< translation key / source text with placeholders, for re-translation */
+    QVariantList args;       /*!< arguments to substitute into sourceMessage */
 
 };
 /**
@@ -107,9 +109,27 @@ class Logger : public QObject
         void log(LogLevel level, const QString &message, const QString &context);
 
         /**
-         * @brief Get history
+         * @brief Log a message, keeping the untranslated source and its args
+         *        so the history can be re-translated later for any client
+         * @param level Log level
+         * @param message Message to log (already translated to server language)
+         * @param context Optional context
+         * @param sourceMessage Translation key / source text with placeholders
+         * @param args Arguments to substitute into sourceMessage
+         */
+        void log(LogLevel level, const QString &message, const QString &context,
+                 const QString &sourceMessage, const QVariantList &args);
+
+        /**
+         * @brief Get history, translated to the server language (legacy/console use)
          */
         QJsonArray getJsonHistory(void);
+
+        /**
+         * @brief Get history, re-translated to the given language
+         * @param language Language to translate each entry into
+         */
+        QJsonArray getJsonHistory(const QString &language);
         /**
          * @brief Glear history
          */

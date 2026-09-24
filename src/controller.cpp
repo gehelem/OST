@@ -524,7 +524,7 @@ void Controller::OnClientEvent(OST::ExtEvent event, QWebSocket* client, QString 
 {
     if (event.ev == OST::ExtEvType::DU || event.ev == OST::ExtEvType::IL  || event.ev == OST::ExtEvType::LO )
     {
-        wshandler->sendJsonMessage(getModulesDump(clientgrant), client);
+        wshandler->sendJsonMessage(getModulesDump(clientgrant, wshandler->getClientLanguage(client)), client);
     }
     if (event.ev == OST::ExtEvType::XX )
     {
@@ -1237,7 +1237,7 @@ void Controller::logError(const QString &message, const QVariantList &args)
     // Broadcast to WebSocket clients (each in their language)
     wshandler->onLog(OST::LogLevel::Error, message, args, "CT");
 }
-QJsonObject Controller::getModulesDump(QString clientgrant)
+QJsonObject Controller::getModulesDump(QString clientgrant, QString clientLanguage)
 {
     QJsonObject result, dump, files, modules;
     dump["grant-client"] = clientgrant;
@@ -1261,7 +1261,7 @@ QJsonObject Controller::getModulesDump(QString clientgrant)
 
     dump["m"] = modules;
     dump["files"] = files;
-    dump["logs"] = mLogger->getJsonHistory();
+    dump["logs"] = mLogger->getJsonHistory(clientLanguage);
     dump["serverlng"] = _lng;
     dump["controllerdata"] = QJsonObject().fromVariantMap(mControllerData);
 

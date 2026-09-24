@@ -119,7 +119,7 @@ class Controller : public QObject
         void logDebug(const QString &message, const QVariantList &args);
         void updateControllerData(QString key, QVariant data);
 
-        QJsonObject getModulesDump(QString clientgrant);
+        QJsonObject getModulesDump(QString clientgrant, QString clientLanguage);
         QString getBanner(void)
         {
             return mBanner;

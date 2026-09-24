@@ -259,6 +259,10 @@ void WShandler::processTextMessage(QString message)
 
 
 
+QString WShandler::getClientLanguage(QWebSocket* client) const
+{
+    return mClientLanguage.value(client, "en");
+}
 void WShandler::sendJsonMessage(QJsonObject json)
 {
     QJsonDocument jsondoc;

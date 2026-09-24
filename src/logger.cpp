@@ -100,6 +100,11 @@ void Logger::log(LogLevel level, const QString &message)
 }
 void Logger::log(LogLevel level, const QString &message, const QString &context)
 {
+    log(level, message, context, message, {});
+}
+void Logger::log(LogLevel level, const QString &message, const QString &context,
+                  const QString &sourceMessage, const QVariantList &args)
+{
     if (level < mLogLevel)
     {
         return;
@@ -122,7 +127,7 @@ void Logger::log(LogLevel level, const QString &message, const QString &context)
 
     formattedMessage += message;
 
-    mHistory.append({level, dt, context, message});
+    mHistory.append({level, dt, context, message, sourceMessage, args});
     if (mHistory.size() > 1000) mHistory.removeFirst();
 
     switch (level)
@@ -190,6 +195,10 @@ void Logger::writeToFile(const QString &formattedMessage)
 }
 QJsonArray Logger::getJsonHistory(void)
 {
+    return getJsonHistory(mServerLanguage);
+}
+QJsonArray Logger::getJsonHistory(const QString &language)
+{
     QJsonArray j;
     QList<LogMess>::iterator i;
     for (i = mHistory.begin(); i != mHistory.end(); ++i)
@@ -200,7 +209,12 @@ QJsonArray Logger::getJsonHistory(void)
             o["d"] = i->datetime.toString("yyyy-MM-dd HH:mm:ss.zzz");
             o["c"] = i->context;
             o["l"] = static_cast<int>(i->level);
-            o["t"] = i->message;
+            QString text = i->message;
+            if (mTranslater && !language.isEmpty())
+            {
+                text = mTranslater->translateWithArgs(i->sourceMessage, i->args, language);
+            }
+            o["t"] = text;
             j.append(o);
         };
     }
@@ -216,15 +230,16 @@ void Logger::setTranslateManager(OST::TranslateManager* translator, const QStrin
 void Logger::onLog(OST::LogLevel level, const QString &message,
                    const QVariantList &args, const QString &context)
 {
-    // Translate the message to server language
+    // Translate the message to server language for console/file output
     QString translatedMessage = message;
     if (mTranslater && !mServerLanguage.isEmpty())
     {
         translatedMessage = mTranslater->translateWithArgs(message, args, mServerLanguage);
     }
 
-    // Log via existing system
-    log(level, translatedMessage, context);
+    // Log via existing system, keeping the source message + args so the
+    // history can be re-translated per client at dump time
+    log(level, translatedMessage, context, message, args);
 }
 
 }
