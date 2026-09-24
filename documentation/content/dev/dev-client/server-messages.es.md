@@ -565,8 +565,10 @@ Enviado a todos los clientes cuando cambia el contenido de la carpeta de archivo
 |---|---|
 | `af` | Archivo añadido a la carpeta seleccionada |
 | `df` | Archivo eliminado de la carpeta seleccionada |
-| `ad` | Subcarpeta añadida al webroot |
-| `dd` | Subcarpeta eliminada del webroot |
+| `ad` | Subcarpeta añadida en cualquier parte del webroot |
+| `dd` | Subcarpeta eliminada de cualquier parte del webroot |
+
+`af`/`df` solo conciernen a la carpeta actualmente seleccionada vía [`FS`]({{% relref "client-messages.es.md" %}}#fs) — no se notifica nada sobre el contenido de otras carpetas. `ad`/`dd` son globales: se disparan para todo el árbol del webroot, sea cual sea la carpeta actualmente seleccionada. Ver [Sistema de archivos]({{% relref "controller.es.md" %}}#fichiers) para el panorama completo.
 
 ---
 

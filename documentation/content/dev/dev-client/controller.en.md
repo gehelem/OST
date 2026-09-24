@@ -136,33 +136,47 @@ There is no pagination and no size limit: on a very full webroot, the list can b
 
 ### Choosing the folder: `FS`
 
-[`FS`]({{% relref "client-messages.en.md" %}}#fs) designates the folder whose file list you want. The server watches **a single** folder at a time.
+[`FS`]({{% relref "client-messages.en.md" %}}#fs) designates the folder to watch and list files from. The server watches **a single** folder for file content at a time; the folder tree itself (`folders`) is tracked independently, see below.
 
 {{% notice style="warning" title="The selected folder is server-wide" %}}
-There is no per-client folder: an `FS` changes the file list seen by **all** connected clients (the events below are broadcast to everyone). A client should not use it for simple "local" browsing if other clients may be connected.
+There is no per-client folder: an `FS` changes the file list seen by **all** connected clients. A client should not use it for simple "local" browsing if other clients may be connected.
 
-The server **does not validate** the path: a non-existent folder simply returns an empty list, without an error.
+The path **is validated**: the target must exist and resolve inside the webroot (no `../` escape). An invalid request is rejected server-side (logged, no state change) — it does not silently return an empty list.
 {{% /notice %}}
+
+A successful `FS` replaces the file list wholesale: the client receives one [`uc`]({{% relref "server-messages.en.md" %}}#uc) `files` message with the complete new list, not a stream of `af`/`df` — selecting a folder is not a filesystem mutation, nothing was actually added or removed. There is **no** message announcing the new `selectedfolder` itself, which only exists in the dump.
+
+### Folder tree vs. selected folder's files
+
+`folders` (the whole recursive tree) and `files` (the selected folder's content) do not share the same scope:
+
+| | Scope | Live updates |
+|---|---|---|
+| `folders` / `ad` / `dd` | The **whole webroot**, recursively — independent of what is currently selected | Always, regardless of the current `FS` selection |
+| `files` / `af` / `df` | **The selected folder only** | Only for changes to the folder the last `FS` selected |
+
+A folder created or deleted anywhere in the webroot is reported live via `ad`/`dd` even if no client currently has it selected. A file created or deleted is only reported via `af`/`df` if it happens in the folder a client's `FS` last selected — `files`/`af`/`df` say nothing about other folders' content, a client has to `FS` into them to find out.
 
 ### Updates: `af` / `df` / `ad` / `dd`
 
-When the content of the selected folder changes (file created, deleted or renamed), or after an `FS`, the server sends one message per affected path — the value is the bare path itself, not wrapped in an object or array:
+When the folder tree or the selected folder's content actually changes, the server sends one message per affected path — the value is the bare path itself, not wrapped in an object or array:
 
 ```json
 { "af": "/Sequencer/gam Cyg/LIGHT/Luminance/img_001.FITS" }
 { "df": "/report.txt" }
+{ "ad": "/Sequencer/new target" }
 ```
 
 | Key | Meaning |
 |---|---|
 | `af` | File appeared in the selected folder |
 | `df` | File disappeared from the selected folder |
-| `ad` | Sub-folder created in the webroot |
-| `dd` | Sub-folder deleted from the webroot |
+| `ad` | Sub-folder appeared anywhere in the webroot |
+| `dd` | Sub-folder disappeared anywhere in the webroot |
 
-Each message carries exactly one path (N files = N messages) — see [`af`/`df`/`ad`/`dd`]({{% relref "server-messages.en.md" %}}#af) for the full reference. After an `FS`, the client receives a `df` for each file of the old folder, then an `af` for each file of the new one: there is **no** message announcing the new `selectedfolder`, which only exists in the dump.
+Each message carries exactly one path (N files = N messages) — see [`af`/`df`/`ad`/`dd`]({{% relref "server-messages.en.md" %}}#af) for the full reference. A rename is reported as a deletion followed by a creation: the server diffs a before/after listing, it does not detect renames as such.
 
-On every pass the server also sends [`uc`]({{% relref "server-messages.en.md" %}}#uc) messages `files` and `folders` containing the **complete** lists: a client can therefore either apply the events one by one, or simply replace its lists with these `uc` messages.
+After the per-path messages, the server sends [`uc`]({{% relref "server-messages.en.md" %}}#uc) `files` and/or `folders` with the complete updated list — but only for whichever of the two actually changed on this pass, never unconditionally. A client can therefore either apply the per-path events incrementally, or simply replace its list(s) with the matching `uc` message(s).
 
 ### Building a file URL
 

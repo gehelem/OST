@@ -136,33 +136,47 @@ No hay paginación ni límite de tamaño: en un webroot muy lleno, la lista pued
 
 ### Elegir la carpeta: `FS`
 
-[`FS`]({{% relref "client-messages.es.md" %}}#fs) designa la carpeta de la que se quiere la lista de archivos. El servidor solo vigila **una** carpeta a la vez.
+[`FS`]({{% relref "client-messages.es.md" %}}#fs) designa la carpeta a vigilar y de la que listar los archivos. El servidor solo vigila el **contenido** de una carpeta a la vez; el árbol de carpetas (`folders`) se sigue de forma independiente, ver más abajo.
 
 {{% notice style="warning" title="La carpeta seleccionada es global en el servidor" %}}
-No hay carpeta por cliente: un `FS` cambia la lista de archivos que ven **todos** los clientes conectados (los eventos siguientes se difunden a todos). Un cliente no debe usarlo para una simple navegación « local » si es posible que haya otros clientes conectados.
+No hay carpeta por cliente: un `FS` cambia la lista de archivos que ven **todos** los clientes conectados. Un cliente no debe usarlo para una simple navegación « local » si es posible que haya otros clientes conectados.
 
-El servidor **no valida** la ruta: una carpeta inexistente devuelve simplemente una lista vacía, sin error.
+La ruta **se valida**: el destino debe existir y quedar dentro del webroot (sin escapar vía `../`). Una solicitud inválida se rechaza en el servidor (se registra, sin cambio de estado) — no devuelve silenciosamente una lista vacía.
 {{% /notice %}}
+
+Un `FS` correcto reemplaza la lista de archivos en bloque: el cliente recibe un único mensaje [`uc`]({{% relref "server-messages.es.md" %}}#uc) `files` con la lista completa de la nueva carpeta, no un flujo de `af`/`df` — seleccionar una carpeta no es una mutación del sistema de archivos, no se añadió ni eliminó realmente nada. **No** hay ningún mensaje que anuncie el nuevo `selectedfolder` en sí, que solo existe en el dump.
+
+### Árbol de carpetas frente a archivos de la carpeta seleccionada
+
+`folders` (el árbol recursivo completo) y `files` (el contenido de la carpeta seleccionada) no tienen el mismo alcance:
+
+| | Alcance | Actualizaciones en vivo |
+|---|---|---|
+| `folders` / `ad` / `dd` | **Todo el webroot**, recursivamente — independiente de lo seleccionado | Siempre, sea cual sea la selección `FS` actual |
+| `files` / `af` / `df` | **Solo la carpeta seleccionada** | Solo para cambios en la carpeta que seleccionó el último `FS` |
+
+Una carpeta creada o eliminada en cualquier parte del webroot se notifica en vivo vía `ad`/`dd` aunque ningún cliente la tenga seleccionada. Un archivo creado o eliminado solo se notifica vía `af`/`df` si ocurre en la carpeta que el `FS` de un cliente seleccionó por última vez — `files`/`af`/`df` no dicen nada sobre el contenido de otras carpetas, un cliente tiene que hacer un `FS` a ellas para saberlo.
 
 ### Actualizaciones: `af` / `df` / `ad` / `dd`
 
-Cuando cambia el contenido de la carpeta seleccionada (archivo creado, eliminado o renombrado), o tras un `FS`, el servidor envía un mensaje por cada ruta afectada — el valor es la ruta en sí, sin envolver en un objeto ni en un array:
+Cuando el árbol de carpetas o el contenido de la carpeta seleccionada cambia realmente, el servidor envía un mensaje por cada ruta afectada — el valor es la ruta en sí, sin envolver en un objeto ni en un array:
 
 ```json
 { "af": "/Sequencer/gam Cyg/LIGHT/Luminance/img_001.FITS" }
 { "df": "/rapport.txt" }
+{ "ad": "/Sequencer/nuevo objetivo" }
 ```
 
 | Clave | Significado |
 |---|---|
 | `af` | Archivo aparecido en la carpeta seleccionada |
 | `df` | Archivo desaparecido de la carpeta seleccionada |
-| `ad` | Subcarpeta creada en el webroot |
-| `dd` | Subcarpeta eliminada del webroot |
+| `ad` | Subcarpeta aparecida en cualquier parte del webroot |
+| `dd` | Subcarpeta desaparecida de cualquier parte del webroot |
 
-Cada mensaje lleva exactamente una ruta (N archivos = N mensajes) — ver [`af`/`df`/`ad`/`dd`]({{% relref "server-messages.es.md" %}}#af) para la referencia completa. Tras un `FS`, el cliente recibe un `df` por cada archivo de la carpeta anterior y luego un `af` por cada archivo de la nueva: **no** hay ningún mensaje que anuncie el nuevo `selectedfolder`, que solo existe en el dump.
+Cada mensaje lleva exactamente una ruta (N archivos = N mensajes) — ver [`af`/`df`/`ad`/`dd`]({{% relref "server-messages.es.md" %}}#af) para la referencia completa. Un renombrado se notifica como una eliminación seguida de una creación: el servidor compara una lista antes/después, no detecta los renombrados como tales.
 
-El servidor envía además, en cada pasada, mensajes [`uc`]({{% relref "server-messages.es.md" %}}#uc) `files` y `folders` con las listas **completas**: un cliente puede por tanto aplicar los eventos uno a uno, o simplemente reemplazar sus listas con esos `uc`.
+Tras los mensajes por ruta, el servidor envía [`uc`]({{% relref "server-messages.es.md" %}}#uc) `files` y/o `folders` con la lista completa actualizada — pero solo para el que realmente cambió en esta pasada, nunca incondicionalmente. Un cliente puede por tanto aplicar los eventos por ruta de forma incremental, o simplemente reemplazar su(s) lista(s) con el/los mensaje(s) `uc` correspondiente(s).
 
 ### Construir la URL de un archivo
 

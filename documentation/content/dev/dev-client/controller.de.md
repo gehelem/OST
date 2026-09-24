@@ -136,33 +136,47 @@ Es gibt weder Paginierung noch Größenbegrenzung: bei einem sehr gefüllten Web
 
 ### Den Ordner wählen: `FS`
 
-[`FS`]({{% relref "client-messages.de.md" %}}#fs) bestimmt den Ordner, dessen Dateiliste man haben möchte. Der Server überwacht immer nur **einen einzigen** Ordner.
+[`FS`]({{% relref "client-messages.de.md" %}}#fs) bestimmt den Ordner, der überwacht und dessen Dateien aufgelistet werden sollen. Der Server überwacht den **Inhalt** immer nur eines **einzigen** Ordners; der Ordnerbaum (`folders`) wird unabhängig davon verfolgt, siehe unten.
 
 {{% notice style="warning" title="Der ausgewählte Ordner gilt global für den Server" %}}
-Es gibt keinen Ordner pro Client: ein `FS` ändert die Dateiliste, die **alle** verbundenen Clients sehen (die untenstehenden Ereignisse werden an alle gesendet). Ein Client sollte es nicht für eine rein „lokale“ Navigation verwenden, wenn andere Clients verbunden sein können.
+Es gibt keinen Ordner pro Client: ein `FS` ändert die Dateiliste, die **alle** verbundenen Clients sehen. Ein Client sollte es nicht für eine rein „lokale“ Navigation verwenden, wenn andere Clients verbunden sein können.
 
-Der Server **validiert den Pfad nicht**: ein nicht existierender Ordner liefert einfach eine leere Liste, ohne Fehler.
+Der Pfad **wird validiert**: das Ziel muss existieren und innerhalb des Webroots liegen (kein Entkommen über `../`). Eine ungültige Anfrage wird serverseitig abgelehnt (protokolliert, kein Zustandswechsel) — sie liefert nicht stillschweigend eine leere Liste.
 {{% /notice %}}
+
+Ein erfolgreiches `FS` ersetzt die Dateiliste vollständig: der Client erhält eine einzige [`uc`]({{% relref "server-messages.de.md" %}}#uc)-Nachricht `files` mit der kompletten neuen Liste, keinen Strom von `af`/`df` — eine Ordnerauswahl ist keine Änderung am Dateisystem, es wurde tatsächlich nichts hinzugefügt oder entfernt. Es gibt **keine** Nachricht, die den neuen `selectedfolder` selbst ankündigt, der nur im Dump existiert.
+
+### Ordnerbaum vs. Dateien des ausgewählten Ordners
+
+`folders` (der gesamte rekursive Baum) und `files` (der Inhalt des ausgewählten Ordners) haben unterschiedliche Reichweiten:
+
+| | Reichweite | Live-Aktualisierungen |
+|---|---|---|
+| `folders` / `ad` / `dd` | **Der gesamte Webroot**, rekursiv — unabhängig von der aktuellen Auswahl | Immer, unabhängig von der aktuellen `FS`-Auswahl |
+| `files` / `af` / `df` | **Nur der ausgewählte Ordner** | Nur für Änderungen am Ordner, den das letzte `FS` ausgewählt hat |
+
+Ein Ordner, der irgendwo im Webroot erstellt oder gelöscht wird, wird live über `ad`/`dd` gemeldet, auch wenn kein Client ihn gerade ausgewählt hat. Eine Datei wird nur über `af`/`df` gemeldet, wenn sie den Ordner betrifft, den das `FS` eines Clients zuletzt ausgewählt hat — `files`/`af`/`df` sagen nichts über den Inhalt anderer Ordner aus, ein Client muss dorthin ein `FS` senden, um es zu erfahren.
 
 ### Aktualisierungen: `af` / `df` / `ad` / `dd`
 
-Wenn sich der Inhalt des ausgewählten Ordners ändert (Datei erstellt, gelöscht oder umbenannt) oder nach einem `FS`, sendet der Server eine Nachricht pro betroffenem Pfad — der Wert ist der reine Pfad selbst, nicht in ein Objekt oder Array verpackt:
+Wenn sich der Ordnerbaum oder der Inhalt des ausgewählten Ordners tatsächlich ändert, sendet der Server eine Nachricht pro betroffenem Pfad — der Wert ist der reine Pfad selbst, nicht in ein Objekt oder Array verpackt:
 
 ```json
 { "af": "/Sequencer/gam Cyg/LIGHT/Luminance/img_001.FITS" }
 { "df": "/rapport.txt" }
+{ "ad": "/Sequencer/neues Ziel" }
 ```
 
 | Schlüssel | Bedeutung |
 |---|---|
 | `af` | Datei im ausgewählten Ordner hinzugekommen |
 | `df` | Datei aus dem ausgewählten Ordner verschwunden |
-| `ad` | Unterordner im Webroot erstellt |
-| `dd` | Unterordner aus dem Webroot gelöscht |
+| `ad` | Unterordner irgendwo im Webroot erschienen |
+| `dd` | Unterordner irgendwo im Webroot verschwunden |
 
-Jede Nachricht trägt genau einen Pfad (N Dateien = N Nachrichten) — siehe [`af`/`df`/`ad`/`dd`]({{% relref "server-messages.de.md" %}}#af) für die vollständige Referenz. Nach einem `FS` erhält der Client für jede Datei des alten Ordners ein `df` und dann für jede Datei des neuen ein `af`: es gibt **keine** Nachricht, die den neuen `selectedfolder` ankündigt, der nur im Dump existiert.
+Jede Nachricht trägt genau einen Pfad (N Dateien = N Nachrichten) — siehe [`af`/`df`/`ad`/`dd`]({{% relref "server-messages.de.md" %}}#af) für die vollständige Referenz. Eine Umbenennung wird als Löschung gefolgt von einer Erstellung gemeldet: der Server vergleicht eine Vorher-/Nachher-Liste, er erkennt Umbenennungen nicht als solche.
 
-Zusätzlich sendet der Server bei jedem Durchlauf [`uc`]({{% relref "server-messages.de.md" %}}#uc)-Nachrichten `files` und `folders` mit den **vollständigen** Listen: ein Client kann also entweder die Ereignisse einzeln anwenden oder seine Listen einfach mit diesen `uc` ersetzen.
+Nach den Pfad-Nachrichten sendet der Server [`uc`]({{% relref "server-messages.de.md" %}}#uc)-Nachrichten `files` und/oder `folders` mit der vollständigen aktualisierten Liste — aber nur für das, was sich bei diesem Durchlauf tatsächlich geändert hat, nie bedingungslos. Ein Client kann also entweder die Pfad-Ereignisse laufend anwenden oder seine Liste(n) einfach mit der/den passenden `uc`-Nachricht(en) ersetzen.
 
 ### Die URL einer Datei bilden
 

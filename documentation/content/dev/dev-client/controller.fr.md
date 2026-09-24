@@ -136,33 +136,47 @@ Il n'y a ni pagination ni limite de taille : sur un webroot très rempli, la lis
 
 ### Choisir le dossier : `FS`
 
-[`FS`]({{% relref "client-messages.fr.md" %}}#fs) désigne le dossier dont on veut la liste de fichiers. Le serveur ne surveille qu'**un seul** dossier à la fois.
+[`FS`]({{% relref "client-messages.fr.md" %}}#fs) désigne le dossier à surveiller et dont on veut la liste de fichiers. Le serveur ne surveille le **contenu** que d'**un seul** dossier à la fois ; l'arbre des dossiers (`folders`) est lui suivi indépendamment, voir plus bas.
 
 {{% notice style="warning" title="Le dossier sélectionné est global au serveur" %}}
-Il n'y a pas de dossier par client : un `FS` change la liste de fichiers vue par **tous** les clients connectés (les événements ci-dessous sont diffusés à tous). Un client ne doit pas s'en servir pour une simple navigation « locale » si d'autres clients sont susceptibles d'être connectés.
+Il n'y a pas de dossier par client : un `FS` change la liste de fichiers vue par **tous** les clients connectés. Un client ne doit pas s'en servir pour une simple navigation « locale » si d'autres clients sont susceptibles d'être connectés.
 
-Le serveur **ne valide pas** le chemin : un dossier inexistant renvoie simplement une liste vide, sans erreur.
+Le chemin **est validé** : la cible doit exister et rester à l'intérieur du webroot (pas d'échappement via `../`). Une requête invalide est rejetée côté serveur (journalisée, sans changement d'état) — elle ne renvoie pas silencieusement une liste vide.
 {{% /notice %}}
+
+Un `FS` réussi remplace la liste de fichiers en bloc : le client reçoit un seul message [`uc`]({{% relref "server-messages.fr.md" %}}#uc) `files` avec la liste complète du nouveau dossier, pas un flot de `af`/`df` — sélectionner un dossier n'est pas une mutation du système de fichiers, rien n'a été réellement ajouté ou supprimé. Il n'y a **pas** de message annonçant le nouveau `selectedfolder`, qui n'existe que dans le dump.
+
+### Arbre des dossiers vs fichiers du dossier sélectionné
+
+`folders` (l'arbre récursif complet) et `files` (le contenu du dossier sélectionné) n'ont pas la même portée :
+
+| | Portée | Mises à jour en direct |
+|---|---|---|
+| `folders` / `ad` / `dd` | **Tout le webroot**, récursivement — indépendant du dossier sélectionné | Toujours, quelle que soit la sélection `FS` en cours |
+| `files` / `af` / `df` | **Le dossier sélectionné uniquement** | Seulement pour les changements du dossier désigné par le dernier `FS` |
+
+Un dossier créé ou supprimé n'importe où dans le webroot est signalé en direct via `ad`/`dd` même si aucun client ne l'a actuellement sélectionné. Un fichier créé ou supprimé n'est signalé via `af`/`df` que s'il concerne le dossier que le `FS` d'un client a sélectionné en dernier — `files`/`af`/`df` ne disent rien du contenu des autres dossiers, un client doit y faire un `FS` pour le savoir.
 
 ### Mises à jour : `af` / `df` / `ad` / `dd`
 
-Quand le contenu du dossier sélectionné change (fichier créé, supprimé ou renommé), ou après un `FS`, le serveur envoie un message par chemin concerné — la valeur est le chemin brut lui-même, sans être enveloppé dans un objet ou un tableau :
+Quand l'arbre des dossiers ou le contenu du dossier sélectionné change réellement, le serveur envoie un message par chemin concerné — la valeur est le chemin brut lui-même, sans être enveloppé dans un objet ou un tableau :
 
 ```json
 { "af": "/Sequencer/gam Cyg/LIGHT/Luminance/img_001.FITS" }
 { "df": "/rapport.txt" }
+{ "ad": "/Sequencer/nouvelle cible" }
 ```
 
 | Clé | Signification |
 |---|---|
 | `af` | Fichier apparu dans le dossier sélectionné |
 | `df` | Fichier disparu du dossier sélectionné |
-| `ad` | Sous-dossier créé dans le webroot |
-| `dd` | Sous-dossier supprimé du webroot |
+| `ad` | Sous-dossier apparu n'importe où dans le webroot |
+| `dd` | Sous-dossier disparu n'importe où dans le webroot |
 
-Chaque message porte exactement un chemin (N fichiers = N messages) — voir [`af`/`df`/`ad`/`dd`]({{% relref "server-messages.fr.md" %}}#af) pour la référence complète. Après un `FS`, le client reçoit un `df` pour chaque fichier de l'ancien dossier puis un `af` pour chaque fichier du nouveau : il n'y a **pas** de message annonçant le nouveau `selectedfolder`, qui n'existe que dans le dump.
+Chaque message porte exactement un chemin (N fichiers = N messages) — voir [`af`/`df`/`ad`/`dd`]({{% relref "server-messages.fr.md" %}}#af) pour la référence complète. Un renommage est signalé comme une suppression suivie d'une création : le serveur compare une liste avant/après, il ne détecte pas les renommages en tant que tels.
 
-Le serveur envoie en plus, à chaque passage, des messages [`uc`]({{% relref "server-messages.fr.md" %}}#uc) `files` et `folders` contenant les listes **complètes** : un client peut donc soit appliquer les événements un par un, soit simplement remplacer ses listes avec ces `uc`.
+Après les messages par chemin, le serveur envoie des [`uc`]({{% relref "server-messages.fr.md" %}}#uc) `files` et/ou `folders` avec la liste complète mise à jour — mais seulement pour celle des deux qui a réellement changé lors de ce passage, jamais de façon inconditionnelle. Un client peut donc soit appliquer les événements par chemin au fil de l'eau, soit simplement remplacer sa (ses) liste(s) avec le(s) `uc` correspondant(s).
 
 ### Construire l'URL d'un fichier
 

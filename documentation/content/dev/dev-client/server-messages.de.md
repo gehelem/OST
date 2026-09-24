@@ -565,8 +565,10 @@ Wird an alle Clients gesendet, wenn sich der Inhalt des überwachten Dateiordner
 |---|---|
 | `af` | Datei zum ausgewählten Ordner hinzugefügt |
 | `df` | Datei aus dem ausgewählten Ordner entfernt |
-| `ad` | Unterordner zum Webroot hinzugefügt |
-| `dd` | Unterordner aus dem Webroot entfernt |
+| `ad` | Unterordner irgendwo im Webroot hinzugefügt |
+| `dd` | Unterordner irgendwo im Webroot entfernt |
+
+`af`/`df` betreffen nur den aktuell über [`FS`]({{% relref "client-messages.de.md" %}}#fs) ausgewählten Ordner — für den Inhalt anderer Ordner wird nichts gemeldet. `ad`/`dd` sind global: sie lösen für den gesamten Webroot-Baum aus, unabhängig von der aktuellen Auswahl. Siehe [Dateisystem]({{% relref "controller.de.md" %}}#fichiers) für das Gesamtbild.
 
 ---
 

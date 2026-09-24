@@ -565,8 +565,10 @@ Envoyé à tous les clients quand le contenu du dossier de fichiers surveillé c
 |---|---|
 | `af` | Fichier ajouté au dossier sélectionné |
 | `df` | Fichier supprimé du dossier sélectionné |
-| `ad` | Sous-dossier ajouté au webroot |
-| `dd` | Sous-dossier supprimé du webroot |
+| `ad` | Sous-dossier ajouté n'importe où dans le webroot |
+| `dd` | Sous-dossier supprimé n'importe où dans le webroot |
+
+`af`/`df` ne concernent que le dossier actuellement sélectionné via [`FS`]({{% relref "client-messages.fr.md" %}}#fs) — rien n'est signalé pour le contenu des autres dossiers. `ad`/`dd` sont globaux : ils se déclenchent pour tout l'arbre du webroot, quel que soit le dossier actuellement sélectionné. Voir [Système de fichiers]({{% relref "controller.fr.md" %}}#fichiers) pour la vue d'ensemble.
 
 ---
 

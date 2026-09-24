@@ -565,8 +565,10 @@ Inviato a tutti i client quando il contenuto della cartella di file sorvegliata 
 |---|---|
 | `af` | File aggiunto alla cartella selezionata |
 | `df` | File eliminato dalla cartella selezionata |
-| `ad` | Sottocartella aggiunta al webroot |
-| `dd` | Sottocartella eliminata dal webroot |
+| `ad` | Sottocartella aggiunta ovunque nel webroot |
+| `dd` | Sottocartella eliminata ovunque nel webroot |
+
+`af`/`df` riguardano solo la cartella attualmente selezionata tramite [`FS`]({{% relref "client-messages.it.md" %}}#fs) — non viene segnalato nulla per il contenuto delle altre cartelle. `ad`/`dd` sono globali: si attivano per l'intero albero del webroot, indipendentemente da cosa è attualmente selezionato. Vedi [File system]({{% relref "controller.it.md" %}}#fichiers) per il quadro completo.
 
 ---
 

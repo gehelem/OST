@@ -565,8 +565,10 @@ Sent to all clients when the content of the watched file folder changes (see [Fi
 |---|---|
 | `af` | File added to the selected folder |
 | `df` | File removed from the selected folder |
-| `ad` | Sub-folder added to the webroot |
-| `dd` | Sub-folder removed from the webroot |
+| `ad` | Sub-folder added anywhere in the webroot |
+| `dd` | Sub-folder removed anywhere in the webroot |
+
+`af`/`df` only concern the folder currently selected via [`FS`]({{% relref "client-messages.en.md" %}}#fs) — nothing is reported for other folders' content. `ad`/`dd` are global: they fire for the whole webroot tree regardless of what is currently selected. See [File system]({{% relref "controller.en.md" %}}#fichiers) for the full picture.
 
 ---
 
