@@ -17,12 +17,18 @@ El controlador es el componente del servidor que carga los módulos y gestiona e
 | `banner` | Banner del servidor (texto libre, opción `--banner`) |
 | `git` | Versión del servidor: `Gitdate`, `Githash`, `Gitmessage`, `Gittag` |
 | `libraries` | Bibliotecas de módulos disponibles, un objeto de metadatos por biblioteca |
-| `profiles` | Perfiles disponibles: objeto `nombre de clase de módulo → lista de nombres de perfil` |
+| `profiles` | Perfiles disponibles: objeto `nombre de biblioteca transformado → lista de nombres de perfil` — ver la convención de claves más abajo |
 | `indiserver` | `"Y"` si el servidor INDI embebido está activado, `"N"` en caso contrario |
 | `indidrivers` | Catálogo de drivers INDI instalados: lista de `{binary, family, label, mdpd}` |
 | `indiactivedrivers` | Drivers INDI actualmente en ejecución |
 | `systemwatcher` | Carga del servidor, ver más abajo |
 | `files`, `folders` | Copia de `d.files.files` y `d.files.folders`, ver [Sistema de archivos](#fichiers) |
+
+{{% notice style="warning" title="Claves de `profiles`: ni el nombre de biblioteca tal cual, ni `infos.template`" %}}
+`profiles` está indexado por el **nombre de biblioteca** del módulo (la misma cadena que se pasa como `lib` a [`ML`]({{% relref "client-messages.es.md" %}}#ml), es decir, la clave en `controllerdata.libraries` sin el prefijo `libost`) — pero transformada: **primera letra en mayúscula, el resto en minúsculas** (`"focus"` → `"Focus"`, no una simple capitalización — un nombre de biblioteca con otra mayúscula quedaría igualmente aplanado, por ejemplo un hipotético `"myFocus"` → `"Myfocus"`). Esta clave no es ni el nombre/etiqueta de la instancia del módulo, ni necesariamente idéntica a `infos.template` (suelen coincidir en la práctica, pero ambos se definen de forma independiente y el protocolo no garantiza nada al respecto).
+
+Esta convención no está documentada en ningún otro sitio y el backend no la impone — se dedujo a partir de la propia lógica de búsqueda de Rooster. Dos clientes independientes construidos únicamente a partir de esta documentación tropezaron con ella (un selector de perfiles que se renderizaba vacío en silencio). Si necesitas buscar los perfiles disponibles de un módulo, reproduce exactamente esta transformación sobre el nombre de biblioteca en lugar de adivinar.
+{{% /notice %}}
 
 {{% notice style="warning" title="`uc`: una clave por mensaje, valor reemplazado por completo" %}}
 Un mensaje `uc` lleva **una sola clave** de `controllerdata`, y su valor reemplaza **por completo** al anterior (sin fusión). Un cliente que solo lee la primera clave del payload (como hace Rooster) es por tanto correcto mientras el servidor envíe una sola clave por mensaje, que es lo que ocurre hoy.

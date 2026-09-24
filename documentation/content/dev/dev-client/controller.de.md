@@ -17,12 +17,18 @@ Der Controller ist die Komponente des Servers, die die Module lädt und den eing
 | `banner` | Banner des Servers (Freitext, Option `--banner`) |
 | `git` | Version des Servers: `Gitdate`, `Githash`, `Gitmessage`, `Gittag` |
 | `libraries` | Verfügbare Modulbibliotheken, ein Metadatenobjekt pro Bibliothek |
-| `profiles` | Verfügbare Profile: Objekt `Klassenname des Moduls → Liste von Profilnamen` |
+| `profiles` | Verfügbare Profile: Objekt `transformierter Bibliotheksname → Liste von Profilnamen` — siehe die Schlüsselkonvention unten |
 | `indiserver` | `"Y"`, wenn der eingebettete INDI-Server aktiviert ist, sonst `"N"` |
 | `indidrivers` | Katalog der installierten INDI-Treiber: Liste von `{binary, family, label, mdpd}` |
 | `indiactivedrivers` | Aktuell gestartete INDI-Treiber |
 | `systemwatcher` | Serverlast, siehe unten |
 | `files`, `folders` | Kopie von `d.files.files` und `d.files.folders`, siehe [Dateisystem](#fichiers) |
+
+{{% notice style="warning" title="`profiles`-Schlüssel: weder der rohe Bibliotheksname noch `infos.template`" %}}
+`profiles` wird über den **Bibliotheksnamen** des Moduls indiziert (derselbe String, der als `lib` an [`ML`]({{% relref "client-messages.de.md" %}}#ml) übergeben wird, also der Schlüssel in `controllerdata.libraries` ohne das `libost`-Präfix) — allerdings transformiert: **erster Buchstabe groß, der Rest klein** (`"focus"` → `"Focus"`, keine einfache Großschreibung des ersten Buchstabens — ein Bibliotheksname mit einem weiteren Großbuchstaben würde trotzdem eingeebnet, z. B. ein hypothetisches `"myFocus"` → `"Myfocus"`). Dieser Schlüssel ist weder der Instanzname/das Label des Moduls, noch notwendigerweise identisch mit `infos.template` (beide stimmen in der Praxis meist überein, werden aber unabhängig gesetzt, und nichts im Protokoll garantiert eine Übereinstimmung).
+
+Diese Konvention ist sonst nirgends dokumentiert und wird vom Backend nicht erzwungen — sie wurde aus Roosters eigener Lookup-Logik zurückentwickelt. Zwei unabhängige, allein aus dieser Dokumentation gebaute Clients sind darüber gestolpert (eine Profilauswahl, die stillschweigend leer blieb). Wer die verfügbaren Profile eines Moduls nachschlagen will, sollte genau diese Transformation auf den Bibliotheksnamen anwenden, statt zu raten.
+{{% /notice %}}
 
 {{% notice style="warning" title="`uc`: ein Schlüssel pro Nachricht, Wert wird komplett ersetzt" %}}
 Eine `uc`-Nachricht trägt **einen einzigen Schlüssel** von `controllerdata`, und ihr Wert ersetzt den alten **vollständig** (keine Zusammenführung). Ein Client, der nur den ersten Schlüssel des Payloads liest (wie es Rooster tut), ist daher korrekt, solange der Server nur einen Schlüssel pro Nachricht sendet — was heute der Fall ist.

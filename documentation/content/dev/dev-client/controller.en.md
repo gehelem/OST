@@ -17,12 +17,18 @@ The controller is the server component that loads the modules and drives the emb
 | `banner` | Server banner (free text, `--banner` option) |
 | `git` | Server version: `Gitdate`, `Githash`, `Gitmessage`, `Gittag` |
 | `libraries` | Available module libraries, one metadata object per library |
-| `profiles` | Available profiles: object `module class name → list of profile names` |
+| `profiles` | Available profiles: object `transformed library name → list of profile names` — see the keying convention below |
 | `indiserver` | `"Y"` if the embedded INDI server is enabled, `"N"` otherwise |
 | `indidrivers` | Catalogue of installed INDI drivers: list of `{binary, family, label, mdpd}` |
 | `indiactivedrivers` | INDI drivers currently running |
 | `systemwatcher` | Server load, see below |
 | `files`, `folders` | Copy of `d.files.files` and `d.files.folders`, see [File system](#fichiers) |
+
+{{% notice style="warning" title="`profiles` keying: not the library name as-is, not `infos.template`" %}}
+`profiles` is keyed by the module's **library name** (the same string passed as `lib` to [`ML`]({{% relref "client-messages.en.md" %}}#ml), i.e. the key in `controllerdata.libraries` with the `libost` prefix stripped) — but transformed: **first letter uppercased, the rest lowercased** (`"focus"` → `"Focus"`, not a simple capitalize — a library name containing another uppercase letter would still be flattened, e.g. a hypothetical `"myFocus"` → `"Myfocus"`). This key is neither the module's instance name/label, nor necessarily identical to `infos.template` (they usually match in practice, but the two are set independently and nothing in the protocol guarantees it).
+
+This convention is undocumented anywhere else and isn't enforced by the backend — it was reverse-engineered from Rooster's own lookup logic. Two independent clients built from this documentation alone got tripped up by it (a profile picker silently rendering empty). If you need to look up a module's available profiles, replicate this exact transform on the library name rather than guessing.
+{{% /notice %}}
 
 {{% notice style="warning" title="`uc`: one key per message, value replaced as a whole" %}}
 A `uc` message carries **a single key** of `controllerdata`, and its value **entirely replaces** the old one (no merge). A client that only reads the first key of the payload (as Rooster does) is therefore correct as long as the server sends only one key per message, which is the case today.

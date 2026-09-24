@@ -17,12 +17,18 @@ Il controller è il componente del server che carica i moduli e pilota il server
 | `banner` | Banner del server (testo libero, opzione `--banner`) |
 | `git` | Versione del server: `Gitdate`, `Githash`, `Gitmessage`, `Gittag` |
 | `libraries` | Librerie di moduli disponibili, un oggetto di metadati per libreria |
-| `profiles` | Profili disponibili: oggetto `nome della classe del modulo → elenco di nomi di profilo` |
+| `profiles` | Profili disponibili: oggetto `nome libreria trasformato → elenco di nomi di profilo` — vedi la convenzione di chiave qui sotto |
 | `indiserver` | `"Y"` se il server INDI integrato è attivato, `"N"` altrimenti |
 | `indidrivers` | Catalogo dei driver INDI installati: elenco di `{binary, family, label, mdpd}` |
 | `indiactivedrivers` | Driver INDI attualmente avviati |
 | `systemwatcher` | Carico del server, vedi più avanti |
 | `files`, `folders` | Copia di `d.files.files` e `d.files.folders`, vedi [File system](#fichiers) |
+
+{{% notice style="warning" title="Chiave di `profiles`: non il nome della libreria così com'è, non `infos.template`" %}}
+`profiles` è indicizzato dal **nome della libreria** del modulo (la stessa stringa passata come `lib` a [`ML`]({{% relref "client-messages.it.md" %}}#ml), cioè la chiave in `controllerdata.libraries` senza il prefisso `libost`) — ma trasformata: **prima lettera maiuscola, il resto minuscolo** (`"focus"` → `"Focus"`, non una semplice capitalizzazione — un nome di libreria con un'altra maiuscola verrebbe comunque appiattito, es. un ipotetico `"myFocus"` → `"Myfocus"`). Questa chiave non è né il nome/etichetta dell'istanza del modulo, né necessariamente identica a `infos.template` (di solito coincidono in pratica, ma i due sono impostati indipendentemente e nulla nel protocollo lo garantisce).
+
+Questa convenzione non è documentata altrove e non è imposta dal backend — è stata ricostruita analizzando la logica di ricerca di Rooster. Due client indipendenti costruiti solo a partire da questa documentazione ci sono cascati (un selettore di profili che si rendeva silenziosamente vuoto). Se devi cercare i profili disponibili di un modulo, riproduci esattamente questa trasformazione sul nome della libreria invece di indovinare.
+{{% /notice %}}
 
 {{% notice style="warning" title="`uc`: una chiave per messaggio, valore sostituito in blocco" %}}
 Un messaggio `uc` porta **una sola chiave** di `controllerdata`, e il suo valore sostituisce **interamente** quello precedente (nessuna fusione). Un client che legge solo la prima chiave del payload (come fa Rooster) è quindi corretto finché il server invia una sola chiave per messaggio, il che oggi è vero.
