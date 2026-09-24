@@ -22,6 +22,7 @@ Toutes les clés de commandes client sont en **MAJUSCULES** (ex. `DU`, `SV`, `SA
 | [`IL`](#il) | Changer la langue |
 | [`SV`](#sv) | Envoyer la valeur d'un seul élément |
 | [`SA`](#sa) | Envoyer toutes les valeurs d'éléments |
+| [`DP`](#dp) | Demander le dump d'une propriété |
 | [`I1`](#i1) | Clic sur preicon1 de propriété |
 | [`I2`](#i2) | Clic sur preicon2 de propriété |
 | [`I3`](#i3) | Clic sur posticon1 de propriété |
@@ -36,6 +37,7 @@ Toutes les clés de commandes client sont en **MAJUSCULES** (ex. `DU`, `SV`, `SA
 | [`GF`](#gf) | Sélectionner une ligne de grille |
 | [`GH`](#gh) | Monter une ligne de grille |
 | [`GB`](#gb) | Descendre une ligne de grille |
+| [`GR`](#gr) | Réinitialiser (vider) la grille |
 | [`CL`](#cl) | Charger une configuration de modules |
 | [`CS`](#cs) | Sauvegarder la configuration courante |
 | [`FS`](#fs) | Choisir le dossier de fichiers surveillé |
@@ -176,6 +178,28 @@ Utilisé pour soumettre tous les éléments éditables d'une propriété en une 
 {{% notice style="warning" title="Toujours envoyer tous les éléments" %}}
 Un `SA` doit contenir tous les éléments éditables de la propriété. Si un seul manque, le backend n'applique rien du tout — pas même les éléments présents — et journalise un avertissement côté serveur (visible côté client via un message `l`). Ce n'est pas un cas à gérer avec une dégradation gracieuse : c'est le signe d'un bug dans le client, qui doit toujours envoyer l'ensemble complet des éléments.
 {{% /notice %}}
+
+---
+
+### `DP` — Demander le dump d'une propriété {#dp}
+
+Demande au serveur de renvoyer l'état complet d'une propriété, comme si elle venait d'être (re)chargée — utile pour forcer le rafraîchissement d'une propriété qu'un client soupçonne d'être désynchronisée, sans recharger tout le module. Le serveur répond par un message [`ap`]({{% relref "server-messages.fr.md" %}}#ap) pour cette seule propriété.
+
+```json
+{
+  "DP": {
+    "m": {
+      "Focus": {
+        "p": {
+          "parameters": {}
+        }
+      }
+    }
+  }
+}
+```
+
+Pas de champ `e` : `DP` cible la propriété entière, pas un élément particulier.
 
 ---
 
@@ -436,6 +460,28 @@ Déplace la ligne à l'index `i` d'une position vers le bas.
   }
 }
 ```
+
+---
+
+### `GR` — Réinitialiser la grille {#gr}
+
+Vide entièrement la grille d'une propriété (toutes les lignes supprimées) — contrairement à `GD` qui ne supprime qu'une ligne. Le serveur diffuse [`gr`]({{% relref "server-messages.fr.md" %}}#gr) en réponse.
+
+```json
+{
+  "GR": {
+    "m": {
+      "Sequencer": {
+        "p": {
+          "sequence": {}
+        }
+      }
+    }
+  }
+}
+```
+
+Pas de champ `i` : `GR` cible la grille entière, pas une ligne particulière.
 
 ---
 

@@ -22,6 +22,7 @@ Alle Client-Befehlsschlüssel stehen in **GROSSBUCHSTABEN** (z. B. `DU`, `SV`, `
 | [`IL`](#il) | Sprache ändern |
 | [`SV`](#sv) | Wert eines einzelnen Elements senden |
 | [`SA`](#sa) | Alle Elementwerte senden |
+| [`DP`](#dp) | Property-Dump anfordern |
 | [`I1`](#i1) | Klick auf preicon1 der Property |
 | [`I2`](#i2) | Klick auf preicon2 der Property |
 | [`I3`](#i3) | Klick auf posticon1 der Property |
@@ -36,6 +37,7 @@ Alle Client-Befehlsschlüssel stehen in **GROSSBUCHSTABEN** (z. B. `DU`, `SV`, `
 | [`GF`](#gf) | Grid-Zeile auswählen |
 | [`GH`](#gh) | Grid-Zeile nach oben verschieben |
 | [`GB`](#gb) | Grid-Zeile nach unten verschieben |
+| [`GR`](#gr) | Grid zurücksetzen (leeren) |
 | [`CL`](#cl) | Modulkonfiguration laden |
 | [`CS`](#cs) | Aktuelle Konfiguration speichern |
 | [`FS`](#fs) | Überwachten Dateiordner wählen |
@@ -176,6 +178,28 @@ Wird verwendet, um alle editierbaren Elemente einer Property auf einmal zu über
 {{% notice style="warning" title="Immer alle Elemente senden" %}}
 Ein `SA` muss alle editierbaren Elemente der Property enthalten. Fehlt auch nur eines, wendet das Backend gar nichts an — nicht einmal die vorhandenen Elemente — und protokolliert serverseitig eine Warnung (für den Client sichtbar über eine `l`-Nachricht). Das ist kein Laufzeitfall, der elegant abgefangen werden soll: Es zeigt einen Bug im Client an, der immer den vollständigen Satz an Elementen senden muss.
 {{% /notice %}}
+
+---
+
+### `DP` — Property-Dump anfordern {#dp}
+
+Bittet den Server, den vollständigen Zustand einer Property erneut zu senden, als wäre sie gerade (neu) geladen worden — nützlich, um eine Property zu aktualisieren, bei der ein Client eine Desynchronisation vermutet, ohne das ganze Modul neu zu laden. Der Server antwortet mit einer [`ap`]({{% relref "server-messages.de.md" %}}#ap)-Nachricht für genau diese Property.
+
+```json
+{
+  "DP": {
+    "m": {
+      "Focus": {
+        "p": {
+          "parameters": {}
+        }
+      }
+    }
+  }
+}
+```
+
+Kein `e`-Feld: `DP` bezieht sich auf die gesamte Property, nicht auf ein einzelnes Element.
 
 ---
 
@@ -436,6 +460,28 @@ Verschiebt die Zeile mit Index `i` um eine Position nach unten.
   }
 }
 ```
+
+---
+
+### `GR` — Grid zurücksetzen {#gr}
+
+Leert das gesamte Grid einer Property (alle Zeilen entfernt) — nicht nur eine einzelne Zeile wie `GD`. Der Server sendet daraufhin [`gr`]({{% relref "server-messages.de.md" %}}#gr).
+
+```json
+{
+  "GR": {
+    "m": {
+      "Sequencer": {
+        "p": {
+          "sequence": {}
+        }
+      }
+    }
+  }
+}
+```
+
+Kein `i`-Feld: `GR` bezieht sich auf das gesamte Grid, nicht auf eine einzelne Zeile.
 
 ---
 

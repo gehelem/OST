@@ -22,6 +22,7 @@ All client command keys are **UPPERCASE** (e.g. `DU`, `SV`, `SA`, `GC`).
 | [`IL`](#il) | Set language |
 | [`SV`](#sv) | Set single element value |
 | [`SA`](#sa) | Set all element values |
+| [`DP`](#dp) | Request property dump |
 | [`I1`](#i1) | Click property preicon1 |
 | [`I2`](#i2) | Click property preicon2 |
 | [`I3`](#i3) | Click property posticon1 |
@@ -36,6 +37,7 @@ All client command keys are **UPPERCASE** (e.g. `DU`, `SV`, `SA`, `GC`).
 | [`GF`](#gf) | Fetch/select grid line |
 | [`GH`](#gh) | Move grid line up |
 | [`GB`](#gb) | Move grid line down |
+| [`GR`](#gr) | Reset (clear) grid |
 | [`CL`](#cl) | Load a module configuration |
 | [`CS`](#cs) | Save the current configuration |
 | [`FS`](#fs) | Select the watched file folder |
@@ -176,6 +178,28 @@ Use to submit all editable elements of a property at once (e.g. from a form). Al
 {{% notice style="warning" title="Always send every element" %}}
 An `SA` must include every editable element of the property. If any is missing, the backend applies nothing at all — not even the elements that were present — and logs a warning server-side (visible to the client via an `l` message). This is not a runtime condition to handle gracefully: it signals a bug in the client, which must always submit the complete set of elements.
 {{% /notice %}}
+
+---
+
+### `DP` — Request property dump {#dp}
+
+Asks the server to resend the full state of one property, as if it had just been (re)loaded — useful to force-refresh a property a client suspects is out of sync, without reloading the whole module. The server replies with an [`ap`]({{% relref "server-messages.en.md" %}}#ap) message for that property alone.
+
+```json
+{
+  "DP": {
+    "m": {
+      "Focus": {
+        "p": {
+          "parameters": {}
+        }
+      }
+    }
+  }
+}
+```
+
+No `e` field: `DP` targets the whole property, not a specific element.
 
 ---
 
@@ -436,6 +460,28 @@ Moves the row at index `i` down by one position.
   }
 }
 ```
+
+---
+
+### `GR` — Reset grid {#gr}
+
+Clears the entire grid of a property (all rows removed) — not a single row like `GD`. The server broadcasts [`gr`]({{% relref "server-messages.en.md" %}}#gr) in response.
+
+```json
+{
+  "GR": {
+    "m": {
+      "Sequencer": {
+        "p": {
+          "sequence": {}
+        }
+      }
+    }
+  }
+}
+```
+
+No `i` field: `GR` targets the whole grid, not one row.
 
 ---
 

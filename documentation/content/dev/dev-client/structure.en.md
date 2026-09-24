@@ -18,8 +18,12 @@ Module
 
 ## Connection and initial state
 
+The server can be discovered on the local network via mDNS/Zeroconf: it advertises itself as service type `_ostserver_ws._tcp` in the `local` domain, with a TXT record `OstServer=Observatoire Sans Tete`. The advertised port is always `9624` (the WebSocket port is not configurable). Discovery is optional — a client that already knows the host can just connect directly.
+
 On connection, send a `DU` request (see [Client → Server]({{< relref "client-messages.en.md" >}})).  
 The server replies with a full dump message (`d`) containing all modules, controller data, and file lists.
+
+Controller-level data (server load, module configurations, INDI drivers, the file system) is not part of the module model described on this page — see [Controller, GlobalDatastore and files]({{% relref "controller.en.md" %}}).
 
 ---
 

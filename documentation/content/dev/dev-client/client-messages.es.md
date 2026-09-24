@@ -22,6 +22,7 @@ Todas las claves de comandos de cliente están en **MAYÚSCULAS** (ej. `DU`, `SV
 | [`IL`](#il) | Cambiar el idioma |
 | [`SV`](#sv) | Enviar el valor de un solo elemento |
 | [`SA`](#sa) | Enviar todos los valores de elementos |
+| [`DP`](#dp) | Solicitar el dump de una propiedad |
 | [`I1`](#i1) | Clic en preicon1 de propiedad |
 | [`I2`](#i2) | Clic en preicon2 de propiedad |
 | [`I3`](#i3) | Clic en posticon1 de propiedad |
@@ -36,6 +37,7 @@ Todas las claves de comandos de cliente están en **MAYÚSCULAS** (ej. `DU`, `SV
 | [`GF`](#gf) | Seleccionar una línea de cuadrícula |
 | [`GH`](#gh) | Subir una línea de cuadrícula |
 | [`GB`](#gb) | Bajar una línea de cuadrícula |
+| [`GR`](#gr) | Restablecer (vaciar) la cuadrícula |
 | [`CL`](#cl) | Cargar una configuración de módulos |
 | [`CS`](#cs) | Guardar la configuración actual |
 | [`FS`](#fs) | Elegir la carpeta de archivos vigilada |
@@ -176,6 +178,28 @@ Usado para enviar todos los elementos editables de una propiedad de una vez (ej.
 {{% notice style="warning" title="Enviar siempre todos los elementos" %}}
 Un `SA` debe incluir todos los elementos editables de la propiedad. Si falta uno solo, el backend no aplica absolutamente nada — ni siquiera los elementos presentes — y registra una advertencia en el servidor (visible para el cliente mediante un mensaje `l`). No es un caso a gestionar con una degradación elegante: indica un error en el cliente, que siempre debe enviar el conjunto completo de elementos.
 {{% /notice %}}
+
+---
+
+### `DP` — Solicitar el dump de una propiedad {#dp}
+
+Pide al servidor que reenvíe el estado completo de una propiedad, como si acabara de (re)cargarse — útil para forzar la actualización de una propiedad que un cliente sospecha desincronizada, sin recargar todo el módulo. El servidor responde con un mensaje [`ap`]({{% relref "server-messages.es.md" %}}#ap) para esa sola propiedad.
+
+```json
+{
+  "DP": {
+    "m": {
+      "Focus": {
+        "p": {
+          "parameters": {}
+        }
+      }
+    }
+  }
+}
+```
+
+Sin campo `e`: `DP` afecta a toda la propiedad, no a un elemento concreto.
 
 ---
 
@@ -436,6 +460,28 @@ Desplaza la línea en el índice `i` una posición hacia abajo.
   }
 }
 ```
+
+---
+
+### `GR` — Restablecer la cuadrícula {#gr}
+
+Vacía por completo la cuadrícula de una propiedad (todas las filas eliminadas) — no una sola fila como `GD`. El servidor difunde [`gr`]({{% relref "server-messages.es.md" %}}#gr) en respuesta.
+
+```json
+{
+  "GR": {
+    "m": {
+      "Sequencer": {
+        "p": {
+          "sequence": {}
+        }
+      }
+    }
+  }
+}
+```
+
+Sin campo `i`: `GR` afecta a toda la cuadrícula, no a una fila concreta.
 
 ---
 

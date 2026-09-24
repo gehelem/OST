@@ -22,6 +22,7 @@ Tutte le chiavi dei comandi client sono in **MAIUSCOLO** (es. `DU`, `SV`, `SA`, 
 | [`IL`](#il) | Cambiare la lingua |
 | [`SV`](#sv) | Inviare il valore di un singolo elemento |
 | [`SA`](#sa) | Inviare tutti i valori degli elementi |
+| [`DP`](#dp) | Richiedere il dump di una proprietà |
 | [`I1`](#i1) | Clic su preicon1 di proprietà |
 | [`I2`](#i2) | Clic su preicon2 di proprietà |
 | [`I3`](#i3) | Clic su posticon1 di proprietà |
@@ -36,6 +37,7 @@ Tutte le chiavi dei comandi client sono in **MAIUSCOLO** (es. `DU`, `SV`, `SA`, 
 | [`GF`](#gf) | Selezionare una riga di griglia |
 | [`GH`](#gh) | Spostare in alto una riga di griglia |
 | [`GB`](#gb) | Spostare in basso una riga di griglia |
+| [`GR`](#gr) | Azzerare (svuotare) la griglia |
 | [`CL`](#cl) | Caricare una configurazione di moduli |
 | [`CS`](#cs) | Salvare la configurazione corrente |
 | [`FS`](#fs) | Scegliere la cartella di file sorvegliata |
@@ -176,6 +178,28 @@ Usato per inviare tutti gli elementi editabili di una proprietà in una volta (e
 {{% notice style="warning" title="Inviare sempre tutti gli elementi" %}}
 Un `SA` deve contenere tutti gli elementi editabili della proprietà. Se anche uno solo manca, il backend non applica nulla — nemmeno gli elementi presenti — e registra un avviso lato server (visibile al client tramite un messaggio `l`). Non è un caso da gestire con una degradazione elegante: indica un bug nel client, che deve sempre inviare l'insieme completo degli elementi.
 {{% /notice %}}
+
+---
+
+### `DP` — Richiedere il dump di una proprietà {#dp}
+
+Chiede al server di rinviare lo stato completo di una proprietà, come se fosse appena stata (ri)caricata — utile per forzare l'aggiornamento di una proprietà che un client sospetta essere disallineata, senza ricaricare l'intero modulo. Il server risponde con un messaggio [`ap`]({{% relref "server-messages.it.md" %}}#ap) per quella sola proprietà.
+
+```json
+{
+  "DP": {
+    "m": {
+      "Focus": {
+        "p": {
+          "parameters": {}
+        }
+      }
+    }
+  }
+}
+```
+
+Nessun campo `e`: `DP` riguarda l'intera proprietà, non un singolo elemento.
 
 ---
 
@@ -436,6 +460,28 @@ Sposta la riga all'indice `i` di una posizione verso il basso.
   }
 }
 ```
+
+---
+
+### `GR` — Azzerare la griglia {#gr}
+
+Svuota completamente la griglia di una proprietà (tutte le righe rimosse) — non una singola riga come `GD`. Il server diffonde [`gr`]({{% relref "server-messages.it.md" %}}#gr) in risposta.
+
+```json
+{
+  "GR": {
+    "m": {
+      "Sequencer": {
+        "p": {
+          "sequence": {}
+        }
+      }
+    }
+  }
+}
+```
+
+Nessun campo `i`: `GR` riguarda l'intera griglia, non una singola riga.
 
 ---
 

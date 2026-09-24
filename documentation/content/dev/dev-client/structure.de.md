@@ -18,8 +18,12 @@ Module
 
 ## Verbindung und Anfangszustand
 
+Der Server kann im lokalen Netzwerk über mDNS/Zeroconf gefunden werden: er meldet sich als Diensttyp `_ostserver_ws._tcp` in der Domäne `local`, mit einem TXT-Eintrag `OstServer=Observatoire Sans Tete`. Der angekündigte Port ist immer `9624` (der WebSocket-Port ist nicht konfigurierbar). Die Erkennung ist optional — ein Client, der den Host bereits kennt, kann sich auch direkt verbinden.
+
 Bei der Verbindung eine `DU`-Anfrage senden (siehe [Client → Server]({{< relref "client-messages.de.md" >}})).  
 Der Server antwortet mit einer vollständigen Dump-Nachricht (`d`), die alle Module, die Controller-Daten und die Dateilisten enthält.
+
+Controller-spezifische Daten (Serverlast, Modulkonfigurationen, INDI-Treiber, Dateisystem) sind nicht Teil des auf dieser Seite beschriebenen Modul-Modells — siehe [Controller, GlobalDatastore und Dateien]({{% relref "controller.de.md" %}}).
 
 ---
 

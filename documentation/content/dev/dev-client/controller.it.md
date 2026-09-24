@@ -87,6 +87,12 @@ I moduli effettivamente caricati sono quelli del dump (`d.m`); compaiono e scomp
 
 Se `controllerdata.indiserver` vale `"Y"`, il server pilota un'istanza INDI integrata. I comandi [`YA`/`YZ`/`YL`/`YR`/`YS`]({{% relref "client-messages.it.md" %}}#indi) la avviano, la arrestano e gestiscono i driver; `controllerdata.indidrivers` fornisce il catalogo disponibile e `controllerdata.indiactivedrivers` ciò che è in esecuzione. `binary` è il valore da passare come `driver` in `YL`, `YR` e `YS`.
 
+`controllerdata.indidrivers` e `controllerdata.indiactivedrivers` sono entrambi elenchi di oggetti `{binary, family, label}` (`indidrivers` ha in più `mdpd`, vedi la tabella sopra).
+
+{{% notice style="warning" title="YA/YZ/YL/YR/YS non hanno una conferma dedicata" %}}
+Nessuno di questi comandi genera un proprio messaggio di conferma. Successo o fallimento vanno dedotti indirettamente: `YL`/`YR`/`YS` sono seguiti da un aggiornamento `uc` di `indiactivedrivers` che riflette la modifica richiesta (ma questo conferma solo che il server ci ha *provato*, non che il driver INDI sottostante sia effettivamente partito), mentre `YA`/`YZ` non producono alcun `uc` — solo messaggi `l` (log), pensati per un umano, non per essere analizzati programmaticamente da un client. `controllerdata.indiserver` stesso riflette l'opzione di avvio `--indiserver`, non se il server integrato sia effettivamente in esecuzione in questo momento.
+{{% /notice %}}
+
 ## Il modulo `GlobalDatastore` {#globaldatastore}
 
 `GlobalDatastore` è un modulo **come gli altri nel dump** (`d.m.GlobalDatastore`, con proprietà, elementi, griglie, profili), ma il suo ruolo è centrale:

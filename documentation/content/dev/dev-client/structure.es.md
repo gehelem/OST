@@ -18,8 +18,12 @@ Module
 
 ## Conexión y estado inicial
 
+El servidor puede descubrirse en la red local vía mDNS/Zeroconf: se anuncia con el tipo de servicio `_ostserver_ws._tcp` en el dominio `local`, con un registro TXT `OstServer=Observatoire Sans Tete`. El puerto anunciado es siempre `9624` (el puerto WebSocket no es configurable). El descubrimiento es opcional — un cliente que ya conoce el host puede conectarse directamente.
+
 Al conectarse, enviar una petición `DU` (ver [Client → Server]({{< relref "client-messages.es.md" >}})).  
 El servidor responde con un mensaje dump completo (`d`) que contiene todos los módulos, los datos del controlador y las listas de archivos.
+
+Los datos propios del controlador (carga del servidor, configuraciones de módulos, drivers INDI, sistema de archivos) no forman parte del modelo de módulos descrito en esta página — ver [Controlador, GlobalDatastore y archivos]({{% relref "controller.es.md" %}}).
 
 ---
 
