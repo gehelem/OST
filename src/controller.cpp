@@ -612,9 +612,8 @@ void Controller::onExternalEvent(OST::ExtEvent event)
             {
                 mFileWatcher.removePath(d);
             }
-            mSelectedFolder = canonicalRequested;
-            mFileWatcher.addPath(mSelectedFolder);
-            OnFileWatcherEvent(QString());
+            mFileWatcher.addPath(canonicalRequested);
+            selectFolder(canonicalRequested);
             return;
         }
         case OST::ExtEvType::YA:
@@ -1125,6 +1124,30 @@ void Controller::queryActiveIndiDrivers()
     mLogger->info(QString::number(_activeIndiDrivers.size()) + " active INDI driver(s) recovered");
     updateControllerData("indiactivedrivers", activeIndiDriversToVariant());
 }
+void Controller::selectFolder(const QString &folder)
+{
+    // A folder selection is not a filesystem mutation: nothing was added or
+    // removed on disk, only what the client is watching changed. Rebuild the
+    // file list of the newly selected folder from scratch and replace it as a
+    // whole (one "files" uc), instead of routing it through OnFileWatcherEvent's
+    // diff logic, which would treat every file of the new folder as "added" and
+    // every file of the old one as "removed" (a flood of af/df events entirely
+    // redundant with the uc replacement that follows them). The folder tree
+    // itself (ad/dd, "folders") is unaffected by a selection change and is not
+    // rescanned/resent here.
+    mSelectedFolder = folder;
+    QStringList files;
+    QDirIterator itFiles(mSelectedFolder, QDir::Files);
+    while (itFiles.hasNext())
+    {
+        QString d = itFiles.next();
+        d.replace(_webroot, "");
+        files.append(d);
+    }
+    mFilesList = files;
+    mControllerData["files"] = mFilesList;
+    wshandler->onControllerEvent(OST::EvType::uc, "files", QVariant(mFilesList), nullptr);
+}
 void Controller::OnFileWatcherEvent(const QString &pEvent)
 {
     QStringList files;
@@ -1161,6 +1184,13 @@ void Controller::OnFileWatcherEvent(const QString &pEvent)
         }
     }
 
+    // A single real filesystem change can raise more than one directoryChanged
+    // signal (the OS/Qt watcher is not deduplicated upstream). Track whether
+    // this pass actually found a difference and skip the uc:files/uc:folders
+    // broadcast when it didn't, instead of resending the same lists on every
+    // spurious extra signal.
+    bool changed = false;
+
     // compare to already known folders
     for (const auto &i : folders)
     {
@@ -1168,15 +1198,17 @@ void Controller::OnFileWatcherEvent(const QString &pEvent)
         {
             wshandler->processFileEvent("ad", i);
             mFoldersList.append(i);
+            changed = true;
             //mFileWatcher.addPath(_webroot + i);
         }
     }
-    for (const auto &i : mFoldersList)
+    for (const auto &i : QStringList(mFoldersList))    // iterate a copy: mFoldersList is mutated below
     {
         if (!folders.contains(i) )
         {
             wshandler->processFileEvent("dd", i);
             mFoldersList.removeOne(i);
+            changed = true;
             //mFileWatcher.removePath(_webroot + i);
         }
     }
@@ -1188,27 +1220,29 @@ void Controller::OnFileWatcherEvent(const QString &pEvent)
         {
             wshandler->processFileEvent("af", i);
             mFilesList.append(i);
+            changed = true;
         }
     }
-    for (const auto &i : mFilesList)
+    for (const auto &i : QStringList(mFilesList))    // iterate a copy: mFilesList is mutated below
     {
         if (!files.contains(i) )
         {
             wshandler->processFileEvent("df", i);
             mFilesList.removeOne(i);
+            changed = true;
         }
     }
+
+    if (!changed)
+    {
+        return;
+    }
+
     mControllerData["files"] = mFilesList;
     mControllerData["folders"] = mFoldersList;
 
     wshandler->onControllerEvent(OST::EvType::uc, "files", QVariant(mFilesList), nullptr);
     wshandler->onControllerEvent(OST::EvType::uc, "folders", QVariant(mFoldersList), nullptr);
-    QVariantMap r;
-    dbmanager->getDbProfiles(r);
-    wshandler->onControllerEvent(OST::EvType::uc, "profiles", r, nullptr);
-    updateControllerData("profiles", r);
-
-
 }
 void Controller::OnFileChangeEvent(const QString &pEvent)
 {
