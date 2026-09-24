@@ -361,6 +361,12 @@ void WShandler::processFileEvent(const QString &eventType, const QStringList &ev
     obj["fileevent"] = QJsonArray::fromStringList(eventData);
     sendJsonMessage(obj);
 }
+void WShandler::processFileEvent(const QString &code, const QString &path)
+{
+    QJsonObject obj;
+    obj[code] = path;
+    sendJsonMessage(obj);
+}
 
 void WShandler::setTranslateManager(OST::TranslateManager* translator)
 {

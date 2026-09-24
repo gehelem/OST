@@ -30,6 +30,7 @@ class WShandler : public QObject
         ~WShandler();
     public :
         void processFileEvent(const QString &eventType, const QStringList &eventData);
+        void processFileEvent(const QString &code, const QString &path);
         DBManager   *dbmanager;
 
         /**

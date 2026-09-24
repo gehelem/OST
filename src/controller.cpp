@@ -1166,7 +1166,7 @@ void Controller::OnFileWatcherEvent(const QString &pEvent)
     {
         if (!mFoldersList.contains(i) )
         {
-            wshandler->processFileEvent("folderadd", QStringList(i));
+            wshandler->processFileEvent("ad", i);
             mFoldersList.append(i);
             //mFileWatcher.addPath(_webroot + i);
         }
@@ -1175,7 +1175,7 @@ void Controller::OnFileWatcherEvent(const QString &pEvent)
     {
         if (!folders.contains(i) )
         {
-            wshandler->processFileEvent("folderdel", QStringList(i));
+            wshandler->processFileEvent("dd", i);
             mFoldersList.removeOne(i);
             //mFileWatcher.removePath(_webroot + i);
         }
@@ -1186,7 +1186,7 @@ void Controller::OnFileWatcherEvent(const QString &pEvent)
     {
         if (!mFilesList.contains(i) )
         {
-            wshandler->processFileEvent("fileadd", QStringList(i));
+            wshandler->processFileEvent("af", i);
             mFilesList.append(i);
         }
     }
@@ -1194,7 +1194,7 @@ void Controller::OnFileWatcherEvent(const QString &pEvent)
     {
         if (!files.contains(i) )
         {
-            wshandler->processFileEvent("filedel", QStringList(i));
+            wshandler->processFileEvent("df", i);
             mFilesList.removeOne(i);
         }
     }
