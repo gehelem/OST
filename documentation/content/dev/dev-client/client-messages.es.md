@@ -43,6 +43,7 @@ Todas las claves de comandos de cliente están en **MAYÚSCULAS** (ej. `DU`, `SV
 | [`FS`](#fs) | Elegir la carpeta de archivos vigilada |
 | [`ML`](#ml) | Cargar un módulo |
 | [`MK`](#mk) | Descargar un módulo |
+| [`QY`](#qy) | Consultar un módulo |
 | [`YA`](#indi) | Iniciar el servidor INDI embebido |
 | [`YZ`](#indi) | Detener el servidor INDI embebido |
 | [`YL`](#indi) | Cargar un driver INDI |
@@ -203,9 +204,11 @@ Sin campo `e`: `DP` afecta a toda la propiedad, no a un elemento concreto.
 
 ---
 
-## Acciones sobre los iconos
+## Acciones sobre los iconos {#icon-actions}
 
-Los iconos de propiedad (preicon / posticon) desencadenan acciones de backend como el guardado de un perfil, la carga de un perfil o el lanzamiento de un proceso. Los eventos de clic se envían mediante los siguientes comandos.
+`preicon1`/`preicon2`/`posticon1`/`posticon2` (propiedades) y `preicon`/`posticon` (elementos, ver [Modelo de datos]({{% relref "structure.es.md" %}})) no son decoraciones: cada una es una **acción clicable**. Un valor no vacío es el nombre del icono de Google Fonts (Material Icons) a mostrar; al hacer clic en el icono mostrado se envía el comando correspondiente de abajo, **sin ningún valor ni parámetro** — un payload vacío que simplemente apunta a la propiedad (o al elemento). Lo que la acción hace realmente en el servidor (guardar un perfil, cargar un perfil, lanzar un proceso...) depende enteramente del módulo; la única tarea del cliente es mostrar el icono y reenviar el clic tal cual.
+
+Una **cadena vacía significa que no hay ningún icono** en ese lugar — nada que mostrar, y por tanto nada que hacer clic ni que enviar. No mostrar un marcador de posición ni conectar un manejador de clic para un campo de icono vacío.
 
 ### `I1` — Clic en preicon1 de propiedad {#i1}
 
@@ -532,6 +535,31 @@ Pide al servidor que descargue un módulo en ejecución, designado por su nombre
 ```
 
 `GlobalDatastore` no puede descargarse: la petición se rechaza (mensaje de error en los logs).
+
+---
+
+## Consultar un módulo
+
+### `QY` — Consultar un módulo {#qy}
+
+Mecanismo genérico de consulta/respuesta propio de cada módulo: hacer a un módulo una pregunta con nombre y parámetros, recibir una respuesta con nombre vía [`qa`]({{% relref "server-messages.es.md" %}}#qa). Qué nombres de consulta entiende realmente un módulo (si entiende alguno) depende enteramente de ese módulo — el protocolo solo define el sobre. Nótese: sin envoltorio `p` aquí, `QY` apunta al propio módulo, no a una de sus propiedades.
+
+```json
+{
+  "QY": {
+    "m": {
+      "Sequencer": {
+        "query": "profileduration",
+        "params": { "profile": "default" }
+      }
+    }
+  }
+}
+```
+
+{{% notice style="note" title="Todavía poco que ver" %}}
+Hoy solo el módulo `Sequencer` implementa una respuesta real (`profileduration`), usada internamente por el módulo Planner. Ningún otro módulo incluido responde de forma significativa a ningún nombre de consulta por ahora.
+{{% /notice %}}
 
 ---
 

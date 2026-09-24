@@ -91,6 +91,10 @@ Eine Property gruppiert zusammengehörige Elemente. Properties werden hierarchis
 | `rule` | int | Gruppierungsregel für bool-Elemente: `0` GenauEines (Radio) · `1` HöchstensEines · `2` Beliebig |
 | `elements` | object | Map von Elementname → Element-Objekt |
 
+{{% notice style="tip" title="`preicon`/`posticon`: klickbare Aktionen, keine Dekoration" %}}
+Ein nicht-leerer Wert von `preicon1`/`preicon2`/`posticon1`/`posticon2` ist der Name des zu rendernden Google-Fonts-Icons (Material Icons) — und er ist klickbar: ein Klick darauf sendet [`I1`/`I2`/`I3`/`I4`]({{% relref "client-messages.de.md" %}}#i1) ohne Wert oder Parameter, nur ein leeres Payload, das die Property adressiert. Ein **leerer String bedeutet, dass an dieser Stelle kein Icon vorhanden ist** — nichts zu rendern, nichts zu klicken, nichts zu senden. Die elementbezogenen `preicon`/`posticon` weiter unten funktionieren genauso, über [`J1`/`J2`]({{% relref "client-messages.de.md" %}}#j1). Siehe [Icon-Aktionen]({{% relref "client-messages.de.md" %}}#icon-actions) für die vollständige Nachrichtenreferenz.
+{{% /notice %}}
+
 {{% notice style="tip" title="`level1`/`level2`/`order` sind informativ, kein Vertrag" %}}
 Diese Felder sind rein informativ — das Backend erzwingt sie nie, und ein Client kann sie teilweise oder gar nicht befolgen. Sie drücken nur aus, wie sich der Entwickler eines Moduls die Organisation seiner eigenen Properties vorgestellt hat. Genau das ermöglicht generischen Clients (Rooster, ostnoctua), sich an jedes Modul anzupassen, ohne modulspezifische UI.
 
@@ -145,6 +149,10 @@ Optionale Felder in `graphParams`, verwendet von den Mehrfach-Serien-Typen (`SXY
 Anders als `XY`/`DY`/`SXY`/`SDY`, deren Rollen generisch genug sind, um eine einzige wiederverwendbare Graph-Komponente zu steuern, hat `PHD` feste, zweckgebundene Rollen für einen PHD2-artigen Guiding-Graphen (verwendet vom `guider`-Modul). Ein Client, der eine generische Graph-Komponente für die anderen vier Typen baut, braucht für `PHD` wahrscheinlich eine eigene Implementierung — oder lässt es weg. Rooster tut Letzteres (nur `SXY`/`SDY`/`XY`/`DY`, `PHD` nicht behandelt).
 {{% /notice %}}
 
+{{% notice style="tip" title="Graphen als lebendige Komponenten rendern, nicht als erzeugte Bilder" %}}
+Die Grid-Daten einer Graph-Property ändern sich mit der Zeit (`gc`/`gu`/`gd`/`gr`, oder ein frischer `uc`/`ap`/`aa`) — also wie jedes andere lebendige UI-Element behandeln: mit einer Diagramm-/Canvas-Komponente zeichnen, die sich bei jedem Update neu aufbaut, so wie Rooster es mit Chart.js macht. Nicht server- oder clientseitig in ein statisches Bild rendern (PNG-Schnappschuss, serverseitig gerendertes Diagramm) und dann nur das `<img>` austauschen — das sieht merklich schlechter aus als ein echtes Diagramm (keine flüssigen Updates, keine Interaktivität, sichtbares Flackern/Neuladen bei jedem Punkt), und es verschenkt den ganzen Sinn, Grid-Daten überhaupt live über die Leitung zu bekommen.
+{{% /notice %}}
+
 {{% notice style="info" title="Wire-Format" %}}
 Im JSON-Format über das Netzwerk wird `elements` zu `e` abgekürzt.
 {{% /notice %}}
@@ -166,8 +174,8 @@ Ein Element enthält einen einzigen typisierten Wert. Es gibt 11 Elementtypen.
 | `autoupdate` | bool | Interner Backend-Indikator; von Clients ignoriert |
 | `badge` | bool | Zeigt an, ob das Element in der Favoritenliste steht |
 | `directedit` | bool | Zeigt an, ob dieses Element allein per `SV` geschrieben werden kann — siehe unten |
-| `preicon` | string | Icon vor dem Element (optional) |
-| `posticon` | string | Icon nach dem Element (optional) |
+| `preicon` | string | Icon vor dem Element — klickbare Aktion, siehe Hinweis oben (optional) |
+| `posticon` | string | Icon nach dem Element — klickbare Aktion, siehe Hinweis oben (optional) |
 
 {{% notice style="warning" title="Teilweise Updates" %}}
 In den Update-Nachrichten `ee` und `ea` enthalten Elemente **nur ihren Wert** — ohne die Metadatenfelder. Clients müssen die Metadaten des letzten vollständigen Dumps behalten.

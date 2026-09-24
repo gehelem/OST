@@ -33,6 +33,14 @@ local **ne change qu'en retour**, quand le serveur répond avec l'update
 confirmé. Le client ne présume jamais du résultat.
 {{% /notice %}}
 
+## Principe : aucune dépendance à internet
+
+Un serveur OST tourne souvent sur un réseau local isolé — un site d'observatoire distant sans accès à internet est un déploiement normal, pas un cas limite. Un client doit fonctionner correctement dans cette situation : **toute ressource dont il a besoin doit être embarquée avec le client lui-même**, pas récupérée depuis un CDN ou un autre service externe au moment de l'exécution.
+
+Ça concerne directement le rendu des icônes : [`preicon1`/`preicon2`/`posticon1`/`posticon2`/`preicon`/`posticon`]({{% relref "structure.fr.md" %}}) donnent un *nom* d'icône Google Fonts (Material Icons), pas une URL — un client doit embarquer localement la police/les glyphes d'icônes (vendorisés, auto-hébergés, ou empaquetés à la construction) plutôt que de charger la feuille de style du CDN Google, qui casse silencieusement dès qu'il n'y a plus de route vers internet.
+
+Ça vaut aussi pour tout ce qu'un client pourrait être tenté de tirer d'un CDN : un framework JS, une bibliothèque de graphes, une police web pour l'UI elle-même. Si le client en a besoin pour fonctionner, ça part avec le client.
+
 ## Dump complet vs mises à jour partielles
 
 À la connexion, le client envoie `DU` ; le serveur répond avec un dump

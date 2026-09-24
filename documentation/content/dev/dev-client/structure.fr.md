@@ -94,6 +94,10 @@ Une propriété regroupe des éléments liés. Les propriétés sont affichées 
 | `rule` | int | Règle de groupement des éléments bool : `0` UnParmi (radio) · `1` AuPlusUn · `2` Quelconque |
 | `elements` | object | Map nom d'élément → objet élément |
 
+{{% notice style="tip" title="`preicon`/`posticon` : des actions cliquables, pas des décorations" %}}
+Une valeur non vide de `preicon1`/`preicon2`/`posticon1`/`posticon2` est le nom d'icône Google Fonts (Material Icons) à afficher — et elle est cliquable : cliquer dessus envoie [`I1`/`I2`/`I3`/`I4`]({{% relref "client-messages.fr.md" %}}#i1) sans valeur ni paramètre, juste un payload vide ciblant la propriété. Une **chaîne vide signifie qu'il n'y a aucune icône** à cet emplacement — rien à afficher, rien à cliquer, rien à envoyer. Les `preicon`/`posticon` au niveau élément (plus bas) fonctionnent pareil, via [`J1`/`J2`]({{% relref "client-messages.fr.md" %}}#j1). Voir [Actions sur les icônes]({{% relref "client-messages.fr.md" %}}#icon-actions) pour la référence complète des messages.
+{{% /notice %}}
+
 {{% notice style="tip" title="`level1`/`level2`/`order` sont informatifs, pas un contrat" %}}
 Ces champs sont purement informatifs — le backend ne les impose jamais, et un client est libre de les respecter partiellement ou pas du tout. Ils expriment seulement la façon dont le développeur d'un module a envisagé d'organiser ses propriétés. C'est précisément ce qui permet à des clients génériques (Rooster, ostnoctua) de s'adapter à n'importe quel module sans UI dédiée par module.
 
@@ -148,6 +152,10 @@ Champs optionnels de `graphParams`, utilisés par les types multi-séries (`SXY`
 Contrairement à `XY`/`DY`/`SXY`/`SDY`, dont les rôles sont assez génériques pour piloter un seul composant de graphe réutilisable, `PHD` a des rôles fixes et spécifiques à un graphe de guidage façon PHD2 (utilisé par le module `guider`). Un client qui construit un composant de graphe générique pour les quatre autres types aura probablement besoin d'une implémentation dédiée pour `PHD`, ou devra le laisser de côté — c'est ce que fait actuellement Rooster (`SXY`/`SDY`/`XY`/`DY` seulement, `PHD` non géré).
 {{% /notice %}}
 
+{{% notice style="tip" title="Restituer les graphes comme des composants vivants, pas des images générées" %}}
+Les données de grille d'une propriété graphe changent dans le temps (`gc`/`gu`/`gd`/`gr`, ou un `uc`/`ap`/`aa` frais) — à traiter comme n'importe quel autre élément d'UI vivant : le dessiner avec un composant graphique/canvas qui se redessine à chaque mise à jour, comme le fait Rooster avec Chart.js. Ne pas le transformer côté serveur ou côté client en image statique (capture PNG, graphe rendu serveur) pour ensuite juste échanger l'`<img>` — c'est visiblement moins bon qu'un vrai graphe (pas de mise à jour fluide, pas d'interactivité, scintillement/rechargement visible à chaque point), et ça jette tout l'intérêt d'avoir reçu les données de grille en direct sur le fil.
+{{% /notice %}}
+
 {{% notice style="info" title="Format wire" %}}
 Dans le format JSON sur le réseau, `elements` est abrégé en `e`.
 {{% /notice %}}
@@ -169,8 +177,8 @@ Un élément contient une valeur typée unique. Il existe 11 types d'éléments.
 | `autoupdate` | bool | Indicateur interne du backend ; ignoré par les clients |
 | `badge` | bool | Indique si l'élément est dans la liste des favoris |
 | `directedit` | bool | Indique si cet élément peut être écrit seul via `SV` — voir ci-dessous |
-| `preicon` | string | Icône avant l'élément (optionnel) |
-| `posticon` | string | Icône après l'élément (optionnel) |
+| `preicon` | string | Icône avant l'élément — action cliquable, voir la note ci-dessus (optionnel) |
+| `posticon` | string | Icône après l'élément — action cliquable, voir la note ci-dessus (optionnel) |
 
 {{% notice style="warning" title="Mises à jour partielles" %}}
 Dans les messages de mise à jour `ee` et `ea`, les éléments ne contiennent **que leur valeur** — sans les champs de métadonnées. Les clients doivent conserver les métadonnées du dernier dump complet.

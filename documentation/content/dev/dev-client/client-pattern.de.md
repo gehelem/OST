@@ -34,6 +34,14 @@ Datastore **ändert sich erst als Reaktion darauf**, sobald der Server mit dem
 bestätigten Update antwortet. Der Client nimmt das Ergebnis niemals vorweg.
 {{% /notice %}}
 
+## Grundsatz: keine Internet-Abhängigkeit
+
+Ein OST-Server läuft häufig in einem isolierten lokalen Netzwerk — ein entlegener Observatoriumsstandort ohne Weg zum öffentlichen Internet ist ein normales Einsatzszenario, kein Randfall. Ein Client muss dort korrekt funktionieren: **jede benötigte Ressource muss mit dem Client selbst ausgeliefert werden**, nicht zur Laufzeit von einem CDN oder einem anderen externen Dienst geladen werden.
+
+Das betrifft direkt das Rendering der Icons: [`preicon1`/`preicon2`/`posticon1`/`posticon2`/`preicon`/`posticon`]({{% relref "structure.de.md" %}}) liefern einen Google-Fonts-Icon-*Namen* (Material Icons), keine URL — ein Client muss die Icon-Schrift/Glyphen lokal mitliefern (vendored, selbst gehostet oder beim Build gebündelt), statt das CDN-Stylesheet von Google zu laden, das in dem Moment stillschweigend versagt, in dem keine Route ins öffentliche Internet mehr besteht.
+
+Dasselbe gilt für alles andere, was ein Client versucht sein könnte, von einem CDN zu laden: ein JS-Framework, eine Diagramm-Bibliothek, eine Web-Schriftart für die UI selbst. Wenn der Client es zum Laufen braucht, wird es mit ausgeliefert.
+
 ## Vollständiger Dump vs. teilweise Updates
 
 Bei der Verbindung sendet der Client `DU`; der Server antwortet mit einem

@@ -43,6 +43,7 @@ All client command keys are **UPPERCASE** (e.g. `DU`, `SV`, `SA`, `GC`).
 | [`FS`](#fs) | Select the watched file folder |
 | [`ML`](#ml) | Load module |
 | [`MK`](#mk) | Kill (unload) module |
+| [`QY`](#qy) | Query a module |
 | [`YA`](#indi) | Start embedded INDI server |
 | [`YZ`](#indi) | Stop embedded INDI server |
 | [`YL`](#indi) | Load INDI driver |
@@ -203,9 +204,11 @@ No `e` field: `DP` targets the whole property, not a specific element.
 
 ---
 
-## Icon actions
+## Icon actions {#icon-actions}
 
-Property icons (preicon / posticon) trigger backend actions such as saving a profile, loading a profile, or starting a process. Click events are sent using the following commands.
+`preicon1`/`preicon2`/`posticon1`/`posticon2` (properties) and `preicon`/`posticon` (elements, see [Data model]({{% relref "structure.en.md" %}})) are not decorations: each is a **clickable action**. A non-empty value is the Google Fonts (Material Icons) icon name to render for it; clicking the rendered icon sends the matching command below with **no value or parameter at all** — an empty payload that simply targets the property (or element). What the action actually does server-side (saving a profile, loading a profile, starting a process...) is entirely up to the module; the client's only job is to render the icon and forward the click as-is.
+
+An **empty string means there is no icon in that slot** — nothing to render, and consequently nothing to click or send. Don't render a placeholder or wire up a click handler for an empty icon field.
 
 ### `I1` — Click property preicon1 {#i1}
 
@@ -532,6 +535,31 @@ Requests the server to unload a running module, identified by its name.
 ```
 
 `GlobalDatastore` cannot be unloaded: the request is refused (error message in the logs).
+
+---
+
+## Module query
+
+### `QY` — Query a module {#qy}
+
+Generic, per-module request/answer mechanism: ask a module a named question with parameters, get a named answer back via [`qa`]({{% relref "server-messages.en.md" %}}#qa). Which query names a module actually understands (if any) is entirely up to that module — the protocol only defines the envelope. Note the payload has no `p` wrapper: `QY` targets the module itself, not one of its properties.
+
+```json
+{
+  "QY": {
+    "m": {
+      "Sequencer": {
+        "query": "profileduration",
+        "params": { "profile": "default" }
+      }
+    }
+  }
+}
+```
+
+{{% notice style="note" title="Not much to see yet" %}}
+Today only the `Sequencer` module implements a real answer (`profileduration`), used internally by the Planner module. No other shipped module responds meaningfully to any query name yet.
+{{% /notice %}}
 
 ---
 

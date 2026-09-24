@@ -49,6 +49,7 @@ Tutte le chiavi degli eventi inviate dal server sono in **minuscolo** (es. `d`, 
 | [`df`](#af) | File eliminato |
 | [`ad`](#af) | Cartella aggiunta |
 | [`dd`](#af) | Cartella eliminata |
+| [`qa`](#qa) | Risposta a una richiesta di modulo |
 | [`xx`](#xx) | Pong keepalive |
 
 ---
@@ -569,6 +570,31 @@ Inviato a tutti i client quando il contenuto della cartella di file sorvegliata 
 | `dd` | Sottocartella eliminata ovunque nel webroot |
 
 `af`/`df` riguardano solo la cartella attualmente selezionata tramite [`FS`]({{% relref "client-messages.it.md" %}}#fs) — non viene segnalato nulla per il contenuto delle altre cartelle. `ad`/`dd` sono globali: si attivano per l'intero albero del webroot, indipendentemente da cosa è attualmente selezionato. Vedi [File system]({{% relref "controller.it.md" %}}#fichiers) per il quadro completo.
+
+---
+
+## `qa` — Risposta a una richiesta di modulo {#qa}
+
+Risposta a una richiesta [`QY`]({{% relref "client-messages.it.md" %}}#qy). `QY`/`qa` è un **meccanismo generico di richiesta/risposta specifico per modulo**: un client (o un altro modulo, internamente) pone a un modulo una domanda nominata con parametri, e riceve indietro una risposta nominata. Quali nomi di richiesta un modulo comprenda realmente, e la forma della sua risposta, dipende interamente da quel modulo — il protocollo definisce solo l'involucro, non il contenuto.
+
+```json
+{
+  "qa-query answer": {
+    "Sequencer": {
+      "q": {
+        "query": "profileduration",
+        "result": { "seconds": 3600 }
+      }
+    }
+  }
+}
+```
+
+`result` è ciò che il modulo ha restituito per quella richiesta — la sua forma dipende interamente da `query`. Un modulo senza un caso corrispondente al nome `query` richiesto restituisce silenziosamente un `result` vuoto.
+
+{{% notice style="note" title="Ancora poco da vedere" %}}
+Oggi solo il modulo `Sequencer` implementa una vera risposta (`profileduration`), usata internamente dal modulo Planner piuttosto che da un qualsiasi flusso client documentato. Nessun altro modulo distribuito risponde in modo significativo a nessun nome di richiesta per ora — il meccanismo esiste ed è completamente cablato, ma c'è ancora poco da interrogare in pratica.
+{{% /notice %}}
 
 ---
 

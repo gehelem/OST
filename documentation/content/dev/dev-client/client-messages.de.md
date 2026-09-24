@@ -43,6 +43,7 @@ Alle Client-Befehlsschlüssel stehen in **GROSSBUCHSTABEN** (z. B. `DU`, `SV`, `
 | [`FS`](#fs) | Überwachten Dateiordner wählen |
 | [`ML`](#ml) | Modul laden |
 | [`MK`](#mk) | Modul entladen |
+| [`QY`](#qy) | Modul abfragen |
 | [`YA`](#indi) | Eingebetteten INDI-Server starten |
 | [`YZ`](#indi) | Eingebetteten INDI-Server stoppen |
 | [`YL`](#indi) | INDI-Treiber laden |
@@ -203,9 +204,11 @@ Kein `e`-Feld: `DP` bezieht sich auf die gesamte Property, nicht auf ein einzeln
 
 ---
 
-## Icon-Aktionen
+## Icon-Aktionen {#icon-actions}
 
-Die Icons einer Property (preicon / posticon) lösen Backend-Aktionen aus, etwa das Speichern eines Profils, das Laden eines Profils oder das Starten eines Prozesses. Klick-Ereignisse werden über folgende Befehle gesendet.
+`preicon1`/`preicon2`/`posticon1`/`posticon2` (Properties) und `preicon`/`posticon` (Elemente, siehe [Datenmodell]({{% relref "structure.de.md" %}})) sind keine Dekoration: jedes ist eine **klickbare Aktion**. Ein nicht-leerer Wert ist der Name des zu rendernden Google-Fonts-Icons (Material Icons); ein Klick darauf sendet den passenden Befehl unten, **ganz ohne Wert oder Parameter** — ein leeres Payload, das einfach die Property (oder das Element) adressiert. Was die Aktion serverseitig tatsächlich tut (Profil speichern, Profil laden, Prozess starten...), entscheidet allein das Modul; die einzige Aufgabe des Clients ist, das Icon zu rendern und den Klick unverändert weiterzugeben.
+
+Ein **leerer String bedeutet, dass an dieser Stelle kein Icon vorhanden ist** — nichts zu rendern, folglich nichts zu klicken oder zu senden. Für ein leeres Icon-Feld sollte weder ein Platzhalter gerendert noch ein Klick-Handler registriert werden.
 
 ### `I1` — Klick auf preicon1 der Property {#i1}
 
@@ -532,6 +535,31 @@ Fordert den Server auf, ein laufendes Modul zu entladen, bezeichnet durch seinen
 ```
 
 `GlobalDatastore` kann nicht entladen werden: die Anfrage wird abgelehnt (Fehlermeldung in den Logs).
+
+---
+
+## Modul abfragen
+
+### `QY` — Modul abfragen {#qy}
+
+Generischer, pro Modul definierter Anfrage-/Antwort-Mechanismus: einem Modul eine benannte Frage mit Parametern stellen, eine benannte Antwort über [`qa`]({{% relref "server-messages.de.md" %}}#qa) zurückerhalten. Welche Anfragenamen ein Modul tatsächlich versteht (falls überhaupt), entscheidet allein das Modul — das Protokoll definiert nur die Hülle. Zu beachten: keine `p`-Hülle hier, `QY` adressiert das Modul selbst, nicht eine seiner Properties.
+
+```json
+{
+  "QY": {
+    "m": {
+      "Sequencer": {
+        "query": "profileduration",
+        "params": { "profile": "default" }
+      }
+    }
+  }
+}
+```
+
+{{% notice style="note" title="Noch nicht viel zu sehen" %}}
+Heute implementiert nur das Modul `Sequencer` eine echte Antwort (`profileduration`), intern genutzt vom Planner-Modul. Kein anderes ausgeliefertes Modul antwortet bislang sinnvoll auf irgendeinen Anfragenamen.
+{{% /notice %}}
 
 ---
 

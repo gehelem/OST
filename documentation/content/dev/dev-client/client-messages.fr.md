@@ -43,6 +43,7 @@ Toutes les clés de commandes client sont en **MAJUSCULES** (ex. `DU`, `SV`, `SA
 | [`FS`](#fs) | Choisir le dossier de fichiers surveillé |
 | [`ML`](#ml) | Charger un module |
 | [`MK`](#mk) | Décharger un module |
+| [`QY`](#qy) | Interroger un module |
 | [`YA`](#indi) | Démarrer le serveur INDI embarqué |
 | [`YZ`](#indi) | Arrêter le serveur INDI embarqué |
 | [`YL`](#indi) | Charger un driver INDI |
@@ -203,9 +204,11 @@ Pas de champ `e` : `DP` cible la propriété entière, pas un élément particul
 
 ---
 
-## Actions sur les icônes
+## Actions sur les icônes {#icon-actions}
 
-Les icônes de propriété (preicon / posticon) déclenchent des actions backend telles que la sauvegarde d'un profil, le chargement d'un profil ou le lancement d'un processus. Les événements de clic sont envoyés via les commandes suivantes.
+`preicon1`/`preicon2`/`posticon1`/`posticon2` (propriétés) et `preicon`/`posticon` (éléments, voir [Modèle de données]({{% relref "structure.fr.md" %}})) ne sont pas des décorations : chacune est une **action cliquable**. Une valeur non vide est le nom de l'icône Google Fonts (Material Icons) à afficher ; cliquer sur l'icône affichée envoie la commande correspondante ci-dessous **sans aucune valeur ni paramètre** — un payload vide qui cible simplement la propriété (ou l'élément). Ce que fait réellement l'action côté serveur (sauvegarder un profil, charger un profil, lancer un processus...) dépend entièrement du module ; le seul rôle du client est d'afficher l'icône et de transmettre le clic tel quel.
+
+Une **chaîne vide signifie qu'il n'y a aucune icône dans cet emplacement** — rien à afficher, et donc rien à cliquer ni à envoyer. Ne pas afficher de substitut ni brancher de gestionnaire de clic pour un champ icône vide.
 
 ### `I1` — Clic sur preicon1 de propriété {#i1}
 
@@ -532,6 +535,31 @@ Demande au serveur de décharger un module en cours d'exécution, désigné par 
 ```
 
 `GlobalDatastore` ne peut pas être déchargé : la demande est refusée (message d'erreur dans les logs).
+
+---
+
+## Interroger un module
+
+### `QY` — Interroger un module {#qy}
+
+Mécanisme générique de requête/réponse propre à chaque module : poser à un module une question nommée avec des paramètres, recevoir une réponse nommée en retour via [`qa`]({{% relref "server-messages.fr.md" %}}#qa). Les noms de requête qu'un module comprend réellement (s'il en comprend) dépendent entièrement de ce module — le protocole ne définit que l'enveloppe. À noter : pas d'enveloppe `p` ici, `QY` cible le module lui-même, pas une de ses propriétés.
+
+```json
+{
+  "QY": {
+    "m": {
+      "Sequencer": {
+        "query": "profileduration",
+        "params": { "profile": "default" }
+      }
+    }
+  }
+}
+```
+
+{{% notice style="note" title="Pas grand-chose à voir pour l'instant" %}}
+Aujourd'hui seul le module `Sequencer` implémente une vraie réponse (`profileduration`), utilisée en interne par le module Planner. Aucun autre module livré ne répond de façon utile à une quelconque requête pour l'instant.
+{{% /notice %}}
 
 ---
 

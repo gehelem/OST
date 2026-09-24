@@ -49,6 +49,7 @@ All server-sent event keys are **lowercase** (e.g. `d`, `ea`, `ap`, `gc`).
 | [`df`](#af) | File deleted |
 | [`ad`](#af) | Directory added |
 | [`dd`](#af) | Directory deleted |
+| [`qa`](#qa) | Answer to a module query |
 | [`xx`](#xx) | Keepalive pong |
 
 ---
@@ -569,6 +570,31 @@ Sent to all clients when the content of the watched file folder changes (see [Fi
 | `dd` | Sub-folder removed anywhere in the webroot |
 
 `af`/`df` only concern the folder currently selected via [`FS`]({{% relref "client-messages.en.md" %}}#fs) — nothing is reported for other folders' content. `ad`/`dd` are global: they fire for the whole webroot tree regardless of what is currently selected. See [File system]({{% relref "controller.en.md" %}}#fichiers) for the full picture.
+
+---
+
+## `qa` — Answer to a module query {#qa}
+
+Reply to a [`QY`]({{% relref "client-messages.en.md" %}}#qy) query. `QY`/`qa` is a **generic, per-module request/answer mechanism**: a client (or another module, internally) asks a module a named question with parameters, and gets a named answer back. What query names a module actually understands, and what its answer looks like, is entirely up to that module — the protocol only defines the envelope, not the content.
+
+```json
+{
+  "qa-query answer": {
+    "Sequencer": {
+      "q": {
+        "query": "profileduration",
+        "result": { "seconds": 3600 }
+      }
+    }
+  }
+}
+```
+
+`result` is whatever the module returned for that query — its shape depends entirely on `query`. A module with no matching case for the requested `query` name returns an empty `result`, silently.
+
+{{% notice style="note" title="Not much to see yet" %}}
+Today only the `Sequencer` module implements a real answer (`profileduration`), used internally by the Planner module rather than by any documented client workflow. No other shipped module responds meaningfully to any query name — this mechanism exists and is fully wired, but there is little to query in practice right now.
+{{% /notice %}}
 
 ---
 

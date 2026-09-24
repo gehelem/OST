@@ -91,6 +91,10 @@ Una propiedad agrupa elementos relacionados. Las propiedades se muestran jerárq
 | `rule` | int | Regla de agrupación de los elementos bool: `0` UnoDeEntre (radio) · `1` AloSumoUno · `2` Cualquiera |
 | `elements` | object | Mapa nombre de elemento → objeto elemento |
 
+{{% notice style="tip" title="`preicon`/`posticon`: acciones clicables, no decoraciones" %}}
+Un valor no vacío de `preicon1`/`preicon2`/`posticon1`/`posticon2` es el nombre del icono de Google Fonts (Material Icons) a mostrar — y es clicable: hacer clic en él envía [`I1`/`I2`/`I3`/`I4`]({{% relref "client-messages.es.md" %}}#i1) sin valor ni parámetro, solo un payload vacío que apunta a la propiedad. Una **cadena vacía significa que no hay ningún icono** en ese lugar — nada que mostrar, nada que hacer clic, nada que enviar. Los `preicon`/`posticon` a nivel de elemento (más abajo) funcionan igual, vía [`J1`/`J2`]({{% relref "client-messages.es.md" %}}#j1). Ver [Acciones sobre los iconos]({{% relref "client-messages.es.md" %}}#icon-actions) para la referencia completa de mensajes.
+{{% /notice %}}
+
 {{% notice style="tip" title="`level1`/`level2`/`order` son informativos, no un contrato" %}}
 Estos campos son puramente informativos — el backend nunca los impone, y un cliente es libre de respetarlos parcialmente o no respetarlos en absoluto. Solo expresan cómo el desarrollador de un módulo imaginó organizar sus propias propiedades. Esto es exactamente lo que permite a clientes genéricos (Rooster, ostnoctua) adaptarse a cualquier módulo sin una UI dedicada por módulo.
 
@@ -145,6 +149,10 @@ Campos opcionales de `graphParams`, usados por los tipos multi-serie (`SXY`/`SDY
 A diferencia de `XY`/`DY`/`SXY`/`SDY`, cuyos roles son suficientemente genéricos como para impulsar un único componente de gráfico reutilizable, `PHD` tiene roles fijos y específicos para un gráfico de guiado estilo PHD2 (usado por el módulo `guider`). Un cliente que construya un componente de gráfico genérico para los otros cuatro tipos probablemente necesitará una implementación dedicada para `PHD`, o tendrá que omitirlo — es lo que hace actualmente Rooster (solo `SXY`/`SDY`/`XY`/`DY`, `PHD` sin implementar).
 {{% /notice %}}
 
+{{% notice style="tip" title="Renderizar los gráficos como componentes vivos, no como imágenes generadas" %}}
+Los datos de cuadrícula de una propiedad con gráfico cambian con el tiempo (`gc`/`gu`/`gd`/`gr`, o un `uc`/`ap`/`aa` nuevo) — así que hay que tratarlo como cualquier otro elemento de UI vivo: dibujarlo con un componente de gráfico/canvas que se redibuje en cada actualización, tal como hace Rooster con Chart.js. No renderizarlo en el servidor o en el cliente como una imagen estática (una captura PNG, un gráfico renderizado por el servidor) para luego simplemente sustituir el `<img>` — se ve visiblemente peor que un gráfico real (sin actualizaciones fluidas, sin interactividad, parpadeo/recarga visible en cada punto), y tira por la borda todo el sentido de haber recibido los datos de cuadrícula en vivo por el cable.
+{{% /notice %}}
+
 {{% notice style="info" title="Formato wire" %}}
 En el formato JSON en la red, `elements` se abrevia como `e`.
 {{% /notice %}}
@@ -166,8 +174,8 @@ Un elemento contiene un valor tipado único. Existen 11 tipos de elementos.
 | `autoupdate` | bool | Indicador interno del backend; ignorado por los clientes |
 | `badge` | bool | Indica si el elemento está en la lista de favoritos |
 | `directedit` | bool | Indica si este elemento puede escribirse solo mediante `SV` — ver más abajo |
-| `preicon` | string | Icono antes del elemento (opcional) |
-| `posticon` | string | Icono después del elemento (opcional) |
+| `preicon` | string | Icono antes del elemento — acción clicable, ver nota arriba (opcional) |
+| `posticon` | string | Icono después del elemento — acción clicable, ver nota arriba (opcional) |
 
 {{% notice style="warning" title="Actualizaciones parciales" %}}
 En los mensajes de actualización `ee` y `ea`, los elementos contienen **solo su valor** — sin los campos de metadatos. Los clientes deben conservar los metadatos del último dump completo.
