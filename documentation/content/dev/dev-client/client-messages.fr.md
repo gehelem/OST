@@ -1,6 +1,6 @@
 ---
 title: Messages Client → Serveur
-weight: 30
+weight: 50
 description: "Tous les messages JSON que les clients peuvent envoyer au serveur OST"
 ---
 

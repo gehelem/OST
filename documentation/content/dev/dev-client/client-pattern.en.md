@@ -1,12 +1,12 @@
 ---
 title: Client Architecture Principles
-weight: 50
+weight: 10
 description: "How to structure an OST client: single datastore, writes through the server only"
 ---
 
 This page describes **how a client should be structured**, not the format
 of the exchanged messages (see [Data Model]({{% relref "structure.en.md" %}})
-and the previous pages for that).
+and the following pages for that).
 
 ## Principle: a single datastore holds the truth
 
@@ -93,6 +93,48 @@ incoming update only replaces the touched property's reference in the
 store, and every list of properties is rendered with a stable
 per-property key. As a result, unrelated properties' UI is never
 disturbed, no matter how fast another property updates elsewhere.
+{{% /notice %}}
+
+## Templates: per-module-type screens with a generic fallback
+
+Each module instance may advertise `infos.template` (see [Data
+Model]({{% relref "structure.en.md" %}})) — a string naming its type
+(`"focus"`, `"guider"`, `"sequencer"`...). It is a hint only, and it is
+**allowed to be absent**.
+
+{{% notice style="tip" title="Absent template = the default screen" %}}
+A client that supports per-template custom screens should treat a
+missing (or unrecognized) `infos.template` exactly like the literal
+value `"default"` — not as an error. Rooster does this with a small
+registry mapping a lowercased template name to a screen component,
+falling back to its generic/default screen when the name is absent or
+not in the registry:
+```
+template = infos.template?.toLowerCase() || "default"
+screen = registry[template] ?? registry["default"]
+```
+This is what lets a client stay fully functional against a module type
+it has never seen before — a new or third-party module always renders
+through the generic screen — while still offering a polished, purpose-built
+screen for the module types worth investing in.
+{{% /notice %}}
+
+{{% notice style="tip" title="Recommended: one single property-rendering component, reused everywhere" %}}
+Not mandatory, but strongly worth it: build a **single** component
+responsible for rendering one property (or one element) — handling
+`directedit`, `permission`, the three LOV scopes, bool-group rules,
+`autoupdate`, grids, graphs — and have **every** screen use it for
+individual properties, including custom per-template screens, not just
+the generic fallback.
+
+The alternative — each screen re-implementing its own field rendering —
+duplicates every wire-format nuance across the codebase, and a fix or a
+new backend capability only reaches the screens someone remembers to
+update. Rooster's custom screens (`GuiderComponent`, `FocusComponent`...)
+render their own layout, but still delegate each individual property to
+the same generic property component the fallback screen uses — a fix
+made once there (e.g. correctly handling an exclusive switch group)
+applies everywhere automatically, custom screens included.
 {{% /notice %}}
 
 ## Heartbeat

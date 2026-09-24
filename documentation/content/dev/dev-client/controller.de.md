@@ -1,6 +1,6 @@
 ---
 title: Controller, GlobalDatastore und Dateien
-weight: 35
+weight: 30
 description: "Was kein gewöhnliches Modul ist: Controller-Daten, Systemlast, Konfigurationen, das Modul GlobalDatastore, Dateisystem"
 ---
 

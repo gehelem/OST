@@ -1,6 +1,6 @@
 ---
 title: Ejemplo de sesión
-weight: 40
+weight: 60
 description: "Intercambios WebSocket anotados que ilustran una sesión de cliente completa"
 ---
 

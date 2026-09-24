@@ -1,6 +1,6 @@
 ---
 title: Beispielsitzung
-weight: 40
+weight: 60
 description: "Kommentierter WebSocket-Austausch, der eine vollständige Client-Sitzung veranschaulicht"
 ---
 

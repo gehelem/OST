@@ -1,12 +1,12 @@
 ---
 title: Principes d'architecture client
-weight: 50
+weight: 10
 description: "Comment structurer un client OST : datastore unique, écriture via WS uniquement"
 ---
 
 Cette page décrit **comment un client doit être structuré**, pas le format
 des messages échangés (voir [Structure des données]({{% relref "structure.fr.md" %}})
-et les pages précédentes pour ça).
+et les pages suivantes pour ça).
 
 ## Principe : un datastore unique détient la vérité
 
@@ -96,6 +96,51 @@ de la propriété concernée dans le store, et toute liste de propriétés
 est rendue avec une clé stable par propriété. Résultat : l'UI des
 propriétés non concernées n'est jamais perturbée, quelle que soit la
 vitesse à laquelle une autre propriété se met à jour en parallèle.
+{{% /notice %}}
+
+## Templates : écrans par type de module, avec un repli générique
+
+Chaque instance de module peut annoncer `infos.template` (voir
+[Modèle de données]({{% relref "structure.fr.md" %}})) — une chaîne
+nommant son type (`"focus"`, `"guider"`, `"sequencer"`...). C'est
+purement indicatif, et **son absence est autorisée**.
+
+{{% notice style="tip" title="Template absent = l'écran par défaut" %}}
+Un client qui gère des écrans dédiés par template doit traiter un
+`infos.template` absent (ou non reconnu) exactement comme la valeur
+littérale `"default"` — pas comme une erreur. Rooster procède ainsi
+avec un petit registre associant un nom de template en minuscules à un
+composant d'écran, avec repli sur son écran générique/par défaut quand
+le nom est absent ou absent du registre :
+```
+template = infos.template?.toLowerCase() || "default"
+screen = registry[template] ?? registry["default"]
+```
+C'est ce qui permet à un client de rester pleinement fonctionnel face
+à un type de module qu'il n'a jamais vu — un module nouveau ou tiers
+s'affiche toujours via l'écran générique — tout en offrant un écran
+soigné et dédié pour les types de modules qui le méritent.
+{{% /notice %}}
+
+{{% notice style="tip" title="Recommandé : un seul composant de rendu de propriété, réutilisé partout" %}}
+Pas obligatoire, mais fortement conseillé : construire un composant
+**unique**, responsable du rendu d'une propriété (ou d'un élément) —
+gérant `directedit`, `permission`, les trois portées de LOV, les
+règles de groupe bool, `autoupdate`, les grilles, les graphes — et
+faire en sorte que **tous** les écrans l'utilisent pour leurs
+propriétés individuelles, y compris les écrans dédiés par template, pas
+seulement le repli générique.
+
+L'alternative — chaque écran réimplémentant son propre rendu de
+champs — duplique chaque nuance du format d'échange dans toute la base
+de code, et un correctif ou une nouvelle capacité backend n'atteint
+que les écrans dont quelqu'un s'est souvenu. Les écrans dédiés de
+Rooster (`GuiderComponent`, `FocusComponent`...) ont leur propre mise
+en page, mais délèguent chaque propriété individuelle au même
+composant de propriété générique que l'écran de repli — un correctif
+fait une seule fois à cet endroit (par exemple gérer correctement un
+groupe de switches exclusifs) s'applique partout automatiquement,
+écrans dédiés compris.
 {{% /notice %}}
 
 ## Heartbeat

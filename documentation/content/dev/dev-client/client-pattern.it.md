@@ -1,12 +1,12 @@
 ---
 title: Principi di architettura client
-weight: 50
+weight: 10
 description: "Come strutturare un client OST: datastore unico, scrittura solo via WS"
 ---
 
 Questa pagina descrive **come deve essere strutturato un client**, non il formato
 dei messaggi scambiati (vedi [Modello dati]({{% relref "structure.it.md" %}})
-e le pagine precedenti per quello).
+e le pagine seguenti per quello).
 
 ## Principio: un datastore unico detiene la verità
 
@@ -98,6 +98,52 @@ proprietà viene renderizzato con una chiave stabile per proprietà. Il
 risultato è che la UI delle proprietà non coinvolte non viene mai
 disturbata, indipendentemente dalla velocità con cui un'altra
 proprietà si aggiorna altrove.
+{{% /notice %}}
+
+## Template: schermate per tipo di modulo con fallback generico
+
+Ogni istanza di modulo può dichiarare `infos.template` (vedi [Modello
+dati]({{% relref "structure.it.md" %}})) — una stringa che ne indica il
+tipo (`"focus"`, `"guider"`, `"sequencer"`...). È solo un suggerimento,
+ed **è ammesso che sia assente**.
+
+{{% notice style="tip" title="Template assente = la schermata di default" %}}
+Un client che supporta schermate personalizzate per template dovrebbe
+trattare un `infos.template` assente (o non riconosciuto) esattamente
+come il valore letterale `"default"` — non come un errore. Rooster fa
+così con un piccolo registro che associa un nome di template in
+minuscolo a un componente di schermata, ricadendo sulla propria
+schermata generica/di default quando il nome è assente o non presente
+nel registro:
+```
+template = infos.template?.toLowerCase() || "default"
+screen = registry[template] ?? registry["default"]
+```
+Questo è ciò che permette a un client di restare pienamente funzionante
+di fronte a un tipo di modulo mai visto prima — un modulo nuovo o di
+terze parti viene sempre renderizzato tramite la schermata generica —
+pur offrendo una schermata curata e mirata per i tipi di modulo che
+meritano l'investimento.
+{{% /notice %}}
+
+{{% notice style="tip" title="Consigliato: un unico componente di rendering delle proprietà, riusato ovunque" %}}
+Non obbligatorio, ma vale decisamente la pena: costruire un **unico**
+componente responsabile del rendering di una proprietà (o di un
+elemento) — gestendo `directedit`, `permission`, le tre portate di LOV,
+le regole dei gruppi bool, `autoupdate`, le griglie, i grafici — e far
+sì che **ogni** schermata lo usi per le singole proprietà, comprese le
+schermate personalizzate per template, non solo il fallback generico.
+
+L'alternativa — ogni schermata che reimplementa il proprio rendering
+dei campi — duplica ogni sfumatura del formato di trasporto in tutto il
+codice, e una correzione o una nuova funzionalità del backend raggiunge
+solo le schermate che qualcuno si ricorda di aggiornare. Le schermate
+personalizzate di Rooster (`GuiderComponent`, `FocusComponent`...)
+renderizzano il proprio layout, ma delegano comunque ogni singola
+proprietà allo stesso componente di proprietà generico usato dalla
+schermata di fallback — una correzione fatta lì una sola volta (ad
+esempio la corretta gestione di un gruppo di switch esclusivi) si
+applica automaticamente ovunque, schermate personalizzate comprese.
 {{% /notice %}}
 
 ## Heartbeat

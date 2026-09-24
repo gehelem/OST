@@ -1,6 +1,6 @@
 ---
 title: Data Model
-weight: 10
+weight: 20
 description: "Hierarchy of modules, properties, and elements exchanged over WebSocket"
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: Controlador, GlobalDatastore y archivos
-weight: 35
+weight: 30
 description: "Lo que no es un módulo ordinario: datos del controlador, carga del sistema, configuraciones, módulo GlobalDatastore, sistema de archivos"
 ---
 

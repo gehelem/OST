@@ -1,6 +1,6 @@
 ---
 title: Contrôleur, GlobalDatastore et fichiers
-weight: 35
+weight: 30
 description: "Ce qui n'est pas un module ordinaire : données du contrôleur, charge système, configurations, module GlobalDatastore, système de fichiers"
 ---
 

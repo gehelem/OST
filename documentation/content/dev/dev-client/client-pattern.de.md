@@ -1,12 +1,12 @@
 ---
 title: Grundsätze der Client-Architektur
-weight: 50
+weight: 10
 description: "Wie ein OST-Client strukturiert sein sollte: ein einziger Datastore, Schreibzugriffe nur über WS"
 ---
 
 Diese Seite beschreibt **wie ein Client strukturiert sein sollte**, nicht das
 Format der ausgetauschten Nachrichten (siehe [Datenmodell]({{% relref "structure.de.md" %}})
-und die vorherigen Seiten dafür).
+und die folgenden Seiten dafür).
 
 ## Grundsatz: ein einziger Datastore hält die Wahrheit
 
@@ -96,6 +96,54 @@ betroffenen Property, und jede Liste von Properties wird mit einem
 stabilen Schlüssel pro Property gerendert. Dadurch wird die UI nicht
 betroffener Properties niemals gestört, egal wie schnell sich eine
 andere Property anderswo aktualisiert.
+{{% /notice %}}
+
+## Templates: Bildschirme pro Modultyp mit generischem Fallback
+
+Jede Modulinstanz kann `infos.template` angeben (siehe
+[Datenmodell]({{% relref "structure.de.md" %}})) — eine Zeichenkette,
+die ihren Typ benennt (`"focus"`, `"guider"`, `"sequencer"` ...). Das
+ist nur ein Hinweis, und er **darf fehlen**.
+
+{{% notice style="tip" title="Fehlendes Template = der Standardbildschirm" %}}
+Ein Client, der eigene Bildschirme pro Template unterstützt, sollte ein
+fehlendes (oder unbekanntes) `infos.template` genauso behandeln wie den
+wörtlichen Wert `"default"` — nicht als Fehler. Rooster macht das mit
+einer kleinen Registry, die einen kleingeschriebenen Template-Namen auf
+eine Bildschirm-Komponente abbildet, mit Rückfall auf den
+generischen/Standard-Bildschirm, wenn der Name fehlt oder nicht in der
+Registry steht:
+```
+template = infos.template?.toLowerCase() || "default"
+screen = registry[template] ?? registry["default"]
+```
+Dadurch bleibt ein Client auch gegenüber einem Modultyp voll
+funktionsfähig, den er noch nie gesehen hat — ein neues oder
+Drittanbieter-Modul wird immer über den generischen Bildschirm
+dargestellt —, während er trotzdem einen ausgefeilten, zweckgebundenen
+Bildschirm für die Modultypen bieten kann, in die es sich lohnt zu
+investieren.
+{{% /notice %}}
+
+{{% notice style="tip" title="Empfehlung: eine einzige, überall wiederverwendete Property-Rendering-Komponente" %}}
+Nicht verpflichtend, aber sehr lohnenswert: eine **einzige** Komponente
+bauen, die für das Rendering einer Property (oder eines Elements)
+zuständig ist — `directedit`, `permission`, die drei LOV-Geltungsbereiche,
+Bool-Gruppenregeln, `autoupdate`, Grids, Graphen behandelt — und diese
+Komponente von **jedem** Bildschirm für einzelne Properties verwenden
+lassen, auch von eigenen Bildschirmen pro Template, nicht nur vom
+generischen Fallback.
+
+Die Alternative — jeder Bildschirm implementiert sein eigenes
+Feld-Rendering neu — verdoppelt jede Nuance des Wire-Formats über die
+gesamte Codebasis hinweg, und ein Fix oder eine neue Backend-Fähigkeit
+erreicht nur die Bildschirme, an die jemand denkt, sie zu aktualisieren.
+Roosters eigene Bildschirme (`GuiderComponent`, `FocusComponent` ...)
+rendern ihr eigenes Layout, delegieren aber jede einzelne Property an
+dieselbe generische Property-Komponente, die auch der Fallback-Bildschirm
+verwendet — ein Fix, der dort einmal gemacht wird (z. B. eine exklusive
+Switch-Gruppe korrekt zu behandeln), wirkt automatisch überall,
+eigene Bildschirme eingeschlossen.
 {{% /notice %}}
 
 ## Heartbeat

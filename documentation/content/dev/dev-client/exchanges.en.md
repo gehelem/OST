@@ -1,6 +1,6 @@
 ---
 title: Example Session
-weight: 40
+weight: 60
 description: "Annotated WebSocket exchange showing a complete client session"
 ---
 

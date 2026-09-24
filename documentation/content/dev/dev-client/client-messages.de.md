@@ -1,6 +1,6 @@
 ---
 title: Nachrichten Client → Server
-weight: 30
+weight: 50
 description: "Alle JSON-Nachrichten, die Clients an den OST-Server senden können"
 ---
 

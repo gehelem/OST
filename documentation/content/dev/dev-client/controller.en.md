@@ -1,6 +1,6 @@
 ---
 title: Controller, GlobalDatastore and files
-weight: 35
+weight: 30
 description: "What is not an ordinary module: controller data, system load, configurations, the GlobalDatastore module, the file system"
 ---
 

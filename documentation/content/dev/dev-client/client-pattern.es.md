@@ -1,12 +1,12 @@
 ---
 title: Principios de arquitectura del cliente
-weight: 50
+weight: 10
 description: "Cómo estructurar un cliente OST: datastore único, escritura únicamente vía WS"
 ---
 
 Esta página describe **cómo debe estructurarse un cliente**, no el formato
 de los mensajes intercambiados (ver [Modelo de datos]({{% relref "structure.es.md" %}})
-y las páginas anteriores para eso).
+y las páginas siguientes para eso).
 
 ## Principio: un datastore único posee la verdad
 
@@ -97,6 +97,52 @@ propiedad afectada en el store, y cada lista de propiedades se
 renderiza con una clave estable por propiedad. Como resultado, la UI
 de las propiedades no afectadas nunca se ve perturbada, sin importar
 la velocidad a la que otra propiedad se actualice en otro lugar.
+{{% /notice %}}
+
+## Plantillas: pantallas por tipo de módulo con repliegue genérico
+
+Cada instancia de módulo puede anunciar `infos.template` (ver [Modelo
+de datos]({{% relref "structure.es.md" %}})) — una cadena que nombra
+su tipo (`"focus"`, `"guider"`, `"sequencer"`...). Es solo indicativo,
+y **puede estar ausente**.
+
+{{% notice style="tip" title="Plantilla ausente = la pantalla por defecto" %}}
+Un cliente que gestiona pantallas dedicadas por plantilla debe tratar
+un `infos.template` ausente (o no reconocido) exactamente como el
+valor literal `"default"` — no como un error. Rooster procede así con
+un pequeño registro que asocia un nombre de plantilla en minúsculas a
+un componente de pantalla, con repliegue a su pantalla genérica/por
+defecto cuando el nombre está ausente o no figura en el registro:
+```
+template = infos.template?.toLowerCase() || "default"
+screen = registry[template] ?? registry["default"]
+```
+Esto es lo que permite a un cliente seguir siendo plenamente funcional
+ante un tipo de módulo que nunca ha visto — un módulo nuevo o de
+terceros siempre se muestra mediante la pantalla genérica — a la vez
+que ofrece una pantalla cuidada y dedicada para los tipos de módulo
+que merecen la inversión.
+{{% /notice %}}
+
+{{% notice style="tip" title="Recomendado: un único componente de renderizado de propiedad, reutilizado en todas partes" %}}
+No obligatorio, pero muy recomendable: construir un componente
+**único**, responsable de renderizar una propiedad (o un elemento) —
+gestionando `directedit`, `permission`, los tres ámbitos de LOV, las
+reglas de grupo bool, `autoupdate`, las cuadrículas, los gráficos — y
+hacer que **todas** las pantallas lo usen para sus propiedades
+individuales, incluidas las pantallas dedicadas por plantilla, no solo
+el repliegue genérico.
+
+La alternativa — cada pantalla reimplementando su propio renderizado
+de campos — duplica cada matiz del formato de intercambio por toda la
+base de código, y una corrección o una nueva capacidad del backend
+solo llega a las pantallas que alguien recuerda actualizar. Las
+pantallas dedicadas de Rooster (`GuiderComponent`, `FocusComponent`...)
+tienen su propia disposición, pero delegan cada propiedad individual
+al mismo componente de propiedad genérico que usa la pantalla de
+repliegue — una corrección hecha una sola vez ahí (por ejemplo,
+gestionar correctamente un grupo de interruptores exclusivos) se
+aplica automáticamente en todas partes, pantallas dedicadas incluidas.
 {{% /notice %}}
 
 ## Heartbeat

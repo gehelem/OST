@@ -1,6 +1,6 @@
 ---
 title: Modèle de données
-weight: 10
+weight: 20
 description: "Hiérarchie des modules, propriétés et éléments échangés via WebSocket"
 ---
 
