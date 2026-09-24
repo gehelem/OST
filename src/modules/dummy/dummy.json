@@ -970,6 +970,51 @@
             }
         }
     },
+    "lovscopes":{
+        "devcat": "Examples",
+        "order": "01",
+        "group": "List of values",
+        "permission": 2,
+        "rule":2,
+        "label": "LOV scopes (local / module / controller)",
+        "e": {
+            "lovlocal": {
+                "type": "string",
+                "label": "Local to this element",
+                "hint": "listOfValues is an inline array of pairs, not shared with any other element",
+                "order":"10",
+                "autoupdate":true,
+                "directedit":true,
+                "value":"loc1",
+                "listOfValues":[
+                    ["loc1","Local value 1"],
+                    ["loc2","Local value 2"],
+                    ["loc3","Local value 3"]
+                ]
+            },
+            "lovmodule": {
+                "type": "string",
+                "label": "Global to this module",
+                "hint": "listOfValues references a key in this module's own globallov section (dummylov)",
+                "order":"20",
+                "autoupdate":true,
+                "directedit":true,
+                "value":"glob1",
+                "listOfValues":"dummylov"
+            },
+            "lovcontroller": {
+                "type": "string",
+                "label": "Global to the controller",
+                "hint": "listOfValues references a controller-wide LOV (optics, shared across all modules), listOfValuesIsExternal marks it as such",
+                "order":"30",
+                "autoupdate":true,
+                "directedit":true,
+                "value":"",
+                "listOfValues":"optics",
+                "listOfValuesIsExternal":true
+            }
+        }
+    },
     "agrid": {
         "showElts":true,
         "showGrid":true,
