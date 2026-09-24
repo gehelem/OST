@@ -608,11 +608,18 @@ void Controller::onExternalEvent(OST::ExtEvent event)
                 logError("Controller::onExternalEvent - folder %1 is outside the webroot", {event.data["folder"].toString()});
                 return;
             }
-            for ( const auto &d : mFileWatcher.directories() )
+            // The webroot itself stays watched permanently (folder tree
+            // visibility is global, see OnFileWatcherEvent) - only the
+            // previously selected folder's own watch, if different, is
+            // swapped out for the newly selected one.
+            if (mSelectedFolder != canonicalWebroot && mFileWatcher.directories().contains(mSelectedFolder))
             {
-                mFileWatcher.removePath(d);
+                mFileWatcher.removePath(mSelectedFolder);
             }
-            mFileWatcher.addPath(canonicalRequested);
+            if (canonicalRequested != canonicalWebroot && !mFileWatcher.directories().contains(canonicalRequested))
+            {
+                mFileWatcher.addPath(canonicalRequested);
+            }
             selectFolder(canonicalRequested);
             return;
         }
@@ -1150,12 +1157,13 @@ void Controller::selectFolder(const QString &folder)
 }
 void Controller::OnFileWatcherEvent(const QString &pEvent)
 {
-    QStringList files;
+    // Folder tree: always a full recursive rescan of the whole webroot,
+    // regardless of which watched path (webroot itself or the currently
+    // selected folder) raised the signal. Folder visibility is global by
+    // design: a client browsing one branch still has to learn about folders
+    // appearing or disappearing in another one, so this cannot be scoped to
+    // pEvent the way the files scan below is.
     QStringList folders;
-    QDir dir(_webroot);
-    QDirIterator it(_webroot, QDirIterator::Subdirectories);
-
-    //check existing folders
     QDirIterator itFolders(_webroot, QDirIterator::Subdirectories);
     while (itFolders.hasNext())
     {
@@ -1172,34 +1180,21 @@ void Controller::OnFileWatcherEvent(const QString &pEvent)
             }
         }
     }
-    //check existing files
-    QDirIterator itFiles(mSelectedFolder, QDirIterator::NoIteratorFlags);
-    while (itFiles.hasNext())
-    {
-        QString d = itFiles.next();
-        d.replace(_webroot, "");
-        if (!d.endsWith("/.") && !d.endsWith("/..") && !folders.contains(d))
-        {
-            files.append(d);
-        }
-    }
 
     // A single real filesystem change can raise more than one directoryChanged
     // signal (the OS/Qt watcher is not deduplicated upstream). Track whether
-    // this pass actually found a difference and skip the uc:files/uc:folders
-    // broadcast when it didn't, instead of resending the same lists on every
-    // spurious extra signal.
-    bool changed = false;
-
-    // compare to already known folders
+    // this pass actually found a difference and skip a broadcast when it
+    // didn't, instead of resending the same list on every spurious extra
+    // signal - folders and files are tracked separately so a files-only
+    // change doesn't also resend the (unchanged) folder list, and vice versa.
+    bool foldersChanged = false;
     for (const auto &i : folders)
     {
         if (!mFoldersList.contains(i) )
         {
             wshandler->processFileEvent("ad", i);
             mFoldersList.append(i);
-            changed = true;
-            //mFileWatcher.addPath(_webroot + i);
+            foldersChanged = true;
         }
     }
     for (const auto &i : QStringList(mFoldersList))    // iterate a copy: mFoldersList is mutated below
@@ -1208,19 +1203,41 @@ void Controller::OnFileWatcherEvent(const QString &pEvent)
         {
             wshandler->processFileEvent("dd", i);
             mFoldersList.removeOne(i);
-            changed = true;
-            //mFileWatcher.removePath(_webroot + i);
+            foldersChanged = true;
         }
     }
+    if (foldersChanged)
+    {
+        mControllerData["folders"] = mFoldersList;
+        wshandler->onControllerEvent(OST::EvType::uc, "folders", QVariant(mFoldersList), nullptr);
+    }
 
-    // compare to already known files
+    // Files: only the selected folder's content is watched and broadcast. If
+    // the change that raised this signal isn't the selected folder itself
+    // (e.g. it's the permanent webroot watch catching a folder appearing
+    // elsewhere), there is nothing to do here.
+    if (pEvent != mSelectedFolder)
+    {
+        return;
+    }
+
+    QStringList files;
+    QDirIterator itFiles(mSelectedFolder, QDir::Files);
+    while (itFiles.hasNext())
+    {
+        QString d = itFiles.next();
+        d.replace(_webroot, "");
+        files.append(d);
+    }
+
+    bool filesChanged = false;
     for (const auto &i : files)
     {
         if (!mFilesList.contains(i) )
         {
             wshandler->processFileEvent("af", i);
             mFilesList.append(i);
-            changed = true;
+            filesChanged = true;
         }
     }
     for (const auto &i : QStringList(mFilesList))    // iterate a copy: mFilesList is mutated below
@@ -1229,20 +1246,14 @@ void Controller::OnFileWatcherEvent(const QString &pEvent)
         {
             wshandler->processFileEvent("df", i);
             mFilesList.removeOne(i);
-            changed = true;
+            filesChanged = true;
         }
     }
-
-    if (!changed)
+    if (filesChanged)
     {
-        return;
+        mControllerData["files"] = mFilesList;
+        wshandler->onControllerEvent(OST::EvType::uc, "files", QVariant(mFilesList), nullptr);
     }
-
-    mControllerData["files"] = mFilesList;
-    mControllerData["folders"] = mFoldersList;
-
-    wshandler->onControllerEvent(OST::EvType::uc, "files", QVariant(mFilesList), nullptr);
-    wshandler->onControllerEvent(OST::EvType::uc, "folders", QVariant(mFoldersList), nullptr);
 }
 void Controller::OnFileChangeEvent(const QString &pEvent)
 {
