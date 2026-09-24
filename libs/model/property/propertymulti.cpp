@@ -155,14 +155,6 @@ bool  PropertyMulti::setElt(QString key, QVariant val, bool emitEvent)
         getElt(key)->accept(&vu, m, s);
         return true;
     }
-    if (mElts[key]->getType() == "light")
-    {
-        ElementUpdate vu;
-        m["value"] = val;
-        getElt(key)->accept(&vu, m, s);
-        return true;
-    }
-
     if ((mElts[key]->getType() == "bool") && (val.canConvert<bool>()) )
     {
         ElementUpdate vu;
@@ -212,9 +204,11 @@ bool  PropertyMulti::setElt(QString key, QVariant val, bool emitEvent)
                 break;
         }
     }
-    if ((mElts[key]->getType() == "prg") || (mElts[key]->getType() == "img") || (mElts[key]->getType() == "video") )
+    if ((mElts[key]->getType() == "prg") || (mElts[key]->getType() == "img") || (mElts[key]->getType() == "video")
+            || (mElts[key]->getType() == "light") )
     {
-        // prg/img/video can't be updated via frontend
+        // prg/img/video/light are display-only, can't be updated via frontend - light is only
+        // ever set server-side, through the dedicated ElementLight::setValue() path
         return true;
     }
     logError("PropertyMulti::setValue - %1 - can't update, unhandled type : %2(%3)", {key, mElts[key]->getType(), val.toString()});
@@ -278,7 +272,7 @@ void PropertyMulti::setAll(const QVariantMap &pValues)
     {
         if ((mElts[elt]->getType() == "int") || (mElts[elt]->getType() == "float") || (mElts[elt]->getType() == "string")
                 || (mElts[elt]->getType() == "bool") || (mElts[elt]->getType() == "date") || (mElts[elt]->getType() == "time")
-                || (mElts[elt]->getType() == "datetime") || (mElts[elt]->getType() == "light"))
+                || (mElts[elt]->getType() == "datetime"))
         {
             if (!pValues.contains(elt))
             {
