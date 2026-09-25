@@ -49,6 +49,7 @@ Todas las claves de eventos enviadas por el servidor están en **minúsculas** (
 | [`df`](#af) | Archivo eliminado |
 | [`ad`](#af) | Carpeta añadida |
 | [`dd`](#af) | Carpeta eliminada |
+| [`qa`](#qa) | Respuesta a una consulta de módulo (mecanismo inter-módulo, no pensado para el cliente) |
 | [`xx`](#xx) | Pong keepalive |
 
 ---
@@ -569,6 +570,35 @@ Enviado a todos los clientes cuando cambia el contenido de la carpeta de archivo
 | `dd` | Subcarpeta eliminada de cualquier parte del webroot |
 
 `af`/`df` solo conciernen a la carpeta actualmente seleccionada vía [`FS`]({{% relref "client-messages.es.md" %}}#fs) — no se notifica nada sobre el contenido de otras carpetas. `ad`/`dd` son globales: se disparan para todo el árbol del webroot, sea cual sea la carpeta actualmente seleccionada. Ver [Sistema de archivos]({{% relref "controller.es.md" %}}#fichiers) para el panorama completo.
+
+---
+
+## `qa` — Respuesta a una consulta de módulo {#qa}
+
+{{% notice style="warning" title="Comunicación inter-módulo, no una funcionalidad de cliente" %}}
+Ver la nota sobre [`QY`]({{% relref "client-messages.es.md" %}}#qy): este mecanismo existe principalmente para que un módulo consulte a otro internamente. Documentado aquí por exhaustividad, no como funcionalidad pensada para el cliente.
+{{% /notice %}}
+
+Respuesta a una consulta [`QY`]({{% relref "client-messages.es.md" %}}#qy). `QY`/`qa` es un **mecanismo genérico de consulta/respuesta propio de cada módulo**: un cliente (u otro módulo, internamente) hace a un módulo una pregunta con nombre y parámetros, y recibe una respuesta con nombre a cambio. Qué nombres de consulta entiende realmente un módulo, y la forma de su respuesta, depende enteramente de ese módulo — el protocolo solo define el sobre, no el contenido.
+
+```json
+{
+  "qa-query answer": {
+    "Sequencer": {
+      "q": {
+        "query": "profileduration",
+        "result": { "seconds": 3600 }
+      }
+    }
+  }
+}
+```
+
+`result` es lo que el módulo devolvió para esa consulta — su forma depende enteramente de `query`. Un módulo sin un caso que coincida con el nombre de `query` solicitado devuelve silenciosamente un `result` vacío.
+
+{{% notice style="note" title="Todavía poco que ver" %}}
+Hoy solo el módulo `Sequencer` implementa una respuesta real (`profileduration`), usada internamente por el módulo Planner en lugar de por ningún flujo de cliente documentado. Ningún otro módulo incluido responde de forma significativa a ningún nombre de consulta por ahora — el mecanismo existe y está completamente cableado, pero de momento hay poco que consultar en la práctica.
+{{% /notice %}}
 
 ---
 

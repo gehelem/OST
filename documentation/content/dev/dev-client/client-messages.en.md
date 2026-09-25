@@ -43,6 +43,7 @@ All client command keys are **UPPERCASE** (e.g. `DU`, `SV`, `SA`, `GC`).
 | [`FS`](#fs) | Select the watched file folder |
 | [`ML`](#ml) | Load module |
 | [`MK`](#mk) | Kill (unload) module |
+| [`QY`](#qy) | Query a module (inter-module mechanism, not client-facing) |
 | [`YA`](#indi) | Start embedded INDI server |
 | [`YZ`](#indi) | Stop embedded INDI server |
 | [`YL`](#indi) | Load INDI driver |
@@ -557,6 +558,35 @@ Requests the server to unload a running module, identified by its name.
 ```
 
 `GlobalDatastore` cannot be unloaded: the request is refused (error message in the logs).
+
+---
+
+## Module query
+
+### `QY` — Query a module {#qy}
+
+{{% notice style="warning" title="Inter-module communication, not a client feature" %}}
+`QY`/`qa` exists primarily so one module can ask another module a question internally (a module calling `Basemodule::otherModuleQuery()`, which goes through this same mechanism). A client can technically send `QY` too — the envelope is identical — but there is no established client-facing use case for it today. It's documented here for completeness, and because it will matter when documenting how to build a module, not as something a client should build a feature around.
+{{% /notice %}}
+
+Generic, per-module request/answer mechanism: ask a module a named question with parameters, get a named answer back via [`qa`]({{% relref "server-messages.en.md" %}}#qa). Which query names a module actually understands (if any) is entirely up to that module — the protocol only defines the envelope. Note the payload has no `p` wrapper: `QY` targets the module itself, not one of its properties.
+
+```json
+{
+  "QY": {
+    "m": {
+      "Sequencer": {
+        "query": "profileduration",
+        "params": { "profile": "default" }
+      }
+    }
+  }
+}
+```
+
+{{% notice style="note" title="Not much to see yet" %}}
+Today only the `Sequencer` module implements a real answer (`profileduration`), used internally by the Planner module. No other shipped module responds meaningfully to any query name yet.
+{{% /notice %}}
 
 ---
 

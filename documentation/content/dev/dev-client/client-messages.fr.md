@@ -43,6 +43,7 @@ Toutes les clés de commandes client sont en **MAJUSCULES** (ex. `DU`, `SV`, `SA
 | [`FS`](#fs) | Choisir le dossier de fichiers surveillé |
 | [`ML`](#ml) | Charger un module |
 | [`MK`](#mk) | Décharger un module |
+| [`QY`](#qy) | Interroger un module (mécanisme inter-module, pas destiné au client) |
 | [`YA`](#indi) | Démarrer le serveur INDI embarqué |
 | [`YZ`](#indi) | Arrêter le serveur INDI embarqué |
 | [`YL`](#indi) | Charger un driver INDI |
@@ -557,6 +558,35 @@ Demande au serveur de décharger un module en cours d'exécution, désigné par 
 ```
 
 `GlobalDatastore` ne peut pas être déchargé : la demande est refusée (message d'erreur dans les logs).
+
+---
+
+## Interroger un module
+
+### `QY` — Interroger un module {#qy}
+
+{{% notice style="warning" title="Communication inter-module, pas une fonctionnalité client" %}}
+`QY`/`qa` existe avant tout pour qu'un module puisse poser une question à un autre module en interne (un module qui appelle `Basemodule::otherModuleQuery()`, qui passe par ce même mécanisme). Un client peut techniquement envoyer `QY` aussi — l'enveloppe est identique — mais il n'y a aujourd'hui aucun cas d'usage établi côté client. Documenté ici pour l'exhaustivité, et parce que ça comptera quand on documentera comment construire un module — pas comme quelque chose sur lequel un client devrait construire une fonctionnalité.
+{{% /notice %}}
+
+Mécanisme générique de requête/réponse propre à chaque module : poser à un module une question nommée avec des paramètres, recevoir une réponse nommée en retour via [`qa`]({{% relref "server-messages.fr.md" %}}#qa). Les noms de requête qu'un module comprend réellement (s'il en comprend) dépendent entièrement de ce module — le protocole ne définit que l'enveloppe. À noter : pas d'enveloppe `p` ici, `QY` cible le module lui-même, pas une de ses propriétés.
+
+```json
+{
+  "QY": {
+    "m": {
+      "Sequencer": {
+        "query": "profileduration",
+        "params": { "profile": "default" }
+      }
+    }
+  }
+}
+```
+
+{{% notice style="note" title="Pas grand-chose à voir pour l'instant" %}}
+Aujourd'hui seul le module `Sequencer` implémente une vraie réponse (`profileduration`), utilisée en interne par le module Planner. Aucun autre module livré ne répond de façon utile à une quelconque requête pour l'instant.
+{{% /notice %}}
 
 ---
 

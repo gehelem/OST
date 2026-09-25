@@ -43,6 +43,7 @@ Todas las claves de comandos de cliente están en **MAYÚSCULAS** (ej. `DU`, `SV
 | [`FS`](#fs) | Elegir la carpeta de archivos vigilada |
 | [`ML`](#ml) | Cargar un módulo |
 | [`MK`](#mk) | Descargar un módulo |
+| [`QY`](#qy) | Consultar un módulo (mecanismo inter-módulo, no pensado para el cliente) |
 | [`YA`](#indi) | Iniciar el servidor INDI embebido |
 | [`YZ`](#indi) | Detener el servidor INDI embebido |
 | [`YL`](#indi) | Cargar un driver INDI |
@@ -557,6 +558,35 @@ Pide al servidor que descargue un módulo en ejecución, designado por su nombre
 ```
 
 `GlobalDatastore` no puede descargarse: la petición se rechaza (mensaje de error en los logs).
+
+---
+
+## Consultar un módulo
+
+### `QY` — Consultar un módulo {#qy}
+
+{{% notice style="warning" title="Comunicación inter-módulo, no una funcionalidad de cliente" %}}
+`QY`/`qa` existe principalmente para que un módulo pueda hacerle una pregunta a otro módulo internamente (un módulo que llama a `Basemodule::otherModuleQuery()`, que pasa por este mismo mecanismo). Un cliente puede técnicamente enviar `QY` también — el sobre es idéntico — pero hoy no hay ningún caso de uso establecido del lado del cliente. Documentado aquí por exhaustividad, y porque será relevante cuando se documente cómo construir un módulo — no como algo sobre lo que un cliente deba construir una funcionalidad.
+{{% /notice %}}
+
+Mecanismo genérico de consulta/respuesta propio de cada módulo: hacer a un módulo una pregunta con nombre y parámetros, recibir una respuesta con nombre vía [`qa`]({{% relref "server-messages.es.md" %}}#qa). Qué nombres de consulta entiende realmente un módulo (si entiende alguno) depende enteramente de ese módulo — el protocolo solo define el sobre. Nótese: sin envoltorio `p` aquí, `QY` apunta al propio módulo, no a una de sus propiedades.
+
+```json
+{
+  "QY": {
+    "m": {
+      "Sequencer": {
+        "query": "profileduration",
+        "params": { "profile": "default" }
+      }
+    }
+  }
+}
+```
+
+{{% notice style="note" title="Todavía poco que ver" %}}
+Hoy solo el módulo `Sequencer` implementa una respuesta real (`profileduration`), usada internamente por el módulo Planner. Ningún otro módulo incluido responde de forma significativa a ningún nombre de consulta por ahora.
+{{% /notice %}}
 
 ---
 

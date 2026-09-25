@@ -43,6 +43,7 @@ Tutte le chiavi dei comandi client sono in **MAIUSCOLO** (es. `DU`, `SV`, `SA`, 
 | [`FS`](#fs) | Scegliere la cartella di file sorvegliata |
 | [`ML`](#ml) | Caricare un modulo |
 | [`MK`](#mk) | Scaricare un modulo |
+| [`QY`](#qy) | Interrogare un modulo (meccanismo inter-modulo, non destinato al client) |
 | [`YA`](#indi) | Avviare il server INDI integrato |
 | [`YZ`](#indi) | Arrestare il server INDI integrato |
 | [`YL`](#indi) | Caricare un driver INDI |
@@ -557,6 +558,35 @@ Chiede al server di scaricare un modulo in esecuzione, indicato dal suo nome.
 ```
 
 `GlobalDatastore` non può essere scaricato: la richiesta viene rifiutata (messaggio di errore nei log).
+
+---
+
+## Interrogare un modulo
+
+### `QY` — Interrogare un modulo {#qy}
+
+{{% notice style="warning" title="Comunicazione inter-modulo, non una funzionalità client" %}}
+`QY`/`qa` esiste principalmente perché un modulo possa porre una domanda a un altro modulo internamente (un modulo che chiama `Basemodule::otherModuleQuery()`, che passa per questo stesso meccanismo). Un client può tecnicamente inviare `QY` anche lui — l'involucro è identico — ma oggi non esiste un caso d'uso lato client consolidato. Documentato qui per completezza, e perché sarà rilevante quando si documenterà come costruire un modulo — non come qualcosa su cui un client dovrebbe costruire una funzionalità.
+{{% /notice %}}
+
+Meccanismo generico di richiesta/risposta specifico per modulo: porre a un modulo una domanda nominata con parametri, ricevere una risposta nominata tramite [`qa`]({{% relref "server-messages.it.md" %}}#qa). Quali nomi di richiesta un modulo comprenda realmente (se ne comprende) dipende interamente da quel modulo — il protocollo definisce solo l'involucro. Da notare: nessun involucro `p` qui, `QY` punta al modulo stesso, non a una sua proprietà.
+
+```json
+{
+  "QY": {
+    "m": {
+      "Sequencer": {
+        "query": "profileduration",
+        "params": { "profile": "default" }
+      }
+    }
+  }
+}
+```
+
+{{% notice style="note" title="Ancora poco da vedere" %}}
+Oggi solo il modulo `Sequencer` implementa una vera risposta (`profileduration`), usata internamente dal modulo Planner. Nessun altro modulo distribuito risponde in modo significativo a nessun nome di richiesta per ora.
+{{% /notice %}}
 
 ---
 

@@ -43,6 +43,7 @@ Alle Client-Befehlsschlüssel stehen in **GROSSBUCHSTABEN** (z. B. `DU`, `SV`, `
 | [`FS`](#fs) | Überwachten Dateiordner wählen |
 | [`ML`](#ml) | Modul laden |
 | [`MK`](#mk) | Modul entladen |
+| [`QY`](#qy) | Modul abfragen (Inter-Modul-Mechanismus, nicht für Clients gedacht) |
 | [`YA`](#indi) | Eingebetteten INDI-Server starten |
 | [`YZ`](#indi) | Eingebetteten INDI-Server stoppen |
 | [`YL`](#indi) | INDI-Treiber laden |
@@ -557,6 +558,35 @@ Fordert den Server auf, ein laufendes Modul zu entladen, bezeichnet durch seinen
 ```
 
 `GlobalDatastore` kann nicht entladen werden: die Anfrage wird abgelehnt (Fehlermeldung in den Logs).
+
+---
+
+## Modul abfragen
+
+### `QY` — Modul abfragen {#qy}
+
+{{% notice style="warning" title="Inter-Modul-Kommunikation, keine Client-Funktion" %}}
+`QY`/`qa` existiert in erster Linie, damit ein Modul einem anderen Modul intern eine Frage stellen kann (ein Modul, das `Basemodule::otherModuleQuery()` aufruft, läuft über denselben Mechanismus). Ein Client kann technisch auch `QY` senden — die Hülle ist identisch — aber dafür gibt es heute keinen etablierten Anwendungsfall auf Client-Seite. Hier der Vollständigkeit halber dokumentiert, und weil es relevant sein wird, wenn dokumentiert wird, wie man ein Modul baut — nicht als etwas, worauf ein Client eine Funktion aufbauen sollte.
+{{% /notice %}}
+
+Generischer, pro Modul definierter Anfrage-/Antwort-Mechanismus: einem Modul eine benannte Frage mit Parametern stellen, eine benannte Antwort über [`qa`]({{% relref "server-messages.de.md" %}}#qa) zurückerhalten. Welche Anfragenamen ein Modul tatsächlich versteht (falls überhaupt), entscheidet allein das Modul — das Protokoll definiert nur die Hülle. Zu beachten: keine `p`-Hülle hier, `QY` adressiert das Modul selbst, nicht eine seiner Properties.
+
+```json
+{
+  "QY": {
+    "m": {
+      "Sequencer": {
+        "query": "profileduration",
+        "params": { "profile": "default" }
+      }
+    }
+  }
+}
+```
+
+{{% notice style="note" title="Noch nicht viel zu sehen" %}}
+Heute implementiert nur das Modul `Sequencer` eine echte Antwort (`profileduration`), intern genutzt vom Planner-Modul. Kein anderes ausgeliefertes Modul antwortet bislang sinnvoll auf irgendeinen Anfragenamen.
+{{% /notice %}}
 
 ---
 
