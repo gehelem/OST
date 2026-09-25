@@ -1,0 +1,84 @@
+/* base.css — reset, page shell, typography, scrollbars. Depends on theme.css
+ * tokens only (imported separately by index.html, order matters: theme.css
+ * first). */
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 13px/1.5 var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Thin, accent-toned scrollbars everywhere content overflows — matches the
+   ostnoctua "glass" feel instead of the default chunky OS scrollbar. */
+* { scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-dim); background-clip: padding-box; }
+
+h1, h2, h3, h4 { margin: 0 0 var(--space-2); font-weight: 600; letter-spacing: 0.2px; }
+h2 { font-size: 17px; }
+h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
+p { margin: 0 0 var(--space-2); }
+a { color: var(--accent); }
+
+@font-face {
+  font-family: "Material Icons";
+  src: url("../assets/fonts/MaterialIcons-Regular.ttf") format("truetype");
+  font-weight: normal; font-style: normal; font-display: swap;
+}
+.material-icons {
+  font-family: "Material Icons";
+  font-weight: normal; font-style: normal;
+  font-size: 20px; display: inline-block; line-height: 1;
+  vertical-align: middle; -webkit-font-smoothing: antialiased;
+  letter-spacing: normal; text-transform: none; white-space: nowrap;
+}
+.icon-sm { font-size: 15px; }
+.icon-lg { font-size: 26px; }
+
+/* ---------------------------------------------------------------- shell */
+#app { height: 100%; display: flex; flex-direction: column; }
+
+#topbar {
+  display: flex; align-items: center; gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  background: var(--bg-raised);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+.brand { display: flex; align-items: center; gap: 6px; font-weight: 700; letter-spacing: 0.3px; color: var(--text); margin-right: var(--space-2); }
+.brand .material-icons { color: var(--accent); }
+.topbar-spacer { flex: 1; }
+
+#shell { flex: 1; display: flex; min-height: 0; }
+
+#sidebar {
+  width: 220px; flex-shrink: 0;
+  background: var(--bg-raised);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: var(--space-3) var(--space-2);
+  display: flex; flex-direction: column; gap: 2px;
+}
+
+#content { flex: 1; overflow-y: auto; padding: var(--space-5); min-width: 0; }
+#content-inner { max-width: 1180px; margin: 0 auto; }
+
+.hidden { display: none !important; }
+.muted { color: var(--text-muted); }
+.dim { color: var(--text-dim); }
+.small { font-size: 11px; }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.spacer { flex: 1; }
+
+@media (max-width: 760px) {
+  #shell { flex-direction: column; }
+  #sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; border-right: none; border-bottom: 1px solid var(--border); }
+  #content { padding: var(--space-3); }
+}

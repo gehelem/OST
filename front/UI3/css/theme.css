@@ -1,0 +1,128 @@
+/* theme.css — design tokens only, no selectors beyond :root/[data-theme].
+ *
+ * Design language: adapted from ostnoctua's themes.css (glass panels, a
+ * cyan "night-vision-friendly" accent, generous use of translucent
+ * surfaces) — but re-tuned for a conventional sidebar+content app instead
+ * of floating panels over a sky canvas, and reduced to the two themes the
+ * client-pattern.en.md dark-mode rule actually requires: dark (default)
+ * and light. Every color used anywhere in UI3 must be one of these
+ * variables — no hardcoded colors in component CSS.
+ */
+
+:root {
+  /* Surfaces */
+  --bg: #0a0d12;
+  --bg-raised: #10141b;
+  --bg-panel: #141a22;
+  --bg-panel-solid: #161d26;
+  --bg-elevated: #1c2530;
+  --bg-input: #10151c;
+  --bg-hover: rgba(0, 229, 204, 0.07);
+  --bg-active: rgba(0, 229, 204, 0.14);
+  --overlay: rgba(3, 5, 8, 0.6);
+
+  /* Accent (cyan, ostnoctua's default "noctua" hue, tuned down slightly) */
+  --accent: #00e5cc;
+  --accent-rgb: 0, 229, 204;
+  --accent-strong: #22f2d8;
+  --accent-dim: rgba(0, 229, 204, 0.45);
+  --accent-subtle: rgba(0, 229, 204, 0.16);
+  --accent-faint: rgba(0, 229, 204, 0.08);
+  --on-accent: #04211d;
+
+  /* Text */
+  --text: #e7ecf1;
+  --text-secondary: #b7c1cc;
+  --text-muted: #7c8896;
+  --text-dim: #55606c;
+
+  /* Borders */
+  --border-subtle: rgba(0, 229, 204, 0.08);
+  --border: rgba(148, 163, 184, 0.16);
+  --border-strong: rgba(0, 229, 204, 0.32);
+  --border-active: #00e5cc;
+
+  /* Status */
+  --standby: #64707d;
+  --ok: #4ade80;
+  --busy: #f5b942;
+  --error: #f36a6a;
+  --warn: #f5b942;
+
+  /* Semantic buttons */
+  --btn-success: #4ade80;
+  --btn-warning: #f5b942;
+  --btn-danger: #f36a6a;
+
+  /* Shadows */
+  --shadow-panel: 0 10px 30px rgba(0, 0, 0, 0.45);
+  --shadow-pop: 0 16px 44px rgba(0, 0, 0, 0.55);
+  --shadow-glow: 0 0 0 1px var(--accent-subtle), 0 0 18px rgba(var(--accent-rgb), 0.18);
+
+  /* Rhythm */
+  --radius-sm: 5px;
+  --radius: 9px;
+  --radius-lg: 14px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  --font-ui: -apple-system, "Segoe UI", Roboto, system-ui, sans-serif;
+}
+
+/* Explicit dark (same values as :root — lets data-theme="dark" be set
+   explicitly by the toggle instead of relying on "not light"). */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+:root:not([data-theme="light"]) {
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  --bg: #eef1f4;
+  --bg-raised: #f7f9fb;
+  --bg-panel: #ffffff;
+  --bg-panel-solid: #ffffff;
+  --bg-elevated: #eef3f5;
+  --bg-input: #ffffff;
+  --bg-hover: rgba(0, 137, 123, 0.06);
+  --bg-active: rgba(0, 137, 123, 0.12);
+  --overlay: rgba(20, 30, 35, 0.35);
+
+  --accent: #00897b;
+  --accent-rgb: 0, 137, 123;
+  --accent-strong: #00695c;
+  --accent-dim: rgba(0, 137, 123, 0.4);
+  --accent-subtle: rgba(0, 137, 123, 0.14);
+  --accent-faint: rgba(0, 137, 123, 0.07);
+  --on-accent: #ffffff;
+
+  --text: #16212a;
+  --text-secondary: #3d4c58;
+  --text-muted: #667582;
+  --text-dim: #8d99a4;
+
+  --border-subtle: rgba(0, 137, 123, 0.12);
+  --border: rgba(32, 48, 58, 0.14);
+  --border-strong: rgba(0, 137, 123, 0.4);
+  --border-active: #00897b;
+
+  --standby: #8b97a3;
+  --ok: #2e9e5b;
+  --busy: #c98a12;
+  --error: #d1453d;
+  --warn: #c98a12;
+
+  --btn-success: #2e9e5b;
+  --btn-warning: #c98a12;
+  --btn-danger: #d1453d;
+
+  --shadow-panel: 0 6px 20px rgba(20, 30, 40, 0.10);
+  --shadow-pop: 0 16px 40px rgba(20, 30, 40, 0.18);
+  --shadow-glow: 0 0 0 1px var(--accent-subtle), 0 0 14px rgba(var(--accent-rgb), 0.12);
+}

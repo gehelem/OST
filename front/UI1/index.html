@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>ostcore UI1 - bare-bones test harness</title>
+</head>
+<body>
+<h1>ostcore UI1</h1>
+<p>No CSS, no design effort: this is a harness that proves core/ works end-to-end against a real server, not a UI.</p>
+
+<p>
+  WS URL: <input id="ws-url" size="40">
+  <button id="connect-btn">Connect</button>
+  <button id="disconnect-btn">Disconnect</button>
+  status: <span id="status">disconnected</span>
+  grant-client: <span id="grant"></span>
+</p>
+
+<h2>Modules</h2>
+<div id="modules"></div>
+
+<h2>Raw message log (subscribeRaw - debug only, see README)</h2>
+<pre id="log" style="height:200px; overflow:auto; border:1px solid black;"></pre>
+
+<script type="module" src="./app.js"></script>
+</body>
+</html>
