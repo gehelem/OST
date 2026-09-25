@@ -12,8 +12,16 @@ import { el, icon, iconButton, moduleIcon } from "./dom.js";
 // only the actually-loaded OST modules. Controller/Files/Logs live in the
 // settings dropdown instead (see renderSystemViews) — Gilles, 2026-09-25:
 // "deplace les boutons controller/files/logs dans les settings".
+//
+// Returns a DocumentFragment, not a wrapping <div>: #modbar itself is the
+// flex row (panels.css), and .mod-btn is `display:flex` for its own
+// icon-over-label stacking — that makes each button a block-level box, so
+// wrapping them in an unstyled <div> stacked them vertically instead of
+// letting #modbar's flex row lay them out (caught live, 2026-09-25: "la
+// barre de menu est a nouveau verticale"). A fragment leaves no such
+// wrapper behind: the buttons become #modbar's direct children.
 export function renderModbar(client, activeKey, onSelect) {
-  const bar = el("div");
+  const bar = document.createDocumentFragment();
   const names = client.get(client.topics.modules());
   for (const name of names) {
     const mod = client.get(client.topics.module(name));

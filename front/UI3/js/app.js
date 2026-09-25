@@ -211,6 +211,9 @@ client.subscribe(client.topics.session(), (session) => {
 renderModbarNow();
 renderContentNow();
 
-// Auto-connect only if the page is actually served by an HTTP(S) origin
-// (the derived default is meaningful there); left as a manual action
-// (press Connect) so the user can adjust the URL first if needed.
+// Auto-connect on load/reload, using whatever URL is already filled in
+// (last-used from history, or the derived default) — Gilles, 2026-09-25:
+// "apres un f5 ou au premier chargement de la page on devrait tenter de se
+// connecter". Reuses the connect button's own handler (click()) rather than
+// duplicating its logic.
+document.getElementById("connect-btn").click();
