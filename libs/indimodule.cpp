@@ -1082,7 +1082,7 @@ bool IndiModule::defineMeAsImager()
 
     if (!getStore().contains("image"))
     {
-        OST::PropertyMulti* dynprop = new OST::PropertyMulti("image", "Image", OST::Permission::WriteOnly, "Control",
+        OST::PropertyMulti* dynprop = new OST::PropertyMulti("image", "Image", OST::Permission::ReadOnly, "Control",
                 "", "000Control222", false, false);
         createProperty(dynprop);
     }
