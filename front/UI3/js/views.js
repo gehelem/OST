@@ -27,7 +27,7 @@ export function renderModbar(client, activeKey, onSelect) {
     const mod = client.get(client.topics.module(name));
     const label = (mod && (mod.infos.modulelabel || mod.infos.label)) || name;
     const btn = el("button", { class: "mod-btn" + (activeKey === name ? " active" : ""), title: label, onclick: () => onSelect(name) }, [
-      icon(moduleIcon(mod, name)),
+      icon(moduleIcon(mod)),
       el("span", { class: "mod-btn-label", text: label }),
     ]);
     bar.appendChild(btn);

@@ -17,7 +17,7 @@
 
 import { renderGraph } from "./chart.js";
 import { mediaUrl as buildMediaUrl } from "../../core/index.js";
-import { el, icon, statusDot, iconButton, moduleIcon } from "./dom.js";
+import { el, icon, statusDot, iconButton } from "./dom.js";
 import * as Panels from "./panels.js";
 
 const DISPLAY_ONLY_TYPES = new Set(["img", "video", "light", "prg", "message"]);

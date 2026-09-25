@@ -35,39 +35,34 @@ export function iconButton(name, title, onClick, opts) {
   return el("button", { class: "btn-icon" + (opts && opts.danger ? " danger" : ""), title, onclick: onClick }, [icon(name)]);
 }
 
-// Best-effort icon per module "kind" (infos.template / infos.lib / the
-// module name itself), purely cosmetic — falls back to a generic icon for
-// any module type this table doesn't know about, so a new/unknown module
-// still renders a sensible sidebar entry (client-pattern.en.md's "generic
-// fallback" rule applied to iconography, not just layout).
+// Icon per module type, keyed by `infos.template` — the module's own
+// metadata, not a guess from its instance name/label. Reuses the exact
+// mapping OstErix/Rooster already maintains for this purpose
+// (src/app/constants.ts TEMPLATE_ICON_MAP) instead of inventing UI3's own
+// heuristic: Gilles, 2026-09-25, on an earlier regex-matching version,
+// "c'est cretin tes icones de modules : normalement c'est dans les
+// metadonnees du module, ne pas surcharger ca". `infos.template` can be
+// absent or (per FINDINGS.md) not always match a module's real identity —
+// an unlisted/missing template just falls through to the same "extension"
+// default Rooster itself uses.
 //
-// Every name used anywhere in UI3 (here and elsewhere) must actually exist
-// in assets/fonts/MaterialIcons-Regular.ttf — it's the older, ~900-glyph
-// "classic" Material Icons set, not the current/expanded one, so several
-// newer-looking names (dark_mode, filter_alt, meeting_room, science, ...)
-// silently render nothing. Caught live 2026-09-25 ("le toggle de theme n'a
-// pas d'icone") and cross-checked every icon name in the codebase against
-// the font's actual cmap before picking replacements.
-const MODULE_ICON_HINTS = [
-  [/mount|eq|telescope/i, "explore"],
-  [/guid/i, "gps_fixed"],
-  [/focus/i, "center_focus_strong"],
-  [/camera|ccd|capture|imag/i, "camera_alt"],
-  [/filter/i, "filter_list"],
-  [/sequenc/i, "playlist_play"],
-  [/dome|roof|shutter/i, "home"],
-  [/weather|meteo/i, "cloud"],
-  [/polar/i, "adjust"],
-  [/rotat/i, "screen_rotation"],
-  [/dummy/i, "bug_report"],
-  [/blindpec|pec/i, "sync"],
-  [/collimat/i, "settings_input_component"],
-  [/switch|relay|power/i, "power"],
-  [/indi/i, "usb"],
-  [/globaldatastore/i, "storage"],
-];
-export function moduleIcon(mod, name) {
-  const hint = ((mod && mod.infos && (mod.infos.template || mod.infos.lib)) || "") + " " + (name || "");
-  for (const [re, iconName] of MODULE_ICON_HINTS) if (re.test(hint)) return iconName;
-  return "extension";
+// Five of Rooster's icon names (zoom_in_map/calendar_today/manage_search/
+// garage/query_stats) don't exist in this project's vendored
+// MaterialIcons-Regular.ttf, the older "classic" set — see this file's
+// other note on that. Substituted with same-intent names confirmed present
+// in the font instead of carrying the gap over silently.
+const TEMPLATE_ICON_MAP = {
+  focus: "filter_center_focus",
+  sequencer: "view_list",
+  navigator: "explore",
+  guider: "gps_fixed", // Rooster: zoom_in_map (missing from this font)
+  allsky: "panorama",
+  planner: "event", // Rooster: calendar_today (missing from this font)
+  inspector: "search", // Rooster: manage_search (missing from this font)
+  parkmanager: "local_parking", // Rooster: garage (missing from this font)
+  monitor: "show_chart", // Rooster: query_stats (missing from this font)
+};
+export function moduleIcon(mod) {
+  const template = ((mod && mod.infos && mod.infos.template) || "").toLowerCase();
+  return TEMPLATE_ICON_MAP[template] || "extension"; // Rooster's own DEFAULT_TEMPLATE_ICON, e.g. for GlobalDatastore
 }
