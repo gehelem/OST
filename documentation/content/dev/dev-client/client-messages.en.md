@@ -349,8 +349,10 @@ Adds a new row to the grid with the provided element values.
 
 The server replies with a `gc` message confirming the new row index.
 
-{{% notice style="note" title="Base elements update before the grid line does" %}}
-Creating a grid line applies the submitted values to the property's base elements first, then appends the row and emits `gc`. This is not one batched update: each changed base element gets its **own full-property `ea`**, one after another (submitting `target`/`exposure`/`count` as above produces three separate `ea` messages, each showing one more field changed than the last), before the final `gc`. If a property shows both its base elements and its grid at the same time (`showElts` and `showGrid` both true — an uncommon combination), a live-rendering client will see the base elements flicker through these intermediate states before the row itself appears. This is the real datastore state, not a bug — adapt your rendering to it (it re-renders correctly either way if you always apply whatever `ea` says, rather than assuming a single message carries every change) rather than filtering it out, and never poll to work around it.
+{{% notice style="note" title="Just apply each `ea` as it arrives — nothing to reason about" %}}
+Creating a grid line applies the submitted values to the property's base elements first, then appends the row and emits `gc`. This can take more than one `ea` message (one per changed base element, sent one after another — submitting `target`/`exposure`/`count` as above produces three separate `ea` messages before the final `gc`), but a client never needs to know or predict that: the server only ever sends exactly what's needed to keep the client's datastore correct, no more and no less (see [Client Architecture Principles]({{% relref "client-pattern.en.md" %}})). Apply each message exactly as it comes, the same way you always do, and the result is correct regardless of how many messages there were.
+
+The one visible side effect: a property showing both its base elements and its grid at the same time (`showElts` and `showGrid` both true — an uncommon combination) will flicker through these intermediate states before the new row appears. This is the real datastore state, not a bug, and it resolves itself — no need to filter it out or poll to work around it.
 {{% /notice %}}
 
 ---
