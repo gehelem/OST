@@ -25,7 +25,7 @@ Sequencer::Sequencer(QString name, QString label, QString profile, QVariantMap a
     setMetadata("thisGitmessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
     setMetadata("description",    "Sequencer module");
     setMetadata("thisversion",    QString::fromStdString(Version::GIT_TAG));
-    setMetadata("template",       "sequence");
+    setMetadata("template",       "sequencer");
 
     loadOstPropertiesFromFile(":sequencer.json");
 
