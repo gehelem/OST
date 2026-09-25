@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="css/theme.css">
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/panels.css">
 </head>
 <body>
   <div id="app">
@@ -28,9 +29,10 @@
       <span id="grant-pill" class="grant-pill"></span>
       <button id="theme-toggle" class="btn-icon" title="Toggle theme"><span class="material-icons">dark_mode</span></button>
     </header>
-    <div id="shell">
-      <nav id="sidebar"></nav>
-      <main id="content"><div id="content-inner"></div></main>
+    <nav id="modbar"></nav>
+    <div id="canvas">
+      <div id="panel-layer" class="hidden"></div>
+      <div id="docked-view" class="hidden"></div>
     </div>
   </div>
   <div id="dialog-root"></div>

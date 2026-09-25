@@ -8,35 +8,36 @@
 
 import { el, icon, iconButton, moduleIcon } from "./dom.js";
 
-export function renderSidebar(client, activeKey, onSelect) {
-  const nav = el("nav");
+// Horizontal module bar (ostnoctua's .on-modbar/.on-mod, see panels.css) —
+// Controller/Files/Logs first, a thin separator, then every loaded module.
+export function renderModbar(client, activeKey, onSelect) {
+  const bar = el("div");
   const staticItems = [
     { key: "__controller", label: "Controller", icon: "tune" },
     { key: "__files", label: "Files", icon: "folder" },
     { key: "__logs", label: "Logs", icon: "receipt_long" },
   ];
   for (const item of staticItems) {
-    const btn = el("button", { class: "nav-item" + (activeKey === item.key ? " active" : ""), onclick: () => onSelect(item.key) }, [
+    const btn = el("button", { class: "mod-btn" + (activeKey === item.key ? " active" : ""), title: item.label, onclick: () => onSelect(item.key) }, [
       icon(item.icon),
-      el("span", { class: "nav-label", text: item.label }),
+      el("span", { class: "mod-btn-label", text: item.label }),
     ]);
-    nav.appendChild(btn);
+    bar.appendChild(btn);
   }
   const names = client.get(client.topics.modules());
   if (names.length) {
-    nav.appendChild(el("div", { class: "nav-sep" }));
-    nav.appendChild(el("div", { class: "nav-section-label", text: "Modules" }));
+    bar.appendChild(el("div", { class: "modbar-sep" }));
     for (const name of names) {
       const mod = client.get(client.topics.module(name));
       const label = (mod && (mod.infos.modulelabel || mod.infos.label)) || name;
-      const btn = el("button", { class: "nav-item" + (activeKey === name ? " active" : ""), onclick: () => onSelect(name) }, [
+      const btn = el("button", { class: "mod-btn" + (activeKey === name ? " active" : ""), title: label, onclick: () => onSelect(name) }, [
         icon(moduleIcon(mod, name)),
-        el("span", { class: "nav-label", text: label }),
+        el("span", { class: "mod-btn-label", text: label }),
       ]);
-      nav.appendChild(btn);
+      bar.appendChild(btn);
     }
   }
-  return nav;
+  return bar;
 }
 
 export function renderLogin(client, onDone) {

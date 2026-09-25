@@ -18,6 +18,7 @@
 import { renderGraph } from "./chart.js";
 import { mediaUrl as buildMediaUrl } from "../../core/index.js";
 import { el, icon, statusDot, iconButton, moduleIcon } from "./dom.js";
+import * as Panels from "./panels.js";
 
 const DISPLAY_ONLY_TYPES = new Set(["img", "video", "light", "prg", "message"]);
 
@@ -431,93 +432,92 @@ function buildLayout(properties) {
   return { noLevel1, tabs };
 }
 
+// Default panel positions for the first-ever render of a module (no saved
+// layout yet in localStorage — see panels.js). Two columns below the header
+// row; once the user drags a panel, its own position persists from then on
+// and this allocator is never consulted again for that (scope, id).
+function autoPos(index) {
+  const col = index % 2, row = Math.floor(index / 2);
+  return { x: 20 + col * 440, y: 230 + row * 260, w: 420 };
+}
+
 /**
- * Renders a full module screen. Subscribes to `client.topics.module(name)`
- * once for the module-level layout (property set + profile bar — this
- * topic does NOT fire on ordinary ea/ee/ps property traffic, see
- * datastore.js), and lets each `renderProperty()` call own its own
- * fine-grained subscription. Returns {node, dispose}.
+ * Renders a module as a set of floating panels (js/panels.js): one "header"
+ * panel (icon/label/description/profile bar), one "actions" panel when the
+ * module has a bool-only `actions` property, one panel per level1 group
+ * (level2 sub-groups as <details>), and one "General" panel for properties
+ * with no level1. Each panel is independently draggable/resizable/
+ * minimizable and remembers its own layout per module (Gilles, 2026-09-25:
+ * "des fenêtres volantes déplaçables, regroupées par level1").
+ *
+ * Subscribes to `client.topics.module(name)` for the module-level layout
+ * (property set + profile — this topic does NOT fire on ordinary ea/ee/ps
+ * property traffic, see datastore.js) and rebuilds all panels on every
+ * emission; panel position/size/collapsed state survives the rebuild
+ * because it lives in localStorage, not in the DOM (see panels.js). Each
+ * `renderProperty()` call owns its own fine-grained subscription, disposed
+ * on rebuild/unmount. Returns {dispose} (panels attach directly to the
+ * shared layer set via Panels.setLayer() — there is no single "screen"
+ * node to return, unlike the other views in this file).
  */
-export function renderModuleScreen(client, moduleName) {
-  const root = el("div", { class: "module-screen" });
-  const header = el("div", { class: "module-header" });
-  const titleRow = el("h2");
-  const descSlot = el("div", { class: "muted" });
-  const profileBarSlot = el("div");
-  header.append(titleRow, descSlot, profileBarSlot);
-  root.appendChild(header);
-  const layoutSlot = el("div");
-  root.appendChild(layoutSlot);
+export function renderModuleView(client, moduleName) {
+  Panels.setScope(moduleName);
+  Panels.clear();
 
   let propertyDisposers = [];
-  let lastPropKey = null;
+  function disposeProperties() { while (propertyDisposers.length) propertyDisposers.pop()(); }
+  function track(node) { propertyDisposers.push(node._dispose); return node; }
 
-  function disposeProperties() {
-    while (propertyDisposers.length) propertyDisposers.pop()();
+  function build(mod) {
+    disposeProperties();
+    Panels.clear();
+
+    const header = Panels.make({ id: "header", title: mod.infos.modulelabel || mod.infos.label || moduleName, x: 20, y: 16, w: 400 });
+    header.appendChild(el("div", { class: "muted small", text: mod.infos.description || "" }));
+    header.appendChild(renderProfileBar(client, moduleName, mod));
+
+    const properties = mod.properties;
+    const hasActions = properties.actions && Object.values(properties.actions.elements || {}).some((e) => e.type === "bool");
+    if (hasActions) {
+      const abody = Panels.make({ id: "actions", title: properties.actions.label || "Actions", x: 440, y: 16, w: 300 });
+      abody.appendChild(track(renderProperty(client, moduleName, "actions")));
+    }
+    const layoutProps = hasActions ? Object.fromEntries(Object.entries(properties).filter(([n]) => n !== "actions")) : properties;
+    const { noLevel1, tabs } = buildLayout(layoutProps);
+
+    let i = 0;
+    if (noLevel1.length) {
+      const pos = autoPos(i++);
+      const gbody = Panels.make({ id: "general", title: "General", x: pos.x, y: pos.y, w: pos.w });
+      for (const { name } of noLevel1) gbody.appendChild(track(renderProperty(client, moduleName, name)));
+    }
+    for (const tab of tabs) {
+      const pos = autoPos(i++);
+      const tbody = Panels.make({ id: "lvl-" + tab.name, title: tab.name || "(ungrouped)", x: pos.x, y: pos.y, w: pos.w });
+      for (const { name } of tab.direct) tbody.appendChild(track(renderProperty(client, moduleName, name)));
+      for (const grp of tab.groups) {
+        const details = el("details", { class: "prop-group", open: true }, [el("summary", { text: grp.name })]);
+        for (const { name } of grp.items) details.appendChild(track(renderProperty(client, moduleName, name)));
+        tbody.appendChild(details);
+      }
+    }
   }
 
   const unsubModule = client.subscribe(client.topics.module(moduleName), (mod) => {
     if (!mod) {
-      titleRow.innerHTML = ""; titleRow.appendChild(el("span", { text: moduleName }));
-      descSlot.textContent = "";
-      profileBarSlot.innerHTML = "";
-      layoutSlot.innerHTML = "";
-      layoutSlot.appendChild(el("div", { class: "muted", text: "Module not found (unloaded?)" }));
       disposeProperties();
-      lastPropKey = null;
+      Panels.clear();
+      const body = Panels.make({ id: "missing", title: moduleName, x: 20, y: 16, w: 320 });
+      body.appendChild(el("div", { class: "muted", text: "Module not found (unloaded?)" }));
       return;
     }
-    titleRow.innerHTML = "";
-    titleRow.append(icon(moduleIcon(mod, moduleName)), el("span", { text: mod.infos.modulelabel || mod.infos.label || moduleName }));
-    descSlot.textContent = mod.infos.description || "";
-    profileBarSlot.innerHTML = "";
-    profileBarSlot.appendChild(renderProfileBar(client, moduleName, mod));
-
-    const propKey = Object.keys(mod.properties).sort().join(",");
-    if (propKey === lastPropKey) return; // property set unchanged: leave existing property nodes (and their own live subscriptions) alone
-    lastPropKey = propKey;
-    disposeProperties();
-    layoutSlot.innerHTML = "";
-
-    const { noLevel1, tabs } = buildLayout(mod.properties);
-
-    if (noLevel1.length) {
-      const sec = el("div", { class: "prop-list" });
-      for (const { name } of noLevel1) { const node = renderProperty(client, moduleName, name); propertyDisposers.push(node._dispose); sec.appendChild(node); }
-      layoutSlot.appendChild(sec);
-    }
-
-    if (tabs.length) {
-      const tabBar = el("div", { class: "tab-bar" });
-      const tabPanels = el("div", { class: "tab-panels" });
-      tabs.forEach((tab, i) => {
-        const btn = el("button", { class: "tab-btn" + (i === 0 ? " active" : ""), text: tab.name });
-        const panel = el("div", { class: "tab-panel" + (i === 0 ? "" : " hidden") });
-        for (const { name } of tab.direct) { const node = renderProperty(client, moduleName, name); propertyDisposers.push(node._dispose); panel.appendChild(node); }
-        for (const grp of tab.groups) {
-          const details = el("details", { class: "prop-group", open: true });
-          details.appendChild(el("summary", { text: grp.name }));
-          for (const { name } of grp.items) { const node = renderProperty(client, moduleName, name); propertyDisposers.push(node._dispose); details.appendChild(node); }
-          panel.appendChild(details);
-        }
-        btn.addEventListener("click", () => {
-          tabBar.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
-          tabPanels.querySelectorAll(".tab-panel").forEach((p) => p.classList.add("hidden"));
-          btn.classList.add("active");
-          panel.classList.remove("hidden");
-        });
-        tabBar.appendChild(btn);
-        tabPanels.appendChild(panel);
-      });
-      layoutSlot.appendChild(tabBar);
-      layoutSlot.appendChild(tabPanels);
-    }
+    build(mod);
   });
 
-  return { node: root, dispose: () => { unsubModule(); disposeProperties(); } };
+  return { dispose: () => { unsubModule(); disposeProperties(); Panels.clear(); } };
 }
 
-function renderProfileBar(client, moduleName, mod) {
+export function renderProfileBar(client, moduleName, mod) {
   const bar = el("div", { class: "profile-bar" });
   bar.appendChild(el("span", { class: "muted", text: "Profile" }));
   const nameSpan = el("span", { class: "profile-name" + (mod.profile.changed ? " changed" : ""), text: mod.profile.name || "(none)" });

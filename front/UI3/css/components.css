@@ -78,20 +78,9 @@ input[type="range"]::-moz-range-thumb {
 
 .grant-pill { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); }
 
-/* --------------------------------------------------------------- sidebar */
-.nav-item {
-  display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
-  padding: 8px 10px; background: none; border: 1px solid transparent; border-radius: var(--radius-sm);
-  color: var(--text-secondary); cursor: pointer; font: inherit; font-size: 12.5px;
-  transition: all 0.15s ease;
-}
-.nav-item .material-icons { font-size: 18px; color: var(--text-muted); transition: color 0.15s ease; flex-shrink: 0; }
-.nav-item:hover { background: var(--bg-hover); color: var(--text); }
-.nav-item.active { background: var(--accent-subtle); border-color: var(--border-subtle); color: var(--accent-strong); font-weight: 600; }
-.nav-item.active .material-icons { color: var(--accent); }
-.nav-item .nav-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.nav-sep { height: 1px; background: var(--border); margin: var(--space-2) 6px; }
-.nav-section-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); padding: 6px 10px 2px; }
+/* Sidebar nav rules removed 2026-09-25: UI3 now uses the horizontal module
+   bar in panels.css (.mod-btn etc.) instead of a vertical sidebar — see
+   panels.css's header comment. */
 
 /* ---------------------------------------------------------------- cards */
 .panel {

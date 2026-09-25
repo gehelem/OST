@@ -1,18 +1,24 @@
 // UI3/js/app.js — wires core/ (connection + datastore, unmodified) to the
-// render/views layer. Same app-level responsibilities as UI2/js/app.js
-// (which screen is active, the sidebar, the connect/login flow) — see that
-// file's header for why the dispatcher-per-message-type pattern is gone:
-// each screen subscribes directly to the core topic(s) it needs instead.
+// render/views/panels/templates layers. Same app-level responsibilities as
+// UI2/js/app.js (which screen is active, the module bar, the connect/login
+// flow) — see that file's header for why the dispatcher-per-message-type
+// pattern is gone: each screen subscribes directly to the core topic(s) it
+// needs instead. UI3-specific: a module renders as floating panels on a
+// shared canvas instead of a single docked node — see renderContentNow().
 
 import { createClient, deriveDefaultUrls } from "../../core/index.js";
-import { renderModuleScreen, setMediaBaseUrl, setDialogRoot } from "./render.js";
-import { renderSidebar, renderController, renderFiles, renderLogs, renderLogin } from "./views.js";
+import { renderModuleView, setMediaBaseUrl, setDialogRoot } from "./render.js";
+import { renderModbar, renderController, renderFiles, renderLogs, renderLogin } from "./views.js";
 import { el, icon } from "./dom.js";
+import * as Panels from "./panels.js";
+import { templates } from "./templates/index.js";
 
 const client = createClient();
 
-const sidebarEl = document.getElementById("sidebar");
-const contentInner = document.getElementById("content-inner");
+const modbarEl = document.getElementById("modbar");
+const panelLayerEl = document.getElementById("panel-layer");
+const dockedViewEl = document.getElementById("docked-view");
+Panels.setLayer(panelLayerEl);
 const statusPill = document.getElementById("status-pill");
 const grantPill = document.getElementById("grant-pill");
 const wsUrlInput = document.getElementById("ws-url");
@@ -81,26 +87,46 @@ client.onStatus((s) => {
   statusPill.textContent = s;
   statusPill.className = "status-pill " + s;
   if (s !== "connected") grantPill.textContent = "";
-  if (s === "connecting" || s === "disconnected") { activeView = null; renderSidebarNow(); renderContentNow(); }
+  if (s === "connecting" || s === "disconnected") { activeView = null; renderModbarNow(); renderContentNow(); }
 });
 
 // ---- rendering -------------------------------------------------------
 
-function renderSidebarNow() {
-  sidebarEl.innerHTML = "";
-  sidebarEl.appendChild(renderSidebar(client, activeView, selectView));
+function renderModbarNow() {
+  modbarEl.innerHTML = "";
+  modbarEl.appendChild(renderModbar(client, activeView, selectView));
 }
 
+// Two mutually-exclusive content modes: a module renders as a set of
+// floating panels directly on #panel-layer (see render.js/panels.js — no
+// single node comes back for those); Controller/Files/Logs/the connect
+// screen are conventional "docked" full-width views appended to
+// #docked-view. Only one of the two containers is shown at a time.
 function renderContentNow() {
   if (contentDispose) { contentDispose(); contentDispose = null; }
-  contentInner.innerHTML = "";
-  if (!activeView) { contentInner.appendChild(renderConnectScreen()); return; }
+  Panels.clear();
+  dockedViewEl.innerHTML = "";
+
+  const isModule = activeView && activeView !== "__controller" && activeView !== "__files" && activeView !== "__logs";
+  panelLayerEl.classList.toggle("hidden", !isModule);
+  dockedViewEl.classList.toggle("hidden", isModule);
+
+  if (!activeView) { dockedViewEl.appendChild(renderConnectScreen()); return; }
+  if (isModule) {
+    // A bespoke template (templates/index.js) wins over the generic,
+    // level1-grouped renderer when infos.template names one we have —
+    // see templates/index.js's header for the fallback-safety note.
+    const mod = client.get(client.topics.module(activeView));
+    const bespoke = mod && templates[mod.infos.template];
+    contentDispose = (bespoke ? bespoke.mount(client, activeView) : renderModuleView(client, activeView)).dispose;
+    return;
+  }
+
   let result;
   if (activeView === "__controller") result = renderController(client);
   else if (activeView === "__files") result = renderFiles(client, mediaUrlInput.value);
-  else if (activeView === "__logs") result = renderLogs(client);
-  else result = renderModuleScreen(client, activeView);
-  contentInner.appendChild(result.node);
+  else result = renderLogs(client);
+  dockedViewEl.appendChild(result.node);
   contentDispose = result.dispose || null;
 }
 
@@ -127,22 +153,22 @@ function renderConnectScreen() {
 
 function selectView(key) {
   activeView = key;
-  renderSidebarNow();
+  renderModbarNow();
   renderContentNow();
 }
 
 // ---- app-level topic subscriptions --------------------------------------
-// Only truly cross-cutting concerns live here: the sidebar (needs the
+// Only truly cross-cutting concerns live here: the module bar (needs the
 // module list), the login flow (needs session/grant), and "the active
 // module just disappeared" (also the module list). Everything else is the
 // concern of whichever screen is currently rendered — see render.js/views.js.
 
 client.subscribe(client.topics.modules(), () => {
-  // Sidebar always needs the fresh module list. The active module screen
-  // does NOT need a poke here: renderModuleScreen (render.js) already
+  // The module bar always needs the fresh module list. The active module
+  // view does NOT need a poke here: renderModuleView (render.js) already
   // subscribes to topics.module(name) directly and renders its own
   // "not found" state when a module is removed — see its module doc.
-  renderSidebarNow();
+  renderModbarNow();
 });
 
 client.subscribe(client.topics.session(), (session) => {
@@ -155,7 +181,7 @@ client.subscribe(client.topics.session(), (session) => {
   }
 });
 
-renderSidebarNow();
+renderModbarNow();
 renderContentNow();
 
 // Auto-connect only if the page is actually served by an HTTP(S) origin
