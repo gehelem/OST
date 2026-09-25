@@ -296,6 +296,10 @@ Misma estructura que `J1`.
 
 El servidor responde con un mensaje `fl` (perfil cargado) y luego envía los valores de propiedades actualizados.
 
+{{% notice style="note" title="Un `fc` transitorio precede a `fl`" %}}
+El servidor envía un mensaje [`fc`]({{% relref "server-messages.es.md" %}}#fs) (modificaciones no guardadas) justo antes de `fl`, como paso intermedio de la carga del perfil, antes de que los valores de la propiedad cambien realmente. Un cliente que reaccione a `fc` mostrando un indicador de "modificaciones no guardadas" lo verá parpadear brevemente y autocorregirse en cuanto llegue `fl` justo después — es lo esperado, no un error.
+{{% /notice %}}
+
 ---
 
 ### `PS` — Guardar un perfil {#ps}
@@ -347,7 +351,7 @@ Añade una nueva línea a la cuadrícula con los valores de elementos proporcion
 El servidor responde con un mensaje `gc` confirmando el índice de la nueva línea.
 
 {{% notice style="note" title="Los elementos base se actualizan antes que la línea de la cuadrícula" %}}
-Crear una línea de cuadrícula aplica primero los valores enviados a los elementos base de la propiedad (cada uno emite su propio `ea`), y luego añade la línea y emite `gc`. Si una propiedad muestra a la vez sus elementos base y su cuadrícula (`showElts` y `showGrid` ambos activos — combinación poco habitual), un cliente que renderiza en directo verá brevemente los elementos base reflejar los valores de la nueva línea antes de que la línea misma aparezca. Este es el estado real del datastore, no un error — adapte su renderizado a este comportamiento en lugar de intentar filtrarlo, y sobre todo nunca haga polling para evitarlo.
+Crear una línea de cuadrícula aplica primero los valores enviados a los elementos base de la propiedad, luego añade la fila y emite `gc`. No se trata de una única actualización agrupada: cada elemento base modificado recibe su propio `ea` de propiedad completa, uno tras otro (enviar `target`/`exposure`/`count` como en el ejemplo de arriba produce tres mensajes `ea` separados, cada uno mostrando un campo más cambiado que el anterior), antes del `gc` final. Si una propiedad muestra a la vez sus elementos base y su cuadrícula (`showElts` y `showGrid` ambos activos — combinación poco habitual), un cliente que renderiza en directo verá los elementos base parpadear a través de estos estados intermedios antes de que la fila misma aparezca. Este es el estado real del datastore, no un error — adapte su renderizado a este comportamiento (se vuelve a renderizar correctamente en cualquier caso si siempre aplica lo que diga cada `ea`, en lugar de asumir que un único mensaje lleva todos los cambios) en lugar de filtrarlo, y sobre todo nunca haga polling para evitarlo.
 {{% /notice %}}
 
 ---

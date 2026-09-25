@@ -98,6 +98,18 @@ Une propriété regroupe des éléments liés. Les propriétés sont affichées 
 Une valeur non vide de `preicon1`/`preicon2`/`posticon1`/`posticon2` est le nom d'icône Google Fonts (Material Icons) à afficher — et elle est cliquable : cliquer dessus envoie [`I1`/`I2`/`I3`/`I4`]({{% relref "client-messages.fr.md" %}}#i1) sans valeur ni paramètre, juste un payload vide ciblant la propriété. Une **chaîne vide signifie qu'il n'y a aucune icône** à cet emplacement — rien à afficher, rien à cliquer, rien à envoyer. Les `preicon`/`posticon` au niveau élément (plus bas) fonctionnent pareil, via [`J1`/`J2`]({{% relref "client-messages.fr.md" %}}#j1). Voir [Actions sur les icônes]({{% relref "client-messages.fr.md" %}}#icon-actions) pour la référence complète des messages.
 {{% /notice %}}
 
+{{% notice style="warning" title="`permission` régit les éléments éditables, pas l'affichage de la valeur" %}}
+`permission: 1` (« écriture seule ») ne veut pas dire « masquer la valeur courante » — ça veut dire que la propriété n'a rien de significatif à relire comme entrée soumissible (une action à sens unique, sans retour). Une propriété dont le seul élément est d'un type non éditable (`img`, `video`, `light`, `prg`, `message`) peut légitimement être `permission: 1` — un aperçu caméra en direct en est un exemple réel — et doit quand même être restituée à partir de sa valeur, quelle que soit `permission`. Conditionner l'interactivité (afficher une saisie, activer une soumission) à `permission`, mais conditionner l'affichage au **type** de l'élément, pas à `permission`.
+{{% /notice %}}
+
+{{% notice style="note" title="`rule` n'a de sens que si tous les éléments sont `bool`" %}}
+`rule` est présent sur chaque propriété (défaut `0`), mais il n'a de sens — et ne doit être pris en compte — que lorsque **tous** les éléments de la propriété sont de type `bool`. Il apparaît aussi, de façon inerte, sur des propriétés dont les éléments sont un mélange d'autres types (ex. une paire de coordonnées composée de deux éléments `float`) — un client doit l'ignorer dans ce cas plutôt que d'essayer de restituer, disons, deux floats comme un groupe de radios.
+{{% /notice %}}
+
+{{% notice style="note" title="`badge` est fixé par l'auteur du module, pas par un client à l'exécution" %}}
+Aucun message client ne permet de basculer `badge` — il est fixé une fois pour toutes par propriété/par élément dans la définition même du module, ce n'est pas un favori par utilisateur, par session, qu'un client pourrait définir. Un écran « favoris » peut lire et agréger ce qui est déjà marqué, mais n'a aucun moyen de laisser un utilisateur marquer lui-même quelque chose comme favori.
+{{% /notice %}}
+
 {{% notice style="tip" title="`level1`/`level2`/`order` sont informatifs, pas un contrat" %}}
 Ces champs sont purement informatifs — le backend ne les impose jamais, et un client est libre de les respecter partiellement ou pas du tout. Ils expriment seulement la façon dont le développeur d'un module a envisagé d'organiser ses propriétés. C'est précisément ce qui permet à des clients génériques (Rooster, ostnoctua) de s'adapter à n'importe quel module sans UI dédiée par module.
 
@@ -134,19 +146,20 @@ Une propriété avec graphe est toujours aussi une propriété grille (`hasGrid:
 
 | `graphType` | Forme | Rôles de `graphParams` |
 |---|---|---|
-| `XY` | Une seule série en nuage de points, bornes d'axe fixes | `X`, `Y`, `Xmin`, `Xmax`, `Ymin`, `Ymax` |
-| `DY` | Une seule série, date/heure en X | `D` (élément date/heure), `Y` |
+| `XY` | Une seule série en nuage de points, bornes d'axe fixes | `X`, `Y`, `Xmin`, `Xmax`, `Ymin`, `Ymax`, plus optionnellement `graphColor` (ci-dessous) |
+| `DY` | Une seule série, date/heure en X | `D` (élément date/heure), `Y`, plus optionnellement `graphColor` (ci-dessous) |
 | `SXY` | Plusieurs séries en nuage de points, regroupées par une clé de série | `S` (élément nom de série), `X`, `Y`, plus optionnellement `graphColors`/`axis`/`mapping` (ci-dessous) |
 | `SDY` | Plusieurs séries, date/heure en X, regroupées par une clé de série | `S`, `D`, `Y`, plus optionnellement `graphColors`/`axis`/`mapping` |
 | `PHD` | Graphe de guidage dédié façon PHD2 (dérive + SNR + RMS) | `D`, `RA`, `DE`, `pRA`, `pDE`, `RSB`, `RMS` — rôles fixes, spécifiques à cet usage |
 
-Champs optionnels de `graphParams`, utilisés par les types multi-séries (`SXY`/`SDY`) :
+Champs optionnels de `graphParams` :
 
-| Champ | Description |
-|---|---|
-| `graphColors` | `{"<série>": {"R": int, "G": int, "B": int}}` — couleur par série |
-| `axis` | `{"<nom>": {"min": number, "max": number, "pos": "left"\|"right", "text": string}}` — un ou plusieurs axes Y |
-| `mapping` | `{"<série>": "<nom d'axe>"}` — sur quelle entrée de `axis` chaque série se trace |
+| Champ | Utilisé par | Description |
+|---|---|---|
+| `graphColor` | `XY`, `DY` | `{"R": int, "G": int, "B": int}` — couleur de la série unique |
+| `graphColors` | `SXY`, `SDY` | `{"<série>": {"R": int, "G": int, "B": int}}` — couleur par série |
+| `axis` | `SXY`, `SDY` | `{"<nom>": {"min": number, "max": number, "pos": "left"\|"right", "text": string}}` — un ou plusieurs axes Y |
+| `mapping` | `SXY`, `SDY` | `{"<série>": "<nom d'axe>"}` — sur quelle entrée de `axis` chaque série se trace |
 
 {{% notice style="warning" title="`PHD` n'est pas un type de graphe générique" %}}
 Contrairement à `XY`/`DY`/`SXY`/`SDY`, dont les rôles sont assez génériques pour piloter un seul composant de graphe réutilisable, `PHD` a des rôles fixes et spécifiques à un graphe de guidage façon PHD2 (utilisé par le module `guider`). Un client qui construit un composant de graphe générique pour les quatre autres types aura probablement besoin d'une implémentation dédiée pour `PHD`, ou devra le laisser de côté — c'est ce que fait actuellement Rooster (`SXY`/`SDY`/`XY`/`DY` seulement, `PHD` non géré).
@@ -272,6 +285,7 @@ Le champ `value` est un objet contenant les métadonnées de l'image :
 | `width` / `height` | int | Dimensions de l'image en pixels |
 | `snr` | float | Rapport signal sur bruit |
 | `hfravg` | float | HFR moyen (rayon à mi-flux) des étoiles détectées |
+| `hfravgdev` | float | Écart-type de `hfravg` |
 | `stars` | int | Nombre d'étoiles détectées |
 | `issolved` | bool | Indique si la résolution de champ a réussi |
 | `solverra` / `solverde` | float | Coordonnées AR/Déc résolues |
@@ -279,6 +293,7 @@ Le champ `value` est un objet contenant les métadonnées de l'image :
 | `min` / `max` / `mean` / `median` / `stddev` | float[] | Statistiques par canal (voir détail ci-dessous) |
 | `histogram` | array | Données d'histogramme par canal (voir détail ci-dessous) |
 | `alternates` | string[] | Optionnel : versions alternatives de l'image |
+| `showstats` | bool | Fixé par le développeur du module : indique si les champs de statistiques ci-dessus ont un sens pour cette image et doivent être affichés (un module peut le mettre à `false` s'il ne les calcule pas, ou s'ils ne s'appliquent pas) |
 
 **Statistiques par canal** : `min`/`max`/`mean`/`median`/`stddev` sont
 des tableaux à **3 emplacements fixes**, quel que soit le nombre réel
@@ -360,7 +375,7 @@ Les LOV fournissent un ensemble de valeurs autorisées pour les éléments de ty
 "lovScope": "module"
 ```
 
-Le LOV lui-même est défini au niveau module (`globallovs`) ou contrôleur (`controllerlovs`) :
+Le LOV lui-même est défini au niveau module (`globallovs`) ou contrôleur (`lovs`) :
 ```json
 "myCameraModels": {
   "label": "Modèles de caméra",

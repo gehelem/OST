@@ -296,6 +296,10 @@ Stessa struttura di `J1`.
 
 Il server risponde con un messaggio `fl` (profilo caricato) poi invia i valori delle proprietà aggiornati.
 
+{{% notice style="note" title="Un `fc` transitorio precede `fl`" %}}
+Il server invia un messaggio [`fc`]({{% relref "server-messages.it.md" %}}#fs) (modifiche non salvate) immediatamente prima di `fl`, come passaggio intermedio del caricamento del profilo, prima che i valori della proprietà cambino effettivamente. Un client che reagisce a `fc` mostrando un indicatore "modifiche non salvate" lo vedrà lampeggiare per un messaggio e autocorreggersi non appena arriva `fl` subito dopo — atteso, non un bug.
+{{% /notice %}}
+
 ---
 
 ### `PS` — Salvare un profilo {#ps}
@@ -347,7 +351,7 @@ Aggiunge una nuova riga alla griglia con i valori degli elementi forniti.
 Il server risponde con un messaggio `gc` che confirma l'indice della nuova riga.
 
 {{% notice style="note" title="Gli elementi di base si aggiornano prima della riga di griglia" %}}
-Creare una riga di griglia applica prima i valori inviati agli elementi di base della proprietà (ognuno emette il proprio `ea`), poi aggiunge la riga ed emette `gc`. Se una proprietà mostra sia i suoi elementi di base sia la sua griglia contemporaneamente (`showElts` e `showGrid` entrambi attivi — combinazione rara), un client che visualizza in diretta vedrà brevemente gli elementi di base riflettere i valori della nuova riga prima che la riga stessa appaia. Questo è il vero stato del datastore, non un bug — adattate la visualizzazione a questo comportamento invece di cercare di filtrarlo, e soprattutto non fate mai polling per aggirarlo.
+Creare una riga di griglia applica prima i valori inviati agli elementi di base della proprietà, poi aggiunge la riga ed emette `gc`. Non è un unico aggiornamento raggruppato: ogni elemento di base modificato riceve il proprio `ea` completo della proprietà, uno dopo l'altro (inviare `target`/`exposure`/`count` come sopra produce tre messaggi `ea` separati, ciascuno con un campo modificato in più rispetto al precedente), prima del `gc` finale. Se una proprietà mostra sia i suoi elementi di base sia la sua griglia contemporaneamente (`showElts` e `showGrid` entrambi attivi — combinazione rara), un client che visualizza in diretta vedrà gli elementi di base sfarfallare attraverso questi stati intermedi prima che la riga stessa appaia. Questo è il vero stato del datastore, non un bug — adattate la visualizzazione a questo comportamento (si ri-renderizza correttamente in ogni caso se applicate sempre ciò che dice `ea`, invece di presumere che un singolo messaggio porti tutte le modifiche) invece di cercare di filtrarlo, e soprattutto non fate mai polling per aggirarlo.
 {{% /notice %}}
 
 ---

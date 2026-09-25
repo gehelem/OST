@@ -296,6 +296,10 @@ Même structure que `J1`.
 
 Le serveur répond avec un message `fl` (profil chargé) puis envoie les valeurs de propriétés mises à jour.
 
+{{% notice style="note" title="Un `fc` transitoire précède `fl`" %}}
+Le serveur envoie un message [`fc`]({{% relref "server-messages.fr.md" %}}#fs) (modifications non sauvegardées) juste avant `fl`, comme étape intermédiaire du chargement du profil, avant que les valeurs des propriétés ne changent réellement. Un client qui réagit à `fc` en affichant un indicateur « modifications non sauvegardées » le verra clignoter le temps d'un message et se corriger de lui-même dès que `fl` arrive juste après — c'est attendu, pas un bug.
+{{% /notice %}}
+
 ---
 
 ### `PS` — Sauvegarder un profil {#ps}
@@ -347,7 +351,7 @@ Ajoute une nouvelle ligne à la grille avec les valeurs d'éléments fournies.
 Le serveur répond avec un message `gc` confirmant l'index de la nouvelle ligne.
 
 {{% notice style="note" title="Les éléments de base se mettent à jour avant la ligne de grille" %}}
-Créer une ligne de grille applique d'abord les valeurs soumises aux éléments de base de la propriété (chacun émettant son propre `ea`), puis ajoute la ligne et émet `gc`. Si une propriété affiche à la fois ses éléments de base et sa grille (`showElts` et `showGrid` tous les deux actifs — combinaison rare), un client qui affiche en direct verra brièvement les éléments de base refléter les valeurs de la nouvelle ligne avant que la ligne elle-même n'apparaisse. C'est le vrai état du datastore, pas un bug — adaptez votre affichage à ce comportement plutôt que de chercher à le filtrer, et surtout ne faites jamais de polling pour le contourner.
+Créer une ligne de grille applique d'abord les valeurs soumises aux éléments de base de la propriété, puis ajoute la ligne et émet `gc`. Ce n'est pas une mise à jour groupée en un seul message : chaque élément de base modifié reçoit son **propre `ea` pleine propriété**, l'un après l'autre (soumettre `target`/`exposure`/`count` comme ci-dessus produit trois messages `ea` distincts, chacun montrant un champ modifié de plus que le précédent), avant le `gc` final. Si une propriété affiche à la fois ses éléments de base et sa grille (`showElts` et `showGrid` tous les deux actifs — combinaison rare), un client qui affiche en direct verra les éléments de base clignoter à travers ces états intermédiaires avant que la ligne elle-même n'apparaisse. C'est le vrai état du datastore, pas un bug — adaptez votre affichage à ce comportement (il se redessine correctement dans tous les cas si vous appliquez systématiquement ce que dit chaque `ea`, plutôt que de supposer qu'un seul message porte tous les changements) plutôt que de chercher à le filtrer, et surtout ne faites jamais de polling pour le contourner.
 {{% /notice %}}
 
 ---

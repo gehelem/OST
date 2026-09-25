@@ -95,6 +95,18 @@ Una proprietà raggruppa elementi collegati. Le proprietà sono mostrate in modo
 Un valore non vuoto di `preicon1`/`preicon2`/`posticon1`/`posticon2` è il nome dell'icona Google Fonts (Material Icons) da visualizzare — ed è cliccabile: cliccandoci si invia [`I1`/`I2`/`I3`/`I4`]({{% relref "client-messages.it.md" %}}#i1) senza valore né parametro, solo un payload vuoto che punta alla proprietà. Una **stringa vuota significa che non c'è alcuna icona** in quella posizione — nulla da visualizzare, nulla da cliccare, nulla da inviare. Le `preicon`/`posticon` a livello di elemento (più sotto) funzionano allo stesso modo, tramite [`J1`/`J2`]({{% relref "client-messages.it.md" %}}#j1). Vedi [Azioni sulle icone]({{% relref "client-messages.it.md" %}}#icon-actions) per il riferimento completo dei messaggi.
 {{% /notice %}}
 
+{{% notice style="warning" title="`permission` governa gli elementi editabili, non la visualizzazione del valore" %}}
+`permission: 1` ("solo scrittura") non significa "nascondere il valore corrente" — significa che la proprietà non ha nulla di significativo da rileggere come input inviabile (un'azione a fuoco e dimentica). Una proprietà il cui unico elemento è di tipo solo-visualizzazione (`img`, `video`, `light`, `prg`, `message`) può legittimamente essere `permission: 1` — un'anteprima live della camera ne è un esempio reale — e deve comunque essere renderizzata a partire dal proprio valore, indipendentemente da `permission`. Condizionare l'interattività (mostrare un input, abilitare un invio) a `permission`, ma condizionare il rendering al **tipo** dell'elemento, non a `permission`.
+{{% /notice %}}
+
+{{% notice style="note" title="`rule` ha senso solo quando tutti gli elementi sono `bool`" %}}
+`rule` è presente su ogni proprietà (default `0`), ma ha significato — e va considerato — solo quando **tutti** gli elementi della proprietà sono di tipo `bool`. Compare anche, in modo inerte, su proprietà i cui elementi sono un mix di altri tipi (es. una coppia di coordinate con due elementi `float`) — un client dovrebbe ignorarlo in quel caso, invece di provare a renderizzare, ad esempio, due float come un gruppo radio.
+{{% /notice %}}
+
+{{% notice style="note" title="`badge` è impostato dall'autore del modulo, non da un client a runtime" %}}
+Non esiste alcun messaggio client che modifichi `badge` — è fisso per proprietà/elemento nella definizione stessa del modulo, non un preferito per utente/sessione che un client può impostare. Una schermata "preferiti" può leggere e aggregare ciò che è già segnato, ma non ha modo di lasciare che un utente marchi qualcosa come preferito da sé.
+{{% /notice %}}
+
 {{% notice style="tip" title="`level1`/`level2`/`order` sono informativi, non un contratto" %}}
 Questi campi sono puramente informativi — il backend non li impone mai, e un client è libero di rispettarli parzialmente o per niente. Esprimono solo il modo in cui lo sviluppatore di un modulo ha pensato di organizzare le proprie proprietà. È esattamente ciò che permette a client generici (Rooster, ostnoctua) di adattarsi a qualsiasi modulo senza UI dedicata per modulo.
 
@@ -131,19 +143,20 @@ Una proprietà con grafico è sempre anche una proprietà a griglia (`hasGrid: t
 
 | `graphType` | Forma | Ruoli di `graphParams` |
 |---|---|---|
-| `XY` | Una sola serie a dispersione, limiti degli assi fissi | `X`, `Y`, `Xmin`, `Xmax`, `Ymin`, `Ymax` |
-| `DY` | Una sola serie, data/ora sull'asse X | `D` (elemento data/ora), `Y` |
+| `XY` | Una sola serie a dispersione, limiti degli assi fissi | `X`, `Y`, `Xmin`, `Xmax`, `Ymin`, `Ymax`, più opzionalmente `graphColor` (sotto) |
+| `DY` | Una sola serie, data/ora sull'asse X | `D` (elemento data/ora), `Y`, più opzionalmente `graphColor` (sotto) |
 | `SXY` | Più serie a dispersione, raggruppate da una chiave di serie | `S` (elemento nome serie), `X`, `Y`, più opzionalmente `graphColors`/`axis`/`mapping` (sotto) |
 | `SDY` | Più serie, data/ora sull'asse X, raggruppate da una chiave di serie | `S`, `D`, `Y`, più opzionalmente `graphColors`/`axis`/`mapping` |
 | `PHD` | Grafico di guida dedicato in stile PHD2 (deriva + SNR + RMS) | `D`, `RA`, `DE`, `pRA`, `pDE`, `RSB`, `RMS` — ruoli fissi, specifici per questo uso |
 
-Campi opzionali di `graphParams`, usati dai tipi multi-serie (`SXY`/`SDY`):
+Campi opzionali di `graphParams`:
 
-| Campo | Descrizione |
-|---|---|
-| `graphColors` | `{"<serie>": {"R": int, "G": int, "B": int}}` — colore per serie |
-| `axis` | `{"<nome>": {"min": number, "max": number, "pos": "left"\|"right", "text": string}}` — uno o più assi Y |
-| `mapping` | `{"<serie>": "<nome asse>"}` — su quale voce di `axis` viene tracciata ciascuna serie |
+| Campo | Usato da | Descrizione |
+|---|---|---|
+| `graphColor` | `XY`, `DY` | `{"R": int, "G": int, "B": int}` — colore per la serie unica |
+| `graphColors` | `SXY`, `SDY` | `{"<serie>": {"R": int, "G": int, "B": int}}` — colore per serie |
+| `axis` | `SXY`, `SDY` | `{"<nome>": {"min": number, "max": number, "pos": "left"\|"right", "text": string}}` — uno o più assi Y |
+| `mapping` | `SXY`, `SDY` | `{"<serie>": "<nome asse>"}` — su quale voce di `axis` viene tracciata ciascuna serie |
 
 {{% notice style="warning" title="`PHD` non è un tipo di grafico generico" %}}
 A differenza di `XY`/`DY`/`SXY`/`SDY`, i cui ruoli sono abbastanza generici da poter guidare un unico componente grafico riutilizzabile, `PHD` ha ruoli fissi e specifici per un grafico di guida in stile PHD2 (usato dal modulo `guider`). Un client che costruisce un componente grafico generico per gli altri quattro tipi avrà probabilmente bisogno di un'implementazione dedicata per `PHD`, o dovrà tralasciarlo — è quello che fa attualmente Rooster (solo `SXY`/`SDY`/`XY`/`DY`, `PHD` non gestito).
@@ -269,6 +282,7 @@ Il campo `value` è un oggetto contenente i metadati dell'immagine:
 | `width` / `height` | int | Dimensioni dell'immagine in pixel |
 | `snr` | float | Rapporto segnale/rumore |
 | `hfravg` | float | HFR medio (raggio a mezzo flusso) delle stelle rilevate |
+| `hfravgdev` | float | Deviazione standard di `hfravg` |
 | `stars` | int | Numero di stelle rilevate |
 | `issolved` | bool | Indica se la risoluzione di campo è riuscita |
 | `solverra` / `solverde` | float | Coordinate RA/DEC risolte |
@@ -276,6 +290,7 @@ Il campo `value` è un oggetto contenente i metadati dell'immagine:
 | `min` / `max` / `mean` / `median` / `stddev` | float[] | Statistiche per canale (vedi sotto) |
 | `histogram` | array | Dati dell'istogramma per canale (vedi sotto) |
 | `alternates` | string[] | Opzionale: versioni alternative dell'immagine |
+| `showstats` | bool | Impostato dallo sviluppatore del modulo: indica se i campi di statistiche sopra sono significativi per questa immagine e vanno mostrati (un modulo può impostarlo a `false` se non li calcola, o se non si applicano) |
 
 **Statistiche per canale**: `min`/`max`/`mean`/`median`/`stddev` sono
 array a **3 posizioni fisse**, indipendentemente dal numero reale di
@@ -357,7 +372,7 @@ I LOV forniscono un insieme di valori consentiti per gli elementi di tipo `int`,
 "lovScope": "module"
 ```
 
-Il LOV stesso è definito a livello modulo (`globallovs`) o controller (`controllerlovs`):
+Il LOV stesso è definito a livello modulo (`globallovs`) o controller (`lovs`):
 ```json
 "myCameraModels": {
   "label": "Modelli di camera",

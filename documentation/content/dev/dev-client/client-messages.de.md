@@ -296,6 +296,10 @@ Gleiche Struktur wie `J1`.
 
 Der Server antwortet mit einer `fl`-Nachricht (Profil geladen) und sendet anschließend die aktualisierten Property-Werte.
 
+{{% notice style="note" title="Ein vorübergehendes `fc` geht `fl` voraus" %}}
+Der Server sendet unmittelbar vor `fl` ein [`fc`]({{% relref "server-messages.de.md" %}}#fs) (nicht gespeicherte Änderungen), als Zwischenschritt beim Laden des Profils, bevor sich die Werte der Property tatsächlich ändern. Ein Client, der auf `fc` reagiert, indem er einen Hinweis auf „nicht gespeicherte Änderungen" anzeigt, sieht diesen für eine Nachricht lang aufblitzen und sich selbst korrigieren, sobald direkt danach `fl` eintrifft — erwartet, kein Bug.
+{{% /notice %}}
+
 ---
 
 ### `PS` — Profil speichern {#ps}
@@ -347,7 +351,7 @@ Fügt der Grid eine neue Zeile mit den übergebenen Elementwerten hinzu.
 Der Server antwortet mit einer `gc`-Nachricht, die den Index der neuen Zeile bestätigt.
 
 {{% notice style="note" title="Basis-Elemente aktualisieren sich vor der Grid-Zeile" %}}
-Das Erstellen einer Grid-Zeile wendet die übermittelten Werte zuerst auf die Basis-Elemente der Property an (jedes sendet sein eigenes `ea`), fügt dann die Zeile hinzu und sendet `gc`. Zeigt eine Property gleichzeitig ihre Basis-Elemente und ihr Grid an (`showElts` und `showGrid` beide aktiv — eine unübliche Kombination), sieht ein live-rendernder Client kurz, wie die Basis-Elemente die Werte der neuen Zeile widerspiegeln, bevor die Zeile selbst erscheint. Das ist der echte Datastore-Zustand, kein Bug — die Darstellung sollte sich daran anpassen, statt es herauszufiltern, und vor allem niemals Polling einsetzen, um das zu umgehen.
+Das Erstellen einer Grid-Zeile wendet die übermittelten Werte zuerst auf die Basis-Elemente der Property an, fügt dann die Zeile hinzu und sendet `gc`. Das ist kein gebündeltes Update: Jedes geänderte Basis-Element erhält sein eigenes vollständiges `ea` der Property, eines nach dem anderen (das Senden von `target`/`exposure`/`count` wie oben erzeugt drei separate `ea`-Nachrichten, jede mit einem weiteren geänderten Feld mehr als die vorherige), bevor das abschließende `gc` folgt. Zeigt eine Property gleichzeitig ihre Basis-Elemente und ihr Grid an (`showElts` und `showGrid` beide aktiv — eine unübliche Kombination), sieht ein live-rendernder Client, wie die Basis-Elemente durch diese Zwischenzustände flackern, bevor die Zeile selbst erscheint. Das ist der echte Datastore-Zustand, kein Bug — die Darstellung sollte sich daran anpassen (sie rendert so oder so korrekt, solange man immer genau das anwendet, was `ea` meldet, statt anzunehmen, dass eine einzelne Nachricht jede Änderung trägt), statt es herauszufiltern, und vor allem niemals Polling einsetzen, um das zu umgehen.
 {{% /notice %}}
 
 ---

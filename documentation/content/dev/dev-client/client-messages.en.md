@@ -296,6 +296,10 @@ Same structure as `J1`.
 
 The server replies with an `fl` (profile loaded) message and then sends updated property values.
 
+{{% notice style="note" title="A transient `fc` precedes `fl`" %}}
+The server sends an [`fc`]({{% relref "server-messages.en.md" %}}#fs) (unsaved changes) message immediately before `fl`, as an intermediate step of loading the profile, before the property's values actually change. A client that reacts to `fc` by showing an "unsaved changes" indicator will see it flash on for one message and self-correct once `fl` arrives right after — expected, not a bug.
+{{% /notice %}}
+
 ---
 
 ### `PS` — Save profile {#ps}
@@ -347,7 +351,7 @@ Adds a new row to the grid with the provided element values.
 The server replies with a `gc` message confirming the new row index.
 
 {{% notice style="note" title="Base elements update before the grid line does" %}}
-Creating a grid line applies the submitted values to the property's base elements first (each emitting its own `ea`), then appends the row and emits `gc`. If a property shows both its base elements and its grid at the same time (`showElts` and `showGrid` both true — an uncommon combination), a live-rendering client will see the base elements briefly reflect the new row's values before the row itself appears. This is the real datastore state, not a bug — adapt your rendering to it rather than filtering it out, and never poll to work around it.
+Creating a grid line applies the submitted values to the property's base elements first, then appends the row and emits `gc`. This is not one batched update: each changed base element gets its **own full-property `ea`**, one after another (submitting `target`/`exposure`/`count` as above produces three separate `ea` messages, each showing one more field changed than the last), before the final `gc`. If a property shows both its base elements and its grid at the same time (`showElts` and `showGrid` both true — an uncommon combination), a live-rendering client will see the base elements flicker through these intermediate states before the row itself appears. This is the real datastore state, not a bug — adapt your rendering to it (it re-renders correctly either way if you always apply whatever `ea` says, rather than assuming a single message carries every change) rather than filtering it out, and never poll to work around it.
 {{% /notice %}}
 
 ---
