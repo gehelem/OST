@@ -40,18 +40,26 @@ export function iconButton(name, title, onClick, opts) {
 // any module type this table doesn't know about, so a new/unknown module
 // still renders a sensible sidebar entry (client-pattern.en.md's "generic
 // fallback" rule applied to iconography, not just layout).
+//
+// Every name used anywhere in UI3 (here and elsewhere) must actually exist
+// in assets/fonts/MaterialIcons-Regular.ttf — it's the older, ~900-glyph
+// "classic" Material Icons set, not the current/expanded one, so several
+// newer-looking names (dark_mode, filter_alt, meeting_room, science, ...)
+// silently render nothing. Caught live 2026-09-25 ("le toggle de theme n'a
+// pas d'icone") and cross-checked every icon name in the codebase against
+// the font's actual cmap before picking replacements.
 const MODULE_ICON_HINTS = [
   [/mount|eq|telescope/i, "explore"],
   [/guid/i, "gps_fixed"],
   [/focus/i, "center_focus_strong"],
   [/camera|ccd|capture|imag/i, "camera_alt"],
-  [/filter/i, "filter_alt"],
+  [/filter/i, "filter_list"],
   [/sequenc/i, "playlist_play"],
-  [/dome|roof|shutter/i, "meeting_room"],
+  [/dome|roof|shutter/i, "home"],
   [/weather|meteo/i, "cloud"],
   [/polar/i, "adjust"],
   [/rotat/i, "screen_rotation"],
-  [/dummy/i, "science"],
+  [/dummy/i, "bug_report"],
   [/blindpec|pec/i, "sync"],
   [/collimat/i, "settings_input_component"],
   [/switch|relay|power/i, "power"],

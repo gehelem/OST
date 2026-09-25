@@ -77,7 +77,7 @@ setMediaBaseUrl(mediaUrlInput.value);
 function applyTheme(t) {
   document.documentElement.setAttribute("data-theme", t);
   themeToggle.innerHTML = "";
-  themeToggle.appendChild(icon(t === "light" ? "light_mode" : "dark_mode"));
+  themeToggle.appendChild(icon(t === "light" ? "wb_sunny" : "brightness_2"));
   themeToggle.title = t === "light" ? "Switch to dark theme" : "Switch to light theme";
 }
 const themeStored = localStorage.getItem("ostcore-ui3.theme") || "dark";
@@ -156,7 +156,7 @@ function renderContentNow() {
 
 function renderConnectScreen() {
   const div = el("div", { class: "connect-screen" });
-  div.appendChild(icon("nights_stay", { small: false }));
+  div.appendChild(icon("stars", { small: false }));
   div.querySelector(".material-icons").classList.add("icon-lg");
   div.appendChild(el("h2", { text: "OST — UI3" }));
   div.appendChild(el("p", { class: "lede", text: "Not connected. Set the WebSocket URL above and press Connect." }));

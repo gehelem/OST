@@ -43,7 +43,7 @@ export function renderModbar(client, activeKey, onSelect) {
 const SYSTEM_VIEWS = [
   { key: "__controller", label: "Controller", icon: "tune" },
   { key: "__files", label: "Files", icon: "folder" },
-  { key: "__logs", label: "Logs", icon: "receipt_long" },
+  { key: "__logs", label: "Logs", icon: "list" },
 ];
 export function renderSystemViews(activeKey, onSelect) {
   const nav = el("div", { class: "settings-nav" });
@@ -249,7 +249,7 @@ export function renderLogs(client) {
 
   scope.subscribe(client.topics.logs(), (logs) => {
     root.innerHTML = "";
-    root.appendChild(el("h2", null, [icon("receipt_long"), el("span", { text: " Logs" })]));
+    root.appendChild(el("h2", null, [icon("list"), el("span", { text: " Logs" })]));
     root.appendChild(el("div", { class: "log-toolbar muted small", text: `${(logs || []).length} entries (capped at 1000)` }));
     const table = el("table", { class: "log-table" });
     for (const entry of (logs || []).slice().reverse()) {
