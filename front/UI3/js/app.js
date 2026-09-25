@@ -8,7 +8,7 @@
 
 import { createClient, deriveDefaultUrls } from "../../core/index.js";
 import { renderModuleView, setMediaBaseUrl, setDialogRoot } from "./render.js";
-import { renderModbar, renderController, renderFiles, renderLogs, renderLogin } from "./views.js";
+import { renderModbar, renderSystemViews, renderController, renderFiles, renderLogs, renderLogin } from "./views.js";
 import { el, icon } from "./dom.js";
 import * as Panels from "./panels.js";
 import { templates } from "./templates/index.js";
@@ -16,14 +16,33 @@ import { templates } from "./templates/index.js";
 const client = createClient();
 
 const modbarEl = document.getElementById("modbar");
+const systemViewsEl = document.getElementById("system-views");
 const panelLayerEl = document.getElementById("panel-layer");
 const dockedViewEl = document.getElementById("docked-view");
 Panels.setLayer(panelLayerEl);
-const statusPill = document.getElementById("status-pill");
+const connWidgetEl = document.getElementById("conn-widget");
+const connToggleEl = document.getElementById("conn-toggle");
+const connDotEl = document.getElementById("conn-dot");
+const connSummaryEl = document.getElementById("conn-summary");
+const connPanelEl = document.getElementById("conn-panel");
 const grantPill = document.getElementById("grant-pill");
 const wsUrlInput = document.getElementById("ws-url");
 const mediaUrlInput = document.getElementById("media-url");
 const themeToggle = document.getElementById("theme-toggle");
+
+// ---- connection widget: collapsed status pill, click (or connecting/
+// disconnected) to fold out the full settings — Gilles, 2026-09-25: "settings
+// general et connexion en haut a droite (version minimale si connexion OK,
+// clic dessus ca la deplie)".
+function setConnPanelOpen(open) {
+  connPanelEl.classList.toggle("hidden", !open);
+  connWidgetEl.classList.toggle("open", open);
+}
+connToggleEl.addEventListener("click", () => setConnPanelOpen(connPanelEl.classList.contains("hidden")));
+document.addEventListener("click", (ev) => {
+  if (!connPanelEl.classList.contains("hidden") && !connWidgetEl.contains(ev.target)) setConnPanelOpen(false);
+});
+setConnPanelOpen(true); // nothing connected yet at boot: start open so the fields are reachable
 
 setDialogRoot(document.getElementById("dialog-root"));
 
@@ -84,9 +103,12 @@ document.getElementById("lang-select").addEventListener("change", (e) => {
 });
 
 client.onStatus((s) => {
-  statusPill.textContent = s;
-  statusPill.className = "status-pill " + s;
+  connDotEl.className = "conn-dot " + s;
+  connSummaryEl.textContent = s.charAt(0).toUpperCase() + s.slice(1);
   if (s !== "connected") grantPill.textContent = "";
+  // Minimal pill once connected; folded open again the moment there's
+  // something the user needs to look at or act on.
+  setConnPanelOpen(s !== "connected");
   if (s === "connecting" || s === "disconnected") { activeView = null; renderModbarNow(); renderContentNow(); }
 });
 
@@ -95,6 +117,8 @@ client.onStatus((s) => {
 function renderModbarNow() {
   modbarEl.innerHTML = "";
   modbarEl.appendChild(renderModbar(client, activeView, selectView));
+  systemViewsEl.innerHTML = "";
+  systemViewsEl.appendChild(renderSystemViews(activeView, selectView));
 }
 
 // Two mutually-exclusive content modes: a module renders as a set of
@@ -153,6 +177,9 @@ function renderConnectScreen() {
 
 function selectView(key) {
   activeView = key;
+  // Picking Controller/Files/Logs from the settings dropdown should close
+  // it back down, same as picking any other destination would.
+  if (key === "__controller" || key === "__files" || key === "__logs") setConnPanelOpen(false);
   renderModbarNow();
   renderContentNow();
 }

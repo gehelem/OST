@@ -10,29 +10,48 @@
 <link rel="stylesheet" href="css/panels.css">
 </head>
 <body>
+  <!-- One flat container: #canvas fills it edge to edge, #modbar and
+       #top-right (theme toggle + connection widget) float directly on top
+       of that same surface as their own small glass chips — there is no
+       shared banner/strip behind them. Mirrors ostnoctua's #on-layer +
+       .on-modbar + .on-conn-cluster, all siblings at the same level — see
+       panels.css's .glass. -->
   <div id="app">
-    <header id="topbar">
-      <div class="brand"><span class="material-icons">nights_stay</span><span>OST</span></div>
-      <span id="status-pill" class="status-pill disconnected">disconnected</span>
-      <input id="ws-url" class="field-input" style="width:250px" placeholder="ws://host:9624">
-      <input id="media-url" class="field-input" style="width:210px" placeholder="http://host/ostmedia/">
-      <button id="connect-btn" class="btn btn-primary"><span class="material-icons">power</span>Connect</button>
-      <button id="disconnect-btn" class="btn">Disconnect</button>
-      <select id="lang-select" class="field-input">
-        <option value="en">EN</option>
-        <option value="fr">FR</option>
-        <option value="de">DE</option>
-        <option value="es">ES</option>
-        <option value="it">IT</option>
-      </select>
-      <span class="topbar-spacer"></span>
-      <span id="grant-pill" class="grant-pill"></span>
-      <button id="theme-toggle" class="btn-icon" title="Toggle theme"><span class="material-icons">dark_mode</span></button>
-    </header>
-    <nav id="modbar"></nav>
     <div id="canvas">
       <div id="panel-layer" class="hidden"></div>
       <div id="docked-view" class="hidden"></div>
+    </div>
+    <nav id="modbar" class="glass"></nav>
+    <div id="top-right">
+      <button id="theme-toggle" class="glass icon-chip" title="Toggle theme"><span class="material-icons">dark_mode</span></button>
+      <div id="conn-widget">
+        <button id="conn-toggle" class="glass conn-toggle" type="button">
+          <span id="conn-dot" class="conn-dot disconnected"></span>
+          <span id="conn-summary">Disconnected</span>
+          <span class="material-icons conn-caret">expand_more</span>
+        </button>
+        <div id="conn-panel" class="glass conn-panel">
+          <div class="brand"><span class="material-icons">nights_stay</span><span>OST — UI3</span></div>
+          <nav id="system-views"></nav>
+          <div class="settings-sep"></div>
+          <div class="form-row"><input id="ws-url" class="field-input" style="width:100%" placeholder="ws://host:9624"></div>
+          <div class="form-row"><input id="media-url" class="field-input" style="width:100%" placeholder="http://host/ostmedia/"></div>
+          <div class="form-row">
+            <select id="lang-select" class="field-input">
+              <option value="en">EN</option>
+              <option value="fr">FR</option>
+              <option value="de">DE</option>
+              <option value="es">ES</option>
+              <option value="it">IT</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <button id="connect-btn" class="btn btn-primary"><span class="material-icons">power</span>Connect</button>
+            <button id="disconnect-btn" class="btn">Disconnect</button>
+          </div>
+          <div id="grant-pill" class="grant-pill"></div>
+        </div>
+      </div>
     </div>
   </div>
   <div id="dialog-root"></div>

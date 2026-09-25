@@ -13,8 +13,13 @@
   /* Surfaces */
   --bg: #0a0d12;
   --bg-raised: #10141b;
-  --bg-panel: #141a22;
-  --bg-panel-solid: #161d26;
+  /* Translucent "glass" surfaces (ostnoctua's --bg-panel/--bg-panel-solid,
+     see ostnoctua/web/themes.css) — always paired with backdrop-filter:
+     blur() via the .glass helper class in panels.css, never used alone
+     (a translucent background with no blur behind it just looks like a
+     washed-out flat color). */
+  --bg-panel: rgba(20, 26, 34, 0.66);
+  --bg-panel-solid: rgba(20, 26, 34, 0.88);
   --bg-elevated: #1c2530;
   --bg-input: #10151c;
   --bg-hover: rgba(0, 229, 204, 0.07);
@@ -45,8 +50,11 @@
   /* Status */
   --standby: #64707d;
   --ok: #4ade80;
+  --ok-rgb: 74, 222, 128;
   --busy: #f5b942;
+  --busy-rgb: 245, 185, 66;
   --error: #f36a6a;
+  --error-rgb: 243, 106, 106;
   --warn: #f5b942;
 
   /* Semantic buttons */
@@ -86,8 +94,8 @@
 
   --bg: #eef1f4;
   --bg-raised: #f7f9fb;
-  --bg-panel: #ffffff;
-  --bg-panel-solid: #ffffff;
+  --bg-panel: rgba(255, 255, 255, 0.68);
+  --bg-panel-solid: rgba(255, 255, 255, 0.9);
   --bg-elevated: #eef3f5;
   --bg-input: #ffffff;
   --bg-hover: rgba(0, 137, 123, 0.06);
@@ -114,8 +122,11 @@
 
   --standby: #8b97a3;
   --ok: #2e9e5b;
+  --ok-rgb: 46, 158, 91;
   --busy: #c98a12;
+  --busy-rgb: 201, 138, 18;
   --error: #d1453d;
+  --error-rgb: 209, 69, 61;
   --warn: #c98a12;
 
   --btn-success: #2e9e5b;

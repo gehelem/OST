@@ -1,41 +1,120 @@
-/* panels.css — floating panel layer + module bar, adapted from ostnoctua's
- * .on-float/.on-mod (ostnoctua.css) onto UI3's own theme.css tokens. See
- * js/panels.js for the behavior this styles. */
+/* panels.css — floating panel layer, module bar, connection widget,
+ * adapted from ostnoctua's .on-glass/.on-modbar/.on-conn-cluster/.on-mod/
+ * .on-float (ostnoctua.css) onto UI3's own theme.css tokens. See
+ * js/panels.js for the panel drag/resize/minimize behavior this styles.
+ *
+ * .glass is ostnoctua's actual "frosted" recipe (translucent background +
+ * backdrop-filter blur + subtle border + soft shadow) — the one visual
+ * ingredient an earlier, flat-opaque-box version of this file was missing
+ * entirely (Gilles, 2026-09-25: "c'est tout moisi ... regarde comment
+ * c'est fait sur ostnoctua"). Every floating surface in UI3 uses it. */
+.glass {
+  background: var(--bg-panel);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-panel);
+}
 
-/* ------------------------------------------------------------ module bar */
+/* ------------------------------------------------------------ module bar
+ * One glass pill floating top-left over the canvas (ostnoctua's
+ * "on-glass on-modbar" nav) — not a boxed-off full-width strip. */
 #modbar {
+  position: fixed; top: 12px; left: 12px; z-index: 20;
   display: flex; align-items: center; gap: 6px;
-  padding: var(--space-2) var(--space-4);
-  background: var(--bg-raised);
-  border-bottom: 1px solid var(--border);
-  overflow-x: auto;
-  flex-shrink: 0;
+  padding: 8px;
+  max-width: calc(100vw - 24px);
+  overflow-x: auto; overflow-y: hidden;
 }
 #modbar .modbar-sep { width: 1px; align-self: stretch; margin: 2px 4px; background: var(--border); flex-shrink: 0; }
+/* Exactly ostnoctua's .on-mod recipe (ostnoctua/web/ostnoctua.css): fixed
+   56x56 square, icon above a small label, not a variable-width inline
+   pill — Gilles, 2026-09-25, after an inline-pill attempt: "reprend
+   exactement le principe de ostnoctua (taille fixe, libellé en dessous
+   police reduite)". */
 .mod-btn {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 2px; width: 58px; height: 52px; flex-shrink: 0;
+  gap: 2px; width: 56px; height: 56px; flex-shrink: 0;
   background: var(--accent-faint); color: var(--text-muted);
   border: 1px solid var(--border-subtle); border-radius: var(--radius);
-  cursor: pointer; transition: border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer; font: inherit;
+  transition: border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 .mod-btn:hover { color: var(--text-secondary); border-color: var(--accent-dim); }
-.mod-btn:hover .material-icons { transform: scale(1.12); }
+.mod-btn:hover .material-icons { transform: scale(1.15); }
 .mod-btn.active {
   background: var(--accent-subtle); color: var(--accent); border-color: var(--accent);
   box-shadow: var(--shadow-glow);
 }
-.mod-btn .material-icons { font-size: 21px; transition: transform 0.15s; }
+.mod-btn .material-icons { font-size: 22px; transition: transform 0.2s; }
 .mod-btn-label {
-  font-size: 9px; letter-spacing: 0.3px; max-width: 54px;
+  font-size: 9px; letter-spacing: 0.5px; max-width: 52px;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 
+/* ------------------------------------------------------------ top-right
+ * Theme toggle + connection widget, each its own glass chip, floating at
+ * the same level as #modbar (Gilles, 2026-09-25: "tout au meme niveau, un
+ * seul conteneur commun"). The theme toggle is deliberately its own
+ * always-visible chip, never nested inside the collapsible connection
+ * panel — burying it there once meant Gilles genuinely couldn't find it. */
+#top-right { position: fixed; top: 12px; right: 12px; z-index: 20; display: flex; align-items: flex-start; gap: 8px; }
+.icon-chip {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; flex-shrink: 0;
+  color: var(--text-secondary); cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.icon-chip:hover { color: var(--accent); border-color: var(--accent-dim); }
+.icon-chip .material-icons { font-size: 19px; }
+
+/* ------------------------------------------------------- connection widget
+ * Collapsed to a small status pill once connected; click anywhere on it to
+ * fold out the full settings (brand/URL/media URL/language/connect). */
+#conn-widget { position: relative; flex-shrink: 0; }
+.conn-toggle {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 0 12px; height: 36px;
+  color: var(--text-secondary); cursor: pointer; font: inherit; font-size: 12px;
+}
+.conn-toggle:hover { border-color: var(--accent-dim); }
+.conn-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: var(--standby); }
+.conn-dot.connected { background: var(--ok); box-shadow: 0 0 6px rgba(var(--ok-rgb), 0.7); }
+.conn-dot.connecting { background: var(--busy); animation: pulse-dot 1s ease-in-out infinite; }
+.conn-dot.disconnected { background: var(--error); }
+.conn-caret { font-size: 16px !important; color: var(--text-dim); transition: transform 0.15s ease; }
+#conn-widget.open .conn-caret { transform: rotate(180deg); }
+.conn-panel {
+  position: absolute; top: calc(100% + 6px); right: 0; z-index: 30;
+  display: flex; flex-direction: column; gap: 8px;
+  width: 280px; padding: var(--space-3);
+}
+/* .hidden (base.css, !important) toggles this panel's visibility. */
+
+/* Controller/Files/Logs — this client's own chrome, not OST modules, so
+   they live here as a small settings-style list instead of in #modbar
+   (Gilles, 2026-09-25). */
+.settings-nav { display: flex; flex-direction: column; gap: 1px; margin: 0 calc(var(--space-3) * -1); }
+.settings-nav-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px var(--space-3);
+  background: none; border: none; border-radius: 0;
+  color: var(--text-secondary); cursor: pointer; font: inherit; font-size: 12.5px; text-align: left;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.settings-nav-item:hover { background: var(--bg-hover); color: var(--text); }
+.settings-nav-item.active { background: var(--accent-subtle); color: var(--accent-strong); font-weight: 600; }
+.settings-nav-item .material-icons { font-size: 16px; color: var(--text-muted); flex-shrink: 0; }
+.settings-nav-item.active .material-icons { color: var(--accent); }
+.settings-sep { height: 1px; background: var(--border); margin: 2px 0; }
+
 /* ------------------------------------------------------------- canvas ---
- * #canvas hosts either #panel-layer (floating panels, one module at a time)
- * or #docked-view (Controller/Files/Logs/connect screen), toggled via
- * .hidden — see js/app.js. */
-#canvas { flex: 1; position: relative; min-height: 0; background: var(--bg); }
+ * Fills #app edge to edge (#modbar/#top-right float on top of it, see
+ * above). Hosts either #panel-layer (floating panels, one module at a
+ * time) or #docked-view (Controller/Files/Logs/connect screen), toggled
+ * via .hidden — see js/app.js. */
+#canvas { position: absolute; inset: 0; background: var(--bg); }
 #panel-layer, #docked-view { position: absolute; inset: 0; overflow: auto; }
 #docked-view { padding: var(--space-5); }
 #docked-view > * { max-width: 1180px; margin: 0 auto; }
@@ -46,6 +125,8 @@
   min-width: 200px; max-width: 92%;
   display: flex; flex-direction: column;
   background: var(--bg-panel-solid);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-panel);

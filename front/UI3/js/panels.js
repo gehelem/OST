@@ -1,12 +1,14 @@
 // panels.js — floating, draggable, minimizable, resizable panels.
 //
 // Direct adaptation of ostnoctua's panel.js (see ostnoctua/web/panel.js) to
-// core/'s client API and UI3's design language, with one structural change:
-// ostnoctua's layer is `position:fixed; inset:0` over the whole viewport
-// (it has no persistent page chrome below the connection pill). UI3 keeps a
-// topbar + module bar as permanent chrome, so the layer here is a normal
-// flex child (see css/panels.css `#panel-layer`) and all drag/resize math is
-// relative to the layer's own bounding box, not the window.
+// core/'s client API and UI3's design language. The layer (#panel-layer,
+// see css/panels.css) fills #canvas edge to edge exactly like ostnoctua's
+// own #on-layer does the viewport — #modbar/#conn-widget float on top of it
+// (position:fixed) rather than living in a separate chrome strip above it,
+// so drag/resize math here is relative to the layer's own bounding box
+// (which is the same as the viewport minus nothing, in practice) rather
+// than hard-coding `window.innerWidth/innerHeight` the way ostnoctua's
+// original does.
 //
 // Usage (mirrors ostnoctua's OstPanels exactly):
 //   Panels.setLayer(layerEl);              // once, at boot

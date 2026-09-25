@@ -9,35 +9,44 @@
 import { el, icon, iconButton, moduleIcon } from "./dom.js";
 
 // Horizontal module bar (ostnoctua's .on-modbar/.on-mod, see panels.css) —
-// Controller/Files/Logs first, a thin separator, then every loaded module.
+// only the actually-loaded OST modules. Controller/Files/Logs live in the
+// settings dropdown instead (see renderSystemViews) — Gilles, 2026-09-25:
+// "deplace les boutons controller/files/logs dans les settings".
 export function renderModbar(client, activeKey, onSelect) {
   const bar = el("div");
-  const staticItems = [
-    { key: "__controller", label: "Controller", icon: "tune" },
-    { key: "__files", label: "Files", icon: "folder" },
-    { key: "__logs", label: "Logs", icon: "receipt_long" },
-  ];
-  for (const item of staticItems) {
-    const btn = el("button", { class: "mod-btn" + (activeKey === item.key ? " active" : ""), title: item.label, onclick: () => onSelect(item.key) }, [
-      icon(item.icon),
-      el("span", { class: "mod-btn-label", text: item.label }),
+  const names = client.get(client.topics.modules());
+  for (const name of names) {
+    const mod = client.get(client.topics.module(name));
+    const label = (mod && (mod.infos.modulelabel || mod.infos.label)) || name;
+    const btn = el("button", { class: "mod-btn" + (activeKey === name ? " active" : ""), title: label, onclick: () => onSelect(name) }, [
+      icon(moduleIcon(mod, name)),
+      el("span", { class: "mod-btn-label", text: label }),
     ]);
     bar.appendChild(btn);
   }
-  const names = client.get(client.topics.modules());
-  if (names.length) {
-    bar.appendChild(el("div", { class: "modbar-sep" }));
-    for (const name of names) {
-      const mod = client.get(client.topics.module(name));
-      const label = (mod && (mod.infos.modulelabel || mod.infos.label)) || name;
-      const btn = el("button", { class: "mod-btn" + (activeKey === name ? " active" : ""), title: label, onclick: () => onSelect(name) }, [
-        icon(moduleIcon(mod, name)),
-        el("span", { class: "mod-btn-label", text: label }),
-      ]);
-      bar.appendChild(btn);
-    }
-  }
   return bar;
+}
+
+// The three system/utility screens, rendered as a small vertical list inside
+// the settings dropdown (#conn-panel) instead of the module bar — they
+// aren't OST modules, they're this client's own chrome, so grouping them
+// with the other app-level settings reads better than mixing them into the
+// live module list.
+const SYSTEM_VIEWS = [
+  { key: "__controller", label: "Controller", icon: "tune" },
+  { key: "__files", label: "Files", icon: "folder" },
+  { key: "__logs", label: "Logs", icon: "receipt_long" },
+];
+export function renderSystemViews(activeKey, onSelect) {
+  const nav = el("div", { class: "settings-nav" });
+  for (const item of SYSTEM_VIEWS) {
+    const btn = el("button", { class: "settings-nav-item" + (activeKey === item.key ? " active" : ""), onclick: () => onSelect(item.key) }, [
+      icon(item.icon, { small: true }),
+      el("span", { text: item.label }),
+    ]);
+    nav.appendChild(btn);
+  }
+  return nav;
 }
 
 export function renderLogin(client, onDone) {

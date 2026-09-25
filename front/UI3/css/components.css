@@ -20,8 +20,8 @@
 .btn .material-icons { font-size: 16px; }
 .btn-primary { background: var(--accent-subtle); border-color: var(--accent-dim); color: var(--accent-strong); font-weight: 600; }
 .btn-primary:hover { background: var(--accent-subtle); border-color: var(--accent); box-shadow: var(--shadow-glow); }
-.btn-danger { border-color: rgba(243, 106, 106, 0.35); color: var(--btn-danger); }
-.btn-danger:hover { background: rgba(243, 106, 106, 0.12); border-color: var(--btn-danger); }
+.btn-danger { border-color: rgba(var(--error-rgb), 0.35); color: var(--btn-danger); }
+.btn-danger:hover { background: rgba(var(--error-rgb), 0.12); border-color: var(--btn-danger); }
 .btn-sm { padding: 3px 9px; font-size: 11.5px; }
 .btn-icon {
   display: inline-flex; align-items: center; justify-content: center;
@@ -64,16 +64,8 @@ input[type="range"]::-moz-range-thumb {
 .slider-val { min-width: 3em; text-align: right; color: var(--accent); font-family: var(--font-mono); font-size: 12px; }
 
 /* --------------------------------------------------------------- pills */
-.status-pill {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600;
-  letter-spacing: 0.02em; border: 1px solid transparent;
-}
-.status-pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-.status-pill.connected { background: rgba(74, 222, 128, 0.14); color: var(--ok); }
-.status-pill.connecting { background: rgba(245, 185, 66, 0.14); color: var(--busy); }
-.status-pill.connecting::before { animation: pulse-dot 1s ease-in-out infinite; }
-.status-pill.disconnected { background: rgba(243, 106, 106, 0.14); color: var(--error); }
+/* Connection status itself now lives in panels.css's #conn-widget
+   (.conn-dot/.conn-toggle) — this keyframe is shared with it. */
 @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
 
 .grant-pill { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); }
@@ -93,9 +85,9 @@ input[type="range"]::-moz-range-thumb {
 /* --------------------------------------------------------- status dots */
 .status-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 2px; flex-shrink: 0; box-shadow: 0 0 0 3px transparent; transition: box-shadow 0.2s ease; }
 .status-dot.status-standby { background: var(--standby); }
-.status-dot.status-ok { background: var(--ok); box-shadow: 0 0 8px rgba(74, 222, 128, 0.5); }
-.status-dot.status-busy { background: var(--busy); box-shadow: 0 0 8px rgba(245, 185, 66, 0.5); animation: pulse-dot 1s ease-in-out infinite; }
-.status-dot.status-error { background: var(--error); box-shadow: 0 0 8px rgba(243, 106, 106, 0.5); }
+.status-dot.status-ok { background: var(--ok); box-shadow: 0 0 8px rgba(var(--ok-rgb), 0.5); }
+.status-dot.status-busy { background: var(--busy); box-shadow: 0 0 8px rgba(var(--busy-rgb), 0.5); animation: pulse-dot 1s ease-in-out infinite; }
+.status-dot.status-error { background: var(--error); box-shadow: 0 0 8px rgba(var(--error-rgb), 0.5); }
 
 .badge-star { color: var(--warn); margin-left: 4px; }
 

@@ -41,25 +41,24 @@ a { color: var(--accent); }
 .icon-sm { font-size: 15px; }
 .icon-lg { font-size: 26px; }
 
-/* ---------------------------------------------------------------- shell */
-#app { height: 100%; display: flex; flex-direction: column; }
+/* ---------------------------------------------------------------- shell
+ * One flat, edge-to-edge surface: #canvas fills #app completely, #modbar
+ * and #top-right (theme toggle + connection widget) float on top of it
+ * (position:fixed, see panels.css) — there is no separate header
+ * strip/band behind them. Gilles, 2026-09-25, rejecting an earlier version
+ * that grouped them into a bordered header: "tout au meme niveau, un seul
+ * conteneur commun." Matches ostnoctua's own #on-layer + .on-modbar +
+ * .on-conn-cluster, all floating "glass" chips over one canvas (see
+ * ostnoctua/web/ostnoctua.css and panels.css's .glass) — panels.js's
+ * header explains the one real behavioral difference (drag/resize math
+ * relative to the canvas, not the window). */
+#app { height: 100%; position: relative; overflow: hidden; }
 
-#topbar {
-  display: flex; align-items: center; gap: var(--space-3);
-  padding: var(--space-2) var(--space-4);
-  background: var(--bg-raised);
-  border-bottom: 1px solid var(--border);
-  flex-wrap: wrap;
-  flex-shrink: 0;
-}
-.brand { display: flex; align-items: center; gap: 6px; font-weight: 700; letter-spacing: 0.3px; color: var(--text); margin-right: var(--space-2); }
+.brand { display: flex; align-items: center; gap: 6px; font-weight: 700; letter-spacing: 0.3px; color: var(--text); }
 .brand .material-icons { color: var(--accent); }
-.topbar-spacer { flex: 1; }
 
-/* #modbar, #canvas, #panel-layer, #docked-view: see panels.css — they
-   replace the earlier sidebar+content shell with a horizontal module bar
-   above a floating-panel canvas (client-pattern.en.md is agnostic about
-   layout shape; this one is modelled on ostnoctua, see panels.js header). */
+/* #canvas, #panel-layer, #docked-view, #modbar, #top-right, #conn-widget:
+   see panels.css. */
 
 .hidden { display: none !important; }
 .muted { color: var(--text-muted); }
@@ -69,6 +68,6 @@ a { color: var(--accent); }
 .spacer { flex: 1; }
 
 @media (max-width: 760px) {
-  #modbar { padding: var(--space-2); }
+  #modbar { max-width: calc(100vw - 24px); }
   #docked-view { padding: var(--space-3); }
 }

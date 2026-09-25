@@ -472,14 +472,14 @@ export function renderModuleView(client, moduleName) {
     disposeProperties();
     Panels.clear();
 
-    const header = Panels.make({ id: "header", title: mod.infos.modulelabel || mod.infos.label || moduleName, x: 20, y: 16, w: 400 });
+    const header = Panels.make({ id: "header", title: mod.infos.modulelabel || mod.infos.label || moduleName, x: 20, y: 60, w: 400 });
     header.appendChild(el("div", { class: "muted small", text: mod.infos.description || "" }));
     header.appendChild(renderProfileBar(client, moduleName, mod));
 
     const properties = mod.properties;
     const hasActions = properties.actions && Object.values(properties.actions.elements || {}).some((e) => e.type === "bool");
     if (hasActions) {
-      const abody = Panels.make({ id: "actions", title: properties.actions.label || "Actions", x: 440, y: 16, w: 300 });
+      const abody = Panels.make({ id: "actions", title: properties.actions.label || "Actions", x: 440, y: 60, w: 300 });
       abody.appendChild(track(renderProperty(client, moduleName, "actions")));
     }
     const layoutProps = hasActions ? Object.fromEntries(Object.entries(properties).filter(([n]) => n !== "actions")) : properties;
@@ -507,7 +507,7 @@ export function renderModuleView(client, moduleName) {
     if (!mod) {
       disposeProperties();
       Panels.clear();
-      const body = Panels.make({ id: "missing", title: moduleName, x: 20, y: 16, w: 320 });
+      const body = Panels.make({ id: "missing", title: moduleName, x: 20, y: 60, w: 320 });
       body.appendChild(el("div", { class: "muted", text: "Module not found (unloaded?)" }));
       return;
     }
