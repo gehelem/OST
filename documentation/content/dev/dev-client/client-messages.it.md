@@ -43,7 +43,6 @@ Tutte le chiavi dei comandi client sono in **MAIUSCOLO** (es. `DU`, `SV`, `SA`, 
 | [`FS`](#fs) | Scegliere la cartella di file sorvegliata |
 | [`ML`](#ml) | Caricare un modulo |
 | [`MK`](#mk) | Scaricare un modulo |
-| [`QY`](#qy) | Interrogare un modulo |
 | [`YA`](#indi) | Avviare il server INDI integrato |
 | [`YZ`](#indi) | Arrestare il server INDI integrato |
 | [`YL`](#indi) | Caricare un driver INDI |
@@ -556,31 +555,6 @@ Chiede al server di scaricare un modulo in esecuzione, indicato dal suo nome.
 ```
 
 `GlobalDatastore` non può essere scaricato: la richiesta viene rifiutata (messaggio di errore nei log).
-
----
-
-## Interrogare un modulo
-
-### `QY` — Interrogare un modulo {#qy}
-
-Meccanismo generico di richiesta/risposta specifico per modulo: porre a un modulo una domanda nominata con parametri, ricevere una risposta nominata tramite [`qa`]({{% relref "server-messages.it.md" %}}#qa). Quali nomi di richiesta un modulo comprenda realmente (se ne comprende) dipende interamente da quel modulo — il protocollo definisce solo l'involucro. Da notare: nessun involucro `p` qui, `QY` punta al modulo stesso, non a una sua proprietà.
-
-```json
-{
-  "QY": {
-    "m": {
-      "Sequencer": {
-        "query": "profileduration",
-        "params": { "profile": "default" }
-      }
-    }
-  }
-}
-```
-
-{{% notice style="note" title="Ancora poco da vedere" %}}
-Oggi solo il modulo `Sequencer` implementa una vera risposta (`profileduration`), usata internamente dal modulo Planner. Nessun altro modulo distribuito risponde in modo significativo a nessun nome di richiesta per ora.
-{{% /notice %}}
 
 ---
 

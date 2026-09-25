@@ -49,7 +49,6 @@ Toutes les clés d'événements envoyées par le serveur sont en **minuscules** 
 | [`df`](#af) | Fichier supprimé |
 | [`ad`](#af) | Dossier ajouté |
 | [`dd`](#af) | Dossier supprimé |
-| [`qa`](#qa) | Réponse à une requête de module |
 | [`xx`](#xx) | Pong keepalive |
 
 ---
@@ -570,31 +569,6 @@ Envoyé à tous les clients quand le contenu du dossier de fichiers surveillé c
 | `dd` | Sous-dossier supprimé n'importe où dans le webroot |
 
 `af`/`df` ne concernent que le dossier actuellement sélectionné via [`FS`]({{% relref "client-messages.fr.md" %}}#fs) — rien n'est signalé pour le contenu des autres dossiers. `ad`/`dd` sont globaux : ils se déclenchent pour tout l'arbre du webroot, quel que soit le dossier actuellement sélectionné. Voir [Système de fichiers]({{% relref "controller.fr.md" %}}#fichiers) pour la vue d'ensemble.
-
----
-
-## `qa` — Réponse à une requête de module {#qa}
-
-Réponse à une requête [`QY`]({{% relref "client-messages.fr.md" %}}#qy). `QY`/`qa` est un **mécanisme générique de requête/réponse propre à chaque module** : un client (ou un autre module, en interne) pose à un module une question nommée avec des paramètres, et reçoit une réponse nommée en retour. Les noms de requête qu'un module comprend réellement, et la forme de sa réponse, dépendent entièrement de ce module — le protocole ne définit que l'enveloppe, pas le contenu.
-
-```json
-{
-  "qa-query answer": {
-    "Sequencer": {
-      "q": {
-        "query": "profileduration",
-        "result": { "seconds": 3600 }
-      }
-    }
-  }
-}
-```
-
-`result` est ce que le module a renvoyé pour cette requête — sa forme dépend entièrement de `query`. Un module sans cas correspondant à la `query` demandée renvoie un `result` vide, silencieusement.
-
-{{% notice style="note" title="Pas grand-chose à voir pour l'instant" %}}
-Aujourd'hui seul le module `Sequencer` implémente une vraie réponse (`profileduration`), utilisée en interne par le module Planner plutôt que par un quelconque flux client documenté. Aucun autre module livré ne répond de façon utile à une quelconque requête — ce mécanisme existe et est entièrement câblé, mais il y a peu de choses à interroger en pratique pour l'instant.
-{{% /notice %}}
 
 ---
 
