@@ -110,6 +110,11 @@ function updateParamsToggle() {
   const hasParams = !!(mod && Object.values(mod.properties).some((p) => p.hasprofile === true));
   paramsToggleEl.disabled = !hasParams;
   paramsToggleEl.title = hasParams ? "Parameters" : "Parameters (this module has none)";
+  // Small red dot when the active profile has unsaved changes (module.f.changed
+  // on the wire) — Gilles, 2026-09-26, so it's visible without opening the
+  // modal. Recomputed on every topics.module(name) emission, which already
+  // fires on profile.changed flips (see render.js's module doc comment).
+  paramsToggleEl.classList.toggle("has-changes", !!(mod && mod.profile && mod.profile.changed));
 }
 
 function openParamsDialog() {
@@ -193,7 +198,13 @@ function renderContentNow() {
     // see templates/index.js's header for the fallback-safety note.
     const mod = client.get(client.topics.module(activeView));
     const bespoke = mod && templates[mod.infos.template];
-    contentDispose = (bespoke ? bespoke.mount(client, activeView) : renderModuleView(client, activeView)).dispose;
+    const result = bespoke ? bespoke.mount(client, activeView) : renderModuleView(client, activeView);
+    // Keeps the gear button's "unsaved changes" dot live while this same
+    // module stays active (updateParamsToggle() already ran once above,
+    // this covers every subsequent profile.changed flip without switching
+    // views) — client.subscribe() fires immediately too, harmless overlap.
+    const unsubParamsWatch = client.subscribe(client.topics.module(activeView), updateParamsToggle);
+    contentDispose = () => { result.dispose(); unsubParamsWatch(); };
     return;
   }
 

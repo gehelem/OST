@@ -61,6 +61,7 @@
  * panel — burying it there once meant Gilles genuinely couldn't find it. */
 #top-right { position: fixed; top: 12px; right: 12px; z-index: 20; display: flex; align-items: flex-start; gap: 8px; }
 .icon-chip {
+  position: relative;
   display: inline-flex; align-items: center; justify-content: center;
   width: 36px; height: 36px; flex-shrink: 0;
   color: var(--text-secondary); cursor: pointer;
@@ -70,6 +71,12 @@
 .icon-chip .material-icons { font-size: 19px; }
 .icon-chip:disabled { color: var(--text-dim); cursor: not-allowed; opacity: 0.5; }
 .icon-chip.active { color: var(--accent); border-color: var(--accent); box-shadow: var(--shadow-glow); }
+/* Unsaved profile changes (module.profile.changed) — params gear button. */
+.icon-chip.has-changes::after {
+  content: ""; position: absolute; top: 3px; right: 3px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--error); box-shadow: 0 0 4px rgba(var(--error-rgb), 0.7);
+}
 
 /* ------------------------------------------------------- connection widget
  * Collapsed to a small status pill once connected; click anywhere on it to
