@@ -327,7 +327,7 @@ bool Controller::loadModule(QString lib, QString label, QString profile)
     // family "guiding").
     for (const QString &family : mod->getFamilies())
     {
-        QString flovname = "family-" + family;
+        QString flovname = "loadedFamilies-" + family;
         if (!mControllerLovs.contains(flovname))
         {
             OST::LovString* fls = new OST::LovString(flovname);
@@ -642,7 +642,7 @@ void Controller::onExternalEvent(OST::ExtEvent event)
                     }
                     for (const QString &family : m->getFamilies())
                     {
-                        QString flovname = "family-" + family;
+                        QString flovname = "loadedFamilies-" + family;
                         if (mControllerLovs.contains(flovname))
                         {
                             OST::LovString* fls = static_cast<OST::LovString*>(mControllerLovs[flovname]);

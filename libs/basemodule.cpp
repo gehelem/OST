@@ -405,7 +405,18 @@ QString Basemodule::getHelpContent(QString language)
 
 QVariantMap Basemodule::getModuleInfo(void)
 {
-    return getAllMetadata();
+    // "library" and "families" are derived here rather than set via
+    // setMetadata() by each module - they never change at runtime once a
+    // module is constructed (declareFamily() only ever gets called from
+    // init code), so computing them centrally means every module gets
+    // them automatically, including in Controller::checkModules()'s
+    // per-library metadata probe (controllerdata.libraries) - Gilles,
+    // 2026-09-26. "library" is somewhat redundant with the "libost<x>"
+    // dict key controllerdata.libraries already uses, but harmless.
+    QVariantMap info = getAllMetadata();
+    info["library"] = getClassName().toLower();
+    info["families"] = QVariant(getFamilies());
+    return info;
 }
 
 void Basemodule::onDatastoreEvent(OST::EvType evt, QVariant data, OST::ElementBase* elt, OST::PropertyBase* prp,

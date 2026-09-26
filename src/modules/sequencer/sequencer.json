@@ -149,7 +149,7 @@
             "focusmodule": {
                 "type": "string",
                 "label": "Focus module instance",
-                "listOfValues":"family-focus",
+                "listOfValues":"loadedFamilies-focus",
                 "listOfValuesIsExternal":true,
                 "autoupdate": true,
                 "directedit": true,
@@ -160,7 +160,7 @@
             "guidermodule": {
                 "type": "string",
                 "label": "Guider module instance",
-                "listOfValues":"family-guiding",
+                "listOfValues":"loadedFamilies-guiding",
                 "listOfValuesIsExternal":true,
                 "autoupdate": true,
                 "directedit": true,
