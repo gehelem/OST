@@ -471,7 +471,7 @@ export function buildParamsPanel(client, moduleName, mod, track, container) {
   const { noLevel1, tabs } = buildLayout(props);
   const allTabs = noLevel1.length ? [{ name: "", direct: noLevel1, groups: [] }, ...tabs] : tabs;
 
-  container.appendChild(renderProfileBar(client, moduleName, mod));
+  container.appendChild(track(renderProfileBar(client, moduleName, mod)));
 
   function fillGroup(target, tab) {
     for (const { name } of tab.direct) target.appendChild(track(renderProperty(client, moduleName, name)));
@@ -588,37 +588,42 @@ export function renderModuleView(client, moduleName) {
   return { dispose: () => { unsubModule(); disposeProperties(); Panels.clear(); } };
 }
 
+/**
+ * Renders the profile load/save bar. Self-subscribes to `client.topics.lovs()`
+ * (the controller-scope lov map) so the profile dropdown stays live — it used
+ * to read client.get(...) once at build time from a snapshot, so it never
+ * refreshed after the very first render, and separately keyed off
+ * infos.template (fragile, see the same class of bug already found on
+ * Sequencer's "sequence"/"sequencer" mismatch). Fixed 2026-09-26, live with
+ * Gilles right after finding the equivalent bug in OstErix: profiles are
+ * per module TYPE, exposed as the controller lov "profiles-<Type>" keyed by
+ * the exact-case infos.classname (new field, added server-side the same
+ * day) - not infos.template, and not a one-shot read.
+ */
 export function renderProfileBar(client, moduleName, mod) {
   const bar = el("div", { class: "profile-bar" });
   bar.appendChild(el("span", { class: "muted", text: "Profile" }));
   const nameSpan = el("span", { class: "profile-name" + (mod.profile.changed ? " changed" : ""), text: mod.profile.name || "(none)" });
   bar.appendChild(nameSpan);
 
-  // Finding the right profile list for this module instance is unreliable
-  // from the dump alone - see ostcore/FINDINGS.md ("profiles-<template> LOV
-  // is never actually sent" and "infos.template does not always match the
-  // controllerdata.profiles key, e.g. Sequencer's template is 'sequence'").
-  // Best effort: try the documented transform of infos.template, then a
-  // case-insensitive/prefix match against controllerdata.profiles' keys,
-  // then fall back to letting the user type a profile name by hand.
-  const template = mod.infos.template || "";
-  let options = [];
-  const profilesMap = client.get(client.topics.controllerData("profiles")) || {};
-  const transformed = template ? template[0].toUpperCase() + template.slice(1).toLowerCase() : "";
-  if (transformed && profilesMap[transformed]) options = profilesMap[transformed];
-  else if (template) {
-    const tl = template.toLowerCase();
-    const matchKey = Object.keys(profilesMap).find((k) => k.toLowerCase() === tl || k.toLowerCase().startsWith(tl) || tl.startsWith(k.toLowerCase()));
-    if (matchKey) options = profilesMap[matchKey];
-  }
   const select = el("select", { class: "field-input small" });
-  select.appendChild(el("option", { value: "", text: options.length ? "(choose)" : "(type name)" }));
-  for (const name of options) select.appendChild(el("option", { value: name, text: name }));
   const nameInput = el("input", { type: "text", class: "field-input small", placeholder: "profile name" });
   select.addEventListener("change", () => { if (select.value) nameInput.value = select.value; });
   bar.appendChild(select);
   bar.appendChild(nameInput);
   bar.appendChild(el("button", { class: "btn btn-sm", onclick: () => { const n = nameInput.value || select.value; if (n) client.loadProfile(moduleName, n); } }, [icon("folder_open", { small: true }), "Load"]));
   bar.appendChild(el("button", { class: "btn btn-sm", onclick: () => { const n = nameInput.value || select.value; if (n) client.saveProfile(moduleName, n); } }, [icon("save", { small: true }), "Save"]));
+
+  const classname = mod.infos.classname || "";
+  const unsubscribe = client.subscribe(client.topics.lovs(), (lovs) => {
+    const lov = (classname && lovs && lovs["profiles-" + classname]) || null;
+    const options = (lov && Object.keys(lov.values || {})) || [];
+    const current = select.value;
+    select.innerHTML = "";
+    select.appendChild(el("option", { value: "", text: options.length ? "(choose)" : "(type name)" }));
+    for (const name of options) select.appendChild(el("option", { value: name, text: name }));
+    if (options.includes(current)) select.value = current;
+  });
+  bar._dispose = unsubscribe;
   return bar;
 }
