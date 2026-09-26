@@ -204,11 +204,30 @@ bool  PropertyMulti::setElt(QString key, QVariant val, bool emitEvent)
                 break;
         }
     }
-    if ((mElts[key]->getType() == "prg") || (mElts[key]->getType() == "img") || (mElts[key]->getType() == "video")
-            || (mElts[key]->getType() == "light") )
+    if (mElts[key]->getType() == "light")
     {
-        // prg/img/video/light are display-only, can't be updated via frontend - light is only
-        // ever set server-side, through the dedicated ElementLight::setValue() path
+        // Regression fixed 2026-09-26: this used to no-op here (grouped
+        // with prg/img/video below), which silently broke every
+        // Basemodule::setStateEvent() call across the whole codebase -
+        // setStateEvent() sets "state" through this same setElt() (via
+        // setAll()), not through ElementLight::setValue() directly, so
+        // "state" stayed frozen at its Idle default forever while the
+        // other fields (statedescription, event, ...) kept updating
+        // normally. ElementUpdate::visit(ElementLight*, ...) already does
+        // the int-to-State conversion correctly - it just wasn't reached.
+        // A client can still reach this through SV/SA, but "signals" (the
+        // only property using "light" today) is permission:ReadOnly, so a
+        // compliant client already won't offer to write it.
+        ElementUpdate vu;
+        QVariantMap m;
+        m["value"] = val;
+        getElt(key)->accept(&vu, m, s);
+        return true;
+    }
+    if ((mElts[key]->getType() == "prg") || (mElts[key]->getType() == "img") || (mElts[key]->getType() == "video"))
+    {
+        // Display-only, no visitor-based write path exists for these
+        // (ElementUpdate::visit(ElementImg*, ...) etc. are no-op stubs).
         return true;
     }
     logError("PropertyMulti::setValue - %1 - can't update, unhandled type : %2(%3)", {key, mElts[key]->getType(), val.toString()});

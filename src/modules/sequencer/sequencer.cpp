@@ -80,9 +80,11 @@ Sequencer::Sequencer(QString name, QString label, QString profile, QVariantMap a
     // does receive it (QScxmlEvent, see qscxmlevent.h) - record it here so
     // SMError() can log something actionable instead of just "Sequence
     // error" with no reason (Gilles, 2026-09-26, hitting exactly that).
-    for (const QString errorEvent : {"CameraAlert", "CoolingTimeout", "FilterTimeout",
-            "FocusTimeout", "GuiderTimeout", "GuiderLost", "ExposureTimeout",
-            "DitherTimeout", "RecalTimeout"})
+    for (const QString errorEvent :
+            {"CameraAlert", "CoolingTimeout", "FilterTimeout",
+             "FocusTimeout", "GuiderTimeout", "GuiderLost", "ExposureTimeout",
+             "DitherTimeout", "RecalTimeout"
+            })
     {
         pMachine->connectToEvent(errorEvent, this, &Sequencer::SMErrorCause);
     }
