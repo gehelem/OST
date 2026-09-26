@@ -1026,6 +1026,11 @@ bool IndiModule::defineMeAsFocuser()
 }
 bool IndiModule::defineMeAsGuider()
 {
+    // "guiding" family: lets any module declaring it (Guider, BlindPEC, ...)
+    // be picked as a generic guiding slave (e.g. Sequencer.slaves.guidermodule,
+    // listOfValues "family-guiding") regardless of its actual type/class -
+    // see Basemodule::declareFamily()'s doc comment.
+    declareFamily("guiding");
     giveMeAParms();
     giveMeAState();
     defineMeAsImager();

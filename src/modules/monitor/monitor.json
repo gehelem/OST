@@ -55,7 +55,7 @@
             "guider": {
                 "type": "string",
                 "label": "Guider instance",
-                "listOfValues": "loadedModules-guider",
+                "listOfValues": "family-guiding",
                 "listOfValuesIsExternal": true,
                 "autoupdate": true,
                 "directedit": true,

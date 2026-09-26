@@ -160,7 +160,7 @@
             "guidermodule": {
                 "type": "string",
                 "label": "Guider module instance",
-                "listOfValues":"loadedModules-guider",
+                "listOfValues":"family-guiding",
                 "listOfValuesIsExternal":true,
                 "autoupdate": true,
                 "directedit": true,

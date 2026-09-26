@@ -300,22 +300,42 @@ bool Controller::loadModule(QString lib, QString label, QString profile)
     mod->onAfterInit();
     wshandler->onModuleEvent(OST::EvType::aa, QVariant(), nullptr, nullptr, nullptr, mod);
 
-    // Keyed by infos.template (not lib/class name): matches the convention
-    // already used by controllerdata.profiles and by every client-side
-    // reconstruction of this data (Rooster's rebuildGlobalLovs()).
-    QString modtemplate = mod->getMetadata("template")->toString().toLower();
-    if (!modtemplate.isEmpty())
+    // Keyed by module TYPE (the library name, e.g. libostfocus -> "focus"),
+    // NOT infos.template: a template is only a display hint ("use this
+    // rendering"), entirely optional and orthogonal to what a module
+    // actually is - two different libraries can share one generic template
+    // (e.g. anything using "default"), and grouping "loaded modules" by
+    // template would wrongly merge them. Gilles, 2026-09-26, catching this
+    // exact conflation: "on est tombe dans un piege qui casse tout ...
+    // c'est sur cette clef [le type] qu'on doit enregistrer les profils ...
+    // et pas du template !!!". lowerlib is already the module type here.
+    QString lovname = "loadedModules-" + lowerlib;
+    if (!mControllerLovs.contains(lovname))
     {
-        QString lovname = "loadedModules-" + modtemplate;
-        if (!mControllerLovs.contains(lovname))
-        {
-            OST::LovString* ls = new OST::LovString(lovname);
-            createControllerLov(lovname, ls);
-        }
-        OST::LovString* ls = static_cast<OST::LovString*>(mControllerLovs[lovname]);
-        if (!ls->contains(name)) ls->lovAdd(name, name);
+        OST::LovString* ls = new OST::LovString(lovname);
+        createControllerLov(lovname, ls);
     }
+    OST::LovString* ls = static_cast<OST::LovString*>(mControllerLovs[lovname]);
+    if (!ls->contains(name)) ls->lovAdd(name, name);
 
+    // One "family-<name>" lov per family the module declared for itself at
+    // init (Basemodule::declareFamily(), called from e.g. IndiModule's
+    // defineMeAsGuider()) - lets another module's slot pick any loaded
+    // module with a given capability, not just a given type (Gilles,
+    // 2026-09-26: Sequencer should be able to use a BlindPEC instance as
+    // its guiding slave exactly like a Guider one, since both declare
+    // family "guiding").
+    for (const QString &family : mod->getFamilies())
+    {
+        QString flovname = "family-" + family;
+        if (!mControllerLovs.contains(flovname))
+        {
+            OST::LovString* fls = new OST::LovString(flovname);
+            createControllerLov(flovname, fls);
+        }
+        OST::LovString* fls = static_cast<OST::LovString*>(mControllerLovs[flovname]);
+        if (!fls->contains(name)) fls->lovAdd(name, name);
+    }
 
     return true;
 
@@ -612,14 +632,21 @@ void Controller::onExternalEvent(OST::ExtEvent event)
             {
                 if (m->getModuleName() == n)
                 {
-                    QString modtemplate = m->getMetadata("template")->toString().toLower();
-                    if (!modtemplate.isEmpty())
+                    // Module TYPE (library name), not infos.template - see
+                    // the matching note in loadModule() above.
+                    QString lovname = "loadedModules-" + m->getClassName().toLower();
+                    if (mControllerLovs.contains(lovname))
                     {
-                        QString lovname = "loadedModules-" + modtemplate;
-                        if (mControllerLovs.contains(lovname))
+                        OST::LovString* ls = static_cast<OST::LovString*>(mControllerLovs[lovname]);
+                        if (ls->contains(n)) ls->lovDel(n);
+                    }
+                    for (const QString &family : m->getFamilies())
+                    {
+                        QString flovname = "family-" + family;
+                        if (mControllerLovs.contains(flovname))
                         {
-                            OST::LovString* ls = static_cast<OST::LovString*>(mControllerLovs[lovname]);
-                            if (ls->contains(n)) ls->lovDel(n);
+                            OST::LovString* fls = static_cast<OST::LovString*>(mControllerLovs[flovname]);
+                            if (fls->contains(n)) fls->lovDel(n);
                         }
                     }
                     m->killMe();

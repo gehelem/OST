@@ -376,6 +376,18 @@ QString Basemodule::getClassName()
 {
     return metaObject()->className();
 }
+void Basemodule::declareFamily(const QString &family)
+{
+    mFamilies.insert(family);
+}
+QStringList Basemodule::getFamilies() const
+{
+    return mFamilies.values();
+}
+bool Basemodule::hasFamily(const QString &family) const
+{
+    return mFamilies.contains(family);
+}
 QString Basemodule::getHelpContent(QString language)
 {
     QString f = ":" + getClassName() + "." + language + ".md";
