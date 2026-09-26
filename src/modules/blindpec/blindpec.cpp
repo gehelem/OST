@@ -56,21 +56,11 @@ BlindPec::BlindPec(QString name, QString label, QString profile, QVariantMap ava
     giveMeADevice("camera", "Microscope", INDI::BaseDevice::CCD_INTERFACE);
     giveMeADevice("guider", "Guide via",  INDI::BaseDevice::GUIDER_INTERFACE);
 
+    // defineMeAsGuider() now creates all 5 shared "guiding family" actions
+    // (abortguider/guide/calibrate/dither/resetcalibration) - dither and
+    // reset-calibration used to be added by hand right here, independently
+    // from guider.cpp's own (functionally identical) copy.
     defineMeAsGuider();
-
-    // Extra action buttons (defineMeAsGuider() creates calibrate / guide /
-    // abortguider; add dither and reset-calibration like the guider does).
-    OST::PropertyMulti *pm = getProperty("actions");
-    OST::ElementBool *rc = new OST::ElementBool("resetcalibration", "Reset calibration", "bpec10", "");
-    rc->setValue(false, false);
-    rc->setDirectEdit(true);
-    rc->setPreIcon("block");
-    pm->addElt(rc);
-    OST::ElementBool *di = new OST::ElementBool("dither", "Dither", "bpec11", "");
-    di->setValue(false, false);
-    di->setDirectEdit(true);
-    di->setPreIcon("shuffle");
-    pm->addElt(di);
 
     // Single-shot hardware watchdog, re-armed at every hardware wait, disarmed on
     // the matching callback or on abort. Same pattern as guider.

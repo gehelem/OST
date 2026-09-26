@@ -1060,6 +1060,16 @@ bool IndiModule::defineMeAsGuider()
     b->setDirectEdit(true);
     b->setPreIcon("arrows_output");
     pm->addElt(b);
+    b = new  OST::ElementBool("resetcalibration", "Reset calibration", "guid10", "");
+    b->setValue(false, false);
+    b->setDirectEdit(true);
+    b->setPreIcon("block");
+    pm->addElt(b);
+    b = new  OST::ElementBool("dither", "Dither", "guid11", "");
+    b->setValue(false, false);
+    b->setDirectEdit(true);
+    b->setPreIcon("shuffle");
+    pm->addElt(b);
     mIsGuider = true;
     return true;
 
@@ -1084,6 +1094,28 @@ bool IndiModule::defineMeAsSequencer()
     pm->addElt(b);
     b->setPreIcon("play_arrow");
     mIsSequencer = true;
+    return true;
+}
+bool IndiModule::defineMeAsPlanner()
+{
+    // Single implementation today (Planner), no family declared for that
+    // reason - added purely so its start/stop actions live in one place
+    // like every other slave-facing module's, per Gilles's 2026-09-26
+    // audit ("il faut verifier tous les modules qui ont des esclaves ...
+    // ces commandes doivent etre definies dans les DefineMeAsXXX").
+    giveMeAnActions();
+    giveMeALocation();
+
+    OST::PropertyMulti* pm = getProperty("actions");
+    OST::ElementBool* b = new  OST::ElementBool("start", "Start", "010", "");
+    b->setValue(false, false);
+    b->setDirectEdit(true);
+    pm->addElt(b);
+    b = new  OST::ElementBool("stop", "Stop", "020", "");
+    b->setValue(false, false);
+    b->setDirectEdit(true);
+    pm->addElt(b);
+    mIsPlanner = true;
     return true;
 
 }

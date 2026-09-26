@@ -20,8 +20,6 @@ Planner::Planner(QString name, QString label, QString profile, QVariantMap avail
       mIsRunning(false)
 {
     Q_INIT_RESOURCE(planner);
-    giveMeAnActions();
-    giveMeALocation();
     loadOstPropertiesFromFile(":planner.json");
     setMetadata("thisGithash", QString::fromStdString(Version::GIT_SHA1));
     setMetadata("thisGitdate", QString::fromStdString(Version::GIT_DATE));
@@ -47,18 +45,11 @@ void Planner::initProperties()
     // Request INDI devices
     giveMeADevice("gps", "GPS", INDI::BaseDevice::GPS_INTERFACE);
 
-    // Add start and stop buttons
-    OST::PropertyMulti* pm = getProperty("actions");
-    OST::ElementBool* b = new OST::ElementBool("start", "Start", "010", "");
-    b->setValue(false, false);
-    b->setDirectEdit(true);
-    pm->addElt( b);
-    b = new OST::ElementBool("stop", "Stop", "020", "");
-    b->setValue(false, false);
-    b->setDirectEdit(true);
-    pm->addElt( b);
-
-
+    // "actions" (start/stop) and "location" - previously created directly
+    // in the constructor (giveMeAnActions()/giveMeALocation()) with the
+    // start/stop elements added by hand right here; now one call, shared
+    // with any other module that wants the same "start/stop" recipe.
+    defineMeAsPlanner();
 }
 
 void Planner::onExternalEvent(OST::ExtEvent event)

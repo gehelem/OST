@@ -90,21 +90,11 @@ Guider::Guider(QString name, QString label, QString profile, QVariantMap availab
     giveMeADevice("camera", "Camera", INDI::BaseDevice::CCD_INTERFACE);      // Guiding camera
     giveMeADevice("guider", "Guide via", INDI::BaseDevice::GUIDER_INTERFACE); // Mount guide interface
 
-    // Register this module as the guider
+    // Register this module as the guider - defineMeAsGuider() now creates
+    // all 5 shared "guiding family" actions (abortguider/guide/calibrate/
+    // dither/resetcalibration), previously only 3; the extra 2 used to be
+    // added by hand right here and in blindpec.cpp, independently.
     defineMeAsGuider();
-
-    // Add custom "Reset calibration" button to actions (not defined in JSON)
-    OST::PropertyMulti* pm = getProperty("actions");
-    OST::ElementBool* b = new OST::ElementBool("resetcalibration", "Reset calibration", "guid10", "");
-    b->setValue(false, false);
-    b->setDirectEdit(true);
-    b->setPreIcon("block");
-    pm->addElt(b);
-    OST::ElementBool* dither = new OST::ElementBool("dither", "Dither", "guid11", "");
-    dither->setValue(false, false);
-    dither->setDirectEdit(true);
-    dither->setPreIcon("shuffle");
-    pm->addElt(dither);
 
     // Watchdog: the state machines wait on INDI callbacks (exposure BLOB, pulse
     // completion, frame reset, SEP). If one never arrives the machine would hang
