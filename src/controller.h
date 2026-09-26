@@ -132,6 +132,7 @@ class Controller : public QObject
         }
         bool createControllerLov(const QString &lovName, OST::LovBase* pLov);
         bool deleteControllerLov(const QString &lovName);
+        void updateProfilesLovs(const QVariantMap &r);
         void forceAdminPassword(const QString &pw);
 
 

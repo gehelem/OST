@@ -207,6 +207,7 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     QVariantMap r;
     dbmanager->getDbProfiles(r);
     updateControllerData("profiles", r);
+    updateProfilesLovs(r);
 
     if (mSystemWatchInterval > 0)
     {
@@ -298,15 +299,22 @@ bool Controller::loadModule(QString lib, QString label, QString profile)
 
     mod->onAfterInit();
     wshandler->onModuleEvent(OST::EvType::aa, QVariant(), nullptr, nullptr, nullptr, mod);
-    // This is redundant with global data, these lovs can (must? => yes) be managed at frontend level
-    //QString lovname = "loadedModules-" + lowerlib;
-    //if (!getControllerLovs().contains(lovname))
-    //{
-    //    OST::LovString* ls = new OST::LovString(lovname);
-    //    createControllerLov(lovname, ls);
-    //}
-    //OST::LovString* ls = static_cast<OST::LovString*>(getControllerLovs()[lovname]);
-    //if (!ls->contains(lovname)) ls->lovAdd(name, name);
+
+    // Keyed by infos.template (not lib/class name): matches the convention
+    // already used by controllerdata.profiles and by every client-side
+    // reconstruction of this data (Rooster's rebuildGlobalLovs()).
+    QString modtemplate = mod->getMetadata("template")->toString().toLower();
+    if (!modtemplate.isEmpty())
+    {
+        QString lovname = "loadedModules-" + modtemplate;
+        if (!mControllerLovs.contains(lovname))
+        {
+            OST::LovString* ls = new OST::LovString(lovname);
+            createControllerLov(lovname, ls);
+        }
+        OST::LovString* ls = static_cast<OST::LovString*>(mControllerLovs[lovname]);
+        if (!ls->contains(name)) ls->lovAdd(name, name);
+    }
 
 
     return true;
@@ -433,6 +441,33 @@ bool Controller::deleteControllerLov(const QString &lovName)
     return true;
 }
 
+// Builds/refreshes one "profiles-<Type>" controller lov per key of `r`
+// (the same QVariantMap already used for controllerdata.profiles, see both
+// call sites) — <Type> keeps the exact case DBManager::getDbProfiles()
+// returns (the module class name), matching every real listOfValues
+// reference (e.g. sequencer.json's "profiles-Focus") and Rooster's own
+// rebuildGlobalLovs(). Previously never implemented server-side at all —
+// controllerdata.profiles carried the data, but no client-facing lov
+// exposed it generically.
+void Controller::updateProfilesLovs(const QVariantMap &r)
+{
+    for (QVariantMap::const_iterator iter = r.begin(); iter != r.end(); ++iter)
+    {
+        QString lovname = "profiles-" + iter.key();
+        if (!mControllerLovs.contains(lovname))
+        {
+            OST::LovString* ls = new OST::LovString(lovname);
+            createControllerLov(lovname, ls);
+        }
+        OST::LovString* ls = static_cast<OST::LovString*>(mControllerLovs[lovname]);
+        ls->lovClear();
+        for (const QVariant &name : iter.value().toList())
+        {
+            ls->lovAdd(name.toString(), name.toString());
+        }
+    }
+}
+
 void Controller::onControllerLovChanged()
 {
     OST::LovBase* lov = qobject_cast<OST::LovBase*>(sender());
@@ -451,6 +486,7 @@ void Controller::onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase*
         QVariantMap r;
         dbmanager->getDbProfiles(r);
         updateControllerData("profiles", r);
+        updateProfilesLovs(r);
     }
 
     /* dispatch event to other modules */
@@ -576,10 +612,16 @@ void Controller::onExternalEvent(OST::ExtEvent event)
             {
                 if (m->getModuleName() == n)
                 {
-                    // This is redundant with global data, these lovs can (must? => yes) be managed at frontend level
-                    //QString lovname = "loadedModules-" + m->getClassName().toLower();
-                    //OST::LovString* ls = static_cast<OST::LovString*>(getControllerLovs()[lovname]);
-                    //ls->lovDel(n);
+                    QString modtemplate = m->getMetadata("template")->toString().toLower();
+                    if (!modtemplate.isEmpty())
+                    {
+                        QString lovname = "loadedModules-" + modtemplate;
+                        if (mControllerLovs.contains(lovname))
+                        {
+                            OST::LovString* ls = static_cast<OST::LovString*>(mControllerLovs[lovname]);
+                            if (ls->contains(n)) ls->lovDel(n);
+                        }
+                    }
                     m->killMe();
                 };
             }
