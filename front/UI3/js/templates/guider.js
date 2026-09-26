@@ -20,11 +20,9 @@
 // `image`, defined generically by IndiModule::defineMeAsImager() (see
 // libs/indimodule.cpp) for any imaging module, guider included.
 
-import { renderProperty, renderProfileBar } from "../render.js";
+import { renderProperty } from "../render.js";
 import { el } from "../dom.js";
 import * as Panels from "../panels.js";
-
-const CONFIG_PROPS = ["calParams", "guideParams", "revCorrections", "disCorrections", "backlash"];
 
 export function mount(client, moduleName) {
   Panels.setScope(moduleName);
@@ -41,7 +39,8 @@ export function mount(client, moduleName) {
 
     const header = Panels.make({ id: "header", title: mod.infos.modulelabel || mod.infos.label || moduleName, x: 20, y: 60, w: 320 });
     header.appendChild(el("div", { class: "muted small", text: mod.infos.description || "" }));
-    header.appendChild(renderProfileBar(client, moduleName, mod));
+    // Profile load/save lives in the dedicated "Parameters" box below
+    // (buildParamsPanel, shared with the generic renderer) — not here.
 
     if (has("actions")) {
       const b = Panels.make({ id: "actions", title: mod.properties.actions.label || "Commands", x: 20, y: 210, w: 300 });
@@ -64,15 +63,17 @@ export function mount(client, moduleName) {
       const b = Panels.make({ id: "drift", title: mod.properties.drift.label || "Drift", x: 990, y: 60, w: 340 });
       b.appendChild(track(renderProperty(client, moduleName, "drift")));
     }
-    const configNames = CONFIG_PROPS.filter(has);
-    if (configNames.length) {
-      const b = Panels.make({ id: "config", title: "Parameters", x: 990, y: 380, w: 340 });
-      for (const name of configNames) b.appendChild(track(renderProperty(client, moduleName, name)));
-    }
+    // The profile-centric "Parameters" box (buildParamsPanel, render.js) is
+    // not built here — it opens on demand from the gear button (app.js),
+    // same as the generic renderer. Its properties (hasprofile:true, from
+    // the module's own metadata, not a hardcoded list) are still excluded
+    // below so they don't also land in the "Other" catch-all.
+
     // Anything this template doesn't know about explicitly (a future
     // property this module gains) still needs to be reachable — fold it
     // into one catch-all panel rather than silently dropping it.
-    const known = new Set(["actions", "values", "calibrationvalues", "image", "guiding", "drift", ...CONFIG_PROPS]);
+    const hasprofileNames = Object.keys(mod.properties).filter((n) => mod.properties[n].hasprofile === true);
+    const known = new Set(["actions", "values", "calibrationvalues", "image", "guiding", "drift", ...hasprofileNames]);
     const rest = Object.keys(mod.properties).filter((n) => !known.has(n));
     if (rest.length) {
       const b = Panels.make({ id: "other", title: "Other", x: 20, y: 620, w: 300 });

@@ -166,6 +166,12 @@ input[type="range"]::-moz-range-thumb {
 .dialog { background: var(--bg-panel-solid); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4) var(--space-5); min-width: 340px; max-width: 90vw; max-height: 85vh; overflow-y: auto; box-shadow: var(--shadow-pop); }
 .dialog h3 { margin-top: 0; text-transform: none; font-size: 15px; color: var(--text); letter-spacing: 0; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-4); }
+/* The Parameters modal (app.js's openParamsDialog) can hold a lot — several
+   tabs of properties — so it gets a roomier default width than a small
+   confirm/edit dialog, still capped by .dialog's own max-width:90vw. */
+.dialog.params-dialog { width: 680px; }
+.params-dialog .dialog-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-3); }
+.params-dialog .dialog-header h3 { margin: 0; }
 .form-table td { padding: 5px 6px; }
 
 /* ---------------------------------------------------------------- panel lists */

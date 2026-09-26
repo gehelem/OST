@@ -7,9 +7,9 @@
 // shared canvas instead of a single docked node — see renderContentNow().
 
 import { createClient, deriveDefaultUrls } from "../../core/index.js";
-import { renderModuleView, setMediaBaseUrl, setDialogRoot } from "./render.js";
+import { renderModuleView, buildParamsPanel, setMediaBaseUrl, setDialogRoot } from "./render.js";
 import { renderModbar, renderSystemViews, renderController, renderFiles, renderLogs, renderLogin } from "./views.js";
-import { el, icon } from "./dom.js";
+import { el, icon, iconButton } from "./dom.js";
 import * as Panels from "./panels.js";
 import { templates } from "./templates/index.js";
 
@@ -29,6 +29,8 @@ const grantPill = document.getElementById("grant-pill");
 const wsUrlInput = document.getElementById("ws-url");
 const mediaUrlInput = document.getElementById("media-url");
 const themeToggle = document.getElementById("theme-toggle");
+const paramsToggleEl = document.getElementById("params-toggle");
+const dialogRootEl = document.getElementById("dialog-root");
 
 // ---- connection widget: collapsed status pill, click (or connecting/
 // disconnected) to fold out the full settings — Gilles, 2026-09-25: "settings
@@ -88,6 +90,54 @@ themeToggle.addEventListener("click", () => {
   localStorage.setItem("ostcore-ui3.theme", cur);
 });
 
+// ---- parameters modal --------------------------------------------------
+// The profile-centric "Parameters" box (render.js's buildParamsPanel) is
+// not one of the module's floating panels — it opens on demand as a
+// focused modal instead, per Gilles, 2026-09-26: "cette boite ... ne doit
+// pas etre affichee par defaut ... quand on affiche la boite, elle doit
+// venir au dessus du reste, elle prend le focus ... et prendre autant de
+// place que necessaire". .dialog-overlay (components.css) already sits
+// above every floating panel/chip (z-index:50 vs. their 20-30) and closes
+// on a backdrop click, same as the grid create/edit dialogs render.js
+// already uses — reused here rather than inventing a second modal pattern.
+
+function isModuleView() {
+  return activeView && activeView !== "__controller" && activeView !== "__files" && activeView !== "__logs";
+}
+
+function updateParamsToggle() {
+  const mod = isModuleView() && client.get(client.topics.module(activeView));
+  const hasParams = !!(mod && Object.values(mod.properties).some((p) => p.hasprofile === true));
+  paramsToggleEl.disabled = !hasParams;
+  paramsToggleEl.title = hasParams ? "Parameters" : "Parameters (this module has none)";
+}
+
+function openParamsDialog() {
+  const moduleName = activeView;
+  const mod = isModuleView() && client.get(client.topics.module(moduleName));
+  if (!mod) return;
+
+  let disposers = [];
+  const track = (node) => { disposers.push(node._dispose); return node; };
+
+  const overlay = el("div", { class: "dialog-overlay" });
+  const dialog = el("div", { class: "dialog params-dialog" });
+  const close = () => { while (disposers.length) disposers.pop()(); overlay.remove(); };
+  dialog.appendChild(el("div", { class: "dialog-header" }, [
+    el("h3", { text: "Parameters — " + (mod.infos.modulelabel || mod.infos.label || moduleName) }),
+    iconButton("close", "Close", close),
+  ]));
+  const body = el("div");
+  dialog.appendChild(body);
+  buildParamsPanel(client, moduleName, mod, track, body);
+
+  overlay.appendChild(dialog);
+  overlay.addEventListener("click", (ev) => { if (ev.target === overlay) close(); });
+  dialogRootEl.appendChild(overlay);
+}
+
+paramsToggleEl.addEventListener("click", () => { if (!paramsToggleEl.disabled) openParamsDialog(); });
+
 // ---- connection controls --------------------------------------------------
 
 document.getElementById("connect-btn").addEventListener("click", () => {
@@ -131,9 +181,10 @@ function renderContentNow() {
   Panels.clear();
   dockedViewEl.innerHTML = "";
 
-  const isModule = activeView && activeView !== "__controller" && activeView !== "__files" && activeView !== "__logs";
+  const isModule = isModuleView();
   panelLayerEl.classList.toggle("hidden", !isModule);
   dockedViewEl.classList.toggle("hidden", isModule);
+  updateParamsToggle();
 
   if (!activeView) { dockedViewEl.appendChild(renderConnectScreen()); return; }
   if (isModule) {

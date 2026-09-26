@@ -442,13 +442,80 @@ function autoPos(index) {
 }
 
 /**
+ * The dedicated "Parameters" box — ostnoctua's OstWidgets.params(), see
+ * widgets.js: content-only (profile load/save toolbar + the module's
+ * `hasprofile:true` properties, grouped into tabs by level1), appended
+ * into whatever `container` the caller provides. Not shown by default and
+ * not one of the draggable floating panels — Gilles, 2026-09-26: it opens
+ * on demand from a dedicated gear button (app.js's openParamsDialog) as a
+ * focused modal, "au dessus du reste ... prend autant de place que
+ * necessaire", not left sitting open alongside everything else.
+ *
+ * Those properties still also appear in their normal General/level1 panel
+ * (ostnoctua's own default.js duplicates them the same way — that flat
+ * panel is a complete read/write overview, this box is the profile-centric
+ * editing surface). When nothing has a level1 (the common case — e.g.
+ * guider's own hasprofile properties all have level1:"") there's nothing
+ * to tab between, so no tab bar is shown, matching ostnoctua's own
+ * `tabsEl.style.display = groups.length > 1 ? '' : 'none'`.
+ *
+ * Returns true if it rendered anything (the module has at least one
+ * `hasprofile:true` property), false otherwise — the caller decides what
+ * "nothing to show" means for its own UI (app.js disables the gear
+ * button; nothing else currently calls this without checking first).
+ */
+export function buildParamsPanel(client, moduleName, mod, track, container) {
+  const names = Object.keys(mod.properties).filter((n) => mod.properties[n].hasprofile === true);
+  if (!names.length) return false;
+  const props = Object.fromEntries(names.map((n) => [n, mod.properties[n]]));
+  const { noLevel1, tabs } = buildLayout(props);
+  const allTabs = noLevel1.length ? [{ name: "", direct: noLevel1, groups: [] }, ...tabs] : tabs;
+
+  container.appendChild(renderProfileBar(client, moduleName, mod));
+
+  function fillGroup(target, tab) {
+    for (const { name } of tab.direct) target.appendChild(track(renderProperty(client, moduleName, name)));
+    for (const grp of tab.groups) {
+      const details = el("details", { class: "prop-group", open: true }, [el("summary", { text: grp.name })]);
+      for (const { name } of grp.items) details.appendChild(track(renderProperty(client, moduleName, name)));
+      target.appendChild(details);
+    }
+  }
+
+  if (allTabs.length <= 1) {
+    if (allTabs[0]) fillGroup(container, allTabs[0]);
+    return true;
+  }
+  const tabBar = el("div", { class: "tab-bar" });
+  const tabPanels = el("div", { class: "tab-panels" });
+  allTabs.forEach((tab, i) => {
+    const btn = el("button", { class: "tab-btn" + (i === 0 ? " active" : ""), text: tab.name || "General" });
+    const panel = el("div", { class: "tab-panel" + (i === 0 ? "" : " hidden") });
+    fillGroup(panel, tab);
+    btn.addEventListener("click", () => {
+      tabBar.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+      tabPanels.querySelectorAll(".tab-panel").forEach((p) => p.classList.add("hidden"));
+      btn.classList.add("active");
+      panel.classList.remove("hidden");
+    });
+    tabBar.appendChild(btn);
+    tabPanels.appendChild(panel);
+  });
+  container.appendChild(tabBar);
+  container.appendChild(tabPanels);
+  return true;
+}
+
+/**
  * Renders a module as a set of floating panels (js/panels.js): one "header"
- * panel (icon/label/description/profile bar), one "actions" panel when the
- * module has a bool-only `actions` property, one panel per level1 group
- * (level2 sub-groups as <details>), and one "General" panel for properties
- * with no level1. Each panel is independently draggable/resizable/
- * minimizable and remembers its own layout per module (Gilles, 2026-09-25:
- * "des fenêtres volantes déplaçables, regroupées par level1").
+ * panel (icon/label/description), one "actions" panel when the module has a
+ * bool-only `actions` property, one panel per level1 group (level2
+ * sub-groups as <details>), and a "General" panel for properties with no
+ * level1. The profile-centric "Parameters" box (buildParamsPanel above) is
+ * NOT one of these — it opens on demand as a modal instead, see app.js.
+ * Each panel is independently draggable/resizable/minimizable and
+ * remembers its own layout per module (Gilles, 2026-09-25: "des fenêtres
+ * volantes déplaçables, regroupées par level1").
  *
  * Subscribes to `client.topics.module(name)` for the module-level layout
  * (property set + profile — this topic does NOT fire on ordinary ea/ee/ps
@@ -472,14 +539,16 @@ export function renderModuleView(client, moduleName) {
     disposeProperties();
     Panels.clear();
 
-    const header = Panels.make({ id: "header", title: mod.infos.modulelabel || mod.infos.label || moduleName, x: 20, y: 60, w: 400 });
+    const header = Panels.make({ id: "header", title: mod.infos.modulelabel || mod.infos.label || moduleName, x: 20, y: 60, w: 320 });
     header.appendChild(el("div", { class: "muted small", text: mod.infos.description || "" }));
-    header.appendChild(renderProfileBar(client, moduleName, mod));
+    // Profile load/save moved out to its own dedicated "Parameters" panel
+    // below — see buildParamsPanel() — not duplicated here (Gilles,
+    // 2026-09-26: pointing out ostnoctua's dedicated OstWidgets.params box).
 
     const properties = mod.properties;
     const hasActions = properties.actions && Object.values(properties.actions.elements || {}).some((e) => e.type === "bool");
     if (hasActions) {
-      const abody = Panels.make({ id: "actions", title: properties.actions.label || "Actions", x: 440, y: 60, w: 300 });
+      const abody = Panels.make({ id: "actions", title: properties.actions.label || "Actions", x: 360, y: 60, w: 280 });
       abody.appendChild(track(renderProperty(client, moduleName, "actions")));
     }
     const layoutProps = hasActions ? Object.fromEntries(Object.entries(properties).filter(([n]) => n !== "actions")) : properties;
@@ -501,6 +570,8 @@ export function renderModuleView(client, moduleName) {
         tbody.appendChild(details);
       }
     }
+    // Parameters box: not built here — see buildParamsPanel's doc, it
+    // opens on demand from the gear button (app.js) instead.
   }
 
   const unsubModule = client.subscribe(client.topics.module(moduleName), (mod) => {

@@ -68,6 +68,8 @@
 }
 .icon-chip:hover { color: var(--accent); border-color: var(--accent-dim); }
 .icon-chip .material-icons { font-size: 19px; }
+.icon-chip:disabled { color: var(--text-dim); cursor: not-allowed; opacity: 0.5; }
+.icon-chip.active { color: var(--accent); border-color: var(--accent); box-shadow: var(--shadow-glow); }
 
 /* ------------------------------------------------------- connection widget
  * Collapsed to a small status pill once connected; click anywhere on it to
