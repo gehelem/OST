@@ -149,7 +149,7 @@
             "focusmodule": {
                 "type": "string",
                 "label": "Focus module instance",
-                "listOfValues":"loadedModules-focus",
+                "listOfValues":"family-focus",
                 "listOfValuesIsExternal":true,
                 "autoupdate": true,
                 "directedit": true,

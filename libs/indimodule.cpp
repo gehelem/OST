@@ -998,6 +998,13 @@ bool IndiModule::refreshDeviceslovs()
 }
 bool IndiModule::defineMeAsFocuser()
 {
+    // "focus" family: only one focuser type exists today, but Sequencer's
+    // slaves.focusmodule (and Monitor's e.focus) already target
+    // "family-focus" rather than "loadedModules-focus" - see sequencer.json/
+    // monitor.json - so any future alternative focuser is pickable the
+    // same way "blindpec" already is for "guiding", with no client-side
+    // change needed.
+    declareFamily("focus");
     giveMeAParms();
     giveMeAState();
     defineMeAsImager();
