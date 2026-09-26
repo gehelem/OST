@@ -86,7 +86,20 @@ QJsonValue ModuleJsonDumper(EvType evt, QVariant data, ElementBase *elt, Propert
     }
     if (evt == EvType::aa)
     {
-        result["infos"] = QJsonObject::fromVariantMap(mod->getAllMetadata());;
+        // library/classname/families computed here, not read from
+        // mMetadata: they can't be set from Basemodule's own constructor
+        // (metaObject()-based virtual dispatch there only ever resolves to
+        // "Basemodule" itself, not the real derived class - found live,
+        // 2026-09-26, every module's infos.classname said "Basemodule").
+        // mod is always fully constructed by the time a dump is built, so
+        // getClassName()/getFamilies() are safe here. Mirrors
+        // Basemodule::getModuleInfo()'s equivalent merge for
+        // controllerdata.libraries - keep both in sync if this changes.
+        QVariantMap info = mod->getAllMetadata();
+        info["library"] = mod->getClassName().toLower();
+        info["classname"] = mod->getClassName();
+        info["families"] = QVariant(mod->getFamilies());
+        result["infos"] = QJsonObject::fromVariantMap(info);
     }
     return result;
 }
