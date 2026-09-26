@@ -51,7 +51,10 @@ Son identifiant est son nom interne (sans espaces).
 |---|---|---|
 | `infos.modulelabel` | string | Nom affiché du module |
 | `infos.description` | string | Description du module |
-| `infos.template` | string | Type de module (ex. `"focus"`, `"guider"`) — peut être absent |
+| `infos.template` | string | Indication d'affichage pour le frontend (quel rendu utiliser), ex. `"focus"`, `"guider"` — purement cosmétique, peut être absent |
+| `infos.library` | string | Le type du module, en minuscules (la bibliothèque depuis laquelle il a été chargé, ex. `"focus"`) |
+| `infos.classname` | string | Le type du module, casse exacte (ex. `"Focus"`) |
+| `infos.families` | tableau de string | Capacités déclarées par cette instance de module (ex. `["guiding"]`) — zéro, une, ou plusieurs |
 | `properties` | object | Map nom de propriété → objet propriété |
 | `globallovs` | object | Map clé LOV → objet LOV (listes de valeurs au niveau module) |
 | `profile.name` | string | Nom du profil actif |
@@ -59,6 +62,15 @@ Son identifiant est son nom interne (sans espaces).
 
 {{% notice style="info" title="Format wire" %}}
 Dans le format JSON sur le réseau, `properties` est abrégé en `p`, `globallovs` en `l`, et `profile` en `f`. Les clients doivent gérer ces clés abrégées.
+{{% /notice %}}
+
+{{% notice style="warning" title="type, template et famille : 3 notions différentes" %}}
+Il est tentant de considérer `infos.template` comme l'identité du module — ne le faites pas. Ce sont 3 notions indépendantes :
+- **le type** (`infos.library`/`infos.classname`) est la véritable identité du module — la bibliothèque depuis laquelle il a été chargé. Deux instances du même type (ex. deux modules Focus) partagent toujours le même type.
+- **le template** (`infos.template`) n'est qu'une indication d'affichage pour le frontend, purement cosmétique et entièrement optionnelle. Deux types différents peuvent partager le même template générique (ex. tout ce qui est rendu avec `"default"`).
+- **la famille** (`infos.families`) est une capacité qu'un module déclare sur lui-même, indépendante à la fois du type et du template. Un module peut déclarer zéro, une, ou plusieurs familles — cela existe pour permettre à un client de cibler « n'importe quel module capable de guider », disons, sans se soucier de savoir si le type réel est `Guider` ou une implémentation différente de la même capacité.
+
+`loadedModules-<type>` et `loadedFamilies-<famille>` (plus bas) s'indexent sur `infos.library`/`infos.families` en minuscules ; `profiles-<Type>` s'indexe quant à lui sur `infos.classname` en casse exacte. Utilisez directement le champ correspondant — ne dérivez jamais l'un de l'autre en transformant la casse côté client.
 {{% /notice %}}
 
 {{% notice style="note" title="Champs internes" %}}
@@ -387,13 +399,14 @@ Le LOV lui-même est défini au niveau module (`globallovs`) ou contrôleur (`lo
 }
 ```
 
-**LOV intégrés du contrôleur** (toujours disponibles) :
+**LOV intégrés du contrôleur** :
 
-| Clé | Contenu |
-|---|---|
-| `loadedModules` | Tous les modules chargés : `{nomModule: libellé}` |
-| `loadedModules-<template>` | Modules filtrés par type (ex. `loadedModules-focus`) |
-| `profiles-<template>` | Profils disponibles pour un type de module |
+| Clé | Contenu | Disponible |
+|---|---|---|
+| `loadedModules` | Tous les modules chargés : `{nomModule: libellé}` | Toujours |
+| `loadedModules-<type>` | Modules d'un type donné, correspondant à `infos.library` (ex. `loadedModules-focus`) | Une fois qu'un module de ce type est chargé |
+| `loadedFamilies-<famille>` | Modules déclarant une famille donnée, correspondant à `infos.families` (ex. `loadedFamilies-guiding` liste tous les modules chargés capables de guider, quel que soit leur type réel) | Une fois qu'un module déclarant cette famille est chargé |
+| `profiles-<Type>` | Profils disponibles pour un type de module, correspondant exactement à `infos.classname` — attention à la casse, ex. `profiles-Focus` | Une fois qu'un profil de ce type a été sauvegardé |
 
 ---
 

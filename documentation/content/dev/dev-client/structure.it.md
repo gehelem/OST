@@ -51,7 +51,10 @@ Il suo identificatore è il suo nome interno (senza spazi).
 |---|---|---|
 | `infos.modulelabel` | string | Nome visualizzato del modulo |
 | `infos.description` | string | Descrizione del modulo |
-| `infos.template` | string | Tipo di modulo (es. `"focus"`, `"guider"`) — può essere assente |
+| `infos.template` | string | Suggerimento di visualizzazione per il frontend (quale rendering usare), es. `"focus"`, `"guider"` — puramente estetico, può essere assente |
+| `infos.library` | string | Il tipo del modulo, minuscolo (la libreria da cui è stato caricato, es. `"focus"`) |
+| `infos.classname` | string | Il tipo del modulo, con maiuscole/minuscole esatte (es. `"Focus"`) |
+| `infos.families` | array di string | Capacità dichiarate da questa istanza di modulo (es. `["guiding"]`) — zero, una o più |
 | `properties` | object | Mappa nome proprietà → oggetto proprietà |
 | `globallovs` | object | Mappa chiave LOV → oggetto LOV (liste di valori a livello modulo) |
 | `profile.name` | string | Nome del profilo attivo |
@@ -59,6 +62,15 @@ Il suo identificatore è il suo nome interno (senza spazi).
 
 {{% notice style="info" title="Formato wire" %}}
 Nel formato JSON di rete, `properties` è abbreviato in `p`, `globallovs` in `l`, e `profile` in `f`. I client devono gestire queste chiavi abbreviate.
+{{% /notice %}}
+
+{{% notice style="warning" title="Tipo, template e famiglia sono 3 cose diverse" %}}
+È allettante trattare `infos.template` come l'identità del modulo — non farlo. Sono 3 nozioni indipendenti:
+- il **tipo** (`infos.library`/`infos.classname`) è la vera identità del modulo — la libreria da cui è stato caricato. Due istanze dello stesso tipo (es. due moduli Focus) condividono sempre lo stesso tipo.
+- il **template** (`infos.template`) è solo un suggerimento di visualizzazione per il frontend, puramente estetico e del tutto opzionale. Due tipi diversi possono condividere lo stesso template generico (es. tutto ciò che viene renderizzato con `"default"`).
+- la **famiglia** (`infos.families`) è una capacità che un modulo dichiara su se stesso, indipendente sia dal tipo che dal template. Un modulo può dichiarare zero, una o più famiglie — esiste per permettere a un client di puntare a "qualsiasi modulo in grado di guidare", ad esempio, senza doversi preoccupare che il tipo effettivo sia `Guider` o un'implementazione diversa della stessa capacità.
+
+`loadedModules-<type>` e `loadedFamilies-<family>` (più sotto) fanno riferimento a `infos.library`/`infos.families` in minuscolo; `profiles-<Type>` fa invece riferimento a `infos.classname` con maiuscole/minuscole esatte. Usare direttamente il campo corrispondente — mai derivarne uno dall'altro trasformando le maiuscole/minuscole lato client.
 {{% /notice %}}
 
 {{% notice style="note" title="Campi interni" %}}
@@ -384,13 +396,14 @@ Il LOV stesso è definito a livello modulo (`globallovs`) o controller (`lovs`):
 }
 ```
 
-**LOV integrati del controller** (sempre disponibili):
+**LOV integrati del controller**:
 
-| Chiave | Contenuto |
-|---|---|
-| `loadedModules` | Tutti i moduli caricati: `{nomeModulo: etichetta}` |
-| `loadedModules-<template>` | Moduli filtrati per tipo (es. `loadedModules-focus`) |
-| `profiles-<template>` | Profili disponibili per un tipo di modulo |
+| Chiave | Contenuto | Disponibilità |
+|---|---|---|
+| `loadedModules` | Tutti i moduli caricati: `{nomeModulo: etichetta}` | Sempre |
+| `loadedModules-<type>` | Moduli di un dato tipo, corrispondente a `infos.library` (es. `loadedModules-focus`) | Una volta caricato un modulo di quel tipo |
+| `loadedFamilies-<family>` | Moduli che dichiarano una data famiglia, corrispondente a `infos.families` (es. `loadedFamilies-guiding` elenca ogni modulo caricato in grado di guidare, qualunque sia il suo tipo effettivo) | Una volta caricato un modulo che dichiara quella famiglia |
+| `profiles-<Type>` | Profili disponibili per un tipo di modulo, corrispondente esattamente a `infos.classname` — da notare l'uso delle maiuscole, es. `profiles-Focus` | Una volta salvato un profilo di quel tipo |
 
 ---
 

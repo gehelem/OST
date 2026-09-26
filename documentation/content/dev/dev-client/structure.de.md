@@ -51,7 +51,10 @@ Seine Kennung ist sein interner Name (ohne Leerzeichen).
 |---|---|---|
 | `infos.modulelabel` | string | Angezeigter Name des Moduls |
 | `infos.description` | string | Beschreibung des Moduls |
-| `infos.template` | string | Modultyp (z. B. `"focus"`, `"guider"`) — kann fehlen |
+| `infos.template` | string | Anzeige-Hinweis für das Frontend (welche Darstellung verwendet werden soll), z. B. `"focus"`, `"guider"` — rein kosmetisch, kann fehlen |
+| `infos.library` | string | Typ des Moduls, kleingeschrieben (die Bibliothek, aus der es geladen wurde, z. B. `"focus"`) |
+| `infos.classname` | string | Typ des Moduls, exakte Schreibweise (z. B. `"Focus"`) |
+| `infos.families` | Array von string | Fähigkeiten, die diese Modulinstanz deklariert (z. B. `["guiding"]`) — keine, eine oder mehrere |
 | `properties` | object | Map von Property-Name → Property-Objekt |
 | `globallovs` | object | Map von LOV-Schlüssel → LOV-Objekt (Wertelisten auf Modulebene) |
 | `profile.name` | string | Name des aktiven Profils |
@@ -59,6 +62,15 @@ Seine Kennung ist sein interner Name (ohne Leerzeichen).
 
 {{% notice style="info" title="Wire-Format" %}}
 Im JSON-Format über das Netzwerk wird `properties` zu `p`, `globallovs` zu `l` und `profile` zu `f` abgekürzt. Clients müssen diese abgekürzten Schlüssel verarbeiten können.
+{{% /notice %}}
+
+{{% notice style="warning" title="Typ, Template und Familie sind drei verschiedene Dinge" %}}
+Es ist verlockend, `infos.template` als Identität des Moduls zu behandeln — nicht tun. Es handelt sich um drei unabhängige Konzepte:
+- **Typ** (`infos.library`/`infos.classname`) ist die eigentliche Identität des Moduls — die Bibliothek, aus der es geladen wurde. Zwei Instanzen desselben Typs (z. B. zwei Focus-Module) haben immer denselben Typ.
+- **Template** (`infos.template`) ist nur ein Anzeige-Hinweis für das Frontend, rein kosmetisch und völlig optional. Zwei unterschiedliche Typen können sich dasselbe generische Template teilen (z. B. alles, was mit `"default"` gerendert wird).
+- **Familie** (`infos.families`) ist eine Fähigkeit, die ein Modul über sich selbst deklariert, unabhängig von Typ und Template. Ein Modul kann keine, eine oder mehrere Familien deklarieren — das existiert, damit ein Client "jedes Modul, das guiden kann" ansprechen kann, ohne sich darum zu kümmern, ob der tatsächliche Typ `Guider` ist oder eine andere Implementierung derselben Fähigkeit.
+
+`loadedModules-<type>` und `loadedFamilies-<family>` (weiter unten) verwenden das kleingeschriebene `infos.library`/`infos.families` als Schlüssel; `profiles-<Type>` dagegen das exakt geschriebene `infos.classname`. Immer das passende Feld direkt verwenden — niemals eines aus dem anderen durch clientseitige Groß-/Kleinschreibungs-Transformation ableiten.
 {{% /notice %}}
 
 {{% notice style="note" title="Interne Felder" %}}
@@ -384,13 +396,14 @@ Die LOV selbst wird auf Modulebene (`globallovs`) oder Controller-Ebene (`lovs`)
 }
 ```
 
-**Eingebaute Controller-LOVs** (immer verfügbar):
+**Eingebaute Controller-LOVs**:
 
-| Schlüssel | Inhalt |
-|---|---|
-| `loadedModules` | Alle geladenen Module: `{Modulname: Bezeichnung}` |
-| `loadedModules-<template>` | Module gefiltert nach Typ (z. B. `loadedModules-focus`) |
-| `profiles-<template>` | Verfügbare Profile für einen Modultyp |
+| Schlüssel | Inhalt | Verfügbar |
+|---|---|---|
+| `loadedModules` | Alle geladenen Module: `{Modulname: Bezeichnung}` | Immer |
+| `loadedModules-<type>` | Module eines bestimmten Typs, passend zu `infos.library` (z. B. `loadedModules-focus`) | Sobald ein Modul dieses Typs geladen ist |
+| `loadedFamilies-<family>` | Module, die eine bestimmte Familie deklarieren, passend zu `infos.families` (z. B. listet `loadedFamilies-guiding` jedes geladene Modul auf, das guiden kann, unabhängig von seinem tatsächlichen Typ) | Sobald ein Modul, das diese Familie deklariert, geladen ist |
+| `profiles-<Type>` | Verfügbare Profile für einen Modultyp, passend zu `infos.classname` exakt — Achtung auf die Großschreibung, z. B. `profiles-Focus` | Sobald ein Profil dieses Typs gespeichert wurde |
 
 ---
 

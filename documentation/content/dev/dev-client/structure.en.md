@@ -51,7 +51,10 @@ Its identifier is its internal name (no spaces).
 |---|---|---|
 | `infos.modulelabel` | string | Human-readable module label |
 | `infos.description` | string | Module description |
-| `infos.template` | string | Module template/type (e.g. `"focus"`, `"guider"`) — may be absent |
+| `infos.template` | string | Display hint for the frontend (which rendering to use), e.g. `"focus"`, `"guider"` — purely cosmetic, may be absent |
+| `infos.library` | string | The module's type, lowercase (the library it was loaded from, e.g. `"focus"`) |
+| `infos.classname` | string | The module's type, exact case (e.g. `"Focus"`) |
+| `infos.families` | array of string | Capabilities this module instance declares (e.g. `["guiding"]`) — zero, one, or several |
 | `properties` | object | Map of property name → property object |
 | `globallovs` | object | Map of LOV key → LOV object (module-level lists of values) |
 | `profile.name` | string | Currently active profile name |
@@ -59,6 +62,15 @@ Its identifier is its internal name (no spaces).
 
 {{% notice style="info" title="Wire format" %}}
 In the JSON wire format, `properties` is abbreviated as `p`, `globallovs` as `l`, and `profile` as `f`. Clients must handle these abbreviated keys.
+{{% /notice %}}
+
+{{% notice style="warning" title="type, template and family are 3 different things" %}}
+It's tempting to treat `infos.template` as the module's identity — don't. These are 3 independent notions:
+- **type** (`infos.library`/`infos.classname`) is the module's real identity — the library it was loaded from. Two instances of the same type (e.g. two Focus modules) always share the same type.
+- **template** (`infos.template`) is only a display hint for the frontend, purely cosmetic and entirely optional. Two different types can share the same generic template (e.g. anything rendered with `"default"`).
+- **family** (`infos.families`) is a capability a module declares about itself, independent of both type and template. A module can declare zero, one, or several families — it exists so a client can target "any module that can guide", say, without caring whether the actual type is `Guider` or a different implementation of the same capability.
+
+`loadedModules-<type>` and `loadedFamilies-<family>` (below) key off the lowercase `infos.library`/`infos.families`; `profiles-<Type>` keys off the exact-case `infos.classname` instead. Use the matching field directly — never derive one from the other by transforming case client-side.
 {{% /notice %}}
 
 {{% notice style="note" title="Internal fields" %}}
@@ -384,13 +396,14 @@ The LOV itself is defined at module level (`globallovs`) or controller level (`l
 }
 ```
 
-**Built-in controller LOVs** (always available):
+**Built-in controller LOVs**:
 
-| Key | Contents |
-|---|---|
-| `loadedModules` | All loaded modules: `{moduleName: label}` |
-| `loadedModules-<template>` | Modules filtered by template (e.g. `loadedModules-focus`) |
-| `profiles-<template>` | Available profiles for a module type |
+| Key | Contents | Available |
+|---|---|---|
+| `loadedModules` | All loaded modules: `{moduleName: label}` | Always |
+| `loadedModules-<type>` | Modules of a given type, matching `infos.library` (e.g. `loadedModules-focus`) | Once a module of that type is loaded |
+| `loadedFamilies-<family>` | Modules declaring a given family, matching `infos.families` (e.g. `loadedFamilies-guiding` lists every loaded module that can guide, whatever its actual type) | Once a module declaring that family is loaded |
+| `profiles-<Type>` | Available profiles for a module type, matching `infos.classname` exactly — note the capitalization, e.g. `profiles-Focus` | Once a profile of that type has been saved |
 
 ---
 
