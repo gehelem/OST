@@ -128,6 +128,11 @@ input[type="range"]::-moz-range-thumb {
 .prop-label { font-weight: 600; }
 .icon-slots { display: inline-flex; gap: 2px; }
 
+/* Chart.js canvases (templates/guider.js's own drift/guiding charts —
+   panels.css's .panel-float-body already scrolls/pads the rest). */
+.gd-chart { position: relative; width: 100%; height: 280px; }
+.gd-chart-square { height: auto; }
+
 .elt-table { width: 100%; border-collapse: collapse; }
 .elt-row td { padding: 6px 4px; vertical-align: middle; border-top: 1px solid var(--border-subtle); }
 .elt-row:first-child td { border-top: none; }

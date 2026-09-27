@@ -8,6 +8,12 @@
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/components.css">
 <link rel="stylesheet" href="css/panels.css">
+<!-- Vendored (no CDN), like ostnoctua's own lib/chart.min.js — only the
+     guider template's dedicated drift/guiding charts use it (Gilles,
+     2026-09-27: "tu as deja fait strictement la meme chose dans
+     ostnoctua"); the generic renderer's own graph properties keep the
+     dependency-free canvas renderer in js/chart.js. -->
+<script src="lib/chart.min.js"></script>
 </head>
 <body>
   <!-- One flat container: #canvas fills it edge to edge, #modbar, #quicknav
