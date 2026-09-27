@@ -159,3 +159,31 @@ export function make(opts) {
   if (!opts.persistent) live.push(panel);
   return body;
 }
+
+/**
+ * Tidies up the current scope's panels: all collapsed, sorted
+ * alphabetically by title, stacked in one left-hand column below the
+ * module bar — Gilles, 2026-09-27. Also clears any per-panel resize
+ * (a collapsed panel showing a leftover wide/tall size from before looks
+ * inconsistent in a tidy stack). Persists the same way drag/resize/
+ * minimize already do, so the tidy layout survives a reload too.
+ */
+export function reorganizeStacked() {
+  const startX = 12, startY = 70, stepY = 38;
+  const sorted = [...live].sort((a, b) => {
+    const ta = a.querySelector(".panel-float-title")?.textContent || "";
+    const tb = b.querySelector(".panel-float-title")?.textContent || "";
+    return ta.localeCompare(tb, undefined, { sensitivity: "base" });
+  });
+  sorted.forEach((panel, i) => {
+    const id = panel.dataset.panel;
+    const y = startY + i * stepY;
+    panel.classList.add("collapsed");
+    panel.classList.remove("resized");
+    panel.style.left = startX + "px";
+    panel.style.top = y + "px";
+    panel.style.width = "";
+    panel.style.height = "";
+    saveState(scope, id, { x: startX, y, collapsed: true });
+  });
+}

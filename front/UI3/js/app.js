@@ -30,6 +30,7 @@ const wsUrlInput = document.getElementById("ws-url");
 const mediaUrlInput = document.getElementById("media-url");
 const themeToggle = document.getElementById("theme-toggle");
 const paramsToggleEl = document.getElementById("params-toggle");
+const reorganizeToggleEl = document.getElementById("reorganize-toggle");
 const dialogRootEl = document.getElementById("dialog-root");
 
 // ---- connection widget: collapsed status pill, click (or connecting/
@@ -117,6 +118,13 @@ function updateParamsToggle() {
   paramsToggleEl.classList.toggle("has-changes", !!(mod && mod.profile && mod.profile.changed));
 }
 
+// Only meaningful once a module (with its own floating panels) is active —
+// Controller/Files/Logs/the connect screen don't have any.
+function updateReorganizeToggle() {
+  reorganizeToggleEl.disabled = !isModuleView();
+}
+reorganizeToggleEl.addEventListener("click", () => { if (!reorganizeToggleEl.disabled) Panels.reorganizeStacked(); });
+
 function openParamsDialog() {
   const moduleName = activeView;
   const mod = isModuleView() && client.get(client.topics.module(moduleName));
@@ -190,6 +198,7 @@ function renderContentNow() {
   panelLayerEl.classList.toggle("hidden", !isModule);
   dockedViewEl.classList.toggle("hidden", isModule);
   updateParamsToggle();
+  updateReorganizeToggle();
 
   if (!activeView) { dockedViewEl.appendChild(renderConnectScreen()); return; }
   if (isModule) {
