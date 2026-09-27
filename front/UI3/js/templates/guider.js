@@ -37,7 +37,7 @@ export function mount(client, moduleName) {
     Panels.clear();
     const has = (name) => name in mod.properties;
 
-    const header = Panels.make({ id: "header", title: mod.infos.modulelabel || mod.infos.label || moduleName, x: 20, y: 60, w: 320 });
+    const header = Panels.make({ id: "header", title: mod.infos.modulelabel || mod.infos.label || moduleName, x: 20, y: 92, w: 320 });
     header.appendChild(el("div", { class: "muted small", text: mod.infos.description || "" }));
     // Profile load/save lives in the dedicated "Parameters" box below
     // (buildParamsPanel, shared with the generic renderer) — not here.
@@ -52,7 +52,7 @@ export function mount(client, moduleName) {
       if (has("calibrationvalues")) b.appendChild(track(renderProperty(client, moduleName, "calibrationvalues")));
     }
     if (has("image")) {
-      const b = Panels.make({ id: "image", title: mod.properties.image.label || "Guide frame", x: 350, y: 60, w: 380 });
+      const b = Panels.make({ id: "image", title: mod.properties.image.label || "Guide frame", x: 350, y: 92, w: 380 });
       b.appendChild(track(renderProperty(client, moduleName, "image")));
     }
     if (has("guiding")) {
@@ -60,7 +60,7 @@ export function mount(client, moduleName) {
       b.appendChild(track(renderProperty(client, moduleName, "guiding")));
     }
     if (has("drift")) {
-      const b = Panels.make({ id: "drift", title: mod.properties.drift.label || "Drift", x: 990, y: 60, w: 340 });
+      const b = Panels.make({ id: "drift", title: mod.properties.drift.label || "Drift", x: 990, y: 92, w: 340 });
       b.appendChild(track(renderProperty(client, moduleName, "drift")));
     }
     // The profile-centric "Parameters" box (buildParamsPanel, render.js) is
@@ -85,7 +85,7 @@ export function mount(client, moduleName) {
     if (!mod) {
       dispose();
       Panels.clear();
-      const b = Panels.make({ id: "missing", title: moduleName, x: 20, y: 60, w: 320 });
+      const b = Panels.make({ id: "missing", title: moduleName, x: 20, y: 92, w: 320 });
       b.appendChild(el("div", { class: "muted", text: "Module not found (unloaded?)" }));
       return;
     }

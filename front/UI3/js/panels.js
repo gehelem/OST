@@ -24,6 +24,20 @@ let layer = null;
 let scope = "";
 const live = [];
 
+// #modbar/#top-right float at top:12px, and #modbar's own tallest content
+// (.mod-btn, 54px) plus its 8px top+bottom padding makes it 70px tall, so
+// its bottom edge sits at 12+70=82px in viewport (== layer) coordinates.
+// A panel dragged with its title bar above this line ends up visually
+// AND pointer-wise behind that fixed, higher-z-index chrome (clicks in
+// that screen region hit the bar, not the panel) - "impossible de les
+// deplacer" once stuck there. Enforced here, once, in the panel engine
+// itself (drag clamp + make()'s own clamp, so an already-bad saved
+// position self-heals on next render) rather than by tuning a handful of
+// per-template default y values again, which is what led to this being a
+// recurring bug across several rounds (60, then 70, both still not quite
+// enough) - Gilles, 2026-09-27: "probleme qu'on a depuis le debut".
+const SAFE_TOP = 92;
+
 const keyFor = (sc, id) => "ostcore-ui3:layout:" + sc + ":" + id;
 function loadState(sc, id) {
   try { return JSON.parse(localStorage.getItem(keyFor(sc, id))) || {}; } catch (e) { return {}; }
@@ -54,7 +68,7 @@ function startDrag(panel, bar, id, ev, sc) {
   const move = (e) => {
     const m = 6;
     const x = Math.max(m, Math.min(e.clientX - lr.left - ox, lr.width - r.width - m));
-    const y = Math.max(m, Math.min(e.clientY - lr.top - oy, lr.height - 36));
+    const y = Math.max(SAFE_TOP, Math.min(e.clientY - lr.top - oy, lr.height - 36));
     panel.style.left = x + "px";
     panel.style.top = y + "px";
   };
@@ -110,7 +124,10 @@ export function make(opts) {
   panel.className = "panel-float";
   panel.dataset.panel = id;
   panel.style.left = (st.x != null ? st.x : (opts.x != null ? opts.x : 20)) + "px";
-  panel.style.top = (st.y != null ? st.y : (opts.y != null ? opts.y : 16)) + "px";
+  // Clamped even for an already-saved position: a layout saved from before
+  // SAFE_TOP existed (or from before it was raised) would otherwise stay
+  // stuck under the chrome forever - see this file's SAFE_TOP comment.
+  panel.style.top = Math.max(SAFE_TOP, st.y != null ? st.y : (opts.y != null ? opts.y : 16)) + "px";
   if (st.w != null || opts.w) panel.style.width = (st.w != null ? st.w : opts.w) + "px";
   if (st.h != null) { panel.style.height = st.h + "px"; panel.classList.add("resized"); }
   if (st.collapsed) panel.classList.add("collapsed");
@@ -169,7 +186,7 @@ export function make(opts) {
  * minimize already do, so the tidy layout survives a reload too.
  */
 export function reorganizeStacked() {
-  const startX = 12, startY = 70, stepY = 38;
+  const startX = 12, startY = SAFE_TOP, stepY = 38;
   const sorted = [...live].sort((a, b) => {
     const ta = a.querySelector(".panel-float-title")?.textContent || "";
     const tb = b.querySelector(".panel-float-title")?.textContent || "";

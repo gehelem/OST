@@ -539,7 +539,7 @@ export function renderModuleView(client, moduleName) {
     disposeProperties();
     Panels.clear();
 
-    const header = Panels.make({ id: "header", title: mod.infos.modulelabel || mod.infos.label || moduleName, x: 20, y: 60, w: 320 });
+    const header = Panels.make({ id: "header", title: mod.infos.modulelabel || mod.infos.label || moduleName, x: 20, y: 92, w: 320 });
     header.appendChild(el("div", { class: "muted small", text: mod.infos.description || "" }));
     // Profile load/save moved out to its own dedicated "Parameters" panel
     // below — see buildParamsPanel() — not duplicated here (Gilles,
@@ -548,7 +548,7 @@ export function renderModuleView(client, moduleName) {
     const properties = mod.properties;
     const hasActions = properties.actions && Object.values(properties.actions.elements || {}).some((e) => e.type === "bool");
     if (hasActions) {
-      const abody = Panels.make({ id: "actions", title: properties.actions.label || "Actions", x: 360, y: 60, w: 280 });
+      const abody = Panels.make({ id: "actions", title: properties.actions.label || "Actions", x: 360, y: 92, w: 280 });
       abody.appendChild(track(renderProperty(client, moduleName, "actions")));
     }
     const layoutProps = hasActions ? Object.fromEntries(Object.entries(properties).filter(([n]) => n !== "actions")) : properties;
@@ -578,7 +578,7 @@ export function renderModuleView(client, moduleName) {
     if (!mod) {
       disposeProperties();
       Panels.clear();
-      const body = Panels.make({ id: "missing", title: moduleName, x: 20, y: 60, w: 320 });
+      const body = Panels.make({ id: "missing", title: moduleName, x: 20, y: 92, w: 320 });
       body.appendChild(el("div", { class: "muted", text: "Module not found (unloaded?)" }));
       return;
     }
