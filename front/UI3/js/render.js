@@ -377,6 +377,26 @@ function renderPropertyBody(client, moduleName, propName, prop) {
   const table = el("table", { class: "elt-table" });
   for (const [name, e] of Object.entries(prop.elements)) {
     const tr = el("tr", { class: "elt-row" });
+    const permOk = (prop.permission === 1 || prop.permission === 2) && prop.enabled !== false;
+    const isGroupBtn = boolGroup.includes(name) && permOk;
+    const isDirectBtn = !isGroupBtn && permOk && e.type === "bool" && e.directedit;
+
+    if (isGroupBtn || isDirectBtn) {
+      // Self-descriptive button (icon + label already inside it, see
+      // boolButtonContent()) — no separate label cell alongside it, or the
+      // same icon/label shows up twice on the same row (Gilles, 2026-09-27,
+      // having seen exactly that: "tu as laisse les libelles des boutons
+      // !!! c'est ridicule"). sendGroupChoice() sends immediately via SA
+      // (the whole group); the directedit case sends immediately via SV
+      // (setValue) — the behavior Gilles asked to keep either way.
+      const td = el("td", { class: "elt-value", colspan: "2" });
+      const send = isGroupBtn ? () => sendGroupChoice(name) : () => client.setValue(moduleName, propName, name, !e.value);
+      td.appendChild(el("button", { class: "btn toggle-btn" + (e.value ? " active" : ""), onclick: send }, boolButtonContent(e, name)));
+      tr.appendChild(td);
+      table.appendChild(tr);
+      continue;
+    }
+
     const labelCell = el("td", { class: "elt-label" });
     if (e.preicon) labelCell.appendChild(iconSlotButtons(moduleName, propName, e, client, name));
     const labelSpan = el("span", { text: e.label || name, title: e.hint || "" });
@@ -388,25 +408,10 @@ function renderPropertyBody(client, moduleName, propName, prop) {
 
     if (DISPLAY_ONLY_TYPES.has(e.type)) {
       valueCell.appendChild(renderDisplayOnly(name, e));
-    } else if (boolGroup.includes(name) && (prop.permission === 1 || prop.permission === 2) && prop.enabled !== false) {
-      // Button, not a radio bullet (same "des boutons plutot que des puces"
-      // request) — sendGroupChoice() already sends immediately (SV via
-      // setAll), so the row-per-choice layout just swaps its control.
-      const btn = el("button", { class: "btn toggle-btn" + (e.value ? " active" : ""), onclick: () => sendGroupChoice(name) }, boolButtonContent(e, name));
-      valueCell.appendChild(btn);
-    } else if ((prop.permission === 1 || prop.permission === 2) && prop.enabled !== false) {
-      if (e.type === "bool" && e.directedit) {
-        // Already a button sending immediately on click (SV, via setValue) —
-        // the specific behavior Gilles asked to preserve: "bien veiller a
-        // permettre l'utilisation pour un directedit=true d'un 'se' si on
-        // clic dessus".
-        const btn = el("button", { class: "btn toggle-btn" + (e.value ? " active" : ""), onclick: () => client.setValue(moduleName, propName, name, !e.value) }, boolButtonContent(e, name));
-        valueCell.appendChild(btn);
-      } else {
-        const ctrl = buildEditControl(client, moduleName, e, name, buffer, {});
-        valueCell.appendChild(ctrl);
-        if (e.directedit) valueCell.appendChild(iconButton("send", "Send now (SV)", () => client.setValue(moduleName, propName, name, buffer[name])));
-      }
+    } else if (permOk) {
+      const ctrl = buildEditControl(client, moduleName, e, name, buffer, {});
+      valueCell.appendChild(ctrl);
+      if (e.directedit) valueCell.appendChild(iconButton("send", "Send now (SV)", () => client.setValue(moduleName, propName, name, buffer[name])));
     } else {
       valueCell.appendChild(el("span", { class: "readonly-val", text: formatScalar(e.type, e.value) }));
     }
