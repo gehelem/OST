@@ -270,41 +270,53 @@ function editableElementNames(prop) {
   return Object.keys(prop.elements).filter((n) => !DISPLAY_ONLY_TYPES.has(prop.elements[n].type));
 }
 
+// `showGrid` (default false — PropertyMulti's own default, see
+// propertymulti.h/propertyfactory.cpp) gates the raw table+toolbar below,
+// independent of the graph canvas: a graph property is always also a grid
+// property (hasGrid:true, structure.en.md), but typically ships
+// showGrid:false — e.g. guider.json's own drift/guiding properties — since
+// only the chart is meant to show by default, not an editable table of the
+// same data (Gilles, 2026-09-27: "pour une propriete avec grille tu ne
+// tiens pas compte de showgrid/showelts" — this was rendering both
+// unconditionally).
 function renderGridSection(client, moduleName, propName, prop) {
   const wrap = el("div", { class: "grid-section" });
-  const headers = prop.gridheaders || [];
-  const table = el("table", { class: "grid-table" });
-  const thead = el("tr");
-  for (const h of headers) {
-    const def = prop.elements[h];
-    thead.appendChild(el("th", { text: def ? def.label || h : h }));
-  }
-  thead.appendChild(el("th", { text: "" }));
-  table.appendChild(el("thead", null, [thead]));
-  const tbody = el("tbody");
-  (prop.rows || []).forEach((row, idx) => {
-    const tr = el("tr", { class: "grid-row" });
-    for (const h of headers) {
-      const def = prop.elements[h] || { type: "string" };
-      tr.appendChild(el("td", { text: formatScalar(def.type, row[h]) }));
-    }
-    const actions = el("td", { class: "grid-actions" });
-    actions.appendChild(iconButton("edit", "Edit row", () => openGridDialog(client, moduleName, propName, prop, idx, row)));
-    actions.appendChild(iconButton("arrow_upward", "Move up", () => client.gridMoveUp(moduleName, propName, idx)));
-    actions.appendChild(iconButton("arrow_downward", "Move down", () => client.gridMoveDown(moduleName, propName, idx)));
-    actions.appendChild(iconButton("delete", "Delete row", () => { if (confirm("Delete this row?")) client.gridDelete(moduleName, propName, idx); }, { danger: true }));
-    tr.appendChild(actions);
-    tr.addEventListener("click", (ev) => { if (ev.target.closest(".grid-actions")) return; client.gridFetch(moduleName, propName, idx); });
-    tbody.appendChild(tr);
-  });
-  table.appendChild(tbody);
-  wrap.appendChild(el("div", { class: "grid-table-wrap" }, [table]));
 
-  const toolbar = el("div", { class: "grid-toolbar" });
-  toolbar.appendChild(el("button", { class: "btn btn-sm", onclick: () => openGridDialog(client, moduleName, propName, prop, null, null) }, [icon("add", { small: true }), "Add row"]));
-  toolbar.appendChild(el("button", { class: "btn btn-sm btn-danger", onclick: () => { if (confirm("Clear the whole grid?")) client.gridReset(moduleName, propName); } }, "Reset grid"));
-  if (prop.gridLimit) toolbar.appendChild(el("span", { class: "muted small mono", text: `${(prop.rows || []).length}/${prop.gridLimit} rows` }));
-  wrap.appendChild(toolbar);
+  if (prop.showGrid) {
+    const headers = prop.gridheaders || [];
+    const table = el("table", { class: "grid-table" });
+    const thead = el("tr");
+    for (const h of headers) {
+      const def = prop.elements[h];
+      thead.appendChild(el("th", { text: def ? def.label || h : h }));
+    }
+    thead.appendChild(el("th", { text: "" }));
+    table.appendChild(el("thead", null, [thead]));
+    const tbody = el("tbody");
+    (prop.rows || []).forEach((row, idx) => {
+      const tr = el("tr", { class: "grid-row" });
+      for (const h of headers) {
+        const def = prop.elements[h] || { type: "string" };
+        tr.appendChild(el("td", { text: formatScalar(def.type, row[h]) }));
+      }
+      const actions = el("td", { class: "grid-actions" });
+      actions.appendChild(iconButton("edit", "Edit row", () => openGridDialog(client, moduleName, propName, prop, idx, row)));
+      actions.appendChild(iconButton("arrow_upward", "Move up", () => client.gridMoveUp(moduleName, propName, idx)));
+      actions.appendChild(iconButton("arrow_downward", "Move down", () => client.gridMoveDown(moduleName, propName, idx)));
+      actions.appendChild(iconButton("delete", "Delete row", () => { if (confirm("Delete this row?")) client.gridDelete(moduleName, propName, idx); }, { danger: true }));
+      tr.appendChild(actions);
+      tr.addEventListener("click", (ev) => { if (ev.target.closest(".grid-actions")) return; client.gridFetch(moduleName, propName, idx); });
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    wrap.appendChild(el("div", { class: "grid-table-wrap" }, [table]));
+
+    const toolbar = el("div", { class: "grid-toolbar" });
+    toolbar.appendChild(el("button", { class: "btn btn-sm", onclick: () => openGridDialog(client, moduleName, propName, prop, null, null) }, [icon("add", { small: true }), "Add row"]));
+    toolbar.appendChild(el("button", { class: "btn btn-sm btn-danger", onclick: () => { if (confirm("Clear the whole grid?")) client.gridReset(moduleName, propName); } }, "Reset grid"));
+    if (prop.gridLimit) toolbar.appendChild(el("span", { class: "muted small mono", text: `${(prop.rows || []).length}/${prop.gridLimit} rows` }));
+    wrap.appendChild(toolbar);
+  }
 
   if (prop.hasGraph) {
     const canvas = el("canvas", { class: "graph-canvas", width: "640", height: "240" });
@@ -357,10 +369,12 @@ function renderPropertyBody(client, moduleName, propName, prop) {
 
   if (prop.freevalue) body.appendChild(el("div", { class: "freevalue", text: prop.freevalue }));
 
-  if (prop.hasGrid) {
-    body.appendChild(renderGridSection(client, moduleName, propName, prop));
-    if (!prop.showElts) return body;
-  }
+  if (prop.hasGrid && (prop.showGrid || prop.hasGraph)) body.appendChild(renderGridSection(client, moduleName, propName, prop));
+  // showElts (default true — same source as showGrid above) gates the
+  // per-element table below regardless of hasGrid: previously only checked
+  // inside the hasGrid branch, so a plain (non-grid) property with
+  // showElts:false still showed its elt-table unconditionally.
+  if (prop.showElts === false) return body;
 
   const editableNames = editableElementNames(prop);
   const buffer = {};

@@ -87,6 +87,22 @@ function saveHistory(entry) {
   try { localStorage.setItem("ostcore-ui3.history", JSON.stringify(hist.slice(0, 10))); } catch (e) { /* ignore */ }
 }
 
+// The active view survives a reload (Gilles, 2026-09-27: "apres un f5 je ne
+// reviens pas sur le module sur lequel j'etais ... il faudrait que ce soit
+// remanent") — persisted on every real selectView() call, restored once the
+// post-reconnect dump lands (see the session subscription below), but only
+// if it still resolves to something real: a module name that's no longer
+// loaded falls back to Controller, same as never having a saved view at all.
+function loadLastView() {
+  try { return localStorage.getItem("ostcore-ui3.lastview") || null; } catch (e) { return null; }
+}
+function saveLastView(key) {
+  try {
+    if (key) localStorage.setItem("ostcore-ui3.lastview", key);
+    else localStorage.removeItem("ostcore-ui3.lastview");
+  } catch (e) { /* ignore */ }
+}
+
 const hist = loadHistory();
 const defaults = deriveDefaultUrls(window.location);
 wsUrlInput.value = (hist[0] && hist[0].wsUrl) || defaults.wsUrl;
@@ -278,6 +294,7 @@ function renderConnectScreen() {
 
 function selectView(key) {
   activeView = key;
+  saveLastView(key);
   // Picking Controller/Files/Logs from the settings dropdown should close
   // it back down, same as picking any other destination would.
   if (key === "__controller" || key === "__files" || key === "__logs") setConnPanelOpen(false);
@@ -304,8 +321,14 @@ client.subscribe(client.topics.session(), (session) => {
   grantPill.textContent = `grant: client=${session.grantClient} server=${session.grantServer}`;
   if (session.grantClient === "-1" && !loginShown) { loginShown = true; renderLogin(client); }
   else if (!activeView) {
-    // First dump after connecting and no view chosen yet: land on Controller.
-    selectView("__controller");
+    // First dump after connecting and no view chosen yet: restore whatever
+    // was on screen before the last reload/disconnect, if it still resolves
+    // to something real — a saved module name that's no longer loaded (or
+    // no saved view at all, e.g. the very first visit) falls back to
+    // Controller, same as before this existed.
+    const last = loadLastView();
+    const stillThere = last === "__controller" || last === "__files" || last === "__logs" || client.get(client.topics.modules()).includes(last);
+    selectView(stillThere ? last : "__controller");
   }
 });
 
