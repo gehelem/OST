@@ -454,6 +454,41 @@ function buildLayout(properties) {
   return { noLevel1, tabs };
 }
 
+/**
+ * Fills a level1 panel's body: level2 sub-groups as tabs (Gilles,
+ * 2026-09-27: "essaie de me presenter les level2 sous forme de tab s'il y
+ * en a") — replaces an earlier always-open <details> accordion for the
+ * same groups. `tab.direct` (properties with this level1 but no level2)
+ * becomes its own leading, unnamed "General" tab when there's anything
+ * else to tab against; no tab bar at all when there's only one group to
+ * show (nothing to tab between), same rule buildParamsPanel's own level1
+ * tabs already follow.
+ */
+function fillLevel1Panel(container, client, moduleName, track, tab) {
+  const groups = tab.direct.length ? [{ name: "", items: tab.direct }, ...tab.groups] : tab.groups;
+  if (groups.length <= 1) {
+    for (const { name } of (groups[0] ? groups[0].items : [])) container.appendChild(track(renderProperty(client, moduleName, name)));
+    return;
+  }
+  const tabBar = el("div", { class: "tab-bar" });
+  const tabPanels = el("div", { class: "tab-panels" });
+  groups.forEach((grp, i) => {
+    const btn = el("button", { class: "tab-btn" + (i === 0 ? " active" : ""), text: grp.name || "General" });
+    const panel = el("div", { class: "tab-panel" + (i === 0 ? "" : " hidden") });
+    for (const { name } of grp.items) panel.appendChild(track(renderProperty(client, moduleName, name)));
+    btn.addEventListener("click", () => {
+      tabBar.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+      tabPanels.querySelectorAll(".tab-panel").forEach((p) => p.classList.add("hidden"));
+      btn.classList.add("active");
+      panel.classList.remove("hidden");
+    });
+    tabBar.appendChild(btn);
+    tabPanels.appendChild(panel);
+  });
+  container.appendChild(tabBar);
+  container.appendChild(tabPanels);
+}
+
 // Default panel positions for the first-ever render of a module (no saved
 // layout yet in localStorage — see panels.js). Two columns below the header
 // row; once the user drags a panel, its own position persists from then on
@@ -479,7 +514,9 @@ function autoPos(index) {
  * editing surface). When nothing has a level1 (the common case — e.g.
  * guider's own hasprofile properties all have level1:"") there's nothing
  * to tab between, so no tab bar is shown, matching ostnoctua's own
- * `tabsEl.style.display = groups.length > 1 ? '' : 'none'`.
+ * `tabsEl.style.display = groups.length > 1 ? '' : 'none'`. (This box's own
+ * level2 groups still show as <details> — see fillLevel1Panel() below for
+ * the level1 panel's own level2-as-tabs treatment.)
  *
  * Returns true if it rendered anything (the module has at least one
  * `hasprofile:true` property), false otherwise — the caller decides what
@@ -532,8 +569,9 @@ export function buildParamsPanel(client, moduleName, mod, track, container) {
  * Renders a module as a set of floating panels (js/panels.js): one "header"
  * panel (icon/label/description), one "actions" panel when the module has a
  * bool-only `actions` property, one panel per level1 group (level2
- * sub-groups as <details>), and a "General" panel for properties with no
- * level1. The profile-centric "Parameters" box (buildParamsPanel above) is
+ * sub-groups as tabs when there are any — see fillLevel1Panel()), and a
+ * "General" panel for properties with no level1. The profile-centric
+ * "Parameters" box (buildParamsPanel above) is
  * NOT one of these — it opens on demand as a modal instead, see app.js.
  * Each panel is independently draggable/resizable/minimizable and
  * remembers its own layout per module (Gilles, 2026-09-25: "des fenêtres
@@ -590,12 +628,7 @@ export function renderModuleView(client, moduleName) {
     for (const tab of tabs) {
       const pos = autoPos(i++);
       const tbody = Panels.make({ id: "lvl-" + tab.name, title: tab.name || "(ungrouped)", x: pos.x, y: pos.y, w: pos.w });
-      for (const { name } of tab.direct) tbody.appendChild(track(renderProperty(client, moduleName, name)));
-      for (const grp of tab.groups) {
-        const details = el("details", { class: "prop-group", open: true }, [el("summary", { text: grp.name })]);
-        for (const { name } of grp.items) details.appendChild(track(renderProperty(client, moduleName, name)));
-        tbody.appendChild(details);
-      }
+      fillLevel1Panel(tbody, client, moduleName, track, tab);
       quickNavEntries.push({ id: "lvl-" + tab.name, label: tab.name || "(ungrouped)" });
     }
     updateQuickNav(quickNavEntries);
