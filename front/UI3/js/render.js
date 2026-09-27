@@ -61,6 +61,20 @@ function formatScalar(type, value) {
   }
 }
 
+// A bool toggle button's own content: its icon (if it has one — e.g. the
+// "stop"/"play_arrow"/"shuffle" preicons Focus/Guider's action elements
+// declare) + its label, never a literal "On"/"Off" (Gilles, 2026-09-27:
+// "dans le bouton : icone et libellé, pas de on/off, l'apparence doit
+// refleter l'etat on/off") — the on/off state itself is shown by the
+// button's own .toggle-btn.active styling instead of by its text, matching
+// ostnoctua's own actions widget (OstWidgets.actions() in widgets.js).
+function boolButtonContent(e, name) {
+  const parts = [];
+  if (e.preicon) parts.push(icon(e.preicon, { small: true }));
+  parts.push(el("span", { text: e.label || name }));
+  return parts;
+}
+
 // Builds the input control for one element, wired to a shared buffer object
 // (buffer[elName] holds the live edit value). Returns the DOM node.
 function buildEditControl(client, moduleName, el_, elName, buffer, opts) {
@@ -104,10 +118,21 @@ function buildEditControl(client, moduleName, el_, elName, buffer, opts) {
     return input;
   }
   if (type === "bool") {
-    const cb = el("input", { type: "checkbox", class: "field-checkbox" });
-    cb.checked = !!buffer[elName];
-    cb.addEventListener("change", () => { buffer[elName] = cb.checked; if (opts && opts.onChange) opts.onChange(); });
-    return cb;
+    // Button, not a checkbox (Gilles, 2026-09-27: "il faut mettre des
+    // boutons plutot que des puces ou des cases a cocher") — same
+    // .toggle-btn look as the directedit case below, but this one's value
+    // only lands in `buffer` (sent on the property's own Save button, see
+    // renderPropertyBody's "formable" list), so its own active class is
+    // toggled by hand on click, same pattern as the slider control above
+    // (no live re-render to refresh from until it's actually sent). Icon
+    // and label are static (boolButtonContent()), only the state changes.
+    const btn = el("button", { type: "button", class: "btn toggle-btn" + (buffer[elName] ? " active" : "") }, boolButtonContent(el_, elName));
+    btn.addEventListener("click", () => {
+      buffer[elName] = !buffer[elName];
+      btn.classList.toggle("active", buffer[elName]);
+      if (opts && opts.onChange) opts.onChange();
+    });
+    return btn;
   }
   if (type === "string") {
     const input = el("input", { type: "text", class: "field-input", value: buffer[elName] ?? "" });
@@ -314,8 +339,17 @@ function openGridDialog(client, moduleName, propName, prop, index, row) {
   (dialogRoot || document.body).appendChild(overlay);
 }
 
+// Excludes directedit elements (Gilles, 2026-09-27, having read a real "SA"
+// dump for a directedit-only "actions" property: "tu dois avoir le droit
+// d'envoyer juste un SV/SE juste sur autofocus:true") — client-messages.en.md
+// allows SV per-element whenever directedit is true, regardless of the
+// property's own rule (OneOfMany/AtMostOne are how e.g. Focus's own
+// abortfocus/autofocus/loop actions are declared, purely so the backend
+// keeps them mutually exclusive server-side; that's independent of how the
+// value gets there). A "boolGroup" needing the batched, all-elements SA
+// send is only the elements that have no directedit path of their own.
 function boolGroupNames(prop) {
-  return Object.entries(prop.elements).filter(([, e]) => e.type === "bool").map(([n]) => n);
+  return Object.entries(prop.elements).filter(([, e]) => e.type === "bool" && !e.directedit).map(([n]) => n);
 }
 
 function renderPropertyBody(client, moduleName, propName, prop) {
@@ -355,13 +389,18 @@ function renderPropertyBody(client, moduleName, propName, prop) {
     if (DISPLAY_ONLY_TYPES.has(e.type)) {
       valueCell.appendChild(renderDisplayOnly(name, e));
     } else if (boolGroup.includes(name) && (prop.permission === 1 || prop.permission === 2) && prop.enabled !== false) {
-      const radio = el("input", { type: "radio", class: "field-checkbox", name: `grp-${moduleName}-${propName}`, style: "border-radius:50%" });
-      radio.checked = !!e.value;
-      radio.addEventListener("change", () => sendGroupChoice(name));
-      valueCell.appendChild(radio);
+      // Button, not a radio bullet (same "des boutons plutot que des puces"
+      // request) — sendGroupChoice() already sends immediately (SV via
+      // setAll), so the row-per-choice layout just swaps its control.
+      const btn = el("button", { class: "btn toggle-btn" + (e.value ? " active" : ""), onclick: () => sendGroupChoice(name) }, boolButtonContent(e, name));
+      valueCell.appendChild(btn);
     } else if ((prop.permission === 1 || prop.permission === 2) && prop.enabled !== false) {
       if (e.type === "bool" && e.directedit) {
-        const btn = el("button", { class: "btn toggle-btn" + (e.value ? " active" : ""), onclick: () => client.setValue(moduleName, propName, name, !e.value) }, e.value ? "On" : "Off");
+        // Already a button sending immediately on click (SV, via setValue) —
+        // the specific behavior Gilles asked to preserve: "bien veiller a
+        // permettre l'utilisation pour un directedit=true d'un 'se' si on
+        // clic dessus".
+        const btn = el("button", { class: "btn toggle-btn" + (e.value ? " active" : ""), onclick: () => client.setValue(moduleName, propName, name, !e.value) }, boolButtonContent(e, name));
         valueCell.appendChild(btn);
       } else {
         const ctrl = buildEditControl(client, moduleName, e, name, buffer, {});
