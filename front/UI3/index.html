@@ -10,22 +10,36 @@
 <link rel="stylesheet" href="css/panels.css">
 </head>
 <body>
-  <!-- One flat container: #canvas fills it edge to edge, #modbar and
-       #top-right (theme toggle + connection widget) float directly on top
-       of that same surface as their own small glass chips — there is no
-       shared banner/strip behind them. Mirrors ostnoctua's #on-layer +
-       .on-modbar + .on-conn-cluster, all siblings at the same level — see
-       panels.css's .glass. -->
+  <!-- One flat container: #canvas fills it edge to edge, #modbar, #quicknav
+       and #top-right (now just theme toggle + connection widget — the only
+       truly global controls) float directly on top of that same surface as
+       their own small glass chips — there is no shared banner/strip behind
+       them. Mirrors ostnoctua's #on-layer + .on-modbar + .on-conn-cluster,
+       all siblings at the same level — see panels.css's .glass. -->
   <div id="app">
     <div id="canvas">
       <div id="panel-layer" class="hidden"></div>
       <div id="docked-view" class="hidden"></div>
     </div>
     <nav id="modbar" class="glass"></nav>
-    <nav id="quicknav" class="glass hidden"></nav>
+    <!-- Bottom bar for the module currently on screen: navigation (one
+         button per panel/level1, filled by render.js/templates) on the
+         left, reorganize+params (this same module's own actions) on the
+         right, separated by a small divider that only shows when there is
+         something to separate — Gilles, 2026-09-27: "le bouton params ...
+         devrait y figurer car il se rapporte au module en cours
+         d'affichage". Whole bar's visibility is driven by app.js from
+         isModuleView(), not by whether there are nav entries — the actions
+         zone matters even for a module with none. -->
+    <nav id="quicknav" class="glass hidden">
+      <div id="quicknav-nav" class="quicknav-zone hidden"></div>
+      <div id="quicknav-sep" class="bar-sep hidden"></div>
+      <div id="quicknav-actions" class="quicknav-zone">
+        <button id="reorganize-toggle" class="icon-chip" title="Tidy up panels" disabled><span class="material-icons">view_agenda</span></button>
+        <button id="params-toggle" class="icon-chip" title="Parameters" disabled><span class="material-icons">settings</span></button>
+      </div>
+    </nav>
     <div id="top-right">
-      <button id="reorganize-toggle" class="glass icon-chip" title="Tidy up panels" disabled><span class="material-icons">view_agenda</span></button>
-      <button id="params-toggle" class="glass icon-chip" title="Parameters" disabled><span class="material-icons">settings</span></button>
       <button id="theme-toggle" class="glass icon-chip" title="Toggle theme"><span class="material-icons">brightness_2</span></button>
       <div id="conn-widget">
         <button id="conn-toggle" class="glass conn-toggle" type="button">

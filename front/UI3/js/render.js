@@ -27,17 +27,25 @@ let mediaBaseUrl = "";
 export function setMediaBaseUrl(url) { mediaBaseUrl = url; }
 export function getMediaBaseUrl() { return mediaBaseUrl; }
 
-// Persistent #quicknav element (app.js sets it once at boot) — each module
-// view (this file's generic renderer, or a bespoke templates/*.js) fills it
-// with its own {id,label} entries every time it (re)builds panels; there is
-// no other coordination between them, per Panels.togglePanel()'s doc comment.
+// #quicknav-nav / #quicknav-sep (app.js sets both once at boot) — each
+// module view (this file's generic renderer, or a bespoke templates/*.js)
+// fills the nav zone with its own {id,label} entries every time it
+// (re)builds panels; there is no other coordination between them, per
+// Panels.togglePanel()'s doc comment. This only owns the *navigation* zone
+// and its separator — #quicknav itself (the reorganize/params actions zone
+// too) is shown/hidden by app.js from isModuleView(), since the actions
+// stay relevant even for a module with zero level1 groups (Gilles,
+// 2026-09-27: "le bouton params ... devrait y figurer" regardless).
 let quickNavRoot = null;
-export function setQuickNavRoot(node) { quickNavRoot = node; }
+let quickNavSep = null;
+export function setQuickNavRoot(node, sepNode) { quickNavRoot = node; quickNavSep = sepNode; }
 export function updateQuickNav(entries) {
   if (!quickNavRoot) return;
   quickNavRoot.innerHTML = "";
   quickNavRoot.appendChild(renderQuickNav(entries));
-  quickNavRoot.classList.toggle("hidden", entries.length === 0);
+  const show = entries.length > 0;
+  quickNavRoot.classList.toggle("hidden", !show);
+  if (quickNavSep) quickNavSep.classList.toggle("hidden", !show);
 }
 
 // ---- element value formatting / editing --------------------------------

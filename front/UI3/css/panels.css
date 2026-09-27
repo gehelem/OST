@@ -27,7 +27,9 @@
   max-width: calc(100vw - 24px);
   overflow-x: auto; overflow-y: hidden;
 }
-#modbar .modbar-sep { width: 1px; align-self: stretch; margin: 2px 4px; background: var(--border); flex-shrink: 0; }
+/* Generic divider, shared by any glass bar that groups buttons into zones
+   (currently just #quicknav's nav/actions split — see below). */
+.bar-sep { width: 1px; align-self: stretch; margin: 2px 4px; background: var(--border); flex-shrink: 0; }
 /* Exactly ostnoctua's .on-mod recipe (ostnoctua/web/ostnoctua.css): fixed
    56x56 square, icon above a small label, not a variable-width inline
    pill — Gilles, 2026-09-25, after an inline-pill attempt: "reprend
@@ -54,12 +56,15 @@
 }
 
 /* --------------------------------------------------------------- quicknav
- * Per-module "jump to panel" bar, bottom-center, one glass pill like
- * #modbar — Gilles, 2026-09-27: generic across every module, the actual
- * panel list just comes from whoever built the panels (the generic
- * level1-grouped renderer, or a bespoke template) via render.js's
- * setQuickNavRoot()/views.js's renderQuickNav(). Hidden when the current
- * view has no panels to jump to (docked views, or a module with none). */
+ * Per-module bottom bar, one glass pill like #modbar — Gilles, 2026-09-27:
+ * generic across every module. Two zones: navigation (left — one button per
+ * panel/level1, filled by render.js's setQuickNavRoot()/views.js's
+ * renderQuickNav()) and actions (right — reorganize/params, this same
+ * module's own controls, moved out of #top-right since "le bouton params
+ * ... se rapporte au module en cours d'affichage"). The whole bar is hidden
+ * for non-module views (docked screens have neither); the nav zone alone
+ * (plus its separator) additionally hides itself when a module has no
+ * panels to jump to, since the actions zone still matters then. */
 #quicknav {
   position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); z-index: 20;
   display: flex; align-items: center; gap: 6px;
@@ -67,6 +72,12 @@
   max-width: calc(100vw - 24px);
   overflow-x: auto;
 }
+.quicknav-zone { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+/* The reorganize/params chips no longer carry their own standalone .glass
+   background (they sit inside #quicknav's shared pill instead) but keep a
+   faint background/border of their own so they still read as buttons —
+   same scoping convention as #modbar's own .mod-btn. */
+#quicknav-actions .icon-chip { background: var(--accent-faint); border: 1px solid var(--border-subtle); border-radius: var(--radius); }
 .quicknav-btn {
   display: inline-flex; align-items: center; justify-content: center;
   height: 36px; padding: 0 12px; flex-shrink: 0;

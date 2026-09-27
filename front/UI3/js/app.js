@@ -20,15 +20,17 @@ const systemViewsEl = document.getElementById("system-views");
 const panelLayerEl = document.getElementById("panel-layer");
 const dockedViewEl = document.getElementById("docked-view");
 const quicknavEl = document.getElementById("quicknav");
+const quicknavNavEl = document.getElementById("quicknav-nav");
+const quicknavSepEl = document.getElementById("quicknav-sep");
 Panels.setLayer(panelLayerEl);
-setQuickNavRoot(quicknavEl);
+setQuickNavRoot(quicknavNavEl, quicknavSepEl);
 // One listener, registered once (not per-render, unlike the quicknav
 // buttons themselves which get rebuilt on every module change) — keeps a
 // quicknav button's "active" state in sync when a panel's visibility
 // changes some other way (its own minimize button, or the reorganize
 // button), not just when the quicknav button itself was clicked.
 panelLayerEl.addEventListener("panelvisibility", (ev) => {
-  const btn = quicknavEl.querySelector(`[data-panel-id="${ev.detail.id}"]`);
+  const btn = quicknavNavEl.querySelector(`[data-panel-id="${ev.detail.id}"]`);
   if (btn) btn.classList.toggle("active", ev.detail.visible);
 });
 const connWidgetEl = document.getElementById("conn-widget");
@@ -208,6 +210,10 @@ function renderContentNow() {
   const isModule = isModuleView();
   panelLayerEl.classList.toggle("hidden", !isModule);
   dockedViewEl.classList.toggle("hidden", isModule);
+  // #quicknav's own visibility follows the module view directly, not
+  // whether it has nav entries to show — the actions zone (reorganize/
+  // params) is still relevant for a module with zero level1 groups.
+  quicknavEl.classList.toggle("hidden", !isModule);
   updateParamsToggle();
   updateReorganizeToggle();
 
