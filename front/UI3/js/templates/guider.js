@@ -20,7 +20,7 @@
 // `image`, defined generically by IndiModule::defineMeAsImager() (see
 // libs/indimodule.cpp) for any imaging module, guider included.
 
-import { renderProperty } from "../render.js";
+import { renderProperty, updateQuickNav } from "../render.js";
 import { el } from "../dom.js";
 import * as Panels from "../panels.js";
 
@@ -36,6 +36,13 @@ export function mount(client, moduleName) {
     dispose();
     Panels.clear();
     const has = (name) => name in mod.properties;
+    // Curated quicknav list — Gilles, 2026-09-27: "actions/image/devices/
+    // control et peut-etre d'autres plus tard, qu'on devra pouvoir adapter
+    // selon le template". "devices"/"control" don't exist as their own
+    // panels yet (guider.json has no such property) - using what's
+    // actually built today (actions/image/guiding/drift); add devices/
+    // control here once those panels are actually created.
+    const quickNavEntries = [];
 
     const header = Panels.make({ id: "header", title: mod.infos.modulelabel || mod.infos.label || moduleName, x: 20, y: 92, w: 320 });
     header.appendChild(el("div", { class: "muted small", text: mod.infos.description || "" }));
@@ -45,6 +52,7 @@ export function mount(client, moduleName) {
     if (has("actions")) {
       const b = Panels.make({ id: "actions", title: mod.properties.actions.label || "Commands", x: 20, y: 210, w: 300 });
       b.appendChild(track(renderProperty(client, moduleName, "actions")));
+      quickNavEntries.push({ id: "actions", label: mod.properties.actions.label || "Actions" });
     }
     if (has("values")) {
       const b = Panels.make({ id: "values", title: mod.properties.values.label || "Session values", x: 20, y: 470, w: 300 });
@@ -54,14 +62,17 @@ export function mount(client, moduleName) {
     if (has("image")) {
       const b = Panels.make({ id: "image", title: mod.properties.image.label || "Guide frame", x: 350, y: 92, w: 380 });
       b.appendChild(track(renderProperty(client, moduleName, "image")));
+      quickNavEntries.push({ id: "image", label: mod.properties.image.label || "Image" });
     }
     if (has("guiding")) {
       const b = Panels.make({ id: "guiding", title: mod.properties.guiding.label || "Guiding", x: 350, y: 300, w: 620 });
       b.appendChild(track(renderProperty(client, moduleName, "guiding")));
+      quickNavEntries.push({ id: "guiding", label: mod.properties.guiding.label || "Guiding" });
     }
     if (has("drift")) {
       const b = Panels.make({ id: "drift", title: mod.properties.drift.label || "Drift", x: 990, y: 92, w: 340 });
       b.appendChild(track(renderProperty(client, moduleName, "drift")));
+      quickNavEntries.push({ id: "drift", label: mod.properties.drift.label || "Drift" });
     }
     // The profile-centric "Parameters" box (buildParamsPanel, render.js) is
     // not built here — it opens on demand from the gear button (app.js),
@@ -78,13 +89,16 @@ export function mount(client, moduleName) {
     if (rest.length) {
       const b = Panels.make({ id: "other", title: "Other", x: 20, y: 620, w: 300 });
       for (const name of rest) b.appendChild(track(renderProperty(client, moduleName, name)));
+      quickNavEntries.push({ id: "other", label: "Other" });
     }
+    updateQuickNav(quickNavEntries);
   }
 
   const unsub = client.subscribe(client.topics.module(moduleName), (mod) => {
     if (!mod) {
       dispose();
       Panels.clear();
+      updateQuickNav([]);
       const b = Panels.make({ id: "missing", title: moduleName, x: 20, y: 92, w: 320 });
       b.appendChild(el("div", { class: "muted", text: "Module not found (unloaded?)" }));
       return;
@@ -92,5 +106,5 @@ export function mount(client, moduleName) {
     build(mod);
   });
 
-  return { dispose: () => { unsub(); dispose(); Panels.clear(); } };
+  return { dispose: () => { unsub(); dispose(); Panels.clear(); updateQuickNav([]); } };
 }

@@ -7,6 +7,7 @@
 // subscription open, so they just return a node.
 
 import { el, icon, iconButton, moduleIcon } from "./dom.js";
+import { togglePanel, isPanelVisible } from "./panels.js";
 
 // Horizontal module bar (ostnoctua's .on-modbar/.on-mod, see panels.css) —
 // only the actually-loaded OST modules. Controller/Files/Logs live in the
@@ -30,6 +31,32 @@ export function renderModbar(client, activeKey, onSelect) {
       icon(moduleIcon(mod)),
       el("span", { class: "mod-btn-label", text: label }),
     ]);
+    bar.appendChild(btn);
+  }
+  return bar;
+}
+
+/**
+ * The per-module "quick nav" bar (#quicknav, bottom-center): one button per
+ * {id, label} entry, showing/hiding that panel and reflecting whether it's
+ * currently visible (Gilles, 2026-09-27: "l'action du bouton doit masquer/
+ * demasquer la fenetre et l'etat du bouton doit montrer si la fenetre est
+ * visible ou pas") — Panels.togglePanel()/isPanelVisible() are the *only*
+ * shared piece (render.js/templates own the entry list; see render.js's
+ * setQuickNavRoot()). `data-panel-id` lets app.js's single "panelvisibility"
+ * listener find and update this same button when the panel's own minimize
+ * button (or reorganizeStacked()) changes it instead. Same DocumentFragment
+ * pattern as renderModbar, for the same reason (no unstyled wrapper
+ * element).
+ */
+export function renderQuickNav(entries) {
+  const bar = document.createDocumentFragment();
+  for (const { id, label } of entries) {
+    const btn = el("button", {
+      class: "quicknav-btn" + (isPanelVisible(id) ? " active" : ""),
+      title: label, "data-panel-id": id,
+      onclick: () => btn.classList.toggle("active", togglePanel(id)),
+    }, label);
     bar.appendChild(btn);
   }
   return bar;

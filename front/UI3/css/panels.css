@@ -53,6 +53,34 @@
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 
+/* --------------------------------------------------------------- quicknav
+ * Per-module "jump to panel" bar, bottom-center, one glass pill like
+ * #modbar — Gilles, 2026-09-27: generic across every module, the actual
+ * panel list just comes from whoever built the panels (the generic
+ * level1-grouped renderer, or a bespoke template) via render.js's
+ * setQuickNavRoot()/views.js's renderQuickNav(). Hidden when the current
+ * view has no panels to jump to (docked views, or a module with none). */
+#quicknav {
+  position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); z-index: 20;
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px;
+  max-width: calc(100vw - 24px);
+  overflow-x: auto;
+}
+.quicknav-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 36px; padding: 0 12px; flex-shrink: 0;
+  background: var(--accent-faint); color: var(--text-secondary);
+  border: 1px solid var(--border-subtle); border-radius: var(--radius);
+  cursor: pointer; font: inherit; font-size: 12px; white-space: nowrap;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.quicknav-btn:hover { color: var(--accent); border-color: var(--accent-dim); }
+.quicknav-btn.active {
+  background: var(--accent-subtle); color: var(--accent); border-color: var(--accent);
+  box-shadow: var(--shadow-glow);
+}
+
 /* ------------------------------------------------------------ top-right
  * Theme toggle + connection widget, each its own glass chip, floating at
  * the same level as #modbar (Gilles, 2026-09-25: "tout au meme niveau, un
@@ -150,6 +178,12 @@
 }
 .panel-float.dragging { opacity: 0.92; box-shadow: var(--shadow-pop); }
 .panel-float.dragging .panel-float-bar { cursor: grabbing; }
+/* Brief highlight when a quicknav button brings this panel forward. */
+.panel-float.flash { animation: panel-flash 0.9s ease; }
+@keyframes panel-flash {
+  0%, 100% { box-shadow: var(--shadow-panel); }
+  25% { box-shadow: 0 0 0 3px var(--accent-subtle), 0 0 24px rgba(var(--accent-rgb), 0.35); }
+}
 .panel-float-grip { opacity: 0.3; letter-spacing: -3px; font-size: 12px; color: var(--text-muted); }
 .panel-float-title {
   flex: 1; font-size: 11px; font-weight: 700; letter-spacing: 0.5px;

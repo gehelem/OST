@@ -19,12 +19,26 @@ import { renderGraph } from "./chart.js";
 import { mediaUrl as buildMediaUrl } from "../../core/index.js";
 import { el, icon, statusDot, iconButton } from "./dom.js";
 import * as Panels from "./panels.js";
+import { renderQuickNav } from "./views.js";
 
 const DISPLAY_ONLY_TYPES = new Set(["img", "video", "light", "prg", "message"]);
 
 let mediaBaseUrl = "";
 export function setMediaBaseUrl(url) { mediaBaseUrl = url; }
 export function getMediaBaseUrl() { return mediaBaseUrl; }
+
+// Persistent #quicknav element (app.js sets it once at boot) — each module
+// view (this file's generic renderer, or a bespoke templates/*.js) fills it
+// with its own {id,label} entries every time it (re)builds panels; there is
+// no other coordination between them, per Panels.togglePanel()'s doc comment.
+let quickNavRoot = null;
+export function setQuickNavRoot(node) { quickNavRoot = node; }
+export function updateQuickNav(entries) {
+  if (!quickNavRoot) return;
+  quickNavRoot.innerHTML = "";
+  quickNavRoot.appendChild(renderQuickNav(entries));
+  quickNavRoot.classList.toggle("hidden", entries.length === 0);
+}
 
 // ---- element value formatting / editing --------------------------------
 
@@ -555,10 +569,15 @@ export function renderModuleView(client, moduleName) {
     const { noLevel1, tabs } = buildLayout(layoutProps);
 
     let i = 0;
+    // One quicknav button per panel built below (Gilles, 2026-09-27: "un
+    // bouton par level1 et un pour level1='' si necessaire") — reuses the
+    // exact same noLevel1/tabs this loop already computed, no separate pass.
+    const quickNavEntries = [];
     if (noLevel1.length) {
       const pos = autoPos(i++);
       const gbody = Panels.make({ id: "general", title: "General", x: pos.x, y: pos.y, w: pos.w });
       for (const { name } of noLevel1) gbody.appendChild(track(renderProperty(client, moduleName, name)));
+      quickNavEntries.push({ id: "general", label: "General" });
     }
     for (const tab of tabs) {
       const pos = autoPos(i++);
@@ -569,7 +588,9 @@ export function renderModuleView(client, moduleName) {
         for (const { name } of grp.items) details.appendChild(track(renderProperty(client, moduleName, name)));
         tbody.appendChild(details);
       }
+      quickNavEntries.push({ id: "lvl-" + tab.name, label: tab.name || "(ungrouped)" });
     }
+    updateQuickNav(quickNavEntries);
     // Parameters box: not built here — see buildParamsPanel's doc, it
     // opens on demand from the gear button (app.js) instead.
   }
@@ -578,6 +599,7 @@ export function renderModuleView(client, moduleName) {
     if (!mod) {
       disposeProperties();
       Panels.clear();
+      updateQuickNav([]);
       const body = Panels.make({ id: "missing", title: moduleName, x: 20, y: 92, w: 320 });
       body.appendChild(el("div", { class: "muted", text: "Module not found (unloaded?)" }));
       return;
@@ -585,7 +607,7 @@ export function renderModuleView(client, moduleName) {
     build(mod);
   });
 
-  return { dispose: () => { unsubModule(); disposeProperties(); Panels.clear(); } };
+  return { dispose: () => { unsubModule(); disposeProperties(); Panels.clear(); updateQuickNav([]); } };
 }
 
 /**

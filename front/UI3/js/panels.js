@@ -59,6 +59,16 @@ export function clear() {
 
 function layerRect() { return layer.getBoundingClientRect(); }
 
+// Whoever cares whether a given panel is shown or hidden (views.js's
+// renderQuickNav() buttons, via app.js's single listener) hears about it
+// here, regardless of which of the 3 ways it happened: the panel's own
+// minimize (-) button, Panels.togglePanel(), or reorganizeStacked(). One
+// small decoupled signal instead of every caller having to know about
+// every other caller.
+function notifyVisibility(id, visible) {
+  layer.dispatchEvent(new CustomEvent("panelvisibility", { detail: { id, visible } }));
+}
+
 function startDrag(panel, bar, id, ev, sc) {
   ev.preventDefault();
   const lr = layerRect();
@@ -166,6 +176,7 @@ export function make(opts) {
     const s = loadState(sc, id);
     s.collapsed = panel.classList.contains("collapsed");
     saveState(sc, id, s);
+    notifyVisibility(id, !s.collapsed);
   });
   bar.addEventListener("mousedown", (e) => {
     if (e.target === min) return;
@@ -175,6 +186,46 @@ export function make(opts) {
   layer.appendChild(panel);
   if (!opts.persistent) live.push(panel);
   return body;
+}
+
+/** True if the panel exists and isn't collapsed — the quicknav button's own
+ * initial on/off state (views.js's renderQuickNav()) comes from this. */
+export function isPanelVisible(id) {
+  const panel = live.find((p) => p.dataset.panel === id);
+  return !!panel && !panel.classList.contains("collapsed");
+}
+
+/**
+ * Shows or hides one panel by id (Gilles, 2026-09-27: the quicknav button
+ * "doit masquer/demasquer la fenetre" and reflect which state it's in) —
+ * toggles the same "collapsed" state the panel's own minimize button uses,
+ * so the two stay interchangeable. Showing it also brings it to front
+ * (re-appended as the layer's last child — later in DOM order paints on
+ * top among default-stacking siblings) and scrolls it into view, with a
+ * brief flash so it's easy to spot; hiding it is just the collapse, no
+ * extra effect needed. Returns the new visible state. This is the one
+ * piece of behavior every quicknav bar shares regardless of who built the
+ * panel list — the generic level1-grouped renderer or a bespoke template —
+ * so it lives here, once, in core (Gilles: "il est important de conserver
+ * l'heritage core").
+ */
+export function togglePanel(id) {
+  const panel = live.find((p) => p.dataset.panel === id);
+  if (!panel) return false;
+  const willShow = panel.classList.contains("collapsed");
+  panel.classList.toggle("collapsed", !willShow);
+  const s = loadState(scope, id);
+  s.collapsed = !willShow;
+  saveState(scope, id, s);
+  if (willShow) {
+    layer.appendChild(panel); // re-append = bring to front
+    panel.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+    panel.classList.remove("flash");
+    void panel.offsetWidth; // restart the animation if toggled again quickly
+    panel.classList.add("flash");
+  }
+  notifyVisibility(id, willShow);
+  return willShow;
 }
 
 /**
@@ -202,5 +253,6 @@ export function reorganizeStacked() {
     panel.style.width = "";
     panel.style.height = "";
     saveState(scope, id, { x: startX, y, collapsed: true });
+    notifyVisibility(id, false);
   });
 }

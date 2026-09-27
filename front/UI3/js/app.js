@@ -7,7 +7,7 @@
 // shared canvas instead of a single docked node — see renderContentNow().
 
 import { createClient, deriveDefaultUrls } from "../../core/index.js";
-import { renderModuleView, buildParamsPanel, setMediaBaseUrl, setDialogRoot } from "./render.js";
+import { renderModuleView, buildParamsPanel, setMediaBaseUrl, setDialogRoot, setQuickNavRoot } from "./render.js";
 import { renderModbar, renderSystemViews, renderController, renderFiles, renderLogs, renderLogin } from "./views.js";
 import { el, icon, iconButton } from "./dom.js";
 import * as Panels from "./panels.js";
@@ -19,7 +19,18 @@ const modbarEl = document.getElementById("modbar");
 const systemViewsEl = document.getElementById("system-views");
 const panelLayerEl = document.getElementById("panel-layer");
 const dockedViewEl = document.getElementById("docked-view");
+const quicknavEl = document.getElementById("quicknav");
 Panels.setLayer(panelLayerEl);
+setQuickNavRoot(quicknavEl);
+// One listener, registered once (not per-render, unlike the quicknav
+// buttons themselves which get rebuilt on every module change) — keeps a
+// quicknav button's "active" state in sync when a panel's visibility
+// changes some other way (its own minimize button, or the reorganize
+// button), not just when the quicknav button itself was clicked.
+panelLayerEl.addEventListener("panelvisibility", (ev) => {
+  const btn = quicknavEl.querySelector(`[data-panel-id="${ev.detail.id}"]`);
+  if (btn) btn.classList.toggle("active", ev.detail.visible);
+});
 const connWidgetEl = document.getElementById("conn-widget");
 const connToggleEl = document.getElementById("conn-toggle");
 const connDotEl = document.getElementById("conn-dot");
