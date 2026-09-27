@@ -6,7 +6,7 @@
 // return {node, dispose}; the sidebar and login dialog don't hold any
 // subscription open, so they just return a node.
 
-import { el, icon, iconButton, moduleIcon } from "./dom.js";
+import { el, icon, iconButton, moduleIcon, statusDot, updateStatusDot } from "./dom.js";
 import { togglePanel, isPanelVisible } from "./panels.js";
 
 // Horizontal module bar (ostnoctua's .on-modbar/.on-mod, see panels.css) —
@@ -14,26 +14,53 @@ import { togglePanel, isPanelVisible } from "./panels.js";
 // settings dropdown instead (see renderSystemViews) — Gilles, 2026-09-25:
 // "deplace les boutons controller/files/logs dans les settings".
 //
-// Returns a DocumentFragment, not a wrapping <div>: #modbar itself is the
-// flex row (panels.css), and .mod-btn is `display:flex` for its own
-// icon-over-label stacking — that makes each button a block-level box, so
-// wrapping them in an unstyled <div> stacked them vertically instead of
-// letting #modbar's flex row lay them out (caught live, 2026-09-25: "la
-// barre de menu est a nouveau verticale"). A fragment leaves no such
-// wrapper behind: the buttons become #modbar's direct children.
+// Returns {node, dispose}: node is a DocumentFragment, not a wrapping <div>
+// — #modbar itself is the flex row (panels.css), and .mod-btn is
+// `display:flex` for its own icon-over-label stacking — that makes each
+// button a block-level box, so wrapping them in an unstyled <div> stacked
+// them vertically instead of letting #modbar's flex row lay them out
+// (caught live, 2026-09-25: "la barre de menu est a nouveau verticale"). A
+// fragment leaves no such wrapper behind: the buttons become #modbar's
+// direct children. `dispose` must be called before the caller rebuilds the
+// bar (app.js's renderModbarNow()) — see the per-module subscription below.
 export function renderModbar(client, activeKey, onSelect) {
   const bar = document.createDocumentFragment();
   const names = client.get(client.topics.modules());
+  const disposers = [];
   for (const name of names) {
     const mod = client.get(client.topics.module(name));
     const label = (mod && (mod.infos.modulelabel || mod.infos.label)) || name;
+    // Global-state dot (Gilles, 2026-09-27): the same "signals.state" light
+    // element the module's own header panel already shows (see render.js's
+    // renderProperty()), so a module in trouble is visible without opening
+    // it. Not every module declares "signals" (a handful, e.g.
+    // GlobalDatastore, don't call Basemodule::setStateEvent() at all) — for
+    // those the dot just stays absent (.hidden) rather than showing a fake
+    // standby color. Subscribes directly to the "signals" *property*, not
+    // topics.module(name) (Gilles, 2026-09-27: "cette bubulle devrait
+    // s'abonner a nomDuModule.signals(.state)") — topics.module() only
+    // fires on module add/remove/profile events (see datastore.js's own
+    // doc comment on it), never on an element value change (ea/ee), which
+    // is exactly how "state" itself updates; only topics.property() covers
+    // that.
+    const dot = statusDot(0);
+    dot.classList.add("mod-btn-dot", "hidden");
+    // client.subscribe() fires immediately with the current value (same
+    // convention as renderProperty()'s own subscription), so no separate
+    // initial call is needed here.
+    disposers.push(client.subscribe(client.topics.property(name, "signals"), (prop) => {
+      const state = prop && prop.elements && prop.elements.state;
+      dot.classList.toggle("hidden", !state);
+      if (state) updateStatusDot(dot, state.value);
+    }));
     const btn = el("button", { class: "mod-btn" + (activeKey === name ? " active" : ""), title: label, onclick: () => onSelect(name) }, [
+      dot,
       icon(moduleIcon(mod)),
       el("span", { class: "mod-btn-label", text: label }),
     ]);
     bar.appendChild(btn);
   }
-  return bar;
+  return { node: bar, dispose: () => disposers.forEach((d) => d()) };
 }
 
 /**

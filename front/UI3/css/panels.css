@@ -36,6 +36,7 @@
    exactement le principe de ostnoctua (taille fixe, libellé en dessous
    police reduite)". */
 .mod-btn {
+  position: relative;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 2px; width: 56px; height: 56px; flex-shrink: 0;
   background: var(--accent-faint); color: var(--text-muted);
@@ -43,6 +44,10 @@
   cursor: pointer; font: inherit;
   transition: border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
+/* Global-state dot (Gilles, 2026-09-27) — same .status-dot component as the
+   module's own "signals" property, just relocated to the button's corner.
+   Absent (.hidden) for modules that never declare a "state" element. */
+.mod-btn-dot { position: absolute; top: 5px; right: 5px; margin-right: 0; }
 .mod-btn:hover { color: var(--text-secondary); border-color: var(--accent-dim); }
 .mod-btn:hover .material-icons { transform: scale(1.15); }
 .mod-btn.active {

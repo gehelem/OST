@@ -65,6 +65,16 @@ setDialogRoot(document.getElementById("dialog-root"));
 let activeView = null; // module name, or "__controller"/"__files"/"__logs", or null
 let contentDispose = null; // disposes whatever subscriptions the current content view opened
 let loginShown = false;
+// Declared up here, not just above renderModbarNow() itself: client.onStatus()
+// below fires its callback synchronously on registration (like subscribe()),
+// which calls renderModbarNow() immediately for the initial "disconnected"
+// status — a `let` declared any later would still be in its temporal dead
+// zone at that point, throwing "Cannot access before initialization" and
+// aborting the whole script (caught live, 2026-09-27: this silently broke
+// the entire app — empty modbar, connect doing nothing — since every
+// subsequent status change re-hit the same dead binding, swallowed by
+// connection.js's own try/catch around each status listener).
+let modbarDispose = null;
 
 // ---- derive defaults per structure.en.md's "Finding the server" table ---
 
@@ -191,8 +201,11 @@ client.onStatus((s) => {
 // ---- rendering -------------------------------------------------------
 
 function renderModbarNow() {
+  if (modbarDispose) { modbarDispose(); modbarDispose = null; }
   modbarEl.innerHTML = "";
-  modbarEl.appendChild(renderModbar(client, activeView, selectView));
+  const modbar = renderModbar(client, activeView, selectView);
+  modbarEl.appendChild(modbar.node);
+  modbarDispose = modbar.dispose;
   systemViewsEl.innerHTML = "";
   systemViewsEl.appendChild(renderSystemViews(activeView, selectView));
 }

@@ -26,9 +26,21 @@ export function icon(name, opts) {
 const STATUS_CLASS = ["standby", "ok", "busy", "error"];
 const STATUS_LABEL = ["Standby", "OK", "Busy", "Error"];
 
-export function statusDot(status) {
+/** Sets/refreshes an existing dot's status class + tooltip in place, without
+ * touching its other classes — split out of statusDot() so a live-updated
+ * dot (e.g. the modbar's per-module global-state dot) doesn't need to be
+ * recreated/replaced on every update. */
+export function updateStatusDot(dotEl, status) {
   const s = typeof status === "number" ? status : 0;
-  return el("span", { class: "status-dot status-" + STATUS_CLASS[s], title: STATUS_LABEL[s] });
+  for (const c of STATUS_CLASS) dotEl.classList.remove("status-" + c);
+  dotEl.classList.add("status-" + STATUS_CLASS[s]);
+  dotEl.title = STATUS_LABEL[s];
+}
+
+export function statusDot(status) {
+  const dot = el("span", { class: "status-dot" });
+  updateStatusDot(dot, status);
+  return dot;
 }
 
 export function iconButton(name, title, onClick, opts) {
