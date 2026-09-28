@@ -13,14 +13,13 @@
 // bespoke file (real Chart.js graphs) since a scaffold has nothing to add
 // there.
 //
-// Hasprofile-backed properties never get their own panel here (same rule
-// guider.js's bespoke template already follows) — they're only reachable
-// through the Parameters modal (app.js's gear button), so a profile-backed
-// setting never shows twice. Note for whoever adds the sequencer template's
-// own bespoke version later: this hides "sequence" itself (the exposure
-// list) behind that modal too, since it's hasprofile:true like everything
-// else here — fine for a first pass, but worth reconsidering once
-// sequencer gets real bespoke treatment.
+// Hasprofile-backed properties get no panel of their own UNLESS a template
+// explicitly lists them in panelSpecs (only then reachable through the
+// Parameters modal too, as any hasprofile property is — see
+// templates/sequencer.js's own "sequence" entry, a real editable grid
+// that's also hasprofile:true, for exactly that case). Anything hasprofile
+// a template does NOT list stays modal-only, so a profile-backed setting
+// never shows twice by default.
 
 import { renderProperty, updateQuickNav } from "../render.js";
 import { addImageBlock } from "../imagelayer.js";
