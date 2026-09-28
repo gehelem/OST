@@ -6,7 +6,7 @@
 // needs instead. UI3-specific: a module renders as floating panels on a
 // shared canvas instead of a single docked node — see renderContentNow().
 
-import { createClient, deriveDefaultUrls } from "../../core/index.js";
+import { createClient, deriveDefaultUrls } from "../core/index.js";
 import { renderModuleView, buildParamsPanel, setMediaBaseUrl, setDialogRoot, setQuickNavRoot } from "./render.js";
 import { renderModbar, renderSystemViews, renderController, renderFiles, renderLogs, renderLogin } from "./views.js";
 import { el, icon, iconButton } from "./dom.js";
@@ -129,6 +129,27 @@ themeToggle.addEventListener("click", () => {
   applyTheme(cur);
   localStorage.setItem("ostcore-ui3.theme", cur);
 });
+
+// ---- UI zoom -----------------------------------------------------------
+// Font size (and, via a real browser-level `zoom` rather than a transform,
+// everything else along with it — panel sizes included) is adjustable from
+// two small +/- chips, persisted like the theme — Gilles, 2026-09-28: "deux
+// boutons +/- ... ajuster la taille de police de tous les composants ...
+// la taille des fenetres doit s'ajuster en consequence". `zoom` on <body>
+// covers dialogs (#dialog-root, a sibling of #app) too, not just #app.
+const ZOOM_MIN = 0.7, ZOOM_MAX = 1.6, ZOOM_STEP = 0.1;
+function applyZoom(z) {
+  z = Math.round(Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, z)) * 100) / 100;
+  document.body.style.zoom = z;
+  return z;
+}
+let zoomLevel = applyZoom(parseFloat(localStorage.getItem("ostcore-ui3.zoom")) || 1);
+function bumpZoom(delta) {
+  zoomLevel = applyZoom(zoomLevel + delta);
+  try { localStorage.setItem("ostcore-ui3.zoom", zoomLevel); } catch (e) { /* ignore */ }
+}
+document.getElementById("zoom-in").addEventListener("click", () => bumpZoom(ZOOM_STEP));
+document.getElementById("zoom-out").addEventListener("click", () => bumpZoom(-ZOOM_STEP));
 
 // ---- parameters modal --------------------------------------------------
 // The profile-centric "Parameters" box (render.js's buildParamsPanel) is

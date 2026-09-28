@@ -104,6 +104,29 @@
  * always-visible chip, never nested inside the collapsible connection
  * panel — burying it there once meant Gilles genuinely couldn't find it. */
 #top-right { position: fixed; top: 12px; right: 12px; z-index: 20; display: flex; align-items: flex-start; gap: 8px; }
+
+/* UI zoom (font size + everything else, incl. floating panels) — Gilles,
+   2026-09-28: "deux boutons +/- plus petits a gauche du toggle jour/nuit
+   ... taille moitie ... ajuster la taille de police de tous les
+   composants ... la taille des fenetres doit s'ajuster en consequence".
+   One glass chip (like the theme toggle), the two buttons stacked instead
+   of side by side, each roughly half the theme toggle's 36px. Applied via
+   CSS `zoom` on <body> (app.js) rather than a transform: zoom is a real
+   browser-level scale, so panels.js's own drag/resize math (getBoundingClientRect/
+   clientX/clientY) keeps working unmodified, and position:fixed chrome
+   (this very bar included) stays anchored to the real viewport instead of
+   being caught in a transformed containing block. */
+#zoom-controls { display: flex; flex-direction: column; gap: 2px; padding: 3px; }
+.zoom-btn {
+  width: 18px; height: 15px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 0; border-radius: 3px; background: transparent;
+  color: var(--text-secondary); cursor: pointer; padding: 0;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.zoom-btn:hover { color: var(--accent); background: var(--bg-hover); }
+.zoom-btn .material-icons { font-size: 12px; }
+
 .icon-chip {
   position: relative;
   display: inline-flex; align-items: center; justify-content: center;

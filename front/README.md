@@ -9,7 +9,11 @@ ostcore/
   core/     the shared library — zero rendering logic, see "Public API" below
   UI1/      bare-bones proof of integration, zero design effort
   UI2/      fuller UI, adapted from ostharfang4's render/views/app layer
-  UI3/      same functional coverage as UI2, with real visual/ergonomic design
+  index.html, js/, css/, lib/, assets/
+            the real site (formerly UI3/) — same functional coverage as
+            UI2, with real visual/ergonomic design; moved to ostcore's own
+            root 2026-09-28, once it became the reference client, while
+            UI1/UI2 stayed put as still-functional earlier stages
   FINDINGS.md
 ```
 
@@ -225,8 +229,14 @@ Run the same way as UI1 (static server, open `UI2/index.html`).
 
 ## UI3 — same coverage as UI2, designed
 
-`UI3/index.html` + `UI3/js/{app,render,views,chart,dom}.js` + `UI3/css/
-{theme,base,components}.css` + `UI3/assets/fonts/MaterialIcons-Regular.ttf`.
+Now `ostcore`'s own root (moved out of `UI3/` 2026-09-28, once it became
+the reference client — see the tree above): `index.html` + `js/
+{app,render,views,chart,dom}.js` + `css/{theme,base,components}.css` +
+`assets/fonts/MaterialIcons-Regular.ttf`. Internal naming (the
+`ostcore-ui3:*`/`ostcore-ui3.*` localStorage key prefixes, doc comments,
+the "UI3" product label in the page itself) was deliberately left alone —
+renaming those isn't part of the move and would silently orphan every
+user's already-saved layout/theme/zoom settings.
 
 Functionally, UI3 is UI2: the same generic module/property/element/grid/
 graph rendering, controller/files/logs screens, login flow, and per-topic
@@ -259,8 +269,8 @@ generically — to a conventional sidebar + content shell:
   login, and thin accent-toned scrollbars everywhere — all lifted in
   spirit from ostnoctua's `.glass-panel`/`.on-prop`/`.conn-led` etc.
 
-Run the same way as UI1/UI2 (static server from `ostcore/`, open
-`UI3/index.html`).
+Run the same way as UI1/UI2 (static server from `ostcore/`), but now at
+`ostcore/index.html` — i.e. the server's own root, not a subfolder.
 
 ## Verification
 

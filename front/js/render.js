@@ -16,7 +16,7 @@
 // subscription itself when discarded — never a global re-render.
 
 import { renderGraph } from "./chart.js";
-import { mediaUrl as buildMediaUrl } from "../../core/index.js";
+import { mediaUrl as buildMediaUrl } from "../core/index.js";
 import { el, icon, statusDot, iconButton } from "./dom.js";
 import * as Panels from "./panels.js";
 import { renderQuickNav } from "./views.js";
