@@ -151,23 +151,57 @@ themeToggle.addEventListener("click", () => {
 // ---- UI zoom -----------------------------------------------------------
 // Font size (and, via a real browser-level `zoom` rather than a transform,
 // everything else along with it — panel sizes included) is adjustable from
-// two small +/- chips, persisted like the theme — Gilles, 2026-09-28: "deux
-// boutons +/- ... ajuster la taille de police de tous les composants ...
-// la taille des fenetres doit s'ajuster en consequence". `zoom` on <body>
-// covers dialogs (#dialog-root, a sibling of #app) too, not just #app.
-const ZOOM_MIN = 0.7, ZOOM_MAX = 1.6, ZOOM_STEP = 0.1;
+// a slider, persisted like the theme, tucked behind a single toggle chip
+// (Gilles, 2026-09-28: "ajuster la taille de police de tous les composants
+// ... la taille des fenetres doit s'ajuster en consequence"; 2026-09-29:
+// "remplace les boutons +/- par un slider qui s'affiche quand on clic sur
+// un bouton unique" — same collapsible pattern as #conn-widget above).
+// `zoom` on <body> covers dialogs (#dialog-root, a sibling of #app) too,
+// not just #app.
+const ZOOM_MIN = 0.7, ZOOM_MAX = 1.6;
 function applyZoom(z) {
   z = Math.round(Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, z)) * 100) / 100;
   document.body.style.zoom = z;
+  // One exception, the control that changes the zoom itself shouldn't grow/
+  // shrink along with it (Gilles, 2026-09-29: "le slider ne devrait pas
+  // changer de taille, ce serait la seule exception") — panels.css's
+  // #zoom-widget counters this exact value via calc(1 / var(--ui-zoom)),
+  // which only works if it's actually published as a real CSS number.
+  document.documentElement.style.setProperty("--ui-zoom", z);
   return z;
 }
+const zoomWidgetEl = document.getElementById("zoom-widget");
+const zoomToggleEl = document.getElementById("zoom-toggle");
+const zoomPanelEl = document.getElementById("zoom-panel");
+const zoomSliderEl = document.getElementById("zoom-slider");
+
 let zoomLevel = applyZoom(parseFloat(localStorage.getItem("ostcore-ui3.zoom")) || 1);
-function bumpZoom(delta) {
-  zoomLevel = applyZoom(zoomLevel + delta);
-  try { localStorage.setItem("ostcore-ui3.zoom", zoomLevel); } catch (e) { /* ignore */ }
+zoomSliderEl.value = zoomLevel;
+
+function setZoomPanelOpen(open) {
+  if (open) {
+    // #zoom-panel is position:fixed (see panels.css) — no longer flowing
+    // relative to the toggle button, so its position is computed here,
+    // once per open, from the button's own real (already-zoomed) screen
+    // rect, in real viewport px. Recomputed every time rather than cached:
+    // cheap, and correct even if the window was resized meanwhile.
+    const r = zoomToggleEl.getBoundingClientRect();
+    zoomPanelEl.style.top = r.bottom + 6 + "px";
+    zoomPanelEl.style.left = r.left + r.width / 2 + "px";
+    zoomPanelEl.style.transform = "translateX(-50%)";
+  }
+  zoomPanelEl.classList.toggle("hidden", !open);
+  zoomToggleEl.classList.toggle("active", open);
+  if (open) zoomSliderEl.focus();
 }
-document.getElementById("zoom-in").addEventListener("click", () => bumpZoom(ZOOM_STEP));
-document.getElementById("zoom-out").addEventListener("click", () => bumpZoom(-ZOOM_STEP));
+zoomToggleEl.addEventListener("click", () => setZoomPanelOpen(zoomPanelEl.classList.contains("hidden")));
+document.addEventListener("click", (ev) => {
+  if (!zoomPanelEl.classList.contains("hidden") && !zoomWidgetEl.contains(ev.target)) setZoomPanelOpen(false);
+});
+zoomSliderEl.addEventListener("input", () => {
+  zoomLevel = applyZoom(parseFloat(zoomSliderEl.value));
+  try { localStorage.setItem("ostcore-ui3.zoom", zoomLevel); } catch (e) { /* ignore */ }
+});
 
 // ---- parameters modal --------------------------------------------------
 // The profile-centric "Parameters" box (render.js's buildParamsPanel) is

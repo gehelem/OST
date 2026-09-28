@@ -106,26 +106,37 @@
 #top-right { position: fixed; top: 12px; right: 12px; z-index: 20; display: flex; align-items: flex-start; gap: 8px; }
 
 /* UI zoom (font size + everything else, incl. floating panels) — Gilles,
-   2026-09-28: "deux boutons +/- plus petits a gauche du toggle jour/nuit
-   ... taille moitie ... ajuster la taille de police de tous les
-   composants ... la taille des fenetres doit s'ajuster en consequence".
-   One glass chip (like the theme toggle), the two buttons stacked instead
-   of side by side, each roughly half the theme toggle's 36px. Applied via
-   CSS `zoom` on <body> (app.js) rather than a transform: zoom is a real
-   browser-level scale, so panels.js's own drag/resize math (getBoundingClientRect/
-   clientX/clientY) keeps working unmodified, and position:fixed chrome
-   (this very bar included) stays anchored to the real viewport instead of
-   being caught in a transformed containing block. */
-#zoom-controls { display: flex; flex-direction: column; gap: 2px; padding: 3px; }
-.zoom-btn {
-  width: 18px; height: 15px;
-  display: inline-flex; align-items: center; justify-content: center;
-  border: 0; border-radius: 3px; background: transparent;
-  color: var(--text-secondary); cursor: pointer; padding: 0;
-  transition: color 0.15s ease, background 0.15s ease;
+   2026-09-28: "ajuster la taille de police de tous les composants ... la
+   taille des fenetres doit s'ajuster en consequence"; 2026-09-29:
+   "remplace les boutons +/- par un slider qui s'affiche quand on clic sur
+   un bouton unique". One icon chip (like the theme toggle); clicking it
+   folds out a small glass popover with the slider, same collapsible
+   pattern as #conn-widget. Applied via CSS `zoom` on <body> (app.js)
+   rather than a transform: zoom is a real browser-level scale, so
+   panels.js's own drag/resize math (getBoundingClientRect/clientX/
+   clientY) keeps working unmodified, and position:fixed chrome (this very
+   bar included) stays anchored to the real viewport instead of being
+   caught in a transformed containing block. */
+/* The toggle chip itself scales with everything else, like every other
+   #top-right chip — no exception there (Gilles, 2026-09-29: "le bouton Tt
+   doit se comporter comme les autres"). Only the popup is the exception:
+   position:fixed (its own app.js-computed top/left, in real viewport px —
+   taken out of #top-right's flex flow entirely, so it can no longer shift
+   position as its own size changes) + zoom: calc(1/--ui-zoom) (app.js sets
+   --ui-zoom to the same value as body's own zoom) to counter that
+   inherited zoom back out to an effective 1x, constant size regardless of
+   the level currently set — the first attempt put both the button and the
+   popup in one zoom-countering wrapper, which shifted the whole thing
+   around inside the flex row as its box's own contribution to that row's
+   layout changed size ("le slide ne devrait pas changer de taille" turned
+   into "la ca change de position aussi"). */
+#zoom-widget { position: relative; flex-shrink: 0; }
+.zoom-panel {
+  position: fixed; z-index: 30; padding: 8px 12px; display: flex; align-items: center;
+  zoom: calc(1 / var(--ui-zoom, 1));
 }
-.zoom-btn:hover { color: var(--accent); background: var(--bg-hover); }
-.zoom-btn .material-icons { font-size: 12px; }
+/* .hidden (base.css, !important) toggles this panel's visibility. */
+#zoom-slider { width: 110px; accent-color: var(--accent); cursor: pointer; }
 
 .icon-chip {
   position: relative;

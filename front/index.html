@@ -47,9 +47,11 @@
       </div>
     </nav>
     <div id="top-right">
-      <div id="zoom-controls" class="glass">
-        <button id="zoom-in" class="zoom-btn" title="Increase font/UI size"><span class="material-icons">add</span></button>
-        <button id="zoom-out" class="zoom-btn" title="Decrease font/UI size"><span class="material-icons">remove</span></button>
+      <div id="zoom-widget">
+        <button id="zoom-toggle" class="glass icon-chip" title="UI size"><span class="material-icons">format_size</span></button>
+        <div id="zoom-panel" class="glass zoom-panel hidden">
+          <input id="zoom-slider" type="range" min="0.7" max="1.6" step="0.1" value="1">
+        </div>
       </div>
       <button id="theme-toggle" class="glass icon-chip" title="Toggle theme"><span class="material-icons">brightness_2</span></button>
       <div id="conn-widget">
