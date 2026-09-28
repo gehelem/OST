@@ -132,6 +132,20 @@ input[type="range"]::-moz-range-thumb {
    panels.css's .panel-float-body already scrolls/pads the rest). */
 .gd-chart { position: relative; width: 100%; height: 280px; }
 .gd-chart-square { height: auto; }
+.gd-chart.hidden { display: none; }
+
+/* templates/guider.js's fuller image stats+histogram panel. */
+.stat-sec { margin: 10px 0 4px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-dim); }
+.stat-sec:first-child { margin-top: 0; }
+.stat-row { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3); padding: 3px 0; border-top: 1px solid var(--border-subtle); }
+.stat-row:first-of-type { border-top: 0; }
+.stat-label { color: var(--text-muted); }
+.stat-value { font-weight: 600; }
+.img-stats-table { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 12px; }
+.img-stats-table th, .img-stats-table td { padding: 4px 6px; text-align: center; }
+.img-stats-table th:first-child, .img-stats-table td:first-child { text-align: left; color: var(--text-muted); }
+.img-stats-table thead th { border-bottom: 1px solid var(--border); font-size: 10px; color: var(--text-dim); }
+.img-stats-table tbody tr { border-top: 1px solid var(--border-subtle); }
 
 .elt-table { width: 100%; border-collapse: collapse; }
 .elt-row td { padding: 6px 4px; vertical-align: middle; border-top: 1px solid var(--border-subtle); }

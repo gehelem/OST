@@ -121,7 +121,10 @@ function startResize(panel, id, ev, sc) {
 
 /**
  * Creates one floating panel and returns its body element (append content
- * to that, not to the panel itself). opts: { id, title, x, y, w, statusEl }.
+ * to that, not to the panel itself). opts: { id, title, x, y, w, statusEl,
+ * collapsed }. `collapsed: true` is only the first-ever-render default
+ * (e.g. a detail panel meant to start hidden behind its own quicknav
+ * button) — the user's own later choice always overrides it afterwards.
  * `persistent: true` panels survive clear() (none used yet in UI3, kept for
  * parity with ostnoctua's always-on log panel — see README if one is added).
  */
@@ -140,7 +143,11 @@ export function make(opts) {
   panel.style.top = Math.max(SAFE_TOP, st.y != null ? st.y : (opts.y != null ? opts.y : 16)) + "px";
   if (st.w != null || opts.w) panel.style.width = (st.w != null ? st.w : opts.w) + "px";
   if (st.h != null) { panel.style.height = st.h + "px"; panel.classList.add("resized"); }
-  if (st.collapsed) panel.classList.add("collapsed");
+  // `opts.collapsed` is only the template's own first-ever-render default
+  // (e.g. a detail panel that should start hidden until its quicknav
+  // button is clicked) — once the user has actually toggled it, their own
+  // choice (persisted as st.collapsed) always wins from then on.
+  if (st.collapsed != null ? st.collapsed : opts.collapsed) panel.classList.add("collapsed");
 
   const bar = document.createElement("div");
   bar.className = "panel-float-bar";
