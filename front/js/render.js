@@ -182,6 +182,21 @@ function buildEditControl(client, moduleName, el_, elName, buffer, opts) {
   return el("input", { type: "text", class: "field-input", value: JSON.stringify(buffer[elName]) });
 }
 
+// Shared by renderDisplayOnly's own "img" case and templates/guider.js's
+// bespoke background-image stats panel (which shows this line but not the
+// thumbnail itself, since the image is already the full background there
+// — see imagelayer.js) — one place for the field list/formatting instead
+// of two copies drifting apart.
+export function imageStatsLine(v) {
+  const stats = [];
+  if (v.width) stats.push(`${v.width}×${v.height}`);
+  if (v.stars !== undefined) stats.push(`${v.stars} stars`);
+  if (v.hfravg !== undefined) stats.push(`HFR ${v.hfravg.toFixed?.(2) ?? v.hfravg}`);
+  if (v.snr !== undefined) stats.push(`SNR ${v.snr.toFixed?.(2) ?? v.snr}`);
+  if (v.issolved) stats.push(`solved (${v.solverra?.toFixed?.(3)}, ${v.solverde?.toFixed?.(3)})`);
+  return stats;
+}
+
 function renderDisplayOnly(elName, el_) {
   const type = el_.type;
   const value = el_.value;
@@ -198,12 +213,7 @@ function renderDisplayOnly(elName, el_) {
     } else {
       wrap.appendChild(el("div", { class: "muted", text: "No image" }));
     }
-    const stats = [];
-    if (v.width) stats.push(`${v.width}×${v.height}`);
-    if (v.stars !== undefined) stats.push(`${v.stars} stars`);
-    if (v.hfravg !== undefined) stats.push(`HFR ${v.hfravg.toFixed?.(2) ?? v.hfravg}`);
-    if (v.snr !== undefined) stats.push(`SNR ${v.snr.toFixed?.(2) ?? v.snr}`);
-    if (v.issolved) stats.push(`solved (${v.solverra?.toFixed?.(3)}, ${v.solverde?.toFixed?.(3)})`);
+    const stats = imageStatsLine(v);
     if (stats.length) wrap.appendChild(el("div", { class: "img-stats muted mono", text: stats.join(" · ") }));
     return wrap;
   }

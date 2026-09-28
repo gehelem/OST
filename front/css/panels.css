@@ -191,10 +191,39 @@
  * time) or #docked-view (Controller/Files/Logs/connect screen), toggled
  * via .hidden — see js/app.js. */
 #canvas { position: absolute; inset: 0; background: var(--bg); }
+/* Full-viewport background image (a template's own module.image, e.g. the
+   guider template's guide frame) — sits behind #panel-layer/#docked-view
+   (DOM order, both position:absolute with no z-index of their own, so
+   later siblings paint on top), letterboxed (resized, aspect ratio kept —
+   never stretched or cropped), click opens the fullscreen viewer. Ported
+   from ostnoctua's own #on-bg/#on-bg-img (Gilles, 2026-09-29: "affiche
+   l'image derriere en ecran de fond, comme dans ostnoctua") — see
+   js/imagelayer.js. Fixed near-black regardless of theme, same as
+   ostnoctua: astro imagery reads wrong against a light theme's own
+   background. */
+#bg-layer { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+#bg-layer.img-active { background: #05070c; }
+#bg-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; opacity: 0.92; cursor: zoom-in; }
 #panel-layer, #docked-view { position: absolute; inset: 0; overflow: auto; }
 #docked-view { padding: var(--space-5); }
 #docked-view > * { max-width: 1180px; margin: 0 auto; }
 #panel-layer.hidden, #docked-view.hidden { display: none; }
+
+/* ------------------------------------------------------- fullscreen image
+ * viewer (js/imagelayer.js's openImageViewer()) — wheel zooms toward the
+ * cursor, drag pans, Esc/backdrop/close button closes. Same behavior and
+ * class shapes as ostnoctua's .oi-viewer/.oi-stage/.oi-img/.oi-close. */
+.img-viewer { position: fixed; inset: 0; z-index: 9999; background: rgba(2, 3, 8, 0.93); backdrop-filter: blur(3px); }
+.img-viewer-stage { position: absolute; inset: 0; overflow: hidden; cursor: grab; }
+.img-viewer-stage.grabbing { cursor: grabbing; }
+.img-viewer-img { position: absolute; top: 0; left: 0; transform-origin: 0 0; image-rendering: pixelated; user-select: none; -webkit-user-drag: none; }
+.img-viewer-close {
+  position: absolute; top: 14px; right: 18px;
+  width: 34px; height: 34px; border-radius: var(--radius);
+  font-size: 22px; line-height: 1; cursor: pointer;
+  border: 1px solid var(--border); background: var(--bg-panel); color: var(--text);
+}
+.img-viewer-close:hover { border-color: var(--accent-dim); }
 
 .panel-float {
   position: absolute;

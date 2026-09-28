@@ -11,6 +11,7 @@ import { renderModuleView, buildParamsPanel, setMediaBaseUrl, setDialogRoot, set
 import { renderModbar, renderSystemViews, renderController, renderFiles, renderLogs, renderLogin } from "./views.js";
 import { el, icon, iconButton } from "./dom.js";
 import * as Panels from "./panels.js";
+import { setBgLayer } from "./imagelayer.js";
 import { templates } from "./templates/index.js";
 
 const client = createClient();
@@ -23,6 +24,7 @@ const quicknavEl = document.getElementById("quicknav");
 const quicknavNavEl = document.getElementById("quicknav-nav");
 const quicknavSepEl = document.getElementById("quicknav-sep");
 Panels.setLayer(panelLayerEl);
+setBgLayer(document.getElementById("bg-layer"));
 setQuickNavRoot(quicknavNavEl, quicknavSepEl);
 // One listener, registered once (not per-render, unlike the quicknav
 // buttons themselves which get rebuilt on every module change) — keeps a
