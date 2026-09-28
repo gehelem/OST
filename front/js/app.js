@@ -11,7 +11,7 @@ import { renderModuleView, buildParamsPanel, setMediaBaseUrl, setDialogRoot, set
 import { renderModbar, renderSystemViews, renderController, renderFiles, renderLogs, renderLogin } from "./views.js";
 import { el, icon, iconButton } from "./dom.js";
 import * as Panels from "./panels.js";
-import { setBgLayer } from "./imagelayer.js";
+import { setBgLayer, openImageViewer } from "./imagelayer.js";
 import { templates } from "./templates/index.js";
 
 const client = createClient();
@@ -34,6 +34,22 @@ setQuickNavRoot(quicknavNavEl, quicknavSepEl);
 panelLayerEl.addEventListener("panelvisibility", (ev) => {
   const btn = quicknavNavEl.querySelector(`[data-panel-id="${ev.detail.id}"]`);
   if (btn) btn.classList.toggle("active", ev.detail.visible);
+});
+// #panel-layer fills the whole canvas even where no panel actually sits
+// (see index.html), so it was silently swallowing clicks meant for
+// #bg-image sitting behind it (Gilles, 2026-09-29: "le clic sur l'image de
+// fond ne marche pas") — a click that lands on genuinely empty space
+// always targets panelLayerEl itself (never ev.target for a click on an
+// actual .panel-float or its descendants), so forward exactly that case to
+// the background image's own click behavior. #bg-image only exists at all
+// when a template actually called showBackgroundImage() — harmless no-op
+// otherwise. Deliberately not a CSS pointer-events:none fix: that would
+// also break wheel-scrolling #panel-layer itself (a real need once many
+// panels are stacked below the fold).
+panelLayerEl.addEventListener("click", (ev) => {
+  if (ev.target !== panelLayerEl) return;
+  const img = document.getElementById("bg-image");
+  if (img && img.src) openImageViewer(img.src);
 });
 const connWidgetEl = document.getElementById("conn-widget");
 const connToggleEl = document.getElementById("conn-toggle");

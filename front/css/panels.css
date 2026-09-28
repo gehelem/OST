@@ -208,6 +208,11 @@
 #docked-view { padding: var(--space-5); }
 #docked-view > * { max-width: 1180px; margin: 0 auto; }
 #panel-layer.hidden, #docked-view.hidden { display: none; }
+/* #panel-layer sits on top of #bg-image (js/app.js forwards its own empty-
+   space clicks to it, see that file), so the "clickable" cursor has to
+   live here too, or hovering the visible background through the gaps
+   between panels shows no hint at all that it's clickable. */
+#bg-layer.img-active ~ #panel-layer { cursor: zoom-in; }
 
 /* ------------------------------------------------------- fullscreen image
  * viewer (js/imagelayer.js's openImageViewer()) — wheel zooms toward the
