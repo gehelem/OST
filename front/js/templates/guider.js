@@ -22,10 +22,12 @@
 // twice (full background + a small embedded copy) would be exactly the
 // kind of redundant duplication Gilles has already flagged elsewhere this
 // project ("tu as laisse les libelles des boutons !!! c'est ridicule"). The
-// quick-stats line + the fuller stats/histogram panel both moved into
-// imagelayer.js itself (Gilles, 2026-09-29, having asked "est-ce que ce
-// truc d'image sera reutilisable sur d'autres templates ?": "Go") — this
-// file just wires them to guider's own "image" property/element.
+// whole thing (background + quick-stats line + the fuller stats/histogram
+// panel, one addImageBlock() call) lives in imagelayer.js (Gilles,
+// 2026-09-29, having asked "est-ce que ce truc d'image sera reutilisable
+// sur d'autres templates ?": "Go") — reused as-is by templates/scaffold.js
+// (focus/sequencer) too, so this file just wires it to guider's own
+// "image" property/element.
 //
 // Real property names confirmed against src/modules/guider/guider.json /
 // guider.cpp: actions, values, calibrationvalues, drift, guiding,
@@ -34,7 +36,7 @@
 // libs/indimodule.cpp) for any imaging module, guider included.
 
 import { renderProperty, updateQuickNav } from "../render.js";
-import { showBackgroundImage, buildImageQuickStats, buildImageStatsHistogramPanel } from "../imagelayer.js";
+import { addImageBlock } from "../imagelayer.js";
 import { el } from "../dom.js";
 import * as Panels from "../panels.js";
 
@@ -287,22 +289,7 @@ export function mount(client, moduleName) {
       b.appendChild(track(renderProperty(client, moduleName, "values")));
       if (has("calibrationvalues")) b.appendChild(track(renderProperty(client, moduleName, "calibrationvalues")));
     }
-    if (has("image")) {
-      // Full background (click -> fullscreen viewer), not a floating
-      // panel — see this file's header. Not tracked via track() (it's not
-      // a node appended anywhere), just its dispose function.
-      disposers.push(showBackgroundImage(client, moduleName, "image", "image").dispose);
-      const b = Panels.make({ id: "image", title: mod.properties.image.label || "Guide frame", x: 350, y: 92, w: 260 });
-      b.appendChild(track(buildImageQuickStats(client, moduleName, "image", "image")));
-      quickNavEntries.push({ id: "image", label: mod.properties.image.label || "Image" });
-
-      // Deeper view (full per-channel stats table + histogram), hidden
-      // until its own quicknav button is clicked — see Panels.make()'s
-      // `collapsed` doc.
-      const sb = Panels.make({ id: "image-stats", title: "Image stats", x: 350, y: 190, w: 360, collapsed: true });
-      sb.appendChild(track(buildImageStatsHistogramPanel(client, moduleName, "image", "image")));
-      quickNavEntries.push({ id: "image-stats", label: "Stats" });
-    }
+    addImageBlock(client, moduleName, mod, "image", "image", Panels, track, disposers, quickNavEntries, { x: 350, y: 92, w: 260 });
     if (has("guiding")) {
       const b = Panels.make({ id: "guiding", title: mod.properties.guiding.label || "Guiding", x: 350, y: 300, w: 620 });
       b.appendChild(track(buildGuidingChartPanel(client, moduleName)));

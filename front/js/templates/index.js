@@ -11,7 +11,11 @@
 // which would just fall back to generic (safe failure, not a crash).
 
 import * as guider from "./guider.js";
+import * as focus from "./focus.js";
+import * as sequencer from "./sequencer.js";
 
 export const templates = {
   guider,
+  focus,
+  sequencer,
 };

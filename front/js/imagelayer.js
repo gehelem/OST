@@ -20,6 +20,8 @@
 //   openImageViewer(src)                                          standalone use
 //   buildImageQuickStats(client, moduleName, propName, elName)    -> node (one live line)
 //   buildImageStatsHistogramPanel(client, moduleName, propName, elName) -> node
+//   addImageBlock(client, moduleName, mod, propName, elName,
+//                 panelsApi, track, disposers, quickNavEntries, pos)  the whole thing, one call
 
 import { el, icon } from "./dom.js";
 import { getMediaBaseUrl, imageStatsLine } from "./render.js";
@@ -284,4 +286,28 @@ export function buildImageStatsHistogramPanel(client, moduleName, propName, elNa
 
   wrap._dispose = () => { unsub(); if (chartRef.chart) { chartRef.chart.destroy(); chartRef.chart = null; } };
   return wrap;
+}
+
+/**
+ * The full "a module has an image" block a template wires in one call:
+ * background + a small quick-stats panel + a deeper stats/histogram panel
+ * (hidden until its own quicknav button is clicked), plus the matching
+ * quicknav entries — shared by templates/scaffold.js and templates/
+ * guider.js so the two can't drift apart. No-op if `mod` doesn't actually
+ * have `propName`. `panelsApi` is js/panels.js (passed in rather than
+ * imported here, same as every template already does, to keep this file
+ * itself DOM-shell-agnostic); `track`/`disposers`/`quickNavEntries` are the
+ * caller's own bookkeeping, same shapes every template already uses.
+ */
+export function addImageBlock(client, moduleName, mod, propName, elName, panelsApi, track, disposers, quickNavEntries, pos) {
+  if (!(propName in mod.properties)) return;
+  const p = { x: 660, y: 92, w: 280, ...pos };
+  disposers.push(showBackgroundImage(client, moduleName, propName, elName).dispose);
+  const b = panelsApi.make({ id: propName, title: mod.properties[propName].label || "Image", x: p.x, y: p.y, w: p.w });
+  b.appendChild(track(buildImageQuickStats(client, moduleName, propName, elName)));
+  quickNavEntries.push({ id: propName, label: mod.properties[propName].label || "Image" });
+
+  const sb = panelsApi.make({ id: propName + "-stats", title: "Image stats", x: p.x, y: p.y + 100, w: p.w + 100, collapsed: true });
+  sb.appendChild(track(buildImageStatsHistogramPanel(client, moduleName, propName, elName)));
+  quickNavEntries.push({ id: propName + "-stats", label: "Stats" });
 }
