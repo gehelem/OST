@@ -49,50 +49,59 @@ export const ZOOM_MIN = 0.5, ZOOM_MAX = 6;
 // the dome edge once panned.
 const HORIZON_SAMPLES = 72;
 
-// Equator/meridian graduations (Gilles, 2026-09-30: "regles graduees
-// dynamiquement en fonction du niveau de zoom") — pickGradStepDeg() picks
-// the finest of these "usual" intervals that keeps the tick count under a
-// zoom-scaled budget, so the ruler gets more detailed as you zoom in
-// instead of a fixed spacing that's either sparse zoomed out or an
-// unreadable smear zoomed in. GRAD_TICK_PX is a fixed screen length (not
-// degrees) so ticks stay a constant, legible size regardless of zoom.
+// Equatorial/azimuthal grid graduations (Gilles, 2026-09-30: "regles
+// graduees dynamiquement en fonction du niveau de zoom", then 2026-10-01,
+// correcting an earlier single-line-per-system pass: "ce que je veux
+// c'est un cadrillage ! ... avec des epaisseurs differentes dynamiques (5°
+// gras et 1° fin par exemple, mais qui s'ajuste en fonction de
+// l'echelle)") — pickGradStepDeg() picks the finest of these "usual"
+// intervals that keeps the line count under a zoom-scaled budget, so the
+// grid gets denser as you zoom in instead of a fixed spacing that's either
+// sparse zoomed out or an unreadable smear zoomed in. Major lines (thicker,
+// full opacity) sit at 5x the minor spacing (Gilles's own "5°/1°" example,
+// applied as a ratio rather than literal degrees so it still makes sense
+// once the minor step itself is something other than 1°).
 const GRAD_STEPS_DEG = [60, 30, 15, 10, 5, 2, 1, 0.5];
-const GRAD_TICK_PX = 6;
+const GRAD_MAJOR_RATIO = 5;
 function pickGradStepDeg(rangeDeg, zoom) {
-  const maxTicks = 12 * Math.max(1, zoom);
+  const maxLines = 12 * Math.max(1, zoom);
   let step = GRAD_STEPS_DEG[0];
   for (const s of GRAD_STEPS_DEG) {
-    if (rangeDeg / s <= maxTicks) step = s; else break;
+    if (rangeDeg / s <= maxLines) step = s; else break;
   }
   return step;
 }
-// Draws one short tick at p0, oriented along the (p0 -> p1) screen-space
-// direction — p1 is any nearby point along the "other" coordinate (e.g.
-// dec+3° for an equator tick, az+3° for a meridian tick), so the tick
-// automatically follows the curve's local perpendicular under whatever
-// rotation/projection is currently active, without needing real calculus.
-function drawTick(ctx, p0, p1, pixelLen) {
-  let dx = p1.x - p0.x, dy = p1.y - p0.y;
-  const len = Math.hypot(dx, dy) || 1;
-  dx = (dx / len) * pixelLen;
-  dy = (dy / len) * pixelLen;
-  ctx.beginPath();
-  ctx.moveTo(p0.x - dx / 2, p0.y - dy / 2);
-  ctx.lineTo(p0.x + dx / 2, p0.y + dy / 2);
-  ctx.stroke();
+function isMajorLine(value, majorStep) {
+  const m = ((value % majorStep) + majorStep) % majorStep;
+  return m < 1e-6 || majorStep - m < 1e-6;
 }
-// Draws a tick's coordinate value just past its outer end (p0 + the same
-// perpendicular direction used for the tick itself, pushed a bit further
-// out) - Gilles, 2026-10-01: "tu n'as pas ajoute les graduations,
-// coordonnees equatoriales et azimutales comme je te l'avais demande":
-// the ticks alone weren't the "graduations", the coordinate numbers next
-// to them are.
-function drawTickLabel(ctx, p0, p1, text) {
-  let dx = p1.x - p0.x, dy = p1.y - p0.y;
-  const len = Math.hypot(dx, dy) || 1;
-  dx = (dx / len) * (GRAD_TICK_PX + 8);
-  dy = (dy / len) * (GRAD_TICK_PX + 8);
-  ctx.fillText(text, p0.x + dx, p0.y + dy);
+// Strokes a polyline given as an array of already-projected {x,y,visible}
+// points, breaking across any gap where the line leaves the currently
+// visible (front) hemisphere and picking back up wherever it re-enters -
+// same "moveTo on the first visible point after a gap" pattern the true
+// horizon/meridian lines already used before this became a generic grid.
+// Returns the first visible point, for a caller that wants to label the
+// line (or null if none of it was visible at all).
+function strokePolyline(ctx, points) {
+  let started = false, first = null;
+  ctx.beginPath();
+  for (const p of points) {
+    if (!p.visible) { started = false; continue; }
+    if (!first) first = p;
+    if (!started) { ctx.moveTo(p.x, p.y); started = true; } else { ctx.lineTo(p.x, p.y); }
+  }
+  ctx.stroke();
+  return first;
+}
+// A grid line's coordinate value, drawn once near wherever it happens to
+// first become visible - Gilles, 2026-10-01: "tu n'as pas ajoute les
+// graduations, coordonnees equatoriales et azimutales comme je te l'avais
+// demande": the lines alone aren't the "graduations", the coordinate
+// numbers are. Only called for major lines (see render()) - a full grid at
+// minor-line density would make every single line's own label unreadable
+// clutter.
+function drawCornerLabel(ctx, p, text) {
+  ctx.fillText(text, p.x + 6, p.y - 6);
 }
 // RA graduation label, in hours - the "usual" unit for equatorial
 // coordinates (as opposed to plain degrees) in every telescope-control
@@ -106,7 +115,17 @@ function fmtRaHoursLabel(raDeg) {
   return mm === 0 ? `${hh}h` : `${hh}h${String(mm).padStart(2, "0")}`;
 }
 function fmtDegLabel(deg) {
-  return `${Math.round(deg)}°`;
+  return `${Math.round(((deg % 360) + 360) % 360)}°`;
+}
+// Multiples of `step` within [min, max], aligned through zero rather than
+// from `min` itself - e.g. rangeSteps(-90, 90, 60) is [-60, 0, 60], not
+// [-90, -30, 30, 90], so 0 (the equator/horizon itself) is always one of
+// the lines regardless of step.
+function rangeSteps(min, max, step) {
+  const start = Math.ceil(min / step - 1e-9) * step;
+  const out = [];
+  for (let v = start; v <= max + 1e-9; v += step) out.push(Math.round(v * 1e6) / 1e6);
+  return out;
 }
 
 // Ground mask (Gilles, 2026-10-01: "si horizon : la partie inferieure doit
@@ -212,8 +231,8 @@ export class SkyEngine {
     this.showCardinals = true;
     this.showMessier = true;
     this.showTrueHorizon = false;
-    this.showEquator = false;
-    this.showMeridian = false;
+    this.showEquatorialGrid = false;
+    this.showAzimuthalGrid = false;
     this.dayMode = false;
     // Whether the *app's own* light/dark theme is currently light — set
     // and kept in sync by the caller (templates/navigator.js watches
@@ -415,8 +434,8 @@ export class SkyEngine {
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, w, h);
     const fg = isLightBg
-      ? { dome: "rgba(0,0,0,0.28)", cardinal: "rgba(0,0,0,0.6)", constellation: "rgba(40,80,140,0.45)", star: "#15181c", messier: "rgba(27,94,32,0.85)", horizon: "rgba(180,110,0,0.65)", equator: "rgba(0,121,107,0.6)", meridian: "rgba(123,31,162,0.6)", grad: "rgba(0,0,0,0.55)", ground: "#cdbb95" }
-      : { dome: "rgba(255,255,255,0.25)", cardinal: "rgba(255,255,255,0.55)", constellation: "rgba(100,160,220,0.35)", star: "#fff", messier: "rgba(129,199,132,0.85)", horizon: "rgba(255,193,7,0.55)", equator: "rgba(77,208,225,0.6)", meridian: "rgba(206,147,216,0.6)", grad: "rgba(255,255,255,0.75)", ground: "#241b12" };
+      ? { dome: "rgba(0,0,0,0.28)", cardinal: "rgba(0,0,0,0.6)", constellation: "rgba(40,80,140,0.45)", star: "#15181c", messier: "rgba(27,94,32,0.85)", horizon: "rgba(180,110,0,0.65)", equator: "rgba(0,121,107,0.6)", azimuthal: "rgba(123,31,162,0.6)", grad: "rgba(0,0,0,0.55)", ground: "#cdbb95" }
+      : { dome: "rgba(255,255,255,0.25)", cardinal: "rgba(255,255,255,0.55)", constellation: "rgba(100,160,220,0.35)", star: "#fff", messier: "rgba(129,199,132,0.85)", horizon: "rgba(255,193,7,0.55)", equator: "rgba(77,208,225,0.6)", azimuthal: "rgba(206,147,216,0.6)", grad: "rgba(255,255,255,0.75)", ground: "#241b12" };
 
     const cx = w / 2, cy = h / 2;
     const domeRadius = Math.min(w, h) / 2 * 0.96 * this.zoom;
@@ -513,91 +532,120 @@ export class SkyEngine {
       // skyPoly === null: whole visible dome is real sky, nothing to mask.
     }
 
-    // Celestial equator (dec=0), graduated like a ruler - Gilles,
-    // 2026-09-30: "afficher les reperes habituels ... equateur, meridien".
-    // Sampled/projected in equatorial coordinates (unlike the true
-    // horizon/meridian below, which are native to the observer's own
-    // horizontal frame) since dec=0 is a fixed circle on the sky regardless
-    // of where the observer is or what time it is - project() (RA/Dec ->
-    // screen) already does the equatorial->horizontal->screen chain for
-    // every other catalog object.
-    if (this.showEquator) {
-      ctx.strokeStyle = fg.equator;
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      let started = false;
-      const EQUATOR_SAMPLES = 144;
-      for (let i = 0; i <= EQUATOR_SAMPLES; i++) {
-        const p = project((360 * i) / EQUATOR_SAMPLES, 0);
-        if (!p.visible) { started = false; continue; }
-        if (!started) { ctx.moveTo(p.x, p.y); started = true; } else { ctx.lineTo(p.x, p.y); }
-      }
-      ctx.stroke();
-
-      const step = pickGradStepDeg(360, this.zoom);
+    // Equatorial grid: lines of constant RA (pole to pole, like meridians
+    // of longitude) and constant Dec (parallels, dec=0 being the celestial
+    // equator itself) - Gilles, 2026-10-01, correcting an earlier
+    // single-line-per-system pass: "ce que je veux c'est un cadrillage !
+    // (pas uniquement les valeurs sur le meridien et l'horizon) - avec des
+    // epaisseurs differentes dynamiques (5° gras et 1° fin par exemple,
+    // mais qui s'ajuste en fonction de l'echelle)". Sampled/projected in
+    // equatorial coordinates (unlike the azimuthal grid below, native to
+    // the observer's own horizontal frame) since RA/Dec are fixed on the
+    // sky regardless of where the observer is or what time it is -
+    // project() (RA/Dec -> screen) already does the equatorial ->
+    // horizontal -> screen chain for every other catalog object. Major
+    // lines only get a coordinate label (RA in hours, Dec in degrees) -
+    // labelling every minor line too would be unreadable clutter.
+    if (this.showEquatorialGrid) {
+      const raMinor = pickGradStepDeg(360, this.zoom), raMajor = raMinor * GRAD_MAJOR_RATIO;
+      const decMinor = pickGradStepDeg(180, this.zoom), decMajor = decMinor * GRAD_MAJOR_RATIO;
       ctx.fillStyle = fg.grad;
       ctx.font = "10px sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      for (let ra = 0; ra < 360; ra += step) {
-        const p0 = project(ra, 0);
-        const p1 = project(ra, 3); // a few degrees off in dec - just used for tick direction, see drawTick()
-        if (!p0.visible || !p1.visible) continue;
-        drawTick(ctx, p0, p1, GRAD_TICK_PX);
-        drawTickLabel(ctx, p0, p1, fmtRaHoursLabel(ra)); // equatorial coordinates - RA in hours
+      const LINE_SAMPLES = 64;
+
+      for (let ra = 0; ra < 360; ra += raMinor) {
+        const major = isMajorLine(ra, raMajor);
+        ctx.strokeStyle = fg.equator;
+        ctx.lineWidth = major ? 1.3 : 0.5;
+        ctx.globalAlpha = major ? 1 : 0.55;
+        const pts = [];
+        for (let i = 0; i <= LINE_SAMPLES; i++) pts.push(project(ra, -90 + (180 * i) / LINE_SAMPLES));
+        const first = strokePolyline(ctx, pts);
+        if (major && first) drawCornerLabel(ctx, first, fmtRaHoursLabel(ra));
       }
+      for (const dec of rangeSteps(-90, 90, decMinor)) {
+        const major = isMajorLine(dec, decMajor);
+        ctx.strokeStyle = fg.equator;
+        ctx.lineWidth = major ? 1.3 : 0.5;
+        ctx.globalAlpha = major ? 1 : 0.55;
+        const pts = [];
+        for (let i = 0; i <= LINE_SAMPLES; i++) pts.push(project((360 * i) / LINE_SAMPLES, dec));
+        const first = strokePolyline(ctx, pts);
+        if (major && first) drawCornerLabel(ctx, first, fmtDegLabel(dec));
+      }
+      ctx.globalAlpha = 1;
     }
 
-    // Local meridian: the great circle through the North point, zenith and
-    // South point - always passes through the celestial pole (at azimuth 0,
-    // altitude = observer latitude, any hemisphere - see
-    // equatorialToHorizontal's own precession-correct math, used here
-    // instead of the textbook alt=latitude shortcut). Split in two styles
-    // at that pole (Gilles, 2026-09-30: "pointille du nord a la polaire, et
-    // continu de la polaire au sud") - dashed below the pole, solid from
-    // the pole through the zenith to the South point; degrades gracefully
-    // to "solid all the way" if the pole itself is below the horizon
-    // (southern-hemisphere sites - not this app's primary use case, but
-    // shouldn't draw a nonsensical dash either).
-    if (this.showMeridian) {
-      const ncpAlt = equatorialToHorizontal(0, 90, this.observer, date).altitude;
-      const splitAlt = Math.max(0, Math.min(90, ncpAlt));
-      ctx.strokeStyle = fg.meridian;
-      ctx.lineWidth = 1;
-
-      const drawMeridianArc = (az, altFrom, altTo, dashed) => {
-        if (altFrom === altTo) return;
-        ctx.setLineDash(dashed ? [4, 4] : []);
-        ctx.beginPath();
-        let started = false;
-        const ARC_SAMPLES = 48;
-        for (let i = 0; i <= ARC_SAMPLES; i++) {
-          const alt = altFrom + (altTo - altFrom) * (i / ARC_SAMPLES);
-          const p = toScreen(horizontalToVector(az, alt));
-          if (!p.visible) { started = false; continue; }
-          if (!started) { ctx.moveTo(p.x, p.y); started = true; } else { ctx.lineTo(p.x, p.y); }
-        }
-        ctx.stroke();
-      };
-      drawMeridianArc(0, 0, splitAlt, true);    // North point -> pole, dashed
-      drawMeridianArc(0, splitAlt, 90, false);  // pole -> zenith, solid
-      drawMeridianArc(180, 90, 0, false);       // zenith -> South point, solid
-      ctx.setLineDash([]);
-
-      const step = pickGradStepDeg(90, this.zoom);
+    // Azimuthal grid: vertical circles through the zenith (constant
+    // azimuth) and circles parallel to the horizon (constant altitude),
+    // native to the observer's own horizontal frame. Each azimuth value
+    // and its antipode (az/az+180) together trace one full great circle
+    // through the zenith - same as two opposite lines of longitude through
+    // both poles - so only half the compass (0-180) needs enumerating.
+    // az=0 is the local meridian itself: always passes through the
+    // celestial pole (at altitude = observer latitude, any hemisphere -
+    // see equatorialToHorizontal's own precession-correct math, used here
+    // instead of the textbook alt=latitude shortcut) and keeps its own
+    // special styling (Gilles, 2026-09-30: "pointille du nord a la
+    // polaire, et continu de la polaire au sud") - dashed below the pole,
+    // solid from the pole through the zenith to the South point, no matter
+    // whether az=0 happens to land on a "major" line at the current zoom.
+    // Every other azimuth/altitude line is a plain arc, styled only by
+    // major/minor. Altitude lines skip 0 (that's showTrueHorizon's own
+    // line, with its own ground-mask semantics, not duplicated here), and
+    // neither system draws below the horizon (alt<0) - a "look at the sky"
+    // grid, not a full free-floating sphere one.
+    if (this.showAzimuthalGrid) {
+      const azMinor = pickGradStepDeg(360, this.zoom), azMajor = azMinor * GRAD_MAJOR_RATIO;
+      const altMinor = pickGradStepDeg(90, this.zoom), altMajor = altMinor * GRAD_MAJOR_RATIO;
       ctx.fillStyle = fg.grad;
       ctx.font = "10px sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      for (const az of [0, 180]) {
-        for (let alt = step; alt < 90; alt += step) {
-          const p0 = toScreen(horizontalToVector(az, alt));
-          const p1 = toScreen(horizontalToVector(az + 3, alt)); // a few degrees off in azimuth - tick direction only
-          if (!p0.visible || !p1.visible) continue;
-          drawTick(ctx, p0, p1, GRAD_TICK_PX);
-          drawTickLabel(ctx, p0, p1, fmtDegLabel(alt)); // azimuthal/horizontal coordinates - altitude in degrees
+      const ARC_SAMPLES = 48;
+
+      for (let az = 0; az < 180; az += azMinor) {
+        const major = isMajorLine(az, azMajor);
+        ctx.strokeStyle = fg.azimuthal;
+        ctx.lineWidth = major ? 1.3 : 0.5;
+        ctx.globalAlpha = major ? 1 : 0.55;
+        if (az === 0) {
+          const ncpAlt = equatorialToHorizontal(0, 90, this.observer, date).altitude;
+          const splitAlt = Math.max(0, Math.min(90, ncpAlt));
+          const drawMeridianArc = (azz, altFrom, altTo, dashed) => {
+            if (altFrom === altTo) return;
+            ctx.setLineDash(dashed ? [4, 4] : []);
+            const pts = [];
+            for (let i = 0; i <= ARC_SAMPLES; i++) pts.push(toScreen(horizontalToVector(azz, altFrom + (altTo - altFrom) * (i / ARC_SAMPLES))));
+            strokePolyline(ctx, pts);
+          };
+          drawMeridianArc(0, 0, splitAlt, true);    // North point -> pole, dashed
+          drawMeridianArc(0, splitAlt, 90, false);  // pole -> zenith, solid
+          drawMeridianArc(180, 90, 0, false);       // zenith -> South point, solid
+          ctx.setLineDash([]);
+        } else {
+          for (const azz of [az, az + 180]) {
+            const pts = [];
+            for (let i = 0; i <= ARC_SAMPLES; i++) pts.push(toScreen(horizontalToVector(azz, (90 * i) / ARC_SAMPLES)));
+            const first = strokePolyline(ctx, pts);
+            if (major && first) drawCornerLabel(ctx, first, fmtDegLabel(azz));
+          }
         }
       }
+      for (let alt = altMinor; alt < 90; alt += altMinor) {
+        const major = isMajorLine(alt, altMajor);
+        ctx.strokeStyle = fg.azimuthal;
+        ctx.lineWidth = major ? 1.3 : 0.5;
+        ctx.globalAlpha = major ? 1 : 0.55;
+        const pts = [];
+        const CIRCLE_SAMPLES = 96;
+        for (let i = 0; i <= CIRCLE_SAMPLES; i++) pts.push(toScreen(horizontalToVector((360 * i) / CIRCLE_SAMPLES, alt)));
+        const first = strokePolyline(ctx, pts);
+        if (major && first) drawCornerLabel(ctx, first, fmtDegLabel(alt));
+      }
+      ctx.globalAlpha = 1;
     }
 
     // Cardinal points. Projected through the same rotation as everything

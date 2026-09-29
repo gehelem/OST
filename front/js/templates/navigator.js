@@ -109,8 +109,8 @@ function saveDisplaySettings(engine) {
       showCardinals: engine.showCardinals,
       showMessier: engine.showMessier,
       showTrueHorizon: engine.showTrueHorizon,
-      showEquator: engine.showEquator,
-      showMeridian: engine.showMeridian,
+      showEquatorialGrid: engine.showEquatorialGrid,
+      showAzimuthalGrid: engine.showAzimuthalGrid,
       dayMode: engine.dayMode,
       zoom: engine.zoom,
     }));
@@ -146,8 +146,8 @@ function buildSettingsPanel(engine) {
   wrap.appendChild(checkboxRow(t("navigator.cardinalPoints"), "showCardinals"));
   wrap.appendChild(checkboxRow(t("navigator.messierObjects"), "showMessier"));
   wrap.appendChild(checkboxRow(t("navigator.trueHorizon"), "showTrueHorizon"));
-  wrap.appendChild(checkboxRow(t("navigator.equator"), "showEquator"));
-  wrap.appendChild(checkboxRow(t("navigator.meridian"), "showMeridian"));
+  wrap.appendChild(checkboxRow(t("navigator.equatorialGrid"), "showEquatorialGrid"));
+  wrap.appendChild(checkboxRow(t("navigator.azimuthalGrid"), "showAzimuthalGrid"));
   wrap.appendChild(checkboxRow(t("navigator.dayMode"), "dayMode"));
 
   const zoomRow = el("div", { class: "form-row" }, [el("span", { class: "muted small", text: t("navigator.zoom") })]);
