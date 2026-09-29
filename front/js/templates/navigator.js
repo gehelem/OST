@@ -113,6 +113,7 @@ function saveDisplaySettings(engine) {
       showAzimuthalGrid: engine.showAzimuthalGrid,
       dayMode: engine.dayMode,
       zoom: engine.zoom,
+      projection: engine.projection,
     }));
   } catch (e) { /* ignore */ }
 }
@@ -149,6 +150,20 @@ function buildSettingsPanel(engine) {
   wrap.appendChild(checkboxRow(t("navigator.equatorialGrid"), "showEquatorialGrid"));
   wrap.appendChild(checkboxRow(t("navigator.azimuthalGrid"), "showAzimuthalGrid"));
   wrap.appendChild(checkboxRow(t("navigator.dayMode"), "dayMode"));
+
+  // Not a plain boolean engine field (it's the string "orthographic"/
+  // "stereographic", see sky-engine.js's own `projection` doc comment) -
+  // checkboxRow() above only knows how to flip a boolean field directly,
+  // so this one gets its own row instead. Gilles, 2026-10-02: "dans les
+  // settings d'affichage prevois un toggle pour afficher en
+  // stereographique/orthographique et implemente le".
+  const projCb = el("input", { type: "checkbox" });
+  projCb.checked = engine.projection === "stereographic";
+  projCb.addEventListener("change", () => {
+    engine.projection = projCb.checked ? "stereographic" : "orthographic";
+    persistAndRender();
+  });
+  wrap.appendChild(el("label", { class: "form-row", style: "cursor:pointer" }, [projCb, el("span", { text: t("navigator.stereographic") })]));
 
   const zoomRow = el("div", { class: "form-row" }, [el("span", { class: "muted small", text: t("navigator.zoom") })]);
   const zoomSlider = el("input", { type: "range", min: String(ZOOM_MIN), max: String(ZOOM_MAX), step: "0.1", value: String(engine.zoom), style: "flex:1" });

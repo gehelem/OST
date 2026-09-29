@@ -69,25 +69,68 @@ export function horizontalToVector(azimuthDeg, altitudeDeg) {
 }
 
 /**
- * Orthographic projection of one unit vector (already rotated to view
- * space by the caller if the dome is panned — see sky-engine.js) onto the
- * dome circle of the given pixel radius. Returns {x, y, visible} —
- * screen-space offsets from the dome's own center (the caller adds its own
- * center point); visible=false below the horizon-equivalent plane (z<0),
- * the caller decides whether to still draw something there.
+ * Projects one unit vector (already rotated to view space by the caller if
+ * the dome is panned — see sky-engine.js) onto the dome circle of the
+ * given pixel radius. Returns {x, y, visible} — screen-space offsets from
+ * the dome's own center (the caller adds its own center point);
+ * visible=false below the horizon-equivalent plane (z<0), the caller
+ * decides whether to still draw something there.
+ *
+ * `projection` picks between the two this engine supports (Gilles,
+ * 2026-10-02: "dans les settings d'affichage prevois un toggle pour
+ * afficher en stereographique/orthographique"), both parametrised the
+ * same way — by θ, the angular distance from the view's own center (the
+ * zenith when unpanned): z=cos(θ), and (v.x,v.y) already has magnitude
+ * sin(θ) (unit vector) — so both reduce to picking a radial scale factor:
+ *
+ * - "orthographic" (the default so far, and the one every existing test
+ *   assumes unless it says otherwise): r = radiusPx*sin(θ) - the "look
+ *   down the barrel" projection, matching the naked eye's own apparent
+ *   foreshortening near the horizon (compressed) relative to overhead
+ *   (spread out). This is exactly `-radiusPx*(v.x,v.y)` already, no
+ *   separate scale needed.
+ * - "stereographic": r = radiusPx*tan(θ/2) = radiusPx*(v.x,v.y)/(1+v.z) -
+ *   conformal (preserves angles/shapes locally, unlike orthographic),
+ *   and trades the opposite way: more room near the horizon, more
+ *   compression near the zenith. Both conventions are picked so θ=90°
+ *   (the horizon, v.z=0) lands at r=radiusPx either way - sin(90°)=1 and
+ *   tan(45°)=1 - so the dome's own edge means the same thing in both
+ *   modes and toggling between them doesn't change domeRadius/zoom math
+ *   at all, only how everything inside that edge is distributed.
  */
-export function vectorToScreen(v, radiusPx) {
+export function vectorToScreen(v, radiusPx, projection) {
+  if (projection === "stereographic") {
+    const scale = radiusPx / (1 + v.z);
+    return { x: -scale * v.x, y: -scale * v.y, visible: v.z >= 0 };
+  }
   return { x: -radiusPx * v.x, y: -radiusPx * v.y, visible: v.z >= 0 };
 }
 
 /**
- * Inverse of vectorToScreen: a screen point (offset from the dome's own
- * center) -> the unit vector it corresponds to. Used to find what's "under
- * the cursor" for the trackball drag. Points outside the dome circle are
- * clamped onto its rim (z=0) instead of producing NaN — dragging past the
- * edge is common and must stay well-defined.
+ * Inverse of vectorToScreen (same `projection` convention - must match
+ * whatever vectorToScreen() was actually rendered with, or "what's under
+ * the cursor" and what's on screen would disagree): a screen point (offset
+ * from the dome's own center) -> the unit vector it corresponds to. Used
+ * to find what's "under the cursor" for the trackball drag. Points
+ * outside the dome circle are clamped onto its rim (z=0) instead of
+ * producing NaN — dragging past the edge is common and must stay
+ * well-defined, in either projection (stereographic could mathematically
+ * represent points past the front hemisphere too, but every OTHER piece
+ * of this engine - ground masking, the dome edge itself - assumes "front
+ * hemisphere only", so this stays consistent with that rather than
+ * exploiting the wider range).
  */
-export function screenToVector(screenX, screenY, radiusPx) {
+export function screenToVector(screenX, screenY, radiusPx, projection) {
+  if (projection === "stereographic") {
+    let X = -screenX / radiusPx, Y = -screenY / radiusPx;
+    const rho2 = X * X + Y * Y;
+    if (rho2 > 1) {
+      const k = 1 / Math.sqrt(rho2);
+      return { x: X * k, y: Y * k, z: 0 };
+    }
+    const denom = 1 + rho2;
+    return { x: (2 * X) / denom, y: (2 * Y) / denom, z: (1 - rho2) / denom };
+  }
   let x = -screenX / radiusPx, y = -screenY / radiusPx;
   const r2 = x * x + y * y;
   if (r2 > 1) {
@@ -99,12 +142,12 @@ export function screenToVector(screenX, screenY, radiusPx) {
 }
 
 /** Convenience for the no-pan case (rotation = identity): equivalent to
- * vectorToScreen(horizontalToVector(az, alt), radiusPx). Once the dome can
- * be panned (sky-engine.js), everything drawn — including the cardinal
- * labels — goes through the rotated vector instead, so its position on
- * screen reflects the current view like everything else. */
-export function horizontalToScreen(azimuthDeg, altitudeDeg, radiusPx) {
-  return vectorToScreen(horizontalToVector(azimuthDeg, altitudeDeg), radiusPx);
+ * vectorToScreen(horizontalToVector(az, alt), radiusPx, projection). Once
+ * the dome can be panned (sky-engine.js), everything drawn — including the
+ * cardinal labels — goes through the rotated vector instead, so its
+ * position on screen reflects the current view like everything else. */
+export function horizontalToScreen(azimuthDeg, altitudeDeg, radiusPx, projection) {
+  return vectorToScreen(horizontalToVector(azimuthDeg, altitudeDeg), radiusPx, projection);
 }
 
 /** Star/DSO magnitude -> dot radius in px, brighter (lower mag) = bigger.

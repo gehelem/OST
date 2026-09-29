@@ -147,6 +147,7 @@ const STRINGS = {
   "navigator.equatorialGrid": { en: "Equatorial grid", fr: "Grille équatoriale", de: "Äquatorialgitter", it: "Griglia equatoriale", es: "Cuadrícula ecuatorial" },
   "navigator.azimuthalGrid": { en: "Azimuthal grid", fr: "Grille azimutale", de: "Azimutalgitter", it: "Griglia azimutale", es: "Cuadrícula azimutal" },
   "navigator.dayMode": { en: "Day mode", fr: "Mode jour", de: "Tagmodus", it: "Modalità giorno", es: "Modo día" },
+  "navigator.stereographic": { en: "Stereographic projection", fr: "Projection stéréographique", de: "Stereografische Projektion", it: "Proiezione stereografica", es: "Proyección estereográfica" },
   "navigator.zoom": { en: "Zoom", fr: "Zoom", de: "Zoom", it: "Zoom", es: "Zoom" },
   "navigator.selection": { en: "Selection", fr: "Sélection", de: "Auswahl", it: "Selezione", es: "Selección" },
   "navigator.displaySettings": { en: "Display settings", fr: "Réglages d'affichage", de: "Anzeigeeinstellungen", it: "Impostazioni di visualizzazione", es: "Ajustes de visualización" },

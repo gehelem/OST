@@ -262,8 +262,8 @@ function rangeSteps(min, max, step) {
 // The real (fixed-frame) altitude at a given screen offset from the dome's
 // centre - screenToVector() already clamps to the visible (front) hemisphere,
 // so this is only meaningful for offsets within the dome disk.
-function altitudeAtOffset(offX, offY, domeRadius, rotation) {
-  const viewVec = screenToVector(offX, offY, domeRadius);
+function altitudeAtOffset(offX, offY, domeRadius, rotation, projection) {
+  const viewVec = screenToVector(offX, offY, domeRadius, projection);
   const fixedVec = rotateVector(conjugate(rotation), viewVec);
   return vectorToHorizontal(fixedVec).altitude;
 }
@@ -290,15 +290,15 @@ const GROUND_MASK_BISECT_STEPS = 10;
  * just collapses to the centre (fully ground) or extends fully to the
  * edge (fully sky).
  */
-function computeSkyPolygon(domeRadius, rotation) {
-  const centerAlt = altitudeAtOffset(0, 0, domeRadius, rotation);
+function computeSkyPolygon(domeRadius, rotation, projection) {
+  const centerAlt = altitudeAtOffset(0, 0, domeRadius, rotation, projection);
   const centerIsSky = centerAlt >= 0;
   let anyGround = !centerIsSky, anySky = centerIsSky;
   const points = [];
   for (let i = 0; i < GROUND_MASK_RAYS; i++) {
     const phi = (2 * Math.PI * i) / GROUND_MASK_RAYS;
     const dx = Math.cos(phi), dy = Math.sin(phi);
-    const edgeAlt = altitudeAtOffset(dx * domeRadius, dy * domeRadius, domeRadius, rotation);
+    const edgeAlt = altitudeAtOffset(dx * domeRadius, dy * domeRadius, domeRadius, rotation, projection);
     const edgeIsSky = edgeAlt >= 0;
     if (!edgeIsSky) anyGround = true; else anySky = true;
     let r;
@@ -308,7 +308,7 @@ function computeSkyPolygon(domeRadius, rotation) {
       let lo = 0, hi = domeRadius;
       for (let k = 0; k < GROUND_MASK_BISECT_STEPS; k++) {
         const mid = (lo + hi) / 2;
-        const midIsSky = altitudeAtOffset(dx * mid, dy * mid, domeRadius, rotation) >= 0;
+        const midIsSky = altitudeAtOffset(dx * mid, dy * mid, domeRadius, rotation, projection) >= 0;
         if (midIsSky === centerIsSky) lo = mid; else hi = mid;
       }
       r = (lo + hi) / 2;
@@ -357,6 +357,16 @@ export class SkyEngine {
     this.showEquatorialGrid = false;
     this.showAzimuthalGrid = false;
     this.dayMode = false;
+    // "orthographic" (default) or "stereographic" - see sky-projection.js's
+    // own vectorToScreen()/screenToVector() doc comment for the actual
+    // math and what each trades off (Gilles, 2026-10-02: "dans les
+    // settings d'affichage prevois un toggle pour afficher en
+    // stereographique/orthographique"). Passed through to every
+    // vectorToScreen/screenToVector call in this file (rendering, drag,
+    // tap-to-select, the ground mask's own ray-casting) - inconsistent
+    // between them would mean "what's under the cursor" and "what's drawn
+    // there" disagree.
+    this.projection = opts.projection === "stereographic" ? "stereographic" : "orthographic";
     // Whether the *app's own* light/dark theme is currently light — set
     // and kept in sync by the caller (templates/navigator.js watches
     // <html data-theme>). Independent of dayMode (that's the astronomical
@@ -441,7 +451,7 @@ export class SkyEngine {
 
   _handlePointerDown(clientX, clientY) {
     const off = this._pointOffset(clientX, clientY);
-    const grabView = screenToVector(off.x, off.y, this._domeRadius);
+    const grabView = screenToVector(off.x, off.y, this._domeRadius, this.projection);
     // The point currently under the cursor, expressed in the FIXED
     // (unrotated) frame: view = rotation * fixed, so fixed = rotation^-1 *
     // view = conjugate(rotation) * view (unit quaternions: inverse = conjugate).
@@ -457,7 +467,7 @@ export class SkyEngine {
       const d = Math.hypot(off.x - this._drag.startOffset.x, off.y - this._drag.startOffset.y);
       if (d > CLICK_THRESHOLD_PX) this._drag.moved = true;
     }
-    const cView = screenToVector(off.x, off.y, this._domeRadius);
+    const cView = screenToVector(off.x, off.y, this._domeRadius, this.projection);
     // The single minimal rotation taking the originally-grabbed view-space
     // point to the current cursor, composed onto the rotation that was
     // active at dragstart — see this file's header + quaternion.js's own
@@ -506,7 +516,7 @@ export class SkyEngine {
     const domeRadius = this._domeRadius;
     const toOffset = (v) => {
       const rv = rotateVector(this.rotation, v);
-      return vectorToScreen(rv, domeRadius);
+      return vectorToScreen(rv, domeRadius, this.projection);
     };
     let best = null, bestDist = HIT_RADIUS_PX;
     const consider = (kind, obj) => {
@@ -522,7 +532,7 @@ export class SkyEngine {
     if (best) { this.onSelect(best); return; }
 
     // Nothing catalogued close enough - report the raw point instead.
-    const view = screenToVector(offX, offY, domeRadius);
+    const view = screenToVector(offX, offY, domeRadius, this.projection);
     const fixed = rotateVector(conjugate(this.rotation), view);
     const { azimuth, altitude } = vectorToHorizontal(fixed);
     if (altitude < 0) return; // tapped past the dome edge - not a real sky point
@@ -571,8 +581,8 @@ export class SkyEngine {
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, w, h);
     const fg = isLightBg
-      ? { dome: "rgba(0,0,0,0.28)", cardinal: "rgba(0,0,0,0.6)", constellation: "rgba(40,80,140,0.45)", star: "#15181c", messier: "rgba(27,94,32,0.85)", horizon: "rgba(180,110,0,0.65)", equator: "rgba(0,121,107,0.6)", azimuthal: "rgba(123,31,162,0.6)", grad: "rgba(0,0,0,0.55)", ground: "#cdbb95" }
-      : { dome: "rgba(255,255,255,0.25)", cardinal: "rgba(255,255,255,0.55)", constellation: "rgba(100,160,220,0.35)", star: "#fff", messier: "rgba(129,199,132,0.85)", horizon: "rgba(255,193,7,0.55)", equator: "rgba(77,208,225,0.6)", azimuthal: "rgba(206,147,216,0.6)", grad: "rgba(255,255,255,0.75)", ground: "#241b12" };
+      ? { dome: "rgba(0,0,0,0.28)", cardinal: "rgba(0,0,0,0.6)", constellation: "rgba(40,80,140,0.45)", star: "#15181c", messier: "rgba(27,94,32,0.85)", horizon: "rgba(180,110,0,0.65)", equator: "rgba(0,121,107,0.6)", azimuthal: "rgba(123,31,162,0.6)", meridian: "rgba(13,71,161,0.95)", grad: "rgba(0,0,0,0.55)", ground: "#cdbb95" }
+      : { dome: "rgba(255,255,255,0.25)", cardinal: "rgba(255,255,255,0.55)", constellation: "rgba(100,160,220,0.35)", star: "#fff", messier: "rgba(129,199,132,0.85)", horizon: "rgba(255,193,7,0.55)", equator: "rgba(77,208,225,0.6)", azimuthal: "rgba(206,147,216,0.6)", meridian: "rgba(41,121,255,0.95)", grad: "rgba(255,255,255,0.75)", ground: "#241b12" };
 
     const cx = w / 2, cy = h / 2;
     const domeRadius = Math.min(w, h) / 2 * 0.96 * this.zoom;
@@ -611,7 +621,7 @@ export class SkyEngine {
 
     const toScreen = (v) => {
       const rv = rotateVector(this.rotation, v);
-      const p = vectorToScreen(rv, domeRadius);
+      const p = vectorToScreen(rv, domeRadius, this.projection);
       return { x: cx + p.x, y: cy + p.y, visible: p.visible };
     };
     const project = (raDeg, decDeg) => {
@@ -661,7 +671,7 @@ export class SkyEngine {
     // ctx.restore() at the very end.
     let groundClipActive = false;
     if (this.showTrueHorizon) {
-      const skyPoly = computeSkyPolygon(domeRadius, this.rotation);
+      const skyPoly = computeSkyPolygon(domeRadius, this.rotation, this.projection);
       if (skyPoly === "none") {
         ctx.fillStyle = fg.ground;
         ctx.beginPath();
@@ -788,10 +798,15 @@ export class SkyEngine {
 
       for (let az = 0; az < 180; az += azMinor) {
         const major = isMajorLine(az, azMajor);
-        ctx.strokeStyle = fg.azimuthal;
-        ctx.lineWidth = major ? 1.3 : 0.5;
-        ctx.globalAlpha = major ? 1 : 0.55;
         if (az === 0) {
+          // Bold, dedicated blue, not the plain azimuthal-grid colour/
+          // major-minor thickness - Gilles, 2026-10-02: "le repere
+          // meridien n'est pas visible sous les grilles, et affiche le en
+          // bleu gras plutot" - it used to blend into the rest of the grid
+          // once showAzimuthalGrid was also on, easy to lose track of.
+          ctx.strokeStyle = fg.meridian;
+          ctx.lineWidth = 2.2;
+          ctx.globalAlpha = 1;
           const ncpAlt = equatorialToHorizontal(0, 90, this.observer, date).altitude;
           const splitAlt = Math.max(0, Math.min(90, ncpAlt));
           const drawMeridianArc = (azz, altFrom, altTo, dashed) => {
@@ -816,6 +831,9 @@ export class SkyEngine {
           const northAnchor = pickOrderedLabelAnchor(northPts.slice(0, -1), w, h, labelMargin);
           if (northAnchor) labelCandidates.push({ anchor: northAnchor, text: fmtDegLabel(0), major: true });
         } else {
+          ctx.strokeStyle = fg.azimuthal;
+          ctx.lineWidth = major ? 1.3 : 0.5;
+          ctx.globalAlpha = major ? 1 : 0.55;
           for (const azz of [az, az + 180]) {
             const pts = [];
             for (let i = 0; i <= ARC_SAMPLES; i++) pts.push(toScreen(horizontalToVector(azz, (90 * i) / ARC_SAMPLES)));
