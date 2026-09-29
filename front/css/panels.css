@@ -219,16 +219,27 @@
    #bg-layer, a <canvas> instead of an <img>. Deep space black regardless
    of theme, same reasoning as .img-active. */
 #bg-layer.sky-active { background: #05070c; }
-#sky-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+#sky-canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; }
+#sky-canvas.dragging { cursor: grabbing; }
 #panel-layer, #docked-view { position: absolute; inset: 0; overflow: auto; }
 #docked-view { padding: var(--space-5); }
 #docked-view > * { max-width: 1180px; margin: 0 auto; }
 #panel-layer.hidden, #docked-view.hidden { display: none; }
-/* #panel-layer sits on top of #bg-image (js/app.js forwards its own empty-
-   space clicks to it, see that file), so the "clickable" cursor has to
-   live here too, or hovering the visible background through the gaps
-   between panels shows no hint at all that it's clickable. */
-#bg-layer.img-active ~ #panel-layer { cursor: zoom-in; }
+/* #panel-layer fills the whole canvas even where no panel actually sits,
+   so by default it would swallow every pointer event aimed at empty space
+   before it could reach #bg-layer's own content underneath (the image
+   viewer's click, the sky dome's wheel-zoom/drag — see js/sky-engine.js) —
+   caught live, 2026-09-29: "le clic sur l'image de fond ne marche pas",
+   then the same root cause again for the sky dome. Fixed generically
+   rather than forwarding one event type at a time: the layer itself is
+   click-through, only actual panels opt back into being interactive.
+   pointer-events:none does mean #panel-layer's own wheel-scroll no longer
+   works when hovering genuinely empty space - not a real loss here, since
+   the established way to reach a panel stacked below the fold is already
+   its quicknav button (panels.js's togglePanel() calls scrollIntoView()),
+   not manually scrolling the layer. */
+#panel-layer { pointer-events: none; }
+.panel-float { pointer-events: auto; }
 
 /* ------------------------------------------------------- fullscreen image
  * viewer (js/imagelayer.js's openImageViewer()) — wheel zooms toward the
