@@ -111,6 +111,7 @@ function saveDisplaySettings(engine) {
       showTrueHorizon: engine.showTrueHorizon,
       showEquatorialGrid: engine.showEquatorialGrid,
       showAzimuthalGrid: engine.showAzimuthalGrid,
+      showMeridian: engine.showMeridian,
       dayMode: engine.dayMode,
       zoom: engine.zoom,
       projection: engine.projection,
@@ -149,6 +150,7 @@ function buildSettingsPanel(engine) {
   wrap.appendChild(checkboxRow(t("navigator.trueHorizon"), "showTrueHorizon"));
   wrap.appendChild(checkboxRow(t("navigator.equatorialGrid"), "showEquatorialGrid"));
   wrap.appendChild(checkboxRow(t("navigator.azimuthalGrid"), "showAzimuthalGrid"));
+  wrap.appendChild(checkboxRow(t("navigator.meridian"), "showMeridian"));
   wrap.appendChild(checkboxRow(t("navigator.dayMode"), "dayMode"));
 
   // Not a plain boolean engine field (it's the string "orthographic"/

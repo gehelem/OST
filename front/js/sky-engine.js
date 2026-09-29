@@ -356,6 +356,12 @@ export class SkyEngine {
     this.showTrueHorizon = false;
     this.showEquatorialGrid = false;
     this.showAzimuthalGrid = false;
+    // Independent of showAzimuthalGrid - Gilles, 2026-10-03: "je ne vois
+    // toujours pas le meridien, d'ailleurs son affichage n'est pas
+    // conditionne par un toggle dans les settings" - it used to only ever
+    // draw as part of the full azimuthal grid's own az=0 special case,
+    // with no way to show just it on its own.
+    this.showMeridian = false;
     this.dayMode = false;
     // "orthographic" (default) or "stereographic" - see sky-projection.js's
     // own vectorToScreen()/screenToVector() doc comment for the actual
@@ -768,25 +774,68 @@ export class SkyEngine {
       ctx.globalAlpha = 1;
     }
 
+    // Local meridian: its OWN toggle (Gilles, 2026-10-03, after it was
+    // only ever drawn as part of showAzimuthalGrid's own az=0 special
+    // case: "je ne vois toujours pas le meridien, d'ailleurs son
+    // affichage n'est pas conditionne par un toggle dans les settings" -
+    // there was no way to show just the meridian without the whole
+    // azimuthal grid). Always passes through the celestial pole (at
+    // altitude = observer latitude, any hemisphere - see
+    // equatorialToHorizontal's own precession-correct math, used here
+    // instead of the textbook alt=latitude shortcut). Bold, dedicated blue
+    // (Gilles, 2026-10-02: "affiche le en bleu gras"), not the plain
+    // azimuthal-grid colour/major-minor thickness, and split in two
+    // styles right at the pole (Gilles, 2026-09-30: "pointille du nord a
+    // la polaire, et continu de la polaire au sud") - dashed below the
+    // pole, solid from the pole through the zenith to the South point.
+    const ARC_SAMPLES = 48;
+    if (this.showMeridian) {
+      ctx.strokeStyle = fg.meridian;
+      ctx.lineWidth = 2.2;
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = fg.grad;
+      ctx.font = uiFont(11);
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      const ncpAlt = equatorialToHorizontal(0, 90, this.observer, date).altitude;
+      const splitAlt = Math.max(0, Math.min(90, ncpAlt));
+      const drawMeridianArc = (azz, altFrom, altTo, dashed) => {
+        if (altFrom === altTo) return;
+        ctx.setLineDash(dashed ? [4, 4] : []);
+        const pts = [];
+        for (let i = 0; i <= ARC_SAMPLES; i++) pts.push(toScreen(horizontalToVector(azz, altFrom + (altTo - altFrom) * (i / ARC_SAMPLES))));
+        strokePolyline(ctx, pts, w, h, labelMargin);
+      };
+      drawMeridianArc(0, 0, splitAlt, true);    // North point -> pole, dashed
+      drawMeridianArc(0, splitAlt, 90, false);  // pole -> zenith, solid
+      drawMeridianArc(180, 90, 0, false);       // zenith -> South point, solid
+      ctx.setLineDash([]);
+      // Every graduation gets its own value label (Gilles, 2026-10-02:
+      // "chaque graduation doit porter un libellé de valeur"), the
+      // meridian included - re-walk just its North-point-to-zenith half
+      // (cheap, ARC_SAMPLES points) purely to find its own anchor. Drops
+      // the last sample (alt=90, the zenith) the same way the regular
+      // az-line branch below does - see its own comment on why.
+      const northPts = [];
+      for (let i = 0; i <= ARC_SAMPLES; i++) northPts.push(toScreen(horizontalToVector(0, (90 * i) / ARC_SAMPLES)));
+      const northAnchor = pickOrderedLabelAnchor(northPts.slice(0, -1), w, h, labelMargin);
+      if (northAnchor) labelCandidates.push({ anchor: northAnchor, text: fmtDegLabel(0), major: true });
+    }
+
     // Azimuthal grid: vertical circles through the zenith (constant
     // azimuth) and circles parallel to the horizon (constant altitude),
     // native to the observer's own horizontal frame. Each azimuth value
     // and its antipode (az/az+180) together trace one full great circle
     // through the zenith - same as two opposite lines of longitude through
     // both poles - so only half the compass (0-180) needs enumerating.
-    // az=0 is the local meridian itself: always passes through the
-    // celestial pole (at altitude = observer latitude, any hemisphere -
-    // see equatorialToHorizontal's own precession-correct math, used here
-    // instead of the textbook alt=latitude shortcut) and keeps its own
-    // special styling (Gilles, 2026-09-30: "pointille du nord a la
-    // polaire, et continu de la polaire au sud") - dashed below the pole,
-    // solid from the pole through the zenith to the South point, no matter
-    // whether az=0 happens to land on a "major" line at the current zoom.
-    // Every other azimuth/altitude line is a plain arc, styled only by
-    // major/minor. Altitude lines skip 0 (that's showTrueHorizon's own
-    // line, with its own ground-mask semantics, not duplicated here), and
-    // neither system draws below the horizon (alt<0) - a "look at the sky"
-    // grid, not a full free-floating sphere one.
+    // az=0 is the local meridian itself, handled above by its own toggle
+    // regardless of whether the rest of this grid is even on - skipped
+    // here so it's never drawn twice when both are. Every other azimuth/
+    // altitude line is a plain arc, styled only by major/minor. Altitude
+    // lines skip 0 (that's showTrueHorizon's own line, with its own
+    // ground-mask semantics, not duplicated here), and neither system
+    // draws below the horizon (alt<0) - a "look at the sky" grid, not a
+    // full free-floating sphere one.
     if (this.showAzimuthalGrid) {
       const azMinor = pickGradStepDeg(360, this.zoom), azMajor = pickMajorStepDeg(azMinor);
       const altMinor = pickGradStepDeg(90, this.zoom), altMajor = pickMajorStepDeg(altMinor);
@@ -794,64 +843,30 @@ export class SkyEngine {
       ctx.font = uiFont(11);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      const ARC_SAMPLES = 48;
 
       for (let az = 0; az < 180; az += azMinor) {
+        if (az === 0) continue; // the meridian - see its own toggle/block above
         const major = isMajorLine(az, azMajor);
-        if (az === 0) {
-          // Bold, dedicated blue, not the plain azimuthal-grid colour/
-          // major-minor thickness - Gilles, 2026-10-02: "le repere
-          // meridien n'est pas visible sous les grilles, et affiche le en
-          // bleu gras plutot" - it used to blend into the rest of the grid
-          // once showAzimuthalGrid was also on, easy to lose track of.
-          ctx.strokeStyle = fg.meridian;
-          ctx.lineWidth = 2.2;
-          ctx.globalAlpha = 1;
-          const ncpAlt = equatorialToHorizontal(0, 90, this.observer, date).altitude;
-          const splitAlt = Math.max(0, Math.min(90, ncpAlt));
-          const drawMeridianArc = (azz, altFrom, altTo, dashed) => {
-            if (altFrom === altTo) return;
-            ctx.setLineDash(dashed ? [4, 4] : []);
-            const pts = [];
-            for (let i = 0; i <= ARC_SAMPLES; i++) pts.push(toScreen(horizontalToVector(azz, altFrom + (altTo - altFrom) * (i / ARC_SAMPLES))));
-            strokePolyline(ctx, pts, w, h, labelMargin);
-          };
-          drawMeridianArc(0, 0, splitAlt, true);    // North point -> pole, dashed
-          drawMeridianArc(0, splitAlt, 90, false);  // pole -> zenith, solid
-          drawMeridianArc(180, 90, 0, false);       // zenith -> South point, solid
-          ctx.setLineDash([]);
-          // Every graduation gets its own value label (Gilles, 2026-10-02:
-          // "chaque graduation doit porter un libellé de valeur"), the
-          // meridian included - re-walk just its North-point-to-zenith
-          // half (cheap, ARC_SAMPLES points) purely to find its own anchor.
-          // Drops the last sample (alt=90, the zenith) the same way the
-          // regular az-line branch below does - see its own comment on why.
-          const northPts = [];
-          for (let i = 0; i <= ARC_SAMPLES; i++) northPts.push(toScreen(horizontalToVector(0, (90 * i) / ARC_SAMPLES)));
-          const northAnchor = pickOrderedLabelAnchor(northPts.slice(0, -1), w, h, labelMargin);
-          if (northAnchor) labelCandidates.push({ anchor: northAnchor, text: fmtDegLabel(0), major: true });
-        } else {
-          ctx.strokeStyle = fg.azimuthal;
-          ctx.lineWidth = major ? 1.3 : 0.5;
-          ctx.globalAlpha = major ? 1 : 0.55;
-          for (const azz of [az, az + 180]) {
-            const pts = [];
-            for (let i = 0; i <= ARC_SAMPLES; i++) pts.push(toScreen(horizontalToVector(azz, (90 * i) / ARC_SAMPLES)));
-            strokePolyline(ctx, pts, w, h, labelMargin);
-            // Anchor picked from pts[0..-2], not strokePolyline()'s own
-            // full-array anchor - pts's last sample is alt=90, the zenith,
-            // a single point shared by every azimuth line (every vertical
-            // circle passes through it). Left in, "bottom-most on-canvas"
-            // could pick that shared point for several different azimuths
-            // at once whenever it happens to be their own extremal one
-            // (typically the "northern" ones, where the zenith's y is
-            // larger than the arc's own near-horizon end) - caught by
-            // dumping the actual drawn label positions, which showed many
-            // different azimuths' labels landing on the exact same point
-            // (Gilles, 2026-10-02: "regroupent en haut, horizontal").
-            const anchor = pickOrderedLabelAnchor(pts.slice(0, -1), w, h, labelMargin);
-            if (anchor) labelCandidates.push({ anchor, text: fmtDegLabel(azz), major });
-          }
+        ctx.strokeStyle = fg.azimuthal;
+        ctx.lineWidth = major ? 1.3 : 0.5;
+        ctx.globalAlpha = major ? 1 : 0.55;
+        for (const azz of [az, az + 180]) {
+          const pts = [];
+          for (let i = 0; i <= ARC_SAMPLES; i++) pts.push(toScreen(horizontalToVector(azz, (90 * i) / ARC_SAMPLES)));
+          strokePolyline(ctx, pts, w, h, labelMargin);
+          // Anchor picked from pts[0..-2], not strokePolyline()'s own
+          // full-array anchor - pts's last sample is alt=90, the zenith,
+          // a single point shared by every azimuth line (every vertical
+          // circle passes through it). Left in, "bottom-most on-canvas"
+          // could pick that shared point for several different azimuths
+          // at once whenever it happens to be their own extremal one
+          // (typically the "northern" ones, where the zenith's y is
+          // larger than the arc's own near-horizon end) - caught by
+          // dumping the actual drawn label positions, which showed many
+          // different azimuths' labels landing on the exact same point
+          // (Gilles, 2026-10-02: "regroupent en haut, horizontal").
+          const anchor = pickOrderedLabelAnchor(pts.slice(0, -1), w, h, labelMargin);
+          if (anchor) labelCandidates.push({ anchor, text: fmtDegLabel(azz), major });
         }
       }
       for (let alt = altMinor; alt < 90; alt += altMinor) {

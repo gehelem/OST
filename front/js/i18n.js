@@ -146,6 +146,7 @@ const STRINGS = {
   "navigator.trueHorizon": { en: "True horizon", fr: "Horizon réel", de: "Wahrer Horizont", it: "Orizzonte reale", es: "Horizonte real" },
   "navigator.equatorialGrid": { en: "Equatorial grid", fr: "Grille équatoriale", de: "Äquatorialgitter", it: "Griglia equatoriale", es: "Cuadrícula ecuatorial" },
   "navigator.azimuthalGrid": { en: "Azimuthal grid", fr: "Grille azimutale", de: "Azimutalgitter", it: "Griglia azimutale", es: "Cuadrícula azimutal" },
+  "navigator.meridian": { en: "Meridian", fr: "Méridien", de: "Meridian", it: "Meridiano", es: "Meridiano" },
   "navigator.dayMode": { en: "Day mode", fr: "Mode jour", de: "Tagmodus", it: "Modalità giorno", es: "Modo día" },
   "navigator.stereographic": { en: "Stereographic projection", fr: "Projection stéréographique", de: "Stereografische Projektion", it: "Proiezione stereografica", es: "Proyección estereográfica" },
   "navigator.zoom": { en: "Zoom", fr: "Zoom", de: "Zoom", it: "Zoom", es: "Zoom" },
