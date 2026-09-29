@@ -215,6 +215,11 @@
 #bg-layer { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
 #bg-layer.img-active { background: #05070c; }
 #bg-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; opacity: 0.92; cursor: zoom-in; }
+/* Sky-dome view (templates/navigator.js, js/sky-engine.js) — same shared
+   #bg-layer, a <canvas> instead of an <img>. Deep space black regardless
+   of theme, same reasoning as .img-active. */
+#bg-layer.sky-active { background: #05070c; }
+#sky-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 #panel-layer, #docked-view { position: absolute; inset: 0; overflow: auto; }
 #docked-view { padding: var(--space-5); }
 #docked-view > * { max-width: 1180px; margin: 0 auto; }
