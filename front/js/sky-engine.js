@@ -129,6 +129,28 @@ function pickLabelAnchor(points, w, h, margin) {
   if (!near) return null;
   return { x: Math.min(Math.max(near.x, lo), hiX), y: Math.min(Math.max(near.y, lo), hiY) };
 }
+// A "bottom-most on-canvas" anchor (pickLabelAnchor() above) breaks down
+// for a family of lines that all converge on one shared point at ONE end
+// (e.g. every azimuth line meets every other one at the zenith): dropping
+// just that exact shared sample (as every azimuth-line call site here
+// does) isn't enough, since the very next sample in from it is still
+// close enough that several different lines' "bottom-most" pick still
+// lands in essentially the same spot on screen, near that shared point,
+// rather than spread out (Gilles, 2026-10-02: "regroupent en haut,
+// horizontal" - trimming only the exact duplicate wasn't the real fix).
+// This instead walks `points` in the order given and returns the first
+// one that's actually on-canvas - so passing them ordered away from the
+// shared end (e.g. an azimuth line's own horizon-to-zenith sweep, in that
+// order) anchors the label at each line's own distinguishing end instead.
+// Falls back to pickLabelAnchor()'s nearest-point rule if nothing in
+// `points` was on-canvas at all.
+function pickOrderedLabelAnchor(points, w, h, margin) {
+  const lo = margin, hiX = w - margin, hiY = h - margin;
+  for (const p of points) {
+    if (p.visible && p.x >= lo && p.x <= hiX && p.y >= lo && p.y <= hiY) return p;
+  }
+  return pickLabelAnchor(points, w, h, margin);
+}
 // Strokes a polyline given as an array of already-projected {x,y,visible}
 // points, breaking across any gap where the line leaves the currently
 // visible (front) hemisphere and picking back up wherever it re-enters -
@@ -168,8 +190,20 @@ function fmtRaHoursLabel(raDeg) {
   const mm = Math.round((h - hh) * 60);
   return mm === 0 ? `${hh}h` : `${hh}h${String(mm).padStart(2, "0")}`;
 }
+// Azimuth graduation label - wraps to [0,360), the correct convention for
+// azimuth (and the only place this file used to wrap-to-positive Dec/Alt
+// values too, which broke them - see fmtSignedDegLabel() below).
 function fmtDegLabel(deg) {
   return `${Math.round(((deg % 360) + 360) % 360)}°`;
+}
+// Declination/altitude graduation label - both are signed, -90° to +90°,
+// never wrapping (Gilles, 2026-10-02: "probleme sur l'affichage des
+// declinaisons (en equatorial) et des altitude (en altaz) ... rien a voir
+// avec les axes qu'ils sont censes graduer" - fmtDegLabel()'s own [0,360)
+// wrap wasn't just visually off for these, it silently turned e.g. dec=-30
+// into "330°", not a smaller mislabelling but a different, wrong value).
+function fmtSignedDegLabel(deg) {
+  return `${Math.round(deg)}°`;
 }
 // Multiples of `step` within [min, max], aligned through zero rather than
 // from `min` itself - e.g. rangeSteps(-90, 90, 60) is [-60, 0, 60], not
@@ -298,6 +332,20 @@ export class SkyEngine {
     // mode clair le fond reste noir ... il faut aussi inverser les
     // couleurs (etoiles noires par exemple)").
     this.lightUI = !!opts.lightUI;
+    // The app's own global "UI size" scale (Gilles, 2026-10-02: "il
+    // faudrait que les libelles ... tiennent compte du niveau d'affichage
+    // Tt" - "Tt" being that "UI size" slider, app.js's own applyZoom(),
+    // 0.7x-1.6x). Independent of `zoom` above (this engine's own sky-dome
+    // zoom): body.style.zoom already makes the whole canvas element (and
+    // so domeRadius, and everything drawn relative to it) bigger/smaller
+    // for free via resize()'s own getBoundingClientRect() call, but a
+    // label's own font size/offsets are absolute device-pixel constants
+    // that don't automatically follow that - see uiFont()/labelOffsetPx
+    // below, the same way `dpr` already has to be applied explicitly.
+    // Kept in sync by the caller the same way lightUI is (watches
+    // <html>'s own style attribute for app.js's --ui-zoom custom property
+    // changing, alongside its existing data-theme watch).
+    this.uiZoom = opts.uiZoom || 1;
     this.onNeedsRender = opts.onNeedsRender || null; // called after wheel-zoom/drag changes, so the caller can re-render immediately instead of waiting for its own timer
     this.onSelect = opts.onSelect || null; // called on a tap/click that isn't a drag - see _handlePointerUp()
     this.onZoomChange = opts.onZoomChange || null; // called after wheel-zoom specifically (not pan/drag) - e.g. to persist it, see templates/navigator.js
@@ -510,15 +558,21 @@ export class SkyEngine {
     // turned out to be exactly this - not a missing-label bug but an
     // illegible-label one). uiFont() keeps every label's actual on-screen
     // (CSS-pixel) size constant regardless of DPI, the same way
-    // `_domeRadius` above already does for geometry.
-    const uiFont = (px) => `${px * dpr}px sans-serif`;
-    const labelOffsetPx = 6 * dpr;
+    // `_domeRadius` above already does for geometry. Also folds in
+    // `uiZoom` (the app's own global "UI size", see this.uiZoom's own doc
+    // comment) - every other piece of on-screen text in this app (panels,
+    // buttons...) already grows/shrinks with it via body.style.zoom;
+    // canvas text needs the same factor applied explicitly since it isn't
+    // real DOM/CSS text.
+    const labelScale = dpr * this.uiZoom;
+    const uiFont = (px) => `${px * labelScale}px sans-serif`;
+    const labelOffsetPx = 6 * labelScale;
     // Keeps a clamped label anchor (pickLabelAnchor()'s fallback path) far
     // enough from the canvas edge that the actual text - drawn offset
     // *above* the anchor, and centred, so it extends further still to
     // either side - never gets clipped off despite the anchor itself being
     // technically inside the rectangle.
-    const labelMargin = labelOffsetPx + 24 * dpr;
+    const labelMargin = labelOffsetPx + 24 * labelScale;
 
     const toScreen = (v) => {
       const rv = rotateVector(this.rotation, v);
@@ -633,7 +687,17 @@ export class SkyEngine {
         ctx.globalAlpha = major ? 1 : 0.55;
         const pts = [];
         for (let i = 0; i <= LINE_SAMPLES; i++) pts.push(project(ra, -90 + (180 * i) / LINE_SAMPLES));
-        const anchor = strokePolyline(ctx, pts, w, h, labelMargin);
+        strokePolyline(ctx, pts, w, h, labelMargin);
+        // Anchor picked from pts[1..-1] specifically, not strokePolyline()'s
+        // own full-array anchor - pts[0]/pts[-1] are the celestial poles
+        // (dec=-90/+90), a single point shared by every RA line. Left in,
+        // "bottom-most on-canvas" could pick that same shared point for
+        // several different RA lines whenever it happens to be their own
+        // extremal one, bunching their labels together there instead of
+        // along each line's own path (Gilles, 2026-10-02: "regroupent en
+        // haut" - the analogous azimuth/zenith case below, but the same
+        // failure mode applies here too).
+        const anchor = pickLabelAnchor(pts.slice(1, -1), w, h, labelMargin);
         if (anchor) drawCornerLabel(ctx, anchor, fmtRaHoursLabel(ra), labelOffsetPx);
       }
       for (const dec of rangeSteps(-90, 90, decMinor)) {
@@ -644,7 +708,7 @@ export class SkyEngine {
         const pts = [];
         for (let i = 0; i <= LINE_SAMPLES; i++) pts.push(project((360 * i) / LINE_SAMPLES, dec));
         const anchor = strokePolyline(ctx, pts, w, h, labelMargin);
-        if (anchor) drawCornerLabel(ctx, anchor, fmtDegLabel(dec), labelOffsetPx);
+        if (anchor) drawCornerLabel(ctx, anchor, fmtSignedDegLabel(dec), labelOffsetPx);
       }
       ctx.globalAlpha = 1;
     }
@@ -699,17 +763,30 @@ export class SkyEngine {
           // Every graduation gets its own value label (Gilles, 2026-10-02:
           // "chaque graduation doit porter un libellé de valeur"), the
           // meridian included - re-walk just its North-point-to-zenith
-          // half (cheap, ARC_SAMPLES points) purely to find its own anchor
-          // via the same rule as every other line (pickLabelAnchor()).
+          // half (cheap, ARC_SAMPLES points) purely to find its own anchor.
+          // Drops the last sample (alt=90, the zenith) the same way the
+          // regular az-line branch below does - see its own comment on why.
           const northPts = [];
           for (let i = 0; i <= ARC_SAMPLES; i++) northPts.push(toScreen(horizontalToVector(0, (90 * i) / ARC_SAMPLES)));
-          const northAnchor = pickLabelAnchor(northPts, w, h, labelMargin);
+          const northAnchor = pickOrderedLabelAnchor(northPts.slice(0, -1), w, h, labelMargin);
           if (northAnchor) drawCornerLabel(ctx, northAnchor, fmtDegLabel(0), labelOffsetPx);
         } else {
           for (const azz of [az, az + 180]) {
             const pts = [];
             for (let i = 0; i <= ARC_SAMPLES; i++) pts.push(toScreen(horizontalToVector(azz, (90 * i) / ARC_SAMPLES)));
-            const anchor = strokePolyline(ctx, pts, w, h, labelMargin);
+            strokePolyline(ctx, pts, w, h, labelMargin);
+            // Anchor picked from pts[0..-2], not strokePolyline()'s own
+            // full-array anchor - pts's last sample is alt=90, the zenith,
+            // a single point shared by every azimuth line (every vertical
+            // circle passes through it). Left in, "bottom-most on-canvas"
+            // could pick that shared point for several different azimuths
+            // at once whenever it happens to be their own extremal one
+            // (typically the "northern" ones, where the zenith's y is
+            // larger than the arc's own near-horizon end) - caught by
+            // dumping the actual drawn label positions, which showed many
+            // different azimuths' labels landing on the exact same point
+            // (Gilles, 2026-10-02: "regroupent en haut, horizontal").
+            const anchor = pickOrderedLabelAnchor(pts.slice(0, -1), w, h, labelMargin);
             if (anchor) drawCornerLabel(ctx, anchor, fmtDegLabel(azz), labelOffsetPx);
           }
         }
@@ -723,7 +800,7 @@ export class SkyEngine {
         const CIRCLE_SAMPLES = 96;
         for (let i = 0; i <= CIRCLE_SAMPLES; i++) pts.push(toScreen(horizontalToVector((360 * i) / CIRCLE_SAMPLES, alt)));
         const anchor = strokePolyline(ctx, pts, w, h, labelMargin);
-        if (anchor) drawCornerLabel(ctx, anchor, fmtDegLabel(alt), labelOffsetPx);
+        if (anchor) drawCornerLabel(ctx, anchor, fmtSignedDegLabel(alt), labelOffsetPx);
       }
       ctx.globalAlpha = 1;
     }
@@ -785,6 +862,7 @@ export class SkyEngine {
     // Sun/Moon/planets - live position for `date`, not from any static file
     // (a fixed file would drift the instant the displayed time isn't "now").
     ctx.textAlign = "left";
+    ctx.font = uiFont(10);
     for (const p of PLANETS) {
       const equ = Equator(p.body, date, this.observer, true, true);
       const h = Horizon(date, this.observer, equ.ra, equ.dec, "normal");
@@ -794,7 +872,7 @@ export class SkyEngine {
       ctx.beginPath();
       ctx.arc(scr.x, scr.y, p.radius, 0, 2 * Math.PI);
       ctx.fill();
-      ctx.fillText(p.label, scr.x + p.radius + 3, scr.y);
+      ctx.fillText(p.label, scr.x + p.radius + 3 * labelScale, scr.y);
     }
 
     if (groundClipActive) ctx.restore(); // matches the ctx.save() in the ground-mask block above

@@ -168,6 +168,19 @@ function buildSettingsPanel(engine) {
 // sequencer's own image background - looked up directly here (unlike
 // imagelayer.js's setBgLayer() indirection) since this is the only
 // consumer and there's no boot-time ordering to get right either way.
+
+// app.js's own applyZoom() publishes the "UI size" slider's current value
+// as a real CSS custom property (needed there so #zoom-widget can counter
+// it - see that file's own comment) - reused here as the one clean way to
+// read it without a direct import/coupling to app.js's own module-local
+// state. Gilles, 2026-10-02: "il faudrait que les libelles ... tiennent
+// compte du niveau d'affichage Tt" (that same "UI size" slider) - see
+// sky-engine.js's own `uiZoom` field for what it does with this value.
+function readUiZoom() {
+  const raw = parseFloat(document.documentElement.style.getPropertyValue("--ui-zoom"));
+  return raw > 0 ? raw : 1;
+}
+
 function buildSkyDome(client, moduleName, onSelect) {
   const bgLayer = document.getElementById("bg-layer");
   if (!bgLayer) return { dispose: () => {}, engine: null };
@@ -180,6 +193,7 @@ function buildSkyDome(client, moduleName, onSelect) {
     onNeedsRender: () => engine.render(),
     onSelect,
     lightUI: document.documentElement.getAttribute("data-theme") === "light",
+    uiZoom: readUiZoom(),
   });
   // Applied before the catalog/first render below, not in the settings
   // panel (built later, after this function returns) — so the very first
@@ -189,17 +203,24 @@ function buildSkyDome(client, moduleName, onSelect) {
   Object.assign(engine, loadDisplaySettings());
   engine.loadCatalog("light").then(() => engine.render()).catch((e) => console.error("[navigator] catalog load", e));
 
-  // lightUI tracks the app's own live theme toggle, not a saved preference
-  // of its own (unlike the fields loadDisplaySettings() restores above) —
-  // it would just drift out of sync with the real theme if it were. Gilles,
-  // 2026-09-30, having switched the app to light theme: "en mode clair le
-  // fond reste noir ... il faut aussi inverser les couleurs". The app sets
-  // <html data-theme> on toggle (see app.js) - watch it directly.
+  // lightUI/uiZoom track the app's own live theme/UI-size, not saved
+  // preferences of their own (unlike the fields loadDisplaySettings()
+  // restores above) — they'd just drift out of sync with the real
+  // setting otherwise. Gilles, 2026-09-30, having switched the app to
+  // light theme: "en mode clair le fond reste noir ... il faut aussi
+  // inverser les couleurs"; 2026-10-02, on the UI-size slider: "il
+  // faudrait que les libelles ... tiennent compte du niveau d'affichage
+  // Tt". The app sets <html data-theme> on toggle and publishes the UI
+  // size as <html>'s own --ui-zoom custom property (both in app.js) -
+  // watch both attributes directly (setProperty() touches the `style`
+  // attribute's own serialised value, which "style" in attributeFilter
+  // does catch).
   const themeObserver = new MutationObserver(() => {
     engine.lightUI = document.documentElement.getAttribute("data-theme") === "light";
+    engine.uiZoom = readUiZoom();
     engine.render();
   });
-  themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "style"] });
 
   const ro = new ResizeObserver(() => {
     const r = bgLayer.getBoundingClientRect();
